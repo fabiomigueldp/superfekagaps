@@ -16,6 +16,11 @@ export class Joaozao {
   private isGrounded: boolean = false;
   private hurtTimer: number = 0;
 
+  // Flag para garantir que o smash ocorra apenas uma vez por execução de ação
+  private hasSmashed: boolean = false;
+  // Impacto pendente para o jogo processar (câmera/partículas/som)
+  private pendingImpact: { x: number; y: number } | null = null
+
   constructor(spawnX: number, spawnY: number) {
     this.data = {
       position: { x: spawnX * TILE_SIZE, y: spawnY * TILE_SIZE - 40 },
@@ -136,6 +141,9 @@ export class Joaozao {
   }
 
   private executeAction(_deltaTime: number, level: Level, playerX: number): void {
+    // Reset visual default
+    this.data.animationFrame = 0;
+
     switch (this.currentAction) {
       case 'idle':
         this.data.velocity.x *= 0.9;
@@ -165,12 +173,31 @@ export class Joaozao {
 
       case 'create_gap':
         this.data.velocity.x = 0;
-        // Cria gaps temporários
-        if (this.actionTimer < 1800 && this.actionTimer > 1600) {
-          const gapCol = Math.floor(playerX / TILE_SIZE);
-          for (let i = -1; i <= 1; i++) {
-            level.removeTileTemporarily(gapCol + i, 9, 3000);
+
+        // FASE 1: PREPARAÇÃO (windup)
+        if (this.actionTimer > 1500) {
+          this.data.animationFrame = 1; // Braços pra cima
+          this.hasSmashed = false;
+        }
+        // FASE 2: IMPACTO
+        else if (this.actionTimer > 1200) {
+          this.data.animationFrame = 2; // Smash!
+
+          // Executa o smash apenas uma vez
+          if (!this.hasSmashed) {
+            const gapCol = Math.floor(playerX / TILE_SIZE);
+            for (let i = -1; i <= 1; i++) {
+              level.removeTileTemporarily(gapCol + i, 9, 3000);
+            }
+
+            // Marca impacto para o jogo processar partículas/som/câmera
+            this.hasSmashed = true;
+            this.pendingImpact = { x: gapCol * TILE_SIZE + TILE_SIZE / 2, y: 9 * TILE_SIZE };
           }
+        }
+        // FASE 3: RECUPERAÇÃO
+        else {
+          this.data.animationFrame = 0;
         }
         break;
     }
@@ -207,6 +234,13 @@ export class Joaozao {
 
       return true;
     });
+  }
+
+  // Consumir impacto (retorna coordenadas do impacto e limpa o evento)
+  consumeImpact(): { x: number; y: number } | null {
+    const p = this.pendingImpact;
+    this.pendingImpact = null;
+    return p;
   }
 
   getRect(): Rect {

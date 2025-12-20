@@ -313,6 +313,15 @@ export class Game {
       );
       this.checkBossCollision();
 
+      // Processa smash do boss (se houver impacto pendente)
+      const impact = this.boss ? this.boss.consumeImpact() : null;
+      if (impact) {
+        this.camera.shakeTimer = GP_SHAKE_MS;
+        this.camera.shakeMagnitude = GP_SHAKE_MAG;
+        this.spawnParticles(impact.x, impact.y, '#FFFFFF', 15);
+        this.audio.playGroundPoundImpact();
+      }
+
       if (this.bossVoice && !this.boss.data.isDead && this.isBossVisible()) {
         this.bossVoice.onFirstSeen();
       }
@@ -422,7 +431,7 @@ export class Game {
     ctx.font = '12px monospace';
     ctx.textAlign = 'center';
     ctx.fillStyle = '#FFFFFF';
-    ctx.fillText('FekaLabs', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 10);
+    ctx.fillText('Torbware', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 10);
     ctx.font = '8px monospace';
     ctx.fillStyle = '#888888';
     ctx.fillText('presents', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 10);

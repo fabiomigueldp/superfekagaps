@@ -103,7 +103,7 @@ src/
 
 ## 📜 Licença
 
-MIT © FekaLabs 2024
+MIT © Torbware 2025
 
 ---
 

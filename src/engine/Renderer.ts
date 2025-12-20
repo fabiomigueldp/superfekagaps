@@ -421,7 +421,7 @@ export class Renderer {
       this.drawGroundPoundIconAt(ctx, Math.round(w / 2 - 120 * pixelScale), Math.round(122 * pixelScale), pixelScale);
 
       ctx.fillStyle = '#666666';
-      ctx.fillText('© 2024 FekaLabs', Math.round(w / 2), Math.round((GAME_HEIGHT - 10) * pixelScale));
+      ctx.fillText('© 2025 Torbware', Math.round(w / 2), Math.round((GAME_HEIGHT - 10) * pixelScale));
     }
 
     ctx.restore();
@@ -895,53 +895,78 @@ export class Renderer {
       ctx.translate(-x, -y);
     }
 
-    // Corpo grande (verde)
+    // Offsets de animação baseados no frame definido na lógica
+    let bodyY = y;
+    let armY = y + 14;
+    let armHeight = 12; // Altura normal do braço
+
+    // Frame 1: Preparação (Estica / Braços pro alto)
+    if (enemy.animationFrame === 1) {
+      bodyY = y - 2; // Corpo sobe um pouco (preparando pulo/impacto)
+      armY = y - 6;  // Braços vão pra cima
+      armHeight = 18; // Braços esticados
+    }
+    // Frame 2: Impacto (Agacha / Braços batem no chão)
+    else if (enemy.animationFrame === 2) {
+      bodyY = y + 2; // Corpo desce (achatado no impacto)
+      armY = y + 20; // Braços baixos
+      armHeight = 8;
+    }
+
+    // --- DESENHO DO CORPO (Usando bodyY) ---
     ctx.fillStyle = COLORS.JOAOZAO_SKIN;
-    ctx.fillRect(x + 4, y + 12, 24, 20);
+    ctx.fillRect(x + 4, bodyY + 12, 24, 20); // Corpo
 
-    // Camisa roxa
+    // Camisa
     ctx.fillStyle = COLORS.JOAOZAO_SHIRT;
-    ctx.fillRect(x + 6, y + 14, 20, 14);
+    ctx.fillRect(x + 6, bodyY + 14, 20, 14);
 
-    // Calças
+    // Calças (seguem o corpo levemente)
     ctx.fillStyle = COLORS.JOAOZAO_PANTS;
-    ctx.fillRect(x + 6, y + 28, 8, 10);
-    ctx.fillRect(x + 18, y + 28, 8, 10);
+    ctx.fillRect(x + 6, bodyY + 28, 8, 10);
+    ctx.fillRect(x + 18, bodyY + 28, 8, 10);
 
-    // Sapatos
+    // Sapatos (fixos no chão para ancorar o personagem)
     ctx.fillStyle = '#1a1a1a';
     ctx.fillRect(x + 4, y + 36, 10, 4);
     ctx.fillRect(x + 18, y + 36, 10, 4);
 
-    // Cabeça grande
+    // --- CABEÇA (Segue bodyY) ---
     ctx.fillStyle = COLORS.JOAOZAO_SKIN;
-    ctx.fillRect(x + 4, y, 24, 14);
+    ctx.fillRect(x + 4, bodyY, 24, 14);
 
-    // Cabelo verde escuro
+    // Cabelo
     ctx.fillStyle = COLORS.JOAOZAO_HAIR;
-    ctx.fillRect(x + 4, y, 24, 4);
-    ctx.fillRect(x + 4, y + 4, 4, 3);
-    ctx.fillRect(x + 24, y + 4, 4, 3);
+    ctx.fillRect(x + 4, bodyY, 24, 4);
+    ctx.fillRect(x + 4, bodyY + 4, 4, 3);
+    ctx.fillRect(x + 24, bodyY + 4, 4, 3);
 
-    // Olhos malignos
+    // Olhos
     ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(x + 8, y + 5, 6, 5);
-    ctx.fillRect(x + 18, y + 5, 6, 5);
+    ctx.fillRect(x + 8, bodyY + 5, 6, 5);
+    ctx.fillRect(x + 18, bodyY + 5, 6, 5);
 
+    // Pupilas (vermelhas se estiver em ação)
     ctx.fillStyle = '#FF0000';
-    ctx.fillRect(x + 10, y + 6, 3, 3);
-    ctx.fillRect(x + 20, y + 6, 3, 3);
+    ctx.fillRect(x + 10, bodyY + 6, 3, 3);
+    ctx.fillRect(x + 20, bodyY + 6, 3, 3);
 
-    // Sorriso malvado
+    // Boca
     ctx.fillStyle = '#000000';
-    ctx.fillRect(x + 10, y + 11, 12, 2);
-    ctx.fillRect(x + 8, y + 10, 2, 2);
-    ctx.fillRect(x + 22, y + 10, 2, 2);
+    if (enemy.animationFrame === 1) {
+      // Boca aberta gritando na preparação
+      ctx.fillRect(x + 10, bodyY + 11, 12, 4);
+    } else {
+      // Sorriso malvado normal
+      ctx.fillRect(x + 10, bodyY + 11, 12, 2);
+      ctx.fillRect(x + 8, bodyY + 10, 2, 2);
+      ctx.fillRect(x + 22, bodyY + 10, 2, 2);
+    }
 
-    // Braços
+    // --- BRAÇOS (Usando armY e armHeight) ---
     ctx.fillStyle = COLORS.JOAOZAO_SKIN;
-    ctx.fillRect(x, y + 14, 6, 12);
-    ctx.fillRect(x + 26, y + 14, 6, 12);
+    ctx.fillRect(x, armY, 6, armHeight);      // Braço esquerdo
+    ctx.fillRect(x + 26, armY, 6, armHeight); // Braço direito
 
     ctx.restore();
     ctx.globalAlpha = 1;
@@ -1496,7 +1521,7 @@ export class Renderer {
 
     // Créditos
     ctx.fillStyle = '#666666';
-    ctx.fillText('© 2024 FekaLabs', GAME_WIDTH / 2, GAME_HEIGHT - 10);
+    ctx.fillText('© 2025 Torbware', GAME_WIDTH / 2, GAME_HEIGHT - 10);
   }
 
   drawPauseOverlay(): void {
