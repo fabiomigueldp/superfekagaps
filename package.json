@@ -1,0 +1,18 @@
+{
+  "name": "super-feka-gaps",
+  "version": "1.0.0",
+  "description": "Um jogo 2D side-scroller platformer 8-bit inspirado em clássicos, 100% gerado por código",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "vite": "^5.0.10"
+  },
+  "keywords": ["game", "platformer", "8-bit", "canvas", "typescript"],
+  "author": "FekaLabs",
+  "license": "MIT"
+}

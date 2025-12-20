@@ -1,0 +1,1795 @@
+// Sistema de Renderização - Super Feka Gaps
+
+import { GAME_WIDTH, GAME_HEIGHT, TILE_SIZE, COLORS, TileType } from '../constants';
+import { CameraData, PlayerData, EnemyData, CollectibleData, FlagData, Particle, EnemyType, CollectibleType, GroundPoundState } from '../types';
+
+
+// Pixel Art Constants (imported from user request)
+const C_PALETTE: any = {
+  _: null,        // Transparente
+  K: '#1a1a1a',   // Preto (Cabelo/Sapatos/Óculos)
+  S: '#b86f30',   // Pele (Skin)
+  B: '#0044cc',   // Azul Claro (Camisa)
+  D: '#002288',   // Azul Escuro (Calça)
+  G: '#555555',   // Cinza (Detalhe óculos)
+  W: '#ffffff',   // Branco (Cinto)
+  H: '#FFD700',   // Dourado (Capacete)
+  h: '#DAA520'    // Dourado Escuro (Sombra Capacete)
+};
+
+const FEKA_SPRITES = {
+  idle: [
+    "__KKKK__",
+    "_KKKKKK_",
+    "_KKSKSS_",
+    "_SKSKSG_",
+    "_SSSSSS_",
+    "_SBBBB__",
+    "BBBBBBBB",
+    "BBSBBSBB",
+    "BWWWWWB_",
+    "_DDDDD__",
+    "_DD_DD__",
+    "_DD_DD__",
+    "_KK_KK__"
+  ],
+  walk1: [
+    "__KKKK__",
+    "_KKKKKK_",
+    "_KKSKSS_",
+    "_SKSKSG_",
+    "_SSSSSS_",
+    "_SBBBB__",
+    "BBBBBBBB",
+    "BBSBBSBB",
+    "BWWWWWB_",
+    "_DDDDD__",
+    "_DD__D__",
+    "_KK__D__",
+    "_____KK_"
+  ],
+  walk2: [
+    "__KKKK__",
+    "_KKKKKK_",
+    "_KKSKSS_",
+    "_SKSKSG_",
+    "_SSSSSS_",
+    "_SBBBB__",
+    "BBBBBBBB",
+    "BBSBBSBB",
+    "BWWWWWB_",
+    "_DDDDD__",
+    "_D__DD__",
+    "_D__KK__",
+    "_KK_____"
+  ],
+  jump: [
+    "__KKKK__",
+    "_KKKKKK_",
+    "_KKSKSS_",
+    "_SKSKSG_",
+    "_SSSSSS_",
+    "__BBBB__",
+    "_BBBBBB_",
+    "BBSBBSBB",
+    "_WWWWW__",
+    "_DDDDD__",
+    "_D___D__",
+    "_KK_KK__",
+    "________"
+  ],
+  sit: [
+    "________",
+    "________",
+    "__KKKK__",
+    "_KKKKKK_",
+    "_KKSKSS_",
+    "_SKSKSG_",
+    "_SSSSSS_",
+    "__BBBB__",
+    "_BBBBBB_",
+    "BBDDDDBB",
+    "_KK__KK_"
+  ],
+  helmet: [
+    "___hh___",
+    "__HHHH__",
+    "_HWHHhh_",
+    "HHHHHHHH"
+  ]
+};
+
+export class Renderer {
+  private canvas: HTMLCanvasElement;
+  private ctx: CanvasRenderingContext2D;
+  private offscreenCanvas: HTMLCanvasElement;
+  private offscreenCtx: CanvasRenderingContext2D;
+  private scale: number = 1;
+  private dpr: number = 1;
+  private debug: boolean = false;
+  private lastUIType: 'HUD' | 'TITLE' | null = null;
+  private lastUIParams: any = null;
+  private yasminImg: HTMLImageElement | null = null;
+
+  constructor() {
+    this.canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
+    this.ctx = this.canvas.getContext('2d')!;
+
+    // Canvas offscreen para renderização em resolução lógica
+    this.offscreenCanvas = document.createElement('canvas');
+    this.offscreenCanvas.width = GAME_WIDTH;
+    this.offscreenCanvas.height = GAME_HEIGHT;
+    this.offscreenCtx = this.offscreenCanvas.getContext('2d')!;
+
+    // Desabilita anti-aliasing para pixel-art
+    this.offscreenCtx.imageSmoothingEnabled = false;
+    this.ctx.imageSmoothingEnabled = false;
+
+    // Carrega imagem da Yasmin para a tela final
+    const img = new Image();
+    img.onload = () => { this.yasminImg = img; };
+    img.src = '/assets/sprites/yasmin.png';
+
+    // Debug: habilita overlay via hash #debug ou variavel global __DEBUG_RENDERER
+    try {
+      this.debug = location.hash.includes('debug') || (window as any).__DEBUG_RENDERER === true;
+    } catch (e) {
+      this.debug = false;
+    }
+
+    // Expõe o renderer para inspeção no console: (window as any).renderer
+    (window as any).renderer = this;
+
+    this.resize();
+    window.addEventListener('resize', () => this.resize());
+  }
+
+  // Helper: retorna camera arredondada para evitar sub-pixel blur na renderização
+  private snapCamera(camera: CameraData): { x: number; y: number } {
+    return { x: Math.round(camera.x), y: Math.round(camera.y) };
+  }
+
+  private resize(): void {
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    // Calcula escala mantendo aspect ratio
+    const scaleX = Math.floor(windowWidth / GAME_WIDTH);
+    const scaleY = Math.floor(windowHeight / GAME_HEIGHT);
+    let chosenScale = Math.max(1, Math.min(scaleX, scaleY));
+
+    const dpr = window.devicePixelRatio || 1;
+    let chosenDpr = dpr;
+    let foundIntegerScale = false;
+
+    for (let s = chosenScale; s >= 1; s--) {
+      const scaled = s * dpr;
+      if (Math.abs(scaled - Math.round(scaled)) < 0.01) {
+        chosenScale = s;
+        foundIntegerScale = true;
+        break;
+      }
+    }
+
+    if (!foundIntegerScale) {
+      chosenDpr = Math.max(1, Math.round(dpr));
+    }
+
+    this.scale = chosenScale;
+    this.dpr = chosenDpr;
+
+    // CSS size (mantem dimensao inteira para pixel-perfect)
+    this.canvas.style.width = `${GAME_WIDTH * this.scale}px`;
+    this.canvas.style.height = `${GAME_HEIGHT * this.scale}px`;
+
+    // Buffer real para suportar HiDPI
+    this.canvas.width = Math.round(GAME_WIDTH * this.scale * chosenDpr);
+    this.canvas.height = Math.round(GAME_HEIGHT * this.scale * chosenDpr);
+
+    // Mantém imageSmoothing desabilitado
+    this.ctx.imageSmoothingEnabled = false;
+
+    if (this.debug) {
+      console.log(`[Renderer] win:${windowWidth}x${windowHeight} dpr:${dpr} chosenScale:${chosenScale} chosenDpr:${chosenDpr} css:${this.canvas.style.width}x${this.canvas.style.height} canvas:${this.canvas.width}x${this.canvas.height}`);
+    }
+  }
+
+  clear(): void {
+    this.offscreenCtx.fillStyle = COLORS.SKY_LIGHT;
+    this.offscreenCtx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+  }
+
+  // Aplica a renderização offscreen ao canvas principal
+  present(): void {
+    // Desenha o offscreen (resolução lógica) para o buffer real (considerando DPR)
+    this.ctx.imageSmoothingEnabled = false;
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    // Overlay de debug (desenhado no offscreen antes de escalar)
+    if (this.debug) this.drawDebugInfo();
+
+    this.ctx.drawImage(
+      this.offscreenCanvas,
+      0, 0, GAME_WIDTH, GAME_HEIGHT,
+      0, 0, this.canvas.width, this.canvas.height
+    );
+
+    // Desenha UI em alta resolução diretamente no canvas principal para evitar blur
+    if (this.lastUIType) {
+      this.drawUIOnScreen();
+    }
+  }
+
+  private drawDebugInfo(): void {
+    const ctx = this.offscreenCtx;
+    const info = [
+      `DPR:${window.devicePixelRatio}`,
+      `scale:${this.scale}`,
+      `css:${this.canvas.style.width}x${this.canvas.style.height}`,
+      `canvas(px):${this.canvas.width}x${this.canvas.height}`,
+      `offscreen:${this.offscreenCanvas.width}x${this.offscreenCanvas.height}`
+    ];
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(4, 4, 140, info.length * 9 + 6);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '7px monospace';
+    ctx.textAlign = 'left';
+    for (let i = 0; i < info.length; i++) {
+      ctx.fillText(info[i], 8, 12 + i * 9);
+    }
+    ctx.restore();
+  }
+
+  private drawUIOnScreen(): void {
+    const ctx = this.ctx;
+    const pixelScale = this.scale * this.dpr;
+    const w = Math.round(GAME_WIDTH * pixelScale);
+    const h = Math.round(GAME_HEIGHT * pixelScale);
+
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+
+    if (this.lastUIType === 'HUD' && this.lastUIParams) {
+      const p = this.lastUIParams;
+      // Background bar
+      const hudH = Math.max(1, Math.round(16 * pixelScale));
+      ctx.fillStyle = 'rgba(0,0,0,0.7)';
+      ctx.fillRect(0, 0, w, hudH);
+
+      // Text
+      const fontSize = Math.max(6, Math.round(8 * pixelScale));
+      ctx.font = `${fontSize}px monospace`;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'alphabetic';
+
+      // Score
+      ctx.fillStyle = COLORS.HUD_TEXT;
+      ctx.fillText(`SCORE:${p.score.toString().padStart(6, '0')}`, Math.round(4 * pixelScale), Math.round(11 * pixelScale));
+
+      // Lives
+      ctx.fillStyle = COLORS.FEKA_SHIRT;
+      for (let i = 0; i < p.lives; i++) {
+        ctx.fillRect(Math.round((100 + i * 10) * pixelScale), Math.round(4 * pixelScale), Math.max(1, Math.round(6 * pixelScale)), Math.max(1, Math.round(8 * pixelScale)));
+      }
+
+      // Helmet icon
+      if (p.hasHelmet) {
+        const x = Math.round(118 * pixelScale);
+        const y = Math.round(4 * pixelScale);
+        ctx.fillStyle = '#FFD700';
+        ctx.fillRect(x + Math.round(1 * pixelScale), y + Math.round(2 * pixelScale), Math.max(1, Math.round(10 * pixelScale)), Math.max(1, Math.round(2 * pixelScale)));
+        ctx.fillRect(x + Math.round(2 * pixelScale), y + Math.round(4 * pixelScale), Math.max(1, Math.round(8 * pixelScale)), Math.max(1, Math.round(3 * pixelScale)));
+        ctx.fillStyle = '#FFF8DC';
+        ctx.fillRect(x + Math.round(4 * pixelScale), y + Math.round(4 * pixelScale), Math.max(1, Math.round(2 * pixelScale)), Math.max(1, Math.round(1 * pixelScale)));
+      }
+
+      // Fanta icon (High Res)
+      if (p.coffeeTimer > 0) {
+        const x = Math.round(132 * pixelScale);
+        const y = Math.round(4 * pixelScale);
+        const w = Math.max(1, Math.round(6 * pixelScale));
+        const h = Math.max(1, Math.round(8 * pixelScale));
+
+        // Lata
+        ctx.fillStyle = '#FF8C00';
+        ctx.fillRect(x, y, w, h);
+
+        // Detalhe
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(x, y + Math.round(3 * pixelScale), w, Math.max(1, Math.round(2 * pixelScale)));
+
+        // Bar
+        const maxTime = 10000;
+        const pct = Math.max(0, Math.min(1, p.coffeeTimer / maxTime));
+        const barW = Math.round(10 * pixelScale * pct);
+        ctx.fillStyle = '#FFA500';
+        ctx.fillRect(x, y + h + Math.round(1 * pixelScale), barW, Math.max(1, Math.round(2 * pixelScale)));
+      }
+
+      // Time
+      ctx.fillStyle = p.time < 30 ? '#FF0000' : COLORS.HUD_TEXT;
+      ctx.fillText(`TIME:${Math.ceil(p.time).toString().padStart(3, '0')}`, Math.round(145 * pixelScale), Math.round(11 * pixelScale));
+
+      // Level
+      ctx.fillStyle = COLORS.HUD_ACCENT;
+      ctx.fillText(p.level, Math.round(210 * pixelScale), Math.round(11 * pixelScale));
+
+      // Sound icon (simplified)
+      const sx = Math.round((GAME_WIDTH - 14) * pixelScale);
+      const sy = Math.round(4 * pixelScale);
+      ctx.fillStyle = p.soundEnabled ? '#00FF00' : '#FF0000';
+      ctx.fillRect(sx, sy + Math.round(3 * pixelScale), Math.max(1, Math.round(3 * pixelScale)), Math.max(1, Math.round(6 * pixelScale)));
+      ctx.fillRect(sx + Math.round(3 * pixelScale), sy + Math.round(2 * pixelScale), Math.max(1, Math.round(2 * pixelScale)), Math.max(1, Math.round(8 * pixelScale)));
+      ctx.fillRect(sx + Math.round(5 * pixelScale), sy + Math.round(3 * pixelScale), Math.max(1, Math.round(2 * pixelScale)), Math.max(1, Math.round(6 * pixelScale)));
+
+    } else if (this.lastUIType === 'TITLE') {
+      // Full screen title / overlay drawn on main canvas for crisp text
+      ctx.save();
+      ctx.imageSmoothingEnabled = false;
+
+      // LEVEL CLEAR (high-res)
+      if (this.lastUIParams && this.lastUIParams.variant === 'LEVEL_CLEAR') {
+        const params = this.lastUIParams as any;
+        ctx.fillStyle = 'rgba(0, 50, 0, 0.9)';
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.textAlign = 'center';
+        ctx.font = `bold ${Math.max(12, Math.round(16 * pixelScale))}px monospace`;
+        ctx.fillStyle = '#00FF00';
+        ctx.fillText('FASE COMPLETA!', Math.round(w / 2), Math.round((GAME_HEIGHT / 2 - 30) * pixelScale));
+
+        ctx.font = `${Math.max(8, Math.round(10 * pixelScale))}px monospace`;
+        ctx.fillStyle = COLORS.MENU_TEXT;
+        ctx.fillText(params.level, Math.round(w / 2), Math.round((GAME_HEIGHT / 2 - 10) * pixelScale));
+        ctx.fillText(`Score: ${params.score}`, Math.round(w / 2), Math.round((GAME_HEIGHT / 2 + 10) * pixelScale));
+        ctx.fillText(`Bônus de tempo: +${params.timeBonus}`, Math.round(w / 2), Math.round((GAME_HEIGHT / 2 + 25) * pixelScale));
+
+        ctx.restore();
+        return;
+      }
+
+      // BOSS INTRO (high-res)
+      if (this.lastUIParams && this.lastUIParams.variant === 'BOSS_INTRO') {
+        const params = this.lastUIParams as any;
+        ctx.fillStyle = 'rgba(50, 0, 50, 0.9)';
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.font = `${Math.max(6, Math.round(8 * pixelScale))}px monospace`;
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#FF0000';
+        ctx.fillText('!! ALERTA DE BOSS !!', Math.round(w / 2), Math.round((GAME_HEIGHT / 2 - 30) * pixelScale));
+
+        ctx.font = `bold ${Math.max(12, Math.round(16 * pixelScale))}px monospace`;
+        ctx.fillStyle = COLORS.JOAOZAO_SKIN;
+        ctx.fillText(params.bossName, Math.round(w / 2), Math.round((GAME_HEIGHT / 2) * pixelScale));
+
+        ctx.font = `${Math.max(6, Math.round(8 * pixelScale))}px monospace`;
+        ctx.fillStyle = '#AAAAAA';
+        ctx.fillText('\"Você vai cair nos meus gaps!\"', Math.round(w / 2), Math.round((GAME_HEIGHT / 2 + 20) * pixelScale));
+
+        ctx.restore();
+        return;
+      }
+
+      // GAME OVER (high-res)
+      if (this.lastUIParams && this.lastUIParams.variant === 'GAME_OVER') {
+        const params = this.lastUIParams as any;
+        ctx.fillStyle = 'rgba(50, 0, 0, 0.9)';
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.font = `bold ${Math.max(20, Math.round(24 * pixelScale))}px monospace`;
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#FF0000';
+        ctx.fillText('GAME OVER', Math.round(w / 2), Math.round((GAME_HEIGHT / 2 - 20) * pixelScale));
+
+        ctx.font = `${Math.max(8, Math.round(10 * pixelScale))}px monospace`;
+        ctx.fillStyle = COLORS.MENU_TEXT;
+        ctx.fillText(`Score Final: ${params.score}`, Math.round(w / 2), Math.round((GAME_HEIGHT / 2 + 10) * pixelScale));
+
+        ctx.font = `${Math.max(6, Math.round(8 * pixelScale))}px monospace`;
+        ctx.fillStyle = '#AAAAAA';
+        ctx.fillText('Pressione ENTER para reiniciar', Math.round(w / 2), Math.round((GAME_HEIGHT / 2 + 35) * pixelScale));
+
+        ctx.restore();
+        return;
+      }
+
+      // ENDING (high-res)
+      if (this.lastUIParams && this.lastUIParams.variant === 'ENDING') {
+        ctx.fillStyle = '#FFB6C1';
+        const g = ctx.createLinearGradient(0, 0, 0, h);
+        g.addColorStop(0, '#FF69B4');
+        g.addColorStop(1, '#FFB6C1');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+
+        // Corações flutuantes (high-res)
+        ctx.save();
+        ctx.fillStyle = '#FF0000';
+        ctx.font = `${Math.max(10, Math.round(10 * pixelScale))}px monospace`;
+        ctx.textAlign = 'left';
+        for (let i = 0; i < 10; i++) {
+          const x = Math.round(((Date.now() / 50 + i * 40) % GAME_WIDTH) * pixelScale);
+          const y = Math.round((30 + Math.sin(Date.now() / 500 + i) * 10) * pixelScale);
+          ctx.fillText('♥', x, y);
+        }
+        ctx.restore();
+
+        // Texto principal (high-res)
+        ctx.font = `bold ${Math.max(12, Math.round(14 * pixelScale))}px monospace`;
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#8B0000';
+        ctx.fillText('Feka salvou Yasmin!', Math.round(w / 2), Math.round(40 * pixelScale));
+
+        ctx.font = `${Math.max(8, Math.round(10 * pixelScale))}px monospace`;
+        ctx.fillStyle = '#4A0000';
+        ctx.fillText('Joãozão foi derrotado!', Math.round(w / 2), Math.round(60 * pixelScale));
+
+        // Desenha o Feka (pixel art) em alta-res no canvas principal para que apareça acima do overlay
+        ((): void => {
+          const art = FEKA_SPRITES.idle;
+          const px = Math.round((GAME_WIDTH / 2 - 40) * pixelScale);
+          const py = Math.round((GAME_HEIGHT / 2 + 10) * pixelScale);
+          const ps = Math.max(1, Math.round(2 * pixelScale));
+
+          ctx.save();
+          ctx.imageSmoothingEnabled = false;
+          // desenhar pixel por pixel escalado
+          for (let row = 0; row < art.length; row++) {
+            for (let col = 0; col < art[row].length; col++) {
+              const ch = art[row][col];
+              const color = (C_PALETTE as any)[ch];
+              if (color) {
+                ctx.fillStyle = color;
+                ctx.fillRect(px + col * ps, py + row * ps, ps, ps);
+              }
+            }
+          }
+          ctx.restore();
+        })();
+
+        // Desenha a imagem da Yasmin diretamente no canvas principal (alta-res, sem blur)
+        if (this.yasminImg) {
+          const img = this.yasminImg;
+          const targetH = Math.round(60 * pixelScale);
+          const ratio = img.width / img.height;
+          const targetW = Math.round(targetH * ratio);
+          const imgX = Math.round(w / 2 + 10 * pixelScale);
+          const imgY = Math.round((GAME_HEIGHT / 2 - 20) * pixelScale);
+          ctx.drawImage(img, imgX, imgY, targetW, targetH);
+        }
+
+        ctx.fillStyle = '#FFD700';
+        ctx.fillText('FIM', Math.round(w / 2), Math.round((GAME_HEIGHT - 40) * pixelScale));
+
+        ctx.font = `${Math.max(6, Math.round(8 * pixelScale))}px monospace`;
+        ctx.fillStyle = '#8B0000';
+        ctx.fillText('Pressione ENTER para jogar novamente', Math.round(w / 2), Math.round((GAME_HEIGHT - 20) * pixelScale));
+
+        ctx.restore();
+        return;
+      }
+
+      // Fallback: original title screen
+      const gradient = ctx.createLinearGradient(0, 0, 0, h);
+      gradient.addColorStop(0, '#1a1a3e');
+      gradient.addColorStop(1, '#0a0a1e');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, w, h);
+
+      // Stars
+      ctx.fillStyle = '#FFFFFF';
+      const starSize = Math.max(1, Math.round(1 * pixelScale));
+      for (let i = 0; i < 30; i++) {
+        const x = Math.round(((i * 37) % GAME_WIDTH) * pixelScale);
+        const y = Math.round(((i * 23) % (GAME_HEIGHT - 50)) * pixelScale);
+        ctx.fillRect(x, y, starSize, starSize);
+      }
+
+      // Title
+      ctx.textAlign = 'center';
+      const titleFont = Math.max(12, Math.round(20 * pixelScale));
+      ctx.font = `bold ${titleFont}px monospace`;
+      ctx.fillStyle = COLORS.MENU_HIGHLIGHT;
+      ctx.fillText('SUPER FEKA GAPS', Math.round(w / 2), Math.round(50 * pixelScale));
+
+      // Subtitle / instructions
+      ctx.font = `${Math.max(6, Math.round(8 * pixelScale))}px monospace`;
+      ctx.fillStyle = COLORS.MENU_TEXT;
+      ctx.fillText('A aventura para salvar Yasmin!', Math.round(w / 2), Math.round(70 * pixelScale));
+
+      ctx.font = `${Math.max(8, Math.round(10 * pixelScale))}px monospace`;
+      ctx.fillStyle = '#AAAAAA';
+      ctx.fillText('Pressione ENTER para começar', Math.round(w / 2), Math.round(120 * pixelScale));
+
+      ctx.font = `${Math.max(6, Math.round(8 * pixelScale))}px monospace`;
+      ctx.fillStyle = '#888888';
+      ctx.fillText('← → : Mover   ESPAÇO : Pular   SHIFT : Correr', Math.round(w / 2), Math.round(145 * pixelScale));
+      ctx.fillText('ESC : Pause   M : Som', Math.round(w / 2), Math.round(157 * pixelScale));
+
+      // Ground pound instruction (moved up to avoid overlapping credits)
+      ctx.fillText('↓ : Sentada Violenta (no ar)', Math.round(w / 2), Math.round(132 * pixelScale));
+      this.drawGroundPoundIconAt(ctx, Math.round(w / 2 - 120 * pixelScale), Math.round(122 * pixelScale), pixelScale);
+
+      ctx.fillStyle = '#666666';
+      ctx.fillText('© 2024 FekaLabs', Math.round(w / 2), Math.round((GAME_HEIGHT - 10) * pixelScale));
+    }
+
+    ctx.restore();
+  }
+
+  getContext(): CanvasRenderingContext2D {
+    return this.offscreenCtx;
+  }
+
+  // === RENDERIZAÇÃO DO BACKGROUND ===
+
+  drawBackground(camera: CameraData): void {
+    const ctx = this.offscreenCtx;
+    const cam = this.snapCamera(camera);
+
+    // Gradiente de céu
+    const gradient = ctx.createLinearGradient(0, 0, 0, GAME_HEIGHT);
+    gradient.addColorStop(0, COLORS.SKY_LIGHT);
+    gradient.addColorStop(1, COLORS.SKY_DARK);
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+    // Nuvens simples (paralaxe)
+    ctx.fillStyle = '#FFFFFF';
+    const cloudOffset = cam.x * 0.3;
+    for (let i = 0; i < 5; i++) {
+      const x = ((i * 80 - cloudOffset) % (GAME_WIDTH + 60)) - 30;
+      const y = 20 + (i % 3) * 15;
+      this.drawCloud(x, y);
+    }
+  }
+
+  private drawCloud(x: number, y: number): void {
+    const ctx = this.offscreenCtx;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.beginPath();
+    ctx.arc(x, y, 8, 0, Math.PI * 2);
+    ctx.arc(x + 10, y - 3, 10, 0, Math.PI * 2);
+    ctx.arc(x + 22, y, 8, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // === RENDERIZAÇÃO DE TILES ===
+
+  drawTiles(tiles: number[][], camera: CameraData): void {
+    const cam = this.snapCamera(camera);
+
+    const startCol = Math.floor(cam.x / TILE_SIZE);
+    const endCol = Math.ceil((cam.x + GAME_WIDTH) / TILE_SIZE);
+    const startRow = Math.floor(cam.y / TILE_SIZE);
+    const endRow = Math.ceil((cam.y + GAME_HEIGHT) / TILE_SIZE);
+
+    for (let row = startRow; row <= endRow; row++) {
+      for (let col = startCol; col <= endCol; col++) {
+        if (row < 0 || row >= tiles.length || col < 0 || col >= tiles[0].length) continue;
+
+        const tile = tiles[row][col];
+        if (tile === TileType.EMPTY) continue;
+
+        const x = col * TILE_SIZE - cam.x;
+        const y = row * TILE_SIZE - cam.y;
+
+        this.drawTile(tile, x, y);
+      }
+    }
+  }
+
+  private drawTile(type: number, x: number, y: number): void {
+
+    switch (type) {
+      case TileType.GROUND:
+        this.drawGroundTile(x, y);
+        break;
+      case TileType.BRICK:
+        this.drawBrickTile(x, y);
+        break;
+      case TileType.BRICK_BREAKABLE:
+        this.drawBreakableBrick(x, y);
+        break;
+      case TileType.PLATFORM:
+        this.drawPlatformTile(x, y);
+        break;
+      case TileType.SPIKE:
+        this.drawSpikeTile(x, y);
+        break;
+      case TileType.POWERUP_BLOCK_COFFEE:
+      case TileType.POWERUP_BLOCK_HELMET:
+        this.drawPowerupBlock(x, y, type);
+        break;
+      case TileType.BLOCK_USED:
+        this.drawUsedBlock(x, y);
+        break;
+      case TileType.CHECKPOINT:
+        // Checkpoint renderizado separadamente
+        break;
+      case TileType.FLAG:
+        this.drawFlagTile(x, y);
+        break;
+    }
+  }
+
+  private drawGroundTile(x: number, y: number): void {
+    const ctx = this.offscreenCtx;
+
+    // Grama no topo
+    ctx.fillStyle = COLORS.GROUND_TOP;
+    ctx.fillRect(x, y, TILE_SIZE, 4);
+
+    // Terra
+    ctx.fillStyle = COLORS.GROUND_FILL;
+    ctx.fillRect(x, y + 4, TILE_SIZE, TILE_SIZE - 4);
+
+    // Detalhes de terra (pontinhos)
+    ctx.fillStyle = COLORS.GROUND_DARK;
+    ctx.fillRect(x + 2, y + 6, 2, 2);
+    ctx.fillRect(x + 10, y + 10, 2, 2);
+    ctx.fillRect(x + 6, y + 14, 2, 2);
+  }
+
+  private drawBrickTile(x: number, y: number): void {
+    const ctx = this.offscreenCtx;
+
+    // Fundo do tijolo
+    ctx.fillStyle = COLORS.BRICK_MAIN;
+    ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+
+    // Linhas de cimento (horizontais)
+    ctx.fillStyle = COLORS.BRICK_DARK;
+    ctx.fillRect(x, y + 7, TILE_SIZE, 2);
+
+    // Linhas verticais alternadas
+    ctx.fillRect(x + 7, y, 2, 7);
+    ctx.fillRect(x + 3, y + 9, 2, 7);
+    ctx.fillRect(x + 11, y + 9, 2, 7);
+
+    // Brilho
+    ctx.fillStyle = COLORS.BRICK_LIGHT;
+    ctx.fillRect(x + 1, y + 1, 5, 2);
+    ctx.fillRect(x + 9, y + 1, 5, 2);
+    ctx.fillRect(x + 1, y + 10, 3, 1);
+    ctx.fillRect(x + 6, y + 10, 3, 1);
+    ctx.fillRect(x + 11, y + 10, 3, 1);
+  }
+
+  private drawBreakableBrick(x: number, y: number): void {
+    // Visual similar ao tijolo, com racha
+    const ctx = this.offscreenCtx;
+    this.drawBrickTile(x, y);
+
+    ctx.strokeStyle = COLORS.BRICK_DARK;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x + 4, y + 4);
+    ctx.lineTo(x + 8, y + 8);
+    ctx.lineTo(x + 12, y + 5);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(x + 6, y + 10);
+    ctx.lineTo(x + 10, y + 6);
+    ctx.stroke();
+  }
+
+  private drawPowerupBlock(x: number, y: number, type: number): void {
+    const ctx = this.offscreenCtx;
+    ctx.fillStyle = COLORS.BRICK_MAIN;
+    ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+
+    // Desenha ponto de interrogação / ícone
+    ctx.fillStyle = '#FFD700';
+    ctx.fillRect(x + 4, y + 4, 8, 8);
+
+    ctx.fillStyle = '#000000';
+    ctx.font = '10px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(type === TileType.POWERUP_BLOCK_COFFEE ? 'F' : 'H', x + TILE_SIZE / 2, y + TILE_SIZE / 2 + 3);
+  }
+
+  private drawUsedBlock(x: number, y: number): void {
+    const ctx = this.offscreenCtx;
+    ctx.fillStyle = COLORS.BRICK_DARK;
+    ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+    ctx.fillStyle = '#555555';
+    ctx.fillRect(x + 4, y + 4, TILE_SIZE - 8, TILE_SIZE - 8);
+  }
+
+  private drawPlatformTile(x: number, y: number): void {
+    const ctx = this.offscreenCtx;
+
+    // Plataforma fina no topo
+    ctx.fillStyle = COLORS.BRICK_MAIN;
+    ctx.fillRect(x, y, TILE_SIZE, 6);
+
+    ctx.fillStyle = COLORS.BRICK_LIGHT;
+    ctx.fillRect(x, y, TILE_SIZE, 2);
+
+    ctx.fillStyle = COLORS.BRICK_DARK;
+    ctx.fillRect(x, y + 5, TILE_SIZE, 1);
+  }
+
+  private drawSpikeTile(x: number, y: number): void {
+    const ctx = this.offscreenCtx;
+
+    ctx.fillStyle = COLORS.SPIKE;
+
+    // Desenha 4 espinhos
+    for (let i = 0; i < 4; i++) {
+      const sx = x + i * 4;
+      ctx.beginPath();
+      ctx.moveTo(sx, y + TILE_SIZE);
+      ctx.lineTo(sx + 2, y + 4);
+      ctx.lineTo(sx + 4, y + TILE_SIZE);
+      ctx.fill();
+    }
+  }
+
+  private drawFlagTile(x: number, y: number): void {
+    const ctx = this.offscreenCtx;
+
+    // Ancorar o mastro na base do tile e usar altura fixa para evitar mastros desproporcionais
+    const mastBottom = y + TILE_SIZE - 2; // base ligeiramente acima da base do tile
+    const mastHeight = TILE_SIZE - 4; // altura do mastro (ex.: 12 px)
+    const mastTop = mastBottom - mastHeight;
+
+    // Mastro
+    ctx.fillStyle = '#8B4513';
+    ctx.fillRect(x + 7, mastTop, 2, mastHeight);
+
+    // Bandeira (posicionada perto do topo do mastro)
+    ctx.fillStyle = COLORS.CHECKPOINT_FLAG;
+    ctx.beginPath();
+    ctx.moveTo(x + 9, mastTop + 1);
+    ctx.lineTo(x + 16, mastTop + 4);
+    ctx.lineTo(x + 9, mastTop + 7);
+    ctx.fill();
+  }
+
+  // === RENDERIZAÇÃO DO PLAYER (FEKA) ===
+
+  drawPlayer(player: PlayerData, camera: CameraData): void {
+    const ctx = this.offscreenCtx;
+    const cam = this.snapCamera(camera);
+    let x = Math.round(player.position.x - cam.x);
+    let y = Math.round(player.position.y - cam.y);
+    const isDead = player.isDead;
+
+    if (isDead) {
+      const max = player.deathTimerMax || 1;
+      const t = Math.max(0, Math.min(1, player.deathTimer / max));
+      const rise = Math.round((1 - t) * 8);
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, t);
+      // Use jump sprite for death (falling/fly up) - white silhouette
+      ctx.save();
+      // Spirit fading effect using composition or simplified
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      this.drawPixelArt(ctx, FEKA_SPRITES.jump, x, y - rise, 2, player.facingRight);
+      ctx.restore();
+      ctx.restore();
+      return;
+    }
+
+    // Efeito de invencibilidade (pisca)
+    const isInvincibleVisible = player.invincibleTimer > 0 && Math.floor(player.invincibleTimer / 50) % 2 === 0;
+    if (isInvincibleVisible) {
+      ctx.save();
+      ctx.globalAlpha = 0.5;
+    }
+
+    // Efeito de Mini Fanta (Fizz & Trail)
+    if (player.coffeeTimer > 0) {
+      ctx.save();
+      const now = Date.now();
+
+      // Partículas rising (fizz) com rastro
+      // Mais partículas (8), ciclo mais longo para não acabar rápido
+      const particleCount = 8;
+
+      for (let i = 0; i < particleCount; i++) {
+        const offset = i * 987; // Random seed
+        const cycle = 1200 + (i * 300); // 1.2s a 2.5s (mais lentas/duradouras)
+        const t = (now + offset) % cycle / cycle; // 0.0 -> 1.0
+
+        // Fade in/out: entra rápido, sai suave
+        const alpha = t < 0.1 ? t * 10 : (t > 0.6 ? (1 - t) * 2.5 : 1);
+
+        // Simulação de rastro: desloca partículas "velhas" na direção oposta ao movimento
+        // Se t=1 (velha), desloca mais.
+        const trailX = (player.velocity.x || 0) * (t * 30); // ~30px de lag máximo
+
+        // Posição:
+        // X: Spread na largura do player - trail
+        const xSpread = ((offset % 100) / 100) * player.width;
+        const xPos = (x + xSpread) - trailX;
+
+        // Y: Sobe acima da cabeça (mais alto agora)
+        const yPos = (y + player.height) - (t * (player.height * 2.0));
+
+        // Cores vibrantes mas translúcidas
+        ctx.fillStyle = i % 2 === 0
+          ? `rgba(255, 180, 50, ${alpha * 0.7})`  // Laranja claro
+          : `rgba(255, 140, 0, ${alpha * 0.7})`;  // Laranja Fanta
+
+        // Pixel particles (variando levemente tamanho)
+        const size = (i % 3 === 0) ? 3 : 2;
+        ctx.fillRect(Math.round(xPos), Math.round(yPos), size, size);
+      }
+      ctx.restore();
+    }
+
+    // Determine Sprite State
+    let currentSprite = FEKA_SPRITES.idle;
+
+    // Check states in order of priority
+    if (player.groundPoundState !== GroundPoundState.NONE) {
+      // During ground pound (any phase), use sit sprite
+      currentSprite = FEKA_SPRITES.sit;
+    } else if (!player.isGrounded) {
+      currentSprite = FEKA_SPRITES.jump;
+    } else if (Math.abs(player.velocity.x) > 0.1) {
+      // Walking/Running
+      // Speed multiplier for animation
+      const animSpeed = Math.abs(player.velocity.x) > 3 ? 50 : 100;
+      const frame = Math.floor(player.animationTimer / animSpeed) % 2;
+      currentSprite = frame === 0 ? FEKA_SPRITES.walk1 : FEKA_SPRITES.walk2;
+    } else {
+      currentSprite = FEKA_SPRITES.idle;
+    }
+
+    // Draw the selected sprite
+    // Center logic: Sprite is roughly 8*2=16 wide. Player width=14.
+    // Center X: x + (player.width - spriteWidth)/2 = x - 1
+    // Align Bottom: Sprite height ~13*2 = 26. Player height=24.
+    // y + (player.height - spriteHeight) = y - 2
+
+    let yOffset = -2;
+    let xOffset = -1;
+    const pixelSize = 2; // Each char is 2x2 logical pixels (matches TILE_SIZE=16 for 8-char width)
+
+    if (currentSprite === FEKA_SPRITES.sit) {
+      yOffset += 2; // Sit sprite looks better slightly lower or adjusted
+    }
+
+    this.drawPixelArt(
+      ctx,
+      currentSprite,
+      x + xOffset,
+      y + yOffset,
+      pixelSize,
+      player.facingRight
+    );
+
+    if (player.hasHelmet && !player.isDead) {
+      // Draw pixel art helmet on top
+      // Shift up by 3 "pixels" (1 row extra for 4-row height) to sit nicely on head
+      this.drawPixelArt(
+        ctx,
+        (FEKA_SPRITES as any).helmet,
+        x + xOffset,
+        y + yOffset - 3,
+        pixelSize,
+        player.facingRight
+      );
+    }
+
+    if (isInvincibleVisible) {
+      ctx.restore();
+    }
+  }
+
+  private drawPixelArt(ctx: CanvasRenderingContext2D, artMatrix: string[], x: number, y: number, size: number, facingRight: boolean) {
+    ctx.save();
+
+    // Inverte o canvas horizontalmente se olhar para a esquerda
+    if (!facingRight) {
+      const width = 8 * size;
+      ctx.translate(x + width, y);
+      ctx.scale(-1, 1);
+      ctx.translate(-x, -y);
+    }
+
+    for (let row = 0; row < artMatrix.length; row++) {
+      for (let col = 0; col < artMatrix[row].length; col++) {
+        const char = artMatrix[row][col];
+        const color = C_PALETTE[char];
+        if (color) {
+          ctx.fillStyle = color;
+          ctx.fillRect(x + col * size, y + row * size, size, size);
+        }
+      }
+    }
+    ctx.restore();
+  }
+
+  // === RENDERIZAÇÃO DE INIMIGOS ===
+
+  drawEnemy(enemy: EnemyData, camera: CameraData): void {
+    if (!enemy.active) return;
+    const cam = this.snapCamera(camera);
+    const x = Math.round(enemy.position.x - cam.x);
+    const y = Math.round(enemy.position.y - cam.y);
+
+    if (enemy.type === EnemyType.MINION) {
+      this.drawMinion(enemy, x, y);
+    } else if (enemy.type === EnemyType.JOAOZAO) {
+      this.drawJoaozao(enemy, x, y);
+    }
+  }
+
+  private drawMinion(enemy: EnemyData, x: number, y: number): void {
+    const ctx = this.offscreenCtx;
+
+    // Se está morrendo, fica achatado
+    if (enemy.isDead) {
+      ctx.fillStyle = COLORS.ENEMY_BODY;
+      ctx.fillRect(x, y + enemy.height - 4, enemy.width, 4);
+      return;
+    }
+
+    ctx.save();
+
+    if (!enemy.facingRight) {
+      ctx.translate(x + enemy.width, y);
+      ctx.scale(-1, 1);
+      ctx.translate(-x, -y);
+    }
+
+    // Corpo redondo (vermelho escuro)
+    ctx.fillStyle = COLORS.ENEMY_BODY;
+    ctx.beginPath();
+    ctx.arc(x + 8, y + 10, 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Face
+    ctx.fillStyle = COLORS.ENEMY_FACE;
+    ctx.beginPath();
+    ctx.arc(x + 8, y + 8, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Olhos bravos
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(x + 5, y + 6, 2, 3);
+    ctx.fillRect(x + 9, y + 6, 2, 3);
+
+    // Sobrancelhas (bravos)
+    ctx.fillRect(x + 4, y + 5, 3, 1);
+    ctx.fillRect(x + 9, y + 5, 3, 1);
+
+    // Pés
+    ctx.fillStyle = '#333333';
+    const footOffset = Math.sin(enemy.animationTimer * 0.2) * 2;
+    ctx.fillRect(x + 2 - footOffset, y + 16, 4, 3);
+    ctx.fillRect(x + 10 + footOffset, y + 16, 4, 3);
+
+    ctx.restore();
+  }
+
+  private drawJoaozao(enemy: EnemyData, x: number, y: number): void {
+    const ctx = this.offscreenCtx;
+
+    if (enemy.isDead) {
+      ctx.globalAlpha = Math.max(0, enemy.deathTimer / 1000);
+    }
+
+    ctx.save();
+
+    if (!enemy.facingRight) {
+      ctx.translate(x + enemy.width, y);
+      ctx.scale(-1, 1);
+      ctx.translate(-x, -y);
+    }
+
+    // Corpo grande (verde)
+    ctx.fillStyle = COLORS.JOAOZAO_SKIN;
+    ctx.fillRect(x + 4, y + 12, 24, 20);
+
+    // Camisa roxa
+    ctx.fillStyle = COLORS.JOAOZAO_SHIRT;
+    ctx.fillRect(x + 6, y + 14, 20, 14);
+
+    // Calças
+    ctx.fillStyle = COLORS.JOAOZAO_PANTS;
+    ctx.fillRect(x + 6, y + 28, 8, 10);
+    ctx.fillRect(x + 18, y + 28, 8, 10);
+
+    // Sapatos
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(x + 4, y + 36, 10, 4);
+    ctx.fillRect(x + 18, y + 36, 10, 4);
+
+    // Cabeça grande
+    ctx.fillStyle = COLORS.JOAOZAO_SKIN;
+    ctx.fillRect(x + 4, y, 24, 14);
+
+    // Cabelo verde escuro
+    ctx.fillStyle = COLORS.JOAOZAO_HAIR;
+    ctx.fillRect(x + 4, y, 24, 4);
+    ctx.fillRect(x + 4, y + 4, 4, 3);
+    ctx.fillRect(x + 24, y + 4, 4, 3);
+
+    // Olhos malignos
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(x + 8, y + 5, 6, 5);
+    ctx.fillRect(x + 18, y + 5, 6, 5);
+
+    ctx.fillStyle = '#FF0000';
+    ctx.fillRect(x + 10, y + 6, 3, 3);
+    ctx.fillRect(x + 20, y + 6, 3, 3);
+
+    // Sorriso malvado
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(x + 10, y + 11, 12, 2);
+    ctx.fillRect(x + 8, y + 10, 2, 2);
+    ctx.fillRect(x + 22, y + 10, 2, 2);
+
+    // Braços
+    ctx.fillStyle = COLORS.JOAOZAO_SKIN;
+    ctx.fillRect(x, y + 14, 6, 12);
+    ctx.fillRect(x + 26, y + 14, 6, 12);
+
+    ctx.restore();
+    ctx.globalAlpha = 1;
+
+    // Desenha diálogo se houver
+    if (enemy.currentDialog && enemy.dialogTimer && enemy.dialogTimer > 0) {
+      this.drawDialogBubble(enemy.currentDialog, x + enemy.width / 2, y - 15);
+    }
+  }
+
+  drawDialogBubble(text: string, x: number, y: number): void {
+    const ctx = this.offscreenCtx;
+
+    ctx.font = '8px monospace';
+    const metrics = ctx.measureText(text);
+    const padding = 4;
+    const width = metrics.width + padding * 2;
+    const height = 12;
+
+    // Balão
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(x - width / 2, y - height, width, height);
+
+    // Borda
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x - width / 2, y - height, width, height);
+
+    // Pontinha do balão
+    ctx.fillStyle = '#FFFFFF';
+    ctx.beginPath();
+    ctx.moveTo(x - 3, y);
+    ctx.lineTo(x, y + 4);
+    ctx.lineTo(x + 3, y);
+    ctx.fill();
+
+    // Texto
+    ctx.fillStyle = '#000000';
+    ctx.textAlign = 'center';
+    ctx.fillText(text, x, y - 4);
+  }
+
+  // === RENDERIZAÇÃO DE COLETÁVEIS ===
+
+  drawCollectible(collectible: CollectibleData, camera: CameraData): void {
+    if (!collectible.active || collectible.collected) return;
+    const cam = this.snapCamera(camera);
+    const x = Math.round(collectible.position.x - cam.x);
+    const y = Math.round(collectible.position.y - cam.y);
+
+    switch (collectible.type) {
+      case CollectibleType.COIN:
+        this.drawCoin(x, y, collectible.animationTimer);
+        break;
+      case CollectibleType.COFFEE:
+        this.drawFanta(x, y, collectible.animationTimer);
+        break;
+      case CollectibleType.HELMET:
+        this.drawHelmet(x, y);
+        break;
+    }
+  }
+
+  private drawCoin(x: number, y: number, animTimer: number): void {
+    const ctx = this.offscreenCtx;
+
+    // Animação de rotação (estilo Mario)
+    const rotationSpeed = 0.15;
+    const widthFactor = Math.abs(Math.cos(animTimer * rotationSpeed));
+
+    // Centro e dimensões
+    const centerX = x + 8;
+    const centerY = y + 8;
+    const maxRadiusX = 6;
+    const radiusY = 7;
+
+    const currentRadiusX = Math.max(0.5, maxRadiusX * widthFactor);
+
+    // Sombra simples no chão (opcional, mas dá profundidade)
+    // ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    // ctx.beginPath();
+    // ctx.ellipse(centerX, centerY + 8, currentRadiusX, 2, 0, 0, Math.PI * 2);
+    // ctx.fill();
+
+    // 1. Corpo da moeda
+    ctx.fillStyle = COLORS.COIN_GOLD;
+    ctx.beginPath();
+    ctx.ellipse(centerX, centerY, currentRadiusX, radiusY, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 2. Borda dourada escura
+    ctx.strokeStyle = '#B8860B'; // Dark Goldenrod
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // 3. Detalhes internos (só visíveis quando a moeda está de frente)
+    if (currentRadiusX > 3) {
+      // Brilho/Relevo interno
+      ctx.fillStyle = COLORS.COIN_SHINE; // Cor clara
+      ctx.beginPath();
+      ctx.ellipse(centerX, centerY, currentRadiusX * 0.65, radiusY * 0.75, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Slot vertical central (característico)
+      ctx.fillStyle = '#B8860B';
+      const slotWidth = Math.max(1, 2 * widthFactor);
+      ctx.fillRect(centerX - slotWidth / 2, centerY - 4, slotWidth, 8);
+    }
+
+    // 4. Brilho especular (reflexo de luz)
+    if (widthFactor > 0.8) {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+      ctx.beginPath();
+      ctx.ellipse(centerX - 2, centerY - 3, 1.5, 2.5, Math.PI / 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  private drawFanta(x: number, y: number, animTimer: number = 0): void {
+    const ctx = this.offscreenCtx;
+
+    // Lata de Fanta (cilindro laranja)
+    // Corpo
+    ctx.fillStyle = '#FF8C00'; // Dark Orange
+    ctx.fillRect(x + 4, y + 4, 8, 10);
+
+    // Topo e Fundo (perspectiva)
+    ctx.fillStyle = '#FFA500'; // Orange
+    ctx.fillRect(x + 4, y + 4, 8, 2); // Topo
+    ctx.fillRect(x + 4, y + 12, 8, 2); // Fundo
+
+    // Rótulo / Detalhe
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(x + 4, y + 7, 8, 3);
+
+    // Logo "F" (simplificado, pontos azuis)
+    ctx.fillStyle = '#0000FF';
+    ctx.fillRect(x + 6, y + 8, 1, 1);
+    ctx.fillRect(x + 8, y + 8, 1, 1);
+    ctx.fillRect(x + 7, y + 9, 2, 1); // Sorriso/Curva do logo
+
+    // Lacre/Anel lata
+    ctx.fillStyle = '#C0C0C0';
+    ctx.fillRect(x + 6, y + 3, 4, 1);
+
+    // Efeito de bolhas subindo (Fanta)
+    const time = animTimer / 12;
+    const bubbleY = y + 2 - (Math.floor(time) % 4);
+    if (bubbleY < y + 2) {
+      ctx.fillStyle = 'rgba(255, 165, 0, 0.8)';
+      ctx.fillRect(x + 6 + (Math.floor(time) % 2) * 4, bubbleY, 1, 1);
+    }
+  }
+
+  private drawHelmet(x: number, y: number): void {
+    const ctx = this.offscreenCtx;
+
+    // Capacete dourado
+    ctx.fillStyle = '#FFD700';
+    ctx.beginPath();
+    ctx.arc(x + 8, y + 10, 7, Math.PI, 0);
+    ctx.fill();
+
+    // Aba
+    ctx.fillRect(x + 1, y + 10, 14, 3);
+
+    // Brilho
+    ctx.fillStyle = '#FFF8DC';
+    ctx.beginPath();
+    ctx.arc(x + 5, y + 7, 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Estrela no centro
+    ctx.fillStyle = '#FF0000';
+    ctx.beginPath();
+    ctx.arc(x + 8, y + 8, 2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // === RENDERIZACAO DE BANDEIRAS (CHECKPOINT / FINAL) ===
+
+  drawFlag(flag: FlagData, camera: CameraData): void {
+    const ctx = this.offscreenCtx;
+    const cam = this.snapCamera(camera);
+    if (!flag.enabled) return;
+
+    const baseX = Math.round(flag.anchor.x - cam.x);
+    const baseY = Math.round(flag.anchor.y - cam.y);
+
+    const mastHeight = Math.round(TILE_SIZE * (flag.kind === 'goal' ? 2.0 : 1.6));
+    const mastWidth = 3;
+    const mastBottom = baseY - 1;
+    const mastTop = mastBottom - mastHeight;
+
+    const popDuration = 450;
+    let scale = 1;
+    if (flag.state === 'activating') {
+      const t = Math.min(1, flag.stateTimer / popDuration);
+      scale = 1 + 0.25 * Math.sin(t * Math.PI);
+    } else if (flag.state === 'clear') {
+      scale = 1 + 0.1 * Math.sin(flag.stateTimer * 0.02);
+    }
+
+    const waveSpeed = flag.state === 'clear' ? 0.03 : 0.02;
+    const waveAmp = flag.state === 'clear' ? 3 : 2;
+    const wave = Math.round(Math.sin(flag.stateTimer * waveSpeed) * waveAmp);
+
+    const flagWidth = Math.round(TILE_SIZE * (flag.kind === 'goal' ? 1.2 : 0.9));
+    const flagHeight = Math.round(TILE_SIZE * 0.6);
+    const flagY = mastTop + Math.round(TILE_SIZE * 0.4);
+
+    ctx.save();
+    if (scale !== 1) {
+      ctx.translate(baseX, mastBottom);
+      ctx.scale(scale, scale);
+      ctx.translate(-baseX, -mastBottom);
+    }
+
+    // Mastro
+    ctx.fillStyle = '#8B4513';
+    ctx.fillRect(baseX - Math.floor(mastWidth / 2), mastTop, mastWidth, mastHeight);
+
+    // Bandeira principal
+    const color = flag.kind === 'goal'
+      ? '#FFD700'
+      : (flag.state === 'active' || flag.state === 'activating' ? '#00FF00' : COLORS.CHECKPOINT_FLAG);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(baseX + Math.ceil(mastWidth / 2), flagY);
+    ctx.lineTo(baseX + Math.ceil(mastWidth / 2) + flagWidth, flagY + wave);
+    ctx.lineTo(baseX + Math.ceil(mastWidth / 2) + flagWidth, flagY + flagHeight + wave);
+    ctx.lineTo(baseX + Math.ceil(mastWidth / 2), flagY + flagHeight);
+    ctx.closePath();
+    ctx.fill();
+
+    // Detalhe de brilho quando ativada
+    if (flag.state === 'activating' || flag.state === 'clear') {
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.fillRect(baseX + Math.ceil(mastWidth / 2) + 2, flagY + 2, 2, 2);
+    }
+
+    // Texto "C" em checkpoint ativo
+    if (flag.kind === 'checkpoint' && flag.state === 'active') {
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '6px monospace';
+      ctx.fillText('C', baseX + Math.ceil(mastWidth / 2) + 2, flagY + 7);
+    }
+
+    ctx.restore();
+  }
+
+
+  // === RENDERIZAÇÃO DE YASMIN ===
+
+  drawYasmin(x: number, y: number): void {
+    const ctx = this.offscreenCtx;
+
+    // Cabelo dourado
+    ctx.fillStyle = COLORS.YASMIN_HAIR;
+    ctx.fillRect(x + 2, y, 12, 10);
+    ctx.fillRect(x, y + 3, 4, 12);
+    ctx.fillRect(x + 12, y + 3, 4, 12);
+
+    // Rosto
+    ctx.fillStyle = COLORS.YASMIN_SKIN;
+    ctx.fillRect(x + 4, y + 3, 8, 7);
+
+    // Olhos
+    ctx.fillStyle = '#0066CC';
+    ctx.fillRect(x + 5, y + 5, 2, 2);
+    ctx.fillRect(x + 9, y + 5, 2, 2);
+
+    // Sorriso
+    ctx.fillStyle = '#FF6B6B';
+    ctx.fillRect(x + 6, y + 8, 4, 1);
+
+    // Vestido rosa
+    ctx.fillStyle = COLORS.YASMIN_DRESS;
+    ctx.fillRect(x + 2, y + 10, 12, 12);
+
+    // Saia expandida
+    ctx.beginPath();
+    ctx.moveTo(x, y + 22);
+    ctx.lineTo(x + 8, y + 14);
+    ctx.lineTo(x + 16, y + 22);
+    ctx.fill();
+
+    // Coroa
+    ctx.fillStyle = '#FFD700';
+    ctx.fillRect(x + 4, y - 3, 8, 3);
+    ctx.fillRect(x + 5, y - 5, 2, 2);
+    ctx.fillRect(x + 9, y - 5, 2, 2);
+    ctx.fillRect(x + 7, y - 6, 2, 3);
+
+    // Gema na coroa
+    ctx.fillStyle = '#FF69B4';
+    ctx.fillRect(x + 7, y - 4, 2, 2);
+  }
+
+  // === RENDERIZAÇÃO DE PARTÍCULAS ===
+
+  drawParticles(particles: Particle[]): void {
+    const ctx = this.offscreenCtx;
+
+    particles.forEach(p => {
+      const alpha = p.life / p.maxLife;
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = alpha;
+      ctx.fillRect(Math.round(p.position.x), Math.round(p.position.y), p.size, p.size);
+    });
+
+    ctx.globalAlpha = 1;
+  }
+
+  // === RENDERIZAÇÃO DE PROJÉTEIS ===
+
+  drawProjectile(x: number, y: number, radius: number = 4): void {
+    const ctx = this.offscreenCtx;
+
+    // Bola de energia roxa
+    ctx.fillStyle = '#800080';
+    ctx.beginPath();
+    ctx.arc(Math.round(x), Math.round(y), radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Brilho
+    ctx.fillStyle = '#DDA0DD';
+    ctx.beginPath();
+    ctx.arc(Math.round(x) - 1, Math.round(y) - 1, radius / 2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // === HUD ===
+
+  drawHUD(score: number, lives: number, time: number, level: string, soundEnabled: boolean, hasHelmet: boolean, coffeeTimer: number): void {
+    // Cache HUD for on-screen high-res rendering
+    this.lastUIType = 'HUD';
+    this.lastUIParams = { score, lives, time, level, soundEnabled, hasHelmet, coffeeTimer };
+    const ctx = this.offscreenCtx;
+
+    // Fundo do HUD
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.fillRect(0, 0, GAME_WIDTH, 16);
+
+    ctx.font = '8px monospace';
+    ctx.textAlign = 'left';
+
+    // Score
+    ctx.fillStyle = COLORS.HUD_TEXT;
+    ctx.fillText(`SCORE:${score.toString().padStart(6, '0')}`, 4, 11);
+
+    // Vidas
+    ctx.fillStyle = COLORS.FEKA_SHIRT;
+    for (let i = 0; i < lives; i++) {
+      ctx.fillRect(100 + i * 10, 4, 6, 8);
+    }
+
+    if (hasHelmet) {
+      this.drawHelmetIcon(118, 4);
+    }
+
+    if (coffeeTimer > 0) {
+      this.drawFantaIcon(132, 4, coffeeTimer);
+    }
+
+
+    // Tempo
+    ctx.fillStyle = time < 30 ? '#FF0000' : COLORS.HUD_TEXT;
+    ctx.fillText(`TIME:${Math.ceil(time).toString().padStart(3, '0')}`, 145, 11);
+
+    // Level
+    ctx.fillStyle = COLORS.HUD_ACCENT;
+    ctx.fillText(level, 210, 11);
+
+    // Sound icon
+    this.drawSoundIcon(GAME_WIDTH - 14, 4, soundEnabled);
+
+
+  }
+
+  private drawSoundIcon(x: number, y: number, enabled: boolean): void {
+    const ctx = this.offscreenCtx;
+    ctx.fillStyle = enabled ? '#00FF00' : '#FF0000';
+    ctx.fillRect(x, y + 3, 3, 6);
+    ctx.fillRect(x + 3, y + 2, 2, 8);
+    ctx.fillRect(x + 5, y + 3, 2, 6);
+
+    if (enabled) {
+      ctx.fillRect(x + 8, y + 2, 1, 8);
+      ctx.fillRect(x + 10, y + 3, 1, 6);
+    } else {
+      for (let i = 0; i < 6; i++) {
+        ctx.fillRect(x + 8 + i, y + 2 + i, 1, 1);
+        ctx.fillRect(x + 8 + i, y + 7 - i, 1, 1);
+      }
+    }
+  }
+
+  private drawHelmetIcon(x: number, y: number): void {
+    const ctx = this.offscreenCtx;
+    ctx.fillStyle = '#FFD700';
+    ctx.fillRect(x + 1, y + 2, 10, 2);
+    ctx.fillRect(x + 2, y + 4, 8, 3);
+    ctx.fillStyle = '#FFF8DC';
+    ctx.fillRect(x + 4, y + 4, 2, 1);
+  }
+
+  private drawFantaIcon(x: number, y: number, timer: number): void {
+    const ctx = this.offscreenCtx;
+    // Lata icon
+    ctx.fillStyle = '#FF8C00';
+    ctx.fillRect(x, y + 1, 6, 8);
+    // Label
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(x, y + 4, 6, 2);
+    // Bar
+    const pct = Math.max(0, Math.min(1, timer / 10000));
+    ctx.fillStyle = '#FFA500';
+    ctx.fillRect(x, y + 10, Math.round(10 * pct), 2);
+  }
+
+  private drawArrowIcon(x: number, y: number, dir: 'left' | 'right'): void {
+    const ctx = this.offscreenCtx;
+    if (dir === 'left') {
+      ctx.fillRect(x + 6, y + 2, 2, 12);
+      ctx.fillRect(x + 2, y + 6, 4, 4);
+      ctx.fillRect(x, y + 7, 2, 2);
+    } else {
+      ctx.fillRect(x + 4, y + 2, 2, 12);
+      ctx.fillRect(x + 6, y + 6, 4, 4);
+      ctx.fillRect(x + 10, y + 7, 2, 2);
+    }
+  }
+
+  private drawJumpIcon(x: number, y: number): void {
+    const ctx = this.offscreenCtx;
+    ctx.fillRect(x + 5, y + 2, 2, 10);
+    ctx.fillRect(x + 2, y + 4, 8, 2);
+    ctx.fillRect(x + 3, y + 2, 6, 2);
+  }
+
+  private drawRunIcon(x: number, y: number): void {
+    const ctx = this.offscreenCtx;
+    ctx.fillRect(x + 2, y + 4, 2, 2);
+    ctx.fillRect(x + 4, y + 5, 2, 2);
+    ctx.fillRect(x + 6, y + 6, 2, 2);
+    ctx.fillRect(x + 4, y + 7, 2, 2);
+    ctx.fillRect(x + 2, y + 8, 2, 2);
+    ctx.fillRect(x + 7, y + 4, 2, 2);
+    ctx.fillRect(x + 9, y + 5, 2, 2);
+    ctx.fillRect(x + 11, y + 6, 2, 2);
+    ctx.fillRect(x + 9, y + 7, 2, 2);
+    ctx.fillRect(x + 7, y + 8, 2, 2);
+  }
+
+  private drawGroundPoundIconAt(ctx: CanvasRenderingContext2D, x: number, y: number, s: number = 1): void {
+    const size = Math.max(1, Math.round(4 * s));
+    const bodyH = Math.max(1, Math.round(6 * s));
+    ctx.save();
+    ctx.fillStyle = COLORS.MENU_HIGHLIGHT;
+
+    // Corpo vertical (retângulo)
+    ctx.fillRect(x, y, size, bodyH);
+
+    // Ponta (triângulo apontando para baixo)
+    ctx.beginPath();
+    ctx.moveTo(x - Math.round(4 * s), y + bodyH);
+    ctx.lineTo(x + size + Math.round(4 * s), y + bodyH);
+    ctx.lineTo(x + Math.round(size / 2), y + bodyH + Math.max(1, Math.round(6 * s)));
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+  // === MENUS E OVERLAYS ===
+
+  drawMenu(title: string, options: string[], selectedIndex: number): void {
+    const ctx = this.offscreenCtx;
+
+    // Fundo
+    ctx.fillStyle = COLORS.MENU_BG;
+    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+    // Título
+    ctx.textAlign = 'center';
+    ctx.fillStyle = COLORS.MENU_HIGHLIGHT;
+    ctx.fillText(title, GAME_WIDTH / 2, 50);
+
+    // Opções
+    ctx.font = '10px monospace';
+    options.forEach((option, i) => {
+      const y = 90 + i * 20;
+      ctx.fillStyle = i === selectedIndex ? COLORS.MENU_HIGHLIGHT : COLORS.MENU_TEXT;
+      ctx.fillText(i === selectedIndex ? `> ${option} <` : option, GAME_WIDTH / 2, y);
+    });
+  }
+
+  drawTitleScreen(): void {
+    // Cache title screen to draw at higher resolution on the main canvas
+    this.lastUIType = 'TITLE';
+    this.lastUIParams = null;
+    const ctx = this.offscreenCtx;
+
+    // Fundo gradiente
+    const gradient = ctx.createLinearGradient(0, 0, 0, GAME_HEIGHT);
+    gradient.addColorStop(0, '#1a1a3e');
+    gradient.addColorStop(1, '#0a0a1e');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+    // Estrelas no fundo
+    ctx.fillStyle = '#FFFFFF';
+    for (let i = 0; i < 30; i++) {
+      const x = (i * 37) % GAME_WIDTH;
+      const y = (i * 23) % (GAME_HEIGHT - 50);
+      ctx.fillRect(x, y, 1, 1);
+    }
+
+    // Título "SUPER FEKA GAPS"
+    ctx.font = 'bold 20px monospace';
+    ctx.textAlign = 'center';
+
+
+    // Título principal
+    ctx.fillStyle = COLORS.MENU_HIGHLIGHT;
+    ctx.fillText('SUPER FEKA GAPS', GAME_WIDTH / 2, 50);
+
+    // Subtítulo
+    ctx.font = '8px monospace';
+    ctx.fillStyle = COLORS.MENU_TEXT;
+    ctx.fillText('A aventura para salvar Yasmin!', GAME_WIDTH / 2, 70);
+
+    // Instruções
+    ctx.font = '10px monospace';
+    ctx.fillStyle = '#AAAAAA';
+    ctx.fillText('Pressione ENTER para começar', GAME_WIDTH / 2, 120);
+
+    // Controles
+    ctx.font = '8px monospace';
+    ctx.fillStyle = '#888888';
+    ctx.fillText('← → : Mover   ESPAÇO : Pular   SHIFT : Correr', GAME_WIDTH / 2, 145);
+    ctx.fillText('ESC : Pause   M : Som', GAME_WIDTH / 2, 157);
+
+    // Instrução da sentada violenta (posicionada acima dos créditos)
+    ctx.fillText('↓ : Sentada Violenta (no ar)', GAME_WIDTH / 2, 132);
+    this.drawGroundPoundIconAt(this.offscreenCtx, Math.round(GAME_WIDTH / 2 - 120), 122, 1);
+
+    // Créditos
+    ctx.fillStyle = '#666666';
+    ctx.fillText('© 2024 FekaLabs', GAME_WIDTH / 2, GAME_HEIGHT - 10);
+  }
+
+  drawPauseOverlay(): void {
+    const ctx = this.offscreenCtx;
+
+    // Overlay escuro
+    ctx.fillStyle = COLORS.OVERLAY;
+    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+    // Caixa central
+    ctx.fillStyle = '#222222';
+    ctx.fillRect(GAME_WIDTH / 2 - 60, GAME_HEIGHT / 2 - 30, 120, 60);
+    ctx.strokeStyle = COLORS.MENU_HIGHLIGHT;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(GAME_WIDTH / 2 - 60, GAME_HEIGHT / 2 - 30, 120, 60);
+
+    // Texto
+    ctx.font = '12px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = COLORS.MENU_HIGHLIGHT;
+    ctx.fillText('PAUSADO', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 10);
+
+    ctx.font = '8px monospace';
+    ctx.fillStyle = COLORS.MENU_TEXT;
+    ctx.fillText('Pressione ESC para continuar', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 15);
+  }
+
+  drawGameOver(score: number): void {
+    // Cache params so we can draw this overlay crisply on the main canvas
+    this.lastUIType = 'TITLE';
+    this.lastUIParams = { variant: 'GAME_OVER', score };
+
+    const ctx = this.offscreenCtx;
+
+    // Fundo vermelho escuro (backup low-res)
+    ctx.fillStyle = 'rgba(50, 0, 0, 0.9)';
+    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+    // Texto GAME OVER (backup)
+    ctx.font = 'bold 24px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#FF0000';
+    ctx.fillText('GAME OVER', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 20);
+
+    // Score final
+    ctx.font = '10px monospace';
+    ctx.fillStyle = COLORS.MENU_TEXT;
+    ctx.fillText(`Score Final: ${score}`, GAME_WIDTH / 2, GAME_HEIGHT / 2 + 10);
+
+    // Instrução
+    ctx.font = '8px monospace';
+    ctx.fillStyle = '#AAAAAA';
+    ctx.fillText('Pressione ENTER para reiniciar', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 35);
+  }
+
+  drawLevelClear(level: string, score: number, timeBonus: number): void {
+    // Cache params so we can draw this overlay crisply on the main canvas
+    this.lastUIType = 'TITLE';
+    this.lastUIParams = { variant: 'LEVEL_CLEAR', level, score, timeBonus };
+
+    const ctx = this.offscreenCtx;
+
+    // Fundo (backup low-res version in offscreen)
+    ctx.fillStyle = 'rgba(0, 50, 0, 0.9)';
+    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+    // Texto (backup low-res)
+    ctx.font = 'bold 16px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#00FF00';
+    ctx.fillText('FASE COMPLETA!', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 30);
+
+    ctx.font = '10px monospace';
+    ctx.fillStyle = COLORS.MENU_TEXT;
+    ctx.fillText(`${level}`, GAME_WIDTH / 2, GAME_HEIGHT / 2 - 10);
+    ctx.fillText(`Score: ${score}`, GAME_WIDTH / 2, GAME_HEIGHT / 2 + 10);
+    ctx.fillText(`Bônus de tempo: +${timeBonus}`, GAME_WIDTH / 2, GAME_HEIGHT / 2 + 25);
+  }
+
+  drawBossIntro(bossName: string): void {
+    // Cache params so we can draw this overlay crisply on the main canvas
+    this.lastUIType = 'TITLE';
+    this.lastUIParams = { variant: 'BOSS_INTRO', bossName };
+
+    const ctx = this.offscreenCtx;
+
+    // Fundo dramático (backup low-res)
+    ctx.fillStyle = 'rgba(50, 0, 50, 0.9)';
+    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+    // Aviso (backup low-res)
+    ctx.font = '8px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#FF0000';
+    ctx.fillText('!! ALERTA DE BOSS !!', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 30);
+
+    // Nome do boss
+    ctx.font = 'bold 16px monospace';
+    ctx.fillStyle = COLORS.JOAOZAO_SKIN;
+    ctx.fillText(bossName, GAME_WIDTH / 2, GAME_HEIGHT / 2);
+
+    // Subtítulo
+    ctx.font = '8px monospace';
+    ctx.fillStyle = '#AAAAAA';
+    ctx.fillText('\"Você vai cair nos meus gaps!\"', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 20);
+  }
+
+  drawEnding(): void {
+    // Use TITLE high-res overlay for ending so we can draw Yasmin crisp
+    this.lastUIType = 'TITLE';
+    this.lastUIParams = { variant: 'ENDING' };
+
+    const ctx = this.offscreenCtx;
+
+    // Fundo romântico (backup)
+    const gradient = ctx.createLinearGradient(0, 0, 0, GAME_HEIGHT);
+    gradient.addColorStop(0, '#FF69B4');
+    gradient.addColorStop(1, '#FFB6C1');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+    // Corações flutuantes (backup)
+    ctx.fillStyle = '#FF0000';
+    for (let i = 0; i < 10; i++) {
+      const x = (Date.now() / 50 + i * 40) % GAME_WIDTH;
+      const y = 30 + Math.sin(Date.now() / 500 + i) * 10;
+      ctx.font = '10px monospace';
+      ctx.fillText('♥', x, y);
+    }
+
+    // Feka (backup pixel-art)
+    const fekaX = GAME_WIDTH / 2 - 40;
+    const fekaY = GAME_HEIGHT / 2 + 10;
+    this.drawPixelArt(ctx, FEKA_SPRITES.idle, fekaX, fekaY, 2, true);
+
+    // Yasmin (Imagem Real - desenhada no offscreen como fallback)
+    if (this.yasminImg) {
+      const targetH = 60; // Altura desejada na tela final (logical px)
+      const ratio = this.yasminImg.width / this.yasminImg.height;
+      const targetW = targetH * ratio;
+
+      ctx.save();
+      // Desenha Yasmin ao lado do Feka (fallback low-res)
+      ctx.drawImage(
+        this.yasminImg,
+        GAME_WIDTH / 2 + 10,
+        GAME_HEIGHT / 2 - 20,
+        targetW,
+        targetH
+      );
+      ctx.restore();
+    } else {
+      // Fallback para pixel art se a imagem não carregar
+      this.drawYasmin(GAME_WIDTH / 2 + 20, GAME_HEIGHT / 2);
+    }
+
+    // Texto (backup low-res)
+    ctx.font = 'bold 14px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#8B0000';
+    ctx.fillText('Feka salvou Yasmin!', GAME_WIDTH / 2, 40);
+
+    ctx.font = '10px monospace';
+    ctx.fillStyle = '#4A0000';
+    ctx.fillText('Joãozão foi derrotado!', GAME_WIDTH / 2, 60);
+
+    ctx.fillStyle = '#FFD700';
+    ctx.fillText('FIM', GAME_WIDTH / 2, GAME_HEIGHT - 40);
+
+    ctx.font = '8px monospace';
+    ctx.fillStyle = '#8B0000';
+    ctx.fillText('Pressione ENTER para jogar novamente', GAME_WIDTH / 2, GAME_HEIGHT - 20);
+  }
+
+  // === TOUCH CONTROLS ===
+
+  drawTouchControls(): void {
+    // Verifica se e dispositivo touch
+    if (!('ontouchstart' in window)) return;
+
+    const ctx = this.offscreenCtx;
+    ctx.globalAlpha = 0.5;
+
+    // D-pad esquerdo
+    ctx.fillStyle = '#333333';
+    ctx.fillRect(10, GAME_HEIGHT - 40, 30, 30);
+    ctx.fillRect(50, GAME_HEIGHT - 40, 30, 30);
+
+    ctx.fillStyle = '#FFFFFF';
+    this.drawArrowIcon(18, GAME_HEIGHT - 34, 'left');
+    this.drawArrowIcon(58, GAME_HEIGHT - 34, 'right');
+
+    // Botoes direita
+    ctx.fillStyle = '#333333';
+    ctx.fillRect(GAME_WIDTH - 80, GAME_HEIGHT - 40, 30, 30);
+    ctx.fillRect(GAME_WIDTH - 40, GAME_HEIGHT - 40, 30, 30);
+
+    ctx.fillStyle = '#FFFFFF';
+    this.drawRunIcon(GAME_WIDTH - 72, GAME_HEIGHT - 34);
+    this.drawJumpIcon(GAME_WIDTH - 32, GAME_HEIGHT - 34);
+
+    ctx.globalAlpha = 1;
+  }
+
+  // Utilitário para obter dimensões
+  getDimensions(): { width: number; height: number } {
+    return { width: GAME_WIDTH, height: GAME_HEIGHT };
+  }
+}
