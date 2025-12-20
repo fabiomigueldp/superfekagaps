@@ -2,102 +2,8 @@
 
 import { GAME_WIDTH, GAME_HEIGHT, TILE_SIZE, COLORS, TileType } from '../constants';
 import { CameraData, PlayerData, EnemyData, CollectibleData, FlagData, Particle, EnemyType, CollectibleType, GroundPoundState } from '../types';
+import { PLAYER_PALETTE, PLAYER_SPRITES, PLAYER_PIXEL_SIZE, PLAYER_RENDER_OFFSET_X, PLAYER_RENDER_OFFSET_Y } from '../assets/playerSpriteSpec';
 
-
-// Pixel Art Constants (imported from user request)
-const C_PALETTE: any = {
-  _: null,        // Transparente
-  K: '#1a1a1a',   // Preto (Cabelo/Sapatos/Óculos)
-  S: '#b86f30',   // Pele (Skin)
-  B: '#0044cc',   // Azul Claro (Camisa)
-  D: '#002288',   // Azul Escuro (Calça)
-  G: '#555555',   // Cinza (Detalhe óculos)
-  W: '#ffffff',   // Branco (Cinto)
-  H: '#FFD700',   // Dourado (Capacete)
-  h: '#DAA520'    // Dourado Escuro (Sombra Capacete)
-};
-
-const FEKA_SPRITES = {
-  idle: [
-    "__KKKK__",
-    "_KKKKKK_",
-    "_KKSKSS_",
-    "_SKSKSG_",
-    "_SSSSSS_",
-    "_SBBBB__",
-    "BBBBBBBB",
-    "BBSBBSBB",
-    "BWWWWWB_",
-    "_DDDDD__",
-    "_DD_DD__",
-    "_DD_DD__",
-    "_KK_KK__"
-  ],
-  walk1: [
-    "__KKKK__",
-    "_KKKKKK_",
-    "_KKSKSS_",
-    "_SKSKSG_",
-    "_SSSSSS_",
-    "_SBBBB__",
-    "BBBBBBBB",
-    "BBSBBSBB",
-    "BWWWWWB_",
-    "_DDDDD__",
-    "_DD__D__",
-    "_KK__D__",
-    "_____KK_"
-  ],
-  walk2: [
-    "__KKKK__",
-    "_KKKKKK_",
-    "_KKSKSS_",
-    "_SKSKSG_",
-    "_SSSSSS_",
-    "_SBBBB__",
-    "BBBBBBBB",
-    "BBSBBSBB",
-    "BWWWWWB_",
-    "_DDDDD__",
-    "_D__DD__",
-    "_D__KK__",
-    "_KK_____"
-  ],
-  jump: [
-    "__KKKK__",
-    "_KKKKKK_",
-    "_KKSKSS_",
-    "_SKSKSG_",
-    "_SSSSSS_",
-    "__BBBB__",
-    "_BBBBBB_",
-    "BBSBBSBB",
-    "_WWWWW__",
-    "_DDDDD__",
-    "_D___D__",
-    "_KK_KK__",
-    "________"
-  ],
-  sit: [
-    "________",
-    "________",
-    "__KKKK__",
-    "_KKKKKK_",
-    "_KKSKSS_",
-    "_SKSKSG_",
-    "_SSSSSS_",
-    "__BBBB__",
-    "_BBBBBB_",
-    "BBDDDDBB",
-    "_KK__KK_"
-  ],
-  helmet: [
-    "___hh___",
-    "__HHHH__",
-    "_HWHHhh_",
-    "HHHHHHHH"
-  ]
-};
 
 export class Renderer {
   private canvas: HTMLCanvasElement;
@@ -429,7 +335,7 @@ export class Renderer {
 
         // Desenha o Feka (pixel art) em alta-res no canvas principal para que apareça acima do overlay
         ((): void => {
-          const art = FEKA_SPRITES.idle;
+          const art = PLAYER_SPRITES.idle;
           const px = Math.round((GAME_WIDTH / 2 - 40) * pixelScale);
           const py = Math.round((GAME_HEIGHT / 2 + 10) * pixelScale);
           const ps = Math.max(1, Math.round(2 * pixelScale));
@@ -440,7 +346,7 @@ export class Renderer {
           for (let row = 0; row < art.length; row++) {
             for (let col = 0; col < art[row].length; col++) {
               const ch = art[row][col];
-              const color = (C_PALETTE as any)[ch];
+              const color = PLAYER_PALETTE[ch];
               if (color) {
                 ctx.fillStyle = color;
                 ctx.fillRect(px + col * ps, py + row * ps, ps, ps);
@@ -772,7 +678,7 @@ export class Renderer {
       // Spirit fading effect using composition or simplified
       ctx.globalCompositeOperation = 'source-over';
       ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-      this.drawPixelArt(ctx, FEKA_SPRITES.jump, x, y - rise, 2, player.facingRight);
+      this.drawPixelArt(ctx, PLAYER_SPRITES.jump, x, y - rise, PLAYER_PIXEL_SIZE, player.facingRight);
       ctx.restore();
       ctx.restore();
       return;
@@ -827,22 +733,22 @@ export class Renderer {
     }
 
     // Determine Sprite State
-    let currentSprite = FEKA_SPRITES.idle;
+    let currentSprite = PLAYER_SPRITES.idle;
 
     // Check states in order of priority
     if (player.groundPoundState !== GroundPoundState.NONE) {
       // During ground pound (any phase), use sit sprite
-      currentSprite = FEKA_SPRITES.sit;
+      currentSprite = PLAYER_SPRITES.sit;
     } else if (!player.isGrounded) {
-      currentSprite = FEKA_SPRITES.jump;
+      currentSprite = PLAYER_SPRITES.jump;
     } else if (Math.abs(player.velocity.x) > 0.1) {
       // Walking/Running
       // Speed multiplier for animation
       const animSpeed = Math.abs(player.velocity.x) > 3 ? 50 : 100;
       const frame = Math.floor(player.animationTimer / animSpeed) % 2;
-      currentSprite = frame === 0 ? FEKA_SPRITES.walk1 : FEKA_SPRITES.walk2;
+      currentSprite = frame === 0 ? PLAYER_SPRITES.walk1 : PLAYER_SPRITES.walk2;
     } else {
-      currentSprite = FEKA_SPRITES.idle;
+      currentSprite = PLAYER_SPRITES.idle;
     }
 
     // Draw the selected sprite
@@ -851,19 +757,19 @@ export class Renderer {
     // Align Bottom: Sprite height ~13*2 = 26. Player height=24.
     // y + (player.height - spriteHeight) = y - 2
 
-    let yOffset = -2;
-    let xOffset = -1;
-    const pixelSize = 2; // Each char is 2x2 logical pixels (matches TILE_SIZE=16 for 8-char width)
+    let yOffset = PLAYER_RENDER_OFFSET_Y;
+    let xOffset = PLAYER_RENDER_OFFSET_X;
+    const pixelSize = PLAYER_PIXEL_SIZE; // Each char is 2x2 logical pixels (matches TILE_SIZE=16 for 8-char width)
 
-    if (currentSprite === FEKA_SPRITES.sit) {
+    if (currentSprite === PLAYER_SPRITES.sit) {
       yOffset += 2; // Sit sprite looks better slightly lower or adjusted
     }
 
     this.drawPixelArt(
       ctx,
       currentSprite,
-      x + xOffset,
-      y + yOffset,
+      Math.round(x + xOffset),
+      Math.round(y + yOffset),
       pixelSize,
       player.facingRight
     );
@@ -873,9 +779,9 @@ export class Renderer {
       // Shift up by 3 "pixels" (1 row extra for 4-row height) to sit nicely on head
       this.drawPixelArt(
         ctx,
-        (FEKA_SPRITES as any).helmet,
-        x + xOffset,
-        y + yOffset - 3,
+        PLAYER_SPRITES.helmet,
+        Math.round(x + xOffset),
+        Math.round(y + yOffset - 3),
         pixelSize,
         player.facingRight
       );
@@ -900,7 +806,7 @@ export class Renderer {
     for (let row = 0; row < artMatrix.length; row++) {
       for (let col = 0; col < artMatrix[row].length; col++) {
         const char = artMatrix[row][col];
-        const color = C_PALETTE[char];
+        const color = PLAYER_PALETTE[char];
         if (color) {
           ctx.fillStyle = color;
           ctx.fillRect(x + col * size, y + row * size, size, size);
@@ -1574,11 +1480,11 @@ export class Renderer {
     // Controles
     ctx.font = '8px monospace';
     ctx.fillStyle = '#888888';
-    ctx.fillText('← → : Mover   ESPAÇO : Pular   SHIFT : Correr', GAME_WIDTH / 2, 145);
+    ctx.fillText('← → / A/D / WASD : Mover   ESPAÇO : Pular   SHIFT : Correr', GAME_WIDTH / 2, 145);
     ctx.fillText('ESC : Pause   M : Som', GAME_WIDTH / 2, 157);
 
     // Instrução da sentada violenta (posicionada acima dos créditos)
-    ctx.fillText('↓ : Sentada Violenta (no ar)', GAME_WIDTH / 2, 132);
+    ctx.fillText('↓ / S : Sentada Violenta (no ar)', GAME_WIDTH / 2, 132);
     this.drawGroundPoundIconAt(this.offscreenCtx, Math.round(GAME_WIDTH / 2 - 120), 122, 1);
 
     // Créditos
@@ -1717,7 +1623,7 @@ export class Renderer {
     // Feka (backup pixel-art)
     const fekaX = GAME_WIDTH / 2 - 40;
     const fekaY = GAME_HEIGHT / 2 + 10;
-    this.drawPixelArt(ctx, FEKA_SPRITES.idle, fekaX, fekaY, 2, true);
+    this.drawPixelArt(ctx, PLAYER_SPRITES.idle, fekaX, fekaY, PLAYER_PIXEL_SIZE, true);
 
     // Yasmin (Imagem Real - desenhada no offscreen como fallback)
     if (this.yasminImg) {

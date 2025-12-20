@@ -6,13 +6,22 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "validate:levels": "tsx scripts/validate_levels.ts",
+    "validate:player-assets": "tsx scripts/validate_player_assets.ts"
   },
   "devDependencies": {
+    "tsx": "^4.21.0",
     "typescript": "^5.3.3",
     "vite": "^5.0.10"
   },
-  "keywords": ["game", "platformer", "8-bit", "canvas", "typescript"],
+  "keywords": [
+    "game",
+    "platformer",
+    "8-bit",
+    "canvas",
+    "typescript"
+  ],
   "author": "FekaLabs",
   "license": "MIT"
 }

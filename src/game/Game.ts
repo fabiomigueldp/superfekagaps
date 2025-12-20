@@ -16,7 +16,7 @@ import { Level, createLevel } from '../world/Level';
 import { Player } from '../entities/Player';
 import { Minion } from '../entities/enemies/Minion';
 import { Joaozao } from '../entities/enemies/Joaozao';
-import { getLevelByIndex, TOTAL_LEVELS } from '../data/levels';
+import { getLevelByIndex, TOTAL_LEVELS, ALL_LEVELS } from '../data/levels';
 
 export class Game {
   // Engine
@@ -74,6 +74,40 @@ export class Game {
       shakeMagnitude: 0,
       bounds: { minX: 0, maxX: 0, minY: 0, maxY: 0 }
     };
+
+    this.validateLevelsOnStartup();
+  }
+
+  private validateLevelsOnStartup(): void {
+    console.log('🔍 Validando níveis...');
+    const levels = ALL_LEVELS;
+    let hasErrors = false;
+
+    levels.forEach((level, index) => {
+      // Validar ID contíguo
+      if (level.id !== index.toString()) {
+        console.error(`❌ Erro no Nível ${index}: ID esperado '${index}', encontrado '${level.id}'`);
+        hasErrors = true;
+      }
+
+      // Validar tiles
+      level.tiles.forEach((row, rIdx) => {
+        row.forEach((tile, cIdx) => {
+          // Tiles válidos: 0-7, 10-13
+          const isValid = (tile >= 0 && tile <= 7) || (tile >= 10 && tile <= 13);
+          if (!isValid) {
+            console.error(`❌ Erro no Nível ${level.id}: Tile inválido '${tile}' em [${rIdx}, ${cIdx}]`);
+            hasErrors = true;
+          }
+        });
+      });
+    });
+
+    if (!hasErrors) {
+      console.log('✅ Todos os níveis validados com sucesso!');
+    } else {
+      console.warn('⚠️ Foram encontrados problemas na validação dos níveis. Verifique o console.');
+    }
   }
 
   start(): void {

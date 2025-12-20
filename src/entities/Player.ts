@@ -8,6 +8,7 @@ import {
 } from '../constants';
 import { PlayerData, InputState, Vector2, Rect, GroundPoundState } from '../types';
 import { Level } from '../world/Level';
+import { PLAYER_HITBOX_W, PLAYER_HITBOX_H } from '../assets/playerSpriteSpec';
 
 export class Player {
   data: PlayerData;
@@ -19,10 +20,10 @@ export class Player {
 
   constructor(spawnX: number, spawnY: number) {
     this.data = {
-      position: { x: spawnX * TILE_SIZE, y: spawnY * TILE_SIZE - 24 },
+      position: { x: spawnX * TILE_SIZE, y: spawnY * TILE_SIZE - PLAYER_HITBOX_H },
       velocity: { x: 0, y: 0 },
-      width: 14,
-      height: 24,
+      width: PLAYER_HITBOX_W,
+      height: PLAYER_HITBOX_H,
       active: true,
       isGrounded: false,
       isRunning: false,

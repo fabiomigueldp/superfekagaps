@@ -11,7 +11,7 @@ window.addEventListener('DOMContentLoaded', () => {
   
   console.log('✅ Jogo iniciado!');
   console.log('📋 Controles:');
-  console.log('   ← → : Mover');
+  console.log('   ← → / A/D / WASD : Mover');
   console.log('   Espaço/Z/↑/W : Pular');
   console.log('   Shift/X : Correr');
   console.log('   Enter : Start/Confirmar');

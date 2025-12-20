@@ -4,11 +4,12 @@ import { LevelData, EnemyType, CollectibleType } from '../types';
 
 // Legenda dos tiles:
 // 0 = vazio, 1 = chão, 2 = bloco, 3 = plataforma, 4 = spike, 5 = checkpoint, 6 = bandeira, 7 = moeda
+// 10 = bloco quebrável, 11 = bloco café, 12 = bloco capacete, 13 = bloco usado
 
 // === FASE 1-1: TUTORIAL ===
 // Introdução aos controles, gaps pequenos, poucas ameaças
 export const LEVEL_1_1: LevelData = {
-  id: '1-1',
+  id: '0',
   name: 'WORLD 1-1',
   width: 80,
   height: 12,
@@ -83,7 +84,7 @@ export const LEVEL_1_1: LevelData = {
 // === FASE 1-2: DESAFIO ===
 // Mais inimigos, gaps maiores, plataformas
 export const LEVEL_1_2: LevelData = {
-  id: '1-2',
+  id: '1',
   name: 'WORLD 1-2',
   width: 100,
   height: 14,
@@ -134,6 +135,7 @@ export const LEVEL_1_2: LevelData = {
     { type: CollectibleType.COIN, position: { x: 93, y: 9 } },
   ],
   tiles: [
+
     // Linha 0-2 (topo vazio)
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -165,7 +167,7 @@ export const LEVEL_1_2: LevelData = {
 
 // === FASE 1-BOSS: ARENA DO JOÃOZÃO ===
 export const LEVEL_1_BOSS: LevelData = {
-  id: '1-BOSS',
+  id: '2',
   name: 'BOSS: JOÃOZÃO',
   width: 40,
   height: 12,
