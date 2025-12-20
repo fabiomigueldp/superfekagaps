@@ -6,7 +6,8 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: false,
-    minify: 'terser'
+    // usar esbuild para minify (mais leve e evita dep opcional `terser`)
+    minify: 'esbuild'
   },
   server: {
     port: 3000,

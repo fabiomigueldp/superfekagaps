@@ -5,10 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
+    "validate": "npm run validate:levels && npm run validate:player-assets",
     "validate:levels": "tsx scripts/validate_levels.ts",
-    "validate:player-assets": "tsx scripts/validate_player_assets.ts"
+    "validate:player-assets": "tsx scripts/validate_player_assets.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prebuild": "npm run validate && npm run typecheck",
+    "build": "vite build",
+    "preview": "vite preview --host"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "devDependencies": {
     "tsx": "^4.21.0",

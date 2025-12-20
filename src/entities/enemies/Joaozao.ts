@@ -81,6 +81,19 @@ export class Joaozao {
     this.data.velocity.y = collision.velocity.y;
     this.isGrounded = collision.grounded;
 
+    // Se bateu a cabeça em um tile, tenta quebrar tijolos (verifica toda a largura do chefe)
+    if (collision.tileHit && collision.tileHit.side === 'top') {
+      const headRow = collision.tileHit.row;
+      const leftCol = Math.floor(rect.x / TILE_SIZE);
+      const rightCol = Math.floor((rect.x + rect.width - 1) / TILE_SIZE);
+      for (let col = leftCol; col <= rightCol; col++) {
+        const res = level.breakTile(col, headRow);
+        if (res.success) {
+          // Opcional: spawn partículas / tocar som aqui
+        }
+      }
+    }
+
     // Limita aos bounds da arena
     if (this.data.position.x < TILE_SIZE * 2) {
       this.data.position.x = TILE_SIZE * 2;

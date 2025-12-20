@@ -127,12 +127,24 @@ export class Input {
   private setupTouchControls(): void {
     // Touch controls serão renderizados e gerenciados pelo Renderer
     // Aqui configuramos os listeners
-    const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
-    if (!canvas) return;
+    const attach = (canvas: HTMLCanvasElement | null) => {
+      if (!canvas) return false;
+      canvas.addEventListener('touchstart', (e) => this.handleTouch(e, true));
+      canvas.addEventListener('touchend', (e) => this.handleTouch(e, false));
+      canvas.addEventListener('touchcancel', (e) => this.handleTouch(e, false));
+      return true;
+    };
 
-    canvas.addEventListener('touchstart', (e) => this.handleTouch(e, true));
-    canvas.addEventListener('touchend', (e) => this.handleTouch(e, false));
-    canvas.addEventListener('touchcancel', (e) => this.handleTouch(e, false));
+    const canvas = document.getElementById('game-canvas') as HTMLCanvasElement | null;
+    if (attach(canvas)) return;
+
+    // Re-tentar até o canvas aparecer (ex: script foi carregado cedo)
+    const tryAttach = () => {
+      const c = document.getElementById('game-canvas') as HTMLCanvasElement | null;
+      if (attach(c)) return;
+      window.requestAnimationFrame(tryAttach);
+    };
+    window.requestAnimationFrame(tryAttach);
   }
 
   private handleTouch(e: TouchEvent, isPressed: boolean): void {

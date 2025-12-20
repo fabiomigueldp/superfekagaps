@@ -34,7 +34,8 @@ export class Renderer {
     // Carrega imagem da Yasmin para a tela final
     const img = new Image();
     img.onload = () => { this.yasminImg = img; };
-    img.src = '/assets/sprites/yasmin.png';
+    const base = (import.meta as any).env?.BASE_URL ?? '/';
+    img.src = `${base}assets/sprites/yasmin.png`;
 
     // Debug: habilita overlay via hash #debug ou variavel global __DEBUG_RENDERER
     try {

@@ -1,6 +1,6 @@
 import { VoiceManifest } from './VoiceManifest';
 
-const BASE_PATH = '/assets/audio/vo/joaozao';
+const BASE_PATH = `${(import.meta as any).env?.BASE_URL ?? '/'}assets/audio/vo/joaozao`;
 
 export const JOAOZAO_VOICE_MANIFEST: VoiceManifest = {
   id: 'joaozao',

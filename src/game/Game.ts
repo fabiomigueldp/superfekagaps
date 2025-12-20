@@ -556,7 +556,7 @@ export class Game {
     });
 
     if (this.boss) {
-      const voicePlayer = new AudioVoicePlayer(this.audio.getAudioEngine(), {
+      const voicePlayer = new AudioVoicePlayer(this.audio.getAudioEngine(), {}, {
         durationWarningThresholdSec: JOAOZAO_VOICE_MANIFEST.config.durationWarningThresholdSec
       });
       const bubble = new SpeechBubbleController({
