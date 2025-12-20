@@ -12,6 +12,10 @@ import {
 import { Input } from '../engine/Input';
 import { Audio } from '../engine/Audio';
 import { Renderer } from '../engine/Renderer';
+import { AudioVoicePlayer } from '../voice/AudioVoicePlayer';
+import { SpeechBubbleController } from '../voice/SpeechBubbleController';
+import { VoiceDirector } from '../voice/VoiceDirector';
+import { JOAOZAO_VOICE_MANIFEST } from '../voice/joaozaoVoiceManifest';
 import { Level, createLevel } from '../world/Level';
 import { Player } from '../entities/Player';
 import { Minion } from '../entities/enemies/Minion';
@@ -33,6 +37,7 @@ export class Game {
   private camera: CameraData;
   private minions: Minion[] = [];
   private boss: Joaozao | null = null;
+  private bossVoice: VoiceDirector | null = null;
   private collectibles: CollectibleData[] = [];
   private flags: FlagData[] = [];
   private particles: Particle[] = [];
@@ -174,6 +179,11 @@ export class Game {
       isDead: this.player?.data.isDead ?? false,
       powerupActive: this.player ? this.player.data.coffeeTimer > 0 : false
     });
+
+    const bossAlive = this.boss ? !this.boss.data.isDead : false;
+    this.bossVoice?.update(deltaTime, {
+      allowAmbient: this.state === GameState.PLAYING && bossAlive
+    });
   }
 
   private updateBoot(deltaTime: number): void {
@@ -302,6 +312,10 @@ export class Game {
         this.player.data.position.y
       );
       this.checkBossCollision();
+
+      if (this.bossVoice && !this.boss.data.isDead && this.isBossVisible()) {
+        this.bossVoice.onFirstSeen();
+      }
 
       // Verifica se boss foi derrotado
       if (this.boss.isDefeated()) {
@@ -453,6 +467,12 @@ export class Game {
       });
     }
 
+
+    const bubbleState = this.bossVoice?.getBubbleRenderState();
+    if (bubbleState) {
+      this.renderer.drawSpeechBubble(bubbleState, this.camera);
+    }
+
     // Player
     this.renderer.drawPlayer(this.player.data, this.camera);
 
@@ -524,6 +544,8 @@ export class Game {
     // Carrega inimigos
     this.minions = [];
     this.boss = null;
+    this.bossVoice?.stop();
+    this.bossVoice = null;
 
     levelData.enemies.forEach(enemy => {
       if (enemy.type === EnemyType.MINION) {
@@ -532,6 +554,22 @@ export class Game {
         this.boss = new Joaozao(enemy.position.x, enemy.position.y);
       }
     });
+
+    if (this.boss) {
+      const voicePlayer = new AudioVoicePlayer(this.audio.getAudioEngine(), {
+        durationWarningThresholdSec: JOAOZAO_VOICE_MANIFEST.config.durationWarningThresholdSec
+      });
+      const bubble = new SpeechBubbleController({
+        fadeOutMs: 120,
+        offset: { x: 0, y: -15 }
+      });
+      this.bossVoice = new VoiceDirector(
+        JOAOZAO_VOICE_MANIFEST,
+        voicePlayer,
+        bubble,
+        () => this.getBossBubbleAnchor()
+      );
+    }
 
     // Carrega coletáveis
     const validatedCollectibles = this.validateCollectibles(levelData.collectibles, levelData.tiles, levelData.id);
@@ -705,6 +743,28 @@ export class Game {
     }
   }
 
+  private getBossBubbleAnchor(): Vector2 {
+    if (!this.boss) {
+      return { x: 0, y: 0 };
+    }
+    return {
+      x: this.boss.data.position.x + this.boss.data.width / 2,
+      y: this.boss.data.position.y - 15
+    };
+  }
+
+  private isBossVisible(): boolean {
+    if (!this.boss) return false;
+    const left = this.boss.data.position.x;
+    const right = left + this.boss.data.width;
+    const top = this.boss.data.position.y;
+    const bottom = top + this.boss.data.height;
+    return right >= this.camera.x &&
+      left <= this.camera.x + GAME_WIDTH &&
+      bottom >= this.camera.y &&
+      top <= this.camera.y + GAME_HEIGHT;
+  }
+
   private checkMinionCollision(minion: Minion): void {
     if (!this.player || this.player.data.isDead) return;
 
@@ -773,12 +833,16 @@ export class Game {
     const canDamageBoss = collision.fromAbove && (stompNormal || gpFalling);
 
     if (canDamageBoss) {
-      const defeated = this.boss.takeDamage();
-      this.audio.playBossHit();
-      this.score += ENEMY_SCORE;
+      const damageResult = this.boss.takeDamage();
+      if (damageResult.damaged) {
+        this.audio.playBossHit();
+        this.score += ENEMY_SCORE;
+        this.bossVoice?.onDamaged();
+      }
 
-      if (defeated) {
+      if (damageResult.defeated) {
         this.score += 1000;
+        this.bossVoice?.stop();
       }
 
       const bossRect = this.boss.getRect();
@@ -953,10 +1017,16 @@ export class Game {
       if (dist < GP_IMPACT_RADIUS_PX * 1.5 && Math.abs(dy) < TILE_SIZE * 3) {
         // Ground pound no boss dá dano se ele estiver vulnerável ou se player tiver capacete
         // Para simplificar, vamos dar dano normal mas com feedback visual
-        const defeated = this.boss.takeDamage();
-        this.audio.playBossHit();
-        this.score += ENEMY_SCORE;
-        if (defeated) this.score += 1000;
+        const damageResult = this.boss.takeDamage();
+        if (damageResult.damaged) {
+          this.audio.playBossHit();
+          this.score += ENEMY_SCORE;
+          this.bossVoice?.onDamaged();
+        }
+        if (damageResult.defeated) {
+          this.score += 1000;
+          this.bossVoice?.stop();
+        }
 
         this.spawnParticles(impact.x, impact.y, '#FFFFFF', 15);
       }
@@ -1051,6 +1121,7 @@ export class Game {
   }
 
   private onBossDefeated(): void {
+    this.bossVoice?.stop();
     // Boss derrotado, pode ir para o final
     const goalFlag = this.flags.find(flag => flag.kind === 'goal') || undefined;
     this.onLevelComplete(goalFlag);

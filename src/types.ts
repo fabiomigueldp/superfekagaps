@@ -60,8 +60,6 @@ export interface EnemyData extends Entity {
   animationTimer: number;
   health?: number; // Para o boss
   attackTimer?: number;
-  dialogTimer?: number;
-  currentDialog?: string;
 }
 
 export enum EnemyType {
@@ -173,11 +171,10 @@ export interface Particle {
 }
 
 // Balão de diálogo
-export interface DialogBubble {
+export interface SpeechBubbleRenderState {
   text: string;
   position: Vector2;
-  timer: number;
-  maxTimer: number;
+  alpha: number;
 }
 
 // Dados do HUD

@@ -1,7 +1,7 @@
 // Sistema de Renderização - Super Feka Gaps
 
 import { GAME_WIDTH, GAME_HEIGHT, TILE_SIZE, COLORS, TileType } from '../constants';
-import { CameraData, PlayerData, EnemyData, CollectibleData, FlagData, Particle, EnemyType, CollectibleType, GroundPoundState } from '../types';
+import { CameraData, PlayerData, EnemyData, CollectibleData, FlagData, Particle, EnemyType, CollectibleType, GroundPoundState, SpeechBubbleRenderState } from '../types';
 import { PLAYER_PALETTE, PLAYER_SPRITES, PLAYER_PIXEL_SIZE, PLAYER_RENDER_OFFSET_X, PLAYER_RENDER_OFFSET_Y } from '../assets/playerSpriteSpec';
 
 
@@ -944,23 +944,28 @@ export class Renderer {
 
     ctx.restore();
     ctx.globalAlpha = 1;
-
-    // Desenha diálogo se houver
-    if (enemy.currentDialog && enemy.dialogTimer && enemy.dialogTimer > 0) {
-      this.drawDialogBubble(enemy.currentDialog, x + enemy.width / 2, y - 15);
-    }
   }
 
-  drawDialogBubble(text: string, x: number, y: number): void {
+
+  drawSpeechBubble(bubble: SpeechBubbleRenderState, camera: CameraData): void {
+    const cam = this.snapCamera(camera);
+    const x = Math.round(bubble.position.x - cam.x);
+    const y = Math.round(bubble.position.y - cam.y);
+    this.drawSpeechBubbleAt(bubble.text, x, y, bubble.alpha);
+  }
+
+  private drawSpeechBubbleAt(text: string, x: number, y: number, alpha: number): void {
     const ctx = this.offscreenCtx;
 
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
     ctx.font = '8px monospace';
     const metrics = ctx.measureText(text);
     const padding = 4;
     const width = metrics.width + padding * 2;
     const height = 12;
 
-    // Balão
+    // Bal?o
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(x - width / 2, y - height, width, height);
 
@@ -969,7 +974,7 @@ export class Renderer {
     ctx.lineWidth = 1;
     ctx.strokeRect(x - width / 2, y - height, width, height);
 
-    // Pontinha do balão
+    // Pontinha do bal?o
     ctx.fillStyle = '#FFFFFF';
     ctx.beginPath();
     ctx.moveTo(x - 3, y);
@@ -981,6 +986,7 @@ export class Renderer {
     ctx.fillStyle = '#000000';
     ctx.textAlign = 'center';
     ctx.fillText(text, x, y - 4);
+    ctx.restore();
   }
 
   // === RENDERIZAÇÃO DE COLETÁVEIS ===

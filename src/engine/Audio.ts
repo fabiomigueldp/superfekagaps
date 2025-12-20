@@ -22,6 +22,10 @@ export class Audio {
     return this.audioEngine.isEnabled();
   }
 
+  getAudioEngine(): AudioEngine {
+    return this.audioEngine;
+  }
+
   // Cria um oscilador com envelope ADSR simples
   private playTone(
     frequency: number,

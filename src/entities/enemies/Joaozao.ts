@@ -4,17 +4,6 @@ import { EnemyData, EnemyType, Rect, Projectile } from '../../types';
 import { TILE_SIZE, GRAVITY, MAX_FALL_SPEED } from '../../constants';
 import { Level } from '../../world/Level';
 
-// Frases do Joãozão para provocar Feka
-const JOAOZAO_DIALOGS = [
-  "Você não passa!",
-  "Cuidado com os gaps!",
-  "Yasmin é minha!",
-  "Vou te derrubar!",
-  "HAHAHA!",
-  "Desista, Feka!",
-  "Caiu no gap!",
-  "Muito lento!",
-];
 
 export class Joaozao {
   data: EnemyData;
@@ -41,9 +30,7 @@ export class Joaozao {
       animationFrame: 0,
       animationTimer: 0,
       health: 3,
-      attackTimer: 0,
-      dialogTimer: 0,
-      currentDialog: ''
+      attackTimer: 0
     };
   }
 
@@ -58,14 +45,6 @@ export class Joaozao {
         this.data.active = false;
       }
       return;
-    }
-
-    // Atualiza dialog timer
-    if (this.data.dialogTimer && this.data.dialogTimer > 0) {
-      this.data.dialogTimer -= deltaTime;
-      if (this.data.dialogTimer <= 0) {
-        this.data.currentDialog = '';
-      }
     }
 
     // Atualiza attack timer
@@ -127,7 +106,6 @@ export class Joaozao {
     if (distToPlayer < 100 && rand < 0.4) {
       this.currentAction = 'attack';
       this.actionTimer = 1500;
-      this.showDialog();
     } else if (rand < 0.5) {
       this.currentAction = 'walk';
       this.actionTimer = 2000;
@@ -138,7 +116,6 @@ export class Joaozao {
     } else if (rand < 0.85 && this.phase >= 2) {
       this.currentAction = 'create_gap';
       this.actionTimer = 2000;
-      this.showDialog();
     } else {
       this.currentAction = 'idle';
       this.actionTimer = 500;
@@ -219,12 +196,6 @@ export class Joaozao {
     });
   }
 
-  private showDialog(): void {
-    const dialog = JOAOZAO_DIALOGS[Math.floor(Math.random() * JOAOZAO_DIALOGS.length)];
-    this.data.currentDialog = dialog;
-    this.data.dialogTimer = 2000;
-  }
-
   getRect(): Rect {
     return {
       x: this.data.position.x,
@@ -233,16 +204,17 @@ export class Joaozao {
       height: this.data.height
     };
   }
-
-  // Chamado quando player pula na cabeça
-  takeDamage(): boolean {
-    if (!this.data.health || this.data.isDead) return false;
-    if (this.hurtTimer > 0) return false;
+  // Chamado quando player pula na cabe?a
+  takeDamage(): { defeated: boolean; damaged: boolean } {
+    if (!this.data.health || this.data.isDead) {
+      return { defeated: false, damaged: false };
+    }
+    if (this.hurtTimer > 0) {
+      return { defeated: false, damaged: false };
+    }
 
     this.hurtTimer = 400;
     this.data.health--;
-    this.data.currentDialog = "ARGH!";
-    this.data.dialogTimer = 1000;
 
     // Knockback
     this.data.velocity.y = -5;
@@ -253,18 +225,16 @@ export class Joaozao {
 
     if (this.data.health <= 0) {
       this.die();
-      return true;
+      return { defeated: true, damaged: true };
     }
 
-    return false;
+    return { defeated: false, damaged: true };
   }
 
   die(): void {
     this.data.isDead = true;
     this.data.deathTimer = 2000;
     this.data.velocity = { x: 0, y: -8 };
-    this.data.currentDialog = "NÃÃÃO!";
-    this.data.dialogTimer = 2000;
     this.projectiles = [];
   }
 
