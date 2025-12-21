@@ -1132,7 +1132,17 @@ export class Game {
         }
         if (damageResult.defeated) {
           this.score += 1000;
-          this.bossVoice?.stop();
+          if (this.bossVoice) {
+            this.bossVoice.playLineAndWait('para_de_encher_o_saco').then(started => {
+              if (!started) {
+                this.boss?.die();
+              } else {
+                this.boss?.die();
+              }
+            });
+          } else {
+            this.boss?.die();
+          }
         }
 
         this.spawnParticles(impact.x, impact.y, '#FFFFFF', 15);
