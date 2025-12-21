@@ -78,6 +78,9 @@ export class Level {
     let grounded = false;
     let tileHit: { type: number; col: number; row: number; side: 'top'|'bottom'|'left'|'right' } | null = null;
 
+    const minX = 0;
+    const maxX = this.data.width * TILE_SIZE - rect.width;
+
     // Resolve horizontal primeiro (checa paredes sólidos, ignora PLATFORMS)
     const horizontalRect = { x: newX, y: rect.y, width: rect.width, height: rect.height };
     const hCollision = this.checkTileCollisionHorizontal(horizontalRect, velocity.x);
@@ -90,6 +93,15 @@ export class Level {
         newX = (hCollision.col + 1) * TILE_SIZE;
         tileHit = { type: hCollision.tile, col: hCollision.col, row: hCollision.row, side: 'right' };
       }
+      newVelX = 0;
+    }
+
+    // Limite lateral do nivel (parede invisivel)
+    if (newX < minX) {
+      newX = minX;
+      newVelX = 0;
+    } else if (newX > maxX) {
+      newX = maxX;
       newVelX = 0;
     }
 
