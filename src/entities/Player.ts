@@ -3,7 +3,8 @@
 import { 
   GRAVITY, MAX_FALL_SPEED, PLAYER_SPEED, PLAYER_RUN_SPEED, 
   PLAYER_JUMP_FORCE, PLAYER_ACCELERATION, PLAYER_FRICTION,
-  COYOTE_TIME, JUMP_BUFFER_TIME, TILE_SIZE,
+  ICE_FRICTION, COYOTE_TIME, JUMP_BUFFER_TIME, TILE_SIZE, TileType,
+  SPRING_BOOST,
   GP_WINDUP_MS, GP_RECOVERY_MS, GP_FALL_SPEED, GP_HORIZONTAL_MULT
 } from '../constants';
 import { PlayerData, InputState, Vector2, Rect, GroundPoundState } from '../types';
@@ -47,7 +48,8 @@ export class Player {
   update(deltaTime: number, input: InputState, level: Level): { 
     tileHit?: { type: number; col: number; row: number; side: 'top'|'bottom'|'left'|'right' } | null,
     groundPoundImpact?: { x: number, y: number, col: number, row: number } | null,
-    groundPoundStarted?: boolean
+    groundPoundStarted?: boolean,
+    landedTile?: { type: number; col: number; row: number } | null
   } {
     if (this.data.isDead) return {};
 
@@ -68,8 +70,9 @@ export class Player {
     const gpStarted = gpResult.started;
 
     // Processa input horizontal (se não estiver em windup/recovery)
+    const friction = this.getGroundFriction(level);
     if (this.data.groundPoundState === GroundPoundState.NONE || this.data.groundPoundState === GroundPoundState.FALL) {
-      this.handleHorizontalMovement(input);
+      this.handleHorizontalMovement(input, friction);
     } else {
       // Em windup ou recovery, velocidade horizontal cai drasticamente
       this.data.velocity.x *= 0.8;
@@ -99,6 +102,28 @@ export class Player {
     this.data.velocity = collisionResult.velocity;
     this.data.isGrounded = collisionResult.grounded;
 
+    const landedTile = (!prevGrounded && this.data.isGrounded && collisionResult.tileHit && collisionResult.tileHit.side === 'bottom')
+      ? collisionResult.tileHit
+      : null;
+
+    const springHit = collisionResult.tileHit &&
+      collisionResult.tileHit.side === 'bottom' &&
+      collisionResult.tileHit.type === TileType.SPRING;
+
+    if (springHit) {
+      this.data.velocity.y = SPRING_BOOST;
+      this.data.isGrounded = false;
+      this.data.isJumping = true;
+      this.data.groundPoundState = GroundPoundState.NONE;
+      this.data.groundPoundTimer = 0;
+      return {
+        tileHit: collisionResult.tileHit || null,
+        groundPoundImpact: gpImpact || null,
+        groundPoundStarted: gpStarted,
+        landedTile
+      };
+    }
+
     // Guard rail: se estamos no chão, garante que isJumping seja resetado
     if (this.data.isGrounded) {
       this.data.isJumping = false;
@@ -118,7 +143,8 @@ export class Player {
       return { 
         tileHit: collisionResult.tileHit || null,
         groundPoundImpact: { x: centerX, y: this.data.position.y + this.data.height, col, row },
-        groundPoundStarted: gpStarted
+        groundPoundStarted: gpStarted,
+        landedTile
       };
     }
 
@@ -140,7 +166,8 @@ export class Player {
     return { 
       tileHit: collisionResult.tileHit || null,
       groundPoundImpact: gpImpact || null,
-      groundPoundStarted: gpStarted
+      groundPoundStarted: gpStarted,
+      landedTile
     };
   }
 
@@ -166,7 +193,18 @@ export class Player {
     }
   }
 
-  private handleHorizontalMovement(input: InputState): void {
+  private getGroundFriction(level: Level): number {
+    if (!this.data.isGrounded) return PLAYER_FRICTION;
+    const footX = this.data.position.x + this.data.width / 2;
+    const footY = this.data.position.y + this.data.height + 1;
+    const col = Math.floor(footX / TILE_SIZE);
+    const row = Math.floor(footY / TILE_SIZE);
+    const tile = level.getTile(col, row);
+    if (tile === TileType.ICE) return ICE_FRICTION;
+    return PLAYER_FRICTION;
+  }
+
+  private handleHorizontalMovement(input: InputState, friction: number): void {
     this.data.isRunning = input.run;
     
     // Velocidade máxima baseada em correr e café
@@ -203,7 +241,7 @@ export class Player {
       }
     } else {
       // Desacelerando (fricção)
-      this.data.velocity.x *= PLAYER_FRICTION;
+      this.data.velocity.x *= friction;
       if (Math.abs(this.data.velocity.x) < 0.1) {
         this.data.velocity.x = 0;
       }

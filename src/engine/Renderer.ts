@@ -1,6 +1,14 @@
 // Sistema de Renderização - Super Feka Gaps
 
-import { GAME_WIDTH, GAME_HEIGHT, TILE_SIZE, COLORS, TileType } from '../constants';
+import {
+  GAME_WIDTH,
+  GAME_HEIGHT,
+  TILE_SIZE,
+  COLORS,
+  TileType,
+  FALLING_PLATFORM_FALL_MS,
+  FALLING_PLATFORM_FALL_DISTANCE
+} from '../constants';
 import { CameraData, PlayerData, EnemyData, CollectibleData, FlagData, Particle, Firework, EnemyType, CollectibleType, GroundPoundState, SpeechBubbleRenderState } from '../types';
 import { PLAYER_PALETTE, PLAYER_SPRITES, PLAYER_PIXEL_SIZE, PLAYER_RENDER_OFFSET_X, PLAYER_RENDER_OFFSET_Y } from '../assets/playerSpriteSpec';
 
@@ -576,6 +584,39 @@ export class Renderer {
     }
   }
 
+  drawFallingPlatforms(
+    platforms: { col: number; row: number; phase: 'contact' | 'arming' | 'falling'; timer: number; contact: number }[],
+    camera: CameraData
+  ): void {
+    if (!platforms.length) return;
+    const cam = this.snapCamera(camera);
+    const ctx = this.offscreenCtx;
+
+    for (let i = 0; i < platforms.length; i++) {
+      const p = platforms[i];
+      const x = p.col * TILE_SIZE - cam.x;
+      const y = p.row * TILE_SIZE - cam.y;
+      let offsetX = 0;
+      let offsetY = 0;
+      let alpha = 1;
+
+      if (p.phase === 'arming') {
+        const seed = (p.col * 17 + p.row * 31) % 10;
+        offsetX = Math.round(Math.sin((p.timer / 40) + seed) * 1);
+        offsetY = Math.round(Math.cos((p.timer / 55) + seed) * 1);
+      } else if (p.phase === 'falling') {
+        const progress = Math.max(0, Math.min(1, 1 - p.timer / FALLING_PLATFORM_FALL_MS));
+        offsetY = Math.round(progress * FALLING_PLATFORM_FALL_DISTANCE);
+        alpha = 1 - progress * 0.4;
+      }
+
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      this.drawFallingPlatformTile(x + offsetX, y + offsetY);
+      ctx.restore();
+    }
+  }
+
   private drawTile(type: number, x: number, y: number, tiles: number[][], row: number, col: number): void {
 
     switch (type) {
@@ -593,6 +634,24 @@ export class Renderer {
         break;
       case TileType.SPIKE:
         this.drawSpikeTile(x, y);
+        break;
+      case TileType.SPRING:
+        this.drawSpringTile(x, y);
+        break;
+      case TileType.ICE:
+        this.drawIceTile(x, y);
+        break;
+      case TileType.PLATFORM_FALLING:
+        this.drawFallingPlatformTile(x, y);
+        break;
+      case TileType.LAVA_TOP:
+        this.drawLavaTopTile(x, y, tiles, row, col);
+        break;
+      case TileType.LAVA_FILL:
+        this.drawLavaFillTile(x, y);
+        break;
+      case TileType.HIDDEN_BLOCK:
+        // Hidden block: no render until revealed
         break;
       case TileType.POWERUP_BLOCK_COFFEE:
       case TileType.POWERUP_BLOCK_HELMET:
@@ -613,9 +672,11 @@ export class Renderer {
   private drawGroundTile(x: number, y: number, tiles: number[][], row: number, col: number): void {
     const ctx = this.offscreenCtx;
     const hasGroundAbove = row > 0 && tiles[row - 1][col] === TileType.GROUND;
+    const hasLavaAbove = row > 0 && (tiles[row - 1][col] === TileType.LAVA_TOP || tiles[row - 1][col] === TileType.LAVA_FILL);
+    const hasCoverAbove = hasGroundAbove || hasLavaAbove;
 
     // Grass only when there is no ground above
-    if (!hasGroundAbove) {
+    if (!hasCoverAbove) {
       ctx.fillStyle = COLORS.GROUND_TOP;
       ctx.fillRect(x, y, TILE_SIZE, 4);
       ctx.fillStyle = COLORS.GROUND_DARK;
@@ -626,12 +687,12 @@ export class Renderer {
 
     // Dirt base
     ctx.fillStyle = COLORS.GROUND_FILL;
-    const dirtTop = hasGroundAbove ? y : y + 4;
+    const dirtTop = hasCoverAbove ? y : y + 4;
     ctx.fillRect(x, dirtTop, TILE_SIZE, TILE_SIZE - (dirtTop - y));
 
     // Dirt speckles
     ctx.fillStyle = COLORS.GROUND_DARK;
-    const baseY = hasGroundAbove ? y + 2 : y + 6;
+    const baseY = hasCoverAbove ? y + 2 : y + 6;
     ctx.fillRect(x + 2, baseY, 2, 2);
     ctx.fillRect(x + 10, baseY + 4, 2, 2);
     ctx.fillRect(x + 6, baseY + 8, 2, 2);
@@ -778,6 +839,167 @@ export class Renderer {
     ctx.fillRect(x + 2, baseY + 1, 1, 1);
     ctx.fillRect(x + 7, baseY + 1, 1, 1);
     ctx.fillRect(x + 12, baseY + 1, 1, 1);
+  }
+
+  private drawSpringTile(x: number, y: number): void {
+    const ctx = this.offscreenCtx;
+
+    const t = Date.now() / 260;
+    const pulse = 0.5 + 0.5 * Math.sin(t);
+
+    // Base plate (anchored to ground)
+    const baseY = y + 12;
+    ctx.fillStyle = '#666666';
+    ctx.fillRect(x + 2, baseY, TILE_SIZE - 4, 3);
+    ctx.fillStyle = '#8e8e8e';
+    ctx.fillRect(x + 3, baseY, TILE_SIZE - 6, 1);
+    ctx.fillStyle = '#4a4a4a';
+    ctx.fillRect(x + 2, baseY + 2, TILE_SIZE - 4, 1);
+    ctx.fillStyle = '#3b3b3b';
+    ctx.fillRect(x + 4, baseY + 1, 1, 1);
+    ctx.fillRect(x + 11, baseY + 1, 1, 1);
+
+    // Top plate
+    const plateY = y + 4;
+    ctx.fillStyle = '#8c8c8c';
+    ctx.fillRect(x + 3, plateY, TILE_SIZE - 6, 3);
+    ctx.fillStyle = '#bdbdbd';
+    ctx.fillRect(x + 4, plateY, TILE_SIZE - 8, 1);
+    ctx.fillStyle = '#6a6a6a';
+    ctx.fillRect(x + 3, plateY + 2, TILE_SIZE - 6, 1);
+    ctx.fillStyle = '#5c5c5c';
+    ctx.fillRect(x + 3, plateY + 1, 1, 1);
+    ctx.fillRect(x + 12, plateY + 1, 1, 1);
+
+    // Energy strip + LED
+    ctx.fillStyle = '#c98a2e';
+    ctx.fillRect(x + 5, plateY + 1, TILE_SIZE - 10, 1);
+    ctx.save();
+    ctx.globalAlpha = 0.2 + 0.6 * pulse;
+    ctx.fillStyle = '#ffd9a0';
+    ctx.fillRect(x + 5, plateY + 1, TILE_SIZE - 10, 1);
+    ctx.fillRect(x + 11, plateY + 1, 1, 1);
+    ctx.restore();
+
+    // X mechanism (scissor), centered
+    const mechTop = y + 6;
+    const mechLeft = x + 4;
+    const mechRight = x + 11;
+    ctx.fillStyle = '#2f2f2f';
+    for (let i = 0; i < 6; i++) {
+      const py = mechTop + i;
+      ctx.fillRect(mechLeft + i, py, 1, 1);
+      ctx.fillRect(mechRight - i, py, 1, 1);
+    }
+    ctx.fillStyle = '#4a4a4a';
+    ctx.fillRect(x + 5, y + 7, 1, 1);
+    ctx.fillRect(x + 10, y + 7, 1, 1);
+
+    // Center hinge
+    ctx.fillStyle = '#1c1c1c';
+    ctx.fillRect(x + 7, y + 9, 2, 2);
+  }
+
+  private drawIceTile(x: number, y: number): void {
+    const ctx = this.offscreenCtx;
+
+    ctx.fillStyle = COLORS.ICE_LIGHT;
+    ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+
+    // Highlights
+    ctx.fillStyle = '#e6f7ff';
+    ctx.fillRect(x + 1, y + 1, TILE_SIZE - 2, 2);
+    ctx.fillRect(x + 2, y + 4, 3, 1);
+    ctx.fillRect(x + 10, y + 6, 3, 1);
+
+    // Cracks
+    ctx.fillStyle = COLORS.ICE_DARK;
+    ctx.fillRect(x + 3, y + 8, 4, 1);
+    ctx.fillRect(x + 7, y + 9, 2, 1);
+    ctx.fillRect(x + 9, y + 11, 3, 1);
+  }
+
+  private drawFallingPlatformTile(x: number, y: number): void {
+    const ctx = this.offscreenCtx;
+
+    // Base plank
+    ctx.fillStyle = COLORS.BRICK_MAIN;
+    ctx.fillRect(x, y, TILE_SIZE, 6);
+    ctx.fillStyle = COLORS.BRICK_LIGHT;
+    ctx.fillRect(x, y, TILE_SIZE, 2);
+    ctx.fillStyle = COLORS.BRICK_DARK;
+    ctx.fillRect(x, y + 5, TILE_SIZE, 1);
+
+    // Cracks
+    ctx.fillStyle = COLORS.BRICK_DARK;
+    ctx.fillRect(x + 3, y + 2, 2, 1);
+    ctx.fillRect(x + 7, y + 3, 3, 1);
+    ctx.fillRect(x + 12, y + 1, 2, 1);
+  }
+
+  private drawLavaTopTile(x: number, y: number, tiles: number[][], row: number, col: number): void {
+    const ctx = this.offscreenCtx;
+
+    const hasLavaAbove = row > 0 && (tiles[row - 1][col] === TileType.LAVA_TOP || tiles[row - 1][col] === TileType.LAVA_FILL);
+    const offset = hasLavaAbove ? 0 : Math.floor(TILE_SIZE / 4);
+    const lavaY = y + offset;
+    const lavaH = TILE_SIZE - offset;
+
+    ctx.fillStyle = COLORS.LAVA_FILL;
+    ctx.fillRect(x, lavaY, TILE_SIZE, lavaH);
+
+    // Base heat bands
+    ctx.fillStyle = '#c33a1b';
+    ctx.fillRect(x, lavaY + 6, TILE_SIZE, 1);
+    ctx.fillRect(x, lavaY + 11, TILE_SIZE, 1);
+
+    // Surface glow
+    ctx.fillStyle = COLORS.LAVA_TOP;
+    ctx.fillRect(x, lavaY, TILE_SIZE, 4);
+    ctx.fillStyle = '#ffd36a';
+    ctx.fillRect(x + 1, lavaY + 1, 4, 1);
+    ctx.fillRect(x + 7, lavaY + 2, 5, 1);
+    ctx.fillRect(x + 12, lavaY + 1, 2, 1);
+
+    // Flowing veins
+    ctx.fillStyle = '#ff7a2a';
+    ctx.fillRect(x + 2, lavaY + 5, 3, 1);
+    ctx.fillRect(x + 8, lavaY + 7, 4, 1);
+    ctx.fillRect(x + 5, lavaY + 9, 3, 1);
+
+    const bottomBubbleY = Math.min(lavaY + 12, lavaY + lavaH - 4);
+    const bottomBubbleShadowY = Math.min(lavaY + 14, lavaY + lavaH - 2);
+
+    // Bubbles with glow
+    ctx.fillStyle = '#ffcf6b';
+    ctx.fillRect(x + 3, lavaY + 8, 2, 2);
+    ctx.fillRect(x + 11, bottomBubbleY, 2, 2);
+    ctx.fillStyle = '#9b2a12';
+    ctx.fillRect(x + 3, lavaY + 10, 2, 1);
+    ctx.fillRect(x + 11, bottomBubbleShadowY, 2, 1);
+  }
+
+  private drawLavaFillTile(x: number, y: number): void {
+    const ctx = this.offscreenCtx;
+
+    ctx.fillStyle = COLORS.LAVA_FILL;
+    ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+
+    // Heat bands
+    ctx.fillStyle = '#c33a1b';
+    ctx.fillRect(x, y + 4, TILE_SIZE, 1);
+    ctx.fillRect(x, y + 9, TILE_SIZE, 1);
+
+    // Glowing pockets
+    ctx.fillStyle = '#ff7a2a';
+    ctx.fillRect(x + 2, y + 6, 3, 2);
+    ctx.fillRect(x + 10, y + 10, 4, 2);
+    ctx.fillRect(x + 7, y + 2, 3, 2);
+
+    // Darker bubbles
+    ctx.fillStyle = '#9b2a12';
+    ctx.fillRect(x + 3, y + 12, 2, 2);
+    ctx.fillRect(x + 12, y + 5, 2, 2);
   }
 
   private drawFlagTile(x: number, y: number): void {

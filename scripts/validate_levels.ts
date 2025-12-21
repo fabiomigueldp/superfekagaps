@@ -25,7 +25,7 @@ function validateLevels() {
 
       row.forEach((tile, cIdx) => {
         // Tiles válidos: 0-7, 10-13
-        const isValid = (tile >= 0 && tile <= 7) || (tile >= 10 && tile <= 13);
+        const isValid = (tile >= 0 && tile <= 7) || (tile >= 10 && tile <= 19);
         if (!isValid) {
           console.error(`❌ Erro no Nível ${level.id}: Tile inválido '${tile}' em [${rIdx}, ${cIdx}]`);
           hasErrors = true;

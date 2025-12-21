@@ -109,7 +109,7 @@ export class Game {
       level.tiles.forEach((row, rIdx) => {
         row.forEach((tile, cIdx) => {
           // Tiles válidos: 0-7, 10-13
-          const isValid = (tile >= 0 && tile <= 7) || (tile >= 10 && tile <= 13);
+          const isValid = (tile >= 0 && tile <= 7) || (tile >= 10 && tile <= 19);
           if (!isValid) {
             console.error(`❌ Erro no Nível ${level.id}: Tile inválido '${tile}' em [${rIdx}, ${cIdx}]`);
             hasErrors = true;
@@ -251,6 +251,7 @@ export class Game {
 
     // Atualiza tiles dinâmicos (gaps temporários do boss)
     this.level.updateDynamicTiles(deltaTime);
+    this.level.clearFallingPlatformTouches();
 
     // Verifica se player está morto
     if (this.player.data.isDead) {
@@ -261,6 +262,7 @@ export class Game {
       if (this.deathTimer <= 0) {
         this.handlePlayerDeath();
       }
+      this.level.updateFallingPlatforms(deltaTime);
       return;
     }
 
@@ -298,6 +300,9 @@ export class Game {
           } else {
             this.audio.playBlockBump();
           }
+        } else if (tileType === TileType.HIDDEN_BLOCK) {
+          this.level.setTile(th.col, th.row, TileType.BRICK);
+          this.audio.playBlockBump();
         } else if (tileType === TileType.POWERUP_BLOCK_COFFEE || tileType === TileType.POWERUP_BLOCK_HELMET) {
           // Troca por usado e spawna power-up
           const newTile = TileType.BLOCK_USED;
@@ -321,9 +326,26 @@ export class Game {
       }
     }
 
+    if (this.player.data.isGrounded) {
+      const footX = this.player.data.position.x + this.player.data.width / 2;
+      const footY = this.player.data.position.y + this.player.data.height + 1;
+      const col = Math.floor(footX / TILE_SIZE);
+      const row = Math.floor(footY / TILE_SIZE);
+      if (this.level.getTile(col, row) === TileType.PLATFORM_FALLING) {
+        this.level.markFallingPlatformContact(col, row);
+      }
+    }
+
+    this.level.updateFallingPlatforms(deltaTime);
+
     // Spike damage uses the same pipeline as enemies/projectiles
     if (!this.player.data.isDead && this.level.checkSpikeCollision(this.player.getRect())) {
       this.playerHit();
+    }
+
+    if (!this.player.data.isDead && this.level.checkLavaCollision(this.player.getRect())) {
+      this.playerDie();
+      return;
     }
 
     // Atualiza câmera
@@ -492,6 +514,7 @@ export class Game {
 
     // Tiles
     this.renderer.drawTiles(this.level.getModifiedTiles(), this.camera);
+    this.renderer.drawFallingPlatforms(this.level.getFallingPlatformRenderData(), this.camera);
 
     // Fogos (se o boss está morto/morrendo)
     const bossDying = this.boss && this.boss.data.isDead;
@@ -1289,7 +1312,12 @@ export class Game {
       tile === TileType.POWERUP_BLOCK_COFFEE ||
       tile === TileType.POWERUP_BLOCK_HELMET ||
       tile === TileType.BLOCK_USED ||
-      tile === TileType.PLATFORM;
+      tile === TileType.PLATFORM ||
+      tile === TileType.PLATFORM_FALLING ||
+      tile === TileType.ICE ||
+      tile === TileType.SPRING ||
+      tile === TileType.LAVA_TOP ||
+      tile === TileType.LAVA_FILL;
   }
 
   private isSolidTile(tile: number): boolean {
@@ -1300,7 +1328,12 @@ export class Game {
       tile === TileType.POWERUP_BLOCK_HELMET ||
       tile === TileType.BLOCK_USED ||
       tile === TileType.PLATFORM ||
-      tile === TileType.SPIKE;
+      tile === TileType.PLATFORM_FALLING ||
+      tile === TileType.SPIKE ||
+      tile === TileType.ICE ||
+      tile === TileType.SPRING ||
+      tile === TileType.LAVA_TOP ||
+      tile === TileType.LAVA_FILL;
   }
 
   private validateCollectibles(

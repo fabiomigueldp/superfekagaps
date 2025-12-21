@@ -18,8 +18,17 @@ export const PLAYER_RUN_SPEED = 3.5;
 export const PLAYER_JUMP_FORCE = -8;
 export const PLAYER_ACCELERATION = 0.3;
 export const PLAYER_FRICTION = 0.85;
+export const ICE_FRICTION = 0.96;
 export const COYOTE_TIME = 100; // ms
 export const JUMP_BUFFER_TIME = 100; // ms
+export const SPRING_BOOST = -13;
+
+// Plataformas instaveis
+export const FALLING_PLATFORM_MIN_CONTACT_MS = 150;
+export const FALLING_PLATFORM_ARM_MS = 250;
+export const FALLING_PLATFORM_FALL_MS = 300;
+export const FALLING_PLATFORM_RESPAWN_MS = 1200;
+export const FALLING_PLATFORM_FALL_DISTANCE = 12;
 
 // Ground Pound
 export const GP_WINDUP_MS = 120;
@@ -73,6 +82,12 @@ export const COLORS = {
 
   // Efeitos
   SPIKE: '#808080',
+  ICE_LIGHT: '#BFE9FF',
+  ICE_DARK: '#6FB7E6',
+  LAVA_TOP: '#FFB020',
+  LAVA_FILL: '#E4471F',
+  SPRING_BASE: '#C0392B',
+  SPRING_COIL: '#F1C40F',
   CHECKPOINT_FLAG: '#FF0000',
   PORTAL: '#00FFFF',
 
@@ -118,7 +133,13 @@ export enum TileType {
   BRICK_BREAKABLE = 10,
   POWERUP_BLOCK_COFFEE = 11,
   POWERUP_BLOCK_HELMET = 12,
-  BLOCK_USED = 13
+  BLOCK_USED = 13,
+  SPRING = 14,
+  ICE = 15,
+  PLATFORM_FALLING = 16,
+  LAVA_TOP = 17,
+  LAVA_FILL = 18,
+  HIDDEN_BLOCK = 19
 }
 
 // Estados do jogo

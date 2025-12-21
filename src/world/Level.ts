@@ -1,14 +1,46 @@
 // Sistema de Níveis - Super Feka Gaps
 
-import { TILE_SIZE, TileType } from '../constants';
+import {
+  TILE_SIZE,
+  TileType,
+  FALLING_PLATFORM_MIN_CONTACT_MS,
+  FALLING_PLATFORM_ARM_MS,
+  FALLING_PLATFORM_FALL_MS,
+  FALLING_PLATFORM_RESPAWN_MS
+} from '../constants';
 import { LevelData, Rect, Vector2 } from '../types';
+
+type FallingPlatformPhase = 'contact' | 'arming' | 'falling' | 'cooldown';
+
+interface FallingPlatformState {
+  phase: FallingPlatformPhase;
+  timer: number;
+  contact: number;
+}
 
 export class Level {
   data: LevelData;
   private dynamicTiles: Map<string, { originalTile: number; timer: number }> = new Map();
+  private fallingPlatforms: Map<string, FallingPlatformState> = new Map();
+  private fallingPlatformTouches: Set<string> = new Set();
 
   constructor(data: LevelData) {
     this.data = data;
+  }
+
+  private hasLavaAbove(col: number, row: number): boolean {
+    if (row <= 0 || col < 0 || col >= this.data.tiles[0].length) return false;
+    const above = this.data.tiles[row - 1]?.[col];
+    return above === TileType.LAVA_TOP || above === TileType.LAVA_FILL;
+  }
+
+  private getLavaTopOffset(col: number, row: number): number {
+    if (row < 0 || row >= this.data.tiles.length || col < 0 || col >= this.data.tiles[0].length) {
+      return 0;
+    }
+    const tile = this.data.tiles[row][col];
+    if (tile !== TileType.LAVA_TOP) return 0;
+    return this.hasLavaAbove(col, row) ? 0 : Math.floor(TILE_SIZE / 4);
   }
 
   // Verifica colisão com um retângulo
@@ -29,19 +61,37 @@ export class Level {
         const tileTop = row * TILE_SIZE;
         const entityBottom = rect.y + rect.height;
         let solid = false;
-        if (tile === TileType.GROUND || tile === TileType.BRICK || tile === TileType.BRICK_BREAKABLE || tile === TileType.BLOCK_USED || tile === TileType.POWERUP_BLOCK_COFFEE || tile === TileType.POWERUP_BLOCK_HELMET) {
+        if (
+          tile === TileType.GROUND ||
+          tile === TileType.BRICK ||
+          tile === TileType.BRICK_BREAKABLE ||
+          tile === TileType.BLOCK_USED ||
+          tile === TileType.POWERUP_BLOCK_COFFEE ||
+          tile === TileType.POWERUP_BLOCK_HELMET ||
+          tile === TileType.SPRING ||
+          tile === TileType.ICE ||
+          tile === TileType.LAVA_TOP ||
+          tile === TileType.LAVA_FILL
+        ) {
           solid = true;
-        } else if (tile === TileType.PLATFORM) {
+        } else if (tile === TileType.PLATFORM || tile === TileType.PLATFORM_FALLING) {
           solid = entityBottom <= tileTop + 2;
         }
 
         if (solid) {
-          // Determina qual lado está colidindo
+          // Determina qual lado esta colidindo
+          let tileY = row * TILE_SIZE;
+          let tileH = TILE_SIZE;
+          if (tile === TileType.LAVA_TOP) {
+            const offset = this.getLavaTopOffset(col, row);
+            tileY += offset;
+            tileH -= offset;
+          }
           const tileRect = {
             x: col * TILE_SIZE,
-            y: row * TILE_SIZE,
+            y: tileY,
             width: TILE_SIZE,
-            height: TILE_SIZE
+            height: tileH
           };
           
           // Calcula overlap
@@ -112,7 +162,12 @@ export class Level {
     if (vCollision.collides) {
       if (velocity.y > 0) {
         // Landing on tile
-        newY = vCollision.row * TILE_SIZE - rect.height;
+        if (vCollision.tile === TileType.LAVA_TOP) {
+          const offset = this.getLavaTopOffset(vCollision.col, vCollision.row);
+          newY = vCollision.row * TILE_SIZE + offset - rect.height;
+        } else {
+          newY = vCollision.row * TILE_SIZE - rect.height;
+        }
         grounded = true;
         tileHit = { type: vCollision.tile, col: vCollision.col, row: vCollision.row, side: 'bottom' };
       } else if (velocity.y < 0) {
@@ -145,9 +200,30 @@ export class Level {
 
         const tile = this.getTile(col, row);
         // Ignora PLATFORMS para colisão lateral
-        if (tile === TileType.PLATFORM) continue;
+        if (tile === TileType.PLATFORM || tile === TileType.PLATFORM_FALLING) continue;
 
-        if (tile === TileType.GROUND || tile === TileType.BRICK || tile === TileType.BRICK_BREAKABLE || tile === TileType.BLOCK_USED || tile === TileType.POWERUP_BLOCK_COFFEE || tile === TileType.POWERUP_BLOCK_HELMET) {
+        if (
+          tile === TileType.GROUND ||
+          tile === TileType.BRICK ||
+          tile === TileType.BRICK_BREAKABLE ||
+          tile === TileType.BLOCK_USED ||
+          tile === TileType.POWERUP_BLOCK_COFFEE ||
+          tile === TileType.POWERUP_BLOCK_HELMET ||
+          tile === TileType.SPRING ||
+          tile === TileType.ICE ||
+          tile === TileType.LAVA_TOP ||
+          tile === TileType.LAVA_FILL
+        ) {
+          if (tile === TileType.LAVA_TOP) {
+            const offset = this.getLavaTopOffset(col, row);
+            if (offset > 0) {
+              const tileTop = row * TILE_SIZE + offset;
+              const tileBottom = (row + 1) * TILE_SIZE;
+              if (rect.y + rect.height <= tileTop || rect.y >= tileBottom) {
+                continue;
+              }
+            }
+          }
           return { collides: true, col, row, tile };
         }
       }
@@ -169,7 +245,7 @@ export class Level {
         const tile = this.getTile(col, row);
         const tileTop = row * TILE_SIZE;
         // Plataformas: só colidem se o jogador vinha de cima e cruzou o topo nesse frame
-        if (tile === TileType.PLATFORM) {
+        if (tile === TileType.PLATFORM || tile === TileType.PLATFORM_FALLING) {
           if (prevRect) {
             const prevBottom = prevRect.y + prevRect.height;
             const newBottom = rect.y + rect.height;
@@ -185,7 +261,35 @@ export class Level {
           }
         }
 
-        if (tile === TileType.GROUND || tile === TileType.BRICK || tile === TileType.BRICK_BREAKABLE || tile === TileType.BLOCK_USED || tile === TileType.POWERUP_BLOCK_COFFEE || tile === TileType.POWERUP_BLOCK_HELMET) {
+        if (tile === TileType.LAVA_TOP) {
+          const offset = this.getLavaTopOffset(col, row);
+          const lavaTop = row * TILE_SIZE + offset;
+          if (prevRect) {
+            const prevBottom = prevRect.y + prevRect.height;
+            const newBottom = rect.y + rect.height;
+            if (prevBottom <= lavaTop + 1 && newBottom >= lavaTop - 0.1) {
+              return { collides: true, col, row, tile };
+            }
+          } else {
+            const newBottom = rect.y + rect.height;
+            if (newBottom >= lavaTop - 0.1) {
+              return { collides: true, col, row, tile };
+            }
+          }
+          continue;
+        }
+
+        if (
+          tile === TileType.GROUND ||
+          tile === TileType.BRICK ||
+          tile === TileType.BRICK_BREAKABLE ||
+          tile === TileType.BLOCK_USED ||
+          tile === TileType.POWERUP_BLOCK_COFFEE ||
+          tile === TileType.POWERUP_BLOCK_HELMET ||
+          tile === TileType.SPRING ||
+          tile === TileType.ICE ||
+          tile === TileType.LAVA_FILL
+        ) {
           return { collides: true, col, row, tile };
         }
       }
@@ -197,7 +301,19 @@ export class Level {
       for (let col = startCol; col <= endCol; col++) {
         if (row < 0 || row >= this.data.tiles.length || col < 0 || col >= this.data.tiles[0].length) continue;
         const tile = this.getTile(col, row);
-        if (tile === TileType.GROUND || tile === TileType.BRICK || tile === TileType.BRICK_BREAKABLE || tile === TileType.POWERUP_BLOCK_COFFEE || tile === TileType.POWERUP_BLOCK_HELMET || tile === TileType.BLOCK_USED) {
+        if (
+          tile === TileType.GROUND ||
+          tile === TileType.BRICK ||
+          tile === TileType.BRICK_BREAKABLE ||
+          tile === TileType.POWERUP_BLOCK_COFFEE ||
+          tile === TileType.POWERUP_BLOCK_HELMET ||
+          tile === TileType.BLOCK_USED ||
+          tile === TileType.SPRING ||
+          tile === TileType.ICE ||
+          tile === TileType.LAVA_TOP ||
+          tile === TileType.LAVA_FILL ||
+          tile === TileType.HIDDEN_BLOCK
+        ) {
           return { collides: true, col, row, tile };
         }
       }
@@ -235,6 +351,35 @@ export class Level {
     return false;
   }
 
+
+
+  // Verifica colisao com lava
+  checkLavaCollision(rect: Rect): boolean {
+    const startCol = Math.floor(rect.x / TILE_SIZE);
+    const endCol = Math.floor((rect.x + rect.width - 1) / TILE_SIZE);
+    const startRow = Math.floor(rect.y / TILE_SIZE);
+    const endRow = Math.floor((rect.y + rect.height) / TILE_SIZE);
+
+    for (let row = startRow; row <= endRow; row++) {
+      for (let col = startCol; col <= endCol; col++) {
+        if (row < 0 || row >= this.data.tiles.length || col < 0 || col >= this.data.tiles[0].length) continue;
+        const tile = this.getTile(col, row);
+        if (tile === TileType.LAVA_TOP || tile === TileType.LAVA_FILL) {
+          const offset = tile === TileType.LAVA_TOP ? this.getLavaTopOffset(col, row) : 0;
+          const lavaY = row * TILE_SIZE + offset;
+          const lavaH = TILE_SIZE - offset;
+          const lavaX = col * TILE_SIZE;
+          const hit = rect.x <= lavaX + TILE_SIZE &&
+            rect.x + rect.width >= lavaX &&
+            rect.y <= lavaY + lavaH &&
+            rect.y + rect.height >= lavaY;
+          if (hit) return true;
+        }
+      }
+    }
+
+    return false;
+  }
   // Verifica se alcançou a bandeira/portal de fim
   checkGoalReached(rect: Rect): boolean {
     const goalX = this.data.goalPosition.x * TILE_SIZE;
@@ -258,6 +403,14 @@ export class Level {
     if (row < 0 || row >= this.data.tiles.length || col < 0 || col >= this.data.tiles[0].length) {
       return TileType.EMPTY;
     }
+
+    const falling = this.fallingPlatforms.get(key);
+    if (falling) {
+      if (falling.phase === 'falling' || falling.phase === 'cooldown') {
+        return TileType.EMPTY;
+      }
+      return TileType.PLATFORM_FALLING;
+    }
     
     return this.data.tiles[row][col];
   }
@@ -274,6 +427,23 @@ export class Level {
     }
   }
 
+
+
+  // Marca contato com plataforma instavel neste frame
+  markFallingPlatformContact(col: number, row: number): void {
+    if (row < 0 || row >= this.data.tiles.length || col < 0 || col >= this.data.tiles[0].length) return;
+    const key = `${col},${row}`;
+    const tile = this.data.tiles[row][col];
+    if (tile !== TileType.PLATFORM_FALLING) return;
+    this.fallingPlatformTouches.add(key);
+    if (!this.fallingPlatforms.has(key)) {
+      this.fallingPlatforms.set(key, { phase: 'contact', timer: 0, contact: 0 });
+    }
+  }
+
+  clearFallingPlatformTouches(): void {
+    this.fallingPlatformTouches.clear();
+  }
   // Atualiza tiles dinâmicos
   updateDynamicTiles(deltaTime: number): void {
     this.dynamicTiles.forEach((v, key) => {
@@ -282,6 +452,53 @@ export class Level {
         this.dynamicTiles.delete(key);
       }
     });
+  }
+
+  // Atualiza plataformas instaveis (contato, arm, queda e respawn)
+  updateFallingPlatforms(deltaTime: number): void {
+    this.fallingPlatforms.forEach((state, key) => {
+      const touched = this.fallingPlatformTouches.has(key);
+
+      if (state.phase === 'contact') {
+        if (touched) {
+          state.contact += deltaTime;
+          if (state.contact >= FALLING_PLATFORM_MIN_CONTACT_MS) {
+            state.phase = 'arming';
+            state.timer = FALLING_PLATFORM_ARM_MS;
+          }
+        } else {
+          this.fallingPlatforms.delete(key);
+        }
+        return;
+      }
+
+      if (state.phase === 'arming') {
+        state.timer -= deltaTime;
+        if (state.timer <= 0) {
+          state.phase = 'falling';
+          state.timer = FALLING_PLATFORM_FALL_MS;
+        }
+        return;
+      }
+
+      if (state.phase === 'falling') {
+        state.timer -= deltaTime;
+        if (state.timer <= 0) {
+          state.phase = 'cooldown';
+          state.timer = FALLING_PLATFORM_RESPAWN_MS;
+        }
+        return;
+      }
+
+      if (state.phase === 'cooldown') {
+        state.timer -= deltaTime;
+        if (state.timer <= 0) {
+          this.fallingPlatforms.delete(key);
+        }
+      }
+    });
+
+    this.fallingPlatformTouches.clear();
   }
 
   // Obtém todos os tiles modificados para renderização
@@ -294,8 +511,26 @@ export class Level {
         tiles[row][col] = TileType.EMPTY;
       }
     });
+
+    this.fallingPlatforms.forEach((_, key) => {
+      const [col, row] = key.split(',').map(Number);
+      if (row >= 0 && row < tiles.length && col >= 0 && col < tiles[0].length) {
+        tiles[row][col] = TileType.EMPTY;
+      }
+    });
     
     return tiles;
+  }
+
+  // Lista plataformas instaveis para renderizacao especial
+  getFallingPlatformRenderData(): { col: number; row: number; phase: FallingPlatformPhase; timer: number; contact: number }[] {
+    const list: { col: number; row: number; phase: FallingPlatformPhase; timer: number; contact: number }[] = [];
+    this.fallingPlatforms.forEach((state, key) => {
+      if (state.phase === 'cooldown') return;
+      const [col, row] = key.split(',').map(Number);
+      list.push({ col, row, phase: state.phase, timer: state.timer, contact: state.contact });
+    });
+    return list;
   }
 
   // Obtém limites do nível para a câmera
@@ -356,6 +591,8 @@ export class Level {
   // Reset do nível
   reset(): void {
     this.dynamicTiles.clear();
+    this.fallingPlatforms.clear();
+    this.fallingPlatformTouches.clear();
   }
 }
 
