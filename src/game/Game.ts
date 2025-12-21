@@ -875,12 +875,28 @@ export class Game {
       if (damageResult.damaged) {
         this.audio.playBossHit();
         this.score += ENEMY_SCORE;
-        this.bossVoice?.onDamaged();
+        // If not the killing blow, play normal hit react; otherwise play the death line explicitly
+        if (!damageResult.defeated) {
+          this.bossVoice?.onDamaged();
+        }
       }
 
       if (damageResult.defeated) {
         this.score += 1000;
-        this.bossVoice?.stop();
+        // Play the specific death line before executing the final die animation
+        if (this.bossVoice) {
+          this.bossVoice.playLineAndWait('porra_nenhuma').then(started => {
+            if (!started) {
+              // Couldn't play; fall back to instant death
+              this.boss?.die();
+            } else {
+              // After the line completes, execute death
+              this.boss?.die();
+            }
+          });
+        } else {
+          this.boss?.die();
+        }
       }
 
       const bossRect = this.boss.getRect();

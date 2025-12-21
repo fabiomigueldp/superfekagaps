@@ -62,6 +62,8 @@ export interface EnemyData extends Entity {
   attackTimer?: number;
   // Rotação visual aplicada na morte (radians)
   deadRotation?: number;
+  // Se a morte foi iniciada mas aguardando algo (ex: fala) antes de executar a animação final
+  pendingDeath?: boolean;
 }
 
 export enum EnemyType {

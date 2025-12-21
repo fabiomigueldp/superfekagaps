@@ -39,7 +39,8 @@ export class Joaozao {
       animationTimer: 0,
       health: 3,
       attackTimer: 0,
-      deadRotation: 0
+      deadRotation: 0,
+      pendingDeath: false
     };
   }
 
@@ -300,7 +301,13 @@ export class Joaozao {
     this.phase = Math.min(3, 4 - this.data.health);
 
     if (this.data.health <= 0) {
-      this.die();
+      // Marca morte pendente e aguarda ação externa (ex: tocar fala) antes de executar a animação final
+      this.data.pendingDeath = true;
+      // Garante que a animação de dano esteja visível durante a fala
+      this.hurtTimer = 800;
+      // Bloqueia novas ações enquanto aguardamos a fala
+      this.actionTimer = Number.MAX_SAFE_INTEGER;
+      this.currentAction = 'idle';
       return { defeated: true, damaged: true };
     }
 
@@ -309,6 +316,7 @@ export class Joaozao {
 
   die(): void {
     this.data.isDead = true;
+    this.data.pendingDeath = false;
     this.data.deathTimer = 3000; // Mais tempo para curtir a animação de morte
     this.data.velocity = { x: 0, y: -6 }; // Pulo da morte (clássico Mario boss)
     this.projectiles = [];

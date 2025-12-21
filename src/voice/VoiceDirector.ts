@@ -17,6 +17,8 @@ export class VoiceDirector {
   private nextAmbientTickAt: number = 0;
   private recentLineIds: string[] = [];
 
+  private pendingPlayResolve: ((value: boolean) => void) | null = null;
+
   constructor(
     manifest: VoiceManifest,
     player: AudioVoicePlayer,
@@ -48,6 +50,11 @@ export class VoiceDirector {
         this.currentPriority = 0;
         if (info.reason === 'ended') {
           this.globalCooldownUntil = this.nowMs + this.manifest.config.globalCooldownMs;
+        }
+        // If an external caller is awaiting a specific line completion, resolve it
+        if (this.pendingPlayResolve) {
+          this.pendingPlayResolve(true);
+          this.pendingPlayResolve = null;
         }
       }
     });
@@ -187,6 +194,21 @@ export class VoiceDirector {
     }
 
     return queue;
+  }
+
+  // Play a specific line immediately and return a promise that resolves when the queue completes
+  public async playLineAndWait(lineId: string, priority: number = 1000): Promise<boolean> {
+    const queue = this.buildLineQueue(lineId);
+    if (!queue.length) return false;
+
+    const started = this.startEvent(priority, queue, { bypassGlobalCooldown: true });
+    if (!started) return false;
+
+    return new Promise<boolean>(resolve => {
+      this.pendingPlayResolve = (v: boolean) => {
+        resolve(v);
+      };
+    });
   }
 
   private buildSequenceQueue(sequenceId: string): VoiceQueueItem[] {
