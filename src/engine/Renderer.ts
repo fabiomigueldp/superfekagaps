@@ -136,6 +136,10 @@ export class Renderer {
       this.drawUIOnScreen();
     }
 
+    if (this.rainActive) {
+      this.drawOrangeFilter();
+    }
+
     if (this.rainActive && this.rainDrops.length > 0) {
       this.drawOrangeRainOnScreen(this.scale * this.dpr);
     }
@@ -193,6 +197,15 @@ export class Renderer {
       ctx.fillRect(x, y - len, thickness, len);
     }
 
+    ctx.restore();
+  }
+
+  private drawOrangeFilter(): void {
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.globalAlpha = 0.12;
+    ctx.fillStyle = '#FFA500';
+    ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     ctx.restore();
   }
 
