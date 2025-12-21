@@ -1169,6 +1169,12 @@ export class Game {
     this.audio.playVictory();
     this.endingTimer = 0;
     this.changeState(GameState.ENDING);
+    
+    // Spawn initial burst of fireworks for ending screen
+    for (let i = 0; i < 5; i++) {
+      setTimeout(() => this.spawnFirework(), i * 150);
+    }
+    this.fireworkSpawnTimer = 300; // Quick respawn
   }
 
   private isSurfaceTile(tile: number): boolean {
@@ -1249,11 +1255,6 @@ export class Game {
 
   // === FOGOS ===
   private updateFireworks(deltaTime: number): void {
-    // Debug inicial
-    if (this.fireworks.length > 0 && this.fireworks.length <= 2) {
-      console.log('[Fireworks] Updating:', this.fireworks.length, 'fireworks');
-    }
-
     // 1. Spawn aleatório (mais intenso após a morte do boss)
     this.fireworkSpawnTimer -= deltaTime;
     if (this.fireworkSpawnTimer <= 0) {
@@ -1275,7 +1276,9 @@ export class Game {
           this.explodeFirework(fw);
         }
       } else if (fw.phase === 'EXPLODED') {
+        // Optimize: only update living particles
         fw.particles.forEach(p => {
+          if (p.life <= 0) return; // Skip dead particles
           p.position.x += p.velocity.x;
           p.position.y += p.velocity.y;
           p.velocity.y += 0.05; // gravidade
@@ -1332,20 +1335,6 @@ export class Game {
     };
 
     this.fireworks.push(fw);
-
-    // Debug: log first few fireworks
-    if (this.fireworks.length <= 3) {
-      console.log('[Firework] Spawned:', {
-        x: fw.x,
-        y: fw.y,
-        targetY: fw.targetY,
-        cameraX: this.camera.x,
-        cameraY: this.camera.y,
-        state: this.state,
-        phase: fw.phase
-      });
-    }
-
     this.audio.playFireworkLaunch();
   }
 

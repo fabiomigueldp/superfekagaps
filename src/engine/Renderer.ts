@@ -1209,12 +1209,9 @@ export class Renderer {
 
   // === FOGOS DE ARTIFÍCIO ===
   public drawFireworks(fireworks: Firework[], cameraX: number = 0, cameraY: number = 0): void {
+    if (fireworks.length === 0) return; // Early exit for performance
+    
     const ctx = this.offscreenCtx;
-
-    // Debug
-    if (fireworks.length > 0) {
-      console.log('[Renderer] Drawing', fireworks.length, 'fireworks, camera:', cameraX, cameraY);
-    }
 
     fireworks.forEach(fw => {
       // Ajusta posição pela câmera
