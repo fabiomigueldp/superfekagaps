@@ -883,9 +883,8 @@ export class Renderer {
   private drawJoaozao(enemy: EnemyData, x: number, y: number): void {
     const ctx = this.offscreenCtx;
     
-    // Cast para acessar a propriedade deadRotation que adicionamos na classe, 
-    // ou assumir 0 se estivermos desenhando apenas a interface EnemyData pura
-    const rotation = (enemy as any).deadRotation || 0;
+    // Rotação da morte (se presente) ou 0
+    const rotation = enemy.deadRotation || 0;
 
     ctx.save();
 

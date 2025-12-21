@@ -38,7 +38,8 @@ export class Joaozao {
       animationFrame: 0,
       animationTimer: 0,
       health: 3,
-      attackTimer: 0
+      attackTimer: 0,
+      deadRotation: 0
     };
   }
 
@@ -56,6 +57,9 @@ export class Joaozao {
       if (this.deadRotation < Math.PI / 2) {
         this.deadRotation += deltaTime * 0.005;
       }
+
+      // Espelha a rotação no objeto de dados para o renderer ler
+      this.data.deadRotation = this.deadRotation;
 
       // Aplica gravidade na morte para ele cair do cenário se estiver no ar
       this.data.velocity.y += GRAVITY;
@@ -308,6 +312,10 @@ export class Joaozao {
     this.data.deathTimer = 3000; // Mais tempo para curtir a animação de morte
     this.data.velocity = { x: 0, y: -6 }; // Pulo da morte (clássico Mario boss)
     this.projectiles = [];
+
+    // Reinicia rotação visual
+    this.deadRotation = 0;
+    this.data.deadRotation = 0;
   }
 
   // Verifica colisão com player

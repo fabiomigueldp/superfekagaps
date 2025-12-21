@@ -60,6 +60,8 @@ export interface EnemyData extends Entity {
   animationTimer: number;
   health?: number; // Para o boss
   attackTimer?: number;
+  // Rotação visual aplicada na morte (radians)
+  deadRotation?: number;
 }
 
 export enum EnemyType {
