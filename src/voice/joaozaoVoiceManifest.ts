@@ -71,8 +71,9 @@ export const JOAOZAO_VOICE_MANIFEST: VoiceManifest = {
     onHitReact: {
       id: 'OnHitReact',
       priority: 70,
-      cooldownMs: 1400,
-      chance: 0.55,
+      // Reduzi cooldown e aumentei muito a chance para respostas de hit
+      cooldownMs: 800,
+      chance: 0.95,
       entries: [
         { id: 'porra_nenhuma', weight: 60 },
         { id: 'para_de_encher_o_saco', weight: 40 }
