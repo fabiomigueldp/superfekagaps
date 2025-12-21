@@ -1232,4 +1232,94 @@ export class Game {
       return p.life > 0;
     });
   }
+
+  // === FOGOS ===
+  private updateFireworks(deltaTime: number): void {
+    // 1. Spawn aleatório
+    this.fireworkSpawnTimer -= deltaTime;
+    if (this.fireworkSpawnTimer <= 0) {
+      this.spawnFirework();
+      this.fireworkSpawnTimer = 500 + Math.random() * 1000; // 0.5s .. 1.5s
+    }
+
+    // 2. Atualizar física
+    this.fireworks.forEach(fw => {
+      if (fw.phase === 'ROCKET') {
+        fw.y += fw.velocity.y;
+        // Gravidade leve
+        fw.velocity.y += 0.05;
+
+        // Explode se atingir target ou começar a cair
+        if (fw.y <= fw.targetY || fw.velocity.y >= 0) {
+          this.explodeFirework(fw);
+        }
+      } else if (fw.phase === 'EXPLODED') {
+        fw.particles.forEach(p => {
+          p.position.x += p.velocity.x;
+          p.position.y += p.velocity.y;
+          p.velocity.y += 0.05; // gravidade
+          p.velocity.x *= 0.96; // resistência do ar
+          p.life -= deltaTime;
+        });
+      }
+    });
+
+    // 3. Limpeza
+    this.fireworks = this.fireworks.filter(fw => {
+      if (fw.phase === 'ROCKET') return true;
+      return fw.particles.some(p => p.life > 0);
+    });
+  }
+
+  private spawnFirework(): void {
+    let spawnX: number;
+    let targetY: number;
+
+    if (this.state === GameState.ENDING) {
+      spawnX = Math.random() * GAME_WIDTH;
+      targetY = 20 + Math.random() * (GAME_HEIGHT / 2);
+    } else {
+      spawnX = this.camera.x + Math.random() * GAME_WIDTH;
+      targetY = this.camera.y + 20 + Math.random() * 60;
+    }
+
+    const color = COLORS.FIREWORK_COLORS[Math.floor(Math.random() * COLORS.FIREWORK_COLORS.length)];
+
+    this.fireworks.push({
+      id: Math.random(),
+      phase: 'ROCKET',
+      x: spawnX,
+      y: (this.state === GameState.ENDING ? GAME_HEIGHT : this.camera.y + GAME_HEIGHT),
+      targetY: targetY,
+      velocity: { x: 0, y: -4 - Math.random() * 2 },
+      color: color,
+      particles: [],
+      trailTimer: 0
+    });
+
+    this.audio.playFireworkLaunch();
+  }
+
+  private explodeFirework(fw: Firework): void {
+    // se já explodiu, ignora
+    if (fw.phase === 'EXPLODED') return;
+
+    fw.phase = 'EXPLODED';
+    this.audio.playFireworkBang();
+
+    const particleCount = 20 + Math.floor(Math.random() * 15);
+    for (let i = 0; i < particleCount; i++) {
+      const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.4;
+      const speed = 1 + Math.random() * 2;
+
+      fw.particles.push({
+        position: { x: fw.x, y: fw.y },
+        velocity: { x: Math.cos(angle) * speed, y: Math.sin(angle) * speed },
+        life: 500 + Math.random() * 500,
+        maxLife: 1000,
+        color: fw.color,
+        size: Math.random() > 0.5 ? 2 : 1
+      });
+    }
+  }
 }
