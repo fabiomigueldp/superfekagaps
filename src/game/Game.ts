@@ -469,9 +469,9 @@ export class Game {
     // Tiles
     this.renderer.drawTiles(this.level.getModifiedTiles(), this.camera);
 
-    // Fogos (se o boss foi derrotado)
-    const bossDefeated = this.boss && this.boss.isDefeated();
-    if (bossDefeated) {
+    // Fogos (se o boss está morto/morrendo)
+    const bossDying = this.boss && this.boss.data.isDead;
+    if (bossDying) {
       this.renderer.drawFireworks(this.fireworks, this.camera.x, this.camera.y);
     }
 
@@ -1249,6 +1249,11 @@ export class Game {
 
   // === FOGOS ===
   private updateFireworks(deltaTime: number): void {
+    // Debug inicial
+    if (this.fireworks.length > 0 && this.fireworks.length <= 2) {
+      console.log('[Fireworks] Updating:', this.fireworks.length, 'fireworks');
+    }
+
     // 1. Spawn aleatório (mais intenso após a morte do boss)
     this.fireworkSpawnTimer -= deltaTime;
     if (this.fireworkSpawnTimer <= 0) {
@@ -1309,17 +1314,37 @@ export class Game {
 
     const color = COLORS.FIREWORK_COLORS[Math.floor(Math.random() * COLORS.FIREWORK_COLORS.length)];
 
-    this.fireworks.push({
+    // Durante PLAYING, spawn do chão visível (bottom of screen)
+    const startY = this.state === GameState.ENDING 
+      ? GAME_HEIGHT 
+      : this.camera.y + GAME_HEIGHT - 10; // Spawn na borda inferior da tela
+
+    const fw: Firework = {
       id: Math.random(),
       phase: 'ROCKET',
       x: sx,
-      y: (this.state === GameState.ENDING ? GAME_HEIGHT : this.camera.y + GAME_HEIGHT),
+      y: startY,
       targetY: ty,
       velocity: { x: (Math.random() - 0.5) * 0.4, y: -4 - Math.random() * 2 },
       color: color,
       particles: [],
       trailTimer: 0
-    });
+    };
+
+    this.fireworks.push(fw);
+
+    // Debug: log first few fireworks
+    if (this.fireworks.length <= 3) {
+      console.log('[Firework] Spawned:', {
+        x: fw.x,
+        y: fw.y,
+        targetY: fw.targetY,
+        cameraX: this.camera.x,
+        cameraY: this.camera.y,
+        state: this.state,
+        phase: fw.phase
+      });
+    }
 
     this.audio.playFireworkLaunch();
   }

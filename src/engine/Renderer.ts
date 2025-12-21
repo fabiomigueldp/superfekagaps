@@ -1211,6 +1211,11 @@ export class Renderer {
   public drawFireworks(fireworks: Firework[], cameraX: number = 0, cameraY: number = 0): void {
     const ctx = this.offscreenCtx;
 
+    // Debug
+    if (fireworks.length > 0) {
+      console.log('[Renderer] Drawing', fireworks.length, 'fireworks, camera:', cameraX, cameraY);
+    }
+
     fireworks.forEach(fw => {
       // Ajusta posição pela câmera
       const drawX = Math.round(fw.x - cameraX);
