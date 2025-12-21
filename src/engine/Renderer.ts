@@ -571,16 +571,16 @@ export class Renderer {
         const x = col * TILE_SIZE - cam.x;
         const y = row * TILE_SIZE - cam.y;
 
-        this.drawTile(tile, x, y);
+        this.drawTile(tile, x, y, tiles, row, col);
       }
     }
   }
 
-  private drawTile(type: number, x: number, y: number): void {
+  private drawTile(type: number, x: number, y: number, tiles: number[][], row: number, col: number): void {
 
     switch (type) {
       case TileType.GROUND:
-        this.drawGroundTile(x, y);
+        this.drawGroundTile(x, y, tiles, row, col);
         break;
       case TileType.BRICK:
         this.drawBrickTile(x, y);
@@ -610,22 +610,37 @@ export class Renderer {
     }
   }
 
-  private drawGroundTile(x: number, y: number): void {
+  private drawGroundTile(x: number, y: number, tiles: number[][], row: number, col: number): void {
     const ctx = this.offscreenCtx;
+    const hasGroundAbove = row > 0 && tiles[row - 1][col] === TileType.GROUND;
 
-    // Grama no topo
-    ctx.fillStyle = COLORS.GROUND_TOP;
-    ctx.fillRect(x, y, TILE_SIZE, 4);
+    // Grass only when there is no ground above
+    if (!hasGroundAbove) {
+      ctx.fillStyle = COLORS.GROUND_TOP;
+      ctx.fillRect(x, y, TILE_SIZE, 4);
+      ctx.fillStyle = COLORS.GROUND_DARK;
+      for (let i = 0; i < TILE_SIZE; i += 3) {
+        ctx.fillRect(x + i, y + 3, 1, 1);
+      }
+    }
 
-    // Terra
+    // Dirt base
     ctx.fillStyle = COLORS.GROUND_FILL;
-    ctx.fillRect(x, y + 4, TILE_SIZE, TILE_SIZE - 4);
+    const dirtTop = hasGroundAbove ? y : y + 4;
+    ctx.fillRect(x, dirtTop, TILE_SIZE, TILE_SIZE - (dirtTop - y));
 
-    // Detalhes de terra (pontinhos)
+    // Dirt speckles
     ctx.fillStyle = COLORS.GROUND_DARK;
-    ctx.fillRect(x + 2, y + 6, 2, 2);
-    ctx.fillRect(x + 10, y + 10, 2, 2);
-    ctx.fillRect(x + 6, y + 14, 2, 2);
+    const baseY = hasGroundAbove ? y + 2 : y + 6;
+    ctx.fillRect(x + 2, baseY, 2, 2);
+    ctx.fillRect(x + 10, baseY + 4, 2, 2);
+    ctx.fillRect(x + 6, baseY + 8, 2, 2);
+    ctx.fillRect(x + 12, baseY + 10, 1, 1);
+
+    // Soil layers for texture
+    ctx.fillStyle = '#6a4b2a';
+    ctx.fillRect(x + 1, baseY + 2, TILE_SIZE - 2, 1);
+    ctx.fillRect(x + 2, baseY + 7, TILE_SIZE - 4, 1);
   }
 
   private drawBrickTile(x: number, y: number): void {
