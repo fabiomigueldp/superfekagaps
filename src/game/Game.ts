@@ -885,7 +885,7 @@ export class Game {
         this.score += 1000;
         // Play the specific death line before executing the final die animation
         if (this.bossVoice) {
-          this.bossVoice.playLineAndWait('porra_nenhuma').then(started => {
+          this.bossVoice.playLineAndWait('para_de_encher_o_saco').then(started => {
             if (!started) {
               // Couldn't play; fall back to instant death
               this.boss?.die();
