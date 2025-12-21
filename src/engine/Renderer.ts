@@ -712,39 +712,57 @@ export class Renderer {
   private drawSpikeTile(x: number, y: number): void {
     const ctx = this.offscreenCtx;
 
-    const spikeDark = '#5f5f5f';
-    const spikeLight = '#b0b0b0';
+    const spikeDark = '#595959';
+    const spikeLight = '#c6c6c6';
+    const spikeMid = COLORS.SPIKE;
 
-    // Base metalica
+    // Base metalica baixa
+    const baseH = 3;
+    const baseY = y + TILE_SIZE - baseH;
     ctx.fillStyle = spikeDark;
-    ctx.fillRect(x, y + TILE_SIZE - 3, TILE_SIZE, 3);
+    ctx.fillRect(x, baseY, TILE_SIZE, baseH);
     ctx.fillStyle = spikeLight;
-    ctx.fillRect(x, y + TILE_SIZE - 3, TILE_SIZE, 1);
+    ctx.fillRect(x, baseY, TILE_SIZE, 1);
 
-    // Desenha 4 espinhos com outline e brilho
-    for (let i = 0; i < 4; i++) {
-      const sx = x + i * 4;
+    // Espinhos pixelados (mais textura e contraste)
+    const spikeWidth = 5;
+    const spikeCount = 3;
+    const spikeHeight = 7;
+    const tipY = baseY - spikeHeight;
+    for (let i = 0; i < spikeCount; i++) {
+      const sx = x + i * spikeWidth;
+      const center = sx + 2;
 
-      // Outline
+      // Contorno em degraus
       ctx.fillStyle = spikeDark;
-      ctx.beginPath();
-      ctx.moveTo(sx - 1, y + TILE_SIZE);
-      ctx.lineTo(sx + 2, y + 3);
-      ctx.lineTo(sx + 5, y + TILE_SIZE);
-      ctx.fill();
+      ctx.fillRect(center - 2, baseY - 1, 5, 1);
+      ctx.fillRect(center - 1, baseY - 2, 3, 1);
+      ctx.fillRect(center - 1, baseY - 3, 3, 1);
+      ctx.fillRect(center, baseY - 4, 1, 1);
+      ctx.fillRect(center, baseY - 5, 1, 1);
+      ctx.fillRect(center, tipY, 1, 1);
 
       // Corpo
-      ctx.fillStyle = COLORS.SPIKE;
-      ctx.beginPath();
-      ctx.moveTo(sx, y + TILE_SIZE);
-      ctx.lineTo(sx + 2, y + 4);
-      ctx.lineTo(sx + 4, y + TILE_SIZE);
-      ctx.fill();
+      ctx.fillStyle = spikeMid;
+      ctx.fillRect(center - 1, baseY - 1, 3, 1);
+      ctx.fillRect(center, baseY - 2, 1, 3);
 
-      // Brilho
+      // Brilho principal
       ctx.fillStyle = spikeLight;
-      ctx.fillRect(sx + 1, y + 7, 1, 3);
+      ctx.fillRect(center - 1, baseY - 1, 1, 1);
+      ctx.fillRect(center, baseY - 3, 1, 1);
+
+      // Micro-riscos para textura
+      ctx.fillStyle = '#9a9a9a';
+      ctx.fillRect(center + 1, baseY - 2, 1, 1);
+      ctx.fillRect(center - 1, baseY - 4, 1, 1);
     }
+
+    // Rebites na base para dar textura metalica
+    ctx.fillStyle = '#8a8a8a';
+    ctx.fillRect(x + 2, baseY + 1, 1, 1);
+    ctx.fillRect(x + 7, baseY + 1, 1, 1);
+    ctx.fillRect(x + 12, baseY + 1, 1, 1);
   }
 
   private drawFlagTile(x: number, y: number): void {
