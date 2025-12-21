@@ -415,7 +415,7 @@ export class Renderer {
         ctx.font = `bold ${Math.max(12, Math.round(14 * pixelScale))}px monospace`;
         ctx.textAlign = 'center';
         ctx.fillStyle = '#8B0000';
-        ctx.fillText('Feka salvou Yasmin!', Math.round(w / 2), Math.round(40 * pixelScale));
+        ctx.fillText('Feka salvou Yasmin?', Math.round(w / 2), Math.round(40 * pixelScale));
 
         ctx.font = `${Math.max(8, Math.round(10 * pixelScale))}px monospace`;
         ctx.fillStyle = '#4A0000';
@@ -492,7 +492,7 @@ export class Renderer {
       // Subtitle / instructions
       ctx.font = `${Math.max(6, Math.round(8 * pixelScale))}px monospace`;
       ctx.fillStyle = COLORS.MENU_TEXT;
-      ctx.fillText('A aventura para salvar Yasmin!', Math.round(w / 2), Math.round(70 * pixelScale));
+      ctx.fillText('A aventura para "salvar" a Yasmin!', Math.round(w / 2), Math.round(70 * pixelScale));
 
       ctx.font = `${Math.max(8, Math.round(10 * pixelScale))}px monospace`;
       ctx.fillStyle = '#AAAAAA';
