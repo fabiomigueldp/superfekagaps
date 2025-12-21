@@ -189,8 +189,8 @@ export class Game {
       allowAmbient: this.state === GameState.PLAYING && bossAlive
     });
 
-    const bossDefeated = this.boss && this.boss.isDefeated();
-    if (this.state === GameState.ENDING || (this.state === GameState.PLAYING && bossDefeated)) {
+    const bossDying = this.boss ? this.boss.data.isDead : false;
+    if (this.state === GameState.ENDING || (this.state === GameState.PLAYING && bossDying)) {
       this.updateFireworks(deltaTime);
     }
   }
@@ -338,6 +338,20 @@ export class Game {
       // Verifica se boss foi derrotado
       if (this.boss.isDefeated()) {
         this.onBossDefeated();
+      }
+
+      // Se o boss entrou no estado isDead (morreu agora), inicia fogos imediatamente
+      if (this.boss.data.isDead && !this.fireworks.length) {
+        // Spawn inicial mais intenso perto do boss
+        const bx = this.boss.data.position.x + this.boss.data.width / 2;
+        const by = this.boss.data.position.y;
+        for (let i = 0; i < 8; i++) {
+          const sx = bx + (Math.random() - 0.5) * 60;
+          const ty = by - 40 - Math.random() * 40;
+          this.spawnFirework(sx, ty);
+        }
+        // Garante spawn rápido em seguida
+        this.fireworkSpawnTimer = 100;
       }
     }
 
@@ -1235,11 +1249,13 @@ export class Game {
 
   // === FOGOS ===
   private updateFireworks(deltaTime: number): void {
-    // 1. Spawn aleatório
+    // 1. Spawn aleatório (mais intenso após a morte do boss)
     this.fireworkSpawnTimer -= deltaTime;
     if (this.fireworkSpawnTimer <= 0) {
       this.spawnFirework();
-      this.fireworkSpawnTimer = 500 + Math.random() * 1000; // 0.5s .. 1.5s
+      // Se estamos na tela de final, spawn um pouco mais rápido
+      const base = this.state === GameState.ENDING ? 350 : 600;
+      this.fireworkSpawnTimer = base + Math.random() * (this.state === GameState.ENDING ? 800 : 600); // ms
     }
 
     // 2. Atualizar física
@@ -1271,16 +1287,24 @@ export class Game {
     });
   }
 
-  private spawnFirework(): void {
-    let spawnX: number;
-    let targetY: number;
+  private spawnFirework(spawnX?: number, targetY?: number): void {
+    let sx: number;
+    let ty: number;
 
-    if (this.state === GameState.ENDING) {
-      spawnX = Math.random() * GAME_WIDTH;
-      targetY = 20 + Math.random() * (GAME_HEIGHT / 2);
+    if (typeof spawnX === 'number') {
+      sx = spawnX;
+    } else if (this.state === GameState.ENDING) {
+      sx = Math.random() * GAME_WIDTH;
     } else {
-      spawnX = this.camera.x + Math.random() * GAME_WIDTH;
-      targetY = this.camera.y + 20 + Math.random() * 60;
+      sx = this.camera.x + Math.random() * GAME_WIDTH;
+    }
+
+    if (typeof targetY === 'number') {
+      ty = targetY;
+    } else if (this.state === GameState.ENDING) {
+      ty = 20 + Math.random() * (GAME_HEIGHT / 2);
+    } else {
+      ty = this.camera.y + 20 + Math.random() * 60;
     }
 
     const color = COLORS.FIREWORK_COLORS[Math.floor(Math.random() * COLORS.FIREWORK_COLORS.length)];
@@ -1288,10 +1312,10 @@ export class Game {
     this.fireworks.push({
       id: Math.random(),
       phase: 'ROCKET',
-      x: spawnX,
+      x: sx,
       y: (this.state === GameState.ENDING ? GAME_HEIGHT : this.camera.y + GAME_HEIGHT),
-      targetY: targetY,
-      velocity: { x: 0, y: -4 - Math.random() * 2 },
+      targetY: ty,
+      velocity: { x: (Math.random() - 0.5) * 0.4, y: -4 - Math.random() * 2 },
       color: color,
       particles: [],
       trailTimer: 0
