@@ -1211,12 +1211,25 @@ export class Renderer {
   public drawFireworks(fireworks: Firework[], cameraX: number = 0, cameraY: number = 0): void {
     if (fireworks.length === 0) return; // Early exit for performance
     
+    console.log('[drawFireworks] Drawing', fireworks.length, 'fireworks, camera:', cameraX, cameraY);
+    
     const ctx = this.offscreenCtx;
 
-    fireworks.forEach(fw => {
+    fireworks.forEach((fw, idx) => {
       // Ajusta posição pela câmera
       const drawX = Math.round(fw.x - cameraX);
       const drawY = Math.round(fw.y - cameraY);
+
+      if (idx === 0) {
+        console.log('[drawFireworks] First firework:', {
+          phase: fw.phase,
+          x: fw.x,
+          y: fw.y,
+          drawX,
+          drawY,
+          particleCount: fw.particles.length
+        });
+      }
 
       if (fw.phase === 'ROCKET') {
         // Desenha o foguete subindo (ponto brilhante + rastro)
@@ -1728,6 +1741,7 @@ export class Renderer {
   }
 
   drawEnding(fireworks: Firework[] = []): void {
+    console.log('[Renderer.drawEnding] Received', fireworks.length, 'fireworks');
     // Use TITLE high-res overlay for ending so we can draw Yasmin crisp
     this.lastUIType = 'TITLE';
     this.lastUIParams = { variant: 'ENDING' };
@@ -1742,6 +1756,7 @@ export class Renderer {
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
     // --- CAMADA DOS FOGOS ---
+    console.log('[Renderer.drawEnding] Calling drawFireworks with', fireworks.length, 'fireworks');
     this.drawFireworks(fireworks, 0, 0);
 
     // Corações flutuantes (backup)
