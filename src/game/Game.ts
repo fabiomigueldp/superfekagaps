@@ -1,13 +1,13 @@
 // Game Principal - Super Feka Gaps
 
 import {
-  GameState, GAME_WIDTH, GAME_HEIGHT, TILE_SIZE,
+  GameState, GAME_WIDTH, GAME_HEIGHT, TILE_SIZE, COLORS,
   INITIAL_LIVES, COIN_SCORE, ENEMY_SCORE, TIME_BONUS_MULTIPLIER, TileType,
   GP_IMPACT_RADIUS_PX, GP_SHAKE_MS, GP_SHAKE_MAG
 } from '../constants';
 import {
   CameraData, Vector2, FlagData, CollectibleData, CollectibleSpawnData,
-  CollectibleType, Particle, EnemyType, GroundPoundState, LevelData
+  CollectibleType, Particle, Firework, EnemyType, GroundPoundState, LevelData
 } from '../types';
 import { Input } from '../engine/Input';
 import { Audio } from '../engine/Audio';
@@ -41,6 +41,10 @@ export class Game {
   private collectibles: CollectibleData[] = [];
   private flags: FlagData[] = [];
   private particles: Particle[] = [];
+
+  // Fireworks
+  private fireworks: Firework[] = [];
+  private fireworkSpawnTimer: number = 0;
 
   // Progresso
   private currentLevelIndex: number = 0;
@@ -184,6 +188,11 @@ export class Game {
     this.bossVoice?.update(deltaTime, {
       allowAmbient: this.state === GameState.PLAYING && bossAlive
     });
+
+    const bossDefeated = this.boss && this.boss.isDefeated();
+    if (this.state === GameState.ENDING || (this.state === GameState.PLAYING && bossDefeated)) {
+      this.updateFireworks(deltaTime);
+    }
   }
 
   private updateBoot(deltaTime: number): void {
@@ -416,7 +425,7 @@ export class Game {
         this.renderer.drawBossIntro('JOÃOZÃO');
         break;
       case GameState.ENDING:
-        this.renderer.drawEnding();
+        this.renderer.drawEnding(this.fireworks);
         break;
     }
 
@@ -445,6 +454,12 @@ export class Game {
 
     // Tiles
     this.renderer.drawTiles(this.level.getModifiedTiles(), this.camera);
+
+    // Fogos (se o boss foi derrotado)
+    const bossDefeated = this.boss && this.boss.isDefeated();
+    if (bossDefeated) {
+      this.renderer.drawFireworks(this.fireworks, this.camera.x, this.camera.y);
+    }
 
     // Flags (checkpoint / final)
     this.flags.forEach(flag => {

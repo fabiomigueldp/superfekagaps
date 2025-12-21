@@ -86,6 +86,16 @@ export const COLORS = {
   MENU_TEXT: '#FFFFFF',
   MENU_HIGHLIGHT: '#FFD700',
 
+  // Cores de Fogos (Vibrantes)
+  FIREWORK_COLORS: [
+    '#FF0000', // Vermelho
+    '#00FF00', // Verde
+    '#00FFFF', // Ciano
+    '#FF00FF', // Magenta
+    '#FFFF00', // Amarelo
+    '#FFFFFF'  // Branco
+  ],
+
   // Transparências
   OVERLAY: 'rgba(0, 0, 0, 0.7)',
   SHADOW: 'rgba(0, 0, 0, 0.3)',

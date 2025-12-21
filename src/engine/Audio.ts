@@ -394,6 +394,64 @@ export class Audio {
     this.playTone(60, 0.4, 'triangle', 0.01, 0.2, 0.3, 0.1, 0.5);
   }
 
+  // Som sutil de subida (assobio rápido)
+  playFireworkLaunch(): void {
+    const audioNodes = this.getSfxNodes();
+    if (!audioNodes) return;
+
+    const now = audioNodes.ctx.currentTime;
+    const oscillator = audioNodes.ctx.createOscillator();
+    const gainNode = audioNodes.ctx.createGain();
+
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(400, now);
+    oscillator.frequency.exponentialRampToValueAtTime(800, now + 0.3);
+
+    // Volume baixo
+    gainNode.gain.setValueAtTime(0.05, now);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioNodes.sfxGain);
+
+    oscillator.start(now);
+    oscillator.stop(now + 0.3);
+  }
+
+  // Som de estouro (grave e suave)
+  playFireworkBang(): void {
+    const audioNodes = this.getSfxNodes();
+    if (!audioNodes) return;
+
+    const duration = 0.4;
+    const bufferSize = audioNodes.ctx.sampleRate * duration;
+    const buffer = audioNodes.ctx.createBuffer(1, bufferSize, audioNodes.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+
+    // Ruído marrom/rosa (mais grave que ruído branco)
+    let lastOut = 0;
+    for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        // Filtro simples para deixar o som mais grave ("thud" em vez de "hiss")
+        lastOut = (lastOut + (0.02 * white)) / 1.02;
+        data[i] = lastOut * 3.5; 
+        data[i] *= 1 - (i / bufferSize); // Fade out natural
+    }
+
+    const noise = audioNodes.ctx.createBufferSource();
+    noise.buffer = buffer;
+    
+    const gainNode = audioNodes.ctx.createGain();
+    // Volume moderado para não competir com a música
+    gainNode.gain.setValueAtTime(0.4, audioNodes.ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioNodes.ctx.currentTime + duration);
+
+    noise.connect(gainNode);
+    gainNode.connect(audioNodes.sfxGain);
+
+    noise.start();
+  }
+
   onStateChange(prevState: GameState, nextState: GameState, context: MusicContext): void {
     this.musicManager.onStateChange(prevState, nextState, context);
   }

@@ -1,7 +1,7 @@
 // Sistema de Renderização - Super Feka Gaps
 
 import { GAME_WIDTH, GAME_HEIGHT, TILE_SIZE, COLORS, TileType } from '../constants';
-import { CameraData, PlayerData, EnemyData, CollectibleData, FlagData, Particle, EnemyType, CollectibleType, GroundPoundState, SpeechBubbleRenderState } from '../types';
+import { CameraData, PlayerData, EnemyData, CollectibleData, FlagData, Particle, Firework, EnemyType, CollectibleType, GroundPoundState, SpeechBubbleRenderState } from '../types';
 import { PLAYER_PALETTE, PLAYER_SPRITES, PLAYER_PIXEL_SIZE, PLAYER_RENDER_OFFSET_X, PLAYER_RENDER_OFFSET_Y } from '../assets/playerSpriteSpec';
 
 
@@ -1207,6 +1207,47 @@ export class Renderer {
     ctx.fill();
   }
 
+  // === FOGOS DE ARTIFÍCIO ===
+  public drawFireworks(fireworks: Firework[], cameraX: number = 0, cameraY: number = 0): void {
+    const ctx = this.offscreenCtx;
+
+    fireworks.forEach(fw => {
+      // Ajusta posição pela câmera
+      const drawX = Math.round(fw.x - cameraX);
+      const drawY = Math.round(fw.y - cameraY);
+
+      if (fw.phase === 'ROCKET') {
+        // Desenha o foguete subindo (ponto brilhante + rastro)
+        ctx.fillStyle = fw.color;
+        ctx.fillRect(drawX, drawY, 2, 2);
+        
+        // Rastro simples
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.fillRect(drawX, drawY + 2, 2, 4);
+      } 
+      else if (fw.phase === 'EXPLODED') {
+        // Desenha as partículas da explosão
+        fw.particles.forEach(p => {
+          const px = Math.round(p.position.x - cameraX);
+          const py = Math.round(p.position.y - cameraY);
+          
+          // Alpha baseado na vida restante
+          const alpha = p.life / p.maxLife;
+          
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+          ctx.fillStyle = p.color;
+          // Partículas piscam no final
+          if (p.life < 100 && Math.floor(p.life / 10) % 2 === 0) {
+             ctx.fillStyle = '#FFFFFF';
+          }
+          ctx.fillRect(px, py, p.size, p.size);
+          ctx.restore();
+        });
+      }
+    });
+  }
+
   // === RENDERIZACAO DE BANDEIRAS (CHECKPOINT / FINAL) ===
 
   drawFlag(flag: FlagData, camera: CameraData): void {
@@ -1684,7 +1725,7 @@ export class Renderer {
     ctx.fillText('\"Você vai cair nos meus gaps!\"', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 20);
   }
 
-  drawEnding(): void {
+  drawEnding(fireworks: Firework[] = []): void {
     // Use TITLE high-res overlay for ending so we can draw Yasmin crisp
     this.lastUIType = 'TITLE';
     this.lastUIParams = { variant: 'ENDING' };
@@ -1697,6 +1738,9 @@ export class Renderer {
     gradient.addColorStop(1, '#FFB6C1');
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+    // --- CAMADA DOS FOGOS ---
+    this.drawFireworks(fireworks, 0, 0);
 
     // Corações flutuantes (backup)
     ctx.fillStyle = '#FF0000';

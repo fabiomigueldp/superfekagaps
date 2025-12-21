@@ -172,12 +172,29 @@ export interface Particle {
   size: number;
 }
 
+// Firework particle + container
+export interface FireworkParticle extends Particle {
+  // por ora, usa Particle como base
+}
+
+export interface Firework {
+  id: number;
+  phase: 'ROCKET' | 'EXPLODED';
+  x: number;
+  y: number;
+  targetY: number; // Altura onde vai explodir
+  velocity: Vector2;
+  color: string;
+  particles: FireworkParticle[]; // Partículas da explosão
+  trailTimer: number; // Para desenhar o rastro na subida
+}
+
 // Balão de diálogo
 export interface SpeechBubbleRenderState {
   text: string;
   position: Vector2;
   alpha: number;
-}
+} 
 
 // Dados do HUD
 export interface HudData {
