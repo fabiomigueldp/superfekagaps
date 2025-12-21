@@ -17,6 +17,9 @@ export class Renderer {
   private lastUIParams: any = null;
   private yasminImg: HTMLImageElement | null = null;
 
+  // Fireworks shown specially on the high-res UI layer (ENDING)
+  private lastEndingFireworks: Firework[] = [];
+
   constructor() {
     this.canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
     this.ctx = this.canvas.getContext('2d')!;
@@ -311,6 +314,11 @@ export class Renderer {
         g.addColorStop(1, '#FFB6C1');
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, w, h);
+
+        // Draw fireworks on the main canvas (high-res, above background)
+        if (this.lastEndingFireworks && this.lastEndingFireworks.length > 0) {
+          this.drawFireworksOnScreen(this.lastEndingFireworks, pixelScale);
+        }
 
         // Corações flutuantes (high-res)
         ctx.save();
@@ -1210,26 +1218,13 @@ export class Renderer {
   // === FOGOS DE ARTIFÍCIO ===
   public drawFireworks(fireworks: Firework[], cameraX: number = 0, cameraY: number = 0): void {
     if (fireworks.length === 0) return; // Early exit for performance
-    
-    console.log('[drawFireworks] Drawing', fireworks.length, 'fireworks, camera:', cameraX, cameraY);
-    
+
     const ctx = this.offscreenCtx;
 
-    fireworks.forEach((fw, idx) => {
+    fireworks.forEach((fw) => {
       // Ajusta posição pela câmera
       const drawX = Math.round(fw.x - cameraX);
       const drawY = Math.round(fw.y - cameraY);
-
-      if (idx === 0) {
-        console.log('[drawFireworks] First firework:', {
-          phase: fw.phase,
-          x: fw.x,
-          y: fw.y,
-          drawX,
-          drawY,
-          particleCount: fw.particles.length
-        });
-      }
 
       if (fw.phase === 'ROCKET') {
         // Desenha o foguete subindo (ponto brilhante + rastro)
@@ -1256,11 +1251,46 @@ export class Renderer {
           if (p.life < 100 && Math.floor(p.life / 10) % 2 === 0) {
              ctx.fillStyle = '#FFFFFF';
           }
-          ctx.fillRect(px, py, p.size, p.size);
+              ctx.fillRect(px, py, p.size, p.size);
           ctx.restore();
         });
       }
     });
+  }
+
+  // Draw fireworks on the main (high-res) canvas scaled by pixelScale
+  private drawFireworksOnScreen(fireworks: Firework[], pixelScale: number): void {
+    if (!fireworks || fireworks.length === 0) return;
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+
+    for (const fw of fireworks) {
+      if (fw.phase === 'ROCKET') {
+        const dx = Math.round(fw.x * pixelScale);
+        const dy = Math.round(fw.y * pixelScale);
+        ctx.fillStyle = fw.color;
+        ctx.fillRect(dx, dy, Math.max(1, Math.round(2 * pixelScale)), Math.max(1, Math.round(2 * pixelScale)));
+        // trail
+        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.fillRect(dx, dy + Math.max(1, Math.round(2 * pixelScale)), Math.max(1, Math.round(2 * pixelScale)), Math.max(2, Math.round(4 * pixelScale)));
+      } else if (fw.phase === 'EXPLODED') {
+        for (const p of fw.particles) {
+          if (p.life <= 0) continue;
+          const px = Math.round(p.position.x * pixelScale);
+          const py = Math.round(p.position.y * pixelScale);
+          const alpha = Math.max(0, Math.min(1, p.life / p.maxLife));
+          ctx.globalAlpha = alpha;
+          ctx.fillStyle = p.color;
+          if (p.life < 100 && Math.floor(p.life / 10) % 2 === 0) ctx.fillStyle = '#FFFFFF';
+          const size = Math.max(1, Math.round(p.size * pixelScale));
+          ctx.fillRect(px, py, size, size);
+        }
+      }
+    }
+
+    ctx.globalAlpha = 1;
+    ctx.restore();
   }
 
   // === RENDERIZACAO DE BANDEIRAS (CHECKPOINT / FINAL) ===
@@ -1741,7 +1771,6 @@ export class Renderer {
   }
 
   drawEnding(fireworks: Firework[] = []): void {
-    console.log('[Renderer.drawEnding] Received', fireworks.length, 'fireworks');
     // Use TITLE high-res overlay for ending so we can draw Yasmin crisp
     this.lastUIType = 'TITLE';
     this.lastUIParams = { variant: 'ENDING' };
@@ -1755,9 +1784,12 @@ export class Renderer {
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
-    // --- CAMADA DOS FOGOS ---
-    console.log('[Renderer.drawEnding] Calling drawFireworks with', fireworks.length, 'fireworks');
+    // --- CAMADA DOS FOGOS (offscreen) ---
     this.drawFireworks(fireworks, 0, 0);
+
+    // --- CAMADA DOS FOGOS (main canvas, high-res) ---
+    // Copy fireworks to a transient property so drawUIOnScreen can draw them on the main canvas
+    this.lastEndingFireworks = fireworks ? fireworks : [];
 
     // Corações flutuantes (backup)
     ctx.fillStyle = '#FF0000';

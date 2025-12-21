@@ -439,7 +439,6 @@ export class Game {
         this.renderer.drawBossIntro('JOÃOZÃO');
         break;
       case GameState.ENDING:
-        console.log('[RENDER] ENDING state, fireworks count:', this.fireworks.length);
         this.renderer.drawEnding(this.fireworks);
         break;
     }
@@ -1167,18 +1166,13 @@ export class Game {
   }
 
   private onGameComplete(): void {
-    console.log('[ENDING] Entering ENDING state, current fireworks:', this.fireworks.length);
     this.audio.playVictory();
     this.endingTimer = 0;
     this.changeState(GameState.ENDING);
     
     // Spawn initial burst of fireworks for ending screen
-    console.log('[ENDING] Spawning initial burst...');
     for (let i = 0; i < 5; i++) {
-      setTimeout(() => {
-        console.log('[ENDING] Burst spawn #', i);
-        this.spawnFirework();
-      }, i * 150);
+      setTimeout(() => this.spawnFirework(), i * 150);
     }
     this.fireworkSpawnTimer = 300; // Quick respawn
   }
