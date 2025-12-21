@@ -30,6 +30,8 @@ export class Game {
 
   // Estado do jogo
   private state: GameState = GameState.BOOT;
+  // Easter egg: modo Delícia
+  private deliciaMode: boolean = false;
 
   // Gameplay
   private player: Player | null = null;
@@ -150,6 +152,11 @@ export class Game {
       this.audio.toggle();
     }
 
+    // Konami: alterna Modo Delícia
+    if (this.input.consumeKonami()) {
+      this.toggleDeliciaMode();
+    }
+
     switch (this.state) {
       case GameState.BOOT:
         this.updateBoot(deltaTime);
@@ -181,7 +188,8 @@ export class Game {
       gameState: this.state,
       isBossLevel: this.level?.data.isBossLevel ?? false,
       isDead: this.player?.data.isDead ?? false,
-      powerupActive: this.player ? this.player.data.coffeeTimer > 0 : false
+      powerupActive: this.player ? this.player.data.coffeeTimer > 0 : false,
+      deliciaMode: this.deliciaMode
     });
 
     const bossAlive = this.boss ? !this.boss.data.isDead : false;
@@ -443,6 +451,7 @@ export class Game {
         break;
     }
 
+    this.renderer.drawOrangeRain(this.deliciaMode);
     this.renderer.present();
   }
 
@@ -547,7 +556,8 @@ export class Game {
       isBossLevel: this.level?.data.isBossLevel ?? false,
       playerAlive: this.player ? !this.player.data.isDead : true,
       powerupActive: this.player ? this.player.data.coffeeTimer > 0 : false,
-      gameState: newState
+      gameState: newState,
+      deliciaMode: this.deliciaMode
     });
   }
 
@@ -677,6 +687,49 @@ export class Game {
       checkpoints,
       goalPosition
     };
+  }
+
+  private toggleDeliciaMode(): void {
+    this.deliciaMode = !this.deliciaMode;
+    console.log(`Modo Delicia: ${this.deliciaMode}`);
+    this.audio.playDeliciaSfx();
+    this.input.reset();
+
+    this.bootTimer = 1500;
+    this.levelClearTimer = 3000;
+    this.gameOverTimer = 3000;
+    this.bossIntroTimer = 2000;
+    this.endingTimer = 0;
+    this.deathTimer = 0;
+    this.fireworkSpawnTimer = 0;
+
+    this.currentLevelIndex = 0;
+    this.score = 0;
+    this.lives = INITIAL_LIVES;
+    this.coins = 0;
+    this.levelTime = 0;
+    this.activeCheckpoint = null;
+
+    this.player = null;
+    this.level = null;
+    this.minions = [];
+    this.bossVoice?.stop();
+    this.bossVoice = null;
+    this.boss = null;
+    this.collectibles = [];
+    this.flags = [];
+    this.particles = [];
+    this.fireworks = [];
+
+    this.camera.x = 0;
+    this.camera.y = 0;
+    this.camera.targetX = 0;
+    this.camera.targetY = 0;
+    this.camera.shakeTimer = 0;
+    this.camera.shakeMagnitude = 0;
+
+    // Reinicia para tela de abertura/menu
+    this.changeState(GameState.BOOT);
   }
 
   private buildFlags(levelData: LevelData): FlagData[] {

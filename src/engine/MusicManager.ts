@@ -9,6 +9,7 @@ export interface MusicContext {
   playerAlive: boolean;
   powerupActive: boolean;
   gameState: GameState;
+  deliciaMode?: boolean;
 }
 
 export class MusicManager {
@@ -21,6 +22,7 @@ export class MusicManager {
   private lastPowerupActive: boolean = false;
   private isPaused: boolean = false;
   private decision: MusicDecision | null = null;
+  private deliciaMode: boolean = false; // estado atual do modo Delícia (propagado de onStateChange)
 
   constructor(engine: AudioEngine) {
     this.engine = engine;
@@ -48,8 +50,11 @@ export class MusicManager {
       gameState: nextState,
       isBossLevel: context.isBossLevel,
       isDead: !context.playerAlive,
-      powerupActive: context.powerupActive
+      powerupActive: context.powerupActive,
+      deliciaMode: !!context.deliciaMode
     };
+
+    this.deliciaMode = !!context.deliciaMode;
 
     this.decision = decideMusic(snapshot);
     this.baseTrackId = this.decision.trackId;
@@ -68,7 +73,7 @@ export class MusicManager {
   }
 
   onPowerupStart(): void {
-    this.overrideTrackId = 'powerup';
+    this.overrideTrackId = this.deliciaMode ? 'powerup_delicia' : 'powerup';
     this.applyDesiredTrack();
   }
 

@@ -101,6 +101,20 @@ src/
 - **WebAudio API**: Som procedural
 - **Zero Assets**: Tudo gerado por código
 
+## 🎉 Easter Egg: Modo da Delícia
+
+Para habilitar corretamente o *Modo da Delícia* (Konami code), mova a pasta `assets_delicia/` para `public/assets_delicia/` para que o Vite sirva os arquivos estáticos.
+
+Arquivos esperados (exemplos presentes no repositório):
+- `super_feka_gaps_delicia_theme_75.577s.webm`
+- `super_feka_world_delicia_92.051s.webm`
+- `delicia_da_mini_fanta_23.106s.webm`
+- `boss_delicia_149.191s.webm`
+- `delicia_ending_53.090s.webm`
+- `ai_que_delicia_1.674s.webm` (SFX)
+
+Após mover, rode `npm run dev` e pressione a sequência: ↑↑↓↓←→←→ para alternar o modo e ver (e ouvir) a mudança.
+
 ## 📜 Licença
 
 MIT © Torbware 2025

@@ -275,6 +275,12 @@ export class Audio {
     oscillator.stop(now + 0.35);
   }
 
+  playDeliciaSfx(): void {
+    // Toca o stinger específico do modo Delícia e faz duck na música
+    if (!this.audioEngine.ensureReady()) return;
+    this.audioEngine.playStinger('sfx_delicia', { duckLevel: 0.4, duckMs: 1500 });
+  }
+
   playMenuSelect(): void {
     this.playTone(440, 0.08, 'square', 0.01, 0.02, 0.5, 0.03, 0.3);
   }

@@ -6,6 +6,7 @@ export interface MusicSnapshot {
   isBossLevel: boolean;
   isDead: boolean;
   powerupActive: boolean;
+  deliciaMode: boolean; // Novo campo
 }
 
 export interface MusicDecision {
@@ -23,12 +24,16 @@ export function decideMusic(snapshot: MusicSnapshot): MusicDecision {
     fadeInMs: 400
   };
 
+  // Helper para sufixo do modo delicia
+  const suffix = snapshot.deliciaMode ? '_delicia' : '';
+  const getTrack = (baseId: string) => (baseId + suffix) as MusicTrackId;
+
   if (snapshot.gameState === GameState.GAME_OVER) {
     return { ...base, trackId: null, fadeOutMs: 300 };
   }
 
   if (snapshot.gameState === GameState.ENDING) {
-    return { ...base, trackId: 'ending', crossfadeMs: 700, fadeInMs: 600 };
+    return { ...base, trackId: getTrack('ending'), crossfadeMs: 700, fadeInMs: 600 };
   }
 
   if (snapshot.gameState === GameState.LEVEL_CLEAR) {
@@ -36,7 +41,7 @@ export function decideMusic(snapshot: MusicSnapshot): MusicDecision {
   }
 
   if (snapshot.gameState === GameState.BOSS_INTRO) {
-    return { ...base, trackId: 'boss', crossfadeMs: 500, fadeInMs: 500 };
+    return { ...base, trackId: getTrack('boss'), crossfadeMs: 500, fadeInMs: 500 };
   }
 
   if (snapshot.gameState === GameState.PAUSED) {
@@ -44,17 +49,17 @@ export function decideMusic(snapshot: MusicSnapshot): MusicDecision {
   }
 
   if (snapshot.gameState === GameState.BOOT || snapshot.gameState === GameState.MENU) {
-    return { ...base, trackId: 'theme', crossfadeMs: 500, fadeInMs: 500 };
+    return { ...base, trackId: getTrack('theme'), crossfadeMs: 500, fadeInMs: 500 };
   }
 
   if (snapshot.gameState === GameState.PLAYING) {
     if (snapshot.powerupActive) {
-      return { ...base, trackId: 'powerup', crossfadeMs: 300, fadeInMs: 250 };
+      return { ...base, trackId: getTrack('powerup'), crossfadeMs: 300, fadeInMs: 250 };
     }
     if (snapshot.isBossLevel) {
-      return { ...base, trackId: 'boss', crossfadeMs: 500, fadeInMs: 400 };
+      return { ...base, trackId: getTrack('boss'), crossfadeMs: 500, fadeInMs: 400 };
     }
-    return { ...base, trackId: 'game', crossfadeMs: 500, fadeInMs: 400 };
+    return { ...base, trackId: getTrack('game'), crossfadeMs: 500, fadeInMs: 400 };
   }
 
   if (snapshot.isDead) {

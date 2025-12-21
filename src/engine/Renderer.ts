@@ -17,6 +17,10 @@ export class Renderer {
   private lastUIParams: any = null;
   private yasminImg: HTMLImageElement | null = null;
 
+  // Partículas para "chuva" do modo Delícia
+  private rainDrops: { x: number; y: number; speed: number; len: number }[] = [];
+  private rainActive: boolean = false;
+
   // Fireworks shown specially on the high-res UI layer (ENDING)
   private lastEndingFireworks: Firework[] = [];
 
@@ -105,6 +109,9 @@ export class Renderer {
   }
 
   clear(): void {
+    this.lastUIType = null;
+    this.lastUIParams = null;
+    this.lastEndingFireworks = [];
     this.offscreenCtx.fillStyle = COLORS.SKY_LIGHT;
     this.offscreenCtx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
   }
@@ -128,6 +135,65 @@ export class Renderer {
     if (this.lastUIType) {
       this.drawUIOnScreen();
     }
+
+    if (this.rainActive && this.rainDrops.length > 0) {
+      this.drawOrangeRainOnScreen(this.scale * this.dpr);
+    }
+  }
+
+  // Desenha chuva de "suco de laranja" sobre o jogo (quando ativo)
+  drawOrangeRain(active: boolean): void {
+    this.rainActive = active;
+    if (!active) {
+      // limpa gotas para evitar persistencia quando desativado
+      this.rainDrops = [];
+      return;
+    }
+
+    const maxDrops = 80;
+    const spawnCount = Math.min(maxDrops - this.rainDrops.length, 2);
+    for (let i = 0; i < spawnCount; i++) {
+      this.rainDrops.push({
+        x: Math.random() * GAME_WIDTH,
+        y: -Math.random() * GAME_HEIGHT,
+        speed: 3 + Math.random() * 3.5,
+        len: 3 + Math.random() * 4
+      });
+    }
+
+    for (let i = 0; i < this.rainDrops.length; i++) {
+      const drop = this.rainDrops[i];
+      drop.y += drop.speed;
+
+      // recicla quando sai da tela (evita alocacao)
+      if (drop.y > GAME_HEIGHT + 10) {
+        drop.y = -10 - Math.random() * 30;
+        drop.x = Math.random() * GAME_WIDTH;
+        drop.speed = 3 + Math.random() * 3.5;
+        drop.len = 3 + Math.random() * 4;
+      }
+    }
+  }
+
+  private drawOrangeRainOnScreen(pixelScale: number): void {
+    if (this.rainDrops.length === 0) return;
+    const ctx = this.ctx;
+    const thickness = Math.max(1, Math.round(pixelScale));
+
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+    ctx.fillStyle = '#FFA500';
+    ctx.globalAlpha = 0.6;
+
+    for (let i = 0; i < this.rainDrops.length; i++) {
+      const drop = this.rainDrops[i];
+      const x = Math.round(drop.x * pixelScale);
+      const y = Math.round(drop.y * pixelScale);
+      const len = Math.max(1, Math.round(drop.len * pixelScale));
+      ctx.fillRect(x, y - len, thickness, len);
+    }
+
+    ctx.restore();
   }
 
   private drawDebugInfo(): void {

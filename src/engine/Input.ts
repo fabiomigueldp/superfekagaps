@@ -23,6 +23,11 @@ export class Input {
   private pauseJustPressed = false;
   private startJustPressed = false;
 
+  // Konami code detector
+  private konamiCode = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight'];
+  private konamiIndex = 0;
+  private konamiJustTriggered = false;
+
   constructor() {
     this.setupKeyboardListeners();
     this.setupTouchControls();
@@ -82,6 +87,27 @@ export class Input {
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
       e.preventDefault();
     }
+
+    // Lógica do Konami Code (consumível)
+    if (e.code === this.konamiCode[this.konamiIndex]) {
+      this.konamiIndex++;
+      if (this.konamiIndex === this.konamiCode.length) {
+        this.konamiJustTriggered = true;
+        this.konamiIndex = 0;
+        console.log('🍹 Konami detectado');
+      }
+    } else {
+      this.konamiIndex = 0; // reset se errar
+    }
+  }
+
+  // Consome o gatilho do Konami (retorna true apenas uma vez por ativação)
+  consumeKonami(): boolean {
+    if (this.konamiJustTriggered) {
+      this.konamiJustTriggered = false;
+      return true;
+    }
+    return false;
   }
 
   private handleKeyUp(e: KeyboardEvent): void {
@@ -241,5 +267,7 @@ export class Input {
     };
     this.previousJump = false;
     this.previousDown = false;
+    this.konamiIndex = 0;
+    this.konamiJustTriggered = false;
   }
 }
