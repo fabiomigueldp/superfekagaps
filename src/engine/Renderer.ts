@@ -508,7 +508,7 @@ export class Renderer {
       this.drawGroundPoundIconAt(ctx, Math.round(w / 2 - 120 * pixelScale), Math.round(122 * pixelScale), pixelScale);
 
       ctx.fillStyle = '#666666';
-      ctx.fillText('© 2025 Torbware', Math.round(w / 2), Math.round((GAME_HEIGHT - 10) * pixelScale));
+      ctx.fillText('© 2025 Torbware v0.0.1', Math.round(w / 2), Math.round((GAME_HEIGHT - 10) * pixelScale));
     }
 
     ctx.restore();
@@ -1741,7 +1741,17 @@ export class Renderer {
 
     // Créditos
     ctx.fillStyle = '#666666';
+    ctx.textAlign = 'center';
     ctx.fillText('© 2025 Torbware', GAME_WIDTH / 2, GAME_HEIGHT - 10);
+
+    // Versão (canto inferior direito)
+    ctx.font = '8px monospace';
+    ctx.fillStyle = '#666666';
+    ctx.textAlign = 'right';
+    ctx.fillText('v0.1', GAME_WIDTH - 4, GAME_HEIGHT - 4);
+
+    // Restaura alinhamento central para outros textos
+    ctx.textAlign = 'center';
   }
 
   drawPauseOverlay(): void {

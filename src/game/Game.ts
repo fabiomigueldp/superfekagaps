@@ -62,6 +62,10 @@ export class Game {
   private bossIntroTimer: number = 2000;
   private endingTimer: number = 0;
   private deathTimer: number = 0;
+  private bossDeathPending: boolean = false;
+  private bossDeathTimer: number = 0;
+  private bossDeathToken: number = 0;
+  private readonly bossDeathTimeoutMs: number = 2500;
 
   // Checkpoint ativo
   private activeCheckpoint: Vector2 | null = null;
@@ -196,6 +200,17 @@ export class Game {
     this.bossVoice?.update(deltaTime, {
       allowAmbient: this.state === GameState.PLAYING && bossAlive
     });
+
+    if (this.boss && this.boss.data.pendingDeath && !this.boss.data.isDead && !this.bossDeathPending) {
+      this.queueBossDeath();
+    }
+
+    if (this.bossDeathPending) {
+      this.bossDeathTimer -= deltaTime;
+      if (this.bossDeathTimer <= 0) {
+        this.finalizeBossDeath();
+      }
+    }
 
     const bossDying = this.boss ? this.boss.data.isDead : false;
     if (this.state === GameState.ENDING || (this.state === GameState.PLAYING && bossDying)) {
@@ -595,6 +610,9 @@ export class Game {
     this.bossVoice?.stop();
     this.bossVoice = null;
 
+    this.bossDeathPending = false;
+    this.bossDeathTimer = 0;
+
     levelData.enemies.forEach(enemy => {
       if (enemy.type === EnemyType.MINION) {
         this.minions.push(new Minion(enemy.position.x, enemy.position.y));
@@ -728,8 +746,38 @@ export class Game {
     this.camera.shakeTimer = 0;
     this.camera.shakeMagnitude = 0;
 
+    this.bossDeathPending = false;
+    this.bossDeathTimer = 0;
+
     // Reinicia para tela de abertura/menu
     this.changeState(GameState.BOOT);
+  }
+
+  private queueBossDeath(): void {
+    if (!this.boss || this.boss.data.isDead) return;
+    if (this.bossDeathPending) return;
+    this.bossDeathPending = true;
+    this.bossDeathTimer = this.bossDeathTimeoutMs;
+    const token = ++this.bossDeathToken;
+    this.boss.projectiles = [];
+
+    if (this.bossVoice) {
+      this.bossVoice.playLineAndWait('para_de_encher_o_saco').then(() => {
+        if (token !== this.bossDeathToken || !this.bossDeathPending) return;
+        this.finalizeBossDeath();
+      });
+      return;
+    }
+
+    this.finalizeBossDeath();
+  }
+
+  private finalizeBossDeath(): void {
+    this.bossDeathPending = false;
+    this.bossDeathTimer = 0;
+    if (!this.boss || this.boss.data.isDead) return;
+    this.boss.projectiles = [];
+    this.boss.die();
   }
 
   private buildFlags(levelData: LevelData): FlagData[] {
@@ -903,6 +951,7 @@ export class Game {
 
   private checkBossCollision(): void {
     if (!this.player || !this.boss || this.player.data.isDead) return;
+    if (this.boss.data.pendingDeath || this.bossDeathPending || this.boss.data.isDead) return;
 
     // Boss collision
     const playerRect = this.player.getRect();
@@ -936,20 +985,7 @@ export class Game {
 
       if (damageResult.defeated) {
         this.score += 1000;
-        // Play the specific death line before executing the final die animation
-        if (this.bossVoice) {
-          this.bossVoice.playLineAndWait('para_de_encher_o_saco').then(started => {
-            if (!started) {
-              // Couldn't play; fall back to instant death
-              this.boss?.die();
-            } else {
-              // After the line completes, execute death
-              this.boss?.die();
-            }
-          });
-        } else {
-          this.boss?.die();
-        }
+        this.queueBossDeath();
       }
 
       const bossRect = this.boss.getRect();
@@ -1132,17 +1168,7 @@ export class Game {
         }
         if (damageResult.defeated) {
           this.score += 1000;
-          if (this.bossVoice) {
-            this.bossVoice.playLineAndWait('para_de_encher_o_saco').then(started => {
-              if (!started) {
-                this.boss?.die();
-              } else {
-                this.boss?.die();
-              }
-            });
-          } else {
-            this.boss?.die();
-          }
+          this.queueBossDeath();
         }
 
         this.spawnParticles(impact.x, impact.y, '#FFFFFF', 15);
