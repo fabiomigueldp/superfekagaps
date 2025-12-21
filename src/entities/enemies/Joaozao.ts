@@ -16,8 +16,11 @@ export class Joaozao {
   private isGrounded: boolean = false;
   private hurtTimer: number = 0;
 
+  // Adicione uma flag para controlar a rotação da morte visualmente
+  public deadRotation: number = 0; 
+
   // Flag para garantir que o smash ocorra apenas uma vez por execução de ação
-  private hasSmashed: boolean = false;
+  private hasSmashed: boolean = false; 
   // Impacto pendente para o jogo processar (câmera/partículas/som)
   private pendingImpact: { x: number; y: number } | null = null
 
@@ -44,13 +47,27 @@ export class Joaozao {
 
     this.data.animationTimer += deltaTime;
 
+    // --- MELHORIA NA MORTE ---
     if (this.data.isDead) {
       this.data.deathTimer -= deltaTime;
+      
+      // Gira o corpo enquanto morre (efeito dramático)
+      // Vai de 0 a 90 graus (PI/2) rapidamente
+      if (this.deadRotation < Math.PI / 2) {
+        this.deadRotation += deltaTime * 0.005;
+      }
+
+      // Aplica gravidade na morte para ele cair do cenário se estiver no ar
+      this.data.velocity.y += GRAVITY;
+      this.data.position.y += this.data.velocity.y;
+      this.data.position.x += this.data.velocity.x; // Mantém inércia horizontal
+
       if (this.data.deathTimer <= 0) {
         this.data.active = false;
       }
       return;
     }
+    // -------------------------
 
     // Atualiza attack timer
     if (this.data.attackTimer !== undefined) {
@@ -70,6 +87,14 @@ export class Joaozao {
 
     // Executa ação atual
     this.executeAction(deltaTime, level, playerX);
+
+    // --- MELHORIA NO DANO (Override visual) ---
+    // Se estiver machucado recentemente, sobrepõe a animação atual com a de dor
+    // Isso sincroniza visualmente com as falas "Hit React" (ex: "Porra nenhuma")
+    if (this.hurtTimer > 200) { // Mostra dor nos primeiros 200ms do hit
+        this.data.animationFrame = 3; // Frame 3 = DANO
+    }
+    // ------------------------------------------
 
     // Aplica gravidade
     this.data.velocity.y += GRAVITY * 0.7;
@@ -260,14 +285,14 @@ export class Joaozao {
       return { defeated: false, damaged: false };
     }
 
-    this.hurtTimer = 400;
+    this.hurtTimer = 800; // Aumentei um pouco para dar tempo da animação tocar
     this.data.health--;
 
-    // Knockback
-    this.data.velocity.y = -5;
-    this.data.velocity.x = (Math.random() - 0.5) * 4;
+    // Knockback mais forte para sentir o impacto
+    this.data.velocity.y = -6; 
+    // Empurra para longe de onde o dano veio (simplificado aleatório ou baseado no player se tivesse ref)
+    this.data.velocity.x = (Math.random() > 0.5 ? 1 : -1) * 3; 
 
-    // Aumenta fase (fica mais agressivo)
     this.phase = Math.min(3, 4 - this.data.health);
 
     if (this.data.health <= 0) {
@@ -280,8 +305,8 @@ export class Joaozao {
 
   die(): void {
     this.data.isDead = true;
-    this.data.deathTimer = 2000;
-    this.data.velocity = { x: 0, y: -8 };
+    this.data.deathTimer = 3000; // Mais tempo para curtir a animação de morte
+    this.data.velocity = { x: 0, y: -6 }; // Pulo da morte (clássico Mario boss)
     this.projectiles = [];
   }
 

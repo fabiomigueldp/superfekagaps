@@ -882,57 +882,82 @@ export class Renderer {
 
   private drawJoaozao(enemy: EnemyData, x: number, y: number): void {
     const ctx = this.offscreenCtx;
-
-    if (enemy.isDead) {
-      ctx.globalAlpha = Math.max(0, enemy.deathTimer / 1000);
-    }
+    
+    // Cast para acessar a propriedade deadRotation que adicionamos na classe, 
+    // ou assumir 0 se estivermos desenhando apenas a interface EnemyData pura
+    const rotation = (enemy as any).deadRotation || 0;
 
     ctx.save();
 
+    // --- ANIMAÇÃO DE MORTE (Rotação e Fade) ---
+    if (enemy.isDead) {
+      // Fade out só no finalzinho
+      const fadeStart = 1000; 
+      if (enemy.deathTimer < fadeStart) {
+        ctx.globalAlpha = Math.max(0, enemy.deathTimer / fadeStart);
+      }
+      
+      // Centraliza o pivot para rotacionar
+      const centerX = x + enemy.width / 2;
+      const centerY = y + enemy.height / 2;
+      ctx.translate(centerX, centerY);
+      ctx.rotate(rotation); // Gira o boneco (cai para trás)
+      ctx.translate(-centerX, -centerY);
+    }
+
+    // Inverte o canvas horizontalmente se olhar para a esquerda
+    // (Aplica depois da rotação de morte para não bugar o eixo)
     if (!enemy.facingRight) {
       ctx.translate(x + enemy.width, y);
       ctx.scale(-1, 1);
       ctx.translate(-x, -y);
     }
 
-    // Offsets de animação baseados no frame definido na lógica
+    // --- LÓGICA DE FRAMES ---
     let bodyY = y;
     let armY = y + 14;
-    let armHeight = 12; // Altura normal do braço
+    let armHeight = 12;
+    let isHurt = false;
 
-    // Frame 1: Preparação (Estica / Braços pro alto)
-    if (enemy.animationFrame === 1) {
-      bodyY = y - 2; // Corpo sobe um pouco (preparando pulo/impacto)
-      armY = y - 6;  // Braços vão pra cima
-      armHeight = 18; // Braços esticados
-    }
-    // Frame 2: Impacto (Agacha / Braços batem no chão)
-    else if (enemy.animationFrame === 2) {
-      bodyY = y + 2; // Corpo desce (achatado no impacto)
-      armY = y + 20; // Braços baixos
+    if (enemy.animationFrame === 1) { // Preparação
+      bodyY = y - 2;
+      armY = y - 6;
+      armHeight = 18;
+    } else if (enemy.animationFrame === 2) { // Smash
+      bodyY = y + 2;
+      armY = y + 20;
       armHeight = 8;
+    } else if (enemy.animationFrame === 3) { // ** NOVO FRAME: DANO **
+      isHurt = true;
+      bodyY = y + 1; // Corpo levemente recuado
+      // Braços flailing (um pra cima, um pra baixo)
+      armY = y + 10; 
     }
 
-    // --- DESENHO DO CORPO (Usando bodyY) ---
-    ctx.fillStyle = COLORS.JOAOZAO_SKIN;
-    ctx.fillRect(x + 4, bodyY + 12, 24, 20); // Corpo
+    // Efeito de piscar branco quando toma dano (flash damage)
+    const flashWhite = isHurt && Math.floor(Date.now() / 50) % 2 === 0;
+    const skinColor = flashWhite ? '#FFFFFF' : COLORS.JOAOZAO_SKIN;
+    const shirtColor = flashWhite ? '#FFFFFF' : COLORS.JOAOZAO_SHIRT;
+    const pantsColor = flashWhite ? '#FFFFFF' : COLORS.JOAOZAO_PANTS;
 
-    // Camisa
-    ctx.fillStyle = COLORS.JOAOZAO_SHIRT;
+    // --- CORPO ---
+    ctx.fillStyle = skinColor;
+    ctx.fillRect(x + 4, bodyY + 12, 24, 20); 
+
+    ctx.fillStyle = shirtColor;
     ctx.fillRect(x + 6, bodyY + 14, 20, 14);
 
-    // Calças (seguem o corpo levemente)
-    ctx.fillStyle = COLORS.JOAOZAO_PANTS;
+    ctx.fillStyle = pantsColor;
     ctx.fillRect(x + 6, bodyY + 28, 8, 10);
     ctx.fillRect(x + 18, bodyY + 28, 8, 10);
 
-    // Sapatos (fixos no chão para ancorar o personagem)
+    // Sapatos
     ctx.fillStyle = '#1a1a1a';
     ctx.fillRect(x + 4, y + 36, 10, 4);
     ctx.fillRect(x + 18, y + 36, 10, 4);
 
-    // --- CABEÇA (Segue bodyY) ---
-    ctx.fillStyle = COLORS.JOAOZAO_SKIN;
+    // --- CABEÇA ---
+    ctx.fillStyle = skinColor;
     ctx.fillRect(x + 4, bodyY, 24, 14);
 
     // Cabelo
@@ -941,32 +966,63 @@ export class Renderer {
     ctx.fillRect(x + 4, bodyY + 4, 4, 3);
     ctx.fillRect(x + 24, bodyY + 4, 4, 3);
 
-    // Olhos
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(x + 8, bodyY + 5, 6, 5);
-    ctx.fillRect(x + 18, bodyY + 5, 6, 5);
+    // --- ROSTO (Expressões) ---
+    if (isHurt) {
+      // ** Expressão de Dor **
+      
+      // Olhos fechados com força (> <) ou linhas
+      ctx.fillStyle = '#000000';
+      // Olho esquerdo (fechado >)
+      ctx.beginPath();
+      ctx.moveTo(x + 8, bodyY + 5);
+      ctx.lineTo(x + 12, bodyY + 7);
+      ctx.lineTo(x + 8, bodyY + 9);
+      ctx.stroke();
+      
+      // Olho direito (fechado <)
+      ctx.beginPath();
+      ctx.moveTo(x + 22, bodyY + 5);
+      ctx.lineTo(x + 18, bodyY + 7);
+      ctx.lineTo(x + 22, bodyY + 9);
+      ctx.stroke();
 
-    // Pupilas (vermelhas se estiver em ação)
-    ctx.fillStyle = '#FF0000';
-    ctx.fillRect(x + 10, bodyY + 6, 3, 3);
-    ctx.fillRect(x + 20, bodyY + 6, 3, 3);
+      // Boca aberta gritando ('O' comprido)
+      // Combina com as falas de hit_react ("Porra nenhuma", "Para de encher...")
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(x + 10, bodyY + 10, 10, 6);
+      ctx.fillStyle = '#FF0000'; // Língua/garganta
+      ctx.fillRect(x + 12, bodyY + 13, 6, 3);
 
-    // Boca
-    ctx.fillStyle = '#000000';
-    if (enemy.animationFrame === 1) {
-      // Boca aberta gritando na preparação
-      ctx.fillRect(x + 10, bodyY + 11, 12, 4);
     } else {
-      // Sorriso malvado normal
-      ctx.fillRect(x + 10, bodyY + 11, 12, 2);
-      ctx.fillRect(x + 8, bodyY + 10, 2, 2);
-      ctx.fillRect(x + 22, bodyY + 10, 2, 2);
+      // ** Expressão Normal/Ataque **
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(x + 8, bodyY + 5, 6, 5);
+      ctx.fillRect(x + 18, bodyY + 5, 6, 5);
+
+      ctx.fillStyle = '#FF0000'; // Pupilas
+      ctx.fillRect(x + 10, bodyY + 6, 3, 3);
+      ctx.fillRect(x + 20, bodyY + 6, 3, 3);
+
+      ctx.fillStyle = '#000000'; // Boca
+      if (enemy.animationFrame === 1) {
+        ctx.fillRect(x + 10, bodyY + 11, 12, 4); // Gritando/Esforço
+      } else {
+        ctx.fillRect(x + 10, bodyY + 11, 12, 2); // Sorriso
+        ctx.fillRect(x + 8, bodyY + 10, 2, 2);
+        ctx.fillRect(x + 22, bodyY + 10, 2, 2);
+      }
     }
 
-    // --- BRAÇOS (Usando armY e armHeight) ---
-    ctx.fillStyle = COLORS.JOAOZAO_SKIN;
-    ctx.fillRect(x, armY, 6, armHeight);      // Braço esquerdo
-    ctx.fillRect(x + 26, armY, 6, armHeight); // Braço direito
+    // --- BRAÇOS ---
+    ctx.fillStyle = skinColor;
+    if (isHurt) {
+      // Braços jogados para o lado/cima em dor
+      ctx.fillRect(x - 2, bodyY + 10, 6, 10); // Esq levantado/aberto
+      ctx.fillRect(x + 28, bodyY + 14, 6, 10); // Dir caído
+    } else {
+      ctx.fillRect(x, armY, 6, armHeight);
+      ctx.fillRect(x + 26, armY, 6, armHeight);
+    }
 
     ctx.restore();
     ctx.globalAlpha = 1;
