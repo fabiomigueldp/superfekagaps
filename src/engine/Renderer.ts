@@ -712,16 +712,38 @@ export class Renderer {
   private drawSpikeTile(x: number, y: number): void {
     const ctx = this.offscreenCtx;
 
-    ctx.fillStyle = COLORS.SPIKE;
+    const spikeDark = '#5f5f5f';
+    const spikeLight = '#b0b0b0';
 
-    // Desenha 4 espinhos
+    // Base metalica
+    ctx.fillStyle = spikeDark;
+    ctx.fillRect(x, y + TILE_SIZE - 3, TILE_SIZE, 3);
+    ctx.fillStyle = spikeLight;
+    ctx.fillRect(x, y + TILE_SIZE - 3, TILE_SIZE, 1);
+
+    // Desenha 4 espinhos com outline e brilho
     for (let i = 0; i < 4; i++) {
       const sx = x + i * 4;
+
+      // Outline
+      ctx.fillStyle = spikeDark;
+      ctx.beginPath();
+      ctx.moveTo(sx - 1, y + TILE_SIZE);
+      ctx.lineTo(sx + 2, y + 3);
+      ctx.lineTo(sx + 5, y + TILE_SIZE);
+      ctx.fill();
+
+      // Corpo
+      ctx.fillStyle = COLORS.SPIKE;
       ctx.beginPath();
       ctx.moveTo(sx, y + TILE_SIZE);
       ctx.lineTo(sx + 2, y + 4);
       ctx.lineTo(sx + 4, y + TILE_SIZE);
       ctx.fill();
+
+      // Brilho
+      ctx.fillStyle = spikeLight;
+      ctx.fillRect(sx + 1, y + 7, 1, 3);
     }
   }
 
