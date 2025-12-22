@@ -101,6 +101,20 @@ export interface FlagData {
   enabled: boolean;
 }
 
+export interface BackgroundLayerSpec {
+  type: 'clouds' | 'mountains' | 'hills' | 'city' | 'castle_wall';
+  color: string; // Hex ou rgba
+  baseHeight?: number; // Altura base da camada
+  scrollFactor: number; // 0.0 (fixo) a 1.0 (segue o player)
+  speedX?: number; // Para nuvens que se movem sozinhas
+  roughness?: number; // Para geração procedural (ex: montanhas mais pontudas)
+}
+
+export interface LevelTheme {
+  skyGradient: [string, string]; // [Topo, Base]
+  layers: BackgroundLayerSpec[];
+}
+
 // Dados do nível
 export interface LevelData {
   id: string;
@@ -115,6 +129,7 @@ export interface LevelData {
   goalPosition: Vector2;
   timeLimit: number;
   isBossLevel: boolean;
+  theme?: LevelTheme;
 }
 
 export interface EnemySpawnData {

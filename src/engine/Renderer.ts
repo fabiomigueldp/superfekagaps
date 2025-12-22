@@ -9,8 +9,9 @@ import {
   FALLING_PLATFORM_FALL_MS,
   FALLING_PLATFORM_FALL_DISTANCE
 } from '../constants';
-import { CameraData, PlayerData, EnemyData, CollectibleData, FlagData, Particle, Firework, EnemyType, CollectibleType, GroundPoundState, SpeechBubbleRenderState, FallingPlatformPhase } from '../types';
+import { CameraData, PlayerData, EnemyData, CollectibleData, FlagData, Particle, Firework, EnemyType, CollectibleType, GroundPoundState, SpeechBubbleRenderState, FallingPlatformPhase, LevelTheme, BackgroundLayerSpec } from '../types';
 import { PLAYER_PALETTE, PLAYER_SPRITES, PLAYER_PIXEL_SIZE, PLAYER_RENDER_OFFSET_X, PLAYER_RENDER_OFFSET_Y } from '../assets/playerSpriteSpec';
+import { BackgroundGenerator } from './BackgroundGenerator';
 
 
 export class Renderer {
@@ -31,6 +32,10 @@ export class Renderer {
 
   // Fireworks shown specially on the high-res UI layer (ENDING)
   private lastEndingFireworks: Firework[] = [];
+
+  // Parallax Background
+  private backgroundLayers: { image: HTMLCanvasElement, spec: BackgroundLayerSpec }[] = [];
+  private currentTheme: LevelTheme | null = null;
 
   constructor() {
     this.canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
@@ -579,24 +584,81 @@ export class Renderer {
 
   // === RENDERIZAÇÃO DO BACKGROUND ===
 
+  prepareLevelBackground(theme: LevelTheme): void {
+    this.currentTheme = theme;
+    this.backgroundLayers = [];
+
+    // Largura base para garantir loop suave (deve ser maior que a tela)
+    // Adicionamos um pouco extra para garantir
+    const width = GAME_WIDTH;
+    const height = GAME_HEIGHT;
+
+    for (const layerSpec of theme.layers) {
+      const image = BackgroundGenerator.generateLayer(layerSpec, width, height);
+      this.backgroundLayers.push({ image, spec: layerSpec });
+    }
+  }
+
   drawBackground(camera: CameraData): void {
     const ctx = this.offscreenCtx;
     const cam = this.snapCamera(camera);
 
-    // Gradiente de céu
-    const gradient = ctx.createLinearGradient(0, 0, 0, GAME_HEIGHT);
-    gradient.addColorStop(0, COLORS.SKY_LIGHT);
-    gradient.addColorStop(1, COLORS.SKY_DARK);
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    if (this.currentTheme) {
+      // 1. Gradiente do céu
+      const gradient = ctx.createLinearGradient(0, 0, 0, GAME_HEIGHT);
+      gradient.addColorStop(0, this.currentTheme.skyGradient[0]);
+      gradient.addColorStop(1, this.currentTheme.skyGradient[1]);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
-    // Nuvens simples (paralaxe)
-    ctx.fillStyle = '#FFFFFF';
-    const cloudOffset = cam.x * 0.3;
-    for (let i = 0; i < 5; i++) {
-      const x = ((i * 80 - cloudOffset) % (GAME_WIDTH + 60)) - 30;
-      const y = 20 + (i % 3) * 15;
-      this.drawCloud(x, y);
+      // 2. Camadas parallax
+      for (const layer of this.backgroundLayers) {
+        // Cálculo do offset parallax
+        // Offset positivo movimenta a imagem para a esquerda
+        let offsetX = (cam.x * layer.spec.scrollFactor);
+
+        // Adiciona movimento automático (vento) se houver
+        if (layer.spec.speedX) {
+          offsetX += (Date.now() / 1000) * layer.spec.speedX;
+        }
+
+        const w = layer.image.width;
+        // Modulo para manter dentro de [0, w)
+        // O operador % pode retornar negativo, então ajustamos
+        offsetX = offsetX % w;
+        if (offsetX < 0) offsetX += w;
+
+        // Desenha a imagem duas vezes para cobrir o gap durante o loop
+        // Desenhamos em -offsetX. Como offsetX está entre 0 e w:
+        // Se offsetX é 0, desenha em 0.
+        // Se offsetX é 10, desenha em -10 (imagem shiftada pra esquerda), e precisa da próxima em -10 + w
+
+        ctx.drawImage(layer.image, -Math.floor(offsetX), 0);
+
+        // Só desenha a segunda se necessário (sempre desenha por segurança ou só se w < GAME_WIDTH + offset?)
+        // Como o width == GAME_WIDTH, se offset > 0, precisamos da segunda imagem.
+        if (offsetX > 0) {
+          ctx.drawImage(layer.image, -Math.floor(offsetX) + w, 0);
+        }
+      }
+
+    } else {
+      // Fallback para background antigo se não houver tema
+      // Gradiente de céu
+      const gradient = ctx.createLinearGradient(0, 0, 0, GAME_HEIGHT);
+      gradient.addColorStop(0, COLORS.SKY_LIGHT);
+      gradient.addColorStop(1, COLORS.SKY_DARK);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+      // Nuvens simples (paralaxe)
+      ctx.fillStyle = '#FFFFFF';
+      const cloudOffset = cam.x * 0.3;
+      for (let i = 0; i < 5; i++) {
+        const x = ((i * 80 - cloudOffset) % (GAME_WIDTH + 60)) - 30;
+        const y = 20 + (i % 3) * 15;
+        this.drawCloud(x, y);
+      }
     }
   }
 

@@ -659,6 +659,11 @@ export class Game {
     this.camera.x = 0;
     this.camera.y = 0;
 
+    // Configura Background Procedural
+    if (levelData.theme) {
+      this.renderer.prepareLevelBackground(levelData.theme);
+    }
+
     // Carrega inimigos
     this.minions = [];
     this.boss = null;
