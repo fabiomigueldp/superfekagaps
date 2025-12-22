@@ -79,6 +79,11 @@ export class Game {
   private accumulator: number = 0;
   private readonly fixedDeltaTime: number = 1000 / 60; // 60 FPS
 
+  // Run Stats
+  private totalRunTime: number = 0;
+  private bestTime: number = Infinity;
+  private newTimeRecord: boolean = false;
+
   constructor() {
     this.input = new Input();
     this.audio = new Audio();
@@ -246,8 +251,11 @@ export class Game {
       return;
     }
 
-    // Timer do nível
-    this.levelTime -= deltaTime / 1000;
+    // Timer do nível (agora conta para run time também)
+    const dtSeconds = deltaTime / 1000;
+    this.levelTime -= dtSeconds;
+    this.totalRunTime += dtSeconds;
+
     if (this.levelTime <= 0) {
       this.playerDie();
       return;
@@ -472,7 +480,14 @@ export class Game {
         break;
       case GameState.GAME_OVER:
         this.renderGame();
-        this.renderer.drawGameOver(this.score, this.highScore, this.newRecord);
+        this.renderer.drawGameOver(
+          this.score,
+          this.highScore,
+          this.newRecord,
+          this.totalRunTime,
+          this.bestTime,
+          this.newTimeRecord
+        );
         break;
       case GameState.LEVEL_CLEAR:
         this.renderGame();
@@ -488,7 +503,15 @@ export class Game {
         this.renderer.drawBossIntro('JOÃOZÃO');
         break;
       case GameState.ENDING:
-        this.renderer.drawEnding(this.fireworks, this.score, this.highScore, this.newRecord);
+        this.renderer.drawEnding(
+          this.fireworks,
+          this.score,
+          this.highScore,
+          this.newRecord,
+          this.totalRunTime,
+          this.bestTime,
+          this.newTimeRecord
+        );
         break;
     }
 
@@ -608,9 +631,12 @@ export class Game {
     this.score = 0;
     this.lives = INITIAL_LIVES;
     this.coins = 0;
+    this.totalRunTime = 0;
     this.loadLevel(0);
     this.highScore = ScoreManager.getHighScore();
+    this.bestTime = ScoreManager.getBestTime();
     this.newRecord = false;
+    this.newTimeRecord = false;
   }
 
   private loadLevel(index: number): void {
@@ -1278,7 +1304,8 @@ export class Game {
 
       const spawnPos = this.activeCheckpoint || this.level.data.playerSpawn;
       this.player.respawn(spawnPos);
-      this.levelTime = this.level.data.timeLimit;
+      // Não resetamos o tempo mais! O tempo é contínuo e cruel.
+      // this.levelTime = this.level.data.timeLimit; 
       this.audio.onRespawn();
     }
   }
@@ -1329,6 +1356,10 @@ export class Game {
     this.endingTimer = 0;
     this.newRecord = ScoreManager.saveHighScore(this.score);
     this.highScore = ScoreManager.getHighScore();
+
+    this.newTimeRecord = ScoreManager.saveBestTime(this.totalRunTime);
+    this.bestTime = ScoreManager.getBestTime();
+
     this.changeState(GameState.ENDING);
 
     // Spawn initial burst of fireworks for ending screen

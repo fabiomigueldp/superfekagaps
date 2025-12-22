@@ -402,6 +402,14 @@ export class Renderer {
         ctx.fillStyle = '#FFD700';
         ctx.fillText(`HI-SCORE: ${params.highScore}`, Math.round(w / 2), Math.round((GAME_HEIGHT / 2 + 22) * pixelScale));
 
+        // Best Time display
+        if (params.bestTime && params.bestTime !== Infinity) {
+          const bt = params.bestTime.toFixed(1);
+          ctx.fillStyle = '#8888AA'; // Subtle color
+          ctx.font = `${Math.max(6, Math.round(8 * pixelScale))}px monospace`;
+          ctx.fillText(`Melhor Tempo: ${bt}s`, Math.round(w / 2), Math.round((GAME_HEIGHT / 2 + 35) * pixelScale));
+        }
+
         ctx.font = `${Math.max(6, Math.round(8 * pixelScale))}px monospace`;
         ctx.fillStyle = '#AAAAAA';
         ctx.fillText('Pressione ENTER para reiniciar', Math.round(w / 2), Math.round((GAME_HEIGHT / 2 + 45) * pixelScale));
@@ -494,6 +502,15 @@ export class Renderer {
         ctx.fillStyle = '#8B0000';
         ctx.fillText(`Score: ${params.score}`, Math.round(w / 2), Math.round((bottomBaseY + (params.newRecord ? 12 : 5)) * pixelScale));
         ctx.fillText(`HI-SCORE: ${params.highScore}`, Math.round(w / 2), Math.round((bottomBaseY + (params.newRecord ? 22 : 15)) * pixelScale));
+
+        // Time Stats
+        const timeY = bottomBaseY + (params.newRecord ? 32 : 25);
+        const totalTime = params.totalRunTime ? params.totalRunTime.toFixed(1) : '0.0';
+
+        ctx.font = `${Math.max(6, Math.round(8 * pixelScale))}px monospace`;
+        ctx.fillStyle = params.newTimeRecord ? '#FFFF00' : '#8B0000'; // Highlight if new record
+        const recordText = params.newTimeRecord ? ' (NOVO RECORDE!)' : '';
+        ctx.fillText(`Tempo Total: ${totalTime}s${recordText}`, Math.round(w / 2), Math.round(timeY * pixelScale));
 
 
         ctx.fillStyle = '#FFD700';
@@ -2174,10 +2191,10 @@ export class Renderer {
     ctx.fillText('Pressione ESC para continuar', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 15);
   }
 
-  drawGameOver(score: number, highScore: number, newRecord: boolean): void {
+  drawGameOver(score: number, highScore: number, newRecord: boolean, totalRunTime: number, bestTime: number, newTimeRecord: boolean): void {
     // Cache params so we can draw this overlay crisply on the main canvas
     this.lastUIType = 'TITLE';
-    this.lastUIParams = { variant: 'GAME_OVER', score, highScore, newRecord };
+    this.lastUIParams = { variant: 'GAME_OVER', score, highScore, newRecord, totalRunTime, bestTime, newTimeRecord };
 
     // Don't draw legacy offscreen UI here to avoid duplicate ghost effects
   }
@@ -2234,10 +2251,10 @@ export class Renderer {
     ctx.fillText('\"Você vai cair nos meus gaps!\"', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 20);
   }
 
-  drawEnding(fireworks: Firework[] = [], score: number, highScore: number, newRecord: boolean): void {
+  drawEnding(fireworks: Firework[] = [], score: number, highScore: number, newRecord: boolean, totalRunTime: number, bestTime: number, newTimeRecord: boolean): void {
     // Use TITLE high-res overlay for ending so we can draw Yasmin crisp
     this.lastUIType = 'TITLE';
-    this.lastUIParams = { variant: 'ENDING', score, highScore, newRecord };
+    this.lastUIParams = { variant: 'ENDING', score, highScore, newRecord, totalRunTime, bestTime, newTimeRecord };
 
     // Draw only fireworks particles offscreen as they need pixel-precision with game world
     this.drawFireworks(fireworks, 0, 0);
