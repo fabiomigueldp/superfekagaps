@@ -34,28 +34,40 @@ export class Level {
     return above === TileType.LAVA_TOP || above === TileType.LAVA_FILL;
   }
 
+  // Se houver AR em cima, a lava ocupa apenas 3/4 de baixo (topo fica offsetado)
   private getLavaTopOffset(col: number, row: number): number {
     if (row < 0 || row >= this.data.tiles.length || col < 0 || col >= this.data.tiles[0].length) {
       return 0;
     }
     const tile = this.data.tiles[row][col];
-    if (tile !== TileType.LAVA_TOP) return 0;
-    return this.hasLavaAbove(col, row) ? 0 : Math.floor(TILE_SIZE / 4);
+    if (tile !== TileType.LAVA_TOP && tile !== TileType.LAVA_FILL) return 0;
+
+    // Se tem lava em cima, nao tem offset (eh um bloco cheio conectado)
+    if (this.hasLavaAbove(col, row)) return 0;
+
+    // Se tem AR em cima, aplica o "gap" de segurança
+    const above = row > 0 ? this.data.tiles[row - 1][col] : null;
+    if (above === TileType.EMPTY) {
+      return Math.floor(TILE_SIZE / 4);
+    }
+
+    // Se tiver qualquer outra coisa solida em cima, consideramos lava cheia ou normal
+    return 0;
   }
 
   // Verifica colisão com um retângulo
   checkCollision(rect: Rect): { left: boolean; right: boolean; top: boolean; bottom: boolean; grounded: boolean } {
     const result = { left: false, right: false, top: false, bottom: false, grounded: false };
-    
+
     const startCol = Math.floor(rect.x / TILE_SIZE);
     const endCol = Math.floor((rect.x + rect.width - 1) / TILE_SIZE);
     const startRow = Math.floor(rect.y / TILE_SIZE);
     const endRow = Math.floor((rect.y + rect.height - 1) / TILE_SIZE);
-    
+
     for (let row = startRow; row <= endRow; row++) {
       for (let col = startCol; col <= endCol; col++) {
         if (row < 0 || row >= this.data.tiles.length || col < 0 || col >= this.data.tiles[0].length) continue;
-        
+
         const tile = this.getTile(col, row);
         // Decide solidez conservadora: plataformas contam como chão se o bottom atual está acima do topo+2
         const tileTop = row * TILE_SIZE;
@@ -82,7 +94,8 @@ export class Level {
           // Determina qual lado esta colidindo
           let tileY = row * TILE_SIZE;
           let tileH = TILE_SIZE;
-          if (tile === TileType.LAVA_TOP) {
+          if (tile === TileType.LAVA_TOP || tile === TileType.LAVA_FILL) {
+
             const offset = this.getLavaTopOffset(col, row);
             tileY += offset;
             tileH -= offset;
@@ -93,11 +106,11 @@ export class Level {
             width: TILE_SIZE,
             height: tileH
           };
-          
+
           // Calcula overlap
           const overlapX = Math.min(rect.x + rect.width, tileRect.x + tileRect.width) - Math.max(rect.x, tileRect.x);
           const overlapY = Math.min(rect.y + rect.height, tileRect.y + tileRect.height) - Math.max(rect.y, tileRect.y);
-          
+
           if (overlapX > overlapY) {
             if (rect.y < tileRect.y) {
               result.bottom = true;
@@ -115,18 +128,18 @@ export class Level {
         }
       }
     }
-    
+
     return result;
   }
 
   // Resolve colisão e retorna nova posição e possível tileHit
-  resolveCollision(rect: Rect, velocity: Vector2, prevRect?: Rect): { position: Vector2; velocity: Vector2; grounded: boolean; tileHit?: { type: number; col: number; row: number; side: 'top'|'bottom'|'left'|'right' } | null } {
+  resolveCollision(rect: Rect, velocity: Vector2, prevRect?: Rect): { position: Vector2; velocity: Vector2; grounded: boolean; tileHit?: { type: number; col: number; row: number; side: 'top' | 'bottom' | 'left' | 'right' } | null } {
     let newX = rect.x + velocity.x;
     let newY = rect.y + velocity.y;
     let newVelX = velocity.x;
     let newVelY = velocity.y;
     let grounded = false;
-    let tileHit: { type: number; col: number; row: number; side: 'top'|'bottom'|'left'|'right' } | null = null;
+    let tileHit: { type: number; col: number; row: number; side: 'top' | 'bottom' | 'left' | 'right' } | null = null;
 
     const minX = 0;
     const maxX = this.data.width * TILE_SIZE - rect.width;
@@ -162,7 +175,7 @@ export class Level {
     if (vCollision.collides) {
       if (velocity.y > 0) {
         // Landing on tile
-        if (vCollision.tile === TileType.LAVA_TOP) {
+        if (vCollision.tile === TileType.LAVA_TOP || vCollision.tile === TileType.LAVA_FILL) {
           const offset = this.getLavaTopOffset(vCollision.col, vCollision.row);
           newY = vCollision.row * TILE_SIZE + offset - rect.height;
         } else {
@@ -214,7 +227,7 @@ export class Level {
           tile === TileType.LAVA_TOP ||
           tile === TileType.LAVA_FILL
         ) {
-          if (tile === TileType.LAVA_TOP) {
+          if (tile === TileType.LAVA_TOP || tile === TileType.LAVA_FILL) {
             const offset = this.getLavaTopOffset(col, row);
             if (offset > 0) {
               const tileTop = row * TILE_SIZE + offset;
@@ -261,7 +274,7 @@ export class Level {
           }
         }
 
-        if (tile === TileType.LAVA_TOP) {
+        if (tile === TileType.LAVA_TOP || tile === TileType.LAVA_FILL) {
           const offset = this.getLavaTopOffset(col, row);
           const lavaTop = row * TILE_SIZE + offset;
           if (prevRect) {
@@ -287,8 +300,7 @@ export class Level {
           tile === TileType.POWERUP_BLOCK_COFFEE ||
           tile === TileType.POWERUP_BLOCK_HELMET ||
           tile === TileType.SPRING ||
-          tile === TileType.ICE ||
-          tile === TileType.LAVA_FILL
+          tile === TileType.ICE
         ) {
           return { collides: true, col, row, tile };
         }
@@ -337,17 +349,17 @@ export class Level {
     const endCol = Math.floor((rect.x + rect.width - 1) / TILE_SIZE);
     const startRow = Math.floor(rect.y / TILE_SIZE);
     const endRow = Math.floor((rect.y + rect.height - 1) / TILE_SIZE);
-    
+
     for (let row = startRow; row <= endRow; row++) {
       for (let col = startCol; col <= endCol; col++) {
         if (row < 0 || row >= this.data.tiles.length || col < 0 || col >= this.data.tiles[0].length) continue;
-        
+
         if (this.getTile(col, row) === TileType.SPIKE) {
           return true;
         }
       }
     }
-    
+
     return false;
   }
 
@@ -365,7 +377,7 @@ export class Level {
         if (row < 0 || row >= this.data.tiles.length || col < 0 || col >= this.data.tiles[0].length) continue;
         const tile = this.getTile(col, row);
         if (tile === TileType.LAVA_TOP || tile === TileType.LAVA_FILL) {
-          const offset = tile === TileType.LAVA_TOP ? this.getLavaTopOffset(col, row) : 0;
+          const offset = this.getLavaTopOffset(col, row);
           const lavaY = row * TILE_SIZE + offset;
           const lavaH = TILE_SIZE - offset;
           const lavaX = col * TILE_SIZE;
@@ -384,22 +396,22 @@ export class Level {
   checkGoalReached(rect: Rect): boolean {
     const goalX = this.data.goalPosition.x * TILE_SIZE;
     const goalY = this.data.goalPosition.y * TILE_SIZE;
-    
+
     return rect.x + rect.width > goalX &&
-           rect.x < goalX + TILE_SIZE &&
-           rect.y + rect.height > goalY &&
-           rect.y < goalY + TILE_SIZE;
+      rect.x < goalX + TILE_SIZE &&
+      rect.y + rect.height > goalY &&
+      rect.y < goalY + TILE_SIZE;
   }
 
   // Obtém tile considerando tiles dinâmicos (para boss)
   getTile(col: number, row: number): number {
     const key = `${col},${row}`;
     const dynamic = this.dynamicTiles.get(key);
-    
+
     if (dynamic && dynamic.timer > 0) {
       return TileType.EMPTY;
     }
-    
+
     if (row < 0 || row >= this.data.tiles.length || col < 0 || col >= this.data.tiles[0].length) {
       return TileType.EMPTY;
     }
@@ -411,17 +423,17 @@ export class Level {
       }
       return TileType.PLATFORM_FALLING;
     }
-    
+
     return this.data.tiles[row][col];
   }
 
   // Remove tile temporariamente (para boss criar gaps)
   removeTileTemporarily(col: number, row: number, duration: number): void {
     if (row < 0 || row >= this.data.tiles.length || col < 0 || col >= this.data.tiles[0].length) return;
-    
+
     const key = `${col},${row}`;
     const originalTile = this.data.tiles[row][col];
-    
+
     if (originalTile !== TileType.EMPTY) {
       this.dynamicTiles.set(key, { originalTile, timer: duration });
     }
@@ -504,7 +516,7 @@ export class Level {
   // Obtém todos os tiles modificados para renderização
   getModifiedTiles(): number[][] {
     const tiles = this.data.tiles.map(row => [...row]);
-    
+
     this.dynamicTiles.forEach((_, key) => {
       const [col, row] = key.split(',').map(Number);
       if (row >= 0 && row < tiles.length && col >= 0 && col < tiles[0].length) {
@@ -518,7 +530,7 @@ export class Level {
         tiles[row][col] = TileType.EMPTY;
       }
     });
-    
+
     return tiles;
   }
 
@@ -547,7 +559,7 @@ export class Level {
   findNearestCheckpoint(checkpoints: Vector2[], playerX: number): Vector2 {
     let nearest = this.data.playerSpawn;
     let nearestDist = Infinity;
-    
+
     checkpoints.forEach(cp => {
       const dist = Math.abs(cp.x - playerX);
       if (dist < nearestDist && cp.x <= playerX) {
@@ -555,7 +567,7 @@ export class Level {
         nearestDist = dist;
       }
     });
-    
+
     return nearest;
   }
 

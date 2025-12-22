@@ -226,14 +226,16 @@ export class Player {
 
     // Aceleração/desaceleração suave
     if (targetVelX !== 0) {
-      // Acelerando
       let accel = PLAYER_ACCELERATION;
       if (this.data.groundPoundState === GroundPoundState.FALL) {
         accel *= GP_HORIZONTAL_MULT;
       }
 
-      if (Math.abs(this.data.velocity.x) < Math.abs(targetVelX)) {
-        this.data.velocity.x += Math.sign(targetVelX) * accel;
+      const delta = targetVelX - this.data.velocity.x;
+      if (Math.abs(delta) <= accel) {
+        this.data.velocity.x = targetVelX;
+      } else {
+        this.data.velocity.x += Math.sign(delta) * accel;
       }
       // Limita velocidade
       if (Math.abs(this.data.velocity.x) > maxSpeed) {

@@ -648,7 +648,12 @@ export class Renderer {
         this.drawLavaTopTile(x, y, tiles, row, col);
         break;
       case TileType.LAVA_FILL:
-        this.drawLavaFillTile(x, y);
+        // Se estiver exposto ao ar, renderiza como Top para ter o visual 3/4 e animacao
+        if (row > 0 && tiles[row - 1][col] === TileType.EMPTY) {
+          this.drawLavaTopTile(x, y, tiles, row, col);
+        } else {
+          this.drawLavaFillTile(x, y, row, col);
+        }
         break;
       case TileType.HIDDEN_BLOCK:
         // Hidden block: no render until revealed
@@ -940,66 +945,145 @@ export class Renderer {
   private drawLavaTopTile(x: number, y: number, tiles: number[][], row: number, col: number): void {
     const ctx = this.offscreenCtx;
 
+    // Lógica visual deve bater com a física: Offset apenas se houver AR em cima
     const hasLavaAbove = row > 0 && (tiles[row - 1][col] === TileType.LAVA_TOP || tiles[row - 1][col] === TileType.LAVA_FILL);
-    const offset = hasLavaAbove ? 0 : Math.floor(TILE_SIZE / 4);
+    const hasAirAbove = row > 0 && tiles[row - 1][col] === TileType.EMPTY;
+
+    // Se tem lava em cima, conecta (offset 0). Se tem AR, faz o "gap" (offset 4). Caso contrario (chao em cima), enche tudo (offset 0).
+    const offset = (!hasLavaAbove && hasAirAbove) ? Math.floor(TILE_SIZE / 4) : 0;
+
     const lavaY = y + offset;
     const lavaH = TILE_SIZE - offset;
+    const time = Date.now();
 
-    ctx.fillStyle = COLORS.LAVA_FILL;
+    // Even slower animation (Ultra viscous)
+    const slowTime = time * 0.0005;
+
+    // Use WORLD X for texture generation to prevent "swimming" when camera moves
+    const worldX = col * TILE_SIZE;
+
+    // Base fill - Darker richer orange/red base
+    ctx.fillStyle = '#cf2f0f';
     ctx.fillRect(x, lavaY, TILE_SIZE, lavaH);
 
-    // Base heat bands
-    ctx.fillStyle = '#c33a1b';
-    ctx.fillRect(x, lavaY + 6, TILE_SIZE, 1);
-    ctx.fillRect(x, lavaY + 11, TILE_SIZE, 1);
+    // Surface Wave - Slower, smoother, more amplitude
+    const surfaceY = lavaY;
+    ctx.beginPath();
+    ctx.moveTo(x, surfaceY + 2);
 
-    // Surface glow
-    ctx.fillStyle = COLORS.LAVA_TOP;
-    ctx.fillRect(x, lavaY, TILE_SIZE, 4);
-    ctx.fillStyle = '#ffd36a';
-    ctx.fillRect(x + 1, lavaY + 1, 4, 1);
-    ctx.fillRect(x + 7, lavaY + 2, 5, 1);
-    ctx.fillRect(x + 12, lavaY + 1, 2, 1);
+    // Wave parameters
+    const waveFreq = 0.2;
+    const waveAmp = 1.8;
+    const waveSpeed = 1.5; // Reduced speed
 
-    // Flowing veins
-    ctx.fillStyle = '#ff7a2a';
-    ctx.fillRect(x + 2, lavaY + 5, 3, 1);
-    ctx.fillRect(x + 8, lavaY + 7, 4, 1);
-    ctx.fillRect(x + 5, lavaY + 9, 3, 1);
+    for (let i = 0; i <= TILE_SIZE; i += 2) {
+      // Use (worldX + i) to anchor wave to world position
+      const wave = Math.sin((worldX + i) * waveFreq + slowTime * waveSpeed) * waveAmp;
+      ctx.lineTo(x + i, surfaceY + 2 + wave);
+    }
 
-    const bottomBubbleY = Math.min(lavaY + 12, lavaY + lavaH - 4);
-    const bottomBubbleShadowY = Math.min(lavaY + 14, lavaY + lavaH - 2);
+    ctx.lineTo(x + TILE_SIZE, surfaceY + 5);
+    ctx.lineTo(x + TILE_SIZE, surfaceY);
+    ctx.lineTo(x, surfaceY);
+    ctx.fill();
 
-    // Bubbles with glow
-    ctx.fillStyle = '#ffcf6b';
-    ctx.fillRect(x + 3, lavaY + 8, 2, 2);
-    ctx.fillRect(x + 11, bottomBubbleY, 2, 2);
-    ctx.fillStyle = '#9b2a12';
-    ctx.fillRect(x + 3, lavaY + 10, 2, 1);
-    ctx.fillRect(x + 11, bottomBubbleShadowY, 2, 1);
+    // Surface Glow / Crust (Top Layer)
+    // Brighter orange "foam" on top
+    ctx.fillStyle = '#ff9020';
+    ctx.beginPath();
+    ctx.moveTo(x, surfaceY + 2);
+    for (let i = 0; i <= TILE_SIZE; i += 2) {
+      // Slightly different phase for top color
+      const wave = Math.sin((worldX + i) * waveFreq + slowTime * waveSpeed) * waveAmp;
+      ctx.lineTo(x + i, surfaceY + 2 + wave);
+    }
+    ctx.lineTo(x + TILE_SIZE, surfaceY + 5);
+    ctx.lineTo(x + TILE_SIZE, surfaceY + 2); // Thin strip
+    ctx.lineTo(x, surfaceY + 2);
+    ctx.fill();
+
+    // Heat currents (Slow flowing veins)
+    // Anchored to row/worldX
+    const bandY = Math.sin(slowTime * 0.5 + row * 1.5) * 1.5;
+    ctx.fillStyle = '#a01000'; // Darker vein
+    ctx.fillRect(x, lavaY + 7 + bandY, TILE_SIZE, 3);
+
+    // Occasional bright magma pocket (very slow pulse)
+    const pulse = (Math.sin(slowTime * 1.5 + worldX) + 1) / 2; // 0..1
+    if (pulse > 0.8) {
+      ctx.fillStyle = `rgba(255, 200, 50, ${(pulse - 0.8) * 5})`; // Sharp peak
+      // Visual position fixed relative to tile
+      ctx.fillRect(x + 5, lavaY + 8 + bandY, 6, 2);
+    }
+
+    // Bubbles (Viscous, slow rising)
+    // Seed uses world position (row/col)
+    const bubbleSeed = col * 13 + row * 7;
+    const bubbleCount = 2; // Fewer bubbles for viscous look
+
+    for (let i = 0; i < bubbleCount; i++) {
+      // Very slow speed
+      const speed = 0.1 + ((bubbleSeed + i) % 3) * 0.05;
+      // Y position derived from time but anchored to height
+      const bY = (slowTime * speed * 20 + i * 40) % (lavaH + 5);
+
+      // Bubbles wobble slightly
+      const wobble = Math.sin(slowTime * 3 + i) * 1.5;
+      // X position anchored to tile
+      const bX = (bubbleSeed + i * 5 + wobble) % (TILE_SIZE - 2);
+      const validBx = Math.abs(bX);
+
+      const drawY = lavaY + lavaH - bY;
+
+      if (drawY > lavaY && drawY < lavaY + lavaH) {
+        // Main bubble
+        ctx.fillStyle = '#ffba50';
+        ctx.fillRect(x + validBx, drawY, 2, 2);
+
+        // Highlight
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(x + validBx, drawY, 1, 1);
+      }
+    }
   }
 
-  private drawLavaFillTile(x: number, y: number): void {
+  private drawLavaFillTile(x: number, y: number, row: number, col: number): void {
     const ctx = this.offscreenCtx;
+    const time = Date.now();
+    const slowTime = time * 0.0005;
 
-    ctx.fillStyle = COLORS.LAVA_FILL;
+    // Use WORLD coordinates
+    const worldX = col * TILE_SIZE;
+    const worldY = row * TILE_SIZE;
+
+    ctx.fillStyle = '#cf2f0f';
     ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
 
-    // Heat bands
-    ctx.fillStyle = '#c33a1b';
-    ctx.fillRect(x, y + 4, TILE_SIZE, 1);
-    ctx.fillRect(x, y + 9, TILE_SIZE, 1);
+    // Slow moving crust/currents - Anchored to worldY
+    // Current 1
+    const offset1 = Math.sin(slowTime * 0.7 + worldY * 0.1) * 2;
+    ctx.fillStyle = '#a01000';
+    ctx.fillRect(x, y + 4 + offset1, TILE_SIZE, 3);
 
-    // Glowing pockets
-    ctx.fillStyle = '#ff7a2a';
-    ctx.fillRect(x + 2, y + 6, 3, 2);
-    ctx.fillRect(x + 10, y + 10, 4, 2);
-    ctx.fillRect(x + 7, y + 2, 3, 2);
+    // Current 2 (Counter movement)
+    const offset2 = Math.cos(slowTime * 0.5 + worldY * 0.15) * 2;
+    ctx.fillRect(x, y + 10 + offset2, TILE_SIZE, 2);
 
-    // Darker bubbles
-    ctx.fillStyle = '#9b2a12';
-    ctx.fillRect(x + 3, y + 12, 2, 2);
-    ctx.fillRect(x + 12, y + 5, 2, 2);
+    // Glowing magma blobs (Lava lamp style)
+    // Anchored to worldX/worldY
+    const blobPulse = (Math.sin(slowTime * 3 + worldX) + 1) / 2;
+
+    ctx.fillStyle = `rgba(255, 100, 0, ${0.3 + blobPulse * 0.2})`;
+    ctx.beginPath();
+    // Center blob relative to tile center
+    ctx.arc(x + 8, y + 8, 4 + blobPulse, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Hot specs - Rare sparkle based on world pos
+    ctx.fillStyle = '#ffcf6b';
+    if (((time + worldX + worldY) % 2000) < 50) {
+      ctx.fillRect(x + 3 + offset1, y + 5 + offset1, 1, 1);
+    }
   }
 
   private drawFlagTile(x: number, y: number): void {
@@ -1246,7 +1330,7 @@ export class Renderer {
 
   private drawJoaozao(enemy: EnemyData, x: number, y: number): void {
     const ctx = this.offscreenCtx;
-    
+
     // Rotação da morte (se presente) ou 0
     const rotation = enemy.deadRotation || 0;
 
@@ -1255,11 +1339,11 @@ export class Renderer {
     // --- ANIMAÇÃO DE MORTE (Rotação e Fade) ---
     if (enemy.isDead) {
       // Fade out só no finalzinho
-      const fadeStart = 1000; 
+      const fadeStart = 1000;
       if (enemy.deathTimer < fadeStart) {
         ctx.globalAlpha = Math.max(0, enemy.deathTimer / fadeStart);
       }
-      
+
       // Centraliza o pivot para rotacionar
       const centerX = x + enemy.width / 2;
       const centerY = y + enemy.height / 2;
@@ -1294,7 +1378,7 @@ export class Renderer {
       isHurt = true;
       bodyY = y + 1; // Corpo levemente recuado
       // Braços flailing (um pra cima, um pra baixo)
-      armY = y + 10; 
+      armY = y + 10;
     }
 
     // Efeito de piscar branco quando toma dano (flash damage)
@@ -1305,7 +1389,7 @@ export class Renderer {
 
     // --- CORPO ---
     ctx.fillStyle = skinColor;
-    ctx.fillRect(x + 4, bodyY + 12, 24, 20); 
+    ctx.fillRect(x + 4, bodyY + 12, 24, 20);
 
     ctx.fillStyle = shirtColor;
     ctx.fillRect(x + 6, bodyY + 14, 20, 14);
@@ -1332,7 +1416,7 @@ export class Renderer {
     // --- ROSTO (Expressões) ---
     if (isHurt) {
       // ** Expressão de Dor **
-      
+
       // Olhos fechados com força (> <) ou linhas
       ctx.fillStyle = '#000000';
       // Olho esquerdo (fechado >)
@@ -1341,7 +1425,7 @@ export class Renderer {
       ctx.lineTo(x + 12, bodyY + 7);
       ctx.lineTo(x + 8, bodyY + 9);
       ctx.stroke();
-      
+
       // Olho direito (fechado <)
       ctx.beginPath();
       ctx.moveTo(x + 22, bodyY + 5);
@@ -1586,28 +1670,28 @@ export class Renderer {
         // Desenha o foguete subindo (ponto brilhante + rastro)
         ctx.fillStyle = fw.color;
         ctx.fillRect(drawX, drawY, 2, 2);
-        
+
         // Rastro simples
         ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
         ctx.fillRect(drawX, drawY + 2, 2, 4);
-      } 
+      }
       else if (fw.phase === 'EXPLODED') {
         // Desenha as partículas da explosão
         fw.particles.forEach(p => {
           const px = Math.round(p.position.x - cameraX);
           const py = Math.round(p.position.y - cameraY);
-          
+
           // Alpha baseado na vida restante
           const alpha = p.life / p.maxLife;
-          
+
           ctx.save();
           ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
           ctx.fillStyle = p.color;
           // Partículas piscam no final
           if (p.life < 100 && Math.floor(p.life / 10) % 2 === 0) {
-             ctx.fillStyle = '#FFFFFF';
+            ctx.fillStyle = '#FFFFFF';
           }
-              ctx.fillRect(px, py, p.size, p.size);
+          ctx.fillRect(px, py, p.size, p.size);
           ctx.restore();
         });
       }
