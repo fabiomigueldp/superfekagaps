@@ -370,11 +370,23 @@ export class Renderer {
         return;
       }
 
-      // GAME OVER (high-res)
+      // GAME_OVER (high-res)
       if (this.lastUIParams && this.lastUIParams.variant === 'GAME_OVER') {
         const params = this.lastUIParams as any;
         ctx.fillStyle = 'rgba(50, 0, 0, 0.9)';
         ctx.fillRect(0, 0, w, h);
+
+        if (params.newRecord) {
+          ctx.font = `bold ${Math.max(12, Math.round(14 * pixelScale))}px monospace`;
+          ctx.fillStyle = '#FFFF00';
+          ctx.fillText('NOVO RECORDE!', Math.round(w / 2), Math.round((GAME_HEIGHT / 2 - 45) * pixelScale));
+          // Animate blink effect
+          if (Math.floor(Date.now() / 300) % 2 === 0) {
+            ctx.strokeStyle = '#FFA500';
+            ctx.lineWidth = 2;
+            ctx.strokeText('NOVO RECORDE!', Math.round(w / 2), Math.round((GAME_HEIGHT / 2 - 45) * pixelScale));
+          }
+        }
 
         ctx.font = `bold ${Math.max(20, Math.round(24 * pixelScale))}px monospace`;
         ctx.textAlign = 'center';
@@ -385,9 +397,12 @@ export class Renderer {
         ctx.fillStyle = COLORS.MENU_TEXT;
         ctx.fillText(`Score Final: ${params.score}`, Math.round(w / 2), Math.round((GAME_HEIGHT / 2 + 10) * pixelScale));
 
+        ctx.fillStyle = '#FFD700';
+        ctx.fillText(`HI-SCORE: ${params.highScore}`, Math.round(w / 2), Math.round((GAME_HEIGHT / 2 + 22) * pixelScale));
+
         ctx.font = `${Math.max(6, Math.round(8 * pixelScale))}px monospace`;
         ctx.fillStyle = '#AAAAAA';
-        ctx.fillText('Pressione ENTER para reiniciar', Math.round(w / 2), Math.round((GAME_HEIGHT / 2 + 35) * pixelScale));
+        ctx.fillText('Pressione ENTER para reiniciar', Math.round(w / 2), Math.round((GAME_HEIGHT / 2 + 45) * pixelScale));
 
         ctx.restore();
         return;
@@ -395,6 +410,7 @@ export class Renderer {
 
       // ENDING (high-res)
       if (this.lastUIParams && this.lastUIParams.variant === 'ENDING') {
+        const params = this.lastUIParams as any;
         ctx.fillStyle = '#FFB6C1';
         const g = ctx.createLinearGradient(0, 0, 0, h);
         g.addColorStop(0, '#FF69B4');
@@ -423,17 +439,20 @@ export class Renderer {
         ctx.font = `bold ${Math.max(12, Math.round(14 * pixelScale))}px monospace`;
         ctx.textAlign = 'center';
         ctx.fillStyle = '#8B0000';
-        ctx.fillText('Feka salvou Yasmin?', Math.round(w / 2), Math.round(40 * pixelScale));
+        ctx.fillText('Feka salvou Yasmin!', Math.round(w / 2), Math.round(30 * pixelScale));
 
         ctx.font = `${Math.max(8, Math.round(10 * pixelScale))}px monospace`;
         ctx.fillStyle = '#4A0000';
-        ctx.fillText('Joãozão foi derrotado!', Math.round(w / 2), Math.round(60 * pixelScale));
+        ctx.fillText('Joãozão foi derrotado!', Math.round(w / 2), Math.round(45 * pixelScale));
+
+        // Score info (moved to bottom)
+        const bottomBaseY = GAME_HEIGHT - 65;
 
         // Desenha o Feka (pixel art) em alta-res no canvas principal para que apareça acima do overlay
         ((): void => {
           const art = PLAYER_SPRITES.idle;
           const px = Math.round((GAME_WIDTH / 2 - 40) * pixelScale);
-          const py = Math.round((GAME_HEIGHT / 2 + 10) * pixelScale);
+          const py = Math.round((GAME_HEIGHT / 2 - 10) * pixelScale);
           const ps = Math.max(1, Math.round(2 * pixelScale));
 
           ctx.save();
@@ -459,16 +478,29 @@ export class Renderer {
           const ratio = img.width / img.height;
           const targetW = Math.round(targetH * ratio);
           const imgX = Math.round(w / 2 + 10 * pixelScale);
-          const imgY = Math.round((GAME_HEIGHT / 2 - 20) * pixelScale);
+          const imgY = Math.round((GAME_HEIGHT / 2 - 40) * pixelScale);
           ctx.drawImage(img, imgX, imgY, targetW, targetH);
         }
 
+        if (params.newRecord) {
+          ctx.fillStyle = '#FFFF00';
+          ctx.font = `bold ${Math.max(10, Math.round(12 * pixelScale))}px monospace`;
+          ctx.fillText('NOVO RECORDE!', Math.round(w / 2), Math.round((bottomBaseY) * pixelScale));
+        }
+
+        ctx.font = `${Math.max(8, Math.round(10 * pixelScale))}px monospace`;
+        ctx.fillStyle = '#8B0000';
+        ctx.fillText(`Score: ${params.score}`, Math.round(w / 2), Math.round((bottomBaseY + (params.newRecord ? 12 : 5)) * pixelScale));
+        ctx.fillText(`HI-SCORE: ${params.highScore}`, Math.round(w / 2), Math.round((bottomBaseY + (params.newRecord ? 22 : 15)) * pixelScale));
+
+
         ctx.fillStyle = '#FFD700';
-        ctx.fillText('FIM', Math.round(w / 2), Math.round((GAME_HEIGHT - 40) * pixelScale));
+        ctx.font = `bold ${Math.max(12, Math.round(14 * pixelScale))}px monospace`;
+        ctx.fillText('FIM', Math.round(w / 2), Math.round((GAME_HEIGHT - 25) * pixelScale));
 
         ctx.font = `${Math.max(6, Math.round(8 * pixelScale))}px monospace`;
         ctx.fillStyle = '#8B0000';
-        ctx.fillText('Pressione ENTER para jogar novamente', Math.round(w / 2), Math.round((GAME_HEIGHT - 20) * pixelScale));
+        ctx.fillText('Pressione ENTER para jogar novamente', Math.round(w / 2), Math.round((GAME_HEIGHT - 10) * pixelScale));
 
         ctx.restore();
         return;
@@ -2140,32 +2172,12 @@ export class Renderer {
     ctx.fillText('Pressione ESC para continuar', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 15);
   }
 
-  drawGameOver(score: number): void {
+  drawGameOver(score: number, highScore: number, newRecord: boolean): void {
     // Cache params so we can draw this overlay crisply on the main canvas
     this.lastUIType = 'TITLE';
-    this.lastUIParams = { variant: 'GAME_OVER', score };
+    this.lastUIParams = { variant: 'GAME_OVER', score, highScore, newRecord };
 
-    const ctx = this.offscreenCtx;
-
-    // Fundo vermelho escuro (backup low-res)
-    ctx.fillStyle = 'rgba(50, 0, 0, 0.9)';
-    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-
-    // Texto GAME OVER (backup)
-    ctx.font = 'bold 24px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#FF0000';
-    ctx.fillText('GAME OVER', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 20);
-
-    // Score final
-    ctx.font = '10px monospace';
-    ctx.fillStyle = COLORS.MENU_TEXT;
-    ctx.fillText(`Score Final: ${score}`, GAME_WIDTH / 2, GAME_HEIGHT / 2 + 10);
-
-    // Instrução
-    ctx.font = '8px monospace';
-    ctx.fillStyle = '#AAAAAA';
-    ctx.fillText('Pressione ENTER para reiniciar', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 35);
+    // Don't draw legacy offscreen UI here to avoid duplicate ghost effects
   }
 
   drawLevelClear(level: string, score: number, timeBonus: number): void {
@@ -2220,78 +2232,16 @@ export class Renderer {
     ctx.fillText('\"Você vai cair nos meus gaps!\"', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 20);
   }
 
-  drawEnding(fireworks: Firework[] = []): void {
+  drawEnding(fireworks: Firework[] = [], score: number, highScore: number, newRecord: boolean): void {
     // Use TITLE high-res overlay for ending so we can draw Yasmin crisp
     this.lastUIType = 'TITLE';
-    this.lastUIParams = { variant: 'ENDING' };
+    this.lastUIParams = { variant: 'ENDING', score, highScore, newRecord };
 
-    const ctx = this.offscreenCtx;
-
-    // Fundo romântico (backup)
-    const gradient = ctx.createLinearGradient(0, 0, 0, GAME_HEIGHT);
-    gradient.addColorStop(0, '#FF69B4');
-    gradient.addColorStop(1, '#FFB6C1');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-
-    // --- CAMADA DOS FOGOS (offscreen) ---
+    // Draw only fireworks particles offscreen as they need pixel-precision with game world
     this.drawFireworks(fireworks, 0, 0);
 
-    // --- CAMADA DOS FOGOS (main canvas, high-res) ---
-    // Copy fireworks to a transient property so drawUIOnScreen can draw them on the main canvas
+    // Copy fireworks for high-res rendering too
     this.lastEndingFireworks = fireworks ? fireworks : [];
-
-    // Corações flutuantes (backup)
-    ctx.fillStyle = '#FF0000';
-    for (let i = 0; i < 10; i++) {
-      const x = (Date.now() / 50 + i * 40) % GAME_WIDTH;
-      const y = 30 + Math.sin(Date.now() / 500 + i) * 10;
-      ctx.font = '10px monospace';
-      ctx.fillText('♥', x, y);
-    }
-
-    // Feka (backup pixel-art)
-    const fekaX = GAME_WIDTH / 2 - 40;
-    const fekaY = GAME_HEIGHT / 2 + 10;
-    this.drawPixelArt(ctx, PLAYER_SPRITES.idle, fekaX, fekaY, PLAYER_PIXEL_SIZE, true);
-
-    // Yasmin (Imagem Real - desenhada no offscreen como fallback)
-    if (this.yasminImg) {
-      const targetH = 60; // Altura desejada na tela final (logical px)
-      const ratio = this.yasminImg.width / this.yasminImg.height;
-      const targetW = targetH * ratio;
-
-      ctx.save();
-      // Desenha Yasmin ao lado do Feka (fallback low-res)
-      ctx.drawImage(
-        this.yasminImg,
-        GAME_WIDTH / 2 + 10,
-        GAME_HEIGHT / 2 - 20,
-        targetW,
-        targetH
-      );
-      ctx.restore();
-    } else {
-      // Fallback para pixel art se a imagem não carregar
-      this.drawYasmin(GAME_WIDTH / 2 + 20, GAME_HEIGHT / 2);
-    }
-
-    // Texto (backup low-res)
-    ctx.font = 'bold 14px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#8B0000';
-    ctx.fillText('Feka salvou Yasmin!', GAME_WIDTH / 2, 40);
-
-    ctx.font = '10px monospace';
-    ctx.fillStyle = '#4A0000';
-    ctx.fillText('Joãozão foi derrotado!', GAME_WIDTH / 2, 60);
-
-    ctx.fillStyle = '#FFD700';
-    ctx.fillText('FIM', GAME_WIDTH / 2, GAME_HEIGHT - 40);
-
-    ctx.font = '8px monospace';
-    ctx.fillStyle = '#8B0000';
-    ctx.fillText('Pressione ENTER para jogar novamente', GAME_WIDTH / 2, GAME_HEIGHT - 20);
   }
 
   // === TOUCH CONTROLS ===

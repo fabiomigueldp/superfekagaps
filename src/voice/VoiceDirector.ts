@@ -211,6 +211,34 @@ export class VoiceDirector {
     });
   }
 
+  public async playLineSequenceAndWait(lineIds: string[], priority: number = 1000): Promise<boolean> {
+    const queue: VoiceQueueItem[] = [];
+    lineIds.forEach(lineId => {
+      const line = this.manifest.voiceLines[lineId];
+      if (!line) {
+        console.warn('[Voice] Unknown line id:', lineId);
+        return;
+      }
+      queue.push({ clip: this.toClip(line), gapAfterMs: 0 });
+    });
+
+    if (!queue.length) return false;
+
+    const comboGapMs = this.manifest.config.comboGapMs;
+    for (let i = 0; i < queue.length - 1; i++) {
+      queue[i].gapAfterMs = comboGapMs;
+    }
+
+    const started = this.startEvent(priority, queue, { bypassGlobalCooldown: true });
+    if (!started) return false;
+
+    return new Promise<boolean>(resolve => {
+      this.pendingPlayResolve = (v: boolean) => {
+        resolve(v);
+      };
+    });
+  }
+
   private buildSequenceQueue(sequenceId: string): VoiceQueueItem[] {
     const seq = this.manifest.sequences[sequenceId];
     if (!seq) {

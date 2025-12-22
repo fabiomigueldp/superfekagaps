@@ -160,6 +160,9 @@ export const LEVEL_TIME = 200; // segundos
 export const COIN_SCORE = 100;
 export const ENEMY_SCORE = 200;
 export const TIME_BONUS_MULTIPLIER = 10;
+export const BLOCK_BREAK_SCORE = 50;
+export const BOSS_DEFEAT_SCORE = 1000;
+export const COINS_PER_LIFE = 100;
 
 // Configurações de áudio
 export const AUDIO_ENABLED_DEFAULT = true;

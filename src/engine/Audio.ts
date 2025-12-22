@@ -129,6 +129,24 @@ export class Audio {
     }, 80);
   }
 
+  playOneUp(): void {
+    // Som de 1-up (arpeggio rapido e feliz)
+    const notes = [
+      { freq: 659, time: 0 },   // E5
+      { freq: 784, time: 80 },  // G5
+      { freq: 1319, time: 160 }, // E6
+      { freq: 1047, time: 240 }, // C6
+      { freq: 1175, time: 320 }, // D6
+      { freq: 1568, time: 400 }, // G6
+    ];
+
+    notes.forEach(note => {
+      setTimeout(() => {
+        this.playTone(note.freq, 0.1, 'square', 0.01, 0.02, 0.5, 0.05, 0.3);
+      }, note.time);
+    });
+  }
+
   playStomp(): void {
     // Som de esmagar inimigo
     const audioNodes = this.getSfxNodes();
@@ -437,16 +455,16 @@ export class Audio {
     // Ruído marrom/rosa (mais grave que ruído branco)
     let lastOut = 0;
     for (let i = 0; i < bufferSize; i++) {
-        const white = Math.random() * 2 - 1;
-        // Filtro simples para deixar o som mais grave ("thud" em vez de "hiss")
-        lastOut = (lastOut + (0.02 * white)) / 1.02;
-        data[i] = lastOut * 3.5; 
-        data[i] *= 1 - (i / bufferSize); // Fade out natural
+      const white = Math.random() * 2 - 1;
+      // Filtro simples para deixar o som mais grave ("thud" em vez de "hiss")
+      lastOut = (lastOut + (0.02 * white)) / 1.02;
+      data[i] = lastOut * 3.5;
+      data[i] *= 1 - (i / bufferSize); // Fade out natural
     }
 
     const noise = audioNodes.ctx.createBufferSource();
     noise.buffer = buffer;
-    
+
     const gainNode = audioNodes.ctx.createGain();
     // Volume moderado para não competir com a música
     gainNode.gain.setValueAtTime(0.4, audioNodes.ctx.currentTime);

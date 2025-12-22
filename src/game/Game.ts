@@ -3,7 +3,8 @@
 import {
   GameState, GAME_WIDTH, GAME_HEIGHT, TILE_SIZE, COLORS,
   INITIAL_LIVES, COIN_SCORE, ENEMY_SCORE, TIME_BONUS_MULTIPLIER, TileType,
-  GP_IMPACT_RADIUS_PX, GP_SHAKE_MS, GP_SHAKE_MAG
+  GP_IMPACT_RADIUS_PX, GP_SHAKE_MS, GP_SHAKE_MAG,
+  BLOCK_BREAK_SCORE, BOSS_DEFEAT_SCORE, COINS_PER_LIFE
 } from '../constants';
 import {
   CameraData, Vector2, FlagData, CollectibleData, CollectibleSpawnData,
@@ -21,6 +22,7 @@ import { Player } from '../entities/Player';
 import { Minion } from '../entities/enemies/Minion';
 import { Joaozao } from '../entities/enemies/Joaozao';
 import { getLevelByIndex, TOTAL_LEVELS, ALL_LEVELS } from '../data/levels';
+import { ScoreManager } from './ScoreManager';
 
 export class Game {
   // Engine
@@ -54,6 +56,8 @@ export class Game {
   private lives: number = INITIAL_LIVES;
   private levelTime: number = 0;
   private coins: number = 0;
+  private highScore: number = 0;
+  private newRecord: boolean = false;
 
   // Timers
   private bootTimer: number = 1500;
@@ -290,13 +294,13 @@ export class Game {
           this.level.setTile(th.col, th.row, TileType.EMPTY);
           this.spawnParticles(th.col * TILE_SIZE + TILE_SIZE / 2, th.row * TILE_SIZE + TILE_SIZE / 2, '#DEB887', 10);
           this.audio.playBlockBreak();
-          this.score += 50;
+          this.score += BLOCK_BREAK_SCORE;
         } else if (tileType === TileType.BRICK) {
           if (this.player.data.hasHelmet) {
             this.level.setTile(th.col, th.row, TileType.EMPTY);
             this.spawnParticles(th.col * TILE_SIZE + TILE_SIZE / 2, th.row * TILE_SIZE + TILE_SIZE / 2, '#DEB887', 10);
             this.audio.playBlockBreak();
-            this.score += 50;
+            this.score += BLOCK_BREAK_SCORE;
           } else {
             this.audio.playBlockBump();
           }
@@ -468,7 +472,7 @@ export class Game {
         break;
       case GameState.GAME_OVER:
         this.renderGame();
-        this.renderer.drawGameOver(this.score);
+        this.renderer.drawGameOver(this.score, this.highScore, this.newRecord);
         break;
       case GameState.LEVEL_CLEAR:
         this.renderGame();
@@ -484,7 +488,7 @@ export class Game {
         this.renderer.drawBossIntro('JOÃOZÃO');
         break;
       case GameState.ENDING:
-        this.renderer.drawEnding(this.fireworks);
+        this.renderer.drawEnding(this.fireworks, this.score, this.highScore, this.newRecord);
         break;
     }
 
@@ -605,6 +609,8 @@ export class Game {
     this.lives = INITIAL_LIVES;
     this.coins = 0;
     this.loadLevel(0);
+    this.highScore = ScoreManager.getHighScore();
+    this.newRecord = false;
   }
 
   private loadLevel(index: number): void {
@@ -986,7 +992,7 @@ export class Game {
     if (!collision.hit) {
       // Projectile collision
       if (this.boss.checkProjectileCollision(this.player.getRect())) {
-        this.playerHit();
+        this.playerHit('boss');
       }
       return;
     }
@@ -1007,7 +1013,7 @@ export class Game {
       }
 
       if (damageResult.defeated) {
-        this.score += 1000;
+        this.score += BOSS_DEFEAT_SCORE;
         this.queueBossDeath();
       }
 
@@ -1028,7 +1034,7 @@ export class Game {
     }
 
     if (this.player.data.invincibleTimer <= 0) {
-      this.playerHit();
+      this.playerHit('boss');
     }
   }
 
@@ -1056,6 +1062,11 @@ export class Game {
           case CollectibleType.COIN:
             this.score += COIN_SCORE;
             this.coins++;
+            if (this.coins >= COINS_PER_LIFE) {
+              this.coins -= COINS_PER_LIFE;
+              this.lives++;
+              this.audio.playOneUp();
+            }
             this.audio.playCoin();
             this.spawnParticles(
               c.position.x + c.width / 2,
@@ -1150,7 +1161,7 @@ export class Game {
           '#DEB887',
           8
         );
-        this.score += 50;
+        this.score += BLOCK_BREAK_SCORE;
       }
     }
 
@@ -1190,7 +1201,7 @@ export class Game {
           this.bossVoice?.onDamaged();
         }
         if (damageResult.defeated) {
-          this.score += 1000;
+          this.score += BOSS_DEFEAT_SCORE;
           this.queueBossDeath();
         }
 
@@ -1214,7 +1225,7 @@ export class Game {
     }
   }
 
-  private playerHit(): void {
+  private playerHit(source: 'boss' | 'other' = 'other'): void {
     if (!this.player || this.player.data.invincibleTimer > 0) return;
 
     const damageResult = this.player.takeDamage();
@@ -1227,12 +1238,12 @@ export class Game {
 
     if (damageResult.damaged) {
       this.audio.playDamage();
-      this.playerDie();
+      this.playerDie(source);
     }
   }
 
-  private playerDie(): void {
-    if (!this.player) return;
+  private playerDie(cause: 'boss' | 'other' = 'other'): void {
+    if (!this.player || this.player.data.isDead) return;
 
     this.player.die();
     this.audio.playFall();
@@ -1240,6 +1251,16 @@ export class Game {
     this.deathTimer = 1500;
     const center = this.player.getCenter();
     this.spawnParticles(center.x, center.y, '#FFFFFF', 12);
+
+    if (cause === 'boss') {
+      this.triggerBossKillTaunt();
+    }
+  }
+
+  private triggerBossKillTaunt(): void {
+    if (!this.boss || !this.bossVoice) return;
+    if (this.boss.data.isDead || this.boss.data.pendingDeath || this.bossDeathPending) return;
+    void this.bossVoice.playLineSequenceAndWait(['sei_que_voce_quer', 'voce_nao_vai_ter']);
   }
 
   private handlePlayerDeath(): void {
@@ -1248,6 +1269,8 @@ export class Game {
     if (this.lives <= 0) {
       this.audio.playGameOver();
       this.gameOverTimer = 3000;
+      this.newRecord = ScoreManager.saveHighScore(this.score);
+      this.highScore = ScoreManager.getHighScore();
       this.changeState(GameState.GAME_OVER);
     } else {
       // Respawn no checkpoint ou início
@@ -1296,8 +1319,11 @@ export class Game {
   private onGameComplete(): void {
     this.audio.playVictory();
     this.endingTimer = 0;
+    this.endingTimer = 0;
+    this.newRecord = ScoreManager.saveHighScore(this.score);
+    this.highScore = ScoreManager.getHighScore();
     this.changeState(GameState.ENDING);
-    
+
     // Spawn initial burst of fireworks for ending screen
     for (let i = 0; i < 5; i++) {
       setTimeout(() => this.spawnFirework(), i * 150);
@@ -1456,8 +1482,8 @@ export class Game {
     const color = COLORS.FIREWORK_COLORS[Math.floor(Math.random() * COLORS.FIREWORK_COLORS.length)];
 
     // Durante PLAYING, spawn do chão visível (bottom of screen)
-    const startY = this.state === GameState.ENDING 
-      ? GAME_HEIGHT 
+    const startY = this.state === GameState.ENDING
+      ? GAME_HEIGHT
       : this.camera.y + GAME_HEIGHT - 10; // Spawn na borda inferior da tela
 
     const fw: Firework = {
