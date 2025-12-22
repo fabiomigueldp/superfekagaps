@@ -21,7 +21,7 @@ export const LEVEL_1_1: LevelData = {
     layers: [
       { type: 'mountains', color: '#5D9CEC', scrollFactor: 0.1, roughness: 10, baseHeight: undefined },
       { type: 'clouds', color: 'rgba(255, 255, 255, 0.8)', scrollFactor: 0.2, speedX: 5 },
-      { type: 'hills', color: '#4CAF50', scrollFactor: 0.5, baseHeight: undefined }
+      { type: 'hills', color: '#2E8B57', scrollFactor: 0.5, baseHeight: undefined }
     ]
   },
   playerSpawn: { x: 2, y: 8 },
