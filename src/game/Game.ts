@@ -1179,15 +1179,48 @@ export class Game {
     // 2. Quebra de tiles (abaixo e pros lados)
     const hasHelmet = this.player.data.hasHelmet;
     for (let dc = -1; dc <= 1; dc++) {
-      const res = this.level.breakTile(impact.col + dc, impact.row, hasHelmet);
-      if (res.success) {
+      const targetCol = impact.col + dc;
+      const targetRow = impact.row;
+      const tileBelow = this.level.getTile(targetCol, targetRow);
+
+      if (tileBelow === TileType.POWERUP_BLOCK_HELMET || tileBelow === TileType.POWERUP_BLOCK_COFFEE) {
+        // Ativa bloco de powerup com a sentada
+        this.level.setTile(targetCol, targetRow, TileType.BLOCK_USED);
+        const collectType = tileBelow === TileType.POWERUP_BLOCK_COFFEE ? CollectibleType.COFFEE : CollectibleType.HELMET;
+
+        // Spawn do item (pop up)
+        const spawnX = targetCol * TILE_SIZE;
+        const spawnY = targetRow * TILE_SIZE - 16;
+        this.collectibles.push({
+          position: { x: spawnX, y: spawnY },
+          velocity: { x: 0, y: -2 },
+          width: 16,
+          height: 16,
+          active: true,
+          type: collectType,
+          collected: false,
+          animationFrame: 0,
+          animationTimer: 0
+        });
+
+        this.audio.playPowerup();
         this.spawnParticles(
-          (impact.col + dc) * TILE_SIZE + TILE_SIZE / 2,
-          impact.row * TILE_SIZE + TILE_SIZE / 2,
-          '#DEB887',
+          targetCol * TILE_SIZE + TILE_SIZE / 2,
+          targetRow * TILE_SIZE + TILE_SIZE / 2,
+          '#FFD700',
           8
         );
-        this.score += BLOCK_BREAK_SCORE;
+      } else {
+        const res = this.level.breakTile(targetCol, targetRow, hasHelmet);
+        if (res.success) {
+          this.spawnParticles(
+            targetCol * TILE_SIZE + TILE_SIZE / 2,
+            targetRow * TILE_SIZE + TILE_SIZE / 2,
+            '#DEB887',
+            8
+          );
+          this.score += BLOCK_BREAK_SCORE;
+        }
       }
     }
 

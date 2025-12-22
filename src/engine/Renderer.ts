@@ -500,11 +500,11 @@ export class Renderer {
 
         ctx.font = `${Math.max(8, Math.round(10 * pixelScale))}px monospace`;
         ctx.fillStyle = '#8B0000';
-        ctx.fillText(`Score: ${params.score}`, Math.round(w / 2), Math.round((bottomBaseY + (params.newRecord ? 12 : 5)) * pixelScale));
-        ctx.fillText(`HI-SCORE: ${params.highScore}`, Math.round(w / 2), Math.round((bottomBaseY + (params.newRecord ? 22 : 15)) * pixelScale));
+        ctx.fillText(`Score: ${params.score}`, Math.round(w / 2), Math.round((bottomBaseY + (params.newRecord ? 10 : 5)) * pixelScale));
+        ctx.fillText(`HI-SCORE: ${params.highScore}`, Math.round(w / 2), Math.round((bottomBaseY + (params.newRecord ? 19 : 14)) * pixelScale));
 
         // Time Stats
-        const timeY = bottomBaseY + (params.newRecord ? 32 : 25);
+        const timeY = bottomBaseY + (params.newRecord ? 28 : 23);
         const totalTime = params.totalRunTime ? params.totalRunTime.toFixed(1) : '0.0';
 
         ctx.font = `${Math.max(6, Math.round(8 * pixelScale))}px monospace`;
@@ -515,11 +515,11 @@ export class Renderer {
 
         ctx.fillStyle = '#FFD700';
         ctx.font = `bold ${Math.max(12, Math.round(14 * pixelScale))}px monospace`;
-        ctx.fillText('FIM', Math.round(w / 2), Math.round((GAME_HEIGHT - 25) * pixelScale));
+        ctx.fillText('FIM', Math.round(w / 2), Math.round((GAME_HEIGHT - 20) * pixelScale));
 
         ctx.font = `${Math.max(6, Math.round(8 * pixelScale))}px monospace`;
         ctx.fillStyle = '#8B0000';
-        ctx.fillText('Pressione ENTER para jogar novamente', Math.round(w / 2), Math.round((GAME_HEIGHT - 10) * pixelScale));
+        ctx.fillText('Pressione ENTER para jogar novamente', Math.round(w / 2), Math.round((GAME_HEIGHT - 8) * pixelScale));
 
         ctx.restore();
         return;
