@@ -4,7 +4,7 @@ import {
   GameState, GAME_WIDTH, GAME_HEIGHT, TILE_SIZE, COLORS,
   INITIAL_LIVES, COIN_SCORE, ENEMY_SCORE, TIME_BONUS_MULTIPLIER, TileType,
   GP_IMPACT_RADIUS_PX, GP_SHAKE_MS, GP_SHAKE_MAG,
-  BLOCK_BREAK_SCORE, BOSS_DEFEAT_SCORE, COINS_PER_LIFE
+  BLOCK_BREAK_SCORE, BOSS_DEFEAT_SCORE, COINS_PER_LIFE, LIVES_BONUS_SCORE
 } from '../constants';
 import {
   CameraData, Vector2, FlagData, CollectibleData, CollectibleSpawnData,
@@ -1318,7 +1318,14 @@ export class Game {
 
   private onGameComplete(): void {
     this.audio.playVictory();
-    this.endingTimer = 0;
+
+    // Bonus por vidas restantes
+    const livesBonus = this.lives * LIVES_BONUS_SCORE;
+    if (livesBonus > 0) {
+      console.log(`Bonus de vidas: ${this.lives} x ${LIVES_BONUS_SCORE} = ${livesBonus}`);
+      this.score += livesBonus;
+    }
+
     this.endingTimer = 0;
     this.newRecord = ScoreManager.saveHighScore(this.score);
     this.highScore = ScoreManager.getHighScore();

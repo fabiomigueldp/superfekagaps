@@ -163,6 +163,7 @@ export const TIME_BONUS_MULTIPLIER = 10;
 export const BLOCK_BREAK_SCORE = 50;
 export const BOSS_DEFEAT_SCORE = 1000;
 export const COINS_PER_LIFE = 100;
+export const LIVES_BONUS_SCORE = 1000;
 
 // Configurações de áudio
 export const AUDIO_ENABLED_DEFAULT = true;
