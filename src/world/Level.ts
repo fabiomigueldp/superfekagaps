@@ -8,9 +8,7 @@ import {
   FALLING_PLATFORM_FALL_MS,
   FALLING_PLATFORM_RESPAWN_MS
 } from '../constants';
-import { LevelData, Rect, Vector2 } from '../types';
-
-type FallingPlatformPhase = 'contact' | 'arming' | 'falling' | 'cooldown';
+import { LevelData, Rect, Vector2, FallingPlatformPhase } from '../types';
 
 interface FallingPlatformState {
   phase: FallingPlatformPhase;

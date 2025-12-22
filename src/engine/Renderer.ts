@@ -9,7 +9,7 @@ import {
   FALLING_PLATFORM_FALL_MS,
   FALLING_PLATFORM_FALL_DISTANCE
 } from '../constants';
-import { CameraData, PlayerData, EnemyData, CollectibleData, FlagData, Particle, Firework, EnemyType, CollectibleType, GroundPoundState, SpeechBubbleRenderState } from '../types';
+import { CameraData, PlayerData, EnemyData, CollectibleData, FlagData, Particle, Firework, EnemyType, CollectibleType, GroundPoundState, SpeechBubbleRenderState, FallingPlatformPhase } from '../types';
 import { PLAYER_PALETTE, PLAYER_SPRITES, PLAYER_PIXEL_SIZE, PLAYER_RENDER_OFFSET_X, PLAYER_RENDER_OFFSET_Y } from '../assets/playerSpriteSpec';
 
 
@@ -585,7 +585,7 @@ export class Renderer {
   }
 
   drawFallingPlatforms(
-    platforms: { col: number; row: number; phase: 'contact' | 'arming' | 'falling'; timer: number; contact: number }[],
+    platforms: { col: number; row: number; phase: FallingPlatformPhase; timer: number; contact: number }[],
     camera: CameraData
   ): void {
     if (!platforms.length) return;

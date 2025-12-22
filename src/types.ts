@@ -14,6 +14,8 @@ export interface Rect {
   height: number;
 }
 
+export type FallingPlatformPhase = 'contact' | 'arming' | 'falling' | 'cooldown';
+
 // Entidade base
 export interface Entity {
   position: Vector2;
@@ -196,7 +198,7 @@ export interface SpeechBubbleRenderState {
   text: string;
   position: Vector2;
   alpha: number;
-} 
+}
 
 // Dados do HUD
 export interface HudData {
@@ -215,7 +217,7 @@ export interface Projectile extends Entity {
 }
 
 // Tipos de eventos do jogo
-export type GameEventType = 
+export type GameEventType =
   | 'COIN_COLLECTED'
   | 'ENEMY_DEFEATED'
   | 'PLAYER_DAMAGED'
