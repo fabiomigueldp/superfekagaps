@@ -391,7 +391,9 @@ export class Renderer {
         ctx.font = `bold ${Math.max(20, Math.round(24 * pixelScale))}px monospace`;
         ctx.textAlign = 'center';
         ctx.fillStyle = '#FF0000';
-        ctx.fillText('GAME OVER', Math.round(w / 2), Math.round((GAME_HEIGHT / 2 - 20) * pixelScale));
+        ctx.fillText('VOCÊ NÃO VAI TER', Math.round(w / 2), Math.round((GAME_HEIGHT / 2 - 20) * pixelScale));
+
+
 
         ctx.font = `${Math.max(8, Math.round(10 * pixelScale))}px monospace`;
         ctx.fillStyle = COLORS.MENU_TEXT;
@@ -439,7 +441,7 @@ export class Renderer {
         ctx.font = `bold ${Math.max(12, Math.round(14 * pixelScale))}px monospace`;
         ctx.textAlign = 'center';
         ctx.fillStyle = '#8B0000';
-        ctx.fillText('Feka salvou Yasmin!', Math.round(w / 2), Math.round(30 * pixelScale));
+        ctx.fillText('Feka salvou Yasmin?', Math.round(w / 2), Math.round(30 * pixelScale));
 
         ctx.font = `${Math.max(8, Math.round(10 * pixelScale))}px monospace`;
         ctx.fillStyle = '#4A0000';
