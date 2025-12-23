@@ -153,6 +153,8 @@ export enum GameState {
   LEVEL_CLEAR = 'LEVEL_CLEAR',
   BOSS_INTRO = 'BOSS_INTRO',
   ENDING = 'ENDING',
+  TRANSITION = 'TRANSITION',
+  EDITOR = 'EDITOR',
 }
 
 // Configurações de gameplay

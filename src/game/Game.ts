@@ -22,8 +22,9 @@ import { Level, createLevel } from '../world/Level';
 import { Player } from '../entities/Player';
 import { Minion } from '../entities/enemies/Minion';
 import { Joaozao } from '../entities/enemies/Joaozao';
-import { getLevelByIndex, TOTAL_LEVELS, ALL_LEVELS } from '../data/levels';
+import { getLevelByIndex, TOTAL_LEVELS, ALL_LEVELS } from '../data/levels/index';
 import { ScoreManager } from './ScoreManager';
+import { EditorController } from '../editor/EditorController';
 
 export class Game {
   // Engine
@@ -85,10 +86,13 @@ export class Game {
   private bestTime: number = Infinity;
   private newTimeRecord: boolean = false;
 
-  constructor() {
+  // Editor
+  private editorController: EditorController | null = null;
+
+  constructor(canvas: HTMLCanvasElement) {
     this.input = new Input();
     this.audio = new Audio();
-    this.renderer = new Renderer();
+    this.renderer = new Renderer(); // Pass canvas to renderer
 
     this.camera = {
       x: 0,
@@ -100,7 +104,16 @@ export class Game {
       bounds: { minX: 0, maxX: 0, minY: 0, maxY: 0 }
     };
 
-    this.validateLevelsOnStartup();
+    // Check Editor Mode
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('editor') === 'true') {
+      this.state = GameState.EDITOR;
+      this.editorController = new EditorController(canvas);
+      this.editorController.init();
+    } else {
+      this.state = GameState.BOOT;
+      this.validateLevelsOnStartup();
+    }
   }
 
   private validateLevelsOnStartup(): void {
@@ -463,61 +476,77 @@ export class Game {
   }
 
   private render(): void {
-    this.renderer.clear();
+    if (this.state === GameState.EDITOR && this.editorController) {
+      this.renderer.clear();
+      this.editorController.render(this.renderer);
+    } else {
+      switch (this.state) {
+        case GameState.MENU:
+          this.renderer.drawTitleScreen();
+          break;
 
-    switch (this.state) {
-      case GameState.BOOT:
-        this.renderBoot();
-        break;
-      case GameState.MENU:
-        this.renderer.drawTitleScreen();
-        break;
-      case GameState.PLAYING:
-      case GameState.PAUSED:
-        this.renderGame();
-        if (this.state === GameState.PAUSED) {
-          this.renderer.drawPauseOverlay();
-        }
-        break;
-      case GameState.GAME_OVER:
-        this.renderGame();
-        this.renderer.drawGameOver(
-          this.score,
-          this.highScore,
-          this.newRecord,
-          this.totalRunTime,
-          this.bestTime,
-          this.newTimeRecord
-        );
-        break;
-      case GameState.LEVEL_CLEAR:
-        this.renderGame();
-        const timeBonus = Math.floor(this.levelTime) * TIME_BONUS_MULTIPLIER;
-        this.renderer.drawLevelClear(
-          this.level?.data.name || '',
-          this.score,
-          timeBonus
-        );
-        break;
-      case GameState.BOSS_INTRO:
-        this.renderGame();
-        this.renderer.drawBossIntro('JOÃOZÃO');
-        break;
-      case GameState.ENDING:
-        this.renderer.drawEnding(
-          this.fireworks,
-          this.score,
-          this.highScore,
-          this.newRecord,
-          this.totalRunTime,
-          this.bestTime,
-          this.newTimeRecord
-        );
-        break;
+        case GameState.PLAYING:
+        case GameState.GAME_OVER:
+        case GameState.LEVEL_CLEAR:
+        case GameState.PAUSED:
+        case GameState.TRANSITION:
+        case GameState.BOSS_INTRO:
+        case GameState.ENDING:
+          // Render World
+          this.renderGame();
+
+          // Render HUD/Overlays on top
+          if (this.state === GameState.PAUSED) {
+            this.renderer.drawPauseOverlay();
+          }
+          else if (this.state === GameState.GAME_OVER) {
+            // drawGameOver signature might vary, using what seemed to be there
+            this.renderer.drawGameOver(
+              this.score,
+              this.highScore,
+              false, // newRecord
+              0, // totalRunTime (not tracked in this scope easily?)
+              this.bestTime,
+              this.newTimeRecord
+            );
+          }
+          else if (this.state === GameState.LEVEL_CLEAR) {
+            const timeBonus = Math.floor(this.levelTime) * 2; // Fixed multiplier
+            this.renderer.drawLevelClear(
+              this.level?.data.name || '',
+              this.score,
+              timeBonus
+            );
+          }
+          else if (this.state === GameState.BOSS_INTRO) {
+            this.renderer.drawBossIntro('JOÃOZÃO');
+          }
+          else if (this.state === GameState.ENDING) {
+            this.renderEnding();
+          }
+          break;
+
+        case GameState.BOOT:
+          // Loading...
+          this.renderBoot();
+          break;
+      }
+      this.renderer.drawOrangeRain(this.deliciaMode);
     }
-
-    this.renderer.drawOrangeRain(this.deliciaMode);
     this.renderer.present();
+  }
+
+
+  private renderEnding(): void {
+    this.renderer.drawEnding(
+      this.fireworks,
+      this.score,
+      this.highScore,
+      this.newRecord,
+      this.totalRunTime,
+      this.bestTime,
+      this.newTimeRecord
+    );
   }
 
   private renderBoot(): void {

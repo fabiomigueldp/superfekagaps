@@ -43,9 +43,38 @@
       user-select: none;
     }
   </style>
+  <style>
+    /* ... existing styles ... */
+  </style>
+  <link rel="stylesheet" href="/src/editor/editor.css">
 </head>
 
 <body>
+  <div id="editor-ui">
+    <div class="toolbar">
+      <button id="btn-mount" class="editor-btn primary">📁 Open Levels Folder</button>
+      <button id="btn-save" class="editor-btn">mb Save Level</button>
+      <div style="flex:1"></div>
+      <span id="current-file-label" style="font-size:12px; color:#888;">No loaded level</span>
+    </div>
+
+    <div class="sidebar">
+      <div>
+        <h3>Tiles</h3>
+        <div id="tile-palette" class="tile-palette">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <div>
+        <h3>Levels</h3>
+        <div id="level-list" style="display:flex; flex-direction:column; gap:2px;">
+          <div style="padding:10px; text-align:center; color:#666;">Mount folder to see files</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <canvas id="game-canvas"></canvas>
   <script type="module" src="/src/main.ts"></script>
 </body>
