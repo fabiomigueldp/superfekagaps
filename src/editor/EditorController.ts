@@ -423,7 +423,7 @@ export class EditorController {
                     CleanText
                 );
 
-                return func(TileType, EnemyType, undefined, COLORS, TILE_SIZE, GAME_WIDTH, GAME_HEIGHT);
+                return func(TileType, EnemyType, CollectibleType, COLORS, TILE_SIZE, GAME_WIDTH, GAME_HEIGHT);
 
             } catch (evalErr) {
                 console.error('Context Eval failed:', evalErr);

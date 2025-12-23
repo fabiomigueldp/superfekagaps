@@ -584,17 +584,20 @@ export class Renderer {
 
   // === RENDERIZAÇÃO DO BACKGROUND ===
 
+  // Fator de escala para background High-DPI (vetorial/suave no editor e em telas grandes)
+  private bgScale: number = 4;
+
   prepareLevelBackground(theme: LevelTheme): void {
     this.currentTheme = theme;
     this.backgroundLayers = [];
 
     // Largura base para garantir loop suave (deve ser maior que a tela)
-    // Adicionamos um pouco extra para garantir
     const width = GAME_WIDTH;
     const height = GAME_HEIGHT;
 
     for (const layerSpec of theme.layers) {
-      const image = BackgroundGenerator.generateLayer(layerSpec, width, height);
+      // Gera em alta resolução (4x) para evitar serrilhado ao dar zoom out ou em telas grandes
+      const image = BackgroundGenerator.generateLayer(layerSpec, width, height, this.bgScale);
       this.backgroundLayers.push({ image, spec: layerSpec });
     }
   }
@@ -621,7 +624,10 @@ export class Renderer {
           offsetX += (Date.now() / 1000) * layer.spec.speedX;
         }
 
-        const imgW = layer.image.width;
+        // Dimensões LÓGICAS da imagem (tamanho real / escala)
+        // Isso garante que a matemática de tiling funcione em "Game Units"
+        const imgW = layer.image.width / this.bgScale;
+        const imgH = layer.image.height / this.bgScale;
 
         // Normaliza o offset para [0, imgW)
         // Isso nos dá onde "começa" o desenho relativo à borda esquerda
@@ -636,7 +642,6 @@ export class Renderer {
         const verticalFactor = layer.spec.scrollFactor * 0.2;
         const offsetY = Math.floor(cam.y * verticalFactor);
 
-        const imgH = layer.image.height;
         // Centraliza verticalmente no viewport (importante para o Zoom Out do editor)
         const centeredY = (viewportHeight - imgH) / 2;
         const drawY = Math.floor(centeredY - offsetY);
@@ -644,7 +649,8 @@ export class Renderer {
         while (currentDrawX < viewportWidth) {
           // Só desenha se estiver visível (otimização simples)
           if (currentDrawX + imgW > -10) { // -10 é margem de segurança
-            ctx.drawImage(layer.image, Math.floor(currentDrawX), drawY);
+            // Desenhamos a imagem HD ajustada para ocupar o tamanho lógico
+            ctx.drawImage(layer.image, Math.floor(currentDrawX), drawY, imgW, imgH);
           }
           currentDrawX += imgW;
         }
@@ -661,15 +667,7 @@ export class Renderer {
 
 
 
-  private drawCloud(x: number, y: number): void {
-    const ctx = this.offscreenCtx;
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-    ctx.beginPath();
-    ctx.arc(x, y, 8, 0, Math.PI * 2);
-    ctx.arc(x + 10, y - 3, 10, 0, Math.PI * 2);
-    ctx.arc(x + 22, y, 8, 0, Math.PI * 2);
-    ctx.fill();
-  }
+
 
   // === RENDERIZAÇÃO DE TILES ===
 

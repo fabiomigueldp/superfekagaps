@@ -6,14 +6,19 @@ export class BackgroundGenerator {
      * A largura (width) deve ser suficiente para cobrir a tela (ex: GAME_WIDTH).
      * O renderizador desenhará essa imagem repetida (tiled) horizontalmente.
      */
-    static generateLayer(spec: BackgroundLayerSpec, width: number, height: number): HTMLCanvasElement {
+    static generateLayer(spec: BackgroundLayerSpec, width: number, height: number, scale: number = 1): HTMLCanvasElement {
         const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
+        canvas.width = Math.ceil(width * scale);
+        canvas.height = Math.ceil(height * scale);
         const ctx = canvas.getContext('2d')!;
 
-        // Desabilita suavização para pixel art
-        ctx.imageSmoothingEnabled = false;
+        // Scale context to draw at high resolution using logical coordinates
+        ctx.scale(scale, scale);
+
+        // Opcional: Para visual "cartoon/vetor" suave, mantemos smoothing padrao (true).
+        // Se quiséssemos pixel art estrito ampliado, desligaríamos.
+        // Como o objetivo é "High Res", deixamos suave para curvas perfeitas.
+        // ctx.imageSmoothingEnabled = false; 
 
         switch (spec.type) {
             case 'clouds':
