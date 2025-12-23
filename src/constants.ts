@@ -13,6 +13,7 @@ export const TILE_SIZE = 16;
 // Física
 export const GRAVITY = 0.5;
 export const MAX_FALL_SPEED = 10;
+export const CULLING_MARGIN = 64; // Pixels off-screen before we stop rendering/updating
 export const PLAYER_SPEED = 2;
 export const PLAYER_RUN_SPEED = 3.5;
 export const PLAYER_JUMP_FORCE = -8;

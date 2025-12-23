@@ -4,7 +4,8 @@ import {
   GameState, GAME_WIDTH, GAME_HEIGHT, TILE_SIZE, COLORS,
   INITIAL_LIVES, COIN_SCORE, ENEMY_SCORE, TIME_BONUS_MULTIPLIER, TileType,
   GP_IMPACT_RADIUS_PX, GP_SHAKE_MS, GP_SHAKE_MAG,
-  BLOCK_BREAK_SCORE, BOSS_DEFEAT_SCORE, COINS_PER_LIFE, LIVES_BONUS_SCORE
+  BLOCK_BREAK_SCORE, BOSS_DEFEAT_SCORE, COINS_PER_LIFE, LIVES_BONUS_SCORE,
+  CULLING_MARGIN
 } from '../constants';
 import {
   CameraData, Vector2, FlagData, CollectibleData, CollectibleSpawnData,
@@ -554,8 +555,13 @@ export class Game {
       this.renderer.drawFlag(flag, this.camera);
     });
 
-    // Coletáveis
+    // Coletáveis (com Culling)
     this.collectibles.forEach(c => {
+      // Simple culling
+      if (c.position.x < this.camera.x - CULLING_MARGIN ||
+        c.position.x > this.camera.x + GAME_WIDTH + CULLING_MARGIN) {
+        return;
+      }
       this.renderer.drawCollectible(c, this.camera);
     });
 
@@ -743,6 +749,19 @@ export class Game {
         }
         if (tile === TileType.FLAG) {
           goalMarkers.push({ x: col, y: row });
+          newRow.push(TileType.EMPTY);
+          continue;
+        }
+        if (tile === TileType.COIN || tile === TileType.POWERUP_COFFEE || tile === TileType.POWERUP_HELMET) {
+          // Extrai item do grid para entidade
+          let type = CollectibleType.COIN;
+          if (tile === TileType.POWERUP_COFFEE) type = CollectibleType.COFFEE;
+          if (tile === TileType.POWERUP_HELMET) type = CollectibleType.HELMET;
+
+          levelData.collectibles.push({
+            type: type,
+            position: { x: col, y: row } // coords em grid
+          });
           newRow.push(TileType.EMPTY);
           continue;
         }
@@ -1079,6 +1098,12 @@ export class Game {
 
       // Atualiza animação
       c.animationTimer++;
+
+      // Culling de lógica
+      if (c.position.x < this.camera.x - CULLING_MARGIN ||
+        c.position.x > this.camera.x + GAME_WIDTH + CULLING_MARGIN) {
+        return;
+      }
 
       // AABB collision
       const hit = c.position.x < playerRect.x + playerRect.width &&
