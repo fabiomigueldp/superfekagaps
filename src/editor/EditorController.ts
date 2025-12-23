@@ -117,9 +117,7 @@ export class EditorController {
             { id: TileType.HIDDEN_BLOCK, label: 'Hidden' },
             { id: TileType.CHECKPOINT, label: 'Check' },
             { id: TileType.FLAG, label: 'Goal' },
-            // Enemies (Virtual IDs or handled via tool modes later)
-            // { id: 999, label: 'Minion' } 
-            // Virtual Tiles could be added here (99 for spawn, etc)
+            { id: 999, label: 'Minion' }
         ];
         const renderer = (window as any).renderer as Renderer; // Access global renderer for thumbnails
 
@@ -152,6 +150,16 @@ export class EditorController {
                     renderer.drawTile(TileType.BRICK, 0, 0, dummyGrid, 0, 0, ctx);
                 }
                 else if (t.id === TileType.CHECKPOINT) renderer['drawFlagTile'](0, 0, ctx);
+                else if (t.id === 999) {
+                    // Virtual Minion ID
+                    const mockEnemy: any = {
+                        type: EnemyType.MINION,
+                        position: { x: 0, y: 0 },
+                        active: true, facingRight: false, isDead: false, width: 16, height: 16, animationTimer: 0, animationFrame: 0
+                    };
+                    const mockCam: any = { x: 0, y: 0 };
+                    renderer.drawEnemy(mockEnemy, mockCam, ctx);
+                }
                 else {
                     renderer.drawTile(t.id, 0, 0, dummyGrid, 0, 0, ctx);
                 }
@@ -535,7 +543,40 @@ export class EditorController {
         if (row >= 0 && row < this.levelData.tiles.length &&
             col >= 0 && col < this.levelData.tiles[0].length) {
 
-            this.levelData.tiles[row][col] = this.selectedTile;
+            // Special Logic for Entities
+            if (this.selectedTile === 999) {
+                // Paint Minion
+                // Check if already exists (using GRID coordinates)
+                const alreadyExists = this.levelData.enemies.some(e =>
+                    Math.abs(e.position.x - col) < 0.1 &&
+                    Math.abs(e.position.y - row) < 0.1
+                );
+
+                if (!alreadyExists) {
+                    this.levelData.enemies.push({
+                        type: EnemyType.MINION,
+                        position: { x: col, y: row } // Store as TILE coordinates
+                    });
+                }
+            }
+            else if (this.selectedTile === TileType.EMPTY) {
+                // ERASE Tool: Clears Tile AND Entities
+                this.levelData.tiles[row][col] = 0;
+
+                // Remove enemies at this location (using GRID comparison)
+                this.levelData.enemies = this.levelData.enemies.filter(e => {
+                    return Math.abs(e.position.x - col) > 0.1 || Math.abs(e.position.y - row) > 0.1;
+                });
+
+                // Remove collectibles at this location (using GRID comparison)
+                this.levelData.collectibles = this.levelData.collectibles.filter(c => {
+                    return Math.abs(c.position.x - col) > 0.1 || Math.abs(c.position.y - row) > 0.1;
+                });
+            }
+            else {
+                // Normal Tile Paint
+                this.levelData.tiles[row][col] = this.selectedTile;
+            }
         }
     }
 }
