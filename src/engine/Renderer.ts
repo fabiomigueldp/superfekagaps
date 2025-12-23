@@ -730,42 +730,42 @@ export class Renderer {
     }
   }
 
-  private drawTile(type: number, x: number, y: number, tiles: number[][], row: number, col: number): void {
+  public drawTile(type: number, x: number, y: number, tiles: number[][], row: number, col: number, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
 
     switch (type) {
       case TileType.GROUND:
-        this.drawGroundTile(x, y, tiles, row, col);
+        this.drawGroundTile(x, y, tiles, row, col, ctx);
         break;
       case TileType.BRICK:
-        this.drawBrickTile(x, y);
+        this.drawBrickTile(x, y, ctx);
         break;
       case TileType.BRICK_BREAKABLE:
-        this.drawBreakableBrick(x, y);
+        this.drawBreakableBrick(x, y, ctx);
         break;
       case TileType.PLATFORM:
-        this.drawPlatformTile(x, y);
+        this.drawPlatformTile(x, y, ctx);
         break;
       case TileType.SPIKE:
-        this.drawSpikeTile(x, y);
+        this.drawSpikeTile(x, y, ctx);
         break;
       case TileType.SPRING:
-        this.drawSpringTile(x, y);
+        this.drawSpringTile(x, y, ctx);
         break;
       case TileType.ICE:
-        this.drawIceTile(x, y);
+        this.drawIceTile(x, y, ctx);
         break;
       case TileType.PLATFORM_FALLING:
-        this.drawFallingPlatformTile(x, y);
+        this.drawFallingPlatformTile(x, y, ctx);
         break;
       case TileType.LAVA_TOP:
-        this.drawLavaTopTile(x, y, tiles, row, col);
+        this.drawLavaTopTile(x, y, tiles, row, col, ctx);
         break;
       case TileType.LAVA_FILL:
         // Se estiver exposto ao ar, renderiza como Top para ter o visual 3/4 e animacao
         if (row > 0 && tiles[row - 1][col] === TileType.EMPTY) {
-          this.drawLavaTopTile(x, y, tiles, row, col);
+          this.drawLavaTopTile(x, y, tiles, row, col, ctx);
         } else {
-          this.drawLavaFillTile(x, y, row, col);
+          this.drawLavaFillTile(x, y, row, col, ctx);
         }
         break;
       case TileType.HIDDEN_BLOCK:
@@ -773,22 +773,21 @@ export class Renderer {
         break;
       case TileType.POWERUP_BLOCK_COFFEE:
       case TileType.POWERUP_BLOCK_HELMET:
-        this.drawPowerupBlock(x, y, type);
+        this.drawPowerupBlock(x, y, type, ctx);
         break;
       case TileType.BLOCK_USED:
-        this.drawUsedBlock(x, y);
+        this.drawUsedBlock(x, y, ctx);
         break;
       case TileType.CHECKPOINT:
         // Checkpoint renderizado separadamente
         break;
       case TileType.FLAG:
-        this.drawFlagTile(x, y);
+        this.drawFlagTile(x, y, ctx);
         break;
     }
   }
 
-  private drawGroundTile(x: number, y: number, tiles: number[][], row: number, col: number): void {
-    const ctx = this.offscreenCtx;
+  private drawGroundTile(x: number, y: number, tiles: number[][], row: number, col: number, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
     const hasGroundAbove = row > 0 && tiles[row - 1][col] === TileType.GROUND;
     const hasLavaAbove = row > 0 && (tiles[row - 1][col] === TileType.LAVA_TOP || tiles[row - 1][col] === TileType.LAVA_FILL);
     const hasCoverAbove = hasGroundAbove || hasLavaAbove;
@@ -822,8 +821,7 @@ export class Renderer {
     ctx.fillRect(x + 2, baseY + 7, TILE_SIZE - 4, 1);
   }
 
-  private drawBrickTile(x: number, y: number): void {
-    const ctx = this.offscreenCtx;
+  private drawBrickTile(x: number, y: number, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
 
     // Fundo do tijolo
     ctx.fillStyle = COLORS.BRICK_MAIN;
@@ -847,10 +845,9 @@ export class Renderer {
     ctx.fillRect(x + 11, y + 10, 3, 1);
   }
 
-  private drawBreakableBrick(x: number, y: number): void {
+  private drawBreakableBrick(x: number, y: number, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
     // Visual similar ao tijolo, com racha
-    const ctx = this.offscreenCtx;
-    this.drawBrickTile(x, y);
+    this.drawBrickTile(x, y, ctx);
 
     ctx.strokeStyle = COLORS.BRICK_DARK;
     ctx.lineWidth = 1;
@@ -866,8 +863,7 @@ export class Renderer {
     ctx.stroke();
   }
 
-  private drawPowerupBlock(x: number, y: number, type: number): void {
-    const ctx = this.offscreenCtx;
+  private drawPowerupBlock(x: number, y: number, type: number, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
     ctx.fillStyle = COLORS.BRICK_MAIN;
     ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
 
@@ -881,16 +877,14 @@ export class Renderer {
     ctx.fillText(type === TileType.POWERUP_BLOCK_COFFEE ? 'F' : 'H', x + TILE_SIZE / 2, y + TILE_SIZE / 2 + 3);
   }
 
-  private drawUsedBlock(x: number, y: number): void {
-    const ctx = this.offscreenCtx;
+  private drawUsedBlock(x: number, y: number, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
     ctx.fillStyle = COLORS.BRICK_DARK;
     ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
     ctx.fillStyle = '#555555';
     ctx.fillRect(x + 4, y + 4, TILE_SIZE - 8, TILE_SIZE - 8);
   }
 
-  private drawPlatformTile(x: number, y: number): void {
-    const ctx = this.offscreenCtx;
+  private drawPlatformTile(x: number, y: number, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
 
     // Plataforma fina no topo
     ctx.fillStyle = COLORS.BRICK_MAIN;
@@ -903,8 +897,7 @@ export class Renderer {
     ctx.fillRect(x, y + 5, TILE_SIZE, 1);
   }
 
-  private drawSpikeTile(x: number, y: number): void {
-    const ctx = this.offscreenCtx;
+  private drawSpikeTile(x: number, y: number, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
 
     const spikeDark = '#595959';
     const spikeLight = '#c6c6c6';
@@ -959,8 +952,7 @@ export class Renderer {
     ctx.fillRect(x + 12, baseY + 1, 1, 1);
   }
 
-  private drawSpringTile(x: number, y: number): void {
-    const ctx = this.offscreenCtx;
+  private drawSpringTile(x: number, y: number, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
 
     const t = Date.now() / 260;
     const pulse = 0.5 + 0.5 * Math.sin(t);
@@ -1018,8 +1010,7 @@ export class Renderer {
     ctx.fillRect(x + 7, y + 9, 2, 2);
   }
 
-  private drawIceTile(x: number, y: number): void {
-    const ctx = this.offscreenCtx;
+  private drawIceTile(x: number, y: number, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
 
     ctx.fillStyle = COLORS.ICE_LIGHT;
     ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
@@ -1037,8 +1028,7 @@ export class Renderer {
     ctx.fillRect(x + 9, y + 11, 3, 1);
   }
 
-  private drawFallingPlatformTile(x: number, y: number): void {
-    const ctx = this.offscreenCtx;
+  private drawFallingPlatformTile(x: number, y: number, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
 
     // Base plank
     ctx.fillStyle = COLORS.BRICK_MAIN;
@@ -1055,8 +1045,7 @@ export class Renderer {
     ctx.fillRect(x + 12, y + 1, 2, 1);
   }
 
-  private drawLavaTopTile(x: number, y: number, tiles: number[][], row: number, col: number): void {
-    const ctx = this.offscreenCtx;
+  private drawLavaTopTile(x: number, y: number, tiles: number[][], row: number, col: number, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
 
     // Lógica visual deve bater com a física: Offset apenas se houver AR em cima
     const hasLavaAbove = row > 0 && (tiles[row - 1][col] === TileType.LAVA_TOP || tiles[row - 1][col] === TileType.LAVA_FILL);
@@ -1160,8 +1149,7 @@ export class Renderer {
     }
   }
 
-  private drawLavaFillTile(x: number, y: number, row: number, col: number): void {
-    const ctx = this.offscreenCtx;
+  private drawLavaFillTile(x: number, y: number, row: number, col: number, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
     const time = Date.now();
     const slowTime = time * 0.0005;
 
@@ -1199,8 +1187,7 @@ export class Renderer {
     }
   }
 
-  private drawFlagTile(x: number, y: number): void {
-    const ctx = this.offscreenCtx;
+  private drawFlagTile(x: number, y: number, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
 
     // Ancorar o mastro na base do tile e usar altura fixa para evitar mastros desproporcionais
     const mastBottom = y + TILE_SIZE - 2; // base ligeiramente acima da base do tile
@@ -1380,21 +1367,20 @@ export class Renderer {
 
   // === RENDERIZAÇÃO DE INIMIGOS ===
 
-  drawEnemy(enemy: EnemyData, camera: CameraData): void {
+  drawEnemy(enemy: EnemyData, camera: CameraData, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
     if (!enemy.active) return;
     const cam = this.snapCamera(camera);
     const x = Math.round(enemy.position.x - cam.x);
     const y = Math.round(enemy.position.y - cam.y);
 
     if (enemy.type === EnemyType.MINION) {
-      this.drawMinion(enemy, x, y);
+      this.drawMinion(enemy, x, y, ctx);
     } else if (enemy.type === EnemyType.JOAOZAO) {
-      this.drawJoaozao(enemy, x, y);
+      this.drawJoaozao(enemy, x, y, ctx);
     }
   }
 
-  private drawMinion(enemy: EnemyData, x: number, y: number): void {
-    const ctx = this.offscreenCtx;
+  private drawMinion(enemy: EnemyData, x: number, y: number, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
 
     // Se está morrendo, fica achatado
     if (enemy.isDead) {
@@ -1441,8 +1427,7 @@ export class Renderer {
     ctx.restore();
   }
 
-  private drawJoaozao(enemy: EnemyData, x: number, y: number): void {
-    const ctx = this.offscreenCtx;
+  private drawJoaozao(enemy: EnemyData, x: number, y: number, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
 
     // Rotação da morte (se presente) ou 0
     const rotation = enemy.deadRotation || 0;
@@ -1633,7 +1618,7 @@ export class Renderer {
 
   // === RENDERIZAÇÃO DE COLETÁVEIS ===
 
-  drawCollectible(collectible: CollectibleData, camera: CameraData): void {
+  drawCollectible(collectible: CollectibleData, camera: CameraData, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
     if (!collectible.active || collectible.collected) return;
     const cam = this.snapCamera(camera);
     const x = Math.round(collectible.position.x - cam.x);
@@ -1641,19 +1626,18 @@ export class Renderer {
 
     switch (collectible.type) {
       case CollectibleType.COIN:
-        this.drawCoin(x, y, collectible.animationTimer);
+        this.drawCoin(x, y, collectible.animationTimer, ctx);
         break;
       case CollectibleType.COFFEE:
-        this.drawFanta(x, y, collectible.animationTimer);
+        this.drawFanta(x, y, collectible.animationTimer, ctx);
         break;
       case CollectibleType.HELMET:
-        this.drawHelmet(x, y);
+        this.drawHelmet(x, y, ctx);
         break;
     }
   }
 
-  private drawCoin(x: number, y: number, animTimer: number): void {
-    const ctx = this.offscreenCtx;
+  public drawCoin(x: number, y: number, animTimer: number, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
 
     // Animação de rotação (estilo Mario)
     const rotationSpeed = 0.15;
@@ -1707,8 +1691,7 @@ export class Renderer {
     }
   }
 
-  private drawFanta(x: number, y: number, animTimer: number = 0): void {
-    const ctx = this.offscreenCtx;
+  public drawFanta(x: number, y: number, animTimer: number = 0, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
 
     // Lata de Fanta (cilindro laranja)
     // Corpo
@@ -1743,8 +1726,7 @@ export class Renderer {
     }
   }
 
-  private drawHelmet(x: number, y: number): void {
-    const ctx = this.offscreenCtx;
+  public drawHelmet(x: number, y: number, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
 
     // Capacete dourado
     ctx.fillStyle = '#FFD700';

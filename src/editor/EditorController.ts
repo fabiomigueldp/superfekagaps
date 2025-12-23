@@ -101,22 +101,77 @@ export class EditorController {
 
         // Manual list of interesting tiles for editing
         const tiles = [
-            { id: TileType.EMPTY, color: '#000', label: 'Erase' },
-            { id: TileType.GROUND, color: COLORS.GROUND_TOP, label: 'Ground' },
-            { id: TileType.BRICK, color: COLORS.BRICK_MAIN, label: 'Brick' },
-            { id: TileType.PLATFORM, color: '#888', label: 'Plat' }, // Platform color not in pallete directly as single color, using placeholder
-            { id: TileType.SPIKE, color: '#f00', label: 'Spike' },
-            { id: TileType.COIN, color: '#ffd700', label: 'Coin' },
-            { id: TileType.BRICK_BREAKABLE, color: COLORS.BRICK_LIGHT, label: 'Break' },
-            { id: TileType.POWERUP_COFFEE, color: '#6F4E37', label: 'Coffee' },
-            { id: TileType.POWERUP_HELMET, color: '#555', label: 'Helmet' },
+            { id: TileType.EMPTY, label: 'Erase' },
+            { id: TileType.GROUND, label: 'Ground' },
+            { id: TileType.BRICK, label: 'Brick' },
+            { id: TileType.BRICK_BREAKABLE, label: 'Break' },
+            { id: TileType.PLATFORM, label: 'Plat' },
+            { id: TileType.PLATFORM_FALLING, label: 'Fall' },
+            { id: TileType.SPIKE, label: 'Spike' },
+            { id: TileType.ICE, label: 'Ice' },
+            { id: TileType.SPRING, label: 'Spring' },
+            { id: TileType.LAVA_TOP, label: 'Lava' },
+            { id: TileType.COIN, label: 'Coin' },
+            { id: TileType.POWERUP_COFFEE, label: 'Coffee' },
+            { id: TileType.POWERUP_HELMET, label: 'Helmet' },
+            { id: TileType.HIDDEN_BLOCK, label: 'Hidden' },
+            { id: TileType.CHECKPOINT, label: 'Check' },
+            { id: TileType.FLAG, label: 'Goal' },
+            // Enemies (Virtual IDs or handled via tool modes later)
+            // { id: 999, label: 'Minion' } 
             // Virtual Tiles could be added here (99 for spawn, etc)
         ];
+        const renderer = (window as any).renderer as Renderer; // Access global renderer for thumbnails
+
         tiles.forEach(t => {
             const btn = document.createElement('div');
             btn.className = 'tile-btn';
-            btn.style.backgroundColor = t.color;
-            btn.innerText = t.label;
+
+            // Create mini canvas for thumbnail
+            const thumb = document.createElement('canvas');
+            thumb.width = TILE_SIZE * 2; // 2x Zoom for clarity
+            thumb.height = TILE_SIZE * 2;
+            thumb.style.imageRendering = 'pixelated';
+            thumb.style.marginBottom = '5px';
+
+            // Draw thumbnail
+            if (renderer && t.id !== TileType.EMPTY) {
+                const ctx = thumb.getContext('2d')!;
+                ctx.scale(2, 2); // Scale up for visibility
+
+                // Hack: We need 'tiles' context for some (like Ground), passing dummy
+                const dummyGrid = [[t.id], [TileType.EMPTY]];
+
+                // Special handling for Entity-Tiles
+                // Special handling for Entity-Tiles
+                if (t.id === TileType.COIN) renderer.drawCoin(0, 0, 0, ctx);
+                else if (t.id === TileType.POWERUP_COFFEE) renderer.drawFanta(0, 0, 0, ctx);
+                else if (t.id === TileType.POWERUP_HELMET) renderer.drawHelmet(0, 0, ctx);
+                else if (t.id === TileType.HIDDEN_BLOCK) {
+                    ctx.globalAlpha = 0.5;
+                    renderer.drawTile(TileType.BRICK, 0, 0, dummyGrid, 0, 0, ctx);
+                }
+                else if (t.id === TileType.CHECKPOINT) renderer['drawFlagTile'](0, 0, ctx);
+                else {
+                    renderer.drawTile(t.id, 0, 0, dummyGrid, 0, 0, ctx);
+                }
+            } else {
+                // Empty / Eraser visual
+                const ctx = thumb.getContext('2d')!;
+                ctx.fillStyle = '#333';
+                ctx.fillRect(0, 0, 32, 32);
+                ctx.strokeStyle = '#555';
+                ctx.strokeRect(0, 0, 32, 32);
+                ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(32, 32); ctx.stroke();
+            }
+
+            btn.appendChild(thumb);
+
+            const label = document.createElement('span');
+            label.innerText = t.label;
+            label.style.fontSize = '10px';
+            btn.appendChild(label);
+
             btn.onclick = () => {
                 this.selectedTile = t.id;
                 // Visual selection
@@ -228,79 +283,153 @@ export class EditorController {
 
     public render(renderer: Renderer) {
         // In TS we can cast to any to bypass privacy for this tool
-        // CRITICAL: We must draw to offscreenCtx, because renderer.present() will overwrite 'ctx'
-        // with the offscreen buffer.
-        const ctx = (renderer as any).offscreenCtx as CanvasRenderingContext2D;
+        // HIGH-DPI UPDATE: We now draw directly to the MAIN canvas (ctx) to ensure crisp rendering
+        // bypassing the low-res offscreen buffer.
 
-        ctx.save();
-        ctx.scale(this.zoom, this.zoom);
+        // We need to access 'ctx' and 'scale' from renderer
+        const mainCtx = (renderer as any).ctx as CanvasRenderingContext2D;
+        const deviceScale = (renderer as any).scale as number;
+
+        // Clear Main Canvas (as we are taking over control)
+        mainCtx.clearRect(0, 0, mainCtx.canvas.width, mainCtx.canvas.height);
+
+        // Effective Zoom = Editor Zoom * Device Up-Scale
+        // Since the game is 320x180 but screen is e.g. 1920x1080 (6x),
+        // we need to scale up our drawing so a 16px tile looks correct on the big screen.
+        const finalZoom = this.zoom * deviceScale;
+
+        mainCtx.save();
+        mainCtx.scale(finalZoom, finalZoom);
 
         if (this.levelData) {
-            // 1. Draw Tiles (Manual implementation since Renderer expects a 'Level' object, 
-            // and we have raw LevelData. easier to just loop and draw rects for the editor)
-            this.renderEditorView(ctx);
+            // 0. Draw Background (Simple Fill based on theme)
+            // Use logical width/height (which is GAME_WIDTH / zoom approx)
+            const visibleWidth = (mainCtx.canvas.width / deviceScale) / this.zoom;
+            const visibleHeight = (mainCtx.canvas.height / deviceScale) / this.zoom;
+
+            mainCtx.fillStyle = this.levelData.theme?.skyGradient?.[0] || COLORS.SKY_LIGHT;
+            mainCtx.fillRect(0, 0, visibleWidth, visibleHeight);
+
+            // 1. Draw Tiles (Using Game Renderer for pixel-perfect accuracy)
+            this.renderEditorView(mainCtx, renderer);
         }
 
         // 2. Draw Grid
-        this.drawGrid(ctx);
+        this.drawGrid(mainCtx);
 
-        ctx.restore();
+        mainCtx.restore();
 
         // 3. Draw UI overlays (e.g. current selection indicator if needed)
         // ...
     }
 
-    private renderEditorView(ctx: CanvasRenderingContext2D) {
+    private renderEditorView(ctx: CanvasRenderingContext2D, renderer: Renderer) {
         if (!this.levelData) return;
         const tiles = this.levelData.tiles;
 
         // Visual region uses ZOOM-adjusted visible area
-        const visibleWidth = ctx.canvas.width / this.zoom;
-        const visibleHeight = ctx.canvas.height / this.zoom;
+        // We use the transform from the context to be accurate
+        const t = ctx.getTransform();
+        const visibleWidth = ctx.canvas.width / t.a;
+        const visibleHeight = ctx.canvas.height / t.d;
 
         const startCol = Math.floor(this.camera.x / TILE_SIZE);
         const endCol = startCol + Math.ceil(visibleWidth / TILE_SIZE) + 1;
         const startRow = Math.floor(this.camera.y / TILE_SIZE);
         const endRow = startRow + Math.ceil(visibleHeight / TILE_SIZE) + 1;
 
+        // 1. Draw Tiles
         for (let r = startRow; r < endRow; r++) {
             if (r < 0 || r >= tiles.length) continue;
             for (let c = startCol; c < endCol; c++) {
                 if (c < 0 || c >= tiles[0].length) continue;
                 const tile = tiles[r][c];
-                if (tile !== 0) {
-                    let color = '#fff';
-                    // Simple loop map
-                    if (tile === TileType.GROUND) color = COLORS.GROUND_TOP;
-                    else if (tile === TileType.BRICK) color = COLORS.BRICK_MAIN;
-                    else if (tile === TileType.PLATFORM) color = '#888';
-                    else if (tile === TileType.SPIKE) color = '#f00';
-                    else if (tile === TileType.COIN) color = '#ffd700';
-                    else if (tile === TileType.BRICK_BREAKABLE) color = COLORS.BRICK_LIGHT;
-                    else if (tile === TileType.POWERUP_COFFEE) color = '#6F4E37';
-                    else if (tile === TileType.POWERUP_HELMET) color = '#555';
+                const x = Math.floor(c * TILE_SIZE - this.camera.x);
+                const y = Math.floor(r * TILE_SIZE - this.camera.y);
 
-                    ctx.fillStyle = color;
-                    ctx.fillRect(Math.floor(c * TILE_SIZE - this.camera.x), Math.floor(r * TILE_SIZE - this.camera.y), TILE_SIZE, TILE_SIZE);
+                if (tile !== 0) {
+                    // Special Handling for Editor-Only Visuals
+                    if (tile === TileType.HIDDEN_BLOCK) {
+                        ctx.save();
+                        ctx.globalAlpha = 0.5; // Ghost mode
+                        renderer.drawTile(TileType.BRICK, x, y, tiles, r, c, ctx);
+                        ctx.restore();
+                    }
+                    else if (tile === TileType.COIN) {
+                        // Manually draw coin entity sprite
+                        (renderer as any).drawCoin(x, y, 0); // Access private method or refactor renderer
+                    }
+                    else if (tile === TileType.CHECKPOINT) {
+                        (renderer as any).drawFlagTile(x, y, ctx);
+                    }
+                    else {
+                        renderer.drawTile(tile, x, y, tiles, r, c, ctx);
+                    }
                 }
             }
+        }
+
+        // 2. Draw Entities (Enemies, Collectibles from the Lists)
+        // Note: These lists are populated in DATA, but sometimes we edit via Tiles.
+        // If we want to visualize pre-placed entities:
+
+        if (this.levelData.enemies) {
+            this.levelData.enemies.forEach(e => {
+                // Mock Enemy Data for Renderer
+                const mockEnemy: any = {
+                    type: e.type,
+                    position: { x: e.position.x * TILE_SIZE, y: e.position.y * TILE_SIZE },
+                    active: true,
+                    facingRight: false,
+                    isDead: false,
+                    width: 16, height: 16,
+                    animationTimer: 0,
+                    animationFrame: 0
+                };
+                renderer.drawEnemy(mockEnemy, this.camera, ctx);
+            });
+        }
+
+        if (this.levelData.collectibles) {
+            this.levelData.collectibles.forEach(c => {
+                const mockCol: any = {
+                    type: c.type,
+                    position: { x: c.position.x * TILE_SIZE, y: c.position.y * TILE_SIZE },
+                    active: true,
+                    collected: false,
+                    animationTimer: 0
+                };
+                renderer.drawCollectible(mockCol, this.camera, ctx);
+            });
         }
     }
 
     private drawGrid(ctx: CanvasRenderingContext2D) {
-        const visibleWidth = ctx.canvas.width / this.zoom;
-        const visibleHeight = ctx.canvas.height / this.zoom;
+        // We are already scaled by `finalZoom` (which is zoom * deviceScale)
+        // so `ctx.canvas.width` is the RAW pixel width (e.g. 1920)
+        // We need 'logical' width relative to our current scale factor
+
+        // Inverse transform to get logical viewport bottom-right
+        const transform = ctx.getTransform();
+        // Since we did scale(finalZoom, finalZoom), the scale factor is in a or d component
+        // But safer to just use values we know:
+        const visibleWidth = ctx.canvas.width / transform.a;
+        const visibleHeight = ctx.canvas.height / transform.d;
 
         const startX = Math.floor(this.camera.x / TILE_SIZE) * TILE_SIZE;
         const endX = startX + visibleWidth + TILE_SIZE;
 
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-        ctx.lineWidth = 1 / this.zoom; // Keep lines crisp
+        // Make line extremely crisp: 1 physical pixel width
+        // If we are at scale 6x (device) * 1x (zoom) = 6x, then 1 logical unit = 6 pixels.
+        // To get 1 pixel line, we need width = 1 / 6.
+        ctx.lineWidth = 1 / transform.a;
+
         ctx.beginPath();
 
         // Vertical lines
         for (let x = startX; x <= endX; x += TILE_SIZE) {
-            const screenX = x - this.camera.x; // No Math.floor here, precise grid
+            const screenX = x - this.camera.x;
             ctx.moveTo(screenX, 0);
             ctx.lineTo(screenX, visibleHeight);
         }

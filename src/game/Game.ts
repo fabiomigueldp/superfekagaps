@@ -533,7 +533,9 @@ export class Game {
       }
       this.renderer.drawOrangeRain(this.deliciaMode);
     }
-    this.renderer.present();
+    if (this.state !== GameState.EDITOR) {
+      this.renderer.present();
+    }
   }
 
 
