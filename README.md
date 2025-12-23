@@ -1,124 +1,139 @@
-# Super Feka Gaps 🎮
+# Super Feka Gaps
 
-Um jogo 2D side-scroller platformer estilo 8-bit, 100% gerado por código (sem assets externos).
-
-## 🎯 História
-
-**Feka** precisa salvar **Yasmin**, que foi sequestrada pelo vilão **Joãozão**! 
-Atravesse fases cheias de "gaps" (buracos), inimigos e armadilhas para resgatar sua amada!
-
-## 🚀 Como Rodar
-
-```bash
-# Instalar dependências
-npm install
-
-# Rodar em modo desenvolvimento
-npm run dev
-
-# Build para produção
-npm run build
-
-# Preview do build
-npm run preview
-```
-
-O jogo abrirá automaticamente no navegador em `http://localhost:3000`
-
-## 🎮 Controles
-
-### Teclado
-| Tecla | Ação |
-|-------|------|
-| ← → ou A D | Mover |
-| Espaço, Z, ↑ ou W | Pular |
-| Shift ou X | Correr |
-| Enter | Start/Confirmar |
-| Esc | Pause |
-| M | Toggle Som |
-
-### Touch (Mobile)
-- Botões na parte inferior da tela para movimento e ações
-
-## 🎨 Características
-
-- **100% Código**: Todos os gráficos são desenhados via Canvas 2D
-- **Estilo 8-bit**: Paleta reduzida e resolução 320x180 escalada
-- **Física estilo Mario**: Coyote time, jump buffer, pulo variável
-- **Áudio Procedural**: Sons gerados com WebAudio API
-- **3 Fases**: Tutorial, Desafio e Boss
-
-## 🗺️ Fases
-
-1. **World 1-1 (Tutorial)**: Aprenda os controles, gaps pequenos
-2. **World 1-2 (Desafio)**: Mais inimigos e plataformas
-3. **Boss: Joãozão**: Enfrente o vilão e salve Yasmin!
-
-## 📁 Estrutura do Projeto
-
-```
-src/
-├── main.ts              # Ponto de entrada
-├── constants.ts         # Constantes do jogo
-├── types.ts             # Tipos TypeScript
-├── game/
-│   └── Game.ts          # Loop principal e estados
-├── engine/
-│   ├── Input.ts         # Sistema de input
-│   ├── Audio.ts         # Áudio procedural
-│   └── Renderer.ts      # Renderização Canvas
-├── world/
-│   └── Level.ts         # Sistema de níveis
-├── entities/
-│   ├── Player.ts        # Feka (jogador)
-│   └── enemies/
-│       ├── Minion.ts    # Inimigo básico
-│       └── Joaozao.ts   # Boss
-└── data/
-    └── levels.ts        # Definição dos níveis
-```
-
-## 🏆 Sistema de Pontuação
-
-- **Moeda**: +100 pontos
-- **Derrotar Inimigo**: +200 pontos
-- **Derrotar Boss**: +1000 pontos
-- **Bônus de Tempo**: Segundos restantes × 10
-
-## 💡 Dicas
-
-- Segure o pulo para saltar mais alto
-- Use Shift para correr e pular mais longe
-- Pule na cabeça dos inimigos para derrotá-los
-- O café aumenta sua velocidade por 10 segundos
-- O capacete protege de um hit
-
-## 🛠️ Stack Técnica
-
-- **Vite**: Build tool e dev server
-- **TypeScript**: Tipagem estática
-- **HTML5 Canvas**: Renderização 2D
-- **WebAudio API**: Som procedural
-- **Zero Assets**: Tudo gerado por código
-
-## 🎉 Easter Egg: Modo da Delícia
-
-Para habilitar corretamente o *Modo da Delícia* (Konami code), mova a pasta `assets_delicia/` para `public/assets_delicia/` para que o Vite sirva os arquivos estáticos.
-
-Arquivos esperados (exemplos presentes no repositório):
-- `super_feka_gaps_delicia_theme_75.577s.webm`
-- `super_feka_world_delicia_92.051s.webm`
-- `delicia_da_mini_fanta_23.106s.webm`
-- `boss_delicia_149.191s.webm`
-- `delicia_ending_53.090s.webm`
-- `ai_que_delicia_1.674s.webm` (SFX)
-
-Após mover, rode `npm run dev` e pressione a sequência: ↑↑↓↓←→←→ para alternar o modo e ver (e ouvir) a mudança.
-
-## 📜 Licença
-
-MIT © Torbware 2025
+[English](#english) | [Português](#português)
 
 ---
 
-Feito com ❤️ e muito código!
+<a name="english"></a>
+
+## English
+
+### Project Overview
+
+Super Feka Gaps is a 2D side-scrolling platformer built in TypeScript with a custom engine. It focuses on pixel-perfect rendering, deterministic gameplay, and an 8-bit aesthetic powered by procedural audio.
+
+### Key Features
+
+- Fixed-timestep game loop (60 FPS) for stable physics.
+- Pixel-art rendering via offscreen canvas and integer scaling.
+- Tile-based levels with AABB collision, hazards, and dynamic tiles (breakable/falling).
+- Procedural SFX and music management with crossfades and ducking.
+- Keyboard and touch input support.
+- Zero runtime dependencies.
+
+### Technical Stack
+
+- **Language:** TypeScript (ES modules).
+- **Runtime:** Modern browsers (HTML5 Canvas + Web Audio API).
+- **Build:** Vite.
+- **Tooling:** tsx for scripts, TypeScript for type checks.
+- **Node:** 20+.
+
+### Architecture
+
+- **Game Loop:** `src/game/Game.ts` manages state, fixed timestep, and orchestration.
+- **Engine:** `src/engine/` provides rendering, input, audio, and background generation.
+- **World & Physics:** `src/world/Level.ts` handles tilemaps and collision resolution.
+- **Entities:** `src/entities/` defines player and enemies.
+- **Content:** `src/data/levels.ts` stores level layouts; `src/assets/` holds sprites.
+- **Voice System:** `src/voice/` manages voice playback and speech bubbles.
+
+### Setup & Scripts
+
+```bash
+npm install
+npm run validate
+npm run dev
+```
+
+Other useful commands:
+
+```bash
+npm run typecheck
+npm run build
+npm run preview
+```
+
+### Input Mapping
+
+| Action | Keys |
+| --- | --- |
+| Move | Arrow Keys, A/D |
+| Jump | Space, Z, W, Arrow Up |
+| Run | Shift, X |
+| Ground Pound | Arrow Down, S (mid-air) |
+| Start/Confirm | Enter |
+| Pause | Esc |
+| Mute | M |
+
+### License
+
+MIT.
+
+---
+
+<a name="português"></a>
+
+## Português
+
+### Visão Geral do Projeto
+
+Super Feka Gaps é um jogo de plataforma 2D side-scroller feito em TypeScript com engine própria. O foco é renderização pixel-perfect, gameplay determinístico e estética 8-bit com áudio procedural.
+
+### Características
+
+- Loop de jogo com timestep fixo (60 FPS) para física estável.
+- Renderização de pixel art via canvas offscreen e escala inteira.
+- Fases em tilemap com colisão AABB, hazards e tiles dinâmicos (quebráveis/instáveis).
+- SFX procedural e gerenciamento de música com crossfade e ducking.
+- Suporte a teclado e toque.
+- Sem dependências de runtime.
+
+### Stack Técnica
+
+- **Linguagem:** TypeScript (ES modules).
+- **Runtime:** Navegadores modernos (HTML5 Canvas + Web Audio API).
+- **Build:** Vite.
+- **Ferramentas:** tsx para scripts, TypeScript para typecheck.
+- **Node:** 20+.
+
+### Arquitetura
+
+- **Loop de Jogo:** `src/game/Game.ts` coordena estados, timestep fixo e orquestração.
+- **Engine:** `src/engine/` entrega render, input, áudio e background.
+- **Mundo e Física:** `src/world/Level.ts` trata tilemap e colisões.
+- **Entidades:** `src/entities/` define player e inimigos.
+- **Conteúdo:** `src/data/levels.ts` guarda os layouts; `src/assets/` contém sprites.
+- **Voz:** `src/voice/` gerencia voz e balões de fala.
+
+### Instalação e Scripts
+
+```bash
+npm install
+npm run validate
+npm run dev
+```
+
+Outros comandos úteis:
+
+```bash
+npm run typecheck
+npm run build
+npm run preview
+```
+
+### Mapeamento de Entrada
+
+| Ação | Teclas |
+| --- | --- |
+| Mover | Setas, A/D |
+| Pular | Espaço, Z, W, Seta Cima |
+| Correr | Shift, X |
+| Ground Pound | Seta Baixo, S (no ar) |
+| Start/Confirmar | Enter |
+| Pausar | Esc |
+| Mutar | M |
+
+### Licença
+
+MIT.
