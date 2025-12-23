@@ -22,6 +22,7 @@ export class EditorController {
     private uiLevelList: HTMLDivElement;
     private uiPalette: HTMLDivElement;
     private uiFileLabel: HTMLSpanElement;
+    private uiShowBgChk: HTMLInputElement;
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
@@ -67,20 +68,20 @@ export class EditorController {
         this.uiLevelList = document.getElementById('level-list') as HTMLDivElement;
         this.uiPalette = document.getElementById('tile-palette') as HTMLDivElement;
         this.uiFileLabel = document.getElementById('current-file-label') as HTMLSpanElement;
+        this.uiShowBgChk = document.getElementById('chk-show-bg') as HTMLInputElement;
 
         this.bindEvents();
         this.buildPalette();
     }
 
     private bindEvents() {
-        // Canvas Input
+        // ... (Canvas events preserved via logic, but overwriting block method)
         this.canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
         this.canvas.addEventListener('mousemove', this.onMouseMove.bind(this));
         this.canvas.addEventListener('mouseup', this.onMouseUp.bind(this));
         this.canvas.addEventListener('wheel', this.onWheel.bind(this));
         this.canvas.addEventListener('contextmenu', e => e.preventDefault());
 
-        // UI Input
         this.uiMountBtn.addEventListener('click', async () => {
             const success = await this.fs.mount();
             if (success) {
@@ -94,6 +95,154 @@ export class EditorController {
                 alert('Saved!');
             }
         });
+
+        // Tab Switching Logic
+        const tabs = document.querySelectorAll('.tab-btn');
+        tabs.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Deactivate all
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+                // Activate clicked
+                btn.classList.add('active');
+                const target = (btn as HTMLElement).dataset.tab;
+                if (target) {
+                    document.getElementById(target)?.classList.add('active');
+                }
+            });
+        });
+
+        // Show BG Toggle
+        if (this.uiShowBgChk) {
+            this.uiShowBgChk.addEventListener('change', () => {
+                // Render loop will pick up the change automatically
+            });
+        }
+
+
+        // Add Layer Button
+        document.getElementById('btn-add-layer')?.addEventListener('click', () => {
+            if (!this.levelData) return;
+            if (!this.levelData.theme) this.ensureTheme();
+
+            this.levelData.theme!.layers.push({
+                type: 'mountains',
+                color: '#555555',
+                scrollFactor: 0.5
+            });
+            this.populateThemeEditor();
+            this.updateTheme();
+        });
+
+        // Sky Inputs
+        document.getElementById('theme-sky-top')?.addEventListener('input', (e) => {
+            if (!this.levelData) return;
+            this.ensureTheme();
+            this.levelData.theme!.skyGradient[0] = (e.target as HTMLInputElement).value;
+            // No need to regenerate background for sky, as it is drawn every frame in render()
+            // BUT `prepareLevelBackground` generates the offscreen layers.
+        });
+        document.getElementById('theme-sky-bottom')?.addEventListener('input', (e) => {
+            if (!this.levelData) return;
+            this.ensureTheme();
+            this.levelData.theme!.skyGradient[1] = (e.target as HTMLInputElement).value;
+        });
+    }
+
+    private ensureTheme() {
+        if (!this.levelData) return;
+        if (!this.levelData.theme) {
+            this.levelData.theme = {
+                skyGradient: [COLORS.SKY_LIGHT, COLORS.SKY_DARK],
+                layers: []
+            };
+        }
+    }
+
+    private updateTheme() {
+        const renderer = (window as any).renderer as Renderer;
+        if (renderer && this.levelData && this.levelData.theme) {
+            renderer.prepareLevelBackground(this.levelData.theme);
+        }
+    }
+
+    private populateThemeEditor() {
+        if (!this.levelData) return;
+        this.ensureTheme();
+        const theme = this.levelData.theme!;
+
+        // Sky
+        (document.getElementById('theme-sky-top') as HTMLInputElement).value = theme.skyGradient[0];
+        (document.getElementById('theme-sky-bottom') as HTMLInputElement).value = theme.skyGradient[1];
+
+        // Layers
+        const list = document.getElementById('theme-layers-list')!;
+        list.innerHTML = '';
+
+        theme.layers.forEach((layer, index) => {
+            const div = document.createElement('div');
+            div.className = 'layer-item';
+            div.innerHTML = `
+                <div class="control-row">
+                    <label>Type</label>
+                     <select class="layer-type" data-idx="${index}">
+                        <option value="mountains" ${layer.type === 'mountains' ? 'selected' : ''}>Mountains</option>
+                        <option value="hills" ${layer.type === 'hills' ? 'selected' : ''}>Hills</option>
+                        <option value="clouds" ${layer.type === 'clouds' ? 'selected' : ''}>Clouds</option>
+                        <option value="city" ${layer.type === 'city' ? 'selected' : ''}>City</option>
+                        <option value="castle_wall" ${layer.type === 'castle_wall' ? 'selected' : ''}>Castle</option>
+                     </select>
+                     <button class="mini-btn remove" data-idx="${index}">x</button>
+                </div>
+                <div class="control-row">
+                    <label>Color</label>
+                    <input type="color" class="layer-color" data-idx="${index}" value="${layer.color}">
+                </div>
+                <div class="control-row">
+                    <label>Parallax</label>
+                    <input type="range" class="layer-scroll" data-idx="${index}" min="0" max="1" step="0.1" value="${layer.scrollFactor}">
+                    <span>${layer.scrollFactor}</span>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+
+        // Bind dynamic inputs
+        list.querySelectorAll('.layer-type').forEach(el => {
+            el.addEventListener('change', (e) => {
+                const idx = parseInt((e.target as HTMLElement).dataset.idx!);
+                theme.layers[idx].type = (e.target as HTMLSelectElement).value as any;
+                this.updateTheme();
+            });
+        });
+        list.querySelectorAll('.layer-color').forEach(el => {
+            el.addEventListener('input', (e) => {
+                const idx = parseInt((e.target as HTMLElement).dataset.idx!);
+                theme.layers[idx].color = (e.target as HTMLInputElement).value;
+                this.updateTheme();
+            });
+        });
+        list.querySelectorAll('.layer-scroll').forEach(el => {
+            el.addEventListener('input', (e) => {
+                const idx = parseInt((e.target as HTMLElement).dataset.idx!);
+                const val = parseFloat((e.target as HTMLInputElement).value);
+                theme.layers[idx].scrollFactor = val;
+                ((e.target as HTMLElement).nextElementSibling as HTMLSpanElement).innerText = val.toFixed(1);
+                // Parallax changes don't need texture regen, but `prepare` sets up the layers array logic.
+                this.updateTheme();
+            });
+        });
+        list.querySelectorAll('.remove').forEach(el => {
+            el.addEventListener('click', (e) => {
+                const idx = parseInt((e.target as HTMLElement).dataset.idx!);
+                theme.layers.splice(idx, 1);
+                this.populateThemeEditor();
+                this.updateTheme();
+            });
+        });
+
+
     }
 
     private buildPalette() {
@@ -220,6 +369,10 @@ export class EditorController {
                 // and extract the JSON object via Regex (hacky but works for this tool)
                 const text = await this.fs.readFile(file) as string;
                 this.levelData = this.parseLevelFromText(text);
+
+                // Initialize Theme Editor with data
+                this.populateThemeEditor();
+                this.updateTheme(); // Force render of background
             };
             this.uiLevelList.appendChild(div);
         });
@@ -310,13 +463,21 @@ export class EditorController {
         mainCtx.scale(finalZoom, finalZoom);
 
         if (this.levelData) {
-            // 0. Draw Background (Simple Fill based on theme)
-            // Use logical width/height (which is GAME_WIDTH / zoom approx)
-            const visibleWidth = (mainCtx.canvas.width / deviceScale) / this.zoom;
-            const visibleHeight = (mainCtx.canvas.height / deviceScale) / this.zoom;
+            // 0. Draw Background
+            if (this.uiShowBgChk && this.uiShowBgChk.checked) {
+                // Calculate logical visible area to tell renderer how much to fill
+                const visibleWidth = (mainCtx.canvas.width / deviceScale) / this.zoom;
+                const visibleHeight = (mainCtx.canvas.height / deviceScale) / this.zoom;
 
-            mainCtx.fillStyle = this.levelData.theme?.skyGradient?.[0] || COLORS.SKY_LIGHT;
-            mainCtx.fillRect(0, 0, visibleWidth, visibleHeight);
+                renderer.drawBackground(this.camera, mainCtx, visibleWidth, visibleHeight);
+            } else {
+                // Draw simple dark background
+                const visibleWidth = (mainCtx.canvas.width / deviceScale) / this.zoom;
+                const visibleHeight = (mainCtx.canvas.height / deviceScale) / this.zoom;
+
+                mainCtx.fillStyle = '#111';
+                mainCtx.fillRect(0, 0, visibleWidth, visibleHeight);
+            }
 
             // 1. Draw Tiles (Using Game Renderer for pixel-perfect accuracy)
             this.renderEditorView(mainCtx, renderer);

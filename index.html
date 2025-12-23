@@ -54,22 +54,56 @@
     <div class="toolbar">
       <button id="btn-mount" class="editor-btn primary">📁 Open Levels Folder</button>
       <button id="btn-save" class="editor-btn">mb Save Level</button>
+      <div style="margin-left: 20px; display: flex; align-items: center; gap: 5px;">
+        <input type="checkbox" id="chk-show-bg" checked>
+        <label for="chk-show-bg" style="font-size: 12px; color: #ccc; cursor: pointer;">Show BG</label>
+      </div>
       <div style="flex:1"></div>
       <span id="current-file-label" style="font-size:12px; color:#888;">No loaded level</span>
     </div>
 
     <div class="sidebar">
-      <div>
-        <h3>Tiles</h3>
-        <div id="tile-palette" class="tile-palette">
-          <!-- Populated by JS -->
+      <div class="sidebar">
+        <div class="tabs-nav">
+          <button class="tab-btn active" data-tab="tab-tiles">Tiles</button>
+          <button class="tab-btn" data-tab="tab-levels">Levels</button>
+          <button class="tab-btn" data-tab="tab-theme">Theme</button>
         </div>
-      </div>
 
-      <div>
-        <h3>Levels</h3>
-        <div id="level-list" style="display:flex; flex-direction:column; gap:2px;">
-          <div style="padding:10px; text-align:center; color:#666;">Mount folder to see files</div>
+        <!-- Tab Content: Tiles -->
+        <div id="tab-tiles" class="tab-content active">
+          <div id="tile-palette" class="tile-palette">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Tab Content: Levels -->
+        <div id="tab-levels" class="tab-content">
+          <div id="level-list" style="display:flex; flex-direction:column; gap:2px;">
+            <div style="padding:10px; text-align:center; color:#666;">Mount folder to see files</div>
+          </div>
+        </div>
+
+        <!-- Tab Content: Theme -->
+        <div id="tab-theme" class="tab-content">
+          <div class="theme-section">
+            <h4>Sky Gradient</h4>
+            <div class="control-row">
+              <label>Top</label>
+              <input type="color" id="theme-sky-top">
+            </div>
+            <div class="control-row">
+              <label>Bottom</label>
+              <input type="color" id="theme-sky-bottom">
+            </div>
+          </div>
+
+          <div class="theme-section">
+            <h4>Layers <button id="btn-add-layer" class="mini-btn">+</button></h4>
+            <div id="theme-layers-list">
+              <!-- Populated by JS -->
+            </div>
+          </div>
         </div>
       </div>
     </div>

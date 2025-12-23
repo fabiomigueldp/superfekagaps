@@ -599,17 +599,16 @@ export class Renderer {
     }
   }
 
-  drawBackground(camera: CameraData): void {
-    const ctx = this.offscreenCtx;
+  drawBackground(camera: CameraData, ctx: CanvasRenderingContext2D = this.offscreenCtx, viewportWidth: number = GAME_WIDTH, viewportHeight: number = GAME_HEIGHT): void {
     const cam = this.snapCamera(camera);
 
     if (this.currentTheme) {
-      // 1. Gradiente do céu
-      const gradient = ctx.createLinearGradient(0, 0, 0, GAME_HEIGHT);
+      // 1. Gradiente do céu (preenche todo o viewport)
+      const gradient = ctx.createLinearGradient(0, 0, 0, viewportHeight);
       gradient.addColorStop(0, this.currentTheme.skyGradient[0]);
       gradient.addColorStop(1, this.currentTheme.skyGradient[1]);
       ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+      ctx.fillRect(0, 0, viewportWidth, viewportHeight);
 
       // 2. Camadas parallax
       for (const layer of this.backgroundLayers) {
@@ -622,45 +621,45 @@ export class Renderer {
           offsetX += (Date.now() / 1000) * layer.spec.speedX;
         }
 
-        const w = layer.image.width;
-        // Modulo para manter dentro de [0, w)
-        // O operador % pode retornar negativo, então ajustamos
-        offsetX = offsetX % w;
-        if (offsetX < 0) offsetX += w;
+        const imgW = layer.image.width;
 
-        // Desenha a imagem duas vezes para cobrir o gap durante o loop
-        // Desenhamos em -offsetX. Como offsetX está entre 0 e w:
-        // Se offsetX é 0, desenha em 0.
-        // Se offsetX é 10, desenha em -10 (imagem shiftada pra esquerda), e precisa da próxima em -10 + w
+        // Normaliza o offset para [0, imgW)
+        // Isso nos dá onde "começa" o desenho relativo à borda esquerda
+        let startX = -(offsetX % imgW);
+        if (startX > 0) startX -= imgW;
 
-        ctx.drawImage(layer.image, -Math.floor(offsetX), 0);
+        // Agora desenhamos cópias da imagem até preencher a largura do viewport
+        let currentDrawX = startX;
 
-        // Só desenha a segunda se necessário (sempre desenha por segurança ou só se w < GAME_WIDTH + offset?)
-        // Como o width == GAME_WIDTH, se offset > 0, precisamos da segunda imagem.
-        if (offsetX > 0) {
-          ctx.drawImage(layer.image, -Math.floor(offsetX) + w, 0);
+        // Cálculo de offset vertical (Parallax Vertical)
+        // Usamos uma fração do scrollFactor horizontal para o vertical
+        const verticalFactor = layer.spec.scrollFactor * 0.2;
+        const offsetY = Math.floor(cam.y * verticalFactor);
+
+        const imgH = layer.image.height;
+        // Centraliza verticalmente no viewport (importante para o Zoom Out do editor)
+        const centeredY = (viewportHeight - imgH) / 2;
+        const drawY = Math.floor(centeredY - offsetY);
+
+        while (currentDrawX < viewportWidth) {
+          // Só desenha se estiver visível (otimização simples)
+          if (currentDrawX + imgW > -10) { // -10 é margem de segurança
+            ctx.drawImage(layer.image, Math.floor(currentDrawX), drawY);
+          }
+          currentDrawX += imgW;
         }
       }
-
     } else {
       // Fallback para background antigo se não houver tema
-      // Gradiente de céu
-      const gradient = ctx.createLinearGradient(0, 0, 0, GAME_HEIGHT);
+      const gradient = ctx.createLinearGradient(0, 0, 0, viewportHeight);
       gradient.addColorStop(0, COLORS.SKY_LIGHT);
       gradient.addColorStop(1, COLORS.SKY_DARK);
       ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-
-      // Nuvens simples (paralaxe)
-      ctx.fillStyle = '#FFFFFF';
-      const cloudOffset = cam.x * 0.3;
-      for (let i = 0; i < 5; i++) {
-        const x = ((i * 80 - cloudOffset) % (GAME_WIDTH + 60)) - 30;
-        const y = 20 + (i % 3) * 15;
-        this.drawCloud(x, y);
-      }
+      ctx.fillRect(0, 0, viewportWidth, viewportHeight);
     }
   }
+
+
 
   private drawCloud(x: number, y: number): void {
     const ctx = this.offscreenCtx;
