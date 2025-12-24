@@ -131,8 +131,8 @@ export class Game {
       // Validar tiles
       level.tiles.forEach((row, rIdx) => {
         row.forEach((tile, cIdx) => {
-          // Tiles válidos: 0-7, 10-13
-          const isValid = (tile >= 0 && tile <= 7) || (tile >= 10 && tile <= 19);
+          // Tiles válidos: 0-19 (inclui legacy para spawn de entidades)
+          const isValid = tile >= 0 && tile <= 19;
           if (!isValid) {
             console.error(`❌ Erro no Nível ${level.id}: Tile inválido '${tile}' em [${rIdx}, ${cIdx}]`);
             hasErrors = true;
@@ -677,12 +677,15 @@ export class Game {
   }
 
   private loadLevel(index: number): void {
-    const rawLevelData = getLevelByIndex(index);
-    if (!rawLevelData) {
+    const rawLevelDataOriginal = getLevelByIndex(index);
+    if (!rawLevelDataOriginal) {
       // Fim do jogo!
       this.onGameComplete();
       return;
     }
+
+    // Deep clone para evitar mutação do objeto estático original (isso causava duplicação de moedas ao reiniciar)
+    const rawLevelData = JSON.parse(JSON.stringify(rawLevelDataOriginal));
 
     const levelData = this.normalizeLevelData(rawLevelData);
     this.level = createLevel(levelData);
@@ -1155,11 +1158,9 @@ export class Game {
               this.audio.playOneUp();
             }
             this.audio.playCoin();
-            this.spawnParticles(
+            this.spawnCoinEffect(
               c.position.x + c.width / 2,
-              c.position.y + c.height / 2,
-              '#FFD700',
-              3
+              c.position.y + c.height / 2
             );
             break;
 
@@ -1539,11 +1540,40 @@ export class Game {
     }
   }
 
+  private spawnCoinEffect(x: number, y: number): void {
+    // 8 partículas em explosão radial
+    for (let i = 0; i < 8; i++) {
+      const angle = (Math.PI * 2 * i) / 8;
+      const speed = 1.5 + Math.random() * 1.5;
+      this.particles.push({
+        position: { x, y },
+        velocity: {
+          x: Math.cos(angle) * speed,
+          y: Math.sin(angle) * speed
+        },
+        life: 300 + Math.random() * 200,
+        maxLife: 500,
+        color: i % 2 === 0 ? '#FFD700' : '#FFFFFF', // Intercala Ouro e Branco
+        size: i % 2 === 0 ? 3 : 2, // Tamanhos variados
+        gravity: 0, // Flutua!
+        friction: 0.92 // Desacelera "mágicamente"
+      });
+    }
+  }
+
   private updateParticles(deltaTime: number): void {
     this.particles = this.particles.filter(p => {
       p.position.x += p.velocity.x;
       p.position.y += p.velocity.y;
-      p.velocity.y += 0.1; // Gravidade nas partículas
+
+      // Física customizável
+      const gravity = p.gravity !== undefined ? p.gravity : 0.1;
+      p.velocity.y += gravity;
+
+      const friction = p.friction !== undefined ? p.friction : 1.0;
+      p.velocity.x *= friction;
+      p.velocity.y *= friction;
+
       p.life -= deltaTime;
       return p.life > 0;
     });

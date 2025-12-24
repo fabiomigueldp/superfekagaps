@@ -262,15 +262,18 @@ export class EditorController {
             { id: TileType.GROUND, label: 'Ground' },
             { id: TileType.BRICK, label: 'Brick' },
             { id: TileType.BRICK_BREAKABLE, label: 'Break' },
+            { id: TileType.POWERUP_BLOCK_MINI_FANTA, label: 'Blk Fanta' },
+            { id: TileType.POWERUP_BLOCK_HELMET, label: 'Blk Helm' },
             { id: TileType.PLATFORM, label: 'Plat' },
             { id: TileType.PLATFORM_FALLING, label: 'Fall' },
             { id: TileType.SPIKE, label: 'Spike' },
             { id: TileType.ICE, label: 'Ice' },
             { id: TileType.SPRING, label: 'Spring' },
-            { id: TileType.LAVA_TOP, label: 'Lava' },
+            { id: TileType.LAVA_TOP, label: 'Lava Top' },
+            { id: TileType.LAVA_FILL, label: 'Lava Fill' },
             { id: TileType.COIN, label: 'Coin' },
-            { id: TileType.POWERUP_MINI_FANTA, label: 'Mini Fanta' },
-            { id: TileType.POWERUP_HELMET, label: 'Helmet' },
+            { id: TileType.POWERUP_MINI_FANTA, label: 'Item Fanta' },
+            { id: TileType.POWERUP_HELMET, label: 'Item Helm' },
             { id: TileType.HIDDEN_BLOCK, label: 'Hidden' },
             { id: TileType.CHECKPOINT, label: 'Check' },
             { id: TileType.FLAG, label: 'Goal' },
@@ -533,8 +536,14 @@ export class EditorController {
                         ctx.restore();
                     }
                     else if (tile === TileType.COIN) {
-                        // Manually draw coin entity sprite
-                        (renderer as any).drawCoin(x, y, 0); // Access private method or refactor renderer
+                        // Manually draw coin entity sprite with correct context
+                        (renderer as any).drawCoin(x, y, 0, ctx);
+                    }
+                    else if (tile === TileType.POWERUP_MINI_FANTA) {
+                        (renderer as any).drawFanta(x, y, 0, ctx);
+                    }
+                    else if (tile === TileType.POWERUP_HELMET) {
+                        (renderer as any).drawHelmet(x, y, ctx);
                     }
                     else if (tile === TileType.CHECKPOINT) {
                         (renderer as any).drawFlagTile(x, y, ctx);

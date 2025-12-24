@@ -189,6 +189,8 @@ export interface Particle {
   maxLife: number;
   color: string;
   size: number;
+  gravity?: number;
+  friction?: number;
 }
 
 // Firework particle + container
