@@ -571,8 +571,8 @@ export class Game {
     // Background
     this.renderer.drawBackground(this.camera);
 
-    // Tiles
-    this.renderer.drawTiles(this.level.getModifiedTiles(), this.camera);
+    // Tiles (pass origin offset for proper world coordinate rendering)
+    this.renderer.drawTiles(this.level.getModifiedTiles(), this.camera, this.level.originX, this.level.originY);
     this.renderer.drawFallingPlatforms(this.level.getFallingPlatformRenderData(), this.camera);
 
     // Fogos (se o boss está morto/morrendo)

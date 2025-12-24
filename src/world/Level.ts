@@ -22,8 +22,48 @@ export class Level {
   private fallingPlatforms: Map<string, FallingPlatformState> = new Map();
   private fallingPlatformTouches: Set<string> = new Set();
 
+  // Cached origin values for performance (defaults to 0)
+  private _originX: number = 0;
+  private _originY: number = 0;
+
   constructor(data: LevelData) {
     this.data = data;
+    this._originX = data.originX ?? 0;
+    this._originY = data.originY ?? 0;
+  }
+
+  // ========== COORDINATE CONVERSION HELPERS ==========
+
+  /** Get the X origin offset in tiles */
+  get originX(): number { return this._originX; }
+
+  /** Get the Y origin offset in tiles */
+  get originY(): number { return this._originY; }
+
+  /** Convert world X coordinate (pixels) to array column index */
+  worldToCol(worldX: number): number {
+    return Math.floor(worldX / TILE_SIZE) - this._originX;
+  }
+
+  /** Convert world Y coordinate (pixels) to array row index */
+  worldToRow(worldY: number): number {
+    return Math.floor(worldY / TILE_SIZE) - this._originY;
+  }
+
+  /** Convert array column index to world X coordinate (pixels, left edge of tile) */
+  colToWorldX(col: number): number {
+    return (col + this._originX) * TILE_SIZE;
+  }
+
+  /** Convert array row index to world Y coordinate (pixels, top edge of tile) */
+  rowToWorldY(row: number): number {
+    return (row + this._originY) * TILE_SIZE;
+  }
+
+  /** Check if array indices are within bounds */
+  isValidArrayIndex(col: number, row: number): boolean {
+    return row >= 0 && row < this.data.tiles.length &&
+      col >= 0 && col < (this.data.tiles[0]?.length ?? 0);
   }
 
   private hasLavaAbove(col: number, row: number): boolean {
@@ -54,21 +94,22 @@ export class Level {
   }
 
   // Verifica colisão com um retângulo
+  // Note: rect coordinates are in world space
   checkCollision(rect: Rect): { left: boolean; right: boolean; top: boolean; bottom: boolean; grounded: boolean } {
     const result = { left: false, right: false, top: false, bottom: false, grounded: false };
 
-    const startCol = Math.floor(rect.x / TILE_SIZE);
-    const endCol = Math.floor((rect.x + rect.width - 1) / TILE_SIZE);
-    const startRow = Math.floor(rect.y / TILE_SIZE);
-    const endRow = Math.floor((rect.y + rect.height - 1) / TILE_SIZE);
+    const startCol = this.worldToCol(rect.x);
+    const endCol = this.worldToCol(rect.x + rect.width - 1);
+    const startRow = this.worldToRow(rect.y);
+    const endRow = this.worldToRow(rect.y + rect.height - 1);
 
     for (let row = startRow; row <= endRow; row++) {
       for (let col = startCol; col <= endCol; col++) {
-        if (row < 0 || row >= this.data.tiles.length || col < 0 || col >= this.data.tiles[0].length) continue;
+        if (!this.isValidArrayIndex(col, row)) continue;
 
         const tile = this.getTile(col, row);
         // Decide solidez conservadora: plataformas contam como chão se o bottom atual está acima do topo+2
-        const tileTop = row * TILE_SIZE;
+        const tileTop = this.rowToWorldY(row);
         const entityBottom = rect.y + rect.height;
         let solid = false;
         if (
@@ -139,8 +180,10 @@ export class Level {
     let grounded = false;
     let tileHit: { type: number; col: number; row: number; side: 'top' | 'bottom' | 'left' | 'right' } | null = null;
 
-    const minX = 0;
-    const maxX = this.data.width * TILE_SIZE - rect.width;
+    // World-space boundaries using origin offset
+    const bounds = this.getBounds();
+    const minX = bounds.minX;
+    const maxX = bounds.maxX - rect.width;
 
     // Resolve horizontal primeiro (checa paredes sólidos, ignora PLATFORMS)
     const horizontalRect = { x: newX, y: rect.y, width: rect.width, height: rect.height };
@@ -148,11 +191,12 @@ export class Level {
 
     if (hCollision.collides) {
       if (velocity.x > 0) {
-        newX = hCollision.col * TILE_SIZE - rect.width;
-        tileHit = { type: hCollision.tile, col: hCollision.col, row: hCollision.row, side: 'left' };
+        // Convert array col to world X
+        newX = this.colToWorldX(hCollision.col) - rect.width;
+        tileHit = { type: hCollision.tile, col: hCollision.col + this._originX, row: hCollision.row + this._originY, side: 'left' };
       } else if (velocity.x < 0) {
-        newX = (hCollision.col + 1) * TILE_SIZE;
-        tileHit = { type: hCollision.tile, col: hCollision.col, row: hCollision.row, side: 'right' };
+        newX = this.colToWorldX(hCollision.col + 1);
+        tileHit = { type: hCollision.tile, col: hCollision.col + this._originX, row: hCollision.row + this._originY, side: 'right' };
       }
       newVelX = 0;
     }
@@ -175,16 +219,16 @@ export class Level {
         // Landing on tile
         if (vCollision.tile === TileType.LAVA_TOP || vCollision.tile === TileType.LAVA_FILL) {
           const offset = this.getLavaTopOffset(vCollision.col, vCollision.row);
-          newY = vCollision.row * TILE_SIZE + offset - rect.height;
+          newY = this.rowToWorldY(vCollision.row) + offset - rect.height;
         } else {
-          newY = vCollision.row * TILE_SIZE - rect.height;
+          newY = this.rowToWorldY(vCollision.row) - rect.height;
         }
         grounded = true;
-        tileHit = { type: vCollision.tile, col: vCollision.col, row: vCollision.row, side: 'bottom' };
+        tileHit = { type: vCollision.tile, col: vCollision.col + this._originX, row: vCollision.row + this._originY, side: 'bottom' };
       } else if (velocity.y < 0) {
         // Head hit
-        newY = (vCollision.row + 1) * TILE_SIZE;
-        tileHit = { type: vCollision.tile, col: vCollision.col, row: vCollision.row, side: 'top' };
+        newY = this.rowToWorldY(vCollision.row + 1);
+        tileHit = { type: vCollision.tile, col: vCollision.col + this._originX, row: vCollision.row + this._originY, side: 'top' };
       }
       newVelY = 0;
     }
@@ -198,16 +242,17 @@ export class Level {
   }
 
   // Horizontal collision check: ignore platforms when checking walls
+  // Note: rect coordinates are in world space, we convert to array indices
   private checkTileCollisionHorizontal(rect: Rect, _velX: number): { collides: boolean; col: number; row: number; tile: number } {
-    const startCol = Math.floor(rect.x / TILE_SIZE);
-    const endCol = Math.floor((rect.x + rect.width - 0.1) / TILE_SIZE);
-    const startRow = Math.floor(rect.y / TILE_SIZE);
-    const endRow = Math.floor((rect.y + rect.height - 0.1) / TILE_SIZE);
+    // Convert world coordinates to array indices
+    const startCol = this.worldToCol(rect.x);
+    const endCol = this.worldToCol(rect.x + rect.width - 0.1);
+    const startRow = this.worldToRow(rect.y);
+    const endRow = this.worldToRow(rect.y + rect.height - 0.1);
 
     for (let row = startRow; row <= endRow; row++) {
       for (let col = startCol; col <= endCol; col++) {
-        if (row < 0 || row >= this.data.tiles.length) continue;
-        if (col < 0 || col >= this.data.tiles[0].length) continue;
+        if (!this.isValidArrayIndex(col, row)) continue;
 
         const tile = this.getTile(col, row);
         // Ignora PLATFORMS para colisão lateral
@@ -228,8 +273,8 @@ export class Level {
           if (tile === TileType.LAVA_TOP || tile === TileType.LAVA_FILL) {
             const offset = this.getLavaTopOffset(col, row);
             if (offset > 0) {
-              const tileTop = row * TILE_SIZE + offset;
-              const tileBottom = (row + 1) * TILE_SIZE;
+              const tileTop = this.rowToWorldY(row) + offset;
+              const tileBottom = this.rowToWorldY(row + 1);
               if (rect.y + rect.height <= tileTop || rect.y >= tileBottom) {
                 continue;
               }
@@ -244,17 +289,19 @@ export class Level {
   }
 
   // Vertical collision check: consider platforms only when moving down and crossing from above
+  // Note: rect coordinates are in world space, we convert to array indices
   private checkTileCollisionVertical(rect: Rect, velY: number, prevRect?: Rect): { collides: boolean; col: number; row: number; tile: number } {
-    const startCol = Math.floor(rect.x / TILE_SIZE);
-    const endCol = Math.floor((rect.x + rect.width - 0.1) / TILE_SIZE);
+    // Convert world coordinates to array indices
+    const startCol = this.worldToCol(rect.x);
+    const endCol = this.worldToCol(rect.x + rect.width - 0.1);
 
     // Quando caindo, olhe a linha do pé
     if (velY > 0) {
-      const row = Math.floor((rect.y + rect.height - 0.1) / TILE_SIZE);
+      const row = this.worldToRow(rect.y + rect.height - 0.1);
       for (let col = startCol; col <= endCol; col++) {
-        if (row < 0 || row >= this.data.tiles.length || col < 0 || col >= this.data.tiles[0].length) continue;
+        if (!this.isValidArrayIndex(col, row)) continue;
         const tile = this.getTile(col, row);
-        const tileTop = row * TILE_SIZE;
+        const tileTop = this.rowToWorldY(row);
         // Plataformas: só colidem se o jogador vinha de cima e cruzou o topo nesse frame
         if (tile === TileType.PLATFORM || tile === TileType.PLATFORM_FALLING) {
           if (prevRect) {
@@ -274,7 +321,7 @@ export class Level {
 
         if (tile === TileType.LAVA_TOP || tile === TileType.LAVA_FILL) {
           const offset = this.getLavaTopOffset(col, row);
-          const lavaTop = row * TILE_SIZE + offset;
+          const lavaTop = this.rowToWorldY(row) + offset;
           if (prevRect) {
             const prevBottom = prevRect.y + prevRect.height;
             const newBottom = rect.y + rect.height;
@@ -307,9 +354,9 @@ export class Level {
 
     // Quando subindo, olhe a linha da cabeça, ignore PLATFORMS
     if (velY < 0) {
-      const row = Math.floor((rect.y + 0.1) / TILE_SIZE);
+      const row = this.worldToRow(rect.y + 0.1);
       for (let col = startCol; col <= endCol; col++) {
-        if (row < 0 || row >= this.data.tiles.length || col < 0 || col >= this.data.tiles[0].length) continue;
+        if (!this.isValidArrayIndex(col, row)) continue;
         const tile = this.getTile(col, row);
         if (
           tile === TileType.GROUND ||
@@ -334,8 +381,9 @@ export class Level {
 
   // Verifica se está em um buraco (gap)
   isInGap(rect: Rect): boolean {
-    // Verifica se caiu abaixo do mapa
-    if (rect.y > this.data.height * TILE_SIZE) {
+    // Verifica se caiu abaixo do mapa (using world coordinates)
+    const bounds = this.getBounds();
+    if (rect.y > bounds.maxY) {
       return true;
     }
     return false;
@@ -343,14 +391,14 @@ export class Level {
 
   // Verifica colisão com spikes
   checkSpikeCollision(rect: Rect): boolean {
-    const startCol = Math.floor(rect.x / TILE_SIZE);
-    const endCol = Math.floor((rect.x + rect.width - 1) / TILE_SIZE);
-    const startRow = Math.floor(rect.y / TILE_SIZE);
-    const endRow = Math.floor((rect.y + rect.height - 1) / TILE_SIZE);
+    const startCol = this.worldToCol(rect.x);
+    const endCol = this.worldToCol(rect.x + rect.width - 1);
+    const startRow = this.worldToRow(rect.y);
+    const endRow = this.worldToRow(rect.y + rect.height - 1);
 
     for (let row = startRow; row <= endRow; row++) {
       for (let col = startCol; col <= endCol; col++) {
-        if (row < 0 || row >= this.data.tiles.length || col < 0 || col >= this.data.tiles[0].length) continue;
+        if (!this.isValidArrayIndex(col, row)) continue;
 
         if (this.getTile(col, row) === TileType.SPIKE) {
           return true;
@@ -365,20 +413,20 @@ export class Level {
 
   // Verifica colisao com lava
   checkLavaCollision(rect: Rect): boolean {
-    const startCol = Math.floor(rect.x / TILE_SIZE);
-    const endCol = Math.floor((rect.x + rect.width - 1) / TILE_SIZE);
-    const startRow = Math.floor(rect.y / TILE_SIZE);
-    const endRow = Math.floor((rect.y + rect.height) / TILE_SIZE);
+    const startCol = this.worldToCol(rect.x);
+    const endCol = this.worldToCol(rect.x + rect.width - 1);
+    const startRow = this.worldToRow(rect.y);
+    const endRow = this.worldToRow(rect.y + rect.height);
 
     for (let row = startRow; row <= endRow; row++) {
       for (let col = startCol; col <= endCol; col++) {
-        if (row < 0 || row >= this.data.tiles.length || col < 0 || col >= this.data.tiles[0].length) continue;
+        if (!this.isValidArrayIndex(col, row)) continue;
         const tile = this.getTile(col, row);
         if (tile === TileType.LAVA_TOP || tile === TileType.LAVA_FILL) {
           const offset = this.getLavaTopOffset(col, row);
-          const lavaY = row * TILE_SIZE + offset;
+          const lavaY = this.rowToWorldY(row) + offset;
           const lavaH = TILE_SIZE - offset;
-          const lavaX = col * TILE_SIZE;
+          const lavaX = this.colToWorldX(col);
           const hit = rect.x <= lavaX + TILE_SIZE &&
             rect.x + rect.width >= lavaX &&
             rect.y <= lavaY + lavaH &&
@@ -543,13 +591,13 @@ export class Level {
     return list;
   }
 
-  // Obtém limites do nível para a câmera
+  // Obtém limites do nível para a câmera (in world pixels)
   getBounds(): { minX: number; maxX: number; minY: number; maxY: number } {
     return {
-      minX: 0,
-      maxX: this.data.width * TILE_SIZE,
-      minY: 0,
-      maxY: this.data.height * TILE_SIZE
+      minX: this._originX * TILE_SIZE,
+      maxX: (this._originX + this.data.width) * TILE_SIZE,
+      minY: this._originY * TILE_SIZE,
+      maxY: (this._originY + this.data.height) * TILE_SIZE
     };
   }
 

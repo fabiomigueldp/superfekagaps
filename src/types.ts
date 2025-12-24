@@ -122,6 +122,13 @@ export interface LevelData {
   width: number;
   height: number;
   tiles: number[][];
+
+  // World offset: allows the level to start at coordinates other than (0,0)
+  // The world coordinate is calculated as: (arrayIndex + origin) * TILE_SIZE
+  // Default: 0 for both (level starts at world origin)
+  originX?: number;  // X offset in tiles (can be negative)
+  originY?: number;  // Y offset in tiles (can be negative)
+
   playerSpawn: Vector2;
   enemies: EnemySpawnData[];
   collectibles: CollectibleSpawnData[];

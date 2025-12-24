@@ -29,8 +29,8 @@ export class EditorController {
 
     // Bounds Edge Drag State
     private isResizingBounds: boolean = false;
-    private activeEdge: 'right' | 'bottom' | 'corner' | null = null;
-    private hoveredEdge: 'right' | 'bottom' | 'corner' | null = null;
+    private activeEdge: 'left' | 'right' | 'top' | 'bottom' | 'corner-br' | 'corner-tl' | null = null;
+    private hoveredEdge: 'left' | 'right' | 'top' | 'bottom' | 'corner-br' | 'corner-tl' | null = null;
     private readonly EDGE_THRESHOLD: number = 8; // pixels to detect edge hover
 
     // UI Elements
@@ -269,6 +269,8 @@ export class EditorController {
 
         const width = this.levelData.tiles[0]?.length || 100;
         const height = this.levelData.tiles.length;
+        const originX = this.levelData.originX ?? 0;
+        const originY = this.levelData.originY ?? 0;
 
         // Update input fields
         if (this.uiBoundsWidth) this.uiBoundsWidth.value = width.toString();
@@ -276,7 +278,10 @@ export class EditorController {
 
         // Update info display
         if (this.uiBoundsInfoSize) {
-            this.uiBoundsInfoSize.textContent = `Size: ${width} × ${height} tiles`;
+            const originInfo = (originX !== 0 || originY !== 0)
+                ? ` @ (${originX}, ${originY})`
+                : '';
+            this.uiBoundsInfoSize.textContent = `Size: ${width} × ${height} tiles${originInfo}`;
         }
         if (this.uiBoundsInfoPixels) {
             this.uiBoundsInfoPixels.textContent = `${width * TILE_SIZE} × ${height * TILE_SIZE} px`;
@@ -715,16 +720,27 @@ export class EditorController {
         if (!this.levelData) return;
         const tiles = this.levelData.tiles;
 
+        // Get origin offset
+        const originX = this.levelData.originX ?? 0;
+        const originY = this.levelData.originY ?? 0;
+
         // Visual region uses ZOOM-adjusted visible area
         // We use the transform from the context to be accurate
         const t = ctx.getTransform();
         const visibleWidth = ctx.canvas.width / t.a;
         const visibleHeight = ctx.canvas.height / t.d;
 
-        const startCol = Math.floor(this.camera.x / TILE_SIZE);
-        const endCol = startCol + Math.ceil(visibleWidth / TILE_SIZE) + 1;
-        const startRow = Math.floor(this.camera.y / TILE_SIZE);
-        const endRow = startRow + Math.ceil(visibleHeight / TILE_SIZE) + 1;
+        // Calculate visible range in WORLD tile coordinates
+        const worldStartCol = Math.floor(this.camera.x / TILE_SIZE);
+        const worldEndCol = worldStartCol + Math.ceil(visibleWidth / TILE_SIZE) + 1;
+        const worldStartRow = Math.floor(this.camera.y / TILE_SIZE);
+        const worldEndRow = worldStartRow + Math.ceil(visibleHeight / TILE_SIZE) + 1;
+
+        // Convert to ARRAY indices
+        const startCol = worldStartCol - originX;
+        const endCol = worldEndCol - originX;
+        const startRow = worldStartRow - originY;
+        const endRow = worldEndRow - originY;
 
         // 1. Draw Tiles
         for (let r = startRow; r < endRow; r++) {
@@ -732,8 +748,12 @@ export class EditorController {
             for (let c = startCol; c < endCol; c++) {
                 if (c < 0 || c >= tiles[0].length) continue;
                 const tile = tiles[r][c];
-                const x = Math.floor(c * TILE_SIZE - this.camera.x);
-                const y = Math.floor(r * TILE_SIZE - this.camera.y);
+
+                // Convert array index back to world position for rendering
+                const worldCol = c + originX;
+                const worldRow = r + originY;
+                const x = Math.floor(worldCol * TILE_SIZE - this.camera.x);
+                const y = Math.floor(worldRow * TILE_SIZE - this.camera.y);
 
                 if (tile !== 0) {
                     // Special Handling for Editor-Only Visuals
@@ -851,9 +871,13 @@ export class EditorController {
         const boundsWidth = this.levelData.tiles[0]?.length * TILE_SIZE || 0;
         const boundsHeight = this.levelData.tiles.length * TILE_SIZE;
 
-        // Bounds position in screen coordinates
-        const boundsLeft = -this.camera.x;
-        const boundsTop = -this.camera.y;
+        // Get origin offset
+        const originX = (this.levelData.originX ?? 0) * TILE_SIZE;
+        const originY = (this.levelData.originY ?? 0) * TILE_SIZE;
+
+        // Bounds position in screen coordinates (considering origin)
+        const boundsLeft = originX - this.camera.x;
+        const boundsTop = originY - this.camera.y;
         const boundsRight = boundsLeft + boundsWidth;
         const boundsBottom = boundsTop + boundsHeight;
 
@@ -891,9 +915,13 @@ export class EditorController {
         const boundsWidth = this.levelData.tiles[0]?.length * TILE_SIZE || 0;
         const boundsHeight = this.levelData.tiles.length * TILE_SIZE;
 
-        // Position in screen space
-        const x = -this.camera.x;
-        const y = -this.camera.y;
+        // Get origin offset
+        const originX = (this.levelData.originX ?? 0) * TILE_SIZE;
+        const originY = (this.levelData.originY ?? 0) * TILE_SIZE;
+
+        // Position in screen space (considering origin)
+        const x = originX - this.camera.x;
+        const y = originY - this.camera.y;
 
         // Draw border
         ctx.strokeStyle = this.boundsColor;
@@ -913,10 +941,16 @@ export class EditorController {
         // Bottom-right corner
         ctx.fillRect(x + boundsWidth - markerSize / 2, y + boundsHeight - markerSize / 2, markerSize, markerSize);
 
-        // Draw size label near top-left
+        // Draw size label near top-left (also show origin if non-zero)
         ctx.font = `${10 / transform.a}px Consolas`;
         ctx.fillStyle = this.boundsColor;
-        const label = `${this.levelData.tiles[0]?.length || 0} × ${this.levelData.tiles.length}`;
+        const width = this.levelData.tiles[0]?.length || 0;
+        const height = this.levelData.tiles.length;
+        const originLabelX = this.levelData.originX ?? 0;
+        const originLabelY = this.levelData.originY ?? 0;
+        const label = originLabelX !== 0 || originLabelY !== 0
+            ? `${width} × ${height} @ (${originLabelX}, ${originLabelY})`
+            : `${width} × ${height}`;
         ctx.fillText(label, x + 4 / transform.a, y - 4 / transform.a);
     }
 
@@ -1065,31 +1099,46 @@ export class EditorController {
         this.activeEdge = null;
     }
 
-    private detectBoundsEdge(worldX: number, worldY: number): 'right' | 'bottom' | 'corner' | null {
+    private detectBoundsEdge(worldX: number, worldY: number): 'left' | 'right' | 'top' | 'bottom' | 'corner-br' | 'corner-tl' | null {
         if (!this.levelData || !this.showBounds) return null;
 
-        const boundsWidth = (this.levelData.tiles[0]?.length || 0) * TILE_SIZE;
-        const boundsHeight = this.levelData.tiles.length * TILE_SIZE;
+        // Get level bounds considering origin offset
+        const originX = this.levelData.originX ?? 0;
+        const originY = this.levelData.originY ?? 0;
+        const boundsLeft = originX * TILE_SIZE;
+        const boundsTop = originY * TILE_SIZE;
+        const boundsRight = (originX + (this.levelData.tiles[0]?.length || 0)) * TILE_SIZE;
+        const boundsBottom = (originY + this.levelData.tiles.length) * TILE_SIZE;
 
         // Threshold in world coordinates (scaled by zoom)
         const threshold = this.EDGE_THRESHOLD / this.zoom;
 
-        // Check corner first (has priority)
-        const nearRight = Math.abs(worldX - boundsWidth) < threshold;
-        const nearBottom = Math.abs(worldY - boundsHeight) < threshold;
+        // Check edges
+        const nearLeft = Math.abs(worldX - boundsLeft) < threshold;
+        const nearRight = Math.abs(worldX - boundsRight) < threshold;
+        const nearTop = Math.abs(worldY - boundsTop) < threshold;
+        const nearBottom = Math.abs(worldY - boundsBottom) < threshold;
 
+        // Check corners first (have priority)
         if (nearRight && nearBottom) {
-            return 'corner';
+            return 'corner-br';
+        }
+        if (nearLeft && nearTop) {
+            return 'corner-tl';
         }
 
-        // Check right edge (within vertical bounds)
-        if (nearRight && worldY >= 0 && worldY <= boundsHeight) {
+        // Check individual edges (within perpendicular bounds)
+        if (nearRight && worldY >= boundsTop && worldY <= boundsBottom) {
             return 'right';
         }
-
-        // Check bottom edge (within horizontal bounds)
-        if (nearBottom && worldX >= 0 && worldX <= boundsWidth) {
+        if (nearLeft && worldY >= boundsTop && worldY <= boundsBottom) {
+            return 'left';
+        }
+        if (nearBottom && worldX >= boundsLeft && worldX <= boundsRight) {
             return 'bottom';
+        }
+        if (nearTop && worldX >= boundsLeft && worldX <= boundsRight) {
+            return 'top';
         }
 
         return null;
@@ -1098,44 +1147,120 @@ export class EditorController {
     private handleBoundsResize(worldX: number, worldY: number): void {
         if (!this.levelData || !this.activeEdge) return;
 
+        const originX = this.levelData.originX ?? 0;
+        const originY = this.levelData.originY ?? 0;
         const currentWidth = this.levelData.tiles[0]?.length || 100;
         const currentHeight = this.levelData.tiles.length;
 
-        // Calculate new size based on mouse position (snap to grid)
-        const newWidth = this.activeEdge === 'right' || this.activeEdge === 'corner'
-            ? Math.max(10, Math.ceil(worldX / TILE_SIZE))
-            : currentWidth;
+        // Calculate new world tile position
+        const mouseTileX = Math.floor(worldX / TILE_SIZE);
+        const mouseTileY = Math.floor(worldY / TILE_SIZE);
 
-        const newHeight = this.activeEdge === 'bottom' || this.activeEdge === 'corner'
-            ? Math.max(5, Math.ceil(worldY / TILE_SIZE))
-            : currentHeight;
+        let newWidth = currentWidth;
+        let newHeight = currentHeight;
+        let newOriginX = originX;
+        let newOriginY = originY;
 
-        // Only resize if changed (to avoid excessive updates)
-        if (newWidth !== currentWidth || newHeight !== currentHeight) {
-            this.resizeTileGrid(newWidth, newHeight);
+        // Handle right/left edges
+        if (this.activeEdge === 'right' || this.activeEdge === 'corner-br') {
+            // Expanding/shrinking from right
+            newWidth = Math.max(10, mouseTileX - originX + 1);
         }
+        if (this.activeEdge === 'left' || this.activeEdge === 'corner-tl') {
+            // Expanding/shrinking from left - changes origin and width
+            const rightEdge = originX + currentWidth;
+            const newLeft = Math.min(mouseTileX, rightEdge - 10);
+            newOriginX = newLeft;
+            newWidth = rightEdge - newLeft;
+        }
+
+        // Handle bottom/top edges  
+        if (this.activeEdge === 'bottom' || this.activeEdge === 'corner-br') {
+            // Expanding/shrinking from bottom
+            newHeight = Math.max(5, mouseTileY - originY + 1);
+        }
+        if (this.activeEdge === 'top' || this.activeEdge === 'corner-tl') {
+            // Expanding/shrinking from top - changes origin and height
+            const bottomEdge = originY + currentHeight;
+            const newTop = Math.min(mouseTileY, bottomEdge - 5);
+            newOriginY = newTop;
+            newHeight = bottomEdge - newTop;
+        }
+
+        // Only resize if something changed
+        const originChanged = newOriginX !== originX || newOriginY !== originY;
+        const sizeChanged = newWidth !== currentWidth || newHeight !== currentHeight;
+
+        if (originChanged || sizeChanged) {
+            if (originChanged) {
+                // Need to shift tiles when origin changes
+                this.shiftAndResizeTileGrid(newOriginX, newOriginY, newWidth, newHeight);
+            } else {
+                this.resizeTileGrid(newWidth, newHeight);
+            }
+        }
+    }
+
+    private shiftAndResizeTileGrid(newOriginX: number, newOriginY: number, newWidth: number, newHeight: number): void {
+        if (!this.levelData) return;
+
+        const oldOriginX = this.levelData.originX ?? 0;
+        const oldOriginY = this.levelData.originY ?? 0;
+        const oldTiles = this.levelData.tiles;
+        const oldHeight = oldTiles.length;
+        const oldWidth = oldTiles[0]?.length || 0;
+
+        // Calculate shift in array indices
+        const shiftX = oldOriginX - newOriginX; // Positive = adding columns on left
+        const shiftY = oldOriginY - newOriginY; // Positive = adding rows on top
+
+        const newTiles: number[][] = [];
+
+        for (let newRow = 0; newRow < newHeight; newRow++) {
+            const newRowArr: number[] = [];
+            for (let newCol = 0; newCol < newWidth; newCol++) {
+                // Map new array position to old array position
+                const oldRow = newRow - shiftY;
+                const oldCol = newCol - shiftX;
+
+                if (oldRow >= 0 && oldRow < oldHeight && oldCol >= 0 && oldCol < oldWidth) {
+                    newRowArr.push(oldTiles[oldRow][oldCol]);
+                } else {
+                    newRowArr.push(TileType.EMPTY);
+                }
+            }
+            newTiles.push(newRowArr);
+        }
+
+        this.levelData.tiles = newTiles;
+        this.levelData.originX = newOriginX;
+        this.levelData.originY = newOriginY;
+        this.levelData.width = newWidth;
+        this.levelData.height = newHeight;
+
+        this.updateBoundsUI();
+        console.log(`📐 Shifted & resized level: origin (${newOriginX}, ${newOriginY}), size ${newWidth}×${newHeight} tiles`);
     }
 
     private updateCursor(): void {
         if (!this.canvas) return;
 
-        if (this.isResizingBounds) {
-            // Keep resize cursor while dragging
-            if (this.activeEdge === 'corner') {
-                this.canvas.style.cursor = 'nwse-resize';
-            } else if (this.activeEdge === 'right') {
-                this.canvas.style.cursor = 'ew-resize';
-            } else if (this.activeEdge === 'bottom') {
-                this.canvas.style.cursor = 'ns-resize';
-            }
-        } else if (this.hoveredEdge) {
-            // Show resize cursor on hover
-            if (this.hoveredEdge === 'corner') {
-                this.canvas.style.cursor = 'nwse-resize';
-            } else if (this.hoveredEdge === 'right') {
-                this.canvas.style.cursor = 'ew-resize';
-            } else if (this.hoveredEdge === 'bottom') {
-                this.canvas.style.cursor = 'ns-resize';
+        const edge = this.isResizingBounds ? this.activeEdge : this.hoveredEdge;
+
+        if (edge) {
+            switch (edge) {
+                case 'corner-br':
+                case 'corner-tl':
+                    this.canvas.style.cursor = 'nwse-resize';
+                    break;
+                case 'left':
+                case 'right':
+                    this.canvas.style.cursor = 'ew-resize';
+                    break;
+                case 'top':
+                case 'bottom':
+                    this.canvas.style.cursor = 'ns-resize';
+                    break;
             }
         } else {
             this.canvas.style.cursor = 'crosshair';
@@ -1152,7 +1277,7 @@ export class EditorController {
         const worldMouseX = (mouseX / this.zoom) + this.camera.x;
         const worldMouseY = (mouseY / this.zoom) + this.camera.y;
 
-        const zoomSpeed = 0.0005; // Reduced sensitivity (was 0.001)
+        const zoomSpeed = 0.0002; // ~2% per scroll step (was 0.0005 = ~5%)
         const zoomDelta = -e.deltaY * zoomSpeed;
         const newZoom = Math.max(0.1, Math.min(5, this.zoom + zoomDelta));
 
@@ -1180,8 +1305,13 @@ export class EditorController {
         const worldX = (screenX / this.zoom) + this.camera.x;
         const worldY = (screenY / this.zoom) + this.camera.y;
 
-        const col = Math.floor(worldX / TILE_SIZE);
-        const row = Math.floor(worldY / TILE_SIZE);
+        // Convert world tile coordinates to array indices
+        const originX = this.levelData.originX ?? 0;
+        const originY = this.levelData.originY ?? 0;
+        const worldCol = Math.floor(worldX / TILE_SIZE);
+        const worldRow = Math.floor(worldY / TILE_SIZE);
+        const col = worldCol - originX;
+        const row = worldRow - originY;
 
         if (row >= 0 && row < this.levelData.tiles.length &&
             col >= 0 && col < this.levelData.tiles[0].length) {
@@ -1189,16 +1319,16 @@ export class EditorController {
             // Special Logic for Entities
             if (this.selectedTile === 999) {
                 // Paint Minion
-                // Check if already exists (using GRID coordinates)
+                // Use WORLD tile coordinates for entity positions (they're stored in world space)
                 const alreadyExists = this.levelData.enemies.some(e =>
-                    Math.abs(e.position.x - col) < 0.1 &&
-                    Math.abs(e.position.y - row) < 0.1
+                    Math.abs(e.position.x - worldCol) < 0.1 &&
+                    Math.abs(e.position.y - worldRow) < 0.1
                 );
 
                 if (!alreadyExists) {
                     this.levelData.enemies.push({
                         type: EnemyType.MINION,
-                        position: { x: col, y: row } // Store as TILE coordinates
+                        position: { x: worldCol, y: worldRow } // Store as WORLD tile coordinates
                     });
                 }
             }
@@ -1206,14 +1336,14 @@ export class EditorController {
                 // ERASE Tool: Clears Tile AND Entities
                 this.levelData.tiles[row][col] = 0;
 
-                // Remove enemies at this location (using GRID comparison)
+                // Remove enemies at this location (using WORLD TILE coordinates)
                 this.levelData.enemies = this.levelData.enemies.filter(e => {
-                    return Math.abs(e.position.x - col) > 0.1 || Math.abs(e.position.y - row) > 0.1;
+                    return Math.abs(e.position.x - worldCol) > 0.1 || Math.abs(e.position.y - worldRow) > 0.1;
                 });
 
-                // Remove collectibles at this location (using GRID comparison)
+                // Remove collectibles at this location (using WORLD TILE coordinates)
                 this.levelData.collectibles = this.levelData.collectibles.filter(c => {
-                    return Math.abs(c.position.x - col) > 0.1 || Math.abs(c.position.y - row) > 0.1;
+                    return Math.abs(c.position.x - worldCol) > 0.1 || Math.abs(c.position.y - worldRow) > 0.1;
                 });
             }
             else {

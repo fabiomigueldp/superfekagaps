@@ -671,13 +671,27 @@ export class Renderer {
 
   // === RENDERIZAÇÃO DE TILES ===
 
-  drawTiles(tiles: number[][], camera: CameraData): void {
+  /**
+   * Draw tiles from a 2D array.
+   * @param tiles The 2D array of tile types
+   * @param camera Camera data for screen offset
+   * @param originX World X offset in tiles (default 0)
+   * @param originY World Y offset in tiles (default 0)
+   */
+  drawTiles(tiles: number[][], camera: CameraData, originX: number = 0, originY: number = 0): void {
     const cam = this.snapCamera(camera);
 
-    const startCol = Math.floor(cam.x / TILE_SIZE);
-    const endCol = Math.ceil((cam.x + GAME_WIDTH) / TILE_SIZE);
-    const startRow = Math.floor(cam.y / TILE_SIZE);
-    const endRow = Math.ceil((cam.y + GAME_HEIGHT) / TILE_SIZE);
+    // Calculate visible range in world tile coordinates
+    const worldStartCol = Math.floor(cam.x / TILE_SIZE);
+    const worldEndCol = Math.ceil((cam.x + GAME_WIDTH) / TILE_SIZE);
+    const worldStartRow = Math.floor(cam.y / TILE_SIZE);
+    const worldEndRow = Math.ceil((cam.y + GAME_HEIGHT) / TILE_SIZE);
+
+    // Convert to array indices
+    const startCol = worldStartCol - originX;
+    const endCol = worldEndCol - originX;
+    const startRow = worldStartRow - originY;
+    const endRow = worldEndRow - originY;
 
     for (let row = startRow; row <= endRow; row++) {
       for (let col = startCol; col <= endCol; col++) {
@@ -686,8 +700,11 @@ export class Renderer {
         const tile = tiles[row][col];
         if (tile === TileType.EMPTY) continue;
 
-        const x = col * TILE_SIZE - cam.x;
-        const y = row * TILE_SIZE - cam.y;
+        // Convert array index back to world position for rendering
+        const worldCol = col + originX;
+        const worldRow = row + originY;
+        const x = worldCol * TILE_SIZE - cam.x;
+        const y = worldRow * TILE_SIZE - cam.y;
 
         this.drawTile(tile, x, y, tiles, row, col);
       }
