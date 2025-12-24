@@ -215,7 +215,7 @@ export class Game {
       gameState: this.state,
       isBossLevel: this.level?.data.isBossLevel ?? false,
       isDead: this.player?.data.isDead ?? false,
-      powerupActive: this.player ? this.player.data.coffeeTimer > 0 : false,
+      powerupActive: this.player ? this.player.data.miniFantaTimer > 0 : false,
       deliciaMode: this.deliciaMode
     });
 
@@ -329,11 +329,11 @@ export class Game {
         } else if (tileType === TileType.HIDDEN_BLOCK) {
           this.level.setTile(th.col, th.row, TileType.BRICK);
           this.audio.playBlockBump();
-        } else if (tileType === TileType.POWERUP_BLOCK_COFFEE || tileType === TileType.POWERUP_BLOCK_HELMET) {
+        } else if (tileType === TileType.POWERUP_BLOCK_MINI_FANTA || tileType === TileType.POWERUP_BLOCK_HELMET) {
           // Troca por usado e spawna power-up
           const newTile = TileType.BLOCK_USED;
           this.level.setTile(th.col, th.row, newTile);
-          const collectType = tileType === TileType.POWERUP_BLOCK_COFFEE ? CollectibleType.COFFEE : CollectibleType.HELMET;
+          const collectType = tileType === TileType.POWERUP_BLOCK_MINI_FANTA ? CollectibleType.MINI_FANTA : CollectibleType.HELMET;
           const spawnX = th.col * TILE_SIZE;
           const spawnY = th.row * TILE_SIZE - 16;
           this.collectibles.push({
@@ -643,7 +643,7 @@ export class Game {
       this.level.data.name,
       this.audio.isEnabled(),
       this.player.data.hasHelmet,
-      this.player.data.coffeeTimer
+      this.player.data.miniFantaTimer
     );
 
     // Touch controls
@@ -657,7 +657,7 @@ export class Game {
       levelId: this.level?.data.id ?? null,
       isBossLevel: this.level?.data.isBossLevel ?? false,
       playerAlive: this.player ? !this.player.data.isDead : true,
-      powerupActive: this.player ? this.player.data.coffeeTimer > 0 : false,
+      powerupActive: this.player ? this.player.data.miniFantaTimer > 0 : false,
       gameState: newState,
       deliciaMode: this.deliciaMode
     });
@@ -783,10 +783,10 @@ export class Game {
           newRow.push(TileType.EMPTY);
           continue;
         }
-        if (tile === TileType.COIN || tile === TileType.POWERUP_COFFEE || tile === TileType.POWERUP_HELMET) {
+        if (tile === TileType.COIN || tile === TileType.POWERUP_MINI_FANTA || tile === TileType.POWERUP_HELMET) {
           // Extrai item do grid para entidade
           let type = CollectibleType.COIN;
-          if (tile === TileType.POWERUP_COFFEE) type = CollectibleType.COFFEE;
+          if (tile === TileType.POWERUP_MINI_FANTA) type = CollectibleType.MINI_FANTA;
           if (tile === TileType.POWERUP_HELMET) type = CollectibleType.HELMET;
 
           levelData.collectibles.push({
@@ -1163,9 +1163,9 @@ export class Game {
             );
             break;
 
-          case CollectibleType.COFFEE:
+          case CollectibleType.MINI_FANTA:
             if (this.player) {
-              this.player.collectCoffee();
+              this.player.collectMiniFanta();
             }
             this.audio.playPowerup();
             break;
@@ -1244,10 +1244,10 @@ export class Game {
       const targetRow = impact.row;
       const tileBelow = this.level.getTile(targetCol, targetRow);
 
-      if (tileBelow === TileType.POWERUP_BLOCK_HELMET || tileBelow === TileType.POWERUP_BLOCK_COFFEE) {
+      if (tileBelow === TileType.POWERUP_BLOCK_HELMET || tileBelow === TileType.POWERUP_BLOCK_MINI_FANTA) {
         // Ativa bloco de powerup com a sentada
         this.level.setTile(targetCol, targetRow, TileType.BLOCK_USED);
-        const collectType = tileBelow === TileType.POWERUP_BLOCK_COFFEE ? CollectibleType.COFFEE : CollectibleType.HELMET;
+        const collectType = tileBelow === TileType.POWERUP_BLOCK_MINI_FANTA ? CollectibleType.MINI_FANTA : CollectibleType.HELMET;
 
         // Spawn do item (pop up)
         const spawnX = targetCol * TILE_SIZE;
@@ -1467,7 +1467,7 @@ export class Game {
     return tile === TileType.GROUND ||
       tile === TileType.BRICK ||
       tile === TileType.BRICK_BREAKABLE ||
-      tile === TileType.POWERUP_BLOCK_COFFEE ||
+      tile === TileType.POWERUP_BLOCK_MINI_FANTA ||
       tile === TileType.POWERUP_BLOCK_HELMET ||
       tile === TileType.BLOCK_USED ||
       tile === TileType.PLATFORM ||
@@ -1482,7 +1482,7 @@ export class Game {
     return tile === TileType.GROUND ||
       tile === TileType.BRICK ||
       tile === TileType.BRICK_BREAKABLE ||
-      tile === TileType.POWERUP_BLOCK_COFFEE ||
+      tile === TileType.POWERUP_BLOCK_MINI_FANTA ||
       tile === TileType.POWERUP_BLOCK_HELMET ||
       tile === TileType.BLOCK_USED ||
       tile === TileType.PLATFORM ||

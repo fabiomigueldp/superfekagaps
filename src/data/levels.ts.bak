@@ -42,7 +42,7 @@ export const LEVEL_1_1: LevelData = {
     { type: CollectibleType.COIN, position: { x: 30, y: 7 } },
     { type: CollectibleType.COIN, position: { x: 32, y: 5 } },
     // Café power-up
-    { type: CollectibleType.COFFEE, position: { x: 45, y: 6 } },
+    { type: CollectibleType.MINI_FANTA, position: { x: 45, y: 6 } },
     // Mais moedas
     { type: CollectibleType.COIN, position: { x: 50, y: 7 } },
     { type: CollectibleType.COIN, position: { x: 51, y: 7 } },
@@ -1082,7 +1082,7 @@ export const LEVEL_1_2: LevelData = {
     { type: CollectibleType.COIN, position: { x: 40, y: 7 } },
     { type: CollectibleType.COIN, position: { x: 41, y: 7 } },
     // Café no meio
-    { type: CollectibleType.COFFEE, position: { x: 50, y: 5 } },
+    { type: CollectibleType.MINI_FANTA, position: { x: 50, y: 5 } },
     // Moedas nas plataformas altas
     { type: CollectibleType.COIN, position: { x: 55, y: 4 } },
     { type: CollectibleType.COIN, position: { x: 60, y: 4 } },

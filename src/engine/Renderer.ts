@@ -288,7 +288,7 @@ export class Renderer {
       }
 
       // Fanta icon (High Res)
-      if (p.coffeeTimer > 0) {
+      if (p.miniFantaTimer > 0) {
         const x = Math.round(132 * pixelScale);
         const y = Math.round(4 * pixelScale);
         const w = Math.max(1, Math.round(6 * pixelScale));
@@ -304,7 +304,7 @@ export class Renderer {
 
         // Bar
         const maxTime = 10000;
-        const pct = Math.max(0, Math.min(1, p.coffeeTimer / maxTime));
+        const pct = Math.max(0, Math.min(1, p.miniFantaTimer / maxTime));
         const barW = Math.round(10 * pixelScale * pct);
         ctx.fillStyle = '#FFA500';
         ctx.fillRect(x, y + h + Math.round(1 * pixelScale), barW, Math.max(1, Math.round(2 * pixelScale)));
@@ -768,7 +768,7 @@ export class Renderer {
       case TileType.HIDDEN_BLOCK:
         // Hidden block: no render until revealed
         break;
-      case TileType.POWERUP_BLOCK_COFFEE:
+      case TileType.POWERUP_BLOCK_MINI_FANTA:
       case TileType.POWERUP_BLOCK_HELMET:
         this.drawPowerupBlock(x, y, type, ctx);
         break;
@@ -871,7 +871,7 @@ export class Renderer {
     ctx.fillStyle = '#000000';
     ctx.font = '10px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText(type === TileType.POWERUP_BLOCK_COFFEE ? 'F' : 'H', x + TILE_SIZE / 2, y + TILE_SIZE / 2 + 3);
+    ctx.fillText(type === TileType.POWERUP_BLOCK_MINI_FANTA ? 'F' : 'H', x + TILE_SIZE / 2, y + TILE_SIZE / 2 + 3);
   }
 
   private drawUsedBlock(x: number, y: number, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
@@ -1238,7 +1238,7 @@ export class Renderer {
     }
 
     // Efeito de Mini Fanta (Fizz & Trail)
-    if (player.coffeeTimer > 0) {
+    if (player.miniFantaTimer > 0) {
       ctx.save();
       const now = Date.now();
 
@@ -1625,7 +1625,7 @@ export class Renderer {
       case CollectibleType.COIN:
         this.drawCoin(x, y, collectible.animationTimer, ctx);
         break;
-      case CollectibleType.COFFEE:
+      case CollectibleType.MINI_FANTA:
         this.drawFanta(x, y, collectible.animationTimer, ctx);
         break;
       case CollectibleType.HELMET:
@@ -1980,10 +1980,10 @@ export class Renderer {
 
   // === HUD ===
 
-  drawHUD(score: number, lives: number, time: number, level: string, soundEnabled: boolean, hasHelmet: boolean, coffeeTimer: number): void {
+  drawHUD(score: number, lives: number, time: number, level: string, soundEnabled: boolean, hasHelmet: boolean, miniFantaTimer: number): void {
     // Cache HUD for on-screen high-res rendering
     this.lastUIType = 'HUD';
-    this.lastUIParams = { score, lives, time, level, soundEnabled, hasHelmet, coffeeTimer };
+    this.lastUIParams = { score, lives, time, level, soundEnabled, hasHelmet, miniFantaTimer };
     const ctx = this.offscreenCtx;
 
     // Fundo do HUD
@@ -2007,8 +2007,8 @@ export class Renderer {
       this.drawHelmetIcon(118, 4);
     }
 
-    if (coffeeTimer > 0) {
-      this.drawFantaIcon(132, 4, coffeeTimer);
+    if (miniFantaTimer > 0) {
+      this.drawFantaIcon(132, 4, miniFantaTimer);
     }
 
 

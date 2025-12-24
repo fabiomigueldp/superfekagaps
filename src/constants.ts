@@ -127,12 +127,12 @@ export enum TileType {
   CHECKPOINT = 5,
   FLAG = 6,
   COIN = 7,
-  POWERUP_COFFEE = 8, // (legacy) not used as tile by default
+  POWERUP_MINI_FANTA = 8, // (legacy) not used as tile by default
   POWERUP_HELMET = 9, // (legacy) not used as tile by default
 
   // Novos tipos para suporte de gameplay
   BRICK_BREAKABLE = 10,
-  POWERUP_BLOCK_COFFEE = 11,
+  POWERUP_BLOCK_MINI_FANTA = 11,
   POWERUP_BLOCK_HELMET = 12,
   BLOCK_USED = 13,
   SPRING = 14,

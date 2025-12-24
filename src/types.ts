@@ -45,7 +45,7 @@ export interface PlayerData extends Entity {
   deathTimerMax: number;
   invincibleTimer: number;
   hasHelmet: boolean;
-  coffeeTimer: number;
+  miniFantaTimer: number;
   animationFrame: number;
   animationTimer: number;
   groundPoundState: GroundPoundState;
@@ -83,7 +83,7 @@ export interface CollectibleData extends Entity {
 
 export enum CollectibleType {
   COIN = 'COIN',
-  COFFEE = 'COFFEE',
+  MINI_FANTA = 'MINI_FANTA',
   HELMET = 'HELMET',
 }
 

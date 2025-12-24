@@ -23,6 +23,7 @@ export class EditorController {
     private uiPalette: HTMLDivElement;
     private uiFileLabel: HTMLSpanElement;
     private uiShowBgChk: HTMLInputElement;
+    private uiZoomLabel: HTMLSpanElement;
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
@@ -69,6 +70,7 @@ export class EditorController {
         this.uiPalette = document.getElementById('tile-palette') as HTMLDivElement;
         this.uiFileLabel = document.getElementById('current-file-label') as HTMLSpanElement;
         this.uiShowBgChk = document.getElementById('chk-show-bg') as HTMLInputElement;
+        this.uiZoomLabel = document.getElementById('zoom-level') as HTMLSpanElement;
 
         this.bindEvents();
         this.buildPalette();
@@ -86,6 +88,7 @@ export class EditorController {
             const success = await this.fs.mount();
             if (success) {
                 this.refreshLevelList();
+                this.selectTab('tab-levels');
             }
         });
 
@@ -148,6 +151,11 @@ export class EditorController {
             this.ensureTheme();
             this.levelData.theme!.skyGradient[1] = (e.target as HTMLInputElement).value;
         });
+    }
+
+    private selectTab(tabId: string) {
+        const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`) as HTMLElement;
+        if (btn) btn.click();
     }
 
     private ensureTheme() {
@@ -261,7 +269,7 @@ export class EditorController {
             { id: TileType.SPRING, label: 'Spring' },
             { id: TileType.LAVA_TOP, label: 'Lava' },
             { id: TileType.COIN, label: 'Coin' },
-            { id: TileType.POWERUP_COFFEE, label: 'Coffee' },
+            { id: TileType.POWERUP_MINI_FANTA, label: 'Mini Fanta' },
             { id: TileType.POWERUP_HELMET, label: 'Helmet' },
             { id: TileType.HIDDEN_BLOCK, label: 'Hidden' },
             { id: TileType.CHECKPOINT, label: 'Check' },
@@ -292,7 +300,7 @@ export class EditorController {
                 // Special handling for Entity-Tiles
                 // Special handling for Entity-Tiles
                 if (t.id === TileType.COIN) renderer.drawCoin(0, 0, 0, ctx);
-                else if (t.id === TileType.POWERUP_COFFEE) renderer.drawFanta(0, 0, 0, ctx);
+                else if (t.id === TileType.POWERUP_MINI_FANTA) renderer.drawFanta(0, 0, 0, ctx);
                 else if (t.id === TileType.POWERUP_HELMET) renderer.drawHelmet(0, 0, ctx);
                 else if (t.id === TileType.HIDDEN_BLOCK) {
                     ctx.globalAlpha = 0.5;
@@ -681,6 +689,11 @@ export class EditorController {
 
         // Apply new zoom
         this.zoom = newZoom;
+
+        // Update Zoom Label
+        if (this.uiZoomLabel) {
+            this.uiZoomLabel.innerText = Math.round(this.zoom * 100) + '%';
+        }
 
         // Adjust camera so that worldMouse is still under mouseX/mouseY
         // newWorldMouseX = (mouseX / newZoom) + newCameraX

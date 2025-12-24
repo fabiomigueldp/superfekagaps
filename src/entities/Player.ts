@@ -1,7 +1,7 @@
 // Entidade Player (Feka) - Super Feka Gaps
 
-import { 
-  GRAVITY, MAX_FALL_SPEED, PLAYER_SPEED, PLAYER_RUN_SPEED, 
+import {
+  GRAVITY, MAX_FALL_SPEED, PLAYER_SPEED, PLAYER_RUN_SPEED,
   PLAYER_JUMP_FORCE, PLAYER_ACCELERATION, PLAYER_FRICTION,
   ICE_FRICTION, COYOTE_TIME, JUMP_BUFFER_TIME, TILE_SIZE, TileType,
   SPRING_BOOST,
@@ -37,7 +37,7 @@ export class Player {
       deathTimerMax: 0,
       invincibleTimer: 0,
       hasHelmet: false,
-      coffeeTimer: 0,
+      miniFantaTimer: 0,
       animationFrame: 0,
       animationTimer: 0,
       groundPoundState: GroundPoundState.NONE,
@@ -45,8 +45,8 @@ export class Player {
     };
   }
 
-  update(deltaTime: number, input: InputState, level: Level): { 
-    tileHit?: { type: number; col: number; row: number; side: 'top'|'bottom'|'left'|'right' } | null,
+  update(deltaTime: number, input: InputState, level: Level): {
+    tileHit?: { type: number; col: number; row: number; side: 'top' | 'bottom' | 'left' | 'right' } | null,
     groundPoundImpact?: { x: number, y: number, col: number, row: number } | null,
     groundPoundStarted?: boolean,
     landedTile?: { type: number; col: number; row: number } | null
@@ -133,14 +133,14 @@ export class Player {
     if (this.data.isGrounded && this.data.groundPoundState === GroundPoundState.FALL) {
       this.data.groundPoundState = GroundPoundState.RECOVERY;
       this.data.groundPoundTimer = GP_RECOVERY_MS;
-      
+
       // Calcula tile abaixo para o evento
       const centerX = this.data.position.x + this.data.width / 2;
       const bottomY = this.data.position.y + this.data.height + 2;
       const col = Math.floor(centerX / TILE_SIZE);
       const row = Math.floor(bottomY / TILE_SIZE);
 
-      return { 
+      return {
         tileHit: collisionResult.tileHit || null,
         groundPoundImpact: { x: centerX, y: this.data.position.y + this.data.height, col, row },
         groundPoundStarted: gpStarted,
@@ -163,7 +163,7 @@ export class Player {
     }
 
     // Verifica colisão com spikes
-    return { 
+    return {
       tileHit: collisionResult.tileHit || null,
       groundPoundImpact: gpImpact || null,
       groundPoundStarted: gpStarted,
@@ -187,9 +187,9 @@ export class Player {
       this.data.invincibleTimer = Math.max(0, this.data.invincibleTimer - deltaTime);
     }
 
-    // Café (velocidade extra)
-    if (this.data.coffeeTimer > 0) {
-      this.data.coffeeTimer = Math.max(0, this.data.coffeeTimer - deltaTime);
+    // Mini Fanta (velocidade extra)
+    if (this.data.miniFantaTimer > 0) {
+      this.data.miniFantaTimer = Math.max(0, this.data.miniFantaTimer - deltaTime);
     }
   }
 
@@ -206,10 +206,10 @@ export class Player {
 
   private handleHorizontalMovement(input: InputState, friction: number): void {
     this.data.isRunning = input.run;
-    
+
     // Velocidade máxima baseada em correr e café
     let maxSpeed = input.run ? PLAYER_RUN_SPEED : PLAYER_SPEED;
-    if (this.data.coffeeTimer > 0) {
+    if (this.data.miniFantaTimer > 0) {
       maxSpeed *= 1.5;
     }
 
@@ -257,8 +257,8 @@ export class Player {
     }
 
     // Pode pular? (coyote time + jump buffer)
-    const canJump = (this.data.isGrounded || this.data.coyoteTimer > 0) && 
-                    !this.data.isJumping;
+    const canJump = (this.data.isGrounded || this.data.coyoteTimer > 0) &&
+      !this.data.isJumping;
 
     if (this.data.jumpBufferTimer > 0 && canJump) {
       // Inicia pulo
@@ -326,7 +326,7 @@ export class Player {
     this.data.velocity.y = Math.min(this.data.velocity.y, cap);
   }
 
-  private resolveCollisions(level: Level, prevRect: { x: number; y: number; width: number; height: number }): { position: { x: number; y: number }, velocity: { x: number; y: number }, grounded: boolean, tileHit?: { type: number; col: number; row: number; side: 'top'|'bottom'|'left'|'right' } | null } {
+  private resolveCollisions(level: Level, prevRect: { x: number; y: number; width: number; height: number }): { position: { x: number; y: number }, velocity: { x: number; y: number }, grounded: boolean, tileHit?: { type: number; col: number; row: number; side: 'top' | 'bottom' | 'left' | 'right' } | null } {
     const rect = this.getRect();
     const result = level.resolveCollision(rect, this.data.velocity, prevRect);
 
@@ -385,9 +385,9 @@ export class Player {
   }
 
   respawn(position: Vector2): void {
-    this.data.position = { 
-      x: position.x * TILE_SIZE, 
-      y: position.y * TILE_SIZE - this.data.height 
+    this.data.position = {
+      x: position.x * TILE_SIZE,
+      y: position.y * TILE_SIZE - this.data.height
     };
     this.data.velocity = { x: 0, y: 0 };
     this.data.isDead = false;
@@ -398,8 +398,8 @@ export class Player {
     this.data.invincibleTimer = 2000; // 2 segundos de invencibilidade
   }
 
-  collectCoffee(): void {
-    this.data.coffeeTimer = 10000; // 10 segundos
+  collectMiniFanta(): void {
+    this.data.miniFantaTimer = 10000; // 10 segundos
   }
 
   collectHelmet(): void {
@@ -447,7 +447,7 @@ export class Player {
     this.data.isJumping = false;
     this.data.invincibleTimer = 0;
     this.data.hasHelmet = false;
-    this.data.coffeeTimer = 0;
+    this.data.miniFantaTimer = 0;
     this.data.coyoteTimer = 0;
     this.data.jumpBufferTimer = 0;
     this.data.facingRight = true;

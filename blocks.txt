@@ -1,0 +1,180 @@
+Vou buscar no código onde os blocos/tiles são definidos e usados para compilar a lista completa e onde cada um é implementado. Vou começar procurando por termos-chave como "block", "tile", "Tile", "Block" e "blocks".
+
+Pesquisado por regex `block|Block|tile|Tile|tiles|Blocks` (`**/src/**`), 20 resultados
+
+Pesquisado por regex `enum TileType|export enum TileType|TileType\.` (`**/src/**`), 20 resultados
+
+Foram pesquisados arquivos correspondentes `**/*.{ts,tsx}`, 34 correspondentes
+
+Leia [](file:///c%3A/Users/fabio/Projects/fekalabs/fekagaps/src/constants.ts)
+
+Leitura [](file:///c%3A/Users/fabio/Projects/fekalabs/fekagaps/src/game/Game.ts#1-1), linhas 1 para 420
+
+Leia [](file:///c%3A/Users/fabio/Projects/fekalabs/fekagaps/src/world/Level.ts)
+
+Leia [](file:///c%3A/Users/fabio/Projects/fekalabs/fekagaps/src/types.ts)
+
+Pesquisado por regex `SPRING|spring` (`**/src/**`), 7 resultados
+
+Pesquisado por texto `SPRING_BOOST` (`**/src/**`), 1 resultado
+
+Leitura [](file:///c%3A/Users/fabio/Projects/fekalabs/fekagaps/src/entities/Player.ts#1-1), linhas 1 para 400
+
+Pesquisado por texto `SPRING` (`**/src/**`), 7 resultados
+
+Pesquisado por regex `PLATFORM_FALLING|FALLING_PLATFORM` (`**/src/**`), 5 resultados
+
+Pesquisado por regex `LAVA_TOP|LAVA_FILL|lava` (`**/src/**`), 20 resultados
+
+Leitura [](file:///c%3A/Users/fabio/Projects/fekalabs/fekagaps/src/world/Level.ts#160-160), linhas 160 para 200
+
+Pesquisado por regex `LAVA|lava` (`**/src/**`), 20 resultados
+
+Leitura [](file:///c%3A/Users/fabio/Projects/fekalabs/fekagaps/src/world/Level.ts#168-168), linhas 168 para 188
+
+Pesquisado por regex `lava collision|checkLava|isLava|touches lava` (`**/src/**`), nenhum resultado
+
+Pesquisado por texto `HIDDEN_BLOCK` (`**/src/**`), 3 resultados
+
+Pesquisado por regex `TileType.COIN|COIN tile` (`**/src/**`), 1 resultado
+
+Pesquisado por regex `checkFlags|updateFlags|CHECKPOINT|FLAG` (`**/src/**`), 20 resultados
+
+Leitura [](file:///c%3A/Users/fabio/Projects/fekalabs/fekagaps/src/game/Game.ts#620-620), linhas 620 para 720
+
+Pesquisado por regex `ICE|ICE_FRICTION` (`**/src/**`), 20 resultados
+
+Leitura [](file:///c%3A/Users/fabio/Projects/fekalabs/fekagaps/src/world/Level.ts#280-280), linhas 280 para 340
+
+Leitura [](file:///c%3A/Users/fabio/Projects/fekalabs/fekagaps/src/world/Level.ts#64-64), linhas 64 para 96
+
+Leitura [](file:///c%3A/Users/fabio/Projects/fekalabs/fekagaps/src/world/Level.ts#208-208), linhas 208 para 240
+
+Pesquisado por regex `isSolid|isGround|isTile|isPlatform|isWalkable` (`**/src/**`), 20 resultados
+
+Leitura [](file:///c%3A/Users/fabio/Projects/fekalabs/fekagaps/src/game/Game.ts#1188-1188), linhas 1188 para 1260
+
+Leitura [](file:///c%3A/Users/fabio/Projects/fekalabs/fekagaps/src/engine/Renderer.ts#680-680), linhas 680 para 820
+
+Leitura [](file:///c%3A/Users/fabio/Projects/fekalabs/fekagaps/src/editor/EditorController.ts#260-260), linhas 260 para 340
+
+Pesquisado por regex `checkCollectibles|collectMiniFanta|collectHelmet` (`**/src/**`), 6 resultados
+
+Leitura [](file:///c%3A/Users/fabio/Projects/fekalabs/fekagaps/src/game/Game.ts#916-916), linhas 916 para 1008
+
+Leia [](file:///c%3A/Users/fabio/Projects/fekalabs/fekagaps/src/data/levels/level_0_world1-1.ts)
+
+Perfeito! Fiz uma varredura completa no código e encontrei todos os tipos de tile/bloco, onde são desenhados e quais têm lógica de jogo implementada — vou listar cada bloco com status e referências de arquivo. Minha próxima etapa é apresentar a lista organizada com observações sobre o que falta ser implementado.## Resumo rápido ✅
+Varri o código fonte e o editor, e identifiquei todos os *blocos/tiles* definidos em `TileType` e onde cada um é usado/implementado (render, colisão, interações). Abaixo está a lista detalhada, com **status de implementação** e referências de arquivos para cada bloco.
+
+---
+
+## Lista completa de blocos (TileType) 🔧
+
+> Referências principais: constants.ts (enum TileType), Renderer.ts (renderização), Level.ts (colisão / lógica de tiles), Game.ts (interações / eventos), EditorController.ts (editor).
+
+1. **EMPTY (0)** — Espaço vazio  
+   - Status: implementado (comportamento padrão).  
+   - Usado: render/colisão naturalmente.
+
+2. **GROUND (1)** — Chão sólido (topo com grama + preenchimento) 🔲  
+   - Status: implementado (render + colisão sólida).  
+   - Código: `Renderer.drawGroundTile` + `Level.checkCollision` / `checkTileCollision*`.
+
+3. **BRICK (2)** — Tijolo sólido (pode ser "bump" ao cabecear; quebrável com capacete) 🧱  
+   - Status: implementado (render + colisão + interação de cabeçada).  
+   - Comportamento: cabeçada toca (`Game` detecta `tileHit`) -> se jogador tem capacete quebra; senão faz som de bump.  
+   - Código: `Renderer.drawBrickTile`, `Level.resolveCollision`, `Game` head-hit branch.
+
+4. **PLATFORM (3)** — Plataforma one-way (passa por baixo, colide de cima) ↕️  
+   - Status: implementado (colisão one-way + render).  
+   - Código: `Level.checkTileCollisionVertical` (checa se jogador cruzou topo).
+
+5. **SPIKE (4)** — Espinhos (dano instantâneo por contato) ⚠️  
+   - Status: implementado (detecção de dano por colisão de spike).  
+   - Código: `Level.checkSpikeCollision` + `Game.updatePlaying` chama `playerHit()`.
+
+6. **CHECKPOINT (5)** — Marcador de checkpoint (convertido a Flag na carga) 📍  
+   - Status: implementado (no carregamento do nível, tile transformado em `FlagData` e removido do grid).  
+   - Código: `Game.normalizeLevelData` / `Game.buildFlags`.
+
+7. **FLAG (6)** — Bandeira / objetivo de fase (convertida a Flag) 🏁  
+   - Status: implementado (mesma tratativa que CHECKPOINT para goal).  
+   - Código: `Game.normalizeLevelData` / `Game.buildFlags` / `checkFlags`.
+
+8. **COIN (7)** — Moeda (representação como tile no editor/renderer) 🪙  
+   - Status: *parcial* — desenhado no `Renderer` e tem apoio no editor, mas **coletáveis** realmente são instâncias em `level.collectibles` (sistema `CollectibleType.COIN`). Tiles de moeda não são automaticamente convertidos em collectíveis no runtime.  
+   - Código: `Renderer.drawCoin`, editor usa mini thumbnail.
+
+9. **POWERUP_MINI_FANTA (8)** — (legacy) bloco powerup antigo  
+   - Status: existe no enum, aparece em alguns níveis como legado; **não é tratado** pelo fluxo moderno de powerup-blocks (validador pode marcar 8/9 como inválidos).  
+   - Observação: valores legados — ver `Game.validateLevels`.
+
+10. **POWERUP_HELMET (9)** — (legacy) idem ao anterior.
+
+11. **BRICK_BREAKABLE (10)** — Tijolo quebrável (quebra ao cabecear) 💥  
+   - Status: implementado. Cabeçada remove o tile e spawna partículas/score.  
+   - Código: `Game` head-hit branch e `Level.breakTile`.
+
+12. **POWERUP_BLOCK_MINI_FANTA (11)** — Bloco com powerup (spawn de MINI_FANTA) 🎁  
+   - Status: implementado. Ao cabecear, troca para `BLOCK_USED` e gera um `CollectibleType.MINI_FANTA`.  
+   - Código: `Game` head-hit branch (gera collectable), `Renderer.drawPowerupBlock`.
+
+13. **POWERUP_BLOCK_HELMET (12)** — Bloco com powerup (spawn de HELMET) 🪖  
+   - Status: implementado (mesma lógica que 11, gera `CollectibleType.HELMET`).
+
+14. **BLOCK_USED (13)** — Bloco usado (após powerup) ✔️  
+   - Status: implementado (estado visual + colisão).  
+   - Código: `Renderer.drawUsedBlock`, `Game` substitui para esse tile após ativação.
+
+15. **SPRING (14)** — Mola (visual presente) ⤴️  
+   - Status: *parcial/visual* — renderizado (`Renderer.drawSpringTile`) e existe `SPRING_BOOST` em constants.ts, **mas** não há código que aplique o bounce ao jogador ao pousar sobre o tile.  
+   - Observação: falta a aplicação do impulso no contato (p.ex., em `Level.resolveCollision` ou `Game` ao detectar landing sobre SPRING).
+
+16. **ICE (15)** — Gelo (visual) ❄️  
+   - Status: *parcial/visual* — há `Renderer.drawIceTile` e cor `ICE_FRICTION` está em constants.ts, mas **não há lógica** que altere fricção do jogador ao ficar sobre ICE (Player usa `PLAYER_FRICTION` por padrão).  
+   - Observação: falta aplicar `ICE_FRICTION` ao locomover sobre tile ICE.
+
+17. **PLATFORM_FALLING (16)** — Plataforma instável / que cai (visual ~ e renderer suporta fases) 🪵⬇️  
+   - Status: *parcial* — há render e assets para fases (arming/falling) e constantes (`FALLING_PLATFORM_*`), `Renderer.drawFallingPlatforms` desenha animação; **mas** não encontrei lógica do jogo que arme/fça cair plataformas (não existe sistema de fases/Timers no Level para fazer cair/respawn).  
+   - Observação: é necessário implementar a máquina de estados/engine para plataformas caírem.
+
+18. **LAVA_TOP (17)** / **LAVA_FILL (18)** — Lava (visual + top offset) 🔥  
+   - Status: parcial/implementado visualmente e com ajuste de collider: `getLavaTopOffset` e render fazem o visual; porém não há tratamento explícito de "dano por contato com lava" como existe para spikes — a detecção de dano por lava não foi encontrada (portanto, pode não matar o player por contato diretamente).  
+   - Código: `Renderer.drawLavaTopTile`, `Level.getLavaTopOffset` / uso em colisões.  
+   - Observação: decidir se lava mata (implementar check e efeitos) pode ser necessário.
+
+19. **HIDDEN_BLOCK (19)** — Bloco escondido (editor e enum) 🕵️‍♂️  
+   - Status: *editor/visual* — no `Renderer` não é desenhado até ser revelado; `EditorController` inclui no palette. **Não há** código que revele HIDDEN_BLOCK ao ser cabeceado (p.ex. transformá-lo em BRICK ou em powerup).  
+
+---
+
+## Observações gerais & gaps detectados 💡
+
+- Código já possui boa separação: render em Renderer.ts, regras de colisão/dinâmica de tiles em Level.ts e interações/heads-up em Game.ts.
+- Alguns tiles são apenas visuais/no editor (SPRING, ICE, PLATFORM_FALLING, HIDDEN_BLOCK, COIN tile) e **seu comportamento de jogo não está totalmente implementado**:
+  - SPRING: precisa aplicar `SPRING_BOOST` ao pousar em cima.
+  - ICE: precisa aplicar `ICE_FRICTION` ao jogador enquanto sobre tile ICE.
+  - PLATFORM_FALLING: renderer suporta fases, mas falta o sistema que ativa *arming → falling → respawn* dependendo de contato.
+  - HIDDEN_BLOCK: precisa sistema para revelação (ao cabecear ou ao ativar via evento).
+  - COIN tile: desenhado, mas coin real funciona via `CollectibleData` (tiles de moeda não são automaticamente coletáveis).
+- Há suporte a tiles dinâmicos removíveis (para o boss): `Level.removeTileTemporarily` e `updateDynamicTiles` — útil para gaps temporários.
+- Validação de níveis (`Game.validateLevelsOnStartup`) considera válidos tiles nos intervalos 0-7 e 10-13; portanto valores legados 8/9 podem causar aviso/erro nos níveis.
+
+---
+
+## Arquivos-chave para referência 🔎
+- Definição de tiles: constants.ts (enum `TileType`)  
+- Renderização visual: Renderer.ts  
+- Colisão / Tile logic: Level.ts  
+- Interações (head-hit, powerups, spikes, collectibles, flags): Game.ts  
+- Editor / paleta: EditorController.ts  
+- Níveis de exemplo: `src/data/levels/*.ts` (ver level_0_world1-1.ts para confirmação do uso de tiles)
+
+---
+
+Se quiser, eu posso:
+- ✅ Gerar uma tabela final em Markdown com status resumido (implementado/parcial/pendente).
+- 🔧 Implementar um dos comportamentos pendentes (por exemplo: bounce do `SPRING`, fricção do `ICE`, ou a queda de `PLATFORM_FALLING`) e abrir um PR com testes manuais/uma demo.
+
+O que prefere que eu faça em seguida?

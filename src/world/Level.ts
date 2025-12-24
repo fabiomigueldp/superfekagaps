@@ -76,7 +76,7 @@ export class Level {
           tile === TileType.BRICK ||
           tile === TileType.BRICK_BREAKABLE ||
           tile === TileType.BLOCK_USED ||
-          tile === TileType.POWERUP_BLOCK_COFFEE ||
+          tile === TileType.POWERUP_BLOCK_MINI_FANTA ||
           tile === TileType.POWERUP_BLOCK_HELMET ||
           tile === TileType.SPRING ||
           tile === TileType.ICE ||
@@ -218,7 +218,7 @@ export class Level {
           tile === TileType.BRICK ||
           tile === TileType.BRICK_BREAKABLE ||
           tile === TileType.BLOCK_USED ||
-          tile === TileType.POWERUP_BLOCK_COFFEE ||
+          tile === TileType.POWERUP_BLOCK_MINI_FANTA ||
           tile === TileType.POWERUP_BLOCK_HELMET ||
           tile === TileType.SPRING ||
           tile === TileType.ICE ||
@@ -295,7 +295,7 @@ export class Level {
           tile === TileType.BRICK ||
           tile === TileType.BRICK_BREAKABLE ||
           tile === TileType.BLOCK_USED ||
-          tile === TileType.POWERUP_BLOCK_COFFEE ||
+          tile === TileType.POWERUP_BLOCK_MINI_FANTA ||
           tile === TileType.POWERUP_BLOCK_HELMET ||
           tile === TileType.SPRING ||
           tile === TileType.ICE
@@ -315,7 +315,7 @@ export class Level {
           tile === TileType.GROUND ||
           tile === TileType.BRICK ||
           tile === TileType.BRICK_BREAKABLE ||
-          tile === TileType.POWERUP_BLOCK_COFFEE ||
+          tile === TileType.POWERUP_BLOCK_MINI_FANTA ||
           tile === TileType.POWERUP_BLOCK_HELMET ||
           tile === TileType.BLOCK_USED ||
           tile === TileType.SPRING ||
