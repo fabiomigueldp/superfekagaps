@@ -16,6 +16,23 @@ export class EditorController {
     private scale: number = 1; // Used for coordinate mapping (Window -> Game Resolution)
     private zoom: number = 1; // Used for visual zoom (Game Resolution -> View)
 
+    // Bounds Visualization
+    private showBounds: boolean = true;
+    private dimOutside: boolean = true;
+    private showCoords: boolean = false;
+    private boundsColor: string = '#00FFFF'; // Cyan
+    private boundsThickness: number = 2;
+
+    // Hover State for coordinates display
+    private hoveredCol: number = -1;
+    private hoveredRow: number = -1;
+
+    // Bounds Edge Drag State
+    private isResizingBounds: boolean = false;
+    private activeEdge: 'right' | 'bottom' | 'corner' | null = null;
+    private hoveredEdge: 'right' | 'bottom' | 'corner' | null = null;
+    private readonly EDGE_THRESHOLD: number = 8; // pixels to detect edge hover
+
     // UI Elements
     private uiMountBtn: HTMLButtonElement;
     private uiSaveBtn: HTMLButtonElement;
@@ -24,25 +41,32 @@ export class EditorController {
     private uiFileLabel: HTMLSpanElement;
     private uiShowBgChk: HTMLInputElement;
     private uiZoomLabel: HTMLSpanElement;
+    private uiBoundsWidth: HTMLInputElement;
+    private uiBoundsHeight: HTMLInputElement;
+    private uiShowBoundsChk: HTMLInputElement;
+    private uiDimOutsideChk: HTMLInputElement;
+    private uiShowCoordsChk: HTMLInputElement;
+    private uiBoundsInfoSize: HTMLSpanElement;
+    private uiBoundsInfoPixels: HTMLSpanElement;
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
         this.fs = new FileSystemManager();
 
-        // Initialize default blank level
+        // Initialize default blank level (width/height in TILES, not pixels!)
         this.levelData = {
             id: 'new_level',
             name: 'New Level',
-            width: 100 * TILE_SIZE,
-            height: 15 * TILE_SIZE,
+            width: 100,  // in tiles
+            height: 15,  // in tiles
             tiles: Array(15).fill(0).map((_, row) =>
                 Array(100).fill(row >= 13 ? TileType.GROUND : TileType.EMPTY)
             ),
-            playerSpawn: { x: 50, y: 100 },
+            playerSpawn: { x: 2, y: 11 },
             enemies: [],
             collectibles: [],
             checkpoints: [],
-            goalPosition: { x: 90 * TILE_SIZE, y: 11 * TILE_SIZE },
+            goalPosition: { x: 95, y: 11 },
             timeLimit: 300,
             isBossLevel: false
         };
@@ -72,8 +96,18 @@ export class EditorController {
         this.uiShowBgChk = document.getElementById('chk-show-bg') as HTMLInputElement;
         this.uiZoomLabel = document.getElementById('zoom-level') as HTMLSpanElement;
 
+        // Bounds UI Elements
+        this.uiBoundsWidth = document.getElementById('bounds-width') as HTMLInputElement;
+        this.uiBoundsHeight = document.getElementById('bounds-height') as HTMLInputElement;
+        this.uiShowBoundsChk = document.getElementById('chk-show-bounds') as HTMLInputElement;
+        this.uiDimOutsideChk = document.getElementById('chk-dim-outside') as HTMLInputElement;
+        this.uiShowCoordsChk = document.getElementById('chk-show-coords') as HTMLInputElement;
+        this.uiBoundsInfoSize = document.getElementById('bounds-info-size') as HTMLSpanElement;
+        this.uiBoundsInfoPixels = document.getElementById('bounds-info-pixels') as HTMLSpanElement;
+
         this.bindEvents();
         this.buildPalette();
+        this.updateBoundsUI();
     }
 
     private bindEvents() {
@@ -151,6 +185,59 @@ export class EditorController {
             this.ensureTheme();
             this.levelData.theme!.skyGradient[1] = (e.target as HTMLInputElement).value;
         });
+
+        // ===== BOUNDS CONTROLS =====
+
+        // Width/Height direct input
+        this.uiBoundsWidth?.addEventListener('change', () => {
+            if (!this.levelData) return;
+            const newWidth = Math.max(10, Math.min(500, parseInt(this.uiBoundsWidth.value) || 100));
+            this.resizeTileGrid(newWidth, this.levelData.tiles.length);
+        });
+
+        this.uiBoundsHeight?.addEventListener('change', () => {
+            if (!this.levelData) return;
+            const newHeight = Math.max(5, Math.min(100, parseInt(this.uiBoundsHeight.value) || 14));
+            this.resizeTileGrid(this.levelData.tiles[0]?.length || 100, newHeight);
+        });
+
+        // Increment/Decrement buttons
+        document.querySelectorAll('.number-input-group .mini-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = (btn as HTMLElement).dataset.target;
+                if (!target) return;
+                const input = document.getElementById(target) as HTMLInputElement;
+                if (!input) return;
+
+                const isIncrement = btn.classList.contains('increment');
+                const step = target === 'bounds-width' ? 5 : 1;
+                const min = parseInt(input.min) || 1;
+                const max = parseInt(input.max) || 500;
+                let value = parseInt(input.value) || 0;
+
+                value = isIncrement ? Math.min(max, value + step) : Math.max(min, value - step);
+                input.value = value.toString();
+                input.dispatchEvent(new Event('change'));
+            });
+        });
+
+        // Visualization checkboxes
+        this.uiShowBoundsChk?.addEventListener('change', () => {
+            this.showBounds = this.uiShowBoundsChk.checked;
+        });
+
+        this.uiDimOutsideChk?.addEventListener('change', () => {
+            this.dimOutside = this.uiDimOutsideChk.checked;
+        });
+
+        this.uiShowCoordsChk?.addEventListener('change', () => {
+            this.showCoords = this.uiShowCoordsChk.checked;
+        });
+
+        // Action buttons
+        document.getElementById('btn-fit-content')?.addEventListener('click', () => {
+            this.fitToContent();
+        });
     }
 
     private selectTab(tabId: string) {
@@ -173,6 +260,114 @@ export class EditorController {
         if (renderer && this.levelData && this.levelData.theme) {
             renderer.prepareLevelBackground(this.levelData.theme);
         }
+    }
+
+    // ===== BOUNDS MANAGEMENT METHODS =====
+
+    private updateBoundsUI(): void {
+        if (!this.levelData) return;
+
+        const width = this.levelData.tiles[0]?.length || 100;
+        const height = this.levelData.tiles.length;
+
+        // Update input fields
+        if (this.uiBoundsWidth) this.uiBoundsWidth.value = width.toString();
+        if (this.uiBoundsHeight) this.uiBoundsHeight.value = height.toString();
+
+        // Update info display
+        if (this.uiBoundsInfoSize) {
+            this.uiBoundsInfoSize.textContent = `Size: ${width} × ${height} tiles`;
+        }
+        if (this.uiBoundsInfoPixels) {
+            this.uiBoundsInfoPixels.textContent = `${width * TILE_SIZE} × ${height * TILE_SIZE} px`;
+        }
+
+        // Sync width/height in LevelData
+        this.levelData.width = width;
+        this.levelData.height = height;
+    }
+
+    private resizeTileGrid(newWidth: number, newHeight: number): void {
+        if (!this.levelData) return;
+
+        const oldTiles = this.levelData.tiles;
+        const oldHeight = oldTiles.length;
+        const oldWidth = oldTiles[0]?.length || 0;
+
+        // Don't do anything if size hasn't changed
+        if (newWidth === oldWidth && newHeight === oldHeight) return;
+
+        const newTiles: number[][] = [];
+
+        for (let row = 0; row < newHeight; row++) {
+            const newRow: number[] = [];
+            for (let col = 0; col < newWidth; col++) {
+                // Copy existing tiles or fill with EMPTY
+                if (row < oldHeight && col < oldWidth) {
+                    newRow.push(oldTiles[row][col]);
+                } else {
+                    newRow.push(TileType.EMPTY);
+                }
+            }
+            newTiles.push(newRow);
+        }
+
+        this.levelData.tiles = newTiles;
+        this.levelData.width = newWidth;
+        this.levelData.height = newHeight;
+
+        // Update UI
+        this.updateBoundsUI();
+
+        console.log(`📐 Resized level to ${newWidth}×${newHeight} tiles`);
+    }
+
+    private fitToContent(): void {
+        if (!this.levelData) return;
+
+        const tiles = this.levelData.tiles;
+        let maxCol = 0;
+        let maxRow = 0;
+
+        // Find the furthest non-empty tile
+        for (let row = 0; row < tiles.length; row++) {
+            for (let col = 0; col < tiles[row].length; col++) {
+                if (tiles[row][col] !== TileType.EMPTY) {
+                    maxCol = Math.max(maxCol, col);
+                    maxRow = Math.max(maxRow, row);
+                }
+            }
+        }
+
+        // Also consider entities (positions are in tile coordinates)
+        this.levelData.enemies.forEach(e => {
+            maxCol = Math.max(maxCol, Math.floor(e.position.x));
+            maxRow = Math.max(maxRow, Math.floor(e.position.y));
+        });
+
+        this.levelData.collectibles.forEach(c => {
+            maxCol = Math.max(maxCol, Math.floor(c.position.x));
+            maxRow = Math.max(maxRow, Math.floor(c.position.y));
+        });
+
+        // Consider goal position
+        maxCol = Math.max(maxCol, Math.floor(this.levelData.goalPosition.x));
+        maxRow = Math.max(maxRow, Math.floor(this.levelData.goalPosition.y));
+
+        // Consider checkpoints
+        this.levelData.checkpoints.forEach(cp => {
+            maxCol = Math.max(maxCol, Math.floor(cp.x));
+            maxRow = Math.max(maxRow, Math.floor(cp.y));
+        });
+
+        // Precise fit: maxCol/maxRow are 0-indexed, so +1 gives exact count
+        // Add only +1 to include the last tile fully (no extra margin)
+        const newWidth = Math.max(10, maxCol + 1);
+        const newHeight = Math.max(5, maxRow + 1);
+
+        this.resizeTileGrid(newWidth, newHeight);
+
+        console.log(`✂️ Fit to content: ${newWidth}×${newHeight} tiles`);
     }
 
     private populateThemeEditor() {
@@ -384,6 +579,7 @@ export class EditorController {
                 // Initialize Theme Editor with data
                 this.populateThemeEditor();
                 this.updateTheme(); // Force render of background
+                this.updateBoundsUI(); // Sync bounds UI with loaded level
             };
             this.uiLevelList.appendChild(div);
         });
@@ -490,17 +686,29 @@ export class EditorController {
                 mainCtx.fillRect(0, 0, visibleWidth, visibleHeight);
             }
 
-            // 1. Draw Tiles (Using Game Renderer for pixel-perfect accuracy)
+            // 1. Dim Outside Area BEFORE tiles (so tiles draw over it)
+            if (this.dimOutside) {
+                this.drawOutsideDim(mainCtx);
+            }
+
+            // 2. Draw Tiles (Using Game Renderer for pixel-perfect accuracy)
             this.renderEditorView(mainCtx, renderer);
         }
 
-        // 2. Draw Grid
+        // 3. Draw Grid
         this.drawGrid(mainCtx);
+
+        // 4. Draw Bounds Frame
+        if (this.showBounds) {
+            this.drawBoundsFrame(mainCtx);
+        }
 
         mainCtx.restore();
 
-        // 3. Draw UI overlays (e.g. current selection indicator if needed)
-        // ...
+        // 5. Draw Editor HUD (coordinates display) - in screen space
+        if (this.showCoords) {
+            this.drawEditorHUD(mainCtx, deviceScale);
+        }
     }
 
     private renderEditorView(ctx: CanvasRenderingContext2D, renderer: Renderer) {
@@ -633,15 +841,170 @@ export class EditorController {
         ctx.stroke();
     }
 
+    private drawOutsideDim(ctx: CanvasRenderingContext2D): void {
+        if (!this.levelData) return;
+
+        const transform = ctx.getTransform();
+        const visibleWidth = ctx.canvas.width / transform.a;
+        const visibleHeight = ctx.canvas.height / transform.d;
+
+        const boundsWidth = this.levelData.tiles[0]?.length * TILE_SIZE || 0;
+        const boundsHeight = this.levelData.tiles.length * TILE_SIZE;
+
+        // Bounds position in screen coordinates
+        const boundsLeft = -this.camera.x;
+        const boundsTop = -this.camera.y;
+        const boundsRight = boundsLeft + boundsWidth;
+        const boundsBottom = boundsTop + boundsHeight;
+
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+
+        // Left region (outside left edge)
+        if (boundsLeft > 0) {
+            ctx.fillRect(0, 0, boundsLeft, visibleHeight);
+        }
+
+        // Right region (outside right edge)
+        if (boundsRight < visibleWidth) {
+            ctx.fillRect(boundsRight, 0, visibleWidth - boundsRight, visibleHeight);
+        }
+
+        // Top region (between left and right bounds)
+        if (boundsTop > 0) {
+            const left = Math.max(0, boundsLeft);
+            const right = Math.min(visibleWidth, boundsRight);
+            ctx.fillRect(left, 0, right - left, boundsTop);
+        }
+
+        // Bottom region (between left and right bounds)
+        if (boundsBottom < visibleHeight) {
+            const left = Math.max(0, boundsLeft);
+            const right = Math.min(visibleWidth, boundsRight);
+            ctx.fillRect(left, boundsBottom, right - left, visibleHeight - boundsBottom);
+        }
+    }
+
+    private drawBoundsFrame(ctx: CanvasRenderingContext2D): void {
+        if (!this.levelData) return;
+
+        const transform = ctx.getTransform();
+        const boundsWidth = this.levelData.tiles[0]?.length * TILE_SIZE || 0;
+        const boundsHeight = this.levelData.tiles.length * TILE_SIZE;
+
+        // Position in screen space
+        const x = -this.camera.x;
+        const y = -this.camera.y;
+
+        // Draw border
+        ctx.strokeStyle = this.boundsColor;
+        ctx.lineWidth = this.boundsThickness / transform.a;
+        ctx.strokeRect(x, y, boundsWidth, boundsHeight);
+
+        // Draw corner markers for better visibility
+        const markerSize = 8 / transform.a;
+        ctx.fillStyle = this.boundsColor;
+
+        // Top-left corner
+        ctx.fillRect(x - markerSize / 2, y - markerSize / 2, markerSize, markerSize);
+        // Top-right corner
+        ctx.fillRect(x + boundsWidth - markerSize / 2, y - markerSize / 2, markerSize, markerSize);
+        // Bottom-left corner
+        ctx.fillRect(x - markerSize / 2, y + boundsHeight - markerSize / 2, markerSize, markerSize);
+        // Bottom-right corner
+        ctx.fillRect(x + boundsWidth - markerSize / 2, y + boundsHeight - markerSize / 2, markerSize, markerSize);
+
+        // Draw size label near top-left
+        ctx.font = `${10 / transform.a}px Consolas`;
+        ctx.fillStyle = this.boundsColor;
+        const label = `${this.levelData.tiles[0]?.length || 0} × ${this.levelData.tiles.length}`;
+        ctx.fillText(label, x + 4 / transform.a, y - 4 / transform.a);
+    }
+
+    private drawEditorHUD(ctx: CanvasRenderingContext2D, deviceScale: number): void {
+        // Draw in screen space (not scaled)
+        const hudHeight = 24 * deviceScale;
+        const canvasWidth = ctx.canvas.width;
+        const canvasHeight = ctx.canvas.height;
+
+        // Account for sidebar width (250px)
+        const sidebarWidth = 250 * deviceScale;
+        const hudWidth = canvasWidth - sidebarWidth;
+
+        // Background bar
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+        ctx.fillRect(0, canvasHeight - hudHeight, hudWidth, hudHeight);
+
+        // Border
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, canvasHeight - hudHeight);
+        ctx.lineTo(hudWidth, canvasHeight - hudHeight);
+        ctx.stroke();
+
+        // Text
+        const fontSize = 11 * deviceScale;
+        ctx.font = `${fontSize}px Consolas, monospace`;
+        ctx.textBaseline = 'middle';
+
+        const textY = canvasHeight - hudHeight / 2;
+        let textX = 10 * deviceScale;
+
+        // Mouse coordinates
+        ctx.fillStyle = '#0FF';
+        const coordText = `Tile: (${this.hoveredCol}, ${this.hoveredRow})`;
+        ctx.fillText(coordText, textX, textY);
+        textX += ctx.measureText(coordText).width + 20 * deviceScale;
+
+        // Separator
+        ctx.fillStyle = '#444';
+        ctx.fillText('│', textX, textY);
+        textX += 20 * deviceScale;
+
+        // Level size
+        if (this.levelData) {
+            ctx.fillStyle = '#888';
+            const width = this.levelData.tiles[0]?.length || 0;
+            const height = this.levelData.tiles.length;
+            const sizeText = `Level: ${width}×${height} tiles`;
+            ctx.fillText(sizeText, textX, textY);
+            textX += ctx.measureText(sizeText).width + 20 * deviceScale;
+
+            // Separator
+            ctx.fillStyle = '#444';
+            ctx.fillText('│', textX, textY);
+            textX += 20 * deviceScale;
+        }
+
+        // Zoom
+        ctx.fillStyle = '#888';
+        const zoomText = `Zoom: ${Math.round(this.zoom * 100)}%`;
+        ctx.fillText(zoomText, textX, textY);
+    }
+
+
     private onMouseDown(e: MouseEvent) {
         this.updateScale();
         const startX = e.offsetX / this.scale;
         const startY = e.offsetY / this.scale;
 
-        // Left click: Paint
+        // Calculate world coordinates for edge detection
+        const worldX = (startX / this.zoom) + this.camera.x;
+        const worldY = (startY / this.zoom) + this.camera.y;
+
+        // Left click: Check for bounds edge first, then paint
         if (e.button === 0) {
-            this.paintTile(startX, startY);
-            this.isDragging = true;
+            const edge = this.detectBoundsEdge(worldX, worldY);
+            if (edge) {
+                // Start bounds resize
+                this.isResizingBounds = true;
+                this.activeEdge = edge;
+                this.isDragging = true;
+            } else {
+                // Normal paint
+                this.paintTile(startX, startY);
+                this.isDragging = true;
+            }
         }
         // Right click: Pan Start
         if (e.button === 2) {
@@ -657,10 +1020,28 @@ export class EditorController {
     }
 
     private onMouseMove(e: MouseEvent) {
-        if (!this.isDragging) return;
-
+        this.updateScale();
         const currentX = e.offsetX / this.scale;
         const currentY = e.offsetY / this.scale;
+
+        // Always track hovered tile for HUD display
+        const worldX = (currentX / this.zoom) + this.camera.x;
+        const worldY = (currentY / this.zoom) + this.camera.y;
+        this.hoveredCol = Math.floor(worldX / TILE_SIZE);
+        this.hoveredRow = Math.floor(worldY / TILE_SIZE);
+
+        // Detect edge hover for cursor change
+        this.hoveredEdge = this.detectBoundsEdge(worldX, worldY);
+        this.updateCursor();
+
+        // Handle bounds resize dragging
+        if (this.isResizingBounds && this.activeEdge && e.buttons === 1) {
+            this.handleBoundsResize(worldX, worldY);
+            this.lastMousePos = { x: currentX, y: currentY };
+            return;
+        }
+
+        if (!this.isDragging) return;
 
         // Panning
         if (e.buttons === 2) {
@@ -670,8 +1051,8 @@ export class EditorController {
             this.camera.y -= dy;
         }
 
-        // Painting
-        if (e.buttons === 1) {
+        // Painting (only if not resizing bounds)
+        if (e.buttons === 1 && !this.isResizingBounds) {
             this.paintTile(currentX, currentY);
         }
 
@@ -680,6 +1061,85 @@ export class EditorController {
 
     private onMouseUp(_e: MouseEvent) {
         this.isDragging = false;
+        this.isResizingBounds = false;
+        this.activeEdge = null;
+    }
+
+    private detectBoundsEdge(worldX: number, worldY: number): 'right' | 'bottom' | 'corner' | null {
+        if (!this.levelData || !this.showBounds) return null;
+
+        const boundsWidth = (this.levelData.tiles[0]?.length || 0) * TILE_SIZE;
+        const boundsHeight = this.levelData.tiles.length * TILE_SIZE;
+
+        // Threshold in world coordinates (scaled by zoom)
+        const threshold = this.EDGE_THRESHOLD / this.zoom;
+
+        // Check corner first (has priority)
+        const nearRight = Math.abs(worldX - boundsWidth) < threshold;
+        const nearBottom = Math.abs(worldY - boundsHeight) < threshold;
+
+        if (nearRight && nearBottom) {
+            return 'corner';
+        }
+
+        // Check right edge (within vertical bounds)
+        if (nearRight && worldY >= 0 && worldY <= boundsHeight) {
+            return 'right';
+        }
+
+        // Check bottom edge (within horizontal bounds)
+        if (nearBottom && worldX >= 0 && worldX <= boundsWidth) {
+            return 'bottom';
+        }
+
+        return null;
+    }
+
+    private handleBoundsResize(worldX: number, worldY: number): void {
+        if (!this.levelData || !this.activeEdge) return;
+
+        const currentWidth = this.levelData.tiles[0]?.length || 100;
+        const currentHeight = this.levelData.tiles.length;
+
+        // Calculate new size based on mouse position (snap to grid)
+        const newWidth = this.activeEdge === 'right' || this.activeEdge === 'corner'
+            ? Math.max(10, Math.ceil(worldX / TILE_SIZE))
+            : currentWidth;
+
+        const newHeight = this.activeEdge === 'bottom' || this.activeEdge === 'corner'
+            ? Math.max(5, Math.ceil(worldY / TILE_SIZE))
+            : currentHeight;
+
+        // Only resize if changed (to avoid excessive updates)
+        if (newWidth !== currentWidth || newHeight !== currentHeight) {
+            this.resizeTileGrid(newWidth, newHeight);
+        }
+    }
+
+    private updateCursor(): void {
+        if (!this.canvas) return;
+
+        if (this.isResizingBounds) {
+            // Keep resize cursor while dragging
+            if (this.activeEdge === 'corner') {
+                this.canvas.style.cursor = 'nwse-resize';
+            } else if (this.activeEdge === 'right') {
+                this.canvas.style.cursor = 'ew-resize';
+            } else if (this.activeEdge === 'bottom') {
+                this.canvas.style.cursor = 'ns-resize';
+            }
+        } else if (this.hoveredEdge) {
+            // Show resize cursor on hover
+            if (this.hoveredEdge === 'corner') {
+                this.canvas.style.cursor = 'nwse-resize';
+            } else if (this.hoveredEdge === 'right') {
+                this.canvas.style.cursor = 'ew-resize';
+            } else if (this.hoveredEdge === 'bottom') {
+                this.canvas.style.cursor = 'ns-resize';
+            }
+        } else {
+            this.canvas.style.cursor = 'crosshair';
+        }
     }
 
     private onWheel(e: WheelEvent) {
