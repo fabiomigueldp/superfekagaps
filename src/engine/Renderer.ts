@@ -1724,27 +1724,38 @@ export class Renderer {
   }
 
   public drawHelmet(x: number, y: number, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
+    // Escala 2x para preencher o tile 16x16
+    const s = 2;
+    // Centralizar verticalmente (Item de 16px, sprite tem 4 units * 2 = 8px altura. Margem de 4px)
+    const dy = y + 4;
+    const dx = x;
 
-    // Capacete dourado
-    ctx.fillStyle = '#FFD700';
-    ctx.beginPath();
-    ctx.arc(x + 8, y + 10, 7, Math.PI, 0);
-    ctx.fill();
+    const GOLD = '#FFD700'; // COLORS.COIN_GOLD
+    const SHADE = '#DAA520';
+    const WHITE = '#FFFFFF';
 
-    // Aba
-    ctx.fillRect(x + 1, y + 10, 14, 3);
+    // Pixel Art Baseado em PLAYER_SPRITES.helmet (8x4)
+    // Linha 0: ___hh___
+    ctx.fillStyle = SHADE;
+    ctx.fillRect(dx + 3 * s, dy, 2 * s, 1 * s);
 
-    // Brilho
-    ctx.fillStyle = '#FFF8DC';
-    ctx.beginPath();
-    ctx.arc(x + 5, y + 7, 2, 0, Math.PI * 2);
-    ctx.fill();
+    // Linha 1: __HHHH__
+    ctx.fillStyle = GOLD;
+    ctx.fillRect(dx + 2 * s, dy + 1 * s, 4 * s, 1 * s);
 
-    // Estrela no centro
-    ctx.fillStyle = '#FF0000';
-    ctx.beginPath();
-    ctx.arc(x + 8, y + 8, 2, 0, Math.PI * 2);
-    ctx.fill();
+    // Linha 2: _HWHHhh_
+    ctx.fillStyle = GOLD;
+    ctx.fillRect(dx + 1 * s, dy + 2 * s, 1 * s, 1 * s); // H
+    ctx.fillStyle = WHITE;
+    ctx.fillRect(dx + 2 * s, dy + 2 * s, 1 * s, 1 * s); // W
+    ctx.fillStyle = GOLD;
+    ctx.fillRect(dx + 3 * s, dy + 2 * s, 2 * s, 1 * s); // HH
+    ctx.fillStyle = SHADE;
+    ctx.fillRect(dx + 5 * s, dy + 2 * s, 2 * s, 1 * s); // hh
+
+    // Linha 3: HHHHHHHH
+    ctx.fillStyle = GOLD;
+    ctx.fillRect(dx, dy + 3 * s, 8 * s, 1 * s);
   }
 
   // === FOGOS DE ARTIFÍCIO ===
@@ -2046,11 +2057,36 @@ export class Renderer {
 
   private drawHelmetIcon(x: number, y: number): void {
     const ctx = this.offscreenCtx;
-    ctx.fillStyle = '#FFD700';
-    ctx.fillRect(x + 1, y + 2, 10, 2);
-    ctx.fillRect(x + 2, y + 4, 8, 3);
-    ctx.fillStyle = '#FFF8DC';
-    ctx.fillRect(x + 4, y + 4, 2, 1);
+    // Sprite 8x4 original em escala 1x
+
+    const GOLD = '#FFD700';
+    const SHADE = '#DAA520';
+    const WHITE = '#FFFFFF';
+
+    // Centralizar no y+4 (h=8) do HUD -> y+2 start
+    const dy = y + 2;
+    const dx = x + 1;
+
+    // Linha 0: ___hh___
+    ctx.fillStyle = SHADE;
+    ctx.fillRect(dx + 3, dy, 2, 1);
+
+    // Linha 1: __HHHH__
+    ctx.fillStyle = GOLD;
+    ctx.fillRect(dx + 2, dy + 1, 4, 1);
+
+    // Linha 2: _HWHHhh_
+    ctx.fillRect(dx + 1, dy + 2, 1, 1);
+    ctx.fillStyle = WHITE;
+    ctx.fillRect(dx + 2, dy + 2, 1, 1);
+    ctx.fillStyle = GOLD;
+    ctx.fillRect(dx + 3, dy + 2, 2, 1);
+    ctx.fillStyle = SHADE;
+    ctx.fillRect(dx + 5, dy + 2, 2, 1);
+
+    // Linha 3: HHHHHHHH
+    ctx.fillStyle = GOLD;
+    ctx.fillRect(dx, dy + 3, 8, 1);
   }
 
   private drawFantaIcon(x: number, y: number, timer: number): void {
