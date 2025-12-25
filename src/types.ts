@@ -1,5 +1,17 @@
 // Tipos e interfaces do jogo Super Feka Gaps
 
+export enum EditorTool {
+  BRUSH = 'BRUSH',
+  ERASER = 'ERASER',
+  SELECT = 'SELECT',
+  RECTANGLE = 'RECTANGLE'
+}
+
+export type PaletteItem =
+  | { type: 'TILE', id: number }
+  | { type: 'ENTITY', id: string, entityType: 'ENEMY' | 'COLLECTIBLE' | 'SPAWN' }
+  | { type: 'TRIGGER', id: string };
+
 // Vetor 2D básico
 export interface Vector2 {
   x: number;

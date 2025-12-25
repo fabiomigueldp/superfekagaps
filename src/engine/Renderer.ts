@@ -9,7 +9,7 @@ import {
   FALLING_PLATFORM_FALL_MS,
   FALLING_PLATFORM_FALL_DISTANCE
 } from '../constants';
-import { CameraData, PlayerData, EnemyData, CollectibleData, FlagData, Particle, Firework, EnemyType, CollectibleType, GroundPoundState, SpeechBubbleRenderState, FallingPlatformPhase, LevelTheme, BackgroundLayerSpec } from '../types';
+import { CameraData, PlayerData, EnemyData, CollectibleData, FlagData, Particle, Firework, EnemyType, CollectibleType, GroundPoundState, SpeechBubbleRenderState, FallingPlatformPhase, LevelTheme, BackgroundLayerSpec, PaletteItem } from '../types';
 import { PLAYER_PALETTE, PLAYER_SPRITES, PLAYER_PIXEL_SIZE, PLAYER_RENDER_OFFSET_X, PLAYER_RENDER_OFFSET_Y } from '../assets/playerSpriteSpec';
 import { BackgroundGenerator } from './BackgroundGenerator';
 
@@ -2390,5 +2390,75 @@ export class Renderer {
   // Utilitário para obter dimensões
   getDimensions(): { width: number; height: number } {
     return { width: GAME_WIDTH, height: GAME_HEIGHT };
+  }
+  // === EDITOR GHOST RENDER ===
+
+  drawEditorGhost(content: PaletteItem, x: number, y: number, opacity: number, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
+    ctx.save();
+    ctx.globalAlpha = opacity;
+
+    // Ensure pixelated rendering is maintained
+    ctx.imageSmoothingEnabled = false;
+
+    if (content.type === 'TILE') {
+      // Use id=0 (Empty) as Eraser
+      if (content.id === TileType.EMPTY) {
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+        ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+        ctx.strokeStyle = '#FF0000';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + TILE_SIZE, y + TILE_SIZE); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x + TILE_SIZE, y); ctx.lineTo(x, y + TILE_SIZE); ctx.stroke();
+      } else {
+        // Draw normal tile
+        // We pass a dummy grid so neighbor-aware tiles (like ground) just draw their default state
+        const dummyGrid = [[content.id], [TileType.EMPTY]];
+        this.drawTile(content.id, x, y, dummyGrid, 0, 0, ctx);
+      }
+    }
+    else if (content.type === 'ENTITY') {
+      if (content.id === 'spawn') {
+        // Draw Player Idle
+        if (PLAYER_SPRITES) {
+          const art = PLAYER_SPRITES.idle;
+          const scale = 1; // 1:1 scale for game world
+
+          const offsetX = PLAYER_RENDER_OFFSET_X;
+          const offsetY = PLAYER_RENDER_OFFSET_Y;
+          const px = Math.round(x + offsetX);
+          const py = Math.round(y + offsetY);
+
+          for (let row = 0; row < art.length; row++) {
+            for (let col = 0; col < art[row].length; col++) {
+              const ch = art[row][col];
+              const color = PLAYER_PALETTE[ch];
+              if (color) {
+                ctx.fillStyle = color;
+                ctx.fillRect(px + col * PLAYER_PIXEL_SIZE, py + row * PLAYER_PIXEL_SIZE, PLAYER_PIXEL_SIZE, PLAYER_PIXEL_SIZE);
+              }
+            }
+          }
+        }
+      }
+      else if (content.id === 'minion') {
+        const mockEnemy: any = {
+          type: EnemyType.MINION,
+          position: { x: x / TILE_SIZE, y: y / TILE_SIZE },
+          active: true, facingRight: false, isDead: false, width: 16, height: 16, animationTimer: 0, animationFrame: 0
+        };
+        this.drawEnemy(mockEnemy, { x: 0, y: 0 } as any, ctx);
+      }
+      else if (content.id === 'boss_joaozao') {
+        const mockEnemy: any = {
+          type: EnemyType.JOAOZAO,
+          position: { x: x / TILE_SIZE, y: y / TILE_SIZE },
+          active: true, facingRight: false, isDead: false, width: 32, height: 32, animationTimer: 0, animationFrame: 0
+        };
+        this.drawEnemy(mockEnemy, { x: 0, y: 0 } as any, ctx);
+      }
+    }
+
+    ctx.restore();
   }
 }

@@ -1,16 +1,24 @@
-import { CameraData, LevelData, Vector2, EnemyType, CollectibleType } from '../types';
+import { CameraData, LevelData, Vector2, EnemyType, CollectibleType, EditorTool, PaletteItem } from '../types';
 import { FileSystemManager } from './FileSystemManager';
 import { TileType, TILE_SIZE, COLORS, GAME_WIDTH, GAME_HEIGHT } from '../constants';
 import { Renderer } from '../engine/Renderer';
+
+
+
 
 export class EditorController {
     public camera: CameraData;
     public fs: FileSystemManager;
     public levelData: LevelData | null = null;
-    public selectedTile: number = 1; // Default to Ground
+    public activeContent: PaletteItem = { type: 'TILE', id: 1 }; // Default to Ground
+    public activeTool: EditorTool = EditorTool.BRUSH;
     public currentLevelFilename: string = '';
 
+    private isCtrlPressed: boolean = false;
+    private currentWorldMouse: Vector2 = { x: 0, y: 0 };
+
     private isDragging: boolean = false;
+    private dragStartTile: Vector2 | null = null;
     private lastMousePos: Vector2 = { x: 0, y: 0 };
     private canvas: HTMLCanvasElement;
     private scale: number = 1; // Used for coordinate mapping (Window -> Game Resolution)
@@ -243,6 +251,14 @@ export class EditorController {
         document.getElementById('btn-fit-content')?.addEventListener('click', () => {
             this.fitToContent();
         });
+
+        // Key modifiers
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Control') this.isCtrlPressed = true;
+        });
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'Control') this.isCtrlPressed = false;
+        });
     }
 
     private selectTab(tabId: string) {
@@ -464,32 +480,44 @@ export class EditorController {
     private buildPalette() {
         this.uiPalette.innerHTML = '';
 
-        // Manual list of interesting tiles for editing
-        const tiles = [
-            { id: TileType.EMPTY, label: 'Erase' },
-            { id: TileType.GROUND, label: 'Ground' },
-            { id: TileType.BRICK, label: 'Brick' },
-            { id: TileType.BRICK_BREAKABLE, label: 'Break' },
-            { id: TileType.POWERUP_BLOCK_MINI_FANTA, label: 'Blk Fanta' },
-            { id: TileType.POWERUP_BLOCK_HELMET, label: 'Blk Helm' },
-            { id: TileType.PLATFORM, label: 'Plat' },
-            { id: TileType.PLATFORM_FALLING, label: 'Fall' },
-            { id: TileType.SPIKE, label: 'Spike' },
-            { id: TileType.ICE, label: 'Ice' },
-            { id: TileType.SPRING, label: 'Spring' },
-            { id: TileType.LAVA_TOP, label: 'Lava Top' },
-            { id: TileType.LAVA_FILL, label: 'Lava Fill' },
-            { id: TileType.COIN, label: 'Coin' },
-            { id: TileType.POWERUP_MINI_FANTA, label: 'Item Fanta' },
-            { id: TileType.POWERUP_HELMET, label: 'Item Helm' },
-            { id: TileType.HIDDEN_BLOCK, label: 'Hidden' },
-            { id: TileType.CHECKPOINT, label: 'Check' },
-            { id: TileType.FLAG, label: 'Goal' },
-            { id: 999, label: 'Minion' }
+        type UIItem = PaletteItem & { label: string };
+
+        // 1. Define Palette Items
+        const items: UIItem[] = [
+            // --- TOOLS / SPECIAL TILES ---
+            { type: 'TILE', id: TileType.EMPTY, label: 'Erase' }, // Acts as Eraser for tiles if clicked, but we have a tool now. Keep for compatibility? Or just 'Empty Air'. 
+
+            // --- STANDARD TILES ---
+            { type: 'TILE', id: TileType.GROUND, label: 'Ground' },
+            { type: 'TILE', id: TileType.BRICK, label: 'Brick' },
+            { type: 'TILE', id: TileType.BRICK_BREAKABLE, label: 'Break' },
+            { type: 'TILE', id: TileType.PLATFORM, label: 'Plat' },
+            { type: 'TILE', id: TileType.PLATFORM_FALLING, label: 'Fall' },
+            { type: 'TILE', id: TileType.SPIKE, label: 'Spike' },
+            { type: 'TILE', id: TileType.ICE, label: 'Ice' },
+            { type: 'TILE', id: TileType.SPRING, label: 'Spring' },
+            { type: 'TILE', id: TileType.LAVA_TOP, label: 'Lava Top' },
+            { type: 'TILE', id: TileType.LAVA_FILL, label: 'Lava Fill' },
+            { type: 'TILE', id: TileType.HIDDEN_BLOCK, label: 'Hidden' },
+
+            // --- OBJECT TILES (Some handled as tiles in game) ---
+            { type: 'TILE', id: TileType.COIN, label: 'Coin' },
+            { type: 'TILE', id: TileType.CHECKPOINT, label: 'Check' },
+            { type: 'TILE', id: TileType.FLAG, label: 'Goal' },
+            { type: 'TILE', id: TileType.POWERUP_BLOCK_MINI_FANTA, label: 'Blk Fanta' },
+            { type: 'TILE', id: TileType.POWERUP_BLOCK_HELMET, label: 'Blk Helm' },
+            { type: 'TILE', id: TileType.POWERUP_MINI_FANTA, label: 'Item Fanta' },
+            { type: 'TILE', id: TileType.POWERUP_HELMET, label: 'Item Helm' },
+
+            // --- ENTITIES ---
+            { type: 'ENTITY', id: 'minion', entityType: 'ENEMY', label: 'Minion' },
+            { type: 'ENTITY', id: 'boss_joaozao', entityType: 'ENEMY', label: 'Boss' },
+            { type: 'ENTITY', id: 'spawn', entityType: 'SPAWN', label: 'Spawn' }
         ];
+
         const renderer = (window as any).renderer as Renderer; // Access global renderer for thumbnails
 
-        tiles.forEach(t => {
+        items.forEach(item => {
             const btn = document.createElement('div');
             btn.className = 'tile-btn';
 
@@ -501,58 +529,87 @@ export class EditorController {
             thumb.style.marginBottom = '5px';
 
             // Draw thumbnail
-            if (renderer && t.id !== TileType.EMPTY) {
+            if (renderer) {
                 const ctx = thumb.getContext('2d')!;
                 ctx.scale(2, 2); // Scale up for visibility
 
-                // Hack: We need 'tiles' context for some (like Ground), passing dummy
-                const dummyGrid = [[t.id], [TileType.EMPTY]];
-
-                // Special handling for Entity-Tiles
-                // Special handling for Entity-Tiles
-                if (t.id === TileType.COIN) renderer.drawCoin(0, 0, 0, ctx);
-                else if (t.id === TileType.POWERUP_MINI_FANTA) renderer.drawFanta(0, 0, 0, ctx);
-                else if (t.id === TileType.POWERUP_HELMET) renderer.drawHelmet(0, 0, ctx);
-                else if (t.id === TileType.HIDDEN_BLOCK) {
-                    ctx.globalAlpha = 0.5;
-                    renderer.drawTile(TileType.BRICK, 0, 0, dummyGrid, 0, 0, ctx);
+                // --- TILE RENDERING ---
+                if (item.type === 'TILE') {
+                    if (item.id === TileType.EMPTY) {
+                        ctx.fillStyle = '#333';
+                        ctx.fillRect(0, 0, 32, 32);
+                        ctx.strokeStyle = '#555';
+                        ctx.strokeRect(0, 0, 32, 32);
+                        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(32, 32); ctx.stroke();
+                    }
+                    else if (item.id === TileType.COIN) renderer.drawCoin(0, 0, 0, ctx);
+                    else if (item.id === TileType.POWERUP_MINI_FANTA) renderer.drawFanta(0, 0, 0, ctx);
+                    else if (item.id === TileType.POWERUP_HELMET) renderer.drawHelmet(0, 0, ctx);
+                    else if (item.id === TileType.HIDDEN_BLOCK) {
+                        ctx.globalAlpha = 0.5;
+                        const dummyGrid = [[item.id], [TileType.EMPTY]];
+                        renderer.drawTile(TileType.BRICK, 0, 0, dummyGrid, 0, 0, ctx);
+                    }
+                    else if (item.id === TileType.CHECKPOINT) renderer['drawFlagTile'](0, 0, ctx);
+                    else {
+                        const dummyGrid = [[item.id], [TileType.EMPTY]];
+                        renderer.drawTile(item.id, 0, 0, dummyGrid, 0, 0, ctx);
+                    }
                 }
-                else if (t.id === TileType.CHECKPOINT) renderer['drawFlagTile'](0, 0, ctx);
-                else if (t.id === 999) {
-                    // Virtual Minion ID
-                    const mockEnemy: any = {
-                        type: EnemyType.MINION,
-                        position: { x: 0, y: 0 },
-                        active: true, facingRight: false, isDead: false, width: 16, height: 16, animationTimer: 0, animationFrame: 0
-                    };
-                    const mockCam: any = { x: 0, y: 0 };
-                    renderer.drawEnemy(mockEnemy, mockCam, ctx);
+                // --- ENTITY RENDERING ---
+                else if (item.type === 'ENTITY') {
+                    if (item.id === 'minion') {
+                        const mockEnemy: any = {
+                            type: EnemyType.MINION,
+                            position: { x: 0, y: 0 },
+                            active: true, facingRight: false, isDead: false, width: 16, height: 16, animationTimer: 0, animationFrame: 0
+                        };
+                        renderer.drawEnemy(mockEnemy, { x: 0, y: 0 } as any, ctx);
+                    }
+                    else if (item.id === 'boss_joaozao') {
+                        // Placeholder for Boss visual
+                        ctx.fillStyle = 'purple';
+                        ctx.fillRect(2, 2, 12, 12);
+                        ctx.fillStyle = 'white';
+                        ctx.font = '8px monospace';
+                        ctx.fillText('BOSS', 0, 10);
+                    }
+                    else if (item.id === 'spawn') {
+                        ctx.fillStyle = 'cyan';
+                        ctx.fillRect(4, 4, 8, 8);
+                        ctx.strokeStyle = 'white';
+                        ctx.strokeRect(4, 4, 8, 8);
+                    }
                 }
-                else {
-                    renderer.drawTile(t.id, 0, 0, dummyGrid, 0, 0, ctx);
-                }
-            } else {
-                // Empty / Eraser visual
-                const ctx = thumb.getContext('2d')!;
-                ctx.fillStyle = '#333';
-                ctx.fillRect(0, 0, 32, 32);
-                ctx.strokeStyle = '#555';
-                ctx.strokeRect(0, 0, 32, 32);
-                ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(32, 32); ctx.stroke();
             }
 
             btn.appendChild(thumb);
 
             const label = document.createElement('span');
-            label.innerText = t.label;
+            label.innerText = item.label;
             label.style.fontSize = '10px';
             btn.appendChild(label);
 
             btn.onclick = () => {
-                this.selectedTile = t.id;
-                // Visual selection
+                this.activeContent = item;
+
+                // Smart Tool Switching:
+                // If we are using ERASER or SELECT, selecting a tile implies we want to paint -> Switch to BRUSH.
+                // If we are using BRUSH or RECTANGLE, keep the tool (user might want to paint a rect of the new tile).
+                if (this.activeTool === EditorTool.ERASER || this.activeTool === EditorTool.SELECT) {
+                    this.activeTool = EditorTool.BRUSH;
+                }
+
+                // Update UI state
                 Array.from(this.uiPalette.children).forEach(c => c.classList.remove('selected'));
                 btn.classList.add('selected');
+
+                // Sync Tool UI
+                document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+                const activeBtn = document.querySelector(`.tool-btn[data-tool="${this.activeTool}"]`);
+                if (activeBtn) activeBtn.classList.add('active');
+
+                console.log('Selected Content:', this.activeContent);
             };
             this.uiPalette.appendChild(btn);
         });
@@ -661,6 +718,22 @@ export class EditorController {
         // Add editor-mode class to body for canvas positioning
         document.body.classList.add('editor-mode');
 
+        // Bind Tool Buttons
+        document.querySelectorAll('.tool-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tool = (btn as HTMLElement).dataset.tool as keyof typeof EditorTool;
+                if (tool && EditorTool[tool]) {
+                    this.activeTool = EditorTool[tool];
+
+                    // Update Visuals
+                    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    console.log('Active Tool:', this.activeTool);
+                }
+            });
+        });
+
         // Resize canvas to fit in editor layout
         this.resizeCanvasForEditor();
         window.addEventListener('resize', () => this.resizeCanvasForEditor());
@@ -675,9 +748,10 @@ export class EditorController {
         const toolbarHeight = 40;
         const statusbarHeight = 22;
         const sidebarWidth = 250;
+        const toolsWidth = 40;
 
         // Calculate available space
-        const availableWidth = window.innerWidth - sidebarWidth;
+        const availableWidth = window.innerWidth - sidebarWidth - toolsWidth;
         const availableHeight = window.innerHeight - toolbarHeight - statusbarHeight;
 
         // Make canvas fill 100% of available space
@@ -685,7 +759,7 @@ export class EditorController {
         this.canvas.style.height = `${availableHeight}px`;
 
         // Position canvas at top-left of available area
-        this.canvas.style.left = `0px`;
+        this.canvas.style.left = `${toolsWidth}px`;
         this.canvas.style.top = `${toolbarHeight}px`;
     }
 
@@ -763,6 +837,12 @@ export class EditorController {
 
             // 2. Draw Tiles (Using Game Renderer for pixel-perfect accuracy)
             this.renderEditorView(mainCtx, renderer);
+
+            // 2.5 Draw Tool Previews (Rectangle Overlay)
+            this.drawRectanglePreview(mainCtx);
+
+            // 2.6 Draw Ghost Preview (Brush/Item placement)
+            this.drawGhostPreview(renderer, mainCtx);
         }
 
         // 3. Draw Grid
@@ -878,6 +958,36 @@ export class EditorController {
                 renderer.drawCollectible(mockCol, this.camera, ctx);
             });
         }
+    }
+
+    private drawRectanglePreview(ctx: CanvasRenderingContext2D) {
+        if (!this.dragStartTile || this.activeTool !== EditorTool.RECTANGLE) return;
+
+        // Current Hover is maintained in hoveredCol/hoveredRow (World Coordinates)
+        const startX = this.dragStartTile.x; // World Tile X
+        const startY = this.dragStartTile.y; // World Tile Y
+        const endX = this.hoveredCol;
+        const endY = this.hoveredRow;
+
+        const minX = Math.min(startX, endX);
+        const maxX = Math.max(startX, endX);
+        const minY = Math.min(startY, endY);
+        const maxY = Math.max(startY, endY);
+
+        // Calculate screen coordinates
+        const x = Math.floor(minX * TILE_SIZE - this.camera.x);
+        const y = Math.floor(minY * TILE_SIZE - this.camera.y);
+        const width = (maxX - minX + 1) * TILE_SIZE;
+        const height = (maxY - minY + 1) * TILE_SIZE;
+
+        ctx.save();
+        ctx.fillStyle = 'rgba(0, 255, 255, 0.3)';
+        ctx.strokeStyle = 'cyan';
+        ctx.lineWidth = 1; // logical pixel width (will be scaled by context)
+
+        ctx.fillRect(x, y, width, height);
+        ctx.strokeRect(x, y, width, height);
+        ctx.restore();
     }
 
     private drawGrid(ctx: CanvasRenderingContext2D) {
@@ -1016,6 +1126,42 @@ export class EditorController {
         ctx.fillText(label, x + 4 / transform.a, y - 4 / transform.a);
     }
 
+    private drawGhostPreview(renderer: Renderer, ctx: CanvasRenderingContext2D) {
+        // Only valid for BRUSH or RECTANGLE (and not dragging Rectangle)
+        if (this.activeTool !== EditorTool.BRUSH && this.activeTool !== EditorTool.RECTANGLE) return;
+        if (this.activeTool === EditorTool.RECTANGLE && this.isDragging) return; // Don't show item ghost while dragging rect
+        if (this.activeContent.type === 'TRIGGER') return; // Triggers usually have different display
+
+        let ghostX = this.currentWorldMouse.x;
+        let ghostY = this.currentWorldMouse.y;
+
+        // Snapping Logic
+        if (this.activeContent.type === 'TILE') {
+            // Tiles ALWAYS snap to grid
+            const col = Math.floor(ghostX / TILE_SIZE);
+            const row = Math.floor(ghostY / TILE_SIZE);
+            ghostX = col * TILE_SIZE - this.camera.x;
+            ghostY = row * TILE_SIZE - this.camera.y;
+        }
+        else if (this.activeContent.type === 'ENTITY') {
+            if (this.isCtrlPressed) {
+                // Snap Entities if Ctrl pressed
+                const col = Math.floor(ghostX / TILE_SIZE);
+                const row = Math.floor(ghostY / TILE_SIZE);
+                // Entities (like Enemies) usually rendered from top-left, so this is fine
+                ghostX = col * TILE_SIZE - this.camera.x;
+                ghostY = row * TILE_SIZE - this.camera.y;
+            } else {
+                // Free movement (Pixel Perfect)
+                // We just subtract camera to get screen-relative coordinates
+                ghostX -= this.camera.x;
+                ghostY -= this.camera.y;
+            }
+        }
+
+        renderer.drawEditorGhost(this.activeContent, ghostX, ghostY, 0.5, ctx);
+    }
+
 
     private onMouseDown(e: MouseEvent) {
         this.updateScale();
@@ -1026,8 +1172,15 @@ export class EditorController {
         const worldX = (startX / this.zoom) + this.camera.x;
         const worldY = (startY / this.zoom) + this.camera.y;
 
+        console.log(`🖱️ MouseDown: Tool=${this.activeTool}, Content=`, this.activeContent);
+
         // Left click: Check for bounds edge first, then paint
         if (e.button === 0) {
+            // Only interact with bounds if SELECT tool is theoretically active? 
+            // Or just always allow bounds resize as a global feature?
+            // The user didn't specify, but "SELECT" tool implies selection/move. 
+            // Current code allows bounds resize always. Let's keep it but maybe prioritize tool logic.
+
             const edge = this.detectBoundsEdge(worldX, worldY);
             if (edge) {
                 // Start bounds resize
@@ -1035,9 +1188,16 @@ export class EditorController {
                 this.activeEdge = edge;
                 this.isDragging = true;
             } else {
-                // Normal paint
-                this.paintTile(startX, startY);
-                this.isDragging = true;
+                // Tool Action
+                if (this.activeTool === EditorTool.BRUSH || this.activeTool === EditorTool.ERASER) {
+                    this.paintTile(startX, startY);
+                    this.isDragging = true;
+                }
+                else if (this.activeTool === EditorTool.RECTANGLE) {
+                    this.dragStartTile = { x: Math.floor(worldX / TILE_SIZE), y: Math.floor(worldY / TILE_SIZE) };
+                    this.isDragging = true;
+                }
+                // (SELECT logic placeholder)
             }
         }
         // Right click: Pan Start
@@ -1059,8 +1219,12 @@ export class EditorController {
         const currentY = e.offsetY / this.scale;
 
         // Always track hovered tile for HUD display
+        // And track precise world mouse for Ghost
         const worldX = (currentX / this.zoom) + this.camera.x;
         const worldY = (currentY / this.zoom) + this.camera.y;
+
+        this.currentWorldMouse = { x: worldX, y: worldY };
+
         this.hoveredCol = Math.floor(worldX / TILE_SIZE);
         this.hoveredRow = Math.floor(worldY / TILE_SIZE);
 
@@ -1090,16 +1254,64 @@ export class EditorController {
 
         // Painting (only if not resizing bounds)
         if (e.buttons === 1 && !this.isResizingBounds) {
-            this.paintTile(currentX, currentY);
+            // Only Brush/Eraser paints continuously on drag
+            if (this.activeTool === EditorTool.BRUSH || this.activeTool === EditorTool.ERASER) {
+                this.paintTile(currentX, currentY);
+            }
         }
 
         this.lastMousePos = { x: currentX, y: currentY };
     }
 
     private onMouseUp(_e: MouseEvent) {
+        if (this.isDragging && this.activeTool === EditorTool.RECTANGLE && this.dragStartTile) {
+            this.applyRectangleTool();
+        }
+
         this.isDragging = false;
         this.isResizingBounds = false;
         this.activeEdge = null;
+        this.dragStartTile = null;
+    }
+
+    private applyRectangleTool() {
+        if (!this.dragStartTile || !this.levelData) return;
+
+        // Don't rect-fill entities, only TILEs or ERASER
+        if (this.activeContent.type === 'ENTITY') {
+            console.warn('Rectangle tool not supported for Entities');
+            return;
+        }
+
+        const startX = this.dragStartTile.x;
+        const startY = this.dragStartTile.y;
+        const endX = this.hoveredCol;
+        const endY = this.hoveredRow;
+
+        const minCol = Math.min(startX, endX);
+        const maxCol = Math.max(startX, endX);
+        const minRow = Math.min(startY, endY);
+        const maxRow = Math.max(startY, endY);
+
+        const originX = this.levelData.originX ?? 0;
+        const originY = this.levelData.originY ?? 0;
+
+        for (let r = minRow; r <= maxRow; r++) {
+            for (let c = minCol; c <= maxCol; c++) {
+                // Convert world coords to array coords
+                const arrayRow = r - originY;
+                const arrayCol = c - originX;
+
+                if (arrayRow >= 0 && arrayRow < this.levelData.tiles.length &&
+                    arrayCol >= 0 && arrayCol < this.levelData.tiles[0].length) {
+
+                    if (this.activeContent.type === 'TILE') {
+                        this.levelData.tiles[arrayRow][arrayCol] = this.activeContent.id;
+                    }
+                }
+            }
+        }
+        console.log(`Squared filled from (${minCol},${minRow}) to (${maxCol},${maxRow})`);
     }
 
     private detectBoundsEdge(worldX: number, worldY: number): 'left' | 'right' | 'top' | 'bottom' | 'corner-br' | 'corner-tl' | null {
@@ -1317,42 +1529,58 @@ export class EditorController {
         const col = worldCol - originX;
         const row = worldRow - originY;
 
+        // Ensure within bounds
         if (row >= 0 && row < this.levelData.tiles.length &&
             col >= 0 && col < this.levelData.tiles[0].length) {
 
-            // Special Logic for Entities
-            if (this.selectedTile === 999) {
-                // Paint Minion
-                // Use WORLD tile coordinates for entity positions (they're stored in world space)
-                const alreadyExists = this.levelData.enemies.some(e =>
-                    Math.abs(e.position.x - worldCol) < 0.1 &&
-                    Math.abs(e.position.y - worldRow) < 0.1
-                );
+            // --- ERASER TOOL OR ERASE CONTENT ---
+            if (this.activeTool === EditorTool.ERASER ||
+                (this.activeContent.type === 'TILE' && this.activeContent.id === TileType.EMPTY)) {
 
-                if (!alreadyExists) {
-                    this.levelData.enemies.push({
-                        type: EnemyType.MINION,
-                        position: { x: worldCol, y: worldRow } // Store as WORLD tile coordinates
-                    });
-                }
-            }
-            else if (this.selectedTile === TileType.EMPTY) {
-                // ERASE Tool: Clears Tile AND Entities
+                // Erase Tile
                 this.levelData.tiles[row][col] = 0;
 
-                // Remove enemies at this location (using WORLD TILE coordinates)
+                // Erase Entities at this location
                 this.levelData.enemies = this.levelData.enemies.filter(e => {
                     return Math.abs(e.position.x - worldCol) > 0.1 || Math.abs(e.position.y - worldRow) > 0.1;
                 });
-
-                // Remove collectibles at this location (using WORLD TILE coordinates)
                 this.levelData.collectibles = this.levelData.collectibles.filter(c => {
                     return Math.abs(c.position.x - worldCol) > 0.1 || Math.abs(c.position.y - worldRow) > 0.1;
                 });
+                return;
             }
-            else {
+
+            // --- BRUSH / RECTANGLE (Point Logic) ---
+            // For now, only handling single point paint here
+
+            if (this.activeContent.type === 'ENTITY') {
+                // Handling Entities
+                const entityId = this.activeContent.id;
+
+                if (entityId === 'spawn') {
+                    // Set Player Spawn
+                    this.levelData.playerSpawn = { x: worldCol, y: worldRow };
+                    console.log('Set Spawn:', worldCol, worldRow);
+                }
+                else if (entityId === 'minion' || entityId === 'boss_joaozao') {
+                    // Check if enemy already exists at this tile
+                    const alreadyExists = this.levelData.enemies.some(e =>
+                        Math.abs(e.position.x - worldCol) < 0.1 &&
+                        Math.abs(e.position.y - worldRow) < 0.1
+                    );
+
+                    if (!alreadyExists) {
+                        const type = entityId === 'boss_joaozao' ? EnemyType.JOAOZAO : EnemyType.MINION;
+                        this.levelData.enemies.push({
+                            type: type,
+                            position: { x: worldCol, y: worldRow }
+                        });
+                    }
+                }
+            }
+            else if (this.activeContent.type === 'TILE') {
                 // Normal Tile Paint
-                this.levelData.tiles[row][col] = this.selectedTile;
+                this.levelData.tiles[row][col] = this.activeContent.id;
             }
         }
     }
