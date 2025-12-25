@@ -585,6 +585,7 @@ export class EditorController {
                 this.populateThemeEditor();
                 this.updateTheme(); // Force render of background
                 this.updateBoundsUI(); // Sync bounds UI with loaded level
+                this.fitLevelToScreen();
             };
             this.uiLevelList.appendChild(div);
         });
@@ -648,6 +649,7 @@ export class EditorController {
         // show ui
         const ui = document.getElementById('editor-ui');
         if (ui) ui.classList.add('active');
+        this.fitLevelToScreen();
     }
 
     public update(_deltaTime: number) {
@@ -1351,5 +1353,56 @@ export class EditorController {
                 this.levelData.tiles[row][col] = this.selectedTile;
             }
         }
+    }
+
+    private fitLevelToScreen(): void {
+        if (!this.levelData) return;
+
+        // Ensure scale is up to date with current window size
+        this.updateScale();
+
+        // Level Dimensions in World Pixels
+        const widthTiles = this.levelData.width;
+        const heightTiles = this.levelData.height;
+        const originX = this.levelData.originX ?? 0;
+        const originY = this.levelData.originY ?? 0;
+
+        const levelWidth = widthTiles * TILE_SIZE;
+        const levelHeight = heightTiles * TILE_SIZE;
+
+        // Viewport Dimensions (Logical Game Units)
+        // scale = canvasWidth / GAME_WIDTH
+        // logicalWidth = canvasWidth / scale = GAME_WIDTH
+        const logicalWidth = GAME_WIDTH;
+        const logicalHeight = this.canvas.height / this.scale;
+
+        // Calculate Target Zoom to fit content (with 10% margin)
+        // zoom = logicalSize / levelSize
+        const zoomX = logicalWidth / (levelWidth * 1.1);
+        const zoomY = logicalHeight / (levelHeight * 1.1);
+
+        // Choose smallest zoom to fit both dimensions
+        // Clamp between 0.1 (zoom out) and 2.0 (zoom in - don't overzoom small levels)
+        let newZoom = Math.min(zoomX, zoomY);
+        newZoom = Math.max(0.1, Math.min(2.0, newZoom));
+
+        this.zoom = newZoom;
+
+        // Update Zoom Label
+        if (this.uiZoomLabel) {
+            this.uiZoomLabel.innerText = Math.round(this.zoom * 100) + '%';
+        }
+
+        // Center Camera
+        const levelCenterX = (originX * TILE_SIZE) + (levelWidth / 2);
+        const levelCenterY = (originY * TILE_SIZE) + (levelHeight / 2);
+
+        const visibleWidth = logicalWidth / this.zoom;
+        const visibleHeight = logicalHeight / this.zoom;
+
+        this.camera.x = levelCenterX - (visibleWidth / 2);
+        this.camera.y = levelCenterY - (visibleHeight / 2);
+
+        console.log(`🎥 Fitted level: Zoom ${newZoom.toFixed(2)}, Cam (${this.camera.x.toFixed(0)}, ${this.camera.y.toFixed(0)})`);
     }
 }

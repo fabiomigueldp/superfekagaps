@@ -17,10 +17,10 @@ export class Joaozao {
   private hurtTimer: number = 0;
 
   // Adicione uma flag para controlar a rotação da morte visualmente
-  public deadRotation: number = 0; 
+  public deadRotation: number = 0;
 
   // Flag para garantir que o smash ocorra apenas uma vez por execução de ação
-  private hasSmashed: boolean = false; 
+  private hasSmashed: boolean = false;
   // Impacto pendente para o jogo processar (câmera/partículas/som)
   private pendingImpact: { x: number; y: number } | null = null
 
@@ -52,7 +52,7 @@ export class Joaozao {
     // --- MELHORIA NA MORTE ---
     if (this.data.isDead) {
       this.data.deathTimer -= deltaTime;
-      
+
       // Gira o corpo enquanto morre (efeito dramático)
       // Vai de 0 a 90 graus (PI/2) rapidamente
       if (this.deadRotation < Math.PI / 2) {
@@ -97,7 +97,7 @@ export class Joaozao {
     // Se estiver machucado recentemente, sobrepõe a animação atual com a de dor
     // Isso sincroniza visualmente com as falas "Hit React" (ex: "Porra nenhuma")
     if (this.hurtTimer > 200) { // Mostra dor nos primeiros 200ms do hit
-        this.data.animationFrame = 3; // Frame 3 = DANO
+      this.data.animationFrame = 3; // Frame 3 = DANO
     }
     // ------------------------------------------
 
@@ -119,8 +119,8 @@ export class Joaozao {
     // Se bateu a cabeça em um tile, tenta quebrar tijolos (verifica toda a largura do chefe)
     if (collision.tileHit && collision.tileHit.side === 'top') {
       const headRow = collision.tileHit.row;
-      const leftCol = Math.floor(rect.x / TILE_SIZE);
-      const rightCol = Math.floor((rect.x + rect.width - 1) / TILE_SIZE);
+      const leftCol = level.worldToCol(rect.x);
+      const rightCol = level.worldToCol(rect.x + rect.width - 1);
       for (let col = leftCol; col <= rightCol; col++) {
         const res = level.breakTile(col, headRow);
         if (res.success) {
@@ -215,8 +215,11 @@ export class Joaozao {
 
           // Executa o smash apenas uma vez
           if (!this.hasSmashed) {
-            const gapCol = Math.floor(playerX / TILE_SIZE);
+            const gapCol = level.worldToCol(playerX);
             for (let i = -1; i <= 1; i++) {
+              // level.removeTileTemporarily espera indices de array, então gapCol + i deve ser indice de array
+              // O removeTileTemporarily provavelmente espera indices de array, vamos confirmar.
+              // Se gapCol vem de worldToCol, ele já é array index.
               level.removeTileTemporarily(gapCol + i, 9, 3000);
             }
 
@@ -236,7 +239,7 @@ export class Joaozao {
   private fireProjectile(playerX: number): void {
     const dirX = playerX > this.data.position.x ? 1 : -1;
     const projectile: Projectile = {
-      position: { 
+      position: {
         x: this.data.position.x + this.data.width / 2,
         y: this.data.position.y + this.data.height / 2
       },
@@ -294,9 +297,9 @@ export class Joaozao {
     this.data.health--;
 
     // Knockback mais forte para sentir o impacto
-    this.data.velocity.y = -6; 
+    this.data.velocity.y = -6;
     // Empurra para longe de onde o dano veio (simplificado aleatório ou baseado no player se tivesse ref)
-    this.data.velocity.x = (Math.random() > 0.5 ? 1 : -1) * 3; 
+    this.data.velocity.x = (Math.random() > 0.5 ? 1 : -1) * 3;
 
     this.phase = Math.min(3, 4 - this.data.health);
 
@@ -333,11 +336,11 @@ export class Joaozao {
     }
 
     const myRect = this.getRect();
-    
+
     const hit = myRect.x < playerRect.x + playerRect.width &&
-                myRect.x + myRect.width > playerRect.x &&
-                myRect.y < playerRect.y + playerRect.height &&
-                myRect.y + myRect.height > playerRect.y;
+      myRect.x + myRect.width > playerRect.x &&
+      myRect.y < playerRect.y + playerRect.height &&
+      myRect.y + myRect.height > playerRect.y;
 
     if (!hit) return { hit: false, fromAbove: false };
 
@@ -362,9 +365,9 @@ export class Joaozao {
       if (!p.active) continue;
 
       const hit = p.position.x < playerRect.x + playerRect.width &&
-                  p.position.x + p.width > playerRect.x &&
-                  p.position.y < playerRect.y + playerRect.height &&
-                  p.position.y + p.height > playerRect.y;
+        p.position.x + p.width > playerRect.x &&
+        p.position.y < playerRect.y + playerRect.height &&
+        p.position.y + p.height > playerRect.y;
 
       if (hit) {
         p.active = false;

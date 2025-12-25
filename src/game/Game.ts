@@ -310,16 +310,21 @@ export class Game {
       const th = playerResult.tileHit;
       if (th && th.side === 'top' && this.level) {
         // Cabeçada em tile (por baixo do bloco)
-        const tileType = this.level.getTile(th.col, th.row);
+        // CONVERTER PARA ÍNDICES DE ARRAY (GRID LOCAL)
+        const gridCol = th.col - this.level.originX;
+        const gridRow = th.row - this.level.originY;
+
+        const tileType = this.level.getTile(gridCol, gridRow);
+
         if (tileType === TileType.BRICK_BREAKABLE) {
           // Quebra o bloco
-          this.level.setTile(th.col, th.row, TileType.EMPTY);
+          this.level.setTile(gridCol, gridRow, TileType.EMPTY);
           this.spawnParticles(th.col * TILE_SIZE + TILE_SIZE / 2, th.row * TILE_SIZE + TILE_SIZE / 2, '#DEB887', 10);
           this.audio.playBlockBreak();
           this.score += BLOCK_BREAK_SCORE;
         } else if (tileType === TileType.BRICK) {
           if (this.player.data.hasHelmet) {
-            this.level.setTile(th.col, th.row, TileType.EMPTY);
+            this.level.setTile(gridCol, gridRow, TileType.EMPTY);
             this.spawnParticles(th.col * TILE_SIZE + TILE_SIZE / 2, th.row * TILE_SIZE + TILE_SIZE / 2, '#DEB887', 10);
             this.audio.playBlockBreak();
             this.score += BLOCK_BREAK_SCORE;
@@ -327,12 +332,12 @@ export class Game {
             this.audio.playBlockBump();
           }
         } else if (tileType === TileType.HIDDEN_BLOCK) {
-          this.level.setTile(th.col, th.row, TileType.BRICK);
+          this.level.setTile(gridCol, gridRow, TileType.BRICK);
           this.audio.playBlockBump();
         } else if (tileType === TileType.POWERUP_BLOCK_MINI_FANTA || tileType === TileType.POWERUP_BLOCK_HELMET) {
           // Troca por usado e spawna power-up
           const newTile = TileType.BLOCK_USED;
-          this.level.setTile(th.col, th.row, newTile);
+          this.level.setTile(gridCol, gridRow, newTile);
           const collectType = tileType === TileType.POWERUP_BLOCK_MINI_FANTA ? CollectibleType.MINI_FANTA : CollectibleType.HELMET;
           const spawnX = th.col * TILE_SIZE;
           const spawnY = th.row * TILE_SIZE - 16;
@@ -688,6 +693,8 @@ export class Game {
     const rawLevelData = JSON.parse(JSON.stringify(rawLevelDataOriginal));
 
     const levelData = this.normalizeLevelData(rawLevelData);
+
+
     this.level = createLevel(levelData);
     this.player = new Player(levelData.playerSpawn.x, levelData.playerSpawn.y);
     this.levelTime = levelData.timeLimit;
@@ -777,12 +784,18 @@ export class Game {
       for (let col = 0; col < sourceRow.length; col++) {
         const tile = sourceRow[col];
         if (tile === TileType.CHECKPOINT) {
-          checkpointMarkers.push({ x: col, y: row });
+          checkpointMarkers.push({
+            x: col + (levelData.originX ?? 0),
+            y: row + (levelData.originY ?? 0)
+          });
           newRow.push(TileType.EMPTY);
           continue;
         }
         if (tile === TileType.FLAG) {
-          goalMarkers.push({ x: col, y: row });
+          goalMarkers.push({
+            x: col + (levelData.originX ?? 0),
+            y: row + (levelData.originY ?? 0)
+          });
           newRow.push(TileType.EMPTY);
           continue;
         }
@@ -792,9 +805,14 @@ export class Game {
           if (tile === TileType.POWERUP_MINI_FANTA) type = CollectibleType.MINI_FANTA;
           if (tile === TileType.POWERUP_HELMET) type = CollectibleType.HELMET;
 
+          // Revertendo para usar apenas coordenadas de grid aqui
+          // CORRIGIDO: Aplicamos o offset AQUI pois estamos convertendo de Grid (row/col) para Mundo
           levelData.collectibles.push({
             type: type,
-            position: { x: col, y: row } // coords em grid
+            position: {
+              x: col + (levelData.originX ?? 0),
+              y: row + (levelData.originY ?? 0)
+            }
           });
           newRow.push(TileType.EMPTY);
           continue;
@@ -898,21 +916,35 @@ export class Game {
     let nextId = 0;
 
     levelData.checkpoints.forEach(cp => {
-      const col = Math.floor(cp.x);
-      const row = Math.floor(cp.y);
-      const surfaceRow = this.findSurfaceRow(levelData.tiles, col, row) ?? row;
-      const resolvedRow = this.clampRow(surfaceRow, levelData.tiles.length);
+      const worldCol = Math.floor(cp.x);
+      const worldRow = Math.floor(cp.y);
+
+      // Converte Mundo -> Grid para acessar tiles
+      const originX = levelData.originX ?? 0;
+      const originY = levelData.originY ?? 0;
+      const gridCol = worldCol - originX;
+      const gridRow = worldRow - originY;
+
+      // Busca colisão no grid
+      const surfaceGridRow = this.findSurfaceRow(levelData.tiles, gridCol, gridRow) ?? gridRow;
+      const resolvedGridRow = this.clampRow(surfaceGridRow, levelData.tiles.length);
+
+      // Converte Grid -> Mundo para posicionar a entidade
+      const resolvedWorldRow = resolvedGridRow + originY;
+      const resolvedWorldCol = gridCol + originX; // = worldCol
+
       const anchor = {
-        x: col * TILE_SIZE + Math.floor(TILE_SIZE / 2),
-        y: resolvedRow * TILE_SIZE
+        x: resolvedWorldCol * TILE_SIZE + Math.floor(TILE_SIZE / 2),
+        y: resolvedWorldRow * TILE_SIZE
       };
-      const triggerTop = Math.max(0, (resolvedRow - 1) * TILE_SIZE);
+
+      const triggerTop = Math.max(0, (resolvedWorldRow - 1) * TILE_SIZE);
       flags.push({
         id: nextId++,
         kind: 'checkpoint',
         anchor,
         trigger: {
-          x: col * TILE_SIZE + 2,
+          x: resolvedWorldCol * TILE_SIZE + 2,
           y: triggerTop,
           width: TILE_SIZE - 4,
           height: TILE_SIZE
@@ -924,21 +956,33 @@ export class Game {
     });
 
     if (levelData.goalPosition) {
-      const col = Math.floor(levelData.goalPosition.x);
-      const row = Math.floor(levelData.goalPosition.y);
-      const surfaceRow = this.findSurfaceRow(levelData.tiles, col, row) ?? row;
-      const resolvedRow = this.clampRow(surfaceRow, levelData.tiles.length);
+      const worldCol = Math.floor(levelData.goalPosition.x);
+      const worldRow = Math.floor(levelData.goalPosition.y);
+
+      // Converte Mundo -> Grid
+      const originX = levelData.originX ?? 0;
+      const originY = levelData.originY ?? 0;
+      const gridCol = worldCol - originX;
+      const gridRow = worldRow - originY;
+
+      const surfaceGridRow = this.findSurfaceRow(levelData.tiles, gridCol, gridRow) ?? gridRow;
+      const resolvedGridRow = this.clampRow(surfaceGridRow, levelData.tiles.length);
+
+      // Converte Grid -> Mundo
+      const resolvedWorldRow = resolvedGridRow + originY;
+      const resolvedWorldCol = gridCol + originX;
+
       const anchor = {
-        x: col * TILE_SIZE + Math.floor(TILE_SIZE / 2),
-        y: resolvedRow * TILE_SIZE
+        x: resolvedWorldCol * TILE_SIZE + Math.floor(TILE_SIZE / 2),
+        y: resolvedWorldRow * TILE_SIZE
       };
-      const triggerTop = Math.max(0, (resolvedRow - 2) * TILE_SIZE);
+      const triggerTop = Math.max(0, (resolvedWorldRow - 2) * TILE_SIZE);
       flags.push({
         id: nextId++,
         kind: 'goal',
         anchor,
         trigger: {
-          x: col * TILE_SIZE,
+          x: resolvedWorldCol * TILE_SIZE,
           y: triggerTop,
           width: TILE_SIZE,
           height: TILE_SIZE * 2
@@ -1243,11 +1287,15 @@ export class Game {
     for (let dc = -1; dc <= 1; dc++) {
       const targetCol = impact.col + dc;
       const targetRow = impact.row;
-      const tileBelow = this.level.getTile(targetCol, targetRow);
+      // Convert to grid coordinates
+      const gridCol = targetCol - this.level.originX;
+      const gridRow = targetRow - this.level.originY;
+
+      const tileBelow = this.level.getTile(gridCol, gridRow);
 
       if (tileBelow === TileType.POWERUP_BLOCK_HELMET || tileBelow === TileType.POWERUP_BLOCK_MINI_FANTA) {
         // Ativa bloco de powerup com a sentada
-        this.level.setTile(targetCol, targetRow, TileType.BLOCK_USED);
+        this.level.setTile(gridCol, gridRow, TileType.BLOCK_USED);
         const collectType = tileBelow === TileType.POWERUP_BLOCK_MINI_FANTA ? CollectibleType.MINI_FANTA : CollectibleType.HELMET;
 
         // Spawn do item (pop up)
@@ -1273,7 +1321,7 @@ export class Game {
           8
         );
       } else {
-        const res = this.level.breakTile(targetCol, targetRow, hasHelmet);
+        const res = this.level.breakTile(gridCol, gridRow, hasHelmet);
         if (res.success) {
           this.spawnParticles(
             targetCol * TILE_SIZE + TILE_SIZE / 2,

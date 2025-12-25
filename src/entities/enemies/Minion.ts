@@ -63,15 +63,16 @@ export class Minion {
 
   private checkWallCollision(level: Level): void {
     // Verifica tile à frente
-    const checkX = this.data.facingRight 
+    const checkX = this.data.facingRight
       ? this.data.position.x + this.data.width + 2
       : this.data.position.x - 2;
     const checkY = this.data.position.y + this.data.height / 2;
-    
-    const tileCol = Math.floor(checkX / TILE_SIZE);
-    const tileRow = Math.floor(checkY / TILE_SIZE);
+
+    // CORREÇÃO: Usar worldToCol/Row para obter índice correto do array
+    const tileCol = level.worldToCol(checkX);
+    const tileRow = level.worldToRow(checkY);
     const tile = level.getTile(tileCol, tileRow);
-    
+
     // Se há parede, inverte direção
     if (tile === 1 || tile === 2) {
       this.reverseDirection();
@@ -82,11 +83,11 @@ export class Minion {
       ? this.data.position.x + this.data.width + 2
       : this.data.position.x - 2;
     const groundCheckY = this.data.position.y + this.data.height + 4;
-    
-    const groundCol = Math.floor(groundCheckX / TILE_SIZE);
-    const groundRow = Math.floor(groundCheckY / TILE_SIZE);
+
+    const groundCol = level.worldToCol(groundCheckX);
+    const groundRow = level.worldToRow(groundCheckY);
     const groundTile = level.getTile(groundCol, groundRow);
-    
+
     // Se não há chão à frente, inverte direção
     if (groundTile === 0 && this.data.velocity.y === 0) {
       this.reverseDirection();
@@ -121,12 +122,12 @@ export class Minion {
     }
 
     const myRect = this.getRect();
-    
+
     // AABB collision
     const hit = myRect.x < playerRect.x + playerRect.width &&
-                myRect.x + myRect.width > playerRect.x &&
-                myRect.y < playerRect.y + playerRect.height &&
-                myRect.y + myRect.height > playerRect.y;
+      myRect.x + myRect.width > playerRect.x &&
+      myRect.y < playerRect.y + playerRect.height &&
+      myRect.y + myRect.height > playerRect.y;
 
     if (!hit) return { hit: false, fromAbove: false };
 
