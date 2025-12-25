@@ -19,9 +19,14 @@ export class EditorController {
     // Bounds Visualization
     private showBounds: boolean = true;
     private dimOutside: boolean = true;
-    private showCoords: boolean = false;
     private boundsColor: string = '#00FFFF'; // Cyan
     private boundsThickness: number = 2;
+
+    // Status Bar UI Elements
+    private statusCoords: HTMLSpanElement | null = null;
+    private statusWorld: HTMLSpanElement | null = null;
+    private statusLevel: HTMLSpanElement | null = null;
+    private statusZoom: HTMLSpanElement | null = null;
 
     // Hover State for coordinates display
     private hoveredCol: number = -1;
@@ -45,7 +50,6 @@ export class EditorController {
     private uiBoundsHeight: HTMLInputElement;
     private uiShowBoundsChk: HTMLInputElement;
     private uiDimOutsideChk: HTMLInputElement;
-    private uiShowCoordsChk: HTMLInputElement;
     private uiBoundsInfoSize: HTMLSpanElement;
     private uiBoundsInfoPixels: HTMLSpanElement;
 
@@ -101,9 +105,14 @@ export class EditorController {
         this.uiBoundsHeight = document.getElementById('bounds-height') as HTMLInputElement;
         this.uiShowBoundsChk = document.getElementById('chk-show-bounds') as HTMLInputElement;
         this.uiDimOutsideChk = document.getElementById('chk-dim-outside') as HTMLInputElement;
-        this.uiShowCoordsChk = document.getElementById('chk-show-coords') as HTMLInputElement;
         this.uiBoundsInfoSize = document.getElementById('bounds-info-size') as HTMLSpanElement;
         this.uiBoundsInfoPixels = document.getElementById('bounds-info-pixels') as HTMLSpanElement;
+
+        // Status Bar Elements
+        this.statusCoords = document.querySelector('.status-coords');
+        this.statusWorld = document.querySelector('.status-world');
+        this.statusLevel = document.querySelector('.status-level');
+        this.statusZoom = document.querySelector('.status-zoom');
 
         this.bindEvents();
         this.buildPalette();
@@ -230,10 +239,6 @@ export class EditorController {
             this.dimOutside = this.uiDimOutsideChk.checked;
         });
 
-        this.uiShowCoordsChk?.addEventListener('change', () => {
-            this.showCoords = this.uiShowCoordsChk.checked;
-        });
-
         // Action buttons
         document.getElementById('btn-fit-content')?.addEventListener('click', () => {
             this.fitToContent();
@@ -290,6 +295,9 @@ export class EditorController {
         // Sync width/height in LevelData
         this.levelData.width = width;
         this.levelData.height = height;
+
+        // Also update status bar
+        this.updateStatusBar();
     }
 
     private resizeTileGrid(newWidth: number, newHeight: number): void {
@@ -646,10 +654,65 @@ export class EditorController {
     }
 
     public init() {
-        // show ui
+        // Show editor UI
         const ui = document.getElementById('editor-ui');
         if (ui) ui.classList.add('active');
+
+        // Add editor-mode class to body for canvas positioning
+        document.body.classList.add('editor-mode');
+
+        // Resize canvas to fit in editor layout
+        this.resizeCanvasForEditor();
+        window.addEventListener('resize', () => this.resizeCanvasForEditor());
+
+        // Initialize status bar
+        this.updateStatusBar();
+
         this.fitLevelToScreen();
+    }
+
+    private resizeCanvasForEditor(): void {
+        const toolbarHeight = 40;
+        const statusbarHeight = 22;
+        const sidebarWidth = 250;
+
+        // Calculate available space
+        const availableWidth = window.innerWidth - sidebarWidth;
+        const availableHeight = window.innerHeight - toolbarHeight - statusbarHeight;
+
+        // Make canvas fill 100% of available space
+        this.canvas.style.width = `${availableWidth}px`;
+        this.canvas.style.height = `${availableHeight}px`;
+
+        // Position canvas at top-left of available area
+        this.canvas.style.left = `0px`;
+        this.canvas.style.top = `${toolbarHeight}px`;
+    }
+
+    private updateStatusBar(): void {
+        // Update coordinates
+        if (this.statusCoords) {
+            this.statusCoords.textContent = `Tile: (${this.hoveredCol}, ${this.hoveredRow})`;
+        }
+
+        // Update world coordinates
+        if (this.statusWorld) {
+            const worldX = this.hoveredCol * TILE_SIZE;
+            const worldY = this.hoveredRow * TILE_SIZE;
+            this.statusWorld.textContent = `World: (${worldX}, ${worldY}) px`;
+        }
+
+        // Update level size
+        if (this.statusLevel && this.levelData) {
+            const w = this.levelData.tiles[0]?.length || 0;
+            const h = this.levelData.tiles.length;
+            this.statusLevel.textContent = `${w} × ${h} tiles`;
+        }
+
+        // Update zoom
+        if (this.statusZoom) {
+            this.statusZoom.textContent = `${Math.round(this.zoom * 100)}%`;
+        }
     }
 
     public update(_deltaTime: number) {
@@ -712,10 +775,7 @@ export class EditorController {
 
         mainCtx.restore();
 
-        // 5. Draw Editor HUD (coordinates display) - in screen space
-        if (this.showCoords) {
-            this.drawEditorHUD(mainCtx, deviceScale);
-        }
+        // Status bar is now updated via HTML elements, no canvas drawing needed
     }
 
     private renderEditorView(ctx: CanvasRenderingContext2D, renderer: Renderer) {
@@ -956,68 +1016,6 @@ export class EditorController {
         ctx.fillText(label, x + 4 / transform.a, y - 4 / transform.a);
     }
 
-    private drawEditorHUD(ctx: CanvasRenderingContext2D, deviceScale: number): void {
-        // Draw in screen space (not scaled)
-        const hudHeight = 24 * deviceScale;
-        const canvasWidth = ctx.canvas.width;
-        const canvasHeight = ctx.canvas.height;
-
-        // Account for sidebar width (250px)
-        const sidebarWidth = 250 * deviceScale;
-        const hudWidth = canvasWidth - sidebarWidth;
-
-        // Background bar
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
-        ctx.fillRect(0, canvasHeight - hudHeight, hudWidth, hudHeight);
-
-        // Border
-        ctx.strokeStyle = '#333';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(0, canvasHeight - hudHeight);
-        ctx.lineTo(hudWidth, canvasHeight - hudHeight);
-        ctx.stroke();
-
-        // Text
-        const fontSize = 11 * deviceScale;
-        ctx.font = `${fontSize}px Consolas, monospace`;
-        ctx.textBaseline = 'middle';
-
-        const textY = canvasHeight - hudHeight / 2;
-        let textX = 10 * deviceScale;
-
-        // Mouse coordinates
-        ctx.fillStyle = '#0FF';
-        const coordText = `Tile: (${this.hoveredCol}, ${this.hoveredRow})`;
-        ctx.fillText(coordText, textX, textY);
-        textX += ctx.measureText(coordText).width + 20 * deviceScale;
-
-        // Separator
-        ctx.fillStyle = '#444';
-        ctx.fillText('│', textX, textY);
-        textX += 20 * deviceScale;
-
-        // Level size
-        if (this.levelData) {
-            ctx.fillStyle = '#888';
-            const width = this.levelData.tiles[0]?.length || 0;
-            const height = this.levelData.tiles.length;
-            const sizeText = `Level: ${width}×${height} tiles`;
-            ctx.fillText(sizeText, textX, textY);
-            textX += ctx.measureText(sizeText).width + 20 * deviceScale;
-
-            // Separator
-            ctx.fillStyle = '#444';
-            ctx.fillText('│', textX, textY);
-            textX += 20 * deviceScale;
-        }
-
-        // Zoom
-        ctx.fillStyle = '#888';
-        const zoomText = `Zoom: ${Math.round(this.zoom * 100)}%`;
-        ctx.fillText(zoomText, textX, textY);
-    }
-
 
     private onMouseDown(e: MouseEvent) {
         this.updateScale();
@@ -1065,6 +1063,9 @@ export class EditorController {
         const worldY = (currentY / this.zoom) + this.camera.y;
         this.hoveredCol = Math.floor(worldX / TILE_SIZE);
         this.hoveredRow = Math.floor(worldY / TILE_SIZE);
+
+        // Update status bar with current coordinates
+        this.updateStatusBar();
 
         // Detect edge hover for cursor change
         this.hoveredEdge = this.detectBoundsEdge(worldX, worldY);
@@ -1286,10 +1287,11 @@ export class EditorController {
         // Apply new zoom
         this.zoom = newZoom;
 
-        // Update Zoom Label
+        // Update Zoom Label and Status Bar
         if (this.uiZoomLabel) {
             this.uiZoomLabel.innerText = Math.round(this.zoom * 100) + '%';
         }
+        this.updateStatusBar();
 
         // Adjust camera so that worldMouse is still under mouseX/mouseY
         // newWorldMouseX = (mouseX / newZoom) + newCameraX

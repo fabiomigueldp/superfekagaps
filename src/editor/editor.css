@@ -159,9 +159,11 @@
   background: #333;
   color: #eee;
   border: 1px solid #555;
-  padding: 5px 10px;
+  padding: 6px 12px;
   cursor: pointer;
   font-size: 12px;
+  border-radius: 3px;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .editor-btn:hover {
@@ -253,8 +255,8 @@ h3 {
 
 /* Bounds Section Styles */
 .bounds-section {
-  margin-bottom: 15px;
-  padding-bottom: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
   border-bottom: 1px solid #333;
 }
 
@@ -267,18 +269,26 @@ h3 {
 .number-input-group {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 0;
+  /* Connected inputs */
+  border: 1px solid #444;
+  border-radius: 3px;
+  overflow: hidden;
 }
 
 .number-input-group input[type="number"] {
   width: 60px;
   background: #1a1a1a;
   border: 1px solid #444;
-  color: #fff;
-  padding: 4px 6px;
+  border-left: none;
+  border-right: none;
+  color: #eee;
+  padding: 4px 0;
+  font-family: 'Consolas', monospace;
   font-size: 12px;
   text-align: center;
-  border-radius: 2px;
+  border-radius: 0;
+  height: 24px;
 }
 
 .number-input-group input[type="number"]::-webkit-inner-spin-button,
@@ -288,21 +298,30 @@ h3 {
 }
 
 .number-input-group .mini-btn {
-  width: 22px;
-  height: 22px;
-  font-size: 14px;
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #2a2a2a;
+  color: #ccc;
+  border: none;
+  cursor: pointer;
+}
+
+.number-input-group .mini-btn:hover {
+  background: #3a3a3a;
+  color: #fff;
 }
 
 .number-input-group .mini-btn.decrement {
-  border-radius: 3px 0 0 3px;
+  border-right: 1px solid #444;
 }
 
 .number-input-group .mini-btn.increment {
-  border-radius: 0 3px 3px 0;
+  border-left: 1px solid #444;
 }
 
 .checkbox-row {
@@ -341,45 +360,83 @@ h3 {
 }
 
 .bounds-info span {
-  font-size: 10px;
-  color: #888;
+  font-family: 'Consolas', monospace;
+  font-size: 11px;
+  color: #bbb;
 }
 
-/* Editor HUD Overlay */
-.editor-hud {
+/* Editor Status Bar (VSCode-style) */
+.editor-statusbar {
+  display: none;
   position: absolute;
   bottom: 0;
   left: 0;
   width: calc(100% - 250px);
-  height: 24px;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
+  height: 22px;
+  background: #007ACC;
+  background: linear-gradient(180deg, #0078d4 0%, #005a9e 100%);
   align-items: center;
-  padding: 0 10px;
-  gap: 20px;
+  padding: 0 12px;
+  gap: 0;
   pointer-events: none;
+  font-family: 'Segoe UI', 'Consolas', monospace;
+  font-size: 12px;
+  color: #fff;
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+}
+
+#editor-ui.active .editor-statusbar {
+  display: flex;
+}
+
+.editor-statusbar .status-item {
+  padding: 0 10px;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.editor-statusbar .status-coords {
+  color: #fff;
+  font-weight: 500;
+}
+
+.editor-statusbar .status-world {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.editor-statusbar .status-level {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.editor-statusbar .status-separator {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 10px;
+}
+
+.editor-statusbar .status-spacer {
+  flex: 1;
+}
+
+.editor-statusbar .status-zoom {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  padding: 2px 8px;
   font-size: 11px;
-  color: #888;
-  border-top: 1px solid #333;
 }
 
-.editor-hud .coord-display {
-  color: #0ff;
-  font-family: 'Consolas', monospace;
+/* Canvas positioning in Editor Mode */
+body.editor-mode {
+  justify-content: flex-start;
+  align-items: flex-start;
 }
 
-.editor-hud .separator {
-  color: #444;
+body.editor-mode #game-canvas {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  /* Canvas size controlled by JS */
 }
 
 /* Bounds Tip */
-.bounds-tip {
-  font-size: 10px;
-  color: #666;
-  margin: 8px 0 0 0;
-  padding: 8px;
-  background: rgba(0, 255, 255, 0.08);
-  border: 1px solid rgba(0, 255, 255, 0.2);
-  border-radius: 4px;
-  line-height: 1.4;
-}

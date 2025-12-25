@@ -194,6 +194,10 @@ IGNORE_EXTENSIONS: Set[str] = {
     ".swn",
     ".tmp",
     "~",
+    # Ignore Markdown files entirely (do not include in tree or snapshot)
+    ".md",
+    ".markdown",
+    ".mdx",
 }
 
 # ─────────────────────────────────────────────────────────────────────────────────

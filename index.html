@@ -53,7 +53,7 @@
   <div id="editor-ui">
     <div class="toolbar">
       <button id="btn-mount" class="editor-btn primary">📁 Open Levels Folder</button>
-      <button id="btn-save" class="editor-btn">mb Save Level</button>
+      <button id="btn-save" class="editor-btn">Save Level</button>
       <div style="margin-left: 20px; display: flex; align-items: center; gap: 5px;">
         <input type="checkbox" id="chk-show-bg">
         <label for="chk-show-bg" style="font-size: 12px; color: #ccc; cursor: pointer;">Show BG</label>
@@ -118,17 +118,11 @@
               <input type="checkbox" id="chk-dim-outside" checked>
               <label for="chk-dim-outside">Dim Outside Area</label>
             </div>
-            <div class="control-row checkbox-row">
-              <input type="checkbox" id="chk-show-coords">
-              <label for="chk-show-coords">Show Coordinates</label>
-            </div>
           </div>
 
           <div class="bounds-section">
             <h4>Actions</h4>
-            <button id="btn-fit-content" class="editor-btn full-width">✂️ Fit to Content</button>
-            <p class="bounds-tip">💡 Drag any edge (⬅➡⬆⬇) or corner of the cyan border to resize. Dragging left/top
-              shifts the level origin!</p>
+            <button id="btn-fit-content" class="editor-btn full-width">Fit to Content</button>
           </div>
 
           <div class="bounds-info">
@@ -159,6 +153,17 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Editor Status Bar (VSCode-style) -->
+    <div class="editor-statusbar">
+      <span class="status-item status-coords">Tile: (0, 0)</span>
+      <span class="status-separator">│</span>
+      <span class="status-item status-world">World: (0, 0) px</span>
+      <span class="status-separator">│</span>
+      <span class="status-item status-level">100 × 14 tiles</span>
+      <span class="status-spacer"></span>
+      <span class="status-item status-zoom">100%</span>
     </div>
   </div>
 
