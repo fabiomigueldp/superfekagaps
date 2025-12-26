@@ -1,4 +1,4 @@
-import { CameraData, LevelData, Vector2, EnemyType, CollectibleType, EditorTool, PaletteItem } from '../types';
+import { CameraData, LevelData, Vector2, EnemyType, CollectibleType, EditorTool, PaletteItem, TriggerType, LevelTrigger } from '../types';
 import { FileSystemManager } from './FileSystemManager';
 import { TileType, TILE_SIZE, COLORS, GAME_WIDTH, GAME_HEIGHT } from '../constants';
 import { PLAYER_RENDER_OFFSET_X, PLAYER_RENDER_OFFSET_Y } from '../assets/playerSpriteSpec';
@@ -51,16 +51,19 @@ export class EditorController {
 
     // Selection State
     private activeSelection: {
-        type: 'ENEMY' | 'COLLECTIBLE' | 'SPAWN';
-        data: any; // Reference to the actual data object (e.g., an enemy object, or the playerSpawn Vector2)
+        type: 'ENEMY' | 'COLLECTIBLE' | 'SPAWN' | 'TRIGGER';
+        data: any; // Reference to the actual data object
     } | null = null;
     private selectionDragOffset: { x: number, y: number } = { x: 0, y: 0 };
 
     // UI Elements
+    private uiInspector: HTMLDivElement;
+    private uiInspectorContent: HTMLDivElement;
     private uiMountBtn: HTMLButtonElement;
     private uiSaveBtn: HTMLButtonElement;
     private uiLevelList: HTMLDivElement;
     private uiPalette: HTMLDivElement;
+    private uiLogicPalette: HTMLDivElement;
     private uiFileLabel: HTMLSpanElement;
     private uiShowBgChk: HTMLInputElement;
     private uiZoomLabel: HTMLSpanElement;
@@ -88,6 +91,7 @@ export class EditorController {
             enemies: [],
             collectibles: [],
             checkpoints: [],
+            triggers: [],
             goalPosition: { x: 95, y: 11 },
             timeLimit: 300,
             isBossLevel: false
@@ -114,6 +118,7 @@ export class EditorController {
         this.uiSaveBtn = document.getElementById('btn-save') as HTMLButtonElement;
         this.uiLevelList = document.getElementById('level-list') as HTMLDivElement;
         this.uiPalette = document.getElementById('tile-palette') as HTMLDivElement;
+        this.uiLogicPalette = document.getElementById('logic-palette') as HTMLDivElement;
         this.uiFileLabel = document.getElementById('current-file-label') as HTMLSpanElement;
         this.uiShowBgChk = document.getElementById('chk-show-bg') as HTMLInputElement;
         this.uiZoomLabel = document.getElementById('zoom-level') as HTMLSpanElement;
@@ -126,6 +131,10 @@ export class EditorController {
         this.uiBoundsInfoSize = document.getElementById('bounds-info-size') as HTMLSpanElement;
         this.uiBoundsInfoPixels = document.getElementById('bounds-info-pixels') as HTMLSpanElement;
 
+        // Inspector UI
+        this.uiInspector = document.getElementById('inspector-panel') as HTMLDivElement;
+        this.uiInspectorContent = document.getElementById('inspector-content') as HTMLDivElement;
+
         // Status Bar Elements
         this.statusCoords = document.querySelector('.status-coords');
         this.statusWorld = document.querySelector('.status-world');
@@ -134,6 +143,7 @@ export class EditorController {
 
         this.bindEvents();
         this.buildPalette();
+        this.buildLogicPalette();
         this.updateBoundsUI();
     }
 
@@ -265,6 +275,37 @@ export class EditorController {
         // Key modifiers
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Control') this.isCtrlPressed = true;
+
+            // Deletion Logic
+            if ((e.key === 'Delete' || e.key === 'Backspace') && this.activeSelection) {
+                // Prevent deletion if editing inspector inputs
+                if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
+                    return;
+                }
+
+                if (!this.levelData) return;
+                const sel = this.activeSelection;
+                let deleted = false;
+
+                if (sel.type === 'TRIGGER' && this.levelData.triggers) {
+                    this.levelData.triggers = this.levelData.triggers.filter(t => t !== sel.data);
+                    deleted = true;
+                }
+                else if (sel.type === 'ENEMY' && this.levelData.enemies) {
+                    this.levelData.enemies = this.levelData.enemies.filter(en => en !== sel.data);
+                    deleted = true;
+                }
+                else if (sel.type === 'COLLECTIBLE' && this.levelData.collectibles) {
+                    this.levelData.collectibles = this.levelData.collectibles.filter(c => c !== sel.data);
+                    deleted = true;
+                }
+
+                if (deleted) {
+                    this.activeSelection = null;
+                    this.updateInspector();
+                    console.log('Deleted selection');
+                }
+            }
         });
         window.addEventListener('keyup', (e) => {
             if (e.key === 'Control') this.isCtrlPressed = false;
@@ -625,6 +666,57 @@ export class EditorController {
         });
     }
 
+    private buildLogicPalette() {
+        this.uiLogicPalette.innerHTML = '';
+
+        const items = [
+            { triggerType: TriggerType.AUDIO, label: 'Audio', icon: '🎵' },
+            { triggerType: TriggerType.CAMERA, label: 'Camera', icon: '🎥' },
+            { triggerType: TriggerType.DAMAGE, label: 'Damage', icon: '💀' },
+            { triggerType: TriggerType.DIALOG, label: 'Dialog', icon: '💬' }
+        ];
+
+        items.forEach(item => {
+            const btn = document.createElement('div');
+            btn.className = 'tile-btn';
+            btn.style.display = 'flex';
+            btn.style.flexDirection = 'column';
+            btn.style.alignItems = 'center';
+            btn.style.justifyContent = 'center';
+
+            const icon = document.createElement('div');
+            icon.innerText = item.icon;
+            icon.style.fontSize = '24px';
+            icon.style.marginBottom = '5px';
+            btn.appendChild(icon);
+
+            const label = document.createElement('span');
+            label.innerText = item.label;
+            label.style.fontSize = '10px';
+            btn.appendChild(label);
+
+            btn.onclick = () => {
+                this.activeContent = { type: 'TRIGGER', triggerType: item.triggerType };
+
+                // Auto-select Rectangle tool for zones
+                this.activeTool = EditorTool.RECTANGLE;
+
+                // Update UI state
+                Array.from(this.uiLogicPalette.children).forEach(c => c.classList.remove('selected'));
+                Array.from(this.uiPalette.children).forEach(c => c.classList.remove('selected')); // Clear other palette too
+                btn.classList.add('selected');
+
+                // Sync Tool UI
+                document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+                const activeBtn = document.querySelector(`.tool-btn[data-tool="${this.activeTool}"]`);
+                if (activeBtn) activeBtn.classList.add('active');
+
+                console.log('Selected Logic Content:', this.activeContent);
+            };
+            this.uiLogicPalette.appendChild(btn);
+        });
+    }
+
     private async refreshLevelList() {
         if (!this.fs.isMounted) return;
 
@@ -894,7 +986,13 @@ export class EditorController {
         const startRow = worldStartRow - originY;
         const endRow = worldEndRow - originY;
 
+        // Check for Logic Mode
+        const isLogicMode = document.querySelector('.tab-btn[data-tab="tab-logic"]')?.classList.contains('active') ?? false;
+
         // 1. Draw Tiles
+        ctx.save();
+        if (isLogicMode) ctx.globalAlpha = 0.4;
+
         for (let r = startRow; r < endRow; r++) {
             if (r < 0 || r >= tiles.length) continue;
             for (let c = startCol; c < endCol; c++) {
@@ -934,6 +1032,7 @@ export class EditorController {
                 }
             }
         }
+        ctx.restore();
 
         // 2. Draw Entities (Enemies, Collectibles from the Lists)
         // Note: These lists are populated in DATA, but sometimes we edit via Tiles.
@@ -1008,7 +1107,14 @@ export class EditorController {
             ctx.restore();
         }
 
-        // 4. Draw Selection Gizmo
+        // 4. Draw Triggers
+        if (isLogicMode && this.levelData.triggers) {
+            this.levelData.triggers.forEach(t => {
+                if (t.active) renderer.drawTrigger(t, this.camera, ctx);
+            });
+        }
+
+        // 5. Draw Selection Gizmo
         this.drawSelectionGizmo(ctx);
     }
 
@@ -1358,7 +1464,7 @@ export class EditorController {
     private applyRectangleTool() {
         if (!this.dragStartTile || !this.levelData) return;
 
-        // Don't rect-fill entities, only TILEs or ERASER
+        // Don't rect-fill entities, only TILEs or ERASER or TRIGGERS
         if (this.activeContent.type === 'ENTITY') {
             console.warn('Rectangle tool not supported for Entities');
             return;
@@ -1374,6 +1480,49 @@ export class EditorController {
         const minRow = Math.min(startY, endY);
         const maxRow = Math.max(startY, endY);
 
+        // 1. Handle TRIGGER Creation
+        if (this.activeContent.type === 'TRIGGER') {
+            const x = minCol * TILE_SIZE;
+            const y = minRow * TILE_SIZE;
+            const width = (maxCol - minCol + 1) * TILE_SIZE;
+            const height = (maxRow - minRow + 1) * TILE_SIZE;
+
+            const baseTrigger = {
+                id: crypto.randomUUID(),
+                x,
+                y,
+                width,
+                height,
+                oneShot: false,
+                active: true
+            };
+
+            let newTrigger: LevelTrigger;
+
+            switch (this.activeContent.triggerType) {
+                case TriggerType.AUDIO:
+                    newTrigger = { ...baseTrigger, type: TriggerType.AUDIO, trackId: 'theme', action: 'PLAY' };
+                    break;
+                case TriggerType.CAMERA:
+                    newTrigger = { ...baseTrigger, type: TriggerType.CAMERA, zoom: 1.5, lockX: false, lockY: false };
+                    break;
+                case TriggerType.DAMAGE:
+                    newTrigger = { ...baseTrigger, type: TriggerType.DAMAGE, damagePerTick: 1, instantKill: false };
+                    break;
+                case TriggerType.DIALOG:
+                    newTrigger = { ...baseTrigger, type: TriggerType.DIALOG, text: 'Hello World' };
+                    break;
+                default:
+                    return;
+            }
+
+            if (!this.levelData.triggers) this.levelData.triggers = [];
+            this.levelData.triggers.push(newTrigger);
+            console.log(`✨ Created Trigger:`, newTrigger);
+            return;
+        }
+
+        // 2. Handle TILE Filling
         const originX = this.levelData.originX ?? 0;
         const originY = this.levelData.originY ?? 0;
 
@@ -1747,7 +1896,7 @@ export class EditorController {
 
     // --- SELECTION LOGIC ---
 
-    private getEntityRect(type: 'ENEMY' | 'COLLECTIBLE' | 'SPAWN', data: any): { x: number, y: number, w: number, h: number } {
+    private getEntityRect(type: 'ENEMY' | 'COLLECTIBLE' | 'SPAWN' | 'TRIGGER', data: any): { x: number, y: number, w: number, h: number } {
         // Spawn: data is just a Vector2 {x, y}
         // Others: data is { position: {x,y}, type: ... }
 
@@ -1771,6 +1920,8 @@ export class EditorController {
             return { x, y, w: size.w, h: size.h };
         } else if (type === 'COLLECTIBLE') {
             return { x, y, w: 16, h: 16 };
+        } else if (type === 'TRIGGER') {
+            return { x: data.x, y: data.y, w: data.width, h: data.height };
         }
         return { x, y, w: 16, h: 16 };
     }
@@ -1804,6 +1955,7 @@ export class EditorController {
                     this.activeSelection = { type: 'ENEMY', data: e };
                     this.selectionDragOffset = { x: worldX - rect.x, y: worldY - rect.y };
                     this.isDragging = true;
+                    this.updateInspector();
                     console.log('Selected Enemy');
                     return;
                 }
@@ -1820,7 +1972,26 @@ export class EditorController {
                     this.activeSelection = { type: 'COLLECTIBLE', data: c };
                     this.selectionDragOffset = { x: worldX - rect.x, y: worldY - rect.y };
                     this.isDragging = true;
+                    this.updateInspector();
                     console.log('Selected Collectible');
+                    return;
+                }
+            }
+        }
+
+        // 4. Triggers
+        if (this.levelData.triggers) {
+            for (let i = this.levelData.triggers.length - 1; i >= 0; i--) {
+                const t = this.levelData.triggers[i];
+                // Triggers are stored in world pixels directly, not tile units
+                if (worldX >= t.x && worldX < t.x + t.width &&
+                    worldY >= t.y && worldY < t.y + t.height) {
+
+                    this.activeSelection = { type: 'TRIGGER', data: t };
+                    this.selectionDragOffset = { x: worldX - t.x, y: worldY - t.y };
+                    this.isDragging = true;
+                    this.updateInspector();
+                    console.log('Selected Trigger');
                     return;
                 }
             }
@@ -1828,6 +1999,7 @@ export class EditorController {
 
         // Nothing hit
         this.activeSelection = null;
+        this.updateInspector();
     }
 
     private drawSelectionGizmo(ctx: CanvasRenderingContext2D) {
@@ -1856,5 +2028,165 @@ export class EditorController {
         ctx.fillRect(sx + rect.w - hSize / 2, sy + rect.h - hSize / 2, hSize, hSize); // BR
 
         ctx.restore();
+    }
+
+    private updateInspector() {
+        if (!this.uiInspectorContent) return;
+        this.uiInspectorContent.innerHTML = '';
+
+        if (!this.activeSelection) {
+            this.uiInspectorContent.innerHTML = '<div style="color:#666; padding:10px; font-size:11px;">Select an object</div>';
+            return;
+        }
+
+        const data = this.activeSelection.data;
+        const type = this.activeSelection.type;
+
+        // Header
+        const header = document.createElement('div');
+        header.style.padding = '5px';
+        header.style.borderBottom = '1px solid #444';
+        header.style.marginBottom = '5px';
+        header.style.fontSize = '12px';
+        header.style.fontWeight = 'bold';
+        header.style.color = '#fff';
+        header.innerText = `${type}`;
+        this.uiInspectorContent.appendChild(header);
+
+        if (type === 'TRIGGER') {
+            // Basic Transform
+            this.createInspectorInput('X', data.x, (v) => data.x = parseFloat(v));
+            this.createInspectorInput('Y', data.y, (v) => data.y = parseFloat(v));
+            this.createInspectorInput('Width', data.width, (v) => data.width = parseFloat(v));
+            this.createInspectorInput('Height', data.height, (v) => data.height = parseFloat(v));
+
+            const trigger = data as LevelTrigger;
+            // Trigger Specifics
+            if (trigger.type === TriggerType.AUDIO) {
+                this.createInspectorInput('Track ID', (trigger as any).trackId, (v) => (trigger as any).trackId = v);
+                this.createInspectorSelect('Action', ['PLAY', 'STOP'], (trigger as any).action, (v) => (trigger as any).action = v);
+            }
+            else if (trigger.type === TriggerType.CAMERA) {
+                this.createInspectorInput('Zoom', (trigger as any).zoom, (v) => (trigger as any).zoom = parseFloat(v));
+                this.createInspectorCheckbox('Lock X', (trigger as any).lockX, (v) => (trigger as any).lockX = v);
+                this.createInspectorCheckbox('Lock Y', (trigger as any).lockY, (v) => (trigger as any).lockY = v);
+            }
+            else if (trigger.type === TriggerType.DAMAGE) {
+                this.createInspectorInput('Dmg/Tick', (trigger as any).damagePerTick, (v) => (trigger as any).damagePerTick = parseFloat(v));
+                this.createInspectorCheckbox('Instant Kill', (trigger as any).instantKill, (v) => (trigger as any).instantKill = v);
+            }
+            else if (trigger.type === TriggerType.DIALOG) {
+                this.createInspectorTextArea('Text', (trigger as any).text, (v) => (trigger as any).text = v);
+            }
+        }
+        else if (type === 'ENEMY') {
+            const e = data;
+            // Coordinate in TILES not pixels for enemies usually, but getEntityRect uses position directly.
+            // Let's assume data.position.x is tiles.
+            this.createInspectorInput('X (Tiles)', e.position.x, (v) => e.position.x = parseFloat(v));
+            this.createInspectorInput('Y (Tiles)', e.position.y, (v) => e.position.y = parseFloat(v));
+            this.createInspectorCheckbox('Facing Right', e.facingRight, (v) => e.facingRight = v);
+        }
+        else if (type === 'SPAWN') {
+            this.createInspectorInput('X (Tiles)', data.x, (v) => data.x = parseFloat(v));
+            this.createInspectorInput('Y (Tiles)', data.y, (v) => data.y = parseFloat(v));
+        }
+    }
+
+    private createInspectorInput(label: string, value: any, onChange: (val: string) => void) {
+        const row = document.createElement('div');
+        row.className = 'control-row';
+
+        const lbl = document.createElement('label');
+        lbl.innerText = label;
+
+        const input = document.createElement('input');
+        input.type = typeof value === 'number' ? 'number' : 'text';
+        input.value = value;
+        input.style.width = '60%';
+        input.style.background = '#222';
+        input.style.border = '1px solid #444';
+        input.style.color = 'white';
+        input.style.padding = '2px';
+
+        input.onchange = (e) => onChange((e.target as HTMLInputElement).value);
+
+        row.appendChild(lbl);
+        row.appendChild(input);
+        this.uiInspectorContent.appendChild(row);
+    }
+
+    private createInspectorSelect(label: string, options: string[], value: string, onChange: (val: string) => void) {
+        const row = document.createElement('div');
+        row.className = 'control-row';
+
+        const lbl = document.createElement('label');
+        lbl.innerText = label;
+
+        const select = document.createElement('select');
+        select.style.width = '60%';
+
+        options.forEach(opt => {
+            const o = document.createElement('option');
+            o.value = opt;
+            o.innerText = opt;
+            o.selected = opt === value;
+            select.appendChild(o);
+        });
+
+        select.onchange = (e) => onChange((e.target as HTMLSelectElement).value);
+
+        row.appendChild(lbl);
+        row.appendChild(select);
+        this.uiInspectorContent.appendChild(row);
+    }
+
+    private createInspectorCheckbox(label: string, value: boolean, onChange: (val: boolean) => void) {
+        const row = document.createElement('div');
+        row.className = 'control-row checkbox-row';
+
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.checked = value;
+        input.id = `chk-${label.replace(/\s+/g, '')}`;
+
+        const lbl = document.createElement('label');
+        lbl.innerText = label;
+        lbl.htmlFor = input.id;
+
+        input.onchange = (e) => onChange((e.target as HTMLInputElement).checked);
+
+        row.appendChild(input);
+        row.appendChild(lbl);
+        this.uiInspectorContent.appendChild(row);
+    }
+
+    private createInspectorTextArea(label: string, value: string, onChange: (val: string) => void) {
+        const div = document.createElement('div');
+        div.style.marginBottom = '5px';
+
+        const lbl = document.createElement('label');
+        lbl.innerText = label;
+        lbl.style.display = 'block';
+        lbl.style.marginBottom = '2px';
+        lbl.style.fontSize = '11px';
+        lbl.style.color = '#ccc';
+
+        const txt = document.createElement('textarea');
+        txt.value = value;
+        txt.style.width = '100%';
+        txt.style.height = '60px';
+        txt.style.background = '#222';
+        txt.style.border = '1px solid #444';
+        txt.style.color = 'white';
+        txt.style.padding = '4px';
+        txt.style.fontSize = '11px';
+        txt.style.fontFamily = 'monospace';
+
+        txt.onchange = (e) => onChange((e.target as HTMLTextAreaElement).value);
+
+        div.appendChild(lbl);
+        div.appendChild(txt);
+        this.uiInspectorContent.appendChild(div);
     }
 }

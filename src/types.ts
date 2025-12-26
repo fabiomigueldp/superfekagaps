@@ -4,13 +4,14 @@ export enum EditorTool {
   BRUSH = 'BRUSH',
   ERASER = 'ERASER',
   SELECT = 'SELECT',
-  RECTANGLE = 'RECTANGLE'
+  RECTANGLE = 'RECTANGLE',
+  HAND = 'HAND'
 }
 
 export type PaletteItem =
   | { type: 'TILE', id: number }
   | { type: 'ENTITY', id: string, entityType: 'ENEMY' | 'COLLECTIBLE' | 'SPAWN' }
-  | { type: 'TRIGGER', id: string };
+  | { type: 'TRIGGER', triggerType: TriggerType };
 
 // Vetor 2D básico
 export interface Vector2 {
@@ -144,6 +145,7 @@ export interface LevelData {
   playerSpawn: Vector2;
   enemies: EnemySpawnData[];
   collectibles: CollectibleSpawnData[];
+  triggers: LevelTrigger[];
   checkpoints: Vector2[];
   goalPosition: Vector2;
   timeLimit: number;
@@ -192,6 +194,7 @@ export interface CameraData {
   targetY: number;
   shakeTimer: number;
   shakeMagnitude: number;
+  zoom?: number;
   bounds: {
     minX: number;
     maxX: number;
@@ -270,4 +273,47 @@ export interface GameEvent {
 }
 
 // Callback de evento
+export enum TriggerType {
+  AUDIO = 'AUDIO',
+  CAMERA = 'CAMERA',
+  DAMAGE = 'DAMAGE',
+  DIALOG = 'DIALOG'
+}
+
+export interface BaseTrigger {
+  id: string; // UUID
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  oneShot: boolean;
+  active: boolean;
+}
+
+export interface AudioTrigger extends BaseTrigger {
+  type: TriggerType.AUDIO;
+  trackId: string;
+  action: 'PLAY' | 'STOP';
+}
+
+export interface CameraTrigger extends BaseTrigger {
+  type: TriggerType.CAMERA;
+  zoom: number;
+  lockX: boolean;
+  lockY: boolean; // Added lockY for completeness, though prompt only asked for lockX, usually good to have both
+}
+
+export interface DamageTrigger extends BaseTrigger {
+  type: TriggerType.DAMAGE;
+  damagePerTick: number;
+  instantKill: boolean;
+}
+
+export interface DialogTrigger extends BaseTrigger {
+  type: TriggerType.DIALOG;
+  text: string;
+}
+
+export type LevelTrigger = AudioTrigger | CameraTrigger | DamageTrigger | DialogTrigger;
+
 export type GameEventCallback = (event: GameEvent) => void;

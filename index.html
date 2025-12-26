@@ -46,7 +46,7 @@
   <style>
     /* ... existing styles ... */
   </style>
-  <link rel="stylesheet" href="/src/editor/editor.css">
+  <link rel="stylesheet" href="/src/editor/editor_complete.css">
 </head>
 
 <body>
@@ -73,6 +73,7 @@
     <div class="sidebar">
       <div class="tabs-nav">
         <button class="tab-btn active" data-tab="tab-tiles">Tiles</button>
+        <button class="tab-btn" data-tab="tab-logic">Logic</button>
         <button class="tab-btn" data-tab="tab-levels">Levels</button>
         <button class="tab-btn" data-tab="tab-bounds">Bounds</button>
         <button class="tab-btn" data-tab="tab-theme">Theme</button>
@@ -81,6 +82,13 @@
       <!-- Tab Content: Tiles -->
       <div id="tab-tiles" class="tab-content active">
         <div id="tile-palette" class="tile-palette">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Tab Content: Logic -->
+      <div id="tab-logic" class="tab-content">
+        <div id="logic-palette" class="tile-palette">
           <!-- Populated by JS -->
         </div>
       </div>
@@ -159,6 +167,13 @@
         </div>
       </div>
     </div>
+
+    <!-- Contextual Inspector (Properties) -->
+    <div id="inspector-panel" class="inspector-panel">
+      <h4 id="inspector-title">Properties</h4>
+      <div id="inspector-content"></div>
+    </div>
+
 
     <!-- Editor Status Bar (VSCode-style) -->
     <div class="editor-statusbar">

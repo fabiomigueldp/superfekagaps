@@ -484,3 +484,34 @@ body.editor-mode #game-canvas {
   left: 0;
   /* Canvas size controlled by JS */
 }
+
+/* Inspector Panel */
+.inspector-panel {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 250px;
+  height: 35%;
+  background: rgba(0, 0, 0, 0.9);
+  border-left: 1px solid #444;
+  border-top: 1px solid #444;
+  padding: 10px;
+  pointer-events: auto;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.inspector-panel h4 {
+  margin: 0 0 10px 0;
+  font-size: 12px;
+  color: #ccc;
+  border-bottom: 1px solid #555;
+  padding-bottom: 5px;
+}
+
+/* Adjust Sidebar */
+.sidebar {
+  height: 65% !important;
+  border-bottom: 1px solid #444;
+}

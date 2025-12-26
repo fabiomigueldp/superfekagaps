@@ -9,7 +9,7 @@ import {
   FALLING_PLATFORM_FALL_MS,
   FALLING_PLATFORM_FALL_DISTANCE
 } from '../constants';
-import { CameraData, PlayerData, EnemyData, CollectibleData, FlagData, Particle, Firework, EnemyType, CollectibleType, GroundPoundState, SpeechBubbleRenderState, FallingPlatformPhase, LevelTheme, BackgroundLayerSpec, PaletteItem } from '../types';
+import { CameraData, PlayerData, EnemyData, CollectibleData, FlagData, Particle, Firework, EnemyType, CollectibleType, GroundPoundState, SpeechBubbleRenderState, FallingPlatformPhase, LevelTheme, BackgroundLayerSpec, PaletteItem, LevelTrigger, TriggerType } from '../types';
 import { PLAYER_PALETTE, PLAYER_SPRITES, PLAYER_PIXEL_SIZE, PLAYER_RENDER_OFFSET_X, PLAYER_RENDER_OFFSET_Y } from '../assets/playerSpriteSpec';
 import { BackgroundGenerator } from './BackgroundGenerator';
 
@@ -122,11 +122,17 @@ export class Renderer {
   }
 
   clear(): void {
+    this.offscreenCtx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
     this.lastUIType = null;
     this.lastUIParams = null;
     this.lastEndingFireworks = [];
     this.offscreenCtx.fillStyle = COLORS.SKY_LIGHT;
     this.offscreenCtx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+  }
+
+  startScene(zoom: number = 1): void {
+    this.clear();
+    this.offscreenCtx.scale(zoom, zoom);
   }
 
   // Aplica a renderização offscreen ao canvas principal
@@ -2472,6 +2478,86 @@ export class Renderer {
         };
         this.drawEnemy(mockEnemy, { x: 0, y: 0 } as any, ctx);
       }
+    }
+
+    ctx.restore();
+  }
+
+  drawTrigger(trigger: LevelTrigger, camera: CameraData, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
+    const cam = this.snapCamera(camera);
+    const x = Math.round(trigger.x - cam.x);
+    const y = Math.round(trigger.y - cam.y);
+    const w = Math.round(trigger.width);
+    const h = Math.round(trigger.height);
+
+    ctx.save();
+
+    // Visual Dictionary Specs
+    let color = 'rgba(255, 255, 255, 0.2)';
+    let borderColor = 'white';
+    let icon = 'TRIG';
+    let subText = '';
+
+    switch (trigger.type) {
+      case TriggerType.AUDIO:
+        // Yellow
+        color = 'rgba(255, 215, 0, 0.2)';
+        borderColor = '#FFD700';
+        icon = '🎵';
+        subText = (trigger as any).trackId || '';
+        break;
+      case TriggerType.CAMERA:
+        // Cyan
+        color = 'rgba(0, 255, 255, 0.2)';
+        borderColor = '#00FFFF';
+        icon = '🎥';
+        break;
+      case TriggerType.DAMAGE:
+        // Red
+        color = 'rgba(255, 0, 0, 0.2)';
+        borderColor = '#FF0000';
+        icon = '💀';
+        break;
+      case TriggerType.DIALOG:
+        // Green
+        color = 'rgba(0, 255, 0, 0.2)';
+        borderColor = '#00FF00';
+        icon = '💬';
+        break;
+    }
+
+    // Draw Fill
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, w, h);
+
+    // Draw Border (dashed)
+    ctx.strokeStyle = borderColor;
+    ctx.lineWidth = 2; // Thicker border
+    ctx.setLineDash([4, 2]);
+    ctx.strokeRect(x, y, w, h);
+
+    // Draw Label/Icon centered
+    ctx.font = '14px sans-serif'; // Bigger icon
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    const centerX = x + w / 2;
+    const centerY = y + h / 2;
+
+    // Helper to draw text with outline for readability
+    const drawText = (txt: string, cx: number, cy: number, size: number) => {
+      ctx.font = `bold ${size}px monospace`;
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = 'rgba(0,0,0,0.8)';
+      ctx.strokeText(txt, cx, cy);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillText(txt, cx, cy);
+    };
+
+    drawText(icon, centerX, centerY - (subText ? 6 : 0), 16);
+
+    if (subText) {
+      drawText(subText, centerX, centerY + 10, 10);
     }
 
     ctx.restore();

@@ -442,7 +442,73 @@ export class Game {
 
     // Atualiza partículas
     this.updateParticles(deltaTime);
+
+    // Atualiza Triggers
+    this.updateTriggers(deltaTime);
   }
+
+  private updateTriggers(_deltaTime: number): void {
+    if (!this.level || !this.player || !this.level.data.triggers) return;
+
+    const playerRect = this.player.getRect();
+    const center = this.player.getCenter();
+
+    // Reset camera override for this frame (it will be re-applied if we are still inside a trigger)
+    this.activeCameraOverride = null;
+
+    this.level.data.triggers.forEach(trigger => {
+      if (!trigger.active) return;
+
+      // Simple AABB collision
+      if (playerRect.x < trigger.x + trigger.width &&
+        playerRect.x + playerRect.width > trigger.x &&
+        playerRect.y < trigger.y + trigger.height &&
+        playerRect.y + playerRect.height > trigger.y) {
+
+        // --- TRIGGER HIT ---
+
+        switch (trigger.type) {
+          case 'DAMAGE':
+            // Apply Damage
+            // We use a cooldown or per-frame check? 
+            // The type definition has 'damagePerTick'.
+            // Assuming 60 ticks per sec roughly.
+            if (!this.player!.data.isDead && !this.player!.data.invincibleTimer) {
+              const dmg = trigger as any; // Cast to DamageTrigger
+              // If instant kill
+              if (dmg.instantKill) {
+                this.playerDie();
+              } else {
+                // Damage per tick - default 1?
+                // For now, just Hit the player immediately if not invincible
+                this.playerHit();
+              }
+            }
+            break;
+
+          case 'CAMERA':
+            // Set as active override
+            // We can handle multiple overlapping by taking the last one or by priority.
+            // For now, last one wins.
+            this.activeCameraOverride = trigger as any;
+            break;
+
+          case 'AUDIO':
+            // Audio triggers change BGM? 
+            // TODO: Implement Logic Audio layer
+            break;
+
+          case 'DIALOG':
+            // Show dialog?
+            // TODO: Implement Dialog System
+            break;
+        }
+      }
+    });
+  }
+
+  private activeCameraOverride: any | null = null;
+
 
   private updatePaused(): void {
     if (this.input.consumePause() || this.input.consumeStart()) {
@@ -485,6 +551,9 @@ export class Game {
       this.renderer.clear();
       this.editorController.render(this.renderer);
     } else {
+      // Start scene with zoom applied
+      this.renderer.startScene(this.camera.zoom || 1);
+
       switch (this.state) {
         case GameState.MENU:
           this.renderer.drawTitleScreen();
@@ -500,7 +569,7 @@ export class Game {
           // Render World
           this.renderGame();
 
-          // Render HUD/Overlays on top
+          // ... overlays ...
           if (this.state === GameState.PAUSED) {
             this.renderer.drawPauseOverlay();
           }
@@ -573,8 +642,9 @@ export class Game {
   private renderGame(): void {
     if (!this.level || !this.player) return;
 
-    // Background
-    this.renderer.drawBackground(this.camera);
+    // Background (Fill the logical viewport which might be smaller/larger due to zoom)
+    const zoom = this.camera.zoom || 1;
+    this.renderer.drawBackground(this.camera, undefined, GAME_WIDTH / zoom, GAME_HEIGHT / zoom);
 
     // Tiles (pass origin offset for proper world coordinate rendering)
     this.renderer.drawTiles(this.level.getModifiedTiles(), this.camera, this.level.originX, this.level.originY);
@@ -705,6 +775,19 @@ export class Game {
     this.camera.bounds = bounds;
     this.camera.x = 0;
     this.camera.y = 0;
+    this.camera.zoom = 1;
+    this.camera.targetX = 0;
+    this.camera.targetY = 0;
+    this.activeCameraOverride = null;
+
+    // Snap camera to start position immediately to avoid weird initial pan
+    // Center on player spawn
+    const startX = levelData.playerSpawn.x * TILE_SIZE;
+    const startY = levelData.playerSpawn.y * TILE_SIZE;
+    // We can't use detailed centering logic easily here without duplicating code, 
+    // but setting it roughly near player is better than 0,0.
+    // Let's just trust updateCamera will fix it quickly, but x=0 is definitely bad if not at 0.
+    // Better to let updateCamera handle it, but definitely reset ZOOM.
 
     // Configura Background Procedural
     if (levelData.theme) {
@@ -1015,23 +1098,57 @@ export class Game {
   private updateCamera(deltaTime: number): void {
     if (!this.player) return;
 
+    const zoom = this.camera.zoom || 1;
+    const viewWidth = GAME_WIDTH / zoom;
+    const viewHeight = GAME_HEIGHT / zoom;
+
     const playerCenter = this.player.getCenter();
 
-    // Target da câmera é o player
-    this.camera.targetX = playerCenter.x - GAME_WIDTH / 2;
-    this.camera.targetY = playerCenter.y - GAME_HEIGHT / 2;
+    // 1. Target da câmera é o player (default)
+    let targetX = playerCenter.x - viewWidth / 2;
+    let targetY = playerCenter.y - viewHeight / 2;
+    let targetZoom = 1;
 
-    // Suavização (lerp)
+    // 2. Aplica Overrides (Triggers)
+    if (this.activeCameraOverride) {
+      if (this.activeCameraOverride.lockX) {
+        // Lock X: Centraliza no trigger
+        const triggerCenter = this.activeCameraOverride.x + this.activeCameraOverride.width / 2;
+        targetX = triggerCenter - viewWidth / 2;
+      }
+      if (this.activeCameraOverride.lockY) {
+        // Lock Y: Centraliza no trigger
+        const triggerCenter = this.activeCameraOverride.y + this.activeCameraOverride.height / 2;
+        targetY = triggerCenter - viewHeight / 2;
+      }
+      if (this.activeCameraOverride.zoom) {
+        targetZoom = this.activeCameraOverride.zoom;
+      }
+    }
+
+    // 3. Suavização (lerp)
+    this.camera.targetX = targetX;
+    this.camera.targetY = targetY;
+
     this.camera.x += (this.camera.targetX - this.camera.x) * 0.1;
     this.camera.y += (this.camera.targetY - this.camera.y) * 0.1;
 
-    // Limita aos bounds
-    this.camera.x = Math.max(this.camera.bounds.minX,
-      Math.min(this.camera.x, this.camera.bounds.maxX - GAME_WIDTH));
-    this.camera.y = Math.max(this.camera.bounds.minY,
-      Math.min(this.camera.y, this.camera.bounds.maxY - GAME_HEIGHT));
+    // Zoom Lerp
+    if (this.camera.zoom === undefined) this.camera.zoom = 1;
+    this.camera.zoom += (targetZoom - this.camera.zoom) * 0.05;
 
-    // Aplica shake
+    // Recalculate view size with new smoothed zoom for clamping
+    const finalZoom = this.camera.zoom;
+    const finalViewW = GAME_WIDTH / finalZoom;
+    const finalViewH = GAME_HEIGHT / finalZoom;
+
+    // 4. Limita aos bounds do nível
+    this.camera.x = Math.max(this.camera.bounds.minX,
+      Math.min(this.camera.x, this.camera.bounds.maxX - finalViewW));
+    this.camera.y = Math.max(this.camera.bounds.minY,
+      Math.min(this.camera.y, this.camera.bounds.maxY - finalViewH));
+
+    // 5. Aplica shake
     if (this.camera.shakeTimer > 0) {
       this.camera.shakeTimer -= deltaTime;
       this.camera.x += (Math.random() - 0.5) * this.camera.shakeMagnitude;
