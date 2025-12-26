@@ -1,6 +1,7 @@
 import { CameraData, LevelData, Vector2, EnemyType, CollectibleType, EditorTool, PaletteItem } from '../types';
 import { FileSystemManager } from './FileSystemManager';
 import { TileType, TILE_SIZE, COLORS, GAME_WIDTH, GAME_HEIGHT } from '../constants';
+import { PLAYER_RENDER_OFFSET_X, PLAYER_RENDER_OFFSET_Y } from '../assets/playerSpriteSpec';
 import { Renderer } from '../engine/Renderer';
 
 
@@ -47,6 +48,13 @@ export class EditorController {
     private activeEdge: 'left' | 'right' | 'top' | 'bottom' | 'corner-br' | 'corner-tl' | null = null;
     private hoveredEdge: 'left' | 'right' | 'top' | 'bottom' | 'corner-br' | 'corner-tl' | null = null;
     private readonly EDGE_THRESHOLD: number = 8; // pixels to detect edge hover
+
+    // Selection State
+    private activeSelection: {
+        type: 'ENEMY' | 'COLLECTIBLE' | 'SPAWN';
+        data: any; // Reference to the actual data object (e.g., an enemy object, or the playerSpawn Vector2)
+    } | null = null;
+    private selectionDragOffset: { x: number, y: number } = { x: 0, y: 0 };
 
     // UI Elements
     private uiMountBtn: HTMLButtonElement;
@@ -999,6 +1007,9 @@ export class EditorController {
             ctx.fillText('SPAWN', spawnX + 7, spawnY - 6);
             ctx.restore();
         }
+
+        // 4. Draw Selection Gizmo
+        this.drawSelectionGizmo(ctx);
     }
 
     private drawRectanglePreview(ctx: CanvasRenderingContext2D) {
@@ -1228,7 +1239,6 @@ export class EditorController {
                 this.isDragging = true;
             } else {
                 // Tool Action
-                // Tool Action
                 if (this.activeTool === EditorTool.BRUSH) {
                     this.handleBrushInteract(worldX, worldY);
                     this.isDragging = true;
@@ -1241,7 +1251,9 @@ export class EditorController {
                     this.dragStartTile = { x: Math.floor(worldX / TILE_SIZE), y: Math.floor(worldY / TILE_SIZE) };
                     this.isDragging = true;
                 }
-                // (SELECT logic placeholder)
+                else if (this.activeTool === EditorTool.SELECT) {
+                    this.handleSelectClick(worldX, worldY);
+                }
             }
         }
         // Right click: Pan Start
@@ -1306,6 +1318,26 @@ export class EditorController {
                 }
             } else if (this.activeTool === EditorTool.ERASER) {
                 this.handleEraserInteract(worldX, worldY);
+            } else if (this.activeTool === EditorTool.SELECT && this.activeSelection) {
+                // Handle Dragging Selection
+                let newX = worldX - this.selectionDragOffset.x;
+                let newY = worldY - this.selectionDragOffset.y;
+
+                // Snap logic
+                if (!this.isCtrlPressed) {
+                    // Default: Snap to Grid
+                    newX = Math.round(newX / TILE_SIZE) * TILE_SIZE;
+                    newY = Math.round(newY / TILE_SIZE) * TILE_SIZE;
+                }
+
+                // Update Data (Convert back to Tile Units)
+                if (this.activeSelection.type === 'SPAWN') {
+                    this.activeSelection.data.x = newX / TILE_SIZE;
+                    this.activeSelection.data.y = newY / TILE_SIZE;
+                } else {
+                    this.activeSelection.data.position.x = newX / TILE_SIZE;
+                    this.activeSelection.data.position.y = newY / TILE_SIZE;
+                }
             }
         }
 
@@ -1455,13 +1487,11 @@ export class EditorController {
         const originChanged = newOriginX !== originX || newOriginY !== originY;
         const sizeChanged = newWidth !== currentWidth || newHeight !== currentHeight;
 
-        if (originChanged || sizeChanged) {
-            if (originChanged) {
-                // Need to shift tiles when origin changes
-                this.shiftAndResizeTileGrid(newOriginX, newOriginY, newWidth, newHeight);
-            } else {
-                this.resizeTileGrid(newWidth, newHeight);
-            }
+        if (originChanged) {
+            // Need to shift tiles when origin changes
+            this.shiftAndResizeTileGrid(newOriginX, newOriginY, newWidth, newHeight);
+        } else if (sizeChanged) {
+            this.resizeTileGrid(newWidth, newHeight);
         }
     }
 
@@ -1713,5 +1743,118 @@ export class EditorController {
         this.camera.y = levelCenterY - (visibleHeight / 2);
 
         console.log(`🎥 Fitted level: Zoom ${newZoom.toFixed(2)}, Cam (${this.camera.x.toFixed(0)}, ${this.camera.y.toFixed(0)})`);
+    }
+
+    // --- SELECTION LOGIC ---
+
+    private getEntityRect(type: 'ENEMY' | 'COLLECTIBLE' | 'SPAWN', data: any): { x: number, y: number, w: number, h: number } {
+        // Spawn: data is just a Vector2 {x, y}
+        // Others: data is { position: {x,y}, type: ... }
+
+        let tx = 0, ty = 0;
+
+        if (type === 'SPAWN') {
+            tx = data.x;
+            ty = data.y;
+        } else {
+            tx = data.position?.x ?? 0;
+            ty = data.position?.y ?? 0;
+        }
+
+        const x = tx * TILE_SIZE;
+        const y = ty * TILE_SIZE;
+
+        if (type === 'SPAWN') {
+            return { x: x + PLAYER_RENDER_OFFSET_X, y: y + PLAYER_RENDER_OFFSET_Y, w: 14, h: 24 }; // Approx player size
+        } else if (type === 'ENEMY') {
+            const size = this.getEntitySize(data.type);
+            return { x, y, w: size.w, h: size.h };
+        } else if (type === 'COLLECTIBLE') {
+            return { x, y, w: 16, h: 16 };
+        }
+        return { x, y, w: 16, h: 16 };
+    }
+
+    private handleSelectClick(worldX: number, worldY: number) {
+        if (!this.levelData) return;
+
+        // Check priorities using helper: Spawn > Enemy > Collectible
+
+        // 1. Spawn
+        if (this.levelData.playerSpawn) {
+            const rect = this.getEntityRect('SPAWN', this.levelData.playerSpawn);
+            if (worldX >= rect.x && worldX < rect.x + rect.w &&
+                worldY >= rect.y && worldY < rect.y + rect.h) {
+
+                this.activeSelection = { type: 'SPAWN', data: this.levelData.playerSpawn };
+                this.selectionDragOffset = { x: worldX - rect.x, y: worldY - rect.y };
+                this.isDragging = true;
+                console.log('Selected Spawn');
+                return;
+            }
+        }
+
+        // 2. Enemies (Reverse order)
+        if (this.levelData.enemies) {
+            for (let i = this.levelData.enemies.length - 1; i >= 0; i--) {
+                const e = this.levelData.enemies[i];
+                const rect = this.getEntityRect('ENEMY', e);
+                if (worldX >= rect.x && worldX < rect.x + rect.w &&
+                    worldY >= rect.y && worldY < rect.y + rect.h) {
+                    this.activeSelection = { type: 'ENEMY', data: e };
+                    this.selectionDragOffset = { x: worldX - rect.x, y: worldY - rect.y };
+                    this.isDragging = true;
+                    console.log('Selected Enemy');
+                    return;
+                }
+            }
+        }
+
+        // 3. Collectibles
+        if (this.levelData.collectibles) {
+            for (let i = this.levelData.collectibles.length - 1; i >= 0; i--) {
+                const c = this.levelData.collectibles[i];
+                const rect = this.getEntityRect('COLLECTIBLE', c);
+                if (worldX >= rect.x && worldX < rect.x + rect.w &&
+                    worldY >= rect.y && worldY < rect.y + rect.h) {
+                    this.activeSelection = { type: 'COLLECTIBLE', data: c };
+                    this.selectionDragOffset = { x: worldX - rect.x, y: worldY - rect.y };
+                    this.isDragging = true;
+                    console.log('Selected Collectible');
+                    return;
+                }
+            }
+        }
+
+        // Nothing hit
+        this.activeSelection = null;
+    }
+
+    private drawSelectionGizmo(ctx: CanvasRenderingContext2D) {
+        if (!this.activeSelection) return;
+
+        let rect = { x: 0, y: 0, w: 0, h: 0 };
+        // Pass the raw data object to helper
+        rect = this.getEntityRect(this.activeSelection.type, this.activeSelection.data);
+
+        // Convert to Screen
+        const sx = rect.x - this.camera.x;
+        const sy = rect.y - this.camera.y;
+
+        ctx.save();
+        ctx.strokeStyle = '#FFFF00'; // Yellow
+        ctx.lineWidth = 1;
+        ctx.setLineDash([2, 2]);
+        ctx.strokeRect(sx, sy, rect.w, rect.h);
+
+        // Handles
+        ctx.fillStyle = '#FFFF00';
+        const hSize = 4;
+        ctx.fillRect(sx - hSize / 2, sy - hSize / 2, hSize, hSize); // TL
+        ctx.fillRect(sx + rect.w - hSize / 2, sy - hSize / 2, hSize, hSize); // TR
+        ctx.fillRect(sx - hSize / 2, sy + rect.h - hSize / 2, hSize, hSize); // BL
+        ctx.fillRect(sx + rect.w - hSize / 2, sy + rect.h - hSize / 2, hSize, hSize); // BR
+
+        ctx.restore();
     }
 }
