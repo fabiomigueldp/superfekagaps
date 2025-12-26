@@ -793,10 +793,19 @@ export class Renderer {
         this.drawUsedBlock(x, y, ctx);
         break;
       case TileType.CHECKPOINT:
-        // Checkpoint renderizado separadamente
+        this.drawFlagTile(x, y, ctx);
         break;
       case TileType.FLAG:
         this.drawFlagTile(x, y, ctx);
+        break;
+      case TileType.COIN:
+        this.drawCoin(x, y, 0, ctx);
+        break;
+      case TileType.POWERUP_MINI_FANTA:
+        this.drawFanta(x, y, 0, ctx);
+        break;
+      case TileType.POWERUP_HELMET:
+        this.drawHelmet(x, y, ctx);
         break;
     }
   }
@@ -1223,8 +1232,7 @@ export class Renderer {
 
   // === RENDERIZAÇÃO DO PLAYER (FEKA) ===
 
-  drawPlayer(player: PlayerData, camera: CameraData): void {
-    const ctx = this.offscreenCtx;
+  drawPlayer(player: PlayerData, camera: CameraData, ctx: CanvasRenderingContext2D = this.offscreenCtx): void {
     const cam = this.snapCamera(camera);
     let x = Math.round(player.position.x - cam.x);
     let y = Math.round(player.position.y - cam.y);
@@ -2410,6 +2418,14 @@ export class Renderer {
         ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
         ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + TILE_SIZE, y + TILE_SIZE); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(x + TILE_SIZE, y); ctx.lineTo(x, y + TILE_SIZE); ctx.stroke();
+      } else if (content.id === TileType.CHECKPOINT) {
+        this.drawFlagTile(x, y, ctx);
+      } else if (content.id === TileType.COIN) {
+        this.drawCoin(x, y, 0, ctx);
+      } else if (content.id === TileType.POWERUP_MINI_FANTA) {
+        this.drawFanta(x, y, 0, ctx);
+      } else if (content.id === TileType.POWERUP_HELMET) {
+        this.drawHelmet(x, y, ctx);
       } else {
         // Draw normal tile
         // We pass a dummy grid so neighbor-aware tiles (like ground) just draw their default state
@@ -2422,7 +2438,6 @@ export class Renderer {
         // Draw Player Idle
         if (PLAYER_SPRITES) {
           const art = PLAYER_SPRITES.idle;
-          const scale = 1; // 1:1 scale for game world
 
           const offsetX = PLAYER_RENDER_OFFSET_X;
           const offsetY = PLAYER_RENDER_OFFSET_Y;
@@ -2444,7 +2459,7 @@ export class Renderer {
       else if (content.id === 'minion') {
         const mockEnemy: any = {
           type: EnemyType.MINION,
-          position: { x: x / TILE_SIZE, y: y / TILE_SIZE },
+          position: { x: x, y: y },
           active: true, facingRight: false, isDead: false, width: 16, height: 16, animationTimer: 0, animationFrame: 0
         };
         this.drawEnemy(mockEnemy, { x: 0, y: 0 } as any, ctx);
@@ -2452,7 +2467,7 @@ export class Renderer {
       else if (content.id === 'boss_joaozao') {
         const mockEnemy: any = {
           type: EnemyType.JOAOZAO,
-          position: { x: x / TILE_SIZE, y: y / TILE_SIZE },
+          position: { x: x, y: y },
           active: true, facingRight: false, isDead: false, width: 32, height: 32, animationTimer: 0, animationFrame: 0
         };
         this.drawEnemy(mockEnemy, { x: 0, y: 0 } as any, ctx);

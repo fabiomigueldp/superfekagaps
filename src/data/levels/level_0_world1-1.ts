@@ -1,4 +1,4 @@
-import { LevelData, EnemyType, CollectibleType } from '../../types';
+import { LevelData, EnemyType } from '../../types';
 
 export const DATA: LevelData = {
   "id": "0",
@@ -48,28 +48,28 @@ export const DATA: LevelData = {
   ],
   "enemies": [
     {
-      "type": EnemyType.MINION,
+      "type": "MINION",
       "position": {
         "x": 20,
         "y": 8
       }
     },
     {
-      "type": EnemyType.MINION,
+      "type": "MINION",
       "position": {
         "x": 35,
         "y": 8
       }
     },
     {
-      "type": EnemyType.MINION,
+      "type": "MINION",
       "position": {
         "x": 55,
         "y": 8
       }
     },
     {
-      "type": EnemyType.MINION,
+      "type": "MINION",
       "position": {
         "x": 65,
         "y": 4
@@ -78,7 +78,7 @@ export const DATA: LevelData = {
   ],
   "collectibles": [
     {
-      "type": CollectibleType.MINI_FANTA,
+      "type": "MINI_FANTA",
       "position": {
         "x": 45,
         "y": 6

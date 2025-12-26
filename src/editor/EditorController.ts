@@ -21,7 +21,9 @@ export class EditorController {
     private dragStartTile: Vector2 | null = null;
     private lastMousePos: Vector2 = { x: 0, y: 0 };
     private canvas: HTMLCanvasElement;
-    private scale: number = 1; // Used for coordinate mapping (Window -> Game Resolution)
+
+    private scaleX: number = 1;
+    private scaleY: number = 1;
     private zoom: number = 1; // Used for visual zoom (Game Resolution -> View)
 
     // Bounds Visualization
@@ -958,6 +960,45 @@ export class EditorController {
                 renderer.drawCollectible(mockCol, this.camera, ctx);
             });
         }
+
+        // 3. Draw Player Spawn (Editor Visual)
+        if (this.levelData.playerSpawn) {
+            // Draw Player Idle Sprite at Spawn Location
+            const spawnX = Math.round(this.levelData.playerSpawn.x * TILE_SIZE - this.camera.x);
+            const spawnY = Math.round(this.levelData.playerSpawn.y * TILE_SIZE - this.camera.y);
+
+            // Use renderer's sprite drawing
+            // Reuse the logic from drawEditorGhost for 'spawn'
+            // We can manually draw it or add a helper in renderer. 
+            // Let's implement manual draw here for now to avoid altering Renderer public API too much just for this.
+            // Or better: Use renderer.drawPlayer with a mock player object
+
+            const mockPlayer: any = {
+                position: { x: this.levelData.playerSpawn.x * TILE_SIZE, y: this.levelData.playerSpawn.y * TILE_SIZE },
+                velocity: { x: 0, y: 0 },
+                isGrounded: true,
+                isDead: false,
+                facingRight: true,
+                animationTimer: 0,
+                width: 14, height: 24,
+                invincibleTimer: 0,
+                miniFantaTimer: 0,
+                hasHelmet: false,
+                groundPoundState: 'NONE'
+            };
+
+            ctx.save();
+            ctx.globalAlpha = 0.7; // Slightly transparent to indicate it's a marker
+            renderer.drawPlayer(mockPlayer, this.camera, ctx);
+
+            // Draw "SPAWN" text label (smaller)
+            ctx.font = '6px Consolas';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#FFFFFF';
+            // Center text above player
+            ctx.fillText('SPAWN', spawnX + 7, spawnY - 6);
+            ctx.restore();
+        }
     }
 
     private drawRectanglePreview(ctx: CanvasRenderingContext2D) {
@@ -1145,17 +1186,15 @@ export class EditorController {
         }
         else if (this.activeContent.type === 'ENTITY') {
             if (this.isCtrlPressed) {
-                // Snap Entities if Ctrl pressed
-                const col = Math.floor(ghostX / TILE_SIZE);
-                const row = Math.floor(ghostY / TILE_SIZE);
-                // Entities (like Enemies) usually rendered from top-left, so this is fine
-                ghostX = col * TILE_SIZE - this.camera.x;
-                ghostY = row * TILE_SIZE - this.camera.y;
-            } else {
-                // Free movement (Pixel Perfect)
-                // We just subtract camera to get screen-relative coordinates
+                // Ctrl Pressed: Free Movement (Pixel Perfect)
                 ghostX -= this.camera.x;
                 ghostY -= this.camera.y;
+            } else {
+                // Default: Snap to Grid
+                const col = Math.floor(ghostX / TILE_SIZE);
+                const row = Math.floor(ghostY / TILE_SIZE);
+                ghostX = col * TILE_SIZE - this.camera.x;
+                ghostY = row * TILE_SIZE - this.camera.y;
             }
         }
 
@@ -1165,8 +1204,8 @@ export class EditorController {
 
     private onMouseDown(e: MouseEvent) {
         this.updateScale();
-        const startX = e.offsetX / this.scale;
-        const startY = e.offsetY / this.scale;
+        const startX = e.offsetX / this.scaleX;
+        const startY = e.offsetY / this.scaleY;
 
         // Calculate world coordinates for edge detection
         const worldX = (startX / this.zoom) + this.camera.x;
@@ -1189,8 +1228,13 @@ export class EditorController {
                 this.isDragging = true;
             } else {
                 // Tool Action
-                if (this.activeTool === EditorTool.BRUSH || this.activeTool === EditorTool.ERASER) {
-                    this.paintTile(startX, startY);
+                // Tool Action
+                if (this.activeTool === EditorTool.BRUSH) {
+                    this.handleBrushInteract(worldX, worldY);
+                    this.isDragging = true;
+                }
+                else if (this.activeTool === EditorTool.ERASER) {
+                    this.handleEraserInteract(worldX, worldY);
                     this.isDragging = true;
                 }
                 else if (this.activeTool === EditorTool.RECTANGLE) {
@@ -1209,14 +1253,15 @@ export class EditorController {
 
     private updateScale() {
         const rect = this.canvas.getBoundingClientRect();
-        // Assuming aspect ratio is maintained, scale is width based
-        this.scale = rect.width / GAME_WIDTH; // e.g. 960 / 320 = 3
+        // Calculate scale independently for X and Y to handle aspect ratio mismatch (stretching)
+        this.scaleX = rect.width / GAME_WIDTH;
+        this.scaleY = rect.height / GAME_HEIGHT;
     }
 
     private onMouseMove(e: MouseEvent) {
         this.updateScale();
-        const currentX = e.offsetX / this.scale;
-        const currentY = e.offsetY / this.scale;
+        const currentX = e.offsetX / this.scaleX;
+        const currentY = e.offsetY / this.scaleY;
 
         // Always track hovered tile for HUD display
         // And track precise world mouse for Ghost
@@ -1254,9 +1299,13 @@ export class EditorController {
 
         // Painting (only if not resizing bounds)
         if (e.buttons === 1 && !this.isResizingBounds) {
-            // Only Brush/Eraser paints continuously on drag
-            if (this.activeTool === EditorTool.BRUSH || this.activeTool === EditorTool.ERASER) {
-                this.paintTile(currentX, currentY);
+            if (this.activeTool === EditorTool.BRUSH) {
+                // Only paint tiles on drag, NOT entities
+                if (this.activeContent.type === 'TILE') {
+                    this.handleBrushInteract(worldX, worldY);
+                }
+            } else if (this.activeTool === EditorTool.ERASER) {
+                this.handleEraserInteract(worldX, worldY);
             }
         }
 
@@ -1485,8 +1534,8 @@ export class EditorController {
     private onWheel(e: WheelEvent) {
         // Zoom on Wheel centered on mouse
         this.updateScale();
-        const mouseX = e.offsetX / this.scale;
-        const mouseY = e.offsetY / this.scale;
+        const mouseX = e.offsetX / this.scaleX;
+        const mouseY = e.offsetY / this.scaleY;
 
         // Convert mouse screen pos to world pos before zoom
         const worldMouseX = (mouseX / this.zoom) + this.camera.x;
@@ -1515,74 +1564,103 @@ export class EditorController {
         this.camera.y = worldMouseY - (mouseY / this.zoom);
     }
 
-    private paintTile(screenX: number, screenY: number) {
+    private handleBrushInteract(worldX: number, worldY: number) {
         if (!this.levelData) return;
 
-        const worldX = (screenX / this.zoom) + this.camera.x;
-        const worldY = (screenY / this.zoom) + this.camera.y;
+        // --- TILE PLACEMENT ---
+        if (this.activeContent.type === 'TILE') {
+            const originX = this.levelData.originX ?? 0;
+            const originY = this.levelData.originY ?? 0;
+            const col = Math.floor(worldX / TILE_SIZE) - originX;
+            const row = Math.floor(worldY / TILE_SIZE) - originY;
 
-        // Convert world tile coordinates to array indices
-        const originX = this.levelData.originX ?? 0;
-        const originY = this.levelData.originY ?? 0;
-        const worldCol = Math.floor(worldX / TILE_SIZE);
-        const worldRow = Math.floor(worldY / TILE_SIZE);
-        const col = worldCol - originX;
-        const row = worldRow - originY;
-
-        // Ensure within bounds
-        if (row >= 0 && row < this.levelData.tiles.length &&
-            col >= 0 && col < this.levelData.tiles[0].length) {
-
-            // --- ERASER TOOL OR ERASE CONTENT ---
-            if (this.activeTool === EditorTool.ERASER ||
-                (this.activeContent.type === 'TILE' && this.activeContent.id === TileType.EMPTY)) {
-
-                // Erase Tile
-                this.levelData.tiles[row][col] = 0;
-
-                // Erase Entities at this location
-                this.levelData.enemies = this.levelData.enemies.filter(e => {
-                    return Math.abs(e.position.x - worldCol) > 0.1 || Math.abs(e.position.y - worldRow) > 0.1;
-                });
-                this.levelData.collectibles = this.levelData.collectibles.filter(c => {
-                    return Math.abs(c.position.x - worldCol) > 0.1 || Math.abs(c.position.y - worldRow) > 0.1;
-                });
-                return;
-            }
-
-            // --- BRUSH / RECTANGLE (Point Logic) ---
-            // For now, only handling single point paint here
-
-            if (this.activeContent.type === 'ENTITY') {
-                // Handling Entities
-                const entityId = this.activeContent.id;
-
-                if (entityId === 'spawn') {
-                    // Set Player Spawn
-                    this.levelData.playerSpawn = { x: worldCol, y: worldRow };
-                    console.log('Set Spawn:', worldCol, worldRow);
-                }
-                else if (entityId === 'minion' || entityId === 'boss_joaozao') {
-                    // Check if enemy already exists at this tile
-                    const alreadyExists = this.levelData.enemies.some(e =>
-                        Math.abs(e.position.x - worldCol) < 0.1 &&
-                        Math.abs(e.position.y - worldRow) < 0.1
-                    );
-
-                    if (!alreadyExists) {
-                        const type = entityId === 'boss_joaozao' ? EnemyType.JOAOZAO : EnemyType.MINION;
-                        this.levelData.enemies.push({
-                            type: type,
-                            position: { x: worldCol, y: worldRow }
-                        });
-                    }
-                }
-            }
-            else if (this.activeContent.type === 'TILE') {
-                // Normal Tile Paint
+            if (row >= 0 && row < this.levelData.tiles.length &&
+                col >= 0 && col < this.levelData.tiles[0].length) {
                 this.levelData.tiles[row][col] = this.activeContent.id;
             }
+            return;
         }
+
+        // --- ENTITY PLACEMENT ---
+        if (this.activeContent.type === 'ENTITY') {
+            let placeX = worldX;
+            let placeY = worldY;
+
+            // Snapping Logic
+            if (this.isCtrlPressed) {
+                // Ctrl: Free Placement (World Coords)
+                // No modification needed, worldX is already absolute
+            } else {
+                // Default: Snap to Grid (World Coords)
+                placeX = Math.floor(worldX / TILE_SIZE) * TILE_SIZE;
+                placeY = Math.floor(worldY / TILE_SIZE) * TILE_SIZE;
+            }
+
+            // Convert to Level Units (Tiles)
+            // Assuming LevelData stores positions in Tile Units (e.g. 10.5 for 168px)
+            const finalX = placeX / TILE_SIZE;
+            const finalY = placeY / TILE_SIZE;
+
+            if (this.activeContent.id === 'spawn') {
+                this.levelData.playerSpawn = { x: finalX, y: finalY };
+                console.log('Placed Spawn:', finalX, finalY);
+            } else if (this.activeContent.entityType === 'ENEMY') {
+                const type = this.activeContent.id === 'boss_joaozao' ? EnemyType.JOAOZAO : EnemyType.MINION;
+                this.levelData.enemies.push({
+                    type: type,
+                    position: { x: finalX, y: finalY }
+                });
+                console.log('Placed Enemy:', type, finalX, finalY);
+            }
+        }
+    }
+
+    private handleEraserInteract(worldX: number, worldY: number) {
+        if (!this.levelData) return;
+
+        // 1. Try to erase Entities first (Click Selection)
+        // Check relative to camera if using pixel coordinates for hit test? 
+        // Our entities are stored in Tile Units. We need to project them to World Pixels to check Click.
+        // Assuming worldX/worldY are absolute world coordinates (including camera).
+
+        // Actually, worldX passed from onMove/onDown implies:
+        // worldX = (screenX / zoom) + cameraX;
+        // So it IS absolute world coordinate.
+
+        // We need to check against Entity World Position
+        // Entity World X = e.position.x * TILE_SIZE
+
+        // Reverse iterate to click 'top' ones first
+        for (let i = this.levelData.enemies.length - 1; i >= 0; i--) {
+            const enemy = this.levelData.enemies[i];
+            const ex = enemy.position.x * TILE_SIZE;
+            const ey = enemy.position.y * TILE_SIZE;
+            const size = this.getEntitySize(enemy.type);
+
+            if (worldX >= ex && worldX < ex + size.w &&
+                worldY >= ey && worldY < ey + size.h) {
+
+                this.levelData.enemies.splice(i, 1);
+                console.log('Erased Enemy at index', i);
+                return; // Stop after erasing one entity (precision)
+            }
+        }
+
+        // 2. Fallback: Erase Tile
+        const originX = this.levelData.originX ?? 0;
+        const originY = this.levelData.originY ?? 0;
+        const col = Math.floor(worldX / TILE_SIZE) - originX;
+        const row = Math.floor(worldY / TILE_SIZE) - originY;
+
+        if (row >= 0 && row < this.levelData.tiles.length &&
+            col >= 0 && col < this.levelData.tiles[0].length) {
+            this.levelData.tiles[row][col] = TileType.EMPTY;
+        }
+    }
+
+    private getEntitySize(type: EnemyType): { w: number, h: number } {
+        if (type === EnemyType.JOAOZAO) return { w: 32, h: 32 };
+        return { w: 16, h: 16 };
     }
 
     private fitLevelToScreen(): void {
@@ -1604,7 +1682,8 @@ export class EditorController {
         // scale = canvasWidth / GAME_WIDTH
         // logicalWidth = canvasWidth / scale = GAME_WIDTH
         const logicalWidth = GAME_WIDTH;
-        const logicalHeight = this.canvas.height / this.scale;
+        // height is also GAME_HEIGHT in logical units if we respect the scaling
+        const logicalHeight = GAME_HEIGHT;
 
         // Calculate Target Zoom to fit content (with 10% margin)
         // zoom = logicalSize / levelSize
