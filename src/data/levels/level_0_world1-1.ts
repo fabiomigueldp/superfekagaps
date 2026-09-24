@@ -1,4 +1,5 @@
-import { LevelData, EnemyType } from '../../types';
+import type { LevelData } from '../../types';
+import { CollectibleType, EnemyType, TriggerType } from '../../types';
 
 export const DATA: LevelData = {
   "id": "0",
@@ -48,28 +49,28 @@ export const DATA: LevelData = {
   ],
   "enemies": [
     {
-      "type": "MINION",
+      "type": EnemyType.MINION,
       "position": {
         "x": 20,
         "y": 8
       }
     },
     {
-      "type": "MINION",
+      "type": EnemyType.MINION,
       "position": {
         "x": 35,
         "y": 8
       }
     },
     {
-      "type": "MINION",
+      "type": EnemyType.MINION,
       "position": {
         "x": 55,
         "y": 8
       }
     },
     {
-      "type": "MINION",
+      "type": EnemyType.MINION,
       "position": {
         "x": 65,
         "y": 4
@@ -78,7 +79,7 @@ export const DATA: LevelData = {
   ],
   "collectibles": [
     {
-      "type": "MINI_FANTA",
+      "type": CollectibleType.MINI_FANTA,
       "position": {
         "x": 45,
         "y": 6
@@ -118,7 +119,7 @@ export const DATA: LevelData = {
       "height": 192,
       "oneShot": false,
       "active": true,
-      "type": "CAMERA",
+      "type": TriggerType.CAMERA,
       "zoom": 1,
       "lockX": false,
       "lockY": true
@@ -131,7 +132,7 @@ export const DATA: LevelData = {
       "height": 32,
       "oneShot": false,
       "active": true,
-      "type": "DAMAGE",
+      "type": TriggerType.DAMAGE,
       "damagePerTick": 1,
       "instantKill": true
     }

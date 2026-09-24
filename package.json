@@ -5,10 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "test": "tsx --test tests/*.test.ts",
+    "check": "npm run test && npm run build",
+    "normalize:tiles": "tsx scripts/normalize_tiles.ts",
     "validate": "npm run validate:levels && npm run validate:player-assets",
     "validate:levels": "tsx scripts/validate_levels.ts",
     "validate:player-assets": "tsx scripts/validate_player_assets.ts",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.tools.json --noEmit",
     "prebuild": "npm run validate && npm run typecheck",
     "build": "vite build",
     "preview": "vite preview --host"
@@ -17,10 +20,11 @@
     "node": ">=20"
   },
   "devDependencies": {
+    "@types/node": "^22.20.1",
     "@types/wicg-file-system-access": "^2023.10.7",
     "tsx": "^4.21.0",
     "typescript": "^5.3.3",
-    "vite": "^5.0.10"
+    "vite": "^6.4.3"
   },
   "keywords": [
     "game",

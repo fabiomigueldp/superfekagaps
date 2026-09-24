@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node", "wicg-file-system-access"]
+  },
+  "include": ["scripts", "tests", "vite.config.ts"]
+}

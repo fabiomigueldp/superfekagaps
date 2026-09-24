@@ -42,18 +42,17 @@ export class Minion {
     this.data.velocity.y += GRAVITY * 0.5;
     this.data.velocity.y = Math.min(this.data.velocity.y, MAX_FALL_SPEED);
 
-    // Move horizontalmente
-    this.data.position.x += this.data.velocity.x;
-    this.data.position.y += this.data.velocity.y;
-
-    // Colisão com tiles
+    // O resolvedor aplica o deslocamento uma única vez em ambos os eixos.
     const rect = this.getRect();
-    const collision = level.resolveCollision(rect, { x: 0, y: this.data.velocity.y });
-    this.data.position.y = collision.position.y;
+    const collision = level.resolveCollision(rect, this.data.velocity, rect);
+    this.data.position = collision.position;
     this.data.velocity.y = collision.velocity.y;
 
-    // Verifica colisão horizontal com paredes
-    this.checkWallCollision(level);
+    if (collision.velocity.x === 0) {
+      this.reverseDirection();
+    } else {
+      this.checkLedge(level);
+    }
 
     // Verifica se caiu no gap
     if (level.isInGap(this.getRect())) {
@@ -61,24 +60,8 @@ export class Minion {
     }
   }
 
-  private checkWallCollision(level: Level): void {
-    // Verifica tile à frente
-    const checkX = this.data.facingRight
-      ? this.data.position.x + this.data.width + 2
-      : this.data.position.x - 2;
-    const checkY = this.data.position.y + this.data.height / 2;
-
-    // CORREÇÃO: Usar worldToCol/Row para obter índice correto do array
-    const tileCol = level.worldToCol(checkX);
-    const tileRow = level.worldToRow(checkY);
-    const tile = level.getTile(tileCol, tileRow);
-
-    // Se há parede, inverte direção
-    if (tile === 1 || tile === 2) {
-      this.reverseDirection();
-    }
-
-    // Também verifica se há chão à frente (para não cair)
+  private checkLedge(level: Level): void {
+    // Verifica se há chão à frente (para não cair).
     const groundCheckX = this.data.facingRight
       ? this.data.position.x + this.data.width + 2
       : this.data.position.x - 2;

@@ -9,7 +9,7 @@ import {
 } from '../constants';
 import {
   CameraData, Vector2, FlagData, CollectibleData, CollectibleSpawnData,
-  CollectibleType, Particle, Firework, EnemyType, GroundPoundState, LevelData
+  CollectibleType, Particle, Firework, EnemyType, GroundPoundState, LevelData, CameraTrigger
 } from '../types';
 import { Input } from '../engine/Input';
 import { Audio } from '../engine/Audio';
@@ -19,11 +19,13 @@ import { SpeechBubbleController } from '../voice/SpeechBubbleController';
 import { VoiceDirector } from '../voice/VoiceDirector';
 import { JOAOZAO_VOICE_MANIFEST } from '../voice/joaozaoVoiceManifest';
 import { Level, createLevel } from '../world/Level';
+import { normalizeLevelData } from '../world/levelValidation';
 import { Player } from '../entities/Player';
 import { Minion } from '../entities/enemies/Minion';
 import { Joaozao } from '../entities/enemies/Joaozao';
 import { getLevelByIndex, TOTAL_LEVELS, ALL_LEVELS } from '../data/levels/index';
 import { ScoreManager } from './ScoreManager';
+import { TriggerController } from './TriggerController';
 import { EditorController } from '../editor/EditorController';
 
 export class Game {
@@ -88,6 +90,7 @@ export class Game {
 
   // Editor
   private editorController: EditorController | null = null;
+  private triggerController = new TriggerController();
 
   constructor(canvas: HTMLCanvasElement) {
     this.input = new Input();
@@ -108,7 +111,7 @@ export class Game {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('editor') === 'true') {
       this.state = GameState.EDITOR;
-      this.editorController = new EditorController(canvas);
+      this.editorController = new EditorController(canvas, this.renderer);
       this.editorController.init();
     } else {
       this.state = GameState.BOOT;
@@ -117,34 +120,15 @@ export class Game {
   }
 
   private validateLevelsOnStartup(): void {
-    console.log('🔍 Validando níveis...');
-    const levels = ALL_LEVELS;
-    let hasErrors = false;
-
-    levels.forEach((level, index) => {
-      // Validar ID contíguo
-      if (level.id !== index.toString()) {
-        console.error(`❌ Erro no Nível ${index}: ID esperado '${index}', encontrado '${level.id}'`);
-        hasErrors = true;
+    const ids = new Set<string>();
+    for (const level of ALL_LEVELS) {
+      try {
+        normalizeLevelData(level);
+        if (ids.has(level.id)) throw new Error('ID de fase duplicado: ' + level.id);
+        ids.add(level.id);
+      } catch (error) {
+        console.error('Falha ao validar a fase ' + level.name, error);
       }
-
-      // Validar tiles
-      level.tiles.forEach((row, rIdx) => {
-        row.forEach((tile, cIdx) => {
-          // Tiles válidos: 0-19 (inclui legacy para spawn de entidades)
-          const isValid = tile >= 0 && tile <= 19;
-          if (!isValid) {
-            console.error(`❌ Erro no Nível ${level.id}: Tile inválido '${tile}' em [${rIdx}, ${cIdx}]`);
-            hasErrors = true;
-          }
-        });
-      });
-    });
-
-    if (!hasErrors) {
-      console.log('✅ Todos os níveis validados com sucesso!');
-    } else {
-      console.warn('⚠️ Foram encontrados problemas na validação dos níveis. Verifique o console.');
     }
   }
 
@@ -155,7 +139,8 @@ export class Game {
 
   private gameLoop = (): void => {
     const currentTime = performance.now();
-    const deltaTime = currentTime - this.lastTime;
+    // Descarte tempo de abas ocultas e limite a recuperação após travamentos.
+    const deltaTime = document.hidden ? 0 : Math.min(250, Math.max(0, currentTime - this.lastTime));
     this.lastTime = currentTime;
 
     // Fixed timestep para física
@@ -265,17 +250,9 @@ export class Game {
       return;
     }
 
-    // Timer do nível (agora conta para run time também)
-    const dtSeconds = deltaTime / 1000;
-    this.levelTime -= dtSeconds;
-    this.totalRunTime += dtSeconds;
-
-    if (this.levelTime <= 0) {
-      this.playerDie();
-      return;
-    }
-
     // Atualiza tiles dinâmicos (gaps temporários do boss)
+    const dtSeconds = deltaTime / 1000;
+    this.totalRunTime += dtSeconds;
     this.level.updateDynamicTiles(deltaTime);
     this.level.clearFallingPlatformTouches();
 
@@ -292,8 +269,21 @@ export class Game {
       return;
     }
 
+    // A morte precisa terminar mesmo quando o cronômetro já chegou a zero.
+    this.levelTime = Math.max(0, this.levelTime - dtSeconds);
+    if (this.levelTime === 0) {
+      this.playerDie();
+      return;
+    }
+
     // Atualiza player
     const playerResult = this.player.update(deltaTime, this.input.getState(), this.level);
+
+    // Quedas detectadas pela física também passam pelo áudio e timer de morte do jogo.
+    if (this.player.data.isDead) {
+      this.playerDie();
+      return;
+    }
 
     // Processa início de Ground Pound
     if (playerResult && playerResult.groundPoundStarted) {
@@ -360,8 +350,8 @@ export class Game {
     if (this.player.data.isGrounded) {
       const footX = this.player.data.position.x + this.player.data.width / 2;
       const footY = this.player.data.position.y + this.player.data.height + 1;
-      const col = Math.floor(footX / TILE_SIZE);
-      const row = Math.floor(footY / TILE_SIZE);
+      const col = this.level.worldToCol(footX);
+      const row = this.level.worldToRow(footY);
       if (this.level.getTile(col, row) === TileType.PLATFORM_FALLING) {
         this.level.markFallingPlatformContact(col, row);
       }
@@ -378,6 +368,10 @@ export class Game {
       this.playerDie();
       return;
     }
+
+    // Aplica zonas antes da câmera para evitar um frame de atraso ao entrar e sair.
+    this.updateTriggers(deltaTime);
+    if (this.player.data.isDead) return;
 
     // Atualiza câmera
     this.updateCamera(deltaTime);
@@ -443,71 +437,26 @@ export class Game {
     // Atualiza partículas
     this.updateParticles(deltaTime);
 
-    // Atualiza Triggers
-    this.updateTriggers(deltaTime);
   }
 
-  private updateTriggers(_deltaTime: number): void {
-    if (!this.level || !this.player || !this.level.data.triggers) return;
-
-    const playerRect = this.player.getRect();
-    const center = this.player.getCenter();
-
-    // Reset camera override for this frame (it will be re-applied if we are still inside a trigger)
-    this.activeCameraOverride = null;
-
-    this.level.data.triggers.forEach(trigger => {
-      if (!trigger.active) return;
-
-      // Simple AABB collision
-      if (playerRect.x < trigger.x + trigger.width &&
-        playerRect.x + playerRect.width > trigger.x &&
-        playerRect.y < trigger.y + trigger.height &&
-        playerRect.y + playerRect.height > trigger.y) {
-
-        // --- TRIGGER HIT ---
-
-        switch (trigger.type) {
-          case 'DAMAGE':
-            // Apply Damage
-            // We use a cooldown or per-frame check? 
-            // The type definition has 'damagePerTick'.
-            // Assuming 60 ticks per sec roughly.
-            if (!this.player!.data.isDead && !this.player!.data.invincibleTimer) {
-              const dmg = trigger as any; // Cast to DamageTrigger
-              // If instant kill
-              if (dmg.instantKill) {
-                this.playerDie();
-              } else {
-                // Damage per tick - default 1?
-                // For now, just Hit the player immediately if not invincible
-                this.playerHit();
-              }
-            }
-            break;
-
-          case 'CAMERA':
-            // Set as active override
-            // We can handle multiple overlapping by taking the last one or by priority.
-            // For now, last one wins.
-            this.activeCameraOverride = trigger as any;
-            break;
-
-          case 'AUDIO':
-            // Audio triggers change BGM? 
-            // TODO: Implement Logic Audio layer
-            break;
-
-          case 'DIALOG':
-            // Show dialog?
-            // TODO: Implement Dialog System
-            break;
+  private updateTriggers(deltaTime: number): void {
+    if (!this.level || !this.player) return;
+    this.activeCameraOverride = this.triggerController.update(deltaTime, this.level.data, this.player.getRect(), {
+      audio: (trigger) => this.audio.applyLevelTrigger(trigger.trackId, trigger.action),
+      damage: (trigger) => {
+        if (!this.player || this.player.data.isDead) return false;
+        if (trigger.instantKill) {
+          this.playerDie();
+          return true;
         }
+        if (trigger.damagePerTick <= 0 || this.player.data.invincibleTimer > 0) return false;
+        this.playerHit();
+        return true;
       }
     });
   }
 
-  private activeCameraOverride: any | null = null;
+  private activeCameraOverride: CameraTrigger | null = null;
 
 
   private updatePaused(): void {
@@ -696,6 +645,10 @@ export class Game {
     if (bubbleState) {
       this.renderer.drawSpeechBubble(bubbleState, this.camera);
     }
+    const dialogState = this.triggerController.getDialogRenderState();
+    if (dialogState && this.state === GameState.PLAYING) {
+      this.renderer.drawSpeechBubble(dialogState, this.camera);
+    }
 
     // Player
     this.renderer.drawPlayer(this.player.data, this.camera);
@@ -782,8 +735,6 @@ export class Game {
 
     // Snap camera to start position immediately to avoid weird initial pan
     // Center on player spawn
-    const startX = levelData.playerSpawn.x * TILE_SIZE;
-    const startY = levelData.playerSpawn.y * TILE_SIZE;
     // We can't use detailed centering logic easily here without duplicating code, 
     // but setting it roughly near player is better than 0,0.
     // Let's just trust updateCamera will fix it quickly, but x=0 is definitely bad if not at 0.
@@ -1529,9 +1480,9 @@ export class Game {
   }
 
   private playerDie(cause: 'boss' | 'other' = 'other'): void {
-    if (!this.player || this.player.data.isDead) return;
+    if (!this.player || (this.player.data.isDead && this.deathTimer > 0)) return;
 
-    this.player.die();
+    if (!this.player.data.isDead) this.player.die();
     this.audio.playFall();
     this.audio.onPlayerDeathStart();
     this.deathTimer = 1500;
@@ -1564,8 +1515,9 @@ export class Game {
 
       const spawnPos = this.activeCheckpoint || this.level.data.playerSpawn;
       this.player.respawn(spawnPos);
-      // Não resetamos o tempo mais! O tempo é contínuo e cruel.
-      // this.levelTime = this.level.data.timeLimit; 
+      // Preserve o tempo restante; após timeout, uma nova vida precisa de tempo para jogar.
+      if (this.levelTime <= 0) this.levelTime = this.level.data.timeLimit;
+      this.deathTimer = 0;
       this.audio.onRespawn();
     }
   }

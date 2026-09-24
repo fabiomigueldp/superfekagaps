@@ -1,4 +1,5 @@
-import { LevelData, EnemyType } from '../../types';
+import type { LevelData } from '../../types';
+import { CollectibleType, EnemyType } from '../../types';
 
 export const DATA: LevelData = {
   "id": "2",
@@ -37,7 +38,7 @@ export const DATA: LevelData = {
   "checkpoints": [],
   "enemies": [
     {
-      "type": "JOAOZAO",
+      "type": EnemyType.JOAOZAO,
       "position": {
         "x": 28,
         "y": 5
@@ -46,7 +47,7 @@ export const DATA: LevelData = {
   ],
   "collectibles": [
     {
-      "type": "HELMET",
+      "type": CollectibleType.HELMET,
       "position": {
         "x": 3,
         "y": 4
@@ -66,5 +67,6 @@ export const DATA: LevelData = {
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-  ]
+  ],
+  "triggers": []
 };

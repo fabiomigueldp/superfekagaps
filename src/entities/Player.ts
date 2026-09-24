@@ -149,7 +149,7 @@ export class Player {
     }
 
     // Ground snap: se estava grounded e agora não, testa 1px abaixo para estabilidade
-    if (!this.data.isGrounded && prevGrounded && this.data.groundPoundState === GroundPoundState.NONE) {
+    if (!this.data.isGrounded && prevGrounded && this.data.velocity.y >= 0 && this.data.groundPoundState === GroundPoundState.NONE) {
       const snapTest = level.resolveCollision({ x: this.data.position.x, y: this.data.position.y, width: this.data.width, height: this.data.height }, { x: 0, y: 1 }, prevRect);
       if (snapTest.grounded && Math.abs(snapTest.position.y - this.data.position.y) <= 2) {
         this.data.position.y = snapTest.position.y;
@@ -197,8 +197,8 @@ export class Player {
     if (!this.data.isGrounded) return PLAYER_FRICTION;
     const footX = this.data.position.x + this.data.width / 2;
     const footY = this.data.position.y + this.data.height + 1;
-    const col = Math.floor(footX / TILE_SIZE);
-    const row = Math.floor(footY / TILE_SIZE);
+    const col = level.worldToCol(footX);
+    const row = level.worldToRow(footY);
     const tile = level.getTile(col, row);
     if (tile === TileType.ICE) return ICE_FRICTION;
     return PLAYER_FRICTION;
@@ -385,16 +385,7 @@ export class Player {
   }
 
   respawn(position: Vector2): void {
-    this.data.position = {
-      x: position.x * TILE_SIZE,
-      y: position.y * TILE_SIZE - this.data.height
-    };
-    this.data.velocity = { x: 0, y: 0 };
-    this.data.isDead = false;
-    this.data.deathTimer = 0;
-    this.data.deathTimerMax = 0;
-    this.data.isGrounded = false;
-    this.data.isJumping = false;
+    this.reset(position.x, position.y);
     this.data.invincibleTimer = 2000; // 2 segundos de invencibilidade
   }
 
@@ -451,5 +442,14 @@ export class Player {
     this.data.coyoteTimer = 0;
     this.data.jumpBufferTimer = 0;
     this.data.facingRight = true;
+    this.data.isRunning = false;
+    this.data.groundPoundState = GroundPoundState.NONE;
+    this.data.groundPoundTimer = 0;
+    this.data.animationFrame = 0;
+    this.data.animationTimer = 0;
+    this.jumpHoldTime = 0;
+    this.prevRectForContacts = null;
+    this.prevVelocityForContacts = { x: 0, y: 0 };
+    this.prevGroundPoundStateForContacts = GroundPoundState.NONE;
   }
 }

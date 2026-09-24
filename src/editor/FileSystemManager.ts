@@ -1,34 +1,27 @@
-import { LevelData } from '../types';
+import type { LevelData } from '../types';
+import { parseLevelFromText, serializeLevelToTS } from './levelSerialization';
 
-/**
- * Manages access to the local file system for saving levels directly.
- * Uses the File System Access API (Chrome/Edge only).
- */
+/** Local level storage through the File System Access API (Chrome/Edge). */
 export class FileSystemManager {
     private dirHandle: FileSystemDirectoryHandle | null = null;
+    private readonly loadedFiles = new Map<string, string>();
+    private saving = false;
 
-    constructor() {
-        // Check support
-        if (!('showDirectoryPicker' in window)) {
-            console.warn('FileSystem Access API not supported in this browser.');
-        }
+    get isSupported(): boolean {
+        return typeof window !== 'undefined' && typeof window.showDirectoryPicker === 'function';
     }
 
-    /**
-     * Prompts user to select the 'src/data/levels' folder.
-     */
+    /** Canceling the picker keeps the previously mounted directory intact. */
     async mount(): Promise<boolean> {
+        if (!this.isSupported) throw new Error('Este navegador não permite abrir pastas locais. Use Chrome ou Edge, ou importe um arquivo.');
         try {
-            this.dirHandle = await window.showDirectoryPicker({
-                id: 'fekagaps-levels',
-                mode: 'readwrite',
-                startIn: 'documents'
-            });
-            console.log('Mounted:', this.dirHandle.name);
+            const directory = await window.showDirectoryPicker({ id: 'fekagaps-levels', mode: 'readwrite', startIn: 'documents' });
+            this.dirHandle = directory;
+            this.loadedFiles.clear();
             return true;
-        } catch (e) {
-            console.error('Failed to mount directory:', e);
-            return false;
+        } catch (error) {
+            if (error instanceof Error && error.name === 'AbortError') return false;
+            throw error;
         }
     }
 
@@ -36,91 +29,73 @@ export class FileSystemManager {
         return this.dirHandle !== null;
     }
 
-    /**
-     * Lists all .ts files in the directory
-     */
-    async listLevels(): Promise<string[]> {
-        if (!this.dirHandle) throw new Error('Not mounted');
-        const files: string[] = [];
-        for await (const entry of this.dirHandle.values()) {
-            if (entry.kind === 'file' && entry.name.endsWith('.ts') && entry.name !== 'index.ts') {
-                files.push(entry.name);
-            }
+    private directory(): FileSystemDirectoryHandle {
+        if (!this.dirHandle) throw new Error('Abra a pasta src/data/levels antes de salvar.');
+        return this.dirHandle;
+    }
+
+    private checkFilename(filename: string): void {
+        if (!filename || /[\\/\u0000]/.test(filename) || !filename.endsWith('.ts') || filename.endsWith('.d.ts') || filename.toLowerCase() === 'index.ts') {
+            throw new Error('Escolha um arquivo de nível .ts; index.ts e caminhos de outras pastas não são permitidos.');
         }
-        return files.sort();
+    }
+
+    async listLevels(): Promise<string[]> {
+        const files: string[] = [];
+        for await (const entry of this.directory().values()) {
+            if (entry.kind === 'file' && entry.name.endsWith('.ts') && !entry.name.endsWith('.d.ts') && entry.name.toLowerCase() !== 'index.ts') files.push(entry.name);
+        }
+        return files.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+    }
+
+    private async readContent(filename: string): Promise<{ directory: FileSystemDirectoryHandle; content: string }> {
+        this.checkFilename(filename);
+        const directory = this.directory();
+        const file = await (await directory.getFileHandle(filename)).getFile();
+        const content = await file.text();
+        return { directory, content };
     }
 
     async readFile(filename: string): Promise<string> {
-        if (!this.dirHandle) throw new Error('Not mounted');
-        try {
-            const fileHandle = await this.dirHandle.getFileHandle(filename);
-            const file = await fileHandle.getFile();
-            return await file.text();
-        } catch (e) {
-            console.error('Error reading file:', e);
-            throw e;
-        }
+        const { directory, content } = await this.readContent(filename);
+        if (directory === this.dirHandle) this.loadedFiles.set(filename, content);
+        return content;
     }
 
-    /**
-     * Saves the level data to a specific file.
-       * Serializes the LevelData object back into a valid TypeScript file string.
-       */
+    async readLevel(filename: string): Promise<LevelData> {
+        const { directory, content } = await this.readContent(filename);
+        const data = parseLevelFromText(content);
+        // A failed import must not authorize overwriting a newer, invalid file on disk.
+        if (directory === this.dirHandle) this.loadedFiles.set(filename, content);
+        return data;
+    }
+
     async saveLevel(filename: string, data: LevelData): Promise<void> {
-        if (!this.dirHandle) throw new Error('Not mounted');
-
-        // Generate TypeScript content
-        const fileContent = this.serializeLevelToTS(data);
-
+        this.checkFilename(filename);
+        const directory = this.directory();
+        if (this.saving) throw new Error('Aguarde o salvamento atual terminar.');
+        // Validate before opening a writable stream, so invalid input cannot damage a file.
+        const content = serializeLevelToTS(data);
+        const previousContent = this.loadedFiles.get(filename);
+        this.saving = true;
+        let writable: FileSystemWritableFileStream | undefined;
         try {
-            const fileHandle = await this.dirHandle.getFileHandle(filename, { create: true });
-            const writable = await fileHandle.createWritable();
-            await writable.write(fileContent);
+            const handle = await directory.getFileHandle(filename, { create: previousContent === undefined });
+            if (previousContent !== undefined && await (await handle.getFile()).text() !== previousContent) {
+                throw new Error('Este arquivo foi alterado fora do editor. Exporte suas alterações antes de reabrir o arquivo.');
+            }
+            writable = await handle.createWritable();
+            await writable.write(content);
             await writable.close();
-            console.log(`Saved ${filename} successfully.`);
-        } catch (e) {
-            console.error(`Error saving ${filename}:`, e);
-            throw e;
+            if (directory === this.dirHandle) this.loadedFiles.set(filename, content);
+        } catch (error) {
+            // The browser commits the temporary file only on close; abort a failed write.
+            if (writable) {
+                try { await writable.abort(); } catch { /* Preserve the original failure. */ }
+            }
+            throw error;
+        } finally {
+            this.saving = false;
         }
-    }
-
-    /**
-     * Converts the LevelData object into a formatted TypeScript file string.
-     * We need to recreate the imports and correct syntax.
-     */
-    private serializeLevelToTS(data: LevelData): string {
-        // Custom replacer to handle potential circular refs or formatting if needed.
-        // However, JSON.stringify doesn't handle Enum names (it outputs raw values/strings).
-        // Luckily, our game uses string enums for most things, or numbers for Tiles.
-
-        // We want the output to be readable, so we format the 'tiles' array specially
-        // to look like a grid in the text file.
-
-        const clone = { ...data };
-        const tiles = clone.tiles;
-        // Remove tiles from clone temporarily to stringify the rest
-        (clone as any).tiles = '___TILES_PLACEHOLDER___';
-
-        let json = JSON.stringify(clone, null, 2);
-
-        // Fix imports
-        let output = `import { LevelData, EnemyType } from '../../types';\n\n`;
-        output += `export const DATA: LevelData = `;
-
-        // Restore tiles with nice formatting
-        const tilesString = '[\n' + tiles.map(row => '    [' + row.join(', ') + ']').join(',\n') + '\n  ]';
-
-        json = json.replace('"___TILES_PLACEHOLDER___"', tilesString);
-
-        // Cleanup JSON keys to look more like standard TS object if desired, 
-        // but JSON format is valid TS (valid JS object).
-        // We should fix specific Enums if they are numbers acting as strings, 
-        // but our EnemyType is string-based, so JSON.stringify keeps them as "MINION".
-        // We can replace "MINION" with EnemyType.MINION if we want perfect code style,
-        // but string literals work fine.
-
-        output += json + ';\n';
-
-        return output;
     }
 }

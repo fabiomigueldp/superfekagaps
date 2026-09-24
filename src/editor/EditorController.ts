@@ -1,6 +1,11 @@
-import { CameraData, LevelData, Vector2, EnemyType, CollectibleType, EditorTool, PaletteItem, TriggerType, LevelTrigger } from '../types';
+import { CameraData, LevelData, Vector2, EnemyType, EditorTool, PaletteItem, TriggerType, LevelTrigger } from '../types';
 import { FileSystemManager } from './FileSystemManager';
-import { TileType, TILE_SIZE, COLORS, GAME_WIDTH, GAME_HEIGHT } from '../constants';
+import { parseLevelFromText, serializeLevelToTS } from './levelSerialization';
+import { ALL_LEVELS } from '../data/levels';
+import { EditorHistory } from './EditorHistory';
+import { screenToWorld, resizeLevel, fitLevelToContent } from './editorGeometry';
+import { MUSIC_TRACKS } from '../engine/audioCatalog';
+import { TileType, TILE_SIZE, COLORS, GAME_HEIGHT } from '../constants';
 import { PLAYER_RENDER_OFFSET_X, PLAYER_RENDER_OFFSET_Y } from '../assets/playerSpriteSpec';
 import { Renderer } from '../engine/Renderer';
 
@@ -21,10 +26,16 @@ export class EditorController {
     private isDragging: boolean = false;
     private dragStartTile: Vector2 | null = null;
     private lastMousePos: Vector2 = { x: 0, y: 0 };
+    private lastPaintPosition: Vector2 | null = null;
     private canvas: HTMLCanvasElement;
 
-    private scaleX: number = 1;
-    private scaleY: number = 1;
+    private readonly history = new EditorHistory<LevelData>();
+    private saving = false;
+    private mountedFile = false;
+    private documentVersion = 0;
+    private loadRequest = 0;
+    private boundsResizeStart: LevelData | null = null;
+    private readonly renderer: Renderer;
     private zoom: number = 1; // Used for visual zoom (Game Resolution -> View)
 
     // Bounds Visualization
@@ -57,7 +68,6 @@ export class EditorController {
     private selectionDragOffset: { x: number, y: number } = { x: 0, y: 0 };
 
     // UI Elements
-    private uiInspector: HTMLDivElement;
     private uiInspectorContent: HTMLDivElement;
     private uiMountBtn: HTMLButtonElement;
     private uiSaveBtn: HTMLButtonElement;
@@ -74,7 +84,8 @@ export class EditorController {
     private uiBoundsInfoSize: HTMLSpanElement;
     private uiBoundsInfoPixels: HTMLSpanElement;
 
-    constructor(canvas: HTMLCanvasElement) {
+    constructor(canvas: HTMLCanvasElement, renderer: Renderer) {
+        this.renderer = renderer;
         this.canvas = canvas;
         this.fs = new FileSystemManager();
 
@@ -132,7 +143,6 @@ export class EditorController {
         this.uiBoundsInfoPixels = document.getElementById('bounds-info-pixels') as HTMLSpanElement;
 
         // Inspector UI
-        this.uiInspector = document.getElementById('inspector-panel') as HTMLDivElement;
         this.uiInspectorContent = document.getElementById('inspector-content') as HTMLDivElement;
 
         // Status Bar Elements
@@ -141,6 +151,7 @@ export class EditorController {
         this.statusLevel = document.querySelector('.status-level');
         this.statusZoom = document.querySelector('.status-zoom');
 
+        this.history.reset(this.levelData);
         this.bindEvents();
         this.buildPalette();
         this.buildLogicPalette();
@@ -149,26 +160,58 @@ export class EditorController {
 
     private bindEvents() {
         // ... (Canvas events preserved via logic, but overwriting block method)
-        this.canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
-        this.canvas.addEventListener('mousemove', this.onMouseMove.bind(this));
-        this.canvas.addEventListener('mouseup', this.onMouseUp.bind(this));
-        this.canvas.addEventListener('wheel', this.onWheel.bind(this));
+        this.canvas.addEventListener('pointerdown', e => {
+            this.canvas.setPointerCapture(e.pointerId);
+            this.onMouseDown(e);
+        });
+        this.canvas.addEventListener('pointermove', this.onMouseMove.bind(this));
+        this.canvas.addEventListener('pointerup', this.onMouseUp.bind(this));
+        this.canvas.addEventListener('pointercancel', () => this.cancelGesture());
+        this.canvas.addEventListener('lostpointercapture', () => this.cancelGesture());
+        this.canvas.addEventListener('wheel', this.onWheel.bind(this), { passive: false });
+        window.addEventListener('blur', () => { this.isCtrlPressed = false; this.cancelGesture(); });
+        window.addEventListener('beforeunload', e => {
+            if (this.levelData && this.history.isDirty(this.levelData)) { e.preventDefault(); e.returnValue = ''; }
+        });
+        document.getElementById('editor-ui')?.addEventListener('change', () => this.recordChange());
         this.canvas.addEventListener('contextmenu', e => e.preventDefault());
 
+        this.uiMountBtn.disabled = !this.fs.isSupported;
+        if (!this.fs.isSupported) this.uiMountBtn.title = 'Use Importar arquivo neste navegador.';
         this.uiMountBtn.addEventListener('click', async () => {
-            const success = await this.fs.mount();
-            if (success) {
-                this.refreshLevelList();
-                this.selectTab('tab-levels');
-            }
+            if (this.saving) return;
+            try {
+                if (await this.fs.mount()) {
+                    this.loadRequest++;
+                    // A document belongs to the directory it was read from.
+                    this.mountedFile = false;
+                    this.updateDocumentUI();
+                    await this.refreshLevelList();
+                    this.selectTab('tab-levels');
+                    this.showMessage('Pasta aberta. Selecione um arquivo para editar.');
+                }
+            } catch (error) { this.showError(error); }
         });
-
-        this.uiSaveBtn.addEventListener('click', async () => {
-            if (this.currentLevelFilename && this.levelData) {
-                await this.fs.saveLevel(this.currentLevelFilename, this.levelData);
-                alert('Saved!');
-            }
+        this.uiSaveBtn.addEventListener('click', () => void this.save());
+        document.getElementById('btn-export')?.addEventListener('click', () => void this.save(true));
+        document.getElementById('btn-import')?.addEventListener('click', () =>
+            document.getElementById('level-import')?.click());
+        document.getElementById('level-import')?.addEventListener('change', async e => {
+            const input = e.target as HTMLInputElement;
+            const file = input.files?.[0];
+            const version = this.documentVersion;
+            const request = ++this.loadRequest;
+            try {
+                if (file) {
+                    const data = parseLevelFromText(await file.text());
+                    if (request === this.loadRequest && version === this.documentVersion && this.canReplaceDocument()) this.loadLevel(data, file.name, false);
+                }
+            } catch (error) { this.showError(error); }
+            input.value = '';
         });
+        document.getElementById('btn-undo')?.addEventListener('click', () => this.restoreHistory(false));
+        document.getElementById('btn-redo')?.addEventListener('click', () => this.restoreHistory(true));
+        document.getElementById('btn-fit-view')?.addEventListener('click', () => this.fitLevelToScreen());
 
         // Tab Switching Logic
         const tabs = document.querySelectorAll('.tab-btn');
@@ -207,6 +250,7 @@ export class EditorController {
             });
             this.populateThemeEditor();
             this.updateTheme();
+            this.recordChange();
         });
 
         // Sky Inputs
@@ -269,12 +313,25 @@ export class EditorController {
 
         // Action buttons
         document.getElementById('btn-fit-content')?.addEventListener('click', () => {
-            this.fitToContent();
+            try { this.fitToContent(); } catch (error) { this.showError(error); }
         });
 
         // Key modifiers
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Control') this.isCtrlPressed = true;
+            if ((e.target as HTMLElement)?.closest('input, textarea, select, [contenteditable="true"]')) return;
+            const key = e.key.toLowerCase();
+            if (e.ctrlKey || e.metaKey) {
+                if (key === 's') { e.preventDefault(); void this.save(); }
+                if (key === 'z' || key === 'y') {
+                    e.preventDefault(); this.restoreHistory(key === 'y' || e.shiftKey);
+                }
+                return;
+            }
+            const shortcuts: Record<string, EditorTool> = { b: EditorTool.BRUSH, e: EditorTool.ERASER,
+                s: EditorTool.SELECT, r: EditorTool.RECTANGLE, h: EditorTool.HAND };
+            if (shortcuts[key]) { e.preventDefault(); this.setTool(shortcuts[key]); }
+            if (key === 'f') { e.preventDefault(); this.fitLevelToScreen(); }
 
             // Deletion Logic
             if ((e.key === 'Delete' || e.key === 'Backspace') && this.activeSelection) {
@@ -303,7 +360,8 @@ export class EditorController {
                 if (deleted) {
                     this.activeSelection = null;
                     this.updateInspector();
-                    console.log('Deleted selection');
+                    e.preventDefault();
+                    this.recordChange();
                 }
             }
         });
@@ -328,7 +386,7 @@ export class EditorController {
     }
 
     private updateTheme() {
-        const renderer = (window as any).renderer as Renderer;
+        const renderer = this.renderer;
         if (renderer && this.levelData && this.levelData.theme) {
             renderer.prepareLevelBackground(this.levelData.theme);
         }
@@ -369,85 +427,17 @@ export class EditorController {
 
     private resizeTileGrid(newWidth: number, newHeight: number): void {
         if (!this.levelData) return;
-
-        const oldTiles = this.levelData.tiles;
-        const oldHeight = oldTiles.length;
-        const oldWidth = oldTiles[0]?.length || 0;
-
-        // Don't do anything if size hasn't changed
-        if (newWidth === oldWidth && newHeight === oldHeight) return;
-
-        const newTiles: number[][] = [];
-
-        for (let row = 0; row < newHeight; row++) {
-            const newRow: number[] = [];
-            for (let col = 0; col < newWidth; col++) {
-                // Copy existing tiles or fill with EMPTY
-                if (row < oldHeight && col < oldWidth) {
-                    newRow.push(oldTiles[row][col]);
-                } else {
-                    newRow.push(TileType.EMPTY);
-                }
-            }
-            newTiles.push(newRow);
-        }
-
-        this.levelData.tiles = newTiles;
-        this.levelData.width = newWidth;
-        this.levelData.height = newHeight;
-
-        // Update UI
+        resizeLevel(this.levelData, newWidth, newHeight);
         this.updateBoundsUI();
-
-        console.log(`📐 Resized level to ${newWidth}×${newHeight} tiles`);
+        if (!this.isDragging) this.recordChange();
     }
 
     private fitToContent(): void {
         if (!this.levelData) return;
-
-        const tiles = this.levelData.tiles;
-        let maxCol = 0;
-        let maxRow = 0;
-
-        // Find the furthest non-empty tile
-        for (let row = 0; row < tiles.length; row++) {
-            for (let col = 0; col < tiles[row].length; col++) {
-                if (tiles[row][col] !== TileType.EMPTY) {
-                    maxCol = Math.max(maxCol, col);
-                    maxRow = Math.max(maxRow, row);
-                }
-            }
-        }
-
-        // Also consider entities (positions are in tile coordinates)
-        this.levelData.enemies.forEach(e => {
-            maxCol = Math.max(maxCol, Math.floor(e.position.x));
-            maxRow = Math.max(maxRow, Math.floor(e.position.y));
-        });
-
-        this.levelData.collectibles.forEach(c => {
-            maxCol = Math.max(maxCol, Math.floor(c.position.x));
-            maxRow = Math.max(maxRow, Math.floor(c.position.y));
-        });
-
-        // Consider goal position
-        maxCol = Math.max(maxCol, Math.floor(this.levelData.goalPosition.x));
-        maxRow = Math.max(maxRow, Math.floor(this.levelData.goalPosition.y));
-
-        // Consider checkpoints
-        this.levelData.checkpoints.forEach(cp => {
-            maxCol = Math.max(maxCol, Math.floor(cp.x));
-            maxRow = Math.max(maxRow, Math.floor(cp.y));
-        });
-
-        // Precise fit: maxCol/maxRow are 0-indexed, so +1 gives exact count
-        // Add only +1 to include the last tile fully (no extra margin)
-        const newWidth = Math.max(10, maxCol + 1);
-        const newHeight = Math.max(5, maxRow + 1);
-
-        this.resizeTileGrid(newWidth, newHeight);
-
-        console.log(`✂️ Fit to content: ${newWidth}×${newHeight} tiles`);
+        fitLevelToContent(this.levelData);
+        this.updateBoundsUI();
+        this.recordChange();
+        this.fitLevelToScreen();
     }
 
     private populateThemeEditor() {
@@ -480,7 +470,7 @@ export class EditorController {
                 </div>
                 <div class="control-row">
                     <label>Color</label>
-                    <input type="color" class="layer-color" data-idx="${index}" value="${layer.color}">
+                    <input type="color" class="layer-color" data-idx="${index}">
                 </div>
                 <div class="control-row">
                     <label>Parallax</label>
@@ -488,6 +478,7 @@ export class EditorController {
                     <span>${layer.scrollFactor}</span>
                 </div>
             `;
+            (div.querySelector('.layer-color') as HTMLInputElement).value = layer.color;
             list.appendChild(div);
         });
 
@@ -522,6 +513,7 @@ export class EditorController {
                 theme.layers.splice(idx, 1);
                 this.populateThemeEditor();
                 this.updateTheme();
+                this.recordChange();
             });
         });
 
@@ -566,11 +558,13 @@ export class EditorController {
             { type: 'ENTITY', id: 'spawn', entityType: 'SPAWN', label: 'Spawn' }
         ];
 
-        const renderer = (window as any).renderer as Renderer; // Access global renderer for thumbnails
+        const renderer = this.renderer; // Access global renderer for thumbnails
 
         items.forEach(item => {
-            const btn = document.createElement('div');
+            const btn = document.createElement('button');
             btn.className = 'tile-btn';
+            btn.type = 'button';
+            btn.title = item.label;
 
             // Create mini canvas for thumbnail
             const thumb = document.createElement('canvas');
@@ -660,7 +654,6 @@ export class EditorController {
                 const activeBtn = document.querySelector(`.tool-btn[data-tool="${this.activeTool}"]`);
                 if (activeBtn) activeBtn.classList.add('active');
 
-                console.log('Selected Content:', this.activeContent);
             };
             this.uiPalette.appendChild(btn);
         });
@@ -677,8 +670,10 @@ export class EditorController {
         ];
 
         items.forEach(item => {
-            const btn = document.createElement('div');
+            const btn = document.createElement('button');
             btn.className = 'tile-btn';
+            btn.type = 'button';
+            btn.title = item.label;
             btn.style.display = 'flex';
             btn.style.flexDirection = 'column';
             btn.style.alignItems = 'center';
@@ -711,105 +706,155 @@ export class EditorController {
                 const activeBtn = document.querySelector(`.tool-btn[data-tool="${this.activeTool}"]`);
                 if (activeBtn) activeBtn.classList.add('active');
 
-                console.log('Selected Logic Content:', this.activeContent);
             };
             this.uiLogicPalette.appendChild(btn);
         });
     }
 
     private async refreshLevelList() {
-        if (!this.fs.isMounted) return;
-
-        const files = await this.fs.listLevels();
-        this.uiLevelList.innerHTML = '';
-
-        files.forEach(file => {
-            const div = document.createElement('div');
-            div.className = 'level-list-item';
-            div.innerText = file;
-            div.onclick = async () => {
-                // Load Level Logic
-                // In a real implementation we would parse the TS file. 
-                // For now, we unfortunately can't 'read' the TS file in browser easily without an AST parser 
-                // unless we export as JSON.
-                // fallback: We just set the name for saving, but we can't 'load' the visuals back from disk 
-                // without more advanced logic (like dynamic import() which implies module loading).
-
-                // WORKAROUND for Internal Tool: 
-                // We assume the game has loaded ALL_LEVELS via import. 
-                // We find the matching LevelData by some heuristic or ID.
-                // Since we split files `level_0_world1 - 1.ts`, we can try to match the ID.
-
-                this.currentLevelFilename = file;
-                this.uiFileLabel.innerText = file;
-
-                // Attempt to "Read" the file text (which we can do via FS API)
-                // and extract the JSON object via Regex (hacky but works for this tool)
-                const text = await this.fs.readFile(file) as string;
-                this.levelData = this.parseLevelFromText(text);
-
-                // Initialize Theme Editor with data
-                this.populateThemeEditor();
-                this.updateTheme(); // Force render of background
-                this.updateBoundsUI(); // Sync bounds UI with loaded level
-                this.fitLevelToScreen();
-            };
-            this.uiLevelList.appendChild(div);
-        });
+        const files = this.fs.isMounted ? await this.fs.listLevels() : [];
+        this.uiLevelList.replaceChildren();
+        const add = (name: string, load: () => void) => {
+            const button = document.createElement('button');
+            button.className = 'level-list-item';
+            button.textContent = name;
+            button.onclick = load;
+            this.uiLevelList.appendChild(button);
+        };
+        if (this.fs.isMounted) {
+            files.forEach(file => add(file, async () => {
+                const version = this.documentVersion;
+                const request = ++this.loadRequest;
+                try {
+                    const level = await this.fs.readLevel(file);
+                    if (request === this.loadRequest && version === this.documentVersion && this.canReplaceDocument()) this.loadLevel(level, file, true);
+                } catch (error) { this.showError(error); }
+            }));
+            if (!files.length) this.uiLevelList.textContent = 'Nenhuma fase nesta pasta. Importe um arquivo ou abra src/data/levels.';
+        } else {
+            ALL_LEVELS.forEach((level, index) => add(level.name, () => {
+                if (this.canReplaceDocument()) {
+                    const filename = ['level_0_world1-1.ts', 'level_1_world1-2.ts', 'level_2_boss.ts'][index]
+                        ?? 'level_' + index + '.ts';
+                    this.loadLevel(level, filename, false);
+                }
+            }));
+        }
     }
 
-    private parseLevelFromText(text: string): LevelData | null {
-        try {
-            // Find the JSON object part: "export const DATA: LevelData = { ... };"
-            // We look for the first '{' and the last '}'
-            const start = text.indexOf('{');
-            const end = text.lastIndexOf('}');
-            if (start === -1 || end === -1) return null;
-
-            let jsonStr = text.substring(start, end + 1);
-
-            // JSON.parse is strict. We probably have mostly valid JSON 
-            // EXCEPT for unquoted keys if we formatted nicely, OR standard objects.
-            // Our serializer creates valid JSON mainly, but we might have issues with Enums or comments.
-            // Ideally we should use a proper parser or just eval() since this is internal local tool.
-
-            // Safety/Hack: Use Function constructor to evaluate object literal
-            // We need to provide context for any Enums used (EnemyType.MINION)
-            // We can naive-replace "EnemyType.MINION" with string "MINION" if needed
-
-            return new Function(`return ${jsonStr} `)();
-
-        } catch (e) {
-            console.warn('Regex parsing failed, trying eval with context', e);
-
-            // Fallback: Safe Eval with Context
-            try {
-                // Remove imports to avoid syntax errors in eval
-                const CleanLines = text.split('\n').filter(l => !l.trim().startsWith('import '));
-                let CleanText = CleanLines.join('\n');
-
-                // We need to capture the variable 'DATA' if it is defined as "const DATA = ..."
-                // Easy hack: Replace "const DATA" with "return " if it's the last export?
-                // Or just append "; return DATA;" at the end.
-
-                // We replace "export const DATA: LevelData =" (or without type) with "const DATA ="
-                // Matches: export const DATA (: Type)? =
-                CleanText = CleanText.replace(/export\s+const\s+DATA(\s*:\s*\w+)?\s*=/g, 'const DATA =');
-
-                CleanText += ';\nreturn DATA;'; // Return the specific object we expect
-
-                const func = new Function(
-                    'TileType', 'EnemyType', 'CollectibleType', 'COLORS', 'TILE_SIZE', 'GAME_WIDTH', 'GAME_HEIGHT',
-                    CleanText
-                );
-
-                return func(TileType, EnemyType, CollectibleType, COLORS, TILE_SIZE, GAME_WIDTH, GAME_HEIGHT);
-
-            } catch (evalErr) {
-                console.error('Context Eval failed:', evalErr);
-                return null;
+    private loadLevel(level: LevelData, filename: string, mounted: boolean): void {
+        if (level.theme) {
+            for (const color of [...level.theme.skyGradient, ...level.theme.layers.map(layer => layer.color)]) {
+                if (!CSS.supports('color', color)) throw new Error('A fase contém uma cor inválida: ' + color);
             }
         }
+        this.cancelGesture();
+        this.loadRequest++;
+        this.levelData = structuredClone(level);
+        this.documentVersion++;
+        this.currentLevelFilename = filename;
+        this.mountedFile = mounted;
+        this.activeSelection = null;
+        this.populateThemeEditor();
+        this.updateTheme();
+        this.updateBoundsUI();
+        this.updateInspector();
+        this.history.reset(this.levelData);
+        this.updateDocumentUI();
+        this.fitLevelToScreen();
+        this.showMessage('Fase carregada.');
+    }
+
+    private canReplaceDocument(): boolean {
+        return !this.saving && (!this.levelData || !this.history.isDirty(this.levelData)
+            || window.confirm('Descartar as alterações não salvas desta fase?'));
+    }
+
+    private async save(exportOnly = false): Promise<void> {
+        if (!this.levelData || this.saving) return;
+        this.cancelGesture();
+        const data = structuredClone(this.levelData);
+        const filename = this.currentLevelFilename || 'new_level.ts';
+        this.saving = true;
+        this.updateDocumentUI();
+        try {
+            if (!exportOnly && this.mountedFile && this.fs.isMounted) {
+                await this.fs.saveLevel(filename, data);
+                this.showMessage('Fase salva em ' + filename + '.');
+            } else {
+                const blob = new Blob([serializeLevelToTS(data)], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename.replace(/\.json$/i, '.ts');
+                link.click();
+                window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+                this.showMessage('Arquivo exportado. Copie-o para src/data/levels para atualizar o jogo.');
+            }
+            this.history.markSaved(data);
+        } catch (error) { this.showError(error); }
+        finally { this.saving = false; this.updateDocumentUI(); }
+    }
+
+    private showMessage(message: string): void {
+        const target = document.getElementById('editor-message');
+        if (target) target.textContent = message;
+    }
+
+    private showError(error: unknown): void {
+        this.showMessage(error instanceof Error ? error.message : 'Não foi possível concluir a operação.');
+    }
+
+    private recordChange(): void {
+        if (!this.levelData) return;
+        if (this.history.record(this.levelData)) this.documentVersion++;
+        this.updateDocumentUI();
+    }
+
+    private updateDocumentUI(): void {
+        const dirty = this.levelData && this.history.isDirty(this.levelData);
+        this.uiFileLabel.textContent = (this.currentLevelFilename || 'Nova fase') + (dirty ? ' •' : '');
+        this.uiSaveBtn.textContent = this.saving ? 'Salvando…' : this.mountedFile ? 'Salvar' : 'Exportar .ts';
+        this.uiSaveBtn.disabled = this.saving;
+        this.uiMountBtn.disabled = this.saving || !this.fs.isSupported;
+        const exportButton = document.getElementById('btn-export') as HTMLButtonElement;
+        exportButton.hidden = !this.mountedFile;
+        exportButton.disabled = this.saving;
+        (document.getElementById('btn-undo') as HTMLButtonElement).disabled = !this.history.canUndo;
+        (document.getElementById('btn-redo') as HTMLButtonElement).disabled = !this.history.canRedo;
+    }
+
+    private restoreHistory(redo: boolean): void {
+        this.cancelGesture();
+        const data = redo ? this.history.redo() : this.history.undo();
+        if (!data) return;
+        this.levelData = data;
+        this.documentVersion++;
+        this.activeSelection = null;
+        this.populateThemeEditor(); this.updateTheme(); this.updateBoundsUI(); this.updateInspector();
+        this.updateDocumentUI();
+    }
+
+    private cancelGesture(): void {
+        const changed = this.isDragging;
+        this.isDragging = false;
+        this.isResizingBounds = false;
+        this.activeEdge = null;
+        this.dragStartTile = null;
+        this.lastPaintPosition = null;
+        this.boundsResizeStart = null;
+        if (changed) this.recordChange();
+    }
+
+    private setTool(tool: EditorTool): void {
+        this.cancelGesture();
+        this.activeTool = tool;
+        document.querySelectorAll<HTMLButtonElement>('.tool-btn').forEach(button => {
+            const active = button.dataset.tool === tool;
+            button.classList.toggle('active', active);
+            button.setAttribute('aria-pressed', String(active));
+        });
+        this.updateCursor();
     }
 
     public init() {
@@ -825,13 +870,12 @@ export class EditorController {
             btn.addEventListener('click', () => {
                 const tool = (btn as HTMLElement).dataset.tool as keyof typeof EditorTool;
                 if (tool && EditorTool[tool]) {
-                    this.activeTool = EditorTool[tool];
+                    this.setTool(EditorTool[tool]);
 
                     // Update Visuals
                     document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
 
-                    console.log('Active Tool:', this.activeTool);
                 }
             });
         });
@@ -843,26 +887,26 @@ export class EditorController {
         // Initialize status bar
         this.updateStatusBar();
 
-        this.fitLevelToScreen();
+        this.loadLevel(ALL_LEVELS[0], 'level_0_world1-1.ts', false);
+        void this.refreshLevelList();
+        this.showMessage('B: pincel · E: apagar · S: selecionar · R: área · H: mover · F: enquadrar · Roda: zoom');
     }
 
     private resizeCanvasForEditor(): void {
-        const toolbarHeight = 40;
-        const statusbarHeight = 22;
-        const sidebarWidth = 250;
-        const toolsWidth = 40;
-
-        // Calculate available space
-        const availableWidth = window.innerWidth - sidebarWidth - toolsWidth;
-        const availableHeight = window.innerHeight - toolbarHeight - statusbarHeight;
-
-        // Make canvas fill 100% of available space
-        this.canvas.style.width = `${availableWidth}px`;
-        this.canvas.style.height = `${availableHeight}px`;
-
-        // Position canvas at top-left of available area
-        this.canvas.style.left = `${toolsWidth}px`;
-        this.canvas.style.top = `${toolbarHeight}px`;
+        const toolbar = document.querySelector('.toolbar')!.getBoundingClientRect();
+        const sidebar = document.querySelector('.sidebar')!.getBoundingClientRect();
+        const tools = document.querySelector('.tools-sidebar')!.getBoundingClientRect();
+        const statusbar = document.querySelector('.editor-statusbar')!.getBoundingClientRect();
+        const width = Math.max(1, sidebar.left - tools.right);
+        const height = Math.max(1, statusbar.top - toolbar.bottom);
+        const dpr = window.devicePixelRatio || 1;
+        this.canvas.style.width = width + 'px';
+        this.canvas.style.height = height + 'px';
+        this.canvas.style.left = tools.right + 'px';
+        this.canvas.style.top = toolbar.bottom + 'px';
+        this.canvas.width = Math.round(width * dpr);
+        this.canvas.height = Math.round(height * dpr);
+        this.canvas.getContext('2d')!.imageSmoothingEnabled = false;
     }
 
     private updateStatusBar(): void {
@@ -896,24 +940,19 @@ export class EditorController {
     }
 
     public render(renderer: Renderer) {
-        // In TS we can cast to any to bypass privacy for this tool
-        // HIGH-DPI UPDATE: We now draw directly to the MAIN canvas (ctx) to ensure crisp rendering
-        // bypassing the low-res offscreen buffer.
-
-        // We need to access 'ctx' and 'scale' from renderer
-        const mainCtx = (renderer as any).ctx as CanvasRenderingContext2D;
-        const deviceScale = (renderer as any).scale as number;
+        // Render and pointer events share CSS pixels; only the backing buffer uses DPR.
+        const mainCtx = this.canvas.getContext('2d')!;
+        const rect = this.canvas.getBoundingClientRect();
+        const deviceScale = this.canvas.width / rect.width;
+        mainCtx.setTransform(1, 0, 0, 1, 0, 0);
 
         // Clear Main Canvas (as we are taking over control)
         mainCtx.clearRect(0, 0, mainCtx.canvas.width, mainCtx.canvas.height);
 
-        // Effective Zoom = Editor Zoom * Device Up-Scale
-        // Since the game is 320x180 but screen is e.g. 1920x1080 (6x),
-        // we need to scale up our drawing so a 16px tile looks correct on the big screen.
         const finalZoom = this.zoom * deviceScale;
 
         mainCtx.save();
-        mainCtx.scale(finalZoom, finalZoom);
+        mainCtx.scale(finalZoom, this.zoom * this.canvas.height / rect.height);
 
         if (this.levelData) {
             // 0. Draw Background
@@ -987,7 +1026,7 @@ export class EditorController {
         const endRow = worldEndRow - originY;
 
         // Check for Logic Mode
-        const isLogicMode = document.querySelector('.tab-btn[data-tab="tab-logic"]')?.classList.contains('active') ?? false;
+        const isLogicMode = this.isLogicMode();
 
         // 1. Draw Tiles
         ctx.save();
@@ -1110,7 +1149,10 @@ export class EditorController {
         // 4. Draw Triggers
         if (isLogicMode && this.levelData.triggers) {
             this.levelData.triggers.forEach(t => {
-                if (t.active) renderer.drawTrigger(t, this.camera, ctx);
+                ctx.save();
+                if (!t.active) ctx.globalAlpha = 0.35;
+                renderer.drawTrigger(t, this.camera, ctx);
+                ctx.restore();
             });
         }
 
@@ -1320,30 +1362,32 @@ export class EditorController {
 
 
     private onMouseDown(e: MouseEvent) {
-        this.updateScale();
-        const startX = e.offsetX / this.scaleX;
-        const startY = e.offsetY / this.scaleY;
+        e.preventDefault();
+        const rect = this.canvas.getBoundingClientRect();
+        const startX = e.clientX - rect.left;
+        const startY = e.clientY - rect.top;
 
         // Calculate world coordinates for edge detection
-        const worldX = (startX / this.zoom) + this.camera.x;
-        const worldY = (startY / this.zoom) + this.camera.y;
+        const { x: worldX, y: worldY } = screenToWorld({ x: startX, y: startY }, this.camera, this.zoom);
+        this.currentWorldMouse = { x: worldX, y: worldY };
+        this.hoveredCol = Math.floor(worldX / TILE_SIZE);
+        this.hoveredRow = Math.floor(worldY / TILE_SIZE);
+        this.lastPaintPosition = { x: worldX, y: worldY };
 
-        console.log(`🖱️ MouseDown: Tool=${this.activeTool}, Content=`, this.activeContent);
 
         // Left click: Check for bounds edge first, then paint
         if (e.button === 0) {
-            // Only interact with bounds if SELECT tool is theoretically active? 
-            // Or just always allow bounds resize as a global feature?
-            // The user didn't specify, but "SELECT" tool implies selection/move. 
-            // Current code allows bounds resize always. Let's keep it but maybe prioritize tool logic.
-
-            const edge = this.detectBoundsEdge(worldX, worldY);
+            const edge = this.activeTool === EditorTool.SELECT ? this.detectBoundsEdge(worldX, worldY) : null;
             if (edge) {
                 // Start bounds resize
                 this.isResizingBounds = true;
+                this.boundsResizeStart = structuredClone(this.levelData);
+                this.activeSelection = null;
+                this.updateInspector();
                 this.activeEdge = edge;
                 this.isDragging = true;
             } else {
+                if (this.activeTool === EditorTool.HAND) this.isDragging = true;
                 // Tool Action
                 if (this.activeTool === EditorTool.BRUSH) {
                     this.handleBrushInteract(worldX, worldY);
@@ -1363,23 +1407,18 @@ export class EditorController {
             }
         }
         // Right click: Pan Start
-        if (e.button === 2) {
+        if (e.button === 2 || e.button === 1) {
             this.isDragging = true;
         }
         this.lastMousePos = { x: startX, y: startY };
     }
 
-    private updateScale() {
-        const rect = this.canvas.getBoundingClientRect();
-        // Calculate scale independently for X and Y to handle aspect ratio mismatch (stretching)
-        this.scaleX = rect.width / GAME_WIDTH;
-        this.scaleY = rect.height / GAME_HEIGHT;
-    }
+
 
     private onMouseMove(e: MouseEvent) {
-        this.updateScale();
-        const currentX = e.offsetX / this.scaleX;
-        const currentY = e.offsetY / this.scaleY;
+        const rect = this.canvas.getBoundingClientRect();
+        const currentX = e.clientX - rect.left;
+        const currentY = e.clientY - rect.top;
 
         // Always track hovered tile for HUD display
         // And track precise world mouse for Ghost
@@ -1395,7 +1434,7 @@ export class EditorController {
         this.updateStatusBar();
 
         // Detect edge hover for cursor change
-        this.hoveredEdge = this.detectBoundsEdge(worldX, worldY);
+        this.hoveredEdge = this.activeTool === EditorTool.SELECT ? this.detectBoundsEdge(worldX, worldY) : null;
         this.updateCursor();
 
         // Handle bounds resize dragging
@@ -1408,7 +1447,7 @@ export class EditorController {
         if (!this.isDragging) return;
 
         // Panning
-        if (e.buttons === 2) {
+        if (e.buttons === 2 || e.buttons === 4 || (e.buttons === 1 && this.activeTool === EditorTool.HAND)) {
             const dx = (currentX - this.lastMousePos.x) / this.zoom;
             const dy = (currentY - this.lastMousePos.y) / this.zoom;
             this.camera.x -= dx;
@@ -1420,7 +1459,13 @@ export class EditorController {
             if (this.activeTool === EditorTool.BRUSH) {
                 // Only paint tiles on drag, NOT entities
                 if (this.activeContent.type === 'TILE') {
-                    this.handleBrushInteract(worldX, worldY);
+                    const previous = this.lastPaintPosition ?? { x: worldX, y: worldY };
+                    const steps = Math.max(1, Math.ceil(Math.max(Math.abs(worldX - previous.x), Math.abs(worldY - previous.y)) / (TILE_SIZE / 2)));
+                    for (let step = 1; step <= steps; step++) {
+                        this.handleBrushInteract(previous.x + (worldX - previous.x) * step / steps,
+                            previous.y + (worldY - previous.y) * step / steps);
+                    }
+                    this.lastPaintPosition = { x: worldX, y: worldY };
                 }
             } else if (this.activeTool === EditorTool.ERASER) {
                 this.handleEraserInteract(worldX, worldY);
@@ -1437,7 +1482,10 @@ export class EditorController {
                 }
 
                 // Update Data (Convert back to Tile Units)
-                if (this.activeSelection.type === 'SPAWN') {
+                if (this.activeSelection.type === 'TRIGGER') {
+                    this.activeSelection.data.x = newX;
+                    this.activeSelection.data.y = newY;
+                } else if (this.activeSelection.type === 'SPAWN') {
                     this.activeSelection.data.x = newX / TILE_SIZE;
                     this.activeSelection.data.y = newY / TILE_SIZE;
                 } else {
@@ -1455,10 +1503,8 @@ export class EditorController {
             this.applyRectangleTool();
         }
 
-        this.isDragging = false;
-        this.isResizingBounds = false;
-        this.activeEdge = null;
-        this.dragStartTile = null;
+        this.cancelGesture();
+        if (this.activeSelection) this.updateInspector();
     }
 
     private applyRectangleTool() {
@@ -1518,7 +1564,7 @@ export class EditorController {
 
             if (!this.levelData.triggers) this.levelData.triggers = [];
             this.levelData.triggers.push(newTrigger);
-            console.log(`✨ Created Trigger:`, newTrigger);
+
             return;
         }
 
@@ -1526,8 +1572,8 @@ export class EditorController {
         const originX = this.levelData.originX ?? 0;
         const originY = this.levelData.originY ?? 0;
 
-        for (let r = minRow; r <= maxRow; r++) {
-            for (let c = minCol; c <= maxCol; c++) {
+        for (let r = Math.max(minRow, originY); r <= Math.min(maxRow, originY + this.levelData.height - 1); r++) {
+            for (let c = Math.max(minCol, originX); c <= Math.min(maxCol, originX + this.levelData.width - 1); c++) {
                 // Convert world coords to array coords
                 const arrayRow = r - originY;
                 const arrayCol = c - originX;
@@ -1541,11 +1587,11 @@ export class EditorController {
                 }
             }
         }
-        console.log(`Squared filled from (${minCol},${minRow}) to (${maxCol},${maxRow})`);
+
     }
 
     private detectBoundsEdge(worldX: number, worldY: number): 'left' | 'right' | 'top' | 'bottom' | 'corner-br' | 'corner-tl' | null {
-        if (!this.levelData || !this.showBounds) return null;
+        if (!this.levelData || !this.showBounds || this.activeTool !== EditorTool.SELECT) return null;
 
         // Get level bounds considering origin offset
         const originX = this.levelData.originX ?? 0;
@@ -1592,10 +1638,11 @@ export class EditorController {
     private handleBoundsResize(worldX: number, worldY: number): void {
         if (!this.levelData || !this.activeEdge) return;
 
-        const originX = this.levelData.originX ?? 0;
-        const originY = this.levelData.originY ?? 0;
-        const currentWidth = this.levelData.tiles[0]?.length || 100;
-        const currentHeight = this.levelData.tiles.length;
+        const source = this.boundsResizeStart ?? this.levelData;
+        const originX = source.originX ?? 0;
+        const originY = source.originY ?? 0;
+        const currentWidth = source.width;
+        const currentHeight = source.height;
 
         // Calculate new world tile position
         const mouseTileX = Math.floor(worldX / TILE_SIZE);
@@ -1609,12 +1656,12 @@ export class EditorController {
         // Handle right/left edges
         if (this.activeEdge === 'right' || this.activeEdge === 'corner-br') {
             // Expanding/shrinking from right
-            newWidth = Math.max(10, mouseTileX - originX + 1);
+            newWidth = Math.max(10, Math.min(500, mouseTileX - originX + 1));
         }
         if (this.activeEdge === 'left' || this.activeEdge === 'corner-tl') {
             // Expanding/shrinking from left - changes origin and width
             const rightEdge = originX + currentWidth;
-            const newLeft = Math.min(mouseTileX, rightEdge - 10);
+            const newLeft = Math.max(rightEdge - 500, Math.min(mouseTileX, rightEdge - 10));
             newOriginX = newLeft;
             newWidth = rightEdge - newLeft;
         }
@@ -1622,67 +1669,18 @@ export class EditorController {
         // Handle bottom/top edges  
         if (this.activeEdge === 'bottom' || this.activeEdge === 'corner-br') {
             // Expanding/shrinking from bottom
-            newHeight = Math.max(5, mouseTileY - originY + 1);
+            newHeight = Math.max(5, Math.min(100, mouseTileY - originY + 1));
         }
         if (this.activeEdge === 'top' || this.activeEdge === 'corner-tl') {
             // Expanding/shrinking from top - changes origin and height
             const bottomEdge = originY + currentHeight;
-            const newTop = Math.min(mouseTileY, bottomEdge - 5);
+            const newTop = Math.max(bottomEdge - 100, Math.min(mouseTileY, bottomEdge - 5));
             newOriginY = newTop;
             newHeight = bottomEdge - newTop;
         }
 
-        // Only resize if something changed
-        const originChanged = newOriginX !== originX || newOriginY !== originY;
-        const sizeChanged = newWidth !== currentWidth || newHeight !== currentHeight;
-
-        if (originChanged) {
-            // Need to shift tiles when origin changes
-            this.shiftAndResizeTileGrid(newOriginX, newOriginY, newWidth, newHeight);
-        } else if (sizeChanged) {
-            this.resizeTileGrid(newWidth, newHeight);
-        }
-    }
-
-    private shiftAndResizeTileGrid(newOriginX: number, newOriginY: number, newWidth: number, newHeight: number): void {
-        if (!this.levelData) return;
-
-        const oldOriginX = this.levelData.originX ?? 0;
-        const oldOriginY = this.levelData.originY ?? 0;
-        const oldTiles = this.levelData.tiles;
-        const oldHeight = oldTiles.length;
-        const oldWidth = oldTiles[0]?.length || 0;
-
-        // Calculate shift in array indices
-        const shiftX = oldOriginX - newOriginX; // Positive = adding columns on left
-        const shiftY = oldOriginY - newOriginY; // Positive = adding rows on top
-
-        const newTiles: number[][] = [];
-
-        for (let newRow = 0; newRow < newHeight; newRow++) {
-            const newRowArr: number[] = [];
-            for (let newCol = 0; newCol < newWidth; newCol++) {
-                // Map new array position to old array position
-                const oldRow = newRow - shiftY;
-                const oldCol = newCol - shiftX;
-
-                if (oldRow >= 0 && oldRow < oldHeight && oldCol >= 0 && oldCol < oldWidth) {
-                    newRowArr.push(oldTiles[oldRow][oldCol]);
-                } else {
-                    newRowArr.push(TileType.EMPTY);
-                }
-            }
-            newTiles.push(newRowArr);
-        }
-
-        this.levelData.tiles = newTiles;
-        this.levelData.originX = newOriginX;
-        this.levelData.originY = newOriginY;
-        this.levelData.width = newWidth;
-        this.levelData.height = newHeight;
-
+        resizeLevel(this.levelData, newWidth, newHeight, newOriginX, newOriginY, source);
         this.updateBoundsUI();
-        console.log(`📐 Shifted & resized level: origin (${newOriginX}, ${newOriginY}), size ${newWidth}×${newHeight} tiles`);
     }
 
     private updateCursor(): void {
@@ -1706,15 +1704,16 @@ export class EditorController {
                     break;
             }
         } else {
-            this.canvas.style.cursor = 'crosshair';
+            this.canvas.style.cursor = this.activeTool === EditorTool.HAND ? 'grab' : 'crosshair';
         }
     }
 
     private onWheel(e: WheelEvent) {
         // Zoom on Wheel centered on mouse
-        this.updateScale();
-        const mouseX = e.offsetX / this.scaleX;
-        const mouseY = e.offsetY / this.scaleY;
+        e.preventDefault();
+        const rect = this.canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
 
         // Convert mouse screen pos to world pos before zoom
         const worldMouseX = (mouseX / this.zoom) + this.camera.x;
@@ -1722,7 +1721,7 @@ export class EditorController {
 
         const zoomSpeed = 0.0002; // ~2% per scroll step (was 0.0005 = ~5%)
         const zoomDelta = -e.deltaY * zoomSpeed;
-        const newZoom = Math.max(0.1, Math.min(5, this.zoom + zoomDelta));
+        const newZoom = Math.max(0.03, Math.min(8, this.zoom + zoomDelta));
 
         // Apply new zoom
         this.zoom = newZoom;
@@ -1781,21 +1780,40 @@ export class EditorController {
             const finalY = placeY / TILE_SIZE;
 
             if (this.activeContent.id === 'spawn') {
-                this.levelData.playerSpawn = { x: finalX, y: finalY };
-                console.log('Placed Spawn:', finalX, finalY);
+                Object.assign(this.levelData.playerSpawn, { x: finalX, y: finalY });
+
             } else if (this.activeContent.entityType === 'ENEMY') {
                 const type = this.activeContent.id === 'boss_joaozao' ? EnemyType.JOAOZAO : EnemyType.MINION;
                 this.levelData.enemies.push({
                     type: type,
                     position: { x: finalX, y: finalY }
                 });
-                console.log('Placed Enemy:', type, finalX, finalY);
+
             }
         }
     }
 
     private handleEraserInteract(worldX: number, worldY: number) {
         if (!this.levelData) return;
+
+        for (let i = this.isLogicMode() ? this.levelData.triggers.length - 1 : -1; i >= 0; i--) {
+            const t = this.levelData.triggers[i];
+            if (worldX >= t.x && worldX < t.x + t.width && worldY >= t.y && worldY < t.y + t.height) {
+                this.levelData.triggers.splice(i, 1);
+                this.activeSelection = null;
+                this.updateInspector();
+                return;
+            }
+        }
+        for (let i = this.levelData.collectibles.length - 1; i >= 0; i--) {
+            const rect = this.getEntityRect('COLLECTIBLE', this.levelData.collectibles[i]);
+            if (worldX >= rect.x && worldX < rect.x + rect.w && worldY >= rect.y && worldY < rect.y + rect.h) {
+                this.levelData.collectibles.splice(i, 1);
+                this.activeSelection = null;
+                this.updateInspector();
+                return;
+            }
+        }
 
         // 1. Try to erase Entities first (Click Selection)
         // Check relative to camera if using pixel coordinates for hit test? 
@@ -1820,7 +1838,9 @@ export class EditorController {
                 worldY >= ey && worldY < ey + size.h) {
 
                 this.levelData.enemies.splice(i, 1);
-                console.log('Erased Enemy at index', i);
+                this.activeSelection = null;
+                this.updateInspector();
+
                 return; // Stop after erasing one entity (precision)
             }
         }
@@ -1844,57 +1864,21 @@ export class EditorController {
 
     private fitLevelToScreen(): void {
         if (!this.levelData) return;
-
-        // Ensure scale is up to date with current window size
-        this.updateScale();
-
-        // Level Dimensions in World Pixels
-        const widthTiles = this.levelData.width;
-        const heightTiles = this.levelData.height;
-        const originX = this.levelData.originX ?? 0;
-        const originY = this.levelData.originY ?? 0;
-
-        const levelWidth = widthTiles * TILE_SIZE;
-        const levelHeight = heightTiles * TILE_SIZE;
-
-        // Viewport Dimensions (Logical Game Units)
-        // scale = canvasWidth / GAME_WIDTH
-        // logicalWidth = canvasWidth / scale = GAME_WIDTH
-        const logicalWidth = GAME_WIDTH;
-        // height is also GAME_HEIGHT in logical units if we respect the scaling
-        const logicalHeight = GAME_HEIGHT;
-
-        // Calculate Target Zoom to fit content (with 10% margin)
-        // zoom = logicalSize / levelSize
-        const zoomX = logicalWidth / (levelWidth * 1.1);
-        const zoomY = logicalHeight / (levelHeight * 1.1);
-
-        // Choose smallest zoom to fit both dimensions
-        // Clamp between 0.1 (zoom out) and 2.0 (zoom in - don't overzoom small levels)
-        let newZoom = Math.min(zoomX, zoomY);
-        newZoom = Math.max(0.1, Math.min(2.0, newZoom));
-
-        this.zoom = newZoom;
-
-        // Update Zoom Label
-        if (this.uiZoomLabel) {
-            this.uiZoomLabel.innerText = Math.round(this.zoom * 100) + '%';
-        }
-
-        // Center Camera
-        const levelCenterX = (originX * TILE_SIZE) + (levelWidth / 2);
-        const levelCenterY = (originY * TILE_SIZE) + (levelHeight / 2);
-
-        const visibleWidth = logicalWidth / this.zoom;
-        const visibleHeight = logicalHeight / this.zoom;
-
-        this.camera.x = levelCenterX - (visibleWidth / 2);
-        this.camera.y = levelCenterY - (visibleHeight / 2);
-
-        console.log(`🎥 Fitted level: Zoom ${newZoom.toFixed(2)}, Cam (${this.camera.x.toFixed(0)}, ${this.camera.y.toFixed(0)})`);
+        const rect = this.canvas.getBoundingClientRect();
+        const width = this.levelData.width * TILE_SIZE;
+        const height = this.levelData.height * TILE_SIZE;
+        this.zoom = Math.max(0.03, Math.min(2, rect.width / (width * 1.1), rect.height / (height * 1.1)));
+        this.camera.x = (this.levelData.originX ?? 0) * TILE_SIZE + width / 2 - rect.width / (2 * this.zoom);
+        this.camera.y = (this.levelData.originY ?? 0) * TILE_SIZE + height / 2 - rect.height / (2 * this.zoom);
+        this.uiZoomLabel.textContent = Math.round(this.zoom * 100) + '%';
+        this.updateStatusBar();
     }
 
     // --- SELECTION LOGIC ---
+
+    private isLogicMode(): boolean {
+        return document.querySelector('.tab-btn[data-tab="tab-logic"]')?.classList.contains('active') ?? false;
+    }
 
     private getEntityRect(type: 'ENEMY' | 'COLLECTIBLE' | 'SPAWN' | 'TRIGGER', data: any): { x: number, y: number, w: number, h: number } {
         // Spawn: data is just a Vector2 {x, y}
@@ -1938,9 +1922,10 @@ export class EditorController {
                 worldY >= rect.y && worldY < rect.y + rect.h) {
 
                 this.activeSelection = { type: 'SPAWN', data: this.levelData.playerSpawn };
-                this.selectionDragOffset = { x: worldX - rect.x, y: worldY - rect.y };
+                this.selectionDragOffset = { x: worldX - this.levelData.playerSpawn.x * TILE_SIZE,
+                    y: worldY - this.levelData.playerSpawn.y * TILE_SIZE };
                 this.isDragging = true;
-                console.log('Selected Spawn');
+                this.updateInspector();
                 return;
             }
         }
@@ -1956,7 +1941,7 @@ export class EditorController {
                     this.selectionDragOffset = { x: worldX - rect.x, y: worldY - rect.y };
                     this.isDragging = true;
                     this.updateInspector();
-                    console.log('Selected Enemy');
+
                     return;
                 }
             }
@@ -1973,14 +1958,14 @@ export class EditorController {
                     this.selectionDragOffset = { x: worldX - rect.x, y: worldY - rect.y };
                     this.isDragging = true;
                     this.updateInspector();
-                    console.log('Selected Collectible');
+
                     return;
                 }
             }
         }
 
         // 4. Triggers
-        if (this.levelData.triggers) {
+        if (this.isLogicMode() && this.levelData.triggers) {
             for (let i = this.levelData.triggers.length - 1; i >= 0; i--) {
                 const t = this.levelData.triggers[i];
                 // Triggers are stored in world pixels directly, not tile units
@@ -1991,7 +1976,7 @@ export class EditorController {
                     this.selectionDragOffset = { x: worldX - t.x, y: worldY - t.y };
                     this.isDragging = true;
                     this.updateInspector();
-                    console.log('Selected Trigger');
+
                     return;
                 }
             }
@@ -2061,9 +2046,11 @@ export class EditorController {
             this.createInspectorInput('Height', data.height, (v) => data.height = parseFloat(v));
 
             const trigger = data as LevelTrigger;
+            this.createInspectorCheckbox('Ativo', trigger.active, value => trigger.active = value);
+            this.createInspectorCheckbox('Uma vez', trigger.oneShot, value => trigger.oneShot = value);
             // Trigger Specifics
             if (trigger.type === TriggerType.AUDIO) {
-                this.createInspectorInput('Track ID', (trigger as any).trackId, (v) => (trigger as any).trackId = v);
+                this.createInspectorSelect('Track ID', Object.keys(MUSIC_TRACKS), trigger.trackId, v => trigger.trackId = v);
                 this.createInspectorSelect('Action', ['PLAY', 'STOP'], (trigger as any).action, (v) => (trigger as any).action = v);
             }
             else if (trigger.type === TriggerType.CAMERA) {
@@ -2079,13 +2066,13 @@ export class EditorController {
                 this.createInspectorTextArea('Text', (trigger as any).text, (v) => (trigger as any).text = v);
             }
         }
-        else if (type === 'ENEMY') {
+        else if (type === 'ENEMY' || type === 'COLLECTIBLE') {
             const e = data;
             // Coordinate in TILES not pixels for enemies usually, but getEntityRect uses position directly.
             // Let's assume data.position.x is tiles.
             this.createInspectorInput('X (Tiles)', e.position.x, (v) => e.position.x = parseFloat(v));
             this.createInspectorInput('Y (Tiles)', e.position.y, (v) => e.position.y = parseFloat(v));
-            this.createInspectorCheckbox('Facing Right', e.facingRight, (v) => e.facingRight = v);
+
         }
         else if (type === 'SPAWN') {
             this.createInspectorInput('X (Tiles)', data.x, (v) => data.x = parseFloat(v));
@@ -2109,7 +2096,20 @@ export class EditorController {
         input.style.color = 'white';
         input.style.padding = '2px';
 
-        input.onchange = (e) => onChange((e.target as HTMLInputElement).value);
+        input.setAttribute('aria-label', label);
+        input.onchange = () => {
+            if (input.type === 'number') {
+                const number = Number(input.value);
+                const positive = ['Width', 'Height', 'Zoom'].includes(label);
+                if (!input.value.trim() || !Number.isFinite(number) || (positive && number <= 0) || (label === 'Dmg/Tick' && number < 0)) {
+                    input.value = String(value);
+                    this.showMessage('Informe um número válido para ' + label + '.');
+                    return;
+                }
+            }
+            onChange(input.value);
+            value = input.type === 'number' ? Number(input.value) : input.value;
+        };
 
         row.appendChild(lbl);
         row.appendChild(input);

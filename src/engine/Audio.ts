@@ -26,6 +26,10 @@ export class Audio {
     return this.audioEngine;
   }
 
+  applyLevelTrigger(trackId: string, action: 'PLAY' | 'STOP'): boolean {
+    return this.musicManager.applyLevelTrigger(trackId, action);
+  }
+
   // Cria um oscilador com envelope ADSR simples
   private playTone(
     frequency: number,

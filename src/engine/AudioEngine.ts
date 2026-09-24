@@ -35,6 +35,7 @@ export class AudioEngine {
   } = { trackId: null, source: null, gain: null };
 
   private visibilityHandlerBound = false;
+  private musicRequest = 0;
 
   isEnabled(): boolean {
     return this.enabled;
@@ -94,13 +95,14 @@ export class AudioEngine {
   }
 
   async playMusic(trackId: MusicTrackId, options: MusicPlayOptions = {}): Promise<boolean> {
+    const request = ++this.musicRequest;
     if (!this.ensureReady()) return false;
     if (!this.audioContext || !this.musicGain) return false;
     const config = this.getTrackConfig(trackId);
     if (!config) return false;
 
     const buffer = await this.loadBuffer(config.url);
-    if (!buffer || !this.audioContext) return false;
+    if (!buffer || !this.audioContext || request !== this.musicRequest) return false;
 
     this.stopCurrentSource(0);
 
@@ -130,6 +132,7 @@ export class AudioEngine {
   }
 
   async crossfadeTo(trackId: MusicTrackId, options: MusicCrossfadeOptions): Promise<boolean> {
+    const request = ++this.musicRequest;
     if (!this.ensureReady()) return false;
     if (!this.audioContext || !this.musicGain) return false;
     const config = this.getTrackConfig(trackId);
@@ -140,7 +143,7 @@ export class AudioEngine {
     }
 
     const buffer = await this.loadBuffer(config.url);
-    if (!buffer || !this.audioContext) return false;
+    if (!buffer || !this.audioContext || request !== this.musicRequest) return false;
 
     const now = this.audioContext.currentTime;
     const duration = Math.max(0, options.durationMs) / 1000;
@@ -170,6 +173,7 @@ export class AudioEngine {
   }
 
   stopMusic(options: MusicStopOptions = {}): void {
+    this.musicRequest++;
     if (!this.audioContext) return;
     const fadeOutMs = options.fadeOutMs ?? 0;
     this.stopCurrentSource(fadeOutMs);

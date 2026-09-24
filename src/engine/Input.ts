@@ -2,271 +2,210 @@
 
 import { InputState } from '../types';
 
+type HeldAction = 'left' | 'right' | 'jump' | 'run' | 'down';
+
+const KEY_ACTIONS: Readonly<Record<string, HeldAction>> = {
+  ArrowLeft: 'left', KeyA: 'left',
+  ArrowRight: 'right', KeyD: 'right',
+  ArrowDown: 'down', KeyS: 'down',
+  Space: 'jump', KeyZ: 'jump', ArrowUp: 'jump', KeyW: 'jump',
+  ShiftLeft: 'run', ShiftRight: 'run', KeyX: 'run'
+};
+
+const createState = (): InputState => ({
+  left: false, right: false, jump: false, run: false, down: false,
+  start: false, pause: false, mute: false,
+  jumpPressed: false, jumpReleased: false, downPressed: false
+});
+
 export class Input {
-  private state: InputState = {
-    left: false,
-    right: false,
-    jump: false,
-    run: false,
-    down: false,
-    start: false,
-    pause: false,
-    mute: false,
-    jumpPressed: false,
-    jumpReleased: false,
-    downPressed: false,
-  };
+  private state = createState();
+  private pressedKeys = new Set<string>();
+  private touchActions = new Set<HeldAction>();
+  private touchMenuPressed = false;
+  private pendingTouchMenu = false;
+  private touchMenuAction = false;
+  private pendingStart = false;
+  private pendingPause = false;
+  private pendingMute = false;
+  private pendingJumpPressed = false;
+  private pendingJumpReleased = false;
+  private pendingDownPressed = false;
 
-  private previousJump = false;
-  private previousDown = false;
-  private muteJustPressed = false;
-  private pauseJustPressed = false;
-  private startJustPressed = false;
-
-  // Konami code detector
-  private konamiCode = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight'];
+  private konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight'];
   private konamiIndex = 0;
   private konamiJustTriggered = false;
 
   constructor() {
-    this.setupKeyboardListeners();
+    window.addEventListener('keydown', (event) => this.handleKeyDown(event));
+    window.addEventListener('keyup', (event) => this.handleKeyUp(event));
+    window.addEventListener('blur', () => this.reset());
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) this.reset();
+    });
     this.setupTouchControls();
   }
 
-  private setupKeyboardListeners(): void {
-    window.addEventListener('keydown', (e) => this.handleKeyDown(e));
-    window.addEventListener('keyup', (e) => this.handleKeyUp(e));
-  }
-
-  private handleKeyDown(e: KeyboardEvent): void {
-    switch (e.code) {
-      case 'ArrowLeft':
-      case 'KeyA':
-        this.state.left = true;
-        break;
-      case 'ArrowRight':
-      case 'KeyD':
-        this.state.right = true;
-        break;
-      case 'ArrowDown':
-      case 'KeyS':
-        this.state.down = true;
-        break;
-      case 'Space':
-      case 'KeyZ':
-      case 'ArrowUp':
-      case 'KeyW':
-        this.state.jump = true;
-        break;
-      case 'ShiftLeft':
-      case 'ShiftRight':
-      case 'KeyX':
-        this.state.run = true;
-        break;
-      case 'Enter':
-        if (!this.startJustPressed) {
-          this.state.start = true;
-          this.startJustPressed = true;
-        }
-        break;
-      case 'Escape':
-        if (!this.pauseJustPressed) {
-          this.state.pause = true;
-          this.pauseJustPressed = true;
-        }
-        break;
-      case 'KeyM':
-        if (!this.muteJustPressed) {
-          this.state.mute = true;
-          this.muteJustPressed = true;
-        }
-        break;
-    }
-    
-    // Previne scroll com setas e espaço
-    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
-      e.preventDefault();
+  private handleKeyDown(event: KeyboardEvent): void {
+    const target = event.target;
+    if (target instanceof HTMLElement && target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) {
+      return;
     }
 
-    // Lógica do Konami Code (consumível)
-    if (e.code === this.konamiCode[this.konamiIndex]) {
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(event.code)) {
+      event.preventDefault();
+    }
+    if (event.repeat || this.pressedKeys.has(event.code)) return;
+    this.pressedKeys.add(event.code);
+
+    if (event.code === 'Enter') this.pendingStart = true;
+    if (event.code === 'Escape') this.pendingPause = true;
+    if (event.code === 'KeyM') this.pendingMute = true;
+    this.refreshHeldActions();
+
+    if (event.code === this.konamiCode[this.konamiIndex]) {
       this.konamiIndex++;
       if (this.konamiIndex === this.konamiCode.length) {
         this.konamiJustTriggered = true;
         this.konamiIndex = 0;
-        console.log('🍹 Konami detectado');
       }
     } else {
-      this.konamiIndex = 0; // reset se errar
+      this.konamiIndex = event.code === this.konamiCode[0] ? 1 : 0;
     }
   }
 
-  // Consome o gatilho do Konami (retorna true apenas uma vez por ativação)
-  consumeKonami(): boolean {
-    if (this.konamiJustTriggered) {
-      this.konamiJustTriggered = false;
-      return true;
-    }
-    return false;
+  private handleKeyUp(event: KeyboardEvent): void {
+    this.pressedKeys.delete(event.code);
+    this.refreshHeldActions();
   }
 
-  private handleKeyUp(e: KeyboardEvent): void {
-    switch (e.code) {
-      case 'ArrowLeft':
-      case 'KeyA':
-        this.state.left = false;
-        break;
-      case 'ArrowRight':
-      case 'KeyD':
-        this.state.right = false;
-        break;
-      case 'ArrowDown':
-      case 'KeyS':
-        this.state.down = false;
-        break;
-      case 'Space':
-      case 'KeyZ':
-      case 'ArrowUp':
-      case 'KeyW':
-        this.state.jump = false;
-        break;
-      case 'ShiftLeft':
-      case 'ShiftRight':
-      case 'KeyX':
-        this.state.run = false;
-        break;
-      case 'Enter':
-        this.state.start = false;
-        this.startJustPressed = false;
-        break;
-      case 'Escape':
-        this.state.pause = false;
-        this.pauseJustPressed = false;
-        break;
-      case 'KeyM':
-        this.state.mute = false;
-        this.muteJustPressed = false;
-        break;
-    }
+  private refreshHeldActions(): void {
+    const held = new Set(this.touchActions);
+    this.pressedKeys.forEach((code) => {
+      const action = KEY_ACTIONS[code];
+      if (action) held.add(action);
+    });
+
+    const jump = held.has('jump');
+    const down = held.has('down');
+    this.pendingJumpPressed ||= jump && !this.state.jump;
+    this.pendingJumpReleased ||= !jump && this.state.jump;
+    this.pendingDownPressed ||= down && !this.state.down;
+    this.state.left = held.has('left');
+    this.state.right = held.has('right');
+    this.state.jump = jump;
+    this.state.run = held.has('run');
+    this.state.down = down;
   }
 
   private setupTouchControls(): void {
-    // Touch controls serão renderizados e gerenciados pelo Renderer
-    // Aqui configuramos os listeners
-    const attach = (canvas: HTMLCanvasElement | null) => {
+    const attach = (canvas: HTMLCanvasElement | null): boolean => {
       if (!canvas) return false;
-      canvas.addEventListener('touchstart', (e) => this.handleTouch(e, true));
-      canvas.addEventListener('touchend', (e) => this.handleTouch(e, false));
-      canvas.addEventListener('touchcancel', (e) => this.handleTouch(e, false));
+      for (const type of ['touchstart', 'touchmove', 'touchend', 'touchcancel'] as const) {
+        canvas.addEventListener(type, (event) => this.handleTouch(event), { passive: false });
+      }
       return true;
     };
 
-    const canvas = document.getElementById('game-canvas') as HTMLCanvasElement | null;
-    if (attach(canvas)) return;
-
-    // Re-tentar até o canvas aparecer (ex: script foi carregado cedo)
-    const tryAttach = () => {
-      const c = document.getElementById('game-canvas') as HTMLCanvasElement | null;
-      if (attach(c)) return;
-      window.requestAnimationFrame(tryAttach);
+    const tryAttach = (): void => {
+      const canvas = document.getElementById('game-canvas') as HTMLCanvasElement | null;
+      if (!attach(canvas)) window.requestAnimationFrame(tryAttach);
     };
-    window.requestAnimationFrame(tryAttach);
+    tryAttach();
   }
 
-  private handleTouch(e: TouchEvent, isPressed: boolean): void {
-    e.preventDefault();
-    const canvas = e.target as HTMLCanvasElement;
+  private handleTouch(event: TouchEvent): void {
+    event.preventDefault();
+    const canvas = event.currentTarget as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
-    
-    for (let i = 0; i < e.changedTouches.length; i++) {
-      const touch = e.changedTouches[i];
+    if (rect.width <= 0 || rect.height <= 0) return;
+    this.touchActions.clear();
+    let menuPressed = false;
+
+    // Rebuild from all remaining fingers, including movements between controls.
+    for (let i = 0; i < event.touches.length; i++) {
+      const touch = event.touches[i];
+      if (touch.target !== canvas) continue;
       const x = (touch.clientX - rect.left) / rect.width;
       const y = (touch.clientY - rect.top) / rect.height;
-      
-      // Botões na parte inferior da tela
+      if (x < 0 || x > 1 || y < 0 || y > 1) continue;
+
       if (y > 0.7) {
-        // Lado esquerdo - movimento
-        if (x < 0.15) {
-          this.state.left = isPressed;
-        } else if (x < 0.3) {
-          this.state.right = isPressed;
-        }
-        // Lado direito - ações
-        else if (x > 0.85) {
-          this.state.jump = isPressed;
-        } else if (x > 0.7) {
-          this.state.run = isPressed;
-        }
-      }
-      // Toque no centro superior - pause/start
-      else if (y < 0.2 && x > 0.4 && x < 0.6) {
-        if (isPressed) {
-          this.state.pause = true;
-          this.state.start = true;
-        }
+        if (x < 0.15) this.touchActions.add('left');
+        else if (x < 0.3) this.touchActions.add('right');
+        else if (x > 0.85) this.touchActions.add('jump');
+        else if (x > 0.7) this.touchActions.add('run');
+      } else if (y < 0.2 && x > 0.4 && x < 0.6) {
+        menuPressed = true;
       }
     }
+
+    if (menuPressed && !this.touchMenuPressed) this.pendingTouchMenu = true;
+    this.touchMenuPressed = menuPressed;
+    this.refreshHeldActions();
   }
 
   update(): void {
-    // Detecta transição de jump (para pulo variável)
-    this.state.jumpPressed = this.state.jump && !this.previousJump;
-    this.state.jumpReleased = !this.state.jump && this.previousJump;
-    this.previousJump = this.state.jump;
-
-    // Detecta transição de down
-    this.state.downPressed = this.state.down && !this.previousDown;
-    this.previousDown = this.state.down;
+    // Keep short taps that start and end between two simulation updates.
+    this.state.start = this.pendingStart;
+    this.state.pause = this.pendingPause;
+    this.state.mute = this.pendingMute;
+    this.touchMenuAction = this.pendingTouchMenu;
+    this.pendingStart = false;
+    this.pendingPause = false;
+    this.pendingMute = false;
+    this.pendingTouchMenu = false;
+    this.state.jumpPressed = this.pendingJumpPressed;
+    this.state.jumpReleased = this.pendingJumpReleased;
+    this.state.downPressed = this.pendingDownPressed;
+    this.pendingJumpPressed = false;
+    this.pendingJumpReleased = false;
+    this.pendingDownPressed = false;
   }
 
   getState(): InputState {
     return { ...this.state };
   }
 
-  // Consome o estado de start (para não repetir)
+  consumeKonami(): boolean {
+    const triggered = this.konamiJustTriggered;
+    this.konamiJustTriggered = false;
+    return triggered;
+  }
+
   consumeStart(): boolean {
-    if (this.state.start) {
-      this.state.start = false;
-      return true;
-    }
-    return false;
+    const pressed = this.state.start || this.touchMenuAction;
+    this.state.start = false;
+    this.touchMenuAction = false;
+    return pressed;
   }
 
-  // Consome o estado de pause
   consumePause(): boolean {
-    if (this.state.pause) {
-      this.state.pause = false;
-      return true;
-    }
-    return false;
+    const pressed = this.state.pause || this.touchMenuAction;
+    this.state.pause = false;
+    this.touchMenuAction = false;
+    return pressed;
   }
 
-  // Consome o estado de mute
   consumeMute(): boolean {
-    if (this.state.mute) {
-      this.state.mute = false;
-      return true;
-    }
-    return false;
+    const pressed = this.state.mute;
+    this.state.mute = false;
+    return pressed;
   }
 
-  // Reset para quando mudar de estado
   reset(): void {
-    this.state = {
-      left: false,
-      right: false,
-      jump: false,
-      run: false,
-      down: false,
-      start: false,
-      pause: false,
-      mute: false,
-      jumpPressed: false,
-      jumpReleased: false,
-      downPressed: false,
-    };
-    this.previousJump = false;
-    this.previousDown = false;
+    this.state = createState();
+    this.pressedKeys.clear();
+    this.touchActions.clear();
+    this.touchMenuPressed = false;
+    this.pendingTouchMenu = false;
+    this.touchMenuAction = false;
+    this.pendingStart = false;
+    this.pendingPause = false;
+    this.pendingMute = false;
+    this.pendingJumpPressed = false;
+    this.pendingJumpReleased = false;
+    this.pendingDownPressed = false;
     this.konamiIndex = 0;
     this.konamiJustTriggered = false;
   }

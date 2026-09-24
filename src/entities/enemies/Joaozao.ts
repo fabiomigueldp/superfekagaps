@@ -105,20 +105,16 @@ export class Joaozao {
     this.data.velocity.y += GRAVITY * 0.7;
     this.data.velocity.y = Math.min(this.data.velocity.y, MAX_FALL_SPEED);
 
-    // Move
-    this.data.position.x += this.data.velocity.x;
-    this.data.position.y += this.data.velocity.y;
-
-    // Colisão
+    // O resolvedor já aplica o deslocamento; usar a posição anterior evita mover duas vezes.
     const rect = this.getRect();
-    const collision = level.resolveCollision(rect, this.data.velocity);
+    const collision = level.resolveCollision(rect, this.data.velocity, rect);
     this.data.position = collision.position;
-    this.data.velocity.y = collision.velocity.y;
+    this.data.velocity = collision.velocity;
     this.isGrounded = collision.grounded;
 
     // Se bateu a cabeça em um tile, tenta quebrar tijolos (verifica toda a largura do chefe)
     if (collision.tileHit && collision.tileHit.side === 'top') {
-      const headRow = collision.tileHit.row;
+      const headRow = collision.tileHit.row - level.originY;
       const leftCol = level.worldToCol(rect.x);
       const rightCol = level.worldToCol(rect.x + rect.width - 1);
       for (let col = leftCol; col <= rightCol; col++) {
@@ -130,12 +126,15 @@ export class Joaozao {
     }
 
     // Limita aos bounds da arena
-    if (this.data.position.x < TILE_SIZE * 2) {
-      this.data.position.x = TILE_SIZE * 2;
+    const bounds = level.getBounds();
+    const arenaMinX = Math.min(bounds.minX + TILE_SIZE * 2, bounds.maxX - this.data.width);
+    const arenaMaxX = Math.max(arenaMinX, bounds.maxX - TILE_SIZE * 2 - this.data.width);
+    if (this.data.position.x < arenaMinX) {
+      this.data.position.x = arenaMinX;
       this.data.velocity.x = Math.abs(this.data.velocity.x);
     }
-    if (this.data.position.x > TILE_SIZE * 35) {
-      this.data.position.x = TILE_SIZE * 35;
+    if (this.data.position.x > arenaMaxX) {
+      this.data.position.x = arenaMaxX;
       this.data.velocity.x = -Math.abs(this.data.velocity.x);
     }
 
@@ -216,16 +215,14 @@ export class Joaozao {
           // Executa o smash apenas uma vez
           if (!this.hasSmashed) {
             const gapCol = level.worldToCol(playerX);
+            const gapRow = level.worldToRow(this.data.position.y + this.data.height + 1);
             for (let i = -1; i <= 1; i++) {
-              // level.removeTileTemporarily espera indices de array, então gapCol + i deve ser indice de array
-              // O removeTileTemporarily provavelmente espera indices de array, vamos confirmar.
-              // Se gapCol vem de worldToCol, ele já é array index.
-              level.removeTileTemporarily(gapCol + i, 9, 3000);
+              level.removeTileTemporarily(gapCol + i, gapRow, 3000);
             }
 
             // Marca impacto para o jogo processar partículas/som/câmera
             this.hasSmashed = true;
-            this.pendingImpact = { x: gapCol * TILE_SIZE + TILE_SIZE / 2, y: 9 * TILE_SIZE };
+            this.pendingImpact = { x: level.colToWorldX(gapCol) + TILE_SIZE / 2, y: level.rowToWorldY(gapRow) };
           }
         }
         // FASE 3: RECUPERAÇÃO
@@ -261,7 +258,9 @@ export class Joaozao {
       p.position.y += p.velocity.y;
 
       // Remove se saiu da tela
-      if (p.position.x < 0 || p.position.x > level.data.width * TILE_SIZE) {
+      const bounds = level.getBounds();
+      if (p.position.x + p.width < bounds.minX || p.position.x > bounds.maxX ||
+        p.position.y + p.height < bounds.minY || p.position.y > bounds.maxY) {
         return false;
       }
 

@@ -1,4 +1,5 @@
-import { LevelData, EnemyType } from '../../types';
+import type { LevelData } from '../../types';
+import { CollectibleType, EnemyType } from '../../types';
 
 export const DATA: LevelData = {
   "id": "1",
@@ -52,63 +53,63 @@ export const DATA: LevelData = {
   ],
   "enemies": [
     {
-      "type": "MINION",
+      "type": EnemyType.MINION,
       "position": {
         "x": 15,
         "y": 10
       }
     },
     {
-      "type": "MINION",
+      "type": EnemyType.MINION,
       "position": {
         "x": 25,
         "y": 10
       }
     },
     {
-      "type": "MINION",
+      "type": EnemyType.MINION,
       "position": {
         "x": 30,
         "y": 10
       }
     },
     {
-      "type": "MINION",
+      "type": EnemyType.MINION,
       "position": {
         "x": 45,
         "y": 10
       }
     },
     {
-      "type": "MINION",
+      "type": EnemyType.MINION,
       "position": {
         "x": 67,
         "y": 5
       }
     },
     {
-      "type": "MINION",
+      "type": EnemyType.MINION,
       "position": {
         "x": 55,
         "y": 5
       }
     },
     {
-      "type": "MINION",
+      "type": EnemyType.MINION,
       "position": {
         "x": 89,
         "y": 10
       }
     },
     {
-      "type": "MINION",
+      "type": EnemyType.MINION,
       "position": {
         "x": 84,
         "y": 10
       }
     },
     {
-      "type": "MINION",
+      "type": EnemyType.MINION,
       "position": {
         "x": 79,
         "y": 10
@@ -117,7 +118,7 @@ export const DATA: LevelData = {
   ],
   "collectibles": [
     {
-      "type": "MINI_FANTA",
+      "type": CollectibleType.MINI_FANTA,
       "position": {
         "x": 50,
         "y": 5
@@ -142,5 +143,6 @@ export const DATA: LevelData = {
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1]
   ],
   "originX": 0,
-  "originY": -1
+  "originY": -1,
+  "triggers": []
 };

@@ -1,83 +1,61 @@
+import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { ALL_LEVELS } from '../src/data/levels';
+import { TILE_SIZE } from '../src/constants';
+import type { Vector2 } from '../src/types';
+import { normalizeLevelData } from '../src/world/levelValidation';
 
-function validateLevels() {
-  console.log('🔍 Validando níveis...');
-  let hasErrors = false;
+export function findLevelErrors(levels: readonly unknown[]): string[] {
+  const errors: string[] = [];
+  const ids = new Set<string>();
+  if (levels.length === 0) errors.push('A campanha precisa ter pelo menos um nível.');
 
-  ALL_LEVELS.forEach((level, index) => {
-    // Validar ID contíguo
-    if (level.id !== index.toString()) {
-      console.error(`❌ Erro no Nível ${index}: ID esperado '${index}', encontrado '${level.id}'`);
-      hasErrors = true;
+  levels.forEach((value, index) => {
+    let level;
+    try {
+      level = normalizeLevelData(value);
+    } catch (error) {
+      errors.push(`Nível na posição ${index}: ${error instanceof Error ? error.message : String(error)}`);
+      return;
     }
 
-    // Validar dimensões (height/width)
-    if (level.tiles.length !== level.height) {
-      console.error(`❌ Nível ${level.id}: height=${level.height} mas tiles.length=${level.tiles.length}`);
-      hasErrors = true;
-    }
+    if (ids.has(level.id)) errors.push(`ID de nível duplicado: '${level.id}'.`);
+    ids.add(level.id);
 
-    level.tiles.forEach((row, rIdx) => {
-      if (row.length !== level.width) {
-        console.error(`❌ Nível ${level.id}: width=${level.width} mas tiles[${rIdx}].length=${row.length}`);
-        hasErrors = true;
+    const minX = level.originX ?? 0;
+    const minY = level.originY ?? 0;
+    const maxX = minX + level.width;
+    const maxY = minY + level.height;
+    const checkPosition = (position: Vector2, field: string): void => {
+      if (position.x < minX || position.x >= maxX || position.y < minY || position.y >= maxY) {
+        errors.push(`Nível ${level.id}: ${field} fora do mapa: (${position.x}, ${position.y}).`);
       }
+    };
 
-      row.forEach((tile, cIdx) => {
-        // Tiles válidos: 0-7, 10-13
-        const isValid = (tile >= 0 && tile <= 7) || (tile >= 10 && tile <= 19);
-        if (!isValid) {
-          console.error(`❌ Erro no Nível ${level.id}: Tile inválido '${tile}' em [${rIdx}, ${cIdx}]`);
-          hasErrors = true;
-        }
-      });
-    });
+    checkPosition(level.playerSpawn, 'playerSpawn');
+    checkPosition(level.goalPosition, 'goalPosition');
+    level.checkpoints.forEach((position, i) => checkPosition(position, `checkpoint[${i}]`));
+    level.enemies.forEach((enemy, i) => checkPosition(enemy.position, `enemy[${i}]`));
+    level.collectibles.forEach((collectible, i) => checkPosition(collectible.position, `collectible[${i}]`));
 
-    const inBounds = (p: { x: number; y: number }) => p.x >= 0 && p.x < level.width && p.y >= 0 && p.y < level.height;
-
-    // Spawn / Goal / Checkpoints
-    if (!inBounds(level.playerSpawn)) {
-      console.error(`❌ Nível ${level.id}: playerSpawn fora do mapa: (${level.playerSpawn.x}, ${level.playerSpawn.y})`);
-      hasErrors = true;
-    }
-
-    if (!inBounds(level.goalPosition)) {
-      console.error(`❌ Nível ${level.id}: goalPosition fora do mapa: (${level.goalPosition.x}, ${level.goalPosition.y})`);
-      hasErrors = true;
-    }
-
-    level.checkpoints.forEach((cp, idx) => {
-      if (!inBounds(cp)) {
-        console.error(`❌ Nível ${level.id}: checkpoint[${idx}] fora do mapa: (${cp.x}, ${cp.y})`);
-        hasErrors = true;
+    // Trigger rectangles use world pixels; other placements use world tiles.
+    level.triggers.forEach((trigger, i) => {
+      if (trigger.x + trigger.width <= minX * TILE_SIZE || trigger.x >= maxX * TILE_SIZE ||
+          trigger.y + trigger.height <= minY * TILE_SIZE || trigger.y >= maxY * TILE_SIZE) {
+        errors.push(`Nível ${level.id}: trigger[${i}] não cruza a área do mapa.`);
       }
     });
-
-    // Enemies
-    (level.enemies || []).forEach((e, idx) => {
-      if (!inBounds(e.position)) {
-        console.error(`❌ Nível ${level.id}: enemy[${idx}] fora do mapa: (${e.position.x}, ${e.position.y})`);
-        hasErrors = true;
-      }
-    });
-
-    // Collectibles
-    (level.collectibles || []).forEach((c, idx) => {
-      if (!inBounds(c.position)) {
-        console.error(`❌ Nível ${level.id}: collectible[${idx}] fora do mapa: (${c.position.x}, ${c.position.y})`);
-        hasErrors = true;
-      }
-    });
-
   });
-
-  if (hasErrors) {
-    console.error('❌ Falha na validação dos níveis.');
-    process.exit(1);
-  } else {
-    console.log(`✅ ${ALL_LEVELS.length} níveis validados com sucesso!`);
-    process.exit(0);
-  }
+  return errors;
 }
 
-validateLevels();
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+  const errors = findLevelErrors(ALL_LEVELS);
+  errors.forEach(error => console.error(`❌ ${error}`));
+  if (errors.length > 0) {
+    console.error('❌ Falha na validação dos níveis.');
+    process.exitCode = 1;
+  } else {
+    console.log(`✅ ${ALL_LEVELS.length} níveis validados com sucesso!`);
+  }
+}

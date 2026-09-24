@@ -43,10 +43,7 @@
       user-select: none;
     }
   </style>
-  <style>
-    /* ... existing styles ... */
-  </style>
-  <link rel="stylesheet" href="/src/editor/editor_complete.css">
+  <link rel="stylesheet" href="/src/editor/editor.css">
 </head>
 
 <body>
@@ -56,12 +53,19 @@
       <button class="tool-btn" data-tool="ERASER" title="Eraser (E)">🧹</button>
       <button class="tool-btn" data-tool="SELECT" title="Select (S)">👆</button>
       <button class="tool-btn" data-tool="RECTANGLE" title="Rectangle (R)">🔲</button>
+      <button class="tool-btn" data-tool="HAND" title="Mover câmera (H)">✋</button>
     </div>
 
     <div class="toolbar">
-      <button id="btn-mount" class="editor-btn primary">📁 Open Levels Folder</button>
-      <button id="btn-save" class="editor-btn">Save Level</button>
-      <div style="margin-left: 20px; display: flex; align-items: center; gap: 5px;">
+      <button id="btn-mount" class="editor-btn">Abrir pasta</button>
+      <button id="btn-import" class="editor-btn">Importar</button>
+      <input id="level-import" type="file" accept=".ts,.json" hidden>
+      <button id="btn-save" class="editor-btn primary">Exportar .ts</button>
+      <button id="btn-export" class="editor-btn" hidden>Exportar cópia</button>
+      <button id="btn-undo" class="editor-btn" title="Desfazer (Ctrl+Z)" disabled>↶</button>
+      <button id="btn-redo" class="editor-btn" title="Refazer (Ctrl+Shift+Z)" disabled>↷</button>
+      <button id="btn-fit-view" class="editor-btn" title="Enquadrar fase (F)">Enquadrar</button>
+      <div style="display: flex; align-items: center; gap: 5px;">
         <input type="checkbox" id="chk-show-bg">
         <label for="chk-show-bg" style="font-size: 12px; color: #ccc; cursor: pointer;">Show BG</label>
       </div>
@@ -182,12 +186,14 @@
       <span class="status-item status-world">World: (0, 0) px</span>
       <span class="status-separator">│</span>
       <span class="status-item status-level">100 × 14 tiles</span>
+      <span id="editor-message" role="status" aria-live="polite"></span>
       <span class="status-spacer"></span>
       <span class="status-item status-zoom">100%</span>
     </div>
   </div>
 
   <canvas id="game-canvas"></canvas>
+  <a id="open-editor" href="?editor=true">Editor de mundos</a>
   <script type="module" src="/src/main.ts"></script>
 </body>
 

@@ -1,6 +1,6 @@
 import { GameState } from '../constants';
 import { AudioEngine } from './AudioEngine';
-import { MusicTrackId } from './audioCatalog';
+import { MUSIC_TRACKS, MusicTrackId } from './audioCatalog';
 import { decideMusic, MusicDecision, MusicSnapshot } from './MusicPolicy';
 
 export interface MusicContext {
@@ -18,7 +18,10 @@ export class MusicManager {
   private desiredTrackId: MusicTrackId | null = null;
   private baseTrackId: MusicTrackId | null = null;
   private overrideTrackId: MusicTrackId | null = null;
+  private triggerTrackId: MusicTrackId | null | undefined = undefined;
+  private levelId: string | null = null;
   private pendingTrackId: MusicTrackId | null = null;
+  private requestToken = 0;
   private lastPowerupActive: boolean = false;
   private isPaused: boolean = false;
   private decision: MusicDecision | null = null;
@@ -29,6 +32,11 @@ export class MusicManager {
   }
 
   onStateChange(prevState: GameState, nextState: GameState, context: MusicContext): void {
+    const levelChanged = this.levelId !== context.levelId;
+    if (levelChanged || (nextState !== GameState.PLAYING && nextState !== GameState.PAUSED)) {
+      this.triggerTrackId = undefined;
+    }
+    this.levelId = context.levelId;
     if (nextState === GameState.PAUSED) {
       this.isPaused = true;
       this.engine.setMusicVolume(0.2, 200);
@@ -40,7 +48,7 @@ export class MusicManager {
       this.engine.setMusicVolume(1, 200);
     }
 
-    if (nextState !== GameState.PLAYING) {
+    if (levelChanged || nextState !== GameState.PLAYING) {
       this.overrideTrackId = null;
       this.lastPowerupActive = false;
       this.pendingTrackId = null;
@@ -94,7 +102,7 @@ export class MusicManager {
       this.lastPowerupActive = powerupActive;
     }
 
-    if (this.desiredTrackId && !this.currentTrackId) {
+    if (this.desiredTrackId && this.desiredTrackId !== this.currentTrackId) {
       this.applyDesiredTrack();
     }
   }
@@ -105,27 +113,38 @@ export class MusicManager {
     this.applyDesiredTrack();
   }
 
+  applyLevelTrigger(trackId: string, action: 'PLAY' | 'STOP'): boolean {
+    if (action === 'PLAY' && !Object.prototype.hasOwnProperty.call(MUSIC_TRACKS, trackId)) return false;
+    this.triggerTrackId = action === 'STOP' ? null : trackId as MusicTrackId;
+    this.applyDesiredTrack();
+    return true;
+  }
+
   stopAll(fadeOutMs: number): void {
+    this.requestToken++;
     this.currentTrackId = null;
     this.desiredTrackId = null;
     this.baseTrackId = null;
     this.overrideTrackId = null;
+    this.triggerTrackId = undefined;
     this.pendingTrackId = null;
     this.engine.stopMusic({ fadeOutMs });
   }
 
   private applyDesiredTrack(): void {
-    const desired = this.overrideTrackId ?? this.baseTrackId;
+    const desired = this.triggerTrackId !== undefined ? this.triggerTrackId : this.overrideTrackId ?? this.baseTrackId;
     this.desiredTrackId = desired;
 
     if (!this.desiredTrackId) {
+      this.requestToken++;
+      this.pendingTrackId = null;
       const fadeOutMs = this.decision?.fadeOutMs ?? 300;
       this.engine.stopMusic({ fadeOutMs });
       this.currentTrackId = null;
       return;
     }
 
-    if (this.currentTrackId === this.desiredTrackId) {
+    if (this.currentTrackId === this.desiredTrackId && !this.pendingTrackId) {
       return;
     }
 
@@ -134,25 +153,30 @@ export class MusicManager {
     }
 
     const crossfadeMs = this.decision?.crossfadeMs ?? 500;
+    const trackId = this.desiredTrackId;
     if (!this.currentTrackId) {
       const fadeInMs = this.decision?.fadeInMs ?? 400;
       if (!this.engine.ensureReady()) return;
-      this.pendingTrackId = this.desiredTrackId;
-      void this.engine.playMusic(this.desiredTrackId, { fadeInMs }).then(started => {
+      const request = ++this.requestToken;
+      this.pendingTrackId = trackId;
+      void this.engine.playMusic(trackId, { fadeInMs }).then(started => {
+        if (request !== this.requestToken) return;
         this.pendingTrackId = null;
         if (started) {
-          this.currentTrackId = this.desiredTrackId;
+          this.currentTrackId = trackId;
         }
       });
       return;
     }
 
     if (!this.engine.ensureReady()) return;
-    this.pendingTrackId = this.desiredTrackId;
-    void this.engine.crossfadeTo(this.desiredTrackId, { durationMs: crossfadeMs }).then(started => {
+    const request = ++this.requestToken;
+    this.pendingTrackId = trackId;
+    void this.engine.crossfadeTo(trackId, { durationMs: crossfadeMs }).then(started => {
+      if (request !== this.requestToken) return;
       this.pendingTrackId = null;
       if (started) {
-        this.currentTrackId = this.desiredTrackId;
+        this.currentTrackId = trackId;
       }
     });
   }

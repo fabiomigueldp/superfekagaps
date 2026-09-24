@@ -5,7 +5,7 @@ scanner.py - Project Snapshot Tool for LLM Context
 Captures a complete snapshot of a directory structure and file contents,
 optimized for feeding into Large Language Models.
 
-Usage: python scanner.py [directory]
+Usage: python tools/scanner.py [directory]
        If no directory specified, uses current working directory.
 """
 
