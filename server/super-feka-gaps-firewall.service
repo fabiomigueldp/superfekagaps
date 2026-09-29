@@ -1,0 +1,13 @@
+[Unit]
+Description=Allow Caddy's internal bridge to reach Super Feka Gaps
+After=network-online.target docker.service
+Before=super-feka-gaps.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -c '/usr/sbin/iptables -C INPUT -s 172.19.0.0/16 -d 172.19.0.1 -p tcp --dport 8787 -j ACCEPT 2>/dev/null || /usr/sbin/iptables -I INPUT 1 -s 172.19.0.0/16 -d 172.19.0.1 -p tcp --dport 8787 -j ACCEPT'
+
+[Install]
+WantedBy=multi-user.target

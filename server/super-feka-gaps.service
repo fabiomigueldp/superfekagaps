@@ -1,6 +1,7 @@
 [Unit]
 Description=Super Feka Gaps Remaster and global scoreboard
-After=network-online.target docker.service
+After=network-online.target docker.service super-feka-gaps-firewall.service
+Requires=super-feka-gaps-firewall.service
 Wants=network-online.target
 
 [Service]
