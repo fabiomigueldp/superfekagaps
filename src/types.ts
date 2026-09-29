@@ -56,6 +56,8 @@ export interface PlayerData extends Entity {
   isDead: boolean;
   deathTimer: number;
   deathTimerMax: number;
+  deathKind?: 'hit' | 'fall';
+  respawnRevealTimer?: number;
   invincibleTimer: number;
   hasHelmet: boolean;
   miniFantaTimer: number;

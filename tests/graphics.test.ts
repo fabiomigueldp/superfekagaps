@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import { test, type TestContext } from 'node:test';
 import { BackgroundGenerator } from '../src/engine/BackgroundGenerator';
 import { Renderer } from '../src/engine/Renderer';
+import { playerDeathMotion } from '../src/graphics/playerDeathMotion';
+import { PLAYER_SPRITES, PLAYER_PALETTE } from '../src/assets/playerSpriteSpec';
 import { SpriteAtlas, VisualClock, animationIndex } from '../src/graphics/pixels';
 import { terrainMask, lavaOffset } from '../src/graphics/TilePainter';
 import { pixelText, textWidth, wrapText } from '../src/graphics/BitmapFont';
@@ -44,6 +46,33 @@ test('authored actors and items have stable frame bounds and complete palettes',
   }
   assert.equal(new Set(MINION_FRAMES.map(f=>f.join(''))).size,3); // Neutral pose is reused between opposite steps.
   assert.equal(new Set(COIN_FRAMES.map(f=>f.join(''))).size,4); // Narrowing and widening intentionally reuse artwork.
+});
+
+test('death pose remains readable through impact, tumble and disappearance',()=>{
+  const frames=[PLAYER_SPRITES.deathImpact,PLAYER_SPRITES.deathCrouch,PLAYER_SPRITES.deathRise,PLAYER_SPRITES.deathFall];
+  assert.equal(new Set(frames.map(frame=>frame.join(''))).size,4);
+  assert.ok(frames.every(frame=>frame.length===26 && frame.every(row=>row.length===16 && [...row].every(symbol=>symbol in PLAYER_PALETTE))));
+  const impact=playerDeathMotion(0),crouch=playerDeathMotion(120),lift=playerDeathMotion(500),fall=playerDeathMotion(900),gone=playerDeathMotion(1300);
+  assert.equal(impact.y,0);
+  assert.ok(crouch.y>impact.y);
+  assert.ok(lift.y<impact.y);
+  assert.ok(fall.y>lift.y);
+  assert.deepEqual([impact.pose,crouch.pose,lift.pose,fall.pose],['deathImpact','deathCrouch','deathRise','deathFall']);
+  assert.equal(gone.alpha,0);
+});
+
+test('renderer draws every death phase with authored frames',(t)=>{
+  canvasHarness(t);
+  const target=new RecordingContext();
+  const renderer=Object.create(Renderer.prototype) as any;
+  Object.assign(renderer,{atlas:new SpriteAtlas(),offscreenCtx:target});
+  const player={position:{x:90,y:80},width:14,height:24,facingRight:true,isDead:true,
+    deathKind:'hit',deathTimerMax:1500,deathTimer:1500};
+  for(const elapsed of [0,120,350,900]){
+    player.deathTimer=1500-elapsed;
+    renderer.drawPlayer(player,{x:0,y:0});
+  }
+  assert.equal(target.images.length,4);
 });
 
 test('sprite atlas caches by frame, palette, facing and tint without blending pixels',(t)=>{

@@ -350,6 +350,11 @@ test('respawn cancels ground pound and clears buffered movement state', () => {
   assert.equal(player.data.isDead, false);
   assert.equal(player.data.invincibleTimer, 2000);
   assert.deepEqual(player.data.position, { x: -3 * TILE_SIZE, y: 7 * TILE_SIZE - player.data.height });
+  const spawn = { ...player.data.position };
+  player.update(200, { ...neutral, right: true }, makeLevel(-5));
+  assert.deepEqual(player.data.position, spawn);
+  player.update(220, { ...neutral, right: true }, makeLevel(-5));
+  assert.ok(player.data.position.x > spawn.x);
 });
 
 test('ice friction uses world origins, including negative coordinates', () => {
@@ -416,10 +421,10 @@ function gameHarness() {
   const audioCalls = { deaths: 0, respawns: 0 };
   Object.assign(game, {
     state: GameState.PLAYING, player: new Player(5, 10), level: makeLevel(),
-    lives: 3, levelTime: 0.001, totalRunTime: 0, deathTimer: 0, activeCheckpoint: null,
+    lives: 3, levelTime: 0.001, totalRunTime: 0, deathTimer: 0, activeCheckpoint: null, particles: [],
     input: { consumePause: () => false, getState: () => neutral },
     audio: {
-      playFall() {}, onPlayerDeathStart() { audioCalls.deaths++; },
+      playFall() {}, playDeath() {}, onPlayerDeathStart() { audioCalls.deaths++; },
       onRespawn() { audioCalls.respawns++; }
     },
     spawnParticles() {}
@@ -431,11 +436,14 @@ test('timeout finishes the death animation and grants time on the next life', ()
   const { game, audioCalls } = gameHarness();
   game.updatePlaying(DT);
   assert.equal(game.player.data.isDead, true);
+  assert.equal(game.player.data.deathKind, 'hit');
+  assert.equal(game.player.data.deathTimer, 1500);
   assert.equal(game.levelTime, 0);
   assert.equal(game.lives, 3);
   game.updatePlaying(1500);
   assert.equal(game.lives, 2);
   assert.equal(game.player.data.isDead, false);
+  assert.equal(game.player.data.respawnRevealTimer, 420);
   assert.equal(game.levelTime, game.level.data.timeLimit);
   assert.deepEqual(audioCalls, { deaths: 1, respawns: 1 });
 });
@@ -446,6 +454,7 @@ test('falling into a gap uses the death timer instead of respawning immediately'
   game.player.data.position.y = game.level.getBounds().maxY + 1;
   game.updatePlaying(DT);
   assert.equal(game.player.data.isDead, true);
+  assert.equal(game.player.data.deathKind, 'fall');
   assert.equal(game.deathTimer, 1500);
   game.updatePlaying(DT);
   assert.equal(game.lives, 3);

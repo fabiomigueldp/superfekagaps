@@ -5,7 +5,7 @@ import {
   INITIAL_LIVES, COIN_SCORE, ENEMY_SCORE, TIME_BONUS_MULTIPLIER, TileType,
   GP_IMPACT_RADIUS_PX, GP_SHAKE_MS, GP_SHAKE_MAG,
   BLOCK_BREAK_SCORE, BOSS_DEFEAT_SCORE, COINS_PER_LIFE, LIVES_BONUS_SCORE,
-  CULLING_MARGIN
+  CULLING_MARGIN, PLAYER_DEATH_MS
 } from '../constants';
 import {
   CameraData, Vector2, FlagData, CollectibleData,
@@ -255,6 +255,7 @@ export class Game {
       if (this.player.data.deathTimer > 0) {
         this.player.data.deathTimer = Math.max(0, this.player.data.deathTimer - deltaTime);
       }
+      this.updateParticles(deltaTime);
       if (this.deathTimer <= 0) {
         this.handlePlayerDeath();
       }
@@ -670,6 +671,7 @@ export class Game {
 
     // Touch controls
     this.renderer.drawTouchControls();
+    this.renderer.drawPlayerTransition(this.player.data, this.camera);
   }
 
   private changeState(newState: GameState): void {
@@ -1409,9 +1411,10 @@ export class Game {
     if (!this.player || (this.player.data.isDead && this.deathTimer > 0)) return;
 
     if (!this.player.data.isDead) this.player.die();
-    this.audio.playFall();
+    if (this.player.data.deathKind === 'fall') this.audio.playFall();
+    else this.audio.playDeath();
     this.audio.onPlayerDeathStart();
-    this.deathTimer = 1500;
+    this.deathTimer = PLAYER_DEATH_MS;
     const center = this.player.getCenter();
     this.spawnParticles(center.x, center.y, ART.paper, 12);
 
@@ -1441,6 +1444,18 @@ export class Game {
 
       const spawnPos = this.activeCheckpoint || this.level.data.playerSpawn;
       this.player.respawn(spawnPos);
+      // The opening iris must reveal the checkpoint, even when it is far from the death camera.
+      if (this.camera) {
+        const zoom = sceneZoom(this.camera.zoom || 1);
+        const center = this.player.getCenter();
+        this.camera.x = Math.max(this.camera.bounds.minX,
+          Math.min(center.x - GAME_WIDTH / zoom / 2, this.camera.bounds.maxX - GAME_WIDTH / zoom));
+        this.camera.y = Math.max(this.camera.bounds.minY,
+          Math.min(center.y - GAME_HEIGHT / zoom / 2, this.camera.bounds.maxY - GAME_HEIGHT / zoom));
+        this.camera.targetX = this.camera.x;
+        this.camera.targetY = this.camera.y;
+        this.camera.shakeTimer = 0;
+      }
       // Preserve o tempo restante; após timeout, uma nova vida precisa de tempo para jogar.
       if (this.levelTime <= 0) this.levelTime = this.level.data.timeLimit;
       this.deathTimer = 0;

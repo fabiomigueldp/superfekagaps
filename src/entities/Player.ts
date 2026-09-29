@@ -4,7 +4,7 @@ import {
   GRAVITY, MAX_FALL_SPEED, PLAYER_SPEED, PLAYER_RUN_SPEED,
   PLAYER_JUMP_FORCE, PLAYER_ACCELERATION, PLAYER_FRICTION,
   ICE_FRICTION, COYOTE_TIME, JUMP_BUFFER_TIME, TILE_SIZE, TileType,
-  SPRING_BOOST,
+  SPRING_BOOST, PLAYER_DEATH_MS, PLAYER_RESPAWN_REVEAL_MS,
   GP_WINDUP_MS, GP_RECOVERY_MS, GP_FALL_SPEED, GP_HORIZONTAL_MULT
 } from '../constants';
 import { PlayerData, InputState, Vector2, Rect, GroundPoundState } from '../types';
@@ -63,6 +63,7 @@ export class Player {
 
     // Atualiza timers
     this.updateTimers(deltaTime);
+    if ((this.data.respawnRevealTimer ?? 0) > 0) return {};
     this.data.animationTimer += deltaTime;
 
     // Processa Ground Pound
@@ -162,7 +163,7 @@ export class Player {
 
     // Verifica queda no gap
     if (level.isInGap(this.getRect())) {
-      this.die();
+      this.die('fall');
     }
 
     // Verifica colisão com spikes
@@ -175,6 +176,7 @@ export class Player {
   }
 
   private updateTimers(deltaTime: number): void {
+    this.data.respawnRevealTimer = Math.max(0, (this.data.respawnRevealTimer ?? 0) - deltaTime);
     this.data.landingTimer = Math.max(0, (this.data.landingTimer ?? 0) - deltaTime);
     // Coyote time
     if (this.data.isGrounded) {
@@ -380,16 +382,19 @@ export class Player {
     return { damaged: true, helmetUsed: false };
   }
 
-  die(): void {
+  die(kind: 'hit' | 'fall' = 'hit'): void {
+    if (this.data.isDead) return;
     this.data.isDead = true;
-    this.data.deathTimerMax = 600;
-    this.data.deathTimer = 600;
-    this.data.velocity = { x: 0, y: PLAYER_JUMP_FORCE };
+    this.data.deathKind = kind;
+    this.data.deathTimerMax = PLAYER_DEATH_MS;
+    this.data.deathTimer = PLAYER_DEATH_MS;
+    this.data.velocity = { x: 0, y: 0 };
   }
 
   respawn(position: Vector2): void {
     this.reset(position.x, position.y);
     this.data.invincibleTimer = 2000; // 2 segundos de invencibilidade
+    this.data.respawnRevealTimer = PLAYER_RESPAWN_REVEAL_MS;
   }
 
   collectMiniFanta(): void {
@@ -437,6 +442,8 @@ export class Player {
     this.data.isDead = false;
     this.data.deathTimer = 0;
     this.data.deathTimerMax = 0;
+    this.data.deathKind = undefined;
+    this.data.respawnRevealTimer = 0;
     this.data.isGrounded = false;
     this.data.isJumping = false;
     this.data.invincibleTimer = 0;
