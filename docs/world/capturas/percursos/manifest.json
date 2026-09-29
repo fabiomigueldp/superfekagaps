@@ -1,0 +1,170 @@
+[
+  {
+    "id": "1-1",
+    "name": "Pé na Estrada",
+    "world": "Costa dos Gaps",
+    "width": 2560,
+    "height": 368
+  },
+  {
+    "id": "1-2",
+    "name": "Ponte Bamba",
+    "world": "Costa dos Gaps",
+    "width": 2560,
+    "height": 368
+  },
+  {
+    "id": "1-3",
+    "name": "Por Baixo do Gap",
+    "world": "Costa dos Gaps",
+    "width": 2560,
+    "height": 368
+  },
+  {
+    "id": "1-4",
+    "name": "Falésias em Sequência",
+    "world": "Costa dos Gaps",
+    "width": 2944,
+    "height": 368
+  },
+  {
+    "id": "2-1",
+    "name": "Carga Chegando",
+    "world": "Porto do Bielzão",
+    "width": 2560,
+    "height": 368
+  },
+  {
+    "id": "2-2",
+    "name": "Peso e Contrapeso",
+    "world": "Porto do Bielzão",
+    "width": 2560,
+    "height": 368
+  },
+  {
+    "id": "2-3",
+    "name": "Entre os Contêineres",
+    "world": "Porto do Bielzão",
+    "width": 2560,
+    "height": 368
+  },
+  {
+    "id": "2-4",
+    "name": "Expediente Pesado",
+    "world": "Porto do Bielzão",
+    "width": 2944,
+    "height": 368
+  },
+  {
+    "id": "3-1",
+    "name": "Recebimento de Barris",
+    "world": "Fábrica de Suco",
+    "width": 2560,
+    "height": 368
+  },
+  {
+    "id": "3-2",
+    "name": "Linha de Envase",
+    "world": "Fábrica de Suco",
+    "width": 2560,
+    "height": 368
+  },
+  {
+    "id": "3-3",
+    "name": "Tanques de Mistura",
+    "world": "Fábrica de Suco",
+    "width": 2560,
+    "height": 368
+  },
+  {
+    "id": "3-4",
+    "name": "Pressão Máxima",
+    "world": "Fábrica de Suco",
+    "width": 2944,
+    "height": 368
+  },
+  {
+    "id": "4-1",
+    "name": "Estação de Subida",
+    "world": "Serra Suspensa",
+    "width": 2560,
+    "height": 368
+  },
+  {
+    "id": "4-2",
+    "name": "Contrapeso nas Nuvens",
+    "world": "Serra Suspensa",
+    "width": 2560,
+    "height": 368
+  },
+  {
+    "id": "4-3",
+    "name": "Cabos Cruzados",
+    "world": "Serra Suspensa",
+    "width": 2560,
+    "height": 368
+  },
+  {
+    "id": "4-4",
+    "name": "Travessia do Alto",
+    "world": "Serra Suspensa",
+    "width": 2944,
+    "height": 368
+  },
+  {
+    "id": "5-1",
+    "name": "Estoque a Frio",
+    "world": "Reserva Gelada",
+    "width": 2560,
+    "height": 368
+  },
+  {
+    "id": "5-2",
+    "name": "Tubulação Congelada",
+    "world": "Reserva Gelada",
+    "width": 2560,
+    "height": 368
+  },
+  {
+    "id": "5-3",
+    "name": "Reserva Especial",
+    "world": "Reserva Gelada",
+    "width": 2560,
+    "height": 368
+  },
+  {
+    "id": "5-4",
+    "name": "Choque de Temperatura",
+    "world": "Reserva Gelada",
+    "width": 2944,
+    "height": 368
+  },
+  {
+    "id": "6-1",
+    "name": "Jardins Pizzarino",
+    "world": "Domínio Pizzarino",
+    "width": 2560,
+    "height": 368
+  },
+  {
+    "id": "6-2",
+    "name": "Fornos e Passarelas",
+    "world": "Domínio Pizzarino",
+    "width": 2560,
+    "height": 368
+  },
+  {
+    "id": "6-3",
+    "name": "Passagem dos Fundos",
+    "world": "Domínio Pizzarino",
+    "width": 2560,
+    "height": 368
+  },
+  {
+    "id": "6-4",
+    "name": "A Última Travessia",
+    "world": "Domínio Pizzarino",
+    "width": 2944,
+    "height": 368
+  }
+]

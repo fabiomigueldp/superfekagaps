@@ -354,7 +354,40 @@ test('respawn cancels ground pound and clears buffered movement state', () => {
   player.update(200, { ...neutral, right: true }, makeLevel(-5));
   assert.deepEqual(player.data.position, spawn);
   player.update(220, { ...neutral, right: true }, makeLevel(-5));
+  assert.deepEqual(player.data.position, spawn);
+  assert.equal(player.data.invincibleTimer, 2000);
+  player.update(DT, { ...neutral, right: true }, makeLevel(-5));
   assert.ok(player.data.position.x > spawn.x);
+});
+
+test('death keeps its impact origin and direction and cancels pending attacks', () => {
+  const player = new Player(5,10);
+  player.data.isGrounded = true;
+  player.data.groundPoundState = GroundPoundState.FALL;
+  player.data.jumpBufferTimer = 100;
+  const origin = { ...player.data.position };
+  player.die('hit', player.getCenter().x + 20);
+  assert.equal(player.data.deathDirection, -1);
+  assert.equal(player.data.deathWasGrounded, true);
+  assert.equal(player.data.groundPoundState, GroundPoundState.NONE);
+  assert.equal(player.data.jumpBufferTimer, 0);
+  player.data.position.x += 30;
+  player.die('fall');
+  player.bounce();
+  assert.deepEqual(player.data.deathOrigin, origin);
+  assert.equal(player.data.deathKind, 'hit');
+  assert.deepEqual(player.data.velocity,{x:0,y:0});
+});
+
+test('fixed simulation steps finish each death on its intended frame', () => {
+  for (const [kind, frames] of [['hit',90],['fall',63]] as const) {
+    const player = new Player(5,10);
+    player.die(kind);
+    for (let i=0;i<frames-1;i++) player.advanceDeath(DT);
+    assert.ok(player.data.deathTimer>0);
+    player.advanceDeath(DT);
+    assert.equal(player.data.deathTimer,0);
+  }
 });
 
 test('ice friction uses world origins, including negative coordinates', () => {
@@ -455,12 +488,28 @@ test('falling into a gap uses the death timer instead of respawning immediately'
   game.updatePlaying(DT);
   assert.equal(game.player.data.isDead, true);
   assert.equal(game.player.data.deathKind, 'fall');
-  assert.equal(game.deathTimer, 1500);
+  assert.equal(game.deathTimer, 1050);
   game.updatePlaying(DT);
   assert.equal(game.lives, 3);
   assert.equal(audioCalls.deaths, 1);
-  game.updatePlaying(1500);
+  game.updatePlaying(1050);
   assert.equal(game.lives, 2);
   assert.ok(game.levelTime > 99 && game.levelTime < 100);
   assert.deepEqual(audioCalls, { deaths: 1, respawns: 1 });
+});
+
+test('death and the checkpoint reveal freeze mechanisms and preserve playable time', () => {
+  const { game } = gameHarness();
+  game.levelTime = 100;
+  let mechanismTicks = 0;
+  game.level.updateDynamicTiles = () => mechanismTicks++;
+  game.playerDie();
+  game.updatePlaying(1500);
+  const spawn = { ...game.player.data.position };
+  const protection = game.player.data.invincibleTimer;
+  game.updatePlaying(420);
+  assert.equal(mechanismTicks,0);
+  assert.equal(game.levelTime,100);
+  assert.deepEqual(game.player.data.position,spawn);
+  assert.equal(game.player.data.invincibleTimer,protection);
 });

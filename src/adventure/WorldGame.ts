@@ -1,0 +1,817 @@
+import { Input } from '../engine/Input';
+import { Renderer } from '../engine/Renderer';
+import { Player } from '../entities/Player';
+import { GroundPoundState, type CameraData, type Rect } from '../types';
+import { TileType as T, PLAYER_RESPAWN_REVEAL_MS } from '../constants';
+import { DEATH_HIT_STOP_MS } from '../graphics/playerDeathMotion';
+import { pixelText, panel, fitText, wrapText } from '../graphics/BitmapFont';
+import { ART } from '../graphics/palette';
+import { PLAYER_SPRITES, PLAYER_PALETTE, PLAYER_WALK } from '../assets/playerSpriteSpec';
+import { YASMIN_FRAMES, SPRITE_PALETTE } from '../graphics/sprites';
+import { ISLANDS, STAGES, stageById } from './campaign';
+import { ProgressStore, isUnlocked, finishStage, parseSave } from './progress';
+import { WorldArt, rect } from './WorldArt';
+import { drawLandmarks } from './WorldScenery';
+import { WorldAudio } from './WorldAudio';
+import { WorldLevel, WorldObjects } from './WorldPhysics';
+import { WorldFoe } from './WorldEnemies';
+import { BossEncounter } from './BossEncounter';
+import { bossFrame, WORLD_PALETTE } from './WorldAssets';
+import { clamp, overlaps, type AdventureStage, type Dialogue } from './types';
+type Screen = 'title' | 'intro' | 'map' | 'playing' | 'paused' | 'dialogue' | 'clear' | 'ending' | 'gallery' | 'settings';
+interface Button extends Rect {
+    run: () => void;
+}
+interface Spark {
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    life: number;
+    color: string;
+}
+export class WorldGame {
+    readonly renderer = new Renderer();
+    readonly input = new Input();
+    readonly art = new WorldArt();
+    readonly store: ProgressStore;
+    readonly audio: WorldAudio;
+    state: Screen = 'title';
+    stage: AdventureStage = STAGES[0];
+    level = new WorldLevel(STAGES[0].level);
+    objects = new WorldObjects([]);
+    player = new Player(3, 14);
+    foes: WorldFoe[] = [];
+    boss: BossEncounter | null = null;
+    camera: CameraData = { x: 0, y: 0, targetX: 0, targetY: 0, shakeTimer: 0, shakeMagnitude: 0, bounds: { minX: 0, minY: 0, maxX: 2560, maxY: 368 } };
+    time = 0;
+    elapsed = 0;
+    coins = 0;
+    private accumulator = 0;
+    private last = 0;
+    private buttons: Button[] = [];
+    private selection = 0;
+    private menuSelection = 0;
+    private checkpoint = -1;
+    private checkpointHelmet = false;
+    private collected = new Set<string>();
+    private spoken = new Set<string>();
+    private sparks: Spark[] = [];
+    private dialog: Dialogue | null = null;
+    private dialogueTime = 0;
+    private clearTimer = 0;
+    private hitStop = 0;
+    private clearSecret = false;
+    private toast = '';
+    private toastTimer = 0;
+    private settingReturn: Screen = 'title';
+    private pausedAudio = false;
+    private introPage = 0;
+    private galleryWorld = 0;
+    private mapMarkerX = 40;
+    private deathFeedbackStarted = false;
+    constructor(canvas: HTMLCanvasElement, ephemeral = false) {
+        document.title = ephemeral ? 'Super Feka Gaps World · Estúdio' : 'Super Feka Gaps World';
+        let storage: Storage | null = null;
+        try {
+            storage = ephemeral ? null : localStorage;
+        }
+        catch { }
+        this.store = new ProgressStore(storage);
+        this.audio = new WorldAudio(this.store.save.preferences);
+        this.selection = Math.max(0, STAGES.findIndex(s => s.id === this.store.save.selected));
+        window.addEventListener('keydown', e => this.menuKey(e));
+        canvas.addEventListener('pointerdown', e => {
+            this.audio.unlock();
+            const r = canvas.getBoundingClientRect();
+            if (this.state === 'playing') {
+                if ((e.clientY - r.top) * 180 / r.height < 23)
+                    this.pause();
+                return;
+            }
+            const x = (e.clientX - r.left) * 320 / r.width, y = (e.clientY - r.top) * 180 / r.height;
+            const hit = this.buttons.find(b => x >= b.x && x <= b.x + b.width && y >= b.y && y <= b.y + b.height);
+            hit?.run();
+        });
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && this.state === 'playing')
+                this.pause();
+        });
+        (window as unknown as {
+            worldGame: WorldGame;
+        }).worldGame = this;
+    }
+    start() { this.last = performance.now(); requestAnimationFrame(this.loop); }
+    private loop = (now: number) => {
+        const dt = document.hidden ? 0 : Math.min(100, now - this.last);
+        this.last = now;
+        this.accumulator += dt;
+        while (this.accumulator >= 1000 / 60) {
+            this.update(1000 / 60);
+            this.accumulator -= 1000 / 60;
+        }
+        this.renderer.setFrameInterpolation(this.state === 'playing' ? this.accumulator : 0);
+        this.render();
+        requestAnimationFrame(this.loop);
+    };
+    private change(screen: Screen) { this.state = screen; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; }
+    private menuKey(e: KeyboardEvent) {
+        const target = e.target;
+        if (target instanceof HTMLElement && target.id !== 'game-canvas' && (target.matches('input,textarea,select') || target.isContentEditable))
+            return;
+        if (this.state === 'playing')
+            return;
+        if (!['Enter', ' ', 'Escape', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'a', 'd', 'w', 's'].includes(e.key) || e.repeat)
+            return;
+        e.preventDefault();
+        this.audio.unlock();
+        if (this.state === 'map') {
+            const shift = e.key === 'ArrowLeft' || e.key === 'a' ? -1 : e.key === 'ArrowRight' || e.key === 'd' ? 1 : e.key === 'ArrowUp' || e.key === 'w' ? -5 : e.key === 'ArrowDown' || e.key === 's' ? 5 : 0;
+            if (shift) {
+                this.selection = clamp(this.selection + shift, 0, 29);
+                this.audio.sfx('coin');
+            }
+            if (e.key === 'Enter' || e.key === ' ')
+                this.enterSelected();
+            if (e.key === 'Escape')
+                this.change('title');
+            return;
+        }
+        if (e.key === 'Escape') {
+            if (this.state === 'paused')
+                this.resume();
+            else if (this.state === 'settings')
+                this.closeSettings();
+            else if (this.state === 'dialogue')
+                this.closeDialogue();
+            else
+                this.toMap();
+            return;
+        }
+        if (e.key === 'ArrowDown' || e.key === 's')
+            this.menuSelection = (this.menuSelection + 1) % Math.max(1, this.buttons.length);
+        else if (e.key === 'ArrowUp' || e.key === 'w')
+            this.menuSelection = (this.menuSelection + this.buttons.length - 1) % Math.max(1, this.buttons.length);
+        else if (e.key === 'Enter' || e.key === ' ')
+            this.buttons[this.menuSelection]?.run();
+    }
+    private begin() {
+        this.audio.unlock();
+        if (!this.store.save.seen.includes('opening')) {
+            this.introPage = 0;
+            this.change('intro');
+            this.audio.select(1);
+            this.audio.say('feka', 'Yasmin precisa de mim. É hora de uma grande aventura!');
+        }
+        else
+            this.toMap();
+    }
+    private nextIntro() {
+        if (++this.introPage >= 2) {
+            this.store.save.seen.push('opening');
+            this.store.persist();
+            this.toMap();
+        }
+        else
+            this.audio.say('joao', 'Aqui é o João, namorado da Yasmin.', 'aqui_e_o_joao_namorado_da_yasmin');
+    }
+    private enterSelected() {
+        const s = STAGES[this.selection];
+        if (!isUnlocked(s.id, this.store.save)) {
+            this.toast = 'Conclua o caminho anterior.';
+            this.toastTimer = 2000;
+            return;
+        }
+        this.load(s.id, true);
+    }
+    /** Loads authored campaign data. Public for the in-repo editor and deterministic browser QA. */
+    load(id: string, resume = false, custom?: AdventureStage) {
+        const stage = custom ?? stageById(id);
+        if (!stage)
+            throw Error('Fase não encontrada');
+        this.stage = stage;
+        this.level = new WorldLevel(stage.level);
+        this.objects = new WorldObjects(stage.mechanisms);
+        this.level.bodies = this.objects.bodies;
+        this.toastTimer = 0;
+        this.foes = stage.foes.map(f => new WorldFoe(f));
+        this.boss = stage.encounter ? new BossEncounter(stage.encounter) : null;
+        this.sparks = [];
+        this.hitStop = 0;
+        this.collected = new Set();
+        this.spoken = new Set();
+        this.checkpoint = -1;
+        this.checkpointHelmet = false;
+        this.elapsed = 0;
+        this.coins = 0;
+        this.store.save.selected = stage.id;
+        const saved = resume && this.store.save.checkpoint?.stage === stage.id ? this.store.save.checkpoint : null;
+        if (!saved)
+            this.store.save.checkpoint = null;
+        if (saved && stage.checkpoints[saved.index]) {
+            this.checkpoint = saved.index;
+            this.checkpointHelmet = saved.helmet;
+        }
+        const spawn = this.checkpoint >= 0 ? stage.checkpoints[this.checkpoint] : stage.level.playerSpawn;
+        this.player = new Player(spawn.x, spawn.y);
+        this.deathFeedbackStarted = false;
+        this.audio.setDying(false);
+        this.player.data.hasHelmet = this.checkpointHelmet;
+        this.camera.bounds = this.level.getBounds();
+        this.camera.x = clamp(this.player.data.position.x - 100, 0, Math.max(0, this.level.data.width * 16 - 320));
+        this.camera.y = clamp(this.player.data.position.y - 112, 0, this.level.data.height * 16 - 180);
+        if (this.boss) {
+            this.camera.x = 0;
+            this.camera.y = 64;
+        }
+        this.change('playing');
+        this.audio.pause(false);
+        this.audio.select(stage.world, !!this.boss);
+        if (stage.encounter)
+            for (const d of stage.dialogues)
+                this.spoken.add(d.id);
+        if (stage.encounter && !this.store.save.seen.includes(`intro:${stage.id}`)) {
+            this.showDialogue(stage.dialogues[0]);
+            this.store.save.seen.push(`intro:${stage.id}`);
+            this.store.persist();
+        }
+    }
+    private toMap() { this.audio.cancelSpeech(); this.audio.setDying(false); this.audio.pause(false); this.change('map'); this.selection = Math.max(0, STAGES.findIndex(s => s.id === this.store.save.selected)); this.audio.select(0); this.store.persist(); }
+    private pause() { this.change('paused'); this.audio.pause(true); }
+    private resume() { this.change('playing'); this.audio.pause(false); }
+    private showDialogue(d: Dialogue) { this.dialog = d; this.dialogueTime = 0; this.spoken.add(d.id); this.change('dialogue'); this.audio.say(d.speaker, d.text, d.clip); }
+    private closeDialogue() {
+        if (this.dialog && this.dialogueTime < this.dialog.text.length * 34) {
+            this.dialogueTime = 10000;
+            this.audio.cancelSpeech();
+            return;
+        }
+        this.dialog = null;
+        this.audio.cancelSpeech();
+        this.change('playing');
+    }
+    private particle(x: number, y: number, color: string, count = 9) {
+        for (let i = 0; i < count; i++) {
+            const angle = i / count * Math.PI * 2;
+            this.sparks.push({ x, y, vx: Math.cos(angle) * 1.6, vy: Math.sin(angle) * 1.6 - 1.5, life: 450 + i % 3 * 70, color });
+        }
+    }
+    private hurt(sourceX?: number) {
+        if (this.player.data.invincibleTimer > 0 || this.player.data.miniFantaTimer > 0 || this.player.data.isDead)
+            return;
+        const result = this.player.takeDamage();
+        this.audio.sfx('hit');
+        if (result.damaged) {
+            this.player.die('hit', sourceX);
+            this.beginDeathFeedback();
+        }
+        else
+            this.particle(this.player.data.position.x, this.player.data.position.y, '#f4d58e');
+    }
+    private beginDeathFeedback() {
+        if (this.deathFeedbackStarted)
+            return;
+        this.deathFeedbackStarted = true;
+        this.audio.cancelSpeech();
+        this.audio.setDying(true);
+        this.audio.sfx(this.player.data.deathKind === 'fall' ? 'fall' : 'death');
+    }
+    private restart() {
+        const index = this.checkpoint, helmet = this.checkpointHelmet, elapsed = this.elapsed, coins = this.coins;
+        if (index >= 0)
+            this.store.save.checkpoint = { stage: this.stage.id, index, helmet };
+        else
+            this.store.save.checkpoint = null;
+        this.load(this.stage.id, true, this.stage);
+        this.elapsed = elapsed;
+        this.coins = coins;
+        this.player.data.invincibleTimer = 1500;
+        this.player.data.respawnRevealTimer = PLAYER_RESPAWN_REVEAL_MS;
+    }
+    update(dt: number) {
+        this.input.setMenuMode(this.state !== 'playing');
+        this.input.update();
+        if (this.input.consumeMute())
+            this.audio.toggle();
+        const frozen = this.state === 'paused' || this.state === 'settings';
+        if (!frozen) {
+            this.time += dt;
+            this.renderer.advanceClock(dt);
+        }
+        if (this.state === 'map')
+            this.mapMarkerX += (40 + (STAGES[this.selection].number - 1) * 60 - this.mapMarkerX) * .16;
+        this.audio.tick(dt);
+        this.toastTimer = Math.max(0, this.toastTimer - dt);
+        if (this.state === 'dialogue') {
+            this.dialogueTime += dt;
+            return;
+        }
+        if (this.state === 'clear') {
+            this.clearTimer += dt;
+            return;
+        }
+        if (this.state !== 'playing')
+            return;
+        if (this.input.consumePause()) {
+            this.pause();
+            return;
+        }
+        if (this.hitStop > 0) {
+            this.hitStop = Math.max(0, this.hitStop - dt);
+            return;
+        }
+        if(this.boss?.phase==='defeated') {
+            this.level.updateDynamicTiles(dt);
+            this.player.update(dt,{...this.input.getState(),left:false,right:false,run:false,jump:false,jumpPressed:false,jumpReleased:false,down:false,downPressed:false},this.level);
+            this.boss.update(dt,this.player.getRect(),this.objects,this.level);
+            this.updateSparks(dt);
+            if(this.boss.timer>1150)this.complete(false);
+            return;
+        }
+        this.elapsed += dt / 1000;
+        this.camera.shakeTimer = Math.max(0, this.camera.shakeTimer - dt);
+        if (this.player.data.isDead) {
+            this.beginDeathFeedback();
+            this.player.advanceDeath(dt);
+            if (this.player.data.deathTimerMax - this.player.data.deathTimer >= DEATH_HIT_STOP_MS)
+                this.updateSparks(dt);
+            if (this.player.data.deathTimer <= 0)
+                this.restart();
+            return;
+        }
+        if ((this.player.data.respawnRevealTimer ?? 0) > 0) {
+            this.player.update(dt, this.input.getState(), this.level);
+            return;
+        }
+        const previous = this.player.getRect(), beforeV = this.player.data.velocity.y, wasGrounded = this.player.data.isGrounded;
+        this.level.clearFallingPlatformTouches();
+        this.level.updateDynamicTiles(dt);
+        this.objects.update(dt, this.level, previous.x);
+        if (this.player.data.isGrounded) {
+            this.player.data.position = this.level.transport(previous);
+            const belt = this.level.beltAt(this.player.getRect());
+            if (belt) {
+                const dx = (belt.direction ?? 1) * (belt.active ? -1 : 1) * 1.2;
+                this.player.data.position = this.level.resolveCollision(this.player.getRect(), { x: dx, y: 0 }, this.player.getRect()).position;
+            }
+        }
+        const input = this.input.getState();
+        const result = this.player.update(dt, input, this.level);
+        if (!wasGrounded && this.player.data.isGrounded && beforeV > 4) {
+            this.particle(this.player.data.position.x + 7, this.player.data.position.y + this.player.data.height, '#d6ccb0', 5);
+            this.audio.sfx('land');
+        }
+        if (this.player.data.isDead) {
+            this.beginDeathFeedback();
+            return;
+        }
+        if (beforeV >= 0 && this.player.data.velocity.y < 0 && input.jumpPressed)
+            this.audio.sfx('jump');
+        if (result.groundPoundImpact) {
+            const p = result.groundPoundImpact;
+            this.objects.pound(p.x, p.y);
+            this.renderer.addImpact(p.x, p.y, 'pound');
+            this.camera.shakeTimer = 130;
+            this.audio.sfx('pound');
+            this.particle(p.x, p.y, '#ecc78e');
+            for (let col = p.col - 1; col <= p.col + 1; col++)
+                if (this.level.getTile(col, p.row) === T.BRICK_BREAKABLE)
+                    this.level.breakTile(col, p.row);
+        }
+        if (result.tileHit?.side === 'top') {
+            const h = result.tileHit;
+            if (h.type === T.BRICK_BREAKABLE) {
+                this.level.breakTile(h.col, h.row);
+                this.audio.sfx('break');
+            }
+        }
+        const p = this.player.getRect();
+        if (this.player.data.isGrounded) {
+            const c = this.level.worldToCol(p.x + p.width / 2), r = this.level.worldToRow(p.y + p.height + 1);
+            if (this.level.getTile(c, r) === T.PLATFORM_FALLING)
+                this.level.markFallingPlatformContact(c, r);
+        }
+        this.level.updateFallingPlatforms(dt);
+        const bossPhase = this.boss?.phase;
+        this.boss?.update(dt, p, this.objects, this.level);
+        if (this.boss?.phase === 'warning' && bossPhase !== 'warning')
+            this.audio.sfx('warning');
+        if (this.level.checkSpikeCollision(p) || this.level.checkLavaCollision(p))
+            this.hurt();
+        for (const b of this.objects.bodies)
+            if (b.kind === 'jet' && this.objects.jetState(b) === 'active' && overlaps(p, b))
+                this.hurt(b.x + b.width / 2);
+        for (const b of this.objects.barrels)
+            if (b.life > 0 && overlaps(p, b))
+                this.hurt(b.x + b.width / 2);
+        if (this.player.data.isDead)
+            return;
+        for (const event of this.objects.events) {
+            this.audio.sfx(event.kind);
+            this.particle(event.x, event.y, '#d8b4ed');
+        }
+        const falling = this.player.data.velocity.y > 0 || beforeV > 0, pound = this.player.data.groundPoundState === GroundPoundState.FALL;
+        for (const enemy of this.foes) {
+            if (Math.abs(enemy.x - p.x) > 500)
+                continue;
+            enemy.update(dt, this.level, this.objects, p);
+            const contact = enemy.contact(p, previous, falling, pound);
+            if (contact === 'hurt')
+                this.hurt(enemy.x + enemy.width / 2);
+            else if (contact === 'bounce' || contact === 'kill') {
+                this.bounce(enemy.y);
+                if (contact === 'bounce' && enemy.phase === 'stunned') {
+                    this.audio.sfx('break');
+                    this.particle(enemy.x, enemy.y, '#eec478', 7);
+                }
+                if (contact === 'kill') {
+                    this.particle(enemy.x, enemy.y, '#ee9c83');
+                    this.audio.sfx('hit');
+                }
+            }
+            if (this.player.data.isDead)
+                return;
+        }
+        if (this.boss) {
+            if (this.boss.impact) {
+                this.camera.shakeTimer = 200;
+                this.audio.sfx('pound');
+                this.renderer.addImpact(this.boss.targetX, 224, 'boss');
+            }
+            if (this.boss.danger && overlaps(p, this.boss.danger))
+                this.hurt(this.boss.danger.x + this.boss.danger.width / 2);
+            if (this.player.data.isDead)
+                return;
+            const contact = this.boss.contact(p, previous, falling);
+            if (contact === 'hurt')
+                this.hurt(this.boss.x + this.boss.width / 2);
+            else if (contact !== 'none') {
+                this.bounce(this.boss.y);
+                if (contact === 'hit' || contact === 'defeated') {
+                    this.particle(this.boss.x, this.boss.y, '#f6d893', 16);
+                    this.audio.sfx('hit');
+                    this.hitStop = 70;
+                    this.camera.shakeTimer = 180;
+                    if (this.boss.character === 'joao')
+                        this.audio.say('joao', 'Porra nenhuma.', 'porra_nenhuma');
+                }
+                if (contact === 'defeated') {
+                    this.objects.barrels = [];
+                    this.particle(this.boss.x + 15, this.boss.y + 12, '#eecb8e', 24);
+                }
+            }
+        }
+        if (this.player.data.isDead)
+            return;
+        for (const item of this.stage.pickups) {
+            if (this.collected.has(item.id) || item.kind === 'seal' && this.store.save.seals.includes(item.id))
+                continue;
+            if (overlaps(p, { x: item.x, y: item.y, width: 16, height: 18 })) {
+                this.collected.add(item.id);
+                if (item.kind === 'seal') {
+                    this.store.collect(item.id);
+                    this.audio.sfx('seal');
+                    this.particle(item.x, item.y, '#ffe1a1', 14);
+                }
+                else if (item.kind === 'helmet') {
+                    this.player.collectHelmet();
+                    this.audio.sfx('checkpoint');
+                }
+                else if (item.kind === 'fanta') {
+                    this.player.collectMiniFanta();
+                    this.audio.sfx('seal');
+                }
+                else {
+                    this.coins++;
+                    this.audio.sfx('coin');
+                    this.particle(item.x, item.y, '#f5cf82', 4);
+                }
+            }
+        }
+        this.stage.checkpoints.forEach((cp, i) => {
+            if (i > this.checkpoint && Math.abs(p.x - cp.x * 16) < 20 && Math.abs(p.y + p.height - cp.y * 16) < 24) {
+                this.checkpoint = i;
+                this.checkpointHelmet = this.player.data.hasHelmet;
+                this.store.save.checkpoint = { stage: this.stage.id, index: i, helmet: this.checkpointHelmet };
+                this.store.persist();
+                this.audio.sfx('checkpoint');
+                if (!this.boss) {
+                    this.toast = 'CAMINHO GUARDADO';
+                    this.toastTimer = 1500;
+                }
+            }
+        });
+        for (const exit of this.stage.exits)
+            if (overlaps(p, exit) && (!exit.requires || this.objects.get(exit.requires)?.active)) {
+                this.complete(exit.id === 'secret');
+                return;
+            }
+        for (const d of this.stage.dialogues)
+            if (!this.spoken.has(d.id) && Math.abs(p.x - d.x) < 22 && this.player.data.isGrounded) {
+                this.showDialogue(d);
+                break;
+            }
+        if (!this.boss) {
+            this.camera.x += (clamp(p.x - 125 + this.player.data.velocity.x * 12, 0, Math.max(0, this.level.data.width * 16 - 320)) - this.camera.x) * .12;
+            const screenY = p.y - this.camera.y;
+            const targetY = this.player.data.isGrounded ? p.y - 108 : screenY < 48 ? p.y - 48 : screenY > 132 ? p.y - 132 : this.camera.y;
+            this.camera.y += (clamp(targetY, 0, this.level.data.height * 16 - 180) - this.camera.y) * .12;
+        }
+        this.updateSparks(dt);
+    }
+    private updateSparks(dt: number) {
+        for (const s of this.sparks) {
+            s.life -= dt;
+            s.x += s.vx;
+            s.y += s.vy;
+            s.vy += .055;
+        }
+        this.sparks = this.sparks.filter(s => s.life > 0);
+    }
+    private bounce(y: number) { if (this.player.data.isDead)
+        return; this.player.data.position.y = y - this.player.data.height; this.player.data.velocity.y = -7; this.player.data.isGrounded = false; this.player.data.groundPoundState = GroundPoundState.NONE; this.player.data.invincibleTimer = Math.max(150, this.player.data.invincibleTimer); }
+    private complete(secret: boolean) { finishStage(this.store.save, this.stage.id, secret ? 'secret' : 'normal', this.elapsed); this.store.persist(); this.clearSecret = secret; this.clearTimer = 0; this.change('clear'); this.audio.sfx('victory'); }
+    private afterClear() {
+        if (this.stage.id === '6-5') {
+            this.change('ending');
+            this.audio.select(6);
+            this.audio.say('feka', 'Uma vitória e tanto!');
+        }
+        else
+            this.toMap();
+    }
+    private button(c: CanvasRenderingContext2D, label: string, x: number, y: number, w: number, run: () => void, accent = ART.goldLight) { const selected = this.buttons.length === this.menuSelection; panel(c, x, y, w, 17, selected ? '#334b62' : '#202d43', selected ? accent : '#637888'); pixelText(c, fitText(label, w - 10), x + w / 2, y + 5, selected ? accent : ART.paper, 1, 'center'); this.buttons.push({ x, y, width: w, height: 17, run }); }
+    private heading(c: CanvasRenderingContext2D, small: string, big: string) { pixelText(c, small, 160, 12, '#c4d7d8', 1, 'center'); pixelText(c, big, 161, 29, '#343651', 2, 'center'); pixelText(c, big, 160, 27, '#ffdf94', 2, 'center'); }
+    private text(c: CanvasRenderingContext2D, text: string, x: number, y: number, width: number, color: string = ART.paper) { wrapText(text, width).forEach((line, i) => pixelText(c, line, x, y + i * 10, color)); }
+    render() {
+        this.renderer.startScene();
+        this.buttons = [];
+        const c = this.renderer.getContext();
+        if (['playing', 'paused', 'dialogue', 'clear'].includes(this.state))
+            this.renderLevel(c);
+        else if (this.state === 'map')
+            this.renderMap(c);
+        else if (this.state === 'title')
+            this.renderTitle(c);
+        else if (this.state === 'intro' || this.state === 'ending')
+            this.renderStory(c);
+        else if (this.state === 'gallery')
+            this.renderGallery(c);
+        else
+            this.renderSettings(c);
+        if (this.state === 'paused') {
+            rect(c, 0, 0, 320, 180, '#172338cc');
+            panel(c, 63, 29, 194, 128);
+            pixelText(c, 'UM RESPIRO', 160, 42, ART.goldLight, 2, 'center');
+            this.button(c, 'CONTINUAR', 84, 68, 152, () => this.resume());
+            this.button(c, 'VOLTAR AO MAPA', 84, 90, 152, () => this.toMap());
+            this.button(c, 'OPÇÕES', 84, 112, 152, () => this.settings('paused'));
+            this.button(c, 'EXPORTAR PROGRESSO', 84, 134, 152, () => this.exportSave());
+        }
+        if (this.state === 'dialogue' && this.dialog) {
+            panel(c, 12, 104, 296, 69, '#202d43', '#aac1cd');
+            pixelText(c, this.dialog.speaker.toUpperCase(), 24, 113, ISLANDS[this.stage.world - 1].accent);
+            this.text(c, this.dialog.text.slice(0, Math.floor(this.dialogueTime / 34)), 24, 127, 270);
+            this.button(c, 'CONTINUAR', 215, 150, 80, () => this.closeDialogue());
+        }
+        if (this.state === 'clear') {
+            panel(c, 32, 38, 256, 109);
+            pixelText(c, this.clearSecret ? 'CAMINHO SECRETO!' : 'FASE CONCLUÍDA!', 160, 51, ART.goldLight, 2, 'center');
+            pixelText(c, fitText(this.stage.name, 230), 160, 75, ART.paper, 1, 'center');
+            pixelText(c, `${Math.round(this.elapsed)} S  ·  ${this.coins} MOEDAS`, 160, 94, '#a7c9d0', 1, 'center');
+            this.button(c, this.stage.id === '6-5' ? 'O GRANDE FINAL' : 'SEGUIR VIAGEM', 86, 120, 148, () => this.afterClear());
+        }
+        if (this.toastTimer > 0 && this.state !== 'dialogue') {
+            panel(c, 35, 29, 250, 19);
+            pixelText(c, fitText(this.toast, 238), 160, 35, ART.goldLight, 1, 'center');
+        }
+        if (this.state === 'playing') {
+            this.renderer.drawTouchControls();
+            this.renderer.drawPlayerTransition(this.player.data, this.camera);
+        }
+        this.renderer.present();
+    }
+    private renderLevel(c: CanvasRenderingContext2D) {
+        const shake = this.store.save.preferences.shake && this.camera.shakeTimer > 0 ? (Math.floor(this.time / 40) % 2 ? 1 : -1) : 0;
+        const view = { ...this.camera, x: this.camera.x + shake, y: this.camera.y };
+        const cx = Math.round(view.x), cy = Math.round(view.y), island = ISLANDS[this.stage.world - 1];
+        this.art.background(c, island, cx, cy, this.time);
+        if (!this.boss)
+            drawLandmarks(c, this.stage, cx, cy, this.time);
+        else
+            this.art.arena(c, this.boss, cx, cy, this.time);
+        this.art.terrain(c, this.level, island, cx, cy, this.time);
+        drawLandmarks(c, this.stage, cx, cy, this.time, true);
+        this.art.objects(c, this.objects, cx, cy, this.time);
+        for (const cp of this.stage.checkpoints) {
+            const x = cp.x * 16 - cx, y = cp.y * 16 - cy;
+            rect(c, x, y - 35, 2, 35, '#f0dbc0');
+            rect(c, x + 2, y - 34, 15, 10, this.checkpoint >= this.stage.checkpoints.indexOf(cp) ? '#86d2ad' : '#788b9a');
+        }
+        for (const exit of this.stage.exits) {
+            const x = exit.x - cx, y = exit.y - cy;
+            if (exit.requires && !this.objects.get(exit.requires)?.active) {
+                rect(c, x, y, 20, 36, '#547187');
+                pixelText(c, '↓', x + 10, y + 8, '#f5dca0', 1, 'center');
+                continue;
+            }
+            rect(c, x + 8, y, 2, 40, '#f2dcc0');
+            rect(c, x + 10, y + 1, 17, 12, exit.id === 'secret' ? '#b48ddc' : '#e57e76');
+            pixelText(c, exit.id === 'secret' ? '?' : '★', x + 18, y + 4, '#fff1c9', 1, 'center');
+        }
+        for (const item of this.stage.pickups) {
+            if (this.collected.has(item.id))
+                continue;
+            const x = item.x - cx, y = item.y - cy;
+            if (x < -20 || x > 340)
+                continue;
+            if (item.kind === 'seal')
+                this.art.seal(c, x, y, this.time, this.store.save.seals.includes(item.id));
+            else if (item.kind === 'coin')
+                this.renderer.drawCoin(x, y, this.time, c);
+            else if (item.kind === 'helmet')
+                this.renderer.drawHelmet(x, y, c);
+            else
+                this.renderer.drawFanta(x, y, this.time, c);
+        }
+        for (const e of this.foes)
+            this.art.foe(c, e, cx, cy, this.time);
+        if (this.boss)
+            this.art.boss(c, this.boss, cx, cy, this.time);
+        this.renderer.drawPlayer(this.player.data, view);
+        this.renderer.drawFallingPlatforms(this.level.getFallingPlatformRenderData(), view);
+        this.renderer.drawWorldEffects(view);
+        for (const s of this.sparks) {
+            c.globalAlpha = Math.min(1, s.life / 180);
+            rect(c, s.x - cx, s.y - cy, 2, 2, s.color);
+        }
+        c.globalAlpha = 1;
+        rect(c, 0, 0, 320, 23, '#1b2940');
+        rect(c, 0, 22, 320, 1, island.accent);
+        pixelText(c, this.stage.id, 8, 8, island.accent);
+        pixelText(c, fitText(this.stage.name, this.boss ? 150 : 170), 40, 8, ART.paper);
+        const count = this.store.save.seals.filter(id => id.startsWith(this.stage.id + ':')).length;
+        pixelText(c, this.boss ? fitText(this.boss.name, 70) : `${count}/3`, 246, 8, ART.goldLight, 1, 'center');
+        pixelText(c, 'II', 305, 8, ART.paper);
+        if (this.boss) {
+            panel(c, 64, 26, 192, 24);
+            const boss = this.boss;
+            for (let i = 0; i < boss.maxHealth; i++)
+                rect(c, 123 + i * 16, 30, 12, 4, i < boss.health ? '#f1a479' : '#4c5264');
+            pixelText(c, fitText(boss.hint, 184), 160, 40, '#e5d6c3', 1, 'center');
+        }
+        else if (this.player.data.hasHelmet)
+            this.renderer.drawHelmet(283, 4, c);
+        if (this.state === 'paused')
+            this.renderer.drawPlayerTransition(this.player.data, view, c);
+    }
+    private renderTitle(c: CanvasRenderingContext2D) {
+        this.art.background(c, ISLANDS[0], this.time * .008, 0, this.time);
+        rect(c, 0, 157, 320, 23, '#364d57');
+        rect(c, 0, 155, 320, 3, '#a7c784');
+        this.heading(c, 'TORBWARE APRESENTA', 'SUPER FEKA GAPS');
+        pixelText(c, 'WORLD', 161, 55, '#395472', 3, 'center');
+        pixelText(c, 'WORLD', 160, 53, '#faf0b8', 3, 'center');
+        pixelText(c, 'SEIS ILHAS. UMA GRANDE MISSÃO?', 160, 86, '#30475b', 1, 'center');
+        this.art.atlas.draw(c, PLAYER_SPRITES.idle, PLAYER_PALETTE, 32, 130);
+        this.art.atlas.draw(c, bossFrame('joao', 'idle'), WORLD_PALETTE, 252, 109);
+        this.button(c, this.store.save.completed.length ? 'CONTINUAR AVENTURA' : 'COMEÇAR AVENTURA', 80, 103, 160, () => this.begin());
+        this.button(c, 'GALERIA', 80, 124, 76, () => this.change('gallery'));
+        this.button(c, 'OPÇÕES', 164, 124, 76, () => this.settings('title'));
+        this.button(c, 'JOGAR O ORIGINAL', 99, 149, 122, () => { location.href = '?classic=true'; });
+        pixelText(c, 'ENTER PARA CONFIRMAR · SETAS PARA ESCOLHER', 160, 172, '#d1d6c2', 1, 'center');
+    }
+    private renderMap(c: CanvasRenderingContext2D) {
+        const selected = STAGES[this.selection], island = ISLANDS[selected.world - 1];
+        rect(c, 0, 0, 320, 180, '#376780');
+        for (let i = 0; i < 85; i++)
+            rect(c, (i * 71 + Math.floor(this.time / 220)) % 320, 35 + i % 19 * 6, 5 + i % 9, 1, '#4c8495');
+        for (let i = 0; i < 5; i++) {
+            const a = ISLANDS[i].map, b = ISLANDS[i + 1].map;
+            for (let k = 0; k < 12; k++) {
+                const t = k / 12;
+                rect(c, a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, 2, 2, this.store.save.completed.includes(`${i + 1}-5`) ? '#e5dcb0' : '#65889b');
+            }
+        }
+        for (const w of ISLANDS) {
+            this.art.island(c, w, w.id === selected.world, this.time);
+            this.buttons.push({ x: w.map[0] - 23, y: w.map[1] - 30, width: 46, height: 47, run: () => { this.selection = (w.id - 1) * 5; } });
+        }
+        rect(c, 0, 0, 320, 26, '#1c2e45');
+        pixelText(c, `${selected.world} · ${island.name}`, 10, 7, island.accent);
+        pixelText(c, `${this.store.save.completed.length}/30  ${this.store.save.seals.length}/72`, 310, 17, '#bdcfd5', 1, 'right');
+        rect(c, 0, 128, 320, 52, '#1e3046');
+        for (let n = 1; n <= 5; n++) {
+            const id = `${selected.world}-${n}`, x = 40 + (n - 1) * 60, open = isUnlocked(id, this.store.save), done = this.store.save.completed.includes(id);
+            if (n < 5)
+                rect(c, x + 9, 138, 43, 2, '#637885');
+            rect(c, x - 8, 131, 17, 16, selected.number === n ? island.accent : done ? '#6aab93' : open ? '#597e95' : '#344557');
+            pixelText(c, String(n), x, 136, selected.number === n ? '#253c50' : ART.paper, 1, 'center');
+            this.buttons.push({ x: x - 16, y: 126, width: 32, height: 27, run: () => { this.selection = (selected.world - 1) * 5 + n - 1; } });
+        }
+        if (this.store.save.secrets.includes(`${selected.world}-3`)) {
+            for (let x = 165; x < 280; x += 7)
+                rect(c, x, 123, 3, 1, '#cbabe9');
+            rect(c, 160, 124, 1, 7, '#cbabe9');
+            rect(c, 280, 124, 1, 7, '#cbabe9');
+        }
+        this.art.atlas.draw(c, Math.abs(this.mapMarkerX - (40 + (selected.number - 1) * 60)) > 2 ? PLAYER_WALK[Math.floor(this.time / 90) % 6] : PLAYER_SPRITES.idle, PLAYER_PALETTE, this.mapMarkerX - 8, 101);
+        pixelText(c, fitText(selected.name, 280), 160, 154, ART.paper, 1, 'center');
+        this.button(c, '←', 5, 96, 23, () => { this.selection = (Math.max(1, selected.world - 1) - 1) * 5; });
+        this.button(c, '→', 292, 96, 23, () => { this.selection = (Math.min(6, selected.world + 1) - 1) * 5; });
+        this.button(c, isUnlocked(selected.id, this.store.save) ? 'JOGAR' : 'BLOQUEADA', 221, 161, 91, () => this.enterSelected());
+        this.button(c, 'MENU', 8, 161, 52, () => this.change('title'));
+        pixelText(c, this.store.save.secrets.includes(`${selected.world}-3`) ? 'ATALHO DESCOBERTO' : 'PROCURE NOVOS CAMINHOS', 139, 167, '#b4cbd2', 1, 'center');
+        if (this.store.warning)
+            this.text(c, this.store.warning, 12, 29, 294, '#ffe0a5');
+    }
+    private renderStory(c: CanvasRenderingContext2D) {
+        this.art.background(c, ISLANDS[this.state === 'ending' ? 5 : 0], 0, 0, this.time);
+        rect(c, 0, 135, 320, 45, '#556d66');
+        rect(c, 0, 134, 320, 2, '#bfd0a0');
+        const ending = this.state === 'ending';
+        this.art.atlas.draw(c, ending ? PLAYER_SPRITES.celebrate : PLAYER_SPRITES.idle, PLAYER_PALETTE, ending ? 125 : 54, 108);
+        this.art.atlas.draw(c, YASMIN_FRAMES[Math.floor(this.time / 600) % 2], SPRITE_PALETTE, ending ? 169 : 225, 104);
+        this.art.atlas.draw(c, bossFrame('joao', ending ? 'hurt' : 'idle'), WORLD_PALETTE, ending ? 262 : 252, 87);
+        panel(c, 18, 12, 284, 78, '#25344c', '#d2bb8e');
+        pixelText(c, ending ? 'UMA VITÓRIA E TANTO!' : 'UMA GRANDE AVENTURA', 160, 23, ART.goldLight, 1, 'center');
+        const text = ending ? 'FEKA SALVOU YASMIN?' : this.introPage === 0 ? 'João e Yasmin partiram para o arquipélago. Feka sabe o que precisa fazer.' : 'Feka ajeita os óculos e parte. Nenhum gap vai impedir essa grande missão!';
+        this.text(c, text, 31, 44, 258);
+        if (ending)
+            pixelText(c, `${this.store.save.completed.length}/30 FASES · ${this.store.save.seals.length}/72 SELOS`, 160, 72, '#b2d4d4', 1, 'center');
+        this.button(c, ending ? 'CONTINUAR EXPLORANDO' : 'SEGUIR VIAGEM', 72, 151, 176, () => ending ? this.toMap() : this.nextIntro());
+    }
+    private renderGallery(c: CanvasRenderingContext2D) {
+        if (this.galleryWorld) {
+            const w = ISLANDS[this.galleryWorld - 1];
+            this.art.background(c, w, 0, 0, this.time);
+            panel(c, 12, 12, 296, 50);
+            pixelText(c, w.name, 160, 22, w.accent, 1, 'center');
+            this.text(c, w.description, 24, 38, 270);
+            this.art.atlas.draw(c, bossFrame(w.boss, 'idle'), WORLD_PALETTE, 137, 90);
+            this.button(c, 'OUTRAS ILHAS', 100, 153, 120, () => { this.galleryWorld = 0; });
+            return;
+        }
+        rect(c, 0, 0, 320, 180, '#1e2f45');
+        this.heading(c, 'CADERNO DA AVENTURA', 'AS SEIS ILHAS');
+        for (let i = 0; i < 6; i++) {
+            const w = ISLANDS[i], x = 10 + (i % 3) * 104, y = 58 + Math.floor(i / 3) * 44, count = this.store.save.seals.filter(id => id.startsWith(`${i + 1}-`)).length;
+            panel(c, x, y, 96, 38, this.menuSelection === i ? '#435f72' : '#2c4156', w.accent);
+            pixelText(c, fitText(w.name, 86), x + 48, y + 6, w.accent, 1, 'center');
+            pixelText(c, `${count}/12 SELOS`, x + 48, y + 20, ART.paper, 1, 'center');
+            this.buttons.push({ x, y, width: 96, height: 38, run: () => {
+                    if (count === 12) {
+                        this.galleryWorld = i + 1;
+                        this.menuSelection = 0;
+                    }
+                    else {
+                        this.toast = 'Encontre os 12 selos desta ilha.';
+                        this.toastTimer = 1800;
+                    }
+                } });
+        }
+        this.button(c, 'VOLTAR', 114, 153, 92, () => this.change('title'));
+    }
+    private settings(from: Screen) { this.settingReturn = from; this.pausedAudio = from === 'paused'; this.audio.pause(false); this.change('settings'); }
+    private closeSettings() {
+        this.store.persist();
+        this.change(this.settingReturn);
+        if (this.pausedAudio)
+            this.audio.pause(true);
+    }
+    private renderSettings(c: CanvasRenderingContext2D) {
+        rect(c, 0, 0, 320, 180, '#1e2e44');
+        this.heading(c, 'DO SEU JEITO', 'OPÇÕES');
+        const prefs = this.store.save.preferences;
+        (['music', 'effects', 'voice'] as const).forEach((key, i) => { const label = ['MÚSICA', 'EFEITOS', 'VOZES'][i]; this.button(c, `${label}: ${Math.round(prefs[key] * 100)}%`, 62, 55 + i * 23, 196, () => { prefs[key] = prefs[key] >= .99 ? 0 : Math.min(1, Math.round((prefs[key] + .25) * 100) / 100); this.audio.volume(); this.store.persist(); }); });
+        this.button(c, 'EXPORTAR SAVE', 10, 127, 98, () => this.exportSave());
+        this.button(c, 'IMPORTAR SAVE', 112, 127, 98, () => this.importSave());
+        this.button(c, prefs.shake ? 'TREMOR: SIM' : 'TREMOR: NÃO', 214, 127, 96, () => { prefs.shake = !prefs.shake; this.store.persist(); });
+        this.button(c, 'VOLTAR', 114, 153, 92, () => this.closeSettings());
+    }
+    private exportSave() { const url = URL.createObjectURL(new Blob([JSON.stringify(this.store.save, null, 2)], { type: 'application/json' })); const a = document.createElement('a'); a.href = url; a.download = 'super-feka-gaps-world-save.json'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); }
+    private importSave() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = async () => {
+            const file = input.files?.[0];
+            if (!file)
+                return;
+            try {
+                const text = await file.text();
+                parseSave(text);
+                this.store.import(text);
+                this.audio.preferences = this.store.save.preferences;
+                this.audio.volume();
+                this.toast = 'Progresso importado.';
+                this.toastTimer = 2500;
+            }
+            catch {
+                this.toast = 'Arquivo de progresso inválido.';
+                this.toastTimer = 3000;
+            }
+        };
+        input.click();
+    }
+}

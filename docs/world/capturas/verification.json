@@ -1,0 +1,29 @@
+{
+  "browser": "152.0.7977.82",
+  "checks": [
+    "Opening reaches the island map using keyboard",
+    "Locked level cannot start",
+    "Keyboard moves Feka",
+    "Pause preserves the rendered scene",
+    "All authored sprite frames export with native dimensions",
+    "Unique seal survives browser reload",
+    "Save is versioned",
+    "World editor exposes campaign and mechanism authoring",
+    "Editor applies authored JSON to runtime",
+    "Editor undo restores original stage",
+    "Editor exports the edited data",
+    "Editor clamps camera to selected arena",
+    "World editor preview runs",
+    "Editor preview does not change real progress",
+    "Touch starts the opening",
+    "Touch direction moves Feka",
+    "Asset gallery loads all 17 images",
+    "All ten music previews are available",
+    "Enemy preview reflects selectable animation states",
+    "All 24 routes are selectable as native panoramas",
+    "No browser runtime errors"
+  ],
+  "errors": [],
+  "stagedViews": "World and boss captures use authored data with staged camera/player positions; they are not evidence of full playthroughs.",
+  "spriteFrames": 140
+}

@@ -1,5 +1,6 @@
 import { ART } from '../graphics/palette';
 import { PixelGrid } from '../graphics/pixels';
+import type { DeathPose } from '../graphics/playerDeathMotion';
 
 export const PLAYER_PALETTE: Record<string, string | null> = {
   _: null, K: ART.ink, H: ART.hair, h: ART.hairLight,
@@ -16,16 +17,22 @@ export const PLAYER_HITBOX_H = 24;
 export const PLAYER_RENDER_OFFSET_X = -1;
 export const PLAYER_RENDER_OFFSET_Y = -2;
 
-type Pose = 'idle' | 'walk' | 'jump' | 'fall' | 'windup' | 'sit' | 'land' | 'hurt' | 'deathImpact' | 'deathCrouch' | 'deathRise' | 'deathFall' | 'celebrate';
+type Pose = 'idle' | 'walk' | 'jump' | 'fall' | 'windup' | 'sit' | 'land' | 'hurt' | DeathPose | 'celebrate';
 function hero(pose: Pose, frame = 0): string[] {
   const g = new PixelGrid(16, 26);
   const dying = pose.startsWith('death');
   const seated = pose === 'sit' || pose === 'land' || pose === 'deathCrouch';
-  const headY = seated ? 7 : pose === 'windup' ? 3 : pose === 'deathImpact' ? 2 : pose === 'walk' && frame % 3 === 1 ? 1 : 0;
-  const hipY = seated ? 23 : 19;
+  const headY = seated ? 7 : pose === 'deathRecoil' ? 4 : pose === 'windup' ? 3 : pose === 'deathImpact' ? 2 : pose === 'deathApex' ? 1 : pose === 'walk' && frame % 3 === 1 ? 1 : 0;
+  const hipY = seated ? 23 : pose === 'deathRecoil' ? 21 : 19;
   if (seated) {
     g.rect(3,21,11,4,'K').rect(4,21,9,2,'D').rect(2,24,5,2,'K').rect(10,24,5,2,'K');
     g.rect(3,24,3,1,'G').rect(11,24,3,1,'G');
+  } else if (pose === 'deathRecoil') {
+    g.rect(3,20,5,4,'K').rect(4,21,3,2,'D').rect(2,24,6,2,'K').rect(3,24,4,1,'G');
+    g.rect(9,20,5,4,'K').rect(10,21,3,2,'B').rect(9,24,6,2,'K').rect(10,24,4,1,'G');
+  } else if (pose === 'deathApex') {
+    g.rect(3,18,5,5,'K').rect(4,19,3,3,'D').rect(1,22,6,2,'K').rect(2,22,4,1,'G');
+    g.rect(9,18,5,5,'K').rect(10,19,3,3,'B').rect(10,22,6,2,'K').rect(11,22,4,1,'G');
   } else if (pose === 'deathRise') {
     g.rect(2,19,5,4,'K').rect(3,20,3,2,'D').rect(1,22,6,3,'K').rect(2,22,4,1,'G');
     g.rect(10,19,5,4,'K').rect(11,20,3,2,'B').rect(10,22,6,3,'K').rect(11,22,4,1,'G');
@@ -47,13 +54,19 @@ function hero(pose: Pose, frame = 0): string[] {
     g.rect(4,18,4,7,'K').rect(10,18,4,7,'K').rect(5,19,2,5,'D').rect(11,19,2,5,'B');
     g.rect(3,24,5,2,'K').rect(10,24,6,2,'K').rect(4,24,3,1,'G').rect(11,24,3,1,'G');
   }
-  const bodyY = seated ? 17 : 11 + Math.min(headY, 2);
+  const bodyY = seated ? 17 : pose === 'deathRecoil' ? 15 : 11 + Math.min(headY, 2);
   g.rect(4,bodyY,9,hipY-bodyY+2,'K').rect(5,bodyY+1,7,hipY-bodyY,'B');
   g.rect(5,bodyY+1,5,2,'b').rect(10,bodyY+3,2,Math.max(1,hipY-bodyY-2),'D');
   g.rect(5,hipY,7,1,'D').dot(8,hipY,'y');
   if (pose === 'deathImpact') {
     g.rect(0,bodyY+1,5,3,'K').rect(1,bodyY+1,3,1,'D').rect(0,bodyY+3,2,2,'s');
     g.rect(12,bodyY+1,4,3,'K').rect(13,bodyY+1,2,1,'B').rect(14,bodyY+3,2,2,'L');
+  } else if (pose === 'deathLaunch') {
+    g.rect(1,bodyY-3,4,8,'K').rect(2,bodyY-3,2,3,'S').rect(2,bodyY+1,2,3,'D');
+    g.rect(12,bodyY-3,4,8,'K').rect(13,bodyY-3,2,3,'L').rect(13,bodyY+1,2,3,'B');
+  } else if (pose === 'deathApex') {
+    g.rect(0,bodyY,5,4,'K').rect(0,bodyY,2,2,'S').rect(2,bodyY+2,2,1,'D');
+    g.rect(12,bodyY,4,4,'K').rect(14,bodyY,2,2,'L').rect(13,bodyY+2,2,1,'B');
   } else if (pose === 'deathRise') {
     g.rect(0,bodyY-2,5,5,'K').rect(1,bodyY-3,2,3,'S').rect(2,bodyY+1,2,1,'D');
     g.rect(12,bodyY-2,4,5,'K').rect(13,bodyY-3,2,3,'L').rect(13,bodyY+1,2,1,'B');
@@ -100,7 +113,8 @@ export const PLAYER_SPRITES = {
   jump: hero('jump'), fall: hero('fall'), windup: hero('windup'), sit: hero('sit'),
   land: hero('land'), hurt: hero('hurt'),
   deathImpact: hero('deathImpact'), deathCrouch: hero('deathCrouch'),
-  deathRise: hero('deathRise'), deathFall: hero('deathFall'),
+  deathRecoil: hero('deathRecoil'), deathLaunch: hero('deathLaunch'),
+  deathRise: hero('deathRise'), deathApex: hero('deathApex'), deathFall: hero('deathFall'),
   celebrate: hero('celebrate'), helmet,
 };
 export const PLAYER_WALK = [PLAYER_SPRITES.walk1,PLAYER_SPRITES.walk2,PLAYER_SPRITES.walk3,PLAYER_SPRITES.walk4,PLAYER_SPRITES.walk5,PLAYER_SPRITES.walk6];

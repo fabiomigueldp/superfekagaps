@@ -4,7 +4,7 @@ import {
   GRAVITY, MAX_FALL_SPEED, PLAYER_SPEED, PLAYER_RUN_SPEED,
   PLAYER_JUMP_FORCE, PLAYER_ACCELERATION, PLAYER_FRICTION,
   ICE_FRICTION, COYOTE_TIME, JUMP_BUFFER_TIME, TILE_SIZE, TileType,
-  SPRING_BOOST, PLAYER_DEATH_MS, PLAYER_RESPAWN_REVEAL_MS,
+  SPRING_BOOST, PLAYER_DEATH_MS, PLAYER_FALL_DEATH_MS, PLAYER_RESPAWN_REVEAL_MS,
   GP_WINDUP_MS, GP_RECOVERY_MS, GP_FALL_SPEED, GP_HORIZONTAL_MULT
 } from '../constants';
 import { PlayerData, InputState, Vector2, Rect, GroundPoundState } from '../types';
@@ -53,6 +53,11 @@ export class Player {
     landedTile?: { type: number; col: number; row: number } | null
   } {
     if (this.data.isDead) return {};
+    if ((this.data.respawnRevealTimer ?? 0) > 0) {
+      // The opening shot belongs to the player: protection starts when controls return.
+      this.data.respawnRevealTimer = Math.max(0, this.data.respawnRevealTimer! - deltaTime);
+      return {};
+    }
 
     // Salva estado anterior para sweep tests de contato
     const prevRect = this.getRect();
@@ -63,7 +68,6 @@ export class Player {
 
     // Atualiza timers
     this.updateTimers(deltaTime);
-    if ((this.data.respawnRevealTimer ?? 0) > 0) return {};
     this.data.animationTimer += deltaTime;
 
     // Processa Ground Pound
@@ -176,7 +180,6 @@ export class Player {
   }
 
   private updateTimers(deltaTime: number): void {
-    this.data.respawnRevealTimer = Math.max(0, (this.data.respawnRevealTimer ?? 0) - deltaTime);
     this.data.landingTimer = Math.max(0, (this.data.landingTimer ?? 0) - deltaTime);
     // Coyote time
     if (this.data.isGrounded) {
@@ -382,19 +385,32 @@ export class Player {
     return { damaged: true, helmetUsed: false };
   }
 
-  die(kind: 'hit' | 'fall' = 'hit'): void {
+  die(kind: 'hit' | 'fall' = 'hit', sourceX?: number): void {
     if (this.data.isDead) return;
     this.data.isDead = true;
     this.data.deathKind = kind;
-    this.data.deathTimerMax = PLAYER_DEATH_MS;
-    this.data.deathTimer = PLAYER_DEATH_MS;
+    this.data.deathOrigin = { ...this.data.position };
+    this.data.deathWasGrounded = this.data.isGrounded;
+    this.data.deathDirection = sourceX === undefined || sourceX === this.getCenter().x
+      ? (this.data.facingRight ? -1 : 1) : (this.getCenter().x < sourceX ? -1 : 1);
+    this.data.deathTimerMax = kind === 'fall' ? PLAYER_FALL_DEATH_MS : PLAYER_DEATH_MS;
+    this.data.deathTimer = this.data.deathTimerMax;
     this.data.velocity = { x: 0, y: 0 };
+    this.data.groundPoundState = GroundPoundState.NONE;
+    this.data.groundPoundTimer = 0;
+    this.data.jumpBufferTimer = 0;
   }
 
   respawn(position: Vector2): void {
     this.reset(position.x, position.y);
     this.data.invincibleTimer = 2000; // 2 segundos de invencibilidade
     this.data.respawnRevealTimer = PLAYER_RESPAWN_REVEAL_MS;
+  }
+
+  advanceDeath(deltaTime: number): void {
+    if (!this.data.isDead) return;
+    const remaining = this.data.deathTimer - Math.max(0, deltaTime);
+    this.data.deathTimer = remaining > 0.000001 ? remaining : 0;
   }
 
   collectMiniFanta(): void {
@@ -432,6 +448,7 @@ export class Player {
 
   // Bounce após stomp
   bounce(): void {
+    if (this.data.isDead) return;
     this.data.velocity.y = PLAYER_JUMP_FORCE * 0.6;
     this.data.isJumping = true;
   }
@@ -443,6 +460,9 @@ export class Player {
     this.data.deathTimer = 0;
     this.data.deathTimerMax = 0;
     this.data.deathKind = undefined;
+    this.data.deathOrigin = undefined;
+    this.data.deathDirection = undefined;
+    this.data.deathWasGrounded = undefined;
     this.data.respawnRevealTimer = 0;
     this.data.isGrounded = false;
     this.data.isJumping = false;

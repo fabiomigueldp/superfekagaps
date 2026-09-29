@@ -1,0 +1,136 @@
+{
+  "method": "Six staged encounters, fixed-step ordinary controls, no pickups or invincibility, no teleports after spawn.",
+  "results": [
+    {
+      "w": 1,
+      "state": "clear",
+      "hp": 0,
+      "minHp": 0,
+      "deaths": 0,
+      "traces": [
+        {
+          "i": 0,
+          "x": 32,
+          "y": 224,
+          "hp": 3,
+          "phase": "rest",
+          "target": 203,
+          "objs": []
+        }
+      ]
+    },
+    {
+      "w": 2,
+      "state": "clear",
+      "hp": 0,
+      "minHp": 0,
+      "deaths": 0,
+      "traces": [
+        {
+          "i": 0,
+          "x": 32,
+          "y": 224,
+          "hp": 3,
+          "phase": "rest",
+          "target": 48,
+          "objs": [
+            false,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "w": 3,
+      "state": "clear",
+      "hp": 0,
+      "minHp": 0,
+      "deaths": 0,
+      "traces": [
+        {
+          "i": 0,
+          "x": 32,
+          "y": 224,
+          "hp": 3,
+          "phase": "rest",
+          "target": 64,
+          "objs": [
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "w": 4,
+      "state": "clear",
+      "hp": 0,
+      "minHp": 0,
+      "deaths": 0,
+      "traces": [
+        {
+          "i": 0,
+          "x": 32,
+          "y": 224,
+          "hp": 4,
+          "phase": "rest",
+          "target": 48,
+          "objs": [
+            false,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "w": 5,
+      "state": "clear",
+      "hp": 0,
+      "minHp": 0,
+      "deaths": 0,
+      "traces": [
+        {
+          "i": 0,
+          "x": 32,
+          "y": 224,
+          "hp": 4,
+          "phase": "rest",
+          "target": 64,
+          "objs": [
+            false,
+            false
+          ]
+        },
+        {
+          "i": 2000,
+          "x": 60,
+          "y": 224,
+          "hp": 1,
+          "phase": "rest",
+          "target": 64,
+          "objs": [
+            false,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "w": 6,
+      "state": "clear",
+      "hp": 0,
+      "minHp": 0,
+      "deaths": 0,
+      "traces": [
+        {
+          "i": 0,
+          "x": 32,
+          "y": 224,
+          "hp": 4,
+          "phase": "rest",
+          "target": 239,
+          "objs": []
+        }
+      ]
+    }
+  ]
+}

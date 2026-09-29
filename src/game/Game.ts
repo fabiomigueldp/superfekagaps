@@ -5,7 +5,7 @@ import {
   INITIAL_LIVES, COIN_SCORE, ENEMY_SCORE, TIME_BONUS_MULTIPLIER, TileType,
   GP_IMPACT_RADIUS_PX, GP_SHAKE_MS, GP_SHAKE_MAG,
   BLOCK_BREAK_SCORE, BOSS_DEFEAT_SCORE, COINS_PER_LIFE, LIVES_BONUS_SCORE,
-  CULLING_MARGIN, PLAYER_DEATH_MS
+  CULLING_MARGIN
 } from '../constants';
 import {
   CameraData, Vector2, FlagData, CollectibleData,
@@ -16,6 +16,7 @@ import { Audio } from '../engine/Audio';
 import { Renderer } from '../engine/Renderer';
 import { ART } from '../graphics/palette';
 import { sceneZoom } from '../graphics/pixels';
+import { DEATH_HIT_STOP_MS } from '../graphics/playerDeathMotion';
 import { AudioVoicePlayer } from '../voice/AudioVoicePlayer';
 import { SpeechBubbleController } from '../voice/SpeechBubbleController';
 import { VoiceDirector } from '../voice/VoiceDirector';
@@ -142,6 +143,7 @@ export class Game {
       this.accumulator -= this.fixedDeltaTime;
     }
 
+    this.renderer.setFrameInterpolation(this.state === GameState.PLAYING ? this.accumulator : 0);
     this.render();
 
     requestAnimationFrame(this.gameLoop);
@@ -246,22 +248,23 @@ export class Game {
     // Atualiza tiles dinâmicos (gaps temporários do boss)
     const dtSeconds = deltaTime / 1000;
     this.totalRunTime += dtSeconds;
-    this.level.updateDynamicTiles(deltaTime);
-    this.level.clearFallingPlatformTouches();
 
     // Verifica se player está morto
     if (this.player.data.isDead) {
-      this.deathTimer -= deltaTime;
-      if (this.player.data.deathTimer > 0) {
-        this.player.data.deathTimer = Math.max(0, this.player.data.deathTimer - deltaTime);
-      }
-      this.updateParticles(deltaTime);
+      this.player.advanceDeath(deltaTime);
+      this.deathTimer = this.player.data.deathTimer;
+      if (this.player.data.deathTimerMax - this.deathTimer >= DEATH_HIT_STOP_MS) this.updateParticles(deltaTime);
       if (this.deathTimer <= 0) {
         this.handlePlayerDeath();
       }
-      this.level.updateFallingPlatforms(deltaTime);
       return;
     }
+    if ((this.player.data.respawnRevealTimer ?? 0) > 0) {
+      this.player.update(deltaTime, this.input.getState(), this.level);
+      return;
+    }
+    this.level.updateDynamicTiles(deltaTime);
+    this.level.clearFallingPlatformTouches();
 
     // A morte precisa terminar mesmo quando o cronômetro já chegou a zero.
     this.levelTime = Math.max(0, this.levelTime - dtSeconds);
@@ -377,10 +380,11 @@ export class Game {
     this.updateCamera(deltaTime);
 
     // Atualiza inimigos minion
-    this.minions.forEach(minion => {
+    for (const minion of this.minions) {
       minion.update(deltaTime, this.level!);
       this.checkMinionCollision(minion);
-    });
+      if (this.player.data.isDead) return;
+    }
 
     // Atualiza boss
     if (this.boss) {
@@ -425,6 +429,8 @@ export class Game {
         this.fireworkSpawnTimer = 100;
       }
     }
+
+    if (this.player.data.isDead) return;
 
     // Verifica coletáveis
     this.checkCollectibles(deltaTime);
@@ -1093,10 +1099,10 @@ export class Game {
             8
           );
         } else {
-          this.playerHit();
+          this.playerHit('other', minion.data.position.x + minion.data.width / 2);
         }
       } else {
-        this.playerHit();
+        this.playerHit('other', minion.data.position.x + minion.data.width / 2);
       }
     }
   }
@@ -1157,7 +1163,7 @@ export class Game {
     }
 
     if (this.player.data.invincibleTimer <= 0) {
-      this.playerHit('boss');
+      this.playerHit('boss', this.boss.getRect().x + this.boss.data.width / 2);
     }
   }
 
@@ -1390,7 +1396,7 @@ export class Game {
     }
   }
 
-  private playerHit(source: 'boss' | 'other' = 'other'): void {
+  private playerHit(source: 'boss' | 'other' = 'other', sourceX?: number): void {
     if (!this.player || this.player.data.invincibleTimer > 0) return;
 
     const damageResult = this.player.takeDamage();
@@ -1403,20 +1409,18 @@ export class Game {
 
     if (damageResult.damaged) {
       this.audio.playDamage();
-      this.playerDie(source);
+      this.playerDie(source, sourceX);
     }
   }
 
-  private playerDie(cause: 'boss' | 'other' = 'other'): void {
+  private playerDie(cause: 'boss' | 'other' = 'other', sourceX?: number): void {
     if (!this.player || (this.player.data.isDead && this.deathTimer > 0)) return;
 
-    if (!this.player.data.isDead) this.player.die();
+    if (!this.player.data.isDead) this.player.die('hit', sourceX);
     if (this.player.data.deathKind === 'fall') this.audio.playFall();
     else this.audio.playDeath();
     this.audio.onPlayerDeathStart();
-    this.deathTimer = PLAYER_DEATH_MS;
-    const center = this.player.getCenter();
-    this.spawnParticles(center.x, center.y, ART.paper, 12);
+    this.deathTimer = this.player.data.deathTimer;
 
     if (cause === 'boss') {
       this.triggerBossKillTaunt();
@@ -1444,6 +1448,7 @@ export class Game {
 
       const spawnPos = this.activeCheckpoint || this.level.data.playerSpawn;
       this.player.respawn(spawnPos);
+      this.activeCameraOverride = null;
       // The opening iris must reveal the checkpoint, even when it is far from the death camera.
       if (this.camera) {
         const zoom = sceneZoom(this.camera.zoom || 1);

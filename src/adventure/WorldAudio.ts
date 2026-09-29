@@ -1,0 +1,167 @@
+import type { Character, Preferences } from './types';
+export const MELODIES = [
+    [0, 4, 7, 9, 7, 4, 2, 4, 0, 4, 7, 12, 11, 7, 4, 2, 5, 9, 12, 14, 12, 9, 7, 5, 4, 7, 11, 9, 7, 4, 2, -1],
+    [0, 0, 7, 4, 0, 2, 4, 7, 9, 7, 4, 2, 0, -1, 2, 4, 5, 5, 12, 9, 5, 7, 9, 12, 11, 7, 4, 2, 0, -1, 7, -1],
+    [0, 7, 3, 10, 7, 3, 5, 7, 0, 3, 7, 12, 10, 7, 5, 3, 5, 12, 8, 15, 12, 8, 7, 5, 3, 10, 7, 5, 3, 2, 0, -1],
+    [0, -1, 7, 12, 11, -1, 7, 4, 2, -1, 9, 14, 12, -1, 9, 7, 5, -1, 12, 16, 14, -1, 12, 9, 7, 4, 2, 4, 0, -1, -1, -1],
+    [0, 7, 12, 15, 14, 12, 7, 3, 5, 12, 17, 15, 12, 8, 7, -1, 3, 10, 15, 19, 17, 15, 10, 7, 2, 7, 11, 14, 12, 7, 3, -1],
+    [0, 4, 7, 12, 11, 9, 7, 4, 5, 9, 12, 17, 16, 14, 12, 9, 7, 11, 14, 19, 17, 14, 11, 7, 0, 7, 12, 11, 9, 7, 4, 0],
+    [0, -1, 4, 7, 9, 7, 4, -1, 2, -1, 5, 9, 7, 5, 2, -1, 4, -1, 7, 11, 12, 11, 7, -1, 5, 4, 2, -1, 0, -1, -1, -1]
+];
+export function musicNotes(theme: number, step: number, boss = false) {
+    const index = boss ? ([0, 5].includes(theme) ? 5 : [1, 3].includes(theme) ? 1 : 2) : theme;
+    const tempo = boss ? (theme >= 3 ? .135 : .15) : [.2, .18, .16, .24, .23, .19, .22][theme];
+    const root = boss ? 155.56 : [261.63, 220, 233.08, 246.94, 261.63, 261.63, 261.63][theme];
+    const note = MELODIES[index][step % 32], minor = index === 2 || index === 4;
+    const chord = [0, 0, 5, 7][Math.floor(step / 8) % 4], notes: {
+        frequency: number;
+        duration: number;
+        type: OscillatorType;
+        volume: number;
+    }[] = [];
+    if (note >= 0)
+        notes.push({ frequency: root * 2 ** ((note + (Math.floor(step / 32) % 4 === 2 ? 12 : 0)) / 12), duration: tempo * 1.7, type: theme === 4 ? 'sine' : 'triangle', volume: .5 });
+    if (step % 4 === 0)
+        notes.push({ frequency: root / 2 * 2 ** (chord / 12), duration: tempo * 3, type: 'triangle', volume: .65 });
+    if (step % 2 === 0)
+        notes.push({ frequency: step % 4 === 0 ? 58 : 160, duration: tempo * .35, type: 'triangle', volume: .22 });
+    if (Math.floor(step / 32) % 2 === 1)
+        notes.push({ frequency: root * 2 ** ((chord + [0, minor ? 3 : 4, 7, 12][step % 4]) / 12), duration: tempo * 1.1, type: 'sine', volume: .12 });
+    return { tempo, notes };
+}
+export class WorldAudio {
+    private ctx: AudioContext | null = null;
+    private music: GainNode | null = null;
+    private effects: GainNode | null = null;
+    private voice: GainNode | null = null;
+    private next = 0;
+    private step = 0;
+    private theme = 0;
+    private boss = false;
+    private paused = false;
+    private dying = false;
+    private clip: HTMLAudioElement | null = null;
+    private speechAt = 0;
+    private speechIndex = 0;
+    private speaking: {
+        who: Character;
+        text: string;
+        at: number;
+    } | null = null;
+    enabled = true;
+    constructor(public preferences: Preferences) { }
+    unlock() { if (!this.ctx) {
+        try {
+            this.ctx = new AudioContext();
+            this.music = this.ctx.createGain();
+            this.effects = this.ctx.createGain();
+            this.voice = this.ctx.createGain();
+            for (const node of [this.music, this.effects, this.voice])
+                node.connect(this.ctx.destination);
+            this.volume();
+        }
+        catch {
+            return;
+        }
+    } void this.ctx.resume(); }
+    volume() { if (!this.ctx)
+        return; const now = this.ctx.currentTime; this.music!.gain.setTargetAtTime(this.enabled ? this.preferences.music * .14 * (this.dying ? .15 : 1) : 0, now, .06); this.effects!.gain.setTargetAtTime(this.enabled ? this.preferences.effects * .3 : 0, now, .02); this.voice!.gain.setTargetAtTime(this.enabled ? this.preferences.voice * .22 : 0, now, .02); if (this.clip)
+        this.clip.volume = this.enabled ? this.preferences.voice : 0; }
+    setDying(value: boolean) { this.dying = value; this.volume(); }
+    toggle() { this.enabled = !this.enabled; this.volume(); }
+    select(world: number, boss = false) { this.theme = world === 0 ? 6 : Math.max(0, world - 1); this.boss = boss; this.step = 0; this.next = this.ctx?.currentTime ?? 0; this.cancelSpeech(); }
+    pause(value: boolean) { this.paused = value; if (value) {
+        this.cancelSpeech();
+        if (this.ctx)
+            void this.ctx.suspend();
+    }
+    else {
+        this.unlock();
+        this.next = this.ctx?.currentTime ?? 0;
+    } }
+    private tone(freq: number, seconds: number, type: OscillatorType, gain: number, bus: GainNode | null, when?: number) {
+        if (!this.ctx || !bus || this.ctx.state !== 'running')
+            return;
+        const t = when ?? this.ctx.currentTime;
+        const osc = this.ctx.createOscillator(), env = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        env.gain.setValueAtTime(0, t);
+        env.gain.linearRampToValueAtTime(gain, t + .008);
+        env.gain.exponentialRampToValueAtTime(.001, t + seconds);
+        osc.connect(env);
+        env.connect(bus);
+        osc.start(t);
+        osc.stop(t + seconds + .015);
+        osc.onended = () => { osc.disconnect(); env.disconnect(); };
+    }
+    sfx(kind: string) {
+        const notes: Record<string, number[]> = { land:[100,75], jump: [400, 600], coin: [880, 1320], seal: [523, 659, 784, 1047], switch: [180, 360, 540], hit: [180, 70], death: [392, 330, 262, 196], fall: [320, 160, 70], break: [90, 60], checkpoint: [440, 660, 880], victory: [523, 659, 784, 1047], warning: [180, 180], pound: [100, 55] };
+        const ns = notes[kind] ?? [330];
+        ns.forEach((f, i) => this.tone(f, kind === 'death' ? .2 : .12, kind === 'pound' || kind === 'fall' ? 'triangle' : 'square', .22, this.effects, (this.ctx?.currentTime ?? 0) + i * (kind === 'death' ? .14 : .07)));
+    }
+    say(who: Character, text: string, clip?: string) {
+        this.cancelSpeech();
+        if (clip) {
+            const audio = new Audio(`${((import.meta as {
+                env?: {
+                    BASE_URL?: string;
+                };
+            }).env?.BASE_URL ?? '/')}assets/audio/vo/joaozao/${clip}_${({ aqui_e_o_joao_namorado_da_yasmin: '1.92', eu_sou_o_namorado_dela: '1.14', para_de_encher_o_saco: '0.96', porra_nenhuma: '0.36', sei_que_voce_quer: '0.66', voce_nao_vai_ter: '0.66' } as Record<string, string>)[clip]}s.ogg`);
+            audio.volume = this.enabled ? this.preferences.voice : 0;
+            this.clip = audio;
+            audio.play().catch(() => { this.speaking = { who, text, at: 0 }; });
+        }
+        else
+            this.speaking = { who, text, at: 0 };
+        this.speechIndex = 0;
+        this.speechAt = 0;
+    }
+    private vocal(pitch: number, unit: number) {
+        if (!this.ctx || !this.voice)
+            return;
+        const now = this.ctx.currentTime, source = this.ctx.createOscillator(), env = this.ctx.createGain();
+        source.type = 'sawtooth';
+        source.frequency.value = pitch;
+        const vowel = [[520, 1450], [700, 1100], [350, 1900], [430, 900]][unit % 4];
+        const filters = vowel.map(f => { const filter = this.ctx!.createBiquadFilter(); filter.type = 'bandpass'; filter.frequency.value = f; filter.Q.value = 3.5; source.connect(filter); filter.connect(env); return filter; });
+        env.gain.setValueAtTime(0, now);
+        env.gain.linearRampToValueAtTime(.22, now + .012);
+        env.gain.exponentialRampToValueAtTime(.001, now + .085);
+        env.connect(this.voice);
+        source.start(now);
+        source.stop(now + .09);
+        source.onended = () => { source.disconnect(); env.disconnect(); filters.forEach(f => f.disconnect()); };
+    }
+    cancelSpeech() { this.clip?.pause(); this.clip = null; this.speaking = null; }
+    tick(dt: number) {
+        if (!this.ctx || this.paused || this.ctx.state !== 'running')
+            return;
+        const now = this.ctx.currentTime;
+        if (this.next < now - .2)
+            this.next = now;
+        while (this.next < now + .07) {
+            const plan = musicNotes(this.theme, this.step, this.boss);
+            for (const n of plan.notes)
+                this.tone(n.frequency, n.duration, n.type, n.volume, this.music, this.next);
+            this.step++;
+            this.next += plan.tempo;
+        }
+        if (this.speaking) {
+            this.speechAt -= dt;
+            if (this.speechAt <= 0) {
+                const char = this.speaking.text[this.speechIndex++];
+                if (!char) {
+                    this.speaking = null;
+                    return;
+                }
+                this.speechAt = /[ .,!?]/.test(char) ? 110 : 60;
+                if (!/[ .,!?]/.test(char) && this.speechIndex % 2 === 0) {
+                    const root = { feka: 200, joao: 115, biel: 95, calabrezzo: 135, yasmin: 240 }[this.speaking.who];
+                    const pitch = root * (1 + (char.charCodeAt(0) % 7 - 3) * .035);
+                    this.vocal(pitch, char.charCodeAt(0));
+                }
+            }
+        }
+    }
+}

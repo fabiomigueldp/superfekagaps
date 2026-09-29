@@ -1,7 +1,7 @@
 import { GAME_WIDTH, GAME_HEIGHT, TILE_SIZE, TileType, FALLING_PLATFORM_FALL_MS, FALLING_PLATFORM_FALL_DISTANCE, PLAYER_RESPAWN_REVEAL_MS } from '../constants';
 import { CameraData, PlayerData, EnemyData, CollectibleData, FlagData, Particle, Firework, EnemyType, CollectibleType, GroundPoundState, SpeechBubbleRenderState, FallingPlatformPhase, LevelTheme, PaletteItem, LevelTrigger, TriggerType } from '../types';
 import { PLAYER_PALETTE, PLAYER_SPRITES, PLAYER_WALK } from '../assets/playerSpriteSpec';
-import { playerDeathMotion } from '../graphics/playerDeathMotion';
+import { playerDeathMotion, deathIrisProgress, DEATH_HIT_STOP_MS } from '../graphics/playerDeathMotion';
 import { ART, hashAt } from '../graphics/palette';
 import { SpriteAtlas, VisualClock, animationIndex, PixelFrame, sceneZoom } from '../graphics/pixels';
 import { TilePainter } from '../graphics/TilePainter';
@@ -37,6 +37,7 @@ export class Renderer {
   private debug=false;
   private zoom=1;
   private touch=false;
+  private interpolationMs=0;
 
   constructor() {
     this.canvas=document.getElementById('game-canvas') as HTMLCanvasElement;
@@ -57,6 +58,12 @@ export class Renderer {
   advanceClock(deltaMs:number):void {
     this.clock.advance(deltaMs);
     this.impacts=this.impacts.filter(p=>this.clock.time-p.time<350);
+  }
+  setFrameInterpolation(deltaMs:number):void {
+    this.interpolationMs=Math.max(0,Math.min(1000/60,deltaMs));
+  }
+  private deathElapsed(p:PlayerData):number {
+    return Math.min(p.deathTimerMax,p.deathTimerMax-p.deathTimer+(this.interpolationMs??0));
   }
   addImpact(x:number,y:number,kind:Impact['kind']):void {
     this.impacts.push({x,y,kind,time:this.clock.time});
@@ -139,17 +146,27 @@ export class Renderer {
     c.fillRect(Math.round(x)+2,Math.round(y)-2,Math.max(1,w-4),1);c.restore();
   }
   drawPlayer(p:PlayerData,camera:CameraData,ctx=this.offscreenCtx):void {
-    const x=Math.round(p.position.x)-Math.round(camera.x)-1,y=Math.round(p.position.y)-Math.round(camera.y)-2;
+    const position=p.isDead?(p.deathOrigin??p.position):p.position;
+    const x=Math.round(position.x)-Math.round(camera.x)-1,y=Math.round(position.y)-Math.round(camera.y)-2;
     if(p.isDead){
+      const elapsed=this.deathElapsed(p);
+      ctx.save();ctx.globalAlpha*=Math.min(.2,elapsed/160*.2);ctx.fillStyle=ART.ink;
+      ctx.fillRect(0,0,GAME_WIDTH/(this.zoom??1),GAME_HEIGHT/(this.zoom??1));ctx.restore();
       if(p.deathKind==='fall')return;
-      const elapsed=p.deathTimerMax-p.deathTimer;
-      const motion=playerDeathMotion(elapsed);
-      if(elapsed<300)this.drawPlayerBurst(ctx,x+8,y+13,elapsed/300,false);
+      const grounded=p.deathWasGrounded??p.isGrounded;
+      const direction=p.deathDirection??(p.facingRight?-1:1);
+      const motion=playerDeathMotion(elapsed,grounded,direction);
+      if(grounded && elapsed<650){
+        ctx.save();ctx.globalAlpha*=Math.max(0,1-elapsed/650);
+        const width=Math.round(Math.max(4,12+Math.min(0,motion.y)*.18));
+        this.shadow(ctx,x+8-width/2,y+26,width);ctx.restore();
+      }
+      if(elapsed<260)this.drawDeathImpact(ctx,x+8-direction*6,y+12,elapsed);
       if(motion.alpha<=0)return;
       ctx.save();
       ctx.globalAlpha*=motion.alpha;
       this.atlas.draw(ctx,PLAYER_SPRITES[motion.pose],PLAYER_PALETTE,
-        x+motion.x*(p.facingRight?1:-1),y+motion.y,!p.facingRight);
+        x+motion.x,y+motion.y,!p.facingRight,1,elapsed<45?ART.paper:undefined);
       ctx.restore();
       return;
     }
@@ -163,7 +180,7 @@ export class Renderer {
     }else if(this.clock.time%3400>3260)frame=PLAYER_SPRITES.blink;
     if(p.isGrounded)this.shadow(ctx,x+3,y+26,12);
     // Flash between complete palette variants; silhouette remains readable during invulnerability.
-    const tint=p.invincibleTimer>0&&animationIndex(p.invincibleTimer,2,90)===1?ART.paper:undefined;
+    const tint=!(p.respawnRevealTimer!>0)&&p.invincibleTimer>0&&animationIndex(p.invincibleTimer,2,90)===1?ART.paper:undefined;
     this.atlas.draw(ctx,frame,PLAYER_PALETTE,x,y,!p.facingRight,1,tint);
     if(p.hasHelmet)this.atlas.draw(ctx,PLAYER_SPRITES.helmet,PLAYER_PALETTE,x,y+headY-2,!p.facingRight);
     if(p.miniFantaTimer>0){
@@ -176,65 +193,65 @@ export class Renderer {
       ctx.fillStyle=ART.paper;ctx.fillRect(x-2,y+9,1,6);ctx.fillRect(x+18,y+5,1,8);
     }
     if((p.respawnRevealTimer??0)>0){
-      this.drawPlayerBurst(ctx,x+8,y+13,1-p.respawnRevealTimer!/PLAYER_RESPAWN_REVEAL_MS,true);
+      this.drawRespawnBurst(ctx,x+8,y+13,Math.min(1,1-(p.respawnRevealTimer!-(this.interpolationMs??0))/PLAYER_RESPAWN_REVEAL_MS));
     }
   }
-  private drawPlayerBurst(c:CanvasRenderingContext2D,x:number,y:number,progress:number,arrival:boolean):void {
-    const radius=Math.round(arrival?4+20*progress:3+13*progress);
-    c.save();c.globalAlpha*=arrival?Math.sin(Math.PI*progress):Math.max(0,1-progress);
+  private drawDeathImpact(c:CanvasRenderingContext2D,x:number,y:number,elapsed:number):void {
+    c.save();c.globalAlpha*=1-elapsed/260;
+    for(let i=0;i<6;i++){
+      const angle=i*Math.PI/3-.4,radius=4+elapsed*.055;
+      const px=Math.round(x+Math.cos(angle)*radius),py=Math.round(y+Math.sin(angle)*radius+elapsed*elapsed*.00009);
+      c.fillStyle=i%2?ART.goldLight:ART.paper;c.fillRect(px,py,2,2);
+    }
+    if(elapsed<DEATH_HIT_STOP_MS){
+      c.fillStyle=ART.paper;c.fillRect(x-5,y-1,11,2);c.fillRect(x-1,y-5,2,11);
+    }
+    c.restore();
+  }
+  private drawRespawnBurst(c:CanvasRenderingContext2D,x:number,y:number,progress:number):void {
+    const radius=Math.round(4+20*progress);
+    c.save();c.globalAlpha*=Math.sin(Math.PI*progress);
     for(let i=0;i<8;i++){
       const angle=i*Math.PI/4;
       const px=Math.round(x+Math.cos(angle)*radius),py=Math.round(y+Math.sin(angle)*radius);
       c.fillStyle=i%2?ART.goldLight:ART.paper;
       c.fillRect(px,py,i%2?2:3,2);
     }
-    c.fillStyle=arrival?ART.tealLight:ART.redLight;
+    c.fillStyle=ART.tealLight;
     c.fillRect(x-radius-2,y,3,1);c.fillRect(x+radius,y,3,1);
     c.fillRect(x,y-radius-2,1,3);c.fillRect(x,y+radius,1,3);
     c.restore();
   }
-  drawPlayerTransition(p:PlayerData,camera:CameraData):void {
+  drawPlayerTransition(p:PlayerData,camera:CameraData,ctx?:CanvasRenderingContext2D):void {
     if(!p.isDead && !(p.respawnRevealTimer && p.respawnRevealTimer>0))return;
-    this.screen(c=>{
-      if(p.isDead && p.deathKind==='fall'){
-        const elapsed=p.deathTimerMax-p.deathTimer;
-        if(elapsed<730){
-          const x=Math.max(12,Math.min(GAME_WIDTH-12,Math.round((p.position.x+p.width/2-camera.x)*this.zoom)));
-          c.save();c.globalAlpha=Math.max(0,1-elapsed/730);
-          for(let i=0;i<4;i++){
-            const y=Math.round(119+elapsed*.075-i*9);
-            c.fillStyle=i%2?ART.blueLight:ART.paper;c.fillRect(x+(i-2)*3,y,2,5);
-          }
-          c.restore();
-        }
-      }
-      const elapsed=p.deathTimerMax-p.deathTimer;
+    const draw=(c:CanvasRenderingContext2D)=>{
+      const elapsed=this.deathElapsed(p);
       const amount=p.isDead
-        ? Math.max(0,Math.min(1,(elapsed-(p.deathKind==='fall'?760:1080))/(p.deathKind==='fall'?740:420)))
-        : Math.max(0,Math.min(1,(p.respawnRevealTimer??0)/PLAYER_RESPAWN_REVEAL_MS));
+        ? deathIrisProgress(elapsed,p.deathKind??'hit',p.deathTimerMax)
+        : Math.max(0,Math.min(1,((p.respawnRevealTimer??0)-(this.interpolationMs??0))/PLAYER_RESPAWN_REVEAL_MS));
       if(amount<=0)return;
       const eased=amount*amount*(3-2*amount);
-      // A stepped iris gives the eye a destination and closes on the lost hero.
-      const centerX=Math.max(20,Math.min(GAME_WIDTH-20,Math.round((p.position.x+p.width/2-camera.x)*this.zoom)));
-      const centerY=Math.max(24,Math.min(GAME_HEIGHT-24,Math.round((p.position.y+p.height/2-camera.y)*this.zoom)));
+      // Native scanlines keep the iris smooth without introducing antialiasing.
+      const position=p.isDead?(p.deathOrigin??p.position):p.position;
+      const motion=p.isDead&&p.deathKind!=='fall'
+        ? playerDeathMotion(elapsed,p.deathWasGrounded??p.isGrounded,p.deathDirection??-1) : {x:0,y:0};
+      const centerX=Math.max(20,Math.min(GAME_WIDTH-20,Math.round((position.x+motion.x+p.width/2-camera.x)*this.zoom)));
+      const centerY=Math.max(24,Math.min(GAME_HEIGHT-24,Math.round((position.y+motion.y+p.height/2-camera.y)*this.zoom)));
       const farthestCorner=Math.max(
         Math.hypot(centerX,centerY),Math.hypot(GAME_WIDTH-centerX,centerY),
         Math.hypot(centerX,GAME_HEIGHT-centerY),Math.hypot(GAME_WIDTH-centerX,GAME_HEIGHT-centerY)
       );
       const radius=Math.ceil(farthestCorner*(1-eased));
       c.fillStyle=ART.ink;
-      for(let y=0;y<GAME_HEIGHT;y+=6){
-        const half=Math.floor(Math.sqrt(Math.max(0,radius*radius-(y+3-centerY)**2)));
-        if(half===0){c.fillRect(0,y,GAME_WIDTH,6);continue;}
+      for(let y=0;y<GAME_HEIGHT;y++){
+        const half=Math.floor(Math.sqrt(Math.max(0,radius*radius-(y+.5-centerY)**2)));
+        if(half===0){c.fillRect(0,y,GAME_WIDTH,1);continue;}
         const left=Math.max(0,centerX-half),right=Math.min(GAME_WIDTH,centerX+half);
-        if(left>0)c.fillRect(0,y,left,6);
-        if(right<GAME_WIDTH)c.fillRect(right,y,GAME_WIDTH-right,6);
-        c.fillStyle=p.isDead?ART.redLight:ART.tealLight;
-        if(left>0)c.fillRect(left-1,y,1,6);
-        if(right<GAME_WIDTH)c.fillRect(right,y,1,6);
-        c.fillStyle=ART.ink;
+        if(left>0)c.fillRect(0,y,left,1);
+        if(right<GAME_WIDTH)c.fillRect(right,y,GAME_WIDTH-right,1);
       }
-    });
+    };
+    if(ctx)draw(ctx);else this.screen(draw);
   }
   drawEnemy(e:EnemyData,camera:CameraData,ctx=this.offscreenCtx):void {
     if(!e.active)return;

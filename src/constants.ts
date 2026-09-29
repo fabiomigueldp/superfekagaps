@@ -18,6 +18,7 @@ export const PLAYER_SPEED = 2;
 export const PLAYER_RUN_SPEED = 3.5;
 export const PLAYER_JUMP_FORCE = -8;
 export const PLAYER_DEATH_MS = 1500;
+export const PLAYER_FALL_DEATH_MS = 1050;
 export const PLAYER_RESPAWN_REVEAL_MS = 420;
 export const PLAYER_ACCELERATION = 0.3;
 export const PLAYER_FRICTION = 0.85;

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test, type TestContext } from 'node:test';
 import { BackgroundGenerator } from '../src/engine/BackgroundGenerator';
 import { Renderer } from '../src/engine/Renderer';
-import { playerDeathMotion } from '../src/graphics/playerDeathMotion';
+import { playerDeathMotion, deathIrisProgress } from '../src/graphics/playerDeathMotion';
 import { PLAYER_SPRITES, PLAYER_PALETTE } from '../src/assets/playerSpriteSpec';
 import { SpriteAtlas, VisualClock, animationIndex } from '../src/graphics/pixels';
 import { terrainMask, lavaOffset } from '../src/graphics/TilePainter';
@@ -48,17 +48,42 @@ test('authored actors and items have stable frame bounds and complete palettes',
   assert.equal(new Set(COIN_FRAMES.map(f=>f.join(''))).size,4); // Narrowing and widening intentionally reuse artwork.
 });
 
-test('death pose remains readable through impact, tumble and disappearance',()=>{
-  const frames=[PLAYER_SPRITES.deathImpact,PLAYER_SPRITES.deathCrouch,PLAYER_SPRITES.deathRise,PLAYER_SPRITES.deathFall];
-  assert.equal(new Set(frames.map(frame=>frame.join(''))).size,4);
+test('death poses keep planted feet through recoil and describe a weighted arc',()=>{
+  const frames=[PLAYER_SPRITES.deathImpact,PLAYER_SPRITES.deathRecoil,PLAYER_SPRITES.deathCrouch,PLAYER_SPRITES.deathLaunch,PLAYER_SPRITES.deathRise,PLAYER_SPRITES.deathApex,PLAYER_SPRITES.deathFall];
+  assert.equal(new Set(frames.map(frame=>frame.join(''))).size,7);
   assert.ok(frames.every(frame=>frame.length===26 && frame.every(row=>row.length===16 && [...row].every(symbol=>symbol in PLAYER_PALETTE))));
-  const impact=playerDeathMotion(0),crouch=playerDeathMotion(120),lift=playerDeathMotion(500),fall=playerDeathMotion(900),gone=playerDeathMotion(1300);
+  const impact=playerDeathMotion(0),crouch=playerDeathMotion(110),lift=playerDeathMotion(300),apex=playerDeathMotion(420),fall=playerDeathMotion(700),gone=playerDeathMotion(1300);
   assert.equal(impact.y,0);
-  assert.ok(crouch.y>impact.y);
+  assert.equal(crouch.y,impact.y);
   assert.ok(lift.y<impact.y);
   assert.ok(fall.y>lift.y);
-  assert.deepEqual([impact.pose,crouch.pose,lift.pose,fall.pose],['deathImpact','deathCrouch','deathRise','deathFall']);
+  assert.ok(apex.y<lift.y);
+  assert.deepEqual([impact.pose,crouch.pose,lift.pose,apex.pose,fall.pose],['deathImpact','deathCrouch','deathRise','deathApex','deathFall']);
   assert.equal(gone.alpha,0);
+});
+
+test('airborne death skips the ground compression and recoil follows the hit direction',()=>{
+  assert.equal(playerDeathMotion(110,false).pose,'deathLaunch');
+  assert.ok(playerDeathMotion(110,false).y<0);
+  for(let t=0;t<900;t+=17){
+    const left=playerDeathMotion(t,true,-1),right=playerDeathMotion(t,true,1);
+    assert.equal(left.x===0?0:left.x,right.x===0?0:-right.x);
+    assert.equal(left.y,right.y);
+  }
+  const before=playerDeathMotion(129.99),after=playerDeathMotion(130.01);
+  assert.ok(Math.abs(before.y-after.y)<.01);
+  // Slowing at the apex, then accelerating into the fall, with no artificial fade.
+  assert.ok(Math.abs(playerDeathMotion(440).y-playerDeathMotion(420).y)<1);
+  assert.ok(playerDeathMotion(920).y-playerDeathMotion(900).y>6);
+  assert.equal(playerDeathMotion(1200).alpha,1);
+});
+
+test('both death paths hold complete black before the checkpoint switches',()=>{
+  for(const [kind,duration] of [['hit',1500],['fall',1050]] as const){
+    assert.equal(deathIrisProgress(0,kind,duration),0);
+    assert.equal(deathIrisProgress(duration-200,kind,duration),1);
+    assert.equal(deathIrisProgress(duration,kind,duration),1);
+  }
 });
 
 test('renderer draws every death phase with authored frames',(t)=>{
@@ -68,11 +93,11 @@ test('renderer draws every death phase with authored frames',(t)=>{
   Object.assign(renderer,{atlas:new SpriteAtlas(),offscreenCtx:target});
   const player={position:{x:90,y:80},width:14,height:24,facingRight:true,isDead:true,
     deathKind:'hit',deathTimerMax:1500,deathTimer:1500};
-  for(const elapsed of [0,120,350,900]){
+  for(const elapsed of [0,80,110,160,300,420,700]){
     player.deathTimer=1500-elapsed;
     renderer.drawPlayer(player,{x:0,y:0});
   }
-  assert.equal(target.images.length,4);
+  assert.equal(target.images.length,7);
 });
 
 test('sprite atlas caches by frame, palette, facing and tint without blending pixels',(t)=>{

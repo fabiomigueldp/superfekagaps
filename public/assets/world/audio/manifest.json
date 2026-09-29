@@ -1,0 +1,76 @@
+{
+  "source": "src/adventure/WorldAudio.ts",
+  "format": "PCM 16-bit mono 22050 Hz",
+  "tracks": [
+    {
+      "name": "mundo-1",
+      "theme": 0,
+      "boss": false,
+      "duration": 25.6,
+      "peak": 0.15785042941570282
+    },
+    {
+      "name": "mundo-2",
+      "theme": 1,
+      "boss": false,
+      "duration": 23.04,
+      "peak": 0.15756836533546448
+    },
+    {
+      "name": "mundo-3",
+      "theme": 2,
+      "boss": false,
+      "duration": 20.48,
+      "peak": 0.15732797980308533
+    },
+    {
+      "name": "mundo-4",
+      "theme": 3,
+      "boss": false,
+      "duration": 30.72,
+      "peak": 0.16343742609024048
+    },
+    {
+      "name": "mundo-5",
+      "theme": 4,
+      "boss": false,
+      "duration": 29.44,
+      "peak": 0.168108731508255
+    },
+    {
+      "name": "mundo-6",
+      "theme": 5,
+      "boss": false,
+      "duration": 24.32,
+      "peak": 0.1593528538942337
+    },
+    {
+      "name": "mapa",
+      "theme": 6,
+      "boss": false,
+      "duration": 28.16,
+      "peak": 0.16330961883068085
+    },
+    {
+      "name": "joaozao",
+      "theme": 0,
+      "boss": true,
+      "duration": 19.2,
+      "peak": 0.1571546345949173
+    },
+    {
+      "name": "bielzao",
+      "theme": 1,
+      "boss": true,
+      "duration": 19.2,
+      "peak": 0.14986562728881836
+    },
+    {
+      "name": "calabrezzo",
+      "theme": 2,
+      "boss": true,
+      "duration": 19.2,
+      "peak": 0.15973205864429474
+    }
+  ]
+}

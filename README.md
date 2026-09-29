@@ -10,6 +10,8 @@ Jogo de plataforma 2D em TypeScript, com engine própria, Canvas, Web Audio e ed
 
 **Jogue online:** [superfekagaps.torbware.space](https://superfekagaps.torbware.space/). Ao concluir a aventura com um novo recorde pessoal, você pode escolher um nome e publicar sua pontuação no [placar global](docs/scoreboard.md).
 
+**Super Feka Gaps World:** a versão local abre a sequência com seis mundos, 30 fases, novos chefes, mapa, progresso salvo e assets próprios. Veja o [estado da implementação](docs/world/implementacao.md), a [galeria de produção](docs/world/capturas/index.html) e o [documento de direção](docs/world/README.md). Use `?classic=true` para jogar o remaster original e `?worldEditor=true` para editar fases World. O endereço online acima não foi atualizado por esta implementação.
+
 ### Rodar o projeto
 
 Use uma versão do Node.js que atenda ao campo `engines` de [package.json](package.json).
