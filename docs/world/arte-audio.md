@@ -6,6 +6,8 @@
 
 Este é um briefing de produção. Nenhum sprite, composição musical ou voz nova é entregue por este documento. As capturas do remaster foram consultadas como referência; os arquivos de voz foram inventariados pelo manifesto, sem avaliação auditiva nesta etapa.
 
+**Atualização visual:** foram produzidas [13 pranchas de conceito](conceitos/index.html), com [análise, revisões de identidade e aplicação às 30 fases](conceitos/README.md). Elas detalham esta direção e servem de referência para a autoria dos próximos sprites e cenários.
+
 ## Direção visual
 
 Pixel art expressiva, mais luminosa e colorida que a campanha atual, mantendo a família visual do remaster. Escala de referência: 320 × 180, tiles de 16 × 16, luz principal superior esquerda e contorno escuro colorido nos atores. Fundo tem contraste menor; plano caminhável, perigos e personagens recebem a definição principal.

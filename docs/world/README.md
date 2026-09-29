@@ -4,6 +4,8 @@ Direção 0.1 · 29 de setembro de 2026 · Com implementação jogável
 
 Esta é a direção de trabalho para a sequência. Uma versão jogável foi implementada após a pré-produção: consulte o [estado da implementação](implementacao.md) e a [galeria de assets](capturas/index.html) para distinguir a entrega atual das metas de refinamento. A referência técnica é o projeto atual e sua [direção visual de produção](../graphics-v2/README.md).
 
+**Estudos visuais:** a [galeria de 13 pranchas de conceito](conceitos/index.html) apresenta os seis mundos, elenco, seis famílias de inimigos, seis confrontos e arquipélago. A [análise de direção e aplicação às fases](conceitos/README.md) orienta a próxima produção de assets; essas imagens ainda não são arte integrada ao runtime.
+
 ## Visão
 
 Uma aventura de plataforma cômica em seis ilhas, com caminhos no mapa, segredos e chefes recorrentes. Feka acredita que precisa salvar Yasmin e superar Joãozão. A apresentação celebra suas conquistas como as de um herói; os acontecimentos permitem perceber que ele está se intrometendo no namoro de Yasmin e João. Os gaps são obstáculos físicos, demonstrações da superioridade de João e oportunidades para Feka encontrar caminhos inesperados.

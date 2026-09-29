@@ -1,0 +1,280 @@
+{
+  "version": 1,
+  "date": "2026-09-29",
+  "tool": "image_gen.imagegen",
+  "mode": "built-in",
+  "count": 13,
+  "concepts": [
+    {
+      "id": "01-costa-dos-gaps",
+      "title": "Costa dos Gaps",
+      "category": "mundo",
+      "file": "imagens/01-costa-dos-gaps.png",
+      "tagline": "Pontes, arcos e caminhos sob as falésias.",
+      "description": "A grama marca os apoios; o farol e as formações de pedra dão direção à travessia.",
+      "palette": [
+        "#48BFC3",
+        "#79AF59",
+        "#EACB87"
+      ],
+      "assets": [
+        "Bordas de falésia com raízes",
+        "Ponte modular e arco de pedra",
+        "Espuma, flores e madeira costeira"
+      ],
+      "width": 1672,
+      "height": 941,
+      "bytes": 2146610,
+      "sha256": "eed9e3d39c9a80a9458cd283d1fab7e4f4a6e07e736d44a08229faec3dc31b3e",
+      "currentCapture": "../capturas/mundo-1.png",
+      "world": 1
+    },
+    {
+      "id": "02-porto-do-bielzao",
+      "title": "Porto do Bielzão",
+      "category": "mundo",
+      "file": "imagens/02-porto-do-bielzao.png",
+      "tagline": "Cargas que constroem o percurso.",
+      "description": "Contêineres formam degraus e túneis; guindastes dão uma função visível às plataformas móveis.",
+      "palette": [
+        "#437FA3",
+        "#E3B74E",
+        "#A96B4B"
+      ],
+      "assets": [
+        "Contêineres abertos e fechados",
+        "Polias, ganchos e apoios",
+        "Cais com amarras e barcos recuados"
+      ],
+      "width": 1672,
+      "height": 941,
+      "bytes": 2060129,
+      "sha256": "53b3742df94de7d68884021f4df1a2bff2d50d6321374ba713f1b2adde8c6ee9",
+      "currentCapture": "../capturas/mundo-2.png",
+      "world": 2
+    },
+    {
+      "id": "03-fabrica-de-suco",
+      "title": "Fábrica de Suco",
+      "category": "mundo",
+      "file": "imagens/03-fabrica-de-suco.png",
+      "tagline": "Suco roxo, metal azul e produção em movimento.",
+      "description": "A fábrica de Calabrezzo combina tanques fechados, cubas abertas, esteiras e uma marca de produto reconhecível.",
+      "palette": [
+        "#466D88",
+        "#A95ADF",
+        "#E6BEFA",
+        "#B7D957"
+      ],
+      "assets": [
+        "Tanques com vidro e líquido separado",
+        "Barris comum e pressurizado",
+        "Esteira reversível, válvula e manômetro"
+      ],
+      "width": 1672,
+      "height": 941,
+      "bytes": 1752942,
+      "sha256": "adcf815fcf9d0a6a5a473cae9bf01364c1fe0f2312a96209ee77a9e038008f41",
+      "currentCapture": "../capturas/mundo-3.png",
+      "world": 3
+    },
+    {
+      "id": "04-serra-suspensa",
+      "title": "Serra Suspensa",
+      "category": "mundo",
+      "file": "imagens/04-serra-suspensa.png",
+      "tagline": "Estações e ilhas de pedra sobre o vazio.",
+      "description": "Cabos, pinheiros e plataformas suspensas estruturam as transferências entre apoios.",
+      "palette": [
+        "#B4A4D5",
+        "#A9B7C2",
+        "#498576"
+      ],
+      "assets": [
+        "Estações e rodas de tensão",
+        "Cabines e plataformas de carga",
+        "Rochedos estreitos e pinheiros"
+      ],
+      "width": 1672,
+      "height": 941,
+      "bytes": 2235680,
+      "sha256": "5bacc6c788fbf36f05a96b0876c05554b04e6f19126b92e8ab6219e5d69ba343",
+      "currentCapture": "../capturas/mundo-4.png",
+      "world": 4
+    },
+    {
+      "id": "05-reserva-gelada",
+      "title": "Reserva Gelada",
+      "category": "mundo",
+      "file": "imagens/05-reserva-gelada.png",
+      "tagline": "O estoque frio da Fábrica de Suco.",
+      "description": "Portas isolantes, tubulações e gelo delimitado distinguem a reserva industrial dos demais ambientes.",
+      "palette": [
+        "#A6DDEB",
+        "#477292",
+        "#A95ADF"
+      ],
+      "assets": [
+        "Porta espessa de câmara fria",
+        "Piso seco e piso congelado",
+        "Tubos com geada e tanques de reserva"
+      ],
+      "width": 1672,
+      "height": 941,
+      "bytes": 2078273,
+      "sha256": "a99f7d6578d2e9fd722e8cc1157cce0be788f2095865e329c96677a4fcd23b85",
+      "currentCapture": "../capturas/mundo-5.png",
+      "world": 5
+    },
+    {
+      "id": "06-dominio-pizzarino",
+      "title": "Domínio Pizzarino",
+      "category": "mundo",
+      "file": "imagens/06-dominio-pizzarino.png",
+      "tagline": "Um jardim habitado no fim da aventura.",
+      "description": "Fornos, flores, terraços e a placa Y + J sustentam o subtexto; a ponte guarda a mecânica do confronto final.",
+      "palette": [
+        "#EBD7AD",
+        "#CD615D",
+        "#657FA3"
+      ],
+      "assets": [
+        "Arcos e apoios de ponte",
+        "Forno, telhados e vasos",
+        "Sinais discretos da vida do casal"
+      ],
+      "width": 1672,
+      "height": 941,
+      "bytes": 2234997,
+      "sha256": "2189c0ac586f1f396104d0e50e6ecd4d5875cf429e68328baa081d89e3155422",
+      "currentCapture": "../capturas/mundo-6.png",
+      "world": 6
+    },
+    {
+      "id": "07-elenco",
+      "title": "Elenco — silhueta e atuação",
+      "category": "personagem",
+      "file": "imagens/07-elenco.png",
+      "tagline": "Quatro silhuetas, quatro maneiras de agir.",
+      "description": "Feka confiante; João pesado; Calabrezzo teatral; Biel prático. Os dois novos chefes têm estudos de silhueta adicionais.",
+      "palette": [],
+      "assets": [
+        "Ajeitar óculos e recompor a pose",
+        "Preparação e recuperação de João",
+        "Pose comercial e operação de cargas"
+      ],
+      "width": 1672,
+      "height": 941,
+      "bytes": 1758552,
+      "sha256": "6bb179c2df5d5d7f6ccd1bea203415f5e5bdca1a006279914f5079285f584848"
+    },
+    {
+      "id": "08-inimigos-patrulha",
+      "title": "Inimigos — patrulha e investida",
+      "category": "inimigo",
+      "file": "imagens/08-inimigos-patrulha.png",
+      "tagline": "A forma antecipa a regra.",
+      "description": "Minion redondo, operário protegido pelo capacete e investidor inclinado para a corrida; poses mostram impacto e recuperação.",
+      "palette": [],
+      "assets": [
+        "Minion: passo, compressão e derrota",
+        "Operário: capacete removível",
+        "Investidor: aviso, corrida e cansaço"
+      ],
+      "width": 1672,
+      "height": 941,
+      "bytes": 1603337,
+      "sha256": "4a141f9cc2b563c2934eeeea0b03d1fe27f408229d59f29dd661f8019c1c8043"
+    },
+    {
+      "id": "09-inimigos-maquinas",
+      "title": "Inimigos — carga, cabo e pressão",
+      "category": "inimigo",
+      "file": "imagens/09-inimigos-maquinas.png",
+      "tagline": "Equipamento que explica o comportamento.",
+      "description": "O carregador usa boné e óculos; o guarda permanece preso ao trilho; o agitador expõe as pás e o motor.",
+      "palette": [],
+      "assets": [
+        "Carregador: erguer, soltar e recuar",
+        "Guarda: andar, frear e inverter",
+        "Agitador: preparar, girar e parar"
+      ],
+      "width": 1672,
+      "height": 941,
+      "bytes": 1681054,
+      "sha256": "94a89071f0cde58a6d7582ac8300ea1407474b6b8f49ed5cde37df32d925291e"
+    },
+    {
+      "id": "10-chefe-joaozao",
+      "title": "Joãozão — ponte e grande gap",
+      "category": "chefe",
+      "file": "imagens/10-chefe-joaozao.png",
+      "tagline": "A força de João muda o caminho.",
+      "description": "1-5: evitar o trecho marcado da ponte. 6-5: usar o impacto para formar uma rota de aproximação.",
+      "palette": [],
+      "assets": [
+        "Aviso de golpe e sombra fixa",
+        "Impacto, quebra e recomposição",
+        "Recuperação com cabeça acessível"
+      ],
+      "width": 1672,
+      "height": 941,
+      "bytes": 2251871,
+      "sha256": "bcddba4cdf11be44dbdb3c1cb1e8116b71feedb985c3d5f162ca179acdd78f65"
+    },
+    {
+      "id": "11-chefe-bielzao",
+      "title": "Bielzão — cargas e teleféricos",
+      "category": "chefe",
+      "file": "imagens/11-chefe-bielzao.png",
+      "tagline": "Altura, comandos e transferência.",
+      "description": "2-5: elevar os apoios. 4-5: transferir entre estações. Apoios seguros e carga perigosa precisam de formas distintas.",
+      "palette": [],
+      "assets": [
+        "Símbolos de comando e apoio",
+        "Esforço no controle do guindaste",
+        "Cabine, freio e carga de perigo"
+      ],
+      "width": 1672,
+      "height": 941,
+      "bytes": 2263984,
+      "sha256": "a7684ac8fd74b6fc01d8b5b6764a76f725616258f931a2e797e5b5bb90345250"
+    },
+    {
+      "id": "12-chefe-calabrezzo",
+      "title": "Calabrezzo — produção e reserva",
+      "category": "chefe",
+      "file": "imagens/12-chefe-calabrezzo.png",
+      "tagline": "Devolver a produção; abrir a reserva.",
+      "description": "3-5: inverter a esteira. 5-5: conduzir pressão ao alvo marcado. A atuação passa de confiança comercial a pane.",
+      "palette": [],
+      "assets": [
+        "Arremesso com soltura legível",
+        "Barril com válvula e cinta diagonal",
+        "Calhas, alvos de gelo e abertura"
+      ],
+      "width": 1672,
+      "height": 941,
+      "bytes": 2082823,
+      "sha256": "08fa2c91130a44d2fe3bd54df4babee99807fef36fc1408b8d188aa29e00b62e"
+    },
+    {
+      "id": "13-arquipelago",
+      "title": "Arquipélago — identidade e percurso",
+      "category": "mapa",
+      "file": "imagens/13-arquipelago.png",
+      "tagline": "Seis lugares ligados pela viagem.",
+      "description": "Cada ilha tem um marco próprio. A rota conecta Costa, Porto, Fábrica, Serra, Reserva e Domínio.",
+      "palette": [],
+      "assets": [
+        "Silhuetas e marcos das seis ilhas",
+        "Rotas de barco e de transporte",
+        "Ícones separados das trilhas de fases"
+      ],
+      "width": 1672,
+      "height": 941,
+      "bytes": 2830714,
+      "sha256": "19642e1245a0d279303e44d7ff30210f8e7176af38af50237472bccc86989c8c"
+    }
+  ]
+}
