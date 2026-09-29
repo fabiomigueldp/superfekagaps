@@ -4,7 +4,8 @@ import { EditorController } from '../src/editor/EditorController';
 import { EditorHistory } from '../src/editor/EditorHistory';
 import { fitLevelToContent, resizeLevel, screenToWorld } from '../src/editor/editorGeometry';
 import { TileType, TILE_SIZE } from '../src/constants';
-import { EditorTool, TriggerType, type LevelData } from '../src/types';
+import { CollectibleType, EditorTool, EnemyType, TriggerType, type LevelData } from '../src/types';
+import { enemySpawnRect } from '../src/entities/enemies/enemyCatalog';
 
 function level(): LevelData {
     return { id: 'test', name: 'Test', width: 20, height: 15,
@@ -56,6 +57,41 @@ test('brush reaches boundary tiles without resizing the map', () => {
     assert.equal(e.levelData.tiles[0][0], TileType.BRICK);
     assert.equal(e.levelData.width, 20);
     assert.equal(e.levelData.originX, undefined);
+});
+
+test('objects use LevelData placements throughout editing', () => {
+    const e = editor();
+    e.activeContent = { type: 'ENTITY', id: 'coin', entityType: 'COLLECTIBLE' };
+    e.onMouseDown(pointer(e, 3 * TILE_SIZE + 1, 4 * TILE_SIZE + 1)); e.onMouseUp({});
+    assert.deepEqual(e.levelData.collectibles, [{ type: CollectibleType.COIN, position: { x: 3, y: 4 } }]);
+    assert.equal(e.levelData.tiles[4][3], TileType.EMPTY);
+    e.activeContent = { type: 'ENTITY', id: 'checkpoint', entityType: 'CHECKPOINT' };
+    e.onMouseDown(pointer(e, 7 * TILE_SIZE + 1, 7 * TILE_SIZE + 1)); e.onMouseUp({});
+    assert.deepEqual(e.levelData.checkpoints, [{ x: 7, y: 7 }]);
+    e.activeContent = { type: 'ENTITY', id: 'goal', entityType: 'GOAL' };
+    e.onMouseDown(pointer(e, 10 * TILE_SIZE + 1, 8 * TILE_SIZE + 1)); e.onMouseUp({});
+    assert.deepEqual(e.levelData.goalPosition, { x: 10, y: 8 });
+    e.activeTool = EditorTool.ERASER;
+    e.onMouseDown(pointer(e, 7 * TILE_SIZE + 1, 7 * TILE_SIZE + 1)); e.onMouseUp({});
+    assert.deepEqual(e.levelData.checkpoints, []);
+    e.onMouseDown(pointer(e, 3 * TILE_SIZE + 1, 4 * TILE_SIZE + 1)); e.onMouseUp({});
+    assert.deepEqual(e.levelData.collectibles, []);
+});
+
+test('enemy selection matches the actual spawn rectangle', () => {
+    for (const type of [EnemyType.MINION, EnemyType.JOAOZAO]) {
+        const e = editor();
+        const position = { x: 8, y: 8 };
+        const rect = enemySpawnRect(type, position);
+        assert.deepEqual(e.getEntityRect('ENEMY', { type, position }),
+            { x: rect.x, y: rect.y, w: rect.width, h: rect.height });
+        e.levelData.enemies.push({ type, position });
+        e.activeTool = EditorTool.SELECT;
+        e.onMouseDown(pointer(e, rect.x + 5, rect.y + 5));
+        e.onMouseMove(pointer(e, rect.x + TILE_SIZE + 5, rect.y + TILE_SIZE + 5));
+        e.onMouseUp({});
+        assert.deepEqual(position, { x: 9, y: 9 });
+    }
 });
 
 test('a quick brush stroke fills intermediate tiles and undoes as a single gesture', () => {

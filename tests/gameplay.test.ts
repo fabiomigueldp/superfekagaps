@@ -39,6 +39,7 @@ class Surface {
 
 function inputHarness(t: TestContext) {
   class Element extends Surface {
+    id = '';
     constructor(private editable = false) { super(); }
     closest(): Element | null { return this.editable ? this : null; }
     getBoundingClientRect() { return { left: 0, top: 0, width: 100, height: 100 }; }
@@ -68,8 +69,62 @@ function inputHarness(t: TestContext) {
       touches: points.map(([clientX, clientY], identifier) => ({ identifier, clientX, clientY, target: canvas }))
     });
   };
-  return { input, key, touch, windowSurface, documentSurface, editable: new Element(true) };
+  return { input, key, touch, canvas, windowSurface, documentSurface, editable: new Element(true) };
 }
+
+test('touch ground pound has a press edge and can be combined with direction', (t) => {
+  const { input, touch } = inputHarness(t);
+  touch('touchstart', [[50, 90], [5, 90]]);
+  input.update();
+  assert.equal(input.getState().downPressed, true);
+  assert.equal(input.getState().left, true);
+  input.update();assert.equal(input.getState().downPressed, false);
+  touch('touchend', [[5, 90]]);assert.equal(input.getState().down, false);
+  touch('touchstart', [[50, 90]]);input.update();assert.equal(input.getState().downPressed, true);
+});
+
+test('menu touch works anywhere without activating movement underneath it', (t) => {
+  const { input, touch } = inputHarness(t);
+  input.setMenuMode(true);touch('touchstart', [[90, 90]]);input.update();
+  assert.equal(input.consumeStart(), true);assert.equal(input.getState().jump, false);
+  touch('touchend', []);input.setMenuMode(false);
+  touch('touchstart', [[90, 90]]);input.update();
+  assert.equal(input.consumePause(), false);assert.equal(input.getState().jumpPressed, true);
+});
+
+test('boss warning locks the gap location so moving away evades the smash', () => {
+  const level = makeLevel(-30, -4);level.data.tiles[10].fill(TileType.GROUND);
+  const boss = new Joaozao(-25, 6);
+  Object.assign(boss, { currentAction: 'create_gap', actionTimer: 2000 });
+  boss.update(100, level, -20 * TILE_SIZE, 64);
+  assert.deepEqual(boss.data.attackPreview, { x: -21 * TILE_SIZE, y: 6 * TILE_SIZE, width: 48, progress: .2 });
+  boss.update(400, level, -14 * TILE_SIZE, 64);
+  assert.equal(boss.data.attackPreview, undefined);
+  assert.equal(level.getTile(10, 10), TileType.EMPTY);
+  assert.equal(level.getTile(16, 10), TileType.GROUND);
+  assert.deepEqual(boss.consumeImpact(), { x: -20 * TILE_SIZE + 8, y: 6 * TILE_SIZE });
+  boss.update(100, level, -14 * TILE_SIZE, 64);assert.equal(boss.consumeImpact(), null);
+});
+
+test('damaging the boss interrupts its warning and prevents the queued gap', () => {
+  const level = makeLevel();level.data.tiles[10].fill(TileType.GROUND);
+  const boss = new Joaozao(5, 10);
+  Object.assign(boss, { currentAction: 'create_gap', actionTimer: 2000 });
+  boss.update(100, level, 10 * TILE_SIZE, 64);
+  assert.ok(boss.data.attackPreview);boss.takeDamage();
+  assert.equal(boss.data.attackPreview, undefined);
+  boss.update(400, level, 10 * TILE_SIZE, 64);
+  assert.equal(level.getTile(10, 10), TileType.GROUND);assert.equal(boss.consumeImpact(), null);
+});
+
+test('landing animation expires without changing the player collision box', () => {
+  const level = makeLevel();level.data.tiles[10].fill(TileType.GROUND);
+  const player = new Player(5, 10),before = player.getRect();
+  player.update(DT, neutral, level);
+  assert.equal(player.data.landingTimer, 90);assert.deepEqual(player.getRect(), before);
+  for(let i=0;i<6;i++)player.update(DT, neutral, level);
+  assert.equal(player.data.landingTimer, 0);assert.deepEqual(player.getRect(), before);
+});
 
 test('releasing one keyboard alias keeps the other held', (t) => {
   const { input, key } = inputHarness(t);
@@ -80,6 +135,118 @@ test('releasing one keyboard alias keeps the other held', (t) => {
   assert.equal(input.getState().left, true);
   key('keyup', 'KeyA');
   assert.equal(input.getState().left, false);
+});
+
+test('WASD resolves opposite directions by latest press and restores the held direction', (t) => {
+  const { input, key } = inputHarness(t);
+  assert.equal(key('keydown', 'KeyA'), true);
+  assert.deepEqual([input.getState().left, input.getState().right], [true, false]);
+  key('keydown', 'KeyD');
+  assert.deepEqual([input.getState().left, input.getState().right], [false, true]);
+  key('keyup', 'KeyD');
+  assert.deepEqual([input.getState().left, input.getState().right], [true, false]);
+  key('keydown', 'ArrowRight');
+  assert.deepEqual([input.getState().left, input.getState().right], [false, true]);
+  key('keyup', 'ArrowRight');
+  assert.deepEqual([input.getState().left, input.getState().right], [true, false]);
+  key('keyup', 'KeyA');
+  assert.deepEqual([input.getState().left, input.getState().right], [false, false]);
+  assert.equal(key('keydown', 'KeyW', { ctrlKey: true }), false);
+  assert.equal(input.getState().jump, false);
+});
+
+test('D still moves for a simulation tick when the tap is shorter than a frame', (t) => {
+  const { input, key } = inputHarness(t);
+  const level = makeLevel();
+  level.data.tiles[10].fill(TileType.GROUND);
+  const player = new Player(5, 10);
+  player.update(DT, neutral, level);
+  const startX = player.data.position.x;
+
+  key('keydown', 'KeyD');
+  key('keyup', 'KeyD');
+  input.update();
+  assert.equal(input.getState().right, true);
+  player.update(DT, input.getState(), level);
+  assert.ok(player.data.position.x > startX);
+  input.update();
+  assert.equal(input.getState().right, false);
+});
+
+test('D and the right arrow produce the same movement for a held press', (t) => {
+  const { input, key } = inputHarness(t);
+  const level = makeLevel();
+  level.data.tiles[10].fill(TileType.GROUND);
+
+  const travel = (code: 'KeyD' | 'ArrowRight') => {
+    input.reset();
+    const player = new Player(5, 10);
+    player.update(DT, neutral, level);
+    key('keydown', code, code === 'KeyD' ? { key: 'd' } : { key: 'ArrowRight' });
+    for (let frame = 0; frame < 12; frame++) {
+      input.update();
+      player.update(DT, input.getState(), level);
+    }
+    key('keyup', code, code === 'KeyD' ? { key: 'd' } : { key: 'ArrowRight' });
+    return { x: player.data.position.x, velocityX: player.data.velocity.x };
+  };
+
+  const arrow = travel('ArrowRight');
+  const d = travel('KeyD');
+  assert.ok(d.x > 5 * TILE_SIZE);
+  assert.deepEqual(d, arrow);
+});
+
+test('D accepts the typed character when code differs and recovers from stale key state', (t) => {
+  const { input, key } = inputHarness(t);
+  key('keydown', 'Unidentified', { key: 'd' });
+  assert.equal(input.getState().right, true);
+  key('keydown', 'KeyA');
+  assert.equal(input.getState().left, true);
+  key('keydown', 'Unidentified', { key: 'd' });
+  assert.equal(input.getState().right, true);
+  key('keyup', 'Unidentified', { key: 'd' });
+  assert.equal(input.getState().left, true);
+  key('keyup', 'KeyA');
+  input.reset();
+  key('keydown', 'Unidentified', { key: 'd', repeat: true });
+  assert.equal(input.getState().right, true);
+  key('keyup', 'Unidentified', { key: 'd' });
+  assert.equal(input.getState().right, false);
+});
+
+test('the gameplay canvas accepts D while ordinary editable fields stay isolated', (t) => {
+  const { input, key, canvas, editable, windowSurface } = inputHarness(t);
+  canvas.id = 'game-canvas';
+  canvas.closest = () => canvas;
+  key('keydown', 'KeyD', { key: 'd' });
+  assert.equal(input.getState().right, true);
+  key('keyup', 'KeyD', { key: 'd' });
+  windowSurface.emit('keydown', { code: 'KeyD', key: 'd', target: editable, repeat: false, preventDefault() {} });
+  assert.equal(input.getState().right, false);
+});
+
+test('W jumps while D moves and S starts the aerial attack', (t) => {
+  const { input, key } = inputHarness(t);
+  const level = makeLevel();
+  level.data.tiles[10].fill(TileType.GROUND);
+  const player = new Player(5, 10);
+  player.update(DT, neutral, level);
+  const start = { ...player.data.position };
+
+  key('keydown', 'KeyD');
+  key('keydown', 'KeyW');
+  key('keydown', 'ShiftLeft');
+  input.update();
+  player.update(DT, input.getState(), level);
+  assert.ok(player.data.position.x > start.x);
+  assert.ok(player.data.position.y < start.y);
+  assert.equal(player.data.isRunning, true);
+
+  key('keydown', 'KeyS');
+  input.update();
+  const attack = player.update(DT, input.getState(), level);
+  assert.equal(attack.groundPoundStarted, true);
 });
 
 test('short jump and menu taps survive until the next simulation tick', (t) => {

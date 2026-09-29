@@ -1,203 +1,125 @@
 import { BackgroundLayerSpec } from '../types';
+import { ART, hashAt, mixColor } from '../graphics/palette';
 
+/** Deterministic authored pixel motifs, rasterized once at native resolution. */
 export class BackgroundGenerator {
-    /**
-     * Gera um canvas offscreen contendo a arte da camada de fundo.
-     * A largura (width) deve ser suficiente para cobrir a tela (ex: GAME_WIDTH).
-     * O renderizador desenhará essa imagem repetida (tiled) horizontalmente.
-     */
-    static generateLayer(spec: BackgroundLayerSpec, width: number, height: number, scale: number = 1): HTMLCanvasElement {
-        const canvas = document.createElement('canvas');
-        canvas.width = Math.ceil(width * scale);
-        canvas.height = Math.ceil(height * scale);
-        const ctx = canvas.getContext('2d')!;
-
-        // Scale context to draw at high resolution using logical coordinates
-        ctx.scale(scale, scale);
-
-        // Opcional: Para visual "cartoon/vetor" suave, mantemos smoothing padrao (true).
-        // Se quiséssemos pixel art estrito ampliado, desligaríamos.
-        // Como o objetivo é "High Res", deixamos suave para curvas perfeitas.
-        // ctx.imageSmoothingEnabled = false; 
-
-        switch (spec.type) {
-            case 'clouds':
-                this.drawClouds(ctx, width, height, spec);
-                break;
-            case 'mountains':
-                this.drawMountains(ctx, width, height, spec);
-                break;
-            case 'hills':
-                this.drawHills(ctx, width, height, spec);
-                break;
-            case 'city':
-                this.drawCity(ctx, width, height, spec);
-                break;
-            case 'castle_wall':
-                this.drawCastleWall(ctx, width, height, spec);
-                break;
-        }
-
-        return canvas;
+  static generateLayer(spec: BackgroundLayerSpec, width: number, height: number, scale = 1): HTMLCanvasElement {
+    const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
+    const c=canvas.getContext('2d')!;
+    const r=(x:number,y:number,w:number,h:number,color:string)=>{
+      c.fillStyle=color;c.fillRect(Math.round(x),Math.round(y),Math.max(0,Math.round(w)),Math.max(0,Math.round(h)));
+    };
+    const seed=spec.type.split('').reduce((s,ch)=>s*31+ch.charCodeAt(0),0);
+    const rand=(i:number)=>hashAt(i,width,seed)/4294967295;
+    const base=spec.color, light=mixColor(base,ART.paper,.18), dark=mixColor(base,ART.ink,.18);
+    const wrap=(x:number,extent:number,paint:(x:number)=>void)=>{
+      for(const shift of [-width,0,width])if(x+shift+extent>=0&&x+shift-extent<=width)paint(x+shift);
+    };
+    if(spec.type==='clouds'){
+      for(let i=0;i<5;i++){
+        const x=Math.floor((i+.5)*width/5+(rand(i)-.5)*28), y=(spec.baseHeight??28)+Math.floor(rand(i+17)*18);
+        const w=22+Math.floor(rand(i+20)*18);
+        wrap(x,w,xx=>{
+          r(xx-w/2,y+7,w,3,dark);r(xx-w/2+2,y+3,w-4,5,base);
+          r(xx-w/2+7,y,w-14,6,base);r(xx-w/2+8,y+1,w-18,1,light);
+          r(xx+w/2-6,y+4,8,3,base);
+        });
+      }
     }
-
-    private static drawClouds(ctx: CanvasRenderingContext2D, width: number, height: number, spec: BackgroundLayerSpec): void {
-        ctx.fillStyle = spec.color;
-        // Nuvens esparsas
-        const numClouds = 5;
-        const avgY = spec.baseHeight || height * 0.2;
-
-        for (let i = 0; i < numClouds; i++) {
-            // Espalhamento uniforme horizontalmente
-            const cx = (width / numClouds) * i + (Math.random() * 40 - 20);
-            const cy = avgY + (Math.random() * 30 - 15);
-            const size = 15 + Math.random() * 10;
-
-            ctx.beginPath();
-            // Desenha nuvem composta por 3-5 círculos
-            const parts = 3 + Math.floor(Math.random() * 3);
-            for (let p = 0; p < parts; p++) {
-                const ox = (Math.random() - 0.5) * size * 1.5;
-                const oy = (Math.random() - 0.5) * size * 0.5;
-                const r = size * (0.6 + Math.random() * 0.4);
-                ctx.arc(cx + ox, cy + oy, r, 0, Math.PI * 2);
-
-                // Wrap around para seamless (desenha também na outra borda se estiver perto)
-                if (cx + ox + r > width) {
-                    ctx.arc(cx + ox - width, cy + oy, r, 0, Math.PI * 2);
-                } else if (cx + ox - r < 0) {
-                    ctx.arc(cx + ox + width, cy + oy, r, 0, Math.PI * 2);
-                }
-            }
-            ctx.fill();
-        }
+    if(spec.type==='mountains'){
+      const baseY=spec.baseHeight??112, rough=spec.roughness??16;
+      for(let x=0;x<width;x++){
+        const p=x/width*Math.PI*2;
+        const ridge=Math.round(baseY-26-Math.abs(Math.sin(p*2+.5))*rough*2-Math.sin(p*5)*rough*.55);
+        r(x,ridge,1,height-ridge,base);
+        const facet=8+Math.round((Math.sin(p*3)+1)*8);
+        if(Math.cos(p*2+.5)>0)r(x,ridge+3,1,facet,light);
+        if(x%7===0 && rand(x)>.6)r(x,ridge+facet+8,1,5,dark);
+      }
     }
-
-    private static drawMountains(ctx: CanvasRenderingContext2D, width: number, height: number, spec: BackgroundLayerSpec): void {
-        ctx.fillStyle = spec.color;
-
-        const baseH = spec.baseHeight || height * 0.6;
-        const roughness = spec.roughness || 15;
-
-        ctx.beginPath();
-        ctx.moveTo(0, height);
-        ctx.lineTo(0, baseH);
-
-        const steps = 20; // Pontos de controle
-        const stepWidth = width / steps;
-
-        // Para garantir seamless, o último ponto deve alinhar com o primeiro (y = baseH)
-        // Vamos gerar deslocamentos aleatórios, mas forçar o fim.
-
-        let currentY = baseH;
-        for (let i = 1; i <= steps; i++) {
-            const x = i * stepWidth;
-            // Interpolação para voltar ao início no final
-            const progress = i / steps;
-
-            // Random walk
-            let targetY = currentY + (Math.random() - 0.5) * roughness * 2;
-
-            // Bias para voltar a baseH perto do fim
-            if (i > steps - 5) {
-                targetY = targetY * (1 - progress) + baseH * progress;
-            }
-
-            // Garante que o último ponto É baseH
-            if (i === steps) targetY = baseH;
-
-            ctx.lineTo(x, targetY);
-            currentY = targetY;
-        }
-
-        ctx.lineTo(width, height);
-        ctx.fill();
+    if(spec.type==='hills'){
+      const baseY=spec.baseHeight??145;
+      const hill=(x:number)=>Math.round(baseY-Math.sin(x/width*Math.PI*4)*11-Math.sin(x/width*Math.PI*10)*4);
+      for(let x=0;x<width;x++)r(x,hill(x),1,height-hill(x),base);
+      // Small woodland silhouettes establish scale, with deliberate quiet space above the path.
+      for(let i=0;i<12;i++){
+        const x=Math.floor(i*width/12+rand(i)*14), ground=hill(x)+6;
+        const h=12+Math.floor(rand(i+30)*16), w=10+Math.floor(rand(i+40)*10);
+        wrap(x,w,xx=>{
+          r(xx-1,ground-h/2,3,h/2,dark);
+          r(xx-w/2,ground-h+5,w,h/2,dark);
+          r(xx-w/2+2,ground-h+2,w-4,h/2,base);
+          r(xx-w/2+4,ground-h,w-8,3,light);
+          r(xx-w/2+1,ground-h+6,5,3,light);
+        });
+      }
+      for(let i=0;i<width;i+=29){const y=hill(i)+15;r(i,y,16,1,dark);}
     }
-
-    private static drawHills(ctx: CanvasRenderingContext2D, width: number, height: number, spec: BackgroundLayerSpec): void {
-        ctx.fillStyle = spec.color;
-        const baseH = spec.baseHeight || height * 0.7;
-
-        ctx.beginPath();
-        ctx.moveTo(0, height);
-
-        // Curva suave usando seno
-        // frequency ajustada para garantir loop perfeito (múltiplo de PI * 2)
-        // Width corresponde a 2 periodos, por exemplo.
-        const frequency = (Math.PI * 2) / width;
-        // Vamos usar 2 'lombadas' grandes
-        const waves = 1.5;
-
-        for (let x = 0; x <= width; x += 5) {
-            // Combinação de senos para irregularidade suave
-            const y1 = Math.sin(x * frequency * waves) * 20;
-            const y2 = Math.sin(x * frequency * waves * 2.5) * 10;
-
-            const y = baseH - (Math.abs(y1) + y2);
-            ctx.lineTo(x, y);
-        }
-
-        ctx.lineTo(width, height);
-        ctx.fill();
+    if(spec.type==='castle_wall'){
+      const baseY=spec.baseHeight??116;
+      r(0,baseY,width,height-baseY,base);
+      const step=width/8;
+      for(let i=0;i<8;i++){
+        const x=Math.floor(i*step), top=baseY-38-(i%3===0?12:0);
+        wrap(x,20,xx=>{
+          r(xx,top,20,baseY-top,base);r(xx-2,top,24,3,light);
+          r(xx-2,top-4,5,4,base);r(xx+8,top-4,5,4,base);r(xx+17,top-4,5,4,base);
+          r(xx+2,top+3,2,baseY-top-3,light);
+          r(xx+8,top+14,5,12,dark);r(xx+9,top+12,3,3,dark);
+        });
+      }
+      // Quiet irregular masonry, avoiding a high-contrast grid behind enemies.
+      for(let y=baseY+8;y<height;y+=16)for(let x=0;x<width;x+=32){
+        const xx=x+((y/16|0)%2)*16;r(xx,y,20,1,dark);r(xx,y-7,1,7,dark);
+      }
     }
-
-    private static drawCity(ctx: CanvasRenderingContext2D, width: number, height: number, spec: BackgroundLayerSpec): void {
-        ctx.fillStyle = spec.color;
-        const baseH = spec.baseHeight || height * 0.8;
-
-        const buildingWidth = 20;
-        const numBuildings = Math.ceil(width / buildingWidth);
-
-        // Seeded random-ish para consistência visual se precisasse recriar, mas aqui é random
-        for (let i = 0; i < numBuildings; i++) {
-            const h = 20 + Math.random() * 40;
-            const x = i * buildingWidth;
-            const y = baseH - h;
-
-            ctx.fillRect(x, y, buildingWidth + 1, h + (height - baseH));
-
-            // Janelas (detalhe simples)
-            ctx.fillStyle = 'rgba(255, 255, 200, 0.3)'; // Luzes
-            for (let wx = x + 4; wx < x + buildingWidth - 4; wx += 4) {
-                for (let wy = y + 4; wy < baseH - 4; wy += 6) {
-                    if (Math.random() > 0.3) {
-                        ctx.fillRect(wx, wy, 2, 4);
-                    }
-                }
-            }
-            // Volta cor original
-            ctx.fillStyle = spec.color;
-        }
+    if(spec.type==='city'){
+      const baseY=spec.baseHeight??height;
+      for(let i=0;i<10;i++){
+        const x=Math.round((i+.2)*width/10), h=20+Math.floor(rand(i)*28), w=18;
+        wrap(x,22,xx=>{
+          r(xx,baseY-h,w,h,base);r(xx-2,baseY-h-3,w+4,3,dark);
+          r(xx+2,baseY-h+1,1,h,light);r(xx+5,baseY-h+9,7,12,dark);
+          r(xx+7,baseY-h+7,3,3,dark);
+          if(i%3===0){r(xx+7,baseY-h+10,2,7,mixColor(base,ART.gold,.35));}
+        });
+      }
     }
-
-    private static drawCastleWall(ctx: CanvasRenderingContext2D, width: number, height: number, spec: BackgroundLayerSpec): void {
-        ctx.fillStyle = spec.color;
-        const baseH = spec.baseHeight || height * 0.5; // Parede alta
-
-        // Fundo solido da parede para baixo
-        ctx.fillRect(0, baseH, width, height - baseH);
-
-        // Torres / Pilares
-        const pillarDist = 60;
-        const numPillars = Math.ceil(width / pillarDist);
-
-        for (let i = 0; i < numPillars; i++) {
-            const x = i * pillarDist;
-            // Pilar sobe um pouco mais
-            ctx.fillRect(x, baseH - 40, 20, 40);
-
-            // Topo do pilar (crenellations)
-            ctx.fillRect(x - 2, baseH - 45, 24, 5);
-        }
-
-        // Detalhes de tijolos na parede
-        ctx.fillStyle = 'rgba(0,0,0,0.2)';
-        for (let y = baseH; y < height; y += 10) {
-            const offsetX = (Math.floor(y / 10) % 2) * 10;
-            for (let x = -10; x < width; x += 20) {
-                ctx.fillRect(x + offsetX, y, 2, 10);
-                ctx.fillRect(x + offsetX, y + 9, 20, 1);
-            }
-        }
+    if(spec.type==='cavern'){
+      const baseY=spec.baseHeight??40, rough=spec.roughness??12;
+      for(let x=0;x<width;x++){
+        const p=x/width*Math.PI*2;
+        const ridge=Math.round(baseY+Math.sin(p*3)*rough+Math.sin(p*7)*rough*.4);
+        r(x,ridge,1,height-ridge,base);
+        const seam=Math.floor(x/18);
+        if(seam%3===0)r(x,ridge+6,1,height-ridge-6,dark);
+        if(x%18===1)r(x,ridge+8,1,31,light);
+      }
+      for(let i=0;i<18;i++){
+        const x=Math.floor(i*width/18), h=7+Math.floor(rand(i+21)*18);
+        wrap(x,12,xx=>{
+          for(let yy=0;yy<h;yy++){const w=Math.max(1,Math.round(11*(1-yy/h)));r(xx-w/2,yy,w,1,dark);}
+        });
+      }
+      for(let y=baseY+30;y<height;y+=28)for(let x=4;x<width;x+=37){
+        r(x+(y%7),y,15,1,dark);r(x+15+(y%7),y+1,5,1,dark);
+      }
     }
+    if(spec.type==='crystals'){
+      const baseY=spec.baseHeight??100;
+      for(let i=0;i<6;i++){
+        const x=Math.floor((i+.5)*width/6), y=baseY+Math.floor(rand(i)*44);
+        wrap(x,12,xx=>{
+          for(const [dx,h] of [[0,11],[-5,6],[5,7]]){
+            r(xx+dx,y-h,1,1,light);r(xx+dx-1,y-h+1,3,h-1,base);r(xx+dx,y-h+2,1,h-2,light);
+          }
+          r(xx-8,y,16,2,dark);
+        });
+      }
+    }
+    if(scale===1)return canvas;
+    const enlarged=document.createElement('canvas');enlarged.width=Math.ceil(width*scale);enlarged.height=Math.ceil(height*scale);
+    const target=enlarged.getContext('2d')!;target.imageSmoothingEnabled=false;target.drawImage(canvas,0,0,enlarged.width,enlarged.height);
+    return enlarged;
+  }
 }

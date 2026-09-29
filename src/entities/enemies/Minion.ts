@@ -1,19 +1,22 @@
 // Inimigo Minion - Super Feka Gaps
 
 import { EnemyData, EnemyType, Rect } from '../../types';
-import { TILE_SIZE, GRAVITY, MAX_FALL_SPEED } from '../../constants';
+import { GRAVITY, MAX_FALL_SPEED } from '../../constants';
 import { Level } from '../../world/Level';
+import { supportsStanding } from '../../world/tileRules';
+import { enemySpawnRect } from './enemyCatalog';
 
 export class Minion {
   data: EnemyData;
   private speed: number = 0.8;
 
   constructor(spawnX: number, spawnY: number) {
+    const rect = enemySpawnRect(EnemyType.MINION, { x: spawnX, y: spawnY });
     this.data = {
-      position: { x: spawnX * TILE_SIZE, y: spawnY * TILE_SIZE - 19 },
+      position: { x: rect.x, y: rect.y },
       velocity: { x: -this.speed, y: 0 },
-      width: 16,
-      height: 19,
+      width: rect.width,
+      height: rect.height,
       active: true,
       type: EnemyType.MINION,
       facingRight: false,
@@ -72,7 +75,7 @@ export class Minion {
     const groundTile = level.getTile(groundCol, groundRow);
 
     // Se não há chão à frente, inverte direção
-    if (groundTile === 0 && this.data.velocity.y === 0) {
+    if (!supportsStanding(groundTile) && this.data.velocity.y === 0) {
       this.reverseDirection();
     }
   }

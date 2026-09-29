@@ -1,8 +1,6 @@
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { ALL_LEVELS } from '../src/data/levels';
-import { TILE_SIZE } from '../src/constants';
-import type { Vector2 } from '../src/types';
 import { normalizeLevelData } from '../src/world/levelValidation';
 
 export function findLevelErrors(levels: readonly unknown[]): string[] {
@@ -22,29 +20,6 @@ export function findLevelErrors(levels: readonly unknown[]): string[] {
     if (ids.has(level.id)) errors.push(`ID de nível duplicado: '${level.id}'.`);
     ids.add(level.id);
 
-    const minX = level.originX ?? 0;
-    const minY = level.originY ?? 0;
-    const maxX = minX + level.width;
-    const maxY = minY + level.height;
-    const checkPosition = (position: Vector2, field: string): void => {
-      if (position.x < minX || position.x >= maxX || position.y < minY || position.y >= maxY) {
-        errors.push(`Nível ${level.id}: ${field} fora do mapa: (${position.x}, ${position.y}).`);
-      }
-    };
-
-    checkPosition(level.playerSpawn, 'playerSpawn');
-    checkPosition(level.goalPosition, 'goalPosition');
-    level.checkpoints.forEach((position, i) => checkPosition(position, `checkpoint[${i}]`));
-    level.enemies.forEach((enemy, i) => checkPosition(enemy.position, `enemy[${i}]`));
-    level.collectibles.forEach((collectible, i) => checkPosition(collectible.position, `collectible[${i}]`));
-
-    // Trigger rectangles use world pixels; other placements use world tiles.
-    level.triggers.forEach((trigger, i) => {
-      if (trigger.x + trigger.width <= minX * TILE_SIZE || trigger.x >= maxX * TILE_SIZE ||
-          trigger.y + trigger.height <= minY * TILE_SIZE || trigger.y >= maxY * TILE_SIZE) {
-        errors.push(`Nível ${level.id}: trigger[${i}] não cruza a área do mapa.`);
-      }
-    });
   });
   return errors;
 }

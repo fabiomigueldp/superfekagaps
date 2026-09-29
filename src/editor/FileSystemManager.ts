@@ -77,11 +77,12 @@ export class FileSystemManager {
         // Validate before opening a writable stream, so invalid input cannot damage a file.
         const content = serializeLevelToTS(data);
         const previousContent = this.loadedFiles.get(filename);
+        if (previousContent === undefined) throw new Error('Abra a fase da pasta antes de sobrescrevê-la.');
         this.saving = true;
         let writable: FileSystemWritableFileStream | undefined;
         try {
-            const handle = await directory.getFileHandle(filename, { create: previousContent === undefined });
-            if (previousContent !== undefined && await (await handle.getFile()).text() !== previousContent) {
+            const handle = await directory.getFileHandle(filename);
+            if (await (await handle.getFile()).text() !== previousContent) {
                 throw new Error('Este arquivo foi alterado fora do editor. Exporte suas alterações antes de reabrir o arquivo.');
             }
             writable = await handle.createWritable();
@@ -90,6 +91,35 @@ export class FileSystemManager {
             if (directory === this.dirHandle) this.loadedFiles.set(filename, content);
         } catch (error) {
             // The browser commits the temporary file only on close; abort a failed write.
+            if (writable) {
+                try { await writable.abort(); } catch { /* Preserve the original failure. */ }
+            }
+            throw error;
+        } finally {
+            this.saving = false;
+        }
+    }
+
+    async createLevel(filename: string, data: LevelData): Promise<void> {
+        this.checkFilename(filename);
+        const directory = this.directory();
+        if (this.saving) throw new Error('Aguarde o salvamento atual terminar.');
+        const content = serializeLevelToTS(data);
+        this.saving = true;
+        let writable: FileSystemWritableFileStream | undefined;
+        try {
+            try {
+                await directory.getFileHandle(filename);
+                throw new Error('Já existe uma fase com esse nome de arquivo. Escolha outro ID.');
+            } catch (error) {
+                if (!(error instanceof DOMException && error.name === 'NotFoundError')) throw error;
+            }
+            const handle = await directory.getFileHandle(filename, { create: true });
+            writable = await handle.createWritable();
+            await writable.write(content);
+            await writable.close();
+            if (directory === this.dirHandle) this.loadedFiles.set(filename, content);
+        } catch (error) {
             if (writable) {
                 try { await writable.abort(); } catch { /* Preserve the original failure. */ }
             }

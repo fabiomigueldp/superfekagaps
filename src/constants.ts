@@ -124,13 +124,7 @@ export enum TileType {
   BRICK = 2,
   PLATFORM = 3,
   SPIKE = 4,
-  CHECKPOINT = 5,
-  FLAG = 6,
-  COIN = 7,
-  POWERUP_MINI_FANTA = 8, // (legacy) not used as tile by default
-  POWERUP_HELMET = 9, // (legacy) not used as tile by default
-
-  // Novos tipos para suporte de gameplay
+  // 5–9 were object markers in old maps; objects now live in LevelData.
   BRICK_BREAKABLE = 10,
   POWERUP_BLOCK_MINI_FANTA = 11,
   POWERUP_BLOCK_HELMET = 12,
@@ -140,7 +134,10 @@ export enum TileType {
   PLATFORM_FALLING = 16,
   LAVA_TOP = 17,
   LAVA_FILL = 18,
-  HIDDEN_BLOCK = 19
+  HIDDEN_BLOCK = 19,
+  CAVE_STONE = 20,
+  CAVE_PLATFORM = 21,
+  GLOW_CRYSTAL = 22
 }
 
 // Estados do jogo
@@ -159,7 +156,6 @@ export enum GameState {
 
 // Configurações de gameplay
 export const INITIAL_LIVES = 3;
-export const LEVEL_TIME = 200; // segundos
 export const COIN_SCORE = 100;
 export const ENEMY_SCORE = 200;
 export const TIME_BONUS_MULTIPLIER = 10;

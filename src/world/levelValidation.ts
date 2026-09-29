@@ -1,5 +1,5 @@
 import { CollectibleType, EnemyType, TriggerType, type LevelData } from '../types';
-import { TileType } from '../constants';
+import { TILE_SIZE, TileType } from '../constants';
 
 type DataObject = Record<string, unknown>;
 
@@ -38,8 +38,6 @@ function oneOf(value: unknown, allowed: readonly unknown[], path: string): void 
 }
 
 function array(data: DataObject, key: string): unknown[] {
-    // Older checked-in levels predate triggers and may omit empty entity lists.
-    if (data[key] === undefined) data[key] = [];
     if (!Array.isArray(data[key])) fail(key, 'deve ser uma lista');
     return data[key] as unknown[];
 }
@@ -83,7 +81,7 @@ export function normalizeLevelData(value: unknown): LevelData {
 
     vector(data.playerSpawn, 'playerSpawn');
     vector(data.goalPosition, 'goalPosition');
-    if (number(data.timeLimit, 'timeLimit') < 0) fail('timeLimit', 'não pode ser negativo');
+    number(data.timeLimit, 'timeLimit', true);
     boolean(data.isBossLevel, 'isBossLevel');
     array(data, 'checkpoints').forEach((point, index) => vector(point, `checkpoints[${index}]`));
     for (const [key, types] of [['enemies', Object.values(EnemyType)], ['collectibles', Object.values(CollectibleType)]] as const) {
@@ -131,22 +129,70 @@ export function normalizeLevelData(value: unknown): LevelData {
     });
 
     if (data.theme !== undefined) {
+        const validateThemeRegion = (value: unknown, path: string): void => {
+            const region = object(value, path);
+            if (!Array.isArray(region.skyGradient) || region.skyGradient.length !== 2) fail(`${path}.skyGradient`, 'deve conter duas cores');
+            (region.skyGradient as unknown[]).forEach((color, index) => text(color, `${path}.skyGradient[${index}]`));
+            if (!Array.isArray(region.layers)) fail(`${path}.layers`, 'deve ser uma lista');
+            (region.layers as unknown[]).forEach((layerValue, index) => {
+                const layerPath = `${path}.layers[${index}]`;
+                const layer = object(layerValue, layerPath);
+                oneOf(layer.type, ['clouds', 'mountains', 'hills', 'city', 'castle_wall', 'cavern', 'crystals'], `${layerPath}.type`);
+                text(layer.color, `${layerPath}.color`);
+                number(layer.scrollFactor, `${layerPath}.scrollFactor`);
+                for (const key of ['baseHeight', 'speedX', 'roughness']) {
+                    if (layer[key] !== undefined) number(layer[key], `${layerPath}.${key}`);
+                }
+            });
+        };
         const theme = object(data.theme, 'theme');
-        if (!Array.isArray(theme.skyGradient) || theme.skyGradient.length !== 2) fail('theme.skyGradient', 'deve conter duas cores');
-        (theme.skyGradient as unknown[]).forEach((color, index) => text(color, `theme.skyGradient[${index}]`));
-        if (!Array.isArray(theme.layers)) fail('theme.layers', 'deve ser uma lista');
-        (theme.layers as unknown[]).forEach((value, index) => {
-            const path = `theme.layers[${index}]`;
-            const layer = object(value, path);
-            oneOf(layer.type, ['clouds', 'mountains', 'hills', 'city', 'castle_wall'], `${path}.type`);
-            text(layer.color, `${path}.color`);
-            number(layer.scrollFactor, `${path}.scrollFactor`);
-            for (const key of ['baseHeight', 'speedX', 'roughness']) {
-                if (layer[key] !== undefined) number(layer[key], `${path}.${key}`);
-            }
-        });
+        if (theme.biome !== undefined) oneOf(theme.biome, ['meadow', 'ember', 'citadel'], 'theme.biome');
+        validateThemeRegion(theme, 'theme');
+        if (theme.underground !== undefined) {
+            const underground = object(theme.underground, 'theme.underground');
+            const startRow = number(underground.startRow, 'theme.underground.startRow');
+            if (!Number.isSafeInteger(startRow)) fail('theme.underground.startRow', 'deve ser um inteiro');
+            validateThemeRegion(underground, 'theme.underground');
+        }
     }
 
-    // Every required field has been checked above; preserve optional metadata as well.
-    return data as unknown as LevelData;
+    const level = data as unknown as LevelData;
+    const minX = level.originX ?? 0;
+    const minY = level.originY ?? 0;
+    const maxX = minX + level.width;
+    const maxY = minY + level.height;
+    if (level.theme?.underground &&
+        (level.theme.underground.startRow < minY || level.theme.underground.startRow >= maxY)) {
+        fail('theme.underground.startRow', 'está fora do mapa');
+    }
+    const inside = (point: { x: number; y: number }, path: string): void => {
+        if (point.x < minX || point.x >= maxX || point.y < minY || point.y >= maxY) fail(path, 'está fora do mapa');
+    };
+    inside(level.playerSpawn, 'playerSpawn');
+    inside(level.goalPosition, 'goalPosition');
+    const checkpointPositions = new Set<string>();
+    level.checkpoints.forEach((point, index) => {
+        inside(point, `checkpoints[${index}]`);
+        const key = `${point.x},${point.y}`;
+        if (checkpointPositions.has(key)) fail(`checkpoints[${index}]`, 'repete outro checkpoint');
+        checkpointPositions.add(key);
+    });
+    level.enemies.forEach((enemy, index) => inside(enemy.position, `enemies[${index}].position`));
+    const collectiblePositions = new Set<string>();
+    level.collectibles.forEach((item, index) => {
+        inside(item.position, `collectibles[${index}].position`);
+        const key = `${item.type}:${item.position.x},${item.position.y}`;
+        if (collectiblePositions.has(key)) fail(`collectibles[${index}]`, 'repete outro coletável');
+        collectiblePositions.add(key);
+    });
+    const bossCount = level.enemies.filter(enemy => enemy.type === EnemyType.JOAOZAO).length;
+    if (level.isBossLevel && bossCount !== 1) fail('enemies', 'fase de boss precisa ter exatamente um boss');
+    if (!level.isBossLevel && bossCount !== 0) fail('isBossLevel', 'deve estar ativo quando há um boss');
+    level.triggers.forEach((trigger, index) => {
+        if (trigger.x + trigger.width <= minX * TILE_SIZE || trigger.x >= maxX * TILE_SIZE ||
+            trigger.y + trigger.height <= minY * TILE_SIZE || trigger.y >= maxY * TILE_SIZE) {
+            fail(`triggers[${index}]`, 'não cruza a área do mapa');
+        }
+    });
+    return level;
 }

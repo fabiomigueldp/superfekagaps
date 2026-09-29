@@ -4,13 +4,16 @@ import { ALL_LEVELS } from '../src/data/levels';
 import { PLAYER_SPRITES } from '../src/assets/playerSpriteSpec';
 import { findLevelErrors } from '../scripts/validate_levels';
 import { findPlayerAssetErrors } from '../scripts/validate_player_assets';
-import { TriggerType } from '../src/types';
+import { CollectibleType, EnemyType, TriggerType } from '../src/types';
 
 const copyLevel = () => structuredClone(ALL_LEVELS[0]);
 
 test('shipped campaign and player sprites pass validation', () => {
   assert.deepEqual(findLevelErrors(ALL_LEVELS), []);
   assert.deepEqual(findPlayerAssetErrors(PLAYER_SPRITES), []);
+  assert.deepEqual(ALL_LEVELS.map(level => level.collectibles.filter(item => item.type === CollectibleType.COIN).length), [37, 17, 5]);
+  assert.deepEqual(ALL_LEVELS.map(level => level.goalPosition), [{ x: 77, y: 8 }, { x: 98, y: 10 }, { x: 36, y: 8 }]);
+  assert.ok(ALL_LEVELS.every(level => level.tiles.flat().every(tile => ![5, 6, 7, 8, 9].includes(tile))));
 });
 
 test('level coordinates account for a negative world origin', () => {
@@ -18,6 +21,7 @@ test('level coordinates account for a negative world origin', () => {
   const offset = { x: -100, y: -40 };
   level.originX = offset.x;
   level.originY = offset.y;
+  if (level.theme?.underground) level.theme.underground.startRow += offset.y;
   const placements = [level.playerSpawn, level.goalPosition, ...level.checkpoints,
     ...level.enemies.map(enemy => enemy.position), ...level.collectibles.map(item => item.position)];
   placements.forEach(position => { position.x += offset.x; position.y += offset.y; });
@@ -38,13 +42,24 @@ test('campaign IDs are unique while custom names are supported', () => {
   assert.ok(findLevelErrors([]).length > 0);
 });
 
-test('legacy power-up tiles are valid but fractional tiles are rejected', () => {
+test('object markers and fractional tiles are rejected from the terrain grid', () => {
   const level = copyLevel();
   level.tiles[0][0] = 8;
-  level.tiles[0][1] = 9;
-  assert.deepEqual(findLevelErrors([level]), []);
+  assert.ok(findLevelErrors([level]).length > 0);
   level.tiles[0][0] = 1.5;
   assert.ok(findLevelErrors([level]).length > 0);
+});
+
+test('boss and object placement invariants are checked before saving', () => {
+  const boss = structuredClone(ALL_LEVELS[2]);
+  boss.enemies = [];
+  assert.ok(findLevelErrors([boss]).some(error => error.includes('boss')));
+  const ordinary = copyLevel();
+  ordinary.enemies.push({ type: EnemyType.JOAOZAO, position: { x: 20, y: 8 } });
+  assert.ok(findLevelErrors([ordinary]).some(error => error.includes('isBossLevel')));
+  ordinary.enemies.pop();
+  ordinary.collectibles.push(structuredClone(ordinary.collectibles[0]));
+  assert.ok(findLevelErrors([ordinary]).some(error => error.includes('repete outro coletável')));
 });
 
 test('malformed levels report validation errors instead of crashing', () => {

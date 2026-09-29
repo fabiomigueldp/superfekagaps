@@ -9,6 +9,7 @@ import {
   FALLING_PLATFORM_RESPAWN_MS
 } from '../constants';
 import { LevelData, Rect, Vector2, FallingPlatformPhase } from '../types';
+import { blocksHead, isOneWayTile, isSolidTile } from './tileRules';
 
 interface FallingPlatformState {
   phase: FallingPlatformPhase;
@@ -91,84 +92,6 @@ export class Level {
 
     // Se tiver qualquer outra coisa solida em cima, consideramos lava cheia ou normal
     return 0;
-  }
-
-  // Verifica colisão com um retângulo
-  // Note: rect coordinates are in world space
-  checkCollision(rect: Rect): { left: boolean; right: boolean; top: boolean; bottom: boolean; grounded: boolean } {
-    const result = { left: false, right: false, top: false, bottom: false, grounded: false };
-
-    const startCol = this.worldToCol(rect.x);
-    const endCol = this.worldToCol(rect.x + rect.width - 1);
-    const startRow = this.worldToRow(rect.y);
-    const endRow = this.worldToRow(rect.y + rect.height - 1);
-
-    for (let row = startRow; row <= endRow; row++) {
-      for (let col = startCol; col <= endCol; col++) {
-        if (!this.isValidArrayIndex(col, row)) continue;
-
-        const tile = this.getTile(col, row);
-        // Decide solidez conservadora: plataformas contam como chão se o bottom atual está acima do topo+2
-        const tileTop = this.rowToWorldY(row);
-        const entityBottom = rect.y + rect.height;
-        let solid = false;
-        if (
-          tile === TileType.GROUND ||
-          tile === TileType.BRICK ||
-          tile === TileType.BRICK_BREAKABLE ||
-          tile === TileType.BLOCK_USED ||
-          tile === TileType.POWERUP_BLOCK_MINI_FANTA ||
-          tile === TileType.POWERUP_BLOCK_HELMET ||
-          tile === TileType.SPRING ||
-          tile === TileType.ICE ||
-          tile === TileType.LAVA_TOP ||
-          tile === TileType.LAVA_FILL
-        ) {
-          solid = true;
-        } else if (tile === TileType.PLATFORM || tile === TileType.PLATFORM_FALLING) {
-          solid = entityBottom <= tileTop + 2;
-        }
-
-        if (solid) {
-          // Determina qual lado esta colidindo
-          let tileY = row * TILE_SIZE;
-          let tileH = TILE_SIZE;
-          if (tile === TileType.LAVA_TOP || tile === TileType.LAVA_FILL) {
-
-            const offset = this.getLavaTopOffset(col, row);
-            tileY += offset;
-            tileH -= offset;
-          }
-          const tileRect = {
-            x: col * TILE_SIZE,
-            y: tileY,
-            width: TILE_SIZE,
-            height: tileH
-          };
-
-          // Calcula overlap
-          const overlapX = Math.min(rect.x + rect.width, tileRect.x + tileRect.width) - Math.max(rect.x, tileRect.x);
-          const overlapY = Math.min(rect.y + rect.height, tileRect.y + tileRect.height) - Math.max(rect.y, tileRect.y);
-
-          if (overlapX > overlapY) {
-            if (rect.y < tileRect.y) {
-              result.bottom = true;
-              result.grounded = true;
-            } else {
-              result.top = true;
-            }
-          } else {
-            if (rect.x < tileRect.x) {
-              result.right = true;
-            } else {
-              result.left = true;
-            }
-          }
-        }
-      }
-    }
-
-    return result;
   }
 
   // Resolve colisão e retorna nova posição e possível tileHit
@@ -256,20 +179,9 @@ export class Level {
 
         const tile = this.getTile(col, row);
         // Ignora PLATFORMS para colisão lateral
-        if (tile === TileType.PLATFORM || tile === TileType.PLATFORM_FALLING) continue;
+        if (isOneWayTile(tile)) continue;
 
-        if (
-          tile === TileType.GROUND ||
-          tile === TileType.BRICK ||
-          tile === TileType.BRICK_BREAKABLE ||
-          tile === TileType.BLOCK_USED ||
-          tile === TileType.POWERUP_BLOCK_MINI_FANTA ||
-          tile === TileType.POWERUP_BLOCK_HELMET ||
-          tile === TileType.SPRING ||
-          tile === TileType.ICE ||
-          tile === TileType.LAVA_TOP ||
-          tile === TileType.LAVA_FILL
-        ) {
+        if (isSolidTile(tile)) {
           if (tile === TileType.LAVA_TOP || tile === TileType.LAVA_FILL) {
             const offset = this.getLavaTopOffset(col, row);
             if (offset > 0) {
@@ -303,7 +215,7 @@ export class Level {
         const tile = this.getTile(col, row);
         const tileTop = this.rowToWorldY(row);
         // Plataformas: só colidem se o jogador vinha de cima e cruzou o topo nesse frame
-        if (tile === TileType.PLATFORM || tile === TileType.PLATFORM_FALLING) {
+        if (isOneWayTile(tile)) {
           if (prevRect) {
             const prevBottom = prevRect.y + prevRect.height;
             const newBottom = rect.y + rect.height;
@@ -337,16 +249,7 @@ export class Level {
           continue;
         }
 
-        if (
-          tile === TileType.GROUND ||
-          tile === TileType.BRICK ||
-          tile === TileType.BRICK_BREAKABLE ||
-          tile === TileType.BLOCK_USED ||
-          tile === TileType.POWERUP_BLOCK_MINI_FANTA ||
-          tile === TileType.POWERUP_BLOCK_HELMET ||
-          tile === TileType.SPRING ||
-          tile === TileType.ICE
-        ) {
+        if (isSolidTile(tile)) {
           return { collides: true, col, row, tile };
         }
       }
@@ -358,19 +261,7 @@ export class Level {
       for (let col = startCol; col <= endCol; col++) {
         if (!this.isValidArrayIndex(col, row)) continue;
         const tile = this.getTile(col, row);
-        if (
-          tile === TileType.GROUND ||
-          tile === TileType.BRICK ||
-          tile === TileType.BRICK_BREAKABLE ||
-          tile === TileType.POWERUP_BLOCK_MINI_FANTA ||
-          tile === TileType.POWERUP_BLOCK_HELMET ||
-          tile === TileType.BLOCK_USED ||
-          tile === TileType.SPRING ||
-          tile === TileType.ICE ||
-          tile === TileType.LAVA_TOP ||
-          tile === TileType.LAVA_FILL ||
-          tile === TileType.HIDDEN_BLOCK
-        ) {
+        if (blocksHead(tile)) {
           return { collides: true, col, row, tile };
         }
       }
@@ -438,17 +329,6 @@ export class Level {
 
     return false;
   }
-  // Verifica se alcançou a bandeira/portal de fim
-  checkGoalReached(rect: Rect): boolean {
-    const goalX = this.data.goalPosition.x * TILE_SIZE;
-    const goalY = this.data.goalPosition.y * TILE_SIZE;
-
-    return rect.x + rect.width > goalX &&
-      rect.x < goalX + TILE_SIZE &&
-      rect.y + rect.height > goalY &&
-      rect.y < goalY + TILE_SIZE;
-  }
-
   // Obtém tile considerando tiles dinâmicos (para boss)
   getTile(col: number, row: number): number {
     const key = `${col},${row}`;
@@ -599,22 +479,6 @@ export class Level {
       minY: this._originY * TILE_SIZE,
       maxY: (this._originY + this.data.height) * TILE_SIZE
     };
-  }
-
-  // Encontra checkpoint mais próximo ativado
-  findNearestCheckpoint(checkpoints: Vector2[], playerX: number): Vector2 {
-    let nearest = this.data.playerSpawn;
-    let nearestDist = Infinity;
-
-    checkpoints.forEach(cp => {
-      const dist = Math.abs(cp.x - playerX);
-      if (dist < nearestDist && cp.x <= playerX) {
-        nearest = cp;
-        nearestDist = dist;
-      }
-    });
-
-    return nearest;
   }
 
   // Muta um tile permanentemente

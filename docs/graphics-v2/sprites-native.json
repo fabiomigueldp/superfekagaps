@@ -1,0 +1,427 @@
+{
+  "image": "sprites-native.png",
+  "width": 384,
+  "height": 336,
+  "frames": {
+    "feka/idle": {
+      "x": 4,
+      "y": 4,
+      "width": 16,
+      "height": 26,
+      "anchor": [
+        8,
+        26
+      ]
+    },
+    "feka/blink": {
+      "x": 52,
+      "y": 4,
+      "width": 16,
+      "height": 26,
+      "anchor": [
+        8,
+        26
+      ]
+    },
+    "feka/walk1": {
+      "x": 100,
+      "y": 4,
+      "width": 16,
+      "height": 26,
+      "anchor": [
+        8,
+        26
+      ]
+    },
+    "feka/walk2": {
+      "x": 148,
+      "y": 4,
+      "width": 16,
+      "height": 26,
+      "anchor": [
+        8,
+        26
+      ]
+    },
+    "feka/walk3": {
+      "x": 196,
+      "y": 4,
+      "width": 16,
+      "height": 26,
+      "anchor": [
+        8,
+        26
+      ]
+    },
+    "feka/walk4": {
+      "x": 244,
+      "y": 4,
+      "width": 16,
+      "height": 26,
+      "anchor": [
+        8,
+        26
+      ]
+    },
+    "feka/walk5": {
+      "x": 292,
+      "y": 4,
+      "width": 16,
+      "height": 26,
+      "anchor": [
+        8,
+        26
+      ]
+    },
+    "feka/walk6": {
+      "x": 340,
+      "y": 4,
+      "width": 16,
+      "height": 26,
+      "anchor": [
+        8,
+        26
+      ]
+    },
+    "feka/jump": {
+      "x": 4,
+      "y": 60,
+      "width": 16,
+      "height": 26,
+      "anchor": [
+        8,
+        26
+      ]
+    },
+    "feka/fall": {
+      "x": 52,
+      "y": 60,
+      "width": 16,
+      "height": 26,
+      "anchor": [
+        8,
+        26
+      ]
+    },
+    "feka/windup": {
+      "x": 100,
+      "y": 60,
+      "width": 16,
+      "height": 26,
+      "anchor": [
+        8,
+        26
+      ]
+    },
+    "feka/sit": {
+      "x": 148,
+      "y": 60,
+      "width": 16,
+      "height": 26,
+      "anchor": [
+        8,
+        26
+      ]
+    },
+    "feka/land": {
+      "x": 196,
+      "y": 60,
+      "width": 16,
+      "height": 26,
+      "anchor": [
+        8,
+        26
+      ]
+    },
+    "feka/hurt": {
+      "x": 244,
+      "y": 60,
+      "width": 16,
+      "height": 26,
+      "anchor": [
+        8,
+        26
+      ]
+    },
+    "feka/celebrate": {
+      "x": 292,
+      "y": 60,
+      "width": 16,
+      "height": 26,
+      "anchor": [
+        8,
+        26
+      ]
+    },
+    "feka/helmet": {
+      "x": 340,
+      "y": 60,
+      "width": 16,
+      "height": 8,
+      "anchor": [
+        8,
+        8
+      ]
+    },
+    "minion/walk0": {
+      "x": 4,
+      "y": 116,
+      "width": 18,
+      "height": 20,
+      "anchor": [
+        9,
+        20
+      ]
+    },
+    "minion/walk1": {
+      "x": 52,
+      "y": 116,
+      "width": 18,
+      "height": 20,
+      "anchor": [
+        9,
+        20
+      ]
+    },
+    "minion/walk2": {
+      "x": 100,
+      "y": 116,
+      "width": 18,
+      "height": 20,
+      "anchor": [
+        9,
+        20
+      ]
+    },
+    "minion/walk3": {
+      "x": 148,
+      "y": 116,
+      "width": 18,
+      "height": 20,
+      "anchor": [
+        9,
+        20
+      ]
+    },
+    "minion/squash": {
+      "x": 196,
+      "y": 116,
+      "width": 18,
+      "height": 20,
+      "anchor": [
+        9,
+        20
+      ]
+    },
+    "joaozao/idle": {
+      "x": 244,
+      "y": 116,
+      "width": 40,
+      "height": 48,
+      "anchor": [
+        20,
+        47
+      ]
+    },
+    "joaozao/walk0": {
+      "x": 292,
+      "y": 116,
+      "width": 40,
+      "height": 48,
+      "anchor": [
+        20,
+        47
+      ]
+    },
+    "joaozao/walk1": {
+      "x": 340,
+      "y": 116,
+      "width": 40,
+      "height": 48,
+      "anchor": [
+        20,
+        47
+      ]
+    },
+    "joaozao/windup": {
+      "x": 4,
+      "y": 172,
+      "width": 40,
+      "height": 48,
+      "anchor": [
+        20,
+        47
+      ]
+    },
+    "joaozao/smash": {
+      "x": 52,
+      "y": 172,
+      "width": 40,
+      "height": 48,
+      "anchor": [
+        20,
+        47
+      ]
+    },
+    "joaozao/hurt": {
+      "x": 100,
+      "y": 172,
+      "width": 40,
+      "height": 48,
+      "anchor": [
+        20,
+        47
+      ]
+    },
+    "joaozao/shoot": {
+      "x": 148,
+      "y": 172,
+      "width": 40,
+      "height": 48,
+      "anchor": [
+        20,
+        47
+      ]
+    },
+    "joaozao/dead": {
+      "x": 196,
+      "y": 172,
+      "width": 40,
+      "height": 48,
+      "anchor": [
+        20,
+        47
+      ]
+    },
+    "yasmin/idle0": {
+      "x": 244,
+      "y": 172,
+      "width": 20,
+      "height": 30,
+      "anchor": [
+        10,
+        30
+      ]
+    },
+    "yasmin/idle1": {
+      "x": 292,
+      "y": 172,
+      "width": 20,
+      "height": 30,
+      "anchor": [
+        10,
+        30
+      ]
+    },
+    "coin/spin0": {
+      "x": 340,
+      "y": 172,
+      "width": 16,
+      "height": 16,
+      "anchor": [
+        8,
+        8
+      ]
+    },
+    "coin/spin1": {
+      "x": 4,
+      "y": 228,
+      "width": 16,
+      "height": 16,
+      "anchor": [
+        8,
+        8
+      ]
+    },
+    "coin/spin2": {
+      "x": 52,
+      "y": 228,
+      "width": 16,
+      "height": 16,
+      "anchor": [
+        8,
+        8
+      ]
+    },
+    "coin/spin3": {
+      "x": 100,
+      "y": 228,
+      "width": 16,
+      "height": 16,
+      "anchor": [
+        8,
+        8
+      ]
+    },
+    "coin/spin4": {
+      "x": 148,
+      "y": 228,
+      "width": 16,
+      "height": 16,
+      "anchor": [
+        8,
+        8
+      ]
+    },
+    "coin/spin5": {
+      "x": 196,
+      "y": 228,
+      "width": 16,
+      "height": 16,
+      "anchor": [
+        8,
+        8
+      ]
+    },
+    "fanta/idle": {
+      "x": 244,
+      "y": 228,
+      "width": 16,
+      "height": 16,
+      "anchor": [
+        8,
+        16
+      ]
+    },
+    "projectile/spin0": {
+      "x": 292,
+      "y": 228,
+      "width": 10,
+      "height": 10,
+      "anchor": [
+        5,
+        5
+      ]
+    },
+    "projectile/spin1": {
+      "x": 340,
+      "y": 228,
+      "width": 10,
+      "height": 10,
+      "anchor": [
+        5,
+        5
+      ]
+    },
+    "projectile/spin2": {
+      "x": 4,
+      "y": 284,
+      "width": 10,
+      "height": 10,
+      "anchor": [
+        5,
+        5
+      ]
+    },
+    "projectile/spin3": {
+      "x": 52,
+      "y": 284,
+      "width": 10,
+      "height": 10,
+      "anchor": [
+        5,
+        5
+      ]
+    }
+  }
+}

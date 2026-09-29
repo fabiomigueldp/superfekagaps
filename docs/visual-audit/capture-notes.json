@@ -1,0 +1,61 @@
+{
+  "capturedAt": "2026-09-29T05:36:20.595Z",
+  "method": "Local Chromium 960x540 DPR 1. Title, gameplay and pause via normal input; other screens via isolated in-memory state using the existing Game and Renderer; source unchanged.",
+  "measurements": {
+    "canvas": {
+      "width": 960,
+      "height": 540
+    },
+    "hud": {
+      "life3": [
+        120,
+        126
+      ],
+      "helmet": [
+        119,
+        129
+      ],
+      "fanta": [
+        132,
+        138
+      ],
+      "levelTextWidth": 62.39984130859375,
+      "levelStart": 210,
+      "soundStart": 306
+    },
+    "colors": {
+      "PLAYER_PALETTE": "see playerSpriteSpec.ts",
+      "defaultLife": "#4169E1"
+    }
+  },
+  "stability": {
+    "minionFrames": [
+      {
+        "t": 0,
+        "footOffset": 0
+      },
+      {
+        "t": 16.6667,
+        "footOffset": -0.3811490147292297
+      },
+      {
+        "t": 33.3333,
+        "footOffset": 0.7482900962231036
+      },
+      {
+        "t": 50,
+        "footOffset": -1.0880422217787395
+      },
+      {
+        "t": 66.6667,
+        "footOffset": 1.3879126694127821
+      },
+      {
+        "t": 83.3333,
+        "footOffset": -1.6368868451906002
+      }
+    ],
+    "minionSinePeriodMs": 31.41592653589793
+  },
+  "errors": []
+}

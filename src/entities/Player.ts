@@ -40,6 +40,7 @@ export class Player {
       miniFantaTimer: 0,
       animationFrame: 0,
       animationTimer: 0,
+      landingTimer: 0,
       groundPoundState: GroundPoundState.NONE,
       groundPoundTimer: 0
     };
@@ -110,6 +111,8 @@ export class Player {
       collisionResult.tileHit.side === 'bottom' &&
       collisionResult.tileHit.type === TileType.SPRING;
 
+    if (landedTile && !springHit) this.data.landingTimer = 90;
+
     if (springHit) {
       this.data.velocity.y = SPRING_BOOST;
       this.data.isGrounded = false;
@@ -172,6 +175,7 @@ export class Player {
   }
 
   private updateTimers(deltaTime: number): void {
+    this.data.landingTimer = Math.max(0, (this.data.landingTimer ?? 0) - deltaTime);
     // Coyote time
     if (this.data.isGrounded) {
       this.data.coyoteTimer = COYOTE_TIME;
@@ -215,11 +219,10 @@ export class Player {
 
     // Direção
     let targetVelX = 0;
-    if (input.left) {
+    if (input.left && !input.right) {
       targetVelX = -maxSpeed;
       this.data.facingRight = false;
-    }
-    if (input.right) {
+    } else if (input.right && !input.left) {
       targetVelX = maxSpeed;
       this.data.facingRight = true;
     }
@@ -447,6 +450,7 @@ export class Player {
     this.data.groundPoundTimer = 0;
     this.data.animationFrame = 0;
     this.data.animationTimer = 0;
+    this.data.landingTimer = 0;
     this.jumpHoldTime = 0;
     this.prevRectForContacts = null;
     this.prevVelocityForContacts = { x: 0, y: 0 };

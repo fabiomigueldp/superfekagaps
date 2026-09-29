@@ -11,7 +11,7 @@ function fixture(): LevelData {
     return {
         id: 'roundtrip', name: 'João: "___TILES_PLACEHOLDER___" / /* céu */',
         width: 3, height: 2, originX: -2, originY: -1,
-        tiles: [[0, 8, 9], [1, 19, 7]],
+        tiles: [[0, 2, 3], [1, 19, 0]],
         playerSpawn: { x: -1.5, y: -1 }, goalPosition: { x: 0, y: 0 },
         enemies: [{ type: EnemyType.MINION, position: { x: -0.5, y: 0 } }],
         collectibles: [{ type: CollectibleType.HELMET, position: { x: 0, y: 0 } }],
@@ -88,11 +88,11 @@ test('imports reject executable content, duplicate fields, malformed enums and b
     assert.equal((globalThis as Record<string, unknown>).__levelImportExecuted, undefined);
 });
 
-test('validation defaults legacy arrays and refuses non-finite or invalid trigger data', () => {
-    const legacy = fixture() as unknown as Record<string, unknown>;
-    delete legacy.triggers;
-    assert.deepEqual(normalizeLevelData(legacy).triggers, []);
-    assert.equal(legacy.triggers, undefined, 'normalization must not mutate legacy input');
+test('validation requires complete object lists and refuses non-finite or invalid trigger data', () => {
+    const incomplete = fixture() as unknown as Record<string, unknown>;
+    delete incomplete.triggers;
+    assert.throws(() => normalizeLevelData(incomplete), /triggers/);
+    assert.equal(incomplete.triggers, undefined, 'normalization must not mutate the input');
     const badNumber = fixture();
     badNumber.playerSpawn.x = NaN;
     assert.throws(() => normalizeLevelData(badNumber), /finito/);
@@ -160,10 +160,42 @@ test('filesystem preserves previous data on invalid input, conflicts and failed 
     delete (globalThis as Record<string, unknown>).window;
 });
 
+test('creating a level refuses to overwrite an existing filename', async () => {
+    const files = new Map<string, string>();
+    const directory = {
+        async getFileHandle(name: string, options?: { create?: boolean }) {
+            if (!files.has(name)) {
+                if (!options?.create) throw new DOMException('missing', 'NotFoundError');
+                files.set(name, '');
+            }
+            return {
+                getFile: async () => ({ text: async () => files.get(name)! }),
+                createWritable: async () => ({
+                    write: async (content: string) => { files.set(name, content); },
+                    close: async () => {}, abort: async () => {}
+                })
+            };
+        }
+    };
+    Object.defineProperty(globalThis, 'window', { configurable: true, value: { showDirectoryPicker: async () => directory } });
+    try {
+        const manager = new FileSystemManager();
+        await manager.mount();
+        await manager.createLevel('level_new.ts', fixture());
+        const original = files.get('level_new.ts');
+        assert.equal(parseLevelFromText(original!).id, 'roundtrip');
+        await assert.rejects(manager.createLevel('level_new.ts', fixture()), /Já existe/);
+        assert.equal(files.get('level_new.ts'), original);
+    } finally {
+        delete (globalThis as Record<string, unknown>).window;
+    }
+});
+
 test('concurrent saves cannot commit an older document over a newer one', async () => {
     const state = fakeStorage();
     const manager = new FileSystemManager();
     await manager.mount();
+    await manager.readLevel('level_2.ts');
     const first = fixture();
     first.name = 'first snapshot';
     const later = fixture();

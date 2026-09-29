@@ -10,7 +10,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
   <link rel="manifest" href="site.webmanifest" />
-  <meta name="theme-color" content="#ffffff" />
+  <meta name="theme-color" content="#191f35" />
 
   <style>
     * {
@@ -24,7 +24,7 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-color: #1a1a2e;
+      background-color: #191f35;
     }
 
     body {
@@ -66,8 +66,8 @@
       <button id="btn-redo" class="editor-btn" title="Refazer (Ctrl+Shift+Z)" disabled>↷</button>
       <button id="btn-fit-view" class="editor-btn" title="Enquadrar fase (F)">Enquadrar</button>
       <div style="display: flex; align-items: center; gap: 5px;">
-        <input type="checkbox" id="chk-show-bg">
-        <label for="chk-show-bg" style="font-size: 12px; color: #ccc; cursor: pointer;">Show BG</label>
+        <input type="checkbox" id="chk-show-bg" checked>
+        <label for="chk-show-bg" style="font-size: 12px; color: #ccc; cursor: pointer;">Prévia do fundo</label>
       </div>
       <div style="flex:1"></div>
       <span id="zoom-level" style="font-size:12px; color:#666; margin-right: 15px;">100%</span>
@@ -99,6 +99,11 @@
 
       <!-- Tab Content: Levels -->
       <div id="tab-levels" class="tab-content">
+        <button id="btn-new-level" class="editor-btn full-width">Nova fase</button>
+        <div class="control-row"><label for="level-id">ID</label><input id="level-id" type="text"></div>
+        <div class="control-row"><label for="level-name">Nome</label><input id="level-name" type="text"></div>
+        <div class="control-row"><label for="level-time-limit">Tempo (s)</label><input id="level-time-limit" type="number" min="1"></div>
+        <div class="control-row checkbox-row"><input id="level-is-boss" type="checkbox"><label for="level-is-boss">Fase de boss</label></div>
         <div id="level-list" style="display:flex; flex-direction:column; gap:2px;">
           <div style="padding:10px; text-align:center; color:#666;">Mount folder to see files</div>
         </div>
@@ -151,20 +156,54 @@
 
       <!-- Tab Content: Theme -->
       <div id="tab-theme" class="tab-content">
+        <p class="theme-hint">Edite as cores e veja o resultado no mapa.</p>
+        <div class="control-row">
+          <label for="theme-biome">Materiais</label>
+          <select id="theme-biome">
+            <option value="meadow">Bosque · terra e grama</option>
+            <option value="ember">Vale · terra quente</option>
+            <option value="citadel">Fortaleza · pedra azul</option>
+          </select>
+        </div>
         <div class="theme-section">
-          <h4>Sky Gradient</h4>
+          <h4>Céu da superfície</h4>
           <div class="control-row">
-            <label>Top</label>
+            <label for="theme-sky-top">Topo</label>
             <input type="color" id="theme-sky-top">
           </div>
           <div class="control-row">
-            <label>Bottom</label>
+            <label for="theme-sky-bottom">Base</label>
             <input type="color" id="theme-sky-bottom">
           </div>
         </div>
 
+        <div class="theme-section underground-section">
+          <div class="control-row checkbox-row">
+            <input type="checkbox" id="theme-underground-enabled">
+            <label for="theme-underground-enabled">Ativar fundo subterrâneo</label>
+          </div>
+          <div id="theme-underground-controls" hidden>
+            <p class="theme-hint">A linha do mundo separa o céu da caverna.</p>
+            <div class="control-row">
+              <label for="theme-underground-start-row">Começa na linha</label>
+              <input type="number" id="theme-underground-start-row" step="1" min="-1000" max="1000">
+            </div>
+            <h4>Gradiente da caverna</h4>
+            <div class="control-row">
+              <label for="theme-underground-top">Topo</label>
+              <input type="color" id="theme-underground-top">
+            </div>
+            <div class="control-row">
+              <label for="theme-underground-bottom">Base</label>
+              <input type="color" id="theme-underground-bottom">
+            </div>
+            <h4>Camadas subterrâneas <button id="btn-add-underground-layer" class="mini-btn" type="button" title="Adicionar camada subterrânea" aria-label="Adicionar camada subterrânea">+</button></h4>
+            <div id="theme-underground-layers-list"></div>
+          </div>
+        </div>
+
         <div class="theme-section">
-          <h4>Layers <button id="btn-add-layer" class="mini-btn">+</button></h4>
+          <h4>Camadas da superfície <button id="btn-add-layer" class="mini-btn" type="button" title="Adicionar camada à superfície" aria-label="Adicionar camada à superfície">+</button></h4>
           <div id="theme-layers-list">
             <!-- Populated by JS -->
           </div>
@@ -192,8 +231,8 @@
     </div>
   </div>
 
-  <canvas id="game-canvas"></canvas>
-  <a id="open-editor" href="?editor=true">Editor de mundos</a>
+  <canvas id="game-canvas" tabindex="0" aria-label="Super Feka Gaps: área do jogo"></canvas>
+  <a id="open-editor" href="?editor=true" hidden>Editor de mundos</a>
   <script type="module" src="/src/main.ts"></script>
 </body>
 

@@ -1,10 +1,10 @@
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { PLAYER_SPRITES, PLAYER_PALETTE, PLAYER_FRAME_W, PLAYER_FRAME_H } from '../src/assets/playerSpriteSpec';
+import { PLAYER_SPRITES, PLAYER_PALETTE, PLAYER_FRAME_W, PLAYER_FRAME_H, PLAYER_HELMET_H } from '../src/assets/playerSpriteSpec';
 
 export function findPlayerAssetErrors(sprites: Record<string, unknown>, palette = PLAYER_PALETTE): string[] {
   const errors: string[] = [];
-  const requiredAnimations = ['idle', 'walk1', 'walk2', 'jump', 'sit', 'helmet'];
+  const requiredAnimations = Object.keys(PLAYER_SPRITES);
 
   for (const animation of requiredAnimations) {
     if (!Object.prototype.hasOwnProperty.call(sprites, animation)) errors.push(`Animação obrigatória '${animation}' ausente.`);
@@ -16,8 +16,8 @@ export function findPlayerAssetErrors(sprites: Record<string, unknown>, palette 
       continue;
     }
 
-    // Helmet is the separate four-row overlay, not a full player frame.
-    const expectedHeight = animation === 'helmet' ? 4 : PLAYER_FRAME_H;
+    // Accessories use their own canvas height and retain the shared pixel scale.
+    const expectedHeight = animation === 'helmet' ? PLAYER_HELMET_H : PLAYER_FRAME_H;
     if (frame.length !== expectedHeight) {
       errors.push(`Animação '${animation}' tem altura ${frame.length}, esperado ${expectedHeight}.`);
     }

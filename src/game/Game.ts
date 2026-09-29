@@ -1,30 +1,34 @@
 // Game Principal - Super Feka Gaps
 
 import {
-  GameState, GAME_WIDTH, GAME_HEIGHT, TILE_SIZE, COLORS,
+  GameState, GAME_WIDTH, GAME_HEIGHT, TILE_SIZE,
   INITIAL_LIVES, COIN_SCORE, ENEMY_SCORE, TIME_BONUS_MULTIPLIER, TileType,
   GP_IMPACT_RADIUS_PX, GP_SHAKE_MS, GP_SHAKE_MAG,
   BLOCK_BREAK_SCORE, BOSS_DEFEAT_SCORE, COINS_PER_LIFE, LIVES_BONUS_SCORE,
   CULLING_MARGIN
 } from '../constants';
 import {
-  CameraData, Vector2, FlagData, CollectibleData, CollectibleSpawnData,
+  CameraData, Vector2, FlagData, CollectibleData,
   CollectibleType, Particle, Firework, EnemyType, GroundPoundState, LevelData, CameraTrigger
 } from '../types';
 import { Input } from '../engine/Input';
 import { Audio } from '../engine/Audio';
 import { Renderer } from '../engine/Renderer';
+import { ART } from '../graphics/palette';
+import { sceneZoom } from '../graphics/pixels';
 import { AudioVoicePlayer } from '../voice/AudioVoicePlayer';
 import { SpeechBubbleController } from '../voice/SpeechBubbleController';
 import { VoiceDirector } from '../voice/VoiceDirector';
 import { JOAOZAO_VOICE_MANIFEST } from '../voice/joaozaoVoiceManifest';
 import { Level, createLevel } from '../world/Level';
+import { supportsStanding } from '../world/tileRules';
 import { normalizeLevelData } from '../world/levelValidation';
 import { Player } from '../entities/Player';
 import { Minion } from '../entities/enemies/Minion';
 import { Joaozao } from '../entities/enemies/Joaozao';
-import { getLevelByIndex, TOTAL_LEVELS, ALL_LEVELS } from '../data/levels/index';
+import { getLevelByIndex, TOTAL_LEVELS } from '../data/levels/index';
 import { ScoreManager } from './ScoreManager';
+import { GlobalScoreboard } from './GlobalScoreboard';
 import { TriggerController } from './TriggerController';
 import { EditorController } from '../editor/EditorController';
 
@@ -91,6 +95,7 @@ export class Game {
   // Editor
   private editorController: EditorController | null = null;
   private triggerController = new TriggerController();
+  private globalScoreboard = new GlobalScoreboard();
 
   constructor(canvas: HTMLCanvasElement) {
     this.input = new Input();
@@ -115,20 +120,6 @@ export class Game {
       this.editorController.init();
     } else {
       this.state = GameState.BOOT;
-      this.validateLevelsOnStartup();
-    }
-  }
-
-  private validateLevelsOnStartup(): void {
-    const ids = new Set<string>();
-    for (const level of ALL_LEVELS) {
-      try {
-        normalizeLevelData(level);
-        if (ids.has(level.id)) throw new Error('ID de fase duplicado: ' + level.id);
-        ids.add(level.id);
-      } catch (error) {
-        console.error('Falha ao validar a fase ' + level.name, error);
-      }
     }
   }
 
@@ -157,7 +148,9 @@ export class Game {
   };
 
   private update(deltaTime: number): void {
+    this.input.setMenuMode([GameState.MENU, GameState.PAUSED, GameState.GAME_OVER, GameState.ENDING].includes(this.state));
     this.input.update();
+    if (this.state !== GameState.PAUSED) this.renderer.advanceClock(deltaTime);
 
     // Toggle som
     if (this.input.consumeMute()) {
@@ -295,6 +288,12 @@ export class Game {
       this.handleGroundPoundImpact(playerResult.groundPoundImpact);
     }
 
+    if (playerResult.landedTile && !playerResult.groundPoundImpact) {
+      const feet = this.player.data.position;
+      this.renderer.addImpact(feet.x + this.player.data.width / 2, feet.y + this.player.data.height,
+        playerResult.landedTile.type === TileType.SPRING ? 'spring' : 'land');
+    }
+
     // Processa tile hits resultantes de colisão com tiles (ex.: cabeçada)
     if (playerResult && playerResult.tileHit) {
       const th = playerResult.tileHit;
@@ -309,13 +308,13 @@ export class Game {
         if (tileType === TileType.BRICK_BREAKABLE) {
           // Quebra o bloco
           this.level.setTile(gridCol, gridRow, TileType.EMPTY);
-          this.spawnParticles(th.col * TILE_SIZE + TILE_SIZE / 2, th.row * TILE_SIZE + TILE_SIZE / 2, '#DEB887', 10);
+          this.spawnParticles(th.col * TILE_SIZE + TILE_SIZE / 2, th.row * TILE_SIZE + TILE_SIZE / 2, ART.soilTop, 10);
           this.audio.playBlockBreak();
           this.score += BLOCK_BREAK_SCORE;
         } else if (tileType === TileType.BRICK) {
           if (this.player.data.hasHelmet) {
             this.level.setTile(gridCol, gridRow, TileType.EMPTY);
-            this.spawnParticles(th.col * TILE_SIZE + TILE_SIZE / 2, th.row * TILE_SIZE + TILE_SIZE / 2, '#DEB887', 10);
+            this.spawnParticles(th.col * TILE_SIZE + TILE_SIZE / 2, th.row * TILE_SIZE + TILE_SIZE / 2, ART.soilTop, 10);
             this.audio.playBlockBreak();
             this.score += BLOCK_BREAK_SCORE;
           } else {
@@ -395,9 +394,10 @@ export class Game {
       // Processa smash do boss (se houver impacto pendente)
       const impact = this.boss ? this.boss.consumeImpact() : null;
       if (impact) {
+        this.renderer.addImpact(impact.x, impact.y, 'boss');
         this.camera.shakeTimer = GP_SHAKE_MS;
         this.camera.shakeMagnitude = GP_SHAKE_MAG;
-        this.spawnParticles(impact.x, impact.y, '#FFFFFF', 15);
+        this.spawnParticles(impact.x, impact.y, ART.paper, 15);
         this.audio.playGroundPoundImpact();
       }
 
@@ -426,7 +426,7 @@ export class Game {
     }
 
     // Verifica coletáveis
-    this.checkCollectibles();
+    this.checkCollectibles(deltaTime);
 
     // Verifica bandeiras (checkpoint/final)
     this.checkFlags();
@@ -490,7 +490,7 @@ export class Game {
 
   private updateEnding(deltaTime: number): void {
     this.endingTimer += deltaTime;
-    if (this.endingTimer > 5000 && this.input.consumeStart()) {
+    if (this.endingTimer > 5000 && !this.globalScoreboard.isOpen && this.input.consumeStart()) {
       this.changeState(GameState.MENU);
     }
   }
@@ -554,7 +554,6 @@ export class Game {
           this.renderBoot();
           break;
       }
-      this.renderer.drawOrangeRain(this.deliciaMode);
     }
     if (this.state !== GameState.EDITOR) {
       this.renderer.present();
@@ -570,34 +569,25 @@ export class Game {
       this.newRecord,
       this.totalRunTime,
       this.bestTime,
-      this.newTimeRecord
+      this.newTimeRecord,
+      this.endingTimer
     );
   }
 
   private renderBoot(): void {
-    const ctx = this.renderer.getContext();
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-
-    ctx.font = '12px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillText('Torbware', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 10);
-    ctx.font = '8px monospace';
-    ctx.fillStyle = '#888888';
-    ctx.fillText('presents', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 10);
+    this.renderer.drawBoot(1500 - this.bootTimer);
   }
 
   private renderGame(): void {
     if (!this.level || !this.player) return;
 
     // Background (Fill the logical viewport which might be smaller/larger due to zoom)
-    const zoom = this.camera.zoom || 1;
+    const zoom = sceneZoom(this.camera.zoom || 1);
     this.renderer.drawBackground(this.camera, undefined, GAME_WIDTH / zoom, GAME_HEIGHT / zoom);
 
     // Tiles (pass origin offset for proper world coordinate rendering)
     this.renderer.drawTiles(this.level.getModifiedTiles(), this.camera, this.level.originX, this.level.originY);
-    this.renderer.drawFallingPlatforms(this.level.getFallingPlatformRenderData(), this.camera);
+    this.renderer.drawFallingPlatforms(this.level.getFallingPlatformRenderData(), this.camera, this.level.originX, this.level.originY);
 
     // Fogos (se o boss está morto/morrendo)
     const bossDying = this.boss && this.boss.data.isDead;
@@ -662,6 +652,8 @@ export class Game {
       }
     }));
     this.renderer.drawParticles(particlesToDraw);
+    this.renderer.drawWorldEffects(this.camera);
+    this.renderer.drawOrangeRain(this.deliciaMode);
 
     // HUD
     this.renderer.drawHUD(
@@ -671,7 +663,9 @@ export class Game {
       this.level.data.name,
       this.audio.isEnabled(),
       this.player.data.hasHelmet,
-      this.player.data.miniFantaTimer
+      this.player.data.miniFantaTimer,
+      this.coins,
+      this.boss && !this.boss.data.isDead ? this.boss.getHealth() : undefined
     );
 
     // Touch controls
@@ -680,6 +674,7 @@ export class Game {
 
   private changeState(newState: GameState): void {
     const prevState = this.state;
+    if (prevState === GameState.ENDING && newState !== GameState.ENDING) this.globalScoreboard.hide();
     this.state = newState;
     this.audio.onStateChange(prevState, newState, {
       levelId: this.level?.data.id ?? null,
@@ -692,6 +687,7 @@ export class Game {
   }
 
   private startNewGame(): void {
+    this.globalScoreboard.hide();
     this.currentLevelIndex = 0;
     this.score = 0;
     this.lives = INITIAL_LIVES;
@@ -712,10 +708,7 @@ export class Game {
       return;
     }
 
-    // Deep clone para evitar mutação do objeto estático original (isso causava duplicação de moedas ao reiniciar)
-    const rawLevelData = JSON.parse(JSON.stringify(rawLevelDataOriginal));
-
-    const levelData = this.normalizeLevelData(rawLevelData);
+    const levelData = normalizeLevelData(rawLevelDataOriginal);
 
 
     this.level = createLevel(levelData);
@@ -741,9 +734,7 @@ export class Game {
     // Better to let updateCamera handle it, but definitely reset ZOOM.
 
     // Configura Background Procedural
-    if (levelData.theme) {
-      this.renderer.prepareLevelBackground(levelData.theme);
-    }
+    this.renderer.prepareLevelBackground(levelData.theme);
 
     // Carrega inimigos
     this.minions = [];
@@ -779,8 +770,7 @@ export class Game {
     }
 
     // Carrega coletáveis
-    const validatedCollectibles = this.validateCollectibles(levelData.collectibles, levelData.tiles, levelData.id);
-    this.collectibles = validatedCollectibles.map(c => ({
+    this.collectibles = levelData.collectibles.map(c => ({
       position: { x: c.position.x * TILE_SIZE, y: c.position.y * TILE_SIZE },
       velocity: { x: 0, y: 0 },
       width: 16,
@@ -789,7 +779,7 @@ export class Game {
       type: c.type,
       collected: false,
       animationFrame: 0,
-      animationTimer: Math.random() * 100
+      animationTimer: Math.random() * 660
     }));
 
     // Carrega bandeiras (checkpoint e final)
@@ -805,71 +795,6 @@ export class Game {
     } else {
       this.changeState(GameState.PLAYING);
     }
-  }
-
-  private normalizeLevelData(levelData: LevelData): LevelData {
-    const tiles: number[][] = [];
-    const checkpointMarkers: Vector2[] = [];
-    const goalMarkers: Vector2[] = [];
-
-    for (let row = 0; row < levelData.tiles.length; row++) {
-      const sourceRow = levelData.tiles[row];
-      const newRow: number[] = [];
-      for (let col = 0; col < sourceRow.length; col++) {
-        const tile = sourceRow[col];
-        if (tile === TileType.CHECKPOINT) {
-          checkpointMarkers.push({
-            x: col + (levelData.originX ?? 0),
-            y: row + (levelData.originY ?? 0)
-          });
-          newRow.push(TileType.EMPTY);
-          continue;
-        }
-        if (tile === TileType.FLAG) {
-          goalMarkers.push({
-            x: col + (levelData.originX ?? 0),
-            y: row + (levelData.originY ?? 0)
-          });
-          newRow.push(TileType.EMPTY);
-          continue;
-        }
-        if (tile === TileType.COIN || tile === TileType.POWERUP_MINI_FANTA || tile === TileType.POWERUP_HELMET) {
-          // Extrai item do grid para entidade
-          let type = CollectibleType.COIN;
-          if (tile === TileType.POWERUP_MINI_FANTA) type = CollectibleType.MINI_FANTA;
-          if (tile === TileType.POWERUP_HELMET) type = CollectibleType.HELMET;
-
-          // Revertendo para usar apenas coordenadas de grid aqui
-          // CORRIGIDO: Aplicamos o offset AQUI pois estamos convertendo de Grid (row/col) para Mundo
-          levelData.collectibles.push({
-            type: type,
-            position: {
-              x: col + (levelData.originX ?? 0),
-              y: row + (levelData.originY ?? 0)
-            }
-          });
-          newRow.push(TileType.EMPTY);
-          continue;
-        }
-        newRow.push(tile);
-      }
-      tiles.push(newRow);
-    }
-
-    const checkpoints = checkpointMarkers.length > 0
-      ? checkpointMarkers
-      : levelData.checkpoints;
-
-    const goalPosition = goalMarkers.length > 0
-      ? goalMarkers[0]
-      : levelData.goalPosition;
-
-    return {
-      ...levelData,
-      tiles,
-      checkpoints,
-      goalPosition
-    };
   }
 
   private toggleDeliciaMode(): void {
@@ -1073,7 +998,7 @@ export class Game {
         targetY = triggerCenter - viewHeight / 2;
       }
       if (this.activeCameraOverride.zoom) {
-        targetZoom = this.activeCameraOverride.zoom;
+        targetZoom = sceneZoom(this.activeCameraOverride.zoom);
       }
     }
 
@@ -1149,7 +1074,7 @@ export class Game {
           this.spawnParticles(
             minion.data.position.x + minion.data.width / 2,
             minion.data.position.y,
-            '#FF6347',
+            ART.redLight,
             5
           );
         } else if (prevGp === GroundPoundState.FALL) {
@@ -1162,7 +1087,7 @@ export class Game {
           this.spawnParticles(
             minion.data.position.x + minion.data.width / 2,
             minion.data.position.y,
-            '#FF6347',
+            ART.redLight,
             8
           );
         } else {
@@ -1234,7 +1159,7 @@ export class Game {
     }
   }
 
-  private checkCollectibles(): void {
+  private checkCollectibles(deltaTime: number): void {
     if (!this.player) return;
 
     const playerRect = this.player.getRect();
@@ -1243,7 +1168,7 @@ export class Game {
       if (c.collected || !c.active) return;
 
       // Atualiza animação
-      c.animationTimer++;
+      c.animationTimer += deltaTime;
 
       // Culling de lógica
       if (c.position.x < this.camera.x - CULLING_MARGIN ||
@@ -1319,7 +1244,7 @@ export class Game {
         };
         this.camera.shakeTimer = 80;
         this.camera.shakeMagnitude = 1;
-        this.spawnParticles(flag.anchor.x, flag.anchor.y - 6, '#00FF00', 8);
+        this.spawnParticles(flag.anchor.x, flag.anchor.y - 6, ART.tealLight, 8);
         this.audio.playCheckpoint();
         return;
       }
@@ -1343,6 +1268,7 @@ export class Game {
   }
 
   private handleGroundPoundImpact(impact: { x: number, y: number, col: number, row: number }): void {
+    this.renderer.addImpact(impact.x, impact.y, 'pound');
     if (!this.level || !this.player) return;
 
     // 1. Efeitos de câmera e som
@@ -1385,7 +1311,7 @@ export class Game {
         this.spawnParticles(
           targetCol * TILE_SIZE + TILE_SIZE / 2,
           targetRow * TILE_SIZE + TILE_SIZE / 2,
-          '#FFD700',
+          ART.goldLight,
           8
         );
       } else {
@@ -1394,7 +1320,7 @@ export class Game {
           this.spawnParticles(
             targetCol * TILE_SIZE + TILE_SIZE / 2,
             targetRow * TILE_SIZE + TILE_SIZE / 2,
-            '#DEB887',
+            ART.soilTop,
             8
           );
           this.score += BLOCK_BREAK_SCORE;
@@ -1416,7 +1342,7 @@ export class Game {
         this.spawnParticles(
           minion.data.position.x + minion.data.width / 2,
           minion.data.position.y + minion.data.height / 2,
-          '#FF6347',
+          ART.redLight,
           10
         );
       }
@@ -1442,7 +1368,7 @@ export class Game {
           this.queueBossDeath();
         }
 
-        this.spawnParticles(impact.x, impact.y, '#FFFFFF', 15);
+        this.spawnParticles(impact.x, impact.y, ART.paper, 15);
       }
     }
 
@@ -1456,7 +1382,7 @@ export class Game {
         },
         life: 400,
         maxLife: 400,
-        color: '#FFFFFF',
+        color: ART.paper,
         size: 1 + Math.random() * 2
       });
     }
@@ -1469,7 +1395,7 @@ export class Game {
 
     if (damageResult.helmetUsed) {
       const center = this.player.getCenter();
-      this.spawnParticles(center.x, center.y - 6, '#FFD700', 8);
+      this.spawnParticles(center.x, center.y - 6, ART.goldLight, 8);
       this.audio.playHelmetBreak();
     }
 
@@ -1487,7 +1413,7 @@ export class Game {
     this.audio.onPlayerDeathStart();
     this.deathTimer = 1500;
     const center = this.player.getCenter();
-    this.spawnParticles(center.x, center.y, '#FFFFFF', 12);
+    this.spawnParticles(center.x, center.y, ART.paper, 12);
 
     if (cause === 'boss') {
       this.triggerBossKillTaunt();
@@ -1573,6 +1499,7 @@ export class Game {
     this.bestTime = ScoreManager.getBestTime();
 
     this.changeState(GameState.ENDING);
+    this.globalScoreboard.showEnding(this.score, Math.round(this.totalRunTime * 1000), this.newRecord);
 
     // Spawn initial burst of fireworks for ending screen
     for (let i = 0; i < 5; i++) {
@@ -1582,63 +1509,7 @@ export class Game {
   }
 
   private isSurfaceTile(tile: number): boolean {
-    return tile === TileType.GROUND ||
-      tile === TileType.BRICK ||
-      tile === TileType.BRICK_BREAKABLE ||
-      tile === TileType.POWERUP_BLOCK_MINI_FANTA ||
-      tile === TileType.POWERUP_BLOCK_HELMET ||
-      tile === TileType.BLOCK_USED ||
-      tile === TileType.PLATFORM ||
-      tile === TileType.PLATFORM_FALLING ||
-      tile === TileType.ICE ||
-      tile === TileType.SPRING ||
-      tile === TileType.LAVA_TOP ||
-      tile === TileType.LAVA_FILL;
-  }
-
-  private isSolidTile(tile: number): boolean {
-    return tile === TileType.GROUND ||
-      tile === TileType.BRICK ||
-      tile === TileType.BRICK_BREAKABLE ||
-      tile === TileType.POWERUP_BLOCK_MINI_FANTA ||
-      tile === TileType.POWERUP_BLOCK_HELMET ||
-      tile === TileType.BLOCK_USED ||
-      tile === TileType.PLATFORM ||
-      tile === TileType.PLATFORM_FALLING ||
-      tile === TileType.SPIKE ||
-      tile === TileType.ICE ||
-      tile === TileType.SPRING ||
-      tile === TileType.LAVA_TOP ||
-      tile === TileType.LAVA_FILL;
-  }
-
-  private validateCollectibles(
-    collectibles: CollectibleSpawnData[],
-    tiles: number[][],
-    levelId: string
-  ): CollectibleSpawnData[] {
-    return collectibles.map(c => {
-      const copy = { type: c.type, position: { x: c.position.x, y: c.position.y } };
-      const col = Math.floor(copy.position.x);
-      const row = Math.floor(copy.position.y);
-
-      if (row < 0 || row >= tiles.length || col < 0 || col >= tiles[0].length) {
-        console.warn(`Level ${levelId} collectible out of bounds at col=${col} row=${row} type=${copy.type}`);
-        return copy;
-      }
-
-      const tile = tiles[row][col];
-      if (this.isSolidTile(tile)) {
-        console.warn(`Level ${levelId} collectible inside solid tile at col=${col} row=${row} tile=${tile} type=${copy.type}`);
-        const aboveRow = row - 1;
-        if (aboveRow >= 0 && !this.isSolidTile(tiles[aboveRow][col])) {
-          copy.position.y = aboveRow;
-          console.warn(`Level ${levelId} collectible moved to col=${col} row=${aboveRow} type=${copy.type}`);
-        }
-      }
-
-      return copy;
-    });
+    return supportsStanding(tile);
   }
 
   private spawnParticles(x: number, y: number, color: string, count: number): void {
@@ -1670,7 +1541,7 @@ export class Game {
         },
         life: 300 + Math.random() * 200,
         maxLife: 500,
-        color: i % 2 === 0 ? '#FFD700' : '#FFFFFF', // Intercala Ouro e Branco
+        color: i % 2 === 0 ? ART.goldLight : ART.paper, // Intercala Ouro e Branco
         size: i % 2 === 0 ? 3 : 2, // Tamanhos variados
         gravity: 0, // Flutua!
         friction: 0.92 // Desacelera "mágicamente"
@@ -1758,7 +1629,8 @@ export class Game {
       ty = this.camera.y + 20 + Math.random() * 60;
     }
 
-    const color = COLORS.FIREWORK_COLORS[Math.floor(Math.random() * COLORS.FIREWORK_COLORS.length)];
+    const colors = [ART.goldLight, ART.tealLight, ART.redLight, ART.purpleLight];
+    const color = colors[Math.floor(Math.random() * colors.length)];
 
     // Durante PLAYING, spawn do chão visível (bottom of screen)
     const startY = this.state === GameState.ENDING

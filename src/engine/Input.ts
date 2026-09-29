@@ -3,6 +3,7 @@
 import { InputState } from '../types';
 
 type HeldAction = 'left' | 'right' | 'jump' | 'run' | 'down';
+type HorizontalAction = 'left' | 'right';
 
 const KEY_ACTIONS: Readonly<Record<string, HeldAction>> = {
   ArrowLeft: 'left', KeyA: 'left',
@@ -11,6 +12,22 @@ const KEY_ACTIONS: Readonly<Record<string, HeldAction>> = {
   Space: 'jump', KeyZ: 'jump', ArrowUp: 'jump', KeyW: 'jump',
   ShiftLeft: 'run', ShiftRight: 'run', KeyX: 'run'
 };
+
+const LETTER_KEYS: Readonly<Record<string, string>> = {
+  a: 'KeyA', d: 'KeyD', w: 'KeyW', s: 'KeyS',
+  z: 'KeyZ', x: 'KeyX', m: 'KeyM'
+};
+
+function controlCode(event: KeyboardEvent): string {
+  // `key` follows the character printed by the active keyboard layout. This
+  // also covers virtual keyboards that report `code: "Unidentified"`.
+  const key = event.key?.toLowerCase();
+  if (key && LETTER_KEYS[key]) return LETTER_KEYS[key];
+  if (event.code && event.code !== 'Unidentified') return event.code;
+  if (event.key === ' ') return 'Space';
+  if (event.key === 'Shift') return 'ShiftLeft';
+  return event.key ?? '';
+}
 
 const createState = (): InputState => ({
   left: false, right: false, jump: false, run: false, down: false,
@@ -31,14 +48,19 @@ export class Input {
   private pendingJumpPressed = false;
   private pendingJumpReleased = false;
   private pendingDownPressed = false;
+  private pendingHorizontal: HorizontalAction | null = null;
+  private menuMode = false;
+
+  setMenuMode(enabled: boolean): void { this.menuMode = enabled; }
 
   private konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight'];
   private konamiIndex = 0;
   private konamiJustTriggered = false;
 
   constructor() {
-    window.addEventListener('keydown', (event) => this.handleKeyDown(event));
-    window.addEventListener('keyup', (event) => this.handleKeyUp(event));
+    // Capture gameplay keys before page widgets can stop bubbling.
+    window.addEventListener('keydown', (event) => this.handleKeyDown(event), true);
+    window.addEventListener('keyup', (event) => this.handleKeyUp(event), true);
     window.addEventListener('blur', () => this.reset());
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) this.reset();
@@ -48,34 +70,58 @@ export class Input {
 
   private handleKeyDown(event: KeyboardEvent): void {
     const target = event.target;
-    if (target instanceof HTMLElement && target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) {
+    if (target instanceof HTMLElement && target.id !== 'game-canvas' && target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) {
       return;
     }
 
-    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(event.code)) {
+    // Let browser/system shortcuts keep their normal behaviour.
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+
+    const code = controlCode(event);
+    if (!code) return;
+    const action = KEY_ACTIONS[code];
+
+    if (action || code === 'Enter' || code === 'Escape' || code === 'KeyM') {
       event.preventDefault();
     }
-    if (event.repeat || this.pressedKeys.has(event.code)) return;
-    this.pressedKeys.add(event.code);
+    // Repeated direction keys can recover after a missed initial keydown.
+    // Repeats must not create another jump, attack, menu or Konami action.
+    if (event.repeat) {
+      if ((action === 'left' || action === 'right') && !this.pressedKeys.has(code)) {
+        this.pressedKeys.add(code);
+        this.refreshHeldActions();
+      }
+      return;
+    }
+    if (this.pressedKeys.has(code)) {
+      if (action !== 'left' && action !== 'right') return;
+      // A fresh keydown after a missed keyup is a new directional press.
+      this.pressedKeys.delete(code);
+    }
+    this.pressedKeys.add(code);
 
-    if (event.code === 'Enter') this.pendingStart = true;
-    if (event.code === 'Escape') this.pendingPause = true;
-    if (event.code === 'KeyM') this.pendingMute = true;
+    if (action === 'left' || action === 'right') {
+      this.pendingHorizontal = action;
+    }
+
+    if (code === 'Enter') this.pendingStart = true;
+    if (code === 'Escape') this.pendingPause = true;
+    if (code === 'KeyM') this.pendingMute = true;
     this.refreshHeldActions();
 
-    if (event.code === this.konamiCode[this.konamiIndex]) {
+    if (code === this.konamiCode[this.konamiIndex]) {
       this.konamiIndex++;
       if (this.konamiIndex === this.konamiCode.length) {
         this.konamiJustTriggered = true;
         this.konamiIndex = 0;
       }
     } else {
-      this.konamiIndex = event.code === this.konamiCode[0] ? 1 : 0;
+      this.konamiIndex = code === this.konamiCode[0] ? 1 : 0;
     }
   }
 
   private handleKeyUp(event: KeyboardEvent): void {
-    this.pressedKeys.delete(event.code);
+    this.pressedKeys.delete(controlCode(event));
     this.refreshHeldActions();
   }
 
@@ -91,8 +137,18 @@ export class Input {
     this.pendingJumpPressed ||= jump && !this.state.jump;
     this.pendingJumpReleased ||= !jump && this.state.jump;
     this.pendingDownPressed ||= down && !this.state.down;
-    this.state.left = held.has('left');
-    this.state.right = held.has('right');
+    // The most recently pressed horizontal key wins. Releasing it restores any
+    // older held key, including an arrow-key alias, without a dead frame.
+    let keyboardDirection: HorizontalAction | null = null;
+    this.pressedKeys.forEach((code) => {
+      const action = KEY_ACTIONS[code];
+      if (action === 'left' || action === 'right') keyboardDirection = action;
+    });
+    const touchLeft = this.touchActions.has('left');
+    const touchRight = this.touchActions.has('right');
+    const direction = keyboardDirection ?? (touchLeft === touchRight ? null : touchLeft ? 'left' : 'right');
+    this.state.left = direction === 'left';
+    this.state.right = direction === 'right';
     this.state.jump = jump;
     this.state.run = held.has('run');
     this.state.down = down;
@@ -130,11 +186,14 @@ export class Input {
       const y = (touch.clientY - rect.top) / rect.height;
       if (x < 0 || x > 1 || y < 0 || y > 1) continue;
 
-      if (y > 0.7) {
+      if (this.menuMode) {
+        menuPressed = true;
+      } else if (y > 0.7) {
         if (x < 0.15) this.touchActions.add('left');
         else if (x < 0.3) this.touchActions.add('right');
         else if (x > 0.85) this.touchActions.add('jump');
         else if (x > 0.7) this.touchActions.add('run');
+        else if (x > 0.44 && x < 0.56) this.touchActions.add('down');
       } else if (y < 0.2 && x > 0.4 && x < 0.6) {
         menuPressed = true;
       }
@@ -146,6 +205,13 @@ export class Input {
   }
 
   update(): void {
+    this.refreshHeldActions();
+    // A tap shorter than 1/60 s still moves for one simulation step.
+    if (this.pendingHorizontal) {
+      this.state.left = this.pendingHorizontal === 'left';
+      this.state.right = this.pendingHorizontal === 'right';
+      this.pendingHorizontal = null;
+    }
     // Keep short taps that start and end between two simulation updates.
     this.state.start = this.pendingStart;
     this.state.pause = this.pendingPause;
@@ -206,6 +272,7 @@ export class Input {
     this.pendingJumpPressed = false;
     this.pendingJumpReleased = false;
     this.pendingDownPressed = false;
+    this.pendingHorizontal = null;
     this.konamiIndex = 0;
     this.konamiJustTriggered = false;
   }

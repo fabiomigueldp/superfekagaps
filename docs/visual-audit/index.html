@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Super Feka Gaps — Direção visual</title>
+  <style>
+    :root { color-scheme: light; --paper:#f5f3eb; --ink:#1b1f3b; --muted:#5d6270; --line:#d6d8ce; --green:#225349; --blue:#3d6fbe; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.65 system-ui,sans-serif; }
+    main { max-width:1192px; margin:auto; padding:32px 32px 72px; }
+    a { color:var(--green); text-underline-offset:4px; }
+    a:focus-visible, select:focus-visible { outline:3px solid var(--blue); outline-offset:4px; }
+    .topline { display:flex; justify-content:space-between; align-items:center; gap:20px; border-bottom:1px solid var(--line); padding-bottom:20px; }
+    .brand { font-weight:750; letter-spacing:.08em; font-size:13px; }
+    .date, .eyebrow { font:12px/1.5 ui-monospace,monospace; letter-spacing:.07em; text-transform:uppercase; }
+    .date { color:var(--muted); }
+    .intro { padding:54px 0 42px; max-width:870px; }
+    .eyebrow { color:var(--green); margin:0 0 14px; }
+    h1 { font-size:clamp(34px,5.8vw,65px); line-height:1.06; letter-spacing:-.045em; margin:0 0 22px; font-weight:700; }
+    .intro p:last-child { color:var(--muted); font-size:19px; max-width:740px; margin:0; }
+    h2 { font-size:27px; letter-spacing:-.025em; line-height:1.2; margin:0 0 14px; }
+    h3 { font-size:17px; line-height:1.35; margin:0 0 8px; }
+    p { margin:0 0 16px; }
+    .facts { display:flex; flex-wrap:wrap; gap:20px 42px; padding:20px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); margin-bottom:48px; }
+    .facts span { display:block; color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.05em; }
+    .facts strong { font-size:19px; font-weight:650; }
+    section { margin:0 0 54px; }
+    .inspect { display:grid; grid-template-columns:minmax(0,2.4fr) minmax(220px,1fr); gap:30px; align-items:start; }
+    figure { margin:0; min-width:0; }
+    .screenshot { display:block; width:100%; height:auto; image-rendering:pixelated; background:#1b1f3b; }
+    figcaption { font-size:13px; line-height:1.6; color:var(--muted); padding-top:12px; }
+    label { display:block; font-size:13px; margin-bottom:6px; font-weight:600; }
+    select { width:100%; min-height:44px; border:1px solid #9a9f98; background:#fffef9; color:var(--ink); padding:8px 12px; font:inherit; border-radius:3px; margin-bottom:20px; }
+    .finding { padding:18px 0; border-top:1px solid var(--line); }
+    .finding p { font-size:14px; margin:0; color:var(--muted); }
+    .tag { font:11px ui-monospace,monospace; color:var(--green); display:block; margin-bottom:8px; text-transform:uppercase; letter-spacing:.08em; }
+    .concept { width:100%; height:auto; display:block; background:#1b1f3b; }
+    .subhead { max-width:780px; color:var(--muted); margin-bottom:22px; }
+    .rules { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:28px; }
+    .rule { border-top:2px solid var(--line); padding-top:18px; }
+    .rule p { color:var(--muted); font-size:14px; margin:0; }
+    .swatches { display:grid; grid-template-columns:repeat(8,minmax(0,1fr)); gap:12px; margin-top:28px; }
+    .swatch i { display:block; height:44px; background:var(--color); }
+    .swatch b { display:block; font-size:12px; font-weight:600; margin-top:6px; }
+    .swatch code { display:block; color:var(--muted); font-size:11px; }
+    .tablewrap { overflow-x:auto; }
+    table { border-collapse:collapse; width:100%; font-size:14px; }
+    th { text-align:left; font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; padding:12px 16px 12px 0; }
+    td { border-top:1px solid var(--line); padding:17px 18px 17px 0; vertical-align:top; }
+    td:first-child { min-width:100px; color:var(--green); font-family:ui-monospace,monospace; font-size:12px; }
+    td strong { font-weight:650; }
+    .next { background:var(--ink); color:#f5f3eb; padding:30px 34px; display:grid; grid-template-columns:1fr 1.2fr; gap:30px; }
+    .next .eyebrow { color:#a0d4be; }
+    .next h2 { margin:0; }
+    .next p { color:#d2d6dc; font-size:15px; margin:0; }
+    footer { border-top:1px solid var(--line); padding-top:22px; color:var(--muted); font-size:13px; }
+    footer p { margin-bottom:8px; }
+    @media(max-width:800px) { .inspect { grid-template-columns:1fr; } .rules { grid-template-columns:repeat(2,minmax(0,1fr)); } .swatches { grid-template-columns:repeat(4,minmax(0,1fr)); } .next { grid-template-columns:1fr; gap:14px; } }
+    @media(max-width:480px) { main { padding:22px 16px 44px; } .topline { align-items:flex-start; flex-direction:column; gap:4px; } .intro { padding:34px 0 28px; } .intro p:last-child { font-size:17px; } .facts { gap:16px 28px; } .rules { grid-template-columns:1fr; } .next { padding:24px; } h2 { font-size:24px; } }
+  </style>
+</head>
+<body>
+<main>
+  <header class="topline"><span class="brand">SUPER FEKA GAPS</span><span class="date">Estudo visual · 29 set 2026</span></header>
+  <div class="intro">
+    <p class="eyebrow">Diagnóstico + direção de arte</p>
+    <h1>Mais personalidade.<br>O mesmo mundo, mais cuidado.</h1>
+    <p>A base técnica já permite um belo jogo em pixel art. O próximo salto está na unidade entre personagens, materiais, cenários, animações e interface.</p>
+  </div>
+  <div class="facts" aria-label="Base técnica atual">
+    <div><span>Cena atual</span><strong>320 × 180</strong></div>
+    <div><span>Tiles atuais</span><strong>16 × 16</strong></div>
+    <div><span>Renderização</span><strong>Canvas 2D</strong></div>
+    <div><span>Validação técnica</span><strong>68 testes + build</strong></div>
+  </div>
+
+  <section aria-labelledby="diagnosis-title">
+    <p class="eyebrow">01 / O que o jogo mostra hoje</p>
+    <h2 id="diagnosis-title">Várias linguagens na mesma tela</h2>
+    <p class="subhead">Capturas do projeto atual, sem retoque. As cenas avançadas foram montadas com o renderizador existente e estados controlados em memória; não são uma partida completa.</p>
+    <div class="inspect">
+      <figure>
+        <a id="full-image" href="02-gameplay.png" target="_blank" rel="noopener"><img id="scene" class="screenshot" src="02-gameplay.png" width="960" height="540" alt="Início atual de WORLD 1-1: Feka, terra repetida, grandes montanhas e moedas com bordas suaves."></a>
+        <figcaption id="caption" aria-live="polite">Início real — o personagem usa pixels de 2×2; terreno, moedas e interface têm tratamentos diferentes.</figcaption>
+      </figure>
+      <div>
+        <label for="scene-select">Inspecionar cena</label>
+        <select id="scene-select">
+          <option value="02-gameplay">Início de jogo</option>
+          <option value="05-cave">Caverna</option>
+          <option value="06-world-two">WORLD 1-2</option>
+          <option value="07-boss">Arena e Joãozão</option>
+          <option value="08-ending">Final e Yasmin</option>
+          <option value="09-assets">Catálogo de desenhos atuais</option>
+          <option value="10-hud-items">HUD com capacete e Mini Fanta</option>
+          <option value="01-title">Título</option>
+          <option value="03-pause">Pausa</option>
+          <option value="04-surface">Trecho da superfície</option>
+        </select>
+        <div class="finding"><span class="tag">Prioridade 01</span><h3>Uma grade de pixel</h3><p>Feka em matriz 8×13 ampliada 2×, inimigos geométricos e textos em alta resolução. A escala de detalhe muda de objeto para objeto.</p></div>
+        <div class="finding"><span class="tag">Prioridade 02</span><h3>Um elenco coeso</h3><p>Redesenhar Feka, minion, Joãozão e Yasmin com a mesma luz, contorno e proporções. Dar poses próprias a cada ação.</p></div>
+        <div class="finding"><span class="tag">Prioridade 03</span><h3>Um mundo legível</h3><p>Bordas de terreno bem desenhadas, menos repetição e fundos mais suaves. Separar visualmente chão, decoração, perigo e recompensa.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="concept-title">
+    <p class="eyebrow">02 / Proposta de direção</p>
+    <h2 id="concept-title">Aventura cômica, cor e profundidade</h2>
+    <p class="subhead">Preservar os óculos e o azul do Feka, a Mini Fanta, o humor e os cristais. Explorar terra quente, vegetação moderada e subsolo frio, com personagens mais expressivos.</p>
+    <figure>
+      <a href="concept-direction.png" target="_blank" rel="noopener"><img class="concept" src="concept-direction.png" width="1672" height="941" alt="Conceito artístico: superfície com terra e vegetação, caverna azul com cristais, Feka de óculos e roupa azul, criatura vermelha e Joãozão verde com roupa roxa."></a>
+      <figcaption>Estudo gerado com imagegen para discutir atmosfera, materiais e personagens. Não é uma captura do jogo nem uma spritesheet. A composição, os detalhes e a densidade de pixels precisam ser adaptados e validados na grade real de 320×180. As cores abaixo são referências separadas para essa adaptação.</figcaption>
+    </figure>
+  </section>
+
+  <section aria-labelledby="rules-title">
+    <p class="eyebrow">03 / Regras que mantêm a identidade</p>
+    <h2 id="rules-title">Um pequeno sistema de arte</h2>
+    <div class="rules">
+      <div class="rule"><h3>Pixel de 1×1</h3><p>Redesenhar o Feka em aproximadamente 16×26 pixels reais. Preservar inicialmente a hitbox e a posição dos pés.</p></div>
+      <div class="rule"><h3>Luz compartilhada</h3><p>Luz superior esquerda, três tons por material e contorno escuro colorido nos elementos importantes.</p></div>
+      <div class="rule"><h3>Textura com propósito</h3><p>Formas maiores e poucos detalhes bem colocados. Bordas, cantos e variações conectam os tiles em um terreno contínuo.</p></div>
+      <div class="rule"><h3>Fundos mais calmos</h3><p>Contraste menor ao longe. Cristais distantes discretos; plataformas, moedas e inimigos aparecem primeiro.</p></div>
+      <div class="rule"><h3>Animação expressiva</h3><p>Quatro a seis desenhos de movimento, salto e queda distintos, antecipação e impacto para a sentada.</p></div>
+      <div class="rule"><h3>Interface em família</h3><p>Fonte bitmap com acentos, retrato com contador de vidas, itens em áreas reservadas e telas com o mesmo acabamento.</p></div>
+    </div>
+    <div class="swatches" aria-label="Amostras propostas; não representam uma paleta final">
+      <div class="swatch" style="--color:#1B1F3B"><i aria-hidden="true"></i><b>Contorno</b><code>#1B1F3B</code></div>
+      <div class="swatch" style="--color:#3D6FBE"><i aria-hidden="true"></i><b>Feka</b><code>#3D6FBE</code></div>
+      <div class="swatch" style="--color:#4D8A62"><i aria-hidden="true"></i><b>Vegetação</b><code>#4D8A62</code></div>
+      <div class="swatch" style="--color:#99614D"><i aria-hidden="true"></i><b>Terra</b><code>#99614D</code></div>
+      <div class="swatch" style="--color:#E6AC4E"><i aria-hidden="true"></i><b>Recompensa</b><code>#E6AC4E</code></div>
+      <div class="swatch" style="--color:#50B9AD"><i aria-hidden="true"></i><b>Caverna</b><code>#50B9AD</code></div>
+      <div class="swatch" style="--color:#8B4D85"><i aria-hidden="true"></i><b>Antagonista</b><code>#8B4D85</code></div>
+      <div class="swatch" style="--color:#C95751"><i aria-hidden="true"></i><b>Ameaça</b><code>#C95751</code></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="sequence-title">
+    <p class="eyebrow">04 / Ordem de melhoria</p>
+    <h2 id="sequence-title">Concluir um conjunto antes de expandir</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Etapa</th><th>Entregar</th><th>Critério de qualidade</th></tr></thead>
+        <tbody>
+          <tr><td>01 · Base</td><td><strong>Grade, paleta e HUD</strong><br>Unificar cores e corrigir sobreposição de vidas/itens.</td><td>Escala definida e informações legíveis com ambos os power-ups.</td></tr>
+          <tr><td>02 · Trecho</td><td><strong>Feka + minion + terreno + fundo</strong><br>Um trecho inicial com os principais elementos redesenhados.</td><td>Tudo pertence ao mesmo mundo em 1×, 3× e em movimento.</td></tr>
+          <tr><td>03 · Subsolo</td><td><strong>Transição, rocha e cristais</strong><br>Reforçar profundidade e clareza de plataformas.</td><td>Chão, cenário e itens são distinguidos imediatamente.</td></tr>
+          <tr><td>04 · Expansão</td><td><strong>Boss, Yasmin e outros biomas</strong><br>Aplicar a direção já validada a todo o conteúdo.</td><td>Cada ambiente é próprio; o elenco mantém a mesma linguagem.</td></tr>
+          <tr><td>05 · Polimento</td><td><strong>Título, final, efeitos e animações</strong><br>Completar a apresentação do jogo.</td><td>As telas e respostas visuais reforçam a identidade.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="next" aria-labelledby="next-title">
+    <div><p class="eyebrow">Primeira implementação recomendada</p><h2 id="next-title">20–30 segundos<br>muito bem resolvidos.</h2></div>
+    <p>Usar o início de WORLD 1-1 e a descida à caverna como referência jogável. Manter a engine e as regras atuais enquanto personagem, inimigo, cenário, itens e HUD recebem o novo acabamento. Esse trecho orienta a produção do restante do jogo.</p>
+  </section>
+
+  <footer>
+    <p><a href="README.md">Ler análise técnica completa (Markdown)</a> · <a href="capture-notes.json">Notas de captura</a> · <a href="concept-prompts.md">Registro do conceito</a></p>
+    <p>Fontes: código local, inspeção em Chromium e documentação de <a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/imageSmoothingEnabled">Canvas/MDN</a> e <a href="https://www.aseprite.org/docs/cli/">Aseprite</a>.</p>
+    <p>Esta entrega é uma análise com proposta visual. O código e os assets do jogo não foram redesenhados. Os testes passaram na base atual; não foi realizado benchmark nem uma revisão completa em dispositivos móveis.</p>
+  </footer>
+</main>
+<script>
+  const captions = {
+    '01-title': 'Título real — tipografia do sistema e cenário ausente; oportunidade para um logo próprio e apresentação do mundo.',
+    '02-gameplay': 'Início real — o personagem usa pixels de 2×2; terreno, moedas e interface têm tratamentos diferentes.',
+    '03-pause': 'Pausa real — o texto volta à resolução lógica, enquanto o HUD é desenhado em alta resolução.',
+    '04-surface': 'Superfície em estado controlado — observar repetição do terreno e grandes massas de cor do fundo.',
+    '05-cave': 'Caverna em estado controlado — boa base cromática; cristais de fundo muito claros competem com elementos da frente.',
+    '06-world-two': 'WORLD 1-2 em estado controlado — céu saturado, terreno genérico e faixa inferior causada pelo fim da imagem do fundo.',
+    '07-boss': 'Arena em estado controlado — boss desenhado com retângulos; muralha e prédios usam escalas pouco relacionadas.',
+    '08-ending': 'Encerramento em estado controlado — o sprite simples do Feka e a ilustração detalhada da Yasmin quebram a unidade.',
+    '09-assets': 'Catálogo extraído do renderizador — cinco poses do Feka, inimigos, tiles e itens. A Yasmin loira é um helper legado não usado no final.',
+    '10-hud-items': 'HUD isolado — o capacete ocupa o mesmo espaço da terceira vida. A Mini Fanta aparece à direita.'
+  };
+  const selector = document.getElementById('scene-select');
+  selector.addEventListener('change', () => {
+    const key = selector.value;
+    const scene = document.getElementById('scene');
+    scene.src = key + '.png';
+    scene.alt = captions[key];
+    document.getElementById('full-image').href = scene.src;
+    document.getElementById('caption').textContent = captions[key];
+  });
+</script>
+</body>
+</html>

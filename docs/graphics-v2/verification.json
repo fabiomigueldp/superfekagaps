@@ -1,0 +1,56 @@
+{
+  "browser": "154.0.8037.57",
+  "checks": [
+    "Enter starts the real game and hides the editor link",
+    "Keyboard movement reaches the player",
+    "Paused scene remains pixel-identical while RAF continues",
+    "Repeated rendering is pure, including the rain effect",
+    "Fractional camera zoom introduces no blended colours into pixel sprites",
+    "Editor materials and renderer update together",
+    "Changing materials participates in editor undo",
+    "Touching the visible menu button starts play",
+    "Visible mobile controls can jump and start a ground pound",
+    "Mobile pause and resume work from the displayed controls",
+    "The obsolete large Yasmin bitmap is not requested",
+    "Browser run has no uncaught JavaScript errors"
+  ],
+  "errors": [],
+  "scenes": [
+    {
+      "name": "04-surface",
+      "level": 0,
+      "x": 400,
+      "y": 0,
+      "px": 468,
+      "py": 120
+    },
+    {
+      "name": "05-cave",
+      "level": 0,
+      "x": 384,
+      "y": 172,
+      "px": 512,
+      "py": 264
+    },
+    {
+      "name": "06-world-two",
+      "level": 1,
+      "x": 320,
+      "y": 30,
+      "px": 440,
+      "py": 152
+    },
+    {
+      "name": "07-boss",
+      "level": 2,
+      "x": 320,
+      "y": 12,
+      "px": 376,
+      "py": 120
+    }
+  ],
+  "zoomResult": {
+    "unexpected": 0
+  },
+  "atlasFrames": 42
+}

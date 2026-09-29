@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "test": "tsx --test tests/*.test.ts",
+    "test": "tsx --test tests/*.test.ts && node --test tests/*.test.mjs",
     "check": "npm run test && npm run build",
     "normalize:tiles": "tsx scripts/normalize_tiles.ts",
     "validate": "npm run validate:levels && npm run validate:player-assets",

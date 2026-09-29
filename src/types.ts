@@ -10,7 +10,7 @@ export enum EditorTool {
 
 export type PaletteItem =
   | { type: 'TILE', id: number }
-  | { type: 'ENTITY', id: string, entityType: 'ENEMY' | 'COLLECTIBLE' | 'SPAWN' }
+  | { type: 'ENTITY', id: string, entityType: 'ENEMY' | 'COLLECTIBLE' | 'SPAWN' | 'CHECKPOINT' | 'GOAL' }
   | { type: 'TRIGGER', triggerType: TriggerType };
 
 // Vetor 2D básico
@@ -63,6 +63,7 @@ export interface PlayerData extends Entity {
   animationTimer: number;
   groundPoundState: GroundPoundState;
   groundPoundTimer: number;
+  landingTimer?: number;
 }
 
 // Dados de inimigo
@@ -79,6 +80,7 @@ export interface EnemyData extends Entity {
   deadRotation?: number;
   // Se a morte foi iniciada mas aguardando algo (ex: fala) antes de executar a animação final
   pendingDeath?: boolean;
+  attackPreview?: { x: number; y: number; width: number; progress: number };
 }
 
 export enum EnemyType {
@@ -115,7 +117,7 @@ export interface FlagData {
 }
 
 export interface BackgroundLayerSpec {
-  type: 'clouds' | 'mountains' | 'hills' | 'city' | 'castle_wall';
+  type: 'clouds' | 'mountains' | 'hills' | 'city' | 'castle_wall' | 'cavern' | 'crystals';
   color: string; // Hex ou rgba
   baseHeight?: number; // Altura base da camada
   scrollFactor: number; // 0.0 (fixo) a 1.0 (segue o player)
@@ -124,8 +126,14 @@ export interface BackgroundLayerSpec {
 }
 
 export interface LevelTheme {
+  biome?: 'meadow' | 'ember' | 'citadel';
   skyGradient: [string, string]; // [Topo, Base]
   layers: BackgroundLayerSpec[];
+  underground?: {
+    startRow: number; // Linha em tiles do mundo onde o subsolo começa
+    skyGradient: [string, string];
+    layers: BackgroundLayerSpec[];
+  };
 }
 
 // Dados do nível
@@ -161,14 +169,6 @@ export interface EnemySpawnData {
 export interface CollectibleSpawnData {
   type: CollectibleType;
   position: Vector2;
-}
-
-// Estado do jogo salvo
-export interface GameSaveState {
-  currentLevel: number;
-  score: number;
-  lives: number;
-  checkpointPosition: Vector2 | null;
 }
 
 // Input state
@@ -255,24 +255,6 @@ export interface Projectile extends Entity {
   owner: 'player' | 'enemy';
 }
 
-// Tipos de eventos do jogo
-export type GameEventType =
-  | 'COIN_COLLECTED'
-  | 'ENEMY_DEFEATED'
-  | 'PLAYER_DAMAGED'
-  | 'PLAYER_DIED'
-  | 'CHECKPOINT_REACHED'
-  | 'LEVEL_COMPLETE'
-  | 'BOSS_DEFEATED'
-  | 'GAME_OVER'
-  | 'POWERUP_COLLECTED';
-
-export interface GameEvent {
-  type: GameEventType;
-  data?: unknown;
-}
-
-// Callback de evento
 export enum TriggerType {
   AUDIO = 'AUDIO',
   CAMERA = 'CAMERA',
@@ -315,5 +297,3 @@ export interface DialogTrigger extends BaseTrigger {
 }
 
 export type LevelTrigger = AudioTrigger | CameraTrigger | DamageTrigger | DialogTrigger;
-
-export type GameEventCallback = (event: GameEvent) => void;

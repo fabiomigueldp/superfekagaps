@@ -3,6 +3,7 @@
 import { EnemyData, EnemyType, Rect, Projectile } from '../../types';
 import { TILE_SIZE, GRAVITY, MAX_FALL_SPEED } from '../../constants';
 import { Level } from '../../world/Level';
+import { enemySpawnRect } from './enemyCatalog';
 
 
 export class Joaozao {
@@ -21,15 +22,17 @@ export class Joaozao {
 
   // Flag para garantir que o smash ocorra apenas uma vez por execução de ação
   private hasSmashed: boolean = false;
+  private gapTarget: { col: number; row: number } | null = null;
   // Impacto pendente para o jogo processar (câmera/partículas/som)
   private pendingImpact: { x: number; y: number } | null = null
 
   constructor(spawnX: number, spawnY: number) {
+    const rect = enemySpawnRect(EnemyType.JOAOZAO, { x: spawnX, y: spawnY });
     this.data = {
-      position: { x: spawnX * TILE_SIZE, y: spawnY * TILE_SIZE - 40 },
+      position: { x: rect.x, y: rect.y },
       velocity: { x: 0, y: 0 },
-      width: 32,
-      height: 40,
+      width: rect.width,
+      height: rect.height,
       active: true,
       type: EnemyType.JOAOZAO,
       facingRight: false,
@@ -146,6 +149,9 @@ export class Joaozao {
   }
 
   private chooseNextAction(playerX: number): void {
+    this.gapTarget = null;
+    this.hasSmashed = false;
+    this.data.attackPreview = undefined;
     const rand = Math.random();
     const distToPlayer = Math.abs(playerX - this.data.position.x);
 
@@ -190,6 +196,7 @@ export class Joaozao {
         break;
 
       case 'attack':
+        this.data.animationFrame = 4;
         this.data.velocity.x *= 0.5;
         // CORREÇÃO: Removida a verificação truthy do timer
         // Agora, se for 0, ele entra no bloco e atira.
@@ -203,10 +210,23 @@ export class Joaozao {
       case 'create_gap':
         this.data.velocity.x = 0;
 
+        // Lock the warned area at windup. Moving away must actually evade the smash.
+        if (!this.gapTarget && !this.hasSmashed) {
+          this.gapTarget = {
+            col: level.worldToCol(playerX),
+            row: level.worldToRow(this.data.position.y + this.data.height + 1)
+          };
+        }
+
         // FASE 1: PREPARAÇÃO (windup)
         if (this.actionTimer > 1500) {
           this.data.animationFrame = 1; // Braços pra cima
-          this.hasSmashed = false;
+          if (this.gapTarget) this.data.attackPreview = {
+            x: level.colToWorldX(this.gapTarget.col - 1),
+            y: level.rowToWorldY(this.gapTarget.row),
+            width: TILE_SIZE * 3,
+            progress: Math.max(0, Math.min(1, (2000 - this.actionTimer) / 500))
+          };
         }
         // FASE 2: IMPACTO
         else if (this.actionTimer > 1200) {
@@ -214,20 +234,22 @@ export class Joaozao {
 
           // Executa o smash apenas uma vez
           if (!this.hasSmashed) {
-            const gapCol = level.worldToCol(playerX);
-            const gapRow = level.worldToRow(this.data.position.y + this.data.height + 1);
+            const gapCol = this.gapTarget!.col;
+            const gapRow = this.gapTarget!.row;
             for (let i = -1; i <= 1; i++) {
               level.removeTileTemporarily(gapCol + i, gapRow, 3000);
             }
 
             // Marca impacto para o jogo processar partículas/som/câmera
             this.hasSmashed = true;
+            this.data.attackPreview = undefined;
             this.pendingImpact = { x: level.colToWorldX(gapCol) + TILE_SIZE / 2, y: level.rowToWorldY(gapRow) };
           }
         }
         // FASE 3: RECUPERAÇÃO
         else {
           this.data.animationFrame = 0;
+          this.data.attackPreview = undefined;
         }
         break;
     }
@@ -293,6 +315,10 @@ export class Joaozao {
     }
 
     this.hurtTimer = 800; // Aumentei um pouco para dar tempo da animação tocar
+    this.data.attackPreview = undefined;
+    this.gapTarget = null;
+    this.currentAction = 'idle';
+    this.actionTimer = 800;
     this.data.health--;
 
     // Knockback mais forte para sentir o impacto
@@ -317,6 +343,7 @@ export class Joaozao {
   }
 
   die(): void {
+    this.data.attackPreview = undefined;
     this.data.isDead = true;
     this.data.pendingDeath = false;
     this.data.deathTimer = 3000; // Mais tempo para curtir a animação de morte

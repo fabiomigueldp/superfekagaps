@@ -1,13 +1,15 @@
-import { CameraData, LevelData, Vector2, EnemyType, EditorTool, PaletteItem, TriggerType, LevelTrigger } from '../types';
+import { BackgroundLayerSpec, CameraData, LevelData, LevelTheme, Vector2, EnemyType, CollectibleType, EditorTool, PaletteItem, TriggerType, LevelTrigger } from '../types';
 import { FileSystemManager } from './FileSystemManager';
 import { parseLevelFromText, serializeLevelToTS } from './levelSerialization';
-import { ALL_LEVELS } from '../data/levels';
+import { CAMPAIGN_LEVELS } from '../data/levels';
 import { EditorHistory } from './EditorHistory';
 import { screenToWorld, resizeLevel, fitLevelToContent } from './editorGeometry';
 import { MUSIC_TRACKS } from '../engine/audioCatalog';
-import { TileType, TILE_SIZE, COLORS, GAME_HEIGHT } from '../constants';
+import { TileType, TILE_SIZE, GAME_HEIGHT } from '../constants';
+import { MEADOW_THEME } from '../graphics/BackgroundScene';
 import { PLAYER_RENDER_OFFSET_X, PLAYER_RENDER_OFFSET_Y } from '../assets/playerSpriteSpec';
 import { Renderer } from '../engine/Renderer';
+import { ENEMY_SPECS, enemySpawnRect } from '../entities/enemies/enemyCatalog';
 
 
 
@@ -32,11 +34,14 @@ export class EditorController {
     private readonly history = new EditorHistory<LevelData>();
     private saving = false;
     private mountedFile = false;
+    private newDocument = false;
     private documentVersion = 0;
     private loadRequest = 0;
     private boundsResizeStart: LevelData | null = null;
     private readonly renderer: Renderer;
     private zoom: number = 1; // Used for visual zoom (Game Resolution -> View)
+    private undergroundDraft: LevelTheme['underground'];
+    private paletteBiome: LevelTheme['biome'];
 
     // Bounds Visualization
     private showBounds: boolean = true;
@@ -62,7 +67,7 @@ export class EditorController {
 
     // Selection State
     private activeSelection: {
-        type: 'ENEMY' | 'COLLECTIBLE' | 'SPAWN' | 'TRIGGER';
+        type: 'ENEMY' | 'COLLECTIBLE' | 'SPAWN' | 'CHECKPOINT' | 'GOAL' | 'TRIGGER';
         data: any; // Reference to the actual data object
     } | null = null;
     private selectionDragOffset: { x: number, y: number } = { x: 0, y: 0 };
@@ -89,24 +94,7 @@ export class EditorController {
         this.canvas = canvas;
         this.fs = new FileSystemManager();
 
-        // Initialize default blank level (width/height in TILES, not pixels!)
-        this.levelData = {
-            id: 'new_level',
-            name: 'New Level',
-            width: 100,  // in tiles
-            height: 15,  // in tiles
-            tiles: Array(15).fill(0).map((_, row) =>
-                Array(100).fill(row >= 13 ? TileType.GROUND : TileType.EMPTY)
-            ),
-            playerSpawn: { x: 2, y: 11 },
-            enemies: [],
-            collectibles: [],
-            checkpoints: [],
-            triggers: [],
-            goalPosition: { x: 95, y: 11 },
-            timeLimit: 300,
-            isBossLevel: false
-        };
+        this.levelData = this.createBlankLevel();
 
         // Initialize fully compliant CameraData
         this.camera = {
@@ -156,6 +144,26 @@ export class EditorController {
         this.buildPalette();
         this.buildLogicPalette();
         this.updateBoundsUI();
+    }
+
+    private createBlankLevel(): LevelData {
+        return {
+            id: 'new_level',
+            name: 'New Level',
+            width: 100,  // in tiles
+            height: 15,  // in tiles
+            tiles: Array(15).fill(0).map((_, row) =>
+                Array(100).fill(row >= 13 ? TileType.GROUND : TileType.EMPTY)
+            ),
+            playerSpawn: { x: 2, y: 11 },
+            enemies: [],
+            collectibles: [],
+            checkpoints: [],
+            triggers: [],
+            goalPosition: { x: 95, y: 11 },
+            timeLimit: 300,
+            isBossLevel: false
+        };
     }
 
     private bindEvents() {
@@ -212,6 +220,28 @@ export class EditorController {
         document.getElementById('btn-undo')?.addEventListener('click', () => this.restoreHistory(false));
         document.getElementById('btn-redo')?.addEventListener('click', () => this.restoreHistory(true));
         document.getElementById('btn-fit-view')?.addEventListener('click', () => this.fitLevelToScreen());
+        document.getElementById('btn-new-level')?.addEventListener('click', () => {
+            if (this.canReplaceDocument()) this.loadLevel(this.createBlankLevel(), 'new_level.ts', false, true);
+        });
+        for (const [id, key] of [['level-id', 'id'], ['level-name', 'name']] as const) {
+            document.getElementById(id)?.addEventListener('change', event => {
+                if (!this.levelData) return;
+                const input = event.target as HTMLInputElement;
+                const value = input.value.trim();
+                if (value) this.levelData[key] = value;
+                else input.value = this.levelData[key];
+            });
+        }
+        document.getElementById('level-time-limit')?.addEventListener('change', event => {
+            if (!this.levelData) return;
+            const input = event.target as HTMLInputElement;
+            const value = Number(input.value);
+            if (input.value.trim() && Number.isFinite(value) && value > 0) this.levelData.timeLimit = value;
+            else input.value = String(this.levelData.timeLimit);
+        });
+        document.getElementById('level-is-boss')?.addEventListener('change', event => {
+            if (this.levelData) this.levelData.isBossLevel = (event.target as HTMLInputElement).checked;
+        });
 
         // Tab Switching Logic
         const tabs = document.querySelectorAll('.tab-btn');
@@ -254,6 +284,15 @@ export class EditorController {
         });
 
         // Sky Inputs
+        document.getElementById('theme-biome')?.addEventListener('change', e => {
+            if (!this.levelData) return;
+            this.ensureTheme();
+            const biome = (e.target as HTMLSelectElement).value;
+            if (biome !== 'meadow' && biome !== 'ember' && biome !== 'citadel') return;
+            this.levelData.theme!.biome = biome;
+            this.updateTheme();
+            this.recordChange();
+        });
         document.getElementById('theme-sky-top')?.addEventListener('input', (e) => {
             if (!this.levelData) return;
             this.ensureTheme();
@@ -265,6 +304,56 @@ export class EditorController {
             if (!this.levelData) return;
             this.ensureTheme();
             this.levelData.theme!.skyGradient[1] = (e.target as HTMLInputElement).value;
+        });
+
+        document.getElementById('theme-underground-enabled')?.addEventListener('change', (e) => {
+            if (!this.levelData) return;
+            this.ensureTheme();
+            const theme = this.levelData.theme!;
+            if ((e.target as HTMLInputElement).checked) {
+                theme.underground = this.undergroundDraft ?? {
+                    startRow: (this.levelData.originY ?? 0) + Math.floor(this.levelData.height * 0.55),
+                    skyGradient: ['#17283d', '#07111f'],
+                    layers: [
+                        { type: 'cavern', color: '#29465a', scrollFactor: 0.18 },
+                        { type: 'crystals', color: '#69d6d4', scrollFactor: 0.45 }
+                    ]
+                };
+            } else {
+                this.undergroundDraft = theme.underground;
+                delete theme.underground;
+            }
+            this.populateThemeEditor();
+            this.updateTheme();
+        });
+
+        document.getElementById('theme-underground-start-row')?.addEventListener('change', e => {
+            const underground = this.levelData?.theme?.underground;
+            if (!underground) return;
+            const input = e.target as HTMLInputElement;
+            const value = Number(input.value);
+            const min = this.levelData?.originY ?? 0;
+            const max = min + (this.levelData?.height ?? 0) - 1;
+            if (Number.isInteger(value) && value >= min && value <= max) {
+                underground.startRow = value;
+                this.updateTheme();
+            } else {
+                input.value = String(underground.startRow);
+            }
+        });
+        for (const [id, index] of [['theme-underground-top', 0], ['theme-underground-bottom', 1]] as const) {
+            document.getElementById(id)?.addEventListener('input', e => {
+                const underground = this.levelData?.theme?.underground;
+                if (underground) underground.skyGradient[index] = (e.target as HTMLInputElement).value;
+            });
+        }
+        document.getElementById('btn-add-underground-layer')?.addEventListener('click', () => {
+            const underground = this.levelData?.theme?.underground;
+            if (!underground) return;
+            underground.layers.push({ type: 'cavern', color: '#31566c', scrollFactor: 0.35 });
+            this.populateThemeEditor();
+            this.updateTheme();
+            this.recordChange();
         });
 
         // ===== BOUNDS CONTROLS =====
@@ -350,10 +439,18 @@ export class EditorController {
                 }
                 else if (sel.type === 'ENEMY' && this.levelData.enemies) {
                     this.levelData.enemies = this.levelData.enemies.filter(en => en !== sel.data);
+                    if (sel.data.type === EnemyType.JOAOZAO) {
+                        this.levelData.isBossLevel = false;
+                        (document.getElementById('level-is-boss') as HTMLInputElement).checked = false;
+                    }
                     deleted = true;
                 }
                 else if (sel.type === 'COLLECTIBLE' && this.levelData.collectibles) {
                     this.levelData.collectibles = this.levelData.collectibles.filter(c => c !== sel.data);
+                    deleted = true;
+                }
+                else if (sel.type === 'CHECKPOINT') {
+                    this.levelData.checkpoints = this.levelData.checkpoints.filter(cp => cp !== sel.data);
                     deleted = true;
                 }
 
@@ -379,8 +476,9 @@ export class EditorController {
         if (!this.levelData) return;
         if (!this.levelData.theme) {
             this.levelData.theme = {
-                skyGradient: [COLORS.SKY_LIGHT, COLORS.SKY_DARK],
-                layers: []
+                biome: 'meadow',
+                skyGradient: [...MEADOW_THEME.skyGradient],
+                layers: MEADOW_THEME.layers.map(layer => ({ ...layer }))
             };
         }
     }
@@ -389,6 +487,11 @@ export class EditorController {
         const renderer = this.renderer;
         if (renderer && this.levelData && this.levelData.theme) {
             renderer.prepareLevelBackground(this.levelData.theme);
+            const biome = this.levelData.theme.biome ?? 'meadow';
+            if (this.paletteBiome !== biome) {
+                this.paletteBiome = biome;
+                this.buildPalette();
+            }
         }
     }
 
@@ -405,6 +508,11 @@ export class EditorController {
         // Update input fields
         if (this.uiBoundsWidth) this.uiBoundsWidth.value = width.toString();
         if (this.uiBoundsHeight) this.uiBoundsHeight.value = height.toString();
+        const undergroundStartInput = document.getElementById('theme-underground-start-row') as HTMLInputElement | null;
+        if (undergroundStartInput) {
+            undergroundStartInput.min = String(originY);
+            undergroundStartInput.max = String(originY + height - 1);
+        }
 
         // Update info display
         if (this.uiBoundsInfoSize) {
@@ -445,79 +553,95 @@ export class EditorController {
         this.ensureTheme();
         const theme = this.levelData.theme!;
 
-        // Sky
-        (document.getElementById('theme-sky-top') as HTMLInputElement).value = theme.skyGradient[0];
-        (document.getElementById('theme-sky-bottom') as HTMLInputElement).value = theme.skyGradient[1];
+        const biomeInput = document.getElementById('theme-biome') as HTMLSelectElement | null;
+        if (biomeInput) biomeInput.value = theme.biome ?? 'meadow';
 
-        // Layers
-        const list = document.getElementById('theme-layers-list')!;
-        list.innerHTML = '';
+        (document.getElementById('theme-sky-top') as HTMLInputElement).value = this.colorForInput(theme.skyGradient[0]);
+        (document.getElementById('theme-sky-bottom') as HTMLInputElement).value = this.colorForInput(theme.skyGradient[1]);
+        this.populateLayerList('theme-layers-list', theme.layers);
 
-        theme.layers.forEach((layer, index) => {
+        const underground = theme.underground;
+        (document.getElementById('theme-underground-enabled') as HTMLInputElement).checked = !!underground;
+        (document.getElementById('theme-underground-controls') as HTMLDivElement).hidden = !underground;
+        if (!underground) return;
+        const startInput = document.getElementById('theme-underground-start-row') as HTMLInputElement;
+        startInput.min = String(this.levelData.originY ?? 0);
+        startInput.max = String((this.levelData.originY ?? 0) + this.levelData.height - 1);
+        startInput.value = String(underground.startRow);
+        (document.getElementById('theme-underground-top') as HTMLInputElement).value = this.colorForInput(underground.skyGradient[0]);
+        (document.getElementById('theme-underground-bottom') as HTMLInputElement).value = this.colorForInput(underground.skyGradient[1]);
+        this.populateLayerList('theme-underground-layers-list', underground.layers);
+    }
+
+    private colorForInput(color: string): string {
+        // A color picker cannot represent alpha; display the RGB swatch without
+        // changing the original rgba() value until the user edits that field.
+        const context = document.createElement('canvas').getContext('2d')!;
+        context.fillStyle = color;
+        const normalized = context.fillStyle;
+        if (/^#[0-9a-f]{6}$/i.test(normalized)) return normalized;
+        const rgb = normalized.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+        if (rgb) return `#${rgb.slice(1, 4).map(component => Number(component).toString(16).padStart(2, '0')).join('')}`;
+        return '#ffffff';
+    }
+
+    private populateLayerList(id: string, layers: BackgroundLayerSpec[]): void {
+        const list = document.getElementById(id)!;
+        list.replaceChildren();
+        const layerTypes: { value: BackgroundLayerSpec['type']; label: string }[] = [
+            { value: 'mountains', label: 'Montanhas' },
+            { value: 'hills', label: 'Colinas' },
+            { value: 'clouds', label: 'Nuvens' },
+            { value: 'city', label: 'Cidade' },
+            { value: 'castle_wall', label: 'Muralha' },
+            { value: 'cavern', label: 'Caverna' },
+            { value: 'crystals', label: 'Cristais' }
+        ];
+        layers.forEach((layer, index) => {
             const div = document.createElement('div');
             div.className = 'layer-item';
+            const options = layerTypes.map(type =>
+                `<option value="${type.value}" ${layer.type === type.value ? 'selected' : ''}>${type.label}</option>`
+            ).join('');
             div.innerHTML = `
                 <div class="control-row">
-                    <label>Type</label>
-                     <select class="layer-type" data-idx="${index}">
-                        <option value="mountains" ${layer.type === 'mountains' ? 'selected' : ''}>Mountains</option>
-                        <option value="hills" ${layer.type === 'hills' ? 'selected' : ''}>Hills</option>
-                        <option value="clouds" ${layer.type === 'clouds' ? 'selected' : ''}>Clouds</option>
-                        <option value="city" ${layer.type === 'city' ? 'selected' : ''}>City</option>
-                        <option value="castle_wall" ${layer.type === 'castle_wall' ? 'selected' : ''}>Castle</option>
-                     </select>
-                     <button class="mini-btn remove" data-idx="${index}">x</button>
+                    <label for="${id}-type-${index}">Tipo</label>
+                    <select class="layer-type" id="${id}-type-${index}">${options}</select>
+                    <button class="mini-btn remove" type="button" title="Remover camada" aria-label="Remover camada ${index + 1}">×</button>
                 </div>
                 <div class="control-row">
-                    <label>Color</label>
-                    <input type="color" class="layer-color" data-idx="${index}">
+                    <label for="${id}-color-${index}">Cor</label>
+                    <input type="color" class="layer-color" id="${id}-color-${index}">
                 </div>
                 <div class="control-row">
-                    <label>Parallax</label>
-                    <input type="range" class="layer-scroll" data-idx="${index}" min="0" max="1" step="0.1" value="${layer.scrollFactor}">
-                    <span>${layer.scrollFactor}</span>
+                    <label for="${id}-scroll-${index}">Paralaxe</label>
+                    <input type="range" class="layer-scroll" id="${id}-scroll-${index}" min="0" max="1" step="0.01" value="${layer.scrollFactor}">
+                    <output>${layer.scrollFactor.toFixed(2)}</output>
                 </div>
             `;
-            (div.querySelector('.layer-color') as HTMLInputElement).value = layer.color;
-            list.appendChild(div);
-        });
-
-        // Bind dynamic inputs
-        list.querySelectorAll('.layer-type').forEach(el => {
-            el.addEventListener('change', (e) => {
-                const idx = parseInt((e.target as HTMLElement).dataset.idx!);
-                theme.layers[idx].type = (e.target as HTMLSelectElement).value as any;
+            const color = div.querySelector<HTMLInputElement>('.layer-color')!;
+            color.value = this.colorForInput(layer.color);
+            div.querySelector<HTMLSelectElement>('.layer-type')!.addEventListener('change', event => {
+                layer.type = (event.target as HTMLSelectElement).value as BackgroundLayerSpec['type'];
                 this.updateTheme();
             });
-        });
-        list.querySelectorAll('.layer-color').forEach(el => {
-            el.addEventListener('input', (e) => {
-                const idx = parseInt((e.target as HTMLElement).dataset.idx!);
-                theme.layers[idx].color = (e.target as HTMLInputElement).value;
+            color.addEventListener('input', event => {
+                layer.color = (event.target as HTMLInputElement).value;
                 this.updateTheme();
             });
-        });
-        list.querySelectorAll('.layer-scroll').forEach(el => {
-            el.addEventListener('input', (e) => {
-                const idx = parseInt((e.target as HTMLElement).dataset.idx!);
-                const val = parseFloat((e.target as HTMLInputElement).value);
-                theme.layers[idx].scrollFactor = val;
-                ((e.target as HTMLElement).nextElementSibling as HTMLSpanElement).innerText = val.toFixed(1);
-                // Parallax changes don't need texture regen, but `prepare` sets up the layers array logic.
-                this.updateTheme();
+            div.querySelector<HTMLInputElement>('.layer-scroll')!.addEventListener('input', event => {
+                layer.scrollFactor = Number((event.target as HTMLInputElement).value);
+                div.querySelector('output')!.value = layer.scrollFactor.toFixed(2);
+                // The renderer keeps a reference to the layer specification.
             });
-        });
-        list.querySelectorAll('.remove').forEach(el => {
-            el.addEventListener('click', (e) => {
-                const idx = parseInt((e.target as HTMLElement).dataset.idx!);
-                theme.layers.splice(idx, 1);
+            div.querySelector<HTMLButtonElement>('.remove')!.addEventListener('click', () => {
+                layers.splice(index, 1);
                 this.populateThemeEditor();
                 this.updateTheme();
                 this.recordChange();
             });
+            list.appendChild(div);
         });
-
-
     }
 
     private buildPalette() {
@@ -542,17 +666,19 @@ export class EditorController {
             { type: 'TILE', id: TileType.LAVA_TOP, label: 'Lava Top' },
             { type: 'TILE', id: TileType.LAVA_FILL, label: 'Lava Fill' },
             { type: 'TILE', id: TileType.HIDDEN_BLOCK, label: 'Hidden' },
+            { type: 'TILE', id: TileType.CAVE_STONE, label: 'Rocha' },
+            { type: 'TILE', id: TileType.CAVE_PLATFORM, label: 'Saliente' },
+            { type: 'TILE', id: TileType.GLOW_CRYSTAL, label: 'Cristal' },
 
-            // --- OBJECT TILES (Some handled as tiles in game) ---
-            { type: 'TILE', id: TileType.COIN, label: 'Coin' },
-            { type: 'TILE', id: TileType.CHECKPOINT, label: 'Check' },
-            { type: 'TILE', id: TileType.FLAG, label: 'Goal' },
             { type: 'TILE', id: TileType.POWERUP_BLOCK_MINI_FANTA, label: 'Blk Fanta' },
             { type: 'TILE', id: TileType.POWERUP_BLOCK_HELMET, label: 'Blk Helm' },
-            { type: 'TILE', id: TileType.POWERUP_MINI_FANTA, label: 'Item Fanta' },
-            { type: 'TILE', id: TileType.POWERUP_HELMET, label: 'Item Helm' },
 
             // --- ENTITIES ---
+            { type: 'ENTITY', id: 'coin', entityType: 'COLLECTIBLE', label: 'Coin' },
+            { type: 'ENTITY', id: 'mini_fanta', entityType: 'COLLECTIBLE', label: 'Item Fanta' },
+            { type: 'ENTITY', id: 'helmet', entityType: 'COLLECTIBLE', label: 'Item Helm' },
+            { type: 'ENTITY', id: 'checkpoint', entityType: 'CHECKPOINT', label: 'Check' },
+            { type: 'ENTITY', id: 'goal', entityType: 'GOAL', label: 'Goal' },
             { type: 'ENTITY', id: 'minion', entityType: 'ENEMY', label: 'Minion' },
             { type: 'ENTITY', id: 'boss_joaozao', entityType: 'ENEMY', label: 'Boss' },
             { type: 'ENTITY', id: 'spawn', entityType: 'SPAWN', label: 'Spawn' }
@@ -565,6 +691,9 @@ export class EditorController {
             btn.className = 'tile-btn';
             btn.type = 'button';
             btn.title = item.label;
+            if (item.type !== 'TRIGGER' && this.activeContent.type !== 'TRIGGER' && this.activeContent.type === item.type && this.activeContent.id === item.id) {
+                btn.classList.add('selected');
+            }
 
             // Create mini canvas for thumbnail
             const thumb = document.createElement('canvas');
@@ -587,44 +716,23 @@ export class EditorController {
                         ctx.strokeRect(0, 0, 32, 32);
                         ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(32, 32); ctx.stroke();
                     }
-                    else if (item.id === TileType.COIN) renderer.drawCoin(0, 0, 0, ctx);
-                    else if (item.id === TileType.POWERUP_MINI_FANTA) renderer.drawFanta(0, 0, 0, ctx);
-                    else if (item.id === TileType.POWERUP_HELMET) renderer.drawHelmet(0, 0, ctx);
                     else if (item.id === TileType.HIDDEN_BLOCK) {
                         ctx.globalAlpha = 0.5;
                         const dummyGrid = [[item.id], [TileType.EMPTY]];
                         renderer.drawTile(TileType.BRICK, 0, 0, dummyGrid, 0, 0, ctx);
                     }
-                    else if (item.id === TileType.CHECKPOINT) renderer['drawFlagTile'](0, 0, ctx);
                     else {
                         const dummyGrid = [[item.id], [TileType.EMPTY]];
                         renderer.drawTile(item.id, 0, 0, dummyGrid, 0, 0, ctx);
                     }
                 }
-                // --- ENTITY RENDERING ---
+                // The palette uses the production sprite at its correct ground anchor.
                 else if (item.type === 'ENTITY') {
-                    if (item.id === 'minion') {
-                        const mockEnemy: any = {
-                            type: EnemyType.MINION,
-                            position: { x: 0, y: 0 },
-                            active: true, facingRight: false, isDead: false, width: 16, height: 16, animationTimer: 0, animationFrame: 0
-                        };
-                        renderer.drawEnemy(mockEnemy, { x: 0, y: 0 } as any, ctx);
-                    }
-                    else if (item.id === 'boss_joaozao') {
-                        // Placeholder for Boss visual
-                        ctx.fillStyle = 'purple';
-                        ctx.fillRect(2, 2, 12, 12);
-                        ctx.fillStyle = 'white';
-                        ctx.font = '8px monospace';
-                        ctx.fillText('BOSS', 0, 10);
-                    }
-                    else if (item.id === 'spawn') {
-                        ctx.fillStyle = 'cyan';
-                        ctx.fillRect(4, 4, 8, 8);
-                        ctx.strokeStyle = 'white';
-                        ctx.strokeRect(4, 4, 8, 8);
-                    }
+                    thumb.width = thumb.height = 48;
+                    thumb.style.width = thumb.style.height = '32px';
+                    ctx.imageSmoothingEnabled = false;
+                    const tall = ['boss_joaozao', 'spawn', 'minion', 'checkpoint', 'goal'].includes(item.id);
+                    renderer.drawEditorGhost(item, item.id === 'boss_joaozao' ? 8 : 16, tall ? 47 : 16, 1, ctx);
                 }
             }
 
@@ -732,29 +840,36 @@ export class EditorController {
             }));
             if (!files.length) this.uiLevelList.textContent = 'Nenhuma fase nesta pasta. Importe um arquivo ou abra src/data/levels.';
         } else {
-            ALL_LEVELS.forEach((level, index) => add(level.name, () => {
+            CAMPAIGN_LEVELS.forEach(({ data: level, filename }) => add(level.name, () => {
                 if (this.canReplaceDocument()) {
-                    const filename = ['level_0_world1-1.ts', 'level_1_world1-2.ts', 'level_2_boss.ts'][index]
-                        ?? 'level_' + index + '.ts';
                     this.loadLevel(level, filename, false);
                 }
             }));
         }
     }
 
-    private loadLevel(level: LevelData, filename: string, mounted: boolean): void {
+    private loadLevel(level: LevelData, filename: string, mounted: boolean, newDocument = false): void {
         if (level.theme) {
-            for (const color of [...level.theme.skyGradient, ...level.theme.layers.map(layer => layer.color)]) {
+            const underground = level.theme.underground;
+            const colors = [
+                ...level.theme.skyGradient,
+                ...level.theme.layers.map(layer => layer.color),
+                ...(underground ? [...underground.skyGradient, ...underground.layers.map(layer => layer.color)] : [])
+            ];
+            for (const color of colors) {
                 if (!CSS.supports('color', color)) throw new Error('A fase contém uma cor inválida: ' + color);
             }
         }
         this.cancelGesture();
         this.loadRequest++;
         this.levelData = structuredClone(level);
+        this.undergroundDraft = undefined;
         this.documentVersion++;
         this.currentLevelFilename = filename;
         this.mountedFile = mounted;
+        this.newDocument = newDocument;
         this.activeSelection = null;
+        this.updateLevelSettingsUI();
         this.populateThemeEditor();
         this.updateTheme();
         this.updateBoundsUI();
@@ -763,6 +878,14 @@ export class EditorController {
         this.updateDocumentUI();
         this.fitLevelToScreen();
         this.showMessage('Fase carregada.');
+    }
+
+    private updateLevelSettingsUI(): void {
+        if (!this.levelData) return;
+        (document.getElementById('level-id') as HTMLInputElement).value = this.levelData.id;
+        (document.getElementById('level-name') as HTMLInputElement).value = this.levelData.name;
+        (document.getElementById('level-time-limit') as HTMLInputElement).value = String(this.levelData.timeLimit);
+        (document.getElementById('level-is-boss') as HTMLInputElement).checked = this.levelData.isBossLevel;
     }
 
     private canReplaceDocument(): boolean {
@@ -774,11 +897,20 @@ export class EditorController {
         if (!this.levelData || this.saving) return;
         this.cancelGesture();
         const data = structuredClone(this.levelData);
-        const filename = this.currentLevelFilename || 'new_level.ts';
+        const filename = this.newDocument
+            ? `level_${data.id.replace(/[^a-zA-Z0-9_-]/g, '_')}.ts`
+            : this.currentLevelFilename || 'new_level.ts';
         this.saving = true;
         this.updateDocumentUI();
         try {
-            if (!exportOnly && this.mountedFile && this.fs.isMounted) {
+            if (!exportOnly && this.newDocument && this.fs.isMounted) {
+                await this.fs.createLevel(filename, data);
+                this.currentLevelFilename = filename;
+                this.mountedFile = true;
+                this.newDocument = false;
+                await this.refreshLevelList();
+                this.showMessage('Nova fase criada em ' + filename + '.');
+            } else if (!exportOnly && this.mountedFile && this.fs.isMounted) {
                 await this.fs.saveLevel(filename, data);
                 this.showMessage('Fase salva em ' + filename + '.');
             } else {
@@ -814,7 +946,8 @@ export class EditorController {
     private updateDocumentUI(): void {
         const dirty = this.levelData && this.history.isDirty(this.levelData);
         this.uiFileLabel.textContent = (this.currentLevelFilename || 'Nova fase') + (dirty ? ' •' : '');
-        this.uiSaveBtn.textContent = this.saving ? 'Salvando…' : this.mountedFile ? 'Salvar' : 'Exportar .ts';
+        this.uiSaveBtn.textContent = this.saving ? 'Salvando…' : this.newDocument && this.fs.isMounted
+            ? 'Criar fase' : this.mountedFile ? 'Salvar' : 'Exportar .ts';
         this.uiSaveBtn.disabled = this.saving;
         this.uiMountBtn.disabled = this.saving || !this.fs.isSupported;
         const exportButton = document.getElementById('btn-export') as HTMLButtonElement;
@@ -829,8 +962,10 @@ export class EditorController {
         const data = redo ? this.history.redo() : this.history.undo();
         if (!data) return;
         this.levelData = data;
+        this.undergroundDraft = undefined;
         this.documentVersion++;
         this.activeSelection = null;
+        this.updateLevelSettingsUI();
         this.populateThemeEditor(); this.updateTheme(); this.updateBoundsUI(); this.updateInspector();
         this.updateDocumentUI();
     }
@@ -887,7 +1022,8 @@ export class EditorController {
         // Initialize status bar
         this.updateStatusBar();
 
-        this.loadLevel(ALL_LEVELS[0], 'level_0_world1-1.ts', false);
+        const firstLevel = CAMPAIGN_LEVELS[0];
+        this.loadLevel(firstLevel.data, firstLevel.filename, false);
         void this.refreshLevelList();
         this.showMessage('B: pincel · E: apagar · S: selecionar · R: área · H: mover · F: enquadrar · Roda: zoom');
     }
@@ -989,6 +1125,10 @@ export class EditorController {
         // 3. Draw Grid
         this.drawGrid(mainCtx);
 
+        if (this.uiShowBgChk.checked) {
+            this.drawUndergroundBoundary(mainCtx, rect.width / this.zoom, rect.height / this.zoom);
+        }
+
         // 4. Draw Bounds Frame
         if (this.showBounds) {
             this.drawBoundsFrame(mainCtx);
@@ -997,6 +1137,36 @@ export class EditorController {
         mainCtx.restore();
 
         // Status bar is now updated via HTML elements, no canvas drawing needed
+    }
+
+    private drawUndergroundBoundary(ctx: CanvasRenderingContext2D, viewportWidth: number, height: number): void {
+        const level = this.levelData;
+        const startRow = level?.theme?.underground?.startRow;
+        if (startRow === undefined) return;
+        const y = startRow * TILE_SIZE - this.camera.y;
+        if (y < 0 || y > height) return;
+        const left = (level?.originX ?? 0) * TILE_SIZE - this.camera.x;
+        const right = left + (level?.width ?? 0) * TILE_SIZE;
+        const lineLeft = Math.max(0, left);
+        const lineRight = Math.min(viewportWidth, right);
+        if (lineLeft >= lineRight) return;
+        ctx.save();
+        ctx.strokeStyle = 'rgba(120, 245, 230, 0.85)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([6, 4]);
+        ctx.beginPath();
+        ctx.moveTo(lineLeft, Math.round(y) + 0.5);
+        ctx.lineTo(lineRight, Math.round(y) + 0.5);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.font = '10px Consolas, monospace';
+        const labelX = Math.max(lineLeft + 4, Math.min(lineRight - 148, left + 4));
+        const labelY = Math.max(12, y - 5);
+        ctx.fillStyle = 'rgba(8, 25, 35, 0.85)';
+        ctx.fillRect(labelX - 3, labelY - 11, 147, 14);
+        ctx.fillStyle = '#9ffff0';
+        ctx.fillText(`SUBSOLO · LINHA ${startRow}`, labelX, labelY);
+        ctx.restore();
     }
 
     private renderEditorView(ctx: CanvasRenderingContext2D, renderer: Renderer) {
@@ -1049,44 +1219,30 @@ export class EditorController {
                     if (tile === TileType.HIDDEN_BLOCK) {
                         ctx.save();
                         ctx.globalAlpha = 0.5; // Ghost mode
-                        renderer.drawTile(TileType.BRICK, x, y, tiles, r, c, ctx);
+                        renderer.drawTile(TileType.BRICK, x, y, tiles, r, c, ctx, worldCol, worldRow);
                         ctx.restore();
                     }
-                    else if (tile === TileType.COIN) {
-                        // Manually draw coin entity sprite with correct context
-                        (renderer as any).drawCoin(x, y, 0, ctx);
-                    }
-                    else if (tile === TileType.POWERUP_MINI_FANTA) {
-                        (renderer as any).drawFanta(x, y, 0, ctx);
-                    }
-                    else if (tile === TileType.POWERUP_HELMET) {
-                        (renderer as any).drawHelmet(x, y, ctx);
-                    }
-                    else if (tile === TileType.CHECKPOINT) {
-                        (renderer as any).drawFlagTile(x, y, ctx);
-                    }
                     else {
-                        renderer.drawTile(tile, x, y, tiles, r, c, ctx);
+                        renderer.drawTile(tile, x, y, tiles, r, c, ctx, worldCol, worldRow);
                     }
                 }
             }
         }
         ctx.restore();
 
-        // 2. Draw Entities (Enemies, Collectibles from the Lists)
-        // Note: These lists are populated in DATA, but sometimes we edit via Tiles.
-        // If we want to visualize pre-placed entities:
+        // Objects are drawn from the same placements used by the game.
 
         if (this.levelData.enemies) {
             this.levelData.enemies.forEach(e => {
+                const rect = enemySpawnRect(e.type, e.position);
                 // Mock Enemy Data for Renderer
                 const mockEnemy: any = {
                     type: e.type,
-                    position: { x: e.position.x * TILE_SIZE, y: e.position.y * TILE_SIZE },
+                    position: { x: rect.x, y: rect.y },
                     active: true,
                     facingRight: false,
                     isDead: false,
-                    width: 16, height: 16,
+                    width: rect.width, height: rect.height,
                     animationTimer: 0,
                     animationFrame: 0
                 };
@@ -1107,6 +1263,13 @@ export class EditorController {
             });
         }
 
+        for (const checkpoint of this.levelData.checkpoints) {
+            renderer.drawFlagTile(Math.round(checkpoint.x * TILE_SIZE - this.camera.x),
+                Math.round(checkpoint.y * TILE_SIZE - this.camera.y), ctx);
+        }
+        renderer.drawFlagTile(Math.round(this.levelData.goalPosition.x * TILE_SIZE - this.camera.x),
+            Math.round(this.levelData.goalPosition.y * TILE_SIZE - this.camera.y), ctx, 'goal');
+
         // 3. Draw Player Spawn (Editor Visual)
         if (this.levelData.playerSpawn) {
             // Draw Player Idle Sprite at Spawn Location
@@ -1120,7 +1283,7 @@ export class EditorController {
             // Or better: Use renderer.drawPlayer with a mock player object
 
             const mockPlayer: any = {
-                position: { x: this.levelData.playerSpawn.x * TILE_SIZE, y: this.levelData.playerSpawn.y * TILE_SIZE },
+                position: { x: this.levelData.playerSpawn.x * TILE_SIZE, y: this.levelData.playerSpawn.y * TILE_SIZE - 24 },
                 velocity: { x: 0, y: 0 },
                 isGrounded: true,
                 isDead: false,
@@ -1142,7 +1305,7 @@ export class EditorController {
             ctx.textAlign = 'center';
             ctx.fillStyle = '#FFFFFF';
             // Center text above player
-            ctx.fillText('SPAWN', spawnX + 7, spawnY - 6);
+            ctx.fillText('SPAWN', spawnX + 7, spawnY - 30);
             ctx.restore();
         }
 
@@ -1476,21 +1639,27 @@ export class EditorController {
 
                 // Snap logic
                 if (!this.isCtrlPressed) {
-                    // Default: Snap to Grid
+                    // Enemy spawn points are ground contacts, above the rendered sprite.
                     newX = Math.round(newX / TILE_SIZE) * TILE_SIZE;
-                    newY = Math.round(newY / TILE_SIZE) * TILE_SIZE;
+                    newY = this.activeSelection.type === 'ENEMY'
+                        ? Math.round((newY + ENEMY_SPECS[this.activeSelection.data.type as EnemyType].height) / TILE_SIZE) * TILE_SIZE
+                            - ENEMY_SPECS[this.activeSelection.data.type as EnemyType].height
+                        : Math.round(newY / TILE_SIZE) * TILE_SIZE;
                 }
 
                 // Update Data (Convert back to Tile Units)
                 if (this.activeSelection.type === 'TRIGGER') {
                     this.activeSelection.data.x = newX;
                     this.activeSelection.data.y = newY;
-                } else if (this.activeSelection.type === 'SPAWN') {
+                } else if (this.activeSelection.type === 'SPAWN' ||
+                    this.activeSelection.type === 'CHECKPOINT' || this.activeSelection.type === 'GOAL') {
                     this.activeSelection.data.x = newX / TILE_SIZE;
                     this.activeSelection.data.y = newY / TILE_SIZE;
                 } else {
                     this.activeSelection.data.position.x = newX / TILE_SIZE;
-                    this.activeSelection.data.position.y = newY / TILE_SIZE;
+                    this.activeSelection.data.position.y = this.activeSelection.type === 'ENEMY'
+                        ? (newY + ENEMY_SPECS[this.activeSelection.data.type as EnemyType].height) / TILE_SIZE
+                        : newY / TILE_SIZE;
                 }
             }
         }
@@ -1761,6 +1930,12 @@ export class EditorController {
 
         // --- ENTITY PLACEMENT ---
         if (this.activeContent.type === 'ENTITY') {
+            const gridX = Math.floor(worldX / TILE_SIZE);
+            const gridY = Math.floor(worldY / TILE_SIZE);
+            const originX = this.levelData.originX ?? 0;
+            const originY = this.levelData.originY ?? 0;
+            if (gridX < originX || gridX >= originX + this.levelData.width ||
+                gridY < originY || gridY >= originY + this.levelData.height) return;
             let placeX = worldX;
             let placeY = worldY;
 
@@ -1781,14 +1956,34 @@ export class EditorController {
 
             if (this.activeContent.id === 'spawn') {
                 Object.assign(this.levelData.playerSpawn, { x: finalX, y: finalY });
-
             } else if (this.activeContent.entityType === 'ENEMY') {
                 const type = this.activeContent.id === 'boss_joaozao' ? EnemyType.JOAOZAO : EnemyType.MINION;
+                if (type === EnemyType.JOAOZAO) {
+                    if (this.levelData.enemies.some(enemy => enemy.type === EnemyType.JOAOZAO)) return;
+                    this.levelData.isBossLevel = true;
+                    if (typeof document !== 'undefined') {
+                        (document.getElementById('level-is-boss') as HTMLInputElement).checked = true;
+                    }
+                }
                 this.levelData.enemies.push({
                     type: type,
                     position: { x: finalX, y: finalY }
                 });
-
+            } else if (this.activeContent.entityType === 'COLLECTIBLE') {
+                const type = {
+                    coin: CollectibleType.COIN,
+                    mini_fanta: CollectibleType.MINI_FANTA,
+                    helmet: CollectibleType.HELMET
+                }[this.activeContent.id];
+                if (!type || this.levelData.collectibles.some(item => item.type === type &&
+                    item.position.x === finalX && item.position.y === finalY)) return;
+                this.levelData.collectibles.push({ type, position: { x: finalX, y: finalY } });
+            } else if (this.activeContent.entityType === 'CHECKPOINT') {
+                if (!this.levelData.checkpoints.some(point => point.x === gridX && point.y === gridY)) {
+                    this.levelData.checkpoints.push({ x: gridX, y: gridY });
+                }
+            } else if (this.activeContent.entityType === 'GOAL') {
+                Object.assign(this.levelData.goalPosition, { x: gridX, y: gridY });
             }
         }
     }
@@ -1815,34 +2010,38 @@ export class EditorController {
             }
         }
 
-        // 1. Try to erase Entities first (Click Selection)
-        // Check relative to camera if using pixel coordinates for hit test? 
-        // Our entities are stored in Tile Units. We need to project them to World Pixels to check Click.
-        // Assuming worldX/worldY are absolute world coordinates (including camera).
-
-        // Actually, worldX passed from onMove/onDown implies:
-        // worldX = (screenX / zoom) + cameraX;
-        // So it IS absolute world coordinate.
-
-        // We need to check against Entity World Position
-        // Entity World X = e.position.x * TILE_SIZE
-
-        // Reverse iterate to click 'top' ones first
-        for (let i = this.levelData.enemies.length - 1; i >= 0; i--) {
-            const enemy = this.levelData.enemies[i];
-            const ex = enemy.position.x * TILE_SIZE;
-            const ey = enemy.position.y * TILE_SIZE;
-            const size = this.getEntitySize(enemy.type);
-
-            if (worldX >= ex && worldX < ex + size.w &&
-                worldY >= ey && worldY < ey + size.h) {
-
-                this.levelData.enemies.splice(i, 1);
+        for (let i = this.levelData.checkpoints.length - 1; i >= 0; i--) {
+            const rect = this.getEntityRect('CHECKPOINT', this.levelData.checkpoints[i]);
+            if (worldX >= rect.x && worldX < rect.x + rect.w && worldY >= rect.y && worldY < rect.y + rect.h) {
+                this.levelData.checkpoints.splice(i, 1);
                 this.activeSelection = null;
                 this.updateInspector();
-
-                return; // Stop after erasing one entity (precision)
+                return;
             }
+        }
+
+        for (let i = this.levelData.enemies.length - 1; i >= 0; i--) {
+            const enemy = this.levelData.enemies[i];
+            const rect = this.getEntityRect('ENEMY', enemy);
+            if (worldX >= rect.x && worldX < rect.x + rect.w &&
+                worldY >= rect.y && worldY < rect.y + rect.h) {
+                this.levelData.enemies.splice(i, 1);
+                if (enemy.type === EnemyType.JOAOZAO) {
+                    this.levelData.isBossLevel = false;
+                    if (typeof document !== 'undefined') {
+                        (document.getElementById('level-is-boss') as HTMLInputElement).checked = false;
+                    }
+                }
+                this.activeSelection = null;
+                this.updateInspector();
+                return;
+            }
+        }
+
+        const goal = this.getEntityRect('GOAL', this.levelData.goalPosition);
+        if (worldX >= goal.x && worldX < goal.x + goal.w && worldY >= goal.y && worldY < goal.y + goal.h) {
+            this.showMessage('A fase precisa de um objetivo. Use seleção para movê-lo.');
+            return;
         }
 
         // 2. Fallback: Erase Tile
@@ -1855,11 +2054,6 @@ export class EditorController {
             col >= 0 && col < this.levelData.tiles[0].length) {
             this.levelData.tiles[row][col] = TileType.EMPTY;
         }
-    }
-
-    private getEntitySize(type: EnemyType): { w: number, h: number } {
-        if (type === EnemyType.JOAOZAO) return { w: 32, h: 32 };
-        return { w: 16, h: 16 };
     }
 
     private fitLevelToScreen(): void {
@@ -1880,13 +2074,12 @@ export class EditorController {
         return document.querySelector('.tab-btn[data-tab="tab-logic"]')?.classList.contains('active') ?? false;
     }
 
-    private getEntityRect(type: 'ENEMY' | 'COLLECTIBLE' | 'SPAWN' | 'TRIGGER', data: any): { x: number, y: number, w: number, h: number } {
-        // Spawn: data is just a Vector2 {x, y}
-        // Others: data is { position: {x,y}, type: ... }
+    private getEntityRect(type: 'ENEMY' | 'COLLECTIBLE' | 'SPAWN' | 'CHECKPOINT' | 'GOAL' | 'TRIGGER', data: any): { x: number, y: number, w: number, h: number } {
+        // Spawn, checkpoints and goal are vectors; enemies and collectibles have positions.
 
         let tx = 0, ty = 0;
 
-        if (type === 'SPAWN') {
+        if (type === 'SPAWN' || type === 'CHECKPOINT' || type === 'GOAL') {
             tx = data.x;
             ty = data.y;
         } else {
@@ -1900,10 +2093,12 @@ export class EditorController {
         if (type === 'SPAWN') {
             return { x: x + PLAYER_RENDER_OFFSET_X, y: y + PLAYER_RENDER_OFFSET_Y, w: 14, h: 24 }; // Approx player size
         } else if (type === 'ENEMY') {
-            const size = this.getEntitySize(data.type);
-            return { x, y, w: size.w, h: size.h };
+            const rect = enemySpawnRect(data.type, data.position);
+            return { x: rect.x, y: rect.y, w: rect.width, h: rect.height };
         } else if (type === 'COLLECTIBLE') {
             return { x, y, w: 16, h: 16 };
+        } else if (type === 'CHECKPOINT' || type === 'GOAL') {
+            return { x, y, w: TILE_SIZE, h: TILE_SIZE };
         } else if (type === 'TRIGGER') {
             return { x: data.x, y: data.y, w: data.width, h: data.height };
         }
@@ -1962,6 +2157,27 @@ export class EditorController {
                     return;
                 }
             }
+        }
+
+        for (let i = this.levelData.checkpoints.length - 1; i >= 0; i--) {
+            const point = this.levelData.checkpoints[i];
+            const rect = this.getEntityRect('CHECKPOINT', point);
+            if (worldX >= rect.x && worldX < rect.x + rect.w && worldY >= rect.y && worldY < rect.y + rect.h) {
+                this.activeSelection = { type: 'CHECKPOINT', data: point };
+                this.selectionDragOffset = { x: worldX - rect.x, y: worldY - rect.y };
+                this.isDragging = true;
+                this.updateInspector();
+                return;
+            }
+        }
+        const goalRect = this.getEntityRect('GOAL', this.levelData.goalPosition);
+        if (worldX >= goalRect.x && worldX < goalRect.x + goalRect.w &&
+            worldY >= goalRect.y && worldY < goalRect.y + goalRect.h) {
+            this.activeSelection = { type: 'GOAL', data: this.levelData.goalPosition };
+            this.selectionDragOffset = { x: worldX - goalRect.x, y: worldY - goalRect.y };
+            this.isDragging = true;
+            this.updateInspector();
+            return;
         }
 
         // 4. Triggers
@@ -2074,7 +2290,7 @@ export class EditorController {
             this.createInspectorInput('Y (Tiles)', e.position.y, (v) => e.position.y = parseFloat(v));
 
         }
-        else if (type === 'SPAWN') {
+        else if (type === 'SPAWN' || type === 'CHECKPOINT' || type === 'GOAL') {
             this.createInspectorInput('X (Tiles)', data.x, (v) => data.x = parseFloat(v));
             this.createInspectorInput('Y (Tiles)', data.y, (v) => data.y = parseFloat(v));
         }

@@ -1,0 +1,24 @@
+[Unit]
+Description=Super Feka Gaps Remaster and global scoreboard
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/super-feka-gaps-remaster
+Environment=SFG_SCORE_HOST=172.19.0.1
+Environment=SFG_SCORE_PORT=8787
+Environment=SFG_SCORE_DB=/home/ubuntu/super-feka-gaps-remaster/data/scores.sqlite
+Environment=SFG_SITE_ROOT=/home/ubuntu/super-feka-gaps-remaster/dist
+ExecStart=/usr/local/bin/node /home/ubuntu/super-feka-gaps-remaster/server/leaderboard.mjs
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/home/ubuntu/super-feka-gaps-remaster/data
+
+[Install]
+WantedBy=multi-user.target

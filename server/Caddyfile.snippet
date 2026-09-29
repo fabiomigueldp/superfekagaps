@@ -1,0 +1,14 @@
+superfekagaps.torbware.space {
+    encode zstd gzip
+    tls {
+        ca https://acme-v02.api.letsencrypt.org/directory
+    }
+    header {
+        -Server
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy strict-origin-when-cross-origin
+        Permissions-Policy "camera=(), geolocation=(), microphone=()"
+    }
+    reverse_proxy 172.19.0.1:8787
+}

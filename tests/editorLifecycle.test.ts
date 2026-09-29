@@ -157,6 +157,42 @@ test('import survives its change event bubbling through the editor before file r
     assert.equal(input.value, '');
 });
 
+test('new levels and campaign metadata can be edited in the Levels tab', async t => {
+    const { controller: e, get } = editor(t);
+    e.bindEvents();
+    await get('btn-new-level').dispatch('click');
+    assert.equal(e.levelData.id, 'new_level');
+    assert.equal(e.newDocument, true);
+    const id = get('level-id');
+    id.value = 'world_2_1';
+    await id.dispatch('change');
+    const name = get('level-name');
+    name.value = 'WORLD 2-1';
+    await name.dispatch('change');
+    const time = get('level-time-limit');
+    time.value = '240';
+    await time.dispatch('change');
+    assert.deepEqual([e.levelData.id, e.levelData.name, e.levelData.timeLimit], ['world_2_1', 'WORLD 2-1', 240]);
+    assert.ok(e.history.isDirty(e.levelData));
+});
+
+test('a new level is created in the mounted folder under its ID', async t => {
+    const { controller: e } = editor(t);
+    const created: string[] = [];
+    e.fs = {
+        isSupported: true, isMounted: true, listLevels: async () => created,
+        createLevel: async (name: string) => { created.push(name); }
+    };
+    e.loadLevel(e.createBlankLevel(), 'new_level.ts', false, true);
+    e.levelData.id = 'world_2-1';
+    await e.save();
+    assert.deepEqual(created, ['level_world_2-1.ts']);
+    assert.equal(e.currentLevelFilename, 'level_world_2-1.ts');
+    assert.equal(e.mountedFile, true);
+    assert.equal(e.newDocument, false);
+    assert.equal(e.history.isDirty(e.levelData), false);
+});
+
 test('mounting another directory exports the current document instead of overwriting a same-named file there', async t => {
     const { controller: e, get, downloads, errors } = editor(t);
     const writes: string[] = [];
@@ -238,12 +274,12 @@ test('erasing a selected enemy clears its detached selection and inspector', t =
     const enemy = { type: EnemyType.MINION, position: { x: 6, y: 6 } };
     e.levelData.enemies.push(enemy);
     e.activeTool = EditorTool.SELECT;
-    e.onMouseDown(pointer(104, 104)); e.onMouseUp({});
+    e.onMouseDown(pointer(104, 88)); e.onMouseUp({});
     assert.equal(e.activeSelection?.data, enemy);
     e.activeTool = EditorTool.ERASER;
     let inspectorRefreshes = 0;
     e.updateInspector = () => { inspectorRefreshes++; };
-    e.onMouseDown(pointer(104, 104)); e.onMouseUp({});
+    e.onMouseDown(pointer(104, 88)); e.onMouseUp({});
     assert.equal(e.levelData.enemies.length, 0);
     assert.equal(e.activeSelection, null);
     assert.ok(inspectorRefreshes > 0);
