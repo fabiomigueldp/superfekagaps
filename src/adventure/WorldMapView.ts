@@ -396,11 +396,13 @@ export class WorldMapView {
             if (hide) return null;
             const id = `${world}-${n + 1}`, point = this.network.nodes[id], screen = mapToScreen(point, this.camera);
             return { x: screen.x + 36, y: screen.y };
-        }), ([1, 2] as const).map(id => {
+        }), ([1, 2] as const).map(destination => {
             if (world > 2 || !this.connectionActive || !this.connection) return null;
-            const point = mapToScreen(localToAtlas(this.connection.docks[id].dock, placementFor(id)), this.camera);
+            // Buttons name their destination, so each sign stands at the opposite departure dock.
+            const departure = destination === 1 ? 2 : 1;
+            const point = mapToScreen(localToAtlas(this.connection.docks[departure].dock, placementFor(departure)), this.camera);
             return { ...point, visible: point.x > 52 && point.x < this.width - 52 && point.y > this.frameInsets.top + 56 && point.y < this.height - this.frameInsets.bottom,
-                available: !!this.save && isUnlocked(`${id}-1`, this.save) };
+                available: !!this.save && isUnlocked(`${destination}-1`, this.save) };
         }));
     }
 }

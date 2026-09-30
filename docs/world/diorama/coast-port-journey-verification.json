@@ -3,9 +3,9 @@
   "branch": "feat/connected-coast-port",
   "baseline": "f7c93bfc9faa9b650d6e31de0dfcb26e65c24fa4",
   "tests": {
-    "typescript": 265,
+    "typescript": 267,
     "server": 3,
-    "total": 268,
+    "total": 270,
     "failed": 0
   },
   "validators": "3 Classic levels, player assets, 30 World stages and260 sprite frames passed",
@@ -16,12 +16,12 @@
   "new_journey_file_bytes": 174356,
   "map_font": "Original in-repository bitmap glyphs; no Nunito request in the new HUD",
   "bundle": {
-    "javascript": "index-FNWK_YPb.js",
-    "javascript_bytes": 419057,
-    "javascript_gzip_level9_bytes": 131649,
-    "css": "index-DXzWfAm7.css",
-    "css_bytes": 19079,
-    "css_gzip_level9_bytes": 4636
+    "javascript": "index-D0tZYFsO.js",
+    "javascript_bytes": 419227,
+    "javascript_gzip_level9_bytes": 131744,
+    "css": "index-B7zdXZZd.css",
+    "css_bytes": 19253,
+    "css_gzip_level9_bytes": 4667
   },
   "canvas_backing_pixel_limit": 4000000,
   "art_checks": {
@@ -34,7 +34,12 @@
     "minimum_clearance_all_eight_headings_in_reference_pixels": 12,
     "terminal_maneuver_projection_overlaps": "Recorded separately from open-water collisions in coast-port-sail-audit.json"
   },
-  "browser_qa": "Pending the separate connected-world preview",
+  "browser_qa": {
+    "preview_commit": "34c06251bb97b0c1ca5cfbb00208f62bccc4fcd4",
+    "observed": "Desktop1180x757 close and panorama inspected in cloud Chromium. Both islands share the scene; available and blocked stage signs are readable.",
+    "corrections": "Destination signs were placed at their own island instead of the departure dock; corrected. Clipped legacy shadow exposed a rectangle in the wider world; omitted from connected painting. Footer narrowed and text made more readable.",
+    "remaining": "Reinspect the updated preview, narrow layouts, and actual boat traversal/return flows."
+  },
   "limitations": [
     "No browser FPS measurement",
     "No physical or emulated touch device test",

@@ -98,6 +98,10 @@ export function paintWorldAtlas(c: CanvasRenderingContext2D, state: AtlasPaintSt
     paintMapSea(c, state.camera, state.time, state.reducedMotion);
     for (const island of state.islands) {
         paintMapIsland(c, { ...island, camera: atlasIslandCamera(state.camera, island.placement),
+            // The old Costa shadow is cropped at its image's right/bottom edges.
+            // A continuous sea exposes that rectangle; keep only the terrain's
+            // baked contact shading here, without changing the legacy painter.
+            assets: { ...island.assets, shadow: null },
             time: state.time, reducedMotion: state.reducedMotion });
         const overlay = island.overlay;
         if (overlay?.image && [overlay.left, overlay.top, overlay.widthInMap, overlay.heightInMap].every(Number.isFinite) &&

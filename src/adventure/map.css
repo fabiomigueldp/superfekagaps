@@ -88,7 +88,7 @@
     position: absolute;
     left: max(12px, env(safe-area-inset-left));
     bottom: max(10px, env(safe-area-inset-bottom));
-    width: min(650px, calc(100% - 24px));
+    width: min(470px, calc(100% - 24px));
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
@@ -98,13 +98,13 @@
     border-left: 3px solid var(--map-gold);
     box-shadow: 2px 3px 0 #191f3566;
 }
-.world-map-stage-copy { min-width: 0; }
-.world-map-stage-title { grid-column: 1 / -1; min-width: 0; max-width: 100%; margin: 0 0 1px; }
+.world-map-stage-copy { display: flex; flex-wrap: wrap; align-items: baseline; gap: 3px 10px; min-width: 0; }
+.world-map-stage-title { grid-column: 1 / -1; min-width: 0; max-width: 100%; margin: 0 0 4px; }
 .world-map-stage-title .world-map-bitmap { max-width: 100%; }
-.world-map-stage-details { color: #ffe29a; font-size: 11px; line-height: 16px; white-space: nowrap; }
-.world-map-status, .world-map-hint { margin: 3px 0 0; font-size: 12px; line-height: 16px; }
+.world-map-stage-details { color: #ffe29a; font-size: 12px; line-height: 18px; white-space: nowrap; }
+.world-map-status, .world-map-hint { margin: 0; font-size: 13px; line-height: 18px; }
 .world-map-status { color: #f5efd3; }
-.world-map-hint { color: #becbd0; }
+.world-map-hint { flex-basis: 100%; color: #c7d2d6; }
 .world-map-stage-actions { display: flex; align-items: center; }
 .world-map-enter, .world-map-skip {
     display: grid;
@@ -121,7 +121,7 @@
 .world-map-enter:disabled { background: #203547; border-color: #648591; }
 .world-map-skip { min-width: 110px; background: #253c73; border-color: #81b7dd; }
 .world-map-skip:hover { background: #303650; }
-.world-map-warning { grid-column: 1 / -1; margin: 6px 0 0; color: #ffc778; font-size: 12px; line-height: 16px; }
+.world-map-warning { grid-column: 1 / -1; margin: 6px 0 0; color: #ffc778; font-size: 13px; line-height: 18px; }
 .world-map-region-menu {
     position: absolute;
     z-index: 5;
@@ -164,9 +164,11 @@
     .world-map-title { justify-self: start; padding: 5px 8px; }
     .world-map-title .world-map-bitmap { max-height: 24px; }
     .world-map-footer { column-gap: 8px; padding: 7px 8px; }
+    .world-map-stage-copy { display: block; }
     .world-map-stage-title .world-map-bitmap { width: auto; height: auto; }
-    .world-map-stage-details { font-size: 10px; line-height: 14px; }
-    .world-map-status, .world-map-hint { font-size: 11px; line-height: 14px; }
+    .world-map-stage-details { font-size: 12px; line-height: 16px; }
+    .world-map-status, .world-map-hint { margin-top: 3px; font-size: 12px; line-height: 16px; }
+    .world-map-warning { font-size: 12px; line-height: 16px; }
     .world-map-enter { min-width: 94px; }
     .world-map-skip { min-width: 94px; padding-inline: 5px; }
     .world-map-region-menu { top: max(104px, calc(env(safe-area-inset-top) + 94px)); max-height: calc(100% - 118px - env(safe-area-inset-bottom)); }
@@ -180,7 +182,7 @@
 @media (max-height: 480px) and (min-width: 520px) {
     .world-map-header { top: max(6px, env(safe-area-inset-top)); display: flex; gap: 8px; }
     .world-map-title { padding: 8px; max-width: calc(100% - 246px); }
-    .world-map-footer { bottom: max(6px, env(safe-area-inset-bottom)); width: min(650px, calc(100% - 24px)); padding-block: 5px; }
+    .world-map-footer { bottom: max(6px, env(safe-area-inset-bottom)); width: min(470px, calc(100% - 24px)); padding-block: 5px; }
     .world-map-footer { grid-template-columns: minmax(0, 1fr) auto; }
     .world-map-stage-title { grid-column: 1; grid-row: 1; }
     .world-map-stage-copy { grid-column: 1; grid-row: 2; }

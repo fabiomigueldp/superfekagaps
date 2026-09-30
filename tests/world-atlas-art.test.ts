@@ -40,13 +40,26 @@ test('connected painter clears and paints sea once, then both fixed island layer
     assert.equal(calls.filter(call => call.name === 'clearRect').length, 1);
     const pictures = calls.filter(call => call.name === 'drawImage');
     assert.deepEqual(pictures.map(call => (call.args[0] as unknown as { id: string }).id),
-        ['shadow1', 'island1', 'shadow2', 'island2', 'rear', 'foreground']);
+        ['island1', 'island2', 'rear', 'foreground']);
     for (const [index, layer] of state.islands.entries()) {
-        const draw = pictures[index * 2 + 1];
+        const draw = pictures[index];
         const top = mapToScreen(localToAtlas({ x: 0, y: 0 }, layer.placement), camera);
         const bottom = mapToScreen(localToAtlas({ x: 1, y: 1 }, layer.placement), camera);
         assert.deepEqual(draw.args.slice(1), [top.x, top.y, bottom.x - top.x, bottom.y - top.y]);
     }
+});
+
+test('connected atlas omits clipped legacy shadows without changing cached assets or the legacy painter', () => {
+    const connected = recordingContext(), legacy = recordingContext(), state = scene();
+    const shadows = state.islands.map(island => island.assets.shadow);
+    paintWorldAtlas(connected.context, state);
+    assert.ok(!connected.calls.some(call => call.name === 'drawImage' && shadows.includes(call.args[0] as CanvasImageSource)),
+        'The continuous sea must never expose the rectangular legacy shadow canvas.');
+    assert.deepEqual(state.islands.map(island => island.assets.shadow), shadows, 'Cached assets remain available to legacy maps.');
+    const island = state.islands[0];
+    paintWorldMap(legacy.context, { ...island, camera, time: 0, reducedMotion: true,
+        marker: { x: .5, y: .5 }, walking: false, facingLeft: false });
+    assert.ok(legacy.calls.some(call => call.name === 'drawImage' && call.args[0] === shadows[0]));
 });
 
 test('aboard Feka retains every original pixel between cropped rear and foreground layers', () => {

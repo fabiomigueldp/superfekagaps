@@ -1,5 +1,5 @@
 import { ISLANDS, STAGES } from './campaign';
-import { fitText, panel, pixelText, textWidth } from '../graphics/BitmapFont';
+import { fitText, panel, pixelText, textWidth, wrapText } from '../graphics/BitmapFont';
 import { ART } from '../graphics/palette';
 
 export type WorldMapMotionState = 'idle' | 'walking' | 'boarding' | 'sailing' | 'arriving';
@@ -70,6 +70,12 @@ function context(canvas: HTMLCanvasElement, width: number, height: number): Canv
 function lettering(canvas: HTMLCanvasElement, text: string, color: string = ART.paper, maxWidth = 180): void {
     const width = Math.min(maxWidth, textWidth(text)), ctx = context(canvas, width + 2, 12);
     if (ctx) pixelText(ctx, fitText(text, width), 1, 3, color);
+}
+function phaseLettering(canvas: HTMLCanvasElement, text: string): void {
+    // Keep every campaign title readable at native pixel size, including 320px screens.
+    const lines = wrapText(text, 140), width = Math.max(...lines.map(line => textWidth(line)));
+    const ctx = context(canvas, width + 2, lines.length * 11 + 1);
+    if (ctx) lines.forEach((line, index) => pixelText(ctx, line, 1, 3 + index * 11, ART.paper));
 }
 function action(className: string, text: string, run: () => void): HTMLButtonElement {
     const button = element('button', className);
@@ -246,7 +252,7 @@ export class WorldMapHud {
         this.titleText.textContent = island.name;
         lettering(this.titleBitmap, island.name, ART.goldLight, 165);
         this.stageTitleText.textContent = title;
-        lettering(this.stageTitleBitmap, title, ART.paper, 140);
+        phaseLettering(this.stageTitleBitmap, title);
         this.stageTitle.title = title;
         this.stageDetails.textContent = stage.encounter ? 'Encontro' : `${state.seals[local] ?? 0}/3 selos`;
         this.status.textContent = state.preview ? traveling ? `Prévia · ${MOTION_COPY[state.motionState]}` : 'Prévia · Feka não chegou aqui'

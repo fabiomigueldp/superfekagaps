@@ -716,3 +716,24 @@ test('arrow selection keeps keyboard focus and Enter on that sign obeys arrival 
     const entered = sign.dispatch('keydown', { key: 'Enter' }); assert.equal(entered.defaultPrevented, true); assert.equal(entered.propagationStopped, true);
     assert.equal(h.events.entered, 1); sign.dispatch('keydown', { key: 'Enter' }); assert.equal(h.events.entered, 1);
 });
+
+test('each dock sign names and selects the opposite destination, with that destination’s availability', async t => {
+    const { localToAtlas, COAST_PORT_PLACEMENTS } = await import('../src/adventure/WorldAtlasModel');
+    const h = mapDOM(t, true), save = openSave('1-5'); await readyConnection(h, save);
+    const assertDockPosition = (destination: 1 | 2) => {
+        const departure = destination === 1 ? 2 : 1;
+        const projected = mapToScreen(localToAtlas(h.internal.connection.docks[departure].dock, COAST_PORT_PLACEMENTS[departure]), h.internal.camera);
+        const button = h.internal.hud.dockButtons[destination - 1] as Button;
+        assert.equal(button.style.transform, `translate(${Math.round(projected.x)}px, ${Math.round(projected.y)}px) translate(-50%, -100%)`);
+        return button;
+    };
+    const toPort = assertDockPosition(2); assert.equal(toPort.hidden, false); assert.match(toPort.getAttribute('aria-label')!, /Porto/);
+    toPort.click(); assert.deepEqual(h.events.selected, [5]); assert.equal(h.internal.journey.selected, '2-1');
+    h.view.render(5, save, 100, '');
+    const toCoast = assertDockPosition(1); assert.equal(toCoast.hidden, false); assert.match(toCoast.getAttribute('aria-label')!, /Costa/);
+    toCoast.click(); assert.deepEqual(h.events.selected, [5, 0]); assert.equal(h.internal.journey.selected, '1-1');
+    h.view.hide(); const locked = freshSave(); h.view.render(0, locked, 200, '');
+    const closedPort = assertDockPosition(2); assert.equal(closedPort.classList.contains('is-locked'), true);
+    assert.match(closedPort.getAttribute('aria-label')!, /bloqueada/); closedPort.click();
+    assert.equal(h.internal.journey.selected, '2-1'); assert.equal(h.internal.journey.arrived, '1-1'); assert.equal(h.internal.journey.blocked, 'unavailable');
+});
