@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mecanismos em movimento · Super Feka Gaps World</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,sans-serif;background:#14263a;color:#e2e8dc}body{margin:0}main{max-width:1100px;margin:auto;padding:40px 24px}a{color:#aad5dc}h1{color:#f5d999;font-size:clamp(28px,5vw,48px);margin:20px 0 10px}h2{color:#d6bbeb;margin-top:38px}p{max-width:820px;line-height:1.7;color:#b8cbd2}.panel{display:grid;grid-template-columns:minmax(320px,2fr) minmax(230px,1fr);gap:24px;padding:20px;background:#20354b;border:1px solid #40596d;border-radius:10px;align-items:center}canvas{width:100%;height:auto;image-rendering:pixelated;background:#26384e}button,select{font:inherit;background:#344f64;border:1px solid #7592a2;border-radius:5px;padding:10px;color:#f7e4b5}label{display:block;margin:14px 0}select,input[type=range]{width:100%;box-sizing:border-box}button{cursor:pointer}.phase{font-size:21px;color:#f6dc9e;font-weight:650;margin-bottom:4px}output{font-variant-numeric:tabular-nums}figure{margin:0;padding:12px;background:#20354b;border:1px solid #40596d;border-radius:8px}img{display:block;width:100%;image-rendering:pixelated}figcaption{font-size:14px;padding-top:10px;color:#c3d2d4}.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}@media(max-width:740px){.panel,.grid{grid-template-columns:1fr}.panel{padding:12px}}
+</style><main>
+<a href="../">← Galeria de produção</a>
+<h1>Mecanismos em movimento</h1>
+<p>Jatos, canhões, transporte de cargas, acionadores e estruturas sob impacto. As sequências abaixo são exportadas do renderizador e da simulação do jogo, em resolução nativa. Use a linha do tempo para examinar cada momento.</p>
+<section class="panel" aria-label="Inspetor de animação">
+<canvas id="machine-preview" width="160" height="96" aria-label="Animação do mecanismo selecionado"></canvas>
+<div><label>Mecanismo <select id="machine-kind"></select></label>
+<div id="phase" class="phase"></div><output id="machine-clock" for="machine-time"></output>
+<label>Momento do ciclo <input id="machine-time" type="range" min="0" max="4150" step="50" value="0"></label>
+<button id="machine-toggle" type="button" aria-pressed="false">Pausar</button>
+<label><input id="machine-hitboxes" type="checkbox"> Mostrar colisões e apoios</label>
+<p id="machine-note"></p></div>
+</section>
+<p>O jato ganha e perde altura junto com sua área de dano. Névoa, gotas soltas e fagulhas são decorativas. O canhão sinaliza o disparo, recua, descarrega o ar e recebe um novo barril. A rotação dos barris acompanha o deslocamento.</p>
+<h2>Dentro das fases</h2><p>Cenas com câmera e posição preparadas para conferir escala, contraste e encaixe com o terreno.</p>
+<div class="grid"><figure><img src="fabrica.png" alt="Jato de suco roxo sobre o tanque da Fábrica"><figcaption>Fábrica de Suco: bocal, espuma lilás e núcleo em movimento.</figcaption></figure><figure><img src="canhao.png" alt="Canhão pneumático sobre a esteira"><figcaption>Canhão com tubo, carregador, reservatório e manômetro.</figcaption></figure><figure><img src="reserva.png" alt="Canhão pressurizado na Reserva Gelada"><figcaption>Reserva Gelada: geada e barris pressurizados.</figcaption></figure><figure><img src="forno.png" alt="Saída de chamas do forno Pizzarino"><figcaption>Domínio Pizzarino: metal quente e línguas de fogo.</figcaption></figure></div>
+<h2>Transporte, comando e resistência</h2><div class="grid"><figure><img src="elevador.png" alt="Elevador guiado na arena do Porto"><figcaption>Guia fixa, cabos, pistão e apoio móvel.</figcaption></figure><figure><img src="teleferico.png" alt="Plataforma suspensa na Serra"><figcaption>Trilho, carro de polias e suspensão com travessas.</figcaption></figure><figure><img src="suporte.png" alt="Suporte de madeira após o impacto de Joãozão"><figcaption>O deck desce quando as travessas cedem.</figcaption></figure><figure><img src="gelo.png" alt="Gelo reforçado com braçadeiras e marca de pressão"><figcaption>Geada, braçadeiras e símbolo de barril pressurizado.</figcaption></figure></div>
+<h2>Quadros de referência</h2><figure><img src="ciclos.png" alt="Dez mecanismos em seis momentos dos ciclos"><figcaption>Preparação, emissão, recuo e dissipação. <a href="verification.json">Verificação desta revisão</a>.</figcaption></figure>
+</main><script>
+(async()=>{
+ const base=location.protocol==='file:'?'../../../../public/assets/world':'/assets/world';
+ const data=await(await fetch(base+'/mechanisms.json')).json(),image=new Image();image.src=base+'/mechanisms.png';await image.decode();
+ const select=document.querySelector('#machine-kind'),timeline=document.querySelector('#machine-time'),toggle=document.querySelector('#machine-toggle'),overlay=document.querySelector('#machine-hitboxes'),ctx=document.querySelector('#machine-preview').getContext('2d');
+ const names={idle:'Em espera',charging:'Pressurizando',rising:'Subida',flowing:'Fluxo',falling:'Recolhimento',venting:'Dissipação',charge:'Preparando disparo',fire:'Disparo',recoil:'Recuo',reload:'Recarga',seat:'Encaixe do barril',holding:'Parado',ascending:'Subida',descending:'Descida',moving:'Transporte',beltRight:'Transporte para a direita',beltLeft:'Transporte para a esquerda',intact:'Estrutura íntegra',collapsing:'Cedendo',collapsed:'Estrutura abatida',sealed:'Gelo reforçado',resisted:'Impacto sem pressão',shattered:'Quebra',passage:'Passagem aberta'};
+ for(const g of data.groups){const option=new Option(g.label,g.id);select.add(option);}
+ let group=data.groups[0],time=0,previous=performance.now(),paused=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ function button(){toggle.textContent=paused?'Reproduzir':'Pausar';toggle.setAttribute('aria-pressed',String(paused));}button();
+ function draw(){const f=group.frames[Math.floor(time/group.frameMs)%group.frames.length];ctx.clearRect(0,0,160,96);ctx.imageSmoothingEnabled=false;ctx.drawImage(image,f.x,f.y,f.width,f.height,0,0,160,96);
+  if(overlay.checked){ctx.fillStyle='#ffbb5566';ctx.strokeStyle='#ffe1a1';for(const b of [...(f.danger?[f.danger]:[]),...f.barrels]){ctx.fillRect(b.x,b.y,b.width,b.height);ctx.strokeRect(Math.floor(b.x)+.5,Math.floor(b.y)+.5,Math.floor(b.width)-1,Math.floor(b.height)-1);}
+   ctx.fillStyle='#a3e4afaa';for(const b of f.surfaces||[])ctx.fillRect(b.x,b.y,b.width,b.height);
+   ctx.fillStyle='#c6b1f077';for(const b of f.solids||[])ctx.fillRect(b.x,b.y,b.width,b.height);
+  }
+  timeline.value=String(f.time);document.querySelector('#phase').textContent=names[f.phase];document.querySelector('#machine-clock').textContent=`${(f.time/1000).toFixed(2)} / ${(group.period/1000).toFixed(2)} s`;
+  document.querySelector('#machine-note').textContent=group.kind==='jet'?(f.danger?'Líquido ou chama ativos.':'Válvula e névoa sem dano.'):group.note||'O barril é o projétil. O clarão e o vapor são decorativos.';
+ }
+ select.onchange=()=>{group=data.groups.find(g=>g.id===select.value);time=0;timeline.max=String(group.period-group.frameMs);draw();};
+ timeline.oninput=()=>{time=Number(timeline.value);paused=true;button();draw();};
+ toggle.onclick=()=>{paused=!paused;button();};overlay.onchange=draw;
+ function frame(t){if(!paused)time=(time+Math.max(0,Math.min(80,t-previous)))%group.period;previous=t;draw();requestAnimationFrame(frame);}draw();requestAnimationFrame(frame);
+})().catch(()=>{document.querySelector('#phase').textContent='Abra a galeria pelo servidor de desenvolvimento.';});
+</script></html>

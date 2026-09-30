@@ -5,7 +5,7 @@
     "Locked level cannot start",
     "Keyboard moves Feka",
     "Pause preserves the rendered scene",
-    "All authored sprite frames export with native dimensions",
+    "All authored sprite frames export inside their native atlas cells",
     "Unique seal survives browser reload",
     "Save is versioned",
     "World editor exposes campaign and mechanism authoring",
@@ -20,10 +20,12 @@
     "Asset gallery loads all 17 images",
     "All ten music previews are available",
     "Enemy preview reflects selectable animation states",
+    "Boss preview shows production poses and the cold variant",
+    "Animation previews can be paused for inspection",
     "All 24 routes are selectable as native panoramas",
     "No browser runtime errors"
   ],
   "errors": [],
   "stagedViews": "World and boss captures use authored data with staged camera/player positions; they are not evidence of full playthroughs.",
-  "spriteFrames": 140
+  "spriteFrames": 260
 }

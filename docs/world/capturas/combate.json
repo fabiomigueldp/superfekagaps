@@ -102,11 +102,11 @@
         },
         {
           "i": 2000,
-          "x": 60,
-          "y": 224,
-          "hp": 1,
-          "phase": "rest",
-          "target": 64,
+          "x": 213,
+          "y": 189,
+          "hp": 2,
+          "phase": "open",
+          "target": 269,
           "objs": [
             false,
             false

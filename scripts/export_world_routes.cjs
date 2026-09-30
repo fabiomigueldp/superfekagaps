@@ -10,7 +10,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_PATH||'playwright');
   for(const stage of STAGES.filter(s=>!s.encounter)){
    g.load(stage.id);const canvas=document.createElement('canvas');canvas.width=stage.level.width*16;canvas.height=368;const c=canvas.getContext('2d');c.imageSmoothingEnabled=false;c.fillStyle='#192d42';c.fillRect(0,0,canvas.width,368);
    for(let cx=0;cx<canvas.width;cx+=320){c.save();c.beginPath();c.rect(cx,0,320,368);c.clip();c.translate(cx,0);g.art.background(c,ISLANDS[stage.world-1],cx,0,0);c.restore();for(const cy of [0,180,360]){
-    c.save();c.beginPath();c.rect(cx,cy,320,180);c.clip();c.translate(cx,cy);drawLandmarks(c,stage,cx,cy,0);g.art.terrain(c,g.level,ISLANDS[stage.world-1],cx,cy,0);drawLandmarks(c,stage,cx,cy,0,true);g.art.objects(c,g.objects,cx,cy,0);
+    c.save();c.beginPath();c.rect(cx,cy,320,180);c.clip();c.translate(cx,cy);drawLandmarks(c,stage,cx,cy,0);g.art.terrain(c,g.level,ISLANDS[stage.world-1],cx,cy,0);drawLandmarks(c,stage,cx,cy,0,true);g.art.objects(c,g.objects,cx,cy,0,stage.world);
     for(const foe of g.foes)g.art.foe(c,foe,cx,cy,0);
     for(const p of stage.pickups)if(p.kind==='seal')g.art.seal(c,p.x-cx,p.y-cy,0);else if(p.kind==='coin')g.renderer.drawCoin(p.x-cx,p.y-cy,0,c);
     for(const cp of stage.checkpoints){c.fillStyle='#f0dbc0';c.fillRect(cp.x*16-cx,cp.y*16-cy-30,2,30);c.fillStyle='#85cbbb';c.fillRect(cp.x*16-cx+2,cp.y*16-cy-30,13,8);}

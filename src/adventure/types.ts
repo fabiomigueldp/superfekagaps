@@ -11,6 +11,8 @@ export interface MechanismSpec extends Rect {
     link?: string;
     direction?: number;
     pressurized?: boolean;
+    /** A lift controlled by an encounter, never by the autonomous cable cycle. */
+    gated?: boolean;
 }
 export type FoeKind = 'minion' | 'helmet' | 'charger' | 'loader' | 'agitator' | 'rail';
 export interface FoeSpec {
@@ -39,7 +41,7 @@ export interface Dialogue {
 }
 /** Authored scenery is anchored to the same tile geometry as the route. */
 export interface Landmark extends Rect {
-    kind: 'palms' | 'lighthouse' | 'rope' | 'container' | 'crane' | 'tank' | 'pipe' | 'station' | 'pine' | 'freezer' | 'arch' | 'oven' | 'banner';
+    kind: 'palms' | 'lighthouse' | 'rope' | 'container' | 'crane' | 'tank' | 'pipe' | 'station' | 'pine' | 'freezer' | 'arch' | 'oven' | 'banner' | 'rockArch' | 'garden' | 'house' | 'bottler';
     label?: string;
     variant?: number;
 }

@@ -2,12 +2,21 @@ import { Level } from '../world/Level';
 import type { LevelData, Rect, Vector2 } from '../types';
 import type { MechanismSpec } from './types';
 import { overlaps } from './types';
+import { cannonMuzzle, jetCycle } from './WorldMachineState';
+/** Pixels per fixed physics step, also used by the visible conveyor tread. */
+export const BELT_CARRY_SPEED = 1.2;
 export interface MovingBody extends MechanismSpec {
     px: number;
     py: number;
     active: boolean;
     timer: number;
     home?: Vector2;
+    firedAt?: number;
+    brokenAt?: number;
+    hitAt?: number;
+    beltOffset: number;
+    changedAt?: number;
+    observedActive: boolean;
 }
 export class WorldLevel extends Level {
     bodies: MovingBody[] = [];
@@ -70,6 +79,8 @@ export interface Barrel extends Rect {
     pressurized: boolean;
     returned: boolean;
     boss: boolean;
+    rotation: number;
+    landedAt?: number;
 }
 export class WorldObjects {
     bodies: MovingBody[];
@@ -80,17 +91,24 @@ export class WorldObjects {
         x: number;
         y: number;
     }[] = [];
-    constructor(specs: MechanismSpec[]) { this.bodies = specs.map(s => ({ ...structuredClone(s), px: s.x, py: s.y, home:{x:s.x,y:s.y}, active: false, timer: 0 })); }
+    constructor(specs: MechanismSpec[]) { this.bodies = specs.map(s => ({ ...structuredClone(s), px: s.x, py: s.y, home:{x:s.x,y:s.y}, active: false, observedActive: false, beltOffset: 0, timer: s.kind === 'launcher' ? 1200 : 0 })); }
     get(id: string) { return this.bodies.find(b => b.id === id); }
+    private recordChange(b: MovingBody) {
+        if (b.active === b.observedActive) return;
+        b.changedAt = this.time;
+        b.observedActive = b.active;
+    }
     activate(id: string): boolean {
         const button = this.get(id);
         if (!button || button.timer > 0)
             return false;
         button.timer = 400;
         button.active = !button.active;
+        this.recordChange(button);
         const target = this.get(button.link ?? '');
         if (target) {
             target.active = !target.active;
+            this.recordChange(target);
             this.events.push({ kind: 'switch', x: button.x, y: button.y });
         }
         return !!target;
@@ -102,20 +120,35 @@ export class WorldObjects {
                 activated = this.activate(b.id) || activated;
         return activated;
     }
-    spawnBarrel(x: number, y: number, direction = -1, pressurized = false, boss = false) { const barrel: Barrel = { x, y, width: 14, height: 16, vx: direction * 1.8, vy: 0, life: 13000, pressurized, returned: false, boss }; this.barrels.push(barrel); return barrel; }
+    spawnBarrel(x: number, y: number, direction = -1, pressurized = false, boss = false) { const barrel: Barrel = { x, y, width: 14, height: 16, vx: direction * 1.8, vy: 0, life: 13000, pressurized, returned: false, boss, rotation: 0 }; this.barrels.push(barrel); return barrel; }
     jetState(b: MovingBody): 'off' | 'warning' | 'active' {
-        if (b.active)
-            return 'off';
-        const t = (this.time + (b.phase ?? 0)) % (b.period ?? 4200);
-        return t < 1000 ? 'off' : t < 1800 ? 'warning' : t < 2500 ? 'active' : 'off';
+        const cycle = jetCycle(b, this.time);
+        return cycle.danger ? 'active' : cycle.phase === 'charging' ? 'warning' : 'off';
     }
+    jetDanger(b: MovingBody): Rect | null { return jetCycle(b, this.time).danger; }
     update(dt: number, level: WorldLevel, playerX: number): void {
+        const beforeTime = this.time;
         this.time += dt;
         this.events = [];
         for (const b of this.bodies) {
             b.px = b.x;
             b.py = b.y;
-            b.timer = Math.max(0, b.timer - dt);
+            this.recordChange(b);
+            if (b.kind === 'belt')
+                b.beltOffset += (b.direction ?? 1) * (b.active ? -1 : 1) * BELT_CARRY_SPEED * dt / (1000 / 60);
+            if (b.kind === 'jet' && Math.abs(b.x - playerX) < 220) {
+                const before = jetCycle(b, beforeTime), now = jetCycle(b, this.time);
+                if (now.phase === 'charging' && before.phase !== 'charging')
+                    this.events.push({ kind: 'pressure', x: b.x + b.width / 2, y: b.y + b.height - 4 });
+                if (now.danger && !before.danger)
+                    this.events.push({ kind: 'jet', x: b.x + b.width / 2, y: b.y + b.height - 4 });
+            }
+            if (b.kind !== 'launcher' || Math.abs(b.x - playerX) < 480) {
+                const before = b.timer;
+                b.timer = Math.max(0, b.timer - dt);
+                if (b.kind === 'launcher' && before > 650 && b.timer <= 650 && Math.abs(b.x - playerX) < 220)
+                    this.events.push({kind:'warning',x:b.x,y:b.y});
+            }
             if (b.to) {
                 // Original coordinates stay immutable, even after a checkpoint rebuild.
                 const home = (b as MovingBody & {
@@ -123,7 +156,7 @@ export class WorldObjects {
                 });
                 home.home ??= { x: b.x, y: b.y };
                 let targetX = home.home.x, targetY = home.home.y;
-                if (b.kind === 'platform' || b.kind === 'swing' || (b.kind === 'lift' && !this.bodies.some(s => s.link === b.id))) {
+                if (b.kind === 'platform' || b.kind === 'swing' || (b.kind === 'lift' && !b.gated && !this.bodies.some(s => s.link === b.id))) {
                     const p = (1 - Math.cos(this.time / (b.period ?? 5000) * Math.PI * 2)) / 2;
                     targetX = home.home.x + (b.to.x - home.home.x) * p;
                     targetY = home.home.y + (b.to.y - home.home.y) * p;
@@ -137,7 +170,11 @@ export class WorldObjects {
                 b.y += Math.max(-max, Math.min(max, targetY - b.y));
             }
             if (b.kind === 'launcher' && b.timer === 0 && Math.abs(b.x - playerX) < 480) {
-                this.spawnBarrel(b.x, b.y, b.direction ?? -1, b.pressurized);
+                const muzzle = cannonMuzzle(b), direction = b.direction ?? -1;
+                this.spawnBarrel(muzzle.x - (direction < 0 ? 14 : 0), muzzle.y - 8, direction, b.pressurized);
+                b.firedAt = this.time;
+                if (Math.abs(b.x - playerX) < 220)
+                    this.events.push({ kind: 'cannon', x: muzzle.x, y: muzzle.y });
                 b.timer = b.period ?? 3200;
             }
         }
@@ -153,16 +190,29 @@ export class WorldObjects {
             }
             p.vy = Math.min(8, p.vy + .35);
             const result = level.resolveBarrel(p, { x: p.vx, y: p.vy });
-            if (result.velocity.x === 0 && p.vx !== 0)
+            if (result.grounded && p.vy > 2) {
+                p.landedAt = this.time;
+                if (Math.abs(p.x - playerX) < 220)
+                    this.events.push({ kind: 'barrelLand', x: p.x + p.width / 2, y: result.position.y + p.height });
+            }
+            if (result.velocity.x === 0 && p.vx !== 0) {
                 p.life = 0;
+                if (Math.abs(p.x - playerX) < 220)
+                    this.events.push({ kind: 'barrelBreak', x: p.x + p.width / 2, y: p.y + p.height / 2 });
+            }
+            p.rotation += (result.position.x - p.x) / 8;
             p.x = result.position.x;
             p.y = result.position.y;
             p.vy = result.velocity.y;
             for (const target of this.bodies)
                 if (target.kind === 'target' && !target.active && overlaps(p, target)) {
-                    target.active = true;
                     p.life = 0;
-                    this.events.push({ kind: 'break', x: target.x, y: target.y });
+                    target.hitAt = this.time;
+                    if (!target.pressurized || p.pressurized) {
+                        target.active = true;
+                        target.brokenAt = this.time;
+                        this.events.push({ kind: 'break', x: target.x, y: target.y });
+                    } else this.events.push({ kind: 'hit', x: target.x, y: target.y });
                 }
             if (p.y > level.data.height * 16 || Math.abs(p.x - playerX) > 900)
                 p.life = 0;

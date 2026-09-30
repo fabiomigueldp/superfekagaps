@@ -48,6 +48,7 @@ export class WorldAudio {
         text: string;
         at: number;
     } | null = null;
+    private airBuffer: AudioBuffer | null = null;
     enabled = true;
     constructor(public preferences: Preferences) { }
     unlock() { if (!this.ctx) {
@@ -95,10 +96,48 @@ export class WorldAudio {
         osc.stop(t + seconds + .015);
         osc.onended = () => { osc.disconnect(); env.disconnect(); };
     }
+    private air(seconds: number, frequency: number, gain: number) {
+        if (!this.ctx || !this.effects || this.ctx.state !== 'running') return;
+        if (!this.airBuffer) {
+            this.airBuffer = this.ctx.createBuffer(1, this.ctx.sampleRate, this.ctx.sampleRate);
+            const data = this.airBuffer.getChannelData(0);
+            let seed = 31;
+            for (let i = 0; i < data.length; i++) {
+                seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+                data[i] = seed / 2147483648 - 1;
+            }
+        }
+        const now = this.ctx.currentTime, source = this.ctx.createBufferSource(), filter = this.ctx.createBiquadFilter(), env = this.ctx.createGain();
+        source.buffer = this.airBuffer;
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(frequency, now);
+        filter.frequency.exponentialRampToValueAtTime(Math.max(100, frequency / 5), now + seconds);
+        env.gain.setValueAtTime(0, now);
+        env.gain.linearRampToValueAtTime(gain, now + .015);
+        env.gain.exponentialRampToValueAtTime(.001, now + seconds);
+        source.connect(filter); filter.connect(env); env.connect(this.effects);
+        source.start(now); source.stop(now + seconds + .02);
+        source.onended = () => { source.disconnect(); filter.disconnect(); env.disconnect(); };
+    }
     sfx(kind: string) {
-        const notes: Record<string, number[]> = { land:[100,75], jump: [400, 600], coin: [880, 1320], seal: [523, 659, 784, 1047], switch: [180, 360, 540], hit: [180, 70], death: [392, 330, 262, 196], fall: [320, 160, 70], break: [90, 60], checkpoint: [440, 660, 880], victory: [523, 659, 784, 1047], warning: [180, 180], pound: [100, 55] };
+        if (kind === 'pressure') {
+            this.air(.22, 1900, .14);
+            this.tone(260, .16, 'sine', .12, this.effects);
+            return;
+        }
+        if (kind === 'jet' || kind === 'cannon') {
+            this.air(kind === 'jet' ? .42 : .2, kind === 'jet' ? 2600 : 1200, .35);
+            this.tone(kind === 'jet' ? 140 : 75, .16, 'triangle', .36, this.effects);
+            return;
+        }
+        if (kind === 'barrelLand' || kind === 'barrelBreak') {
+            this.air(.09, 750, .18);
+            this.tone(85, .09, 'triangle', .17, this.effects);
+            return;
+        }
+        const notes: Record<string, number[]> = { throw:[270,180,105], land:[100,75], jump: [400, 600], coin: [880, 1320], seal: [523, 659, 784, 1047], switch: [180, 360, 540], hit: [180, 70], death: [392, 330, 262, 196], fall: [320, 160, 70], break: [90, 60], checkpoint: [440, 660, 880], victory: [523, 659, 784, 1047], warning: [180, 180], pound: [100, 55] };
         const ns = notes[kind] ?? [330];
-        ns.forEach((f, i) => this.tone(f, kind === 'death' ? .2 : .12, kind === 'pound' || kind === 'fall' ? 'triangle' : 'square', .22, this.effects, (this.ctx?.currentTime ?? 0) + i * (kind === 'death' ? .14 : .07)));
+        ns.forEach((f, i) => this.tone(f, kind === 'death' ? .2 : .12, kind === 'pound' || kind === 'fall' || kind === 'throw' ? 'triangle' : 'square', .22, this.effects, (this.ctx?.currentTime ?? 0) + i * (kind === 'death' ? .14 : .07)));
     }
     say(who: Character, text: string, clip?: string) {
         this.cancelSpeech();

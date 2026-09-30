@@ -2,12 +2,12 @@ import { TileType as T } from '../constants';
 import { EnemyType } from '../types';
 import type { AdventureStage, Island, MechanismSpec, FoeKind, EncounterId, Character, Landmark } from './types';
 export const ISLANDS: Island[] = [
-    { id: 1, name: 'Costa dos Gaps', accent: '#83d8ba', sky: ['#70c3d0', '#daedc8'], soil: ['#77a84d', '#a17755', '#594c46'], map: [42, 94], description: 'Toda grande aventura começa com um gap.', boss: 'joao' },
-    { id: 2, name: 'Porto do Bielzão', accent: '#f6c65c', sky: ['#6da7c2', '#c4dbe0'], soil: ['#ddb170', '#947450', '#39495b'], map: [93, 74], description: 'Carga pesada. Passagem complicada.', boss: 'biel' },
-    { id: 3, name: 'Fábrica de Suco', accent: '#cb91ef', sky: ['#6871a3', '#c1acd2'], soil: ['#a9ced5', '#486778', '#25354d'], map: [139, 108], description: 'Um produto forte. Um visitante insistente.', boss: 'calabrezzo' },
-    { id: 4, name: 'Serra Suspensa', accent: '#e5c4f1', sky: ['#8799cb', '#e0d6e7'], soil: ['#d1d9d9', '#80949d', '#425769'], map: [180, 68], description: 'Bielzão já chegou lá em cima.', boss: 'biel' },
-    { id: 5, name: 'Reserva Gelada', accent: '#a7e7fa', sky: ['#477b9f', '#c2e4eb'], soil: ['#ddf8f7', '#8cc0d5', '#406c8c'], map: [230, 94], description: 'A mistura ficou ainda mais concentrada.', boss: 'calabrezzo' },
-    { id: 6, name: 'Domínio Pizzarino', accent: '#f3be8b', sky: ['#9585b9', '#f4cbb1'], soil: ['#ecd8b1', '#8c8fa2', '#48516c'], map: [281, 65], description: 'Yasmin está logo ali. João também.', boss: 'joao' }
+    { id: 1, name: 'Costa dos Gaps', accent: '#83d8ba', sky: ['#65bee7', '#c9eddf'], soil: ['#77a84d', '#a17755', '#594c46'], map: [42, 94], description: 'Toda grande aventura começa com um gap.', boss: 'joao' },
+    { id: 2, name: 'Porto do Bielzão', accent: '#f6c65c', sky: ['#88b8d2', '#f0d8a4'], soil: ['#ddb170', '#947450', '#39495b'], map: [93, 74], description: 'Carga pesada. Passagem complicada.', boss: 'biel' },
+    { id: 3, name: 'Fábrica de Suco', accent: '#cb91ef', sky: ['#76b7d4', '#d8e7df'], soil: ['#a9ced5', '#486778', '#25354d'], map: [139, 108], description: 'Um produto forte. Um visitante insistente.', boss: 'calabrezzo' },
+    { id: 4, name: 'Serra Suspensa', accent: '#e5c4f1', sky: ['#86b4da', '#e1def1'], soil: ['#d1d9d9', '#80949d', '#425769'], map: [180, 68], description: 'Bielzão já chegou lá em cima.', boss: 'biel' },
+    { id: 5, name: 'Reserva Gelada', accent: '#a7e7fa', sky: ['#416a8f', '#97c3d5'], soil: ['#ddf8f7', '#8cc0d5', '#406c8c'], map: [230, 94], description: 'A mistura ficou ainda mais concentrada.', boss: 'calabrezzo' },
+    { id: 6, name: 'Domínio Pizzarino', accent: '#f3be8b', sky: ['#a58dc2', '#f6c69e'], soil: ['#ecd8b1', '#8c8fa2', '#48516c'], map: [281, 65], description: 'Yasmin está logo ali. João também.', boss: 'joao' }
 ];
 const NAMES = [
     ['Pé na Estrada', 'Ponte Bamba', 'Por Baixo do Gap', 'Falésias em Sequência', 'Joãozão na Ponte'],
@@ -81,6 +81,16 @@ class Draft {
 }
 function course(w: number, n: number): AdventureStage {
     const d = new Draft(w, n, n === 4 ? 184 : 160);
+    const accents: Record<number, [Landmark['kind'], number, number, number, number, string?][][]> = {
+        1: [[['garden', 8, 14, 7, 1]], [['palms', 3, 14, 8, 6]], [['rockArch', 20, 18, 22, 7]], [['rockArch', 71, 20, 12, 7]]],
+        2: [[['crane', 2, 14, 16, 9]], [['container', 5, 17, 8, 3, 'ENTRADA']], [['station', 38, 14, 14, 5, 'RECEBIMENTO']], [['container', 70, 17, 9, 3, '04']]],
+        3: [[['station', 1, 14, 13, 6, 'RECEBIMENTO']], [['bottler', 19, 11, 20, 5], ['bottler', 61, 10, 22, 5], ['bottler', 106, 11, 18, 5]], [['station', 53, 14, 12, 6, 'MISTURA']], [['bottler', 3, 13, 11, 4]]],
+        4: [[['pine', 5, 14, 7, 6]], [['pine', 6, 14, 10, 8]], [['pine', 77, 13, 8, 7]], [['pine', 151, 11, 8, 8]]],
+        5: [[['pipe', 2, 14, 14, 8]], [['freezer', 3, 14, 11, 7, 'MANUTENÇÃO']], [['pipe', 51, 14, 11, 6]], [['pipe', 65, 14, 12, 6]]],
+        6: [[['house', 1, 14, 14, 7, 'Y + J'], ['garden', 60, 14, 13, 5]], [['garden', 66, 14, 12, 5]], [['house', 3, 14, 13, 7, 'Y + J']], [['garden', 1, 14, 13, 7]]],
+    };
+    for (const [kind,x,y,width,height,label] of accents[w][n-1]) d.art(kind,x,y,width,height,label);
+
     // Routes are built from islands, rooms and manufactured structures, never a continuous filler floor.
     if (w === 1 && n === 1) {
         d.land(0, 14, 18).land(18, 12, 9).land(31, 14, 18).land(49, 11, 12).land(61, 14, 17).land(84, 13, 15).land(99, 11, 10).land(113, 14, 16).land(129, 12, 11).land(143, 14, 17);
@@ -146,9 +156,16 @@ function course(w: number, n: number): AdventureStage {
     }
     if (w === 3 && n === 2) {
         d.land(0, 14, 17).land(17, 12, 24).land(47, 14, 12).land(59, 11, 27).land(92, 14, 12).land(104, 12, 23).land(133, 14, 27);
-        d.belt('b1', 17, 12, 24, -1).sw('s1', 14, 14, 'b1').loader(39, 12).m('target', 't1', 20, 9, 1, 3).platform(42, 13, 4).belt('b2', 59, 11, 27, -1).sw('s2', 55, 14, 'b2').loader(84, 11).platform(87, 12, 4).belt('b3', 104, 12, 23).platform(128, 13, 4).jet('j1', 118, 12);
-        d.cp(49).cp(95).foe('agitator', 71, 11).seal(1, 27, 9).seal(2, 76, 8).seal(3, 114, 9).item('helmet', 50).art('pipe', 18, 12, 23, 7).art('tank', 59, 11, 24, 10, 'LINHA 02').art('tank', 104, 12, 23, 10, 'CONTROLE').talk(52, 'joao', 'Para de encher o saco.', 'para_de_encher_o_saco');
-        d.cue(26, 12).cue(51, 14).cue(64, 11).cue(81, 11).cue(97, 14).cue(111, 12).cue(139, 14);
+        // Observe the first line from a stationary ledge; invert it before mixing belts and hazards.
+        d.belt('b1', 21, 12, 20, -1).sw('s1', 14, 14, 'b1').loader(39, 12).m('target', 't1', 23, 10, 1, 2);
+        d.move('crate1',41,13,44,13,3600).land(41,19,6,4).platform(45,16,2);
+        d.belt('b2', 62, 11, 24, -1).sw('s2', 55, 14, 'b2').loader(84, 11).move('crate2',86,12,89,12,3900).land(86,19,6,4).platform(90,16,2);
+        d.belt('b3',107,12,20).sw('s3',100,14,'b3').platform(128,13,4).jet('j1',118,12);
+        // Optional maintenance catwalk rewards a longer jump; both routes rejoin on safe ground.
+        d.platform(109,8,4).platform(116,7,4).platform(122,9,3).arc(112,7,5);
+        d.cp(49).cp(95).foe('agitator', 73, 11).seal(1, 27, 9).seal(2, 76, 8).seal(3, 117, 5).item('helmet', 50).art('pipe', 18, 12, 23, 7).art('tank', 59, 11, 24, 10, 'LINHA 02').art('tank', 104, 12, 23, 10, 'CONTROLE');
+        d.talk(10,'feka','Uma sentada no botão... e a esteira troca de lado!').talk(52, 'joao', 'Para de encher o saco.', 'para_de_encher_o_saco');
+        d.cue(15,14,'s1').cue(26, 12).cue(51, 14).cue(56,14,'s2').cue(64, 11).cue(81, 11).cue(97, 14).cue(111, 12).cue(139, 14);
     }
     if (w === 3 && n === 3) {
         d.land(0, 14, 18).land(18, 12, 12).land(35, 10, 12).land(51, 14, 17).land(68, 11, 12).land(85, 9, 13).land(104, 14, 16).land(120, 11, 14).land(140, 14, 20);
@@ -235,6 +252,7 @@ function course(w: number, n: number): AdventureStage {
         d.cue(42, 10).cue(63, 8).cue(83, 14).cue(99, 11).cue(127, 9).cue(148, 13).cue(167, 10).cue(180, 14);
     }
     // The finish is always on a quiet, solid landing. Pickups guide jumps; they never mark empty death space.
+    if(w===5) for(const m of d.s.mechanisms) if(m.kind==='target') m.pressurized=true;
     d.cue(d.s.level.width - 4, 14);
     for (const cue of d.s.route ?? [])
         if (!cue.switch)
@@ -262,12 +280,12 @@ function arena(w: number): AdventureStage {
     if (type === 'C1' || type === 'C2') {
         d.m('platform','dais',16,12.5625,3.5625,.3125);
         d.belt('bossBelt', 7, 14, 11, -1).sw('a', 4, 14, 'bossBelt');
-        d.lift('access', 14, 13, 10).jet('bossJet', 10, 14);
+        d.m('lift','access',14,13,4,.5,{to:{x:224,y:160},gated:true}).jet('bossJet', 10, 14);
         if (type === 'C2')
-            d.ice(8, 5).sw('b', 18, 14, 'bossBelt').m('target', 'iceLeft', 8, 11, 1, 3).m('target', 'iceRight', 18, 11, 1, 3);
+            d.ice(8, 5).sw('b', 18, 14, 'bossBelt').m('target', 'iceLeft', 8, 11, 1, 3, {pressurized:true}).m('target', 'iceRight', 18, 11, 1, 3, {pressurized:true});
     }
     if (type === 'J2')
-        d.m('support', 'left', 5, 10, 4, .5, { to: { x: 80, y: 13 * 16 } }).m('support', 'right', 14, 10, 4, .5, { to: { x: 224, y: 13 * 16 } });
+        d.m('platform','dais',16.5,11.8125,3.125,.3125).m('support', 'left', 5, 10, 4, .5, { to: { x: 80, y: 13 * 16 } }).m('support', 'right', 14, 10, 4, .5, { to: { x: 224, y: 13 * 16 } });
     const who = ISLANDS[w - 1].boss;
     d.talk(0, who, type === 'J1' ? 'Aqui é o João, namorado da Yasmin.' : type === 'J2' ? 'Eu sou o namorado dela.' : who === 'biel' ? 'A passagem fechou.' : 'Vamos fazer um controle de qualidade.', type === 'J1' ? 'aqui_e_o_joao_namorado_da_yasmin' : type === 'J2' ? 'eu_sou_o_namorado_dela' : undefined);
     return d.done();

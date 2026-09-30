@@ -37,7 +37,7 @@ export function auditRoute(stage: AdventureStage) {
     const reached = new Set<number>(start < 0 ? [] : [start]), edges: Record<string, number> = {};
     const level = new WorldLevel(stage.level);
     // Endpoint fixtures are only used to probe each local landing. The runtime still moves one real body.
-    level.bodies = surfaces.filter(s => s.mechanism).map((s, i) => ({ id: `probe${i}`, kind: 'platform', x: s.x, y: s.y, width: s.width, height: 8, px: s.x, py: s.y, active: false, timer: 0 }));
+    level.bodies = surfaces.filter(s => s.mechanism).map((s, i) => ({ id: `probe${i}`, kind: 'platform', x: s.x, y: s.y, width: s.width, height: 8, px: s.x, py: s.y, active: false, observedActive: false, beltOffset: 0, timer: 0 }));
     function canJump(a: Surface, b: Surface): boolean {
         if (b.y < a.y - 116)
             return false;

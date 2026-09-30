@@ -13,7 +13,7 @@ import { ProgressStore, isUnlocked, finishStage, parseSave } from './progress';
 import { WorldArt, rect } from './WorldArt';
 import { drawLandmarks } from './WorldScenery';
 import { WorldAudio } from './WorldAudio';
-import { WorldLevel, WorldObjects } from './WorldPhysics';
+import { WorldLevel, WorldObjects, BELT_CARRY_SPEED } from './WorldPhysics';
 import { WorldFoe } from './WorldEnemies';
 import { BossEncounter } from './BossEncounter';
 import { bossFrame, WORLD_PALETTE } from './WorldAssets';
@@ -351,7 +351,7 @@ export class WorldGame {
             this.player.data.position = this.level.transport(previous);
             const belt = this.level.beltAt(this.player.getRect());
             if (belt) {
-                const dx = (belt.direction ?? 1) * (belt.active ? -1 : 1) * 1.2;
+                const dx = (belt.direction ?? 1) * (belt.active ? -1 : 1) * BELT_CARRY_SPEED;
                 this.player.data.position = this.level.resolveCollision(this.player.getRect(), { x: dx, y: 0 }, this.player.getRect()).position;
             }
         }
@@ -393,14 +393,18 @@ export class WorldGame {
         }
         this.level.updateFallingPlatforms(dt);
         const bossPhase = this.boss?.phase;
+        const shockWarning = this.boss?.shockWarning;
         this.boss?.update(dt, p, this.objects, this.level);
-        if (this.boss?.phase === 'warning' && bossPhase !== 'warning')
+        if (this.boss?.phase === 'warning' && bossPhase !== 'warning' || this.boss?.shockWarning && !shockWarning)
             this.audio.sfx('warning');
+        if (this.boss?.released) this.audio.sfx('throw');
         if (this.level.checkSpikeCollision(p) || this.level.checkLavaCollision(p))
             this.hurt();
-        for (const b of this.objects.bodies)
-            if (b.kind === 'jet' && this.objects.jetState(b) === 'active' && overlaps(p, b))
-                this.hurt(b.x + b.width / 2);
+        for (const b of this.objects.bodies) {
+            if (b.kind !== 'jet') continue;
+            const danger = this.objects.jetDanger(b);
+            if (danger && overlaps(p, danger)) this.hurt(b.x + b.width / 2);
+        }
         for (const b of this.objects.barrels)
             if (b.life > 0 && overlaps(p, b))
                 this.hurt(b.x + b.width / 2);
@@ -408,13 +412,19 @@ export class WorldGame {
             return;
         for (const event of this.objects.events) {
             this.audio.sfx(event.kind);
-            this.particle(event.x, event.y, '#d8b4ed');
+            // Machine mist and flashes are drawn on the simulation clock.
+            if (['warning', 'pressure', 'jet', 'cannon'].includes(event.kind)) continue;
+            this.particle(event.x, event.y, event.kind === 'barrelLand' ? '#b9b9b4' : event.kind === 'switch' ? '#d8df98' : '#d8b4ed', event.kind === 'barrelLand' ? 3 : 9);
         }
         const falling = this.player.data.velocity.y > 0 || beforeV > 0, pound = this.player.data.groundPoundState === GroundPoundState.FALL;
         for (const enemy of this.foes) {
             if (Math.abs(enemy.x - p.x) > 500)
                 continue;
+            const phase = enemy.phase;
             enemy.update(dt, this.level, this.objects, p);
+            if (enemy.phase === 'warning' && phase !== 'warning' && Math.abs(enemy.x - p.x) < 200)
+                this.audio.sfx('warning');
+            if (enemy.phase === 'recoil' && phase !== 'recoil') this.audio.sfx('throw');
             const contact = enemy.contact(p, previous, falling, pound);
             if (contact === 'hurt')
                 this.hurt(enemy.x + enemy.width / 2);
@@ -436,7 +446,7 @@ export class WorldGame {
             if (this.boss.impact) {
                 this.camera.shakeTimer = 200;
                 this.audio.sfx('pound');
-                this.renderer.addImpact(this.boss.targetX, 224, 'boss');
+                this.renderer.addImpact(this.boss.impactPoint.x, this.boss.impactPoint.y, 'boss');
             }
             if (this.boss.danger && overlaps(p, this.boss.danger))
                 this.hurt(this.boss.danger.x + this.boss.danger.width / 2);
@@ -595,14 +605,14 @@ export class WorldGame {
         const shake = this.store.save.preferences.shake && this.camera.shakeTimer > 0 ? (Math.floor(this.time / 40) % 2 ? 1 : -1) : 0;
         const view = { ...this.camera, x: this.camera.x + shake, y: this.camera.y };
         const cx = Math.round(view.x), cy = Math.round(view.y), island = ISLANDS[this.stage.world - 1];
-        this.art.background(c, island, cx, cy, this.time);
+        this.art.background(c, island, cx, cy, this.time, this.stage.number);
         if (!this.boss)
             drawLandmarks(c, this.stage, cx, cy, this.time);
         else
             this.art.arena(c, this.boss, cx, cy, this.time);
         this.art.terrain(c, this.level, island, cx, cy, this.time);
         drawLandmarks(c, this.stage, cx, cy, this.time, true);
-        this.art.objects(c, this.objects, cx, cy, this.time);
+        this.art.objects(c, this.objects, cx, cy, this.time, this.stage.world);
         for (const cp of this.stage.checkpoints) {
             const x = cp.x * 16 - cx, y = cp.y * 16 - cy;
             rect(c, x, y - 35, 2, 35, '#f0dbc0');
@@ -674,7 +684,7 @@ export class WorldGame {
         pixelText(c, 'WORLD', 160, 53, '#faf0b8', 3, 'center');
         pixelText(c, 'SEIS ILHAS. UMA GRANDE MISSÃO?', 160, 86, '#30475b', 1, 'center');
         this.art.atlas.draw(c, PLAYER_SPRITES.idle, PLAYER_PALETTE, 32, 130);
-        this.art.atlas.draw(c, bossFrame('joao', 'idle'), WORLD_PALETTE, 252, 109);
+        this.art.atlas.draw(c, bossFrame('joao', 'idle'), WORLD_PALETTE, 252, 99);
         this.button(c, this.store.save.completed.length ? 'CONTINUAR AVENTURA' : 'COMEÇAR AVENTURA', 80, 103, 160, () => this.begin());
         this.button(c, 'GALERIA', 80, 124, 76, () => this.change('gallery'));
         this.button(c, 'OPÇÕES', 164, 124, 76, () => this.settings('title'));
@@ -732,13 +742,13 @@ export class WorldGame {
         const ending = this.state === 'ending';
         this.art.atlas.draw(c, ending ? PLAYER_SPRITES.celebrate : PLAYER_SPRITES.idle, PLAYER_PALETTE, ending ? 125 : 54, 108);
         this.art.atlas.draw(c, YASMIN_FRAMES[Math.floor(this.time / 600) % 2], SPRITE_PALETTE, ending ? 169 : 225, 104);
-        this.art.atlas.draw(c, bossFrame('joao', ending ? 'hurt' : 'idle'), WORLD_PALETTE, ending ? 262 : 252, 87);
-        panel(c, 18, 12, 284, 78, '#25344c', '#d2bb8e');
+        this.art.atlas.draw(c, bossFrame('joao', ending ? 'hurt' : 'idle'), WORLD_PALETTE, ending ? 262 : 252, 79);
+        panel(c, 18, 12, 284, 68, '#25344c', '#d2bb8e');
         pixelText(c, ending ? 'UMA VITÓRIA E TANTO!' : 'UMA GRANDE AVENTURA', 160, 23, ART.goldLight, 1, 'center');
         const text = ending ? 'FEKA SALVOU YASMIN?' : this.introPage === 0 ? 'João e Yasmin partiram para o arquipélago. Feka sabe o que precisa fazer.' : 'Feka ajeita os óculos e parte. Nenhum gap vai impedir essa grande missão!';
         this.text(c, text, 31, 44, 258);
         if (ending)
-            pixelText(c, `${this.store.save.completed.length}/30 FASES · ${this.store.save.seals.length}/72 SELOS`, 160, 72, '#b2d4d4', 1, 'center');
+            pixelText(c, `${this.store.save.completed.length}/30 FASES · ${this.store.save.seals.length}/72 SELOS`, 160, 69, '#b2d4d4', 1, 'center');
         this.button(c, ending ? 'CONTINUAR EXPLORANDO' : 'SEGUIR VIAGEM', 72, 151, 176, () => ending ? this.toMap() : this.nextIntro());
     }
     private renderGallery(c: CanvasRenderingContext2D) {

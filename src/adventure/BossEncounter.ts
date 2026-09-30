@@ -20,11 +20,15 @@ export class BossEncounter implements Rect {
     impact = false;
     opened = false;
     pose = 'idle';
+    poseTime = 0;
+    released = false;
+    impactPoint = { x: 100, y: 224 };
     pattern: BossPattern = 'gap';
     private launchX = 0;
     private homeY = 180;
     private releasedExtra = false;
     private resetAfterHit = false;
+    private retryAt = 0;
     constructor(readonly id: EncounterId) {
         this.character = id[0] === 'J' ? 'joao' : id[0] === 'B' ? 'biel' : 'calabrezzo';
         this.health = this.maxHealth = id.endsWith('2') ? 4 : 3;
@@ -46,16 +50,38 @@ export class BossEncounter implements Rect {
         }
         this.homeY = this.y;
     }
-    private enter(phase: BossPhase) { this.phase = phase; this.timer = 0; this.danger = null; if (phase === 'hurt')
-        this.resetAfterHit = false; }
-    private expose(objects: WorldObjects) { this.enter('open'); objects.barrels = objects.barrels.filter(b => !b.boss); const lift = objects.get('access'); if (lift)
-        lift.active = true; }
+    private enter(phase: BossPhase) {
+        this.phase = phase;
+        this.timer = 0;
+        this.danger = null;
+        if (phase === 'hurt')
+            this.resetAfterHit = false;
+    }
+    private expose(objects: WorldObjects) {
+        this.enter('open');
+        this.pose = 'recover';
+        this.poseTime = 0;
+        objects.barrels = objects.barrels.filter(b => !b.boss);
+        const lift = objects.get('access');
+        if (lift)
+            lift.active = true;
+    }
+    private throwBarrel(objects: WorldObjects) {
+        const barrel = objects.spawnBarrel(this.x - 12, this.y + 8, -1, this.id === 'C2', true);
+        barrel.vy = -2.5;
+        this.released = true;
+        this.pose = 'shoot';
+        this.poseTime = 0;
+    }
+    get shockWarning() { return this.id === 'J2' && this.health <= 2 && this.phase === 'rest' && this.timer < 650; }
     get secondTarget() { return clamp(this.targetX + (this.targetX > 155 ? -76 : 76), 28, 272); }
     update(dt: number, player: Rect, objects: WorldObjects, level: WorldLevel) {
         this.timer += dt;
         this.impact = false;
+        this.released = false;
         this.danger = null;
         this.pose = 'idle';
+        this.poseTime = this.timer;
         const pressure = objects.get('bossJet');
         if (pressure) {
             const enabled = this.health < this.maxHealth && !['open', 'hurt', 'defeated'].includes(this.phase);
@@ -73,6 +99,9 @@ export class BossEncounter implements Rect {
         if (this.phase === 'hurt') {
             if (!this.resetAfterHit) {
                 this.resetAfterHit = true;
+                const access = objects.get('access');
+                if (access)
+                    access.active = false;
                 if (this.character === 'biel')
                     for (const body of objects.bodies) {
                         const selected = this.id === 'B1' || body.id === (this.health % 2 ? 'left' : 'right') || body.link === (this.health % 2 ? 'left' : 'right');
@@ -94,9 +123,15 @@ export class BossEncounter implements Rect {
             return;
         }
         if (this.phase === 'rest') {
-            if (this.id === 'J2' && this.health <= 2 && this.timer < 850)
-                this.danger = { x: 24 + this.timer * .28, y: 214, width: 20, height: 10 };
-            if (this.timer > 1100) {
+            const shock = this.id === 'J2' && this.health <= 2;
+            if (this.shockWarning)
+                this.pose = 'windup';
+            if (shock && this.timer >= 650 && this.timer < 1500) {
+                this.danger = { x: 270 - (this.timer - 650) * .30, y: 214, width: 20, height: 10 };
+                this.pose = 'smash';
+                this.poseTime = this.timer - 650;
+            }
+            if (this.timer > (shock ? 1900 : 1100)) {
                 this.targetX = clamp(player.x + player.width / 2, 24, 294);
                 this.enter('warning');
                 this.opened = false;
@@ -106,6 +141,12 @@ export class BossEncounter implements Rect {
                     this.targetX = clamp(this.targetX, 110, 262);
                 this.launchX = this.x;
                 this.releasedExtra = false;
+                this.retryAt = 0;
+                this.pose = 'windup';
+                this.poseTime = 0;
+                const access = objects.get('access');
+                if (access)
+                    access.active = false;
                 for (const target of objects.bodies)
                     if (target.id.startsWith('ice'))
                         target.active = false;
@@ -115,9 +156,11 @@ export class BossEncounter implements Rect {
             this.pose = 'windup';
             if (this.timer > 950) {
                 this.enter('attack');
-                this.impact = true;
+                this.poseTime = 0;
+                this.impact = this.character === 'joao' && this.pattern !== 'leap';
+                this.impactPoint = { x: this.targetX, y: 224 };
                 if (this.character === 'calabrezzo')
-                    objects.spawnBarrel(this.x - 16, 198, -1, this.id === 'C2', true);
+                    this.throwBarrel(objects);
                 if (this.character === 'joao') {
                     if (this.id === 'J1' && this.pattern === 'gap') {
                         for (let c = Math.floor(this.targetX / 16) - 1; c <= Math.floor(this.targetX / 16) + 1; c++) {
@@ -129,6 +172,7 @@ export class BossEncounter implements Rect {
                     else if (this.id === 'J2')
                         for (const s of objects.bodies)
                             if (s.kind === 'support' && Math.abs(s.x + s.width / 2 - this.targetX) < 64) {
+                                this.impactPoint = { x: s.x + s.width / 2, y: s.y };
                                 s.active = true;
                                 this.opened = true;
                             }
@@ -136,7 +180,7 @@ export class BossEncounter implements Rect {
             }
         }
         else if (this.phase === 'attack') {
-            this.pose = this.character === 'calabrezzo' ? 'shoot' : 'smash';
+            this.pose = this.character === 'calabrezzo' ? (this.timer < 430 ? 'shoot' : 'idle') : 'smash';
             if (this.character === 'joao') {
                 if (this.pattern === 'leap') {
                     const t = Math.min(1, this.timer / 650);
@@ -147,6 +191,7 @@ export class BossEncounter implements Rect {
                         this.danger = { x: this.targetX - 28, y: 211, width: 56, height: 13 };
                         if (!this.releasedExtra) {
                             this.impact = true;
+                            this.impactPoint = { x: this.targetX, y: 224 };
                             this.releasedExtra = true;
                         }
                     }
@@ -160,8 +205,9 @@ export class BossEncounter implements Rect {
             }
             else if (this.character === 'biel') {
                 const second = this.pattern === 'doubleCargo' && this.timer >= 1000;
-                const local = this.timer - (second ? 1000 : 0), dropY = Math.min(188, 48 + local * .24);
+                const local = this.timer - (second ? 1000 : 0), dropY = Math.min(188, 90 + local * .18);
                 this.pose = local < 500 ? 'shoot' : 'smash';
+                this.poseTime = local;
                 this.danger = local < 800 ? { x: this.id === 'B2' ? clamp(this.targetX - 80 + local * .16, 20, 272) : (second ? this.secondTarget : this.targetX) - 21, y: dropY, width: 42, height: 36 } : null;
                 const elevated = this.id === 'B2' ? objects.get('left')!.active && objects.get('right')!.active && player.y < 175 : objects.bodies.some(b => b.kind === 'lift' && b.active);
                 if (this.timer > (this.pattern === 'doubleCargo' ? 2050 : 1100) && elevated)
@@ -174,25 +220,37 @@ export class BossEncounter implements Rect {
                     this.expose(objects);
                     objects.barrels = [];
                     this.impact = true;
+                    this.impactPoint = { x: this.cycle % 2 ? 296 : 136, y: 208 };
                 }
-                if (this.pattern === 'volley' && !this.releasedExtra) {
-                    if (this.timer > 650 && this.timer < 1200)
+                if (this.phase === 'attack' && this.pattern === 'volley' && !this.releasedExtra) {
+                    if (this.timer > 650 && this.timer < 1200) {
                         this.pose = 'windup';
+                        this.poseTime = (this.timer - 650) * 1.7;
+                    }
                     if (this.timer >= 1200) {
-                        const p = objects.spawnBarrel(this.x - 16, 180, -1, this.id === 'C2', true);
-                        p.vy = -2;
+                        this.throwBarrel(objects);
                         this.releasedExtra = true;
-                        this.pose = 'shoot';
                     }
                 }
-                if (this.id === 'C2' && this.timer > 1800 && !objects.barrels.some(b => b.boss)) {
-                    objects.spawnBarrel(this.x - 16, 198, -1, true, true);
+                if (this.phase === 'attack' && this.pattern === 'volley' && this.releasedExtra && this.timer >= 1200 && this.timer < 1630) {
+                    this.pose = 'shoot';
+                    this.poseTime = this.timer - 1200;
+                }
+                if (this.phase === 'attack' && this.id === 'C2' && this.timer > 1800 && (this.timer < 5400 || this.retryAt > 0) && !objects.barrels.some(b => b.boss)) {
+                    this.retryAt ||= this.timer + 750;
+                    this.pose = 'windup';
+                    this.poseTime = 750 - (this.retryAt - this.timer);
+                    if (this.timer >= this.retryAt) {
+                        this.throwBarrel(objects);
+                        this.retryAt = 0;
+                    }
                 }
                 for (const barrel of objects.barrels)
-                    if (this.id === 'C1' && barrel.boss && barrel.returned && barrel.x > this.x - 26) {
+                    if (this.id === 'C1' && barrel.boss && barrel.returned && barrel.x > this.x - 26 && barrel.y + barrel.height > 202 && barrel.y < 224) {
                         barrel.life = 0;
                         this.expose(objects);
                         this.impact = true;
+                        this.impactPoint = { x: 249, y: 215 };
                         break;
                     }
                 if (this.timer > 6800) {
@@ -202,7 +260,7 @@ export class BossEncounter implements Rect {
             }
         }
         else if (this.phase === 'open') {
-            this.pose = 'hurt';
+            this.pose = 'recover';
             if (this.timer > 3200)
                 this.enter('rest');
         }
@@ -222,5 +280,5 @@ export class BossEncounter implements Rect {
         return this.phase === 'open' ? 'none' : 'hurt';
     }
     get name() { return this.character === 'joao' ? 'JOÃOZÃO' : this.character === 'biel' ? 'BIELZÃO' : 'CALABREZZO'; }
-    get hint() { return this.phase === 'open' ? 'AGORA! PULE NA CABEÇA' : this.pattern === 'leap' && ['warning', 'attack'].includes(this.phase) ? 'SALTO! SAIA DA SOMBRA' : this.pattern === 'doubleCargo' && ['warning', 'attack'].includes(this.phase) ? 'DUAS CARGAS. DOIS AVISOS' : this.id === 'B2' ? 'ATIVE OS APOIOS E SUBA' : this.character === 'biel' ? 'LEVANTE UM APOIO' : this.id === 'C2' ? (this.cycle % 2 ? 'GELO DA DIREITA' : 'GELO DA ESQUERDA') : this.character === 'calabrezzo' ? 'INVERTA A ESTEIRA' : this.id === 'J2' ? 'ATRAIA O GOLPE ATÉ O APOIO' : 'SAIA DA MARCAÇÃO'; }
+    get hint() { return this.shockWarning ? 'ONDA NO CHÃO! PULE' : this.phase === 'open' ? 'AGORA! PULE NA CABEÇA' : this.pattern === 'leap' && ['warning', 'attack'].includes(this.phase) ? 'SALTO! SAIA DA SOMBRA' : this.pattern === 'doubleCargo' && ['warning', 'attack'].includes(this.phase) ? 'DUAS CARGAS. DOIS AVISOS' : this.id === 'B2' ? 'ATIVE OS APOIOS E SUBA' : this.character === 'biel' ? 'LEVANTE UM APOIO' : this.id === 'C2' ? (this.cycle % 2 ? 'GELO DA DIREITA' : 'GELO DA ESQUERDA') : this.character === 'calabrezzo' ? 'INVERTA A ESTEIRA' : this.id === 'J2' ? 'ATRAIA O GOLPE ATÉ O APOIO' : 'SAIA DA MARCAÇÃO'; }
 }

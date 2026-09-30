@@ -7,7 +7,7 @@ import { BossEncounter } from '../src/adventure/BossEncounter';
 import { auditRoute } from './helpers/worldRoutes';
 import { WorldFoe } from '../src/adventure/WorldEnemies';
 import { Player } from '../src/entities/Player';
-import type { InputState } from '../src/types';
+import type { InputState, Rect } from '../src/types';
 const idle: InputState = { left: false, right: false, run: false, jump: false, down: false, start: false, pause: false, mute: false, jumpPressed: false, jumpReleased: false, downPressed: false };
 test('World authors 30 valid stages, 72 unique seals, six secrets and six encounters', () => {
     assert.equal(STAGES.length, 30);
@@ -207,4 +207,103 @@ test('João leap commits to its shadow, moves through the air and opens on landi
     assert.equal(b.phase, 'open');
     assert.equal(b.y, 180);
     assert.equal(b.danger, null);
+});
+test('Calabrezzo throws from his raised hand before the barrel reaches the conveyor', () => {
+    const stage = stageById('3-5')!, boss = new BossEncounter('C1'), o = new WorldObjects(stage.mechanisms), l = new WorldLevel(stage.level), p = { x: 30, y: 200, width: 14, height: 24 };
+    boss.update(1200, p, o, l);
+    boss.update(900, p, o, l);
+    assert.equal(o.barrels.length, 0);
+    assert.equal(boss.pose, 'windup');
+    boss.update(60, p, o, l);
+    assert.equal(boss.released, true);
+    assert.equal(boss.pose, 'shoot');
+    assert.equal(boss.poseTime, 0);
+    assert.ok(o.barrels[0].y < 180 && o.barrels[0].vy < 0);
+    assert.equal(boss.impact, false, 'A throw is not an impact at the player target.');
+    for (let i = 0; i < 80; i++)
+        o.update(1000 / 60, l, p.x);
+    assert.ok(o.barrels.some(b => Math.abs(b.y + b.height - 224) < 1));
+});
+test('encounter lift waits for an opening instead of following the autonomous cable cycle', () => {
+    const stage = stageById('3-5')!, boss = new BossEncounter('C1'), o = new WorldObjects(stage.mechanisms), l = new WorldLevel(stage.level), p = { x: 30, y: 200, width: 14, height: 24 };
+    for (let i = 0; i < 150; i++)
+        o.update(1000 / 60, l, p.x);
+    assert.equal(o.get('access')!.y, 208);
+    boss.phase = 'attack';
+    const barrel = o.spawnBarrel(240, 208, 1, false, true);
+    barrel.returned = true;
+    boss.update(16, p, o, l);
+    assert.equal(boss.phase, 'open');
+    for (let i = 0; i < 70; i++)
+        o.update(1000 / 60, l, p.x);
+    assert.equal(o.get('access')!.y, 160);
+    boss.phase = 'hurt';
+    boss.update(16, p, o, l);
+    assert.equal(o.get('access')!.active, false);
+});
+test('reinforced ice blocks ordinary barrels and yields to a pressurized one', () => {
+    const stage = stageById('5-5')!, o = new WorldObjects(stage.mechanisms), l = new WorldLevel(stage.level), target = o.get('iceLeft')!;
+    o.spawnBarrel(target.x - 8, 208, 1, false);
+    o.update(16, l, target.x);
+    assert.equal(target.active, false);
+    assert.equal(o.barrels.length, 0);
+    o.spawnBarrel(target.x - 8, 208, 1, true);
+    o.update(16, l, target.x);
+    assert.equal(target.active, true);
+    assert.ok(o.events.some(e => e.kind === 'break'));
+});
+test('an opening cancels a pending Calabrezzo volley and retry shots get a new windup', () => {
+    const stage = stageById('5-5')!, boss = new BossEncounter('C2'), o = new WorldObjects(stage.mechanisms), l = new WorldLevel(stage.level), p = { x: 30, y: 200, width: 14, height: 24 };
+    boss.phase = 'attack';
+    boss.pattern = 'volley';
+    boss.cycle = 1;
+    boss.timer = 1195;
+    o.get('iceRight')!.active = true;
+    boss.update(16, p, o, l);
+    assert.equal(boss.phase, 'open');
+    assert.equal(o.barrels.length, 0);
+    assert.equal(boss.released, false);
+    const retry = new BossEncounter('C2');
+    retry.phase = 'attack';
+    retry.timer = 1850;
+    o.get('iceLeft')!.active = false;
+    o.get('iceRight')!.active = false;
+    retry.update(16, p, o, l);
+    assert.equal(retry.pose, 'windup');
+    assert.equal(o.barrels.length, 0);
+    retry.update(700, p, o, l);
+    assert.equal(o.barrels.length, 0);
+    retry.update(60, p, o, l);
+    assert.equal(o.barrels.length, 1);
+    assert.equal(retry.released, true);
+});
+test('final João shockwave has a warning interval with no active floor hitbox', () => {
+    const stage = stageById('6-5')!, boss = new BossEncounter('J2'), o = new WorldObjects(stage.mechanisms), l = new WorldLevel(stage.level), p = { x: 239, y: 200, width: 14, height: 24 };
+    boss.health = 2;
+    boss.update(600, p, o, l);
+    assert.equal(boss.shockWarning, true);
+    assert.equal(boss.danger, null);
+    assert.equal(boss.pose, 'windup');
+    boss.update(60, p, o, l);
+    assert.equal(boss.shockWarning, false);
+    assert.ok(boss.danger);
+    const x = (boss.danger as Rect | null)!.x;
+    boss.update(100, p, o, l);
+    assert.ok((boss.danger as Rect | null)!.x < x);
+    boss.update(800, p, o, l);
+    assert.equal(boss.danger, null);
+});
+test('a launcher waits through its visible warning and keeps its cycle frozen offscreen', () => {
+    const stage = stageById('3-2')!, o = new WorldObjects(stage.mechanisms), l = new WorldLevel(stage.level), launcher = o.get('launch39')!;
+    o.update(900, l, 3000);
+    assert.equal(launcher.timer, 1200);
+    assert.equal(o.barrels.length, 0);
+    o.update(600, l, launcher.x);
+    assert.equal(launcher.timer, 600);
+    assert.equal(o.barrels.length, 0);
+    assert.ok(o.events.some(e => e.kind === 'warning'));
+    o.update(500, l, launcher.x);
+    assert.equal(o.barrels.length, 0);
+    o.update(110, l, launcher.x);
+    assert.equal(o.barrels.length, 1);
 });

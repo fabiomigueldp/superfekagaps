@@ -1,0 +1,18 @@
+{
+  "checks": [
+    "The real damage loop follows the growing jet",
+    "All ten mechanism variants contain complete cycles",
+    "Timeline exposes the shorter rising plume",
+    "The machine inspector freezes on the selected frame",
+    "Collision overlay can be inspected independently",
+    "Inspector selects the production recoil frame",
+    "Inspector exposes the real reversed conveyor direction",
+    "A stopped lift has stopped pulleys",
+    "Ordinary barrel resistance is visible",
+    "Pressurized barrel fracture is visible",
+    "No browser runtime errors"
+  ],
+  "errors": [],
+  "frames": 720,
+  "stagedViews": true
+}

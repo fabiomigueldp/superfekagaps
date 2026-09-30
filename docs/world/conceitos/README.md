@@ -6,7 +6,7 @@
 
 Esta entrega traduz a direção existente em imagens para orientar a próxima produção de cenários, personagens e animações. São seis mundos com estudos de peças, um elenco, duas pranchas com as seis famílias de inimigos, três pranchas cobrindo os seis confrontos e uma visão do arquipélago. Os PNGs finais estão em `imagens/`, todos com 1672 × 941 pixels.
 
-**Estado:** conceitos gerados e inspecionados visualmente. As imagens ainda não são sprites, tiles ou fases integrados ao jogo. A galeria permite ampliar cada prancha e comparar os seis mundos com capturas da versão atual.
+**Estado:** conceitos gerados e inspecionados visualmente; a direção foi aplicada à arte nativa dos seis mundos, inimigos, chefes, mecanismos, arenas e mapa. As imagens desta pasta continuam como pranchas de referência. Os sprites e cenários jogáveis foram redesenhados em PixelGrid/Canvas. Veja a [implementação](../implementacao.md#aplicação-dos-conceitos--29092026) e a [galeria de produção](../capturas/index.html), agora com as capturas atualizadas.
 
 ## Diagnóstico e direção
 
@@ -80,9 +80,9 @@ Isso orienta enquadramento, materiais e conjuntos de peças. A geometria de cada
 
 ## Passagem dos conceitos para o jogo
 
-### Primeiro trecho a produzir
+### Trecho usado para implementação
 
-Usar **3-2 · Linha de Envase** como trecho de referência: entrada segura, esteira, um carregador, inversão claramente animada, tanque fechado ao fundo e saída para uma área de descanso. Em seguida, aplicar o mesmo padrão ao encontro **3-5 · Controle de Qualidade**. Essa combinação valida cenário, ator, objeto móvel, mecanismo e resposta visual com um único conjunto de materiais.
+**3-2 · Linha de Envase** e **3-5 · Controle de Qualidade** foram usados como referência para materiais, barris, máquinas e atuação. A fase recebeu patamares seguros, esteiras com direção animada, transportadores com caminhos inferiores e uma passarela de manutenção. O padrão visual foi aplicado aos outros cinco mundos. O roteiro abaixo registra a sequência de produção proposta; os limites da verificação estão no documento de implementação.
 
 1. Desenhar o conjunto modular na grade real: topo, miolo, cantos, plataformas atravessáveis, suportes e conexão entre tubos. Separar vidro, líquido e moldura.
 2. Refazer carregador e barris em escala nativa, começando por silhueta e poses de aviso/soltura/recuperação.
@@ -107,4 +107,4 @@ Foram conferidos títulos, identidade dos personagens, paletas, distinção dos 
 
 O [manifesto](manifest.json) registra caminho, tamanho e hash SHA-256 dos 13 PNGs. Os [prompts](prompts.json) guardam instruções, referências e revisões. Todos os finais foram copiados para este projeto. A geração usou a ferramenta integrada, sem CLI/API alternativa.
 
-O critério para a próxima entrega é uma cena jogável que conserve estas identidades em escala nativa, com animação e leitura de contato verificadas. A qualidade da ilustração, por si só, não verifica dificuldade ou diversão das fases.
+A implementação já permite comparar estas identidades em escala nativa, com animação e contato. As verificações automáticas e capturas estão registradas na galeria de produção. Dificuldade, ritmo e diversão ainda precisam de sessões observadas com jogadores.

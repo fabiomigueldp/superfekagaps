@@ -123,7 +123,7 @@ export class WorldEditor {
             }
             else {
                 const kind = this.tool as MechanismKind, id = `${kind}-${Date.now().toString(36)}`, x = Math.floor(p.x / 16) * 16, y = Math.floor(p.y / 16) * 16;
-                this.draft.mechanisms.push({ id, kind, x, y, width: kind === 'switch' ? 24 : kind === 'jet' ? 12 : 64, height: kind === 'jet' ? 48 : 8, ...(['platform', 'lift', 'support'].includes(kind) ? { to: { x: x + 64, y: y - 32 }, period: 4000 } : {}), ...(kind === 'belt' ? { direction: 1 } : {}) });
+                this.draft.mechanisms.push({ id, kind, x, y, width: kind === 'switch' ? 24 : kind === 'jet' ? 12 : kind === 'launcher' ? 16 : 64, height: kind === 'jet' ? 48 : kind === 'launcher' ? 16 : 8, ...(['platform', 'lift', 'support'].includes(kind) ? { to: { x: x + 64, y: y - 32 }, period: 4000 } : {}), ...(kind === 'belt' ? { direction: 1 } : {}), ...(kind === 'launcher' ? { direction: -1, period: 3200 } : {}) });
                 this.selected = this.draft.mechanisms.length - 1;
             }
             this.reload();
