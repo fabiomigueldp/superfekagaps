@@ -801,3 +801,40 @@ test('real DOM controls keep separate native targets at zoom200%, portrait and s
     }
     assert.equal(h.internal.journey.arrived, '1-1'); assert.equal(h.events.entered, 0);
 });
+
+test('narrow channel travel hides dock signs while drawer, keyboard and skip remain usable', async t => {
+    const h = mapDOM(t), save = openSave('2-1'), progress = structuredClone({ completed: save.completed, seals: save.seals });
+    h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width: 590, height: 378 };
+    h.get('world-map-header').bounds = { x: 12, y: 6, left: 12, top: 6, width: 566, height: 44 };
+    h.get('world-map-tools').bounds = h.get('world-map-header').bounds;
+    h.get('world-map-footer').bounds = { x: 12, y: 314, left: 12, top: 314, width: 470, height: 56 };
+    await readyConnection(h, save);
+    assert.equal(h.internal.hud.dockButtons[0].hidden, false, 'Idle Porto keeps its normal Costa dock action.');
+    h.view.render(0, save, 100, '');
+    const modes = new Set<string>(); let time = 100;
+    while (time < 6000) {
+        h.view.render(0, save, time += 50, '');
+        const mode = h.internal.motionState(); modes.add(mode);
+        if (mode === 'boarding' || mode === 'sailing') {
+            assert.ok(h.internal.hud.stageButtons.every((button: Button) => button.hidden));
+            assert.ok(h.internal.hud.dockButtons.every((button: Button) => button.hidden), 'Dock labels must not cover Feka aboard.');
+            assert.equal(h.internal.hud.skipButton.hidden, false);
+            assert.equal(h.internal.journey.arrived, '2-1'); assert.equal(h.view.enterSelected(0), false);
+        }
+        if (mode === 'sailing') break;
+    }
+    assert.ok(modes.has('boarding') && modes.has('sailing'));
+    const aboard = { ...h.internal.marker };
+    h.internal.hud.regionButton.click(); assert.equal(h.internal.hud.regionMenu.hidden, false);
+    const toPort = (Array.from(h.internal.hud.regionMenu.children) as Element[]).find(button => button.getAttribute('aria-label')?.startsWith('Ilha 2:'))!;
+    toPort.click(); assert.equal(h.internal.hud.regionMenu.hidden, true);
+    assert.equal(h.internal.journey.selected, '2-1'); assert.deepEqual(h.internal.marker, aboard);
+    h.root.dispatch('keydown', { key: 'ArrowUp' });
+    assert.equal(h.internal.journey.selected, '1-1'); assert.deepEqual(h.internal.marker, aboard);
+    assert.deepEqual(h.events.arrived, [], 'Retargeting never changes the saved arrival.');
+    h.internal.hud.skipButton.click();
+    assert.equal(h.internal.journey.arrived, '1-1'); assert.deepEqual(h.events.arrived, [0]); assert.equal(h.events.entered, 0);
+    tick(h, 0, save, time + 50, 1600);
+    assert.equal(h.internal.motionState(), 'idle'); assert.equal(h.internal.hud.dockButtons[1].hidden, false, 'The idle Coast dock action returns.');
+    assert.deepEqual({ completed: save.completed, seals: save.seals }, progress, 'Hiding travel labels cannot change unlocks or collectibles.');
+});
