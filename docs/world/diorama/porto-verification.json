@@ -28,10 +28,36 @@
     "projected_load_samples": 273,
     "failed": 0
   },
-  "browser_qa": "Pending combined Porto preview; released HUD has desktop, narrow portrait, short landscape and editor browser checks",
+  "browser_qa": {
+    "status": "passed observed checks on the separate Porto preview",
+    "preview_commit": "aaa209e359f4f7247d5c093c535395425207365d",
+    "date": "2026-09-30",
+    "browser": "Cloud Chromium with real window resizing",
+    "viewports_css_px": [
+      { "width": 1181, "height": 757, "layout": "desktop" },
+      { "width": 400, "height": 606, "layout": "portrait" },
+      { "width": 846, "height": 392, "layout": "landscape" }
+    ],
+    "observed_checks": [
+      "Porto composition and HUD at all three viewport sizes",
+      "Repeated Costa to Porto and Porto to Costa switching",
+      "Panorama toggle",
+      "Keyboard navigation from 2-5 to 2-4",
+      "Locked-stage behavior",
+      "Reloading the normal preview outside the editor preserved selection 2-4 and showed 0 of 30 stages and 0 of 72 seals, confirming that the editor's secret-exit draft and progress stayed isolated"
+    ],
+    "isolated_editor_checks": {
+      "secret_exit": "Only the 2-3 draft was changed to put a secret exit at spawn. Running it recorded one completed stage, returned to 2-5 and showed the correct 2-3 to 2-5 route. Porto remained locked because Costa was incomplete, as expected.",
+      "stage_return": "Entered the actual 2-1 stage, paused and returned to the map with 2-1 still selected. Route and progress state remained ephemeral to the isolated editor session."
+    },
+    "app_warning_and_error_logs": "No entries observed"
+  },
   "limitations": [
     "No browser FPS claim; DevTools disabled by policy",
     "No physical or emulated touch device test",
-    "Reduced-motion behavior verified by integration tests, not a browser preference switch"
+    "Reduced-motion behavior verified by integration tests, not a browser preference switch",
+    "Cache reuse, late-response isolation and loading failures verified by deterministic integration tests; browser checks covered visible repeated world switching",
+    "Editor progress and secret-exit checks used an isolated session; normal-preview selection persistence and editor isolation were observed after reload, but completed-stage campaign persistence was not exercised",
+    "No screen-reader test"
   ]
 }
