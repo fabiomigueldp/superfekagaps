@@ -737,3 +737,31 @@ test('each dock sign names and selects the opposite destination, with that desti
     assert.match(closedPort.getAttribute('aria-label')!, /bloqueada/); closedPort.click();
     assert.equal(h.internal.journey.selected, '2-1'); assert.equal(h.internal.journey.arrived, '1-1'); assert.equal(h.internal.journey.blocked, 'unavailable');
 });
+
+test('locked Porto preview frames all five signs without dragging the camera toward Costa, and return/overview preserve arrival', async t => {
+    const h = mapDOM(t), save = freshSave(); await readyConnection(h, save); tick(h, 0, save, 16, 1500);
+    const originalPoint = { ...h.internal.marker }, portNodes = structuredClone(h.internal.network.nodes);
+    const assertVisibleRegion = (world: number) => {
+        for (let n = 0; n < 5; n++) {
+            const node = mapToScreen(h.internal.network.nodes[`${world}-${n + 1}`], h.internal.camera);
+            const sign = h.internal.hud.stageButtons[n] as Button;
+            assert.equal(sign.hidden, false, `${world}-${n + 1} sign remains available for inspection`);
+            assert.ok(node.x >= 0 && node.x <= h.internal.width && node.y >= 0 && node.y <= h.internal.height);
+            assert.ok(node.x + 36 - 28 >= 0 && node.x + 36 + 28 <= h.internal.width,
+                `${world}-${n + 1} full sign is inside horizontal frame`);
+            assert.ok(node.y - 58 >= 0 && node.y <= h.internal.height, `${world}-${n + 1} full sign is inside vertical frame`);
+        }
+    };
+    h.internal.hud.dockButtons[1].click(); h.view.render(5, save, 1600, ''); tick(h, 5, save, 1600, 3000);
+    assertVisibleRegion(2); assert.equal(h.internal.journey.arrived, '1-1'); assert.deepEqual(h.internal.marker, originalPoint);
+    const origin = mapToScreen(originalPoint, h.internal.camera); assert.ok(origin.x < 0, 'Origin Feka may be offscreen while inspecting locked Porto.');
+    h.get('world-map-overview').click(); tick(h, 5, save, 4600, 3000); assertVisibleRegion(2);
+    for (const world of [1, 2]) for (let n = 1; n <= 5; n++) {
+        const node = mapToScreen(h.internal.network.nodes[`${world}-${n}`], h.internal.camera);
+        assert.ok(node.x >= 0 && node.x <= h.internal.width && node.y >= 0 && node.y <= h.internal.height, 'Overview shows both unchanged regions.');
+    }
+    h.get('world-map-overview').click(); tick(h, 5, save, 7600, 3000); assertVisibleRegion(2);
+    h.view.render(0, save, 10700, ''); tick(h, 0, save, 10700, 3000); assertVisibleRegion(1);
+    assert.equal(h.internal.journey.arrived, '1-1'); assert.equal(h.internal.journey.destination, null); assert.deepEqual(h.events.arrived, []);
+    assert.deepEqual(h.internal.network.nodes, portNodes, 'Preview camera changes never move either island.');
+});

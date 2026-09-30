@@ -345,13 +345,17 @@ export class WorldMapView {
         const active = this.journey!.legs[0], channel = active?.mode === 'board' || active?.mode === 'sail';
         const activeWorld = active && active.mode !== 'sail' ? worldOf(active.from) : world;
         const boat = this.currentBoat();
+        // A region preview frames that region. Feka and a moored boat may remain
+        // offscreen on the origin island until a real trip begins or we return.
+        const trackJourney = !!this.journey!.destination || this.overview || worldOf(this.journey!.arrived) === activeWorld;
+        const trackedBoat = trackJourney ? boat : undefined;
         const waterRoute = this.connection?.sailRoute ?? active?.points ?? [];
         const travelPoints = channel ? this.width < 600 ? atlasTravelWindow(waterRoute, this.marker) : waterRoute : undefined;
         const target = getAtlasCamera({ mode: this.overview ? 'overview' : channel ? 'channel' : 'island', activeWorld,
             layers: islands, width: this.width, height: this.height, insets: { ...this.frameInsets, left: 16, right: 16 },
-            focus: this.journey!.blocked && !this.journey!.destination ? undefined : this.marker,
-            travelPoints, focusBounds: boat ? [atlasBoatBounds(boat.foot, boat.frame)] : undefined });
-        this.camera = this.blendAtlasCamera(target, dt, boat);
+            focus: trackJourney ? this.marker : undefined,
+            travelPoints, focusBounds: trackedBoat ? [atlasBoatBounds(trackedBoat.foot, trackedBoat.frame)] : undefined });
+        this.camera = this.blendAtlasCamera(target, dt, trackedBoat);
         const aboard = active?.mode === 'sail' || (active?.mode === 'board' && active.progress > .45);
         paintWorldAtlas(this.ctx, { camera: this.camera, time, reducedMotion: this.media.matches, islands,
             actor: { point: this.marker, walking: !!active && active.mode !== 'sail', facingLeft: this.facingLeft, aboard }, boat });
