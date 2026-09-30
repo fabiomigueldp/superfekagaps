@@ -24,7 +24,7 @@ The scripts create no JPEG preview, node subprocess, or .blend cache. Seven
 individual DPR2 WebPs are also emitted as optional alternatives; the shared
 atlas is the normal runtime deliverable.
 
-The accepted atlas is 560 × 232 pixels and 30,000 bytes. Its seven frames
+The accepted atlas is 560 × 232 pixels and 29,396 bytes. Its seven frames
 preserve full-contrast original bitmap IDs and combine selection/completion
 without hiding either state. The native phase and dock targets remain
 56 × 58 and 104 × 56 CSS pixels. Only decoration moves to align the measured
@@ -34,3 +34,9 @@ Repacking the original PNGs reproduced the atlas and manifest byte-for-byte.
 A fresh Blender render through the portable source also reproduced the stage
 pixels and measured metadata. Alpha checks cover the outer two pixels of every
 packed frame, including the completion pennant and contact shadow.
+
+Dock boards have one pier-side support and a short timber cantilever bracket.
+The COSTA board retains its right post; PORTO retains its left post. This keeps
+the support on the landing when a narrow layout shifts the label toward free
+water. The closed-dock marker follows that remaining post. Frame dimensions,
+reference points, faces and the five phase-state sources remain unchanged.

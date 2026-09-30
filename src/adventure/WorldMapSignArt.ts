@@ -103,9 +103,10 @@ export function paintPhysicalDockSign(canvas: HTMLCanvasElement, atlas: MapSignA
     const ctx = paint(canvas, atlas, world === 1 ? 'dock-left' : 'dock-right', world === 1 ? 'COSTA' : 'PORTO');
     if (!ctx) return false;
     if (!available) {
-        // A brass band belongs to the right post, never a floating lock icon.
-        ctx.fillStyle = ART.ink; ctx.fillRect(80, 33, 2, 5);
-        ctx.fillStyle = ART.gold; ctx.fillRect(79, 35, 4, 1);
+        // The cantilevered boards keep their support on the pier side.
+        const postX = world === 1 ? 80 : 23;
+        ctx.fillStyle = ART.ink; ctx.fillRect(postX, 33, 2, 5);
+        ctx.fillStyle = ART.gold; ctx.fillRect(postX - 1, 35, 4, 1);
     }
     return true;
 }

@@ -5,7 +5,7 @@
     "image": "signs-atlas.webp",
     "width": 560,
     "height": 232,
-    "bytes": 30000
+    "bytes": 29396
   },
   "frames": [
     {
@@ -230,7 +230,7 @@
         "selected": "#e9ad4c"
       },
       "decorativeTranslateY": 10.322,
-      "bytes": 8148,
+      "bytes": 7704,
       "sourceRect": {
         "x": 0,
         "y": 120,
@@ -269,7 +269,7 @@
         "selected": "#e9ad4c"
       },
       "decorativeTranslateY": 10.322,
-      "bytes": 8086,
+      "bytes": 7744,
       "sourceRect": {
         "x": 208,
         "y": 120,

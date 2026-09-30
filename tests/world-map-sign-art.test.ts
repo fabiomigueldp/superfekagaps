@@ -66,7 +66,9 @@ test('physical dock arrows retain names and attached gate marker without a float
         assert.equal(painted.canvas.style.transform, 'translate(0px, 10px)');
         const draw = painted.calls.find(call => call.method === 'drawImage')!;
         assert.equal(draw.args[1], world === 1 ? 208 : 0);
-        assert.ok(painted.calls.some(call => call.method === 'fillRect' && call.color === ART.gold && call.args.join(',') === '79,35,4,1'));
+        // Authored support centers: COSTA x80.51, PORTO x23.49 CSSpx.
+        const bandX = world === 1 ? 79 : 22;
+        assert.ok(painted.calls.some(call => call.method === 'fillRect' && call.color === ART.gold && call.args.join(',') === `${bandX},35,4,1`));
     }
     const fallback = canvas();
     assert.equal(paintPhysicalStageSign(fallback.canvas, null, '1-1', true, false, true), false);

@@ -1,14 +1,14 @@
 {
   "allEdgesTransparent": true,
-  "atlasBytes": 30000,
+  "atlasBytes": 29396,
   "atlasSize": [
     560,
     232
   ],
   "frameCount": 7,
   "hashes": {
-    "signs-atlas.webp": "b55be38dbe2f03ea4bf0d535df941f75404b0572fb3e450d5736591197b709f5",
-    "signs-atlas.meta.json": "a5d11c0c918468fcd4f66d8fc83305c4a865b169139f7f89fc3c446269ac9203"
+    "signs-atlas.webp": "ae7143d081a730c72a8b7218d4147fc590c7f34d46737e568c06fb1c66254272",
+    "signs-atlas.meta.json": "6799f626478e433cdb98d9f7744a6ba4da131fb96bcefb14654afef0ab59343c"
   },
   "frozenByteComparison": {
     "signs-atlas.webp": true,

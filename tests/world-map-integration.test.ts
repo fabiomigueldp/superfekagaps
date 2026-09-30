@@ -838,3 +838,36 @@ test('narrow channel travel hides dock signs while drawer, keyboard and skip rem
     assert.equal(h.internal.motionState(), 'idle'); assert.equal(h.internal.hud.dockButtons[1].hidden, false, 'The idle Coast dock action returns.');
     assert.deepEqual({ completed: save.completed, seals: save.seals }, progress, 'Hiding travel labels cannot change unlocks or collectibles.');
 });
+
+test('dock signs stay hidden through disembarkation and the final walk, returning only at confirmed arrival', async t => {
+    const h = mapDOM(t), save = openSave('2-1'), progress = structuredClone({ completed: save.completed, seals: save.seals });
+    await readyConnection(h, save); h.view.render(0, save, 100, '');
+    let time = 100, disembarked = false, finalWalk = false;
+    while (time < 12000) {
+        h.view.render(0, save, time += 50, '');
+        const mode = h.internal.motionState();
+        if (mode === 'arriving') disembarked = true;
+        if (h.internal.journey.destination)
+            assert.ok(h.internal.hud.dockButtons.every((button: Button) => button.hidden), 'No dock label may cover Feka during any part of a trip.');
+        if (disembarked && mode === 'walking') {
+            finalWalk = true;
+            assert.ok(h.internal.hud.stageButtons.some((button: Button) => !button.hidden), 'Phase navigation returns normally on land.');
+            assert.equal(h.internal.hud.skipButton.hidden, false);
+            assert.equal(h.internal.journey.arrived, '2-1'); assert.deepEqual(h.events.arrived, []);
+            break;
+        }
+    }
+    assert.ok(disembarked && finalWalk, 'Exercise the actual boarding-edge-to-land transition that exposed the sign.');
+    const feet = { ...h.internal.marker };
+    h.root.dispatch('keydown', { key: 'ArrowRight' });
+    assert.equal(h.internal.journey.selected, '1-2'); assert.deepEqual(h.internal.marker, feet);
+    assert.equal(h.view.enterSelected(1), false); assert.deepEqual(h.events.arrived, []);
+    while (h.internal.journey.destination && time < 16000) {
+        h.view.render(1, save, time += 50, '');
+        if (h.internal.journey.destination) assert.ok(h.internal.hud.dockButtons.every((button: Button) => button.hidden));
+    }
+    assert.equal(h.internal.journey.arrived, '1-2'); assert.equal(h.internal.motionState(), 'idle');
+    assert.deepEqual(h.events.arrived, [1]); assert.equal(h.events.entered, 0);
+    assert.equal(h.internal.hud.dockButtons[1].hidden, false, 'The normal Porto action returns only after Feka reaches the selected phase.');
+    assert.deepEqual({ completed: save.completed, seals: save.seals }, progress);
+});

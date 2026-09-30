@@ -61,10 +61,16 @@ for kind in kinds:
     # Painted face is inset from a visible, beveled solid wood edge.
     inset=[(x*.93,-.109,.91+(z-.91)*.91) for x,z in outline]
     mesh('thin warm ivory painted face',inset,[tuple(range(n-1,-1,-1))],face)
-    for x in ([-.91,.91] if dock else [-.44,.44]):
+    support_x = [.91] if kind=='dock-left' else [-.91] if kind=='dock-right' else [-.44,.44]
+    for x in support_x:
         cube('square timber support post',(x,.065,.36),(.095,.125,.72),post,.017)
         cube('sunlit post grain',(x-.022,-.001,.32),(.022,.011,.56),timber,.004)
         cube('rear strengthening cleat',(x,.145,.90),(.11,.11,.65),edge,.017)
+    # Dock signs cantilever from the pier-side post; the short rear bracket
+    # stays below the name and leaves all canvas/camera/anchor geometry fixed.
+    if dock:
+        x=support_x[0]; inward=-1 if x>0 else 1
+        a=Vector((x,.13,.37));b=Vector((x+inward*.46,.13,.66));o=cube('small cantilever knee brace',(a+b)/2,(.075,.10,(b-a).length),edge,.012);o.rotation_euler=(b-a).to_track_quat('Z','Y').to_euler()
     # Four modest forged fixings, not an outline around the whole sign.
     for x in [-half*.80,half*.78]:
         for z in [.70,1.12]:

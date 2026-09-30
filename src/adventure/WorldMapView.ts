@@ -485,7 +485,7 @@ export class WorldMapView {
             return { x: screen.x + 36, y: screen.y };
         });
         const docks = ([1, 2] as const).map(destination => {
-            if (hide || world > 2 || !this.connectionActive || !this.connection) return null;
+            if (hide || this.journey?.destination || world > 2 || !this.connectionActive || !this.connection) return null;
             // Buttons name their destination, so each sign stands at the opposite departure dock.
             const departure = destination === 1 ? 2 : 1;
             const point = mapToScreen(localToAtlas(this.connection.docks[departure].dock, placementFor(departure)), this.camera);
