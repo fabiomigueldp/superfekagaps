@@ -79,6 +79,7 @@ export class WorldGame {
     private mapReturn?: { playedStage: string; nextSelected: string };
     private nextMapSelection?: string;
     private mapCanvas: HTMLCanvasElement;
+    private saveImportCleanup?: () => void;
     private deathFeedbackStarted = false;
     constructor(canvas: HTMLCanvasElement, private readonly ephemeral = false) {
         this.mapCanvas = canvas;
@@ -842,15 +843,28 @@ export class WorldGame {
     }
     private exportSave() { const url = URL.createObjectURL(new Blob([JSON.stringify(this.store.save, null, 2)], { type: 'application/json' })); const a = document.createElement('a'); a.href = url; a.download = 'super-feka-gaps-world-save.json'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); }
     private importSave() {
+        this.saveImportCleanup?.();
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = '.json';
+        input.id = 'world-save-import';
+        input.hidden = true;
+        let active = true;
+        const cleanup = () => {
+            active = false;
+            input.onchange = null; input.oncancel = null;
+            input.remove();
+            if (this.saveImportCleanup === cleanup) this.saveImportCleanup = undefined;
+        };
+        this.saveImportCleanup = cleanup;
+        input.oncancel = cleanup;
         input.onchange = async () => {
             const file = input.files?.[0];
-            if (!file)
-                return;
+            if (!file) { cleanup(); return; }
+            input.onchange = null;
             try {
                 const text = await file.text();
+                if (!active) return;
                 parseSave(text);
                 this.store.import(text);
                 this.audio.preferences = this.store.save.preferences;
@@ -859,10 +873,18 @@ export class WorldGame {
                 this.toastTimer = 2500;
             }
             catch {
+                if (!active) return;
                 this.toast = 'Arquivo de progresso inválido.';
                 this.toastTimer = 3000;
             }
+            finally { cleanup(); }
         };
-        input.click();
+        // Keep a live DOM node throughout the chooser and asynchronous read;
+        // detached inputs can lose their browser node ID after a long delay.
+        document.body.append(input);
+        try { input.click(); }
+        catch {
+            cleanup(); this.toast = 'Não foi possível abrir o arquivo de progresso.'; this.toastTimer = 3000;
+        }
     }
 }
