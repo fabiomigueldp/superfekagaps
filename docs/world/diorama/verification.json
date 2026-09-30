@@ -2,9 +2,9 @@
   "date": "2026-09-30",
   "branch": "feat/costa-diorama-map",
   "base_commit": "56348fa0b3618510dfd44746d4e7c63974c38403",
-  "publication": "Public Vercel preview on feat/costa-diorama-map; main unchanged during browser QA",
+  "publication": "Preview browser QA completed; production refs/status verified separately at release",
   "tests": {
-    "typescript": 206,
+    "typescript": 207,
     "javascript": 3,
     "failed": 0
   },
@@ -28,9 +28,9 @@
   },
   "runtime_art_total_bytes": 260561,
   "bundle": {
-    "filename": "index-D1yw1Nsx.js",
-    "bytes": 388561,
-    "gzip_bytes": 122351
+    "filename": "index-SF8-UWtU.js",
+    "bytes": 388575,
+    "gzip_bytes": 122357
   },
   "canvas_backing_budget_pixels": 4000000,
   "source_render": [
@@ -52,9 +52,10 @@
   "visual_review": {
     "blender_art": "Inspected full-resolution geometry and stair/bridge junctions",
     "offline_compositions": "Production Canvas commands plus an SVG review facsimile of the UI; not browser screenshots",
-    "browser": "Initial preview tested in cloud Chromium at1180x757,500x757,400x606 and846x392 CSS pixels. Keyboard, pointer, panorama, locks, rapid selection, level entry/return and persisted selection passed. Roof overlap and short-landscape marker scale corrected; follow-up browser review pending.",
+    "browser": "Verified actual cloud Chromium layouts at1180x757,500x757,400x606 and846x392 CSS pixels. Final code5411250 verified desktop and846x392 after roof clearance, compact landscape footer/pins and panorama fixes. Keyboard/pointer, locks, repeated selection, panorama, level entry/return and persisted selection passed.",
     "fps": "Not measured; no FPS claim",
-    "limits": "DevTools disabled by browser policy. No touch-device emulation, physical touch, screen reader, or browser reduced-motion preference test. Reduced-motion rendering covered by deterministic integration tests."
+    "limits": "DevTools disabled by browser policy. No touch-device emulation, physical touch, screen reader, or browser reduced-motion preference test. Reduced-motion rendering covered by deterministic integration tests.",
+    "console": "No app-origin warnings/errors observed in the final captured100-entry console sample; browser-extension metadata errors excluded."
   },
   "regression_focus": [
     "late asset completion",
@@ -65,11 +66,13 @@
     "reduced-motion idle rendering",
     "repeated and alternating travel retargets",
     "short-landscape pin/focus bounds",
-    "relative deployment asset base"
+    "relative deployment asset base",
+    "visible panorama after constrained silhouette framing"
   ],
   "preview": {
     "initial_commit": "35d93d2a821c24b5e4aa349e2c01ec905380bc0a",
     "url": "https://superfekagaps-git-feat-costa-dio-4da41b-fabiomigueldps-projects.vercel.app/",
-    "status": "Ready verified in Vercel and game opened in cloud browser"
+    "status": "Ready; final desktop and short-landscape behavior verified in cloud Chromium",
+    "validated_commit": "541125021848216ea0fa5f800dd6f41df5d2c722"
   }
 }
