@@ -148,10 +148,10 @@ export function paintWorldMap(c: CanvasRenderingContext2D, state: MapPaintState)
 }
 
 /** Fit pins/focus rings and, when supplied, the artwork between top tools and footer. */
-export function frameMapPins(camera: MapCamera, points: Record<number, MapPoint>, selected: number, compact: boolean, artBounds?: MapArtBounds): MapCamera {
+export function frameMapPins(camera: MapCamera, points: Record<number, MapPoint>, selected: number, compact: boolean, artBounds?: MapArtBounds, hud?: { top: number; bottom: number }): MapCamera {
     const result = { ...camera, center: { ...camera.center } };
-    const topLimit = Math.min(compact ? 132 : 12, Math.max(8, camera.height * .35));
-    const bottomLimit = camera.height - 12, pinHeight = compact ? 54 : 58;
+    const topLimit = Math.min(compact ? hud?.top ?? 132 : 12, Math.max(8, camera.height * .35));
+    const bottomLimit = camera.height - (hud?.bottom ?? 12), pinHeight = compact ? 54 : 58;
     const bounds = () => {
         const tops: number[] = [], bottoms: number[] = [];
         for (const [index, point] of Object.entries(points)) {
@@ -162,7 +162,7 @@ export function frameMapPins(camera: MapCamera, points: Record<number, MapPoint>
         if (artBounds) {
             // Artwork needs room below the tools, while pins retain their existing
             // smaller inset. Sharing one inset would over-shrink short landscapes.
-            const artTopLimit = compact ? 135 : 80;
+            const artTopLimit = hud?.top ?? (compact ? 135 : 80);
             tops.push(mapToScreen({ x: .5, y: artBounds.top }, result).y - (artTopLimit - topLimit));
             bottoms.push(mapToScreen({ x: .5, y: artBounds.bottom }, result).y);
         }

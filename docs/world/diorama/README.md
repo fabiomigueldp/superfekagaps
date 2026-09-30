@@ -15,10 +15,18 @@ A apresentação tem uma câmera dirigida, aproximação inicial, botão de pano
 - `WorldMapView.ts`: camada dedicada de alta resolução, controles HTML semânticos e ciclo de vida
 - `WorldGame.ts`: continua sendo o único dono do loop; o mapa retorna antes da renderização 320×180
 - `map.css`: layout responsivo para desktop e telefone, foco visível e estados de progresso
+- `WorldMapIcons.ts`: emblemas SVG originais, compartilhados entre os controles e as seis ilhas
+- `public/assets/world/fonts`: Nunito variável local (600–900), subconjunto latino/português e licença OFL
 - `public/assets/world/map`: camadas e metadados exportados pelo Blender
 - `tools/diorama`: fonte reproduzível da cena, descrita em `art-direction.md`
 
 O gameplay, a física e o render 320×180 das fases permanecem separados. São preservados os seis mundos, 30 IDs de fase, 72 selos, saídas secretas, checkpoints, save v1, galeria, opções, modo clássico e editor. O mapa reutiliza o mesmo `isUnlocked`, `ProgressStore` e `load` da campanha.
+
+### HUD de expedição
+
+A HUD usa uma pequena placa de identificação, contadores de progresso, uma ficha de fase com ação coral e seis medalhões ligados por uma rota. O mar continua sob a interface, sem uma faixa opaca no rodapé. Os emblemas são SVGs originais e a tipografia é servida pelo próprio jogo; não há dependência de fontes externas. Selos, cadeados e fases concluídas têm estados visuais e rótulos acessíveis.
+
+O canvas ocupa a tela toda. O enquadramento mede os limites reais do cabeçalho, ferramentas e ficha para manter farol, cais e marcadores livres. O mesmo `ResizeObserver` acompanha alterações de tamanho da HUD, inclusive quebra de título e carregamento da fonte; não há outro loop. Container queries consideram a largura útil do mapa, incluindo os 340 px reservados para o editor. Em paisagem baixa, ficha e rota ficam lado a lado. Os botões mantêm alvos de pelo menos 44 px, navegação nativa e movimento reduzido.
 
 Os controles têm rótulos acessíveis, foco visível e estado da seleção anunciado. Setas/WASD navegam; Enter/Espaço ativam botões nativos; Escape retorna ao menu. Toque em um ponto seleciona; tocar novamente ou usar “Jogar fase” entra. Fase bloqueada continua inspecionável, sem desbloqueio indevido. Há botão Menu também no telefone. Na prévia do editor, a camada ocupa apenas a área do jogo e não cobre o painel de autoria.
 

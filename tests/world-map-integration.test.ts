@@ -4,9 +4,9 @@ import test, { type TestContext } from 'node:test';
 import { STAGES } from '../src/adventure/campaign';
 import { freshSave, ProgressStore, SAVE_KEY } from '../src/adventure/progress';
 import { WorldGame } from '../src/adventure/WorldGame';
-import { FALLBACK_POINTS, fallbackMapMetadata, parseMapMetadata } from '../src/adventure/WorldMapArt';
+import { COSTA_ART_BOUNDS, FALLBACK_POINTS, fallbackMapMetadata, parseMapMetadata } from '../src/adventure/WorldMapArt';
 import { WorldMapView } from '../src/adventure/WorldMapView';
-import type { MapPoint } from '../src/adventure/WorldMapModel';
+import { mapToScreen, type MapPoint } from '../src/adventure/WorldMapModel';
 import { Input } from '../src/engine/Input';
 
 type Listener = (event: any) => void;
@@ -45,7 +45,9 @@ class Element extends Surface {
     readonly attributes = new Map<string, string>();
     readonly style: Record<string, string> = {};
     className = '';
-    textContent = '';
+    private ownText = '';
+    get textContent(): string { return this.ownText + this.children.map(child => child.textContent).join(''); }
+    set textContent(text: string) { this.ownText = text; this.children = []; }
     type = '';
     id = '';
     title = '';
@@ -67,14 +69,15 @@ class Element extends Surface {
     };
     constructor(readonly tagName: string, private readonly focused: (element: Element) => void, readonly context?: any) { super(); }
     append(...elements: Element[]) { elements.forEach(element => { element.parent = this; this.children.push(element); }); }
+    replaceChildren(...elements: Element[]) { this.children.forEach(child => child.parent = null); this.children = []; this.ownText = ''; this.append(...elements); }
     remove() {
         if (this.parent instanceof Element) this.parent.children = this.parent.children.filter(child => child !== this);
         this.parent = null;
     }
-    setAttribute(key: string, value: string) { this.attributes.set(key, value); }
+    setAttribute(key: string, value: string) { this.attributes.set(key, value); if (key === 'class') this.className = value; }
     getAttribute(key: string) { return this.attributes.get(key) ?? null; }
     removeAttribute(key: string) { this.attributes.delete(key); }
-    getBoundingClientRect() { return this.bounds; }
+    getBoundingClientRect() { return { ...this.bounds, bottom: this.bounds.top + this.bounds.height, right: this.bounds.left + this.bounds.width }; }
     getContext() { return this.context; }
     focus() { this.focusCount++; this.focused(this); }
     click() { if (!this.disabled) this.dispatch('click'); }
@@ -110,6 +113,7 @@ function mapDOM(t: TestContext, reducedMotion = false) {
     gameCanvas.id = 'game-canvas'; body.append(gameCanvas);
     const documentMock = Object.assign(new Surface(), { body, hidden: false,
         createElement: (tag: string) => tag === 'button' ? new Button('BUTTON', focused) : new Element(tag.toUpperCase(), focused, paint.context),
+        createElementNS: (_namespace: string, tag: string) => new Element(tag.toUpperCase(), focused),
         getElementById: (id: string) => id === 'game-canvas' ? gameCanvas : null });
     const media = Object.assign(new Surface(), { matches: reducedMotion });
     const windowMock = Object.assign(new Surface(), { devicePixelRatio: 3, matchMedia: () => media });
@@ -149,6 +153,9 @@ function mapDOM(t: TestContext, reducedMotion = false) {
     const root = view.root as unknown as Element;
     const descendants = (element: Element): Element[] => [element, ...element.children.flatMap(descendants)];
     const get = (className: string) => descendants(root).find(element => element.classList.contains(className))!;
+    get('world-map-header').bounds = { x: 24, y: 22, left: 24, top: 22, width: 350, height: 72 };
+    get('world-map-tools').bounds = { x: 900, y: 25, left: 900, top: 25, width: 276, height: 44 };
+    get('world-map-footer').bounds = { x: 170, y: 556, left: 170, top: 556, width: 860, height: 182 };
     return { view, internal, root, get, events, gameCanvas, body, documentMock, windowMock, media, observers, images, fetches, paint,
         get active() { return active; },
         async finishAssets(metadata: unknown = fallbackMapMetadata(), imageSuccess = true) {
@@ -698,4 +705,63 @@ test('panorama visibly zooms out after close framing in short landscape and comp
             assertPinsSafe();
         }
     }
+});
+
+test('the illustrated HUD exposes meaningful labels and preserves collected, locked, and encounter states', t => {
+    const h = mapDOM(t, true), save = freshSave();
+    h.view.render(0, save, 100, '');
+    assert.equal(h.get('world-map-overview').getAttribute('aria-label'), 'Ver panorama');
+    assert.equal(h.get('world-map-menu').getAttribute('aria-label'), 'Menu');
+    assert.match(h.get('world-map-play').getAttribute('aria-label')!, /1-1: Pé na Estrada/);
+    assert.equal(h.get('world-map-total').getAttribute('aria-label'), '0 de 30 fases concluídas, 0 de 72 selos');
+    assert.equal(h.get('world-map-icon-coast').getAttribute('aria-hidden'), 'true');
+    assert.equal(h.get('world-map-icon-coast').getAttribute('focusable'), 'false');
+    assert.equal(h.get('world-map-route-hint').hidden, true);
+    save.completed.push('1-1'); save.seals.push('1-1:s1', '1-1:s3');
+    h.view.render(0, save, 200, '');
+    assert.equal(h.internal.sealSlots.filter((slot: Element) => slot.classList.contains('is-collected')).length, 2);
+    assert.equal(h.get('world-map-seals').getAttribute('aria-label'), '2 de 3 selos encontrados');
+    assert.equal(h.get('world-map-footer').classList.contains('is-completed'), true);
+    h.view.render(4, save, 300, '');
+    assert.equal(h.get('world-map-seals').hidden, true);
+    assert.equal(h.get('world-map-encounter').hidden, false);
+    assert.equal(h.get('world-map-footer').classList.contains('is-locked'), true);
+    assert.equal(h.get('world-map-route-hint').hidden, false);
+    assert.equal(h.get('world-map-play').disabled, true);
+    h.get('world-map-overview').click();
+    assert.equal(h.get('world-map-overview').getAttribute('aria-label'), 'Aproximar ilha');
+    assert.equal(h.get('world-map-overview').getAttribute('aria-pressed'), 'true');
+    for (let i = 0; i < 6; i++) {
+        h.view.render(i * 5, save, 400 + i, '');
+        assert.equal(h.internal.worlds[i].getAttribute('aria-current'), 'location');
+        assert.match(h.internal.worlds[i].getAttribute('aria-label'), new RegExp(`Ilha ${i + 1}:`));
+        assert.equal(h.get('world-map-island-emblem').children.length, 1, 'The island emblem replaces rather than accumulates SVGs.');
+    }
+});
+
+test('measured HUD bounds reserve the lighthouse and dock on full-canvas desktop, mobile, landscape and editor layouts', async t => {
+    const h = mapDOM(t, true);
+    const data = JSON.parse(readFileSync(new URL('../public/assets/world/map/costa-diorama.meta.json', import.meta.url), 'utf8'));
+    await h.finishAssets(data);
+    for (const [width, height, headerBottom, footerTop] of [[1180, 757, 94, 563], [400, 606, 92, 425],
+        [844, 392, 68, 307], [840, 757, 94, 563], [320, 568, 92, 377]]) {
+        h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width, height };
+        h.get('world-map-header').bounds = { x: 12, y: 12, left: 12, top: 12, width: 230, height: headerBottom - 12 };
+        h.get('world-map-tools').bounds = { x: width - 110, y: 14, left: width - 110, top: 14, width: 96, height: headerBottom - 14 };
+        h.get('world-map-footer').bounds = { x: 10, y: footerTop, left: 10, top: footerTop, width: width - 20, height: height - footerTop - 9 };
+        h.observers[0].callback();
+        for (let stage = 0; stage < 5; stage++) {
+            h.view.render(stage, freshSave(), 2000 + stage * 100, '');
+            const camera = h.internal.camera;
+            const roof = mapToScreen({ x: .5, y: COSTA_ART_BOUNDS.top }, camera).y;
+            const dock = mapToScreen({ x: .5, y: COSTA_ART_BOUNDS.bottom }, camera).y;
+            assert.ok(roof >= headerBottom + 14 - .001, `The lighthouse clears the ${width} × ${height} pennant.`);
+            assert.ok(dock <= footerTop - 12 + .001, `The dock clears the ${width} × ${height} boarding ticket.`);
+        }
+    }
+    const before = h.internal.camera.zoom;
+    h.get('world-map-footer').bounds.top -= 32;
+    h.observers[0].callback();
+    h.view.render(4, freshSave(), 3000, '');
+    assert.ok(h.internal.camera.zoom < before, 'A wrapping title or larger text reflows the measured scene even in reduced motion.');
 });

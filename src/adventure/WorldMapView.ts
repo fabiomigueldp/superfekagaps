@@ -3,6 +3,7 @@ import { isUnlocked } from './progress';
 import type { AdventureSave } from './types';
 import { buildTravelPath, clampMapSelection, easeMapMotion, getMapCamera, mapToScreen, moveMapSelection, recordMapTravel, retargetMapTravel, samplePath, type MapCamera, type MapPoint } from './WorldMapModel';
 import { COSTA_ART_BOUNDS, FALLBACK_POINTS, fallbackMapMetadata, frameMapPins, mapActorScale, mapAssetPrefix, paintWorldMap, parseMapMetadata, type MapArtAssets, type MapArtMetadata } from './WorldMapArt';
+import { ISLAND_ICONS, mapIcon } from './WorldMapIcons';
 
 interface MapCallbacks { select(index: number): void; enter(): void; exit(): void; unlockAudio(): void; }
 const STAGE_NOTES = [
@@ -13,7 +14,7 @@ const STAGE_NOTES = [
     'Joãozão está na ponte. É aqui que a travessia fica pessoal.'
 ];
 const LANDMARKS = ['A chegada', 'As pontes', 'O arco de pedra', 'As falésias', 'O grande encontro'];
-const WORLD_SYMBOLS = ['☀', '⚓', '◈', '△', '❄', '♜'];
+const ISLAND_LABELS = ['Costa', 'Porto', 'Fábrica', 'Serra', 'Reserva', 'Domínio'];
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, className: string, text?: string): HTMLElementTagNameMap[K] {
     const element = document.createElement(tag); element.className = className; if (text) element.textContent = text; return element;
 }
@@ -27,18 +28,28 @@ export class WorldMapView {
     private readonly canvas = el('canvas', 'world-map-art');
     private readonly ctx: CanvasRenderingContext2D;
     private readonly nodeLayer = el('nav', 'world-map-nodes');
+    private readonly header = el('header', 'world-map-header');
+    private readonly tools = el('div', 'world-map-tools');
+    private readonly footer = el('footer', 'world-map-footer');
+    private readonly islandEmblem = el('span', 'world-map-island-emblem');
     private readonly title = el('h1', 'world-map-title');
-    private readonly subtitle = el('p', 'world-map-subtitle');
     private readonly worldNumber = el('span', 'world-map-eyebrow');
     private readonly progress = el('span', 'world-map-total');
+    private readonly phaseTotal = el('span', 'world-map-total-count');
+    private readonly sealTotal = el('span', 'world-map-total-count');
+    private readonly stageNumber = el('span', 'world-map-stage-number');
     private readonly chapter = el('span', 'world-map-chapter');
     private readonly stageName = el('h2', 'world-map-stage-title');
     private readonly description = el('p', 'world-map-description');
     private readonly seals = el('span', 'world-map-seals');
+    private readonly sealSlots: HTMLElement[] = [];
+    private readonly sealCount = el('span', 'world-map-seal-count');
+    private readonly encounter = el('span', 'world-map-encounter');
     private readonly routeHint = el('span', 'world-map-route-hint');
     private readonly announcer = el('p', 'world-map-sr');
     private readonly warning = el('p', 'world-map-warning');
     private readonly play: HTMLButtonElement;
+    private readonly playLabel = el('span', 'world-map-play-label');
     private readonly overviewButton: HTMLButtonElement;
     private readonly nodes: HTMLButtonElement[] = [];
     private readonly worlds: HTMLButtonElement[] = [];
@@ -62,6 +73,7 @@ export class WorldMapView {
     private camera: MapCamera = getMapCamera(0, { overview: true }, 1, 1);
     private width = 1;
     private height = 1;
+    private frameInsets = { top: 90, bottom: 190 };
     private dpr = 1;
     private screenDpr = 0;
     private dirtySize = true;
@@ -80,50 +92,71 @@ export class WorldMapView {
         this.scene.append(this.canvas, this.nodeLayer);
         this.nodeLayer.setAttribute('aria-label', 'Fases desta ilha');
         this.root.append(this.scene);
-        const header = el('header', 'world-map-header');
-        const brand = el('span', 'world-map-brand', 'SUPER FEKA GAPS  /  WORLD');
-        header.append(brand, this.worldNumber, this.title, this.subtitle);
-        this.root.append(header);
-        const tools = el('div', 'world-map-tools');
-        this.overviewButton = button('world-map-quiet', 'Ver panorama', () => {
+        const heading = el('div', 'world-map-heading');
+        heading.append(this.worldNumber, this.title);
+        this.islandEmblem.append(mapIcon('coast'));
+        this.header.append(this.islandEmblem, heading);
+        this.root.append(this.header);
+        this.overviewButton = button('world-map-quiet world-map-overview', '', () => {
             this.overview = !this.overview; this.paintDirty = true;
-            this.overviewButton.textContent = this.overview ? 'Aproximar ilha' : 'Ver panorama';
+            const label = this.overview ? 'Aproximar ilha' : 'Ver panorama';
+            this.overviewButton.setAttribute('aria-label', label); this.overviewButton.title = label;
             this.overviewButton.setAttribute('aria-pressed', String(this.overview));
         });
+        this.overviewButton.append(mapIcon('compass'));
+        this.overviewButton.setAttribute('aria-label', 'Ver panorama'); this.overviewButton.title = 'Ver panorama';
         this.overviewButton.setAttribute('aria-pressed', 'false');
-        tools.append(this.progress, this.overviewButton, button('world-map-quiet world-map-menu', 'Menu', () => this.act(() => callbacks.exit())));
-        this.root.append(tools);
+        const menu = button('world-map-quiet world-map-menu', '', () => this.act(() => callbacks.exit()));
+        menu.append(mapIcon('menu')); menu.setAttribute('aria-label', 'Menu'); menu.title = 'Menu';
+        const phases = el('span', 'world-map-total-part'), collected = el('span', 'world-map-total-part');
+        phases.append(mapIcon('flag'), this.phaseTotal); collected.append(mapIcon('seal'), this.sealTotal);
+        this.progress.append(phases, collected);
+        this.tools.append(this.progress, this.overviewButton, menu);
+        this.root.append(this.tools);
         for (let n = 0; n < 5; n++) {
             const b = button('world-map-node', '', () => this.act(() => {
                 const index = Math.floor(this.controlSelection / 5) * 5 + n;
                 if (index === this.controlSelection) callbacks.enter(); else this.select(index);
             }));
-            b.append(el('span', 'world-map-node-disc', String(n + 1)), el('span', 'world-map-node-check', '✓'));
+            const check = el('span', 'world-map-node-check'), lock = el('span', 'world-map-node-lock');
+            check.append(mapIcon('check')); lock.append(mapIcon('lock'));
+            b.append(el('span', 'world-map-node-disc', String(n + 1)), check, lock);
             this.nodeLayer.append(b); this.nodes.push(b);
         }
-        const footer = el('footer', 'world-map-footer');
         const card = el('div', 'world-map-stage');
         const details = el('div', 'world-map-stage-copy');
         const row = el('div', 'world-map-detail-row'); row.append(this.chapter, this.seals);
-        details.append(row, this.stageName, this.description);
+        for (let i = 0; i < 3; i++) {
+            const slot = el('span', 'world-map-seal'); slot.append(mapIcon('seal'));
+            this.sealSlots.push(slot); this.seals.append(slot);
+        }
+        this.seals.append(this.sealCount);
+        this.encounter.append(mapIcon('flag'), el('span', '', 'Encontro')); this.encounter.hidden = true;
+        row.append(this.encounter);
+        details.append(row, this.stageName, this.description, this.routeHint);
         const actions = el('div', 'world-map-stage-actions');
-        this.play = button('world-map-play', 'Jogar fase  →', () => this.act(() => callbacks.enter()));
-        actions.append(this.routeHint, this.play);
-        card.append(details, actions);
+        this.play = button('world-map-play', '', () => this.act(() => callbacks.enter()));
+        this.play.append(this.playLabel, mapIcon('arrow'));
+        actions.append(this.play);
+        card.append(this.stageNumber, details, actions);
         const rail = el('nav', 'world-map-worlds'); rail.setAttribute('aria-label', 'As seis ilhas');
         for (const island of ISLANDS) {
             const b = button('world-map-world', '', () => this.act(() => this.select((island.id - 1) * 5)));
-            b.append(el('span', 'world-map-world-symbol', WORLD_SYMBOLS[island.id - 1]), el('span', 'world-map-world-name', island.name), el('span', 'world-map-world-index', String(island.id).padStart(2, '0')));
+            const emblem = el('span', 'world-map-world-symbol'), lock = el('span', 'world-map-world-lock');
+            emblem.append(mapIcon(ISLAND_ICONS[island.id - 1])); lock.append(mapIcon('lock'));
+            b.append(emblem, el('span', 'world-map-world-name', ISLAND_LABELS[island.id - 1]), el('span', 'world-map-world-index', String(island.id).padStart(2, '0')), lock);
+            b.title = island.name;
             this.worlds.push(b); rail.append(b);
         }
-        const controls = el('p', 'world-map-controls', '← → fases   ·   ↑ ↓ ilhas   ·   Enter jogar   ·   Esc menu');
-        footer.append(card, rail, controls);
+        const controls = el('p', 'world-map-controls', '← → Fases   ·   ↑ ↓ Ilhas   ·   Enter Jogar   ·   Esc Menu');
+        this.footer.append(card, rail, controls);
         this.warning.setAttribute('role', 'status'); this.warning.hidden = true;
         this.announcer.setAttribute('role', 'status'); this.announcer.setAttribute('aria-live', 'polite');
-        this.root.append(footer, this.warning, this.announcer);
+        this.root.append(this.footer, this.warning, this.announcer);
         this.root.addEventListener('keydown', this.onKey);
         document.body.append(this.root);
-        this.resizeObserver = new ResizeObserver(this.onResize); this.resizeObserver.observe(this.scene);
+        this.resizeObserver = new ResizeObserver(this.onResize);
+        for (const surface of [this.scene, this.header, this.tools, this.footer]) this.resizeObserver.observe(surface);
         window.addEventListener('resize', this.onResize);
         this.media.addEventListener('change', this.onMotion);
         void this.loadAssets();
@@ -194,6 +227,12 @@ export class WorldMapView {
         if (this.dirtySize || this.screenDpr !== (window.devicePixelRatio || 1)) {
             const bounds = this.scene.getBoundingClientRect();
             this.width = Math.max(1, bounds.width); this.height = Math.max(1, bounds.height);
+            // Frame the art against the actual ticket and pennant, including font/layout changes.
+            const headerBottom = Math.max(this.header.getBoundingClientRect().bottom, this.tools.getBoundingClientRect().bottom);
+            this.frameInsets = {
+                top: Math.max(16, Math.min(this.height * .35, headerBottom - bounds.top + 14)),
+                bottom: Math.max(12, Math.min(this.height * .48, bounds.top + this.height - this.footer.getBoundingClientRect().top + 12))
+            };
             this.screenDpr = window.devicePixelRatio || 1;
             // Keep a 4 MP backing-store budget even on ultrawide/high-DPR displays.
             this.dpr = Math.min(2, this.screenDpr, Math.sqrt(4_000_000 / (this.width * this.height)));
@@ -223,19 +262,19 @@ export class WorldMapView {
         let target = getMapCamera(selection, { overview: this.overview }, this.width, this.height);
         const opening = reducedMotion ? 1 : Math.min(1, (time - this.shownAt) / 1600);
         const focus = points[selection];
-        const portrait = this.width < 600;
+        const portrait = this.width <= 640;
         const fitHeight = Math.min(this.width / 1.6, this.height);
         const closeZoom = portrait ? Math.min(1.25, Math.max(.45, (this.height - 140) / (fitHeight * .93))) : 1.04;
         target.zoom = (stage.world !== 1 ? Math.min(.82, closeZoom) : closeZoom) * (.84 + .16 * easeMapMotion(opening, reducedMotion));
         target.center = { x: .5 + (focus.x - .5) * .12,
             y: .52 + (focus.y - .52) * .035 - (portrait ? 60 / (fitHeight * target.zoom) : 0) };
-        target = frameMapPins(target, points, selection, portrait, stage.world === 1 && this.assets.island ? COSTA_ART_BOUNDS : undefined);
+        target = frameMapPins(target, points, selection, portrait, stage.world === 1 && this.assets.island ? COSTA_ART_BOUNDS : undefined, this.frameInsets);
         // Keep panorama distinct even when a short scene has already constrained close zoom.
         if (this.overview) target.zoom *= .82;
         const dt = Math.max(0, Math.min(80, time - this.lastTime)); this.lastTime = time;
         const blend = reducedMotion ? 1 : 1 - Math.exp(-dt / 260);
         this.camera = { ...target, center: { x: this.camera.center.x + (target.center.x - this.camera.center.x) * blend, y: this.camera.center.y + (target.center.y - this.camera.center.y) * blend }, zoom: this.camera.zoom + (target.zoom - this.camera.zoom) * blend };
-        this.camera = frameMapPins(this.camera, points, selection, portrait, stage.world === 1 && this.assets.island ? COSTA_ART_BOUNDS : undefined);
+        this.camera = frameMapPins(this.camera, points, selection, portrait, stage.world === 1 && this.assets.island ? COSTA_ART_BOUNDS : undefined, this.frameInsets);
         this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0); this.ctx.imageSmoothingEnabled = true;
         paintWorldMap(this.ctx, { camera: this.camera, world: stage.world, time, reducedMotion, metadata: this.metadata, assets: this.assets,
             secret: save.secrets.includes(`${stage.world}-3`), completed: save.completed, marker: this.marker, walking: progress < 1, facingLeft: this.marker.x < previous.x });
@@ -247,16 +286,25 @@ export class WorldMapView {
         if (signature === this.lastSignature) return;
         this.lastSignature = signature;
         const island = ISLANDS[stage.world - 1], open = isUnlocked(stage.id, save), completed = save.completed.includes(stage.id);
-        this.subtitle.textContent = island.description;
-        this.title.textContent = island.name; this.worldNumber.textContent = `ARQUIPÉLAGO  /  ILHA ${String(stage.world).padStart(2, '0')}`;
-        this.progress.textContent = `${save.completed.length}/30 fases  ·  ✦ ${save.seals.length}/72 selos`;
-        this.chapter.textContent = `${stage.id}  ·  ${stage.world === 1 ? LANDMARKS[stage.number - 1] : 'Próxima travessia'}`;
+        this.title.textContent = island.name; this.worldNumber.textContent = `ILHA ${String(stage.world).padStart(2, '0')} / 06`;
+        this.islandEmblem.replaceChildren(mapIcon(ISLAND_ICONS[stage.world - 1]));
+        this.phaseTotal.textContent = `${save.completed.length}/30`; this.sealTotal.textContent = `${save.seals.length}/72`;
+        this.progress.setAttribute('aria-label', `${save.completed.length} de 30 fases concluídas, ${save.seals.length} de 72 selos`);
+        this.stageNumber.textContent = stage.id;
+        this.chapter.textContent = completed ? 'Travessia concluída' : !open ? 'Caminho bloqueado' : stage.world === 1 ? LANDMARKS[stage.number - 1] : 'Próxima travessia';
         this.stageName.textContent = stage.name;
         this.description.textContent = stage.world === 1 ? STAGE_NOTES[stage.number - 1] : island.description;
         const sealCount = save.seals.filter(id => id.startsWith(stage.id + ':')).length;
-        this.seals.textContent = stage.encounter ? (completed ? '✦ Encontro vencido' : '⚑ Encontro') : `${'◆'.repeat(sealCount)}${'◇'.repeat(3 - sealCount)}  ${sealCount}/3`;
-        this.play.disabled = !open; this.play.textContent = open ? completed ? 'Jogar de novo  →' : 'Jogar fase  →' : 'Fase bloqueada';
-        this.routeHint.textContent = save.secrets.includes(`${stage.world}-3`) ? '✦ Atalho 3 → 5 descoberto' : !open ? 'Conclua o caminho anterior para abrir' : 'Há sempre outro caminho para descobrir';
+        this.seals.hidden = !!stage.encounter; this.encounter.hidden = !stage.encounter;
+        this.encounter.setAttribute('aria-label', completed ? 'Encontro vencido' : 'Encontro');
+        this.sealSlots.forEach((slot, i) => slot.classList.toggle('is-collected', i < sealCount));
+        this.sealCount.textContent = `${sealCount}/3`;
+        this.seals.setAttribute('aria-label', `${sealCount} de 3 selos encontrados`);
+        this.play.disabled = !open; this.playLabel.textContent = open ? completed ? 'Jogar de novo' : 'Jogar fase' : 'Bloqueada';
+        this.play.setAttribute('aria-label', open ? `${completed ? 'Jogar de novo' : 'Jogar fase'} ${stage.id}: ${stage.name}` : `Fase ${stage.id} bloqueada`);
+        this.footer.classList.toggle('is-locked', !open); this.footer.classList.toggle('is-completed', completed);
+        this.routeHint.textContent = save.secrets.includes(`${stage.world}-3`) ? 'Atalho 3 → 5 descoberto!' : !open ? 'Conclua a travessia anterior para abrir' : '';
+        this.routeHint.hidden = !this.routeHint.textContent;
         this.routeHint.classList.toggle('is-secret', save.secrets.includes(`${stage.world}-3`));
         this.announcer.textContent = `${stage.id}, ${stage.name}. ${open ? completed ? 'Concluída.' : 'Disponível.' : 'Bloqueada.'} ${stage.encounter ? '' : `${sealCount} de 3 selos.`}`;
         this.warning.textContent = toast || warning; this.warning.hidden = !this.warning.textContent;
