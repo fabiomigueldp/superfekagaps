@@ -660,3 +660,42 @@ test('map assets honor relative and subdirectory deployment bases', async () => 
             base === '/' ? '/assets/world/map/costa-diorama.webp' : '/game/assets/world/map/costa-diorama.webp');
     }
 });
+
+test('panorama visibly zooms out after close framing in short landscape and compact portrait', async t => {
+    const { mapToScreen } = await import('../src/adventure/WorldMapModel');
+    const { mapActorScale } = await import('../src/adventure/WorldMapArt');
+    const h = mapDOM(t, true), save = freshSave();
+    const data = JSON.parse(readFileSync(new URL('../public/assets/world/map/costa-diorama.meta.json', import.meta.url), 'utf8'));
+    await h.finishAssets(data);
+    let time = 4000;
+    // Actual 846 × 392 and 400 × 606 viewport sizes, excluding their CSS footers.
+    for (const [width, height] of [[846, 227], [400, 347]]) {
+        h.internal.scene.bounds = { ...h.internal.scene.bounds, width, height }; h.observers[0].callback();
+        for (const selected of [0, 1, 4]) {
+            const assertPinsSafe = () => {
+                const camera = h.internal.camera;
+                for (let node = 0; node < 5; node++) {
+                    const p = mapToScreen(data.nodes[`1-${node + 1}`], camera);
+                    const top = p.y - (width < 600 ? 54 : 58) - (node === selected ? mapActorScale(camera) * 26 + 4 : 0) - 8;
+                    assert.ok(top >= -1e-6, `${width}×${height}, selected ${selected + 1}: node ${node + 1} clips above scene`);
+                    assert.ok(p.y + 8 <= height + 1e-6, `${width}×${height}: node ${node + 1} clips below scene`);
+                    assert.ok(p.x - 31 >= 0 && p.x + 31 <= width, 'Node and focus ring stay inside horizontal bounds.');
+                }
+            };
+            h.view.render(selected, save, time += 16, '');
+            const closeZoom = h.internal.camera.zoom;
+            assertPinsSafe();
+            h.internal.overviewButton.click();
+            h.view.render(selected, save, time += 16, '');
+            assert.equal(h.internal.overviewButton.getAttribute('aria-pressed'), 'true');
+            assert.ok(h.internal.camera.zoom < closeZoom * .9,
+                `${width}×${height}, selected ${selected + 1}: panorama ${h.internal.camera.zoom} must visibly shrink close zoom ${closeZoom}`);
+            assertPinsSafe();
+            h.internal.overviewButton.click();
+            h.view.render(selected, save, time += 16, '');
+            assert.equal(h.internal.overviewButton.getAttribute('aria-pressed'), 'false');
+            assert.ok(Math.abs(h.internal.camera.zoom - closeZoom) < 1e-6, 'Returning from panorama restores the fitted close zoom.');
+            assertPinsSafe();
+        }
+    }
+});

@@ -226,10 +226,12 @@ export class WorldMapView {
         const portrait = this.width < 600;
         const fitHeight = Math.min(this.width / 1.6, this.height);
         const closeZoom = portrait ? Math.min(1.25, Math.max(.45, (this.height - 140) / (fitHeight * .93))) : 1.04;
-        target.zoom = (this.overview || stage.world !== 1 ? Math.min(.82, closeZoom) : closeZoom) * (.84 + .16 * easeMapMotion(opening, reducedMotion));
+        target.zoom = (stage.world !== 1 ? Math.min(.82, closeZoom) : closeZoom) * (.84 + .16 * easeMapMotion(opening, reducedMotion));
         target.center = { x: .5 + (focus.x - .5) * .12,
             y: .52 + (focus.y - .52) * .035 - (portrait ? 60 / (fitHeight * target.zoom) : 0) };
         target = frameMapPins(target, points, selection, portrait, stage.world === 1 && this.assets.island ? COSTA_ART_BOUNDS : undefined);
+        // Keep panorama distinct even when a short scene has already constrained close zoom.
+        if (this.overview) target.zoom *= .82;
         const dt = Math.max(0, Math.min(80, time - this.lastTime)); this.lastTime = time;
         const blend = reducedMotion ? 1 : 1 - Math.exp(-dt / 260);
         this.camera = { ...target, center: { x: this.camera.center.x + (target.center.x - this.camera.center.x) * blend, y: this.camera.center.y + (target.center.y - this.camera.center.y) * blend }, zoom: this.camera.zoom + (target.zoom - this.camera.zoom) * blend };
