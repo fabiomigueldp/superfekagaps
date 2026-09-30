@@ -60,3 +60,6 @@
 @media(max-height:500px) and (min-width:601px){.world-map-total{display:none}.world-map-brand{margin-bottom:13px}.world-map-title{font-size:27px}.world-map-stage-title{font-size:20px}}
 /* Keep 44px touch targets while letting the miniature scenery breathe. */
 @media(max-width:600px){.world-map-node{width:44px;height:54px}.world-map-node-disc{inset:7px 6px 15px;font-size:14px}.world-map-node:after{left:17px}.world-map-node-check{width:14px;height:14px;font-size:8px;top:0;right:3px}.world-map-node.is-selected .world-map-node-disc{box-shadow:0 0 0 4px #fff7c43b,inset 0 0 0 2px #ffeaa1}}
+
+/* Short landscape preserves touch targets without hiding the miniature terrain. */
+@media(max-height:500px) and (min-width:601px){.world-map-node{width:44px;height:54px}.world-map-node-disc{inset:12px 10px 18px;font-size:11px;border-width:2px}.world-map-node:after{left:18px;bottom:8px;width:8px;height:10px}.world-map-node-check{width:13px;height:13px;font-size:8px;top:5px;right:5px}.world-map-node.is-selected .world-map-node-disc{box-shadow:0 0 0 3px #fff7c43b,inset 0 0 0 1px #ffeaa1}}

@@ -4,7 +4,7 @@
  */
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { performance } from 'node:perf_hooks';
-import { paintWorldMap, frameMapPins, mapActorScale, parseMapMetadata } from '../src/adventure/WorldMapArt';
+import { COSTA_ART_BOUNDS, paintWorldMap, frameMapPins, mapActorScale, parseMapMetadata } from '../src/adventure/WorldMapArt';
 import { getMapCamera, mapToScreen } from '../src/adventure/WorldMapModel';
 import { ISLANDS, STAGES } from '../src/adventure/campaign';
 
@@ -56,7 +56,7 @@ for (const v of cases) {
     let camera = getMapCamera(v.selected, { overview: false }, v.w, sceneH), focus = metadata.nodes[`1-${v.selected + 1}`];
     const fitHeight = Math.min(v.w / 1.6, sceneH); camera.zoom = v.w < 600 ? Math.min(1.25, Math.max(.45, (sceneH - 140) / (fitHeight * .93))) : 1.04;
     camera.center = { x: .5 + (focus.x - .5) * .12, y: .52 + (focus.y - .52) * .035 - (v.w < 600 ? 60 / (fitHeight * camera.zoom) : 0) };
-    camera = frameMapPins(camera, Object.fromEntries(Object.entries(metadata.nodes).map(([id, p]) => [Number(id.split('-')[1]) - 1, p])), v.selected, v.w < 600);
+    camera = frameMapPins(camera, Object.fromEntries(Object.entries(metadata.nodes).map(([id, p]) => [Number(id.split('-')[1]) - 1, p])), v.selected, v.w < 600, image ? COSTA_ART_BOUNDS : undefined);
     const start = performance.now();
     paintWorldMap(c as unknown as CanvasRenderingContext2D, { camera, world: 1, time: 4000, reducedMotion: false, metadata,
         assets: { island: image, shadow: asset('costa-shadow.webp'), port: asset('porto-distant.webp') }, secret: v.secret, completed: v.secret ? ['1-1', '1-2', '1-3'] : [], marker: focus, walking: false, facingLeft: false });
@@ -68,7 +68,7 @@ for (const v of cases) {
     }
     ui.push(text(mobile ? 22 : 40, mobile ? 29 : 44, 'SUPER FEKA GAPS  /  WORLD', mobile ? 7 : 10, '#c4deda', 'letter-spacing="2.7" font-weight="bold"'), text(mobile ? 22 : 40, mobile ? 69 : 93, 'ARQUIPÉLAGO  /  ILHA 01', mobile ? 8 : 10, '#add9d3', 'letter-spacing="3"'), `<text x="${mobile ? 22 : 40}" y="${mobile ? 107 : 145}" fill="#fff4da" font-size="${mobile ? 31 : 49}" font-family="Georgia,serif" font-weight="bold" letter-spacing="-1.8">Costa dos Gaps</text>`);
     if (!mobile) ui.push(text(40, 176, 'Toda grande aventura começa com um gap.', 14, '#c0ddd5', 'font-style="italic"'));
-    ui.push(text(v.w - (mobile ? 26 : 270), mobile ? 32 : 47, '↗ Ver panorama', mobile ? 10 : 12, '#eee8d0', mobile ? 'text-anchor="end"' : ''), text(v.w - 27, mobile ? 73 : 47, '0/30 fases · ✦ 0/72 selos', mobile ? 9 : 12, '#fae5ae', 'text-anchor="end"'));
+    ui.push(text(v.w - (mobile ? 26 : 270), mobile ? 32 : 47, 'Ver panorama', mobile ? 10 : 12, '#eee8d0', mobile ? 'text-anchor="end"' : ''), text(v.w - 27, mobile ? 73 : 47, '0/30 fases · ✦ 0/72 selos', mobile ? 9 : 12, '#fae5ae', 'text-anchor="end"'));
     ui.push(`<rect y="${sceneH}" width="${v.w}" height="${v.footer}" fill="#142e40"/>`);
     const x = mobile ? 20 : 40;
     ui.push(text(x, sceneH + 30, `1-${v.selected+1}  ·  ${v.selected ? 'O GRANDE ENCONTRO' : 'A CHEGADA'}`, 10, '#c5d1ba', 'letter-spacing="1.6"'), `<text x="${x}" y="${sceneH+59}" fill="#fff0d5" font-family="Georgia,serif" font-size="${mobile ? 23 : 25}">${STAGES[v.selected].name}</text>`);

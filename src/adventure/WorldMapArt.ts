@@ -13,6 +13,10 @@ export interface MapArtAssets {
     shadow: CanvasImageSource | null;
     port: CanvasImageSource | null;
 }
+/** Normalized vertical silhouette bounds, excluding the separate soft shadow. */
+export interface MapArtBounds { top: number; bottom: number }
+/** Alpha bounds of the shipped 1920 × 1200 Costa layer: lighthouse tip through dock. */
+export const COSTA_ART_BOUNDS: MapArtBounds = { top: 96 / 1200, bottom: 1166 / 1200 };
 export const FALLBACK_POINTS: MapPoint[] = [
     { x: .28, y: .70 }, { x: .34, y: .48 }, { x: .51, y: .72 },
     { x: .66, y: .53 }, { x: .70, y: .36 }
@@ -58,7 +62,7 @@ function linePath(c: CanvasRenderingContext2D, points: MapPoint[], camera: MapCa
 }
 /** The painter has no event listeners, RAF or DOM dependencies. The game owns its clock. */
 export function mapActorScale(camera: MapCamera): number {
-    return Math.max(1.15, Math.min(2.2, Math.min(camera.width / 900, camera.height / 380) * camera.zoom));
+    return Math.max(camera.height < 320 ? .85 : 1.15, Math.min(2.2, Math.min(camera.width / 900, camera.height / 380) * camera.zoom));
 }
 export function paintWorldMap(c: CanvasRenderingContext2D, state: MapPaintState): void {
     const { camera, assets, world, metadata } = state;
@@ -80,7 +84,7 @@ export function paintWorldMap(c: CanvasRenderingContext2D, state: MapPaintState)
     }
     // The port moves more slowly than the foreground for restrained layered parallax.
     if (assets.port && world === 1 && w > 600) {
-        const pw = Math.min(330, w * .26), ph = pw / 1.6;
+        const pw = Math.min(330, w * .26, h * .65), ph = pw / 1.6;
         c.save(); c.globalAlpha = .50; c.drawImage(assets.port, w * .81 - pw / 2 - (camera.center.x - .5) * w * .25, h * .06, pw, ph); c.restore();
     }
     // A faint navigational compass is scenery, never a clickable target.
@@ -143,8 +147,8 @@ export function paintWorldMap(c: CanvasRenderingContext2D, state: MapPaintState)
     vignette.addColorStop(0, '#102c4100'); vignette.addColorStop(1, '#102c4166'); c.fillStyle = vignette; c.fillRect(0, h - 70, w, 70);
 }
 
-/** Fit HTML pins and their focus rings, not just the underlying artwork. */
-export function frameMapPins(camera: MapCamera, points: Record<number, MapPoint>, selected: number, compact: boolean): MapCamera {
+/** Fit pins/focus rings and, when supplied, the artwork between top tools and footer. */
+export function frameMapPins(camera: MapCamera, points: Record<number, MapPoint>, selected: number, compact: boolean, artBounds?: MapArtBounds): MapCamera {
     const result = { ...camera, center: { ...camera.center } };
     const topLimit = Math.min(compact ? 132 : 12, Math.max(8, camera.height * .35));
     const bottomLimit = camera.height - 12, pinHeight = compact ? 54 : 58;
@@ -154,6 +158,13 @@ export function frameMapPins(camera: MapCamera, points: Record<number, MapPoint>
             const p = mapToScreen(point, result);
             tops.push(p.y - pinHeight - (Number(index) === selected ? mapActorScale(result) * 26 + 4 : 0) - 8);
             bottoms.push(p.y + 8);
+        }
+        if (artBounds) {
+            // Artwork needs room below the tools, while pins retain their existing
+            // smaller inset. Sharing one inset would over-shrink short landscapes.
+            const artTopLimit = compact ? 135 : 80;
+            tops.push(mapToScreen({ x: .5, y: artBounds.top }, result).y - (artTopLimit - topLimit));
+            bottoms.push(mapToScreen({ x: .5, y: artBounds.bottom }, result).y);
         }
         return { top: Math.min(...tops), bottom: Math.max(...bottoms) };
     };

@@ -2,9 +2,9 @@
   "date": "2026-09-30",
   "branch": "feat/costa-diorama-map",
   "base_commit": "56348fa0b3618510dfd44746d4e7c63974c38403",
-  "publication": "Separate preview publication authorized; deployment checks recorded separately",
+  "publication": "Public Vercel preview on feat/costa-diorama-map; main unchanged during browser QA",
   "tests": {
-    "typescript": 203,
+    "typescript": 206,
     "javascript": 3,
     "failed": 0
   },
@@ -28,9 +28,9 @@
   },
   "runtime_art_total_bytes": 260561,
   "bundle": {
-    "filename": "index-7x1apOQP.js",
-    "bytes": 388306,
-    "gzip_bytes": 122286
+    "filename": "index-D1yw1Nsx.js",
+    "bytes": 388561,
+    "gzip_bytes": 122351
   },
   "canvas_backing_budget_pixels": 4000000,
   "source_render": [
@@ -52,8 +52,9 @@
   "visual_review": {
     "blender_art": "Inspected full-resolution geometry and stair/bridge junctions",
     "offline_compositions": "Production Canvas commands plus an SVG review facsimile of the UI; not browser screenshots",
-    "browser": "Pending authorized preview; local browser/loopback access is blocked",
-    "fps": "Not measured; no FPS claim"
+    "browser": "Initial preview tested in cloud Chromium at1180x757,500x757,400x606 and846x392 CSS pixels. Keyboard, pointer, panorama, locks, rapid selection, level entry/return and persisted selection passed. Roof overlap and short-landscape marker scale corrected; follow-up browser review pending.",
+    "fps": "Not measured; no FPS claim",
+    "limits": "DevTools disabled by browser policy. No touch-device emulation, physical touch, screen reader, or browser reduced-motion preference test. Reduced-motion rendering covered by deterministic integration tests."
   },
   "regression_focus": [
     "late asset completion",
@@ -65,5 +66,10 @@
     "repeated and alternating travel retargets",
     "short-landscape pin/focus bounds",
     "relative deployment asset base"
-  ]
+  ],
+  "preview": {
+    "initial_commit": "35d93d2a821c24b5e4aa349e2c01ec905380bc0a",
+    "url": "https://superfekagaps-git-feat-costa-dio-4da41b-fabiomigueldps-projects.vercel.app/",
+    "status": "Ready verified in Vercel and game opened in cloud browser"
+  }
 }

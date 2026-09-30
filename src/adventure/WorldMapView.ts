@@ -2,7 +2,7 @@ import { ISLANDS, STAGES } from './campaign';
 import { isUnlocked } from './progress';
 import type { AdventureSave } from './types';
 import { buildTravelPath, clampMapSelection, easeMapMotion, getMapCamera, mapToScreen, moveMapSelection, recordMapTravel, retargetMapTravel, samplePath, type MapCamera, type MapPoint } from './WorldMapModel';
-import { FALLBACK_POINTS, fallbackMapMetadata, frameMapPins, mapActorScale, mapAssetPrefix, paintWorldMap, parseMapMetadata, type MapArtAssets, type MapArtMetadata } from './WorldMapArt';
+import { COSTA_ART_BOUNDS, FALLBACK_POINTS, fallbackMapMetadata, frameMapPins, mapActorScale, mapAssetPrefix, paintWorldMap, parseMapMetadata, type MapArtAssets, type MapArtMetadata } from './WorldMapArt';
 
 interface MapCallbacks { select(index: number): void; enter(): void; exit(): void; unlockAudio(): void; }
 const STAGE_NOTES = [
@@ -28,6 +28,7 @@ export class WorldMapView {
     private readonly ctx: CanvasRenderingContext2D;
     private readonly nodeLayer = el('nav', 'world-map-nodes');
     private readonly title = el('h1', 'world-map-title');
+    private readonly subtitle = el('p', 'world-map-subtitle');
     private readonly worldNumber = el('span', 'world-map-eyebrow');
     private readonly progress = el('span', 'world-map-total');
     private readonly chapter = el('span', 'world-map-chapter');
@@ -81,12 +82,12 @@ export class WorldMapView {
         this.root.append(this.scene);
         const header = el('header', 'world-map-header');
         const brand = el('span', 'world-map-brand', 'SUPER FEKA GAPS  /  WORLD');
-        header.append(brand, this.worldNumber, this.title, el('p', 'world-map-subtitle', 'Toda grande aventura começa com um gap.'));
+        header.append(brand, this.worldNumber, this.title, this.subtitle);
         this.root.append(header);
         const tools = el('div', 'world-map-tools');
-        this.overviewButton = button('world-map-quiet', '↗ Ver panorama', () => {
+        this.overviewButton = button('world-map-quiet', 'Ver panorama', () => {
             this.overview = !this.overview; this.paintDirty = true;
-            this.overviewButton.textContent = this.overview ? '↙ Aproximar ilha' : '↗ Ver panorama';
+            this.overviewButton.textContent = this.overview ? 'Aproximar ilha' : 'Ver panorama';
             this.overviewButton.setAttribute('aria-pressed', String(this.overview));
         });
         this.overviewButton.setAttribute('aria-pressed', 'false');
@@ -228,11 +229,11 @@ export class WorldMapView {
         target.zoom = (this.overview || stage.world !== 1 ? Math.min(.82, closeZoom) : closeZoom) * (.84 + .16 * easeMapMotion(opening, reducedMotion));
         target.center = { x: .5 + (focus.x - .5) * .12,
             y: .52 + (focus.y - .52) * .035 - (portrait ? 60 / (fitHeight * target.zoom) : 0) };
-        target = frameMapPins(target, points, selection, portrait);
+        target = frameMapPins(target, points, selection, portrait, stage.world === 1 && this.assets.island ? COSTA_ART_BOUNDS : undefined);
         const dt = Math.max(0, Math.min(80, time - this.lastTime)); this.lastTime = time;
         const blend = reducedMotion ? 1 : 1 - Math.exp(-dt / 260);
         this.camera = { ...target, center: { x: this.camera.center.x + (target.center.x - this.camera.center.x) * blend, y: this.camera.center.y + (target.center.y - this.camera.center.y) * blend }, zoom: this.camera.zoom + (target.zoom - this.camera.zoom) * blend };
-        this.camera = frameMapPins(this.camera, points, selection, portrait);
+        this.camera = frameMapPins(this.camera, points, selection, portrait, stage.world === 1 && this.assets.island ? COSTA_ART_BOUNDS : undefined);
         this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0); this.ctx.imageSmoothingEnabled = true;
         paintWorldMap(this.ctx, { camera: this.camera, world: stage.world, time, reducedMotion, metadata: this.metadata, assets: this.assets,
             secret: save.secrets.includes(`${stage.world}-3`), completed: save.completed, marker: this.marker, walking: progress < 1, facingLeft: this.marker.x < previous.x });
@@ -244,6 +245,7 @@ export class WorldMapView {
         if (signature === this.lastSignature) return;
         this.lastSignature = signature;
         const island = ISLANDS[stage.world - 1], open = isUnlocked(stage.id, save), completed = save.completed.includes(stage.id);
+        this.subtitle.textContent = island.description;
         this.title.textContent = island.name; this.worldNumber.textContent = `ARQUIPÉLAGO  /  ILHA ${String(stage.world).padStart(2, '0')}`;
         this.progress.textContent = `${save.completed.length}/30 fases  ·  ✦ ${save.seals.length}/72 selos`;
         this.chapter.textContent = `${stage.id}  ·  ${stage.world === 1 ? LANDMARKS[stage.number - 1] : 'Próxima travessia'}`;
@@ -251,7 +253,7 @@ export class WorldMapView {
         this.description.textContent = stage.world === 1 ? STAGE_NOTES[stage.number - 1] : island.description;
         const sealCount = save.seals.filter(id => id.startsWith(stage.id + ':')).length;
         this.seals.textContent = stage.encounter ? (completed ? '✦ Encontro vencido' : '⚑ Encontro') : `${'◆'.repeat(sealCount)}${'◇'.repeat(3 - sealCount)}  ${sealCount}/3`;
-        this.play.disabled = !open; this.play.textContent = open ? completed ? 'Jogar de novo  ↗' : 'Jogar fase  →' : 'Fase bloqueada';
+        this.play.disabled = !open; this.play.textContent = open ? completed ? 'Jogar de novo  →' : 'Jogar fase  →' : 'Fase bloqueada';
         this.routeHint.textContent = save.secrets.includes(`${stage.world}-3`) ? '✦ Atalho 3 → 5 descoberto' : !open ? 'Conclua o caminho anterior para abrir' : 'Há sempre outro caminho para descobrir';
         this.routeHint.classList.toggle('is-secret', save.secrets.includes(`${stage.world}-3`));
         this.announcer.textContent = `${stage.id}, ${stage.name}. ${open ? completed ? 'Concluída.' : 'Disponível.' : 'Bloqueada.'} ${stage.encounter ? '' : `${sealCount} de 3 selos.`}`;
