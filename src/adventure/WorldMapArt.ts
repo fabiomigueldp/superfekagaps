@@ -15,8 +15,8 @@ export interface MapArtAssets {
     shadow: CanvasImageSource | null;
     port: CanvasImageSource | null;
 }
-/** Normalized vertical silhouette bounds, excluding the separate soft shadow. */
-export interface MapArtBounds { top: number; bottom: number }
+/** Normalized silhouette bounds, excluding the separate soft shadow. */
+export interface MapArtBounds { top: number; bottom: number; left?: number; right?: number }
 /** Alpha bounds of the shipped 1920 × 1200 Costa layer: lighthouse tip through dock. */
 export const COSTA_ART_BOUNDS: MapArtBounds = { top: 96 / 1200, bottom: 1166 / 1200 };
 export const FALLBACK_POINTS: MapPoint[] = [
@@ -39,7 +39,10 @@ export function parseMapMetadata(value: unknown, world = 1): MapArtMetadata | nu
     if (!data.nodes || ![1, 2, 3, 4, 5].every(n => point(data.nodes[`${world}-${n}`]))) return null;
     const bounds = data.artBounds;
     if (bounds !== undefined && (!bounds || typeof bounds !== 'object' || !Number.isFinite(bounds.top) ||
-        !Number.isFinite(bounds.bottom) || bounds.top < 0 || bounds.bottom > 1 || bounds.top >= bounds.bottom)) return null;
+        !Number.isFinite(bounds.bottom) || bounds.top < 0 || bounds.bottom > 1 || bounds.top >= bounds.bottom ||
+        (bounds.left !== undefined && (!Number.isFinite(bounds.left) || bounds.left < 0 || bounds.left > 1)) ||
+        (bounds.right !== undefined && (!Number.isFinite(bounds.right) || bounds.right < 0 || bounds.right > 1)) ||
+        (bounds.left !== undefined && bounds.right !== undefined && bounds.left >= bounds.right))) return null;
     const matches = (a: MapPoint, b: MapPoint) => Math.hypot(a.x - b.x, a.y - b.y) <= 1e-5;
     const path = (value: unknown, from: number, to: number): value is MapPoint[] => Array.isArray(value) && value.length > 1 &&
         value.every(point) && matches(value[0], data.nodes[`${world}-${from}`]) && matches(value[value.length - 1], data.nodes[`${world}-${to}`]);
@@ -53,7 +56,9 @@ export function parseMapMetadata(value: unknown, world = 1): MapArtMetadata | nu
     if (!path(data.secretRoute, 3, 5)) return null;
     return { world, nodes: Object.fromEntries([1, 2, 3, 4, 5].map(n => [`${world}-${n}`, data.nodes[`${world}-${n}`]])),
         routes, secretRoute: data.secretRoute,
-        ...(bounds ? { artBounds: { top: bounds.top, bottom: bounds.bottom } } : {}) };
+        ...(bounds ? { artBounds: { top: bounds.top, bottom: bounds.bottom,
+            ...(bounds.left === undefined ? {} : { left: bounds.left }),
+            ...(bounds.right === undefined ? {} : { right: bounds.right }) } } : {}) };
 }
 
 export interface MapPaintState {
@@ -80,9 +85,9 @@ function linePath(c: CanvasRenderingContext2D, points: MapPoint[], camera: MapCa
 export function mapActorScale(camera: MapCamera): number {
     return Math.max(camera.height < 320 ? .85 : 1.15, Math.min(2.2, Math.min(camera.width / 900, camera.height / 380) * camera.zoom));
 }
-export function paintWorldMap(c: CanvasRenderingContext2D, state: MapPaintState): void {
-    const { camera, assets, world, metadata } = state;
-    const { width: w, height: h } = camera, t = state.reducedMotion ? 0 : state.time;
+/** A single ocean layer shared by the connected atlas and the legacy island map. */
+export function paintMapSea(c: CanvasRenderingContext2D, camera: MapCamera, time: number, reducedMotion: boolean): void {
+    const { width: w, height: h } = camera, t = reducedMotion ? 0 : time;
     c.clearRect(0, 0, w, h);
     const sea = c.createLinearGradient(0, 0, w * .3, h);
     sea.addColorStop(0, '#173e59'); sea.addColorStop(.42, '#237d91'); sea.addColorStop(1, '#3ca6aa');
@@ -98,15 +103,13 @@ export function paintWorldMap(c: CanvasRenderingContext2D, state: MapPaintState)
         c.strokeStyle = i % 3 === 0 ? '#bde8d52a' : '#7cd6cf1a';
         c.beginPath(); c.moveTo(x, y); c.quadraticCurveTo(x + length * .5, y - 3, x + length, y); c.stroke();
     }
-    // The port moves more slowly than the foreground for restrained layered parallax.
-    if (assets.port && world === 1 && w > 600) {
-        const pw = Math.min(330, w * .26, h * .65), ph = pw / 1.6;
-        c.save(); c.globalAlpha = .50; c.drawImage(assets.port, w * .81 - pw / 2 - (camera.center.x - .5) * w * .25, h * .06, pw, ph); c.restore();
-    }
-    // A faint navigational compass is scenery, never a clickable target.
-    c.save(); c.translate(w - 60, h - 60); c.strokeStyle = '#cef4df38'; c.fillStyle = '#d3ead45a'; c.lineWidth = 1;
-    c.beginPath(); c.arc(0, 0, 25, 0, Math.PI * 2); c.moveTo(-33, 0); c.lineTo(33, 0); c.moveTo(0, -33); c.lineTo(0, 33); c.stroke();
-    c.beginPath(); c.moveTo(0, -23); c.lineTo(5, 0); c.lineTo(0, 23); c.lineTo(-5, 0); c.closePath(); c.fill(); c.restore();
+}
+
+export type MapIslandPaintState = Pick<MapPaintState, 'camera' | 'assets' | 'world' | 'metadata' | 'time' | 'reducedMotion' | 'completed' | 'secret'>;
+/** The camera may be expressed in an island's local space to place it in an atlas. */
+export function paintMapIsland(c: CanvasRenderingContext2D, state: MapIslandPaintState): void {
+    const { camera, assets, world, metadata } = state;
+    const { width: w, height: h } = camera, t = state.reducedMotion ? 0 : state.time;
     const top = mapToScreen({ x: 0, y: 0 }, camera), bottom = mapToScreen({ x: 1, y: 1 }, camera);
     if (assets.island) {
         if (assets.shadow) c.drawImage(assets.shadow, top.x, top.y, bottom.x - top.x, bottom.y - top.y);
@@ -140,6 +143,39 @@ export function paintWorldMap(c: CanvasRenderingContext2D, state: MapPaintState)
             c.fillStyle = '#ffe8fa'; c.font = 'bold 11px sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(state.secret ? '✦' : '?', q.x, q.y);
         }
     }
+}
+
+export type MapActorPaintState = Pick<MapPaintState, 'camera' | 'marker' | 'time' | 'reducedMotion' | 'walking' | 'facingLeft'> & { scale?: number; shadow?: boolean };
+/** Draw the original 16×26 Feka pixels with the supplied point anchored at his feet. */
+export function paintMapActor(c: CanvasRenderingContext2D, state: MapActorPaintState): void {
+    const { camera } = state, t = state.reducedMotion ? 0 : state.time;
+    const p = mapToScreen(state.marker, camera);
+    const scale = state.scale ?? mapActorScale(camera);
+    const walking = state.walking && !state.reducedMotion;
+    const frame = walking ? PLAYER_WALK[Math.floor(t / 95) % PLAYER_WALK.length] : PLAYER_SPRITES.idle;
+    const x = p.x - 8 * scale, y = p.y - frame.length * scale;
+    if (state.shadow !== false) ellipse(c, x + 8 * scale, p.y - 1, 9 * scale, 3.2 * scale, '#233c405b');
+    // Keep Feka's recognizable pixel silhouette; only the surrounding world changes medium.
+    for (let row = 0; row < frame.length; row++) for (let col = 0; col < frame[row].length; col++) {
+        const color = PLAYER_PALETTE[frame[row][col]]; if (!color) continue;
+        c.fillStyle = color; c.fillRect(Math.round(x + (state.facingLeft ? 15 - col : col) * scale), Math.round(y + row * scale), Math.ceil(scale), Math.ceil(scale));
+    }
+}
+
+export function paintWorldMap(c: CanvasRenderingContext2D, state: MapPaintState): void {
+    const { camera, assets, world } = state;
+    const { width: w, height: h } = camera, t = state.reducedMotion ? 0 : state.time;
+    paintMapSea(c, camera, state.time, state.reducedMotion);
+    // The port moves more slowly than the foreground for restrained layered parallax.
+    if (assets.port && world === 1 && w > 600) {
+        const pw = Math.min(330, w * .26, h * .65), ph = pw / 1.6;
+        c.save(); c.globalAlpha = .50; c.drawImage(assets.port, w * .81 - pw / 2 - (camera.center.x - .5) * w * .25, h * .06, pw, ph); c.restore();
+    }
+    // A faint navigational compass is scenery, never a clickable target.
+    c.save(); c.translate(w - 60, h - 60); c.strokeStyle = '#cef4df38'; c.fillStyle = '#d3ead45a'; c.lineWidth = 1;
+    c.beginPath(); c.arc(0, 0, 25, 0, Math.PI * 2); c.moveTo(-33, 0); c.lineTo(33, 0); c.moveTo(0, -33); c.lineTo(0, 33); c.stroke();
+    c.beginPath(); c.moveTo(0, -23); c.lineTo(5, 0); c.lineTo(0, 23); c.lineTo(-5, 0); c.closePath(); c.fill(); c.restore();
+    paintMapIsland(c, state);
     // Small passing gulls sit in front of the terrain and behind the map controls.
     c.save(); c.strokeStyle = '#f9f2dcb8'; c.lineWidth = 1.7; c.lineCap = 'round';
     for (let i = 0; i < 3; i++) {
@@ -148,17 +184,7 @@ export function paintWorldMap(c: CanvasRenderingContext2D, state: MapPaintState)
         c.beginPath(); c.moveTo(x - 7, y + flap); c.quadraticCurveTo(x - 3, y - 4, x, y); c.quadraticCurveTo(x + 3, y - 4, x + 7, y + flap); c.stroke();
     }
     c.restore();
-    const p = mapToScreen(state.marker, camera);
-    const scale = mapActorScale(camera);
-    const walking = state.walking && !state.reducedMotion;
-    const frame = walking ? PLAYER_WALK[Math.floor(t / 95) % PLAYER_WALK.length] : PLAYER_SPRITES.idle;
-    const x = p.x - 8 * scale, y = p.y - frame.length * scale;
-    ellipse(c, x + 8 * scale, p.y - 1, 9 * scale, 3.2 * scale, '#233c405b');
-    // Keep Feka's recognizable pixel silhouette; only the surrounding world changes medium.
-    for (let row = 0; row < frame.length; row++) for (let col = 0; col < frame[row].length; col++) {
-        const color = PLAYER_PALETTE[frame[row][col]]; if (!color) continue;
-        c.fillStyle = color; c.fillRect(Math.round(x + (state.facingLeft ? 15 - col : col) * scale), Math.round(y + row * scale), Math.ceil(scale), Math.ceil(scale));
-    }
+    paintMapActor(c, state);
     const vignette = c.createLinearGradient(0, h - 70, 0, h);
     vignette.addColorStop(0, '#102c4100'); vignette.addColorStop(1, '#102c4166'); c.fillStyle = vignette; c.fillRect(0, h - 70, w, 70);
 }

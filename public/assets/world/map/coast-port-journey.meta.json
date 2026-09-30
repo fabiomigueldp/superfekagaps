@@ -1,0 +1,624 @@
+{
+  "version": 1,
+  "coordinateSystem": "All points and overlay bounds are normalized local coordinates of the unchanged island 1920x1200 frames. The world renderer applies its own stable island transforms. Boat source rectangles use atlas pixels.",
+  "boatMetadata": "/assets/world/map/journey-boat.meta.json",
+  "islands": {
+    "costa": {
+      "version": 1,
+      "island": "costa",
+      "source": "tools/diorama/render_costa.py",
+      "sourceSha256": "2c9acf31893b734c2190161043955608e5765b036a97c171426bb572995a183e",
+      "coordinateSystem": "Normalized accepted island 1920x1200 top-left frame; positions outside 0..1 are valid in the continuous world. World XYZ are local to this island.",
+      "camera": {
+        "position": [
+          11.0,
+          -20.0,
+          17.5
+        ],
+        "target": [
+          0.0,
+          0.0,
+          2.700000047683716
+        ],
+        "orthoScale": 20.600000381469727
+      },
+      "size": {
+        "width": 1920,
+        "height": 1200
+      },
+      "join": {
+        "route": "2:3",
+        "from": "1-3",
+        "to": "1-4",
+        "worldSegment": 3,
+        "segment": 3,
+        "t": 0.5,
+        "world": [
+          3.4,
+          -3.045,
+          1.6
+        ],
+        "x": 0.573383,
+        "y": 0.753665
+      },
+      "dock": {
+        "x": 0.634027,
+        "y": 0.906058,
+        "world": [
+          5.56,
+          -4.38,
+          0.695
+        ]
+      },
+      "approach": [
+        {
+          "x": 0.630752,
+          "y": 0.619739,
+          "world": [
+            3.8,
+            -1.32,
+            2.8
+          ]
+        },
+        {
+          "x": 0.654678,
+          "y": 0.648333,
+          "world": [
+            4.61,
+            -1.77,
+            2.87
+          ]
+        },
+        {
+          "x": 0.663461,
+          "y": 0.670382,
+          "world": [
+            5.02,
+            -2.14,
+            2.87
+          ]
+        },
+        {
+          "x": 0.642874,
+          "y": 0.699315,
+          "world": [
+            4.8,
+            -2.62,
+            2.63
+          ]
+        },
+        {
+          "x": 0.600191,
+          "y": 0.738431,
+          "world": [
+            4.0,
+            -2.99,
+            1.99
+          ]
+        },
+        {
+          "x": 0.573383,
+          "y": 0.753665,
+          "world": [
+            3.4,
+            -3.045,
+            1.6
+          ]
+        },
+        {
+          "x": 0.562037,
+          "y": 0.771623,
+          "world": [
+            3.4,
+            -3.53,
+            1.6
+          ]
+        },
+        {
+          "x": 0.58239,
+          "y": 0.876267,
+          "world": [
+            4.5,
+            -4.66,
+            0.98
+          ]
+        },
+        {
+          "x": 0.610037,
+          "y": 0.889503,
+          "world": [
+            5.15,
+            -4.66,
+            0.98
+          ]
+        },
+        {
+          "x": 0.627477,
+          "y": 0.906976,
+          "world": [
+            5.56,
+            -4.66,
+            0.84
+          ]
+        },
+        {
+          "x": 0.634027,
+          "y": 0.906058,
+          "world": [
+            5.56,
+            -4.38,
+            0.695
+          ]
+        }
+      ],
+      "boardingRoute": [
+        {
+          "x": 0.634027,
+          "y": 0.906058,
+          "world": [
+            5.56,
+            -4.38,
+            0.695
+          ]
+        },
+        {
+          "x": 0.627477,
+          "y": 0.906976,
+          "world": [
+            5.56,
+            -4.66,
+            0.84
+          ]
+        },
+        {
+          "x": 0.617651,
+          "y": 0.922527,
+          "world": [
+            5.56,
+            -5.08,
+            0.84
+          ]
+        },
+        {
+          "x": 0.607124,
+          "y": 0.954829,
+          "world": [
+            5.56,
+            -5.53,
+            0.6
+          ]
+        }
+      ],
+      "berth": {
+        "headingFrame": 0,
+        "passengerWorld": [
+          5.56,
+          -5.53,
+          0.6
+        ],
+        "waterlineWorld": [
+          5.34,
+          -5.53,
+          0.03
+        ],
+        "passenger": {
+          "x": 0.607124,
+          "y": 0.954829
+        },
+        "waterline": {
+          "x": 0.597766,
+          "y": 0.987495
+        }
+      },
+      "audit": {
+        "approach": {
+          "sampleCount": 366,
+          "supportRayCount": 366,
+          "headroomRayCount": 366,
+          "issueCount": 0,
+          "issues": []
+        },
+        "gangway": {
+          "sampleCount": 69,
+          "supportRayCount": 69,
+          "headroomRayCount": 69,
+          "issueCount": 0,
+          "issues": []
+        }
+      },
+      "frozenFields": [
+        "nodes",
+        "routes",
+        "secretRoute",
+        "worldRoutes",
+        "camera"
+      ],
+      "existingFieldsUnchanged": true,
+      "newGeometryObjects": 115,
+      "junctionToDock": [
+        {
+          "x": 0.573383,
+          "y": 0.753665,
+          "world": [
+            3.4,
+            -3.045,
+            1.6
+          ]
+        },
+        {
+          "x": 0.562037,
+          "y": 0.771623,
+          "world": [
+            3.4,
+            -3.53,
+            1.6
+          ]
+        },
+        {
+          "x": 0.58239,
+          "y": 0.876267,
+          "world": [
+            4.5,
+            -4.66,
+            0.98
+          ]
+        },
+        {
+          "x": 0.610037,
+          "y": 0.889503,
+          "world": [
+            5.15,
+            -4.66,
+            0.98
+          ]
+        },
+        {
+          "x": 0.627477,
+          "y": 0.906976,
+          "world": [
+            5.56,
+            -4.66,
+            0.84
+          ]
+        },
+        {
+          "x": 0.634027,
+          "y": 0.906058,
+          "world": [
+            5.56,
+            -4.38,
+            0.695
+          ]
+        }
+      ],
+      "existingRouteAuditDelta": {
+        "newIssueCount": 0,
+        "newIssues": {
+          "main:0": [],
+          "main:1": [],
+          "main:2": [],
+          "main:3": [],
+          "secret:0": []
+        },
+        "baselineIssueCounts": {
+          "main:0": 1,
+          "main:1": 9,
+          "main:2": 0,
+          "main:3": 4,
+          "secret:0": 24
+        },
+        "note": "Same strict support/headroom method run before/after additions. Baseline Costa corner/bridge/foliage contacts belong to the accepted unchanged source; this addition must introduce zero new contacts."
+      },
+      "projectedClearance": {
+        "method": "Orthographic camera rays through a billboard envelope matching the 48x78 pixel original Feka used in the boat proof. Three width positions at 38%, 64% and 88% of actor height, every \u22640.08 world units on new junction/dock/boarding paths. Lower guardrail contact is reported separately from upper-body blockage.",
+        "sampleCount": 657,
+        "upperBodyConflictCount": 0,
+        "lowerBodyContactCount": 0,
+        "upperBodyConflicts": [],
+        "lowerBodyContacts": []
+      },
+      "overlay": {
+        "path": "/assets/world/map/costa-journey-dock.webp",
+        "width": 212,
+        "height": 312,
+        "left": 0.540625,
+        "top": 0.739166667,
+        "widthInMap": 0.110416667,
+        "heightInMap": 0.26,
+        "bytes": 15270,
+        "sha256": "a02ddaa0530b9a638cc610788997e6b444115adee687359c0e4b09295916f2a4"
+      }
+    },
+    "porto": {
+      "version": 1,
+      "island": "porto",
+      "source": "tools/diorama/render_porto_map.py",
+      "sourceSha256": "ad10f064c9f5c66581c741296972105043790a2fd1d87fcb323b5fd29eeb9d0d",
+      "coordinateSystem": "Normalized accepted island 1920x1200 top-left frame; positions outside 0..1 are valid in the continuous world. World XYZ are local to this island.",
+      "camera": {
+        "position": [
+          11.0,
+          -20.0,
+          17.5
+        ],
+        "target": [
+          0.0,
+          0.0,
+          2.450000047683716
+        ],
+        "orthoScale": 20.600000381469727
+      },
+      "size": {
+        "width": 1920,
+        "height": 1200
+      },
+      "join": {
+        "node": "2-1",
+        "world": [
+          -5.0,
+          -2.83,
+          0.992
+        ],
+        "x": 0.221121,
+        "y": 0.597539
+      },
+      "dock": {
+        "x": 0.176034,
+        "y": 0.575698,
+        "world": [
+          -6.06,
+          -2.83,
+          0.992
+        ]
+      },
+      "approach": [
+        {
+          "x": 0.221121,
+          "y": 0.597539,
+          "world": [
+            -5.0,
+            -2.83,
+            0.992
+          ]
+        },
+        {
+          "x": 0.176034,
+          "y": 0.575698,
+          "world": [
+            -6.06,
+            -2.83,
+            0.992
+          ]
+        }
+      ],
+      "boardingRoute": [
+        {
+          "x": 0.176034,
+          "y": 0.575698,
+          "world": [
+            -6.06,
+            -2.83,
+            0.992
+          ]
+        },
+        {
+          "x": 0.15817,
+          "y": 0.578197,
+          "world": [
+            -6.48,
+            -2.83,
+            0.82
+          ]
+        },
+        {
+          "x": 0.132649,
+          "y": 0.5801,
+          "world": [
+            -7.08,
+            -2.83,
+            0.6
+          ]
+        }
+      ],
+      "berth": {
+        "headingFrame": 2,
+        "passengerWorld": [
+          -7.08,
+          -2.83,
+          0.6
+        ],
+        "waterlineWorld": [
+          -7.08,
+          -3.05,
+          0.03
+        ],
+        "passenger": {
+          "x": 0.132649,
+          "y": 0.5801
+        },
+        "waterline": {
+          "x": 0.127502,
+          "y": 0.625303
+        }
+      },
+      "audit": {
+        "approach": {
+          "sampleCount": 51,
+          "supportRayCount": 51,
+          "headroomRayCount": 51,
+          "issueCount": 0,
+          "issues": []
+        },
+        "gangway": {
+          "sampleCount": 57,
+          "supportRayCount": 57,
+          "headroomRayCount": 57,
+          "issueCount": 0,
+          "issues": []
+        }
+      },
+      "frozenFields": [
+        "nodes",
+        "routes",
+        "secretRoute",
+        "worldRoutes",
+        "camera"
+      ],
+      "existingFieldsUnchanged": true,
+      "newGeometryObjects": 21,
+      "junctionToDock": [
+        {
+          "x": 0.221121,
+          "y": 0.597539,
+          "world": [
+            -5.0,
+            -2.83,
+            0.992
+          ]
+        },
+        {
+          "x": 0.176034,
+          "y": 0.575698,
+          "world": [
+            -6.06,
+            -2.83,
+            0.992
+          ]
+        }
+      ],
+      "existingRouteAuditDelta": {
+        "newIssueCount": 0,
+        "newIssues": {
+          "main:0": [],
+          "main:1": [],
+          "main:2": [],
+          "main:3": [],
+          "secret:0": []
+        },
+        "baselineIssueCounts": {
+          "main:0": 0,
+          "main:1": 0,
+          "main:2": 0,
+          "main:3": 0,
+          "secret:0": 0
+        },
+        "note": "Same strict support/headroom method run before/after additions. Baseline Costa corner/bridge/foliage contacts belong to the accepted unchanged source; this addition must introduce zero new contacts."
+      },
+      "projectedClearance": {
+        "method": "Orthographic camera rays through a billboard envelope matching the 48x78 pixel original Feka used in the boat proof. Three width positions at 38%, 64% and 88% of actor height, every \u22640.08 world units on new junction/dock/boarding paths. Lower guardrail contact is reported separately from upper-body blockage.",
+        "sampleCount": 279,
+        "upperBodyConflictCount": 0,
+        "lowerBodyContactCount": 0,
+        "upperBodyConflicts": [],
+        "lowerBodyContacts": []
+      },
+      "overlay": {
+        "path": "/assets/world/map/porto-journey-dock.webp",
+        "width": 96,
+        "height": 99,
+        "left": 0.1234375,
+        "top": 0.5675,
+        "widthInMap": 0.05,
+        "heightInMap": 0.0825,
+        "bytes": 2534,
+        "sha256": "00af652ca4ab5e104a7d2ea024ff135235ecf58f457fa34ab191f475dd513af2"
+      }
+    }
+  },
+  "sources": [
+    "tools/diorama/render_journey_docks.py",
+    "tools/diorama/render_journey_boat.py",
+    "tools/diorama/package_journey_assets.py",
+    "tools/diorama/check_journey_projection.py",
+    "tools/diorama/render_journey_dock_masks.py",
+    "tools/diorama/author_journey_sail.py"
+  ],
+  "placements": {
+    "costa": {
+      "origin": {
+        "x": 0,
+        "y": 0
+      },
+      "scale": 1
+    },
+    "porto": {
+      "origin": {
+        "x": 1.1,
+        "y": -0.12
+      },
+      "scale": 1
+    }
+  },
+  "sailRoute": {
+    "points": [
+      {
+        "x": 0.607124,
+        "y": 0.954829
+      },
+      {
+        "x": 0.663,
+        "y": 1.015
+      },
+      {
+        "x": 0.775,
+        "y": 1.035
+      },
+      {
+        "x": 0.887,
+        "y": 0.97
+      },
+      {
+        "x": 0.982,
+        "y": 0.845
+      },
+      {
+        "x": 1.075,
+        "y": 0.674
+      },
+      {
+        "x": 1.14,
+        "y": 0.55
+      },
+      {
+        "x": 1.198,
+        "y": 0.481
+      },
+      {
+        "x": 1.232649,
+        "y": 0.4601
+      }
+    ],
+    "durationSeconds": 6,
+    "coordinateSystem": "atlas",
+    "segmentHeadings": [
+      0,
+      0,
+      1,
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "reverseSegmentHeadings": [
+      6,
+      6,
+      6,
+      6,
+      6,
+      5,
+      4,
+      4
+    ]
+  },
+  "sailAudit": {
+    "sampleCount": 522,
+    "minimumLandClearanceNativePixels": 0,
+    "minimumOpenWaterClearanceNativePixels": 42,
+    "allHeadingOpenWaterClearanceNativePixels": 12,
+    "nonterminalSilhouetteOverlapCount": 0,
+    "terminalProjectionOverlapCount": 27,
+    "dockContactCount": 126,
+    "method": "Sweep the real packaged base alpha footprint (hull, cabin, mast, rails and fenders, alpha>32) in both sailing directions every \u22643 half-native raster pixels (\u22646 canonical pixels). Also test all8headings along open-water legs. Original dock objects are identified by a Blender camera-holdout mask. Two terminal manoeuvre legs at each end permit the intended projected overlap at the authored berths; this is reported explicitly, not called zero clearance. Costa cabin/mast project over the beach behind the physically offshore hull. At Costa the full boat beam is at least0.37world units south of the old dock; at Porto it is at least0.22world units west of the arrival deck. New gangways intentionally bridge these gaps. Open-water legs require zero silhouette intersection. Distances are isotropic raster Euclidean distances, rounded down in native1920px island units."
+  }
+}

@@ -1,0 +1,289 @@
+{
+  "version": 1,
+  "island": "porto",
+  "source": "tools/diorama/render_porto_map.py",
+  "sourceSha256": "ad10f064c9f5c66581c741296972105043790a2fd1d87fcb323b5fd29eeb9d0d",
+  "coordinateSystem": "Normalized accepted island 1920x1200 top-left frame; positions outside 0..1 are valid in the continuous world. World XYZ are local to this island.",
+  "camera": {
+    "position": [
+      11.0,
+      -20.0,
+      17.5
+    ],
+    "target": [
+      0.0,
+      0.0,
+      2.450000047683716
+    ],
+    "orthoScale": 20.600000381469727
+  },
+  "size": {
+    "width": 1920,
+    "height": 1200
+  },
+  "join": {
+    "node": "2-1",
+    "world": [
+      -5.0,
+      -2.83,
+      0.992
+    ],
+    "x": 0.221121,
+    "y": 0.597539
+  },
+  "dock": {
+    "x": 0.176034,
+    "y": 0.575698,
+    "world": [
+      -6.06,
+      -2.83,
+      0.992
+    ]
+  },
+  "approach": [
+    {
+      "x": 0.221121,
+      "y": 0.597539,
+      "world": [
+        -5.0,
+        -2.83,
+        0.992
+      ]
+    },
+    {
+      "x": 0.176034,
+      "y": 0.575698,
+      "world": [
+        -6.06,
+        -2.83,
+        0.992
+      ]
+    }
+  ],
+  "boardingRoute": [
+    {
+      "x": 0.176034,
+      "y": 0.575698,
+      "world": [
+        -6.06,
+        -2.83,
+        0.992
+      ]
+    },
+    {
+      "x": 0.15817,
+      "y": 0.578197,
+      "world": [
+        -6.48,
+        -2.83,
+        0.82
+      ]
+    },
+    {
+      "x": 0.132649,
+      "y": 0.5801,
+      "world": [
+        -7.08,
+        -2.83,
+        0.6
+      ]
+    }
+  ],
+  "berth": {
+    "headingFrame": 2,
+    "passengerWorld": [
+      -7.08,
+      -2.83,
+      0.6
+    ],
+    "waterlineWorld": [
+      -7.08,
+      -3.05,
+      0.03
+    ],
+    "passenger": {
+      "x": 0.132649,
+      "y": 0.5801
+    },
+    "waterline": {
+      "x": 0.127502,
+      "y": 0.625303
+    }
+  },
+  "audit": {
+    "approach": {
+      "sampleCount": 51,
+      "supportRayCount": 51,
+      "headroomRayCount": 51,
+      "issueCount": 0,
+      "issues": [],
+      "supportObjects": [
+        "walk_arrival pier board surface",
+        "walk_arrival pier structural deck"
+      ]
+    },
+    "gangway": {
+      "sampleCount": 57,
+      "supportRayCount": 57,
+      "headroomRayCount": 57,
+      "issueCount": 0,
+      "issues": [],
+      "supportObjects": [
+        "arrival edge end grain",
+        "journey_Porto west boarding gangway supported deck",
+        "journey_Porto west boarding gangway supported deck.001",
+        "walk_arrival pier board surface"
+      ]
+    }
+  },
+  "existingRouteAudit": {
+    "main:0": {
+      "sampleCount": 186,
+      "supportRayCount": 186,
+      "headroomRayCount": 186,
+      "issueCount": 0,
+      "issues": [],
+      "supportObjects": [
+        "walk_arrival pier board surface",
+        "walk_arrival ramp board seam.001",
+        "walk_arrival ramp board seam.004",
+        "walk_arrival ramp continuous surface",
+        "walk_arrival ramp threshold",
+        "walk_counterweight berth board surface",
+        "walk_counterweight berth structural deck"
+      ]
+    },
+    "main:1": {
+      "sampleCount": 249,
+      "supportRayCount": 249,
+      "headroomRayCount": 249,
+      "issueCount": 0,
+      "issues": [],
+      "supportObjects": [
+        "walk_container courtyard board surface",
+        "walk_container courtyard structural deck",
+        "walk_counterweight berth board surface",
+        "walk_counterweight berth structural deck",
+        "walk_loading stencil 2-3.002",
+        "walk_loading stencil 2-3.003"
+      ]
+    },
+    "main:2": {
+      "sampleCount": 222,
+      "supportRayCount": 222,
+      "headroomRayCount": 222,
+      "issueCount": 0,
+      "issues": [],
+      "supportObjects": [
+        "walk_cargo apron board surface",
+        "walk_cargo apron structural deck",
+        "walk_container courtyard board surface",
+        "walk_container courtyard structural deck"
+      ]
+    },
+    "main:3": {
+      "sampleCount": 282,
+      "supportRayCount": 282,
+      "headroomRayCount": 282,
+      "issueCount": 0,
+      "issues": [],
+      "supportObjects": [
+        "walk_cargo apron board surface",
+        "walk_cargo apron structural deck",
+        "walk_loading stencil 2-4.006",
+        "walk_operations access ramp continuous surface",
+        "walk_operations platform board surface",
+        "walk_operations platform structural deck",
+        "walk_operations ramp threshold"
+      ]
+    },
+    "secret:0": {
+      "sampleCount": 333,
+      "supportRayCount": 333,
+      "headroomRayCount": 333,
+      "issueCount": 0,
+      "issues": [],
+      "supportObjects": [
+        "walk_container courtyard board surface",
+        "walk_container courtyard structural deck",
+        "walk_loading stencil 2-3.006",
+        "walk_maintenance level catwalk board seam.001",
+        "walk_maintenance level catwalk board seam.002",
+        "walk_maintenance level catwalk continuous surface",
+        "walk_maintenance rising catwalk board seam.001",
+        "walk_maintenance rising catwalk board seam.004",
+        "walk_maintenance rising catwalk continuous surface",
+        "walk_maintenance rising catwalk continuous surface.001",
+        "walk_maintenance turn landing structural deck",
+        "walk_operations platform board surface",
+        "walk_operations platform structural deck"
+      ]
+    }
+  },
+  "frozenFields": [
+    "nodes",
+    "routes",
+    "secretRoute",
+    "worldRoutes",
+    "camera"
+  ],
+  "existingFieldsUnchanged": true,
+  "newGeometryObjects": 21,
+  "junctionToDock": [
+    {
+      "x": 0.221121,
+      "y": 0.597539,
+      "world": [
+        -5.0,
+        -2.83,
+        0.992
+      ]
+    },
+    {
+      "x": 0.176034,
+      "y": 0.575698,
+      "world": [
+        -6.06,
+        -2.83,
+        0.992
+      ]
+    }
+  ],
+  "existingRouteAuditDelta": {
+    "newIssueCount": 0,
+    "newIssues": {
+      "main:0": [],
+      "main:1": [],
+      "main:2": [],
+      "main:3": [],
+      "secret:0": []
+    },
+    "baselineIssueCounts": {
+      "main:0": 0,
+      "main:1": 0,
+      "main:2": 0,
+      "main:3": 0,
+      "secret:0": 0
+    },
+    "note": "Same strict support/headroom method run before/after additions. Baseline Costa corner/bridge/foliage contacts belong to the accepted unchanged source; this addition must introduce zero new contacts."
+  },
+  "projectedClearance": {
+    "method": "Orthographic camera rays through a billboard envelope matching the 48x78 pixel original Feka used in the boat proof. Three width positions at 38%, 64% and 88% of actor height, every \u22640.08 world units on new junction/dock/boarding paths. Lower guardrail contact is reported separately from upper-body blockage.",
+    "sampleCount": 279,
+    "upperBodyConflictCount": 0,
+    "lowerBodyContactCount": 0,
+    "upperBodyConflicts": [],
+    "lowerBodyContacts": []
+  },
+  "overlay": {
+    "path": "/assets/world/map/porto-journey-dock.webp",
+    "width": 96,
+    "height": 99,
+    "left": 0.1234375,
+    "top": 0.5675,
+    "widthInMap": 0.05,
+    "heightInMap": 0.0825,
+    "bytes": 2534,
+    "sha256": "00af652ca4ab5e104a7d2ea024ff135235ecf58f457fa34ab191f475dd513af2"
+  }
+}

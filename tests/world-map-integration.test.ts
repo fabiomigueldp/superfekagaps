@@ -144,10 +144,10 @@ function mapDOM(t: TestContext, reducedMotion = false) {
         Object.defineProperty(globalThis, name, { configurable: true, writable: true, value });
         restore.push(() => { if (original) Object.defineProperty(globalThis, name, original); else Reflect.deleteProperty(globalThis, name); });
     }
-    const events = { selected: [] as number[], entered: 0, exited: 0, unlocked: 0 };
+    const events = { selected: [] as number[], arrived: [] as number[], entered: 0, exited: 0, unlocked: 0 };
     const view = new WorldMapView(gameCanvas as unknown as HTMLCanvasElement, {
         select: index => { events.selected.push(index); }, enter: () => { events.entered++; },
-        exit: () => { events.exited++; }, unlockAudio: () => { events.unlocked++; }
+        arrive: index => { events.arrived.push(index); }, exit: () => { events.exited++; }, unlockAudio: () => { events.unlocked++; }
     });
     t.after(() => { view.dispose(); restore.forEach(action => action()); });
     const internal = view as any;
@@ -266,794 +266,453 @@ test('metadata is world-specific and accepts only finite normalized silhouette b
     assert.equal(parseMapMetadata(data, NaN), null);
 });
 
-test('map show/hide remounts nothing, restores focus/tabindex and retains exactly one listener set', t => {
-    const h = mapDOM(t);
-    h.gameCanvas.setAttribute('tabindex', '7');
-    const originalChildren = h.body.children.length;
-    assert.equal(h.root.hidden, true);
-    assert.equal(h.fetches.length, 0);
-    assert.equal(h.images.length, 0);
-    for (let iteration = 0; iteration < 3; iteration++) {
-        h.view.show(iteration * 1000); h.view.show(iteration * 1000 + 1);
-        h.view.render(0, freshSave(), iteration * 1000 + 2, '');
-        assert.equal(h.root.hidden, false);
-        assert.equal(h.active, h.root);
-        assert.equal(h.gameCanvas.getAttribute('tabindex'), '-1');
-        assert.equal(h.gameCanvas.getAttribute('aria-hidden'), 'true');
-        assert.equal(h.gameCanvas.style.visibility, 'hidden');
-        assert.equal(h.body.children.length, originalChildren);
-        assert.equal(h.root.count('keydown'), 1);
-        assert.equal(h.windowMock.count('resize'), 1);
-        assert.equal(h.media.count('change'), 1);
-        h.view.hide(); h.view.hide();
-        assert.equal(h.root.hidden, true);
-        assert.equal(h.active, h.gameCanvas);
-        assert.equal(h.gameCanvas.getAttribute('tabindex'), '7');
-        assert.equal(h.gameCanvas.getAttribute('aria-hidden'), null);
-        assert.equal(h.gameCanvas.style.visibility, '');
+const openSave = (selected = '1-1') => ({ ...freshSave(), selected, completed: STAGES.map(stage => stage.id) });
+const currentArt = (h: ReturnType<typeof mapDOM>, world: number) => h.internal.activeArt.get(world);
+function tick(h: ReturnType<typeof mapDOM>, selected: number, save: ReturnType<typeof freshSave>, from: number, duration: number) {
+    for (let time = from + 50; time <= from + duration; time += 50) h.view.render(selected, save, time, '');
+}
+async function readyLand(h: ReturnType<typeof mapDOM>, save = openSave(), selection = 0, metadata = fixtureMapMetadata(1)) {
+    h.view.render(selection, save, 0, ''); await finishWorld(h, 1, metadata); await finishWorld(h, 2);
+    h.view.render(selection, save, 16, '');
+}
+
+test('map show/hide retains one mount and fixed listener sets, and restores canvas focus', t => {
+    const h = mapDOM(t); h.gameCanvas.setAttribute('tabindex', '7'); const children = h.body.children.length;
+    for (let i = 0; i < 3; i++) {
+        h.view.show(i * 100); h.view.show(i * 100 + 1); h.view.render(0, freshSave(), i * 100 + 2, '');
+        assert.equal(h.root.hidden, false); assert.equal(h.active, h.root); assert.equal(h.gameCanvas.style.visibility, 'hidden');
+        assert.equal(h.gameCanvas.getAttribute('tabindex'), '-1'); assert.equal(h.body.children.length, children);
+        assert.equal(h.root.count('keydown'), 2, 'The HUD drawer and controller each own one stable key listener.');
+        assert.equal(h.windowMock.count('resize'), 1); assert.equal(h.media.count('change'), 1);
+        h.view.hide(); h.view.hide(); assert.equal(h.active, h.gameCanvas); assert.equal(h.gameCanvas.getAttribute('tabindex'), '7');
+        assert.equal(h.gameCanvas.getAttribute('aria-hidden'), null); assert.equal(h.gameCanvas.style.visibility, '');
     }
-    assert.equal(h.root.focusCount, 3);
-    assert.equal(h.gameCanvas.focusCount, 3);
-    assert.equal(h.observers.length, 1);
-    h.view.dispose();
-    assert.equal(h.body.children.length, originalChildren - 1);
-    assert.equal(h.windowMock.count('resize'), 0);
-    assert.equal(h.media.count('change'), 0);
-    assert.equal(h.root.count('keydown'), 0);
-    assert.ok(h.observers[0].disconnected);
-    assert.ok(h.fetches[0].signal.aborted);
+    assert.equal(h.observers.length, 1); assert.equal(h.root.focusCount, 3); assert.equal(h.gameCanvas.focusCount, 3);
+    h.view.dispose(); h.view.dispose(); h.view.show(999);
+    assert.equal(h.body.children.length, children - 1); assert.equal(h.root.count('keydown'), 0);
+    assert.equal(h.windowMock.count('resize'), 0); assert.equal(h.media.count('change'), 0);
+    assert.ok(h.observers[0].disconnected); assert.ok(h.fetches.every(request => request.signal.aborted));
 });
 
-test('disposing during asset fetch cannot resurrect the map or apply late assets', async t => {
-    const h = mapDOM(t);
-    h.view.render(0, freshSave(), 0, ''); h.view.dispose();
-    await h.finishAssets();
-    assert.equal(h.root.parent, null);
-    assert.equal(h.root.hidden, true);
-    assert.equal(h.internal.assets.island, null);
-    assert.equal(h.gameCanvas.getAttribute('tabindex'), null);
-    assert.equal(h.gameCanvas.style.visibility, '');
-    h.root.dispatch('keydown', { key: 'ArrowRight' });
-    assert.deepEqual(h.events.selected, []);
+test('disposing during fetch cannot resurrect the map or publish late art', async t => {
+    const h = mapDOM(t); h.view.render(0, freshSave(), 0, ''); h.view.dispose();
+    await finishWorld(h, 1); await finishWorld(h, 2);
+    assert.equal(h.root.parent, null); assert.equal(h.root.hidden, true); assert.equal(currentArt(h, 1).assets.island, null);
+    h.view.render(0, freshSave(), 100, ''); h.root.dispatch('keydown', { key: 'ArrowRight' });
+    assert.deepEqual(h.events.selected, []); assert.equal(h.gameCanvas.style.visibility, '');
 });
 
-test('art requires matching valid metadata and failures keep all stage selections usable', async t => {
-    const h = mapDOM(t);
-    await h.finishAssets({ nodes: {} });
-    assert.equal(h.internal.assets.island, null, 'Actual terrain must never use guessed node coordinates.');
-    for (let index = 0; index < STAGES.length; index++) {
-        h.view.render(index, freshSave(), index * 16, '');
-        assert.equal(h.get('world-map-stage-title').textContent, STAGES[index].name);
-        assert.equal(h.get('world-map-play').disabled, index !== 0);
+test('only the visible connected pair is requested and cached, with no duplicate visits or distant Porto decoration', t => {
+    const h = mapDOM(t, true), save = openSave('2-1');
+    assert.equal(h.images.length, 0); h.view.render(5, save, 0, '');
+    assert.ok(h.images.some(image => image.src.endsWith('porto-diorama.webp')));
+    assert.ok(h.images.some(image => image.src.endsWith('costa-diorama.webp')));
+    assert.ok(h.images.every(image => !image.src.endsWith('porto-distant.webp')));
+    const count = [h.images.length, h.fetches.length];
+    for (const selected of [0, 5, 10, 15, 20, 25, 0, 5]) h.view.render(selected, save, selected + 20, '');
+    assert.deepEqual([h.images.length, h.fetches.length], count);
+});
+
+test('paired art waits for matching metadata in either completion order and never applies invalid coordinates', async t => {
+    for (const metadataFirst of [false, true]) await t.test(String(metadataFirst), async child => {
+        const h = mapDOM(child, true), data = fixtureMapMetadata(1, { '1-1': { x: .25, y: .62 } });
+        h.view.render(0, freshSave(), 0, '');
+        const image = h.images.find(image => image.src.endsWith('costa-diorama.webp'))!, request = h.fetches.find(request => request.url.endsWith('costa-diorama.meta.json'))!;
+        if (metadataFirst) request.resolve({ ok: true, json: async () => data }); else image.onload?.();
+        await flushAssets(); h.view.render(0, freshSave(), 16, ''); assert.equal(currentArt(h, 1).assets.island, null);
+        if (metadataFirst) image.onload?.(); else request.resolve({ ok: true, json: async () => data });
+        await flushAssets(); h.view.render(0, freshSave(), 32, '');
+        assert.equal(currentArt(h, 1).assets.island, image); assert.deepEqual(h.internal.marker, data.nodes['1-1']);
+    });
+});
+
+test('failed island pairs retain usable fallback, preserve the other cache, and do not retry per frame', async t => {
+    for (const [metadata, imageSuccess] of [[fixtureMapMetadata(1), true], [{}, true], [fixtureMapMetadata(2), false]] as const) await t.test(JSON.stringify(metadata).slice(0, 30), async child => {
+        const save = openSave(), j = mapDOM(child, true); j.view.render(0, save, 0, ''); await finishWorld(j, 1);
+        await finishWorld(j, 2, metadata, imageSuccess); j.view.render(0, save, 16, '');
+        assert.ok(currentArt(j, 1).assets.island); assert.equal(currentArt(j, 2).assets.island, null);
+        const requests = j.fetches.length; j.view.render(5, save, 32, ''); j.view.render(0, save, 48, '');
+        assert.equal(j.fetches.length, requests); assert.ok(j.internal.network.nodes['2-1']);
+    });
+});
+
+test('late geometry is activated only after safe arrival and optional shadows never restart a walk', async t => {
+    const h = mapDOM(t), save = openSave(); h.view.render(0, save, 0, ''); h.view.render(1, save, 50, '');
+    const active = structuredClone(h.internal.journey.legs[0]), data = fixtureMapMetadata(1, { '1-2': { x: .43, y: .37 } });
+    await finishWorld(h, 1, data); h.view.render(1, save, 100, '');
+    assert.equal(currentArt(h, 1).assets.island, null); assert.deepEqual(h.internal.journey.legs[0].points, active.points);
+    h.images.find(image => image.src.endsWith('costa-shadow.webp'))!.onload?.(); await flushAssets();
+    const progress = h.internal.journey.legs[0].progress; h.view.render(1, save, 150, ''); assert.ok(h.internal.journey.legs[0].progress > progress);
+    tick(h, 1, save, 150, 1000); h.view.render(1, save, 1200, '');
+    assert.ok(currentArt(h, 1).assets.island); assert.deepEqual(h.internal.marker, data.nodes['1-2']); assert.equal(h.internal.journey.arrived, '1-2');
+});
+
+test('phase selection walks, arrival saves once, and only explicit Enter starts exactly one stage', async t => {
+    const h = mapDOM(t), save = openSave(); await readyLand(h, save);
+    h.internal.hud.stageButtons[1].click(); h.internal.hud.stageButtons[1].click();
+    assert.deepEqual(h.events.selected, [1, 1]); assert.equal(h.events.entered, 0);
+    assert.equal(h.internal.journey.selected, '1-2'); assert.equal(h.internal.journey.arrived, '1-1');
+    assert.equal(h.view.enterSelected(1), false); assert.equal(h.view.enterSelected(0), false); assert.deepEqual(h.events.arrived, []);
+    tick(h, 1, save, 16, 1000); assert.equal(h.internal.journey.arrived, '1-2'); assert.deepEqual(h.events.arrived, [1]);
+    assert.equal(h.events.entered, 0); assert.equal(h.internal.hud.enterButton.disabled, false);
+    h.internal.hud.enterButton.click(); h.internal.hud.enterButton.click(); h.root.dispatch('keydown', { key: 'Enter' });
+    assert.equal(h.events.entered, 1); assert.equal(h.internal.journey.entered, '1-2');
+});
+
+test('retargeting mid-walk preserves position, authored bends, and reverses continuously', async t => {
+    const h = mapDOM(t), save = openSave(), data = fixtureMapMetadata(1), bend = { x: .18, y: .42 };
+    data.routes['0:1'] = [data.nodes['1-1'], bend, data.nodes['1-2']]; await readyLand(h, save, 0, data);
+    h.view.render(1, save, 100, ''); h.view.render(1, save, 200, ''); const foot = { ...h.internal.marker };
+    h.view.render(2, save, 200, ''); assert.deepEqual(h.internal.marker, foot);
+    assert.ok(h.internal.journey.legs[0].points.some((point: MapPoint) => point.x === bend.x && point.y === bend.y));
+    h.view.render(0, save, 200, ''); assert.deepEqual(h.internal.marker, foot); assert.equal(h.internal.journey.legs[0].direction, -1);
+    tick(h, 0, save, 200, 1000); assert.equal(h.internal.journey.arrived, '1-1');
+});
+
+test('locked phase and region previews never move Feka, persist the target, or permit entry', t => {
+    const h = mapDOM(t, true), save = freshSave(); h.view.render(0, save, 0, ''); const foot = { ...h.internal.marker };
+    for (const selected of [1, 4, 5, 25]) {
+        h.view.render(selected, save, selected + 20, ''); assert.deepEqual(h.internal.marker, foot);
+        assert.equal(h.internal.journey.arrived, '1-1'); assert.equal(h.view.enterSelected(selected), false);
+        assert.equal(h.internal.hud.enterButton.disabled, true); assert.match(h.get('world-map-status').textContent, /Prévia/);
     }
+    assert.deepEqual(h.events.arrived, []); assert.equal(save.selected, '1-1');
 });
 
-test('the map uses capped device-resolution canvas, responds to resize and updates accessible state', t => {
-    const h = mapDOM(t, true), save = freshSave();
-    h.view.render(0, save, 0, 'Storage warning');
-    const canvas = h.get('world-map-art');
-    assert.equal(canvas.width, 2400); assert.equal(canvas.height, 1500);
-    assert.equal(h.paint.context.imageSmoothingEnabled, true);
-    assert.equal(h.get('world-map-warning').textContent, 'Storage warning');
-    assert.equal(h.get('world-map-warning').hidden, false);
-    assert.equal(h.get('world-map-play').disabled, false);
-    assert.match(h.get('world-map-sr').textContent, /Disponível/);
-    h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width: 390, height: 620 };
-    h.windowMock.devicePixelRatio = 1.5; h.observers[0].callback();
-    save.completed.push('1-1'); save.seals.push('1-1:s1');
-    h.view.render(0, save, 16, 'Storage warning', 'Conclua o caminho anterior.');
-    assert.equal(canvas.width, 585); assert.equal(canvas.height, 930);
-    assert.match(h.get('world-map-play').textContent, /de novo/);
-    assert.match(h.get('world-map-seals').textContent, /1\/3/);
-    assert.match(h.get('world-map-sr').textContent, /Concluída/);
-    assert.equal(h.get('world-map-warning').textContent, 'Conclua o caminho anterior.');
-    h.view.render(2, save, 32, '');
-    assert.equal(h.get('world-map-play').disabled, true);
-    assert.equal(h.get('world-map-warning').hidden, true);
-    assert.match(h.get('world-map-sr').textContent, /Bloqueada/);
+test('menu round trips cancel the hidden destination and reload only the last arrival', async t => {
+    const h = mapDOM(t), save = openSave(); await readyLand(h, save); h.view.render(4, save, 100, '');
+    assert.equal(h.internal.journey.destination, '1-5'); h.view.hide();
+    h.view.render(0, save, 5000, ''); assert.equal(h.internal.journey.arrived, '1-1'); assert.equal(h.internal.journey.destination, null);
+    assert.deepEqual(h.internal.marker, fixtureMapMetadata().nodes['1-1']);
 });
 
-test('reduced motion snaps authored travel and freezes time-driven decorative painting', async t => {
-    const h = mapDOM(t, true), data = fixtureMapMetadata();
-    data.routes['0:1'] = [data.nodes['1-1'], { x: .2, y: .5 }, data.nodes['1-2']];
-    await h.finishAssets(data);
-    h.view.render(0, freshSave(), 0, '');
-    h.view.render(1, freshSave(), 16, '');
-    assert.ok(Math.abs(h.internal.marker.x - data.nodes['1-2'].x) < 1e-12);
-    assert.ok(Math.abs(h.internal.marker.y - data.nodes['1-2'].y) < 1e-12);
-    const camera = structuredClone(h.internal.camera);
-    h.paint.calls.length = 0; h.view.render(1, freshSave(), 32, '');
-    const painting = [...h.paint.calls];
-    h.paint.calls.length = 0; h.view.render(1, freshSave(), 4000, '');
-    assert.deepEqual(h.internal.camera, camera);
-    assert.deepEqual(h.paint.calls, painting, 'Waves, gulls, character and camera must not animate under reduced motion.');
+test('return from gameplay starts at played stage, replay stays there, and clear requests a fresh trip', async t => {
+    const h = mapDOM(t), save = openSave('1-2'); await readyLand(h, save, 1);
+    h.view.enterSelected(1); h.view.hide(); h.view.render(1, save, 1000, '', '', { playedStage: '1-2', nextSelected: '1-2' });
+    assert.equal(h.internal.journey.arrived, '1-2'); assert.equal(h.internal.journey.destination, null); assert.equal(h.internal.hud.enterButton.disabled, false);
+    h.view.hide(); h.view.render(2, save, 2000, '', '', { playedStage: '1-2', nextSelected: '1-3' });
+    assert.equal(h.internal.journey.arrived, '1-2'); assert.equal(h.internal.journey.destination, '1-3'); assert.equal(h.events.entered, 1);
 });
 
-test('changing the reduced-motion preference stops an in-flight journey on its destination', async t => {
-    const h = mapDOM(t), data = fixtureMapMetadata();
-    data.routes['0:1'] = [data.nodes['1-1'], { x: .2, y: .5 }, data.nodes['1-2']];
-    await h.finishAssets(data);
-    h.view.render(0, freshSave(), 0, '');
-    h.view.render(1, freshSave(), 100, '');
-    assert.notDeepEqual(h.internal.marker, data.nodes['1-2']);
-    h.media.matches = true; h.media.dispatch('change');
-    h.view.render(1, freshSave(), 101, '');
-    assert.ok(Math.abs(h.internal.marker.x - data.nodes['1-2'].x) < 1e-12);
-    assert.ok(Math.abs(h.internal.marker.y - data.nodes['1-2'].y) < 1e-12);
-    assert.equal(h.internal.travelDuration, 0);
+test('skip and reduced motion finish travel without entering; changing motion preference completes the existing trip', async t => {
+    const h = mapDOM(t), save = openSave(); await readyLand(h, save); h.view.render(4, save, 100, '');
+    h.internal.hud.skipButton.click(); assert.equal(h.internal.journey.arrived, '1-5'); assert.equal(h.events.entered, 0);
+    h.view.render(0, save, 200, ''); h.media.matches = true; h.media.dispatch('change'); h.view.render(0, save, 201, '');
+    assert.equal(h.internal.journey.arrived, '1-1'); assert.equal(h.internal.journey.destination, null); assert.equal(h.events.entered, 0);
+    const camera = structuredClone(h.internal.camera); h.paint.calls.length = 0; h.view.render(0, save, 220, ''); h.view.render(0, save, 9000, '');
+    assert.deepEqual(h.internal.camera, camera); assert.equal(h.paint.calls.length, 0);
 });
 
-test('keyboard navigation focuses the destination and hidden/modifier/repeat events stay inert', t => {
-    const h = mapDOM(t);
-    h.view.render(0, freshSave(), 0, '');
-    const event = h.root.dispatch('keydown', { key: 'ArrowRight' });
-    assert.deepEqual(h.events.selected, [1]);
-    assert.equal(event.defaultPrevented, true);
-    assert.equal(event.propagationStopped, true);
-    assert.equal(h.active, h.internal.nodes[1]);
-    h.root.dispatch('keydown', { key: 'ArrowRight', repeat: true });
-    h.root.dispatch('keydown', { key: 'ArrowRight', ctrlKey: true });
-    h.root.dispatch('keydown', { key: 'Enter' });
-    assert.equal(h.events.entered, 1);
-    h.root.dispatch('keydown', { key: 'Escape' });
-    assert.equal(h.events.exited, 1);
-    h.view.hide();
-    h.root.dispatch('keydown', { key: 'ArrowRight' });
-    h.get('world-map-play').click();
-    assert.deepEqual(h.events.selected, [1]);
-    assert.equal(h.events.entered, 1);
+test('reduced-motion idle frames do no canvas work, but progress, panorama, selection, late art and resize repaint', async t => {
+    const h = mapDOM(t, true), save = openSave(); h.view.render(0, save, 0, ''); h.paint.calls.length = 0;
+    for (let frame = 1; frame <= 120; frame++) h.view.render(0, save, frame * 16, ''); assert.equal(h.paint.calls.length, 0);
+    for (const mutate of [() => h.get('world-map-overview').click(), () => save.seals.push('1-1:s1'),
+        () => { h.get('world-map-scene').bounds.width = 800; h.observers[0].callback(); }]) {
+        mutate(); h.paint.calls.length = 0; h.view.render(0, save, 2100, ''); assert.ok(h.paint.calls.some(call => call.method === 'clearRect'));
+    }
+    await finishWorld(h, 1); h.paint.calls.length = 0; h.view.render(0, save, 2200, ''); assert.ok(h.paint.calls.length);
+});
+
+test('keyboard selection is synchronous, consumes boundaries, and ignores modifiers, repeats and hidden state', t => {
+    const h = mapDOM(t); h.view.render(0, freshSave(), 0, '');
+    const boundary = h.root.dispatch('keydown', { key: 'A' }); assert.equal(boundary.defaultPrevented, true);
+    const event = h.root.dispatch('keydown', { key: 'ArrowRight' }); assert.equal(event.defaultPrevented, true); assert.equal(event.propagationStopped, true);
+    assert.equal(h.active, h.internal.hud.stageButtons[1]); h.root.dispatch('keydown', { key: 'ArrowRight' });
+    assert.deepEqual(h.events.selected, [1, 2]);
+    h.root.dispatch('keydown', { key: 'ArrowRight', repeat: true }); h.root.dispatch('keydown', { key: 'ArrowRight', ctrlKey: true });
+    h.root.dispatch('keydown', { key: 'Enter' }); assert.equal(h.events.entered, 0);
+    h.root.dispatch('keydown', { key: 'Escape' }); assert.equal(h.events.exited, 1); h.view.hide();
+    h.root.dispatch('keydown', { key: 'ArrowRight' }); h.internal.hud.stageButtons[3].click(); assert.deepEqual(h.events.selected, [1, 2]);
+});
+
+test('the region drawer owns Escape and arrow events without leaking to map navigation', t => {
+    const h = mapDOM(t); h.view.render(0, freshSave(), 0, ''); h.internal.hud.regionButton.click();
+    assert.equal(h.internal.hud.regionMenu.hidden, false); h.root.dispatch('keydown', { key: 'ArrowRight' });
+    assert.deepEqual(h.events.selected, []); h.root.dispatch('keydown', { key: 'Escape' });
+    assert.equal(h.internal.hud.regionMenu.hidden, true); assert.equal(h.events.exited, 0);
+});
+
+test('capture-phase gameplay Input and global menus preserve native map activation without double entry', t => {
+    const h = mapDOM(t), input = new Input(), game = worldHarness().game; input.setMenuMode(true);
+    h.windowMock.addEventListener('keydown', event => game.menuKey(event)); let stray = 0; game.enterSelected = () => { stray++; };
+    h.view.render(0, freshSave(), 0, ''); const button = h.get('world-map-enter');
+    for (const key of ['Enter', ' ']) {
+        const event = button.dispatch('keydown', { key, code: key === ' ' ? 'Space' : 'Enter' }); assert.equal(event.defaultPrevented, false);
+        button.click(); button.dispatch('keyup', { key, code: key === ' ' ? 'Space' : 'Enter' });
+    }
+    input.update(); assert.equal(h.events.entered, 1); assert.equal(stray, 0); assert.equal(input.getState().jumpPressed, false);
+    h.root.dispatch('keydown', { key: 'm', code: 'KeyM' }); input.update(); assert.equal(input.consumeMute(), true);
+    h.view.hide(); input.setMenuMode(false); h.gameCanvas.dispatch('keydown', { key: 'ArrowRight', code: 'ArrowRight' }); input.update();
+    assert.equal(input.getState().right, true);
+});
+
+test('capped backing resolution responds to DPR and resize without resizing each idle frame', t => {
+    const h = mapDOM(t, true), canvas = h.get('world-map-art'); h.view.render(0, freshSave(), 0, 'Storage warning');
+    assert.equal(canvas.width, 2400); assert.equal(canvas.height, 1500); assert.equal(h.get('world-map-warning').textContent, 'Storage warning');
+    h.get('world-map-scene').bounds.width = 5120; h.get('world-map-scene').bounds.height = 1440; h.observers[0].callback();
+    let width = 0, height = 0, writes = 0; Object.defineProperties(canvas, {
+        width: { get: () => width, set: (value: number) => { width = value; writes++; } },
+        height: { get: () => height, set: (value: number) => { height = value; writes++; } } });
+    h.view.render(0, freshSave(), 16, ''); assert.ok(width * height <= 4_000_000 + width + height); assert.ok(width * height > 3_990_000);
+    for (const time of [32, 48, 64]) h.view.render(0, freshSave(), time, ''); assert.equal(writes, 2);
+    h.windowMock.devicePixelRatio = 1; h.view.render(0, freshSave(), 80, ''); h.view.render(0, freshSave(), 96, ''); assert.equal(writes, 4);
+});
+
+test('measured HUD bounds and both fixed island geometries remain valid through viewport and font reflow', async t => {
+    const h = mapDOM(t, true), save = openSave(), costa = JSON.parse(readFileSync(new URL('../public/assets/world/map/costa-diorama.meta.json', import.meta.url), 'utf8'));
+    await readyLand(h, save, 0, costa);
+    for (const [width, height, top, bottom] of [[1180, 757, 94, 650], [400, 606, 92, 490], [844, 392, 68, 307], [320, 568, 92, 440]]) {
+        h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width, height };
+        h.get('world-map-header').bounds.height = top - h.get('world-map-header').bounds.top;
+        h.get('world-map-tools').bounds.height = top - h.get('world-map-tools').bounds.top;
+        h.get('world-map-footer').bounds.top = bottom; h.observers[0].callback(); h.view.render(0, save, height, '');
+        const camera = h.internal.camera;
+        assert.ok(mapToScreen({ x: .5, y: COSTA_ART_BOUNDS.top }, camera).y >= top + 14 - .001);
+        assert.ok(mapToScreen({ x: .5, y: COSTA_ART_BOUNDS.bottom }, camera).y <= bottom - 12 + .001);
+        assert.ok(Number.isFinite(camera.zoom) && camera.zoom > 0);
+    }
+    const before = h.internal.camera.zoom; h.get('world-map-footer').bounds.top -= 24; h.observers[0].callback(); h.view.render(0, save, 3000, '');
+    assert.ok(h.internal.camera.zoom <= before);
+    assert.ok(mapToScreen({ x: .5, y: COSTA_ART_BOUNDS.bottom }, h.internal.camera).y <= h.get('world-map-footer').bounds.top - 12 + .001);
+    assert.deepEqual(h.observers[0].targets.map(target => target.className.split(' ')[0]), ['world-map-scene', 'world-map-header', 'world-map-tools', 'world-map-footer']);
+});
+
+test('each island secret uses only its own authored geometry and progress', async t => {
+    const h = mapDOM(t), save = openSave('2-3'), porto = fixtureMapMetadata(2); porto.secretRoute = [porto.nodes['2-3'], { x: .63, y: .73 }, porto.nodes['2-5']];
+    h.view.render(7, save, 0, ''); await finishWorld(h, 1); await finishWorld(h, 2, porto); h.view.render(7, save, 16, '');
+    save.secrets.push('1-3'); h.view.render(9, save, 32, ''); assert.equal(h.internal.journey.legs.length, 2);
+    h.internal.hud.skipButton.click(); save.secrets.push('2-3'); h.view.render(7, save, 100, '');
+    assert.equal(h.internal.journey.legs.length, 1); assert.match(h.internal.journey.legs[0].id, /secret/);
+});
+
+test('later worlds retain fallback navigation and explicit entry without creating any sea edge', t => {
+    const h = mapDOM(t, true), save = openSave(); h.view.render(0, save, 0, ''); h.view.render(14, save, 16, '');
+    assert.equal(h.internal.journey.arrived, '3-5'); assert.equal(h.events.entered, 0); assert.equal(h.internal.hud.enterButton.disabled, false);
+    h.view.render(10, save, 32, ''); assert.equal(h.internal.journey.arrived, '3-1');
+    assert.ok(h.internal.network.edges.every((edge: { from: string; to: string; mode: string }) => edge.mode !== 'sail'));
+});
+
+test('hidden documents skip direct map painting and the Game wrapper resumes when visible', t => {
+    const h = mapDOM(t), g = worldHarness(); h.view.render(0, freshSave(), 0, ''); h.paint.calls.length = 0; h.documentMock.hidden = true;
+    h.view.render(0, freshSave(), 100, ''); g.game.render(); assert.equal(h.paint.calls.length, 0); assert.equal(g.mapRenders.length, 0);
+    h.documentMock.hidden = false; g.game.render(); assert.equal(g.mapRenders.length, 1);
+});
+
+test('asset prefixes preserve relative and subdirectory deployments', async () => {
+    const { mapAssetPrefix } = await import('../src/adventure/WorldMapArt');
+    for (const [base, expected] of [['/', '/assets/world/map/'], ['./', './assets/world/map/'], ['/game/', '/game/assets/world/map/'], ['/game', '/game/assets/world/map/']]) assert.equal(mapAssetPrefix(base), expected);
 });
 
 function worldHarness(ephemeral = false) {
     const values = new Map<string, string>(), writes: string[] = [], calls: string[] = [];
-    const store = new ProgressStore({ getItem: key => values.get(key) ?? null,
-        setItem: (key, value) => { values.set(key, value); writes.push(value); } });
-    const game = Object.create(WorldGame.prototype) as any;
-    const mapRenders: unknown[][] = [];
-    Object.assign(game, { store, ephemeral, state: 'map', selection: 0, time: 1234, toast: '', toastTimer: 0,
+    const store = new ProgressStore({ getItem: key => values.get(key) ?? null, setItem: (key, value) => { values.set(key, value); writes.push(value); } });
+    const game = Object.create(WorldGame.prototype) as any, mapRenders: unknown[][] = [];
+    Object.assign(game, { store, ephemeral, state: 'map', stage: STAGES[0], selection: 0, time: 1234, toast: '', toastTimer: 0, elapsed: 9,
         buttons: [{ run() {} }], menuSelection: 0,
         input: { reset() { calls.push('reset'); }, setMenuMode(value: boolean) { calls.push(`menu:${value}`); } },
-        audio: { cancelSpeech() {}, setDying() {}, pause() {}, select() {}, unlock() { calls.push('unlock'); },
-            sfx(name: string) { calls.push(`sfx:${name}`); } },
-        renderer: { startScene() { calls.push('startScene'); }, getContext: () => ({}), present() { calls.push('present'); } },
-        mapView: { render(...args: unknown[]) { mapRenders.push(args); }, show() { calls.push('map:show'); }, hide() { calls.push('map:hide'); } },
+        audio: { cancelSpeech() {}, setDying() {}, pause() {}, select() {}, unlock() { calls.push('unlock'); }, sfx(name: string) { calls.push(`sfx:${name}`); } },
+        renderer: { startScene() { calls.push('startScene'); }, getContext: () => canvasContext().context, present() { calls.push('present'); } },
+        mapView: { render(...args: unknown[]) { mapRenders.push(args); }, hide() { calls.push('map:hide'); },
+            selectDestination(index: number) { calls.push(`select:${index}`); }, enterSelected(index: number) { calls.push(`enter:${index}`); return false; } },
         renderTitle() { calls.push('title'); }, renderMap() { calls.push('legacyMap'); } });
     return { game, store, values, writes, calls, mapRenders };
 }
 
-test('WorldGame map render bypasses the entire pixel renderer and sends current warnings/toasts to the high-resolution view', () => {
-    const h = worldHarness();
-    h.game.selection = 8; h.store.warning = 'Storage warning'; h.game.toast = 'Locked'; h.game.toastTimer = 100;
-    h.game.render();
-    assert.equal(h.mapRenders.length, 1);
-    assert.deepEqual(h.mapRenders[0], [8, h.store.save, 1234, 'Storage warning', 'Locked']);
-    assert.equal(h.calls.includes('startScene'), false);
-    assert.equal(h.calls.includes('present'), false);
-    assert.equal(h.calls.includes('legacyMap'), false);
-    assert.deepEqual(h.game.buttons, []);
-    h.game.toastTimer = 0; h.game.render();
-    assert.equal(h.mapRenders[1][4], '');
-    h.game.change('title'); h.game.render();
-    assert.ok(h.calls.includes('map:hide'));
-    assert.ok(h.calls.includes('startScene'));
-    assert.ok(h.calls.includes('title'));
-    assert.ok(h.calls.includes('present'));
+test('WorldGame map rendering bypasses pixel UI, forwards warnings and consumes return context once', () => {
+    const h = worldHarness(); h.game.selection = 8; h.store.warning = 'Storage warning'; h.game.toast = 'Locked'; h.game.toastTimer = 100;
+    const returned = { playedStage: '2-3', nextSelected: '2-4' }; h.game.mapReturn = returned; h.game.render();
+    assert.deepEqual(h.mapRenders[0], [8, h.store.save, 1234, 'Storage warning', 'Locked', returned]); assert.equal(h.game.mapReturn, undefined);
+    assert.equal(h.calls.includes('startScene'), false); assert.equal(h.calls.includes('present'), false); assert.deepEqual(h.game.buttons, []);
+    h.game.change('title'); h.game.render(); assert.ok(h.calls.includes('map:hide')); assert.ok(h.calls.includes('title')); assert.ok(h.calls.includes('present'));
 });
 
-test('intentional ephemeral editor maps suppress storage warnings while normal failures and all toasts stay visible', () => {
+test('ephemeral editor maps suppress storage warnings but preserve toasts and protected saves', () => {
     for (const ephemeral of [true, false]) {
-        const h = worldHarness(ephemeral), store = new ProgressStore(null);
-        h.game.store = store;
-        assert.equal(store.persist(), false);
-        assert.match(store.warning, /Armazenamento indisponível/);
-        h.game.toast = 'Conclua o caminho anterior.'; h.game.toastTimer = 100;
-        h.game.render();
-        assert.equal(h.mapRenders[0][3], ephemeral ? '' : store.warning);
-        assert.equal(h.mapRenders[0][4], 'Conclua o caminho anterior.');
-        assert.match(store.warning, /Armazenamento indisponível/, 'Presentation does not alter the store or save behavior.');
+        const h = worldHarness(ephemeral); h.game.store = new ProgressStore(null); h.game.store.persist(); h.game.toast = 'Conclua'; h.game.toastTimer = 10; h.game.render();
+        assert.equal(h.mapRenders[0][3], ephemeral ? '' : h.game.store.warning); assert.equal(h.mapRenders[0][4], 'Conclua');
     }
-    const normal = worldHarness();
-    const failedRead = new ProgressStore({ getItem() { throw Error('Storage denied'); }, setItem() { assert.fail('Protected progress must not be overwritten.'); } });
-    normal.game.store = failedRead; normal.game.render();
-    assert.match(String(normal.mapRenders[0][3]), /Não foi possível abrir o progresso/);
-    assert.equal(failedRead.persist(), false);
+    const h = worldHarness(); h.game.store = new ProgressStore({ getItem() { throw Error('Denied'); }, setItem() { assert.fail('Protected progress cannot be overwritten.'); } });
+    h.game.render(); assert.match(String(h.mapRenders[0][3]), /Não foi possível abrir/); assert.equal(h.game.store.persist(), false);
 });
 
-test('locked selection stays on the map, while an unlocked selection resumes that exact stage', () => {
-    const h = worldHarness(), loads: unknown[][] = [];
-    h.game.load = (...args: unknown[]) => { loads.push(args); };
-    h.game.selection = 1; h.game.enterSelected();
-    assert.equal(h.game.state, 'map');
-    assert.deepEqual(loads, []);
-    assert.match(h.game.toast, /Conclua/);
-    assert.ok(h.game.toastTimer > 0);
-    h.store.save.completed.push('1-1'); h.game.enterSelected();
-    assert.deepEqual(loads, [['1-2', true]]);
+test('WorldGame global shortcuts consult the journey gate and cannot bypass arrival or load a locked target', () => {
+    const h = worldHarness(), loads: unknown[][] = []; h.game.load = (...args: unknown[]) => loads.push(args);
+    h.game.selection = 1; h.game.enterSelected(); assert.equal(h.calls.length, 0); assert.match(h.game.toast, /Conclua/);
+    h.store.save.completed.push('1-1'); h.game.enterSelected(); assert.ok(h.calls.includes('enter:1')); assert.deepEqual(loads, []);
+    h.game.mapView = undefined; h.game.enterSelected(); assert.deepEqual(loads, [], 'Even the frame before lazy map mount cannot bypass the gate.');
 });
 
-test('returning to map restores the selected save destination and persists it without disturbing progression', () => {
-    const h = worldHarness();
-    h.store.save.selected = '3-4'; h.store.save.completed = ['1-1', '1-2']; h.store.save.seals = ['1-1:s1'];
-    h.store.save.checkpoint = { stage: '3-4', index: 1, helmet: true };
-    const expected = structuredClone(h.store.save);
-    h.game.state = 'paused'; h.game.selection = 0; h.game.toMap();
-    assert.equal(h.game.state, 'map'); assert.equal(h.game.selection, 13);
-    assert.deepEqual(h.store.save, expected);
-    assert.deepEqual(JSON.parse(h.values.get(SAVE_KEY)!), expected);
-    assert.ok(h.calls.includes('menu:true'));
-});
-
-test('map selection clamps and persists every navigation target without changing campaign unlocks', () => {
+test('WorldGame navigation changes only session selection, never persisted arrival or campaign progress', () => {
     const h = worldHarness(), before = structuredClone(h.store.save);
-    for (const [index, selection] of [[NaN, 0], [-50, 0], [4.9, 4], [29, 29], [100, 29], [13, 13]]) {
-        h.game.selectMap(index);
-        assert.equal(h.game.selection, selection);
-        assert.equal(h.store.save.selected, STAGES[selection].id);
-        assert.equal(JSON.parse(h.values.get(SAVE_KEY)!).selected, STAGES[selection].id);
-        assert.deepEqual(h.store.save.completed, before.completed);
-        assert.deepEqual(h.store.save.seals, before.seals);
-        assert.deepEqual(h.store.save.secrets, before.secrets);
-    }
-    assert.equal(h.writes.length, 6);
-    assert.equal(h.calls.filter(call => call === 'sfx:coin').length, 6);
+    for (const [index, selected] of [[NaN, 0], [-50, 0], [4.9, 4], [29, 29], [100, 29], [13, 13]]) { h.game.selectMap(index); assert.equal(h.game.selection, selected); }
+    assert.deepEqual(h.store.save, before); assert.equal(h.writes.length, 0); assert.equal(h.calls.filter(call => call === 'sfx:coin').length, 6);
 });
 
-test('capture-phase gameplay Input and global WorldGame menus leave native map buttons to the map', t => {
-    const h = mapDOM(t), input = new Input(), game = worldHarness().game;
-    input.setMenuMode(true);
-    h.windowMock.addEventListener('keydown', event => game.menuKey(event));
-    let strayEntries = 0;
-    game.enterSelected = () => { strayEntries++; };
-    h.view.render(0, freshSave(), 0, '');
-    const play = h.get('world-map-play');
-    for (const key of ['Enter', ' ']) {
-        const event = play.dispatch('keydown', { key, code: key === ' ' ? 'Space' : 'Enter' });
-        assert.equal(event.defaultPrevented, false, 'Native button activation must survive Input capture and the global menu listener.');
-        // Default browser button activation occurs after keydown (Enter) or keyup (Space).
-        play.click();
-        play.dispatch('keyup', { key, code: key === ' ' ? 'Space' : 'Enter' });
-    }
-    input.update();
-    assert.equal(h.events.entered, 2);
-    assert.equal(strayEntries, 0);
-    assert.equal(input.getState().start, false);
-    assert.equal(input.getState().jump, false);
-    assert.equal(input.getState().jumpPressed, false);
-    h.root.dispatch('keydown', { key: 'ArrowRight', code: 'ArrowRight' });
-    input.update();
-    assert.deepEqual(h.events.selected, [1]);
-    assert.equal(input.getState().right, false, 'Map arrows must not prime the character movement state.');
-    assert.equal(game.selection, 0, 'The root handles the navigation once; the window handler must not repeat it.');
-    h.view.hide(); input.setMenuMode(false);
-    const gameplay = h.gameCanvas.dispatch('keydown', { key: 'ArrowRight', code: 'ArrowRight' });
-    assert.equal(gameplay.defaultPrevented, true);
-    input.update();
-    assert.equal(input.getState().right, true, 'Normal canvas gameplay controls must still work.');
+test('completion preserves the played arrival in storage while keeping the unlocked next target session-only', () => {
+    const h = worldHarness(); h.game.stage = STAGES[4]; h.game.state = 'playing'; h.store.save.completed = STAGES.slice(0, 4).map(stage => stage.id);
+    h.game.complete(false); assert.equal(h.game.state, 'clear'); assert.equal(h.game.nextMapSelection, '2-1');
+    assert.equal(h.store.save.selected, '1-5'); assert.equal(JSON.parse(h.values.get(SAVE_KEY)!).selected, '1-5'); assert.ok(h.store.save.completed.includes('1-5'));
+    h.game.toMap(); assert.equal(h.game.selection, 5); assert.deepEqual(h.game.mapReturn, { playedStage: '1-5', nextSelected: '2-1' });
+    assert.equal(h.store.save.selected, '1-5');
 });
 
-test('native node clicks select once, selected nodes enter, and world rail navigation remains available when locked', t => {
-    const h = mapDOM(t);
-    h.view.render(0, freshSave(), 0, '');
-    h.internal.nodes[1].click();
-    assert.deepEqual(h.events.selected, [1]); assert.equal(h.events.entered, 0);
-    h.view.render(1, freshSave(), 16, '');
-    h.internal.nodes[1].click();
-    assert.equal(h.events.entered, 1, 'The game owns the lock check for a selected-node activation.');
-    assert.equal(h.get('world-map-play').disabled, true);
-    h.internal.worlds[5].click();
-    assert.deepEqual(h.events.selected, [1, 25]);
-    assert.equal(h.events.unlocked, 3);
+test('return without clear restores played stage; menu visits restore last saved arrival', () => {
+    const h = worldHarness(); h.game.state = 'paused'; h.game.stage = STAGES[13]; h.store.save.selected = '1-1';
+    h.game.toMap(); assert.equal(h.game.selection, 13); assert.deepEqual(h.game.mapReturn, { playedStage: '3-4', nextSelected: '3-4' });
+    assert.equal(h.store.save.selected, '3-4'); h.game.mapReturn = undefined; h.game.state = 'title'; h.game.selection = 25; h.game.toMap();
+    assert.equal(h.game.selection, 13); assert.equal(h.game.mapReturn, undefined);
 });
 
-test('WorldGame lazy map creation is reused across repeated renders and menu round trips', t => {
-    const h = mapDOM(t), g = worldHarness();
-    h.view.dispose();
-    g.game.mapView = null; g.game.mapCanvas = h.gameCanvas;
-    g.game.render();
-    const view = g.game.mapView as WorldMapView;
+test('WorldGame lazy map creation is reused and arrival callback persists exactly the reached phase', t => {
+    const h = mapDOM(t), g = worldHarness(); h.view.dispose(); g.game.mapView = undefined; g.game.mapCanvas = h.gameCanvas;
+    g.game.store.save.completed.push('1-1'); g.game.render(); const view = g.game.mapView as WorldMapView;
     try {
-        assert.ok(view instanceof WorldMapView);
-        const children = h.body.children.length, observers = h.observers.length, requests = h.fetches.length;
-        g.game.render(); g.game.change('title'); g.game.render();
-        assert.equal(view.root.hidden, true);
-        g.game.toMap(); g.game.render();
-        assert.equal(view.root.hidden, false);
-        assert.equal(g.game.mapView, view);
-        assert.equal(h.body.children.length, children);
-        assert.equal(h.observers.length, observers);
-        assert.equal(h.fetches.length, requests);
-        assert.equal(h.windowMock.count('resize'), 1);
-        assert.equal(h.media.count('change'), 1);
+        assert.ok(view instanceof WorldMapView); const children = h.body.children.length, requests = h.fetches.length;
+        g.game.selectMap(1); g.game.time += 16; g.game.render(); assert.equal(g.store.save.selected, '1-1');
+        const controller = view as any; controller.hud.skipButton.click(); assert.equal(g.store.save.selected, '1-2'); assert.equal(JSON.parse(g.values.get(SAVE_KEY)!).selected, '1-2');
+        g.game.change('title'); g.game.toMap(); g.game.render(); assert.equal(g.game.mapView, view); assert.equal(h.body.children.length, children); assert.equal(h.fetches.length, requests);
+        assert.equal(h.windowMock.count('resize'), 1); assert.equal(h.media.count('change'), 1);
     } finally { view.dispose(); }
 });
 
-test('late successful art uses the currently selected stage and matching exported geometry', async t => {
-    const h = mapDOM(t, true), metadata = fixtureMapMetadata(1, { '1-4': { x: .71, y: .61 } });
-    h.view.render(3, freshSave(), 0, '');
-    assert.deepEqual(h.internal.marker, FALLBACK_POINTS[3]);
-    await h.finishAssets(metadata);
-    h.view.render(3, freshSave(), 100, '');
-    assert.equal(h.internal.assets.island, h.images[0]);
-    assert.deepEqual(h.internal.marker, metadata.nodes['1-4']);
-    assert.equal(h.get('world-map-stage-title').textContent, STAGES[3].name);
-});
-
-test('a failed terrain image never applies its metadata over fallback art', async t => {
-    const h = mapDOM(t, true), metadata = fixtureMapMetadata(1, { '1-1': { x: .7, y: .2 } });
-    await h.finishAssets(metadata, false);
-    h.view.render(0, freshSave(), 0, '');
-    assert.equal(h.internal.assets.island, null);
-    assert.deepEqual(h.internal.marker, FALLBACK_POINTS[0]);
-});
-
-test('uppercase navigation at campaign boundaries is consumed without another selection', t => {
-    const h = mapDOM(t);
-    h.view.render(0, freshSave(), 0, '');
-    for (const key of ['A', 'W']) {
-        const event = h.root.dispatch('keydown', { key });
-        assert.equal(event.defaultPrevented, true);
-        assert.equal(event.propagationStopped, true);
+const actualMetadata = (world: number) => JSON.parse(readFileSync(new URL(`../public/assets/world/map/${dioramaName(world)}.meta.json`, import.meta.url), 'utf8'));
+async function readyConnection(h: ReturnType<typeof mapDOM>, save = openSave('1-5'), failAsset = '') {
+    const selection = STAGES.findIndex(stage => stage.id === save.selected);
+    h.view.render(selection, save, 0, ''); await finishWorld(h, 1, actualMetadata(1)); await finishWorld(h, 2, actualMetadata(2));
+    for (const name of ['coast-port-journey', 'journey-boat']) {
+        const data = JSON.parse(readFileSync(new URL(`../public/assets/world/map/${name}.meta.json`, import.meta.url), 'utf8'));
+        h.fetches.find(request => request.url.endsWith(`${name}.meta.json`))!.resolve({ ok: true, json: async () => data });
     }
-    h.view.render(29, freshSave(), 16, '');
-    for (const key of ['D', 'S']) assert.equal(h.root.dispatch('keydown', { key }).defaultPrevented, true);
-    assert.deepEqual(h.events.selected, []);
-});
+    await flushAssets();
+    const connection = JSON.parse(readFileSync(new URL('../public/assets/world/map/coast-port-journey.meta.json', import.meta.url), 'utf8'));
+    const boat = JSON.parse(readFileSync(new URL('../public/assets/world/map/journey-boat.meta.json', import.meta.url), 'utf8'));
+    for (const size of [connection.islands.costa.overlay, connection.islands.porto.overlay, boat.atlas]) {
+        const image = h.images.find(image => image.src.endsWith(size.path.split('/').pop()))!;
+        assert.ok(image, `Expected validated journey image ${size.path}`);
+        Object.assign(image, { naturalWidth: size.width, naturalHeight: size.height });
+        if (size.path.includes(failAsset) && failAsset) image.onerror?.(); else image.onload?.();
+    }
+    await flushAssets(); h.view.render(selection, save, 16, '');
+}
 
-test('later islands keep their wider camera framing and DPR changes do not need a resize event', t => {
-    const h = mapDOM(t, true);
-    h.view.render(0, freshSave(), 0, '');
-    const costaZoom = h.internal.camera.zoom;
-    h.view.render(5, freshSave(), 16, '');
-    assert.ok(h.internal.camera.zoom < costaZoom);
-    assert.equal(h.internal.camera.zoom, .82);
-    h.windowMock.devicePixelRatio = 1;
-    h.view.render(5, freshSave(), 32, '');
-    assert.equal(h.get('world-map-art').width, 1200);
-    assert.equal(h.get('world-map-art').height, 750);
-});
-
-test('ultrawide rendering stays within the 4 MP rounding budget and does not resize its backing canvas every frame', t => {
-    const h = mapDOM(t, true), canvas = h.get('world-map-art');
-    h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width: 5120, height: 1440 };
-    let width = 0, height = 0, writes = 0;
-    Object.defineProperties(canvas, {
-        width: { get: () => width, set: (value: number) => { width = value; writes++; } },
-        height: { get: () => height, set: (value: number) => { height = value; writes++; } }
-    });
-    h.view.render(0, freshSave(), 0, '');
-    assert.ok(width * height <= 4_000_000 + width + height, 'Allow only integer dimension rounding beyond four million backing pixels.');
-    assert.ok(width * height > 3_990_000, 'A large display should use the available resolution budget.');
-    assert.ok(h.internal.dpr < 1);
-    assert.equal(h.internal.screenDpr, 3);
-    assert.equal(writes, 2);
-    for (const time of [16, 32, 48, 64]) h.view.render(0, freshSave(), time, '');
-    assert.equal(writes, 2, 'A budget-limited DPR must not be mistaken for a changed device DPR each frame.');
-    h.windowMock.devicePixelRatio = 4;
-    h.view.render(0, freshSave(), 80, '');
-    h.view.render(0, freshSave(), 96, '');
-    assert.equal(writes, 4, 'An actual display DPR change updates the backing dimensions exactly once.');
-});
-
-test('WorldGame skips hidden-document map painting and resumes exactly when visible', t => {
-    const h = mapDOM(t), g = worldHarness();
-    h.documentMock.hidden = true;
-    g.game.render(); g.game.render();
-    assert.equal(g.mapRenders.length, 0);
-    assert.equal(g.calls.includes('startScene'), false);
-    h.documentMock.hidden = false;
-    g.game.render();
-    assert.equal(g.mapRenders.length, 1);
-    assert.equal(g.calls.includes('startScene'), false);
-});
-
-test('settling assets preserves the input selection before the next rendered frame', async t => {
-    const h = mapDOM(t);
-    h.view.render(3, freshSave(), 0, '');
-    await h.finishAssets();
-    // Asset promises can settle between a RAF and the next physical key/click event.
-    h.internal.nodes[3].click();
-    assert.equal(h.events.entered, 1, 'The selected node must remain selected before any subsequent render.');
-    h.root.dispatch('keydown', { key: 'ArrowRight' });
-    assert.deepEqual(h.events.selected, [4], 'Navigation must continue from 1-4, never the geometry invalidation sentinel.');
-});
-
-
-test('the global mute shortcut is still available while semantic map controls own focus', t => {
-    const h = mapDOM(t), input = new Input();
-    input.setMenuMode(true); h.view.render(0, freshSave(), 0, '');
-    const event = h.root.dispatch('keydown', { key: 'm', code: 'KeyM' });
-    input.update();
-    assert.equal(event.defaultPrevented, true);
-    assert.equal(input.consumeMute(), true);
-    assert.equal(input.consumeMute(), false);
-    h.root.dispatch('keyup', { key: 'm', code: 'KeyM' });
-});
-
-
-test('a secret from a later island never reuses Costa terrain coordinates for travel', async t => {
-    const h = mapDOM(t, true), metadata = fixtureMapMetadata();
-    metadata.secretRoute = [metadata.nodes['1-3'], { x: .1, y: .1 }, metadata.nodes['1-5']];
-    await h.finishAssets(metadata);
-    const save = freshSave(); save.secrets.push('2-3');
-    h.view.render(7, save, 0, ''); h.view.render(9, save, 100, '');
-    assert.equal(h.internal.travel.length, 1);
-    assert.deepEqual(h.internal.marker, FALLBACK_POINTS[4]);
-});
-
-
-test('two distinct directional presses before the next frame advance two stages without stale input', t => {
-    const h = mapDOM(t); h.view.render(0, freshSave(), 0, '');
-    h.root.dispatch('keydown', { key: 'ArrowRight' });
-    h.root.dispatch('keyup', { key: 'ArrowRight' });
-    h.root.dispatch('keydown', { key: 'ArrowRight' });
-    assert.deepEqual(h.events.selected, [1, 2]);
-});
-
-test('reduced-motion idle frames avoid all canvas work but selection, panorama, progress and resize repaint', t => {
-    const h = mapDOM(t, true), save = freshSave();
-    h.view.render(0, save, 0, ''); h.paint.calls.length = 0;
-    for (let frame = 1; frame <= 120; frame++) h.view.render(0, save, frame * 16, '');
-    assert.equal(h.paint.calls.length, 0, 'A static reduced-motion map should not copy its backing store 60 times per second.');
-    h.internal.overviewButton.click(); h.view.render(0, save, 2000, '');
-    assert.ok(h.paint.calls.some(call => call.method === 'clearRect'));
-    h.paint.calls.length = 0; save.seals.push('1-1:s1'); h.view.render(0, save, 2016, '');
-    assert.ok(h.paint.calls.some(call => call.method === 'clearRect'));
-    h.paint.calls.length = 0; h.internal.scene.bounds.width = 800; h.observers[0].callback(); h.view.render(0, save, 2032, '');
-    assert.ok(h.paint.calls.some(call => call.method === 'clearRect'));
-    h.paint.calls.length = 0; h.view.render(1, save, 2048, '');
-    assert.ok(h.paint.calls.some(call => call.method === 'clearRect'));
-});
-
-test('retargeting mid-walk preserves the eased foot position and visits the remaining authored bend', async t => {
-    const h = mapDOM(t), data = fixtureMapMetadata();
-    const bend = { x: .18, y: .42 };
-    data.routes['0:1'] = [data.nodes['1-1'], bend, data.nodes['1-2']];
-    data.routes['1:2'] = [data.nodes['1-2'], { x: .45, y: .50 }, data.nodes['1-3']];
-    await h.finishAssets(data);
-    h.view.render(0, freshSave(), 0, ''); h.view.render(1, freshSave(), 100, '');
-    h.view.render(1, freshSave(), 300, ''); const feet = { ...h.internal.marker };
-    h.view.render(2, freshSave(), 300, '');
-    assert.deepEqual(h.internal.marker, feet);
-    assert.ok(h.internal.travel.some((point: MapPoint) => point.x === bend.x && point.y === bend.y));
-    const firstArrival = h.internal.travel.findIndex((point: MapPoint) => point.x === data.nodes['1-2'].x && point.y === data.nodes['1-2'].y);
-    assert.ok(firstArrival > 0, 'Feka reaches the old edge endpoint before departing on the next edge.');
-});
-
-test('all selected node hitboxes and focus rings stay inside short-landscape map scenes', async t => {
-    const { mapToScreen } = await import('../src/adventure/WorldMapModel');
-    const { mapActorScale } = await import('../src/adventure/WorldMapArt');
-    const h = mapDOM(t, true);
-    const data = JSON.parse(readFileSync(new URL('../public/assets/world/map/costa-diorama.meta.json', import.meta.url), 'utf8'));
-    await h.finishAssets(data);
-    for (const [width, height] of [[844, 225], [667, 210], [896, 249], [390, 341], [390, 585]]) {
-        h.internal.scene.bounds = { ...h.internal.scene.bounds, width, height }; h.observers[0].callback();
-        for (let selected = 0; selected < 5; selected++) {
-            h.view.render(selected, freshSave(), 4000 + selected * 32, '');
-            const camera = h.internal.camera;
-            for (let node = 0; node < 5; node++) {
-                const p = mapToScreen(data.nodes[`1-${node + 1}`], camera);
-                const top = p.y - (width < 600 ? 54 : 58) - (node === selected ? mapActorScale(camera) * 26 + 4 : 0) - 8;
-                assert.ok(top >= 0, `${width}×${height} selected ${selected + 1}, node ${node + 1}: top ${top}`);
-                assert.ok(p.y + 8 <= height, `${width}×${height} node ${node + 1} bottom exceeds scene`);
-            }
+test('Costa to Porto travels through connected docks with Feka aboard, saves only final arrival and waits for Enter', async t => {
+    const h = mapDOM(t), save = openSave('1-5'); await readyConnection(h, save);
+    assert.equal(h.internal.connectionStatus, 'ready'); assert.equal(h.internal.connectionActive, true);
+    assert.ok(h.internal.network.nodes['1-junction']); assert.ok(h.internal.network.edges.some((edge: { id: string }) => edge.id === 'coast-port-sail'));
+    h.view.render(5, save, 100, ''); const modes = new Set<string>();
+    for (let time = 150; time <= 12000; time += 50) {
+        h.view.render(5, save, time, ''); const mode = h.internal.motionState(); modes.add(mode);
+        if (mode === 'sailing') {
+            assert.equal(h.internal.journey.arrived, '1-5'); assert.deepEqual(h.internal.currentBoat().foot, h.internal.marker);
+            assert.equal(h.view.enterSelected(5), false); assert.equal(h.internal.hud.stageButtons.every((button: Button) => button.hidden), true);
         }
     }
+    assert.ok(modes.has('walking')); assert.ok(modes.has('boarding')); assert.ok(modes.has('sailing')); assert.ok(modes.has('arriving')); assert.ok(modes.has('idle'));
+    assert.equal(h.internal.journey.arrived, '2-1'); assert.equal(h.events.entered, 0); assert.deepEqual(h.events.arrived, [5]);
+    assert.equal(h.internal.hud.enterButton.disabled, false); h.internal.hud.enterButton.click(); assert.equal(h.events.entered, 1);
 });
 
-test('map assets honor relative and subdirectory deployment bases', async () => {
-    const { mapAssetPrefix } = await import('../src/adventure/WorldMapArt');
-    for (const [base, expected] of [['/', '/assets/world/map/'], ['./', './assets/world/map/'], ['/game/', '/game/assets/world/map/'], ['/game', '/game/assets/world/map/']]) {
-        assert.equal(mapAssetPrefix(base), expected);
-        assert.equal(new URL(mapAssetPrefix(base) + 'costa-diorama.webp', 'https://example.com/game/index.html').pathname,
-            base === '/' ? '/assets/world/map/costa-diorama.webp' : '/game/assets/world/map/costa-diorama.webp');
+test('boat retargets continuously in both directions and never changes last arrival mid-crossing', async t => {
+    const h = mapDOM(t), save = openSave('1-5'); await readyConnection(h, save); h.view.render(5, save, 100, '');
+    let time = 100;
+    while (h.internal.motionState() !== 'sailing' && time < 5000) { time += 50; h.view.render(5, save, time, ''); }
+    for (let i = 0; i < 8; i++) { time += 50; h.view.render(5, save, time, ''); }
+    const feet = { ...h.internal.marker }; h.view.render(4, save, time, '');
+    assert.deepEqual(h.internal.marker, feet); assert.equal(h.internal.journey.legs[0].mode, 'sail'); assert.equal(h.internal.journey.legs[0].direction, -1);
+    assert.equal(h.internal.journey.arrived, '1-5'); assert.deepEqual(h.events.arrived, []);
+    h.view.render(5, save, time, ''); assert.deepEqual(h.internal.marker, feet); assert.equal(h.internal.journey.legs[0].direction, 1);
+    h.internal.hud.skipButton.click(); assert.equal(h.internal.journey.arrived, '2-1'); assert.equal(h.events.entered, 0);
+    h.view.render(0, save, time + 50, ''); assert.ok(h.internal.journey.legs.some((leg: { mode: string; direction: number }) => leg.mode === 'sail' && leg.direction === -1));
+    h.internal.hud.skipButton.click(); assert.equal(h.internal.journey.arrived, '1-1'); assert.equal(h.events.entered, 0);
+});
+
+test('loading a crossing keeps entry gated and cancelling or inspecting locked destinations remains safe', async t => {
+    const h = mapDOM(t), save = openSave('1-5'); h.view.render(4, save, 0, ''); h.view.render(5, save, 50, '');
+    assert.equal(h.internal.journey.blocked, 'no-route'); assert.equal(h.view.enterSelected(5), false); assert.match(h.get('world-map-hint').textContent, /Preparando/);
+    h.view.render(3, save, 100, ''); assert.equal(h.internal.journey.destination, '1-4'); assert.equal(h.internal.journey.blocked, null);
+    h.view.hide(); h.view.render(4, save, 5000, ''); assert.equal(h.internal.journey.arrived, '1-5'); assert.equal(h.internal.journey.destination, null);
+    const locked = freshSave(); h.view.hide(); h.view.render(0, locked, 5100, ''); h.view.render(5, locked, 5150, '');
+    assert.equal(h.internal.journey.blocked, 'unavailable'); assert.equal(h.internal.journey.arrived, '1-1'); assert.equal(h.view.enterSelected(5), false);
+});
+
+test('failed crossing art exposes a clear usable region fallback without inventing any water route', async t => {
+    const h = mapDOM(t, true), save = openSave('1-5'); await readyConnection(h, save, 'journey-boat.webp');
+    assert.equal(h.internal.connectionStatus, 'failed'); h.view.render(5, save, 100, '');
+    assert.equal(h.internal.journey.arrived, '2-1'); assert.equal(h.internal.journey.destination, null); assert.equal(h.events.entered, 0);
+    assert.ok(h.internal.network.edges.every((edge: { mode: string }) => edge.mode !== 'sail'));
+    assert.match(h.get('world-map-warning').textContent, /travessia visual não carregou/); assert.equal(h.internal.hud.enterButton.disabled, false);
+});
+
+test('a phase clear crossing and reloading mid-sail both begin at the played Costa arrival', async t => {
+    const h = mapDOM(t), save = openSave('1-5'); await readyConnection(h, save); h.view.hide();
+    h.view.render(5, save, 1000, '', '', { playedStage: '1-5', nextSelected: '2-1' });
+    assert.equal(h.internal.journey.arrived, '1-5'); assert.equal(h.internal.journey.destination, '2-1'); assert.equal(h.internal.motionState(), 'walking');
+    let time = 1000; while (h.internal.motionState() !== 'sailing' && time < 6000) { time += 50; h.view.render(5, save, time, ''); }
+    assert.equal(h.internal.motionState(), 'sailing'); h.view.hide(); h.view.render(4, save, 9000, '');
+    assert.equal(h.internal.journey.arrived, '1-5'); assert.equal(h.internal.journey.destination, null); assert.deepEqual(h.internal.marker, point(actualMetadata(1).nodes['1-5']));
+});
+
+test('vertical keyboard region selection matches docks and drawer rather than retaining a locked phase number', t => {
+    mapDOM(t); const h = worldHarness(); h.game.selection = 2; h.game.menuKey({ key: 'ArrowDown', repeat: false, target: null, preventDefault() {} });
+    assert.equal(h.game.selection, 5); h.game.menuKey({ key: 'ArrowUp', repeat: false, target: null, preventDefault() {} }); assert.equal(h.game.selection, 0);
+});
+
+test('boat heading changes at the same aspect-adjusted segment boundary as the sampled passenger path', async t => {
+    const { journeyPathSegment } = await import('../src/adventure/WorldMapView');
+    const { samplePath } = await import('../src/adventure/WorldMapModel');
+    const h = mapDOM(t), save = openSave('1-5'); await readyConnection(h, save);
+    const route: MapPoint[] = h.internal.connection.sailRoute;
+    const lengths = route.slice(1).map((point, index) => Math.hypot((point.x - route[index].x) * 1.6, point.y - route[index].y));
+    const total = lengths.reduce((sum, length) => sum + length, 0), boundary = (lengths[0] + lengths[1]) / total;
+    assert.equal(journeyPathSegment(route, boundary - 1e-6), 1); assert.equal(journeyPathSegment(route, boundary + 1e-6), 2);
+    const sampled = samplePath(route, boundary); assert.ok(Math.hypot(sampled.x - route[2].x, sampled.y - route[2].y) < 1e-8);
+    const edge = h.internal.network.edges.find((edge: { mode: string }) => edge.mode === 'sail'); h.media.matches = true;
+    for (const direction of [1, -1]) for (const progress of [boundary - 1e-6, boundary + 1e-6]) {
+        h.internal.journey.legs = [{ ...edge, direction, progress }]; h.internal.marker = samplePath(route, progress);
+        const segment = journeyPathSegment(route, progress), expected = direction === 1 ? h.internal.connection.segmentHeadings[segment]
+            : h.internal.connection.reverseSegmentHeadings[route.length - 2 - segment];
+        assert.equal(h.internal.currentBoat().frame.index, expected);
     }
 });
 
-test('first visiting Porto requests only its main pair and revisits never duplicate requests', t => {
-    const h = mapDOM(t, true);
-    assert.equal(h.images.length, 0);
-    assert.equal(h.fetches.length, 0);
-    h.view.render(7, freshSave(), 0, '');
-    assert.deepEqual(h.images.map(image => image.src), ['/assets/world/map/porto-diorama.webp']);
-    assert.deepEqual(h.fetches.map(request => request.url), ['/assets/world/map/porto-diorama.meta.json']);
-    assert.equal(h.internal.metadata.world, 2);
-    for (const selection of [8, 10, 29, 7]) h.view.render(selection, freshSave(), 16, '');
-    assert.equal(h.images.length, 1, 'Unconverted islands make no speculative image requests.');
-    assert.equal(h.fetches.length, 1, 'A pending request is cached on repeated visits too.');
-    assert.equal(h.get('world-map-stage-title').textContent, 'Entre os Contêineres');
-    assert.equal(h.get('world-map-stage-number').textContent, '2-3');
-    assert.equal(h.get('world-map-chapter').textContent, 'Caminho bloqueado');
-    assert.match(h.get('world-map-description').textContent, /passarelas de manutenção/);
-    const save = freshSave(); save.completed.push('1-5', '2-2');
-    h.view.render(7, save, 32, '');
-    assert.equal(h.get('world-map-chapter').textContent, 'O pátio de contêineres');
-});
-
-test('the main Costa pair becomes visible while optional scenery remains pending', async t => {
-    const h = mapDOM(t, true), data = fixtureMapMetadata(1, { '1-3': { x: .43, y: .69 } });
-    h.view.render(2, freshSave(), 0, '');
-    h.images[0].onload?.(); await flushAssets();
-    assert.equal(h.internal.assets.island, null, 'An image alone must not use guessed coordinates.');
-    h.fetches[0].resolve({ ok: true, json: async () => data }); await flushAssets();
-    assert.equal(h.internal.assets.island, h.images[0]);
-    assert.equal(h.internal.assets.shadow, null);
-    assert.equal(h.internal.assets.port, null);
-    h.paint.calls.length = 0;
-    h.view.render(2, freshSave(), 16, '');
-    assert.deepEqual(h.internal.marker, data.nodes['1-3']);
-    assert.ok(h.paint.calls.some(call => call.method === 'drawImage' && call.args[0] === h.images[0]));
-    const painted = h.paint.calls.length;
-    h.view.render(2, freshSave(), 32, '');
-    assert.equal(h.paint.calls.length, painted, 'Reduced-motion rendering becomes idle after the ready pair is painted.');
-    const shadow = h.images.find(image => image.src.endsWith('costa-shadow.webp'))!;
-    shadow.onload?.(); await flushAssets();
-    assert.equal(h.internal.geometryDirty, false, 'A late shadow must not restart the actor path.');
-    h.view.render(2, freshSave(), 48, '');
-    assert.ok(h.paint.calls.length > painted, 'A newly available optional layer invalidates reduced-motion paint.');
-    assert.deepEqual(h.internal.marker, data.nodes['1-3']);
-});
-
-test('metadata settling before the main image keeps fallback until the matching image arrives', async t => {
-    const h = mapDOM(t, true), data = fixtureMapMetadata(2, { '2-5': { x: .6, y: .42 } });
-    h.view.render(9, freshSave(), 0, '');
-    h.fetches[0].resolve({ ok: true, json: async () => data }); await flushAssets();
-    assert.equal(h.internal.assets.island, null);
-    assert.deepEqual(h.internal.marker, FALLBACK_POINTS[4]);
-    h.images[0].onload?.(); await flushAssets();
-    h.view.render(9, freshSave(), 16, '');
-    assert.equal(h.internal.assets.island, h.images[0]);
-    assert.deepEqual(h.internal.marker, data.nodes['2-5']);
-});
-
-test('late completions stay in their own island cache when the player switches before loading finishes', async t => {
-    const h = mapDOM(t, true), costa = fixtureMapMetadata(1, { '1-1': { x: .24, y: .66 } }),
-        porto = fixtureMapMetadata(2, { '2-3': { x: .47, y: .68 } });
-    h.view.render(0, freshSave(), 0, '');
-    h.view.render(7, freshSave(), 16, '');
-    await finishWorld(h, 1, costa);
-    assert.equal(h.internal.assets.island, null, 'An obsolete Costa completion cannot replace visible Porto fallback.');
-    assert.equal(h.internal.metadata.world, 2);
-    assert.equal(h.internal.geometryDirty, false);
-    await finishWorld(h, 2, porto);
-    h.view.render(7, freshSave(), 32, '');
-    const portoImage = h.internal.assets.island;
-    assert.deepEqual(h.internal.marker, porto.nodes['2-3']);
-    const counts = [h.images.length, h.fetches.length], painted = h.paint.calls.length;
-    h.images.find(image => image.src.endsWith('costa-shadow.webp'))!.onload?.(); await flushAssets();
-    h.view.render(7, freshSave(), 48, '');
-    assert.equal(h.paint.calls.length, painted, 'Old-island optional scenery does not wake an idle current scene.');
-    assert.equal(h.internal.assets.island, portoImage);
-    h.view.render(0, freshSave(), 64, '');
-    assert.equal(h.internal.metadata.world, 1);
-    assert.deepEqual(h.internal.marker, costa.nodes['1-1']);
-    assert.ok(h.internal.assets.shadow);
-    h.view.render(7, freshSave(), 80, '');
-    assert.equal(h.internal.assets.island, portoImage);
-    assert.deepEqual([h.images.length, h.fetches.length], counts, 'Both ready pairs are immediately reusable without new network requests.');
-});
-
-test('failed Porto pairs keep its fallback and do not poison a ready Costa cache', async t => {
-    const incomplete = fixtureMapMetadata(2); delete incomplete.nodes['2-4'];
-    for (const [label, metadata, imageSuccess] of [
-        ['wrong-world metadata', fixtureMapMetadata(), true], ['incomplete metadata', incomplete, true],
-        ['invalid silhouette bounds', { ...fixtureMapMetadata(2), artBounds: { top: .9, bottom: .1 } }, true],
-        ['missing image', fixtureMapMetadata(2), false],
-    ] as const) await t.test(label, async child => {
-        const h = mapDOM(child, true);
-        h.view.render(0, freshSave(), 0, ''); await finishWorld(h, 1);
-        h.view.render(0, freshSave(), 16, ''); const costaImage = h.internal.assets.island;
-        h.view.render(5, freshSave(), 32, ''); await finishWorld(h, 2, metadata, imageSuccess);
-        h.view.render(5, freshSave(), 48, '');
-        assert.equal(h.internal.assets.island, null);
-        assert.equal(h.internal.metadata.world, 2);
-        assert.deepEqual(h.internal.marker, FALLBACK_POINTS[0]);
-        h.view.render(0, freshSave(), 64, '');
-        assert.equal(h.internal.assets.island, costaImage);
-        h.view.render(5, freshSave(), 80, '');
-        assert.equal(h.fetches.length, 2, 'A failed optional island is not retried every frame or visit.');
-    });
-});
-
-test('Porto local routes offset into stages 5–9 and its secret never borrows Costa progress', async t => {
-    const h = mapDOM(t, true), data = fixtureMapMetadata(2), save = freshSave();
-    for (let n = 1; n <= 5; n++) data.nodes[`2-${n}`] = { x: .2 + n * .1, y: n % 2 ? .66 : .46 };
-    for (let n = 0; n < 4; n++) data.routes[`${n}:${n + 1}`] = [data.nodes[`2-${n + 1}`], { x: .31 + n * .1, y: .55 }, data.nodes[`2-${n + 2}`]];
-    data.secretRoute = [data.nodes['2-3'], { x: .63, y: .73 }, data.nodes['2-5']];
-    h.view.render(5, save, 0, ''); await finishWorld(h, 2, data);
-    h.view.render(5, save, 16, ''); h.view.render(6, save, 32, '');
-    assert.deepEqual(h.internal.travel, data.routes['0:1']);
-    save.secrets.push('1-3');
-    h.view.render(7, save, 2000, ''); h.view.render(9, save, 4000, '');
-    assert.deepEqual(h.internal.travel, [...data.routes['2:3'], ...data.routes['3:4'].slice(1)]);
-    save.secrets.push('2-3');
-    h.view.render(7, save, 6000, ''); h.view.render(9, save, 8000, '');
-    assert.deepEqual(h.internal.travel, data.secretRoute);
-    assert.deepEqual(h.internal.marker, data.nodes['2-5']);
-    assert.match(h.get('world-map-route-hint').textContent, /Atalho 3 → 5 descoberto/);
-    const strokes: unknown[] = [];
-    Object.defineProperty(h.paint.context, 'strokeStyle', { configurable: true, set: value => strokes.push(value) });
-    save.completed.push('2-1');
-    h.view.render(9, save, 8016, '');
-    assert.ok(strokes.includes('#fff4b6c4'), 'Porto trail completion reads 2-1 rather than Costa’s 1-1.');
-    assert.ok(h.paint.calls.some(call => call.method === 'drawImage' && call.args[0] === h.images[0]), 'The painter draws Porto main art.');
-});
-
-test('late optional Costa art preserves the current walk rather than relocating or restarting it', async t => {
-    const h = mapDOM(t), data = fixtureMapMetadata();
-    data.routes['0:1'] = [data.nodes['1-1'], { x: .19, y: .5 }, data.nodes['1-2']];
-    h.view.render(0, freshSave(), 0, ''); await finishWorld(h, 1, data);
-    h.view.render(0, freshSave(), 100, ''); h.view.render(1, freshSave(), 116, '');
-    const started = h.internal.travelStarted, travel = structuredClone(h.internal.travel);
-    h.images.find(image => image.src.endsWith('porto-distant.webp'))!.onload?.(); await flushAssets();
-    h.view.render(1, freshSave(), 132, '');
-    assert.equal(h.internal.travelStarted, started);
-    assert.deepEqual(h.internal.travel, travel);
-    assert.notDeepEqual(h.internal.marker, data.nodes['1-2'], 'Feka continues its authored walk.');
-});
-
-test('Porto without silhouette metadata reserves the full vertical art canvas and exported bounds override it', async t => {
-    const { mapToScreen } = await import('../src/adventure/WorldMapModel');
-    for (const bounds of [undefined, { top: .12, bottom: .91 }]) await t.test(bounds ? 'exported bounds' : 'conservative bounds', async child => {
-        const h = mapDOM(child, true), data = fixtureMapMetadata(2);
-        data.artBounds = bounds;
-        h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width: 1180, height: 555 };
-        h.view.render(5, freshSave(), 0, ''); await finishWorld(h, 2, data);
-        h.view.render(5, freshSave(), 16, '');
-        const camera = h.internal.camera, silhouette = bounds ?? { top: 0, bottom: 1 };
-        assert.ok(mapToScreen({ x: .5, y: silhouette.top }, camera).y >= 80 - 1e-6);
-        assert.ok(mapToScreen({ x: .5, y: silhouette.bottom }, camera).y <= 543 + 1e-6);
-        if (!bounds) assert.ok(camera.zoom < .835, 'Do not silently substitute Costa’s narrower silhouette.');
-    });
-});
-
-test('panorama visibly zooms out after close framing in short landscape and compact portrait', async t => {
-    const { mapToScreen } = await import('../src/adventure/WorldMapModel');
-    const { mapActorScale } = await import('../src/adventure/WorldMapArt');
-    const h = mapDOM(t, true), save = freshSave();
-    const data = JSON.parse(readFileSync(new URL('../public/assets/world/map/costa-diorama.meta.json', import.meta.url), 'utf8'));
-    await h.finishAssets(data);
-    let time = 4000;
-    // Actual 846 × 392 and 400 × 606 viewport sizes, excluding their CSS footers.
-    for (const [width, height] of [[846, 227], [400, 347]]) {
-        h.internal.scene.bounds = { ...h.internal.scene.bounds, width, height }; h.observers[0].callback();
-        for (const selected of [0, 1, 4]) {
-            const assertPinsSafe = () => {
-                const camera = h.internal.camera;
-                for (let node = 0; node < 5; node++) {
-                    const p = mapToScreen(data.nodes[`1-${node + 1}`], camera);
-                    const top = p.y - (width < 600 ? 54 : 58) - (node === selected ? mapActorScale(camera) * 26 + 4 : 0) - 8;
-                    assert.ok(top >= -1e-6, `${width}×${height}, selected ${selected + 1}: node ${node + 1} clips above scene`);
-                    assert.ok(p.y + 8 <= height + 1e-6, `${width}×${height}: node ${node + 1} clips below scene`);
-                    assert.ok(p.x - 31 >= 0 && p.x + 31 <= width, 'Node and focus ring stay inside horizontal bounds.');
-                }
-            };
-            h.view.render(selected, save, time += 16, '');
-            const closeZoom = h.internal.camera.zoom;
-            assertPinsSafe();
-            h.internal.overviewButton.click();
-            h.view.render(selected, save, time += 16, '');
-            assert.equal(h.internal.overviewButton.getAttribute('aria-pressed'), 'true');
-            assert.ok(h.internal.camera.zoom < closeZoom * .9,
-                `${width}×${height}, selected ${selected + 1}: panorama ${h.internal.camera.zoom} must visibly shrink close zoom ${closeZoom}`);
-            assertPinsSafe();
-            h.internal.overviewButton.click();
-            h.view.render(selected, save, time += 16, '');
-            assert.equal(h.internal.overviewButton.getAttribute('aria-pressed'), 'false');
-            assert.ok(Math.abs(h.internal.camera.zoom - closeZoom) < 1e-6, 'Returning from panorama restores the fitted close zoom.');
-            assertPinsSafe();
+test('atlas camera eases overview and channel transitions while keeping boat bounds inside the measured scene', async t => {
+    const { atlasBoatBounds } = await import('../src/adventure/WorldAtlasArt');
+    const h = mapDOM(t), save = openSave('1-5'); await readyConnection(h, save); tick(h, 4, save, 16, 1000);
+    const before = structuredClone(h.internal.camera); h.get('world-map-overview').click(); h.view.render(4, save, 1032, '');
+    const middle = structuredClone(h.internal.camera); tick(h, 4, save, 1032, 2000); const after = structuredClone(h.internal.camera);
+    assert.ok(middle.zoom < before.zoom && middle.zoom > after.zoom, 'Overview zoom must move through an intermediate frame.');
+    assert.ok(Math.hypot(middle.center.x - after.center.x, middle.center.y - after.center.y) > .0001);
+    h.get('world-map-overview').click(); tick(h, 4, save, 3032, 2000);
+    h.view.render(5, save, 5050, ''); let sawChannel = false;
+    for (let time = 5100; time <= 15000; time += 50) {
+        h.view.render(5, save, time, ''); const mode = h.internal.motionState();
+        if (mode === 'sailing' || mode === 'boarding' || mode === 'arriving') {
+            sawChannel = true; const boat = h.internal.currentBoat(), bounds = atlasBoatBounds(boat.foot, boat.frame);
+            const top = mapToScreen({ x: bounds.left, y: bounds.top }, h.internal.camera), bottom = mapToScreen({ x: bounds.right, y: bounds.bottom }, h.internal.camera);
+            assert.ok(top.x >= 16 - .001 && bottom.x <= h.internal.width - 16 + .001);
+            assert.ok(top.y >= h.internal.frameInsets.top - .001 && bottom.y <= h.internal.height - h.internal.frameInsets.bottom + .001);
         }
     }
+    assert.ok(sawChannel);
 });
 
-test('the illustrated HUD exposes meaningful labels and preserves collected, locked, and encounter states', t => {
-    const h = mapDOM(t, true), save = freshSave();
-    h.view.render(0, save, 100, '');
-    assert.equal(h.get('world-map-overview').getAttribute('aria-label'), 'Ver panorama');
-    assert.equal(h.get('world-map-menu').getAttribute('aria-label'), 'Menu');
-    assert.match(h.get('world-map-play').getAttribute('aria-label')!, /1-1: Pé na Estrada/);
-    assert.equal(h.get('world-map-total').getAttribute('aria-label'), '0 de 30 fases concluídas, 0 de 72 selos');
-    assert.equal(h.get('world-map-icon-coast').getAttribute('aria-hidden'), 'true');
-    assert.equal(h.get('world-map-icon-coast').getAttribute('focusable'), 'false');
-    assert.equal(h.get('world-map-route-hint').hidden, true);
-    save.completed.push('1-1'); save.seals.push('1-1:s1', '1-1:s3');
-    h.view.render(0, save, 200, '');
-    assert.equal(h.internal.sealSlots.filter((slot: Element) => slot.classList.contains('is-collected')).length, 2);
-    assert.equal(h.get('world-map-seals').getAttribute('aria-label'), '2 de 3 selos encontrados');
-    assert.equal(h.get('world-map-footer').classList.contains('is-completed'), true);
-    h.view.render(4, save, 300, '');
-    assert.equal(h.get('world-map-seals').hidden, true);
-    assert.equal(h.get('world-map-encounter').hidden, false);
-    assert.equal(h.get('world-map-footer').classList.contains('is-locked'), true);
-    assert.equal(h.get('world-map-route-hint').hidden, false);
-    assert.equal(h.get('world-map-play').disabled, true);
-    h.get('world-map-overview').click();
-    assert.equal(h.get('world-map-overview').getAttribute('aria-label'), 'Aproximar ilha');
-    assert.equal(h.get('world-map-overview').getAttribute('aria-pressed'), 'true');
-    for (let i = 0; i < 6; i++) {
-        h.view.render(i * 5, save, 400 + i, '');
-        assert.equal(h.internal.worlds[i].getAttribute('aria-current'), 'location');
-        assert.match(h.internal.worlds[i].getAttribute('aria-label'), new RegExp(`Ilha ${i + 1}:`));
-        assert.equal(h.get('world-map-island-emblem').children.length, 1, 'The island emblem replaces rather than accumulates SVGs.');
-    }
+test('camera framing snaps after resize and for reduced motion without moving either island', async t => {
+    const h = mapDOM(t), save = openSave('1-5'); await readyConnection(h, save); tick(h, 4, save, 16, 1000);
+    h.get('world-map-scene').bounds.width = 400; h.get('world-map-scene').bounds.height = 606; h.observers[0].callback(); h.view.render(4, save, 1100, '');
+    const resized = structuredClone(h.internal.camera); h.media.matches = true; h.media.dispatch('change'); h.view.render(4, save, 1116, '');
+    assert.deepEqual(h.internal.camera, resized, 'Resize already frames the target immediately.');
+    const node = { ...h.internal.network.nodes['2-1'] }; h.get('world-map-overview').click(); h.view.render(4, save, 1132, ''); const overview = structuredClone(h.internal.camera);
+    h.view.render(4, save, 1148, ''); assert.deepEqual(h.internal.camera, overview); assert.deepEqual(h.internal.network.nodes['2-1'], node);
 });
 
-test('measured HUD bounds reserve the lighthouse and dock on full-canvas desktop, mobile, landscape and editor layouts', async t => {
-    const h = mapDOM(t, true);
-    const data = JSON.parse(readFileSync(new URL('../public/assets/world/map/costa-diorama.meta.json', import.meta.url), 'utf8'));
-    await h.finishAssets(data);
-    for (const [width, height, headerBottom, footerTop] of [[1180, 757, 94, 563], [400, 606, 92, 425],
-        [844, 392, 68, 307], [840, 757, 94, 563], [506, 392, 59, 270], [320, 568, 92, 377]]) {
-        h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width, height };
-        h.get('world-map-header').bounds = { x: 12, y: 12, left: 12, top: 12, width: 230, height: headerBottom - 12 };
-        h.get('world-map-tools').bounds = { x: width - 110, y: 14, left: width - 110, top: 14, width: 96, height: headerBottom - 14 };
-        h.get('world-map-footer').bounds = { x: 10, y: footerTop, left: 10, top: footerTop, width: width - 20, height: height - footerTop - 9 };
-        h.observers[0].callback();
-        for (let stage = 0; stage < 5; stage++) {
-            h.view.render(stage, freshSave(), 2000 + stage * 100, '');
-            const camera = h.internal.camera;
-            const roof = mapToScreen({ x: .5, y: COSTA_ART_BOUNDS.top }, camera).y;
-            const dock = mapToScreen({ x: .5, y: COSTA_ART_BOUNDS.bottom }, camera).y;
-            assert.ok(roof >= headerBottom + 14 - .001, `The lighthouse clears the ${width} × ${height} pennant.`);
-            assert.ok(dock <= footerTop - 12 + .001, `The dock clears the ${width} × ${height} boarding ticket.`);
-        }
-    }
-    const before = h.internal.camera.zoom;
-    h.get('world-map-footer').bounds.top -= 32;
-    h.observers[0].callback();
-    h.view.render(4, freshSave(), 3000, '');
-    assert.ok(h.internal.camera.zoom < before, 'A wrapping title or larger text reflows the measured scene even in reduced motion.');
-});
-
-test('both shipped dioramas retain measured HUD clearance after cached island switches and Porto font reflow', async t => {
-    const h = mapDOM(t, true);
-    const metadata = [1, 2].map(world => JSON.parse(readFileSync(new URL(`../public/assets/world/map/${dioramaName(world)}.meta.json`, import.meta.url), 'utf8')));
-    h.view.render(0, freshSave(), 0, ''); await finishWorld(h, 1, metadata[0]);
-    h.view.render(5, freshSave(), 16, ''); await finishWorld(h, 2, metadata[1]);
-    assert.deepEqual(h.observers[0].targets.map(target => target.className.split(' ')[0]), ['world-map-scene', 'world-map-header', 'world-map-tools', 'world-map-footer']);
-    for (const [width, height, headerBottom, footerTop] of [[1180, 757, 94, 563], [400, 606, 92, 425],
-        [844, 392, 68, 307], [506, 392, 59, 270], [640, 606, 92, 425], [641, 606, 92, 425], [320, 568, 92, 377]]) {
-        h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width, height };
-        h.get('world-map-header').bounds = { x: 12, y: 12, left: 12, top: 12, width: 230, height: headerBottom - 12 };
-        h.get('world-map-tools').bounds = { x: width - 110, y: 14, left: width - 110, top: 14, width: 96, height: headerBottom - 14 };
-        h.get('world-map-footer').bounds = { x: 10, y: footerTop, left: 10, top: footerTop, width: width - 20, height: height - footerTop - 9 };
-        h.observers[0].callback();
-        for (const world of [1, 2]) for (let stage = 0; stage < 5; stage++) {
-            h.paint.calls.length = 0;
-            h.view.render((world - 1) * 5 + stage, freshSave(), 2000 + stage * 100, '');
-            const camera = h.internal.camera, silhouette = metadata[world - 1].artBounds ?? COSTA_ART_BOUNDS;
-            assert.ok(mapToScreen({ x: .5, y: silhouette.top }, camera).y >= headerBottom + 14 - .001);
-            assert.ok(mapToScreen({ x: .5, y: silhouette.bottom }, camera).y <= footerTop - 12 + .001);
-            assert.equal(h.internal.metadata.world, world);
-            assert.match(h.internal.assets.island.src, new RegExp(`${dioramaName(world)}\\.webp$`));
-            assert.ok(h.paint.calls.some(call => call.method === 'drawImage' && call.args[0] === h.internal.assets.island));
-        }
-    }
-    const before = h.internal.camera.zoom, bottomInset = h.internal.frameInsets.bottom;
-    h.paint.calls.length = 0;
-    h.get('world-map-footer').bounds.top -= 24;
-    h.observers[0].callback(); h.view.render(9, freshSave(), 4000, '');
-    assert.equal(h.internal.frameInsets.bottom, bottomInset + 24, 'Porto remeasures a larger boarding ticket in reduced motion.');
-    assert.ok(h.paint.calls.length > 0);
-    assert.ok(h.internal.camera.zoom <= before, 'Use existing spare space before shrinking the diorama further.');
-    assert.ok(mapToScreen({ x: .5, y: metadata[1].artBounds.bottom }, h.internal.camera).y <= h.get('world-map-footer').bounds.top - 12 + .001);
-    assert.equal(h.fetches.length, 2, 'HUD layout changes and island switches retain both cached pairs.');
-});
-
-test('the runtime uses compact framing through 640px and desktop framing from 641px', async t => {
-    const { frameMapPins } = await import('../src/adventure/WorldMapArt');
-    const h = mapDOM(t, true), selected = 14, points = Object.fromEntries(FALLBACK_POINTS.map((p, i) => [10 + i, p]));
-    for (const width of [620, 640, 641]) {
-        const height = 392, compact = width <= 640, fitHeight = Math.min(width / 1.6, height), focus = FALLBACK_POINTS[4];
-        h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width, height };
-        h.get('world-map-header').bounds = { x: 12, y: 12, left: 12, top: 12, width: 230, height: 47 };
-        h.get('world-map-tools').bounds = { x: width - 110, y: 14, left: width - 110, top: 14, width: 96, height: 44 };
-        h.get('world-map-footer').bounds = { x: 10, y: 270, left: 10, top: 270, width: width - 20, height: 113 };
-        h.observers[0].callback(); h.view.render(selected, freshSave(), 4000, '');
-        const zoom = Math.min(.82, compact ? Math.min(1.25, Math.max(.45, (height - 140) / (fitHeight * .93))) : 1.04);
-        const expected = frameMapPins({ width, height, zoom, center: { x: .5 + (focus.x - .5) * .12,
-            y: .52 + (focus.y - .52) * .035 - (compact ? 60 / (fitHeight * zoom) : 0) } },
-        points, selected, compact, undefined, { top: 73, bottom: 134 });
-        assert.ok(Math.abs(h.internal.camera.zoom - expected.zoom) < 1e-8);
-        assert.ok(Math.abs(h.internal.camera.center.y - expected.center.y) < 1e-8);
-    }
+test('arrow selection keeps keyboard focus and Enter on that sign obeys arrival without changing mouse or Space selection', async t => {
+    const h = mapDOM(t), save = openSave(); await readyLand(h, save); h.root.dispatch('keydown', { key: 'ArrowRight' });
+    const sign = h.internal.hud.stageButtons[1] as Button; assert.equal(h.active, sign);
+    const traveling = sign.dispatch('keydown', { key: 'Enter' }); assert.equal(traveling.defaultPrevented, true); assert.equal(h.events.entered, 0);
+    tick(h, 1, save, 16, 1000); assert.equal(h.active, sign); assert.equal(h.internal.journey.arrived, '1-2');
+    const space = sign.dispatch('keydown', { key: ' ' }); assert.equal(space.defaultPrevented, false, 'Space keeps native sign selection.');
+    sign.click(); sign.click(); assert.equal(h.events.entered, 0, 'Repeated mouse/touch selection never starts gameplay.');
+    const tab = sign.dispatch('keydown', { key: 'Tab' }); assert.equal(tab.defaultPrevented, false);
+    const entered = sign.dispatch('keydown', { key: 'Enter' }); assert.equal(entered.defaultPrevented, true); assert.equal(entered.propagationStopped, true);
+    assert.equal(h.events.entered, 1); sign.dispatch('keydown', { key: 'Enter' }); assert.equal(h.events.entered, 1);
 });

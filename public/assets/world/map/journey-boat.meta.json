@@ -1,0 +1,382 @@
+{
+  "version": 1,
+  "frame": {
+    "width": 384,
+    "height": 256,
+    "widthInMap": 0.201456311
+  },
+  "orthoScale": 4.15,
+  "worldDimensions": {
+    "length": 2.98,
+    "beam": 1.22,
+    "height": 1.52
+  },
+  "passenger": {
+    "heightWorld": 1.02,
+    "widthWorld": 0.48,
+    "footWorld": [
+      0.22,
+      0,
+      0.6
+    ],
+    "openDeckBounds": {
+      "xMin": -0.3,
+      "xMax": 0.72,
+      "yMin": -0.43,
+      "yMax": 0.43
+    },
+    "drawOrder": [
+      "base",
+      "Feka at passengerFoot",
+      "foreground"
+    ]
+  },
+  "frames": [
+    {
+      "index": 0,
+      "worldHeadingRadians": 0.0,
+      "screenHeadingRadians": 0.290746,
+      "passengerFoot": {
+        "x": 0.54645,
+        "y": 0.505685
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.657702
+      },
+      "passengerWorld": [
+        0.2199999988079071,
+        0.0,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 23,
+      "sourceRects": {
+        "base": {
+          "x": 0,
+          "y": 0,
+          "width": 384,
+          "height": 256
+        },
+        "foreground": {
+          "x": 0,
+          "y": 512,
+          "width": 384,
+          "height": 256
+        }
+      },
+      "passengerFootPixels": {
+        "x": 209.8368,
+        "y": 129.4554
+      },
+      "waterlineAnchorPixels": {
+        "x": 192.0,
+        "y": 168.3717
+      },
+      "widthInMap": 0.201456311
+    },
+    {
+      "index": 1,
+      "worldHeadingRadians": 0.785398,
+      "screenHeadingRadians": -0.156654,
+      "passengerFoot": {
+        "x": 0.55091,
+        "y": 0.472774
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.657702
+      },
+      "passengerWorld": [
+        0.15556347370147705,
+        0.15556350350379944,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 30,
+      "sourceRects": {
+        "base": {
+          "x": 384,
+          "y": 0,
+          "width": 384,
+          "height": 256
+        },
+        "foreground": {
+          "x": 384,
+          "y": 512,
+          "width": 384,
+          "height": 256
+        }
+      },
+      "passengerFootPixels": {
+        "x": 211.5494,
+        "y": 121.0301
+      },
+      "waterlineAnchorPixels": {
+        "x": 192.0,
+        "y": 168.3717
+      },
+      "widthInMap": 0.201456311
+    },
+    {
+      "index": 2,
+      "worldHeadingRadians": 1.570796,
+      "screenHeadingRadians": -0.779954,
+      "passengerFoot": {
+        "x": 0.525547,
+        "y": 0.44693
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.657702
+      },
+      "passengerWorld": [
+        1.66095386333609e-08,
+        0.2199999988079071,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 27,
+      "sourceRects": {
+        "base": {
+          "x": 768,
+          "y": 0,
+          "width": 384,
+          "height": 256
+        },
+        "foreground": {
+          "x": 768,
+          "y": 512,
+          "width": 384,
+          "height": 256
+        }
+      },
+      "passengerFootPixels": {
+        "x": 201.81,
+        "y": 114.4141
+      },
+      "waterlineAnchorPixels": {
+        "x": 192.0,
+        "y": 168.3717
+      },
+      "widthInMap": 0.201456311
+    },
+    {
+      "index": 3,
+      "worldHeadingRadians": 2.356194,
+      "screenHeadingRadians": -2.060989,
+      "passengerFoot": {
+        "x": 0.48522,
+        "y": 0.44329
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.657702
+      },
+      "passengerWorld": [
+        -0.15556353330612183,
+        0.15556344389915466,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 26,
+      "sourceRects": {
+        "base": {
+          "x": 1152,
+          "y": 0,
+          "width": 384,
+          "height": 256
+        },
+        "foreground": {
+          "x": 1152,
+          "y": 512,
+          "width": 384,
+          "height": 256
+        }
+      },
+      "passengerFootPixels": {
+        "x": 186.3245,
+        "y": 113.4822
+      },
+      "waterlineAnchorPixels": {
+        "x": 192.0,
+        "y": 168.3717
+      },
+      "widthInMap": 0.201456311
+    },
+    {
+      "index": 4,
+      "worldHeadingRadians": 3.141593,
+      "screenHeadingRadians": -2.850846,
+      "passengerFoot": {
+        "x": 0.45355,
+        "y": 0.463988
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.657702
+      },
+      "passengerWorld": [
+        -0.2199999988079071,
+        1.9233011627761698e-08,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 29,
+      "sourceRects": {
+        "base": {
+          "x": 0,
+          "y": 256,
+          "width": 384,
+          "height": 256
+        },
+        "foreground": {
+          "x": 0,
+          "y": 768,
+          "width": 384,
+          "height": 256
+        }
+      },
+      "passengerFootPixels": {
+        "x": 174.1632,
+        "y": 118.7809
+      },
+      "waterlineAnchorPixels": {
+        "x": 192.0,
+        "y": 168.3717
+      },
+      "widthInMap": 0.201456311
+    },
+    {
+      "index": 5,
+      "worldHeadingRadians": 3.926991,
+      "screenHeadingRadians": 2.984938,
+      "passengerFoot": {
+        "x": 0.44909,
+        "y": 0.496898
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.657702
+      },
+      "passengerWorld": [
+        -0.15556353330612183,
+        -0.15556344389915466,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 30,
+      "sourceRects": {
+        "base": {
+          "x": 384,
+          "y": 256,
+          "width": 384,
+          "height": 256
+        },
+        "foreground": {
+          "x": 384,
+          "y": 768,
+          "width": 384,
+          "height": 256
+        }
+      },
+      "passengerFootPixels": {
+        "x": 172.4506,
+        "y": 127.2059
+      },
+      "waterlineAnchorPixels": {
+        "x": 192.0,
+        "y": 168.3717
+      },
+      "widthInMap": 0.201456311
+    },
+    {
+      "index": 6,
+      "worldHeadingRadians": 4.712389,
+      "screenHeadingRadians": 2.361639,
+      "passengerFoot": {
+        "x": 0.474452,
+        "y": 0.522742
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.657702
+      },
+      "passengerWorld": [
+        1.66095386333609e-08,
+        -0.2199999988079071,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 25,
+      "sourceRects": {
+        "base": {
+          "x": 768,
+          "y": 256,
+          "width": 384,
+          "height": 256
+        },
+        "foreground": {
+          "x": 768,
+          "y": 768,
+          "width": 384,
+          "height": 256
+        }
+      },
+      "passengerFootPixels": {
+        "x": 182.1896,
+        "y": 133.822
+      },
+      "waterlineAnchorPixels": {
+        "x": 192.0,
+        "y": 168.3717
+      },
+      "widthInMap": 0.201456311
+    },
+    {
+      "index": 7,
+      "worldHeadingRadians": 5.497787,
+      "screenHeadingRadians": 1.080603,
+      "passengerFoot": {
+        "x": 0.51478,
+        "y": 0.526382
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.657702
+      },
+      "passengerWorld": [
+        0.15556341409683228,
+        -0.1555635780096054,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 27,
+      "sourceRects": {
+        "base": {
+          "x": 1152,
+          "y": 256,
+          "width": 384,
+          "height": 256
+        },
+        "foreground": {
+          "x": 1152,
+          "y": 768,
+          "width": 384,
+          "height": 256
+        }
+      },
+      "passengerFootPixels": {
+        "x": 197.6755,
+        "y": 134.7538
+      },
+      "waterlineAnchorPixels": {
+        "x": 192.0,
+        "y": 168.3717
+      },
+      "widthInMap": 0.201456311
+    }
+  ],
+  "source": "tools/diorama/render_journey_boat.py",
+  "note": "Original low-cabin working launch. Transparent fixed-size frames. Base contains the complete boat; nearer solid geometry is repeated on foreground to occlude actor feet correctly.",
+  "atlas": {
+    "path": "/assets/world/map/journey-boat.webp",
+    "width": 1536,
+    "height": 1024,
+    "bytes": 133830,
+    "sha256": "c4abc0bdf515ff89a88f4e63464749c4acd1e794797fe8f6ee9b648bdf9c082a"
+  },
+  "passengerPixelScale": 3
+}

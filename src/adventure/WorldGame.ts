@@ -19,8 +19,8 @@ import { BossEncounter } from './BossEncounter';
 import { WorldTutorial } from './WorldTutorial';
 import { bossFrame, WORLD_PALETTE } from './WorldAssets';
 import { clamp, overlaps, type AdventureStage, type Dialogue } from './types';
-import { WorldMapView } from './WorldMapView';
-import { clampMapSelection, moveMapSelection } from './WorldMapModel';
+import { WorldMapView, moveJourneySelection } from './WorldMapView';
+import { clampMapSelection } from './WorldMapModel';
 type Screen = 'title' | 'intro' | 'map' | 'playing' | 'paused' | 'dialogue' | 'clear' | 'ending' | 'gallery' | 'settings';
 interface Button extends Rect {
     run: () => void;
@@ -76,6 +76,8 @@ export class WorldGame {
     private introPage = 0;
     private galleryWorld = 0;
     private mapView?: WorldMapView;
+    private mapReturn?: { playedStage: string; nextSelected: string };
+    private nextMapSelection?: string;
     private mapCanvas: HTMLCanvasElement;
     private deathFeedbackStarted = false;
     constructor(canvas: HTMLCanvasElement, private readonly ephemeral = false) {
@@ -137,7 +139,7 @@ export class WorldGame {
         e.preventDefault();
         this.audio.unlock();
         if (this.state === 'map') {
-            const next = moveMapSelection(this.selection, e.key);
+            const next = moveJourneySelection(this.selection, e.key);
             if (next !== this.selection) this.selectMap(next);
             if (e.key === 'Enter' || e.key === ' ')
                 this.enterSelected();
@@ -185,8 +187,7 @@ export class WorldGame {
     }
     private selectMap(index: number) {
         this.selection = clampMapSelection(index);
-        this.store.save.selected = STAGES[this.selection].id;
-        this.store.persist();
+        this.mapView?.selectDestination(this.selection);
         this.audio.sfx('coin');
     }
     private enterSelected() {
@@ -196,7 +197,8 @@ export class WorldGame {
             this.toastTimer = 2000;
             return;
         }
-        this.load(s.id, true);
+        // The old canvas/global shortcut must obey the same arrival gate as the HUD.
+        this.mapView?.enterSelected(this.selection);
     }
     /** Loads authored campaign data. Public for the in-repo editor and deterministic browser QA. */
     load(id: string, resume = false, custom?: AdventureStage) {
@@ -204,6 +206,7 @@ export class WorldGame {
         if (!stage)
             throw Error('Fase não encontrada');
         this.stage = stage;
+        this.nextMapSelection = undefined;
         this.level = new WorldLevel(stage.level);
         this.objects = new WorldObjects(stage.mechanisms);
         this.level.bodies = this.objects.bodies;
@@ -252,7 +255,18 @@ export class WorldGame {
             this.showDialogue(stage.dialogues[0]);
         }
     }
-    private toMap() { this.audio.cancelSpeech(); this.audio.setDying(false); this.audio.pause(false); this.change('map'); this.selection = Math.max(0, STAGES.findIndex(s => s.id === this.store.save.selected)); this.audio.select(0); this.store.persist(); }
+    private toMap() {
+        const fromGameplay = ['playing', 'paused', 'dialogue', 'clear'].includes(this.state);
+        if (fromGameplay) {
+            const playedStage = this.stage.id;
+            this.store.save.selected = playedStage;
+            this.mapReturn = { playedStage, nextSelected: this.state === 'clear' ? this.nextMapSelection ?? playedStage : playedStage };
+        }
+        this.audio.cancelSpeech(); this.audio.setDying(false); this.audio.pause(false); this.change('map');
+        this.selection = Math.max(0, STAGES.findIndex(s => s.id === (this.mapReturn?.nextSelected ?? this.store.save.selected)));
+        this.nextMapSelection = undefined;
+        this.audio.select(0); this.store.persist();
+    }
     private pause() { this.change('paused'); this.audio.pause(true); }
     private resume() { this.change('playing'); this.audio.pause(false); }
     private showDialogue(d: Dialogue) { this.dialog = d; this.dialogueTime = 0; this.spoken.add(d.id); this.change('dialogue'); this.audio.say(d.speaker, d.text, d.clip); }
@@ -582,7 +596,13 @@ export class WorldGame {
     }
     private bounce(y: number) { if (this.player.data.isDead)
         return; this.player.data.position.y = y - this.player.data.height; this.player.data.velocity.y = -7; this.player.data.isGrounded = false; this.player.data.groundPoundState = GroundPoundState.NONE; this.player.data.invincibleTimer = Math.max(150, this.player.data.invincibleTimer); }
-    private complete(secret: boolean) { finishStage(this.store.save, this.stage.id, secret ? 'secret' : 'normal', this.elapsed); this.store.persist(); this.clearSecret = secret; this.clearTimer = 0; this.change('clear'); this.audio.sfx('victory'); }
+    private complete(secret: boolean) {
+        finishStage(this.store.save, this.stage.id, secret ? 'secret' : 'normal', this.elapsed);
+        this.nextMapSelection = this.store.save.selected;
+        // Unlock the next stage now, but save only the place Feka has reached.
+        this.store.save.selected = this.stage.id;
+        this.store.persist(); this.clearSecret = secret; this.clearTimer = 0; this.change('clear'); this.audio.sfx('victory');
+    }
     private afterClear() {
         if (this.stage.id === '6-5') {
             this.change('ending');
@@ -601,11 +621,16 @@ export class WorldGame {
             this.buttons = [];
             this.mapView ??= new WorldMapView(this.mapCanvas, {
                 select: index => { if (this.state === 'map') this.selectMap(index); },
-                enter: () => { if (this.state === 'map') this.enterSelected(); },
+                enter: () => { if (this.state === 'map') this.load(STAGES[this.selection].id, true); },
+                arrive: index => {
+                    const id = STAGES[index].id;
+                    if (this.state === 'map' && this.store.save.selected !== id) { this.store.save.selected = id; this.store.persist(); }
+                },
                 exit: () => { if (this.state === 'map') this.change('title'); },
                 unlockAudio: () => this.audio.unlock()
             });
-            this.mapView.render(this.selection, this.store.save, this.time, this.ephemeral ? '' : this.store.warning, this.toastTimer > 0 ? this.toast : '');
+            this.mapView.render(this.selection, this.store.save, this.time, this.ephemeral ? '' : this.store.warning, this.toastTimer > 0 ? this.toast : '', this.mapReturn);
+            this.mapReturn = undefined;
             return;
         }
         this.mapView?.hide();

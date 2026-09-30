@@ -1,0 +1,934 @@
+{
+  "version": 1,
+  "island": "costa",
+  "source": "tools/diorama/render_costa.py",
+  "sourceSha256": "2c9acf31893b734c2190161043955608e5765b036a97c171426bb572995a183e",
+  "coordinateSystem": "Normalized accepted island 1920x1200 top-left frame; positions outside 0..1 are valid in the continuous world. World XYZ are local to this island.",
+  "camera": {
+    "position": [
+      11.0,
+      -20.0,
+      17.5
+    ],
+    "target": [
+      0.0,
+      0.0,
+      2.700000047683716
+    ],
+    "orthoScale": 20.600000381469727
+  },
+  "size": {
+    "width": 1920,
+    "height": 1200
+  },
+  "join": {
+    "route": "2:3",
+    "from": "1-3",
+    "to": "1-4",
+    "worldSegment": 3,
+    "segment": 3,
+    "t": 0.5,
+    "world": [
+      3.4,
+      -3.045,
+      1.6
+    ],
+    "x": 0.573383,
+    "y": 0.753665
+  },
+  "dock": {
+    "x": 0.634027,
+    "y": 0.906058,
+    "world": [
+      5.56,
+      -4.38,
+      0.695
+    ]
+  },
+  "approach": [
+    {
+      "x": 0.630752,
+      "y": 0.619739,
+      "world": [
+        3.8,
+        -1.32,
+        2.8
+      ]
+    },
+    {
+      "x": 0.654678,
+      "y": 0.648333,
+      "world": [
+        4.61,
+        -1.77,
+        2.87
+      ]
+    },
+    {
+      "x": 0.663461,
+      "y": 0.670382,
+      "world": [
+        5.02,
+        -2.14,
+        2.87
+      ]
+    },
+    {
+      "x": 0.642874,
+      "y": 0.699315,
+      "world": [
+        4.8,
+        -2.62,
+        2.63
+      ]
+    },
+    {
+      "x": 0.600191,
+      "y": 0.738431,
+      "world": [
+        4.0,
+        -2.99,
+        1.99
+      ]
+    },
+    {
+      "x": 0.573383,
+      "y": 0.753665,
+      "world": [
+        3.4,
+        -3.045,
+        1.6
+      ]
+    },
+    {
+      "x": 0.562037,
+      "y": 0.771623,
+      "world": [
+        3.4,
+        -3.53,
+        1.6
+      ]
+    },
+    {
+      "x": 0.58239,
+      "y": 0.876267,
+      "world": [
+        4.5,
+        -4.66,
+        0.98
+      ]
+    },
+    {
+      "x": 0.610037,
+      "y": 0.889503,
+      "world": [
+        5.15,
+        -4.66,
+        0.98
+      ]
+    },
+    {
+      "x": 0.627477,
+      "y": 0.906976,
+      "world": [
+        5.56,
+        -4.66,
+        0.84
+      ]
+    },
+    {
+      "x": 0.634027,
+      "y": 0.906058,
+      "world": [
+        5.56,
+        -4.38,
+        0.695
+      ]
+    }
+  ],
+  "boardingRoute": [
+    {
+      "x": 0.634027,
+      "y": 0.906058,
+      "world": [
+        5.56,
+        -4.38,
+        0.695
+      ]
+    },
+    {
+      "x": 0.627477,
+      "y": 0.906976,
+      "world": [
+        5.56,
+        -4.66,
+        0.84
+      ]
+    },
+    {
+      "x": 0.617651,
+      "y": 0.922527,
+      "world": [
+        5.56,
+        -5.08,
+        0.84
+      ]
+    },
+    {
+      "x": 0.607124,
+      "y": 0.954829,
+      "world": [
+        5.56,
+        -5.53,
+        0.6
+      ]
+    }
+  ],
+  "berth": {
+    "headingFrame": 0,
+    "passengerWorld": [
+      5.56,
+      -5.53,
+      0.6
+    ],
+    "waterlineWorld": [
+      5.34,
+      -5.53,
+      0.03
+    ],
+    "passenger": {
+      "x": 0.607124,
+      "y": 0.954829
+    },
+    "waterline": {
+      "x": 0.597766,
+      "y": 0.987495
+    }
+  },
+  "audit": {
+    "approach": {
+      "sampleCount": 366,
+      "supportRayCount": 366,
+      "headroomRayCount": 366,
+      "issueCount": 0,
+      "issues": [],
+      "supportObjects": [
+        "dock weathered plank.010",
+        "east ascent carved step continuous supported treads",
+        "east stair open arrival landing",
+        "journey_Costa dock turn landing supported deck",
+        "journey_Costa fishers access supported deck",
+        "journey_Costa fishers access supported deck.001",
+        "journey_Costa fishers access supported deck.002",
+        "journey_Costa fishers access supported tread",
+        "journey_Costa fishers access supported tread.001",
+        "journey_Costa fishers access supported tread.002",
+        "journey_Costa fishers access supported tread.003",
+        "journey_Costa fishers access supported tread.004",
+        "journey_Costa fishers access supported tread.005",
+        "journey_Costa fishers access underside bearer.007",
+        "journey_Costa stair turn landing board joint",
+        "journey_Costa stair turn landing board joint.001",
+        "journey_Costa stair turn landing board joint.002",
+        "journey_Costa stair turn landing board joint.003",
+        "journey_Costa stair turn landing supported deck",
+        "journey_Costa stair turn landing supported deck.001",
+        "turf lip.053",
+        "worn sandstone footpath.004"
+      ]
+    },
+    "gangway": {
+      "sampleCount": 69,
+      "supportRayCount": 69,
+      "headroomRayCount": 69,
+      "issueCount": 0,
+      "issues": [],
+      "supportObjects": [
+        "dock weathered plank.010",
+        "journey_Costa boarding gangway board joint.001",
+        "journey_Costa boarding gangway board joint.002",
+        "journey_Costa boarding gangway supported deck",
+        "journey_Costa boarding gangway supported deck.001",
+        "journey_Costa dock turn landing supported deck",
+        "journey_Costa fishers access supported deck.002",
+        "journey_Costa fishers access underside bearer.007"
+      ]
+    }
+  },
+  "existingRouteAudit": {
+    "main:0": {
+      "sampleCount": 336,
+      "supportRayCount": 336,
+      "headroomRayCount": 336,
+      "issueCount": 1,
+      "issues": [
+        {
+          "type": "support",
+          "segment": 6,
+          "t": 0.0,
+          "side": 0.16,
+          "world": [
+            -5.8129658699035645,
+            0.8389270901679993,
+            3.0999999046325684
+          ],
+          "hit": null
+        }
+      ],
+      "supportObjects": [
+        "clearing edge pebble.002",
+        "clearing edge pebble.009",
+        "natural clearing 1-1",
+        "natural clearing 1-2",
+        "single sculpted sand shoreline",
+        "west ascent carved step continuous supported treads",
+        "worn sandstone footpath",
+        "worn sandstone footpath.001"
+      ]
+    },
+    "main:1": {
+      "sampleCount": 537,
+      "supportRayCount": 537,
+      "headroomRayCount": 537,
+      "issueCount": 9,
+      "issues": [
+        {
+          "type": "headroom",
+          "segment": 0,
+          "t": 0.789,
+          "side": 0,
+          "world": [
+            -3.563157796859741,
+            0.5026316046714783,
+            3.143157958984375
+          ],
+          "hit": "western companion folded leaf.006"
+        },
+        {
+          "type": "support",
+          "segment": 1,
+          "t": 0.292,
+          "side": -0.16,
+          "world": [
+            -2.814701795578003,
+            0.4484293460845947,
+            3.1483333110809326
+          ],
+          "hit": null
+        },
+        {
+          "type": "support",
+          "segment": 1,
+          "t": 0.292,
+          "side": 0,
+          "world": [
+            -2.827500104904175,
+            0.6079166531562805,
+            3.1483333110809326
+          ],
+          "hit": null
+        },
+        {
+          "type": "support",
+          "segment": 1,
+          "t": 0.292,
+          "side": 0.16,
+          "world": [
+            -2.8402984142303467,
+            0.7674039602279663,
+            3.1483333110809326
+          ],
+          "hit": null
+        },
+        {
+          "type": "support",
+          "segment": 1,
+          "t": 0.708,
+          "side": -0.16,
+          "world": [
+            -2.1397016048431396,
+            0.5025960206985474,
+            3.131666660308838
+          ],
+          "hit": null
+        },
+        {
+          "type": "support",
+          "segment": 1,
+          "t": 0.708,
+          "side": 0,
+          "world": [
+            -2.1524999141693115,
+            0.6620833277702332,
+            3.131666660308838
+          ],
+          "hit": null
+        },
+        {
+          "type": "support",
+          "segment": 1,
+          "t": 0.708,
+          "side": 0.16,
+          "world": [
+            -2.1652982234954834,
+            0.821570634841919,
+            3.131666660308838
+          ],
+          "hit": null
+        },
+        {
+          "type": "headroom",
+          "segment": 3,
+          "t": 0.556,
+          "side": -0.16,
+          "world": [
+            -1.568170428276062,
+            0.2363499104976654,
+            3.003333330154419
+          ],
+          "hit": "western gap bridge brass cap.001"
+        },
+        {
+          "type": "headroom",
+          "segment": 3,
+          "t": 0.667,
+          "side": -0.16,
+          "world": [
+            -1.5781704187393188,
+            0.17079435288906097,
+            3.0
+          ],
+          "hit": "western gap bridge anchor timber.001"
+        }
+      ],
+      "supportObjects": [
+        "arch descent carved step continuous supported treads",
+        "central green backbone scalloped turf",
+        "clearing edge pebble.006",
+        "clearing edge pebble.015",
+        "natural clearing 1-2",
+        "natural clearing 1-3",
+        "turf lip.029",
+        "western bridge headland scalloped turf",
+        "western gap bridge plank",
+        "western gap bridge plank.001",
+        "western gap bridge plank.002",
+        "western gap bridge plank.003",
+        "western gap bridge plank.004",
+        "western gap bridge plank.005",
+        "western gap bridge plank.006",
+        "worn sandstone footpath.001",
+        "worn sandstone footpath.002",
+        "worn sandstone footpath.003"
+      ]
+    },
+    "main:2": {
+      "sampleCount": 387,
+      "supportRayCount": 387,
+      "headroomRayCount": 387,
+      "issueCount": 0,
+      "issues": [],
+      "supportObjects": [
+        "clearing edge pebble.012",
+        "east ascent carved step continuous supported treads",
+        "east stair open arrival landing",
+        "journey_Costa fishers access supported deck",
+        "journey_Costa fishers access underside bearer",
+        "natural clearing 1-3",
+        "secret branch beach landing",
+        "secret ledge climb continuous supported treads",
+        "worn sandstone footpath.003",
+        "worn sandstone footpath.004"
+      ]
+    },
+    "main:3": {
+      "sampleCount": 306,
+      "supportRayCount": 306,
+      "headroomRayCount": 306,
+      "issueCount": 4,
+      "issues": [
+        {
+          "type": "support",
+          "segment": 5,
+          "t": 1.0,
+          "side": 0,
+          "world": [
+            1.7899999618530273,
+            1.399999976158142,
+            4.800000190734863
+          ],
+          "hit": null
+        },
+        {
+          "type": "support",
+          "segment": 5,
+          "t": 1.0,
+          "side": 0.16,
+          "world": [
+            1.722338318824768,
+            1.5449892282485962,
+            4.800000190734863
+          ],
+          "hit": null
+        },
+        {
+          "type": "support",
+          "segment": 6,
+          "t": 0.0,
+          "side": 0,
+          "world": [
+            1.7899999618530273,
+            1.399999976158142,
+            4.800000190734863
+          ],
+          "hit": null
+        },
+        {
+          "type": "support",
+          "segment": 6,
+          "t": 0.0,
+          "side": 0.16,
+          "world": [
+            1.7899999618530273,
+            1.559999942779541,
+            4.800000190734863
+          ],
+          "hit": null
+        }
+      ],
+      "supportObjects": [
+        "clearing edge pebble.020",
+        "east lower climbing terrace scalloped turf",
+        "highpoint climbing step continuous supported treads",
+        "lighthouse approach bridge plank",
+        "lighthouse approach bridge plank.001",
+        "lighthouse approach bridge plank.002",
+        "lighthouse approach bridge plank.003",
+        "lighthouse approach bridge plank.004",
+        "lighthouse approach bridge plank.005",
+        "lighthouse approach bridge plank.006",
+        "natural clearing 1-5",
+        "worn sandstone footpath.004",
+        "worn sandstone footpath.006"
+      ]
+    },
+    "secret:0": {
+      "sampleCount": 582,
+      "supportRayCount": 582,
+      "headroomRayCount": 582,
+      "issueCount": 24,
+      "issues": [
+        {
+          "type": "headroom",
+          "segment": 7,
+          "t": 0.6,
+          "side": 0.1,
+          "world": [
+            1.340000033378601,
+            -0.3499999940395355,
+            2.880000114440918
+          ],
+          "hit": "highpoint climbing step continuous supported treads"
+        },
+        {
+          "type": "headroom",
+          "segment": 7,
+          "t": 0.7,
+          "side": 0.1,
+          "world": [
+            1.4049999713897705,
+            -0.3499999940395355,
+            2.880000114440918
+          ],
+          "hit": "highpoint climbing step continuous supported treads"
+        },
+        {
+          "type": "headroom",
+          "segment": 7,
+          "t": 0.8,
+          "side": 0.1,
+          "world": [
+            1.4700000286102295,
+            -0.3499999940395355,
+            2.880000114440918
+          ],
+          "hit": "highpoint climbing step continuous supported treads"
+        },
+        {
+          "type": "headroom",
+          "segment": 7,
+          "t": 0.9,
+          "side": 0,
+          "world": [
+            1.534999966621399,
+            -0.44999998807907104,
+            2.880000114440918
+          ],
+          "hit": "highpoint climbing step continuous supported treads"
+        },
+        {
+          "type": "headroom",
+          "segment": 7,
+          "t": 0.9,
+          "side": 0.1,
+          "world": [
+            1.534999966621399,
+            -0.3499999940395355,
+            2.880000114440918
+          ],
+          "hit": "highpoint climbing step continuous supported treads"
+        },
+        {
+          "type": "headroom",
+          "segment": 7,
+          "t": 1.0,
+          "side": 0,
+          "world": [
+            1.600000023841858,
+            -0.44999998807907104,
+            2.880000114440918
+          ],
+          "hit": "highpoint climbing step continuous supported treads"
+        },
+        {
+          "type": "headroom",
+          "segment": 7,
+          "t": 1.0,
+          "side": 0.1,
+          "world": [
+            1.600000023841858,
+            -0.3499999940395355,
+            2.880000114440918
+          ],
+          "hit": "highpoint climbing step continuous supported treads"
+        },
+        {
+          "type": "headroom",
+          "segment": 8,
+          "t": 0.0,
+          "side": 0,
+          "world": [
+            1.600000023841858,
+            -0.44999998807907104,
+            2.880000114440918
+          ],
+          "hit": "highpoint climbing step continuous supported treads"
+        },
+        {
+          "type": "headroom",
+          "segment": 8,
+          "t": 0.0,
+          "side": 0.1,
+          "world": [
+            1.5869545936584473,
+            -0.3508545458316803,
+            2.880000114440918
+          ],
+          "hit": "highpoint climbing step continuous supported treads"
+        },
+        {
+          "type": "headroom",
+          "segment": 8,
+          "t": 0.167,
+          "side": 0,
+          "world": [
+            1.6633334159851074,
+            -0.4416666626930237,
+            2.880000114440918
+          ],
+          "hit": "highpoint climbing step continuous supported treads"
+        },
+        {
+          "type": "headroom",
+          "segment": 8,
+          "t": 0.167,
+          "side": 0.1,
+          "world": [
+            1.6502879858016968,
+            -0.34252122044563293,
+            2.880000114440918
+          ],
+          "hit": "highpoint climbing step continuous supported treads"
+        },
+        {
+          "type": "headroom",
+          "segment": 8,
+          "t": 0.333,
+          "side": -0.1,
+          "world": [
+            1.739712119102478,
+            -0.5324787497520447,
+            2.880000114440918
+          ],
+          "hit": "highpoint climbing step continuous supported treads"
+        },
+        {
+          "type": "headroom",
+          "segment": 8,
+          "t": 0.333,
+          "side": 0,
+          "world": [
+            1.7266666889190674,
+            -0.4333333373069763,
+            2.880000114440918
+          ],
+          "hit": "highpoint climbing step continuous supported treads"
+        },
+        {
+          "type": "headroom",
+          "segment": 8,
+          "t": 0.333,
+          "side": 0.1,
+          "world": [
+            1.7136212587356567,
+            -0.33418789505958557,
+            2.880000114440918
+          ],
+          "hit": "highpoint climbing step continuous supported treads"
+        },
+        {
+          "type": "headroom",
+          "segment": 8,
+          "t": 0.5,
+          "side": -0.1,
+          "world": [
+            1.803045392036438,
+            -0.5241454243659973,
+            2.880000114440918
+          ],
+          "hit": "highpoint climbing step continuous supported treads"
+        },
+        {
+          "type": "headroom",
+          "segment": 8,
+          "t": 0.5,
+          "side": 0,
+          "world": [
+            1.7899999618530273,
+            -0.42500001192092896,
+            2.880000114440918
+          ],
+          "hit": "highpoint climbing step continuous supported treads"
+        },
+        {
+          "type": "headroom",
+          "segment": 8,
+          "t": 0.5,
+          "side": 0.1,
+          "world": [
+            1.7769545316696167,
+            -0.3258545696735382,
+            2.880000114440918
+          ],
+          "hit": "highpoint climbing step continuous supported treads"
+        },
+        {
+          "type": "headroom",
+          "segment": 8,
+          "t": 0.667,
+          "side": 0,
+          "world": [
+            1.8533333539962769,
+            -0.4166666865348816,
+            2.880000114440918
+          ],
+          "hit": "highpoint climbing step continuous supported treads"
+        },
+        {
+          "type": "headroom",
+          "segment": 8,
+          "t": 0.667,
+          "side": 0.1,
+          "world": [
+            1.8402879238128662,
+            -0.31752124428749084,
+            2.880000114440918
+          ],
+          "hit": "highpoint climbing step continuous supported treads"
+        },
+        {
+          "type": "headroom",
+          "segment": 8,
+          "t": 0.833,
+          "side": 0.1,
+          "world": [
+            1.9036213159561157,
+            -0.3091879189014435,
+            2.880000114440918
+          ],
+          "hit": "highpoint climbing step continuous supported treads"
+        },
+        {
+          "type": "support",
+          "segment": 13,
+          "t": 1.0,
+          "side": 0,
+          "world": [
+            1.7899999618530273,
+            1.399999976158142,
+            4.800000190734863
+          ],
+          "hit": null
+        },
+        {
+          "type": "support",
+          "segment": 13,
+          "t": 1.0,
+          "side": 0.1,
+          "world": [
+            1.747711420059204,
+            1.4906182289123535,
+            4.800000190734863
+          ],
+          "hit": null
+        },
+        {
+          "type": "support",
+          "segment": 14,
+          "t": 0.0,
+          "side": 0,
+          "world": [
+            1.7899999618530273,
+            1.399999976158142,
+            4.800000190734863
+          ],
+          "hit": null
+        },
+        {
+          "type": "support",
+          "segment": 14,
+          "t": 0.0,
+          "side": 0.1,
+          "world": [
+            1.7899999618530273,
+            1.5,
+            4.800000190734863
+          ],
+          "hit": null
+        }
+      ],
+      "supportObjects": [
+        "clearing edge pebble.012",
+        "clearing edge pebble.027",
+        "east lower climbing terrace scalloped turf",
+        "highpoint climbing step continuous supported treads",
+        "lighthouse approach bridge plank",
+        "lighthouse approach bridge plank.001",
+        "lighthouse approach bridge plank.002",
+        "lighthouse approach bridge plank.003",
+        "lighthouse approach bridge plank.004",
+        "lighthouse approach bridge plank.005",
+        "lighthouse approach bridge plank.006",
+        "natural clearing 1-3",
+        "natural clearing 1-5",
+        "secret branch beach landing",
+        "secret ledge climb continuous supported treads",
+        "turf lip.046",
+        "worn sandstone footpath.003",
+        "worn sandstone footpath.006"
+      ]
+    }
+  },
+  "frozenFields": [
+    "nodes",
+    "routes",
+    "secretRoute",
+    "worldRoutes",
+    "camera"
+  ],
+  "existingFieldsUnchanged": true,
+  "newGeometryObjects": 115,
+  "junctionToDock": [
+    {
+      "x": 0.573383,
+      "y": 0.753665,
+      "world": [
+        3.4,
+        -3.045,
+        1.6
+      ]
+    },
+    {
+      "x": 0.562037,
+      "y": 0.771623,
+      "world": [
+        3.4,
+        -3.53,
+        1.6
+      ]
+    },
+    {
+      "x": 0.58239,
+      "y": 0.876267,
+      "world": [
+        4.5,
+        -4.66,
+        0.98
+      ]
+    },
+    {
+      "x": 0.610037,
+      "y": 0.889503,
+      "world": [
+        5.15,
+        -4.66,
+        0.98
+      ]
+    },
+    {
+      "x": 0.627477,
+      "y": 0.906976,
+      "world": [
+        5.56,
+        -4.66,
+        0.84
+      ]
+    },
+    {
+      "x": 0.634027,
+      "y": 0.906058,
+      "world": [
+        5.56,
+        -4.38,
+        0.695
+      ]
+    }
+  ],
+  "existingRouteAuditDelta": {
+    "newIssueCount": 0,
+    "newIssues": {
+      "main:0": [],
+      "main:1": [],
+      "main:2": [],
+      "main:3": [],
+      "secret:0": []
+    },
+    "baselineIssueCounts": {
+      "main:0": 1,
+      "main:1": 9,
+      "main:2": 0,
+      "main:3": 4,
+      "secret:0": 24
+    },
+    "note": "Same strict support/headroom method run before/after additions. Baseline Costa corner/bridge/foliage contacts belong to the accepted unchanged source; this addition must introduce zero new contacts."
+  },
+  "projectedClearance": {
+    "method": "Orthographic camera rays through a billboard envelope matching the 48x78 pixel original Feka used in the boat proof. Three width positions at 38%, 64% and 88% of actor height, every \u22640.08 world units on new junction/dock/boarding paths. Lower guardrail contact is reported separately from upper-body blockage.",
+    "sampleCount": 657,
+    "upperBodyConflictCount": 0,
+    "lowerBodyContactCount": 0,
+    "upperBodyConflicts": [],
+    "lowerBodyContacts": []
+  },
+  "overlay": {
+    "path": "/assets/world/map/costa-journey-dock.webp",
+    "width": 212,
+    "height": 312,
+    "left": 0.540625,
+    "top": 0.739166667,
+    "widthInMap": 0.110416667,
+    "heightInMap": 0.26,
+    "bytes": 15270,
+    "sha256": "a02ddaa0530b9a638cc610788997e6b444115adee687359c0e4b09295916f2a4"
+  }
+}
