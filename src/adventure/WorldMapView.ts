@@ -11,6 +11,7 @@ interface CachedMapArt { assets: MapArtAssets; metadata: MapArtMetadata }
 const MAP_ART: Record<number, MapArtDescriptor> = {
     1: { name: 'costa-diorama', shadow: 'costa-shadow.webp', port: 'porto-distant.webp', bounds: COSTA_ART_BOUNDS },
     2: { name: 'porto-diorama', bounds: { top: 0, bottom: 1 } },
+    3: { name: 'fabrica-diorama', bounds: { top: 0, bottom: 1 } },
 };
 const STAGE_NOTES = [
     'O primeiro passo de uma grande viagem. A praia guarda mais do que parece.',
@@ -29,6 +30,14 @@ const STAGE_COPY: Record<number, { notes: string[]; landmarks: string[] }> = {
             'Nem tudo passa pelo chão. As passarelas de manutenção guardam outra rota.',
             'O porto não para. Há áreas de espera entre uma carga e outra.',
             'Bielzão controla a passagem. Os apoios são o caminho até ele.'],
+    },
+    3: {
+        landmarks: ['O recebimento', 'A linha de envase', 'Os tanques de mistura', 'Sob pressão', 'O controle de qualidade'],
+        notes: ['Barris chegam à fábrica. Observe a esteira e encontre espaço para passar.',
+            'A esteira troca de lado. Acione o comando e acompanhe a linha de envase.',
+            'Os tanques avisam antes dos jatos. Uma passarela de manutenção guarda outra saída.',
+            'A produção ganhou força. Alterne esteiras e jatos com uma pausa entre os perigos.',
+            'Calabrezzo apresenta seu melhor produto. Devolva o barril e aproveite a abertura.'],
     },
 };
 const ISLAND_LABELS = ['Costa', 'Porto', 'Fábrica', 'Serra', 'Reserva', 'Domínio'];

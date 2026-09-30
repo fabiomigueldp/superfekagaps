@@ -1,0 +1,28 @@
+{
+  "world": 3,
+  "canvas": [
+    1920,
+    1200
+  ],
+  "rgba": true,
+  "alphaBounds": [
+    246,
+    196,
+    1602,
+    1078
+  ],
+  "runtimeBytes": 152456,
+  "files": {
+    "fabrica-diorama.png": 2363918,
+    "fabrica-diorama.webp": 147156,
+    "fabrica-diorama.lossless.webp": 1045758,
+    "fabrica-diorama.meta.json": 5300
+  },
+  "sha256": {
+    "fabrica-diorama.png": "58f4a1b9ba12f000734a4043c8bd73e6d938cbdeb6c59e2848a4f41d1569dd8c",
+    "fabrica-diorama.webp": "205e565333833daec4adb7085224b8d61043f7e38e8ccbebb2add04c36222e94",
+    "fabrica-diorama.lossless.webp": "e8024454dcb4125b16b76a75618a4e3c9cca22c84907c436056db18ee6be69c4",
+    "fabrica-diorama.meta.json": "5cef59dc45724b19c443231049e25d7f2bf7b9909f6e125d7326ed557d8e0dd5"
+  },
+  "canonicalSource": "tools/diorama/render_fabrica_map.py"
+}

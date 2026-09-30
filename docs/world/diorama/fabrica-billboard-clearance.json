@@ -1,0 +1,6133 @@
+{
+  "method": "Foreground camera-directed rays through each measured upright projected actor rectangle. Three horizontal samples and five vertical body fractions at every <=0.13 world-unit route step. Rear geometry is excluded by ray direction; support/guardrail contacts are reported separately, never silently discarded.",
+  "scope": "Five stage selections, opening factors 0.84 and 1, fitted close/panorama targets. Does not claim a universal bound over arbitrary tiny viewports or resize/camera interpolation transients.",
+  "footNote": "The lowest billboard sample is10% of its height. Foot raster overshoot belongs to the independent world support test. Rectangle edge contacts are conservative and need the actual sprite browser review.",
+  "sampleCount": 52800,
+  "equipmentContactCount": 0,
+  "pathEdgeContactCount": 438,
+  "profiles": [
+    {
+      "profile": "desktop",
+      "width": 1180,
+      "height": 757,
+      "mode": "close",
+      "normalized": {
+        "left": -0.010058708564247468,
+        "right": 0.010940141788949564,
+        "top": -0.0504387200582471,
+        "bottom": 0.0022398773710076837
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.8172360229492188,
+      "sampleCount": 3300,
+      "equipmentContactCount": 0,
+      "pathEdgeContactCount": 31,
+      "objects": {
+        "walk_main inspection lane 3": 13,
+        "walk_main inspection lane 3 flush tread.006": 1,
+        "walk_dry maintenance catwalk": 15,
+        "walk_dry maintenance catwalk flush tread.012": 1,
+        "maintenance rail upright.002": 1
+      },
+      "contacts": [
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0628,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0628,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0625,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0716,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.125,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0804,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.1875,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0843,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.25,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0772,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.3125,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0701,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.375,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.063,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.4375,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3 flush tread.006",
+          "distanceTowardCamera": 0.0155,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0488,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5625,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0417,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.625,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0345,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.6875,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0274,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.75,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0203,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0747,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0747,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.0667,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0739,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.1333,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0734,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.2,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0742,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.2667,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.075,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.3333,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0758,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0766,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4667,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0774,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.5333,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0782,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.079,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6667,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0798,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.7333,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0806,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0814,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8667,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk flush tread.012",
+          "distanceTowardCamera": 0.0201,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.9333,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0244,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 2,
+          "t": 0.0909,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance rail upright.002",
+          "distanceTowardCamera": 0.5098,
+          "classification": "path-edge-or-guardrail"
+        }
+      ]
+    },
+    {
+      "profile": "desktop",
+      "width": 1180,
+      "height": 757,
+      "mode": "panorama",
+      "normalized": {
+        "left": -0.012266717761277399,
+        "right": 0.013341636327987273,
+        "top": -0.06151063421737451,
+        "bottom": 0.0027315577695215657
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.6701335388183594,
+      "sampleCount": 3300,
+      "equipmentContactCount": 0,
+      "pathEdgeContactCount": 29,
+      "objects": {
+        "walk_main inspection lane 3": 14,
+        "walk_dry maintenance catwalk": 13,
+        "walk_dry maintenance catwalk flush tread.001": 1,
+        "walk_dry maintenance catwalk flush tread.002": 1
+      },
+      "contacts": [
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0768,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0768,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0625,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0856,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.125,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0898,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.1875,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0827,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.25,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0756,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.3125,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0685,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.375,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0614,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.4375,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0543,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0471,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5625,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.04,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.625,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0329,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.6875,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0258,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.75,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0187,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0886,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0886,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.0667,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk flush tread.001",
+          "distanceTowardCamera": 0.0235,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.1333,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk flush tread.002",
+          "distanceTowardCamera": 0.0243,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.2,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0901,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.2667,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0909,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.3333,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0917,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0925,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4667,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0933,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.5333,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0941,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0949,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6667,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0957,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.7333,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0965,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0973,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8667,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0982,
+          "classification": "path-edge-or-guardrail"
+        }
+      ]
+    },
+    {
+      "profile": "browser-desktop",
+      "width": 1181,
+      "height": 757,
+      "mode": "close",
+      "normalized": {
+        "left": -0.010058657808513366,
+        "right": 0.010940086585548042,
+        "top": -0.050438465547019605,
+        "bottom": 0.002239866068699884
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.8165481567382813,
+      "sampleCount": 3300,
+      "equipmentContactCount": 0,
+      "pathEdgeContactCount": 31,
+      "objects": {
+        "walk_main inspection lane 3": 13,
+        "walk_main inspection lane 3 flush tread.006": 1,
+        "walk_dry maintenance catwalk": 15,
+        "walk_dry maintenance catwalk flush tread.012": 1,
+        "maintenance rail upright.002": 1
+      },
+      "contacts": [
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0628,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0628,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0625,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0716,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.125,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0804,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.1875,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0843,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.25,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0772,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.3125,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0701,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.375,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.063,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.4375,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3 flush tread.006",
+          "distanceTowardCamera": 0.0155,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0488,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5625,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0417,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.625,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0345,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.6875,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0274,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.75,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0203,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0747,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0747,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.0667,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0739,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.1333,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0734,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.2,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0742,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.2667,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.075,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.3333,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0758,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0766,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4667,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0774,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.5333,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0782,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.079,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6667,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0798,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.7333,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0806,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0814,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8667,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk flush tread.012",
+          "distanceTowardCamera": 0.0201,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.9333,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0244,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 2,
+          "t": 0.0909,
+          "normalizedOffset": [
+            0.01094,
+            -0.005044
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance rail upright.002",
+          "distanceTowardCamera": 0.5098,
+          "classification": "path-edge-or-guardrail"
+        }
+      ]
+    },
+    {
+      "profile": "browser-desktop",
+      "width": 1181,
+      "height": 757,
+      "mode": "panorama",
+      "normalized": {
+        "left": -0.012266655864040691,
+        "right": 0.013341569006765905,
+        "top": -0.061510323837828784,
+        "bottom": 0.002731543986219371
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.6695694885253907,
+      "sampleCount": 3300,
+      "equipmentContactCount": 0,
+      "pathEdgeContactCount": 29,
+      "objects": {
+        "walk_main inspection lane 3": 14,
+        "walk_dry maintenance catwalk": 13,
+        "walk_dry maintenance catwalk flush tread.001": 1,
+        "walk_dry maintenance catwalk flush tread.002": 1
+      },
+      "contacts": [
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0768,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0768,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0625,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0856,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.125,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0898,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.1875,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0827,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.25,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0756,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.3125,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0685,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.375,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0614,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.4375,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0543,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0471,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5625,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.04,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.625,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0329,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.6875,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0258,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.75,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0187,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0886,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0886,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.0667,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk flush tread.001",
+          "distanceTowardCamera": 0.0235,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.1333,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk flush tread.002",
+          "distanceTowardCamera": 0.0243,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.2,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0901,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.2667,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0909,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.3333,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0917,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0925,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4667,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0933,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.5333,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0941,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0949,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6667,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0957,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.7333,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0965,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0973,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8667,
+          "normalizedOffset": [
+            0.013342,
+            -0.006151
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0982,
+          "classification": "path-edge-or-guardrail"
+        }
+      ]
+    },
+    {
+      "profile": "portrait",
+      "width": 400,
+      "height": 606,
+      "mode": "close",
+      "normalized": {
+        "left": -0.023095238095238092,
+        "right": 0.025119047619047617,
+        "top": -0.1158095238095238,
+        "bottom": 0.0051428571428571435
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 1.05,
+      "sampleCount": 3300,
+      "equipmentContactCount": 0,
+      "pathEdgeContactCount": 25,
+      "objects": {
+        "walk_main inspection lane 3": 14,
+        "quality access rail upright.002": 1,
+        "walk_dry maintenance catwalk": 2,
+        "maintenance rail upright": 4,
+        "maintenance rail upright.001": 2,
+        "maintenance rail upright.002": 2
+      },
+      "contacts": [
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 0.9091,
+          "normalizedOffset": [
+            0.025119,
+            -0.011581
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0356,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.025119,
+            -0.011581
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0961,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.025119,
+            -0.011581
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0961,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0625,
+          "normalizedOffset": [
+            0.025119,
+            -0.011581
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.089,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.125,
+          "normalizedOffset": [
+            0.025119,
+            -0.011581
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0818,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.1875,
+          "normalizedOffset": [
+            0.025119,
+            -0.011581
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0747,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.25,
+          "normalizedOffset": [
+            0.025119,
+            -0.011581
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0676,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.3125,
+          "normalizedOffset": [
+            0.025119,
+            -0.011581
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0605,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.375,
+          "normalizedOffset": [
+            0.025119,
+            -0.011581
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0534,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.4375,
+          "normalizedOffset": [
+            0.025119,
+            -0.011581
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0463,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5,
+          "normalizedOffset": [
+            0.025119,
+            -0.011581
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0392,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5625,
+          "normalizedOffset": [
+            0.025119,
+            -0.011581
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0321,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.625,
+          "normalizedOffset": [
+            0.025119,
+            -0.011581
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0249,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.6875,
+          "normalizedOffset": [
+            0.025119,
+            -0.011581
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0178,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.875,
+          "normalizedOffset": [
+            0.025119,
+            -0.011581
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access rail upright.002",
+          "distanceTowardCamera": 0.3367,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 0,
+          "t": 0.9231,
+          "normalizedOffset": [
+            0.025119,
+            -0.011581
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0462,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.025119,
+            -0.011581
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance rail upright",
+          "distanceTowardCamera": 0.0706,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.025119,
+            -0.028952
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance rail upright",
+          "distanceTowardCamera": 0.0706,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.025119,
+            -0.011581
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance rail upright",
+          "distanceTowardCamera": 0.0706,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.025119,
+            -0.028952
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance rail upright",
+          "distanceTowardCamera": 0.0706,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.3333,
+          "normalizedOffset": [
+            0.025119,
+            -0.011581
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance rail upright.001",
+          "distanceTowardCamera": 0.0385,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.3333,
+          "normalizedOffset": [
+            0.025119,
+            -0.028952
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance rail upright.001",
+          "distanceTowardCamera": 0.0557,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.7333,
+          "normalizedOffset": [
+            0.025119,
+            -0.011581
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance rail upright.002",
+          "distanceTowardCamera": 0.0577,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.7333,
+          "normalizedOffset": [
+            0.025119,
+            -0.028952
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance rail upright.002",
+          "distanceTowardCamera": 0.0577,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8,
+          "normalizedOffset": [
+            0.025119,
+            -0.011581
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0397,
+          "classification": "path-edge-or-guardrail"
+        }
+      ]
+    },
+    {
+      "profile": "portrait",
+      "width": 400,
+      "height": 606,
+      "mode": "panorama",
+      "normalized": {
+        "left": -0.028164924506387915,
+        "right": 0.03063298490127758,
+        "top": -0.14123112659698026,
+        "bottom": 0.0062717770034843206
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.861,
+      "sampleCount": 3300,
+      "equipmentContactCount": 0,
+      "pathEdgeContactCount": 23,
+      "objects": {
+        "walk_main inspection lane 3": 1,
+        "quality access rail upright": 4,
+        "quality access rail upright.001": 2,
+        "quality access rail upright.002": 2,
+        "maintenance rail upright": 2,
+        "maintenance rail upright.003": 1,
+        "maintenance outer rail.001": 10,
+        "maintenance rail upright.004": 1
+      },
+      "contacts": [
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 0.9091,
+          "normalizedOffset": [
+            0.030633,
+            -0.014123
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0318,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.030633,
+            -0.014123
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access rail upright",
+          "distanceTowardCamera": 0.1041,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.030633,
+            -0.035308
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access rail upright",
+          "distanceTowardCamera": 0.1041,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.030633,
+            -0.014123
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access rail upright",
+          "distanceTowardCamera": 0.1041,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.030633,
+            -0.035308
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access rail upright",
+          "distanceTowardCamera": 0.1041,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.375,
+          "normalizedOffset": [
+            0.030633,
+            -0.014123
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access rail upright.001",
+          "distanceTowardCamera": 0.0943,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.375,
+          "normalizedOffset": [
+            0.030633,
+            -0.035308
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access rail upright.001",
+          "distanceTowardCamera": 0.0943,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.75,
+          "normalizedOffset": [
+            0.030633,
+            -0.014123
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access rail upright.002",
+          "distanceTowardCamera": 0.127,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.75,
+          "normalizedOffset": [
+            0.030633,
+            -0.035308
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access rail upright.002",
+          "distanceTowardCamera": 0.127,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 0,
+          "t": 0.9231,
+          "normalizedOffset": [
+            0.030633,
+            -0.014123
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance rail upright",
+          "distanceTowardCamera": 0.0597,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 0,
+          "t": 0.9231,
+          "normalizedOffset": [
+            0.030633,
+            -0.035308
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance rail upright",
+          "distanceTowardCamera": 0.0597,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.3333,
+          "normalizedOffset": [
+            -0.028165,
+            -0.014123
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance rail upright.003",
+          "distanceTowardCamera": 0.0666,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4,
+          "normalizedOffset": [
+            -0.028165,
+            -0.014123
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0565,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4667,
+          "normalizedOffset": [
+            -0.028165,
+            -0.014123
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0565,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.5333,
+          "normalizedOffset": [
+            -0.028165,
+            -0.014123
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0565,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6,
+          "normalizedOffset": [
+            -0.028165,
+            -0.014123
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0565,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6667,
+          "normalizedOffset": [
+            -0.028165,
+            -0.014123
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0565,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.7333,
+          "normalizedOffset": [
+            -0.028165,
+            -0.014123
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance rail upright.004",
+          "distanceTowardCamera": 0.0365,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8,
+          "normalizedOffset": [
+            -0.028165,
+            -0.014123
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0565,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8667,
+          "normalizedOffset": [
+            -0.028165,
+            -0.014123
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0565,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.9333,
+          "normalizedOffset": [
+            -0.028165,
+            -0.014123
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0565,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 1.0,
+          "normalizedOffset": [
+            -0.028165,
+            -0.014123
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0565,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 2,
+          "t": 0.0,
+          "normalizedOffset": [
+            -0.028165,
+            -0.014123
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0565,
+          "classification": "path-edge-or-guardrail"
+        }
+      ]
+    },
+    {
+      "profile": "landscape",
+      "width": 846,
+      "height": 392,
+      "mode": "close",
+      "normalized": {
+        "left": -0.02092010430026678,
+        "right": 0.022753309316269538,
+        "top": -0.10490246115102847,
+        "bottom": 0.004658497452430541
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.7392678833007813,
+      "sampleCount": 3300,
+      "equipmentContactCount": 0,
+      "pathEdgeContactCount": 28,
+      "objects": {
+        "walk_main inspection lane 3": 14,
+        "quality access outer rail": 3,
+        "quality access rail upright.002": 1,
+        "walk_dry maintenance catwalk": 3,
+        "maintenance rail upright": 2,
+        "maintenance rail upright.001": 4,
+        "maintenance rail upright.002": 1
+      },
+      "contacts": [
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 0.9091,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0352,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0977,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0977,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0625,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0906,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.125,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0834,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.1875,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0763,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.25,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0692,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.3125,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0621,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.375,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.055,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.4375,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0479,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0408,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5625,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0337,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.625,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0265,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.6875,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0194,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.75,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail",
+          "distanceTowardCamera": 0.481,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.8125,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail",
+          "distanceTowardCamera": 0.481,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.875,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail",
+          "distanceTowardCamera": 0.481,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.9375,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access rail upright.002",
+          "distanceTowardCamera": 0.4455,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 0,
+          "t": 0.9231,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0471,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.0667,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance rail upright",
+          "distanceTowardCamera": 0.166,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.0667,
+          "normalizedOffset": [
+            0.022753,
+            -0.026226
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance rail upright",
+          "distanceTowardCamera": 0.166,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance rail upright.001",
+          "distanceTowardCamera": 0.1053,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4,
+          "normalizedOffset": [
+            0.022753,
+            -0.026226
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance rail upright.001",
+          "distanceTowardCamera": 0.1053,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4667,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance rail upright.001",
+          "distanceTowardCamera": 0.2112,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4667,
+          "normalizedOffset": [
+            0.022753,
+            -0.026226
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance rail upright.001",
+          "distanceTowardCamera": 0.2112,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0626,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8,
+          "normalizedOffset": [
+            0.022753,
+            -0.026226
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance rail upright.002",
+          "distanceTowardCamera": 0.1548,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8667,
+          "normalizedOffset": [
+            0.022753,
+            -0.01049
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0158,
+          "classification": "path-edge-or-guardrail"
+        }
+      ]
+    },
+    {
+      "profile": "landscape",
+      "width": 846,
+      "height": 392,
+      "mode": "panorama",
+      "normalized": {
+        "left": -0.02551232231739851,
+        "right": 0.027747938190572606,
+        "top": -0.12792983067198593,
+        "bottom": 0.005681094454183587
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.6061996643066406,
+      "sampleCount": 3300,
+      "equipmentContactCount": 0,
+      "pathEdgeContactCount": 27,
+      "objects": {
+        "walk_main inspection lane 3": 14,
+        "quality access rail upright": 1,
+        "quality access outer rail": 10,
+        "quality access rail upright.001": 1,
+        "quality access rail upright.002": 1
+      },
+      "contacts": [
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 0.9091,
+          "normalizedOffset": [
+            0.027748,
+            -0.012793
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0338,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.027748,
+            -0.012793
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0445,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.027748,
+            -0.012793
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0445,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0625,
+          "normalizedOffset": [
+            0.027748,
+            -0.012793
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0445,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0625,
+          "normalizedOffset": [
+            0.027748,
+            -0.031982
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access rail upright",
+          "distanceTowardCamera": 0.21,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.125,
+          "normalizedOffset": [
+            0.027748,
+            -0.012793
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0445,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.125,
+          "normalizedOffset": [
+            0.027748,
+            -0.031982
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access outer rail",
+          "distanceTowardCamera": 0.2109,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.1875,
+          "normalizedOffset": [
+            0.027748,
+            -0.012793
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0445,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.1875,
+          "normalizedOffset": [
+            0.027748,
+            -0.031982
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access outer rail",
+          "distanceTowardCamera": 0.2109,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.25,
+          "normalizedOffset": [
+            0.027748,
+            -0.012793
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0445,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.25,
+          "normalizedOffset": [
+            0.027748,
+            -0.031982
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access outer rail",
+          "distanceTowardCamera": 0.2109,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.3125,
+          "normalizedOffset": [
+            0.027748,
+            -0.012793
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0445,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.3125,
+          "normalizedOffset": [
+            0.027748,
+            -0.031982
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access outer rail",
+          "distanceTowardCamera": 0.2109,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.375,
+          "normalizedOffset": [
+            0.027748,
+            -0.012793
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0427,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.375,
+          "normalizedOffset": [
+            0.027748,
+            -0.031982
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access outer rail",
+          "distanceTowardCamera": 0.2109,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.4375,
+          "normalizedOffset": [
+            0.027748,
+            -0.012793
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0392,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.4375,
+          "normalizedOffset": [
+            0.027748,
+            -0.031982
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access rail upright.001",
+          "distanceTowardCamera": 0.2027,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5,
+          "normalizedOffset": [
+            0.027748,
+            -0.012793
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0341,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5,
+          "normalizedOffset": [
+            0.027748,
+            -0.031982
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access outer rail",
+          "distanceTowardCamera": 0.2109,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5625,
+          "normalizedOffset": [
+            0.027748,
+            -0.012793
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0288,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5625,
+          "normalizedOffset": [
+            0.027748,
+            -0.031982
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access outer rail",
+          "distanceTowardCamera": 0.2109,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.625,
+          "normalizedOffset": [
+            0.027748,
+            -0.012793
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0224,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.625,
+          "normalizedOffset": [
+            0.027748,
+            -0.031982
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access outer rail",
+          "distanceTowardCamera": 0.2109,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.6875,
+          "normalizedOffset": [
+            0.027748,
+            -0.012793
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.016,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.6875,
+          "normalizedOffset": [
+            0.027748,
+            -0.031982
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access outer rail",
+          "distanceTowardCamera": 0.2109,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.75,
+          "normalizedOffset": [
+            0.027748,
+            -0.031982
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access outer rail",
+          "distanceTowardCamera": 0.2109,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.8125,
+          "normalizedOffset": [
+            0.027748,
+            -0.012793
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access rail upright.002",
+          "distanceTowardCamera": 0.2295,
+          "classification": "path-edge-or-guardrail"
+        }
+      ]
+    },
+    {
+      "profile": "compact-boundary",
+      "width": 640,
+      "height": 606,
+      "mode": "close",
+      "normalized": {
+        "left": -0.014514501130511415,
+        "right": 0.01578639040483458,
+        "top": -0.07278199329773972,
+        "bottom": 0.0032320950971035734
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 1.044214324951172,
+      "sampleCount": 3300,
+      "equipmentContactCount": 0,
+      "pathEdgeContactCount": 32,
+      "objects": {
+        "walk_main inspection lane 3": 12,
+        "walk_main inspection lane 3 flush tread.002": 1,
+        "walk_main inspection lane 3 flush tread.009": 1,
+        "walk_dry maintenance catwalk": 13,
+        "walk_dry maintenance catwalk flush tread.004": 1,
+        "walk_dry maintenance catwalk flush tread.005": 1,
+        "maintenance outer rail": 1,
+        "maintenance rail upright.002": 2
+      },
+      "contacts": [
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.091,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.091,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0625,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0953,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.125,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3 flush tread.002",
+          "distanceTowardCamera": 0.016,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.1875,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0811,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.25,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0739,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.3125,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0668,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.375,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0597,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.4375,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0526,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0455,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5625,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0384,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.625,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3 flush tread.009",
+          "distanceTowardCamera": 0.016,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.6875,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0241,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.75,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.017,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.1039,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.1039,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.0667,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.1047,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.1333,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.1055,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.2,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.1063,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.2667,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk flush tread.004",
+          "distanceTowardCamera": 0.0281,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.3333,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk flush tread.005",
+          "distanceTowardCamera": 0.0252,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.1087,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4667,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.1095,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.5333,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0157,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0165,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6667,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0173,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.7333,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0181,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0189,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8667,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.1051,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.9333,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail",
+          "distanceTowardCamera": 0.4602,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance rail upright.002",
+          "distanceTowardCamera": 0.4485,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 2,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.015786,
+            -0.007278
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance rail upright.002",
+          "distanceTowardCamera": 0.4485,
+          "classification": "path-edge-or-guardrail"
+        }
+      ]
+    },
+    {
+      "profile": "compact-boundary",
+      "width": 640,
+      "height": 606,
+      "mode": "panorama",
+      "normalized": {
+        "left": -0.017700611134770016,
+        "right": 0.019251695615651924,
+        "top": -0.0887585284118777,
+        "bottom": 0.003941579386711675
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.8562557464599609,
+      "sampleCount": 3300,
+      "equipmentContactCount": 0,
+      "pathEdgeContactCount": 42,
+      "objects": {
+        "walk_main inspection lane 3": 13,
+        "walk_dry maintenance catwalk": 16,
+        "maintenance rail upright": 1,
+        "maintenance outer rail": 9,
+        "maintenance rail upright.001": 1,
+        "maintenance rail upright.002": 2
+      },
+      "contacts": [
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.1,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.1,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0625,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0929,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.125,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0858,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.1875,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0787,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.25,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0716,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.3125,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0645,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.375,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0574,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.4375,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0503,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0431,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5625,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.036,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.625,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0289,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.6875,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0218,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 0,
+          "t": 0.9231,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0244,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0322,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0322,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.0667,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.033,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.1333,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0338,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.1333,
+          "normalizedOffset": [
+            0.019252,
+            -0.02219
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance rail upright",
+          "distanceTowardCamera": 0.2679,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.2,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0346,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.2,
+          "normalizedOffset": [
+            0.019252,
+            -0.02219
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance outer rail",
+          "distanceTowardCamera": 0.2923,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.2667,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0354,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.2667,
+          "normalizedOffset": [
+            0.019252,
+            -0.02219
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance outer rail",
+          "distanceTowardCamera": 0.2923,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.3333,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0362,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.3333,
+          "normalizedOffset": [
+            0.019252,
+            -0.02219
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance outer rail",
+          "distanceTowardCamera": 0.2923,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.037,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4,
+          "normalizedOffset": [
+            0.019252,
+            -0.02219
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance outer rail",
+          "distanceTowardCamera": 0.2923,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4667,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0378,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4667,
+          "normalizedOffset": [
+            0.019252,
+            -0.02219
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance outer rail",
+          "distanceTowardCamera": 0.2923,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.5333,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0386,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.5333,
+          "normalizedOffset": [
+            0.019252,
+            -0.02219
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance rail upright.001",
+          "distanceTowardCamera": 0.2911,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0394,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6,
+          "normalizedOffset": [
+            0.019252,
+            -0.02219
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance outer rail",
+          "distanceTowardCamera": 0.2923,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6667,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0402,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6667,
+          "normalizedOffset": [
+            0.019252,
+            -0.02219
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance outer rail",
+          "distanceTowardCamera": 0.2923,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.7333,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.041,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.7333,
+          "normalizedOffset": [
+            0.019252,
+            -0.02219
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance outer rail",
+          "distanceTowardCamera": 0.2923,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0235,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8,
+          "normalizedOffset": [
+            0.019252,
+            -0.02219
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance outer rail",
+          "distanceTowardCamera": 0.2923,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8667,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0609,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8667,
+          "normalizedOffset": [
+            0.019252,
+            -0.02219
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance rail upright.002",
+          "distanceTowardCamera": 0.2637,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.9333,
+          "normalizedOffset": [
+            0.019252,
+            -0.008876
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance rail upright.002",
+          "distanceTowardCamera": 0.3653,
+          "classification": "path-edge-or-guardrail"
+        }
+      ]
+    },
+    {
+      "profile": "desktop-boundary",
+      "width": 641,
+      "height": 606,
+      "mode": "close",
+      "normalized": {
+        "left": -0.01732212145628682,
+        "right": 0.018840039315858346,
+        "top": -0.08686061728183413,
+        "bottom": 0.0038572971490288188
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.8736,
+      "sampleCount": 3300,
+      "equipmentContactCount": 0,
+      "pathEdgeContactCount": 43,
+      "objects": {
+        "walk_main inspection lane 3": 12,
+        "walk_main inspection lane 3 flush tread.004": 1,
+        "walk_main inspection lane 3 flush tread.011": 1,
+        "walk_dry maintenance catwalk": 16,
+        "maintenance rail upright": 1,
+        "maintenance outer rail": 10,
+        "maintenance rail upright.001": 1,
+        "maintenance rail upright.002": 1
+      },
+      "contacts": [
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.1003,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.1003,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0625,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0932,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.125,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0861,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.1875,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.079,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.25,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3 flush tread.004",
+          "distanceTowardCamera": 0.0156,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.3125,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0648,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.375,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0576,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.4375,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0505,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0434,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5625,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0363,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.625,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0292,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.6875,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0221,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.75,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3 flush tread.011",
+          "distanceTowardCamera": 0.0156,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 0,
+          "t": 0.9231,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.022,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0295,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0295,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.0667,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0303,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.1333,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0311,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.1333,
+          "normalizedOffset": [
+            0.01884,
+            -0.021715
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance rail upright",
+          "distanceTowardCamera": 0.2792,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.2,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0319,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.2,
+          "normalizedOffset": [
+            0.01884,
+            -0.021715
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance outer rail",
+          "distanceTowardCamera": 0.3004,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.2667,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0327,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.2667,
+          "normalizedOffset": [
+            0.01884,
+            -0.021715
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance outer rail",
+          "distanceTowardCamera": 0.3004,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.3333,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0335,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.3333,
+          "normalizedOffset": [
+            0.01884,
+            -0.021715
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance outer rail",
+          "distanceTowardCamera": 0.3004,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0343,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4,
+          "normalizedOffset": [
+            0.01884,
+            -0.021715
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance outer rail",
+          "distanceTowardCamera": 0.3004,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4667,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0351,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4667,
+          "normalizedOffset": [
+            0.01884,
+            -0.021715
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance outer rail",
+          "distanceTowardCamera": 0.3004,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.5333,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0359,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.5333,
+          "normalizedOffset": [
+            0.01884,
+            -0.021715
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance rail upright.001",
+          "distanceTowardCamera": 0.2941,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0367,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6,
+          "normalizedOffset": [
+            0.01884,
+            -0.021715
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance outer rail",
+          "distanceTowardCamera": 0.3004,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6667,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0375,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6667,
+          "normalizedOffset": [
+            0.01884,
+            -0.021715
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance outer rail",
+          "distanceTowardCamera": 0.3004,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.7333,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0383,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.7333,
+          "normalizedOffset": [
+            0.01884,
+            -0.021715
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance outer rail",
+          "distanceTowardCamera": 0.3004,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0288,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8,
+          "normalizedOffset": [
+            0.01884,
+            -0.021715
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance outer rail",
+          "distanceTowardCamera": 0.3004,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8667,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0663,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8667,
+          "normalizedOffset": [
+            0.01884,
+            -0.021715
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance outer rail",
+          "distanceTowardCamera": 0.3004,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.9333,
+          "normalizedOffset": [
+            0.01884,
+            -0.008686
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance rail upright.002",
+          "distanceTowardCamera": 0.3556,
+          "classification": "path-edge-or-guardrail"
+        }
+      ]
+    },
+    {
+      "profile": "desktop-boundary",
+      "width": 641,
+      "height": 606,
+      "mode": "panorama",
+      "normalized": {
+        "left": -0.02112453836132539,
+        "right": 0.022975657702266276,
+        "top": -0.10592758205101722,
+        "bottom": 0.004704020913449779
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.716352,
+      "sampleCount": 3300,
+      "equipmentContactCount": 0,
+      "pathEdgeContactCount": 25,
+      "objects": {
+        "walk_main inspection lane 3": 13,
+        "walk_main inspection lane 3 flush tread.007": 1,
+        "quality access outer rail": 3,
+        "quality access rail upright.002": 1,
+        "walk_dry maintenance catwalk": 2,
+        "maintenance rail upright": 2,
+        "maintenance rail upright.001": 2,
+        "maintenance rail upright.002": 1
+      },
+      "contacts": [
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 0.9091,
+          "normalizedOffset": [
+            0.022976,
+            -0.010593
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0365,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.022976,
+            -0.010593
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0975,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.022976,
+            -0.010593
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0975,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0625,
+          "normalizedOffset": [
+            0.022976,
+            -0.010593
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0904,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.125,
+          "normalizedOffset": [
+            0.022976,
+            -0.010593
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0833,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.1875,
+          "normalizedOffset": [
+            0.022976,
+            -0.010593
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0762,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.25,
+          "normalizedOffset": [
+            0.022976,
+            -0.010593
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0691,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.3125,
+          "normalizedOffset": [
+            0.022976,
+            -0.010593
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.062,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.375,
+          "normalizedOffset": [
+            0.022976,
+            -0.010593
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0548,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.4375,
+          "normalizedOffset": [
+            0.022976,
+            -0.010593
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3 flush tread.007",
+          "distanceTowardCamera": 0.0153,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5,
+          "normalizedOffset": [
+            0.022976,
+            -0.010593
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0406,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5625,
+          "normalizedOffset": [
+            0.022976,
+            -0.010593
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0335,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.625,
+          "normalizedOffset": [
+            0.022976,
+            -0.010593
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0264,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.6875,
+          "normalizedOffset": [
+            0.022976,
+            -0.010593
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0193,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.75,
+          "normalizedOffset": [
+            0.022976,
+            -0.010593
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail",
+          "distanceTowardCamera": 0.4824,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.8125,
+          "normalizedOffset": [
+            0.022976,
+            -0.010593
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail",
+          "distanceTowardCamera": 0.4824,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.875,
+          "normalizedOffset": [
+            0.022976,
+            -0.010593
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail",
+          "distanceTowardCamera": 0.4824,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.9375,
+          "normalizedOffset": [
+            0.022976,
+            -0.010593
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access rail upright.002",
+          "distanceTowardCamera": 0.4469,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 0,
+          "t": 0.9231,
+          "normalizedOffset": [
+            0.022976,
+            -0.010593
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0485,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.0667,
+          "normalizedOffset": [
+            0.022976,
+            -0.010593
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance rail upright",
+          "distanceTowardCamera": 0.1694,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.0667,
+          "normalizedOffset": [
+            0.022976,
+            -0.026482
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance rail upright",
+          "distanceTowardCamera": 0.1694,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4,
+          "normalizedOffset": [
+            0.022976,
+            -0.010593
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance rail upright.001",
+          "distanceTowardCamera": 0.0995,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4,
+          "normalizedOffset": [
+            0.022976,
+            -0.026482
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance rail upright.001",
+          "distanceTowardCamera": 0.0995,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8,
+          "normalizedOffset": [
+            0.022976,
+            -0.010593
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_dry maintenance catwalk",
+          "distanceTowardCamera": 0.0604,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8,
+          "normalizedOffset": [
+            0.022976,
+            -0.026482
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance rail upright.002",
+          "distanceTowardCamera": 0.1562,
+          "classification": "path-edge-or-guardrail"
+        }
+      ]
+    },
+    {
+      "profile": "editor",
+      "width": 506,
+      "height": 392,
+      "mode": "close",
+      "normalized": {
+        "left": -0.028388784069053753,
+        "right": 0.03087646102355846,
+        "top": -0.14235365537306954,
+        "bottom": 0.00632162614321197
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.6752652888436045,
+      "sampleCount": 3300,
+      "equipmentContactCount": 0,
+      "pathEdgeContactCount": 25,
+      "objects": {
+        "walk_main inspection lane 3": 1,
+        "quality access rail upright": 4,
+        "quality access rail upright.001": 2,
+        "quality access rail upright.002": 4,
+        "maintenance rail upright": 2,
+        "maintenance rail upright.003": 1,
+        "maintenance outer rail.001": 10,
+        "maintenance rail upright.004": 1
+      },
+      "contacts": [
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 0.9091,
+          "normalizedOffset": [
+            0.030876,
+            -0.014235
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0317,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.030876,
+            -0.014235
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access rail upright",
+          "distanceTowardCamera": 0.1064,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.030876,
+            -0.035588
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access rail upright",
+          "distanceTowardCamera": 0.1064,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.030876,
+            -0.014235
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access rail upright",
+          "distanceTowardCamera": 0.1064,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.030876,
+            -0.035588
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access rail upright",
+          "distanceTowardCamera": 0.1064,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.375,
+          "normalizedOffset": [
+            0.030876,
+            -0.014235
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access rail upright.001",
+          "distanceTowardCamera": 0.0957,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.375,
+          "normalizedOffset": [
+            0.030876,
+            -0.035588
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access rail upright.001",
+          "distanceTowardCamera": 0.0957,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.6875,
+          "normalizedOffset": [
+            0.030876,
+            -0.014235
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access rail upright.002",
+          "distanceTowardCamera": 0.0396,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.6875,
+          "normalizedOffset": [
+            0.030876,
+            -0.035588
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access rail upright.002",
+          "distanceTowardCamera": 0.0396,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.75,
+          "normalizedOffset": [
+            0.030876,
+            -0.014235
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access rail upright.002",
+          "distanceTowardCamera": 0.1327,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.75,
+          "normalizedOffset": [
+            0.030876,
+            -0.035588
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access rail upright.002",
+          "distanceTowardCamera": 0.1327,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 0,
+          "t": 0.9231,
+          "normalizedOffset": [
+            0.030876,
+            -0.014235
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance rail upright",
+          "distanceTowardCamera": 0.0533,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 0,
+          "t": 0.9231,
+          "normalizedOffset": [
+            0.030876,
+            -0.035588
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "maintenance rail upright",
+          "distanceTowardCamera": 0.0533,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.3333,
+          "normalizedOffset": [
+            -0.028389,
+            -0.014235
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance rail upright.003",
+          "distanceTowardCamera": 0.0187,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4,
+          "normalizedOffset": [
+            -0.028389,
+            -0.014235
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0548,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4667,
+          "normalizedOffset": [
+            -0.028389,
+            -0.014235
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0548,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.5333,
+          "normalizedOffset": [
+            -0.028389,
+            -0.014235
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0548,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6,
+          "normalizedOffset": [
+            -0.028389,
+            -0.014235
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0548,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6667,
+          "normalizedOffset": [
+            -0.028389,
+            -0.014235
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0548,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.7333,
+          "normalizedOffset": [
+            -0.028389,
+            -0.014235
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance rail upright.004",
+          "distanceTowardCamera": 0.0382,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8,
+          "normalizedOffset": [
+            -0.028389,
+            -0.014235
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0548,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8667,
+          "normalizedOffset": [
+            -0.028389,
+            -0.014235
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0548,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.9333,
+          "normalizedOffset": [
+            -0.028389,
+            -0.014235
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0548,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 1.0,
+          "normalizedOffset": [
+            -0.028389,
+            -0.014235
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0548,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 2,
+          "t": 0.0,
+          "normalizedOffset": [
+            -0.028389,
+            -0.014235
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0548,
+          "classification": "path-edge-or-guardrail"
+        }
+      ]
+    },
+    {
+      "profile": "editor",
+      "width": 506,
+      "height": 392,
+      "mode": "panorama",
+      "normalized": {
+        "left": -0.03462046837689482,
+        "right": 0.03765422076043715,
+        "top": -0.1736020187476458,
+        "bottom": 0.007709300174648745
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.5537175368517556,
+      "sampleCount": 3300,
+      "equipmentContactCount": 0,
+      "pathEdgeContactCount": 13,
+      "objects": {
+        "quality access outer rail.001": 12,
+        "quality access rail upright.005": 1
+      },
+      "contacts": [
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.375,
+          "normalizedOffset": [
+            -0.03462,
+            -0.01736
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0174,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.4375,
+          "normalizedOffset": [
+            -0.03462,
+            -0.01736
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0174,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5,
+          "normalizedOffset": [
+            -0.03462,
+            -0.01736
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0174,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5625,
+          "normalizedOffset": [
+            -0.03462,
+            -0.01736
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0174,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.625,
+          "normalizedOffset": [
+            -0.03462,
+            -0.01736
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0174,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.6875,
+          "normalizedOffset": [
+            -0.03462,
+            -0.01736
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0174,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.75,
+          "normalizedOffset": [
+            -0.03462,
+            -0.01736
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0174,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.8125,
+          "normalizedOffset": [
+            -0.03462,
+            -0.01736
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0174,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.875,
+          "normalizedOffset": [
+            -0.03462,
+            -0.01736
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0174,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.9375,
+          "normalizedOffset": [
+            -0.03462,
+            -0.01736
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0174,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 1.0,
+          "normalizedOffset": [
+            -0.03462,
+            -0.01736
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0174,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 2,
+          "t": 0.0,
+          "normalizedOffset": [
+            -0.03462,
+            -0.01736
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0174,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 2,
+          "t": 0.1111,
+          "normalizedOffset": [
+            -0.03462,
+            -0.01736
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access rail upright.005",
+          "distanceTowardCamera": 0.0484,
+          "classification": "path-edge-or-guardrail"
+        }
+      ]
+    },
+    {
+      "profile": "narrow-portrait",
+      "width": 320,
+      "height": 568,
+      "mode": "close",
+      "normalized": {
+        "left": -0.028869047619047617,
+        "right": 0.03139880952380952,
+        "top": -0.14476190476190476,
+        "bottom": 0.006428571428571429
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 1.05,
+      "sampleCount": 3300,
+      "equipmentContactCount": 0,
+      "pathEdgeContactCount": 20,
+      "objects": {
+        "walk_main inspection lane 3": 1,
+        "quality access rail upright": 4,
+        "quality access rail upright.001": 2,
+        "quality access rail upright.002": 2,
+        "maintenance outer rail.001": 10,
+        "maintenance rail upright.004": 1
+      },
+      "contacts": [
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 0.9091,
+          "normalizedOffset": [
+            0.031399,
+            -0.014476
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "walk_main inspection lane 3",
+          "distanceTowardCamera": 0.0313,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.031399,
+            -0.014476
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access rail upright",
+          "distanceTowardCamera": 0.1221,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 0,
+          "t": 1.0,
+          "normalizedOffset": [
+            0.031399,
+            -0.03619
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access rail upright",
+          "distanceTowardCamera": 0.1221,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.031399,
+            -0.014476
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access rail upright",
+          "distanceTowardCamera": 0.1221,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.0,
+          "normalizedOffset": [
+            0.031399,
+            -0.03619
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access rail upright",
+          "distanceTowardCamera": 0.1221,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.375,
+          "normalizedOffset": [
+            0.031399,
+            -0.014476
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access rail upright.001",
+          "distanceTowardCamera": 0.1054,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.375,
+          "normalizedOffset": [
+            0.031399,
+            -0.03619
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access rail upright.001",
+          "distanceTowardCamera": 0.1054,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.6875,
+          "normalizedOffset": [
+            0.031399,
+            -0.014476
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access rail upright.002",
+          "distanceTowardCamera": 0.017,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.6875,
+          "normalizedOffset": [
+            0.031399,
+            -0.03619
+          ],
+          "bodyFractionAboveFoot": 0.25,
+          "object": "quality access rail upright.002",
+          "distanceTowardCamera": 0.017,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4,
+          "normalizedOffset": [
+            -0.028869,
+            -0.014476
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0567,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.4667,
+          "normalizedOffset": [
+            -0.028869,
+            -0.014476
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0567,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.5333,
+          "normalizedOffset": [
+            -0.028869,
+            -0.014476
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0567,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6,
+          "normalizedOffset": [
+            -0.028869,
+            -0.014476
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0567,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.6667,
+          "normalizedOffset": [
+            -0.028869,
+            -0.014476
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0567,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.7333,
+          "normalizedOffset": [
+            -0.028869,
+            -0.014476
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance rail upright.004",
+          "distanceTowardCamera": 0.0438,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8,
+          "normalizedOffset": [
+            -0.028869,
+            -0.014476
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0567,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.8667,
+          "normalizedOffset": [
+            -0.028869,
+            -0.014476
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0567,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 0.9333,
+          "normalizedOffset": [
+            -0.028869,
+            -0.014476
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0567,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 1,
+          "t": 1.0,
+          "normalizedOffset": [
+            -0.028869,
+            -0.014476
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0567,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 2,
+          "t": 0.0,
+          "normalizedOffset": [
+            -0.028869,
+            -0.014476
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance outer rail.001",
+          "distanceTowardCamera": 0.0567,
+          "classification": "path-edge-or-guardrail"
+        }
+      ]
+    },
+    {
+      "profile": "narrow-portrait",
+      "width": 320,
+      "height": 568,
+      "mode": "panorama",
+      "normalized": {
+        "left": -0.035206155632984903,
+        "right": 0.03829123112659698,
+        "top": -0.1765389082462253,
+        "bottom": 0.007839721254355402
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.861,
+      "sampleCount": 3300,
+      "equipmentContactCount": 0,
+      "pathEdgeContactCount": 15,
+      "objects": {
+        "quality access outer rail.001": 13,
+        "quality access rail upright.005": 1,
+        "maintenance rail upright.005": 1
+      },
+      "contacts": [
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.375,
+          "normalizedOffset": [
+            -0.035206,
+            -0.017654
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0383,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.4375,
+          "normalizedOffset": [
+            -0.035206,
+            -0.017654
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0383,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5,
+          "normalizedOffset": [
+            -0.035206,
+            -0.017654
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0383,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.5625,
+          "normalizedOffset": [
+            -0.035206,
+            -0.017654
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0383,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.625,
+          "normalizedOffset": [
+            -0.035206,
+            -0.017654
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0383,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.6875,
+          "normalizedOffset": [
+            -0.035206,
+            -0.017654
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0383,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.75,
+          "normalizedOffset": [
+            -0.035206,
+            -0.017654
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0383,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.8125,
+          "normalizedOffset": [
+            -0.035206,
+            -0.017654
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0383,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.875,
+          "normalizedOffset": [
+            -0.035206,
+            -0.017654
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0383,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 0.9375,
+          "normalizedOffset": [
+            -0.035206,
+            -0.017654
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0383,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 1,
+          "t": 1.0,
+          "normalizedOffset": [
+            -0.035206,
+            -0.017654
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0383,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 2,
+          "t": 0.0,
+          "normalizedOffset": [
+            -0.035206,
+            -0.017654
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0383,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 2,
+          "t": 0.1111,
+          "normalizedOffset": [
+            -0.035206,
+            -0.017654
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access outer rail.001",
+          "distanceTowardCamera": 0.0784,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "main:3",
+          "segment": 2,
+          "t": 0.2222,
+          "normalizedOffset": [
+            -0.035206,
+            -0.017654
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "quality access rail upright.005",
+          "distanceTowardCamera": 0.1406,
+          "classification": "path-edge-or-guardrail"
+        },
+        {
+          "route": "secret:0",
+          "segment": 2,
+          "t": 0.1818,
+          "normalizedOffset": [
+            -0.035206,
+            -0.017654
+          ],
+          "bodyFractionAboveFoot": 0.1,
+          "object": "maintenance rail upright.005",
+          "distanceTowardCamera": 0.0372,
+          "classification": "path-edge-or-guardrail"
+        }
+      ]
+    }
+  ]
+}

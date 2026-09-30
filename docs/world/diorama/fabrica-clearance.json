@@ -1,0 +1,11 @@
+{
+  "method": "Read-only rays at route center and both edges, every <=0.13 world unit. Support is an authored walk_ surface within 0.16 under the foot; headroom checked to0.88.",
+  "sampleCount": 660,
+  "headroomRayCount": 660,
+  "supportRayCount": 660,
+  "obstructionCount": 0,
+  "unsupportedCount": 0,
+  "maxAdjacentSampleRise": 0.0793,
+  "obstructions": [],
+  "unsupported": []
+}

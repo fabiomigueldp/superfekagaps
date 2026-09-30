@@ -1,0 +1,11 @@
+{
+  "method": "Actual camera-facing ray intersections from actor silhouette samples, rather than overlapping screen bounding boxes. Every route step uses three lateral samples and four body heights.",
+  "actorWorldEnvelope": {
+    "halfWidth": 0.26,
+    "height": 0.98,
+    "lowestTestHeight": 0.22
+  },
+  "sampleCount": 2640,
+  "conflictCount": 0,
+  "conflicts": []
+}

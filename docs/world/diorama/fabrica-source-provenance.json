@@ -1,0 +1,32 @@
+{
+  "world": 3,
+  "blenderVersion": "4.3.2",
+  "canonicalSource": "tools/diorama/render_fabrica_map.py",
+  "sourceSha256": {
+    "render_fabrica_map.py": "458641df20dc4234b84d887d5dea04a34b912b58e8626d73a2951d3b24cff2d2",
+    "check_fabrica_clearance.py": "308e544c4f5c8f350731983f7797386ba12c1e2a30d2a99e328f50b08ea76d00",
+    "check_fabrica_billboard.py": "638722475c1e6ed6019c60e07a7d3b845f1ae1efc08874562f8779ecbf4dfe66",
+    "render_fabrica_cached.py": "71ba89e0770adb1c4101c94f3fdf7ffb348e2533d8eca1b3de5d8cb87fb31e60",
+    "package_fabrica_map.py": "0abfffced0b1619165d3d47fa0aa724a79574a9690b41c6c5ecdbbe2257084ee"
+  },
+  "primitiveMeshObjects": 590,
+  "meshVerticesBeforeModifiers": 12578,
+  "curveObjects": 4,
+  "textObjects": 4,
+  "materials": 19,
+  "booleanModifiers": 0,
+  "externalImages": [],
+  "render": {
+    "engine": "CYCLES",
+    "samples": 160,
+    "denoising": false,
+    "resolution": [
+      1920,
+      1200
+    ],
+    "transparent": true
+  },
+  "navigationMetadataEmbedded": true,
+  "cachePolicy": "Discardable /tmp .blend, not tracked or deployed",
+  "provenance": "Original procedural Blender meshes/materials. No imported third-party assets. Palette and visual motifs informed by repository campaign/lore/concept reference."
+}

@@ -3,5 +3,5 @@
   "compilerOptions": {
     "types": ["node", "wicg-file-system-access"]
   },
-  "include": ["scripts", "tests", "vite.config.ts"]
+  "include": ["scripts", "tests", "tools/diorama/*.ts", "vite.config.ts"]
 }

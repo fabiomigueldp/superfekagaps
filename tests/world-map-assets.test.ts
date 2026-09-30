@@ -8,6 +8,7 @@ test('each visited island loads under 350 KB of authored WebP art and matching m
     const islands = [
         { world: 1, files: ['costa-diorama.webp', 'costa-shadow.webp', 'porto-distant.webp', 'costa-diorama.meta.json'] },
         { world: 2, files: ['porto-diorama.webp', 'porto-diorama.meta.json'] },
+        { world: 3, files: ['fabrica-diorama.webp', 'fabrica-diorama.meta.json'] },
     ];
     for (const { world, files } of islands) {
         let bytes = 0;
@@ -19,11 +20,14 @@ test('each visited island loads under 350 KB of authored WebP art and matching m
             }
         }
         assert.ok(bytes <= 350_000, `Island ${world} lazy-loaded art totals ${bytes} bytes`);
-        assert.ok(parseMapMetadata(JSON.parse(readFileSync(new URL(files.at(-1)!, root), 'utf8')), world));
+        const metadata = parseMapMetadata(JSON.parse(readFileSync(new URL(files.at(-1)!, root), 'utf8')), world);
+        assert.ok(metadata);
+        if (world > 1) assert.ok(metadata.artBounds, `Island ${world} ships measured silhouette bounds.`);
     }
 });
 test('the shipped transparent WebP layers retain the authored camera framing', () => {
-    for (const [file, width, height] of [['costa-diorama.webp', 1920, 1200], ['porto-diorama.webp', 1920, 1200], ['porto-distant.webp', 960, 600]] as const) {
+    for (const [file, width, height] of [['costa-diorama.webp', 1920, 1200], ['porto-diorama.webp', 1920, 1200],
+        ['fabrica-diorama.webp', 1920, 1200], ['porto-distant.webp', 960, 600]] as const) {
         const webp = readFileSync(new URL(file, root));
         assert.equal(webp.toString('ascii', 12, 16), 'VP8X');
         assert.ok(webp[20] & 0x10, `${file} must retain transparency for sea compositing`);

@@ -1,0 +1,32 @@
+{
+  "date": "2026-09-30",
+  "branch": "feat/fabrica-diorama-map",
+  "baseline": "f7c93bfc9faa9b650d6e31de0dfcb26e65c24fa4",
+  "tests": { "typescript": 248, "server": 3, "total": 251, "map_subset": 90, "failed": 0 },
+  "validators": "Classic levels, player assets and all World stages/sprites passed",
+  "typecheck": "src and tools passed",
+  "production_build": "passed",
+  "diff_check": "passed",
+  "runtime_art_bytes": { "costa": 260561, "porto": 187342, "fabrica": 152456 },
+  "loading": "Each authored island requests its own image and metadata only on its first visit; subsequent visits reuse that world's cache",
+  "shared_map_font_bytes": 52348,
+  "bundle": { "filename": "index-DIJob2wH.js", "bytes": 395275, "gzip_bytes": 124803, "gzip_measurement": "Python gzip level 9 on the emitted JS file; transport compression can differ" },
+  "art_checks": {
+    "support_samples": 660,
+    "headroom_samples": 660,
+    "physical_projected_rays": 2640,
+    "physical_failures": 0,
+    "viewport_billboard_rays": 52800,
+    "equipment_contacts": 0,
+    "conservative_path_or_guardrail_contacts": 438,
+    "maximum_contact_fraction_above_foot": 0.25
+  },
+  "browser_qa": "Pending the separate Factory preview; lower-quarter path and guardrail rectangle contacts must be inspected with the actual sprite",
+  "limitations": [
+    "No browser FPS claim; DevTools disabled by policy",
+    "No physical or emulated touch device test",
+    "Reduced-motion behavior, loading failures and late-cache isolation are covered by deterministic integration tests",
+    "Billboard sampling is conservative rectangle coverage at recorded viewport profiles, not proof for arbitrary sizes or resize transients",
+    "No screen-reader test"
+  ]
+}
