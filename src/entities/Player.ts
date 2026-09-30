@@ -50,6 +50,8 @@ export class Player {
     tileHit?: { type: number; col: number; row: number; side: 'top' | 'bottom' | 'left' | 'right' } | null,
     groundPoundImpact?: { x: number, y: number, col: number, row: number } | null,
     groundPoundStarted?: boolean,
+    /** Emitted when a manual/buffered jump executes, even if released in the same step. */
+    jumpStarted?: boolean,
     landedTile?: { type: number; col: number; row: number } | null
   } {
     if (this.data.isDead) return {};
@@ -85,8 +87,9 @@ export class Player {
     }
 
     // Processa pulo (bloqueado durante ground pound)
+    let jumpStarted = false;
     if (this.data.groundPoundState === GroundPoundState.NONE) {
-      this.handleJump(input, deltaTime);
+      jumpStarted = this.handleJump(input, deltaTime);
     }
 
     // Aplica gravidade (se não estiver em windup ou recovery)
@@ -128,6 +131,7 @@ export class Player {
         tileHit: collisionResult.tileHit || null,
         groundPoundImpact: gpImpact || null,
         groundPoundStarted: gpStarted,
+        jumpStarted,
         landedTile
       };
     }
@@ -152,6 +156,7 @@ export class Player {
         tileHit: collisionResult.tileHit || null,
         groundPoundImpact: { x: centerX, y: this.data.position.y + this.data.height, col, row },
         groundPoundStarted: gpStarted,
+        jumpStarted,
         landedTile
       };
     }
@@ -175,6 +180,7 @@ export class Player {
       tileHit: collisionResult.tileHit || null,
       groundPoundImpact: gpImpact || null,
       groundPoundStarted: gpStarted,
+      jumpStarted,
       landedTile
     };
   }
@@ -258,7 +264,8 @@ export class Player {
     }
   }
 
-  private handleJump(input: InputState, deltaTime: number): void {
+  private handleJump(input: InputState, deltaTime: number): boolean {
+    let started = false;
     // Buffer de pulo
     if (input.jumpPressed) {
       this.data.jumpBufferTimer = JUMP_BUFFER_TIME;
@@ -269,6 +276,7 @@ export class Player {
       !this.data.isJumping;
 
     if (this.data.jumpBufferTimer > 0 && canJump) {
+      started = true;
       // Inicia pulo
       this.data.velocity.y = PLAYER_JUMP_FORCE;
       this.data.isJumping = true;
@@ -295,6 +303,7 @@ export class Player {
     if (this.data.velocity.y > 0) {
       this.data.isJumping = false;
     }
+    return started;
   }
 
   private handleGroundPound(input: InputState, deltaTime: number, _level: Level): { impact: { x: number, y: number, col: number, row: number } | null, started: boolean } {

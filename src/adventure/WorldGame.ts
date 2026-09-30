@@ -16,6 +16,7 @@ import { WorldAudio } from './WorldAudio';
 import { WorldLevel, WorldObjects, BELT_CARRY_SPEED } from './WorldPhysics';
 import { WorldFoe } from './WorldEnemies';
 import { BossEncounter } from './BossEncounter';
+import { WorldTutorial } from './WorldTutorial';
 import { bossFrame, WORLD_PALETTE } from './WorldAssets';
 import { clamp, overlaps, type AdventureStage, type Dialogue } from './types';
 type Screen = 'title' | 'intro' | 'map' | 'playing' | 'paused' | 'dialogue' | 'clear' | 'ending' | 'gallery' | 'settings';
@@ -36,6 +37,7 @@ export class WorldGame {
     readonly art = new WorldArt();
     readonly store: ProgressStore;
     readonly audio: WorldAudio;
+    readonly tutorial: WorldTutorial;
     state: Screen = 'title';
     stage: AdventureStage = STAGES[0];
     level = new WorldLevel(STAGES[0].level);
@@ -59,6 +61,9 @@ export class WorldGame {
     private sparks: Spark[] = [];
     private dialog: Dialogue | null = null;
     private dialogueTime = 0;
+    private comment: Dialogue | null = null;
+    private commentTimer = 0;
+    private touch = typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0;
     private clearTimer = 0;
     private hitStop = 0;
     private clearSecret = false;
@@ -78,6 +83,7 @@ export class WorldGame {
         }
         catch { }
         this.store = new ProgressStore(storage);
+        this.tutorial = new WorldTutorial(this.store);
         this.audio = new WorldAudio(this.store.save.preferences);
         this.selection = Math.max(0, STAGES.findIndex(s => s.id === this.store.save.selected));
         window.addEventListener('keydown', e => this.menuKey(e));
@@ -200,6 +206,10 @@ export class WorldGame {
         this.hitStop = 0;
         this.collected = new Set();
         this.spoken = new Set();
+        this.dialog = null;
+        this.comment = null;
+        this.commentTimer = 0;
+        this.tutorial.resetAttempt();
         this.checkpoint = -1;
         this.checkpointHelmet = false;
         this.elapsed = 0;
@@ -230,10 +240,8 @@ export class WorldGame {
         if (stage.encounter)
             for (const d of stage.dialogues)
                 this.spoken.add(d.id);
-        if (stage.encounter && !this.store.save.seen.includes(`intro:${stage.id}`)) {
+        if (stage.encounter && !this.store.save.seen.includes(`intro:${stage.id}`) && stage.dialogues[0] && !this.store.save.seen.includes(`dialogue:${stage.dialogues[0].id}`)) {
             this.showDialogue(stage.dialogues[0]);
-            this.store.save.seen.push(`intro:${stage.id}`);
-            this.store.persist();
         }
     }
     private toMap() { this.audio.cancelSpeech(); this.audio.setDying(false); this.audio.pause(false); this.change('map'); this.selection = Math.max(0, STAGES.findIndex(s => s.id === this.store.save.selected)); this.audio.select(0); this.store.persist(); }
@@ -246,9 +254,30 @@ export class WorldGame {
             this.audio.cancelSpeech();
             return;
         }
+        if (this.dialog) {
+            this.store.markSeen(`dialogue:${this.dialog.id}`);
+            if (this.stage.encounter)
+                this.store.markSeen(`intro:${this.stage.id}`);
+        }
         this.dialog = null;
         this.audio.cancelSpeech();
         this.change('playing');
+    }
+    private queueComment(d: Dialogue) {
+        this.spoken.add(d.id);
+        this.comment = d;
+        this.commentTimer = 0;
+    }
+    private updateComment(dt: number) {
+        if (!this.comment || this.toastTimer > 0 || this.tutorial.cue(this.stage, this.player.data, this.touch))
+            return;
+        if (this.commentTimer === 0) {
+            this.store.markSeen(`dialogue:${this.comment.id}`);
+            this.audio.say(this.comment.speaker, this.comment.text, this.comment.clip);
+        }
+        this.commentTimer += dt;
+        if (this.commentTimer >= Math.max(2600, this.comment.text.length * 65))
+            this.comment = null;
     }
     private particle(x: number, y: number, color: string, count = 9) {
         for (let i = 0; i < count; i++) {
@@ -357,6 +386,7 @@ export class WorldGame {
         }
         const input = this.input.getState();
         const result = this.player.update(dt, input, this.level);
+        let switchActivated = false;
         if (!wasGrounded && this.player.data.isGrounded && beforeV > 4) {
             this.particle(this.player.data.position.x + 7, this.player.data.position.y + this.player.data.height, '#d6ccb0', 5);
             this.audio.sfx('land');
@@ -369,7 +399,7 @@ export class WorldGame {
             this.audio.sfx('jump');
         if (result.groundPoundImpact) {
             const p = result.groundPoundImpact;
-            this.objects.pound(p.x, p.y);
+            switchActivated = this.objects.pound(p.x, p.y);
             this.renderer.addImpact(p.x, p.y, 'pound');
             this.camera.shakeTimer = 130;
             this.audio.sfx('pound');
@@ -473,6 +503,7 @@ export class WorldGame {
         }
         if (this.player.data.isDead)
             return;
+        this.tutorial.observe(this.player.data, previous, input, result.jumpStarted === true, switchActivated);
         for (const item of this.stage.pickups) {
             if (this.collected.has(item.id) || item.kind === 'seal' && this.store.save.seals.includes(item.id))
                 continue;
@@ -517,10 +548,15 @@ export class WorldGame {
                 return;
             }
         for (const d of this.stage.dialogues)
-            if (!this.spoken.has(d.id) && Math.abs(p.x - d.x) < 22 && this.player.data.isGrounded) {
-                this.showDialogue(d);
+            if (!this.spoken.has(d.id) && !this.store.save.seen.includes(`dialogue:${d.id}`) && Math.abs(p.x - d.x) < 22 && this.player.data.isGrounded) {
+                if (d.presentation === 'comment')
+                    this.queueComment(d);
+                else
+                    this.showDialogue(d);
                 break;
             }
+        if (this.state === 'playing')
+            this.updateComment(dt);
         if (!this.boss) {
             this.camera.x += (clamp(p.x - 125 + this.player.data.velocity.x * 12, 0, Math.max(0, this.level.data.width * 16 - 320)) - this.camera.x) * .12;
             const screenY = p.y - this.camera.y;
@@ -591,7 +627,14 @@ export class WorldGame {
             pixelText(c, `${Math.round(this.elapsed)} S  ·  ${this.coins} MOEDAS`, 160, 94, '#a7c9d0', 1, 'center');
             this.button(c, this.stage.id === '6-5' ? 'O GRANDE FINAL' : 'SEGUIR VIAGEM', 86, 120, 148, () => this.afterClear());
         }
-        if (this.toastTimer > 0 && this.state !== 'dialogue') {
+        const cue = this.state === 'playing' && this.toastTimer <= 0 ? this.tutorial.cue(this.stage, this.player.data, this.touch) : null;
+        const comment = this.state === 'playing' && this.toastTimer <= 0 && !this.player.data.isDead && this.comment && this.commentTimer > 0 ? this.comment : null;
+        if (cue || comment) {
+            const lines = cue?.lines ?? wrapText(comment!.text, 272);
+            panel(c, 12, 29, 296, 12 + lines.length * 10, '#202d43', '#aac1cd');
+            lines.forEach((line, i) => pixelText(c, line, 24, 36 + i * 10, i === 0 && cue ? ART.goldLight : ART.paper));
+        }
+        else if (this.toastTimer > 0 && this.state !== 'dialogue') {
             panel(c, 35, 29, 250, 19);
             pixelText(c, fitText(this.toast, 238), 160, 35, ART.goldLight, 1, 'center');
         }

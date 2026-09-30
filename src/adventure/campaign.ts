@@ -1,6 +1,6 @@
 import { TileType as T } from '../constants';
 import { EnemyType } from '../types';
-import type { AdventureStage, Island, MechanismSpec, FoeKind, EncounterId, Character, Landmark } from './types';
+import type { AdventureStage, Island, MechanismSpec, FoeKind, EncounterId, Character, Landmark, Dialogue } from './types';
 export const ISLANDS: Island[] = [
     { id: 1, name: 'Costa dos Gaps', accent: '#83d8ba', sky: ['#65bee7', '#c9eddf'], soil: ['#77a84d', '#a17755', '#594c46'], map: [42, 94], description: 'Toda grande aventura começa com um gap.', boss: 'joao' },
     { id: 2, name: 'Porto do Bielzão', accent: '#f6c65c', sky: ['#88b8d2', '#f0d8a4'], soil: ['#ddb170', '#947450', '#39495b'], map: [93, 74], description: 'Carga pesada. Passagem complicada.', boss: 'biel' },
@@ -69,7 +69,7 @@ class Draft {
     ice(x: number, w: number) { return this.platform(x, 14, w, T.ICE); }
     loader(x: number, y = 14, pressurized = false) { return this.m('launcher', `launch${x}`, x, y - 1, 1, 1, { direction: -1, period: 3200, pressurized }); }
     secret(x: number, y: number, requires?: string) { this.s.exits.push({ id: 'secret', x: x * 16, y: y * 16 - 36, width: 20, height: 36, requires }); return this; }
-    talk(x: number, speaker: Character, text: string, clip?: string) { this.s.dialogues.push({ id: `${this.s.id}:d${this.s.dialogues.length}`, x: x * 16, speaker, text, clip }); return this; }
+    talk(x: number, speaker: Character, text: string, clip?: string, presentation: Dialogue['presentation'] = 'comment') { this.s.dialogues.push({ id: `${this.s.id}:d${this.s.dialogues.length}`, x: x * 16, speaker, text, clip, presentation }); return this; }
     land(x: number, y: number, w: number, depth = 23 - y) { for (let r = y; r < Math.min(23, y + depth); r++)
         for (let c = x; c < x + w; c++)
             this.s.level.tiles[r][c] = T.GROUND; return this; }
@@ -97,7 +97,11 @@ function course(w: number, n: number): AdventureStage {
         d.land(27, 18, 4).platform(29, 16, 2).land(78, 18, 6).platform(82, 16, 2).land(109, 18, 4).platform(111, 16, 2);
         d.platform(9, 11, 3).blocks(39, 11, 3).platform(67, 11, 4).platform(121, 11, 3).platform(132, 9, 4);
         d.foe('minion', 36, 14, 32).foe('minion', 91, 13, 40).cp(64).cp(116).item('helmet', 65).seal(1, 21, 10).seal(2, 79, 16).seal(3, 133, 7);
-        d.arc(25, 10, 7).arc(76, 11, 8).arc(138, 10, 6).coins(4, 12, 3).talk(4, 'feka', 'Yasmin, estou chegando!').talk(74, 'feka', 'Caiu? A praia lá embaixo também tem caminho.');
+        d.arc(25, 10, 7);
+        // The second gap's coins dip toward its seal and trace the existing recovery steps.
+        for (const [x, y] of [[75, 12], [77, 13], [78, 14.5], [80, 17], [81, 17], [82, 15], [83, 13], [85, 11]])
+            d.coins(x, y, 1);
+        d.arc(138, 10, 6).coins(4, 12, 3).talk(4, 'feka', 'Yasmin, estou chegando!').talk(74, 'feka', 'A praia lá embaixo também tem caminho.');
         d.art('palms', 5, 14, 8, 7).art('rope', 27, 14, 4, 3).art('palms', 63, 14, 9, 8).art('lighthouse', 129, 12, 8, 12);
         d.cue(22, 12).cue(41, 14).cue(55, 11).cue(70, 14).cue(91, 13).cue(104, 11).cue(121, 14).cue(136, 12);
     }
@@ -132,7 +136,7 @@ function course(w: number, n: number): AdventureStage {
         d.land(0, 14, 25).land(34, 7, 19, 11).land(57, 12, 17).land(83, 6, 19, 12).land(106, 12, 16).land(131, 8, 12, 10).land(146, 14, 14);
         d.lift('l1', 24, 13, 6).sw('s1', 20, 14, 'l1').platform(29, 7, 5).lift('l2', 73, 11, 5).sw('s2', 68, 12, 'l2').platform(78, 6, 5).lift('l3', 121, 11, 7).sw('s3', 116, 12, 'l3').platform(126, 8, 5);
         d.land(25, 20, 9, 3).platform(27, 17, 4).land(74, 20, 9, 3).platform(76, 16, 4).land(122, 20, 9, 3).platform(124, 16, 4).cp(59, 12).cp(108, 12).foe('helmet', 44, 7, 40).foe('charger', 92, 6, 45).seal(1, 39, 5).seal(2, 89, 4).seal(3, 137, 6).item('helmet', 60, 11);
-        d.art('crane', 19, 14, 24, 12).art('container', 34, 18, 19, 11, 'PESO').art('container', 131, 18, 12, 10, '08').art('container', 83, 18, 19, 12, 'BIEL').art('crane', 66, 12, 26, 12).art('crane', 114, 12, 23, 11).talk(15, 'feka', 'Uma sentada no botão. Depois, embarcar!');
+        d.art('crane', 19, 14, 24, 12).art('container', 34, 18, 19, 11, 'PESO').art('container', 131, 18, 12, 10, '08').art('container', 83, 18, 19, 12, 'BIEL').art('crane', 66, 12, 26, 12).art('crane', 114, 12, 23, 11).talk(15, 'feka', 'Uma sentada no botão. Depois, embarcar!', undefined, 'dialogue');
         d.cue(21, 14, 's1').cue(26, 6).cue(42, 7).cue(62, 12).cue(69, 12, 's2').cue(75, 5).cue(92, 6).cue(112, 12).cue(117, 12, 's3').cue(123, 7).cue(137, 8).cue(150, 14);
     }
     if (w === 2 && n === 3) {
@@ -164,14 +168,14 @@ function course(w: number, n: number): AdventureStage {
         // Optional maintenance catwalk rewards a longer jump; both routes rejoin on safe ground.
         d.platform(109,8,4).platform(116,7,4).platform(122,9,3).arc(112,7,5);
         d.cp(49).cp(95).foe('agitator', 73, 11).seal(1, 27, 9).seal(2, 76, 8).seal(3, 117, 5).item('helmet', 50).art('pipe', 18, 12, 23, 7).art('tank', 59, 11, 24, 10, 'LINHA 02').art('tank', 104, 12, 23, 10, 'CONTROLE');
-        d.talk(10,'feka','Uma sentada no botão... e a esteira troca de lado!').talk(52, 'joao', 'Para de encher o saco.', 'para_de_encher_o_saco');
+        d.talk(10,'feka','Uma sentada no botão... e a esteira troca de lado!', undefined, 'dialogue').talk(52, 'joao', 'Para de encher o saco.', 'para_de_encher_o_saco');
         d.cue(15,14,'s1').cue(26, 12).cue(51, 14).cue(56,14,'s2').cue(64, 11).cue(81, 11).cue(97, 14).cue(111, 12).cue(139, 14);
     }
     if (w === 3 && n === 3) {
         d.land(0, 14, 18).land(18, 12, 12).land(35, 10, 12).land(51, 14, 17).land(68, 11, 12).land(85, 9, 13).land(104, 14, 16).land(120, 11, 14).land(140, 14, 20);
         d.jet('j1', 24, 12).jet('j2', 41, 10, 2100).platform(31, 11, 3).platform(48, 12, 3).platform(81, 10, 3).jet('j3', 74, 11, 900).jet('j4', 91, 9, 2600).platform(99, 11, 4).platform(135, 12, 4);
         d.platform(72, 7, 6).platform(87, 5, 8).move('sl', 100, 8, 112, 5).platform(116, 5, 16).secret(129, 5);
-        d.cp(54).cp(107).seal(1, 39, 7).seal(2, 89, 3).seal(3, 124, 3).item('helmet', 55).art('tank', 18, 12, 12, 10, 'A').art('tank', 35, 10, 12, 9, 'B').art('tank', 68, 11, 12, 10, 'C').art('tank', 85, 9, 13, 8, 'D').art('pipe', 97, 14, 22, 8).talk(14, 'feka', 'Primeiro treme... depois espirra.');
+        d.cp(54).cp(107).seal(1, 39, 7).seal(2, 89, 3).seal(3, 124, 3).item('helmet', 55).art('tank', 18, 12, 12, 10, 'A').art('tank', 35, 10, 12, 9, 'B').art('tank', 68, 11, 12, 10, 'C').art('tank', 85, 9, 13, 8, 'D').art('pipe', 97, 14, 22, 8).talk(14, 'feka', 'Primeiro treme... depois espirra.', undefined, 'dialogue');
         d.cue(25, 12).cue(41, 10).cue(57, 14).cue(74, 11).cue(91, 9).cue(111, 14).cue(127, 11).cue(145, 14);
     }
     if (w === 3 && n === 4) {
@@ -208,7 +212,7 @@ function course(w: number, n: number): AdventureStage {
     if (w === 5 && n === 1) {
         d.land(0, 14, 19).land(19, 12, 16).land(41, 14, 16).land(57, 11, 18).land(82, 14, 16).land(98, 12, 18).land(123, 9, 14).land(143, 14, 17);
         d.platform(19, 12, 16, T.ICE).platform(57, 11, 18, T.ICE).platform(98, 12, 18, T.ICE).platform(123, 9, 14, T.ICE).platform(36, 13, 4).platform(76, 12, 5).platform(117, 11, 5).platform(138, 11, 4);
-        d.cp(44).cp(85).foe('helmet', 68, 11, 45).foe('loader', 130, 9).seal(1, 26, 9).seal(2, 65, 8).seal(3, 130, 6).item('helmet', 45).arc(32, 10, 10).arc(112, 10, 11).art('freezer', 19, 12, 16, 10, 'ESTOQUE 01').art('freezer', 57, 11, 18, 10, '-18°').art('freezer', 98, 12, 18, 10, 'RESERVA').talk(13, 'feka', 'No gelo, soltar não basta. Preciso frear para o outro lado.');
+        d.cp(44).cp(85).foe('helmet', 68, 11, 45).foe('loader', 130, 9).seal(1, 26, 9).seal(2, 65, 8).seal(3, 130, 6).item('helmet', 45).arc(32, 10, 10).arc(112, 10, 11).art('freezer', 19, 12, 16, 10, 'ESTOQUE 01').art('freezer', 57, 11, 18, 10, '-18°').art('freezer', 98, 12, 18, 10, 'RESERVA').talk(13, 'feka', 'No gelo, soltar não basta. Preciso frear para o outro lado.', undefined, 'dialogue');
         d.cue(27, 12).cue(46, 14).cue(66, 11).cue(88, 14).cue(108, 12).cue(130, 9).cue(148, 14);
     }
     if (w === 5 && n === 2) {
@@ -287,7 +291,7 @@ function arena(w: number): AdventureStage {
     if (type === 'J2')
         d.m('platform','dais',16.5,11.8125,3.125,.3125).m('support', 'left', 5, 10, 4, .5, { to: { x: 80, y: 13 * 16 } }).m('support', 'right', 14, 10, 4, .5, { to: { x: 224, y: 13 * 16 } });
     const who = ISLANDS[w - 1].boss;
-    d.talk(0, who, type === 'J1' ? 'Aqui é o João, namorado da Yasmin.' : type === 'J2' ? 'Eu sou o namorado dela.' : who === 'biel' ? 'A passagem fechou.' : 'Vamos fazer um controle de qualidade.', type === 'J1' ? 'aqui_e_o_joao_namorado_da_yasmin' : type === 'J2' ? 'eu_sou_o_namorado_dela' : undefined);
+    d.talk(0, who, type === 'J1' ? 'Aqui é o João, namorado da Yasmin.' : type === 'J2' ? 'Eu sou o namorado dela.' : who === 'biel' ? 'A passagem fechou.' : 'Vamos fazer um controle de qualidade.', type === 'J1' ? 'aqui_e_o_joao_namorado_da_yasmin' : type === 'J2' ? 'eu_sou_o_namorado_dela' : undefined, 'dialogue');
     return d.done();
 }
 export const STAGES: AdventureStage[] = ISLANDS.flatMap(w => [1, 2, 3, 4].map(n => course(w.id, n)).concat(arena(w.id)));

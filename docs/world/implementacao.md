@@ -30,6 +30,20 @@ No mapa, use esquerda/direita para escolher fase e cima/baixo para mudar ilha. E
 - Opções separadas de música, efeitos, vozes e tremor.
 - Editor World com paleta, seleção/arraste de mecanismos, inspetor, destinos, ligações, undo/redo, JSON, importação/exportação e prévia isolada do save real.
 
+## Primeiro contato e novas tentativas — 30/09/2026
+
+- Comentários de percurso aparecem em uma faixa curta, sem pausar nem limpar as teclas mantidas. Falas de ensino de mecanismos, pressão e gelo e as apresentações de chefes conservam a primeira leitura com pausa.
+- Falas concluídas ficam no save World e não se repetem ao morrer, retornar do mapa ou recarregar. Uma cena interrompida antes de fechar continua disponível. Saves anteriores e a campanha clássica são preservados.
+- Cada nova prévia do editor permite reler falas alteradas e testar dicas novamente, sem afetar o save real. Morrer dentro da mesma prévia continua sem repetir as falas.
+- Dicas de pulo e corrida aparecem nos trechos seguros de 1-1, com retomada no início de 1-2. Pular e aterrissar confirma o pulo; percorrer três tiles correndo confirma a corrida. Apertar teclas sem executar a ação não dispensa a dica.
+- A sentada é explicada perto do primeiro acionador de 2-2 ou 3-2. A dica permanece após um golpe que erra e desaparece quando uma sentada ativa um mecanismo. Teclado e toque têm instruções próprias.
+- As oito moedas sobre o gap do segundo selo de 1-1 agora indicam a descida e os apoios de retorno. O selo, terreno, arte, inimigos e saídas permanecem no lugar. A queda a pé e a recuperação com dois pulos comuns têm regressão usando a física real.
+- As dicas têm prioridade sobre comentários; o aviso de checkpoint tem prioridade sobre ambos. O tempo de leitura de comentários para durante pausa e quando outra indicação ocupa a faixa.
+
+Regressões específicas: `tests/world-guidance.test.ts` e `tests/world-opening-route.test.ts`. Para revisão visual, usar uma sessão de teste isolada: primeiro pulo/corrida em 1-1, queda pelo rastro de moedas, morte e nova passagem em Ponte Bamba, primeira leitura/interrupção de uma instrução e uma sentada errada/correta no acionador. Repetir com toque. A execução sem navegador testa fluxo e física, mas não substitui essa revisão de legibilidade e sensação de jogo.
+
+Neste ambiente, o comando agregado `npm run check` encontra `EPERM` ao abrir o pipe temporário do CLI `tsx`. As mesmas etapas podem ser executadas sem esse CLI: `node --import tsx --test tests/*.test.ts`, `node --test tests/*.test.mjs`, `node --import tsx scripts/validate_levels.ts`, `node --import tsx scripts/validate_player_assets.ts`, `node --import tsx scripts/validate_world.ts`, `npm run typecheck` e `node node_modules/vite/bin/vite.js build`. Nenhuma configuração ou dependência do projeto foi alterada por essa limitação.
+
 ## Estrutura do código
 
 | Arquivo em `src/adventure/` | Responsabilidade |
@@ -51,6 +65,7 @@ No mapa, use esquerda/direita para escolher fase e cima/baixo para mudar ilha. E
 | `WorldTransportArt.ts` | correias, roletes, elevadores guiados, teleféricos, acionadores e suportes de madeira |
 | `WorldAudio.ts` | composição, efeitos, vozes e reprodução das gravações |
 | `WorldGame.ts` | fluxo, input, encontros, interface e cenas |
+| `WorldTutorial.ts` | dicas contextuais e confirmação de movimentos executados, exclusivas do World |
 | `WorldEditor.ts` | autoria e prévia dos dados World |
 
 Player, Input, Renderer, PixelGrid, atlas, fonte e parte dos assets vêm da base do remaster. O World mantém seu coordenador de campanha separado das regras lineares do original.

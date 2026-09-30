@@ -1,6 +1,6 @@
 import { WorldGame } from './WorldGame';
 import { STAGES } from './campaign';
-import { validateStage } from './progress';
+import { resetPreviewGuidance, validateStage } from './progress';
 import type { AdventureStage, MechanismKind } from './types';
 import { TileType } from '../constants';
 import { rect } from './WorldArt';
@@ -197,6 +197,7 @@ export class WorldEditor {
         this.pan.max = String(maxX);
         const camera = { x: Math.min(maxX, this.game.camera.x), y: this.draft.encounter ? 64 : 88 };
         this.pan.value = String(camera.x);
+        resetPreviewGuidance(this.game.store.save);
         if (!this.game.store.save.seen.includes(`intro:${this.draft.id}`))
             this.game.store.save.seen.push(`intro:${this.draft.id}`);
         this.game.load(this.draft.id, false, this.draft);

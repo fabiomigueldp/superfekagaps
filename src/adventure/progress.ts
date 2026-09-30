@@ -1,6 +1,10 @@
 import type { AdventureSave, AdventureStage } from './types';
 export const SAVE_KEY = 'super_feka_gaps_world_v1';
 export const freshSave = (): AdventureSave => ({ version: 1, completed: [], seals: [], secrets: [], seen: [], selected: '1-1', checkpoint: null, times: {}, preferences: { music: .55, effects: .7, voice: .8, shake: true } });
+/** Fresh editor previews need a new read-through. Never call for an in-game retry. */
+export function resetPreviewGuidance(save: AdventureSave): void {
+    save.seen = save.seen.filter(id => !id.startsWith('dialogue:') && !id.startsWith('control:'));
+}
 const validId = (s: unknown): s is string => typeof s === 'string' && /^[1-6]-[1-5]$/.test(s);
 export function parseSave(raw: string): AdventureSave {
     const data: unknown = JSON.parse(raw);
@@ -95,6 +99,14 @@ export class ProgressStore {
         }
     }
     import(raw: string): void { const next = parseSave(raw); this.save = next; this.protected = false; this.persist(); }
+    /** First-time guidance survives retries, map returns and browser reloads. */
+    markSeen(id: string): boolean {
+        if (this.save.seen.includes(id))
+            return false;
+        this.save.seen.push(id);
+        this.persist();
+        return true;
+    }
     collect(id: string): boolean { if (this.save.seals.includes(id))
         return false; this.save.seals.push(id); this.persist(); return true; }
 }

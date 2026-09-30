@@ -38,6 +38,8 @@ export interface Dialogue {
     speaker: Character;
     text: string;
     clip?: string;
+    /** Missing means a first-time blocking scene, including older editor exports. */
+    presentation?: 'dialogue' | 'comment';
 }
 /** Authored scenery is anchored to the same tile geometry as the route. */
 export interface Landmark extends Rect {
