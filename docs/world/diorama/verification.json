@@ -1,0 +1,69 @@
+{
+  "date": "2026-09-30",
+  "branch": "feat/costa-diorama-map",
+  "base_commit": "56348fa0b3618510dfd44746d4e7c63974c38403",
+  "publication": "Separate preview publication authorized; deployment checks recorded separately",
+  "tests": {
+    "typescript": 203,
+    "javascript": 3,
+    "failed": 0
+  },
+  "validators": {
+    "classic_levels": 3,
+    "world_stages": 30,
+    "world_sprite_frames": 260,
+    "player_assets": "passed"
+  },
+  "typecheck": {
+    "src": "passed",
+    "tools": "passed"
+  },
+  "production_build": "passed",
+  "git_diff_check": "passed",
+  "runtime_art_bytes": {
+    "costa-diorama.webp": 199774,
+    "porto-distant.webp": 42068,
+    "costa-shadow.webp": 9198,
+    "costa-diorama.meta.json": 9521
+  },
+  "runtime_art_total_bytes": 260561,
+  "bundle": {
+    "filename": "index-7x1apOQP.js",
+    "bytes": 388306,
+    "gzip_bytes": 122286
+  },
+  "canvas_backing_budget_pixels": 4000000,
+  "source_render": [
+    1920,
+    1200
+  ],
+  "geometry_audit": {
+    "method": "Vertical rays at route center and lateral offsets; flags non-walkable geometry >0.18 world units above intended footline within 0.85 headroom. Visual inspection is also required. Handrail edge contacts are reported, not silently ignored.",
+    "rayCount": 966,
+    "centerRayCount": 322,
+    "edgeRayCount": 644,
+    "flagCount": 0,
+    "centerFlagCount": 0,
+    "edgeFlagCount": 0,
+    "byObject": {},
+    "flags": []
+  },
+  "art_provenance_hashes": "verified",
+  "visual_review": {
+    "blender_art": "Inspected full-resolution geometry and stair/bridge junctions",
+    "offline_compositions": "Production Canvas commands plus an SVG review facsimile of the UI; not browser screenshots",
+    "browser": "Pending authorized preview; local browser/loopback access is blocked",
+    "fps": "Not measured; no FPS claim"
+  },
+  "regression_focus": [
+    "late asset completion",
+    "hidden-tab lifecycle",
+    "native map keyboard buttons",
+    "mute and editor preservation",
+    "locked stages and save selection",
+    "reduced-motion idle rendering",
+    "repeated and alternating travel retargets",
+    "short-landscape pin/focus bounds",
+    "relative deployment asset base"
+  ]
+}

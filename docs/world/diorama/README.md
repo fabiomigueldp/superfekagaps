@@ -1,0 +1,55 @@
+# Costa dos Gaps · mapa-diorama 2.5D
+
+Primeiro recorte da nova apresentação de mapa. Branch de prévia `feat/costa-diorama-map`, a partir de `56348fa`. A prévia é publicada separadamente da produção para revisão no navegador.
+
+## Direção e composição
+
+A Costa foi modelada e iluminada no Blender: praia, arco natural, falésias estratificadas, palmeiras, ponte suspensa, caminhos e escadas, farol listrado, casa e cais. O Porto aparece como outra camada ao fundo. Os cinco pontos e as rotas são projetados pela própria câmera ortográfica do render, não posicionados por aproximação visual.
+
+A apresentação tem uma câmera dirigida, aproximação inicial, botão de panorama, mar e gaivotas com movimento discreto. Feka percorre as rotas entre os pontos. A saída secreta da fase 1-3 revela a ligação para 1-5. As demais ilhas mantêm uma apresentação cartográfica compatível com a arte legada nesta primeira fatia.
+
+## Arquitetura
+
+- `WorldMapModel.ts`: coordenadas, câmera, seleção, progresso e percursos puros/testáveis
+- `WorldMapArt.ts`: compositor Canvas sem DOM, listeners ou relógio próprio
+- `WorldMapView.ts`: camada dedicada de alta resolução, controles HTML semânticos e ciclo de vida
+- `WorldGame.ts`: continua sendo o único dono do loop; o mapa retorna antes da renderização 320×180
+- `map.css`: layout responsivo para desktop e telefone, foco visível e estados de progresso
+- `public/assets/world/map`: camadas e metadados exportados pelo Blender
+- `tools/diorama`: fonte reproduzível da cena, descrita em `art-direction.md`
+
+O gameplay, a física e o render 320×180 das fases permanecem separados. São preservados os seis mundos, 30 IDs de fase, 72 selos, saídas secretas, checkpoints, save v1, galeria, opções, modo clássico e editor. O mapa reutiliza o mesmo `isUnlocked`, `ProgressStore` e `load` da campanha.
+
+Os controles têm rótulos acessíveis, foco visível e estado da seleção anunciado. Setas/WASD navegam; Enter/Espaço ativam botões nativos; Escape retorna ao menu. Toque em um ponto seleciona; tocar novamente ou usar “Jogar fase” entra. Fase bloqueada continua inspecionável, sem desbloqueio indevido. Há botão Menu também no telefone. Na prévia do editor, a camada ocupa apenas a área do jogo e não cobre o painel de autoria.
+
+## Movimento e custo
+
+`prefers-reduced-motion` remove interpolação de câmera, percurso e animação ambiente. Uma única instância da camada é reutilizada nas voltas ao mapa; não há RAF adicional. Quando o documento está oculto, o mapa não é pintado. Em movimento reduzido, quadros estáticos não fazem nenhuma chamada de pintura; progresso, seleção, panorama e resize invalidam a imagem normalmente. Mudanças repetidas de destino preservam o trecho já percorrido e podem inverter o sentido sem cortar pelo terreno. O backing canvas é limitado a DPR 2 e aproximadamente 4 megapixels (mais eventual arredondamento de um pixel), inclusive em telas ultrawide.
+
+Os assets são carregados apenas na primeira abertura do mapa. A arte e os metadados precisam estar disponíveis em conjunto; caso contrário é usada a apresentação legada funcional, evitando pinos em posições incorretas. O runtime não inclui Blender, WebGL ou dependência 3D.
+
+## Verificação visual e limites
+
+`costa-review.png`, `costa-secret-review.png` e `costa-mobile-review.png` são composições de revisão offline. O cenário vem das chamadas reais do painter de produção, serializadas em SVG e rasterizadas pelo Inkscape. O texto, os botões e os marcadores nessas imagens são uma reprodução SVG de revisão. **Essas imagens não são capturas de navegador e não comprovam o layout CSS ou o desempenho do navegador.** Os renders Blender foram inspecionados diretamente.
+
+O navegador local/loopback está bloqueado neste ambiente; não foi contornado. Navegação browser real, layout CSS final, leitor de tela, dispositivo touch físico e FPS continuam pendentes. Uma revisão em preview autorizado será necessária antes de afirmar QA visual/interativo completo. O site público existente não foi usado como evidência da mudança local. A câmera considera também os alvos de toque e seus anéis de foco, inclusive no modo paisagem curto. Os URLs de assets respeitam a base de implantação relativa do Vite.
+
+## Reproduzir os checks
+
+Neste sandbox o executável `tsx` tenta abrir IPC e recebe EPERM. O equivalente sem socket executa as mesmas entradas:
+
+```sh
+node --import tsx --test tests/*.test.ts
+node --test tests/*.test.mjs
+node --import tsx scripts/validate_levels.ts
+node --import tsx scripts/validate_player_assets.ts
+node --import tsx scripts/validate_world.ts
+npm run typecheck
+node node_modules/vite/bin/vite.js build
+node --import tsx scripts/render_diorama_review.ts
+inkscape docs/world/diorama/costa-review.svg -o docs/world/diorama/costa-review.png
+inkscape docs/world/diorama/costa-secret-review.svg -o docs/world/diorama/costa-secret-review.png
+inkscape docs/world/diorama/costa-mobile-review.svg -o docs/world/diorama/costa-mobile-review.png
+```
+
+Os renders PNG, versões lossless, imagens de revisão e SVGs intermediários são reproduzíveis e ficam apenas no ambiente de autoria, fora do Git e da publicação. O gerador de revisão usa os WebPs enviados ao jogo. A fonte Blender, os relatórios de geometria e os quatro arquivos de runtime ficam versionados. Os SVGs incorporam os WebPs como base64. O script imprime quantidade de comandos e tempo de serialização offline, sem apresentar esse tempo como custo de rasterização ou FPS.

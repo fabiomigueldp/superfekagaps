@@ -1,0 +1,32 @@
+{
+  "west ascent carved step": {
+    "treadCount": 24,
+    "walkingArcLength": 4.109,
+    "maxAdjacentRiser": 0.167,
+    "width": 0.82
+  },
+  "arch descent carved step": {
+    "treadCount": 28,
+    "walkingArcLength": 4.875,
+    "maxAdjacentRiser": 0.144,
+    "width": 0.86
+  },
+  "east ascent carved step": {
+    "treadCount": 25,
+    "walkingArcLength": 4.401,
+    "maxAdjacentRiser": 0.152,
+    "width": 0.88
+  },
+  "highpoint climbing step": {
+    "treadCount": 20,
+    "walkingArcLength": 3.438,
+    "maxAdjacentRiser": 0.146,
+    "width": 0.88
+  },
+  "secret ledge climb": {
+    "treadCount": 25,
+    "walkingArcLength": 4.261,
+    "maxAdjacentRiser": 0.154,
+    "width": 0.44
+  }
+}

@@ -74,6 +74,9 @@ export class Input {
       return;
     }
 
+    // Semantic map controls own native Enter/Space and directional navigation.
+    if (this.menuMode && target instanceof HTMLElement && target.closest('.world-map') && controlCode(event) !== 'KeyM') return;
+
     // Let browser/system shortcuts keep their normal behaviour.
     if (event.ctrlKey || event.metaKey || event.altKey) return;
 

@@ -6,7 +6,7 @@ import { TileType as T, PLAYER_RESPAWN_REVEAL_MS } from '../constants';
 import { DEATH_HIT_STOP_MS } from '../graphics/playerDeathMotion';
 import { pixelText, panel, fitText, wrapText } from '../graphics/BitmapFont';
 import { ART } from '../graphics/palette';
-import { PLAYER_SPRITES, PLAYER_PALETTE, PLAYER_WALK } from '../assets/playerSpriteSpec';
+import { PLAYER_SPRITES, PLAYER_PALETTE } from '../assets/playerSpriteSpec';
 import { YASMIN_FRAMES, SPRITE_PALETTE } from '../graphics/sprites';
 import { ISLANDS, STAGES, stageById } from './campaign';
 import { ProgressStore, isUnlocked, finishStage, parseSave } from './progress';
@@ -19,6 +19,8 @@ import { BossEncounter } from './BossEncounter';
 import { WorldTutorial } from './WorldTutorial';
 import { bossFrame, WORLD_PALETTE } from './WorldAssets';
 import { clamp, overlaps, type AdventureStage, type Dialogue } from './types';
+import { WorldMapView } from './WorldMapView';
+import { clampMapSelection, moveMapSelection } from './WorldMapModel';
 type Screen = 'title' | 'intro' | 'map' | 'playing' | 'paused' | 'dialogue' | 'clear' | 'ending' | 'gallery' | 'settings';
 interface Button extends Rect {
     run: () => void;
@@ -73,9 +75,11 @@ export class WorldGame {
     private pausedAudio = false;
     private introPage = 0;
     private galleryWorld = 0;
-    private mapMarkerX = 40;
+    private mapView?: WorldMapView;
+    private mapCanvas: HTMLCanvasElement;
     private deathFeedbackStarted = false;
     constructor(canvas: HTMLCanvasElement, ephemeral = false) {
+        this.mapCanvas = canvas;
         document.title = ephemeral ? 'Super Feka Gaps World · Estúdio' : 'Super Feka Gaps World';
         let storage: Storage | null = null;
         try {
@@ -120,9 +124,10 @@ export class WorldGame {
         this.render();
         requestAnimationFrame(this.loop);
     };
-    private change(screen: Screen) { this.state = screen; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; }
+    private change(screen: Screen) { if (screen !== 'map') this.mapView?.hide(); this.state = screen; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; }
     private menuKey(e: KeyboardEvent) {
         const target = e.target;
+        if (target instanceof HTMLElement && target.closest('.world-map')) return;
         if (target instanceof HTMLElement && target.id !== 'game-canvas' && (target.matches('input,textarea,select') || target.isContentEditable))
             return;
         if (this.state === 'playing')
@@ -132,11 +137,8 @@ export class WorldGame {
         e.preventDefault();
         this.audio.unlock();
         if (this.state === 'map') {
-            const shift = e.key === 'ArrowLeft' || e.key === 'a' ? -1 : e.key === 'ArrowRight' || e.key === 'd' ? 1 : e.key === 'ArrowUp' || e.key === 'w' ? -5 : e.key === 'ArrowDown' || e.key === 's' ? 5 : 0;
-            if (shift) {
-                this.selection = clamp(this.selection + shift, 0, 29);
-                this.audio.sfx('coin');
-            }
+            const next = moveMapSelection(this.selection, e.key);
+            if (next !== this.selection) this.selectMap(next);
             if (e.key === 'Enter' || e.key === ' ')
                 this.enterSelected();
             if (e.key === 'Escape')
@@ -180,6 +182,12 @@ export class WorldGame {
         }
         else
             this.audio.say('joao', 'Aqui é o João, namorado da Yasmin.', 'aqui_e_o_joao_namorado_da_yasmin');
+    }
+    private selectMap(index: number) {
+        this.selection = clampMapSelection(index);
+        this.store.save.selected = STAGES[this.selection].id;
+        this.store.persist();
+        this.audio.sfx('coin');
     }
     private enterSelected() {
         const s = STAGES[this.selection];
@@ -327,8 +335,6 @@ export class WorldGame {
             this.time += dt;
             this.renderer.advanceClock(dt);
         }
-        if (this.state === 'map')
-            this.mapMarkerX += (40 + (STAGES[this.selection].number - 1) * 60 - this.mapMarkerX) * .16;
         this.audio.tick(dt);
         this.toastTimer = Math.max(0, this.toastTimer - dt);
         if (this.state === 'dialogue') {
@@ -590,13 +596,24 @@ export class WorldGame {
     private heading(c: CanvasRenderingContext2D, small: string, big: string) { pixelText(c, small, 160, 12, '#c4d7d8', 1, 'center'); pixelText(c, big, 161, 29, '#343651', 2, 'center'); pixelText(c, big, 160, 27, '#ffdf94', 2, 'center'); }
     private text(c: CanvasRenderingContext2D, text: string, x: number, y: number, width: number, color: string = ART.paper) { wrapText(text, width).forEach((line, i) => pixelText(c, line, x, y + i * 10, color)); }
     render() {
+        if (this.state === 'map') {
+            if (typeof document !== 'undefined' && document.hidden) return;
+            this.buttons = [];
+            this.mapView ??= new WorldMapView(this.mapCanvas, {
+                select: index => { if (this.state === 'map') this.selectMap(index); },
+                enter: () => { if (this.state === 'map') this.enterSelected(); },
+                exit: () => { if (this.state === 'map') this.change('title'); },
+                unlockAudio: () => this.audio.unlock()
+            });
+            this.mapView.render(this.selection, this.store.save, this.time, this.store.warning, this.toastTimer > 0 ? this.toast : '');
+            return;
+        }
+        this.mapView?.hide();
         this.renderer.startScene();
         this.buttons = [];
         const c = this.renderer.getContext();
         if (['playing', 'paused', 'dialogue', 'clear'].includes(this.state))
             this.renderLevel(c);
-        else if (this.state === 'map')
-            this.renderMap(c);
         else if (this.state === 'title')
             this.renderTitle(c);
         else if (this.state === 'intro' || this.state === 'ending')
@@ -733,50 +750,6 @@ export class WorldGame {
         this.button(c, 'OPÇÕES', 164, 124, 76, () => this.settings('title'));
         this.button(c, 'JOGAR O ORIGINAL', 99, 149, 122, () => { location.href = '?classic=true'; });
         pixelText(c, 'ENTER PARA CONFIRMAR · SETAS PARA ESCOLHER', 160, 172, '#d1d6c2', 1, 'center');
-    }
-    private renderMap(c: CanvasRenderingContext2D) {
-        const selected = STAGES[this.selection], island = ISLANDS[selected.world - 1];
-        rect(c, 0, 0, 320, 180, '#376780');
-        for (let i = 0; i < 85; i++)
-            rect(c, (i * 71 + Math.floor(this.time / 220)) % 320, 35 + i % 19 * 6, 5 + i % 9, 1, '#4c8495');
-        for (let i = 0; i < 5; i++) {
-            const a = ISLANDS[i].map, b = ISLANDS[i + 1].map;
-            for (let k = 0; k < 12; k++) {
-                const t = k / 12;
-                rect(c, a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, 2, 2, this.store.save.completed.includes(`${i + 1}-5`) ? '#e5dcb0' : '#65889b');
-            }
-        }
-        for (const w of ISLANDS) {
-            this.art.island(c, w, w.id === selected.world, this.time);
-            this.buttons.push({ x: w.map[0] - 23, y: w.map[1] - 30, width: 46, height: 47, run: () => { this.selection = (w.id - 1) * 5; } });
-        }
-        rect(c, 0, 0, 320, 26, '#1c2e45');
-        pixelText(c, `${selected.world} · ${island.name}`, 10, 7, island.accent);
-        pixelText(c, `${this.store.save.completed.length}/30  ${this.store.save.seals.length}/72`, 310, 17, '#bdcfd5', 1, 'right');
-        rect(c, 0, 128, 320, 52, '#1e3046');
-        for (let n = 1; n <= 5; n++) {
-            const id = `${selected.world}-${n}`, x = 40 + (n - 1) * 60, open = isUnlocked(id, this.store.save), done = this.store.save.completed.includes(id);
-            if (n < 5)
-                rect(c, x + 9, 138, 43, 2, '#637885');
-            rect(c, x - 8, 131, 17, 16, selected.number === n ? island.accent : done ? '#6aab93' : open ? '#597e95' : '#344557');
-            pixelText(c, String(n), x, 136, selected.number === n ? '#253c50' : ART.paper, 1, 'center');
-            this.buttons.push({ x: x - 16, y: 126, width: 32, height: 27, run: () => { this.selection = (selected.world - 1) * 5 + n - 1; } });
-        }
-        if (this.store.save.secrets.includes(`${selected.world}-3`)) {
-            for (let x = 165; x < 280; x += 7)
-                rect(c, x, 123, 3, 1, '#cbabe9');
-            rect(c, 160, 124, 1, 7, '#cbabe9');
-            rect(c, 280, 124, 1, 7, '#cbabe9');
-        }
-        this.art.atlas.draw(c, Math.abs(this.mapMarkerX - (40 + (selected.number - 1) * 60)) > 2 ? PLAYER_WALK[Math.floor(this.time / 90) % 6] : PLAYER_SPRITES.idle, PLAYER_PALETTE, this.mapMarkerX - 8, 101);
-        pixelText(c, fitText(selected.name, 280), 160, 154, ART.paper, 1, 'center');
-        this.button(c, '←', 5, 96, 23, () => { this.selection = (Math.max(1, selected.world - 1) - 1) * 5; });
-        this.button(c, '→', 292, 96, 23, () => { this.selection = (Math.min(6, selected.world + 1) - 1) * 5; });
-        this.button(c, isUnlocked(selected.id, this.store.save) ? 'JOGAR' : 'BLOQUEADA', 221, 161, 91, () => this.enterSelected());
-        this.button(c, 'MENU', 8, 161, 52, () => this.change('title'));
-        pixelText(c, this.store.save.secrets.includes(`${selected.world}-3`) ? 'ATALHO DESCOBERTO' : 'PROCURE NOVOS CAMINHOS', 139, 167, '#b4cbd2', 1, 'center');
-        if (this.store.warning)
-            this.text(c, this.store.warning, 12, 29, 294, '#ffe0a5');
     }
     private renderStory(c: CanvasRenderingContext2D) {
         this.art.background(c, ISLANDS[this.state === 'ending' ? 5 : 0], 0, 0, this.time);

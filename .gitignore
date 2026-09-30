@@ -64,3 +64,10 @@ env/
 # Misc
 # ============================
 *.local
+
+# Reproducible diorama renders and local review snapshots
+/docs/world/diorama/*.png
+/docs/world/diorama/*-review.svg
+/public/assets/world/map/*.png
+/public/assets/world/map/*.lossless.webp
+/public/assets/world/map/art-manifest.json

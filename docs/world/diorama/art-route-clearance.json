@@ -1,0 +1,11 @@
+{
+  "method": "Vertical rays at route center and lateral offsets; flags non-walkable geometry >0.18 world units above intended footline within 0.85 headroom. Visual inspection is also required. Handrail edge contacts are reported, not silently ignored.",
+  "rayCount": 966,
+  "centerRayCount": 322,
+  "edgeRayCount": 644,
+  "flagCount": 0,
+  "centerFlagCount": 0,
+  "edgeFlagCount": 0,
+  "byObject": {},
+  "flags": []
+}

@@ -4,6 +4,7 @@ import { Game } from './game/Game';
 import { WorldGame } from './adventure/WorldGame';
 import { WorldEditor } from './adventure/WorldEditor';
 import './game/scoreboard.css';
+import './adventure/map.css';
 
 // Inicializa o jogo quando a página carregar
 window.addEventListener('DOMContentLoaded', () => {

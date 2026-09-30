@@ -1,0 +1,16 @@
+{
+  "canonicalSource": "tools/diorama/render_costa.py",
+  "renderer": "Blender 4.3.2 / Cycles CPU / 192 samples / AgX",
+  "cameraCanvas": [
+    1920,
+    1200
+  ],
+  "geometryPolicy": "Closed authored terrain, exterior supported winder stairs, no Boolean operations",
+  "currentAudit": "docs/world/diorama/art-route-clearance.json",
+  "sha256": {
+    "tools/diorama/render_costa.py": "2c9acf31893b734c2190161043955608e5765b036a97c171426bb572995a183e",
+    "tools/diorama/check_clearance.py": "bfe8a0efe89a66b32cd1874b4500379b6474b98ee40c977966e0ebc6c29ffa90",
+    "public/assets/world/map/costa-diorama.png": "d4ab9c1857dd1d958e400ebd9ef645e15b83a884a73cb0c88bb1c16bfa0786ed",
+    "public/assets/world/map/costa-diorama.meta.json": "bee968f38e74e2d3839aa60eb1f67b83643fd8f519b3b9867a664eecc2f8e1e8"
+  }
+}
