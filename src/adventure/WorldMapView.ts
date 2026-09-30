@@ -2,12 +2,13 @@ import { STAGES } from './campaign';
 import { isUnlocked } from './progress';
 import type { AdventureSave } from './types';
 import { clampMapSelection, getMapCamera, mapToScreen, moveMapSelection, type MapCamera, type MapPoint } from './WorldMapModel';
-import { COSTA_ART_BOUNDS, fallbackMapMetadata, frameMapPins, mapAssetPrefix, paintMapActor, paintMapIsland, paintMapSea, parseMapMetadata, type MapArtAssets, type MapArtMetadata } from './WorldMapArt';
+import { COSTA_ART_BOUNDS, fallbackMapMetadata, frameMapPins, mapActorScale, mapAssetPrefix, paintMapActor, paintMapIsland, paintMapSea, parseMapMetadata, type MapArtAssets, type MapArtMetadata } from './WorldMapArt';
 import { WorldMapHud, type WorldMapMotionState } from './WorldMapHud';
 import { COAST_PORT_PLACEMENTS, getAtlasCamera, atlasTravelWindow, localToAtlas } from './WorldAtlasModel';
-import { atlasBoatBounds, paintWorldAtlas, type AtlasBoat, type AtlasIslandLayer } from './WorldAtlasArt';
+import { atlasActorScale, atlasBoatBounds, paintWorldAtlas, type AtlasBoat, type AtlasIslandLayer } from './WorldAtlasArt';
 import { buildJourneyNetwork, parseJourneyBoat, parseJourneyConnection, type JourneyBoatMetadata, type JourneyConnection } from './WorldJourneyNetwork';
 import { advanceJourney, canEnterJourney, createJourney, enterJourney, journeyBlockReason, journeyMode, returnToJourney, selectJourney, skipJourney, type JourneyCapabilities, type JourneyNetwork, type JourneyState } from './WorldJourneyModel';
+import { ART } from '../graphics/palette';
 
 interface MapCallbacks { select(index: number): void; enter(): void; exit(): void; unlockAudio(): void; arrive?(index: number): void }
 interface CachedMapArt { assets: MapArtAssets; metadata: MapArtMetadata; status: 'loading' | 'ready' | 'failed' }
@@ -34,6 +35,80 @@ export function journeyPathSegment(points: readonly MapPoint[], progress: number
     return Math.max(0, lengths.length - 1);
 }
 const placementFor = (world: number) => COAST_PORT_PLACEMENTS[world] ?? { origin: { x: 0, y: 0 }, scale: 1 };
+
+export interface MapControlPlacement extends MapPoint { width: number; height: number }
+export interface MapControlBounds { left: number; top: number; right: number; bottom: number }
+const controlRect = (point: MapControlPlacement): MapControlBounds => ({
+    left: point.x - point.width / 2, right: point.x + point.width / 2, top: point.y - point.height, bottom: point.y,
+});
+const controlsIntersect = (a: MapControlBounds, b: MapControlBounds, gap: number): boolean =>
+    a.left < b.right + gap && a.right + gap > b.left && a.top < b.bottom + gap && a.bottom + gap > b.top;
+
+/** Screen-space labels may move; the authored geography and journey never do.
+ * Keep the nearest free placement, testing the complete native hit rectangles.
+ * Priority follows input order, so phase signs keep their established positions
+ * and a dock sign first looks for free water beside its actual landing point.
+ */
+export function layoutMapControls(points: readonly MapControlPlacement[], bounds: MapControlBounds, gap = 8,
+    previousOffsets: readonly (MapPoint | undefined)[] = []): MapControlPlacement[] {
+    if (!points.length) return [];
+    const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, Math.round(value)));
+    const tryOrder = (order: number[]): MapControlPlacement[] | null => {
+        const result: MapControlPlacement[] = [], occupied: MapControlBounds[] = [];
+        for (const index of order) {
+            const point = points[index], minX = Math.ceil(bounds.left + point.width / 2), maxX = Math.floor(bounds.right - point.width / 2);
+            const minY = Math.ceil(bounds.top + point.height), maxY = Math.floor(bounds.bottom);
+            if (minX > maxX || minY > maxY) return null;
+            const xs = new Set([point.x, minX, maxX].map(x => clamp(x, minX, maxX)));
+            const ys = new Set([point.y, minY, maxY].map(y => clamp(y, minY, maxY)));
+            const previous = previousOffsets[index];
+            if (previous) {
+                xs.add(clamp(point.x + previous.x * .7, minX, maxX));
+                ys.add(clamp(point.y + previous.y * .7, minY, maxY));
+            }
+            for (const rect of occupied) {
+                xs.add(clamp(rect.left - gap - point.width / 2, minX, maxX));
+                xs.add(clamp(rect.right + gap + point.width / 2, minX, maxX));
+                ys.add(clamp(rect.top - gap, minY, maxY));
+                ys.add(clamp(rect.bottom + gap + point.height, minY, maxY));
+            }
+            let best: MapControlPlacement | null = null, bestCost = Infinity;
+            for (const x of xs) for (const y of ys) {
+                const candidate = { ...point, x, y }, rect = controlRect(candidate);
+                if (occupied.some(other => controlsIntersect(rect, other, gap))) continue;
+                const dx = x - point.x, dy = y - point.y;
+                // Prefer the established side while the camera eases; when the
+                // obstruction clears, return toward the terrain in small steps.
+                const cost = dx ** 2 + dy ** 2 * 1.2 + (previous ? 4 * ((dx - previous.x * .7) ** 2 + (dy - previous.y * .7) ** 2) : 0);
+                if (cost < bestCost) { best = candidate; bestCost = cost; }
+            }
+            if (!best) return null;
+            result[index] = best; occupied.push(controlRect(best));
+        }
+        return result;
+    };
+    const order = points.map((_, index) => index);
+    const placed = tryOrder(order) ?? tryOrder([...order].sort((a, b) => points[b].width - points[a].width));
+    if (placed) return placed;
+    // A very short overview can fragment all free space. Use the minimum number
+    // of compact rows only as a last resort; leaders still identify each place.
+    const rows: number[][] = [[]]; let rowWidth = 0;
+    for (const index of [...order].sort((a, b) => points[a].x - points[b].x)) {
+        if (rowWidth && rowWidth + gap + points[index].width > bounds.right - bounds.left) { rows.push([]); rowWidth = 0; }
+        rows[rows.length - 1].push(index); rowWidth += (rowWidth ? gap : 0) + points[index].width;
+    }
+    const heights = rows.map(row => Math.max(...row.map(index => points[index].height)));
+    const totalHeight = heights.reduce((sum, height) => sum + height, 0) + gap * (rows.length - 1);
+    let top = clamp(points.reduce((sum, point) => sum + point.y, 0) / points.length - totalHeight / 2, bounds.top, bounds.bottom - totalHeight);
+    const result: MapControlPlacement[] = [];
+    rows.forEach((row, rowIndex) => {
+        const width = row.reduce((sum, index) => sum + points[index].width, 0) + gap * (row.length - 1);
+        let left = Math.round(bounds.left + (bounds.right - bounds.left - width) / 2);
+        for (const index of row) { result[index] = { ...points[index], x: left + points[index].width / 2, y: top + points[index].height }; left += points[index].width + gap; }
+        top += heights[rowIndex] + gap;
+    });
+    return result;
+}
 
 /** One map-owned state machine, one mount, and the game's existing animation clock. */
 export class WorldMapView {
@@ -85,6 +160,7 @@ export class WorldMapView {
     private readonly resizeObserver: ResizeObserver;
     private readonly onResize = () => { this.dirtySize = true; this.paintDirty = true; };
     private readonly onMotion = () => { this.paintDirty = true; };
+    private readonly controlOffsets = new Map<string, MapPoint>();
 
     constructor(private readonly gameCanvas: HTMLCanvasElement, private readonly callbacks: MapCallbacks) {
         this.hud = new WorldMapHud({
@@ -207,6 +283,7 @@ export class WorldMapView {
     show(time: number): void {
         if (this.visible || this.disposed) return;
         this.visible = true; this.hud.setVisible(true); this.lastTime = time; this.dirtySize = true; this.cameraSnap = true;
+        this.controlOffsets.clear();
         this.journey = null; this.boatHeadingIndex = -1; this.selection = -1; this.lastSignature = ''; this.geometryDirty = true;
         this.restoreTabIndex = this.gameCanvas.getAttribute('tabindex');
         this.gameCanvas.setAttribute('tabindex', '-1'); this.gameCanvas.setAttribute('aria-hidden', 'true');
@@ -277,6 +354,7 @@ export class WorldMapView {
         this.dpr = Math.min(2, this.screenDpr, Math.sqrt(4_000_000 / (this.width * this.height)));
         this.canvas.width = Math.round(this.width * this.dpr); this.canvas.height = Math.round(this.height * this.dpr);
         this.dirtySize = false; this.paintDirty = true; this.cameraSnap = true;
+        this.controlOffsets.clear();
     }
     render(selection: number, save: AdventureSave, time: number, warning: string, toast = '', returned?: MapReturnContext): void {
         if (this.disposed || document.hidden) return;
@@ -359,7 +437,7 @@ export class WorldMapView {
         const aboard = active?.mode === 'sail' || (active?.mode === 'board' && active.progress > .45);
         paintWorldAtlas(this.ctx, { camera: this.camera, time, reducedMotion: this.media.matches, islands,
             actor: { point: this.marker, walking: !!active && active.mode !== 'sail', facingLeft: this.facingLeft, aboard }, boat });
-        this.positionNodes(world, channel || activeWorld !== world);
+        this.positionNodes(world, channel || activeWorld !== world, boat);
     }
     private blendAtlasCamera(target: MapCamera, dt: number, boat?: AtlasBoat): MapCamera {
         if (this.cameraSnap || this.media.matches) { this.cameraSnap = false; return target; }
@@ -395,18 +473,60 @@ export class WorldMapView {
             walking: !!this.journey!.destination, facingLeft: this.facingLeft });
         this.positionNodes(world, false);
     }
-    private positionNodes(world: number, hide: boolean): void {
-        this.hud.positionNodes(Array.from({ length: 5 }, (_, n) => {
+    private positionNodes(world: number, hide: boolean, boat?: AtlasBoat): void {
+        const anchors: MapPoint[] = [];
+        const stages = Array.from({ length: 5 }, (_, n) => {
             if (hide) return null;
             const id = `${world}-${n + 1}`, point = this.network.nodes[id], screen = mapToScreen(point, this.camera);
+            anchors[n] = screen;
+            // Do not pull another island's offscreen signs into the current view
+            // while the camera is still approaching that island.
+            if (screen.x < 0 || screen.x > this.width || screen.y < this.frameInsets.top || screen.y > this.height - this.frameInsets.bottom) return null;
             return { x: screen.x + 36, y: screen.y };
-        }), ([1, 2] as const).map(destination => {
+        });
+        const docks = ([1, 2] as const).map(destination => {
             if (world > 2 || !this.connectionActive || !this.connection) return null;
             // Buttons name their destination, so each sign stands at the opposite departure dock.
             const departure = destination === 1 ? 2 : 1;
             const point = mapToScreen(localToAtlas(this.connection.docks[departure].dock, placementFor(departure)), this.camera);
-            return { ...point, visible: point.x > 52 && point.x < this.width - 52 && point.y > this.frameInsets.top + 56 && point.y < this.height - this.frameInsets.bottom,
+            return { ...point, visible: point.x > 8 && point.x < this.width - 8 && point.y > this.frameInsets.top && point.y < this.height - this.frameInsets.bottom,
                 available: !!this.save && isUnlocked(`${destination}-1`, this.save) };
-        }));
+        });
+        const visible = [...stages.map((point, n) => point ? { id: `stage:${world}-${n + 1}`, point, anchor: anchors[n], width: 56, height: 58 } : null),
+            ...docks.map((point, n) => point?.visible ? { id: `dock:${n + 1}`, point, anchor: { x: point.x, y: point.y }, width: 104, height: 56 } : null)].filter((entry): entry is NonNullable<typeof entry> => !!entry);
+        const positions = layoutMapControls(visible.map(({ point, width, height }) => ({ ...point, width, height })),
+            { left: 8, right: this.width - 8, top: this.frameInsets.top + 2, bottom: this.height - this.frameInsets.bottom - 2 },
+            8, this.media.matches ? [] : visible.map(entry => this.controlOffsets.get(entry.id)));
+        const actor = mapToScreen(this.marker, this.camera), scale = world <= 2 ? atlasActorScale(this.camera, boat?.frame) : mapActorScale(this.camera);
+        const obstacles = [{ left: actor.x - 10 * scale - 2, right: actor.x + 10 * scale + 2, top: actor.y - 28 * scale - 2, bottom: actor.y + 3 }];
+        if (boat) {
+            const bounds = atlasBoatBounds(boat.foot, boat.frame);
+            const a = mapToScreen({ x: bounds.left, y: bounds.top }, this.camera), b = mapToScreen({ x: bounds.right, y: bounds.bottom }, this.camera);
+            obstacles.push({ left: a.x - 2, right: b.x + 2, top: a.y - 2, bottom: b.y + 2 });
+        }
+        for (let index = 0; index < positions.length; index++) {
+            const result = positions[index], point = visible[index].point;
+            this.controlOffsets.set(visible[index].id, { x: result.x - point.x, y: result.y - point.y });
+            if (Math.hypot(result.x - point.x, result.y - point.y) > 2) {
+                const rect = controlRect(result), anchor = visible[index].anchor;
+                const start = { x: Math.max(rect.left + 6, Math.min(rect.right - 6, anchor.x)),
+                    y: anchor.y < rect.top ? rect.top + 14 : anchor.y > rect.bottom ? rect.bottom - 2 : anchor.y };
+                // A small wooden leader keeps a displaced sign tied to the dock
+                // or phase landing, even at browser zoom and during camera easing.
+                this.ctx.save();
+                // Separate clips intersect, so overlapping actor/boat bounds can
+                // never cancel each other out and expose a line over the sprite.
+                for (const obstacle of obstacles) {
+                    this.ctx.beginPath(); this.ctx.rect(0, 0, this.width, this.height);
+                    this.ctx.rect(obstacle.left, obstacle.top, obstacle.right - obstacle.left, obstacle.bottom - obstacle.top); this.ctx.clip('evenodd');
+                }
+                this.ctx.beginPath(); this.ctx.moveTo(Math.round(start.x), Math.round(start.y));
+                this.ctx.lineTo(Math.round(anchor.x), Math.round(anchor.y));
+                this.ctx.strokeStyle = ART.ink; this.ctx.lineWidth = 4; this.ctx.stroke();
+                this.ctx.strokeStyle = ART.soilLight; this.ctx.lineWidth = 2; this.ctx.stroke(); this.ctx.restore();
+            }
+            point.x = result.x; point.y = result.y;
+        }
+        this.hud.positionNodes(stages, docks);
     }
 }

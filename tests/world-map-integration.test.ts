@@ -724,7 +724,14 @@ test('each dock sign names and selects the opposite destination, with that desti
         const departure = destination === 1 ? 2 : 1;
         const projected = mapToScreen(localToAtlas(h.internal.connection.docks[departure].dock, COAST_PORT_PLACEMENTS[departure]), h.internal.camera);
         const button = h.internal.hud.dockButtons[destination - 1] as Button;
-        assert.equal(button.style.transform, `translate(${Math.round(projected.x)}px, ${Math.round(projected.y)}px) translate(-50%, -100%)`);
+        const match = /^translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(button.style.transform)!;
+        const actual = { x: Number(match[1]), y: Number(match[2]) };
+        assert.ok(Math.hypot(actual.x - projected.x, actual.y - projected.y) < 48, 'Dock labels remain close to their actual departure dock.');
+        if (Math.hypot(actual.x - projected.x, actual.y - projected.y) > 2) {
+            assert.ok(h.paint.calls.some(call => call.method === 'lineTo' && call.args[0] === Math.round(projected.x) && call.args[1] === Math.round(projected.y)),
+                'A displaced dock label has a visible leader back to its actual dock.');
+            assert.ok(h.paint.calls.some(call => call.method === 'clip' && call.args[0] === 'evenodd'), 'Leader drawing excludes actor/boat sprite bounds.');
+        }
         return button;
     };
     const toPort = assertDockPosition(2); assert.equal(toPort.hidden, false); assert.match(toPort.getAttribute('aria-label')!, /Porto/);
@@ -764,4 +771,33 @@ test('locked Porto preview frames all five signs without dragging the camera tow
     h.view.render(0, save, 10700, ''); tick(h, 0, save, 10700, 3000); assertVisibleRegion(1);
     assert.equal(h.internal.journey.arrived, '1-1'); assert.equal(h.internal.journey.destination, null); assert.deepEqual(h.events.arrived, []);
     assert.deepEqual(h.internal.network.nodes, portNodes, 'Preview camera changes never move either island.');
+});
+
+test('real DOM controls keep separate native targets at zoom200%, portrait and short landscape', async t => {
+    const h = mapDOM(t, true), save = freshSave(); await readyConnection(h, save);
+    let time = 100;
+    for (const [width, height, top, footerTop] of [[590, 378, 6, 314], [320, 568, 10, 432], [400, 606, 10, 476], [846, 392, 6, 322]]) {
+        h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width, height };
+        h.get('world-map-header').bounds = { x: 12, y: top, left: 12, top, width: width - 24, height: width < 520 ? 84 : 44 };
+        h.get('world-map-tools').bounds = h.get('world-map-header').bounds;
+        h.get('world-map-footer').bounds = { x: 12, y: footerTop, left: 12, top: footerTop, width: Math.min(470, width - 24), height: height - footerTop - 8 };
+        for (const world of [1, 2]) for (const overview of [false, true]) {
+            h.internal.overview = overview; h.observers[0].callback(); h.view.render((world - 1) * 5, save, time += 100, '');
+            assert.equal(h.internal.hud.stageButtons.every((button: Button) => !button.hidden), true, 'All five phases remain inspectable after the camera settles.');
+            const buttons = [...h.internal.hud.stageButtons, ...h.internal.hud.dockButtons] as Button[];
+            const rectangles = buttons.flatMap((button, index) => {
+                if (button.hidden) return [];
+                const match = /^translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(button.style.transform)!;
+                const x = Number(match[1]), y = Number(match[2]), w = index < 5 ? 56 : 104, tall = index < 5 ? 58 : 56;
+                return [{ left: x - w / 2, right: x + w / 2, top: y - tall, bottom: y }];
+            });
+            rectangles.forEach((a, index) => {
+                assert.ok(a.left >= 8 && a.right <= width - 8 && a.top >= h.internal.frameInsets.top && a.bottom <= height - h.internal.frameInsets.bottom);
+                for (const b of rectangles.slice(index + 1))
+                    assert.ok(a.right + 8 <= b.left || b.right + 8 <= a.left || a.bottom + 8 <= b.top || b.bottom + 8 <= a.top,
+                        `Control overlap at ${width}×${height}, world${world}, overview${overview}`);
+            });
+        }
+    }
+    assert.equal(h.internal.journey.arrived, '1-1'); assert.equal(h.events.entered, 0);
 });
