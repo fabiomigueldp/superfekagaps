@@ -4,9 +4,11 @@ import { ISLANDS } from './campaign';
 import { mapToScreen, type MapCamera, type MapPoint } from './WorldMapModel';
 
 export interface MapArtMetadata {
+    world: number;
     nodes: Record<string, MapPoint>;
     routes: Record<string, MapPoint[]>;
     secretRoute: MapPoint[];
+    artBounds?: MapArtBounds;
 }
 export interface MapArtAssets {
     island: CanvasImageSource | null;
@@ -21,23 +23,37 @@ export const FALLBACK_POINTS: MapPoint[] = [
     { x: .28, y: .70 }, { x: .34, y: .48 }, { x: .51, y: .72 },
     { x: .66, y: .53 }, { x: .70, y: .36 }
 ];
-export const fallbackMapMetadata = (): MapArtMetadata => ({
-    nodes: Object.fromEntries(FALLBACK_POINTS.map((p, i) => [`1-${i + 1}`, p])),
+export const fallbackMapMetadata = (world = 1): MapArtMetadata => ({
+    world,
+    nodes: Object.fromEntries(FALLBACK_POINTS.map((p, i) => [`${world}-${i + 1}`, p])),
     routes: {}, secretRoute: []
 });
 /** Data comes from the same camera used to render the terrain. Reject incomplete exports. */
-export function parseMapMetadata(value: unknown): MapArtMetadata | null {
-    if (!value || typeof value !== 'object') return null;
+export function parseMapMetadata(value: unknown, world = 1): MapArtMetadata | null {
+    if (!value || typeof value !== 'object' || !Number.isInteger(world) || world < 1 || world > 6) return null;
     const data = value as MapArtMetadata;
+    if (data.world !== undefined && data.world !== world) return null;
     const point = (v: unknown): v is MapPoint => !!v && typeof v === 'object' &&
         ['x', 'y'].every(k => typeof (v as Record<string, unknown>)[k] === 'number' &&
             Number.isFinite((v as Record<string, number>)[k]) && (v as Record<string, number>)[k] >= 0 && (v as Record<string, number>)[k] <= 1);
-    if (!data.nodes || ![1, 2, 3, 4, 5].every(n => point(data.nodes[`1-${n}`]))) return null;
+    if (!data.nodes || ![1, 2, 3, 4, 5].every(n => point(data.nodes[`${world}-${n}`]))) return null;
+    const bounds = data.artBounds;
+    if (bounds !== undefined && (!bounds || typeof bounds !== 'object' || !Number.isFinite(bounds.top) ||
+        !Number.isFinite(bounds.bottom) || bounds.top < 0 || bounds.bottom > 1 || bounds.top >= bounds.bottom)) return null;
+    const matches = (a: MapPoint, b: MapPoint) => Math.hypot(a.x - b.x, a.y - b.y) <= 1e-5;
+    const path = (value: unknown, from: number, to: number): value is MapPoint[] => Array.isArray(value) && value.length > 1 &&
+        value.every(point) && matches(value[0], data.nodes[`${world}-${from}`]) && matches(value[value.length - 1], data.nodes[`${world}-${to}`]);
+    if (!data.routes || typeof data.routes !== 'object') return null;
     const routes: Record<string, MapPoint[]> = {};
-    if (data.routes && typeof data.routes === 'object') for (const [key, points] of Object.entries(data.routes)) {
-        if (/^[0-4]:[0-4]$/.test(key) && Array.isArray(points) && points.length > 1 && points.every(point)) routes[key] = points;
+    for (let from = 0; from < 4; from++) {
+        const key = `${from}:${from + 1}`, points = data.routes[key];
+        if (!path(points, from + 1, from + 2)) return null;
+        routes[key] = points;
     }
-    return { nodes: data.nodes, routes, secretRoute: Array.isArray(data.secretRoute) && data.secretRoute.every(point) ? data.secretRoute : [] };
+    if (!path(data.secretRoute, 3, 5)) return null;
+    return { world, nodes: Object.fromEntries([1, 2, 3, 4, 5].map(n => [`${world}-${n}`, data.nodes[`${world}-${n}`]])),
+        routes, secretRoute: data.secretRoute,
+        ...(bounds ? { artBounds: { top: bounds.top, bottom: bounds.bottom } } : {}) };
 }
 
 export interface MapPaintState {
@@ -92,7 +108,7 @@ export function paintWorldMap(c: CanvasRenderingContext2D, state: MapPaintState)
     c.beginPath(); c.arc(0, 0, 25, 0, Math.PI * 2); c.moveTo(-33, 0); c.lineTo(33, 0); c.moveTo(0, -33); c.lineTo(0, 33); c.stroke();
     c.beginPath(); c.moveTo(0, -23); c.lineTo(5, 0); c.lineTo(0, 23); c.lineTo(-5, 0); c.closePath(); c.fill(); c.restore();
     const top = mapToScreen({ x: 0, y: 0 }, camera), bottom = mapToScreen({ x: 1, y: 1 }, camera);
-    if (world === 1 && assets.island) {
+    if (assets.island) {
         if (assets.shadow) c.drawImage(assets.shadow, top.x, top.y, bottom.x - top.x, bottom.y - top.y);
         c.drawImage(assets.island, top.x, top.y, bottom.x - top.x, bottom.y - top.y);
     } else {
@@ -105,12 +121,12 @@ export function paintWorldMap(c: CanvasRenderingContext2D, state: MapPaintState)
         c.save(); c.setLineDash([4, 8]); c.strokeStyle = '#dce4c9aa'; c.lineWidth = 2;
         c.beginPath(); pts.forEach((p, i) => { if (i) c.lineTo(p.x, p.y); else c.moveTo(p.x, p.y); }); c.stroke(); c.restore();
     }
-    if (world === 1 && assets.island) {
+    if (assets.island) {
         // Warm small trail studs are planted in the authored ground route.
         for (const [edge, path] of Object.entries(metadata.routes)) {
             const from = Number(edge.split(':')[0]) + 1;
             c.save(); c.setLineDash([1, 11]); c.lineCap = 'round'; c.lineWidth = 3;
-            c.strokeStyle = state.completed.includes(`1-${from}`) ? '#fff4b6c4' : '#f1e4b658';
+            c.strokeStyle = state.completed.includes(`${world}-${from}`) ? '#fff4b6c4' : '#f1e4b658';
             linePath(c, path, camera); c.stroke(); c.restore();
         }
         if (metadata.secretRoute.length > 1) {

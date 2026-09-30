@@ -1,0 +1,28 @@
+{
+  "world": 2,
+  "canvas": [
+    1920,
+    1200
+  ],
+  "rgba": true,
+  "alphaBounds": [
+    277,
+    153,
+    1622,
+    1077
+  ],
+  "runtimeBytes": 187342,
+  "files": {
+    "porto-diorama.png": 2312741,
+    "porto-diorama.webp": 181346,
+    "porto-diorama.lossless.webp": 1022956,
+    "porto-diorama.meta.json": 5996
+  },
+  "sha256": {
+    "porto-diorama.png": "fb672bc9d7bf041dccb2722a66085bdb0ae7489b10ca30a624ab5bd927444738",
+    "porto-diorama.webp": "c49d322dd21031bdcf3d9e67128e8e8dc1d68cc21113c19f42b0b71047304e69",
+    "porto-diorama.lossless.webp": "0bcdbb542b85e1233ecdb5570b194ee23dc0b010470524aa5643f2d1afa0af49",
+    "porto-diorama.meta.json": "fb86cea7a555475632bbec5c7ba4a3330128b34b411df824292ddd303f602fdf"
+  },
+  "canonicalSource": "tools/diorama/render_porto_map.py"
+}

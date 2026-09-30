@@ -1,0 +1,37 @@
+{
+  "date": "2026-09-30",
+  "branch": "feat/porto-diorama-map",
+  "hud_baseline": "92d7b43ebef1f58813d962e708fc6db9be9701c0",
+  "tests": {
+    "typescript": 228,
+    "server": 3,
+    "total": 231,
+    "failed": 0
+  },
+  "validators": "Classic levels, player assets and all World stages/sprites passed",
+  "typecheck": "src and tools passed",
+  "production_build": "passed",
+  "diff_check": "passed",
+  "runtime_art_bytes": {
+    "costa": 260561,
+    "porto": 187342
+  },
+  "shared_map_font_bytes": 52348,
+  "bundle": {
+    "filename": "index-CfygL9jI.js",
+    "bytes": 394686,
+    "gzip_bytes": 124533
+  },
+  "art_checks": {
+    "headroom_samples": 666,
+    "support_samples": 666,
+    "projected_load_samples": 273,
+    "failed": 0
+  },
+  "browser_qa": "Pending combined Porto preview; released HUD has desktop, narrow portrait, short landscape and editor browser checks",
+  "limitations": [
+    "No browser FPS claim; DevTools disabled by policy",
+    "No physical or emulated touch device test",
+    "Reduced-motion behavior verified by integration tests, not a browser preference switch"
+  ]
+}

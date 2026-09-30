@@ -1,0 +1,11 @@
+{
+  "method": "Read-only center and edge vertical rays. Obstructions above footline+0.17 inside 0.88 headroom are flagged, including railings. Support must be an authored walk_ surface within 0.16 below footline.",
+  "sampleCount": 666,
+  "headroomRayCount": 666,
+  "supportRayCount": 666,
+  "obstructionCount": 0,
+  "unsupportedCount": 0,
+  "maxAdjacentSampleRise": 0.0643,
+  "obstructions": [],
+  "unsupported": []
+}

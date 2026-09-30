@@ -1,0 +1,17 @@
+{
+  "world": 2,
+  "canonicalSource": "tools/diorama/render_porto_map.py",
+  "sourceSha256": {
+    "tools/diorama/render_porto_map.py": "ad10f064c9f5c66581c741296972105043790a2fd1d87fcb323b5fd29eeb9d0d",
+    "tools/diorama/check_porto_clearance.py": "acd2325fb8ef67d2867dcca616fd745605d7d79cc6a710c3d3b1c2c1c4023dcb",
+    "tools/diorama/render_porto_cached.py": "a32feacd6c3e6fac7024d4af876c430ed76bbf66669ae20ee251eaf7caa4b380",
+    "tools/diorama/package_porto_map.py": "796d00fbad3a7c2d06a68a81227ba1209444fb321b2fb6df55aad885b8c9baf4"
+  },
+  "references": [
+    "src/adventure/campaign.ts",
+    "docs/world/campanha.md",
+    "docs/world/conceitos/imagens/02-porto-do-bielzao.png"
+  ],
+  "geometryPolicy": "Supported exterior decks/ramps; no Boolean operations; no changed Costa or distant layer",
+  "frozenReference": "docs/world/diorama/porto-prototype-approved.meta.json"
+}

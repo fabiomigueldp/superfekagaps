@@ -118,13 +118,14 @@ function mapDOM(t: TestContext, reducedMotion = false) {
     const media = Object.assign(new Surface(), { matches: reducedMotion });
     const windowMock = Object.assign(new Surface(), { devicePixelRatio: 3, matchMedia: () => media });
     body.parent = documentMock; documentMock.parent = windowMock;
-    const observers: Array<{ target: Element | null; disconnected: boolean; callback: () => void }> = [];
+    const observers: Array<{ target: Element | null; targets: Element[]; disconnected: boolean; callback: () => void }> = [];
     class Observer {
         target: Element | null = null;
+        targets: Element[] = [];
         disconnected = false;
         constructor(readonly callback: () => void) { observers.push(this); }
-        observe(target: Element) { this.target = target; }
-        disconnect() { this.target = null; this.disconnected = true; }
+        observe(target: Element) { this.target = target; this.targets.push(target); }
+        disconnect() { this.target = null; this.targets = []; this.disconnected = true; }
     }
     const images: MockImage[] = [];
     class MockImage {
@@ -158,7 +159,9 @@ function mapDOM(t: TestContext, reducedMotion = false) {
     get('world-map-footer').bounds = { x: 170, y: 556, left: 170, top: 556, width: 860, height: 182 };
     return { view, internal, root, get, events, gameCanvas, body, documentMock, windowMock, media, observers, images, fetches, paint,
         get active() { return active; },
-        async finishAssets(metadata: unknown = fallbackMapMetadata(), imageSuccess = true) {
+        async finishAssets(metadata: unknown = fixtureMapMetadata(), imageSuccess = true) {
+            // Existing single-island cases explicitly visit Costa before resolving its lazy request.
+            if (!fetches.length) view.render(0, freshSave(), 0, '');
             images.forEach(image => imageSuccess ? image.onload?.() : image.onerror?.());
             fetches.forEach(request => request.resolve({ ok: true, json: async () => metadata }));
             await new Promise<void>(resolve => setImmediate(resolve));
@@ -167,6 +170,24 @@ function mapDOM(t: TestContext, reducedMotion = false) {
 }
 
 const point = (value: { x: number; y: number }) => ({ x: value.x, y: value.y });
+/** Complete authored export fixture; runtime fallback metadata deliberately has no routes. */
+function fixtureMapMetadata(world = 1, overrides: Record<string, MapPoint> = {}) {
+    const data = fallbackMapMetadata(world);
+    Object.assign(data.nodes, overrides);
+    for (let from = 0; from < 4; from++) data.routes[`${from}:${from + 1}`] = [data.nodes[`${world}-${from + 1}`], data.nodes[`${world}-${from + 2}`]];
+    data.secretRoute = [data.nodes[`${world}-3`], data.nodes[`${world}-5`]];
+    return data;
+}
+const flushAssets = () => new Promise<void>(resolve => setImmediate(resolve));
+const dioramaName = (world: number) => world === 1 ? 'costa-diorama' : 'porto-diorama';
+async function finishWorld(h: ReturnType<typeof mapDOM>, world: number, metadata: unknown = fixtureMapMetadata(world), imageSuccess = true) {
+    const image = h.images.find(image => image.src.endsWith(`${dioramaName(world)}.webp`));
+    const request = h.fetches.find(request => request.url.endsWith(`${dioramaName(world)}.meta.json`));
+    assert.ok(image && request, `World ${world} must already have been visited before its assets can settle.`);
+    imageSuccess ? image.onload?.() : image.onerror?.();
+    request.resolve({ ok: true, json: async () => metadata });
+    await flushAssets();
+}
 
 test('real camera export retains all five authored nodes, adjacent routes and secret endpoints', () => {
     const raw = JSON.parse(readFileSync(new URL('../public/assets/world/map/costa-diorama.meta.json', import.meta.url), 'utf8'));
@@ -187,20 +208,62 @@ test('real camera export retains all five authored nodes, adjacent routes and se
     assert.deepEqual(point(data.secretRoute[data.secretRoute.length - 1]), point(data.nodes['1-5']));
 });
 
-test('metadata rejects incomplete or nonfinite node exports and drops malformed paths', () => {
+test('metadata rejects incomplete or nonfinite node exports and malformed required paths', () => {
     for (const value of [null, undefined, 42, {}, { nodes: {} }]) assert.equal(parseMapMetadata(value), null);
     for (const value of [NaN, Infinity, -.01, 1.01, '0.5']) {
-        const data = structuredClone(fallbackMapMetadata());
+        const data = structuredClone(fixtureMapMetadata());
         (data.nodes['1-3'] as any).x = value;
         assert.equal(parseMapMetadata(data), null);
     }
-    const data = fallbackMapMetadata();
+    const data = fixtureMapMetadata();
     data.routes = { '0:1': [FALLBACK_POINTS[0], FALLBACK_POINTS[1]], '1:2': [FALLBACK_POINTS[1]],
         '3:4': [{ x: Infinity, y: .5 }, FALLBACK_POINTS[4]], '20:21': [FALLBACK_POINTS[0], FALLBACK_POINTS[1]] };
     data.secretRoute = [{ x: .5, y: NaN }];
-    const parsed = parseMapMetadata(data)!;
-    assert.deepEqual(Object.keys(parsed.routes), ['0:1']);
-    assert.deepEqual(parsed.secretRoute, []);
+    assert.equal(parseMapMetadata(data), null);
+    assert.equal(parseMapMetadata(fallbackMapMetadata()), null, 'Runtime fallback is deliberately not an authored export.');
+});
+
+test('authored metadata requires every adjacent edge and aligned main and secret endpoints', () => {
+    for (const world of [1, 2]) {
+        for (let from = 0; from < 4; from++) {
+            const key = `${from}:${from + 1}`;
+            const missing = fixtureMapMetadata(world); delete missing.routes[key];
+            assert.equal(parseMapMetadata(missing, world), null, `${world}: missing ${key}`);
+            for (const points of [[], [missing.nodes[`${world}-${from + 1}`]],
+                [...fixtureMapMetadata(world).routes[key]].reverse(),
+                [{ x: .01, y: .01 }, missing.nodes[`${world}-${from + 2}`]],
+                [missing.nodes[`${world}-${from + 1}`], { x: .99, y: .99 }],
+                [missing.nodes[`${world}-${from + 1}`], { x: NaN, y: .5 }, missing.nodes[`${world}-${from + 2}`]]]) {
+                const invalid = fixtureMapMetadata(world); invalid.routes[key] = points;
+                assert.equal(parseMapMetadata(invalid, world), null, `${world}: invalid ${key}`);
+            }
+        }
+        for (const secretRoute of [undefined, [], [FALLBACK_POINTS[2]], [...fixtureMapMetadata(world).secretRoute].reverse(),
+            [{ x: .01, y: .01 }, FALLBACK_POINTS[4]], [FALLBACK_POINTS[2], { x: Infinity, y: .9 }]])
+            assert.equal(parseMapMetadata({ ...fixtureMapMetadata(world), secretRoute }, world), null);
+        const rounded = fixtureMapMetadata(world);
+        rounded.routes['0:1'] = rounded.routes['0:1'].map(p => ({ x: p.x + 1e-6, y: p.y - 1e-6 }));
+        assert.ok(parseMapMetadata(rounded, world), 'Small export rounding is allowed without introducing visible connectors.');
+        const extras = fixtureMapMetadata(world);
+        extras.routes['20:21'] = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
+        assert.deepEqual(Object.keys(parseMapMetadata(extras, world)!.routes), ['0:1', '1:2', '2:3', '3:4']);
+    }
+});
+
+test('metadata is world-specific and accepts only finite normalized silhouette bounds', () => {
+    const data = fixtureMapMetadata(2);
+    data.artBounds = { top: .1, bottom: .92 };
+    assert.equal(parseMapMetadata(data), null, 'Porto metadata cannot pair with the Costa image.');
+    assert.equal(parseMapMetadata(fixtureMapMetadata(), 2), null);
+    assert.deepEqual(parseMapMetadata(data, 2), data);
+    const legacy = structuredClone(data) as any;
+    delete legacy.world;
+    assert.equal(parseMapMetadata(legacy, 2)?.world, 2, 'Node IDs also identify older exports without an explicit world field.');
+    for (const artBounds of [null, {}, { top: NaN, bottom: .9 }, { top: 0, bottom: Infinity },
+        { top: -.1, bottom: .9 }, { top: .1, bottom: 1.1 }, { top: .8, bottom: .1 }, { top: .5, bottom: .5 }])
+        assert.equal(parseMapMetadata({ ...data, artBounds }, 2), null);
+    assert.equal(parseMapMetadata({ ...data, world: 1 }, 2), null);
+    assert.equal(parseMapMetadata(data, NaN), null);
 });
 
 test('map show/hide remounts nothing, restores focus/tabindex and retains exactly one listener set', t => {
@@ -208,10 +271,11 @@ test('map show/hide remounts nothing, restores focus/tabindex and retains exactl
     h.gameCanvas.setAttribute('tabindex', '7');
     const originalChildren = h.body.children.length;
     assert.equal(h.root.hidden, true);
-    assert.equal(h.fetches.length, 1);
-    assert.equal(h.images.length, 3);
+    assert.equal(h.fetches.length, 0);
+    assert.equal(h.images.length, 0);
     for (let iteration = 0; iteration < 3; iteration++) {
         h.view.show(iteration * 1000); h.view.show(iteration * 1000 + 1);
+        h.view.render(0, freshSave(), iteration * 1000 + 2, '');
         assert.equal(h.root.hidden, false);
         assert.equal(h.active, h.root);
         assert.equal(h.gameCanvas.getAttribute('tabindex'), '-1');
@@ -242,7 +306,7 @@ test('map show/hide remounts nothing, restores focus/tabindex and retains exactl
 
 test('disposing during asset fetch cannot resurrect the map or apply late assets', async t => {
     const h = mapDOM(t);
-    h.view.show(0); h.view.dispose();
+    h.view.render(0, freshSave(), 0, ''); h.view.dispose();
     await h.finishAssets();
     assert.equal(h.root.parent, null);
     assert.equal(h.root.hidden, true);
@@ -290,7 +354,7 @@ test('the map uses capped device-resolution canvas, responds to resize and updat
 });
 
 test('reduced motion snaps authored travel and freezes time-driven decorative painting', async t => {
-    const h = mapDOM(t, true), data = fallbackMapMetadata();
+    const h = mapDOM(t, true), data = fixtureMapMetadata();
     data.routes['0:1'] = [data.nodes['1-1'], { x: .2, y: .5 }, data.nodes['1-2']];
     await h.finishAssets(data);
     h.view.render(0, freshSave(), 0, '');
@@ -306,7 +370,7 @@ test('reduced motion snaps authored travel and freezes time-driven decorative pa
 });
 
 test('changing the reduced-motion preference stops an in-flight journey on its destination', async t => {
-    const h = mapDOM(t), data = fallbackMapMetadata();
+    const h = mapDOM(t), data = fixtureMapMetadata();
     data.routes['0:1'] = [data.nodes['1-1'], { x: .2, y: .5 }, data.nodes['1-2']];
     await h.finishAssets(data);
     h.view.render(0, freshSave(), 0, '');
@@ -504,8 +568,7 @@ test('WorldGame lazy map creation is reused across repeated renders and menu rou
 });
 
 test('late successful art uses the currently selected stage and matching exported geometry', async t => {
-    const h = mapDOM(t, true), metadata = fallbackMapMetadata();
-    metadata.nodes['1-4'] = { x: .71, y: .61 };
+    const h = mapDOM(t, true), metadata = fixtureMapMetadata(1, { '1-4': { x: .71, y: .61 } });
     h.view.render(3, freshSave(), 0, '');
     assert.deepEqual(h.internal.marker, FALLBACK_POINTS[3]);
     await h.finishAssets(metadata);
@@ -516,8 +579,7 @@ test('late successful art uses the currently selected stage and matching exporte
 });
 
 test('a failed terrain image never applies its metadata over fallback art', async t => {
-    const h = mapDOM(t, true), metadata = fallbackMapMetadata();
-    metadata.nodes['1-1'] = { x: .7, y: .2 };
+    const h = mapDOM(t, true), metadata = fixtureMapMetadata(1, { '1-1': { x: .7, y: .2 } });
     await h.finishAssets(metadata, false);
     h.view.render(0, freshSave(), 0, '');
     assert.equal(h.internal.assets.island, null);
@@ -609,8 +671,8 @@ test('the global mute shortcut is still available while semantic map controls ow
 
 
 test('a secret from a later island never reuses Costa terrain coordinates for travel', async t => {
-    const h = mapDOM(t, true), metadata = fallbackMapMetadata();
-    metadata.secretRoute = [{ x: .1, y: .1 }, { x: .9, y: .9 }];
+    const h = mapDOM(t, true), metadata = fixtureMapMetadata();
+    metadata.secretRoute = [metadata.nodes['1-3'], { x: .1, y: .1 }, metadata.nodes['1-5']];
     await h.finishAssets(metadata);
     const save = freshSave(); save.secrets.push('2-3');
     h.view.render(7, save, 0, ''); h.view.render(9, save, 100, '');
@@ -643,7 +705,7 @@ test('reduced-motion idle frames avoid all canvas work but selection, panorama, 
 });
 
 test('retargeting mid-walk preserves the eased foot position and visits the remaining authored bend', async t => {
-    const h = mapDOM(t), data = fallbackMapMetadata();
+    const h = mapDOM(t), data = fixtureMapMetadata();
     const bend = { x: .18, y: .42 };
     data.routes['0:1'] = [data.nodes['1-1'], bend, data.nodes['1-2']];
     data.routes['1:2'] = [data.nodes['1-2'], { x: .45, y: .50 }, data.nodes['1-3']];
@@ -685,6 +747,163 @@ test('map assets honor relative and subdirectory deployment bases', async () => 
         assert.equal(new URL(mapAssetPrefix(base) + 'costa-diorama.webp', 'https://example.com/game/index.html').pathname,
             base === '/' ? '/assets/world/map/costa-diorama.webp' : '/game/assets/world/map/costa-diorama.webp');
     }
+});
+
+test('first visiting Porto requests only its main pair and revisits never duplicate requests', t => {
+    const h = mapDOM(t, true);
+    assert.equal(h.images.length, 0);
+    assert.equal(h.fetches.length, 0);
+    h.view.render(7, freshSave(), 0, '');
+    assert.deepEqual(h.images.map(image => image.src), ['/assets/world/map/porto-diorama.webp']);
+    assert.deepEqual(h.fetches.map(request => request.url), ['/assets/world/map/porto-diorama.meta.json']);
+    assert.equal(h.internal.metadata.world, 2);
+    for (const selection of [8, 10, 29, 7]) h.view.render(selection, freshSave(), 16, '');
+    assert.equal(h.images.length, 1, 'Unconverted islands make no speculative image requests.');
+    assert.equal(h.fetches.length, 1, 'A pending request is cached on repeated visits too.');
+    assert.equal(h.get('world-map-stage-title').textContent, 'Entre os Contêineres');
+    assert.equal(h.get('world-map-stage-number').textContent, '2-3');
+    assert.equal(h.get('world-map-chapter').textContent, 'Caminho bloqueado');
+    assert.match(h.get('world-map-description').textContent, /passarelas de manutenção/);
+    const save = freshSave(); save.completed.push('1-5', '2-2');
+    h.view.render(7, save, 32, '');
+    assert.equal(h.get('world-map-chapter').textContent, 'O pátio de contêineres');
+});
+
+test('the main Costa pair becomes visible while optional scenery remains pending', async t => {
+    const h = mapDOM(t, true), data = fixtureMapMetadata(1, { '1-3': { x: .43, y: .69 } });
+    h.view.render(2, freshSave(), 0, '');
+    h.images[0].onload?.(); await flushAssets();
+    assert.equal(h.internal.assets.island, null, 'An image alone must not use guessed coordinates.');
+    h.fetches[0].resolve({ ok: true, json: async () => data }); await flushAssets();
+    assert.equal(h.internal.assets.island, h.images[0]);
+    assert.equal(h.internal.assets.shadow, null);
+    assert.equal(h.internal.assets.port, null);
+    h.paint.calls.length = 0;
+    h.view.render(2, freshSave(), 16, '');
+    assert.deepEqual(h.internal.marker, data.nodes['1-3']);
+    assert.ok(h.paint.calls.some(call => call.method === 'drawImage' && call.args[0] === h.images[0]));
+    const painted = h.paint.calls.length;
+    h.view.render(2, freshSave(), 32, '');
+    assert.equal(h.paint.calls.length, painted, 'Reduced-motion rendering becomes idle after the ready pair is painted.');
+    const shadow = h.images.find(image => image.src.endsWith('costa-shadow.webp'))!;
+    shadow.onload?.(); await flushAssets();
+    assert.equal(h.internal.geometryDirty, false, 'A late shadow must not restart the actor path.');
+    h.view.render(2, freshSave(), 48, '');
+    assert.ok(h.paint.calls.length > painted, 'A newly available optional layer invalidates reduced-motion paint.');
+    assert.deepEqual(h.internal.marker, data.nodes['1-3']);
+});
+
+test('metadata settling before the main image keeps fallback until the matching image arrives', async t => {
+    const h = mapDOM(t, true), data = fixtureMapMetadata(2, { '2-5': { x: .6, y: .42 } });
+    h.view.render(9, freshSave(), 0, '');
+    h.fetches[0].resolve({ ok: true, json: async () => data }); await flushAssets();
+    assert.equal(h.internal.assets.island, null);
+    assert.deepEqual(h.internal.marker, FALLBACK_POINTS[4]);
+    h.images[0].onload?.(); await flushAssets();
+    h.view.render(9, freshSave(), 16, '');
+    assert.equal(h.internal.assets.island, h.images[0]);
+    assert.deepEqual(h.internal.marker, data.nodes['2-5']);
+});
+
+test('late completions stay in their own island cache when the player switches before loading finishes', async t => {
+    const h = mapDOM(t, true), costa = fixtureMapMetadata(1, { '1-1': { x: .24, y: .66 } }),
+        porto = fixtureMapMetadata(2, { '2-3': { x: .47, y: .68 } });
+    h.view.render(0, freshSave(), 0, '');
+    h.view.render(7, freshSave(), 16, '');
+    await finishWorld(h, 1, costa);
+    assert.equal(h.internal.assets.island, null, 'An obsolete Costa completion cannot replace visible Porto fallback.');
+    assert.equal(h.internal.metadata.world, 2);
+    assert.equal(h.internal.geometryDirty, false);
+    await finishWorld(h, 2, porto);
+    h.view.render(7, freshSave(), 32, '');
+    const portoImage = h.internal.assets.island;
+    assert.deepEqual(h.internal.marker, porto.nodes['2-3']);
+    const counts = [h.images.length, h.fetches.length], painted = h.paint.calls.length;
+    h.images.find(image => image.src.endsWith('costa-shadow.webp'))!.onload?.(); await flushAssets();
+    h.view.render(7, freshSave(), 48, '');
+    assert.equal(h.paint.calls.length, painted, 'Old-island optional scenery does not wake an idle current scene.');
+    assert.equal(h.internal.assets.island, portoImage);
+    h.view.render(0, freshSave(), 64, '');
+    assert.equal(h.internal.metadata.world, 1);
+    assert.deepEqual(h.internal.marker, costa.nodes['1-1']);
+    assert.ok(h.internal.assets.shadow);
+    h.view.render(7, freshSave(), 80, '');
+    assert.equal(h.internal.assets.island, portoImage);
+    assert.deepEqual([h.images.length, h.fetches.length], counts, 'Both ready pairs are immediately reusable without new network requests.');
+});
+
+test('failed Porto pairs keep its fallback and do not poison a ready Costa cache', async t => {
+    const incomplete = fixtureMapMetadata(2); delete incomplete.nodes['2-4'];
+    for (const [label, metadata, imageSuccess] of [
+        ['wrong-world metadata', fixtureMapMetadata(), true], ['incomplete metadata', incomplete, true],
+        ['invalid silhouette bounds', { ...fixtureMapMetadata(2), artBounds: { top: .9, bottom: .1 } }, true],
+        ['missing image', fixtureMapMetadata(2), false],
+    ] as const) await t.test(label, async child => {
+        const h = mapDOM(child, true);
+        h.view.render(0, freshSave(), 0, ''); await finishWorld(h, 1);
+        h.view.render(0, freshSave(), 16, ''); const costaImage = h.internal.assets.island;
+        h.view.render(5, freshSave(), 32, ''); await finishWorld(h, 2, metadata, imageSuccess);
+        h.view.render(5, freshSave(), 48, '');
+        assert.equal(h.internal.assets.island, null);
+        assert.equal(h.internal.metadata.world, 2);
+        assert.deepEqual(h.internal.marker, FALLBACK_POINTS[0]);
+        h.view.render(0, freshSave(), 64, '');
+        assert.equal(h.internal.assets.island, costaImage);
+        h.view.render(5, freshSave(), 80, '');
+        assert.equal(h.fetches.length, 2, 'A failed optional island is not retried every frame or visit.');
+    });
+});
+
+test('Porto local routes offset into stages 5–9 and its secret never borrows Costa progress', async t => {
+    const h = mapDOM(t, true), data = fixtureMapMetadata(2), save = freshSave();
+    for (let n = 1; n <= 5; n++) data.nodes[`2-${n}`] = { x: .2 + n * .1, y: n % 2 ? .66 : .46 };
+    for (let n = 0; n < 4; n++) data.routes[`${n}:${n + 1}`] = [data.nodes[`2-${n + 1}`], { x: .31 + n * .1, y: .55 }, data.nodes[`2-${n + 2}`]];
+    data.secretRoute = [data.nodes['2-3'], { x: .63, y: .73 }, data.nodes['2-5']];
+    h.view.render(5, save, 0, ''); await finishWorld(h, 2, data);
+    h.view.render(5, save, 16, ''); h.view.render(6, save, 32, '');
+    assert.deepEqual(h.internal.travel, data.routes['0:1']);
+    save.secrets.push('1-3');
+    h.view.render(7, save, 2000, ''); h.view.render(9, save, 4000, '');
+    assert.deepEqual(h.internal.travel, [...data.routes['2:3'], ...data.routes['3:4'].slice(1)]);
+    save.secrets.push('2-3');
+    h.view.render(7, save, 6000, ''); h.view.render(9, save, 8000, '');
+    assert.deepEqual(h.internal.travel, data.secretRoute);
+    assert.deepEqual(h.internal.marker, data.nodes['2-5']);
+    assert.match(h.get('world-map-route-hint').textContent, /Atalho 3 → 5 descoberto/);
+    const strokes: unknown[] = [];
+    Object.defineProperty(h.paint.context, 'strokeStyle', { configurable: true, set: value => strokes.push(value) });
+    save.completed.push('2-1');
+    h.view.render(9, save, 8016, '');
+    assert.ok(strokes.includes('#fff4b6c4'), 'Porto trail completion reads 2-1 rather than Costa’s 1-1.');
+    assert.ok(h.paint.calls.some(call => call.method === 'drawImage' && call.args[0] === h.images[0]), 'The painter draws Porto main art.');
+});
+
+test('late optional Costa art preserves the current walk rather than relocating or restarting it', async t => {
+    const h = mapDOM(t), data = fixtureMapMetadata();
+    data.routes['0:1'] = [data.nodes['1-1'], { x: .19, y: .5 }, data.nodes['1-2']];
+    h.view.render(0, freshSave(), 0, ''); await finishWorld(h, 1, data);
+    h.view.render(0, freshSave(), 100, ''); h.view.render(1, freshSave(), 116, '');
+    const started = h.internal.travelStarted, travel = structuredClone(h.internal.travel);
+    h.images.find(image => image.src.endsWith('porto-distant.webp'))!.onload?.(); await flushAssets();
+    h.view.render(1, freshSave(), 132, '');
+    assert.equal(h.internal.travelStarted, started);
+    assert.deepEqual(h.internal.travel, travel);
+    assert.notDeepEqual(h.internal.marker, data.nodes['1-2'], 'Feka continues its authored walk.');
+});
+
+test('Porto without silhouette metadata reserves the full vertical art canvas and exported bounds override it', async t => {
+    const { mapToScreen } = await import('../src/adventure/WorldMapModel');
+    for (const bounds of [undefined, { top: .12, bottom: .91 }]) await t.test(bounds ? 'exported bounds' : 'conservative bounds', async child => {
+        const h = mapDOM(child, true), data = fixtureMapMetadata(2);
+        data.artBounds = bounds;
+        h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width: 1180, height: 555 };
+        h.view.render(5, freshSave(), 0, ''); await finishWorld(h, 2, data);
+        h.view.render(5, freshSave(), 16, '');
+        const camera = h.internal.camera, silhouette = bounds ?? { top: 0, bottom: 1 };
+        assert.ok(mapToScreen({ x: .5, y: silhouette.top }, camera).y >= 80 - 1e-6);
+        assert.ok(mapToScreen({ x: .5, y: silhouette.bottom }, camera).y <= 543 + 1e-6);
+        if (!bounds) assert.ok(camera.zoom < .835, 'Do not silently substitute Costa’s narrower silhouette.');
+    });
 });
 
 test('panorama visibly zooms out after close framing in short landscape and compact portrait', async t => {
@@ -783,4 +1002,58 @@ test('measured HUD bounds reserve the lighthouse and dock on full-canvas desktop
     h.observers[0].callback();
     h.view.render(4, freshSave(), 3000, '');
     assert.ok(h.internal.camera.zoom < before, 'A wrapping title or larger text reflows the measured scene even in reduced motion.');
+});
+
+test('both shipped dioramas retain measured HUD clearance after cached island switches and Porto font reflow', async t => {
+    const h = mapDOM(t, true);
+    const metadata = [1, 2].map(world => JSON.parse(readFileSync(new URL(`../public/assets/world/map/${dioramaName(world)}.meta.json`, import.meta.url), 'utf8')));
+    h.view.render(0, freshSave(), 0, ''); await finishWorld(h, 1, metadata[0]);
+    h.view.render(5, freshSave(), 16, ''); await finishWorld(h, 2, metadata[1]);
+    assert.deepEqual(h.observers[0].targets.map(target => target.className.split(' ')[0]), ['world-map-scene', 'world-map-header', 'world-map-tools', 'world-map-footer']);
+    for (const [width, height, headerBottom, footerTop] of [[1180, 757, 94, 563], [400, 606, 92, 425],
+        [844, 392, 68, 307], [506, 392, 59, 270], [640, 606, 92, 425], [641, 606, 92, 425], [320, 568, 92, 377]]) {
+        h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width, height };
+        h.get('world-map-header').bounds = { x: 12, y: 12, left: 12, top: 12, width: 230, height: headerBottom - 12 };
+        h.get('world-map-tools').bounds = { x: width - 110, y: 14, left: width - 110, top: 14, width: 96, height: headerBottom - 14 };
+        h.get('world-map-footer').bounds = { x: 10, y: footerTop, left: 10, top: footerTop, width: width - 20, height: height - footerTop - 9 };
+        h.observers[0].callback();
+        for (const world of [1, 2]) for (let stage = 0; stage < 5; stage++) {
+            h.paint.calls.length = 0;
+            h.view.render((world - 1) * 5 + stage, freshSave(), 2000 + stage * 100, '');
+            const camera = h.internal.camera, silhouette = metadata[world - 1].artBounds ?? COSTA_ART_BOUNDS;
+            assert.ok(mapToScreen({ x: .5, y: silhouette.top }, camera).y >= headerBottom + 14 - .001);
+            assert.ok(mapToScreen({ x: .5, y: silhouette.bottom }, camera).y <= footerTop - 12 + .001);
+            assert.equal(h.internal.metadata.world, world);
+            assert.match(h.internal.assets.island.src, new RegExp(`${dioramaName(world)}\\.webp$`));
+            assert.ok(h.paint.calls.some(call => call.method === 'drawImage' && call.args[0] === h.internal.assets.island));
+        }
+    }
+    const before = h.internal.camera.zoom, bottomInset = h.internal.frameInsets.bottom;
+    h.paint.calls.length = 0;
+    h.get('world-map-footer').bounds.top -= 24;
+    h.observers[0].callback(); h.view.render(9, freshSave(), 4000, '');
+    assert.equal(h.internal.frameInsets.bottom, bottomInset + 24, 'Porto remeasures a larger boarding ticket in reduced motion.');
+    assert.ok(h.paint.calls.length > 0);
+    assert.ok(h.internal.camera.zoom <= before, 'Use existing spare space before shrinking the diorama further.');
+    assert.ok(mapToScreen({ x: .5, y: metadata[1].artBounds.bottom }, h.internal.camera).y <= h.get('world-map-footer').bounds.top - 12 + .001);
+    assert.equal(h.fetches.length, 2, 'HUD layout changes and island switches retain both cached pairs.');
+});
+
+test('the runtime uses compact framing through 640px and desktop framing from 641px', async t => {
+    const { frameMapPins } = await import('../src/adventure/WorldMapArt');
+    const h = mapDOM(t, true), selected = 14, points = Object.fromEntries(FALLBACK_POINTS.map((p, i) => [10 + i, p]));
+    for (const width of [620, 640, 641]) {
+        const height = 392, compact = width <= 640, fitHeight = Math.min(width / 1.6, height), focus = FALLBACK_POINTS[4];
+        h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width, height };
+        h.get('world-map-header').bounds = { x: 12, y: 12, left: 12, top: 12, width: 230, height: 47 };
+        h.get('world-map-tools').bounds = { x: width - 110, y: 14, left: width - 110, top: 14, width: 96, height: 44 };
+        h.get('world-map-footer').bounds = { x: 10, y: 270, left: 10, top: 270, width: width - 20, height: 113 };
+        h.observers[0].callback(); h.view.render(selected, freshSave(), 4000, '');
+        const zoom = Math.min(.82, compact ? Math.min(1.25, Math.max(.45, (height - 140) / (fitHeight * .93))) : 1.04);
+        const expected = frameMapPins({ width, height, zoom, center: { x: .5 + (focus.x - .5) * .12,
+            y: .52 + (focus.y - .52) * .035 - (compact ? 60 / (fitHeight * zoom) : 0) } },
+        points, selected, compact, undefined, { top: 73, bottom: 134 });
+        assert.ok(Math.abs(h.internal.camera.zoom - expected.zoom) < 1e-8);
+        assert.ok(Math.abs(h.internal.camera.center.y - expected.center.y) < 1e-8);
+    }
 });

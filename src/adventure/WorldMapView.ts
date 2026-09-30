@@ -2,10 +2,16 @@ import { ISLANDS, STAGES } from './campaign';
 import { isUnlocked } from './progress';
 import type { AdventureSave } from './types';
 import { buildTravelPath, clampMapSelection, easeMapMotion, getMapCamera, mapToScreen, moveMapSelection, recordMapTravel, retargetMapTravel, samplePath, type MapCamera, type MapPoint } from './WorldMapModel';
-import { COSTA_ART_BOUNDS, FALLBACK_POINTS, fallbackMapMetadata, frameMapPins, mapActorScale, mapAssetPrefix, paintWorldMap, parseMapMetadata, type MapArtAssets, type MapArtMetadata } from './WorldMapArt';
+import { COSTA_ART_BOUNDS, FALLBACK_POINTS, fallbackMapMetadata, frameMapPins, mapActorScale, mapAssetPrefix, paintWorldMap, parseMapMetadata, type MapArtAssets, type MapArtBounds, type MapArtMetadata } from './WorldMapArt';
 import { ISLAND_ICONS, mapIcon } from './WorldMapIcons';
 
 interface MapCallbacks { select(index: number): void; enter(): void; exit(): void; unlockAudio(): void; }
+interface MapArtDescriptor { name: string; shadow?: string; port?: string; bounds?: MapArtBounds }
+interface CachedMapArt { assets: MapArtAssets; metadata: MapArtMetadata }
+const MAP_ART: Record<number, MapArtDescriptor> = {
+    1: { name: 'costa-diorama', shadow: 'costa-shadow.webp', port: 'porto-distant.webp', bounds: COSTA_ART_BOUNDS },
+    2: { name: 'porto-diorama', bounds: { top: 0, bottom: 1 } },
+};
 const STAGE_NOTES = [
     'O primeiro passo de uma grande viagem. A praia guarda mais do que parece.',
     'Madeira, corda e coragem. Encontre seu ritmo nas pontes da costa.',
@@ -14,6 +20,17 @@ const STAGE_NOTES = [
     'Joãozão está na ponte. É aqui que a travessia fica pessoal.'
 ];
 const LANDMARKS = ['A chegada', 'As pontes', 'O arco de pedra', 'As falésias', 'O grande encontro'];
+const STAGE_COPY: Record<number, { notes: string[]; landmarks: string[] }> = {
+    1: { notes: STAGE_NOTES, landmarks: LANDMARKS },
+    2: {
+        landmarks: ['O cais de chegada', 'Peso e contrapeso', 'O pátio de contêineres', 'A expedição', 'A cabine de operações'],
+        notes: ['Cargas cruzam o cais. Espere a passagem e embarque no próximo apoio.',
+            'Um comando muda o caminho. Eleve as cargas e alcance a passarela.',
+            'Nem tudo passa pelo chão. As passarelas de manutenção guardam outra rota.',
+            'O porto não para. Há áreas de espera entre uma carga e outra.',
+            'Bielzão controla a passagem. Os apoios são o caminho até ele.'],
+    },
+};
 const ISLAND_LABELS = ['Costa', 'Porto', 'Fábrica', 'Serra', 'Reserva', 'Domínio'];
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, className: string, text?: string): HTMLElementTagNameMap[K] {
     const element = document.createElement(tag); element.className = className; if (text) element.textContent = text; return element;
@@ -57,6 +74,8 @@ export class WorldMapView {
     private readonly abort = new AbortController();
     private metadata: MapArtMetadata = fallbackMapMetadata();
     private assets: MapArtAssets = { island: null, shadow: null, port: null };
+    private readonly artCache = new Map<number, CachedMapArt>();
+    private assetWorld = 0;
     private visible = false;
     private selection = -1;
     private controlSelection = 0;
@@ -159,7 +178,6 @@ export class WorldMapView {
         for (const surface of [this.scene, this.header, this.tools, this.footer]) this.resizeObserver.observe(surface);
         window.addEventListener('resize', this.onResize);
         this.media.addEventListener('change', this.onMotion);
-        void this.loadAssets();
     }
     private select(index: number) { this.controlSelection = clampMapSelection(index); this.callbacks.select(this.controlSelection); }
     private act(action: () => void) { if (this.visible) { this.callbacks.unlockAudio(); action(); } }
@@ -183,17 +201,40 @@ export class WorldMapView {
             img.onload = () => resolve(img); img.onerror = () => resolve(null); img.src = path;
         });
     }
-    private async loadAssets() {
+    private useWorldArt(world: number) {
+        let cached = this.artCache.get(world);
+        if (!cached) {
+            cached = { assets: { island: null, shadow: null, port: null }, metadata: fallbackMapMetadata(world) };
+            this.artCache.set(world, cached);
+            if (MAP_ART[world]) void this.loadAssets(world, cached, MAP_ART[world]);
+        }
+        if (this.assetWorld === world) return;
+        this.assetWorld = world;
+        this.assets = cached.assets; this.metadata = cached.metadata;
+        this.geometryDirty = true; this.paintDirty = true;
+    }
+    private async loadAssets(world: number, cached: CachedMapArt, descriptor: MapArtDescriptor) {
         const prefix = mapAssetPrefix((import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/');
-        const [island, shadow, port, metadata] = await Promise.all([
-            this.loadImage(prefix + 'costa-diorama.webp'), this.loadImage(prefix + 'costa-shadow.webp'),
-            this.loadImage(prefix + 'porto-distant.webp'),
-            fetch(prefix + 'costa-diorama.meta.json', { signal: this.abort.signal }).then(r => r.ok ? r.json() : null).then(parseMapMetadata).catch(() => null)
-        ]);
+        const mainImage = this.loadImage(prefix + descriptor.name + '.webp');
+        const mainMetadata = fetch(prefix + descriptor.name + '.meta.json', { signal: this.abort.signal })
+            .then(r => r.ok ? r.json() : null).then(value => parseMapMetadata(value, world)).catch(() => null);
+        // Optional scenery never delays a ready image/metadata pair or restarts travel.
+        for (const layer of ['shadow', 'port'] as const) if (descriptor[layer]) {
+            void this.loadImage(prefix + descriptor[layer]).then(image => {
+                if (this.abort.signal.aborted) return;
+                cached.assets[layer] = image;
+                if (this.assetWorld === world && cached.assets.island) this.paintDirty = true;
+            });
+        }
+        const [island, metadata] = await Promise.all([mainImage, mainMetadata]);
         if (this.abort.signal.aborted) return;
         // Never overlay guessed coordinates on actual art if the matching camera export fails.
-        if (island && metadata) { this.assets = { island, shadow, port }; this.metadata = metadata; }
-        this.geometryDirty = true; this.lastSignature = '';
+        if (island && metadata) {
+            cached.assets.island = island; cached.metadata = metadata;
+            if (this.assetWorld === world) {
+                this.metadata = metadata; this.geometryDirty = true; this.paintDirty = true;
+            }
+        }
     }
     show(time: number) {
         if (this.visible) return;
@@ -220,7 +261,7 @@ export class WorldMapView {
     }
     private points(world: number): Record<number, MapPoint> {
         return Object.fromEntries(FALLBACK_POINTS.map((fallback, i) => [(world - 1) * 5 + i,
-            world === 1 && this.assets.island ? this.metadata.nodes[`1-${i + 1}`] : fallback]));
+            this.assets.island ? this.metadata.nodes[`${world}-${i + 1}`] : fallback]));
     }
     render(selection: number, save: AdventureSave, time: number, warning: string, toast = '') {
         this.show(time); selection = clampMapSelection(selection); this.controlSelection = selection;
@@ -239,14 +280,20 @@ export class WorldMapView {
             this.canvas.width = Math.round(this.width * this.dpr); this.canvas.height = Math.round(this.height * this.dpr);
             this.dirtySize = false; this.paintDirty = true;
         }
-        const stage = STAGES[selection], points = this.points(stage.world), reducedMotion = this.media.matches;
+        const stage = STAGES[selection];
+        this.useWorldArt(stage.world);
+        const points = this.points(stage.world), reducedMotion = this.media.matches;
         const signature = `${selection}|${save.completed.join(',')}|${save.seals.join(',')}|${save.secrets.join(',')}|${warning}|${toast}`;
         if (reducedMotion && !this.paintDirty && !this.geometryDirty && signature === this.lastSignature) return;
         if (this.selection !== selection || this.geometryDirty) {
             const old = this.geometryDirty ? -1 : this.selection;
             this.geometryDirty = false;
+            const offset = (stage.world - 1) * 5;
+            const routes = Object.fromEntries(Object.entries(this.metadata.routes).map(([edge, path]) => {
+                const [from, to] = edge.split(':').map(Number); return [`${from + offset}:${to + offset}`, path];
+            }));
             const requested = old < 0 ? [points[selection]] : buildTravelPath(old, selection, points,
-                stage.world === 1 ? this.metadata.routes : {}, save.secrets.includes(`${stage.world}-3`), stage.world === 1 ? this.metadata.secretRoute : []);
+                routes, save.secrets.includes(`${stage.world}-3`), this.metadata.secretRoute);
             const previousProgress = this.travelDuration ? Math.min(1, (time - this.travelStarted) / this.travelDuration) : 1;
             const continuing = old >= 0 && Math.floor(old / 5) === Math.floor(selection / 5) && previousProgress < 1;
             const easedProgress = easeMapMotion(previousProgress, reducedMotion);
@@ -265,16 +312,17 @@ export class WorldMapView {
         const portrait = this.width <= 640;
         const fitHeight = Math.min(this.width / 1.6, this.height);
         const closeZoom = portrait ? Math.min(1.25, Math.max(.45, (this.height - 140) / (fitHeight * .93))) : 1.04;
-        target.zoom = (stage.world !== 1 ? Math.min(.82, closeZoom) : closeZoom) * (.84 + .16 * easeMapMotion(opening, reducedMotion));
+        target.zoom = (stage.world !== 1 && !this.assets.island ? Math.min(.82, closeZoom) : closeZoom) * (.84 + .16 * easeMapMotion(opening, reducedMotion));
         target.center = { x: .5 + (focus.x - .5) * .12,
             y: .52 + (focus.y - .52) * .035 - (portrait ? 60 / (fitHeight * target.zoom) : 0) };
-        target = frameMapPins(target, points, selection, portrait, stage.world === 1 && this.assets.island ? COSTA_ART_BOUNDS : undefined, this.frameInsets);
+        const artBounds = this.assets.island ? this.metadata.artBounds ?? MAP_ART[stage.world]?.bounds : undefined;
+        target = frameMapPins(target, points, selection, portrait, artBounds, this.frameInsets);
         // Keep panorama distinct even when a short scene has already constrained close zoom.
         if (this.overview) target.zoom *= .82;
         const dt = Math.max(0, Math.min(80, time - this.lastTime)); this.lastTime = time;
         const blend = reducedMotion ? 1 : 1 - Math.exp(-dt / 260);
         this.camera = { ...target, center: { x: this.camera.center.x + (target.center.x - this.camera.center.x) * blend, y: this.camera.center.y + (target.center.y - this.camera.center.y) * blend }, zoom: this.camera.zoom + (target.zoom - this.camera.zoom) * blend };
-        this.camera = frameMapPins(this.camera, points, selection, portrait, stage.world === 1 && this.assets.island ? COSTA_ART_BOUNDS : undefined, this.frameInsets);
+        this.camera = frameMapPins(this.camera, points, selection, portrait, artBounds, this.frameInsets);
         this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0); this.ctx.imageSmoothingEnabled = true;
         paintWorldMap(this.ctx, { camera: this.camera, world: stage.world, time, reducedMotion, metadata: this.metadata, assets: this.assets,
             secret: save.secrets.includes(`${stage.world}-3`), completed: save.completed, marker: this.marker, walking: progress < 1, facingLeft: this.marker.x < previous.x });
@@ -286,14 +334,15 @@ export class WorldMapView {
         if (signature === this.lastSignature) return;
         this.lastSignature = signature;
         const island = ISLANDS[stage.world - 1], open = isUnlocked(stage.id, save), completed = save.completed.includes(stage.id);
+        const stageCopy = STAGE_COPY[stage.world];
         this.title.textContent = island.name; this.worldNumber.textContent = `ILHA ${String(stage.world).padStart(2, '0')} / 06`;
         this.islandEmblem.replaceChildren(mapIcon(ISLAND_ICONS[stage.world - 1]));
         this.phaseTotal.textContent = `${save.completed.length}/30`; this.sealTotal.textContent = `${save.seals.length}/72`;
         this.progress.setAttribute('aria-label', `${save.completed.length} de 30 fases concluídas, ${save.seals.length} de 72 selos`);
         this.stageNumber.textContent = stage.id;
-        this.chapter.textContent = completed ? 'Travessia concluída' : !open ? 'Caminho bloqueado' : stage.world === 1 ? LANDMARKS[stage.number - 1] : 'Próxima travessia';
+        this.chapter.textContent = completed ? 'Travessia concluída' : !open ? 'Caminho bloqueado' : stageCopy?.landmarks[stage.number - 1] ?? 'Próxima travessia';
         this.stageName.textContent = stage.name;
-        this.description.textContent = stage.world === 1 ? STAGE_NOTES[stage.number - 1] : island.description;
+        this.description.textContent = stageCopy?.notes[stage.number - 1] ?? island.description;
         const sealCount = save.seals.filter(id => id.startsWith(stage.id + ':')).length;
         this.seals.hidden = !!stage.encounter; this.encounter.hidden = !stage.encounter;
         this.encounter.setAttribute('aria-label', completed ? 'Encontro vencido' : 'Encontro');

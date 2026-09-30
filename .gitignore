@@ -71,3 +71,6 @@ env/
 /public/assets/world/map/*.png
 /public/assets/world/map/*.lossless.webp
 /public/assets/world/map/art-manifest.json
+
+# Historical local geometry audit, not a release artifact
+/docs/world/diorama/porto-prototype-initial-clearance.json

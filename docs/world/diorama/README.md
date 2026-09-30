@@ -1,12 +1,12 @@
-# Costa dos Gaps · mapa-diorama 2.5D
+# Costa e Porto · mapa-diorama 2.5D
 
-Primeiro recorte da nova apresentação de mapa. Branch de prévia `feat/costa-diorama-map`, a partir de `56348fa`. A prévia é publicada separadamente da produção para revisão no navegador.
+Apresentação do mapa com dioramas autorais para a Costa dos Gaps e o Porto do Bielzão. Cada extensão passa por uma prévia separada e revisão no navegador antes da promoção à produção.
 
 ## Direção e composição
 
 A Costa foi modelada e iluminada no Blender: praia, arco natural, falésias estratificadas, palmeiras, ponte suspensa, caminhos e escadas, farol listrado, casa e cais. O Porto aparece como outra camada ao fundo. Os cinco pontos e as rotas são projetados pela própria câmera ortográfica do render, não posicionados por aproximação visual.
 
-A apresentação tem uma câmera dirigida, aproximação inicial, botão de panorama, mar e gaivotas com movimento discreto. Feka percorre as rotas entre os pontos. A saída secreta da fase 1-3 revela a ligação para 1-5. As demais ilhas mantêm uma apresentação cartográfica compatível com a arte legada nesta primeira fatia.
+A apresentação tem uma câmera dirigida, aproximação inicial, botão de panorama, mar e gaivotas com movimento discreto. Feka percorre as rotas entre os pontos. A saída secreta da fase 1-3 revela a ligação para 1-5. O Porto tem cinco áreas de carga e uma passarela de manutenção 2-3 → 2-5; sua autoria e verificações estão em `porto.md` e `porto-art-direction.md`. As quatro ilhas restantes mantêm a apresentação cartográfica legada até seus próximos recortes.
 
 ## Arquitetura
 
@@ -34,7 +34,7 @@ Os controles têm rótulos acessíveis, foco visível e estado da seleção anun
 
 `prefers-reduced-motion` remove interpolação de câmera, percurso e animação ambiente. Uma única instância da camada é reutilizada nas voltas ao mapa; não há RAF adicional. Quando o documento está oculto, o mapa não é pintado. Em movimento reduzido, quadros estáticos não fazem nenhuma chamada de pintura; progresso, seleção, panorama e resize invalidam a imagem normalmente. Mudanças repetidas de destino preservam o trecho já percorrido e podem inverter o sentido sem cortar pelo terreno. O backing canvas é limitado a DPR 2 e aproximadamente 4 megapixels (mais eventual arredondamento de um pixel), inclusive em telas ultrawide.
 
-Os assets são carregados apenas na primeira abertura do mapa. A arte e os metadados precisam estar disponíveis em conjunto; caso contrário é usada a apresentação legada funcional, evitando pinos em posições incorretas. O runtime não inclui Blender, WebGL ou dependência 3D.
+Os assets de cada diorama são carregados apenas na primeira visita àquela ilha e ficam em cache nas voltas. A imagem principal e os metadados precisam estar disponíveis em conjunto; camadas opcionais não atrasam esse par. Respostas tardias de outra ilha não trocam a cena atual. Nós, quatro percursos principais, atalho e seus endpoints são validados; caso contrário é usada a apresentação legada funcional, evitando pinos ou percursos incorretos. O runtime não inclui Blender, WebGL ou dependência 3D.
 
 ## Verificação visual e limites
 

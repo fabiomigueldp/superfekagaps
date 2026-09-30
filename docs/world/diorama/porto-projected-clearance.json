@@ -1,0 +1,17 @@
+{
+  "purpose": "Conservative image-space route and actor envelope against the entire suspended-load/hoist assembly. Complements 3D headroom and support checks.",
+  "actorEnvelope": {
+    "halfWidth": 0.035,
+    "height": 0.105,
+    "footMargin": 0.008
+  },
+  "loadBounds": {
+    "left": 0.797166,
+    "right": 0.844361,
+    "top": 0.350489,
+    "bottom": 0.54128
+  },
+  "sampleCount": 273,
+  "conflictCount": 0,
+  "conflicts": []
+}
