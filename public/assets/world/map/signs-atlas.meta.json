@@ -1,0 +1,285 @@
+{
+  "version": 1,
+  "coordinateSystem": "sourceRect is physical atlas pixels; displaySize, foot, letterCenter, usableFace and decorativeTranslateY are CSS pixels. Glyph cells are integer2CSSpx.",
+  "atlas": {
+    "image": "signs-atlas.webp",
+    "width": 560,
+    "height": 232,
+    "bytes": 30000
+  },
+  "frames": [
+    {
+      "kind": "stage",
+      "image": "stage-dpr2.webp",
+      "cssWidth": 56,
+      "cssHeight": 58,
+      "dpr": 2,
+      "foot": {
+        "x": 28.0,
+        "y": 47.388
+      },
+      "letterCenter": {
+        "x": 28.0,
+        "y": 22.856
+      },
+      "usableFace": {
+        "x": 8.775,
+        "y": 14.83,
+        "width": 38.45,
+        "height": 15.469
+      },
+      "letterPixelScale": 2,
+      "palette": {
+        "letters": "#191f35",
+        "closedLetters": "#191f35",
+        "selected": "#e9ad4c"
+      },
+      "decorativeTranslateY": 10.612,
+      "bytes": 4890,
+      "sourceRect": {
+        "x": 0,
+        "y": 0,
+        "width": 112,
+        "height": 116
+      },
+      "displaySize": {
+        "width": 56,
+        "height": 58
+      }
+    },
+    {
+      "kind": "selected",
+      "image": "selected-dpr2.webp",
+      "cssWidth": 56,
+      "cssHeight": 58,
+      "dpr": 2,
+      "foot": {
+        "x": 28.0,
+        "y": 47.388
+      },
+      "letterCenter": {
+        "x": 28.0,
+        "y": 22.856
+      },
+      "usableFace": {
+        "x": 8.775,
+        "y": 14.83,
+        "width": 38.45,
+        "height": 15.469
+      },
+      "letterPixelScale": 2,
+      "palette": {
+        "letters": "#191f35",
+        "closedLetters": "#191f35",
+        "selected": "#e9ad4c"
+      },
+      "decorativeTranslateY": 10.612,
+      "bytes": 4944,
+      "sourceRect": {
+        "x": 112,
+        "y": 0,
+        "width": 112,
+        "height": 116
+      },
+      "displaySize": {
+        "width": 56,
+        "height": 58
+      }
+    },
+    {
+      "kind": "complete",
+      "image": "complete-dpr2.webp",
+      "cssWidth": 56,
+      "cssHeight": 58,
+      "dpr": 2,
+      "foot": {
+        "x": 28.0,
+        "y": 47.388
+      },
+      "letterCenter": {
+        "x": 28.0,
+        "y": 22.856
+      },
+      "usableFace": {
+        "x": 8.775,
+        "y": 14.83,
+        "width": 38.45,
+        "height": 15.469
+      },
+      "letterPixelScale": 2,
+      "palette": {
+        "letters": "#191f35",
+        "closedLetters": "#191f35",
+        "selected": "#e9ad4c"
+      },
+      "decorativeTranslateY": 10.612,
+      "bytes": 5174,
+      "sourceRect": {
+        "x": 224,
+        "y": 0,
+        "width": 112,
+        "height": 116
+      },
+      "displaySize": {
+        "width": 56,
+        "height": 58
+      }
+    },
+    {
+      "kind": "locked",
+      "image": "locked-dpr2.webp",
+      "cssWidth": 56,
+      "cssHeight": 58,
+      "dpr": 2,
+      "foot": {
+        "x": 28.0,
+        "y": 47.388
+      },
+      "letterCenter": {
+        "x": 28.0,
+        "y": 22.856
+      },
+      "usableFace": {
+        "x": 8.775,
+        "y": 14.83,
+        "width": 38.45,
+        "height": 15.469
+      },
+      "letterPixelScale": 2,
+      "palette": {
+        "letters": "#191f35",
+        "closedLetters": "#191f35",
+        "selected": "#e9ad4c"
+      },
+      "decorativeTranslateY": 10.612,
+      "bytes": 4970,
+      "sourceRect": {
+        "x": 336,
+        "y": 0,
+        "width": 112,
+        "height": 116
+      },
+      "displaySize": {
+        "width": 56,
+        "height": 58
+      }
+    },
+    {
+      "kind": "selected-complete",
+      "image": "selected-complete-dpr2.webp",
+      "cssWidth": 56,
+      "cssHeight": 58,
+      "dpr": 2,
+      "foot": {
+        "x": 28.0,
+        "y": 47.388
+      },
+      "letterCenter": {
+        "x": 28.0,
+        "y": 22.856
+      },
+      "usableFace": {
+        "x": 8.775,
+        "y": 14.83,
+        "width": 38.45,
+        "height": 15.469
+      },
+      "letterPixelScale": 2,
+      "palette": {
+        "letters": "#191f35",
+        "closedLetters": "#191f35",
+        "selected": "#e9ad4c"
+      },
+      "decorativeTranslateY": 10.612,
+      "bytes": 5272,
+      "sourceRect": {
+        "x": 448,
+        "y": 0,
+        "width": 112,
+        "height": 116
+      },
+      "displaySize": {
+        "width": 56,
+        "height": 58
+      }
+    },
+    {
+      "kind": "dock-right",
+      "image": "dock-right-dpr2.webp",
+      "cssWidth": 104,
+      "cssHeight": 56,
+      "dpr": 2,
+      "foot": {
+        "x": 52.0,
+        "y": 45.678
+      },
+      "letterCenter": {
+        "x": 49.181,
+        "y": 22.094
+      },
+      "usableFace": {
+        "x": 19.422,
+        "y": 14.377,
+        "width": 65.156,
+        "height": 14.871999999999998
+      },
+      "letterPixelScale": 2,
+      "palette": {
+        "letters": "#191f35",
+        "closedLetters": "#191f35",
+        "selected": "#e9ad4c"
+      },
+      "decorativeTranslateY": 10.322,
+      "bytes": 8148,
+      "sourceRect": {
+        "x": 0,
+        "y": 120,
+        "width": 208,
+        "height": 112
+      },
+      "displaySize": {
+        "width": 104,
+        "height": 56
+      }
+    },
+    {
+      "kind": "dock-left",
+      "image": "dock-left-dpr2.webp",
+      "cssWidth": 104,
+      "cssHeight": 56,
+      "dpr": 2,
+      "foot": {
+        "x": 52.0,
+        "y": 45.678
+      },
+      "letterCenter": {
+        "x": 54.819,
+        "y": 22.094
+      },
+      "usableFace": {
+        "x": 19.422,
+        "y": 14.377,
+        "width": 65.156,
+        "height": 14.871999999999998
+      },
+      "letterPixelScale": 2,
+      "palette": {
+        "letters": "#191f35",
+        "closedLetters": "#191f35",
+        "selected": "#e9ad4c"
+      },
+      "decorativeTranslateY": 10.322,
+      "bytes": 8086,
+      "sourceRect": {
+        "x": 208,
+        "y": 120,
+        "width": 208,
+        "height": 112
+      },
+      "displaySize": {
+        "width": 104,
+        "height": 56
+      }
+    }
+  ]
+}

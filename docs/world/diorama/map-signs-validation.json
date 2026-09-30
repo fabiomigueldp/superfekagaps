@@ -1,0 +1,152 @@
+{
+  "allEdgesTransparent": true,
+  "atlasBytes": 30000,
+  "atlasSize": [
+    560,
+    232
+  ],
+  "frameCount": 7,
+  "hashes": {
+    "signs-atlas.webp": "b55be38dbe2f03ea4bf0d535df941f75404b0572fb3e450d5736591197b709f5",
+    "signs-atlas.meta.json": "a5d11c0c918468fcd4f66d8fc83305c4a865b169139f7f89fc3c446269ac9203"
+  },
+  "frozenByteComparison": {
+    "signs-atlas.webp": true,
+    "signs-atlas.meta.json": true
+  },
+  "assets": [
+    {
+      "kind": "stage",
+      "edgeAlphaMax": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "foot": {
+        "x": 28.0,
+        "y": 47.388
+      },
+      "usableFace": {
+        "x": 8.775,
+        "y": 14.83,
+        "width": 38.45,
+        "height": 15.469
+      }
+    },
+    {
+      "kind": "selected",
+      "edgeAlphaMax": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "foot": {
+        "x": 28.0,
+        "y": 47.388
+      },
+      "usableFace": {
+        "x": 8.775,
+        "y": 14.83,
+        "width": 38.45,
+        "height": 15.469
+      }
+    },
+    {
+      "kind": "complete",
+      "edgeAlphaMax": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "foot": {
+        "x": 28.0,
+        "y": 47.388
+      },
+      "usableFace": {
+        "x": 8.775,
+        "y": 14.83,
+        "width": 38.45,
+        "height": 15.469
+      }
+    },
+    {
+      "kind": "locked",
+      "edgeAlphaMax": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "foot": {
+        "x": 28.0,
+        "y": 47.388
+      },
+      "usableFace": {
+        "x": 8.775,
+        "y": 14.83,
+        "width": 38.45,
+        "height": 15.469
+      }
+    },
+    {
+      "kind": "selected-complete",
+      "edgeAlphaMax": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "foot": {
+        "x": 28.0,
+        "y": 47.388
+      },
+      "usableFace": {
+        "x": 8.775,
+        "y": 14.83,
+        "width": 38.45,
+        "height": 15.469
+      }
+    },
+    {
+      "kind": "dock-right",
+      "edgeAlphaMax": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "foot": {
+        "x": 52.0,
+        "y": 45.678
+      },
+      "usableFace": {
+        "x": 19.422,
+        "y": 14.377,
+        "width": 65.156,
+        "height": 14.871999999999998
+      }
+    },
+    {
+      "kind": "dock-left",
+      "edgeAlphaMax": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "foot": {
+        "x": 52.0,
+        "y": 45.678
+      },
+      "usableFace": {
+        "x": 19.422,
+        "y": 14.377,
+        "width": 65.156,
+        "height": 14.871999999999998
+      }
+    }
+  ]
+}

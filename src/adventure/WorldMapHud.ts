@@ -1,6 +1,8 @@
 import { ISLANDS, STAGES } from './campaign';
 import { fitText, panel, pixelText, textWidth, wrapText } from '../graphics/BitmapFont';
 import { ART } from '../graphics/palette';
+import { mapAssetPrefix } from './WorldMapArt';
+import { loadMapSignAtlas, paintPhysicalDockSign, paintPhysicalStageSign, type MapSignAtlas } from './WorldMapSignArt';
 
 export type WorldMapMotionState = 'idle' | 'walking' | 'boarding' | 'sailing' | 'arriving';
 export interface WorldMapHudCallbacks {
@@ -91,6 +93,7 @@ function lock(ctx: CanvasRenderingContext2D, x: number, y: number): void {
     ctx.fillRect(x, y + 3, 5, 4); ctx.fillStyle = ART.ink; ctx.fillRect(x + 2, y + 4, 1, 2);
 }
 function stageSign(canvas: HTMLCanvasElement, id: string, selected: boolean, completed: boolean, open: boolean): void {
+    canvas.style.transform = '';
     const ctx = context(canvas, 28, 29);
     if (!ctx) return;
     ctx.fillStyle = ART.soilDark; ctx.fillRect(6, 18, 3, 11); ctx.fillRect(20, 18, 3, 11);
@@ -105,6 +108,7 @@ function stageSign(canvas: HTMLCanvasElement, id: string, selected: boolean, com
     if (!open) lock(ctx, 21, 0);
 }
 function dockSign(canvas: HTMLCanvasElement, world: number, available: boolean, current: boolean): void {
+    canvas.style.transform = '';
     const ctx = context(canvas, 52, 28);
     if (!ctx) return;
     ctx.fillStyle = ART.soilDark; ctx.fillRect(9, 17, 3, 11); ctx.fillRect(39, 17, 3, 11);
@@ -153,6 +157,11 @@ export class WorldMapHud {
     private signature = '';
     private announcement = '';
     private readonly dockSignatures = ['', ''];
+    private readonly dockAvailability = [false, false];
+    private readonly assetAbort = new AbortController();
+    private signAtlas: MapSignAtlas | null = null;
+    private signsRequested = false;
+    private disposed = false;
 
     constructor(callbacks: WorldMapHudCallbacks) {
         const id = ++instanceId;
@@ -233,12 +242,28 @@ export class WorldMapHud {
 
     /** Mount is explicit so the game controls ownership and canvas focus restoration. */
     setVisible(visible: boolean): void {
+        if (this.disposed) return;
         this.root.hidden = !visible;
         if (!visible) this.closeRegionMenu();
+        else this.loadSignArt();
     }
-    private run(action: () => void): void { if (!this.root.hidden) action(); }
+    private loadSignArt(): void {
+        if (this.signsRequested) return;
+        this.signsRequested = true;
+        const prefix = mapAssetPrefix((import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/');
+        void loadMapSignAtlas(prefix, this.assetAbort.signal).then(atlas => {
+            if (!atlas || this.disposed) return;
+            this.signAtlas = atlas;
+            if (!this.state) return;
+            for (let n = 0; n < 5; n++) this.paintStage(n, this.state);
+            this.dockSignatures.fill('');
+            this.dockAvailability.forEach((available, n) => this.updateDock(n, available));
+        });
+    }
+    private run(action: () => void): void { if (!this.disposed && !this.root.hidden) action(); }
 
     update(state: WorldMapHudState): void {
+        if (this.disposed) return;
         this.state = state;
         const signature = JSON.stringify(state);
         if (signature === this.signature) return;
@@ -280,7 +305,7 @@ export class WorldMapHud {
             const entry = STAGES[(state.world - 1) * 5 + n], selected = entry.id === stage.id;
             const unlocked = !!state.open[n], done = !!state.completed[n], button = this.stageButtons[n];
             const status = !unlocked ? 'bloqueada' : done ? 'concluída' : 'disponível';
-            stageSign(this.stageCanvases[n], entry.id, selected, done, unlocked);
+            this.paintStage(n, state);
             button.classList.toggle('is-selected', selected); button.classList.toggle('is-completed', done); button.classList.toggle('is-locked', !unlocked);
             button.setAttribute('aria-pressed', String(selected));
             button.setAttribute('aria-label', `Fase ${entry.id}: ${entry.name}, ${status}. ${unlocked ? 'Marcar destino.' : 'Ver caminho bloqueado.'}`);
@@ -297,6 +322,11 @@ export class WorldMapHud {
         const announcement = `${title}. ${this.status.textContent}. ${this.stageDetails.textContent}.`;
         if (announcement !== this.announcement) { this.announcement = announcement; this.announcer.textContent = announcement; }
     }
+    private paintStage(index: number, state: WorldMapHudState): void {
+        const entry = STAGES[(state.world - 1) * 5 + index], selected = entry.id === STAGES[state.stage].id;
+        if (state.world > 2 || !paintPhysicalStageSign(this.stageCanvases[index], this.signAtlas, entry.id, selected, !!state.completed[index], !!state.open[index]))
+            stageSign(this.stageCanvases[index], entry.id, selected, !!state.completed[index], !!state.open[index]);
+    }
 
     /** Five phase points, then Costa and Porto dock points. Missing points hide controls. */
     positionNodes(stages: readonly (WorldMapHudPoint | null)[], docks: readonly (WorldMapHudPoint | null)[]): void {
@@ -311,10 +341,13 @@ export class WorldMapHud {
         });
     }
     private updateDock(index: number, available: boolean): void {
-        const current = this.state?.world === index + 1, key = `${available}:${current}`;
+        const current = this.state?.world === index + 1, physical = !!this.state && this.state.world <= 2;
+        const key = `${available}:${current}:${physical}`;
         if (this.dockSignatures[index] === key) return;
         this.dockSignatures[index] = key;
-        dockSign(this.dockCanvases[index], index + 1, available, current);
+        this.dockAvailability[index] = available;
+        if (!physical || !paintPhysicalDockSign(this.dockCanvases[index], this.signAtlas, index + 1, available))
+            dockSign(this.dockCanvases[index], index + 1, available, current);
         const button = this.dockButtons[index];
         button.classList.toggle('is-locked', !available);
         button.setAttribute('aria-label', `Cais para ${ISLANDS[index].name}. ${available ? 'Marcar destino da travessia.' : 'Travessia bloqueada. Ver prévia.'}`);
@@ -339,5 +372,8 @@ export class WorldMapHud {
         if (this.regionMenu.hidden || event.key !== 'Escape') return;
         event.preventDefault(); event.stopPropagation(); this.closeRegionMenu(true);
     };
-    dispose(): void { this.root.removeEventListener('keydown', this.onKey); this.root.remove(); }
+    dispose(): void {
+        this.disposed = true; this.root.hidden = true; this.assetAbort.abort();
+        this.root.removeEventListener('keydown', this.onKey); this.root.remove();
+    }
 }

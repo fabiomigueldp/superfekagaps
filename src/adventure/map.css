@@ -43,6 +43,7 @@
     border: 0;
     background: transparent;
     pointer-events: auto;
+    overflow: visible;
 }
 .world-map-node { width: 56px; height: 58px; }
 .world-map-node .world-map-bitmap { width: 56px; height: 58px; }

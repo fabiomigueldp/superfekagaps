@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test, { type TestContext } from 'node:test';
 import { WorldMapHud, type WorldMapHudState, type WorldMapMotionState } from '../src/adventure/WorldMapHud';
 
@@ -13,6 +14,7 @@ class Element {
     attributes = new Map<string, string>();
     listeners = new Map<string, Listener[]>();
     focusCount = 0;
+    draws: unknown[][] = [];
     readonly classList = { toggle: (name: string, on: boolean) => {
         const classes = new Set(this.className.split(' ').filter(Boolean));
         if (on) classes.add(name); else classes.delete(name);
@@ -26,7 +28,7 @@ class Element {
     removeEventListener(type: string, listener: Listener) { this.listeners.set(type, (this.listeners.get(type) ?? []).filter(item => item !== listener)); }
     focus() { this.focusCount++; }
     remove() { if (this.parent) this.parent.children = this.parent.children.filter(item => item !== this); }
-    getContext() { return { setTransform() {}, fillRect() {}, fillStyle: '', imageSmoothingEnabled: false }; }
+    getContext() { return { setTransform() {}, fillRect() {}, drawImage: (...args: unknown[]) => this.draws.push(args), fillStyle: '', imageSmoothingEnabled: false }; }
     dispatch(type: string, data: Record<string, unknown> = {}) {
         const event = { key: '', defaultPrevented: false, propagationStopped: false,
             preventDefault() { this.defaultPrevented = true; }, stopPropagation() { this.propagationStopped = true; }, ...data };
@@ -49,6 +51,7 @@ function fixture(t: TestContext) {
         completed: [true, false, false, false, false], seals: [3, 1, 0, 0, 0], globalProgress: { completed: 1, seals: 4 },
         motionState: 'idle', canEnter: true, hint: '', worldAvailability: [true, false, false, false, false, false] };
     hud.update(state); hud.setVisible(true);
+    t.after(() => hud.dispose());
     return { hud, calls, state };
 }
 const asElement = (element: HTMLElement) => element as unknown as Element;
@@ -125,4 +128,82 @@ test('Escape closes only the region drawer, restores focus and cannot escape to 
     const closed = root.dispatch('keydown', { key: 'Escape' });
     assert.equal(closed.defaultPrevented, false, 'Closed drawers leave scene keyboard routing to their owner.');
     hud.regionButton.click(); hud.closeRegionMenu(true); assert.equal(button.focusCount, 2);
+});
+
+function signResources(t: TestContext) {
+    const requests: Array<{ signal: AbortSignal; resolve: (value: unknown) => void }> = [];
+    const images: ImageMock[] = [];
+    class ImageMock {
+        decoding = ''; src = ''; naturalWidth = 560; naturalHeight = 232;
+        onload: (() => void) | null = null; onerror: (() => void) | null = null;
+        constructor() { images.push(this); }
+    }
+    for (const [key, value] of Object.entries({ Image: ImageMock,
+        fetch: (_url: string, options: { signal: AbortSignal }) => new Promise(resolve => requests.push({ signal: options.signal, resolve })),
+        requestAnimationFrame: () => assert.fail('Sign decoration must not create an animation loop.') })) {
+        const previous = Object.getOwnPropertyDescriptor(globalThis, key);
+        Object.defineProperty(globalThis, key, { configurable: true, writable: true, value });
+        t.after(() => { if (previous) Object.defineProperty(globalThis, key, previous); else Reflect.deleteProperty(globalThis, key); });
+    }
+    const settle = () => new Promise<void>(resolve => setImmediate(resolve));
+    return { requests, images, settle, async metadata() {
+        requests[0].resolve({ ok: true, json: async () => JSON.parse(readFileSync(new URL('../public/assets/world/map/signs-atlas.meta.json', import.meta.url), 'utf8')) });
+        await settle();
+    } };
+}
+
+test('one optional atlas paints all seven existing sign canvases and survives hide/show without extra requests', async t => {
+    const resources = signResources(t), { hud, calls, state } = fixture(t);
+    const stage = asElement(hud.stageButtons[0]).children[0], dock = asElement(hud.dockButtons[0]).children[0];
+    const stageLabel = hud.stageButtons[0].getAttribute('aria-label');
+    assert.equal(stage.width, 56, 'The procedural sign is ready immediately.');
+    hud.setVisible(false); hud.setVisible(true); hud.update(state); assert.equal(resources.requests.length, 1);
+    await resources.metadata(); assert.equal(resources.images.length, 1);
+    resources.images[0].onload!(); await resources.settle();
+    assert.equal(stage.width, 112); assert.equal(dock.width, 208);
+    assert.equal(stage.style.transform, 'translate(0px, 11px)'); assert.equal(dock.style.transform, 'translate(0px, 10px)');
+    assert.equal(hud.stageButtons[0].getAttribute('aria-label'), stageLabel);
+    for (const button of [...hud.stageButtons, ...hud.dockButtons]) assert.equal(asElement(button).children[0].draws.length, 1);
+    hud.setVisible(false); hud.setVisible(true); hud.update(state);
+    assert.equal(resources.requests.length, 1); assert.equal(resources.images.length, 1); assert.deepEqual(calls, []);
+    assert.equal(hud.enterButton.disabled, false); hud.stageButtons[0].click(); assert.deepEqual(calls, [0]);
+});
+
+test('missing atlas image keeps every procedural sign usable and never retries per frame', async t => {
+    const resources = signResources(t), { hud, state } = fixture(t);
+    await resources.metadata(); resources.images[0].onerror!(); await resources.settle();
+    for (let frame = 0; frame < 10; frame++) hud.update({ ...state, stage: frame % 2 });
+    const stage = asElement(hud.stageButtons[0]).children[0];
+    assert.equal(stage.width, 56); assert.equal(stage.style.transform, ''); assert.equal(stage.draws.length, 0);
+    assert.equal(resources.requests.length, 1); assert.equal(resources.images.length, 1);
+});
+
+test('disposing during atlas load removes handlers and cannot repaint or resurrect the HUD', async t => {
+    const resources = signResources(t), { hud } = fixture(t);
+    await resources.metadata(); const image = resources.images[0], lateLoad = image.onload!;
+    const stage = asElement(hud.stageButtons[0]).children[0];
+    hud.dispose(); assert.equal(resources.requests[0].signal.aborted, true);
+    assert.equal(image.onload, null); assert.equal(image.onerror, null);
+    lateLoad(); await resources.settle(); hud.setVisible(true);
+    assert.equal(stage.draws.length, 0); assert.equal(stage.width, 56);
+});
+
+test('physical props stay on Costa and Porto; later-region fallbacks reset decoration without reloading', async t => {
+    const resources = signResources(t), { hud, state } = fixture(t);
+    await resources.metadata(); resources.images[0].onload!(); await resources.settle();
+    const stage = asElement(hud.stageButtons[0]).children[0], dock = asElement(hud.dockButtons[1]).children[0];
+    assert.equal(stage.style.transform, 'translate(0px, 11px)');
+    for (const world of [3, 4, 5, 6]) {
+        hud.update({ ...state, world, stage: (world - 1) * 5 });
+        assert.equal(stage.width, 56); assert.equal(stage.style.transform, '');
+        assert.equal(dock.width, 104); assert.equal(dock.style.transform, '');
+        assert.match(hud.stageButtons[0].getAttribute('aria-label')!, new RegExp(`Fase ${world}-1:`));
+    }
+    for (const world of [2, 3, 1]) {
+        hud.update({ ...state, world, stage: (world - 1) * 5 });
+        assert.equal(stage.width, world === 3 ? 56 : 112);
+        assert.equal(stage.style.transform, world === 3 ? '' : 'translate(0px, 11px)');
+        assert.equal(dock.style.transform, world === 3 ? '' : 'translate(0px, 10px)');
+    }
+    assert.equal(resources.requests.length, 1); assert.equal(resources.images.length, 1);
 });
