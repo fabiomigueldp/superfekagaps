@@ -78,7 +78,7 @@ export class WorldGame {
     private mapView?: WorldMapView;
     private mapCanvas: HTMLCanvasElement;
     private deathFeedbackStarted = false;
-    constructor(canvas: HTMLCanvasElement, ephemeral = false) {
+    constructor(canvas: HTMLCanvasElement, private readonly ephemeral = false) {
         this.mapCanvas = canvas;
         document.title = ephemeral ? 'Super Feka Gaps World · Estúdio' : 'Super Feka Gaps World';
         let storage: Storage | null = null;
@@ -605,7 +605,7 @@ export class WorldGame {
                 exit: () => { if (this.state === 'map') this.change('title'); },
                 unlockAudio: () => this.audio.unlock()
             });
-            this.mapView.render(this.selection, this.store.save, this.time, this.store.warning, this.toastTimer > 0 ? this.toast : '');
+            this.mapView.render(this.selection, this.store.save, this.time, this.ephemeral ? '' : this.store.warning, this.toastTimer > 0 ? this.toast : '');
             return;
         }
         this.mapView?.hide();

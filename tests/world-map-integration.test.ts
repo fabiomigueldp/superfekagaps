@@ -340,13 +340,13 @@ test('keyboard navigation focuses the destination and hidden/modifier/repeat eve
     assert.equal(h.events.entered, 1);
 });
 
-function worldHarness() {
+function worldHarness(ephemeral = false) {
     const values = new Map<string, string>(), writes: string[] = [], calls: string[] = [];
     const store = new ProgressStore({ getItem: key => values.get(key) ?? null,
         setItem: (key, value) => { values.set(key, value); writes.push(value); } });
     const game = Object.create(WorldGame.prototype) as any;
     const mapRenders: unknown[][] = [];
-    Object.assign(game, { store, state: 'map', selection: 0, time: 1234, toast: '', toastTimer: 0,
+    Object.assign(game, { store, ephemeral, state: 'map', selection: 0, time: 1234, toast: '', toastTimer: 0,
         buttons: [{ run() {} }], menuSelection: 0,
         input: { reset() { calls.push('reset'); }, setMenuMode(value: boolean) { calls.push(`menu:${value}`); } },
         audio: { cancelSpeech() {}, setDying() {}, pause() {}, select() {}, unlock() { calls.push('unlock'); },
@@ -374,6 +374,25 @@ test('WorldGame map render bypasses the entire pixel renderer and sends current 
     assert.ok(h.calls.includes('startScene'));
     assert.ok(h.calls.includes('title'));
     assert.ok(h.calls.includes('present'));
+});
+
+test('intentional ephemeral editor maps suppress storage warnings while normal failures and all toasts stay visible', () => {
+    for (const ephemeral of [true, false]) {
+        const h = worldHarness(ephemeral), store = new ProgressStore(null);
+        h.game.store = store;
+        assert.equal(store.persist(), false);
+        assert.match(store.warning, /Armazenamento indisponível/);
+        h.game.toast = 'Conclua o caminho anterior.'; h.game.toastTimer = 100;
+        h.game.render();
+        assert.equal(h.mapRenders[0][3], ephemeral ? '' : store.warning);
+        assert.equal(h.mapRenders[0][4], 'Conclua o caminho anterior.');
+        assert.match(store.warning, /Armazenamento indisponível/, 'Presentation does not alter the store or save behavior.');
+    }
+    const normal = worldHarness();
+    const failedRead = new ProgressStore({ getItem() { throw Error('Storage denied'); }, setItem() { assert.fail('Protected progress must not be overwritten.'); } });
+    normal.game.store = failedRead; normal.game.render();
+    assert.match(String(normal.mapRenders[0][3]), /Não foi possível abrir o progresso/);
+    assert.equal(failedRead.persist(), false);
 });
 
 test('locked selection stays on the map, while an unlocked selection resumes that exact stage', () => {
@@ -744,7 +763,7 @@ test('measured HUD bounds reserve the lighthouse and dock on full-canvas desktop
     const data = JSON.parse(readFileSync(new URL('../public/assets/world/map/costa-diorama.meta.json', import.meta.url), 'utf8'));
     await h.finishAssets(data);
     for (const [width, height, headerBottom, footerTop] of [[1180, 757, 94, 563], [400, 606, 92, 425],
-        [844, 392, 68, 307], [840, 757, 94, 563], [320, 568, 92, 377]]) {
+        [844, 392, 68, 307], [840, 757, 94, 563], [506, 392, 59, 270], [320, 568, 92, 377]]) {
         h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width, height };
         h.get('world-map-header').bounds = { x: 12, y: 12, left: 12, top: 12, width: 230, height: headerBottom - 12 };
         h.get('world-map-tools').bounds = { x: width - 110, y: 14, left: width - 110, top: 14, width: 96, height: headerBottom - 14 };

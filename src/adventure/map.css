@@ -206,6 +206,31 @@
     .world-map-stage { min-height: 82px; padding-block: 12px; }
 }
 @media (max-height: 500px) {
+    @container map (max-width: 640px) {
+        .world-map-header { top: max(8px,env(safe-area-inset-top)); left: 10px; gap: 7px; padding: 6px 13px 6px 6px; }
+        .world-map-island-emblem { width: 32px; height: 32px; }
+        .world-map-island-emblem .world-map-icon { width: 22px; height: 22px; }
+        .world-map-eyebrow { font-size: 8px; margin-bottom: 2px; }
+        .world-map-title { font-size: 19px; }
+        .world-map-tools { top: max(10px,env(safe-area-inset-top)); right: 10px; }
+        .world-map-total { display: none; }
+        .world-map-footer { bottom: max(7px,env(safe-area-inset-bottom)); }
+        .world-map-stage { min-height: 62px; padding: 8px 11px; gap: 8px; }
+        .world-map-stage-number { height: 31px; }
+        .world-map-detail-row { min-height: 12px; margin-bottom: 3px; }
+        .world-map-stage-title { font-size: 18px; line-height: 1.05; }
+        .world-map-route-hint { display: none; }
+        .world-map-play { flex-direction: row; gap: 5px; min-width: 103px; min-height: 44px; padding: 8px; }
+        .world-map-play .world-map-icon { width: 16px; height: 16px; }
+        .world-map-worlds { margin-top: 8px; }
+        .world-map-worlds::before { top: 15px; }
+        .world-map-world { min-height: 46px; gap: 3px; }
+        .world-map-world-symbol { width: 30px; height: 30px; }
+        .world-map-world-symbol .world-map-icon { width: 19px; height: 19px; }
+        .world-map-world-index { top: 23px; left: calc(50% + 7px); height: 12px; line-height: 12px; }
+        .world-map-world-lock { left: calc(50% + 8px); }
+        .world-map-warning { top: 72px; }
+    }
     @container map (min-width: 641px) {
         .world-map-header { top: 12px; left: 14px; padding: 7px 17px 7px 7px; max-width: calc(100% - 250px); }
         .world-map-island-emblem { width: 37px; height: 37px; }
