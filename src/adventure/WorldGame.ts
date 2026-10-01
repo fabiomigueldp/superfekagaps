@@ -106,6 +106,9 @@ export class WorldGame {
             const hit = this.buttons.find(b => x >= b.x && x <= b.x + b.width && y >= b.y && y <= b.y + b.height);
             hit?.run();
         });
+        window.addEventListener('blur', () => {
+            if (this.state === 'playing') this.pause();
+        });
         document.addEventListener('visibilitychange', () => {
             if (document.hidden && this.state === 'playing')
                 this.pause();

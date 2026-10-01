@@ -97,7 +97,11 @@ export class JuiceMinibossLab extends WorldGame {
         this.art.background = (c, _island, _cx, _cy, time) => drawJuiceLabBackground(c, time);
         this.art.terrain = (c, _level, _island, _cx, cy) => drawJuiceLabFloor(c, cy);
         this.replayIntro();
-        window.addEventListener('blur', () => { this.introAudio.cancel(); if (this.state === 'playing') this.toggleLabPause(); });
+        window.addEventListener('blur', () => {
+            this.pendingPresentation = false; this.introAudio.cancel();
+            if (this.state === 'playing') this.toggleLabPause();
+            this.introAudio.setPaused(this.state === 'paused');
+        });
         window.addEventListener('pagehide', () => this.introAudio.cancel());
         window.addEventListener('keydown', e => { if (['ArrowLeft','ArrowRight',' ','a','d','m','M'].includes(e.key)) this.audio.unlock(); });
         document.addEventListener('visibilitychange', () => { if (document.hidden) this.introAudio.cancel(); });
@@ -158,6 +162,8 @@ export class JuiceMinibossLab extends WorldGame {
             this.renderer.startScene();
             const c = this.renderer.getContext();
             drawJuiceIntro(c, this.intro.frame, this.reducedMotion);
+            if (this.state === 'playing' && (this.intro.beat === 'walk' || this.intro.beat === 'prepare'))
+                this.renderer.drawIntroTouchControls(this.intro.beat);
             if (this.state === 'paused') {
                 c.fillStyle = '#171324bb'; c.fillRect(0, 0, 320, 180);
                 panel(c, 62, 70, 196, 43, '#292033', '#bfce64');

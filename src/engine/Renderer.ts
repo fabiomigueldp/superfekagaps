@@ -413,6 +413,23 @@ export class Renderer {
       this.ui.ending(c,{score,highScore,newRecord,totalRunTime,bestTime,newTimeRecord},this.touch,endingTime);
     });
   }
+  drawIntroTouchControls(beat: 'walk' | 'prepare'): void {
+    if (!this.touch) return;
+    this.screen(c => {
+      // Actors end at y=160 and dialogue ends at y=63. Keep the controls in
+      // the footer rather than covering Feka with the combat-sized buttons.
+      if (beat === 'prepare') {
+        // Replace the keyboard-only footer hint, leaving subtitles untouched.
+        panel(c, 100, 163, 212, 16, ART.ink, ART.rockLight);
+        pixelText(c, 'TOQUE PARA APRESENTAR', 188, 167, ART.paper, 1, 'center');
+      }
+      const controls = beat === 'walk' ? [[8, '←'], [56, '→']] as const : [[280, 'POSE']] as const;
+      for (const [x, label] of controls) {
+        panel(c, x, 163, 32, 16, ART.ink, ART.rockLight);
+        pixelText(c, label, x + 16, 167, ART.paper, 1, 'center');
+      }
+    });
+  }
   drawTouchControls():void {
     if(!this.touch)return;
     this.screen(c=>{

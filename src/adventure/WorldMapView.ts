@@ -330,15 +330,15 @@ export class WorldMapView {
             event.preventDefault(); event.stopPropagation(); this.act(() => this.enterSelected(this.controlSelection));
         }
     };
-    private loadImage(path: string): Promise<HTMLImageElement | null> {
+    private loadImage(path: string, signal = this.abort.signal): Promise<HTMLImageElement | null> {
         return new Promise(resolve => {
-            if (this.abort.signal.aborted) { resolve(null); return; }
+            if (signal.aborted) { resolve(null); return; }
             const image = new Image(); image.decoding = 'async';
             const finish = (result: HTMLImageElement | null) => {
-                image.onload = null; image.onerror = null; this.abort.signal.removeEventListener('abort', aborted); resolve(result);
+                image.onload = null; image.onerror = null; signal.removeEventListener('abort', aborted); resolve(result);
             };
             const aborted = () => finish(null);
-            this.abort.signal.addEventListener('abort', aborted, { once: true });
+            signal.addEventListener('abort', aborted, { once: true });
             image.onload = () => finish(image); image.onerror = () => finish(null); image.src = path;
         });
     }
@@ -389,20 +389,24 @@ export class WorldMapView {
         }));
     }
     private async loadAssets(world: number, cached: CachedMapArt): Promise<void> {
+        if (this.abort.signal.aborted) return;
         const prefix = mapAssetPrefix((import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/');
         const name = DIORAMA_NAMES[world];
-        const mainImage = this.loadImage(prefix + name + '.webp');
-        const mainMetadata = fetch(prefix + name + '.meta.json', { signal: this.abort.signal })
-            .then(response => response.ok ? response.json() : null).then(value => parseMapMetadata(value, world)).catch(() => null);
-        if (world === 1) void this.loadImage(prefix + 'costa-shadow.webp').then(image => {
-            if (this.abort.signal.aborted) return;
-            cached.assets.shadow = image;
-            const active = this.activeArt.get(world);
-            if (active) active.assets.shadow = image;
-            if (worldOf(this.journey?.selected ?? '') <= 2) this.paintDirty = true;
+        const pairAbort = new AbortController(), abortPair = () => pairAbort.abort();
+        this.abort.signal.addEventListener('abort', abortPair, { once: true });
+        // Both assets are required: explicit failure must settle the pair even if its partner is still pending.
+        const required = <T>(load: Promise<T | null>) => load.then(value => {
+            if (value === null) throw new Error('Missing required map asset');
+            return value;
         });
-        const [island, metadata] = await Promise.all([mainImage, mainMetadata]);
-        if (this.abort.signal.aborted) return;
+        const mainImage = required(this.loadImage(prefix + name + '.webp', pairAbort.signal));
+        const mainMetadata = required(fetch(prefix + name + '.meta.json', { signal: pairAbort.signal })
+            .then(response => response.ok ? response.json() : null).then(value => parseMapMetadata(value, world)));
+        const pair = await Promise.all([mainImage, mainMetadata]).catch(() => null);
+        this.abort.signal.removeEventListener('abort', abortPair);
+        if (!pair) pairAbort.abort();
+        if (this.abort.signal.aborted || this.artCache.get(world) !== cached) return;
+        const island = pair?.[0] ?? null, metadata = pair?.[1] ?? null;
         const matchingPair = island && metadata && (world < 3 || (island.naturalWidth === 1920 && island.naturalHeight === 1200));
         cached.status = matchingPair ? 'ready' : 'failed';
         if (matchingPair) { cached.assets.island = island; cached.metadata = metadata; }

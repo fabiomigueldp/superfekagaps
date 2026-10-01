@@ -40,7 +40,14 @@ export class Input {
   private pressedKeys = new Set<string>();
   private touchActions = new Set<HeldAction>();
   private touchMenuPressed = false;
-  private pendingTouchMenu = false;
+  // Pending touch edges keep their gesture owner, so cancellation cannot erase
+  // keyboard presses or another finger's queued action.
+  private touchOwners = new Map<number, HeldAction | 'menu'>();
+  private pendingTouchJump = new Set<number>();
+  private pendingTouchDown = new Set<number>();
+  private pendingTouchRelease = new Set<number>();
+  private completedTouchMenu = false;
+  private pendingTouchMenu = new Set<number>();
   private touchMenuAction = false;
   private pendingStart = false;
   private pendingPause = false;
@@ -110,6 +117,8 @@ export class Input {
       this.pendingHorizontal = action;
     }
 
+    if (action === 'jump' && this.pendingTouchJump.size) this.pendingJumpPressed = true;
+    if (action === 'down' && this.pendingTouchDown.size) this.pendingDownPressed = true;
     if (code === 'Enter') this.pendingStart = true;
     if (code === 'Escape') this.pendingPause = true;
     if (code === 'KeyM') this.pendingMute = true;
@@ -131,7 +140,7 @@ export class Input {
     this.refreshHeldActions();
   }
 
-  private refreshHeldActions(): void {
+  private refreshHeldActions(captureEdges = true): void {
     const held = new Set(this.touchActions);
     this.pressedKeys.forEach((code) => {
       const action = KEY_ACTIONS[code];
@@ -140,9 +149,11 @@ export class Input {
 
     const jump = held.has('jump');
     const down = held.has('down');
-    this.pendingJumpPressed ||= jump && !this.state.jump;
-    this.pendingJumpReleased ||= !jump && this.state.jump;
-    this.pendingDownPressed ||= down && !this.state.down;
+    if (captureEdges) {
+      this.pendingJumpPressed ||= jump && !this.state.jump;
+      this.pendingJumpReleased ||= !jump && this.state.jump;
+      this.pendingDownPressed ||= down && !this.state.down;
+    }
     // The most recently pressed horizontal key wins. Releasing it restores any
     // older held key, including an arrow-key alias, without a dead frame.
     let keyboardDirection: HorizontalAction | null = null;
@@ -164,7 +175,7 @@ export class Input {
     const attach = (canvas: HTMLCanvasElement | null): boolean => {
       if (!canvas) return false;
       for (const type of ['touchstart', 'touchmove', 'touchend', 'touchcancel'] as const) {
-        canvas.addEventListener(type, (event) => this.handleTouch(event), { passive: false });
+        canvas.addEventListener(type, (event) => this.handleTouch(event, type === 'touchcancel'), { passive: false });
       }
       return true;
     };
@@ -176,38 +187,71 @@ export class Input {
     tryAttach();
   }
 
-  private handleTouch(event: TouchEvent): void {
+  private handleTouch(event: TouchEvent, cancelled = false): void {
     event.preventDefault();
     const canvas = event.currentTarget as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
     if (rect.width <= 0 || rect.height <= 0) return;
-    this.touchActions.clear();
-    let menuPressed = false;
-
-    // Rebuild from all remaining fingers, including movements between controls.
+    const owners = new Map<number, HeldAction | 'menu'>();
+    const activeIds = new Set<number>();
+    // Rebuild from remaining fingers. Real Touch objects always have identifiers;
+    // the fallback supports older synthetic event adapters.
     for (let i = 0; i < event.touches.length; i++) {
       const touch = event.touches[i];
       if (touch.target !== canvas) continue;
+      activeIds.add(touch.identifier ?? i);
       const x = (touch.clientX - rect.left) / rect.width;
       const y = (touch.clientY - rect.top) / rect.height;
       if (x < 0 || x > 1 || y < 0 || y > 1) continue;
-
-      if (this.menuMode) {
-        menuPressed = true;
-      } else if (y > 0.7) {
-        if (x < 0.15) this.touchActions.add('left');
-        else if (x < 0.3) this.touchActions.add('right');
-        else if (x > 0.85) this.touchActions.add('jump');
-        else if (x > 0.7) this.touchActions.add('run');
-        else if (x > 0.44 && x < 0.56) this.touchActions.add('down');
-      } else if (y < 0.2 && x > 0.4 && x < 0.6) {
-        menuPressed = true;
+      let action: HeldAction | 'menu' | undefined;
+      if (this.menuMode) action = 'menu';
+      else if (y > 0.7) {
+        if (x < 0.15) action = 'left';
+        else if (x < 0.3) action = 'right';
+        else if (x > 0.85) action = 'jump';
+        else if (x > 0.7) action = 'run';
+        else if (x > 0.44 && x < 0.56) action = 'down';
+      } else if (y < 0.2 && x > 0.4 && x < 0.6) action = 'menu';
+      if (action) owners.set(touch.identifier ?? i, action);
+    }
+    if (cancelled) {
+      const ids = event.changedTouches
+        ? Array.from(event.changedTouches, touch => touch.identifier)
+        : [...this.touchOwners.keys()].filter(id => !owners.has(id));
+      for (const id of ids) {
+        this.pendingTouchJump.delete(id);
+        this.pendingTouchDown.delete(id);
+        this.pendingTouchRelease.delete(id);
+        this.pendingTouchMenu.delete(id);
+      }
+    } else {
+      for (const [id, action] of owners) {
+        if (this.touchOwners.get(id) === action) continue;
+        if (action === 'jump' && (!this.state.jump || this.pendingTouchJump.size > 0)) this.pendingTouchJump.add(id);
+        if (action === 'down' && (!this.state.down || this.pendingTouchDown.size > 0)) this.pendingTouchDown.add(id);
+        if (action === 'menu' && (!this.touchMenuPressed || this.pendingTouchMenu.size > 0)) this.pendingTouchMenu.add(id);
       }
     }
-
-    if (menuPressed && !this.touchMenuPressed) this.pendingTouchMenu = true;
-    this.touchMenuPressed = menuPressed;
-    this.refreshHeldActions();
+    const wasJump = this.state.jump;
+    const previousOwners = this.touchOwners;
+    this.touchOwners = owners;
+    this.touchActions.clear();
+    for (const action of owners.values()) if (action !== 'menu') this.touchActions.add(action);
+    this.touchMenuPressed = [...owners.values()].includes('menu');
+    this.refreshHeldActions(false);
+    // A cancelled gesture is not a release command. Ordinary short taps retain
+    // both their press and release edges until the next simulation update.
+    if (!cancelled && wasJump && !this.state.jump) {
+      for (const [id, action] of previousOwners) if (action === 'jump') this.pendingTouchRelease.add(id);
+    }
+    if (!cancelled) {
+      // Finished taps are committed; reusing a Touch identifier for a later
+      // cancelled gesture must not erase an earlier valid tap.
+      for (const id of this.pendingTouchJump) if (!activeIds.has(id)) { this.pendingJumpPressed = true; this.pendingTouchJump.delete(id); }
+      for (const id of this.pendingTouchDown) if (!activeIds.has(id)) { this.pendingDownPressed = true; this.pendingTouchDown.delete(id); }
+      for (const id of this.pendingTouchRelease) if (!activeIds.has(id)) { this.pendingJumpReleased = true; this.pendingTouchRelease.delete(id); }
+      for (const id of this.pendingTouchMenu) if (!activeIds.has(id)) { this.completedTouchMenu = true; this.pendingTouchMenu.delete(id); }
+    }
   }
 
   update(): void {
@@ -222,14 +266,18 @@ export class Input {
     this.state.start = this.pendingStart;
     this.state.pause = this.pendingPause;
     this.state.mute = this.pendingMute;
-    this.touchMenuAction = this.pendingTouchMenu;
+    this.touchMenuAction = this.completedTouchMenu || this.pendingTouchMenu.size > 0;
+    this.completedTouchMenu = false;
     this.pendingStart = false;
     this.pendingPause = false;
     this.pendingMute = false;
-    this.pendingTouchMenu = false;
-    this.state.jumpPressed = this.pendingJumpPressed;
-    this.state.jumpReleased = this.pendingJumpReleased;
-    this.state.downPressed = this.pendingDownPressed;
+    this.pendingTouchMenu.clear();
+    this.state.jumpPressed = this.pendingJumpPressed || this.pendingTouchJump.size > 0;
+    this.state.jumpReleased = this.pendingJumpReleased || this.pendingTouchRelease.size > 0;
+    this.state.downPressed = this.pendingDownPressed || this.pendingTouchDown.size > 0;
+    this.pendingTouchJump.clear();
+    this.pendingTouchDown.clear();
+    this.pendingTouchRelease.clear();
     this.pendingJumpPressed = false;
     this.pendingJumpReleased = false;
     this.pendingDownPressed = false;
@@ -269,8 +317,13 @@ export class Input {
     this.state = createState();
     this.pressedKeys.clear();
     this.touchActions.clear();
+    this.touchOwners.clear();
+    this.pendingTouchJump.clear();
+    this.pendingTouchDown.clear();
+    this.pendingTouchRelease.clear();
     this.touchMenuPressed = false;
-    this.pendingTouchMenu = false;
+    this.completedTouchMenu = false;
+    this.pendingTouchMenu.clear();
     this.touchMenuAction = false;
     this.pendingStart = false;
     this.pendingPause = false;

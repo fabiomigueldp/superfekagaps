@@ -136,9 +136,9 @@ function mapDOM(t: TestContext, reducedMotion = false) {
         decoding = ''; src = ''; onload: (() => void) | null = null; onerror: (() => void) | null = null;
         constructor() { images.push(this); }
     }
-    const fetches: Array<{ url: string; signal: AbortSignal; resolve: (value: unknown) => void }> = [];
-    const fetchMock = (url: string, options: { signal: AbortSignal }) => new Promise(resolve => {
-        fetches.push({ url, signal: options.signal, resolve });
+    const fetches: Array<{ url: string; signal: AbortSignal; resolve: (value: unknown) => void; reject: (reason: unknown) => void }> = [];
+    const fetchMock = (url: string, options: { signal: AbortSignal }) => new Promise((resolve, reject) => {
+        fetches.push({ url, signal: options.signal, resolve, reject });
     });
     const restore: Array<() => void> = [];
     for (const [name, value] of Object.entries({ document: documentMock, window: windowMock, Image: MockImage,
@@ -368,9 +368,118 @@ test('paired art waits for matching metadata in either completion order and neve
         const image = h.images.find(image => image.src.endsWith('costa-diorama.webp'))!, request = h.fetches.find(request => request.url.endsWith('costa-diorama.meta.json'))!;
         if (metadataFirst) request.resolve({ ok: true, json: async () => data }); else image.onload?.();
         await flushAssets(); h.view.render(0, freshSave(), 16, ''); assert.equal(currentArt(h, 1).assets.island, null);
+        assert.equal(h.internal.artCache.get(1).status, 'loading');
+        assert.equal(request.signal.aborted, false, 'A pending required asset is not a failure.');
         if (metadataFirst) image.onload?.(); else request.resolve({ ok: true, json: async () => data });
         await flushAssets(); h.view.render(0, freshSave(), 32, '');
         assert.equal(currentArt(h, 1).assets.island, image); assert.deepEqual(h.internal.marker, data.nodes['1-1']);
+    });
+});
+
+test('a failed required asset settles its island pair while the other asset stays pending', async t => {
+    for (const failure of ['image', 'metadata HTTP', 'metadata invalid', 'metadata fetch rejection', 'metadata JSON rejection'] as const)
+        await t.test(failure, async child => {
+            const h = mapDOM(child, true), save = { ...freshSave(), selected: '1-5', completed: STAGES.filter(stage => stage.world === 1).map(stage => stage.id) };
+            const before = structuredClone(save);
+            h.view.render(4, save, 0, ''); await finishWorld(h, 1);
+            const coast = h.internal.artCache.get(1), image = h.images.find(image => image.src.endsWith('porto-diorama.webp'))!;
+            const request = h.fetches.find(request => request.url.endsWith('porto-diorama.meta.json'))!;
+            const lateImageSuccess = image.onload!;
+            let settled = false; void h.internal.pairLoads.get(2).then(() => { settled = true; });
+            h.view.render(5, save, 16, '');
+            assert.equal(h.internal.journey.blocked, 'no-route'); assert.equal(h.internal.hud.state.canEnter, false);
+            assert.equal(h.view.enterSelected(5), false); assert.equal(request.signal.aborted, false);
+            if (failure === 'image') image.onerror!();
+            else if (failure === 'metadata fetch rejection') request.reject(new Error('Network failed'));
+            else if (failure === 'metadata JSON rejection') request.resolve({ ok: true, json: async () => { throw new Error('Invalid JSON'); } });
+            else request.resolve({ ok: failure !== 'metadata HTTP', json: async () => ({}) });
+            await flushAssets();
+            assert.equal(h.internal.artCache.get(2).status, 'failed', 'An explicit failure must not wait for its pending partner.');
+            assert.equal(settled, true, 'Dependent loads can observe the terminal failed pair.');
+            assert.equal(request.signal.aborted, true, 'The failed pair cancels its own remaining work.');
+            assert.equal(image.onload, null); assert.equal(image.onerror, null);
+            assert.equal(h.fetches.find(request => request.url.endsWith('costa-diorama.meta.json'))!.signal.aborted, false);
+            h.view.render(5, save, 32, '');
+            const failed = h.internal.artCache.get(2), requests = [h.images.length, h.fetches.length];
+            assert.equal(currentArt(h, 2).assets.island, null); assert.deepEqual(currentArt(h, 2).metadata, fallbackMapMetadata(2));
+            assert.equal(h.internal.journey.arrived, '2-1'); assert.equal(h.internal.journey.blocked, null);
+            assert.equal(h.internal.hud.enterButton.disabled, false); assert.equal(h.events.entered, 0);
+            assert.match(h.get('world-map-warning').textContent, /travessia visual não carregou/);
+            assert.ok(h.internal.network.edges.every((edge: { mode: string }) => edge.mode !== 'sail'));
+            // Simulate work that completes despite cancellation, including an already queued image callback.
+            request.resolve({ ok: true, json: async () => fixtureMapMetadata(2, { '2-1': { x: .3, y: .4 } }) });
+            lateImageSuccess(); await flushAssets(); h.view.render(5, save, 48, '');
+            assert.equal(h.internal.artCache.get(2), failed); assert.equal(failed.status, 'failed');
+            assert.equal(failed.assets.island, null); assert.deepEqual(failed.metadata, fallbackMapMetadata(2));
+            assert.equal(h.internal.artCache.get(1), coast); assert.equal(currentArt(h, 1).assets.island, coast.assets.island);
+            h.view.hide(); h.view.render(5, save, 64, '');
+            assert.deepEqual([h.images.length, h.fetches.length], requests, 'Reentry reuses the terminal pair without retrying.');
+            assert.equal(h.internal.journey.arrived, '2-1'); assert.equal(h.view.enterSelected(5), true);
+            assert.equal(h.events.entered, 1); assert.deepEqual(save, before);
+        });
+});
+
+test('pending island pairs survive reentry but disposal prevents late art from reaching a replacement view', async t => {
+    for (const first of ['neither', 'image', 'metadata'] as const) await t.test(first, async child => {
+        const h = mapDOM(child, true), save = freshSave(); h.view.render(0, save, 0, '');
+        const image = h.images.find(image => image.src.endsWith('costa-diorama.webp'))!;
+        const request = h.fetches.find(request => request.url.endsWith('costa-diorama.meta.json'))!;
+        const lateImageSuccess = image.onload!, data = fixtureMapMetadata(1, { '1-1': { x: .2, y: .6 } });
+        if (first === 'image') image.onload!();
+        if (first === 'metadata') request.resolve({ ok: true, json: async () => data });
+        await flushAssets();
+        const requests = [h.images.length, h.fetches.length];
+        h.view.hide(); h.view.render(0, save, 16, '');
+        assert.deepEqual([h.images.length, h.fetches.length], requests);
+        assert.equal(h.internal.artCache.get(1).status, 'loading'); assert.equal(request.signal.aborted, false);
+        h.view.dispose();
+        assert.ok(h.fetches.every(request => request.signal.aborted));
+        assert.ok(h.images.every(image => image.onload === null && image.onerror === null));
+        const replacement = new WorldMapView(h.gameCanvas as unknown as HTMLCanvasElement, {
+            select() {}, enter() {}, exit() {}, unlockAudio() {}
+        });
+        try {
+            replacement.render(0, save, 32, '');
+            const nextImage = h.images.slice(requests[0]).find(image => image.src.endsWith('costa-diorama.webp'))!;
+            const nextRequest = h.fetches.slice(requests[1]).find(request => request.url.endsWith('costa-diorama.meta.json'))!;
+            const nextData = fixtureMapMetadata(1, { '1-1': { x: .4, y: .5 } });
+            nextImage.onload!(); nextRequest.resolve({ ok: true, json: async () => nextData });
+            await flushAssets(); replacement.render(0, save, 48, '');
+            lateImageSuccess(); request.resolve({ ok: true, json: async () => data });
+            await flushAssets(); replacement.render(0, save, 64, '');
+            const art = (replacement as any).activeArt.get(1);
+            assert.equal(art.status, 'ready'); assert.equal(art.assets.island, nextImage); assert.deepEqual(art.metadata, nextData);
+            assert.equal(nextRequest.signal.aborted, false);
+            assert.equal(h.internal.artCache.get(1).assets.island, null); assert.equal(h.root.parent, null);
+            assert.deepEqual(h.events.arrived, []); assert.equal(h.events.entered, 0);
+        } finally { replacement.dispose(); }
+    });
+});
+
+test('connected atlas loads and renders Costa or its usable fallback without requesting a legacy shadow', async t => {
+    for (const outcome of ['ready', 'missing image', 'invalid metadata'] as const) await t.test(outcome, async child => {
+        const h = mapDOM(child, true), save = freshSave(); save.completed.push('1-1');
+        const before = structuredClone(save), ready = outcome === 'ready';
+        h.view.render(0, save, 0, '');
+        const sources = h.images.map(image => image.src);
+        assert.deepEqual(sources, ['/assets/world/map/costa-diorama.webp', '/assets/world/map/porto-diorama.webp'],
+            'The initial terrain load must not allocate an Image or request for a legacy shadow.');
+        await finishWorld(h, 1, outcome === 'invalid metadata' ? {} : fixtureMapMetadata(1), outcome !== 'missing image');
+        await finishWorld(h, 2);
+        h.paint.calls.length = 0; h.view.render(0, save, 16, '');
+        const art = currentArt(h, 1), terrain = h.images[0];
+        assert.equal(art.status, ready ? 'ready' : 'failed');
+        assert.equal(art.assets.island, ready ? terrain : null);
+        assert.equal(art.assets.shadow, null);
+        assert.equal(h.internal.artCache.get(1).assets.shadow, null);
+        assert.equal(h.paint.calls.some(call => call.method === 'drawImage' && call.args[0] === terrain), ready);
+        if (!ready) assert.deepEqual(art.metadata, fallbackMapMetadata(1));
+        h.view.render(1, save, 32, '');
+        assert.equal(h.internal.journey.arrived, '1-2', 'Authored and fallback routes both retain local travel.');
+        assert.equal(h.view.enterSelected(1), true); assert.equal(h.events.entered, 1);
+        assert.deepEqual(save, before, 'Loading and local travel never rewrite progress.');
+        h.view.hide(); h.view.render(0, save, 48, '');
+        assert.deepEqual(h.images.map(image => image.src), sources, 'Reopening reuses the pair without extra shadow requests.');
     });
 });
 
@@ -386,12 +495,11 @@ test('failed island pairs retain usable fallback, preserve the other cache, and 
     });
 });
 
-test('late geometry is activated only after safe arrival and optional shadows never restart a walk', async t => {
+test('late geometry is activated only after safe arrival without restarting a walk', async t => {
     const h = mapDOM(t), save = openSave(); h.view.render(0, save, 0, ''); h.view.render(1, save, 50, '');
     const active = structuredClone(h.internal.journey.legs[0]), data = fixtureMapMetadata(1, { '1-2': { x: .43, y: .37 } });
     await finishWorld(h, 1, data); h.view.render(1, save, 100, '');
     assert.equal(currentArt(h, 1).assets.island, null); assert.deepEqual(h.internal.journey.legs[0].points, active.points);
-    h.images.find(image => image.src.endsWith('costa-shadow.webp'))!.onload?.(); await flushAssets();
     const progress = h.internal.journey.legs[0].progress; h.view.render(1, save, 150, ''); assert.ok(h.internal.journey.legs[0].progress > progress);
     tick(h, 1, save, 150, 1000); h.view.render(1, save, 1200, '');
     assert.ok(currentArt(h, 1).assets.island); assert.deepEqual(h.internal.marker, data.nodes['1-2']); assert.equal(h.internal.journey.arrived, '1-2');
