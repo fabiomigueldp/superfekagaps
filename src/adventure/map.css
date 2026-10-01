@@ -51,8 +51,8 @@
 .world-map-dock .world-map-bitmap { width: 104px; height: 56px; }
 .world-map-travel-wide, .world-map-travel-wide .world-map-bitmap { width: 128px; }
 .world-map-island, .world-map-island .world-map-bitmap { width: 128px; height: 44px; }
-.has-compact-island-names .world-map-island { width: 76px; }
-.has-compact-island-names .world-map-island .world-map-bitmap { width: 64px; height: 22px; }
+.has-compact-island-names .world-map-island { width: 44px; }
+.has-compact-island-names .world-map-island .world-map-bitmap { width: 28px; height: 29px; }
 .world-map-node:hover, .world-map-dock:hover, .world-map-island:hover { filter: brightness(1.2); }
 .world-map-node.is-selected, .world-map-island.is-selected { z-index: 2; }
 .world-map-header {

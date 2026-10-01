@@ -3,7 +3,7 @@ import { fitText, panel, pixelText, textWidth, wrapText } from '../graphics/Bitm
 import { ART } from '../graphics/palette';
 import { mapAssetPrefix } from './WorldMapArt';
 import { loadMapSignAtlas, loadMapFactorySignAtlas, loadMapFactoryLeftSignAtlas, paintPhysicalTravelSign, paintPhysicalStageSign,
-    loadMapIslandSignAtlas, paintPhysicalIslandSign, paintIslandSelectionPointer,
+    loadMapIslandSignAtlas, paintPhysicalIslandSign, paintPhysicalIslandBadge, paintIslandSelectionPointer,
     type MapSignAtlas, type MapFactorySignAtlas, type MapTravelSign, type MapIslandSignAtlas } from './WorldMapSignArt';
 
 export const WORLD_MAP_TRAVEL_ACTION_IDS = ['ferry-costa-porto', 'ferry-porto-costa', 'bridge-porto-factory', 'bridge-factory-porto',
@@ -144,6 +144,18 @@ function islandSign(canvas: HTMLCanvasElement, text: string, selected: boolean, 
     if (selected) { ctx.fillStyle = ART.gold; ctx.fillRect(7, 11, 3, 21); paintIslandSelectionPointer(ctx); }
     pixelText(ctx, text, 64, 15, ART.ink, 2, 'center');
 }
+function islandBadge(canvas: HTMLCanvasElement, number: string, selected: boolean, open: boolean): void {
+    canvas.style.transform = '';
+    const ctx = context(canvas, 28, 29);
+    if (!ctx) return;
+    ctx.fillStyle = ART.soilDark; ctx.fillRect(6, 18, 3, 11); ctx.fillRect(20, 18, 3, 11);
+    ctx.fillStyle = ART.soilLight; ctx.fillRect(6, 19, 1, 9); ctx.fillRect(20, 19, 1, 9);
+    ctx.fillStyle = ART.soilDark; ctx.fillRect(0, 7, 26, 15);
+    ctx.fillStyle = open ? ART.paper : ART.rockLight; ctx.fillRect(2, 9, 22, 11);
+    pixelText(ctx, number, 13, 11, ART.ink, 1, 'center');
+    if (selected) paintIslandSelectionPointer(ctx, 14, .5);
+    if (!open) lock(ctx, 21, 0);
+}
 function stageSign(canvas: HTMLCanvasElement, id: string, selected: boolean, completed: boolean, open: boolean): void {
     canvas.style.transform = '';
     const ctx = context(canvas, 28, 29);
@@ -213,6 +225,9 @@ export class WorldMapHud {
     private state: WorldMapHudState | null = null;
     private signature = '';
     private announcement = '';
+    private compactOverview = false;
+    private overviewFallback = false;
+    private overviewSignature = '';
     private readonly travelSignatures: Partial<Record<WorldMapTravelActionId, string>> = {};
     private readonly travelAvailability: Partial<Record<WorldMapTravelActionId, boolean>> = {};
     private readonly assetAbort = new AbortController();
@@ -356,6 +371,7 @@ export class WorldMapHud {
             this.signAtlas = atlas;
             if (!this.state) return;
             for (let n = 0; n < 5; n++) this.paintStage(n, this.state);
+            this.paintOverview(this.state);
             this.repaintTravelSigns();
         });
     }
@@ -425,7 +441,7 @@ export class WorldMapHud {
         const arrived = STAGES.find(entry => entry.id === state.arrivedStage);
         this.location.textContent = arrived ? `${traveling ? 'Última chegada' : 'Feka em'}${traveling ? ':' : ''} ${arrived.id} · ${REGION_NAMES[arrived.world - 1]}` : '';
         this.location.hidden = !arrived;
-        this.hint.textContent = state.overview ? traveling ? 'Aguarde a chegada ou pule a viagem.' : 'Escolha uma ilha para ver suas fases.'
+        this.hint.textContent = state.overview ? this.overviewHint(state)
             : prerequisiteHint || state.hint || (state.preview || !open ? 'Conclua o caminho anterior para visitar.'
             : traveling ? 'Você pode mudar o destino durante a viagem.' : 'Toque numa placa para caminhar até ela.');
         this.enterButton.disabled = !canAct;
@@ -470,7 +486,10 @@ export class WorldMapHud {
         const announcedStatus = prerequisite ? `${traveling ? this.status.textContent : 'Prévia'}. ${prerequisiteHint}` : `${this.status.textContent}.`;
         const announcement = state.overview ? `${title}. ${this.status.textContent}. ${this.location.textContent}. ${this.hint.textContent}`
             : `${title}. ${announcedStatus} ${this.stageDetails.textContent}.${arrived ? ` ${this.location.textContent}.` : ''}`;
-        if (announcement !== this.announcement) { this.announcement = announcement; this.announcer.textContent = announcement; }
+        this.announce(announcement);
+    }
+    private announce(message: string): void {
+        if (message !== this.announcement) { this.announcement = message; this.announcer.textContent = message; }
     }
     private paintStage(index: number, state: WorldMapHudState): void {
         const entry = STAGES[(state.world - 1) * 5 + index], selected = entry.id === STAGES[state.stage].id;
@@ -478,11 +497,18 @@ export class WorldMapHud {
             stageSign(this.stageCanvases[index], entry.id, selected, !!state.completed[index], !!state.open[index]);
     }
     private paintOverview(state: WorldMapHudState): void {
+        const signature = `${this.compactOverview}|${state.world}|${state.worldAvailability.join(',')}|${this.compactOverview ? !!this.signAtlas : !!this.islandSignAtlas}`;
+        const repaint = signature !== this.overviewSignature; this.overviewSignature = signature;
         this.overviewButtons.forEach((button, index) => {
             const selected = state.world === index + 1, open = !!state.worldAvailability[index];
             const label = `${index + 1} ${REGION_NAMES[index]}`;
-            if (!paintPhysicalIslandSign(this.overviewCanvases[index], this.islandSignAtlas, label, selected, open))
-                islandSign(this.overviewCanvases[index], label, selected, open);
+            if (repaint) {
+                if (this.compactOverview) {
+                    if (!paintPhysicalIslandBadge(this.overviewCanvases[index], this.signAtlas, String(index + 1), selected, open))
+                        islandBadge(this.overviewCanvases[index], String(index + 1), selected, open);
+                } else if (!paintPhysicalIslandSign(this.overviewCanvases[index], this.islandSignAtlas, label, selected, open))
+                    islandSign(this.overviewCanvases[index], label, selected, open);
+            }
             button.classList.toggle('is-selected', selected); button.classList.toggle('is-locked', !open);
             button.setAttribute('aria-pressed', String(selected));
             button.setAttribute('aria-label', `Ilha ${index + 1}: ${ISLANDS[index].name}. ${open ? 'Disponível. Ver de perto.' : 'Bloqueada. Ver prévia de perto.'}`);
@@ -510,8 +536,22 @@ export class WorldMapHud {
             if (point?.available !== undefined && this.state) this.updateTravel(id, point.available);
         });
     }
-    positionOverviewWorlds(points: readonly (WorldMapHudPoint | null)[], compact = false): void {
-        this.root.classList.toggle('has-compact-island-names', compact);
+    private overviewHint(state: WorldMapHudState): string {
+        return state.motionState !== 'idle' ? 'Aguarde a chegada ou pule a viagem.' : this.overviewFallback
+            ? 'Abra Arquipélago para escolher uma ilha.' : 'Escolha uma ilha para ver suas fases.';
+    }
+    positionOverviewWorlds(points: readonly (WorldMapHudPoint | null)[], compact = false, fallback = false): void {
+        if (this.compactOverview !== compact) {
+            this.compactOverview = compact; this.root.classList.toggle('has-compact-island-names', compact);
+            if (this.state) this.paintOverview(this.state);
+        }
+        if (this.overviewFallback !== fallback) {
+            this.overviewFallback = fallback; this.root.classList.toggle('has-island-selector-fallback', fallback);
+            if (this.state?.overview) {
+                this.hint.textContent = this.overviewHint(this.state);
+                this.announce(`${this.stageTitleText.textContent}. ${this.status.textContent}. ${this.location.textContent}. ${this.hint.textContent}`);
+            }
+        }
         this.overviewButtons.forEach((button, index) => this.position(button, this.state?.overview ? points[index] : null));
     }
     /** Authored departure anchors only. Omitted actions hide; availability belongs to each route. */
@@ -585,7 +625,8 @@ export class WorldMapHud {
         } else if (activateIsland) {
             event.preventDefault(); event.stopPropagation();
             const button = this.overviewButtons[this.state.world - 1];
-            if (button && !button.hidden) button.click();
+            if (this.overviewFallback) this.toggleRegionMenu();
+            else if (button && !button.hidden) button.click();
         }
     };
     dispose(): void {

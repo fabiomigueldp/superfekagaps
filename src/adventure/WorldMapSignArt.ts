@@ -173,12 +173,12 @@ async function loadFactorySignAtlas(prefix: string, signal: AbortSignal, directi
 export function mapStageSignKind(selected: boolean, completed: boolean, open: boolean): BaseMapSignKind {
     return !open ? 'locked' : completed ? selected ? 'selected-complete' : 'complete' : selected ? 'selected' : 'stage';
 }
-function paint(canvas: HTMLCanvasElement, image: HTMLImageElement, frame: MapSignFrame, text: string): CanvasRenderingContext2D | null {
+function paint(canvas: HTMLCanvasElement, image: HTMLImageElement, frame: MapSignFrame, text: string, displayScale = 1): CanvasRenderingContext2D | null {
     const size = frame.displaySize, source = frame.sourceRect;
     canvas.width = size.width * frame.dpr; canvas.height = size.height * frame.dpr;
     // The button's geometry stays unchanged; only the transparent canvas follows
     // the measured foot. Integer CSS pixels preserve the original bitmap glyphs.
-    canvas.style.transform = `translate(${Math.round(size.width / 2 - frame.foot.x)}px, ${Math.round(size.height - frame.foot.y)}px)`;
+    canvas.style.transform = `translate(${Math.round((size.width / 2 - frame.foot.x) * displayScale)}px, ${Math.round((size.height - frame.foot.y) * displayScale)}px)`;
     const ctx = canvas.getContext('2d');
     if (!ctx) return null;
     ctx.setTransform(2, 0, 0, 2, 0, 0); ctx.imageSmoothingEnabled = false;
@@ -198,12 +198,22 @@ export function paintPhysicalStageSign(canvas: HTMLCanvasElement, atlas: MapSign
 }
 /** A static 16×10 pointer above the name. Two-pixel steps retain their outline
  * at the panorama's 64×22 compact size without covering accents or timber feet. */
-export function paintIslandSelectionPointer(ctx: CanvasRenderingContext2D): void {
+export function paintIslandSelectionPointer(ctx: CanvasRenderingContext2D, center = 64, scale = 1): void {
+    const rect = (x: number, y: number, width: number, height: number) => ctx.fillRect(center + x * scale, y * scale, width * scale, height * scale);
     ctx.fillStyle = ART.ink;
-    ctx.fillRect(56, 0, 16, 4); ctx.fillRect(58, 4, 12, 2);
-    ctx.fillRect(60, 6, 8, 2); ctx.fillRect(62, 8, 4, 2);
-    ctx.fillStyle = ART.paper; ctx.fillRect(58, 2, 12, 2);
-    ctx.fillStyle = ART.gold; ctx.fillRect(60, 4, 8, 2); ctx.fillRect(62, 6, 4, 2);
+    rect(-8, 0, 16, 4); rect(-6, 4, 12, 2);
+    rect(-4, 6, 8, 2); rect(-2, 8, 4, 2);
+    ctx.fillStyle = ART.paper; rect(-6, 2, 12, 2);
+    ctx.fillStyle = ART.gold; rect(-4, 4, 8, 2); rect(-2, 6, 4, 2);
+}
+/** The original narrow plank at half size, never a squeezed wide nameboard. */
+export function paintPhysicalIslandBadge(canvas: HTMLCanvasElement, atlas: MapSignAtlas | null, number: string,
+    selected: boolean, open: boolean): boolean {
+    if (!atlas) return false;
+    const kind = mapStageSignKind(selected, false, open), ctx = paint(canvas, atlas.image, atlas.metadata.frames[kind], number, .5);
+    if (!ctx) return false;
+    if (selected) paintIslandSelectionPointer(ctx, 28);
+    return true;
 }
 export function paintPhysicalIslandSign(canvas: HTMLCanvasElement, atlas: MapIslandSignAtlas | null, text: string,
     selected: boolean, open: boolean): boolean {

@@ -129,6 +129,23 @@ export function layoutMapControls(points: readonly MapControlPlacement[], bounds
     return result;
 }
 
+/** Compact numbers must stay attached to their own shoreline. If that cannot
+ * fit, the existing Arquipélago selector is safer than a misleading packed row. */
+export function layoutCompactIslandControls(points: readonly MapControlPlacement[], owners: readonly MapControlBounds[],
+    bounds: MapControlBounds): MapControlPlacement[] | null {
+    const valid = (placed: readonly MapControlPlacement[]) => placed.every((point, index) => {
+        const anchor = points[index], owner = owners[index], box = controlRect(point);
+        return owner && Math.abs(point.x - anchor.x) <= 12 && Math.abs(point.y - anchor.y) <= 12 &&
+            point.x >= owner.left && point.x <= owner.right && Math.abs(point.y - owner.bottom) <= 12 &&
+            box.left >= bounds.left && box.right <= bounds.right && box.top >= bounds.top && box.bottom <= bounds.bottom &&
+            placed.slice(index + 1).every(other => !controlsIntersect(box, controlRect(other), 8));
+    });
+    const direct = points.map(point => ({ ...point, x: Math.round(point.x), y: Math.round(point.y) }));
+    if (valid(direct)) return direct;
+    const placed = layoutMapControls(points, bounds);
+    return valid(placed) ? placed : null;
+}
+
 /** One map-owned state machine, one mount, and the game's existing animation clock. */
 export class WorldMapView {
     readonly hud: WorldMapHud;
@@ -205,6 +222,8 @@ export class WorldMapView {
     private readonly onResize = () => { this.dirtySize = true; this.paintDirty = true; };
     private readonly onMotion = () => { this.paintDirty = true; };
     private readonly controlOffsets = new Map<string, MapPoint>();
+    private compactOverviewKey = '';
+    private compactOverviewPositions: MapControlPlacement[] | null = null;
 
     constructor(private readonly gameCanvas: HTMLCanvasElement, private readonly callbacks: MapCallbacks) {
         this.hud = new WorldMapHud({
@@ -853,19 +872,28 @@ export class WorldMapView {
         if (this.overview) {
             this.hud.positionNodes([]); this.hud.positionTravelActions({});
             if (this.journey?.destination) { this.hud.positionOverviewWorlds([]); return; }
-            // Integer-scale bitmap names stay subordinate to tiny islands;
-            // the native hit area remains 76×44 even when the art is 64×22.
+            // Compact views use a naturally proportioned narrow numbered plank;
+            // the full island name stays in the footer and accessible label.
             const compact = this.width < 640 || this.height < 480;
+            const owners: MapControlBounds[] = [];
             const names = Array.from({ length: 6 }, (_, index) => {
                 const id = index + 1, metadata = this.activeArt.get(id)!.metadata;
                 // Island identity follows the terrain, never an outboard dock
                 // or a neighboring destination. No leader can resemble a route.
                 const bounds = atlasIslandBounds({ world: id, metadata, placement: placementFor(id) });
+                const a = mapToScreen({ x: bounds.left, y: bounds.top }, this.camera), b = mapToScreen({ x: bounds.right, y: bounds.bottom }, this.camera);
+                owners.push({ left: a.x, top: a.y, right: b.x, bottom: b.y });
                 const point = mapToScreen({ x: (bounds.left + bounds.right) / 2, y: bounds.bottom }, this.camera);
-                return { x: point.x, y: point.y + (compact ? 22 : 32), width: compact ? 76 : 128, height: 44 };
+                return { x: point.x, y: point.y + (compact ? 8 : 32), width: compact ? 44 : 128, height: 44 };
             });
-            this.hud.positionOverviewWorlds(layoutMapControls(names,
-                { left: 8, right: this.width - 8, top: this.frameInsets.top + 2, bottom: this.height - this.frameInsets.bottom - 2 }, 8), compact);
+            const bounds = { left: 8, right: this.width - 8, top: this.frameInsets.top + 2, bottom: this.height - this.frameInsets.bottom - 2 };
+            const layoutKey = JSON.stringify([names, owners, bounds]);
+            if (compact && layoutKey !== this.compactOverviewKey) {
+                this.compactOverviewKey = layoutKey;
+                this.compactOverviewPositions = layoutCompactIslandControls(names, owners, bounds);
+            }
+            const positions = compact ? this.compactOverviewPositions : layoutMapControls(names, bounds);
+            this.hud.positionOverviewWorlds(positions ?? [], compact, !positions);
             return;
         }
         this.hud.positionOverviewWorlds([]);

@@ -43,7 +43,7 @@ and `closedLetters` both remain `#191f35`; the selected cue is `#e9ad4c`.
 
 Confirmed selection also uses a static original bitmap pointer above the name:
 16 × 10 CSS pixels at `(56, 0)`, with a dark outline and cream/brass fill. Its
-two-pixel steps remain whole pixels at the 64 × 22 compact display size. The
+two-pixel steps remain whole pixels at half display scale. The
 same painter is used for atlas and fallback boards, including locked previews.
 It never overlaps accent cells or changes the foot/target. Keyboard focus keeps
 its separate native white outline; it does not move the selection marker.
@@ -53,6 +53,33 @@ TypeScript projects and diff checks. Vite built in 1.25 s: 491.89 kB JS /
 152.43 kB gzip. No image, CSS, hitbox, camera, route or save changed. Actual
 desktop and compact preview review will compare selected Domínio with keyboard
 focus on Reserva, so those two states can be judged independently.
+
+## Attached controls in compact overview
+
+The short 472 × 303 viewport exposed a semantic failure in the old collision
+packing: 76 × 44 name targets could move beneath another island. The compact
+prototype uses the existing narrow plank with a single island number, displayed
+at its natural 28 × 29 proportions inside a 44 × 44 native target. The complete
+name remains in the accessible label and the selected-island footer. Desktop
+nameboards, region ownership, campaign progression and transport routes stay
+unchanged.
+
+The visible foot accounts for the half-scale authored translation and the
+canvas centering within its target. A candidate must remain within 12 CSS pixels
+of its own anchor, within its island's horizontal terrain bounds, near that
+shoreline, inside the safe scene and separated from other complete hit targets.
+Direct anchors are tried first. A deterministic placement pass is validated
+against those ownership limits and cached while geometry is unchanged. There
+is no free row-packing fallback: if all six cannot fit, the existing Arquipélago
+chooser is announced instead. Enter/Space on the map opens that chooser.
+
+The preview must be inspected with the actual 94-pixel footer and complete
+dock/vehicle camera extents, comparing the old misleading labels with the
+attached number badges before production promotion.
+
+The prototype passed 172 focused checks, both TypeScript projects and the final
+508 TypeScript + 3 server tests in 14.54 s. Vite built in 1.23 s: 494.27 kB JS /
+153.09 kB gzip. Existing textures are reused with no additional image payload.
 
 ## Reproduce and check
 

@@ -473,6 +473,30 @@ test('one optional atlas paints all seven existing sign canvases and survives hi
     assert.equal(hud.enterButton.disabled, false); hud.stageButtons[0].click(); assert.deepEqual(calls, [0]);
 });
 
+test('compact numbers repaint from their own late narrow atlas and stay stationary after it resolves', async t => {
+    const resources = signResources(t), { hud, state } = fixture(t);
+    hud.update({ ...state, overview: true });
+    const points = Array.from({ length: 6 }, (_, n) => ({ x: 60 + n * 52, y: 160 }));
+    hud.positionOverviewWorlds(points, true);
+    const board = asElement(hud.overviewButtons[0]).children[0], label = hud.overviewButtons[0].getAttribute('aria-label');
+    assert.equal(board.width, 56); assert.equal(board.height, 58);
+    await resources.metadata(); resources.images[0].onload!(); await resources.settle();
+    assert.equal(board.width, 112); assert.equal(board.height, 116); assert.equal(board.draws.length, 1);
+    assert.equal(board.style.transform, 'translate(0px, 5px)');
+    assert.equal(hud.overviewButtons[0].getAttribute('aria-label'), label);
+    for (let frame = 0; frame < 30; frame++) hud.positionOverviewWorlds(points, true);
+    assert.equal(board.draws.length, 1, 'Positioning never repaints a stationary badge.');
+    hud.positionOverviewWorlds([], true, true);
+    assert.ok(hud.overviewButtons.every(button => button.hidden));
+    assert.equal(find(asElement(hud.root), 'world-map-hint').textContent, 'Abra Arquipélago para escolher uma ilha.');
+    const announcement = asElement(hud.root).children.find(child => child.getAttribute('aria-live') === 'polite')!;
+    assert.match(announcement.textContent, /Abra Arquipélago/); assert.doesNotMatch(announcement.textContent, /Escolha uma ilha para ver/);
+    const activation = asElement(hud.root).dispatch('keydown', { key: 'Enter', target: hud.root });
+    assert.equal(activation.defaultPrevented, true); assert.equal(hud.regionMenu.hidden, false);
+    hud.closeRegionMenu(); hud.positionOverviewWorlds(points, true);
+    assert.equal(find(asElement(hud.root), 'world-map-hint').textContent, 'Escolha uma ilha para ver suas fases.');
+});
+
 test('missing atlas image keeps every procedural sign usable and never retries per frame', async t => {
     const resources = signResources(t), { hud, state } = fixture(t);
     await resources.metadata(); resources.images[0].onerror!(); await resources.settle();

@@ -8,6 +8,7 @@ import { COSTA_ART_BOUNDS, FALLBACK_POINTS, fallbackMapMetadata, parseMapMetadat
 import { WorldMapView } from '../src/adventure/WorldMapView';
 import { WORLD_MAP_TRAVEL_ACTIONS } from '../src/adventure/WorldMapHud';
 import { mapToScreen, type MapPoint } from '../src/adventure/WorldMapModel';
+import { atlasIslandBounds, WORLD_ATLAS_PLACEMENTS } from '../src/adventure/WorldAtlasModel';
 import { Input } from '../src/engine/Input';
 
 type Listener = (event: any) => void;
@@ -275,10 +276,11 @@ function nativeControlEntries(h: ReturnType<typeof mapDOM>): Array<{ button: But
     if (h.internal.overview) {
         assert.ok(h.internal.hud.stageButtons.every((button: Button) => button.hidden));
         assert.ok(Object.values(h.internal.hud.travelButtons).every((button: any) => button.hidden));
-        assert.equal(h.internal.hud.overviewButtons.filter((button: Button) => !button.hidden).length, 6);
+        assert.equal(h.internal.hud.overviewButtons.filter((button: Button) => !button.hidden).length,
+            h.root.classList.contains('has-island-selector-fallback') ? 0 : 6);
         const compact = h.internal.width < 640 || h.internal.height < 480;
         assert.equal(h.root.classList.contains('has-compact-island-names'), compact);
-        return h.internal.hud.overviewButtons.map((button: Button) => ({ button, width: compact ? 76 : 128, height: 44 }));
+        return h.internal.hud.overviewButtons.map((button: Button) => ({ button, width: compact ? 44 : 128, height: 44 }));
     }
     return [...h.internal.hud.stageButtons.map((button: Button) => ({ button, width: 56, height: 58 })),
         ...Object.entries(h.internal.hud.travelButtons).map(([id, button]) => ({ button: button as Button,
@@ -765,6 +767,34 @@ test('all six owned overview labels select their own region and open its close v
         assert.equal(h.internal.journey.arrived, `${world}-1`);
         assert.equal(h.events.entered, 0);
     }
+});
+
+test('472px panorama with its real 94px footer keeps each numbered badge attached to its own shore', async t => {
+    const h = mapDOM(t, true), save = { ...openSave('6-1'), secrets: ['1-3', '4-3', '5-3', '6-3'] }; await readyDominio(h, save);
+    h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width: 472, height: 303 };
+    h.get('world-map-header').bounds = { x: 12, y: 6, left: 12, top: 6, width: 448, height: 44 };
+    h.get('world-map-tools').bounds = h.get('world-map-header').bounds;
+    h.get('world-map-footer').bounds = { x: 12, y: 203, left: 12, top: 203, width: 448, height: 94 };
+    h.observers[0].callback(); h.get('world-map-overview').click(); h.view.render(25, save, 100, '');
+    assert.equal(h.internal.frameInsets.bottom, 112);
+    assert.equal(h.root.classList.contains('has-island-selector-fallback'), false, 'The real short overview can fit all six attached 44px targets.');
+    const boxes = h.internal.hud.overviewButtons.map((button: Button, index: number) => {
+        assert.equal(button.hidden, false); assert.match(button.getAttribute('aria-label')!, new RegExp(`Ilha ${index + 1}:`));
+        const match = /^translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(button.style.transform)!;
+        const x = Number(match[1]), y = Number(match[2]);
+        const b = atlasIslandBounds({ world: index + 1, metadata: currentArt(h, index + 1).metadata, placement: WORLD_ATLAS_PLACEMENTS[index + 1] });
+        const left = mapToScreen({ x: b.left, y: b.bottom }, h.internal.camera), right = mapToScreen({ x: b.right, y: b.bottom }, h.internal.camera);
+        assert.ok(x >= left.x && x <= right.x, 'A number stays within its own island silhouette, never its neighbor.');
+        assert.ok(Math.abs(x - (left.x + right.x) / 2) <= 12 && Math.abs(y - (left.y + 8)) <= 12, 'Local adjustment stays bounded.');
+        assert.ok(Math.abs(y - left.y) <= 12.5, 'The visible plank foot remains beside its own shore.');
+        return { left: x - 22, right: x + 22, top: y - 44, bottom: y };
+    });
+    boxes.forEach((a: any, index: number) => {
+        assert.ok(a.left >= 8 && a.right <= 464 && a.top >= 66 && a.bottom <= 189);
+        for (const b of boxes.slice(index + 1)) assert.ok(a.right + 8 <= b.left || b.right + 8 <= a.left || a.bottom + 8 <= b.top || b.bottom + 8 <= a.top);
+    });
+    const positions = h.internal.compactOverviewPositions; h.view.render(25, save, 200, '');
+    assert.equal(h.internal.compactOverviewPositions, positions);
 });
 
 test('panorama primary action opens the selected island and a double click cannot also enter gameplay', async t => {

@@ -4,7 +4,7 @@ import test from 'node:test';
 import { mapStageSignKind, paintPhysicalDockSign, paintPhysicalStageSign, paintPhysicalTravelSign, parseMapSignMetadata, parseMapFactorySignMetadata, parseMapFactoryLeftSignMetadata } from '../src/adventure/WorldMapSignArt';
 import { textWidth } from '../src/graphics/BitmapFont';
 import { ART } from '../src/graphics/palette';
-import { parseMapIslandSignMetadata, paintPhysicalIslandSign } from '../src/adventure/WorldMapSignArt';
+import { parseMapIslandSignMetadata, paintPhysicalIslandSign, paintPhysicalIslandBadge } from '../src/adventure/WorldMapSignArt';
 
 const metadata = () => JSON.parse(readFileSync(new URL('../public/assets/world/map/signs-atlas.meta.json', import.meta.url), 'utf8'));
 function canvas() {
@@ -72,6 +72,25 @@ test('selected island pointers retain a contrasting outline at compact size with
             const [x, y] = key.split(',').map(Number);
             for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]])
                 assert.ok(compact.has(`${x + dx},${y + dy}`), 'Cream and brass remain enclosed by the dark outline at compact size.');
+        }
+    }
+});
+
+test('compact island numbers reuse the narrow plank without stretching or detaching its scaled foot', () => {
+    const atlas = { metadata: parseMapSignMetadata(metadata())!, image: {} as HTMLImageElement };
+    for (const [selected, open, kind] of [[false, true, 'stage'], [true, true, 'selected'], [true, false, 'locked']] as const) {
+        const painted = canvas(); assert.equal(paintPhysicalIslandBadge(painted.canvas, atlas, '6', selected, open), true);
+        const frame = atlas.metadata.frames[kind], draw = painted.calls.find(call => call.method === 'drawImage')!;
+        assert.deepEqual(draw.args.slice(1, 5), [frame.sourceRect.x, frame.sourceRect.y, 112, 116]);
+        assert.equal(painted.canvas.width, 112); assert.equal(painted.canvas.height, 116);
+        assert.equal(painted.canvas.style.transform, 'translate(0px, 5px)');
+        const visibleFoot = 44 - 29 + frame.foot.y / 2 + 5;
+        assert.ok(Math.abs(visibleFoot - 44) < .5, 'The original posts reach the 44px target anchor after 50% display scaling.');
+        const letters = painted.calls.filter(call => call.method === 'fillRect' && Number(call.args[1]) >= frame.usableFace.y);
+        assert.ok(letters.length > 0);
+        for (const letter of letters) {
+            const [x, y, width, height] = letter.args as number[];
+            assert.ok(x >= 23 && x + width <= 33 && y + height <= frame.usableFace.y + frame.usableFace.height, 'Only the centered island numeral occupies the plank.');
         }
     }
 });

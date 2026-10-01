@@ -4,7 +4,7 @@ import test from 'node:test';
 import { parseMapMetadata } from '../src/adventure/WorldMapArt';
 import { COAST_PORT_PLACEMENTS, getAtlasCamera, localToAtlas } from '../src/adventure/WorldAtlasModel';
 import { mapToScreen } from '../src/adventure/WorldMapModel';
-import { layoutMapControls, type MapControlBounds, type MapControlPlacement } from '../src/adventure/WorldMapView';
+import { layoutMapControls, layoutCompactIslandControls, type MapControlBounds, type MapControlPlacement } from '../src/adventure/WorldMapView';
 
 const read = (name: string) => JSON.parse(readFileSync(new URL(`../public/assets/world/map/${name}`, import.meta.url), 'utf8'));
 const journey = read('coast-port-journey.meta.json');
@@ -24,6 +24,12 @@ function assertSeparated(points: MapControlPlacement[], bounds: MapControlBounds
         });
     });
 }
+
+test('compact island targets reject packed rows outside their own shore instead of labeling a neighbor', () => {
+    const owners = Array.from({ length: 6 }, (_, n) => ({ left: 190 + n * 4, right: 210 + n * 4, top: 90, bottom: 120 }));
+    const points = owners.map(owner => ({ x: (owner.left + owner.right) / 2, y: owner.bottom + 8, width: 44, height: 44 }));
+    assert.equal(layoutCompactIslandControls(points, owners, { left: 8, right: 464, top: 66, bottom: 189 }), null);
+});
 
 test('Porto zoom200% regression moves the dock onto nearby free water and keeps phase signs near their terrain', () => {
     // Measured positions from the real 590×378 browser screenshot.
