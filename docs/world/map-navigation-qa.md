@@ -134,3 +134,29 @@ Final verification passed 486 TypeScript + 3 server tests in 11.67 s, both
 TypeScript projects and diff checks. Vite built in 2.40 s, 490.49 kB JS /
 152.05 kB gzip; CSS is unchanged. Actual browser copy and compact layout are
 checked on the corresponding preview before production promotion.
+
+Preview `a5231db` loaded `index-Daeqsa3-.js`. Real 472×303 UI showed local
+1-2 requiring 1-1 and Porto 2-1 requiring 1-5; the status remained inside its
+58-pixel footer. Desktop showed the full boss name and the live announcement
+named the prerequisite once. Enter remained blocked, and returning to Costa
+cleared the lock copy and restored available 1-1. Public main
+`a5231db3bd899630b831563da5d722852836b1de`, deployment
+`Cso2c8mRw9AWFHbfdFA3eQRo72wJ`, passed the same prerequisite/return smoke with
+its matching bundle. Only the prepared preview received a synthetic save.
+
+## Gallery return parity
+
+The next real walkthrough reproduced Escape opening the map from the gallery
+grid, while its visible “Voltar” returned to the title. The gallery now shares
+one back action: detail → island grid → title. Returning from detail selects
+the island just viewed and clears stale callbacks before the next frame.
+Other screens retain their previous Escape handling; gallery navigation does
+not persist progress or bypass its twelve-seal requirement.
+
+All 498 TypeScript + 3 server tests passed in 11.54 s, both TypeScript projects
+and diff checks passed, and Vite built in 2.66 s (490.68 kB JS / 152.08 kB gzip).
+The original game title and legacy editor also loaded through their existing
+links. The World studio listed all 30 phases and previewed 6-1 in isolation;
+no level data, files or production save were edited during those browser checks.
+Full continuous-key gameplay was not established by the available input pass;
+jump, landing, guidance advancement, pause and map return were observed.

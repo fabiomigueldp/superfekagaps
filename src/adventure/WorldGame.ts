@@ -155,6 +155,8 @@ export class WorldGame {
                 this.closeSettings();
             else if (this.state === 'dialogue')
                 this.closeDialogue();
+            else if (this.state === 'gallery')
+                this.backGallery();
             else
                 this.toMap();
             return;
@@ -793,6 +795,16 @@ export class WorldGame {
             pixelText(c, `${this.store.save.completed.length}/30 FASES · ${this.store.save.seals.length}/72 SELOS`, 160, 69, '#b2d4d4', 1, 'center');
         this.button(c, ending ? 'CONTINUAR EXPLORANDO' : 'SEGUIR VIAGEM', 72, 151, 176, () => ending ? this.toMap() : this.nextIntro());
     }
+    private backGallery() {
+        if (this.galleryWorld) {
+            const selection = this.galleryWorld - 1;
+            this.galleryWorld = 0;
+            this.change('gallery');
+            this.menuSelection = selection;
+        }
+        else
+            this.change('title');
+    }
     private renderGallery(c: CanvasRenderingContext2D) {
         if (this.galleryWorld) {
             const w = ISLANDS[this.galleryWorld - 1];
@@ -801,7 +813,7 @@ export class WorldGame {
             pixelText(c, w.name, 160, 22, w.accent, 1, 'center');
             this.text(c, w.description, 24, 38, 270);
             this.art.atlas.draw(c, bossFrame(w.boss, 'idle'), WORLD_PALETTE, 137, 90);
-            this.button(c, 'OUTRAS ILHAS', 100, 153, 120, () => { this.galleryWorld = 0; });
+            this.button(c, 'OUTRAS ILHAS', 100, 153, 120, () => this.backGallery());
             return;
         }
         rect(c, 0, 0, 320, 180, '#1e2f45');
@@ -822,7 +834,7 @@ export class WorldGame {
                     }
                 } });
         }
-        this.button(c, 'VOLTAR', 114, 153, 92, () => this.change('title'));
+        this.button(c, 'VOLTAR', 114, 153, 92, () => this.backGallery());
     }
     private settings(from: Screen) { this.settingReturn = from; this.pausedAudio = from === 'paused'; this.audio.pause(false); this.change('settings'); }
     private closeSettings() {
