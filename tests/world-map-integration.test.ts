@@ -9,7 +9,7 @@ import { WorldMapView } from '../src/adventure/WorldMapView';
 import { WORLD_MAP_TRAVEL_ACTIONS } from '../src/adventure/WorldMapHud';
 import { mapToScreen, type MapPoint } from '../src/adventure/WorldMapModel';
 import { atlasIslandBounds, WORLD_ATLAS_PLACEMENTS } from '../src/adventure/WorldAtlasModel';
-import { atlasActorBounds } from '../src/adventure/WorldAtlasArt';
+import { atlasActorBounds, atlasBoatBounds } from '../src/adventure/WorldAtlasArt';
 import { Input } from '../src/engine/Input';
 
 type Listener = (event: any) => void;
@@ -837,6 +837,56 @@ test('compact overview fits the actual actor and all attached badges at fresh Co
         assert.ok(close.y >= frameInsets.top + 44 - 1e-8 && close.y <= 303 - frameInsets.bottom - 44 + 1e-8);
         assert.equal(h.internal.journey.arrived, stage); assert.equal(h.events.entered, 0);
     });
+});
+
+test('normal-motion travel and overview settling retain actual actor framing through Costa, Factory and Domínio', async t => {
+    const h = mapDOM(t), save = openSave('1-1'); await readyDominio(h, save);
+    h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width: 472, height: 303 };
+    h.get('world-map-header').bounds = { x: 12, y: 6, left: 12, top: 6, width: 448, height: 44 };
+    h.get('world-map-tools').bounds = h.get('world-map-header').bounds;
+    h.get('world-map-footer').bounds = { x: 12, y: 202.8, left: 12, top: 202.8, width: 448, height: 94 };
+    h.observers[0].callback(); let time = 100, selection = 0;
+    h.view.render(selection, save, time, '');
+    const assertSubjects = () => {
+        const v = h.internal, ferry = v.activeFerry(), parked = !v.journey.destination
+            ? v.ferryLines().find((line: any) => line.definition.worlds.includes(STAGES[selection].world)) : undefined;
+        const boat = v.currentBoats().find((entry: any) => entry.id === (ferry ?? parked)?.definition.id);
+        const occupied = v.activeFerry(true);
+        const boxes = [atlasActorBounds(v.marker, occupied ? boat?.frame : undefined, !occupied),
+            ...(boat ? [atlasBoatBounds(boat.foot, boat.frame)] : [])];
+        for (const bounds of boxes) {
+            const a = mapToScreen({ x: bounds.left, y: bounds.top }, v.camera), b = mapToScreen({ x: bounds.right, y: bounds.bottom }, v.camera);
+            assert.ok(a.x >= 16 && b.x <= 456 && a.y >= v.frameInsets.top && b.y <= 303 - v.frameInsets.bottom,
+                `Actor/boat escaped during overview interpolation at ${STAGES[selection].id}: ${JSON.stringify({ a, b })}`);
+        }
+    };
+    for (const destination of [0, 12, 25]) {
+        selection = destination;
+        if (selection) {
+            h.internal.hud.regionButton.click();
+            const regions = h.internal.hud.regionMenu.children.filter((entry: Element) => entry.classList.contains('world-map-region'));
+            regions[STAGES[selection].world - 1].click();
+            h.internal.hud.stageButtons[selection % 5].click(); h.view.render(selection, save, time += 100, '');
+            assert.ok(h.internal.journey.destination);
+            if (selection === 12) {
+                const deadline = time + 30000;
+                while (!h.internal.activeFerry(true) && time < deadline) h.view.render(selection, save, time += 100, '');
+                assert.ok(h.internal.activeFerry(true), 'Exercise an occupied ferry before Skip.');
+                h.get('world-map-overview').click();
+                for (let frame = 0; frame < 5; frame++) { h.view.render(selection, save, time += 50, ''); assertSubjects(); }
+            }
+            h.internal.hud.skipButton.click(); h.view.render(selection, save, time += 50, '');
+            assert.equal(h.internal.journey.arrived, STAGES[selection].id);
+        }
+        if (!h.internal.overview) h.get('world-map-overview').click();
+        for (let frame = 0; frame < 60; frame++) { h.view.render(selection, save, time += 50, ''); assertSubjects(); }
+        assert.equal(h.root.classList.contains('has-island-selector-fallback'), false, `Settled ${STAGES[selection].id} keeps its six badges.`);
+        assert.equal(h.internal.hud.overviewButtons.filter((button: Button) => !button.hidden).length, 6);
+        assert.ok(h.internal.camera.zoom > .12);
+        h.get('world-map-overview').click();
+        for (let frame = 0; frame < 40; frame++) h.view.render(selection, save, time += 50, '');
+    }
+    assert.equal(h.media.matches, false); assert.equal(h.events.entered, 0);
 });
 
 test('panorama primary action opens the selected island and a double click cannot also enter gameplay', async t => {

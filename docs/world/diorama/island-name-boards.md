@@ -101,6 +101,16 @@ The final framing tree passed 162 focused checks, both TypeScript projects and
 513 TypeScript + 3 server tests in 12.29 s. Vite built in 1.14 s: 494.70 kB JS /
 153.25 kB gzip. CSS and image payload are unchanged in this follow-up.
 
+Normal-motion preview also exposed the old 20/44-pixel actor box inside camera
+interpolation safety. Overview now shares its real actor bounds between the
+target fit, zoom guard and translation clamp, together with the tracked vehicle.
+The normal-motion regression follows 1-1 → 3-3 → 6-1, including an occupied
+ferry and settled overview frames. Close/channel safety retains its old margins.
+
+The smoothing follow-up passed 152 focused checks, both TypeScript projects and
+514 TypeScript + 3 server tests in 13.29 s. Vite built in 1.19 s: 494.87 kB JS /
+153.31 kB gzip. No CSS or image changes accompany this correction.
+
 ## Reproduce and check
 
 Requirements: Blender 4.3.2, Python, Pillow and NumPy. Use an output directory
