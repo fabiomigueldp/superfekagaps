@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Guaíra · Prefeito da Vazão experimental</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;background:#2a2029;color:#f5efd3;font-family:system-ui,sans-serif;height:100%;overflow:hidden}
+body{display:flex;align-items:center;justify-content:center;padding-top:66px}
+#game-canvas{image-rendering:pixelated;touch-action:none;box-shadow:0 0 80px #803a5e40;max-width:100%;outline-offset:3px}
+nav{position:fixed;z-index:20;top:0;left:0;right:0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 12px;background:#382b35;border-bottom:2px solid #81583f;font-size:12px}
+nav button,nav a{display:inline-flex;flex:none;align-items:center;justify-content:center;min-height:44px;min-width:44px;padding:0;color:#f5efd3;background:#81583f;border:0;border-radius:0;font:600 12px system-ui;cursor:pointer;text-decoration:none;white-space:nowrap}
+[hidden]{display:none!important}
+.lab-action-art{display:block;image-rendering:pixelated;pointer-events:none}
+.lab-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+nav button:hover,nav a:hover{filter:brightness(1.2)}
+nav button:active .lab-action-art,nav a:active .lab-action-art{transform:translateY(2px)}
+nav button:focus-visible,nav a:focus-visible{outline:2px solid #ffe29a;outline-offset:2px}
+#lab-status{flex:1;min-width:0;color:#f5efd3;line-height:18px}
+@media(max-width:620px){nav{gap:4px;padding:6px}#lab-status{flex-basis:100%;font-size:11px;line-height:16px}body{padding-top:78px}}
+@media(forced-colors:active){.lab-action-art{display:none}.lab-sr{position:static;width:auto;height:auto;margin:0;clip-path:none}nav button,nav a{padding:6px;border:1px solid ButtonText}}
+</style>
+</head>
+<body>
+<nav aria-label="Controles do laboratório"><span id="lab-status" role="status">Protótipo experimental · Guaíra · Prefeito da Vazão (nome provisório)</span><button type="button" id="lab-pause">Pausar</button><button type="button" id="lab-retry">Tentar novamente</button></nav>
+<canvas id="game-canvas" tabindex="0" aria-label="Reabra a água pública: após o carimbo, sentada no registro, suba pela passarela e pule no topo exposto do prefeito fictício. Setas para mover, Espaço para pular, baixo no ar para sentada, Shift para correr e Escape para pausar"></canvas>
+<script type="module" src="/src/guaira-prefeito.ts"></script>
+</body>
+</html>
