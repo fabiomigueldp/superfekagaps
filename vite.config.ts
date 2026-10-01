@@ -6,6 +6,7 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: false,
+    rollupOptions: { input: { main: 'index.html', juiceLab: 'juice-lab.html' } },
     // usar esbuild para minify (mais leve e evita dep opcional `terser`)
     minify: 'esbuild'
   },

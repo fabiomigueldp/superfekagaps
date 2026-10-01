@@ -223,9 +223,11 @@ function course(w: number, n: number): AdventureStage {
     }
     if (w === 5 && n === 3) {
         d.land(0, 14, 19).land(19, 12, 25).land(50, 14, 15).land(65, 11, 20).land(91, 14, 16).land(107, 12, 27).land(141, 14, 19);
-        d.belt('b1', 19, 12, 25, -1).loader(42, 12, true).sw('s1', 15, 14, 'b1').m('target', 't1', 22, 9, 1, 3).platform(45, 13, 4).platform(65, 11, 20, T.ICE).jet('j1', 76, 11).platform(86, 12, 4).belt('sb', 107, 12, 27, -1).loader(132, 12, true).sw('ss', 103, 14, 'sb').m('target', 'st', 111, 9, 1, 3).platform(135, 13, 5);
+        d.belt('b1', 19, 12, 25, -1).loader(42, 12, true).sw('s1', 15, 14, 'b1').m('target', 't1', 22, 9, 1, 3).platform(45, 13, 4).platform(65, 11, 20, T.ICE).jet('j1', 76, 11).platform(86, 12, 4).belt('sb', 107, 12, 27, 1).loader(132, 12, true).sw('ss', 103, 14, 'sb').m('target', 'st', 111, 9, 1, 3).platform(135, 13, 5);
         d.platform(116, 8, 6).platform(124, 5, 12).secret(133, 5, 'st').cp(53).cp(94).foe('agitator', 80, 11).seal(1, 30, 9).seal(2, 71, 8).seal(3, 127, 3).item('helmet', 54).art('freezer', 19, 12, 25, 10, 'RESERVA ESPECIAL').art('pipe', 65, 11, 20, 7).art('freezer', 107, 12, 27, 10, 'ACESSO RESTRITO').talk(9, 'calabrezzo', 'Isso é a reserva especial.');
-        d.cue(30, 12).cue(56, 14).cue(71, 11).cue(98, 14).cue(119, 12).cue(148, 14);
+        // The default belt carries barrels away from the secret ice; a deliberate reversal opens it.
+        d.talk(100, 'feka', 'Uma sentada no botão manda o barril contra o gelo. A saída fica lá em cima!');
+        d.cue(30, 12).cue(56, 14).cue(71, 11).cue(98, 14).cue(104, 14, 'ss').cue(119, 12).cue(148, 14);
     }
     if (w === 5 && n === 4) {
         d.land(0, 14, 17).land(17, 12, 18).land(42, 9, 14).land(63, 14, 16).land(79, 11, 23).land(109, 9, 13).land(128, 14, 15).land(143, 11, 20).land(170, 14, 14);

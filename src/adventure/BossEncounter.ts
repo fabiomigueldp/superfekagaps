@@ -279,6 +279,6 @@ export class BossEncounter implements Rect {
         // A stunned boss cannot punish a slightly low approach. Only a landing deals damage.
         return this.phase === 'open' ? 'none' : 'hurt';
     }
-    get name() { return this.character === 'joao' ? 'JOÃOZÃO' : this.character === 'biel' ? 'BIELZÃO' : 'CALABREZZO'; }
-    get hint() { return this.shockWarning ? 'ONDA NO CHÃO! PULE' : this.phase === 'open' ? 'AGORA! PULE NA CABEÇA' : this.pattern === 'leap' && ['warning', 'attack'].includes(this.phase) ? 'SALTO! SAIA DA SOMBRA' : this.pattern === 'doubleCargo' && ['warning', 'attack'].includes(this.phase) ? 'DUAS CARGAS. DOIS AVISOS' : this.id === 'B2' ? 'ATIVE OS APOIOS E SUBA' : this.character === 'biel' ? 'LEVANTE UM APOIO' : this.id === 'C2' ? (this.cycle % 2 ? 'GELO DA DIREITA' : 'GELO DA ESQUERDA') : this.character === 'calabrezzo' ? 'INVERTA A ESTEIRA' : this.id === 'J2' ? 'ATRAIA O GOLPE ATÉ O APOIO' : 'SAIA DA MARCAÇÃO'; }
+    get name(): string { return this.character === 'joao' ? 'JOÃOZÃO' : this.character === 'biel' ? 'BIELZÃO' : 'CALABREZZO'; }
+    get hint(): string { return this.shockWarning ? 'ONDA NO CHÃO! PULE' : this.phase === 'open' ? 'AGORA! PULE NA CABEÇA' : this.pattern === 'leap' && ['warning', 'attack'].includes(this.phase) ? 'SALTO! SAIA DA SOMBRA' : this.pattern === 'doubleCargo' && ['warning', 'attack'].includes(this.phase) ? 'DUAS CARGAS. DOIS AVISOS' : this.id === 'B2' ? 'ATIVE OS APOIOS E SUBA' : this.character === 'biel' ? 'LEVANTE UM APOIO' : this.id === 'C2' ? (this.cycle % 2 ? 'GELO DA DIREITA' : 'GELO DA ESQUERDA') : this.character === 'calabrezzo' ? 'INVERTA A ESTEIRA' : this.id === 'J2' ? 'ATRAIA O GOLPE ATÉ O APOIO' : 'SAIA DA MARCAÇÃO'; }
 }
