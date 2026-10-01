@@ -2,12 +2,34 @@ import { ISLANDS, STAGES } from './campaign';
 import { fitText, panel, pixelText, textWidth, wrapText } from '../graphics/BitmapFont';
 import { ART } from '../graphics/palette';
 import { mapAssetPrefix } from './WorldMapArt';
-import { loadMapSignAtlas, paintPhysicalDockSign, paintPhysicalStageSign, type MapSignAtlas } from './WorldMapSignArt';
+import { loadMapSignAtlas, loadMapFactorySignAtlas, paintPhysicalTravelSign, paintPhysicalStageSign,
+    type MapSignAtlas, type MapFactorySignAtlas, type MapTravelSign } from './WorldMapSignArt';
+
+export const WORLD_MAP_TRAVEL_ACTION_IDS = ['ferry-costa-porto', 'ferry-porto-costa', 'bridge-porto-factory', 'bridge-factory-porto'] as const;
+export type WorldMapTravelActionId = typeof WORLD_MAP_TRAVEL_ACTION_IDS[number];
+export interface WorldMapTravelAction extends MapTravelSign {
+    id: WorldMapTravelActionId;
+    fromWorld: number;
+    toWorld: number;
+    mode: 'ferry' | 'bridge';
+    width: number;
+    height: number;
+}
+/** Stable route IDs: PORTO has a ferry approach and a separate walking return. */
+export const WORLD_MAP_TRAVEL_ACTIONS: Readonly<Record<WorldMapTravelActionId, WorldMapTravelAction>> = {
+    'ferry-costa-porto': { id: 'ferry-costa-porto', fromWorld: 1, toWorld: 2, mode: 'ferry', label: 'PORTO', direction: 'right', width: 104, height: 56 },
+    'ferry-porto-costa': { id: 'ferry-porto-costa', fromWorld: 2, toWorld: 1, mode: 'ferry', label: 'COSTA', direction: 'left', width: 104, height: 56 },
+    'bridge-porto-factory': { id: 'bridge-porto-factory', fromWorld: 2, toWorld: 3, mode: 'bridge', label: 'FÁBRICA', direction: 'right', wide: true, width: 128, height: 56 },
+    'bridge-factory-porto': { id: 'bridge-factory-porto', fromWorld: 3, toWorld: 2, mode: 'bridge', label: 'PORTO', direction: 'left', width: 104, height: 56 },
+};
+const LEGACY_DOCK_ACTION_IDS = ['ferry-porto-costa', 'ferry-costa-porto'] as const;
 
 export type WorldMapMotionState = 'idle' | 'walking' | 'boarding' | 'sailing' | 'arriving';
 export interface WorldMapHudCallbacks {
     selectStage(index: number): void;
     selectWorld(world: number): void;
+    /** Route-specific action; omitted callbacks retain destination-world selection. */
+    selectTravel?(action: WorldMapTravelActionId): void;
     enter(): void;
     skip(): void;
     overview(): void;
@@ -107,16 +129,16 @@ function stageSign(canvas: HTMLCanvasElement, id: string, selected: boolean, com
     }
     if (!open) lock(ctx, 21, 0);
 }
-function dockSign(canvas: HTMLCanvasElement, world: number, available: boolean, current: boolean): void {
+function travelSign(canvas: HTMLCanvasElement, sign: WorldMapTravelAction, available: boolean, current: boolean): void {
     canvas.style.transform = '';
-    const ctx = context(canvas, 52, 28);
+    const width = sign.width / 2, ctx = context(canvas, width, 28);
     if (!ctx) return;
-    ctx.fillStyle = ART.soilDark; ctx.fillRect(9, 17, 3, 11); ctx.fillRect(39, 17, 3, 11);
-    ctx.fillStyle = ART.soilTop; ctx.fillRect(9, 19, 1, 8); ctx.fillRect(39, 19, 1, 8);
-    panel(ctx, 0, 3, 50, 17, ART.ink, available ? ART.gold : ART.rockLight);
-    const name = world === 1 ? '← COSTA' : 'PORTO →';
-    pixelText(ctx, name, 25, 8, current ? ART.goldLight : available ? ART.paper : ART.muted, 1, 'center');
-    if (!available) lock(ctx, 44, 0);
+    ctx.fillStyle = ART.soilDark; ctx.fillRect(9, 17, 3, 11); ctx.fillRect(width - 13, 17, 3, 11);
+    ctx.fillStyle = ART.soilTop; ctx.fillRect(9, 19, 1, 8); ctx.fillRect(width - 13, 19, 1, 8);
+    panel(ctx, 0, 3, width - 2, 17, ART.ink, available ? ART.gold : ART.rockLight);
+    const name = sign.direction === 'left' ? `← ${sign.label}` : `${sign.label} →`;
+    pixelText(ctx, name, (width - 2) / 2, 8, current ? ART.goldLight : available ? ART.paper : ART.muted, 1, 'center');
+    if (!available) lock(ctx, width - 8, 0);
 }
 
 /** DOM-only map controls. The owner supplies projection, journey state and the game loop. */
@@ -129,7 +151,9 @@ export class WorldMapHud {
     readonly tools = element('div', 'world-map-tools');
     readonly footer = element('footer', 'world-map-footer');
     readonly stageButtons: HTMLButtonElement[] = [];
+    /** Legacy destination order: Costa, Porto. Both are ferry actions. */
     readonly dockButtons: HTMLButtonElement[] = [];
+    readonly travelButtons = {} as Record<WorldMapTravelActionId, HTMLButtonElement>;
     readonly regionMenu = element('nav', 'world-map-region-menu');
     readonly regionButton: HTMLButtonElement;
     readonly enterButton: HTMLButtonElement;
@@ -147,7 +171,7 @@ export class WorldMapHud {
     private readonly warning = element('p', 'world-map-warning');
     private readonly announcer = element('p', 'world-map-sr');
     private readonly stageCanvases: HTMLCanvasElement[] = [];
-    private readonly dockCanvases: HTMLCanvasElement[] = [];
+    private readonly travelCanvases = {} as Record<WorldMapTravelActionId, HTMLCanvasElement>;
     private readonly regionButtons: HTMLButtonElement[] = [];
     private readonly regionStates: HTMLSpanElement[] = [];
     private readonly overviewButton: HTMLButtonElement;
@@ -156,11 +180,13 @@ export class WorldMapHud {
     private state: WorldMapHudState | null = null;
     private signature = '';
     private announcement = '';
-    private readonly dockSignatures = ['', ''];
-    private readonly dockAvailability = [false, false];
+    private readonly travelSignatures: Partial<Record<WorldMapTravelActionId, string>> = {};
+    private readonly travelAvailability: Partial<Record<WorldMapTravelActionId, boolean>> = {};
     private readonly assetAbort = new AbortController();
     private signAtlas: MapSignAtlas | null = null;
     private signsRequested = false;
+    private factorySignAtlas: MapFactorySignAtlas | null = null;
+    private factorySignsRequested = false;
     private disposed = false;
 
     constructor(callbacks: WorldMapHudCallbacks) {
@@ -168,7 +194,7 @@ export class WorldMapHud {
         this.root.hidden = true; this.root.tabIndex = -1;
         this.root.setAttribute('aria-label', 'Mapa do arquipélago');
         this.canvas.setAttribute('aria-hidden', 'true');
-        this.nodeLayer.setAttribute('aria-label', 'Fases e cais do mapa');
+        this.nodeLayer.setAttribute('aria-label', 'Fases, cais e ponte do mapa');
         this.scene.append(this.canvas, this.nodeLayer);
         this.regionButton = action('world-map-tool world-map-archipelago', 'Arquipélago', () => this.toggleRegionMenu());
         this.regionButton.setAttribute('aria-expanded', 'false');
@@ -192,13 +218,18 @@ export class WorldMapHud {
             button.hidden = true;
             this.stageButtons.push(button); this.stageCanvases.push(canvas); this.nodeLayer.append(button);
         }
-        for (let world = 1; world <= 2; world++) {
-            const button = element('button', 'world-map-dock'); button.type = 'button';
-            const canvas = bitmap(button); accessibleText(button, `Cais: ${REGION_NAMES[world - 1]}`);
-            button.addEventListener('click', () => this.run(() => callbacks.selectWorld(world)));
+        for (const id of WORLD_MAP_TRAVEL_ACTION_IDS) {
+            const sign = WORLD_MAP_TRAVEL_ACTIONS[id];
+            const button = element('button', `world-map-dock world-map-travel${sign.wide ? ' world-map-travel-wide' : ''}`); button.type = 'button';
+            button.setAttribute('data-travel-action', id);
+            const canvas = bitmap(button); accessibleText(button, `${sign.mode === 'bridge' ? 'Ponte' : 'Cais'}: ${sign.label}`);
+            button.addEventListener('click', () => this.run(() => {
+                if (callbacks.selectTravel) callbacks.selectTravel(id); else callbacks.selectWorld(sign.toWorld);
+            }));
             button.hidden = true;
-            this.dockButtons.push(button); this.dockCanvases.push(canvas); this.nodeLayer.append(button);
+            this.travelButtons[id] = button; this.travelCanvases[id] = canvas; this.nodeLayer.append(button);
         }
+        this.dockButtons.push(...LEGACY_DOCK_ACTION_IDS.map(id => this.travelButtons[id]));
         const drawerHeading = element('div', 'world-map-region-heading');
         const drawerTitle = element('h2', 'world-map-region-title');
         lettering(bitmap(drawerTitle), 'ARQUIPÉLAGO', ART.goldLight); accessibleText(drawerTitle, 'Arquipélago');
@@ -245,7 +276,7 @@ export class WorldMapHud {
         if (this.disposed) return;
         this.root.hidden = !visible;
         if (!visible) this.closeRegionMenu();
-        else this.loadSignArt();
+        else { this.loadSignArt(); if (this.state?.world === 3 || !this.travelButtons['bridge-porto-factory'].hidden) this.loadFactorySignArt(); }
     }
     private loadSignArt(): void {
         if (this.signsRequested) return;
@@ -256,15 +287,31 @@ export class WorldMapHud {
             this.signAtlas = atlas;
             if (!this.state) return;
             for (let n = 0; n < 5; n++) this.paintStage(n, this.state);
-            this.dockSignatures.fill('');
-            this.dockAvailability.forEach((available, n) => this.updateDock(n, available));
+            this.repaintTravelSigns();
         });
+    }
+    private loadFactorySignArt(): void {
+        if (this.factorySignsRequested || this.root.hidden || this.disposed) return;
+        this.factorySignsRequested = true;
+        const prefix = mapAssetPrefix((import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/');
+        void loadMapFactorySignAtlas(prefix, this.assetAbort.signal).then(atlas => {
+            if (!atlas || this.disposed) return;
+            this.factorySignAtlas = atlas;
+            this.repaintTravelSigns();
+        });
+    }
+    private repaintTravelSigns(): void {
+        for (const id of WORLD_MAP_TRAVEL_ACTION_IDS) {
+            delete this.travelSignatures[id];
+            this.updateTravel(id, !!this.travelAvailability[id]);
+        }
     }
     private run(action: () => void): void { if (!this.disposed && !this.root.hidden) action(); }
 
     update(state: WorldMapHudState): void {
         if (this.disposed) return;
         this.state = state;
+        if (state.world === 3) this.loadFactorySignArt();
         const signature = JSON.stringify(state);
         if (signature === this.signature) return;
         this.signature = signature;
@@ -318,39 +365,50 @@ export class WorldMapHud {
             button.classList.toggle('is-current', current);
             this.regionStates[n].textContent = current ? state.preview ? 'Prévia' : 'No mapa' : available ? 'Visitar →' : 'Bloqueada';
         });
-        this.dockButtons.forEach((_button, n) => this.updateDock(n, !!state.worldAvailability[n]));
+        for (const id of WORLD_MAP_TRAVEL_ACTION_IDS) this.updateTravel(id, !!state.worldAvailability[WORLD_MAP_TRAVEL_ACTIONS[id].toWorld - 1]);
         const announcement = `${title}. ${this.status.textContent}. ${this.stageDetails.textContent}.`;
         if (announcement !== this.announcement) { this.announcement = announcement; this.announcer.textContent = announcement; }
     }
     private paintStage(index: number, state: WorldMapHudState): void {
         const entry = STAGES[(state.world - 1) * 5 + index], selected = entry.id === STAGES[state.stage].id;
-        if (state.world > 2 || !paintPhysicalStageSign(this.stageCanvases[index], this.signAtlas, entry.id, selected, !!state.completed[index], !!state.open[index]))
+        if (state.world > 3 || !paintPhysicalStageSign(this.stageCanvases[index], this.signAtlas, entry.id, selected, !!state.completed[index], !!state.open[index]))
             stageSign(this.stageCanvases[index], entry.id, selected, !!state.completed[index], !!state.open[index]);
     }
 
-    /** Five phase points, then Costa and Porto dock points. Missing points hide controls. */
-    positionNodes(stages: readonly (WorldMapHudPoint | null)[], docks: readonly (WorldMapHudPoint | null)[]): void {
-        const position = (button: HTMLButtonElement, point: WorldMapHudPoint | null | undefined) => {
-            button.hidden = !point || point.visible === false || !Number.isFinite(point.x) || !Number.isFinite(point.y);
-            if (!button.hidden && point) button.style.transform = `translate(${Math.round(point.x)}px, ${Math.round(point.y)}px) translate(-50%, -100%)`;
-        };
-        this.stageButtons.forEach((button, n) => position(button, stages[n]));
-        this.dockButtons.forEach((button, n) => {
-            const point = docks[n]; position(button, point);
-            if (point?.available !== undefined && this.state) this.updateDock(n, point.available);
+    private position(button: HTMLButtonElement, point: WorldMapHudPoint | null | undefined): void {
+        button.hidden = !point || point.visible === false || !Number.isFinite(point.x) || !Number.isFinite(point.y);
+        if (!button.hidden && point) button.style.transform = `translate(${Math.round(point.x)}px, ${Math.round(point.y)}px) translate(-50%, -100%)`;
+    }
+    /** Legacy docks are Costa then Porto. Call before positionTravelActions when using both. */
+    positionNodes(stages: readonly (WorldMapHudPoint | null)[], docks: readonly (WorldMapHudPoint | null)[] = []): void {
+        this.stageButtons.forEach((button, n) => this.position(button, stages[n]));
+        LEGACY_DOCK_ACTION_IDS.forEach((id, n) => {
+            const point = docks[n]; this.position(this.travelButtons[id], point);
+            if (point?.available !== undefined && this.state) this.updateTravel(id, point.available);
         });
     }
-    private updateDock(index: number, available: boolean): void {
-        const current = this.state?.world === index + 1, physical = !!this.state && this.state.world <= 2;
+    /** Authored departure anchors only. Omitted actions hide; availability belongs to each route. */
+    positionTravelActions(points: Readonly<Partial<Record<WorldMapTravelActionId, WorldMapHudPoint | null>>>): void {
+        for (const id of WORLD_MAP_TRAVEL_ACTION_IDS) {
+            const point = points[id]; this.position(this.travelButtons[id], point);
+            if (point?.available !== undefined && this.state) this.updateTravel(id, point.available);
+        }
+        if (!this.travelButtons['bridge-porto-factory'].hidden) this.loadFactorySignArt();
+    }
+    private updateTravel(id: WorldMapTravelActionId, available: boolean): void {
+        const sign = WORLD_MAP_TRAVEL_ACTIONS[id];
+        const current = this.state?.world === sign.toWorld, physical = !!this.state && this.state.world <= 3;
         const key = `${available}:${current}:${physical}`;
-        if (this.dockSignatures[index] === key) return;
-        this.dockSignatures[index] = key;
-        this.dockAvailability[index] = available;
-        if (!physical || !paintPhysicalDockSign(this.dockCanvases[index], this.signAtlas, index + 1, available))
-            dockSign(this.dockCanvases[index], index + 1, available, current);
-        const button = this.dockButtons[index];
+        if (this.travelSignatures[id] === key) return;
+        this.travelSignatures[id] = key; this.travelAvailability[id] = available;
+        if (!physical || !paintPhysicalTravelSign(this.travelCanvases[id], this.signAtlas, this.factorySignAtlas, sign, available))
+            travelSign(this.travelCanvases[id], sign, available, current);
+        const button = this.travelButtons[id], destination = ISLANDS[sign.toWorld - 1].name;
         button.classList.toggle('is-locked', !available);
-        button.setAttribute('aria-label', `Cais para ${ISLANDS[index].name}. ${available ? 'Marcar destino da travessia.' : 'Travessia bloqueada. Ver prévia.'}`);
+        button.setAttribute('aria-label', sign.mode === 'bridge'
+            ? `Ponte de carga para ${destination}. ${available ? 'Caminhar pela ponte.' : 'Ponte bloqueada. Ver prévia.'}`
+            : `Cais para ${destination}. ${available ? 'Marcar destino da travessia de barco.' : 'Travessia bloqueada. Ver prévia.'}`);
+        button.title = `${sign.label} ${sign.direction === 'left' ? '←' : '→'} · ${sign.mode === 'bridge' ? 'ponte de carga' : 'barco'}`;
     }
     focusStage(globalIndex: number): void {
         if (this.state && Math.floor(globalIndex / 5) === this.state.world - 1) this.stageButtons[globalIndex % 5]?.focus({ preventScroll: true });

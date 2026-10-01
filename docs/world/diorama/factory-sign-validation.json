@@ -1,0 +1,35 @@
+{
+  "allEdgesTransparent": true,
+  "atlasBytes": 7798,
+  "atlasSize": [
+    256,
+    112
+  ],
+  "frameCount": 1,
+  "hashes": {
+    "signs-factory.webp": "55309ef4268c777422a0963c60324e01a217518dbb3556d35feda6c3bb0618cf",
+    "signs-factory.meta.json": "39939a5800323a2ccb9b92d873ff0189c0261bf1744750ef0fa4443eec4581bc"
+  },
+  "frozenByteComparison": null,
+  "assets": [
+    {
+      "kind": "factory-right",
+      "edgeAlphaMax": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "foot": {
+        "x": 64.0,
+        "y": 45.678
+      },
+      "usableFace": {
+        "x": 18.578,
+        "y": 9.888,
+        "width": 90.844,
+        "height": 19.360999999999997
+      }
+    }
+  ]
+}

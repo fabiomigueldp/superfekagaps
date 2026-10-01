@@ -1,0 +1,106 @@
+{
+  "sourceCommit": "eab1a34addb278a898e95a1c9e77bcd8b2de68e6",
+  "existingCameraNodesAndRoutesUnchanged": true,
+  "factoryOnlyLocalArtAdjustment": "Move coastal scrub.001 0.38world units west to clear new receiving approach. No phase surface or stage prop changed.",
+  "bridgePhysicalAudit": {
+    "physicalSampleCount": 357,
+    "physicalIssueCount": 0,
+    "physicalIssues": [],
+    "projectedSampleCount": 1428,
+    "projectedContactCount": 0,
+    "projectedContacts": []
+  },
+  "bridgeBillboardAudit": {
+    "loweredCrossing": {
+      "sampleCount": 3990,
+      "upperBodyContactCount": 0,
+      "lowerBodyContactCount": 0
+    },
+    "raisedOriginalPortRoutesNewBridgeContacts": {
+      "sampleCount": 11220,
+      "upperBodyContactCount": 0,
+      "lowerBodyContactCount": 0
+    }
+  },
+  "movingSpan": {
+    "start": [
+      6.72,
+      -1.225,
+      1.692
+    ],
+    "end": [
+      11.603099822998047,
+      1.3462631702423096,
+      1.1799999475479126
+    ],
+    "lengthWorld": 5.5424,
+    "widthWorld": 1.48,
+    "portFootHeight": 1.692,
+    "factoryFootHeight": 1.18,
+    "slopeDegrees": 5.3,
+    "deckUndersideWaterClearanceAtLowEnd": 0.96,
+    "lowestGirderWaterClearanceAtLowEnd": 0.865
+  },
+  "assets": {
+    "fabrica-diorama.webp": {
+      "bytes": 152416,
+      "sha256": "b0d233b22cecfb2bf3c46a6c4a04d45256ec12d69751d9f38fac4c97c6624dba"
+    },
+    "fabrica-diorama.meta.json": {
+      "bytes": 5300,
+      "sha256": "ffb2d59726caed94a905ec42d0c56181cbeea00798a0ed4b220ce60691d164fe"
+    },
+    "port-factory-bridge.meta.json": {
+      "bytes": 2910,
+      "sha256": "d5d1916785aa266510a25cb0a143326d01e7df4281e07ac73404281e33f24606"
+    },
+    "port-factory-bridge-open.webp": {
+      "bytes": 41560,
+      "sha256": "4d91b67d9ece26fc3f9445c02c211be4d11ce48a2d7d735215f96c348f958c09"
+    },
+    "port-factory-bridge-closed.webp": {
+      "bytes": 50966,
+      "sha256": "c6cd182a4c5d29702367187ddd028862c87f31a47c6581ac00001a571cc6a0eb"
+    }
+  },
+  "totalRuntimeBytes": 253152,
+  "portableSources": {
+    "render_fabrica_map.py": {
+      "sha256": "d31cebbad43b81952e10dd94474d30dee9234051764a962a5de3e5d4f8578d2f"
+    },
+    "check_fabrica_clearance.py": {
+      "sha256": "308e544c4f5c8f350731983f7797386ba12c1e2a30d2a99e328f50b08ea76d00"
+    },
+    "check_fabrica_billboard.py": {
+      "sha256": "638722475c1e6ed6019c60e07a7d3b845f1ae1efc08874562f8779ecbf4dfe66"
+    },
+    "render_port_factory_bridge.py": {
+      "sha256": "ee5a7a6977f67fec3de81321d589fa8e229a33088216383850df1b0f106111ba"
+    },
+    "check_port_factory_bridge.py": {
+      "sha256": "e49e137286563dde11135324a6266b3db758972f970042f120a7223edf24c283"
+    },
+    "render_port_factory_bridge_layers.py": {
+      "sha256": "23a8fe64cb277a2c4b4c54cfd769d5e591bbf871ac4c4efad0932637042050ea"
+    },
+    "package_port_factory_bridge.py": {
+      "sha256": "96c189f4c708889e3b47641f28226d414e10ee9117fc528276abb969d338083c"
+    }
+  },
+  "portableBuildVerification": {
+    "freshSourceSceneBuilt": true,
+    "physicalSampleCount": 357,
+    "physicalIssueCount": 0,
+    "projectedSampleCount": 1428,
+    "projectedContactCount": 0,
+    "pythonSyntaxCheck": "passed",
+    "freshBillboardChecks": {
+      "loweredSampleCount": 3990,
+      "loweredUpperBodyContactCount": 0,
+      "loweredLowerBodyContactCount": 0,
+      "raisedPortRoutesSampleCount": 11220,
+      "raisedUpperBodyContactCount": 0,
+      "raisedLowerBodyContactCount": 0
+    }
+  }
+}

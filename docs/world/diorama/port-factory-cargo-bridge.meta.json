@@ -1,0 +1,188 @@
+{
+  "version": 1,
+  "status": "lowered-bridge-local-prototype",
+  "storySource": "docs/world/campanha.md:66",
+  "placements": {
+    "costa": {
+      "origin": {
+        "x": 0,
+        "y": 0
+      },
+      "scale": 1
+    },
+    "porto": {
+      "origin": {
+        "x": 1.1,
+        "y": -0.12
+      },
+      "scale": 1
+    },
+    "fabrica": {
+      "origin": {
+        "x": 1.98,
+        "y": 0.03
+      },
+      "scale": 1
+    }
+  },
+  "portJoin": {
+    "kind": "route-segment",
+    "from": "2-4",
+    "to": "2-5",
+    "worldPoint": [
+      4.575,
+      -1.225,
+      1.692
+    ],
+    "worldSegment": 0,
+    "t": 0.5,
+    "atlas": {
+      "x": 1.765939,
+      "y": 0.569307
+    }
+  },
+  "factoryJoin": {
+    "kind": "node",
+    "node": "3-1",
+    "atlas": {
+      "x": 2.190478,
+      "y": 0.598483
+    }
+  },
+  "pathAtlas": [
+    {
+      "x": 1.765939,
+      "y": 0.569307
+    },
+    {
+      "x": 1.857176,
+      "y": 0.613503
+    },
+    {
+      "x": 2.12503,
+      "y": 0.65099
+    },
+    {
+      "x": 2.150624,
+      "y": 0.663266
+    },
+    {
+      "x": 2.171478,
+      "y": 0.629368
+    },
+    {
+      "x": 2.190478,
+      "y": 0.598483
+    }
+  ],
+  "pathPortoAuthoringWorld": [
+    [
+      4.575,
+      -1.225,
+      1.692
+    ],
+    [
+      6.72,
+      -1.225,
+      1.692
+    ],
+    [
+      11.603099822998047,
+      1.3462631702423096,
+      1.1799999475479126
+    ],
+    [
+      12.203441619873047,
+      1.3487639427185059,
+      1.1799999475479126
+    ],
+    [
+      12.197769165039062,
+      2.250509023666382,
+      1.1799999475479126
+    ],
+    [
+      12.192602157592773,
+      3.072098731994629,
+      1.1799999475479126
+    ]
+  ],
+  "factoryApproachLocal": [
+    [
+      -5.85,
+      -4.3,
+      1.18
+    ],
+    [
+      -5.25,
+      -4.3,
+      1.18
+    ],
+    [
+      -5.25,
+      -3.4,
+      1.18
+    ],
+    [
+      -5.25,
+      -2.58,
+      1.18
+    ]
+  ],
+  "movingSpan": {
+    "start": [
+      6.72,
+      -1.225,
+      1.692
+    ],
+    "end": [
+      11.603099822998047,
+      1.3462631702423096,
+      1.1799999475479126
+    ],
+    "lengthWorld": 5.5424,
+    "widthWorld": 1.48,
+    "portFootHeight": 1.692,
+    "factoryFootHeight": 1.18,
+    "slopeDegrees": 5.3,
+    "deckUndersideWaterClearanceAtLowEnd": 0.96,
+    "lowestGirderWaterClearanceAtLowEnd": 0.865
+  },
+  "audits": {
+    "physicalSampleCount": 357,
+    "physicalIssueCount": 0,
+    "physicalIssues": [],
+    "projectedSampleCount": 1428,
+    "projectedContactCount": 0,
+    "projectedContacts": []
+  },
+  "registration": {
+    "method": "height-preserving orthographic affine registration of Factory source into Porto authoring space only",
+    "factoryToPortoMatrix": [
+      [
+        1.0005685091018677,
+        -0.006302207708358765,
+        0.0008062176057137549,
+        17.428375244140625
+      ],
+      [
+        0.004167795181274414,
+        1.0019385814666748,
+        -0.0014658512081950903,
+        5.680710792541504
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  }
+}

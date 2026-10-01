@@ -177,3 +177,38 @@ test('partial or reversed horizontal silhouette bounds are rejected, legacy vert
         assert.equal(parseMapMetadata({ ...raw, artBounds: { top: .1, bottom: .9, ...bad } }, 2), null);
     assert.deepEqual(parseMapMetadata({ ...raw, artBounds: { top: .1, bottom: .9 } }, 2)?.artBounds, { top: .1, bottom: .9 });
 });
+
+test('a bridge approach expands only its own island fit while complete span bounds belong to panorama', () => {
+    const original = structuredClone(layers);
+    const approach = { left: .7, top: .7, right: 1.12, bottom: 1.08 };
+    const port = { ...layers[1], approachBounds: [approach] };
+    // Deliberately synthetic connection envelope extends below the land; it is
+    // independent of the production artist's pending bridge crop.
+    const span = { left: 1.95, top: .7, right: 2.6, bottom: 1.7 };
+    const extended = [layers[0], port];
+    const expected = localToAtlas({ x: approach.right, y: approach.bottom }, port.placement);
+    const bounds = atlasIslandBounds(port);
+    close(bounds.right, expected.x); close(bounds.bottom, expected.y);
+    assert.deepEqual(atlasIslandBounds(layers[0]), atlasIslandBounds(extended[0]));
+    for (const [width, height] of sizes) {
+        const base: AtlasCameraOptions = { width, height, layers: extended, activeWorld: 2, mode: 'island',
+            insets: { top: 65, bottom: 110, left: 16, right: 16 } };
+        assert.deepEqual(getAtlasCamera({ ...base, connectionBounds: [span] }), getAtlasCamera(base),
+            'Factory bridge art must not pull the Porto island view into panorama.');
+        assertInside(expected, base, 12);
+        const overview: AtlasCameraOptions = { ...base, mode: 'overview', connectionBounds: [span] };
+        assertInside({ x: span.left, y: span.top }, overview, 12);
+        assertInside({ x: span.right, y: span.bottom }, overview, 12);
+        const crossing: AtlasCameraOptions = { ...base, mode: 'channel', travelPoints: [{ x: 2, y: .8 }, { x: 2.4, y: .9 }] };
+        assert.deepEqual(getAtlasCamera({ ...crossing, connectionBounds: [span] }), getAtlasCamera(crossing),
+            'The travel window follows the route, not the whole raised bridge silhouette.');
+    }
+    assert.deepEqual(layers, original);
+});
+
+test('invalid optional bridge bounds cannot corrupt island or panorama cameras', () => {
+    const malformed = [{ left: NaN, top: 0, right: 2, bottom: 2 }, { left: 2, top: 0, right: 1, bottom: 2 }];
+    assert.deepEqual(atlasIslandBounds({ ...layers[1], approachBounds: malformed }), atlasIslandBounds(layers[1]));
+    const options: AtlasCameraOptions = { width: 400, height: 606, layers, activeWorld: 2, mode: 'overview' };
+    assert.deepEqual(getAtlasCamera({ ...options, connectionBounds: malformed }), getAtlasCamera(options));
+});

@@ -108,6 +108,34 @@ test('dock overlays use stable island-local rectangles and render before the pas
     assert.ok(calls.indexOf(draw) < calls.indexOf(actorPixels(calls)[0]));
 });
 
+test('cargo bridge art stays in atlas coordinates and below the walking actor for both gate states', () => {
+    for (const gate of ['open', 'closed']) {
+        const { context, calls } = recordingContext(), state = scene(false), bridge = image(`bridge-${gate}`);
+        state.connections = [{ image: bridge, left: 1.7, top: .35, widthInMap: .42, heightInMap: .26 }];
+        state.actor.point = { x: 1.9, y: .5 };
+        paintWorldAtlas(context, state);
+        const draw = calls.find(call => call.name === 'drawImage' && call.args[0] === bridge)!;
+        const top = mapToScreen({ x: 1.7, y: .35 }, camera), bottom = mapToScreen({ x: 2.12, y: .61 }, camera);
+        assert.deepEqual(draw.args.slice(1), [top.x, top.y, bottom.x - top.x, bottom.y - top.y]);
+        const islandDraws = calls.filter(call => call.name === 'drawImage' && state.islands.some(island => island.assets.island === call.args[0]));
+        assert.ok(islandDraws.every(island => calls.indexOf(island) < calls.indexOf(draw)));
+        assert.ok(calls.indexOf(draw) < calls.indexOf(actorPixels(calls)[0]));
+        assert.equal(calls.filter(call => call.name === 'drawImage' && call.args[0] === rear).length, 1, 'The bridge cannot duplicate the ferry.');
+    }
+});
+
+test('missing or malformed connection layers leave the normal sea, islands and actor intact', () => {
+    const baseline = recordingContext(), invalid = recordingContext(), state = scene(false);
+    paintWorldAtlas(baseline.context, state);
+    state.connections = [
+        { image: null, left: 1, top: .2, widthInMap: .4, heightInMap: .2 },
+        { image: image('invalid'), left: NaN, top: .2, widthInMap: .4, heightInMap: .2 },
+        { image: image('invalid'), left: 1, top: .2, widthInMap: -.4, heightInMap: .2 },
+    ];
+    paintWorldAtlas(invalid.context, state);
+    assert.deepEqual(invalid.calls, baseline.calls);
+});
+
 test('unavailable or invalid boat art is omitted safely while original Feka and legacy island fallback remain', () => {
     for (const fail of ['missing', 'invalid'] as const) {
         const { context, calls } = recordingContext(), state = scene();

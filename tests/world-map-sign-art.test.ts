@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { mapStageSignKind, paintPhysicalDockSign, paintPhysicalStageSign, parseMapSignMetadata } from '../src/adventure/WorldMapSignArt';
+import { mapStageSignKind, paintPhysicalDockSign, paintPhysicalStageSign, paintPhysicalTravelSign, parseMapSignMetadata, parseMapFactorySignMetadata } from '../src/adventure/WorldMapSignArt';
+import { textWidth } from '../src/graphics/BitmapFont';
 import { ART } from '../src/graphics/palette';
 
 const metadata = () => JSON.parse(readFileSync(new URL('../public/assets/world/map/signs-atlas.meta.json', import.meta.url), 'utf8'));
@@ -74,4 +75,44 @@ test('physical dock arrows retain names and attached gate marker without a float
     assert.equal(paintPhysicalStageSign(fallback.canvas, null, '1-1', true, false, true), false);
     assert.equal(paintPhysicalDockSign(fallback.canvas, null, 2, false), false);
     assert.equal(fallback.calls.length, 0, 'Missing decoration leaves the existing procedural renderer available.');
+});
+
+
+test('Factory arrow provides measured room for every original bitmap cell including its accent', () => {
+    const raw = JSON.parse(readFileSync(new URL('../public/assets/world/map/signs-factory.meta.json', import.meta.url), 'utf8'));
+    const frame = parseMapFactorySignMetadata(raw); assert.ok(frame);
+    assert.equal(textWidth('FÁBRICA', 2), 82);
+    assert.ok(frame.usableFace.width > 82); assert.ok(frame.usableFace.height >= 18);
+    const painted = canvas();
+    assert.equal(paintPhysicalTravelSign(painted.canvas, null, { frame, image: {} as HTMLImageElement },
+        { label: 'FÁBRICA', direction: 'right', wide: true }, true), true);
+    assert.equal(painted.canvas.width, 256); assert.equal(painted.canvas.height, 112);
+    for (const call of painted.calls.filter(call => call.method === 'fillRect')) {
+        const [x, y, width, height] = call.args as number[];
+        assert.equal(call.color, ART.ink); assert.ok(call.args.every(Number.isInteger));
+        assert.ok(x >= frame.usableFace.x && x + width <= frame.usableFace.x + frame.usableFace.width);
+        assert.ok(y >= frame.usableFace.y && y + height <= frame.usableFace.y + frame.usableFace.height, 'Accent cells must stay on the painted plank.');
+    }
+    for (const change of [
+        (copy: any) => { copy.frames[0].usableFace.width = 65; },
+        (copy: any) => { copy.frames[0].usableFace.y = 14; },
+        (copy: any) => { copy.frames[0].displaySize.width = 104; },
+        (copy: any) => { copy.frames[0].sourceRect.x = 1; },
+        (copy: any) => { copy.atlas.image = 'signs-atlas.webp'; },
+    ]) { const copy = structuredClone(raw); change(copy); assert.equal(parseMapFactorySignMetadata(copy), null); }
+});
+
+test('the two Porto signs use opposite physical arrows and departure-side gates', () => {
+    const atlas = { metadata: parseMapSignMetadata(metadata())!, image: {} as HTMLImageElement };
+    for (const direction of ['left', 'right'] as const) {
+        const painted = canvas();
+        assert.equal(paintPhysicalTravelSign(painted.canvas, atlas, null, { label: 'PORTO', direction }, false), true);
+        const draw = painted.calls.find(call => call.method === 'drawImage')!;
+        assert.equal(draw.args[1], direction === 'left' ? 208 : 0);
+        const bandX = direction === 'left' ? 79 : 22;
+        assert.ok(painted.calls.some(call => call.method === 'fillRect' && call.color === ART.gold && call.args.join(',') === `${bandX},35,4,1`));
+    }
+    const fallback = canvas();
+    assert.equal(paintPhysicalTravelSign(fallback.canvas, atlas, null, { label: 'FÁBRICA', direction: 'right', wide: true }, false), false);
+    assert.equal(fallback.calls.length, 0, 'A missing wide prop cannot squeeze Factory lettering onto the short board.');
 });

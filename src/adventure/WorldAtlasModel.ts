@@ -11,11 +11,16 @@ export interface AtlasIslandDescriptor {
     metadata: MapArtMetadata;
     placement: AtlasPlacement;
     overlay?: AtlasOverlayBounds;
+    /** Local approach silhouettes, separate from a complete inter-island span. */
+    approachBounds?: readonly AtlasBounds[];
 }
-export const COAST_PORT_PLACEMENTS: Readonly<Record<number, AtlasPlacement>> = Object.freeze({
+export const WORLD_ATLAS_PLACEMENTS: Readonly<Record<number, AtlasPlacement>> = Object.freeze({
     1: Object.freeze({ origin: Object.freeze({ x: 0, y: 0 }), scale: 1 }),
     2: Object.freeze({ origin: Object.freeze({ x: 1.1, y: -.12 }), scale: 1 }),
+    3: Object.freeze({ origin: Object.freeze({ x: 1.98, y: .03 }), scale: 1 }),
 });
+/** Compatibility for the released ferry contract and its consumers. */
+export const COAST_PORT_PLACEMENTS = WORLD_ATLAS_PLACEMENTS;
 /** Measured alpha bounds of the shipped 1920×1200 layers, excluding soft shadows. */
 export const ATLAS_ART_BOUNDS: Readonly<Record<number, AtlasBounds>> = Object.freeze({
     1: Object.freeze({ left: 259 / 1920, top: 96 / 1200, right: 1598 / 1920, bottom: 1166 / 1200 }),
@@ -70,6 +75,12 @@ export function atlasIslandBounds(layer: AtlasIslandDescriptor): AtlasBounds {
         bounds.right = Math.max(bounds.right, overlay.left + overlay.widthInMap);
         bounds.bottom = Math.max(bounds.bottom, overlay.top + overlay.heightInMap);
     }
+    for (const approach of layer.approachBounds ?? []) {
+        if (![approach.left, approach.top, approach.right, approach.bottom].every(Number.isFinite) ||
+            approach.left >= approach.right || approach.top >= approach.bottom) continue;
+        bounds.left = Math.min(bounds.left, approach.left); bounds.top = Math.min(bounds.top, approach.top);
+        bounds.right = Math.max(bounds.right, approach.right); bounds.bottom = Math.max(bounds.bottom, approach.bottom);
+    }
     const topLeft = localToAtlas({ x: bounds.left, y: bounds.top }, layer.placement);
     const bottomRight = localToAtlas({ x: bounds.right, y: bounds.bottom }, layer.placement);
     return { left: topLeft.x, top: topLeft.y, right: bottomRight.x, bottom: bottomRight.y };
@@ -121,6 +132,8 @@ export interface AtlasCameraOptions {
     travelPoints?: readonly MapPoint[];
     /** World-space bounds of moving art such as a boat, including its anchor. */
     focusBounds?: readonly AtlasBounds[];
+    /** Full connection art is fitted in panorama only, not a nearby island view. */
+    connectionBounds?: readonly AtlasBounds[];
     showPins?: boolean;
     /** Optional ceiling; fitting can always shrink further on a small surface. */
     maxZoom?: number;
@@ -158,6 +171,10 @@ export function getAtlasCamera(options: AtlasCameraOptions): MapCamera {
     }
     if (options.focus) add(options.focus, ATLAS_FOCUS_CLEARANCE);
     options.focusBounds?.forEach(bounds => addBounds(bounds, 12));
+    if (options.mode === 'overview') options.connectionBounds?.forEach(bounds => {
+        if ([bounds.left, bounds.top, bounds.right, bounds.bottom].every(Number.isFinite) &&
+            bounds.left < bounds.right && bounds.top < bounds.bottom) addBounds(bounds, 12);
+    });
     if (!points.length) add({ x: .5, y: .5 }, 12);
     // On a pathological tiny surface, keep the geometry finite while preserving
     // as much of the measured safe rectangle as can physically be represented.

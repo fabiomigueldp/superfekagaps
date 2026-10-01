@@ -40,3 +40,41 @@ The COSTA board retains its right post; PORTO retains its left post. This keeps
 the support on the landing when a narrow layout shifts the label toward free
 water. The closed-dock marker follows that remaining post. Frame dimensions,
 reference points, faces and the five phase-state sources remain unchanged.
+
+## Factory cargo-bridge supplement
+
+The walking Porto↔Fábrica bridge adds two distinct actions to the ferry pair.
+All four have stable IDs and authored arrow direction in `WorldMapHud.ts`:
+`ferry-costa-porto`, `ferry-porto-costa`, `bridge-porto-factory`, and
+`bridge-factory-porto`. The two PORTO boards have separate departure anchors,
+callbacks and semantics: right for the Costa ferry, left for the Factory bridge.
+The bridge return reuses the released left-arrow blank and right-side support.
+All five Factory phase boards use the existing phase-state art.
+
+FÁBRICA needs 82 CSS pixels at the game's original 2-pixel bitmap scale, plus
+18 vertical pixels for the acute accent. Its new Blender-authored blank has a
+90.844 × 19.361 CSS-pixel safe face and a 128 × 56 CSS-pixel target. It preserves
+the original camera's pixels-per-world-unit scale, vertical foot and lighting,
+with a wider, slightly taller solid plank, a left departure-side post and the
+same cantilever bracket. No old frame, glyph, atlas pixel or target was changed.
+
+Render and package the optional Factory atlas separately:
+
+```sh
+blender -b -t 8 -P tools/diorama/render_map_signs.py -- --repo-root . --output-dir /tmp/feka-factory-sign-renders --only factory-right
+python tools/diorama/package_map_signs.py --repo-root . --render-dir /tmp/feka-factory-sign-renders --output-dir /tmp/feka-factory-sign-assets --factory-only
+```
+
+The production additions are `signs-factory.webp` (256 × 112 pixels, 7,798 bytes)
+and `signs-factory.meta.json`. They load once, only when Factory is inspected or
+its bridge sign is shown. Missing or invalid supplemental art leaves the full
+bitmap fallback available without affecting the released atlas. Both requests
+share the HUD's disposal signal. No additional animation loop or click listener
+is created during updates.
+
+`factory-sign-validation.json` records the supplemental hashes and transparent
+edges. Focused tests check the accented glyph cells against the measured safe
+face, independent bridge availability, both PORTO arrows, stable callbacks,
+lazy loading, hidden actions and procedural fallbacks. Repacking the original
+seven cached Blender renders with the extended packager still reproduces the
+released atlas and manifest byte-for-byte.

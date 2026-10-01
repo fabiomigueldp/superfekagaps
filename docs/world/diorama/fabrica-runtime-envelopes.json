@@ -1,0 +1,367 @@
+{
+  "units": "Sprite/frame and HUD measurements use CSS pixels, independent of devicePixelRatio. Normalized coordinates use the full 1920×1200 exported image, x right and y down. Bounds are relative to the foot anchor.",
+  "scope": "Five stage selections, opening factors 0.84 and 1, fitted close/panorama targets. Does not claim a universal bound over arbitrary tiny viewports or resize/camera interpolation transients.",
+  "formula": "S=min(viewportWidth/1.6,viewportHeight)*camera.zoom; x CSS pixels divide by 1.6*S and y CSS pixels by S. Use rasterGridBoundsFromFootNormalized for precisely anchored camera-ray tests; reportedEnvelopeNormalized is a padded width/height summary.",
+  "support": "Blender support/headroom audits are separate world-space checks. Their 0.52-unit support footprint must not be equated with this camera-facing 16×26 sprite grid.",
+  "source": "public/assets/world/map/fabrica-diorama.meta.json",
+  "metadataSha256": "5cef59dc45724b19c443231049e25d7f2bf7b9909f6e125d7326ed557d8e0dd5",
+  "artBoundsUsed": {
+    "top": 0.163333,
+    "bottom": 0.898333
+  },
+  "sourceScript": "tools/diorama/measure_fabrica_envelopes.ts",
+  "profiles": [
+    {
+      "profile": "desktop",
+      "width": 1180,
+      "height": 757,
+      "headerBottom": 94,
+      "footerTop": 563,
+      "hudInsetsCssPx": {
+        "top": 108,
+        "bottom": 206
+      },
+      "mode": "close",
+      "selectedStage": "3-1",
+      "opening": 1,
+      "normalized": {
+        "left": -0.010058708564247468,
+        "right": 0.010940141788949564,
+        "top": -0.0504387200582471,
+        "bottom": 0.0022398773710076837
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.8172360229492188
+    },
+    {
+      "profile": "desktop",
+      "width": 1180,
+      "height": 757,
+      "headerBottom": 94,
+      "footerTop": 563,
+      "hudInsetsCssPx": {
+        "top": 108,
+        "bottom": 206
+      },
+      "mode": "panorama",
+      "selectedStage": "3-1",
+      "opening": 1,
+      "normalized": {
+        "left": -0.012266717761277399,
+        "right": 0.013341636327987273,
+        "top": -0.06151063421737451,
+        "bottom": 0.0027315577695215657
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.6701335388183594
+    },
+    {
+      "profile": "browser-desktop",
+      "width": 1181,
+      "height": 757,
+      "headerBottom": 94,
+      "footerTop": 563,
+      "hudInsetsCssPx": {
+        "top": 108,
+        "bottom": 206
+      },
+      "mode": "close",
+      "selectedStage": "3-1",
+      "opening": 1,
+      "normalized": {
+        "left": -0.010058657808513366,
+        "right": 0.010940086585548042,
+        "top": -0.050438465547019605,
+        "bottom": 0.002239866068699884
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.8165481567382813
+    },
+    {
+      "profile": "browser-desktop",
+      "width": 1181,
+      "height": 757,
+      "headerBottom": 94,
+      "footerTop": 563,
+      "hudInsetsCssPx": {
+        "top": 108,
+        "bottom": 206
+      },
+      "mode": "panorama",
+      "selectedStage": "3-1",
+      "opening": 1,
+      "normalized": {
+        "left": -0.012266655864040691,
+        "right": 0.013341569006765905,
+        "top": -0.061510323837828784,
+        "bottom": 0.002731543986219371
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.6695694885253907
+    },
+    {
+      "profile": "portrait",
+      "width": 400,
+      "height": 606,
+      "headerBottom": 92,
+      "footerTop": 425,
+      "hudInsetsCssPx": {
+        "top": 106,
+        "bottom": 193
+      },
+      "mode": "close",
+      "selectedStage": "3-1",
+      "opening": 0.84,
+      "normalized": {
+        "left": -0.023095238095238092,
+        "right": 0.025119047619047617,
+        "top": -0.1158095238095238,
+        "bottom": 0.0051428571428571435
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 1.05
+    },
+    {
+      "profile": "portrait",
+      "width": 400,
+      "height": 606,
+      "headerBottom": 92,
+      "footerTop": 425,
+      "hudInsetsCssPx": {
+        "top": 106,
+        "bottom": 193
+      },
+      "mode": "panorama",
+      "selectedStage": "3-1",
+      "opening": 0.84,
+      "normalized": {
+        "left": -0.028164924506387915,
+        "right": 0.03063298490127758,
+        "top": -0.14123112659698026,
+        "bottom": 0.0062717770034843206
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.861
+    },
+    {
+      "profile": "landscape",
+      "width": 846,
+      "height": 392,
+      "headerBottom": 68,
+      "footerTop": 307,
+      "hudInsetsCssPx": {
+        "top": 82,
+        "bottom": 97
+      },
+      "mode": "close",
+      "selectedStage": "3-1",
+      "opening": 1,
+      "normalized": {
+        "left": -0.02092010430026678,
+        "right": 0.022753309316269538,
+        "top": -0.10490246115102847,
+        "bottom": 0.004658497452430541
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.7392678833007813
+    },
+    {
+      "profile": "landscape",
+      "width": 846,
+      "height": 392,
+      "headerBottom": 68,
+      "footerTop": 307,
+      "hudInsetsCssPx": {
+        "top": 82,
+        "bottom": 97
+      },
+      "mode": "panorama",
+      "selectedStage": "3-1",
+      "opening": 1,
+      "normalized": {
+        "left": -0.02551232231739851,
+        "right": 0.027747938190572606,
+        "top": -0.12792983067198593,
+        "bottom": 0.005681094454183587
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.6061996643066406
+    },
+    {
+      "profile": "compact-boundary",
+      "width": 640,
+      "height": 606,
+      "headerBottom": 92,
+      "footerTop": 425,
+      "hudInsetsCssPx": {
+        "top": 106,
+        "bottom": 193
+      },
+      "mode": "close",
+      "selectedStage": "3-1",
+      "opening": 0.84,
+      "normalized": {
+        "left": -0.014514501130511415,
+        "right": 0.01578639040483458,
+        "top": -0.07278199329773972,
+        "bottom": 0.0032320950971035734
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 1.044214324951172
+    },
+    {
+      "profile": "compact-boundary",
+      "width": 640,
+      "height": 606,
+      "headerBottom": 92,
+      "footerTop": 425,
+      "hudInsetsCssPx": {
+        "top": 106,
+        "bottom": 193
+      },
+      "mode": "panorama",
+      "selectedStage": "3-1",
+      "opening": 0.84,
+      "normalized": {
+        "left": -0.017700611134770016,
+        "right": 0.019251695615651924,
+        "top": -0.0887585284118777,
+        "bottom": 0.003941579386711675
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.8562557464599609
+    },
+    {
+      "profile": "desktop-boundary",
+      "width": 641,
+      "height": 606,
+      "headerBottom": 92,
+      "footerTop": 425,
+      "hudInsetsCssPx": {
+        "top": 106,
+        "bottom": 193
+      },
+      "mode": "close",
+      "selectedStage": "3-1",
+      "opening": 0.84,
+      "normalized": {
+        "left": -0.01732212145628682,
+        "right": 0.018840039315858346,
+        "top": -0.08686061728183413,
+        "bottom": 0.0038572971490288188
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.8736
+    },
+    {
+      "profile": "desktop-boundary",
+      "width": 641,
+      "height": 606,
+      "headerBottom": 92,
+      "footerTop": 425,
+      "hudInsetsCssPx": {
+        "top": 106,
+        "bottom": 193
+      },
+      "mode": "panorama",
+      "selectedStage": "3-1",
+      "opening": 0.84,
+      "normalized": {
+        "left": -0.02112453836132539,
+        "right": 0.022975657702266276,
+        "top": -0.10592758205101722,
+        "bottom": 0.004704020913449779
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.716352
+    },
+    {
+      "profile": "editor",
+      "width": 506,
+      "height": 392,
+      "headerBottom": 59,
+      "footerTop": 270,
+      "hudInsetsCssPx": {
+        "top": 73,
+        "bottom": 134
+      },
+      "mode": "close",
+      "selectedStage": "3-2",
+      "opening": 1,
+      "normalized": {
+        "left": -0.028388784069053753,
+        "right": 0.03087646102355846,
+        "top": -0.14235365537306954,
+        "bottom": 0.00632162614321197
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.6752652888436045
+    },
+    {
+      "profile": "editor",
+      "width": 506,
+      "height": 392,
+      "headerBottom": 59,
+      "footerTop": 270,
+      "hudInsetsCssPx": {
+        "top": 73,
+        "bottom": 134
+      },
+      "mode": "panorama",
+      "selectedStage": "3-2",
+      "opening": 1,
+      "normalized": {
+        "left": -0.03462046837689482,
+        "right": 0.03765422076043715,
+        "top": -0.1736020187476458,
+        "bottom": 0.007709300174648745
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.5537175368517556
+    },
+    {
+      "profile": "narrow-portrait",
+      "width": 320,
+      "height": 568,
+      "headerBottom": 92,
+      "footerTop": 377,
+      "hudInsetsCssPx": {
+        "top": 106,
+        "bottom": 203
+      },
+      "mode": "close",
+      "selectedStage": "3-1",
+      "opening": 0.84,
+      "normalized": {
+        "left": -0.028869047619047617,
+        "right": 0.03139880952380952,
+        "top": -0.14476190476190476,
+        "bottom": 0.006428571428571429
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 1.05
+    },
+    {
+      "profile": "narrow-portrait",
+      "width": 320,
+      "height": 568,
+      "headerBottom": 92,
+      "footerTop": 377,
+      "hudInsetsCssPx": {
+        "top": 106,
+        "bottom": 203
+      },
+      "mode": "panorama",
+      "selectedStage": "3-1",
+      "opening": 0.84,
+      "normalized": {
+        "left": -0.035206155632984903,
+        "right": 0.03829123112659698,
+        "top": -0.1765389082462253,
+        "bottom": 0.007839721254355402
+      },
+      "actorScale": 1.15,
+      "cameraZoom": 0.861
+    }
+  ]
+}

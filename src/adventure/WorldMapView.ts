@@ -3,10 +3,12 @@ import { isUnlocked } from './progress';
 import type { AdventureSave } from './types';
 import { clampMapSelection, getMapCamera, mapToScreen, moveMapSelection, type MapCamera, type MapPoint } from './WorldMapModel';
 import { COSTA_ART_BOUNDS, fallbackMapMetadata, frameMapPins, mapActorScale, mapAssetPrefix, paintMapActor, paintMapIsland, paintMapSea, parseMapMetadata, type MapArtAssets, type MapArtMetadata } from './WorldMapArt';
-import { WorldMapHud, type WorldMapMotionState } from './WorldMapHud';
-import { COAST_PORT_PLACEMENTS, getAtlasCamera, atlasTravelWindow, localToAtlas } from './WorldAtlasModel';
+import { WorldMapHud, WORLD_MAP_TRAVEL_ACTIONS, WORLD_MAP_TRAVEL_ACTION_IDS,
+    type WorldMapMotionState, type WorldMapHudPoint, type WorldMapTravelActionId } from './WorldMapHud';
+import { WORLD_ATLAS_PLACEMENTS, getAtlasCamera, atlasTravelWindow, localToAtlas } from './WorldAtlasModel';
 import { atlasActorScale, atlasBoatBounds, paintWorldAtlas, type AtlasBoat, type AtlasIslandLayer } from './WorldAtlasArt';
-import { buildJourneyNetwork, parseJourneyBoat, parseJourneyConnection, type JourneyBoatMetadata, type JourneyConnection } from './WorldJourneyNetwork';
+import { buildJourneyNetwork, parseJourneyBoat, parseJourneyConnection, parseJourneyBridge, PORT_FACTORY_BRIDGE_EDGE,
+    type JourneyBoatMetadata, type JourneyConnection, type JourneyBridge } from './WorldJourneyNetwork';
 import { advanceJourney, canEnterJourney, createJourney, enterJourney, journeyBlockReason, journeyMode, returnToJourney, selectJourney, skipJourney, type JourneyCapabilities, type JourneyNetwork, type JourneyState } from './WorldJourneyModel';
 import { ART } from '../graphics/palette';
 
@@ -34,7 +36,7 @@ export function journeyPathSegment(points: readonly MapPoint[], progress: number
     }
     return Math.max(0, lengths.length - 1);
 }
-const placementFor = (world: number) => COAST_PORT_PLACEMENTS[world] ?? { origin: { x: 0, y: 0 }, scale: 1 };
+const placementFor = (world: number) => WORLD_ATLAS_PLACEMENTS[world] ?? { origin: { x: 0, y: 0 }, scale: 1 };
 
 export interface MapControlPlacement extends MapPoint { width: number; height: number }
 export interface MapControlBounds { left: number; top: number; right: number; bottom: number }
@@ -128,9 +130,14 @@ export class WorldMapView {
     private boatImage: HTMLImageElement | null = null;
     private readonly dockImages = new Map<number, HTMLImageElement>();
     private connectionActive = false;
+    private bridgeStatus: 'idle' | 'loading' | 'ready' | 'failed' = 'idle';
+    private bridge: JourneyBridge | null = null;
+    private readonly bridgeImages = new Map<'open' | 'closed', HTMLImageElement>();
+    private bridgeActive = false;
     private assetWarning = '';
     private boatHeadingIndex = -1;
     private boatHeadingAt = 0;
+    private mooredBoatWorld: 1 | 2 = 1;
     private readonly activeArt = new Map<number, CachedMapArt>();
     private journey: JourneyState | null = null;
     private network: JourneyNetwork = { nodes: {}, edges: [] };
@@ -198,8 +205,16 @@ export class WorldMapView {
     }
     private skip(): void {
         if (!this.journey) return;
-        this.journey = skipJourney(this.journey); this.paintDirty = true;
+        const before = this.journey;
+        this.journey = skipJourney(before); this.updateMooredBoat(before, this.journey); this.paintDirty = true;
         this.reportArrival(); this.refreshHud();
+    }
+    private updateMooredBoat(before: JourneyState, after: JourneyState): void {
+        const nextLeg = after.legs[0];
+        for (const leg of before.legs) {
+            if (nextLeg?.id === leg.id) break;
+            if (leg.id === 'coast-port-sail') this.mooredBoatWorld = leg.direction === 1 ? 2 : 1;
+        }
     }
     private readonly onKey = (event: KeyboardEvent) => {
         if (!this.visible || event.defaultPrevented || !this.hud.regionMenu.hidden || event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
@@ -218,24 +233,38 @@ export class WorldMapView {
     };
     private loadImage(path: string): Promise<HTMLImageElement | null> {
         return new Promise(resolve => {
+            if (this.abort.signal.aborted) { resolve(null); return; }
             const image = new Image(); image.decoding = 'async';
-            const finish = (result: HTMLImageElement | null) => { image.onload = null; image.onerror = null; resolve(result); };
+            const finish = (result: HTMLImageElement | null) => {
+                image.onload = null; image.onerror = null; this.abort.signal.removeEventListener('abort', aborted); resolve(result);
+            };
+            const aborted = () => finish(null);
+            this.abort.signal.addEventListener('abort', aborted, { once: true });
             image.onload = () => finish(image); image.onerror = () => finish(null); image.src = path;
         });
     }
     private ensureWorld(world: number): void {
         if (this.artCache.has(world)) return;
-        const cached: CachedMapArt = { assets: EMPTY_ART(), metadata: fallbackMapMetadata(world), status: world <= 2 ? 'loading' : 'ready' };
+        const cached: CachedMapArt = { assets: EMPTY_ART(), metadata: fallbackMapMetadata(world), status: world <= 3 ? 'loading' : 'ready' };
         this.artCache.set(world, cached);
-        if (world <= 2) this.pairLoads.set(world, this.loadAssets(world, cached));
+        if (world <= 3) this.pairLoads.set(world, this.loadAssets(world, cached));
     }
     private ensureArt(world: number): void {
-        if (world <= 2) { this.ensureWorld(world); this.ensureWorld(world === 1 ? 2 : 1); if (this.connectionStatus === 'idle') void this.loadConnection(); }
+        if (world <= 3) {
+            this.ensureWorld(1); this.ensureWorld(2);
+            if (this.connectionStatus === 'idle') void this.loadConnection();
+            // The third island is explicit lazy content, never a recursive
+            // consequence of Porto being Costa's neighboring scenery.
+            if (world === 3 || this.overview || (world === 2 && this.save && isUnlocked('3-1', this.save))) {
+                this.ensureWorld(3);
+                if (this.bridgeStatus === 'idle') void this.loadBridge();
+            }
+        }
         else this.ensureWorld(world);
     }
     private async loadAssets(world: number, cached: CachedMapArt): Promise<void> {
         const prefix = mapAssetPrefix((import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/');
-        const name = world === 1 ? 'costa-diorama' : 'porto-diorama';
+        const name = world === 1 ? 'costa-diorama' : world === 2 ? 'porto-diorama' : 'fabrica-diorama';
         const mainImage = this.loadImage(prefix + name + '.webp');
         const mainMetadata = fetch(prefix + name + '.meta.json', { signal: this.abort.signal })
             .then(response => response.ok ? response.json() : null).then(value => parseMapMetadata(value, world)).catch(() => null);
@@ -248,13 +277,24 @@ export class WorldMapView {
         });
         const [island, metadata] = await Promise.all([mainImage, mainMetadata]);
         if (this.abort.signal.aborted) return;
-        cached.status = island && metadata ? 'ready' : 'failed';
-        if (island && metadata) { cached.assets.island = island; cached.metadata = metadata; }
+        const matchingPair = island && metadata && (world !== 3 || (island.naturalWidth === 1920 && island.naturalHeight === 1200));
+        cached.status = matchingPair ? 'ready' : 'failed';
+        if (matchingPair) { cached.assets.island = island; cached.metadata = metadata; }
         else this.assetWarning = 'A travessia visual não carregou. As fases continuam disponíveis pelo arquipélago.';
         this.geometryDirty = true; this.paintDirty = true;
     }
-    private crossingFailed(): boolean {
-        return this.connectionStatus === 'failed' || [1, 2].some(world => this.artCache.get(world)?.status === 'failed');
+    private crossingFailed(from: number, to: number): boolean {
+        const low = Math.min(from, to), high = Math.max(from, to);
+        return (low === 1 && high >= 2 && (this.connectionStatus === 'failed' || [1, 2].some(world => this.artCache.get(world)?.status === 'failed'))) ||
+            (low <= 2 && high === 3 && (this.bridgeStatus === 'failed' || [2, 3].some(world => this.artCache.get(world)?.status === 'failed'))) ||
+            // A previous regional fallback can leave Feka opposite the ferry.
+            // Keep that recovery usable without boarding an absent vessel.
+            (low === 1 && high <= 3 && this.mooredBoatWorld !== (from === 1 ? 1 : 2));
+    }
+    private crossingLoading(from: number, to: number): boolean {
+        const low = Math.min(from, to), high = Math.max(from, to);
+        return (low === 1 && high >= 2 && this.connectionStatus === 'loading') ||
+            (low <= 2 && high === 3 && this.bridgeStatus === 'loading');
     }
     private async loadConnection(): Promise<void> {
         this.connectionStatus = 'loading';
@@ -278,6 +318,28 @@ export class WorldMapView {
             } else this.connectionStatus = 'failed';
         } else this.connectionStatus = 'failed';
         if (this.connectionStatus === 'failed') this.assetWarning = 'A travessia visual não carregou. As fases continuam disponíveis pelo arquipélago.';
+        this.geometryDirty = true; this.paintDirty = true;
+    }
+    private async loadBridge(): Promise<void> {
+        this.bridgeStatus = 'loading';
+        const prefix = mapAssetPrefix((import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/');
+        const request = fetch(prefix + 'port-factory-bridge.meta.json', { signal: this.abort.signal })
+            .then(response => response.ok ? response.json() : null).catch(() => null);
+        const [raw] = await Promise.all([request, this.pairLoads.get(2), this.pairLoads.get(3)]);
+        if (this.abort.signal.aborted) return;
+        const port = this.artCache.get(2), factory = this.artCache.get(3);
+        const bridge = port?.status === 'ready' && factory?.status === 'ready'
+            ? parseJourneyBridge(raw, port.metadata, factory.metadata, { 2: placementFor(2), 3: placementFor(3) }) : null;
+        if (bridge) {
+            const states = ['open', 'closed'] as const;
+            const images = await Promise.all(states.map(state => this.loadImage(prefix + bridge.overlays[state].path.slice('/assets/world/map/'.length))));
+            if (this.abort.signal.aborted) return;
+            if (images.every((image, index) => image && image.naturalWidth === bridge.overlays[states[index]].width &&
+                image.naturalHeight === bridge.overlays[states[index]].height)) {
+                this.bridge = bridge; states.forEach((state, index) => this.bridgeImages.set(state, images[index]!)); this.bridgeStatus = 'ready';
+            } else this.bridgeStatus = 'failed';
+        } else this.bridgeStatus = 'failed';
+        if (this.bridgeStatus === 'failed') this.assetWarning = 'A ponte de carga não carregou. As fases continuam disponíveis pelo arquipélago.';
         this.geometryDirty = true; this.paintDirty = true;
     }
     show(time: number): void {
@@ -308,8 +370,10 @@ export class WorldMapView {
             this.activeArt.set(world, cached ? { ...cached, assets: { ...cached.assets } } : { metadata: fallbackMapMetadata(world), assets: EMPTY_ART(), status: 'ready' });
         }
         this.connectionActive = this.connectionStatus === 'ready' && [1, 2].every(world => this.activeArt.get(world)?.status === 'ready');
+        this.bridgeActive = this.bridgeStatus === 'ready' && [2, 3].every(world => this.activeArt.get(world)?.status === 'ready');
         this.network = buildJourneyNetwork({ islands: [...this.activeArt].map(([world, art]) => ({ world, metadata: art.metadata, placement: placementFor(world), ready: !!art.assets.island })),
-            secrets: this.save?.secrets ?? [], connection: this.connection, connectionReady: this.connectionActive });
+            secrets: this.save?.secrets ?? [], connection: this.connection, connectionReady: this.connectionActive,
+            bridge: this.bridge, bridgeReady: this.bridgeActive, bridgeOpen: !!this.save && isUnlocked('3-1', this.save) });
         this.geometryDirty = false;
     }
     private requestDestination(selection: number): void {
@@ -318,9 +382,15 @@ export class WorldMapView {
         if (this.journey.selected === id && this.selection === selection && !this.journey.blocked) return;
         this.ensureArt(world); this.selection = selection;
         // Regions beyond this slice retain their existing menu handoff. No sea route is fabricated.
-        if (world !== currentWorld && (world > 2 || currentWorld > 2 || this.crossingFailed()) && this.capabilities.availableStages.includes(id))
+        if (world !== currentWorld && !this.journey.destination &&
+            (world > 3 || currentWorld > 3 || this.crossingFailed(currentWorld, world)) && this.capabilities.availableStages.includes(id))
             this.journey = createJourney(id, this.network, this.capabilities);
-        else this.journey = selectJourney(this.journey, id, this.network, this.capabilities, { reducedMotion: this.media.matches });
+        else {
+            this.journey = selectJourney(this.journey, id, this.network, this.capabilities);
+            if (this.media.matches) {
+                const before = this.journey; this.journey = skipJourney(before); this.updateMooredBoat(before, this.journey);
+            }
+        }
         this.paintDirty = true; this.reportArrival();
     }
     private reportArrival(): void {
@@ -340,7 +410,10 @@ export class WorldMapView {
             seals: Array.from({ length: 5 }, (_, n) => this.save!.seals.filter(id => id.startsWith(`${world}-${n + 1}:`)).length),
             globalProgress: { completed: this.save.completed.length, seals: this.save.seals.length },
             motionState: this.motionState(), canEnter: canEnterJourney(this.journey, this.capabilities),
-            hint: this.journey.blocked === 'no-route' && this.connectionStatus === 'loading' ? 'Preparando o barco e os cais… Você pode escolher outra fase ou voltar ao menu.' : journeyBlockReason(this.journey) || (this.save.secrets.includes(`${world}-3`) ? 'Atalho 3 → 5 descoberto!' : ''),
+            hint: this.journey.blocked === 'no-route' && this.crossingLoading(worldOf(this.journey.arrived), world)
+                ? world === 3 ? 'Preparando a ponte de carga… Você pode escolher outra fase ou voltar ao menu.'
+                    : 'Preparando o barco e os cais… Você pode escolher outra fase ou voltar ao menu.'
+                : journeyBlockReason(this.journey) || (this.save.secrets.includes(`${world}-3`) ? 'Atalho 3 → 5 descoberto!' : ''),
             warnings: [toast || warning, this.assetWarning], worldAvailability: Array.from({ length: 6 }, (_, n) => isUnlocked(`${n + 1}-1`, this.save!)),
             preview: !!this.journey.blocked, overview: this.overview,
         });
@@ -361,7 +434,7 @@ export class WorldMapView {
         this.show(time); this.save = save; this.controlSelection = clampMapSelection(selection);
         this.capabilities = { availableStages: STAGES.filter(stage => isUnlocked(stage.id, save)).map(stage => stage.id) };
         this.ensureArt(STAGES[this.controlSelection].world); this.ensureArt(worldOf(returned?.playedStage ?? save.selected));
-        const progressSignature = save.secrets.join(',');
+        const progressSignature = `${save.secrets.join(',')}:${isUnlocked('3-1', save)}`;
         if (this.lastSignature.split('|')[0] !== progressSignature) this.geometryDirty = true;
         if (this.geometryDirty && !this.journey?.destination) {
             const previous = this.journey; this.rebuildNetwork();
@@ -369,14 +442,16 @@ export class WorldMapView {
             this.selection = -1;
         }
         if (!this.journey || returned) {
-            this.journey = returned ? returnToJourney(returned.playedStage, returned.nextSelected, this.network, this.capabilities, { reducedMotion: this.media.matches })
+            this.mooredBoatWorld = worldOf(returned?.playedStage ?? save.selected) === 1 ? 1 : 2;
+            this.journey = returned ? returnToJourney(returned.playedStage, returned.nextSelected, this.network, this.capabilities)
                 : createJourney(save.selected, this.network, this.capabilities);
             this.reportedArrival = save.selected; this.selection = -1;
         }
         this.requestDestination(this.controlSelection);
         const dt = Math.max(0, Math.min(100, time - this.lastTime)); this.lastTime = time;
-        const previous = this.journey.point;
-        this.journey = advanceJourney(this.journey, dt / 1000, this.media.matches);
+        const previousState = this.journey, previous = previousState.point;
+        this.journey = advanceJourney(previousState, dt / 1000, this.media.matches);
+        this.updateMooredBoat(previousState, this.journey);
         this.marker = this.journey.point;
         if (Math.abs(previous.x - this.marker.x) > 1e-8) this.facingLeft = this.marker.x < previous.x;
         this.reportArrival(); this.refreshHud(warning, toast);
@@ -384,8 +459,8 @@ export class WorldMapView {
         const signature = `${progressSignature}|${this.controlSelection}|${save.completed.join(',')}|${save.seals.join(',')}|${warning}|${toast}|${this.overview}|${this.journey.arrived}|${this.journey.destination}|${this.journey.blocked}`;
         if (this.media.matches && !this.paintDirty && !this.geometryDirty && signature === this.lastSignature) return;
         this.lastSignature = signature;
-        const stage = STAGES[this.controlSelection], actualWorld = worldOf(this.journey.arrived);
-        const connected = stage.world <= 2 && actualWorld <= 2;
+        const stage = STAGES[this.controlSelection];
+        const connected = stage.world <= 3;
         this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0); this.ctx.imageSmoothingEnabled = true;
         if (connected) this.paintAtlas(stage.world, save, time, dt);
         else this.paintSingle(stage.world, save, time);
@@ -394,9 +469,9 @@ export class WorldMapView {
     private currentBoat(): AtlasBoat | undefined {
         if (!this.connectionActive || !this.connection || !this.boatMetadata || !this.boatImage) return;
         const active = this.journey!.legs[0];
-        let world = worldOf(this.journey!.arrived) as 1 | 2;
-        if (active && active.mode !== 'sail') world = worldOf(active.from) as 1 | 2;
-        if (world !== 1 && world !== 2) world = 1;
+        // Only an actual sea crossing changes the ferry berth. A regional art
+        // fallback or a locked preview cannot move an otherwise healthy boat.
+        const world = this.mooredBoatWorld;
         const dock = this.connection.docks[world];
         let frame = this.boatMetadata.frames[dock.berth.headingFrame], foot = localToAtlas(dock.berth.passenger, placementFor(world));
         if (active?.mode === 'sail') {
@@ -417,26 +492,38 @@ export class WorldMapView {
         return { foot, frame, assets: { rear: this.boatImage, foreground: this.boatImage } };
     }
     private paintAtlas(world: number, save: AdventureSave, time: number, dt: number): void {
-        const islands: AtlasIslandLayer[] = ([1, 2] as const).map(id => ({ world: id, metadata: this.activeArt.get(id)!.metadata,
+        const ids = [1, 2, ...(world === 3 || this.activeArt.get(3)?.assets.island ? [3] : [])];
+        const islands: AtlasIslandLayer[] = ids.map(id => ({ world: id, metadata: this.activeArt.get(id)!.metadata,
             placement: placementFor(id), assets: this.activeArt.get(id)!.assets, completed: save.completed, secret: save.secrets.includes(`${id}-3`),
-            ...(this.connectionActive && this.connection ? { overlay: { ...this.connection.docks[id].overlay, image: this.dockImages.get(id)! } } : {}) }));
-        const active = this.journey!.legs[0], channel = active?.mode === 'board' || active?.mode === 'sail';
+            ...(this.connectionActive && this.connection && (id === 1 || id === 2)
+                ? { overlay: { ...this.connection.docks[id].overlay, image: this.dockImages.get(id)! } } : {}),
+            ...(this.bridgeActive && this.bridge && (id === 2 || id === 3)
+                ? { approachBounds: [this.bridge.landings[id].approachBounds] } : {}) }));
+        const actorInAtlas = worldOf(this.journey!.arrived) <= 3;
+        const active = actorInAtlas ? this.journey!.legs[0] : undefined, onBridge = active?.id === PORT_FACTORY_BRIDGE_EDGE;
+        const channel = active?.mode === 'board' || active?.mode === 'sail' || onBridge;
         const activeWorld = active && active.mode !== 'sail' ? worldOf(active.from) : world;
         const boat = this.currentBoat();
         // A region preview frames that region. Feka and a moored boat may remain
         // offscreen on the origin island until a real trip begins or we return.
-        const trackJourney = !!this.journey!.destination || this.overview || worldOf(this.journey!.arrived) === activeWorld;
-        const trackedBoat = trackJourney ? boat : undefined;
-        const waterRoute = this.connection?.sailRoute ?? active?.points ?? [];
-        const travelPoints = channel ? this.width < 600 ? atlasTravelWindow(waterRoute, this.marker) : waterRoute : undefined;
+        const trackJourney = actorInAtlas && (!!this.journey!.destination || this.overview || worldOf(this.journey!.arrived) === activeWorld);
+        const trackedBoat = trackJourney && (this.overview || active?.mode === 'sail' || active?.mode === 'board' || (!onBridge && activeWorld <= 2)) ? boat : undefined;
+        const travelRoute = onBridge ? this.bridge?.bridgeRoute ?? active.points : this.connection?.sailRoute ?? active?.points ?? [];
+        const travelPoints = channel ? this.width < 600 ? atlasTravelWindow(travelRoute, this.marker) : travelRoute : undefined;
+        const bridgeState = isUnlocked('3-1', save) ? 'open' : 'closed';
+        const overlay = this.bridgeActive && this.bridge ? this.bridge.overlays[bridgeState] : null;
+        const connectionBounds = overlay ? [{ left: overlay.left, top: overlay.top,
+            right: overlay.left + overlay.widthInMap, bottom: overlay.top + overlay.heightInMap }] : [];
         const target = getAtlasCamera({ mode: this.overview ? 'overview' : channel ? 'channel' : 'island', activeWorld,
             layers: islands, width: this.width, height: this.height, insets: { ...this.frameInsets, left: 16, right: 16 },
             focus: trackJourney ? this.marker : undefined,
-            travelPoints, focusBounds: trackedBoat ? [atlasBoatBounds(trackedBoat.foot, trackedBoat.frame)] : undefined });
+            travelPoints, connectionBounds, focusBounds: trackedBoat ? [atlasBoatBounds(trackedBoat.foot, trackedBoat.frame)] : undefined });
         this.camera = this.blendAtlasCamera(target, dt, trackedBoat);
         const aboard = active?.mode === 'sail' || (active?.mode === 'board' && active.progress > .45);
         paintWorldAtlas(this.ctx, { camera: this.camera, time, reducedMotion: this.media.matches, islands,
-            actor: { point: this.marker, walking: !!active && active.mode !== 'sail', facingLeft: this.facingLeft, aboard }, boat });
+            connections: overlay ? [{ ...overlay, image: this.bridgeImages.get(bridgeState)! }] : [],
+            actor: { point: this.marker, walking: !!active && active.mode !== 'sail', facingLeft: this.facingLeft, aboard,
+                visible: actorInAtlas }, boat });
         this.positionNodes(world, channel || activeWorld !== world, boat);
     }
     private blendAtlasCamera(target: MapCamera, dt: number, boat?: AtlasBoat): MapCamera {
@@ -484,20 +571,29 @@ export class WorldMapView {
             if (screen.x < 0 || screen.x > this.width || screen.y < this.frameInsets.top || screen.y > this.height - this.frameInsets.bottom) return null;
             return { x: screen.x + 36, y: screen.y };
         });
-        const docks = ([1, 2] as const).map(destination => {
-            if (hide || this.journey?.destination || world > 2 || !this.connectionActive || !this.connection) return null;
-            // Buttons name their destination, so each sign stands at the opposite departure dock.
-            const departure = destination === 1 ? 2 : 1;
-            const point = mapToScreen(localToAtlas(this.connection.docks[departure].dock, placementFor(departure)), this.camera);
-            return { ...point, visible: point.x > 8 && point.x < this.width - 8 && point.y > this.frameInsets.top && point.y < this.height - this.frameInsets.bottom,
-                available: !!this.save && isUnlocked(`${destination}-1`, this.save) };
-        });
+        const travel: Partial<Record<WorldMapTravelActionId, WorldMapHudPoint | null>> = {};
+        for (const id of WORLD_MAP_TRAVEL_ACTION_IDS) {
+            travel[id] = null;
+            if (hide || this.journey?.destination || world > 3) continue;
+            const action = WORLD_MAP_TRAVEL_ACTIONS[id], departure = action.fromWorld;
+            const anchor = action.mode === 'ferry' && this.connectionActive && this.connection && (departure === 1 || departure === 2)
+                ? this.connection.docks[departure].dock
+                : action.mode === 'bridge' && this.bridgeActive && this.bridge && (departure === 2 || departure === 3)
+                    ? this.bridge.landings[departure].landing : null;
+            if (!anchor) continue;
+            const point = mapToScreen(localToAtlas(anchor, placementFor(departure)), this.camera);
+            travel[id] = { ...point, visible: point.x > 8 && point.x < this.width - 8 && point.y > this.frameInsets.top && point.y < this.height - this.frameInsets.bottom,
+                available: !!this.save && isUnlocked(`${action.toWorld}-1`, this.save) };
+        }
         const visible = [...stages.map((point, n) => point ? { id: `stage:${world}-${n + 1}`, point, anchor: anchors[n], width: 56, height: 58 } : null),
-            ...docks.map((point, n) => point?.visible ? { id: `dock:${n + 1}`, point, anchor: { x: point.x, y: point.y }, width: 104, height: 56 } : null)].filter((entry): entry is NonNullable<typeof entry> => !!entry);
+            ...WORLD_MAP_TRAVEL_ACTION_IDS.map(id => {
+                const point = travel[id], { width, height } = WORLD_MAP_TRAVEL_ACTIONS[id];
+                return point?.visible ? { id, point, anchor: { x: point.x, y: point.y }, width, height } : null;
+            })].filter((entry): entry is NonNullable<typeof entry> => !!entry);
         const positions = layoutMapControls(visible.map(({ point, width, height }) => ({ ...point, width, height })),
             { left: 8, right: this.width - 8, top: this.frameInsets.top + 2, bottom: this.height - this.frameInsets.bottom - 2 },
             8, this.media.matches ? [] : visible.map(entry => this.controlOffsets.get(entry.id)));
-        const actor = mapToScreen(this.marker, this.camera), scale = world <= 2 ? atlasActorScale(this.camera, boat?.frame) : mapActorScale(this.camera);
+        const actor = mapToScreen(this.marker, this.camera), scale = world <= 3 ? atlasActorScale(this.camera, boat?.frame) : mapActorScale(this.camera);
         const obstacles = [{ left: actor.x - 10 * scale - 2, right: actor.x + 10 * scale + 2, top: actor.y - 28 * scale - 2, bottom: actor.y + 3 }];
         if (boat) {
             const bounds = atlasBoatBounds(boat.foot, boat.frame);
@@ -527,6 +623,7 @@ export class WorldMapView {
             }
             point.x = result.x; point.y = result.y;
         }
-        this.hud.positionNodes(stages, docks);
+        this.hud.positionNodes(stages);
+        this.hud.positionTravelActions(travel);
     }
 }

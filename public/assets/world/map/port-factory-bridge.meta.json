@@ -1,0 +1,139 @@
+{
+  "version": 1,
+  "connection": "port-factory-bridge",
+  "placements": {
+    "porto": {
+      "origin": {
+        "x": 1.1,
+        "y": -0.12
+      },
+      "scale": 1
+    },
+    "fabrica": {
+      "origin": {
+        "x": 1.98,
+        "y": 0.03
+      },
+      "scale": 1
+    }
+  },
+  "islands": {
+    "porto": {
+      "version": 1,
+      "island": "porto",
+      "size": {
+        "width": 1920,
+        "height": 1200
+      },
+      "join": {
+        "x": 0.665939,
+        "y": 0.689307,
+        "route": "3:4",
+        "from": "2-4",
+        "to": "2-5",
+        "segment": 0,
+        "t": 0.5
+      },
+      "landing": {
+        "x": 0.757176,
+        "y": 0.733503
+      },
+      "junctionToLanding": [
+        {
+          "x": 0.665939,
+          "y": 0.689307
+        },
+        {
+          "x": 0.757176,
+          "y": 0.733503
+        }
+      ],
+      "approachBounds": {
+        "left": 0.645525,
+        "top": 0.662426,
+        "right": 0.798368,
+        "bottom": 0.897764
+      }
+    },
+    "fabrica": {
+      "version": 1,
+      "island": "fabrica",
+      "size": {
+        "width": 1920,
+        "height": 1200
+      },
+      "join": {
+        "x": 0.210478,
+        "y": 0.568483,
+        "node": "3-1"
+      },
+      "landing": {
+        "x": 0.14503,
+        "y": 0.62099
+      },
+      "junctionToLanding": [
+        {
+          "x": 0.210478,
+          "y": 0.568483
+        },
+        {
+          "x": 0.191478,
+          "y": 0.599368
+        },
+        {
+          "x": 0.170624,
+          "y": 0.633266
+        },
+        {
+          "x": 0.14503,
+          "y": 0.62099
+        }
+      ],
+      "approachBounds": {
+        "left": 0.119445,
+        "top": 0.552912,
+        "right": 0.244425,
+        "bottom": 0.761411
+      }
+    }
+  },
+  "bridgeRoute": {
+    "coordinateSystem": "atlas",
+    "points": [
+      {
+        "x": 1.857176,
+        "y": 0.613503
+      },
+      {
+        "x": 2.12503,
+        "y": 0.65099
+      }
+    ],
+    "durationSeconds": 3.2
+  },
+  "overlays": {
+    "open": {
+      "path": "/assets/world/map/port-factory-bridge-open.webp",
+      "width": 890,
+      "height": 282,
+      "left": 1.756354167,
+      "top": 0.551666667,
+      "widthInMap": 0.463541667,
+      "heightInMap": 0.235,
+      "bytes": 41560,
+      "sha256": "4d91b67d9ece26fc3f9445c02c211be4d11ce48a2d7d735215f96c348f958c09"
+    },
+    "closed": {
+      "path": "/assets/world/map/port-factory-bridge-closed.webp",
+      "width": 890,
+      "height": 626,
+      "left": 1.756354167,
+      "top": 0.265,
+      "widthInMap": 0.463541667,
+      "heightInMap": 0.521666667,
+      "bytes": 50966,
+      "sha256": "c6cd182a4c5d29702367187ddd028862c87f31a47c6581ac00001a571cc6a0eb"
+    }
+  },
+  "source": "Original lowered cargo-bridge transition in docs/world/campanha.md:66. Local prototype authored in Blender; existing phase nodes/routes and Costa\u2194Porto placements preserved."
+}

@@ -12,12 +12,17 @@ export interface AtlasIslandLayer extends AtlasIslandDescriptor {
 export interface AtlasIslandOverlay extends AtlasOverlayBounds {
     image: CanvasImageSource | null;
 }
+/** A connection spans fixed island placements and is already in atlas space. */
+export interface AtlasConnectionOverlay extends AtlasOverlayBounds {
+    image: CanvasImageSource | null;
+}
 export interface AtlasActor {
     point: MapPoint;
     walking: boolean;
     facingLeft: boolean;
     /** During boarding the actor can walk independently of the moored boat. */
     aboard: boolean;
+    visible?: boolean;
 }
 export interface BoatAtlasCrop { x: number; y: number; w: number; h: number }
 export interface BoatAtlasFrame {
@@ -49,6 +54,7 @@ export interface AtlasPaintState {
     time: number;
     reducedMotion: boolean;
     islands: readonly AtlasIslandLayer[];
+    connections?: readonly AtlasConnectionOverlay[];
     actor: AtlasActor;
     boat?: AtlasBoat;
 }
@@ -112,6 +118,13 @@ export function paintWorldAtlas(c: CanvasRenderingContext2D, state: AtlasPaintSt
             c.drawImage(overlay.image, top.x, top.y, bottom.x - top.x, bottom.y - top.y);
         }
     }
+    for (const overlay of state.connections ?? []) {
+        if (!overlay.image || ![overlay.left, overlay.top, overlay.widthInMap, overlay.heightInMap].every(Number.isFinite) ||
+            overlay.widthInMap <= 0 || overlay.heightInMap <= 0) continue;
+        const top = mapToScreen({ x: overlay.left, y: overlay.top }, state.camera);
+        const bottom = mapToScreen({ x: overlay.left + overlay.widthInMap, y: overlay.top + overlay.heightInMap }, state.camera);
+        c.drawImage(overlay.image, top.x, top.y, bottom.x - top.x, bottom.y - top.y);
+    }
     const boat = state.boat;
     // An incomplete or unavailable atlas never becomes a placeholder drawing.
     const hasBoat = !!boat?.assets.rear && validFrame(boat.frame);
@@ -119,7 +132,7 @@ export function paintWorldAtlas(c: CanvasRenderingContext2D, state: AtlasPaintSt
         paintBoatLayer(c, state.camera, boat, false);
         if (!state.actor.aboard) paintBoatLayer(c, state.camera, boat, true);
     }
-    paintMapActor(c, { camera: state.camera, marker: state.actor.point, time: state.time,
+    if (state.actor.visible !== false) paintMapActor(c, { camera: state.camera, marker: state.actor.point, time: state.time,
         reducedMotion: state.reducedMotion, walking: state.actor.walking, facingLeft: state.actor.facingLeft,
         scale: atlasActorScale(state.camera, boat && validFrame(boat.frame) ? boat.frame : undefined),
         shadow: !state.actor.aboard || !hasBoat });

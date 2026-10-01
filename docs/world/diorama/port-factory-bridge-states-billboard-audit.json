@@ -1,0 +1,21 @@
+{
+  "status": "prototype geometry only",
+  "billboardContract": "WorldAtlasArt.ts atlasActorScale: 16\u00d726 original Feka at 3\u00d7 pixels in boat frame 384px / orthoScale4.15. Fixed world envelope: width0.51875, projected height0.842969. Samples five widths and six body heights every\u22640.08 world unit.",
+  "loweredCrossing": {
+    "sampleCount": 3990,
+    "upperBodyContactCount": 0,
+    "lowerBodyContactCount": 0,
+    "upperBodyContacts": [],
+    "lowerBodyContacts": []
+  },
+  "raisedAngleDegrees": 70,
+  "raisedOriginalPortRoutesNewBridgeContacts": {
+    "sampleCount": 11220,
+    "upperBodyContactCount": 0,
+    "lowerBodyContactCount": 0,
+    "upperBodyContacts": [],
+    "lowerBodyContacts": []
+  },
+  "movingObjectCount": 30,
+  "limitation": "Runtime/browser interaction, walk frame raster edges, collision gating and lowering animation are not part of this prototype. Low-body contacts are reported, not silently dismissed."
+}

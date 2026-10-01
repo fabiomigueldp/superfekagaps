@@ -1,4 +1,4 @@
-import { COAST_PORT_PLACEMENTS, localToAtlas, type AtlasPlacement } from './WorldAtlasModel';
+import { COAST_PORT_PLACEMENTS, localToAtlas, type AtlasBounds, type AtlasPlacement } from './WorldAtlasModel';
 import type { BoatAtlasFrame } from './WorldAtlasArt';
 import type { MapArtMetadata } from './WorldMapArt';
 import type { MapPoint } from './WorldMapModel';
@@ -21,6 +21,35 @@ export interface JourneyConnection {
     /** Atlas frame indices per segment; reverse headings follow reversed path order. */
     segmentHeadings: number[];
     reverseSegmentHeadings: number[];
+}
+export const PORT_FACTORY_BRIDGE_EDGE = 'port-factory-bridge';
+export const BRIDGE_NODES = {
+    2: { join: '2-bridge-junction', landing: '2-bridge-landing' },
+    3: { join: '3-1', landing: '3-bridge-landing' },
+} as const;
+export interface JourneyBridgeLanding {
+    join: JourneyDock['join'];
+    landing: MapPoint;
+    junctionToLanding: MapPoint[];
+    /** Local bounds of this approach only, excluding the inter-island span. */
+    approachBounds: AtlasBounds;
+}
+/** Cropped bridge art uses atlas coordinates, including the gaps between islands. */
+export interface JourneyBridgeOverlay {
+    path: string;
+    width: number;
+    height: number;
+    left: number;
+    top: number;
+    widthInMap: number;
+    heightInMap: number;
+}
+export interface JourneyBridge {
+    landings: Record<2 | 3, JourneyBridgeLanding>;
+    placements: Record<2 | 3, AtlasPlacement>;
+    bridgeRoute: MapPoint[];
+    bridgeDuration: number;
+    overlays: { open: JourneyBridgeOverlay; closed: JourneyBridgeOverlay };
 }
 export interface JourneyBoatMetadata {
     atlas: { path: string; width: number; height: number };
@@ -104,6 +133,72 @@ export function parseJourneyConnection(value: unknown, costa: MapArtMetadata, po
         segmentHeadings: [...sailing.segmentHeadings], reverseSegmentHeadings: [...sailing.reverseSegmentHeadings] };
 }
 
+function bridgeJoinMatches(join: JourneyDock['join'], metadata: MapArtMetadata, world: 2 | 3): boolean {
+    if (metadata.world !== world) return false;
+    if (world === 3) return join.node === '3-1' && !!metadata.nodes['3-1'] && near(join, metadata.nodes['3-1']);
+    const route = metadata.routes['3:4'];
+    if (join.route !== '3:4' || !route || !integer(join.segment) || join.segment >= route.length - 1 ||
+        !finite(join.t) || join.t < 0 || join.t > 1) return false;
+    const a = route[join.segment], b = route[join.segment + 1];
+    return near(join, { x: a.x + (b.x - a.x) * join.t, y: a.y + (b.y - a.y) * join.t });
+}
+function parseBridgeLanding(value: unknown, metadata: MapArtMetadata, world: 2 | 3): JourneyBridgeLanding | null {
+    const data = object(value), rawJoin = object(data?.join), size = object(data?.size);
+    const join = point(rawJoin), landing = point(data?.landing), approach = path(data?.junctionToLanding);
+    const bounds = object(data?.approachBounds);
+    if (data?.version !== 1 || data.island !== (world === 2 ? 'porto' : 'fabrica') ||
+        size?.width !== 1920 || size.height !== 1200 || !rawJoin || !join || !landing || !approach || !joined(approach, join, landing) ||
+        !bounds || !finite(bounds.left) || !finite(bounds.top) || !finite(bounds.right) || !finite(bounds.bottom) ||
+        bounds.left >= bounds.right || bounds.top >= bounds.bottom) return null;
+    const approachBounds = { left: bounds.left, top: bounds.top, right: bounds.right, bottom: bounds.bottom };
+    if (approach.some(point => point.x < approachBounds.left - 1e-5 || point.x > approachBounds.right + 1e-5 ||
+        point.y < approachBounds.top - 1e-5 || point.y > approachBounds.bottom + 1e-5)) return null;
+    let validated: JourneyDock['join'];
+    if (world === 2) {
+        if (rawJoin.route !== '3:4' || rawJoin.from !== '2-4' || rawJoin.to !== '2-5' || !integer(rawJoin.segment) || !finite(rawJoin.t)) return null;
+        validated = { ...join, route: '3:4', segment: rawJoin.segment, t: rawJoin.t };
+    } else {
+        if (rawJoin.node !== '3-1') return null;
+        validated = { ...join, node: '3-1' };
+    }
+    return bridgeJoinMatches(validated, metadata, world) ? { join: validated, landing, junctionToLanding: approach,
+        approachBounds } : null;
+}
+function parseBridgeOverlay(value: unknown): JourneyBridgeOverlay | null {
+    const data = object(value);
+    if (!data || !asset(data.path, 'webp') || !integer(data.width) || !integer(data.height) ||
+        data.width < 1 || data.height < 1 || data.width > 8192 || data.height > 8192 ||
+        !finite(data.left) || !finite(data.top) || !positive(data.widthInMap) || !positive(data.heightInMap) ||
+        Math.abs(data.widthInMap * 1920 - data.width) > .01 || Math.abs(data.heightInMap * 1200 - data.height) > .01) return null;
+    return { path: data.path, width: data.width, height: data.height, left: data.left, top: data.top,
+        widthInMap: data.widthInMap, heightInMap: data.heightInMap };
+}
+const matchingPlacement = (a: AtlasPlacement, b: AtlasPlacement) => positive(a.scale) && positive(b.scale) &&
+    near(a.origin, b.origin) && a.scale === b.scale;
+
+/** Factory placement comes from the approved composition, never from the request's
+ * untrusted export. Both bridge states must agree with the same island snapshots.
+ */
+export function parseJourneyBridge(value: unknown, porto: MapArtMetadata, fabrica: MapArtMetadata,
+    expectedPlacements: Readonly<Record<2 | 3, AtlasPlacement>>): JourneyBridge | null {
+    const data = object(value), islands = object(data?.islands), placements = object(data?.placements);
+    const route = object(data?.bridgeRoute), overlays = object(data?.overlays);
+    const port = parseBridgeLanding(islands?.porto, porto, 2), factory = parseBridgeLanding(islands?.fabrica, fabrica, 3);
+    const bridgeRoute = path(route?.points), duration = route?.durationSeconds;
+    const open = parseBridgeOverlay(overlays?.open), closed = parseBridgeOverlay(overlays?.closed);
+    if (data?.version !== 1 || data.connection !== PORT_FACTORY_BRIDGE_EDGE || route?.coordinateSystem !== 'atlas' ||
+        !port || !factory || !bridgeRoute || !positive(duration) || duration > 120 || !open || !closed) return null;
+    const normalized = {} as JourneyBridge['placements'];
+    for (const [world, name] of [[2, 'porto'], [3, 'fabrica']] as const) {
+        const placement = object(placements?.[name]), origin = point(placement?.origin), scale = placement?.scale;
+        if (!origin || !positive(scale) || !expectedPlacements[world] ||
+            !matchingPlacement({ origin, scale }, expectedPlacements[world])) return null;
+        normalized[world] = { origin, scale };
+    }
+    if (!joined(bridgeRoute, localToAtlas(port.landing, normalized[2]), localToAtlas(factory.landing, normalized[3]))) return null;
+    return { landings: { 2: port, 3: factory }, placements: normalized, bridgeRoute, bridgeDuration: duration, overlays: { open, closed } };
+}
+
 /** Convert normalized export anchors and checked atlas crops into painter frames. */
 export function parseJourneyBoat(value: unknown): JourneyBoatMetadata | null {
     const data = object(value), atlas = object(data?.atlas), frame = object(data?.frame);
@@ -135,12 +230,13 @@ export function parseJourneyBoat(value: unknown): JourneyBoatMetadata | null {
 export const JOURNEY_DOCK_NODES = { 1: { join: '1-junction', dock: '1-dock', berth: '1-berth' },
     2: { join: '2-1', dock: '2-dock', berth: '2-berth' } } as const;
 
-/** Every image snapshot supplies its matching local geometry. The only inter-island
- * edge is the accepted sail route, enabled once all paired visual assets are ready.
- * Worlds 3–6 remain separate local graphs for the controller's established fallback.
+/** Each crossing is enabled independently against its matching image snapshots.
+ * A missing bridge cannot change the shipped ferry graph. Its open state comes
+ * from the controller's existing progression rules, never from art metadata.
  */
 export function buildJourneyNetwork(options: { islands: readonly JourneyIsland[]; secrets: readonly string[];
-    connection: JourneyConnection | null; connectionReady: boolean }): JourneyNetwork {
+    connection: JourneyConnection | null; connectionReady: boolean;
+    bridge?: JourneyBridge | null; bridgeReady?: boolean; bridgeOpen?: boolean }): JourneyNetwork {
     const nodes: Record<string, MapPoint> = {}, edges: JourneyEdge[] = [];
     const coast = options.islands.find(island => island.world === 1), port = options.islands.find(island => island.world === 2);
     const connection = options.connectionReady && coast?.ready && port?.ready ? options.connection : null;
@@ -151,6 +247,13 @@ export function buildJourneyNetwork(options: { islands: readonly JourneyIsland[]
         port?.metadata.nodes['2-1'] && near(connection.docks[2].join, port.metadata.nodes['2-1']) &&
         joined(connection.sailRoute, localToAtlas(connection.docks[1].berth.passenger, coast!.placement),
             localToAtlas(connection.docks[2].berth.passenger, port.placement)) ? connection : null;
+    const factory = options.islands.find(island => island.world === 3);
+    const readyBridge = options.bridgeReady && options.bridgeOpen && port?.ready && factory?.ready ? options.bridge : null;
+    const bridge = readyBridge && bridgeJoinMatches(readyBridge.landings[2].join, port!.metadata, 2) &&
+        bridgeJoinMatches(readyBridge.landings[3].join, factory!.metadata, 3) &&
+        matchingPlacement(readyBridge.placements[2], port!.placement) && matchingPlacement(readyBridge.placements[3], factory!.placement) &&
+        joined(readyBridge.bridgeRoute, localToAtlas(readyBridge.landings[2].landing, port!.placement),
+            localToAtlas(readyBridge.landings[3].landing, factory!.placement)) ? readyBridge : null;
     const add = (id: string, from: string, to: string, points: MapPoint[], duration: number, mode: JourneyEdge['mode'] = 'walk') =>
         edges.push({ id, from, to, points, duration, mode });
     for (const island of options.islands) {
@@ -164,6 +267,11 @@ export function buildJourneyNetwork(options: { islands: readonly JourneyIsland[]
                 nodes['1-junction'] = transform(join);
                 add('1-3:1-junction', from, '1-junction', [...points.slice(0, segment + 1), join].map(transform), .5);
                 add('1-junction:1-4', '1-junction', to, [join, ...points.slice(segment + 1)].map(transform), .5);
+            } else if (world === 2 && n === 4 && bridge) {
+                const join = bridge.landings[2].join, segment = join.segment!, junction = BRIDGE_NODES[2].join;
+                nodes[junction] = transform(join);
+                add(`2-4:${junction}`, from, junction, [...points.slice(0, segment + 1), join].map(transform), .39);
+                add(`${junction}:2-5`, junction, to, [join, ...points.slice(segment + 1)].map(transform), .39);
             } else add(`${from}:${to}`, from, to, points.map(transform), .78);
         }
         if (options.secrets.includes(`${world}-3`) && metadata.secretRoute.length > 1)
@@ -174,7 +282,14 @@ export function buildJourneyNetwork(options: { islands: readonly JourneyIsland[]
             add(`${world}-dock-approach`, ids.join, ids.dock, dock.junctionToDock.map(transform), 1.25);
             add(`${world}-board`, ids.dock, ids.berth, dock.boardingRoute.map(transform), .85, 'board');
         }
+        if (bridge && (world === 2 || world === 3)) {
+            const landing = bridge.landings[world], ids = BRIDGE_NODES[world];
+            nodes[ids.landing] = transform(landing.landing);
+            add(`${world}-bridge-approach`, ids.join, ids.landing, landing.junctionToLanding.map(transform), 1.25);
+        }
     }
     if (crossing) add('coast-port-sail', '1-berth', '2-berth', crossing.sailRoute.map(point => ({ ...point })), crossing.sailDuration, 'sail');
+    if (bridge) add(PORT_FACTORY_BRIDGE_EDGE, BRIDGE_NODES[2].landing, BRIDGE_NODES[3].landing,
+        bridge.bridgeRoute.map(point => ({ ...point })), bridge.bridgeDuration);
     return { nodes, edges };
 }

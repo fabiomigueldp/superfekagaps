@@ -49,6 +49,7 @@
 .world-map-node .world-map-bitmap { width: 56px; height: 58px; }
 .world-map-dock { width: 104px; height: 56px; }
 .world-map-dock .world-map-bitmap { width: 104px; height: 56px; }
+.world-map-travel-wide, .world-map-travel-wide .world-map-bitmap { width: 128px; }
 .world-map-node:hover, .world-map-dock:hover { filter: brightness(1.2); }
 .world-map-node.is-selected { z-index: 2; }
 .world-map-header {

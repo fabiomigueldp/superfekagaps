@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test, { type TestContext } from 'node:test';
-import { WorldMapHud, type WorldMapHudState, type WorldMapMotionState } from '../src/adventure/WorldMapHud';
+import { WorldMapHud, WORLD_MAP_TRAVEL_ACTIONS, WORLD_MAP_TRAVEL_ACTION_IDS, type WorldMapHudState, type WorldMapMotionState } from '../src/adventure/WorldMapHud';
 
 type Listener = (event: any) => void;
 /** The component owns semantics, not the renderer's layout or event routing. */
@@ -188,12 +188,12 @@ test('disposing during atlas load removes handlers and cannot repaint or resurre
     assert.equal(stage.draws.length, 0); assert.equal(stage.width, 56);
 });
 
-test('physical props stay on Costa and Porto; later-region fallbacks reset decoration without reloading', async t => {
+test('physical props include all Factory phases while later-region fallbacks reset decoration', async t => {
     const resources = signResources(t), { hud, state } = fixture(t);
     await resources.metadata(); resources.images[0].onload!(); await resources.settle();
     const stage = asElement(hud.stageButtons[0]).children[0], dock = asElement(hud.dockButtons[1]).children[0];
     assert.equal(stage.style.transform, 'translate(0px, 11px)');
-    for (const world of [3, 4, 5, 6]) {
+    for (const world of [4, 5, 6]) {
         hud.update({ ...state, world, stage: (world - 1) * 5 });
         assert.equal(stage.width, 56); assert.equal(stage.style.transform, '');
         assert.equal(dock.width, 104); assert.equal(dock.style.transform, '');
@@ -201,9 +201,97 @@ test('physical props stay on Costa and Porto; later-region fallbacks reset decor
     }
     for (const world of [2, 3, 1]) {
         hud.update({ ...state, world, stage: (world - 1) * 5 });
-        assert.equal(stage.width, world === 3 ? 56 : 112);
-        assert.equal(stage.style.transform, world === 3 ? '' : 'translate(0px, 11px)');
-        assert.equal(dock.style.transform, world === 3 ? '' : 'translate(0px, 10px)');
+        assert.equal(stage.width, 112);
+        assert.equal(stage.style.transform, 'translate(0px, 11px)');
+        assert.equal(dock.style.transform, 'translate(0px, 10px)');
     }
-    assert.equal(resources.requests.length, 1); assert.equal(resources.images.length, 1);
+    assert.equal(resources.requests.length, 2); assert.equal(resources.images.length, 1);
+});
+
+
+test('four route IDs keep same-name Porto signs, boat docks and walking bridge actions independent', t => {
+    dom(t);
+    const calls: string[] = [];
+    const hud = new WorldMapHud({ selectTravel: id => calls.push(id), selectWorld: world => calls.push(`world:${world}`),
+        selectStage() {}, enter() {}, skip() {}, overview() {}, menu() {} });
+    t.after(() => hud.dispose()); hud.setVisible(true);
+    assert.equal(hud.dockButtons.length, 2);
+    assert.equal(hud.dockButtons[0], hud.travelButtons['ferry-porto-costa']);
+    assert.equal(hud.dockButtons[1], hud.travelButtons['ferry-costa-porto']);
+    for (const id of WORLD_MAP_TRAVEL_ACTION_IDS) {
+        const button = hud.travelButtons[id], sign = WORLD_MAP_TRAVEL_ACTIONS[id];
+        assert.equal(button.getAttribute('data-travel-action'), id);
+        assert.ok(sign.width >= 44 && sign.height >= 44);
+        button.click(); button.click();
+        assert.equal(asElement(button).listeners.get('click')?.length, 1);
+    }
+    assert.deepEqual(calls, WORLD_MAP_TRAVEL_ACTION_IDS.flatMap(id => [id, id]));
+    const ferry = WORLD_MAP_TRAVEL_ACTIONS['ferry-costa-porto'], bridge = WORLD_MAP_TRAVEL_ACTIONS['bridge-factory-porto'];
+    assert.equal(ferry.label, 'PORTO'); assert.equal(bridge.label, 'PORTO');
+    assert.equal(ferry.direction, 'right'); assert.equal(bridge.direction, 'left');
+    assert.equal(ferry.mode, 'ferry'); assert.equal(bridge.mode, 'bridge');
+    hud.dispose(); hud.travelButtons['bridge-porto-factory'].click();
+    assert.equal(calls.length, 8, 'Disposed route buttons never dispatch.');
+});
+
+test('bridge signs use their own availability, hide missing anchors and retain the legacy fallback callback', t => {
+    const { hud, state, calls } = fixture(t);
+    hud.update({ ...state, world: 2, stage: 5, worldAvailability: [true, true, false, false, false, false] });
+    hud.positionNodes([{ x: 60, y: 80 }]);
+    hud.positionTravelActions({
+        'ferry-porto-costa': { x: 50, y: 120, available: false },
+        'bridge-porto-factory': { x: 200, y: 200, available: true },
+    });
+    assert.equal(hud.travelButtons['ferry-costa-porto'].hidden, true);
+    assert.equal(hud.travelButtons['bridge-factory-porto'].hidden, true);
+    const bridge = hud.travelButtons['bridge-porto-factory'];
+    assert.equal(bridge.hidden, false);
+    assert.match(bridge.getAttribute('aria-label')!, /Ponte de carga.*Fábrica.*Caminhar/);
+    assert.doesNotMatch(bridge.getAttribute('aria-label')!, /barco|Cais|Embarcar/);
+    assert.match(hud.travelButtons['ferry-porto-costa'].getAttribute('aria-label')!, /Travessia bloqueada/);
+    bridge.click(); assert.deepEqual(calls, ['world:3']);
+    for (let n = 0; n < 5; n++) {
+        hud.positionNodes([]);
+        hud.positionTravelActions({ 'bridge-factory-porto': { x: 80, y: 160, available: true } });
+    }
+    assert.equal(bridge.hidden, true);
+    hud.travelButtons['bridge-factory-porto'].click(); assert.deepEqual(calls, ['world:3', 'world:2']);
+    assert.equal(asElement(hud.travelButtons['bridge-factory-porto']).listeners.get('click')?.length, 1);
+    hud.positionTravelActions({ 'bridge-factory-porto': { x: NaN, y: 20 } });
+    assert.ok(Object.values(hud.travelButtons).every(button => button.hidden));
+});
+
+test('Factory supplement loads lazily once and paints its accented sign without reloading the released atlas', async t => {
+    const resources = signResources(t), { hud, state } = fixture(t);
+    await resources.metadata(); resources.images[0].onload!(); await resources.settle();
+    assert.equal(resources.requests.length, 1);
+    const bridge = asElement(hud.travelButtons['bridge-porto-factory']).children[0];
+    hud.positionTravelActions({ 'bridge-porto-factory': { x: 190, y: 180, available: true } });
+    assert.equal(resources.requests.length, 2);
+    resources.requests[1].resolve({ ok: true, json: async () => JSON.parse(readFileSync(new URL('../public/assets/world/map/signs-factory.meta.json', import.meta.url), 'utf8')) });
+    await resources.settle();
+    const image = resources.images[1]; image.naturalWidth = 256; image.naturalHeight = 112;
+    image.onload!(); await resources.settle();
+    assert.equal(bridge.width, 256); assert.equal(bridge.height, 112);
+    assert.equal(bridge.style.transform, 'translate(0px, 10px)');
+    const draw = bridge.draws.at(-1)!; assert.equal(draw[0], image);
+    hud.update({ ...state, world: 3, stage: 10 });
+    hud.setVisible(false); hud.setVisible(true);
+    hud.positionTravelActions({ 'bridge-porto-factory': { x: 190, y: 180, available: false } });
+    assert.equal(resources.requests.length, 2); assert.equal(resources.images.length, 2);
+    assert.equal(asElement(hud.stageButtons[4]).children[0].width, 112);
+    assert.match(hud.travelButtons['bridge-porto-factory'].getAttribute('aria-label')!, /Ponte bloqueada/);
+});
+
+test('failed Factory decoration preserves its readable fallback and leaves all existing art available', async t => {
+    const resources = signResources(t), { hud, state } = fixture(t);
+    await resources.metadata(); resources.images[0].onload!(); await resources.settle();
+    hud.update({ ...state, world: 3, stage: 10 });
+    resources.requests[1].resolve({ ok: false }); await resources.settle();
+    for (let n = 0; n < 10; n++) hud.update({ ...state, world: 3, stage: 10 + n % 5 });
+    const factory = asElement(hud.travelButtons['bridge-porto-factory']).children[0];
+    assert.equal(factory.width, 128); assert.equal(factory.style.transform, '');
+    assert.equal(asElement(hud.stageButtons[0]).children[0].width, 112);
+    assert.equal(asElement(hud.travelButtons['bridge-factory-porto']).children[0].width, 208);
+    assert.equal(resources.requests.length, 2);
 });

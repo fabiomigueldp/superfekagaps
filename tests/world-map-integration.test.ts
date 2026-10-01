@@ -179,11 +179,12 @@ function fixtureMapMetadata(world = 1, overrides: Record<string, MapPoint> = {})
     return data;
 }
 const flushAssets = () => new Promise<void>(resolve => setImmediate(resolve));
-const dioramaName = (world: number) => world === 1 ? 'costa-diorama' : 'porto-diorama';
+const dioramaName = (world: number) => world === 1 ? 'costa-diorama' : world === 2 ? 'porto-diorama' : 'fabrica-diorama';
 async function finishWorld(h: ReturnType<typeof mapDOM>, world: number, metadata: unknown = fixtureMapMetadata(world), imageSuccess = true) {
     const image = h.images.find(image => image.src.endsWith(`${dioramaName(world)}.webp`));
     const request = h.fetches.find(request => request.url.endsWith(`${dioramaName(world)}.meta.json`));
     assert.ok(image && request, `World ${world} must already have been visited before its assets can settle.`);
+    if (world === 3) Object.assign(image, { naturalWidth: 1920, naturalHeight: 1200 });
     imageSuccess ? image.onload?.() : image.onerror?.();
     request.resolve({ ok: true, json: async () => metadata });
     await flushAssets();
@@ -302,15 +303,23 @@ test('disposing during fetch cannot resurrect the map or publish late art', asyn
     assert.deepEqual(h.events.selected, []); assert.equal(h.gameCanvas.style.visibility, '');
 });
 
-test('only the visible connected pair is requested and cached, with no duplicate visits or distant Porto decoration', t => {
+test('the ferry pair loads first; an explicit Factory preview loads its own content once', t => {
     const h = mapDOM(t, true), save = openSave('2-1');
+    save.completed = STAGES.filter(stage => stage.world === 1).map(stage => stage.id);
     assert.equal(h.images.length, 0); h.view.render(5, save, 0, '');
     assert.ok(h.images.some(image => image.src.endsWith('porto-diorama.webp')));
     assert.ok(h.images.some(image => image.src.endsWith('costa-diorama.webp')));
     assert.ok(h.images.every(image => !image.src.endsWith('porto-distant.webp')));
     const count = [h.images.length, h.fetches.length];
-    for (const selected of [0, 5, 10, 15, 20, 25, 0, 5]) h.view.render(selected, save, selected + 20, '');
+    for (const selected of [0, 5, 0, 5]) h.view.render(selected, save, selected + 20, '');
     assert.deepEqual([h.images.length, h.fetches.length], count);
+    assert.ok(!h.fetches.some(request => /fabrica|factory/.test(request.url)));
+    h.view.render(10, save, 100, '');
+    assert.equal(h.fetches.filter(request => request.url.endsWith('fabrica-diorama.meta.json')).length, 1);
+    assert.equal(h.fetches.filter(request => request.url.endsWith('port-factory-bridge.meta.json')).length, 1);
+    const expanded = [h.images.length, h.fetches.length];
+    for (const selected of [15, 20, 25, 0, 5, 10]) h.view.render(selected, save, selected + 120, '');
+    assert.deepEqual([h.images.length, h.fetches.length], expanded);
 });
 
 test('paired art waits for matching metadata in either completion order and never applies invalid coordinates', async t => {
@@ -328,7 +337,9 @@ test('paired art waits for matching metadata in either completion order and neve
 
 test('failed island pairs retain usable fallback, preserve the other cache, and do not retry per frame', async t => {
     for (const [metadata, imageSuccess] of [[fixtureMapMetadata(1), true], [{}, true], [fixtureMapMetadata(2), false]] as const) await t.test(JSON.stringify(metadata).slice(0, 30), async child => {
-        const save = openSave(), j = mapDOM(child, true); j.view.render(0, save, 0, ''); await finishWorld(j, 1);
+        const save = openSave(), j = mapDOM(child, true);
+        save.completed = STAGES.filter(stage => stage.world === 1).map(stage => stage.id);
+        j.view.render(0, save, 0, ''); await finishWorld(j, 1);
         await finishWorld(j, 2, metadata, imageSuccess); j.view.render(0, save, 16, '');
         assert.ok(currentArt(j, 1).assets.island); assert.equal(currentArt(j, 2).assets.island, null);
         const requests = j.fetches.length; j.view.render(5, save, 32, ''); j.view.render(0, save, 48, '');
@@ -486,9 +497,9 @@ test('each island secret uses only its own authored geometry and progress', asyn
 });
 
 test('later worlds retain fallback navigation and explicit entry without creating any sea edge', t => {
-    const h = mapDOM(t, true), save = openSave(); h.view.render(0, save, 0, ''); h.view.render(14, save, 16, '');
-    assert.equal(h.internal.journey.arrived, '3-5'); assert.equal(h.events.entered, 0); assert.equal(h.internal.hud.enterButton.disabled, false);
-    h.view.render(10, save, 32, ''); assert.equal(h.internal.journey.arrived, '3-1');
+    const h = mapDOM(t, true), save = openSave(); h.view.render(0, save, 0, ''); h.view.render(19, save, 16, '');
+    assert.equal(h.internal.journey.arrived, '4-5'); assert.equal(h.events.entered, 0); assert.equal(h.internal.hud.enterButton.disabled, false);
+    h.view.render(15, save, 32, ''); assert.equal(h.internal.journey.arrived, '4-1');
     assert.ok(h.internal.network.edges.every((edge: { from: string; to: string; mode: string }) => edge.mode !== 'sail'));
 });
 
@@ -593,6 +604,31 @@ async function readyConnection(h: ReturnType<typeof mapDOM>, save = openSave('1-
         if (size.path.includes(failAsset) && failAsset) image.onerror?.(); else image.onload?.();
     }
     await flushAssets(); h.view.render(selection, save, 16, '');
+}
+
+async function finishFactory(h: ReturnType<typeof mapDOM>, failAsset = '') {
+    await finishWorld(h, 3, actualMetadata(3), failAsset !== 'fabrica-diorama.webp');
+    const data = JSON.parse(readFileSync(new URL('../public/assets/world/map/port-factory-bridge.meta.json', import.meta.url), 'utf8'));
+    h.fetches.find(request => request.url.endsWith('port-factory-bridge.meta.json'))!.resolve({ ok: true, json: async () => data });
+    await flushAssets();
+    for (const state of ['open', 'closed']) {
+        const size = data.overlays[state], image = h.images.find(image => image.src.endsWith(size.path.split('/').pop()));
+        if (failAsset === 'fabrica-diorama.webp') { assert.equal(image, undefined); continue; }
+        assert.ok(image, `Expected bridge layer ${state}`);
+        Object.assign(image, { naturalWidth: size.width, naturalHeight: size.height });
+        if (failAsset && size.path.includes(failAsset)) image.onerror?.(); else image.onload?.();
+    }
+    await flushAssets();
+}
+
+async function readyConnectedFactory(h: ReturnType<typeof mapDOM>, save = openSave('2-5')) {
+    await readyConnection(h, save);
+    const selection = STAGES.findIndex(stage => stage.id === save.selected);
+    // Panorama is an explicit request for all authored neighboring regions.
+    h.get('world-map-overview').click(); h.view.render(selection, save, 32, '');
+    await finishFactory(h); h.view.render(selection, save, 48, '');
+    h.get('world-map-overview').click(); h.view.render(selection, save, 64, '');
+    assert.equal(h.internal.bridgeStatus, 'ready'); assert.equal(h.internal.bridgeActive, true);
 }
 
 test('Costa to Porto travels through connected docks with Feka aboard, saves only final arrival and waits for Enter', async t => {
@@ -870,4 +906,209 @@ test('dock signs stay hidden through disembarkation and the final walk, returnin
     assert.deepEqual(h.events.arrived, [1]); assert.equal(h.events.entered, 0);
     assert.equal(h.internal.hud.dockButtons[1].hidden, false, 'The normal Porto action returns only after Feka reaches the selected phase.');
     assert.deepEqual({ completed: save.completed, seals: save.seals }, progress);
+});
+
+test('unlocked Factory loads on a real Porto visit, without adding requests to an initial Costa visit', t => {
+    const h = mapDOM(t), save = openSave('1-1'); h.view.render(0, save, 0, '');
+    assert.ok(!h.fetches.some(request => /fabrica|factory/.test(request.url)));
+    h.view.render(5, save, 16, '');
+    assert.equal(h.fetches.filter(request => request.url.endsWith('fabrica-diorama.meta.json')).length, 1);
+    assert.equal(h.fetches.filter(request => request.url.endsWith('port-factory-bridge.meta.json')).length, 1);
+    for (let time = 32; time < 160; time += 16) h.view.render(5, save, time, '');
+    assert.equal(h.fetches.filter(request => request.url.endsWith('port-factory-bridge.meta.json')).length, 1);
+});
+
+test('Porto clear walks the real cargo bridge, keeps its ferry moored, and requires explicit entry after Factory arrival', async t => {
+    const h = mapDOM(t), save = openSave('2-5'); await readyConnectedFactory(h, save);
+    const moored = structuredClone(h.internal.currentBoat().foot), progress = structuredClone({ completed: save.completed, seals: save.seals });
+    h.view.render(10, save, 100, '');
+    assert.equal(h.internal.journey.destination, '3-1');
+    assert.ok(h.internal.journey.legs.some((leg: { id: string }) => leg.id === 'port-factory-bridge'));
+    assert.ok(h.internal.journey.legs.every((leg: { mode: string }) => leg.mode === 'walk'));
+    let crossed = false;
+    for (let time = 150; time <= 8500; time += 50) {
+        h.view.render(10, save, time, '');
+        assert.deepEqual(h.internal.currentBoat().foot, moored);
+        if (h.internal.journey.destination) {
+            assert.equal(h.internal.journey.arrived, '2-5'); assert.deepEqual(h.events.arrived, []);
+            assert.equal(h.view.enterSelected(10), false);
+            assert.ok(Object.values(h.internal.hud.travelButtons).every((button: any) => button.hidden));
+        }
+        if (h.internal.journey.legs[0]?.id === 'port-factory-bridge') {
+            crossed = true;
+            const feet = mapToScreen(h.internal.marker, h.internal.camera);
+            assert.ok(feet.x > 10 && feet.x < h.internal.width - 10);
+        }
+    }
+    assert.ok(crossed); assert.equal(h.internal.journey.arrived, '3-1'); assert.deepEqual(h.events.arrived, [10]);
+    assert.equal(h.events.entered, 0); assert.equal(h.internal.hud.enterButton.disabled, false);
+    assert.equal(h.view.enterSelected(10), true); assert.equal(h.view.enterSelected(10), false); assert.equal(h.events.entered, 1);
+    assert.deepEqual({ completed: save.completed, seals: save.seals }, progress);
+});
+
+test('Costa to Factory disembarks at Porto without saving an intermediate stage and can reverse on the bridge', async t => {
+    const h = mapDOM(t), save = openSave('1-5'); await readyConnectedFactory(h, save);
+    h.view.render(10, save, 100, '');
+    const modes = new Set<string>(); let time = 100;
+    while (h.internal.journey.legs[0]?.id !== 'port-factory-bridge' && time < 18000) {
+        h.view.render(10, save, time += 50, ''); modes.add(h.internal.motionState());
+        assert.equal(h.internal.journey.arrived, '1-5'); assert.deepEqual(h.events.arrived, []);
+    }
+    assert.ok(modes.has('boarding') && modes.has('sailing') && modes.has('arriving'));
+    assert.equal(h.internal.journey.legs[0]?.id, 'port-factory-bridge');
+    for (let n = 0; n < 16; n++) h.view.render(10, save, time += 50, '');
+    const feet = { ...h.internal.marker }, boat = { ...h.internal.currentBoat().foot };
+    h.view.render(9, save, time, ''); assert.deepEqual(h.internal.marker, feet);
+    assert.equal(h.internal.journey.legs[0].direction, -1); assert.equal(h.internal.journey.arrived, '1-5');
+    h.view.render(10, save, time, ''); assert.deepEqual(h.internal.marker, feet); assert.deepEqual(h.internal.currentBoat().foot, boat);
+    h.internal.hud.skipButton.click(); assert.equal(h.internal.journey.arrived, '3-1'); assert.deepEqual(h.events.arrived, [10]);
+    assert.equal(h.events.entered, 0);
+    h.view.render(0, save, time + 50, '');
+    const legs = h.internal.journey.legs as Array<{ id: string; direction: number }>;
+    assert.ok(legs.some(leg => leg.id === 'port-factory-bridge' && leg.direction === -1));
+    assert.ok(legs.some(leg => leg.id === 'coast-port-sail' && leg.direction === -1));
+    h.internal.hud.skipButton.click(); assert.equal(h.internal.journey.arrived, '1-1'); assert.equal(h.events.entered, 0);
+});
+
+test('the raised bridge follows existing unlock progression without moving a locked preview or inventing a crossing', async t => {
+    const h = mapDOM(t, true), save = openSave('2-1');
+    save.completed = STAGES.filter(stage => stage.world === 1).map(stage => stage.id);
+    await readyConnectedFactory(h, save);
+    const feet = { ...h.internal.marker }, boat = { ...h.internal.currentBoat().foot };
+    h.view.render(10, save, 100, '');
+    assert.equal(h.internal.journey.blocked, 'unavailable'); assert.equal(h.internal.journey.arrived, '2-1');
+    assert.deepEqual(h.internal.marker, feet); assert.deepEqual(h.internal.currentBoat().foot, boat);
+    assert.ok(!h.internal.network.edges.some((edge: { id: string }) => edge.id === 'port-factory-bridge'));
+    assert.ok(h.paint.calls.some(call => call.method === 'drawImage' && (call.args[0] as any)?.src?.endsWith('port-factory-bridge-closed.webp')));
+    assert.equal(h.view.enterSelected(10), false); assert.deepEqual(h.events.arrived, []);
+    save.completed.push(...STAGES.filter(stage => stage.world === 2).map(stage => stage.id));
+    h.view.render(10, save, 116, '');
+    assert.ok(h.internal.network.edges.some((edge: { id: string }) => edge.id === 'port-factory-bridge'));
+    assert.equal(h.internal.journey.arrived, '3-1'); assert.equal(h.events.entered, 0);
+    assert.ok(h.paint.calls.some(call => call.method === 'drawImage' && (call.args[0] as any)?.src?.endsWith('port-factory-bridge-open.webp')));
+});
+
+test('Factory assets resolving during a ferry trip preserve the active edge, then activate at a safe arrival', async t => {
+    const h = mapDOM(t), save = openSave('1-5'); await readyConnection(h, save);
+    h.view.render(5, save, 100, ''); let time = 100;
+    while (h.internal.motionState() !== 'sailing' && time < 5000) h.view.render(5, save, time += 50, '');
+    const active = structuredClone(h.internal.journey.legs[0]), feet = { ...h.internal.marker };
+    h.view.render(10, save, time, ''); assert.deepEqual(h.internal.marker, feet);
+    assert.equal(h.internal.journey.blocked, 'no-route'); assert.equal(h.internal.journey.destination, '2-1');
+    await finishFactory(h); h.view.render(10, save, time, '');
+    assert.equal(h.internal.bridgeActive, false); assert.deepEqual(h.internal.journey.legs[0], active);
+    assert.equal(h.internal.journey.arrived, '1-5');
+    while (!h.internal.bridgeActive && time < 16000) h.view.render(10, save, time += 50, '');
+    assert.equal(h.internal.bridgeActive, true); assert.equal(h.internal.journey.destination, '3-1');
+    assert.deepEqual(h.events.arrived, [5], 'The already requested Porto destination settles before the late new geometry activates.');
+    h.internal.hud.skipButton.click(); assert.equal(h.internal.journey.arrived, '3-1'); assert.equal(h.events.entered, 0);
+});
+
+test('a failed bridge never removes the working ferry or teleports Feka off an active crossing', async t => {
+    const h = mapDOM(t), save = openSave('1-5'); await readyConnection(h, save);
+    const ferry = structuredClone(h.internal.network.edges.filter((edge: { id: string }) => /board|dock|coast-port/.test(edge.id)));
+    h.view.render(5, save, 100, ''); let time = 100;
+    while (h.internal.motionState() !== 'sailing' && time < 5000) h.view.render(5, save, time += 50, '');
+    const feet = { ...h.internal.marker }; h.view.render(10, save, time, '');
+    await finishFactory(h, 'bridge-open.webp'); h.view.render(10, save, time, '');
+    assert.equal(h.internal.bridgeStatus, 'failed'); assert.equal(h.internal.connectionStatus, 'ready');
+    assert.deepEqual(h.internal.marker, feet); assert.equal(h.internal.motionState(), 'sailing'); assert.deepEqual(h.events.arrived, []);
+    assert.deepEqual(h.internal.network.edges.filter((edge: { id: string }) => /board|dock|coast-port/.test(edge.id)), ferry);
+    while (h.internal.journey.arrived !== '3-1' && time < 18000) h.view.render(10, save, time += 50, '');
+    assert.equal(h.internal.journey.arrived, '3-1'); assert.deepEqual(h.events.arrived, [5, 10]);
+    assert.equal(h.events.entered, 0); assert.equal(h.internal.connectionActive, true);
+    assert.match(h.get('world-map-warning').textContent, /ponte de carga não carregou/);
+    const count = [h.images.length, h.fetches.length];
+    for (let n = 0; n < 5; n++) h.view.render(10, save, time += 50, '');
+    assert.deepEqual([h.images.length, h.fetches.length], count);
+});
+
+test('Factory and bridge views keep every native target separate in portrait and short landscape', async t => {
+    const { WORLD_MAP_TRAVEL_ACTIONS } = await import('../src/adventure/WorldMapHud');
+    const h = mapDOM(t, true), save = openSave('3-1'); await readyConnectedFactory(h, save);
+    for (const [width, height] of [[320, 568], [400, 606], [590, 378], [740, 320]]) {
+        h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width, height };
+        h.get('world-map-header').bounds = { x: 8, y: 6, left: 8, top: 6, width: width - 16, height: 44 };
+        h.get('world-map-tools').bounds = h.get('world-map-header').bounds;
+        h.get('world-map-footer').bounds = { x: 8, y: height - 76, left: 8, top: height - 76, width: width - 16, height: 68 };
+        h.observers[0].callback();
+        for (const world of [2, 3]) for (const overview of [false, true]) {
+            h.internal.overview = overview; h.view.render((world - 1) * 5, save, 100, '');
+            const entries = [...h.internal.hud.stageButtons.map((button: Button) => ({ button, width: 56, height: 58 })),
+                ...Object.entries(h.internal.hud.travelButtons).map(([id, button]) => ({ button: button as Button,
+                    width: WORLD_MAP_TRAVEL_ACTIONS[id as keyof typeof WORLD_MAP_TRAVEL_ACTIONS].width, height: 56 }))];
+            const rectangles = entries.flatMap(({ button, width: wide, height: tall }) => {
+                if (button.hidden) return [];
+                const match = /^translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(button.style.transform)!;
+                const x = Number(match[1]), y = Number(match[2]);
+                return [{ left: x - wide / 2, right: x + wide / 2, top: y - tall, bottom: y }];
+            });
+            rectangles.forEach((a, index) => {
+                assert.ok(a.left >= 8 && a.right <= width - 8 && a.top >= h.internal.frameInsets.top && a.bottom <= height - h.internal.frameInsets.bottom,
+                    `Out of bounds ${width}×${height} world${world} overview${overview}`);
+                for (const b of rectangles.slice(index + 1)) assert.ok(a.right + 8 <= b.left || b.right + 8 <= a.left ||
+                    a.bottom + 8 <= b.top || b.bottom + 8 <= a.top, `Overlap ${width}×${height} world${world} overview${overview}`);
+            });
+        }
+    }
+});
+
+test('direct Costa to Factory keeps the complete sailing boat inside a short phone viewport', async t => {
+    const { atlasBoatBounds } = await import('../src/adventure/WorldAtlasArt');
+    const h = mapDOM(t), save = openSave('1-5'); await readyConnectedFactory(h, save);
+    h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width: 590, height: 378 };
+    h.get('world-map-header').bounds = { x: 12, y: 6, left: 12, top: 6, width: 566, height: 44 };
+    h.get('world-map-tools').bounds = h.get('world-map-header').bounds;
+    h.get('world-map-footer').bounds = { x: 12, y: 314, left: 12, top: 314, width: 470, height: 56 };
+    h.observers[0].callback(); h.view.render(10, save, 100, ''); let frames = 0;
+    for (let time = 150; time < 14000; time += 50) {
+        h.view.render(10, save, time, '');
+        if (h.internal.motionState() !== 'sailing') continue;
+        frames++;
+        const boat = h.internal.currentBoat(), box = atlasBoatBounds(boat.foot, boat.frame);
+        const a = mapToScreen({ x: box.left, y: box.top }, h.internal.camera), b = mapToScreen({ x: box.right, y: box.bottom }, h.internal.camera);
+        assert.ok(a.x >= 16 && b.x <= 574 && a.y >= h.internal.frameInsets.top && b.y <= 378 - h.internal.frameInsets.bottom);
+        assert.equal(h.internal.journey.arrived, '1-5');
+    }
+    assert.ok(frames > 20);
+});
+
+test('a locked Factory preview from a later sparse save still frames its atlas signs without moving the save', async t => {
+    const h = mapDOM(t, true), save = { ...freshSave(), selected: '4-1', completed: ['3-5'] };
+    h.view.render(15, save, 0, ''); h.view.render(10, save, 16, '');
+    await finishWorld(h, 1, actualMetadata(1)); await finishWorld(h, 2, actualMetadata(2)); await finishFactory(h);
+    h.view.render(10, save, 32, '');
+    assert.equal(h.internal.journey.arrived, '4-1'); assert.equal(h.internal.journey.blocked, 'unavailable');
+    assert.ok(h.internal.hud.stageButtons.every((button: Button) => !button.hidden));
+    for (let n = 1; n <= 5; n++) {
+        const point = mapToScreen(h.internal.network.nodes[`3-${n}`], h.internal.camera);
+        assert.ok(point.x > 0 && point.x < h.internal.width && point.y > h.internal.frameInsets.top && point.y < h.internal.height - h.internal.frameInsets.bottom);
+    }
+    assert.deepEqual(h.events.arrived, []); assert.equal(h.view.enterSelected(10), false);
+});
+
+test('idle Factory failure preserves the healthy ferry berth and never boards it from the opposite island', async t => {
+    const h = mapDOM(t, true), save = openSave('1-5'); await readyConnection(h, save);
+    const boat = { ...h.internal.currentBoat().foot };
+    h.view.render(10, save, 32, ''); await finishFactory(h, 'bridge-open.webp'); h.view.render(10, save, 48, '');
+    assert.equal(h.internal.journey.arrived, '3-1'); assert.deepEqual(h.internal.currentBoat().foot, boat);
+    h.view.render(5, save, 64, ''); assert.equal(h.internal.journey.arrived, '2-1'); assert.deepEqual(h.internal.currentBoat().foot, boat);
+    h.media.matches = false; h.view.render(0, save, 80, '');
+    assert.equal(h.internal.journey.arrived, '1-1'); assert.equal(h.internal.journey.destination, null);
+    assert.deepEqual(h.internal.currentBoat().foot, boat);
+    h.view.render(5, save, 96, '');
+    assert.equal(h.internal.journey.destination, '2-1'); assert.ok(h.internal.journey.legs.some((leg: { mode: string }) => leg.mode === 'sail'));
+});
+
+test('a wrongly sized Factory bitmap is rejected independently and pending image callbacks release on disposal', async t => {
+    const h = mapDOM(t), save = openSave('1-5'); await readyConnection(h, save); h.view.render(10, save, 32, '');
+    const image = h.images.find(image => image.src.endsWith('fabrica-diorama.webp'))!;
+    Object.assign(image, { naturalWidth: 960, naturalHeight: 600 }); image.onload?.();
+    const request = h.fetches.find(request => request.url.endsWith('fabrica-diorama.meta.json'))!;
+    request.resolve({ ok: true, json: async () => actualMetadata(3) }); await flushAssets();
+    assert.equal(h.internal.artCache.get(3).status, 'failed'); assert.equal(h.internal.artCache.get(3).assets.island, null);
+    assert.equal(h.internal.connectionStatus, 'ready');
+    const pending = h.images.filter(image => image.onload);
+    assert.ok(pending.length > 0); h.view.dispose();
+    assert.ok(pending.every(image => image.onload === null && image.onerror === null));
 });
