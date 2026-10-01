@@ -1,6 +1,6 @@
 # Guaíra: mapa experimental isolado
 
-Entrada: `/guaira.html`. A maquete de terra vermelha conecta dois experimentos reais: **Estrada do Vento → `/guaira-travessia.html`** e **Curral da Comporta → `/guaira-lab.html`**. Selecionar inicia a caminhada; **Entrar** só funciona na chegada. **Chegar** pula a caminhada. O distrito, o arrozal e a casa da vazão continuam marcos da paisagem, sem fases, bloqueios ou progresso inventados.
+Entrada: `/guaira.html`. A maquete de terra vermelha conecta três experiências: **Estrada do Vento → `/guaira-travessia.html`**, **Arena do Curral → `/guaira-lab.html`** e **Subida à Casa → `/guaira-subida.html`**. Arena e Subida partem do mesmo marco do curral; são escolhas distintas, com ações **ARENA** e **SUBIR**. Selecionar inicia a caminhada; A ação de entrada só funciona na chegada ao ponto de partida. **Chegar** pula a caminhada. O distrito e o arrozal continuam marcos da paisagem. A Casa da Vazão é uma chegada neutra ao terraço, sem botão de entrada na casa, bloqueios ou progresso inventados.
 
 O experimento não recebe número de mundo de campanha, não usa `parseMapMetadata`, não importa `WorldGame`, não modifica o atlas de seis mundos e não lê/escreve saves ou placar. A saída pública **Sair** continua apontando para `./`. Nenhum link foi adicionado à campanha. O mapa não altera o servidor Oracle.
 
@@ -8,21 +8,22 @@ O experimento não recebe número de mundo de campanha, não usa `parseMapMetada
 
 - `guaira.html?at=town`: Feka na estrada `guaira-1`, pronto para entrar na travessia
 - `guaira.html?at=rice`: Feka no arrozal `guaira-3`, sem destino selecionado; escolher Curral percorre apenas a estrada canônica 3→4
-- `guaira.html?at=corral`: Feka no curral `guaira-4`, pronto para entrar na arena
+- `guaira.html?at=corral`: Feka no curral `guaira-4`, pronto para entrar na arena; escolher Subida troca a experiência sem caminhar
+- `guaira.html?at=vazao`: Feka no terraço `guaira-5`, sem destino selecionado; escolher Arena ou Subida volta ao curral pela rota `3:4` ao contrário
 
-Outros valores caem na estrada. O retorno é uma posição de visita, nunca um desbloqueio persistente. Ao chegar a um dos dois destinos, `history.replaceState` atualiza apenas `at` na URL atual. O modelo não navega sozinho; **Entrar** é sempre uma ação separada.
+Outros valores caem na estrada. O retorno é uma posição de visita, nunca um desbloqueio persistente. Ao chegar a um ponto de partida, `history.replaceState` atualiza apenas `at` na URL atual. Arena e Subida gravam a mesma posição de visita `at=corral`; a seleção de experiência não é persistida. O modelo não navega sozinho; **JOGAR**, **ARENA** ou **SUBIR** são sempre uma ação separada.
 
-O laboratório usa **MAPA** / “Voltar ao mapa de Guaíra”, com `href="./guaira.html?at=corral"`, no lugar da saída direta, mantendo apenas três controles na barra. **Sair** no mapa leva ao jogo principal. A travessia retorna a `at=town` antes de seu checkpoint e `at=rice` depois dele ou da conclusão.
+O laboratório usa **MAPA** / “Voltar ao mapa de Guaíra”, com `href="./guaira.html?at=corral"`, no lugar da saída direta, mantendo apenas três controles na barra. **Sair** no mapa leva ao jogo principal. A travessia retorna a `at=town` antes de seu checkpoint e `at=rice` depois dele ou da conclusão. A Subida retorna a `at=corral` antes da conclusão e a `at=vazao` depois dela.
 
 ## Comportamento
 
-A estrada é a concatenação exata das rotas projetadas `0:1`, `1:2`, `2:3` da câmera Blender. Não há atalhos desenhados sobre a água. Trocar de destino durante a caminhada inverte o movimento a partir da posição atual. A posição é medida em comprimento de estrada no quadro 1920×1200, com 170 pixels desse quadro por segundo.
+A estrada é a concatenação exata das rotas projetadas `0:1`, `1:2`, `2:3`, `3:4` da câmera Blender, conservando todos os pontos projetados. Tabelas explícitas de distâncias por marco, chegada e experiência mantêm o curral em `guaira-4`, mesmo com o fim da estrada em `guaira-5`. As duas experiências do curral têm a mesma distância física. Não há atalhos desenhados sobre a água. Trocar de destino durante a caminhada inverte o movimento a partir da posição atual. A posição é medida em comprimento de estrada no quadro 1920×1200, com 170 pixels desse quadro por segundo.
 
 O ator usa diretamente as matrizes e a paleta originais de Feka. A escala física coincide com a auditoria da maquete: `(4.15 / 20.6) × 3 / 384` da largura do quadro por pixel do ator. A cena conserva renderização suave, e o ator/placas conservam pixels duros. O modo de movimento reduzido chega imediatamente e remove interpolação de câmera e caminhada. A câmera de celular acompanha Feka; **Ver mapa** mostra a ilha inteira. Destinos fora do enquadramento continuam disponíveis nos botões do painel.
 
-Todos os controles usam botões ou links nativos, com área de pelo menos 44 CSS pixels, nome acessível, foco visível e alternativa textual em alto contraste. Setas esquerda/direita selecionam o destino; Tab e Enter/Espaço operam os controles nativos. Sair, fechar a página e bfcache suspendem/descartam o controlador. Ocultar a aba cancela o quadro pendente e evita salto de tempo ao retornar.
+Todos os controles usam botões ou links nativos, com área de pelo menos 44 CSS pixels, nome acessível, foco visível e alternativa textual em alto contraste. Seta esquerda seleciona Travessia, direita seleciona Arena e cima seleciona Subida; Tab e Enter/Espaço operam os controles nativos. Sair, fechar a página e bfcache suspendem/descartam o controlador. Ocultar a aba cancela o quadro pendente e evita salto de tempo ao retornar.
 
-Metadados/imagem inválidos exibem um estado terminal com links para as duas experiências. A validação JSON ocorre antes de aguardar a imagem. Acesso direto às duas rotas também fica disponível enquanto a cena carrega; lentidão sem erro não dispara timeout arbitrário. Uma conclusão tardia de carregamento após sair nunca inicia o mapa.
+Metadados/imagem inválidos exibem um estado terminal com links para as três experiências. A validação JSON ocorre antes de aguardar a imagem. Acesso direto às três rotas também fica disponível enquanto a cena carrega; lentidão sem erro não dispara timeout arbitrário. Uma conclusão tardia de carregamento após sair nunca inicia o mapa.
 
 ## Arte e reprodução
 
@@ -39,8 +40,8 @@ A fonte usa Cycles CPU, 48 amostras e nenhum denoiser. `--draft` não pode ser e
 
 ## Verificação e limites
 
-Os testes próprios cobrem os dois destinos, o retorno neutro do arrozal, reversões rápidas, entrada antes da chegada, skip, movimento reduzido, limites de câmera, erro explícito com decode pendente, carregamento lento, descarte ao sair e restauração bfcache. O teste do entrypoint usa o controlador de produção com EventTarget e ambiente DOM mínimo, tornando qualquer acesso a `localStorage` um erro.
+Os testes próprios cobrem as três experiências, os retornos neutros do arrozal e da casa, o percurso exato da casa ao curral, a troca de experiência sem deslocamento, reversões rápidas, entrada antes da chegada, skip, movimento reduzido, limites de câmera, erro explícito com decode pendente, carregamento lento, descarte ao sair e restauração bfcache. O teste do entrypoint usa o controlador de produção com EventTarget e ambiente DOM mínimo, tornando qualquer acesso a `localStorage` um erro.
 
-As provas offline usam o pintor real da cena/ator e das placas; cabeçalho e painel são composições equivalentes, não capturas de browser. Incluem desktop, celular, 320×480, 472×303 e paisagem. Os testes matemáticos de viewport verificam o retângulo 16×26 de todos os frames, mas não provam oclusão 3D animada. A auditoria Blender original cobre pixels do sprite parado. Layout CSS real, toques nativos e recorte móvel precisam de QA em navegador pelo integrador antes de uma alegação de validação visual completa.
+As provas offline usam o pintor real da cena/ator e das placas; cabeçalho e painel são composições equivalentes, não capturas de browser. Incluem desktop, celular, 320×480, 472×303 e paisagem. As três placas de escolha medem 118 + 70 + 82 px, com dois intervalos de 8 px: cabem na área de 296 px de uma tela de 320 px. Em telas estreitas e baixas, as escolhas ocupam uma linha inteira, e as ações ficam na linha seguinte. Painéis de carregamento/falha permitem rolagem desde o início. Os testes matemáticos de viewport verificam o retângulo 16×26 de todos os frames, mas não provam oclusão 3D animada. A auditoria Blender original cobre pixels do sprite parado. Layout CSS real, toques nativos e recorte móvel precisam de QA em navegador pelo integrador antes de uma alegação de validação visual completa.
 
 As provas e logs ficam fora da árvore de produção; esta entrega não publica nem altera o jogo principal.

@@ -18,7 +18,8 @@ export function startGuairaMap(): () => void {
     const destinations = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-map-destination]'));
     const markers = destinations.filter(button => button.classList.contains('guaira-marker'));
     new LabToolbarAction(element('map-exit')).setLabel('SAIR', 'Sair para o jogo principal');
-    new LabToolbarAction(enter, true).setLabel('ENTRAR', 'Entrar no destino selecionado');
+    const enterArt = new LabToolbarAction(enter, true);
+    enterArt.setLabel('ENTRAR', 'Entrar no destino selecionado');
     new LabToolbarAction(skip).setLabel('CHEGAR', 'Chegar agora, pulando a caminhada');
     const overviewArt = new LabToolbarAction(overviewButton);
     const destinationArt = destinations.map(button => {
@@ -38,12 +39,18 @@ export function startGuairaMap(): () => void {
         const key = `${model.selected}:${model.moving}:${overview}`;
         if (key === previousState) return;
         previousState = key;
-        const destination = model.selected ? GUAIRA_DESTINATIONS[model.selected] : { title: 'Passarela dos Arrozais', description: 'A travessia chegou ao arrozal. Escolha o próximo destino.' };
+        const atHouse = model.arrival === 'vazao';
+        const destination = model.selected ? GUAIRA_DESTINATIONS[model.selected] : atHouse
+            ? { title: 'Casa da Vazão', description: 'Você chegou ao terraço. Escolha uma experiência para voltar pela estrada.' }
+            : { title: 'Passarela dos Arrozais', description: 'A travessia chegou ao arrozal. Escolha o próximo destino.' };
         element('map-title').textContent = destination.title;
         element('map-description').textContent = destination.description;
-        status.textContent = !model.selected ? 'Feka está nos arrozais. Escolha Travessia ou Curral.' : model.moving ? `Feka está a caminho de ${destination.title}.` : `Feka chegou. Entre para jogar.`;
+        status.textContent = !model.selected ? `Feka está ${atHouse ? 'na casa' : 'nos arrozais'}. Escolha Travessia, Arena ou Subida.`
+            : model.moving ? `Feka está a caminho de ${model.selected === 'subida' ? 'seu embarque no curral' : destination.title}.`
+            : model.selected === 'subida' ? 'Feka está no curral. Subir inicia a travessia.' : 'Feka chegou. Entre para jogar.';
         enter.disabled = !model.canEnter; skip.hidden = !model.moving;
-        enter.setAttribute('aria-label', `Entrar: ${destination.title}`);
+        enterArt.setLabel(model.selected ? GUAIRA_DESTINATIONS[model.selected].action : 'ENTRAR',
+            model.selected ? `Entrar: ${destination.title}` : 'Escolha uma experiência para entrar');
         overviewButton.setAttribute('aria-pressed', String(overview));
         overviewArt.setLabel(overview ? 'VER FEKA' : 'VER MAPA', overview ? 'Acompanhar Feka' : 'Ver mapa inteiro');
         for (const { button, art } of destinationArt) {
@@ -53,7 +60,7 @@ export function startGuairaMap(): () => void {
         }
         if (model.selected && !model.moving && lastArrival !== model.selected) {
             lastArrival = model.selected;
-            const url = new URL(location.href); url.searchParams.set('at', model.selected === 'curral' ? 'corral' : 'town');
+            const url = new URL(location.href); url.searchParams.set('at', GUAIRA_DESTINATIONS[model.selected].arrival);
             history.replaceState(null, '', url);
         }
     }
@@ -92,7 +99,9 @@ export function startGuairaMap(): () => void {
     overviewButton.addEventListener('click', () => { overview = !overview; reflect(); requestFrame(); }, { signal });
     document.addEventListener('keydown', event => {
         if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.repeat) return;
-        if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); select(event.key === 'ArrowLeft' ? 'town' : 'curral'); }
+        if (event.key === 'ArrowLeft' || event.key === 'ArrowRight' || event.key === 'ArrowUp') {
+            event.preventDefault(); select(event.key === 'ArrowLeft' ? 'town' : event.key === 'ArrowRight' ? 'curral' : 'subida');
+        }
     }, { signal });
     motion.addEventListener('change', () => { model?.setReducedMotion(motion.matches); camera = null; reflect(); requestFrame(); }, { signal });
     document.addEventListener('visibilitychange', () => {
@@ -119,7 +128,7 @@ export function startGuairaMap(): () => void {
             loadingPanel.hidden = true; reflect(); resize();
         } catch {
             if (!signal.aborted) { loadingPanel.hidden = true; element('map-error').hidden = false; overviewButton.disabled = true; enter.hidden = true;
-                element('map-title').textContent = 'Guaíra'; element('map-description').textContent = 'A maquete não carregou. Os dois experimentos continuam disponíveis acima.';
+                element('map-title').textContent = 'Guaíra'; element('map-description').textContent = 'A maquete não carregou. Os três experimentos continuam disponíveis acima.';
                 status.textContent = ''; destinations.forEach(button => { button.hidden = true; }); }
         }
     }

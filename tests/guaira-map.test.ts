@@ -17,28 +17,34 @@ test('Guaíra accepts the exact independent scene contract and rejects wrong ass
         (v: typeof raw) => { v.routes['1:2'][0].x += .02; },
         (v: typeof raw) => { v.nodes['guaira-3'].x = NaN; },
         (v: typeof raw) => { v.artBounds.left = v.artBounds.right; },
+        (v: typeof raw) => { v.nodes = []; },
+        (v: typeof raw) => { v.routes = []; },
+        (v: typeof raw) => { v.artBounds = []; },
+        (v: typeof raw) => { v.routes['3:4'] = { length: 2 }; },
+        (v: typeof raw) => { v.routes['3:4'][1].x = Infinity; },
+        (v: typeof raw) => { v.routes['3:4'].at(-1).x += .01; },
     ];
     for (const mutate of mutations) { const copy = structuredClone(raw); mutate(copy); assert.equal(parseGuairaMetadata(copy), null); }
     const copy = structuredClone(raw); copy.routes['0:4'] = 'not a path'; copy.nodes['fake-stage'] = {};
     assert.deepEqual(parseGuairaMetadata(copy), metadata, 'unknown data cannot become a playable destination');
 });
-test('only two explicit destinations enter; neutral rice return must select and arrive first', () => {
-    assert.deepEqual(Object.keys(GUAIRA_DESTINATIONS), ['town', 'curral']);
+test('three explicit experiences enter; neutral rice return must select and arrive first', () => {
+    assert.deepEqual(Object.keys(GUAIRA_DESTINATIONS), ['town', 'curral', 'subida']);
     const model = new GuairaMapModel(metadata, 'rice');
     assert.deepEqual(model.point, metadata.nodes['guaira-3']);
     assert.equal(model.selected, null); assert.equal(model.moving, false); assert.equal(model.enterHref(), null);
     model.select('curral'); assert.equal(model.enterHref(), null);
-    assert.ok(model.distance > model.length / 2);
+    assert.ok(model.distance > model.arrivalDistances.town && model.distance < model.arrivalDistances.corral);
     finish(model); assert.deepEqual(model.point, metadata.nodes['guaira-4']);
     assert.equal(model.enterHref(), './guaira-lab.html');
     model.select('town'); assert.equal(model.enterHref(), null); finish(model);
     assert.equal(model.enterHref(), './guaira-travessia.html');
 });
-test('the concatenated road uses only authored points through town, dry district, rice and curral', () => {
+test('the concatenated road uses every authored point through town, district, rice, curral and house', () => {
     const model = new GuairaMapModel(metadata);
-    const expected = ['0:1', '1:2', '2:3'].flatMap((key, i) => metadata.routes[key].slice(i ? 1 : 0));
+    const expected = ['0:1', '1:2', '2:3', '3:4'].flatMap((key, i) => metadata.routes[key].slice(i ? 1 : 0));
     assert.deepEqual(model.path, expected);
-    assert.equal(model.path.some(p => p.x === metadata.nodes['guaira-5'].x && p.y === metadata.nodes['guaira-5'].y), false);
+    assert.equal(model.path.some(p => p.x === metadata.nodes['guaira-5'].x && p.y === metadata.nodes['guaira-5'].y), true);
     model.path.forEach((point, i) => assert.deepEqual(model.pointAt(model.distances[i]), point));
 });
 test('repeated taps and rapid reversal preserve the current foot position on the same road', () => {
@@ -54,9 +60,9 @@ test('skip, dynamic reduced motion and hidden-tab deltas do not create overshoot
     const model = new GuairaMapModel(metadata); model.select('curral'); model.tick(10);
     assert.equal(model.distance, 8.5, 'return from suspension is capped to 50 ms');
     model.tick(NaN); model.tick(-1); assert.equal(model.distance, 8.5);
-    model.skip(); assert.equal(model.distance, model.length); assert.equal(model.canEnter, true);
+    model.skip(); assert.equal(model.distance, model.destinationDistances.curral); assert.equal(model.canEnter, true);
     model.select('town'); model.setReducedMotion(true); assert.equal(model.distance, 0);
-    model.select('curral'); assert.equal(model.distance, model.length); assert.equal(model.moving, false);
+    model.select('curral'); assert.equal(model.distance, model.destinationDistances.curral); assert.equal(model.moving, false);
     model.setReducedMotion(false); model.select('town'); assert.equal(model.moving, true);
 });
 test('leaving while moving prevents subsequent animation, skip, selection or entry', () => {
@@ -64,8 +70,8 @@ test('leaving while moving prevents subsequent animation, skip, selection or ent
     const point = model.point; model.close(); model.tick(1); model.skip(); model.select('town');
     assert.deepEqual(model.point, point); assert.equal(model.enterHref(), null); assert.equal(model.moving, false);
 });
-test('return URLs are limited to town/rice/corral and never treated as arbitrary destinations', () => {
-    for (const at of ['town', 'rice', 'corral'] as const) {
+test('return URLs include neutral vazao and never accept arbitrary destinations', () => {
+    for (const at of ['town', 'rice', 'corral', 'vazao'] as const) {
         assert.equal(guairaArrivalFromSearch(`?at=${at}`), at); assert.equal(guairaReturnHref(at), `./guaira.html?at=${at}`);
     }
     for (const search of ['', '?at=7', '?at=house', '?at=https://example.com', '?at=curral']) assert.equal(guairaArrivalFromSearch(search), 'town');
@@ -111,4 +117,35 @@ test('slow successful loading remains pending until completion without an arbitr
     void loading.then(() => { settled = true; });
     await new Promise(resolve => setTimeout(resolve, 25)); assert.equal(settled, false);
     complete('late but valid image'); assert.equal((await loading).image, 'late but valid image');
+});
+
+test('arena and ascent share the curral distance while retaining distinct actions and links', () => {
+    const model = new GuairaMapModel(metadata, 'corral');
+    assert.ok(model.arrivalDistances.corral < model.length, 'appending house never moves curral');
+    assert.equal(model.destinationDistances.curral, model.destinationDistances.subida);
+    assert.equal(model.arrival, 'corral');
+    const point = model.point, distance = model.distance;
+    assert.equal(model.enterHref(), './guaira-lab.html');
+    model.select('subida');
+    assert.equal(model.selected, 'subida'); assert.equal(model.moving, false);
+    assert.deepEqual(model.point, point); assert.equal(model.distance, distance);
+    assert.equal(model.enterHref(), './guaira-subida.html');
+    assert.notEqual(GUAIRA_DESTINATIONS.curral.action, GUAIRA_DESTINATIONS.subida.action);
+    model.select('curral'); assert.equal(model.enterHref(), './guaira-lab.html');
+});
+test('house arrival is neutral and returns over the exact final canonical segment in reverse', () => {
+    const model = new GuairaMapModel(metadata, 'vazao');
+    assert.equal(model.selected, null); assert.equal(model.arrival, 'vazao');
+    assert.deepEqual(model.point, metadata.nodes['guaira-5']);
+    assert.equal(model.enterHref(), null); assert.equal(model.moving, false);
+    model.select('curral'); assert.equal(model.enterHref(), null);
+    assert.equal(model.targetDistance, model.arrivalDistances.corral);
+    const finalRoute = metadata.routes['3:4'];
+    assert.deepEqual(model.path.slice(-finalRoute.length), finalRoute);
+    model.tick(.05); assert.ok(model.distance < model.arrivalDistances.vazao);
+    const before = model.point, distance = model.distance;
+    model.select('subida'); assert.deepEqual(model.point, before); assert.equal(model.distance, distance);
+    finish(model); assert.deepEqual(model.point, metadata.nodes['guaira-4']);
+    assert.equal(model.arrival, 'corral'); assert.equal(model.enterHref(), './guaira-subida.html');
+    model.select('town'); finish(model); assert.deepEqual(model.point, metadata.nodes['guaira-1']);
 });

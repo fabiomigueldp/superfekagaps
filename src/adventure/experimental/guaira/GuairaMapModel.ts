@@ -1,6 +1,6 @@
 /** Isolated local navigation. These names never enter the campaign or saved progress. */
-export type GuairaDestination = 'town' | 'curral';
-export type GuairaArrival = 'town' | 'rice' | 'corral';
+export type GuairaDestination = 'town' | 'curral' | 'subida';
+export type GuairaArrival = 'town' | 'rice' | 'corral' | 'vazao';
 export interface GuairaPoint { x: number; y: number }
 export interface GuairaMetadata {
     worldId: 'guaira'; size: { width: 1920; height: 1200 };
@@ -9,24 +9,27 @@ export interface GuairaMetadata {
     artBounds: { left: number; top: number; right: number; bottom: number };
 }
 export const GUAIRA_DESTINATIONS = {
-    town: { node: 'guaira-1', title: 'Estrada do Vento', short: 'TRAVESSIA', href: './guaira-travessia.html', description: 'Atravesse a terra seca e leve água ao bairro.' },
-    curral: { node: 'guaira-4', title: 'Curral da Comporta', short: 'CURRAL', href: './guaira-lab.html', description: 'Enfrente Ossabravo na arena experimental.' },
+    town: { node: 'guaira-1', arrival: 'town', title: 'Estrada do Vento', short: 'TRAVESSIA', action: 'JOGAR', href: './guaira-travessia.html', description: 'Atravesse a terra seca e leve água ao bairro.' },
+    curral: { node: 'guaira-4', arrival: 'corral', title: 'Curral da Comporta', short: 'ARENA', action: 'ARENA', href: './guaira-lab.html', description: 'Enfrente Ossabravo na arena experimental.' },
+    subida: { node: 'guaira-4', arrival: 'corral', title: 'Subida à Casa', short: 'SUBIDA', action: 'SUBIR', href: './guaira-subida.html', description: 'Parta do curral e suba até o terraço da Casa da Vazão.' },
 } as const;
+const ARRIVAL_NODES = { town: 'guaira-1', rice: 'guaira-3', corral: 'guaira-4', vazao: 'guaira-5' } as const;
 export function guairaArrivalFromSearch(search: string): GuairaArrival {
     const at = new URLSearchParams(search).get('at');
-    return at === 'rice' || at === 'corral' ? at : 'town';
+    return at === 'rice' || at === 'corral' || at === 'vazao' ? at : 'town';
 }
 export function guairaReturnHref(at: GuairaArrival): string { return `./guaira.html?at=${at}`; }
 const isPoint = (v: unknown): v is GuairaPoint => !!v && typeof v === 'object' && ['x', 'y'].every(k => {
     const n = (v as Record<string, unknown>)[k]; return typeof n === 'number' && Number.isFinite(n) && n >= 0 && n <= 1;
 });
 const samePoint = (a: GuairaPoint, b: GuairaPoint) => Math.hypot(a.x - b.x, a.y - b.y) < 1e-6;
+const isRecord = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
 /** Fail closed: the rendered scene and its exact five projected landmarks form one contract. */
 export function parseGuairaMetadata(value: unknown): GuairaMetadata | null {
     if (!value || typeof value !== 'object') return null;
     const data = value as GuairaMetadata & { campaignIntegrated?: unknown; version?: unknown };
     if (data.version !== 1 || data.worldId !== 'guaira' || data.campaignIntegrated !== false ||
-        data.size?.width !== 1920 || data.size?.height !== 1200 || !data.nodes || !data.routes) return null;
+        data.size?.width !== 1920 || data.size?.height !== 1200 || !isRecord(data.nodes) || !isRecord(data.routes)) return null;
     if (![1, 2, 3, 4, 5].every(i => isPoint(data.nodes[`guaira-${i}`]))) return null;
     for (let i = 0; i < 4; i++) {
         const route = data.routes[`${i}:${i + 1}`];
@@ -34,33 +37,44 @@ export function parseGuairaMetadata(value: unknown): GuairaMetadata | null {
             !samePoint(route[0], data.nodes[`guaira-${i + 1}`]) || !samePoint(route[route.length - 1], data.nodes[`guaira-${i + 2}`])) return null;
     }
     const b = data.artBounds;
-    if (!b || !isPoint({ x: b.left, y: b.top }) || !isPoint({ x: b.right, y: b.bottom }) || b.left >= b.right || b.top >= b.bottom) return null;
+    if (!isRecord(b) || !isPoint({ x: b.left, y: b.top }) || !isPoint({ x: b.right, y: b.bottom }) || b.left >= b.right || b.top >= b.bottom) return null;
     // Copy only local geometric data; no external IDs or links can become destinations.
     return { worldId: 'guaira', size: { width: 1920, height: 1200 },
         nodes: Object.fromEntries([1, 2, 3, 4, 5].map(i => { const key = `guaira-${i}`, p = data.nodes[key]; return [key, { x: p.x, y: p.y }]; })),
         routes: Object.fromEntries(['0:1', '1:2', '2:3', '3:4'].map(key => [key, data.routes[key].map(p => ({ x: p.x, y: p.y }))])),
-        artBounds: { ...b } };
+        artBounds: { left: b.left, top: b.top, right: b.right, bottom: b.bottom } };
 }
 /** One continuous authored road: rapid reversals change direction at the current foot position. */
 export class GuairaMapModel {
     readonly path: GuairaPoint[];
     readonly distances: number[] = [0];
     readonly length: number;
+    readonly landmarkDistances: Record<string, number>;
+    readonly destinationDistances: Record<GuairaDestination, number>;
+    readonly arrivalDistances: Record<GuairaArrival, number>;
     selected: GuairaDestination | null;
     distance: number;
     facingLeft = false;
     closed = false;
     reducedMotion = false;
     constructor(readonly metadata: GuairaMetadata, initial: GuairaArrival = 'town') {
-        this.path = ['0:1', '1:2', '2:3'].flatMap((key, index) => metadata.routes[key].slice(index ? 1 : 0));
+        this.path = ['0:1', '1:2', '2:3', '3:4'].flatMap((key, index) => metadata.routes[key].slice(index ? 1 : 0));
         for (let i = 1; i < this.path.length; i++) this.distances.push(this.distances[i - 1] +
             Math.hypot((this.path[i].x - this.path[i - 1].x) * 1920, (this.path[i].y - this.path[i - 1].y) * 1200));
         this.length = this.distances[this.distances.length - 1];
-        this.selected = initial === 'rice' ? null : initial === 'corral' ? 'curral' : 'town';
-        const riceIndex = this.path.findIndex(p => samePoint(p, metadata.nodes['guaira-3']));
-        this.distance = initial === 'corral' ? this.length : initial === 'rice' ? this.distances[riceIndex] : 0;
+        this.landmarkDistances = Object.fromEntries(Object.entries(metadata.nodes).map(([id, point]) =>
+            [id, this.distances[this.path.findIndex(p => samePoint(p, point))]]));
+        this.destinationDistances = Object.fromEntries(Object.entries(GUAIRA_DESTINATIONS).map(([id, destination]) =>
+            [id, this.landmarkDistances[destination.node]])) as Record<GuairaDestination, number>;
+        this.arrivalDistances = Object.fromEntries(Object.entries(ARRIVAL_NODES).map(([arrival, node]) =>
+            [arrival, this.landmarkDistances[node]])) as Record<GuairaArrival, number>;
+        this.selected = initial === 'rice' || initial === 'vazao' ? null : initial === 'corral' ? 'curral' : 'town';
+        this.distance = this.arrivalDistances[initial];
     }
-    get targetDistance(): number { return this.selected === null ? this.distance : this.selected === 'curral' ? this.length : 0; }
+    get targetDistance(): number { return this.selected === null ? this.distance : this.destinationDistances[this.selected]; }
+    get arrival(): GuairaArrival | null {
+        return (Object.keys(ARRIVAL_NODES) as GuairaArrival[]).find(at => Math.abs(this.arrivalDistances[at] - this.distance) < 1e-6) ?? null;
+    }
     get moving(): boolean { return !this.closed && Math.abs(this.targetDistance - this.distance) > 1e-6; }
     get canEnter(): boolean { return !this.closed && this.selected !== null && !this.moving; }
     get point(): GuairaPoint { return this.pointAt(this.distance); }
