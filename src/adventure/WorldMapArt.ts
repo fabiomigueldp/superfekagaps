@@ -8,6 +8,10 @@ export interface MapArtMetadata {
     nodes: Record<string, MapPoint>;
     routes: Record<string, MapPoint[]>;
     secretRoute: MapPoint[];
+    /** Serra's maintenance shortcut is a vehicle, never an airborne walk path. */
+    secretTransport?: 'maintenance-cable';
+    /** Authored Serra traversal times; other regions retain their released pace. */
+    routeDurationsSeconds?: Record<string, number>;
     artBounds?: MapArtBounds;
 }
 export interface MapArtAssets {
@@ -53,9 +57,22 @@ export function parseMapMetadata(value: unknown, world = 1): MapArtMetadata | nu
         if (!path(points, from + 1, from + 2)) return null;
         routes[key] = points;
     }
-    if (!path(data.secretRoute, 3, 5)) return null;
+    let routeDurationsSeconds: Record<string, number> | undefined;
+    if (data.routeDurationsSeconds !== undefined) {
+        const timings = data.routeDurationsSeconds;
+        if (world !== 4 || !timings || typeof timings !== 'object' || Array.isArray(timings) ||
+            Object.keys(timings).length !== 4 || Object.keys(routes).some(key => !Number.isFinite(timings[key]) ||
+                timings[key] <= 0 || timings[key] > 120)) return null;
+        routeDurationsSeconds = Object.fromEntries(Object.keys(routes).map(key => [key, timings[key]]));
+    }
+    if (data.secretTransport !== undefined && (world !== 4 || data.secretTransport !== 'maintenance-cable')) return null;
+    if (data.secretTransport === 'maintenance-cable') {
+        if (!Array.isArray(data.secretRoute) || data.secretRoute.length !== 0) return null;
+    } else if (!path(data.secretRoute, 3, 5)) return null;
     return { world, nodes: Object.fromEntries([1, 2, 3, 4, 5].map(n => [`${world}-${n}`, data.nodes[`${world}-${n}`]])),
         routes, secretRoute: data.secretRoute,
+        ...(data.secretTransport ? { secretTransport: data.secretTransport } : {}),
+        ...(routeDurationsSeconds ? { routeDurationsSeconds } : {}),
         ...(bounds ? { artBounds: { top: bounds.top, bottom: bounds.bottom,
             ...(bounds.left === undefined ? {} : { left: bounds.left }),
             ...(bounds.right === undefined ? {} : { right: bounds.right }) } } : {}) };

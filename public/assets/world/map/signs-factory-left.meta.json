@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "coordinateSystem": "sourceRect is physical atlas pixels; displaySize, foot, letterCenter, usableFace and decorativeTranslateY are CSS pixels. Glyph cells are integer2CSSpx.",
+  "atlas": {
+    "image": "signs-factory-left.webp",
+    "width": 256,
+    "height": 112,
+    "bytes": 7936
+  },
+  "frames": [
+    {
+      "kind": "factory-left",
+      "image": "factory-left-dpr2.webp",
+      "cssWidth": 128,
+      "cssHeight": 56,
+      "dpr": 2,
+      "foot": {
+        "x": 64.0,
+        "y": 45.678
+      },
+      "letterCenter": {
+        "x": 66.819,
+        "y": 22.094
+      },
+      "usableFace": {
+        "x": 18.578,
+        "y": 9.888,
+        "width": 90.844,
+        "height": 19.360999999999997
+      },
+      "letterPixelScale": 2,
+      "palette": {
+        "letters": "#191f35",
+        "closedLetters": "#191f35",
+        "selected": "#e9ad4c"
+      },
+      "decorativeTranslateY": 10.322,
+      "bytes": 8458,
+      "sourceRect": {
+        "x": 0,
+        "y": 0,
+        "width": 256,
+        "height": 112
+      },
+      "displaySize": {
+        "width": 128,
+        "height": 56
+      }
+    }
+  ]
+}

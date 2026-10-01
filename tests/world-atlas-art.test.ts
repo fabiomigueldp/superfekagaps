@@ -5,6 +5,7 @@ import { fallbackMapMetadata, paintWorldMap } from '../src/adventure/WorldMapArt
 import { COAST_PORT_PLACEMENTS, localToAtlas } from '../src/adventure/WorldAtlasModel';
 import { atlasActorScale, atlasBoatBounds, paintWorldAtlas, type AtlasPaintState, type BoatAtlasFrame } from '../src/adventure/WorldAtlasArt';
 import { mapToScreen } from '../src/adventure/WorldMapModel';
+import { atlasCableBounds, validCableFrame, type AtlasCableCar, type CableAtlasFrame } from '../src/adventure/WorldCableArt';
 
 interface Call { name: string; args: unknown[]; color?: unknown }
 function recordingContext() {
@@ -158,4 +159,64 @@ test('reduced motion has identical paint output across timestamps and retains th
     paintWorldMap(legacy.context, { ...island, camera, time: 0, reducedMotion: true,
         marker: { x: .5, y: .5 }, walking: false, facingLeft: false });
     assert.ok(legacy.calls.some(call => call.name === 'drawImage' && call.args[0] === phantom));
+});
+
+const cableFrame: CableAtlasFrame = { width: 144, height: 260, widthInMap: .075, passengerPixelScale: (4.15 / 20.6 * 3 / 384) * 144 / .075,
+    passengerFoot: { x: 72, y: 225 }, rear: { x: 0, y: 0, w: 144, h: 260 }, foreground: { x: 144, y: 0, w: 144, h: 260 } };
+const cable = (id: 'a' | 'b', x: number, y: number): AtlasCableCar => ({ id, foot: { x, y }, frame: cableFrame,
+    assets: { rear: image(`${id}-rear`), foreground: image(`${id}-front`) } });
+
+test('cabin bounds preserve the measured passenger foot, full hanger and original Feka scale', () => {
+    const car = cable('a', 3.3, -.4), bounds = atlasCableBounds(car);
+    assert.ok(validCableFrame(car.frame));
+    const top = mapToScreen({ x: bounds.left, y: bounds.top }, camera), bottom = mapToScreen({ x: bounds.right, y: bounds.bottom }, camera);
+    const foot = mapToScreen(car.foot, camera);
+    assert.ok(Math.abs(top.x + (bottom.x - top.x) * 72 / 144 - foot.x) < 1e-8);
+    assert.ok(Math.abs(top.y + (bottom.y - top.y) * 225 / 260 - foot.y) < 1e-8);
+    assert.ok(bounds.top < car.foot.y && bounds.bottom > car.foot.y);
+    assert.ok(Math.abs(atlasActorScale(camera, car.frame) - atlasActorScale(camera)) < 1e-10);
+});
+
+test('only the occupied cable car surrounds Feka; the other car and moored ferry remain passenger-free', () => {
+    for (const occupied of ['a', 'b'] as const) {
+        const state = scene(true), a = cable('a', 3.3, -.4), b = cable('b', 3.4, -.5), { context, calls } = recordingContext();
+        state.cableCars = [a, b]; state.actor.cableCar = occupied; state.actor.point = (occupied === 'a' ? a : b).foot;
+        paintWorldAtlas(context, state);
+        const active = occupied === 'a' ? a : b, empty = occupied === 'a' ? b : a;
+        const rearIndex = calls.findIndex(call => call.name === 'drawImage' && call.args[0] === active.assets.rear);
+        const frontIndex = calls.findIndex(call => call.name === 'drawImage' && call.args[0] === active.assets.foreground);
+        const pixels = actorPixels(calls);
+        assert.equal(pixels.length, PLAYER_SPRITES.idle.flatMap(row => [...row]).filter(pixel => PLAYER_PALETTE[pixel]).length);
+        assert.ok(pixels.every(pixel => calls.indexOf(pixel) > rearIndex && calls.indexOf(pixel) < frontIndex));
+        for (const source of [rear, foreground])
+            assert.ok(calls.findIndex(call => call.name === 'drawImage' && call.args[0] === source) < calls.indexOf(pixels[0]));
+        const emptyRear = calls.findIndex(call => call.name === 'drawImage' && call.args[0] === empty.assets.rear);
+        const emptyFront = calls.findIndex(call => call.name === 'drawImage' && call.args[0] === empty.assets.foreground);
+        assert.ok(emptyRear < emptyFront);
+        if (occupied === 'a') assert.ok(emptyRear > frontIndex, 'The front empty car retains honest depth over the rear passenger.');
+        else assert.ok(emptyFront < rearIndex, 'The rear empty car stays behind the occupied front car.');
+        const draw = calls[rearIndex], top = atlasCableBounds(active);
+        assert.deepEqual(draw.args.slice(1, 5), [0, 0, 144, 260]);
+        assert.equal(draw.args[5], mapToScreen({ x: top.left, y: top.top }, camera).x);
+    }
+});
+
+test('an incomplete or invalid cabin disappears safely and cannot hide the original actor', () => {
+    for (const failure of ['rear', 'front', 'frame'] as const) {
+        const state = scene(true), car = cable('a', 3.3, -.4), { context, calls } = recordingContext();
+        if (failure === 'rear') car.assets.rear = null;
+        if (failure === 'front') car.assets.foreground = null;
+        if (failure === 'frame') car.frame = { ...car.frame, passengerFoot: { x: Infinity, y: 225 } };
+        state.cableCars = [car]; state.actor.cableCar = 'a'; state.actor.point = car.foot;
+        paintWorldAtlas(context, state);
+        assert.ok(actorPixels(calls).length > 100);
+        assert.equal(calls.filter(call => call.name === 'drawImage' && [car.assets.rear, car.assets.foreground].includes(call.args[0] as CanvasImageSource)).length, 0);
+    }
+});
+
+test('parked cabin paint stays deterministic and a remote-region preview never invents a passenger', () => {
+    const state = scene(false), a = recordingContext(), b = recordingContext();
+    state.cableCars = [cable('a', 3.3, -.4), cable('b', 3.4, -.5)]; state.actor.visible = false;
+    paintWorldAtlas(a.context, state); paintWorldAtlas(b.context, { ...state, time: 99999 });
+    assert.equal(actorPixels(a.calls).length, 0); assert.deepEqual(a.calls, b.calls);
 });

@@ -12,7 +12,7 @@ cli = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--repo-root', default=os.environ.get('FEKA_SIGN_REPO_ROOT'))
 parser.add_argument('--output-dir', default=os.environ.get('FEKA_SIGN_OUTPUT_DIR'))
-parser.add_argument('--only', choices=['stage','selected','complete','locked','selected-complete','dock-right','dock-left','factory-right'])
+parser.add_argument('--only', choices=['stage','selected','complete','locked','selected-complete','dock-right','dock-left','factory-right','factory-left'])
 args = parser.parse_args(cli)
 if not args.repo_root or not args.output_dir:
     parser.error('--repo-root and --output-dir (or FEKA_SIGN_* equivalents) are required')
@@ -49,7 +49,7 @@ for kind in kinds:
     bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
     for m in list(bpy.data.materials):bpy.data.materials.remove(m)
     timber=material('Original soil warm timber','#bc845d',True);edge=material('Original soil end grain','#92604c',True);face=material('Original paper pale weathered plank','#f5efd3',True);post=material('Original soil shadow','#523748',True);nail=material('Original ink iron nail','#303650');gold=material('Original gold paint','#e9ad4c');teal=material('Original teal completion cloth','#4eafa7')
-    factory=kind=='factory-right';dock=kind.startswith('dock') or factory
+    factory=kind.startswith('factory-');dock=kind.startswith('dock') or factory
     half=1.80 if factory else 1.42 if dock else .72;top=1.24;bottom=.59
     # Tiny natural chips keep the silhouette tactile without noisy ornament.
     outline=[(-half+.05,bottom),(-half,bottom+.07),(-half,top-.05),(-half+.035,top),(half-.055,top-.012),(half,top-.06),(half-.015,bottom+.02)]
@@ -64,7 +64,7 @@ for kind in kinds:
     face_center=.99 if factory else .91
     inset=[(x*.93,-.109,face_center+(z-face_center)*.91) for x,z in outline]
     mesh('thin warm ivory painted face',inset,[tuple(range(n-1,-1,-1))],face)
-    support_x = [-1.29] if factory else [.91] if kind=='dock-left' else [-.91] if kind=='dock-right' else [-.44,.44]
+    support_x = [1.29 if kind=='factory-left' else -1.29] if factory else [.91] if kind=='dock-left' else [-.91] if kind=='dock-right' else [-.44,.44]
     for x in support_x:
         cube('square timber support post',(x,.065,.36),(.095,.125,.72),post,.017)
         cube('sunlit post grain',(x-.022,-.001,.32),(.022,.011,.56),timber,.004)
@@ -98,7 +98,7 @@ for kind in kinds:
     bpy.context.view_layer.update()
     def project(p):
         q=world_to_camera_view(scene,cam,Vector(p));return {'x':round(q.x*width/4,3),'y':round((1-q.y)*height/4,3)}
-    letter_center=project((-.09 if kind in {'dock-right','factory-right'} else .09 if kind=='dock-left' else 0,-.13,.905))
+    letter_center=project((-.09 if kind in {'dock-right','factory-right'} else .09 if kind in {'dock-left','factory-left'} else 0,-.13,.905))
     half_safe=1.45 if factory else 1.04 if dock else .59;corners=[project((x,-.13,z)) for x in [-half_safe,half_safe] for z in [.65,1.34 if factory else 1.18]]
     face_rect={'x':min(p['x'] for p in corners),'y':min(p['y'] for p in corners),'width':max(p['x'] for p in corners)-min(p['x'] for p in corners),'height':max(p['y'] for p in corners)-min(p['y'] for p in corners)}
     data={'kind':kind,'image':kind+'.png','cssWidth':width//4,'cssHeight':height//4,'dpr':4,'foot':project((0,0,0)),'letterCenter':letter_center,'usableFace':face_rect,'letterPixelScale':2,'palette':{'letters':'#191f35','closedLetters':'#191f35','selected':'#e9ad4c'}}

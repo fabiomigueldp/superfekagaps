@@ -7,18 +7,23 @@ export interface JourneyEdge {
     to: string;
     points?: readonly MapPoint[];
     duration: number;
-    /** Author boarding edges from the shore to the boat; reverse is disembark. */
-    mode: 'walk' | 'board' | 'sail';
+    /** Boarding edges go from the platform to the vehicle; reverse is disembark. */
+    mode: 'walk' | 'board' | 'sail' | 'cable-board' | 'cable';
 }
 export interface JourneyNetwork {
     nodes: Readonly<Record<string, MapPoint>>;
     edges: readonly JourneyEdge[];
 }
+export type JourneyEdgeDirection = 'forward' | 'reverse' | 'both' | 'none';
 export interface JourneyCapabilities {
     /** Derive these IDs with the existing progression rules, including secrets. */
     availableStages: readonly string[];
     /** Omit to enable every authored edge; supply to gate shortcuts or crossings. */
     availableEdges?: readonly string[];
+    /** Departure permissions relative to each authored from/to pair. Omitted
+     * edges remain bidirectional. Closing a departure never strands an active leg.
+     */
+    edgeDirections?: Readonly<Record<string, JourneyEdgeDirection>>;
 }
 export interface JourneyLeg extends JourneyEdge {
     points: readonly MapPoint[];
@@ -38,7 +43,7 @@ export interface JourneyState {
     legs: readonly JourneyLeg[];
     blocked: 'unavailable' | 'no-route' | null;
 }
-export type JourneyMode = 'arrived' | 'walk' | 'board' | 'sail' | 'disembark' | 'entered';
+export type JourneyMode = 'arrived' | JourneyEdge['mode'] | 'disembark' | 'cable-disembark' | 'entered';
 const stageId = (id: string) => /^[1-6]-[1-5]$/.test(id);
 const stageIndex = (id: string) => Number(id[0]) * 5 + Number(id[2]);
 const copy = (point: MapPoint): MapPoint => ({ x: point.x, y: point.y });
@@ -74,7 +79,7 @@ function authoredLegs(network: JourneyNetwork, capabilities: JourneyCapabilities
 }
 
 /** Small weighted route search over authored paths, not terrain or rendered pixels. */
-function route(from: string, to: string, edges: readonly JourneyLeg[]): JourneyLeg[] | null {
+function route(from: string, to: string, edges: readonly JourneyLeg[], capabilities: JourneyCapabilities): JourneyLeg[] | null {
     const queue = [{ node: from, cost: 0, legs: [] as JourneyLeg[] }], visited = new Set<string>();
     while (queue.length) {
         queue.sort((a, b) => a.cost - b.cost);
@@ -85,6 +90,8 @@ function route(from: string, to: string, edges: readonly JourneyLeg[]): JourneyL
         for (const edge of edges) {
             if (edge.from !== current.node && edge.to !== current.node) continue;
             const forward = edge.from === current.node, node = forward ? edge.to : edge.from;
+            const permission = capabilities.edgeDirections?.[edge.id] ?? 'both';
+            if (permission !== 'both' && permission !== (forward ? 'forward' : 'reverse')) continue;
             if (!visited.has(node)) queue.push({ node, cost: current.cost + edge.duration,
                 legs: [...current.legs, { ...edge, direction: forward ? 1 : -1, progress: forward ? 0 : 1 }] });
         }
@@ -111,12 +118,12 @@ export function selectJourney(state: JourneyState, selected: string, network: Jo
         // is a safe exit. Every subsequent edge still obeys current capabilities.
         const candidates = [active.direction, -active.direction].flatMap(direction => {
             const partial: JourneyLeg = { ...active, direction: direction as 1 | -1 };
-            const rest = route(endpoint(partial), selected, edges);
+            const rest = route(endpoint(partial), selected, edges, capabilities);
             return rest ? [[partial, ...rest]] : [];
         });
         candidates.sort((a, b) => cost(a) - cost(b));
         legs = candidates[0] ?? null;
-    } else legs = route(state.node ?? state.arrived, selected, edges);
+    } else legs = route(state.node ?? state.arrived, selected, edges, capabilities);
     if (!legs) return { ...state, selected, blocked: 'no-route' };
     const next = { ...state, selected, destination: selected, entered: null, legs, blocked: null };
     return options.reducedMotion ? skipJourney(next) : advanceJourney(next, 0);
@@ -164,7 +171,8 @@ export function enterJourney(state: JourneyState, capabilities: JourneyCapabilit
 export function journeyMode(state: JourneyState): JourneyMode {
     if (state.entered) return 'entered';
     const leg = state.legs[0];
-    return !leg ? 'arrived' : leg.mode === 'board' && leg.direction === -1 ? 'disembark' : leg.mode;
+    return !leg ? 'arrived' : leg.mode === 'board' && leg.direction === -1 ? 'disembark'
+        : leg.mode === 'cable-board' && leg.direction === -1 ? 'cable-disembark' : leg.mode;
 }
 export function journeyBlockReason(state: JourneyState): string {
     return state.blocked === 'unavailable' ? 'Conclua o caminho anterior para visitar esta fase.'

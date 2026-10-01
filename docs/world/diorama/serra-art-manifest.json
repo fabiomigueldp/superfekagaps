@@ -1,0 +1,55 @@
+{
+  "status": "authoring-physical-and-head-visibility-checks-pass-browser-review-required",
+  "sourceBuilder": "tools/diorama/render_serra_map.py",
+  "packager": "tools/diorama/package_serra_map.py",
+  "size": {
+    "width": 1920,
+    "height": 1200
+  },
+  "artBounds": {
+    "left": 0.12395833333333334,
+    "top": 0.0825,
+    "right": 0.8416666666666667,
+    "bottom": 0.9766666666666667
+  },
+  "movingCarriersBakedIntoBackground": false,
+  "cabinCrop": {
+    "x": 871,
+    "y": 325,
+    "width": 135,
+    "height": 195
+  },
+  "timingCalibration": {
+    "walkWorldUnitsPerSecond": 1.73,
+    "cableWorldUnitsPerSecond": 2.1,
+    "source": "Walk pace matches released cargo bridge5.54/3.2; cable modestly faster; no route cost overrides."
+  },
+  "main43to45Seconds": 6.641684,
+  "maintenance43to45Seconds": {
+    "a": 6.598429,
+    "b": 4.170429
+  },
+  "files": [
+    {
+      "path": "serra-diorama.webp",
+      "bytes": 240110,
+      "sha256": "b4ad877e076d706d1c7858162074f322cc8d05515ff5cfd6a551db2444578e56"
+    },
+    {
+      "path": "serra-diorama.meta.json",
+      "bytes": 2903,
+      "sha256": "38f80126ef8e6953355e24152551878fd429693b814cac7504ea546346929da0"
+    },
+    {
+      "path": "serra-maintenance-cabin.webp",
+      "bytes": 10376,
+      "sha256": "0765d65a0d3f0fb2a6d93df1ed0f971fa6f71fbad4a6f48c493b418897224ce2"
+    },
+    {
+      "path": "serra-maintenance-cable.meta.json",
+      "bytes": 6905,
+      "sha256": "63a4145b7c47a78daca4c8cebb524e1a55d2196c0e8df8a91cbfc754bc862691"
+    }
+  ],
+  "validation": "docs/world/diorama/serra-validation.json"
+}

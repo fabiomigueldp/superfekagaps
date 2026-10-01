@@ -24,6 +24,7 @@ Chrome na origem de prévia da branch `feat/connected-coast-port`, com save inte
 - Duas mudanças de direção pelo teclado durante a ponte conservaram a caminhada; Pular concluiu em Porto
 - Recarregar durante o retorno na ponte restaurou `3-1`, a última chegada confirmada
 - Panorama de três regiões e closes inspecionados em 1180×757 e 590×378 pixels CSS. O tamanho estreito foi obtido por zoom de 200%, não por um aparelho com toque
+- Revisão final `c56024567526133575d76e2456492cdf6a9d731e`, bundle `index-DDypKL4z.js`, confirmada na mesma prévia. O close estreito da Fábrica mostra apenas sua placa de retorno; a viagem direta Costa→Fábrica manteve Feka e o barco inteiros durante o trecho marítimo
 
 ## Correções da revisão
 
@@ -38,3 +39,11 @@ A inspeção em 590×378 revelou que a placa de ida do Porto reaparecia junto à
 Falhas de carregamento, respostas tardias e preferência de movimento reduzido foram exercitadas nos testes automatizados; não foram induzidas no navegador. Não foram medidos FPS nem toque físico. A ponte tem estados estáticos levantado e baixado, sem animação intermediária.
 
 Os assets novos da Fábrica e da ponte somam 253.152 bytes; a placa opcional usa 7.798 bytes de imagem mais 1.135 bytes de metadados. Os arquivos de autoria são reproduzíveis e ficam fora do carregamento do jogo. Não há save de teste, captura de QA, arquivo Blender ou implantação Oracle no produto.
+
+## Produção
+
+`c56024567526133575d76e2456492cdf6a9d731e` foi integrado por fast-forward e a implantação Vercel terminou com sucesso. O bundle `index-DDypKL4z.js` foi confirmado em `https://superfekagaps.vercel.app/`.
+
+Com o progresso normal da origem de produção, a Fábrica permaneceu bloqueada e a ponte apareceu levantada. O panorama terminou o enquadramento com as três regiões completas. Retornar à Costa, entrar em `1-1`, pausar e voltar ao mapa preservou a chegada e os bloqueios. Nenhuma fixture foi importada nessa origem.
+
+Antes da integração, não havia alterações em workflows, configuração de implantação, servidor ou scripts, nem hooks Git personalizados. O checkout original aberto pelo usuário foi preservado; toda a implementação usou um worktree separado.

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { mapStageSignKind, paintPhysicalDockSign, paintPhysicalStageSign, paintPhysicalTravelSign, parseMapSignMetadata, parseMapFactorySignMetadata } from '../src/adventure/WorldMapSignArt';
+import { mapStageSignKind, paintPhysicalDockSign, paintPhysicalStageSign, paintPhysicalTravelSign, parseMapSignMetadata, parseMapFactorySignMetadata, parseMapFactoryLeftSignMetadata } from '../src/adventure/WorldMapSignArt';
 import { textWidth } from '../src/graphics/BitmapFont';
 import { ART } from '../src/graphics/palette';
 
@@ -115,4 +115,45 @@ test('the two Porto signs use opposite physical arrows and departure-side gates'
     const fallback = canvas();
     assert.equal(paintPhysicalTravelSign(fallback.canvas, atlas, null, { label: 'FÁBRICA', direction: 'right', wide: true }, false), false);
     assert.equal(fallback.calls.length, 0, 'A missing wide prop cannot squeeze Factory lettering onto the short board.');
+});
+
+test('the Serra return uses its own left Factory blank, full accented lettering and right-side support gate', () => {
+    const raw = JSON.parse(readFileSync(new URL('../public/assets/world/map/signs-factory-left.meta.json', import.meta.url), 'utf8'));
+    const frame = parseMapFactoryLeftSignMetadata(raw); assert.ok(frame);
+    assert.equal(parseMapFactorySignMetadata(raw), null, 'The left supplement cannot replace the released right-arrow image.');
+    const atlas = { frame, image: {} as HTMLImageElement }, painted = canvas();
+    assert.equal(paintPhysicalTravelSign(painted.canvas, null, atlas, { label: 'FÁBRICA', direction: 'left', wide: true }, true), true);
+    assert.equal(painted.canvas.width, 256); assert.equal(painted.canvas.height, 112);
+    assert.equal(painted.canvas.style.transform, 'translate(0px, 10px)');
+    assert.ok(Math.abs(frame.foot.y + 10 - frame.displaySize.height) < .4);
+    for (const call of painted.calls.filter(call => call.method === 'fillRect')) {
+        const [x, y, width, height] = call.args as number[];
+        assert.equal(call.color, ART.ink); assert.ok(call.args.every(Number.isInteger));
+        assert.ok(x >= frame.usableFace.x && x + width <= frame.usableFace.x + frame.usableFace.width);
+        assert.ok(y >= frame.usableFace.y && y + height <= frame.usableFace.y + frame.usableFace.height, 'The acute accent stays on the measured face.');
+    }
+    const closed = canvas();
+    paintPhysicalTravelSign(closed.canvas, null, atlas, { label: 'FÁBRICA', direction: 'left', wide: true }, false);
+    assert.ok(closed.calls.some(call => call.method === 'fillRect' && call.color === ART.gold && call.args.join(',') === '103,35,4,1'));
+    const wrongDirection = canvas();
+    assert.equal(paintPhysicalTravelSign(wrongDirection.canvas, null, atlas, { label: 'FÁBRICA', direction: 'right', wide: true }, true), false);
+    assert.equal(wrongDirection.calls.length, 0);
+    for (const change of [
+        (copy: any) => { copy.frames[0].kind = 'factory-right'; },
+        (copy: any) => { copy.atlas.image = 'signs-factory.webp'; },
+        (copy: any) => { copy.frames[0].letterCenter.y = 10; },
+        (copy: any) => { copy.frames[0].displaySize.width = 104; },
+    ]) { const copy = structuredClone(raw); change(copy); assert.equal(parseMapFactoryLeftSignMetadata(copy), null); }
+});
+
+test('Serra lettering fits the released right arrow without changing its target or left support', () => {
+    const atlas = { metadata: parseMapSignMetadata(metadata())!, image: {} as HTMLImageElement }, painted = canvas();
+    const frame = atlas.metadata.frames['dock-right'];
+    assert.equal(paintPhysicalTravelSign(painted.canvas, atlas, null, { label: 'SERRA', direction: 'right' }, true), true);
+    assert.equal(painted.canvas.width, 208); assert.equal(painted.canvas.height, 112);
+    for (const call of painted.calls.filter(call => call.method === 'fillRect')) {
+        const [x, y, width, height] = call.args as number[];
+        assert.ok(x >= frame.usableFace.x && x + width <= frame.usableFace.x + frame.usableFace.width);
+        assert.ok(y >= frame.usableFace.y && y + height <= frame.usableFace.y + frame.usableFace.height);
+    }
 });

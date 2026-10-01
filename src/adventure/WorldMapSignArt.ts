@@ -3,7 +3,7 @@ import { ART } from '../graphics/palette';
 
 const KINDS = ['stage', 'selected', 'complete', 'locked', 'selected-complete', 'dock-right', 'dock-left'] as const;
 type BaseMapSignKind = typeof KINDS[number];
-export type MapSignKind = BaseMapSignKind | 'factory-right';
+export type MapSignKind = BaseMapSignKind | 'factory-right' | 'factory-left';
 export type MapSignDirection = 'left' | 'right';
 export interface MapTravelSign { label: string; direction: MapSignDirection; wide?: boolean }
 interface Point { x: number; y: number }
@@ -56,10 +56,19 @@ export function parseMapSignMetadata(value: unknown): MapSignMetadata | null {
 
 /** The wider Factory face is optional; invalid geometry keeps its procedural fallback. */
 export function parseMapFactorySignMetadata(value: unknown): MapSignFrame | null {
-    if (!object(value) || value.version !== 1 || !object(value.atlas) || value.atlas.image !== 'signs-factory.webp' ||
+    return parseFactorySignMetadata(value, 'right');
+}
+/** Independently loaded return arrow; it never changes the released right-arrow atlas. */
+export function parseMapFactoryLeftSignMetadata(value: unknown): MapSignFrame | null {
+    return parseFactorySignMetadata(value, 'left');
+}
+function parseFactorySignMetadata(value: unknown, direction: MapSignDirection): MapSignFrame | null {
+    const kind = direction === 'left' ? 'factory-left' : 'factory-right';
+    const filename = direction === 'left' ? 'signs-factory-left.webp' : 'signs-factory.webp';
+    if (!object(value) || value.version !== 1 || !object(value.atlas) || value.atlas.image !== filename ||
         value.atlas.width !== 256 || value.atlas.height !== 112 || !Array.isArray(value.frames) || value.frames.length !== 1) return null;
     const raw = value.frames[0], width = 128, height = 56;
-    if (!object(raw) || raw.kind !== 'factory-right' || raw.dpr !== 2 || raw.letterPixelScale !== 2 ||
+    if (!object(raw) || raw.kind !== kind || raw.dpr !== 2 || raw.letterPixelScale !== 2 ||
         !object(raw.displaySize) || raw.displaySize.width !== width || raw.displaySize.height !== height ||
         !rect(raw.sourceRect) || raw.sourceRect.x !== 0 || raw.sourceRect.y !== 0 || raw.sourceRect.width !== 256 || raw.sourceRect.height !== 112 ||
         !point(raw.foot) || raw.foot.x < 0 || raw.foot.x > width || raw.foot.y < 0 || raw.foot.y > height ||
@@ -69,7 +78,7 @@ export function parseMapFactorySignMetadata(value: unknown): MapSignFrame | null
     const textWidthPx = textWidth('FÁBRICA', 2), x = Math.round(raw.letterCenter.x - textWidthPx / 2), y = Math.round(raw.letterCenter.y - 7);
     if (x < raw.usableFace.x || x + textWidthPx > raw.usableFace.x + raw.usableFace.width ||
         y - 4 < raw.usableFace.y || y + 14 > raw.usableFace.y + raw.usableFace.height) return null;
-    return { kind: 'factory-right', sourceRect: { ...raw.sourceRect }, displaySize: { width, height }, dpr: 2,
+    return { kind, sourceRect: { ...raw.sourceRect }, displaySize: { width, height }, dpr: 2,
         foot: { ...raw.foot }, letterCenter: { ...raw.letterCenter }, usableFace: { ...raw.usableFace }, letterPixelScale: 2 };
 }
 function loadSignImage(url: string, width: number, height: number, signal: AbortSignal): Promise<HTMLImageElement | null> {
@@ -99,12 +108,20 @@ export async function loadMapSignAtlas(prefix: string, signal: AbortSignal): Pro
 }
 /** Requested only when the cargo-bridge sign or Factory region is visible. */
 export async function loadMapFactorySignAtlas(prefix: string, signal: AbortSignal): Promise<MapFactorySignAtlas | null> {
+    return loadFactorySignAtlas(prefix, signal, 'right');
+}
+/** Requested only when Serra is inspected or its left return sign is visible. */
+export async function loadMapFactoryLeftSignAtlas(prefix: string, signal: AbortSignal): Promise<MapFactorySignAtlas | null> {
+    return loadFactorySignAtlas(prefix, signal, 'left');
+}
+async function loadFactorySignAtlas(prefix: string, signal: AbortSignal, direction: MapSignDirection): Promise<MapFactorySignAtlas | null> {
     if (signal.aborted || typeof Image === 'undefined') return null;
     try {
-        const response = await fetch(prefix + 'signs-factory.meta.json', { signal });
-        const frame = response.ok ? parseMapFactorySignMetadata(await response.json()) : null;
+        const name = direction === 'left' ? 'signs-factory-left' : 'signs-factory';
+        const response = await fetch(prefix + name + '.meta.json', { signal });
+        const frame = response.ok ? parseFactorySignMetadata(await response.json(), direction) : null;
         if (!frame || signal.aborted) return null;
-        const image = await loadSignImage(prefix + 'signs-factory.webp', 256, 112, signal);
+        const image = await loadSignImage(prefix + name + '.webp', 256, 112, signal);
         return image && !signal.aborted ? { image, frame } : null;
     } catch { return null; }
 }
@@ -140,12 +157,12 @@ export function paintPhysicalTravelSign(canvas: HTMLCanvasElement, atlas: MapSig
     sign: MapTravelSign, available: boolean): boolean {
     const frame = sign.wide ? factory?.frame : atlas?.metadata.frames[sign.direction === 'left' ? 'dock-left' : 'dock-right'];
     const image = sign.wide ? factory?.image : atlas?.image;
-    if (!frame || !image || (sign.wide && sign.direction !== 'right') || textWidth(sign.label, 2) > frame.usableFace.width) return false;
+    if (!frame || !image || (sign.wide && frame.kind !== `factory-${sign.direction}`) || textWidth(sign.label, 2) > frame.usableFace.width) return false;
     const ctx = paint(canvas, image, frame, sign.label);
     if (!ctx) return false;
     if (!available) {
         // Every arrow keeps its timber support and attached gate on the departure side.
-        const postX = sign.wide ? 24 : sign.direction === 'left' ? 80 : 23;
+        const postX = sign.wide ? sign.direction === 'left' ? 104 : 24 : sign.direction === 'left' ? 80 : 23;
         ctx.fillStyle = ART.ink; ctx.fillRect(postX, 33, 2, 5);
         ctx.fillStyle = ART.gold; ctx.fillRect(postX - 1, 35, 4, 1);
     }

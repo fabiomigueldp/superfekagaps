@@ -1,0 +1,483 @@
+{
+  "status": "PASS physical and head/face visibility prototype gates",
+  "scope": "Occupied walking and boarding routes in both station phases; moving cabins and riders in both lanes and directions. Head/hair/face tests use actual opaque Feka source pixels and rounded raster profiles. Full-body visibility is not claimed: lower-body and peripheral contacts remain listed. This report does not approve runtime integration or deployment.",
+  "stamp": {
+    "metadataSha256": "7d621187079cc2e1207ab618b669c9eb68653e4fc48e6b9ab6a6c0866e3d7a8e",
+    "label": "final-approved"
+  },
+  "blendSha256": "6d7609c72624edf4bdf3b9e540a413beeaf42f7b99a4e757fa1792579e726141",
+  "builderAtAudit": {
+    "path": "tools/diorama/render_serra_map.py",
+    "sha256": "a6feca3fe05ea5310fcba9b3633367409fa8b639ceaa4c3d898e619822823e7f",
+    "gitBlobSha1": "12e1f7806d35a9042c0fec6f433883fd2ab1697f"
+  },
+  "stationaryPhases": [
+    {
+      "phase": 0,
+      "passedPhysicalAndHeadFaceGate": true,
+      "physicalCounts": {
+        "unsupportedFeet": 0,
+        "headroomObstructions": 0,
+        "walkSurfaceMismatches": 0,
+        "floatingTimberAnchors": 0
+      },
+      "sourceHeadFacePassed": true,
+      "raster": [
+        {
+          "profile": "desktop",
+          "headContacts": 0,
+          "faceContacts": 0
+        },
+        {
+          "profile": "portrait",
+          "headContacts": 0,
+          "faceContacts": 0
+        },
+        {
+          "profile": "landscape",
+          "headContacts": 0,
+          "faceContacts": 0
+        }
+      ],
+      "remainingNonHeadForegroundContacts": [
+        {
+          "route": "boardingA:0",
+          "movement": "board",
+          "phaseAvailable": true,
+          "segment": 0,
+          "t": 0.55556,
+          "world": [
+            -1.63396,
+            2.01217,
+            3.75
+          ],
+          "distanceToTerminal": 0.42222,
+          "pixelRelativeToFoot": [
+            -6.92,
+            5.92
+          ],
+          "object": "maintenance carrier A cream belt",
+          "contactWorld": [
+            -1.6978,
+            1.65967,
+            4.16497
+          ],
+          "distanceTowardCamera": 0.33489,
+          "classification": "scenery-or-equipment",
+          "frames": [
+            "walk5Left"
+          ]
+        },
+        {
+          "route": "boardingA:0",
+          "movement": "board",
+          "phaseAvailable": true,
+          "segment": 0,
+          "t": 0.55556,
+          "world": [
+            -1.63396,
+            2.01217,
+            3.75
+          ],
+          "distanceToTerminal": 0.42222,
+          "pixelRelativeToFoot": [
+            -5.92,
+            5.08
+          ],
+          "object": "maintenance carrier A front red wall",
+          "contactWorld": [
+            -1.67743,
+            1.69009,
+            4.12106
+          ],
+          "distanceTowardCamera": 0.3145,
+          "classification": "scenery-or-equipment",
+          "frames": [
+            "idleLeft",
+            "walk1Left",
+            "walk2Left",
+            "walk2Right",
+            "walk5Left"
+          ]
+        },
+        {
+          "route": "boardingB:1",
+          "movement": "board",
+          "phaseAvailable": true,
+          "segment": 0,
+          "t": 0.44444,
+          "world": [
+            3.19,
+            0.75722,
+            5.45
+          ],
+          "distanceToTerminal": 0.52778,
+          "pixelRelativeToFoot": [
+            -6.92,
+            5.08
+          ],
+          "object": "maintenance carrier B front red wall",
+          "contactWorld": [
+            3.10715,
+            0.43972,
+            5.80595
+          ],
+          "distanceTowardCamera": 0.28713,
+          "classification": "scenery-or-equipment",
+          "frames": [
+            "walk5Left"
+          ]
+        },
+        {
+          "route": "boardingB:1",
+          "movement": "board",
+          "phaseAvailable": true,
+          "segment": 0,
+          "t": 0.44444,
+          "world": [
+            3.19,
+            0.75722,
+            5.45
+          ],
+          "distanceToTerminal": 0.52778,
+          "pixelRelativeToFoot": [
+            -6.92,
+            5.92
+          ],
+          "object": "maintenance carrier B cream belt",
+          "contactWorld": [
+            3.12616,
+            0.40472,
+            5.86497
+          ],
+          "distanceTowardCamera": 0.33489,
+          "classification": "scenery-or-equipment",
+          "frames": [
+            "walk5Left"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": 1,
+      "passedPhysicalAndHeadFaceGate": true,
+      "physicalCounts": {
+        "unsupportedFeet": 0,
+        "headroomObstructions": 0,
+        "walkSurfaceMismatches": 0,
+        "floatingTimberAnchors": 0
+      },
+      "sourceHeadFacePassed": true,
+      "raster": [
+        {
+          "profile": "desktop",
+          "headContacts": 0,
+          "faceContacts": 0
+        },
+        {
+          "profile": "portrait",
+          "headContacts": 0,
+          "faceContacts": 0
+        },
+        {
+          "profile": "landscape",
+          "headContacts": 0,
+          "faceContacts": 0
+        }
+      ],
+      "remainingNonHeadForegroundContacts": [
+        {
+          "route": "terminalWalkB:0",
+          "movement": "walk",
+          "phaseAvailable": true,
+          "segment": 1,
+          "t": 0.64706,
+          "world": [
+            1.92299,
+            2.92082,
+            5.45
+          ],
+          "distanceToTerminal": 0.65606,
+          "pixelRelativeToFoot": [
+            -6.92,
+            7.92
+          ],
+          "object": "upper maintenance terminal sheave.001",
+          "contactWorld": [
+            2.80888,
+            0.81995,
+            7.2594
+          ],
+          "distanceTowardCamera": 2.72076,
+          "classification": "scenery-or-equipment",
+          "frames": [
+            "walk4Left",
+            "walk5Left",
+            "walk6Left"
+          ]
+        },
+        {
+          "route": "terminalWalkB:0",
+          "movement": "walk",
+          "phaseAvailable": true,
+          "segment": 1,
+          "t": 0.94118,
+          "world": [
+            1.56072,
+            3.33028,
+            5.45
+          ],
+          "distanceToTerminal": 0.10934,
+          "pixelRelativeToFoot": [
+            -6.92,
+            5.08
+          ],
+          "object": "upper maintenance terminal short sheave support 1",
+          "contactWorld": [
+            2.64157,
+            0.8705,
+            7.41928
+          ],
+          "distanceTowardCamera": 3.21055,
+          "classification": "scenery-or-equipment",
+          "frames": [
+            "walk5Left"
+          ]
+        },
+        {
+          "route": "boardingA:1",
+          "movement": "board",
+          "phaseAvailable": true,
+          "segment": 0,
+          "t": 0.55556,
+          "world": [
+            0.49,
+            -0.64278,
+            3.75
+          ],
+          "distanceToTerminal": 0.42222,
+          "pixelRelativeToFoot": [
+            -6.92,
+            5.92
+          ],
+          "object": "maintenance carrier A cream belt",
+          "contactWorld": [
+            0.42616,
+            -0.99528,
+            4.16497
+          ],
+          "distanceTowardCamera": 0.33489,
+          "classification": "scenery-or-equipment",
+          "frames": [
+            "walk5Left"
+          ]
+        },
+        {
+          "route": "boardingA:1",
+          "movement": "board",
+          "phaseAvailable": true,
+          "segment": 0,
+          "t": 0.55556,
+          "world": [
+            0.49,
+            -0.64278,
+            3.75
+          ],
+          "distanceToTerminal": 0.42222,
+          "pixelRelativeToFoot": [
+            -5.92,
+            5.08
+          ],
+          "object": "maintenance carrier A front red wall",
+          "contactWorld": [
+            0.44653,
+            -0.96486,
+            4.12106
+          ],
+          "distanceTowardCamera": 0.3145,
+          "classification": "scenery-or-equipment",
+          "frames": [
+            "idleLeft",
+            "walk1Left",
+            "walk2Left",
+            "walk2Right",
+            "walk5Left"
+          ]
+        },
+        {
+          "route": "boardingB:0",
+          "movement": "board",
+          "phaseAvailable": true,
+          "segment": 0,
+          "t": 0.11111,
+          "world": [
+            1.38271,
+            3.41217,
+            5.45
+          ],
+          "distanceToTerminal": 0.84444,
+          "pixelRelativeToFoot": [
+            -6.92,
+            8.08
+          ],
+          "object": "upper maintenance terminal side blue support 1",
+          "contactWorld": [
+            2.1622,
+            1.50716,
+            7.11812
+          ],
+          "distanceTowardCamera": 2.45349,
+          "classification": "scenery-or-equipment",
+          "frames": [
+            "idleLeft",
+            "walk1Left",
+            "walk4Left",
+            "walk5Left",
+            "walk6Left"
+          ]
+        },
+        {
+          "route": "boardingB:0",
+          "movement": "board",
+          "phaseAvailable": true,
+          "segment": 0,
+          "t": 0.44444,
+          "world": [
+            1.06604,
+            3.41217,
+            5.45
+          ],
+          "distanceToTerminal": 0.52778,
+          "pixelRelativeToFoot": [
+            -6.92,
+            5.08
+          ],
+          "object": "maintenance carrier B front red wall",
+          "contactWorld": [
+            0.98318,
+            3.09467,
+            5.80595
+          ],
+          "distanceTowardCamera": 0.28713,
+          "classification": "scenery-or-equipment",
+          "frames": [
+            "walk5Left"
+          ]
+        },
+        {
+          "route": "boardingB:0",
+          "movement": "board",
+          "phaseAvailable": true,
+          "segment": 0,
+          "t": 0.44444,
+          "world": [
+            1.06604,
+            3.41217,
+            5.45
+          ],
+          "distanceToTerminal": 0.52778,
+          "pixelRelativeToFoot": [
+            -6.92,
+            5.92
+          ],
+          "object": "maintenance carrier B cream belt",
+          "contactWorld": [
+            1.0022,
+            3.05967,
+            5.86497
+          ],
+          "distanceTowardCamera": 0.33489,
+          "classification": "scenery-or-equipment",
+          "frames": [
+            "walk5Left"
+          ]
+        }
+      ]
+    }
+  ],
+  "cabinPhysical": {
+    "poseCount": 106,
+    "collisionPoseObjectCount": 0,
+    "continuousHullCount": 624,
+    "expectedHullCount": 624,
+    "continuousContactCount": 0,
+    "pairCrossing": {
+      "method": "Minimum distance between full evaluated carrier axis-aligned envelopes over every piecewise-linear interval of lane0(t) against lane1(1-t), convex minimization plus endpoints. Positive separation guarantees mesh separation.",
+      "minimumClearance": 2.165056,
+      "t": 0.433312,
+      "lane0Foot": [
+        -0.45344,
+        2.61881,
+        4.37877
+      ],
+      "lane1Foot": [
+        1.90393,
+        0.15058,
+        4.60551
+      ],
+      "axisGaps": [
+        1.35237,
+        1.690728,
+        0
+      ],
+      "passed": true
+    }
+  },
+  "movingRider": {
+    "includesCountercarStaticSceneryAndOwnCarrier": true,
+    "sourceHeadFacePassed": true,
+    "sampleCountPerLane": 2001,
+    "sourceFrames": 7,
+    "facings": 2,
+    "rasterHeadFacePassed": true,
+    "rasterProfiles": [
+      {
+        "profile": "desktop",
+        "lane": 0,
+        "sampleCount": 2001,
+        "headContactPoses": 0,
+        "faceContactPoses": 0
+      },
+      {
+        "profile": "desktop",
+        "lane": 1,
+        "sampleCount": 2001,
+        "headContactPoses": 0,
+        "faceContactPoses": 0
+      },
+      {
+        "profile": "portrait",
+        "lane": 0,
+        "sampleCount": 2001,
+        "headContactPoses": 0,
+        "faceContactPoses": 0
+      },
+      {
+        "profile": "portrait",
+        "lane": 1,
+        "sampleCount": 2001,
+        "headContactPoses": 0,
+        "faceContactPoses": 0
+      },
+      {
+        "profile": "landscape",
+        "lane": 0,
+        "sampleCount": 2001,
+        "headContactPoses": 0,
+        "faceContactPoses": 0
+      },
+      {
+        "profile": "landscape",
+        "lane": 1,
+        "sampleCount": 2001,
+        "headContactPoses": 0,
+        "faceContactPoses": 0
+      }
+    ]
+  },
+  "limitations": [
+    "Projection ride is densely sampled at .0005 progress; tiny intervals shorter than the base step are not an analytic continuous visibility proof. Physical sweep is continuous across every authored piecewise-linear path segment.",
+    "Raster checks use declared desktop1180x757 zoom1, portrait400x606 zoom1.05, landscape846x392 zoom1, camera image centered and island placement scale1. Runtime fitting/zoom/panning must match or be revalidated.",
+    "Cabin physical sweep excludes only named own paired cables and terminal sheaves; all structural supports, scenery and approaches remain checked."
+  ]
+}

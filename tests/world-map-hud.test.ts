@@ -79,13 +79,13 @@ test('phase activation always selects; entering is a separate arrival-gated acti
 
 test('every in-flight state exposes skip and an honest motion status, with explicit entry after arrival', t => {
     const { hud, calls, state } = fixture(t);
-    for (const [motionState, copy] of [['walking', 'a caminho'], ['boarding', 'Embarcando'], ['sailing', 'Navegando'], ['arriving', 'Desembarcando']] as const) {
+    for (const [motionState, copy] of [['walking', 'a caminho'], ['boarding', 'Embarcando'], ['sailing', 'Navegando'], ['riding', 'Na cabine'], ['arriving', 'Desembarcando']] as const) {
         hud.update({ ...state, motionState: motionState as WorldMapMotionState, canEnter: false });
         assert.equal(hud.skipButton.hidden, false); assert.equal(hud.enterButton.hidden, true);
         assert.match(find(asElement(hud.root), 'world-map-status').textContent, new RegExp(copy));
         hud.skipButton.click(); assert.equal(calls.at(-1), 'skip');
     }
-    assert.equal(calls.filter(value => value === 'skip').length, 4);
+    assert.equal(calls.filter(value => value === 'skip').length, 5);
     assert.equal(calls.includes('enter'), false);
     hud.update(state);
     assert.equal(hud.skipButton.hidden, true); assert.equal(hud.enterButton.hidden, false);
@@ -131,7 +131,7 @@ test('Escape closes only the region drawer, restores focus and cannot escape to 
 });
 
 function signResources(t: TestContext) {
-    const requests: Array<{ signal: AbortSignal; resolve: (value: unknown) => void }> = [];
+    const requests: Array<{ url: string; signal: AbortSignal; resolve: (value: unknown) => void }> = [];
     const images: ImageMock[] = [];
     class ImageMock {
         decoding = ''; src = ''; naturalWidth = 560; naturalHeight = 232;
@@ -139,7 +139,7 @@ function signResources(t: TestContext) {
         constructor() { images.push(this); }
     }
     for (const [key, value] of Object.entries({ Image: ImageMock,
-        fetch: (_url: string, options: { signal: AbortSignal }) => new Promise(resolve => requests.push({ signal: options.signal, resolve })),
+        fetch: (url: string, options: { signal: AbortSignal }) => new Promise(resolve => requests.push({ url, signal: options.signal, resolve })),
         requestAnimationFrame: () => assert.fail('Sign decoration must not create an animation loop.') })) {
         const previous = Object.getOwnPropertyDescriptor(globalThis, key);
         Object.defineProperty(globalThis, key, { configurable: true, writable: true, value });
@@ -188,28 +188,28 @@ test('disposing during atlas load removes handlers and cannot repaint or resurre
     assert.equal(stage.draws.length, 0); assert.equal(stage.width, 56);
 });
 
-test('physical props include all Factory phases while later-region fallbacks reset decoration', async t => {
+test('physical props include all Factory and Serra phases while later-region fallbacks reset decoration', async t => {
     const resources = signResources(t), { hud, state } = fixture(t);
     await resources.metadata(); resources.images[0].onload!(); await resources.settle();
     const stage = asElement(hud.stageButtons[0]).children[0], dock = asElement(hud.dockButtons[1]).children[0];
     assert.equal(stage.style.transform, 'translate(0px, 11px)');
-    for (const world of [4, 5, 6]) {
+    for (const world of [5, 6]) {
         hud.update({ ...state, world, stage: (world - 1) * 5 });
         assert.equal(stage.width, 56); assert.equal(stage.style.transform, '');
         assert.equal(dock.width, 104); assert.equal(dock.style.transform, '');
         assert.match(hud.stageButtons[0].getAttribute('aria-label')!, new RegExp(`Fase ${world}-1:`));
     }
-    for (const world of [2, 3, 1]) {
+    for (const world of [2, 3, 4, 1]) {
         hud.update({ ...state, world, stage: (world - 1) * 5 });
         assert.equal(stage.width, 112);
         assert.equal(stage.style.transform, 'translate(0px, 11px)');
         assert.equal(dock.style.transform, 'translate(0px, 10px)');
     }
-    assert.equal(resources.requests.length, 2); assert.equal(resources.images.length, 1);
+    assert.equal(resources.requests.length, 3); assert.equal(resources.images.length, 1);
 });
 
 
-test('four route IDs keep same-name Porto signs, boat docks and walking bridge actions independent', t => {
+test('six route IDs keep same-name signs, boat docks, bridge and mountain walking actions independent', t => {
     dom(t);
     const calls: string[] = [];
     const hud = new WorldMapHud({ selectTravel: id => calls.push(id), selectWorld: world => calls.push(`world:${world}`),
@@ -231,7 +231,7 @@ test('four route IDs keep same-name Porto signs, boat docks and walking bridge a
     assert.equal(ferry.direction, 'right'); assert.equal(bridge.direction, 'left');
     assert.equal(ferry.mode, 'ferry'); assert.equal(bridge.mode, 'bridge');
     hud.dispose(); hud.travelButtons['bridge-porto-factory'].click();
-    assert.equal(calls.length, 8, 'Disposed route buttons never dispatch.');
+    assert.equal(calls.length, WORLD_MAP_TRAVEL_ACTION_IDS.length * 2, 'Disposed route buttons never dispatch.');
 });
 
 test('bridge signs use their own availability, hide missing anchors and retain the legacy fallback callback', t => {
@@ -293,5 +293,82 @@ test('failed Factory decoration preserves its readable fallback and leaves all e
     assert.equal(factory.width, 128); assert.equal(factory.style.transform, '');
     assert.equal(asElement(hud.stageButtons[0]).children[0].width, 112);
     assert.equal(asElement(hud.travelButtons['bridge-factory-porto']).children[0].width, 208);
+    assert.equal(resources.requests.length, 2);
+});
+
+test('Serra walking signs preserve directional route availability and destination fallback without boat copy', t => {
+    const { hud, state, calls } = fixture(t);
+    hud.update({ ...state, world: 3, stage: 10, worldAvailability: [true, true, true, false, false, false] });
+    assert.equal(hud.travelButtons['walk-factory-serra'].hidden, true);
+    assert.equal(hud.travelButtons['walk-serra-factory'].hidden, true);
+    hud.positionTravelActions({ 'walk-factory-serra': { x: 180, y: 210, available: false } });
+    const outward = hud.travelButtons['walk-factory-serra'], inward = hud.travelButtons['walk-serra-factory'];
+    assert.match(outward.getAttribute('aria-label')!, /Caminho.*Serra.*Passagem bloqueada/);
+    assert.doesNotMatch(outward.getAttribute('aria-label')!, /barco|Cais|Ponte/);
+    assert.match(outward.title, /SERRA →.*caminho/);
+    assert.equal(inward.hidden, true);
+    outward.click(); assert.deepEqual(calls, ['world:4']);
+    hud.update({ ...state, world: 4, stage: 15 });
+    hud.positionTravelActions({ 'walk-serra-factory': { x: 90, y: 190, available: true } });
+    assert.equal(outward.hidden, true); assert.equal(inward.hidden, false);
+    assert.match(inward.getAttribute('aria-label')!, /Caminho.*Fábrica.*Caminhar pela passagem/);
+    assert.doesNotMatch(inward.getAttribute('aria-label')!, /barco|Cais|Ponte/);
+    assert.match(inward.title, /FÁBRICA ←.*caminho/);
+    inward.click(); assert.deepEqual(calls, ['world:4', 'world:3']);
+    hud.positionTravelActions({}); assert.equal(inward.hidden, true);
+});
+
+test('the left Factory supplement stays out of initial Costa and Factory requests and paints only its own arrow', async t => {
+    const resources = signResources(t), { hud, state } = fixture(t);
+    await resources.metadata(); resources.images[0].onload!(); await resources.settle();
+    hud.update({ ...state, world: 3, stage: 10 });
+    hud.positionTravelActions({ 'walk-factory-serra': { x: 180, y: 210, available: true } });
+    assert.equal(resources.requests.length, 2);
+    assert.ok(resources.requests.every(request => !request.url.includes('factory-left')));
+    const outward = asElement(hud.travelButtons['walk-factory-serra']).children[0];
+    assert.equal(outward.width, 208); assert.equal(outward.draws.at(-1)![0], resources.images[0]);
+    hud.update({ ...state, world: 4, stage: 15 });
+    assert.equal(resources.requests.length, 3); assert.match(resources.requests[2].url, /signs-factory-left.meta.json$/);
+    resources.requests[2].resolve({ ok: true, json: async () => JSON.parse(readFileSync(new URL('../public/assets/world/map/signs-factory-left.meta.json', import.meta.url), 'utf8')) });
+    await resources.settle();
+    const image = resources.images[1]; image.naturalWidth = 256; image.naturalHeight = 112;
+    image.onload!(); await resources.settle();
+    const inward = asElement(hud.travelButtons['walk-serra-factory']).children[0];
+    assert.equal(inward.width, 256); assert.equal(inward.height, 112);
+    assert.equal(inward.style.transform, 'translate(0px, 10px)'); assert.equal(inward.draws.at(-1)![0], image);
+    hud.setVisible(false); hud.setVisible(true);
+    hud.positionTravelActions({ 'walk-serra-factory': { x: 90, y: 190, available: false } });
+    hud.update({ ...state, world: 4, stage: 16 });
+    assert.equal(resources.requests.length, 3); assert.equal(resources.images.length, 2);
+    assert.equal(asElement(hud.stageButtons[4]).children[0].width, 112);
+});
+
+test('hidden Serra waits for visibility and disposal aborts its independently loaded left image', async t => {
+    const resources = signResources(t), { hud, state } = fixture(t);
+    hud.setVisible(false); hud.update({ ...state, world: 4, stage: 15 });
+    assert.equal(resources.requests.length, 1);
+    hud.setVisible(true); assert.equal(resources.requests.length, 2);
+    resources.requests[1].resolve({ ok: true, json: async () => JSON.parse(readFileSync(new URL('../public/assets/world/map/signs-factory-left.meta.json', import.meta.url), 'utf8')) });
+    await resources.settle();
+    const image = resources.images[0], lateLoad = image.onload!;
+    const inward = asElement(hud.travelButtons['walk-serra-factory']).children[0];
+    hud.dispose(); assert.equal(resources.requests[1].signal.aborted, true);
+    assert.equal(image.onload, null); assert.equal(image.onerror, null);
+    image.naturalWidth = 256; image.naturalHeight = 112; lateLoad(); await resources.settle();
+    assert.equal(inward.width, 128); assert.equal(inward.draws.length, 0);
+});
+
+test('failed left-supplement decoration keeps Serra phases and both walking actions readable without retries', async t => {
+    const resources = signResources(t), { hud, state, calls } = fixture(t);
+    await resources.metadata(); resources.images[0].onload!(); await resources.settle();
+    hud.positionTravelActions({ 'walk-serra-factory': { x: 90, y: 190, available: true } });
+    assert.equal(resources.requests.length, 2); assert.match(resources.requests[1].url, /signs-factory-left.meta.json$/);
+    resources.requests[1].resolve({ ok: false }); await resources.settle();
+    for (let n = 0; n < 10; n++) hud.update({ ...state, world: 4, stage: 15 + n % 5 });
+    const inward = asElement(hud.travelButtons['walk-serra-factory']).children[0];
+    assert.equal(inward.width, 128); assert.equal(inward.style.transform, '');
+    assert.equal(asElement(hud.travelButtons['walk-factory-serra']).children[0].width, 208);
+    assert.equal(asElement(hud.stageButtons[0]).children[0].width, 112);
+    hud.travelButtons['walk-serra-factory'].click(); assert.deepEqual(calls, ['world:3']);
     assert.equal(resources.requests.length, 2);
 });

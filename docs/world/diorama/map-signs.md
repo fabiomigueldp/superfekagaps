@@ -78,3 +78,47 @@ face, independent bridge availability, both PORTO arrows, stable callbacks,
 lazy loading, hidden actions and procedural fallbacks. Repacking the original
 seven cached Blender renders with the extended packager still reproduces the
 released atlas and manifest byte-for-byte.
+
+## Factory–Serra walking signs
+
+Two further stable actions extend the existing four: `walk-factory-serra`
+(SERRA right, 104 × 56 CSS pixels) and `walk-serra-factory` (FÁBRICA left,
+128 × 56 CSS pixels). Both have `mode: 'walk'`, use Caminho/Passagem wording,
+and preserve the destination-world callback fallback. Their departure positions
+remain authored by the map owner; absent anchors leave both buttons hidden.
+Every Serra stage uses the existing physical phase-state family. Regions five
+and six keep the procedural fallback. An explicit cable ride can report
+`motionState: 'riding'`, which reads “Na cabine” and keeps the existing skip and
+arrival-gated entry controls.
+
+The new Factory-left blank is a separate Blender render of the same solid plank,
+camera, lighting and materials. Its arrow points left and its single support and
+cantilever bracket sit on the right. The face keeps 90.844 × 19.361 CSS pixels
+of measured lettering space; the 82-pixel FÁBRICA name and 18-pixel accented
+height fit at the original bitmap scale. Its horizontal letter center is 66.819
+CSS pixels. The foot remains `(64, 45.678)` with a rounded 10-pixel decoration
+translation, leaving a 0.322-pixel vertical error while the native target stays
+fixed. The closed-route marker follows the right post at x104.
+
+```sh
+blender -b -t 8 -P tools/diorama/render_map_signs.py -- --repo-root . --output-dir /tmp/feka-factory-left-sign-renders --only factory-left
+python tools/diorama/package_map_signs.py --repo-root . --render-dir /tmp/feka-factory-left-sign-renders --output-dir /tmp/feka-factory-left-sign-assets --factory-left-only
+```
+
+Only `signs-factory-left.webp` (256 × 112 pixels; 7,936 bytes) and
+`signs-factory-left.meta.json` (1,138 bytes) are added to the runtime payload:
+9,074 bytes total, fetched once when Serra is explicitly inspected or its left
+Factory return sign is visible. Showing the SERRA arrow from Factory reuses the
+released atlas. Initial Costa and Factory inspection do not request the left
+supplement. Hidden HUD updates defer the request until the map is shown.
+Missing, invalid or interrupted art leaves the procedural arrow usable, with
+no per-frame retries. The new supplement shares the HUD disposal signal.
+
+`factory-left-sign-validation.json` records dimensions, hashes, transparent
+edges and the measured foot/face. Focused tests inspect every accented glyph
+cell, reject a wrong-direction wide image, preserve the right-side closed-route
+marker, and cover lazy loading, hidden updates, disposal, failure and callback
+behavior. A fresh Factory-right Blender render and repack reproduced the
+released right atlas and manifest byte-for-byte; repacking the original seven
+PNG frames also reproduced their released atlas and manifest byte-for-byte.
+Neither existing runtime image nor manifest is modified for this extension.

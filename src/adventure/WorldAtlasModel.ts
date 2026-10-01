@@ -18,6 +18,7 @@ export const WORLD_ATLAS_PLACEMENTS: Readonly<Record<number, AtlasPlacement>> = 
     1: Object.freeze({ origin: Object.freeze({ x: 0, y: 0 }), scale: 1 }),
     2: Object.freeze({ origin: Object.freeze({ x: 1.1, y: -.12 }), scale: 1 }),
     3: Object.freeze({ origin: Object.freeze({ x: 1.98, y: .03 }), scale: 1 }),
+    4: Object.freeze({ origin: Object.freeze({ x: 2.78, y: -.65 }), scale: 1 }),
 });
 /** Compatibility for the released ferry contract and its consumers. */
 export const COAST_PORT_PLACEMENTS = WORLD_ATLAS_PLACEMENTS;
@@ -50,6 +51,8 @@ export function transformAtlasMetadata(metadata: MapArtMetadata, placement: Atla
         nodes: Object.fromEntries(Object.entries(metadata.nodes).map(([id, point]) => [id, localToAtlas(point, placement)])),
         routes: Object.fromEntries(Object.entries(metadata.routes).map(([id, points]) => [id, localPathToAtlas(points, placement)])),
         secretRoute: localPathToAtlas(metadata.secretRoute, placement),
+        ...(metadata.secretTransport ? { secretTransport: metadata.secretTransport } : {}),
+        ...(metadata.routeDurationsSeconds ? { routeDurationsSeconds: { ...metadata.routeDurationsSeconds } } : {}),
     };
     if (metadata.artBounds) {
         const bounds = metadata.artBounds;

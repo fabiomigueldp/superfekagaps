@@ -1,0 +1,463 @@
+{
+  "version": 1,
+  "connection": "factory-serra-link",
+  "status": "final-separated-carrier-source-geometry-revalidated; approved-public-link-assets-preserved",
+  "verificationDate": "2026-10-01",
+  "renderer": "Blender4.3.2 Cycles CPU,96samples,no denoise; Pillow WebPquality94",
+  "sourceFiles": {
+    "tools/diorama/check_factory_serra_link.py": "af1d1cc8a59fb51b91c81072d5de5a986ab2c10fac4dbc713bb2e8ff44b5bb4a",
+    "tools/diorama/check_factory_serra_structure.py": "dcc223bd0c3dacee40e1f64321ae73c5d7144777a3e67821e91d54fc360d0120",
+    "tools/diorama/export_factory_serra_sprite.mjs": "8c49ea89aacd176cc7bd16070e7484e53573917f7be1c90d56d83821c764993a",
+    "tools/diorama/package_factory_serra_link.py": "128f29f4da3ae11a0823a076772ea6040f208d1b4815dd5cf2685bafe8912783",
+    "tools/diorama/render_factory_serra_link.py": "a8e55834b0ff31b54948554caa70f6f00edfdaf829c3d670deab744c64bca055",
+    "tools/diorama/render_factory_serra_link_layers.py": "df148e953318f7f850a0959c7f7919728de0645bdbd5a8427d6b3873a13ed18a",
+    "tools/diorama/render_fabrica_map.py": "d31cebbad43b81952e10dd94474d30dee9234051764a962a5de3e5d4f8578d2f",
+    "tools/diorama/render_serra_map.py": "a6feca3fe05ea5310fcba9b3633367409fa8b639ceaa4c3d898e619822823e7f",
+    "src/assets/playerSpriteSpec.ts": "56248862ebf8657d54162f547b767d8d2971a58594bbef33421b63f0f1bbcc68",
+    "src/adventure/WorldAtlasArt.ts": "5f213f86e9ced9d1613aee037248a312d00c59763981164040c12fbcde384087",
+    "src/adventure/WorldMapArt.ts": "66e8065fd9292be00afb3308c9dcb8a5a8c68b4b76c11ce4e75420e8801de2d9",
+    "docs/world/diorama/fabrica-composition-approved.meta.json": "ad6d249ab94ba4d5043db1e9a488471d2795b959ba6914c582b15676591df182"
+  },
+  "installedAssets": {
+    "factory-serra-link.meta.json": {
+      "bytes": 3155,
+      "sha256": "f9f0868742aee6aea1228dba3c39dcd96041817034aaccc5facad366e6df6840"
+    },
+    "factory-serra-link-open.webp": {
+      "bytes": 67552,
+      "sha256": "5a46a96936c505b71f61a5b37e8d8d929e7e89a2ccab25fa2e3c9e4848dcb7a8"
+    },
+    "factory-serra-link-closed.webp": {
+      "bytes": 69280,
+      "sha256": "3a380962d60954c36eedbb0ff7faa6da592c2301c04ca26e31b95794b1cf9721"
+    }
+  },
+  "totalInstalledRuntimeBytes": 139987,
+  "freshRebuild": {
+    "externalBlendInputs": false,
+    "sourceVersionsIdenticalAcrossStates": true,
+    "inputSourceHashes": {
+      "tools/diorama/render_fabrica_map.py": "d31cebbad43b81952e10dd94474d30dee9234051764a962a5de3e5d4f8578d2f",
+      "tools/diorama/render_serra_map.py": "28d5d478b2553c4ebe1bd28737e485a36e33f329082839fc5c6f38409331c473",
+      "tools/diorama/render_factory_serra_link.py": "a8e55834b0ff31b54948554caa70f6f00edfdaf829c3d670deab744c64bca055"
+    },
+    "semanticContractAndCropMatchInstalled": true,
+    "stagedAssets": {
+      "factory-serra-link.meta.json": {
+        "bytes": 3155,
+        "sha256": "0c94491b85e6f00eddd1a269f3ebb063b08dd9d06d4e0f7619bb5de87740998c"
+      },
+      "factory-serra-link-open.webp": {
+        "bytes": 67562,
+        "sha256": "f87049e6cce738ec28b2ac4746b213dac37f1cab2b1699cd43e4ad07ddf7ab51"
+      },
+      "factory-serra-link-closed.webp": {
+        "bytes": 69284,
+        "sha256": "cce2ce38e2a9615dc32127c66ab7f695181e0f52e8c9358fbcbc3ae4497c24c1"
+      }
+    },
+    "pixelComparisonToInstalled": {
+      "open": {
+        "dimensionsIdentical": true,
+        "size": [
+          484,
+          882
+        ],
+        "byteIdentical": false,
+        "rgbMeanAbsoluteDifference255": [
+          0.48969284683570397,
+          0.45041322314049587,
+          0.5287592998631959
+        ],
+        "alphaDifferingPixels": 16,
+        "totalPixels": 426888,
+        "alphaMaxDifference255": 4,
+        "alphaMeanAbsoluteDifference255": 7.964618354228744e-05
+      },
+      "closed": {
+        "dimensionsIdentical": true,
+        "size": [
+          484,
+          882
+        ],
+        "byteIdentical": false,
+        "rgbMeanAbsoluteDifference255": [
+          0.4985124903956073,
+          0.4633768107794082,
+          0.541994621540076
+        ],
+        "alphaDifferingPixels": 19,
+        "totalPixels": 426888,
+        "alphaMaxDifference255": 4,
+        "alphaMeanAbsoluteDifference255": 8.667378797248928e-05
+      }
+    },
+    "publication": "Freshly rebuilt images remain staging-only. Approved public WEBP bytes are unchanged. Latest Serra internal geometry/materials and rendering/encoding produce minor pixel differences; bit-identical reproduction is not claimed.",
+    "sourceFiles": {
+      "tools/diorama/check_factory_serra_link.py": "af1d1cc8a59fb51b91c81072d5de5a986ab2c10fac4dbc713bb2e8ff44b5bb4a",
+      "tools/diorama/check_factory_serra_structure.py": "dcc223bd0c3dacee40e1f64321ae73c5d7144777a3e67821e91d54fc360d0120",
+      "tools/diorama/export_factory_serra_sprite.mjs": "8c49ea89aacd176cc7bd16070e7484e53573917f7be1c90d56d83821c764993a",
+      "tools/diorama/package_factory_serra_link.py": "128f29f4da3ae11a0823a076772ea6040f208d1b4815dd5cf2685bafe8912783",
+      "tools/diorama/render_factory_serra_link.py": "a8e55834b0ff31b54948554caa70f6f00edfdaf829c3d670deab744c64bca055",
+      "tools/diorama/render_factory_serra_link_layers.py": "df148e953318f7f850a0959c7f7919728de0645bdbd5a8427d6b3873a13ed18a",
+      "tools/diorama/render_fabrica_map.py": "d31cebbad43b81952e10dd94474d30dee9234051764a962a5de3e5d4f8578d2f",
+      "tools/diorama/render_serra_map.py": "28d5d478b2553c4ebe1bd28737e485a36e33f329082839fc5c6f38409331c473",
+      "src/assets/playerSpriteSpec.ts": "56248862ebf8657d54162f547b767d8d2971a58594bbef33421b63f0f1bbcc68",
+      "src/adventure/WorldAtlasArt.ts": "b0ec26898c808aef38875f20898777c4a2737055bbc04d001ec7137bd4cc18cb",
+      "src/adventure/WorldMapArt.ts": "66e8065fd9292be00afb3308c9dcb8a5a8c68b4b76c11ce4e75420e8801de2d9",
+      "docs/world/diorama/fabrica-composition-approved.meta.json": "ad6d249ab94ba4d5043db1e9a488471d2795b959ba6914c582b15676591df182"
+    },
+    "provenanceScope": "Historical complete96-sample rebuild before final rear-carrier separation. Retained with its original source hashes and bitmap comparisons; not rerendered during geometry revalidation."
+  },
+  "physicalAudit": {
+    "open": {
+      "routeSamples": 174,
+      "existingFactorySamples": 278,
+      "spriteHeightWorld": 1.0108313512436384,
+      "rayCount": 795520,
+      "unsupportedCount": 0,
+      "headroomCount": 0,
+      "bodyContactsByObject": {},
+      "footContactsByObject": {
+        "walk_stage landing paving.004": 213,
+        "walk_serra 4-1 generous stage landing": 290
+      },
+      "existingFactoryNewObjectContactsByObject": {}
+    },
+    "closed": {
+      "routeSamples": 174,
+      "existingFactorySamples": 278,
+      "spriteHeightWorld": 1.0108313512436384,
+      "rayCount": 795520,
+      "unsupportedCount": 0,
+      "headroomCount": 9,
+      "bodyContactsByObject": {
+        "link retracting equipment safety beam": 7534,
+        "link gate dark hazard stripe.002": 667,
+        "link gate dark hazard stripe.003": 8
+      },
+      "footContactsByObject": {
+        "walk_stage landing paving.004": 213,
+        "link gate dark hazard stripe.003": 8,
+        "link retracting equipment safety beam": 1560,
+        "link gate dark hazard stripe.002": 7,
+        "walk_serra 4-1 generous stage landing": 290
+      },
+      "existingFactoryNewObjectContactsByObject": {}
+    }
+  },
+  "roundedRasterAudit": {
+    "open": [
+      {
+        "profile": "desktop",
+        "viewport": [
+          1180,
+          757
+        ],
+        "zoom": 1.0,
+        "spriteCssScale": 1.8571753640776698,
+        "paintPixelCssSize": 2,
+        "rayCount": 554101,
+        "bodyContactsByObject": {},
+        "footContactsByObject": {
+          "walk_dry maintenance catwalk": 7,
+          "link structural 1 flush joint.002": 1,
+          "link structural 1 flush joint.007": 1,
+          "link structural 1 flush joint.010": 1,
+          "link structural 2 flush joint.005": 1,
+          "link structural 2 flush joint.010": 3,
+          "link structural 2 flush joint.017": 3,
+          "link structural 2 flush joint.024": 3,
+          "walk_serra 4-1 generous stage landing": 208,
+          "link structural 3 flush joint.001": 1,
+          "link structural 3 flush joint.002": 1
+        },
+        "existingFactoryBodyContactsByObject": {},
+        "existingFactoryFootContactsByObject": {}
+      },
+      {
+        "profile": "portrait",
+        "viewport": [
+          400,
+          606
+        ],
+        "zoom": 1.05,
+        "spriteCssScale": 0.6610285194174758,
+        "paintPixelCssSize": 1,
+        "rayCount": 74111,
+        "bodyContactsByObject": {},
+        "footContactsByObject": {
+          "walk_stage landing paving.004": 32,
+          "walk_main inspection lane 3": 43,
+          "walk_link continuous section 0": 27,
+          "walk_link continuous section 1": 65,
+          "link structural 1 flush joint.001": 1,
+          "walk_link machine service floor": 11,
+          "walk_link continuous section 2": 113,
+          "link structural 2 flush joint.002": 2,
+          "link structural 2 flush joint.003": 1,
+          "link structural 2 flush joint.004": 1,
+          "link structural 2 flush joint.005": 1,
+          "link structural 2 flush joint.007": 1,
+          "walk_link continuous section 3": 30,
+          "walk_serra 4-1 generous stage landing": 65,
+          "link structural 3 flush joint.001": 1
+        },
+        "existingFactoryBodyContactsByObject": {},
+        "existingFactoryFootContactsByObject": {
+          "walk_link continuous section 0": 3
+        }
+      },
+      {
+        "profile": "landscape",
+        "viewport": [
+          846,
+          392
+        ],
+        "zoom": 1.0,
+        "spriteCssScale": 0.9871359223300972,
+        "paintPixelCssSize": 1,
+        "rayCount": 155642,
+        "bodyContactsByObject": {},
+        "footContactsByObject": {
+          "walk_stage landing paving.004": 28,
+          "link structural 2 flush joint.007": 1,
+          "link structural 2 flush joint.017": 1,
+          "link structural 2 flush joint.027": 1,
+          "walk_serra 4-1 generous stage landing": 64
+        },
+        "existingFactoryBodyContactsByObject": {},
+        "existingFactoryFootContactsByObject": {}
+      }
+    ],
+    "closed": [
+      {
+        "profile": "desktop",
+        "viewport": [
+          1180,
+          757
+        ],
+        "zoom": 1.0,
+        "spriteCssScale": 1.8571753640776698,
+        "paintPixelCssSize": 2,
+        "rayCount": 554101,
+        "bodyContactsByObject": {
+          "link retracting equipment safety beam": 5208,
+          "link gate dark hazard stripe.002": 473,
+          "link gate dark hazard stripe.003": 2
+        },
+        "footContactsByObject": {
+          "walk_dry maintenance catwalk": 7,
+          "link structural 1 flush joint.002": 1,
+          "link structural 1 flush joint.007": 1,
+          "link gate dark hazard stripe.003": 7,
+          "link retracting equipment safety beam": 1161,
+          "link gate dark hazard stripe.002": 8,
+          "link structural 1 flush joint.010": 1,
+          "link structural 2 flush joint.005": 1,
+          "link structural 2 flush joint.010": 3,
+          "link structural 2 flush joint.017": 3,
+          "link structural 2 flush joint.024": 3,
+          "walk_serra 4-1 generous stage landing": 208,
+          "link structural 3 flush joint.001": 1,
+          "link structural 3 flush joint.002": 1
+        },
+        "existingFactoryBodyContactsByObject": {},
+        "existingFactoryFootContactsByObject": {}
+      },
+      {
+        "profile": "portrait",
+        "viewport": [
+          400,
+          606
+        ],
+        "zoom": 1.05,
+        "spriteCssScale": 0.6610285194174758,
+        "paintPixelCssSize": 1,
+        "rayCount": 74111,
+        "bodyContactsByObject": {
+          "link retracting equipment safety beam": 662,
+          "link gate dark hazard stripe.002": 63,
+          "link gate dark hazard stripe.003": 6
+        },
+        "footContactsByObject": {
+          "walk_stage landing paving.004": 32,
+          "walk_main inspection lane 3": 43,
+          "walk_link continuous section 0": 27,
+          "walk_link continuous section 1": 65,
+          "link structural 1 flush joint.001": 1,
+          "link gate dark hazard stripe.003": 1,
+          "link retracting equipment safety beam": 126,
+          "walk_link machine service floor": 11,
+          "walk_link continuous section 2": 113,
+          "link structural 2 flush joint.002": 2,
+          "link structural 2 flush joint.003": 1,
+          "link structural 2 flush joint.004": 1,
+          "link structural 2 flush joint.005": 1,
+          "link structural 2 flush joint.007": 1,
+          "walk_link continuous section 3": 30,
+          "walk_serra 4-1 generous stage landing": 65,
+          "link structural 3 flush joint.001": 1
+        },
+        "existingFactoryBodyContactsByObject": {},
+        "existingFactoryFootContactsByObject": {
+          "walk_link continuous section 0": 3
+        }
+      },
+      {
+        "profile": "landscape",
+        "viewport": [
+          846,
+          392
+        ],
+        "zoom": 1.0,
+        "spriteCssScale": 0.9871359223300972,
+        "paintPixelCssSize": 1,
+        "rayCount": 155642,
+        "bodyContactsByObject": {
+          "link retracting equipment safety beam": 1490,
+          "link gate dark hazard stripe.002": 122
+        },
+        "footContactsByObject": {
+          "walk_stage landing paving.004": 28,
+          "link gate dark hazard stripe.003": 2,
+          "link retracting equipment safety beam": 312,
+          "link gate dark hazard stripe.002": 2,
+          "link structural 2 flush joint.007": 1,
+          "link structural 2 flush joint.017": 1,
+          "link structural 2 flush joint.027": 1,
+          "walk_serra 4-1 generous stage landing": 64
+        },
+        "existingFactoryBodyContactsByObject": {},
+        "existingFactoryFootContactsByObject": {}
+      }
+    ]
+  },
+  "structureAudit": {
+    "pileCount": 30,
+    "unrootedCount": 0,
+    "missingBearingCount": 0,
+    "booleanModifierCount": 0
+  },
+  "sourcePreservation": {
+    "open": {
+      "allFactoryObjectsUnchanged": true,
+      "fiveFactoryNodesUnchanged": true,
+      "serraEntryUnchanged": true,
+      "originalPortoBridgeAndFerryUnchanged": true
+    },
+    "closed": {
+      "allFactoryObjectsUnchanged": true,
+      "fiveFactoryNodesUnchanged": true,
+      "serraEntryUnchanged": true,
+      "originalPortoBridgeAndFerryUnchanged": true
+    }
+  },
+  "walkingTiming": {
+    "worldUnitsPerSecond": 1.73,
+    "factoryApproachLength": 4.68,
+    "factoryApproachSeconds": 2.7052,
+    "serraApproachLength": 1.25,
+    "serraApproachSeconds": 0.7225,
+    "spanLength": 10.794885463111388,
+    "spanSeconds": 6.2398
+  },
+  "limits": [
+    "Physical checks use three sampled support/head rays every<=0.10world unit, not continuous actor-volume simulation.",
+    "Opaque pixel audit covers idle,six walk frames,both facings; two lowest source-pixel rows are explicitly classified as foot contacts.",
+    "Rounded raster covers declared1180x757/zoom1,400x606/zoom1.05,846x392/zoom1 scenarios; integrated fitted camera zoom and label rectangles remain runtime QA.",
+    "Structural connectivity uses evaluated bounding envelopes of modeled piles,footings and bearing members,not geotechnical or load simulation.",
+    "This art-source pipeline makes no claim of runtime interaction,progression or transition QA."
+  ],
+  "commands": "See factory-serra-link.md for the complete source-only rebuild sequence. Packaging stages by default; --install-assets is a separate explicit action.",
+  "sourceFilesScope": "Current repository sources at the final geometry/clearance revalidation; see freshRebuild for historical high-quality-render source hashes.",
+  "geometryRevalidation": {
+    "reason": "Serra maintenance lane A and its rear boarding platforms moved back; one upper terminal support top was lowered0.32world unit while its slanted arm kept the same pulley. Lane B, five phase nodes, main paths, camera and entry4-1 remained fixed.",
+    "date": "2026-10-01",
+    "sourceInputHashes": {
+      "tools/diorama/render_fabrica_map.py": "d31cebbad43b81952e10dd94474d30dee9234051764a962a5de3e5d4f8578d2f",
+      "tools/diorama/render_serra_map.py": "a6feca3fe05ea5310fcba9b3633367409fa8b639ceaa4c3d898e619822823e7f",
+      "tools/diorama/render_factory_serra_link.py": "a8e55834b0ff31b54948554caa70f6f00edfdaf829c3d670deab744c64bca055"
+    },
+    "bothStatesUseIdenticalSources": true,
+    "method": "Evaluated world-space geometry of every new_link mesh/curve/font, six-decimal vertices, triangulation, object names/groups/visibility; source camera, routes, approach bounds and span metrics compared separately. Previous verified source-cache baseline is local QA evidence, not a build dependency.",
+    "states": {
+      "open": {
+        "oldLinkGeometrySha256": "79ab98219726e2aec2f65916fe44966a967227baff4f5f793c88b09a4bab862a",
+        "newLinkGeometrySha256": "79ab98219726e2aec2f65916fe44966a967227baff4f5f793c88b09a4bab862a",
+        "objectCount": 188,
+        "changedGeometryOrContractFields": [],
+        "currentSourceHashes": {
+          "tools/diorama/render_fabrica_map.py": "d31cebbad43b81952e10dd94474d30dee9234051764a962a5de3e5d4f8578d2f",
+          "tools/diorama/render_serra_map.py": "a6feca3fe05ea5310fcba9b3633367409fa8b639ceaa4c3d898e619822823e7f",
+          "tools/diorama/render_factory_serra_link.py": "a8e55834b0ff31b54948554caa70f6f00edfdaf829c3d670deab744c64bca055"
+        },
+        "sourcePreservation": {
+          "allFactoryObjectsUnchanged": true,
+          "fiveFactoryNodesUnchanged": true,
+          "serraEntryUnchanged": true,
+          "originalPortoBridgeAndFerryUnchanged": true
+        }
+      },
+      "closed": {
+        "oldLinkGeometrySha256": "57248778212f1160a78104440baf466106d867c97a60e9a2fc7cc474ba8f8ca7",
+        "newLinkGeometrySha256": "57248778212f1160a78104440baf466106d867c97a60e9a2fc7cc474ba8f8ca7",
+        "objectCount": 188,
+        "changedGeometryOrContractFields": [],
+        "currentSourceHashes": {
+          "tools/diorama/render_fabrica_map.py": "d31cebbad43b81952e10dd94474d30dee9234051764a962a5de3e5d4f8578d2f",
+          "tools/diorama/render_serra_map.py": "a6feca3fe05ea5310fcba9b3633367409fa8b639ceaa4c3d898e619822823e7f",
+          "tools/diorama/render_factory_serra_link.py": "a8e55834b0ff31b54948554caa70f6f00edfdaf829c3d670deab744c64bca055"
+        },
+        "sourcePreservation": {
+          "allFactoryObjectsUnchanged": true,
+          "fiveFactoryNodesUnchanged": true,
+          "serraEntryUnchanged": true,
+          "originalPortoBridgeAndFerryUnchanged": true
+        }
+      }
+    },
+    "physicalMetricsIdenticalToPriorAudit": true,
+    "roundedRasterClearanceIdenticalToPriorAudit": true,
+    "roundedRasterObjectAttributionChanges": [
+      {
+        "state": "open",
+        "profile": "portrait",
+        "classification": "footContactsByObject",
+        "before": {
+          "walk_link continuous section 2": 111,
+          "walk_link continuous section 3": 32
+        },
+        "after": {
+          "walk_link continuous section 2": 113,
+          "walk_link continuous section 3": 30
+        },
+        "contactCountChanged": false,
+        "bodyClearanceChanged": false,
+        "note": "Two foot-level shared-edge hits resolve to the adjacent deck section. Geometry fingerprints and route/camera coordinates match; this is consistent with scene-BVH tie attribution after unrelated Serra geometry changes."
+      },
+      {
+        "state": "closed",
+        "profile": "portrait",
+        "classification": "footContactsByObject",
+        "before": {
+          "walk_link continuous section 2": 111,
+          "walk_link continuous section 3": 32
+        },
+        "after": {
+          "walk_link continuous section 2": 113,
+          "walk_link continuous section 3": 30
+        },
+        "contactCountChanged": false,
+        "bodyClearanceChanged": false,
+        "note": "Two foot-level shared-edge hits resolve to the adjacent deck section. Geometry fingerprints and route/camera coordinates match; this is consistent with scene-BVH tie attribution after unrelated Serra geometry changes."
+      }
+    ],
+    "structureMetricsIdenticalToPriorAudit": true,
+    "retainedAuditResults": "Top-level physicalAudit and structureAudit match the prior audit exactly. Top-level roundedRasterAudit contains current results; the only difference is the explicitly retained two-contact shared-edge attribution in portrait.",
+    "publicAssetsUnchanged": true,
+    "highQualityBitmapsRerendered": false,
+    "runtimeContractChanged": false,
+    "scope": "Fresh procedural scene builds, evaluated new-link geometry, camera/routes/bounds/span metrics, all declared physical and source/rounded-raster checks, and modeled structural support. No runtime QA or lighting/pixel revalidation is claimed."
+  }
+}

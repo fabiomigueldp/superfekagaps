@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "connection": "factory-serra-link",
+  "placements": {
+    "fabrica": {
+      "origin": {
+        "x": 1.98,
+        "y": 0.03
+      },
+      "scale": 1
+    },
+    "serra": {
+      "origin": {
+        "x": 2.78,
+        "y": -0.65
+      },
+      "scale": 1
+    }
+  },
+  "islands": {
+    "fabrica": {
+      "version": 1,
+      "island": "fabrica",
+      "world": 3,
+      "size": {
+        "width": 1920,
+        "height": 1200
+      },
+      "join": {
+        "x": 0.705057,
+        "y": 0.509121,
+        "node": "3-5"
+      },
+      "landing": {
+        "x": 0.8456492,
+        "y": 0.4287555
+      },
+      "junctionToLanding": [
+        {
+          "x": 0.705057,
+          "y": 0.509121
+        },
+        {
+          "x": 0.7562444,
+          "y": 0.5336726
+        },
+        {
+          "x": 0.7754398,
+          "y": 0.5428796
+        },
+        {
+          "x": 0.8456492,
+          "y": 0.4287555
+        }
+      ],
+      "approachBounds": {
+        "left": 0.669989,
+        "top": 0.3994847,
+        "right": 0.9547368,
+        "bottom": 0.7491082
+      },
+      "approachDurationSeconds": 2.7052
+    },
+    "serra": {
+      "version": 1,
+      "island": "serra",
+      "world": 4,
+      "size": {
+        "width": 1920,
+        "height": 1200
+      },
+      "join": {
+        "x": 0.165515,
+        "y": 0.65367,
+        "node": "4-1"
+      },
+      "landing": {
+        "x": 0.1365519,
+        "y": 0.7007513
+      },
+      "junctionToLanding": [
+        {
+          "x": 0.165515,
+          "y": 0.65367
+        },
+        {
+          "x": 0.1365519,
+          "y": 0.7007513
+        }
+      ],
+      "approachBounds": {
+        "left": 0.0879791,
+        "top": 0.6136651,
+        "right": 0.2104664,
+        "bottom": 0.8597165
+      },
+      "approachDurationSeconds": 0.7225
+    }
+  },
+  "walkRoute": {
+    "coordinateSystem": "atlas",
+    "points": [
+      {
+        "x": 2.8256492,
+        "y": 0.4587555
+      },
+      {
+        "x": 2.9165519,
+        "y": 0.0507513
+      }
+    ],
+    "durationSeconds": 6.2398
+  },
+  "overlays": {
+    "open": {
+      "path": "/assets/world/map/factory-serra-link-open.webp",
+      "width": 484,
+      "height": 882,
+      "left": 2.7328125,
+      "top": -0.0025,
+      "widthInMap": 0.252083333,
+      "heightInMap": 0.735,
+      "bytes": 67552,
+      "sha256": "5a46a96936c505b71f61a5b37e8d8d929e7e89a2ccab25fa2e3c9e4848dcb7a8"
+    },
+    "closed": {
+      "path": "/assets/world/map/factory-serra-link-closed.webp",
+      "width": 484,
+      "height": 882,
+      "left": 2.7328125,
+      "top": -0.0025,
+      "widthInMap": 0.252083333,
+      "heightInMap": 0.735,
+      "bytes": 69280,
+      "sha256": "3a380962d60954c36eedbb0ff7faa6da592c2301c04ca26e31b95794b1cf9721"
+    }
+  },
+  "unlock": {
+    "stage": "3-5",
+    "stateBefore": "closed",
+    "stateAfter": "open"
+  },
+  "source": "docs/world/campanha.md:115: after C1 the equipment blocking the Serra exit stops. Permanent supported walkway; side-retracting inspection stop. Original Factory source camera, all five nodes, paths and objects preserved. Serra entry/camera approved at placement (2.78,-0.65), scale1."
+}

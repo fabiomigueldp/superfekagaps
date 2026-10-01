@@ -4,7 +4,7 @@ import { STAGES } from '../src/adventure/campaign';
 import { finishStage, freshSave, isUnlocked, parseSave } from '../src/adventure/progress';
 import { advanceJourney, canEnterJourney, createJourney, enterJourney, journeyBlockReason, journeyMode,
     journeySaveSelection, returnToJourney, selectJourney, skipJourney,
-    type JourneyCapabilities, type JourneyNetwork, type JourneyState } from '../src/adventure/WorldJourneyModel';
+    type JourneyCapabilities, type JourneyEdgeDirection, type JourneyNetwork, type JourneyState } from '../src/adventure/WorldJourneyModel';
 
 const network: JourneyNetwork = {
     nodes: {
@@ -277,4 +277,46 @@ test('model leaves inputs immutable and handles zero-duration legs and invalid d
     assert.equal(arrived.arrived, '2-1');
     assert.equal(arrived.entered, null);
     assert.equal(arrived.legs.length, 0);
+});
+
+test('omitted, empty and explicit both direction permissions preserve the complete legacy journey exactly', () => {
+    for (const edgeDirections of [{}, Object.fromEntries(network.edges.map(edge => [edge.id, 'both' as const]))]) {
+        const explicit = { ...capabilities, edgeDirections };
+        let expected = initial(), actual = createJourney('1-1', network, explicit);
+        for (const [target, seconds] of [['2-1', 5.8], ['1-1', .2], ['2-2', .1], ['1-2', 100], ['2-1', 100]] as const) {
+            expected = selectJourney(expected, target, network, capabilities);
+            actual = selectJourney(actual, target, network, explicit);
+            assert.deepEqual(actual, expected);
+            expected = advanceJourney(expected, seconds); actual = advanceJourney(actual, seconds);
+            assert.deepEqual(actual, expected);
+        }
+        assert.deepEqual(enterJourney(actual, explicit), enterJourney(expected, capabilities));
+    }
+});
+
+test('edge direction permissions independently gate each authored departure and retain availableEdges gates', () => {
+    const trail = { ...network, edges: [network.edges[0]] };
+    for (const permission of ['forward', 'reverse', 'both', 'none'] as const) {
+        const cap: JourneyCapabilities = { ...capabilities, edgeDirections: { 'coast-trail': permission } };
+        for (const [from, to, direction] of [['1-1', '1-2', 'forward'], ['1-2', '1-1', 'reverse']] as const) {
+            const state = selectJourney(createJourney(from, trail, cap), to, trail, cap);
+            assert.equal(state.blocked, permission === 'both' || permission === direction ? null : 'no-route');
+        }
+    }
+    const closed: JourneyCapabilities = { ...capabilities, availableEdges: [], edgeDirections: { 'coast-trail': 'both' } };
+    assert.equal(selectJourney(initial(), '1-2', trail, closed).blocked, 'no-route');
+    const malformed = { ...capabilities, edgeDirections: { 'coast-trail': 'sideways' as JourneyEdgeDirection } };
+    assert.equal(selectJourney(initial(), '1-2', trail, malformed).blocked, 'no-route');
+});
+
+test('closing both departure directions still permits continuous exit or reversal of the active partial leg', () => {
+    const state = advanceJourney(select(initial(), '2-1'), 5);
+    const closed: JourneyCapabilities = { ...capabilities, edgeDirections: { crossing: 'none' } };
+    for (const [target, direction] of [['1-1', -1], ['2-1', 1]] as const) {
+        const next = selectJourney(state, target, network, closed);
+        assert.deepEqual(next.point, state.point); assert.equal(next.legs[0].direction, direction);
+        assert.deepEqual(next.legs[0].points, state.legs[0].points);
+        assert.equal(advanceJourney(next, 100).arrived, target);
+    }
+    assert.equal(selectJourney(initial(), '2-1', network, closed).blocked, 'no-route');
 });

@@ -3,6 +3,7 @@ import type { BoatAtlasFrame } from './WorldAtlasArt';
 import type { MapArtMetadata } from './WorldMapArt';
 import type { MapPoint } from './WorldMapModel';
 import type { JourneyEdge, JourneyNetwork } from './WorldJourneyModel';
+import { buildSerraJourney, type SerraJourneyOptions } from './WorldSerraJourney';
 
 export interface JourneyDock {
     join: MapPoint & { route?: string; segment?: number; t?: number; node?: string };
@@ -236,7 +237,7 @@ export const JOURNEY_DOCK_NODES = { 1: { join: '1-junction', dock: '1-dock', ber
  */
 export function buildJourneyNetwork(options: { islands: readonly JourneyIsland[]; secrets: readonly string[];
     connection: JourneyConnection | null; connectionReady: boolean;
-    bridge?: JourneyBridge | null; bridgeReady?: boolean; bridgeOpen?: boolean }): JourneyNetwork {
+    bridge?: JourneyBridge | null; bridgeReady?: boolean; bridgeOpen?: boolean } & SerraJourneyOptions): JourneyNetwork {
     const nodes: Record<string, MapPoint> = {}, edges: JourneyEdge[] = [];
     const coast = options.islands.find(island => island.world === 1), port = options.islands.find(island => island.world === 2);
     const connection = options.connectionReady && coast?.ready && port?.ready ? options.connection : null;
@@ -272,7 +273,7 @@ export function buildJourneyNetwork(options: { islands: readonly JourneyIsland[]
                 nodes[junction] = transform(join);
                 add(`2-4:${junction}`, from, junction, [...points.slice(0, segment + 1), join].map(transform), .39);
                 add(`${junction}:2-5`, junction, to, [join, ...points.slice(segment + 1)].map(transform), .39);
-            } else add(`${from}:${to}`, from, to, points.map(transform), .78);
+            } else add(`${from}:${to}`, from, to, points.map(transform), world === 4 ? metadata.routeDurationsSeconds?.[`${n - 1}:${n}`] ?? .78 : .78);
         }
         if (options.secrets.includes(`${world}-3`) && metadata.secretRoute.length > 1)
             add(`${world}-secret`, `${world}-3`, `${world}-5`, metadata.secretRoute.map(transform), 1.1);
@@ -291,5 +292,7 @@ export function buildJourneyNetwork(options: { islands: readonly JourneyIsland[]
     if (crossing) add('coast-port-sail', '1-berth', '2-berth', crossing.sailRoute.map(point => ({ ...point })), crossing.sailDuration, 'sail');
     if (bridge) add(PORT_FACTORY_BRIDGE_EDGE, BRIDGE_NODES[2].landing, BRIDGE_NODES[3].landing,
         bridge.bridgeRoute.map(point => ({ ...point })), bridge.bridgeDuration);
+    const serra = buildSerraJourney(options);
+    Object.assign(nodes, serra.nodes); edges.push(...serra.edges);
     return { nodes, edges };
 }
