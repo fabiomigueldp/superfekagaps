@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "coordinateSystem": "atlas",
+  "sprites": {
+    "coral": {
+      "path": "/assets/world/map/maritime-buoy-coral.webp",
+      "width": 160,
+      "height": 208,
+      "widthInMap": 0.07281553398058252,
+      "waterlineAnchor": {
+        "x": 80.00003814697266,
+        "y": 165.6254117488861
+      }
+    },
+    "sage": {
+      "path": "/assets/world/map/maritime-buoy-sage.webp",
+      "width": 160,
+      "height": 208,
+      "widthInMap": 0.07281553398058252,
+      "waterlineAnchor": {
+        "x": 80.00003814697266,
+        "y": 165.6254117488861
+      }
+    }
+  },
+  "instances": [
+    {
+      "id": "coast-port-costa",
+      "route": "coast-port",
+      "sprite": "sage",
+      "point": {
+        "x": 0.847552380723927,
+        "y": 0.8276973448682413
+      }
+    },
+    {
+      "id": "coast-port-porto",
+      "route": "coast-port",
+      "sprite": "coral",
+      "point": {
+        "x": 1.1726028037900418,
+        "y": 0.7212261318945039
+      }
+    },
+    {
+      "id": "reserva-dominio-reserva",
+      "route": "reserva-dominio",
+      "sprite": "coral",
+      "point": {
+        "x": 2.510399567589041,
+        "y": -1.3321437685421882
+      }
+    },
+    {
+      "id": "reserva-dominio-dominio",
+      "route": "reserva-dominio",
+      "sprite": "sage",
+      "point": {
+        "x": 2.567669768444458,
+        "y": -0.8876690091459706
+      }
+    }
+  ]
+}

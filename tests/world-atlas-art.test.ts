@@ -7,6 +7,7 @@ import { atlasIslandCamera, COAST_PORT_PLACEMENTS, getAtlasCamera, localToAtlas 
 import { atlasActorBounds, atlasActorScale, atlasBoatBounds, paintWorldAtlas, type AtlasPaintState, type BoatAtlasFrame } from '../src/adventure/WorldAtlasArt';
 import { mapToScreen, screenToMap, type MapCamera } from '../src/adventure/WorldMapModel';
 import { atlasCableBounds, paintCableLines, validCableFrame, type AtlasCableCar, type CableAtlasFrame } from '../src/adventure/WorldCableArt';
+import { parseMaritimeBuoys } from '../src/adventure/WorldMaritimeArt';
 
 interface Call { name: string; args: unknown[]; color?: unknown }
 function recordingContext() {
@@ -62,6 +63,22 @@ test('connected painter clears and paints sea once, then both fixed island layer
         const bottom = mapToScreen(localToAtlas({ x: 1, y: 1 }, layer.placement), camera);
         assert.deepEqual(draw.args.slice(1), [top.x, top.y, bottom.x - top.x, bottom.y - top.y]);
     }
+});
+
+test('maritime decorations follow the sea and precede terrain, docks and passenger layers without changing them', () => {
+    const metadata = parseMaritimeBuoys(JSON.parse(readFileSync(new URL('../public/assets/world/map/maritime-buoys.meta.json', import.meta.url), 'utf8')))!;
+    const state = scene(), baseline = recordingContext(), decorated = recordingContext();
+    state.islands[0].overlay = { image: image('dock'), left: .05, top: .6, widthInMap: .2, heightInMap: .1 };
+    paintWorldAtlas(baseline.context, state);
+    const buoy = image('buoy');
+    state.buoys = [{ point: { x: .85, y: .8 }, sprite: metadata.sprites.sage, image: buoy }];
+    paintWorldAtlas(decorated.context, state);
+    const drawIndex = decorated.calls.findIndex(call => call.name === 'drawImage' && call.args[0] === buoy);
+    const terrainIndex = decorated.calls.findIndex(call => call.name === 'drawImage' && call.args[0] === state.islands[0].assets.island);
+    assert.ok(drawIndex > 0 && drawIndex < terrainIndex);
+    assert.ok(decorated.calls.slice(0, drawIndex).some(call => call.name === 'clearRect'));
+    const withoutBuoy = decorated.calls.filter((_, index) => ![drawIndex - 1, drawIndex, drawIndex + 1].includes(index));
+    assert.deepEqual(withoutBuoy, baseline.calls, 'Every sea, terrain, dock, boat and actor command retains its original coordinates and order.');
 });
 
 const authoredLayers = ['costa', 'porto', 'fabrica', 'serra', 'reserva', 'dominio'].map((name, index) => ({

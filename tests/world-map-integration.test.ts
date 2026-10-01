@@ -748,6 +748,89 @@ async function readyDominio(h: ReturnType<typeof mapDOM>, save = openSave('5-5')
     h.view.render(STAGES.findIndex(stage => stage.id === save.selected), save, 96, '');
 }
 
+const buoyMetadata = () => JSON.parse(readFileSync(new URL('../public/assets/world/map/maritime-buoys.meta.json', import.meta.url), 'utf8'));
+async function finishBuoyMetadata(h: ReturnType<typeof mapDOM>, value: unknown = buoyMetadata(), ok = true) {
+    h.fetches.find(request => request.url.endsWith('maritime-buoys.meta.json'))!.resolve({ ok, json: async () => value });
+    await flushAssets();
+}
+function buoyDraws(h: ReturnType<typeof mapDOM>) {
+    return h.paint.calls.filter(call => call.method === 'drawImage' && String((call.args[0] as any)?.src).includes('maritime-buoy-'));
+}
+async function finishBuoyImages(h: ReturnType<typeof mapDOM>, outcome: 'ready' | 'failed' | 'wrong-size' = 'ready') {
+    for (const sprite of Object.values(buoyMetadata().sprites) as any[]) {
+        const image = h.images.find(image => image.src.endsWith(sprite.path.split('/').pop()))!;
+        assert.ok(image);
+        Object.assign(image, { naturalWidth: outcome === 'wrong-size' ? 1 : sprite.width, naturalHeight: sprite.height });
+        if (outcome === 'failed') image.onerror?.(); else image.onload?.();
+    }
+    await flushAssets();
+}
+
+test('late optional buoy art repaints once without changing locked compact camera, controls, journey or save', async t => {
+    const h = mapDOM(t, true), save = freshSave(); await readyDominio(h, save);
+    h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width: 472, height: 303 };
+    h.get('world-map-header').bounds = { x: 12, y: 6, left: 12, top: 6, width: 448, height: 44 };
+    h.get('world-map-tools').bounds = h.get('world-map-header').bounds;
+    h.get('world-map-footer').bounds = { x: 12, y: 202.8, left: 12, top: 202.8, width: 448, height: 94 };
+    h.observers[0].callback(); h.get('world-map-overview').click(); h.view.render(0, save, 100, '');
+    const network = h.internal.network, camera = structuredClone(h.internal.camera), journey = structuredClone(h.internal.journey);
+    const saved = structuredClone(save), positions = h.internal.compactOverviewPositions;
+    const controls = nativeControlEntries(h).map(({ button }) => [button, button.style.transform, button.hidden, button.getAttribute('aria-label')]);
+    assert.equal(buoyDraws(h).length, 0); assert.equal(h.internal.geometryDirty, false);
+    await finishBuoyMetadata(h); await finishBuoyImages(h);
+    assert.equal(h.internal.geometryDirty, false); assert.equal(h.internal.paintDirty, true);
+    h.paint.calls.length = 0; h.view.render(0, save, 116, '');
+    assert.equal(buoyDraws(h).length, 4, 'Ready route art shows all four props even while progression gates are locked.');
+    assert.equal(h.internal.network, network); assert.deepEqual(h.internal.camera, camera);
+    assert.deepEqual(h.internal.journey, journey); assert.deepEqual(save, saved);
+    assert.equal(h.internal.compactOverviewPositions, positions);
+    assert.deepEqual(nativeControlEntries(h).map(({ button }) => [button, button.style.transform, button.hidden, button.getAttribute('aria-label')]), controls);
+    assert.equal(h.events.entered, 0); assert.equal(h.internal.assetWarning, '');
+    h.paint.calls.length = 0; h.view.render(0, save, 132, '');
+    assert.equal(h.paint.calls.length, 0, 'Stationary reduced-motion frames remain a no-op after optional art settles.');
+    assert.equal(h.fetches.filter(request => request.url.endsWith('maritime-buoys.meta.json')).length, 1);
+    assert.equal(h.images.filter(image => image.src.includes('maritime-buoy-')).length, 2);
+});
+
+test('buoys wait for each corresponding route art independently of progression and never become controls', async t => {
+    const h = mapDOM(t, true), save = freshSave(); h.view.render(0, save, 0, '');
+    await finishBuoyMetadata(h); await finishBuoyImages(h);
+    h.paint.calls.length = 0; h.view.render(0, save, 16, ''); assert.equal(buoyDraws(h).length, 0);
+    await readyConnection(h, save); h.get('world-map-overview').click(); h.paint.calls.length = 0; h.view.render(0, save, 32, '');
+    assert.equal(h.internal.connectionActive, true); assert.equal(h.internal.dominioActive, false);
+    assert.equal(buoyDraws(h).length, 2, 'Only the ready Coast/Porto route can display its two sprites.');
+    assert.equal(h.root.textContent.includes('buoy'), false);
+    assert.equal(h.internal.journey.arrived, '1-1'); assert.equal(h.events.entered, 0);
+});
+
+test('optional buoy metadata or image failures stay silent and leave normal ferry navigation available', async t => {
+    for (const failure of ['metadata', 'malformed', 'failed', 'wrong-size'] as const) await t.test(failure, async child => {
+        const h = mapDOM(child, true), save = openSave('1-5'); await readyConnection(h, save);
+        const network = h.internal.network;
+        await finishBuoyMetadata(h, failure === 'malformed' ? {} : buoyMetadata(), failure !== 'metadata');
+        if (failure === 'failed' || failure === 'wrong-size') await finishBuoyImages(h, failure);
+        h.paint.calls.length = 0; h.view.render(4, save, 32, '');
+        assert.equal(buoyDraws(h).length, 0); assert.equal(h.internal.assetWarning, ''); assert.equal(h.internal.network, network);
+        h.view.selectDestination(5); h.view.render(5, save, 48, ''); h.internal.hud.skipButton.click(); h.view.render(5, save, 64, '');
+        assert.equal(h.internal.journey.arrived, '2-1'); assert.equal(h.events.entered, 0);
+    });
+});
+
+test('disposing aborts pending buoy metadata and image callbacks without publishing late decoration', async t => {
+    for (const pending of ['metadata', 'images']) await t.test(pending, async child => {
+        const h = mapDOM(child, true); h.view.render(0, freshSave(), 0, '');
+        if (pending === 'images') await finishBuoyMetadata(h);
+        const callbacks = h.images.filter(image => image.src.includes('maritime-buoy-')).map(image => image.onload!);
+        const count = h.images.length; h.view.dispose();
+        if (pending === 'metadata') await finishBuoyMetadata(h);
+        else { callbacks.forEach(callback => callback()); await flushAssets(); }
+        assert.equal(h.images.length, count); assert.equal(h.internal.buoyImages.size, 0);
+        assert.ok(h.fetches.find(request => request.url.endsWith('maritime-buoys.meta.json'))!.signal.aborted);
+        assert.ok(h.images.filter(image => image.src.includes('maritime-buoy-')).every(image => image.onload === null && image.onerror === null));
+        assert.equal(h.root.parent, null);
+    });
+});
+
 test('all six owned overview labels select their own region and open its close view without entering', async t => {
     const h = mapDOM(t, true), save = openSave('4-3'); await readyDominio(h, save);
     let time = 100;

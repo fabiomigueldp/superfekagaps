@@ -20,6 +20,7 @@ import { PASSENGER_CABLE_PAIR, parseReservaPassengerCable, type ReservaPassenger
 import { COAST_PORT_FERRY, createFerry, ferryEdgeDirections, sampleFerry, updateFerryAfterTravel,
     type FerryDefinition, type FerryState } from './WorldFerryModel';
 import { DOMINIO_FERRY, parseDominioJourney, matchesDominioAssetSize, type DominioJourneyConnection } from './WorldDominioJourney';
+import { MARITIME_BUOY_SPRITES, parseMaritimeBuoys, type MaritimeBuoyKind, type MaritimeBuoyMetadata } from './WorldMaritimeArt';
 export { journeyPathSegment } from './WorldFerryModel';
 
 interface MapCallbacks { select(index: number): void; enter(): void; exit(): void; unlockAudio(): void; arrive?(index: number): void }
@@ -200,6 +201,9 @@ export class WorldMapView {
     private dominioConnection: DominioJourneyConnection | null = null;
     private readonly dominioOverlays = new Map<string, HTMLImageElement>();
     private dominioActive = false;
+    private buoysStarted = false;
+    private buoyMetadata: MaritimeBuoyMetadata | null = null;
+    private readonly buoyImages = new Map<MaritimeBuoyKind, HTMLImageElement>();
     private readonly activeArt = new Map<number, CachedMapArt>();
     private journey: JourneyState | null = null;
     private network: JourneyNetwork = { nodes: {}, edges: [] };
@@ -337,6 +341,7 @@ export class WorldMapView {
     }
     private ensureArt(world: number): void {
         if (inAtlas(world)) {
+            if (!this.buoysStarted) void this.loadBuoys();
             this.ensureWorld(1); this.ensureWorld(2);
             if (this.connectionStatus === 'idle') void this.loadConnection();
             // The third island is explicit lazy content, never a recursive
@@ -360,6 +365,19 @@ export class WorldMapView {
             }
         }
         else this.ensureWorld(world);
+    }
+    private async loadBuoys(): Promise<void> {
+        this.buoysStarted = true;
+        const prefix = mapAssetPrefix((import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/');
+        const metadata = await fetch(prefix + 'maritime-buoys.meta.json', { signal: this.abort.signal })
+            .then(response => response.ok ? response.json() : null).then(parseMaritimeBuoys).catch(() => null);
+        if (this.abort.signal.aborted || !metadata) return;
+        this.buoyMetadata = metadata;
+        await Promise.all(MARITIME_BUOY_SPRITES.map(async kind => {
+            const sprite = metadata.sprites[kind], image = await this.loadImage(prefix + sprite.path.slice('/assets/world/map/'.length));
+            if (this.abort.signal.aborted || !image || image.naturalWidth !== sprite.width || image.naturalHeight !== sprite.height) return;
+            this.buoyImages.set(kind, image); this.paintDirty = true;
+        }));
     }
     private async loadAssets(world: number, cached: CachedMapArt): Promise<void> {
         const prefix = mapAssetPrefix((import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/');
@@ -820,6 +838,11 @@ export class WorldMapView {
             : trackedBoat ? atlasBoatBounds(trackedBoat.foot, trackedBoat.frame) : undefined, overviewActorBounds);
         const aboard = !!occupiedCabin || !!occupiedBoat;
         paintWorldAtlas(this.ctx, { camera: this.camera, time, reducedMotion: this.media.matches, islands,
+            buoys: this.buoyMetadata?.instances.flatMap(instance => {
+                const ready = instance.route === 'coast-port' ? this.connectionActive : this.dominioActive;
+                const image = this.buoyImages.get(instance.sprite);
+                return ready && image ? [{ point: instance.point, sprite: this.buoyMetadata!.sprites[instance.sprite], image }] : [];
+            }),
             connections: [...(overlay ? [{ ...overlay, image: this.bridgeImages.get(bridgeState)! }] : []),
                 ...(serraOverlay ? [{ ...serraOverlay, image: this.factorySerraImages.get(serraState)! }] : []),
                 ...passengerLayers.map(layer => ({ ...layer, image: this.passengerOverlays.get(layer.path)! })),

@@ -2,6 +2,7 @@ import { paintMapActor, paintMapIsland, paintMapSea, type MapArtAssets } from '.
 import { atlasIslandCamera, localToAtlas, type AtlasBounds, type AtlasIslandDescriptor, type AtlasOverlayBounds } from './WorldAtlasModel';
 import { mapToScreen, type MapCamera, type MapPoint } from './WorldMapModel';
 import { paintCableCarLayer, paintCableLines, validCableFrame, type AtlasCableCar } from './WorldCableArt';
+import { paintMaritimeBuoys, type AtlasMaritimeBuoy } from './WorldMaritimeArt';
 
 export interface AtlasIslandLayer extends AtlasIslandDescriptor {
     assets: MapArtAssets;
@@ -61,6 +62,7 @@ export interface AtlasPaintState {
     reducedMotion: boolean;
     islands: readonly AtlasIslandLayer[];
     connections?: readonly AtlasConnectionOverlay[];
+    buoys?: readonly AtlasMaritimeBuoy[];
     actor: AtlasActor;
     boats?: readonly AtlasBoat[];
     cableCars?: readonly AtlasCableCar[];
@@ -124,12 +126,13 @@ function islandOutsideViewport(camera: MapCamera): boolean {
         bottom.y < -ISLAND_PAINT_GUTTER || top.y > camera.height + ISLAND_PAINT_GUTTER;
 }
 
-/** One pure scene pass: sea → both fixed islands/routes → boat/Feka layers.
+/** One pure scene pass: sea → optional buoys → fixed islands/routes → boat/Feka layers.
  * No events, DOM, image loading, canvas allocation or animation clock lives here.
  * The legacy distant-Porto decoration is intentionally absent from this scene.
  */
 export function paintWorldAtlas(c: CanvasRenderingContext2D, state: AtlasPaintState): void {
     paintMapSea(c, state.camera, state.time, state.reducedMotion);
+    paintMaritimeBuoys(c, state.camera, state.buoys ?? []);
     for (const island of state.islands) {
         const camera = atlasIslandCamera(state.camera, island.placement);
         // Fallback procedural scenery has different extents. Dock overlays may
