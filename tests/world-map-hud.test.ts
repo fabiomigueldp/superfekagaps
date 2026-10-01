@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test, { type TestContext } from 'node:test';
-import { WorldMapHud, WORLD_MAP_TRAVEL_ACTIONS, WORLD_MAP_TRAVEL_ACTION_IDS, type WorldMapHudState, type WorldMapMotionState } from '../src/adventure/WorldMapHud';
+import { WorldMapHud, WORLD_MAP_TRAVEL_ACTIONS, WORLD_MAP_TRAVEL_ACTION_IDS, type WorldMapHudPoint, type WorldMapHudState, type WorldMapMotionState } from '../src/adventure/WorldMapHud';
 
 type Listener = (event: any) => void;
 /** The component owns semantics, not the renderer's layout or event routing. */
@@ -55,6 +55,20 @@ function fixture(t: TestContext) {
     return { hud, calls, state };
 }
 const asElement = (element: HTMLElement) => element as unknown as Element;
+/** Count setter calls, including assignments that leave the value unchanged. */
+function positionWrites(buttons: readonly HTMLButtonElement[]) {
+    const writes: Array<{ index: number; property: 'hidden' | 'transform'; value: boolean | string }> = [];
+    buttons.forEach((button, index) => {
+        let hidden = button.hidden, transform = button.style.transform;
+        Object.defineProperty(button, 'hidden', { configurable: true, get: () => hidden, set(value: boolean) {
+            writes.push({ index, property: 'hidden', value }); hidden = value;
+        } });
+        Object.defineProperty(button.style, 'transform', { configurable: true, get: () => transform, set(value: string) {
+            writes.push({ index, property: 'transform', value }); transform = value;
+        } });
+    });
+    return writes;
+}
 function find(root: Element, className: string): Element {
     if (root.className.split(' ').includes(className)) return root;
     for (const child of root.children) { const result = maybeFind(child, className); if (result) return result; }
@@ -169,6 +183,111 @@ test('projection can hide all stage signs while preserving independently positio
     hud.dockButtons[1].click(); assert.deepEqual(calls, ['world:2']);
     hud.positionNodes([{ x: NaN, y: 0 }], [{ x: 20, y: 150, visible: false }]);
     assert.equal(hud.stageButtons[0].hidden, true); assert.equal(hud.dockButtons[0].hidden, true);
+});
+
+test('stationary stage and travel passes make no hidden or transform assignments', t => {
+    const { hud } = fixture(t);
+    const stages = Array.from({ length: 5 }, (_, n) => ({ x: 100 + n * 60, y: 200 }));
+    const travel = { 'ferry-costa-porto': { x: 100, y: 300, available: false } };
+    const writes = positionWrites([...hud.stageButtons, ...WORLD_MAP_TRAVEL_ACTION_IDS.map(id => hud.travelButtons[id])]);
+    const position = () => { hud.positionNodes(stages); hud.positionTravelActions(travel); };
+    position();
+    assert.equal(writes.filter(write => write.property === 'hidden').length, 6);
+    assert.equal(writes.filter(write => write.property === 'transform').length, 6);
+    writes.length = 0;
+    for (let n = 0; n < 120; n++) position();
+    assert.deepEqual(writes, [], 'Stable frames must neither hide/show the ferry nor rewrite any control.');
+    travel['ferry-costa-porto'].available = true;
+    position();
+    assert.deepEqual(writes, [], 'Availability changes need no position or visibility assignment.');
+    assert.match(hud.travelButtons['ferry-costa-porto'].getAttribute('aria-label')!, /Marcar destino da travessia/);
+    travel['ferry-costa-porto'].available = false;
+    position();
+    assert.deepEqual(writes, []);
+    assert.match(hud.travelButtons['ferry-costa-porto'].getAttribute('aria-label')!, /Travessia bloqueada/);
+});
+
+test('position setters follow rounded movement and visibility changes for every control kind', t => {
+    const { hud, state } = fixture(t);
+    hud.update({ ...state, overview: true });
+    const buttons = [hud.stageButtons[0], hud.travelButtons['ferry-costa-porto'], hud.overviewButtons[0]];
+    const writes = positionWrites(buttons);
+    const position = (point: WorldMapHudPoint | null) => {
+        hud.positionNodes([point]);
+        hud.positionTravelActions({ 'ferry-costa-porto': point });
+        hud.positionOverviewWorlds([point]);
+    };
+    position({ x: 10.1, y: 20.1 }); writes.length = 0;
+    position({ x: 10.49, y: 20.49 });
+    assert.deepEqual(writes, [], 'Subpixel settling within the same pixel does not change the transform.');
+    position({ x: 10.51, y: 20.51 });
+    assert.deepEqual(writes, buttons.map((_, index) => ({ index, property: 'transform', value: 'translate(11px, 21px) translate(-50%, -100%)' })));
+    writes.length = 0;
+    position({ x: 11, y: 21, visible: false });
+    assert.deepEqual(writes, buttons.map((_, index) => ({ index, property: 'hidden', value: true })));
+    writes.length = 0;
+    for (const point of [null, { x: NaN, y: 21 }, { x: 11, y: Infinity }, { x: 80, y: 90, visible: false }]) position(point);
+    assert.deepEqual(writes, [], 'Hidden and invalid anchors never rewrite visibility or position.');
+    position({ x: 11, y: 21 });
+    assert.deepEqual(writes, buttons.map((_, index) => ({ index, property: 'hidden', value: false })));
+    writes.length = 0;
+    position(null);
+    assert.deepEqual(writes, buttons.map((_, index) => ({ index, property: 'hidden', value: true })));
+    writes.length = 0;
+    position({ x: 30, y: 40 });
+    assert.deepEqual(writes, buttons.flatMap((_, index) => [
+        { index, property: 'hidden', value: false },
+        { index, property: 'transform', value: 'translate(30px, 40px) translate(-50%, -100%)' },
+    ]));
+});
+
+test('explicit legacy dock arrays still own visibility, availability and route overrides', t => {
+    const { hud } = fixture(t);
+    const docks = [{ x: 20, y: 150, available: true }, { x: 240, y: 150, available: false }];
+    hud.positionNodes([], docks);
+    const writes = positionWrites(hud.dockButtons);
+    hud.positionNodes([], docks);
+    assert.deepEqual(writes, []);
+    hud.positionNodes([]);
+    assert.deepEqual(writes, [], 'Omitting legacy docks leaves their positioning to the route pass.');
+    assert.ok(hud.dockButtons.every(button => !button.hidden));
+    hud.positionNodes([], []);
+    assert.deepEqual(writes, hud.dockButtons.map((_, index) => ({ index, property: 'hidden', value: true })));
+    writes.length = 0;
+    hud.positionNodes([], []);
+    assert.deepEqual(writes, [], 'An explicit empty legacy array still hides both docks.');
+    hud.positionNodes([], docks);
+    assert.match(hud.dockButtons[1].getAttribute('aria-label')!, /Travessia bloqueada/);
+    hud.positionTravelActions({ 'ferry-costa-porto': { x: 300, y: 200, available: true } });
+    assert.equal(hud.dockButtons[0].hidden, true);
+    assert.equal(hud.dockButtons[1].hidden, false);
+    assert.equal(hud.dockButtons[1].style.transform, 'translate(300px, 200px) translate(-50%, -100%)');
+    assert.match(hud.dockButtons[1].getAttribute('aria-label')!, /Marcar destino da travessia/);
+});
+
+test('stationary panorama positioning preserves keyboard activation and disposal', t => {
+    const { hud, state, calls } = fixture(t);
+    hud.update({ ...state, overview: true });
+    const points = Array.from({ length: 6 }, (_, n) => ({ x: 80 + n * 140, y: 160 }));
+    hud.positionOverviewWorlds(points, true);
+    const writes = positionWrites(hud.overviewButtons);
+    for (let n = 0; n < 120; n++) hud.positionOverviewWorlds(points, true);
+    assert.deepEqual(writes, []);
+    const root = asElement(hud.root);
+    root.dispatch('keydown', { key: 'ArrowRight', target: hud.overviewButtons[0] });
+    assert.equal(asElement(hud.overviewButtons[1]).focusCount, 1);
+    root.dispatch('keydown', { key: 'Enter', target: hud.root });
+    assert.deepEqual(calls, ['world:1']);
+    hud.setVisible(false); hud.setVisible(true);
+    hud.positionOverviewWorlds(points, false);
+    assert.deepEqual(writes, [], 'Changing name size or map visibility does not require new button anchors.');
+    assert.equal(root.className.split(' ').includes('has-compact-island-names'), false);
+    hud.dispose();
+    assert.equal(root.listeners.get('keydown')?.length, 0);
+    root.dispatch('keydown', { key: 'ArrowRight', target: hud.overviewButtons[0] });
+    hud.overviewButtons[1].click();
+    assert.equal(asElement(hud.overviewButtons[1]).focusCount, 1);
+    assert.deepEqual(calls, ['world:1']);
 });
 
 test('Escape closes only the region drawer, restores focus and cannot escape to the game', t => {

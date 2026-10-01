@@ -43,5 +43,33 @@ small islands. The bounded correction uses the same artwork at integer 1×
 letter scale (64×22 visible art) inside 76×44 native targets for viewports below
 640 pixels wide or 480 pixels high. The layout uses the same target dimensions.
 Focused HUD/integration tests, both typechecks and build passed after this
-correction; actual compact composition is checked on its new preview before
-production promotion. No physical touch/FPS/GPU measurement is claimed.
+correction (135 affected tests; Vite 1.45 s). Actual compact composition passed
+at 472×303 and 590×378 on `2402c52`; all six selection targets resolved to the
+correct region. Space preserved the current phase, Escape closed only overview,
+and gameplay 1-1 → pause → map restored 1-1. No physical touch/FPS/GPU
+measurement is claimed.
+
+Main `2402c522bcd97f715f22e7a1d2c6f58e91f7f8c9` deployed on 2026-10-01.
+The public URL `https://superfekagaps.vercel.app/` loaded matching
+`index-BXUzM5MZ.js` / `index-C-4s6zen.css`; Vercel deployment
+`7SnHPZtQsmxLw4tZgv9jxXo4Pxav` succeeded. Public smoke checked the six owned
+labels, locked Domínio preview rejecting Enter, restored Costa arrival, and
+unchanged normal progress 0/30 and 0/72. No test save was imported into production.
+No deployment configuration, GitHub workflow or hook changed; Oracle and the
+user's original working checkout were preserved.
+
+## Idle native-control writes
+
+A subsequent measured change guards identical visibility and transform values.
+Omitting the legacy dock argument leaves travel positioning to the immediately
+following route pass; explicit dock arrays (including `[]`) retain their prior
+behavior. Both production callers were checked. The audited stationary Costa
+pass falls from 17 hidden + 6 transform assignments to 0 + 0. Tests run 120
+full close passes and 120 overview passes without repeated position setters;
+real move/hide/show, invalid anchors, availability, keyboard and disposal still
+work. Close → overview performs its necessary 12 visibility and 6 position writes.
+These are setter counts, not browser frame-rate measurements.
+
+The final tree passed 473 TypeScript + 3 server tests in 13.66 s, both TypeScript
+projects, diff checks and a 2.02 s Vite build (489.69 kB JS / 151.76 kB gzip).
+No art, projection, cache, transport state or save change belongs to this patch.

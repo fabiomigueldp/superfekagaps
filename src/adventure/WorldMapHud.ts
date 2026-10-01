@@ -466,13 +466,17 @@ export class WorldMapHud {
     }
 
     private position(button: HTMLButtonElement, point: WorldMapHudPoint | null | undefined): void {
-        button.hidden = !point || point.visible === false || !Number.isFinite(point.x) || !Number.isFinite(point.y);
-        if (!button.hidden && point) button.style.transform = `translate(${Math.round(point.x)}px, ${Math.round(point.y)}px) translate(-50%, -100%)`;
+        const hidden = !point || point.visible === false || !Number.isFinite(point.x) || !Number.isFinite(point.y);
+        if (button.hidden !== hidden) button.hidden = hidden;
+        if (!hidden && point) {
+            const transform = `translate(${Math.round(point.x)}px, ${Math.round(point.y)}px) translate(-50%, -100%)`;
+            if (button.style.transform !== transform) button.style.transform = transform;
+        }
     }
-    /** Legacy docks are Costa then Porto. Call before positionTravelActions when using both. */
-    positionNodes(stages: readonly (WorldMapHudPoint | null)[], docks: readonly (WorldMapHudPoint | null)[] = []): void {
+    /** Legacy docks are Costa then Porto; omitted docks leave route positioning to positionTravelActions. */
+    positionNodes(stages: readonly (WorldMapHudPoint | null)[], docks?: readonly (WorldMapHudPoint | null)[]): void {
         this.stageButtons.forEach((button, n) => this.position(button, stages[n]));
-        LEGACY_DOCK_ACTION_IDS.forEach((id, n) => {
+        if (docks) LEGACY_DOCK_ACTION_IDS.forEach((id, n) => {
             const point = docks[n]; this.position(this.travelButtons[id], point);
             if (point?.available !== undefined && this.state) this.updateTravel(id, point.available);
         });
