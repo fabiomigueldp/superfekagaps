@@ -32,13 +32,16 @@ class EventSurface {
 
 class Element extends EventSurface {
     id = '';
+    tagName = 'DIV';
     textContent = '';
     hidden = false;
     contentEditable = 'false';
     spellcheck = true;
     style: Record<string, string> = {};
     focused = false;
-    closest() { return null; }
+    closest(selector: string): Element | null {
+        return this.tagName === 'BUTTON' && selector.includes('button') || this.tagName === 'A' && selector.includes('a[href]') ? this : null;
+    }
     matches() { return false; }
     get isContentEditable() { return this.contentEditable === 'true'; }
     setAttribute() {}
@@ -70,6 +73,7 @@ function browser(t: TestContext) {
     const skip = new Element(); skip.id = 'lab-skip';
     const replay = new Element(); replay.id = 'lab-replay';
     const present = new Element(); present.id = 'lab-present';
+    for (const button of [retry, pause, skip, replay, present]) button.tagName = 'BUTTON';
     const elements = new Map<string, Element>([[canvas.id, canvas], [status.id, status], [retry.id, retry], [pause.id, pause], [skip.id, skip], [replay.id, replay], [present.id, present]]);
     const frames = new Map<number, FrameRequestCallback>();
     let nextFrame = 0;
@@ -225,10 +229,16 @@ test('the real retry button resets boss, player, queued input and pause state', 
     const game = h.window.worldGame;
     assert.ok(game instanceof JuiceMinibossLab);
     assert.equal(game.labMode, 'intro');
-    h.skip.dispatch('click'); assert.equal(game.labMode, 'combat');
-    h.replay.dispatch('click'); assert.equal(game.labMode, 'intro');
+    assert.equal(h.retry.hidden, true, 'Intro uses Skip; redundant Retry must not force compact navigation to wrap.');
+    h.skip.dispatch('click'); h.frame(); assert.equal(game.labMode, 'combat');
+    assert.equal(h.retry.hidden, false, 'Retry is available during combat.');
+    h.replay.dispatch('click'); h.frame(); assert.equal(game.labMode, 'intro');
+    assert.equal(h.retry.hidden, true, 'Replay restores the compact intro controls.');
     for (let i=0;i<1000 && game.intro?.beat !== 'prepare';i++) game.intro?.advance(100,{right:true});
-    advance(game, 12); h.present.dispatch('click'); advance(game);
+    advance(game, 12); h.frame();
+    assert.equal(h.present.hidden, false);
+    assert.equal(h.retry.hidden, true, 'Presentation and Retry never compete for the compact toolbar.');
+    h.present.dispatch('click'); advance(game);
     assert.equal(game.intro?.beat, 'reveal', 'The real accessible presentation control triggers the pose.');
     assert.equal(h.frames.size, 2, 'The actual entrypoint starts gameplay and accessible-control refresh.');
     h.pause.dispatch('click'); h.frame();
@@ -383,4 +393,39 @@ test('real Escape resumes an introduction through inherited menu listener withou
     assert.ok(game.intro!.timeMs > time);
     assert.equal(encounter(game).model.time, 0, 'Resuming the scene must not advance combat.');
     game.render(); assert.doesNotMatch(h.status.textContent, /Pausado/);
+});
+
+test('native toolbar activation is not cancelled or leaked into gameplay in playing and paused states', t => {
+    const h = browser(t), game = h.create(true), link = new Element(); link.tagName = 'A';
+    for (const state of ['playing', 'paused'] as const) {
+        game.state = state;
+        for (const target of [h.pause, h.present, h.skip, h.replay, h.retry, link]) {
+            for (const [key, code] of [['Enter', 'Enter'], [' ', 'Space']]) {
+                game.input.reset();
+                const prevented = h.window.dispatch('keydown', { key, code, target });
+                assert.equal(prevented, false, `${state}/${target.id || 'link'}/${code} keeps native activation`);
+                game.input.update();
+                const input = game.input.getState();
+                assert.equal(input.start, false); assert.equal(input.jump, false); assert.equal(input.jumpPressed, false);
+                assert.equal(game.state, state, 'Native activation cannot invoke the canvas pause menu.');
+                h.window.dispatch('keyup', { key, code, target });
+            }
+        }
+    }
+    game.state = 'title'; game.input.reset();
+    const prevented = h.window.dispatch('keydown', { key: 'Enter', code: 'Enter', target: h.canvas });
+    assert.equal(prevented, true, 'The ordinary canvas menu still owns Enter.');
+});
+
+test('movement gestures cannot resume paused audio; explicit Escape resume can', t => {
+    const h = browser(t), game = h.create(true);
+    const context = { state: 'running', currentTime: 0, resumes: 0,
+        suspend() { this.state = 'suspended'; return Promise.resolve(); },
+        resume() { this.resumes++; this.state = 'running'; return Promise.resolve(); } };
+    (game.audio as unknown as { ctx: unknown }).ctx = context;
+    game.toggleLabPause();
+    for (const key of ['ArrowRight', 'ArrowLeft', 'a', 'd', ' ']) h.key(key);
+    assert.equal(game.state, 'paused'); assert.equal(context.state, 'suspended'); assert.equal(context.resumes, 0);
+    h.key('Escape');
+    assert.equal(game.state, 'playing'); assert.equal(context.state, 'running'); assert.equal(context.resumes, 1);
 });

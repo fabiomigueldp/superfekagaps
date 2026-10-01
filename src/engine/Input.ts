@@ -73,6 +73,9 @@ export class Input {
     if (target instanceof HTMLElement && target.id !== 'game-canvas' && target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) {
       return;
     }
+    // Native activation belongs to focused page controls, not jump/start.
+    if (target instanceof HTMLElement && target.closest('button, a[href]') &&
+      ['Enter', 'Space'].includes(controlCode(event))) return;
 
     // Semantic map controls own native Enter/Space and directional navigation.
     if (this.menuMode && target instanceof HTMLElement && target.closest('.world-map') && controlCode(event) !== 'KeyM') return;

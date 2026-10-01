@@ -51,7 +51,7 @@ export class WorldAudio {
     private airBuffer: AudioBuffer | null = null;
     enabled = true;
     constructor(public preferences: Preferences) { }
-    unlock() { if (!this.ctx) {
+    unlock() { if (this.paused) return; if (!this.ctx) {
         try {
             this.ctx = new AudioContext();
             this.music = this.ctx.createGain();

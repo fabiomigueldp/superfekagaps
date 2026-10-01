@@ -130,6 +130,7 @@ export class WorldGame {
     private change(screen: Screen) { if (screen !== 'map') this.mapView?.hide(); this.state = screen; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; }
     private menuKey(e: KeyboardEvent) {
         const target = e.target;
+        if (target instanceof HTMLElement && target.closest('button, a[href]') && (e.key === 'Enter' || e.key === ' ')) return;
         if (target instanceof HTMLElement && target.closest('.world-map')) return;
         if (target instanceof HTMLElement && target.id !== 'game-canvas' && (target.matches('input,textarea,select') || target.isContentEditable))
             return;

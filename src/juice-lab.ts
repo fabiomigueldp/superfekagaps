@@ -11,6 +11,7 @@ window.addEventListener('resize', fitLab); fitLab();
 const skipButton = document.getElementById('lab-skip');
 const replayButton = document.getElementById('lab-replay');
 const presentButton = document.getElementById('lab-present');
+const retryButton = document.getElementById('lab-retry')!;
 skipButton?.addEventListener('click', () => { game.skipIntro(); canvas.focus(); });
 replayButton?.addEventListener('click', () => { game.replayIntro(); canvas.focus(); });
 presentButton?.addEventListener('click', () => { game.presentIntro(); canvas.focus(); });
@@ -20,13 +21,14 @@ function reflectPause() {
     if (skipButton) skipButton.hidden = game.labMode !== 'intro';
     if (replayButton) replayButton.hidden = game.labMode === 'intro';
     if (presentButton) presentButton.hidden = game.intro?.beat !== 'prepare';
+    retryButton.hidden = game.labMode === 'intro';
     const label = game.state === 'paused' ? 'Continuar' : 'Pausar';
     if (pauseButton.textContent !== label) pauseButton.textContent = label;
     requestAnimationFrame(reflectPause);
 }
 reflectPause();
 if (typeof ResizeObserver !== 'undefined') { const nav = document.querySelector('nav'); if (nav) new ResizeObserver(fitLab).observe(nav); }
-document.getElementById('lab-retry')!.addEventListener('click', () => { game.load('juice-lab'); canvas.focus(); });
+retryButton.addEventListener('click', () => { game.load('juice-lab'); canvas.focus(); });
 canvas.contentEditable = 'true'; canvas.spellcheck = false; canvas.setAttribute('inputmode', 'none');
 canvas.addEventListener('pointerdown', () => canvas.focus({ preventScroll: true }));
 game.start(); canvas.focus();
