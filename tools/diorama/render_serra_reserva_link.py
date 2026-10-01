@@ -432,11 +432,12 @@ if not ARGS.build_only:
     render_crop(OUT/'serra-reserva-corridor-proof.png', (2.70, -1.80, 4.18, .35), 1100)
 
 if ARGS.render_overlays:
+    record['exportSources'] = {'tools/diorama/render_serra_reserva_overlays.py': hashlib.sha256((ROOT/'tools/diorama/render_serra_reserva_overlays.py').read_bytes()).hexdigest()}
+    overlay_spec = importlib.util.spec_from_file_location('passenger_overlay_export', ROOT/'tools/diorama/render_serra_reserva_overlays.py')
+    overlay_export = importlib.util.module_from_spec(overlay_spec)
+    overlay_spec.loader.exec_module(overlay_export)
     def overlay(name, objects, when=None):
-        for obj in scene.objects:
-            if obj.type in {'MESH', 'CURVE', 'FONT'}:
-                obj.hide_render = obj not in objects
-        bpy.context.view_layer.update()
+        overlay_export.set_overlay_visibility(scene, objects)
         projected = [project(obj.matrix_world@Vector(p)) for obj in objects for p in obj.bound_box]
         left = math.floor((min(p['x'] for p in projected)-.005)*1920)/1920
         top = math.floor((min(p['y'] for p in projected)-.005)*1200)/1200

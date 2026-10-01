@@ -18,6 +18,7 @@ meta = json.loads((args.source/'serra-reserva-link.meta.json').read_text())
 audit = json.loads((args.source/'serra-reserva-clearance.json').read_text())
 assert audit['passed'], 'The exact combined link audit must pass before packaging'
 assert all(hashlib.sha256((ROOT/name).read_bytes()).hexdigest() == sha for name, sha in meta['sources'].items()), 'Source drift after frozen render'
+assert all(hashlib.sha256((ROOT/name).read_bytes()).hexdigest() == sha for name, sha in meta.get('exportSources', {}).items()), 'Overlay exporter drift after render'
 assert len(meta['overlays']) == 6, 'Two static endpoints plus four raised closed barriers'
 assets = ROOT/'public/assets/world/map'
 docs = ROOT/'docs/world/diorama'

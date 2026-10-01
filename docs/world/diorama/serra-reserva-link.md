@@ -30,6 +30,11 @@ open mechanisms are hidden inside the shared terminal decks. The two long cables
 with the exact projected offset to the cabin grip `(0, 0.13, 2.60)`; there is no
 large transparent bitmap spanning the gap between islands.
 
+Terminal exports retain the fixed island/structure geometry as Cycles alpha
+holdouts. Buried foundation sockets and cliff anchors therefore stay behind
+the ice/rock when the runtime paints each overlay over the island bitmap.
+Moving carriers, actors, cables and retracted gates are not baked as occluders.
+
 ## Rebuild and check
 
 Requires Blender 4.x, Node, Python and Pillow. The passenger cabin's approved
@@ -53,7 +58,18 @@ The frozen package passes 576 passenger poses, 114 maintenance-preservation
 poses, 1,182 grounded foot probes, 716 new-route actor poses and 348 old-route
 actor poses. There are zero mesh collisions, support failures, head/body
 occlusions or independent-phase maintenance/passenger frame overlaps. The six
-WebP overlays total 152,238 bytes.
+WebP overlays total 150,352 bytes.
+
+A focused occlusion correction after preview `43c5d16` removed 12,005 opaque
+buried pixels from the Serra terminal and 11,222 from the Reserva terminal,
+without adding opaque pixels outside the old silhouettes. Both native image
+sizes and the runtime metadata remain unchanged. Before/after scene-geometry
+hashes and an exact comparison of the geometry-bearing builder source confirm
+that this correction changes export visibility only. The approved manifest
+retains the original geometry-audit source snapshot and the new export record.
+Compositions made from the actual base WebP, overlay rectangles, closed gates,
+wire paths and cabin layers verified the corrected layering at both joins.
+All 13 passenger contract/integration asset tests pass after the correction.
 
 The checked-in combined checker covers the actual passenger mesh on both ride
 curves, grounded center/foot-width samples of each approach and boarding route,

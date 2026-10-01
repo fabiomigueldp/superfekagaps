@@ -2274,7 +2274,7 @@
     "reservaFiveNodesAndRoutesUnchanged": true
   },
   "sources": {
-    "tools/diorama/render_serra_reserva_link.py": "5e15b26de64f0a6aaa678074df9f8af818e1201241ec726400e95d9725d5a9ec",
+    "tools/diorama/render_serra_reserva_link.py": "0eb1d9f1dc918035e6b15a3050f0390fa837a1bc0b9a6d68fc2105c4b86a204d",
     "tools/diorama/render_serra_map.py": "a6feca3fe05ea5310fcba9b3633367409fa8b639ceaa4c3d898e619822823e7f",
     "tools/diorama/render_reserva_map.py": "7fa0433d641a200b9f2b87c50102ac01adb385b4035d6da006b35d792790ce40",
     "tools/diorama/render_passenger_cabin.py": "2d7fa5da5c7d2ad039f3ede7def3433de27af76c58984f9a1be0a8c04eadfdc7"
@@ -2310,13 +2310,13 @@
   "assets": [
     {
       "path": "public/assets/world/map/serra-reserva-lower-terminal.webp",
-      "bytes": 107940,
-      "sha256": "c319c0738a15910e74d69648628ce9048aecb99e1ec6b09eb924561fca21fd1c"
+      "bytes": 107292,
+      "sha256": "249d3f9d6050ff39a260051992b641f95a5530b60b0aa816d87bb6d624c5bb30"
     },
     {
       "path": "public/assets/world/map/serra-reserva-upper-terminal.webp",
-      "bytes": 38320,
-      "sha256": "8b36836bba1d2dba3bbcd3e35f6fbf13d89d76d8345f140877acbb3629f6ea1c"
+      "bytes": 37082,
+      "sha256": "7c153d6930b3dda5cfe625f719861db9d58a3c25579973d9ed980cfbaab93cd5"
     },
     {
       "path": "public/assets/world/map/serra-reserva-lower-gate-0-closed.webp",
@@ -2386,5 +2386,86 @@
       "maintenancePassengerFrameOverlapCount": 0,
       "maintenancePassengerFrameOverlaps": []
     }
+  },
+  "geometryAuditSourceSnapshot": {
+    "tools/diorama/render_serra_reserva_link.py": "5e15b26de64f0a6aaa678074df9f8af818e1201241ec726400e95d9725d5a9ec",
+    "tools/diorama/render_serra_map.py": "a6feca3fe05ea5310fcba9b3633367409fa8b639ceaa4c3d898e619822823e7f",
+    "tools/diorama/render_reserva_map.py": "7fa0433d641a200b9f2b87c50102ac01adb385b4035d6da006b35d792790ce40",
+    "tools/diorama/render_passenger_cabin.py": "2d7fa5da5c7d2ad039f3ede7def3433de27af76c58984f9a1be0a8c04eadfdc7"
+  },
+  "exportSources": {
+    "tools/diorama/render_serra_reserva_overlays.py": "20bdb534889b34214b4509b1c3c0878120fa63298ce399e2c45e29f9fcbe1982"
+  },
+  "occlusionExportRevision": {
+    "geometryUnchanged": true,
+    "geometrySha256": "d6e4a4cb21c311962d7660bc3baf55593908f89f268d5cd0f7f3b67828422013",
+    "metadataSha256": "ed9a8508cb40602924db3c2b6aa215e8826a3ab306ece8e56299b1391f944088",
+    "method": "Cycles object holdouts from all fixed scene geometry preserve real front/back occlusion; moving carriers, cables, actors and retracted gates are excluded.",
+    "rendered": [
+      {
+        "terminal": "lower",
+        "file": "serra-reserva-lower-terminal.png",
+        "holdoutObjects": 929,
+        "width": 1080,
+        "height": 650
+      },
+      {
+        "terminal": "upper",
+        "file": "serra-reserva-upper-terminal.png",
+        "holdoutObjects": 957,
+        "width": 730,
+        "height": 540
+      }
+    ],
+    "exportSource": "tools/diorama/render_serra_reserva_overlays.py",
+    "exportSourceSha256": "20bdb534889b34214b4509b1c3c0878120fa63298ce399e2c45e29f9fcbe1982",
+    "baselineCommit": "43c5d16",
+    "geometryBearingBuilderPrefixUnchanged": true,
+    "geometryBearingBuilderPrefixSha256": "627b83a2889c25176b8eee32e3b5087cb6bb298aea18e8d928ef873cf08f28b9",
+    "runtimeMetadataUnchangedSha256": "ed9a8508cb40602924db3c2b6aa215e8826a3ab306ece8e56299b1391f944088",
+    "unchangedAssets": {
+      "public/assets/world/map/serra-diorama.webp": "b4ad877e076d706d1c7858162074f322cc8d05515ff5cfd6a551db2444578e56",
+      "public/assets/world/map/serra-diorama.meta.json": "38f80126ef8e6953355e24152551878fd429693b814cac7504ea546346929da0",
+      "public/assets/world/map/serra-maintenance-cable.meta.json": "63a4145b7c47a78daca4c8cebb524e1a55d2196c0e8df8a91cbfc754bc862691",
+      "public/assets/world/map/reserva-diorama.webp": "e50eae818196985280d0a66ff2120b6c3891c61a9612fab09b7912bd9527b26b",
+      "public/assets/world/map/reserva-diorama.meta.json": "8c13bced3cdcb0373682b6fbd3c290e35455d7a4c18d66fd470e458abe309f96",
+      "public/assets/world/map/reserva-passenger-cabin.webp": "67f3cd862cd9a4eb49506f58229381b52d5907e7269a0b1744bca27d421de0f7",
+      "public/assets/world/map/reserva-passenger-cabin.meta.json": "0cab79327417159f6d6a7baa9df412be56a7820ac865b0b713241e6b51d844e7",
+      "public/assets/world/map/serra-reserva-lower-gate-0-closed.webp": "0cd098324d5f06eb1551f081ac3235e91c6f587cf2d6d98ef0fc7653caf8d73d",
+      "public/assets/world/map/serra-reserva-lower-gate-1-closed.webp": "51d50de17bdad6a391c7e31fd3812ce5201da2626f2de11a0586a6426ceabf4d",
+      "public/assets/world/map/serra-reserva-upper-gate-0-closed.webp": "fcab1d7c9b70f98e6ac92d5a2a696f8a497c390d7b527d1474828e6b930ee06d",
+      "public/assets/world/map/serra-reserva-upper-gate-1-closed.webp": "2fe68daae306e5f7ae055d256ece18173b059ca066db188260a6f9e8244fadc0"
+    },
+    "assets": [
+      {
+        "path": "public/assets/world/map/serra-reserva-lower-terminal.webp",
+        "oldSha256": "c319c0738a15910e74d69648628ce9048aecb99e1ec6b09eb924561fca21fd1c",
+        "sha256": "249d3f9d6050ff39a260051992b641f95a5530b60b0aa816d87bb6d624c5bb30",
+        "bytes": 107292,
+        "removedOpaquePixels": 12005,
+        "addedOpaquePixels": 0,
+        "size": [
+          1080,
+          650
+        ]
+      },
+      {
+        "path": "public/assets/world/map/serra-reserva-upper-terminal.webp",
+        "oldSha256": "8b36836bba1d2dba3bbcd3e35f6fbf13d89d76d8345f140877acbb3629f6ea1c",
+        "sha256": "7c153d6930b3dda5cfe625f719861db9d58a3c25579973d9ed980cfbaab93cd5",
+        "bytes": 37082,
+        "removedOpaquePixels": 11222,
+        "addedOpaquePixels": 0,
+        "size": [
+          730,
+          540
+        ]
+      }
+    ],
+    "compositionProofs": [
+      "serra-runtime-comparison.png",
+      "reserva-runtime-comparison.png"
+    ],
+    "compositing": "Existing native base WebP \u2192 exported overlay rectangles \u2192 closed barriers \u2192 authored cable polylines \u2192 native cabin rear and foreground crops, all positioned by unchanged runtime metadata."
   }
 }

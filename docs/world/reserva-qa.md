@@ -29,10 +29,32 @@ changed.
 - The aggregate test attempt took 11.88 seconds; validators, both typechecks and
   build took 11.71 seconds in parallel. Vite itself took 1.89 seconds
 - Build: JS 471.77 kB (147.61 kB gzip), CSS 19.35 kB (4.70 kB gzip)
-- Added assets total 448,192 bytes, including 4,387 bytes of authoring-only cabin
-  metadata. New runtime fetches total 443,805 bytes. Decoded image storage is
+- Added assets total 446,306 bytes, including 4,387 bytes of authoring-only cabin
+  metadata. New runtime fetches total 441,919 bytes. Decoded image storage is
   approximately 14.50 MB; this is a dimension estimate, not measured browser RAM
 
-Actual browser traversal and public deployment verification are pending on the
-published preview. Automated layout coverage does not establish physical touch
-behavior, browser FPS or a browser-level reduced-motion setting.
+## Live preview checks
+
+Preview `43c5d16`, bundle `index-Bcp1on_A.js`, was tested in the cloud browser at
+1180×757 and 590×378 CSS pixels. The old 18-stage fixture kept Reserva blocked,
+including Enter. The approved artificial 23-stage/57-seal fixture was imported
+only into the established test origin; production progress was not imported.
+
+Verified actual passenger departure, natural 5-1 arrival, explicit gameplay entry
+and return to 5-1; walking to 5-3, shipping shortcut to 5-5, return to the real
+4-5 terminal and immediate maintenance travel to 4-3. The complete 4-3→5-1 route
+also arrived correctly. Reload during a passenger ride restored the last saved
+5-1 arrival. Two rapid direction inputs and skip arrived at the selected 5-2.
+The region menu retained 23/30 and 57/72, with region 6 still locked.
+
+Visual QA identified buried foundation sockets incorrectly painted over the
+island by isolated terminal exports. Both terminal overlays were re-exported
+with the unchanged island geometry as depth holdouts. Runtime-style composites
+verify the correction; geometry, paths, metadata, cabins and gate images are
+unchanged. This export-only revision needs a final preview image check before
+main promotion. No unchanged aggregate test rerun is required for those pixels.
+
+Recent browser diagnostic entries were extension metadata errors, so this is
+not an exhaustive app-console claim. Automated layout coverage does not
+establish physical touch behavior, browser FPS or a browser-level reduced-motion
+setting. Public deployment verification remains pending.
