@@ -53,7 +53,7 @@ class Canvas extends Element {
     private context = Object.assign(Object.fromEntries([
         'beginPath', 'closePath', 'moveTo', 'lineTo', 'quadraticCurveTo', 'bezierCurveTo', 'arc', 'ellipse', 'fill', 'stroke',
         'fillRect', 'strokeRect', 'clearRect', 'save', 'restore', 'setTransform', 'translate',
-        'scale', 'rotate', 'clip', 'drawImage'
+        'scale', 'rotate', 'rect', 'clip', 'drawImage'
     ].map(name => [name, () => { this.drawCalls++; }])), {
         globalAlpha: 1, imageSmoothingEnabled: false,
         createLinearGradient: () => ({ addColorStop() {} }),
@@ -67,12 +67,15 @@ function browser(t: TestContext) {
     const status = new Element(); status.id = 'lab-status';
     const retry = new Element(); retry.id = 'lab-retry';
     const pause = new Element(); pause.id = 'lab-pause';
-    const elements = new Map<string, Element>([[canvas.id, canvas], [status.id, status], [retry.id, retry], [pause.id, pause]]);
+    const skip = new Element(); skip.id = 'lab-skip';
+    const replay = new Element(); replay.id = 'lab-replay';
+    const present = new Element(); present.id = 'lab-present';
+    const elements = new Map<string, Element>([[canvas.id, canvas], [status.id, status], [retry.id, retry], [pause.id, pause], [skip.id, skip], [replay.id, replay], [present.id, present]]);
     const frames = new Map<number, FrameRequestCallback>();
     let nextFrame = 0;
     const requestFrame = (callback: FrameRequestCallback) => { frames.set(++nextFrame, callback); return nextFrame; };
     const document = Object.assign(new EventSurface(), {
-        title: '', hidden: false,
+        title: '', hidden: false, body: { style: {} }, querySelector: () => null,
         getElementById: (id: string) => elements.get(id) ?? null,
         createElement: (tag: string) => tag === 'canvas' ? new Canvas() : new Element()
     });
@@ -115,12 +118,12 @@ function browser(t: TestContext) {
     }
     function pointer(x: number, y: number) { canvas.dispatch('pointerdown', { clientX: x * 2, clientY: y * 2 }); }
     function hidden(value: boolean) { document.hidden = value; document.dispatch('visibilitychange'); }
-    function create() { return new JuiceMinibossLab(canvas as unknown as HTMLCanvasElement, status as unknown as HTMLElement); }
+    function create(withIntro = false) { const game = new JuiceMinibossLab(canvas as unknown as HTMLCanvasElement, status as unknown as HTMLElement); if (!withIntro) game.skipIntro(); return game; }
     function frame() {
         const pending = [...frames]; frames.clear();
         for (const [, callback] of pending) callback(performance.now());
     }
-    return { canvas, status, retry, pause, document, window, frames, storageCalls, create, key, pointer, hidden, frame };
+    return { canvas, status, retry, pause, skip, replay, present, document, window, frames, storageCalls, create, key, pointer, hidden, frame };
 }
 
 function encounter(game: JuiceMinibossLab) {
@@ -221,6 +224,12 @@ test('the real retry button resets boss, player, queued input and pause state', 
     await import('../src/juice-lab');
     const game = h.window.worldGame;
     assert.ok(game instanceof JuiceMinibossLab);
+    assert.equal(game.labMode, 'intro');
+    h.skip.dispatch('click'); assert.equal(game.labMode, 'combat');
+    h.replay.dispatch('click'); assert.equal(game.labMode, 'intro');
+    for (let i=0;i<1000 && game.intro?.beat !== 'prepare';i++) game.intro?.advance(100,{right:true});
+    advance(game, 12); h.present.dispatch('click'); advance(game);
+    assert.equal(game.intro?.beat, 'reveal', 'The real accessible presentation control triggers the pose.');
     assert.equal(h.frames.size, 2, 'The actual entrypoint starts gameplay and accessible-control refresh.');
     h.pause.dispatch('click'); h.frame();
     assert.equal(game.state, 'paused');
@@ -316,4 +325,62 @@ test('death automatically restarts a fresh experimental encounter without loadin
     assert.equal(encounter(game).model.phase, 'intro');
     assert.deepEqual(encounter(game).model.drops, []);
     assert.deepEqual(game.store.save.completed, []);
+});
+
+
+test('stage introduction freezes encounter, pauses, skips and replays without touching storage', t => {
+    const h = browser(t), authored = structuredClone(STAGES), game = h.create(true);
+    assert.equal(game.labMode, 'intro');
+    const model = encounter(game).model;
+    advance(game, 220); game.render();
+    assert.equal(game.intro?.beat, 'walk');
+    assert.equal(model.time, 0); assert.equal(model.health, model.maxHealth);
+    h.key('Escape'); advance(game);
+    const before = JSON.stringify(game.intro?.frame);
+    advance(game, 200); game.render();
+    assert.equal(JSON.stringify(game.intro?.frame), before);
+    game.skipIntro();
+    assert.equal(game.state, 'paused', 'Skip preserves pause intent');
+    assert.equal(game.labMode, 'combat');
+    assert.equal(game.player.data.position.x, 68);
+    assert.equal(encounter(game).model.time, 0);
+    h.key('Escape'); advance(game, 5);
+    assert.ok(encounter(game).model.time > 0);
+    game.load('juice-lab'); assert.equal(game.labMode, 'combat');
+    game.replayIntro(); assert.equal(game.labMode, 'intro');
+    assert.equal(game.intro?.beat, 'establish');
+    assert.deepEqual(STAGES, authored); assert.deepEqual(h.storageCalls, []);
+});
+
+test('complete staged route hands off once, without stale presentation input or hidden attack time', t => {
+    const h = browser(t), game = h.create(true); const cues: string[] = [];
+    game.onIntroCue = cue => cues.push(cue);
+    for (let n = 0; n < 4000 && game.labMode === 'intro'; n++) {
+        game.intro!.advance(STEP, { right: true, presentPressed: true });
+        game.update(STEP);
+    }
+    assert.equal(game.labMode, 'combat'); assert.equal(game.intro, null);
+    assert.equal(encounter(game).model.time, 0);
+    assert.equal(encounter(game).model.phase, 'intro');
+    assert.equal(game.player.data.velocity.y, 0);
+    assert.equal(cues.filter(c => c === 'combat').length, 1);
+    game.skipIntro(); assert.equal(cues.filter(c => c === 'combat').length, 1);
+    assert.deepEqual(h.storageCalls, []);
+});
+
+test('real Escape resumes an introduction through inherited menu listener without re-pausing', t => {
+    const h = browser(t), game = h.create(true);
+    advance(game, 12);
+    h.key('Escape'); advance(game);
+    assert.equal(game.state, 'paused');
+    const time = game.intro!.timeMs;
+    advance(game, 60); assert.equal(game.intro!.timeMs, time);
+    h.key('Escape', true); assert.equal(game.state, 'paused');
+    h.key('Escape');
+    assert.equal(game.state, 'playing', 'WorldGame.menuKey handles resume synchronously.');
+    advance(game);
+    assert.equal(game.state, 'playing', 'Resume clears the queued pause input.');
+    assert.ok(game.intro!.timeMs > time);
+    assert.equal(encounter(game).model.time, 0, 'Resuming the scene must not advance combat.');
+    game.render(); assert.doesNotMatch(h.status.textContent, /Pausado/);
 });

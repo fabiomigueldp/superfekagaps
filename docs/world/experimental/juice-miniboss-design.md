@@ -2,6 +2,14 @@
 
 Status: experimental playable lab, not in the campaign. Open `/juice-lab.html` through Vite or a reviewed deployment. The dedicated multi-page entry preserves the normal `index.html` app. Do not deploy this work to the Oracle-hosted game.
 
+## Calabrezzo championship introduction
+
+The first visit stages a bodybuilding competition: walk Feka to the mark, present his thin torso, hear the judges' taunts through subtitles, and confront the emerging purple slime. The invitation is “venha fazer amor com o suco”; Feka answers that he will defend his gaps and his “shape patético”. His existing shirt returns before combat. The composition of the slime remains unexplained.
+
+`JuiceIntroDirector` owns named beats, holds and one-shot cue events. Timed beats total 31.65 seconds, plus the player's walk and presentation holds. The scene freezes boss collision/timers, then hands control to grounded Feka at x68 with a fresh encounter. The scene can be skipped, paused, or explicitly replayed; death and retry begin combat directly. Reduced motion removes cinematic zoom and focus shifts. Audio cues use the existing effects bus and are cancelled on interruption; no external sound files or voice recordings were added.
+
+The original 1,098-frame combat recording below explicitly retains its historical starting seed. It is a regression for unchanged combat rules, not a recording of this new cinematic handoff. Scene lifecycle tests separately cover its start position, input reset, skip, pause/resume, replay and storage isolation. Offline scene renders are visual evidence; they do not establish browser FPS, physical-touch behavior or an auditory review.
+
 ## Identity and art
 
 A heaving, irregular mound of mysterious purple industrial slime with expressive eyes. The factory’s “juice” has a deliberately unexplained composition. There is no fruit, citrus, cap, glove, bottle or ingredient label. The runtime Canvas2D painter draws a continuous viscous silhouette in the existing 320×180 presentation.

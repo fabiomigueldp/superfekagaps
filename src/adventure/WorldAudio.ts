@@ -65,6 +65,10 @@ export class WorldAudio {
             return;
         }
     } void this.ctx.resume(); }
+    /** Read-only route for cancellable lab cues; never creates or resumes a context. */
+    getEffectsRoute(): { context: AudioContext; destination: GainNode; enabled: boolean } | null {
+        return this.ctx && this.effects ? { context: this.ctx, destination: this.effects, enabled: this.enabled } : null;
+    }
     volume() { if (!this.ctx)
         return; const now = this.ctx.currentTime; this.music!.gain.setTargetAtTime(this.enabled ? this.preferences.music * .14 * (this.dying ? .15 : 1) : 0, now, .06); this.effects!.gain.setTargetAtTime(this.enabled ? this.preferences.effects * .3 : 0, now, .02); this.voice!.gain.setTargetAtTime(this.enabled ? this.preferences.voice * .22 : 0, now, .02); if (this.clip)
         this.clip.volume = this.enabled ? this.preferences.voice : 0; }

@@ -8,6 +8,9 @@ import type { AdventureStage } from '../types';
 import { overlaps } from '../types';
 import { JuiceMinibossModel } from './JuiceMinibossModel';
 import { drawJuiceMiniboss, drawJuiceLabBackground, drawJuiceLabFloor } from './JuiceMinibossArt';
+import { JuiceIntroDirector, type IntroCue } from './JuiceIntroDirector';
+import { drawJuiceIntro } from './JuiceIntroArt';
+import { JuiceIntroAudio } from './JuiceIntroAudio';
 import { pixelText, panel } from '../../graphics/BitmapFont';
 
 export function juiceLabStage(): AdventureStage {
@@ -51,18 +54,61 @@ class LabEncounter extends BossEncounter {
 
 /** Dedicated ephemeral laboratory; normal campaign files and storage are untouched. */
 export class JuiceMinibossLab extends WorldGame {
+    labMode: 'intro' | 'combat' | 'result' = 'combat';
+    intro: JuiceIntroDirector | null = null;
+    reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    /** Optional audio/telemetry adapter. Receives one-shot semantic cues, including cancellation. */
+    onIntroCue?: (cue: IntroCue) => void;
+    private pendingPresentation = false;
+    private introStatus = '';
+    private introAudio = new JuiceIntroAudio(() => this.audio.getEffectsRoute());
+    presentIntro() { if (this.state === 'playing' && this.intro?.beat === 'prepare') this.pendingPresentation = true; }
+    replayIntro() {
+        this.load('juice-lab');
+        this.labMode = 'intro'; this.intro = new JuiceIntroDirector(); this.introStatus = '';
+        this.audio.cancelSpeech(); this.input.reset();
+    }
+    skipIntro() { if (this.labMode !== 'intro') return; this.intro?.skip(); this.startCombat(); }
+    private startCombat() {
+        const paused = this.state === 'paused';
+        this.onIntroCue?.('cancel'); this.introAudio?.cancel(); this.audio.cancelSpeech();
+        this.labMode = 'combat'; this.intro = null; this.pendingPresentation = false;
+        this.boss = new LabEncounter();
+        this.player.data.position.x = 68;
+        this.player.data.position.y = 224 - this.player.data.height;
+        this.player.data.velocity.x = 0; this.player.data.velocity.y = 0;
+        this.player.data.facingRight = true; this.player.data.isGrounded = true;
+        this.player.data.respawnRevealTimer = 0;
+        this.camera.x = 0; this.camera.y = 64;
+        this.input.reset(); this.input.setMenuMode(paused);
+        this.audio.select(3, true); this.audio.pause(paused);
+        this.introAudio?.setPaused(paused); this.introAudio?.play('combat'); this.onIntroCue?.('combat');
+    }
+    private emitIntroCues() {
+        for (const cue of this.intro?.drainCues() ?? []) {
+            this.onIntroCue?.(cue);
+            this.introAudio?.play(cue);
+        }
+    }
     constructor(canvas: HTMLCanvasElement, private readonly status: HTMLElement) {
         super(canvas, true);
         this.art.boss = (c, boss, cx, cy) => { if (boss instanceof LabEncounter) drawJuiceMiniboss(c, boss.model, cx, cy); };
         this.art.arena = () => {};
         this.art.background = (c, _island, _cx, _cy, time) => drawJuiceLabBackground(c, time);
         this.art.terrain = (c, _level, _island, _cx, cy) => drawJuiceLabFloor(c, cy);
-        this.load('juice-lab');
+        this.replayIntro();
+        window.addEventListener('blur', () => { this.introAudio.cancel(); if (this.state === 'playing') this.toggleLabPause(); });
+        window.addEventListener('pagehide', () => this.introAudio.cancel());
+        window.addEventListener('keydown', e => { if (['ArrowLeft','ArrowRight',' ','a','d','m','M'].includes(e.key)) this.audio.unlock(); });
+        document.addEventListener('visibilitychange', () => { if (document.hidden) this.introAudio.cancel(); });
         document.title = 'Super Feka Gaps · Laboratório do Turbosuco';
     }
     override load(_id: string, _resume = false, _custom?: AdventureStage) {
+        this.onIntroCue?.('cancel'); this.introAudio?.cancel(); this.intro = null; this.labMode = 'combat'; this.pendingPresentation = false;
         super.load('juice-lab', false, juiceLabStage());
-        this.boss = new LabEncounter();
+        this.boss = new LabEncounter(); this.introAudio?.setPaused(false);
+        this.player.data.position.x = 68; this.player.data.position.y = 224 - this.player.data.height;
+        this.player.data.isGrounded = true; this.player.data.respawnRevealTimer = 0;
         if (this.status) this.status.textContent = 'Experimento · setas para mover, Espaço para pular, Esc para pausar';
     }
     /** Used by the accessible page control; keyboard/touch keep the base controls. */
@@ -70,12 +116,28 @@ export class JuiceMinibossLab extends WorldGame {
         if (this.state !== 'playing' && this.state !== 'paused') return;
         this.state = this.state === 'paused' ? 'playing' : 'paused';
         this.input.reset(); this.input.setMenuMode(this.state === 'paused');
-        this.audio.pause(this.state === 'paused');
+        this.audio.pause(this.state === 'paused'); this.introAudio?.setPaused(this.state === 'paused'); this.pendingPresentation = false;
     }
     override update(dt: number) {
         if (!Number.isFinite(dt) || dt <= 0) return;
+        this.introAudio?.setPaused(this.state === 'paused'); this.introAudio?.sync();
+        if (this.labMode === 'intro' && this.intro) {
+            this.input.setMenuMode(this.state !== 'playing'); this.input.update();
+            if (this.input.consumeMute()) { this.audio.toggle(); this.introAudio?.sync(); }
+            if (this.state !== 'playing') return;
+            if (this.input.consumePause()) { this.toggleLabPause(); return; }
+            const input = this.input.getState();
+            this.intro.advance(dt, { left: input.left, right: input.right,
+                presentPressed: input.jumpPressed || this.pendingPresentation });
+            this.pendingPresentation = false;
+            this.time += Math.min(dt, 100); this.renderer.advanceClock(Math.min(dt, 100));
+            this.emitIntroCues();
+            if (this.intro.complete) this.startCombat();
+            return;
+        }
         if (this.state === 'map' || this.state === 'title' || this.state === 'intro') { this.load('juice-lab'); return; }
         if (this.boss instanceof LabEncounter && this.boss.phase === 'defeated') {
+            this.labMode = 'result';
             // Never call campaign completion with an experimental identifier.
             // Keep pause/mute alive, including after the final stomp.
             this.input.setMenuMode(this.state !== 'playing'); this.input.update();
@@ -92,6 +154,23 @@ export class JuiceMinibossLab extends WorldGame {
         super.update(dt);
     }
     override render() {
+        if (this.labMode === 'intro' && this.intro) {
+            this.renderer.startScene();
+            const c = this.renderer.getContext();
+            drawJuiceIntro(c, this.intro.frame, this.reducedMotion);
+            if (this.state === 'paused') {
+                c.fillStyle = '#171324bb'; c.fillRect(0, 0, 320, 180);
+                panel(c, 62, 70, 196, 43, '#292033', '#bfce64');
+                pixelText(c, 'PAUSADO', 160, 79, '#edf292', 2, 'center');
+                pixelText(c, 'ESC OU CONTINUAR', 160, 100, '#fff0cc', 1, 'center');
+            }
+            this.renderer.present();
+            const f = this.intro.frame;
+            const message = this.state === 'paused' ? 'Pausado · Esc ou Continuar para voltar'
+                : f.subtitle ? `${f.subtitle.speaker}: ${f.subtitle.text}` : f.prompt || 'Apresentação Calabrezzo · Esc pausa · M som';
+            if (this.introStatus !== message) { this.status.textContent = message; this.introStatus = message; }
+            return;
+        }
         const paused = this.state === 'paused';
         // Do not create base pause buttons, which could route into campaign UI.
         if (paused) this.state = 'playing';

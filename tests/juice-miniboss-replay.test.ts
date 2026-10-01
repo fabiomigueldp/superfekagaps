@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { Player } from '../src/entities/Player';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { JuiceMinibossLab } from '../src/adventure/experimental/JuiceMinibossLab';
@@ -28,6 +29,9 @@ function harness() {
         audio: { cancelSpeech: noop, setDying: noop, pause: noop, select: noop, tick: noop, toggle: noop, say: noop, sfx: noop },
         renderer: { advanceClock: noop, addImpact: noop } });
     game.load('juice-lab');
+    // This immutable historical input recording starts at the original airborne seed.
+    // The intro now hands off grounded at x68; lifecycle tests cover that new contract.
+    game.player = new Player(3, 12);
     return { game, step(input: InputState) { controls = input; game.update(recording.stepMs); } };
 }
 
