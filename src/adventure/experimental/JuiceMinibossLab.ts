@@ -118,9 +118,8 @@ export class JuiceMinibossLab extends WorldGame {
     /** Used by the accessible page control; keyboard/touch keep the base controls. */
     toggleLabPause() {
         if (this.state !== 'playing' && this.state !== 'paused') return;
-        this.state = this.state === 'paused' ? 'playing' : 'paused';
-        this.input.reset(); this.input.setMenuMode(this.state === 'paused');
-        this.audio.pause(this.state === 'paused'); this.introAudio?.setPaused(this.state === 'paused'); this.pendingPresentation = false;
+        if (this.state === 'paused') this.resume(); else this.pause();
+        this.introAudio?.setPaused(this.state === 'paused'); this.pendingPresentation = false;
     }
     override update(dt: number) {
         if (!Number.isFinite(dt) || dt <= 0) return;

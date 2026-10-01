@@ -466,3 +466,18 @@ test('movement gestures cannot resume paused audio; explicit Escape resume can',
     h.key('Escape');
     assert.equal(game.state, 'playing'); assert.equal(context.state, 'running'); assert.equal(context.resumes, 1);
 });
+
+test('toolbar intro pause clears pending presentation and impact input while preserving audio pause', t => {
+    const h = browser(t), game = h.create(true);
+    const internals = game as unknown as { pendingPresentation: boolean; hitStopInput: unknown; introAudio: { setPaused(value: boolean): void } };
+    const audioStates: boolean[] = [];
+    internals.introAudio.setPaused = value => audioStates.push(value);
+    internals.pendingPresentation = true;
+    internals.hitStopInput = { jumpPressed: false, jumpReleased: false, downPressed: true };
+    game.toggleLabPause();
+    assert.equal(game.state, 'paused'); assert.equal(internals.pendingPresentation, false); assert.equal(internals.hitStopInput, null);
+    assert.equal(audioStates.at(-1), true);
+    game.toggleLabPause();
+    assert.equal(game.state, 'playing'); assert.equal(audioStates.at(-1), false);
+    assert.equal(internals.pendingPresentation, false); assert.equal(internals.hitStopInput, null);
+});

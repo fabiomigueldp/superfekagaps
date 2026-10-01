@@ -280,8 +280,8 @@ export class WorldGame {
         this.nextMapSelection = undefined;
         this.audio.select(0); this.store.persist();
     }
-    private pause() { this.change('paused'); this.audio.pause(true); }
-    private resume() { this.change('playing'); this.audio.pause(false); }
+    protected pause() { this.change('paused'); this.audio.pause(true); }
+    protected resume() { this.change('playing'); this.audio.pause(false); }
     private showDialogue(d: Dialogue) { this.dialog = d; this.dialogueTime = 0; this.spoken.add(d.id); this.change('dialogue'); this.audio.say(d.speaker, d.text, d.clip); }
     private closeDialogue() {
         if (this.dialog && this.dialogueTime < this.dialog.text.length * 34) {
