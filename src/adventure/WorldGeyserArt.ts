@@ -79,7 +79,7 @@ export function drawGeyser(c: CanvasRenderingContext2D, b: MovingBody, atlas: Sp
 
     if (s.danger) {
         const top = Math.round(s.danger.y - cy), height = s.height;
-        // Every collidable pixel has opaque grape liquid, even at the narrow neck.
+        // Every collidable pixel has opaque purple fluid, even at the narrow neck.
         // The richer winding core changes texture, never the collision envelope.
         r(c, x, top, w, height, JUICE.edge);
         for (let yy = 0; yy < height; yy++) {

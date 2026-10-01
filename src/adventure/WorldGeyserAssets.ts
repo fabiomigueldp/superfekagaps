@@ -1,6 +1,6 @@
 import { PixelGrid, type PixelFrame } from '../graphics/pixels';
 
-/** Shared factory metals, brass and grape concentrate. No new global palette entries. */
+/** Shared factory metals, brass and mysterious purple fluid. No new global palette entries. */
 export const GEYSER_PALETTE = {
     _: null, K: '#192c44', n: '#22384f', N: '#365d70', E: '#6e9ca6', D: '#b6d6cb',
     I: '#f5e7b7', Y: '#dba94a', y: '#967145', v: '#683b93', V: '#a65ad9', Q: '#e0b4f1',
@@ -16,7 +16,7 @@ function ellipse(g: PixelGrid, x: number, y: number, w: number, h: number, color
 
 function housing(cold: boolean): PixelFrame {
     const g = new PixelGrid(42, 30);
-    // Bolted foot, rolled steel sump and a grape-stained, serviceable outlet.
+    // Bolted foot, rolled steel sump and a purple-stained, serviceable outlet.
     g.rect(5, 17, 32, 10, 'K').rect(6, 18, 30, 8, 'N');
     g.rect(7, 18, 28, 2, 'E').rect(7, 20, 3, 4, 'D').rect(33, 20, 2, 5, 'n');
     g.rect(3, 26, 36, 4, 'K').rect(4, 26, 34, 1, 'D').rect(6, 28, 5, 1, 'E').rect(31, 28, 5, 1, 'E');

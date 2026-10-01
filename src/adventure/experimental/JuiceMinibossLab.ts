@@ -44,7 +44,7 @@ class LabEncounter extends BossEncounter {
     override get hint() {
         const b = this.model;
         if (b.phase === 'defeated') return 'EXPERIMENTO CONCLUÍDO!';
-        if (b.vulnerable) return 'AGORA! PULE NA COROA';
+        if (b.vulnerable) return 'AGORA! PULE EM CIMA';
         return b.attack === 'dash' ? 'ARRANCADA! PULE SOBRE ELE' : b.attack === 'pounce' ? 'SALTO! SAIA DA MARCA' : 'LEQUE! LEIA AS GOTAS';
     }
 }

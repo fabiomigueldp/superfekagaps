@@ -1,11 +1,10 @@
 import { JuiceMinibossModel } from './JuiceMinibossModel';
 
-// Small, high-contrast forms derived from the imagegen concept. The painted
-// silhouette is deliberately distinct from the existing campaign boss sprites.
+// Mysterious industrial purple slime: no fruit, vessel or literal ingredients.
+// A compact liquid core keeps the unchanged 30×30 collision body readable.
 const P = {
     edge: '#28103d', deep: '#491363', dark: '#691986', body: '#a32fc8',
-    light: '#e766ef', shine: '#fff1ff', lime: '#dded67', pulp: '#b5ce39',
-    rind: '#698329', eye: '#fff2b2', amber: '#eea843',
+    light: '#e766ef', shine: '#fff1ff', signal: '#dded67', eye: '#fff2b2',
 };
 function ellipse(c: CanvasRenderingContext2D, x: number, y: number, rx: number, ry: number, color: string) {
     c.fillStyle = color; c.beginPath(); c.ellipse(x, y, Math.max(.1, rx), Math.max(.1, ry), 0, 0, Math.PI * 2); c.fill();
@@ -15,25 +14,17 @@ function path(c: CanvasRenderingContext2D, points: number[], color: string | Can
     for (let i = 2; i < points.length; i += 2) c.lineTo(points[i], points[i + 1]);
     c.closePath(); c.fill();
 }
-function citrus(c: CanvasRenderingContext2D, x: number, y: number, r: number, angle = 0) {
-    c.save(); c.translate(x, y); c.rotate(angle);
-    ellipse(c, 0, 0, r + 1, r + 1, P.edge);
-    ellipse(c, 0, 0, r, r, P.rind);
-    ellipse(c, 0, -.5, r - 1, r - 1, P.lime);
-    ellipse(c, 0, -.5, r - 2, r - 2, P.pulp);
-    c.strokeStyle = '#f9ffc3'; c.lineWidth = .7;
-    for (let i = 0; i < 6; i++) {
-        const a = i * Math.PI / 3;
-        c.beginPath(); c.moveTo(0, -.5); c.lineTo(Math.cos(a) * (r - 1.5), Math.sin(a) * (r - 1.5) - .5); c.stroke();
-    }
-    ellipse(c, -.4, -.6, 1, 1, '#f9ffc3'); c.restore();
-}
-function tendril(c: CanvasRenderingContext2D, x: number, y: number, ex: number, ey: number, bend: number, width: number) {
-    c.lineCap = 'round';
-    for (const [color, w] of [[P.edge, width + 3], [P.dark, width], [P.light, 1]] as const) {
-        c.strokeStyle = color; c.lineWidth = w; c.beginPath();
-        c.moveTo(x, y); c.quadraticCurveTo((x + ex) / 2 + bend, Math.min(y, ey) - 9, ex, ey); c.stroke();
-    }
+/** One continuous, asymmetric contour, with moving lobes instead of limbs or a cap. */
+function slimeContour(c: CanvasRenderingContext2D, lean: number, ripple: number, swell: number) {
+    c.beginPath(); c.moveTo(-14, -1);
+    c.bezierCurveTo(-21, -1, -21, -6, -15, -9);
+    c.bezierCurveTo(-19 - swell, -13, -15, -21, -11 + lean, -21);
+    c.bezierCurveTo(-14 + lean, -28 - ripple, -7 + lean, -33, -3 + lean, -27);
+    c.bezierCurveTo(1 + lean, -34 + ripple, 10 + lean, -29, 10 + lean, -24);
+    c.bezierCurveTo(16 + lean, -25, 17 + swell, -16, 14, -11);
+    c.bezierCurveTo(21, -8, 22, -2, 15, -1);
+    c.bezierCurveTo(9, 2, 5, -1, 1, 0);
+    c.bezierCurveTo(-4, 2, -9, -1, -14, -1); c.closePath();
 }
 function droplet(c: CanvasRenderingContext2D, x: number, y: number, radius: number, angle = 0) {
     c.save(); c.translate(x, y); c.rotate(angle);
@@ -52,20 +43,20 @@ export function drawJuiceMiniboss(c: CanvasRenderingContext2D, b: JuiceMinibossM
     if (warning) {
         c.globalAlpha = .3 + b.progress * .4;
         if (b.attack === 'pounce') {
-            ellipse(c, b.targetX - cx, floor - 1, 22, 4, P.lime);
+            ellipse(c, b.targetX - cx, floor - 1, 22, 4, P.signal);
             c.strokeStyle = P.eye; c.lineWidth = 1;
             c.beginPath(); c.ellipse(b.targetX - cx, floor - 1, 26 - b.progress * 4, 6, 0, 0, Math.PI * 2); c.stroke();
             c.fillStyle = P.edge; c.fillRect(b.targetX - cx - 1, floor - 8, 2, 7);
         } else if (b.attack === 'dash') {
             const end = f < 0 ? b.arena.left - cx : b.arena.right - cx;
-            c.strokeStyle = P.lime; c.lineWidth = 1; c.beginPath();
+            c.strokeStyle = P.signal; c.lineWidth = 1; c.beginPath();
             c.moveTo(center, floor - 3); c.lineTo(end, floor - 3); c.stroke();
             for (let i = 1; i <= 3; i++) {
                 const ax = center + f * (20 + i * 13 + b.progress * 4);
-                path(c, [ax - f * 3, floor - 7, ax + f * 2, floor - 4, ax - f * 3, floor - 1], P.lime);
+                path(c, [ax - f * 3, floor - 7, ax + f * 2, floor - 4, ax - f * 3, floor - 1], P.signal);
             }
         } else {
-            c.strokeStyle = P.lime; c.lineWidth = 1;
+            c.strokeStyle = P.signal; c.lineWidth = 1;
             const fan = b.fanLaunch;
             // Five short rays share the exact locked launch vectors, including
             // upward bias. A new player position cannot rotate them mid-warning.
@@ -91,7 +82,7 @@ export function drawJuiceMiniboss(c: CanvasRenderingContext2D, b: JuiceMinibossM
         const dx = d.x - cx + 4, dy = d.y - cy + 4;
         c.globalAlpha = .45; ellipse(c, dx - d.vx * 38, dy - d.vy * 38, 6, 2, P.light); c.globalAlpha = 1;
         droplet(c, dx, dy, 4, Math.atan2(d.vy, d.vx));
-        ellipse(c, dx, dy, 1.4, 1.4, P.lime);
+        ellipse(c, dx, dy, 1.4, 1.4, P.shine);
     }
     if (b.phase === 'recover' && b.phaseTime < 300 || b.phase === 'hurt' || b.phase === 'defeated') {
         const age = b.phaseTime / (b.phase === 'defeated' ? 800 : 350);
@@ -105,34 +96,36 @@ export function drawJuiceMiniboss(c: CanvasRenderingContext2D, b: JuiceMinibossM
     const pulse = warning ? Math.sin(b.progress * Math.PI * 8) * b.progress : Math.sin(t * 5) * .35;
     const squash = recover ? .72 : warning && b.attack === 'pounce' ? 1 - b.progress * .3 : dash ? .72 : 1;
     const stretch = dash ? 1.38 : recover ? 1.17 : warning && b.attack === 'fan' ? 1 + b.progress * .13 : 1;
-    // Anchor the core at the feet; the crown stays attached during squash/recovery.
+    // Anchor the viscous mound at the feet. Surface motion never changes collision.
     c.save(); c.translate(center, y + 30); c.scale(stretch, squash);
     const lean = dash ? f * 4 : warning ? -f * b.progress * 2 : Math.sin(t * 3) * .5;
-    const armLift = warning ? b.progress * 7 : b.phase === 'attack' && b.attack === 'fan' ? 7 : Math.sin(t * 6) * 1.8;
-    tendril(c, -8, -12, -20 - pulse, -10 - armLift, -4, 5);
-    tendril(c, 8, -12, 20 + pulse, -10 - armLift, 4, 5);
-    for (const side of [-1, 1]) {
-        ellipse(c, side * 19, -8 - armLift, 6, 6, P.edge);
-        ellipse(c, side * 19, -9 - armLift, 5, 5, P.body);
-        citrus(c, side * 19, -11 - armLift, 3.6, t * .6 * side);
-        ellipse(c, side * 10, -2, 9, 3, P.edge);
-        ellipse(c, side * 10, -3, 7, 2, P.dark);
-        ellipse(c, side * 12, -4, 4, .8, P.light);
+    const ripple = Math.sin(t * 5) * 1.4 + pulse;
+    const swell = warning && b.attack === 'fan' ? b.progress * 3 : Math.sin(t * 4) * .7;
+    slimeContour(c, lean, ripple, swell);
+    c.fillStyle = P.edge; c.fill();
+    c.save(); c.translate(0, -1); c.scale(.89, .94);
+    slimeContour(c, lean, ripple, swell);
+    c.fillStyle = P.dark; c.fill();
+    c.save(); c.clip();
+    // Overlapping liquid volumes are clipped into one continuous mound.
+    ellipse(c, lean - 2, -18, 14, 14, P.body);
+    ellipse(c, lean + 9, -9, 7, 10, P.deep);
+    ellipse(c, lean - 9, -23 - ripple * .4, 4, 5, P.light);
+    ellipse(c, lean - 10, -25 - ripple * .4, 1.5, 2, P.shine);
+    ellipse(c, lean + 3, -27 + ripple * .4, 3, 2, P.light);
+    // Slow embedded gas pockets; highlights stay lilac, never fruit-colored.
+    for (let i = 0; i < 4; i++) {
+        const bx = [-10, 8, -5, 11][i] + Math.sin(t * 2 + i) * .7;
+        const by = -5 - (t * 3 + i * 6) % 21;
+        const radius = 1.2 + i % 2 * .6;
+        ellipse(c, bx, by, radius + .7, radius + .9, P.dark);
+        ellipse(c, bx - .3, by - .4, radius, radius, P.light);
+        ellipse(c, bx - .6, by - .8, .55, .55, P.shine);
     }
-    // Flowing crest, citrus pressure cap, sharp brow and glossy juice core.
-    tendril(c, -f * 6, -21, -f * (13 + pulse), -36 + Math.sin(t * 4) * 2, -f * 7, 3);
-    ellipse(c, lean, -16, 15, 14, P.edge);
-    ellipse(c, lean, -17, 13.5, 12.5, P.dark);
-    ellipse(c, lean - 1, -19, 11.7, 10, P.body);
-    ellipse(c, lean - 6, -23, 4, 3, P.light);
-    ellipse(c, lean - 7, -24, 2, 1, P.shine);
-    c.save(); c.translate(lean, -28); c.rotate(-f * .18 + pulse * .04);
-    ellipse(c, 0, 0, 10, 3, P.edge);
-    citrus(c, 0, -1, 7, .3);
-    path(c, [-3, -4, -3, -10, 3, -11, 4, -4], P.edge);
-    path(c, [-2, -5, -2, -9, 2, -10, 3, -5], P.pulp);
-    c.fillStyle = P.lime; c.fillRect(-1, -9, 2, 4);
-    path(c, [-2, -9, -7, -14, -9, -13, -7, -9], P.rind); c.restore();
+    c.restore(); c.restore();
+    // Low puddled skirts communicate weight without hands, gloves or footwear.
+    ellipse(c, -10, -3, 5, 1, P.light);
+    ellipse(c, 10, -3, 4, .8, P.body);
     for (const side of [-1, 1]) {
         const ex = lean + side * 6;
         ellipse(c, ex, -15, 5.5, recover ? 3.4 : 5, P.edge);
@@ -148,13 +141,13 @@ export function drawJuiceMiniboss(c: CanvasRenderingContext2D, b: JuiceMinibossM
     }
     c.restore();
     if (b.vulnerable) {
-        const crownY = y + 30 - 35 * squash;
-        c.strokeStyle = P.lime; c.lineWidth = 1;
+        const surfaceY = y + 30 - 30 * squash;
+        c.strokeStyle = P.signal; c.lineWidth = 1;
         for (let i = 0; i < 3; i++) {
             const a = -Math.PI / 2 + (i - 1) * .8;
             const r = 8 + Math.sin(t * 10) * 1.5;
-            c.beginPath(); c.moveTo(center + Math.cos(a) * r, crownY + Math.sin(a) * r);
-            c.lineTo(center + Math.cos(a) * (r + 3), crownY + Math.sin(a) * (r + 3)); c.stroke();
+            c.beginPath(); c.moveTo(center + Math.cos(a) * r, surfaceY + Math.sin(a) * r);
+            c.lineTo(center + Math.cos(a) * (r + 3), surfaceY + Math.sin(a) * (r + 3)); c.stroke();
         }
     }
     c.restore();
