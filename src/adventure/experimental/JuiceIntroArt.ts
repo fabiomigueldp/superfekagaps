@@ -1,4 +1,4 @@
-import { PLAYER_PALETTE, PLAYER_SPRITES } from '../../assets/playerSpriteSpec';
+import { PLAYER_PALETTE, PLAYER_SPRITES, PLAYER_WALK } from '../../assets/playerSpriteSpec';
 import { pixelText, panel, wrapText } from '../../graphics/BitmapFont';
 import { drawCalabrezzoStageBackground, drawCalabrezzoStageCast, drawCalabrezzoStageFloor, type CalabrezzoStageState } from './CalabrezzoStageArt';
 import { drawJuiceMiniboss, drawJuiceLabBackground, drawJuiceLabFloor } from './JuiceMinibossArt';
@@ -8,9 +8,9 @@ const visualBoss = new JuiceMinibossModel();
 function sprite(c: CanvasRenderingContext2D, rows: readonly string[], x: number, y: number) {
     rows.forEach((row, yy) => [...row].forEach((key, xx) => { const color = PLAYER_PALETTE[key]; if (color) { c.fillStyle = color; c.fillRect(Math.round(x + xx), Math.round(y + yy), 1, 1); } }));
 }
-function slimTorso(rows: readonly string[]) {
+function slimTorso(rows: readonly string[], torsoY = 11) {
     return rows.map((row, y) => {
-        if (y < 11 || y > 18) return row;
+        if (y < torsoY || y > 18) return row;
         const pixels = [...row];
         for (let x = 4; x <= 12; x++) pixels[x] = '_';
         pixels[6] = 'K'; pixels[7] = 'S'; pixels[8] = 'L'; pixels[9] = 'S'; pixels[10] = 'K';
@@ -19,30 +19,58 @@ function slimTorso(rows: readonly string[]) {
     });
 }
 const SLIM_IDLE = slimTorso(PLAYER_SPRITES.idle), SLIM_POSE = slimTorso(PLAYER_SPRITES.celebrate), SLIM_BLINK = slimTorso(PLAYER_SPRITES.blink);
+const SLIM_WALK = PLAYER_WALK.map((rows, i) => slimTorso(rows, i % 3 === 1 ? 12 : 11));
+// Remove only lowered arms during the garment action; the authored head stays intact.
+const SLIM_LIFT = SLIM_IDLE.map((row, y) => y < 12 || y > 18 ? row : '______' + row.slice(6, 11) + '_____');
+const clamp = (n: number) => Math.max(0, Math.min(1, n));
+function shirt(c: CanvasRenderingContext2D, x: number, y: number, height: number) {
+    c.fillStyle = PLAYER_PALETTE.K!; c.fillRect(x, y, 9, height);
+    c.fillStyle = PLAYER_PALETTE.B!; c.fillRect(x + 1, y + 1, 7, height - 2);
+    c.fillStyle = PLAYER_PALETTE.b!; c.fillRect(x + 1, y + 1, 5, 1);
+}
+function shirtHands(c: CanvasRenderingContext2D, x: number, clothX: number, clothY: number, tuck: number) {
+    // Hands follow the same garment through the lift and tuck, never a free-floating prop.
+    for (const side of [-1, 1]) {
+        const release = side > 0 && tuck > 0;
+        const gripX = release ? x + 16 : clothX + (side < 0 ? 0 : 8), handY = release ? 141 : clothY + 2;
+        const shoulderX = x + (side < 0 ? 5 : 9);
+        const elbowX = x + (side < 0 ? -1 : 15), elbowY = Math.round((147 + handY) / 2 + 2);
+        const line = (ax: number, ay: number, bx: number, by: number, size: number) => {
+            const length = Math.max(Math.abs(bx - ax), Math.abs(by - ay), 1);
+            for (let i = 0; i <= length; i++) c.fillRect(Math.round(ax + (bx - ax) * i / length) - (size >> 1), Math.round(ay + (by - ay) * i / length) - (size >> 1), size, size);
+        };
+        for (const [color, size] of [[PLAYER_PALETTE.K!, 3], [PLAYER_PALETTE.S!, 1]] as const) {
+            c.fillStyle = color;
+            line(shoulderX, 147, elbowX, elbowY, size); line(elbowX, elbowY, gripX, handY, size);
+        }
+    }
+}
 /** Scenic acting derives directly from Feka's authored palette/head/clothes. */
 function feka(c: CanvasRenderingContext2D, f: IntroFrame, reduced: boolean) {
     const x = Math.round(f.fekaX), floor = 160;
-    const stepping = f.beat === 'walk' || f.beat === 'push' || f.beat === 'emerge' && f.elapsedMs < 2300;
-    const bob = stepping && !reduced ? Math.floor(f.timeMs / 130) % 2 : 0;
-    const flex = f.beat === 'reveal' || f.beat === 'judges';
+    const stepping = f.fekaMoving && !reduced;
+    const step = Math.floor(f.fekaWalkDistance / 5.5) % PLAYER_WALK.length;
+    const lifting = f.beat === 'reveal' && f.elapsedMs >= 100 && f.elapsedMs < 550;
+    const flex = f.beat === 'reveal' && f.elapsedMs >= 550 || f.beat === 'judges';
     const defiant = f.beat === 'defy' || f.beat === 'transition' && f.elapsedMs < 750;
     const down = f.beat === 'resolve' && f.elapsedMs < 650;
     c.fillStyle = '#17132388'; c.fillRect(x + 2, floor - 1, 14, 2);
     const bare = ['reveal','judges','resolve','emerge','invite','defy','transition'].includes(f.beat)
+        && !(f.beat === 'reveal' && f.elapsedMs < 100)
         && !(f.beat === 'transition' && f.elapsedMs >= 750);
-    const frame = bare ? down ? SLIM_BLINK : flex || defiant ? SLIM_POSE : SLIM_IDLE
-        : down ? PLAYER_SPRITES.blink : flex || defiant ? PLAYER_SPRITES.celebrate : PLAYER_SPRITES.idle;
-    sprite(c, frame, x - 1, floor - 26 + bob);
+    const frame = lifting ? SLIM_LIFT : bare ? down ? SLIM_BLINK : flex || defiant ? SLIM_POSE : stepping ? SLIM_WALK[step] : SLIM_IDLE
+        : down ? PLAYER_SPRITES.blink : flex || defiant ? PLAYER_SPRITES.celebrate : stepping ? PLAYER_WALK[step] : PLAYER_SPRITES.idle;
+    // Walk frames already contain the authored head/leg motion; keep the feet on their floor.
+    sprite(c, frame, x - 1, floor - 26);
     if (bare) {
-        // Shirt is visibly lifted, then tucked at the waist; the same garment returns before combat.
-        const removal = f.beat === 'reveal' ? Math.min(1, f.elapsedMs / 550) : 1;
-        const dressing = f.beat === 'transition' ? Math.min(1, f.elapsedMs / 750) : 0;
-        const clothY = f.beat === 'transition' ? floor - 12 - dressing * 13
-            : removal < .5 ? floor - 20 - removal * 24 : floor - 32 + (removal - .5) * 40;
-        const clothX = f.beat === 'transition' ? x + 2 + dressing * 2 : x + 2 - Math.max(0,removal-.5)*8;
-        c.fillStyle = PLAYER_PALETTE.K!; c.fillRect(Math.round(clothX), Math.round(clothY), 9, 5);
-        c.fillStyle = PLAYER_PALETTE.B!; c.fillRect(Math.round(clothX)+1, Math.round(clothY)+1, 7, 3);
-        c.fillStyle = PLAYER_PALETTE.b!; c.fillRect(Math.round(clothX)+1, Math.round(clothY)+1, 5, 1);
+        const lift = clamp((f.elapsedMs - 100) / 200), tuck = clamp((f.elapsedMs - 300) / 250);
+        const dressing = f.beat === 'transition' ? clamp(f.elapsedMs / 750) : 0;
+        const clothX = Math.round(x + (lifting ? 3 - tuck - Math.sin(tuck * Math.PI) * 11 : 2 + dressing));
+        const clothY = Math.round(lifting ? floor - 15 - lift * 17 + tuck * 23 : floor - 9 - dressing * 6);
+        const clothH = Math.round(lifting ? 9 - lift * 4 : 5 + dressing * 4);
+        if (lifting) shirtHands(c, x, clothX, clothY, tuck);
+        // At the first lift pixel this covers the whole torso, then exposes it from the hem up.
+        shirt(c, clothX, clothY, clothH);
     }
     // Thin upward forearms extend the existing celebration pose without replacing identity.
     if (flex) {
@@ -74,6 +102,8 @@ function usher(c: CanvasRenderingContext2D, frame: IntroFrame) {
 export function drawJuiceIntro(c: CanvasRenderingContext2D, frame: IntroFrame, reducedMotion = false) {
     const { beat, timeMs, stageExit } = frame;
     const s: CalabrezzoStageState = { time: timeMs, floorY: 160, reducedMotion,
+        // Clear the cast before the lab is exposed, avoiding lingering translucent people.
+        castOpacity: Math.max(0, 1 - stageExit * 3),
         reaction: beat === 'judges' || beat === 'resolve' ? 'mock' : ['emerge', 'invite', 'defy', 'transition'].includes(beat) ? 'shock' : 'neutral' };
     const closeFeka = ['reveal', 'resolve', 'defy'].includes(beat);
     const zoom = reducedMotion ? 1 : beat === 'transition' ? 1 + (1 - stageExit) : closeFeka ? 2 : beat === 'invite' ? 1.5 : 1;
@@ -90,7 +120,7 @@ export function drawJuiceIntro(c: CanvasRenderingContext2D, frame: IntroFrame, r
         c.fillStyle = '#ffe4a315'; c.beginPath(); c.moveTo(frame.fekaX - 10, 25); c.lineTo(frame.fekaX + 24, 25);
         c.lineTo(frame.fekaX + 43, 160); c.lineTo(frame.fekaX - 28, 160); c.fill();
     }
-    c.save(); c.translate(Math.round(stageExit * 340), 0); drawCalabrezzoStageCast(c, s); c.restore();
+    if (s.castOpacity! > 0) drawCalabrezzoStageCast(c, s);
     usher(c, frame);
     feka(c, frame, reducedMotion);
     if (frame.bossReveal > 0) {

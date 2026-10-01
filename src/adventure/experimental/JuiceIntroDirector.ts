@@ -5,6 +5,8 @@ export interface IntroInput { left?: boolean; right?: boolean; presentPressed?: 
 export interface IntroSubtitle { speaker: string; text: string; }
 export interface IntroFrame {
     beat: IntroBeat; timeMs: number; elapsedMs: number; progress: number; fekaX: number;
+    /** Scenic gait follows displacement, so held inputs at a boundary never march in place. */
+    fekaMoving: boolean; fekaWalkDistance: number;
     subtitle: IntroSubtitle | null; prompt: string; bossReveal: number; stageExit: number;
 }
 export interface IntroBeatSpec { id: IntroBeat; durationMs: number; hold?: 'walkToMark' | 'present'; cue?: IntroCue; }
@@ -32,6 +34,8 @@ export class JuiceIntroDirector {
     elapsedMs = 0;
     timeMs = 0;
     fekaX = 36;
+    private fekaMoving = false;
+    private fekaWalkDistance = 0;
     private pending: IntroCue[] = ['fanfare'];
     private awkwardPlayed = false;
     private presentBufferMs = 0;
@@ -43,28 +47,35 @@ export class JuiceIntroDirector {
     }
     skip() {
         if (this.complete) return;
-        this.pending = ['cancel']; this.fekaX = 68; this.enter('complete');
+        this.pending = ['cancel']; this.fekaX = 68; this.fekaMoving = false; this.enter('complete');
+    }
+    private moveFeka(x: number) {
+        const distance = Math.abs(x - this.fekaX);
+        this.fekaMoving = distance > 0;
+        this.fekaWalkDistance += distance;
+        this.fekaX = x;
     }
     advance(dt: number, input: IntroInput = {}) {
         if (this.complete) return;
         if (input.skipPressed) { this.skip(); return; }
         if (!Number.isFinite(dt) || dt <= 0) return;
+        this.fekaMoving = false;
         // Match lab fixed-step policy; background stalls may not consume entire dialogue pages.
         const step = Math.min(dt, 100);
         this.elapsedMs += step; this.timeMs += step;
         this.presentBufferMs = Math.max(0, this.presentBufferMs - step);
         if (input.presentPressed && (this.beat === 'prepare' || this.beat === 'push' && this.elapsedMs > 450)) this.presentBufferMs = 200;
         if (this.beat === 'walk') {
-            this.fekaX = clamp(this.fekaX + ((input.right ? 1 : 0) - (input.left ? 1 : 0)) * step * .055, 28, 98);
+            this.moveFeka(clamp(this.fekaX + ((input.right ? 1 : 0) - (input.left ? 1 : 0)) * step * .055, 28, 98));
             if (this.fekaX >= 97.9) this.enter('push');
             return;
         }
-        if (this.beat === 'push') this.fekaX = 98 + smooth(this.elapsedMs / 400) * 14;
+        if (this.beat === 'push') this.moveFeka(98 + smooth(this.elapsedMs / 400) * 14);
         if (this.beat === 'prepare') {
             if (this.presentBufferMs > 0 && this.elapsedMs >= 150) this.enter('reveal');
             return;
         }
-        if (this.beat === 'emerge') this.fekaX = 112 - smooth((this.elapsedMs - 900) / 1400) * 44;
+        if (this.beat === 'emerge') this.moveFeka(112 - smooth((this.elapsedMs - 900) / 1400) * 44);
         if (this.beat === 'reveal' && this.elapsedMs >= 1000 && !this.awkwardPlayed) {
             this.awkwardPlayed = true; this.pending.push('awkward');
         }
@@ -82,6 +93,7 @@ export class JuiceIntroDirector {
         if (b === 'defy') subtitle = { speaker: 'FEKA', text: t < 2800 ? 'Eu vou defender até a morte' : 'meus gaps e meu shape patético!' };
         const index = ORDER.indexOf(b);
         return { beat: b, timeMs: this.timeMs, elapsedMs: t, progress: clamp(t / SPEC[b].durationMs), fekaX: this.fekaX,
+            fekaMoving: this.fekaMoving, fekaWalkDistance: this.fekaWalkDistance,
             subtitle, prompt: b === 'walk' ? 'VÁ ATÉ A MARCA →' : b === 'prepare' ? 'ESPAÇO · APRESENTAR' : '',
             bossReveal: b === 'emerge' ? smooth(t / 2800) : index > ORDER.indexOf('emerge') ? 1 : 0,
             stageExit: b === 'transition' ? smooth(t / 1800) : b === 'complete' ? 1 : 0 };
