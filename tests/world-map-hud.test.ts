@@ -77,6 +77,61 @@ test('phase activation always selects; entering is a separate arrival-gated acti
     hud.setVisible(false); hud.stageButtons[1].click(); assert.equal(calls.at(-1), 3, 'Hidden maps cannot dispatch gameplay actions.');
 });
 
+test('panorama buttons own six full region names and keep locked islands inspectable', t => {
+    const { hud, calls, state } = fixture(t);
+    hud.update({ ...state, overview: true });
+    hud.positionOverviewWorlds(Array.from({ length: 6 }, (_, n) => ({ x: 80 + n * 140, y: 160 })));
+    const names = ['Costa dos Gaps', 'Porto do Bielzão', 'Fábrica de Suco', 'Serra Suspensa', 'Reserva Gelada', 'Domínio Pizzarino'];
+    hud.overviewButtons.forEach((button, index) => {
+        assert.equal(button.hidden, false); assert.equal(button.getAttribute('data-island-world'), String(index + 1));
+        assert.ok(button.getAttribute('aria-label')!.includes(`Ilha ${index + 1}: ${names[index]}.`));
+        assert.match(button.getAttribute('aria-label')!, index ? /Bloqueada.*prévia de perto/ : /Disponível.*de perto/);
+        button.click();
+    });
+    assert.deepEqual(calls, names.map((_, index) => `world:${index + 1}`));
+    assert.equal(calls.includes('enter'), false);
+    hud.update(state); assert.ok(hud.overviewButtons.every(button => button.hidden));
+    hud.setVisible(false); hud.overviewButtons[0].click(); assert.equal(calls.length, 6);
+});
+
+test('island decoration is lazy and shared, and disposal prevents a late overview repaint', async t => {
+    const resources = signResources(t), { hud, state } = fixture(t);
+    await resources.metadata(); resources.images[0].onload!(); await resources.settle();
+    assert.equal(resources.requests.length, 1);
+    hud.update({ ...state, overview: true });
+    assert.equal(resources.requests.length, 2); assert.match(resources.requests[1].url, /island-signs.meta.json$/);
+    resources.requests[1].resolve({ ok: true, json: async () => JSON.parse(readFileSync(new URL('../public/assets/world/map/island-signs.meta.json', import.meta.url), 'utf8')) });
+    await resources.settle();
+    const image = resources.images[1], late = image.onload!;
+    const board = asElement(hud.overviewButtons[0]).children[0], draws = board.draws.length;
+    hud.setVisible(false); hud.setVisible(true); assert.equal(resources.requests.length, 2);
+    hud.dispose(); image.naturalWidth = 768; image.naturalHeight = 88; late(); await resources.settle();
+    assert.equal(board.draws.length, draws); assert.equal(hud.root.hidden, true);
+    assert.equal(image.onload, null); assert.equal(image.onerror, null);
+});
+
+test('overview arrow keys focus island choices without travelling and Escape closes only the overview', t => {
+    const { hud, calls, state } = fixture(t); hud.update({ ...state, overview: true });
+    let prevented = false;
+    asElement(hud.root).dispatch('keydown', { key: 'ArrowRight', target: hud.overviewButtons[0],
+        preventDefault() { prevented = true; }, stopPropagation() {} });
+    assert.ok(prevented); assert.equal(asElement(hud.overviewButtons[1]).focusCount, 1); assert.deepEqual(calls, []);
+    asElement(hud.root).dispatch('keydown', { key: 'Escape', target: hud.overviewButtons[1], preventDefault() {}, stopPropagation() {} });
+    assert.deepEqual(calls, ['overview']);
+});
+
+test('a journey heading names its destination without claiming arrival or relabeling a locked preview', t => {
+    const { hud, state } = fixture(t);
+    const title = () => find(find(asElement(hud.root), 'world-map-title'), 'world-map-sr').textContent;
+    hud.update({ ...state, world: 2, stage: 5, arrivedWorld: 1, motionState: 'sailing', canEnter: false });
+    assert.match(title(), /Rumo a Porto do Bielzão/);
+    hud.update({ ...state, world: 2, stage: 6, arrivedWorld: 2, motionState: 'walking', canEnter: false });
+    assert.equal(title(), 'Porto do Bielzão');
+    hud.update({ ...state, world: 6, stage: 25, arrivedWorld: 1, preview: true, motionState: 'sailing', canEnter: false });
+    assert.equal(title(), 'Domínio Pizzarino');
+    assert.match(find(asElement(hud.root), 'world-map-status').textContent, /Prévia/);
+});
+
 test('every in-flight state exposes skip and an honest motion status, with explicit entry after arrival', t => {
     const { hud, calls, state } = fixture(t);
     for (const [motionState, copy] of [['walking', 'a caminho'], ['boarding', 'Embarcando'], ['sailing', 'Navegando'], ['riding', 'Na cabine'], ['arriving', 'Desembarcando']] as const) {

@@ -64,6 +64,22 @@ layout passed all four profiles, including 472×303, in 5 focused test cases;
 the production rebuild passed. The unchanged aggregate suite was not repeated.
 New build: `index-wWZIwsQO.js`, CSS `index-XHS49ZnI.css` (19.51 kB / 4.71 kB gzip).
 
-Final browser confirmation of this layout correction and public rollout remain
-pending. Automated viewport/reduced-motion cases do not establish physical
-touch behavior or measured browser FPS.
+The corrected preview `2e9e163` was verified at 472×303 with the new JS/CSS. All
+seven native stage/departure targets fit between the actual 50px header bottom
+and 218.8px footer top. The region drawer retained 28/30 and 69/72. Reload while
+sailing restored 5-5; rapid reverse selection and skip arrived at the chosen
+5-4. Automated viewport/reduced-motion cases do not establish physical touch
+behavior or measured browser FPS.
+
+## Public release
+
+Main `2e9e1631b2f9d8d42199d04b12d5ae81a2ed42af` deployed successfully on
+2026-10-01 at `https://superfekagaps.vercel.app/`; Vercel deployment
+`6JNHrEo8jA84SowUghuLb4nHrC63` completed. The public page served the verified
+`index-wWZIwsQO.js` and `index-XHS49ZnI.css`. Actual Domínio art, the final dock,
+closed barriers and locked Enter behavior were inspected in production. Its
+normal save retained 0/30 and 0/72; no test fixture was imported there.
+
+No deployment scripts/configuration changed. No GitHub workflows, custom hooks
+or configured hooks path existed. The Oracle-hosted game and the user's
+separate original checkout were untouched.

@@ -3,7 +3,9 @@ import { ART } from '../graphics/palette';
 
 const KINDS = ['stage', 'selected', 'complete', 'locked', 'selected-complete', 'dock-right', 'dock-left'] as const;
 type BaseMapSignKind = typeof KINDS[number];
-export type MapSignKind = BaseMapSignKind | 'factory-right' | 'factory-left';
+const ISLAND_KINDS = ['island', 'island-selected', 'island-locked'] as const;
+type MapIslandSignKind = typeof ISLAND_KINDS[number];
+export type MapSignKind = BaseMapSignKind | 'factory-right' | 'factory-left' | MapIslandSignKind;
 export type MapSignDirection = 'left' | 'right';
 export interface MapTravelSign { label: string; direction: MapSignDirection; wide?: boolean }
 interface Point { x: number; y: number }
@@ -21,6 +23,8 @@ export interface MapSignFrame {
 export interface MapSignMetadata { width: number; height: number; frames: Record<BaseMapSignKind, MapSignFrame> }
 export interface MapSignAtlas { metadata: MapSignMetadata; image: HTMLImageElement }
 export interface MapFactorySignAtlas { frame: MapSignFrame; image: HTMLImageElement }
+export interface MapIslandSignMetadata { width: number; height: number; frames: Record<MapIslandSignKind, MapSignFrame> }
+export interface MapIslandSignAtlas { metadata: MapIslandSignMetadata; image: HTMLImageElement }
 const object = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
 const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value);
 const point = (value: unknown): value is Point => object(value) && finite(value.x) && finite(value.y);
@@ -81,6 +85,35 @@ function parseFactorySignMetadata(value: unknown, direction: MapSignDirection): 
     return { kind, sourceRect: { ...raw.sourceRect }, displaySize: { width, height }, dpr: 2,
         foot: { ...raw.foot }, letterCenter: { ...raw.letterCenter }, usableFace: { ...raw.usableFace }, letterPixelScale: 2 };
 }
+
+/** A nameboard has no directional tip: it identifies the island beneath it. */
+export function parseMapIslandSignMetadata(value: unknown): MapIslandSignMetadata | null {
+    if (!object(value) || value.version !== 1 || !object(value.atlas) || value.atlas.image !== 'island-signs.webp' ||
+        value.atlas.width !== 768 || value.atlas.height !== 88 || !Array.isArray(value.frames) || value.frames.length !== 3) return null;
+    const frames = {} as Record<MapIslandSignKind, MapSignFrame>;
+    let geometry = '';
+    for (const raw of value.frames) {
+        if (!object(raw) || !ISLAND_KINDS.includes(raw.kind as MapIslandSignKind)) return null;
+        const kind = raw.kind as MapIslandSignKind, index = ISLAND_KINDS.indexOf(kind);
+        if (frames[kind] || raw.dpr !== 2 || raw.letterPixelScale !== 2 || !object(raw.displaySize) ||
+            raw.displaySize.width !== 128 || raw.displaySize.height !== 44 || !rect(raw.sourceRect) ||
+            raw.sourceRect.x !== index * 256 || raw.sourceRect.y !== 0 || raw.sourceRect.width !== 256 || raw.sourceRect.height !== 88 ||
+            !point(raw.foot) || raw.foot.x < 0 || raw.foot.x > 128 || raw.foot.y < 0 || raw.foot.y > 44 ||
+            !rect(raw.usableFace) || raw.usableFace.x < 0 || raw.usableFace.y < 0 ||
+            raw.usableFace.x + raw.usableFace.width > 128 || raw.usableFace.y + raw.usableFace.height > 44 ||
+            !point(raw.letterCenter)) return null;
+        const width = textWidth('6 DOMÍNIO', 2), x = Math.round(raw.letterCenter.x - width / 2), y = Math.round(raw.letterCenter.y - 7);
+        if (x < raw.usableFace.x || x + width > raw.usableFace.x + raw.usableFace.width ||
+            y - 4 < raw.usableFace.y || y + 14 > raw.usableFace.y + raw.usableFace.height) return null;
+        const shape = JSON.stringify([raw.foot.x, raw.foot.y, raw.letterCenter.x, raw.letterCenter.y,
+            raw.usableFace.x, raw.usableFace.y, raw.usableFace.width, raw.usableFace.height]);
+        if (geometry && shape !== geometry) return null;
+        geometry = shape;
+        frames[kind] = { kind, sourceRect: { ...raw.sourceRect }, displaySize: { width: 128, height: 44 }, dpr: 2,
+            foot: { ...raw.foot }, letterCenter: { ...raw.letterCenter }, usableFace: { ...raw.usableFace }, letterPixelScale: 2 };
+    }
+    return ISLAND_KINDS.every(kind => frames[kind]) ? { width: 768, height: 88, frames } : null;
+}
 function loadSignImage(url: string, width: number, height: number, signal: AbortSignal): Promise<HTMLImageElement | null> {
     return new Promise(resolve => {
         if (signal.aborted) { resolve(null); return; }
@@ -103,6 +136,17 @@ export async function loadMapSignAtlas(prefix: string, signal: AbortSignal): Pro
         const metadata = response.ok ? parseMapSignMetadata(await response.json()) : null;
         if (!metadata || signal.aborted) return null;
         const image = await loadSignImage(prefix + 'signs-atlas.webp', metadata.width, metadata.height, signal);
+        return image && !signal.aborted ? { image, metadata } : null;
+    } catch { return null; }
+}
+/** Overview decoration is loaded only when the user opens the panorama. */
+export async function loadMapIslandSignAtlas(prefix: string, signal: AbortSignal): Promise<MapIslandSignAtlas | null> {
+    if (signal.aborted || typeof Image === 'undefined') return null;
+    try {
+        const response = await fetch(prefix + 'island-signs.meta.json', { signal });
+        const metadata = response.ok ? parseMapIslandSignMetadata(await response.json()) : null;
+        if (!metadata || signal.aborted) return null;
+        const image = await loadSignImage(prefix + 'island-signs.webp', metadata.width, metadata.height, signal);
         return image && !signal.aborted ? { image, metadata } : null;
     } catch { return null; }
 }
@@ -150,6 +194,15 @@ export function paintPhysicalStageSign(canvas: HTMLCanvasElement, atlas: MapSign
     // One original bitmap pointer complements the subtle brass strip at 1×.
     // The locked frame keeps its attached pin and the combined frame its pennant.
     if (selected) pixelText(ctx, '↓', 28, 0, ART.ink, 2, 'center');
+    return true;
+}
+export function paintPhysicalIslandSign(canvas: HTMLCanvasElement, atlas: MapIslandSignAtlas | null, text: string,
+    selected: boolean, open: boolean): boolean {
+    if (!atlas) return false;
+    const kind: MapIslandSignKind = !open ? 'island-locked' : selected ? 'island-selected' : 'island';
+    const ctx = paint(canvas, atlas.image, atlas.metadata.frames[kind], text);
+    if (!ctx) return false;
+    if (selected) pixelText(ctx, '↓', 64, 0, ART.gold, 1, 'center');
     return true;
 }
 /** Explicit text and direction distinguish ferry PORTO from the return bridge PORTO. */

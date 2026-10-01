@@ -31,7 +31,7 @@
 .world-map-art { width: 100%; height: 100%; display: block; }
 .world-map-bitmap { display: block; width: auto; max-width: 100%; height: auto; image-rendering: pixelated; pointer-events: none; }
 .world-map-nodes { position: absolute; inset: 0; pointer-events: none; }
-.world-map-node, .world-map-dock {
+.world-map-node, .world-map-dock, .world-map-island {
     position: absolute;
     top: 0;
     left: 0;
@@ -50,8 +50,9 @@
 .world-map-dock { width: 104px; height: 56px; }
 .world-map-dock .world-map-bitmap { width: 104px; height: 56px; }
 .world-map-travel-wide, .world-map-travel-wide .world-map-bitmap { width: 128px; }
-.world-map-node:hover, .world-map-dock:hover { filter: brightness(1.2); }
-.world-map-node.is-selected { z-index: 2; }
+.world-map-island, .world-map-island .world-map-bitmap { width: 128px; height: 44px; }
+.world-map-node:hover, .world-map-dock:hover, .world-map-island:hover { filter: brightness(1.2); }
+.world-map-node.is-selected, .world-map-island.is-selected { z-index: 2; }
 .world-map-header {
     position: absolute;
     top: max(10px, env(safe-area-inset-top));

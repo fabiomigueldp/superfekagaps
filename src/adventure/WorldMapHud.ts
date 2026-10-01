@@ -3,7 +3,8 @@ import { fitText, panel, pixelText, textWidth, wrapText } from '../graphics/Bitm
 import { ART } from '../graphics/palette';
 import { mapAssetPrefix } from './WorldMapArt';
 import { loadMapSignAtlas, loadMapFactorySignAtlas, loadMapFactoryLeftSignAtlas, paintPhysicalTravelSign, paintPhysicalStageSign,
-    type MapSignAtlas, type MapFactorySignAtlas, type MapTravelSign } from './WorldMapSignArt';
+    loadMapIslandSignAtlas, paintPhysicalIslandSign,
+    type MapSignAtlas, type MapFactorySignAtlas, type MapTravelSign, type MapIslandSignAtlas } from './WorldMapSignArt';
 
 export const WORLD_MAP_TRAVEL_ACTION_IDS = ['ferry-costa-porto', 'ferry-porto-costa', 'bridge-porto-factory', 'bridge-factory-porto',
     'walk-factory-serra', 'walk-serra-factory', 'cable-serra-reserva', 'cable-reserva-serra',
@@ -39,6 +40,8 @@ export type WorldMapMotionState = 'idle' | 'walking' | 'boarding' | 'sailing' | 
 export interface WorldMapHudCallbacks {
     selectStage(index: number): void;
     selectWorld(world: number): void;
+    /** A named island in the panorama opens its close view. */
+    selectOverviewWorld?(world: number): void;
     /** Route-specific action; omitted callbacks retain destination-world selection. */
     selectTravel?(action: WorldMapTravelActionId): void;
     enter(): void;
@@ -64,6 +67,8 @@ export interface WorldMapHudState {
     /** Inspecting a place Feka has not arrived at; never announce arrival. */
     preview?: boolean;
     overview?: boolean;
+    /** Last confirmed arrival, distinct from a selected destination or preview. */
+    arrivedWorld?: number;
 }
 export interface WorldMapHudPoint {
     /** Scene-relative CSS pixels at the foot of the sign. */
@@ -125,6 +130,17 @@ function lock(ctx: CanvasRenderingContext2D, x: number, y: number): void {
     ctx.fillRect(x + 1, y, 3, 1); ctx.fillRect(x, y + 1, 1, 3); ctx.fillRect(x + 4, y + 1, 1, 3);
     ctx.fillRect(x, y + 3, 5, 4); ctx.fillStyle = ART.ink; ctx.fillRect(x + 2, y + 4, 1, 2);
 }
+function islandSign(canvas: HTMLCanvasElement, text: string, selected: boolean, open: boolean): void {
+    canvas.style.transform = '';
+    const ctx = context(canvas, 128, 44);
+    if (!ctx) return;
+    ctx.fillStyle = ART.soilDark; ctx.fillRect(20, 25, 4, 19); ctx.fillRect(104, 25, 4, 19);
+    ctx.fillStyle = ART.soilLight; ctx.fillRect(21, 26, 1, 17); ctx.fillRect(105, 26, 1, 17);
+    ctx.fillStyle = ART.soilDark; ctx.fillRect(4, 9, 120, 25);
+    ctx.fillStyle = open ? ART.paper : ART.rockLight; ctx.fillRect(7, 11, 114, 21);
+    if (selected) { ctx.fillStyle = ART.gold; ctx.fillRect(7, 11, 3, 21); pixelText(ctx, '↓', 64, 0, ART.gold, 1, 'center'); }
+    pixelText(ctx, text, 64, 15, ART.ink, 2, 'center');
+}
 function stageSign(canvas: HTMLCanvasElement, id: string, selected: boolean, completed: boolean, open: boolean): void {
     canvas.style.transform = '';
     const ctx = context(canvas, 28, 29);
@@ -162,6 +178,7 @@ export class WorldMapHud {
     readonly tools = element('div', 'world-map-tools');
     readonly footer = element('footer', 'world-map-footer');
     readonly stageButtons: HTMLButtonElement[] = [];
+    readonly overviewButtons: HTMLButtonElement[] = [];
     /** Legacy destination order: Costa, Porto. Both are ferry actions. */
     readonly dockButtons: HTMLButtonElement[] = [];
     readonly travelButtons = {} as Record<WorldMapTravelActionId, HTMLButtonElement>;
@@ -182,6 +199,7 @@ export class WorldMapHud {
     private readonly warning = element('p', 'world-map-warning');
     private readonly announcer = element('p', 'world-map-sr');
     private readonly stageCanvases: HTMLCanvasElement[] = [];
+    private readonly overviewCanvases: HTMLCanvasElement[] = [];
     private readonly travelCanvases = {} as Record<WorldMapTravelActionId, HTMLCanvasElement>;
     private readonly regionButtons: HTMLButtonElement[] = [];
     private readonly regionStates: HTMLSpanElement[] = [];
@@ -200,9 +218,11 @@ export class WorldMapHud {
     private factorySignsRequested = false;
     private factoryLeftSignAtlas: MapFactorySignAtlas | null = null;
     private factoryLeftSignsRequested = false;
+    private islandSignAtlas: MapIslandSignAtlas | null = null;
+    private islandSignsRequested = false;
     private disposed = false;
 
-    constructor(callbacks: WorldMapHudCallbacks) {
+    constructor(private readonly callbacks: WorldMapHudCallbacks) {
         const id = ++instanceId;
         this.root.hidden = true; this.root.tabIndex = -1;
         this.root.setAttribute('aria-label', 'Mapa do arquipélago');
@@ -222,6 +242,16 @@ export class WorldMapHud {
         const menu = action('world-map-tool world-map-menu', 'II', () => this.run(() => callbacks.menu()));
         menu.setAttribute('aria-label', 'Menu do jogo'); menu.title = 'Menu do jogo';
         this.tools.append(this.regionButton, this.overviewButton, menu); this.header.append(this.title, this.tools);
+        for (const island of ISLANDS) {
+            const button = element('button', 'world-map-island'); button.type = 'button';
+            button.setAttribute('data-island-world', String(island.id));
+            const canvas = bitmap(button); accessibleText(button, island.name);
+            button.addEventListener('click', () => this.run(() => {
+                if (callbacks.selectOverviewWorld) callbacks.selectOverviewWorld(island.id); else callbacks.selectWorld(island.id);
+            }));
+            button.hidden = true;
+            this.overviewButtons.push(button); this.overviewCanvases.push(canvas); this.nodeLayer.append(button);
+        }
         for (let n = 0; n < 5; n++) {
             const button = element('button', 'world-map-node'); button.type = 'button';
             const canvas = bitmap(button); accessibleText(button, `Fase ${n + 1}`);
@@ -291,6 +321,7 @@ export class WorldMapHud {
         if (!visible) this.closeRegionMenu();
         else {
             this.loadSignArt();
+            if (this.state?.overview) this.loadIslandSignArt();
             if (this.state?.world === 3 || this.hasWideTravel('right')) this.loadFactorySignArt();
             if (this.state?.world === 4 || this.hasWideTravel('left')) this.loadFactoryLeftSignArt();
         }
@@ -298,6 +329,16 @@ export class WorldMapHud {
     private hasWideTravel(direction: 'left' | 'right'): boolean {
         return WORLD_MAP_TRAVEL_ACTION_IDS.some(id => WORLD_MAP_TRAVEL_ACTIONS[id].wide &&
             WORLD_MAP_TRAVEL_ACTIONS[id].direction === direction && !this.travelButtons[id].hidden);
+    }
+    private loadIslandSignArt(): void {
+        if (this.islandSignsRequested || this.root.hidden || this.disposed) return;
+        this.islandSignsRequested = true;
+        const prefix = mapAssetPrefix((import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/');
+        void loadMapIslandSignAtlas(prefix, this.assetAbort.signal).then(atlas => {
+            if (!atlas || this.disposed) return;
+            this.islandSignAtlas = atlas;
+            if (this.state) this.paintOverview(this.state);
+        });
     }
     private loadSignArt(): void {
         if (this.signsRequested) return;
@@ -342,6 +383,7 @@ export class WorldMapHud {
     update(state: WorldMapHudState): void {
         if (this.disposed) return;
         this.state = state;
+        if (state.overview) this.loadIslandSignArt();
         if (state.world === 3) this.loadFactorySignArt();
         if (state.world === 4) this.loadFactoryLeftSignArt();
         const signature = JSON.stringify(state);
@@ -353,8 +395,9 @@ export class WorldMapHud {
         const traveling = state.motionState !== 'idle';
         const canEnter = state.canEnter && open && !state.preview && !traveling;
         const title = `${stage.id} ${stage.name}`;
-        this.titleText.textContent = island.name;
-        lettering(this.titleBitmap, island.name, ART.goldLight, 165);
+        const changingRegion = traveling && !state.preview && state.arrivedWorld !== undefined && state.arrivedWorld !== state.world;
+        this.titleText.textContent = changingRegion ? `Rumo a ${island.name}` : island.name;
+        lettering(this.titleBitmap, changingRegion ? `Rumo a ${REGION_NAMES[state.world - 1]}` : island.name, ART.goldLight, 165);
         this.stageTitleText.textContent = title;
         phaseLettering(this.stageTitleBitmap, title);
         this.stageTitle.title = title;
@@ -377,6 +420,7 @@ export class WorldMapHud {
         this.overviewButton.setAttribute('aria-label', state.overview ? 'Aproximar mapa' : 'Ver panorama');
         this.root.setAttribute('data-motion', state.motionState);
         this.root.classList.toggle('is-preview', !!state.preview);
+        this.nodeLayer.setAttribute('aria-label', state.overview ? 'Ilhas do arquipélago' : 'Fases e transportes do mapa');
         this.globalProgress.textContent = `${state.globalProgress.completed}/30 fases · ${state.globalProgress.seals}/72 selos`;
         const warnings = state.warnings?.filter(Boolean).join(' ') ?? '';
         this.warning.textContent = warnings; this.warning.hidden = !warnings;
@@ -397,6 +441,7 @@ export class WorldMapHud {
             button.classList.toggle('is-current', current);
             this.regionStates[n].textContent = current ? state.preview ? 'Prévia' : 'No mapa' : available ? 'Visitar →' : 'Bloqueada';
         });
+        this.paintOverview(state);
         for (const id of WORLD_MAP_TRAVEL_ACTION_IDS) this.updateTravel(id, !!state.worldAvailability[WORLD_MAP_TRAVEL_ACTIONS[id].toWorld - 1]);
         const announcement = `${title}. ${this.status.textContent}. ${this.stageDetails.textContent}.`;
         if (announcement !== this.announcement) { this.announcement = announcement; this.announcer.textContent = announcement; }
@@ -405,6 +450,19 @@ export class WorldMapHud {
         const entry = STAGES[(state.world - 1) * 5 + index], selected = entry.id === STAGES[state.stage].id;
         if (!paintPhysicalStageSign(this.stageCanvases[index], this.signAtlas, entry.id, selected, !!state.completed[index], !!state.open[index]))
             stageSign(this.stageCanvases[index], entry.id, selected, !!state.completed[index], !!state.open[index]);
+    }
+    private paintOverview(state: WorldMapHudState): void {
+        this.overviewButtons.forEach((button, index) => {
+            const selected = state.world === index + 1, open = !!state.worldAvailability[index];
+            const label = `${index + 1} ${REGION_NAMES[index]}`;
+            if (!paintPhysicalIslandSign(this.overviewCanvases[index], this.islandSignAtlas, label, selected, open))
+                islandSign(this.overviewCanvases[index], label, selected, open);
+            button.classList.toggle('is-selected', selected); button.classList.toggle('is-locked', !open);
+            button.setAttribute('aria-pressed', String(selected));
+            button.setAttribute('aria-label', `Ilha ${index + 1}: ${ISLANDS[index].name}. ${open ? 'Disponível. Ver de perto.' : 'Bloqueada. Ver prévia de perto.'}`);
+            button.title = `${ISLANDS[index].name} · ${open ? 'ver ilha' : 'ver prévia'}`;
+            if (!state.overview) button.hidden = true;
+        });
     }
 
     private position(button: HTMLButtonElement, point: WorldMapHudPoint | null | undefined): void {
@@ -418,6 +476,9 @@ export class WorldMapHud {
             const point = docks[n]; this.position(this.travelButtons[id], point);
             if (point?.available !== undefined && this.state) this.updateTravel(id, point.available);
         });
+    }
+    positionOverviewWorlds(points: readonly (WorldMapHudPoint | null)[]): void {
+        this.overviewButtons.forEach((button, index) => this.position(button, this.state?.overview ? points[index] : null));
     }
     /** Authored departure anchors only. Omitted actions hide; availability belongs to each route. */
     positionTravelActions(points: Readonly<Partial<Record<WorldMapTravelActionId, WorldMapHudPoint | null>>>): void {
@@ -462,9 +523,24 @@ export class WorldMapHud {
         this.regionButtons[(this.state?.world ?? 1) - 1]?.focus({ preventScroll: true });
     }
     private readonly onKey = (event: KeyboardEvent) => {
-        // Only consume drawer commands. Scene movement and Enter remain game-owned.
-        if (this.regionMenu.hidden || event.key !== 'Escape') return;
-        event.preventDefault(); event.stopPropagation(); this.closeRegionMenu(true);
+        if (!this.regionMenu.hidden) {
+            if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); this.closeRegionMenu(true); }
+            return;
+        }
+        if (!this.state?.overview || this.root.hidden || this.disposed || event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
+        if (event.key === 'Escape') {
+            event.preventDefault(); event.stopPropagation(); this.run(() => this.callbacks.overview()); return;
+        }
+        if (this.state.motionState !== 'idle') return;
+        const key = event.key.toLowerCase(), direction = ['arrowright', 'arrowdown', 'd', 's'].includes(key) ? 1
+            : ['arrowleft', 'arrowup', 'a', 'w'].includes(key) ? -1 : 0;
+        if (direction) {
+            event.preventDefault(); event.stopPropagation();
+            const focused = this.overviewButtons.indexOf(event.target as HTMLButtonElement), current = focused < 0 ? this.state.world - 1 : focused;
+            this.overviewButtons[Math.max(0, Math.min(5, current + direction))]?.focus({ preventScroll: true });
+        } else if ((event.key === 'Enter' || event.key === ' ') && event.target === this.root) {
+            event.preventDefault(); event.stopPropagation(); this.overviewButtons[this.state.world - 1]?.click();
+        }
     };
     dispose(): void {
         this.disposed = true; this.root.hidden = true; this.assetAbort.abort();

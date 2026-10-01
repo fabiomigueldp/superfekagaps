@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { PLAYER_PALETTE, PLAYER_SPRITES } from '../src/assets/playerSpriteSpec';
-import { fallbackMapMetadata, paintWorldMap } from '../src/adventure/WorldMapArt';
-import { COAST_PORT_PLACEMENTS, localToAtlas } from '../src/adventure/WorldAtlasModel';
+import { fallbackMapMetadata, paintMapIsland, paintMapSea, paintWorldMap, parseMapMetadata } from '../src/adventure/WorldMapArt';
+import { atlasIslandCamera, COAST_PORT_PLACEMENTS, getAtlasCamera, localToAtlas } from '../src/adventure/WorldAtlasModel';
 import { atlasActorScale, atlasBoatBounds, paintWorldAtlas, type AtlasPaintState, type BoatAtlasFrame } from '../src/adventure/WorldAtlasArt';
-import { mapToScreen } from '../src/adventure/WorldMapModel';
+import { mapToScreen, screenToMap, type MapCamera } from '../src/adventure/WorldMapModel';
 import { atlasCableBounds, paintCableLines, validCableFrame, type AtlasCableCar, type CableAtlasFrame } from '../src/adventure/WorldCableArt';
 
 interface Call { name: string; args: unknown[]; color?: unknown }
@@ -48,6 +49,77 @@ test('connected painter clears and paints sea once, then both fixed island layer
         const bottom = mapToScreen(localToAtlas({ x: 1, y: 1 }, layer.placement), camera);
         assert.deepEqual(draw.args.slice(1), [top.x, top.y, bottom.x - top.x, bottom.y - top.y]);
     }
+});
+
+const authoredLayers = ['costa', 'porto', 'fabrica', 'serra', 'reserva', 'dominio'].map((name, index) => ({
+    world: index + 1, metadata: parseMapMetadata(JSON.parse(readFileSync(new URL(
+        `../public/assets/world/map/${name}-diorama.meta.json`, import.meta.url), 'utf8')), index + 1)!,
+    placement: COAST_PORT_PLACEMENTS[index + 1], completed: [`${index + 1}-1`], secret: true,
+    assets: { island: image(name), shadow: null, port: null },
+}));
+
+/** Reference the unchanged island painter so edge checks compare the complete
+ * terrain/route/badge commands, including their exact coordinates and colors. */
+function unculledTerrain(state: AtlasPaintState): Call[] {
+    const recorded = recordingContext();
+    paintMapSea(recorded.context, state.camera, state.time, state.reducedMotion);
+    for (const island of state.islands) paintMapIsland(recorded.context, { ...island,
+        assets: { ...island.assets, shadow: null }, camera: atlasIslandCamera(state.camera, island.placement),
+        time: state.time, reducedMotion: state.reducedMotion });
+    paintCableLines(recorded.context, state.camera, []);
+    return recorded.calls;
+}
+
+test('partial terrain and offscreen route effects retain the exact unculled commands at every viewport edge', () => {
+    for (const [width, height, zoom] of [[320, 740, .55], [800, 500, 1], [1200, 750, 1.3]]) {
+        const camera: MapCamera = { width, height, zoom, center: { x: .5, y: .5 } };
+        const span = Math.min(width / 1.6, height) * zoom;
+        // A subpixel overlap, the secret marker radius and the outer glow gutter
+        // must all survive. Coordinates here are CSS pixels, independent of zoom.
+        for (const distance of [-.25, 9, 23.5]) for (const edge of ['left', 'right', 'top', 'bottom']) {
+            const x = edge === 'left' ? -span * 1.6 - distance : edge === 'right' ? width + distance : width / 2 - span * .8;
+            const y = edge === 'top' ? -span - distance : edge === 'bottom' ? height + distance : height / 2 - span / 2;
+            const island = { ...authoredLayers[0], placement: { origin: screenToMap({ x, y }, camera), scale: 1 } };
+            const state: AtlasPaintState = { camera, time: 3210, reducedMotion: true, islands: [island],
+                actor: { point: { x: 0, y: 0 }, walking: false, facingLeft: false, aboard: false, visible: false } };
+            const recorded = recordingContext(); paintWorldAtlas(recorded.context, state);
+            assert.deepEqual(recorded.calls, unculledTerrain(state), `${edge} at ${distance}px, ${width}×${height}`);
+        }
+    }
+});
+
+test('six loaded regions skip only completely offscreen terrain; retained regions keep identical painter commands', () => {
+    const camera = getAtlasCamera({ mode: 'island', activeWorld: 1, layers: authoredLayers,
+        width: 390, height: 740, insets: { top: 104, bottom: 144, left: 16, right: 16 } });
+    const state: AtlasPaintState = { camera, time: 4000, reducedMotion: true, islands: authoredLayers,
+        actor: { point: { x: 0, y: 0 }, walking: false, facingLeft: false, aboard: false, visible: false } };
+    const baseline = unculledTerrain(state), recorded = recordingContext();
+    paintWorldAtlas(recorded.context, state);
+    assert.equal(baseline.filter(call => call.name === 'drawImage').length, 6);
+    assert.deepEqual(recorded.calls, unculledTerrain({ ...state, islands: [authoredLayers[0]] }));
+    assert.equal(recorded.calls.filter(call => call.name === 'drawImage').length, 1);
+    assert.ok(baseline.filter(call => call.name === 'lineTo').length > recorded.calls.filter(call => call.name === 'lineTo').length,
+        'Offscreen routes stop submitting path segments as well as bitmap draws.');
+    assert.ok(baseline.length - recorded.calls.length >= 200, 'The actual six-region scene avoids substantial Canvas work.');
+    const overview = { ...state, camera: getAtlasCamera({ mode: 'overview', activeWorld: 1, layers: authoredLayers,
+        width: 390, height: 740, insets: { top: 104, bottom: 144, left: 16, right: 16 } }) };
+    const panorama = recordingContext(); paintWorldAtlas(panorama.context, overview);
+    assert.deepEqual(panorama.calls, unculledTerrain(overview), 'The full panorama retains every region and its exact drawing order.');
+});
+
+test('offscreen terrain does not suppress its visible dock, an independent connection, or procedural fallback', () => {
+    const state = scene(false), terrain = { ...authoredLayers[0], placement: { origin: { x: 5, y: 5 }, scale: 1 },
+        overlay: { image: image('offscreen-island-visible-dock'), left: -4.5, top: -4.5, widthInMap: .1, heightInMap: .1 } };
+    state.islands = [terrain];
+    state.connections = [{ image: image('visible-connection'), left: .5, top: .5, widthInMap: .2, heightInMap: .1 }];
+    const recorded = recordingContext(); paintWorldAtlas(recorded.context, state);
+    assert.ok(!recorded.calls.some(call => call.name === 'drawImage' && call.args[0] === terrain.assets.island));
+    for (const source of [terrain.overlay.image, state.connections[0].image])
+        assert.ok(recorded.calls.some(call => call.name === 'drawImage' && call.args[0] === source));
+    const fallback = { ...state, islands: [{ ...terrain, overlay: undefined, assets: { island: null, shadow: null, port: null } }],
+        connections: [], boats: [], actor: { ...state.actor, visible: false } };
+    const procedural = recordingContext(); paintWorldAtlas(procedural.context, fallback);
+    assert.deepEqual(procedural.calls, unculledTerrain(fallback), 'Fallback extent is not inferred from an absent bitmap.');
 });
 
 test('connected atlas omits clipped legacy shadows without changing cached assets or the legacy painter', () => {

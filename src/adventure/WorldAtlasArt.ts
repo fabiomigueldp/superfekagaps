@@ -104,6 +104,17 @@ function paintBoatLayer(c: CanvasRenderingContext2D, camera: MapCamera, boat: At
     c.restore();
 }
 
+// paintMapIsland's validated routes stay inside the full local [0, 1] bitmap.
+// Its largest outside effects are the 10px secret badge and the 3.5px secret
+// stroke with shadowBlur 7. Reserve three blur radii plus half the stroke and
+// one filtering pixel; using alpha/art bounds would crop routes near the edge.
+const ISLAND_PAINT_GUTTER = Math.ceil(Math.max(10, 3.5 / 2 + 3 * 7) + 1);
+function islandOutsideViewport(camera: MapCamera): boolean {
+    const top = mapToScreen({ x: 0, y: 0 }, camera), bottom = mapToScreen({ x: 1, y: 1 }, camera);
+    return bottom.x < -ISLAND_PAINT_GUTTER || top.x > camera.width + ISLAND_PAINT_GUTTER ||
+        bottom.y < -ISLAND_PAINT_GUTTER || top.y > camera.height + ISLAND_PAINT_GUTTER;
+}
+
 /** One pure scene pass: sea → both fixed islands/routes → boat/Feka layers.
  * No events, DOM, image loading, canvas allocation or animation clock lives here.
  * The legacy distant-Porto decoration is intentionally absent from this scene.
@@ -111,7 +122,10 @@ function paintBoatLayer(c: CanvasRenderingContext2D, camera: MapCamera, boat: At
 export function paintWorldAtlas(c: CanvasRenderingContext2D, state: AtlasPaintState): void {
     paintMapSea(c, state.camera, state.time, state.reducedMotion);
     for (const island of state.islands) {
-        paintMapIsland(c, { ...island, camera: atlasIslandCamera(state.camera, island.placement),
+        const camera = atlasIslandCamera(state.camera, island.placement);
+        // Fallback procedural scenery has different extents. Dock overlays may
+        // reach into view even when this bitmap and all its routes are outside.
+        if (!island.assets.island || !islandOutsideViewport(camera)) paintMapIsland(c, { ...island, camera,
             // The old Costa shadow is cropped at its image's right/bottom edges.
             // A continuous sea exposes that rectangle; keep only the terrain's
             // baked contact shading here, without changing the legacy painter.

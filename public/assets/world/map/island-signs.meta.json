@@ -1,0 +1,123 @@
+{
+  "version": 1,
+  "coordinateSystem": "sourceRect is physical atlas pixels; displaySize, foot, letterCenter, usableFace and decorativeTranslateY are CSS pixels. Glyph cells are integer2CSSpx.",
+  "atlas": {
+    "image": "island-signs.webp",
+    "width": 768,
+    "height": 88,
+    "bytes": 14464
+  },
+  "frames": [
+    {
+      "kind": "island",
+      "cssWidth": 128,
+      "cssHeight": 44,
+      "foot": {
+        "x": 64.0,
+        "y": 41.018
+      },
+      "letterCenter": {
+        "x": 64.0,
+        "y": 22.0
+      },
+      "usableFace": {
+        "x": 10,
+        "y": 10,
+        "width": 108,
+        "height": 20
+      },
+      "letterPixelScale": 2,
+      "palette": {
+        "letters": "#191f35",
+        "closedLetters": "#191f35",
+        "selected": "#e9ad4c"
+      },
+      "dpr": 2,
+      "sourceRect": {
+        "x": 0,
+        "y": 0,
+        "width": 256,
+        "height": 88
+      },
+      "displaySize": {
+        "width": 128,
+        "height": 44
+      },
+      "decorativeTranslateY": 2.982
+    },
+    {
+      "kind": "island-selected",
+      "cssWidth": 128,
+      "cssHeight": 44,
+      "foot": {
+        "x": 64.0,
+        "y": 41.018
+      },
+      "letterCenter": {
+        "x": 64.0,
+        "y": 22.0
+      },
+      "usableFace": {
+        "x": 10,
+        "y": 10,
+        "width": 108,
+        "height": 20
+      },
+      "letterPixelScale": 2,
+      "palette": {
+        "letters": "#191f35",
+        "closedLetters": "#191f35",
+        "selected": "#e9ad4c"
+      },
+      "dpr": 2,
+      "sourceRect": {
+        "x": 256,
+        "y": 0,
+        "width": 256,
+        "height": 88
+      },
+      "displaySize": {
+        "width": 128,
+        "height": 44
+      },
+      "decorativeTranslateY": 2.982
+    },
+    {
+      "kind": "island-locked",
+      "cssWidth": 128,
+      "cssHeight": 44,
+      "foot": {
+        "x": 64.0,
+        "y": 41.018
+      },
+      "letterCenter": {
+        "x": 64.0,
+        "y": 22.0
+      },
+      "usableFace": {
+        "x": 10,
+        "y": 10,
+        "width": 108,
+        "height": 20
+      },
+      "letterPixelScale": 2,
+      "palette": {
+        "letters": "#191f35",
+        "closedLetters": "#191f35",
+        "selected": "#e9ad4c"
+      },
+      "dpr": 2,
+      "sourceRect": {
+        "x": 512,
+        "y": 0,
+        "width": 256,
+        "height": 88
+      },
+      "displaySize": {
+        "width": 128,
+        "height": 44
+      },
+      "decorativeTranslateY": 2.982
+    }
+  ]
+}

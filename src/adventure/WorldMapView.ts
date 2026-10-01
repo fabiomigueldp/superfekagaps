@@ -5,7 +5,7 @@ import { clampMapSelection, getMapCamera, mapToScreen, moveMapSelection, type Ma
 import { COSTA_ART_BOUNDS, fallbackMapMetadata, frameMapPins, mapActorScale, mapAssetPrefix, paintMapActor, paintMapIsland, paintMapSea, parseMapMetadata, type MapArtAssets, type MapArtMetadata } from './WorldMapArt';
 import { WorldMapHud, WORLD_MAP_TRAVEL_ACTIONS, WORLD_MAP_TRAVEL_ACTION_IDS,
     type WorldMapMotionState, type WorldMapHudPoint, type WorldMapTravelActionId } from './WorldMapHud';
-import { WORLD_ATLAS_PLACEMENTS, getAtlasCamera, atlasTravelWindow, localToAtlas, type AtlasBounds } from './WorldAtlasModel';
+import { WORLD_ATLAS_PLACEMENTS, getAtlasCamera, atlasTravelWindow, atlasIslandBounds, localToAtlas, type AtlasBounds } from './WorldAtlasModel';
 import { atlasActorScale, atlasBoatBounds, paintWorldAtlas, type AtlasBoat, type AtlasIslandLayer } from './WorldAtlasArt';
 import { buildJourneyNetwork, parseJourneyBoat, parseJourneyConnection, parseJourneyBridge, PORT_FACTORY_BRIDGE_EDGE,
     type JourneyBoatMetadata, type JourneyConnection, type JourneyBridge } from './WorldJourneyNetwork';
@@ -210,6 +210,12 @@ export class WorldMapView {
         this.hud = new WorldMapHud({
             selectStage: index => this.act(() => this.select(index)),
             selectWorld: world => this.act(() => this.select((world - 1) * 5)),
+            selectOverviewWorld: world => this.act(() => {
+                const selection = world === worldOf(STAGES[this.controlSelection].id) ? this.controlSelection
+                    : this.journey && world === worldOf(this.journey.arrived) ? indexOf(this.journey.arrived) : (world - 1) * 5;
+                this.overview = false; this.paintDirty = true; this.select(selection);
+                this.root.focus({ preventScroll: true });
+            }),
             selectTravel: id => this.act(() => {
                 const action = WORLD_MAP_TRAVEL_ACTIONS[id];
                 this.select(action.toStage ? indexOf(action.toStage) : (action.toWorld - 1) * 5);
@@ -596,7 +602,7 @@ export class WorldMapView {
     private refreshHud(warning = '', toast = ''): void {
         if (!this.save || !this.journey) return;
         const stage = STAGES[this.controlSelection], world = stage.world;
-        this.hud.update({ world, stage: this.controlSelection,
+        this.hud.update({ world, stage: this.controlSelection, arrivedWorld: worldOf(this.journey.arrived),
             open: Array.from({ length: 5 }, (_, n) => isUnlocked(`${world}-${n + 1}`, this.save!)),
             completed: Array.from({ length: 5 }, (_, n) => this.save!.completed.includes(`${world}-${n + 1}`)),
             seals: Array.from({ length: 5 }, (_, n) => this.save!.seals.filter(id => id.startsWith(`${world}-${n + 1}:`)).length),
@@ -725,7 +731,7 @@ export class WorldMapView {
         }
     }
     private paintAtlas(world: number, save: AdventureSave, time: number, dt: number): void {
-        const ids = [1, 2, ...([3, 4, 5, 6].filter(id => world === id || !!this.activeArt.get(id)?.assets.island))];
+        const ids = [1, 2, ...([3, 4, 5, 6].filter(id => this.overview || world === id || !!this.activeArt.get(id)?.assets.island))];
         const islands: AtlasIslandLayer[] = ids.map(id => ({ world: id, metadata: this.activeArt.get(id)!.metadata,
             placement: placementFor(id), assets: this.activeArt.get(id)!.assets, completed: save.completed, secret: save.secrets.includes(`${id}-3`),
             ...(this.connectionActive && this.connection && (id === 1 || id === 2)
@@ -843,6 +849,22 @@ export class WorldMapView {
         this.positionNodes(world, false);
     }
     private positionNodes(world: number, hide: boolean, boats: readonly AtlasBoat[] = [], cableCars: readonly AtlasCableCar[] = []): void {
+        if (this.overview) {
+            this.hud.positionNodes([]); this.hud.positionTravelActions({});
+            if (this.journey?.destination) { this.hud.positionOverviewWorlds([]); return; }
+            const names = Array.from({ length: 6 }, (_, index) => {
+                const id = index + 1, metadata = this.activeArt.get(id)!.metadata;
+                // Island identity follows the terrain, never an outboard dock
+                // or a neighboring destination. No leader can resemble a route.
+                const bounds = atlasIslandBounds({ world: id, metadata, placement: placementFor(id) });
+                const point = mapToScreen({ x: (bounds.left + bounds.right) / 2, y: bounds.bottom }, this.camera);
+                return { x: point.x, y: point.y + 32, width: 128, height: 44 };
+            });
+            this.hud.positionOverviewWorlds(layoutMapControls(names,
+                { left: 8, right: this.width - 8, top: this.frameInsets.top + 2, bottom: this.height - this.frameInsets.bottom - 2 }, 8));
+            return;
+        }
+        this.hud.positionOverviewWorlds([]);
         const anchors: MapPoint[] = [];
         const stages = Array.from({ length: 5 }, (_, n) => {
             if (hide) return null;
@@ -858,7 +880,7 @@ export class WorldMapView {
             travel[id] = null;
             if (hide || this.journey?.destination || !inAtlas(world)) continue;
             const action = WORLD_MAP_TRAVEL_ACTIONS[id], departure = action.fromWorld;
-            if (!this.overview && departure !== world) continue;
+            if (departure !== world) continue;
             const anchor = action.mode === 'ferry' && this.connectionActive && this.connection && (departure === 1 || departure === 2)
                 ? this.connection.docks[departure].dock
                 : action.mode === 'ferry' && this.dominioActive && this.dominioConnection && (departure === 5 || departure === 6)
@@ -875,30 +897,14 @@ export class WorldMapView {
                 available: !!this.save && isUnlocked(action.toStage ?? `${action.toWorld}-1`, this.save) &&
                     (!action.requiresStage || isUnlocked(action.requiresStage, this.save)) };
         }
-        let visible = [...stages.map((point, n) => point ? { id: `stage:${world}-${n + 1}`, point, anchor: anchors[n], width: 56, height: 58 } : null),
+        const visible = [...stages.map((point, n) => point ? { id: `stage:${world}-${n + 1}`, point, anchor: anchors[n], width: 56, height: 58 } : null),
             ...WORLD_MAP_TRAVEL_ACTION_IDS.map(id => {
                 const point = travel[id], { width, height } = WORLD_MAP_TRAVEL_ACTIONS[id];
                 return point?.visible ? { id, point, anchor: { x: point.x, y: point.y }, width, height } : null;
             })].filter((entry): entry is NonNullable<typeof entry> => !!entry);
         const controlBounds = { left: 8, right: this.width - 8, top: this.frameInsets.top + 2, bottom: this.height - this.frameInsets.bottom - 2 };
-        const arrange = () => layoutMapControls(visible.map(({ point, width, height }) => ({ ...point, width, height })),
+        const positions = layoutMapControls(visible.map(({ point, width, height }) => ({ ...point, width, height })),
             controlBounds, 8, this.media.matches ? [] : visible.map(entry => this.controlOffsets.get(entry.id)));
-        let positions = arrange();
-        if (this.overview && positions.some(point => {
-            const rect = controlRect(point);
-            return rect.left < controlBounds.left || rect.right > controlBounds.right || rect.top < controlBounds.top || rect.bottom > controlBounds.bottom;
-        })) {
-            // A compact panorama cannot hold every region's full-size signs.
-            // Keep the selected island's stages and departures readable; the
-            // archipelago drawer still provides every region as a native action.
-            visible = visible.filter(entry => {
-                if (entry.id.startsWith('stage:')) return true;
-                const id = entry.id as WorldMapTravelActionId;
-                if (WORLD_MAP_TRAVEL_ACTIONS[id].fromWorld === world) return true;
-                travel[id] = null; return false;
-            });
-            positions = arrange();
-        }
         const actor = mapToScreen(this.marker, this.camera), scale = inAtlas(world) ? atlasActorScale(this.camera) : mapActorScale(this.camera);
         const obstacles = [{ left: actor.x - 10 * scale - 2, right: actor.x + 10 * scale + 2, top: actor.y - 28 * scale - 2, bottom: actor.y + 3 }];
         for (const bounds of [...boats.map(boat => atlasBoatBounds(boat.foot, boat.frame)), ...cableCars.map(atlasCableBounds)]) {

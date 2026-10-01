@@ -6,6 +6,7 @@ import { freshSave, ProgressStore, SAVE_KEY } from '../src/adventure/progress';
 import { WorldGame } from '../src/adventure/WorldGame';
 import { COSTA_ART_BOUNDS, FALLBACK_POINTS, fallbackMapMetadata, parseMapMetadata } from '../src/adventure/WorldMapArt';
 import { WorldMapView } from '../src/adventure/WorldMapView';
+import { WORLD_MAP_TRAVEL_ACTIONS } from '../src/adventure/WorldMapHud';
 import { mapToScreen, type MapPoint } from '../src/adventure/WorldMapModel';
 import { Input } from '../src/engine/Input';
 
@@ -269,6 +270,17 @@ test('metadata is world-specific and accepts only finite normalized silhouette b
 
 const openSave = (selected = '1-1') => ({ ...freshSave(), selected, completed: STAGES.map(stage => stage.id) });
 const currentArt = (h: ReturnType<typeof mapDOM>, world: number) => h.internal.activeArt.get(world);
+function nativeControlEntries(h: ReturnType<typeof mapDOM>): Array<{ button: Button; width: number; height: number }> {
+    if (h.internal.overview) {
+        assert.ok(h.internal.hud.stageButtons.every((button: Button) => button.hidden));
+        assert.ok(Object.values(h.internal.hud.travelButtons).every((button: any) => button.hidden));
+        assert.equal(h.internal.hud.overviewButtons.filter((button: Button) => !button.hidden).length, 6);
+        return h.internal.hud.overviewButtons.map((button: Button) => ({ button, width: 128, height: 44 }));
+    }
+    return [...h.internal.hud.stageButtons.map((button: Button) => ({ button, width: 56, height: 58 })),
+        ...Object.entries(h.internal.hud.travelButtons).map(([id, button]) => ({ button: button as Button,
+            width: WORLD_MAP_TRAVEL_ACTIONS[id as keyof typeof WORLD_MAP_TRAVEL_ACTIONS].width, height: 56 }))];
+}
 function tick(h: ReturnType<typeof mapDOM>, selected: number, save: ReturnType<typeof freshSave>, from: number, duration: number) {
     for (let time = from + 50; time <= from + duration; time += 50) h.view.render(selected, save, time, '');
 }
@@ -706,6 +718,62 @@ async function readyDominio(h: ReturnType<typeof mapDOM>, save = openSave('5-5')
     h.view.render(STAGES.findIndex(stage => stage.id === save.selected), save, 96, '');
 }
 
+test('all six owned overview labels select their own region and open its close view without entering', async t => {
+    const h = mapDOM(t, true), save = openSave('4-3'); await readyDominio(h, save);
+    let time = 100;
+    h.get('world-map-overview').click(); h.view.render(17, save, time, '');
+    h.internal.hud.overviewButtons[3].click();
+    assert.equal(h.internal.overview, false); assert.equal(h.internal.controlSelection, 17);
+    assert.equal(h.internal.journey.arrived, '4-3', 'Opening the focused island preserves its selected phase.');
+    const names = ['Costa dos Gaps', 'Porto do Bielzão', 'Fábrica de Suco', 'Serra Suspensa', 'Reserva Gelada', 'Domínio Pizzarino'];
+    for (let world = 1; world <= 6; world++) {
+        h.get('world-map-overview').click(); h.view.render(h.internal.controlSelection, save, time += 100, '');
+        nativeControlEntries(h);
+        h.internal.hud.overviewButtons.forEach((button: Button, index: number) => {
+            assert.equal(button.getAttribute('data-island-world'), String(index + 1));
+            assert.ok(button.getAttribute('aria-label')!.includes(`Ilha ${index + 1}: ${names[index]}.`));
+        });
+        h.internal.hud.overviewButtons[world - 1].click();
+        assert.equal(h.internal.overview, false); assert.equal(h.internal.controlSelection, (world - 1) * 5);
+        assert.equal(h.internal.journey.arrived, `${world}-1`);
+        assert.equal(h.events.entered, 0);
+    }
+});
+
+test('owned island previews preserve Feka and restore the actual arrival when returning to its island', async t => {
+    const h = mapDOM(t), save = { ...freshSave(), selected: '1-5', completed: ['1-1', '1-2', '1-3', '1-4'] };
+    await readyDominio(h, save); const origin = { ...h.internal.marker };
+    h.get('world-map-overview').click(); h.view.render(4, save, 100, '');
+    h.internal.hud.overviewButtons[5].click();
+    assert.equal(h.internal.overview, false); assert.equal(h.internal.journey.selected, '6-1');
+    assert.equal(h.internal.journey.arrived, '1-5'); assert.deepEqual(h.internal.marker, origin);
+    assert.deepEqual(h.events.arrived, []); assert.equal(h.view.enterSelected(25), false);
+    h.get('world-map-overview').click(); h.view.render(25, save, 200, '');
+    h.internal.hud.overviewButtons[0].click();
+    assert.equal(h.internal.controlSelection, 4); assert.equal(h.internal.journey.destination, null);
+    assert.equal(h.internal.journey.arrived, '1-5'); assert.equal(h.events.entered, 0);
+    h.internal.hud.enterButton.click(); assert.equal(h.events.entered, 1);
+});
+
+test('overview keyboard focus and native activation cannot leak into phase navigation or gameplay', async t => {
+    const h = mapDOM(t), save = openSave('4-3'); await readyDominio(h, save);
+    h.get('world-map-overview').click(); h.view.render(17, save, 100, '');
+    const event = h.root.dispatch('keydown', { key: 'ArrowRight' });
+    assert.equal(event.defaultPrevented, true); assert.equal(h.active, h.internal.hud.overviewButtons[4]);
+    assert.equal(h.internal.controlSelection, 17); assert.equal(h.internal.journey.destination, null);
+    const target = h.internal.hud.overviewButtons[4] as Button;
+    const activation = target.dispatch('keydown', { key: 'Enter' });
+    assert.equal(activation.defaultPrevented, false, 'Native button activation owns Enter.');
+    target.click();
+    assert.equal(h.internal.overview, false); assert.equal(h.internal.controlSelection, 20);
+    assert.equal(h.internal.journey.arrived, '4-3'); assert.equal(h.internal.journey.destination, '5-1');
+    assert.equal(h.events.entered, 0); h.internal.hud.skipButton.click(); h.view.render(20, save, 200, '');
+    h.get('world-map-overview').click(); h.view.render(20, save, 300, '');
+    h.root.dispatch('keydown', { key: 'Escape' });
+    assert.equal(h.internal.overview, false); assert.equal(h.events.exited, 0);
+    h.root.dispatch('keydown', { key: 'Escape' }); assert.equal(h.events.exited, 1);
+});
+
 test('heated ferry is gated by C2 and its return sign targets the real 5-5 terminal', async t => {
     const h = mapDOM(t), save = { ...openSave('5-5'), completed: STAGES.filter(stage => stage.world < 5 ||
         (stage.world === 5 && stage.id !== '5-5')).map(stage => stage.id) };
@@ -821,7 +889,6 @@ test('late heated dock readiness waits for a safe arrival without resetting the 
 test('the complete six-region route frames every occupied vehicle and keeps overview targets separate', async t => {
     const { atlasCableBounds } = await import('../src/adventure/WorldCableArt');
     const { atlasBoatBounds } = await import('../src/adventure/WorldAtlasArt');
-    const { WORLD_MAP_TRAVEL_ACTIONS } = await import('../src/adventure/WorldMapHud');
     for (const [width, height] of [[320, 568], [472, 303], [590, 378], [740, 320]]) await t.test(`${width}x${height}`, async child => {
         const h = mapDOM(child), save = { ...openSave('1-5'), secrets: ['1-3', '4-3', '5-3', '6-3'] }; await readyDominio(h, save);
         h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width, height };
@@ -850,9 +917,7 @@ test('the complete six-region route frames every occupied vehicle and keeps over
         assert.equal(h.internal.journey.arrived, '6-5'); assert.equal(h.events.entered, 0);
         assert.deepEqual([...vehicles].sort(), ['coast-port-sail', 'maintenance', 'passenger', 'reserva-dominio-sail']);
         h.get('world-map-overview').click(); tick(h, 29, save, time, 3000);
-        const entries = [...h.internal.hud.stageButtons.map((button: Button) => ({ button, width: 56, height: 58 })),
-            ...Object.entries(h.internal.hud.travelButtons).map(([id, button]) => ({ button: button as Button,
-                width: WORLD_MAP_TRAVEL_ACTIONS[id as keyof typeof WORLD_MAP_TRAVEL_ACTIONS].width, height: 56 }))];
+        const entries = nativeControlEntries(h);
         const boxes = entries.flatMap(({ button, width: wide, height: tall }) => {
             if (button.hidden) return [];
             const match = /^translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(button.style.transform)!;
@@ -1049,7 +1114,7 @@ test('locked Porto preview frames all five signs without dragging the camera tow
     h.internal.hud.dockButtons[1].click(); h.view.render(5, save, 1600, ''); tick(h, 5, save, 1600, 3000);
     assertVisibleRegion(2); assert.equal(h.internal.journey.arrived, '1-1'); assert.deepEqual(h.internal.marker, originalPoint);
     const origin = mapToScreen(originalPoint, h.internal.camera); assert.ok(origin.x < 0, 'Origin Feka may be offscreen while inspecting locked Porto.');
-    h.get('world-map-overview').click(); tick(h, 5, save, 4600, 3000); assertVisibleRegion(2);
+    h.get('world-map-overview').click(); tick(h, 5, save, 4600, 3000); nativeControlEntries(h);
     for (const world of [1, 2]) for (let n = 1; n <= 5; n++) {
         const node = mapToScreen(h.internal.network.nodes[`${world}-${n}`], h.internal.camera);
         assert.ok(node.x >= 0 && node.x <= h.internal.width && node.y >= 0 && node.y <= h.internal.height, 'Overview shows both unchanged regions.');
@@ -1070,12 +1135,11 @@ test('real DOM controls keep separate native targets at zoom200%, portrait and s
         h.get('world-map-footer').bounds = { x: 12, y: footerTop, left: 12, top: footerTop, width: Math.min(470, width - 24), height: height - footerTop - 8 };
         for (const world of [1, 2]) for (const overview of [false, true]) {
             h.internal.overview = overview; h.observers[0].callback(); h.view.render((world - 1) * 5, save, time += 100, '');
-            assert.equal(h.internal.hud.stageButtons.every((button: Button) => !button.hidden), true, 'All five phases remain inspectable after the camera settles.');
-            const buttons = [...h.internal.hud.stageButtons, ...h.internal.hud.dockButtons] as Button[];
-            const rectangles = buttons.flatMap((button, index) => {
+            assert.equal(h.internal.hud.stageButtons.every((button: Button) => !button.hidden), !overview, 'Close views show phases; overview shows owned island names.');
+            const rectangles = nativeControlEntries(h).flatMap(({ button, width: w, height: tall }) => {
                 if (button.hidden) return [];
                 const match = /^translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(button.style.transform)!;
-                const x = Number(match[1]), y = Number(match[2]), w = index < 5 ? 56 : 104, tall = index < 5 ? 58 : 56;
+                const x = Number(match[1]), y = Number(match[2]);
                 return [{ left: x - w / 2, right: x + w / 2, top: y - tall, bottom: y }];
             });
             rectangles.forEach((a, index) => {
@@ -1275,7 +1339,6 @@ test('a failed bridge never removes the working ferry or teleports Feka off an a
 });
 
 test('Factory and bridge views keep every native target separate in portrait and short landscape', async t => {
-    const { WORLD_MAP_TRAVEL_ACTIONS } = await import('../src/adventure/WorldMapHud');
     const h = mapDOM(t, true), save = openSave('3-1'); await readyConnectedFactory(h, save);
     for (const [width, height] of [[320, 568], [400, 606], [590, 378], [740, 320]]) {
         h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width, height };
@@ -1285,9 +1348,7 @@ test('Factory and bridge views keep every native target separate in portrait and
         h.observers[0].callback();
         for (const world of [2, 3]) for (const overview of [false, true]) {
             h.internal.overview = overview; h.view.render((world - 1) * 5, save, 100, '');
-            const entries = [...h.internal.hud.stageButtons.map((button: Button) => ({ button, width: 56, height: 58 })),
-                ...Object.entries(h.internal.hud.travelButtons).map(([id, button]) => ({ button: button as Button,
-                    width: WORLD_MAP_TRAVEL_ACTIONS[id as keyof typeof WORLD_MAP_TRAVEL_ACTIONS].width, height: 56 }))];
+            const entries = nativeControlEntries(h);
             const rectangles = entries.flatMap(({ button, width: wide, height: tall }) => {
                 if (button.hidden) return [];
                 const match = /^translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(button.style.transform)!;
@@ -1364,7 +1425,7 @@ test('a wrongly sized Factory bitmap is rejected independently and pending image
     assert.ok(pending.every(image => image.onload === null && image.onerror === null));
 });
 
-test('close views show only their own departure signs while panorama retains the neighboring bridge direction', async t => {
+test('close views own their departure signs while panorama names the islands themselves', async t => {
     const h = mapDOM(t, true), save = openSave('3-1'); await readyConnectedFactory(h, save);
     const travel = h.internal.hud.travelButtons;
     assert.equal(travel['bridge-factory-porto'].hidden, false);
@@ -1373,7 +1434,8 @@ test('close views show only their own departure signs while panorama retains the
     assert.equal(travel['bridge-porto-factory'].hidden, false); assert.equal(travel['ferry-porto-costa'].hidden, false);
     assert.equal(travel['bridge-factory-porto'].hidden, true);
     h.get('world-map-overview').click(); h.view.render(5, save, 116, '');
-    assert.equal(travel['bridge-porto-factory'].hidden, false); assert.equal(travel['bridge-factory-porto'].hidden, false);
+    assert.ok(Object.values(travel).every((button: any) => button.hidden));
+    assert.equal(h.internal.hud.overviewButtons.filter((button: Button) => !button.hidden).length, 6);
 });
 
 test('Factory reaches Serra over its supported link while the ferry stays at Porto and entry remains explicit', async t => {
@@ -1498,7 +1560,6 @@ test('late cabin imagery activates only after the already supported walk reaches
 
 test('cabin framing and all six travel signs remain usable in narrow, portrait and short map layouts', async t => {
     const { atlasCableBounds } = await import('../src/adventure/WorldCableArt');
-    const { WORLD_MAP_TRAVEL_ACTIONS } = await import('../src/adventure/WorldMapHud');
     const h = mapDOM(t, true), save = { ...openSave('4-3'), secrets: ['4-3'] }; await readySerra(h, save);
     for (const [width, height] of [[320, 568], [400, 606], [590, 378], [740, 320]]) {
         h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width, height };
@@ -1508,9 +1569,7 @@ test('cabin framing and all six travel signs remain usable in narrow, portrait a
         h.observers[0].callback();
         for (const world of [3, 4]) for (const overview of [false, true]) {
             h.internal.overview = overview; h.view.render((world - 1) * 5, save, 100, '');
-            const entries = [...h.internal.hud.stageButtons.map((button: Button) => ({ button, width: 56, height: 58 })),
-                ...Object.entries(h.internal.hud.travelButtons).map(([id, button]) => ({ button: button as Button,
-                    width: WORLD_MAP_TRAVEL_ACTIONS[id as keyof typeof WORLD_MAP_TRAVEL_ACTIONS].width, height: 56 }))];
+            const entries = nativeControlEntries(h);
             const boxes = entries.flatMap(({ button, width: wide, height: tall }) => {
                 if (button.hidden) return [];
                 const match = /^translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(button.style.transform)!;
@@ -1667,7 +1726,6 @@ test('late passenger layers activate only at a stage arrival and preserve the co
 
 test('both cable lines keep the occupied vehicle framed across Reserva trips in narrow and short layouts', async t => {
     const { atlasCableBounds } = await import('../src/adventure/WorldCableArt');
-    const { WORLD_MAP_TRAVEL_ACTIONS } = await import('../src/adventure/WorldMapHud');
     for (const [width, height] of [[320, 568], [400, 606], [590, 378], [740, 320]]) await t.test(`${width}x${height}`, async child => {
         const h = mapDOM(child), save = { ...openSave('4-3'), secrets: ['4-3', '5-3'] }; await readyReserva(h, save);
         h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width, height };
@@ -1699,9 +1757,7 @@ test('both cable lines keep the occupied vehicle framed across Reserva trips in 
             assert.equal(h.events.entered, 0);
             if (selection !== 24) continue;
             h.get('world-map-overview').click(); h.view.render(selection, save, time += 100, '');
-            const entries = [...h.internal.hud.stageButtons.map((button: Button) => ({ button, width: 56, height: 58 })),
-                ...Object.entries(h.internal.hud.travelButtons).map(([id, button]) => ({ button: button as Button,
-                    width: WORLD_MAP_TRAVEL_ACTIONS[id as keyof typeof WORLD_MAP_TRAVEL_ACTIONS].width, height: 56 }))];
+            const entries = nativeControlEntries(h);
             const boxes = entries.flatMap(({ button, width: wide, height: tall }) => {
                 if (button.hidden) return [];
                 const match = /^translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(button.style.transform)!;

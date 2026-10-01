@@ -4,6 +4,7 @@ import test from 'node:test';
 import { mapStageSignKind, paintPhysicalDockSign, paintPhysicalStageSign, paintPhysicalTravelSign, parseMapSignMetadata, parseMapFactorySignMetadata, parseMapFactoryLeftSignMetadata } from '../src/adventure/WorldMapSignArt';
 import { textWidth } from '../src/graphics/BitmapFont';
 import { ART } from '../src/graphics/palette';
+import { parseMapIslandSignMetadata, paintPhysicalIslandSign } from '../src/adventure/WorldMapSignArt';
 
 const metadata = () => JSON.parse(readFileSync(new URL('../public/assets/world/map/signs-atlas.meta.json', import.meta.url), 'utf8'));
 function canvas() {
@@ -15,6 +16,45 @@ function canvas() {
     const surface = { width: 0, height: 0, style: { transform: '' }, getContext: () => context };
     return { canvas: surface as unknown as HTMLCanvasElement, calls };
 }
+
+test('owned island nameboards preserve all six labels, accents and stable native targets', () => {
+    const raw = JSON.parse(readFileSync(new URL('../public/assets/world/map/island-signs.meta.json', import.meta.url), 'utf8'));
+    const data = parseMapIslandSignMetadata(raw); assert.ok(data);
+    const bytes = readFileSync(new URL('../public/assets/world/map/island-signs.webp', import.meta.url));
+    assert.equal(bytes.toString('ascii', 12, 16), 'VP8X'); assert.ok(bytes[20] & 0x10);
+    assert.equal(1 + bytes.readUIntLE(24, 3), data.width); assert.equal(1 + bytes.readUIntLE(27, 3), data.height);
+    const atlas = { metadata: data, image: {} as HTMLImageElement };
+    for (const label of ['1 COSTA', '2 PORTO', '3 FÁBRICA', '4 SERRA', '5 RESERVA', '6 DOMÍNIO'])
+        for (const [selected, open, sourceX] of [[false, true, 0], [true, true, 256], [true, false, 512]] as const) {
+            const painted = canvas(); assert.equal(paintPhysicalIslandSign(painted.canvas, atlas, label, selected, open), true);
+            assert.equal(painted.canvas.width, 256); assert.equal(painted.canvas.height, 88);
+            assert.equal(painted.canvas.style.transform, 'translate(0px, 3px)');
+            assert.equal(painted.calls.find(call => call.method === 'drawImage')!.args[1], sourceX);
+            for (const pixel of painted.calls.filter(call => call.method === 'fillRect' && call.color === ART.ink)) {
+                const [x, y, width, height] = pixel.args as number[], face = data.frames.island.usableFace;
+                assert.ok(pixel.args.every(Number.isInteger));
+                assert.ok(x >= face.x && y >= face.y && x + width <= face.x + face.width && y + height <= face.y + face.height);
+            }
+        }
+});
+
+test('malformed island name art cannot shrink targets, clip accents or shift a selected board', () => {
+    const raw = JSON.parse(readFileSync(new URL('../public/assets/world/map/island-signs.meta.json', import.meta.url), 'utf8'));
+    for (const change of [
+        (data: any) => { data.frames[0].displaySize.height = 30; },
+        (data: any) => { data.frames[1].foot.y += 1; },
+        (data: any) => { data.frames[0].usableFace.y = 14; },
+        (data: any) => { data.frames[0].sourceRect.x = 256; },
+        (data: any) => { data.frames[0].letterCenter.x = Infinity; },
+        (data: any) => { data.frames[1] = data.frames[0]; },
+        (data: any) => { data.atlas.image = 'other.webp'; },
+    ]) { const data = structuredClone(raw); change(data); assert.equal(parseMapIslandSignMetadata(data), null); }
+    const reordered = structuredClone(raw);
+    reordered.frames[0].foot = { y: raw.frames[0].foot.y, x: raw.frames[0].foot.x };
+    assert.ok(parseMapIslandSignMetadata(reordered), 'JSON key order does not change geometry.');
+    const fallback = canvas(); assert.equal(paintPhysicalIslandSign(fallback.canvas, null, '1 COSTA', false, true), false);
+    assert.equal(fallback.calls.length, 0);
+});
 
 test('frozen atlas metadata preserves native targets, integer bitmap text and a subpixel foot error', () => {
     const raw = metadata(), data = parseMapSignMetadata(raw); assert.ok(data);
