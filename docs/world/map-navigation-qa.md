@@ -182,3 +182,12 @@ TypeScript projects and diff checks. Vite built in 1.19 s: 491.68 kB JS /
 152.36 kB gzip, 19.94 kB CSS / 4.80 kB gzip. Real compact-landscape and desktop
 checks follow on the matching preview; the prior portrait browser limitation
 still applies.
+
+Preview `080a125` verified the new footer at 1180×757 and 472×303, double-click
+non-entry, overview keyboard focus, hidden controls during ferry travel, and
+natural arrival updating “Feka em 6-1 · Domínio”. The compact panorama footer
+fits within y=202.8–296.8 of its 303-pixel viewport; close-view phase controls
+and Enter remain visible. One observed travel-only hint still invited choosing
+hidden islands, so its text now says “Aguarde a chegada ou pule a viagem.”
+That text-only follow-up passed all 33 HUD tests and a 1.22 s Vite build
+(491.72 kB JS / 152.37 kB gzip); the unchanged aggregate was not repeated.

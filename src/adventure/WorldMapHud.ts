@@ -425,7 +425,7 @@ export class WorldMapHud {
         const arrived = STAGES.find(entry => entry.id === state.arrivedStage);
         this.location.textContent = arrived ? `${traveling ? 'Última chegada' : 'Feka em'}${traveling ? ':' : ''} ${arrived.id} · ${REGION_NAMES[arrived.world - 1]}` : '';
         this.location.hidden = !arrived;
-        this.hint.textContent = state.overview ? 'Escolha uma ilha para ver suas fases.'
+        this.hint.textContent = state.overview ? traveling ? 'Aguarde a chegada ou pule a viagem.' : 'Escolha uma ilha para ver suas fases.'
             : prerequisiteHint || state.hint || (state.preview || !open ? 'Conclua o caminho anterior para visitar.'
             : traveling ? 'Você pode mudar o destino durante a viagem.' : 'Toque numa placa para caminhar até ela.');
         this.enterButton.disabled = !canAct;

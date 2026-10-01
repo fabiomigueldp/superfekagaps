@@ -133,6 +133,7 @@ test('moving in panorama preserves Skip and last arrival without activating hidd
     for (const motionState of ['walking', 'boarding', 'sailing', 'riding', 'arriving'] as const) {
         hud.update({ ...state, overview: true, world: 2, stage: 5, canEnter: false, motionState, arrivedStage: '1-5' });
         assert.equal(find(root, 'world-map-location').textContent, 'Última chegada: 1-5 · Costa');
+        assert.equal(find(root, 'world-map-hint').textContent, 'Aguarde a chegada ou pule a viagem.');
         assert.equal(hud.skipButton.hidden, false); assert.equal(hud.enterButton.hidden, true);
         assert.ok(hud.overviewButtons.every(button => button.hidden));
         for (const key of ['ArrowRight', 'w', 'Enter', ' ']) {
@@ -147,6 +148,7 @@ test('moving in panorama preserves Skip and last arrival without activating hidd
     assert.equal(hud.skipButton.hidden, true); assert.equal(hud.enterButton.hidden, false);
     assert.equal(document.activeElement, hud.enterButton);
     assert.equal(find(root, 'world-map-location').textContent, 'Feka em 2-1 · Porto');
+    assert.equal(find(root, 'world-map-hint').textContent, 'Escolha uma ilha para ver suas fases.');
     assert.match(hud.enterButton.getAttribute('aria-label')!, /Ver fases/);
 });
 
