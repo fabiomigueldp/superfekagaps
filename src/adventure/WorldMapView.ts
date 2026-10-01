@@ -17,6 +17,10 @@ import { cableEdgeDirections, createCablePair, sampleCablePair, updateCablePairA
     type CablePairDefinition, type CablePairState, type CableFootPaths } from './WorldCableModel';
 import { atlasCableBounds, type AtlasCableCar } from './WorldCableArt';
 import { PASSENGER_CABLE_PAIR, parseReservaPassengerCable, type ReservaPassengerCable } from './WorldReservaJourney';
+import { COAST_PORT_FERRY, createFerry, ferryEdgeDirections, sampleFerry, updateFerryAfterTravel,
+    type FerryDefinition, type FerryState } from './WorldFerryModel';
+import { DOMINIO_FERRY, parseDominioJourney, matchesDominioAssetSize, type DominioJourneyConnection } from './WorldDominioJourney';
+export { journeyPathSegment } from './WorldFerryModel';
 
 interface MapCallbacks { select(index: number): void; enter(): void; exit(): void; unlockAudio(): void; arrive?(index: number): void }
 interface CachedMapArt { assets: MapArtAssets; metadata: MapArtMetadata; status: 'loading' | 'ready' | 'failed' }
@@ -27,9 +31,17 @@ interface CableLineView {
     paths: CableFootPaths;
     image: HTMLImageElement;
 }
+interface FerryLineView {
+    definition: FerryDefinition;
+    state: FerryState;
+    docks: Readonly<Record<number, { berth: { passenger: MapPoint; headingFrame: number }; aboardProgress?: number }>>;
+    segmentHeadings: readonly number[];
+    reverseSegmentHeadings: readonly number[];
+    sailRoute: readonly MapPoint[];
+}
 export interface MapReturnContext { playedStage: string; nextSelected: string }
 const EMPTY_ART = (): MapArtAssets => ({ island: null, shadow: null, port: null });
-const DIORAMA_NAMES: Readonly<Record<number, string>> = { 1: 'costa-diorama', 2: 'porto-diorama', 3: 'fabrica-diorama', 4: 'serra-diorama', 5: 'reserva-diorama' };
+const DIORAMA_NAMES: Readonly<Record<number, string>> = { 1: 'costa-diorama', 2: 'porto-diorama', 3: 'fabrica-diorama', 4: 'serra-diorama', 5: 'reserva-diorama', 6: 'dominio-diorama' };
 const inAtlas = (world: number) => Object.prototype.hasOwnProperty.call(DIORAMA_NAMES, world);
 const worldOf = (id: string) => Number(id.split('-')[0]);
 const indexOf = (id: string) => Math.max(0, STAGES.findIndex(stage => stage.id === id));
@@ -40,16 +52,6 @@ export function moveJourneySelection(index: number, key: string): number {
         return next === world ? clampMapSelection(index) : next * 5;
     }
     return moveMapSelection(index, key);
-}
-/** Matches samplePath's camera-aspect-adjusted distance exactly. */
-export function journeyPathSegment(points: readonly MapPoint[], progress: number): number {
-    const lengths = points.slice(1).map((point, index) => Math.hypot((point.x - points[index].x) * 1.6, point.y - points[index].y));
-    let distance = lengths.reduce((sum, length) => sum + length, 0) * Math.max(0, Math.min(1, progress));
-    for (let index = 0; index < lengths.length; index++) {
-        if (lengths[index] > 0 && distance < lengths[index]) return index;
-        distance -= lengths[index];
-    }
-    return Math.max(0, lengths.length - 1);
 }
 const placementFor = (world: number) => WORLD_ATLAS_PLACEMENTS[world] ?? { origin: { x: 0, y: 0 }, scale: 1 };
 
@@ -143,6 +145,7 @@ export class WorldMapView {
     private connection: JourneyConnection | null = null;
     private boatMetadata: JourneyBoatMetadata | null = null;
     private boatImage: HTMLImageElement | null = null;
+    private boatLoad: Promise<void> | null = null;
     private readonly dockImages = new Map<number, HTMLImageElement>();
     private connectionActive = false;
     private bridgeStatus: 'idle' | 'loading' | 'ready' | 'failed' = 'idle';
@@ -166,9 +169,12 @@ export class WorldMapView {
     private passengerActive = false;
     private passengerPair = createCablePair();
     private assetWarning = '';
-    private boatHeadingIndex = -1;
-    private boatHeadingAt = 0;
-    private mooredBoatWorld: 1 | 2 = 1;
+    private coastFerry = createFerry(COAST_PORT_FERRY, 1);
+    private dominioFerry = createFerry(DOMINIO_FERRY, 1);
+    private dominioStatus: 'idle' | 'loading' | 'ready' | 'failed' = 'idle';
+    private dominioConnection: DominioJourneyConnection | null = null;
+    private readonly dominioOverlays = new Map<string, HTMLImageElement>();
+    private dominioActive = false;
     private readonly activeArt = new Map<number, CachedMapArt>();
     private journey: JourneyState | null = null;
     private network: JourneyNetwork = { nodes: {}, edges: [] };
@@ -244,15 +250,9 @@ export class WorldMapView {
         this.journey = skipJourney(before); this.updateVehicles(before, this.journey); this.paintDirty = true;
         this.reportArrival(); this.refreshHud();
     }
-    private updateMooredBoat(before: JourneyState, after: JourneyState): void {
-        const nextLeg = after.legs[0];
-        for (const leg of before.legs) {
-            if (nextLeg?.id === leg.id) break;
-            if (leg.id === 'coast-port-sail') this.mooredBoatWorld = leg.direction === 1 ? 2 : 1;
-        }
-    }
     private updateVehicles(before: JourneyState, after: JourneyState): void {
-        this.updateMooredBoat(before, after);
+        this.coastFerry = updateFerryAfterTravel(this.coastFerry, COAST_PORT_FERRY, before, after);
+        this.dominioFerry = updateFerryAfterTravel(this.dominioFerry, DOMINIO_FERRY, before, after);
         this.cablePair = updateCablePairAfterTravel(this.cablePair, SERRA_CABLE_PAIR, before, after);
         this.passengerPair = updateCablePairAfterTravel(this.passengerPair, PASSENGER_CABLE_PAIR, before, after);
         this.updateCapabilities();
@@ -261,6 +261,8 @@ export class WorldMapView {
         if (!this.save) return;
         this.capabilities = { availableStages: STAGES.filter(stage => isUnlocked(stage.id, this.save!)).map(stage => stage.id),
             edgeDirections: {
+                ...(this.connectionActive ? ferryEdgeDirections(this.coastFerry, COAST_PORT_FERRY, isUnlocked('2-1', this.save)) : {}),
+                ...(this.dominioActive ? ferryEdgeDirections(this.dominioFerry, DOMINIO_FERRY, isUnlocked('6-1', this.save)) : {}),
                 ...(this.maintenanceActive ? cableEdgeDirections(this.cablePair, SERRA_CABLE_PAIR,
                     this.save.secrets.includes('4-3'), this.journey?.legs[0]) : {}),
                 ...(this.passengerActive ? cableEdgeDirections(this.passengerPair, PASSENGER_CABLE_PAIR,
@@ -315,9 +317,13 @@ export class WorldMapView {
                 if (this.factorySerraStatus === 'idle') void this.loadFactorySerraLink();
                 if (this.maintenanceStatus === 'idle') void this.loadMaintenanceCable();
             }
-            if (world === 5 || this.overview || (world === 4 && this.save && isUnlocked('5-1', this.save))) {
+            if (world >= 5 || this.overview || (world === 4 && this.save && isUnlocked('5-1', this.save))) {
                 this.ensureWorld(5);
                 if (this.passengerStatus === 'idle') void this.loadPassengerCable();
+            }
+            if (world === 6 || this.overview || (world === 5 && this.save && isUnlocked('6-1', this.save))) {
+                this.ensureWorld(6);
+                if (this.dominioStatus === 'idle') void this.loadDominioConnection();
             }
         }
         else this.ensureWorld(world);
@@ -349,39 +355,77 @@ export class WorldMapView {
             (low <= 2 && high >= 3 && (this.bridgeStatus === 'failed' || [2, 3].some(world => this.artCache.get(world)?.status === 'failed'))) ||
             (low <= 3 && high >= 4 && (this.factorySerraStatus === 'failed' || [3, 4].some(world => this.artCache.get(world)?.status === 'failed'))) ||
             (low <= 4 && high >= 5 && (this.passengerStatus === 'failed' || [4, 5].some(world => this.artCache.get(world)?.status === 'failed'))) ||
+            (low <= 5 && high === 6 && (this.dominioStatus === 'failed' || [5, 6].some(world => this.artCache.get(world)?.status === 'failed'))) ||
             // A previous regional fallback can leave Feka opposite the ferry.
             // Keep that recovery usable without boarding an absent vessel.
-            (low === 1 && inAtlas(high) && this.mooredBoatWorld !== (from === 1 ? 1 : 2));
+            (low === 1 && inAtlas(high) && this.coastFerry.mooredWorld !== (from === 1 ? 1 : 2)) ||
+            (low <= 5 && high === 6 && this.dominioFerry.mooredWorld !== (from === 6 ? 6 : 5));
     }
     private crossingLoading(from: number, to: number): boolean {
         const low = Math.min(from, to), high = Math.max(from, to);
         return (low === 1 && high >= 2 && this.connectionStatus === 'loading') ||
             (low <= 2 && high >= 3 && this.bridgeStatus === 'loading') ||
             (low <= 3 && high >= 4 && this.factorySerraStatus === 'loading') ||
-            (low <= 4 && high >= 5 && this.passengerStatus === 'loading');
+            (low <= 4 && high >= 5 && this.passengerStatus === 'loading') ||
+            (low <= 5 && high === 6 && this.dominioStatus === 'loading');
     }
     private async loadConnection(): Promise<void> {
         this.connectionStatus = 'loading';
+        const boatLoad = this.boatLoad ??= this.loadSharedBoat();
         const prefix = mapAssetPrefix((import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/');
         const json = (name: string) => fetch(prefix + name, { signal: this.abort.signal }).then(response => response.ok ? response.json() : null).catch(() => null);
-        const [raw, rawBoat] = await Promise.all([json('coast-port-journey.meta.json'), json('journey-boat.meta.json'),
+        const [raw] = await Promise.all([json('coast-port-journey.meta.json'),
             this.pairLoads.get(1), this.pairLoads.get(2)]);
         if (this.abort.signal.aborted) return;
         const coast = this.artCache.get(1), port = this.artCache.get(2);
         const connection = coast?.status === 'ready' && port?.status === 'ready' ? parseJourneyConnection(raw, coast.metadata, port.metadata) : null;
-        const boat = parseJourneyBoat(rawBoat);
         const path = (asset: string) => prefix + asset.slice('/assets/world/map/'.length);
-        if (connection && boat) {
-            const [coastDock, portDock, image] = await Promise.all([this.loadImage(path(connection.docks[1].overlay.path)),
-                this.loadImage(path(connection.docks[2].overlay.path)), this.loadImage(path(boat.atlas.path))]);
+        if (connection) {
+            const [coastDock, portDock] = await Promise.all([this.loadImage(path(connection.docks[1].overlay.path)),
+                this.loadImage(path(connection.docks[2].overlay.path)), boatLoad]);
             if (this.abort.signal.aborted) return;
             const sized = (image: HTMLImageElement | null, size: { width: number; height: number }) => !!image && image.naturalWidth === size.width && image.naturalHeight === size.height;
-            if (sized(coastDock, connection.docks[1].overlay) && sized(portDock, connection.docks[2].overlay) && sized(image, boat.atlas)) {
-                this.connection = connection; this.boatMetadata = boat; this.boatImage = image;
+            if (sized(coastDock, connection.docks[1].overlay) && sized(portDock, connection.docks[2].overlay) && this.boatMetadata && this.boatImage) {
+                this.connection = connection;
                 this.dockImages.set(1, coastDock!); this.dockImages.set(2, portDock!); this.connectionStatus = 'ready';
             } else this.connectionStatus = 'failed';
         } else this.connectionStatus = 'failed';
         if (this.connectionStatus === 'failed') this.assetWarning = 'A travessia visual não carregou. As fases continuam disponíveis pelo arquipélago.';
+        this.geometryDirty = true; this.paintDirty = true;
+    }
+    private async loadSharedBoat(): Promise<void> {
+        const prefix = mapAssetPrefix((import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/');
+        const raw = await fetch(prefix + 'journey-boat.meta.json', { signal: this.abort.signal })
+            .then(response => response.ok ? response.json() : null).catch(() => null);
+        if (this.abort.signal.aborted) return;
+        const boat = parseJourneyBoat(raw);
+        if (!boat) return;
+        const image = await this.loadImage(prefix + boat.atlas.path.slice('/assets/world/map/'.length));
+        if (this.abort.signal.aborted) return;
+        if (matchesSerraAssetSize(image, boat.atlas)) { this.boatMetadata = boat; this.boatImage = image; }
+    }
+    private async loadDominioConnection(): Promise<void> {
+        this.dominioStatus = 'loading';
+        const boatLoad = this.boatLoad ??= this.loadSharedBoat();
+        const prefix = mapAssetPrefix((import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/');
+        const request = fetch(prefix + 'reserva-dominio-journey.meta.json', { signal: this.abort.signal })
+            .then(response => response.ok ? response.json() : null).catch(() => null);
+        const [raw] = await Promise.all([request, this.pairLoads.get(5), this.pairLoads.get(6)]);
+        if (this.abort.signal.aborted) return;
+        const reserva = this.artCache.get(5), dominio = this.artCache.get(6);
+        const connection = reserva?.status === 'ready' && dominio?.status === 'ready'
+            ? parseDominioJourney(raw, reserva.metadata, dominio.metadata, { 5: placementFor(5), 6: placementFor(6) }) : null;
+        if (connection) {
+            const [images] = await Promise.all([Promise.all(connection.overlays.map(layer =>
+                this.loadImage(prefix + layer.path.slice('/assets/world/map/'.length)))), boatLoad]);
+            if (this.abort.signal.aborted) return;
+            if (this.boatMetadata && this.boatImage && images.every((image, index) => matchesDominioAssetSize(image, connection.overlays[index]))) {
+                this.dominioConnection = connection;
+                connection.overlays.forEach((layer, index) => this.dominioOverlays.set(layer.path, images[index]!));
+                this.dominioStatus = 'ready';
+            } else this.dominioStatus = 'failed';
+        } else this.dominioStatus = 'failed';
+        if (this.dominioStatus === 'failed') this.assetWarning = 'A travessia da doca aquecida não carregou. As fases continuam disponíveis pelo arquipélago.';
         this.geometryDirty = true; this.paintDirty = true;
     }
     private async loadBridge(): Promise<void> {
@@ -474,7 +518,9 @@ export class WorldMapView {
         this.visible = true; this.hud.setVisible(true); this.lastTime = time; this.dirtySize = true; this.cameraSnap = true;
         this.controlOffsets.clear();
         this.journey = null; this.cablePair = createCablePair(); this.passengerPair = createCablePair();
-        this.boatHeadingIndex = -1; this.selection = -1; this.lastSignature = ''; this.geometryDirty = true;
+        this.coastFerry = createFerry(COAST_PORT_FERRY, 1);
+        this.dominioFerry = createFerry(DOMINIO_FERRY, 1);
+        this.selection = -1; this.lastSignature = ''; this.geometryDirty = true;
         this.restoreTabIndex = this.gameCanvas.getAttribute('tabindex');
         this.gameCanvas.setAttribute('tabindex', '-1'); this.gameCanvas.setAttribute('aria-hidden', 'true');
         this.gameCanvas.style.visibility = 'hidden'; this.root.focus({ preventScroll: true });
@@ -502,6 +548,7 @@ export class WorldMapView {
         this.factorySerraActive = this.factorySerraStatus === 'ready' && [3, 4].every(world => this.activeArt.get(world)?.status === 'ready');
         this.maintenanceActive = this.maintenanceStatus === 'ready' && this.activeArt.get(4)?.status === 'ready';
         this.passengerActive = this.passengerStatus === 'ready' && [4, 5].every(world => this.activeArt.get(world)?.status === 'ready');
+        this.dominioActive = this.dominioStatus === 'ready' && [5, 6].every(world => this.activeArt.get(world)?.status === 'ready');
         this.maintenancePaths = this.maintenanceActive && this.maintenanceCable ? {
             a: this.maintenanceCable.lanes.a.pathPoints.map(point => localToAtlas(point, placementFor(4))),
             b: this.maintenanceCable.lanes.b.pathPoints.map(point => localToAtlas(point, placementFor(4))),
@@ -513,7 +560,9 @@ export class WorldMapView {
             factorySerraLinkOpen: !!this.save && isUnlocked('4-1', this.save),
             maintenanceCable: this.maintenanceCable, maintenanceCableReady: this.maintenanceActive,
             passengerCable: this.passengerCable, passengerCableReady: this.passengerActive,
-            passengerCableOpen: !!this.save && isUnlocked('5-1', this.save) });
+            passengerCableOpen: !!this.save && isUnlocked('5-1', this.save),
+            dominioConnection: this.dominioConnection, dominioConnectionReady: this.dominioActive,
+            dominioConnectionOpen: !!this.save && isUnlocked('6-1', this.save) });
         this.updateCapabilities();
         this.geometryDirty = false;
     }
@@ -579,7 +628,7 @@ export class WorldMapView {
         this.show(time); this.save = save; this.controlSelection = clampMapSelection(selection);
         this.updateCapabilities();
         this.ensureArt(STAGES[this.controlSelection].world); this.ensureArt(worldOf(returned?.playedStage ?? save.selected));
-        const progressSignature = `${save.secrets.join(',')}:${isUnlocked('3-1', save)}:${isUnlocked('4-1', save)}:${isUnlocked('5-1', save)}`;
+        const progressSignature = `${save.secrets.join(',')}:${isUnlocked('3-1', save)}:${isUnlocked('4-1', save)}:${isUnlocked('5-1', save)}:${isUnlocked('6-1', save)}`;
         if (this.lastSignature.split('|')[0] !== progressSignature) this.geometryDirty = true;
         if (this.geometryDirty && !this.journey?.destination) {
             const previous = this.journey; this.rebuildNetwork();
@@ -587,10 +636,12 @@ export class WorldMapView {
             this.selection = -1;
         }
         if (!this.journey || returned) {
-            this.mooredBoatWorld = worldOf(returned?.playedStage ?? save.selected) === 1 ? 1 : 2;
             this.cablePair = createCablePair(); this.passengerPair = createCablePair(); this.journey = null; this.updateCapabilities();
             this.journey = returned ? returnToJourney(returned.playedStage, returned.nextSelected, this.network, this.capabilities)
                 : createJourney(save.selected, this.network, this.capabilities);
+            this.coastFerry = createFerry(COAST_PORT_FERRY, worldOf(this.journey.arrived));
+            this.dominioFerry = createFerry(DOMINIO_FERRY, worldOf(this.journey.arrived));
+            this.updateCapabilities();
             this.reportedArrival = save.selected; this.selection = -1;
         }
         this.requestDestination(this.controlSelection);
@@ -612,30 +663,39 @@ export class WorldMapView {
         else this.paintSingle(stage.world, save, time);
         this.paintDirty = false;
     }
-    private currentBoat(): AtlasBoat | undefined {
-        if (!this.connectionActive || !this.connection || !this.boatMetadata || !this.boatImage) return;
-        const active = this.journey!.legs[0];
-        // Only an actual sea crossing changes the ferry berth. A regional art
-        // fallback or a locked preview cannot move an otherwise healthy boat.
-        const world = this.mooredBoatWorld;
-        const dock = this.connection.docks[world];
-        let frame = this.boatMetadata.frames[dock.berth.headingFrame], foot = localToAtlas(dock.berth.passenger, placementFor(world));
-        if (active?.mode === 'sail') {
-            foot = this.marker;
-            const segment = journeyPathSegment(active.points, active.progress);
-            const headings = active.direction === 1 ? this.connection.segmentHeadings : this.connection.reverseSegmentHeadings;
-            const heading = headings[active.direction === 1 ? segment : active.points.length - 2 - segment];
-            const remaining = active.duration * (active.direction === 1 ? 1 - active.progress : active.progress);
-            const arrivalWorld = (active.direction === 1 ? 2 : 1) as 1 | 2;
-            frame = this.boatMetadata.frames[remaining < .65 ? this.connection.docks[arrivalWorld].berth.headingFrame : heading];
-        }
-        if (this.boatHeadingIndex < 0 || this.media.matches || !active) { this.boatHeadingIndex = frame.index; this.boatHeadingAt = this.lastTime; }
-        else if (this.boatHeadingIndex !== frame.index && this.lastTime - this.boatHeadingAt >= 120) {
-            const turn = (frame.index - this.boatHeadingIndex + 8) % 8;
-            this.boatHeadingIndex = (this.boatHeadingIndex + (turn <= 4 ? 1 : 7)) % 8; this.boatHeadingAt = this.lastTime;
-        }
-        frame = this.boatMetadata.frames[this.boatHeadingIndex];
-        return { foot, frame, assets: { rear: this.boatImage, foreground: this.boatImage } };
+    private ferryLines(): FerryLineView[] {
+        const lines: FerryLineView[] = [];
+        if (this.connectionActive && this.connection)
+            lines.push({ ...this.connection, definition: COAST_PORT_FERRY, state: this.coastFerry });
+        if (this.dominioActive && this.dominioConnection)
+            lines.push({ ...this.dominioConnection, definition: DOMINIO_FERRY, state: this.dominioFerry });
+        return lines;
+    }
+    private currentBoat(id = COAST_PORT_FERRY.id): AtlasBoat | undefined {
+        const line = this.ferryLines().find(line => line.definition.id === id);
+        if (!line || !this.boatMetadata || !this.boatImage) return;
+        const berths = Object.fromEntries(line.definition.worlds.map(world => {
+            const berth = line.docks[world].berth;
+            return [world, { foot: localToAtlas(berth.passenger, placementFor(world)), headingFrame: berth.headingFrame }];
+        }));
+        const pose = sampleFerry(line.state, line.definition, { berths,
+            segmentHeadings: line.segmentHeadings, reverseSegmentHeadings: line.reverseSegmentHeadings },
+        { active: this.journey!.legs[0], point: this.marker, time: this.lastTime, reducedMotion: this.media.matches });
+        if (id === COAST_PORT_FERRY.id) this.coastFerry = pose.state; else this.dominioFerry = pose.state;
+        return { id, foot: pose.foot, frame: this.boatMetadata.frames[pose.frameIndex],
+            assets: { rear: this.boatImage, foreground: this.boatImage } };
+    }
+    private currentBoats(): AtlasBoat[] {
+        return this.ferryLines().flatMap(line => {
+            const boat = this.currentBoat(line.definition.id); return boat ? [boat] : [];
+        });
+    }
+    private activeFerry(aboardOnly = false): FerryLineView | undefined {
+        const active = this.journey?.legs[0];
+        if (!active) return;
+        return this.ferryLines().find(line => active.mode === 'sail' ? active.id === line.definition.sailEdge :
+            active.mode === 'board' && line.definition.worlds.some(world => active.id === line.definition.boardingEdges[world] &&
+                (!aboardOnly || active.progress >= (line.docks[world].aboardProgress ?? .45))));
     }
     private cableLines(): CableLineView[] {
         const lines: CableLineView[] = [];
@@ -665,7 +725,7 @@ export class WorldMapView {
         }
     }
     private paintAtlas(world: number, save: AdventureSave, time: number, dt: number): void {
-        const ids = [1, 2, ...([3, 4, 5].filter(id => world === id || !!this.activeArt.get(id)?.assets.island))];
+        const ids = [1, 2, ...([3, 4, 5, 6].filter(id => world === id || !!this.activeArt.get(id)?.assets.island))];
         const islands: AtlasIslandLayer[] = ids.map(id => ({ world: id, metadata: this.activeArt.get(id)!.metadata,
             placement: placementFor(id), assets: this.activeArt.get(id)!.assets, completed: save.completed, secret: save.secrets.includes(`${id}-3`),
             ...(this.connectionActive && this.connection && (id === 1 || id === 2)
@@ -673,22 +733,26 @@ export class WorldMapView {
             approachBounds: [...(this.bridgeActive && this.bridge && (id === 2 || id === 3) ? [this.bridge.landings[id].approachBounds] : []),
                 ...(this.factorySerraActive && this.factorySerraLink && (id === 3 || id === 4) ? [this.factorySerraLink.landings[id].approachBounds] : []),
                 ...(this.passengerActive && this.passengerCable && (id === 4 || id === 5)
-                    ? [this.passengerCable.stations[id === 4 ? 'lower' : 'upper'].artBounds] : [])] }));
+                    ? [this.passengerCable.stations[id === 4 ? 'lower' : 'upper'].artBounds] : []),
+                ...(this.dominioActive && this.dominioConnection && (id === 5 || id === 6)
+                    ? [this.dominioConnection.docks[id].artBounds] : [])] }));
         const actorInAtlas = inAtlas(worldOf(this.journey!.arrived));
         const active = actorInAtlas ? this.journey!.legs[0] : undefined;
         const onBridge = active?.id === PORT_FACTORY_BRIDGE_EDGE, onSerraLink = active?.id === FACTORY_SERRA_LINK_EDGE;
         const cableCar = actorInAtlas ? this.activeCableCar() : undefined;
         const channel = active?.mode === 'board' || active?.mode === 'sail' || onBridge || onSerraLink || !!cableCar;
         const activeWorld = active && active.mode !== 'sail' ? worldOf(active.from) : world;
-        const boat = this.currentBoat(), cableCars = this.currentCableCars();
+        const boats = this.currentBoats(), cableCars = this.currentCableCars(), activeFerry = this.activeFerry();
         // A region preview frames that region. Feka and a moored boat may remain
         // offscreen on the origin island until a real trip begins or we return.
         const trackJourney = actorInAtlas && (!!this.journey!.destination || this.overview || worldOf(this.journey!.arrived) === activeWorld);
-        const trackedBoat = trackJourney && (this.overview || active?.mode === 'sail' || active?.mode === 'board' || (!onBridge && !onSerraLink && activeWorld <= 2)) ? boat : undefined;
+        const trackedFerry = activeFerry ?? (!cableCar && !onBridge && !onSerraLink
+            ? this.ferryLines().find(line => line.definition.worlds.includes(activeWorld)) : undefined);
+        const trackedBoat = trackJourney && trackedFerry ? boats.find(boat => boat.id === trackedFerry.definition.id) : undefined;
         const trackedCabin = trackJourney && cableCar ? cableCars.find(car => car.id === cableCar) : undefined;
         const travelRoute = onBridge ? this.bridge?.bridgeRoute ?? active.points
             : onSerraLink ? this.factorySerraLink?.walkRoute ?? active!.points
-                : cableCar ? active!.points : this.connection?.sailRoute ?? active?.points ?? [];
+                : cableCar ? active!.points : activeFerry?.sailRoute ?? active?.points ?? [];
         const travelPoints = channel ? this.width < 600 ? atlasTravelWindow(travelRoute, this.marker) : travelRoute : undefined;
         const bridgeState = isUnlocked('3-1', save) ? 'open' : 'closed';
         const overlay = this.bridgeActive && this.bridge ? this.bridge.overlays[bridgeState] : null;
@@ -697,13 +761,17 @@ export class WorldMapView {
         const passengerState = isUnlocked('5-1', save) ? 'open' : 'closed';
         const passengerLayers = this.passengerActive && this.passengerCable
             ? this.passengerCable.overlays.filter(layer => !layer.when || layer.when === passengerState) : [];
+        const dominioState = isUnlocked('6-1', save) ? 'open' : 'closed';
+        const dominioLayers = this.dominioActive && this.dominioConnection
+            ? this.dominioConnection.overlays.filter(layer => !layer.when || layer.when === dominioState) : [];
         const cablePaths = this.passengerActive && this.passengerCable ? this.passengerCable.cablePolylines : [];
-        const connectionBounds = [overlay, serraOverlay, ...passengerLayers].flatMap(layer => layer ? [{ left: layer.left, top: layer.top,
+        const connectionBounds = [overlay, serraOverlay, ...passengerLayers, ...dominioLayers].flatMap(layer => layer ? [{ left: layer.left, top: layer.top,
             right: layer.left + layer.widthInMap, bottom: layer.top + layer.heightInMap }] : []);
         const cablePoints = cablePaths.flat();
         if (cablePoints.length) connectionBounds.push({ left: Math.min(...cablePoints.map(p => p.x)), right: Math.max(...cablePoints.map(p => p.x)),
             top: Math.min(...cablePoints.map(p => p.y)), bottom: Math.max(...cablePoints.map(p => p.y)) });
-        const focusBounds = [...(trackedBoat ? [atlasBoatBounds(trackedBoat.foot, trackedBoat.frame)] : []),
+        const focusBounds = [...(this.overview ? boats.map(boat => atlasBoatBounds(boat.foot, boat.frame))
+            : trackedBoat ? [atlasBoatBounds(trackedBoat.foot, trackedBoat.frame)] : []),
             ...(this.overview ? cableCars.map(atlasCableBounds) : trackedCabin ? [atlasCableBounds(trackedCabin)] : [])];
         const target = getAtlasCamera({ mode: this.overview ? 'overview' : channel ? 'channel' : 'island', activeWorld,
             layers: islands, width: this.width, height: this.height, insets: { ...this.frameInsets, left: 16, right: 16 },
@@ -712,14 +780,16 @@ export class WorldMapView {
         this.camera = this.blendAtlasCamera(target, dt, trackedCabin ? atlasCableBounds(trackedCabin)
             : trackedBoat ? atlasBoatBounds(trackedBoat.foot, trackedBoat.frame) : undefined);
         const occupiedCabin = actorInAtlas ? this.activeCableCar(true) : undefined;
-        const aboard = !!occupiedCabin || active?.mode === 'sail' || (active?.mode === 'board' && active.progress > .45);
+        const occupiedBoat = actorInAtlas ? this.activeFerry(true)?.definition.id : undefined;
+        const aboard = !!occupiedCabin || !!occupiedBoat;
         paintWorldAtlas(this.ctx, { camera: this.camera, time, reducedMotion: this.media.matches, islands,
             connections: [...(overlay ? [{ ...overlay, image: this.bridgeImages.get(bridgeState)! }] : []),
                 ...(serraOverlay ? [{ ...serraOverlay, image: this.factorySerraImages.get(serraState)! }] : []),
-                ...passengerLayers.map(layer => ({ ...layer, image: this.passengerOverlays.get(layer.path)! }))],
+                ...passengerLayers.map(layer => ({ ...layer, image: this.passengerOverlays.get(layer.path)! })),
+                ...dominioLayers.map(layer => ({ ...layer, image: this.dominioOverlays.get(layer.path)! }))],
             actor: { point: this.marker, walking: !!active && active.mode !== 'sail' && active.mode !== 'cable', facingLeft: this.facingLeft, aboard,
-                visible: actorInAtlas, cableCar: occupiedCabin }, boat, cableCars, cablePaths });
-        this.positionNodes(world, channel || activeWorld !== world, boat, cableCars);
+                visible: actorInAtlas, cableCar: occupiedCabin, boatId: occupiedBoat }, boats, cableCars, cablePaths });
+        this.positionNodes(world, channel || activeWorld !== world, boats, cableCars);
     }
     private blendAtlasCamera(target: MapCamera, dt: number, bounds?: AtlasBounds): MapCamera {
         if (this.cameraSnap || this.media.matches) { this.cameraSnap = false; return target; }
@@ -772,7 +842,7 @@ export class WorldMapView {
             walking: !!this.journey!.destination, facingLeft: this.facingLeft });
         this.positionNodes(world, false);
     }
-    private positionNodes(world: number, hide: boolean, boat?: AtlasBoat, cableCars: readonly AtlasCableCar[] = []): void {
+    private positionNodes(world: number, hide: boolean, boats: readonly AtlasBoat[] = [], cableCars: readonly AtlasCableCar[] = []): void {
         const anchors: MapPoint[] = [];
         const stages = Array.from({ length: 5 }, (_, n) => {
             if (hide) return null;
@@ -791,6 +861,8 @@ export class WorldMapView {
             if (!this.overview && departure !== world) continue;
             const anchor = action.mode === 'ferry' && this.connectionActive && this.connection && (departure === 1 || departure === 2)
                 ? this.connection.docks[departure].dock
+                : action.mode === 'ferry' && this.dominioActive && this.dominioConnection && (departure === 5 || departure === 6)
+                    ? this.dominioConnection.docks[departure].dock
                 : action.mode === 'bridge' && this.bridgeActive && this.bridge && (departure === 2 || departure === 3)
                     ? this.bridge.landings[departure].landing
                     : action.mode === 'walk' && this.factorySerraActive && this.factorySerraLink && (departure === 3 || departure === 4)
@@ -801,19 +873,35 @@ export class WorldMapView {
             const point = mapToScreen(localToAtlas(anchor, placementFor(departure)), this.camera);
             travel[id] = { ...point, visible: point.x > 8 && point.x < this.width - 8 && point.y > this.frameInsets.top && point.y < this.height - this.frameInsets.bottom,
                 available: !!this.save && isUnlocked(action.toStage ?? `${action.toWorld}-1`, this.save) &&
-                    (action.mode !== 'cable' || isUnlocked('5-1', this.save)) };
+                    (!action.requiresStage || isUnlocked(action.requiresStage, this.save)) };
         }
-        const visible = [...stages.map((point, n) => point ? { id: `stage:${world}-${n + 1}`, point, anchor: anchors[n], width: 56, height: 58 } : null),
+        let visible = [...stages.map((point, n) => point ? { id: `stage:${world}-${n + 1}`, point, anchor: anchors[n], width: 56, height: 58 } : null),
             ...WORLD_MAP_TRAVEL_ACTION_IDS.map(id => {
                 const point = travel[id], { width, height } = WORLD_MAP_TRAVEL_ACTIONS[id];
                 return point?.visible ? { id, point, anchor: { x: point.x, y: point.y }, width, height } : null;
             })].filter((entry): entry is NonNullable<typeof entry> => !!entry);
-        const positions = layoutMapControls(visible.map(({ point, width, height }) => ({ ...point, width, height })),
-            { left: 8, right: this.width - 8, top: this.frameInsets.top + 2, bottom: this.height - this.frameInsets.bottom - 2 },
-            8, this.media.matches ? [] : visible.map(entry => this.controlOffsets.get(entry.id)));
-        const actor = mapToScreen(this.marker, this.camera), scale = inAtlas(world) ? atlasActorScale(this.camera, boat?.frame) : mapActorScale(this.camera);
+        const controlBounds = { left: 8, right: this.width - 8, top: this.frameInsets.top + 2, bottom: this.height - this.frameInsets.bottom - 2 };
+        const arrange = () => layoutMapControls(visible.map(({ point, width, height }) => ({ ...point, width, height })),
+            controlBounds, 8, this.media.matches ? [] : visible.map(entry => this.controlOffsets.get(entry.id)));
+        let positions = arrange();
+        if (this.overview && positions.some(point => {
+            const rect = controlRect(point);
+            return rect.left < controlBounds.left || rect.right > controlBounds.right || rect.top < controlBounds.top || rect.bottom > controlBounds.bottom;
+        })) {
+            // A compact panorama cannot hold every region's full-size signs.
+            // Keep the selected island's stages and departures readable; the
+            // archipelago drawer still provides every region as a native action.
+            visible = visible.filter(entry => {
+                if (entry.id.startsWith('stage:')) return true;
+                const id = entry.id as WorldMapTravelActionId;
+                if (WORLD_MAP_TRAVEL_ACTIONS[id].fromWorld === world) return true;
+                travel[id] = null; return false;
+            });
+            positions = arrange();
+        }
+        const actor = mapToScreen(this.marker, this.camera), scale = inAtlas(world) ? atlasActorScale(this.camera) : mapActorScale(this.camera);
         const obstacles = [{ left: actor.x - 10 * scale - 2, right: actor.x + 10 * scale + 2, top: actor.y - 28 * scale - 2, bottom: actor.y + 3 }];
-        for (const bounds of [...(boat ? [atlasBoatBounds(boat.foot, boat.frame)] : []), ...cableCars.map(atlasCableBounds)]) {
+        for (const bounds of [...boats.map(boat => atlasBoatBounds(boat.foot, boat.frame)), ...cableCars.map(atlasCableBounds)]) {
             const a = mapToScreen({ x: bounds.left, y: bounds.top }, this.camera), b = mapToScreen({ x: bounds.right, y: bounds.bottom }, this.camera);
             obstacles.push({ left: a.x - 2, right: b.x + 2, top: a.y - 2, bottom: b.y + 2 });
         }

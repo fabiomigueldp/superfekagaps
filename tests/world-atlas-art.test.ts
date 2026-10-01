@@ -29,8 +29,8 @@ function scene(aboard = true): AtlasPaintState {
         islands: [1, 2].map(world => ({ world, metadata: fallbackMapMetadata(world),
             placement: COAST_PORT_PLACEMENTS[world], completed: [], secret: false,
             assets: { island: image(`island${world}`), shadow: image(`shadow${world}`), port: phantom } })),
-        actor: { point: { x: .9, y: .8 }, walking: false, facingLeft: false, aboard },
-        boat: { foot: { x: .9, y: .8 }, frame, assets: { rear, foreground } } };
+        actor: { point: { x: .9, y: .8 }, walking: false, facingLeft: false, aboard, boatId: 'coast-port-sail' },
+        boats: [{ id: 'coast-port-sail', foot: { x: .9, y: .8 }, frame, assets: { rear, foreground } }] };
 }
 const actorColors = new Set(Object.values(PLAYER_PALETTE).filter(Boolean));
 const actorPixels = (calls: Call[]) => calls.filter(call => call.name === 'fillRect' && actorColors.has(call.color as string));
@@ -75,7 +75,7 @@ test('aboard Feka retains every original pixel between cropped rear and foregrou
     assert.deepEqual(calls[foregroundIndex].args.slice(1, 5), [768, 256, 384, 256]);
     assert.deepEqual(calls[rearIndex].args.slice(5), calls[foregroundIndex].args.slice(5));
     const [, , , , , x, y, width, height] = calls[rearIndex].args as number[];
-    const foot = mapToScreen(state.boat!.foot, camera);
+    const foot = mapToScreen(state.boats![0].foot, camera);
     assert.ok(Math.abs(x + frame.passengerFoot.x / frame.width * width - foot.x) < 1e-7);
     assert.ok(Math.abs(y + frame.passengerFoot.y / frame.height * height - foot.y) < 1e-7);
 });
@@ -95,6 +95,25 @@ test('boarding keeps the boat anchored independently; the foreground cannot mask
     assert.deepEqual(snapshots[1].boat, snapshots[2].boat);
     assert.notDeepEqual(snapshots[0].actor, snapshots[2].actor);
     assert.equal(atlasActorScale(camera, frame), atlasActorScale(camera), 'Walking and deck scales agree before changing aboard.');
+});
+
+test('independent ferries render one passenger inside only the occupied hull', () => {
+    for (const occupied of ['coast-port-sail', 'reserva-dominio-sail']) {
+        const state = scene(true), { context, calls } = recordingContext();
+        state.boats = [state.boats![0], { id: 'reserva-dominio-sail', foot: { x: 2.5, y: -1.1 }, frame,
+            assets: { rear: image('heated-ferry-rear'), foreground: image('heated-ferry-front') } }];
+        state.actor.boatId = occupied;
+        state.actor.point = state.boats.find(boat => boat.id === occupied)!.foot;
+        paintWorldAtlas(context, state);
+        const pixels = actorPixels(calls);
+        assert.equal(pixels.length, PLAYER_SPRITES.idle.flatMap(row => [...row]).filter(pixel => PLAYER_PALETTE[pixel]).length);
+        for (const boat of state.boats) {
+            const behind = calls.findIndex(call => call.name === 'drawImage' && call.args[0] === boat.assets.rear);
+            const front = calls.findIndex(call => call.name === 'drawImage' && call.args[0] === boat.assets.foreground);
+            assert.ok(behind < front);
+            assert.equal(pixels.every(pixel => calls.indexOf(pixel) > behind && calls.indexOf(pixel) < front), boat.id === occupied);
+        }
+    }
 });
 
 test('dock overlays use stable island-local rectangles and render before the passenger', () => {
@@ -140,8 +159,8 @@ test('missing or malformed connection layers leave the normal sea, islands and a
 test('unavailable or invalid boat art is omitted safely while original Feka and legacy island fallback remain', () => {
     for (const fail of ['missing', 'invalid'] as const) {
         const { context, calls } = recordingContext(), state = scene();
-        if (fail === 'missing') state.boat!.assets.rear = null;
-        else state.boat!.frame = { ...frame, width: NaN };
+        if (fail === 'missing') state.boats![0].assets.rear = null;
+        else state.boats![0].frame = { ...frame, width: NaN };
         state.islands[0].assets.island = null;
         assert.doesNotThrow(() => paintWorldAtlas(context, state));
         assert.ok(actorPixels(calls).length > 100);

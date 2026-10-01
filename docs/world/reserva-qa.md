@@ -51,10 +51,25 @@ Visual QA identified buried foundation sockets incorrectly painted over the
 island by isolated terminal exports. Both terminal overlays were re-exported
 with the unchanged island geometry as depth holdouts. Runtime-style composites
 verify the correction; geometry, paths, metadata, cabins and gate images are
-unchanged. This export-only revision needs a final preview image check before
-main promotion. No unchanged aggregate test rerun is required for those pixels.
+unchanged. Revision `319ecf9` passed the final preview image check at both joins
+and a natural return to 4-5. Only the 13 affected asset/contract cases were rerun
+for this export-only change; the unchanged aggregate suite was not repeated.
 
 Recent browser diagnostic entries were extension metadata errors, so this is
 not an exhaustive app-console claim. Automated layout coverage does not
 establish physical touch behavior, browser FPS or a browser-level reduced-motion
-setting. Public deployment verification remains pending.
+setting.
+
+## Public release
+
+Main `319ecf9326decfbcf9a7c98f047d590642a42b8c` deployed successfully on
+2026-10-01 at `https://superfekagaps.vercel.app/`. Vercel deployment
+`4P6M1LE2XcmbZSp6t4vFH4P28Dj5` was observed pending, then successful.
+The public page served `index-Bcp1on_A.js`; the corrected Reserva terminal,
+closed barriers and locked Enter behavior were inspected in the actual browser.
+The normal production save retained 0/30 phases and 0/72 seals. No synthetic
+progress was imported into production.
+
+No deployment scripts or configuration changed. There were no GitHub workflows,
+custom Git hooks or configured hooks path. The Oracle-hosted game and the
+user's separate original checkout were untouched.

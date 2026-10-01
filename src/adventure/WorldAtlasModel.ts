@@ -20,6 +20,7 @@ export const WORLD_ATLAS_PLACEMENTS: Readonly<Record<number, AtlasPlacement>> = 
     3: Object.freeze({ origin: Object.freeze({ x: 1.98, y: .03 }), scale: 1 }),
     4: Object.freeze({ origin: Object.freeze({ x: 2.78, y: -.65 }), scale: 1 }),
     5: Object.freeze({ origin: Object.freeze({ x: 2.7, y: -1.8 }), scale: 1 }),
+    6: Object.freeze({ origin: Object.freeze({ x: 1.5, y: -1.8 }), scale: 1 }),
 });
 /** Compatibility for the released ferry contract and its consumers. */
 export const COAST_PORT_PLACEMENTS = WORLD_ATLAS_PLACEMENTS;

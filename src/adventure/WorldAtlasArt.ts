@@ -26,6 +26,8 @@ export interface AtlasActor {
     visible?: boolean;
     /** Only the occupied cabin gets a passenger between its authored layers. */
     cableCar?: string;
+    /** Stable ferry identity; independent lines never borrow another hull. */
+    boatId?: string;
 }
 export interface BoatAtlasCrop { x: number; y: number; w: number; h: number }
 export interface BoatAtlasFrame {
@@ -46,6 +48,7 @@ export interface BoatAtlasAssets {
     foreground: CanvasImageSource | null;
 }
 export interface AtlasBoat {
+    id: string;
     foot: MapPoint;
     frame: BoatAtlasFrame;
     assets: BoatAtlasAssets;
@@ -59,7 +62,7 @@ export interface AtlasPaintState {
     islands: readonly AtlasIslandLayer[];
     connections?: readonly AtlasConnectionOverlay[];
     actor: AtlasActor;
-    boat?: AtlasBoat;
+    boats?: readonly AtlasBoat[];
     cableCars?: readonly AtlasCableCar[];
     cablePaths?: readonly (readonly MapPoint[])[];
 }
@@ -131,22 +134,25 @@ export function paintWorldAtlas(c: CanvasRenderingContext2D, state: AtlasPaintSt
         c.drawImage(overlay.image, top.x, top.y, bottom.x - top.x, bottom.y - top.y);
     }
     paintCableLines(c, state.camera, state.cablePaths ?? []);
-    const boat = state.boat, cableCars = (state.cableCars ?? []).filter(car => car.assets.rear && car.assets.foreground && validCableFrame(car.frame));
+    const boats = (state.boats ?? []).filter(boat => boat.assets.rear && boat.assets.foreground && validFrame(boat.frame));
+    const cableCars = (state.cableCars ?? []).filter(car => car.assets.rear && car.assets.foreground && validCableFrame(car.frame));
     const occupiedCabin = state.actor.aboard ? cableCars.find(car => car.id === state.actor.cableCar) : undefined;
-    // An incomplete or unavailable atlas never becomes a placeholder drawing.
-    const hasBoat = !!boat?.assets.rear && validFrame(boat.frame);
-    if (boat && hasBoat) {
-        paintBoatLayer(c, state.camera, boat, false);
-        if (!state.actor.aboard || state.actor.cableCar) paintBoatLayer(c, state.camera, boat, true);
-    }
+    const occupiedBoat = state.actor.aboard && !state.actor.cableCar ? boats.find(boat => boat.id === state.actor.boatId) : undefined;
     let actorPainted = false;
     const actor = () => {
         actorPainted = true;
         if (state.actor.visible !== false) paintMapActor(c, { camera: state.camera, marker: state.actor.point, time: state.time,
             reducedMotion: state.reducedMotion, walking: state.actor.walking, facingLeft: state.actor.facingLeft,
-            scale: atlasActorScale(state.camera, occupiedCabin?.frame ?? (boat && validFrame(boat.frame) ? boat.frame : undefined)),
-            shadow: !state.actor.aboard || (state.actor.cableCar ? !occupiedCabin : !hasBoat) });
+            scale: atlasActorScale(state.camera, occupiedCabin?.frame ?? occupiedBoat?.frame),
+            shadow: !occupiedCabin && !occupiedBoat });
     };
+    // Keep each hull's rear, passenger and foreground together. A parked ferry
+    // cannot accidentally capture the passenger riding a different connection.
+    for (const boat of boats) {
+        paintBoatLayer(c, state.camera, boat, false);
+        if (boat === occupiedBoat) actor();
+        paintBoatLayer(c, state.camera, boat, true);
+    }
     // Caller supplies physical back-to-front lane order. A passenger in the rear
     // car must not be painted artificially over a foreground counterweight car.
     for (const car of cableCars) {
@@ -155,5 +161,4 @@ export function paintWorldAtlas(c: CanvasRenderingContext2D, state: AtlasPaintSt
         paintCableCarLayer(c, state.camera, car, true);
     }
     if (!actorPainted) actor();
-    if (boat && hasBoat && state.actor.aboard && !state.actor.cableCar) paintBoatLayer(c, state.camera, boat, true);
 }

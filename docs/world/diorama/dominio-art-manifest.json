@@ -1,0 +1,58 @@
+{
+  "status": "frozen-source-physical-original-sprite-and-raster-gates-pass-browser-integration-pending",
+  "sourceBuilder": "tools/diorama/render_dominio_map.py",
+  "builderSha256": "75dad697e5401ec60e0f6225a5c87c1184d8284e8b9a15931ae7ddd82f055615",
+  "checker": "tools/diorama/check_dominio_map.py",
+  "packager": "tools/diorama/package_dominio_map.py",
+  "validation": "docs/world/diorama/dominio-validation.json",
+  "size": {
+    "width": 1920,
+    "height": 1200
+  },
+  "placement": {
+    "origin": {
+      "x": 1.5,
+      "y": -1.8
+    },
+    "scale": 1
+  },
+  "alphaBoundsPixels": [
+    261,
+    76,
+    1617,
+    1110
+  ],
+  "artBounds": {
+    "left": 0.1359375,
+    "top": 0.06333333333333334,
+    "right": 0.8421875,
+    "bottom": 0.925
+  },
+  "quality": 93,
+  "actorsOrPassengerCabinsBaked": false,
+  "timingCalibration": {
+    "walkWorldUnitsPerSecond": 1.73,
+    "source": "Same real-world pace as released Serra and Reserva routes."
+  },
+  "mainRouteSeconds": {
+    "0:1": 2.296253,
+    "1:2": 2.081955,
+    "2:3": 2.404624,
+    "3:4": 3.820923
+  },
+  "serviceShortcutSeconds": 5.086913,
+  "entryApproachSeconds": 0.606936,
+  "futureFerryDock": "Frozen eastern garden ingress; additive connector owns the docks and second ferry.",
+  "files": [
+    {
+      "path": "/assets/world/map/dominio-diorama.webp",
+      "bytes": 200914,
+      "sha256": "aa178601b2a1595cbac2a14fccf14706f8504073cd39b7c35059177ad1e53d5a"
+    },
+    {
+      "path": "/assets/world/map/dominio-diorama.meta.json",
+      "bytes": 3017,
+      "sha256": "de2becb7944244ad08951540825991d8df900b7d5503648768c52eb24271e058"
+    }
+  ]
+}

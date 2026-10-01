@@ -62,13 +62,13 @@ export function parseMapMetadata(value: unknown, world = 1): MapArtMetadata | nu
     let routeDurationsSeconds: Record<string, number> | undefined;
     if (data.routeDurationsSeconds !== undefined) {
         const timings = data.routeDurationsSeconds;
-        if ((world !== 4 && world !== 5) || !timings || typeof timings !== 'object' || Array.isArray(timings) ||
+        if ((world < 4 || world > 6) || !timings || typeof timings !== 'object' || Array.isArray(timings) ||
             Object.keys(timings).length !== 4 || Object.keys(routes).some(key => !Number.isFinite(timings[key]) ||
                 timings[key] <= 0 || timings[key] > 120)) return null;
         routeDurationsSeconds = Object.fromEntries(Object.keys(routes).map(key => [key, timings[key]]));
     }
     if (data.secretTransport !== undefined && (world !== 4 || data.secretTransport !== 'maintenance-cable')) return null;
-    if (data.secretDurationSeconds !== undefined && (world !== 5 || !Number.isFinite(data.secretDurationSeconds) ||
+    if (data.secretDurationSeconds !== undefined && ((world !== 5 && world !== 6) || !Number.isFinite(data.secretDurationSeconds) ||
         data.secretDurationSeconds <= 0 || data.secretDurationSeconds > 120)) return null;
     if (data.secretTransport === 'maintenance-cable') {
         if (!Array.isArray(data.secretRoute) || data.secretRoute.length !== 0) return null;

@@ -179,7 +179,7 @@ function fixtureMapMetadata(world = 1, overrides: Record<string, MapPoint> = {})
     return data;
 }
 const flushAssets = () => new Promise<void>(resolve => setImmediate(resolve));
-const dioramaName = (world: number) => ({ 1: 'costa-diorama', 2: 'porto-diorama', 3: 'fabrica-diorama', 4: 'serra-diorama', 5: 'reserva-diorama' }[world]);
+const dioramaName = (world: number) => ({ 1: 'costa-diorama', 2: 'porto-diorama', 3: 'fabrica-diorama', 4: 'serra-diorama', 5: 'reserva-diorama', 6: 'dominio-diorama' }[world]);
 async function finishWorld(h: ReturnType<typeof mapDOM>, world: number, metadata: unknown = fixtureMapMetadata(world), imageSuccess = true) {
     const image = h.images.find(image => image.src.endsWith(`${dioramaName(world)}.webp`));
     const request = h.fetches.find(request => request.url.endsWith(`${dioramaName(world)}.meta.json`));
@@ -322,6 +322,10 @@ test('the ferry pair loads first; an explicit Factory preview loads its own cont
     h.view.render(20, save, 120, ''); // A locked Reserva preview still lazily loads its own authored scene.
     assert.equal(h.fetches.filter(request => request.url.endsWith('reserva-diorama.meta.json')).length, 1);
     assert.equal(h.fetches.filter(request => request.url.endsWith('serra-reserva-link.meta.json')).length, 1);
+    assert.ok(!h.fetches.some(request => /dominio/.test(request.url)));
+    h.view.render(25, save, 124, '');
+    assert.equal(h.fetches.filter(request => request.url.endsWith('dominio-diorama.meta.json')).length, 1);
+    assert.equal(h.fetches.filter(request => request.url.endsWith('reserva-dominio-journey.meta.json')).length, 1);
     const expanded = [h.images.length, h.fetches.length];
     for (const selected of [15, 20, 25, 0, 5, 10]) h.view.render(selected, save, selected + 120, '');
     assert.deepEqual([h.images.length, h.fetches.length], expanded);
@@ -501,8 +505,9 @@ test('each island secret uses only its own authored geometry and progress', asyn
     assert.equal(h.internal.journey.legs.length, 1); assert.match(h.internal.journey.legs[0].id, /secret/);
 });
 
-test('the remaining fallback region retains navigation and explicit entry without creating any sea edge', t => {
-    const h = mapDOM(t, true), save = openSave(); h.view.render(0, save, 0, ''); h.view.render(29, save, 16, '');
+test('failed Domínio terrain retains local navigation and explicit entry without inventing a sea edge', async t => {
+    const h = mapDOM(t, true), save = openSave('6-1'); h.view.render(25, save, 0, '');
+    await finishWorld(h, 6, actualMetadata(6), false); h.view.render(29, save, 16, '');
     assert.equal(h.internal.journey.arrived, '6-5'); assert.equal(h.events.entered, 0); assert.equal(h.internal.hud.enterButton.disabled, false);
     h.view.render(25, save, 32, ''); assert.equal(h.internal.journey.arrived, '6-1');
     assert.ok(h.internal.network.edges.every((edge: { from: string; to: string; mode: string }) => edge.mode !== 'sail'));
@@ -653,8 +658,8 @@ async function finishSerra(h: ReturnType<typeof mapDOM>, failAsset = '') {
     await flushAssets();
 }
 
-async function readySerra(h: ReturnType<typeof mapDOM>, save = { ...openSave('4-3'), secrets: ['4-3'] }, failAsset = '') {
-    await readyConnection(h, save);
+async function readySerra(h: ReturnType<typeof mapDOM>, save = { ...openSave('4-3'), secrets: ['4-3'] }, failAsset = '', coastFail = '') {
+    await readyConnection(h, save, coastFail);
     const selection = STAGES.findIndex(stage => stage.id === save.selected);
     h.get('world-map-overview').click(); h.view.render(selection, save, 32, '');
     await finishFactory(h); await finishSerra(h, failAsset); h.view.render(selection, save, 48, '');
@@ -676,10 +681,191 @@ async function finishPassenger(h: ReturnType<typeof mapDOM>, failAsset = '') {
     await flushAssets();
 }
 
-async function readyReserva(h: ReturnType<typeof mapDOM>, save = openSave('4-5'), failAsset = '') {
-    await readySerra(h, save); await finishPassenger(h, failAsset);
+async function readyReserva(h: ReturnType<typeof mapDOM>, save = openSave('4-5'), failAsset = '', coastFail = '') {
+    await readySerra(h, save, '', coastFail); await finishPassenger(h, failAsset);
     h.view.render(STAGES.findIndex(stage => stage.id === save.selected), save, 80, '');
 }
+
+async function finishDominio(h: ReturnType<typeof mapDOM>, failAsset = '') {
+    await finishWorld(h, 6, actualMetadata(6), failAsset !== 'dominio-diorama.webp');
+    const raw = JSON.parse(readFileSync(new URL('../public/assets/world/map/reserva-dominio-journey.meta.json', import.meta.url), 'utf8'));
+    h.fetches.find(request => request.url.endsWith('reserva-dominio-journey.meta.json'))!.resolve({ ok: true, json: async () => raw });
+    await flushAssets();
+    for (const size of raw.overlays) {
+        const image = h.images.find(image => image.src.endsWith(size.path.split('/').pop()));
+        if (failAsset === 'dominio-diorama.webp') { assert.equal(image, undefined); continue; }
+        assert.ok(image, `Expected heated dock layer ${size.path}`);
+        Object.assign(image, { naturalWidth: size.width, naturalHeight: size.height });
+        if (failAsset && size.path.includes(failAsset)) image.onerror?.(); else image.onload?.();
+    }
+    await flushAssets();
+}
+
+async function readyDominio(h: ReturnType<typeof mapDOM>, save = openSave('5-5'), failAsset = '', coastFail = '') {
+    await readyReserva(h, save, '', coastFail); await finishDominio(h, failAsset);
+    h.view.render(STAGES.findIndex(stage => stage.id === save.selected), save, 96, '');
+}
+
+test('heated ferry is gated by C2 and its return sign targets the real 5-5 terminal', async t => {
+    const h = mapDOM(t), save = { ...openSave('5-5'), completed: STAGES.filter(stage => stage.world < 5 ||
+        (stage.world === 5 && stage.id !== '5-5')).map(stage => stage.id) };
+    await readyDominio(h, save);
+    assert.equal(h.internal.dominioActive, true);
+    assert.ok(!h.internal.network.edges.some((edge: any) => edge.id === 'reserva-dominio-sail'));
+    h.internal.hud.travelButtons['ferry-reserva-dominio'].click();
+    assert.equal(h.internal.journey.selected, '6-1'); assert.equal(h.internal.journey.arrived, '5-5');
+    assert.equal(h.internal.journey.blocked, 'unavailable'); assert.equal(h.view.enterSelected(25), false);
+    save.completed.push('5-5'); h.view.hide();
+    h.view.render(25, save, 150, '', '', { playedStage: '5-5', nextSelected: '6-1' });
+    assert.equal(h.internal.journey.arrived, '5-5');
+    assert.ok(h.internal.journey.legs.some((edge: any) => edge.id === 'reserva-dominio-sail'));
+    h.internal.hud.skipButton.click(); assert.equal(h.internal.journey.arrived, '6-1');
+    h.view.render(25, save, 200, ''); h.internal.hud.travelButtons['ferry-dominio-reserva'].click();
+    assert.equal(h.internal.journey.selected, '5-5'); assert.equal(h.internal.journey.destination, '5-5');
+    assert.equal(h.events.entered, 0);
+});
+
+test('a natural heated-dock crossing moves only its own hull and preserves explicit arrival and entry', async t => {
+    const h = mapDOM(t), save = openSave('5-5'); await readyDominio(h, save);
+    const coast = h.internal.currentBoat(), oldFoot = { ...coast.foot }, oldFrame = coast.frame.index;
+    const progress = structuredClone({ completed: save.completed, seals: save.seals });
+    h.view.render(25, save, 100, ''); let time = 100, sawSail = false, sawBoard = false;
+    while (h.internal.journey.destination && time < 30000) {
+        h.paint.calls.length = 0; h.view.render(25, save, time += 100, '');
+        const active = h.internal.journey.legs[0];
+        if (active?.mode === 'board') sawBoard = true;
+        if (active?.id === 'reserva-dominio-sail') {
+            sawSail = true;
+            assert.deepEqual(h.internal.currentBoat('reserva-dominio-sail').foot, h.internal.marker);
+            assert.equal(h.internal.activeFerry(true).definition.id, 'reserva-dominio-sail');
+            assert.equal(h.view.enterSelected(25), false);
+        }
+        assert.deepEqual(h.internal.currentBoat().foot, oldFoot);
+        assert.equal(h.internal.currentBoat().frame.index, oldFrame);
+        if (h.internal.journey.destination) {
+            assert.equal(h.internal.journey.arrived, '5-5'); assert.deepEqual(h.events.arrived, []);
+            assert.ok(Object.values(h.internal.hud.travelButtons).every((button: any) => button.hidden));
+        }
+    }
+    assert.ok(sawSail && sawBoard); assert.equal(h.internal.journey.arrived, '6-1');
+    assert.equal(h.internal.dominioFerry.mooredWorld, 6); assert.deepEqual(h.events.arrived, [25]);
+    assert.deepEqual({ completed: save.completed, seals: save.seals }, progress); assert.equal(h.events.entered, 0);
+    assert.equal(h.view.enterSelected(25), true); assert.equal(h.events.entered, 1);
+    h.view.hide(); h.view.render(25, save, time + 100, '', '', { playedStage: '6-1', nextSelected: '6-1' });
+    assert.equal(h.internal.journey.arrived, '6-1'); assert.equal(h.internal.dominioFerry.mooredWorld, 6);
+});
+
+test('both ferries and cable pairs survive full-world skips, reversals and reload at the saved arrival', async t => {
+    const h = mapDOM(t), save = { ...openSave('1-5'), secrets: ['1-3', '4-3', '5-3', '6-3'] }; await readyDominio(h, save);
+    h.view.render(25, save, 100, '');
+    for (const edge of ['coast-port-sail', 'reserva-dominio-sail'])
+        assert.ok(h.internal.journey.legs.some((leg: any) => leg.id === edge));
+    h.internal.hud.skipButton.click();
+    assert.equal(h.internal.journey.arrived, '6-1'); assert.equal(h.internal.coastFerry.mooredWorld, 2);
+    assert.equal(h.internal.dominioFerry.mooredWorld, 6); assert.equal(h.events.entered, 0);
+    save.selected = '6-1'; h.view.render(0, save, 200, '');
+    let time = 200;
+    while (h.internal.journey.legs[0]?.id !== 'reserva-dominio-sail' && time < 10000) {
+        h.paint.calls.length = 0; h.view.render(0, save, time += 100, '');
+    }
+    assert.equal(h.internal.journey.legs[0]?.id, 'reserva-dominio-sail');
+    const foot = { ...h.internal.marker }; h.view.selectDestination(26);
+    assert.deepEqual(h.internal.marker, foot); assert.equal(h.internal.journey.legs[0].direction, 1);
+    h.view.selectDestination(0); assert.deepEqual(h.internal.marker, foot);
+    h.view.hide(); h.view.render(25, save, time += 100, '');
+    assert.equal(h.internal.journey.arrived, '6-1'); assert.equal(h.internal.dominioFerry.mooredWorld, 6);
+    h.media.matches = true; h.view.render(0, save, time += 100, '');
+    assert.equal(h.internal.journey.arrived, '1-1'); assert.equal(h.internal.coastFerry.mooredWorld, 1);
+    assert.equal(h.internal.dominioFerry.mooredWorld, 5); assert.equal(h.events.entered, 0);
+});
+
+test('a failed Costa dock cannot suppress the shared hull on the independent heated ferry', async t => {
+    const h = mapDOM(t, true), save = openSave('5-5'); await readyDominio(h, save, '', 'costa-journey-dock.webp');
+    assert.equal(h.internal.connectionActive, false); assert.equal(h.internal.dominioActive, true);
+    assert.ok(h.internal.boatImage); assert.equal(h.internal.currentBoat(), undefined);
+    assert.ok(h.internal.currentBoat('reserva-dominio-sail'));
+    assert.equal(h.fetches.filter(request => request.url.endsWith('journey-boat.meta.json')).length, 1);
+    assert.equal(h.images.filter(image => image.src.endsWith('journey-boat.webp')).length, 1);
+    h.view.render(25, save, 100, ''); assert.equal(h.internal.journey.arrived, '6-1');
+    assert.equal(h.internal.dominioFerry.mooredWorld, 6);
+});
+
+test('failed heated dock layers preserve both cable lines and the original ferry', async t => {
+    const raw = JSON.parse(readFileSync(new URL('../public/assets/world/map/reserva-dominio-journey.meta.json', import.meta.url), 'utf8'));
+    for (const failAsset of ['dominio-diorama.webp', raw.overlays[0].path.split('/').pop()]) await t.test(failAsset, async child => {
+        const h = mapDOM(child), save = openSave('5-5'); await readyDominio(h, save, failAsset);
+        assert.equal(h.internal.dominioStatus, 'failed'); assert.equal(h.internal.dominioActive, false);
+        assert.equal(h.internal.connectionActive, true); assert.equal(h.internal.maintenanceActive, true);
+        assert.equal(h.internal.passengerActive, true);
+        const oldBoat = structuredClone(h.internal.currentBoat().foot);
+        h.view.render(25, save, 100, ''); assert.equal(h.internal.journey.arrived, '6-1');
+        assert.equal(h.internal.dominioFerry.mooredWorld, 5);
+        assert.deepEqual(h.internal.currentBoat().foot, oldBoat); assert.equal(h.events.entered, 0);
+    });
+});
+
+test('late heated dock readiness waits for a safe arrival without resetting the other vehicles', async t => {
+    const h = mapDOM(t), save = { ...openSave('5-1'), secrets: ['5-3'] }; await readyReserva(h, save);
+    const oldBoat = structuredClone(h.internal.currentBoat().foot);
+    h.view.render(24, save, 100, ''); const pointBefore = { ...h.internal.marker };
+    await finishDominio(h);
+    assert.equal(h.internal.dominioStatus, 'ready'); assert.equal(h.internal.dominioActive, false);
+    h.view.render(24, save, 116, ''); assert.notDeepEqual(h.internal.marker, pointBefore);
+    assert.equal(h.internal.dominioActive, false); assert.equal(h.internal.journey.arrived, '5-1');
+    h.internal.hud.skipButton.click(); h.view.render(24, save, 200, '');
+    assert.equal(h.internal.dominioActive, true); assert.equal(h.internal.journey.arrived, '5-5');
+    assert.deepEqual(h.internal.currentBoat().foot, oldBoat);
+    assert.equal(h.fetches.filter(request => request.url.endsWith('journey-boat.meta.json')).length, 1);
+});
+
+test('the complete six-region route frames every occupied vehicle and keeps overview targets separate', async t => {
+    const { atlasCableBounds } = await import('../src/adventure/WorldCableArt');
+    const { atlasBoatBounds } = await import('../src/adventure/WorldAtlasArt');
+    const { WORLD_MAP_TRAVEL_ACTIONS } = await import('../src/adventure/WorldMapHud');
+    for (const [width, height] of [[320, 568], [590, 378], [740, 320]]) await t.test(`${width}x${height}`, async child => {
+        const h = mapDOM(child), save = { ...openSave('1-5'), secrets: ['1-3', '4-3', '5-3', '6-3'] }; await readyDominio(h, save);
+        h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width, height };
+        h.get('world-map-header').bounds = { x: 8, y: 6, left: 8, top: 6, width: width - 16, height: 44 };
+        h.get('world-map-tools').bounds = h.get('world-map-header').bounds;
+        h.get('world-map-footer').bounds = { x: 8, y: height - 76, left: 8, top: height - 76, width: width - 16, height: 68 };
+        h.observers[0].callback(); let time = 100; const vehicles = new Set<string>();
+        h.view.render(29, save, time, '');
+        while (h.internal.journey.destination && time < 150000) {
+            h.paint.calls.length = 0; h.view.render(29, save, time += 100, '');
+            const active = h.internal.journey.legs[0]; if (!active) continue;
+            assert.equal(h.internal.journey.arrived, '1-5');
+            const actor = mapToScreen(h.internal.marker, h.internal.camera);
+            assert.ok(actor.x >= 0 && actor.x <= width && actor.y >= h.internal.frameInsets.top && actor.y <= height - h.internal.frameInsets.bottom,
+                `${active.id}: actor outside ${width}x${height}: ${JSON.stringify(actor)}`);
+            const cable = h.internal.activeCableCar(), ferry = h.internal.activeFerry();
+            if (!cable && !ferry) continue;
+            const bounds = cable ? atlasCableBounds(h.internal.currentCableCars().find((car: any) => car.id === cable)) : (() => {
+                const boat = h.internal.currentBoat(ferry.definition.id); return atlasBoatBounds(boat.foot, boat.frame);
+            })();
+            vehicles.add(cable ? cable.startsWith('serra-reserva') ? 'passenger' : 'maintenance' : ferry.definition.id);
+            const a = mapToScreen({ x: bounds.left, y: bounds.top }, h.internal.camera), b = mapToScreen({ x: bounds.right, y: bounds.bottom }, h.internal.camera);
+            assert.ok(a.x >= 16 && b.x <= width - 16 && a.y >= h.internal.frameInsets.top && b.y <= height - h.internal.frameInsets.bottom,
+                `${active.id}: carrier outside ${width}x${height}: ${JSON.stringify({ a, b })}`);
+        }
+        assert.equal(h.internal.journey.arrived, '6-5'); assert.equal(h.events.entered, 0);
+        assert.deepEqual([...vehicles].sort(), ['coast-port-sail', 'maintenance', 'passenger', 'reserva-dominio-sail']);
+        h.get('world-map-overview').click(); tick(h, 29, save, time, 3000);
+        const entries = [...h.internal.hud.stageButtons.map((button: Button) => ({ button, width: 56, height: 58 })),
+            ...Object.entries(h.internal.hud.travelButtons).map(([id, button]) => ({ button: button as Button,
+                width: WORLD_MAP_TRAVEL_ACTIONS[id as keyof typeof WORLD_MAP_TRAVEL_ACTIONS].width, height: 56 }))];
+        const boxes = entries.flatMap(({ button, width: wide, height: tall }) => {
+            if (button.hidden) return [];
+            const match = /^translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(button.style.transform)!;
+            const x = Number(match[1]), y = Number(match[2]);
+            return [{ left: x - wide / 2, right: x + wide / 2, top: y - tall, bottom: y }];
+        });
+        boxes.forEach((a, i) => {
+            assert.ok(a.left >= 8 && a.right <= width - 8 && a.top >= h.internal.frameInsets.top && a.bottom <= height - h.internal.frameInsets.bottom,
+                `Overview target outside ${width}x${height}: ${JSON.stringify(a)}`);
+            for (const b of boxes.slice(i + 1)) assert.ok(a.right + 8 <= b.left || b.right + 8 <= a.left || a.bottom + 8 <= b.top || b.bottom + 8 <= a.top);
+        });
+    });
+});
 
 test('Costa to Porto travels through connected docks with Feka aboard, saves only final arrival and waits for Enter', async t => {
     const h = mapDOM(t), save = openSave('1-5'); await readyConnection(h, save);
@@ -736,6 +922,21 @@ test('a phase clear crossing and reloading mid-sail both begin at the played Cos
     let time = 1000; while (h.internal.motionState() !== 'sailing' && time < 6000) { time += 50; h.view.render(5, save, time, ''); }
     assert.equal(h.internal.motionState(), 'sailing'); h.view.hide(); h.view.render(4, save, 9000, '');
     assert.equal(h.internal.journey.arrived, '1-5'); assert.equal(h.internal.journey.destination, null); assert.deepEqual(h.internal.marker, point(actualMetadata(1).nodes['1-5']));
+});
+
+test('recovering a locked saved region seeds the ferry at Feka’s actual arrival', async t => {
+    const h = mapDOM(t), save = { ...freshSave(), selected: '2-4' };
+    await readyConnection(h, save);
+    assert.equal(h.internal.journey.arrived, '1-1');
+    assert.equal(h.internal.journey.blocked, 'unavailable');
+    assert.equal(h.internal.coastFerry.mooredWorld, 1);
+    const waiting = structuredClone(h.internal.currentBoat().foot);
+    h.view.render(0, save, 100, '');
+    save.completed = STAGES.filter(stage => stage.world === 1).map(stage => stage.id);
+    h.view.render(5, save, 150, '');
+    assert.equal(h.internal.journey.arrived, '1-1');
+    assert.equal(h.internal.journey.destination, '2-1');
+    assert.deepEqual(h.internal.currentBoat().foot, waiting);
 });
 
 test('vertical keyboard region selection matches docks and drawer rather than retaining a locked phase number', t => {

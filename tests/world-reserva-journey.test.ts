@@ -259,17 +259,19 @@ test('physical passenger travel uses both supported approaches, boards and disem
     }
 });
 
-test('authored Reserva walking durations apply while released Serra timing and all other regional cadences stay unchanged', () => {
+test('authored Reserva walking durations apply while released Serra timing and Costa–Factory cadences stay unchanged', () => {
     const f = fixture();
     const islands = f.islands.map(island => island.world === 4 || island.world === 5 ? island : { ...island,
         metadata: { ...island.metadata, routeDurationsSeconds: { '0:1': 17 }, secretDurationSeconds: 17,
             secretRoute: [island.metadata.nodes[`${island.world}-3`], island.metadata.nodes[`${island.world}-5`]] },
     });
     const graph = buildJourneyNetwork({ ...f.options, islands, secrets: ['1-3', '2-3', '3-3', '4-3', '5-3', '6-3'] });
-    for (const world of [1, 2, 3, 6]) {
+    for (const world of [1, 2, 3]) {
         assert.equal(graph.edges.find(edge => edge.id === `${world}-1:${world}-2`)!.duration, .78);
         assert.equal(graph.edges.find(edge => edge.id === `${world}-secret`)!.duration, 1.1);
     }
+    assert.equal(graph.edges.find(edge => edge.id === '6-1:6-2')!.duration, 17);
+    assert.equal(graph.edges.find(edge => edge.id === '6-secret')!.duration, 17);
     assert.equal(graph.edges.find(edge => edge.id === '5-secret')!.duration, 4.6);
     assert.equal(graph.edges.some(edge => edge.id === '4-secret'), false);
     for (const world of [4, 5]) for (let n = 1; n < 5; n++) {

@@ -5,6 +5,7 @@ import type { MapPoint } from './WorldMapModel';
 import type { JourneyEdge, JourneyNetwork } from './WorldJourneyModel';
 import { buildSerraJourney, type SerraJourneyOptions } from './WorldSerraJourney';
 import { buildReservaJourney, type ReservaJourneyOptions } from './WorldReservaJourney';
+import { buildDominioJourney, type DominioJourneyOptions } from './WorldDominioJourney';
 
 export interface JourneyDock {
     join: MapPoint & { route?: string; segment?: number; t?: number; node?: string };
@@ -238,7 +239,7 @@ export const JOURNEY_DOCK_NODES = { 1: { join: '1-junction', dock: '1-dock', ber
  */
 export function buildJourneyNetwork(options: { islands: readonly JourneyIsland[]; secrets: readonly string[];
     connection: JourneyConnection | null; connectionReady: boolean;
-    bridge?: JourneyBridge | null; bridgeReady?: boolean; bridgeOpen?: boolean } & SerraJourneyOptions & ReservaJourneyOptions): JourneyNetwork {
+    bridge?: JourneyBridge | null; bridgeReady?: boolean; bridgeOpen?: boolean } & SerraJourneyOptions & ReservaJourneyOptions & DominioJourneyOptions): JourneyNetwork {
     const nodes: Record<string, MapPoint> = {}, edges: JourneyEdge[] = [];
     const coast = options.islands.find(island => island.world === 1), port = options.islands.find(island => island.world === 2);
     const connection = options.connectionReady && coast?.ready && port?.ready ? options.connection : null;
@@ -274,10 +275,10 @@ export function buildJourneyNetwork(options: { islands: readonly JourneyIsland[]
                 nodes[junction] = transform(join);
                 add(`2-4:${junction}`, from, junction, [...points.slice(0, segment + 1), join].map(transform), .39);
                 add(`${junction}:2-5`, junction, to, [join, ...points.slice(segment + 1)].map(transform), .39);
-            } else add(`${from}:${to}`, from, to, points.map(transform), world === 4 || world === 5 ? metadata.routeDurationsSeconds?.[`${n - 1}:${n}`] ?? .78 : .78);
+            } else add(`${from}:${to}`, from, to, points.map(transform), world === 4 || world === 5 || world === 6 ? metadata.routeDurationsSeconds?.[`${n - 1}:${n}`] ?? .78 : .78);
         }
         if (options.secrets.includes(`${world}-3`) && metadata.secretRoute.length > 1)
-            add(`${world}-secret`, `${world}-3`, `${world}-5`, metadata.secretRoute.map(transform), world === 5 ? metadata.secretDurationSeconds ?? 1.1 : 1.1);
+            add(`${world}-secret`, `${world}-3`, `${world}-5`, metadata.secretRoute.map(transform), world === 5 || world === 6 ? metadata.secretDurationSeconds ?? 1.1 : 1.1);
         if (crossing && (world === 1 || world === 2)) {
             const dock = crossing.docks[world], ids = JOURNEY_DOCK_NODES[world];
             nodes[ids.dock] = transform(dock.dock); nodes[ids.berth] = transform(dock.berth.passenger);
@@ -297,5 +298,7 @@ export function buildJourneyNetwork(options: { islands: readonly JourneyIsland[]
     Object.assign(nodes, serra.nodes); edges.push(...serra.edges);
     const reserva = buildReservaJourney(options);
     Object.assign(nodes, reserva.nodes); edges.push(...reserva.edges);
+    const dominio = buildDominioJourney(options);
+    Object.assign(nodes, dominio.nodes); edges.push(...dominio.edges);
     return { nodes, edges };
 }

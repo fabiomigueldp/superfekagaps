@@ -1,0 +1,130 @@
+{
+  "status": "PASS",
+  "scope": "Frozen Dom\u00ednio base: four main routes, shipping shortcut and retained station approach. All five landings included. Future heated dock is reserved only. Additive passenger terminals/cabins/link and older maintenance pdominiotion are separate gates.",
+  "builder": {
+    "path": "tools/diorama/render_dominio_map.py",
+    "sha256": "75dad697e5401ec60e0f6225a5c87c1184d8284e8b9a15931ae7ddd82f055615"
+  },
+  "checker": {
+    "path": "tools/diorama/check_dominio_map.py",
+    "sha256": "5a177d67712ba8cee30501ba0b204d5fa5a1c3130fe867f0d1feb039b4cd92ae"
+  },
+  "metadataSha256": "525163bd1c2f8b1180c8bfb456ebb46a760f02f9f93f61992eba58201b60b1b0",
+  "methods": {
+    "physical": "Evaluated triangles:three footprint rays, upright headroom, closed-solid containment, and real masonry arch abutments rooted into authored bedrock/foundation with deck/spandrel overlap.",
+    "source": "Original idle plus6 walk frames, both facings, every opaque square center plus4 inset corners, world-vertical actor plane and camera-directed rays.",
+    "raster": "Exact Math.round pixel origin and Math.ceil square size from paintMapActor at occupied CSS-pixel centers. Fixed review profiles at island scale1; browser camera fitting remains a separate runtime gate.",
+    "footContacts": "Original source pixels at height<=2 are reported separately. They include intended floor contact and fractional CSS footprint overlap; no contact is silently discarded."
+  },
+  "sampleStepWorld": 0.1,
+  "routeSampleCount": 312,
+  "footprintRayCount": 936,
+  "headroomRayCount": 936,
+  "actualFekaWorldPixel": 0.03242187560038659,
+  "actualFekaWorldHeight": 1.0108313699621605,
+  "physicalCounts": {},
+  "pierCount": 0,
+  "archStructure": {
+    "voussoirCount": 14,
+    "rootedAbutments": [
+      {
+        "object": "great bridge rooted abutment",
+        "baseZ": -0.30000001192092896,
+        "foundations": [
+          "continuous coastal bedrock",
+          "walk_garden foundation"
+        ],
+        "rooted": true
+      },
+      {
+        "object": "great bridge rooted abutment.001",
+        "baseZ": -0.30000001192092896,
+        "foundations": [
+          "continuous coastal bedrock",
+          "walk_garden foundation"
+        ],
+        "rooted": true
+      }
+    ],
+    "deckSpandrelOverlap": 0.05
+  },
+  "allActiveRoutePiersRooted": true,
+  "sourceProjection": {
+    "rayCount": 549120,
+    "bodyContacts": {},
+    "footContacts": {
+      "walk_main garden route 4": 595,
+      "walk_last terrace ascent flush stone tread joint": 1,
+      "walk_last terrace ascent flush stone tread joint.009": 1,
+      "walk_back passage service stairs": 595,
+      "walk_service stairs flush stone tread joint": 1
+    },
+    "headContacts": 0,
+    "faceContacts": 0
+  },
+  "rasterProfiles": [
+    {
+      "profile": "desktop",
+      "viewport": [
+        1180,
+        757
+      ],
+      "zoom": 1.0,
+      "actorScaleCssPixels": 1.8571753640776698,
+      "paintPixelSize": 2,
+      "rayCount": 382812,
+      "bodyContacts": {},
+      "footContacts": {
+        "walk_main garden route 4": 450,
+        "walk_back passage service stairs": 488,
+        "walk_service stairs flush stone tread joint.004": 1
+      },
+      "headContacts": 0,
+      "faceContacts": 0
+    },
+    {
+      "profile": "portrait",
+      "viewport": [
+        400,
+        606
+      ],
+      "zoom": 1.05,
+      "actorScaleCssPixels": 0.6610285194174758,
+      "paintPixelSize": 1,
+      "rayCount": 51051,
+      "bodyContacts": {},
+      "footContacts": {
+        "walk_main garden route 1": 55,
+        "walk_6-2 generous garden landing": 33,
+        "walk_main garden route 2": 66,
+        "walk_6-3 generous garden landing": 66,
+        "walk_main garden route 3": 32,
+        "walk_6-4 generous garden landing": 36,
+        "walk_main garden route 4": 120,
+        "walk_6-5 generous garden landing": 22,
+        "walk_back passage service stairs": 96
+      },
+      "headContacts": 0,
+      "faceContacts": 0
+    },
+    {
+      "profile": "landscape",
+      "viewport": [
+        846,
+        392
+      ],
+      "zoom": 1.0,
+      "actorScaleCssPixels": 0.9871359223300972,
+      "paintPixelSize": 1,
+      "rayCount": 107262,
+      "bodyContacts": {},
+      "footContacts": {
+        "walk_main garden route 4": 119,
+        "walk_back passage service stairs": 111
+      },
+      "headContacts": 0,
+      "faceContacts": 0
+    }
+  ],
+  "browserGate": "Authoring gates pass; browser walkthrough and combined second-ferry gates belong to integration."
+}

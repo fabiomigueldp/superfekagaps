@@ -188,28 +188,23 @@ test('disposing during atlas load removes handlers and cannot repaint or resurre
     assert.equal(stage.draws.length, 0); assert.equal(stage.width, 56);
 });
 
-test('physical props include Reserva phases while the final region fallback resets decoration', async t => {
+test('physical props consistently cover all six campaign regions', async t => {
     const resources = signResources(t), { hud, state } = fixture(t);
     await resources.metadata(); resources.images[0].onload!(); await resources.settle();
     const stage = asElement(hud.stageButtons[0]).children[0], dock = asElement(hud.dockButtons[1]).children[0];
     assert.equal(stage.style.transform, 'translate(0px, 11px)');
-    for (const world of [6]) {
-        hud.update({ ...state, world, stage: (world - 1) * 5 });
-        assert.equal(stage.width, 56); assert.equal(stage.style.transform, '');
-        assert.equal(dock.width, 104); assert.equal(dock.style.transform, '');
-        assert.match(hud.stageButtons[0].getAttribute('aria-label')!, new RegExp(`Fase ${world}-1:`));
-    }
-    for (const world of [2, 3, 4, 5, 1]) {
+    for (const world of [6, 2, 3, 4, 5, 1]) {
         hud.update({ ...state, world, stage: (world - 1) * 5 });
         assert.equal(stage.width, 112);
         assert.equal(stage.style.transform, 'translate(0px, 11px)');
         assert.equal(dock.style.transform, 'translate(0px, 10px)');
+        assert.match(hud.stageButtons[0].getAttribute('aria-label')!, new RegExp(`Fase ${world}-1:`));
     }
     assert.equal(resources.requests.length, 3); assert.equal(resources.images.length, 1);
 });
 
 
-test('six route IDs keep same-name signs, boat docks, bridge and mountain walking actions independent', t => {
+test('route IDs keep same-name signs and independent transport actions distinct', t => {
     dom(t);
     const calls: string[] = [];
     const hud = new WorldMapHud({ selectTravel: id => calls.push(id), selectWorld: world => calls.push(`world:${world}`),
@@ -396,4 +391,21 @@ test('passenger directions announce their gate and reuse the authored wide sign 
     assert.match(incoming.title, /SERRA →.*teleférico/);
     assert.equal(asElement(hud.stageButtons[0]).children[0].width, 112);
     assert.equal(resources.requests.length, 2, 'The new labels reuse existing blank wooden faces.');
+});
+
+test('heated ferry signs load the correct wide faces and preserve their actual terminal destinations', async t => {
+    const resources = signResources(t), { hud, state } = fixture(t);
+    await resources.metadata(); resources.images[0].onload!(); await resources.settle();
+    hud.update({ ...state, world: 5, stage: 24 });
+    hud.positionTravelActions({ 'ferry-reserva-dominio': { x: 170, y: 220, available: false } });
+    assert.match(hud.travelButtons['ferry-reserva-dominio'].getAttribute('aria-label')!, /Cais.*Domínio Pizzarino.*Travessia bloqueada/);
+    assert.match(resources.requests[1].url, /signs-factory-left.meta.json$/);
+    hud.update({ ...state, world: 6, stage: 25 });
+    hud.positionTravelActions({ 'ferry-dominio-reserva': { x: 180, y: 220, available: true } });
+    assert.match(hud.travelButtons['ferry-dominio-reserva'].getAttribute('aria-label')!, /Cais.*Reserva Gelada.*travessia de barco/);
+    assert.match(resources.requests[2].url, /signs-factory.meta.json$/);
+    assert.equal(hud.travelButtons['ferry-reserva-dominio'].hidden, true);
+    assert.equal(WORLD_MAP_TRAVEL_ACTIONS['ferry-dominio-reserva'].toStage, '5-5');
+    hud.positionTravelActions({ 'ferry-reserva-dominio': { x: 170, y: 220, available: true } });
+    assert.equal(resources.requests.length, 3, 'Returning to the same face never requests it again.');
 });
