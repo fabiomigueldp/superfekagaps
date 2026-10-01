@@ -1,0 +1,139 @@
+import { WorldGame } from '../../WorldGame';
+import { STAGES } from '../../campaign';
+import { TileType } from '../../../constants';
+import type { AdventureStage } from '../../types';
+import { panel, pixelText } from '../../../graphics/BitmapFont';
+import { drawGuairaTraversalBackground, drawGuairaTraversalTerrain, drawGuairaTraversalObjects } from './GuairaTraversalArt';
+
+export const GUAIRA_TRAVERSAL = Object.freeze({
+    id: 'guaira-travessia', width: 72, height: 18, floor: 224,
+    pitStart: 416, pitEnd: 624, valveId: 'guaira-valve', bridgeId: 'guaira-bridge',
+    checkpointX: 656, finishX: 1080, bossHref: './guaira-lab.html', mapHref: './guaira.html'
+});
+
+/** Local authored data only: never registered as a seventh campaign world. */
+export function guairaTraversalStage(): AdventureStage {
+    const stage = structuredClone(STAGES[0]);
+    stage.id = GUAIRA_TRAVERSAL.id; stage.name = 'GUAÍRA · TRAVESSIA';
+    stage.subtitle = 'Uma comporta para o arrozal · localidade fictícia';
+    delete stage.encounter;
+    stage.level.id = 'experimental-guaira-travessia';
+    stage.level.width = GUAIRA_TRAVERSAL.width; stage.level.height = GUAIRA_TRAVERSAL.height;
+    stage.level.originX = 0; stage.level.originY = 0;
+    stage.level.tiles = Array.from({ length: 18 }, (_, y) => Array.from({ length: 72 }, (_, x) =>
+        y >= 14 && (x < 26 || x >= 39) ? TileType.GROUND : TileType.EMPTY));
+    stage.level.playerSpawn = { x: 3, y: 14 };
+    stage.level.enemies = []; stage.level.collectibles = []; stage.level.triggers = [];
+    stage.level.checkpoints = []; stage.level.goalPosition = { x: 69, y: 14 }; stage.level.isBossLevel = false;
+    stage.mechanisms = [
+        { id: GUAIRA_TRAVERSAL.valveId, kind: 'switch', x: 352, y: 216, width: 32, height: 8, link: GUAIRA_TRAVERSAL.bridgeId },
+        { id: GUAIRA_TRAVERSAL.bridgeId, kind: 'lift', x: 416, y: 336, width: 208, height: 16, to: { x: 416, y: 224 }, gated: true }
+    ];
+    stage.foes = []; stage.exits = []; stage.dialogues = []; stage.landmarks = [];
+    stage.checkpoints = [{ x: 41, y: 14 }];
+    stage.pickups = [112, 224, 360, 456, 520, 584, 744, 824, 904, 984].map((x, i) =>
+        ({ id: `guaira-travessia:coin:${i}`, kind: 'coin', x, y: i === 2 ? 164 : 202 }));
+    stage.route = [{ x: 48, y: 224 }, { x: 368, y: 224, switch: GUAIRA_TRAVERSAL.valveId },
+        { x: 656, y: 224 }, { x: 1080, y: 224 }];
+    return stage;
+}
+
+/** Real movement and checkpoint/death pipeline, with ephemeral completion. */
+export class GuairaTraversal extends WorldGame {
+    readonly reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    finished = false;
+    constructor(canvas: HTMLCanvasElement, private readonly status: HTMLElement) {
+        super(canvas, true);
+        this.art.background = (c, _island, cx, cy, time) => drawGuairaTraversalBackground(c, cx, cy, time, this.reducedMotion);
+        this.art.terrain = (c, level, _island, cx, cy, time) => drawGuairaTraversalTerrain(c, level, cx, cy, time, this.reducedMotion);
+        this.art.objects = (c, objects, cx, cy, time) => drawGuairaTraversalObjects(c, objects, cx, cy, time, this.reducedMotion);
+        this.store.save.preferences.shake = !this.reducedMotion;
+        this.tutorial.observe = () => {};
+        this.load(GUAIRA_TRAVERSAL.id);
+        window.addEventListener('keydown', e => {
+            if (['ArrowLeft', 'ArrowRight', 'ArrowDown', ' ', 'a', 'd', 'm', 'M'].includes(e.key)) this.audio.unlock();
+        });
+        document.title = 'Super Feka Gaps · Guaíra · Travessia experimental';
+    }
+    override load(_id: string, resume = false, _custom?: AdventureStage) {
+        super.load(GUAIRA_TRAVERSAL.id, resume, guairaTraversalStage());
+        this.finished = false; this.time = 0;
+        this.player.data.isGrounded = true; this.player.data.facingRight = true;
+        if (!resume || !this.store.save.checkpoint) this.player.data.hasHelmet = true;
+        // The checkpoint is beyond the sluice; restore its solved approach too.
+        if (resume && this.store.save.checkpoint?.stage === GUAIRA_TRAVERSAL.id) {
+            const valve = this.objects.get(GUAIRA_TRAVERSAL.valveId)!;
+            const bridge = this.objects.get(GUAIRA_TRAVERSAL.bridgeId)!;
+            valve.active = valve.observedActive = true;
+            bridge.active = bridge.observedActive = true; bridge.y = bridge.py = 224;
+        }
+        this.player.data.respawnRevealTimer = 0;
+    }
+    get bridgeReady() {
+        const bridge = this.objects.get(GUAIRA_TRAVERSAL.bridgeId)!;
+        return bridge.active && bridge.y === GUAIRA_TRAVERSAL.floor;
+    }
+    toggleTraversalPause() {
+        if (this.state === 'paused') this.resume();
+        else if (this.state === 'playing') this.pause();
+    }
+    override update(dt: number) {
+        if (!Number.isFinite(dt) || dt <= 0) return;
+        if (this.state === 'map' || this.state === 'title' || this.state === 'intro') { this.load(GUAIRA_TRAVERSAL.id); return; }
+        if (this.finished) {
+            this.input.setMenuMode(this.state !== 'playing'); this.input.update();
+            if (this.input.consumeMute()) this.audio.toggle();
+            this.audio.tick(dt);
+            if (this.state !== 'playing') return;
+            if (this.input.consumePause()) { this.toggleTraversalPause(); return; }
+            // Keep the water and the native idle animation alive; the result and
+            // elapsed run time stay fixed while horizontal friction settles Feka.
+            this.time += dt; this.renderer.advanceClock(dt);
+            this.player.update(dt, { ...this.input.getState(), left: false, right: false, run: false,
+                jump: false, jumpPressed: false, jumpReleased: false, down: false, downPressed: false }, this.level);
+            return;
+        }
+        super.update(dt);
+        // There are no campaign exits or boss here: finishStage is unreachable.
+        if (this.state === 'playing' && !this.player.data.isDead && this.player.data.isGrounded &&
+            this.player.data.position.x >= GUAIRA_TRAVERSAL.finishX && this.bridgeReady) {
+            this.finished = true; this.input.reset(); this.audio.sfx('victory');
+        }
+    }
+    override render() {
+        const paused = this.state === 'paused';
+        // Render the real world without creating campaign pause-menu callbacks.
+        if (paused) this.state = 'playing';
+        try { super.render(); } finally { if (paused) this.state = 'paused'; }
+        const c = this.renderer.getContext();
+        c.fillStyle = '#382b35'; c.fillRect(0, 0, 320, 23);
+        c.fillStyle = '#d8ac7a'; c.fillRect(0, 22, 320, 1);
+        pixelText(c, 'GUAIRA', 8, 8, '#f0ddae');
+        pixelText(c, this.finished ? 'TRAVESSIA FEITA' : this.player.data.position.x < 416 ? 'RUA DA VALA SECA' : 'PASSARELA DO ARROZ', 57, 8, '#f0ddae');
+        if (this.player.data.hasHelmet) this.renderer.drawHelmet(279, 4, c);
+        pixelText(c, 'II', 305, 8, '#f0ddae');
+        const valve = this.objects.get(GUAIRA_TRAVERSAL.valveId)!;
+        const nearValve = this.player.data.position.x > 275 && this.player.data.position.x < 416;
+        if (paused) {
+            c.fillStyle = '#211b2bbd'; c.fillRect(0, 23, 320, 157);
+            panel(c, 62, 70, 196, 43, '#382b35', '#d8ac7a');
+            pixelText(c, 'PAUSADO', 160, 79, '#f0ddae', 2, 'center');
+            pixelText(c, 'ESC OU CONTINUAR', 160, 100, '#edcaf5', 1, 'center');
+        } else if (this.finished) {
+            panel(c, 27, 40, 266, 43, '#382b35', '#d8ac7a');
+            pixelText(c, 'A AGUA CHEGOU AO ARROZAL!', 160, 50, '#f0ddae', 1, 'center');
+            pixelText(c, 'CURRAL: ENFRENTE OSSABRAVO', 160, 65, '#edcaf5', 1, 'center');
+        } else if (nearValve && !this.player.data.isDead) {
+            panel(c, 42, 29, 236, 19, '#382b35', '#d8ac7a');
+            pixelText(c, !valve.active ? 'PULE + BAIXO NO REGISTRO' : this.bridgeReady ? 'PASSAGEM ABERTA' : 'PONTE SUBINDO...', 160, 35, '#f0ddae', 1, 'center');
+        }
+        this.renderer.present();
+        const message = paused ? 'Pausado · Esc ou Continuar para voltar'
+            : this.finished ? 'Travessia concluída · Curral abre a arena de Ossabravo · Mapa volta à maquete'
+            : this.player.data.isDead ? 'Feka caiu · retorno automático ao último checkpoint · Recomeçar reinicia a travessia'
+            : nearValve ? (!valve.active ? 'Registro: pule e aperte baixo no ar para uma sentada · espere a ponte subir' : this.bridgeReady ? 'Ponte pronta · atravesse até a bandeira do checkpoint' : 'Água liberada · a ponte está subindo')
+            : this.player.data.position.x >= 624 ? 'Arrozal irrigado · siga à direita até o curral · checkpoint local na bandeira'
+            : 'Guaíra fictícia · setas/A D: mover · Espaço: pular · baixo no ar: sentada · Shift: correr · Esc: pausa · M: som';
+        if (this.status.textContent !== message) this.status.textContent = message;
+    }
+}

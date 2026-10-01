@@ -1,0 +1,94 @@
+/** Isolated local navigation. These names never enter the campaign or saved progress. */
+export type GuairaDestination = 'town' | 'curral';
+export type GuairaArrival = 'town' | 'rice' | 'corral';
+export interface GuairaPoint { x: number; y: number }
+export interface GuairaMetadata {
+    worldId: 'guaira'; size: { width: 1920; height: 1200 };
+    nodes: Record<string, GuairaPoint>;
+    routes: Record<string, GuairaPoint[]>;
+    artBounds: { left: number; top: number; right: number; bottom: number };
+}
+export const GUAIRA_DESTINATIONS = {
+    town: { node: 'guaira-1', title: 'Estrada do Vento', short: 'TRAVESSIA', href: './guaira-travessia.html', description: 'Atravesse a terra seca e leve água ao bairro.' },
+    curral: { node: 'guaira-4', title: 'Curral da Comporta', short: 'CURRAL', href: './guaira-lab.html', description: 'Enfrente Ossabravo na arena experimental.' },
+} as const;
+export function guairaArrivalFromSearch(search: string): GuairaArrival {
+    const at = new URLSearchParams(search).get('at');
+    return at === 'rice' || at === 'corral' ? at : 'town';
+}
+export function guairaReturnHref(at: GuairaArrival): string { return `./guaira.html?at=${at}`; }
+const isPoint = (v: unknown): v is GuairaPoint => !!v && typeof v === 'object' && ['x', 'y'].every(k => {
+    const n = (v as Record<string, unknown>)[k]; return typeof n === 'number' && Number.isFinite(n) && n >= 0 && n <= 1;
+});
+const samePoint = (a: GuairaPoint, b: GuairaPoint) => Math.hypot(a.x - b.x, a.y - b.y) < 1e-6;
+/** Fail closed: the rendered scene and its exact five projected landmarks form one contract. */
+export function parseGuairaMetadata(value: unknown): GuairaMetadata | null {
+    if (!value || typeof value !== 'object') return null;
+    const data = value as GuairaMetadata & { campaignIntegrated?: unknown; version?: unknown };
+    if (data.version !== 1 || data.worldId !== 'guaira' || data.campaignIntegrated !== false ||
+        data.size?.width !== 1920 || data.size?.height !== 1200 || !data.nodes || !data.routes) return null;
+    if (![1, 2, 3, 4, 5].every(i => isPoint(data.nodes[`guaira-${i}`]))) return null;
+    for (let i = 0; i < 4; i++) {
+        const route = data.routes[`${i}:${i + 1}`];
+        if (!Array.isArray(route) || route.length < 2 || !route.every(isPoint) ||
+            !samePoint(route[0], data.nodes[`guaira-${i + 1}`]) || !samePoint(route[route.length - 1], data.nodes[`guaira-${i + 2}`])) return null;
+    }
+    const b = data.artBounds;
+    if (!b || !isPoint({ x: b.left, y: b.top }) || !isPoint({ x: b.right, y: b.bottom }) || b.left >= b.right || b.top >= b.bottom) return null;
+    // Copy only local geometric data; no external IDs or links can become destinations.
+    return { worldId: 'guaira', size: { width: 1920, height: 1200 },
+        nodes: Object.fromEntries([1, 2, 3, 4, 5].map(i => { const key = `guaira-${i}`, p = data.nodes[key]; return [key, { x: p.x, y: p.y }]; })),
+        routes: Object.fromEntries(['0:1', '1:2', '2:3', '3:4'].map(key => [key, data.routes[key].map(p => ({ x: p.x, y: p.y }))])),
+        artBounds: { ...b } };
+}
+/** One continuous authored road: rapid reversals change direction at the current foot position. */
+export class GuairaMapModel {
+    readonly path: GuairaPoint[];
+    readonly distances: number[] = [0];
+    readonly length: number;
+    selected: GuairaDestination | null;
+    distance: number;
+    facingLeft = false;
+    closed = false;
+    reducedMotion = false;
+    constructor(readonly metadata: GuairaMetadata, initial: GuairaArrival = 'town') {
+        this.path = ['0:1', '1:2', '2:3'].flatMap((key, index) => metadata.routes[key].slice(index ? 1 : 0));
+        for (let i = 1; i < this.path.length; i++) this.distances.push(this.distances[i - 1] +
+            Math.hypot((this.path[i].x - this.path[i - 1].x) * 1920, (this.path[i].y - this.path[i - 1].y) * 1200));
+        this.length = this.distances[this.distances.length - 1];
+        this.selected = initial === 'rice' ? null : initial === 'corral' ? 'curral' : 'town';
+        const riceIndex = this.path.findIndex(p => samePoint(p, metadata.nodes['guaira-3']));
+        this.distance = initial === 'corral' ? this.length : initial === 'rice' ? this.distances[riceIndex] : 0;
+    }
+    get targetDistance(): number { return this.selected === null ? this.distance : this.selected === 'curral' ? this.length : 0; }
+    get moving(): boolean { return !this.closed && Math.abs(this.targetDistance - this.distance) > 1e-6; }
+    get canEnter(): boolean { return !this.closed && this.selected !== null && !this.moving; }
+    get point(): GuairaPoint { return this.pointAt(this.distance); }
+    pointAt(distance: number): GuairaPoint {
+        const d = Math.min(this.length, Math.max(0, distance));
+        for (let i = 1; i < this.path.length; i++) {
+            if (d > this.distances[i]) continue;
+            const a = this.path[i - 1], b = this.path[i], segment = this.distances[i] - this.distances[i - 1];
+            const t = segment > 0 ? (d - this.distances[i - 1]) / segment : 0;
+            return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+        }
+        return { ...this.path[this.path.length - 1] };
+    }
+    select(destination: GuairaDestination): void {
+        if (this.closed || !Object.prototype.hasOwnProperty.call(GUAIRA_DESTINATIONS, destination)) return;
+        this.selected = destination;
+        if (this.reducedMotion) this.skip();
+    }
+    tick(seconds: number): void {
+        if (!this.moving || !Number.isFinite(seconds) || seconds <= 0) return;
+        const before = this.point;
+        const delta = this.targetDistance - this.distance;
+        // Suspension never teleports the actor across the route on focus return.
+        this.distance += Math.sign(delta) * Math.min(Math.abs(delta), Math.min(seconds, .05) * 170);
+        this.facingLeft = this.point.x < before.x;
+    }
+    skip(): void { if (!this.closed) this.distance = this.targetDistance; }
+    setReducedMotion(reduced: boolean): void { this.reducedMotion = reduced; if (reduced) this.skip(); }
+    enterHref(): string | null { return this.canEnter && this.selected ? GUAIRA_DESTINATIONS[this.selected].href : null; }
+    close(): void { this.closed = true; }
+}

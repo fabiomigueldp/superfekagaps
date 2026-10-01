@@ -5,7 +5,7 @@ const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
 const game = new GuairaBullLab(canvas, document.getElementById('lab-status')!);
 const pauseButton = document.getElementById('lab-pause')!;
 const pauseAction = new LabToolbarAction(pauseButton);
-for (const [id, label, name] of [['lab-retry', 'TENTAR', 'Tentar novamente'], ['lab-exit', 'SAIR', 'Sair']])
+for (const [id, label, name] of [['lab-retry', 'TENTAR', 'Tentar novamente'], ['lab-exit', 'MAPA', 'Voltar ao mapa de Guaíra']])
     new LabToolbarAction(document.getElementById(id)!).setLabel(label, name);
 pauseButton.addEventListener('click', () => { game.toggleLabPause(); canvas.focus(); });
 document.getElementById('lab-retry')!.addEventListener('click', () => { game.load('guaira-lab'); canvas.focus(); });

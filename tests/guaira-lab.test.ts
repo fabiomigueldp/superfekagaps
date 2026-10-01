@@ -26,7 +26,7 @@ test('isolated lab uses the real engine, cloned flat stage, helmet and fixed cam
     game.render(); assert.ok(h.canvas.drawCalls > 0);
     assert.deepEqual(game.store.save.completed, []); assert.deepEqual(STAGES, original);
     const html = readFileSync(new URL('../guaira-lab.html', import.meta.url), 'utf8');
-    assert.match(html, /id="lab-exit" href="\.\/"/);
+    assert.match(html, /id="lab-exit" href="\.\/guaira\.html\?at=corral"/);
     assert.doesNotMatch(html, /intro|KeyX|HP/);
 });
 
@@ -48,7 +48,7 @@ test('pause via Escape, HUD, blur and visibility freezes and resumes without cam
 test('real toolbar has native 44px bitmap controls, retry resets combat and Enter/Space do not leak', async t => {
     const h = guairaBrowser(t); await import('../src/guaira-lab');
     const game = h.window.worldGame as GuairaBullLab;
-    for (const [control, name] of [[h.pause, 'Pausar'], [h.retry, 'Tentar novamente'], [h.exit, 'Sair']] as const) {
+    for (const [control, name] of [[h.pause, 'Pausar'], [h.retry, 'Tentar novamente'], [h.exit, 'Voltar ao mapa de Guaíra']] as const) {
         assert.equal(control.getAttribute('aria-label'), name);
         assert.equal(control.textContent, name);
         assert.ok(control.children[0] instanceof Canvas); assert.equal((control.children[0] as Canvas).height, 44);

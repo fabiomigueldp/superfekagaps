@@ -13,7 +13,7 @@ The dry red arena has a continuous horizontal floor at world y224, shown at scre
 - Escape or the native Pause/Continue control: pause/resume
 - M: toggle sound
 - Tentar: start a fresh fight with a helmet
-- Sair: navigate to the existing game home
+- Mapa: return to the isolated Guaíra map at the corral; its Sair link returns to the existing game home
 
 The ordinary engine touch zones provide movement, jump, run and sentada. Page controls use native buttons/links, accessible names and 44px-high bitmap faces; native Enter/Space activation remains owned by those controls. Blur/hidden-tab pause requires explicit resume. Reduced-motion preference disables camera shake, decorative bull bob/stride and warning flashing; direction cues and combat timing remain visible.
 

@@ -1,0 +1,277 @@
+{
+  "version": 1,
+  "worldId": "guaira",
+  "status": "experimental-isolated-map",
+  "campaignIntegrated": false,
+  "size": {
+    "width": 1920,
+    "height": 1200
+  },
+  "coordinateSystem": "Normalized top-left coordinates in complete frame; projected from authored Blender camera",
+  "camera": {
+    "position": [
+      11.0,
+      -20.0,
+      18.850000381469727
+    ],
+    "target": [
+      0.0,
+      0.25,
+      3.0
+    ],
+    "orthoScale": 20.600000381469727
+  },
+  "nodes": {
+    "guaira-1": {
+      "x": 0.216045,
+      "y": 0.58971,
+      "world": [
+        -5,
+        -2.8,
+        1.8
+      ],
+      "label": "Estrada do Vento",
+      "clearingRadius": 0.76
+    },
+    "guaira-2": {
+      "x": 0.32474,
+      "y": 0.500491,
+      "world": [
+        -4,
+        0.05,
+        1.8
+      ],
+      "label": "Bairro da Vala Seca",
+      "clearingRadius": 0.76
+    },
+    "guaira-3": {
+      "x": 0.521592,
+      "y": 0.725175,
+      "world": [
+        2,
+        -2.5,
+        1.8
+      ],
+      "label": "Passarela dos Arrozais",
+      "clearingRadius": 0.76
+    },
+    "guaira-4": {
+      "x": 0.644979,
+      "y": 0.620652,
+      "world": [
+        3.1,
+        0.8,
+        1.8
+      ],
+      "label": "Curral da Comporta",
+      "clearingRadius": 0.76
+    },
+    "guaira-5": {
+      "x": 0.578888,
+      "y": 0.459486,
+      "world": [
+        0.6,
+        2.55,
+        2.44
+      ],
+      "label": "Casa da Vazão",
+      "clearingRadius": 0.76
+    }
+  },
+  "routes": {
+    "0:1": [
+      {
+        "x": 0.216045,
+        "y": 0.58971
+      },
+      {
+        "x": 0.241533,
+        "y": 0.547165
+      },
+      {
+        "x": 0.27787,
+        "y": 0.504955
+      },
+      {
+        "x": 0.32474,
+        "y": 0.500491
+      }
+    ],
+    "1:2": [
+      {
+        "x": 0.32474,
+        "y": 0.500491
+      },
+      {
+        "x": 0.371293,
+        "y": 0.533438
+      },
+      {
+        "x": 0.384196,
+        "y": 0.594891
+      },
+      {
+        "x": 0.453341,
+        "y": 0.691559
+      },
+      {
+        "x": 0.521592,
+        "y": 0.725175
+      }
+    ],
+    "2:3": [
+      {
+        "x": 0.521592,
+        "y": 0.725175
+      },
+      {
+        "x": 0.566381,
+        "y": 0.747235
+      },
+      {
+        "x": 0.600954,
+        "y": 0.694138
+      },
+      {
+        "x": 0.644979,
+        "y": 0.620652
+      }
+    ],
+    "3:4": [
+      {
+        "x": 0.644979,
+        "y": 0.620652
+      },
+      {
+        "x": 0.644321,
+        "y": 0.564257
+      },
+      {
+        "x": 0.63866,
+        "y": 0.516475
+      },
+      {
+        "x": 0.630076,
+        "y": 0.484698
+      },
+      {
+        "x": 0.578888,
+        "y": 0.459486
+      }
+    ]
+  },
+  "worldRoutes": [
+    [
+      [
+        -5,
+        -2.8,
+        1.8
+      ],
+      [
+        -5,
+        -1.7,
+        1.8
+      ],
+      [
+        -4.8,
+        -0.5,
+        1.8
+      ],
+      [
+        -4,
+        0.05,
+        1.8
+      ]
+    ],
+    [
+      [
+        -4,
+        0.05,
+        1.8
+      ],
+      [
+        -2.8,
+        -0.15,
+        1.8
+      ],
+      [
+        -1.9,
+        -1.25,
+        1.8
+      ],
+      [
+        0.4,
+        -2.5,
+        1.8
+      ],
+      [
+        2,
+        -2.5,
+        1.8
+      ]
+    ],
+    [
+      [
+        2,
+        -2.5,
+        1.8
+      ],
+      [
+        3.05,
+        -2.5,
+        1.8
+      ],
+      [
+        3.1,
+        -1.1,
+        1.8
+      ],
+      [
+        3.1,
+        0.8,
+        1.8
+      ]
+    ],
+    [
+      [
+        3.1,
+        0.8,
+        1.8
+      ],
+      [
+        2.65,
+        1.6,
+        2.05
+      ],
+      [
+        2.3,
+        2.0,
+        2.44
+      ],
+      [
+        1.8,
+        2.55,
+        2.44
+      ],
+      [
+        0.6,
+        2.55,
+        2.44
+      ]
+    ]
+  ],
+  "routeWidth": 0.98,
+  "futureBossArea": {
+    "localNode": "guaira-4",
+    "status": "reserved-empty-arena",
+    "bossModelIncluded": false
+  },
+  "fictionalSetting": true,
+  "note": "Projected Blender geometry for the isolated Guaíra experiment. No campaign world number, save schema, or persistent progress.",
+  "artBounds": {
+    "left": 0.17864583333333334,
+    "top": 0.23,
+    "right": 0.8223958333333333,
+    "bottom": 0.9391666666666667
+  }
+}

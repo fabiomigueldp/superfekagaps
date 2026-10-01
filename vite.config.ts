@@ -6,7 +6,7 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: false,
-    rollupOptions: { input: { main: 'index.html', juiceLab: 'juice-lab.html', guairaLab: 'guaira-lab.html' } },
+    rollupOptions: { input: { main: 'index.html', juiceLab: 'juice-lab.html', guairaLab: 'guaira-lab.html', guairaMap: 'guaira.html', guairaTraversal: 'guaira-travessia.html' } },
     // usar esbuild para minify (mais leve e evita dep opcional `terser`)
     minify: 'esbuild'
   },

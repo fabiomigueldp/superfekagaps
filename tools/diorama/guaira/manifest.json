@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "scope": "Isolated Gua\u00edra experiment, no campaign world number or save schema",
+  "origin": "Original deterministic Blender scene inspired by the Gua\u00edra fictional-setting concept, authored in the Super Feka Gaps task",
+  "renderer": "Blender 4.3.2 / Cycles CPU / 48 samples / AgX medium-high contrast / no denoising",
+  "runtimeImage": {
+    "dimensions": [
+      1920,
+      1200
+    ],
+    "mode": "RGBA",
+    "encoding": "WebP quality94, method6, exact alpha",
+    "unchangedFromCandidate": false,
+    "alphaUnchanged": true,
+    "originalLosslessBytes": 893266,
+    "visualReview": "Full-resolution roof/road/rice crop compared during integration; geometry and transparency unchanged"
+  },
+  "metadataChanges": "Only status and explanatory note changed; exact camera projections and route points preserved",
+  "candidateBuilderSha256": "29f4f3a5628a5505dc7af7b87879625353361fcde71cce238954837ee59146f9",
+  "files": {
+    "public/assets/world/experimental/guaira/guaira-diorama.webp": {
+      "bytes": 195902,
+      "sha256": "20af3203af8ce1881c5a2370d7093105cf780ccfc3ef809c25c94c8c790b5b3e"
+    },
+    "public/assets/world/experimental/guaira/guaira-diorama.meta.json": {
+      "bytes": 4206,
+      "sha256": "2e02904c2664ab7e6b19687693c057edbb1c3a255281c1934f684f88b9d0ebd1"
+    },
+    "tools/diorama/guaira/build_guaira.py": {
+      "bytes": 15505,
+      "sha256": "4547a7b2602c6ad76f35ebb11c14305c6425974f4580e77bbada0600cbbad35b"
+    },
+    "tools/diorama/guaira/package_guaira.py": {
+      "bytes": 1664,
+      "sha256": "366918840b36493c8eccfdd93b24c4ae56a80fc9d38035e04f68cbaa3dfd8474"
+    }
+  },
+  "excludedFromProduction": [
+    "Blender scene/master PNG files",
+    "proof screenshots",
+    "concept raster",
+    "static proof claims about full animated occlusion"
+  ]
+}

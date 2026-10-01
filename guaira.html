@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#24494f">
+<title>Guaíra · Mapa experimental</title>
+<link rel="stylesheet" href="/src/adventure/experimental/guaira/guaira-map.css">
+</head>
+<body>
+<main id="guaira-map">
+  <header class="guaira-header">
+    <div><p class="guaira-kicker">SUPER FEKA GAPS · PROTÓTIPO</p><h1>Guaíra</h1></div>
+    <nav aria-label="Visualização e saída">
+      <button id="map-overview" type="button" aria-pressed="false">Ver mapa inteiro</button>
+      <a id="map-exit" href="./">Sair para o jogo principal</a>
+    </nav>
+  </header>
+  <section class="guaira-scene" aria-label="Maquete navegável de Guaíra" aria-describedby="map-instructions">
+    <canvas id="guaira-canvas" aria-hidden="true"></canvas>
+    <div id="guaira-markers" aria-label="Destinos na maquete">
+      <button type="button" class="guaira-marker" data-map-destination="town" aria-label="Ir à Estrada do Vento" hidden>TRAVESSIA</button>
+      <button type="button" class="guaira-marker" data-map-destination="curral" aria-label="Ir ao Curral da Comporta" hidden>CURRAL</button>
+    </div>
+    <p class="guaira-caption">A água tem dono. Por enquanto.</p>
+    <div id="map-error" hidden>
+      <p role="alert">Não foi possível carregar a maquete. Você pode entrar direto em um dos experimentos.</p>
+      <nav aria-label="Experimentos disponíveis"><a href="./guaira-travessia.html">Jogar travessia</a><a href="./guaira-lab.html">Jogar curral</a></nav>
+      <a href="./guaira.html">Tentar carregar o mapa de novo</a>
+    </div>
+    <div id="map-loading-panel"><p id="map-loading" role="status">Carregando a maquete…</p>
+      <nav aria-label="Entrar direto enquanto a maquete carrega"><a href="./guaira-travessia.html">Jogar travessia</a><a href="./guaira-lab.html">Jogar curral</a></nav>
+    </div>
+  </section>
+  <footer class="guaira-panel">
+    <div class="guaira-destinations" role="group" aria-label="Escolher destino">
+      <button id="destination-town" type="button" data-map-destination="town" disabled>Travessia</button>
+      <button id="destination-curral" type="button" data-map-destination="curral" disabled>Curral</button>
+    </div>
+    <div class="guaira-description">
+      <h2 id="map-title">Estrada do Vento</h2>
+      <p id="map-description">Atravesse a terra seca e leve água ao bairro.</p>
+      <p id="map-status" role="status" aria-live="polite" aria-atomic="true"></p>
+    </div>
+    <div class="guaira-actions">
+      <button id="map-skip" type="button" hidden>Chegar agora</button>
+      <button id="map-enter" type="button" disabled>Entrar</button>
+    </div>
+    <p id="map-instructions">Escolha um destino e entre quando Feka chegar. Setas ← → escolhem; Tab navega pelos controles.</p>
+  </footer>
+</main>
+<script type="module" src="/src/guaira.ts"></script>
+</body>
+</html>
