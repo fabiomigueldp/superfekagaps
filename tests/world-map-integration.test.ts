@@ -1112,3 +1112,15 @@ test('a wrongly sized Factory bitmap is rejected independently and pending image
     assert.ok(pending.length > 0); h.view.dispose();
     assert.ok(pending.every(image => image.onload === null && image.onerror === null));
 });
+
+test('close views show only their own departure signs while panorama retains the neighboring bridge direction', async t => {
+    const h = mapDOM(t, true), save = openSave('3-1'); await readyConnectedFactory(h, save);
+    const travel = h.internal.hud.travelButtons;
+    assert.equal(travel['bridge-factory-porto'].hidden, false);
+    assert.equal(travel['bridge-porto-factory'].hidden, true, 'An arrival view must not offer its own destination from the neighboring island.');
+    h.view.render(5, save, 100, '');
+    assert.equal(travel['bridge-porto-factory'].hidden, false); assert.equal(travel['ferry-porto-costa'].hidden, false);
+    assert.equal(travel['bridge-factory-porto'].hidden, true);
+    h.get('world-map-overview').click(); h.view.render(5, save, 116, '');
+    assert.equal(travel['bridge-porto-factory'].hidden, false); assert.equal(travel['bridge-factory-porto'].hidden, false);
+});

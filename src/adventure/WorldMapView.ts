@@ -576,6 +576,7 @@ export class WorldMapView {
             travel[id] = null;
             if (hide || this.journey?.destination || world > 3) continue;
             const action = WORLD_MAP_TRAVEL_ACTIONS[id], departure = action.fromWorld;
+            if (!this.overview && departure !== world) continue;
             const anchor = action.mode === 'ferry' && this.connectionActive && this.connection && (departure === 1 || departure === 2)
                 ? this.connection.docks[departure].dock
                 : action.mode === 'bridge' && this.bridgeActive && this.bridge && (departure === 2 || departure === 3)
