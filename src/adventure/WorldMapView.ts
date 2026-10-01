@@ -6,7 +6,7 @@ import { COSTA_ART_BOUNDS, fallbackMapMetadata, frameMapPins, mapActorScale, map
 import { WorldMapHud, WORLD_MAP_TRAVEL_ACTIONS, WORLD_MAP_TRAVEL_ACTION_IDS,
     type WorldMapMotionState, type WorldMapHudPoint, type WorldMapTravelActionId } from './WorldMapHud';
 import { WORLD_ATLAS_PLACEMENTS, getAtlasCamera, atlasTravelWindow, atlasIslandBounds, localToAtlas, type AtlasBounds } from './WorldAtlasModel';
-import { atlasActorScale, atlasBoatBounds, paintWorldAtlas, type AtlasBoat, type AtlasIslandLayer } from './WorldAtlasArt';
+import { atlasActorBounds, atlasActorScale, atlasBoatBounds, paintWorldAtlas, type AtlasBoat, type AtlasIslandLayer } from './WorldAtlasArt';
 import { buildJourneyNetwork, parseJourneyBoat, parseJourneyConnection, parseJourneyBridge, PORT_FACTORY_BRIDGE_EDGE,
     type JourneyBoatMetadata, type JourneyConnection, type JourneyBridge } from './WorldJourneyNetwork';
 import { advanceJourney, canEnterJourney, createJourney, enterJourney, journeyBlockReason, journeyMode, returnToJourney, selectJourney, skipJourney, type JourneyCapabilities, type JourneyNetwork, type JourneyState } from './WorldJourneyModel';
@@ -143,7 +143,15 @@ export function layoutCompactIslandControls(points: readonly MapControlPlacement
     const direct = points.map(point => ({ ...point, x: Math.round(point.x), y: Math.round(point.y) }));
     if (valid(direct)) return direct;
     const placed = layoutMapControls(points, bounds);
-    return valid(placed) ? placed : null;
+    if (valid(placed)) return placed;
+    // A two-pixel adjustment can free the neighboring row. Try each island
+    // once; acceptance always uses the original anchors and shore constraints.
+    for (let index = 0; index < Math.min(6, points.length); index++) {
+        const nudged = points.map((point, n) => n === index ? { ...point, y: point.y + 2 } : point);
+        const retry = layoutMapControls(nudged, bounds);
+        if (valid(retry)) return retry;
+    }
+    return null;
 }
 
 /** One map-owned state machine, one mount, and the game's existing animation clock. */
@@ -796,17 +804,19 @@ export class WorldMapView {
         const cablePoints = cablePaths.flat();
         if (cablePoints.length) connectionBounds.push({ left: Math.min(...cablePoints.map(p => p.x)), right: Math.max(...cablePoints.map(p => p.x)),
             top: Math.min(...cablePoints.map(p => p.y)), bottom: Math.max(...cablePoints.map(p => p.y)) });
-        const focusBounds = [...(this.overview ? boats.map(boat => atlasBoatBounds(boat.foot, boat.frame))
+        const occupiedCabin = actorInAtlas ? this.activeCableCar(true) : undefined;
+        const occupiedBoat = actorInAtlas ? this.activeFerry(true)?.definition.id : undefined;
+        const actorFrame = cableCars.find(car => car.id === occupiedCabin)?.frame ?? boats.find(boat => boat.id === occupiedBoat)?.frame;
+        const focusBounds = [...(this.overview && actorInAtlas ? [atlasActorBounds(this.marker, actorFrame, !occupiedCabin && !occupiedBoat)] : []),
+            ...(this.overview ? boats.map(boat => atlasBoatBounds(boat.foot, boat.frame))
             : trackedBoat ? [atlasBoatBounds(trackedBoat.foot, trackedBoat.frame)] : []),
             ...(this.overview ? cableCars.map(atlasCableBounds) : trackedCabin ? [atlasCableBounds(trackedCabin)] : [])];
         const target = getAtlasCamera({ mode: this.overview ? 'overview' : channel ? 'channel' : 'island', activeWorld,
             layers: islands, width: this.width, height: this.height, insets: { ...this.frameInsets, left: 16, right: 16 },
-            focus: trackJourney ? this.marker : undefined,
+            focus: trackJourney && !this.overview ? this.marker : undefined,
             travelPoints, connectionBounds, focusBounds });
         this.camera = this.blendAtlasCamera(target, dt, trackedCabin ? atlasCableBounds(trackedCabin)
             : trackedBoat ? atlasBoatBounds(trackedBoat.foot, trackedBoat.frame) : undefined);
-        const occupiedCabin = actorInAtlas ? this.activeCableCar(true) : undefined;
-        const occupiedBoat = actorInAtlas ? this.activeFerry(true)?.definition.id : undefined;
         const aboard = !!occupiedCabin || !!occupiedBoat;
         paintWorldAtlas(this.ctx, { camera: this.camera, time, reducedMotion: this.media.matches, islands,
             connections: [...(overlay ? [{ ...overlay, image: this.bridgeImages.get(bridgeState)! }] : []),

@@ -71,9 +71,18 @@ export interface AtlasPaintState {
  * Keep him the same world size while approaching and standing on the deck.
  */
 const FEKA_PIXEL_MAP_WIDTH = (4.15 / 20.6) * 3 / 384;
+const actorPixelMapWidth = (frame?: BoatAtlasFrame) => frame ? frame.widthInMap * frame.passengerPixelScale / frame.width : FEKA_PIXEL_MAP_WIDTH;
 export function atlasActorScale(camera: MapCamera, frame?: BoatAtlasFrame): number {
-    const pixelWidth = frame ? frame.widthInMap * frame.passengerPixelScale / frame.width : FEKA_PIXEL_MAP_WIDTH;
+    const pixelWidth = actorPixelMapWidth(frame);
     return Math.min(camera.width / 1.6, camera.height) * camera.zoom * 1.6 * pixelWidth;
+}
+/** Match the 16×26 actor and optional 9×3.2px shadow in world units. The
+ * bounds fitter's 12px visual padding covers pixel rounding and the shadow's
+ * fixed 1px upward offset, without imposing a close-view 44px focus margin. */
+export function atlasActorBounds(foot: MapPoint, frame?: BoatAtlasFrame, shadow = true): AtlasBounds {
+    const pixelWidth = actorPixelMapWidth(frame), radius = shadow ? 9 : 8;
+    return { left: foot.x - radius * pixelWidth, right: foot.x + radius * pixelWidth,
+        top: foot.y - 26 * 1.6 * pixelWidth, bottom: foot.y + (shadow ? 3.2 * 1.6 * pixelWidth : 0) };
 }
 function validFrame(frame: BoatAtlasFrame): boolean {
     return [frame.width, frame.height, frame.widthInMap, frame.passengerPixelScale].every(value => Number.isFinite(value) && value > 0) &&

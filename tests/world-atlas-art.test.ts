@@ -4,7 +4,7 @@ import test from 'node:test';
 import { PLAYER_PALETTE, PLAYER_SPRITES } from '../src/assets/playerSpriteSpec';
 import { fallbackMapMetadata, paintMapIsland, paintMapSea, paintWorldMap, parseMapMetadata } from '../src/adventure/WorldMapArt';
 import { atlasIslandCamera, COAST_PORT_PLACEMENTS, getAtlasCamera, localToAtlas } from '../src/adventure/WorldAtlasModel';
-import { atlasActorScale, atlasBoatBounds, paintWorldAtlas, type AtlasPaintState, type BoatAtlasFrame } from '../src/adventure/WorldAtlasArt';
+import { atlasActorBounds, atlasActorScale, atlasBoatBounds, paintWorldAtlas, type AtlasPaintState, type BoatAtlasFrame } from '../src/adventure/WorldAtlasArt';
 import { mapToScreen, screenToMap, type MapCamera } from '../src/adventure/WorldMapModel';
 import { atlasCableBounds, paintCableLines, validCableFrame, type AtlasCableCar, type CableAtlasFrame } from '../src/adventure/WorldCableArt';
 
@@ -35,6 +35,19 @@ function scene(aboard = true): AtlasPaintState {
 }
 const actorColors = new Set(Object.values(PLAYER_PALETTE).filter(Boolean));
 const actorPixels = (calls: Call[]) => calls.filter(call => call.name === 'fillRect' && actorColors.has(call.color as string));
+
+test('actor bounds use the painted sprite and shadow scale on land and in a vehicle', () => {
+    const foot = { x: .9, y: .8 };
+    for (const view of [camera, { ...camera, width: 472, height: 303, zoom: .12 }])
+        for (const vehicle of [undefined, frame, { ...frame, passengerPixelScale: 4 }]) for (const shadow of [false, true]) {
+            const bounds = atlasActorBounds(foot, vehicle, shadow), scale = atlasActorScale(view, vehicle), p = mapToScreen(foot, view);
+            const top = mapToScreen({ x: bounds.left, y: bounds.top }, view), bottom = mapToScreen({ x: bounds.right, y: bounds.bottom }, view);
+            assert.ok(Math.abs(top.x - (p.x - (shadow ? 9 : 8) * scale)) < 1e-10);
+            assert.ok(Math.abs(bottom.x - (p.x + (shadow ? 9 : 8) * scale)) < 1e-10);
+            assert.ok(Math.abs(top.y - (p.y - 26 * scale)) < 1e-10);
+            assert.ok(Math.abs(bottom.y - (p.y + (shadow ? 3.2 * scale : 0))) < 1e-10);
+        }
+});
 
 test('connected painter clears and paints sea once, then both fixed island layers with no phantom distant Porto', () => {
     const { context, calls } = recordingContext(), state = scene();

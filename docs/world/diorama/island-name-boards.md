@@ -58,7 +58,7 @@ focus on Reserva, so those two states can be judged independently.
 
 The short 472 × 303 viewport exposed a semantic failure in the old collision
 packing: 76 × 44 name targets could move beneath another island. The compact
-prototype uses the existing narrow plank with a single island number, displayed
+view uses the existing narrow plank with a single island number, displayed
 at its natural 28 × 29 proportions inside a 44 × 44 native target. The complete
 name remains in the accessible label and the selected-island footer. Desktop
 nameboards, region ownership, campaign progression and transport routes stay
@@ -80,6 +80,26 @@ attached number badges before production promotion.
 The prototype passed 172 focused checks, both TypeScript projects and the final
 508 TypeScript + 3 server tests in 14.54 s. Vite built in 1.23 s: 494.27 kB JS /
 153.09 kB gzip. Existing textures are reused with no additional image payload.
+
+## Overview framing at the first arrival
+
+Public smoke at 1-1 exposed excessive overview padding: the camera reserved the
+close-view 44 CSS pixels around Feka even though his overview sprite is small.
+The panorama now fits the actual 16 × 26 sprite and optional shadow in world
+units, using the same scale basis as the painter and the bounds fitter's visual
+padding. Occupied boat/cabin scale is included. Close and travel views retain
+their existing 44-pixel focus clearance.
+
+At the real 472 × 303 geometry, the larger overview makes a valid six-badge
+layout possible at 1-1. If direct and normal placement miss it, at most six
+deterministic retries move one desired anchor two pixels downward. Acceptance
+still uses the original anchors, owner bounds, 12-pixel limits, 44-pixel targets
+and 8-pixel gaps. The explicit chooser remains when no accepted layout fits.
+Regression checks cover 1-1, 3-3 and 6-1 without player/save-specific rules.
+
+The final framing tree passed 162 focused checks, both TypeScript projects and
+513 TypeScript + 3 server tests in 12.29 s. Vite built in 1.14 s: 494.70 kB JS /
+153.25 kB gzip. CSS and image payload are unchanged in this follow-up.
 
 ## Reproduce and check
 

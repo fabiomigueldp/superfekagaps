@@ -9,6 +9,7 @@ import { WorldMapView } from '../src/adventure/WorldMapView';
 import { WORLD_MAP_TRAVEL_ACTIONS } from '../src/adventure/WorldMapHud';
 import { mapToScreen, type MapPoint } from '../src/adventure/WorldMapModel';
 import { atlasIslandBounds, WORLD_ATLAS_PLACEMENTS } from '../src/adventure/WorldAtlasModel';
+import { atlasActorBounds } from '../src/adventure/WorldAtlasArt';
 import { Input } from '../src/engine/Input';
 
 type Listener = (event: any) => void;
@@ -795,6 +796,47 @@ test('472px panorama with its real 94px footer keeps each numbered badge attache
     });
     const positions = h.internal.compactOverviewPositions; h.view.render(25, save, 200, '');
     assert.equal(h.internal.compactOverviewPositions, positions);
+});
+
+test('compact overview fits the actual actor and all attached badges at fresh Costa, Factory and Domínio', async t => {
+    for (const stage of ['1-1', '3-3', '6-1']) await t.test(stage, async child => {
+        const h = mapDOM(child, true), save = stage === '1-1' ? freshSave() : openSave(stage); await readyDominio(h, save);
+        const selection = STAGES.findIndex(entry => entry.id === stage);
+        h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width: 472, height: 303 };
+        h.get('world-map-header').bounds = { x: 12, y: 6, left: 12, top: 6, width: 448, height: 44 };
+        h.get('world-map-tools').bounds = h.get('world-map-header').bounds;
+        h.get('world-map-footer').bounds = { x: 12, y: 202.8, left: 12, top: 202.8, width: 448, height: 94 };
+        h.observers[0].callback(); h.get('world-map-overview').click(); h.view.render(selection, save, 100, '');
+        const { camera, marker, frameInsets } = h.internal;
+        assert.ok(camera.zoom > .12, 'A tiny overview actor does not reserve the close-view 44px margin.');
+        const actor = atlasActorBounds(marker), a = mapToScreen({ x: actor.left, y: actor.top }, camera), b = mapToScreen({ x: actor.right, y: actor.bottom }, camera);
+        assert.ok(a.x >= 16 && b.x <= 456 && a.y >= frameInsets.top && b.y <= 303 - frameInsets.bottom);
+        for (let world = 1; world <= 6; world++) {
+            const island = atlasIslandBounds({ world, metadata: currentArt(h, world).metadata, placement: WORLD_ATLAS_PLACEMENTS[world] });
+            const top = mapToScreen({ x: island.left, y: island.top }, camera), bottom = mapToScreen({ x: island.right, y: island.bottom }, camera);
+            assert.ok(top.x >= 16 && bottom.x <= 456 && top.y >= frameInsets.top && bottom.y <= 303 - frameInsets.bottom);
+        }
+        assert.equal(h.root.classList.contains('has-island-selector-fallback'), false, 'Fresh 1-1 also fits through a bounded retry, without relying on unlocks.');
+        const feet = h.internal.hud.overviewButtons.map((button: Button, index: number) => {
+            assert.equal(button.hidden, false);
+            const match = /^translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(button.style.transform)!;
+            const x = Number(match[1]), y = Number(match[2]);
+            const b = atlasIslandBounds({ world: index + 1, metadata: currentArt(h, index + 1).metadata, placement: WORLD_ATLAS_PLACEMENTS[index + 1] });
+            const left = mapToScreen({ x: b.left, y: b.bottom }, camera), right = mapToScreen({ x: b.right, y: b.bottom }, camera);
+            assert.ok(x >= left.x && x <= right.x && Math.abs(y - left.y) <= 12);
+            assert.ok(Math.abs(x - (left.x + right.x) / 2) <= 12 && Math.abs(y - left.y - 8) <= 12, 'Retries must satisfy the original, unnudged anchor limits.');
+            assert.ok(x - 22 >= 8 && x + 22 <= 464 && y - 44 >= frameInsets.top + 2 && y <= 303 - frameInsets.bottom - 2);
+            return { x, y };
+        });
+        feet.forEach((point: MapPoint, index: number) => {
+            for (const other of feet.slice(index + 1)) assert.ok(Math.abs(point.x - other.x) >= 52 || Math.abs(point.y - other.y) >= 52);
+        });
+        h.get('world-map-overview').click(); h.view.render(selection, save, 200, '');
+        const close = mapToScreen(h.internal.marker, h.internal.camera);
+        assert.ok(close.x >= 60 - 1e-8 && close.x <= 412 + 1e-8);
+        assert.ok(close.y >= frameInsets.top + 44 - 1e-8 && close.y <= 303 - frameInsets.bottom - 44 + 1e-8);
+        assert.equal(h.internal.journey.arrived, stage); assert.equal(h.events.entered, 0);
+    });
 });
 
 test('panorama primary action opens the selected island and a double click cannot also enter gameplay', async t => {
