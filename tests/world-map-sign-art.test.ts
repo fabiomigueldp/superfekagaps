@@ -33,9 +33,47 @@ test('owned island nameboards preserve all six labels, accents and stable native
             for (const pixel of painted.calls.filter(call => call.method === 'fillRect' && call.color === ART.ink)) {
                 const [x, y, width, height] = pixel.args as number[], face = data.frames.island.usableFace;
                 assert.ok(pixel.args.every(Number.isInteger));
+                if (y < face.y) {
+                    assert.ok(selected && x >= 56 && x + width <= 72 && y >= 0 && y + height <= 10, 'The selection outline stays above every accented label.');
+                    continue;
+                }
                 assert.ok(x >= face.x && y >= face.y && x + width <= face.x + face.width && y + height <= face.y + face.height);
             }
         }
+});
+
+test('selected island pointers retain a contrasting outline at compact size without repainting locks or letters', () => {
+    const raw = JSON.parse(readFileSync(new URL('../public/assets/world/map/island-signs.meta.json', import.meta.url), 'utf8'));
+    const atlas = { metadata: parseMapIslandSignMetadata(raw)!, image: {} as HTMLImageElement };
+    let openMarker: unknown;
+    for (const open of [true, false]) {
+        const selected = canvas(), idle = canvas();
+        paintPhysicalIslandSign(selected.canvas, atlas, '6 DOMÍNIO', true, open);
+        paintPhysicalIslandSign(idle.canvas, atlas, '6 DOMÍNIO', false, open);
+        const lettering = (painted: ReturnType<typeof canvas>) => painted.calls.filter(call => call.method === 'fillRect' && Number(call.args[1]) >= 11);
+        assert.deepEqual(lettering(selected), lettering(idle), 'Selection never alters the complete accented name.');
+        const marker = selected.calls.filter(call => call.method === 'fillRect' && Number(call.args[1]) < 10);
+        assert.ok(marker.length > 0);
+        assert.equal(idle.calls.some(call => call.method === 'fillRect' && Number(call.args[1]) < 10), false);
+        if (open) openMarker = marker; else {
+            assert.deepEqual(marker, openMarker, 'A locked preview retains the same clear selection marker.');
+            assert.deepEqual(selected.calls.find(call => call.method === 'drawImage'), idle.calls.find(call => call.method === 'drawImage'), 'The locked wood and red keeper are unchanged.');
+        }
+        const compact = new Map<string, string>();
+        for (const call of marker) {
+            const [x, y, width, height] = (call.args as number[]).map(value => value / 2);
+            assert.ok([x, y, width, height].every(Number.isInteger), 'Every marker block survives 50% display scale as whole pixels.');
+            for (let py = y; py < y + height; py++) for (let px = x; px < x + width; px++) compact.set(`${px},${py}`, call.color!);
+        }
+        assert.deepEqual(new Set(compact.values()), new Set([ART.ink, ART.paper, ART.gold]));
+        const xs = [...compact.keys()].map(key => Number(key.split(',')[0])), ys = [...compact.keys()].map(key => Number(key.split(',')[1]));
+        assert.equal(Math.max(...xs) - Math.min(...xs) + 1, 8); assert.equal(Math.max(...ys) - Math.min(...ys) + 1, 5);
+        for (const [key, color] of compact) if (color !== ART.ink) {
+            const [x, y] = key.split(',').map(Number);
+            for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]])
+                assert.ok(compact.has(`${x + dx},${y + dy}`), 'Cream and brass remain enclosed by the dark outline at compact size.');
+        }
+    }
 });
 
 test('malformed island name art cannot shrink targets, clip accents or shift a selected board', () => {

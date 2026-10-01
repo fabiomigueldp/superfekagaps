@@ -196,13 +196,22 @@ export function paintPhysicalStageSign(canvas: HTMLCanvasElement, atlas: MapSign
     if (selected) pixelText(ctx, '↓', 28, 0, ART.ink, 2, 'center');
     return true;
 }
+/** A static 16×10 pointer above the name. Two-pixel steps retain their outline
+ * at the panorama's 64×22 compact size without covering accents or timber feet. */
+export function paintIslandSelectionPointer(ctx: CanvasRenderingContext2D): void {
+    ctx.fillStyle = ART.ink;
+    ctx.fillRect(56, 0, 16, 4); ctx.fillRect(58, 4, 12, 2);
+    ctx.fillRect(60, 6, 8, 2); ctx.fillRect(62, 8, 4, 2);
+    ctx.fillStyle = ART.paper; ctx.fillRect(58, 2, 12, 2);
+    ctx.fillStyle = ART.gold; ctx.fillRect(60, 4, 8, 2); ctx.fillRect(62, 6, 4, 2);
+}
 export function paintPhysicalIslandSign(canvas: HTMLCanvasElement, atlas: MapIslandSignAtlas | null, text: string,
     selected: boolean, open: boolean): boolean {
     if (!atlas) return false;
     const kind: MapIslandSignKind = !open ? 'island-locked' : selected ? 'island-selected' : 'island';
     const ctx = paint(canvas, atlas.image, atlas.metadata.frames[kind], text);
     if (!ctx) return false;
-    if (selected) pixelText(ctx, '↓', 64, 0, ART.gold, 1, 'center');
+    if (selected) paintIslandSelectionPointer(ctx);
     return true;
 }
 /** Explicit text and direction distinguish ferry PORTO from the return bridge PORTO. */

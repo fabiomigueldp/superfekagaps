@@ -41,6 +41,19 @@ pixels. Accented names extend upward to y11; every original glyph cell stays
 inside the authored safe face and has fully opaque board backing. `letters`
 and `closedLetters` both remain `#191f35`; the selected cue is `#e9ad4c`.
 
+Confirmed selection also uses a static original bitmap pointer above the name:
+16 × 10 CSS pixels at `(56, 0)`, with a dark outline and cream/brass fill. Its
+two-pixel steps remain whole pixels at the 64 × 22 compact display size. The
+same painter is used for atlas and fallback boards, including locked previews.
+It never overlaps accent cells or changes the foot/target. Keyboard focus keeps
+its separate native white outline; it does not move the selection marker.
+
+The marker pass passed 504 TypeScript + 3 server tests in 12.80 s, both
+TypeScript projects and diff checks. Vite built in 1.25 s: 491.89 kB JS /
+152.43 kB gzip. No image, CSS, hitbox, camera, route or save changed. Actual
+desktop and compact preview review will compare selected Domínio with keyboard
+focus on Reserva, so those two states can be judged independently.
+
 ## Reproduce and check
 
 Requirements: Blender 4.3.2, Python, Pillow and NumPy. Use an output directory

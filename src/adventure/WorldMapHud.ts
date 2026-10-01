@@ -3,7 +3,7 @@ import { fitText, panel, pixelText, textWidth, wrapText } from '../graphics/Bitm
 import { ART } from '../graphics/palette';
 import { mapAssetPrefix } from './WorldMapArt';
 import { loadMapSignAtlas, loadMapFactorySignAtlas, loadMapFactoryLeftSignAtlas, paintPhysicalTravelSign, paintPhysicalStageSign,
-    loadMapIslandSignAtlas, paintPhysicalIslandSign,
+    loadMapIslandSignAtlas, paintPhysicalIslandSign, paintIslandSelectionPointer,
     type MapSignAtlas, type MapFactorySignAtlas, type MapTravelSign, type MapIslandSignAtlas } from './WorldMapSignArt';
 
 export const WORLD_MAP_TRAVEL_ACTION_IDS = ['ferry-costa-porto', 'ferry-porto-costa', 'bridge-porto-factory', 'bridge-factory-porto',
@@ -141,7 +141,7 @@ function islandSign(canvas: HTMLCanvasElement, text: string, selected: boolean, 
     ctx.fillStyle = ART.soilLight; ctx.fillRect(21, 26, 1, 17); ctx.fillRect(105, 26, 1, 17);
     ctx.fillStyle = ART.soilDark; ctx.fillRect(4, 9, 120, 25);
     ctx.fillStyle = open ? ART.paper : ART.rockLight; ctx.fillRect(7, 11, 114, 21);
-    if (selected) { ctx.fillStyle = ART.gold; ctx.fillRect(7, 11, 3, 21); pixelText(ctx, '↓', 64, 0, ART.gold, 1, 'center'); }
+    if (selected) { ctx.fillStyle = ART.gold; ctx.fillRect(7, 11, 3, 21); paintIslandSelectionPointer(ctx); }
     pixelText(ctx, text, 64, 15, ART.ink, 2, 'center');
 }
 function stageSign(canvas: HTMLCanvasElement, id: string, selected: boolean, completed: boolean, open: boolean): void {
