@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test, { type TestContext } from 'node:test';
 import { WorldMapHud, WORLD_MAP_TRAVEL_ACTIONS, WORLD_MAP_TRAVEL_ACTION_IDS, type WorldMapHudPoint, type WorldMapHudState, type WorldMapMotionState } from '../src/adventure/WorldMapHud';
+import { STAGES } from '../src/adventure/campaign';
 
 type Listener = (event: any) => void;
 /** The component owns semantics, not the renderer's layout or event routing. */
@@ -90,6 +91,52 @@ test('phase activation always selects; entering is a separate arrival-gated acti
     hud.stageButtons[3].click(); assert.equal(calls.at(-1), 3, 'Locked phases stay inspectable.');
     assert.match(hud.stageButtons[3].getAttribute('aria-label')!, /1-4.*bloqueada/);
     hud.setVisible(false); hud.stageButtons[1].click(); assert.equal(calls.at(-1), 3, 'Hidden maps cannot dispatch gameplay actions.');
+});
+
+test('stage names expose saved seals and remaining counts without conflating completion or locks', t => {
+    const { hud, state } = fixture(t);
+    hud.update({ ...state, seals: [0, 1, 2, 3, 0], motionState: 'walking', canEnter: false });
+    const counts = ['0 de 3 selos; faltam 3 selos.', '1 de 3 selos; faltam 2 selos.',
+        '2 de 3 selos; falta 1 selo.', '3 de 3 selos; nenhum selo restante.'];
+    counts.forEach((count, index) => {
+        const stage = STAGES[index], status = index === 0 ? 'concluída' : index === 1 ? 'disponível' : 'bloqueada';
+        assert.equal(hud.stageButtons[index].getAttribute('aria-label'),
+            `Fase ${stage.id}: ${stage.name}, ${status}. ${count} ${index < 2 ? 'Marcar destino.' : 'Ver caminho bloqueado.'}`);
+        assert.equal(hud.stageButtons[index].title, `${stage.id} · ${stage.name} · ${status}`, 'Visible tooltip wording stays unchanged.');
+    });
+    assert.equal(find(asElement(hud.root), 'world-map-stage-details').textContent, '0/3 selos');
+    assert.equal(hud.enterButton.hidden, true); assert.equal(hud.skipButton.hidden, false);
+});
+
+test('all encounter stage names omit seal counts even if the supplied slot contains seals', t => {
+    const { hud, state } = fixture(t);
+    for (const encounter of STAGES.filter(stage => stage.encounter)) {
+        const index = STAGES.indexOf(encounter);
+        hud.update({ ...state, world: encounter.world, stage: index, open: Array(5).fill(true), seals: [0, 1, 2, 3, 3] });
+        assert.equal(hud.stageButtons[encounter.number - 1].getAttribute('aria-label'),
+            `Fase ${encounter.id}: ${encounter.name}, disponível. Marcar destino.`);
+        assert.equal(find(asElement(hud.root), 'world-map-stage-details').textContent, 'Encontro');
+    }
+});
+
+test('seal progress refreshes a stage name once without announcing an unselected stage or rewriting stable frames', t => {
+    const { hud, calls, state } = fixture(t), button = hud.stageButtons[1];
+    const announcer = asElement(hud.root).children.find(child => child.getAttribute('role') === 'status')!;
+    let nameWrites = 0, announcements = 0, announcement = announcer.textContent;
+    const original = button.setAttribute.bind(button);
+    button.setAttribute = (name, value) => { if (name === 'aria-label') nameWrites++; original(name, value); };
+    Object.defineProperty(announcer, 'textContent', { configurable: true, get: () => announcement,
+        set(value: string) { announcements++; announcement = value; } });
+    const title = button.title, classes = button.className;
+    const updated = { ...state, seals: [3, 2, 0, 0, 0] };
+    hud.update(updated);
+    assert.match(button.getAttribute('aria-label')!, /2 de 3 selos; falta 1 selo/);
+    assert.equal(nameWrites, 1); assert.equal(announcements, 0);
+    assert.equal(button.title, title); assert.equal(button.className, classes);
+    assert.equal(find(asElement(hud.root), 'world-map-stage-details').textContent, '3/3 selos');
+    hud.update(updated); hud.update({ ...updated, seals: [...updated.seals] });
+    assert.equal(nameWrites, 1); assert.equal(announcements, 0);
+    button.click(); assert.deepEqual(calls, [1]);
 });
 
 test('panorama buttons own six full region names and keep locked islands inspectable', t => {

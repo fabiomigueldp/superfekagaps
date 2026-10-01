@@ -468,10 +468,13 @@ export class WorldMapHud {
             const entry = STAGES[(state.world - 1) * 5 + n], selected = entry.id === stage.id;
             const unlocked = !!state.open[n], done = !!state.completed[n], button = this.stageButtons[n];
             const status = !unlocked ? 'bloqueada' : done ? 'concluída' : 'disponível';
+            const seals = state.seals[n] ?? 0, remaining = 3 - seals;
+            const sealLabel = entry.encounter ? '' : `${seals} de 3 selos; ${remaining === 0 ? 'nenhum selo restante'
+                : remaining === 1 ? 'falta 1 selo' : `faltam ${remaining} selos`}. `;
             this.paintStage(n, state);
             button.classList.toggle('is-selected', selected); button.classList.toggle('is-completed', done); button.classList.toggle('is-locked', !unlocked);
             button.setAttribute('aria-pressed', String(selected));
-            button.setAttribute('aria-label', `Fase ${entry.id}: ${entry.name}, ${status}. ${unlocked ? 'Marcar destino.' : 'Ver caminho bloqueado.'}`);
+            button.setAttribute('aria-label', `Fase ${entry.id}: ${entry.name}, ${status}. ${sealLabel}${unlocked ? 'Marcar destino.' : 'Ver caminho bloqueado.'}`);
             button.title = `${entry.id} · ${entry.name} · ${status}`;
         }
         this.regionButtons.forEach((button, n) => {
