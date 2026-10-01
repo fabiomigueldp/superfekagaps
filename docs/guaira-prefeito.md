@@ -12,6 +12,8 @@ Encontro experimental isolado em `guaira-prefeito.html`. Prefeito fictício, sem
 
 O checkpoint local fica na aproximação do registro. Morrer reinicia o encontro inteiro e recupera o capacete que foi guardado ali. “Tentar” reinicia a tentativa. Não há links vindos da campanha ou do mapa, saída de campanha, identificador registrado, esquema de save novo ou acesso ao armazenamento persistente.
 
+O botão “Mapa” sai explicitamente para a chegada neutra da Casa da Vazão (`./guaira.html?at=vazao`), antes ou depois da vitória. Não é preciso usar o histórico do navegador para sair do experimento.
+
 ## Contrato de simulação
 
 O adapter herda `WorldGame` em modo efêmero. Input, movimento, pulo variável, sentada, transporte, colisão, capacete, morte, checkpoint, toque, pausa e renderização de Feka são os reais. `GuairaMayorModel` controla somente o encontro; não contém um jogador ou física alternativa.

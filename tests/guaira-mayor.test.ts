@@ -58,7 +58,8 @@ test('isolated native scene has only local mechanisms, checkpoint and a safe con
     g.render(); assert.ok(h.canvas.drawCalls > 0);
     assert.deepEqual(STAGES, campaign); assert.deepEqual(ISLANDS, islands);
     const html = readFileSync(new URL('../guaira-prefeito.html', import.meta.url), 'utf8');
-    assert.doesNotMatch(html, /href=|guaira-lab\.ts|KeyX|HP/);
+    assert.deepEqual(Array.from(html.matchAll(/href="([^"]+)"/g), match => match[1]), ['./guaira.html?at=vazao']);
+    assert.doesNotMatch(html, /guaira-lab\.ts|KeyX|HP/);
     assert.match(html, /guaira-prefeito\.ts/);
 });
 
@@ -241,10 +242,18 @@ test('reduced motion preserves the winning route and suppresses cosmetic impacts
     assert.equal(g.store.save.preferences.shake, false); replay(h, g); g.render();
 });
 
-test('dedicated entry has native accessible pause/retry controls and retry clears the encounter', async t => {
+test('dedicated entry has accessible pause/retry/map controls and retry clears the encounter', async t => {
     const h = guairaMayorBrowser(t); await import('../src/guaira-prefeito');
     const g = h.window.worldGame as GuairaMayorLab;
     assert.equal(h.pause.getAttribute('aria-label'), 'Pausar'); assert.equal(h.retry.getAttribute('aria-label'), 'Tentar novamente');
+    assert.equal(h.exit.getAttribute('aria-label'), 'Voltar à Casa da Vazão no mapa');
+    for (const control of [h.pause, h.retry, h.exit]) for (const [key, code] of [[' ', 'Space'], ['Enter', 'Enter']]) {
+        g.input.reset(); assert.equal(h.window.dispatch('keydown', { key, code, target: control }), false);
+        g.input.update(); assert.equal(g.input.getState().jumpPressed, false);
+        h.window.dispatch('keyup', { key, code, target: control });
+    }
+    const html = readFileSync(new URL('../guaira-prefeito.html', import.meta.url), 'utf8');
+    assert.match(html, /id="lab-exit" href="\.\/guaira.html\?at=vazao"/);
     h.pause.dispatch('click'); h.frame(); assert.equal(g.state, 'paused');
     const old = g.player; h.retry.dispatch('click'); assert.equal(g.state, 'playing');
     assert.notEqual(g.player, old); assert.equal(g.mayor.state, 'intro'); assert.equal(g.mayor.sealsRemaining, 3);

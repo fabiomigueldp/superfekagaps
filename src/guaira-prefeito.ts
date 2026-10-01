@@ -6,6 +6,7 @@ const game = new GuairaMayorLab(canvas, document.getElementById('lab-status')!);
 const pauseButton = document.getElementById('lab-pause')!;
 const pauseAction = new LabToolbarAction(pauseButton);
 new LabToolbarAction(document.getElementById('lab-retry')!).setLabel('TENTAR', 'Tentar novamente');
+new LabToolbarAction(document.getElementById('lab-exit')!).setLabel('MAPA', 'Voltar à Casa da Vazão no mapa');
 pauseButton.addEventListener('click', () => { game.toggleLabPause(); canvas.focus(); });
 document.getElementById('lab-retry')!.addEventListener('click', () => { game.load('guaira-prefeito'); canvas.focus(); });
 
