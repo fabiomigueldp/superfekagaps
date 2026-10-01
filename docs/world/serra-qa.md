@@ -50,7 +50,8 @@ painted once, inside the physically ordered occupied car.
 
 On 2026-10-01, the implementation and final cabin exports passed 390 TypeScript
 tests, 3 server tests, both TypeScript project checks, the level/player/world
-validators and the production build. Live browser verification is still pending.
+validators and the production build. Live browser verification then passed on
+the Vercel preview for commit `0360f98238a984204a6a2b6e54a3848c81bfa910`.
 The added assets total 409,355 bytes and load on demand; their uncompressed RGBA
 size is approximately 12.96 MB, before browser-specific storage or GPU overhead.
 The JavaScript bundle is 144.17 KB gzip. These measurements do not claim physical touch coverage,
@@ -60,3 +61,32 @@ The synthetic browser fixture contains only artificial campaign progress. It is
 kept outside the repository and may be imported only into the prepared preview
 origin. Production progress is preserved. Oracle and deployment configuration are
 outside this change.
+
+## Live browser verification
+
+The cloud Chromium browser loaded `index-D5YuyD7i.js`. At 590×378 CSS pixels,
+the locked Serra preview kept Enter disabled and preserved the previous arrival.
+The authorized synthetic import then exposed the expected 18 completed phases,
+45 seals and discovered 4-3 shortcut.
+
+Both maintenance cabins were used in the running game. After the first ride,
+Feka returned on the supported paths through 4-4 and 4-3 and boarded the other
+waiting car. The narrow screenshots show his face clearly inside each car, with
+the other car separated and the skip control available. Enter during travel did
+not open the phase. Rapid keyboard destination changes reversed the journey;
+skipping completed it without an automatic level entry.
+
+Reloading while riding restored the last confirmed arrival, 4-5, rather than the
+unfinished destination. A later real entry into 4-3, pause and return restored
+that phase selection and the same 18/45 progress. The complete Serra→Factory and
+Factory→Serra walks reached 3-1 and 4-1 respectively. The 1180×757 desktop view
+and settled four-region panorama were inspected, including all six directions.
+
+One 10-second automation wait expired during a walking arrival. The next DOM and
+image inspection confirmed the correct arrival; no repeated action or save
+change was needed. This observation is not a frame-rate benchmark. Portrait,
+reduced-motion and missing-asset cases are covered by automated tests; physical
+touch and a browser-level reduced-motion setting were not exercised.
+
+Screenshots and the synthetic save remain outside the production repository.
+This final documentation update changes no tested runtime source or asset.
