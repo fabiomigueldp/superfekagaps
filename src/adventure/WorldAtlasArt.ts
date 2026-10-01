@@ -1,8 +1,7 @@
 import { paintMapActor, paintMapIsland, paintMapSea, type MapArtAssets } from './WorldMapArt';
 import { atlasIslandCamera, localToAtlas, type AtlasBounds, type AtlasIslandDescriptor, type AtlasOverlayBounds } from './WorldAtlasModel';
 import { mapToScreen, type MapCamera, type MapPoint } from './WorldMapModel';
-import { paintCableCarLayer, validCableFrame, type AtlasCableCar } from './WorldCableArt';
-import type { CableCar } from './WorldCableModel';
+import { paintCableCarLayer, paintCableLines, validCableFrame, type AtlasCableCar } from './WorldCableArt';
 
 export interface AtlasIslandLayer extends AtlasIslandDescriptor {
     assets: MapArtAssets;
@@ -26,7 +25,7 @@ export interface AtlasActor {
     aboard: boolean;
     visible?: boolean;
     /** Only the occupied cabin gets a passenger between its authored layers. */
-    cableCar?: CableCar;
+    cableCar?: string;
 }
 export interface BoatAtlasCrop { x: number; y: number; w: number; h: number }
 export interface BoatAtlasFrame {
@@ -62,6 +61,7 @@ export interface AtlasPaintState {
     actor: AtlasActor;
     boat?: AtlasBoat;
     cableCars?: readonly AtlasCableCar[];
+    cablePaths?: readonly (readonly MapPoint[])[];
 }
 
 /** Authored at 3× Feka pixels in a 384px frame with orthoScale 4.15 / 20.6.
@@ -130,6 +130,7 @@ export function paintWorldAtlas(c: CanvasRenderingContext2D, state: AtlasPaintSt
         const bottom = mapToScreen({ x: overlay.left + overlay.widthInMap, y: overlay.top + overlay.heightInMap }, state.camera);
         c.drawImage(overlay.image, top.x, top.y, bottom.x - top.x, bottom.y - top.y);
     }
+    paintCableLines(c, state.camera, state.cablePaths ?? []);
     const boat = state.boat, cableCars = (state.cableCars ?? []).filter(car => car.assets.rear && car.assets.foreground && validCableFrame(car.frame));
     const occupiedCabin = state.actor.aboard ? cableCars.find(car => car.id === state.actor.cableCar) : undefined;
     // An incomplete or unavailable atlas never becomes a placeholder drawing.

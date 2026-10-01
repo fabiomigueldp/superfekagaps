@@ -1,0 +1,58 @@
+{
+  "status": "frozen-source-physical-original-sprite-and-raster-gates-pass-browser-integration-pending",
+  "sourceBuilder": "tools/diorama/render_reserva_map.py",
+  "builderSha256": "7fa0433d641a200b9f2b87c50102ac01adb385b4035d6da006b35d792790ce40",
+  "checker": "tools/diorama/check_reserva_map.py",
+  "packager": "tools/diorama/package_reserva_map.py",
+  "validation": "docs/world/diorama/reserva-validation.json",
+  "size": {
+    "width": 1920,
+    "height": 1200
+  },
+  "placement": {
+    "origin": {
+      "x": 2.7,
+      "y": -1.8
+    },
+    "scale": 1
+  },
+  "alphaBoundsPixels": [
+    266,
+    79,
+    1630,
+    1093
+  ],
+  "artBounds": {
+    "left": 0.13854166666666667,
+    "top": 0.06583333333333333,
+    "right": 0.8489583333333334,
+    "bottom": 0.9108333333333334
+  },
+  "quality": 93,
+  "actorsOrPassengerCabinsBaked": false,
+  "timingCalibration": {
+    "walkWorldUnitsPerSecond": 1.73,
+    "source": "Same real-world pace as released Serra routes; lengths follow the authored3D paths."
+  },
+  "mainRouteSeconds": {
+    "0:1": 1.857203,
+    "1:2": 2.431564,
+    "2:3": 2.663976,
+    "3:4": 4.319177
+  },
+  "shippingShortcutSeconds": 4.705948,
+  "stationApproachSeconds": 1.184971,
+  "futureHeatedDock": "Reserved boundary only; no world6 route or new physics.",
+  "files": [
+    {
+      "path": "/assets/world/map/reserva-diorama.webp",
+      "bytes": 175854,
+      "sha256": "e50eae818196985280d0a66ff2120b6c3891c61a9612fab09b7912bd9527b26b"
+    },
+    {
+      "path": "/assets/world/map/reserva-diorama.meta.json",
+      "bytes": 2996,
+      "sha256": "8c13bced3cdcb0373682b6fbd3c290e35455d7a4c18d66fd470e458abe309f96"
+    }
+  ]
+}

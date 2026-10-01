@@ -1,0 +1,173 @@
+{
+  "atlas": {
+    "path": "/assets/world/map/reserva-passenger-cabin.webp",
+    "width": 556,
+    "height": 370
+  },
+  "frame": {
+    "width": 278,
+    "height": 370,
+    "widthInMap": 0.10938448118932038,
+    "passengerFoot": {
+      "x": 138.99998474121094,
+      "y": 297.7261657714844
+    },
+    "passengerPixelScale": 4.0,
+    "rear": {
+      "x": 0,
+      "y": 0,
+      "w": 278,
+      "h": 370
+    },
+    "foreground": {
+      "x": 278,
+      "y": 0,
+      "w": 278,
+      "h": 370
+    }
+  },
+  "source": "tools/diorama/render_passenger_cabin.py",
+  "status": "reviewed half-resolution passenger cabin; final corridor pair check passed",
+  "export": {
+    "samples": 32,
+    "projectionOrthoScale": 4.15,
+    "sourceSize": [
+      1024,
+      1024
+    ],
+    "crop": [
+      234,
+      142,
+      790,
+      882
+    ],
+    "contains": "cabin, hanger, grip only; no cable, actor, station, scenery",
+    "packaging": {
+      "resize": 0.5,
+      "filter": "Lanczos; layers resized separately",
+      "originalDirectory": "source-8px",
+      "rerendered": false
+    }
+  },
+  "boardingContract": {
+    "footLocal": [
+      0,
+      0,
+      0
+    ],
+    "doors": [
+      [
+        -0.81,
+        0,
+        0
+      ],
+      [
+        0.81,
+        0,
+        0
+      ]
+    ],
+    "staging": [
+      [
+        -1.2,
+        0,
+        0
+      ],
+      [
+        1.2,
+        0,
+        0
+      ]
+    ],
+    "stationLipEnds": [
+      [
+        -0.81,
+        0,
+        0
+      ],
+      [
+        0.81,
+        0,
+        0
+      ]
+    ],
+    "floorTop": 0,
+    "lipTop": 0,
+    "minimumLipWidth": 0.84,
+    "note": "Station lips must reach the real floor at either X end; floor spans \u00b1.81. No decorative object or railing in the center Y\u00b1.42 walking lane."
+  },
+  "physicalEnvelope": {
+    "x": [
+      -0.92,
+      0.92
+    ],
+    "y": [
+      -0.66,
+      0.66
+    ],
+    "z": [
+      -0.12,
+      2.69
+    ]
+  },
+  "projectedEnvelopeWorld": {
+    "x": [
+      -1.1036051663858117,
+      1.1036053147810279
+    ],
+    "y": [
+      -0.5639135912060738,
+      2.3913062065839767
+    ]
+  },
+  "authoring": {
+    "source": "tools/diorama/render_passenger_cabin.py",
+    "sourceSha256": "2d7fa5da5c7d2ad039f3ede7def3433de27af76c58984f9a1be0a8c04eadfdc7",
+    "assetSha256": "67f3cd862cd9a4eb49506f58229381b52d5907e7269a0b1744bca27d421de0f7",
+    "payloadBytes": 84230,
+    "nativeCharacterSource": "src/assets/playerSpriteSpec.ts",
+    "renderCommand": "blender -b -t 4 -P tools/diorama/render_passenger_cabin.py -- --output-dir /tmp/feka-passenger-build --route-dx -15.0285312653 --route-dy 21.3318206787 --route-dz -4.1 --lane-spacing 4.5 --export-layers",
+    "packageCommand": "blender -b -P tools/diorama/render_passenger_cabin.py -- --output-dir /tmp/feka-passenger-build --package-half",
+    "packagingNote": "Use a fresh output directory for new geometry. Packaging preserves the verified 8-pixel source under export/source-8px, halves the image and anchor dimensions, keeps widthInMap, and does not rerender."
+  },
+  "validation": {
+    "status": "PASS",
+    "routeDelta": [
+      -15.028531074523926,
+      21.33182144165039,
+      -4.099999904632568
+    ],
+    "laneSpacing": 4.5,
+    "positiveLaneOffset": [
+      3.6787283420562744,
+      2.5917093753814697,
+      0.0
+    ],
+    "headRayCountPerPose": 810,
+    "countercarPosesPerLane": 332,
+    "countercarHeadHits": {},
+    "screenRightSeparation": 4.469688653945923,
+    "screenUpSeparation": 0.28775322437286377,
+    "projectedCabinWidth": 2.2072104811668396,
+    "projectedCabinHeight": 2.9552197977900505,
+    "passingHorizontalGap": 2.2624781727790833,
+    "depthTowardCameraBMinusA": -0.43483400344848633,
+    "crossingPaintOrder": [
+      "b",
+      "a"
+    ],
+    "continuousProjectedBoundsOverlapInterval": null,
+    "axisOverlapProgressIntervals": {
+      "horizontal": [
+        0.0,
+        0.1258606929509253
+      ],
+      "vertical": [
+        0.3774614599810933,
+        0.6489762424952831
+      ]
+    },
+    "method": "Exact source idle/walk head union, both facings, five subpixel rays against frozen evaluated mesh. Continuous projected AABB intersection solved analytically over affine counterphase trajectories; common symmetric sag cancels.",
+    "unchanged": "Doorways, cabin geometry, packaged atlas and player scale; own/boarding head checks retain their frozen-geometry result."
+  }
+}

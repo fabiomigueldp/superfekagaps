@@ -1,6 +1,5 @@
 import { mapToScreen, type MapCamera, type MapPoint } from './WorldMapModel';
 import type { AtlasBounds } from './WorldAtlasModel';
-import type { CableCar } from './WorldCableModel';
 
 export interface CableAtlasCrop { x: number; y: number; w: number; h: number }
 export interface CableAtlasFrame {
@@ -13,7 +12,8 @@ export interface CableAtlasFrame {
     foreground: CableAtlasCrop;
 }
 export interface AtlasCableCar {
-    id: CableCar;
+    /** Globally unique vehicle identity, normally its line's authored ride edge. */
+    id: string;
     foot: MapPoint;
     frame: CableAtlasFrame;
     assets: { rear: CanvasImageSource | null; foreground: CanvasImageSource | null };
@@ -47,5 +47,24 @@ export function paintCableCarLayer(ctx: CanvasRenderingContext2D, camera: MapCam
     const bottom = mapToScreen({ x: bounds.right, y: bounds.bottom }, camera), crop = foreground ? car.frame.foreground : car.frame.rear;
     ctx.save(); ctx.imageSmoothingEnabled = true;
     ctx.drawImage(source, crop.x, crop.y, crop.w, crop.h, top.x, top.y, bottom.x - top.x, bottom.y - top.y);
+    ctx.restore();
+}
+
+/** Authored wire curves stay vector-sized rather than loading a mostly empty
+ * spanning bitmap. Their knots include the measured passenger-grip offset. */
+export function paintCableLines(ctx: CanvasRenderingContext2D, camera: MapCamera, paths: readonly (readonly MapPoint[])[]): void {
+    const scale = Math.min(camera.width / 1.6, camera.height) * camera.zoom * 1.6;
+    const width = Math.max(1, scale * .045 / 20.6);
+    ctx.save(); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    for (const path of paths) {
+        if (path.length < 2 || path.some(point => !Number.isFinite(point.x) || !Number.isFinite(point.y))) continue;
+        ctx.beginPath();
+        path.forEach((point, index) => {
+            const screen = mapToScreen(point, camera);
+            if (index === 0) ctx.moveTo(screen.x, screen.y); else ctx.lineTo(screen.x, screen.y);
+        });
+        ctx.strokeStyle = '#314b62'; ctx.lineWidth = width; ctx.stroke();
+        ctx.strokeStyle = '#879cac'; ctx.lineWidth = Math.max(.4, width * .35); ctx.stroke();
+    }
     ctx.restore();
 }

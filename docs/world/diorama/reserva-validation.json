@@ -1,0 +1,120 @@
+{
+  "status": "PASS",
+  "scope": "Frozen Reserva base: four main routes, shipping shortcut and retained station approach. All five landings included. Future heated dock is reserved only. Additive passenger terminals/cabins/link and older maintenance preservation are separate gates.",
+  "builder": {
+    "path": "tools/diorama/render_reserva_map.py",
+    "sha256": "7fa0433d641a200b9f2b87c50102ac01adb385b4035d6da006b35d792790ce40"
+  },
+  "checker": {
+    "path": "tools/diorama/check_reserva_map.py",
+    "sha256": "436ff6635b6c135afd7b7e790ec193ad806ff2b27a2c98af6743ccd0da19ef20"
+  },
+  "metadataSha256": "6c0ccddf225ad5b92f9a697b9cab8c8dbb1261269392b1e975dbefa3df8d3b89",
+  "methods": {
+    "physical": "Evaluated triangles:three footprint rays, upright headroom, closed-solid containment, and every active-route pier rooted into authored bedrock/foundation.",
+    "source": "Original idle plus6 walk frames, both facings, every opaque square center plus4 inset corners, world-vertical actor plane and camera-directed rays.",
+    "raster": "Exact Math.round pixel origin and Math.ceil square size from paintMapActor at occupied CSS-pixel centers. Fixed review profiles at island scale1; browser camera fitting remains a separate runtime gate.",
+    "footContacts": "Original source pixels at height<=2 are reported separately. They include intended floor contact and fractional CSS footprint overlap; no contact is silently discarded."
+  },
+  "sampleStepWorld": 0.1,
+  "routeSampleCount": 327,
+  "footprintRayCount": 981,
+  "headroomRayCount": 981,
+  "actualFekaWorldPixel": 0.03242187560038659,
+  "actualFekaWorldHeight": 1.0108313699621605,
+  "physicalCounts": {},
+  "pierCount": 120,
+  "allActiveRoutePiersRooted": true,
+  "sourceProjection": {
+    "rayCount": 575520,
+    "bodyContacts": {},
+    "footContacts": {
+      "walk_5-1 wide landing": 564,
+      "walk_5-2 wide landing": 582,
+      "walk_5-3 wide landing": 858,
+      "walk_5-4 wide landing": 562,
+      "walk_main inspection route 4": 784,
+      "walk_5-5 wide landing": 572,
+      "walk_cutaway shipping tunnel route": 871
+    },
+    "headContacts": 0,
+    "faceContacts": 0
+  },
+  "rasterProfiles": [
+    {
+      "profile": "desktop",
+      "viewport": [
+        1180,
+        757
+      ],
+      "zoom": 1.0,
+      "actorScaleCssPixels": 1.8571753640776698,
+      "paintPixelSize": 2,
+      "rayCount": 400892,
+      "bodyContacts": {},
+      "footContacts": {
+        "walk_5-1 wide landing": 224,
+        "walk_5-2 wide landing": 338,
+        "walk_5-3 wide landing": 413,
+        "walk_5-4 wide landing": 322,
+        "walk_main inspection route 4": 580,
+        "walk_5-5 wide landing": 332,
+        "walk_cutaway shipping tunnel route": 794
+      },
+      "headContacts": 0,
+      "faceContacts": 0
+    },
+    {
+      "profile": "portrait",
+      "viewport": [
+        400,
+        606
+      ],
+      "zoom": 1.05,
+      "actorScaleCssPixels": 0.6610285194174758,
+      "paintPixelSize": 1,
+      "rayCount": 53700,
+      "bodyContacts": {},
+      "footContacts": {
+        "walk_5-1 wide landing": 115,
+        "walk_main inspection route 1": 62,
+        "walk_passenger terminal approach reservation": 30,
+        "walk_5-2 wide landing": 76,
+        "walk_main inspection route 2": 94,
+        "walk_5-3 wide landing": 86,
+        "walk_cutaway shipping tunnel route": 365,
+        "walk_main inspection route 3": 113,
+        "walk_5-4 wide landing": 33,
+        "walk_main inspection route 4": 372,
+        "walk_reserved heated western dock": 13,
+        "walk_5-5 wide landing": 46
+      },
+      "headContacts": 0,
+      "faceContacts": 0
+    },
+    {
+      "profile": "landscape",
+      "viewport": [
+        846,
+        392
+      ],
+      "zoom": 1.0,
+      "actorScaleCssPixels": 0.9871359223300972,
+      "paintPixelSize": 1,
+      "rayCount": 112338,
+      "bodyContacts": {},
+      "footContacts": {
+        "walk_5-1 wide landing": 76,
+        "walk_5-2 wide landing": 88,
+        "walk_5-3 wide landing": 144,
+        "walk_5-4 wide landing": 72,
+        "walk_main inspection route 4": 141,
+        "walk_5-5 wide landing": 46,
+        "walk_cutaway shipping tunnel route": 178
+      },
+      "headContacts": 0,
+      "faceContacts": 0
+    }
+  ],
+  "browserGate": "Authoring gates pass; browser walkthrough and combined passenger-link gates belong to integration."
+}

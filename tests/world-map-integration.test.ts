@@ -179,7 +179,7 @@ function fixtureMapMetadata(world = 1, overrides: Record<string, MapPoint> = {})
     return data;
 }
 const flushAssets = () => new Promise<void>(resolve => setImmediate(resolve));
-const dioramaName = (world: number) => ({ 1: 'costa-diorama', 2: 'porto-diorama', 3: 'fabrica-diorama', 4: 'serra-diorama' }[world]);
+const dioramaName = (world: number) => ({ 1: 'costa-diorama', 2: 'porto-diorama', 3: 'fabrica-diorama', 4: 'serra-diorama', 5: 'reserva-diorama' }[world]);
 async function finishWorld(h: ReturnType<typeof mapDOM>, world: number, metadata: unknown = fixtureMapMetadata(world), imageSuccess = true) {
     const image = h.images.find(image => image.src.endsWith(`${dioramaName(world)}.webp`));
     const request = h.fetches.find(request => request.url.endsWith(`${dioramaName(world)}.meta.json`));
@@ -318,6 +318,10 @@ test('the ferry pair loads first; an explicit Factory preview loads its own cont
     assert.equal(h.fetches.filter(request => request.url.endsWith('fabrica-diorama.meta.json')).length, 1);
     assert.equal(h.fetches.filter(request => request.url.endsWith('port-factory-bridge.meta.json')).length, 1);
     h.view.render(15, save, 116, ''); // First Serra inspection may request its own optional return sign.
+    assert.ok(!h.fetches.some(request => /reserva/.test(request.url)));
+    h.view.render(20, save, 120, ''); // A locked Reserva preview still lazily loads its own authored scene.
+    assert.equal(h.fetches.filter(request => request.url.endsWith('reserva-diorama.meta.json')).length, 1);
+    assert.equal(h.fetches.filter(request => request.url.endsWith('serra-reserva-link.meta.json')).length, 1);
     const expanded = [h.images.length, h.fetches.length];
     for (const selected of [15, 20, 25, 0, 5, 10]) h.view.render(selected, save, selected + 120, '');
     assert.deepEqual([h.images.length, h.fetches.length], expanded);
@@ -497,10 +501,10 @@ test('each island secret uses only its own authored geometry and progress', asyn
     assert.equal(h.internal.journey.legs.length, 1); assert.match(h.internal.journey.legs[0].id, /secret/);
 });
 
-test('later worlds retain fallback navigation and explicit entry without creating any sea edge', t => {
-    const h = mapDOM(t, true), save = openSave(); h.view.render(0, save, 0, ''); h.view.render(24, save, 16, '');
-    assert.equal(h.internal.journey.arrived, '5-5'); assert.equal(h.events.entered, 0); assert.equal(h.internal.hud.enterButton.disabled, false);
-    h.view.render(20, save, 32, ''); assert.equal(h.internal.journey.arrived, '5-1');
+test('the remaining fallback region retains navigation and explicit entry without creating any sea edge', t => {
+    const h = mapDOM(t, true), save = openSave(); h.view.render(0, save, 0, ''); h.view.render(29, save, 16, '');
+    assert.equal(h.internal.journey.arrived, '6-5'); assert.equal(h.events.entered, 0); assert.equal(h.internal.hud.enterButton.disabled, false);
+    h.view.render(25, save, 32, ''); assert.equal(h.internal.journey.arrived, '6-1');
     assert.ok(h.internal.network.edges.every((edge: { from: string; to: string; mode: string }) => edge.mode !== 'sail'));
 });
 
@@ -655,6 +659,26 @@ async function readySerra(h: ReturnType<typeof mapDOM>, save = { ...openSave('4-
     h.get('world-map-overview').click(); h.view.render(selection, save, 32, '');
     await finishFactory(h); await finishSerra(h, failAsset); h.view.render(selection, save, 48, '');
     h.get('world-map-overview').click(); h.view.render(selection, save, 64, '');
+}
+
+async function finishPassenger(h: ReturnType<typeof mapDOM>, failAsset = '') {
+    await finishWorld(h, 5, actualMetadata(5), failAsset !== 'reserva-diorama.webp');
+    const raw = JSON.parse(readFileSync(new URL('../public/assets/world/map/serra-reserva-link.meta.json', import.meta.url), 'utf8'));
+    h.fetches.find(request => request.url.endsWith('serra-reserva-link.meta.json'))!.resolve({ ok: true, json: async () => raw });
+    await flushAssets();
+    for (const size of [raw.atlas, ...raw.overlays]) {
+        const image = h.images.find(image => image.src.endsWith(size.path.split('/').pop()));
+        if (failAsset === 'reserva-diorama.webp') { assert.equal(image, undefined); continue; }
+        assert.ok(image, `Expected passenger layer ${size.path}`);
+        Object.assign(image, { naturalWidth: size.width, naturalHeight: size.height });
+        if (failAsset && size.path.includes(failAsset)) image.onerror?.(); else image.onload?.();
+    }
+    await flushAssets();
+}
+
+async function readyReserva(h: ReturnType<typeof mapDOM>, save = openSave('4-5'), failAsset = '') {
+    await readySerra(h, save); await finishPassenger(h, failAsset);
+    h.view.render(STAGES.findIndex(stage => stage.id === save.selected), save, 80, '');
 }
 
 test('Costa to Porto travels through connected docks with Feka aboard, saves only final arrival and waits for Enter', async t => {
@@ -1185,12 +1209,12 @@ test('the actual cabin trip uses its measured doorway, carries Feka and moves it
         if (active?.id === '4-cable-a-lower-board') {
             const threshold = h.internal.maintenanceCable.lanes.a.lower.aboardProgress;
             if (active.progress < threshold) { outsideDoor = true; assert.equal(h.internal.activeCableCar(true), undefined); }
-            else { insideDoor = true; assert.equal(h.internal.activeCableCar(true), 'a'); }
+            else { insideDoor = true; assert.equal(h.internal.activeCableCar(true), 'serra-maintenance-cable-a'); }
         }
         if (active?.mode === 'cable') {
-            ride = true; assert.equal(h.internal.motionState(), 'riding'); assert.equal(h.internal.activeCableCar(true), 'a');
+            ride = true; assert.equal(h.internal.motionState(), 'riding'); assert.equal(h.internal.activeCableCar(true), 'serra-maintenance-cable-a');
             const cars = h.internal.currentCableCars();
-            assert.deepEqual(cars.find((car: any) => car.id === 'a').foot, h.internal.marker);
+            assert.deepEqual(cars.find((car: any) => car.id === 'serra-maintenance-cable-a').foot, h.internal.marker);
             assert.notDeepEqual(cars[0].foot, cars[1].foot);
             assert.equal(h.view.enterSelected(19), false); assert.deepEqual(h.events.arrived, []);
             assert.ok(h.internal.hud.stageButtons.every((button: Button) => button.hidden));
@@ -1341,7 +1365,8 @@ test('mixed Costa and Serra trips keep Feka and each occupied vehicle in frame t
                         `${active.id} car clipping at ${JSON.stringify({a,b})}`);
                     if (active.mode==='cable-board') {
                         const terminal=active.id.includes('lower')?'lower':'upper';
-                        const threshold=h.internal.maintenanceCable.lanes[car.id][terminal].aboardProgress;
+                        const carName=car.id==='serra-maintenance-cable-a'?'a':'b';
+                        const threshold=h.internal.maintenanceCable.lanes[carName][terminal].aboardProgress;
                         assert.equal(h.internal.activeCableCar(true),active.progress>=threshold?car.id:undefined);
                     }
                 }
@@ -1351,4 +1376,142 @@ test('mixed Costa and Serra trips keep Feka and each occupied vehicle in frame t
             for (const mode of ['walking','boarding','sailing','riding','arriving']) assert.ok(modes.has(mode),mode);
             assert.equal(h.events.entered,0);
         });
+});
+
+test('Reserva passenger gates follow B2 and travel signs stop at their actual stage terminals', async t => {
+    const h = mapDOM(t), save = { ...openSave('4-5'), completed: STAGES.filter(stage => stage.id !== '4-5').map(stage => stage.id), secrets: [] as string[] };
+    await readyReserva(h, save);
+    assert.equal(h.internal.passengerActive, true);
+    assert.ok(!h.internal.network.edges.some((edge: any) => edge.id.startsWith('serra-reserva-passenger')));
+    h.view.render(20, save, 100, '');
+    assert.equal(h.internal.journey.arrived, '4-5'); assert.equal(h.view.enterSelected(20), false);
+    save.completed.push('4-5'); h.view.render(19, save, 120, '');
+    assert.ok(h.internal.network.edges.some((edge: any) => edge.id === 'serra-reserva-passenger-a'));
+    assert.ok(!h.internal.network.edges.some((edge: any) => edge.id === 'serra-maintenance-cable-a'), 'Passenger service does not require or invent the maintenance secret.');
+    const boat = { ...h.internal.currentBoat().foot };
+    h.internal.hud.travelButtons['cable-serra-reserva'].click(); h.view.render(20, save, 140, '');
+    assert.equal(h.internal.journey.destination, '5-1'); assert.equal(h.view.enterSelected(20), false);
+    h.internal.hud.skipButton.click(); assert.equal(h.internal.journey.arrived, '5-1');
+    assert.equal(h.internal.passengerPair.aAt, 'upper'); assert.equal(h.internal.cablePair.aAt, 'lower');
+    assert.deepEqual(h.internal.currentBoat().foot, boat);
+    h.view.render(20, save, 160, ''); h.internal.hud.travelButtons['cable-reserva-serra'].click();
+    assert.equal(h.events.selected.at(-1), 19, 'The return stops at the upper Serra station, not at the foot of the mountain.');
+    h.internal.hud.skipButton.click(); assert.equal(h.internal.journey.arrived, '4-5');
+    assert.equal(h.events.entered, 0); assert.equal(h.view.enterSelected(19), true);
+    h.view.hide(); h.view.render(20, save, 180, '', '', { playedStage: '4-5', nextSelected: '5-1' });
+    assert.equal(h.internal.journey.arrived, '4-5'); assert.equal(h.internal.journey.destination, '5-1');
+    assert.ok(h.internal.journey.legs.some((leg: any) => leg.id === 'serra-reserva-passenger-a'));
+    assert.equal(h.events.entered, 1, 'Returning from B2 starts the connection, not another level.');
+});
+
+test('sequential maintenance and passenger rides keep independent phases through rapid reversal, skip and reload', async t => {
+    const h = mapDOM(t), save = { ...openSave('4-3'), secrets: ['4-3'] }; await readyReserva(h, save);
+    assert.equal(h.internal.currentCableCars().length, 4);
+    assert.equal(new Set(h.internal.currentCableCars().map((car: any) => car.id)).size, 4);
+    h.view.render(20, save, 100, '');
+    assert.ok(h.internal.journey.legs.some((leg: any) => leg.id === 'serra-maintenance-cable-a'));
+    assert.ok(h.internal.journey.legs.some((leg: any) => leg.id === 'serra-reserva-passenger-a'));
+    let time = 100;
+    while (h.internal.journey.legs[0]?.id !== 'serra-reserva-passenger-a' && time < 60000) {
+        h.paint.calls.length = 0; h.view.render(20, save, time += 100, '');
+        assert.equal(h.internal.journey.arrived, '4-3'); assert.deepEqual(h.events.arrived, []);
+    }
+    assert.equal(h.internal.journey.legs[0]?.id, 'serra-reserva-passenger-a');
+    assert.equal(h.internal.cablePair.aAt, 'upper'); assert.equal(h.internal.passengerPair.aAt, 'lower');
+    h.view.render(20, save, time += 100, ''); const foot = { ...h.internal.journey.point };
+    h.view.selectDestination(17); assert.deepEqual(h.internal.journey.point, foot);
+    assert.equal(h.internal.journey.legs[0].direction, -1);
+    h.view.selectDestination(20); assert.deepEqual(h.internal.journey.point, foot);
+    h.internal.hud.skipButton.click(); assert.equal(h.internal.journey.arrived, '5-1');
+    assert.deepEqual(h.events.arrived, [20]); assert.equal(h.events.entered, 0);
+    assert.equal(h.internal.cablePair.aAt, 'upper'); assert.equal(h.internal.passengerPair.aAt, 'upper');
+    save.selected = '5-1'; h.view.hide(); h.view.render(20, save, time += 100, '');
+    assert.equal(h.internal.cablePair.aAt, 'lower'); assert.equal(h.internal.passengerPair.aAt, 'lower');
+    h.view.render(19, save, time += 100, '');
+    assert.ok(h.internal.journey.legs.some((leg: any) => leg.id === 'serra-reserva-passenger-b' && leg.direction === -1));
+    h.media.matches = true; h.view.render(19, save, time += 100, '');
+    assert.equal(h.internal.journey.arrived, '4-5'); assert.equal(h.internal.passengerPair.aAt, 'upper');
+    assert.equal(h.events.entered, 0);
+});
+
+test('failed passenger visuals preserve older transport and permit regional recovery without moving the ferry', async t => {
+    const raw = JSON.parse(readFileSync(new URL('../public/assets/world/map/serra-reserva-link.meta.json', import.meta.url), 'utf8'));
+    for (const failAsset of ['reserva-diorama.webp', raw.atlas.path.split('/').pop(), raw.overlays[0].path.split('/').pop()])
+        await t.test(failAsset, async child => {
+            const h = mapDOM(child), save = { ...openSave('4-3'), secrets: ['4-3'] }; await readyReserva(h, save, failAsset);
+            assert.equal(h.internal.passengerActive, false); assert.equal(h.internal.passengerStatus, 'failed');
+            assert.equal(h.internal.maintenanceActive, true); assert.equal(h.internal.factorySerraActive, true);
+            assert.equal(h.internal.bridgeActive, true); assert.equal(h.internal.connectionActive, true);
+            const boat = { ...h.internal.currentBoat().foot }; h.view.render(19, save, 100, '');
+            assert.ok(h.internal.journey.legs.some((leg: any) => leg.id === 'serra-maintenance-cable-a'));
+            h.internal.hud.skipButton.click(); h.view.render(20, save, 120, '');
+            assert.equal(h.internal.journey.arrived, '5-1'); assert.deepEqual(h.internal.currentBoat().foot, boat);
+            assert.equal(h.internal.currentCableCars().length, 2); assert.equal(h.events.entered, 0);
+        });
+});
+
+test('late passenger layers activate only at a stage arrival and preserve the completed maintenance trip', async t => {
+    const h = mapDOM(t), save = { ...openSave('4-3'), secrets: ['4-3'] }; await readySerra(h, save);
+    h.view.render(19, save, 100, ''); const active = structuredClone(h.internal.journey.legs[0]);
+    await finishPassenger(h); h.view.render(19, save, 100, '');
+    assert.equal(h.internal.passengerActive, false); assert.deepEqual(h.internal.journey.legs[0], active);
+    let time = 100;
+    while (!h.internal.passengerActive && time < 20000) { h.paint.calls.length = 0; h.view.render(19, save, time += 100, ''); }
+    assert.equal(h.internal.passengerActive, true); assert.equal(h.internal.journey.arrived, '4-5');
+    assert.equal(h.internal.cablePair.aAt, 'upper'); assert.equal(h.internal.passengerPair.aAt, 'lower');
+    assert.deepEqual(h.events.arrived, [19]);
+    h.view.render(20, save, time += 100, '');
+    assert.ok(h.internal.journey.legs.some((leg: any) => leg.id === 'serra-reserva-passenger-a'));
+});
+
+test('both cable lines keep the occupied vehicle framed across Reserva trips in narrow and short layouts', async t => {
+    const { atlasCableBounds } = await import('../src/adventure/WorldCableArt');
+    const { WORLD_MAP_TRAVEL_ACTIONS } = await import('../src/adventure/WorldMapHud');
+    for (const [width, height] of [[320, 568], [400, 606], [590, 378], [740, 320]]) await t.test(`${width}x${height}`, async child => {
+        const h = mapDOM(child), save = { ...openSave('4-3'), secrets: ['4-3', '5-3'] }; await readyReserva(h, save);
+        h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width, height };
+        h.get('world-map-header').bounds = { x: 8, y: 6, left: 8, top: 6, width: width - 16, height: 44 };
+        h.get('world-map-tools').bounds = h.get('world-map-header').bounds;
+        h.get('world-map-footer').bounds = { x: 8, y: height - 76, left: 8, top: height - 76, width: width - 16, height: 68 };
+        h.observers[0].callback(); let time = 100;
+        for (const selection of [24, 17]) {
+            const origin = h.internal.journey.arrived, deadline = time + 90000, rides = new Set<string>();
+            h.view.render(selection, save, time, '');
+            while (h.internal.journey.destination && time < deadline) {
+                h.paint.calls.length = 0; h.view.render(selection, save, time += 100, '');
+                const active = h.internal.journey.legs[0]; if (!active) continue;
+                assert.equal(h.internal.journey.arrived, origin);
+                assert.ok(Object.values(h.internal.hud.travelButtons).every((button: any) => button.hidden));
+                const marker = mapToScreen(h.internal.marker, h.internal.camera);
+                assert.ok(marker.x >= 0 && marker.x <= width && marker.y >= h.internal.frameInsets.top && marker.y <= height - h.internal.frameInsets.bottom,
+                    `${active.id}: actor outside scene at ${JSON.stringify(marker)}`);
+                const id = h.internal.activeCableCar();
+                if (!id) continue;
+                rides.add(id.startsWith('serra-reserva') ? 'passenger' : 'maintenance');
+                const car = h.internal.currentCableCars().find((car: any) => car.id === id), bounds = atlasCableBounds(car);
+                const top = mapToScreen({ x: bounds.left, y: bounds.top }, h.internal.camera), bottom = mapToScreen({ x: bounds.right, y: bounds.bottom }, h.internal.camera);
+                assert.ok(top.x >= 16 && bottom.x <= width - 16 && top.y >= h.internal.frameInsets.top && bottom.y <= height - h.internal.frameInsets.bottom,
+                    `${active.id}: carrier outside scene at ${JSON.stringify({ top, bottom })}`);
+            }
+            assert.equal(h.internal.journey.arrived, STAGES[selection].id);
+            assert.deepEqual([...rides].sort(), ['maintenance', 'passenger']);
+            assert.equal(h.events.entered, 0);
+            if (selection !== 24) continue;
+            h.get('world-map-overview').click(); h.view.render(selection, save, time += 100, '');
+            const entries = [...h.internal.hud.stageButtons.map((button: Button) => ({ button, width: 56, height: 58 })),
+                ...Object.entries(h.internal.hud.travelButtons).map(([id, button]) => ({ button: button as Button,
+                    width: WORLD_MAP_TRAVEL_ACTIONS[id as keyof typeof WORLD_MAP_TRAVEL_ACTIONS].width, height: 56 }))];
+            const boxes = entries.flatMap(({ button, width: wide, height: tall }) => {
+                if (button.hidden) return [];
+                const match = /^translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(button.style.transform)!;
+                const x = Number(match[1]), y = Number(match[2]);
+                return [{ left: x - wide / 2, right: x + wide / 2, top: y - tall, bottom: y }];
+            });
+            boxes.forEach((a, i) => {
+                assert.ok(a.left >= 8 && a.right <= width - 8 && a.top >= h.internal.frameInsets.top && a.bottom <= height - h.internal.frameInsets.bottom);
+                for (const b of boxes.slice(i + 1)) assert.ok(a.right + 8 <= b.left || b.right + 8 <= a.left || a.bottom + 8 <= b.top || b.bottom + 8 <= a.top);
+            });
+            h.get('world-map-overview').click(); h.view.render(selection, save, time += 100, '');
+        }
+    });
 });

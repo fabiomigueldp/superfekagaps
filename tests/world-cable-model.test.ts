@@ -308,3 +308,66 @@ test('pair pose rejects incomplete/nonfinite paths and cannot fabricate a car fo
     assert.deepEqual(sampleCablePair(pair, definition, paths, { id: 'unrelated', mode: 'cable', progress: .7 }), parked);
     assert.deepEqual(sampleCablePair(pair, definition, paths, { id: 'cable-a', mode: 'cable', progress: -1 })!.feet, parked.feet);
 });
+
+test('two independent cable pairs share one journey across transfer, reversal, skip and reload', () => {
+    const passenger: CablePairDefinition = { lanes: Object.fromEntries((['a', 'b'] as const).map(car => [car, {
+        rideEdge: `passenger-${car}`, boardingEdges: { lower: `p-board-${car}-lower`, upper: `p-board-${car}-upper` },
+        berths: { lower: `p-${car}-lower`, upper: `p-${car}-upper` },
+    }])) as CablePairDefinition['lanes'] };
+    const both: JourneyNetwork = { nodes: { ...network.nodes, '5-1': { x: 1.8, y: -.5 },
+        'p-a-lower': { x: 1, y: .2 }, 'p-a-upper': { x: 1.7, y: -.6 },
+        'p-b-lower': { x: 1.1, y: .3 }, 'p-b-upper': { x: 1.8, y: -.5 } },
+        edges: [...network.edges, ...(['a', 'b'] as const).flatMap(car => {
+            const lane = passenger.lanes[car];
+            return [
+                { id: lane.boardingEdges.lower, from: '4-5', to: lane.berths.lower, mode: 'cable-board' as const, duration: .5 },
+                { id: lane.rideEdge, from: lane.berths.lower, to: lane.berths.upper, mode: 'cable' as const, duration: 4 },
+                { id: lane.boardingEdges.upper, from: '5-1', to: lane.berths.upper, mode: 'cable-board' as const, duration: .5 },
+            ];
+        })],
+    };
+    const secondPaths = Object.fromEntries((['a', 'b'] as const).map(car => [car,
+        [both.nodes[passenger.lanes[car].berths.lower], both.nodes[passenger.lanes[car].berths.upper]],
+    ])) as unknown as CableFootPaths;
+    let maintenance = createCablePair(), second = createCablePair();
+    const cap = (journey?: JourneyState): JourneyCapabilities => ({ availableStages: ['4-3', '4-4', '4-5', '5-1'],
+        edgeDirections: { ...cableEdgeDirections(maintenance, definition, true, journey?.legs[0]),
+            ...cableEdgeDirections(second, passenger, true, journey?.legs[0]) },
+    });
+    let journey = selectJourney(createJourney('4-3', both, cap()), '5-1', both, cap());
+    assert.deepEqual(journey.legs.filter(leg => leg.mode === 'cable').map(leg => leg.id), ['cable-a', 'passenger-a']);
+    const travel = (seconds?: number) => {
+        const before = journey;
+        journey = seconds === undefined ? skipJourney(journey) : advanceJourney(journey, seconds);
+        maintenance = updateCablePairAfterTravel(maintenance, definition, before, journey);
+        second = updateCablePairAfterTravel(second, passenger, before, journey);
+    };
+    travel(1.2);
+    assert.equal(journey.legs[0].id, 'cable-a'); assert.equal(second.aAt, 'lower');
+    assert.deepEqual(sampleCablePair(second, passenger, secondPaths, journey.legs[0]), sampleCablePair(second, passenger, secondPaths));
+    travel(3.3);
+    assert.equal(journey.legs[0].id, 'passenger-a'); assert.equal(maintenance.aAt, 'upper'); assert.equal(second.aAt, 'lower');
+    const parkedMaintenance = sampleCablePair(maintenance, definition, paths)!;
+    for (const target of ['4-3', '5-1', '4-5', '5-1']) {
+        const at = journey.point;
+        journey = selectJourney(journey, target, both, cap(journey));
+        assert.deepEqual(journey.point, at); assert.equal(journey.legs[0].id, 'passenger-a');
+        assert.deepEqual(sampleCablePair(maintenance, definition, paths, journey.legs[0]), parkedMaintenance);
+        assert.equal(second.aAt, 'lower');
+    }
+    travel();
+    assert.equal(journey.arrived, '5-1'); assert.equal(journey.entered, null);
+    assert.equal(maintenance.aAt, 'upper'); assert.equal(second.aAt, 'upper');
+    journey = selectJourney(journey, '4-3', both, cap(journey));
+    assert.deepEqual(journey.legs.filter(leg => leg.mode === 'cable').map(leg => leg.id), ['passenger-a', 'cable-a']);
+    travel(1.5); const at = journey.point;
+    journey = selectJourney(journey, '5-1', both, cap(journey));
+    assert.deepEqual(journey.point, at); travel();
+    assert.equal(journey.arrived, '5-1'); assert.equal(maintenance.aAt, 'upper'); assert.equal(second.aAt, 'upper');
+    const save = freshSave(); save.selected = journeySaveSelection(journey);
+    const restored = parseSave(JSON.stringify(save)); maintenance = createCablePair(); second = createCablePair();
+    journey = selectJourney(createJourney(restored.selected, both, cap()), '4-3', both, cap());
+    assert.deepEqual(journey.legs.filter(leg => leg.mode === 'cable').map(leg => leg.id), ['passenger-b', 'cable-b']);
+    travel(); assert.equal(journey.arrived, '4-3'); assert.equal(maintenance.aAt, 'upper'); assert.equal(second.aAt, 'upper');
+    assert.deepEqual(Object.keys(restored).sort(), Object.keys(freshSave()).sort());
+});

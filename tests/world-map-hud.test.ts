@@ -188,18 +188,18 @@ test('disposing during atlas load removes handlers and cannot repaint or resurre
     assert.equal(stage.draws.length, 0); assert.equal(stage.width, 56);
 });
 
-test('physical props include all Factory and Serra phases while later-region fallbacks reset decoration', async t => {
+test('physical props include Reserva phases while the final region fallback resets decoration', async t => {
     const resources = signResources(t), { hud, state } = fixture(t);
     await resources.metadata(); resources.images[0].onload!(); await resources.settle();
     const stage = asElement(hud.stageButtons[0]).children[0], dock = asElement(hud.dockButtons[1]).children[0];
     assert.equal(stage.style.transform, 'translate(0px, 11px)');
-    for (const world of [5, 6]) {
+    for (const world of [6]) {
         hud.update({ ...state, world, stage: (world - 1) * 5 });
         assert.equal(stage.width, 56); assert.equal(stage.style.transform, '');
         assert.equal(dock.width, 104); assert.equal(dock.style.transform, '');
         assert.match(hud.stageButtons[0].getAttribute('aria-label')!, new RegExp(`Fase ${world}-1:`));
     }
-    for (const world of [2, 3, 4, 1]) {
+    for (const world of [2, 3, 4, 5, 1]) {
         hud.update({ ...state, world, stage: (world - 1) * 5 });
         assert.equal(stage.width, 112);
         assert.equal(stage.style.transform, 'translate(0px, 11px)');
@@ -371,4 +371,29 @@ test('failed left-supplement decoration keeps Serra phases and both walking acti
     assert.equal(asElement(hud.stageButtons[0]).children[0].width, 112);
     hud.travelButtons['walk-serra-factory'].click(); assert.deepEqual(calls, ['world:3']);
     assert.equal(resources.requests.length, 2);
+});
+
+test('passenger directions announce their gate and reuse the authored wide sign without another atlas', async t => {
+    const resources = signResources(t), { hud, state } = fixture(t);
+    await resources.metadata(); resources.images[0].onload!(); await resources.settle();
+    hud.update({ ...state, world: 4, stage: 19, worldAvailability: [true, true, true, true, false, false] });
+    hud.positionTravelActions({ 'cable-serra-reserva': { x: 160, y: 210, available: false } });
+    const outgoing = hud.travelButtons['cable-serra-reserva'];
+    assert.match(outgoing.getAttribute('aria-label')!, /Teleférico.*Reserva.*Linha de passageiros bloqueada/);
+    assert.doesNotMatch(outgoing.getAttribute('aria-label')!, /barco|Cais|Ponte/);
+    assert.match(outgoing.title, /RESERVA ←.*teleférico/);
+    assert.equal(resources.requests.length, 2);
+    assert.match(resources.requests[1].url, /signs-factory-left.meta.json$/);
+    resources.requests[1].resolve({ ok: true, json: async () => JSON.parse(readFileSync(new URL('../public/assets/world/map/signs-factory-left.meta.json', import.meta.url), 'utf8')) });
+    await resources.settle();
+    const image = resources.images[1]; image.naturalWidth = 256; image.naturalHeight = 112;
+    image.onload!(); await resources.settle();
+    assert.equal(asElement(outgoing).children[0].draws.at(-1)![0], image);
+    hud.update({ ...state, world: 5, stage: 20, worldAvailability: [true, true, true, true, true, false] });
+    hud.positionTravelActions({ 'cable-reserva-serra': { x: 180, y: 220, available: true } });
+    const incoming = hud.travelButtons['cable-reserva-serra'];
+    assert.match(incoming.getAttribute('aria-label')!, /Teleférico.*Serra.*Viajar pela linha de passageiros/);
+    assert.match(incoming.title, /SERRA →.*teleférico/);
+    assert.equal(asElement(hud.stageButtons[0]).children[0].width, 112);
+    assert.equal(resources.requests.length, 2, 'The new labels reuse existing blank wooden faces.');
 });

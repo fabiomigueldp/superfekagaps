@@ -65,5 +65,5 @@ test('malformed or cross-world cadence exports are rejected instead of producing
     for (const value of [null, [], {}, { ...timings, extra: 1 }, { ...timings, '3:4': undefined },
         ...[NaN, Infinity, 0, -1, 121, '2'].map(value => ({ ...timings, '2:3': value }))])
         assert.equal(parseMapMetadata({ ...authored(4), routeDurationsSeconds: value }, 4), null);
-    for (const world of [1, 2, 3, 5, 6]) assert.equal(parseMapMetadata({ ...authored(world), routeDurationsSeconds: timings }, world), null);
+    for (const world of [1, 2, 3, 6]) assert.equal(parseMapMetadata({ ...authored(world), routeDurationsSeconds: timings }, world), null);
 });

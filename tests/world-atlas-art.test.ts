@@ -5,7 +5,7 @@ import { fallbackMapMetadata, paintWorldMap } from '../src/adventure/WorldMapArt
 import { COAST_PORT_PLACEMENTS, localToAtlas } from '../src/adventure/WorldAtlasModel';
 import { atlasActorScale, atlasBoatBounds, paintWorldAtlas, type AtlasPaintState, type BoatAtlasFrame } from '../src/adventure/WorldAtlasArt';
 import { mapToScreen } from '../src/adventure/WorldMapModel';
-import { atlasCableBounds, validCableFrame, type AtlasCableCar, type CableAtlasFrame } from '../src/adventure/WorldCableArt';
+import { atlasCableBounds, paintCableLines, validCableFrame, type AtlasCableCar, type CableAtlasFrame } from '../src/adventure/WorldCableArt';
 
 interface Call { name: string; args: unknown[]; color?: unknown }
 function recordingContext() {
@@ -163,7 +163,7 @@ test('reduced motion has identical paint output across timestamps and retains th
 
 const cableFrame: CableAtlasFrame = { width: 144, height: 260, widthInMap: .075, passengerPixelScale: (4.15 / 20.6 * 3 / 384) * 144 / .075,
     passengerFoot: { x: 72, y: 225 }, rear: { x: 0, y: 0, w: 144, h: 260 }, foreground: { x: 144, y: 0, w: 144, h: 260 } };
-const cable = (id: 'a' | 'b', x: number, y: number): AtlasCableCar => ({ id, foot: { x, y }, frame: cableFrame,
+const cable = (id: string, x: number, y: number): AtlasCableCar => ({ id, foot: { x, y }, frame: cableFrame,
     assets: { rear: image(`${id}-rear`), foreground: image(`${id}-front`) } });
 
 test('cabin bounds preserve the measured passenger foot, full hanger and original Feka scale', () => {
@@ -212,6 +212,44 @@ test('an incomplete or invalid cabin disappears safely and cannot hide the origi
         assert.ok(actorPixels(calls).length > 100);
         assert.equal(calls.filter(call => call.name === 'drawImage' && [car.assets.rear, car.assets.foreground].includes(call.args[0] as CanvasImageSource)).length, 0);
     }
+});
+
+test('two cable lines keep a single passenger inside the uniquely identified occupied vehicle', () => {
+    const ids = ['serra-maintenance-cable-a', 'serra-maintenance-cable-b', 'serra-reserva-passenger-b', 'serra-reserva-passenger-a'];
+    for (const occupied of ids) {
+        const state = scene(true), { context, calls } = recordingContext();
+        state.cableCars = ids.map((id, n) => cable(id, 3 + n / 10, -.3 - n / 10));
+        const active = state.cableCars.find(car => car.id === occupied)!;
+        state.actor.cableCar = occupied; state.actor.point = active.foot;
+        paintWorldAtlas(context, state);
+        const pixels = actorPixels(calls);
+        assert.equal(pixels.length, PLAYER_SPRITES.idle.flatMap(row => [...row]).filter(pixel => PLAYER_PALETTE[pixel]).length);
+        for (const car of state.cableCars) {
+            const rearAt = calls.findIndex(call => call.name === 'drawImage' && call.args[0] === car.assets.rear);
+            const frontAt = calls.findIndex(call => call.name === 'drawImage' && call.args[0] === car.assets.foreground);
+            assert.ok(rearAt < frontAt);
+            assert.equal(pixels.every(pixel => calls.indexOf(pixel) > rearAt && calls.indexOf(pixel) < frontAt), car === active);
+        }
+    }
+});
+
+test('authored wire curves keep their projected grip positions and render behind vehicles', () => {
+    const paths = [[{ x: 3.61, y: -.42 }, { x: 3.52, y: -1.01 }], [{ x: 3.87, y: -.41 }, { x: 3.78, y: -1 }]];
+    const isolated = recordingContext();
+    paintCableLines(isolated.context, camera, [...paths, [{ x: NaN, y: 0 }, { x: 0, y: 0 }]]);
+    assert.deepEqual(isolated.calls.filter(call => call.name === 'moveTo').map(call => call.args), paths.map(path => {
+        const p = mapToScreen(path[0], camera); return [p.x, p.y];
+    }));
+    assert.equal(isolated.calls.filter(call => call.name === 'stroke').length, 4);
+    const state = scene(true), recorded = recordingContext(); state.cablePaths = paths;
+    state.cableCars = [cable('serra-reserva-passenger-a', 3.61, -.25)];
+    state.actor.cableCar = state.cableCars[0].id; state.actor.point = state.cableCars[0].foot;
+    paintWorldAtlas(recorded.context, state);
+    const first = mapToScreen(paths[0][0], camera);
+    const wireAt = recorded.calls.findIndex(call => call.name === 'moveTo' && call.args[0] === first.x && call.args[1] === first.y);
+    const islandAt = recorded.calls.findIndex(call => call.name === 'drawImage' && call.args[0] === state.islands[1].assets.island);
+    const cabinAt = recorded.calls.findIndex(call => call.name === 'drawImage' && call.args[0] === state.cableCars![0].assets.rear);
+    assert.ok(islandAt < wireAt && wireAt < cabinAt);
 });
 
 test('parked cabin paint stays deterministic and a remote-region preview never invents a passenger', () => {

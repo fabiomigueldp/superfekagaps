@@ -13,14 +13,23 @@ import { advanceJourney, canEnterJourney, createJourney, enterJourney, journeyBl
 import { ART } from '../graphics/palette';
 import { FACTORY_SERRA_LINK_EDGE, SERRA_CABLE_PAIR, parseFactorySerraLink, parseSerraMaintenanceCable, matchesSerraAssetSize,
     type FactorySerraLink, type SerraMaintenanceCable } from './WorldSerraJourney';
-import { cableEdgeDirections, createCablePair, sampleCablePair, updateCablePairAfterTravel, type CableCar } from './WorldCableModel';
+import { cableEdgeDirections, createCablePair, sampleCablePair, updateCablePairAfterTravel,
+    type CablePairDefinition, type CablePairState, type CableFootPaths } from './WorldCableModel';
 import { atlasCableBounds, type AtlasCableCar } from './WorldCableArt';
+import { PASSENGER_CABLE_PAIR, parseReservaPassengerCable, type ReservaPassengerCable } from './WorldReservaJourney';
 
 interface MapCallbacks { select(index: number): void; enter(): void; exit(): void; unlockAudio(): void; arrive?(index: number): void }
 interface CachedMapArt { assets: MapArtAssets; metadata: MapArtMetadata; status: 'loading' | 'ready' | 'failed' }
+interface CableLineView {
+    definition: CablePairDefinition;
+    state: CablePairState;
+    metadata: SerraMaintenanceCable | ReservaPassengerCable;
+    paths: CableFootPaths;
+    image: HTMLImageElement;
+}
 export interface MapReturnContext { playedStage: string; nextSelected: string }
 const EMPTY_ART = (): MapArtAssets => ({ island: null, shadow: null, port: null });
-const DIORAMA_NAMES: Readonly<Record<number, string>> = { 1: 'costa-diorama', 2: 'porto-diorama', 3: 'fabrica-diorama', 4: 'serra-diorama' };
+const DIORAMA_NAMES: Readonly<Record<number, string>> = { 1: 'costa-diorama', 2: 'porto-diorama', 3: 'fabrica-diorama', 4: 'serra-diorama', 5: 'reserva-diorama' };
 const inAtlas = (world: number) => Object.prototype.hasOwnProperty.call(DIORAMA_NAMES, world);
 const worldOf = (id: string) => Number(id.split('-')[0]);
 const indexOf = (id: string) => Math.max(0, STAGES.findIndex(stage => stage.id === id));
@@ -150,6 +159,12 @@ export class WorldMapView {
     private maintenanceActive = false;
     private maintenancePaths: { a: MapPoint[]; b: MapPoint[] } | null = null;
     private cablePair = createCablePair();
+    private passengerStatus: 'idle' | 'loading' | 'ready' | 'failed' = 'idle';
+    private passengerCable: ReservaPassengerCable | null = null;
+    private passengerImage: HTMLImageElement | null = null;
+    private readonly passengerOverlays = new Map<string, HTMLImageElement>();
+    private passengerActive = false;
+    private passengerPair = createCablePair();
     private assetWarning = '';
     private boatHeadingIndex = -1;
     private boatHeadingAt = 0;
@@ -189,6 +204,10 @@ export class WorldMapView {
         this.hud = new WorldMapHud({
             selectStage: index => this.act(() => this.select(index)),
             selectWorld: world => this.act(() => this.select((world - 1) * 5)),
+            selectTravel: id => this.act(() => {
+                const action = WORLD_MAP_TRAVEL_ACTIONS[id];
+                this.select(action.toStage ? indexOf(action.toStage) : (action.toWorld - 1) * 5);
+            }),
             enter: () => this.act(() => this.enterSelected(this.controlSelection)),
             skip: () => this.act(() => this.skip()),
             overview: () => this.act(() => { this.overview = !this.overview; this.paintDirty = true; this.refreshHud(); }),
@@ -235,13 +254,18 @@ export class WorldMapView {
     private updateVehicles(before: JourneyState, after: JourneyState): void {
         this.updateMooredBoat(before, after);
         this.cablePair = updateCablePairAfterTravel(this.cablePair, SERRA_CABLE_PAIR, before, after);
+        this.passengerPair = updateCablePairAfterTravel(this.passengerPair, PASSENGER_CABLE_PAIR, before, after);
         this.updateCapabilities();
     }
     private updateCapabilities(): void {
         if (!this.save) return;
         this.capabilities = { availableStages: STAGES.filter(stage => isUnlocked(stage.id, this.save!)).map(stage => stage.id),
-            ...(this.maintenanceActive ? { edgeDirections: cableEdgeDirections(this.cablePair, SERRA_CABLE_PAIR,
-                this.save.secrets.includes('4-3'), this.journey?.legs[0]) } : {}) };
+            edgeDirections: {
+                ...(this.maintenanceActive ? cableEdgeDirections(this.cablePair, SERRA_CABLE_PAIR,
+                    this.save.secrets.includes('4-3'), this.journey?.legs[0]) : {}),
+                ...(this.passengerActive ? cableEdgeDirections(this.passengerPair, PASSENGER_CABLE_PAIR,
+                    isUnlocked('5-1', this.save), this.journey?.legs[0]) : {}),
+            } };
     }
     private readonly onKey = (event: KeyboardEvent) => {
         if (!this.visible || event.defaultPrevented || !this.hud.regionMenu.hidden || event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
@@ -286,10 +310,14 @@ export class WorldMapView {
                 this.ensureWorld(3);
                 if (this.bridgeStatus === 'idle') void this.loadBridge();
             }
-            if (world === 4 || this.overview || (world === 3 && this.save && isUnlocked('4-1', this.save))) {
+            if (world >= 4 || this.overview || (world === 3 && this.save && isUnlocked('4-1', this.save))) {
                 this.ensureWorld(4);
                 if (this.factorySerraStatus === 'idle') void this.loadFactorySerraLink();
                 if (this.maintenanceStatus === 'idle') void this.loadMaintenanceCable();
+            }
+            if (world === 5 || this.overview || (world === 4 && this.save && isUnlocked('5-1', this.save))) {
+                this.ensureWorld(5);
+                if (this.passengerStatus === 'idle') void this.loadPassengerCable();
             }
         }
         else this.ensureWorld(world);
@@ -320,15 +348,17 @@ export class WorldMapView {
         return (low === 1 && high >= 2 && (this.connectionStatus === 'failed' || [1, 2].some(world => this.artCache.get(world)?.status === 'failed'))) ||
             (low <= 2 && high >= 3 && (this.bridgeStatus === 'failed' || [2, 3].some(world => this.artCache.get(world)?.status === 'failed'))) ||
             (low <= 3 && high >= 4 && (this.factorySerraStatus === 'failed' || [3, 4].some(world => this.artCache.get(world)?.status === 'failed'))) ||
+            (low <= 4 && high >= 5 && (this.passengerStatus === 'failed' || [4, 5].some(world => this.artCache.get(world)?.status === 'failed'))) ||
             // A previous regional fallback can leave Feka opposite the ferry.
             // Keep that recovery usable without boarding an absent vessel.
-            (low === 1 && high <= 4 && this.mooredBoatWorld !== (from === 1 ? 1 : 2));
+            (low === 1 && inAtlas(high) && this.mooredBoatWorld !== (from === 1 ? 1 : 2));
     }
     private crossingLoading(from: number, to: number): boolean {
         const low = Math.min(from, to), high = Math.max(from, to);
         return (low === 1 && high >= 2 && this.connectionStatus === 'loading') ||
             (low <= 2 && high >= 3 && this.bridgeStatus === 'loading') ||
-            (low <= 3 && high >= 4 && this.factorySerraStatus === 'loading');
+            (low <= 3 && high >= 4 && this.factorySerraStatus === 'loading') ||
+            (low <= 4 && high >= 5 && this.passengerStatus === 'loading');
     }
     private async loadConnection(): Promise<void> {
         this.connectionStatus = 'loading';
@@ -416,11 +446,35 @@ export class WorldMapView {
         if (this.maintenanceStatus === 'failed') this.assetWarning = 'A cabine não carregou. O percurso a pé continua disponível.';
         this.geometryDirty = true; this.paintDirty = true;
     }
+    private async loadPassengerCable(): Promise<void> {
+        this.passengerStatus = 'loading';
+        const prefix = mapAssetPrefix((import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/');
+        const request = fetch(prefix + 'serra-reserva-link.meta.json', { signal: this.abort.signal })
+            .then(response => response.ok ? response.json() : null).catch(() => null);
+        const [raw] = await Promise.all([request, this.pairLoads.get(4), this.pairLoads.get(5)]);
+        if (this.abort.signal.aborted) return;
+        const serra = this.artCache.get(4), reserva = this.artCache.get(5);
+        const cable = serra?.status === 'ready' && reserva?.status === 'ready'
+            ? parseReservaPassengerCable(raw, serra.metadata, reserva.metadata, { 4: placementFor(4), 5: placementFor(5) }) : null;
+        if (cable) {
+            const layers = [cable.atlas, ...cable.overlays];
+            const images = await Promise.all(layers.map(layer => this.loadImage(prefix + layer.path.slice('/assets/world/map/'.length))));
+            if (this.abort.signal.aborted) return;
+            if (images.every((image, index) => matchesSerraAssetSize(image, layers[index]))) {
+                this.passengerCable = cable; this.passengerImage = images[0];
+                cable.overlays.forEach((layer, index) => this.passengerOverlays.set(layer.path, images[index + 1]!));
+                this.passengerStatus = 'ready';
+            } else this.passengerStatus = 'failed';
+        } else this.passengerStatus = 'failed';
+        if (this.passengerStatus === 'failed') this.assetWarning = 'A linha de passageiros não carregou. As fases continuam disponíveis pelo arquipélago.';
+        this.geometryDirty = true; this.paintDirty = true;
+    }
     show(time: number): void {
         if (this.visible || this.disposed) return;
         this.visible = true; this.hud.setVisible(true); this.lastTime = time; this.dirtySize = true; this.cameraSnap = true;
         this.controlOffsets.clear();
-        this.journey = null; this.cablePair = createCablePair(); this.boatHeadingIndex = -1; this.selection = -1; this.lastSignature = ''; this.geometryDirty = true;
+        this.journey = null; this.cablePair = createCablePair(); this.passengerPair = createCablePair();
+        this.boatHeadingIndex = -1; this.selection = -1; this.lastSignature = ''; this.geometryDirty = true;
         this.restoreTabIndex = this.gameCanvas.getAttribute('tabindex');
         this.gameCanvas.setAttribute('tabindex', '-1'); this.gameCanvas.setAttribute('aria-hidden', 'true');
         this.gameCanvas.style.visibility = 'hidden'; this.root.focus({ preventScroll: true });
@@ -447,6 +501,7 @@ export class WorldMapView {
         this.bridgeActive = this.bridgeStatus === 'ready' && [2, 3].every(world => this.activeArt.get(world)?.status === 'ready');
         this.factorySerraActive = this.factorySerraStatus === 'ready' && [3, 4].every(world => this.activeArt.get(world)?.status === 'ready');
         this.maintenanceActive = this.maintenanceStatus === 'ready' && this.activeArt.get(4)?.status === 'ready';
+        this.passengerActive = this.passengerStatus === 'ready' && [4, 5].every(world => this.activeArt.get(world)?.status === 'ready');
         this.maintenancePaths = this.maintenanceActive && this.maintenanceCable ? {
             a: this.maintenanceCable.lanes.a.pathPoints.map(point => localToAtlas(point, placementFor(4))),
             b: this.maintenanceCable.lanes.b.pathPoints.map(point => localToAtlas(point, placementFor(4))),
@@ -456,7 +511,9 @@ export class WorldMapView {
             bridge: this.bridge, bridgeReady: this.bridgeActive, bridgeOpen: !!this.save && isUnlocked('3-1', this.save),
             factorySerraLink: this.factorySerraLink, factorySerraLinkReady: this.factorySerraActive,
             factorySerraLinkOpen: !!this.save && isUnlocked('4-1', this.save),
-            maintenanceCable: this.maintenanceCable, maintenanceCableReady: this.maintenanceActive });
+            maintenanceCable: this.maintenanceCable, maintenanceCableReady: this.maintenanceActive,
+            passengerCable: this.passengerCable, passengerCableReady: this.passengerActive,
+            passengerCableOpen: !!this.save && isUnlocked('5-1', this.save) });
         this.updateCapabilities();
         this.geometryDirty = false;
     }
@@ -497,7 +554,8 @@ export class WorldMapView {
             globalProgress: { completed: this.save.completed.length, seals: this.save.seals.length },
             motionState: this.motionState(), canEnter: canEnterJourney(this.journey, this.capabilities),
             hint: this.journey.blocked === 'no-route' && this.crossingLoading(worldOf(this.journey.arrived), world)
-                ? world === 4 ? 'Preparando a passagem da Serra… Você pode escolher outra fase ou voltar ao menu.'
+                ? world === 5 ? 'Preparando a linha de passageiros… Você pode escolher outra fase ou voltar ao menu.'
+                    : world === 4 ? 'Preparando a passagem da Serra… Você pode escolher outra fase ou voltar ao menu.'
                     : world === 3 ? 'Preparando a ponte de carga… Você pode escolher outra fase ou voltar ao menu.'
                     : 'Preparando o barco e os cais… Você pode escolher outra fase ou voltar ao menu.'
                 : journeyBlockReason(this.journey) || (this.save.secrets.includes(`${world}-3`) ? 'Atalho 3 → 5 descoberto!' : ''),
@@ -521,7 +579,7 @@ export class WorldMapView {
         this.show(time); this.save = save; this.controlSelection = clampMapSelection(selection);
         this.updateCapabilities();
         this.ensureArt(STAGES[this.controlSelection].world); this.ensureArt(worldOf(returned?.playedStage ?? save.selected));
-        const progressSignature = `${save.secrets.join(',')}:${isUnlocked('3-1', save)}:${isUnlocked('4-1', save)}`;
+        const progressSignature = `${save.secrets.join(',')}:${isUnlocked('3-1', save)}:${isUnlocked('4-1', save)}:${isUnlocked('5-1', save)}`;
         if (this.lastSignature.split('|')[0] !== progressSignature) this.geometryDirty = true;
         if (this.geometryDirty && !this.journey?.destination) {
             const previous = this.journey; this.rebuildNetwork();
@@ -530,7 +588,7 @@ export class WorldMapView {
         }
         if (!this.journey || returned) {
             this.mooredBoatWorld = worldOf(returned?.playedStage ?? save.selected) === 1 ? 1 : 2;
-            this.cablePair = createCablePair(); this.journey = null; this.updateCapabilities();
+            this.cablePair = createCablePair(); this.passengerPair = createCablePair(); this.journey = null; this.updateCapabilities();
             this.journey = returned ? returnToJourney(returned.playedStage, returned.nextSelected, this.network, this.capabilities)
                 : createJourney(save.selected, this.network, this.capabilities);
             this.reportedArrival = save.selected; this.selection = -1;
@@ -579,31 +637,43 @@ export class WorldMapView {
         frame = this.boatMetadata.frames[this.boatHeadingIndex];
         return { foot, frame, assets: { rear: this.boatImage, foreground: this.boatImage } };
     }
-    private currentCableCars(): AtlasCableCar[] {
-        if (!this.maintenanceActive || !this.maintenanceCable || !this.maintenanceImage || !this.maintenancePaths) return [];
-        const pose = sampleCablePair(this.cablePair, SERRA_CABLE_PAIR, this.maintenancePaths, this.journey?.legs[0]);
-        if (!pose) return [];
-        return this.maintenanceCable.paintOrder.map(id => ({ id, foot: pose.feet[id], frame: this.maintenanceCable!.frame,
-            assets: { rear: this.maintenanceImage, foreground: this.maintenanceImage } }));
+    private cableLines(): CableLineView[] {
+        const lines: CableLineView[] = [];
+        if (this.maintenanceActive && this.maintenanceCable && this.maintenanceImage && this.maintenancePaths)
+            lines.push({ definition: SERRA_CABLE_PAIR, state: this.cablePair, metadata: this.maintenanceCable,
+                paths: this.maintenancePaths, image: this.maintenanceImage });
+        if (this.passengerActive && this.passengerCable && this.passengerImage)
+            lines.push({ definition: PASSENGER_CABLE_PAIR, state: this.passengerPair, metadata: this.passengerCable,
+                paths: { a: this.passengerCable.lanes.a.pathPoints, b: this.passengerCable.lanes.b.pathPoints }, image: this.passengerImage });
+        return lines;
     }
-    private activeCableCar(aboardOnly = false): CableCar | undefined {
+    private currentCableCars(): AtlasCableCar[] {
+        return this.cableLines().flatMap(line => {
+            const pose = sampleCablePair(line.state, line.definition, line.paths, this.journey?.legs[0]);
+            return pose ? line.metadata.paintOrder.map(car => ({ id: line.definition.lanes[car].rideEdge,
+                foot: pose.feet[car], frame: line.metadata.frame, assets: { rear: line.image, foreground: line.image } })) : [];
+        });
+    }
+    private activeCableCar(aboardOnly = false): string | undefined {
         const active = this.journey?.legs[0];
-        if (!active || !this.maintenanceActive || !this.maintenanceCable) return;
-        for (const car of ['a', 'b'] as const) {
-            const lane = SERRA_CABLE_PAIR.lanes[car];
-            if (active.mode === 'cable' && active.id === lane.rideEdge) return car;
+        if (!active) return;
+        for (const line of this.cableLines()) for (const car of ['a', 'b'] as const) {
+            const lane = line.definition.lanes[car];
+            if (active.mode === 'cable' && active.id === lane.rideEdge) return lane.rideEdge;
             if (active.mode === 'cable-board') for (const terminal of ['lower', 'upper'] as const)
-                if (active.id === lane.boardingEdges[terminal] && (!aboardOnly || active.progress >= this.maintenanceCable.lanes[car][terminal].aboardProgress)) return car;
+                if (active.id === lane.boardingEdges[terminal] && (!aboardOnly || active.progress >= line.metadata.lanes[car][terminal].aboardProgress)) return lane.rideEdge;
         }
     }
     private paintAtlas(world: number, save: AdventureSave, time: number, dt: number): void {
-        const ids = [1, 2, ...([3, 4].filter(id => world === id || !!this.activeArt.get(id)?.assets.island))];
+        const ids = [1, 2, ...([3, 4, 5].filter(id => world === id || !!this.activeArt.get(id)?.assets.island))];
         const islands: AtlasIslandLayer[] = ids.map(id => ({ world: id, metadata: this.activeArt.get(id)!.metadata,
             placement: placementFor(id), assets: this.activeArt.get(id)!.assets, completed: save.completed, secret: save.secrets.includes(`${id}-3`),
             ...(this.connectionActive && this.connection && (id === 1 || id === 2)
                 ? { overlay: { ...this.connection.docks[id].overlay, image: this.dockImages.get(id)! } } : {}),
             approachBounds: [...(this.bridgeActive && this.bridge && (id === 2 || id === 3) ? [this.bridge.landings[id].approachBounds] : []),
-                ...(this.factorySerraActive && this.factorySerraLink && (id === 3 || id === 4) ? [this.factorySerraLink.landings[id].approachBounds] : [])] }));
+                ...(this.factorySerraActive && this.factorySerraLink && (id === 3 || id === 4) ? [this.factorySerraLink.landings[id].approachBounds] : []),
+                ...(this.passengerActive && this.passengerCable && (id === 4 || id === 5)
+                    ? [this.passengerCable.stations[id === 4 ? 'lower' : 'upper'].artBounds] : [])] }));
         const actorInAtlas = inAtlas(worldOf(this.journey!.arrived));
         const active = actorInAtlas ? this.journey!.legs[0] : undefined;
         const onBridge = active?.id === PORT_FACTORY_BRIDGE_EDGE, onSerraLink = active?.id === FACTORY_SERRA_LINK_EDGE;
@@ -624,8 +694,15 @@ export class WorldMapView {
         const overlay = this.bridgeActive && this.bridge ? this.bridge.overlays[bridgeState] : null;
         const serraState = isUnlocked('4-1', save) ? 'open' : 'closed';
         const serraOverlay = this.factorySerraActive && this.factorySerraLink ? this.factorySerraLink.overlays[serraState] : null;
-        const connectionBounds = [overlay, serraOverlay].flatMap(layer => layer ? [{ left: layer.left, top: layer.top,
+        const passengerState = isUnlocked('5-1', save) ? 'open' : 'closed';
+        const passengerLayers = this.passengerActive && this.passengerCable
+            ? this.passengerCable.overlays.filter(layer => !layer.when || layer.when === passengerState) : [];
+        const cablePaths = this.passengerActive && this.passengerCable ? this.passengerCable.cablePolylines : [];
+        const connectionBounds = [overlay, serraOverlay, ...passengerLayers].flatMap(layer => layer ? [{ left: layer.left, top: layer.top,
             right: layer.left + layer.widthInMap, bottom: layer.top + layer.heightInMap }] : []);
+        const cablePoints = cablePaths.flat();
+        if (cablePoints.length) connectionBounds.push({ left: Math.min(...cablePoints.map(p => p.x)), right: Math.max(...cablePoints.map(p => p.x)),
+            top: Math.min(...cablePoints.map(p => p.y)), bottom: Math.max(...cablePoints.map(p => p.y)) });
         const focusBounds = [...(trackedBoat ? [atlasBoatBounds(trackedBoat.foot, trackedBoat.frame)] : []),
             ...(this.overview ? cableCars.map(atlasCableBounds) : trackedCabin ? [atlasCableBounds(trackedCabin)] : [])];
         const target = getAtlasCamera({ mode: this.overview ? 'overview' : channel ? 'channel' : 'island', activeWorld,
@@ -638,9 +715,10 @@ export class WorldMapView {
         const aboard = !!occupiedCabin || active?.mode === 'sail' || (active?.mode === 'board' && active.progress > .45);
         paintWorldAtlas(this.ctx, { camera: this.camera, time, reducedMotion: this.media.matches, islands,
             connections: [...(overlay ? [{ ...overlay, image: this.bridgeImages.get(bridgeState)! }] : []),
-                ...(serraOverlay ? [{ ...serraOverlay, image: this.factorySerraImages.get(serraState)! }] : [])],
+                ...(serraOverlay ? [{ ...serraOverlay, image: this.factorySerraImages.get(serraState)! }] : []),
+                ...passengerLayers.map(layer => ({ ...layer, image: this.passengerOverlays.get(layer.path)! }))],
             actor: { point: this.marker, walking: !!active && active.mode !== 'sail' && active.mode !== 'cable', facingLeft: this.facingLeft, aboard,
-                visible: actorInAtlas, cableCar: occupiedCabin }, boat, cableCars });
+                visible: actorInAtlas, cableCar: occupiedCabin }, boat, cableCars, cablePaths });
         this.positionNodes(world, channel || activeWorld !== world, boat, cableCars);
     }
     private blendAtlasCamera(target: MapCamera, dt: number, bounds?: AtlasBounds): MapCamera {
@@ -716,11 +794,14 @@ export class WorldMapView {
                 : action.mode === 'bridge' && this.bridgeActive && this.bridge && (departure === 2 || departure === 3)
                     ? this.bridge.landings[departure].landing
                     : action.mode === 'walk' && this.factorySerraActive && this.factorySerraLink && (departure === 3 || departure === 4)
-                        ? this.factorySerraLink.landings[departure].landing : null;
+                        ? this.factorySerraLink.landings[departure].landing
+                        : action.mode === 'cable' && this.passengerActive && this.passengerCable && (departure === 4 || departure === 5)
+                            ? this.passengerCable.stations[departure === 4 ? 'lower' : 'upper'].platform : null;
             if (!anchor) continue;
             const point = mapToScreen(localToAtlas(anchor, placementFor(departure)), this.camera);
             travel[id] = { ...point, visible: point.x > 8 && point.x < this.width - 8 && point.y > this.frameInsets.top && point.y < this.height - this.frameInsets.bottom,
-                available: !!this.save && isUnlocked(`${action.toWorld}-1`, this.save) };
+                available: !!this.save && isUnlocked(action.toStage ?? `${action.toWorld}-1`, this.save) &&
+                    (action.mode !== 'cable' || isUnlocked('5-1', this.save)) };
         }
         const visible = [...stages.map((point, n) => point ? { id: `stage:${world}-${n + 1}`, point, anchor: anchors[n], width: 56, height: 58 } : null),
             ...WORLD_MAP_TRAVEL_ACTION_IDS.map(id => {

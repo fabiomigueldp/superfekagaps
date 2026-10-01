@@ -6,13 +6,15 @@ import { loadMapSignAtlas, loadMapFactorySignAtlas, loadMapFactoryLeftSignAtlas,
     type MapSignAtlas, type MapFactorySignAtlas, type MapTravelSign } from './WorldMapSignArt';
 
 export const WORLD_MAP_TRAVEL_ACTION_IDS = ['ferry-costa-porto', 'ferry-porto-costa', 'bridge-porto-factory', 'bridge-factory-porto',
-    'walk-factory-serra', 'walk-serra-factory'] as const;
+    'walk-factory-serra', 'walk-serra-factory', 'cable-serra-reserva', 'cable-reserva-serra'] as const;
 export type WorldMapTravelActionId = typeof WORLD_MAP_TRAVEL_ACTION_IDS[number];
 export interface WorldMapTravelAction extends MapTravelSign {
     id: WorldMapTravelActionId;
     fromWorld: number;
     toWorld: number;
-    mode: 'ferry' | 'bridge' | 'walk';
+    /** A new line can arrive at its actual neighboring stage terminal. */
+    toStage?: string;
+    mode: 'ferry' | 'bridge' | 'walk' | 'cable';
     width: number;
     height: number;
 }
@@ -24,6 +26,8 @@ export const WORLD_MAP_TRAVEL_ACTIONS: Readonly<Record<WorldMapTravelActionId, W
     'bridge-factory-porto': { id: 'bridge-factory-porto', fromWorld: 3, toWorld: 2, mode: 'bridge', label: 'PORTO', direction: 'left', width: 104, height: 56 },
     'walk-factory-serra': { id: 'walk-factory-serra', fromWorld: 3, toWorld: 4, mode: 'walk', label: 'SERRA', direction: 'right', width: 104, height: 56 },
     'walk-serra-factory': { id: 'walk-serra-factory', fromWorld: 4, toWorld: 3, mode: 'walk', label: 'FÁBRICA', direction: 'left', wide: true, width: 128, height: 56 },
+    'cable-serra-reserva': { id: 'cable-serra-reserva', fromWorld: 4, toWorld: 5, toStage: '5-1', mode: 'cable', label: 'RESERVA', direction: 'left', wide: true, width: 128, height: 56 },
+    'cable-reserva-serra': { id: 'cable-reserva-serra', fromWorld: 5, toWorld: 4, toStage: '4-5', mode: 'cable', label: 'SERRA', direction: 'right', width: 104, height: 56 },
 };
 const LEGACY_DOCK_ACTION_IDS = ['ferry-porto-costa', 'ferry-costa-porto'] as const;
 
@@ -199,7 +203,7 @@ export class WorldMapHud {
         this.root.hidden = true; this.root.tabIndex = -1;
         this.root.setAttribute('aria-label', 'Mapa do arquipélago');
         this.canvas.setAttribute('aria-hidden', 'true');
-        this.nodeLayer.setAttribute('aria-label', 'Fases, cais, ponte e caminhos do mapa');
+        this.nodeLayer.setAttribute('aria-label', 'Fases e transportes do mapa');
         this.scene.append(this.canvas, this.nodeLayer);
         this.regionButton = action('world-map-tool world-map-archipelago', 'Arquipélago', () => this.toggleRegionMenu());
         this.regionButton.setAttribute('aria-expanded', 'false');
@@ -227,7 +231,7 @@ export class WorldMapHud {
             const sign = WORLD_MAP_TRAVEL_ACTIONS[id];
             const button = element('button', `world-map-dock world-map-travel${sign.wide ? ' world-map-travel-wide' : ''}`); button.type = 'button';
             button.setAttribute('data-travel-action', id);
-            const canvas = bitmap(button); accessibleText(button, `${sign.mode === 'bridge' ? 'Ponte' : sign.mode === 'walk' ? 'Caminho' : 'Cais'}: ${sign.label}`);
+            const canvas = bitmap(button); accessibleText(button, `${sign.mode === 'bridge' ? 'Ponte' : sign.mode === 'walk' ? 'Caminho' : sign.mode === 'cable' ? 'Teleférico' : 'Cais'}: ${sign.label}`);
             button.addEventListener('click', () => this.run(() => {
                 if (callbacks.selectTravel) callbacks.selectTravel(id); else callbacks.selectWorld(sign.toWorld);
             }));
@@ -284,7 +288,7 @@ export class WorldMapHud {
         else {
             this.loadSignArt();
             if (this.state?.world === 3 || !this.travelButtons['bridge-porto-factory'].hidden) this.loadFactorySignArt();
-            if (this.state?.world === 4 || !this.travelButtons['walk-serra-factory'].hidden) this.loadFactoryLeftSignArt();
+            if (this.state?.world === 4 || !this.travelButtons['walk-serra-factory'].hidden || !this.travelButtons['cable-serra-reserva'].hidden) this.loadFactoryLeftSignArt();
         }
     }
     private loadSignArt(): void {
@@ -391,7 +395,7 @@ export class WorldMapHud {
     }
     private paintStage(index: number, state: WorldMapHudState): void {
         const entry = STAGES[(state.world - 1) * 5 + index], selected = entry.id === STAGES[state.stage].id;
-        if (state.world > 4 || !paintPhysicalStageSign(this.stageCanvases[index], this.signAtlas, entry.id, selected, !!state.completed[index], !!state.open[index]))
+        if (state.world > 5 || !paintPhysicalStageSign(this.stageCanvases[index], this.signAtlas, entry.id, selected, !!state.completed[index], !!state.open[index]))
             stageSign(this.stageCanvases[index], entry.id, selected, !!state.completed[index], !!state.open[index]);
     }
 
@@ -414,11 +418,11 @@ export class WorldMapHud {
             if (point?.available !== undefined && this.state) this.updateTravel(id, point.available);
         }
         if (!this.travelButtons['bridge-porto-factory'].hidden) this.loadFactorySignArt();
-        if (!this.travelButtons['walk-serra-factory'].hidden) this.loadFactoryLeftSignArt();
+        if (!this.travelButtons['walk-serra-factory'].hidden || !this.travelButtons['cable-serra-reserva'].hidden) this.loadFactoryLeftSignArt();
     }
     private updateTravel(id: WorldMapTravelActionId, available: boolean): void {
         const sign = WORLD_MAP_TRAVEL_ACTIONS[id];
-        const current = this.state?.world === sign.toWorld, physical = !!this.state && this.state.world <= 4;
+        const current = this.state?.world === sign.toWorld, physical = !!this.state && this.state.world <= 5;
         const key = `${available}:${current}:${physical}`;
         if (this.travelSignatures[id] === key) return;
         this.travelSignatures[id] = key; this.travelAvailability[id] = available;
@@ -430,8 +434,9 @@ export class WorldMapHud {
         button.setAttribute('aria-label', sign.mode === 'bridge'
             ? `Ponte de carga para ${destination}. ${available ? 'Caminhar pela ponte.' : 'Ponte bloqueada. Ver prévia.'}`
             : sign.mode === 'walk' ? `Caminho para ${destination}. ${available ? 'Caminhar pela passagem.' : 'Passagem bloqueada. Ver prévia.'}`
+            : sign.mode === 'cable' ? `Teleférico para ${destination}. ${available ? 'Viajar pela linha de passageiros.' : 'Linha de passageiros bloqueada. Ver prévia.'}`
             : `Cais para ${destination}. ${available ? 'Marcar destino da travessia de barco.' : 'Travessia bloqueada. Ver prévia.'}`);
-        button.title = `${sign.label} ${sign.direction === 'left' ? '←' : '→'} · ${sign.mode === 'bridge' ? 'ponte de carga' : sign.mode === 'walk' ? 'caminho' : 'barco'}`;
+        button.title = `${sign.label} ${sign.direction === 'left' ? '←' : '→'} · ${sign.mode === 'bridge' ? 'ponte de carga' : sign.mode === 'walk' ? 'caminho' : sign.mode === 'cable' ? 'teleférico' : 'barco'}`;
     }
     focusStage(globalIndex: number): void {
         if (this.state && Math.floor(globalIndex / 5) === this.state.world - 1) this.stageButtons[globalIndex % 5]?.focus({ preventScroll: true });
