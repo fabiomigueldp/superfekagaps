@@ -388,6 +388,85 @@ garden_pot('oven herb pot',1.18,1.28,1.20,.22,.43)
 garden_pot('east garden ceramic pot',5.78,1.35,1.20,.24,.52)
 garden_pot('residence doorway pot',-2.65,2.28,2.505,.18,.36)
 
+# Authored enrichment: architectural finish and planted recesses only.
+# All walk geometry, camera, lights, actors and ferry ingress remain frozen.
+claysoft=material('Sun washed clay tile',(0.80,.36,.23))
+claydeep=material('Aged terracotta tile',(0.66,.245,.155))
+soil=material('Rich herb garden soil',(.24,.22,.13))
+sage=material('Silvery coastal sage',(.51,.64,.36))
+lavender=material('Quiet lavender bloom',(.61,.44,.74))
+bronze=material('Weathered lantern bronze',(.30,.29,.20),.25)
+
+# Shallow interlocking terracotta courses add hand-built scale to the original roofs.
+for label,x,y,z,w,d,rise in [('home',-4.18,2.77,4.46,3.07,2.12,.59),('cottage',2.80,2.40,3.10,3.22,2.03,.59)]:
+    for side in [-1,1]:
+        for row in range(4):
+            t0=row/4; t1=(row+1)/4
+            for col in range(14):
+                xa=x-w/2+col*w/14+.042;xb=x-w/2+(col+1)*w/14-.042
+                ya=y+side*d/2*(1-t0);yb=y+side*d/2*(1-t1)
+                za=z+rise*t0+.009;zb=z+rise*t1+.009
+                mat=[roof,roof,claysoft,roof,claydeep][(row*7+col*3)%5]
+                mesh(label+' individual clay tile course',[(xa,ya,za),(xb,ya,za),(xb,yb,zb),(xa,yb,zb)],[(0,1,2,3)],mat)
+            beam(label+' subtle overlap lip',(x-w/2,y+side*d/2*(1-t0),z+rise*t0+.018),(x+w/2,y+side*d/2*(1-t0),z+rise*t0+.018),.021,roof)
+    beam(label+' timber eaves fascia',(x-w/2,y-d/2,z-.045),(x+w/2,y-d/2,z-.045),.055,wood)
+
+# Carefully fitted corner quoins and shutter joinery enrich the two facades.
+for name,x,y,z,w,d,h in [('home',-4.18,2.77,2.51,2.65,1.72,1.90),('cottage',2.80,2.40,1.20,2.80,1.63,1.85)]:
+    for side in [-1,1]:
+        for row in range(5):
+            cube(name+' corner limestone quoin',(x+side*(w/2-.10),y-d/2-.026,z+.38+row*.29),(.23 if row%2 else .31,.08,.235),light,.014)
+    for dx in [-w*.24,w*.24]:
+        for sx in [-.28,.28]:
+            for j in range(5):
+                cube(name+' shutter recessed louvre',(x+dx+sx,y-d/2-.089,z+h*.58-.25+j*.12),(.107,.018,.027),blue,.006)
+    # Discreet central wall lantern safely over the existing facade.
+    lx=x; ly=y-d/2-.085; lz=z+1.00
+    cube(name+' lantern backplate',(lx,ly,lz),(.13,.05,.29),bronze,.012)
+    cube(name+' warm lantern glass',(lx,ly-.075,lz),(.10,.10,.18),gold,.012)
+    cube(name+' lantern canopy',(lx,ly-.075,lz+.13),(.18,.16,.05),bronze,.015)
+
+# One espalier on the home side wall, contained inside its silhouette.
+for j in range(4):
+    yy=2.19+j*.32
+    beam('home side espalier upright',(-2.827,yy,2.70),(-2.827,yy,4.20),.018,wood)
+for zz in [2.9,3.30,3.70,4.08]:
+    beam('home side espalier rung',(-2.82,2.08,zz),(-2.82,3.26,zz),.018,wood)
+for j in range(8):
+    yy=2.16+(j%4)*.29; zz=2.95+(j//4)*.70+(j%2)*.16
+    shrub('trained climbing vine',-2.80,yy,zz,.075,.19,.19)
+    if j in [1,4,6]:
+        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1,radius=.062,location=(-2.71,yy,zz+.14))
+        assign(bpy.context.object,white);bpy.context.object.name='espalier small ivory blossom'
+
+# Replace the five identical dots per bed with planted, varied flower heads.
+for obj in list(bpy.data.objects):
+    if 'pink and ivory blooms' in obj.name:
+        bpy.data.objects.remove(obj,do_unlink=True)
+for bed,x,y,z,w,d in [(0,5.50,.66,1.20,1.15,.55),(1,3.40,-2.50,1.20,1.15,.57),(2,1.0,-2.94,1.20,1.04,.49),(3,-4.4,-3.0,1.20,1.28,.45),(4,-3.95,1.76,2.51,1.05,.37),(5,-2.70,2.72,2.51,.54,.65),(6,4.60,1.35,1.20,.62,.92)]:
+    for i in range(5):
+        xx=x+(i-2)*w*.16; yy=y+(.065 if i%2 else -.065)
+        height=.72+(i%3)*.035
+        if bed in [0,2,6]:
+            beam('garden lavender stem',(xx,yy,z+.43),(xx,yy,z+height+.13),.012,green)
+            for k in range(3):
+                bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1,radius=.048-k*.006,location=(xx,yy,z+height+k*.045))
+                obj=bpy.context.object;obj.name='lavender flower spike';obj.scale=(.8,.8,1.2);assign(obj,lavender)
+        else:
+            for k in range(5):
+                angle=k*2*math.pi/5
+                bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1,radius=.042,location=(xx+.045*math.cos(angle),yy+.045*math.sin(angle),z+height))
+                obj=bpy.context.object;obj.name='garden open flower petal';obj.scale.z=.53;assign(obj,white if i%2==0 else rose)
+            cyl('garden flower golden center',(xx,yy,z+height+.015),.022,.027,gold,10)
+
+# Baker's work shelf attached behind the oven, clear of the approach and stairs.
+cube('oven cottage flour shelf',(3.64,1.53,1.92),(.62,.36,.10),wood,.020)
+for xx in [3.40,3.86]:
+    beam('flour shelf wall bracket',(xx,1.67,1.58),(xx,1.38,1.86),.025,bronze)
+cyl('bakery ivory flour jar',(3.73,1.53,2.10),.11,.26,white,20)
+cyl('bakery terracotta jar lid',(3.73,1.53,2.245),.125,.04,roofhi,20)
+cube('bakers folded linen',(3.48,1.53,1.996),(.22,.22,.035),white,.015)
+
 scene = bpy.context.scene
 bpy.ops.object.camera_add(location=(11, -20, 17.5))
 cam = bpy.context.object

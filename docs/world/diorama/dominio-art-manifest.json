@@ -1,7 +1,7 @@
 {
   "status": "frozen-source-physical-original-sprite-and-raster-gates-pass-browser-integration-pending",
   "sourceBuilder": "tools/diorama/render_dominio_map.py",
-  "builderSha256": "75dad697e5401ec60e0f6225a5c87c1184d8284e8b9a15931ae7ddd82f055615",
+  "builderSha256": "2341ebd6d4d4b1997701b633514096eb98974a7d369faa1fd98e6ecfa20a89c2",
   "checker": "tools/diorama/check_dominio_map.py",
   "packager": "tools/diorama/package_dominio_map.py",
   "validation": "docs/world/diorama/dominio-validation.json",
@@ -46,8 +46,8 @@
   "files": [
     {
       "path": "/assets/world/map/dominio-diorama.webp",
-      "bytes": 200914,
-      "sha256": "aa178601b2a1595cbac2a14fccf14706f8504073cd39b7c35059177ad1e53d5a"
+      "bytes": 208318,
+      "sha256": "620bae8096c284ac7bc6ea6f861c92bbdeecc594ab832c4bff1cce46debf8379"
     },
     {
       "path": "/assets/world/map/dominio-diorama.meta.json",

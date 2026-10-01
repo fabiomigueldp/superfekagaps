@@ -1,0 +1,60 @@
+{
+  "fabrica": {
+    "size": [
+      1920,
+      1200
+    ],
+    "previousImageBytes": 152416,
+    "imageBytes": 174128,
+    "metadataBytes": 5300,
+    "imageSha256": "9e0e55d42c176f3e5159311a88b0a263adca4fc9e15edb50048d14865a0ab748",
+    "changedMetadataKeys": [
+      "artBounds"
+    ],
+    "decodedBytes": 9216000
+  },
+  "serra": {
+    "size": [
+      1920,
+      1200
+    ],
+    "previousImageBytes": 240110,
+    "imageBytes": 208442,
+    "metadataBytes": 2907,
+    "imageSha256": "0c670a3a8675e726ab6f464b5e7e5a32adc6909e1cf880db922c1838c4d86daf",
+    "changedMetadataKeys": [
+      "artBounds"
+    ],
+    "decodedBytes": 9216000
+  },
+  "reserva": {
+    "size": [
+      1920,
+      1200
+    ],
+    "previousImageBytes": 175854,
+    "imageBytes": 149414,
+    "metadataBytes": 2985,
+    "imageSha256": "8e727f28c1ac479f0afea6ab2c67c2bd313d537c88e0b2787c81e19975759a8d",
+    "changedMetadataKeys": [
+      "artBounds"
+    ],
+    "decodedBytes": 9216000
+  },
+  "dominio": {
+    "size": [
+      1920,
+      1200
+    ],
+    "previousImageBytes": 200914,
+    "imageBytes": 208318,
+    "metadataBytes": 3017,
+    "imageSha256": "620bae8096c284ac7bc6ea6f861c92bbdeecc594ab832c4bff1cce46debf8379",
+    "changedMetadataKeys": [],
+    "decodedBytes": 9216000
+  },
+  "summary": {
+    "imageDeltaBytes": -28992,
+    "additionalDecodedBytes": 0
+  }
+}

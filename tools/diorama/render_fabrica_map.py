@@ -272,13 +272,17 @@ scene=bpy.context.scene;bpy.ops.object.camera_add(location=(11,-20,17.5));cam=bp
 world=bpy.data.worlds.new('warm maritime sky');scene.world=world;world.use_nodes=True;world.node_tree.nodes['Background'].inputs[0].default_value=(.52,.68,.82,1);world.node_tree.nodes['Background'].inputs[1].default_value=.6
 for name,loc,power,size,color in [('warm key',(-8,-10,18),2100,9,(1,.85,.64)),('sea fill',(8,3,12),1250,8,(.66,.82,1)),('warm rim',(-4,10,13),1500,7,(1,.94,.77))]:
  bpy.ops.object.light_add(type='AREA',location=loc);o=bpy.context.object;o.name=name;o.data.energy=power;o.data.shape='DISK';o.data.size=size;o.data.color=color;o.rotation_euler=(Vector((0,0,1))-o.location).to_track_quat('-Z','Y').to_euler()
-scene.render.engine='CYCLES';scene.cycles.samples=160 if FINAL else 16;scene.cycles.use_denoising=False;scene.cycles.max_bounces=6;scene.render.resolution_x=1920;scene.render.resolution_y=1200;scene.render.resolution_percentage=100 if FINAL else 50;scene.render.film_transparent=True;scene.render.image_settings.file_format='PNG';scene.render.image_settings.color_mode='RGBA';scene.view_settings.view_transform='AgX';scene.view_settings.look='AgX - Medium High Contrast';scene.view_settings.exposure=.35
+scene.render.engine='CYCLES';scene.cycles.samples=192 if FINAL else 16;scene.cycles.use_denoising=False;scene.cycles.max_bounces=6;scene.render.resolution_x=1920;scene.render.resolution_y=1200;scene.render.resolution_percentage=100 if FINAL else 50;scene.render.film_transparent=True;scene.render.image_settings.file_format='PNG';scene.render.image_settings.color_mode='RGBA';scene.view_settings.view_transform='AgX';scene.view_settings.look='AgX - Medium High Contrast';scene.view_settings.exposure=.35
 bpy.context.view_layer.update()
 def project(co):
  p=world_to_camera_view(scene,cam,Vector(co));return {'x':round(p.x,6),'y':round(1-p.y,6)}
 world_routes={'main':[{'from':f'3-{i+1}','to':f'3-{i+2}','world':[list(p) for p in path]} for i,path in enumerate(MAIN)],'secret':[{'from':'3-3','to':'3-5','world':[list(p) for p in SECRET]}]}
 meta={'version':1,'world':3,'status':'authored-candidate-for-runtime-review' if FINAL else 'craft-pass-awaiting-visual-review','size':{'width':1920,'height':1200},'coordinateSystem':'Normalized top-left image space; preserve the full 8:5 frame. World Z is up.','camera':{'position':list(cam.location),'target':list(target),'orthoScale':cam.data.ortho_scale},'nodes':{key:{**project(co),'world':list(co),'clearingRadius':.64} for key,co in NODES.items()},'routes':{f'{i}:{i+1}':[project(p) for p in path] for i,path in enumerate(MAIN)},'secretRoute':[project(p) for p in SECRET],'worldRoutes':world_routes,'campaignSources':['src/adventure/campaign.ts','docs/world/campanha.md#M3','docs/world/lore.md','docs/world/conceitos/imagens/03-fabrica-de-suco.png']}
 assert all(mod.type!='BOOLEAN' for ob in scene.objects for mod in ob.modifiers)
+# Bounded coastal craft enrichment; applied to the fresh model before every
+# source-only consumer (bridge/Serra), clearance audit and final export.
+enrichment=runpy.run_path(os.path.join(ROOT,'tools/diorama/factory_enrichment.py'))['apply'](globals())
+scene['factory_enrichment_invariants']=json.dumps(enrichment)
 # Always audit fresh in-memory coordinates; never let a prior metadata file approve a new build.
 audit_out=tempfile.mkdtemp(prefix='fabrica-source-audit-') if AUDIT_ONLY else OUT
 audit=runpy.run_path(os.path.join(ROOT,'tools/diorama/check_fabrica_clearance.py'),init_globals={'FABRICA_META':meta,'FABRICA_OUT':audit_out,'FABRICA_DOC':audit_out if AUDIT_ONLY else DOC},run_name='__main__');meta=audit['meta']

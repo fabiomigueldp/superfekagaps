@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "dimensions": [
+    1920,
+    1200
+  ],
+  "alphaBoundsThreshold8": [
+    258,
+    79,
+    1640,
+    1093
+  ],
+  "decodedAlphaBoundsThreshold8": [
+    258,
+    79,
+    1640,
+    1093
+  ],
+  "baseReplacementOnly": true,
+  "newRuntimeTextures": 0,
+  "additionalDecodedRuntimeBytes": 0,
+  "decodedReplacementBytes": 9216000,
+  "baselineBytes": 175854,
+  "allPublishedMetadataExceptArtBoundsExact": true,
+  "files": {
+    "candidate/reserva-diorama.webp": {
+      "bytes": 149414,
+      "sha256": "8e727f28c1ac479f0afea6ab2c67c2bd313d537c88e0b2787c81e19975759a8d"
+    },
+    "candidate/reserva-diorama.meta.json": {
+      "bytes": 2985,
+      "sha256": "975d503cf5e496adf34391170357f16ef299c836cdb83d47b7ad4de3f6837559"
+    },
+    "final/reserva-enriched.blend": {
+      "bytes": 6088172,
+      "sha256": "7deb392e923d4115bd1739535bf130c17da8c0a55b6abf720df051b420ca3e48"
+    },
+    "enrich_reserva.py": {
+      "bytes": 14224,
+      "sha256": "96323bd5fe2deed8b9ff8af2b2d98963cd88f2fea2ed5949c125491d95bddafc"
+    }
+  }
+}

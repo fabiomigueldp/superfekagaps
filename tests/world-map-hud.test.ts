@@ -784,3 +784,48 @@ test('heated ferry signs load the correct wide faces and preserve their actual t
     hud.positionTravelActions({ 'ferry-reserva-dominio': { x: 170, y: 220, available: true } });
     assert.equal(resources.requests.length, 3, 'Returning to the same face never requests it again.');
 });
+
+test('compact title badges expose zero, partial and complete seals while encounters remain encounters', t => {
+    const { hud, state } = fixture(t), badge = find(asElement(hud.root), 'world-map-compact-details');
+    for (const count of [0, 1, 3]) {
+        hud.update({ ...state, stage: 3, seals: [0, 0, 0, count, 0] });
+        assert.equal(badge.getAttribute('aria-label'), `${count} de 3 selos`);
+        assert.equal(badge.getAttribute('role'), 'img');
+        assert.equal(badge.children[0].width, 62); assert.equal(badge.children[0].height, 20);
+        assert.equal(badge.hidden, false);
+    }
+    hud.update({ ...state, stage: 4 });
+    assert.equal(badge.getAttribute('aria-label'), 'Encontro');
+    assert.equal(badge.children[0].width, 96);
+    hud.update({ ...state, overview: true }); assert.equal(badge.hidden, true);
+});
+
+test('panorama toggle synchronizes bitmap face, accessible action, tooltip and pressed state including Escape', t => {
+    const { hud, state, calls } = fixture(t), toggle = find(asElement(hud.root), 'world-map-overview');
+    for (const overview of [false, true, false]) {
+        hud.update({ ...state, overview });
+        const label = overview ? 'Ver ilha' : 'Ver panorama';
+        assert.equal(toggle.getAttribute('aria-label'), label);
+        assert.equal(toggle.title, label);
+        assert.equal(toggle.children[1].textContent, label);
+        assert.equal(toggle.getAttribute('aria-pressed'), String(overview));
+        toggle.click(); assert.equal(calls.at(-1), 'overview');
+    }
+    hud.update({ ...state, overview: true });
+    const before = calls.length;
+    const event = asElement(hud.root).dispatch('keydown', { key: 'Escape' });
+    assert.equal(event.defaultPrevented, true); assert.equal(calls.length, before + 1);
+    assert.equal(calls.at(-1), 'overview');
+});
+
+test('short-screen seal badges use existing title row and the toolbar fits a 320px viewport', () => {
+    // Source contract only: this is not browser layout or screenshot validation.
+    const css = readFileSync(new URL('../src/adventure/map.css', import.meta.url), 'utf8');
+    const short = css.slice(css.indexOf('@media (max-height: 480px) {'));
+    assert.match(short, /world-map-compact-details \{ display: block; position: absolute;/);
+    assert.match(short, /world-map-compact-details \.world-map-bitmap \{ width: 31px; height: 10px;/);
+    assert.match(css, /world-map-overview \{ width: 66px;/);
+    // 11 bitmap letters at 12px, horizontal padding22, overview66, menu44, two6px gaps.
+    assert.ok(132 + 22 + 66 + 44 + 12 <= 320 - 18);
+    assert.match(css, /min-width: 44px;\s*height: 44px;/);
+});

@@ -1,0 +1,75 @@
+{
+  "status": "candidate for sole integrator; not published",
+  "files": {
+    "fabrica-diorama.meta.json": {
+      "bytes": 5300,
+      "sha256": "042d6d20b289a3282784b4b706a82bc995d9d01e69320bd22798ee5999cde12b"
+    },
+    "fabrica-diorama.webp": {
+      "bytes": 174128,
+      "sha256": "9e0e55d42c176f3e5159311a88b0a263adca4fc9e15edb50048d14865a0ab748"
+    }
+  },
+  "render": {
+    "size": [
+      1920,
+      1200
+    ],
+    "samples": 192,
+    "denoising": false,
+    "renderer": "Blender 4.3.2 Cycles",
+    "webpQuality": 91,
+    "webpMethod": 6,
+    "alphaBoundsPx": [
+      246,
+      196,
+      1602,
+      1094
+    ],
+    "allFrameEdgesTransparent": true,
+    "webpAlphaExactlyMatchesPng": true
+  },
+  "invariants": {
+    "camera": true,
+    "nodes": true,
+    "routes": true,
+    "secretRoute": true,
+    "worldRoutes": true,
+    "size": true
+  },
+  "budget": {
+    "oldWebpBytes": 152416,
+    "newWebpBytes": 174128,
+    "webpDeltaBytes": 21712,
+    "oldDecodedBytes": 9216000,
+    "newDecodedBytes": 9216000,
+    "decodedDeltaBytes": 0,
+    "newFullSizeLayers": 0
+  },
+  "canonicalAudits": {
+    "auditSummary": {
+      "sampleCount": 660,
+      "headroomRayCount": 660,
+      "supportRayCount": 660,
+      "obstructionCount": 0,
+      "unsupportedCount": 0,
+      "maxAdjacentSampleRise": 0.0793
+    },
+    "projectedAuditSummary": {
+      "sampleCount": 2640,
+      "conflictCount": 0
+    },
+    "billboardAuditSummary": {
+      "sampleCount": 52800,
+      "equipmentContactCount": 0,
+      "pathEdgeContactCount": 438
+    }
+  },
+  "changedGeometryAudit": {
+    "physicalSamples": 2455,
+    "physicalConflicts": 0,
+    "screenSamples": 235680,
+    "screenConflicts": 0,
+    "boolModifierCount": 0
+  }
+}

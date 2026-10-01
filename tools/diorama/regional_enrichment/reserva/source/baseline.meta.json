@@ -184,9 +184,9 @@
   "stationApproachDurationSeconds": 1.184971,
   "coordinateSystem": "Normalized top-left image space in the complete1920x1200 frame; worldZ is up.",
   "artBounds": {
-    "left": 0.134375,
+    "left": 0.13854166666666667,
     "top": 0.06583333333333333,
-    "right": 0.8541666666666666,
+    "right": 0.8489583333333334,
     "bottom": 0.9108333333333334
   }
 }

@@ -1,0 +1,204 @@
+{
+  "status": "PASS",
+  "scope": "Frozen original geometry and metadata; active walking/boarding approaches both phases; full original Feka head/face and new-geometry body occlusion; both maintenance cabins and riders, both directions; conservative passenger-exit body/screen corridor. Integration/browser gate remains separate.",
+  "originalGeometry": {
+    "passed": true,
+    "checkedOriginalObjects": 514,
+    "newObjects": 3410,
+    "geometryAndTransformsExact": true,
+    "fullSourceMetadataExact": true,
+    "cameraLightsExact": true,
+    "publishedRuntimeFieldsExact": {
+      "camera": true,
+      "nodes": true,
+      "routes": true,
+      "secretTransport": true,
+      "secretRoute": true,
+      "routeDurationsSeconds": true,
+      "size": true
+    },
+    "sourceSha256": "a6feca3fe05ea5310fcba9b3633367409fa8b639ceaa4c3d898e619822823e7f"
+  },
+  "stationaryPhases": [
+    {
+      "phase": 0,
+      "passed": true,
+      "activePhysicalCounts": {
+        "unsupportedFeet": 0,
+        "headroomObstructions": 0,
+        "walkSurfaceMismatches": 0,
+        "floatingTimberAnchors": 0
+      },
+      "sourceHeadFacePassed": true,
+      "newSourceBodyContacts": 0,
+      "raster": [
+        {
+          "profile": "desktop",
+          "headContacts": 0,
+          "faceContacts": 0,
+          "newBodyContacts": 0
+        },
+        {
+          "profile": "portrait",
+          "headContacts": 0,
+          "faceContacts": 0,
+          "newBodyContacts": 0
+        },
+        {
+          "profile": "landscape",
+          "headContacts": 0,
+          "faceContacts": 0,
+          "newBodyContacts": 0
+        }
+      ],
+      "routeSamples": 349,
+      "supportRays": 1047,
+      "spriteSourceRays": 614240
+    },
+    {
+      "phase": 1,
+      "passed": true,
+      "activePhysicalCounts": {
+        "unsupportedFeet": 0,
+        "headroomObstructions": 0,
+        "walkSurfaceMismatches": 0,
+        "floatingTimberAnchors": 0
+      },
+      "sourceHeadFacePassed": true,
+      "newSourceBodyContacts": 0,
+      "raster": [
+        {
+          "profile": "desktop",
+          "headContacts": 0,
+          "faceContacts": 0,
+          "newBodyContacts": 0
+        },
+        {
+          "profile": "portrait",
+          "headContacts": 0,
+          "faceContacts": 0,
+          "newBodyContacts": 0
+        },
+        {
+          "profile": "landscape",
+          "headContacts": 0,
+          "faceContacts": 0,
+          "newBodyContacts": 0
+        }
+      ],
+      "routeSamples": 349,
+      "supportRays": 1047,
+      "spriteSourceRays": 614240
+    }
+  ],
+  "maintenancePhysical": {
+    "poses": 106,
+    "collisions": 0,
+    "continuousHullCount": 624,
+    "continuousContacts": 0,
+    "pairCrossing": {
+      "method": "Minimum distance between full evaluated carrier axis-aligned envelopes over every piecewise-linear interval of lane0(t) against lane1(1-t), convex minimization plus endpoints. Positive separation guarantees mesh separation.",
+      "minimumClearance": 2.165056,
+      "t": 0.433312,
+      "lane0Foot": [
+        -0.45344,
+        2.61881,
+        4.37877
+      ],
+      "lane1Foot": [
+        1.90393,
+        0.15058,
+        4.60551
+      ],
+      "axisGaps": [
+        1.35237,
+        1.690728,
+        0
+      ],
+      "passed": true
+    }
+  },
+  "movingRider": {
+    "sourcePassed": true,
+    "roundedRasterPassed": true,
+    "samplesPerLane": 2001,
+    "profiles": [
+      {
+        "profile": "desktop",
+        "lane": 0,
+        "sampleCount": 2001,
+        "headContactPoses": 0,
+        "faceContactPoses": 0
+      },
+      {
+        "profile": "desktop",
+        "lane": 1,
+        "sampleCount": 2001,
+        "headContactPoses": 0,
+        "faceContactPoses": 0
+      },
+      {
+        "profile": "portrait",
+        "lane": 0,
+        "sampleCount": 2001,
+        "headContactPoses": 0,
+        "faceContactPoses": 0
+      },
+      {
+        "profile": "portrait",
+        "lane": 1,
+        "sampleCount": 2001,
+        "headContactPoses": 0,
+        "faceContactPoses": 0
+      },
+      {
+        "profile": "landscape",
+        "lane": 0,
+        "sampleCount": 2001,
+        "headContactPoses": 0,
+        "faceContactPoses": 0
+      },
+      {
+        "profile": "landscape",
+        "lane": 1,
+        "sampleCount": 2001,
+        "headContactPoses": 0,
+        "faceContactPoses": 0
+      }
+    ]
+  },
+  "addedGeometryPreflight": {
+    "rays": 51428,
+    "includesPassengerExit": true,
+    "removedGroups": {
+      "station_upper_continuous timber eave": {
+        "route": "terminalWalkB:0",
+        "object": "enrich_station_upper continuous timber eave",
+        "method": "conservative-full-body-screen"
+      },
+      "station_upper_gable timber edge": {
+        "route": "terminalWalkB:0",
+        "object": "enrich_station_upper gable timber edge",
+        "method": "conservative-full-body-screen"
+      }
+    }
+  },
+  "render": {
+    "size": [
+      1920,
+      1200
+    ],
+    "samples": 128,
+    "denoise": false,
+    "newFullSizeOverlays": 0,
+    "baseReplacement": true
+  },
+  "limitations": [
+    "Existing low body contacts with maintenance cabin panels and one foreground support remain from the approved scene; do not claim complete full-body visibility.",
+    "Dense rider samples use .0005 progress, 2001 poses per lane; physical hull sweep is continuous but visibility is sampled.",
+    "Raster profiles remain desktop1180x757 zoom1, portrait400x606 zoom1.05, landscape846x392 zoom1; runtime pan/zoom integration is owned by the integrator.",
+    "No independent browser or Oracle actions were performed."
+  ],
+  "sourceSha256": "87a92a773a77f1ec82e095302eee9fa7de8bd0738ed461ed4daa656de09d8d3a",
+  "blendSha256": "e8be8d01334da01a60db3d1269ad710384a9984c513d7d4ab3d7418d4a512c22"
+}

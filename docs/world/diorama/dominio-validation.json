@@ -3,7 +3,7 @@
   "scope": "Frozen Dom\u00ednio base: four main routes, shipping shortcut and retained station approach. All five landings included. Future heated dock is reserved only. Additive passenger terminals/cabins/link and older maintenance pdominiotion are separate gates.",
   "builder": {
     "path": "tools/diorama/render_dominio_map.py",
-    "sha256": "75dad697e5401ec60e0f6225a5c87c1184d8284e8b9a15931ae7ddd82f055615"
+    "sha256": "2341ebd6d4d4b1997701b633514096eb98974a7d369faa1fd98e6ecfa20a89c2"
   },
   "checker": {
     "path": "tools/diorama/check_dominio_map.py",
@@ -53,6 +53,7 @@
     "rayCount": 549120,
     "bodyContacts": {},
     "footContacts": {
+      "lavender flower spike.020": 2,
       "walk_main garden route 4": 595,
       "walk_last terrace ascent flush stone tread joint": 1,
       "walk_last terrace ascent flush stone tread joint.009": 1,

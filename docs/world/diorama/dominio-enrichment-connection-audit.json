@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "scope": "Only new Reserva/Dom\u00ednio docks, fixed source approaches, reused8-heading boat and old Reserva preservation",
+  "support": {
+    "sampleCount": 1785,
+    "failureCount": 0,
+    "failures": []
+  },
+  "bodyClearance": {
+    "failureCount": 0,
+    "failures": []
+  },
+  "boatSweep": {
+    "poseCount": 1024,
+    "failureCount": 0,
+    "failures": []
+  },
+  "runtimeHeadingSweep": {
+    "poseCount": 328,
+    "failureCount": 0,
+    "failures": []
+  },
+  "actorVisibility": {
+    "poseCount": 242,
+    "issueCount": 0,
+    "issues": []
+  },
+  "oldReservaActorPreservation": {
+    "poseCount": 256,
+    "issueCount": 0,
+    "issues": []
+  },
+  "preservation": {
+    "reservaNodesAndCameraUnchanged": true,
+    "baseObjectTransformsUnchanged": true,
+    "sourceHashes": {
+      "tools/diorama/render_reserva_dominio_docks.py": true,
+      "tools/diorama/render_reserva_map.py": true,
+      "tools/diorama/render_dominio_map.py": true,
+      "tools/diorama/render_journey_boat.py": true
+    },
+    "protectedChanged": []
+  }
+}

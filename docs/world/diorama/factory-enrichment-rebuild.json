@@ -1,0 +1,36 @@
+{
+  "faceComparison": "Canonical polygon storage ordering only; vertex winding and per-face material retained",
+  "objectCount": 1031,
+  "geometryMaterialSlotsAndLightsSha256": "de5a24aae806f5aa633c6e34f2f1e8750160afbeaf7fe58e5ed6c543d660acdc",
+  "camera": {
+    "matrix": [
+      [
+        0.8787234,
+        -0.2634206,
+        0.3980638,
+        11.0
+      ],
+      [
+        0.4773313,
+        0.4849332,
+        -0.7327992,
+        -20.0
+      ],
+      [
+        0.0,
+        0.8339361,
+        0.551861,
+        17.5
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "orthoScale": 20.6000004
+  },
+  "booleans": 0,
+  "matchesDeliveredModel": true
+}

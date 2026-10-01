@@ -44,6 +44,7 @@ export interface WorldMapHudCallbacks {
     selectOverviewWorld?(world: number): void;
     /** Route-specific action; omitted callbacks retain destination-world selection. */
     selectTravel?(action: WorldMapTravelActionId): void;
+    returnToFeka?(): void;
     enter(): void;
     skip(): void;
     overview(): void;
@@ -207,6 +208,8 @@ export class WorldMapHud {
     private readonly stageTitle = element('h2', 'world-map-stage-title');
     private readonly stageTitleBitmap = bitmap(this.stageTitle);
     private readonly stageTitleText = accessibleText(this.stageTitle, '');
+    private readonly compactDetails = element('span', 'world-map-compact-details');
+    private readonly sealBitmap = bitmap(this.compactDetails);
     private readonly status = element('p', 'world-map-status');
     private readonly location = element('p', 'world-map-location');
     private readonly hint = element('p', 'world-map-hint');
@@ -253,9 +256,7 @@ export class WorldMapHud {
         this.regionMenu.id = `world-map-regions-${id}`;
         this.regionButton.setAttribute('aria-controls', this.regionMenu.id);
         this.regionMenu.setAttribute('aria-label', 'As seis ilhas'); this.regionMenu.hidden = true;
-        this.overviewButton = action('world-map-tool world-map-overview', '← →', () => this.run(() => callbacks.overview()));
-        // The game's original alphabet has cardinal arrows; no external icon or font is needed.
-        lettering(this.overviewButton.children[0] as HTMLCanvasElement, '← →');
+        this.overviewButton = action('world-map-tool world-map-overview', 'MAPA', () => this.run(() => callbacks.overview()));
         this.overviewButton.setAttribute('aria-label', 'Ver panorama'); this.overviewButton.title = 'Ver panorama';
         this.overviewButton.setAttribute('aria-pressed', 'false');
         const menu = action('world-map-tool world-map-menu', 'II', () => this.run(() => callbacks.menu()));
@@ -317,9 +318,11 @@ export class WorldMapHud {
         this.playCanvas = bitmap(this.enterButton); this.playText = accessibleText(this.enterButton, 'Entrar');
         this.enterButton.addEventListener('click', event => this.run(() => {
             if (!this.state || event.detail > 1) return;
-            if (this.state.overview) {
+            if (this.state.preview && !this.state.overview && this.state.motionState === 'idle' && callbacks.returnToFeka) {
+                callbacks.returnToFeka();
+            } else if (this.state.overview) {
                 if (callbacks.selectOverviewWorld) callbacks.selectOverviewWorld(this.state.world); else callbacks.selectWorld(this.state.world);
-            } else if (this.state.canEnter && !this.state.preview && this.state.motionState === 'idle' && this.state.open[this.state.stage % 5]) callbacks.enter();
+            } else if (this.state.canEnter && !this.state.preview && !this.state.overview && this.state.motionState === 'idle' && this.state.open[this.state.stage % 5]) callbacks.enter();
         }));
         this.skipButton = action('world-map-skip', 'Pular →', () => this.run(() => {
             if (this.state && this.state.motionState !== 'idle') callbacks.skip();
@@ -331,6 +334,7 @@ export class WorldMapHud {
         this.enterButton.setAttribute('aria-describedby', this.hint.id);
         this.announcer.setAttribute('role', 'status'); this.announcer.setAttribute('aria-live', 'polite');
         this.announcer.setAttribute('aria-atomic', 'true');
+        this.stageTitle.append(this.compactDetails);
         this.footer.append(this.stageTitle, copy, actions, this.warning);
         this.root.append(this.scene, this.header, this.footer, this.regionMenu, this.announcer);
         this.root.addEventListener('keydown', this.onKey);
@@ -420,7 +424,8 @@ export class WorldMapHud {
         const prerequisiteHint = prerequisite ? `Conclua ${prerequisite.id}: ${prerequisite.name} para visitar esta fase.` : '';
         const traveling = state.motionState !== 'idle';
         const canEnter = state.canEnter && open && !state.preview && !traveling;
-        const canAct = !!state.overview || canEnter;
+        const canReturn = !!state.preview && !state.overview && !traveling && !!this.callbacks.returnToFeka;
+        const canAct = canReturn || !!state.overview || canEnter;
         const title = state.overview ? `Ilha ${state.world}: ${REGION_NAMES[state.world - 1]}` : `${stage.id} ${stage.name}`;
         const changingRegion = traveling && !state.preview && state.arrivedWorld !== undefined && state.arrivedWorld !== state.world;
         this.titleText.textContent = changingRegion ? `Rumo a ${island.name}` : island.name;
@@ -430,6 +435,23 @@ export class WorldMapHud {
         this.stageTitle.title = title;
         this.stageDetails.textContent = stage.encounter ? 'Encontro' : `${state.seals[local] ?? 0}/3 selos`;
         this.stageDetails.hidden = !!state.overview;
+        this.compactDetails.hidden = !!state.overview;
+        const seals = Math.max(0, Math.min(3, state.seals[local] ?? 0));
+        const sealLabel = stage.encounter ? 'Encontro' : `${seals} de 3 selos`;
+        this.compactDetails.setAttribute('role', 'img');
+        this.compactDetails.setAttribute('aria-label', sealLabel);
+        this.compactDetails.title = sealLabel;
+        const sealCtx = context(this.sealBitmap, stage.encounter ? 48 : 31, 10);
+        if (sealCtx) {
+            if (stage.encounter) pixelText(sealCtx, 'Encontro', 0, 2, ART.goldLight);
+            else for (let n = 0; n < 3; n++) {
+                const x = n * 11;
+                sealCtx.fillStyle = n < seals ? ART.goldLight : ART.muted;
+                sealCtx.fillRect(x + 2, 0, 5, 9); sealCtx.fillRect(x, 2, 9, 5);
+                if (n >= seals) { sealCtx.fillStyle = ART.ink; sealCtx.fillRect(x + 2, 2, 5, 5); }
+            }
+        }
+        this.compactDetails.classList.toggle('is-encounter', !!stage.encounter);
         this.status.textContent = state.overview ? traveling ? MOTION_COPY[state.motionState]
             : `Ilha selecionada · ${state.worldAvailability[state.world - 1] ? 'disponível' : 'bloqueada'}`
             : state.preview ? traveling ? `Prévia · ${MOTION_COPY[state.motionState]}`
@@ -445,10 +467,14 @@ export class WorldMapHud {
             : prerequisiteHint || state.hint || (state.preview || !open ? 'Conclua o caminho anterior para visitar.'
             : traveling ? 'Você pode mudar o destino durante a viagem.' : 'Toque numa placa para caminhar até ela.');
         this.enterButton.disabled = !canAct;
-        const playLabel = state.overview ? 'Ver fases' : canEnter ? 'Entrar →' : state.preview ? 'Prévia' : traveling ? 'A caminho' : open ? 'Aguarde' : 'Fechada';
-        lettering(this.playCanvas, playLabel, canAct ? ART.ink : ART.muted);
+        this.enterButton.classList.toggle('is-return', canReturn);
+        const playLabel = canReturn ? 'Voltar ao Feka' : state.overview ? 'Ver fases' : canEnter ? 'Entrar →' : state.preview ? 'Prévia' : traveling ? 'A caminho' : open ? 'Aguarde' : 'Fechada';
+        if (canReturn) {
+            const ctx = context(this.playCanvas, 48, 16);
+            if (ctx) { pixelText(ctx, 'VOLTAR', 24, 0, ART.ink, 1, 'center'); pixelText(ctx, 'AO FEKA', 24, 8, ART.ink, 1, 'center'); }
+        } else lettering(this.playCanvas, playLabel, canAct ? ART.ink : ART.muted);
         this.playText.textContent = playLabel;
-        this.enterButton.setAttribute('aria-label', state.overview ? `Ver fases da ilha ${state.world}: ${island.name}`
+        this.enterButton.setAttribute('aria-label', canReturn ? `Voltar ao Feka na fase ${state.arrivedStage}` : state.overview ? `Ver fases da ilha ${state.world}: ${island.name}`
             : canEnter ? `Entrar na fase ${stage.id}: ${stage.name}` : `${playLabel}. ${this.status.textContent}`);
         this.skipButton.hidden = !traveling;
         this.enterButton.hidden = traveling;
@@ -456,7 +482,11 @@ export class WorldMapHud {
             if (canAct && !traveling) this.focusEnter(); else this.root.focus({ preventScroll: true });
         }
         this.overviewButton.setAttribute('aria-pressed', String(!!state.overview));
-        this.overviewButton.setAttribute('aria-label', state.overview ? 'Aproximar mapa' : 'Ver panorama');
+        const overviewLabel = state.overview ? 'Ver ilha' : 'Ver panorama';
+        lettering(this.overviewButton.children[0] as HTMLCanvasElement, state.overview ? 'ILHA' : 'MAPA');
+        (this.overviewButton.children[1] as HTMLElement).textContent = overviewLabel;
+        this.overviewButton.setAttribute('aria-label', overviewLabel);
+        this.overviewButton.title = overviewLabel;
         this.root.setAttribute('data-motion', state.motionState);
         this.root.classList.toggle('is-preview', !!state.preview);
         this.root.classList.toggle('is-overview', !!state.overview);

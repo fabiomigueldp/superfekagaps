@@ -89,6 +89,7 @@
 }
 .world-map-tool:hover, .world-map-tool[aria-pressed='true'], .world-map-tool[aria-expanded='true'] { background: #303650; border-color: #ffe29a; }
 .world-map-archipelago { padding-inline: 10px; }
+.world-map-overview { width: 66px; padding-inline: 6px; }
 .world-map-footer {
     position: absolute;
     left: max(12px, env(safe-area-inset-left));
@@ -104,8 +105,9 @@
     box-shadow: 2px 3px 0 #191f3566;
 }
 .world-map-stage-copy { display: flex; flex-wrap: wrap; align-items: baseline; gap: 3px 10px; min-width: 0; }
-.world-map-stage-title { grid-column: 1 / -1; min-width: 0; max-width: 100%; margin: 0 0 4px; }
+.world-map-stage-title { position: relative; grid-column: 1 / -1; min-width: 0; max-width: 100%; margin: 0 0 4px; }
 .world-map-stage-title .world-map-bitmap { max-width: 100%; }
+.world-map-compact-details { display: none; }
 .world-map-stage-details { color: #ffe29a; font-size: 12px; line-height: 18px; white-space: nowrap; }
 .world-map-status, .world-map-location, .world-map-hint { margin: 0; font-size: 13px; line-height: 18px; }
 .world-map-status { color: #f5efd3; }
@@ -123,6 +125,7 @@
     border-bottom-width: 4px;
     background: #e9ad4c;
 }
+.world-map-enter.is-return { padding-block: 3px; }
 .world-map-enter:enabled:hover { background: #ffe29a; }
 .world-map-enter:disabled { background: #203547; border-color: #648591; }
 .world-map-skip { min-width: 110px; background: #253c73; border-color: #81b7dd; }
@@ -190,10 +193,16 @@
     .world-map-title { padding: 8px; max-width: calc(100% - 246px); }
     .world-map-footer { bottom: max(6px, env(safe-area-inset-bottom)); width: min(470px, calc(100% - 24px)); padding-block: 5px; }
     .world-map-footer { grid-template-columns: minmax(0, 1fr) auto; }
-    .world-map-stage-title { grid-column: 1; grid-row: 1; }
+    .world-map-stage-title { position: relative; grid-column: 1; grid-row: 1; }
     .world-map-stage-copy { grid-column: 1; grid-row: 2; }
     .world-map-stage-actions { grid-column: 2; grid-row: 1 / span 2; }
     .world-map-stage-details { display: none; }
+    .world-map-stage-title { padding-right: 37px; }
+    .world-map-stage-title:has(.is-encounter) { padding-right: 54px; }
+    .is-overview .world-map-stage-title { padding-right: 0; }
+    .world-map-compact-details { display: block; position: absolute; right: 0; bottom: 3px; }
+    .world-map-compact-details .world-map-bitmap { width: 31px; height: 10px; }
+    .world-map-compact-details.is-encounter .world-map-bitmap { width: 48px; }
     .world-map-status { margin-top: 2px; }
     .world-map-hint { display: none; }
     .is-overview .world-map-hint { display: block; }

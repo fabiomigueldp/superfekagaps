@@ -45,7 +45,7 @@ embutidos. O packager gera WebP de qualidade 93, metadata, manifesto e gate conc
 ## Fonte congelada e validação
 
 Builder: `tools/diorama/render_dominio_map.py`  
-SHA-256: `75dad697e5401ec60e0f6225a5c87c1184d8284e8b9a15931ae7ddd82f055615`
+SHA-256: `2341ebd6d4d4b1997701b633514096eb98974a7d369faa1fd98e6ecfa20a89c2`
 
 O [manifesto](dominio-art-manifest.json) registra os hashes dos assets, câmera,
 bounds e timings; o [gate](dominio-validation.json) registra a fonte e o checker.

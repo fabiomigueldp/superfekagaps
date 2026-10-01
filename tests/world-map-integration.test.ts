@@ -424,7 +424,8 @@ test('locked phase and region previews never move Feka, persist the target, or p
     for (const [selected, prerequisite] of [[1, '1-1'], [4, '1-4'], [5, '1-5'], [9, '1-5'], [25, '5-5']] as const) {
         h.view.render(selected, save, selected + 20, ''); assert.deepEqual(h.internal.marker, foot);
         assert.equal(h.internal.journey.arrived, '1-1'); assert.equal(h.view.enterSelected(selected), false);
-        assert.equal(h.internal.hud.enterButton.disabled, true);
+        assert.equal(h.internal.hud.enterButton.disabled, false);
+        assert.match(h.internal.hud.enterButton.getAttribute('aria-label'), /Voltar ao Feka/);
         assert.equal(h.get('world-map-status').textContent, `Prévia · Conclua ${prerequisite}`);
         const phase = STAGES.find(stage => stage.id === prerequisite)!;
         assert.equal(h.get('world-map-hint').textContent, `Conclua ${phase.id}: ${phase.name} para visitar esta fase.`);
@@ -1010,7 +1011,8 @@ test('a locked panorama primary action preserves actual arrival and close-view p
     assert.equal(primary.disabled, false); primary.click();
     assert.equal(h.internal.overview, false); assert.equal(h.internal.controlSelection, 25);
     assert.equal(h.internal.journey.arrived, '1-5'); assert.equal(h.events.entered, 0);
-    assert.equal(primary.disabled, true);
+    assert.equal(primary.disabled, false);
+    assert.match(primary.getAttribute('aria-label')!, /Voltar ao Feka/);
     assert.match(h.get('world-map-status').textContent, /Prévia · Conclua 5-5/);
     assert.equal(h.get('world-map-location').textContent, 'Feka em 1-5 · Costa');
 });
@@ -2119,4 +2121,42 @@ test('both cable lines keep the occupied vehicle framed across Reserva trips in 
             h.get('world-map-overview').click(); h.view.render(selection, save, time += 100, '');
         }
     });
+});
+
+
+test('idle preview returns to exact Feka arrival by CTA or current-island menu without walking', async t => {
+    const h = mapDOM(t), save = { ...freshSave(), selected: '1-4', completed: ['1-1', '1-2', '1-3'] };
+    await readyLand(h, save, 3); const origin = { ...h.internal.marker };
+    for (const route of ['cta', 'menu']) {
+        h.view.selectDestination(5);
+        assert.equal(h.internal.journey.arrived, '1-4');
+        assert.equal(h.internal.journey.destination, null);
+        assert.equal(h.view.enterSelected(5), false);
+        if (route === 'cta') h.internal.hud.enterButton.click();
+        else {
+            h.get('world-map-overview').click();
+            h.internal.hud.regionButton.click();
+            h.internal.hud.regionButtons[0].click();
+        }
+        assert.equal(h.internal.overview, false);
+        assert.equal(h.internal.controlSelection, 3);
+        assert.equal(h.internal.journey.selected, '1-4');
+        assert.equal(h.internal.journey.arrived, '1-4');
+        assert.equal(h.internal.journey.destination, null);
+        assert.deepEqual(h.internal.marker, origin);
+        assert.deepEqual(h.events.arrived, []);
+        assert.equal(h.events.entered, 0);
+    }
+});
+
+test('preview cannot return to Feka during a journey', async t => {
+    const h = mapDOM(t), save = openSave(); await readyLand(h, save);
+    h.view.selectDestination(3);
+    const destination = h.internal.journey.destination;
+    h.view.selectDestination(25);
+    assert.equal(h.internal.hud.enterButton.hidden, true);
+    h.internal.hud.enterButton.click();
+    assert.equal(h.internal.journey.destination, destination);
+    assert.equal(h.internal.controlSelection, 25);
+    assert.equal(h.events.entered, 0);
 });

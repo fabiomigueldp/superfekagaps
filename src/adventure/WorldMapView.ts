@@ -240,7 +240,16 @@ export class WorldMapView {
     constructor(private readonly gameCanvas: HTMLCanvasElement, private readonly callbacks: MapCallbacks) {
         this.hud = new WorldMapHud({
             selectStage: index => this.act(() => this.select(index)),
-            selectWorld: world => this.act(() => this.select((world - 1) * 5)),
+            selectWorld: world => this.act(() => {
+                const selection = this.journey && !this.journey.destination && world === worldOf(this.journey.arrived)
+                    ? indexOf(this.journey.arrived) : (world - 1) * 5;
+                this.overview = false; this.paintDirty = true; this.select(selection);
+            }),
+            returnToFeka: () => this.act(() => {
+                if (!this.journey || this.journey.destination || !this.journey.blocked) return;
+                this.overview = false; this.paintDirty = true; this.select(indexOf(this.journey.arrived));
+                this.root.focus({ preventScroll: true });
+            }),
             selectOverviewWorld: world => this.act(() => {
                 const selection = world === worldOf(STAGES[this.controlSelection].id) ? this.controlSelection
                     : this.journey && world === worldOf(this.journey.arrived) ? indexOf(this.journey.arrived) : (world - 1) * 5;
