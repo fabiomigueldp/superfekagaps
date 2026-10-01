@@ -406,12 +406,36 @@ test('retargeting mid-walk preserves position, authored bends, and reverses cont
 
 test('locked phase and region previews never move Feka, persist the target, or permit entry', t => {
     const h = mapDOM(t, true), save = freshSave(); h.view.render(0, save, 0, ''); const foot = { ...h.internal.marker };
-    for (const selected of [1, 4, 5, 25]) {
+    for (const [selected, prerequisite] of [[1, '1-1'], [4, '1-4'], [5, '1-5'], [9, '1-5'], [25, '5-5']] as const) {
         h.view.render(selected, save, selected + 20, ''); assert.deepEqual(h.internal.marker, foot);
         assert.equal(h.internal.journey.arrived, '1-1'); assert.equal(h.view.enterSelected(selected), false);
-        assert.equal(h.internal.hud.enterButton.disabled, true); assert.match(h.get('world-map-status').textContent, /Prévia/);
+        assert.equal(h.internal.hud.enterButton.disabled, true);
+        assert.equal(h.get('world-map-status').textContent, `Prévia · Conclua ${prerequisite}`);
+        const phase = STAGES.find(stage => stage.id === prerequisite)!;
+        assert.equal(h.get('world-map-hint').textContent, `Conclua ${phase.id}: ${phase.name} para visitar esta fase.`);
     }
     assert.deepEqual(h.events.arrived, []); assert.equal(save.selected, '1-1');
+});
+
+test('clearing the previous island boss changes preview guidance to the selected local prerequisite', t => {
+    const h = mapDOM(t, true), save = freshSave();
+    h.view.render(6, save, 0, '');
+    assert.equal(h.get('world-map-status').textContent, 'Prévia · Conclua 1-5');
+    save.completed.push('1-5'); h.view.render(6, save, 50, '');
+    assert.equal(h.get('world-map-status').textContent, 'Prévia · Conclua 2-1');
+    assert.equal(h.get('world-map-hint').textContent, 'Conclua 2-1: Carga Chegando para visitar esta fase.');
+    assert.equal(h.internal.journey.arrived, '1-1'); assert.equal(h.view.enterSelected(6), false);
+    assert.deepEqual(h.events.arrived, []); assert.equal(save.seals.length, 0);
+});
+
+test('an unlocked stage with a missing route retains route failure feedback instead of a completion gate', async t => {
+    const h = mapDOM(t), save = freshSave(); save.completed.push('1-1'); await readyLand(h, save);
+    h.internal.network.edges = []; h.view.render(1, save, 100, '');
+    assert.equal(h.internal.journey.blocked, 'no-route');
+    assert.equal(h.get('world-map-status').textContent, 'Prévia · Feka não chegou aqui');
+    assert.equal(h.get('world-map-hint').textContent, 'Esta ligação ainda não está disponível no mapa.');
+    assert.equal(h.internal.hud.state.prerequisiteStage, null);
+    assert.equal(h.view.enterSelected(1), false); assert.deepEqual(h.events.arrived, []);
 });
 
 test('menu round trips cancel the hidden destination and reload only the last arrival', async t => {
@@ -1013,6 +1037,9 @@ test('boat retargets continuously in both directions and never changes last arri
 test('loading a crossing keeps entry gated and cancelling or inspecting locked destinations remains safe', async t => {
     const h = mapDOM(t), save = openSave('1-5'); h.view.render(4, save, 0, ''); h.view.render(5, save, 50, '');
     assert.equal(h.internal.journey.blocked, 'no-route'); assert.equal(h.view.enterSelected(5), false); assert.match(h.get('world-map-hint').textContent, /Preparando/);
+    assert.equal(h.get('world-map-status').textContent, 'Prévia · Feka não chegou aqui');
+    assert.equal(h.internal.hud.state.prerequisiteStage, null);
+    assert.doesNotMatch(h.get('world-map-hint').textContent, /Conclua/);
     h.view.render(3, save, 100, ''); assert.equal(h.internal.journey.destination, '1-4'); assert.equal(h.internal.journey.blocked, null);
     h.view.hide(); h.view.render(4, save, 5000, ''); assert.equal(h.internal.journey.arrived, '1-5'); assert.equal(h.internal.journey.destination, null);
     const locked = freshSave(); h.view.hide(); h.view.render(0, locked, 5100, ''); h.view.render(5, locked, 5150, '');
@@ -1142,6 +1169,11 @@ test('each dock sign names and selects the opposite destination, with that desti
     const closedPort = assertDockPosition(2); assert.equal(closedPort.classList.contains('is-locked'), true);
     assert.match(closedPort.getAttribute('aria-label')!, /bloqueada/); closedPort.click();
     assert.equal(h.internal.journey.selected, '2-1'); assert.equal(h.internal.journey.arrived, '1-1'); assert.equal(h.internal.journey.blocked, 'unavailable');
+    assert.equal(h.get('world-map-status').textContent, 'Prévia · Conclua 1-5');
+    assert.equal(h.get('world-map-hint').textContent, 'Conclua 1-5: Joãozão na Ponte para visitar esta fase.');
+    const announcement = h.root.children.find(child => child.getAttribute('role') === 'status')!.textContent;
+    assert.match(announcement, /Prévia\. Conclua 1-5: Joãozão na Ponte/);
+    assert.equal(announcement.match(/1-5/g)?.length, 1);
 });
 
 test('locked Porto preview frames all five signs without dragging the camera toward Costa, and return/overview preserve arrival', async t => {

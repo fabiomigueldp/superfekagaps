@@ -61,6 +61,8 @@ export interface WorldMapHudState {
     motionState: WorldMapMotionState;
     canEnter: boolean;
     hint: string;
+    /** Exact progression gate for an unavailable preview, never a missing/loading route. */
+    prerequisiteStage?: string | null;
     warnings?: readonly string[];
     /** Six entries, one per region. Locked regions remain inspectable. */
     worldAvailability: readonly boolean[];
@@ -393,6 +395,8 @@ export class WorldMapHud {
         const island = ISLANDS[state.world - 1], stage = STAGES[state.stage];
         if (!island || !stage) return;
         const local = stage.number - 1, open = !!state.open[local], completed = !!state.completed[local];
+        const prerequisite = state.preview && !open ? STAGES.find(entry => entry.id === state.prerequisiteStage) : undefined;
+        const prerequisiteHint = prerequisite ? `Conclua ${prerequisite.id}: ${prerequisite.name} para visitar esta fase.` : '';
         const traveling = state.motionState !== 'idle';
         const canEnter = state.canEnter && open && !state.preview && !traveling;
         const title = `${stage.id} ${stage.name}`;
@@ -403,12 +407,13 @@ export class WorldMapHud {
         phaseLettering(this.stageTitleBitmap, title);
         this.stageTitle.title = title;
         this.stageDetails.textContent = stage.encounter ? 'Encontro' : `${state.seals[local] ?? 0}/3 selos`;
-        this.status.textContent = state.preview ? traveling ? `Prévia · ${MOTION_COPY[state.motionState]}` : 'Prévia · Feka não chegou aqui'
+        this.status.textContent = state.preview ? traveling ? `Prévia · ${MOTION_COPY[state.motionState]}`
+            : prerequisite ? `Prévia · Conclua ${prerequisite.id}` : 'Prévia · Feka não chegou aqui'
             : traveling ? MOTION_COPY[state.motionState]
             : !open ? 'Caminho fechado'
             : canEnter ? completed ? 'Concluída · pode entrar de novo' : 'Feka chegou · pode entrar'
             : 'Destino marcado';
-        this.hint.textContent = state.hint || (state.preview || !open ? 'Conclua o caminho anterior para visitar.'
+        this.hint.textContent = prerequisiteHint || state.hint || (state.preview || !open ? 'Conclua o caminho anterior para visitar.'
             : traveling ? 'Você pode mudar o destino durante a viagem.' : 'Toque numa placa para caminhar até ela.');
         this.enterButton.disabled = !canEnter;
         const playLabel = canEnter ? 'Entrar →' : state.preview ? 'Prévia' : traveling ? 'A caminho' : open ? 'Aguarde' : 'Fechada';
@@ -447,7 +452,8 @@ export class WorldMapHud {
         });
         this.paintOverview(state);
         for (const id of WORLD_MAP_TRAVEL_ACTION_IDS) this.updateTravel(id, !!state.worldAvailability[WORLD_MAP_TRAVEL_ACTIONS[id].toWorld - 1]);
-        const announcement = `${title}. ${this.status.textContent}. ${this.stageDetails.textContent}.`;
+        const announcedStatus = prerequisite ? `${traveling ? this.status.textContent : 'Prévia'}. ${prerequisiteHint}` : `${this.status.textContent}.`;
+        const announcement = `${title}. ${announcedStatus} ${this.stageDetails.textContent}.`;
         if (announcement !== this.announcement) { this.announcement = announcement; this.announcer.textContent = announcement; }
     }
     private paintStage(index: number, state: WorldMapHudState): void {

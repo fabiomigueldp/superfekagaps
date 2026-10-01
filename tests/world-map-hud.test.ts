@@ -178,6 +178,42 @@ test('a preview never claims Feka arrived and keeps all six regions accessible',
     assert.match(regions[5].getAttribute('aria-label')!, /Domínio Pizzarino.*Bloqueada/);
 });
 
+test('a blocked preview keeps its exact prerequisite in the primary line and announces the full phase once', t => {
+    const { hud, state } = fixture(t);
+    const root = asElement(hud.root), announcement = root.children.find(child => child.getAttribute('role') === 'status')!;
+    const blocked: WorldMapHudState = { ...state, world: 2, stage: 5, open: Array(5).fill(false),
+        preview: true, canEnter: false, prerequisiteStage: '1-5', hint: 'Conclua o caminho anterior para visitar esta fase.' };
+    hud.update(blocked);
+    const status = find(root, 'world-map-status');
+    assert.equal(status.textContent, 'Prévia · Conclua 1-5', 'The primary line survives the short-screen layout that hides the hint.');
+    assert.equal(status.hidden, false);
+    assert.equal(find(root, 'world-map-hint').textContent, 'Conclua 1-5: Joãozão na Ponte para visitar esta fase.');
+    assert.match(announcement.textContent, /2-1 Carga Chegando\. Prévia\. Conclua 1-5: Joãozão na Ponte/);
+    assert.equal(announcement.textContent.match(/1-5/g)?.length, 1);
+    assert.doesNotMatch(announcement.textContent, /Feka chegou|pode entrar/);
+    assert.match(hud.enterButton.getAttribute('aria-label')!, /Prévia.*Conclua 1-5/);
+    assert.equal(hud.enterButton.disabled, true);
+
+    hud.update({ ...blocked, motionState: 'sailing' });
+    assert.equal(status.textContent, 'Prévia · Navegando', 'Inspecting a lock preserves an existing trip’s motion copy.');
+    assert.match(announcement.textContent, /Prévia · Navegando\. Conclua 1-5: Joãozão na Ponte/);
+    assert.equal(announcement.textContent.match(/1-5/g)?.length, 1);
+    assert.equal(hud.skipButton.hidden, false);
+});
+
+test('an open preview preserves route feedback without a progression prerequisite', t => {
+    const { hud, state } = fixture(t), root = asElement(hud.root);
+    for (const hint of ['Preparando o barco e os cais… Você pode escolher outra fase ou voltar ao menu.',
+        'Esta ligação ainda não está disponível no mapa.']) {
+        hud.update({ ...state, world: 2, stage: 5, preview: true, canEnter: false, hint });
+        assert.equal(find(root, 'world-map-status').textContent, 'Prévia · Feka não chegou aqui');
+        assert.equal(find(root, 'world-map-hint').textContent, hint);
+        const announcement = root.children.find(child => child.getAttribute('role') === 'status')!.textContent;
+        assert.doesNotMatch(announcement, /Conclua|1-5/);
+        assert.equal(hud.enterButton.disabled, true);
+    }
+});
+
 test('focused travel actions hand off only when hidden or disabled, including a non-enterable arrival', t => {
     const { hud, state, calls } = fixture(t);
     const active = () => document.activeElement as unknown as Element | null;

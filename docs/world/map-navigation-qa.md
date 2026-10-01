@@ -101,7 +101,36 @@ The patch restores the panorama toggle after Escape from an island, root before
 the focused sign hides, and enabled Enter (or root for a non-enterable preview)
 after focused Skip disappears. It also captures focus before disabling Enter.
 
+Preview `1e60e7b` loaded matching `index-CTpP91IR.js` and repeated all three
+gestures successfully: overview toggle after Escape, map root after departure,
+enabled Enter after Skip. Natural Porto→Costa arrival also handed focused Skip
+to Enter; an independently focused header control survived another natural walk.
+No arrival entered gameplay automatically. Main deployed as
+`1e60e7bf1e6c28aa742fca339f4ed74c1b1eb3f6`, Vercel
+`E9zxAG8w3vNmSoysTVow98EAQb1d`. Public smoke matched the bundle and restored
+the panorama toggle after Escape from a locked island name. Normal progress,
+Oracle and the original checkout were preserved.
+
 Portrait coverage remains contract-level: native Chromium window-menu and edge
 resize attempts did not change its dimensions. No DevTools or denied route was
 used. Existing synthetic portrait DOM bounds do not prove real CSS rendering or
 physical touch behavior; real browser coverage is desktop and compact landscape.
+
+## Explain the actual progression gate
+
+The public 0-progress walkthrough exposed ambiguous blocked-preview copy: the
+Porto departure said only to complete the previous path, and compact landscape
+hid even that hint. The selected preview now says “Prévia · Conclua 1-5” in its
+persistent status, with the actual prerequisite name (“Joãozão na Ponte”) in the
+full hint and accessible announcement. The phase ID is announced once.
+
+A pure explanation helper defers eligibility to unchanged `isUnlocked`. Island
+boss gates take precedence over local prerequisites; already-open secret bosses
+have no lock reason. Seals remain optional. In-flight, loading and missing-route
+feedback keep their own semantics. The live QA fixture is a reviewed artificial
+fresh save used only on the prepared preview; production progress is untouched.
+
+Final verification passed 486 TypeScript + 3 server tests in 11.67 s, both
+TypeScript projects and diff checks. Vite built in 2.40 s, 490.49 kB JS /
+152.05 kB gzip; CSS is unchanged. Actual browser copy and compact layout are
+checked on the corresponding preview before production promotion.

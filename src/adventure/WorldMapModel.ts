@@ -27,6 +27,15 @@ export function mapStageState(stageId: string, save: AdventureSave): MapStageSta
     };
 }
 
+/** Explain a closed stage; eligibility still belongs exclusively to isUnlocked. */
+export function mapStagePrerequisite(stageId: string, save: AdventureSave): string | null {
+    if (!/^[1-6]-[1-5]$/.test(stageId) || isUnlocked(stageId, save)) return null;
+    const [world, number] = stageId.split('-').map(Number);
+    const islandGate = `${world - 1}-5`;
+    if (world > 1 && !save.completed.includes(islandGate)) return islandGate;
+    return number > 1 ? `${world}-${number - 1}` : null;
+}
+
 /** Selection is always a zero-based campaign index, including locked stages. */
 export const clampMapSelection = (selection: number): number => Math.trunc(clamp(selection, 0, 29));
 

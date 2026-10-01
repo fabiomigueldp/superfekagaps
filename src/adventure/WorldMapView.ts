@@ -1,7 +1,7 @@
 import { STAGES } from './campaign';
 import { isUnlocked } from './progress';
 import type { AdventureSave } from './types';
-import { clampMapSelection, getMapCamera, mapToScreen, moveMapSelection, type MapCamera, type MapPoint } from './WorldMapModel';
+import { clampMapSelection, getMapCamera, mapStagePrerequisite, mapToScreen, moveMapSelection, type MapCamera, type MapPoint } from './WorldMapModel';
 import { COSTA_ART_BOUNDS, fallbackMapMetadata, frameMapPins, mapActorScale, mapAssetPrefix, paintMapActor, paintMapIsland, paintMapSea, parseMapMetadata, type MapArtAssets, type MapArtMetadata } from './WorldMapArt';
 import { WorldMapHud, WORLD_MAP_TRAVEL_ACTIONS, WORLD_MAP_TRAVEL_ACTION_IDS,
     type WorldMapMotionState, type WorldMapHudPoint, type WorldMapTravelActionId } from './WorldMapHud';
@@ -608,6 +608,7 @@ export class WorldMapView {
             seals: Array.from({ length: 5 }, (_, n) => this.save!.seals.filter(id => id.startsWith(`${world}-${n + 1}:`)).length),
             globalProgress: { completed: this.save.completed.length, seals: this.save.seals.length },
             motionState: this.motionState(), canEnter: canEnterJourney(this.journey, this.capabilities),
+            prerequisiteStage: this.journey.blocked === 'unavailable' ? mapStagePrerequisite(stage.id, this.save) : null,
             hint: this.journey.blocked === 'no-route' && this.crossingLoading(worldOf(this.journey.arrived), world)
                 ? world === 5 ? 'Preparando a linha de passageiros… Você pode escolher outra fase ou voltar ao menu.'
                     : world === 4 ? 'Preparando a passagem da Serra… Você pode escolher outra fase ou voltar ao menu.'

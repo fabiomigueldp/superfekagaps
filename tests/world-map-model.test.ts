@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { STAGES } from '../src/adventure/campaign';
 import { finishStage, freshSave, isUnlocked } from '../src/adventure/progress';
-import { buildTravelPath, clampMapSelection, easeMapMotion, getMapCamera, mapStageState, mapToScreen,
+import { buildTravelPath, clampMapSelection, easeMapMotion, getMapCamera, mapStagePrerequisite, mapStageState, mapToScreen,
     moveMapSelection, sampleCubic, samplePath, screenToMap, stableMapDelta, stageIndexForWorld } from '../src/adventure/WorldMapModel';
 import type { MapPoint } from '../src/adventure/WorldMapModel';
 
@@ -47,6 +47,50 @@ test('map state delegates progression and counts exactly the existing 72 unique 
     assert.equal(mapStageState('1-1', save).seals, 3);
     assert.equal(mapStageState('1-5', save).seals, 0);
     assert.deepEqual(mapStageState('7-1', save), { unlocked: false, completed: false, seals: 0, secret: false });
+});
+
+test('locked first-island phases name their local prerequisite without inventing seal requirements', () => {
+    const save = freshSave(), before = structuredClone(save);
+    assert.equal(mapStagePrerequisite('1-1', save), null);
+    for (let number = 2; number <= 5; number++)
+        assert.equal(mapStagePrerequisite(`1-${number}`, save), `1-${number - 1}`);
+    for (const id of ['0-1', '7-1', '1-0', '1-6', 'invalid']) assert.equal(mapStagePrerequisite(id, save), null);
+    assert.deepEqual(save, before, 'Explaining a lock must never change the save.');
+    finishStage(save, '1-1', 'normal', 10);
+    assert.equal(mapStagePrerequisite('1-2', save), null, 'Completion with zero seals opens the next phase.');
+    assert.equal(mapStagePrerequisite('1-3', save), '1-2');
+});
+
+test('each island boss gate takes precedence, then the selected local prerequisite becomes relevant', () => {
+    for (let world = 2; world <= 6; world++) {
+        const save = freshSave();
+        for (let number = 1; number <= 5; number++)
+            assert.equal(mapStagePrerequisite(`${world}-${number}`, save), `${world - 1}-5`);
+        finishStage(save, `${world - 1}-5`, 'normal', 10);
+        assert.equal(mapStagePrerequisite(`${world}-1`, save), null);
+        for (let number = 2; number <= 5; number++)
+            assert.equal(mapStagePrerequisite(`${world}-${number}`, save), `${world}-${number - 1}`);
+        finishStage(save, `${world}-1`, 'normal', 10);
+        assert.equal(mapStagePrerequisite(`${world}-2`, save), null);
+        assert.equal(mapStagePrerequisite(`${world}-3`, save), `${world}-2`);
+    }
+});
+
+test('an already open secret boss has no lock explanation, while its island gate still applies', () => {
+    for (let world = 1; world <= 6; world++) {
+        const save = freshSave();
+        finishStage(save, `${world}-3`, 'secret', 10);
+        if (world > 1) {
+            assert.equal(mapStagePrerequisite(`${world}-5`, save), `${world - 1}-5`);
+            finishStage(save, `${world - 1}-5`, 'normal', 10);
+        }
+        assert.equal(isUnlocked(`${world}-5`, save), true);
+        assert.equal(mapStagePrerequisite(`${world}-5`, save), null);
+        assert.equal(save.completed.includes(`${world}-4`), false);
+        assert.equal(save.seals.length, 0);
+        for (const stage of STAGES)
+            assert.equal(mapStagePrerequisite(stage.id, save) === null, isUnlocked(stage.id, save));
+    }
 });
 
 test('secret exit opens the boss while retaining the skipped normal stage and next-island gate', () => {
