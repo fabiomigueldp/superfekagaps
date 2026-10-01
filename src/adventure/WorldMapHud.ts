@@ -477,7 +477,8 @@ export class WorldMapHud {
             if (point?.available !== undefined && this.state) this.updateTravel(id, point.available);
         });
     }
-    positionOverviewWorlds(points: readonly (WorldMapHudPoint | null)[]): void {
+    positionOverviewWorlds(points: readonly (WorldMapHudPoint | null)[], compact = false): void {
+        this.root.classList.toggle('has-compact-island-names', compact);
         this.overviewButtons.forEach((button, index) => this.position(button, this.state?.overview ? points[index] : null));
     }
     /** Authored departure anchors only. Omitted actions hide; availability belongs to each route. */

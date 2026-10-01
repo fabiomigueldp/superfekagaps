@@ -31,6 +31,17 @@ counts, not browser FPS or GPU-memory measurements. Lazy loading is unchanged.
   keyboard focus and Escape isolation, locked preview, optional atlas failure
   and disposal, native target bounds, and culling command equivalence at edges.
 
-Browser verification follows publication of this exact tree to the existing
-prepared QA preview. Production remains on the prior verified release until
-desktop and compact composition and navigation have been checked there.
+The prepared QA preview loaded the matching module/CSS for `875e601`. At
+1180×757 all six owned labels were visually associated with their islands.
+ArrowRight focused Domínio while Reserva remained idle; native Enter selected
+Domínio and started the existing journey. Natural sailing showed Feka aboard,
+“Rumo a Domínio”, and only Skip; confirmed arrival restored the island heading
+and Enter. The existing synthetic 28/30, 69/72 progress was retained.
+
+At 472×303 the original 128-pixel labels stayed in bounds but dominated the
+small islands. The bounded correction uses the same artwork at integer 1×
+letter scale (64×22 visible art) inside 76×44 native targets for viewports below
+640 pixels wide or 480 pixels high. The layout uses the same target dimensions.
+Focused HUD/integration tests, both typechecks and build passed after this
+correction; actual compact composition is checked on its new preview before
+production promotion. No physical touch/FPS/GPU measurement is claimed.

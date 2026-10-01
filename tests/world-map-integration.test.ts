@@ -275,7 +275,9 @@ function nativeControlEntries(h: ReturnType<typeof mapDOM>): Array<{ button: But
         assert.ok(h.internal.hud.stageButtons.every((button: Button) => button.hidden));
         assert.ok(Object.values(h.internal.hud.travelButtons).every((button: any) => button.hidden));
         assert.equal(h.internal.hud.overviewButtons.filter((button: Button) => !button.hidden).length, 6);
-        return h.internal.hud.overviewButtons.map((button: Button) => ({ button, width: 128, height: 44 }));
+        const compact = h.internal.width < 640 || h.internal.height < 480;
+        assert.equal(h.root.classList.contains('has-compact-island-names'), compact);
+        return h.internal.hud.overviewButtons.map((button: Button) => ({ button, width: compact ? 76 : 128, height: 44 }));
     }
     return [...h.internal.hud.stageButtons.map((button: Button) => ({ button, width: 56, height: 58 })),
         ...Object.entries(h.internal.hud.travelButtons).map(([id, button]) => ({ button: button as Button,

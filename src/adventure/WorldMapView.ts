@@ -852,16 +852,19 @@ export class WorldMapView {
         if (this.overview) {
             this.hud.positionNodes([]); this.hud.positionTravelActions({});
             if (this.journey?.destination) { this.hud.positionOverviewWorlds([]); return; }
+            // Integer-scale bitmap names stay subordinate to tiny islands;
+            // the native hit area remains 76×44 even when the art is 64×22.
+            const compact = this.width < 640 || this.height < 480;
             const names = Array.from({ length: 6 }, (_, index) => {
                 const id = index + 1, metadata = this.activeArt.get(id)!.metadata;
                 // Island identity follows the terrain, never an outboard dock
                 // or a neighboring destination. No leader can resemble a route.
                 const bounds = atlasIslandBounds({ world: id, metadata, placement: placementFor(id) });
                 const point = mapToScreen({ x: (bounds.left + bounds.right) / 2, y: bounds.bottom }, this.camera);
-                return { x: point.x, y: point.y + 32, width: 128, height: 44 };
+                return { x: point.x, y: point.y + (compact ? 22 : 32), width: compact ? 76 : 128, height: 44 };
             });
             this.hud.positionOverviewWorlds(layoutMapControls(names,
-                { left: 8, right: this.width - 8, top: this.frameInsets.top + 2, bottom: this.height - this.frameInsets.bottom - 2 }, 8));
+                { left: 8, right: this.width - 8, top: this.frameInsets.top + 2, bottom: this.height - this.frameInsets.bottom - 2 }, 8), compact);
             return;
         }
         this.hud.positionOverviewWorlds([]);
