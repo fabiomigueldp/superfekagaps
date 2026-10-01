@@ -18,6 +18,8 @@ export interface MovingBody extends MechanismSpec {
     changedAt?: number;
     /** A manual valve restart; boss-authored phase resets remain independent. */
     jetOpenedAt?: number;
+    /** Cosmetic pre-close liquid snapshot, recorded only by a manual valve. */
+    jetShutdown?: { at: number; height: number };
     observedActive: boolean;
 }
 export class WorldLevel extends Level {
@@ -112,6 +114,10 @@ export class WorldObjects {
         this.recordChange(button);
         const target = this.get(button.link ?? '');
         if (target) {
+            if (target.kind === 'jet') {
+                const height = jetCycle(target, this.time).height;
+                target.jetShutdown = !target.active && height > 0 ? { at: this.time, height } : undefined;
+            }
             target.active = !target.active;
             this.recordChange(target);
             if (target.kind === 'jet') target.jetOpenedAt = target.active ? undefined : this.time;

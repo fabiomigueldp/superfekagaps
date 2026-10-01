@@ -7,6 +7,34 @@ import { geyserDroplet, geyserPresentation } from './WorldGeyserState';
 
 const JUICE = { edge: '#653581', shade: '#81449f', body: '#a863c8', light: '#d59ae7', foam: '#edc3f3', shine: '#f4d8f6' };
 
+/** Closing breaks the column into sparse pale beads, already harmless and only falling. */
+function drawShutdownDrops(c: CanvasRenderingContext2D, b: MovingBody, mid: number, mouth: number, time: number, cold: boolean) {
+    const shutdown = b.jetShutdown;
+    if (!b.active || !shutdown) return;
+    const elapsed = time - shutdown.at;
+    if (elapsed < 0 || elapsed >= 380) return;
+    const height = Math.min(shutdown.height, Math.max(0, b.height - 4));
+    if (height <= 0) return;
+    const count = Math.min(6, Math.ceil(height / 7));
+    for (let i = 0; i < count; i++) {
+        const depth = (i + .5) / count;
+        const distance = height * depth;
+        const flight = 110 + Math.sqrt(depth) * 190;
+        const progress = Math.min(1, elapsed / flight);
+        const side = i % 2 ? 1 : -1;
+        const xx = Math.round(mid + side * (2 + progress * 3));
+        const yy = Math.round(mouth - distance * (1 - progress * progress));
+        if (elapsed < flight) {
+            const length = Math.min(3, Math.max(1, mouth - yy));
+            r(c, xx, yy, 2, length, cold ? '#d1d9ee' : '#d7b8e5');
+            r(c, xx, yy, 1, 1, '#f4d8f6');
+        } else if (elapsed < flight + 80) {
+            // One low drain fleck, never a new upward burst or a solid purple core.
+            r(c, xx + side, mouth, 2, 1, '#cbb9db');
+        }
+    }
+}
+
 /** Pixel-only machine art. Drawing is deterministic and never changes the simulation. */
 export function drawGeyser(c: CanvasRenderingContext2D, b: MovingBody, atlas: SpriteAtlas, cx: number, cy: number, time: number, world: number) {
     const s = geyserPresentation(b, time), cold = world === 5;
@@ -141,6 +169,7 @@ export function drawGeyser(c: CanvasRenderingContext2D, b: MovingBody, atlas: Sp
             }
         }
     }
+    drawShutdownDrops(c, b, mid, mouth, time, cold);
     if (s.pose === 'settle') {
         const spread = Math.round(3 + s.progress * 6);
         r(c, mid - spread, floor - 1, 3, 1, '#c69add');

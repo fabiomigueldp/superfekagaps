@@ -53,7 +53,7 @@ export function isUnlocked(id: string, save: AdventureSave): boolean {
         return true;
     return save.completed.includes(`${w}-${n - 1}`);
 }
-export function finishStage(save: AdventureSave, id: string, exit: 'normal' | 'secret', seconds: number): void {
+export function finishStage(save: AdventureSave, id: string, exit: 'normal' | 'secret', seconds: number | null): void {
     if (!validId(id))
         throw Error('Fase inválida');
     if (exit === 'secret' && !id.endsWith('-3'))
@@ -62,7 +62,7 @@ export function finishStage(save: AdventureSave, id: string, exit: 'normal' | 's
         save.completed.push(id);
     if (exit === 'secret' && !save.secrets.includes(id))
         save.secrets.push(id);
-    if (Number.isFinite(seconds) && seconds > 0)
+    if (seconds !== null && Number.isFinite(seconds) && seconds > 0)
         save.times[id] = Math.min(save.times[id] ?? Infinity, seconds);
     save.checkpoint = null;
     const [w, n] = id.split('-').map(Number);

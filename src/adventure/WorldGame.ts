@@ -1,7 +1,7 @@
 import { Input } from '../engine/Input';
 import { Renderer } from '../engine/Renderer';
 import { Player } from '../entities/Player';
-import { GroundPoundState, type CameraData, type Rect } from '../types';
+import { GroundPoundState, type CameraData, type InputState, type Rect } from '../types';
 import { TileType as T, PLAYER_RESPAWN_REVEAL_MS } from '../constants';
 import { DEATH_HIT_STOP_MS } from '../graphics/playerDeathMotion';
 import { pixelText, panel, fitText, wrapText } from '../graphics/BitmapFont';
@@ -51,6 +51,7 @@ export class WorldGame {
     time = 0;
     elapsed = 0;
     coins = 0;
+    private recordEligible = true;
     private accumulator = 0;
     private last = 0;
     private buttons: Button[] = [];
@@ -68,6 +69,7 @@ export class WorldGame {
     private touch = typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0;
     private clearTimer = 0;
     private hitStop = 0;
+    private hitStopInput: Pick<InputState, 'jumpPressed' | 'jumpReleased' | 'downPressed'> | null = null;
     private clearSecret = false;
     private toast = '';
     private toastTimer = 0;
@@ -130,7 +132,7 @@ export class WorldGame {
         this.render();
         requestAnimationFrame(this.loop);
     };
-    private change(screen: Screen) { if (screen !== 'map') this.mapView?.hide(); this.state = screen; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; }
+    private change(screen: Screen) { if (screen !== 'map') this.mapView?.hide(); this.state = screen; this.hitStopInput = null; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; }
     private menuKey(e: KeyboardEvent) {
         const target = e.target;
         if (target instanceof HTMLElement && target.closest('button, a[href]') && (e.key === 'Enter' || e.key === ' ')) return;
@@ -232,11 +234,15 @@ export class WorldGame {
         this.checkpointHelmet = false;
         this.elapsed = 0;
         this.coins = 0;
+        this.recordEligible = true;
         this.store.save.selected = stage.id;
         const saved = resume && this.store.save.checkpoint?.stage === stage.id ? this.store.save.checkpoint : null;
         if (!saved)
             this.store.save.checkpoint = null;
         if (saved && stage.checkpoints[saved.index]) {
+            // Version-1 checkpoints contain no complete run clock. A resumed segment
+            // may unlock the route, but must never replace a full-stage record.
+            this.recordEligible = false;
             this.checkpoint = saved.index;
             this.checkpointHelmet = saved.helmet;
         }
@@ -327,6 +333,7 @@ export class WorldGame {
             this.particle(this.player.data.position.x, this.player.data.position.y, '#f4d58e');
     }
     private beginDeathFeedback() {
+        this.hitStopInput = null;
         if (this.deathFeedbackStarted)
             return;
         this.deathFeedbackStarted = true;
@@ -336,6 +343,10 @@ export class WorldGame {
     }
     private restart() {
         const index = this.checkpoint, helmet = this.checkpointHelmet, elapsed = this.elapsed, coins = this.coins;
+        const recordEligible = this.recordEligible;
+        // Coins belong to this run; equipment can respawn so retries remain playable.
+        const collectedCoins = new Set(this.stage.pickups
+            .filter(item => item.kind === 'coin' && this.collected.has(item.id)).map(item => item.id));
         if (index >= 0)
             this.store.save.checkpoint = { stage: this.stage.id, index, helmet };
         else
@@ -343,6 +354,8 @@ export class WorldGame {
         this.load(this.stage.id, true, this.stage);
         this.elapsed = elapsed;
         this.coins = coins;
+        this.collected = collectedCoins;
+        this.recordEligible = recordEligible;
         this.player.data.invincibleTimer = 1500;
         this.player.data.respawnRevealTimer = PLAYER_RESPAWN_REVEAL_MS;
     }
@@ -373,10 +386,21 @@ export class WorldGame {
             return;
         }
         if (this.hitStop > 0) {
+            // Input still advances so pause/mute remain immediate. Keep gameplay
+            // edges until simulation resumes, but sample held controls fresh.
+            if (!this.player.data.isDead && this.boss?.phase !== 'defeated' && !((this.player.data.respawnRevealTimer ?? 0) > 0)) {
+                const input = this.input.getState();
+                this.hitStopInput = {
+                    jumpPressed: input.jumpPressed || !!this.hitStopInput?.jumpPressed,
+                    jumpReleased: input.jumpReleased || !!this.hitStopInput?.jumpReleased,
+                    downPressed: input.downPressed || !!this.hitStopInput?.downPressed
+                };
+            } else this.hitStopInput = null;
             this.hitStop = Math.max(0, this.hitStop - dt);
             return;
         }
         if(this.boss?.phase==='defeated') {
+            this.hitStopInput = null;
             this.level.updateDynamicTiles(dt);
             this.player.update(dt,{...this.input.getState(),left:false,right:false,run:false,jump:false,jumpPressed:false,jumpReleased:false,down:false,downPressed:false},this.level);
             this.boss.update(dt,this.player.getRect(),this.objects,this.level);
@@ -396,6 +420,7 @@ export class WorldGame {
             return;
         }
         if ((this.player.data.respawnRevealTimer ?? 0) > 0) {
+            this.hitStopInput = null;
             this.player.update(dt, this.input.getState(), this.level);
             return;
         }
@@ -412,6 +437,12 @@ export class WorldGame {
             }
         }
         const input = this.input.getState();
+        if (this.hitStopInput) {
+            input.jumpPressed ||= this.hitStopInput.jumpPressed;
+            input.jumpReleased ||= this.hitStopInput.jumpReleased;
+            input.downPressed ||= this.hitStopInput.downPressed;
+            this.hitStopInput = null;
+        }
         const result = this.player.update(dt, input, this.level);
         let switchActivated = false;
         if (!wasGrounded && this.player.data.isGrounded && beforeV > 4) {
@@ -604,7 +635,7 @@ export class WorldGame {
     private bounce(y: number) { if (this.player.data.isDead)
         return; this.player.data.position.y = y - this.player.data.height; this.player.data.velocity.y = -7; this.player.data.isGrounded = false; this.player.data.groundPoundState = GroundPoundState.NONE; this.player.data.invincibleTimer = Math.max(150, this.player.data.invincibleTimer); }
     private complete(secret: boolean) {
-        finishStage(this.store.save, this.stage.id, secret ? 'secret' : 'normal', this.elapsed);
+        finishStage(this.store.save, this.stage.id, secret ? 'secret' : 'normal', this.recordEligible ? this.elapsed : null);
         this.nextMapSelection = this.store.save.selected;
         // Unlock the next stage now, but save only the place Feka has reached.
         this.store.save.selected = this.stage.id;
@@ -674,6 +705,8 @@ export class WorldGame {
             pixelText(c, this.clearSecret ? 'CAMINHO SECRETO!' : 'FASE CONCLUÍDA!', 160, 51, ART.goldLight, 2, 'center');
             pixelText(c, fitText(this.stage.name, 230), 160, 75, ART.paper, 1, 'center');
             pixelText(c, `${Math.round(this.elapsed)} S  ·  ${this.coins} MOEDAS`, 160, 94, '#a7c9d0', 1, 'center');
+            if (!this.recordEligible)
+                pixelText(c, 'TEMPO PARCIAL · SEM RECORDE', 160, 106, '#a7c9d0', 1, 'center');
             this.button(c, this.stage.id === '6-5' ? 'O GRANDE FINAL' : 'SEGUIR VIAGEM', 86, 120, 148, () => this.afterClear());
         }
         const cue = this.state === 'playing' && this.toastTimer <= 0 ? this.tutorial.cue(this.stage, this.player.data, this.touch) : null;
