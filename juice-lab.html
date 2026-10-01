@@ -6,11 +6,25 @@
 <meta name="robots" content="noindex">
 <title>Turbosuco · laboratório experimental</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;background:#171323;color:#f6e6c8;font-family:system-ui,sans-serif;height:100%;overflow:hidden}body{display:flex;align-items:center;justify-content:center;padding-top:64px}canvas{image-rendering:pixelated;touch-action:none;box-shadow:0 0 80px #803a5e40;max-width:100%;outline-offset:3px}nav{position:fixed;z-index:20;top:0;left:0;right:0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 16px;background:#271b35;border-bottom:1px solid #68516e;font-size:12px}button,a{min-height:44px;min-width:44px;padding:9px 12px;color:#251337;background:#dce67e;border:0;border-radius:4px;font:600 12px system-ui;cursor:pointer;text-decoration:none;white-space:nowrap}[hidden]{display:none!important}button:hover,a:hover{background:#f1f6bf}button:focus-visible,a:focus-visible{outline:2px solid white;outline-offset:3px}#lab-status{flex:1;color:#ddcce8;line-height:1.5}@media(max-width:620px){nav{flex-wrap:wrap;gap:6px;padding:7px}#lab-status{flex-basis:100%;font-size:11px}body{padding-top:84px}button,a{padding:6px 10px}}
+*{box-sizing:border-box}
+html,body{margin:0;background:#171323;color:#f5efd3;font-family:system-ui,sans-serif;height:100%;overflow:hidden}
+body{display:flex;align-items:center;justify-content:center;padding-top:66px}
+#game-canvas{image-rendering:pixelated;touch-action:none;box-shadow:0 0 80px #803a5e40;max-width:100%;outline-offset:3px}
+nav{position:fixed;z-index:20;top:0;left:0;right:0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 12px;background:#211a2b;border-bottom:2px solid #523748;font-size:12px}
+nav button,nav a{display:inline-flex;flex:none;align-items:center;justify-content:center;min-height:44px;min-width:44px;padding:0;color:#f5efd3;background:#523748;border:0;border-radius:0;font:600 12px system-ui;cursor:pointer;text-decoration:none;white-space:nowrap}
+[hidden]{display:none!important}
+.lab-action-art{display:block;image-rendering:pixelated;pointer-events:none}
+.lab-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+nav button:hover,nav a:hover{filter:brightness(1.2)}
+nav button:active .lab-action-art,nav a:active .lab-action-art{transform:translateY(2px)}
+nav button:focus-visible,nav a:focus-visible{outline:2px solid #ffe29a;outline-offset:2px}
+#lab-status{flex:1;min-width:0;color:#f5efd3;line-height:18px}
+@media(max-width:620px){nav{gap:4px;padding:6px}#lab-status{flex-basis:100%;font-size:11px;line-height:16px}body{padding-top:78px}}
+@media(forced-colors:active){.lab-action-art{display:none}.lab-sr{position:static;width:auto;height:auto;margin:0;clip-path:none}nav button,nav a{padding:6px;border:1px solid ButtonText}}
 </style>
 </head>
 <body>
-<nav aria-label="Controles do laboratório"><span id="lab-status" role="status">Experimento · progresso separado da campanha</span><button id="lab-pause">Pausar</button><button id="lab-present" hidden>Apresentar</button><button id="lab-skip">Pular introdução</button><button id="lab-replay" hidden>Rever introdução</button><button id="lab-retry" hidden>Tentar novamente</button><a href="./">Sair</a></nav>
+<nav aria-label="Controles do laboratório"><span id="lab-status" role="status">Experimento · progresso separado da campanha</span><button type="button" id="lab-pause">Pausar</button><button type="button" id="lab-present" hidden>Apresentar pose</button><button type="button" id="lab-skip">Pular introdução</button><button type="button" id="lab-replay" hidden>Rever introdução</button><button type="button" id="lab-retry" hidden>Tentar novamente</button><a id="lab-exit" href="./">Sair</a></nav>
 <canvas id="game-canvas" tabindex="0" aria-label="Arena experimental do Turbosuco. Setas para mover, espaço para pular, Shift para correr e Escape para pausar"></canvas>
 <script type="module" src="/src/juice-lab.ts"></script>
 </body>

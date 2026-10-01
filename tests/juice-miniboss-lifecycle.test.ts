@@ -33,7 +33,13 @@ class EventSurface {
 class Element extends EventSurface {
     id = '';
     tagName = 'DIV';
-    textContent = '';
+    className = '';
+    title = '';
+    children: Element[] = [];
+    readonly attributes = new Map<string, string>();
+    private ownText = '';
+    get textContent(): string { return this.ownText + this.children.map(child => child.textContent).join(''); }
+    set textContent(value: string) { this.ownText = value; this.children = []; }
     hidden = false;
     contentEditable = 'false';
     spellcheck = true;
@@ -44,7 +50,9 @@ class Element extends EventSurface {
     }
     matches() { return false; }
     get isContentEditable() { return this.contentEditable === 'true'; }
-    setAttribute() {}
+    append(...children: Element[]) { this.children.push(...children); }
+    setAttribute(key: string, value: string) { this.attributes.set(key, value); }
+    getAttribute(key: string) { return this.attributes.get(key) ?? null; }
     focus() { this.focused = true; }
     getBoundingClientRect() { return { left: 0, top: 0, width: 640, height: 360 }; }
 }
@@ -73,8 +81,9 @@ function browser(t: TestContext) {
     const skip = new Element(); skip.id = 'lab-skip';
     const replay = new Element(); replay.id = 'lab-replay';
     const present = new Element(); present.id = 'lab-present';
+    const exit = new Element(); exit.id = 'lab-exit'; exit.tagName = 'A';
     for (const button of [retry, pause, skip, replay, present]) button.tagName = 'BUTTON';
-    const elements = new Map<string, Element>([[canvas.id, canvas], [status.id, status], [retry.id, retry], [pause.id, pause], [skip.id, skip], [replay.id, replay], [present.id, present]]);
+    const elements = new Map<string, Element>([canvas, status, retry, pause, skip, replay, present, exit].map(element => [element.id, element]));
     const frames = new Map<number, FrameRequestCallback>();
     let nextFrame = 0;
     const requestFrame = (callback: FrameRequestCallback) => { frames.set(++nextFrame, callback); return nextFrame; };
@@ -127,7 +136,7 @@ function browser(t: TestContext) {
         const pending = [...frames]; frames.clear();
         for (const [, callback] of pending) callback(performance.now());
     }
-    return { canvas, status, retry, pause, skip, replay, present, document, window, frames, storageCalls, create, key, pointer, hidden, frame };
+    return { canvas, status, retry, pause, skip, replay, present, exit, document, window, frames, storageCalls, create, key, pointer, hidden, frame };
 }
 
 function encounter(game: JuiceMinibossLab) {
@@ -223,30 +232,58 @@ test('paused lab rendering never exposes or activates the campaign menu', t => {
     assert.deepEqual(game.store.save, before);
 });
 
-test('the real retry button resets boss, player, queued input and pause state', async t => {
+test('the real toolbar preserves bitmap names through intro, pause, replay and retry lifecycle', async t => {
     const h = browser(t);
     await import('../src/juice-lab');
     const game = h.window.worldGame;
     assert.ok(game instanceof JuiceMinibossLab);
+    for (const [control, name] of [[h.pause, 'Pausar'], [h.present, 'Apresentar pose'],
+        [h.skip, 'Pular introdução'], [h.replay, 'Rever introdução'],
+        [h.retry, 'Tentar novamente'], [h.exit, 'Sair']] as const) {
+        assert.equal(control.textContent, name);
+        assert.equal(control.getAttribute('aria-label'), name);
+        assert.equal(control.title, name, 'Compact bitmap copy has an unabridged tooltip.');
+        const art = control.children[0];
+        assert.ok(art instanceof Canvas);
+        assert.equal(art.getAttribute('aria-hidden'), 'true', 'Only semantic text names the native control.');
+        assert.equal(art.height, 44); assert.ok(art.width >= 44);
+    }
+    const pauseArt = h.pause.children[0] as Canvas;
+    const pauseWidth = pauseArt.width;
     assert.equal(game.labMode, 'intro');
     assert.equal(h.retry.hidden, true, 'Intro uses Skip; redundant Retry must not force compact navigation to wrap.');
+    assert.equal(h.skip.hidden, false); assert.equal(h.replay.hidden, true); assert.equal(h.present.hidden, true);
     h.skip.dispatch('click'); h.frame(); assert.equal(game.labMode, 'combat');
     assert.equal(h.retry.hidden, false, 'Retry is available during combat.');
+    assert.equal(h.skip.hidden, true); assert.equal(h.replay.hidden, false); assert.equal(h.present.hidden, true);
     h.replay.dispatch('click'); h.frame(); assert.equal(game.labMode, 'intro');
     assert.equal(h.retry.hidden, true, 'Replay restores the compact intro controls.');
+    assert.equal(h.skip.hidden, false); assert.equal(h.replay.hidden, true);
     for (let i=0;i<1000 && game.intro?.beat !== 'prepare';i++) game.intro?.advance(100,{right:true});
     advance(game, 12); h.frame();
     assert.equal(h.present.hidden, false);
     assert.equal(h.retry.hidden, true, 'Presentation and Retry never compete for the compact toolbar.');
-    h.present.dispatch('click'); advance(game);
+    h.present.dispatch('click'); advance(game); h.frame();
     assert.equal(game.intro?.beat, 'reveal', 'The real accessible presentation control triggers the pose.');
+    assert.equal(h.present.hidden, true, 'The pose action leaves the toolbar after presentation.');
     assert.equal(h.frames.size, 2, 'The actual entrypoint starts gameplay and accessible-control refresh.');
     h.pause.dispatch('click'); h.frame();
     assert.equal(game.state, 'paused');
     assert.equal(h.pause.textContent, 'Continuar');
+    assert.equal(h.pause.getAttribute('aria-label'), 'Continuar'); assert.equal(h.pause.title, 'Continuar');
+    assert.equal(h.pause.children[0], pauseArt, 'Updating the pause label preserves the bitmap child.');
+    assert.ok(pauseArt.width > pauseWidth, 'The face is repainted for the full CONTINUAR label.');
+    const pausedDraws = pauseArt.drawCalls; h.frame();
+    assert.equal(pauseArt.drawCalls, pausedDraws, 'An unchanged frame does not repaint the control.');
     h.pause.dispatch('click'); h.frame();
     assert.equal(game.state, 'playing');
     assert.equal(h.pause.textContent, 'Pausar');
+    assert.equal(h.pause.getAttribute('aria-label'), 'Pausar'); assert.equal(h.pause.title, 'Pausar');
+    assert.equal(h.pause.children[0], pauseArt); assert.equal(pauseArt.width, pauseWidth);
+    h.key('Escape'); advance(game); h.frame();
+    assert.equal(h.pause.getAttribute('aria-label'), 'Continuar', 'Keyboard pause also refreshes the semantic action.');
+    h.key('Escape'); advance(game); h.frame();
+    assert.equal(h.pause.getAttribute('aria-label'), 'Pausar');
     game.load('juice-lab');
     const initialPlayer = structuredClone(game.player.data);
     const initialBoss = structuredClone(encounter(game).model);
