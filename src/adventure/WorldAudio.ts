@@ -1,4 +1,5 @@
 import type { Character, Preferences } from './types';
+import { combatTones } from './WorldCombatFeedback';
 export const MELODIES = [
     [0, 4, 7, 9, 7, 4, 2, 4, 0, 4, 7, 12, 11, 7, 4, 2, 5, 9, 12, 14, 12, 9, 7, 5, 4, 7, 11, 9, 7, 4, 2, -1],
     [0, 0, 7, 4, 0, 2, 4, 7, 9, 7, 4, 2, 0, -1, 2, 4, 5, 5, 12, 9, 5, 7, 9, 12, 11, 7, 4, 2, 0, -1, 7, -1],
@@ -124,6 +125,13 @@ export class WorldAudio {
         source.onended = () => { source.disconnect(); filter.disconnect(); env.disconnect(); };
     }
     sfx(kind: string) {
+        const combat = combatTones(kind);
+        if (combat) {
+            if (this.paused || !this.enabled || this.preferences.effects <= 0 || !this.ctx || this.ctx.state !== 'running') return;
+            for (const n of combat)
+                this.tone(n.frequency, n.duration, n.type, n.volume, this.effects, this.ctx.currentTime + n.at);
+            return;
+        }
         if (kind === 'pressure') {
             this.air(.22, 1900, .14);
             this.tone(260, .16, 'sine', .12, this.effects);

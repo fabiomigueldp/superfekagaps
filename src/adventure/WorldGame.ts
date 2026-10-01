@@ -13,6 +13,7 @@ import { ProgressStore, isUnlocked, finishStage, parseSave } from './progress';
 import { WorldArt, rect } from './WorldArt';
 import { drawLandmarks } from './WorldScenery';
 import { WorldAudio } from './WorldAudio';
+import { combatSparks, type CombatCue, type WorldSpark } from './WorldCombatFeedback';
 import { WorldLevel, WorldObjects, BELT_CARRY_SPEED } from './WorldPhysics';
 import { WorldFoe } from './WorldEnemies';
 import { BossEncounter } from './BossEncounter';
@@ -24,14 +25,6 @@ import { clampMapSelection } from './WorldMapModel';
 type Screen = 'title' | 'intro' | 'map' | 'playing' | 'paused' | 'dialogue' | 'clear' | 'ending' | 'gallery' | 'settings';
 interface Button extends Rect {
     run: () => void;
-}
-interface Spark {
-    x: number;
-    y: number;
-    vx: number;
-    vy: number;
-    life: number;
-    color: string;
 }
 export class WorldGame {
     readonly renderer = new Renderer();
@@ -61,7 +54,7 @@ export class WorldGame {
     private checkpointHelmet = false;
     private collected = new Set<string>();
     private spoken = new Set<string>();
-    private sparks: Spark[] = [];
+    private sparks: WorldSpark[] = [];
     private dialog: Dialogue | null = null;
     private dialogueTime = 0;
     private comment: Dialogue | null = null;
@@ -320,17 +313,21 @@ export class WorldGame {
             this.sparks.push({ x, y, vx: Math.cos(angle) * 1.6, vy: Math.sin(angle) * 1.6 - 1.5, life: 450 + i % 3 * 70, color });
         }
     }
+    private combatFeedback(kind: CombatCue, x: number, y: number) {
+        this.audio.sfx(kind);
+        this.sparks.push(...combatSparks(kind, x, y));
+    }
     private hurt(sourceX?: number) {
         if (this.player.data.invincibleTimer > 0 || this.player.data.miniFantaTimer > 0 || this.player.data.isDead)
             return;
         const result = this.player.takeDamage();
-        this.audio.sfx('hit');
         if (result.damaged) {
+            this.audio.sfx('hit');
             this.player.die('hit', sourceX);
             this.beginDeathFeedback();
         }
-        else
-            this.particle(this.player.data.position.x, this.player.data.position.y, '#f4d58e');
+        else if (result.helmetUsed)
+            this.combatFeedback('helmetLoss', this.player.getCenter().x, this.player.data.position.y + 3);
     }
     private beginDeathFeedback() {
         this.hitStopInput = null;
@@ -522,6 +519,8 @@ export class WorldGame {
                     this.audio.sfx('break');
                     this.particle(enemy.x, enemy.y, '#eec478', 7);
                 }
+                else if (contact === 'bounce')
+                    this.combatFeedback('blockedStomp', this.player.getCenter().x, enemy.y);
                 if (contact === 'kill') {
                     this.particle(enemy.x, enemy.y, '#ee9c83');
                     this.audio.sfx('hit');
