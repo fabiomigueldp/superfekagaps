@@ -29,12 +29,13 @@ const motion = new Media(), queue = new Map<number, FrameRequestCallback>(); let
 const navigations: string[] = [], replacements: string[] = [];
 const locationMock = { href: 'https://example.test/guaira.html?at=rice', search: '?at=rice', assign: (href: string) => navigations.push(href) };
 let fetchRaw: unknown = raw;
+let imageReady: Promise<void> = Promise.resolve();
 Object.assign(globalThis, {
     document: doc, window: win, location: locationMock,
     history: { replaceState: (_a: unknown, _b: string, url: URL) => replacements.push(String(url)) },
     matchMedia: () => motion, devicePixelRatio: 1,
     ResizeObserver: class { observe() {} disconnect() { observerDisconnected++; } },
-    Image: class { src = ''; naturalWidth = 1920; naturalHeight = 1200; async decode() {} },
+    Image: class { src = ''; naturalWidth = 1920; naturalHeight = 1200; async decode() { await imageReady; } },
     fetch: async () => ({ ok: true, json: async () => fetchRaw }),
     requestAnimationFrame: (callback: FrameRequestCallback) => { const id = next++; queue.set(id, callback); return id; },
     cancelAnimationFrame: (id: number) => queue.delete(id),
@@ -44,8 +45,15 @@ const ready = () => new Promise(resolve => setTimeout(resolve, 0));
 function frames(count: number) { for (let i = 0; i < count; i++) { clock += 1000 / 60; const callbacks = [...queue.values()]; queue.clear(); callbacks.forEach(callback => callback(clock)); } }
 function key(name: string) { const event = new Event('keydown', { cancelable: true }); Object.assign(event, { key: name, repeat: false, altKey: false, ctrlKey: false, metaKey: false }); doc.dispatchEvent(event); return event; }
 
-test('actual map entry handles pointer/keyboard selection, arrival, reduced motion, error and lifecycle without saves', async () => {
-    const module = await import('../src/guaira'); await ready(); frames(2);
+test('actual map entry handles pending loading, selection, arrival, reduced motion, error and lifecycle without saves', async () => {
+    let finishImage!: () => void;
+    imageReady = new Promise(resolve => { finishImage = resolve; });
+    const module = await import('../src/guaira'); await ready();
+    assert.equal(elements['map-loading-panel'].hidden, false);
+    assert.ok(destinations.every(button => button.children[0]?.height === 44),
+        'Loading plates must never expand to a default 300×150 canvas');
+    assert.ok(destinations.every(button => button.disabled));
+    finishImage(); await ready(); frames(2);
     assert.equal(elements['map-title'].textContent, 'Passarela dos Arrozais');
     assert.equal(elements['map-enter'].disabled, true); assert.equal(elements['map-loading-panel'].hidden, true);
     assert.equal(navigations.length, 0); assert.equal(replacements.length, 0);

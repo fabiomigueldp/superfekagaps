@@ -21,7 +21,13 @@ export function startGuairaMap(): () => void {
     new LabToolbarAction(enter, true).setLabel('ENTRAR', 'Entrar no destino selecionado');
     new LabToolbarAction(skip).setLabel('CHEGAR', 'Chegar agora, pulando a caminhada');
     const overviewArt = new LabToolbarAction(overviewButton);
-    const destinationArt = destinations.map(button => ({ button, art: new LabToolbarAction(button) }));
+    const destinationArt = destinations.map(button => {
+        const destination = GUAIRA_DESTINATIONS[button.dataset.mapDestination as GuairaDestination];
+        const art = new LabToolbarAction(button);
+        // Size plates before async scene loading: the canvas default is 300×150.
+        art.setLabel(destination.short, `Ir a ${destination.title}`);
+        return { button, art };
+    });
     const motion = matchMedia('(prefers-reduced-motion: reduce)');
     let model: GuairaMapModel | null = null, image: HTMLImageElement | null = null;
     let camera: GuairaCamera | null = null, overview = false, frame = 0, previousTime = 0, lastArrival = '', previousState = '';
