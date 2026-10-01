@@ -27,10 +27,69 @@ export interface JourneyCapabilities {
 }
 export interface JourneyLeg extends JourneyEdge {
     points: readonly MapPoint[];
-    /** Always measured along the authored edge, even after repeated reversals. */
+    /** Canonical leg clock; sailing maps it through its speed ramp. Reversing
+     * keeps this same value, so the current physical point never jumps. */
     progress: number;
     direction: 1 | -1;
+    /** Retargets back along the channel in reverse gear, without spinning the
+     * hull across its moving track. These values live only in this journey. */
+    sailHeadingDirection?: 1 | -1;
+    sailManeuver?: { elapsed: number; initialVelocity: number };
 }
+
+const SAIL_BRAKE_SECONDS = .22, SAIL_PAUSE_SECONDS = .1, SAIL_ACCEL_SECONDS = .3;
+const SAIL_MANEUVER_SECONDS = SAIL_BRAKE_SECONDS + SAIL_PAUSE_SECONDS + SAIL_ACCEL_SECONDS;
+/** Signed fraction of the normal sail clock speed, including a retarget brake. */
+export function sailClockVelocity(leg: JourneyLeg): number {
+    const maneuver = leg.sailManeuver;
+    if (!maneuver) return leg.direction;
+    if (maneuver.elapsed < SAIL_BRAKE_SECONDS)
+        return maneuver.initialVelocity * (1 - maneuver.elapsed / SAIL_BRAKE_SECONDS);
+    if (maneuver.elapsed <= SAIL_BRAKE_SECONDS + SAIL_PAUSE_SECONDS) return 0;
+    return leg.direction * Math.max(0, Math.min(1,
+        (maneuver.elapsed - SAIL_BRAKE_SECONDS - SAIL_PAUSE_SECONDS) / SAIL_ACCEL_SECONDS));
+}
+function maneuverDistance(leg: JourneyLeg, elapsed: number): number {
+    const brake = Math.min(elapsed, SAIL_BRAKE_SECONDS);
+    const accelerate = Math.max(0, Math.min(SAIL_ACCEL_SECONDS, elapsed - SAIL_BRAKE_SECONDS - SAIL_PAUSE_SECONDS));
+    return leg.sailManeuver!.initialVelocity * (brake - brake * brake / (2 * SAIL_BRAKE_SECONDS))
+        + leg.direction * accelerate * accelerate / (2 * SAIL_ACCEL_SECONDS);
+}
+
+/** Keep the authored sail clock and polyline, with gentle departure/arrival
+ * speed ramps. The symmetric mapping also preserves position when reversed. */
+export function sailDistanceProgress(progress: number): number {
+    const p = Math.max(0, Math.min(1, progress)), ramp = .15;
+    if (p > .5) return 1 - sailDistanceProgress(1 - p);
+    return p < ramp ? (p - ramp * Math.sin(Math.PI * p / ramp) / Math.PI) / (2 * (1 - ramp))
+        : (p - ramp / 2) / (1 - ramp);
+}
+const roundedSailPaths = new WeakMap<readonly MapPoint[], readonly MapPoint[]>();
+/** Small quadratic corner cuts stay inside each original corner triangle.
+ * No spline overshoot; terminal positions and boarding geometry stay exact. */
+export function sailPathPoints(points: readonly MapPoint[]): readonly MapPoint[] {
+    const cached = roundedSailPaths.get(points);
+    if (cached) return cached;
+    const result: MapPoint[] = points.length ? [{ ...points[0] }] : [];
+    for (let i = 1; i < points.length - 1; i++) {
+        const a = points[i - 1], b = points[i], c = points[i + 1];
+        const before = Math.hypot((b.x - a.x) * 1.6, b.y - a.y), after = Math.hypot((c.x - b.x) * 1.6, c.y - b.y);
+        const radius = Math.min(.03, before * .2, after * .2);
+        if (radius < 1e-8) { result.push({ ...b }); continue; }
+        const enter = { x: b.x + (a.x - b.x) * radius / before, y: b.y + (a.y - b.y) * radius / before };
+        const leave = { x: b.x + (c.x - b.x) * radius / after, y: b.y + (c.y - b.y) * radius / after };
+        result.push(enter);
+        for (let step = 1; step <= 8; step++) {
+            const t = step / 8, u = 1 - t;
+            result.push({ x: u * u * enter.x + 2 * u * t * b.x + t * t * leave.x,
+                y: u * u * enter.y + 2 * u * t * b.y + t * t * leave.y });
+        }
+    }
+    if (points.length > 1) result.push({ ...points[points.length - 1] });
+    roundedSailPaths.set(points, result); return result;
+}
+export const journeyLegPoint = (leg: JourneyLeg, progress = leg.progress): MapPoint => leg.mode === 'sail'
+    ? samplePath(sailPathPoints(leg.points), sailDistanceProgress(progress)) : samplePath(leg.points, progress);
 export interface JourneyState {
     selected: string;
     /** Last reached stage; the only journey value written to save.selected. */
@@ -118,6 +177,10 @@ export function selectJourney(state: JourneyState, selected: string, network: Jo
         // is a safe exit. Every subsequent edge still obeys current capabilities.
         const candidates = [active.direction, -active.direction].flatMap(direction => {
             const partial: JourneyLeg = { ...active, direction: direction as 1 | -1 };
+            if (active.mode === 'sail' && direction !== active.direction) {
+                partial.sailHeadingDirection = active.sailHeadingDirection ?? active.direction;
+                partial.sailManeuver = { elapsed: 0, initialVelocity: sailClockVelocity(active) };
+            }
             const rest = route(endpoint(partial), selected, edges, capabilities);
             return rest ? [[partial, ...rest]] : [];
         });
@@ -139,11 +202,30 @@ export function advanceJourney(state: JourneyState, seconds: number, reducedMoti
     let point = state.point, node = state.node;
     const legs = [...state.legs];
     while (legs.length) {
-        const leg = legs[0], duration = remaining(leg);
+        let leg = legs[0];
+        if (leg.mode === 'sail' && leg.sailManeuver) {
+            const elapsed = Math.min(SAIL_MANEUVER_SECONDS, leg.sailManeuver.elapsed + budget);
+            const used = elapsed - leg.sailManeuver.elapsed;
+            let progress = leg.progress, from = leg.sailManeuver.elapsed;
+            // Split at the three phase ends so a large frame delta clamps a
+            // brake at a terminal exactly as successive small frames would.
+            for (const boundary of [SAIL_BRAKE_SECONDS, SAIL_BRAKE_SECONDS + SAIL_PAUSE_SECONDS, SAIL_MANEUVER_SECONDS]) {
+                const to = Math.min(elapsed, boundary);
+                if (to <= from) continue;
+                progress = Math.max(0, Math.min(1, progress +
+                    (maneuverDistance(leg, to) - maneuverDistance(leg, from)) / Math.max(leg.duration, 1e-9)));
+                from = to;
+            }
+            leg = { ...leg, progress, sailManeuver: elapsed < SAIL_MANEUVER_SECONDS
+                ? { ...leg.sailManeuver, elapsed } : undefined };
+            legs[0] = leg; budget -= used; point = journeyLegPoint(leg); node = null;
+            if (leg.sailManeuver) return { ...state, point, node, legs };
+        }
+        const duration = remaining(leg);
         if (duration > budget) {
             const progress = leg.progress + leg.direction * budget / leg.duration;
             legs[0] = { ...leg, progress };
-            return { ...state, point: samplePath(leg.points, progress), node: null, legs };
+            return { ...state, point: journeyLegPoint(leg, progress), node: null, legs };
         }
         budget -= duration;
         point = samplePath(leg.points, leg.direction === 1 ? 1 : 0);

@@ -731,10 +731,10 @@ export class WorldMapView {
             return [world, { foot: localToAtlas(berth.passenger, placementFor(world)), headingFrame: berth.headingFrame }];
         }));
         const pose = sampleFerry(line.state, line.definition, { berths,
-            segmentHeadings: line.segmentHeadings, reverseSegmentHeadings: line.reverseSegmentHeadings },
+            segmentHeadings: line.segmentHeadings, reverseSegmentHeadings: line.reverseSegmentHeadings, art: this.boatMetadata },
         { active: this.journey!.legs[0], point: this.marker, time: this.lastTime, reducedMotion: this.media.matches });
         if (id === COAST_PORT_FERRY.id) this.coastFerry = pose.state; else this.dominioFerry = pose.state;
-        return { id, foot: pose.foot, frame: this.boatMetadata.frames[pose.frameIndex],
+        return { id, foot: pose.foot, frame: this.boatMetadata.frames[pose.frameIndex], motion: pose.motion,
             assets: { rear: this.boatImage, foreground: this.boatImage } };
     }
     private currentBoats(): AtlasBoat[] {
@@ -824,18 +824,19 @@ export class WorldMapView {
             top: Math.min(...cablePoints.map(p => p.y)), bottom: Math.max(...cablePoints.map(p => p.y)) });
         const occupiedCabin = actorInAtlas ? this.activeCableCar(true) : undefined;
         const occupiedBoat = actorInAtlas ? this.activeFerry(true)?.definition.id : undefined;
+        const actorPoint = active?.mode === 'sail' ? boats.find(boat => boat.id === occupiedBoat)?.foot ?? this.marker : this.marker;
         const actorFrame = cableCars.find(car => car.id === occupiedCabin)?.frame ?? boats.find(boat => boat.id === occupiedBoat)?.frame;
-        const overviewActorBounds = this.overview && actorInAtlas ? atlasActorBounds(this.marker, actorFrame, !occupiedCabin && !occupiedBoat) : undefined;
+        const overviewActorBounds = this.overview && actorInAtlas ? atlasActorBounds(actorPoint, actorFrame, !occupiedCabin && !occupiedBoat) : undefined;
         const focusBounds = [...(overviewActorBounds ? [overviewActorBounds] : []),
             ...(this.overview ? boats.map(boat => atlasBoatBounds(boat.foot, boat.frame))
             : trackedBoat ? [atlasBoatBounds(trackedBoat.foot, trackedBoat.frame)] : []),
             ...(this.overview ? cableCars.map(atlasCableBounds) : trackedCabin ? [atlasCableBounds(trackedCabin)] : [])];
         const target = getAtlasCamera({ mode: this.overview ? 'overview' : channel ? 'channel' : 'island', activeWorld,
             layers: islands, width: this.width, height: this.height, insets: { ...this.frameInsets, left: 16, right: 16 },
-            focus: trackJourney && !this.overview ? this.marker : undefined,
+            focus: trackJourney && !this.overview ? actorPoint : undefined,
             travelPoints, connectionBounds, focusBounds });
         this.camera = this.blendAtlasCamera(target, dt, trackedCabin ? atlasCableBounds(trackedCabin)
-            : trackedBoat ? atlasBoatBounds(trackedBoat.foot, trackedBoat.frame) : undefined, overviewActorBounds);
+            : trackedBoat ? atlasBoatBounds(trackedBoat.foot, trackedBoat.frame) : undefined, overviewActorBounds, actorPoint);
         const aboard = !!occupiedCabin || !!occupiedBoat;
         paintWorldAtlas(this.ctx, { camera: this.camera, time, reducedMotion: this.media.matches, islands,
             buoys: this.buoyMetadata?.instances.flatMap(instance => {
@@ -847,11 +848,11 @@ export class WorldMapView {
                 ...(serraOverlay ? [{ ...serraOverlay, image: this.factorySerraImages.get(serraState)! }] : []),
                 ...passengerLayers.map(layer => ({ ...layer, image: this.passengerOverlays.get(layer.path)! })),
                 ...dominioLayers.map(layer => ({ ...layer, image: this.dominioOverlays.get(layer.path)! }))],
-            actor: { point: this.marker, walking: !!active && active.mode !== 'sail' && active.mode !== 'cable', facingLeft: this.facingLeft, aboard,
+            actor: { point: actorPoint, walking: !!active && active.mode !== 'sail' && active.mode !== 'cable', facingLeft: this.facingLeft, aboard,
                 visible: actorInAtlas, cableCar: occupiedCabin, boatId: occupiedBoat }, boats, cableCars, cablePaths });
         this.positionNodes(world, channel || activeWorld !== world, boats, cableCars);
     }
-    private blendAtlasCamera(target: MapCamera, dt: number, bounds?: AtlasBounds, actorBounds?: AtlasBounds): MapCamera {
+    private blendAtlasCamera(target: MapCamera, dt: number, bounds?: AtlasBounds, actorBounds?: AtlasBounds, actorPoint = this.marker): MapCamera {
         if (this.cameraSnap || this.media.matches) { this.cameraSnap = false; return target; }
         const blend = 1 - Math.exp(-dt / 180);
         const camera = { ...target, zoom: this.camera.zoom + (target.zoom - this.camera.zoom) * blend,
@@ -867,10 +868,10 @@ export class WorldMapView {
         const span = (zoom: number) => {
             const x = base * 1.6 * zoom, y = base * zoom;
             return {
-                width: Math.max(bounds.right * x, actorBounds ? actorBounds.right * x : this.marker.x * x + 20)
-                    - Math.min(bounds.left * x, actorBounds ? actorBounds.left * x : this.marker.x * x - 20),
-                height: Math.max(bounds.bottom * y, actorBounds ? actorBounds.bottom * y : this.marker.y * y + 8)
-                    - Math.min(bounds.top * y, actorBounds ? actorBounds.top * y : this.marker.y * y - 44),
+                width: Math.max(bounds.right * x, actorBounds ? actorBounds.right * x : actorPoint.x * x + 20)
+                    - Math.min(bounds.left * x, actorBounds ? actorBounds.left * x : actorPoint.x * x - 20),
+                height: Math.max(bounds.bottom * y, actorBounds ? actorBounds.bottom * y : actorPoint.y * y + 8)
+                    - Math.min(bounds.top * y, actorBounds ? actorBounds.top * y : actorPoint.y * y - 44),
             };
         };
         const fits = (zoom: number) => {
@@ -886,7 +887,7 @@ export class WorldMapView {
             camera.zoom = low;
         }
         const upper = mapToScreen({ x: bounds.left, y: bounds.top }, camera), lower = mapToScreen({ x: bounds.right, y: bounds.bottom }, camera);
-        const actor = mapToScreen(this.marker, camera);
+        const actor = mapToScreen(actorPoint, camera);
         const actorUpper = actorBounds ? mapToScreen({ x: actorBounds.left, y: actorBounds.top }, camera) : { x: actor.x - 20, y: actor.y - 44 };
         const actorLower = actorBounds ? mapToScreen({ x: actorBounds.right, y: actorBounds.bottom }, camera) : { x: actor.x + 20, y: actor.y + 8 };
         const left = Math.min(upper.x, actorUpper.x), right = Math.max(lower.x, actorLower.x);

@@ -1,0 +1,232 @@
+{
+  "method": "Recorded final 64-view runtime poses in both directions and mid-water reversal; 1920\u00d71200 island metric, packaged hull alpha>32 tested against all six island silhouettes, open dock overlays and four buoy sprites. Terminal contacts are separately retained, not described as zero-clearance travel. The local buoy search additionally unions interpolated poses every\u22642native pixels, both adjacent headings, the full16\u00d726passenger billboard and the actual two quadratic wake strokes with an extra raster pixel. Selected props keep\u22654native pixels from that conservative moving envelope.",
+  "sampleCount": 1034,
+  "samplesSha256": "beb9c9e61a3a52d3834d5a12542a8a8b4696d52959f1b886755e711ec0aef084",
+  "cases": [
+    {
+      "from": 1,
+      "to": 2,
+      "poseCount": 216,
+      "openWaterPoseCount": 96,
+      "openWaterContactPoseCount": 0,
+      "minimumOpenWaterClearanceNativePixels": 47,
+      "terminalContactPoseCount": 101,
+      "peakTerminalOverlapNativePixels": {
+        "island": 2239,
+        "dock": 10540,
+        "buoy": 0
+      }
+    },
+    {
+      "from": 2,
+      "to": 1,
+      "poseCount": 216,
+      "openWaterPoseCount": 95,
+      "openWaterContactPoseCount": 0,
+      "minimumOpenWaterClearanceNativePixels": 21,
+      "terminalContactPoseCount": 96,
+      "peakTerminalOverlapNativePixels": {
+        "island": 2239,
+        "dock": 10540,
+        "buoy": 0
+      }
+    },
+    {
+      "from": 5,
+      "to": 6,
+      "poseCount": 199,
+      "openWaterPoseCount": 83,
+      "openWaterContactPoseCount": 0,
+      "minimumOpenWaterClearanceNativePixels": 48,
+      "terminalContactPoseCount": 65,
+      "peakTerminalOverlapNativePixels": {
+        "island": 0,
+        "dock": 870,
+        "buoy": 0
+      }
+    },
+    {
+      "from": 6,
+      "to": 5,
+      "poseCount": 199,
+      "openWaterPoseCount": 84,
+      "openWaterContactPoseCount": 0,
+      "minimumOpenWaterClearanceNativePixels": 5,
+      "terminalContactPoseCount": 65,
+      "peakTerminalOverlapNativePixels": {
+        "island": 0,
+        "dock": 870,
+        "buoy": 0
+      }
+    },
+    {
+      "from": 5,
+      "to": 5,
+      "poseCount": 204,
+      "openWaterPoseCount": 84,
+      "openWaterContactPoseCount": 0,
+      "minimumOpenWaterClearanceNativePixels": 48,
+      "terminalContactPoseCount": 69,
+      "peakTerminalOverlapNativePixels": {
+        "island": 0,
+        "dock": 870,
+        "buoy": 0
+      }
+    }
+  ],
+  "selectedBuoyChanges": [
+    {
+      "id": "coast-port-porto",
+      "route": "coast-port",
+      "oldPoint": {
+        "x": 1.1726028037900418,
+        "y": 0.7212261318945039
+      },
+      "outwardUnitNormalNative": {
+        "x": 0.7661915431257929,
+        "y": 0.6426122619764708
+      },
+      "normalAuthoredSegment": 5,
+      "oldClearanceNativePixels": {
+        "terrain": 158,
+        "dock": 175,
+        "otherBuoy": 528,
+        "hull": 0,
+        "passenger": 88,
+        "wake": 0,
+        "moving": 0,
+        "static": 158
+      },
+      "recordedPoses": 432,
+      "interpolatedEnvelopes": 1239,
+      "minimumMovingGuardNativePixels": 4,
+      "proposal": {
+        "method": "minimum local outward-component integer-pixel shift, normal-only path approaches shore",
+        "newPoint": {
+          "x": 1.1658319704567084,
+          "y": 0.7362261318945039
+        },
+        "shiftNativePixels": 22.20360331117452,
+        "outwardComponentNativePixels": 1.6065306549411673,
+        "nativeDelta": {
+          "x": -13,
+          "y": 18
+        },
+        "newClearanceNativePixels": {
+          "terrain": 177,
+          "dock": 197,
+          "otherBuoy": 512,
+          "hull": 14,
+          "passenger": 90,
+          "wake": 4,
+          "moving": 4,
+          "static": 177
+        }
+      }
+    },
+    {
+      "id": "reserva-dominio-dominio",
+      "route": "reserva-dominio",
+      "oldPoint": {
+        "x": 2.567669768444458,
+        "y": -0.8876690091459706
+      },
+      "outwardUnitNormalNative": {
+        "x": 0.8683602291189494,
+        "y": 0.4959339799655654
+      },
+      "normalAuthoredSegment": 1,
+      "oldClearanceNativePixels": {
+        "terrain": 447,
+        "dock": 436,
+        "otherBuoy": 402,
+        "hull": 0,
+        "passenger": 88,
+        "wake": 56,
+        "moving": 0,
+        "static": 436
+      },
+      "recordedPoses": 581,
+      "interpolatedEnvelopes": 1446,
+      "minimumMovingGuardNativePixels": 4,
+      "proposal": {
+        "method": "outward normal",
+        "newPoint": {
+          "x": 2.5717402070184527,
+          "y": -0.8839495042962289
+        },
+        "shiftNativePixels": 9,
+        "nativeDelta": {
+          "x": 7.815242062070545,
+          "y": 4.463405819690088
+        },
+        "newClearanceNativePixels": {
+          "terrain": 456,
+          "dock": 443,
+          "otherBuoy": 409,
+          "hull": 5,
+          "passenger": 98,
+          "wake": 65,
+          "moving": 5,
+          "static": 443
+        }
+      }
+    }
+  ],
+  "assets": {
+    "journey-boat.webp": {
+      "bytes": 133830,
+      "sha256": "c4abc0bdf515ff89a88f4e63464749c4acd1e794797fe8f6ee9b648bdf9c082a"
+    },
+    "journey-boat-64.webp": {
+      "bytes": 721512,
+      "sha256": "1f49560c638137da251fe25366753e36b3c448a6aa090a317c4ffbce36b90a56"
+    },
+    "journey-boat.meta.json": {
+      "bytes": 59464,
+      "sha256": "ab9db9967f30930a3aa0cce258acfe31e37bab112bd230ce6d055672c924548a"
+    },
+    "maritime-buoys.meta.json": {
+      "bytes": 1390,
+      "sha256": "339b693dc6392412741f29e1c1ddc0ca26a8592550e5f6c64dd01077fa26b921"
+    }
+  },
+  "sourceScripts": [
+    "tools/diorama/render_journey_boat.py",
+    "tools/diorama/package_journey_boat.py"
+  ],
+  "note": "The other two buoys, published route control points and boarding points, hull geometry and actor world scale are unchanged. The animation rounds the path between control points. Pixel contacts with authored piers during terminal projection remain expected and are reported separately.",
+  "retargetRecheck": {
+    "brakeSeconds": 0.22,
+    "pauseSeconds": 0.1,
+    "reverseAccelerationSeconds": 0.3,
+    "fourOrdinaryCrossingsUnchanged": true,
+    "reversalPoseCount": 204,
+    "reversalOpenWaterContacts": 0,
+    "reversalMinimumOpenWaterClearanceNativePixels": 48,
+    "noAdditionalBuoyMoves": true,
+    "envelopeClearances": {
+      "coast-port-porto": {
+        "terrain": 177,
+        "dock": 197,
+        "otherBuoy": 512,
+        "hull": 14,
+        "passenger": 90,
+        "wake": 24,
+        "moving": 14,
+        "static": 177
+      },
+      "reserva-dominio-dominio": {
+        "terrain": 456,
+        "dock": 443,
+        "otherBuoy": 409,
+        "hull": 5,
+        "passenger": 98,
+        "wake": 65,
+        "moving": 5,
+        "static": 443
+      }
+    },
+    "sourcePngRepackAlphaIdentical": true
+  }
+}

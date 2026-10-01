@@ -57,6 +57,7 @@ export interface JourneyBridge {
 export interface JourneyBoatMetadata {
     atlas: { path: string; width: number; height: number };
     frames: (BoatAtlasFrame & { index: number; screenHeadingRadians: number; worldHeadingRadians: number })[];
+    headingProjection?: { xAxis: MapPoint; yAxis: MapPoint };
 }
 export interface JourneyIsland {
     world: number;
@@ -208,14 +209,18 @@ export function parseJourneyBoat(value: unknown): JourneyBoatMetadata | null {
     if (data?.version !== 1 || !atlas || !asset(atlas.path, 'webp') || !integer(atlas.width) || !integer(atlas.height) ||
         atlas.width < 1 || atlas.height < 1 || atlas.width > 8192 || atlas.height > 8192 || !frame || !integer(frame.width) ||
         !integer(frame.height) || frame.width < 1 || frame.height < 1 || !positive(frame.widthInMap) ||
-        !positive(data.passengerPixelScale) || data.passengerPixelScale > 16 || !Array.isArray(data.frames) || data.frames.length !== 8) return null;
+        !positive(data.passengerPixelScale) || data.passengerPixelScale > 16 || !Array.isArray(data.frames) || ![8, 32, 48, 64].includes(data.frames.length)) return null;
     const frames: JourneyBoatMetadata['frames'] = [];
     for (let index = 0; index < data.frames.length; index++) {
         const entry = object(data.frames[index]), rects = object(entry?.sourceRects), foot = point(entry?.passengerFoot), pixels = point(entry?.passengerFootPixels);
+        const water = point(entry?.waterlineAnchor), waterPixels = point(entry?.waterlineAnchorPixels);
         if (!entry || entry.index !== index || !finite(entry.screenHeadingRadians) || !finite(entry.worldHeadingRadians) ||
+            Math.abs(entry.worldHeadingRadians - index * Math.PI * 2 / data.frames.length) > 1e-5 ||
             !positive(entry.widthInMap) || Math.abs(entry.widthInMap - frame.widthInMap) > 1e-8 || !foot || !pixels ||
             foot.x < 0 || foot.x > 1 || foot.y < 0 || foot.y > 1 ||
-            Math.abs(foot.x * frame.width - pixels.x) > .01 || Math.abs(foot.y * frame.height - pixels.y) > .01) return null;
+            Math.abs(foot.x * frame.width - pixels.x) > .01 || Math.abs(foot.y * frame.height - pixels.y) > .01 ||
+            !water || !waterPixels || water.x < 0 || water.x > 1 || water.y < 0 || water.y > 1 ||
+            Math.abs(water.x * frame.width - waterPixels.x) > .01 || Math.abs(water.y * frame.height - waterPixels.y) > .01) return null;
         const crops: BoatAtlasFrame['rear'][] = [];
         for (const kind of ['base', 'foreground']) {
             const rect = object(rects?.[kind]);
@@ -224,10 +229,15 @@ export function parseJourneyBoat(value: unknown): JourneyBoatMetadata | null {
             crops.push({ x: rect.x, y: rect.y, w: frame.width, h: frame.height });
         }
         frames.push({ index, screenHeadingRadians: entry.screenHeadingRadians, worldHeadingRadians: entry.worldHeadingRadians,
-            width: frame.width, height: frame.height, widthInMap: entry.widthInMap, passengerFoot: pixels,
+            width: frame.width, height: frame.height, widthInMap: entry.widthInMap, passengerFoot: pixels, waterlineAnchor: waterPixels,
             passengerPixelScale: data.passengerPixelScale, rear: crops[0], foreground: crops[1] });
     }
-    return { atlas: { path: atlas.path, width: atlas.width, height: atlas.height }, frames };
+    const projection = object(data.headingProjection), xAxis = point(projection?.xAxis), yAxis = point(projection?.yAxis);
+    const determinant = xAxis && yAxis ? xAxis.x * yAxis.y - xAxis.y * yAxis.x : NaN;
+    if ((data.frames.length > 8 || data.headingProjection !== undefined) &&
+        (!xAxis || !yAxis || !Number.isFinite(determinant) || Math.abs(determinant) < 1e-8)) return null;
+    return { atlas: { path: atlas.path, width: atlas.width, height: atlas.height }, frames,
+        ...(xAxis && yAxis ? { headingProjection: { xAxis, yAxis } } : {}) };
 }
 
 export const JOURNEY_DOCK_NODES = { 1: { join: '1-junction', dock: '1-dock', berth: '1-berth' },

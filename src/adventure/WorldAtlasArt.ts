@@ -37,6 +37,8 @@ export interface BoatAtlasFrame {
     height: number;
     /** Pixel coordinates in this frame of the passenger's foot on the deck. */
     passengerFoot: MapPoint;
+    /** The invariant hull pivot, independently of the rotating passenger deck. */
+    waterlineAnchor?: MapPoint;
     /** Full frame width in the same normalized x units as the island canvas. */
     widthInMap: number;
     /** Frame pixels per original Feka pixel; authored together with the deck. */
@@ -55,6 +57,7 @@ export interface AtlasBoat {
     assets: BoatAtlasAssets;
     /** Radians in the authored world; the caller chooses the matching frame. */
     heading?: number;
+    motion?: { waterline: MapPoint; screenHeading: number; speed: number };
 }
 export interface AtlasPaintState {
     camera: MapCamera;
@@ -133,6 +136,22 @@ function islandOutsideViewport(camera: MapCamera): boolean {
 export function paintWorldAtlas(c: CanvasRenderingContext2D, state: AtlasPaintState): void {
     paintMapSea(c, state.camera, state.time, state.reducedMotion);
     paintMaritimeBuoys(c, state.camera, state.buoys ?? []);
+    if (!state.reducedMotion) for (const boat of state.boats ?? []) {
+        const motion = boat.motion;
+        if (!motion || motion.speed <= .01) continue;
+        const water = mapToScreen(motion.waterline, state.camera), scale = atlasActorScale(state.camera, boat.frame);
+        const dx = Math.cos(motion.screenHeading), dy = Math.sin(motion.screenHeading);
+        const stern = 15 * scale, length = (8 + 14 * motion.speed) * scale;
+        c.save(); c.strokeStyle = 'rgba(229,247,233,.32)'; c.lineWidth = .7 * scale;
+        for (const side of [-1, 1]) {
+            c.beginPath(); c.moveTo(water.x - dx * stern - dy * side * 3 * scale, water.y - dy * stern + dx * side * 3 * scale);
+            c.quadraticCurveTo(water.x - dx * (stern + length * .55) - dy * side * 5 * scale,
+                water.y - dy * (stern + length * .55) + dx * side * 5 * scale,
+                water.x - dx * (stern + length) - dy * side * 8 * scale, water.y - dy * (stern + length) + dx * side * 8 * scale);
+            c.stroke();
+        }
+        c.restore();
+    }
     for (const island of state.islands) {
         const camera = atlasIslandCamera(state.camera, island.placement);
         // Fallback procedural scenery has different extents. Dock overlays may

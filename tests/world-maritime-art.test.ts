@@ -12,9 +12,9 @@ test('shipped buoy metadata retains the four audited placements and natural map 
     assert.ok(metadata);
     assert.deepEqual(metadata.instances.map(instance => [instance.route, instance.sprite, instance.point.x, instance.point.y]), [
         ['coast-port', 'sage', .847552380723927, .8276973448682413],
-        ['coast-port', 'coral', 1.1726028037900418, .7212261318945039],
+        ['coast-port', 'coral', 1.1658319704567084, .7362261318945039],
         ['reserva-dominio', 'coral', 2.510399567589041, -1.3321437685421882],
-        ['reserva-dominio', 'sage', 2.567669768444458, -.8876690091459706],
+        ['reserva-dominio', 'sage', 2.5717402070184527, -.8839495042962289],
     ]);
     for (const sprite of Object.values(metadata.sprites)) {
         assert.equal(sprite.widthInMap, 1.5 / 20.6);

@@ -4,12 +4,12 @@ import test, { type TestContext } from 'node:test';
 import { STAGES } from '../src/adventure/campaign';
 import { freshSave, ProgressStore, SAVE_KEY } from '../src/adventure/progress';
 import { WorldGame } from '../src/adventure/WorldGame';
-import { COSTA_ART_BOUNDS, FALLBACK_POINTS, fallbackMapMetadata, parseMapMetadata } from '../src/adventure/WorldMapArt';
+import { COSTA_ART_BOUNDS, FALLBACK_POINTS, fallbackMapMetadata, parseMapMetadata, paintMapActor } from '../src/adventure/WorldMapArt';
 import { WorldMapView } from '../src/adventure/WorldMapView';
 import { WORLD_MAP_TRAVEL_ACTIONS } from '../src/adventure/WorldMapHud';
 import { mapToScreen, type MapPoint } from '../src/adventure/WorldMapModel';
 import { atlasIslandBounds, WORLD_ATLAS_PLACEMENTS } from '../src/adventure/WorldAtlasModel';
-import { atlasActorBounds, atlasBoatBounds } from '../src/adventure/WorldAtlasArt';
+import { atlasActorBounds, atlasActorScale, atlasBoatBounds } from '../src/adventure/WorldAtlasArt';
 import { Input } from '../src/engine/Input';
 
 type Listener = (event: any) => void;
@@ -289,6 +289,18 @@ function nativeControlEntries(h: ReturnType<typeof mapDOM>): Array<{ button: But
 }
 function tick(h: ReturnType<typeof mapDOM>, selected: number, save: ReturnType<typeof freshSave>, from: number, duration: number) {
     for (let time = from + 50; time <= from + duration; time += 50) h.view.render(selected, save, time, '');
+}
+function assertPaintedPassengerOnDeck(h: ReturnType<typeof mapDOM>, id = 'coast-port-sail') {
+    const boat = h.internal.currentBoat(id), frame = boat.frame, calls = h.paint.calls;
+    const layer = (crop: any) => calls.map(call => call.method === 'drawImage' && call.args[0] === boat.assets.rear &&
+        call.args[1] === crop.x && call.args[2] === crop.y).lastIndexOf(true);
+    const rear = layer(frame.rear), foreground = layer(frame.foreground);
+    assert.ok(rear >= 0 && foreground > rear);
+    const expected = canvasContext();
+    paintMapActor(expected.context as unknown as CanvasRenderingContext2D, { camera: h.internal.camera, marker: boat.foot,
+        time: h.internal.lastTime, reducedMotion: h.media.matches, walking: false, facingLeft: h.internal.facingLeft,
+        scale: atlasActorScale(h.internal.camera, frame), shadow: false });
+    assert.deepEqual(calls.slice(rear + 1, foreground).filter(call => call.method === 'fillRect'), expected.calls);
 }
 async function readyLand(h: ReturnType<typeof mapDOM>, save = openSave(), selection = 0, metadata = fixtureMapMetadata(1)) {
     h.view.render(selection, save, 0, ''); await finishWorld(h, 1, metadata); await finishWorld(h, 2);
@@ -639,6 +651,7 @@ test('WorldGame lazy map creation is reused and arrival callback persists exactl
 });
 
 const actualMetadata = (world: number) => JSON.parse(readFileSync(new URL(`../public/assets/world/map/${dioramaName(world)}.meta.json`, import.meta.url), 'utf8'));
+const actualBoatMetadata = () => JSON.parse(readFileSync(new URL('../public/assets/world/map/journey-boat.meta.json', import.meta.url), 'utf8'));
 async function readyConnection(h: ReturnType<typeof mapDOM>, save = openSave('1-5'), failAsset = '') {
     const selection = STAGES.findIndex(stage => stage.id === save.selected);
     h.view.render(selection, save, 0, ''); await finishWorld(h, 1, actualMetadata(1)); await finishWorld(h, 2, actualMetadata(2));
@@ -648,7 +661,7 @@ async function readyConnection(h: ReturnType<typeof mapDOM>, save = openSave('1-
     }
     await flushAssets();
     const connection = JSON.parse(readFileSync(new URL('../public/assets/world/map/coast-port-journey.meta.json', import.meta.url), 'utf8'));
-    const boat = JSON.parse(readFileSync(new URL('../public/assets/world/map/journey-boat.meta.json', import.meta.url), 'utf8'));
+    const boat = actualBoatMetadata();
     for (const size of [connection.islands.costa.overlay, connection.islands.porto.overlay, boat.atlas]) {
         const image = h.images.find(image => image.src.endsWith(size.path.split('/').pop()))!;
         assert.ok(image, `Expected validated journey image ${size.path}`);
@@ -1132,7 +1145,7 @@ test('a natural heated-dock crossing moves only its own hull and preserves expli
         if (active?.mode === 'board') sawBoard = true;
         if (active?.id === 'reserva-dominio-sail') {
             sawSail = true;
-            assert.deepEqual(h.internal.currentBoat('reserva-dominio-sail').foot, h.internal.marker);
+            assertPaintedPassengerOnDeck(h, 'reserva-dominio-sail');
             assert.equal(h.internal.activeFerry(true).definition.id, 'reserva-dominio-sail');
             assert.equal(h.view.enterSelected(25), false);
         }
@@ -1181,7 +1194,7 @@ test('a failed Costa dock cannot suppress the shared hull on the independent hea
     assert.ok(h.internal.boatImage); assert.equal(h.internal.currentBoat(), undefined);
     assert.ok(h.internal.currentBoat('reserva-dominio-sail'));
     assert.equal(h.fetches.filter(request => request.url.endsWith('journey-boat.meta.json')).length, 1);
-    assert.equal(h.images.filter(image => image.src.endsWith('journey-boat.webp')).length, 1);
+    assert.equal(h.images.filter(image => image.src.endsWith(actualBoatMetadata().atlas.path.split('/').pop())).length, 1);
     h.view.render(25, save, 100, ''); assert.equal(h.internal.journey.arrived, '6-1');
     assert.equal(h.internal.dominioFerry.mooredWorld, 6);
 });
@@ -1268,7 +1281,7 @@ test('Costa to Porto travels through connected docks with Feka aboard, saves onl
     for (let time = 150; time <= 12000; time += 50) {
         h.view.render(5, save, time, ''); const mode = h.internal.motionState(); modes.add(mode);
         if (mode === 'sailing') {
-            assert.equal(h.internal.journey.arrived, '1-5'); assert.deepEqual(h.internal.currentBoat().foot, h.internal.marker);
+            assert.equal(h.internal.journey.arrived, '1-5'); assertPaintedPassengerOnDeck(h);
             assert.equal(h.view.enterSelected(5), false); assert.equal(h.internal.hud.stageButtons.every((button: Button) => button.hidden), true);
         }
     }
@@ -1304,7 +1317,7 @@ test('loading a crossing keeps entry gated and cancelling or inspecting locked d
 });
 
 test('failed crossing art exposes a clear usable region fallback without inventing any water route', async t => {
-    const h = mapDOM(t, true), save = openSave('1-5'); await readyConnection(h, save, 'journey-boat.webp');
+    const h = mapDOM(t, true), save = openSave('1-5'); await readyConnection(h, save, actualBoatMetadata().atlas.path.split('/').pop());
     assert.equal(h.internal.connectionStatus, 'failed'); h.view.render(5, save, 100, '');
     assert.equal(h.internal.journey.arrived, '2-1'); assert.equal(h.internal.journey.destination, null); assert.equal(h.events.entered, 0);
     assert.ok(h.internal.network.edges.every((edge: { mode: string }) => edge.mode !== 'sail'));
@@ -1340,22 +1353,21 @@ test('vertical keyboard region selection matches docks and drawer rather than re
     assert.equal(h.game.selection, 5); h.game.menuKey({ key: 'ArrowUp', repeat: false, target: null, preventDefault() {} }); assert.equal(h.game.selection, 0);
 });
 
-test('boat heading changes at the same aspect-adjusted segment boundary as the sampled passenger path', async t => {
-    const { journeyPathSegment } = await import('../src/adventure/WorldMapView');
-    const { samplePath } = await import('../src/adventure/WorldMapModel');
+test('the View forwards continuous ferry headings and attached deck poses without rewriting the authored route', async t => {
+    const { journeyLegPoint } = await import('../src/adventure/WorldJourneyModel');
     const h = mapDOM(t), save = openSave('1-5'); await readyConnection(h, save);
     const route: MapPoint[] = h.internal.connection.sailRoute;
-    const lengths = route.slice(1).map((point, index) => Math.hypot((point.x - route[index].x) * 1.6, point.y - route[index].y));
-    const total = lengths.reduce((sum, length) => sum + length, 0), boundary = (lengths[0] + lengths[1]) / total;
-    assert.equal(journeyPathSegment(route, boundary - 1e-6), 1); assert.equal(journeyPathSegment(route, boundary + 1e-6), 2);
-    const sampled = samplePath(route, boundary); assert.ok(Math.hypot(sampled.x - route[2].x, sampled.y - route[2].y) < 1e-8);
-    const edge = h.internal.network.edges.find((edge: { mode: string }) => edge.mode === 'sail'); h.media.matches = true;
-    for (const direction of [1, -1]) for (const progress of [boundary - 1e-6, boundary + 1e-6]) {
-        h.internal.journey.legs = [{ ...edge, direction, progress }]; h.internal.marker = samplePath(route, progress);
-        const segment = journeyPathSegment(route, progress), expected = direction === 1 ? h.internal.connection.segmentHeadings[segment]
-            : h.internal.connection.reverseSegmentHeadings[route.length - 2 - segment];
-        assert.equal(h.internal.currentBoat().frame.index, expected);
+    const snapshot = structuredClone(route), edge = h.internal.network.edges.find((edge: { mode: string }) => edge.mode === 'sail');
+    let previous: number | undefined;
+    for (let frame = 0; frame <= 360; frame++) {
+        const leg = { ...edge, direction: 1 as const, progress: frame / 360 };
+        h.internal.journey.legs = [leg]; h.internal.marker = journeyLegPoint(leg); h.internal.lastTime = frame * 1000 / 60;
+        const boat = h.internal.currentBoat(), angle = boat.motion.screenHeading;
+        if (previous !== undefined) assert.ok(Math.abs(Math.atan2(Math.sin(angle - previous), Math.cos(angle - previous))) < .15);
+        previous = angle;
+        assert.deepEqual(h.internal.currentBoat(), boat, 'Resampling the same timestamp cannot advance the turn.');
     }
+    assert.deepEqual(route, snapshot);
 });
 
 test('atlas camera eases overview and channel transitions while keeping boat bounds inside the measured scene', async t => {

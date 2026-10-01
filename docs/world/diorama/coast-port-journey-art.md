@@ -1,5 +1,10 @@
 # Costa ↔ Porto: connected dock and ferry artwork
 
+This document records the original connection and eight-view artwork. The
+current runtime uses the separate 64-view atlas described in
+[Fluid ferry artwork](ferry-heading-refresh.md); the original eight-view image
+and all authored route points are preserved.
+
 The original Costa and Porto island assets, five stage anchors, main and secret
 route arrays, and camera exports are unchanged. The journey adds two small
 transparent dock overlays and one original working launch atlas. There is no
@@ -97,7 +102,7 @@ sprite composited between its two packaged atlas layers.
 ## Rebuild
 
 ```sh
-blender -b -t 8 -P tools/diorama/render_journey_boat.py
+blender -b -t 8 -P tools/diorama/render_journey_boat.py -- --output-dir /tmp/feka-journey/boat --headings 8 --height 256
 blender -b -t 8 -P tools/diorama/render_journey_docks.py -- costa --render
 blender -b -t 8 -P tools/diorama/render_journey_docks.py -- porto --render
 python tools/diorama/package_journey_assets.py

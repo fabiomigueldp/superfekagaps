@@ -1,9 +1,9 @@
 {
   "version": 1,
   "frame": {
-    "width": 384,
-    "height": 256,
-    "widthInMap": 0.201456311
+    "width": 304,
+    "height": 248,
+    "widthInMap": 0.159486246
   },
   "orthoScale": 4.15,
   "worldDimensions": {
@@ -35,14 +35,14 @@
     {
       "index": 0,
       "worldHeadingRadians": 0.0,
-      "screenHeadingRadians": 0.290746,
+      "screenHeadingRadians": 0.290745,
       "passengerFoot": {
-        "x": 0.54645,
-        "y": 0.505685
+        "x": 0.558673684,
+        "y": 0.562319758
       },
       "waterlineAnchor": {
         "x": 0.5,
-        "y": 0.657702
+        "y": 0.719241129
       },
       "passengerWorld": [
         0.2199999988079071,
@@ -54,37 +54,331 @@
         "base": {
           "x": 0,
           "y": 0,
-          "width": 384,
-          "height": 256
+          "width": 304,
+          "height": 248
         },
         "foreground": {
           "x": 0,
-          "y": 512,
-          "width": 384,
-          "height": 256
+          "y": 1984,
+          "width": 304,
+          "height": 248
         }
       },
       "passengerFootPixels": {
-        "x": 209.8368,
-        "y": 129.4554
+        "x": 169.8368,
+        "y": 139.4553
       },
       "waterlineAnchorPixels": {
-        "x": 192.0,
-        "y": 168.3717
+        "x": 152.0,
+        "y": 178.3718
       },
-      "widthInMap": 0.201456311
+      "widthInMap": 0.159486246
     },
     {
       "index": 1,
-      "worldHeadingRadians": 0.785398,
-      "screenHeadingRadians": -0.156654,
+      "worldHeadingRadians": 0.098175,
+      "screenHeadingRadians": 0.228931,
       "passengerFoot": {
-        "x": 0.55091,
-        "y": 0.472774
+        "x": 0.561553618,
+        "y": 0.558380645
       },
       "waterlineAnchor": {
         "x": 0.5,
-        "y": 0.657702
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.2189406305551529,
+        0.021563779562711716,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 29,
+      "sourceRects": {
+        "base": {
+          "x": 304,
+          "y": 0,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 304,
+          "y": 1984,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 170.7123,
+        "y": 138.4784
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 2,
+      "worldHeadingRadians": 0.19635,
+      "screenHeadingRadians": 0.170499,
+      "passengerFoot": {
+        "x": 0.563842434,
+        "y": 0.554271774
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.21577274799346924,
+        0.042919889092445374,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 33,
+      "sourceRects": {
+        "base": {
+          "x": 608,
+          "y": 0,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 608,
+          "y": 1984,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 171.4081,
+        "y": 137.4594
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 3,
+      "worldHeadingRadians": 0.294524,
+      "screenHeadingRadians": 0.1145,
+      "passengerFoot": {
+        "x": 0.565514803,
+        "y": 0.550034274
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.21052686870098114,
+        0.06386265158653259,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 34,
+      "sourceRects": {
+        "base": {
+          "x": 912,
+          "y": 0,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 912,
+          "y": 1984,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 171.9165,
+        "y": 136.4085
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 4,
+      "worldHeadingRadians": 0.392699,
+      "screenHeadingRadians": 0.060093,
+      "passengerFoot": {
+        "x": 0.566556908,
+        "y": 0.545707258
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.20325350761413574,
+        0.08419033885002136,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 34,
+      "sourceRects": {
+        "base": {
+          "x": 1216,
+          "y": 0,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1216,
+          "y": 1984,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 172.2333,
+        "y": 135.3354
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 5,
+      "worldHeadingRadians": 0.490874,
+      "screenHeadingRadians": 0.006512,
+      "passengerFoot": {
+        "x": 0.566957566,
+        "y": 0.541332661
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.19402268528938293,
+        0.10370727628469467,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 34,
+      "sourceRects": {
+        "base": {
+          "x": 1520,
+          "y": 0,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1520,
+          "y": 1984,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 172.3551,
+        "y": 134.2505
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 6,
+      "worldHeadingRadians": 0.589049,
+      "screenHeadingRadians": -0.046983,
+      "passengerFoot": {
+        "x": 0.566713816,
+        "y": 0.536953629
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.1829233169555664,
+        0.12222545593976974,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 30,
+      "sourceRects": {
+        "base": {
+          "x": 1824,
+          "y": 0,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1824,
+          "y": 1984,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 172.281,
+        "y": 133.1645
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 7,
+      "worldHeadingRadians": 0.687223,
+      "screenHeadingRadians": -0.10112,
+      "passengerFoot": {
+        "x": 0.565826974,
+        "y": 0.53261129
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.17006228864192963,
+        0.13956652581691742,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 30,
+      "sourceRects": {
+        "base": {
+          "x": 2128,
+          "y": 0,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 2128,
+          "y": 1984,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 172.0114,
+        "y": 132.0876
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 8,
+      "worldHeadingRadians": 0.785398,
+      "screenHeadingRadians": -0.156657,
+      "passengerFoot": {
+        "x": 0.564307237,
+        "y": 0.528348387
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
       },
       "passengerWorld": [
         0.15556347370147705,
@@ -94,39 +388,333 @@
       "foregroundObjectCount": 30,
       "sourceRects": {
         "base": {
-          "x": 384,
-          "y": 0,
-          "width": 384,
-          "height": 256
+          "x": 0,
+          "y": 248,
+          "width": 304,
+          "height": 248
         },
         "foreground": {
-          "x": 384,
-          "y": 512,
-          "width": 384,
-          "height": 256
+          "x": 0,
+          "y": 2232,
+          "width": 304,
+          "height": 248
         }
       },
       "passengerFootPixels": {
-        "x": 211.5494,
-        "y": 121.0301
+        "x": 171.5494,
+        "y": 131.0304
       },
       "waterlineAnchorPixels": {
-        "x": 192.0,
-        "y": 168.3717
+        "x": 152.0,
+        "y": 178.3718
       },
-      "widthInMap": 0.201456311
+      "widthInMap": 0.159486246
     },
     {
-      "index": 2,
-      "worldHeadingRadians": 1.570796,
-      "screenHeadingRadians": -0.779954,
+      "index": 9,
+      "worldHeadingRadians": 0.883573,
+      "screenHeadingRadians": -0.214412,
       "passengerFoot": {
-        "x": 0.525547,
-        "y": 0.44693
+        "x": 0.562167434,
+        "y": 0.524203629
       },
       "waterlineAnchor": {
         "x": 0.5,
-        "y": 0.657702
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.1395665407180786,
+        0.17006227374076843,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 30,
+      "sourceRects": {
+        "base": {
+          "x": 304,
+          "y": 248,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 304,
+          "y": 2232,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 170.8989,
+        "y": 130.0025
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 10,
+      "worldHeadingRadians": 0.981748,
+      "screenHeadingRadians": -0.275306,
+      "passengerFoot": {
+        "x": 0.559428947,
+        "y": 0.520220565
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.12222542613744736,
+        0.1829233318567276,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 30,
+      "sourceRects": {
+        "base": {
+          "x": 608,
+          "y": 248,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 608,
+          "y": 2232,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 170.0664,
+        "y": 129.0147
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 11,
+      "worldHeadingRadians": 1.079922,
+      "screenHeadingRadians": -0.34039,
+      "passengerFoot": {
+        "x": 0.556118421,
+        "y": 0.516434677
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.10370729118585587,
+        0.19402267038822174,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 32,
+      "sourceRects": {
+        "base": {
+          "x": 912,
+          "y": 248,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 912,
+          "y": 2232,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 169.06,
+        "y": 128.0758
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 12,
+      "worldHeadingRadians": 1.178097,
+      "screenHeadingRadians": -0.410894,
+      "passengerFoot": {
+        "x": 0.552267105,
+        "y": 0.512883468
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.08419040590524673,
+        0.20325347781181335,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 32,
+      "sourceRects": {
+        "base": {
+          "x": 1216,
+          "y": 248,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1216,
+          "y": 2232,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 167.8892,
+        "y": 127.1951
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 13,
+      "worldHeadingRadians": 1.276272,
+      "screenHeadingRadians": -0.488278,
+      "passengerFoot": {
+        "x": 0.547912829,
+        "y": 0.509601613
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.0638626217842102,
+        0.21052688360214233,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 31,
+      "sourceRects": {
+        "base": {
+          "x": 1520,
+          "y": 248,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1520,
+          "y": 2232,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 166.5655,
+        "y": 126.3812
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 14,
+      "worldHeadingRadians": 1.374447,
+      "screenHeadingRadians": -0.574247,
+      "passengerFoot": {
+        "x": 0.543097697,
+        "y": 0.506619355
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.04291990399360657,
+        0.21577274799346924,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 30,
+      "sourceRects": {
+        "base": {
+          "x": 1824,
+          "y": 248,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1824,
+          "y": 2232,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 165.1017,
+        "y": 125.6416
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 15,
+      "worldHeadingRadians": 1.472622,
+      "screenHeadingRadians": -0.670761,
+      "passengerFoot": {
+        "x": 0.537865789,
+        "y": 0.503966935
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.02156374230980873,
+        0.2189406305551529,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 30,
+      "sourceRects": {
+        "base": {
+          "x": 2128,
+          "y": 248,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 2128,
+          "y": 2232,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 163.5112,
+        "y": 124.9838
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 16,
+      "worldHeadingRadians": 1.570796,
+      "screenHeadingRadians": -0.779955,
+      "passengerFoot": {
+        "x": 0.532269737,
+        "y": 0.501670161
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
       },
       "passengerWorld": [
         1.66095386333609e-08,
@@ -136,39 +724,333 @@
       "foregroundObjectCount": 27,
       "sourceRects": {
         "base": {
-          "x": 768,
-          "y": 0,
-          "width": 384,
-          "height": 256
+          "x": 0,
+          "y": 496,
+          "width": 304,
+          "height": 248
         },
         "foreground": {
-          "x": 768,
-          "y": 512,
-          "width": 384,
-          "height": 256
+          "x": 0,
+          "y": 2480,
+          "width": 304,
+          "height": 248
         }
       },
       "passengerFootPixels": {
-        "x": 201.81,
-        "y": 114.4141
+        "x": 161.81,
+        "y": 124.4142
       },
       "waterlineAnchorPixels": {
-        "x": 192.0,
-        "y": 168.3717
+        "x": 152.0,
+        "y": 178.3718
       },
-      "widthInMap": 0.201456311
+      "widthInMap": 0.159486246
     },
     {
-      "index": 3,
-      "worldHeadingRadians": 2.356194,
-      "screenHeadingRadians": -2.060989,
+      "index": 17,
+      "worldHeadingRadians": 1.668971,
+      "screenHeadingRadians": -0.903869,
       "passengerFoot": {
-        "x": 0.48522,
-        "y": 0.44329
+        "x": 0.526364474,
+        "y": 0.499747984
       },
       "waterlineAnchor": {
         "x": 0.5,
-        "y": 0.657702
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.02156381495296955,
+        0.2189406305551529,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 26,
+      "sourceRects": {
+        "base": {
+          "x": 304,
+          "y": 496,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 304,
+          "y": 2480,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 160.0148,
+        "y": 123.9375
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 18,
+      "worldHeadingRadians": 1.767146,
+      "screenHeadingRadians": -1.04395,
+      "passengerFoot": {
+        "x": 0.520204276,
+        "y": 0.498223387
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.04291987046599388,
+        0.21577274799346924,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 26,
+      "sourceRects": {
+        "base": {
+          "x": 608,
+          "y": 496,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 608,
+          "y": 2480,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 158.1421,
+        "y": 123.5594
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 19,
+      "worldHeadingRadians": 1.865321,
+      "screenHeadingRadians": -1.200206,
+      "passengerFoot": {
+        "x": 0.513849342,
+        "y": 0.497107258
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.06386258453130722,
+        0.21052688360214233,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 26,
+      "sourceRects": {
+        "base": {
+          "x": 912,
+          "y": 496,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 912,
+          "y": 2480,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 156.2102,
+        "y": 123.2826
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 20,
+      "worldHeadingRadians": 1.963495,
+      "screenHeadingRadians": -1.370252,
+      "passengerFoot": {
+        "x": 0.507360526,
+        "y": 0.496412903
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.08419037610292435,
+        0.20325349271297455,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 26,
+      "sourceRects": {
+        "base": {
+          "x": 1216,
+          "y": 496,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1216,
+          "y": 2480,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 154.2376,
+        "y": 123.1104
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 21,
+      "worldHeadingRadians": 2.06167,
+      "screenHeadingRadians": -1.548799,
+      "passengerFoot": {
+        "x": 0.500800987,
+        "y": 0.496144758
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.10370725393295288,
+        0.19402268528938293,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 26,
+      "sourceRects": {
+        "base": {
+          "x": 1520,
+          "y": 496,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1520,
+          "y": 2480,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 152.2435,
+        "y": 123.0439
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 22,
+      "worldHeadingRadians": 2.159845,
+      "screenHeadingRadians": -1.728329,
+      "passengerFoot": {
+        "x": 0.494234868,
+        "y": 0.496307258
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.12222538888454437,
+        0.1829233467578888,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 26,
+      "sourceRects": {
+        "base": {
+          "x": 1824,
+          "y": 496,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1824,
+          "y": 2480,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 150.2474,
+        "y": 123.0842
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 23,
+      "worldHeadingRadians": 2.25802,
+      "screenHeadingRadians": -1.901044,
+      "passengerFoot": {
+        "x": 0.487723355,
+        "y": 0.496898387
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.13956652581691742,
+        0.17006230354309082,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 26,
+      "sourceRects": {
+        "base": {
+          "x": 2128,
+          "y": 496,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 2128,
+          "y": 2480,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 148.2679,
+        "y": 123.2308
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 24,
+      "worldHeadingRadians": 2.356194,
+      "screenHeadingRadians": -2.06099,
+      "passengerFoot": {
+        "x": 0.481330592,
+        "y": 0.497912097
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
       },
       "passengerWorld": [
         -0.15556353330612183,
@@ -178,39 +1060,333 @@
       "foregroundObjectCount": 26,
       "sourceRects": {
         "base": {
-          "x": 1152,
-          "y": 0,
-          "width": 384,
-          "height": 256
+          "x": 0,
+          "y": 744,
+          "width": 304,
+          "height": 248
         },
         "foreground": {
-          "x": 1152,
-          "y": 512,
-          "width": 384,
-          "height": 256
+          "x": 0,
+          "y": 2728,
+          "width": 304,
+          "height": 248
         }
       },
       "passengerFootPixels": {
-        "x": 186.3245,
-        "y": 113.4822
+        "x": 146.3245,
+        "y": 123.4822
       },
       "waterlineAnchorPixels": {
-        "x": 192.0,
-        "y": 168.3717
+        "x": 152.0,
+        "y": 178.3718
       },
-      "widthInMap": 0.201456311
+      "widthInMap": 0.159486246
     },
     {
-      "index": 4,
-      "worldHeadingRadians": 3.141593,
-      "screenHeadingRadians": -2.850846,
+      "index": 25,
+      "worldHeadingRadians": 2.454369,
+      "screenHeadingRadians": -2.205091,
       "passengerFoot": {
-        "x": 0.45355,
-        "y": 0.463988
+        "x": 0.475117105,
+        "y": 0.499339516
       },
       "waterlineAnchor": {
         "x": 0.5,
-        "y": 0.657702
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.17006230354309082,
+        0.13956652581691742,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 26,
+      "sourceRects": {
+        "base": {
+          "x": 304,
+          "y": 744,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 304,
+          "y": 2728,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 144.4356,
+        "y": 123.8362
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 26,
+      "worldHeadingRadians": 2.552544,
+      "screenHeadingRadians": -2.332849,
+      "passengerFoot": {
+        "x": 0.469143421,
+        "y": 0.501166129
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.1829233020544052,
+        0.12222547829151154,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 27,
+      "sourceRects": {
+        "base": {
+          "x": 608,
+          "y": 744,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 608,
+          "y": 2728,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 142.6196,
+        "y": 124.2892
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 27,
+      "worldHeadingRadians": 2.650719,
+      "screenHeadingRadians": -2.445456,
+      "passengerFoot": {
+        "x": 0.463467105,
+        "y": 0.50337379
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.19402270019054413,
+        0.10370725393295288,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 28,
+      "sourceRects": {
+        "base": {
+          "x": 912,
+          "y": 744,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 912,
+          "y": 2728,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 140.894,
+        "y": 124.8367
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 28,
+      "worldHeadingRadians": 2.748894,
+      "screenHeadingRadians": -2.544864,
+      "passengerFoot": {
+        "x": 0.458141447,
+        "y": 0.505941129
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.20325349271297455,
+        0.08419036865234375,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 29,
+      "sourceRects": {
+        "base": {
+          "x": 1216,
+          "y": 744,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1216,
+          "y": 2728,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 139.275,
+        "y": 125.4734
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 29,
+      "worldHeadingRadians": 2.847068,
+      "screenHeadingRadians": -2.633219,
+      "passengerFoot": {
+        "x": 0.453220066,
+        "y": 0.508845565
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.21052685379981995,
+        0.06386268138885498,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 30,
+      "sourceRects": {
+        "base": {
+          "x": 1520,
+          "y": 744,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1520,
+          "y": 2728,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 137.7789,
+        "y": 126.1937
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 30,
+      "worldHeadingRadians": 2.945243,
+      "screenHeadingRadians": -2.712527,
+      "passengerFoot": {
+        "x": 0.44875,
+        "y": 0.512057661
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.21577276289463043,
+        0.04291986674070358,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 31,
+      "sourceRects": {
+        "base": {
+          "x": 1824,
+          "y": 744,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1824,
+          "y": 2728,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 136.42,
+        "y": 126.9903
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 31,
+      "worldHeadingRadians": 3.043418,
+      "screenHeadingRadians": -2.784563,
+      "passengerFoot": {
+        "x": 0.444772368,
+        "y": 0.515546371
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.2189406454563141,
+        0.021563708782196045,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 31,
+      "sourceRects": {
+        "base": {
+          "x": 2128,
+          "y": 744,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 2128,
+          "y": 2728,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 135.2108,
+        "y": 127.8555
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 32,
+      "worldHeadingRadians": 3.141593,
+      "screenHeadingRadians": -2.850844,
+      "passengerFoot": {
+        "x": 0.441326316,
+        "y": 0.519277419
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
       },
       "passengerWorld": [
         -0.2199999988079071,
@@ -221,38 +1397,332 @@
       "sourceRects": {
         "base": {
           "x": 0,
-          "y": 256,
-          "width": 384,
-          "height": 256
+          "y": 992,
+          "width": 304,
+          "height": 248
         },
         "foreground": {
           "x": 0,
-          "y": 768,
-          "width": 384,
-          "height": 256
+          "y": 2976,
+          "width": 304,
+          "height": 248
         }
       },
       "passengerFootPixels": {
-        "x": 174.1632,
-        "y": 118.7809
+        "x": 134.1632,
+        "y": 128.7808
       },
       "waterlineAnchorPixels": {
-        "x": 192.0,
-        "y": 168.3717
+        "x": 152.0,
+        "y": 178.3718
       },
-      "widthInMap": 0.201456311
+      "widthInMap": 0.159486246
     },
     {
-      "index": 5,
-      "worldHeadingRadians": 3.926991,
-      "screenHeadingRadians": 2.984938,
+      "index": 33,
+      "worldHeadingRadians": 3.239767,
+      "screenHeadingRadians": -2.912659,
       "passengerFoot": {
-        "x": 0.44909,
-        "y": 0.496898
+        "x": 0.438446382,
+        "y": 0.523216532
       },
       "waterlineAnchor": {
         "x": 0.5,
-        "y": 0.657702
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.2189406454563141,
+        -0.021563708782196045,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 29,
+      "sourceRects": {
+        "base": {
+          "x": 304,
+          "y": 992,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 304,
+          "y": 2976,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 133.2877,
+        "y": 129.7577
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 34,
+      "worldHeadingRadians": 3.337942,
+      "screenHeadingRadians": -2.97109,
+      "passengerFoot": {
+        "x": 0.436157566,
+        "y": 0.527325403
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.21577276289463043,
+        -0.04291986674070358,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 29,
+      "sourceRects": {
+        "base": {
+          "x": 608,
+          "y": 992,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 608,
+          "y": 2976,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 132.5919,
+        "y": 130.7767
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 35,
+      "worldHeadingRadians": 3.436117,
+      "screenHeadingRadians": -3.027092,
+      "passengerFoot": {
+        "x": 0.434485197,
+        "y": 0.531562903
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.21052688360214233,
+        -0.06386258453130722,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 27,
+      "sourceRects": {
+        "base": {
+          "x": 912,
+          "y": 992,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 912,
+          "y": 2976,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 132.0835,
+        "y": 131.8276
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 36,
+      "worldHeadingRadians": 3.534292,
+      "screenHeadingRadians": -3.081497,
+      "passengerFoot": {
+        "x": 0.433443092,
+        "y": 0.535889919
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.20325352251529694,
+        -0.08419027179479599,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 25,
+      "sourceRects": {
+        "base": {
+          "x": 1216,
+          "y": 992,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1216,
+          "y": 2976,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 131.7667,
+        "y": 132.9007
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 37,
+      "worldHeadingRadians": 3.632467,
+      "screenHeadingRadians": -3.135078,
+      "passengerFoot": {
+        "x": 0.433042434,
+        "y": 0.540264516
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.19402270019054413,
+        -0.10370725393295288,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 29,
+      "sourceRects": {
+        "base": {
+          "x": 1520,
+          "y": 992,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1520,
+          "y": 2976,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 131.6449,
+        "y": 133.9856
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 38,
+      "worldHeadingRadians": 3.730641,
+      "screenHeadingRadians": 3.094613,
+      "passengerFoot": {
+        "x": 0.433286184,
+        "y": 0.544643548
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.1829233020544052,
+        -0.12222547829151154,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 29,
+      "sourceRects": {
+        "base": {
+          "x": 1824,
+          "y": 992,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1824,
+          "y": 2976,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 131.719,
+        "y": 135.0716
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 39,
+      "worldHeadingRadians": 3.828816,
+      "screenHeadingRadians": 3.040476,
+      "passengerFoot": {
+        "x": 0.434171711,
+        "y": 0.548985484
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.1700623780488968,
+        -0.13956642150878906,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 29,
+      "sourceRects": {
+        "base": {
+          "x": 2128,
+          "y": 992,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 2128,
+          "y": 2976,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 131.9882,
+        "y": 136.1484
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 40,
+      "worldHeadingRadians": 3.926991,
+      "screenHeadingRadians": 2.984939,
+      "passengerFoot": {
+        "x": 0.435692763,
+        "y": 0.55325
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
       },
       "passengerWorld": [
         -0.15556353330612183,
@@ -262,39 +1732,333 @@
       "foregroundObjectCount": 30,
       "sourceRects": {
         "base": {
-          "x": 384,
-          "y": 256,
-          "width": 384,
-          "height": 256
+          "x": 0,
+          "y": 1240,
+          "width": 304,
+          "height": 248
         },
         "foreground": {
-          "x": 384,
-          "y": 768,
-          "width": 384,
-          "height": 256
+          "x": 0,
+          "y": 3224,
+          "width": 304,
+          "height": 248
         }
       },
       "passengerFootPixels": {
-        "x": 172.4506,
-        "y": 127.2059
+        "x": 132.4506,
+        "y": 137.206
       },
       "waterlineAnchorPixels": {
-        "x": 192.0,
-        "y": 168.3717
+        "x": 152.0,
+        "y": 178.3718
       },
-      "widthInMap": 0.201456311
+      "widthInMap": 0.159486246
     },
     {
-      "index": 6,
-      "worldHeadingRadians": 4.712389,
-      "screenHeadingRadians": 2.361639,
+      "index": 41,
+      "worldHeadingRadians": 4.025166,
+      "screenHeadingRadians": 2.927184,
       "passengerFoot": {
-        "x": 0.474452,
-        "y": 0.522742
+        "x": 0.437832566,
+        "y": 0.557393548
       },
       "waterlineAnchor": {
         "x": 0.5,
-        "y": 0.657702
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.13956652581691742,
+        -0.17006230354309082,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 27,
+      "sourceRects": {
+        "base": {
+          "x": 304,
+          "y": 1240,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 304,
+          "y": 3224,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 133.1011,
+        "y": 138.2336
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 42,
+      "worldHeadingRadians": 4.12334,
+      "screenHeadingRadians": 2.866288,
+      "passengerFoot": {
+        "x": 0.440571053,
+        "y": 0.561376613
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.1222255676984787,
+        -0.18292322754859924,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 23,
+      "sourceRects": {
+        "base": {
+          "x": 608,
+          "y": 1240,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 608,
+          "y": 3224,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 133.9336,
+        "y": 139.2214
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 43,
+      "worldHeadingRadians": 4.221515,
+      "screenHeadingRadians": 2.801206,
+      "passengerFoot": {
+        "x": 0.443881579,
+        "y": 0.5651625
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.10370735079050064,
+        -0.19402264058589935,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 23,
+      "sourceRects": {
+        "base": {
+          "x": 912,
+          "y": 1240,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 912,
+          "y": 3224,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 134.94,
+        "y": 140.1603
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 44,
+      "worldHeadingRadians": 4.31969,
+      "screenHeadingRadians": 2.730702,
+      "passengerFoot": {
+        "x": 0.447732895,
+        "y": 0.56871371
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.08419037610292435,
+        -0.20325349271297455,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 22,
+      "sourceRects": {
+        "base": {
+          "x": 1216,
+          "y": 1240,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1216,
+          "y": 3224,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 136.1108,
+        "y": 141.041
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 45,
+      "worldHeadingRadians": 4.417865,
+      "screenHeadingRadians": 2.653318,
+      "passengerFoot": {
+        "x": 0.452087171,
+        "y": 0.571995565
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.06386258453130722,
+        -0.21052688360214233,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 22,
+      "sourceRects": {
+        "base": {
+          "x": 1520,
+          "y": 1240,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1520,
+          "y": 3224,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 137.4345,
+        "y": 141.8549
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 46,
+      "worldHeadingRadians": 4.516039,
+      "screenHeadingRadians": 2.567349,
+      "passengerFoot": {
+        "x": 0.456902303,
+        "y": 0.574977823
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.04291997477412224,
+        -0.21577274799346924,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 22,
+      "sourceRects": {
+        "base": {
+          "x": 1824,
+          "y": 1240,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1824,
+          "y": 3224,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 138.8983,
+        "y": 142.5945
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 47,
+      "worldHeadingRadians": 4.614214,
+      "screenHeadingRadians": 2.470835,
+      "passengerFoot": {
+        "x": 0.462134211,
+        "y": 0.577630242
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        -0.02156381495296955,
+        -0.2189406305551529,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 25,
+      "sourceRects": {
+        "base": {
+          "x": 2128,
+          "y": 1240,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 2128,
+          "y": 3224,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 140.4888,
+        "y": 143.2523
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 48,
+      "worldHeadingRadians": 4.712389,
+      "screenHeadingRadians": 2.361641,
+      "passengerFoot": {
+        "x": 0.467728947,
+        "y": 0.579928226
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
       },
       "passengerWorld": [
         1.66095386333609e-08,
@@ -304,39 +2068,333 @@
       "foregroundObjectCount": 25,
       "sourceRects": {
         "base": {
-          "x": 768,
-          "y": 256,
-          "width": 384,
-          "height": 256
+          "x": 0,
+          "y": 1488,
+          "width": 304,
+          "height": 248
         },
         "foreground": {
-          "x": 768,
-          "y": 768,
-          "width": 384,
-          "height": 256
+          "x": 0,
+          "y": 3472,
+          "width": 304,
+          "height": 248
         }
       },
       "passengerFootPixels": {
-        "x": 182.1896,
-        "y": 133.822
+        "x": 142.1896,
+        "y": 143.8222
       },
       "waterlineAnchorPixels": {
-        "x": 192.0,
-        "y": 168.3717
+        "x": 152.0,
+        "y": 178.3718
       },
-      "widthInMap": 0.201456311
+      "widthInMap": 0.159486246
     },
     {
-      "index": 7,
-      "worldHeadingRadians": 5.497787,
-      "screenHeadingRadians": 1.080603,
+      "index": 49,
+      "worldHeadingRadians": 4.810564,
+      "screenHeadingRadians": 2.237727,
       "passengerFoot": {
-        "x": 0.51478,
-        "y": 0.526382
+        "x": 0.473635526,
+        "y": 0.581849194
       },
       "waterlineAnchor": {
         "x": 0.5,
-        "y": 0.657702
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.021563639864325523,
+        -0.2189406454563141,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 27,
+      "sourceRects": {
+        "base": {
+          "x": 304,
+          "y": 1488,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 304,
+          "y": 3472,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 143.9852,
+        "y": 144.2986
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 50,
+      "worldHeadingRadians": 4.908739,
+      "screenHeadingRadians": 2.097646,
+      "passengerFoot": {
+        "x": 0.479795724,
+        "y": 0.58337379
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.04291980341076851,
+        -0.21577277779579163,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 27,
+      "sourceRects": {
+        "base": {
+          "x": 608,
+          "y": 1488,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 608,
+          "y": 3472,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 145.8579,
+        "y": 144.6767
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 51,
+      "worldHeadingRadians": 5.006913,
+      "screenHeadingRadians": 1.941389,
+      "passengerFoot": {
+        "x": 0.486150658,
+        "y": 0.584489919
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.0638626217842102,
+        -0.21052688360214233,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 27,
+      "sourceRects": {
+        "base": {
+          "x": 912,
+          "y": 1488,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 912,
+          "y": 3472,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 147.7898,
+        "y": 144.9535
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 52,
+      "worldHeadingRadians": 5.105088,
+      "screenHeadingRadians": 1.77134,
+      "passengerFoot": {
+        "x": 0.492639474,
+        "y": 0.585185484
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.08419040590524673,
+        -0.20325347781181335,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 27,
+      "sourceRects": {
+        "base": {
+          "x": 1216,
+          "y": 1488,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1216,
+          "y": 3472,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 149.7624,
+        "y": 145.126
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 53,
+      "worldHeadingRadians": 5.203263,
+      "screenHeadingRadians": 1.592794,
+      "passengerFoot": {
+        "x": 0.499198026,
+        "y": 0.585452419
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.1037071943283081,
+        -0.19402271509170532,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 27,
+      "sourceRects": {
+        "base": {
+          "x": 1520,
+          "y": 1488,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1520,
+          "y": 3472,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 151.7562,
+        "y": 145.1922
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 54,
+      "worldHeadingRadians": 5.301438,
+      "screenHeadingRadians": 1.413263,
+      "passengerFoot": {
+        "x": 0.505765132,
+        "y": 0.585289919
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.12222542613744736,
+        -0.1829233318567276,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 27,
+      "sourceRects": {
+        "base": {
+          "x": 1824,
+          "y": 1488,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1824,
+          "y": 3472,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 153.7526,
+        "y": 145.1519
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 55,
+      "worldHeadingRadians": 5.399612,
+      "screenHeadingRadians": 1.240547,
+      "passengerFoot": {
+        "x": 0.512276645,
+        "y": 0.58469879
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.1395665407180786,
+        -0.17006227374076843,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 27,
+      "sourceRects": {
+        "base": {
+          "x": 2128,
+          "y": 1488,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 2128,
+          "y": 3472,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 155.7321,
+        "y": 145.0053
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 56,
+      "worldHeadingRadians": 5.497787,
+      "screenHeadingRadians": 1.080603,
+      "passengerFoot": {
+        "x": 0.518669408,
+        "y": 0.583685081
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
       },
       "passengerWorld": [
         0.15556341409683228,
@@ -346,37 +2404,355 @@
       "foregroundObjectCount": 27,
       "sourceRects": {
         "base": {
-          "x": 1152,
-          "y": 256,
-          "width": 384,
-          "height": 256
+          "x": 0,
+          "y": 1736,
+          "width": 304,
+          "height": 248
         },
         "foreground": {
-          "x": 1152,
-          "y": 768,
-          "width": 384,
-          "height": 256
+          "x": 0,
+          "y": 3720,
+          "width": 304,
+          "height": 248
         }
       },
       "passengerFootPixels": {
-        "x": 197.6755,
-        "y": 134.7538
+        "x": 157.6755,
+        "y": 144.7539
       },
       "waterlineAnchorPixels": {
-        "x": 192.0,
-        "y": 168.3717
+        "x": 152.0,
+        "y": 178.3718
       },
-      "widthInMap": 0.201456311
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 57,
+      "worldHeadingRadians": 5.595962,
+      "screenHeadingRadians": 0.936502,
+      "passengerFoot": {
+        "x": 0.524882895,
+        "y": 0.582257661
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.17006225883960724,
+        -0.139566570520401,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 27,
+      "sourceRects": {
+        "base": {
+          "x": 304,
+          "y": 1736,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 304,
+          "y": 3720,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 159.5644,
+        "y": 144.3999
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 58,
+      "worldHeadingRadians": 5.694137,
+      "screenHeadingRadians": 0.808741,
+      "passengerFoot": {
+        "x": 0.530856579,
+        "y": 0.580431048
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.1829233169555664,
+        -0.12222545593976974,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 27,
+      "sourceRects": {
+        "base": {
+          "x": 608,
+          "y": 1736,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 608,
+          "y": 3720,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 161.3804,
+        "y": 143.9469
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 59,
+      "worldHeadingRadians": 5.792311,
+      "screenHeadingRadians": 0.696133,
+      "passengerFoot": {
+        "x": 0.536532895,
+        "y": 0.578223387
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.19402271509170532,
+        -0.10370723158121109,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 25,
+      "sourceRects": {
+        "base": {
+          "x": 912,
+          "y": 1736,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 912,
+          "y": 3720,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 163.106,
+        "y": 143.3994
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 60,
+      "worldHeadingRadians": 5.890486,
+      "screenHeadingRadians": 0.596725,
+      "passengerFoot": {
+        "x": 0.541858553,
+        "y": 0.575656048
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.20325346291065216,
+        -0.08419043570756912,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 23,
+      "sourceRects": {
+        "base": {
+          "x": 1216,
+          "y": 1736,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1216,
+          "y": 3720,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 164.725,
+        "y": 142.7627
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 61,
+      "worldHeadingRadians": 5.988661,
+      "screenHeadingRadians": 0.508376,
+      "passengerFoot": {
+        "x": 0.546779934,
+        "y": 0.572751613
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.21052686870098114,
+        -0.06386265158653259,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 23,
+      "sourceRects": {
+        "base": {
+          "x": 1520,
+          "y": 1736,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1520,
+          "y": 3720,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 166.2211,
+        "y": 142.0424
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 62,
+      "worldHeadingRadians": 6.086836,
+      "screenHeadingRadians": 0.429066,
+      "passengerFoot": {
+        "x": 0.55125,
+        "y": 0.569539516
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.21577276289463043,
+        -0.0429198332130909,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 23,
+      "sourceRects": {
+        "base": {
+          "x": 1824,
+          "y": 1736,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 1824,
+          "y": 3720,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 167.58,
+        "y": 141.2458
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
+    },
+    {
+      "index": 63,
+      "worldHeadingRadians": 6.185011,
+      "screenHeadingRadians": 0.357028,
+      "passengerFoot": {
+        "x": 0.555227632,
+        "y": 0.566050806
+      },
+      "waterlineAnchor": {
+        "x": 0.5,
+        "y": 0.719241129
+      },
+      "passengerWorld": [
+        0.2189406305551529,
+        -0.021563883870840073,
+        0.6000000238418579
+      ],
+      "foregroundObjectCount": 23,
+      "sourceRects": {
+        "base": {
+          "x": 2128,
+          "y": 1736,
+          "width": 304,
+          "height": 248
+        },
+        "foreground": {
+          "x": 2128,
+          "y": 3720,
+          "width": 304,
+          "height": 248
+        }
+      },
+      "passengerFootPixels": {
+        "x": 168.7892,
+        "y": 140.3806
+      },
+      "waterlineAnchorPixels": {
+        "x": 152.0,
+        "y": 178.3718
+      },
+      "widthInMap": 0.159486246
     }
   ],
-  "source": "tools/diorama/render_journey_boat.py",
-  "note": "Original low-cabin working launch. Transparent fixed-size frames. Base contains the complete boat; nearer solid geometry is repeated on foreground to occlude actor feet correctly.",
-  "atlas": {
-    "path": "/assets/world/map/journey-boat.webp",
-    "width": 1536,
-    "height": 1024,
-    "bytes": 133830,
-    "sha256": "c4abc0bdf515ff89a88f4e63464749c4acd1e794797fe8f6ee9b648bdf9c082a"
+  "headingProjection": {
+    "xAxis": {
+      "x": 81.076377869,
+      "y": 24.260009766
+    },
+    "yAxis": {
+      "x": 44.591995239,
+      "y": -44.109120369
+    }
   },
-  "passengerPixelScale": 3
+  "headingCount": 64,
+  "samples": 48,
+  "source": "tools/diorama/render_journey_boat.py",
+  "note": "64 genuine Blender headings with a common alpha-safe crop. Same camera, orthoScale and pixels per world unit as the original 384px-wide boat; only vertical padding and transparent borders change. Anchor the hull at waterlineAnchorPixels, then draw the actor at its separate passengerFootPixels between base and foreground.",
+  "rawFrame": {
+    "width": 384,
+    "height": 288,
+    "crop": {
+      "x": 40,
+      "y": 6,
+      "width": 304,
+      "height": 248
+    },
+    "referenceWidthInMap": 0.201456311
+  },
+  "passengerPixelScale": 3,
+  "packager": "tools/diorama/package_journey_boat.py",
+  "atlas": {
+    "path": "/assets/world/map/journey-boat-64.webp",
+    "width": 2432,
+    "height": 3968,
+    "bytes": 721512,
+    "sha256": "1f49560c638137da251fe25366753e36b3c448a6aa090a317c4ffbce36b90a56"
+  }
 }

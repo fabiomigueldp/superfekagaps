@@ -25,12 +25,13 @@ const parsedConnection = () => {
 test('shipped boat atlas normalizes checked crops and passenger anchors for the painter', () => {
     const result = parseJourneyBoat(boatRaw);
     assert.ok(result);
-    assert.equal(result.frames.length, 8);
-    assert.equal(result.atlas.path, '/assets/world/map/journey-boat.webp');
+    assert.equal(result.frames.length, boatRaw.frames.length);
+    assert.equal(result.atlas.path, boatRaw.atlas.path);
     for (const frame of result.frames) {
-        assert.equal(frame.rear?.w, 384);
-        assert.equal(frame.foreground?.h, 256);
+        assert.equal(frame.rear?.w, boatRaw.frame.width);
+        assert.equal(frame.foreground?.h, boatRaw.frame.height);
         assert.deepEqual(frame.passengerFoot, boatRaw.frames[frame.index].passengerFootPixels);
+        assert.deepEqual(frame.waterlineAnchor, boatRaw.frames[frame.index].waterlineAnchorPixels);
         assert.equal(frame.passengerPixelScale, 3);
     }
 });
@@ -43,10 +44,35 @@ test('boat parser rejects unsafe paths, invalid crops, nonfinite headings and in
         (data: typeof boatRaw) => { data.frames[0].sourceRects.foreground.x = data.atlas.width; },
         (data: typeof boatRaw) => { data.frames[0].screenHeadingRadians = Infinity; },
         (data: typeof boatRaw) => { data.frames[0].passengerFootPixels.x += 10; },
+        (data: typeof boatRaw) => { data.frames[0].waterlineAnchorPixels.x += 10; },
+        (data: typeof boatRaw) => { data.headingProjection = { xAxis: { x: 1, y: 0 }, yAxis: { x: 1, y: 0 } }; },
         (data: typeof boatRaw) => { data.frames[0].index = 7; },
         (data: typeof boatRaw) => { data.passengerPixelScale = 0; },
     ];
     for (const mutate of mutations) { const data = clone(boatRaw); mutate(data); assert.equal(parseJourneyBoat(data), null); }
+});
+
+test('dense boat metadata requires ordered uniform headings and a finite independent projection basis', () => {
+    for (const count of [32, 64]) {
+        const data = clone(boatRaw), width = data.frame.width, height = data.frame.height;
+        data.atlas.width = width * 8; data.atlas.height = height * count / 4;
+        data.headingProjection = { xAxis: { x: 80, y: 20 }, yAxis: { x: 40, y: -40 } };
+        data.frames = Array.from({ length: count }, (_, index) => {
+            const frame = clone(boatRaw.frames[index % boatRaw.frames.length]);
+            frame.index = index; frame.worldHeadingRadians = index * Math.PI * 2 / count;
+            frame.sourceRects.base = { x: index % 8 * width, y: Math.floor(index / 8) * height, width, height };
+            frame.sourceRects.foreground = { ...frame.sourceRects.base, y: frame.sourceRects.base.y + count / 8 * height };
+            return frame;
+        });
+        const parsed = parseJourneyBoat(data); assert.ok(parsed); assert.equal(parsed.frames.length, count);
+        for (const mutate of [
+            (value: typeof data) => { value.frames[1].worldHeadingRadians = value.frames[0].worldHeadingRadians; },
+            (value: typeof data) => { [value.frames[1].worldHeadingRadians, value.frames[2].worldHeadingRadians] = [value.frames[2].worldHeadingRadians, value.frames[1].worldHeadingRadians]; },
+            (value: typeof data) => { delete value.headingProjection; },
+            (value: typeof data) => { value.headingProjection.xAxis.x = Infinity; },
+            (value: typeof data) => { value.headingProjection.yAxis = value.headingProjection.xAxis; },
+        ]) { const invalid = clone(data); mutate(invalid); assert.equal(parseJourneyBoat(invalid), null); }
+    }
 });
 
 test('shipped connection validates the route junction, docks and fixed atlas berth endpoints', () => {

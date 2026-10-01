@@ -1,17 +1,26 @@
-"""Original working launch for the Costa/Porto crossing, Blender 4.3+.
+"""Render the original working launch at genuine 3D headings (Blender 4.3+).
 
-blender -b -t 8 -P tools/diorama/render_journey_boat.py -- [--prototype]
-Only temporary renders are written here. package_journey_boat.py creates the
-compact shipped WebP atlas. The actor belongs between the base and foreground
-layers, at the exported passengerFoot coordinate for the selected heading.
+blender -b -t 8 -P render_journey_boat.py -- --output-dir RENDERS --headings 64
+Model, camera transform, orthographic scale, lighting and passenger world point
+match the original eight views. The default 384x288 raster adds vertical padding
+for the mast; package_journey_boat.py makes the shared alpha-safe crop.
+Use --headings 8 --height 256 to reproduce the legacy raw frame convention.
 """
-import bpy, math, json, os, sys
+import bpy, math, json, os, sys, argparse
 from mathutils import Vector, Matrix
 from bpy_extras.object_utils import world_to_camera_view
 
-OUT = '/tmp/feka-journey/boat'
+parser=argparse.ArgumentParser()
+parser.add_argument('--output-dir', required=True)
+parser.add_argument('--headings', type=int, choices=[8,32,48,64], default=64)
+parser.add_argument('--samples', type=int, default=48)
+parser.add_argument('--height', type=int, default=288)
+parser.add_argument('--indices', default='')
+args=parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
+if args.samples < 1 or args.height < 1:
+    parser.error('Sample count and raster height must be positive')
+OUT = args.output_dir
 os.makedirs(OUT, exist_ok=True)
-PROTOTYPE = '--prototype' in sys.argv
 bpy.ops.object.select_all(action='SELECT')
 bpy.ops.object.delete(use_global=False)
 for material in list(bpy.data.materials):
@@ -119,17 +128,24 @@ world=bpy.data.worlds.new('soft maritime sky');scene.world=world;world.use_nodes
 world.node_tree.nodes['Background'].inputs[0].default_value=(.52,.68,.82,1);world.node_tree.nodes['Background'].inputs[1].default_value=.6
 for name,loc,power,size,color in [('warm key',(-4,-6,9),680,5,(1,.85,.64)),('sea fill',(5,2,7),420,5,(.66,.82,1)),('warm rim',(-4,6,8),480,4,(1,.94,.77))]:
     bpy.ops.object.light_add(type='AREA',location=loc);o=bpy.context.object;o.name=name;o.data.energy=power;o.data.size=size;o.data.color=color;o.rotation_euler=(target-o.location).to_track_quat('-Z','Y').to_euler()
-scene.render.engine='CYCLES';scene.cycles.samples=12 if PROTOTYPE else 48;scene.cycles.use_denoising=False
-scene.render.resolution_x=384;scene.render.resolution_y=256;scene.render.resolution_percentage=100
+scene.render.engine='CYCLES';scene.cycles.samples=args.samples;scene.cycles.use_denoising=False
+scene.render.resolution_x=384;scene.render.resolution_y=args.height;scene.render.resolution_percentage=100
 scene.render.film_transparent=True;scene.render.image_settings.file_format='PNG';scene.render.image_settings.color_mode='RGBA'
 scene.view_settings.view_transform='AgX';scene.view_settings.look='AgX - Medium High Contrast';scene.view_settings.exposure=.35
 passenger=Vector((.22,0,.600));origin=Vector((0,0,.03))
 originals={o.name:o.matrix_world.copy() for o in objects}
-frames=[]
+previous=json.load(open(f'{OUT}/boat.meta.json')) if args.indices and os.path.exists(f'{OUT}/boat.meta.json') else None
+if previous and (previous.get('headingCount')!=args.headings or previous['frame']!={'width':384,'height':args.height} or previous.get('samples')!=args.samples):
+    raise ValueError('Partial renders must use matching heading count, raster dimensions and sample count')
+frames=previous['frames'] if previous else []
+render_indices=[int(item) for item in args.indices.split(',')] if args.indices else list(range(args.headings))
+if len(render_indices)!=len(set(render_indices)) or any(i<0 or i>=args.headings for i in render_indices):
+    parser.error('Partial indices must be unique and within the heading count')
+frames=[f for f in frames if f['index'] not in render_indices]
 def project(p):
     q=world_to_camera_view(scene,cam,p);return {'x':round(q.x,6),'y':round(1-q.y,6)}
-for index in ([0,4] if PROTOTYPE else range(8)):
-    angle=index*math.tau/8;rot=Matrix.Rotation(angle,4,'Z');foot=rot@passenger
+for index in render_indices:
+    angle=index*math.tau/args.headings;rot=Matrix.Rotation(angle,4,'Z');foot=rot@passenger
     for o in objects:o.matrix_world=rot@originals[o.name]
     bpy.context.view_layer.update()
     # Foreground membership is based on the mesh's transformed center depth,
@@ -143,9 +159,14 @@ for index in ([0,4] if PROTOTYPE else range(8)):
         scene.render.filepath=f'{OUT}/heading-{index}-{layer}.png'
         bpy.ops.render.render(write_still=True)
     front=project(rot@Vector((1,0,.03)));back=project(origin)
-    frames.append({'index':index,'worldHeadingRadians':round(angle,6),'screenHeadingRadians':round(math.atan2((front['y']-back['y'])*256,(front['x']-back['x'])*384),6),'passengerFoot':project(foot),'waterlineAnchor':project(origin),'passengerWorld':list(foot),'foregroundObjectCount':len(near)})
+    frames.append({'index':index,'worldHeadingRadians':round(angle,6),'screenHeadingRadians':round(math.atan2((front['y']-back['y'])*args.height,(front['x']-back['x'])*384),6),'passengerFoot':project(foot),'waterlineAnchor':project(origin),'passengerWorld':list(foot),'foregroundObjectCount':len(near)})
 for o in objects:o.hide_render=False
-meta={'version':1,'frame':{'width':384,'height':256},'orthoScale':4.15,'worldDimensions':{'length':2.98,'beam':1.22,'height':1.52},'passenger':{'heightWorld':1.02,'widthWorld':.48,'footWorld':[.22,0,.60],'openDeckBounds':{'xMin':-.30,'xMax':.72,'yMin':-.43,'yMax':.43},'drawOrder':['base','Feka at passengerFoot','foreground']},'frames':frames,'source':'tools/diorama/render_journey_boat.py','note':'Original low-cabin working launch. Transparent fixed-size frames. Base contains the complete boat; nearer solid geometry is repeated on foreground to occlude actor feet correctly.'}
+frames.sort(key=lambda f:f['index'])
+def projected_vector(offset):
+    start=world_to_camera_view(scene,cam,origin);end=world_to_camera_view(scene,cam,origin+Vector(offset))
+    return {'x':round((end.x-start.x)*384,9),'y':round((start.y-end.y)*args.height,9)}
+heading_projection={'xAxis':projected_vector((1,0,0)),'yAxis':projected_vector((0,1,0))}
+meta={'version':1,'frame':{'width':384,'height':args.height},'orthoScale':4.15,'worldDimensions':{'length':2.98,'beam':1.22,'height':1.52},'passenger':{'heightWorld':1.02,'widthWorld':.48,'footWorld':[.22,0,.60],'openDeckBounds':{'xMin':-.30,'xMax':.72,'yMin':-.43,'yMax':.43},'drawOrder':['base','Feka at passengerFoot','foreground']},'frames':frames,'headingProjection':heading_projection,'headingCount':args.headings,'samples':args.samples,'source':'tools/diorama/render_journey_boat.py','note':'Original low-cabin working launch. Transparent fixed-size frames. Base contains the complete boat; nearer solid geometry is repeated on foreground to occlude actor feet correctly.'}
 with open(f'{OUT}/boat.meta.json','w') as handle:json.dump(meta,handle,indent=2)
 bpy.ops.wm.save_as_mainfile(filepath=f'{OUT}/journey-boat.blend')
 print('JOURNEY_BOAT_OUTPUT='+OUT)
