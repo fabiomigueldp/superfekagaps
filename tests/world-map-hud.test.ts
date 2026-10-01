@@ -26,7 +26,7 @@ class Element {
     getAttribute(key: string) { return this.attributes.get(key) ?? null; }
     addEventListener(type: string, listener: Listener) { this.listeners.set(type, [...this.listeners.get(type) ?? [], listener]); }
     removeEventListener(type: string, listener: Listener) { this.listeners.set(type, (this.listeners.get(type) ?? []).filter(item => item !== listener)); }
-    focus() { this.focusCount++; }
+    focus() { this.focusCount++; (document as unknown as { activeElement: Element | null }).activeElement = this; }
     remove() { if (this.parent) this.parent.children = this.parent.children.filter(item => item !== this); }
     getContext() { return { setTransform() {}, fillRect() {}, drawImage: (...args: unknown[]) => this.draws.push(args), fillStyle: '', imageSmoothingEnabled: false }; }
     dispatch(type: string, data: Record<string, unknown> = {}) {
@@ -39,7 +39,7 @@ class Element {
 }
 function dom(t: TestContext) {
     const previous = Object.getOwnPropertyDescriptor(globalThis, 'document');
-    Object.defineProperty(globalThis, 'document', { configurable: true, value: { createElement: (tag: string) => new Element(tag) } });
+    Object.defineProperty(globalThis, 'document', { configurable: true, value: { activeElement: null, createElement: (tag: string) => new Element(tag) } });
     t.after(() => { if (previous) Object.defineProperty(globalThis, 'document', previous); else Reflect.deleteProperty(globalThis, 'document'); });
 }
 function fixture(t: TestContext) {
@@ -132,6 +132,12 @@ test('overview arrow keys focus island choices without travelling and Escape clo
     assert.ok(prevented); assert.equal(asElement(hud.overviewButtons[1]).focusCount, 1); assert.deepEqual(calls, []);
     asElement(hud.root).dispatch('keydown', { key: 'Escape', target: hud.overviewButtons[1], preventDefault() {}, stopPropagation() {} });
     assert.deepEqual(calls, ['overview']);
+    const overview = asElement(hud.tools).children.find(button => button.className.includes('world-map-overview'))!;
+    assert.equal(overview.focusCount, 1, 'The closing overview returns focus to its persistent toggle.');
+    hud.regionButton.focus();
+    asElement(hud.root).dispatch('keydown', { key: 'Escape', target: hud.regionButton });
+    assert.equal(document.activeElement as unknown, hud.regionButton, 'A persistent header control keeps its own focus.');
+    assert.equal(overview.focusCount, 1);
 });
 
 test('a journey heading names its destination without claiming arrival or relabeling a locked preview', t => {
@@ -170,6 +176,49 @@ test('a preview never claims Feka arrived and keeps all six regions accessible',
     const regions = asElement(hud.regionMenu).children.filter(child => child.className.split(' ').includes('world-map-region'));
     assert.equal(regions.length, 6);
     assert.match(regions[5].getAttribute('aria-label')!, /Domínio Pizzarino.*Bloqueada/);
+});
+
+test('focused travel actions hand off only when hidden or disabled, including a non-enterable arrival', t => {
+    const { hud, state, calls } = fixture(t);
+    const active = () => document.activeElement as unknown as Element | null;
+    for (const arrival of [state, { ...state, canEnter: false }, { ...state, preview: true }]) {
+        hud.update({ ...state, motionState: 'sailing', canEnter: false }); hud.skipButton.focus();
+        hud.update(arrival);
+        assert.equal(active(), asElement(arrival.canEnter && !arrival.preview ? hud.enterButton : hud.root));
+        assert.equal(hud.skipButton.hidden, true);
+    }
+    hud.update(state); hud.enterButton.focus();
+    const enter = asElement(hud.enterButton); let disabled = enter.disabled;
+    Object.defineProperty(enter, 'disabled', { configurable: true, get: () => disabled, set: value => {
+        disabled = value;
+        if (disabled && active() === enter) (document as unknown as { activeElement: Element | null }).activeElement = null;
+    } });
+    hud.update({ ...state, motionState: 'walking', canEnter: false });
+    assert.equal(active(), asElement(hud.root), 'Focus is captured before the browser blurs a newly disabled Enter button.');
+    hud.regionButton.focus(); const rootFocus = asElement(hud.root).focusCount;
+    hud.update(state); hud.update(state);
+    assert.equal(active(), asElement(hud.regionButton)); assert.equal(asElement(hud.root).focusCount, rootFocus);
+    const external = document.createElement('button'); external.focus();
+    hud.update({ ...state, motionState: 'walking', canEnter: false }); hud.update(state);
+    assert.equal(document.activeElement, external); assert.deepEqual(calls, []);
+});
+
+test('hiding a focused phase, departure or island name retains map focus without idle focus churn', t => {
+    const { hud, state } = fixture(t); hud.update({ ...state, overview: true });
+    const cases = [
+        { button: hud.stageButtons[0], position: (point: WorldMapHudPoint | null) => hud.positionNodes([point]) },
+        { button: hud.travelButtons['ferry-costa-porto'], position: (point: WorldMapHudPoint | null) => hud.positionTravelActions({ 'ferry-costa-porto': point }) },
+        { button: hud.overviewButtons[0], position: (point: WorldMapHudPoint | null) => hud.positionOverviewWorlds([point]) },
+    ];
+    for (const { button, position } of cases) {
+        position({ x: 120, y: 200 }); button.focus(); position(null);
+        assert.equal(button.hidden, true); assert.equal(document.activeElement as unknown, hud.root);
+        const count = asElement(hud.root).focusCount; position(null); position(null);
+        assert.equal(asElement(hud.root).focusCount, count);
+    }
+    hud.positionOverviewWorlds([{ x: 120, y: 200 }]); hud.overviewButtons[0].focus();
+    hud.update(state);
+    assert.equal(document.activeElement as unknown, hud.root, 'Closing panorama also hides its name controls during the state update.');
 });
 
 test('projection can hide all stage signs while preserving independently positioned world docks', t => {

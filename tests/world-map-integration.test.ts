@@ -116,6 +116,7 @@ function mapDOM(t: TestContext, reducedMotion = false) {
         createElement: (tag: string) => tag === 'button' ? new Button('BUTTON', focused) : new Element(tag.toUpperCase(), focused, paint.context),
         createElementNS: (_namespace: string, tag: string) => new Element(tag.toUpperCase(), focused),
         getElementById: (id: string) => id === 'game-canvas' ? gameCanvas : null });
+    Object.defineProperty(documentMock, 'activeElement', { get: () => active });
     const media = Object.assign(new Surface(), { matches: reducedMotion });
     const windowMock = Object.assign(new Surface(), { devicePixelRatio: 3, matchMedia: () => media });
     body.parent = documentMock; documentMock.parent = windowMock;
@@ -774,6 +775,50 @@ test('overview keyboard focus and native activation cannot leak into phase navig
     h.root.dispatch('keydown', { key: 'Escape' });
     assert.equal(h.internal.overview, false); assert.equal(h.events.exited, 0);
     h.root.dispatch('keydown', { key: 'Escape' }); assert.equal(h.events.exited, 1);
+});
+
+test('Escape from a focused island after portrait resize restores the overview toggle without travelling or entering', async t => {
+    const h = mapDOM(t, true), save = openSave('4-3'); await readyDominio(h, save);
+    h.get('world-map-overview').click(); h.view.render(17, save, 100, '');
+    h.root.dispatch('keydown', { key: 'ArrowRight' });
+    const island = h.internal.hud.overviewButtons[4] as Button;
+    assert.equal(h.active, island);
+    h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width: 320, height: 568 };
+    h.get('world-map-header').bounds = { x: 9, y: 10, left: 9, top: 10, width: 302, height: 84 };
+    h.get('world-map-tools').bounds = { ...h.get('world-map-header').bounds };
+    h.get('world-map-footer').bounds = { x: 9, y: 432, left: 9, top: 432, width: 302, height: 126 };
+    h.observers[0].callback(); h.view.render(17, save, 200, '');
+    assert.equal(h.active, island); assert.equal(island.hidden, false);
+    const event = island.dispatch('keydown', { key: 'Escape' });
+    h.view.render(17, save, 300, '');
+    const toggle = h.get('world-map-overview');
+    assert.equal(event.defaultPrevented, true); assert.equal(event.propagationStopped, true);
+    assert.equal(h.internal.overview, false); assert.equal(island.hidden, true);
+    assert.equal(h.active, toggle); assert.equal(toggle.hidden, false);
+    assert.equal(toggle.getAttribute('aria-pressed'), 'false');
+    assert.equal(h.internal.controlSelection, 17); assert.equal(h.internal.journey.arrived, '4-3');
+    assert.equal(h.internal.journey.destination, null); assert.deepEqual(h.events.selected, []);
+    assert.deepEqual(h.events.arrived, []); assert.equal(h.events.entered, 0); assert.equal(h.events.exited, 0);
+    toggle.dispatch('keydown', { key: 'Escape' }); assert.equal(h.events.exited, 1);
+});
+
+test('activating a focused departure retains map focus and focused skip arrival exposes Enter without starting gameplay', async t => {
+    for (const mode of ['skip', 'natural'] as const) await t.test(mode, async child => {
+        const h = mapDOM(child), save = openSave('1-5'); await readyConnection(h, save);
+        const departure = h.internal.hud.travelButtons['ferry-costa-porto'] as Button;
+        assert.equal(departure.hidden, false); departure.focus();
+        assert.equal(departure.dispatch('keydown', { key: 'Enter' }).defaultPrevented, false);
+        departure.click(); h.view.render(5, save, 100, '');
+        assert.equal(departure.hidden, true); assert.equal(h.active, h.root);
+        assert.equal(h.internal.journey.destination, '2-1'); assert.equal(h.internal.journey.arrived, '1-5');
+        const skip = h.internal.hud.skipButton as Button; skip.focus();
+        if (mode === 'skip') {
+            assert.equal(skip.dispatch('keydown', { key: 'Enter' }).defaultPrevented, false); skip.click();
+        } else tick(h, 5, save, 100, 12000);
+        assert.equal(skip.hidden, true); assert.equal(h.internal.journey.arrived, '2-1');
+        assert.equal(h.active, h.internal.hud.enterButton); assert.equal(h.internal.hud.enterButton.disabled, false);
+        assert.equal(h.events.entered, 0); assert.equal(h.events.exited, 0); assert.deepEqual(h.events.arrived, [5]);
+    });
 });
 
 test('heated ferry is gated by C2 and its return sign targets the real 5-5 terminal', async t => {

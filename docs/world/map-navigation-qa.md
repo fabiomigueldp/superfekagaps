@@ -73,3 +73,35 @@ These are setter counts, not browser frame-rate measurements.
 The final tree passed 473 TypeScript + 3 server tests in 13.66 s, both TypeScript
 projects, diff checks and a 2.02 s Vite build (489.69 kB JS / 151.76 kB gzip).
 No art, projection, cache, transport state or save change belongs to this patch.
+
+The idle-write patch shipped as `cff4bf3cdfff38146c527530ce57a6e8676ac7cc`.
+Preview smoke covered close/overview/close, native Enter, natural 1-2 walking,
+Costa→Porto departure and Skip, and actual 2-1 gameplay → pause → return with
+both travel controls restored. Public deployment `69S1nHYdqnyK8CLfVuoMxk8HX3hs`
+loaded `index-3jTQ3Ido.js`; normal progression and panorama/Space return remained
+correct. The original worktree and Oracle remained untouched.
+
+## Focus continuity findings
+
+A user-flow pass reproduced three concrete cases on the deployed build where
+the browser moved `document.activeElement` to `BODY` as a focused control hid:
+
+- Arrow to an island name in overview, then Escape to close overview.
+- Activate a departure sign with Enter as travel starts.
+- Activate “Pular viagem” with Enter as arrival replaces that action.
+
+The correction is limited to handing focus to an existing visible map control
+when its current control becomes hidden or disabled. Background updates must
+not steal focus. Route selection, travel, unlock rules and saves remain separate.
+
+The focused regression set passed 149 tests, followed by the final aggregate:
+479 TypeScript + 3 server tests in 13.90 s. Both TypeScript projects and diff
+checks passed. Vite completed in 2.47 s (490.01 kB JS / 151.85 kB gzip).
+The patch restores the panorama toggle after Escape from an island, root before
+the focused sign hides, and enabled Enter (or root for a non-enterable preview)
+after focused Skip disappears. It also captures focus before disabling Enter.
+
+Portrait coverage remains contract-level: native Chromium window-menu and edge
+resize attempts did not change its dimensions. No DevTools or denied route was
+used. Existing synthetic portrait DOM bounds do not prove real CSS rendering or
+physical touch behavior; real browser coverage is desktop and compact landscape.

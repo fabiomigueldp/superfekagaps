@@ -389,6 +389,7 @@ export class WorldMapHud {
         const signature = JSON.stringify(state);
         if (signature === this.signature) return;
         this.signature = signature;
+        const focused = document.activeElement;
         const island = ISLANDS[state.world - 1], stage = STAGES[state.stage];
         if (!island || !stage) return;
         const local = stage.number - 1, open = !!state.open[local], completed = !!state.completed[local];
@@ -416,6 +417,9 @@ export class WorldMapHud {
         this.enterButton.setAttribute('aria-label', canEnter ? `Entrar na fase ${stage.id}: ${stage.name}` : `${playLabel}. ${this.status.textContent}`);
         this.skipButton.hidden = !traveling;
         this.enterButton.hidden = traveling;
+        if ((focused === this.skipButton && !traveling) || (focused === this.enterButton && !canEnter)) {
+            if (canEnter) this.focusEnter(); else this.root.focus({ preventScroll: true });
+        }
         this.overviewButton.setAttribute('aria-pressed', String(!!state.overview));
         this.overviewButton.setAttribute('aria-label', state.overview ? 'Aproximar mapa' : 'Ver panorama');
         this.root.setAttribute('data-motion', state.motionState);
@@ -461,13 +465,16 @@ export class WorldMapHud {
             button.setAttribute('aria-pressed', String(selected));
             button.setAttribute('aria-label', `Ilha ${index + 1}: ${ISLANDS[index].name}. ${open ? 'Disponível. Ver de perto.' : 'Bloqueada. Ver prévia de perto.'}`);
             button.title = `${ISLANDS[index].name} · ${open ? 'ver ilha' : 'ver prévia'}`;
-            if (!state.overview) button.hidden = true;
+            if (!state.overview) this.position(button, null);
         });
     }
 
     private position(button: HTMLButtonElement, point: WorldMapHudPoint | null | undefined): void {
         const hidden = !point || point.visible === false || !Number.isFinite(point.x) || !Number.isFinite(point.y);
-        if (button.hidden !== hidden) button.hidden = hidden;
+        if (button.hidden !== hidden) {
+            if (hidden && document.activeElement === button) this.root.focus({ preventScroll: true });
+            button.hidden = hidden;
+        }
         if (!hidden && point) {
             const transform = `translate(${Math.round(point.x)}px, ${Math.round(point.y)}px) translate(-50%, -100%)`;
             if (button.style.transform !== transform) button.style.transform = transform;
@@ -534,7 +541,10 @@ export class WorldMapHud {
         }
         if (!this.state?.overview || this.root.hidden || this.disposed || event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
         if (event.key === 'Escape') {
-            event.preventDefault(); event.stopPropagation(); this.run(() => this.callbacks.overview()); return;
+            event.preventDefault(); event.stopPropagation();
+            const focusedIsland = this.overviewButtons.includes(document.activeElement as HTMLButtonElement);
+            this.run(() => { this.callbacks.overview(); if (focusedIsland) this.overviewButton.focus({ preventScroll: true }); });
+            return;
         }
         if (this.state.motionState !== 'idle') return;
         const key = event.key.toLowerCase(), direction = ['arrowright', 'arrowdown', 'd', 's'].includes(key) ? 1
