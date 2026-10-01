@@ -107,8 +107,9 @@
 .world-map-stage-title { grid-column: 1 / -1; min-width: 0; max-width: 100%; margin: 0 0 4px; }
 .world-map-stage-title .world-map-bitmap { max-width: 100%; }
 .world-map-stage-details { color: #ffe29a; font-size: 12px; line-height: 18px; white-space: nowrap; }
-.world-map-status, .world-map-hint { margin: 0; font-size: 13px; line-height: 18px; }
+.world-map-status, .world-map-location, .world-map-hint { margin: 0; font-size: 13px; line-height: 18px; }
 .world-map-status { color: #f5efd3; }
+.world-map-location { flex-basis: 100%; color: #ffe29a; }
 .world-map-hint { flex-basis: 100%; color: #c7d2d6; }
 .world-map-stage-actions { display: flex; align-items: center; }
 .world-map-enter, .world-map-skip {
@@ -172,7 +173,7 @@
     .world-map-stage-copy { display: block; }
     .world-map-stage-title .world-map-bitmap { width: auto; height: auto; }
     .world-map-stage-details { font-size: 12px; line-height: 16px; }
-    .world-map-status, .world-map-hint { margin-top: 3px; font-size: 12px; line-height: 16px; }
+    .world-map-status, .world-map-location, .world-map-hint { margin-top: 3px; font-size: 12px; line-height: 16px; }
     .world-map-warning { font-size: 12px; line-height: 16px; }
     .world-map-enter { min-width: 94px; }
     .world-map-skip { min-width: 94px; padding-inline: 5px; }
@@ -195,6 +196,7 @@
     .world-map-stage-details { display: none; }
     .world-map-status { margin-top: 2px; }
     .world-map-hint { display: none; }
+    .is-overview .world-map-hint { display: block; }
     .world-map-region-menu { top: max(56px, calc(env(safe-area-inset-top) + 50px)); max-height: calc(100% - 66px - env(safe-area-inset-bottom)); }
 }
 @media (max-height: 480px) and (max-width: 419px) {

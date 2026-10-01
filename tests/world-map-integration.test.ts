@@ -767,6 +767,58 @@ test('all six owned overview labels select their own region and open its close v
     }
 });
 
+test('panorama primary action opens the selected island and a double click cannot also enter gameplay', async t => {
+    const h = mapDOM(t), save = openSave('4-3'); await readyDominio(h, save);
+    h.get('world-map-overview').click(); h.view.render(17, save, 100, '');
+    const primary = h.internal.hud.enterButton as Button;
+    assert.equal(h.get('world-map-stage-title').textContent, 'Ilha 4: Serra');
+    assert.equal(h.get('world-map-location').textContent, 'Feka em 4-3 · Serra');
+    assert.match(primary.getAttribute('aria-label')!, /Ver fases da ilha 4/);
+    primary.dispatch('click', { detail: 1 });
+    assert.equal(h.internal.overview, false); assert.equal(h.internal.controlSelection, 17);
+    assert.equal(h.internal.journey.arrived, '4-3'); assert.equal(h.internal.journey.destination, null);
+    assert.equal(h.events.entered, 0);
+    primary.dispatch('click', { detail: 2 }); assert.equal(h.events.entered, 0);
+    primary.dispatch('click', { detail: 1 }); assert.equal(h.events.entered, 1);
+});
+
+test('a locked panorama primary action preserves actual arrival and close-view prerequisites', async t => {
+    const h = mapDOM(t), save = { ...freshSave(), selected: '1-5', completed: ['1-1', '1-2', '1-3', '1-4'] };
+    await readyDominio(h, save); h.view.render(25, save, 100, '');
+    h.get('world-map-overview').click(); h.view.render(25, save, 200, '');
+    assert.equal(h.get('world-map-location').textContent, 'Feka em 1-5 · Costa');
+    assert.match(h.get('world-map-status').textContent, /Ilha selecionada · bloqueada/);
+    const primary = h.internal.hud.enterButton as Button;
+    assert.equal(primary.disabled, false); primary.click();
+    assert.equal(h.internal.overview, false); assert.equal(h.internal.controlSelection, 25);
+    assert.equal(h.internal.journey.arrived, '1-5'); assert.equal(h.events.entered, 0);
+    assert.equal(primary.disabled, true);
+    assert.match(h.get('world-map-status').textContent, /Prévia · Conclua 5-5/);
+    assert.equal(h.get('world-map-location').textContent, 'Feka em 1-5 · Costa');
+});
+
+test('panorama keeps an in-flight journey intact through keyboard navigation and Skip arrival', async t => {
+    const h = mapDOM(t), save = openSave('1-5'); await readyConnection(h, save);
+    h.internal.hud.travelButtons['ferry-costa-porto'].click(); h.view.render(5, save, 100, '');
+    h.get('world-map-overview').click(); h.view.render(5, save, 200, '');
+    const journey = structuredClone(h.internal.journey);
+    assert.ok(h.internal.hud.overviewButtons.every((button: Button) => button.hidden));
+    h.root.focus();
+    for (const key of ['ArrowRight', 'w', 'Enter', ' ']) {
+        const event = h.root.dispatch('keydown', { key });
+        assert.equal(event.defaultPrevented, true); assert.equal(h.active, h.root);
+    }
+    assert.deepEqual(h.internal.journey, journey); assert.equal(h.internal.controlSelection, 5);
+    assert.equal(h.get('world-map-location').textContent, 'Última chegada: 1-5 · Costa');
+    const skip = h.internal.hud.skipButton as Button; assert.equal(skip.hidden, false); skip.focus();
+    assert.equal(skip.dispatch('keydown', { key: 'Enter' }).defaultPrevented, false); skip.click();
+    assert.equal(h.internal.overview, true); assert.equal(h.internal.journey.arrived, '2-1');
+    assert.equal(h.get('world-map-location').textContent, 'Feka em 2-1 · Porto');
+    assert.equal(h.active, h.internal.hud.enterButton); assert.equal(h.events.entered, 0);
+    h.internal.hud.enterButton.click();
+    assert.equal(h.internal.overview, false); assert.equal(h.events.entered, 0);
+});
+
 test('owned island previews preserve Feka and restore the actual arrival when returning to its island', async t => {
     const h = mapDOM(t), save = { ...freshSave(), selected: '1-5', completed: ['1-1', '1-2', '1-3', '1-4'] };
     await readyDominio(h, save); const origin = { ...h.internal.marker };

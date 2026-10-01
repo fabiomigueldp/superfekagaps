@@ -602,7 +602,7 @@ export class WorldMapView {
     private refreshHud(warning = '', toast = ''): void {
         if (!this.save || !this.journey) return;
         const stage = STAGES[this.controlSelection], world = stage.world;
-        this.hud.update({ world, stage: this.controlSelection, arrivedWorld: worldOf(this.journey.arrived),
+        this.hud.update({ world, stage: this.controlSelection, arrivedWorld: worldOf(this.journey.arrived), arrivedStage: this.journey.arrived,
             open: Array.from({ length: 5 }, (_, n) => isUnlocked(`${world}-${n + 1}`, this.save!)),
             completed: Array.from({ length: 5 }, (_, n) => this.save!.completed.includes(`${world}-${n + 1}`)),
             seals: Array.from({ length: 5 }, (_, n) => this.save!.seals.filter(id => id.startsWith(`${world}-${n + 1}:`)).length),

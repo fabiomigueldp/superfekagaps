@@ -160,3 +160,25 @@ links. The World studio listed all 30 phases and previewed 6-1 in isolation;
 no level data, files or production save were edited during those browser checks.
 Full continuous-key gameplay was not established by the available input pass;
 jump, landing, guidance advancement, pause and map return were observed.
+
+## Contextual panorama action
+
+The consolidated production screenshot exposed a mismatch: the panorama's
+boards represent islands, but its footer still described walking to a phase
+and offered immediate phase entry. Panorama now identifies the selected island,
+invites the player to inspect its phases, and uses “Ver fases” to open the
+existing close view. The confirmed Feka arrival has its own persistent line;
+an inspected destination cannot masquerade as the character's location.
+
+Close view retains phase entry and exact prerequisite feedback. Travel retains
+Skip and reports the last confirmed arrival. While overview boards are hidden
+during travel, its navigation keys are consumed without focusing or activating
+invisible boards. A double click on the changing primary action cannot also
+enter gameplay after opening the close view. No save, route, art or progression
+rules change in this correction.
+
+The final source tree passed 503 TypeScript + 3 server tests in 13.32 s, both
+TypeScript projects and diff checks. Vite built in 1.19 s: 491.68 kB JS /
+152.36 kB gzip, 19.94 kB CSS / 4.80 kB gzip. Real compact-landscape and desktop
+checks follow on the matching preview; the prior portrait browser limitation
+still applies.

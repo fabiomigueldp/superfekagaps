@@ -42,10 +42,11 @@ function dom(t: TestContext) {
     Object.defineProperty(globalThis, 'document', { configurable: true, value: { activeElement: null, createElement: (tag: string) => new Element(tag) } });
     t.after(() => { if (previous) Object.defineProperty(globalThis, 'document', previous); else Reflect.deleteProperty(globalThis, 'document'); });
 }
-function fixture(t: TestContext) {
+function fixture(t: TestContext, overviewCallback = false) {
     dom(t);
     const calls: Array<string | number> = [];
     const hud = new WorldMapHud({ selectStage: index => calls.push(index), selectWorld: world => calls.push(`world:${world}`),
+        selectOverviewWorld: overviewCallback ? world => calls.push(`overview-world:${world}`) : undefined,
         enter: () => calls.push('enter'), skip: () => calls.push('skip'), overview: () => calls.push('overview'), menu: () => calls.push('menu') });
     const state: WorldMapHudState = { world: 1, stage: 0, open: [true, true, false, false, false],
         completed: [true, false, false, false, false], seals: [3, 1, 0, 0, 0], globalProgress: { completed: 1, seals: 4 },
@@ -108,6 +109,47 @@ test('panorama buttons own six full region names and keep locked islands inspect
     hud.setVisible(false); hud.overviewButtons[0].click(); assert.equal(calls.length, 6);
 });
 
+test('panorama footer describes an island and opens its phases even when that island is locked', t => {
+    const { hud, calls, state } = fixture(t, true), root = asElement(hud.root);
+    for (const [world, stage, preview] of [[1, 0, false], [6, 25, true]] as const) {
+        hud.update({ ...state, world, stage, overview: true, preview, canEnter: !preview, arrivedStage: '1-2' });
+        assert.equal(find(find(root, 'world-map-stage-title'), 'world-map-sr').textContent, `Ilha ${world}: ${world === 1 ? 'Costa' : 'Domínio'}`);
+        assert.match(find(root, 'world-map-status').textContent, world === 1 ? /Ilha selecionada · disponível/ : /Ilha selecionada · bloqueada/);
+        assert.equal(find(root, 'world-map-location').textContent, 'Feka em 1-2 · Costa');
+        assert.equal(find(root, 'world-map-location').hidden, false);
+        assert.equal(find(root, 'world-map-hint').textContent, 'Escolha uma ilha para ver suas fases.');
+        assert.equal(find(root, 'world-map-stage-details').hidden, true);
+        assert.equal(hud.enterButton.disabled, false); assert.equal(hud.enterButton.hidden, false);
+        assert.match(hud.enterButton.getAttribute('aria-label')!, /Ver fases da ilha/);
+        hud.enterButton.click(); assert.equal(calls.at(-1), `overview-world:${world}`);
+    }
+    assert.equal(calls.includes('enter'), false);
+    hud.setVisible(false); hud.enterButton.click(); assert.equal(calls.length, 2);
+});
+
+test('moving in panorama preserves Skip and last arrival without activating hidden islands', t => {
+    const { hud, calls, state } = fixture(t, true), root = asElement(hud.root);
+    hud.root.focus();
+    for (const motionState of ['walking', 'boarding', 'sailing', 'riding', 'arriving'] as const) {
+        hud.update({ ...state, overview: true, world: 2, stage: 5, canEnter: false, motionState, arrivedStage: '1-5' });
+        assert.equal(find(root, 'world-map-location').textContent, 'Última chegada: 1-5 · Costa');
+        assert.equal(hud.skipButton.hidden, false); assert.equal(hud.enterButton.hidden, true);
+        assert.ok(hud.overviewButtons.every(button => button.hidden));
+        for (const key of ['ArrowRight', 'w', 'Enter', ' ']) {
+            const event = root.dispatch('keydown', { key, target: hud.root });
+            assert.equal(event.defaultPrevented, true); assert.equal(document.activeElement, hud.root);
+        }
+        assert.equal(calls.length, 0);
+    }
+    hud.skipButton.click(); assert.deepEqual(calls, ['skip']);
+    hud.skipButton.focus();
+    hud.update({ ...state, overview: true, world: 2, stage: 5, arrivedStage: '2-1' });
+    assert.equal(hud.skipButton.hidden, true); assert.equal(hud.enterButton.hidden, false);
+    assert.equal(document.activeElement, hud.enterButton);
+    assert.equal(find(root, 'world-map-location').textContent, 'Feka em 2-1 · Porto');
+    assert.match(hud.enterButton.getAttribute('aria-label')!, /Ver fases/);
+});
+
 test('island decoration is lazy and shared, and disposal prevents a late overview repaint', async t => {
     const resources = signResources(t), { hud, state } = fixture(t);
     await resources.metadata(); resources.images[0].onload!(); await resources.settle();
@@ -126,6 +168,7 @@ test('island decoration is lazy and shared, and disposal prevents a late overvie
 
 test('overview arrow keys focus island choices without travelling and Escape closes only the overview', t => {
     const { hud, calls, state } = fixture(t); hud.update({ ...state, overview: true });
+    hud.positionOverviewWorlds(Array.from({ length: 6 }, (_, n) => ({ x: 80 + n * 140, y: 160 })));
     let prevented = false;
     asElement(hud.root).dispatch('keydown', { key: 'ArrowRight', target: hud.overviewButtons[0],
         preventDefault() { prevented = true; }, stopPropagation() {} });

@@ -71,6 +71,7 @@ export interface WorldMapHudState {
     overview?: boolean;
     /** Last confirmed arrival, distinct from a selected destination or preview. */
     arrivedWorld?: number;
+    arrivedStage?: string;
 }
 export interface WorldMapHudPoint {
     /** Scene-relative CSS pixels at the foot of the sign. */
@@ -195,6 +196,7 @@ export class WorldMapHud {
     private readonly stageTitleBitmap = bitmap(this.stageTitle);
     private readonly stageTitleText = accessibleText(this.stageTitle, '');
     private readonly status = element('p', 'world-map-status');
+    private readonly location = element('p', 'world-map-location');
     private readonly hint = element('p', 'world-map-hint');
     private readonly stageDetails = element('span', 'world-map-stage-details');
     private readonly globalProgress = element('p', 'world-map-region-progress');
@@ -294,12 +296,15 @@ export class WorldMapHud {
             this.regionButtons.push(button); this.regionStates.push(status); this.regionMenu.append(button);
         }
         const copy = element('div', 'world-map-stage-copy');
-        copy.append(this.stageDetails, this.status, this.hint);
+        copy.append(this.stageDetails, this.status, this.location, this.hint);
         const actions = element('div', 'world-map-stage-actions');
         this.enterButton = element('button', 'world-map-enter'); this.enterButton.type = 'button';
         this.playCanvas = bitmap(this.enterButton); this.playText = accessibleText(this.enterButton, 'Entrar');
-        this.enterButton.addEventListener('click', () => this.run(() => {
-            if (this.state?.canEnter && !this.state.preview && this.state.motionState === 'idle' && this.state.open[this.state.stage % 5]) callbacks.enter();
+        this.enterButton.addEventListener('click', event => this.run(() => {
+            if (!this.state || event.detail > 1) return;
+            if (this.state.overview) {
+                if (callbacks.selectOverviewWorld) callbacks.selectOverviewWorld(this.state.world); else callbacks.selectWorld(this.state.world);
+            } else if (this.state.canEnter && !this.state.preview && this.state.motionState === 'idle' && this.state.open[this.state.stage % 5]) callbacks.enter();
         }));
         this.skipButton = action('world-map-skip', 'Pular →', () => this.run(() => {
             if (this.state && this.state.motionState !== 'idle') callbacks.skip();
@@ -399,7 +404,8 @@ export class WorldMapHud {
         const prerequisiteHint = prerequisite ? `Conclua ${prerequisite.id}: ${prerequisite.name} para visitar esta fase.` : '';
         const traveling = state.motionState !== 'idle';
         const canEnter = state.canEnter && open && !state.preview && !traveling;
-        const title = `${stage.id} ${stage.name}`;
+        const canAct = !!state.overview || canEnter;
+        const title = state.overview ? `Ilha ${state.world}: ${REGION_NAMES[state.world - 1]}` : `${stage.id} ${stage.name}`;
         const changingRegion = traveling && !state.preview && state.arrivedWorld !== undefined && state.arrivedWorld !== state.world;
         this.titleText.textContent = changingRegion ? `Rumo a ${island.name}` : island.name;
         lettering(this.titleBitmap, changingRegion ? `Rumo a ${REGION_NAMES[state.world - 1]}` : island.name, ART.goldLight, 165);
@@ -407,28 +413,37 @@ export class WorldMapHud {
         phaseLettering(this.stageTitleBitmap, title);
         this.stageTitle.title = title;
         this.stageDetails.textContent = stage.encounter ? 'Encontro' : `${state.seals[local] ?? 0}/3 selos`;
-        this.status.textContent = state.preview ? traveling ? `Prévia · ${MOTION_COPY[state.motionState]}`
+        this.stageDetails.hidden = !!state.overview;
+        this.status.textContent = state.overview ? traveling ? MOTION_COPY[state.motionState]
+            : `Ilha selecionada · ${state.worldAvailability[state.world - 1] ? 'disponível' : 'bloqueada'}`
+            : state.preview ? traveling ? `Prévia · ${MOTION_COPY[state.motionState]}`
             : prerequisite ? `Prévia · Conclua ${prerequisite.id}` : 'Prévia · Feka não chegou aqui'
             : traveling ? MOTION_COPY[state.motionState]
             : !open ? 'Caminho fechado'
             : canEnter ? completed ? 'Concluída · pode entrar de novo' : 'Feka chegou · pode entrar'
             : 'Destino marcado';
-        this.hint.textContent = prerequisiteHint || state.hint || (state.preview || !open ? 'Conclua o caminho anterior para visitar.'
+        const arrived = STAGES.find(entry => entry.id === state.arrivedStage);
+        this.location.textContent = arrived ? `${traveling ? 'Última chegada' : 'Feka em'}${traveling ? ':' : ''} ${arrived.id} · ${REGION_NAMES[arrived.world - 1]}` : '';
+        this.location.hidden = !arrived;
+        this.hint.textContent = state.overview ? 'Escolha uma ilha para ver suas fases.'
+            : prerequisiteHint || state.hint || (state.preview || !open ? 'Conclua o caminho anterior para visitar.'
             : traveling ? 'Você pode mudar o destino durante a viagem.' : 'Toque numa placa para caminhar até ela.');
-        this.enterButton.disabled = !canEnter;
-        const playLabel = canEnter ? 'Entrar →' : state.preview ? 'Prévia' : traveling ? 'A caminho' : open ? 'Aguarde' : 'Fechada';
-        lettering(this.playCanvas, playLabel, canEnter ? ART.ink : ART.muted);
+        this.enterButton.disabled = !canAct;
+        const playLabel = state.overview ? 'Ver fases' : canEnter ? 'Entrar →' : state.preview ? 'Prévia' : traveling ? 'A caminho' : open ? 'Aguarde' : 'Fechada';
+        lettering(this.playCanvas, playLabel, canAct ? ART.ink : ART.muted);
         this.playText.textContent = playLabel;
-        this.enterButton.setAttribute('aria-label', canEnter ? `Entrar na fase ${stage.id}: ${stage.name}` : `${playLabel}. ${this.status.textContent}`);
+        this.enterButton.setAttribute('aria-label', state.overview ? `Ver fases da ilha ${state.world}: ${island.name}`
+            : canEnter ? `Entrar na fase ${stage.id}: ${stage.name}` : `${playLabel}. ${this.status.textContent}`);
         this.skipButton.hidden = !traveling;
         this.enterButton.hidden = traveling;
-        if ((focused === this.skipButton && !traveling) || (focused === this.enterButton && !canEnter)) {
-            if (canEnter) this.focusEnter(); else this.root.focus({ preventScroll: true });
+        if ((focused === this.skipButton && !traveling) || (focused === this.enterButton && (!canAct || traveling))) {
+            if (canAct && !traveling) this.focusEnter(); else this.root.focus({ preventScroll: true });
         }
         this.overviewButton.setAttribute('aria-pressed', String(!!state.overview));
         this.overviewButton.setAttribute('aria-label', state.overview ? 'Aproximar mapa' : 'Ver panorama');
         this.root.setAttribute('data-motion', state.motionState);
         this.root.classList.toggle('is-preview', !!state.preview);
+        this.root.classList.toggle('is-overview', !!state.overview);
         this.nodeLayer.setAttribute('aria-label', state.overview ? 'Ilhas do arquipélago' : 'Fases e transportes do mapa');
         this.globalProgress.textContent = `${state.globalProgress.completed}/30 fases · ${state.globalProgress.seals}/72 selos`;
         const warnings = state.warnings?.filter(Boolean).join(' ') ?? '';
@@ -453,7 +468,8 @@ export class WorldMapHud {
         this.paintOverview(state);
         for (const id of WORLD_MAP_TRAVEL_ACTION_IDS) this.updateTravel(id, !!state.worldAvailability[WORLD_MAP_TRAVEL_ACTIONS[id].toWorld - 1]);
         const announcedStatus = prerequisite ? `${traveling ? this.status.textContent : 'Prévia'}. ${prerequisiteHint}` : `${this.status.textContent}.`;
-        const announcement = `${title}. ${announcedStatus} ${this.stageDetails.textContent}.`;
+        const announcement = state.overview ? `${title}. ${this.status.textContent}. ${this.location.textContent}. ${this.hint.textContent}`
+            : `${title}. ${announcedStatus} ${this.stageDetails.textContent}.${arrived ? ` ${this.location.textContent}.` : ''}`;
         if (announcement !== this.announcement) { this.announcement = announcement; this.announcer.textContent = announcement; }
     }
     private paintStage(index: number, state: WorldMapHudState): void {
@@ -552,15 +568,24 @@ export class WorldMapHud {
             this.run(() => { this.callbacks.overview(); if (focusedIsland) this.overviewButton.focus({ preventScroll: true }); });
             return;
         }
-        if (this.state.motionState !== 'idle') return;
         const key = event.key.toLowerCase(), direction = ['arrowright', 'arrowdown', 'd', 's'].includes(key) ? 1
             : ['arrowleft', 'arrowup', 'a', 'w'].includes(key) ? -1 : 0;
+        const activateIsland = (event.key === 'Enter' || event.key === ' ') && event.target === this.root;
+        // The camera hides island boards during a journey. Keep these keys in
+        // the panorama without focusing or activating its invisible controls.
+        if (this.state.motionState !== 'idle') {
+            if (direction || activateIsland) { event.preventDefault(); event.stopPropagation(); }
+            return;
+        }
         if (direction) {
             event.preventDefault(); event.stopPropagation();
             const focused = this.overviewButtons.indexOf(event.target as HTMLButtonElement), current = focused < 0 ? this.state.world - 1 : focused;
-            this.overviewButtons[Math.max(0, Math.min(5, current + direction))]?.focus({ preventScroll: true });
-        } else if ((event.key === 'Enter' || event.key === ' ') && event.target === this.root) {
-            event.preventDefault(); event.stopPropagation(); this.overviewButtons[this.state.world - 1]?.click();
+            const button = this.overviewButtons[Math.max(0, Math.min(5, current + direction))];
+            if (button && !button.hidden) button.focus({ preventScroll: true });
+        } else if (activateIsland) {
+            event.preventDefault(); event.stopPropagation();
+            const button = this.overviewButtons[this.state.world - 1];
+            if (button && !button.hidden) button.click();
         }
     };
     dispose(): void {
