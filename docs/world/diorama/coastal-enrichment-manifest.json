@@ -1,0 +1,52 @@
+{
+  "costa": {
+    "size": [
+      1920,
+      1200
+    ],
+    "alphaBounds": [
+      104,
+      96,
+      1752,
+      1166
+    ],
+    "previousImageBytes": 199774,
+    "imageBytes": 306508,
+    "metadataBytes": 9627,
+    "imageSha256": "cfef64840259cafcdf2280638a176c44b1050e40803d4f6060698556fe1a7363",
+    "protectedContract": [
+      "nodes",
+      "routes",
+      "secretRoute",
+      "worldRoutes",
+      "camera",
+      "size"
+    ],
+    "decodedBytes": 9216000
+  },
+  "porto": {
+    "size": [
+      1920,
+      1200
+    ],
+    "alphaBounds": [
+      274,
+      153,
+      1691,
+      1077
+    ],
+    "previousImageBytes": 181346,
+    "imageBytes": 218184,
+    "metadataBytes": 6077,
+    "imageSha256": "99223baf518f921485b9b10b27448dbb14d3eb803879465db3711b1967b5a425",
+    "protectedContract": [
+      "nodes",
+      "routes",
+      "secretRoute",
+      "worldRoutes",
+      "camera",
+      "size"
+    ],
+    "decodedBytes": 9216000
+  }
+}

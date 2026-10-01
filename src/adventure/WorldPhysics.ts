@@ -16,6 +16,8 @@ export interface MovingBody extends MechanismSpec {
     hitAt?: number;
     beltOffset: number;
     changedAt?: number;
+    /** A manual valve restart; boss-authored phase resets remain independent. */
+    jetOpenedAt?: number;
     observedActive: boolean;
 }
 export class WorldLevel extends Level {
@@ -81,6 +83,9 @@ export interface Barrel extends Rect {
     boss: boolean;
     rotation: number;
     landedAt?: number;
+    /** Presentation markers for launcher kegs only, on the simulation clock. */
+    launchedAt?: number;
+    landingPoint?: Vector2;
 }
 export class WorldObjects {
     bodies: MovingBody[];
@@ -109,6 +114,7 @@ export class WorldObjects {
         if (target) {
             target.active = !target.active;
             this.recordChange(target);
+            if (target.kind === 'jet') target.jetOpenedAt = target.active ? undefined : this.time;
             this.events.push({ kind: 'switch', x: button.x, y: button.y });
         }
         return !!target;
@@ -138,7 +144,8 @@ export class WorldObjects {
                 b.beltOffset += (b.direction ?? 1) * (b.active ? -1 : 1) * BELT_CARRY_SPEED * dt / (1000 / 60);
             if (b.kind === 'jet' && Math.abs(b.x - playerX) < 220) {
                 const before = jetCycle(b, beforeTime), now = jetCycle(b, this.time);
-                if (now.phase === 'charging' && before.phase !== 'charging')
+                const reopened = !b.active && b.jetOpenedAt !== undefined && beforeTime <= b.jetOpenedAt && this.time > b.jetOpenedAt;
+                if (now.phase === 'charging' && (before.phase !== 'charging' || reopened))
                     this.events.push({ kind: 'pressure', x: b.x + b.width / 2, y: b.y + b.height - 4 });
                 if (now.danger && !before.danger)
                     this.events.push({ kind: 'jet', x: b.x + b.width / 2, y: b.y + b.height - 4 });
@@ -171,7 +178,8 @@ export class WorldObjects {
             }
             if (b.kind === 'launcher' && b.timer === 0 && Math.abs(b.x - playerX) < 480) {
                 const muzzle = cannonMuzzle(b), direction = b.direction ?? -1;
-                this.spawnBarrel(muzzle.x - (direction < 0 ? 14 : 0), muzzle.y - 8, direction, b.pressurized);
+                const keg = this.spawnBarrel(muzzle.x - (direction < 0 ? 14 : 0), muzzle.y - 8, direction, b.pressurized);
+                keg.launchedAt = this.time;
                 b.firedAt = this.time;
                 if (Math.abs(b.x - playerX) < 220)
                     this.events.push({ kind: 'cannon', x: muzzle.x, y: muzzle.y });
@@ -192,6 +200,8 @@ export class WorldObjects {
             const result = level.resolveBarrel(p, { x: p.vx, y: p.vy });
             if (result.grounded && p.vy > 2) {
                 p.landedAt = this.time;
+                if (p.launchedAt !== undefined)
+                    p.landingPoint = { x: result.position.x + p.width / 2, y: result.position.y + p.height };
                 if (Math.abs(p.x - playerX) < 220)
                     this.events.push({ kind: 'barrelLand', x: p.x + p.width / 2, y: result.position.y + p.height });
             }

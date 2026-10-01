@@ -1,0 +1,107 @@
+{
+  "world": 2,
+  "frame": [
+    1920,
+    1200
+  ],
+  "baselineFieldsPreserved": [
+    "nodes",
+    "routes",
+    "secretRoute",
+    "worldRoutes",
+    "camera",
+    "size"
+  ],
+  "alphaBounds": [
+    274,
+    153,
+    1691,
+    1077
+  ],
+  "edgeAlphaMax": {
+    "top": 0,
+    "left": 0,
+    "bottom": 0,
+    "right": 0
+  },
+  "newProjectedRayCount": 15120,
+  "newProjectedContactCount": 0,
+  "newHeadroomContactCount": 0,
+  "canonicalSupportAndHeadroom": {
+    "sampleCount": 666,
+    "headroomRayCount": 666,
+    "supportRayCount": 666,
+    "obstructionCount": 0,
+    "unsupportedCount": 0,
+    "maxAdjacentSampleRise": 0.0643
+  },
+  "canonicalLoadProjection": {
+    "sampleCount": 273,
+    "conflictCount": 0
+  },
+  "runtimeBytes": 224394,
+  "files": {
+    "porto-diorama.webp": {
+      "bytes": 218184,
+      "sha256": "99223baf518f921485b9b10b27448dbb14d3eb803879465db3711b1967b5a425"
+    },
+    "porto-diorama.meta.json": {
+      "bytes": 6210,
+      "sha256": "e18e076c867afb2176d75005a5739c9684e4960ddb7526881c7f8609680ff80d"
+    }
+  },
+  "baselineImageSha256": "c49d322dd21031bdcf3d9e67128e8e8dc1d68cc21113c19f42b0b71047304e69",
+  "note": "Scratch candidate only. Full native camera and original walking geometry, published route controls, boarding and bridge contract stay fixed. Zero new projected actor contacts and zero open-water ferry contacts; existing terminal projection contacts are separately reported.",
+  "ferryAlphaAudit": {
+    "sampleCount": 1034,
+    "cases": [
+      {
+        "from": 1,
+        "to": 2,
+        "samples": 216,
+        "openWaterContacts": 0,
+        "minimumOpenWaterClearanceNativePixels": 47,
+        "terminalContactPoseCount": 101
+      },
+      {
+        "from": 2,
+        "to": 1,
+        "samples": 216,
+        "openWaterContacts": 0,
+        "minimumOpenWaterClearanceNativePixels": 21,
+        "terminalContactPoseCount": 96
+      },
+      {
+        "from": 5,
+        "to": 6,
+        "samples": 199,
+        "openWaterContacts": 0,
+        "minimumOpenWaterClearanceNativePixels": 48,
+        "terminalContactPoseCount": 65
+      },
+      {
+        "from": 6,
+        "to": 5,
+        "samples": 199,
+        "openWaterContacts": 0,
+        "minimumOpenWaterClearanceNativePixels": 5,
+        "terminalContactPoseCount": 65
+      },
+      {
+        "from": 5,
+        "to": 5,
+        "samples": 204,
+        "openWaterContacts": 0,
+        "minimumOpenWaterClearanceNativePixels": 48,
+        "terminalContactPoseCount": 69
+      }
+    ],
+    "inputSamplesSha256": "beb9c9e61a3a52d3834d5a12542a8a8b4696d52959f1b886755e711ec0aef084",
+    "method": "Replace only the Porto alpha layer in the final 64-view ferry pose audit, at native1920\u00d71200 metric. Alpha>32 includes every new prop/shore pixel. Preserve terminal projection contacts as separate findings."
+  },
+  "sourceHashes": {
+    "enrich_porto.py": "dd1cf37f3bb14c775769384740193c24774fcb1674b3c29ffb1982fcb348ccfc",
+    "source/porto_baseline.py": "ad10f064c9f5c66581c741296972105043790a2fd1d87fcb323b5fd29eeb9d0d",
+    "package_porto_candidate.py": "415f760735942ca6f0502e4d0c7cc24e84db02592e509100bd69c3f591870143"
+  }
+}

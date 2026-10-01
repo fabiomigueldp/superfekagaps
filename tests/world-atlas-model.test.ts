@@ -168,7 +168,7 @@ test('camera uses real insets and tolerates missing art, empty scenes and very s
     const open = getAtlasCamera({ ...base, insets: { top: 16, bottom: 20 } });
     assert.ok(open.zoom > tight.zoom, 'Removing a measured panel returns space to the artwork.');
     assert.equal(ATLAS_ART_BOUNDS[1].top, 96 / 1200);
-    assert.equal(layers[1].metadata.artBounds?.left, .144271, 'Parser preserves authored horizontal silhouette bounds.');
+    assert.equal(layers[1].metadata.artBounds?.left, .142708, 'Parser preserves the enriched Porto silhouette (274/1920, rounded to six decimals).');
 });
 
 test('partial or reversed horizontal silhouette bounds are rejected, legacy vertical bounds remain supported', () => {

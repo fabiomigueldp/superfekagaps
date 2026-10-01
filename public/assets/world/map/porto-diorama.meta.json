@@ -1,7 +1,6 @@
 {
   "version": 1,
   "world": 2,
-  "status": "authored-candidate-for-runtime-review",
   "size": {
     "width": 1920,
     "height": 1200
@@ -372,9 +371,14 @@
     "conflictCount": 0
   },
   "artBounds": {
-    "left": 0.144271,
+    "left": 0.142708,
     "top": 0.1275,
-    "right": 0.844792,
+    "right": 0.880729,
     "bottom": 0.8975
+  },
+  "enrichmentAuditSummary": {
+    "projectedSamples": 15120,
+    "newProjectedContactCount": 0,
+    "newHeadroomContactCount": 0
   }
 }

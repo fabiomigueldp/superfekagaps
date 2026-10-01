@@ -1,7 +1,7 @@
 import type { Rect, Vector2 } from '../types';
 import type { MechanismSpec } from './types';
 
-type Machine = MechanismSpec & { active: boolean; timer: number; firedAt?: number };
+type Machine = MechanismSpec & { active: boolean; timer: number; firedAt?: number; jetOpenedAt?: number };
 export type JetPhase = 'idle' | 'charging' | 'rising' | 'flowing' | 'falling' | 'venting';
 export interface JetCycle {
     phase: JetPhase;
@@ -12,9 +12,18 @@ export interface JetCycle {
     vent: number;
 }
 const clamp = (n: number) => Math.max(0, Math.min(1, n));
-export function jetCycle(b: Machine, time: number): JetCycle {
+
+/** Opening a stopped valve starts a complete, authored warning before pressure returns. */
+export function jetCycleTick(b: Machine, time: number): number {
     const period = Math.max(1, b.period ?? 4200);
-    const t = ((time + (b.phase ?? 0)) % period + period) % period / period * 4200;
+    const elapsed = !b.active && b.jetOpenedAt !== undefined
+        ? Math.max(0, time - b.jetOpenedAt) + period * 1000 / 4200
+        : time + (b.phase ?? 0);
+    return ((elapsed % period + period) % period) / period * 4200;
+}
+
+export function jetCycle(b: Machine, time: number): JetCycle {
+    const t = jetCycleTick(b, time);
     let phase: JetPhase = 'idle', pressure = .08, height = 0, vent = 0;
     if (!b.active) {
         if (t >= 1000 && t < 1800) {

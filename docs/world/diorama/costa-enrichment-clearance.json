@@ -1,0 +1,208 @@
+{
+  "variant": "Costa v6 substantial visual polish",
+  "baseFile": "base-v5.blend",
+  "cameraUnchanged": true,
+  "nodesAndRoutesUnchanged": true,
+  "protectedWalkMeshes": 76,
+  "walkMeshesIdentical": true,
+  "removedUnsafeFoliageGroups": [
+    "v6_cliff_curtain_1452",
+    "v6_cliff_curtain_1454",
+    "v6_cliff_curtain_1455",
+    "v6_cliff_curtain_1457",
+    "v6_fan_0",
+    "v6_cliff_curtain_1456"
+  ],
+  "initialAudit": {
+    "bodyRays": 1029,
+    "cameraRays": 1029,
+    "flags": [
+      {
+        "type": "view",
+        "group": "v6_fan_0",
+        "object": "v6 broad coastal fan.004",
+        "point": [
+          -6.552856922149658,
+          -0.10428572446107864,
+          2.0642857551574707
+        ]
+      },
+      {
+        "type": "view",
+        "group": "v6_fan_0",
+        "object": "v6 broad coastal fan.004",
+        "point": [
+          -6.52571439743042,
+          -0.008571445941925049,
+          2.158571481704712
+        ]
+      },
+      {
+        "type": "view",
+        "group": "v6_fan_0",
+        "object": "v6 broad coastal fan.004",
+        "point": [
+          -6.498571395874023,
+          0.08714288473129272,
+          2.252857208251953
+        ]
+      },
+      {
+        "type": "view",
+        "group": "v6_fan_0",
+        "object": "v6 broad coastal fan.002",
+        "point": [
+          -6.471428394317627,
+          0.18285715579986572,
+          2.3471429347991943
+        ]
+      },
+      {
+        "type": "view",
+        "group": "v6_fan_0",
+        "object": "v6 broad coastal fan.004",
+        "point": [
+          -6.471428394317627,
+          0.18285715579986572,
+          2.3471429347991943
+        ]
+      },
+      {
+        "type": "view",
+        "group": "v6_fan_0",
+        "object": "v6 broad coastal fan.002",
+        "point": [
+          -6.4442853927612305,
+          0.2785714268684387,
+          2.4414286613464355
+        ]
+      },
+      {
+        "type": "view",
+        "group": "v6_fan_0",
+        "object": "v6 broad coastal fan.001",
+        "point": [
+          -6.4442853927612305,
+          0.2785714268684387,
+          2.4414286613464355
+        ]
+      },
+      {
+        "type": "view",
+        "group": "v6_fan_0",
+        "object": "v6 broad coastal fan.004",
+        "point": [
+          -6.417142868041992,
+          0.3742857277393341,
+          2.5357143878936768
+        ]
+      },
+      {
+        "type": "view",
+        "group": "v6_fan_0",
+        "object": "v6 broad coastal fan.001",
+        "point": [
+          -6.417142868041992,
+          0.3742857277393341,
+          2.5357143878936768
+        ]
+      },
+      {
+        "type": "view",
+        "group": "v6_fan_0",
+        "object": "v6 broad coastal fan.001",
+        "point": [
+          -6.389999866485596,
+          0.4699999988079071,
+          2.630000114440918
+        ]
+      },
+      {
+        "type": "view",
+        "group": "v6_fan_0",
+        "object": "v6 broad coastal fan.001",
+        "point": [
+          -6.311666488647461,
+          0.5116666555404663,
+          2.7083332538604736
+        ]
+      },
+      {
+        "type": "view",
+        "group": "v6_fan_0",
+        "object": "v6 broad coastal fan.001",
+        "point": [
+          -6.233333587646484,
+          0.5533333420753479,
+          2.7866668701171875
+        ]
+      },
+      {
+        "type": "view",
+        "group": "v6_fan_0",
+        "object": "v6 broad coastal fan.006",
+        "point": [
+          -6.154999732971191,
+          0.5950000286102295,
+          2.865000009536743
+        ]
+      },
+      {
+        "type": "body",
+        "group": "v6_cliff_curtain_1457",
+        "object": "v6 cliff trailing broad leaf.023",
+        "point": [
+          2.694999933242798,
+          -3.0999999046325684,
+          1.1369999647140503
+        ]
+      },
+      {
+        "type": "body",
+        "group": "v6_cliff_curtain_1457",
+        "object": "v6 cliff trailing broad leaf.023",
+        "point": [
+          2.799999952316284,
+          -3.0999999046325684,
+          1.2100000381469727
+        ]
+      },
+      {
+        "type": "body",
+        "group": "v6_cliff_curtain_1455",
+        "object": "v6 cliff trailing broad leaf.021",
+        "point": [
+          2.909090995788574,
+          -3.0899996757507324,
+          1.2809091806411743
+        ]
+      },
+      {
+        "type": "body",
+        "group": "v6_cliff_curtain_1452",
+        "object": "v6 cliff trailing broad leaf.018",
+        "point": [
+          3.018181800842285,
+          -3.0799999237060547,
+          1.3518182039260864
+        ]
+      },
+      {
+        "type": "body",
+        "group": "v6_cliff_curtain_1454",
+        "object": "v6 cliff trailing broad leaf.020",
+        "point": [
+          3.127272605895996,
+          -3.069999933242798,
+          1.422727346420288
+        ]
+      }
+    ]
+  },
+  "finalAudit": {
+    "bodyRays": 1029,
+    "cameraRays": 1029,
+    "flags": []
+  },
+  "limits": "Static art prototype. Sampled route body/view checks and identity checks, not a full gameplay certification."
+}

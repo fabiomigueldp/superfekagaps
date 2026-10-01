@@ -1,0 +1,96 @@
+{
+  "method": "Actual recorded before/after runtime poses at 30fps, native 1920\u00d71200 island metric, packaged alpha>32 including mast/cabin/rails/fenders. After uses final 48-sample common-crop art, with after.foot exactly including runtime heave. All six islands (including their original dock pixels), open dock additions and all four buoys are tested separately. Existing first/last two Costa-Porto route legs and first/last Reserva-Dominio legs are terminal manoeuvres; nearest authored segment classifies the actual foot position. Every terminal contact is retained. Clearance is conservatively capped at64native pixels. Costa v6 and Porto v3 layers are integrated; route and placement geometry is unchanged.",
+  "portoLayer": "public/assets/world/map/porto-diorama.webp",
+  "samplesFile": "motion-samples-64-reversal-brake.json (offline QA artifact)",
+  "samplesSha256": "beb9c9e61a3a52d3834d5a12542a8a8b4696d52959f1b886755e711ec0aef084",
+  "buoyMetadata": "public/assets/world/map/maritime-buoys.meta.json",
+  "buoyMetadataSha256": "339b693dc6392412741f29e1c1ddc0ca26a8592550e5f6c64dd01077fa26b921",
+  "boatAtlasSha256": "1f49560c638137da251fe25366753e36b3c448a6aa090a317c4ffbce36b90a56",
+  "cases": [
+    {
+      "from": 1,
+      "to": 2,
+      "samples": 216,
+      "terminalSegments": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "after": {
+        "openWaterPoseCount": 96,
+        "openWaterContactPoseCount": 0,
+        "openWaterBuoyContactPoseCount": 0,
+        "terminalContactPoseCount": 101,
+        "minimumOpenWaterClearanceNativePixelsCapped64": 45
+      }
+    },
+    {
+      "from": 2,
+      "to": 1,
+      "samples": 216,
+      "terminalSegments": [
+        0,
+        1,
+        6,
+        7
+      ],
+      "after": {
+        "openWaterPoseCount": 95,
+        "openWaterContactPoseCount": 0,
+        "openWaterBuoyContactPoseCount": 0,
+        "terminalContactPoseCount": 96,
+        "minimumOpenWaterClearanceNativePixelsCapped64": 21
+      }
+    },
+    {
+      "from": 5,
+      "to": 6,
+      "samples": 199,
+      "terminalSegments": [
+        0,
+        2
+      ],
+      "after": {
+        "openWaterPoseCount": 83,
+        "openWaterContactPoseCount": 0,
+        "openWaterBuoyContactPoseCount": 0,
+        "terminalContactPoseCount": 65,
+        "minimumOpenWaterClearanceNativePixelsCapped64": 48
+      }
+    },
+    {
+      "from": 6,
+      "to": 5,
+      "samples": 199,
+      "terminalSegments": [
+        0,
+        2
+      ],
+      "after": {
+        "openWaterPoseCount": 84,
+        "openWaterContactPoseCount": 0,
+        "openWaterBuoyContactPoseCount": 0,
+        "terminalContactPoseCount": 65,
+        "minimumOpenWaterClearanceNativePixelsCapped64": 5
+      }
+    },
+    {
+      "from": 5,
+      "to": 5,
+      "samples": 204,
+      "terminalSegments": [
+        0,
+        2
+      ],
+      "after": {
+        "openWaterPoseCount": 84,
+        "openWaterContactPoseCount": 0,
+        "openWaterBuoyContactPoseCount": 0,
+        "terminalContactPoseCount": 69,
+        "minimumOpenWaterClearanceNativePixelsCapped64": 48
+      }
+    }
+  ],
+  "rawPoseRecords": "Retained in the offline QA artifact; this file contains the per-route result and hashes."
+}

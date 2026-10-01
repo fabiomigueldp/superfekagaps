@@ -4,6 +4,7 @@ import { BARRELS, PRESSURE_BARRELS, WORLD_PALETTE } from './WorldAssets';
 import type { MovingBody, WorldObjects } from './WorldPhysics';
 import { box as r, pixelLine as line, oval, polygon, rivet, ink } from './WorldPainting';
 import { drawJet, drawCannon } from './WorldMachineArt';
+import { drawCannonBarrelEffects } from './WorldCannonEffects';
 import { drawCarrier, drawCarrierTrack, drawBelt, drawSwitch, drawSupport } from './WorldTransportArt';
 function identity(objects: WorldObjects, b: MovingBody) {
     const ids = [...new Set(objects.bodies.filter(s => s.kind === 'switch' && s.link).map(s => s.link!))];
@@ -98,8 +99,9 @@ export function drawWorldObjects(c: CanvasRenderingContext2D, objects: WorldObje
         const x = Math.round(p.x - cx), y = Math.round(p.y - cy);
         if (p.vy === 0) oval(c, x - 1, y + p.height - 1, 16, 3, '#263143');
         atlas.draw(c, frames[index], WORLD_PALETTE, x - 3, y - 4);
+        drawCannonBarrelEffects(c, p, cx, cy, objects.time);
         const impact = p.landedAt === undefined ? Infinity : objects.time - p.landedAt;
-        if (impact < 180) for (const dir of [-1, 1]) {
+        if (p.launchedAt === undefined && impact < 180) for (const dir of [-1, 1]) {
             r(c, x + 6 + dir * (8 + impact / 18), y + p.height - 2, 3, 1, '#d0c8b3');
             r(c, x + 6 + dir * (5 + impact / 24), y + p.height - 4, 1, 1, '#b5baa9');
         }
@@ -108,7 +110,7 @@ export function drawWorldObjects(c: CanvasRenderingContext2D, objects: WorldObje
             r(c, behind, y + 8, 3, 2, '#c3de85');
             r(c, behind + dir * 5, y + 10, 2, 1, '#92b46e');
         }
-        if (p.pressurized && Math.floor(objects.time / 90) % 3 === 0)
+        if (p.launchedAt === undefined && p.pressurized && Math.floor(objects.time / 90) % 3 === 0)
             r(c, x + 6, y - 6, 2, 2, '#e1d0f1');
     }
 }

@@ -6,7 +6,8 @@ import { parseMapMetadata } from '../src/adventure/WorldMapArt';
 const root = new URL('../public/assets/world/map/', import.meta.url);
 test('each visited island loads under 350 KB of authored WebP art and matching metadata', () => {
     const islands = [
-        { world: 1, files: ['costa-diorama.webp', 'costa-shadow.webp', 'porto-distant.webp', 'costa-diorama.meta.json'] },
+        // Distant Porto is a retained legacy asset; WorldMapView no longer requests it.
+        { world: 1, files: ['costa-diorama.webp', 'costa-shadow.webp', 'costa-diorama.meta.json'] },
         { world: 2, files: ['porto-diorama.webp', 'porto-diorama.meta.json'] },
     ];
     for (const { world, files } of islands) {
