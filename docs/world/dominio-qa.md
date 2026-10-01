@@ -41,6 +41,29 @@ dock audit covers 1,785 supports, 1,024 hull poses, 992 raster silhouettes and
 alpha holdouts, avoiding exposed buried supports and floating underwater feet.
 Runtime-style compositions were inspected using the exported WebPs.
 
-Actual browser traversal, final UI inspection and public rollout verification
-are pending on the published preview. Automated viewport/reduced-motion cases
-do not establish physical touch behavior or measured browser FPS.
+## Live preview checks
+
+Preview `b140119`, bundle `index-C-B5MPgZ.js`, was tested in the cloud browser at
+1180×757 and 590×378 CSS pixels. The old 23-stage fixture kept Domínio and Enter
+blocked until C2. The approved artificial 28-stage/69-seal fixture was imported
+only into the established QA origin.
+
+Verified natural Reserva→6-1 travel with the original Feka aboard, blocked early
+Enter, explicit 6-1 gameplay entry and return to its arrival. Walked the gardens,
+6-3→6-4 stone bridge, 6-4→6-5 ascent and 6-5→6-3 service shortcut. The narrow
+reverse ferry journey naturally returned to the actual 5-5 terminal. One
+10-second locator wait expired during walking; the next DOM/image observation
+showed correct arrival, without repeating the action.
+
+At 472×303 (250% browser zoom), the old short-layout media query excluded widths
+below 520px. Its two-row header and expanded footer left too little map space,
+making the panorama almost disappear. The compact footer/header now apply at
+all short widths, retaining the region heading for assistive technology when
+the narrowest header cannot fit it. The complete six-region route and control
+layout passed all four profiles, including 472×303, in 5 focused test cases;
+the production rebuild passed. The unchanged aggregate suite was not repeated.
+New build: `index-wWZIwsQO.js`, CSS `index-XHS49ZnI.css` (19.51 kB / 4.71 kB gzip).
+
+Final browser confirmation of this layout correction and public rollout remain
+pending. Automated viewport/reduced-motion cases do not establish physical
+touch behavior or measured browser FPS.

@@ -822,7 +822,7 @@ test('the complete six-region route frames every occupied vehicle and keeps over
     const { atlasCableBounds } = await import('../src/adventure/WorldCableArt');
     const { atlasBoatBounds } = await import('../src/adventure/WorldAtlasArt');
     const { WORLD_MAP_TRAVEL_ACTIONS } = await import('../src/adventure/WorldMapHud');
-    for (const [width, height] of [[320, 568], [590, 378], [740, 320]]) await t.test(`${width}x${height}`, async child => {
+    for (const [width, height] of [[320, 568], [472, 303], [590, 378], [740, 320]]) await t.test(`${width}x${height}`, async child => {
         const h = mapDOM(child), save = { ...openSave('1-5'), secrets: ['1-3', '4-3', '5-3', '6-3'] }; await readyDominio(h, save);
         h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width, height };
         h.get('world-map-header').bounds = { x: 8, y: 6, left: 8, top: 6, width: width - 16, height: 44 };

@@ -181,7 +181,7 @@
     .world-map-stage-title .world-map-bitmap { max-width: 100%; }
     .world-map-hint { margin-top: 2px; }
 }
-@media (max-height: 480px) and (min-width: 520px) {
+@media (max-height: 480px) {
     .world-map-header { top: max(6px, env(safe-area-inset-top)); display: flex; gap: 8px; }
     .world-map-title { padding: 8px; max-width: calc(100% - 246px); }
     .world-map-footer { bottom: max(6px, env(safe-area-inset-bottom)); width: min(470px, calc(100% - 24px)); padding-block: 5px; }
@@ -193,6 +193,14 @@
     .world-map-status { margin-top: 2px; }
     .world-map-hint { display: none; }
     .world-map-region-menu { top: max(56px, calc(env(safe-area-inset-top) + 50px)); max-height: calc(100% - 66px - env(safe-area-inset-bottom)); }
+}
+@media (max-height: 480px) and (max-width: 419px) {
+    /* Keep the full-size map controls and stage action on a short phone view.
+       The repeated region banner stays available to assistive technology. */
+    .world-map-title {
+        position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+        border: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap;
+    }
 }
 @media (prefers-reduced-motion: reduce) { .world-map * { transition: none !important; animation: none !important; } }
 @media (forced-colors: active) {
