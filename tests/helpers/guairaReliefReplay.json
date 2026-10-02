@@ -1,0 +1,7 @@
+{
+  "description": "Native 60Hz keyboard/canvas-touch event blocks. No player, tile, checkpoint, jet or result writes.",
+  "maintenance": [[39,["ArrowRight"]],[30,[]],[45,["Space"]],[1,[]],[26,["ArrowRight","Space"]],[30,[]],[26,["ArrowRight","Space"]],[30,[]],[19,["ArrowRight"]],[30,[]],[8,["Space"]],[40,["ArrowDown"]],[180,["ArrowRight"]]],
+  "interval": [[154,["ArrowRight"]],[80,[]],[130,["ArrowRight"]]],
+  "headBump": [[39,["ArrowRight"]],[30,[]],[45,["Space"]],[1,[]],[26,["ArrowRight","Space"]],[30,[]],[39,["ArrowRight"]],[30,[]],[45,["Space"]],[180,["ArrowRight"]]],
+  "skipFlag": [[42,["ArrowRight","Space"]],[118,["ArrowRight"]],[60,[]],[130,["ArrowRight"]]]
+}

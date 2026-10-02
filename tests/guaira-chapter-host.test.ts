@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import type { WorldGame } from '../src/adventure/WorldGame';
 import test, { type TestContext } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { transpileModule, ModuleKind, ScriptTarget } from 'typescript';
@@ -8,6 +9,7 @@ import { loadGuairaChapterScene, type GuairaChapterSceneFactory, type GuairaChap
 import { type GuairaChapterSnapshot, type GuairaChapterSceneId } from '../src/adventure/experimental/guaira/chapter/GuairaChapterSession';
 import { loadGuairaChapterExcursion, type GuairaChapterExcursionFactory } from '../src/adventure/experimental/guaira/chapter/GuairaChapterExcursions';
 import { sameChapterMapTarget, type GuairaChapterNavigation } from '../src/adventure/experimental/guaira/chapter/GuairaChapterNavigation';
+import { GuairaRelief } from '../src/adventure/experimental/guaira/relief/GuairaRelief';
 import { GuairaGallery } from '../src/adventure/experimental/guaira/gallery/GuairaGallery';
 import { GuairaTraversal } from '../src/adventure/experimental/guaira/GuairaTraversal';
 import { DisposalScope } from '../src/engine/DisposalScope';
@@ -347,8 +349,8 @@ function chooseRequired(h: ReturnType<typeof hostBrowser>, sceneId = h.currentMa
 
 for (const opening of ['guaira-travessia', 'guaira-patio-comportas'] as const)
 for (const completed of [0, 1, 5]) test(`optional ownership preserves ${completed}/5 receipts and exact retained target after ${opening}`, async t => {
-    const h = hostBrowser(t), galleryFactory = await loadGuairaChapterExcursion();
-    const app = h.create({ loadExcursion: async () => galleryFactory, loadScene: async id => {
+    const h = hostBrowser(t), galleryFactory = await loadGuairaChapterExcursion(), reliefFactory = await loadGuairaChapterExcursion('relief');
+    const app = h.create({ loadExcursion: async id => id === 'relief' ? reliefFactory : galleryFactory, loadScene: async id => {
         const factory = await loadGuairaChapterScene(id);
         // This suite proves host ownership with explicit result fixtures. Native victory replay is tested separately.
         return (canvas, status) => {
@@ -372,13 +374,21 @@ for (const completed of [0, 1, 5]) test(`optional ownership preserves ${complete
     assert.equal(h.byId('chapter-map-return').getAttribute('aria-label'), 'Voltar ao Bairro da Vala Seca no capítulo');
     first.finished = true; h.frame(); // Live local finish fixture cannot create a sixth result.
     assert.match(h.byId('lab-status').textContent, /Acesso de inspeção aberto/);
-    assert.equal(h.byId('chapter-primary').getAttribute('aria-label'), 'Pausar');
-    h.byId('chapter-primary').click(); assert.equal(first.state, 'paused'); assert.deepEqual(app.snapshot, before);
+    assert.equal(h.byId('chapter-primary').getAttribute('aria-label'), 'Seguir para a Câmara de Alívio, continuação opcional');
+    first.toggleGalleryPause(); h.frame(); assert.equal(first.state, 'paused'); assert.deepEqual(app.snapshot, before);
     h.byId('chapter-retry').click(); await flush();
     const fresh = app.activeGame as GuairaGallery;
     assert.notEqual(fresh, first); assert.equal(first.isDisposed, true); assert.equal(fresh.finished, false);
     assert.deepEqual(fresh.openings, { first: false, second: false }); assert.deepEqual(app.snapshot, before);
-    h.byId('chapter-map-return').click(); assert.equal(fresh.isDisposed, true); assert.deepEqual(app.snapshot, before);
+    fresh.finished = true; h.frame(); h.byId('chapter-primary').click(); await flush();
+    const relief = app.activeGame as GuairaRelief;
+    assert.equal(relief.stage.id, 'guaira-camara-alivio'); assert.equal(fresh.isDisposed, true);
+    assert.equal(relief.player.data.hasHelmet, true); assert.deepEqual(app.snapshot, before);
+    h.byId('chapter-retry').click(); await flush();
+    const freshRelief = app.activeGame as GuairaRelief;
+    assert.notEqual(freshRelief, relief); assert.equal(relief.isDisposed, true);
+    assert.equal(freshRelief.stage.id, 'guaira-camara-alivio'); assert.equal(freshRelief.finished, false);
+    h.byId('chapter-map-return').click(); assert.equal(freshRelief.isDisposed, true); assert.deepEqual(app.snapshot, before);
     assert.equal(h.currentMap().options.arrival, 'bairro'); assert.equal(h.currentMap().options.focusAction, true);
     assert.deepEqual(h.currentMap().navigation.target, { kind: 'optional', stop: 'bairro' });
     assert.equal(h.currentMap().options.openingAvailable, openingAvailable);
@@ -573,5 +583,165 @@ test(`${kind} hidden and restored during pending import still mounts paused`, as
     h.document.hidden = false; h.document.dispatch('visibilitychange');
     sceneLoad.resolve(required); excursionLoad.resolve(optional); await flush();
     assert.equal(app.activeGame!.state, 'paused'); assert.equal(h.frames.size, 2);
+    app.dispose(); h.checkDisposed();
+});
+
+const reliefName = 'Seguir para a Câmara de Alívio, continuação opcional';
+function finishGalleryFixture(h: ReturnType<typeof hostBrowser>, app: GuairaChapterApp) {
+    assert.ok((app.activeGame as WorldGame | null) instanceof GuairaGallery);
+    // Ownership-only fixture. Native end-to-end movement is covered separately.
+    (app.activeGame as GuairaGallery).finished = true; h.frame();
+    assert.equal(h.byId('chapter-primary').getAttribute('aria-label'), reliefName);
+}
+const savedClick = (node: LifecycleElement) => node.listeners.find(item => item.type === 'click')!.callback;
+
+for (const interrupt of ['blur', 'hidden'] as const)
+test(`Gallery ALÍVIO action is retired by ${interrupt}; resumed completion needs a fresh explicit action`, async t => {
+    const h = hostBrowser(t), gallery = await loadGuairaChapterExcursion(), relief = await loadGuairaChapterExcursion('relief');
+    const loads: string[] = [];
+    const app = h.create({ loadExcursion: async id => { loads.push(id); return id === 'gallery' ? gallery : relief; } });
+    chooseGallery(h); h.enter(); await flush(); const game = app.activeGame!;
+    finishGalleryFixture(h, app); const primary = h.byId('chapter-primary'), oldAction = savedClick(primary);
+    game.audio.enabled = false;
+    if (interrupt === 'blur') h.window.dispatch('blur');
+    else { h.document.hidden = true; h.document.dispatch('visibilitychange'); }
+    invokeSaved(oldAction); primary.click(); assert.deepEqual(loads, ['gallery']); assert.equal(game.state, 'paused');
+    if (interrupt === 'blur') h.window.dispatch('focus');
+    else { h.document.hidden = false; h.document.dispatch('visibilitychange'); }
+    h.frame(); invokeSaved(oldAction); assert.equal(game.state, 'paused');
+    assert.equal(primary.getAttribute('aria-label'), 'Retomar a tentativa opcional');
+    primary.click(); assert.equal(game.state, 'playing'); assert.deepEqual(loads, ['gallery']);
+    invokeSaved(oldAction); assert.deepEqual(loads, ['gallery'], 'The old completion callback stays inert after Resume');
+    primary.click(); await flush(); assert.deepEqual(loads, ['gallery', 'relief']);
+    assert.ok((app.activeGame as WorldGame | null) instanceof GuairaRelief); assert.equal(app.activeGame!.audio.enabled, false);
+    assert.equal(game.isDisposed, true); assert.equal(game.input.isDisposed, true); assert.equal(game.audio.isDisposed, true);
+    app.dispose(); h.checkDisposed();
+});
+
+test('optional primary requires living native Gallery finish, rejects a held press and retires Gallery before Relief factory mounts', async t => {
+    const h = hostBrowser(t), gallery = await loadGuairaChapterExcursion(), relief = await loadGuairaChapterExcursion('relief');
+    let old: WorldGame | null = null, loads = 0;
+    const app = h.create({ loadExcursion: async id => {
+        loads++;
+        if (id === 'gallery') return gallery;
+        assert.equal(old!.isDisposed, true); assert.equal(old!.input.isDisposed, true);
+        assert.equal(old!.audio.isDisposed, true); assert.equal(h.frames.size, 0);
+        assert.ok(h.observers.slice(0, -1).every(observer => observer.disconnected));
+        assert.equal(h.all().filter(node => node.id === 'guaira-touch-controls').length, 0);
+        return relief;
+    } });
+    chooseGallery(h); h.enter(); await flush(); old = app.activeGame!;
+    const before = app.snapshot, primary = h.byId('chapter-primary');
+    primary.click(); assert.equal(old.state, 'paused'); primary.click(); assert.equal(loads, 1, 'Unfinished Gallery only pauses/resumes');
+    primary.dispatch('pointerdown', { pointerId: 99 });
+    finishGalleryFixture(h, app); primary.dispatch('click', { detail: 1 }); assert.equal(loads, 1, 'Press begun before ALÍVIO cannot enter');
+    const oldAction = savedClick(primary);
+    old.player.data.isDead = true; invokeSaved(oldAction); assert.equal(loads, 1);
+    old.player.data.isDead = false;
+    h.nativeKey('Enter', primary, true); assert.equal(loads, 1);
+    h.nativeKey('Enter', primary); await flush(); assert.ok((app.activeGame as WorldGame | null) instanceof GuairaRelief);
+    const newest = app.activeGame!; invokeSaved(oldAction); primary.click(); assert.equal(app.activeGame, newest); assert.equal(loads, 2);
+    h.nativeKey('Enter', h.byId('chapter-primary'), true); assert.equal(newest.state, 'playing');
+    assert.deepEqual(app.snapshot, before); app.dispose(); h.checkDisposed();
+});
+
+for (const exit of ['retry', 'bairro', 'restart', 'dispose'] as const)
+test(`late Relief import and saved ALÍVIO cannot replace the current view after ${exit}`, async t => {
+    const h = hostBrowser(t), gallery = await loadGuairaChapterExcursion(), relief = await loadGuairaChapterExcursion('relief');
+    const pending = deferred<GuairaChapterExcursionFactory>(); let reliefLoads = 0, staleConstructions = 0;
+    const app = h.create({ loadExcursion: async id => id === 'gallery' ? gallery : ++reliefLoads === 1 ? pending.promise : relief });
+    chooseGallery(h); h.enter(); await flush(); finishGalleryFixture(h, app);
+    const oldPrimary = h.byId('chapter-primary'), oldAction = savedClick(oldPrimary);
+    oldPrimary.click(); assert.equal(app.mode, 'loading'); assert.equal(app.activeGame, null);
+    const oldRetry = h.byId('chapter-retry'), retryAction = savedClick(oldRetry);
+    if (exit === 'retry') { oldRetry.click(); await flush(); assert.ok((app.activeGame as WorldGame | null) instanceof GuairaRelief); }
+    else if (exit === 'dispose') app.dispose();
+    else {
+        h.byId('chapter-map-return').click();
+        if (exit === 'restart') { const map = h.currentMap(); map.options.onRestart(map.snapshot.generation, map.navigation.revision); }
+        else { h.enter(); await flush(); assert.ok((app.activeGame as WorldGame | null) instanceof GuairaGallery, 'Fresh map entry always starts Gallery'); }
+    }
+    const view = app.activeGame, before = app.snapshot;
+    invokeSaved(oldAction); invokeSaved(retryAction); oldPrimary.click(); oldRetry.click();
+    pending.resolve(() => { staleConstructions++; throw Error('Retired Relief factory'); }); await flush();
+    assert.equal(staleConstructions, 0); assert.equal(app.activeGame, view); assert.deepEqual(app.snapshot, before);
+    assert.equal(reliefLoads, exit === 'retry' ? 2 : 1); app.dispose(); h.checkDisposed();
+});
+
+for (const interruption of ['blur', 'hidden'] as const)
+test(`Relief loading remembers ${interruption}, mounts paused and requires explicit resume`, async t => {
+    const h = hostBrowser(t), gallery = await loadGuairaChapterExcursion(), relief = await loadGuairaChapterExcursion('relief');
+    const pending = deferred<GuairaChapterExcursionFactory>();
+    const app = h.create({ loadExcursion: id => id === 'gallery' ? Promise.resolve(gallery) : pending.promise });
+    chooseGallery(h); h.enter(); await flush(); finishGalleryFixture(h, app); h.byId('chapter-primary').click();
+    if (interruption === 'blur') { h.window.dispatch('blur'); h.window.dispatch('focus'); }
+    else { h.document.hidden = true; h.document.dispatch('visibilitychange'); h.document.hidden = false; h.document.dispatch('visibilitychange'); }
+    pending.resolve(relief); await flush(); const game = app.activeGame!;
+    assert.ok(game instanceof GuairaRelief); assert.equal(game.state, 'paused');
+    const elapsed = game.elapsed; h.frame(); assert.equal(game.elapsed, elapsed);
+    h.byId('chapter-primary').click(); assert.equal(game.state, 'playing');
+    assert.match(h.byId('lab-status').textContent, /intervalo seco.*tampa de alívio.*baixo no ar.*restaura tampa e jato/);
+    app.dispose(); h.checkDisposed();
+});
+
+for (const failure of ['import', 'constructor', 'controls', 'toolbar', 'bitmap', 'wrong-room'] as const)
+test(`Relief ${failure} failure disposes partial ownership; TENTAR retries Relief and Bairro exits internally`, async t => {
+    const h = hostBrowser(t), gallery = await loadGuairaChapterExcursion(), relief = await loadGuairaChapterExcursion('relief');
+    t.mock.method(console, 'error', () => {}); let fail = true; const loads: string[] = [];
+    const app = h.create({ loadExcursion: async id => {
+        loads.push(id); if (id === 'gallery') return gallery;
+        if (failure === 'import' && fail) throw Error('Relief import failed');
+        return failure === 'wrong-room' && fail ? gallery : relief;
+    } });
+    chooseGallery(h); h.enter(); await flush(); finishGalleryFixture(h, app); const before = app.snapshot;
+    let restore = () => {};
+    if (failure === 'constructor') {
+        const patch = t.mock.method(GuairaRelief.prototype, 'load', () => { throw Error('Relief stage failed'); }); restore = () => patch.mock.restore();
+    } else if (failure === 'bitmap') {
+        const patch = t.mock.method(LifecycleElement.prototype, 'getContext', () => { throw Error('Canvas failed'); }); restore = () => patch.mock.restore();
+    } else if (failure === 'controls' || failure === 'toolbar') {
+        const observe = ResizeObserver.prototype.observe;
+        const patch = t.mock.method(ResizeObserver.prototype, 'observe', function (this: ResizeObserver, target: Element) {
+            observe.call(this, target); const node = target as unknown as LifecycleElement;
+            if (failure === 'controls' ? node.id === 'guaira-touch-controls' : node.tagName === 'NAV') throw Error('Relief observer failed');
+        }); restore = () => patch.mock.restore();
+    }
+    h.byId('chapter-primary').click(); await flush();
+    assert.equal(app.mode, 'error'); assert.equal(app.activeGame, null); assert.deepEqual(app.snapshot, before);
+    assert.match(h.byId('lab-status').textContent, /Câmara de Alívio/); assert.equal(h.frames.size, 0);
+    assert.equal(h.contexts.filter(context => context.state !== 'closed').length, 0);
+    assert.ok(h.observers.every(observer => observer.disconnected));
+    restore(); fail = false; h.byId('chapter-retry').click(); await flush();
+    assert.ok((app.activeGame as WorldGame | null) instanceof GuairaRelief); assert.equal(loads.at(-1), 'relief'); assert.deepEqual(app.snapshot, before);
+    h.byId('chapter-map-return').click(); assert.equal(h.currentMap().options.arrival, 'bairro'); assert.deepEqual(app.snapshot, before);
+    h.enter(); await flush(); assert.ok((app.activeGame as WorldGame | null) instanceof GuairaGallery); assert.equal(loads.at(-1), 'gallery');
+    app.dispose(); h.checkDisposed();
+});
+
+for (const action of ['retry', 'bairro'] as const)
+test(`reentrant Relief factory cannot replace the newer ${action === 'retry' ? 'Relief' : 'Gallery'} attempt`, async t => {
+    const h = hostBrowser(t), gallery = await loadGuairaChapterExcursion(), relief = await loadGuairaChapterExcursion('relief');
+    let retired: WorldGame | null = null, reliefLoads = 0;
+    const app = h.create({ loadExcursion: async id => id === 'gallery' ? gallery : ++reliefLoads > 1 ? relief : (canvas, status) => {
+        const runtime = relief(canvas, status); retired = runtime.game;
+        if (action === 'retry') h.byId('chapter-retry').click();
+        else { h.byId('chapter-map-return').click(); h.enter(); }
+        return runtime;
+    } });
+    chooseGallery(h); h.enter(); await flush(); const before = app.snapshot;
+    finishGalleryFixture(h, app); h.byId('chapter-primary').click(); await flush();
+    assert.equal(app.activeGame?.stage.id, action === 'retry' ? 'guaira-camara-alivio' : 'guaira-galeria'); assert.equal(retired!.isDisposed, true);
+    assert.deepEqual(app.snapshot, before); assert.equal(h.frames.size, 2);
+    app.dispose(); h.checkDisposed();
+});
+
+test('saved ALÍVIO is not a pause/resume callback and stays retired after an explicit pause cycle', async t => {
+    const h = hostBrowser(t), gallery = await loadGuairaChapterExcursion(), relief = await loadGuairaChapterExcursion('relief');
+    const app = h.create({ loadExcursion: async id => id === 'gallery' ? gallery : relief });
+    chooseGallery(h); h.enter(); await flush(); finishGalleryFixture(h, app);
+    const game = app.activeGame as GuairaGallery, primary = h.byId('chapter-primary'), oldAction = savedClick(primary);
+    game.toggleGalleryPause(); h.frame(); invokeSaved(oldAction); assert.equal(game.state, 'paused');
+    primary.click(); assert.equal(game.state, 'playing'); invokeSaved(oldAction); assert.equal(app.activeGame, game);
+    primary.click(); await flush(); assert.ok(app.activeGame instanceof GuairaRelief);
     app.dispose(); h.checkDisposed();
 });

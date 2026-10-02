@@ -8,7 +8,7 @@ import { GuairaChapterSession, type GuairaChapterAttempt, type GuairaChapterGene
 import { CHAPTER_SCENES, loadGuairaChapterScene, type GuairaChapterRuntime, type GuairaChapterSceneFactory } from './GuairaChapterScenes';
 import { GuairaChapterMapView, type GuairaChapterMapOptions } from './GuairaChapterMapView';
 import { sameChapterMapTarget, type GuairaChapterMapTarget, type GuairaChapterNavigation } from './GuairaChapterNavigation';
-import { loadGuairaChapterExcursion, type GuairaChapterExcursionFactory, type GuairaChapterExcursionRuntime, type GuairaChapterExcursionToken } from './GuairaChapterExcursions';
+import { CHAPTER_EXCURSIONS, loadGuairaChapterExcursion, type GuairaChapterExcursionSceneId, type GuairaChapterExcursionFactory, type GuairaChapterExcursionRuntime, type GuairaChapterExcursionToken } from './GuairaChapterExcursions';
 
 export interface GuairaChapterMapPort {
     update(snapshot: ReturnType<GuairaChapterSession['snapshot']>, walkToSelection?: boolean, openingAvailable?: boolean, navigation?: GuairaChapterNavigation): void;
@@ -17,7 +17,7 @@ export interface GuairaChapterMapPort {
 }
 export interface GuairaChapterAppDependencies {
     loadScene?: (sceneId: GuairaChapterSceneId) => Promise<GuairaChapterSceneFactory>;
-    loadExcursion?: () => Promise<GuairaChapterExcursionFactory>;
+    loadExcursion?: (sceneId: GuairaChapterExcursionSceneId) => Promise<GuairaChapterExcursionFactory>;
     createMap?: (root: HTMLElement, options: GuairaChapterMapOptions) => GuairaChapterMapPort;
     exit?: () => void;
 }
@@ -300,9 +300,9 @@ export class GuairaChapterApp {
             && token.navigationRevision === this.navigation.revision && this.navigation.target.kind === 'optional'
             && !this.snapshot.activeAttempt;
     }
-    private beginExcursion() {
+    private beginExcursion(sceneId: GuairaChapterExcursionSceneId = 'gallery') {
         this.advanceNavigation({ kind: 'optional', stop: 'bairro' });
-        const token: GuairaChapterExcursionToken = Object.freeze({ sessionId: this.snapshot.generation.sessionId,
+        const token: GuairaChapterExcursionToken = Object.freeze({ sceneId, sessionId: this.snapshot.generation.sessionId,
             attemptId: ++this.excursionAttempt, navigationRevision: this.navigation.revision });
         this.excursionToken = token; void this.showExcursion(token);
     }
@@ -311,29 +311,25 @@ export class GuairaChapterApp {
         this.excursionToken = null; this.advanceNavigation(); this.showMap('bairro', false, true);
     }
     private excursionPanel(token: GuairaChapterExcursionToken, scope: DisposalScope) {
-        const nav = document.createElement('nav');
-        nav.className = 'chapter-game-toolbar'; nav.setAttribute('aria-label', 'Controles da Galeria dos Remendos, desvio opcional');
+        const info = CHAPTER_EXCURSIONS[token.sceneId], nav = document.createElement('nav');
+        nav.className = 'chapter-game-toolbar'; nav.setAttribute('aria-label', `Controles de ${info.title}, desvio opcional`);
         const status = document.createElement('span'); status.id = 'lab-status'; status.setAttribute('role', 'status');
         status.setAttribute('aria-live', 'polite'); status.setAttribute('aria-atomic', 'true');
         const primary = document.createElement('button'), retry = document.createElement('button'), map = document.createElement('button');
         primary.type = retry.type = map.type = 'button';
         primary.id = 'chapter-primary'; retry.id = 'chapter-retry'; map.id = 'chapter-map-return';
         const primaryArt = new LabToolbarAction(primary, true);
-        new LabToolbarAction(retry).setLabel('TENTAR', 'Recomeçar a Galeria dos Remendos nesta tentativa opcional');
+        new LabToolbarAction(retry).setLabel('TENTAR', `Recomeçar ${info.title} nesta tentativa opcional`);
         new LabToolbarAction(map).setLabel('BAIRRO', 'Voltar ao Bairro da Vala Seca no capítulo');
         primaryArt.setLabel('PAUSA', 'Pausar'); primary.disabled = true;
         nav.append(status, primary, retry, map);
         const canvas = document.createElement('canvas'); canvas.id = 'game-canvas'; canvas.tabIndex = 0;
         canvas.contentEditable = 'true'; canvas.spellcheck = false; canvas.setAttribute('inputmode', 'none');
-        canvas.setAttribute('aria-label', 'Galeria dos Remendos, percurso opcional. Abra as tampas rachadas e alcance o patamar de inspeção. Setas para mover, Espaço para pular, baixo no ar para sentada, Shift para correr e Escape para pausar.');
+        canvas.setAttribute('aria-label', `${info.title}, percurso opcional. ${info.objective}. Setas para mover, Espaço para pular, baixo no ar para sentada, Shift para correr e Escape para pausar.`);
         this.root.append(nav, canvas);
         scope.listen(canvas, 'pointerdown', () => canvas.focus({ preventScroll: true }));
-        scope.listen(retry, 'click', () => { if (this.currentExcursion(token, scope)) this.beginExcursion(); });
+        scope.listen(retry, 'click', () => { if (this.currentExcursion(token, scope)) this.beginExcursion(token.sceneId); });
         scope.listen(map, 'click', () => this.leaveExcursion(token, scope));
-        scope.listen(primary, 'click', () => {
-            if (!this.currentExcursion(token, scope) || this.mounted?.kind !== 'optional' || this.mounted.token !== token) return;
-            this.mounted.runtime.togglePause(); canvas.focus({ preventScroll: true });
-        });
         const fit = () => { if (this.current(scope)) fitGuairaLabCanvas(canvas); };
         scope.listen(window, 'resize', fit);
         if (typeof ResizeObserver !== 'undefined') {
@@ -343,54 +339,89 @@ export class GuairaChapterApp {
     }
     private async showExcursion(token: GuairaChapterExcursionToken) {
         if (this.isDisposed) return;
-        const scope = this.replaceView('loading'), activity = this.sceneActivity(scope);
+        const scope = this.replaceView('loading'), activity = this.sceneActivity(scope), info = CHAPTER_EXCURSIONS[token.sceneId];
         try {
             const panel = this.excursionPanel(token, scope);
-            panel.status.textContent = 'Abrindo Galeria dos Remendos · desvio opcional…';
-            document.title = 'Guaíra · Galeria dos Remendos · capítulo';
-            const factory = await this.loadExcursion();
+            panel.status.textContent = `Abrindo ${info.title} · desvio opcional…`;
+            document.title = `Guaíra · ${info.title} · capítulo`;
+            const factory = await this.loadExcursion(token.sceneId);
             if (!this.currentExcursion(token, scope)) return;
             const nativeStatus = document.createElement('span');
             const runtime = factory(panel.canvas, nativeStatus), game = runtime.game;
             // Own the native resources before controls, observers or reflection can fail.
             scope.add(() => { this.audioEnabled = game.audio.enabled; game.dispose(); });
             if (!this.currentExcursion(token, scope)) return;
+            if (runtime.sceneId !== token.sceneId) throw Error('Optional factory returned a different room');
             this.mounted = { kind: 'optional', token, runtime }; this.phase = 'game';
             game.audio.enabled = this.audioEnabled; game.audio.volume();
             const controls = installGuairaLabControls(game, panel.canvas, () => runtime.finished);
             scope.add(() => controls.dispose());
+            type PrimaryAction = 'pause' | 'resume' | 'relief' | null;
+            let primaryAction: PrimaryAction = null, primaryRevision = 0, pressedPrimaryRevision: number | null = null, releasePrimary = () => {};
+            scope.listen(panel.primary, 'pointerdown', () => { pressedPrimaryRevision = primaryRevision; });
+            scope.listen(panel.primary, 'pointercancel', () => { pressedPrimaryRevision = -1; });
+            const actionNow = (): PrimaryAction => game.isDisposed ? null : game.state === 'paused' ? 'resume'
+                : game.state !== 'playing' ? null : token.sceneId === 'gallery' && runtime.finished && !game.player.data.isDead ? 'relief' : 'pause';
+            const invalidatePrimary = () => {
+                primaryRevision++; primaryAction = null; releasePrimary(); releasePrimary = () => {};
+                panel.primary.disabled = true;
+            };
+            scope.add(invalidatePrimary);
+            scope.listen(window, 'blur', invalidatePrimary);
+            scope.listen(document, 'visibilitychange', () => { if (document.hidden) invalidatePrimary(); });
             const reflect = () => {
                 if (!this.currentExcursion(token, scope) || game.isDisposed) return false;
                 controls.sync();
-                panel.primary.disabled = game.state !== 'playing' && game.state !== 'paused';
-                panel.primaryArt.setLabel(game.state === 'paused' ? 'CONTINUAR' : 'PAUSA',
-                    game.state === 'paused' ? 'Retomar a tentativa opcional' : 'Pausar');
-                const message = game.state === 'paused' ? 'Pausado · Continuar volta à Galeria'
+                const action = actionNow();
+                if (action !== primaryAction) {
+                    invalidatePrimary(); primaryAction = action;
+                    const revision = primaryRevision;
+                    if (action) releasePrimary = scope.listen(panel.primary, 'click', event => {
+                        if (!this.currentExcursion(token, scope) || !this.focused || document.hidden
+                            || this.mounted?.kind !== 'optional' || this.mounted.token !== token
+                            || revision !== primaryRevision || actionNow() !== action) return;
+                        const pressedRevision = pressedPrimaryRevision; pressedPrimaryRevision = null;
+                        if (event.detail !== 0 && pressedRevision !== null && pressedRevision !== revision) return;
+                        // Every action is leased to its displayed state. A saved ALÍVIO
+                        // callback cannot turn into Resume, or survive interruption.
+                        invalidatePrimary();
+                        if (action === 'relief') { this.beginExcursion('relief'); return; }
+                        runtime.togglePause(); reflect(); panel.canvas.focus({ preventScroll: true });
+                    });
+                }
+                panel.primary.disabled = action === null;
+                panel.primaryArt.setLabel(action === 'resume' ? 'CONTINUAR' : action === 'relief' ? 'ALÍVIO' : 'PAUSA',
+                    action === 'resume' ? 'Retomar a tentativa opcional'
+                        : action === 'relief' ? 'Seguir para a Câmara de Alívio, continuação opcional' : 'Pausar');
+                const message = game.state === 'paused' ? `Pausado · Continuar volta a ${info.title}`
                     : game.player.data.isDead ? 'Feka caiu · retorno ao ponto seguro desta tentativa opcional'
-                    : runtime.finished ? 'Acesso de inspeção aberto · Bairro volta à maquete do capítulo'
-                    : 'Desvio opcional · Abra as tampas rachadas e alcance o patamar de inspeção';
+                    : runtime.finished ? runtime.sceneId === 'gallery'
+                        ? 'Acesso de inspeção aberto · Alívio segue para a Câmara de Alívio; Bairro volta à maquete'
+                        : `Passagem inspecionada · ${runtime.reliefOpened ? 'alívio aberto, grelha sem pressão' : 'alívio intacto, grelha mantém o ciclo'} · Bairro volta à maquete`
+                    : runtime.sceneId === 'relief' && nativeStatus.textContent && !nativeStatus.textContent.startsWith('Pausado')
+                        ? nativeStatus.textContent : `Desvio opcional · ${info.objective}`;
                 if (panel.status.textContent !== message) panel.status.textContent = message;
                 return true;
             };
             if (activity.shouldPause() && game.state === 'playing') runtime.togglePause();
             activity.observe(reflect); panel.fit(); game.start(); panel.canvas.focus({ preventScroll: true });
-            document.title = 'Guaíra · Galeria dos Remendos · capítulo';
+            document.title = `Guaíra · ${info.title} · capítulo`;
         } catch (error) {
             if (!this.currentExcursion(token, scope)) return;
             this.excursionError(token); console.error('Chapter excursion initialization failed', error);
         }
     }
     private excursionError(token: GuairaChapterExcursionToken) {
-        const scope = this.replaceView('error');
+        const scope = this.replaceView('error'), info = CHAPTER_EXCURSIONS[token.sceneId];
         const nav = document.createElement('nav'), status = document.createElement('p');
-        nav.className = 'chapter-game-toolbar'; nav.setAttribute('aria-label', 'Recuperar a Galeria dos Remendos');
+        nav.className = 'chapter-game-toolbar'; nav.setAttribute('aria-label', `Recuperar ${info.title}`);
         status.id = 'lab-status'; status.setAttribute('role', 'alert');
-        status.textContent = 'Não foi possível abrir a Galeria. Tentar repete o carregamento; Bairro volta ao capítulo. Sua jornada continua aqui.';
+        status.textContent = `Não foi possível abrir ${info.title}. Tentar repete o carregamento; Bairro volta ao capítulo. Sua jornada continua aqui.`;
         const retry = document.createElement('button'), map = document.createElement('button');
         retry.type = map.type = 'button'; retry.id = 'chapter-retry'; map.id = 'chapter-map-return';
-        retry.textContent = 'TENTAR'; retry.setAttribute('aria-label', 'Tentar abrir a Galeria dos Remendos novamente');
+        retry.textContent = 'TENTAR'; retry.setAttribute('aria-label', `Tentar abrir ${info.title} novamente`);
         map.textContent = 'BAIRRO'; map.setAttribute('aria-label', 'Voltar ao Bairro da Vala Seca no capítulo');
-        scope.listen(retry, 'click', () => { if (this.currentExcursion(token, scope)) this.beginExcursion(); });
+        scope.listen(retry, 'click', () => { if (this.currentExcursion(token, scope)) this.beginExcursion(token.sceneId); });
         scope.listen(map, 'click', () => this.leaveExcursion(token, scope));
         nav.append(status, retry, map); this.root.append(nav);
     }

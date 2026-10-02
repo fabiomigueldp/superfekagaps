@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { WorldGame } from '../src/adventure/WorldGame';
+import reliefRecordings from './helpers/guairaReliefReplay.json';
+import { GuairaRelief } from '../src/adventure/experimental/guaira/relief/GuairaRelief';
 import { GuairaGallery } from '../src/adventure/experimental/guaira/gallery/GuairaGallery';
 import { CHAPTER_SCENES, loadGuairaChapterScene, type GuairaChapterSceneFactory } from '../src/adventure/experimental/guaira/chapter/GuairaChapterScenes';
 import { loadGuairaChapterExcursion } from '../src/adventure/experimental/guaira/chapter/GuairaChapterExcursions';
@@ -24,12 +26,12 @@ function arrive(h: Harness) { h.frames(1200); }
  * Unlike failure/ownership fixtures, this suite never supplies a result or
  * writes a player position, breakable tile, checkpoint, boss or finish flag. */
 for (const [opening, touch] of [['guaira-travessia', false], ['guaira-patio-comportas', true]] as const) {
-    test(`${opening}: real host/map/Gallery excursion preserves receipts and resumes the five-stage journey (${touch ? 'touch' : 'keyboard'})`, async t => {
+    test(`${opening}: real host/map/Gallery → Relief excursion preserves receipts and resumes the five-stage journey (${touch ? 'touch' : 'keyboard'})`, async t => {
         const h = chapterExcursionBrowser(t);
         const factories = Object.fromEntries(await Promise.all(Object.keys(CHAPTER_SCENES).map(async id =>
             [id, await loadGuairaChapterScene(id as GuairaChapterSceneId)]))) as Record<GuairaChapterSceneId, GuairaChapterSceneFactory>;
-        const excursion = await loadGuairaChapterExcursion();
-        const app = h.create({ loadScene: async id => factories[id], loadExcursion: async () => excursion });
+        const excursion = await loadGuairaChapterExcursion(), reliefFactory = await loadGuairaChapterExcursion('relief');
+        const app = h.create({ loadScene: async id => factories[id], loadExcursion: async id => id === 'gallery' ? excursion : reliefFactory });
         const activeGame = (): WorldGame | null => app.activeGame;
         await mapReady(h);
         if (opening === 'guaira-patio-comportas') {
@@ -64,7 +66,21 @@ for (const [opening, touch] of [['guaira-travessia', false], ['guaira-patio-comp
         h.play(gallery, chapterRecording('guairaGalleryReplay'), touch);
         assert.equal(gallery.finished, true, 'native breaks, descents and stairs reached the real exit');
         h.frames(); assert.deepEqual(app.snapshot, retained, 'optional victory is not a sixth receipt');
+        assert.equal(h.byId('chapter-primary').getAttribute('aria-label'), 'Seguir para a Câmara de Alívio, continuação opcional');
+        assert.match(h.byId('lab-status').textContent, /Câmara de Alívio/);
+        gallery.toggleGalleryPause(); h.frames();
+        h.byId('chapter-primary').click(); assert.equal(activeGame(), gallery, 'Paused primary resumes the Gallery first');
+        h.byId('chapter-primary').click(); await flushChapter();
+        const relief = activeGame(); assert.ok(relief instanceof GuairaRelief); assert.equal(gallery.isDisposed, true);
+        assert.equal(relief.player.data.hasHelmet, true); assert.equal(relief.finished, false);
+        assert.equal(relief.store.save.checkpoint, null, 'New room owns a fresh local checkpoint');
+        const routeName = touch ? 'interval' : 'maintenance';
+        h.play(relief, { runs: reliefRecordings[routeName] as Array<[number, string[]]> }, touch); h.frames();
+        assert.equal(relief.finished, true); assert.equal(relief.reliefOpened, routeName === 'maintenance');
+        assert.match(h.byId('lab-status').textContent, routeName === 'maintenance' ? /alívio aberto/ : /alívio intacto/);
+        assert.deepEqual(app.snapshot, retained, 'Relief success has no required chapter authority');
         h.byId('chapter-map-return').click(); await mapReady(h);
+        assert.equal(relief.isDisposed, true);
         assert.equal(gallery.isDisposed, true); assert.equal(app.mode, 'map');
         assert.deepEqual(app.snapshot, retained);
         assert.ok(h.all().some(node => node.className === 'chapter-map-count' && node.textContent === '1/5 · nesta sessão'));
@@ -91,9 +107,22 @@ for (const [opening, touch] of [['guaira-travessia', false], ['guaira-patio-comp
         choose(h, optionalName); arrive(h);
         h.button('Entrar na Galeria dos Remendos, percurso opcional').click(); await flushChapter();
         const finalGallery = activeGame(); assert.ok(finalGallery instanceof GuairaGallery);
-        h.play(finalGallery, { runs: [[20, ['ArrowRight']]] }, touch);
-        assert.equal(finalGallery.finished, false); h.byId('chapter-map-return').click(); await mapReady(h);
-        assert.equal(finalGallery.isDisposed, true); assert.deepEqual(app.snapshot, completed, 'abandoning after 5/5 preserves the exact original receipts');
+        h.play(finalGallery, chapterRecording('guairaGalleryReplay'), touch); h.frames();
+        assert.equal(finalGallery.finished, true); h.byId('chapter-primary').click(); await flushChapter();
+        const finalRelief = activeGame(); assert.ok(finalRelief instanceof GuairaRelief);
+        assert.equal(finalGallery.isDisposed, true); assert.deepEqual(app.snapshot, completed);
+        const finalRoute = touch ? 'maintenance' : 'interval';
+        h.play(finalRelief, { runs: reliefRecordings[finalRoute] as Array<[number, string[]]> }, touch); h.frames();
+        assert.equal(finalRelief.finished, true); assert.equal(finalRelief.reliefOpened, finalRoute === 'maintenance');
+        assert.deepEqual(app.snapshot, completed, 'Both optional native finishes preserve 5/5');
+        h.byId('chapter-map-return').click(); await mapReady(h);
+        assert.equal(finalRelief.isDisposed, true); assert.deepEqual(app.snapshot, completed);
+        completed.accepted.forEach((receipt, index) => assert.equal(app.snapshot.accepted[index], receipt));
+        assert.ok(h.all().some(node => node.className === 'chapter-map-count' && node.textContent === '5/5 · nesta sessão'));
+        h.button('Entrar na Galeria dos Remendos, percurso opcional').click(); await flushChapter();
+        assert.ok(activeGame() instanceof GuairaGallery, 'Later map entry starts a fresh Gallery even after Relief completion');
+        assert.equal((activeGame() as GuairaGallery).finished, false);
+        h.byId('chapter-map-return').click(); await mapReady(h); assert.deepEqual(app.snapshot, completed);
         app.dispose(); h.checkDisposed();
     });
 }
