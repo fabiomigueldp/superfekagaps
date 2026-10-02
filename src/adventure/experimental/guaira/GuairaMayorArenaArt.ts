@@ -21,6 +21,12 @@ function oval(c:CanvasRenderingContext2D,x:number,y:number,w:number,h:number,col
 const FONT:Readonly<Record<string,string>>={A:'010101111101101',B:'110101110101110',C:'011100100100011',D:'110101101101110',E:'111100110100111',F:'111100110100100',I:'111010010010111',L:'100100100100111',O:'010101101101010',P:'110101110100100',R:'110101110101101',S:'011100010001110',T:'111010010010010',U:'101101101101111',V:'101101101101010',Z:'111001010100111'};
 function word(c:CanvasRenderingContext2D,text:string,x:number,y:number,color:string){[...text].forEach((letter,i)=>{const bits=FONT[letter]??'000000000000000';for(let n=0;n<15;n++)if(bits[n]==='1')rect(c,x+i*4+n%3,y+Math.floor(n/3),1,1,color);});}
 function pipe(c:CanvasRenderingContext2D,x:number,y:number,w:number){rect(c,x,y,w,7,M.bronzeShade);rect(c,x,y+1,w,4,M.bronze);rect(c,x+1,y+1,w-2,1,M.bronzeLight);for(let dx=10;dx<w-4;dx+=31){rect(c,x+dx,y-1,3,9,P.woodShade);rect(c,x+dx+1,y,1,6,M.bronzeLight);}}
+function waitInlay(c:CanvasRenderingContext2D,x:number,y:number){
+    // An amber hourglass replaces the forward arrow while the seam is unsafe.
+    rect(c,x,y,7,1,M.warning);rect(c,x,y+4,7,1,M.warning);
+    rect(c,x+1,y+1,2,1,M.warning);rect(c,x+4,y+1,2,1,M.warning);
+    rect(c,x+3,y+2,1,1,M.warning);rect(c,x+2,y+3,3,1,M.warning);
+}
 
 /** Architecture sits behind the real running surfaces; bright tops are reserved for collision. */
 export function drawGuairaMayorBackground(c:CanvasRenderingContext2D,m:GuairaMayorArtState,cx=0,cy=64,time=0,reducedMotion=false){
@@ -104,6 +110,7 @@ export function drawGuairaMayorObjects(c:CanvasRenderingContext2D,objects:Bodies
     layer(c,cx,cy,(cx,cy)=>{
         const lift=objects.get(MAYOR_ART_OBJECTS.lift),upper=objects.get(MAYOR_ART_OBJECTS.deck),valve=objects.get(MAYOR_ART_OBJECTS.valve);
         const cue=mechanismCue(m),pressure=cue==='rising'||cue==='ready'||cue==='released';
+        const seamBusy=m.state==='recover'&&!!m.counterpressure;
         if(lift&&valve){
             // The hydraulic connection stays behind the real plate and lift.
             // Its light means a fresh request, never a stale pre-stamp toggle.
@@ -130,9 +137,12 @@ export function drawGuairaMayorObjects(c:CanvasRenderingContext2D,objects:Bodies
             }
             deck(c,lift,cx,cy,true);
             if(cue==='ready'){
-                // A right-pointing inlay on the board directs the now-open route.
                 const x=lift.x+lift.width-20-cx,y=lift.y+3-cy;
-                rect(c,x,y+1,8,1,M.waterLight);rect(c,x+5,y-1,1,5,M.waterLight);rect(c,x+6,y,1,3,M.waterLight);
+                if(seamBusy)waitInlay(c,x,y-1);
+                else{
+                    // A forward inlay is safe only once the announced pulse ends.
+                    rect(c,x,y+1,8,1,M.waterLight);rect(c,x+5,y-1,1,5,M.waterLight);rect(c,x+6,y,1,3,M.waterLight);
+                }
             }
             for(const wx of [lift.x+4,lift.x+lift.width-8]){
                 rect(c,wx-cx,lift.y+lift.height-cy,3,5,'#816d51');line(c,wx-cx,lift.y+lift.height+5-cy,wx+7-cx,lift.y+lift.height-cy,'#a38a5d');
@@ -146,6 +156,15 @@ export function drawGuairaMayorObjects(c:CanvasRenderingContext2D,objects:Bodies
             deck(c,upper,cx,cy,false);
             // The stamp lands on a brass plate flush with the actual deck, no invented pedestal.
             rect(c,upper.x+23-cx,upper.y-cy,13,1,M.bronzeLight);rect(c,upper.x+24-cx,upper.y+1-cy,11,2,M.bronzeShade);
+            if(seamBusy){
+                // Flush bronze outlets sit below the hazard, never above its top.
+                const q=m.counterpressure!.rect;
+                for(const x of [q.x+4,q.x+q.width-9]){
+                    rect(c,x-cx,q.y+q.height-cy,5,3,M.bronzeShade);
+                    rect(c,x+1-cx,q.y+q.height-cy,3,1,M.bronzeLight);
+                    rect(c,x+2-cx,q.y+q.height+1-cy,1,2,M.waterShade);
+                }
+            }
         }
         if(valve){
             const x=Math.round(valve.x)-cx,y=Math.round(valve.y)-cy,w=Math.round(valve.width),h=Math.round(valve.height);
@@ -159,7 +178,8 @@ export function drawGuairaMayorObjects(c:CanvasRenderingContext2D,objects:Bodies
             }else if(cue==='rising'){
                 rect(c,mx,y+2,1,5,color);rect(c,mx-1,y+3,3,1,color);rect(c,mx-2,y+4,5,1,color);
             }else if(cue==='ready'||cue==='released'){
-                rect(c,mx-4,y+4,8,1,color);rect(c,mx+1,y+2,1,5,color);rect(c,mx+2,y+3,1,3,color);
+                if(seamBusy)waitInlay(c,mx-3,y+2);
+                else{rect(c,mx-4,y+4,8,1,color);rect(c,mx+1,y+2,1,5,color);rect(c,mx+2,y+3,1,3,color);}
             }else{
                 // A quiet closed latch replaces the misleading permanent arrow.
                 rect(c,mx-4,y+3,8,2,M.creamShade);rect(c,mx-4,y+2,2,4,M.creamShade);rect(c,mx+2,y+2,2,4,M.creamShade);

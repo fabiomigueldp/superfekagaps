@@ -40,8 +40,8 @@ function replay(h: ReturnType<typeof guairaMayorBrowser>, g: GuairaMayorLab, tou
     }
     assert.equal(frame, recording.frames); assert.ok(pounds > 15); assert.equal(openings, 3);
     assert.ok(carried >= 20, 'actual native lift carry was used');
-    assert.deepEqual(hitFrames, [322, 622, 922]);
-    assert.ok(hitRecoveryTicks.every(tick => tick < R.recover - 120), 'more than two seconds of margin in every window');
+    assert.deepEqual(hitFrames, [322, 652, 982]);
+    assert.ok(hitRecoveryTicks.every(tick => tick < R.recover - 100), 'more than 100 ticks of margin in every window');
     assert.equal(g.mayor.publicWaterOpen, true); assert.equal(g.mayor.sealsRemaining, 0);
     assert.ok(g.player.data.position.x < 100); assert.equal(feet(g), A.floor);
     assert.equal(g.player.data.isGrounded, true);

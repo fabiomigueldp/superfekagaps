@@ -7,11 +7,16 @@ export const MAYOR_ARENA = Object.freeze({
     valve: Object.freeze({ x: 64, y: 216, width: 32, height: 8 }),
     lift: Object.freeze({ x: 112, y: 224, width: 112, height: 8 }),
     deck: Object.freeze({ x: 224, y: 160, width: 92, height: 8 }),
-    vent: Object.freeze({ x: 112, y: 204, width: 112, height: 20 })
+    vent: Object.freeze({ x: 112, y: 204, width: 112, height: 20 }),
+    seam: Object.freeze({ x: 208, y: 140, width: 32, height: 20 })
 });
 export const MAYOR_RULES = Object.freeze({ tickMs: 1000 / 60, intro: 72, idle: 30, warning: 60,
-    stamp: 24, recover: 270, hurt: 45, seals: 3 });
+    stamp: 24, recover: 270, hurt: 45, seals: 3, counterpressureWarning: 60, counterpressureActive: 24 });
 export type MayorState = 'intro' | 'idle' | 'warning' | 'stamp' | 'recover' | 'hurt' | 'released';
+export interface MayorCounterpressure {
+    readonly phase: 'warning' | 'active'; readonly rect: Readonly<Rect>;
+    readonly ticksRemaining: number; readonly progress: number;
+}
 export interface MayorAccess { valveActive: boolean; liftReady: boolean; registerOpened: boolean }
 export interface MayorEvent { kind: 'warning' | 'stamp' | 'hit' | 'released'; tick: number }
 export const mayorOverlaps = (a: Rect, b: Rect) => a.x < b.x + b.width && a.x + a.width > b.x &&
@@ -30,14 +35,43 @@ export class GuairaMayorModel implements Rect {
     private freshOpening = false;
     private accessReady = false;
     private valveActive = false;
+    private pressurePhase: MayorCounterpressure['phase'] | null = null;
+    private pressureTick = 0;
+    private pressureSpent = false;
     get publicWaterOpen() { return this.state === 'released'; }
     get registerOpenedThisCycle() { return this.freshOpening; }
     get accessRequested() { return this.freshOpening && this.valveActive; }
     get vulnerable() { return this.state === 'recover' && this.freshOpening && this.accessReady; }
     get warningProgress() { return Math.min(1, this.stateTick / MAYOR_RULES.warning); }
-    get danger(): Readonly<Rect> | null { return this.state === 'stamp' ? this.stampTarget : null; }
-    private enter(state: MayorState) { this.state = state; this.stateTick = 0; }
+    get counterpressure(): Readonly<MayorCounterpressure> | null {
+        if (!this.pressurePhase) return null;
+        const duration = this.pressurePhase === 'warning' ? MAYOR_RULES.counterpressureWarning : MAYOR_RULES.counterpressureActive;
+        return Object.freeze({ phase: this.pressurePhase, rect: MAYOR_ARENA.seam,
+            ticksRemaining: duration - this.pressureTick, progress: this.pressureTick / duration });
+    }
+    get danger(): Readonly<Rect> | null {
+        return this.state === 'stamp' ? this.stampTarget : this.pressurePhase === 'active' ? MAYOR_ARENA.seam : null;
+    }
+    /** Closing the valve or ending an attempt consumes the pulse, even on reopening. */
+    cancelCounterpressure() { this.pressurePhase = null; this.pressureTick = 0; this.pressureSpent = true; }
+    private enter(state: MayorState) {
+        this.state = state; this.stateTick = 0;
+        if (state !== 'recover') this.cancelCounterpressure();
+    }
     private emit(kind: MayorEvent['kind']) { this.events.push({ kind, tick: this.tick }); }
+    private advanceCounterpressure() {
+        if (!this.vulnerable || this.sealsRemaining === MAYOR_RULES.seals) return;
+        if (!this.pressureSpent) {
+            this.pressureSpent = true; this.pressurePhase = 'warning'; this.pressureTick = 0;
+        } else if (this.pressurePhase) {
+            this.pressureTick++;
+            if (this.pressurePhase === 'warning' && this.pressureTick >= MAYOR_RULES.counterpressureWarning) {
+                this.pressurePhase = 'active'; this.pressureTick = 0;
+            } else if (this.pressurePhase === 'active' && this.pressureTick >= MAYOR_RULES.counterpressureActive) {
+                this.cancelCounterpressure();
+            }
+        }
+    }
 
     update(dt: number, access: MayorAccess) {
         this.events = [];
@@ -46,6 +80,7 @@ export class GuairaMayorModel implements Rect {
             this.freshOpening = true;
         this.valveActive = access.valveActive;
         this.accessReady = access.valveActive && access.liftReady;
+        if (this.freshOpening && !this.valveActive) this.cancelCounterpressure();
         // A resumed browser frame cannot consume an entire warning.
         this.remainder += Math.min(dt, 100);
         while (this.remainder + 1e-7 >= MAYOR_RULES.tickMs) {
@@ -62,11 +97,13 @@ export class GuairaMayorModel implements Rect {
                 case 'warning': if (this.stateTick >= MAYOR_RULES.warning) {
                     this.freshOpening = this.accessReady = this.valveActive = false;
                     this.enter('stamp'); this.emit('stamp');
+                    this.pressureSpent = false;
                 } break;
                 case 'stamp': if (this.stateTick >= MAYOR_RULES.stamp) this.enter('recover'); break;
                 case 'recover': if (this.stateTick >= MAYOR_RULES.recover) this.enter('idle'); break;
                 case 'hurt': if (this.stateTick >= MAYOR_RULES.hurt) this.enter('idle'); break;
             }
+            this.advanceCounterpressure();
         }
     }
 
@@ -82,7 +119,7 @@ export class GuairaMayorModel implements Rect {
                 this.enter(released ? 'released' : 'hurt'); this.emit(released ? 'released' : 'hit');
                 return released ? 'defeated' : 'hit';
             }
-            // The exact warned vent is the only damage source. A player beside
+            // Only exact warned water bounds deal damage. A player beside
             // the mayor cannot be hurt merely because a recovery window ends.
         }
         return this.danger && mayorOverlaps(player, this.danger) ? 'hurt' : 'none';

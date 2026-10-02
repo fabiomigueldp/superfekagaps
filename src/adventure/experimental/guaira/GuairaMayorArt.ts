@@ -12,6 +12,12 @@ export const MAYOR_PALETTE = Object.freeze({
 });
 export type MayorPose = 'intro'|'idle'|'warning'|'stamp'|'recover'|'hurt'|'released';
 export interface MayorRect { readonly x:number; readonly y:number; readonly width:number; readonly height:number }
+export interface MayorCounterpressure {
+    readonly phase:'warning'|'active';
+    readonly rect:Readonly<MayorRect>;
+    readonly ticksRemaining:number;
+    readonly progress:number;
+}
 export interface GuairaMayorArtState extends MayorRect {
     readonly state: MayorPose;
     readonly stateTick:number;
@@ -22,6 +28,7 @@ export interface GuairaMayorArtState extends MayorRect {
     readonly publicWaterOpen:boolean;
     readonly sealsRemaining:number;
     readonly warningProgress?:number;
+    readonly counterpressure?:Readonly<MayorCounterpressure>|null;
 }
 
 type Brush = ReturnType<typeof brush>;
@@ -144,7 +151,34 @@ function coveredRecovery(b:Brush){
     stamp(b,10,-12);r(9,-13,10,4,P.skinShade);r(10,-13,8,2,P.skinLight);r(14,-12,1,2,P.skinShade);
     key(b,-22,-2,true);
 }
-function recovering(b:Brush,vulnerable:boolean){
+function pressureOrder(b:Brush,pulse:Readonly<MayorCounterpressure>){
+    const {rect:r}=b;
+    // The stamp comes free of its socket, extends toward the seam, then orders
+    // the discharge down. All action stays forward of the exposed upper back.
+    const progress=Number.isFinite(pulse.progress)?Math.max(0,Math.min(1,pulse.progress)):0;
+    const pose=pulse.phase==='active'?2:progress<.35?0:1;
+    face(b,5,-33,pose===2?'effort':'frown');
+    // The rear hand braces the knee; it never rises over the hit opening.
+    b.poly([[1,-24],[7,-22],[10,-14],[5,-12],[0,-18]],P.creamShade);
+    r(5,-15,5,3,P.skinShade);r(6,-15,3,1,P.skinLight);
+    if(pose===0){
+        b.poly([[9,-25],[14,-25],[18,-21],[20,-28],[25,-27],[23,-16],[17,-15],[10,-19]],P.ink);
+        b.poly([[10,-24],[13,-24],[18,-19],[21,-25],[23,-25],[21,-17],[18,-17],[11,-20]],P.cream);
+        stamp(b,18,-35);r(21,-28,5,4,P.skin);r(21,-28,3,2,P.skinLight);
+    }else if(pose===1){
+        b.poly([[9,-25],[15,-25],[21,-22],[29,-24],[31,-19],[21,-16],[12,-19]],P.ink);
+        b.poly([[10,-24],[14,-24],[21,-20],[28,-22],[29,-20],[21,-18],[13,-20]],P.cream);
+        stamp(b,25,-31);r(28,-24,5,4,P.skin);r(28,-24,3,2,P.skinLight);
+        // A tightened mouth and extended hand make the order readable at rest.
+        r(12,-23,4,1,P.ink);
+    }else{
+        b.poly([[9,-25],[15,-23],[22,-16],[28,-14],[26,-9],[18,-11],[10,-19]],P.ink);
+        b.poly([[10,-24],[14,-22],[21,-14],[26,-13],[25,-11],[19,-13],[11,-20]],P.cream);
+        stamp(b,23,-17);r(25,-14,6,4,P.skinShade);r(25,-14,4,2,P.skinLight);
+    }
+    key(b,-22,-2,true);
+}
+function recovering(b:Brush,vulnerable:boolean,pulse?:Readonly<MayorCounterpressure>|null){
     const {rect:r}=b;
     // The back, supported by bent legs, stays exactly on the model's top plane.
     b.poly([[-8,-18],[0,-16],[-4,-7],[-12,-5],[-15,-8]],P.ink);b.poly([[-8,-17],[-1,-16],[-5,-8],[-12,-7]],P.pantsShade);
@@ -155,6 +189,7 @@ function recovering(b:Brush,vulnerable:boolean){
     b.poly([[-9,-37],[-5,-39],[0,-39],[7,-31],[4,-22],[-3,-20],[-12,-24]],P.cream);
     b.line(-6,-39,0,-39,vulnerable?P.creamLight:P.cream);
     b.poly([[-10,-34],[-7,-37],[8,-26],[7,-22]],P.sash);b.line(-8,-34,5,-25,P.sashLight);
+    if(pulse){pressureOrder(b,pulse);return;}
     face(b,5,-33,'effort');
     // Both hands pull a square stamp visibly stuck in the low control plate.
     b.poly([[9,-25],[15,-25],[20,-11],[14,-9],[9,-18]],P.ink);b.poly([[10,-24],[14,-23],[18,-12],[15,-11],[10,-18]],P.cream);
@@ -182,7 +217,7 @@ export function drawGuairaMayor(c:CanvasRenderingContext2D,m:GuairaMayorArtState
     c.save();c.translate(Math.round(m.x+m.width/2-cx),Math.round(m.y+m.height-cy));c.scale(-1,1);
     const b=brush(c);
     if(m.state==='released')released(b);
-    else if(m.state==='recover'){if(m.vulnerable)recovering(b,true);else coveredRecovery(b);}
+    else if(m.state==='recover'){if(m.vulnerable)recovering(b,true,m.counterpressure);else coveredRecovery(b);}
     else if(m.state==='stamp')stamping(b);
     else if(m.state==='hurt'){
         recovering(b,false);
@@ -194,11 +229,47 @@ export function drawGuairaMayor(c:CanvasRenderingContext2D,m:GuairaMayorArtState
 
 /** Warning and active ink never extend beyond the model's exact locked rectangle. */
 export function drawGuairaMayorStampTarget(c:CanvasRenderingContext2D,m:GuairaMayorArtState,cx=0,cy=0,_reducedMotion=false){
-    const q=m.stampTarget;if(!q||(m.state!=='warning'&&m.state!=='stamp'))return;
+    const pulse=m.state==='recover'?m.counterpressure:null;
+    const q=pulse?.rect??m.stampTarget;if(!q||(!pulse&&m.state!=='warning'&&m.state!=='stamp'))return;
     if(![q.x,q.y,q.width,q.height,cx,cy].every(Number.isFinite)||q.width<=0||q.height<=0)return;
     const x=Math.round(q.x-cx),y=Math.round(q.y-cy),w=Math.round(q.width),h=Math.round(q.height);
     c.save();c.beginPath();c.rect(x,y,w,h);c.clip();const b=brush(c),r=b.rect;
-    if(m.state==='warning'){
+    if(pulse){
+        // The seam is a separate, frozen pressure chamber. Every warning and
+        // active pixel stays in the same model rectangle, including both ends.
+        const progress=Number.isFinite(pulse.progress)?Math.max(0,Math.min(1,pulse.progress)):0;
+        if(pulse.phase==='warning'){
+            // Dark inner edges preserve contrast against the warm stone room.
+            r(x,y,w,2,P.ink);r(x,y+h-3,w,3,P.ink);r(x,y,2,h,P.ink);r(x+w-2,y,2,h,P.ink);
+            r(x,y,1,h,P.warning);r(x+w-1,y,1,h,P.warning);
+            for(let xx=2;xx<w-2;xx+=6)r(x+xx,y,Math.min(3,w-2-xx),1,P.warning);
+            r(x,y+h-2,w,2,P.warning);
+            for(let xx=8;xx<w-4;xx+=14){
+                b.line(x+xx-4,y+8,x+xx,y+4,P.ink,2);b.line(x+xx,y+4,x+xx+4,y+8,P.ink,2);
+                b.line(x+xx-3,y+8,x+xx,y+5,P.warning);b.line(x+xx,y+5,x+xx+3,y+8,P.warning);
+            }
+            const span=Math.max(0,w-8),filled=Math.floor(span*progress);
+            r(x+3,y+h-8,w-6,5,P.bronzeShade);r(x+4,y+h-7,span,3,P.ink);
+            for(let i=0;i<4;i++){
+                const start=Math.floor(i*span/4),end=Math.floor((i+1)*span/4)-1;
+                r(x+4+start,y+h-6,Math.max(0,end-start),1,P.bronze);
+                r(x+4+start,y+h-6,Math.max(0,Math.min(end,filled)-start),1,P.warning);
+            }
+        }else{
+            // A solid bounded body is dangerous on its first AND last tick.
+            // Moving highlights use only pulse progress, so pausing freezes it.
+            r(x,y,w,h,P.waterShade);
+            const step=_reducedMotion?0:Math.floor(progress*8);
+            for(let xx=3;xx<w-2;xx+=7){
+                r(x+xx,y+2,3,h-3,P.water);
+                r(x+xx,y+2+(step+xx)%4,1,Math.max(1,h-8),P.waterLight);
+            }
+            r(x,y,w,1,P.waterLight);r(x,y,2,h,P.waterLight);r(x+w-2,y,2,h,P.waterLight);r(x,y+h-2,w,2,P.waterLight);
+            // The narrow base stripe empties with the model's active phase.
+            r(x+3,y+h-4,Math.max(0,w-6),1,P.waterShade);
+            r(x+3,y+h-4,Math.floor(Math.max(0,w-6)*(1-progress)),1,P.waterLight);
+        }
+    }else if(m.state==='warning'){
         for(let xx=0;xx<w;xx+=8){r(x+xx,y,4,1,P.warning);r(x+xx,y+h-3,4,3,P.warning);}
         r(x,y,2,h,P.warning);r(x+w-2,y,2,h,P.warning);
         // Downward chevrons tie the fixed marked region to a closing order.

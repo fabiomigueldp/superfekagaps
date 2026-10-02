@@ -63,7 +63,7 @@ export class GuairaMayorEncounter extends BossEncounter {
             valve.active = valve.observedActive = lift.active = lift.observedActive = true;
         }
         this.impactPoint = { x: 278, y: 160 };
-        // Resolve the exactly painted vent inside contact, after top precedence.
+        // Resolve exactly painted water inside contact, after top precedence.
         this.danger = null; this.sync();
     }
     override contact(p: Rect, previous: Rect, falling: boolean) {
@@ -74,6 +74,8 @@ export class GuairaMayorEncounter extends BossEncounter {
     override get hint() {
         const b = this.model;
         if (b.publicWaterOpen) return 'AGUA DO BAIRRO LIBERADA';
+        if (b.counterpressure?.phase === 'warning') return 'EMENDA: ESPERE OU PULE';
+        if (b.counterpressure?.phase === 'active') return 'AGUA NA EMENDA! ESPERE OU PULE';
         if (b.vulnerable) return 'AGORA! GOLPE POR CIMA';
         if (b.state === 'warning') return 'CARIMBO ALTO: SAIA DA GRELHA';
         if (b.state === 'stamp') return 'AGUA NA GRELHA! REGISTRO A ESQUERDA';
@@ -128,6 +130,7 @@ export class GuairaMayorLab extends WorldGame {
         if (!Number.isFinite(dt) || dt <= 0) return;
         if (this.state === 'map' || this.state === 'title' || this.state === 'intro') { this.load(MAYOR_ARENA.id); return; }
         super.update(dt);
+        if (this.player.data.isDead) this.mayor.cancelCounterpressure();
         if (this.state === 'playing' && !this.player.data.isDead) {
             // Native renderer places the body at y-2 and the standing/jumping
             // helmet another 2px above it. Use that conservative visual top,
