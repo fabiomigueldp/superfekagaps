@@ -22,15 +22,16 @@
     <div id="guaira-markers" aria-label="Destinos na maquete">
       <button type="button" class="guaira-marker" data-map-destination="town" aria-label="Ir à Estrada do Vento" hidden>TRAVESSIA</button>
       <button type="button" class="guaira-marker" data-map-destination="curral" aria-label="Ir ao Curral da Comporta" hidden>CURRAL</button>
+      <button type="button" class="guaira-marker guaira-marker-bairro" data-map-destination="bairro" aria-label="Caminhar ao Bairro da Vala Seca" hidden>BAIRRO</button>
     </div>
     <p class="guaira-caption">Da vala seca à Casa da Vazão.</p>
     <div id="map-error" hidden>
       <p role="alert">Não foi possível carregar a maquete. Você pode entrar direto em um dos experimentos.</p>
-      <nav aria-label="Experimentos disponíveis"><a href="./guaira-travessia.html">Jogar travessia</a><a href="./guaira-lab.html">Jogar arena</a><a href="./guaira-subida.html">Subida à Casa</a><a href="./guaira-prefeito.html">Prefeito · experimento opcional</a><a href="./guaira-patio.html">Pátio das Comportas · percurso opcional</a><a href="./guaira-respiros.html">Passagem dos Respiros · irrigação opcional</a></nav>
+      <nav aria-label="Experimentos disponíveis"><a href="./guaira-travessia.html">Jogar travessia</a><a href="./guaira-lab.html">Jogar arena</a><a href="./guaira-subida.html">Subida à Casa</a><a href="./guaira-prefeito.html">Prefeito · experimento opcional</a><a href="./guaira-patio.html">Pátio das Comportas · percurso opcional</a><a href="./guaira-respiros.html">Passagem dos Respiros · irrigação opcional</a><a href="./guaira-galeria.html">Galeria dos Remendos · percurso opcional do bairro</a></nav>
       <a href="./guaira.html">Tentar carregar o mapa de novo</a>
     </div>
     <div id="map-loading-panel"><p id="map-loading" role="status">Carregando a maquete…</p>
-      <nav aria-label="Entrar direto enquanto a maquete carrega"><a href="./guaira-travessia.html">Jogar travessia</a><a href="./guaira-lab.html">Jogar arena</a><a href="./guaira-subida.html">Subida à Casa</a><a href="./guaira-prefeito.html">Prefeito · experimento opcional</a><a href="./guaira-patio.html">Pátio das Comportas · percurso opcional</a><a href="./guaira-respiros.html">Passagem dos Respiros · irrigação opcional</a></nav>
+      <nav aria-label="Entrar direto enquanto a maquete carrega"><a href="./guaira-travessia.html">Jogar travessia</a><a href="./guaira-lab.html">Jogar arena</a><a href="./guaira-subida.html">Subida à Casa</a><a href="./guaira-prefeito.html">Prefeito · experimento opcional</a><a href="./guaira-patio.html">Pátio das Comportas · percurso opcional</a><a href="./guaira-respiros.html">Passagem dos Respiros · irrigação opcional</a><a href="./guaira-galeria.html">Galeria dos Remendos · percurso opcional do bairro</a></nav>
     </div>
   </section>
   <footer class="guaira-panel">
@@ -46,11 +47,20 @@
     </div>
     <div class="guaira-actions">
       <button id="map-skip" type="button" hidden>Chegar agora</button>
-      <button id="map-return" type="button" hidden disabled>Voltar ao curral pela estrada</button>
+      <button id="map-return" type="button" aria-controls="map-detours" hidden disabled>Voltar ao curral pela estrada</button>
       <button id="map-enter" type="button" aria-describedby="map-description map-status" disabled>Entrar</button>
     </div>
     <p id="map-instructions">Escolha e entre ao chegar. ← Travessia · → Arena · ↑ Subida · Tab navega pelos controles.</p>
   </footer>
+  <dialog id="map-detours" aria-labelledby="map-detours-title" aria-describedby="map-detours-description">
+    <h2 id="map-detours-title">Desvios da estrada</h2>
+    <p id="map-detours-description">Escolha um percurso opcional. A Travessia continua no mapa.</p>
+    <div class="guaira-detour-choices">
+      <button id="map-detour-patio" type="button" autofocus disabled>Entrar no Pátio<span>Pátio das Comportas · dois ramais de água</span></button>
+      <button id="map-detour-bairro" type="button" disabled>Caminhar ao Bairro da Vala Seca<span>A Galeria dos Remendos fica no bairro. Entre ao chegar.</span></button>
+    </div>
+    <button id="map-detours-close" type="button">Voltar ao mapa</button>
+  </dialog>
 </main>
 <script type="module" src="/src/guaira.ts"></script>
 </body>

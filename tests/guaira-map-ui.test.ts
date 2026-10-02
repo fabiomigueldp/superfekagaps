@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 const raw = JSON.parse(readFileSync(new URL('../public/assets/world/experimental/guaira/guaira-diorama.meta.json', import.meta.url), 'utf8'));
 const noop = () => {};
-let basePaints = 0, markerReads = 0, regionClips = 0;
+let basePaints = 0, markerReads = 0, regionClips = 0, sceneWidth = 390, sceneHeight = 450;
 const context = new Proxy({ createLinearGradient: () => ({ addColorStop: noop }),
     drawImage: (image: { src?: string }) => { if (image.src?.endsWith('guaira-diorama.webp')) basePaints++; },
     clip: () => { regionClips++; },
@@ -14,22 +14,28 @@ class Element extends EventTarget {
     style: Record<string, string> = {}; attributes: Record<string, string> = {}; children: Element[] = [];
     dataset: Record<string, string> = {}; marker = false; focused = false;
     classList = { contains: (name: string) => name === 'guaira-marker' && this.marker };
-    className = '';
+    className = ''; open = false; lastClick?: EventListener;
+    override addEventListener(type: string, listener: EventListenerOrEventListenerObject | null, options?: boolean | AddEventListenerOptions) {
+        super.addEventListener(type, listener, options);
+        if (type === 'click' && typeof listener === 'function') this.lastClick = listener;
+    }
+    showModal() { this.open = true; }
+    close() { if (!this.open) return; this.open = false; this.dispatchEvent(new Event('close')); }
     append(...children: Element[]) { this.children.push(...children); }
     setAttribute(key: string, value: string) { this.attributes[key] = value; }
-    getBoundingClientRect() { if (this.marker) markerReads++; return { width: this.marker ? 116 : 390, height: this.marker ? 44 : 450 }; }
+    getBoundingClientRect() { if (this.marker) markerReads++; return { width: this.marker ? this.hidden ? 0 : (this.children.at(-2)?.width ?? 116) : sceneWidth, height: this.marker ? 44 : sceneHeight }; }
     getContext() { return context; }
-    focus() { this.focused = true; }
+    focus() { this.focused = true; doc.activeElement = this; }
     click() { if (!this.disabled) this.dispatchEvent(new Event('click')); }
 }
 class Media extends EventTarget { matches = false; }
-const ids = ['guaira-canvas', 'map-loading', 'map-loading-panel', 'map-status', 'map-enter', 'map-skip', 'map-return', 'map-overview', 'map-exit', 'map-title', 'map-description', 'map-error'];
+const ids = ['guaira-canvas', 'map-loading', 'map-loading-panel', 'map-status', 'map-enter', 'map-skip', 'map-return', 'map-overview', 'map-exit', 'map-title', 'map-description', 'map-error', 'map-detours', 'map-detour-patio', 'map-detour-bairro', 'map-detours-close'];
 const elements = Object.fromEntries(ids.map(id => [id, new Element()]));
-const destinations = ['town', 'curral', 'subida', 'town', 'curral'].map((id, i) => { const e = new Element(); e.dataset.mapDestination = id; e.marker = i > 2; return e; });
+const destinations = ['town', 'curral', 'subida', 'town', 'curral', 'bairro'].map((id, i) => { const e = new Element(); e.dataset.mapDestination = id; e.marker = i > 2; return e; });
 const scene = new Element(), doc = new EventTarget() as EventTarget & Record<string, unknown>, win = new EventTarget();
 let observerDisconnected = 0;
 Object.assign(doc, { hidden: false, getElementById: (id: string) => elements[id], querySelector: () => scene, querySelectorAll: () => destinations, createElement: () => new Element() });
-const motion = new Media(), queue = new Map<number, FrameRequestCallback>(); let next = 1, clock = 0;
+const motion = new Media(), compactMarkers = new Media(), queue = new Map<number, FrameRequestCallback>(); let next = 1, clock = 0;
 const navigations: string[] = [], replacements: string[] = [];
 const locationMock = { href: 'https://example.test/guaira.html?at=rice', search: '?at=rice', assign: (href: string) => navigations.push(href) };
 let fetchRaw: unknown = raw;
@@ -38,7 +44,7 @@ let waterReady: Promise<void> = Promise.resolve(), waterFailure = true;
 Object.assign(globalThis, {
     document: doc, window: win, location: locationMock,
     history: { replaceState: (_a: unknown, _b: string, url: URL) => replacements.push(String(url)) },
-    matchMedia: () => motion, devicePixelRatio: 1,
+    matchMedia: (query: string) => query.includes('prefers-reduced-motion') ? motion : compactMarkers, devicePixelRatio: 1,
     ResizeObserver: class { observe() {} disconnect() { observerDisconnected++; } },
     Image: class {
         src = '';
@@ -156,7 +162,7 @@ test('actual map entry handles pending loading, selection, arrival, reduced moti
 
 test('loading and failure markup retain direct links to every isolated experiment', () => {
     const html = readFileSync(new URL('../guaira.html', import.meta.url), 'utf8');
-    for (const href of ['./guaira-travessia.html', './guaira-lab.html', './guaira-subida.html', './guaira-prefeito.html', './guaira-patio.html', './guaira-respiros.html']) {
+    for (const href of ['./guaira-travessia.html', './guaira-lab.html', './guaira-subida.html', './guaira-prefeito.html', './guaira-patio.html', './guaira-respiros.html', './guaira-galeria.html']) {
         assert.equal(html.split(`href="${href}"`).length - 1, 2, `${href} is available during loading and failure`);
     }
     assert.match(html, /id="destination-subida"[^>]*data-map-destination="subida"/);
@@ -165,7 +171,7 @@ test('loading and failure markup retain direct links to every isolated experimen
     assert.match(html, /id="map-enter"[^>]*aria-describedby="map-description map-status"/);
 });
 
-test('town shows the optional Patio separately from the primary traversal and validates live entry', async () => {
+test('town keeps Patio in the Desvios menu, separate from the primary traversal, and validates live entry', async () => {
     const module = await import('../src/guaira');
     fetchRaw = raw; imageReady = Promise.resolve(); waterReady = Promise.resolve(); waterFailure = true;
     motion.matches = false; doc.hidden = false;
@@ -173,14 +179,15 @@ test('town shows the optional Patio separately from the primary traversal and va
     const dispose = module.startGuairaMap(); await ready(); frames(2);
     assert.equal(elements['map-enter'].attributes['aria-label'], 'Entrar: Estrada do Vento');
     assert.equal(elements['map-return'].hidden, false);
-    assert.equal(elements['map-return'].attributes['aria-label'], 'Pátio das Comportas: explorar o percurso opcional de água');
+    assert.equal(elements['map-return'].attributes['aria-label'], 'Desvios: entrar no Pátio ou caminhar ao Bairro da Vala Seca');
     const before = navigations.length;
     destinations[1].click();
     assert.equal(elements['map-return'].hidden, true); assert.equal(elements['map-return'].disabled, true);
     elements['map-return'].dispatchEvent(new Event('click')); assert.equal(navigations.length, before);
     frames(2); destinations[0].click(); elements['map-skip'].click();
     assert.equal(elements['map-return'].disabled, false);
-    elements['map-return'].click(); assert.equal(navigations.at(-1), './guaira-patio.html');
+    elements['map-return'].click(); assert.equal(elements['map-detours'].open, true);
+    assert.equal(navigations.length, before); elements['map-detour-patio'].click(); assert.equal(navigations.at(-1), './guaira-patio.html');
     elements['map-return'].dispatchEvent(new Event('click'));
     elements['map-enter'].dispatchEvent(new Event('click'));
     assert.equal(navigations.length, before + 1, 'closing guards both the primary and optional entries');
@@ -314,4 +321,154 @@ test('return summaries survive reload but clear synchronously on a new choice wi
         assert.equal(elements['map-title'].textContent, 'Curral da Comporta');
         assert.doesNotMatch(elements['map-status'].textContent, /descansou/); dispose();
     } finally { history.replaceState = originalReplace; motion.matches = false; win.dispatchEvent(new Event('pagehide')); }
+});
+
+
+test('native detours suspend the map, preserve arrows, dismiss with focus, and reject old sessions and presses', async () => {
+    const module = await import('../src/guaira');
+    fetchRaw = raw; imageReady = Promise.resolve(); waterReady = Promise.resolve(); waterFailure = false;
+    motion.matches = false; doc.hidden = false;
+    locationMock.search = '?at=town'; locationMock.href = 'https://example.test/guaira.html?at=town';
+    const dispose = module.startGuairaMap(); await ready(); frames(2);
+    const before = navigations.length, beforeTitle = elements['map-title'].textContent;
+    const open = () => { elements['map-return'].click(); assert.equal(elements['map-detours'].open, true); };
+    open();
+    const oldPatio = elements['map-detour-patio'].lastClick!, oldBairro = elements['map-detour-bairro'].lastClick!;
+    assert.equal(doc.activeElement, elements['map-detour-patio']);
+    assert.equal(elements['map-return'].attributes['aria-expanded'], 'true');
+    const frozen = basePaints;
+    for (const arrow of ['ArrowLeft', 'ArrowRight', 'ArrowUp']) assert.equal(key(arrow).defaultPrevented, false);
+    destinations[1].dispatchEvent(new Event('click')); elements['map-skip'].dispatchEvent(new Event('click'));
+    elements['map-enter'].dispatchEvent(new Event('click')); elements['map-overview'].dispatchEvent(new Event('click'));
+    frames(600);
+    assert.equal(queue.size, 0); assert.equal(basePaints, frozen); assert.equal(elements['map-title'].textContent, beforeTitle);
+    assert.equal(navigations.length, before);
+    const cancel = new Event('cancel', { cancelable: true }); elements['map-detours'].dispatchEvent(cancel);
+    assert.equal(cancel.defaultPrevented, true); assert.equal(elements['map-detours'].open, false);
+    assert.equal(elements['map-return'].attributes['aria-expanded'], 'false');
+    assert.equal(doc.activeElement, elements['map-return']);
+    frames(1); assert.equal(basePaints, frozen, 'modal close resumes water at the same phase'); frames(3); assert.ok(basePaints > frozen);
+    oldPatio(new Event('click')); oldBairro(new Event('click')); assert.equal(navigations.length, before);
+    open();
+    oldPatio(new Event('click')); oldBairro(new Event('click'));
+    assert.equal(elements['map-detours'].open, true); assert.equal(navigations.length, before);
+    const queuedBairro = elements['map-detour-bairro'].lastClick!;
+    elements['map-detour-bairro'].dispatchEvent(new Event('pointerdown'));
+    elements['map-detours-close'].click(); open();
+    queuedBairro(new Event('click')); assert.equal(elements['map-detours'].open, true);
+    // A late native click from the previous press must not activate the new menu binding.
+    elements['map-detour-bairro'].click(); assert.equal(elements['map-detours'].open, true);
+    compactMarkers.matches = true; compactMarkers.dispatchEvent(new Event('change'));
+    const beforeCompactFrames = basePaints; frames(60);
+    assert.equal(basePaints, beforeCompactFrames); assert.equal(queue.size, 0);
+    elements['map-detours-close'].click(); assert.equal(elements['map-detours'].open, false, 'crossing the breakpoint preserves the modal close action');
+    open(); compactMarkers.matches = false; compactMarkers.dispatchEvent(new Event('change'));
+    const beforeExpandFrames = basePaints; frames(60);
+    assert.equal(basePaints, beforeExpandFrames); assert.equal(queue.size, 0);
+    elements['map-detour-bairro'].dispatchEvent(new Event('pointerdown'));
+    elements['map-detour-bairro'].click();
+    assert.equal(elements['map-detours'].open, false); assert.equal(elements['map-title'].textContent, 'Bairro da Vala Seca');
+    assert.equal(elements['map-enter'].disabled, true); assert.equal(elements['map-skip'].hidden, false);
+    assert.equal(navigations.length, before); assert.equal(doc.activeElement, elements['map-skip']);
+    elements['map-enter'].dispatchEvent(new Event('click')); assert.equal(navigations.length, before);
+    frames(240);
+    assert.equal(elements['map-enter'].disabled, false);
+    assert.match(elements['map-enter'].attributes['aria-label'], /Galeria/);
+    assert.match(replacements.at(-1)!, /at=bairro/); assert.doesNotMatch(replacements.at(-1)!, /visit=/);
+    assert.equal(navigations.length, before, 'real arrival still requires explicit entry');
+    const repeatEnter = Object.assign(new Event('keydown', { cancelable: true }), { key: 'Enter', repeat: true });
+    elements['map-enter'].dispatchEvent(repeatEnter);
+    assert.equal(repeatEnter.defaultPrevented, true, 'held Enter cannot activate a newly focused entry');
+    elements['map-enter'].click(); elements['map-enter'].dispatchEvent(new Event('click'));
+    assert.equal(navigations.length, before + 1); assert.equal(navigations.at(-1), './guaira-galeria.html');
+    dispose(); waterFailure = true;
+});
+
+test('detour callbacks cannot survive hide, disposal, same-state reselection, or reduced-motion arrival', async () => {
+    const module = await import('../src/guaira');
+    fetchRaw = raw; imageReady = Promise.resolve(); waterReady = Promise.resolve(); waterFailure = true;
+    motion.matches = false; doc.hidden = false;
+    locationMock.search = '?at=town'; locationMock.href = 'https://example.test/guaira.html?at=town';
+    let dispose = module.startGuairaMap(); await ready(); frames(2);
+    const before = navigations.length, staleOpen = elements['map-return'].lastClick!;
+    destinations[0].click(); staleOpen(new Event('click')); assert.equal(elements['map-detours'].open, false);
+    elements['map-return'].click(); const stalePatio = elements['map-detour-patio'].lastClick!;
+    doc.hidden = true; doc.dispatchEvent(new Event('visibilitychange'));
+    assert.equal(elements['map-detours'].open, false); assert.equal(queue.size, 0);
+    stalePatio(new Event('click')); assert.equal(navigations.length, before);
+    doc.hidden = false; doc.dispatchEvent(new Event('visibilitychange')); frames(2);
+    assert.equal(doc.activeElement, elements['map-return'], 'showing a dismissed modal restores its live opener after re-enabling it');
+    elements['map-return'].click(); stalePatio(new Event('click')); assert.equal(navigations.length, before);
+    const disposedPatio = elements['map-detour-patio'].lastClick!; dispose();
+    disposedPatio(new Event('click')); assert.equal(navigations.length, before); assert.equal(queue.size, 0);
+    motion.matches = true; dispose = module.startGuairaMap(); await ready(); frames(2);
+    elements['map-return'].click(); elements['map-detour-bairro'].click();
+    assert.equal(elements['map-title'].textContent, 'Bairro da Vala Seca'); assert.equal(elements['map-enter'].disabled, false);
+    assert.equal(elements['map-skip'].hidden, true); assert.equal(navigations.length, before);
+    const oldGallery = elements['map-enter'].lastClick!;
+    elements['map-enter'].dispatchEvent(new Event('pointerdown'));
+    destinations[0].click(); destinations[5].hidden = false; destinations[5].click();
+    oldGallery(new Event('click')); assert.equal(navigations.length, before, 'retained callback cannot enter after a round trip');
+    elements['map-enter'].click(); assert.equal(navigations.length, before, 'late native press cannot enter a newer arrival');
+    elements['map-enter'].click(); assert.equal(navigations.length, before + 1);
+    dispose(); motion.matches = false;
+});
+
+test('the optional neighborhood marker keeps its authored anchor and hides instead of overlapping', async () => {
+    const module = await import('../src/guaira');
+    const { guairaCamera, guairaScreenPoint } = await import('../src/adventure/experimental/guaira/GuairaMapArt');
+    const { parseGuairaMetadata } = await import('../src/adventure/experimental/guaira/GuairaMapModel');
+    const fits = module.guairaBairroMarkerFits;
+    const rect = { left: 100, top: 60, width: 82, height: 44 };
+    assert.equal(fits(rect, 320, 200, []), true);
+    for (const obstacle of [{ left: 95, top: 62, width: 44, height: 44 }, { left: 180, top: 100, width: 24, height: 38 }]) {
+        assert.equal(fits(rect, 320, 200, [obstacle]), false, 'town/curral and actor bounds both protect their clearance');
+    }
+    assert.equal(fits({ ...rect, left: -1 }, 320, 200, []), false);
+    assert.equal(fits({ ...rect, top: 160 }, 320, 200, []), false);
+    assert.equal(fits({ ...rect, width: 43 }, 320, 200, []), false);
+    sceneWidth = 1280; sceneHeight = 720; motion.matches = true; doc.hidden = false;
+    fetchRaw = raw; imageReady = Promise.resolve(); waterFailure = true;
+    locationMock.search = '?at=town'; locationMock.href = 'https://example.test/guaira.html?at=town';
+    const originalOrder = [...destinations];
+    destinations.splice(0, destinations.length, ...originalOrder.filter(button => button.marker), ...originalOrder.filter(button => !button.marker));
+    const dispose = module.startGuairaMap(); await ready(); frames(2);
+    const metadata = parseGuairaMetadata(raw)!, camera = guairaCamera(metadata, sceneWidth, sceneHeight, metadata.nodes['guaira-1'], false);
+    const anchor = guairaScreenPoint(metadata.nodes['guaira-2'], camera), marker = destinations.find(button => button.dataset.mapDestination === 'bairro')!;
+    assert.equal(marker.hidden, false); assert.equal(marker.style.left, `${anchor.x}px`); assert.equal(marker.style.top, `${anchor.y + 12}px`);
+    assert.ok((marker.children.at(-2)?.width ?? 0) >= 44);
+    const before = navigations.length; marker.click();
+    assert.equal(elements['map-title'].textContent, 'Bairro da Vala Seca'); assert.equal(navigations.length, before);
+    const town = destinations.find(button => button.dataset.mapDestination === 'town' && !button.marker)!;
+    town.click(); frames(2); const staleMarker = marker.lastClick!;
+    marker.focus(); sceneWidth = 180; sceneHeight = 100; win.dispatchEvent(new Event('resize')); frames(2);
+    assert.equal(marker.hidden, true); assert.equal(doc.activeElement, town, 'clipping restores a persistent control even with marker-first DOM order');
+    sceneWidth = 1280; sceneHeight = 720; win.dispatchEvent(new Event('resize')); frames(2);
+    assert.equal(marker.hidden, false); staleMarker(new Event('click'));
+    assert.equal(elements['map-title'].textContent, 'Estrada do Vento', 'a marker hidden and shown again rejects its old callback');
+    // This scene still fits the plate, but the viewport's short-screen media rule hides the ancestor.
+    sceneWidth = 700; sceneHeight = 280; win.dispatchEvent(new Event('resize')); frames(2);
+    assert.equal(marker.hidden, false, 'the control is geometrically safe before the CSS breakpoint');
+    marker.focus(); const beforeBreakpoint = marker.lastClick!;
+    compactMarkers.matches = true; compactMarkers.dispatchEvent(new Event('change'));
+    assert.equal(marker.hidden, true, 'ancestor suppression is reflected synchronously');
+    assert.equal(doc.activeElement, town, 'CSS suppression restores a persistent control before the next frame');
+    beforeBreakpoint(new Event('click')); assert.equal(elements['map-title'].textContent, 'Estrada do Vento');
+    frames(2); assert.equal(marker.hidden, true, 'rendering cannot revive a CSS-suppressed marker');
+    compactMarkers.matches = false; compactMarkers.dispatchEvent(new Event('change')); frames(2);
+    assert.equal(marker.hidden, false); beforeBreakpoint(new Event('click'));
+    assert.equal(elements['map-title'].textContent, 'Estrada do Vento', 'expanding the viewport cannot revive the old callback');
+    const curralMarker = destinations.find(button => button.dataset.mapDestination === 'curral' && button.marker)!;
+    assert.equal(curralMarker.hidden, false); curralMarker.focus(); const staleCurral = curralMarker.lastClick!;
+    compactMarkers.matches = true; compactMarkers.dispatchEvent(new Event('change'));
+    assert.equal(doc.activeElement, town, 'the same CSS-focus rescue covers the existing markers');
+    compactMarkers.matches = false; compactMarkers.dispatchEvent(new Event('change')); frames(2);
+    staleCurral(new Event('click')); assert.equal(elements['map-title'].textContent, 'Estrada do Vento');
+    dispose(); destinations.splice(0, destinations.length, ...originalOrder);
+    sceneWidth = 390; sceneHeight = 450; motion.matches = false;
+    const html = readFileSync(new URL('../guaira.html', import.meta.url), 'utf8');
+    assert.match(html, /<dialog id="map-detours"[^>]*aria-labelledby="map-detours-title"/);
+    assert.match(html, /id="map-detour-patio"[^>]*autofocus[^>]*>Entrar no Pátio/);
+    assert.match(html, /id="map-detour-bairro"[^>]*>Caminhar ao Bairro da Vala Seca/);
+    assert.equal((html.match(/data-map-destination="bairro"/g) ?? []).length, 1);
 });

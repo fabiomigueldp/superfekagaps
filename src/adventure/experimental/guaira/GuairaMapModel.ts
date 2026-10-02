@@ -1,6 +1,8 @@
 /** Isolated local navigation. These names never enter the campaign or saved progress. */
 export type GuairaDestination = 'town' | 'curral' | 'subida';
-export type GuairaArrival = 'town' | 'rice' | 'corral' | 'vazao';
+/** Contextual stops do not add buttons to the three persistent destinations. */
+export type GuairaSelection = GuairaDestination | 'bairro';
+export type GuairaArrival = 'town' | 'bairro' | 'rice' | 'corral' | 'vazao';
 /** A summary of the visit just left, never saved progress or a world-state flag. */
 export type GuairaReturnContext = 'traversal-clear' | 'junction-clear' | 'respiros-clear' | 'bull-clear' | 'ascent-clear' | 'mayor-clear';
 const RETURN_ARRIVALS: Record<GuairaReturnContext, GuairaArrival> = {
@@ -22,10 +24,16 @@ export const GUAIRA_DESTINATIONS = {
     curral: { node: 'guaira-4', arrival: 'corral', title: 'Curral da Comporta', short: 'ARENA', action: 'ARENA', href: './guaira-lab.html', description: 'Enfrente Ossabravo na arena experimental.' },
     subida: { node: 'guaira-4', arrival: 'corral', title: 'Subida à Casa', short: 'SUBIDA', action: 'SUBIR', href: './guaira-subida.html', description: 'Parta do curral e suba até o terraço da Casa da Vazão.' },
 } as const;
-const ARRIVAL_NODES = { town: 'guaira-1', rice: 'guaira-3', corral: 'guaira-4', vazao: 'guaira-5' } as const;
+/** All walkable selections, including the optional stop on the existing road. */
+export const GUAIRA_SELECTIONS = {
+    ...GUAIRA_DESTINATIONS,
+    bairro: { node: 'guaira-2', arrival: 'bairro', title: 'Bairro da Vala Seca', short: 'BAIRRO', action: 'GALERIA', href: './guaira-galeria.html', description: 'A Galeria dos Remendos é um percurso opcional sob o bairro. Entre ao chegar.' },
+} as const;
+const ARRIVAL_NODES = { town: 'guaira-1', bairro: 'guaira-2', rice: 'guaira-3', corral: 'guaira-4', vazao: 'guaira-5' } as const;
+const validArrival = (value: unknown): value is GuairaArrival => typeof value === 'string' && Object.prototype.hasOwnProperty.call(ARRIVAL_NODES, value);
 export function guairaArrivalFromSearch(search: string): GuairaArrival {
     const at = new URLSearchParams(search).get('at');
-    return at === 'rice' || at === 'corral' || at === 'vazao' ? at : 'town';
+    return validArrival(at) ? at : 'town';
 }
 export function guairaReturnContextFromSearch(search: string): GuairaReturnContext | null {
     const params = new URLSearchParams(search), value = params.get('visit');
@@ -33,7 +41,8 @@ export function guairaReturnContextFromSearch(search: string): GuairaReturnConte
         validReturnContext(guairaArrivalFromSearch(search), value) ? value : null;
 }
 export function guairaReturnHref(at: GuairaArrival, context?: GuairaReturnContext | null): string {
-    return `./guaira.html?at=${at}${validReturnContext(at, context) ? `&visit=${context}` : ''}`;
+    const arrival = validArrival(at) ? at : 'town';
+    return `./guaira.html?at=${arrival}${validReturnContext(arrival, context) ? `&visit=${context}` : ''}`;
 }
 const isPoint = (v: unknown): v is GuairaPoint => !!v && typeof v === 'object' && ['x', 'y'].every(k => {
     const n = (v as Record<string, unknown>)[k]; return typeof n === 'number' && Number.isFinite(n) && n >= 0 && n <= 1;
@@ -67,14 +76,17 @@ export class GuairaMapModel {
     readonly length: number;
     readonly landmarkDistances: Record<string, number>;
     readonly destinationDistances: Record<GuairaDestination, number>;
+    readonly selectionDistances: Record<GuairaSelection, number>;
     readonly arrivalDistances: Record<GuairaArrival, number>;
-    selected: GuairaDestination | null;
+    selected: GuairaSelection | null;
     distance: number;
     facingLeft = false;
     closed = false;
     reducedMotion = false;
     returnContext: GuairaReturnContext | null;
+    private actionRevision = 0;
     constructor(readonly metadata: GuairaMetadata, initial: GuairaArrival = 'town', context: GuairaReturnContext | null = null) {
+        if (!validArrival(initial)) initial = 'town';
         this.path = ['0:1', '1:2', '2:3', '3:4'].flatMap((key, index) => metadata.routes[key].slice(index ? 1 : 0));
         for (let i = 1; i < this.path.length; i++) this.distances.push(this.distances[i - 1] +
             Math.hypot((this.path[i].x - this.path[i - 1].x) * 1920, (this.path[i].y - this.path[i - 1].y) * 1200));
@@ -83,14 +95,18 @@ export class GuairaMapModel {
             [id, this.distances[this.path.findIndex(p => samePoint(p, point))]]));
         this.destinationDistances = Object.fromEntries(Object.entries(GUAIRA_DESTINATIONS).map(([id, destination]) =>
             [id, this.landmarkDistances[destination.node]])) as Record<GuairaDestination, number>;
+        this.selectionDistances = Object.fromEntries(Object.entries(GUAIRA_SELECTIONS).map(([id, selection]) =>
+            [id, this.landmarkDistances[selection.node]])) as Record<GuairaSelection, number>;
         this.arrivalDistances = Object.fromEntries(Object.entries(ARRIVAL_NODES).map(([arrival, node]) =>
             [arrival, this.landmarkDistances[node]])) as Record<GuairaArrival, number>;
         this.returnContext = validReturnContext(initial, context) ? context : null;
-        this.selected = initial === 'rice' || initial === 'vazao' ? null : initial === 'corral'
+        this.selected = initial === 'bairro' ? 'bairro' : initial === 'rice' || initial === 'vazao' ? null : initial === 'corral'
             ? this.returnContext === 'bull-clear' ? 'subida' : 'curral' : 'town';
         this.distance = this.arrivalDistances[initial];
     }
-    get targetDistance(): number { return this.selected === null ? this.distance : this.destinationDistances[this.selected]; }
+    /** Captured view actions must still match this token and their live physical conditions. */
+    get revision(): number { return this.actionRevision; }
+    get targetDistance(): number { return this.selected === null ? this.distance : this.selectionDistances[this.selected]; }
     get arrival(): GuairaArrival | null {
         return (Object.keys(ARRIVAL_NODES) as GuairaArrival[]).find(at => Math.abs(this.arrivalDistances[at] - this.distance) < 1e-6) ?? null;
     }
@@ -102,7 +118,10 @@ export class GuairaMapModel {
     /** The irrigation passage is optional at the rice-field arrival, never a global destination. */
     get canEnterRespiros(): boolean { return !this.closed && this.selected === null && this.arrival === 'rice' && !this.moving; }
     get canWalkToCorral(): boolean { return !this.closed && this.selected === null && this.arrival === 'rice' && !this.moving; }
-    get canEnter(): boolean { return this.canEnterMayor || (!this.closed && this.selected !== null && !this.moving); }
+    /** Passing through the bairro on another journey never offers Gallery entry. */
+    get canEnterGallery(): boolean { return !this.closed && this.selected === 'bairro' && this.arrival === 'bairro' && !this.moving; }
+    get canEnter(): boolean { return this.canEnterMayor || this.canEnterGallery ||
+        (!this.closed && this.selected !== null && this.selected !== 'bairro' && !this.moving); }
     get point(): GuairaPoint { return this.pointAt(this.distance); }
     pointAt(distance: number): GuairaPoint {
         const d = Math.min(this.length, Math.max(0, distance));
@@ -114,10 +133,11 @@ export class GuairaMapModel {
         }
         return { ...this.path[this.path.length - 1] };
     }
-    select(destination: GuairaDestination): void {
-        if (this.closed || !Object.prototype.hasOwnProperty.call(GUAIRA_DESTINATIONS, destination)) return;
+    select(destination: GuairaSelection): void {
+        if (this.closed || !Object.prototype.hasOwnProperty.call(GUAIRA_SELECTIONS, destination)) return;
         this.returnContext = null;
         this.selected = destination;
+        this.actionRevision++;
         if (this.reducedMotion) this.skip();
     }
     tick(seconds: number): void {
@@ -127,16 +147,26 @@ export class GuairaMapModel {
         // Suspension never teleports the actor across the route on focus return.
         this.distance += Math.sign(delta) * Math.min(Math.abs(delta), Math.min(seconds, .05) * 170);
         this.facingLeft = this.point.x < before.x;
+        if (!this.moving) this.actionRevision++;
     }
-    skip(): void { if (!this.closed) this.distance = this.targetDistance; }
-    setReducedMotion(reduced: boolean): void { this.reducedMotion = reduced; if (reduced) this.skip(); }
+    skip(): void {
+        if (this.closed || !this.moving) return;
+        this.distance = this.targetDistance;
+        this.actionRevision++;
+    }
+    setReducedMotion(reduced: boolean): void {
+        if (this.closed) return;
+        if (this.reducedMotion !== reduced) this.actionRevision++;
+        this.reducedMotion = reduced;
+        if (reduced) this.skip();
+    }
     returnToCorral(): void { if (this.canEnterMayor) this.select('curral'); }
     walkToCorral(): void { if (this.canWalkToCorral) this.select('curral'); }
     enterHref(): string | null {
         if (this.canEnterMayor) return './guaira-prefeito.html';
-        return this.canEnter && this.selected ? GUAIRA_DESTINATIONS[this.selected].href : null;
+        return this.canEnter && this.selected ? GUAIRA_SELECTIONS[this.selected].href : null;
     }
     junctionHref(): string | null { return this.canEnterJunction ? './guaira-patio.html' : null; }
     respirosHref(): string | null { return this.canEnterRespiros ? './guaira-respiros.html' : null; }
-    close(): void { this.closed = true; }
+    close(): void { if (!this.closed) { this.closed = true; this.actionRevision++; } }
 }

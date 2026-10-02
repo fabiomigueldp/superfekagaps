@@ -21,8 +21,8 @@ export interface GuairaChapterMapOptions {
 }
 
 const ASSET_ROOT = './assets/world/experimental/guaira/';
-const ARRIVAL_NODE: Record<GuairaArrival, string> = { town: 'guaira-1', rice: 'guaira-3', corral: 'guaira-4', vazao: 'guaira-5' };
-const ARRIVAL_WORDS: Record<GuairaArrival, string> = { town: 'na estrada', rice: 'no arrozal', corral: 'no curral', vazao: 'na Casa da Vazão' };
+const ARRIVAL_NODE: Record<GuairaArrival, string> = { town: 'guaira-1', bairro: 'guaira-2', rice: 'guaira-3', corral: 'guaira-4', vazao: 'guaira-5' };
+const ARRIVAL_WORDS: Record<GuairaArrival, string> = { town: 'na estrada', bairro: 'no Bairro da Vala Seca', rice: 'no arrozal', corral: 'no curral', vazao: 'na Casa da Vazão' };
 const sameGeneration = (a: GuairaChapterGeneration, b: GuairaChapterGeneration) => a.sessionId === b.sessionId && a.generation === b.generation;
 let nextViewId = 1;
 

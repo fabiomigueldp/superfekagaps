@@ -7,14 +7,14 @@ export const GUAIRA_GALLERY = Object.freeze({
     firstStart: 160, firstEnd: 208, firstY: 176, firstLandingY: 240,
     checkpointX: 320, galleryY: 288,
     secondStart: 384, secondEnd: 432, secondY: 288, secondLandingY: 336,
-    lowerY: 384, terraceY: 192, finishX: 656, mapHref: './guaira.html?at=town'
+    lowerY: 384, terraceY: 192, finishX: 656, mapHref: './guaira.html?at=bairro'
 });
 
 /** The checkpoint is a canonical local rebuild, not a saved copy of mutable tiles. */
 export function guairaGalleryStage(firstOpened = false): AdventureStage {
     const G = GUAIRA_GALLERY, stage = structuredClone(STAGES[0]);
     stage.id = G.id; stage.name = 'GUAÍRA · GALERIA DOS REMENDOS';
-    stage.subtitle = 'Acesso de serviço da Estrada do Vento · protótipo';
+    stage.subtitle = 'Acesso de serviço do Bairro da Vala Seca · protótipo';
     delete stage.encounter;
     stage.level.id = 'experimental-guaira-galeria';
     stage.level.width = G.width; stage.level.height = G.height;

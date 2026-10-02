@@ -22,3 +22,17 @@ button,a{touch-action:manipulation}.guaira-header button,.guaira-header a,.guair
 
 /* A short portrait still has room for the objective; reserve the landscape compaction for truly shallow views. */
 @media(min-height:400px) and (max-height:500px) and (orientation:portrait){.guaira-description #map-description{display:block}}
+
+/* The neighborhood plate keeps a short stem on the exact guaira-2 anchor. Crowding hides it, never shifts it. */
+.guaira-marker-bairro::before{content:"";position:absolute;left:calc(50% - 1px);top:-12px;width:2px;height:12px;background:#bc8c50;pointer-events:none}
+/* A small native modal keeps focus and keyboard activation in the two optional routes. */
+#map-detours{width:min(400px,calc(100vw - 24px));max-height:calc(100svh - 24px);margin:auto;padding:16px;border:3px solid #bc8c50;border-radius:0;background:#262936;color:#f6e5c1;box-shadow:4px 4px 0 #142e37;overflow:auto}
+#map-detours::backdrop{background:#10252aba}
+#map-detours h2{font:700 19px/1.25 monospace;margin:0 0 8px}
+#map-detours p{font-size:12px;line-height:1.5;color:#d2c8ad;margin:0 0 12px}
+.guaira-detour-choices{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.guaira-detour-choices button{display:block;width:100%;min-height:56px;padding:10px 12px;text-align:left;font:700 14px/1.35 monospace;background:#75503b;color:#f6e5c1;border:2px solid #bc8c50;border-radius:0;cursor:pointer}
+.guaira-detour-choices span{display:block;margin-top:4px;font:400 11px/1.4 system-ui,sans-serif;color:#f0dfbf}
+#map-detours-close{display:flex;min-width:44px;min-height:44px;padding:0;border:0;background:#75503b;cursor:pointer}
+@media(max-height:360px){#map-detours{padding:10px}#map-detours h2{font-size:16px;margin-bottom:4px}#map-detours p{margin-bottom:8px}.guaira-detour-choices{gap:6px;margin-bottom:8px}.guaira-detour-choices button{padding:6px 9px;min-height:44px}.guaira-detour-choices span{margin-top:2px}}
+@media(forced-colors:active){#map-detours,.guaira-detour-choices button{background:Canvas;color:CanvasText;border-color:ButtonText}#map-detours p,.guaira-detour-choices span{color:CanvasText}}

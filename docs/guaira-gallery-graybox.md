@@ -1,6 +1,6 @@
 # Galeria dos Remendos: optional native route
 
-Dedicated entry: `/guaira-galeria.html`. This optional service gallery does not register a campaign stage, change the five chapter conclusions or persist a save. MAPA always returns to `./guaira.html?at=town` without `visit`. Its label is “Voltar à Estrada do Vento”. No Oracle access was used.
+Dedicated entry: `/guaira-galeria.html`. This optional service gallery does not register a campaign stage, change the five chapter conclusions or persist a save. MAPA always returns to `./guaira.html?at=bairro` without `visit`. Its label is “Voltar ao Bairro da Vala Seca”. No Oracle access was used.
 
 The goal is “Abra as tampas rachadas e alcance o patamar de inspeção”. The local result is “ACESSO DE INSPEÇÃO ABERTO”. It opens a dry service passage; it does not restore neighborhood water.
 

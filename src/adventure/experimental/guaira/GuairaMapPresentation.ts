@@ -2,14 +2,21 @@ import { GUAIRA_DESTINATIONS, type GuairaMapModel } from './GuairaMapModel';
 
 /** Visit summaries change guidance only. They never unlock or restore gameplay. */
 export function guairaMapPresentation(model: GuairaMapModel) {
+    if (model.selected === 'bairro') {
+        return { title: 'Bairro da Vala Seca',
+            description: 'A Galeria dos Remendos é um percurso opcional sob o bairro. Entre ao chegar.',
+            status: model.moving ? 'Feka está a caminho do Bairro da Vala Seca.'
+                : 'Feka está no bairro. Galeria inicia o percurso opcional; os destinos continuam pela estrada.',
+            action: 'GALERIA', actionName: 'Entrar na Galeria dos Remendos: percurso opcional no Bairro da Vala Seca' };
+    }
     if (model.selected) {
         const destination = GUAIRA_DESTINATIONS[model.selected];
         return { title: destination.title, description: model.canEnterJunction
-                ? 'Travessia segue ao arrozal. Pátio oferece outro percurso de água, opcional.' : destination.description,
+                ? 'Travessia segue ao arrozal. Desvios oferece Pátio, um percurso opcional, e a caminhada ao bairro.' : destination.description,
             status: model.moving ? `Feka está a caminho de ${model.selected === 'subida' ? 'seu embarque no curral' : destination.title}.`
                 : model.returnContext === 'bull-clear' ? 'Ossabravo descansou nesta visita. Subir leva à Casa da Vazão.'
                 : model.selected === 'subida' ? 'Feka está no curral. Subir inicia a subida à Casa da Vazão.'
-                : model.canEnterJunction ? 'Jogar inicia a Travessia. Pátio testa o desvio entre dois ramais.'
+                : model.canEnterJunction ? 'Jogar inicia a Travessia. Desvios abre as opções de Pátio e Bairro.'
                 : 'Feka chegou. Entre para jogar.',
             action: destination.action, actionName: `Entrar: ${destination.title}` };
     }

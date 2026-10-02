@@ -24,7 +24,7 @@ export function mountGuairaGalleryPage(): () => void {
             owner.add(() => controls.dispose());
             const pauseArt = new LabToolbarAction(pause);
             new LabToolbarAction(retry).setLabel('TENTAR', 'Recomeçar Galeria dos Remendos');
-            new LabToolbarAction(map).setLabel('MAPA', 'Voltar à Estrada do Vento');
+            new LabToolbarAction(map).setLabel('MAPA', 'Voltar ao Bairro da Vala Seca');
             map.href = game.mapReturnHref;
             pause.disabled = false;
             status.setAttribute('role', 'status');
@@ -61,7 +61,7 @@ export function mountGuairaGalleryPage(): () => void {
             owner.dispose(); lifetime = new DisposalScope();
             pause.disabled = true; status.setAttribute('role', 'alert');
             pause.textContent = 'PAUSA'; retry.textContent = 'TENTAR'; map.textContent = 'MAPA';
-            status.textContent = 'Não foi possível abrir a galeria. Tentar repete o carregamento; Mapa volta à Estrada do Vento.';
+            status.textContent = 'Não foi possível abrir a galeria. Tentar repete o carregamento; Mapa volta ao Bairro da Vala Seca.';
             lifetime.listen(retry, 'click', mount);
             console.error('Gallery initialization failed', error);
         }

@@ -54,7 +54,7 @@ test('gallery is an isolated native level with only six real breakable tiles and
     assert.equal(g.player.data.position.x,48); assert.equal(feet(g),176); assert.equal(g.player.data.hasHelmet,true);
     assert.equal(g.stage.level.tiles.flat().filter(tile => tile === T.BRICK_BREAKABLE).length,6);
     for (const key of ['exits','foes','mechanisms','pickups','dialogues','landmarks'] as const) assert.deepEqual(g.stage[key],[]);
-    assert.equal(g.boss,null); assert.equal(g.mapReturnHref,'./guaira.html?at=town');
+    assert.equal(g.boss,null); assert.equal(g.mapReturnHref,'./guaira.html?at=bairro');
     for (let row=0;row<15;row++) assert.equal(g.level.getTile(14,row),T.GROUND);
     for (let row=0;row<21;row++) assert.equal(g.level.getTile(28,row),T.GROUND);
     assert.equal(g.level.getTile(27,19),T.EMPTY,'B lip must not seal the underpass');

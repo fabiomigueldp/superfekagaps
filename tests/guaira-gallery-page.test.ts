@@ -20,7 +20,10 @@ function page(t: TestContext) {
     const nav = h.document.createElement('nav');
     const pause = h.document.createElement('button'), retry = h.document.createElement('button'), map = h.document.createElement('a');
     h.status.id = 'lab-status'; pause.id = 'lab-pause'; retry.id = 'lab-retry'; map.id = 'lab-exit';
-    Object.assign(map, { href: './guaira.html?at=town' });
+    const html = readFileSync(new URL('../guaira-galeria.html', import.meta.url), 'utf8');
+    const fallbackHref = html.match(/id="lab-exit" href="([^"]+)"/)?.[1];
+    assert.ok(fallbackHref, 'The static exit remains available before JavaScript loads');
+    Object.assign(map, { href: fallbackHref });
     h.body.replaceChildren(nav, h.canvas); nav.append(h.status, pause, retry, map);
     for (const [name, value] of Object.entries({ innerWidth: 640, innerHeight: 440 })) {
         const old = Object.getOwnPropertyDescriptor(globalThis, name);
@@ -44,7 +47,7 @@ function page(t: TestContext) {
     return { ...h, all, pause, retry, map, nav, games, boot };
 }
 
-test('gallery page owns one scene, preserves native pause/retry and always exits to Estrada without a result URL', t => {
+test('gallery page owns one scene, preserves native pause/retry and always exits to Bairro without a result URL', t => {
     const h = page(t); h.boot(); const game = h.games[0];
     assert.ok(game); assert.equal(h.frames.size, 2);
     const listeners = h.listenerCount();
@@ -54,8 +57,14 @@ test('gallery page owns one scene, preserves native pause/retry and always exits
     game.finished = true; h.retry.click();
     assert.equal(game.finished, false); assert.equal(game.input.getState().right, false);
     h.retry.click(); assert.equal(h.games.length, 1); assert.equal(h.listenerCount(), listeners); assert.equal(h.frames.size, 2);
-    game.finished = true; h.map.click();
-    assert.equal((h.map as unknown as HTMLAnchorElement).href, './guaira.html?at=town');
+    for (const state of ['playing', 'paused'] as const) {
+        for (const finished of [false, true]) {
+            game.state = state; game.finished = finished; h.map.click();
+            assert.equal((h.map as unknown as HTMLAnchorElement).href, './guaira.html?at=bairro');
+        }
+    }
+    game.state = 'playing'; game.finished = false; game.player.die('fall'); h.map.click();
+    assert.equal((h.map as unknown as HTMLAnchorElement).href, './guaira.html?at=bairro');
     assert.equal(game.store.save.completed.length, 0);
 });
 
@@ -85,6 +94,8 @@ test('gallery toolbar setup failure leaves plain retry/exit and cleans the parti
     });
     h.boot(); assert.equal(h.games[0].isDisposed, true); assert.equal(h.frames.size, 0);
     assert.equal(h.status.getAttribute('role'), 'alert'); assert.equal(h.retry.textContent, 'TENTAR'); assert.equal(h.map.textContent, 'MAPA');
+    assert.equal((h.map as unknown as HTMLAnchorElement).href, './guaira.html?at=bairro');
+    assert.match(h.status.textContent ?? '', /Bairro da Vala Seca/);
     assert.equal(h.all().filter(n => n.id === 'guaira-touch-controls').length, 0);
     assert.equal(h.listenerCount(), 3, 'Only the retry and document bootstrap callbacks survive');
     fail = false; h.retry.click(); assert.equal(h.games.length, 2); assert.equal(h.games[1].isDisposed, false);

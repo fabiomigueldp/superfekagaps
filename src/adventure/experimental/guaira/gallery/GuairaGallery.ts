@@ -107,7 +107,7 @@ export class GuairaGallery extends WorldGame {
         }
         this.renderer.present();
         const message = paused ? 'Pausado · Esc ou Continuar para voltar'
-            : this.finished ? 'ACESSO DE INSPEÇÃO ABERTO · Mapa volta à Estrada do Vento · sem progresso salvo'
+            : this.finished ? 'ACESSO DE INSPEÇÃO ABERTO · Mapa volta ao Bairro da Vala Seca · sem progresso salvo'
             : this.player.data.isDead ? 'Retorno automático ao ponto seguro desta tentativa · Tentar fecha as duas tampas'
             : 'Abra as tampas rachadas e alcance o patamar de inspeção · PULE. NO AR, APERTE BAIXO · setas/A D: mover · Espaço: pular · Esc: pausa · M: som';
         if (this.status.textContent !== message) this.status.textContent = message;
