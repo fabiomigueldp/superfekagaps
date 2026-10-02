@@ -46,10 +46,10 @@ export class FactoryCampaign extends WorldGame {
         canvas.contentEditable = 'true'; canvas.spellcheck = false; canvas.setAttribute('inputmode', 'none');
         shell.append(nav, canvas, status); document.body.append(shell); shell.showModal();
         this.shell = shell;
-        const lab = new FactorySalonSession(canvas, status); this.salon = lab;
-        lab.store.save.preferences = { ...this.store.save.preferences };
-        if (lab.reducedMotion) lab.store.save.preferences.shake = false;
-        lab.audio.preferences = lab.store.save.preferences; lab.audio.volume();
+        // Keep native lab presentation separate from the campaign's live region.
+        const nativeStatus = document.createElement('span');
+        const lab = new FactorySalonSession(canvas, nativeStatus); this.salon = lab;
+        lab.inheritCampaignAudio(this.audio);
         document.title = 'Super Feka Gaps · Salão da Fábrica';
         const button = (label: string, run: () => void) => {
             const b = document.createElement('button'); b.textContent = label;
@@ -76,9 +76,7 @@ export class FactoryCampaign extends WorldGame {
             skip.hidden = lab.labMode !== 'intro' && (!lab.epilogue.frame || lab.victorious);
             retry.hidden = lab.labMode === 'intro' || !!lab.epilogue.frame;
             pause.textContent = lab.state === 'paused' ? 'Continuar' : 'Pausar';
-            if (lab.epilogue.frame) status.textContent = lab.state === 'paused' ? 'Pausado' : lab.victorious
-                ? 'Turbosuco derrotado. Volte à fase para registrar o resultado.' : 'Encerramento da competição';
-            else if (lab.player.data.isDead) status.textContent = 'Feka caiu · a luta reinicia automaticamente';
+            lab.reflectCampaignStatus(status, nativeStatus.textContent ?? '');
         };
         this.reflect(); canvas.focus();
     }

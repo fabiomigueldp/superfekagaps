@@ -120,3 +120,24 @@ Capturas da implementação integrada em Chromium:
 [salão 360px](salon-compact.png). Nenhum asset de QA é publicado no build.
 
 Build integrado: 156 arquivos, 42.715.470 bytes; gate de 45 MB aprovado.
+
+## Revisão final de integração — 2026-10-02
+
+A revisão final corrigiu a herança do mute por tecla M ao entrar no salão e
+separou o status nativo do laboratório da região aria-live da campanha, evitando
+anúncios repetidos do epílogo a cada frame. Regressões verificam preferências
+independentes, movimento reduzido e uma única atualização do status final.
+
+No executor cloud, o wrapper `npm run check` encontrou `EPERM` ao criar o pipe
+local de IPC do CLI tsx. Os mesmos gates foram executados sem editar os scripts:
+`node --import tsx --test tests/*.test.ts` (**1.332 aprovados**),
+`node --test tests/*.test.mjs` (**3 aprovados**), os três validadores via
+`node --import tsx`, `npm run typecheck`, Vite build e `check_build_size.ts`.
+Resultado: **1.335 testes**, 156 arquivos e **42.715.691 bytes**, abaixo de
+45.000.000. As evidências Chromium acima pertencem à entrega original; esta
+revisão não repete nem amplia a alegação de vitória manual.
+
+A configuração mantém `git.deploymentEnabled=false`. A saída publicável é
+`dist/`, com URLs relativas (`base: './'`); documentação e capturas de QA não
+entram no pacote. A publicação World deve continuar pelo empacotador isolado,
+sem substituir outros jogos/serviços. Estes checks não constituem deploy.

@@ -63,6 +63,18 @@ test('campaign session earns result through six real hits, landing and existing 
     game.toggleLabPause();
     for (let n = 0; n < 65; n++) game.update(100);
     assert.equal(game.victorious, true);
+    let liveText = '', liveWrites = 0;
+    const liveStatus = {
+        get textContent() { return liveText; },
+        set textContent(value: string) { liveText = value; liveWrites++; }
+    };
+    for (let n = 0; n < 5; n++) {
+        game.render();
+        game.reflectCampaignStatus(liveStatus, h.status.textContent);
+    }
+    assert.equal(liveWrites, 1, 'completed epilogue must not repeatedly mutate the live region');
+    assert.match(liveText, /Volte à fase/);
+    assert.notEqual(h.status.textContent, liveText, 'native lab and campaign status remain separate');
     game.load('juice-lab');
     assert.equal(game.victorious, false);
     assert.equal(game.epilogue.skip(), false);
@@ -70,4 +82,23 @@ test('campaign session earns result through six real hits, landing and existing 
     assert.equal(game.labMode, 'intro');
     game.dispose();
     assert.equal(game.victorious, false);
+});
+
+test('salon inherits campaign mute and isolated preferences, including reduced motion', t => {
+    const h = juiceEpilogueBrowser(t, true);
+    const game = new FactorySalonSession(h.canvas as unknown as HTMLCanvasElement, h.status as unknown as HTMLElement);
+    const campaign = { enabled: false, preferences: { ...freshSave().preferences, shake: true } };
+    game.inheritCampaignAudio(campaign);
+    assert.equal(game.audio.enabled, false);
+    assert.equal(game.audio.preferences.shake, false);
+    assert.equal(campaign.preferences.shake, true);
+    assert.notEqual(game.audio.preferences, campaign.preferences);
+    assert.equal(game.audio.preferences, game.store.save.preferences);
+    game.audio.toggle();
+    game.audio.preferences.music = 0;
+    assert.equal(campaign.enabled, false);
+    assert.notEqual(campaign.preferences.music, 0);
+    game.inheritCampaignAudio({ ...campaign, enabled: true });
+    assert.equal(game.audio.enabled, true);
+    game.dispose();
 });
