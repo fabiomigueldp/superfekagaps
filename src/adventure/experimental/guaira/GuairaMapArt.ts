@@ -47,7 +47,14 @@ export function paintGuairaMap(ctx: CanvasRenderingContext2D, image: CanvasImage
     ctx.fillStyle = bg; ctx.fillRect(0, 0, width, height);
     ctx.imageSmoothingEnabled = true;
     ctx.drawImage(image, camera.x, camera.y, camera.imageWidth, camera.imageWidth / 1.6);
-    water?.effect.draw(ctx, camera, water.seconds, model.reducedMotion);
+    if (water) {
+        ctx.save();
+        try {
+            // Full and partial frames use the same clip, including vector edge coverage.
+            clipWaterRegions(ctx, camera, water.effect);
+            water.effect.draw(ctx, camera, water.seconds, model.reducedMotion);
+        } finally { ctx.restore(); }
+    }
     // The Blender roads already explain the connection. Never draw a synthetic line over water.
     const p = guairaScreenPoint(model.point, camera), scale = camera.imageWidth * GUAIRA_FEKA_PIXEL_WIDTH;
     ctx.fillStyle = '#25353b55'; ctx.beginPath(); ctx.ellipse(p.x, p.y - 1, scale * 8, scale * 2.6, 0, 0, Math.PI * 2); ctx.fill();
@@ -64,19 +71,23 @@ export function paintGuairaMap(ctx: CanvasRenderingContext2D, image: CanvasImage
 /** A stationary map restores only water regions; Feka is repainted above any overlap. */
 export function paintGuairaWaterFrame(ctx: CanvasRenderingContext2D, image: CanvasImageSource, camera: GuairaCamera,
     model: GuairaMapActor, time: number, water: { effect: GuairaMapWaterEffect; seconds: number }): void {
-    const scale = camera.imageWidth / 1920;
     ctx.save();
     try {
-        ctx.beginPath();
-        for (const { bounds: [x, y, width, height] } of water.effect.regions) {
-            // The small border includes interpolation pixels without widening the water mask.
-            const left = Math.floor(camera.x + x * scale) - 2, top = Math.floor(camera.y + y * scale) - 2;
-            const right = Math.ceil(camera.x + (x + width) * scale) + 2, bottom = Math.ceil(camera.y + (y + height) * scale) + 2;
-            ctx.rect(left, top, right - left, bottom - top);
-        }
-        ctx.clip();
+        clipWaterRegions(ctx, camera, water.effect);
         paintGuairaMap(ctx, image, camera, model, time, water);
     } finally {
         ctx.restore();
     }
+}
+
+function clipWaterRegions(ctx: CanvasRenderingContext2D, camera: GuairaCamera, effect: GuairaMapWaterEffect): void {
+    const scale = camera.imageWidth / 1920;
+    ctx.beginPath();
+    for (const { bounds: [x, y, width, height] } of effect.regions) {
+        // The small border includes interpolation pixels without widening the water mask.
+        const left = Math.floor(camera.x + x * scale) - 2, top = Math.floor(camera.y + y * scale) - 2;
+        const right = Math.ceil(camera.x + (x + width) * scale) + 2, bottom = Math.ceil(camera.y + (y + height) * scale) + 2;
+        ctx.rect(left, top, right - left, bottom - top);
+    }
+    ctx.clip();
 }

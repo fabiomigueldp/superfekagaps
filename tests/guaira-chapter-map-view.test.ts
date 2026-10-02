@@ -48,7 +48,7 @@ function browser(t: TestContext, options: { deferredImage?: boolean; badMetadata
             return { width: this.className === 'chapter-map-plaque' ? 150 : options.width ?? 800, height: options.height ?? 420, left: 0, top: 0 };
         }
         getContext() {
-            return Object.assign(Object.fromEntries(['setTransform', 'clearRect', 'fillRect', 'drawImage', 'beginPath', 'ellipse', 'fill', 'save', 'restore', 'rect', 'clip', 'translate', 'moveTo', 'quadraticCurveTo', 'stroke']
+            return Object.assign(Object.fromEntries(['setTransform', 'clearRect', 'fillRect', 'drawImage', 'beginPath', 'ellipse', 'fill', 'save', 'restore', 'rect', 'clip', 'translate', 'moveTo', 'lineTo', 'closePath', 'scale', 'quadraticCurveTo', 'stroke']
                 .map(method => [method, () => { drawCalls++; }])), { createLinearGradient: () => ({ addColorStop() {} }) });
         }
     }
@@ -265,7 +265,7 @@ test('completed chapter reports only accepted results and requires explicit new 
     await flush(); h.tick();
     assert.equal(h.byClass('chapter-map-title').textContent, 'CAPÍTULO CONCLUÍDO');
     assert.equal(h.byClass('chapter-map-count').textContent, '5/5 · nesta sessão');
-    assert.match(h.byClass('chapter-map-hint').textContent, /Água pública liberada/);
+    assert.match(h.byClass('chapter-map-hint').textContent, /A água voltou\. Os gaps continuam\./);
     assert.equal(entries, 0); h.button('Repetir o Prefeito em uma nova tentativa').click(); assert.equal(entries, 1);
     assert.deepEqual(session.snapshot().accepted, complete.accepted); view.dispose();
     const abandoned = new GuairaChapterSession(), attempt = abandoned.enterScene('guaira-travessia', abandoned.snapshot().generation)!;
@@ -434,7 +434,7 @@ test('optional target title takes precedence at 5/5 and a natural arrival repair
     assert.equal(h.doc.activeElement, h.button(GALLERY_LABEL));
     assert.equal(h.byClass('chapter-map-title').textContent, 'Galeria dos Remendos');
     assert.equal(h.byClass('chapter-map-count').textContent, '5/5 · nesta sessão');
-    assert.match(h.byClass('chapter-map-hint').textContent, /Água pública liberada/);
+    assert.match(h.byClass('chapter-map-hint').textContent, /A água voltou\. Os gaps continuam\./);
     assert.equal(entries, 0); assert.deepEqual(session.snapshot(), before);
     h.button('Ver a jornada de Guaíra').click(); assert.equal(h.byClass('chapter-map-list').children.length, 5);
     assert.equal(h.byClass('chapter-map-optional').textContent.includes('Concluído'), false);
@@ -518,4 +518,65 @@ test('a map created or decoded while window-blurred stays suspended until focus 
         h.blur(); h.focus(); h.images[1].decoded.resolve(); await flush();
         assert.equal(h.frames.size, 0); assert.equal(h.root.children.length, 0);
     });
+});
+
+/** Presentation fixture only; real Prefeito acceptance is covered separately. */
+function acceptedWaterSession() {
+    const session = new GuairaChapterSession();
+    for (const sceneId of session.snapshot().route) {
+        const attempt = session.enterScene(sceneId, session.snapshot().generation)!;
+        const result = sceneId === 'guaira-lab' ? { sceneId, kind: 'defeated-bull' } as const
+            : sceneId === 'guaira-prefeito' ? { sceneId, kind: 'mayor-water-released' } as const : { sceneId, kind: 'reached-finish' } as const;
+        session.continueFrom(attempt, { attempt, alive: true, state: 'playing', result });
+    }
+    return session;
+}
+
+test('accepted Bairro water uses one existing clock without irrigation, preserves optional priority, and freezes on every suspension', async t => {
+    const h = browser(t), session = acceptedWaterSession();
+    const view = h.create(configuration(session.snapshot(), { arrival: 'bairro', navigation: { target: optionalTarget, revision: 1 } }));
+    await flush(); h.tick(2);
+    assert.equal(h.byClass('chapter-map-title').textContent, 'Galeria dos Remendos');
+    assert.equal(h.byClass('chapter-map-count').textContent, '5/5 · nesta sessão');
+    assert.equal(h.byClass('chapter-map-hint').textContent, 'A água voltou. Os gaps continuam. · 5/5 nesta sessão');
+    assert.match(h.byClass('chapter-map-canvas').getAttribute('aria-label')!, /Bica do Bairro com água nesta sessão\./);
+    assert.equal(h.button(GALLERY_LABEL).disabled, false); assert.equal(h.frames.size, 1);
+    const internals = view as unknown as { water: { released: boolean; draw: (...args: unknown[]) => void }; waterClock: { seconds: number } };
+    assert.equal(internals.water.released, true);
+    let paints = 0; const draw = internals.water.draw.bind(internals.water);
+    internals.water.draw = (...args) => { paints++; draw(...args); };
+    h.tick(60); assert.equal(paints, 30, 'stationary water shares the existing 30Hz cadence');
+    for (const mode of ['hidden', 'blur', 'menu'] as const) {
+        const pending = [...h.frames.values()][0], seconds = internals.waterClock.seconds;
+        const paintsBefore: number = paints;
+        if (mode === 'hidden') h.hidden(true); else if (mode === 'blur') h.blur(); else h.button('Ver a jornada de Guaíra').click();
+        const draws = h.draws();
+        pending(900_000); h.tick(90); assert.equal(h.frames.size, 0); assert.equal(h.draws(), draws); assert.equal(paints, paintsBefore); assert.equal(internals.waterClock.seconds, seconds);
+        if (mode === 'hidden') h.hidden(false); else if (mode === 'blur') h.focus(); else h.button('Fechar a jornada e voltar à maquete').click();
+        h.tick(); assert.equal(internals.waterClock.seconds, seconds, 'resume resets the timestamp without consuming hidden time');
+        assert.equal(h.frames.size, 1); h.tick(2);
+    }
+    h.reduced(true); h.tick(); const still = h.draws(); h.tick(120); assert.equal(h.draws(), still); assert.equal(h.frames.size, 0);
+    h.reduced(false); h.tick();
+    const active = session.enterScene('guaira-prefeito', session.snapshot().generation)!;
+    view.update(session.snapshot(), false, false, { target: chapterTarget('guaira-prefeito'), revision: 2 });
+    h.tick(10); assert.equal(h.frames.size, 0); assert.equal(internals.water.released, true, 'replay retains receipt but has no active map paint');
+    session.exitToMap(active, { attempt: active, alive: false, state: 'dead', result: null });
+    view.update(session.snapshot(), false, false, { target: optionalTarget, revision: 3 }); h.tick(); assert.equal(h.frames.size, 1);
+    view.dispose(); assert.equal(internals.water.released, false); assert.equal(h.frames.size, 0);
+});
+
+test('new or disposed sessions have no water text, and late old wet decode cannot repaint the new dry map', async t => {
+    const h = browser(t, { deferredImage: true }), old = acceptedWaterSession();
+    const first = h.create(configuration(old.snapshot(), { arrival: 'bairro', navigation: { target: optionalTarget, revision: 1 } }));
+    const fresh = old.restartChapter(old.snapshot().generation)!;
+    first.dispose();
+    h.create(configuration(fresh.snapshot(), { arrival: 'bairro', navigation: { target: optionalTarget, revision: 1 } }));
+    h.images[1].decoded.resolve(); await flush(); h.tick();
+    const draws = h.draws(); h.images[0].decoded.resolve(); await flush(); h.tick(30);
+    assert.equal(h.draws(), draws); assert.equal(h.frames.size, 0);
+    assert.equal(h.byClass('chapter-map-count').textContent, '0/5 · nesta sessão');
+    assert.doesNotMatch(h.byClass('chapter-map-hint').textContent, /água voltou/);
+    assert.doesNotMatch(h.byClass('chapter-map-canvas').getAttribute('aria-label')!, /Bica do Bairro/);
+    assert.equal(h.button(GALLERY_LABEL).disabled, false);
 });
