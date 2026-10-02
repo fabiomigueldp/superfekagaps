@@ -239,6 +239,21 @@ function channel(c: CanvasRenderingContext2D, left: number, right: number, y: nu
     }
 }
 
+/** Recessed distribution pipes join the sluice shoulders to the two open canals. */
+function distributionBranch(c: CanvasRenderingContext2D, bankX: number, sluiceX: number, cx: number, cy: number) {
+    // The sloped bronze silhouette has no pale horizontal edge to imply a landing.
+    line(c, bankX - cx, 207 - cy, sluiceX - cx, 195 - cy, '#72584d', 7);
+    line(c, bankX + 1 - cx, 208 - cy, sluiceX + 1 - cx, 196 - cy, '#a07b56', 5);
+    line(c, bankX + 1 - cx, 208 - cy, sluiceX + 1 - cx, 196 - cy, '#c09a6b', 1);
+    for (const fraction of [0, .48, 1]) {
+        const x = Math.round(bankX + (sluiceX - bankX) * fraction) - cx;
+        const y = Math.round(207 - 12 * fraction) - cy;
+        r(c, x, y - 1, 4, 9, '#806651');
+        r(c, x + 1, y, 2, 7, '#b39368');
+        r(c, x + 1, y + 1, 1, 1, '#d0af7d');
+    }
+}
+
 /** Pure projection of the actual valve/lift, including the intermediate rising position. */
 export function drawGuairaTraversalObjects(c: CanvasRenderingContext2D, objects: WorldObjects, cx: number, cy: number, time: number, reducedMotion: boolean) {
     layer(c, cx, cy, (cameraX, cameraY) => {
@@ -253,6 +268,9 @@ export function drawGuairaTraversalObjects(c: CanvasRenderingContext2D, objects:
         if (visible(296, 24, cameraX)) drawGuairaWorker(c, 304 - cameraX, 216 - cameraY, 'pump', workerState);
         if (visible(712, 24, cameraX)) drawGuairaWorker(c, 720 - cameraX, 212 - cameraY, 'rice', workerState);
         if (visible(400, 240, cameraX)) {
+            // Both branches pass behind the gate masonry, chains and real moving deck.
+            distributionBranch(c, 411, 500, cameraX, cameraY);
+            distributionBranch(c, 623, 541, cameraX, cameraY);
             // Pit back wall and vertical sluice have no misleading horizontal landing lip.
             const x = 498 - cameraX, top = 175 - cameraY;
             r(c, x, top, 50, 85, '#92745f');

@@ -4,6 +4,14 @@ import { MAYOR_PALETTE as M, type GuairaMayorArtState, type MayorRect } from './
 export const MAYOR_ART_OBJECTS = Object.freeze({valve:'guaira-mayor-register',lift:'guaira-mayor-lift',deck:'guaira-mayor-deck'});
 interface Body extends MayorRect { readonly kind:string; readonly active:boolean; readonly home?:{readonly x:number;readonly y:number};readonly to?:{readonly x:number;readonly y:number} }
 interface Bodies { get(id:string):Body|undefined }
+type MechanismCue='waiting'|'register'|'rising'|'ready'|'released';
+/** A moving lift alone is not a fresh opening: the encounter owns that decision. */
+function mechanismCue(m:GuairaMayorArtState):MechanismCue {
+    if(m.publicWaterOpen)return 'released';
+    if(m.state==='recover'&&m.vulnerable)return 'ready';
+    if((m.state==='stamp'||m.state==='recover')&&m.accessRequested)return 'rising';
+    return m.state==='recover'?'register':'waiting';
+}
 interface GroundLevel {readonly data:{readonly width:number;readonly height:number;readonly tiles:readonly (readonly number[])[]};colToWorldX(c:number):number;rowToWorldY(r:number):number;worldToCol(x:number):number;worldToRow(y:number):number}
 const P={ink:'#493c43',wall:'#d4af87',wallLight:'#e0c299',wallShade:'#bc9276',earth:'#b87955',earthShade:'#925c49',dust:'#e8b17c',wood:'#997454',woodLight:'#d1ac77',woodShade:'#695449',iron:'#697a78',ironDark:'#4e5c5c',deck:'#f2d69b'};
 function rect(c:CanvasRenderingContext2D,x:number,y:number,w:number,h:number,color:string){if(w<=0||h<=0)return;c.fillStyle=color;c.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));}
@@ -92,9 +100,16 @@ function deck(c:CanvasRenderingContext2D,b:Body,cx:number,cy:number,lift:boolean
 }
 
 /** Draw actual bodies, including fractional live lift coordinates rounded once. */
-export function drawGuairaMayorObjects(c:CanvasRenderingContext2D,objects:Bodies,_m:GuairaMayorArtState,cx=0,cy=64,_time=0,_reducedMotion=false){
+export function drawGuairaMayorObjects(c:CanvasRenderingContext2D,objects:Bodies,m:GuairaMayorArtState,cx=0,cy=64,_time=0,_reducedMotion=false){
     layer(c,cx,cy,(cx,cy)=>{
         const lift=objects.get(MAYOR_ART_OBJECTS.lift),upper=objects.get(MAYOR_ART_OBJECTS.deck),valve=objects.get(MAYOR_ART_OBJECTS.valve);
+        const cue=mechanismCue(m),pressure=cue==='rising'||cue==='ready'||cue==='released';
+        if(lift&&valve){
+            // The hydraulic connection stays behind the real plate and lift.
+            // Its light means a fresh request, never a stale pre-stamp toggle.
+            const x=valve.x+valve.width-2,end=(lift.home??lift).x+5,y=valve.y+valve.height-5;
+            rect(c,x-cx,y-cy,end-x,4,M.bronzeShade);rect(c,x-cx,y+1-cy,end-x,2,pressure?M.water:M.bronze);
+        }
         if(lift){
             const a=lift.home??lift,b=lift.to??a,top=Math.min(a.y,b.y),bottom=Math.max(a.y,b.y);
             for(const wx of [a.x+4,a.x+lift.width-5]){
@@ -102,7 +117,23 @@ export function drawGuairaMayorObjects(c:CanvasRenderingContext2D,objects:Bodies
                 rect(c,wx-cx,top-12-cy,1,Math.max(0,lift.y-top+12),'#706b5a');
                 oval(c,wx-4-cx,top-22-cy,9,9,'#8e7456');oval(c,wx-2-cx,top-20-cy,5,5,'#c7a572');rect(c,wx-cx,top-19-cy,1,3,'#7e694f');
             }
+            if(pressure){
+                // Pressure climbs the existing guide only as far as the real
+                // platform has travelled. No independent timer or moving prop.
+                const reached=Math.max(top,Math.min(bottom,lift.y));
+                rect(c,a.x+4-cx,reached-cy,2,bottom-reached,M.waterShade);
+                rect(c,a.x+4-cx,reached-cy,1,bottom-reached,M.waterLight);
+                if(cue==='ready'||cue==='released'){
+                    rect(c,a.x+2-cx,top-19-cy,5,3,M.waterShade);
+                    rect(c,a.x+3-cx,top-19-cy,3,2,M.waterLight);
+                }
+            }
             deck(c,lift,cx,cy,true);
+            if(cue==='ready'){
+                // A right-pointing inlay on the board directs the now-open route.
+                const x=lift.x+lift.width-20-cx,y=lift.y+3-cy;
+                rect(c,x,y+1,8,1,M.waterLight);rect(c,x+5,y-1,1,5,M.waterLight);rect(c,x+6,y,1,3,M.waterLight);
+            }
             for(const wx of [lift.x+4,lift.x+lift.width-8]){
                 rect(c,wx-cx,lift.y+lift.height-cy,3,5,'#816d51');line(c,wx-cx,lift.y+lift.height+5-cy,wx+7-cx,lift.y+lift.height-cy,'#a38a5d');
             }
@@ -119,9 +150,20 @@ export function drawGuairaMayorObjects(c:CanvasRenderingContext2D,objects:Bodies
         if(valve){
             const x=Math.round(valve.x)-cx,y=Math.round(valve.y)-cy,w=Math.round(valve.width),h=Math.round(valve.height);
             rect(c,x,y,w,h,P.woodShade);rect(c,x+1,y+1,w-2,h-2,M.bronzeShade);rect(c,x+2,y+1,w-4,2,M.bronzeLight);
-            rect(c,x+5,y+3,w-10,Math.max(1,h-4),valve.active?M.waterShade:M.sash);
-            // A central downward mark belongs to the existing ground-pound control.
-            const mx=x+Math.floor(w/2);rect(c,mx-1,y+2,2,3,valve.active?M.waterLight:M.creamLight);rect(c,mx-3,y+4,6,1,valve.active?M.waterLight:M.creamLight);rect(c,mx-2,y+5,4,1,valve.active?M.waterLight:M.creamLight);
+            rect(c,x+5,y+3,w-10,Math.max(1,h-4),pressure?M.waterShade:M.sash);
+            const mx=x+Math.floor(w/2),color=pressure?M.waterLight:M.creamLight;
+            if(cue==='register'){
+                // Down is the real ground-pound control, shown only when useful.
+                rect(c,mx-1,y+2,2,3,color);rect(c,mx-3,y+4,6,1,color);rect(c,mx-2,y+5,4,1,color);rect(c,mx-1,y+6,2,1,color);
+                rect(c,x+2,y+1,w-4,1,M.warning);
+            }else if(cue==='rising'){
+                rect(c,mx,y+2,1,5,color);rect(c,mx-1,y+3,3,1,color);rect(c,mx-2,y+4,5,1,color);
+            }else if(cue==='ready'||cue==='released'){
+                rect(c,mx-4,y+4,8,1,color);rect(c,mx+1,y+2,1,5,color);rect(c,mx+2,y+3,1,3,color);
+            }else{
+                // A quiet closed latch replaces the misleading permanent arrow.
+                rect(c,mx-4,y+3,8,2,M.creamShade);rect(c,mx-4,y+2,2,4,M.creamShade);rect(c,mx+2,y+2,2,4,M.creamShade);
+            }
             for(const dx of [2,w-4])rect(c,x+dx,y+h-3,2,2,P.ironDark);
         }
     });

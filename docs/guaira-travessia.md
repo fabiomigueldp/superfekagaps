@@ -25,3 +25,7 @@ Reflexos ficam recortados no canal, no interior dos arrozais, na queda e no pool
 Os dois módulos visuais recebem somente tempo e estado do jogo, sem timers, RAF, armazenamento ou alteração de mecanismo. Pausa conserva o tempo; movimento reduzido mantém poses estáveis para o estado atual. Tiles, suporte, ponte, placa, risco, câmera, controles e coleta permanecem sob as mesmas autoridades do motor.
 
 `tests/guaira-vitality.test.ts` cobre pés/envelope, estados estáticos, moinho/eixo, ausência de água decorativa quando seca, clips e continuidade dos quatro fluxos. O replay de 585 quadros foi comparado antes/depois, incluindo Player, corpos, tempo, resultado, checkpoint, moedas e IDs coletados em cada quadro; o digest foi idêntico e cada render preservou a simulação. As provas visuais combinadas são Canvas offline, sem alegação de FPS ou substituição de QA em navegador.
+
+## Continuidade da distribuição
+
+Dois ramais inclinados de bronze ligam os ombros da comporta às pontas dos canais do bairro e do arrozal. As flanges seguem a linguagem da tubulação da Casa da Vazão. Os tubos ficam atrás da alvenaria, das correntes e do deck real; suas bordas discretas não usam a faixa clara dos apoios jogáveis. A mudança é só de pintura, sem alterar canais animados, trabalhadores, estado da válvula ou geometria da ponte. A comparação no mesmo enquadramento usa o render real em Canvas offline; o replay de 585 quadros preserva o digest de simulação e cada render deixa o estado intacto.

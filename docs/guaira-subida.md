@@ -45,3 +45,7 @@ A segunda URL depende da integração do mapa, feita separadamente: chegada neut
 Provas de render foram geradas executando o replay e chamando `GuairaAscent.render()` com Canvas Skia, incluindo câmera, HUD, resultado, jogador e controles de toque reais. São imagens da implementação, **não capturas de navegador**. O acesso local do navegador recebeu `ERR_BLOCKED_BY_CLIENT`; a revisão visual e navegação no navegador ficam com a integração em prévia. Não chamar esta evidência de teste humano de dificuldade, teste de dispositivo móvel ou teste do deploy.
 
 O ponto seguro pertence somente à tentativa aberta. A mensagem efêmera é **PONTO SEGURO NESTA TENTATIVA**; os status locais explicam que sair e reentrar inicia outra tentativa. A campanha continua usando sua mensagem e persistência anteriores. Isso altera apenas feedback textual, não posição, capacete, moedas, física ou restauração.
+
+## Apoio da cisterna
+
+A bacia de entrada agora pertence a uma cisterna de alvenaria apoiada até o terraço, com corpo e base recuados atrás dos canos. A massa em pedra não usa a borda clara dos pisos; BAIRRO, sua válvula fechada, PARTICULAR e o visor de água limpa conservam posição e leitura. Nenhuma distribuição é consertada por essa mudança de pintura. A comparação antes/depois no mesmo enquadramento usa o render real em Canvas offline; o replay de 904 quadros preserva o digest de simulação e cada render deixa o estado intacto. Os testes da subida, travessia e vitalidade passam junto ao typecheck.

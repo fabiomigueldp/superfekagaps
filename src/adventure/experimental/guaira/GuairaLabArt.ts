@@ -51,17 +51,32 @@ export function drawGuairaFloor(c: CanvasRenderingContext2D, cy: number) {
     }
 }
 
-export function drawGuairaBoss(c: CanvasRenderingContext2D, b: SkeletonBullModel, cx: number, cy: number, reducedMotion: boolean) {
-    c.save(); c.translate(-cx, -cy);
+/** Full body sweep, including its starting position; no promised safe gap. */
+export function bullChargeWarningRange(b: SkeletonBullModel) {
+    const target = b.facing < 0 ? b.arena.left + 12 : b.arena.right - b.width - 12;
+    return { left: Math.min(b.x, target), right: Math.max(b.x, target) + b.width };
+}
+
+export function drawBullWarning(c: CanvasRenderingContext2D, b: SkeletonBullModel) {
     if (b.state === 'tell' || b.state === 'rattle') {
-        const y = b.arena.floor - 5;
-        rect(c, '#653752', b.arena.left, y, b.arena.right - b.arena.left, 3);
-        for (let x = b.arena.left + 6; x < b.arena.right - 6; x += 20) {
-            const color = b.state === 'tell' ? '#edcaf5' : '#f0ddae';
-            rect(c, color, x, y + 1, b.state === 'tell' ? 6 : 9, 1);
-            if (b.state === 'tell') rect(c, color, x + (b.facing > 0 ? 5 : 0), y - 1, 1, 5);
+        const y = b.arena.floor - 5, charge = b.state === 'tell';
+        const range = charge ? bullChargeWarningRange(b) : { left: b.arena.left, right: b.arena.right };
+        rect(c, '#653752', range.left, y, range.right - range.left, 3);
+        for (let x = range.left + 7; x < range.right - 7; x += 20) {
+            if (charge) for (let d = 0; d < 3; d++) {
+                rect(c, '#edcaf5', x + b.facing * d, y - 1 + d, 1, 1);
+                rect(c, '#edcaf5', x + b.facing * d, y + 3 - d, 1, 1);
+            } else {
+                rect(c, '#f0ddae', x - 3, y + 1, 7, 1);
+                rect(c, '#f0ddae', x - 4, y, 2, 3); rect(c, '#f0ddae', x + 3, y, 2, 3);
+            }
         }
     }
+}
+
+export function drawGuairaBoss(c: CanvasRenderingContext2D, b: SkeletonBullModel, cx: number, cy: number, reducedMotion: boolean) {
+    c.save(); c.translate(-cx, -cy);
+    drawBullWarning(c, b);
     drawSkeletonBull(c, b, reducedMotion);
     for (const bone of b.bones) {
         rect(c, '#493444', bone.x - 1, bone.y - 1, 12, 9);

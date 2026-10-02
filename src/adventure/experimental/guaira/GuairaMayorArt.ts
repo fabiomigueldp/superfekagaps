@@ -17,6 +17,7 @@ export interface GuairaMayorArtState extends MayorRect {
     readonly stateTick:number;
     readonly tick:number;
     readonly vulnerable?:boolean;
+    readonly accessRequested?:boolean;
     readonly stampTarget:MayorRect|null;
     readonly publicWaterOpen:boolean;
     readonly sealsRemaining:number;
@@ -202,6 +203,16 @@ export function drawGuairaMayorStampTarget(c:CanvasRenderingContext2D,m:GuairaMa
         r(x,y,2,h,P.warning);r(x+w-2,y,2,h,P.warning);
         // Downward chevrons tie the fixed marked region to a closing order.
         for(let xx=13;xx<w-10;xx+=28){b.line(x+xx-3,y+5,x+xx,y+8,P.warning);b.line(x+xx,y+8,x+xx+3,y+5,P.warning);}
+        // Eight pressure slots fill from the simulation's warning clock. They
+        // stay inside the already warned vent and remain legible without motion.
+        const progress=Number.isFinite(m.warningProgress)?Math.max(0,Math.min(1,m.warningProgress!)):0;
+        const span=Math.max(0,w-8),filled=Math.floor(span*progress);
+        r(x+4,y+h-8,span,4,P.ink);
+        for(let i=0;i<8;i++){
+            const start=Math.floor(i*span/8),end=Math.floor((i+1)*span/8)-2;
+            r(x+4+start,y+h-7,Math.max(0,end-start),2,P.bronzeShade);
+            r(x+4+start,y+h-7,Math.max(0,Math.min(end,filled)-start),2,P.warning);
+        }
     }else{
         r(x,y,w,h,P.waterShade);r(x,y,w,1,P.waterLight);
         for(let xx=0;xx<w;xx+=8){r(x+xx,y+3,4,h-3,P.water);r(x+xx+1,y+2,2,Math.max(1,h-6),P.waterLight);}

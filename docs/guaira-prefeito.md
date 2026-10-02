@@ -5,7 +5,7 @@ Encontro experimental isolado em `guaira-prefeito.html`. Prefeito fictício, sem
 ## Jogar
 
 - Setas ou A/D: mover; Espaço: pular; baixo no ar: sentada; Shift: correr; Esc: pausar; M: som
-- Espere o carimbo alto. A moldura amarela marca a grelha exata que soltará água; saia dessa região
+- Espere o carimbo alto. A moldura amarela marca a grelha exata que soltará água; saia dessa região. Oito ranhuras dentro da moldura se enchem durante o aviso até a batida
 - Depois da batida, use a sentada na placa à esquerda. A passarela sobe e o prefeito tenta soltar o carimbo
 - Espere o dorso ficar exposto e pule sobre ele. O texto distingue registro fechado, passarela subindo e golpe disponível
 - Volte pelo piso seco e repita. Perder uma janela apenas reinicia o ciclo. Depois do terceiro lacre, a água chega ao bairro e Feka continua controlável
@@ -30,11 +30,15 @@ A câmera local parte de y64 e acompanha saltos altos sem mudar física, escala 
 
 O render nativo de Feka permanece ativo. Apenas o painel genérico de HP é omitido, temporariamente retirando o boss durante render com restauração em `finally`; a referência estável do encontro alimenta os pintores. O prefeito é desenhado no pass de objetos, antes de Feka. A barra superior indica água liberada. A pequena dica é omitida quando encobriria o sprite; o mesmo texto permanece no status externo. Aviso, batida, recuperação coberta, dorso exposto e desfecho têm poses próprias.
 
+As ranhuras da grelha usam diretamente `warningProgress`, sem piscar, expandir o retângulo avisado ou alterar os 60 ticks de preparação. O registro mostra uma trava em espera, uma seta para baixo na recuperação fechada, uma seta para cima durante a subida válida e uma seta para a direita quando a rota abre. A pequena ligação hidráulica e a guia já existente ficam ciano apenas após uma ativação fresca; a coluna acompanha a altura real do lift. A lâmpada superior acende quando o acesso fica pronto e permanece acesa após a liberação definitiva da água; a seta na passarela só indica o golpe disponível durante a vulnerabilidade. Uma ativação anterior à batida ou uma janela perdida não mantém a indicação de acesso, mesmo se o switch físico ainda estiver ativo. Todos esses sinais funcionam com movimento reduzido e consomem apenas estado de leitura.
+
 O problema anterior de enquadramento foi medido com um salto segurado normal sobre o deck: 11 frames totalmente fora do canvas e 22 acima/atrás da barra superior. Depois do ajuste local, o mesmo input tem zero frames ocultos e capacete no mínimo em y27 da tela. Timing, posições físicas e frames dos três golpes permanecem iguais. Há prova separada do salto vertical no centro da passarela, onde a dica precisa desaparecer.
 
 ## Verificação e integração
 
 `node --import tsx --test tests/guaira-mayor.test.ts` cobre teclado e toque completos, canto/passividade, janela perdida/repetível, toggle fechado/reaberto, carry descendente sem esmagamento, bordas do dorso, capacete/morte/checkpoint, retry, Escape/blur/visibilidade, pausa, render sem mutações, falha de painter com restauração, pulo curto/segurado e movimento reduzido. São 18 casos focados. Os dois projetos TypeScript passam.
+
+`tests/guaira-mayor-cues.test.ts` acrescenta dois casos de pintura: progresso dentro da grelha exata, sem antecipar dano, e sinais do mecanismo ligados ao modelo e objetos nativos. Cobre ativação obsoleta, subida, chegada real, fechamento, reabertura e expiração da janela. O replay congelado continua atingindo nos mesmos frames 322, 622 e 922.
 
 A cobertura da barra verifica o ciclo MAPA → vitória/CASA → pausa/CASA → TENTAR/MAPA, os nomes acessíveis e tooltip, o reaproveitamento do bitmap, três controles de 44 px e a largura combinada de CONTINUAR/TENTAR/CASA em 320 px. CASA tem a mesma largura de MAPA. Essa medição é focada e não substitui a inspeção do layout no navegador da prévia.
 

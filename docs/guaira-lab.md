@@ -35,6 +35,26 @@ The production build retains `main` and `juiceLab` inputs and adds `guairaLab`. 
 
 Offline proof images/video are kept outside the repository and explicitly labeled as actual-engine offline rendering, not browser screenshots. No prototype screenshot, custom-player entry, GIF or diorama proof is shipped under `public`.
 
+## Articulated skeleton and directional warning
+
+The bull now lowers its skull for a charge, raises its jaw for low bones, uses
+six authored gallop poses with articulated knees/hooves, braces when braking and
+opens its ribs around the purple core during recovery. These poses read the
+existing simulation state and fixed-step clock; no attack timing, body shape,
+contact priority or Player behavior changed. Reduced motion holds one pose within
+each phase, and pause holds the current frame.
+
+Charge chevrons point in the locked direction. Their floor band covers the union
+of the complete current body and its travel to the existing stopping position;
+tests compare it to every actual body and swept hazard along both directions.
+The bone attack keeps a distinct low-bone mark across the arena. The existing
+top-contact cue remains over the vulnerable ribs.
+
+The actual-engine before/after replay renders all 1,019 frames with an identical
+simulation digest, all six hits and the helmet intact. Corner and recovery tests
+remain unchanged. The comparison movie is offline Canvas output, not browser
+footage or a claim of human difficulty calibration.
+
 ## Explicit continuation
 
 After the real final hit, the toolbar offers **SUBIR / TENTAR / MAPA**. SUBIR is a native link to `./guaira-subida.html`; victory itself never navigates. This replaces the PAUSA slot rather than adding a fourth visible control. Escape and the canvas pause target still work; while paused, CONTINUAR returns in that slot and SUBIR is hidden. Focus moves to the replacement control if the previously focused slot disappears. Retry clears the result, and click-time state validation rejects an obsolete continuation after pause or retry.

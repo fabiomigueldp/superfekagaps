@@ -149,7 +149,21 @@ function bureau(c: CanvasRenderingContext2D, cx: number, cy: number, t: number) 
     r(c, x + 73, y + 58, 1, 32, '#b59264');
     r(c, x + 69, y + 73, 10, 2, '#caa168');
     r(c, x + 72, y + 71, 4, 5, '#80694e');
-    // Intake -> fork -> private cistern. Cyan is contained inside a real bronze pipe.
+    // A masonry cistern supports the intake down to the terrace. Its muted curved
+    // body and base stay behind the plumbing; neither uses the playable deck edge.
+    polygon(c, [[790 - cx,72 - cy],[835 - cx,72 - cy],[835 - cx,119 - cy],
+        [830 - cx,128 - cy],[795 - cx,128 - cy],[790 - cx,119 - cy]], '#af9172');
+    r(c, 792 - cx, 74 - cy, 35, 44, '#c5a882');
+    r(c, 793 - cx, 76 - cy, 6, 42, '#d1b690');
+    r(c, 828 - cx, 75 - cy, 5, 44, '#a48668');
+    for (const [yy, joint] of [[84,808],[96,799],[108,810]]) {
+        r(c, 794 - cx, yy - cy, 35, 1, '#b39876');
+        r(c, joint - cx, yy - 9 - cy, 1, 9, '#b39876');
+    }
+    r(c, 790 - cx, 119 - cy, 45, 8, '#baa07c');
+    r(c, 786 - cx, 127 - cy, 53, 6, '#a98c6c');
+    r(c, 789 - cx, 128 - cy, 47, 3, '#c0a17a');
+    // Intake -> fork -> private tank. Cyan is contained inside a real bronze pipe.
     oval(c, 787 - cx, 65 - cy, 51, 14, '#ae9375');
     oval(c, 790 - cx, 66 - cy, 45, 10, '#d0b892');
     oval(c, 794 - cx, 68 - cy, 37, 6, P.waterShade);
