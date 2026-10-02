@@ -34,3 +34,9 @@ Both experimental labs reuse the base pause/resume transition so buffered hit-st
 The production build retains `main` and `juiceLab` inputs and adds `guairaLab`. Its dedicated JavaScript is 13.09 kB raw / 5.46 kB gzip, plus the shared 1.43 kB / 0.69 kB bitmap toolbar and 2.67 kB / 1.28 kB HTML. The existing WorldGame bundle remains shared; campaign HTML does not preload the Guaíra entry. These are build sizes, not an FPS claim.
 
 Offline proof images/video are kept outside the repository and explicitly labeled as actual-engine offline rendering, not browser screenshots. No prototype screenshot, custom-player entry, GIF or diorama proof is shipped under `public`.
+
+## Explicit continuation
+
+After the real final hit, the toolbar offers **SUBIR / TENTAR / MAPA**. SUBIR is a native link to `./guaira-subida.html`; victory itself never navigates. This replaces the PAUSA slot rather than adding a fourth visible control. Escape and the canvas pause target still work; while paused, CONTINUAR returns in that slot and SUBIR is hidden. Focus moves to the replacement control if the previously focused slot disappears. Retry clears the result, and click-time state validation rejects an obsolete continuation after pause or retry.
+
+The next step is to inspect the water diversion at Casa da Vazão. The ascent remains freely accessible from the experimental map; this link creates no unlock, shared attempt, campaign registration or saved completion. Tests exercise the final native falling hit and toolbar states; compact compositions use the real renderer and equivalent toolbar drawing, distinct from browser captures.

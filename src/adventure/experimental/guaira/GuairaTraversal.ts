@@ -130,9 +130,9 @@ export class GuairaTraversal extends WorldGame {
         this.renderer.present();
         const message = paused ? 'Pausado · Esc ou Continuar para voltar'
             : this.finished ? 'Travessia concluída · Curral abre a arena de Ossabravo · Mapa volta à maquete'
-            : this.player.data.isDead ? 'Feka caiu · retorno automático ao último checkpoint · Recomeçar reinicia a travessia'
+            : this.player.data.isDead ? 'Feka caiu · retorno automático ao ponto seguro desta tentativa · Recomeçar reinicia a travessia'
             : nearValve ? (!valve.active ? 'Pule e aperte baixo sobre a placa no chão · espere a ponte subir' : this.bridgeReady ? 'Ponte pronta · atravesse até a bandeira do checkpoint' : 'Água liberada · a ponte está subindo')
-            : this.player.data.position.x >= 624 ? 'Arrozal irrigado · siga à direita até o curral · checkpoint local na bandeira'
+            : this.player.data.position.x >= 624 ? 'Siga à direita até o curral · ponto seguro na bandeira só nesta tentativa · sair e reentrar reinicia a travessia'
             : 'Guaíra fictícia · setas/A D: mover · Espaço: pular · baixo no ar: sentada · Shift: correr · Esc: pausa · M: som';
         if (this.status.textContent !== message) this.status.textContent = message;
     }

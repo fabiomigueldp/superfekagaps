@@ -27,6 +27,7 @@ test('isolated lab uses the real engine, cloned flat stage, helmet and fixed cam
     assert.deepEqual(game.store.save.completed, []); assert.deepEqual(STAGES, original);
     const html = readFileSync(new URL('../guaira-lab.html', import.meta.url), 'utf8');
     assert.match(html, /id="lab-exit" href="\.\/guaira\.html\?at=corral"/);
+    assert.match(html, /id="lab-ascent" href="\.\/guaira-subida\.html" hidden/);
     assert.doesNotMatch(html, /intro|KeyX|HP/);
 });
 
@@ -48,7 +49,8 @@ test('pause via Escape, HUD, blur and visibility freezes and resumes without cam
 test('real toolbar has native 44px bitmap controls, retry resets combat and Enter/Space do not leak', async t => {
     const h = guairaBrowser(t); await import('../src/guaira-lab');
     const game = h.window.worldGame as GuairaBullLab;
-    for (const [control, name] of [[h.pause, 'Pausar'], [h.retry, 'Tentar novamente'], [h.exit, 'Voltar ao mapa de Guaíra']] as const) {
+    for (const [control, name] of [[h.pause, 'Pausar'], [h.retry, 'Tentar novamente'], [h.exit, 'Voltar ao mapa de Guaíra'],
+        [h.ascent, 'Subir à Casa da Vazão para observar o desvio da água']] as const) {
         assert.equal(control.getAttribute('aria-label'), name);
         assert.equal(control.textContent, name);
         assert.ok(control.children[0] instanceof Canvas); assert.equal((control.children[0] as Canvas).height, 44);
@@ -68,6 +70,28 @@ test('real toolbar has native 44px bitmap controls, retry resets combat and Ente
     assert.equal(model(game).health, 6); assert.equal(model(game).state, 'intro');
     assert.equal(game.player.data.hasHelmet, true); assert.equal(game.player.data.isDead, false);
     assert.equal(h.canvas.focused, true); assert.equal(game.elapsed, 0);
+    h.frame(); assert.equal(h.ascent.hidden, true); assert.equal(h.pause.hidden, false);
+    assert.equal(h.ascent.dispatch('click'), true, 'a stale early activation cannot open Subida');
+    // The real final falling hit exposes the contextual continuation, not an automatic navigation.
+    const b = model(game); b.health = 1; b.state = 'recover'; b.stateTick = 0;
+    game.player.data.position = { x: b.x + 12, y: b.y - game.player.data.height - 1 };
+    game.player.data.velocity = { x: 0, y: 2 }; game.player.data.isGrounded = false;
+    step(game); game.render(); h.frame();
+    assert.equal(game.canAdvanceToAscent, true); assert.equal(h.ascent.hidden, false); assert.equal(h.pause.hidden, true);
+    assert.equal(game.stage.id, 'guaira-lab', 'winning stays here until the player chooses');
+    assert.match(h.status.textContent, /Subir leva à Casa da Vazão/);
+    assert.equal(h.ascent.dispatch('click'), false, 'native link is allowed only in the completed playing state');
+    h.ascent.focus(); h.key('Escape'); step(game); h.frame();
+    assert.equal(game.state, 'paused'); assert.equal(h.ascent.hidden, true); assert.equal(h.pause.hidden, false);
+    assert.equal(h.document.activeElement, h.pause, 'focus follows the visible continuation/pause slot');
+    assert.equal(h.pause.getAttribute('aria-label'), 'Continuar');
+    assert.equal(h.ascent.dispatch('click'), true, 'a queued next activation cannot bypass Pause');
+    h.key('Escape'); step(game); h.frame();
+    assert.equal(game.canAdvanceToAscent, true); assert.equal(h.document.activeElement, h.ascent);
+    h.retry.dispatch('click'); h.frame();
+    assert.equal(game.canAdvanceToAscent, false); assert.equal(h.ascent.hidden, true); assert.equal(h.pause.hidden, false);
+    assert.equal(h.ascent.dispatch('click'), true, 'Retry invalidates an earlier completion action');
+    assert.deepEqual(game.store.save.completed, []);
 });
 
 test('touch owns ordinary move, jump and ground-pound actions and cancel releases them', t => {

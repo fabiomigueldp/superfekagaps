@@ -121,11 +121,11 @@ export class GuairaAscent extends WorldGame {
         this.renderer.present();
         const message = paused ? 'Pausado · Esc ou Continuar para voltar'
             : this.finished ? 'Desvio à vista · o cano particular recebe água, o ramal do bairro segue fechado · Mapa volta à Casa da Vazão'
-            : this.player.data.isDead ? 'Retorno automático ao último checkpoint · Recomeçar limpa esta tentativa'
+            : this.player.data.isDead ? 'Retorno automático ao ponto seguro desta tentativa · Recomeçar reinicia a subida'
             : this.player.data.position.y + this.player.data.height > 328 ? 'Piso seco de recuperação · pule pelo degrau à esquerda e reembarque'
             : x < 160 ? 'Subida da Vazão · setas/A D: mover · Espaço: pular · Esc: pausa · M: som'
             : x < 496 ? 'Prancha de inspeção · ela vai e volta · pule para embarcar, solte a direção para viajar'
-            : x < 768 ? 'Checkpoint local · elevador de manutenção · embarque embaixo e salte à direita perto do terraço'
+            : x < 768 ? 'Ponto seguro só nesta tentativa · sair e reentrar reinicia a subida · embarque no elevador e salte à direita perto do terraço'
             : 'Casa da Vazão · siga até o cano para observar o desvio';
         if (this.status.textContent !== message) this.status.textContent = message;
     }

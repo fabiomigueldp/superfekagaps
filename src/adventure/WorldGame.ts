@@ -594,7 +594,7 @@ export class WorldGame {
                 this.store.persist();
                 this.audio.sfx('checkpoint');
                 if (!this.boss) {
-                    this.toast = 'CAMINHO GUARDADO';
+                    this.toast = this.ephemeral ? 'PONTO SEGURO NESTA TENTATIVA' : 'CAMINHO GUARDADO';
                     this.toastTimer = 1500;
                 }
             }

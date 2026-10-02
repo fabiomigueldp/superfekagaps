@@ -43,3 +43,5 @@ A segunda URL depende da integração do mapa, feita separadamente: chegada neut
 - `npm run typecheck` e os validadores de níveis, assets do Player e mundos passam. Build Vite validado com a entrada nova fornecida no override local de build; integrar a entrada permanentemente na configuração junto ao mapa.
 
 Provas de render foram geradas executando o replay e chamando `GuairaAscent.render()` com Canvas Skia, incluindo câmera, HUD, resultado, jogador e controles de toque reais. São imagens da implementação, **não capturas de navegador**. O acesso local do navegador recebeu `ERR_BLOCKED_BY_CLIENT`; a revisão visual e navegação no navegador ficam com a integração em prévia. Não chamar esta evidência de teste humano de dificuldade, teste de dispositivo móvel ou teste do deploy.
+
+O ponto seguro pertence somente à tentativa aberta. A mensagem efêmera é **PONTO SEGURO NESTA TENTATIVA**; os status locais explicam que sair e reentrar inicia outra tentativa. A campanha continua usando sua mensagem e persistência anteriores. Isso altera apenas feedback textual, não posição, capacete, moedas, física ou restauração.

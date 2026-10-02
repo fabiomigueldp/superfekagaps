@@ -90,6 +90,9 @@ export class GuairaBullLab extends WorldGame {
         if (this.state !== 'playing' && this.state !== 'paused') return;
         if (this.state === 'paused') this.resume(); else this.pause();
     }
+    get canAdvanceToAscent() {
+        return this.state === 'playing' && !this.player.data.isDead && this.boss?.phase === 'defeated';
+    }
     override update(dt: number) {
         if (!Number.isFinite(dt) || dt <= 0) return;
         if (this.state === 'map' || this.state === 'title' || this.state === 'intro') { this.load('guaira-lab'); return; }
@@ -128,12 +131,12 @@ export class GuairaBullLab extends WorldGame {
         } else if (this.boss?.phase === 'defeated') {
             panel(c, 62, 64, 196, 34, '#382b35', '#d8ac7a');
             pixelText(c, 'A OSSADA DESCANSOU!', 160, 72, '#f0ddae', 1, 'center');
-            pixelText(c, 'TENTAR: NOVA LUTA', 160, 85, '#edcaf5', 1, 'center');
+            pixelText(c, 'SUBIR: CASA DA VAZAO', 160, 85, '#edcaf5', 1, 'center');
         }
         this.renderer.present();
         const message = paused ? 'Pausado · Esc ou Continuar para voltar'
             : this.player.data.isDead ? 'Feka caiu · reinício automático · Tentar para recomeçar já'
-            : this.boss?.phase === 'defeated' ? 'Vitória! Ossabravo descansou · Tentar inicia outra luta'
+            : this.boss?.phase === 'defeated' ? 'Vitória! Ossabravo descansou · Subir leva à Casa da Vazão para observar o desvio da água · Tentar repete a luta'
             : 'Ossabravo · setas/A D: mover · Espaço: pular · baixo no ar: sentada · Shift: correr · Esc: pausa · M: som';
         if (this.status.textContent !== message) this.status.textContent = message;
     }

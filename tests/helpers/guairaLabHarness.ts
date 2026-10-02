@@ -47,7 +47,7 @@ export class Element extends EventSurface {
     append(...children: Element[]) { this.children.push(...children); }
     setAttribute(key: string, value: string) { this.attributes.set(key, value); }
     getAttribute(key: string) { return this.attributes.get(key) ?? null; }
-    focus() { this.focused = true; }
+    focus() { this.focused = true; (document as unknown as { activeElement: Element }).activeElement = this; }
     getBoundingClientRect() { return { left: 0, top: 0, width: 640, height: 360 }; }
 }
 
@@ -73,13 +73,14 @@ export function guairaBrowser(t: Pick<TestContext, 'after'>, options: { touch?: 
     const retry = new Element(); retry.id = 'lab-retry';
     const pause = new Element(); pause.id = 'lab-pause';
     const exit = new Element(); exit.id = 'lab-exit'; exit.tagName = 'A';
+    const ascent = new Element(); ascent.id = 'lab-ascent'; ascent.tagName = 'A'; ascent.hidden = true;
     for (const button of [retry, pause]) button.tagName = 'BUTTON';
-    const elements = new Map<string, Element>([canvas, status, retry, pause, exit].map(element => [element.id, element]));
+    const elements = new Map<string, Element>([canvas, status, retry, pause, exit, ascent].map(element => [element.id, element]));
     const frames = new Map<number, FrameRequestCallback>();
     let nextFrame = 0;
     const requestFrame = (callback: FrameRequestCallback) => { frames.set(++nextFrame, callback); return nextFrame; };
     const document = Object.assign(new EventSurface(), {
-        title: '', hidden: false, body: { style: {} }, querySelector: () => null,
+        title: '', hidden: false, activeElement: null as Element | null, body: { style: {} }, querySelector: () => null,
         getElementById: (id: string) => elements.get(id) ?? null,
         createElement: (tag: string) => tag === 'canvas' ? new Canvas() : new Element()
     });
@@ -127,5 +128,5 @@ export function guairaBrowser(t: Pick<TestContext, 'after'>, options: { touch?: 
         const pending = [...frames]; frames.clear();
         for (const [, callback] of pending) callback(performance.now());
     }
-    return { canvas, status, retry, pause, exit, document, window, frames, storageCalls, create, key, pointer, hidden, frame };
+    return { canvas, status, retry, pause, exit, ascent, document, window, frames, storageCalls, create, key, pointer, hidden, frame };
 }
