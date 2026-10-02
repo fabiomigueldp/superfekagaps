@@ -77,3 +77,110 @@ emendas de loop, volume e clipping, pausa/retomada, mute, troca de faixa e edito
 É necessária comparação auditiva humana em diferentes trechos e taxas antes de
 afirmar qualidade equivalente. Não foi feita compressão, audição ou promessa de
 economia para essa etapa futura.
+
+## Perfil conservador da frente cloud — 2 de outubro de 2026
+
+Base medida: `f4106941e97a30e9e8911f30428319d6ddb92635`, obtida de
+`origin/main`, em Linux com Node `24.19.0`, npm `11.9.0` e dependências do
+lockfile instaladas por `npm ci`. O checkout inicial estava limpo e um commit
+atrás dessa base. Não havia `AGENTS.md` nem skills locais em `.agents/` disponíveis
+nesta configuração. Esta etapa altera somente a política de empacotamento,
+seus testes e esta documentação.
+
+### Diagnóstico e mudança
+
+O pacote tem **141 arquivos e 40.572.532 bytes**, com **4.427.468 bytes** de
+margem para o orçamento de 45.000.000 bytes. Os cinco WAV clássicos representam
+28.800.220 bytes (70,99%); os seis WebM, 6.346.260 bytes (15,64%). Os 31 arquivos
+JavaScript somam 822.788 bytes (2,03%). Esses valores descrevem o pacote inteiro,
+não os recursos baixados por uma rota específica.
+
+A cópia fazia `mkdirSync(..., { recursive: true })` para cada asset publicado,
+mesmo quando vários compartilhavam o diretório. Agora um conjunto local à chamada
+evita repetir a criação do mesmo diretório: **95 chamadas antes, 9 depois**.
+O conjunto não persiste entre builds; um output limpo é recriado corretamente.
+As exclusões continuam sendo os mesmos 21 caminhos exatos (23.091.611 bytes).
+
+`npm run size:build` continua retornando os campos existentes e agora acrescenta
+`headroomBytes` e `byExtension` (extensão, quantidade e bytes, em ordem decrescente
+de tamanho). Extensões são normalizadas para minúsculas; arquivos sem extensão
+usam a string vazia. Os totais incluem todos os arquivos e mantêm o orçamento
+medido em bytes decimais. Nenhum relatório é escrito em `dist/`.
+
+Para identificar o custo da política durante um build real:
+
+```sh
+FEKA_BUILD_PROFILE=1 npm run build
+npm run size:build
+node --import tsx --test tests/build-output-policy.test.ts
+```
+
+A linha opcional `[feka-output-profile]` informa `copyMs`, `inspectMs` e
+`headroomBytes`. Esses tempos cobrem apenas cópia e inspeção no hook `writeBundle`,
+excluindo validadores, typechecks, transformação de módulos e compressão usada
+pelo relatório do Vite. O log habitual e todas as proteções permanecem ativos
+sem a variável de ambiente.
+
+### Comparação local
+
+| Medida | Antes | Depois |
+| --- | ---: | ---: |
+| Arquivos / bytes em `dist/` | 141 / 40.572.532 | 141 / 40.572.532 |
+| Chamadas de `mkdirSync` na cópia | 95 | 9 |
+| Mediana da cópia isolada, cache aquecido | 11,062 ms | 10,865 ms |
+| Mediana da inspeção do fixture de cópia | 4,684 ms | 4,650 ms |
+| `npm run build`, incluindo prebuild, uma execução | 13,091 s | 12,082 s |
+| Build reportado pelo Vite, uma execução | 1,94 s | 1,81 s |
+
+A sondagem isolada executou seis cópias em diretório temporário recriado, descartou
+a primeira amostra e contou chamadas ao próprio `mkdirSync` do Node. A inspeção
+desse fixture cobre os 95 assets publicados mais `index.html`, não os bundles.
+Já o perfil do build completo atualizado mediu **13,736 ms de cópia e 16,666 ms
+de inspeção** de todo o output. Não se deve comparar diretamente as duas
+inspeções, pois os conjuntos de arquivos são diferentes.
+
+Os dois typechecks da base, executados separadamente, levaram **3,032 s** e
+**5,114 s**; `npm run validate` levou **1,367 s**. A evidência aponta o trabalho
+de validação de tipos como o maior custo observado, e a cópia como uma parcela
+pequena. As medições não sustentam atribuir a diferença de aproximadamente um
+segundo do build completo à mudança de diretórios: são execuções únicas,
+sujeitas a cache e variação do host. Não se removeu validação nem se alteraram
+os scripts compartilhados do `package.json` para obter um resultado aparente.
+
+Foi comparado o inventário de caminhos, tamanhos e hashes SHA-256 antes/depois:
+**todos os 141 arquivos de `dist/` e todos os 116 arquivos de `public/` são
+idênticos**. Não há economia de bytes nesta etapa. Os seis testes focados da
+política passam, incluindo builds limpos consecutivos, reconciliação por extensão,
+margem zero no limite e rejeição de excesso; validadores, typechecks e build passam.
+A suíte completa dessa versão passou com **1.241 testes TypeScript e três testes
+de servidor**, sem falhas.
+
+### Limites e integração
+
+Durante a frente chegou `bc431d5c492079a4565fe39fe96742f8dd790057`, com a bica
+pós-vitória do Bairro. A branch foi rebaseada sobre esse commit, sem conflito
+ou sobreposição de arquivos; essa é a **base efetiva da entrega**. O commit foi
+preservado integralmente, inclusive o novo asset. A comparação foi repetida com
+um worktree destacado da base, usando o mesmo lockfile e as mesmas dependências:
+
+| Medida sobre `bc431d5` | Base sem esta mudança | Com esta mudança |
+| --- | ---: | ---: |
+| Arquivos / bytes em `dist/` | 141 / 40.574.974 | 141 / 40.574.974 |
+| Margem para 45.000.000 bytes | 4.425.026 | 4.425.026 |
+| `npm run build`, incluindo prebuild | 11,749 s | 11,853 s |
+| Build reportado pelo Vite | 1,60 s | 1,66 s |
+
+Novamente, os **141 arquivos publicados e os 116 originais** são idênticos por
+SHA-256 entre a nova base e a branch. O perfil atualizado mediu **15,383 ms de
+cópia e 19,855 ms de inspeção**. A ausência de ganho no build total nessa segunda
+comparação reforça o limite: a melhoria é a redução de chamadas redundantes e a
+visibilidade do orçamento, não uma aceleração comprovada do build completo.
+Após a reconciliação, **1.248 testes TypeScript e três testes de servidor**
+passaram, assim como os validadores, ambos os typechecks, o build e `size:build`.
+
+Esta etapa não mediu navegador, rede, FPS, memória de runtime, Safari/iOS,
+qualidade auditiva ou emendas de loop. Não comprimiu músicas, alterou gameplay,
+arte, renderer, carregamento de runtime, Oracle ou configuração de publicação.
+Não houve merge na main nem publicação. Qualquer otimização futura de áudio ou
+carregamento precisa combinar propriedade com a frente de runtime e validar seus
+consumidores e loops; esta mudança não depende de código de outra frente.

@@ -62,3 +62,35 @@ test('copy refuses an output directory overlapping preserved sources', t => {
     assert.throws(() => copyPublishedAssets(f.publicDir, join(f.publicDir, 'dist')), /separate/);
     assert.equal(readFileSync(join(f.publicDir, 'keep.txt'), 'utf8'), 'original');
 });
+
+test('copy recreates nested output directories on subsequent clean builds', t => {
+    const f = fixture(t);
+    const retained = ['a.txt', 'nested/one.txt', 'nested/two.txt', 'nested/deeper/three.txt'];
+    for (const name of retained) f.put(`public/${name}`, `original:${name}`);
+    for (let run = 0; run < 2; run++) {
+        rmSync(f.outDir, { recursive: true, force: true });
+        copyPublishedAssets(f.publicDir, f.outDir);
+        for (const name of retained) {
+            assert.deepEqual(readFileSync(join(f.outDir, name)), readFileSync(join(f.publicDir, name)));
+        }
+    }
+});
+
+test('size diagnostics reconcile extension totals and exact budget headroom', t => {
+    const f = fixture(t);
+    f.put('dist/assets/one.wav', '123456');
+    f.put('dist/assets/two.WAV', '1234');
+    f.put('dist/LICENSE', '123');
+    const measured = inspectBuildOutput(f.outDir);
+    const htmlBytes = Buffer.byteLength('<html>game</html>');
+    assert.deepEqual(measured.byExtension, [
+        { extension: '.html', files: 1, bytes: htmlBytes },
+        { extension: '.wav', files: 2, bytes: 10 },
+        { extension: '', files: 1, bytes: 3 },
+    ]);
+    assert.equal(measured.byExtension.reduce((sum, group) => sum + group.bytes, 0), measured.bytes);
+    assert.equal(measured.byExtension.reduce((sum, group) => sum + group.files, 0), measured.files);
+    assert.equal(measured.headroomBytes, measured.maxBytes - measured.bytes);
+    assert.equal(inspectBuildOutput(f.outDir, measured.bytes).headroomBytes, 0);
+    assert.throws(() => inspectBuildOutput(f.outDir, measured.bytes - 1), /repository budget/);
+});
