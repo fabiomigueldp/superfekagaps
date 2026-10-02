@@ -79,3 +79,36 @@ test('register and lift cues reject stale openings, follow actual carry height a
     assert.equal(connectColor(), P.bronze, 'an expired opening must not keep the route-ready cue');
     assert.notEqual(art().at(116, 142), P.waterLight);
 });
+
+test('recovery readout shares the real deadline across lift travel, reclosure, pressure and hits', () => {
+    const b = new GuairaMayorModel();
+    const closed = { valveActive: false, liftReady: false, registerOpened: false };
+    const advance = (n: number, access = closed) => { for (let i = 0; i < n; i++) b.update(R.tickMs, access); };
+    assert.equal(b.recoveryProgress, 0);
+    advance(R.intro + R.idle + R.warning + R.stamp);
+    assert.equal(b.state, 'recover'); assert.equal(b.recoveryProgress, 0);
+    advance(90);
+    assert.equal(b.vulnerable, false); assert.equal(b.recoveryProgress, 1 / 3, 'waiting at the valve still consumes recovery');
+    advance(1, { valveActive: true, liftReady: false, registerOpened: true });
+    advance(70, { valveActive: true, liftReady: false, registerOpened: false });
+    const travelled = b.recoveryProgress;
+    advance(1, { valveActive: true, liftReady: true, registerOpened: false });
+    assert.equal(b.vulnerable, true); assert.ok(b.recoveryProgress > travelled, 'arrival does not restart the readout');
+    advance(1); assert.equal(b.vulnerable, false);
+    advance(1, { valveActive: true, liftReady: true, registerOpened: true });
+    assert.equal(b.vulnerable, true); assert.ok(b.recoveryProgress > travelled);
+    assert.equal(b.contact({ x: 274, y: 100, width: 14, height: 24 }, { x: 274, y: 96, width: 14, height: 24 }, true), 'hit');
+    assert.equal(b.recoveryProgress, 0, 'a successful contact clears the readout');
+    advance(R.hurt + R.idle + R.warning + R.stamp);
+    advance(1, { valveActive: true, liftReady: true, registerOpened: true });
+    assert.equal(b.counterpressure?.phase, 'warning');
+    advance(R.counterpressureWarning, { valveActive: true, liftReady: true, registerOpened: false });
+    assert.equal(b.counterpressure?.phase, 'active');
+    const active = b.recoveryProgress;
+    advance(R.counterpressureActive, { valveActive: true, liftReady: true, registerOpened: false });
+    assert.equal(b.counterpressure, null); assert.ok(b.recoveryProgress > active, 'waiting for water consumes the same deadline');
+    advance(R.recover - b.stateTick - 1, { valveActive: true, liftReady: true, registerOpened: false });
+    assert.equal(b.vulnerable, true); assert.ok(b.recoveryProgress < 1 && b.recoveryProgress > .99);
+    advance(1, { valveActive: true, liftReady: true, registerOpened: false });
+    assert.equal(b.state, 'idle'); assert.equal(b.vulnerable, false); assert.equal(b.recoveryProgress, 0);
+});
