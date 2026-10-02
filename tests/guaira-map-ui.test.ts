@@ -4,7 +4,11 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 const raw = JSON.parse(readFileSync(new URL('../public/assets/world/experimental/guaira/guaira-diorama.meta.json', import.meta.url), 'utf8'));
 const noop = () => {};
-const context = new Proxy({ createLinearGradient: () => ({ addColorStop: noop }) }, { get(target, key) { return key in target ? target[key as keyof typeof target] : noop; }, set() { return true; } });
+let basePaints = 0, markerReads = 0, regionClips = 0;
+const context = new Proxy({ createLinearGradient: () => ({ addColorStop: noop }),
+    drawImage: (image: { src?: string }) => { if (image.src?.endsWith('guaira-diorama.webp')) basePaints++; },
+    clip: () => { regionClips++; },
+}, { get(target, key) { return key in target ? target[key as keyof typeof target] : noop; }, set() { return true; } });
 class Element extends EventTarget {
     textContent = ''; hidden = false; disabled = false; title = ''; width = 1; height = 1;
     style: Record<string, string> = {}; attributes: Record<string, string> = {}; children: Element[] = [];
@@ -13,7 +17,7 @@ class Element extends EventTarget {
     className = '';
     append(...children: Element[]) { this.children.push(...children); }
     setAttribute(key: string, value: string) { this.attributes[key] = value; }
-    getBoundingClientRect() { return { width: this.marker ? 116 : 390, height: this.marker ? 44 : 450 }; }
+    getBoundingClientRect() { if (this.marker) markerReads++; return { width: this.marker ? 116 : 390, height: this.marker ? 44 : 450 }; }
     getContext() { return context; }
     focus() { this.focused = true; }
     click() { if (!this.disabled) this.dispatchEvent(new Event('click')); }
@@ -30,12 +34,21 @@ const navigations: string[] = [], replacements: string[] = [];
 const locationMock = { href: 'https://example.test/guaira.html?at=rice', search: '?at=rice', assign: (href: string) => navigations.push(href) };
 let fetchRaw: unknown = raw;
 let imageReady: Promise<void> = Promise.resolve();
+let waterReady: Promise<void> = Promise.resolve(), waterFailure = true;
 Object.assign(globalThis, {
     document: doc, window: win, location: locationMock,
     history: { replaceState: (_a: unknown, _b: string, url: URL) => replacements.push(String(url)) },
     matchMedia: () => motion, devicePixelRatio: 1,
     ResizeObserver: class { observe() {} disconnect() { observerDisconnected++; } },
-    Image: class { src = ''; naturalWidth = 1920; naturalHeight = 1200; async decode() { await imageReady; } },
+    Image: class {
+        src = '';
+        get naturalWidth() { return this.src.endsWith('guaira-water-mask.png') ? 516 : 1920; }
+        get naturalHeight() { return this.src.endsWith('guaira-water-mask.png') ? 306 : 1200; }
+        async decode() {
+            if (this.src.endsWith('guaira-water-mask.png')) { await waterReady; if (waterFailure) throw new Error('Optional mask unavailable'); }
+            else await imageReady;
+        }
+    },
     fetch: async () => ({ ok: true, json: async () => fetchRaw }),
     requestAnimationFrame: (callback: FrameRequestCallback) => { const id = next++; queue.set(id, callback); return id; },
     cancelAnimationFrame: (id: number) => queue.delete(id),
@@ -145,4 +158,35 @@ test('loading and failure markup retain direct links to every isolated experimen
     assert.equal((html.match(/id="destination-/g) ?? []).length, 3, 'no fourth global destination');
     assert.match(html, /id="map-return"[^>]*hidden disabled/);
     assert.match(html, /id="map-enter"[^>]*aria-describedby="map-description map-status"/);
+});
+
+test('water repaints regions at30Hz without idle marker layout, freezes when hidden/reduced, and ignores late disposal', async () => {
+    const module = await import('../src/guaira');
+    fetchRaw = raw; imageReady = Promise.resolve(); waterReady = Promise.resolve(); waterFailure = false;
+    locationMock.search = '?at=town'; locationMock.href = 'https://example.test/guaira.html?at=town';
+    motion.matches = false; doc.hidden = false;
+    const dispose = module.startGuairaMap(); await ready(); frames(2);
+    assert.equal(elements['map-error'].hidden, true); assert.equal(queue.size, 1);
+    const paintsBefore = basePaints, readsBefore = markerReads, clipsBefore = regionClips;
+    frames(60);
+    assert.ok(basePaints - paintsBefore >= 29 && basePaints - paintsBefore <= 31, 'stationary decoration is capped at30Hz');
+    assert.equal(markerReads, readsBefore, 'idle water never triggers marker layout reads');
+    assert.ok(regionClips > clipsBefore, 'stationary map restores the clipped water regions');
+    doc.hidden = true; doc.dispatchEvent(new Event('visibilitychange'));
+    const hiddenPaints = basePaints; frames(600); assert.equal(basePaints, hiddenPaints); assert.equal(queue.size, 0);
+    doc.hidden = false; doc.dispatchEvent(new Event('visibilitychange')); frames(1);
+    assert.equal(basePaints, hiddenPaints, 'first visible frame keeps the same water phase');
+    frames(3); assert.ok(basePaints > hiddenPaints);
+    motion.matches = true; motion.dispatchEvent(new Event('change')); frames(2);
+    const reducedPaints = basePaints; frames(60); assert.equal(basePaints, reducedPaints); assert.equal(queue.size, 0);
+    motion.matches = false; motion.dispatchEvent(new Event('change')); frames(3); assert.equal(queue.size, 1);
+    dispose(); assert.equal(queue.size, 0);
+    let finishWater!: () => void; waterReady = new Promise(resolve => { finishWater = resolve; });
+    const disposePending = module.startGuairaMap(); await ready(); frames(2);
+    assert.equal(elements['map-error'].hidden, true, 'decoration does not delay the scene');
+    disposePending(); finishWater(); await ready(); frames(2); assert.equal(queue.size, 0, 'late decoration cannot restart a disposed controller');
+    waterFailure = true; waterReady = Promise.resolve();
+    const disposeFailure = module.startGuairaMap(); await ready(); frames(2);
+    assert.equal(elements['map-error'].hidden, true); assert.equal(elements['map-enter'].disabled, false);
+    assert.equal(queue.size, 0, 'missing decoration retains the original static-map lifecycle'); disposeFailure();
 });

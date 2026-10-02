@@ -1,6 +1,7 @@
 import { LabToolbarAction } from './adventure/experimental/JuiceLabToolbar';
 import { GUAIRA_DESTINATIONS, GuairaMapModel, guairaArrivalFromSearch, type GuairaDestination } from './adventure/experimental/guaira/GuairaMapModel';
-import { approachGuairaCamera, guairaCamera, guairaScreenPoint, paintGuairaMap, type GuairaCamera } from './adventure/experimental/guaira/GuairaMapArt';
+import { approachGuairaCamera, guairaCamera, guairaScreenPoint, paintGuairaMap, paintGuairaWaterFrame, type GuairaCamera } from './adventure/experimental/guaira/GuairaMapArt';
+import { GUAIRA_WATER_CONTRACT, GuairaWaterMotion, VisibleWaterClock } from './adventure/experimental/guaira/GuairaWaterMotion';
 
 import { loadGuairaScene } from './adventure/experimental/guaira/GuairaMapLoader';
 
@@ -34,6 +35,9 @@ export function startGuairaMap(): () => void {
     const motion = matchMedia('(prefers-reduced-motion: reduce)');
     let model: GuairaMapModel | null = null, image: HTMLImageElement | null = null;
     let camera: GuairaCamera | null = null, overview = false, frame = 0, previousTime = 0, lastArrival = '', previousState = '';
+    let water: GuairaWaterMotion | undefined, paintedCamera: GuairaCamera | null = null;
+    let paintedDistance = -1, paintedMoving = false, lastWaterPaint = -Infinity;
+    const waterClock = new VisibleWaterClock();
     let width = 1, height = 1, ratio = 1;
     const requestFrame = () => { if (!signal.aborted && !frame && !document.hidden) frame = requestAnimationFrame(render); };
     function reflect() {
@@ -72,15 +76,25 @@ export function startGuairaMap(): () => void {
     }
     function render(time: number) {
         frame = 0;
-        if (signal.aborted || !model || !image || !context || document.hidden) return;
+        if (signal.aborted || !model || model.closed || !image || !context || document.hidden) return;
         const dt = previousTime ? Math.min(.05, (time - previousTime) / 1000) : 1 / 60;
         previousTime = time;
         model.tick(dt);
         const target = guairaCamera(model.metadata, width, height, model.point, overview);
         camera = !camera || model.reducedMotion ? target : approachGuairaCamera(camera, target, dt);
+        const seconds = waterClock.tick(time, !!water && !model.reducedMotion);
+        const overlay = water ? { effect: water, seconds } : undefined;
+        const fullPaint = !paintedCamera || camera.x !== paintedCamera.x || camera.y !== paintedCamera.y ||
+            camera.imageWidth !== paintedCamera.imageWidth || model.distance !== paintedDistance || model.moving !== paintedMoving;
         context.setTransform(ratio, 0, 0, ratio, 0, 0);
-        paintGuairaMap(context, image, camera, model, time);
-        for (const marker of markers) {
+        if (fullPaint) {
+            paintGuairaMap(context, image, camera, model, time, overlay);
+            paintedCamera = camera; paintedDistance = model.distance; paintedMoving = model.moving; lastWaterPaint = seconds;
+        } else if (overlay && !model.reducedMotion && seconds - lastWaterPaint >= 1 / 30 - 1e-6) {
+            paintGuairaWaterFrame(context, image, camera, model, time, overlay);
+            lastWaterPaint = seconds;
+        }
+        if (fullPaint) for (const marker of markers) {
             const node = GUAIRA_DESTINATIONS[marker.dataset.mapDestination as GuairaDestination].node;
             const p = guairaScreenPoint(model.metadata.nodes[node], camera);
             const markerWidth = marker.getBoundingClientRect().width || 116;
@@ -88,12 +102,13 @@ export function startGuairaMap(): () => void {
             marker.style.left = `${p.x}px`; marker.style.top = `${p.y + 12}px`;
         }
         reflect();
-        if (model.moving || camera.x !== target.x || camera.y !== target.y || camera.imageWidth !== target.imageWidth) requestFrame();
+        if (model.moving || camera.x !== target.x || camera.y !== target.y || camera.imageWidth !== target.imageWidth ||
+            (water && !model.reducedMotion)) requestFrame();
     }
     function resize() {
         const bounds = scene.getBoundingClientRect(); width = Math.max(1, bounds.width); height = Math.max(1, bounds.height);
         ratio = Math.min(2, devicePixelRatio || 1); canvas.width = Math.round(width * ratio); canvas.height = Math.round(height * ratio);
-        camera = null; requestFrame();
+        camera = null; paintedCamera = null; requestFrame();
     }
     function select(destination: GuairaDestination) { model?.select(destination); previousTime = 0; reflect(); requestFrame(); }
     for (const button of destinations) button.addEventListener('click', () => select(button.dataset.mapDestination as GuairaDestination), { signal });
@@ -114,13 +129,27 @@ export function startGuairaMap(): () => void {
             event.preventDefault(); select(event.key === 'ArrowLeft' ? 'town' : event.key === 'ArrowRight' ? 'curral' : 'subida');
         }
     }, { signal });
-    motion.addEventListener('change', () => { model?.setReducedMotion(motion.matches); camera = null; reflect(); requestFrame(); }, { signal });
+    motion.addEventListener('change', () => {
+        model?.setReducedMotion(motion.matches); camera = null; paintedCamera = null; waterClock.suspend(); reflect(); requestFrame();
+    }, { signal });
     document.addEventListener('visibilitychange', () => {
         previousTime = 0;
+        waterClock.suspend();
         if (document.hidden) { cancelAnimationFrame(frame); frame = 0; } else requestFrame();
     }, { signal });
     window.addEventListener('resize', resize, { signal });
     const observer = new ResizeObserver(resize); observer.observe(scene);
+    async function loadWater() {
+        try {
+            const atlas = new Image(); atlas.src = `${assetRoot}guaira-water-mask.png`; await atlas.decode();
+            if (signal.aborted || model?.closed) return;
+            if (atlas.naturalWidth !== GUAIRA_WATER_CONTRACT.atlasSize[0] || atlas.naturalHeight !== GUAIRA_WATER_CONTRACT.atlasSize[1]) return;
+            water = new GuairaWaterMotion(atlas, GUAIRA_WATER_CONTRACT, document.createElement('canvas'));
+            waterClock.suspend(); paintedCamera = null; requestFrame();
+        } catch {
+            // Decoration is optional: the already loaded map stays usable and static.
+        }
+    }
     async function load() {
         try {
             if (!context) throw new Error('Canvas indisponível');
@@ -137,6 +166,7 @@ export function startGuairaMap(): () => void {
             model = new GuairaMapModel(metadata, guairaArrivalFromSearch(location.search));
             model.setReducedMotion(motion.matches); image = art;
             loadingPanel.hidden = true; reflect(); resize();
+            void loadWater();
         } catch {
             if (!signal.aborted) { loadingPanel.hidden = true; element('map-error').hidden = false; overviewButton.disabled = true; enter.hidden = true;
                 element('map-title').textContent = 'Guaíra'; element('map-description').textContent = 'A maquete não carregou. Os experimentos continuam disponíveis acima.';
@@ -149,7 +179,7 @@ export function startGuairaMap(): () => void {
     destinations.forEach(button => { button.disabled = true; button.hidden = markers.includes(button); });
     enter.disabled = true; skip.hidden = true; returnButton.hidden = true; returnButton.disabled = true;
     void load();
-    return () => { model?.close(); abort.abort(); cancelAnimationFrame(frame); observer.disconnect(); };
+    return () => { model?.close(); abort.abort(); cancelAnimationFrame(frame); waterClock.suspend(); water = undefined; image = null; observer.disconnect(); };
 }
 let dispose = startGuairaMap();
 window.addEventListener('pagehide', () => dispose());

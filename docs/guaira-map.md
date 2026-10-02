@@ -46,6 +46,23 @@ python tools/diorama/guaira/package_guaira.py --input /tmp/guaira-render --outpu
 
 A fonte usa Cycles CPU, 48 amostras e nenhum denoiser. `--draft` não pode ser empacotado. Alterar a cena exige rever projeções, caminhos e legibilidade.
 
+## Água discreta e custo limitado
+
+Um passe decorativo acrescenta reflexos curtos ao reservatório/arrozais e movimento na direção real dos canais. A máscara foi derivada das superfícies de água na câmera Blender, usando pedras, arroz, ponte e tubulações como oclusores, com recuo de um pixel. Feka é desenhado depois do efeito. A base, as rotas e os metadados de navegação não mudam.
+
+O atlas PNG mede 516×306 (19.420 bytes); o buffer reutilizável mede 344×206. A estimativa de atlas RGBA decodificado + buffer é 915.040 bytes (~0,873MiB), sem textura adicional de 1920×1200. É orçamento de superfícies, não memória medida do browser/GPU. O manifesto registra proveniência e hashes; o JSON decorativo é compilado no módulo do mapa.
+
+Com câmera e Feka parados, apenas a união dos quatro recortes de água é restaurada, no máximo30 vezes por segundo. As placas não fazem consultas de layout nesse estado. Durante caminhada/enquadramento, o renderer normal recompõe o quadro completo. O tempo da água é acumulado somente enquanto a decoração está ativa; ocultar a aba suspende RAF e preserva a fase, sem salto na retomada. Reduced motion usa um quadro estático e volta ao agendamento sob demanda. O mapa não tem pausa separada: entrar/sair descarta o controlador. A máscara carrega depois da cena sem bloquear destinos; falha mantém a maquete estática, e conclusão tardia após descarte é ignorada.
+
+Reproduzir a máscara a partir da cena temporária gerada acima:
+
+```sh
+blender -b /tmp/guaira-render/guaira-diorama.blend -t 8 --python tools/diorama/guaira/export_water_mask.py -- --output-dir /tmp/guaira-water
+python tools/diorama/guaira/package_water.py --input /tmp/guaira-water --asset-output /tmp/guaira-water-package --data-output /tmp/guaira-water-package/GuairaWaterData.json
+```
+
+A fonte nunca salva sobre o `.blend` de entrada. O atlas empacotado e o JSON decorativo foram reproduzidos byte a byte. A prova offline de atualização parcial versus quadro completo teve igualdade em48 casos: quatro chegadas, três viewports, DPR1/2 e movimento normal/reduzido. O efeito alterou somente pixels da água no teste de máscara. Isso não é medição de FPS nem validação em dispositivo físico.
+
 ## Verificação e limites
 
 Os testes próprios cobrem os três destinos permanentes, o retorno neutro do arrozal, a entrada contextual da casa, o retorno do Prefeito pausado, o percurso exato da casa ao curral, a troca de experiência sem deslocamento, reversões rápidas, entrada antes da chegada, cliques atrasados após nova seleção, skip, movimento reduzido, limites de câmera, erro explícito com decode pendente, carregamento lento, descarte ao sair, reload e restauração bfcache. O teste do entrypoint usa o controlador de produção com EventTarget e ambiente DOM mínimo, tornando qualquer acesso a `localStorage` um erro. O retorno pausado verifica o link nativo e o modelo reconstruído; a navegação real é responsabilidade do QA em navegador.

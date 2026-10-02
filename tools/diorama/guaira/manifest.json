@@ -1,6 +1,6 @@
 {
-  "version": 2,
-  "scope": "Isolated Guaíra experimental map; no campaign or save-schema changes",
+  "version": 3,
+  "scope": "Isolated Gua\u00edra experimental map; no campaign or save-schema changes",
   "origin": "Original deterministic Blender scene and second procedural geometry/material polish",
   "renderer": "Blender 4.3.2 / Cycles CPU / 48 samples / AgX medium-high contrast / no denoising",
   "runtimeImage": {
@@ -50,6 +50,22 @@
     "tools/diorama/guaira/build_guaira.py": {
       "bytes": 34537,
       "sha256": "6e925523457bf939074c0897a2d202d2e0d58028f2acae01088ccd2f98d3a89b"
+    },
+    "public/assets/world/experimental/guaira/guaira-water-mask.png": {
+      "bytes": 19420,
+      "sha256": "562056681fd89232d788b29e94f9bb90ceb7c31905a6bda07644380d4c3a49c8"
+    },
+    "src/adventure/experimental/guaira/GuairaWaterData.json": {
+      "bytes": 1516,
+      "sha256": "854a748f1a343ae5cf1390719026d37964b83047be9b2fbab5d98e738593f3a1"
+    },
+    "tools/diorama/guaira/export_water_mask.py": {
+      "bytes": 3296,
+      "sha256": "a324dd7dfb3fb8008a8ef3e024adf6b50a1a047dd70c02f202ac7d12698401b2"
+    },
+    "tools/diorama/guaira/package_water.py": {
+      "bytes": 2913,
+      "sha256": "e350f383d302ade00d70757823f71d61165d26fbe8fa5b0a7d07f530d752b48c"
     }
   },
   "excludedFromProduction": [
@@ -57,5 +73,23 @@
     "Concept/reference raster",
     "Scratch component scripts, proofs, screenshots, and intermediate renders"
   ],
-  "limitations": "Static art/geometry checks; runtime navigation and focus verification belongs to integration QA"
+  "limitations": "Static art/geometry checks; runtime navigation and focus verification belongs to integration QA",
+  "waterDecoration": {
+    "origin": "Occluded emission mask of authored Blender water surfaces, with one source-pixel inset",
+    "maskSize": [
+      516,
+      306
+    ],
+    "scratchSize": [
+      344,
+      206
+    ],
+    "maskBytes": 19420,
+    "estimatedDecodedAndScratchBytes": 915040,
+    "idlePaintCadenceLimitHz": 30,
+    "memoryMeasurement": false,
+    "fullSizeAdditionalTexture": false,
+    "navigationMetadataUnchanged": true,
+    "maskFailure": "Static map remains functional"
+  }
 }

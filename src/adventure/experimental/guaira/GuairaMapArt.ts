@@ -2,6 +2,11 @@ import { PLAYER_PALETTE, PLAYER_SPRITES, PLAYER_WALK } from '../../../assets/pla
 import type { GuairaMetadata, GuairaPoint, GuairaMapModel } from './GuairaMapModel';
 
 export interface GuairaCamera { x: number; y: number; imageWidth: number; width: number; height: number }
+/** Decorative water owns only authored source-image regions, never navigation. */
+export interface GuairaMapWaterEffect {
+    readonly regions: ReadonlyArray<{ bounds: readonly [number, number, number, number] }>;
+    draw(ctx: CanvasRenderingContext2D, camera: GuairaCamera, visibleSeconds: number, reducedMotion: boolean): void;
+}
 /** Same physical pixel scale as the Blender sprite clearance audit. */
 export const GUAIRA_FEKA_PIXEL_WIDTH = (4.15 / 20.6) * 3 / 384;
 export function guairaScreenPoint(p: GuairaPoint, camera: GuairaCamera): GuairaPoint {
@@ -25,7 +30,8 @@ export function approachGuairaCamera(current: GuairaCamera, target: GuairaCamera
     const lerp = (a: number, b: number) => Math.abs(a - b) < .08 ? b : a + (b - a) * t;
     return { ...target, x: lerp(current.x, target.x), y: lerp(current.y, target.y), imageWidth: lerp(current.imageWidth, target.imageWidth) };
 }
-export function paintGuairaMap(ctx: CanvasRenderingContext2D, image: CanvasImageSource, camera: GuairaCamera, model: GuairaMapModel, time: number): void {
+export function paintGuairaMap(ctx: CanvasRenderingContext2D, image: CanvasImageSource, camera: GuairaCamera, model: GuairaMapModel, time: number,
+    water?: { effect: GuairaMapWaterEffect; seconds: number }): void {
     const { width, height } = camera;
     ctx.clearRect(0, 0, width, height);
     const bg = ctx.createLinearGradient(0, 0, width, height);
@@ -33,6 +39,7 @@ export function paintGuairaMap(ctx: CanvasRenderingContext2D, image: CanvasImage
     ctx.fillStyle = bg; ctx.fillRect(0, 0, width, height);
     ctx.imageSmoothingEnabled = true;
     ctx.drawImage(image, camera.x, camera.y, camera.imageWidth, camera.imageWidth / 1.6);
+    water?.effect.draw(ctx, camera, water.seconds, model.reducedMotion);
     // The Blender roads already explain the connection. Never draw a synthetic line over water.
     const p = guairaScreenPoint(model.point, camera), scale = camera.imageWidth * GUAIRA_FEKA_PIXEL_WIDTH;
     ctx.fillStyle = '#25353b55'; ctx.beginPath(); ctx.ellipse(p.x, p.y - 1, scale * 8, scale * 2.6, 0, 0, Math.PI * 2); ctx.fill();
@@ -43,5 +50,25 @@ export function paintGuairaMap(ctx: CanvasRenderingContext2D, image: CanvasImage
         ctx.fillStyle = color;
         ctx.fillRect(Math.round(p.x - 8 * scale + (model.facingLeft ? 15 - col : col) * scale),
             Math.round(p.y - frame.length * scale + row * scale), Math.ceil(scale), Math.ceil(scale));
+    }
+}
+
+/** A stationary map restores only water regions; Feka is repainted above any overlap. */
+export function paintGuairaWaterFrame(ctx: CanvasRenderingContext2D, image: CanvasImageSource, camera: GuairaCamera,
+    model: GuairaMapModel, time: number, water: { effect: GuairaMapWaterEffect; seconds: number }): void {
+    const scale = camera.imageWidth / 1920;
+    ctx.save();
+    try {
+        ctx.beginPath();
+        for (const { bounds: [x, y, width, height] } of water.effect.regions) {
+            // The small border includes interpolation pixels without widening the water mask.
+            const left = Math.floor(camera.x + x * scale) - 2, top = Math.floor(camera.y + y * scale) - 2;
+            const right = Math.ceil(camera.x + (x + width) * scale) + 2, bottom = Math.ceil(camera.y + (y + height) * scale) + 2;
+            ctx.rect(left, top, right - left, bottom - top);
+        }
+        ctx.clip();
+        paintGuairaMap(ctx, image, camera, model, time, water);
+    } finally {
+        ctx.restore();
     }
 }
