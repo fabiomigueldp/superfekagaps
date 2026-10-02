@@ -176,6 +176,12 @@ export class GuairaChapterApp {
         this.advanceNavigation({ kind: 'chapter', sceneId: next.snapshot().selectedScene }); this.showMap('town');
     }
 
+    private keyboardHint() {
+        const hint = document.createElement('p'); hint.id = 'chapter-keyboard-hint';
+        hint.textContent = 'Teclado: ←/→ mover · Espaço pular · ↓ no ar: sentada · Shift correr · Esc pausa';
+        return hint;
+    }
+
     private scenePanel(attempt: GuairaChapterAttempt, scope: DisposalScope) {
         const info = CHAPTER_SCENES[attempt.sceneId], nav = document.createElement('nav');
         nav.className = 'chapter-game-toolbar'; nav.setAttribute('aria-label', 'Controles do capítulo de Guaíra');
@@ -188,7 +194,7 @@ export class GuairaChapterApp {
         new LabToolbarAction(retry).setLabel('TENTAR', `Recomeçar ${info.title} nesta tentativa`);
         new LabToolbarAction(map).setLabel('MAPA', 'Voltar à maquete do capítulo');
         primaryArt.setLabel('PAUSA', 'Pausar'); primary.disabled = true;
-        nav.append(status, primary, retry, map);
+        nav.append(status, primary, retry, map, this.keyboardHint());
         const canvas = document.createElement('canvas'); canvas.id = 'game-canvas'; canvas.tabIndex = 0;
         canvas.contentEditable = 'true'; canvas.spellcheck = false; canvas.setAttribute('inputmode', 'none');
         canvas.setAttribute('aria-label', `${info.title}. ${info.objective} Setas para mover, Espaço para pular, baixo no ar para sentada, Shift para correr e Escape para pausar.`);
@@ -324,7 +330,7 @@ export class GuairaChapterApp {
         new LabToolbarAction(retry).setLabel('TENTAR', `Recomeçar ${info.title} nesta tentativa opcional`);
         new LabToolbarAction(map).setLabel('BAIRRO', 'Voltar ao Bairro da Vala Seca no capítulo');
         primaryArt.setLabel('PAUSA', 'Pausar'); primary.disabled = true;
-        nav.append(status, primary, retry, map);
+        nav.append(status, primary, retry, map, this.keyboardHint());
         const canvas = document.createElement('canvas'); canvas.id = 'game-canvas'; canvas.tabIndex = 0;
         canvas.contentEditable = 'true'; canvas.spellcheck = false; canvas.setAttribute('inputmode', 'none');
         canvas.setAttribute('aria-label', `${info.title}, percurso opcional. ${info.objective}. Setas para mover, Espaço para pular, baixo no ar para sentada, Shift para correr e Escape para pausar.`);

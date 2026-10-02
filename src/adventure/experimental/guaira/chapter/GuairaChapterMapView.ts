@@ -320,7 +320,8 @@ export class GuairaChapterMapView {
         const last = snapshot.accepted[snapshot.accepted.length - 1];
         this.hint.textContent = snapshot.chapterComplete && this.water.released ? `A água voltou. Os gaps continuam. · ${snapshot.accepted.length}/${snapshot.route.length} nesta sessão`
             : last ? `${CHAPTER_SCENES[last.sceneId].title} concluído · ${snapshot.accepted.length}/${snapshot.route.length} nesta sessão`
-                : 'Recarregar recomeça o capítulo';
+                : optional ? 'Recarregar recomeça o capítulo'
+                    : 'Devolva a água ao bairro em cinco etapas. Recarregar recomeça o capítulo.';
         this.primary.art.setLabel(optional ? canEnter ? 'GALERIA' : 'CAMINHAR' : canEnter && accepted ? 'REPETIR' : !canEnter && !moving && ready ? 'CAMINHAR' : 'ENTRAR',
             optional ? canEnter ? 'Entrar na Galeria dos Remendos, percurso opcional' : 'Caminhar até Bairro da Vala Seca'
                 : canEnter && accepted ? snapshot.selectedScene === 'guaira-prefeito' ? 'Repetir o Prefeito em uma nova tentativa' : `Repetir ${selected.title} em uma nova tentativa`
