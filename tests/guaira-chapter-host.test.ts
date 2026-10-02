@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { setImmediate as nextTurn } from 'node:timers/promises';
 import type { WorldGame } from '../src/adventure/WorldGame';
 import test, { type TestContext } from 'node:test';
 import { readFileSync } from 'node:fs';
@@ -22,6 +23,15 @@ function deferred<T>() {
     return { promise, resolve, reject };
 }
 const flush = async () => { for (let n = 0; n < 20; n++) await Promise.resolve(); };
+
+async function waitForGame(app: GuairaChapterApp) {
+    const deadline = performance.now() + 5000;
+    // Dynamic imports need event-loop progress, even when their modules were warmed.
+    // The deadline bounds a broken load; readiness, not elapsed time, completes the wait.
+    while (app.mode === 'loading' && performance.now() < deadline) await nextTurn();
+    assert.equal(app.mode, 'game', 'The requested scene must finish loading before its controls are used');
+    assert.ok(app.activeGame, 'The loaded scene must own a native runtime');
+}
 
 /** Real host/session/controls/native adapters. Canvas/audio/DOM device boundaries are instrumented.
  * The map port is deliberately injected: this suite tests ownership/dispatch, not painted geography.
@@ -365,7 +375,9 @@ function chooseRequired(h: ReturnType<typeof hostBrowser>, sceneId = h.currentMa
 for (const opening of ['guaira-travessia', 'guaira-patio-comportas'] as const)
 for (const completed of [0, 1, 5]) test(`optional ownership preserves ${completed}/5 receipts and exact retained target after ${opening}`, async t => {
     const h = hostBrowser(t), galleryFactory = await loadGuairaChapterExcursion(), reliefFactory = await loadGuairaChapterExcursion('relief');
-    const app = h.create({ loadExcursion: async id => id === 'relief' ? reliefFactory : galleryFactory, loadScene: async id => {
+    const app = h.create({ loadExcursion: async id => { await nextTurn(); return id === 'relief' ? reliefFactory : galleryFactory; }, loadScene: async id => {
+        // A cached dynamic import may still need an event-loop turn on another Node runtime.
+        await nextTurn();
         const factory = await loadGuairaChapterScene(id);
         // This suite proves host ownership with explicit result fixtures. Native victory replay is tested separately.
         return (canvas, status) => {
@@ -378,16 +390,18 @@ for (const completed of [0, 1, 5]) test(`optional ownership preserves ${complete
     if (opening !== app.snapshot.opening) {
         const map = h.currentMap(); map.options.onOpening(opening, map.snapshot.generation, map.navigation.revision);
     }
-    // Warm all necessary imports, so deterministic microtask flushing handles only host ownership.
-    for (const id of app.snapshot.route.slice(0, completed)) await loadGuairaChapterScene(id);
-    for (let step = 0; step < completed; step++) { h.enter(); await flush(); h.byId('chapter-primary').click(); }
+    for (let step = 0; step < completed; step++) {
+        h.enter(); await waitForGame(app); h.byId('chapter-primary').click();
+        assert.equal(app.mode, 'map');
+        assert.equal(app.snapshot.accepted.length, step + 1, 'Each required scene earns its receipt before the optional visit');
+    }
     if (completed) chooseRequired(h, opening); // Retain an earned replay, which differs from recommendation.
     const before = app.snapshot, openingAvailable = h.currentMap().options.openingAvailable;
     chooseGallery(h); assert.deepEqual(app.snapshot, before);
     const optionalMap = h.currentMap();
     optionalMap.options.onOpening('guaira-patio-comportas', before.generation, optionalMap.navigation.revision);
     assert.deepEqual(app.snapshot, before, 'Even current optional callbacks cannot change the opening');
-    h.enter(); await flush();
+    h.enter(); await waitForGame(app);
     const first = app.activeGame as GuairaGallery;
     assert.equal(first.stage.id, 'guaira-galeria'); assert.deepEqual(app.snapshot, before);
     assert.equal(h.byId('chapter-map-return').getAttribute('aria-label'), 'Voltar ao Bairro da Vala Seca no capítulo');
@@ -395,15 +409,15 @@ for (const completed of [0, 1, 5]) test(`optional ownership preserves ${complete
     assert.match(h.byId('lab-status').textContent, /Acesso de inspeção aberto/);
     assert.equal(h.byId('chapter-primary').getAttribute('aria-label'), 'Seguir para a Câmara de Alívio, continuação opcional');
     first.toggleGalleryPause(); h.frame(); assert.equal(first.state, 'paused'); assert.deepEqual(app.snapshot, before);
-    h.byId('chapter-retry').click(); await flush();
+    h.byId('chapter-retry').click(); await waitForGame(app);
     const fresh = app.activeGame as GuairaGallery;
     assert.notEqual(fresh, first); assert.equal(first.isDisposed, true); assert.equal(fresh.finished, false);
     assert.deepEqual(fresh.openings, { first: false, second: false }); assert.deepEqual(app.snapshot, before);
-    fresh.finished = true; h.frame(); h.byId('chapter-primary').click(); await flush();
+    fresh.finished = true; h.frame(); h.byId('chapter-primary').click(); await waitForGame(app);
     const relief = app.activeGame as GuairaRelief;
     assert.equal(relief.stage.id, 'guaira-camara-alivio'); assert.equal(fresh.isDisposed, true);
     assert.equal(relief.player.data.hasHelmet, true); assert.deepEqual(app.snapshot, before);
-    h.byId('chapter-retry').click(); await flush();
+    h.byId('chapter-retry').click(); await waitForGame(app);
     const freshRelief = app.activeGame as GuairaRelief;
     assert.notEqual(freshRelief, relief); assert.equal(relief.isDisposed, true);
     assert.equal(freshRelief.stage.id, 'guaira-camara-alivio'); assert.equal(freshRelief.finished, false);
