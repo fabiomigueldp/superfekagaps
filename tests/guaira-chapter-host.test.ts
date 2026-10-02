@@ -745,3 +745,34 @@ test('saved ALÍVIO is not a pause/resume callback and stays retired after an ex
     primary.click(); await flush(); assert.ok(app.activeGame instanceof GuairaRelief);
     app.dispose(); h.checkDisposed();
 });
+
+
+for (const failure of ['wrong-room', 'reentrant'] as const) test(`optional muted preference survives unadopted ${failure} factory`, async t => {
+    const h = hostBrowser(t), gallery = await loadGuairaChapterExcursion(), relief = await loadGuairaChapterExcursion('relief');
+    let loads = 0;
+    t.mock.method(console, 'error', () => {});
+    const app = h.create({ loadExcursion: async () => ++loads === 2 ? failure === 'wrong-room' ? relief
+        : (canvas, status) => { const runtime = gallery(canvas, status); h.byId('chapter-retry').click(); return runtime; } : gallery });
+    const map = h.currentMap();
+    map.options.onSelect({ kind: 'optional', stop: 'bairro' }, map.snapshot.generation, map.navigation.revision);
+    h.enter(); await flush();
+    const before = app.snapshot;
+    app.activeGame!.audio.enabled = false;
+    h.byId('chapter-retry').click(); await flush();
+    if (failure === 'wrong-room') { assert.equal(app.mode, 'error'); h.byId('chapter-retry').click(); await flush(); }
+    assert.deepEqual(app.snapshot, before);
+    assert.equal(app.activeGame!.audio.enabled, false, 'A retired candidate never owns the preference of the adopted scene');
+    app.dispose(); h.checkDisposed();
+});
+
+test('required muted preference survives an unadopted reentrant factory', async t => {
+    const h = hostBrowser(t), traversal = await loadGuairaChapterScene('guaira-travessia');
+    let loads = 0;
+    const app = h.create({ loadScene: async () => ++loads === 2
+        ? (canvas, status) => { const runtime = traversal(canvas, status); h.byId('chapter-retry').click(); return runtime; } : traversal });
+    h.enter(); await flush(); app.activeGame!.audio.enabled = false;
+    h.byId('chapter-retry').click(); await flush();
+    assert.equal(app.mode, 'game'); assert.equal(app.activeGame!.stage.id, 'guaira-travessia');
+    assert.equal(app.activeGame!.audio.enabled, false);
+    app.dispose(); h.checkDisposed();
+});

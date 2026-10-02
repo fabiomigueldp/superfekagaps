@@ -12,7 +12,7 @@ A Câmara conserva o Player, capacete, checkpoint, grelha, tampa, câmera e duas
 
 O botão primário recebe uma autorização vinculada à ação apresentada. Trocar pausa/retomada/conclusão, perder foco, ocultar a página ou descartar a view invalida o callback anterior. Um clique iniciado antes de ALÍVIO aparecer não entra na Câmara; Enter repetido continua bloqueado. Ao terminar um carregamento interrompido, a sala fica pausada até retomada explícita.
 
-Não há alteração de Session, registro dos trechos obrigatórios, geometria da caminhada, saves, badges, destinos permanentes, HTML ou entradas Vite. Os cinco recibos e a seleção obrigatória são preservados exatamente. A página independente da Galeria e seus links do mapa livre mantêm o endpoint existente; só este owner do capítulo oferece a continuação. A Câmara não recebe página independente.
+Não há alteração de Session, registro dos trechos obrigatórios, geometria da caminhada, saves, badges, destinos permanentes, HTML ou entradas Vite. Os cinco recibos e a seleção obrigatória são preservados exatamente. A página independente da Galeria e seus links do mapa livre mantêm o endpoint existente. A continuação passou a ser oferecida também por seu owner livre, conforme [Galeria → Câmara na visita livre](guaira-free-gallery-continuation.md). A Câmara não recebe página independente.
 
 ## Verificação focada
 

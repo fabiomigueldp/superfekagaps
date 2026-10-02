@@ -134,12 +134,34 @@ export function drawGalleryTerrain(c: CanvasRenderingContext2D, level: WorldLeve
     });
 }
 
+/** Blind service bay cut into the plaster, with worn stone jambs. All edges are
+ * recessed and muted: only live terrain is allowed a pale, continuous cap. */
+export function drawWorkshopWallBay(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
+    polygon(c, [[x,y + 13],[x + 13,y],[x + w - 14,y],[x + w,y + 13],
+        [x + w,y + h],[x,y + h]], '#c5a17f');
+    polygon(c, [[x + 3,y + 14],[x + 15,y + 3],[x + w - 16,y + 3],[x + w - 3,y + 14],
+        [x + w - 3,y + h],[x + 3,y + h]], '#b99879');
+    polygon(c, [[x + 7,y + 17],[x + 19,y + 7],[x + w - 17,y + 7],[x + w - 4,y + 18],
+        [x + w - 4,y + h],[x + 7,y + h]], '#d0ac87');
+    // The broad inside reveal catches light from the workshop; it is not a sill.
+    r(c, x + 7, y + 21, 2, h - 21, '#c39e7c');
+    r(c, x + w - 5, y + 24, 1, h - 24, '#d8b58e');
+    for (let yy = 27; yy < h - 6; yy += 21) {
+        r(c, x + 1, y + yy, 2, 1, '#bc997a');
+        r(c, x + w - 3, y + yy + 6, 2, 1, '#bc997a');
+    }
+    // Two old repairs interrupt the masonry without borrowing brittle cracks.
+    r(c, x + 15, y + 8, 7, 3, '#c6a27d');
+    r(c, x + w - 17, y + 14, 6, 3, '#c6a27d');
+}
+
 /** A quiet wall-mounted repair niche, away from the actor and jump corridor.
  * Muted tools and an inset frame cannot be mistaken for a usable platform. */
-function toolNiche(c: CanvasRenderingContext2D, x: number, y: number) {
+export function drawWorkshopToolNiche(c: CanvasRenderingContext2D, x: number, y: number) {
     r(c, x, y, 48, 30, '#b6977c');
-    r(c, x + 2, y + 2, 44, 27, '#a48668');
-    r(c, x + 4, y + 3, 40, 23, '#b39876');
+    r(c, x + 2, y + 2, 44, 27, '#937e68');
+    r(c, x + 5, y + 4, 40, 24, '#b39876');
+    r(c, x + 7, y + 5, 36, 1, '#a68b6e');
     // A long brush, a mason's trowel and a spare timber offcut, not collectibles.
     r(c, x + 10, y + 7, 2, 15, '#92745b');
     r(c, x + 7, y + 18, 8, 5, '#9f7e61');
@@ -148,8 +170,11 @@ function toolNiche(c: CanvasRenderingContext2D, x: number, y: number) {
     r(c, x + 25, y + 6, 2, 7, '#92745b');
     polygon(c, [[x + 24,y + 13],[x + 19,y + 22],[x + 29,y + 21]], '#8e8777');
     r(c, x + 22, y + 20, 5, 1, '#b1a18a');
-    r(c, x + 36, y + 10, 4, 13, '#a58a68');
-    r(c, x + 37, y + 11, 1, 11, '#c0a17a');
+    // A spare pipe union hangs beside the masonry tools; it is wall hardware.
+    r(c, x + 34, y + 11, 7, 11, '#947d65');
+    r(c, x + 36, y + 13, 3, 7, '#b39876');
+    r(c, x + 35, y + 10, 5, 2, '#c0a17a');
+    r(c, x + 36, y + 7, 2, 3, '#92745b');
 }
 
 function workshop(c: CanvasRenderingContext2D, cx: number, cy: number) {
@@ -164,7 +189,7 @@ function workshop(c: CanvasRenderingContext2D, cx: number, cy: number) {
     r(c, x + 28, y + 59, 1, 2, '#c7a575');
     r(c, x + 44, y + 26, 62, 11, '#c7a17f');
     pixelText(c, 'OFICINA', x + 49, y + 28, '#816257');
-    toolNiche(c, x + 67, y + 41);
+    drawWorkshopToolNiche(c, x + 67, y + 41);
     // Broad new plaster patches convey everyday maintenance, never fresh cracks.
     r(c, x + 38, y + 60, 17, 9, '#d0a67e');
     r(c, x + 43, y + 57, 8, 3, '#d0a67e');
@@ -186,13 +211,11 @@ export function drawGalleryBackground(c: CanvasRenderingContext2D, cx: number, c
         r(c, 0, 208 - cameraY, 320, 224, '#bf967d');
         r(c, 0, 304 - cameraY, 320, 128, '#b6977c');
         workshop(c, cameraX, cameraY);
-        // Inset rear-wall panels stay low contrast and have no projecting sill.
-        for (const [wx, wy, width, height] of [[249,168,124,90],[472,180,78,124],[574,107,116,67]] as const) {
-            r(c, wx - cameraX, wy - cameraY, width, height, '#c5a882');
-            r(c, wx + 3 - cameraX, wy + 3 - cameraY, width - 6, height - 6, '#cfad87');
-            r(c, wx + width - 7 - cameraX, wy + 4 - cameraY, 3, height - 10, '#baa07c');
+        // The same worn, inset service bays tie the gallery to the water workshop.
+        for (const [wx, wy, width, height] of [[249,168,124,120],[472,180,78,204],[574,107,116,85]] as const) {
+            drawWorkshopWallBay(c, wx - cameraX, wy - cameraY, width, height);
         }
-        toolNiche(c, 273 - cameraX, 215 - cameraY);
+        drawWorkshopToolNiche(c, 273 - cameraX, 215 - cameraY);
         // Hand-smoothed plaster seams are short and broken, never route arrows.
         for (const [wx, wy, w, h] of [[338,232,15,9],[247,250,13,6],[502,255,20,8],[479,306,10,7],[583,158,15,6],[663,143,16,12]] as const) {
             r(c, wx - cameraX, wy - cameraY, w, h, '#c3a280');

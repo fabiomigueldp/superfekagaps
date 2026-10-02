@@ -2,8 +2,9 @@ import { box as r, pixelLine as line, polygon, roof } from '../../../WorldPainti
 import { jetCycle } from '../../../WorldMachineState';
 import type { WorldLevel, WorldObjects } from '../../../WorldPhysics';
 import { pixelText } from '../../../../graphics/BitmapFont';
-import { drawGalleryTerrain } from '../gallery/GuairaGalleryArt';
+import { drawGalleryTerrain, drawWorkshopWallBay, drawWorkshopToolNiche } from '../gallery/GuairaGalleryArt';
 import { GUAIRA_RELIEF as G, reliefOpen } from './GuairaReliefStage';
+import { drawReliefFlow } from './GuairaReliefFlow';
 
 /** Guaíra's plaster, clay and worn brass; liquid colours belong to the native jet. */
 export const RELIEF_MATERIAL_COLORS = Object.freeze({
@@ -39,6 +40,9 @@ function pipe(c: CanvasRenderingContext2D, x: number, y: number, length: number,
 
 /** One quiet opening explains the water's purpose without adding scenery actors. */
 function irrigationWindow(c: CanvasRenderingContext2D, x: number, y: number) {
+    // Uneven masonry reveal gives the crop view a real opening in the workshop.
+    r(c, x - 5, y - 7, 102, 65, '#ba9476');
+    r(c, x - 3, y - 5, 98, 61, '#d0ac87');
     r(c, x, y, 92, 56, P.recess);
     r(c, x + 3, y + 3, 86, 50, '#e9c89e');
     polygon(c, [[x + 3,y + 22],[x + 23,y + 12],[x + 40,y + 18],
@@ -53,6 +57,14 @@ function irrigationWindow(c: CanvasRenderingContext2D, x: number, y: number) {
     }
     r(c, x + 44, y + 2, 3, 52, '#b49a77');
     r(c, x + 2, y + 26, 88, 2, '#b49a77');
+    // Thick inner left/top shadows stay inside the aperture; no external ledge.
+    r(c, x + 3, y + 3, 3, 47, '#b59878');
+    r(c, x + 6, y + 3, 81, 2, '#c4a17d');
+    r(c, x - 4, y + 13, 3, 2, '#ad886f');
+    r(c, x + 93, y + 30, 3, 2, '#ad886f');
+    // Irrigation stains belong only to the inside lower corners of the opening.
+    r(c, x + 4, y + 48, 6, 4, '#92a087');
+    r(c, x + 82, y + 47, 5, 5, '#92a087');
 }
 
 /** The collector sits directly under all three real brittle tiles. Breaking any
@@ -91,6 +103,14 @@ export function drawReliefBackground(c: CanvasRenderingContext2D, level: WorldLe
         const open = reliefOpen(level);
         r(c, 0, 23, 320, 157, P.wall);
         r(c, 0, 296 - y, 320, 88, '#d2ad87');
+        // Deep plaster bays organise the cutaway into a repair wall, water
+        // service wall and field-facing inspection wall. None is walkable.
+        // The vertical reveals meet the actual floor, so no jamb hangs over a
+        // jump corridor. Background-only inner shadows give them their depth.
+        drawWorkshopWallBay(c, 16 - x, 153 - y, 171, 183);
+        drawWorkshopWallBay(c, 303 - x, 194 - y, 204, 142);
+        drawWorkshopWallBay(c, 518 - x, 202 - y, 116, 134);
+        drawWorkshopToolNiche(c, 357 - x, 220 - y);
         // Broad hand-smoothed patches, few and low contrast, keep jump paths quiet.
         for (const [xx, yy, w, h] of [[29,243,28,17],[76,179,25,11],[192,188,17,8],
             [319,197,25,13],[535,237,33,17],[587,312,27,8]] as const) {
@@ -159,10 +179,7 @@ export function drawReliefObjects(c: CanvasRenderingContext2D, objects: WorldObj
         }
         // Native jet paint retained from the gameplay prototype, inside danger.
         if (s.danger) {
-            const d = s.danger, top = Math.floor(d.y - y), height = Math.ceil(d.y + d.height - y) - top;
-            r(c, left, top, b.width, height, P.water);
-            for (let dx = 5; dx < b.width - 2; dx += 12) r(c, left + dx, top, 3, height, P.waterShade);
-            r(c, left, top, b.width, 1, P.foam);
+            drawReliefFlow(c, s.danger, objects.time, x, y, reducedMotion, P);
         }
         // Same native shutdown snapshot, visibly harmless sparse pale drops only.
         const shutdown = b.jetShutdown;

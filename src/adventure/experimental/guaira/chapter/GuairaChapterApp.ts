@@ -230,10 +230,11 @@ export class GuairaChapterApp {
             // guidance; the actual canvas/character/mechanisms remain native.
             const nativeStatus = document.createElement('span');
             const runtime = factory(panel.canvas, nativeStatus), game = runtime.game;
-            scope.add(() => { this.audioEnabled = game.audio.enabled; game.dispose(); });
+            let ownsAudioPreference = false;
+            scope.add(() => { if (ownsAudioPreference) this.audioEnabled = game.audio.enabled; game.dispose(); });
             if (!this.current(scope) || this.snapshot.activeAttempt !== attempt) return;
             this.mounted = { kind: 'chapter', attempt, runtime }; this.phase = 'game';
-            game.audio.enabled = this.audioEnabled; game.audio.volume();
+            game.audio.enabled = this.audioEnabled; ownsAudioPreference = true; game.audio.volume();
             const controls = installGuairaLabControls(game, panel.canvas, () => !!runtime.sample(attempt).result);
             scope.add(() => controls.dispose());
             const reflect = () => {
@@ -349,11 +350,12 @@ export class GuairaChapterApp {
             const nativeStatus = document.createElement('span');
             const runtime = factory(panel.canvas, nativeStatus), game = runtime.game;
             // Own the native resources before controls, observers or reflection can fail.
-            scope.add(() => { this.audioEnabled = game.audio.enabled; game.dispose(); });
+            let ownsAudioPreference = false;
+            scope.add(() => { if (ownsAudioPreference) this.audioEnabled = game.audio.enabled; game.dispose(); });
             if (!this.currentExcursion(token, scope)) return;
             if (runtime.sceneId !== token.sceneId) throw Error('Optional factory returned a different room');
             this.mounted = { kind: 'optional', token, runtime }; this.phase = 'game';
-            game.audio.enabled = this.audioEnabled; game.audio.volume();
+            game.audio.enabled = this.audioEnabled; ownsAudioPreference = true; game.audio.volume();
             const controls = installGuairaLabControls(game, panel.canvas, () => runtime.finished);
             scope.add(() => controls.dispose());
             type PrimaryAction = 'pause' | 'resume' | 'relief' | null;

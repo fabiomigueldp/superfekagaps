@@ -1,6 +1,6 @@
 # Guaíra · Câmara de Alívio
 
-Este documento registra a autoria e as provas do protótipo original. A Câmara agora é carregada como continuação opcional da Galeria no capítulo, sem página própria; o contrato de integração e seus testes estão em [guaira-relief-chapter-continuation.md](./guaira-relief-chapter-continuation.md). As declarações de isolamento abaixo descrevem a etapa anterior à integração.
+Este documento registra a autoria e as provas do protótipo original. A Câmara agora é carregada como continuação opcional da Galeria no capítulo e na visita livre, sem página própria; os contratos e testes estão em [guaira-relief-chapter-continuation.md](./guaira-relief-chapter-continuation.md) e [guaira-free-gallery-continuation.md](./guaira-free-gallery-continuation.md). As declarações de isolamento abaixo descrevem a etapa anterior à integração.
 
 Protótipo isolado sobre a base `5892a0e`, sem página ou entrada pública. O construtor é `GuairaRelief(canvas,status)`; não está importado por uma entrada Vite, mapa, capítulo ou campanha. A tentativa é efêmera e não lê `localStorage`.
 
