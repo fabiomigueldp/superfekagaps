@@ -56,8 +56,15 @@ export function startGuairaMap(): () => void {
     const waterClock = new VisibleWaterClock();
     let width = 1, height = 1, ratio = 1, actionEpoch = 0, menuOpen = false, pendingResize = false, restoreDetoursOnVisible = false;
     let actionBindings = new AbortController(), menuBindings = new AbortController();
+    let focusedMarker: HTMLButtonElement | null = null;
     const requestFrame = () => { if (!signal.aborted && !frame && !document.hidden && !menuOpen) frame = requestAnimationFrame(render); };
     const live = () => !!model && !!image && !signal.aborted && !model.closed && !document.hidden && loadingPanel.hidden;
+    function rescueMarkerFocus(marker: HTMLButtonElement | null) {
+        const active = document.activeElement;
+        if (!marker || !live() || menuOpen || (active && active !== marker && active !== document.body && active !== document.documentElement)) return;
+        focusedMarker = null;
+        destinations.find(button => button.dataset.mapDestination === 'town' && !markers.includes(button) && !button.hidden && !button.disabled)?.focus();
+    }
     function snapshot() {
         return { model, revision: model?.revision, selected: model?.selected, arrival: model?.arrival, epoch: actionEpoch };
     }
@@ -204,8 +211,10 @@ export function startGuairaMap(): () => void {
                 const p = guairaScreenPoint(model.metadata.nodes[destination.node], camera);
                 const bounds = marker.getBoundingClientRect();
                 const markerWidth = bounds.width || labActionSize(destination.short).width * 2;
+                const wasFocused = document.activeElement === marker;
                 marker.hidden = compactMarkers.matches || p.x < markerWidth / 2 + 3 || p.x > width - markerWidth / 2 - 3 || p.y < 0 || p.y + 58 > height;
                 marker.style.left = `${p.x}px`; marker.style.top = `${p.y + 12}px`;
+                if (marker.hidden && wasFocused) rescueMarkerFocus(marker);
                 if (!marker.hidden) placed.push({ left: p.x - markerWidth / 2, top: p.y + 12, width: markerWidth, height: Math.max(44, bounds.height) });
             }
             const optional = markers.find(button => button.dataset.mapDestination === 'bairro');
@@ -214,14 +223,12 @@ export function startGuairaMap(): () => void {
                 const bounds = optional.getBoundingClientRect(), scale = camera.imageWidth * GUAIRA_FEKA_PIXEL_WIDTH;
                 const markerWidth = bounds.width || labActionSize(GUAIRA_SELECTIONS.bairro.short).width * 2;
                 placed.push({ left: actor.x - 8 * scale, top: actor.y - 26 * scale, width: 16 * scale, height: 29 * scale });
-                const wasHidden = optional.hidden;
+                const wasHidden = optional.hidden, wasFocused = document.activeElement === optional;
                 optional.hidden = compactMarkers.matches || !guairaBairroMarkerFits({ left: p.x - markerWidth / 2, top: p.y + 12,
                     width: markerWidth, height: Math.max(44, bounds.height) }, width, height, placed);
                 if (!wasHidden && optional.hidden) actionEpoch++;
                 optional.style.left = `${p.x}px`; optional.style.top = `${p.y + 12}px`;
-                if (optional.hidden && document.activeElement === optional) {
-                    destinations.find(button => button.dataset.mapDestination === 'town' && !markers.includes(button) && !button.hidden && !button.disabled)?.focus();
-                }
+                if (optional.hidden && wasFocused) rescueMarkerFocus(optional);
             }
         }
         reflect();
@@ -254,15 +261,25 @@ export function startGuairaMap(): () => void {
             event.preventDefault(); select(event.key === 'ArrowLeft' ? 'town' : event.key === 'ArrowRight' ? 'curral' : 'subida');
         }
     }, { signal });
+    // CSS may reset activeElement to body before matchMedia emits its change event.
+    // Keep focus ownership only until an actual focus or pointer choice moves elsewhere.
+    document.addEventListener('focusin', event => {
+        const target = event.target as HTMLButtonElement;
+        if (target === document.body && compactMarkers.matches && focusedMarker) return;
+        focusedMarker = markers.includes(target) ? target : null;
+    }, { signal });
+    document.addEventListener('pointerdown', event => {
+        if (event.target !== focusedMarker) focusedMarker = null;
+    }, { signal, capture: true });
     compactMarkers.addEventListener('change', () => {
         // CSS can hide the whole group while every individual plate still fits the scene.
         // Map actions invalidate immediately; an open modal keeps its separate active choices.
         if (!menuOpen) actionEpoch++;
         if (compactMarkers.matches) {
-            const markerHadFocus = markers.includes(document.activeElement as HTMLButtonElement);
+            const markerHadFocus = markers.includes(document.activeElement as HTMLButtonElement)
+                ? document.activeElement as HTMLButtonElement : focusedMarker;
             markers.forEach(marker => { marker.hidden = true; });
-            if (markerHadFocus) destinations.find(button => button.dataset.mapDestination === 'town' &&
-                !markers.includes(button) && !button.hidden && !button.disabled)?.focus();
+            rescueMarkerFocus(markerHadFocus);
         }
         paintedCamera = null; reflect(); requestFrame();
     }, { signal });

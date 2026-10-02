@@ -10,7 +10,13 @@ const context = new Proxy({ createLinearGradient: () => ({ addColorStop: noop })
     clip: () => { regionClips++; },
 }, { get(target, key) { return key in target ? target[key as keyof typeof target] : noop; }, set() { return true; } });
 class Element extends EventTarget {
-    textContent = ''; hidden = false; disabled = false; title = ''; width = 1; height = 1;
+    textContent = ''; private isHidden = false;
+    get hidden() { return this.isHidden; }
+    set hidden(value: boolean) {
+        this.isHidden = value;
+        if (value && typeof doc !== 'undefined' && doc.activeElement === this) doc.activeElement = doc.body;
+    }
+    disabled = false; title = ''; width = 1; height = 1;
     style: Record<string, string> = {}; attributes: Record<string, string> = {}; children: Element[] = [];
     dataset: Record<string, string> = {}; marker = false; focused = false;
     classList = { contains: (name: string) => name === 'guaira-marker' && this.marker };
@@ -25,7 +31,7 @@ class Element extends EventTarget {
     setAttribute(key: string, value: string) { this.attributes[key] = value; }
     getBoundingClientRect() { if (this.marker) markerReads++; return { width: this.marker ? this.hidden ? 0 : (this.children.at(-2)?.width ?? 116) : sceneWidth, height: this.marker ? 44 : sceneHeight }; }
     getContext() { return context; }
-    focus() { this.focused = true; doc.activeElement = this; }
+    focus() { this.focused = true; doc.activeElement = this; doc.dispatchEvent(Object.defineProperty(new Event('focusin'), 'target', { value: this })); }
     click() { if (!this.disabled) this.dispatchEvent(new Event('click')); }
 }
 class Media extends EventTarget { matches = false; }
@@ -34,7 +40,7 @@ const elements = Object.fromEntries(ids.map(id => [id, new Element()]));
 const destinations = ['town', 'curral', 'subida', 'town', 'curral', 'bairro'].map((id, i) => { const e = new Element(); e.dataset.mapDestination = id; e.marker = i > 2; return e; });
 const scene = new Element(), doc = new EventTarget() as EventTarget & Record<string, unknown>, win = new EventTarget();
 let observerDisconnected = 0;
-Object.assign(doc, { hidden: false, getElementById: (id: string) => elements[id], querySelector: () => scene, querySelectorAll: () => destinations, createElement: () => new Element() });
+Object.assign(doc, { hidden: false, body: new Element(), documentElement: new Element(), getElementById: (id: string) => elements[id], querySelector: () => scene, querySelectorAll: () => destinations, createElement: () => new Element() });
 const motion = new Media(), compactMarkers = new Media(), queue = new Map<number, FrameRequestCallback>(); let next = 1, clock = 0;
 const navigations: string[] = [], replacements: string[] = [];
 const locationMock = { href: 'https://example.test/guaira.html?at=rice', search: '?at=rice', assign: (href: string) => navigations.push(href) };
@@ -450,7 +456,8 @@ test('the optional neighborhood marker keeps its authored anchor and hides inste
     sceneWidth = 700; sceneHeight = 280; win.dispatchEvent(new Event('resize')); frames(2);
     assert.equal(marker.hidden, false, 'the control is geometrically safe before the CSS breakpoint');
     marker.focus(); const beforeBreakpoint = marker.lastClick!;
-    compactMarkers.matches = true; compactMarkers.dispatchEvent(new Event('change'));
+    compactMarkers.matches = true; doc.activeElement = doc.body;
+    compactMarkers.dispatchEvent(new Event('change'));
     assert.equal(marker.hidden, true, 'ancestor suppression is reflected synchronously');
     assert.equal(doc.activeElement, town, 'CSS suppression restores a persistent control before the next frame');
     beforeBreakpoint(new Event('click')); assert.equal(elements['map-title'].textContent, 'Estrada do Vento');
@@ -460,10 +467,19 @@ test('the optional neighborhood marker keeps its authored anchor and hides inste
     assert.equal(elements['map-title'].textContent, 'Estrada do Vento', 'expanding the viewport cannot revive the old callback');
     const curralMarker = destinations.find(button => button.dataset.mapDestination === 'curral' && button.marker)!;
     assert.equal(curralMarker.hidden, false); curralMarker.focus(); const staleCurral = curralMarker.lastClick!;
-    compactMarkers.matches = true; compactMarkers.dispatchEvent(new Event('change'));
+    compactMarkers.matches = true; doc.activeElement = doc.body;
+    compactMarkers.dispatchEvent(new Event('change'));
     assert.equal(doc.activeElement, town, 'the same CSS-focus rescue covers the existing markers');
     compactMarkers.matches = false; compactMarkers.dispatchEvent(new Event('change')); frames(2);
     staleCurral(new Event('click')); assert.equal(elements['map-title'].textContent, 'Estrada do Vento');
+    marker.focus(); elements['map-overview'].focus();
+    compactMarkers.matches = true; compactMarkers.dispatchEvent(new Event('change'));
+    assert.equal(doc.activeElement, elements['map-overview'], 'CSS rescue never steals focus after another control was chosen');
+    compactMarkers.matches = false; compactMarkers.dispatchEvent(new Event('change')); frames(2);
+    marker.focus(); doc.dispatchEvent(Object.defineProperty(new Event('pointerdown'), 'target', { value: doc.body }));
+    doc.activeElement = doc.body; compactMarkers.matches = true; compactMarkers.dispatchEvent(new Event('change'));
+    assert.equal(doc.activeElement, doc.body, 'an intentional pointer choice outside the plate releases focus ownership');
+    compactMarkers.matches = false; compactMarkers.dispatchEvent(new Event('change'));
     dispose(); destinations.splice(0, destinations.length, ...originalOrder);
     sceneWidth = 390; sceneHeight = 450; motion.matches = false;
     const html = readFileSync(new URL('../guaira.html', import.meta.url), 'utf8');
