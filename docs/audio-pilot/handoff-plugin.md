@@ -16,7 +16,7 @@ Os prompts pedidos ficam preservados em
 | Saída | Nó informado pelo root | Modelo real informado |
 | --- | --- | --- |
 | `mus_guaira_arcade__a__take01` — Salto de partida | `hm9vDDKaLjGeDoFhGAUP` | `eleven_music_v2` |
-| `mus_guaira_arcade__b__take01` — Impulso pixel | `eFFpzG5UMvU8XTgxZMbSx` | `eleven_music_v2` |
+| `mus_guaira_arcade__b__take01` — Impulso pixel | `FFpzG5UMvU8XTgxZMbSx` | `eleven_music_v2` |
 
 A intenção no pedido era Music v2.5, mas o enum do plugin não aceitou
 `eleven_music_v2_5`, segundo o root. Não declarar que o modelo v2.5 foi usado.
@@ -50,10 +50,16 @@ A entrega e a integração estão descritas no [README](README.md). Não há blo
 de transferência ou credencial. A Library não foi necessária; o transporte por
 GitHub funcionou. Não houve geração adicional, instalação de segredo ou gasto.
 
-**Divergência de metadado:** a mensagem inicial informou o nó B como
-`eFFpzG5UMvU8XTgxZMbSx`; o manifesto recebido informa `FFpzG5UMvU8XTgxZMbSx`.
-Ambos foram preservados no ledger para o root reconciliar. O arquivo B foi
-identificado pelo SHA-256 verificado, sem depender dessa grafia nem chamar a API.
+**Proveniência reconciliada:** o root confirmou `FFpzG5UMvU8XTgxZMbSx` como
+ID exato de B. O “e” inicial no relato anterior era erro de transcrição; o
+manifesto recebido já estava correto. O histórico foi mantido no ledger, agora
+com status resolvido. O SHA-256 de B foi reconferido:
+`21dc9f1af39ac0fc6987f197eea995c2f5c43287fac32765949d597392cfd93c`.
+
+Sessões confirmadas do flow `l5NIpun9E59Ud2olB4zR`:
+`DO6kt310RtoQE7KsrFQy` e `48LqOmokDEZEuyXErBrb`. O modelo efetivo permanece
+`eleven_music_v2`; A permanece `hm9vDDKaLjGeDoFhGAUP`. Esta correção não alterou
+áudio, não fez chamada ao provedor e não repetiu geração ou testes agregados.
 
 ## Trabalho paralelo
 

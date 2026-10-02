@@ -18,6 +18,8 @@ Somente `public/assets/audio/arcade-r2/` é servido no build. Detalhes e limites
 em [docs/audio-pilot](../../docs/audio-pilot/README.md).
 
 Não houve nova geração. O modelo musical efetivo informado é `eleven_music_v2`.
-O ID de B diverge entre a mensagem do root e o manifesto recebido; ambos foram
-preservados no ledger. O hash do arquivo confere. A licença comercial não foi
+O root confirmou o ID de B como `FFpzG5UMvU8XTgxZMbSx`, igual ao manifesto
+recebido. O erro de transcrição no relato anterior foi resolvido no ledger, com
+flow e sessões confirmados no manifesto de produção. O hash de B foi reconferido;
+nenhum arquivo de áudio mudou. A licença comercial não foi
 verificada; sua gestão segue com o usuário. Não houve deploy ou merge em main.

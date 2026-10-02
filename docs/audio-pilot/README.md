@@ -24,7 +24,7 @@ credencial ou despesa foi necessária nesta integração.
 | Registro de audição por arquivo | [selection.csv](../../audio-pilots/arcade-r2/selection.csv) |
 | QA do navegador | [browser-qa.json](../../audio-pilots/arcade-r2/browser-qa.json) |
 | Direção e inventário | [direcao.md](direcao.md) · [cues.csv](cues.csv) |
-| Gerações e divergência de ID do provedor | [generation-ledger.json](generation-ledger.json) |
+| Gerações e reconciliação de proveniência | [generation-ledger.json](generation-ledger.json) |
 | Reprodução da edição offline | [finish_arcade.py](../../tools/audio_offline/finish_arcade.py) · [arcade-edits.json](../../tools/audio_offline/arcade-edits.json) |
 | Validação | [validacao.md](validacao.md) |
 

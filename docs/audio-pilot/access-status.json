@@ -34,7 +34,7 @@
     {
       "id": "mus_guaira_arcade__b__take01",
       "title": "Impulso pixel",
-      "provider_node_id": "eFFpzG5UMvU8XTgxZMbSx",
+      "provider_node_id": "FFpzG5UMvU8XTgxZMbSx",
       "provider_model_id": "eleven_music_v2"
     }
   ],
@@ -42,5 +42,11 @@
   "next_step": "Technical game integration complete. Perceptual audition and commercial license evidence remain unverified. No further generation or credential access required.",
   "active_pilot_id": "sfg-arcade-r2",
   "prior_root_generation_report": "14 outputs already generated in flow aoC2seBLqtH0qywcqdFt; 2 music rejected for direction, 12 SFX to reuse after audition.",
-  "assets_received_from_commit": "5ad7ea10eee5b69f758c1728971fb1856346ee9a"
+  "assets_received_from_commit": "5ad7ea10eee5b69f758c1728971fb1856346ee9a",
+  "generation_flow_id": "l5NIpun9E59Ud2olB4zR",
+  "generation_session_ids": [
+    "DO6kt310RtoQE7KsrFQy",
+    "48LqOmokDEZEuyXErBrb"
+  ],
+  "generation_metadata_confirmation": "parent_root_explicit_followup; music B leading-e transcription typo resolved"
 }

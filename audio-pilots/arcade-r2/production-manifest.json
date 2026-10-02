@@ -848,5 +848,21 @@
       "artistic_approval": false,
       "commercial_license_verified": false
     }
-  ]
+  ],
+  "music_generation_confirmation": {
+    "confirmed_by": "parent_root_explicit_followup",
+    "flow_id": "l5NIpun9E59Ud2olB4zR",
+    "model_id": "eleven_music_v2",
+    "generation_ids": {
+      "music-a": "hm9vDDKaLjGeDoFhGAUP",
+      "music-b": "FFpzG5UMvU8XTgxZMbSx"
+    },
+    "session_ids": [
+      "DO6kt310RtoQE7KsrFQy",
+      "48LqOmokDEZEuyXErBrb"
+    ],
+    "music_b_original_sha256": "21dc9f1af39ac0fc6987f197eea995c2f5c43287fac32765949d597392cfd93c",
+    "prior_report_typo_resolved": true,
+    "audio_changed": false
+  }
 }
