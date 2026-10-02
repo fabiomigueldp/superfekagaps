@@ -7,6 +7,7 @@ import { STAGES, ISLANDS } from '../src/adventure/campaign';
 import { GuairaMayorLab, guairaMayorStage } from '../src/adventure/experimental/guaira/GuairaMayorLab';
 import { GuairaMayorModel, MAYOR_ARENA as A, MAYOR_RULES as R } from '../src/adventure/experimental/guaira/GuairaMayorModel';
 import { guairaMayorBrowser } from './helpers/guairaMayorHarness';
+import { Canvas } from './helpers/guairaLabHarness';
 import { GuairaMapModel, guairaArrivalFromSearch, parseGuairaMetadata } from '../src/adventure/experimental/guaira/GuairaMapModel';
 import recording from './helpers/guairaMayorReplay.json';
 
@@ -69,7 +70,8 @@ for (const touch of [false, true]) test(`${touch ? 'native touch' : 'keyboard'} 
     (g as unknown as { complete(): void }).complete = () => { completed++; };
     replay(h, g, touch); h.run(g, 240); g.render();
     assert.equal(completed, 0); assert.deepEqual(g.store.save.completed, []); assert.deepEqual(g.store.save.times, {});
-    assert.match(h.status.textContent, /Água pública liberada/);
+    assert.equal(g.boss!.hint, 'AGUA DO BAIRRO LIBERADA');
+    assert.equal(h.status.textContent, 'Feka: “A água voltou. Os gaps continuam.” · CASA: voltar à Casa da Vazão · TENTAR: recomeçar o encontro');
     assert.equal(g.objects.get(A.valveId)!.active, true); assert.equal(g.objects.get(A.liftId)!.y, A.deckY);
     const before = g.player.data.position.x; h.run(g, 12, ['ArrowRight']);
     assert.ok(g.player.data.position.x > before, 'controls continue to work after the public water opens');
@@ -243,11 +245,13 @@ test('reduced motion preserves the winning route and suppresses cosmetic impacts
     assert.equal(g.store.save.preferences.shake, false); replay(h, g); g.render();
 });
 
-test('dedicated entry has accessible controls, paused return offers an explicit Casa action and retry clears the encounter', async t => {
+test('three native toolbar actions expose Casa after victory, retain paused return and reset on retry', async t => {
     const h = guairaMayorBrowser(t); await import('../src/guaira-prefeito');
     const g = h.window.worldGame as GuairaMayorLab;
     assert.equal(h.pause.getAttribute('aria-label'), 'Pausar'); assert.equal(h.retry.getAttribute('aria-label'), 'Tentar novamente');
     assert.equal(h.exit.getAttribute('aria-label'), 'Voltar à Casa da Vazão no mapa');
+    const exitArt = h.exit.children[0] as Canvas, mapWidth = exitArt.width;
+    assert.ok(exitArt instanceof Canvas); assert.equal(exitArt.height, 44);
     for (const control of [h.pause, h.retry, h.exit]) for (const [key, code] of [[' ', 'Space'], ['Enter', 'Enter']]) {
         g.input.reset(); assert.equal(h.window.dispatch('keydown', { key, code, target: control }), false);
         g.input.update(); assert.equal(g.input.getState().jumpPressed, false);
@@ -255,6 +259,8 @@ test('dedicated entry has accessible controls, paused return offers an explicit 
     }
     const html = readFileSync(new URL('../guaira-prefeito.html', import.meta.url), 'utf8');
     assert.match(html, /id="lab-exit" href="\.\/guaira.html\?at=vazao"/);
+    assert.equal(Array.from(html.matchAll(/<(?:button|a)\b/g)).length, 3);
+    assert.match(html, /min-height:44px;min-width:44px/);
     h.pause.dispatch('click'); h.frame(); assert.equal(g.state, 'paused');
     assert.equal(h.exit.dispatch('click'), false, 'pause never intercepts the native map link');
     const returnHref = html.match(/id="lab-exit" href="([^"]+)"/)![1];
@@ -266,4 +272,33 @@ test('dedicated entry has accessible controls, paused return offers an explicit 
     const old = g.player; h.retry.dispatch('click'); assert.equal(g.state, 'playing');
     assert.notEqual(g.player, old); assert.equal(g.mayor.state, 'intro'); assert.equal(g.mayor.sealsRemaining, 3);
     assert.equal(h.canvas.focused, true); assert.equal(g.elapsed, 0); assert.equal(g.player.data.hasHelmet, true);
+
+    replay(h, g); h.frame();
+    assert.equal(h.exit.getAttribute('aria-label'), 'Voltar à Casa da Vazão');
+    assert.equal(h.exit.title, 'Voltar à Casa da Vazão');
+    assert.equal(h.exit.textContent, 'Voltar à Casa da Vazão');
+    assert.equal(h.exit.children[0], exitArt, 'Casa reuses the existing native anchor and bitmap');
+    assert.equal(exitArt.width, mapWidth, 'Casa occupies the same width as Mapa');
+    assert.equal(exitArt.height, 44);
+    let exitNameWrites = 0;
+    const setExitAttribute = h.exit.setAttribute.bind(h.exit);
+    t.mock.method(h.exit, 'setAttribute', (key: string, value: string) => { exitNameWrites++; setExitAttribute(key, value); });
+    h.frame(); h.frame();
+    assert.equal(exitNameWrites, 0, 'stable outcome does not rewrite the accessible exit name each frame');
+    assert.equal(h.exit.dispatch('click'), false, 'victory keeps native navigation to the same neutral Casa arrival');
+    assert.match(h.status.textContent, /A água voltou\. Os gaps continuam\./);
+    h.pause.dispatch('click'); h.frame();
+    assert.equal(g.state, 'paused'); assert.equal(h.pause.getAttribute('aria-label'), 'Continuar');
+    assert.equal(h.exit.getAttribute('aria-label'), 'Voltar à Casa da Vazão');
+    assert.equal(h.exit.dispatch('click'), false);
+    const frozen = snapshot(g); h.run(g, 60); g.render(); assert.deepEqual(snapshot(g), frozen);
+    const controlsWidth = [h.pause, h.retry, h.exit].reduce((sum, control) => sum + (control.children[0] as Canvas).width, 0);
+    assert.ok(controlsWidth + 2 * 4 + 2 * 6 <= 320, 'even Continuar/Tentar/Casa fit the 320px toolbar with existing gaps and padding');
+    assert.deepEqual(g.store.save.completed, []); assert.deepEqual(g.store.save.times, {});
+    h.retry.dispatch('click'); h.frame();
+    assert.equal(g.state, 'playing'); assert.equal(g.mayor.publicWaterOpen, false); assert.equal(g.mayor.sealsRemaining, 3);
+    assert.equal(h.exit.getAttribute('aria-label'), 'Voltar à Casa da Vazão no mapa');
+    assert.equal(exitNameWrites, 1, 'Retry changes the exit name once');
+    assert.equal(h.exit.children[0], exitArt); assert.equal(h.canvas.focused, true);
+    assert.doesNotMatch(h.status.textContent, /A água voltou|CASA:/);
 });

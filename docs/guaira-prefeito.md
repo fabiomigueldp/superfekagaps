@@ -12,7 +12,7 @@ Encontro experimental isolado em `guaira-prefeito.html`. Prefeito fictício, sem
 
 O checkpoint local fica na aproximação do registro. Morrer reinicia o encontro inteiro e recupera o capacete que foi guardado ali. “Tentar” reinicia a tentativa. A maquete oferece entrada opcional quando Feka está na Casa da Vazão, sem início automático. Não há link vindo da campanha, saída de campanha, identificador registrado, esquema de save novo ou acesso ao armazenamento persistente.
 
-O botão “Mapa” sai explicitamente para a chegada neutra da Casa da Vazão (`./guaira.html?at=vazao`), antes ou depois da vitória. Não é preciso usar o histórico do navegador para sair do experimento.
+O botão “Mapa” sai explicitamente para a chegada neutra da Casa da Vazão (`./guaira.html?at=vazao`). Depois da vitória local, o mesmo link mostra “CASA”, com nome acessível “Voltar à Casa da Vazão”; destino e comportamento de navegação continuam iguais, inclusive durante a pausa. O status traz a fala de Feka “A água voltou. Os gaps continuam.” e explica “CASA: voltar à Casa da Vazão” e “TENTAR: recomeçar o encontro”. A dica no canvas permanece “AGUA DO BAIRRO LIBERADA”. Não há quarta ação, nova cena ou consequência persistente. Tentar limpa a vitória e restaura “MAPA”. Não é preciso usar o histórico do navegador para sair do experimento.
 
 ## Contrato de simulação
 
@@ -36,6 +36,8 @@ O problema anterior de enquadramento foi medido com um salto segurado normal sob
 
 `node --import tsx --test tests/guaira-mayor.test.ts` cobre teclado e toque completos, canto/passividade, janela perdida/repetível, toggle fechado/reaberto, carry descendente sem esmagamento, bordas do dorso, capacete/morte/checkpoint, retry, Escape/blur/visibilidade, pausa, render sem mutações, falha de painter com restauração, pulo curto/segurado e movimento reduzido. São 18 casos focados. Os dois projetos TypeScript passam.
 
-A prova gráfica usa `GuairaMayorLab.render`, `Renderer` e o replay nativo em Skia Canvas offline; não é gravação de navegador. Os PNGs e scripts de prova ficam fora do pacote de produção. A integração ainda deve rodar sua suíte combinada e verificar a entrada no navegador da prévia antes de publicar.
+A cobertura da barra verifica o ciclo MAPA → vitória/CASA → pausa/CASA → TENTAR/MAPA, os nomes acessíveis e tooltip, o reaproveitamento do bitmap, três controles de 44 px e a largura combinada de CONTINUAR/TENTAR/CASA em 320 px. CASA tem a mesma largura de MAPA. Essa medição é focada e não substitui a inspeção do layout no navegador da prévia.
 
-Hunk de Vite reservado ao integrador: adicionar `guairaMayor: 'guaira-prefeito.html'` ao objeto `build.rollupOptions.input`. Um bundle de produção foi validado com esse override programático em diretório temporário, sem editar `vite.config.ts`. Nenhuma publicação, alteração no servidor Oracle ou mudança na campanha faz parte deste laboratório.
+A prova gráfica usa `GuairaMayorLab.render`, `Renderer` e o replay nativo em Skia Canvas offline; não é gravação de navegador. Os PNGs e scripts de prova ficam fora do pacote de produção. Os testes com eventos DOM verificam a transição de rótulos e o retorno; inspeção em navegador e testes físicos de toque são evidências distintas.
+
+A entrada `guairaMayor` de `vite.config.ts` produz `/guaira-prefeito.html`, acessível diretamente e pela Casa da Vazão experimental. O encontro continua fora da campanha e do save persistente.

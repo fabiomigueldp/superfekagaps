@@ -170,7 +170,7 @@ export class GuairaMayorLab extends WorldGame {
         this.renderer.present();
         const message = paused ? 'Pausado · Esc ou Continuar para voltar'
             : this.player.data.isDead ? 'Feka caiu · retorno automático ao registro com a luta reiniciada · Tentar recomeça já'
-            : b.publicWaterOpen ? 'Água pública liberada! A chave ficou para trás · você pode voltar pelo piso seguro · Tentar inicia outro encontro'
+            : b.publicWaterOpen ? 'Feka: “A água voltou. Os gaps continuam.” · CASA: voltar à Casa da Vazão · TENTAR: recomeçar o encontro'
             : `Prefeito da Vazão (nome provisório) · ${this.boss!.hint} · setas/A D: mover · Espaço: pular · baixo no ar: sentada · Esc: pausa`;
         if (this.status.textContent !== message) this.status.textContent = message;
     }
