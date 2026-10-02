@@ -28,6 +28,8 @@ export interface GuairaMayorArtState extends MayorRect {
     readonly publicWaterOpen:boolean;
     readonly sealsRemaining:number;
     readonly warningProgress?:number;
+    readonly opening?:Readonly<MayorRect>;
+    readonly recoveryProgress?:number;
     readonly counterpressure?:Readonly<MayorCounterpressure>|null;
 }
 
@@ -211,6 +213,24 @@ function released(b:Brush){
     key(b,-23,-2,true);stamp(b,21,-11);
 }
 
+/** A downward contact cue, separate from the amber seam warning and cyan water.
+ * The small cream rail is time left in this recovery, never remaining seals.
+ * It stays visible during pressure because jumping to the back is still valid.
+ */
+function openingCue(c:CanvasRenderingContext2D,m:GuairaMayorArtState,cx:number,cy:number){
+    const q=m.opening;
+    if(m.state!=='recover'||!m.vulnerable||!q||!Number.isFinite(m.recoveryProgress))return;
+    if(![q.x,q.y,q.width].every(Number.isFinite)||q.width<4)return;
+    const x=Math.round(q.x-cx),y=Math.round(q.y-cy),w=Math.round(q.width);
+    const remaining=1-Math.max(0,Math.min(1,m.recoveryProgress!));
+    const b=brush(c),r=b.rect,mid=x+Math.floor(w/2);
+    // Fixed silhouette, no bobbing or blinking. The last tick retains one pip.
+    r(x,y-7,w,3,P.ink);r(x+1,y-6,w-2,1,P.creamDark);
+    r(x+1,y-6,Math.ceil((w-2)*remaining),1,P.creamLight);
+    r(mid-3,y-4,7,1,P.ink);r(mid-2,y-3,5,1,P.ink);r(mid-1,y-2,3,1,P.ink);
+    r(mid-2,y-4,5,1,P.creamLight);r(mid-1,y-3,3,1,P.creamLight);r(mid,y-2,1,1,P.creamLight);
+}
+
 /** Feet are always y+height. The base art uses a 28×40 body; props are non-colliding. */
 export function drawGuairaMayor(c:CanvasRenderingContext2D,m:GuairaMayorArtState,cx=0,cy=0,reducedMotion=false){
     if(![m.x,m.y,m.width,m.height,cx,cy].every(Number.isFinite))return;
@@ -225,6 +245,7 @@ export function drawGuairaMayor(c:CanvasRenderingContext2D,m:GuairaMayorArtState
         face(b,4,-36,'surprise');b.rect(20,-18,4,3,P.skinLight);b.rect(-17,-25,4,3,P.skin);
     }else neutral(b,m.state,m.tick,reducedMotion);
     c.restore();
+    c.save();openingCue(c,m,cx,cy);c.restore();
 }
 
 /** Warning and active ink never extend beyond the model's exact locked rectangle. */

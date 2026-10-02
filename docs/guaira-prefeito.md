@@ -40,6 +40,16 @@ As ranhuras da grelha usam diretamente `warningProgress`, sem piscar, expandir o
 
 O problema anterior de enquadramento foi medido com um salto segurado normal sobre o deck: 11 frames totalmente fora do canvas e 22 acima/atrás da barra superior. Depois do ajuste local, o mesmo input tem zero frames ocultos e capacete no mínimo em y27 da tela. Esse ajuste de câmera não modifica física ou timing; a contrapressão posterior altera apenas a escolha de travessia descrita acima. Há prova separada do salto vertical no centro da passarela, onde a dica precisa desaparecer.
 
+### Alvo e prazo de recuperação
+
+O dorso exposto agora recebe uma pequena seta creme para baixo e uma régua de tempo dentro da largura do `opening` real (14 px). O marcador fica imediatamente acima do alvo, antes do pass de Feka, sem piscar ou saltitar. Continua presente durante o aviso e a água da emenda: o golpe superior permanece válido, inclusive para quem salta antes. O amarelo continua reservado ao aviso da água; o ciano, à água e ao mecanismo.
+
+O getter somente de leitura `recoveryProgress` fornece a fração decorrida dos 270 ticks da recuperação (zero fora dela). O pintor esvazia a régua a partir desse sinal; espera no registro, subida, contrapressão e fechamento/reabertura consomem a mesma janela, sem reiniciar o marcador. O último tick mantém um ponto claro. Perda de vulnerabilidade, golpe e fim da janela retiram todo o sinal. `opening` e `recoveryProgress` são opcionais no contrato de arte; sem ambos válidos, não há marcador. Não há mudança de física, dano, poses de vitória, durações ou dicas do adapter.
+
+Verificação sobre a base `bc431d5`: 55 testes do Prefeito passam (52 anteriores e três novos para prazo, alvo e pintura); somados aos testes de água, host, mapa e excursão do capítulo, são 154 casos aprovados. Build com validações de níveis/assets/mundo e os dois projetos TypeScript passa. O pacote cresce de 40.574.974 para 40.575.668 bytes (+694), com 141 arquivos, abaixo de 45.000.000 bytes e sem assets novos.
+
+Inspeção adicional no Chromium headless usa a página real, eventos de teclado DOM e updates controlados em 60 Hz. A rota cautelosa mantém golpes 322/652/982 e retorno no frame 1112; a de salto mantém 322/624/926 e retorno no 1056, ambas com capacete nos modos normal e reduzido. Capturas iguais antes/depois nos frames 300/502/562/586 diferem apenas nos 14 × 6 pixels lógicos do marcador; 652 (golpe confirmado) e 982 (vitória) são idênticas. A página carrega sem overlay ou erros de console detectados; viewport de 360 px não produz rolagem horizontal. Isso não mede aprendizado humano, latência de input em tempo real, toque físico ou qualidade de áudio; não houve audição. Os replays e PNGs de revisão ficam fora do pacote de produção.
+
 ## Verificação e integração
 
 `node --import tsx --test tests/guaira-mayor.test.ts` cobre teclado e toque completos, canto/passividade, janela perdida/repetível, toggle fechado/reaberto, carry descendente sem esmagamento, bordas do dorso, capacete/morte/checkpoint, retry, Escape/blur/visibilidade, pausa, render sem mutações, falha de painter com restauração, pulo curto/segurado e movimento reduzido. São 18 casos focados. Os dois projetos TypeScript passam.

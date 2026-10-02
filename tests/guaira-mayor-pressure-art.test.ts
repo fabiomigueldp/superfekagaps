@@ -9,7 +9,8 @@ function state(phase:'warning'|'active'|null,elapsed=0):GuairaMayorArtState {
     const duration=phase==='warning'?60:24;
     const counterpressure:MayorCounterpressure|null=phase?Object.freeze({phase,rect:seam,ticksRemaining:duration-elapsed,progress:elapsed/duration}):null;
     return Object.freeze({x:264,y:120,width:28,height:40,state:'recover',stateTick:100,tick:700,
-        vulnerable:true,accessRequested:true,stampTarget:{x:112,y:204,width:112,height:20},publicWaterOpen:false,sealsRemaining:2,counterpressure});
+        vulnerable:true,accessRequested:true,opening:{x:274,y:120,width:14,height:6},recoveryProgress:100/270,
+        stampTarget:{x:112,y:204,width:112,height:20},publicWaterOpen:false,sealsRemaining:2,counterpressure});
 }
 
 /** Integer raster of production fillRect commands, including the actor mirror. */
@@ -94,4 +95,39 @@ test('both crossing arrows become wait inlays until the pulse is over',()=>{
     const clear=objects(state(null));
     assert.equal(clear.at(211,164),P.waterLight,'forward route returns after the pulse');
     assert.equal(clear.at(76,220),P.waterLight);
+});
+
+test('back cue names the same top contact throughout warning, water and the clear crossing',()=>{
+    for(const phase of [null,'warning','active'] as const)for(const reduced of [false,true]){
+        const m=state(phase),before=JSON.stringify(m),p=actor(m,reduced);
+        assert.equal(p.at(281,118),P.creamLight,'downward tip points to the actual opening');
+        assert.equal(p.at(278,116),P.ink,'dark edge separates the tip from the warm building');
+        assert.equal(p.at(274,113),P.ink,'time rail begins at the true opening, not the body edge');
+        assert.equal(p.at(287,113),P.ink);
+        assert.equal(p.at(288,113),undefined,'cue never widens the apparent top target');
+        assert.equal(JSON.stringify(m),before);
+        const offset=paint(c=>drawGuairaMayor(c,m,3.4,63.6,reduced));
+        assert.equal(offset.at(278,54),P.creamLight,'camera offset moves target and cue together');
+    }
+});
+
+test('recovery rail drains without blinking, stays nonempty on the last tick and clears with access',()=>{
+    const lit:number[]=[];
+    for(const elapsed of [0,90,180,269]){
+        const m={...state('warning'),recoveryProgress:elapsed/270},p=actor(m);
+        const reduced=actor({...m,tick:999999,stateTick:999999},true);
+        assert.deepEqual(p.pixels,reduced.pixels,'only the recovery signal can move the clock');
+        lit.push([...Array(12)].filter((_,i)=>p.at(275+i,114)===P.creamLight).length);
+        assert.equal(p.at(281,118),P.creamLight,'the instruction stays solid as time runs down');
+    }
+    assert.equal(lit[0],12);assert.equal(lit.at(-1),1);
+    assert.ok(lit.every((n,i)=>i===0||n<lit[i-1]));
+    for(const m of [
+        {...state(null),vulnerable:false},
+        {...state(null),state:'idle' as const},
+        {...state(null),state:'hurt' as const},
+        {...state(null),state:'released' as const,publicWaterOpen:true},
+        {...state(null),opening:undefined},
+        {...state(null),recoveryProgress:NaN}
+    ]) assert.notEqual(actor(m).at(281,118),P.creamLight,'closed, spent or unspecified windows have no top invitation');
 });
