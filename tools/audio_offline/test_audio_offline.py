@@ -42,6 +42,8 @@ class OfflinePipelineTests(unittest.TestCase):
                 pipeline.validate(pilot)
 
     def test_export_works_with_all_network_sockets_disabled_and_never_overwrites(self):
+        # Historical pre-generation export; the active pilot is now complete.
+        self.pilot["status"] = "prepared_not_generated"
         with tempfile.TemporaryDirectory() as folder, patch.object(socket, "socket", side_effect=AssertionError("Network forbidden")):
             output = Path(folder) / "pilot"
             pipeline.prepare(self.pilot, output)
@@ -59,6 +61,15 @@ class OfflinePipelineTests(unittest.TestCase):
                 self.assertNotIn("seed", request["body"])
             with self.assertRaises(FileExistsError):
                 pipeline.prepare(self.pilot, output)
+
+    def test_completed_pilot_cannot_export_duplicate_requests(self):
+        self.assertEqual(self.pilot["status"], "generated_by_parent")
+        self.assertEqual(pipeline.estimate(pipeline.validate(self.pilot), completed=True)["paid_requests_planned"], 0)
+        with tempfile.TemporaryDirectory() as folder:
+            output = Path(folder) / "duplicate"
+            with self.assertRaisesRegex(ValueError, "already generated"):
+                pipeline.prepare(self.pilot, output)
+            self.assertFalse(output.exists())
 
     def test_outputs_cannot_enter_runtime_or_source_even_via_symlink(self):
         for destination in (pipeline.ROOT / "public/audio-review", pipeline.ROOT / "src/audio-review", pipeline.ROOT / "dist/audio-review", pipeline.ROOT.parent / "another-package/audio-review"):

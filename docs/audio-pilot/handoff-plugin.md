@@ -5,27 +5,23 @@ geradas no [flow anterior](https://elevenlabs.io/app/flows/aoC2seBLqtH0qywcqdFt)
 duas músicas e 12 SFX. As músicas estão rejeitadas pela direção, não por uma
 audição feita aqui; preservar os originais. Os SFX ficam candidatos a reaproveitar.
 
-## Gerar somente duas músicas substitutas
+## Duas músicas substitutas concluídas — não gerar novamente
 
-Fonte canônica: [pilot.json](../../tools/audio_offline/pilot.json), revisão
-`sfg-arcade-r2`. `music[0].prompt` e `music[1].prompt` contêm os textos completos.
-São **uma saída A e uma saída B**, ambas de 40 s, instrumentais, sem letra/fala.
+O root informou a conclusão de A e B no
+[flow arcade r2](https://elevenlabs.io/app/flows/l5NIpun9E59Ud2olB4zR).
+Os prompts pedidos ficam preservados em
+[pilot.json](../../tools/audio_offline/pilot.json), mas o status agora é
+`generated_by_parent` e `prepare` bloqueia outro export.
 
-| Saída | Direção | Modelo do plugin informado pelo root |
+| Saída | Nó informado pelo root | Modelo real informado |
 | --- | --- | --- |
-| `mus_guaira_arcade__a__take01` — Salto de partida | Arcade de aventura, 120 BPM, synth dedilhado, bateria precisa, acentos pulse 8-bit | `eleven_music_v2_5` |
-| `mus_guaira_arcade__b__take01` — Impulso pixel | Arcade mais cinético, 144 BPM, pulse/FM, baixo sincopado, bateria firme | `eleven_music_v2_5` |
+| `mus_guaira_arcade__a__take01` — Salto de partida | `hm9vDDKaLjGeDoFhGAUP` | `eleven_music_v2` |
+| `mus_guaira_arcade__b__take01` — Impulso pixel | `eFFpzG5UMvU8XTgxZMbSx` | `eleven_music_v2` |
 
-Confirmar campos no schema atual do `creative-studio`. O modelo REST equivalente
-é `music_v2_5`, com `music_length_ms:40000` e `force_instrumental:true`; não
-presumir nomes iguais no nó do plugin. Sem seed, vozes, stems, inpainting ou
-retry automático. Preferência MP3 48 kHz/192 kbps quando disponível; preservar
-o formato realmente retornado. Não repetir geração somente por formato.
-
-`prepare` agora exporta **apenas dois pedidos musicais**. Ele rejeita o schema
-antigo e uma tentativa de reativar geração de SFX. Descrições de SFX no JSON são
-um inventário de reaproveitamento, não novos pedidos. Exports antigos de 14
-pedidos e o commit `7a714a5` são histórico, não instrução de execução atual.
+A intenção no pedido era Music v2.5, mas o enum do plugin não aceitou
+`eleven_music_v2_5`, segundo o root. Não declarar que o modelo v2.5 foi usado.
+Não repetir geração por modelo/formato. Formato e duração finais aguardam os
+arquivos; custos reais aguardam recibos. Nenhum novo SFX foi pedido na revisão.
 
 ## Reaproveitar os 12 SFX existentes, após audição
 
@@ -50,6 +46,13 @@ dedicada, por exemplo `codex/audio-generated-arcade-r2`, sem merge em `main`.
 Enviar o SHA exato para que esta sessão possa buscar esse commit e importar
 somente a pasta `audio-deliveries/sfg-arcade-r2/`. Não incluir os nove pacotes de
 gameplay ainda locais ao integrador. Não depender de disco compartilhado.
+
+A Library deste ambiente expõe apenas envio (`create_library_file`,
+`prepare_uploads`, `finalize_uploads`, `replace_library_file`). Não há
+`prepare_materialize`/leitura de arquivos neste catálogo. Um Library ID isolado
+não basta para baixar aqui; preferir a branch de assets. Um objeto completo de
+transferência preparado pela Library no root poderá ser tentado com o helper
+oficial, se disponibilizado, sem copiar links assinados para o Git.
 
 Estrutura esperada:
 

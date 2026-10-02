@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "pilot_id": "sfg-arcade-r2",
-  "status": "prepared_not_generated",
+  "status": "generated_by_parent",
   "music": [
     {
       "cue_id": "mus_guaira_arcade",

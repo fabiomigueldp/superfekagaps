@@ -26,12 +26,35 @@
   },
   "current_revision": {
     "pilot_id": "sfg-arcade-r2",
-    "new_music_outputs_planned": 2,
+    "new_music_outputs_planned": 0,
     "new_sfx_outputs_planned": 0,
     "generation_started_by_this_session": false,
     "integration_authorized_by_user": true,
     "github_branch_publication_authorized": true,
-    "commercial_license_verified": false
+    "commercial_license_verified": false,
+    "status": "generated_by_parent_awaiting_assets",
+    "flow_url": "https://elevenlabs.io/app/flows/l5NIpun9E59Ud2olB4zR",
+    "reported_by": "parent_root",
+    "new_music_outputs_reported_generated": 2,
+    "reported_assets": [
+      {
+        "id": "mus_guaira_arcade__a__take01",
+        "title": "Salto de partida",
+        "provider_node_id": "hm9vDDKaLjGeDoFhGAUP",
+        "provider_model_id": "eleven_music_v2"
+      },
+      {
+        "id": "mus_guaira_arcade__b__take01",
+        "title": "Impulso pixel",
+        "provider_node_id": "eFFpzG5UMvU8XTgxZMbSx",
+        "provider_model_id": "eleven_music_v2"
+      }
+    ],
+    "requested_model_id": "music_v2_5",
+    "actual_plugin_model_id": "eleven_music_v2",
+    "model_difference_reason": "Parent reports plugin enum lacks eleven_music_v2_5 despite catalog advertising it; no regeneration.",
+    "exact_credits_consumed": null,
+    "heard_by_this_session": false
   },
   "prior_prompt_commit": "7a714a537d4945a38bc4bd2851647bd8815459a6",
   "parallel_integrator_head_reported": "ab942fee",

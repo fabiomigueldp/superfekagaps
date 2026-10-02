@@ -2,7 +2,8 @@
 
 Esta é uma especificação de produção e integração. O root informou 14 saídas do
 lote anterior; os arquivos ainda não chegaram a este ambiente. Duas músicas
-foram rejeitadas pela direção e terão substitutas arcade; 12 SFX aguardam audição.
+foram rejeitadas pela direção; as duas substitutas arcade também já foram
+geradas pelo root. Os 14 candidatos finais aguardam transferência e audição.
 Nenhuma audição foi realizada por esta sessão.
 
 ## Originais e edição
@@ -16,13 +17,13 @@ custo; não provocar nova geração automaticamente para obter outro formato.
 Estrutura privada sugerida, fora das pastas servidas:
 
 ```text
-audio-production/sfg-guaira-pilot-01/
+audio-production/sfg-arcade-r2/
   requests/             # JSON e hashes; nenhum header com valor de credencial
   originals/            # respostas imutáveis por cue/variante/take
   working/              # WAV PCM para edição; nunca sobrescrever originals
   masters/              # edição aprovada, origem/limitações explicitadas
   review/               # A/B privados e cópias com volume comparável
-  delivery-candidates/  # comprimidos, ainda sem autorização de publicação
+  delivery-candidates/  # comprimidos, para integração autorizada, após verificação
   records/              # geração, custo, cortes, audição, seleção e direitos
 ```
 
@@ -49,7 +50,7 @@ ffmpeg -nostdin -n -i masters/mus_guaira_a.wav -map_metadata -1 -c:a libvorbis -
 `-n` impede sobrescrever. Uma música de 40 s a 128 kbps representa cerca de
 640 kB de payload, antes de overhead; WAV s16 estéreo/48 kHz ocupa cerca de
 7,68 MB. Esses são cálculos de formato, não uma promessa de qualidade ou tamanho
-medido para o material ainda não gerado. Prever também memória decodificada:
+medido para o material ainda não recebido. Prever também memória decodificada:
 40 s × 48.000 × 2 × 4 ≈ 15,36 MB por AudioBuffer estéreo float32.
 
 ## Loops e transições
@@ -132,4 +133,5 @@ O registro separa `generated`, `heard`, `selected`, `rights_verified` e
 Anexar referência privada à evidência de licença, plano e data de geração,
 termos aplicáveis, escopo de plataformas/monetização e responsável pela aprovação.
 Não salvar segredo ou dados de pagamento no registro. O usuário tratará da
-licença comercial; neste pacote todas as autorizações de publicação são falsas.
+licença comercial; a verificação da licença não foi concluída. Integração e envio à branch foram
+autorizados pelo usuário; deploy e merge em main não fazem parte desta entrega.
