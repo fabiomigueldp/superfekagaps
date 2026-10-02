@@ -64,22 +64,22 @@ test('banner prioritizes DESVIO, actual travel at replay frame 500, then the nex
         const expected = recorder(); pixelText(expected.c, text, 160, 34, '#f3ddb1', 1, 'center');
         assert.deepEqual(calls.slice(-expected.calls.length), expected.calls);
     };
-    expectBanner('PULE + BAIXO: AGUA PARA A');
+    expectBanner('PULE. NO AR, BAIXO: AGUA PARA A');
     g.routing.step('a', 1); expectBanner('DESVIO PARA A...');
     g.routing.step('a', 399); expectBanner('DESVIO PARA A...');
     g.routing.step('a', 1); g.objects.get(G.liftAId)!.active = true;
     g.objects.get(G.liftBId)!.active = false;
     expectBanner('A SOBE / B DESCE');
     g.objects.get(G.liftAId)!.y = G.middleY; g.objects.get(G.liftBId)!.y = G.dockY;
-    expectBanner('PULE + BAIXO: AGUA PARA B');
+    expectBanner('PULE. NO AR, BAIXO: AGUA PARA B');
     g.player.data.position.x = 490; g.player.data.position.y = G.middleY - g.player.data.height; g.camera.x = 360; g.camera.y = 156;
-    expectBanner('PULE + BAIXO: AGUA PARA B');
+    expectBanner('PULE. NO AR, BAIXO: AGUA PARA B');
     g.routing.step('b', 1); expectBanner('DESVIO PARA B...');
     g.routing.step('b', 400);
     g.objects.get(G.liftAId)!.active = false; g.objects.get(G.liftBId)!.active = true;
     expectBanner('B SOBE / A DESCE');
     g.objects.get(G.liftAId)!.y = G.dockY; g.objects.get(G.liftBId)!.y = G.terraceY;
-    expectBanner('PULE + BAIXO: AGUA PARA A');
+    expectBanner('PULE. NO AR, BAIXO: AGUA PARA A');
     g.load(G.id);
     let frame = 0;
     for (const [count, keys] of recording.runs as Array<[number, string[]]>) {

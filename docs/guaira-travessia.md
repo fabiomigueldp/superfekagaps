@@ -29,3 +29,23 @@ Os dois módulos visuais recebem somente tempo e estado do jogo, sem timers, RAF
 ## Continuidade da distribuição
 
 Dois ramais inclinados de bronze ligam os ombros da comporta às pontas do canal esquerdo e do arrozal. As flanges seguem a linguagem da tubulação da Casa da Vazão. Os tubos ficam atrás da alvenaria, das correntes e do deck real; suas bordas discretas não usam a faixa clara dos apoios jogáveis. A mudança é só de pintura, sem alterar canais animados, trabalhadores, estado da válvula ou geometria da ponte. A comparação no mesmo enquadramento usa o render real em Canvas offline; o replay de 585 quadros preserva o digest de simulação e cada render deixa o estado intacto.
+
+## Ensino da sentada e visibilidade de Feka
+
+A placa orienta `PULE. NO AR, APERTE BAIXO`. A sentada exige uma nova pressão de
+baixo quando Feka já está no ar; o texto anterior com `+` podia sugerir uma
+combinação simultânea. Nenhuma regra de input ou física foi alterada. O Pátio,
+abertura alternativa do capítulo, usa a mesma sequência e continua identificando
+o ramal A/B que receberá água.
+
+A faixa da comporta fica oculta somente quando seus pixels e sombra poderiam
+cobrir o corpo, capacete ou pés no enquadramento nativo. A mensagem da página
+permanece disponível. Ao sair dessa área, a faixa reaparece com a instrução ou
+o estado atual da ponte. O capítulo começa exibindo seu objetivo em vez do
+rótulo genérico do experimento.
+
+`tests/guaira-traversal-guidance.test.ts` exercita salto alto, retorno da faixa,
+toque, movimento reduzido, pausa e os textos de conclusão nas duas entradas.
+`tools/guaira/render_traversal_guidance.mts` gera a comparação offline com Input,
+Player e pintores reais, usando um checkout anterior como baseline. Seus PNGs
+ficam fora do output de produção; não equivalem a captura do navegador.

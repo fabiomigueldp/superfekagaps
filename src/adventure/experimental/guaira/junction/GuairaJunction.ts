@@ -136,7 +136,7 @@ export class GuairaJunction extends WorldGame {
         } else if (!bannerWouldCoverPlayer && (this.finished || this.routing.warning || this.moving || nearPlate)) {
             panel(c, 19, 28, 282, 19, '#382f36', '#d8b485');
             const text = this.finished ? 'DO BAIRRO AO ARROZAL!' : this.routing.warning ? `DESVIO PARA ${this.routing.selected.toUpperCase()}...` :
-                this.moving ? `${this.routing.supplied.toUpperCase()} SOBE / ${this.routing.supplied === 'a' ? 'B' : 'A'} DESCE` : `PULE + BAIXO: AGUA PARA ${nextOutlet}`;
+                this.moving ? `${this.routing.supplied.toUpperCase()} SOBE / ${this.routing.supplied === 'a' ? 'B' : 'A'} DESCE` : `PULE. NO AR, BAIXO: AGUA PARA ${nextOutlet}`;
             pixelText(c, text, 160, 34, '#f3ddb1', 1, 'center');
         }
         this.renderer.present();
@@ -147,7 +147,7 @@ export class GuairaJunction extends WorldGame {
             : deck ? `No tabuleiro ${deck.id === G.liftAId ? 'A' : 'B'} · ${Math.abs(deck.y - (deck.active ? deck.to!.y : G.dockY)) > .01 ? deck.active ? 'subindo' : 'descendo' : deck.active ? 'no alto' : 'na doca'} · água no ramal ${this.routing.supplied.toUpperCase()} · pode esperar apoiado`
             : onRecovery ? 'Piso seco de recuperação · volte à esquerda e pule pelo degrau até a entrada'
             : this.moving ? `Água no ramal ${this.routing.supplied.toUpperCase()} · ${this.routing.supplied.toUpperCase()} sobe, ${this.routing.supplied === 'a' ? 'B' : 'A'} desce · espere ou embarque`
-            : p.position.x < 384 ? `Uma entrada, dois ramais · pule e aperte baixo na placa para dar água a ${nextOutlet} · a outra plataforma desce`
+            : p.position.x < 384 ? `Pule primeiro. No ar, aperte baixo na placa: água para ${nextOutlet}; a outra plataforma desce`
             : p.position.x < 736 ? `Ponto seguro nesta tentativa · dê água a ${nextOutlet} com uma sentada na segunda placa · pode trocar quantas vezes quiser`
             : 'Siga à direita até o arrozal · sair e reentrar reinicia o protótipo';
         if (this.status.textContent !== message) this.status.textContent = message;

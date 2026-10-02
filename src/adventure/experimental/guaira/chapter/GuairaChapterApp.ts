@@ -181,10 +181,13 @@ export class GuairaChapterApp {
                     game.state === 'paused' ? 'Retomar a tentativa' : complete ? 'Continuar a jornada pela maquete' : 'Pausar');
                 const step = this.snapshot.route.indexOf(attempt.sceneId) + 1;
                 const native = nativeStatus.textContent?.split(/ · setas\/A D:| · setas:| · Esc:/)[0] || info.objective;
+                // The free-lab introduction names the fictional setting. In the
+                // chapter this line should tell the player what to do next.
+                const guidance = native === 'Guaíra fictícia' ? info.objective : native;
                 const message = game.state === 'paused' ? 'Pausado · Continuar volta à tentativa'
                     : !live.alive ? 'Feka caiu · retorno ao ponto seguro desta tentativa'
                     : complete ? 'Trecho concluído · Continuar volta à maquete'
-                    : `Etapa ${step}/5 · ${game.boss?.hint ?? native}`;
+                    : `Etapa ${step}/5 · ${game.boss?.hint ?? guidance}`;
                 if (panel.status.textContent !== message) panel.status.textContent = message;
                 if (!document.hidden) frame = requestAnimationFrame(reflect);
             };

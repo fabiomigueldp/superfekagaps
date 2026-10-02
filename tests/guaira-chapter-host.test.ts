@@ -88,6 +88,22 @@ function invokeSaved(callback: EventListenerOrEventListenerObject, event = new E
     if (typeof callback === 'function') callback(event); else callback.handleEvent(event);
 }
 
+test('chapter guidance opens with the real objective and retains the native valve instruction', async t => {
+    const h = hostBrowser(t), factory = await loadGuairaChapterScene('guaira-travessia');
+    const app = h.create({ loadScene: async () => factory }); h.enter(); await flush();
+    const game = app.activeGame!;
+    game.render(); h.frame();
+    assert.match(h.byId('lab-status').textContent, /Abra a comporta e atravesse até o arrozal/);
+    assert.doesNotMatch(h.byId('lab-status').textContent, /Guaíra fictícia/);
+    h.key('keydown', 'ArrowRight'); h.key('keydown', 'ShiftLeft');
+    for (let frame = 0; frame < 92; frame++) game.update(1000 / 60);
+    h.key('keyup', 'ArrowRight'); h.key('keyup', 'ShiftLeft');
+    game.render(); h.frame();
+    assert.match(h.byId('lab-status').textContent, /Pule primeiro\. No ar, aperte baixo sobre a placa/);
+    assert.equal(app.snapshot.accepted.length, 0);
+    app.dispose(); h.checkDisposed();
+});
+
 for (const exit of ['map', 'dispose'] as const) test(`late scene import after ${exit} never constructs a stale runtime`, async t => {
     const h = hostBrowser(t), pending = deferred<GuairaChapterSceneFactory>(); let constructed = 0;
     const app = h.create({ loadScene: () => pending.promise }); h.enter();

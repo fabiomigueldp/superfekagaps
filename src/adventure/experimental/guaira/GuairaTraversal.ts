@@ -129,6 +129,10 @@ export class GuairaTraversal extends WorldGame {
         pixelText(c, 'II', 305, 8, '#f0ddae');
         const valve = this.objects.get(GUAIRA_TRAVERSAL.valveId)!;
         const nearValve = this.player.data.position.x > 275 && this.player.data.position.x < 416;
+        // Match the native painter's rounded camera and include the helmet,
+        // feet and panel shadow. Page status keeps the instruction during a jump.
+        const playerY = Math.round(this.player.data.position.y) - Math.round(this.camera.y);
+        const bannerWouldCoverPlayer = playerY - 4 < 50 && playerY + this.player.data.height + 2 > 29;
         if (paused) {
             c.fillStyle = '#211b2bbd'; c.fillRect(0, 23, 320, 157);
             panel(c, 62, 70, 196, 43, '#382b35', '#d8ac7a');
@@ -138,15 +142,15 @@ export class GuairaTraversal extends WorldGame {
             panel(c, 27, 40, 266, 43, '#382b35', '#d8ac7a');
             pixelText(c, 'A AGUA CHEGOU AO ARROZAL!', 160, 50, '#f0ddae', 1, 'center');
             pixelText(c, this.continuationHint, 160, 65, '#edcaf5', 1, 'center');
-        } else if (nearValve && !this.player.data.isDead) {
+        } else if (nearValve && !this.player.data.isDead && !bannerWouldCoverPlayer) {
             panel(c, 42, 29, 236, 19, '#382b35', '#d8ac7a');
-            pixelText(c, !valve.active ? 'PULE + BAIXO NA PLACA' : this.bridgeReady ? 'PASSAGEM ABERTA' : 'PONTE SUBINDO...', 160, 35, '#f0ddae', 1, 'center');
+            pixelText(c, !valve.active ? 'PULE. NO AR, APERTE BAIXO' : this.bridgeReady ? 'PASSAGEM ABERTA' : 'PONTE SUBINDO...', 160, 35, '#f0ddae', 1, 'center');
         }
         this.renderer.present();
         const message = paused ? 'Pausado · Esc ou Continuar para voltar'
             : this.finished ? 'Travessia concluída · a água chegou ao arrozal · Curral abre a arena de Ossabravo · Mapa volta ao arrozal na maquete'
             : this.player.data.isDead ? 'Feka caiu · retorno automático ao ponto seguro desta tentativa · Recomeçar reinicia a travessia'
-            : nearValve ? (!valve.active ? 'Pule e aperte baixo sobre a placa no chão · espere a ponte subir' : this.bridgeReady ? 'Ponte pronta · atravesse até a bandeira do checkpoint' : 'Água liberada · a ponte está subindo')
+            : nearValve ? (!valve.active ? 'Pule primeiro. No ar, aperte baixo sobre a placa; espere a ponte subir' : this.bridgeReady ? 'Ponte pronta · atravesse até a bandeira do checkpoint' : 'Água liberada · a ponte está subindo')
             : this.player.data.position.x >= 624 ? 'Siga à direita até o curral · ponto seguro na bandeira só nesta tentativa · sair e reentrar reinicia a travessia'
             : 'Guaíra fictícia · setas/A D: mover · Espaço: pular · baixo no ar: sentada · Shift: correr · Esc: pausa · M: som';
         if (this.status.textContent !== message) this.status.textContent = message;
