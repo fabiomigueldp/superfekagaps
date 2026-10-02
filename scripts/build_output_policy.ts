@@ -1,5 +1,6 @@
 import { copyFileSync, mkdirSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { basename, dirname, extname, join, relative, resolve } from 'node:path';
+import { performance } from 'node:perf_hooks';
 import type { Plugin, ResolvedConfig } from 'vite';
 
 // Exact reviewed files, not extension/directory globs. New assets ship by default.
@@ -33,10 +34,16 @@ export function copyPublishedAssets(publicDir: string, outDir: string) {
     const overlaps = (a: string, b: string) => { const r = relative(a, b); return !r || (!r.startsWith('..') && !r.startsWith('/')); };
     if (overlaps(source, destination) || overlaps(destination, source)) throw new Error('Build output must be separate from public sources');
     let omittedBytes = 0, omittedFiles = 0;
+    // Per-copy state: a later build may recreate or use a different output directory.
+    const directories = new Set<string>();
     for (const name of filesIn(source)) {
         if (excluded.has(name)) { omittedBytes += statSync(join(source, name)).size; omittedFiles++; continue; }
         const target = join(destination, name);
-        mkdirSync(dirname(target), { recursive: true });
+        const directory = dirname(target);
+        if (!directories.has(directory)) {
+            mkdirSync(directory, { recursive: true });
+            directories.add(directory);
+        }
         copyFileSync(join(source, name), target);
     }
     return { omittedFiles, omittedBytes };
@@ -61,7 +68,19 @@ export function inspectBuildOutput(outDir: string, maxBytes = BUILD_SIZE_LIMIT) 
     const entries = files.map(path => ({ path, bytes: statSync(join(outDir, path)).size }));
     const bytes = entries.reduce((sum, file) => sum + file.bytes, 0);
     if (bytes > maxBytes) throw new Error(`Build output is ${bytes} bytes, above the ${maxBytes}-byte repository budget`);
-    return { files: files.length, bytes, maxBytes, largestFiles: [...entries].sort((a, b) => b.bytes - a.bytes).slice(0, 10) };
+    const extensions = new Map<string, { extension: string; files: number; bytes: number }>();
+    for (const file of entries) {
+        const extension = extname(file.path).toLowerCase();
+        const group = extensions.get(extension) ?? { extension, files: 0, bytes: 0 };
+        group.files++;
+        group.bytes += file.bytes;
+        extensions.set(extension, group);
+    }
+    return {
+        files: files.length, bytes, maxBytes, headroomBytes: maxBytes - bytes,
+        byExtension: [...extensions.values()].sort((a, b) => b.bytes - a.bytes || a.extension.localeCompare(b.extension)),
+        largestFiles: [...entries].sort((a, b) => b.bytes - a.bytes).slice(0, 10),
+    };
 }
 
 export function publishedAssetsPlugin(): Plugin {
@@ -73,9 +92,19 @@ export function publishedAssetsPlugin(): Plugin {
         writeBundle() {
             if (!config.publicDir) throw new Error('The asset policy requires the project public directory');
             const outDir = resolve(config.root, config.build.outDir);
+            const started = performance.now();
             const omitted = copyPublishedAssets(config.publicDir, outDir);
+            const copied = performance.now();
             const size = inspectBuildOutput(outDir);
+            const inspected = performance.now();
             console.log(`[feka-output] ${size.files} files, ${size.bytes} bytes; omitted ${omitted.omittedFiles} review files (${omitted.omittedBytes} bytes)`);
+            if (process.env.FEKA_BUILD_PROFILE === '1') {
+                console.log(`[feka-output-profile] ${JSON.stringify({
+                    copyMs: Number((copied - started).toFixed(3)),
+                    inspectMs: Number((inspected - copied).toFixed(3)),
+                    headroomBytes: size.headroomBytes,
+                })}`);
+            }
         },
     };
 }
