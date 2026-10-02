@@ -10,7 +10,7 @@ Encontro experimental isolado em `guaira-prefeito.html`. Prefeito fictício, sem
 - Espere o dorso ficar exposto e pule sobre ele. O texto distingue registro fechado, passarela subindo e golpe disponível
 - Volte pelo piso seco e repita. Perder uma janela apenas reinicia o ciclo. Depois do terceiro lacre, a água chega ao bairro e Feka continua controlável
 
-O checkpoint local fica na aproximação do registro. Morrer reinicia o encontro inteiro e recupera o capacete que foi guardado ali. “Tentar” reinicia a tentativa. Não há links vindos da campanha ou do mapa, saída de campanha, identificador registrado, esquema de save novo ou acesso ao armazenamento persistente.
+O checkpoint local fica na aproximação do registro. Morrer reinicia o encontro inteiro e recupera o capacete que foi guardado ali. “Tentar” reinicia a tentativa. A maquete oferece entrada opcional quando Feka está na Casa da Vazão, sem início automático. Não há link vindo da campanha, saída de campanha, identificador registrado, esquema de save novo ou acesso ao armazenamento persistente.
 
 O botão “Mapa” sai explicitamente para a chegada neutra da Casa da Vazão (`./guaira.html?at=vazao`), antes ou depois da vitória. Não é preciso usar o histórico do navegador para sair do experimento.
 

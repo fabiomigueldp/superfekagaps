@@ -1,6 +1,6 @@
 # Guaíra: mapa experimental isolado
 
-Entrada: `/guaira.html`. A maquete de terra vermelha conecta três experiências: **Estrada do Vento → `/guaira-travessia.html`**, **Arena do Curral → `/guaira-lab.html`** e **Subida à Casa → `/guaira-subida.html`**. Arena e Subida partem do mesmo marco do curral; são escolhas distintas, com ações **ARENA** e **SUBIR**. Selecionar inicia a caminhada; A ação de entrada só funciona na chegada ao ponto de partida. **Chegar** pula a caminhada. O distrito e o arrozal continuam marcos da paisagem. A Casa da Vazão é uma chegada neutra ao terraço, sem botão de entrada na casa, bloqueios ou progresso inventados.
+Entrada: `/guaira.html`. A maquete de terra vermelha mantém três destinos permanentes: **Estrada do Vento → `/guaira-travessia.html`**, **Arena do Curral → `/guaira-lab.html`** e **Subida à Casa → `/guaira-subida.html`**. Arena e Subida partem do mesmo marco do curral; são escolhas distintas, com ações **ARENA** e **SUBIR**. Selecionar inicia a caminhada; a ação de entrada só funciona na chegada ao ponto de partida. **Chegar** pula a caminhada. O distrito e o arrozal continuam marcos da paisagem. Ao chegar à Casa da Vazão, o botão principal oferece **PREFEITO → `/guaira-prefeito.html`**, explicitamente descrito como experimento opcional. **VOLTAR** inicia a caminhada de volta ao curral. Não há quarto destino permanente, entrada automática, desbloqueio ou progresso inventado.
 
 O experimento não recebe número de mundo de campanha, não usa `parseMapMetadata`, não importa `WorldGame`, não modifica o atlas de seis mundos e não lê/escreve saves ou placar. A saída pública **Sair** continua apontando para `./`. Nenhum link foi adicionado à campanha. O mapa não altera o servidor Oracle.
 
@@ -9,11 +9,19 @@ O experimento não recebe número de mundo de campanha, não usa `parseMapMetada
 - `guaira.html?at=town`: Feka na estrada `guaira-1`, pronto para entrar na travessia
 - `guaira.html?at=rice`: Feka no arrozal `guaira-3`, sem destino selecionado; escolher Curral percorre apenas a estrada canônica 3→4
 - `guaira.html?at=corral`: Feka no curral `guaira-4`, pronto para entrar na arena; escolher Subida troca a experiência sem caminhar
-- `guaira.html?at=vazao`: Feka no terraço `guaira-5`, sem destino selecionado; escolher Arena ou Subida volta ao curral pela rota `3:4` ao contrário
+- `guaira.html?at=vazao`: Feka no terraço `guaira-5`, sem destino selecionado; **PREFEITO** entra no experimento opcional; **VOLTAR**, Arena ou Subida voltam ao curral pela rota `3:4` ao contrário
 
-Outros valores caem na estrada. O retorno é uma posição de visita, nunca um desbloqueio persistente. Ao chegar a um ponto de partida, `history.replaceState` atualiza apenas `at` na URL atual. Arena e Subida gravam a mesma posição de visita `at=corral`; a seleção de experiência não é persistida. O modelo não navega sozinho; **JOGAR**, **ARENA** ou **SUBIR** são sempre uma ação separada.
+Outros valores caem na estrada. O retorno é uma posição de visita, nunca um desbloqueio persistente. Ao chegar a um ponto de partida, `history.replaceState` atualiza apenas `at` na URL atual. Arena e Subida gravam a mesma posição de visita `at=corral`; a seleção de experiência não é persistida. O modelo não navega sozinho; **JOGAR**, **ARENA**, **SUBIR** ou **PREFEITO** são sempre uma ação separada. Recarregar durante uma caminhada restaura a última chegada registrada na URL; não salva uma posição intermediária.
 
-O laboratório usa **MAPA** / “Voltar ao mapa de Guaíra”, com `href="./guaira.html?at=corral"`, no lugar da saída direta, mantendo apenas três controles na barra. **Sair** no mapa leva ao jogo principal. A travessia retorna a `at=town` antes de seu checkpoint e `at=rice` depois dele ou da conclusão. A Subida retorna a `at=corral` antes da conclusão e a `at=vazao` depois dela.
+O laboratório usa **MAPA** / “Voltar ao mapa de Guaíra”, com `href="./guaira.html?at=corral"`, no lugar da saída direta, mantendo apenas três controles na barra. **Sair** no mapa leva ao jogo principal. A travessia retorna a `at=town` antes de seu checkpoint e a `at=rice` depois dele ou da conclusão. A Subida retorna a `at=corral` antes da conclusão e a `at=vazao` depois dela. O Prefeito retorna explicitamente a `at=vazao`, inclusive quando pausado, sem retomar ou reiniciar o encontro por chegar ao mapa.
+
+### Contrato da ação contextual
+
+- Casa, `selected=null`, controlador aberto e parado: principal **PREFEITO** habilitado; **VOLTAR** visível; os três destinos permanentes continuam disponíveis
+- **VOLTAR** seleciona `curral`; não muda a posição no clique. O ator percorre `3:4` ao contrário e só então habilita **ARENA**. Apenas **Chegar** ou movimento reduzido pulam a caminhada
+- Selecionar qualquer destino remove imediatamente a ação contextual, mesmo antes do primeiro quadro. Um clique atrasado em **VOLTAR** não substitui uma escolha mais recente; um clique em entrada consulta o estado atual, nunca um `href` antigo
+- Arrozal sem seleção: entrada desabilitada e **VOLTAR** oculto. Em movimento: entrada desabilitada e **CHEGAR** disponível. Curral: **ARENA** ou **SUBIR**, conforme a seleção
+- Carregamento: ações do mapa desabilitadas. Falha: somente links diretos. Saída: modelo fechado, sem segunda navegação em cliques repetidos. Reload e bfcache reconstroem o contexto a partir de `at`
 
 ## Comportamento
 
@@ -23,7 +31,7 @@ O ator usa diretamente as matrizes e a paleta originais de Feka. A escala físic
 
 Todos os controles usam botões ou links nativos, com área de pelo menos 44 CSS pixels, nome acessível, foco visível e alternativa textual em alto contraste. Seta esquerda seleciona Travessia, direita seleciona Arena e cima seleciona Subida; Tab e Enter/Espaço operam os controles nativos. Sair, fechar a página e bfcache suspendem/descartam o controlador. Ocultar a aba cancela o quadro pendente e evita salto de tempo ao retornar.
 
-Metadados/imagem inválidos exibem um estado terminal com links para as três experiências. A validação JSON ocorre antes de aguardar a imagem. Acesso direto às três rotas também fica disponível enquanto a cena carrega; lentidão sem erro não dispara timeout arbitrário. Uma conclusão tardia de carregamento após sair nunca inicia o mapa.
+Metadados/imagem inválidos exibem um estado terminal com links para os quatro experimentos, incluindo Prefeito opcional. A validação JSON ocorre antes de aguardar a imagem. Esses links diretos também ficam disponíveis enquanto a cena carrega e podem quebrar linha; não são destinos permanentes da barra. Lentidão sem erro não dispara timeout arbitrário. Uma conclusão tardia de carregamento após sair nunca inicia o mapa.
 
 ## Arte e reprodução
 
@@ -40,8 +48,8 @@ A fonte usa Cycles CPU, 48 amostras e nenhum denoiser. `--draft` não pode ser e
 
 ## Verificação e limites
 
-Os testes próprios cobrem as três experiências, os retornos neutros do arrozal e da casa, o percurso exato da casa ao curral, a troca de experiência sem deslocamento, reversões rápidas, entrada antes da chegada, skip, movimento reduzido, limites de câmera, erro explícito com decode pendente, carregamento lento, descarte ao sair e restauração bfcache. O teste do entrypoint usa o controlador de produção com EventTarget e ambiente DOM mínimo, tornando qualquer acesso a `localStorage` um erro.
+Os testes próprios cobrem os três destinos permanentes, o retorno neutro do arrozal, a entrada contextual da casa, o retorno do Prefeito pausado, o percurso exato da casa ao curral, a troca de experiência sem deslocamento, reversões rápidas, entrada antes da chegada, cliques atrasados após nova seleção, skip, movimento reduzido, limites de câmera, erro explícito com decode pendente, carregamento lento, descarte ao sair, reload e restauração bfcache. O teste do entrypoint usa o controlador de produção com EventTarget e ambiente DOM mínimo, tornando qualquer acesso a `localStorage` um erro. O retorno pausado verifica o link nativo e o modelo reconstruído; a navegação real é responsabilidade do QA em navegador.
 
-As provas offline usam o pintor real da cena/ator e das placas; cabeçalho e painel são composições equivalentes, não capturas de browser. Incluem desktop, celular, 320×480, 472×303 e paisagem. As três placas de escolha medem 118 + 70 + 82 px, com dois intervalos de 8 px: cabem na área de 296 px de uma tela de 320 px. Em telas estreitas e baixas, as escolhas ocupam uma linha inteira, e as ações ficam na linha seguinte. Painéis de carregamento/falha permitem rolagem desde o início. Os testes matemáticos de viewport verificam o retângulo 16×26 de todos os frames, mas não provam oclusão 3D animada. A auditoria Blender original cobre pixels do sprite parado. Layout CSS real, toques nativos e recorte móvel precisam de QA em navegador pelo integrador antes de uma alegação de validação visual completa.
+As provas offline usam o pintor real da cena/ator e das placas; cabeçalho e painel são composições equivalentes, não capturas de browser. Incluem desktop, celular, 320×480, 472×303 e paisagem. As três placas de escolha medem 118 + 70 + 82 px, com dois intervalos de 8 px: cabem na área de 296 px de uma tela de 320 px. Na Casa, as placas contextuais **VOLTAR** (82 px) e **PREFEITO** (106 px) mantêm 44 px de altura, empilhadas com intervalo de 5 px no modo compacto. Em telas estreitas e baixas, as escolhas ocupam uma linha inteira, e as ações ficam na linha seguinte. Painéis de carregamento/falha permitem rolagem desde o início. Os testes matemáticos de viewport verificam o retângulo 16×26 de todos os frames, mas não provam oclusão 3D animada. A auditoria Blender original cobre pixels do sprite parado. Layout CSS real, toques nativos e recorte móvel precisam de QA em navegador pelo integrador antes de uma alegação de validação visual completa.
 
 As provas e logs ficam fora da árvore de produção; esta entrega não publica nem altera o jogo principal.

@@ -19,7 +19,7 @@ class Element extends EventTarget {
     click() { if (!this.disabled) this.dispatchEvent(new Event('click')); }
 }
 class Media extends EventTarget { matches = false; }
-const ids = ['guaira-canvas', 'map-loading', 'map-loading-panel', 'map-status', 'map-enter', 'map-skip', 'map-overview', 'map-exit', 'map-title', 'map-description', 'map-error'];
+const ids = ['guaira-canvas', 'map-loading', 'map-loading-panel', 'map-status', 'map-enter', 'map-skip', 'map-return', 'map-overview', 'map-exit', 'map-title', 'map-description', 'map-error'];
 const elements = Object.fromEntries(ids.map(id => [id, new Element()]));
 const destinations = ['town', 'curral', 'subida', 'town', 'curral'].map((id, i) => { const e = new Element(); e.dataset.mapDestination = id; e.marker = i > 2; return e; });
 const scene = new Element(), doc = new EventTarget() as EventTarget & Record<string, unknown>, win = new EventTarget();
@@ -53,9 +53,14 @@ test('actual map entry handles pending loading, selection, arrival, reduced moti
     assert.ok(destinations.every(button => button.children[0]?.height === 44),
         'Loading plates must never expand to a default 300×150 canvas');
     assert.ok(destinations.every(button => button.disabled));
+    assert.equal(elements['map-return'].hidden, true); assert.equal(elements['map-return'].disabled, true);
     finishImage(); await ready(); frames(2);
     assert.equal(elements['map-title'].textContent, 'Passarela dos Arrozais');
     assert.equal(elements['map-enter'].disabled, true); assert.equal(elements['map-loading-panel'].hidden, true);
+    assert.equal(elements['map-return'].hidden, true);
+    elements['map-return'].dispatchEvent(new Event('click'));
+    elements['map-enter'].dispatchEvent(new Event('click'));
+    assert.equal(elements['map-title'].textContent, 'Passarela dos Arrozais', 'rice ignores stale context actions');
     assert.equal(navigations.length, 0); assert.equal(replacements.length, 0);
     assert.equal(key('ArrowRight').defaultPrevented, true); frames(2);
     assert.equal(elements['map-title'].textContent, 'Curral da Comporta'); assert.equal(elements['map-enter'].disabled, true);
@@ -77,11 +82,21 @@ test('actual map entry handles pending loading, selection, arrival, reduced moti
     const beforeHouse = replacements.length;
     win.dispatchEvent(pageShow); await ready(); frames(2);
     assert.equal(elements['map-title'].textContent, 'Casa da Vazão');
-    assert.equal(elements['map-enter'].disabled, true); assert.equal(elements['map-skip'].hidden, true);
-    assert.equal(elements['map-enter'].attributes['aria-label'], 'Escolha uma experiência para entrar');
-    assert.equal(replacements.length, beforeHouse, 'neutral house arrival must not rewrite its location');
+    assert.equal(elements['map-enter'].disabled, false); assert.equal(elements['map-skip'].hidden, true);
+    assert.equal(elements['map-enter'].attributes['aria-label'], 'Enfrentar o Prefeito: experimento opcional na Casa da Vazão');
+    assert.equal(elements['map-return'].hidden, false); assert.equal(elements['map-return'].disabled, false);
+    assert.equal(elements['map-return'].attributes['aria-label'], 'Voltar ao curral pela estrada');
+    assert.equal(replacements.length, beforeHouse, 'contextual house arrival must not rewrite its location');
     assert.ok(destinations.every(button => button.attributes['aria-pressed'] === 'false'));
-    assert.equal(key('ArrowUp').defaultPrevented, true); frames(1);
+    assert.equal(navigations.length, 2, 'Casa never auto-enters, including cached loading');
+    elements['map-return'].click();
+    assert.equal(destinations[1].focused, true, 'focus moves off the contextual control when it disappears');
+    assert.equal(elements['map-return'].hidden, true); assert.equal(elements['map-enter'].disabled, true);
+    elements['map-enter'].dispatchEvent(new Event('click')); assert.equal(navigations.length, 2, 'departure closes entry before any animation frame');
+    assert.equal(key('ArrowUp').defaultPrevented, true);
+    elements['map-return'].dispatchEvent(new Event('click'));
+    assert.equal(elements['map-enter'].attributes['aria-label'], 'Entrar: Subida à Casa', 'stale return cannot override a newer selection');
+    frames(1);
     assert.equal(elements['map-title'].textContent, 'Subida à Casa');
     assert.equal(elements['map-enter'].disabled, true); assert.equal(elements['map-skip'].hidden, false);
     elements['map-enter'].dispatchEvent(new Event('click')); assert.equal(navigations.length, 2);
@@ -98,16 +113,36 @@ test('actual map entry handles pending loading, selection, arrival, reduced moti
     assert.equal(navigations.length, 2, 'switching experiences at the same node never enters automatically');
     elements['map-enter'].click(); assert.equal(navigations.at(-1), './guaira-subida.html');
     win.dispatchEvent(new Event('pagehide'));
+    // A full reload and a bfcache return to Casa expose the same explicit action.
+    const beforeMayor = navigations.length;
+    const disposeReload = module.startGuairaMap(); await ready(); frames(2);
+    assert.equal(elements['map-return'].hidden, false); assert.equal(navigations.length, beforeMayor);
+    elements['map-enter'].click(); assert.equal(navigations.at(-1), './guaira-prefeito.html');
+    elements['map-enter'].dispatchEvent(new Event('click')); elements['map-return'].dispatchEvent(new Event('click'));
+    assert.equal(navigations.length, beforeMayor + 1, 'closing prevents repeated context navigation');
+    assert.equal(elements['map-enter'].disabled, true); assert.equal(elements['map-return'].hidden, true);
+    disposeReload();
+    motion.matches = true; win.dispatchEvent(pageShow); await ready(); frames(2);
+    assert.equal(elements['map-enter'].disabled, false);
+    elements['map-return'].click(); frames(1);
+    assert.equal(elements['map-skip'].hidden, true); assert.equal(elements['map-return'].hidden, true);
+    assert.equal(elements['map-enter'].attributes['aria-label'], 'Entrar: Curral da Comporta');
+    assert.equal(navigations.length, beforeMayor + 1, 'reduced-motion return never auto-enters the arena');
+    win.dispatchEvent(new Event('pagehide')); motion.matches = false;
     fetchRaw = {}; const dispose = module.startGuairaMap(); await ready(); frames(1);
     assert.equal(elements['map-error'].hidden, false); assert.equal(elements['map-loading-panel'].hidden, true);
     assert.equal(elements['map-enter'].hidden, true); assert.equal(elements['map-overview'].disabled, true);
+    assert.equal(elements['map-return'].hidden, true);
     assert.ok(destinations.every(button => button.hidden)); dispose();
 });
 
 test('loading and failure markup retain direct links to every isolated experiment', () => {
     const html = readFileSync(new URL('../guaira.html', import.meta.url), 'utf8');
-    for (const href of ['./guaira-travessia.html', './guaira-lab.html', './guaira-subida.html']) {
+    for (const href of ['./guaira-travessia.html', './guaira-lab.html', './guaira-subida.html', './guaira-prefeito.html']) {
         assert.equal(html.split(`href="${href}"`).length - 1, 2, `${href} is available during loading and failure`);
     }
     assert.match(html, /id="destination-subida"[^>]*data-map-destination="subida"/);
+    assert.equal((html.match(/id="destination-/g) ?? []).length, 3, 'no fourth global destination');
+    assert.match(html, /id="map-return"[^>]*hidden disabled/);
+    assert.match(html, /id="map-enter"[^>]*aria-describedby="map-description map-status"/);
 });

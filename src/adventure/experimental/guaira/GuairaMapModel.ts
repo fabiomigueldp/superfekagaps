@@ -76,7 +76,9 @@ export class GuairaMapModel {
         return (Object.keys(ARRIVAL_NODES) as GuairaArrival[]).find(at => Math.abs(this.arrivalDistances[at] - this.distance) < 1e-6) ?? null;
     }
     get moving(): boolean { return !this.closed && Math.abs(this.targetDistance - this.distance) > 1e-6; }
-    get canEnter(): boolean { return !this.closed && this.selected !== null && !this.moving; }
+    /** Casa is a contextual experiment entry, never a fourth map destination. */
+    get canEnterMayor(): boolean { return !this.closed && this.selected === null && this.arrival === 'vazao' && !this.moving; }
+    get canEnter(): boolean { return this.canEnterMayor || (!this.closed && this.selected !== null && !this.moving); }
     get point(): GuairaPoint { return this.pointAt(this.distance); }
     pointAt(distance: number): GuairaPoint {
         const d = Math.min(this.length, Math.max(0, distance));
@@ -103,6 +105,10 @@ export class GuairaMapModel {
     }
     skip(): void { if (!this.closed) this.distance = this.targetDistance; }
     setReducedMotion(reduced: boolean): void { this.reducedMotion = reduced; if (reduced) this.skip(); }
-    enterHref(): string | null { return this.canEnter && this.selected ? GUAIRA_DESTINATIONS[this.selected].href : null; }
+    returnToCorral(): void { if (this.canEnterMayor) this.select('curral'); }
+    enterHref(): string | null {
+        if (this.canEnterMayor) return './guaira-prefeito.html';
+        return this.canEnter && this.selected ? GUAIRA_DESTINATIONS[this.selected].href : null;
+    }
     close(): void { this.closed = true; }
 }

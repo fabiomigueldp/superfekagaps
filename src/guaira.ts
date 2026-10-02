@@ -14,6 +14,7 @@ export function startGuairaMap(): () => void {
     const scene = document.querySelector<HTMLElement>('.guaira-scene')!;
     const loading = element('map-loading'), loadingPanel = element('map-loading-panel'), status = element('map-status');
     const enter = element<HTMLButtonElement>('map-enter'), skip = element<HTMLButtonElement>('map-skip');
+    const returnButton = element<HTMLButtonElement>('map-return');
     const overviewButton = element<HTMLButtonElement>('map-overview');
     const destinations = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-map-destination]'));
     const markers = destinations.filter(button => button.classList.contains('guaira-marker'));
@@ -21,6 +22,7 @@ export function startGuairaMap(): () => void {
     const enterArt = new LabToolbarAction(enter, true);
     enterArt.setLabel('ENTRAR', 'Entrar no destino selecionado');
     new LabToolbarAction(skip).setLabel('CHEGAR', 'Chegar agora, pulando a caminhada');
+    new LabToolbarAction(returnButton).setLabel('VOLTAR', 'Voltar ao curral pela estrada');
     const overviewArt = new LabToolbarAction(overviewButton);
     const destinationArt = destinations.map(button => {
         const destination = GUAIRA_DESTINATIONS[button.dataset.mapDestination as GuairaDestination];
@@ -36,21 +38,25 @@ export function startGuairaMap(): () => void {
     const requestFrame = () => { if (!signal.aborted && !frame && !document.hidden) frame = requestAnimationFrame(render); };
     function reflect() {
         if (!model) return;
-        const key = `${model.selected}:${model.moving}:${overview}`;
+        const key = `${model.selected}:${model.arrival}:${model.moving}:${model.closed}:${overview}`;
         if (key === previousState) return;
         previousState = key;
         const atHouse = model.arrival === 'vazao';
         const destination = model.selected ? GUAIRA_DESTINATIONS[model.selected] : atHouse
-            ? { title: 'Casa da Vazão', description: 'Você chegou ao terraço. Escolha uma experiência para voltar pela estrada.' }
+            ? { title: 'Casa da Vazão', description: 'Prefeito: experimento opcional. Entre para testar ou volte ao curral pela estrada.' }
             : { title: 'Passarela dos Arrozais', description: 'A travessia chegou ao arrozal. Escolha o próximo destino.' };
         element('map-title').textContent = destination.title;
         element('map-description').textContent = destination.description;
-        status.textContent = !model.selected ? `Feka está ${atHouse ? 'na casa' : 'nos arrozais'}. Escolha Travessia, Arena ou Subida.`
+        status.textContent = !model.selected ? atHouse ? 'Feka está no terraço. Prefeito entra no experimento; Voltar leva ao curral.'
+            : 'Feka está nos arrozais. Escolha Travessia, Arena ou Subida.'
             : model.moving ? `Feka está a caminho de ${model.selected === 'subida' ? 'seu embarque no curral' : destination.title}.`
             : model.selected === 'subida' ? 'Feka está no curral. Subir inicia a travessia.' : 'Feka chegou. Entre para jogar.';
         enter.disabled = !model.canEnter; skip.hidden = !model.moving;
-        enterArt.setLabel(model.selected ? GUAIRA_DESTINATIONS[model.selected].action : 'ENTRAR',
-            model.selected ? `Entrar: ${destination.title}` : 'Escolha uma experiência para entrar');
+        returnButton.hidden = !model.canEnterMayor;
+        returnButton.disabled = !model.canEnterMayor;
+        enterArt.setLabel(model.canEnterMayor ? 'PREFEITO' : model.selected ? GUAIRA_DESTINATIONS[model.selected].action : 'ENTRAR',
+            model.canEnterMayor ? 'Enfrentar o Prefeito: experimento opcional na Casa da Vazão'
+                : model.selected ? `Entrar: ${destination.title}` : 'Escolha uma experiência para entrar');
         overviewButton.setAttribute('aria-pressed', String(overview));
         overviewArt.setLabel(overview ? 'VER FEKA' : 'VER MAPA', overview ? 'Acompanhar Feka' : 'Ver mapa inteiro');
         for (const { button, art } of destinationArt) {
@@ -91,10 +97,15 @@ export function startGuairaMap(): () => void {
     }
     function select(destination: GuairaDestination) { model?.select(destination); previousTime = 0; reflect(); requestFrame(); }
     for (const button of destinations) button.addEventListener('click', () => select(button.dataset.mapDestination as GuairaDestination), { signal });
+    returnButton.addEventListener('click', () => {
+        if (!model?.canEnterMayor) return;
+        model.returnToCorral(); previousTime = 0; reflect(); requestFrame();
+        destinations.find(button => button.dataset.mapDestination === 'curral' && !markers.includes(button))?.focus();
+    }, { signal });
     skip.addEventListener('click', () => { model?.skip(); camera = null; reflect(); requestFrame(); enter.focus(); }, { signal });
     enter.addEventListener('click', () => {
         const href = model?.enterHref(); if (!href) return;
-        model?.close(); location.assign(href);
+        model?.close(); reflect(); location.assign(href);
     }, { signal });
     overviewButton.addEventListener('click', () => { overview = !overview; reflect(); requestFrame(); }, { signal });
     document.addEventListener('keydown', event => {
@@ -128,7 +139,7 @@ export function startGuairaMap(): () => void {
             loadingPanel.hidden = true; reflect(); resize();
         } catch {
             if (!signal.aborted) { loadingPanel.hidden = true; element('map-error').hidden = false; overviewButton.disabled = true; enter.hidden = true;
-                element('map-title').textContent = 'Guaíra'; element('map-description').textContent = 'A maquete não carregou. Os três experimentos continuam disponíveis acima.';
+                element('map-title').textContent = 'Guaíra'; element('map-description').textContent = 'A maquete não carregou. Os experimentos continuam disponíveis acima.';
                 status.textContent = ''; destinations.forEach(button => { button.hidden = true; }); }
         }
     }
@@ -136,7 +147,7 @@ export function startGuairaMap(): () => void {
     overviewButton.disabled = false; enter.hidden = false; element('map-error').hidden = true;
     loadingPanel.hidden = false; loading.textContent = 'Carregando a maquete…';
     destinations.forEach(button => { button.disabled = true; button.hidden = markers.includes(button); });
-    enter.disabled = true; skip.hidden = true;
+    enter.disabled = true; skip.hidden = true; returnButton.hidden = true; returnButton.disabled = true;
     void load();
     return () => { model?.close(); abort.abort(); cancelAnimationFrame(frame); observer.disconnect(); };
 }

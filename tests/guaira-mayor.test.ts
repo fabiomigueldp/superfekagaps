@@ -7,6 +7,7 @@ import { STAGES, ISLANDS } from '../src/adventure/campaign';
 import { GuairaMayorLab, guairaMayorStage } from '../src/adventure/experimental/guaira/GuairaMayorLab';
 import { GuairaMayorModel, MAYOR_ARENA as A, MAYOR_RULES as R } from '../src/adventure/experimental/guaira/GuairaMayorModel';
 import { guairaMayorBrowser } from './helpers/guairaMayorHarness';
+import { GuairaMapModel, guairaArrivalFromSearch, parseGuairaMetadata } from '../src/adventure/experimental/guaira/GuairaMapModel';
 import recording from './helpers/guairaMayorReplay.json';
 
 const snapshot = (g: GuairaMayorLab) => structuredClone({ player: g.player.data, mayor: g.mayor,
@@ -242,7 +243,7 @@ test('reduced motion preserves the winning route and suppresses cosmetic impacts
     assert.equal(g.store.save.preferences.shake, false); replay(h, g); g.render();
 });
 
-test('dedicated entry has accessible pause/retry/map controls and retry clears the encounter', async t => {
+test('dedicated entry has accessible controls, paused return offers an explicit Casa action and retry clears the encounter', async t => {
     const h = guairaMayorBrowser(t); await import('../src/guaira-prefeito');
     const g = h.window.worldGame as GuairaMayorLab;
     assert.equal(h.pause.getAttribute('aria-label'), 'Pausar'); assert.equal(h.retry.getAttribute('aria-label'), 'Tentar novamente');
@@ -255,6 +256,13 @@ test('dedicated entry has accessible pause/retry/map controls and retry clears t
     const html = readFileSync(new URL('../guaira-prefeito.html', import.meta.url), 'utf8');
     assert.match(html, /id="lab-exit" href="\.\/guaira.html\?at=vazao"/);
     h.pause.dispatch('click'); h.frame(); assert.equal(g.state, 'paused');
+    assert.equal(h.exit.dispatch('click'), false, 'pause never intercepts the native map link');
+    const returnHref = html.match(/id="lab-exit" href="([^"]+)"/)![1];
+    const meta = parseGuairaMetadata(JSON.parse(readFileSync(new URL('../public/assets/world/experimental/guaira/guaira-diorama.meta.json', import.meta.url), 'utf8')))!;
+    const map = new GuairaMapModel(meta, guairaArrivalFromSearch(new URL(returnHref, 'https://example.test/').search));
+    assert.equal(map.arrival, 'vazao'); assert.equal(map.selected, null); assert.equal(map.moving, false);
+    assert.equal(map.enterHref(), './guaira-prefeito.html', 'the paused exit returns to Casa with a separate optional entry');
+    assert.equal(g.state, 'paused', 'reading the return action does not resume the lab');
     const old = g.player; h.retry.dispatch('click'); assert.equal(g.state, 'playing');
     assert.notEqual(g.player, old); assert.equal(g.mayor.state, 'intro'); assert.equal(g.mayor.sealsRemaining, 3);
     assert.equal(h.canvas.focused, true); assert.equal(g.elapsed, 0); assert.equal(g.player.data.hasHelmet, true);

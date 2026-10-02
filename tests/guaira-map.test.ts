@@ -70,7 +70,7 @@ test('leaving while moving prevents subsequent animation, skip, selection or ent
     const point = model.point; model.close(); model.tick(1); model.skip(); model.select('town');
     assert.deepEqual(model.point, point); assert.equal(model.enterHref(), null); assert.equal(model.moving, false);
 });
-test('return URLs include neutral vazao and never accept arbitrary destinations', () => {
+test('return URLs include contextual vazao and never accept arbitrary destinations', () => {
     for (const at of ['town', 'rice', 'corral', 'vazao'] as const) {
         assert.equal(guairaArrivalFromSearch(`?at=${at}`), at); assert.equal(guairaReturnHref(at), `./guaira.html?at=${at}`);
     }
@@ -133,12 +133,12 @@ test('arena and ascent share the curral distance while retaining distinct action
     assert.notEqual(GUAIRA_DESTINATIONS.curral.action, GUAIRA_DESTINATIONS.subida.action);
     model.select('curral'); assert.equal(model.enterHref(), './guaira-lab.html');
 });
-test('house arrival is neutral and returns over the exact final canonical segment in reverse', () => {
+test('house arrival offers an explicit optional encounter and returns over the exact final canonical segment in reverse', () => {
     const model = new GuairaMapModel(metadata, 'vazao');
     assert.equal(model.selected, null); assert.equal(model.arrival, 'vazao');
     assert.deepEqual(model.point, metadata.nodes['guaira-5']);
-    assert.equal(model.enterHref(), null); assert.equal(model.moving, false);
-    model.select('curral'); assert.equal(model.enterHref(), null);
+    assert.equal(model.canEnterMayor, true); assert.equal(model.enterHref(), './guaira-prefeito.html'); assert.equal(model.moving, false);
+    model.returnToCorral(); assert.equal(model.canEnterMayor, false); assert.equal(model.enterHref(), null);
     assert.equal(model.targetDistance, model.arrivalDistances.corral);
     const finalRoute = metadata.routes['3:4'];
     assert.deepEqual(model.path.slice(-finalRoute.length), finalRoute);
@@ -148,4 +148,33 @@ test('house arrival is neutral and returns over the exact final canonical segmen
     finish(model); assert.deepEqual(model.point, metadata.nodes['guaira-4']);
     assert.equal(model.arrival, 'corral'); assert.equal(model.enterHref(), './guaira-subida.html');
     model.select('town'); finish(model); assert.deepEqual(model.point, metadata.nodes['guaira-1']);
+});
+
+test('Casa action cannot survive a departure selection, reversal, skip, reduced motion or closing', () => {
+    for (const selected of ['town', 'curral', 'subida'] as const) {
+        const model = new GuairaMapModel(metadata, 'vazao');
+        model.select(selected);
+        assert.equal(model.arrival, 'vazao', 'selection precedes the first animation frame');
+        assert.equal(model.canEnterMayor, false); assert.equal(model.enterHref(), null);
+        model.returnToCorral(); assert.equal(model.selected, selected, 'stale contextual return cannot override the chosen departure');
+        model.tick(.05); const distance = model.distance;
+        model.select('town'); model.select('subida');
+        assert.equal(model.distance, distance, 'changes do not teleport');
+        model.skip(); assert.equal(model.enterHref(), './guaira-subida.html');
+        model.select('town'); model.tick(.05); model.select('curral');
+        const reversal = model.distance; model.tick(.05); assert.ok(model.distance > reversal);
+        model.setReducedMotion(true); assert.equal(model.enterHref(), './guaira-lab.html');
+        assert.equal(model.canEnterMayor, false);
+    }
+    const reduced = new GuairaMapModel(metadata, 'vazao'); reduced.setReducedMotion(true);
+    assert.equal(reduced.enterHref(), './guaira-prefeito.html'); reduced.returnToCorral();
+    assert.equal(reduced.moving, false); assert.equal(reduced.arrival, 'corral'); assert.equal(reduced.enterHref(), './guaira-lab.html');
+    const closed = new GuairaMapModel(metadata, 'vazao'); closed.close(); closed.returnToCorral();
+    assert.equal(closed.canEnterMayor, false); assert.equal(closed.canEnter, false); assert.equal(closed.enterHref(), null);
+    assert.equal(closed.selected, null);
+    for (const arrival of ['town', 'rice', 'corral'] as const) {
+        const model = new GuairaMapModel(metadata, arrival); const before = model.selected;
+        model.returnToCorral(); assert.equal(model.selected, before); assert.equal(model.canEnterMayor, false);
+        assert.notEqual(model.enterHref(), './guaira-prefeito.html');
+    }
 });

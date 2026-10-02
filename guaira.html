@@ -26,11 +26,11 @@
     <p class="guaira-caption">A água tem dono. Por enquanto.</p>
     <div id="map-error" hidden>
       <p role="alert">Não foi possível carregar a maquete. Você pode entrar direto em um dos experimentos.</p>
-      <nav aria-label="Experimentos disponíveis"><a href="./guaira-travessia.html">Jogar travessia</a><a href="./guaira-lab.html">Jogar arena</a><a href="./guaira-subida.html">Subida à Casa</a></nav>
+      <nav aria-label="Experimentos disponíveis"><a href="./guaira-travessia.html">Jogar travessia</a><a href="./guaira-lab.html">Jogar arena</a><a href="./guaira-subida.html">Subida à Casa</a><a href="./guaira-prefeito.html">Prefeito · experimento opcional</a></nav>
       <a href="./guaira.html">Tentar carregar o mapa de novo</a>
     </div>
     <div id="map-loading-panel"><p id="map-loading" role="status">Carregando a maquete…</p>
-      <nav aria-label="Entrar direto enquanto a maquete carrega"><a href="./guaira-travessia.html">Jogar travessia</a><a href="./guaira-lab.html">Jogar arena</a><a href="./guaira-subida.html">Subida à Casa</a></nav>
+      <nav aria-label="Entrar direto enquanto a maquete carrega"><a href="./guaira-travessia.html">Jogar travessia</a><a href="./guaira-lab.html">Jogar arena</a><a href="./guaira-subida.html">Subida à Casa</a><a href="./guaira-prefeito.html">Prefeito · experimento opcional</a></nav>
     </div>
   </section>
   <footer class="guaira-panel">
@@ -46,7 +46,8 @@
     </div>
     <div class="guaira-actions">
       <button id="map-skip" type="button" hidden>Chegar agora</button>
-      <button id="map-enter" type="button" disabled>Entrar</button>
+      <button id="map-return" type="button" hidden disabled>Voltar ao curral pela estrada</button>
+      <button id="map-enter" type="button" aria-describedby="map-description map-status" disabled>Entrar</button>
     </div>
     <p id="map-instructions">Escolha e entre ao chegar. ← Travessia · → Arena · ↑ Subida · Tab navega pelos controles.</p>
   </footer>
