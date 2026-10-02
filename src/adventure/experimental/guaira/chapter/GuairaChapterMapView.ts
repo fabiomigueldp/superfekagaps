@@ -5,11 +5,16 @@ import type { GuairaArrival, GuairaMetadata } from '../GuairaMapModel';
 import { GUAIRA_WATER_CONTRACT, GuairaWaterMotion, VisibleWaterClock } from '../GuairaWaterMotion';
 import { CHAPTER_SCENES } from './GuairaChapterScenes';
 import { GuairaChapterWater } from './GuairaChapterWater';
+import { publicWaterAudioLevel } from './GuairaChapterAudio';
+import { WorldAmbientAudio } from '../../../WorldAmbientAudio';
+import { GUAIRA_MAP_AUDIO_PACK } from '../../../ArcadeAudioPack';
 import type { GuairaChapterGeneration, GuairaChapterOpening, GuairaChapterSceneId, GuairaChapterSnapshot } from './GuairaChapterSession';
 import { GuairaChapterTravel } from './GuairaChapterTravel';
 import { sameChapterMapTarget, type GuairaChapterMapTarget, type GuairaChapterNavigation } from './GuairaChapterNavigation';
 
 export interface GuairaChapterMapOptions {
+    audioEnabled?: () => boolean;
+    onAudioEnabled?: (enabled: boolean) => void;
     snapshot: GuairaChapterSnapshot;
     navigation: GuairaChapterNavigation;
     arrival: GuairaArrival;
@@ -62,6 +67,8 @@ export class GuairaChapterMapView {
     private readonly plaqueArt = new LabToolbarAction(this.plaque);
     private readonly journey = control('JORNADA', 'Ver a jornada de Guaíra');
     private readonly overview = control('VER MAPA', 'Ver mapa inteiro');
+    private readonly sound = control('SOM', 'Ativar ou desativar o som do capítulo');
+    private readonly ambient = new WorldAmbientAudio(GUAIRA_MAP_AUDIO_PACK, 'accepted-water');
     private readonly exit = control('SAIR', 'Sair do capítulo e voltar à seleção de experimentos');
     private readonly primary = control('ENTRAR', 'Entrar no trecho selecionado', true);
     private readonly skip = control('CHEGAR', 'Chegar agora, pulando a caminhada');
@@ -120,7 +127,7 @@ export class GuairaChapterMapView {
         const identity = element('div', 'chapter-map-identity');
         identity.append(element('h1', 'chapter-map-name', 'GUAÍRA'), this.count);
         const navigation = element('nav', 'chapter-map-navigation'); navigation.setAttribute('aria-label', 'Controles do mapa');
-        navigation.append(this.journey.button, this.overview.button, this.exit.button);
+        navigation.append(this.journey.button, this.overview.button, this.sound.button, this.exit.button);
         this.header.append(identity, navigation);
         this.canvas.setAttribute('role', 'img'); this.canvas.setAttribute('aria-label', 'Maquete de Guaíra com Feka na estrada');
         this.loading.setAttribute('role', 'status'); this.failure.setAttribute('role', 'alert');
@@ -153,8 +160,12 @@ export class GuairaChapterMapView {
         try {
             root.append(this.shell);
             const { signal } = this.lifecycle;
+            this.sound.button.addEventListener('click', () => this.toggleSound(), { signal });
+            this.shell.addEventListener('pointerdown', () => { if (!this.suspended()) this.ambient.unlock(); }, { signal });
             this.dialog.addEventListener('cancel', event => { event.preventDefault(); if (this.windowFocused) this.closeMenu(); }, { signal });
             this.shell.addEventListener('keydown', event => {
+                if (!event.repeat && !event.altKey && !event.ctrlKey && !event.metaKey && event.key?.toLowerCase() === 'm') this.toggleSound();
+                else if (!this.suspended()) this.ambient.unlock();
                 if (event.repeat && ['Enter', ' ', 'Spacebar'].includes(event.key) && (event.target as HTMLElement | null)?.tagName === 'BUTTON') event.preventDefault();
                 if (event.key === 'Escape' && this.menuOpen && this.windowFocused) { event.preventDefault(); this.closeMenu(); }
             }, { signal });
@@ -202,7 +213,7 @@ export class GuairaChapterMapView {
 
     dispose(): void {
         if (this.closed) return;
-        this.closed = true; this.lifecycle.abort(); this.loadAbort?.abort(); this.suspendFrames();
+        this.closed = true; this.lifecycle.abort(); this.loadAbort?.abort(); this.suspendFrames(); this.ambient.dispose();
         this.observer?.disconnect(); this.observer = null; this.travel?.dispose(); this.travel = null;
         this.image = null; this.metadata = null; this.water.dispose();
         this.primary.button.onclick = null; this.skip.button.onclick = null;
@@ -269,7 +280,23 @@ export class GuairaChapterMapView {
         };
     }
 
+    private toggleSound() {
+        if (this.closed || !this.windowFocused || document.hidden) return;
+        this.ambient.enabled = !(this.options.audioEnabled?.() ?? this.ambient.enabled);
+        this.options.onAudioEnabled?.(this.ambient.enabled);
+        this.syncAudio(); this.ambient.unlock(); this.requestFrame();
+    }
+    private syncAudio() {
+        this.ambient.enabled = this.options.audioEnabled?.() ?? this.ambient.enabled;
+        const paused = this.suspended() || this.loadState !== 'ready';
+        this.ambient.pause(paused);
+        const level = paused ? 0 : publicWaterAudioLevel(this.snapshot, this.travel?.point);
+        this.ambient.set(level > 0 ? 'water' : undefined, level);
+        this.sound.button.setAttribute('aria-pressed', String(this.ambient.enabled));
+        this.sound.art.setLabel(this.ambient.enabled ? 'SOM' : 'MUDO', this.ambient.enabled ? 'Desativar o som do capítulo' : 'Ativar o som do capítulo');
+    }
     private reflect() {
+        this.syncAudio();
         const snapshot = this.snapshot, selected = this.selectedPlace(), { target, revision } = this.navigation;
         const optional = target.kind === 'optional';
         const ready = this.loadState === 'ready', moving = this.moving();
@@ -375,6 +402,7 @@ export class GuairaChapterMapView {
         this.reflect(); this.restorePendingFocus(); this.requestFrame();
     }
     private suspendFrames() {
+        this.ambient.pause(true);
         if (this.frame) cancelAnimationFrame(this.frame);
         this.frame = 0; this.previousTime = 0; this.waterClock.suspend();
     }
@@ -395,6 +423,7 @@ export class GuairaChapterMapView {
         const dt = this.previousTime ? Math.min(.05, (time - this.previousTime) / 1000) : 1 / 60;
         this.previousTime = time;
         if (this.walkRequested) this.travel.tick(dt);
+        this.syncAudio();
         const target = guairaCamera(this.metadata, this.width, this.height, this.travel.point, this.overviewActive);
         this.camera = !this.camera || this.motion.matches ? target : approachGuairaCamera(this.camera, target, dt);
         const seconds = this.waterClock.tick(time, this.water.active && !this.motion.matches);

@@ -25,7 +25,7 @@ function harness() {
         camera: { x: 0, y: 64, targetX: 0, targetY: 64, shakeTimer: 0, shakeMagnitude: 0, bounds: { minX: 0, minY: 0, maxX: 320, maxY: 288 } },
         input: { reset() { controls = { ...idle }; }, setMenuMode: noop, update: noop,
             consumeMute: () => false, consumePause: () => false, getState: () => controls },
-        audio: { cancelSpeech: noop, setDying: noop, pause: noop, select: noop, tick: noop, toggle: noop, say: noop, sfx: noop },
+        audio: { cancelSpeech: noop, setDying: noop, pause: noop, select: noop, tick: noop, toggle: noop, say: noop, sfx: noop, ambience: noop },
         renderer: { advanceClock: noop, addImpact: noop } });
     game.load('juice-lab');
     // Recording starts at the same grounded handoff as skipping/completing the intro.

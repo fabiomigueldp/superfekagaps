@@ -118,13 +118,15 @@ export class WorldAudio {
         return !this.disposed && this.ctx && this.effects ? { context: this.ctx, destination: this.effects, enabled: this.enabled } : null;
     }
     volume() { if (this.disposed || !this.ctx)
-        return; if (!this.enabled || this.preferences.effects <= 0) this.samples.cancelEffects(); const now = this.ctx.currentTime; this.music!.gain.setTargetAtTime(this.enabled ? this.preferences.music * .14 * (this.dying ? .15 : 1) : 0, now, .06); this.effects!.gain.setTargetAtTime(this.enabled ? this.preferences.effects * .3 : 0, now, .02); this.voice!.gain.setTargetAtTime(this.enabled ? this.preferences.voice * .22 : 0, now, .02); if (this.clip)
+        return; if (!this.enabled || this.preferences.effects <= 0) { this.samples.cancelEffects(); this.samples.cancelAmbience(); } const now = this.ctx.currentTime; this.music!.gain.setTargetAtTime(this.enabled ? this.preferences.music * .14 * (this.dying ? .15 : 1) : 0, now, .06); this.effects!.gain.setTargetAtTime(this.enabled ? this.preferences.effects * .3 : 0, now, .02); this.voice!.gain.setTargetAtTime(this.enabled ? this.preferences.voice * .22 : 0, now, .02); if (this.clip)
         this.clip.volume = this.enabled ? this.preferences.voice : 0; }
-    setDying(value: boolean) { if (this.disposed) return; this.dying = value; this.volume(); }
+    setDying(value: boolean) { if (this.disposed) return; this.dying = value; if (value) { this.samples.cancelEffects(); this.samples.setAmbience(); } this.volume(); }
+    ambience(kind?: string, level = 1) { if (!this.disposed) this.samples.setAmbience(this.dying ? undefined : kind, level); }
     toggle() { if (this.disposed) return; this.enabled = !this.enabled; this.volume(); }
     select(world: number, boss = false, sceneId?: string) { if (this.disposed) return; this.samples.select(sceneId); for (const release of [...this.musicSources]) release(); this.theme = world === 0 ? 6 : Math.max(0, world - 1); this.boss = boss; this.step = 0; this.next = this.ctx?.currentTime ?? 0; this.cancelSpeech(); }
     pause(value: boolean) { if (this.disposed) return; this.paused = value; if (value) {
         this.samples.cancelEffects();
+        this.samples.cancelAmbience();
         this.cancelSpeech();
         if (this.ctx)
             try { void this.ctx.suspend().catch(() => {}); } catch { /* Device may have closed. */ }
@@ -174,6 +176,11 @@ export class WorldAudio {
     }
     sfx(kind: string) {
         if (this.disposed || this.paused || !this.enabled || this.preferences.effects <= 0) return;
+        if (kind === 'jet' || kind === 'cannon') { this.samples.cancelEffect('pressure'); this.samples.cancelEffect('warning'); }
+        if (kind === 'pressure' && this.samples.play('pressure', .24)) {
+            this.sfx('warning'); // Audio-only lead-in; the simulation still owns discharge timing.
+            return;
+        }
         if (this.samples.play(kind)) return;
         const combat = combatTones(kind);
         if (combat) {

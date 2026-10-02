@@ -112,6 +112,7 @@ export class GuairaChapterApp {
         node.id = 'guaira-chapter-map'; this.root.append(node);
         document.title = 'Guaíra · Capítulo nesta sessão';
         const options: GuairaChapterMapOptions = {
+            audioEnabled: () => this.audioEnabled, onAudioEnabled: enabled => { this.audioEnabled = enabled; },
             snapshot: this.snapshot, navigation: this.navigation, arrival, walkToSelection, focusAction, openingAvailable: this.openingAvailable,
             onSelect: (target, generation, revision) => {
                 if (!this.currentMapAction(scope, generation, revision)) return;

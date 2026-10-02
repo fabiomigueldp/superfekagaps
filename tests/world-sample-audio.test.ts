@@ -2,6 +2,7 @@ import test, { type TestContext } from 'node:test';
 import assert from 'node:assert/strict';
 import { WorldSampleAudio, type WorldSample, type WorldSamplePack, type WorldSampleRoute } from '../src/adventure/WorldSampleAudio';
 import { WorldAudio } from '../src/adventure/WorldAudio';
+import { WorldAmbientAudio } from '../src/adventure/WorldAmbientAudio';
 
 class Param {
     value = 0;
@@ -146,4 +147,50 @@ test('WorldAudio switches from synthesized music only after decode, preserves bu
     world.pause(false); world.toggle(); const muted = context.nodes.length; world.sfx('jump'); assert.equal(context.nodes.length, muted);
     world.select(0); assert.ok(context.nodes.filter(n => n.loop).every(n => n.disconnected));
     world.dispose(); assert.ok(context.nodes.every(n => n.disconnected)); assert.equal(context.state, 'closed');
+});
+
+test('ambient loops fetch only on a current request; state removal beats late decode and disposal', async t => {
+    const f = fixture(t, { scenes: { test: { effects: {}, ambience: { water: sample('water', { loop: { start: 0, end: 1 } }) } } } });
+    f.audio.select('test'); f.audio.tick(); assert.equal(f.requests.length, 0);
+    f.audio.setAmbience('water', .5); f.audio.tick(); assert.equal(f.requests.length, 1);
+    f.audio.setAmbience(); f.deliver(0); await settle(); f.audio.tick(); assert.equal(f.context.nodes.length, 0);
+    f.audio.setAmbience('water', .5); f.audio.tick();
+    const source = f.context.nodes.find(n => n.loop)!; assert.ok(source);
+    const count = f.context.nodes.length; f.audio.setAmbience('water', .2); f.audio.tick(); assert.equal(f.context.nodes.length, count);
+    f.route.enabled = false; f.audio.tick(); assert.ok(source.disconnected);
+    f.audio.setAmbience(); f.route.enabled = true; f.audio.tick(); assert.equal(f.context.nodes.length, count);
+});
+
+test('map ambience waits for gesture and respects pause/mute without any independent timer', async t => {
+    const net = network(t), original = globalThis.AudioContext;
+    Object.assign(globalThis, { AudioContext: Context });
+    t.after(() => { if (original) globalThis.AudioContext = original; else Reflect.deleteProperty(globalThis, 'AudioContext'); });
+    const bedPack = { scenes: { map: { effects: {}, ambience: { water: sample('water', { loop: { start: 0, end: 1 } }) } } } };
+    const bed = new WorldAmbientAudio(bedPack, 'map'); t.after(() => bed.dispose());
+    bed.set('water'); assert.equal(net.requests.length, 0);
+    bed.unlock(); await settle(); assert.equal(net.requests.length, 1);
+    bed.pause(true); net.deliver(0); await settle();
+    const context = (bed as unknown as { context: Context }).context;
+    assert.equal(context.nodes.filter(n => n.starts.length).length, 0);
+    bed.pause(false); await settle(); assert.equal(context.nodes.filter(n => n.loop && !n.disconnected).length, 1);
+    bed.enabled = false; bed.set('water'); assert.equal(context.nodes.filter(n => n.loop && !n.disconnected).length, 0);
+    bed.dispose(); assert.equal(context.state, 'closed'); assert.ok(context.nodes.every(n => n.disconnected));
+});
+
+test('machine pressure has a cancellable warning lead-in; early discharge stops scheduled pressure', async t => {
+    const net = network(t), original = globalThis.AudioContext;
+    Object.assign(globalThis, { AudioContext: Context });
+    t.after(() => { if (original) globalThis.AudioContext = original; else Reflect.deleteProperty(globalThis, 'AudioContext'); });
+    const machinePack = { scenes: { test: { effects: {
+        warning: [sample('warning', { maxSeconds: .22 })], pressure: [sample('pressure', { maxSeconds: .52 })], jet: [sample('jet')],
+    } } } };
+    const world = new WorldAudio({ music: .5, effects: .6, voice: .7, shake: true }, machinePack);
+    t.after(() => world.dispose()); world.select(3, false, 'test'); world.unlock(); world.tick(16);
+    net.requests.forEach((_, i) => net.deliver(i)); await settle(); world.sfx('pressure');
+    const context = world.getEffectsRoute()!.context as unknown as Context;
+    const sources = context.nodes.filter(n => n.buffer);
+    assert.deepEqual(sources.map(n => n.starts[0]), [.24, 0]);
+    context.currentTime = .1; world.sfx('jet');
+    assert.ok(sources.every(n => n.disconnected && n.stops.includes(undefined)));
+    const active = context.nodes.filter(n => n.buffer && !n.disconnected); assert.equal(active.length, 1); assert.equal(active[0].starts[0], .1);
 });

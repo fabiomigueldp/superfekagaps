@@ -101,7 +101,7 @@ export class JuiceMinibossLab extends WorldGame {
         this.player.data.respawnRevealTimer = 0;
         this.camera.x = 0; this.camera.y = 64;
         this.input.reset(); this.input.setMenuMode(paused);
-        this.audio.select(3, true); this.audio.pause(paused);
+        this.audio.select(3, true, 'juice-lab'); this.audio.pause(paused);
         this.introAudio?.setPaused(paused); this.introAudio?.play('combat'); this.onIntroCue?.('combat');
     }
     private emitIntroCues() {
@@ -168,6 +168,7 @@ export class JuiceMinibossLab extends WorldGame {
         }
         if (this.state === 'map' || this.state === 'title' || this.state === 'intro') { this.load('juice-lab'); return; }
         if (this.boss instanceof LabEncounter && this.boss.phase === 'defeated') {
+            this.audio.ambience();
             this.labMode = 'result';
             // Never call campaign completion with an experimental identifier.
             // Keep pause/mute alive, including after the final stomp.
@@ -185,6 +186,9 @@ export class JuiceMinibossLab extends WorldGame {
             return;
         }
         const model = this.boss instanceof LabEncounter ? this.boss.model : null;
+        this.audio.ambience(model && model.phase !== 'defeated' && !this.player.data.isDead
+            ? model.enraged ? 'juice-enraged' : 'juice' : undefined,
+            model ? Math.max(0, 1 - Math.abs(this.player.data.position.x - model.x) / 320) : 0);
         const before = model?.time;
         super.update(dt);
         // Sound follows simulation events, so pause or hit-stop cannot repeat a cue.
