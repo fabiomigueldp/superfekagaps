@@ -7,6 +7,7 @@ import { GuairaGallery } from '../src/adventure/experimental/guaira/gallery/Guai
 import { CHAPTER_SCENES, loadGuairaChapterScene, type GuairaChapterSceneFactory } from '../src/adventure/experimental/guaira/chapter/GuairaChapterScenes';
 import { loadGuairaChapterExcursion } from '../src/adventure/experimental/guaira/chapter/GuairaChapterExcursions';
 import type { GuairaChapterSceneId } from '../src/adventure/experimental/guaira/chapter/GuairaChapterSession';
+import { hasAcceptedPublicWater } from '../src/adventure/experimental/guaira/chapter/GuairaChapterWater';
 import { chapterExcursionBrowser, chapterRecording, flushChapter } from './helpers/chapterExcursionHarness';
 
 const recordings: Record<GuairaChapterSceneId, string> = {
@@ -79,6 +80,7 @@ for (const [opening, touch] of [['guaira-travessia', false], ['guaira-patio-comp
         assert.equal(relief.finished, true); assert.equal(relief.reliefOpened, routeName === 'maintenance');
         assert.match(h.byId('lab-status').textContent, routeName === 'maintenance' ? /alívio aberto/ : /alívio intacto/);
         assert.deepEqual(app.snapshot, retained, 'Relief success has no required chapter authority');
+        assert.equal(hasAcceptedPublicWater(app.snapshot), false, 'a real optional cap never wets the Bairro');
         h.byId('chapter-map-return').click(); await mapReady(h);
         assert.equal(relief.isDisposed, true);
         assert.equal(gallery.isDisposed, true); assert.equal(app.mode, 'map');
@@ -104,6 +106,7 @@ for (const [opening, touch] of [['guaira-travessia', false], ['guaira-patio-comp
         const completed = app.snapshot;
         assert.equal(completed.chapterComplete, true); assert.equal(completed.accepted.length, 5);
         assert.deepEqual(completed.accepted.map(receipt => receipt.sceneId), route);
+        assert.equal(hasAcceptedPublicWater(completed), true, 'the actual five-scene host journey owns accepted public water');
         choose(h, optionalName); arrive(h);
         h.button('Entrar na Galeria dos Remendos, percurso opcional').click(); await flushChapter();
         const finalGallery = activeGame(); assert.ok(finalGallery instanceof GuairaGallery);
@@ -115,6 +118,7 @@ for (const [opening, touch] of [['guaira-travessia', false], ['guaira-patio-comp
         h.play(finalRelief, { runs: reliefRecordings[finalRoute] as Array<[number, string[]]> }, touch); h.frames();
         assert.equal(finalRelief.finished, true); assert.equal(finalRelief.reliefOpened, finalRoute === 'maintenance');
         assert.deepEqual(app.snapshot, completed, 'Both optional native finishes preserve 5/5');
+        assert.equal(hasAcceptedPublicWater(app.snapshot), true, 'later optional visits retain the real accepted Prefeito receipt');
         h.byId('chapter-map-return').click(); await mapReady(h);
         assert.equal(finalRelief.isDisposed, true); assert.deepEqual(app.snapshot, completed);
         completed.accepted.forEach((receipt, index) => assert.equal(app.snapshot.accepted[index], receipt));

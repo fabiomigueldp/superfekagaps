@@ -4,6 +4,7 @@ import test, { type TestContext } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { transpileModule, ModuleKind, ScriptTarget } from 'typescript';
 import { GuairaChapterApp, type GuairaChapterAppDependencies, type GuairaChapterMapPort } from '../src/adventure/experimental/guaira/chapter/GuairaChapterApp';
+import { hasAcceptedPublicWater } from '../src/adventure/experimental/guaira/chapter/GuairaChapterWater';
 import { GuairaChapterMapView, type GuairaChapterMapOptions } from '../src/adventure/experimental/guaira/chapter/GuairaChapterMapView';
 import { loadGuairaChapterScene, type GuairaChapterSceneFactory, type GuairaChapterRuntime } from '../src/adventure/experimental/guaira/chapter/GuairaChapterScenes';
 import { type GuairaChapterSnapshot, type GuairaChapterSceneId } from '../src/adventure/experimental/guaira/chapter/GuairaChapterSession';
@@ -231,6 +232,7 @@ test('all six real scene factories are owned once; host acceptance uses live sam
         assert.equal(h.contexts.filter(context => context.state !== 'closed').length, 0);
     }
     assert.equal(app.snapshot.chapterComplete, true); assert.equal(app.snapshot.accepted.length, 5);
+    assert.equal(hasAcceptedPublicWater(app.snapshot), true);
     const receipts = app.snapshot.accepted; const last = h.currentMap(); last.options.onSelect({ kind: 'chapter', sceneId: 'guaira-prefeito' }, last.snapshot.generation, last.navigation.revision);
     h.enter(); await flush(); assert.equal(app.snapshot.accepted.length, 5);
     h.byId('chapter-map-return').click(); assert.deepEqual(app.snapshot.accepted, receipts);
@@ -258,6 +260,7 @@ test('actual entrypoint pagehide/bfcache remount and reload reset the session an
     h.window.dispatch('pageshow', { persisted: true }); const restored = h.apps.at(-1)!;
     assert.notEqual(restored.snapshot.generation.sessionId, firstSession); assert.equal(restored.snapshot.accepted.length, 0);
     assert.equal(restored.snapshot.activeAttempt, null); assert.equal(restored.mode, 'map');
+    assert.equal(hasAcceptedPublicWater(first.snapshot), false); assert.equal(hasAcceptedPublicWater(restored.snapshot), false);
     h.window.dispatch('pageshow', { persisted: true }); const twiceRestored = h.apps.at(-1)!;
     assert.equal(restored.isDisposed, true, 'Even duplicate restoration retires the previous owner');
     assert.notEqual(twiceRestored, restored); assert.equal(twiceRestored.snapshot.accepted.length, 0);
@@ -269,6 +272,7 @@ test('actual entrypoint pagehide/bfcache remount and reload reset the session an
     for (const item of [...h.window.listeners]) if (['pagehide', 'pageshow'].includes(item.type)) h.window.removeEventListener(item.type, item.callback, item.capture);
     entry(); const reloaded = h.apps.at(-1)!; assert.notEqual(reloaded.snapshot.generation.sessionId, beforeReload);
     assert.equal(reloaded.snapshot.accepted.length, 0); assert.equal(reloaded.snapshot.opening, 'guaira-travessia');
+    assert.equal(hasAcceptedPublicWater(reloaded.snapshot), false);
     reloaded.dispose();
     for (const item of [...h.window.listeners]) if (['pagehide', 'pageshow'].includes(item.type)) h.window.removeEventListener(item.type, item.callback, item.capture);
     h.checkDisposed();

@@ -142,3 +142,12 @@ Validation for this revision:
 Browser replay drives the existing InputState through the mounted game; it is
 not a physical keyboard/touch test, a human playtest, an auditory review or a
 frame-rate benchmark. No deployment or campaign promotion was performed.
+
+The delivery branch was subsequently reconciled with main `bc431d5` (Bairro
+post-victory water). That commit has no file overlap with this change. On the
+reconciled base, `npm run check` passed 1,253 TypeScript tests, three server
+tests, validation, type checks and build; output is 40,575,243 bytes. The mounted
+Chromium replay was repeated with the same victory, hit frames, 62 active-jet
+frames, unchanged storage and no browser errors. The original authoring commit
+and the incoming main commit remain in history; integration should use the
+three-file Turbosuco delta against `bc431d5`.

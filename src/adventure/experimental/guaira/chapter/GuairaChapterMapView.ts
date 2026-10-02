@@ -4,6 +4,7 @@ import { loadGuairaScene } from '../GuairaMapLoader';
 import type { GuairaArrival, GuairaMetadata } from '../GuairaMapModel';
 import { GUAIRA_WATER_CONTRACT, GuairaWaterMotion, VisibleWaterClock } from '../GuairaWaterMotion';
 import { CHAPTER_SCENES } from './GuairaChapterScenes';
+import { GuairaChapterWater } from './GuairaChapterWater';
 import type { GuairaChapterGeneration, GuairaChapterOpening, GuairaChapterSceneId, GuairaChapterSnapshot } from './GuairaChapterSession';
 import { GuairaChapterTravel } from './GuairaChapterTravel';
 import { sameChapterMapTarget, type GuairaChapterMapTarget, type GuairaChapterNavigation } from './GuairaChapterNavigation';
@@ -96,7 +97,7 @@ export class GuairaChapterMapView {
     private metadata: GuairaMetadata | null = null;
     private image: HTMLImageElement | null = null;
     private context: CanvasRenderingContext2D | null = null;
-    private water: GuairaWaterMotion | undefined;
+    private readonly water = new GuairaChapterWater();
     private camera: GuairaCamera | null = null;
     private paintedCamera: GuairaCamera | null = null;
     private paintedDistance = -1;
@@ -110,7 +111,7 @@ export class GuairaChapterMapView {
     private presentationKey = '';
 
     constructor(root: HTMLElement, private readonly options: GuairaChapterMapOptions) {
-        this.snapshot = options.snapshot;
+        this.snapshot = options.snapshot; this.water.update(this.snapshot);
         this.navigation = options.navigation;
         this.pendingFocus = options.focusAction ? document.activeElement : undefined;
         this.openingAvailable = options.openingAvailable ?? (options.snapshot.generation.generation === 0 && options.snapshot.accepted.length === 0);
@@ -182,7 +183,7 @@ export class GuairaChapterMapView {
         if (this.closed) return;
         if (snapshot.generation.sessionId === this.snapshot.generation.sessionId && snapshot.generation.generation < this.snapshot.generation.generation) return;
         if (navigation.revision < this.navigation.revision) return;
-        this.snapshot = snapshot; this.navigation = navigation; this.openingAvailable = openingAvailable;
+        this.snapshot = snapshot; this.water.update(snapshot); this.navigation = navigation; this.openingAvailable = openingAvailable;
         this.walkRequested = walkToSelection; this.entryRequested = false;
         this.closeMenu(false); this.suspendFrames();
         if (this.travel && walkToSelection && this.targetSelectable(navigation.target)) {
@@ -203,7 +204,7 @@ export class GuairaChapterMapView {
         if (this.closed) return;
         this.closed = true; this.lifecycle.abort(); this.loadAbort?.abort(); this.suspendFrames();
         this.observer?.disconnect(); this.observer = null; this.travel?.dispose(); this.travel = null;
-        this.image = null; this.metadata = null; this.water = undefined;
+        this.image = null; this.metadata = null; this.water.dispose();
         this.primary.button.onclick = null; this.skip.button.onclick = null;
         this.traversal.button.onclick = null; this.junction.button.onclick = null; this.restart.button.onclick = null;
         this.returnToChapter.button.onclick = null; this.optionalButton.onclick = null;
@@ -275,7 +276,7 @@ export class GuairaChapterMapView {
         const canEnter = this.canEnter(target, snapshot.generation, revision);
         const accepted = !optional && snapshot.accepted.some(receipt => receipt.sceneId === snapshot.selectedScene);
         const opening = this.openingAvailable && !snapshot.accepted.length && !snapshot.activeAttempt;
-        const key = `${snapshot.generation.sessionId}:${snapshot.generation.generation}:${revision}:${optional}:${ready}:${this.loadState}:${moving}:${canEnter}:${this.entryRequested}:${this.overviewActive}:${opening}:${snapshot.selectedScene}:${snapshot.accepted.length}`;
+        const key = `${snapshot.generation.sessionId}:${snapshot.generation.generation}:${revision}:${optional}:${ready}:${this.loadState}:${moving}:${canEnter}:${this.entryRequested}:${this.overviewActive}:${opening}:${snapshot.selectedScene}:${snapshot.accepted.length}:${this.water.released}`;
         if (key === this.presentationKey) return; this.presentationKey = key;
         // hidden=true drops focus in real DOM immediately, so capture ownership first.
         const focusedSkip = document.activeElement === this.skip.button;
@@ -290,7 +291,7 @@ export class GuairaChapterMapView {
                 : canEnter ? `Selecionado · Feka ${ARRIVAL_WORDS[selected.arrival]} · pronto para ${accepted ? 'repetir' : 'entrar'}`
                     : `Selecionado: ${selected.title} · caminhe até ${selected.place}`;
         const last = snapshot.accepted[snapshot.accepted.length - 1];
-        this.hint.textContent = snapshot.chapterComplete ? `Água pública liberada · ${snapshot.accepted.length}/${snapshot.route.length} nesta sessão`
+        this.hint.textContent = snapshot.chapterComplete && this.water.released ? `A água voltou. Os gaps continuam. · ${snapshot.accepted.length}/${snapshot.route.length} nesta sessão`
             : last ? `${CHAPTER_SCENES[last.sceneId].title} concluído · ${snapshot.accepted.length}/${snapshot.route.length} nesta sessão`
                 : 'Recarregar recomeça o capítulo';
         this.primary.art.setLabel(optional ? canEnter ? 'GALERIA' : 'CAMINHAR' : canEnter && accepted ? 'REPETIR' : !canEnter && !moving && ready ? 'CAMINHAR' : 'ENTRAR',
@@ -312,8 +313,9 @@ export class GuairaChapterMapView {
         this.loading.hidden = this.loadState !== 'loading'; this.failure.hidden = this.loadState !== 'failed';
         this.plaqueArt.setLabel(selected.short, selected.title);
         this.plaque.hidden = true; this.paintedCamera = null;
-        this.canvas.setAttribute('aria-label', moving ? `Maquete de Guaíra. Feka a caminho de ${selected.place}.`
-            : this.travel?.arrival ? `Maquete de Guaíra. Feka ${ARRIVAL_WORDS[this.travel.arrival]}.` : 'Maquete de Guaíra. Feka na estrada.');
+        this.canvas.setAttribute('aria-label', (moving ? `Maquete de Guaíra. Feka a caminho de ${selected.place}.`
+            : this.travel?.arrival ? `Maquete de Guaíra. Feka ${ARRIVAL_WORDS[this.travel.arrival]}.` : 'Maquete de Guaíra. Feka na estrada.')
+            + (this.water.released && !moving && this.travel?.arrival === 'bairro' ? ' Bica do Bairro com água nesta sessão.' : ''));
         if (!this.suspended() && ((focusedSkip && this.skip.button.hidden) || (focusedReturn && this.returnToChapter.button.hidden))) this.focusMapAction();
     }
 
@@ -395,8 +397,8 @@ export class GuairaChapterMapView {
         if (this.walkRequested) this.travel.tick(dt);
         const target = guairaCamera(this.metadata, this.width, this.height, this.travel.point, this.overviewActive);
         this.camera = !this.camera || this.motion.matches ? target : approachGuairaCamera(this.camera, target, dt);
-        const seconds = this.waterClock.tick(time, !!this.water && !this.motion.matches);
-        const overlay = this.water ? { effect: this.water, seconds } : undefined;
+        const seconds = this.waterClock.tick(time, this.water.active && !this.motion.matches);
+        const overlay = this.water.active ? { effect: this.water, seconds } : undefined;
         const moving = this.moving();
         // A frozen old target is not a walking actor; position still comes from the real road model.
         const actor = { point: this.travel.point, facingLeft: this.travel.facingLeft, reducedMotion: this.motion.matches, moving };
@@ -415,7 +417,7 @@ export class GuairaChapterMapView {
         const plaqueWidth = this.plaque.getBoundingClientRect().width || 150;
         this.plaque.hidden = this.width < 520 || this.height < 250 || point.x < plaqueWidth / 2 + 8 || point.x > this.width - plaqueWidth / 2 - 8 || point.y < 12 || point.y + 68 > this.height;
         this.plaque.style.left = `${point.x}px`; this.plaque.style.top = `${point.y + 16}px`;
-        if (moving || this.camera.x !== target.x || this.camera.y !== target.y || this.camera.imageWidth !== target.imageWidth || (this.water && !this.motion.matches)) this.requestFrame();
+        if (moving || this.camera.x !== target.x || this.camera.y !== target.y || this.camera.imageWidth !== target.imageWidth || (this.water.active && !this.motion.matches)) this.requestFrame();
     };
 
     private async load() {
@@ -446,7 +448,7 @@ export class GuairaChapterMapView {
             const atlas = new Image(); atlas.src = `${ASSET_ROOT}guaira-water-mask.png`; await atlas.decode();
             if (this.closed || abort.signal.aborted || this.loadAbort !== abort || !this.travel) return;
             if (atlas.naturalWidth !== GUAIRA_WATER_CONTRACT.atlasSize[0] || atlas.naturalHeight !== GUAIRA_WATER_CONTRACT.atlasSize[1]) return;
-            this.water = new GuairaWaterMotion(atlas, GUAIRA_WATER_CONTRACT, document.createElement('canvas'));
+            this.water.setIrrigation(new GuairaWaterMotion(atlas, GUAIRA_WATER_CONTRACT, document.createElement('canvas')));
             this.waterClock.suspend(); this.paintedCamera = null; this.requestFrame();
         } catch { /* Water is decoration. A usable diorama remains usable if the mask fails. */ }
     }

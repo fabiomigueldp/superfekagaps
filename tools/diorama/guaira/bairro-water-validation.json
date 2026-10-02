@@ -1,0 +1,134 @@
+{
+  "version": 1,
+  "baselineCommit": "f4106941e97a30e9e8911f30428319d6ddb92635",
+  "scope": "One local dry Bairro receiver and standpipe, actual Blender source; optional wet vector geometry only, no gameplay/progress implementation in art pass",
+  "blender": "4.3.2 Cycles CPU 48 samples, original camera/lights/color management",
+  "art": {
+    "sourceSize": [
+      1920,
+      1200
+    ],
+    "baseEnvelope": [
+      884,
+      566,
+      80,
+      80
+    ],
+    "shadowEdgeFeatherPixels": 6,
+    "sourceChangedPixels": 4676,
+    "sourceChangedBounds": [
+      885,
+      567,
+      78,
+      77
+    ],
+    "sourceChangedPixelsOutsideEnvelope": 0,
+    "sourceAlphaUnchanged": true,
+    "encodedAlphaUnchanged": true,
+    "baselineEncodedBytes": 193260,
+    "encodedBytes": 193538,
+    "encodedDeltaBytes": 278,
+    "encoding": "WebP quality92 method6 exact alpha; unchanged packaging quality",
+    "lossyCodecDriftOutsideEnvelope": {
+      "changedPixels": 141765,
+      "maxChannelDelta": 14,
+      "pixelsAbove4": 7595,
+      "pixelsAbove8": 233,
+      "meanMaximumChannelDelta": 0.13378003133704736,
+      "percentilesMaximumChannelDelta": {
+        "50": 0.0,
+        "90": 0.0,
+        "95": 1.0,
+        "99": 3.0,
+        "99.9": 6.0,
+        "100": 14.0
+      },
+      "nonzeroMeanMaximumChannelDelta": 2.1681867879942156,
+      "explanation": "VP8 lossy re-encoding propagates RGB quantization changes beyond a local master edit. It is codec drift, not source scenery changes. Alpha is exact."
+    },
+    "sha256": "c2079e61d833233b2535f1f036d2e3c9836bfb80448fb73efea1ab2bd3852279",
+    "baselineSha256": "38c1043fbdbd3a7481c4f5ae71f4763031cd4873bd0af22ff4f081efb5503fc3"
+  },
+  "water": {
+    "bounds": [
+      908,
+      597,
+      37,
+      18
+    ],
+    "rawDataBytes": 220,
+    "gzipDataBytes": 153,
+    "visibleBowlRays": 965,
+    "visibleFallRays": 69,
+    "blockedWaterRays": 0,
+    "clipInsetSourcePixels": 1,
+    "runtimeExtraTextureCount": 0,
+    "scratchCanvasCount": 0,
+    "protectedSceneryOcclusions": 0,
+    "groundSupportProbes": 9
+  },
+  "nativeActorAudit": {
+    "exactStructure": {
+      "walk": true,
+      "water": true,
+      "camera": true,
+      "lights": true
+    },
+    "exactNavigation": {
+      "camera": true,
+      "nodes": true,
+      "routes": true,
+      "worldRoutes": true,
+      "routeWidth": true,
+      "futureBossArea": true
+    },
+    "walkMeshCount": 16,
+    "waterMeshCount": 9,
+    "nativeFrames": 7,
+    "opaqueUnion": 317,
+    "routeSamples": 203,
+    "supportProbes": 609,
+    "method": "Evaluated Blender geometry with Blender loop triangulation; both-facing native opaque-pixel union, 5 subpixel rays per pixel; full-body and face included",
+    "opaquePixelRays": 643510
+  },
+  "inheritedContacts": {
+    "count": 6962,
+    "rows": {
+      "25": 5239,
+      "23": 415,
+      "24": 1308
+    },
+    "unsupportedSupportProbes": 2,
+    "explanation": "6,962 preexisting foot/floor contacts in bottom three sprite rows and 2 existing bridge-gap support probes match baseline exactly. No new scenery or head/face/body contact."
+  },
+  "newActorForegroundContacts": 0,
+  "newUnsupportedSupportProbes": 0,
+  "headroomObstructions": 0,
+  "originalScene": {
+    "baselineObjects": 2448,
+    "unchangedOriginalObjects": 2448,
+    "changedOriginalObjects": [],
+    "baselineUsedMaterials": 49,
+    "changedOriginalMaterials": [],
+    "addedObjects": [
+      "Bairro public water buried riser and spout",
+      "Bairro public water buried riser socket",
+      "Bairro public water carved trough",
+      "Bairro public water open outlet throat",
+      "Bairro public water outlet lip",
+      "Bairro public water riser union collar",
+      "Bairro public water SOURCE bowl water",
+      "Bairro public water SOURCE contained fall"
+    ],
+    "addedMaterials": [
+      "Bairro public water carved sandstone",
+      "Bairro public water dry sheltered basin",
+      "Bairro public water joint patina",
+      "Bairro public water spout interior",
+      "Bairro public water water source reference",
+      "Bairro public water weathered bronze"
+    ],
+    "materialScope": "Used original materials; the unreferenced Blender startup Material datablock is not scene scenery and may be dropped by normal saving"
+  },
+  "limitations": "Offline Blender geometry/native-painter art validation only. Real chapter-result lifecycle and browser viewport verification belong to implementation/integration; no campaign suite run."
+}
