@@ -15,6 +15,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.tools.json --noEmit",
     "prebuild": "npm run validate && npm run typecheck",
     "build": "vite build",
+    "size:build": "tsx scripts/check_build_size.ts",
     "preview": "vite preview --host"
   },
   "engines": {

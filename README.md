@@ -31,7 +31,11 @@ O Vite informa a URL local no terminal, normalmente `http://localhost:3000`. Abr
 | `npm run validate` | Valida fases e matrizes de sprites |
 | `npm run typecheck` | Verificação estática de TypeScript |
 | `npm run build` | Executa validação e typecheck, depois gera `dist/` |
+| `npm run size:build` | Confere o orçamento do pacote já gerado e lista os maiores arquivos |
 | `npm run preview` | Serve o build de `dist/` para revisão local |
+
+O [critério do pacote de publicação](docs/build-output.md) preserva os originais
+e omite apenas referências de revisão que não são usadas pelas entradas publicadas.
 
 ### Editor de mundos
 

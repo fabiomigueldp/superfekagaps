@@ -15,3 +15,13 @@ The toolbar uses native buttons/links containing the existing 44px bitmap action
 Verification: `tests/guaira-traversal.test.ts` exercises a frozen keyboard replay through real Input, Player, WorldObjects and WorldGame, checkpoint and death recovery, failed puzzle bypass, pause/visibility, touch, toolbar navigation and campaign/storage isolation. The browser harness substitutes DOM boundaries only. An actual offline Canvas replay is a rendering proof, not a browser capture; proof media lives outside the repository.
 
 O ponto seguro pertence somente à tentativa aberta. A mensagem efêmera é **PONTO SEGURO NESTA TENTATIVA**; os status locais explicam que sair e reentrar inicia outra tentativa. A campanha continua usando sua mensagem e persistência anteriores. Isso altera apenas feedback textual, não posição, capacete, moedas, física ou restauração.
+
+## Movimento decorativo da travessia
+
+O moinho mantém torre/eixo firmes e constrói suas pás no grid nativo ao longo da rotação. Os dois trabalhadores usam sete poses desenhadas, com pés fixos, trabalho curto de braços/ferramentas e reação ao estado real da comporta. As poses são obtidas diretamente de válvula e altura da ponte; um checkpoint restaurado não depende de um evento de abertura antigo. Eles continuam cenários sem colisão, ataque, comando obrigatório ou diálogo novo.
+
+Reflexos ficam recortados no canal, no interior dos arrozais, na queda e no pool existente. O bairro recebe fluxo à esquerda, os arrozais à direita e a queda para baixo. Os períodos de repetição coincidem com o espaçamento dos reflexos, evitando recuos no fim do ciclo. O pool conserva sua linha e cor originais e diverge do centro da queda. Os reflexos do arroz são pintados antes das folhas; Feka permanece na frente da camada de objetos.
+
+Os dois módulos visuais recebem somente tempo e estado do jogo, sem timers, RAF, armazenamento ou alteração de mecanismo. Pausa conserva o tempo; movimento reduzido mantém poses estáveis para o estado atual. Tiles, suporte, ponte, placa, risco, câmera, controles e coleta permanecem sob as mesmas autoridades do motor.
+
+`tests/guaira-vitality.test.ts` cobre pés/envelope, estados estáticos, moinho/eixo, ausência de água decorativa quando seca, clips e continuidade dos quatro fluxos. O replay de 585 quadros foi comparado antes/depois, incluindo Player, corpos, tempo, resultado, checkpoint, moedas e IDs coletados em cada quadro; o digest foi idêntico e cada render preservou a simulação. As provas visuais combinadas são Canvas offline, sem alegação de FPS ou substituição de QA em navegador.

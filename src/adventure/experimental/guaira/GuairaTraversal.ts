@@ -44,7 +44,7 @@ export class GuairaTraversal extends WorldGame {
     finished = false;
     constructor(canvas: HTMLCanvasElement, private readonly status: HTMLElement) {
         super(canvas, true);
-        this.art.background = (c, _island, cx, cy, time) => drawGuairaTraversalBackground(c, cx, cy, time, this.reducedMotion);
+        this.art.background = (c, _island, cx, cy, time) => drawGuairaTraversalBackground(c, cx, cy, time, this.reducedMotion, !!this.objects.get(GUAIRA_TRAVERSAL.bridgeId)?.active);
         this.art.terrain = (c, level, _island, cx, cy, time) => drawGuairaTraversalTerrain(c, level, cx, cy, time, this.reducedMotion);
         this.art.objects = (c, objects, cx, cy, time) => drawGuairaTraversalObjects(c, objects, cx, cy, time, this.reducedMotion);
         this.store.save.preferences.shake = !this.reducedMotion;
