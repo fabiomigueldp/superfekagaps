@@ -44,3 +44,39 @@ test('presentation tap is buffered through the short prompt settling window', ()
     for(let i=0;i<10;i++) d.advance(16);
     assert.equal(d.beat,'reveal');
 });
+
+for (const dt of [1000 / 60, 1000 / 30, 100]) test(`a single late shove tap survives prompt settling at dt=${dt}`, () => {
+    const d = new JuiceIntroDirector();
+    while (d.beat !== 'push') d.advance(dt, { right: true });
+    while (d.elapsedMs <= 450) d.advance(dt);
+    d.advance(dt, { presentPressed: true });
+    for (let elapsed = 0; elapsed < 500; elapsed += dt) d.advance(dt);
+    assert.equal(d.beat, 'reveal', 'no second tap needed after the escort lets go');
+});
+
+test('an early shove tap does not auto-present after reaching the mark', () => {
+    const d = new JuiceIntroDirector();
+    while (d.beat !== 'push') d.advance(50, { right: true });
+    d.advance(50, { presentPressed: true });
+    for (let i = 0; i < 40; i++) d.advance(50);
+    assert.equal(d.beat, 'prepare');
+});
+
+test('judge punchline precedes one laugh, with a caption-free beat before the second judge', () => {
+    const d = new JuiceIntroDirector();
+    while (d.beat !== 'judges') d.advance(50, { right: true, presentPressed: true });
+    assert.equal(d.frame.subtitle?.text, 'Isso é pose ou intervalo?');
+    assert.ok(!d.drainCues().includes('laugh'), 'no laugh on the cut to the judge');
+    for (let i = 0; i < 27; i++) d.advance(50);
+    assert.deepEqual(d.drainCues(), []);
+    d.advance(50);
+    assert.deepEqual(d.drainCues(), ['laugh']);
+    while (d.elapsedMs < 2250) d.advance(50);
+    assert.equal(d.frame.subtitle, null);
+    while (d.elapsedMs < 2500) d.advance(50);
+    assert.equal(d.frame.subtitle, null);
+    d.advance(50);
+    assert.deepEqual(d.frame.subtitle, { speaker: 'JURADO 2', text: 'Nota: falta preencher.' });
+    while (d.beat === 'judges') d.advance(50);
+    assert.deepEqual(d.drainCues(), ['boo'], 'laugh cannot repeat or carry into the next beat');
+});
