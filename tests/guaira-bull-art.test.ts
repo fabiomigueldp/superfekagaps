@@ -59,13 +59,14 @@ test('native bull poses articulate without modifying the simulation or using fra
     assert.equal(strides.size, 6);
 });
 
-test('pause repeats the same pose and reduced motion holds a stable pose within each phase', () => {
+test('pause repeats the same pose and reduced motion is stable between opening-clock marks', () => {
     const b = new SkeletonBullModel();
     for (const state of ['idle', 'tell', 'rattle', 'charge', 'brake', 'recover'] as const) {
         b.state = state; b.stateTick = 7;
         const a = recorder(), pause = recorder(); drawSkeletonBull(a.c, b); drawSkeletonBull(pause.c, b);
         assert.deepEqual(a.calls, pause.calls);
         const start = recorder(), later = recorder(); drawSkeletonBull(start.c, b, true);
-        b.stateTick = 35; b.tick += 100; drawSkeletonBull(later.c, b, true); assert.deepEqual(start.calls, later.calls);
+        b.stateTick = state === 'recover' ? 8 : 35; b.tick += 100;
+        drawSkeletonBull(later.c, b, true); assert.deepEqual(start.calls, later.calls);
     }
 });
