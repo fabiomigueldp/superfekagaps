@@ -24,7 +24,8 @@ export function startGuairaMap(): () => void {
     const enterArt = new LabToolbarAction(enter, true);
     enterArt.setLabel('ENTRAR', 'Entrar no destino selecionado');
     new LabToolbarAction(skip).setLabel('CHEGAR', 'Chegar agora, pulando a caminhada');
-    new LabToolbarAction(returnButton).setLabel('VOLTAR', 'Voltar ao curral pela estrada');
+    const returnArt = new LabToolbarAction(returnButton);
+    returnArt.setLabel('VOLTAR', 'Voltar ao curral pela estrada');
     const overviewArt = new LabToolbarAction(overviewButton);
     const destinationArt = destinations.map(button => {
         const destination = GUAIRA_DESTINATIONS[button.dataset.mapDestination as GuairaDestination];
@@ -51,8 +52,10 @@ export function startGuairaMap(): () => void {
         element('map-description').textContent = presentation.description;
         status.textContent = presentation.status;
         enter.disabled = !model.canEnter && !model.canWalkToCorral; skip.hidden = !model.moving;
-        returnButton.hidden = !model.canEnterMayor;
-        returnButton.disabled = !model.canEnterMayor;
+        returnButton.hidden = !model.canEnterMayor && !model.canEnterJunction;
+        returnButton.disabled = returnButton.hidden;
+        returnArt.setLabel(model.canEnterJunction ? 'PATIO' : 'VOLTAR', model.canEnterJunction
+            ? 'Pátio das Comportas: explorar o percurso opcional de água' : 'Voltar ao curral pela estrada');
         enterArt.setLabel(presentation.action, presentation.actionName);
         overviewButton.setAttribute('aria-pressed', String(overview));
         overviewArt.setLabel(overview ? 'VER FEKA' : 'VER MAPA', overview ? 'Acompanhar Feka' : 'Ver mapa inteiro');
@@ -116,6 +119,8 @@ export function startGuairaMap(): () => void {
     }
     for (const button of destinations) button.addEventListener('click', () => select(button.dataset.mapDestination as GuairaDestination), { signal });
     returnButton.addEventListener('click', () => {
+        const junctionHref = model?.junctionHref();
+        if (junctionHref) { model?.close(); reflect(); location.assign(junctionHref); return; }
         if (!model?.canEnterMayor) return;
         model.returnToCorral(); clearVisitURL(); previousTime = 0; reflect(); requestFrame();
         destinations.find(button => button.dataset.mapDestination === 'curral' && !markers.includes(button))?.focus();

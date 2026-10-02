@@ -2,7 +2,17 @@
 
 import { InputState } from '../types';
 
-type HeldAction = 'left' | 'right' | 'jump' | 'run' | 'down';
+export type InputAction = 'left' | 'right' | 'jump' | 'run' | 'down';
+type HeldAction = InputAction;
+type ActionOwner = number | symbol;
+
+/** One independent gesture. Release commits a tap; cancel/dispose discard only its pending edges. */
+export interface InputActionSource {
+  press(action: InputAction): void;
+  release(): void;
+  cancel(): void;
+  dispose(): void;
+}
 type HorizontalAction = 'left' | 'right';
 
 const KEY_ACTIONS: Readonly<Record<string, HeldAction>> = {
@@ -42,12 +52,17 @@ export class Input {
   private touchMenuPressed = false;
   // Pending touch edges keep their gesture owner, so cancellation cannot erase
   // keyboard presses or another finger's queued action.
-  private touchOwners = new Map<number, HeldAction | 'menu'>();
-  private pendingTouchJump = new Set<number>();
-  private pendingTouchDown = new Set<number>();
-  private pendingTouchRelease = new Set<number>();
+  private touchOwners = new Map<ActionOwner, HeldAction | 'menu'>();
+  private activeCanvasTouches = new Set<number>();
+  private actionSources = new Map<symbol, (() => void) | undefined>();
+  private pendingSourceTaps = new Map<symbol, HeldAction>();
+  private completedSourceTaps = new Set<HeldAction>();
+  private canvasTouchSuspensions = new Set<symbol>();
+  private pendingTouchJump = new Set<ActionOwner>();
+  private pendingTouchDown = new Set<ActionOwner>();
+  private pendingTouchRelease = new Set<ActionOwner>();
   private completedTouchMenu = false;
-  private pendingTouchMenu = new Set<number>();
+  private pendingTouchMenu = new Set<ActionOwner>();
   private touchMenuAction = false;
   private pendingStart = false;
   private pendingPause = false;
@@ -188,12 +203,13 @@ export class Input {
   }
 
   private handleTouch(event: TouchEvent, cancelled = false): void {
+    if (this.canvasTouchSuspensions.size) return;
     event.preventDefault();
     const canvas = event.currentTarget as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
     if (rect.width <= 0 || rect.height <= 0) return;
-    const owners = new Map<number, HeldAction | 'menu'>();
-    const activeIds = new Set<number>();
+    const owners = new Map([...this.touchOwners].filter(([id]) => typeof id === 'symbol'));
+    const activeIds = new Set<ActionOwner>(owners.keys());
     // Rebuild from remaining fingers. Real Touch objects always have identifiers;
     // the fallback supports older synthetic event adapters.
     for (let i = 0; i < event.touches.length; i++) {
@@ -214,15 +230,22 @@ export class Input {
       } else if (y < 0.2 && x > 0.4 && x < 0.6) action = 'menu';
       if (action) owners.set(touch.identifier ?? i, action);
     }
+    this.activeCanvasTouches = new Set([...activeIds].filter((id): id is number => typeof id === 'number'));
+    const cancelledIds = cancelled ? event.changedTouches
+      ? Array.from(event.changedTouches, touch => touch.identifier)
+      : [...this.touchOwners.keys()].filter(id => typeof id === 'number' && !owners.has(id)) : [];
+    this.applyActionOwners(owners, activeIds, cancelled, cancelledIds);
+  }
+
+  private applyActionOwners(owners: Map<ActionOwner, HeldAction | 'menu'>,
+    activeIds: Set<ActionOwner>, cancelled = false, cancelledIds: ActionOwner[] = []): void {
     if (cancelled) {
-      const ids = event.changedTouches
-        ? Array.from(event.changedTouches, touch => touch.identifier)
-        : [...this.touchOwners.keys()].filter(id => !owners.has(id));
-      for (const id of ids) {
+      for (const id of cancelledIds) {
         this.pendingTouchJump.delete(id);
         this.pendingTouchDown.delete(id);
         this.pendingTouchRelease.delete(id);
         this.pendingTouchMenu.delete(id);
+        if (typeof id === 'symbol') this.pendingSourceTaps.delete(id);
       }
     } else {
       for (const [id, action] of owners) {
@@ -254,8 +277,64 @@ export class Input {
     }
   }
 
+  /** Opt-in controls use the same owned action path as canvas touches, never fake keys. */
+  createActionSource(onReset?: () => void): InputActionSource {
+    const owner = Symbol('input-action');
+    this.actionSources.set(owner, onReset);
+    const change = (action: HeldAction | null, cancelled: boolean): void => {
+      if (!this.actionSources.has(owner)) return;
+      const previous = this.touchOwners.get(owner);
+      if (action === previous || (!action && !previous)) return;
+      const owners = new Map(this.touchOwners);
+      if (action) owners.set(owner, action); else owners.delete(owner);
+      if (action && (action === 'left' || action === 'right' || action === 'run')) this.pendingSourceTaps.set(owner, action);
+      if (!action && !cancelled) {
+        const tap = this.pendingSourceTaps.get(owner);
+        if (tap) this.completedSourceTaps.add(tap);
+        this.pendingSourceTaps.delete(owner);
+      }
+      const active = new Set<ActionOwner>([...this.activeCanvasTouches, ...[...owners.keys()].filter(id => typeof id === 'symbol')]);
+      this.applyActionOwners(owners, active, cancelled, cancelled ? [owner] : []);
+    };
+    return {
+      press: action => {
+        if (this.touchOwners.get(owner) === action) return;
+        if (this.touchOwners.has(owner)) change(null, true);
+        change(action, false);
+      },
+      release: () => change(null, false),
+      cancel: () => change(null, true),
+      dispose: () => { change(null, true); this.actionSources.delete(owner); }
+    };
+  }
+
+  /** Scoped suppression; disposing an optional bar restores legacy canvas controls. */
+  suspendCanvasTouchControls(): () => void {
+    const suspension = Symbol('canvas-touch');
+    this.canvasTouchSuspensions.add(suspension);
+    const canvasIds = [...new Set([...this.activeCanvasTouches, ...this.touchOwners.keys(),
+      ...this.pendingTouchJump, ...this.pendingTouchDown, ...this.pendingTouchRelease, ...this.pendingTouchMenu])]
+      .filter(id => typeof id === 'number');
+    const owners = new Map([...this.touchOwners].filter(([id]) => typeof id === 'symbol'));
+    this.activeCanvasTouches.clear();
+    this.applyActionOwners(owners, new Set(owners.keys()), true, canvasIds);
+    return () => { this.canvasTouchSuspensions.delete(suspension); };
+  }
+
   update(): void {
     this.refreshHeldActions();
+    // External pointer/assistive clicks shorter than a frame retain one movement step.
+    if (this.completedSourceTaps.size || this.pendingSourceTaps.size) {
+      const taps = new Set([...this.completedSourceTaps, ...this.pendingSourceTaps.values()]);
+      const keyboardDirection = [...this.pressedKeys].some(code => KEY_ACTIONS[code] === 'left' || KEY_ACTIONS[code] === 'right');
+      if (!keyboardDirection && !this.state.left && !this.state.right) {
+        this.state.left = taps.has('left') && !taps.has('right');
+        this.state.right = taps.has('right') && !taps.has('left');
+      }
+      this.state.run ||= taps.has('run');
+      this.completedSourceTaps.clear();
+      this.pendingSourceTaps.clear();
+    }
     // A tap shorter than 1/60 s still moves for one simulation step.
     if (this.pendingHorizontal) {
       this.state.left = this.pendingHorizontal === 'left';
@@ -318,6 +397,9 @@ export class Input {
     this.pressedKeys.clear();
     this.touchActions.clear();
     this.touchOwners.clear();
+    this.activeCanvasTouches.clear();
+    this.pendingSourceTaps.clear();
+    this.completedSourceTaps.clear();
     this.pendingTouchJump.clear();
     this.pendingTouchDown.clear();
     this.pendingTouchRelease.clear();
@@ -334,5 +416,7 @@ export class Input {
     this.pendingHorizontal = null;
     this.konamiIndex = 0;
     this.konamiJustTriggered = false;
+    // Invalidates active DOM captures too; an old move/up can never re-arm a reset gesture.
+    for (const notify of [...this.actionSources.values()]) notify?.();
   }
 }

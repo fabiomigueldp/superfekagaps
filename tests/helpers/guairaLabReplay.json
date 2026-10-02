@@ -1,7 +1,7 @@
 {
   "description": "Frozen ordinary keyboard input, real GuairaBullLab constructor, Player and Input; no state mutation during replay.",
   "stepMs": 16.666666666666668,
-  "frames": 1019,
+  "frames": 1065,
   "runs": [
     [
       12,
@@ -238,7 +238,7 @@
       ]
     ],
     [
-      3,
+      22,
       [
         "ShiftLeft"
       ]
@@ -452,7 +452,7 @@
       ]
     ],
     [
-      5,
+      32,
       [
         "ShiftLeft"
       ]
@@ -468,19 +468,19 @@
       "health": 4
     },
     {
-      "frame": 519,
+      "frame": 547,
       "health": 3
     },
     {
-      "frame": 677,
+      "frame": 696,
       "health": 2
     },
     {
-      "frame": 835,
+      "frame": 854,
       "health": 1
     },
     {
-      "frame": 1018,
+      "frame": 1064,
       "health": 0
     }
   ]

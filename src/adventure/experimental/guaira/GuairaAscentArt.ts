@@ -1,6 +1,6 @@
 import { box as r, pixelLine as line, polygon, roof } from '../../WorldPainting';
 import type { WorldLevel, WorldObjects, MovingBody } from '../../WorldPhysics';
-import { ART, hashAt } from '../../../graphics/palette';
+import { ART } from '../../../graphics/palette';
 import { PixelGrid, type PixelFrame, type PixelPalette } from '../../../graphics/pixels';
 import { pixelText } from '../../../graphics/BitmapFont';
 import { isOneWayTile, supportsStanding } from '../../../world/tileRules';
@@ -261,6 +261,33 @@ export function drawGuairaAscentBackground(c: CanvasRenderingContext2D, cx: numb
     });
 }
 
+/** Larger quiet strata give the terrace the same terracotta mass as the diorama. */
+function cutEarth(c: CanvasRenderingContext2D, left: number, right: number, top: number, cx: number, cy: number) {
+    const x = left - cx, y = top - cy, w = right - left;
+    r(c, x, y + 4, w, 400 - top - 4, '#ba8059');
+    const seam = [[0,0],[31,2],[68,1],[105,6],[141,4],[181,10],[222,7],[261,8],[300,4]] as const;
+    for (const [depth, color] of [[22,'#b47754'],[55,'#ab6d50'],[102,'#a7674d'],[160,'#a15f49'],[218,'#975b48']] as const) {
+        if (top + depth > 400) continue;
+        const edge = seam.map(([sx, sy]) => [x + sx, y + depth + sy] as const);
+        polygon(c, [...edge, [x + 300,400 - cy],[x,400 - cy]], color);
+    }
+    // Sloping clay planes cross the tile grid. They end in soft, broken seams;
+    // there are no isolated bright shelves for a player to mistake as support.
+    for (const [dx, depth, span, height] of [[13,34,48,53],[86,41,63,77],[185,32,52,65],
+        [30,121,55,63],[128,151,67,66],[218,117,40,81],[7,209,40,43]] as const) {
+        if (top + depth > 400) continue;
+        polygon(c, [[x + dx,y + depth],[x + dx + span,y + depth + 7],
+            [x + dx + span - 17,y + depth + height],[x + dx + 10,y + depth + height + 9]],
+        depth < 100 ? '#b67753' : '#ab6c50');
+        line(c, x + dx + 4, y + depth + 2, x + dx + span - 10, y + depth + 7, depth < 100 ? '#c18a60' : '#b57b57');
+    }
+    for (const [dx, depth, span] of [[9,12,21],[96,16,16],[193,17,27],[51,47,16],[161,82,23],
+        [14,92,18],[91,135,22],[213,160,14],[51,188,24],[139,229,27]] as const) {
+        r(c, x + dx, y + depth, span, 1, depth < 50 ? '#c99568' : '#bc805b');
+        r(c, x + dx + span - 3, y + depth + 1, 6, 1, '#b87d58');
+    }
+}
+
 /** Only real supporting tiles receive a pale top. One-way recovery steps remain thin boards. */
 export function drawGuairaAscentTerrain(c: CanvasRenderingContext2D, level: WorldLevel, cx: number, cy: number, _time: number, _reducedMotion: boolean) {
     layer(c, cx, cy, (cameraX, cameraY) => {
@@ -278,18 +305,12 @@ export function drawGuairaAscentTerrain(c: CanvasRenderingContext2D, level: Worl
                 r(c, x + 1, y + 2, 1, 5, '#715e4e');
                 continue;
             }
-            const top = !supportsStanding(level.data.tiles[row - 1]?.[col] ?? 0), h = hashAt(col, row, 79), terrace = wy < 304;
+            const top = !supportsStanding(level.data.tiles[row - 1]?.[col] ?? 0), terrace = wy < 304;
             r(c, x, y, 16, 16, terrace ? '#ab805b' : '#aa664b');
             if (top) {
                 r(c, x, y + 3, 16, 13, terrace ? '#bb9467' : '#bd7750');
                 r(c, x, y, 16, 2, terrace ? '#eed4a0' : '#f1c189');
                 r(c, x, y + 2, 16, 2, terrace ? '#d3b27f' : '#d89563');
-            }
-            if (h % 3 !== 0) r(c, x + 2 + h % 5, y + 7 + h % 3, 4 + h % 3, 1, terrace ? '#c39d71' : '#c48357');
-            if (h % 5 === 0) {
-                r(c, x + 2, y + 6, 7, 1, '#8b5b43');
-                r(c, x + 8, y + 7, 1, 4, '#8b5b43');
-                r(c, x + 9, y + 10, 4, 1, '#8b5b43');
             }
             // Retaining edges come from actual neighboring tiles, never from scenic assumptions.
             const left = !supportsStanding(level.data.tiles[row]?.[col - 1] ?? 0), right = !supportsStanding(level.data.tiles[row]?.[col + 1] ?? 0);
@@ -299,6 +320,23 @@ export function drawGuairaAscentTerrain(c: CanvasRenderingContext2D, level: Worl
                 r(c, edge + 1, y + (top ? 4 : 0), 1, top ? 12 : 16, '#c7a47b');
             }
         }
+        // Scenery is clipped to existing solid interiors. Caps, side retainers,
+        // one-way boards and every empty recovery space retain their own pixels.
+        c.save(); c.beginPath();
+        for (let row = startRow; row <= endRow; row++) for (let col = startCol; col <= endCol; col++) {
+            const tile = level.data.tiles[row]?.[col] ?? 0;
+            if (!supportsStanding(tile) || isOneWayTile(tile)) continue;
+            const top = !supportsStanding(level.data.tiles[row - 1]?.[col] ?? 0);
+            const left = !supportsStanding(level.data.tiles[row]?.[col - 1] ?? 0);
+            const right = !supportsStanding(level.data.tiles[row]?.[col + 1] ?? 0);
+            c.rect(level.colToWorldX(col) - cameraX + (left ? 3 : 0), level.rowToWorldY(row) - cameraY + (top ? 4 : 0),
+                16 - (left ? 3 : 0) - (right ? 3 : 0), 16 - (top ? 4 : 0));
+        }
+        c.clip();
+        for (const [left, right, top] of [[0,224,304],[496,656,304],[768,1024,144]]) {
+            if (visible(left, right - left, cameraX)) cutEarth(c, left, right, top, cameraX, cameraY);
+        }
+        c.restore();
     });
 }
 

@@ -1,8 +1,11 @@
+import { fitGuairaLabCanvas } from './guaira-lab-layout';
+import { installGuairaLabControls } from './guaira-lab-controls';
 import { GuairaMayorLab } from './adventure/experimental/guaira/GuairaMayorLab';
 import { LabToolbarAction } from './adventure/experimental/JuiceLabToolbar';
 
 const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
 const game = new GuairaMayorLab(canvas, document.getElementById('lab-status')!);
+const touchControls = installGuairaLabControls(game, canvas, () => game.mayor.publicWaterOpen);
 const pauseButton = document.getElementById('lab-pause')!;
 const mapLink = document.getElementById('lab-exit')!;
 const pauseAction = new LabToolbarAction(pauseButton);
@@ -17,13 +20,9 @@ mapLink.addEventListener('click', () => {
     mapLink.setAttribute('href', game.mapReturnHref);
 });
 
-function fitLab() {
-    const navHeight = document.querySelector('nav')?.getBoundingClientRect().height ?? 100;
-    const scale = Math.max(.5, Math.floor(Math.min(innerWidth / 320, (innerHeight - navHeight - 12) / 180)));
-    document.body.style.paddingTop = `${navHeight}px`;
-    canvas.style.width = `${320 * scale}px`; canvas.style.height = `${180 * scale}px`;
-}
+function fitLab() { fitGuairaLabCanvas(canvas); }
 function syncToolbar() {
+    touchControls.sync();
     const href = game.mapReturnHref;
     if (mapLink.getAttribute('href') !== href) mapLink.setAttribute('href', href);
     pauseAction.setLabel(game.state === 'paused' ? 'CONTINUAR' : 'PAUSA', game.state === 'paused' ? 'Continuar' : 'Pausar');

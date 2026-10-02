@@ -4,6 +4,8 @@ Entrada: `/guaira.html`. A maquete de terra vermelha mantém três destinos perm
 
 O experimento não recebe número de mundo de campanha, não usa `parseMapMetadata`, não importa `WorldGame`, não modifica o atlas de seis mundos e não lê/escreve saves ou placar. A saída pública **Sair** continua apontando para `./`. Nenhum link foi adicionado à campanha. O mapa não altera o servidor Oracle.
 
+No início da estrada, **JOGAR** mantém a Travessia principal. A ação secundária **PATIO** abre `/guaira-patio.html`, o Pátio das Comportas: um segundo percurso opcional de seleção A/B da água. A escolha só fica disponível quando Feka está parado no início, nunca durante caminhada ou em outro marco. Isso reutiliza o espaço da ação contextual, sem acrescentar um quarto destino permanente. O Pátio retorna ao início se interrompido e ao arrozal com `visit=junction-clear` quando concluído; o resumo indica o trecho real, sem afirmar que a Travessia principal também foi feita. Links diretos do Pátio permanecem disponíveis nos painéis de carregamento/falha.
+
 ## Retornos sem save
 
 - `guaira.html?at=town`: Feka na estrada `guaira-1`, pronto para entrar na travessia

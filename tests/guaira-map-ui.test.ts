@@ -155,13 +155,35 @@ test('actual map entry handles pending loading, selection, arrival, reduced moti
 
 test('loading and failure markup retain direct links to every isolated experiment', () => {
     const html = readFileSync(new URL('../guaira.html', import.meta.url), 'utf8');
-    for (const href of ['./guaira-travessia.html', './guaira-lab.html', './guaira-subida.html', './guaira-prefeito.html']) {
+    for (const href of ['./guaira-travessia.html', './guaira-lab.html', './guaira-subida.html', './guaira-prefeito.html', './guaira-patio.html']) {
         assert.equal(html.split(`href="${href}"`).length - 1, 2, `${href} is available during loading and failure`);
     }
     assert.match(html, /id="destination-subida"[^>]*data-map-destination="subida"/);
     assert.equal((html.match(/id="destination-/g) ?? []).length, 3, 'no fourth global destination');
     assert.match(html, /id="map-return"[^>]*hidden disabled/);
     assert.match(html, /id="map-enter"[^>]*aria-describedby="map-description map-status"/);
+});
+
+test('town shows the optional Patio separately from the primary traversal and validates live entry', async () => {
+    const module = await import('../src/guaira');
+    fetchRaw = raw; imageReady = Promise.resolve(); waterReady = Promise.resolve(); waterFailure = true;
+    motion.matches = false; doc.hidden = false;
+    locationMock.search = '?at=town'; locationMock.href = 'https://example.test/guaira.html?at=town';
+    const dispose = module.startGuairaMap(); await ready(); frames(2);
+    assert.equal(elements['map-enter'].attributes['aria-label'], 'Entrar: Estrada do Vento');
+    assert.equal(elements['map-return'].hidden, false);
+    assert.equal(elements['map-return'].attributes['aria-label'], 'Pátio das Comportas: explorar o percurso opcional de água');
+    const before = navigations.length;
+    destinations[1].click();
+    assert.equal(elements['map-return'].hidden, true); assert.equal(elements['map-return'].disabled, true);
+    elements['map-return'].dispatchEvent(new Event('click')); assert.equal(navigations.length, before);
+    frames(2); destinations[0].click(); elements['map-skip'].click();
+    assert.equal(elements['map-return'].disabled, false);
+    elements['map-return'].click(); assert.equal(navigations.at(-1), './guaira-patio.html');
+    elements['map-return'].dispatchEvent(new Event('click'));
+    elements['map-enter'].dispatchEvent(new Event('click'));
+    assert.equal(navigations.length, before + 1, 'closing guards both the primary and optional entries');
+    dispose();
 });
 
 test('water repaints regions at30Hz without idle marker layout, freezes when hidden/reduced, and ignores late disposal', async () => {

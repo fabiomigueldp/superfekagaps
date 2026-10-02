@@ -1,0 +1,53 @@
+/* Screen-space controls, never scaled with the 320×180 game canvas. */
+.guaira-touch-controls {
+    box-sizing: border-box;
+    position: fixed;
+    z-index: 20;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    min-height: 56px;
+    padding: 6px max(6px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
+    border-top: 2px solid #81583f;
+    background: #382b35;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.guaira-touch-controls[hidden] { display: none !important; }
+.guaira-touch-button {
+    box-sizing: border-box;
+    display: inline-flex;
+    flex: 0 0 44px;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    color: #f5efd3;
+    background: #81583f;
+    cursor: pointer;
+    touch-action: none;
+    -webkit-touch-callout: none;
+}
+.guaira-touch-button .lab-action-art { display: block; width: 44px; height: 44px; image-rendering: pixelated; pointer-events: none; }
+.guaira-touch-button .lab-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.guaira-touch-button[data-held] .lab-action-art { transform: translateY(2px); }
+.guaira-touch-button:focus-visible { outline: 2px solid #ffe29a; outline-offset: 2px; }
+.guaira-touch-button:disabled { opacity: .5; cursor: default; }
+@media (forced-colors: active) {
+    .guaira-touch-button { border: 1px solid ButtonText; }
+    .guaira-touch-button .lab-action-art { display: none; }
+    .guaira-touch-button .lab-sr { position: absolute; width: 1px; height: 1px; margin: -1px; clip-path: inset(50%); white-space: nowrap; overflow: hidden; }
+    .guaira-touch-button::after { content: attr(data-symbol); color: ButtonText; font: 700 24px/1 monospace; }
+    .guaira-touch-button:focus-visible { outline-color: Highlight; }
+    .guaira-touch-button[data-held] { border-width: 3px; }
+}

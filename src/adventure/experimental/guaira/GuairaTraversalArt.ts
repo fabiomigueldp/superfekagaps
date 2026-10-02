@@ -1,7 +1,6 @@
 import { drawGuairaWindPump, drawGuairaChannelFlow, drawGuairaRiceFlow, drawGuairaSluiceFlow, drawGuairaPoolFlow } from './GuairaWaterworksArt';
 import { box as r, pixelLine as line, polygon, oval, roof } from '../../WorldPainting';
 import type { WorldLevel, WorldObjects } from '../../WorldPhysics';
-import { hashAt } from '../../../graphics/palette';
 import { drawGuairaWorker } from './GuairaWorkerArt';
 import { supportsStanding } from '../../../world/tileRules';
 
@@ -94,17 +93,58 @@ function house(c: CanvasRenderingContext2D, x: number, floor: number, w: number,
 }
 
 function riceTerrace(c: CanvasRenderingContext2D, x: number, y: number, width: number, row: number, time: number, reducedMotion: boolean, wet: boolean) {
-    r(c, x, y + 5, width, 10, '#8f8e5a');
-    r(c, x + 2, y + 6, width - 4, 6, '#89aa96');
-    r(c, x, y + 13, width, 3, '#a69760');
-    r(c, x + 1, y + 13, width - 2, 1, '#ccb37c');
+    // Shallow flooded beds echo the island's stone borders. Their grey, broken
+    // rims stay softer than the continuous cream edge of real supporting tiles.
+    r(c, x, y + 5, width, 10, '#8c9273');
+    r(c, x + 2, y + 6, width - 4, 6, '#83aaa0');
+    r(c, x + 3, y + 6, width - 6, 1, '#acc3ac');
+    r(c, x, y + 13, width, 3, '#9c987b');
+    for (let xx = 0; xx < width; xx += 19) {
+        const w = Math.min(18, width - xx);
+        r(c, x + xx + 1, y + 12, w - 1, 2, '#b5b19a');
+        r(c, x + xx + 2, y + 12, Math.min(9, w - 2), 1, '#c5c1a7');
+        r(c, x + xx + w - 1, y + 14, 1, 2, '#818c75');
+    }
+    r(c, x, y + 5, 3, 8, '#a9ac92');
+    r(c, x + width - 3, y + 5, 3, 8, '#969e84');
     drawGuairaRiceFlow(c, x, y, width, wet, time, reducedMotion, row);
-    for (let xx = 6; xx < width - 4; xx += 13) {
-        const sway = Math.floor(time / 1000 + (xx + row) / 13) % 3 === 0 ? 1 : 0;
-        line(c, x + xx, y + 10, x + xx - 2 + sway, y, P.leafShade, 2);
-        line(c, x + xx, y + 9, x + xx + 4 + sway, y + 2, P.leaf, 2);
-        line(c, x + xx + 1, y + 8, x + xx + 1, y - 2, P.leafLight);
-        r(c, x + xx + 5, y + 8, 3, 1, '#bad6b5');
+    // Alternating planted clumps leave water between their feet. Neighbouring
+    // beds offset their groups; a single repeating grass glyph cannot emerge.
+    const clumps = [[8, 14, -3], [20, 11, 3], [31, 16, -2], [47, 12, 4]] as const;
+    for (let group = -row * 17; group < width; group += 57) for (const [offset, height, lean] of clumps) {
+        const xx = group + offset;
+        if (xx < 6 || xx > width - 7) continue;
+        const sway = Math.floor(time / 1200 + group / 57 + row) % 4 === 0 ? 1 : 0;
+        const root = y + 10, tip = root - height;
+        r(c, x + xx - 2, root, 6, 2, '#6f9180');
+        polygon(c, [[x + xx - 1,root],[x + xx - 6,tip + 4],[x + xx - 3,tip + 5],[x + xx + 2,root]], '#587c53');
+        polygon(c, [[x + xx,root],[x + xx + lean + sway,tip],[x + xx + lean + 2 + sway,tip + 2],[x + xx + 3,root]], '#799951');
+        polygon(c, [[x + xx + 1,root],[x + xx + 7 + sway,tip + 4],[x + xx + 6,tip + 8],[x + xx + 3,root]], '#6f9251');
+        line(c, x + xx + 1, root - 2, x + xx + lean + 1 + sway, tip + 2, '#a3b56b');
+        line(c, x + xx + 2, root - 3, x + xx + 5 + sway, tip + 6, '#96ab61');
+        r(c, x + xx + 4, root + 1, 3, 1, '#a6c1ab');
+    }
+}
+
+/** Broad clay seams and sloping facets continue across tiles, like the map's cut island. */
+function cutBank(c: CanvasRenderingContext2D, left: number, right: number, cx: number, cy: number, irrigated: boolean) {
+    const x = left - cx, w = right - left;
+    r(c, x, 228 - cy, w, 60, irrigated ? '#b5865f' : '#ba7754');
+    const seam = [[0,0],[29,2],[61,1],[96,5],[131,3],[168,7],[206,4],[243,5],[280,1],[318,3],[359,0]] as const;
+    for (let block = left - 35; block < right; block += 359) {
+        for (const [base, color] of [[241, irrigated ? '#ac7c58' : '#b06a4e'], [267, irrigated ? '#a27454' : '#a76149']] as const) {
+            const edge = seam.map(([sx, sy]) => [block + sx - cx, base + sy - cy] as const);
+            polygon(c, [...edge, [block + 359 - cx, 288 - cy], [block - cx, 288 - cy]], color);
+        }
+        for (const [dx, dy, span] of [[18,247,46],[103,250,58],[234,244,51],[312,252,37]] as const) {
+            polygon(c, [[block + dx - cx,dy - cy],[block + dx + span - cx,dy + 4 - cy],
+                [block + dx + span - 13 - cx,283 - cy],[block + dx + 12 - cx,288 - cy]], irrigated ? '#b2825b' : '#b67150');
+            line(c, block + dx + 5 - cx, dy + 2 - cy, block + dx + span - 8 - cx, dy + 5 - cy, irrigated ? '#bc9167' : '#c08158');
+        }
+        for (const [dx, dy, span] of [[5,235,18],[76,264,23],[181,235,26],[267,276,17],[325,256,15]] as const) {
+            r(c, block + dx - cx, dy - cy, span, 1, irrigated ? '#c3996c' : '#cf9266');
+            r(c, block + dx + span - 5 - cx, dy + 1 - cy, 8, 1, irrigated ? '#b68a60' : '#c48359');
+        }
     }
 }
 
@@ -203,26 +243,34 @@ export function drawGuairaTraversalTerrain(c: CanvasRenderingContext2D, level: W
             const tile = level.data.tiles[row]?.[col];
             if (!supportsStanding(tile ?? 0)) continue;
             const wx = level.colToWorldX(col), wy = level.rowToWorldY(row), x = wx - cameraX, y = wy - cameraY;
-            const top = !supportsStanding(level.data.tiles[row - 1]?.[col] ?? 0), rice = wx >= 624, h = hashAt(col, row, 71);
+            const top = !supportsStanding(level.data.tiles[row - 1]?.[col] ?? 0), rice = wx >= 624;
             r(c, x, y, 16, 16, rice ? '#aa764f' : '#a55f47');
             if (top) {
                 r(c, x, y + 3, 16, 13, rice ? '#b47e52' : P.earth);
                 r(c, x, y, 16, 2, rice ? '#dcc28b' : '#f0be83');
                 r(c, x, y + 2, 16, 2, rice ? '#c8a66d' : '#d8915f');
             }
-            if (h % 3 !== 0) r(c, x + 2 + h % 6, y + 7 + h % 3, 3 + h % 4, 1 + h % 2, rice ? '#bd8b5d' : '#ba7752');
-            if (h % 5 === 0) {
-                r(c, x + 2, y + 6, 8, 1, '#89533f');
-                r(c, x + 8, y + 7, 1, 4, '#89533f');
-                r(c, x + 9, y + 10, 5, 1, '#89533f');
-            }
-            if (h % 4 === 0) r(c, x + 10, y + 12, 3, 2, rice ? '#c3a071' : '#d09666');
             if (col === 25 || col === 39) {
                 const edge = col === 25 ? x + 12 : x;
                 r(c, edge, y + (top ? 4 : 0), 4, top ? 12 : 16, '#765346');
                 r(c, edge + (col === 25 ? 0 : 3), y + (top ? 4 : 0), 1, top ? 12 : 16, '#d2b28a');
             }
         }
+        // Mask the authored geology with the real solid tiles. Preserve every
+        // walkable cap and retaining edge, including changed test geometry.
+        c.save(); c.beginPath();
+        for (let row = startRow; row <= endRow; row++) for (let col = startCol; col <= endCol; col++) {
+            if (!supportsStanding(level.data.tiles[row]?.[col] ?? 0)) continue;
+            const top = !supportsStanding(level.data.tiles[row - 1]?.[col] ?? 0);
+            const left = !supportsStanding(level.data.tiles[row]?.[col - 1] ?? 0);
+            const right = !supportsStanding(level.data.tiles[row]?.[col + 1] ?? 0);
+            c.rect(level.colToWorldX(col) - cameraX + (left ? 4 : 0), level.rowToWorldY(row) - cameraY + (top ? 4 : 0),
+                16 - (left ? 4 : 0) - (right ? 4 : 0), 16 - (top ? 4 : 0));
+        }
+        c.clip();
+        if (visible(0, 416, cameraX)) cutBank(c, 0, 416, cameraX, cameraY, false);
+        if (visible(624, 528, cameraX)) cutBank(c, 624, 1152, cameraX, cameraY, true);
+        c.restore();
     });
 }
 

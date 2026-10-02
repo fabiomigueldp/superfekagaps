@@ -19,3 +19,6 @@ button,a{touch-action:manipulation}.guaira-header button,.guaira-header a,.guair
 @media(max-width:420px) and (max-height:500px){.guaira-destinations{grid-column:1/-1}.guaira-actions{grid-column:2;grid-row:2}.guaira-panel{padding-left:8px;padding-right:8px;gap:5px 8px}}
 /* A short loading/error panel scrolls from its beginning; no links sit above its scroll origin. */
 #map-loading-panel,#map-error{justify-content:flex-start;justify-content:safe center}
+
+/* A short portrait still has room for the objective; reserve the landscape compaction for truly shallow views. */
+@media(min-height:400px) and (max-height:500px) and (orientation:portrait){.guaira-description #map-description{display:block}}

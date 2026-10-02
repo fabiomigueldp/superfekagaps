@@ -15,11 +15,15 @@ The dry red arena has a continuous horizontal floor at world y224, shown at scre
 - Tentar: start a fresh fight with a helmet
 - Mapa: return to the isolated Guaíra map at the corral; its Sair link returns to the existing game home
 
-The ordinary engine touch zones provide movement, jump, run and sentada. Page controls use native buttons/links, accessible names and 44px-high bitmap faces; native Enter/Space activation remains owned by those controls. Blur/hidden-tab pause requires explicit resume. Reduced-motion preference disables camera shake, decorative bull bob/stride and warning flashing; direction cues and combat timing remain visible.
+Touch-capable Pointer Events devices use the local five-button DOM bar, with44CSSpx targets independent of canvas scale; older devices retain the ordinary engine touch zones. Both use the real Input action path. Page controls use native buttons/links, accessible names and44px-high bitmap faces; native Enter/Space activation remains owned by those controls. Blur/hidden-tab pause requires explicit resume. Reduced-motion preference disables camera shake, decorative bull bob/stride and warning flashing; direction cues and combat timing remain visible.
 
 ## Encounter contract
 
 The bull locks direction at the start of a 42-tick charge warning or 48-tick low-bone warning. Each fixed tick is 1/60 second; catch-up is capped at 100ms. Six falling top hits defeat it. Brake/recovery opens the ribs for an ordinary jump or sentada; side contact never damages the boss. The charge's final swept collision is resolved with top contact, so a valid first-braking-frame stomp wins over the residual sweep. A descending player on the trailing swept edge safely bounces but cannot deal damage without touching the present body.
+
+At the start of a charge warning, an aimed route shorter than one bull width (48px) selects the inward direction instead. The complete warning and its painted arrows already show that locked route; it cannot turn after the warning starts. Charge speed, hitboxes and the full 20-tick brake plus 52-tick recovery remain unchanged. This removes zero-distance, one-tick wall charges that previously offered a full opening.
+
+Low bones retain their own player-facing direction, 48-tick warning, 3px/tick speed and two-projectile limit. Their flight duration is locked from the trailing projectile's distance to the announced arena edge, including its width. In the current arena, full-width flights take 100 ticks to the left or 96 to the right; outward corner flights take 16–20 ticks. After the last projectile exits, hazards are cleared and the full 52-tick safe recovery begins. The warning's full-floor range therefore matches the reachable danger. Neither aim nor duration tracks Feka after the warning begins.
 
 Charge stops leave narrow corner room, but low bones reach both edges. Stationary corner camping loses the helmet and then kills Feka. No custom player HP or melee attack exists. On defeat the lab intercepts campaign completion and remains available for pause, retry or exit.
 
@@ -27,7 +31,9 @@ The final edge-despawn bone can still collide over its physically traversed last
 
 ## Verification
 
-`node --import tsx --test tests/guaira-*.test.ts` runs the lab constructor/lifecycle tests and frozen real-input replay. The replay fixture uses ordinary keyboard events through actual Input, Player and WorldGame. It wins in 1,019 frames (about 17 seconds) with all six hits and the helmet intact, exercises charges and bones, repeats deterministically, and changes no campaign completion. Separate tests cover both corners, the first braking frame, both trailing sweep directions, eight normal jump/sentada recovery cases, pause/blur/visibility, native page activation, touch cancellation, helmet/death/retry, reduced motion and victory isolation.
+`node --import tsx --test tests/guaira-*.test.ts` runs the lab constructor/lifecycle tests and frozen real-input replay. The replay fixture uses ordinary keyboard events through actual Input, Player and WorldGame. With the geometric bone flight it wins in 1,065 frames (about 17.75 seconds), compared with the earlier 1,019-frame route. All six hits preserve the helmet, exercise charges and bones, repeat deterministically, and change no campaign completion. The same updated route wins through native touch with and without reduced motion. Separate tests cover both corners, the first braking frame, both trailing sweep directions, eight normal jump/sentada recovery cases, pause/blur/visibility, native page activation, touch cancellation, helmet/death/retry, reduced motion and victory isolation.
+
+`guaira-bull-runway.test.ts` verifies both runway boundaries, the entire locked warning and painted charge envelope, edge-reaching bone flights, and safe native jumps at both corners. A reproducible blind policy (walk right for 100 frames, then jump 24 frames on/24 off without horizontal movement) previously won at frame 1123, receiving three zero-distance charges. The same policy now dies at frame 1397 with one boss health remaining. That measures this specific policy, not every possible stationary strategy. A separate native keyboard/touch route follows the new inward tell and lands a safe recovery hit, including pause/resume during the warning. The existing passive-corner death tests remain unchanged.
 
 Both experimental labs reuse the base pause/resume transition so buffered hit-stop actions cannot leak across toolbar pause. The Turbosuco intro retains presentation cancellation and audio-pause behavior.
 
@@ -50,9 +56,9 @@ tests compare it to every actual body and swept hazard along both directions.
 The bone attack keeps a distinct low-bone mark across the arena. The existing
 top-contact cue remains over the vulnerable ribs.
 
-The actual-engine before/after replay renders all 1,019 frames with an identical
-simulation digest, all six hits and the helmet intact. Corner and recovery tests
-remain unchanged. The comparison movie is offline Canvas output, not browser
+The earlier art-only before/after replay rendered its 1,019 frames with an identical
+simulation digest, all six hits and the helmet intact. Its corner and recovery tests
+were unchanged. That comparison movie is offline Canvas output, not browser
 footage or a claim of human difficulty calibration.
 
 ## Explicit continuation
@@ -61,4 +67,4 @@ After the real final hit, the toolbar offers **SUBIR / TENTAR / MAPA**. SUBIR is
 
 The next step is to inspect the water diversion at Casa da Vazão. The ascent remains freely accessible from the experimental map; this link creates no unlock, shared attempt, campaign registration or saved completion. Tests exercise the final native falling hit and toolbar states; compact compositions use the real renderer and equivalent toolbar drawing, distinct from browser captures.
 
-The map return stays `./guaira.html?at=corral` before defeat. Only the real defeated state adds `&visit=bull-clear`; it survives pause and reports only this encounter’s result. Retry synchronously restores the neutral corral URL before the next frame and invalidates SUBIR. The link also reads the live result at activation. The toolbar regression uses the full existing 1,019-frame native-input victory recording, checks both return states, pause and same-turn retry, and verifies zero storage access. No saved result or unlock is created.
+The map return stays `./guaira.html?at=corral` before defeat. Only the real defeated state adds `&visit=bull-clear`; it survives pause and reports only this encounter’s result. Retry synchronously restores the neutral corral URL before the next frame and invalidates SUBIR. The link also reads the live result at activation. The toolbar regression uses the full 1,065-frame native-input victory recording, checks both return states, pause and same-turn retry, and verifies zero storage access. No saved result or unlock is created.

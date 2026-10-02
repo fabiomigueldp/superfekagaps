@@ -37,6 +37,7 @@ export class Renderer {
   private debug=false;
   private zoom=1;
   private touch=false;
+  private touchControlsVisible=true;
   private interpolationMs=0;
 
   constructor() {
@@ -430,8 +431,10 @@ export class Renderer {
       }
     });
   }
+  /** Optional DOM controls may replace this overlay on one game instance. */
+  setTouchControlsVisible(visible:boolean):void {this.touchControlsVisible=visible;}
   drawTouchControls():void {
-    if(!this.touch)return;
+    if(!this.touch||!this.touchControlsVisible)return;
     this.screen(c=>{
       c.globalAlpha=.72;
       for(const [x,label] of [[8,'←'],[56,'→'],[144,'↓'],[232,'X'],[280,'↑']] as const){

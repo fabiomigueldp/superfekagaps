@@ -4,10 +4,11 @@ export interface BullArena { left: number; right: number; floor: number }
 export type BullState = 'intro' | 'idle' | 'tell' | 'charge' | 'brake' | 'recover' | 'rattle' | 'bones' | 'hurt' | 'defeated';
 export interface Bone extends Box { vx: number; life: number }
 export interface BullEvent { kind: 'tell' | 'charge' | 'brake' | 'bones' | 'hit' | 'defeated'; tick: number }
-export const BULL_RULES = Object.freeze({ tickMs: 1000 / 60, tell: 42, rattle: 48, brake: 20, recover: 52, hurt: 30, maxBones: 2, boneLife: 72, speed: 5, health: 6 });
+export const BULL_RULES = Object.freeze({ tickMs: 1000 / 60, tell: 42, rattle: 48, brake: 20, recover: 52, hurt: 30, maxBones: 2, speed: 5, health: 6 });
 export const intersects = (a: Box, b: Box) => a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
 const swept = (a: Box, previousX: number): Box => ({ ...a, x: Math.min(a.x, previousX), width: a.width + Math.abs(a.x - previousX) });
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+const BONE = Object.freeze({ speed: 3, width: 10, spacing: 22 });
 export class SkeletonBullModel implements Box {
     readonly width = 48; readonly height = 34;
     x: number; y: number; state: BullState = 'intro'; stateTick = 0; tick = 0;
@@ -15,6 +16,7 @@ export class SkeletonBullModel implements Box {
     bones: Bone[] = []; events: BullEvent[] = []; private frameHazards: Box[] = [];
     private chargeSweeps: Box[] = [];
     private remainder = 0; private hitThisOpening = false;
+    private boneFlightTicks = 0;
     readonly arena: Readonly<BullArena>;
     constructor(arena: BullArena = { left: 4, right: 316, floor: 224 }) {
         if (![arena.left, arena.right, arena.floor].every(Number.isFinite) || arena.right - arena.left < 280) throw new Error('Bull arena requires finite bounds and at least 280px of clear floor');
@@ -31,7 +33,21 @@ export class SkeletonBullModel implements Box {
     private warn(player: Box) {
         this.facing = player.x + player.width / 2 < this.x + this.width / 2 ? -1 : 1;
         this.hitThisOpening = false;
-        this.enter(this.cycle++ % 3 === 2 ? 'rattle' : 'tell'); this.emit('tell');
+        const bones = this.cycle++ % 3 === 2;
+        if (!bones) {
+            const stop = this.facing < 0 ? this.arena.left + 12 : this.arena.right - this.width - 12;
+            // A cornered bull needs one body length of runway. Choose the
+            // inward route before its full tell, never turn during a charge.
+            if (Math.abs(stop - this.x) < this.width) this.facing = this.facing === -1 ? 1 : -1;
+        } else {
+            // The full-floor warning promises that both low bones can reach
+            // the announced edge, even when the bull is across the arena.
+            const trailingX = this.x + this.width / 2 - this.facing * BONE.spacing;
+            const distance = this.facing < 0 ? trailingX - this.arena.left
+                : this.arena.right - trailingX - BONE.width;
+            this.boneFlightTicks = Math.max(1, Math.ceil(distance / BONE.speed));
+        }
+        this.enter(bones ? 'rattle' : 'tell'); this.emit('tell');
     }
     /** Maximum 100ms catch-up: tab resumption cannot silently consume an entire tell. */
     update(dtMs: number, player: Box) {
@@ -68,10 +84,10 @@ export class SkeletonBullModel implements Box {
             case 'recover': if (this.stateTick >= BULL_RULES.recover) { this.bones = []; this.enter('idle'); } break;
             case 'rattle': if (this.stateTick >= BULL_RULES.rattle) {
                 const origin = this.x + this.width / 2;
-                this.bones = [0, 22].map(offset => ({ x: origin - this.facing * offset, y: this.arena.floor - 9, width: 10, height: 7, vx: this.facing * 3, life: BULL_RULES.boneLife }));
+                this.bones = [0, BONE.spacing].map(offset => ({ x: origin - this.facing * offset, y: this.arena.floor - 9, width: BONE.width, height: 7, vx: this.facing * BONE.speed, life: this.boneFlightTicks }));
                 this.enter('bones'); this.emit('bones');
             } break;
-            case 'bones': if (this.stateTick >= BULL_RULES.boneLife) { this.bones = []; this.frameHazards = []; this.enter('recover'); } break;
+            case 'bones': if (this.stateTick >= this.boneFlightTicks) { this.bones = []; this.frameHazards = []; this.enter('recover'); } break;
             case 'hurt': if (this.stateTick >= BULL_RULES.hurt) this.enter('idle'); break;
         }
     }

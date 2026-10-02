@@ -59,6 +59,12 @@ atribuída a uma regressão resolvida neste pacote.
 
 ## Próxima avaliação de música, sem conversão nesta etapa
 
+O lote seguinte de Guaíra acrescenta o Pátio das Comportas e controles locais de
+toque, além de polimento nativo de cenários e chefe. O output consolidado mede
+**120 arquivos, 40.403.971 bytes**, sem texturas, música ou dependências novas.
+O filtro dos21 originais continua aplicado e o orçamento segue45.000.000 bytes.
+Essa é uma medição de arquivos de deploy, não de carregamento inicial ou memória.
+
 As cinco músicas clássicas usadas por `src/engine/audioCatalog.ts` permanecem
 WAV PCM de 16 bits, estéreo, 48 kHz, 30 segundos cada: **28.800.220 bytes** no total.
 As falas atuais são OGG/Vorbis estéreo a 48 kHz. Os seis arquivos Delícia usados

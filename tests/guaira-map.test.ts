@@ -181,7 +181,7 @@ test('Casa action cannot survive a departure selection, reversal, skip, reduced 
 });
 
 test('visit summaries accept only exact outcome/arrival pairs and never become gameplay state', () => {
-    const pairs = [['rice', 'traversal-clear'], ['corral', 'bull-clear'], ['vazao', 'ascent-clear'], ['vazao', 'mayor-clear']] as const;
+    const pairs = [['rice', 'traversal-clear'], ['rice', 'junction-clear'], ['corral', 'bull-clear'], ['vazao', 'ascent-clear'], ['vazao', 'mayor-clear']] as const;
     for (const [at, visit] of pairs) {
         const href = guairaReturnHref(at, visit);
         assert.equal(href, `./guaira.html?at=${at}&visit=${visit}`);
@@ -206,6 +206,22 @@ test('visit summaries accept only exact outcome/arrival pairs and never become g
     assert.equal(released.enterHref(), './guaira-prefeito.html', 'repeat always starts the ordinary fresh experiment');
     released.returnToCorral(); assert.equal(released.returnContext, null);
     assert.equal(released.enterHref(), null, 'visit context grants no entry during departure');
+});
+
+test('the optional junction route is available only at the arrived town and never adds a map destination', () => {
+    assert.equal(Object.keys(GUAIRA_DESTINATIONS).length, 3);
+    const model = new GuairaMapModel(metadata, 'town');
+    assert.equal(model.enterHref(), './guaira-travessia.html', 'the primary route remains the traversal');
+    assert.equal(model.junctionHref(), './guaira-patio.html');
+    assert.match(guairaMapPresentation(model).description, /Pátio.*opcional/);
+    model.select('curral'); assert.equal(model.junctionHref(), null);
+    model.tick(.05); model.select('town'); assert.equal(model.junctionHref(), null);
+    finish(model); assert.equal(model.junctionHref(), './guaira-patio.html');
+    model.close(); assert.equal(model.junctionHref(), null);
+    for (const at of ['rice', 'corral', 'vazao'] as const) assert.equal(new GuairaMapModel(metadata, at).junctionHref(), null);
+    const returned = new GuairaMapModel(metadata, 'rice', 'junction-clear');
+    assert.match(guairaMapPresentation(returned).status, /Pátio concluído/);
+    assert.equal(returned.canWalkToCorral, true); assert.equal(returned.junctionHref(), null);
 });
 
 test('rice continuation follows the authored road and is distinct from entering the arena', () => {

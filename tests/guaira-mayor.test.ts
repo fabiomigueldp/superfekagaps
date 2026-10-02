@@ -60,7 +60,7 @@ test('isolated native scene has only local mechanisms, checkpoint and a safe con
     g.render(); assert.ok(h.canvas.drawCalls > 0);
     assert.deepEqual(STAGES, campaign); assert.deepEqual(ISLANDS, islands);
     const html = readFileSync(new URL('../guaira-prefeito.html', import.meta.url), 'utf8');
-    assert.deepEqual(Array.from(html.matchAll(/href="([^"]+)"/g), match => match[1]), ['./guaira.html?at=vazao']);
+    assert.deepEqual(Array.from(html.matchAll(/<a\b[^>]*href="([^"]+)"/g), match => match[1]), ['./guaira.html?at=vazao']);
     assert.doesNotMatch(html, /guaira-lab\.ts|KeyX|HP/);
     assert.match(html, /guaira-prefeito\.ts/);
 });

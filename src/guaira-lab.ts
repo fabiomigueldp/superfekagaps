@@ -1,8 +1,11 @@
+import { fitGuairaLabCanvas } from './guaira-lab-layout';
+import { installGuairaLabControls } from './guaira-lab-controls';
 import { GuairaBullLab } from './adventure/experimental/guaira/GuairaBullLab';
 import { LabToolbarAction } from './adventure/experimental/JuiceLabToolbar';
 
 const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
 const game = new GuairaBullLab(canvas, document.getElementById('lab-status')!);
+const touchControls = installGuairaLabControls(game, canvas, () => game.boss?.phase === 'defeated');
 const pauseButton = document.getElementById('lab-pause')!;
 const mapLink = document.getElementById('lab-exit')!;
 const ascentLink = document.getElementById('lab-ascent')!;
@@ -22,13 +25,9 @@ mapLink.addEventListener('click', () => {
     mapLink.setAttribute('href', game.mapReturnHref);
 });
 
-function fitLab() {
-    const navHeight = document.querySelector('nav')?.getBoundingClientRect().height ?? 100;
-    const scale = Math.max(.5, Math.floor(Math.min(innerWidth / 320, (innerHeight - navHeight - 12) / 180)));
-    document.body.style.paddingTop = `${navHeight}px`;
-    canvas.style.width = `${320 * scale}px`; canvas.style.height = `${180 * scale}px`;
-}
+function fitLab() { fitGuairaLabCanvas(canvas); }
 function syncToolbar() {
+    touchControls.sync();
     const href = game.mapReturnHref;
     if (mapLink.getAttribute('href') !== href) mapLink.setAttribute('href', href);
     const next = game.canAdvanceToAscent;
