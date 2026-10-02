@@ -1,3 +1,4 @@
+import { guairaReturnHref } from './GuairaMapModel';
 import { WorldGame } from '../../WorldGame';
 import { BossEncounter } from '../../BossEncounter';
 import type { WorldLevel, WorldObjects } from '../../WorldPhysics';
@@ -115,6 +116,9 @@ export class GuairaMayorLab extends WorldGame {
         if (!resume || !this.store.save.checkpoint) this.player.data.hasHelmet = true;
         this.player.data.respawnRevealTimer = 0;
         this.camera.x = 0; this.camera.y = 64;
+    }
+    get mapReturnHref() {
+        return guairaReturnHref('vazao', this.mayor.publicWaterOpen ? 'mayor-clear' : null);
     }
     toggleLabPause() {
         if (this.state === 'paused') this.resume();

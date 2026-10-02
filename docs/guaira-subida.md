@@ -2,7 +2,7 @@
 
 Protótipo isolado em `guaira-subida.html`, com `Player`, `WorldGame`, `WorldLevel` e `WorldObjects` reais. Não integra `STAGES`, não cria mundo, não lê nem escreve `localStorage`, não registra placar e não exige vitória na arena. Fechar a página descarta a tentativa.
 
-A sequência é **curral → prancha de inspeção → checkpoint → elevador de serviço → Casa da Vazão**. Movimento e salto bastam. A conclusão mostra o desvio: o cano particular recebe água limpa, enquanto o ramal do bairro permanece fechado. Não significa que a distribuição foi consertada. Mapa e Recomeçar são ações explícitas; não há transição automática.
+A sequência é **curral → prancha de inspeção → checkpoint → elevador de serviço → Casa da Vazão**. Movimento e salto bastam. A conclusão mostra o desvio: o cano particular recebe água limpa, enquanto o ramal do bairro permanece fechado. Não significa que a distribuição foi consertada. Casa/Mapa e Recomeçar são ações explícitas; não há transição automática.
 
 ## Geometria verificada
 
@@ -31,9 +31,9 @@ Na conclusão, Feka fica imediatamente parado e o relógio da tentativa e os mec
 ## Retorno ao mapa
 
 - Antes da conclusão: `./guaira.html?at=corral`
-- Depois: `./guaira.html?at=vazao`
+- Depois: `./guaira.html?at=vazao&visit=ascent-clear`, inclusive durante a pausa
 
-A segunda URL depende da integração do mapa, feita separadamente: chegada neutra em `guaira-5`, sem seleção automática. A experiência começa no curral; nenhuma seleção da casa se torna portão jogável. O mapa deve preservar os pontos canônicos de `3:4` e as distâncias do curral ao estender a estrada. Este módulo não modifica `GuairaMapModel` ou seu controller.
+O retorno concluído mostra **CASA**, com nome acessível “Voltar à Casa da Vazão no mapa”, reaproveitando o mesmo link e bitmap. O status explica que, a partir da Casa, Prefeito é um encontro opcional para reabrir a água do bairro. Continuam sendo três controles, sem transição automática. O resumo `ascent-clear` relata somente que o desvio foi observado; não abre o ramal, registra progresso ou exige uma vitória anterior. O checkpoint não produz resumo de conclusão. Tentar restaura MAPA e o retorno neutro ao curral sincronamente, antes do próximo frame. Os links consultam também o resultado atual na ativação, sem acessar armazenamento.
 
 ## Evidência reproduzível
 

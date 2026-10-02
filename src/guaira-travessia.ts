@@ -10,8 +10,18 @@ const pauseAction = new LabToolbarAction(pauseButton);
 for (const [id, label, name] of [['lab-retry', 'TENTAR', 'Recomeçar travessia'],
     ['lab-exit', 'MAPA', 'Voltar ao mapa de Guaíra'], ['traversal-boss', 'CURRAL', 'Enfrentar Ossabravo']])
     new LabToolbarAction(document.getElementById(id)!).setLabel(label, name);
-pauseButton.addEventListener('click', () => { game.toggleTraversalPause(); canvas.focus(); });
-document.getElementById('lab-retry')!.addEventListener('click', () => { game.load(GUAIRA_TRAVERSAL.id); canvas.focus(); });
+pauseButton.addEventListener('click', () => { game.toggleTraversalPause(); syncToolbar(); canvas.focus(); });
+document.getElementById('lab-retry')!.addEventListener('click', () => { game.load(GUAIRA_TRAVERSAL.id); syncToolbar(); canvas.focus(); });
+
+bossLink.addEventListener('click', event => {
+    // Recheck current state: a queued activation cannot survive Pause or Retry.
+    if (!game.canAdvanceToBoss) event.preventDefault();
+});
+
+mapLink.addEventListener('click', () => {
+    // Use the live result even if this activation precedes the next animation frame.
+    mapLink.setAttribute('href', game.mapReturnHref);
+});
 
 function fitTraversal() {
     const navHeight = document.querySelector('nav')?.getBoundingClientRect().height ?? 100;
@@ -19,12 +29,18 @@ function fitTraversal() {
     document.body.style.paddingTop = `${navHeight}px`;
     canvas.style.width = `${320 * scale}px`; canvas.style.height = `${180 * scale}px`;
 }
-function reflectState() {
+function syncToolbar() {
+    const href = game.mapReturnHref;
+    if (mapLink.getAttribute('href') !== href) mapLink.setAttribute('href', href);
     pauseAction.setLabel(game.state === 'paused' ? 'CONTINUAR' : 'PAUSA', game.state === 'paused' ? 'Continuar' : 'Pausar');
-    bossLink.hidden = !game.finished || game.state === 'paused';
-    pauseButton.hidden = game.finished && game.state !== 'paused';
-    mapLink.setAttribute('href', `${GUAIRA_TRAVERSAL.mapHref}?at=${game.store.save.checkpoint ? 'rice' : 'town'}`);
-    requestAnimationFrame(reflectState);
+    const next = game.canAdvanceToBoss;
+    bossLink.hidden = !next;
+    pauseButton.hidden = next;
+    if (next && document.activeElement === pauseButton) bossLink.focus();
+    else if (!next && document.activeElement === bossLink) pauseButton.focus();
+}
+function reflectState() {
+    syncToolbar(); requestAnimationFrame(reflectState);
 }
 window.addEventListener('resize', fitTraversal);
 if (typeof ResizeObserver !== 'undefined') {

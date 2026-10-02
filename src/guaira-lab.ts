@@ -4,16 +4,22 @@ import { LabToolbarAction } from './adventure/experimental/JuiceLabToolbar';
 const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
 const game = new GuairaBullLab(canvas, document.getElementById('lab-status')!);
 const pauseButton = document.getElementById('lab-pause')!;
+const mapLink = document.getElementById('lab-exit')!;
 const ascentLink = document.getElementById('lab-ascent')!;
 const pauseAction = new LabToolbarAction(pauseButton);
 for (const [id, label, name] of [['lab-retry', 'TENTAR', 'Tentar novamente'], ['lab-exit', 'MAPA', 'Voltar ao mapa de Guaíra'],
     ['lab-ascent', 'SUBIR', 'Subir à Casa da Vazão para observar o desvio da água']])
     new LabToolbarAction(document.getElementById(id)!).setLabel(label, name);
-pauseButton.addEventListener('click', () => { game.toggleLabPause(); canvas.focus(); });
-document.getElementById('lab-retry')!.addEventListener('click', () => { game.load('guaira-lab'); canvas.focus(); });
+pauseButton.addEventListener('click', () => { game.toggleLabPause(); syncToolbar(); canvas.focus(); });
+document.getElementById('lab-retry')!.addEventListener('click', () => { game.load('guaira-lab'); syncToolbar(); canvas.focus(); });
 ascentLink.addEventListener('click', event => {
     // Recheck current state: a queued activation cannot survive Pause or Retry.
     if (!game.canAdvanceToAscent) event.preventDefault();
+});
+
+mapLink.addEventListener('click', () => {
+    // Use the live result even if this activation precedes the next animation frame.
+    mapLink.setAttribute('href', game.mapReturnHref);
 });
 
 function fitLab() {
@@ -22,14 +28,18 @@ function fitLab() {
     document.body.style.paddingTop = `${navHeight}px`;
     canvas.style.width = `${320 * scale}px`; canvas.style.height = `${180 * scale}px`;
 }
-function reflectPause() {
+function syncToolbar() {
+    const href = game.mapReturnHref;
+    if (mapLink.getAttribute('href') !== href) mapLink.setAttribute('href', href);
     const next = game.canAdvanceToAscent;
     pauseButton.hidden = next;
     ascentLink.hidden = !next;
     pauseAction.setLabel(game.state === 'paused' ? 'CONTINUAR' : 'PAUSA', game.state === 'paused' ? 'Continuar' : 'Pausar');
     if (next && document.activeElement === pauseButton) ascentLink.focus();
     else if (!next && document.activeElement === ascentLink) pauseButton.focus();
-    requestAnimationFrame(reflectPause);
+}
+function reflectPause() {
+    syncToolbar(); requestAnimationFrame(reflectPause);
 }
 window.addEventListener('resize', fitLab);
 if (typeof ResizeObserver !== 'undefined') {

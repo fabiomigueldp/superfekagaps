@@ -1,5 +1,6 @@
 import { LabToolbarAction } from './adventure/experimental/JuiceLabToolbar';
-import { GUAIRA_DESTINATIONS, GuairaMapModel, guairaArrivalFromSearch, type GuairaDestination } from './adventure/experimental/guaira/GuairaMapModel';
+import { GUAIRA_DESTINATIONS, GuairaMapModel, guairaArrivalFromSearch, guairaReturnContextFromSearch, type GuairaDestination } from './adventure/experimental/guaira/GuairaMapModel';
+import { guairaMapPresentation } from './adventure/experimental/guaira/GuairaMapPresentation';
 import { approachGuairaCamera, guairaCamera, guairaScreenPoint, paintGuairaMap, paintGuairaWaterFrame, type GuairaCamera } from './adventure/experimental/guaira/GuairaMapArt';
 import { GUAIRA_WATER_CONTRACT, GuairaWaterMotion, VisibleWaterClock } from './adventure/experimental/guaira/GuairaWaterMotion';
 
@@ -42,25 +43,17 @@ export function startGuairaMap(): () => void {
     const requestFrame = () => { if (!signal.aborted && !frame && !document.hidden) frame = requestAnimationFrame(render); };
     function reflect() {
         if (!model) return;
-        const key = `${model.selected}:${model.arrival}:${model.moving}:${model.closed}:${overview}`;
+        const key = `${model.selected}:${model.arrival}:${model.moving}:${model.closed}:${model.returnContext}:${overview}`;
         if (key === previousState) return;
         previousState = key;
-        const atHouse = model.arrival === 'vazao';
-        const destination = model.selected ? GUAIRA_DESTINATIONS[model.selected] : atHouse
-            ? { title: 'Casa da Vazão', description: 'Prefeito: experimento opcional. Entre para testar ou volte ao curral pela estrada.' }
-            : { title: 'Passarela dos Arrozais', description: 'A travessia chegou ao arrozal. Escolha o próximo destino.' };
-        element('map-title').textContent = destination.title;
-        element('map-description').textContent = destination.description;
-        status.textContent = !model.selected ? atHouse ? 'Feka está no terraço. Prefeito entra no experimento; Voltar leva ao curral.'
-            : 'Feka está nos arrozais. Escolha Travessia, Arena ou Subida.'
-            : model.moving ? `Feka está a caminho de ${model.selected === 'subida' ? 'seu embarque no curral' : destination.title}.`
-            : model.selected === 'subida' ? 'Feka está no curral. Subir inicia a travessia.' : 'Feka chegou. Entre para jogar.';
-        enter.disabled = !model.canEnter; skip.hidden = !model.moving;
+        const presentation = guairaMapPresentation(model);
+        element('map-title').textContent = presentation.title;
+        element('map-description').textContent = presentation.description;
+        status.textContent = presentation.status;
+        enter.disabled = !model.canEnter && !model.canWalkToCorral; skip.hidden = !model.moving;
         returnButton.hidden = !model.canEnterMayor;
         returnButton.disabled = !model.canEnterMayor;
-        enterArt.setLabel(model.canEnterMayor ? 'PREFEITO' : model.selected ? GUAIRA_DESTINATIONS[model.selected].action : 'ENTRAR',
-            model.canEnterMayor ? 'Enfrentar o Prefeito: experimento opcional na Casa da Vazão'
-                : model.selected ? `Entrar: ${destination.title}` : 'Escolha uma experiência para entrar');
+        enterArt.setLabel(presentation.action, presentation.actionName);
         overviewButton.setAttribute('aria-pressed', String(overview));
         overviewArt.setLabel(overview ? 'VER FEKA' : 'VER MAPA', overview ? 'Acompanhar Feka' : 'Ver mapa inteiro');
         for (const { button, art } of destinationArt) {
@@ -71,6 +64,9 @@ export function startGuairaMap(): () => void {
         if (model.selected && !model.moving && lastArrival !== model.selected) {
             lastArrival = model.selected;
             const url = new URL(location.href); url.searchParams.set('at', GUAIRA_DESTINATIONS[model.selected].arrival);
+            // Canonicalizing duplicate arrivals must never revive a rejected visit.
+            if (model.returnContext) url.searchParams.set('visit', model.returnContext);
+            else url.searchParams.delete('visit');
             history.replaceState(null, '', url);
         }
     }
@@ -110,15 +106,26 @@ export function startGuairaMap(): () => void {
         ratio = Math.min(2, devicePixelRatio || 1); canvas.width = Math.round(width * ratio); canvas.height = Math.round(height * ratio);
         camera = null; paintedCamera = null; requestFrame();
     }
-    function select(destination: GuairaDestination) { model?.select(destination); previousTime = 0; reflect(); requestFrame(); }
+    function clearVisitURL() {
+        const url = new URL(location.href);
+        if (url.searchParams.has('visit')) { url.searchParams.delete('visit'); history.replaceState(null, '', url); }
+    }
+    function select(destination: GuairaDestination) {
+        if (!model || model.closed) return;
+        model.select(destination); clearVisitURL(); previousTime = 0; reflect(); requestFrame();
+    }
     for (const button of destinations) button.addEventListener('click', () => select(button.dataset.mapDestination as GuairaDestination), { signal });
     returnButton.addEventListener('click', () => {
         if (!model?.canEnterMayor) return;
-        model.returnToCorral(); previousTime = 0; reflect(); requestFrame();
+        model.returnToCorral(); clearVisitURL(); previousTime = 0; reflect(); requestFrame();
         destinations.find(button => button.dataset.mapDestination === 'curral' && !markers.includes(button))?.focus();
     }, { signal });
     skip.addEventListener('click', () => { model?.skip(); camera = null; reflect(); requestFrame(); enter.focus(); }, { signal });
     enter.addEventListener('click', () => {
+        if (model?.canWalkToCorral) {
+            model.walkToCorral(); clearVisitURL(); previousTime = 0; reflect(); requestFrame();
+            return;
+        }
         const href = model?.enterHref(); if (!href) return;
         model?.close(); reflect(); location.assign(href);
     }, { signal });
@@ -163,7 +170,7 @@ export function startGuairaMap(): () => void {
                 return art;
             }, signal);
             if (signal.aborted) return;
-            model = new GuairaMapModel(metadata, guairaArrivalFromSearch(location.search));
+            model = new GuairaMapModel(metadata, guairaArrivalFromSearch(location.search), guairaReturnContextFromSearch(location.search));
             model.setReducedMotion(motion.matches); image = art;
             loadingPanel.hidden = true; reflect(); resize();
             void loadWater();

@@ -69,7 +69,7 @@ for (const touch of [false, true]) test(`${touch ? 'native touch' : 'keyboard'} 
     replay(h, game, touch);
     assert.equal(game.finished, true); assert.equal(game.coins, 0); assert.equal(game.store.save.checkpoint?.index, 0);
     assert.equal(feet(game), G.terraceY); assert.equal(game.player.data.velocity.x, 0);
-    assert.equal(game.mapReturnHref, './guaira.html?at=vazao');
+    assert.equal(game.mapReturnHref, './guaira.html?at=vazao&visit=ascent-clear');
     assert.deepEqual(game.store.save.completed, []); assert.deepEqual(game.store.save.times, {}); assert.equal(completions, 0);
     const finished = snapshot(game); h.run(game, 90, ['ArrowRight', 'Space']); game.render();
     assert.deepEqual(game.player.data.position, finished.player.position); assert.equal(game.elapsed, finished.elapsed);
@@ -166,14 +166,34 @@ test('bitmap toolbar is 44px, keyboard safe, repeatable and has explicit map anc
         }
     }
     assert.equal(h.exit.getAttribute('href'), './guaira.html?at=corral');
-    replay(h, game); h.frame(); assert.equal(h.exit.getAttribute('href'), './guaira.html?at=vazao');
+    replay(h, game, false, true); h.frame();
+    assert.equal(game.finished, false); assert.equal(h.exit.getAttribute('href'), './guaira.html?at=corral', 'a checkpoint is not a completed visit');
+    h.retry.dispatch('click');
+    const exitArt = h.exit.children[0] as Canvas, mapWidth = exitArt.width;
+    replay(h, game);
+    assert.equal(h.exit.dispatch('click'), false, 'return activation reads a completion before RAF');
+    assert.equal(h.exit.getAttribute('href'), './guaira.html?at=vazao&visit=ascent-clear'); h.frame();
+    assert.equal(h.exit.getAttribute('aria-label'), 'Voltar à Casa da Vazão no mapa');
+    assert.equal(h.exit.textContent, 'Voltar à Casa da Vazão no mapa');
+    assert.equal(h.exit.title, 'Voltar à Casa da Vazão no mapa');
+    assert.equal(h.exit.children[0], exitArt); assert.equal(exitArt.width, mapWidth);
+    assert.match(h.status.textContent, /CASA volta ao mapa/);
+    assert.match(h.status.textContent, /Prefeito: encontro opcional para reabrir a água/);
     h.pause.dispatch('click'); h.frame(); assert.equal(game.state, 'paused'); assert.equal(h.pause.getAttribute('aria-label'), 'Continuar');
-    h.pause.dispatch('click'); h.frame(); assert.equal(game.state, 'playing');
-    h.retry.dispatch('click'); h.frame(); assert.equal(game.finished, false); assert.equal(game.state, 'playing');
-    assert.equal(h.exit.getAttribute('href'), './guaira.html?at=corral'); assert.equal(h.canvas.focused, true);
+    assert.equal(h.exit.getAttribute('href'), './guaira.html?at=vazao&visit=ascent-clear');
+    assert.equal(h.exit.getAttribute('aria-label'), 'Voltar à Casa da Vazão no mapa');
+    assert.equal(h.exit.dispatch('click'), false);
+    const controlsWidth = [h.pause, h.retry, h.exit].reduce((sum, control) => sum + (control.children[0] as Canvas).width, 0);
+    assert.ok(controlsWidth + 2 * 4 + 2 * 6 <= 320, 'Continuar/Tentar/Casa fit the 320px toolbar');
+    h.retry.dispatch('click'); assert.equal(game.finished, false); assert.equal(game.state, 'playing');
+    assert.equal(h.exit.getAttribute('href'), './guaira.html?at=corral', 'Retry clears the visit before RAF');
+    assert.equal(h.exit.getAttribute('aria-label'), 'Voltar ao mapa de Guaíra');
+    assert.equal(h.exit.dispatch('click'), false); h.frame(); assert.equal(h.canvas.focused, true);
+    assert.deepEqual(h.storageCalls, []);
     const html = readFileSync(new URL('../guaira-subida.html', import.meta.url), 'utf8');
     assert.match(html, /min-height:44px;min-width:44px/); assert.match(html, /id="lab-exit" href="\.\/guaira.html\?at=corral"/);
     assert.doesNotMatch(html, /traversal-boss|guaira-lab\.html|localStorage/);
+    assert.equal(Array.from(html.matchAll(/<(?:button|a)\b/g)).length, 3);
 });
 
 test('reduced motion removes cosmetic landing dust and shake while required vehicles still move', t => {

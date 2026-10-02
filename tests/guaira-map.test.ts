@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { GUAIRA_DESTINATIONS, GuairaMapModel, guairaArrivalFromSearch, guairaReturnHref, parseGuairaMetadata } from '../src/adventure/experimental/guaira/GuairaMapModel';
+import { GUAIRA_DESTINATIONS, GuairaMapModel, guairaArrivalFromSearch, guairaReturnContextFromSearch, guairaReturnHref, parseGuairaMetadata } from '../src/adventure/experimental/guaira/GuairaMapModel';
+import { guairaMapPresentation } from '../src/adventure/experimental/guaira/GuairaMapPresentation';
 import { GUAIRA_FEKA_PIXEL_WIDTH, guairaCamera, guairaScreenPoint } from '../src/adventure/experimental/guaira/GuairaMapArt';
 import { loadGuairaScene } from '../src/adventure/experimental/guaira/GuairaMapLoader';
 const raw = JSON.parse(readFileSync(new URL('../public/assets/world/experimental/guaira/guaira-diorama.meta.json', import.meta.url), 'utf8'));
@@ -177,4 +178,51 @@ test('Casa action cannot survive a departure selection, reversal, skip, reduced 
         model.returnToCorral(); assert.equal(model.selected, before); assert.equal(model.canEnterMayor, false);
         assert.notEqual(model.enterHref(), './guaira-prefeito.html');
     }
+});
+
+test('visit summaries accept only exact outcome/arrival pairs and never become gameplay state', () => {
+    const pairs = [['rice', 'traversal-clear'], ['corral', 'bull-clear'], ['vazao', 'ascent-clear'], ['vazao', 'mayor-clear']] as const;
+    for (const [at, visit] of pairs) {
+        const href = guairaReturnHref(at, visit);
+        assert.equal(href, `./guaira.html?at=${at}&visit=${visit}`);
+        assert.equal(guairaReturnContextFromSearch(href.slice(href.indexOf('?'))), visit);
+        for (const other of ['town', 'rice', 'corral', 'vazao'] as const) if (other !== at) {
+            assert.equal(guairaReturnHref(other, visit), guairaReturnHref(other));
+            assert.equal(guairaReturnContextFromSearch(`?at=${other}&visit=${visit}`), null);
+            assert.equal(new GuairaMapModel(metadata, other, visit).returnContext, null);
+        }
+    }
+    for (const search of ['', '?visit=bull-clear', '?at=rice&visit=checkpoint', '?at=rice&visit=__proto__',
+        '?at=rice&visit=traversal-clear&visit=mayor-clear', '?at=rice&at=vazao&visit=traversal-clear'])
+        assert.equal(guairaReturnContextFromSearch(search), null);
+    const won = new GuairaMapModel(metadata, 'corral', 'bull-clear');
+    assert.equal(won.selected, 'subida'); assert.equal(won.moving, false);
+    assert.deepEqual(won.point, metadata.nodes['guaira-4']); assert.equal(won.enterHref(), './guaira-subida.html');
+    assert.match(guairaMapPresentation(won).status, /Ossabravo descansou/);
+    won.select('curral'); assert.equal(won.returnContext, null); assert.equal(won.enterHref(), './guaira-lab.html');
+    assert.doesNotMatch(guairaMapPresentation(won).status, /descansou/);
+    const released = new GuairaMapModel(metadata, 'vazao', 'mayor-clear');
+    assert.equal(guairaMapPresentation(released).action, 'REPETIR');
+    assert.equal(released.enterHref(), './guaira-prefeito.html', 'repeat always starts the ordinary fresh experiment');
+    released.returnToCorral(); assert.equal(released.returnContext, null);
+    assert.equal(released.enterHref(), null, 'visit context grants no entry during departure');
+});
+
+test('rice continuation follows the authored road and is distinct from entering the arena', () => {
+    for (const reduced of [false, true]) for (const context of [null, 'traversal-clear'] as const) {
+        const model = new GuairaMapModel(metadata, 'rice', context); model.setReducedMotion(reduced);
+        assert.equal(model.canWalkToCorral, true); assert.equal(model.canEnter, false); assert.equal(model.enterHref(), null);
+        const text = guairaMapPresentation(model);
+        assert.equal(text.action, 'CURRAL'); assert.match(text.actionName, /Caminhar/);
+        assert.equal(text.status.includes('concluída'), context !== null, 'a checkpoint/neutral return is never a completion');
+        model.walkToCorral(); assert.equal(model.canWalkToCorral, false); assert.equal(model.returnContext, null);
+        assert.equal(model.selected, 'curral'); assert.equal(model.moving, !reduced);
+        const selected = model.selected; model.walkToCorral(); assert.equal(model.selected, selected);
+        finish(model); assert.deepEqual(model.point, metadata.nodes['guaira-4']); assert.equal(model.enterHref(), './guaira-lab.html');
+    }
+    const stale = new GuairaMapModel(metadata, 'rice', 'traversal-clear');
+    stale.select('town'); stale.walkToCorral(); assert.equal(stale.selected, 'town');
+    const closed = new GuairaMapModel(metadata, 'rice'); closed.close(); closed.walkToCorral();
+    assert.equal(closed.canWalkToCorral, false); assert.equal(closed.selected, null);
+    assert.doesNotMatch(GUAIRA_DESTINATIONS.town.description, /leve água ao bairro/);
 });

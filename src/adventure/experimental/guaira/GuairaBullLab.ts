@@ -1,3 +1,4 @@
+import { guairaReturnHref } from './GuairaMapModel';
 import { WorldGame } from '../../WorldGame';
 import { BossEncounter } from '../../BossEncounter';
 import type { WorldLevel, WorldObjects } from '../../WorldPhysics';
@@ -89,6 +90,9 @@ export class GuairaBullLab extends WorldGame {
     toggleLabPause() {
         if (this.state !== 'playing' && this.state !== 'paused') return;
         if (this.state === 'paused') this.resume(); else this.pause();
+    }
+    get mapReturnHref() {
+        return guairaReturnHref('corral', this.boss?.phase === 'defeated' ? 'bull-clear' : null);
     }
     get canAdvanceToAscent() {
         return this.state === 'playing' && !this.player.data.isDead && this.boss?.phase === 'defeated';

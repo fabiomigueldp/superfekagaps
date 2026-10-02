@@ -248,6 +248,7 @@ test('reduced motion preserves the winning route and suppresses cosmetic impacts
 test('three native toolbar actions expose Casa after victory, retain paused return and reset on retry', async t => {
     const h = guairaMayorBrowser(t); await import('../src/guaira-prefeito');
     const g = h.window.worldGame as GuairaMayorLab;
+    assert.equal(h.exit.getAttribute('href'), './guaira.html?at=vazao');
     assert.equal(h.pause.getAttribute('aria-label'), 'Pausar'); assert.equal(h.retry.getAttribute('aria-label'), 'Tentar novamente');
     assert.equal(h.exit.getAttribute('aria-label'), 'Voltar à Casa da Vazão no mapa');
     const exitArt = h.exit.children[0] as Canvas, mapWidth = exitArt.width;
@@ -273,7 +274,9 @@ test('three native toolbar actions expose Casa after victory, retain paused retu
     assert.notEqual(g.player, old); assert.equal(g.mayor.state, 'intro'); assert.equal(g.mayor.sealsRemaining, 3);
     assert.equal(h.canvas.focused, true); assert.equal(g.elapsed, 0); assert.equal(g.player.data.hasHelmet, true);
 
-    replay(h, g); h.frame();
+    replay(h, g);
+    assert.equal(h.exit.dispatch('click'), false, 'return activation reads a victory before RAF');
+    assert.equal(h.exit.getAttribute('href'), './guaira.html?at=vazao&visit=mayor-clear'); h.frame();
     assert.equal(h.exit.getAttribute('aria-label'), 'Voltar à Casa da Vazão');
     assert.equal(h.exit.title, 'Voltar à Casa da Vazão');
     assert.equal(h.exit.textContent, 'Voltar à Casa da Vazão');
@@ -282,23 +285,28 @@ test('three native toolbar actions expose Casa after victory, retain paused retu
     assert.equal(exitArt.height, 44);
     let exitNameWrites = 0;
     const setExitAttribute = h.exit.setAttribute.bind(h.exit);
-    t.mock.method(h.exit, 'setAttribute', (key: string, value: string) => { exitNameWrites++; setExitAttribute(key, value); });
+    t.mock.method(h.exit, 'setAttribute', (key: string, value: string) => { if (key === 'aria-label') exitNameWrites++; setExitAttribute(key, value); });
     h.frame(); h.frame();
     assert.equal(exitNameWrites, 0, 'stable outcome does not rewrite the accessible exit name each frame');
-    assert.equal(h.exit.dispatch('click'), false, 'victory keeps native navigation to the same neutral Casa arrival');
+    assert.equal(h.exit.dispatch('click'), false, 'victory keeps native navigation to the Casa arrival with its visit summary');
     assert.match(h.status.textContent, /A água voltou\. Os gaps continuam\./);
     h.pause.dispatch('click'); h.frame();
     assert.equal(g.state, 'paused'); assert.equal(h.pause.getAttribute('aria-label'), 'Continuar');
     assert.equal(h.exit.getAttribute('aria-label'), 'Voltar à Casa da Vazão');
+    assert.equal(h.exit.getAttribute('href'), './guaira.html?at=vazao&visit=mayor-clear');
     assert.equal(h.exit.dispatch('click'), false);
     const frozen = snapshot(g); h.run(g, 60); g.render(); assert.deepEqual(snapshot(g), frozen);
     const controlsWidth = [h.pause, h.retry, h.exit].reduce((sum, control) => sum + (control.children[0] as Canvas).width, 0);
     assert.ok(controlsWidth + 2 * 4 + 2 * 6 <= 320, 'even Continuar/Tentar/Casa fit the 320px toolbar with existing gaps and padding');
     assert.deepEqual(g.store.save.completed, []); assert.deepEqual(g.store.save.times, {});
-    h.retry.dispatch('click'); h.frame();
+    h.retry.dispatch('click');
+    assert.equal(h.exit.getAttribute('href'), './guaira.html?at=vazao', 'Retry clears the completed visit before RAF');
+    assert.equal(h.exit.getAttribute('aria-label'), 'Voltar à Casa da Vazão no mapa');
+    h.frame();
     assert.equal(g.state, 'playing'); assert.equal(g.mayor.publicWaterOpen, false); assert.equal(g.mayor.sealsRemaining, 3);
     assert.equal(h.exit.getAttribute('aria-label'), 'Voltar à Casa da Vazão no mapa');
     assert.equal(exitNameWrites, 1, 'Retry changes the exit name once');
     assert.equal(h.exit.children[0], exitArt); assert.equal(h.canvas.focused, true);
     assert.doesNotMatch(h.status.textContent, /A água voltou|CASA:/);
+    assert.deepEqual(h.storageCalls, []);
 });

@@ -69,12 +69,16 @@ test('actual map entry handles pending loading, selection, arrival, reduced moti
     assert.equal(elements['map-return'].hidden, true); assert.equal(elements['map-return'].disabled, true);
     finishImage(); await ready(); frames(2);
     assert.equal(elements['map-title'].textContent, 'Passarela dos Arrozais');
-    assert.equal(elements['map-enter'].disabled, true); assert.equal(elements['map-loading-panel'].hidden, true);
+    assert.equal(elements['map-enter'].disabled, false); assert.equal(elements['map-loading-panel'].hidden, true);
     assert.equal(elements['map-return'].hidden, true);
     elements['map-return'].dispatchEvent(new Event('click'));
-    elements['map-enter'].dispatchEvent(new Event('click'));
     assert.equal(elements['map-title'].textContent, 'Passarela dos Arrozais', 'rice ignores stale context actions');
     assert.equal(navigations.length, 0); assert.equal(replacements.length, 0);
+    assert.equal(elements['map-enter'].attributes['aria-label'], 'Caminhar até o Curral da Comporta');
+    elements['map-enter'].click();
+    assert.equal(elements['map-title'].textContent, 'Curral da Comporta');
+    assert.equal(elements['map-enter'].disabled, true);
+    assert.equal(navigations.length, 0, 'contextual continuation walks before entering');
     assert.equal(key('ArrowRight').defaultPrevented, true); frames(2);
     assert.equal(elements['map-title'].textContent, 'Curral da Comporta'); assert.equal(elements['map-enter'].disabled, true);
     elements['map-enter'].dispatchEvent(new Event('click')); assert.equal(navigations.length, 0, 'even synthetic early Enter cannot navigate');
@@ -189,4 +193,75 @@ test('water repaints regions at30Hz without idle marker layout, freezes when hid
     const disposeFailure = module.startGuairaMap(); await ready(); frames(2);
     assert.equal(elements['map-error'].hidden, true); assert.equal(elements['map-enter'].disabled, false);
     assert.equal(queue.size, 0, 'missing decoration retains the original static-map lifecycle'); disposeFailure();
+});
+
+test('return summaries survive reload but clear synchronously on a new choice without automatic entry', async () => {
+    const module = await import('../src/guaira');
+    fetchRaw = raw; imageReady = Promise.resolve(); waterReady = Promise.resolve(); waterFailure = true;
+    motion.matches = false; doc.hidden = false;
+    const originalReplace = history.replaceState;
+    history.replaceState = (_state: unknown, _title: string, href?: string | URL | null) => {
+        if (href) { const url = new URL(String(href)); locationMock.href = url.href; locationMock.search = url.search; replacements.push(url.href); }
+    };
+    const open = async (search: string) => {
+        locationMock.search = search; locationMock.href = `https://example.test/guaira.html${search}`;
+        const dispose = module.startGuairaMap(); await ready(); frames(2); return dispose;
+    };
+    try {
+        let dispose = await open('?at=rice&visit=traversal-clear');
+        assert.match(elements['map-status'].textContent, /Travessia concluída/);
+        assert.equal(elements['map-enter'].attributes['aria-label'], 'Caminhar até o Curral da Comporta');
+        const before = navigations.length;
+        elements['map-enter'].click();
+        assert.equal(navigations.length, before); assert.equal(elements['map-enter'].disabled, true);
+        assert.equal(new URL(locationMock.href).searchParams.has('visit'), false);
+        assert.doesNotMatch(elements['map-status'].textContent, /concluída/);
+        elements['map-enter'].dispatchEvent(new Event('click')); assert.equal(navigations.length, before);
+        dispose();
+
+        dispose = await open('?at=corral&visit=bull-clear');
+        assert.match(elements['map-status'].textContent, /Ossabravo descansou/);
+        assert.equal(elements['map-title'].textContent, 'Subida à Casa');
+        assert.equal(elements['map-enter'].disabled, false);
+        assert.equal(navigations.length, before, 'a result suggests the next step without launching it');
+        dispose();
+        dispose = await open(locationMock.search);
+        assert.match(elements['map-status'].textContent, /Ossabravo descansou/, 'reload keeps the current visit summary');
+        destinations[1].click();
+        assert.equal(elements['map-title'].textContent, 'Curral da Comporta');
+        assert.equal(new URL(locationMock.href).searchParams.has('visit'), false);
+        assert.doesNotMatch(elements['map-status'].textContent, /descansou/);
+        dispose();
+
+        dispose = await open('?at=vazao&visit=ascent-clear');
+        assert.match(elements['map-status'].textContent, /Subida concluída/);
+        assert.match(elements['map-status'].textContent, /Prefeito/); dispose();
+        dispose = await open('?at=vazao&visit=mayor-clear');
+        assert.match(elements['map-status'].textContent, /Vitória nesta visita/);
+        assert.match(elements['map-enter'].attributes['aria-label'], /Repetir/);
+        elements['map-return'].click();
+        assert.equal(new URL(locationMock.href).searchParams.has('visit'), false);
+        assert.doesNotMatch(elements['map-status'].textContent, /Vitória/);
+        elements['map-enter'].dispatchEvent(new Event('click')); assert.equal(navigations.length, before);
+        dispose();
+
+        dispose = await open('?at=rice&visit=mayor-clear');
+        assert.doesNotMatch(elements['map-status'].textContent, /Vitória|concluída/);
+        motion.matches = true; motion.dispatchEvent(new Event('change'));
+        elements['map-enter'].click();
+        assert.equal(navigations.length, before, 'reduced motion arrives but does not enter on the walk action');
+        assert.equal(elements['map-title'].textContent, 'Curral da Comporta');
+        assert.equal(elements['map-enter'].disabled, false);
+        elements['map-enter'].click(); assert.equal(navigations.at(-1), './guaira-lab.html');
+        elements['map-enter'].dispatchEvent(new Event('click')); assert.equal(navigations.length, before + 1);
+        dispose();
+
+        dispose = await open('?at=corral&at=vazao&visit=bull-clear');
+        assert.equal(elements['map-title'].textContent, 'Curral da Comporta');
+        assert.equal(new URL(locationMock.href).searchParams.has('visit'), false,
+            'canonicalizing duplicate arrivals cannot turn a rejected summary into an accepted one');
+        dispose(); dispose = await open(locationMock.search);
+        assert.equal(elements['map-title'].textContent, 'Curral da Comporta');
+        assert.doesNotMatch(elements['map-status'].textContent, /descansou/); dispose();
+    } finally { history.replaceState = originalReplace; motion.matches = false; win.dispatchEvent(new Event('pagehide')); }
 });

@@ -6,11 +6,16 @@ const game = new GuairaAscent(canvas, document.getElementById('lab-status')!);
 const pauseButton = document.getElementById('lab-pause')!;
 const mapLink = document.getElementById('lab-exit')!;
 const pauseAction = new LabToolbarAction(pauseButton);
-for (const [id, label, name] of [['lab-retry', 'TENTAR', 'Recomeçar subida'],
-    ['lab-exit', 'MAPA', 'Voltar ao mapa de Guaíra']])
-    new LabToolbarAction(document.getElementById(id)!).setLabel(label, name);
-pauseButton.addEventListener('click', () => { game.toggleAscentPause(); canvas.focus(); });
-document.getElementById('lab-retry')!.addEventListener('click', () => { game.load(GUAIRA_ASCENT.id); canvas.focus(); });
+new LabToolbarAction(document.getElementById('lab-retry')!).setLabel('TENTAR', 'Recomeçar subida');
+const exitAction = new LabToolbarAction(mapLink);
+let exitShowsCasa: boolean | undefined;
+pauseButton.addEventListener('click', () => { game.toggleAscentPause(); syncToolbar(); canvas.focus(); });
+document.getElementById('lab-retry')!.addEventListener('click', () => { game.load(GUAIRA_ASCENT.id); syncToolbar(); canvas.focus(); });
+
+mapLink.addEventListener('click', () => {
+    // Use the live result even if this activation precedes the next animation frame.
+    mapLink.setAttribute('href', game.mapReturnHref);
+});
 
 function fitAscent() {
     const navHeight = document.querySelector('nav')?.getBoundingClientRect().height ?? 100;
@@ -18,10 +23,18 @@ function fitAscent() {
     document.body.style.paddingTop = `${navHeight}px`;
     canvas.style.width = `${320 * scale}px`; canvas.style.height = `${180 * scale}px`;
 }
-function reflectState() {
+function syncToolbar() {
+    const href = game.mapReturnHref;
+    if (mapLink.getAttribute('href') !== href) mapLink.setAttribute('href', href);
     pauseAction.setLabel(game.state === 'paused' ? 'CONTINUAR' : 'PAUSA', game.state === 'paused' ? 'Continuar' : 'Pausar');
-    mapLink.setAttribute('href', game.mapReturnHref);
-    requestAnimationFrame(reflectState);
+    const casa = game.finished;
+    if (casa !== exitShowsCasa) {
+        exitAction.setLabel(casa ? 'CASA' : 'MAPA', casa ? 'Voltar à Casa da Vazão no mapa' : 'Voltar ao mapa de Guaíra');
+        exitShowsCasa = casa;
+    }
+}
+function reflectState() {
+    syncToolbar(); requestAnimationFrame(reflectState);
 }
 window.addEventListener('resize', fitAscent);
 if (typeof ResizeObserver !== 'undefined') {

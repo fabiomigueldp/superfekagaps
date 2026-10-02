@@ -1,3 +1,4 @@
+import { guairaReturnHref } from './GuairaMapModel';
 import { WorldGame } from '../../WorldGame';
 import { STAGES } from '../../campaign';
 import { TileType } from '../../../constants';
@@ -70,7 +71,9 @@ export class GuairaAscent extends WorldGame {
         if (!resume || !this.store.save.checkpoint) this.player.data.hasHelmet = true;
         this.player.data.respawnRevealTimer = 0;
     }
-    get mapReturnHref() { return `${GUAIRA_ASCENT.mapHref}?at=${this.finished ? 'vazao' : 'corral'}`; }
+    get mapReturnHref() {
+        return guairaReturnHref(this.finished ? 'vazao' : 'corral', this.finished ? 'ascent-clear' : null);
+    }
     toggleAscentPause() {
         if (this.state === 'paused') this.resume();
         else if (this.state === 'playing') this.pause();
@@ -120,7 +123,7 @@ export class GuairaAscent extends WorldGame {
         }
         this.renderer.present();
         const message = paused ? 'Pausado · Esc ou Continuar para voltar'
-            : this.finished ? 'Desvio à vista · o cano particular recebe água, o ramal do bairro segue fechado · Mapa volta à Casa da Vazão'
+            : this.finished ? 'O ramal do bairro segue fechado · CASA volta ao mapa · Prefeito: encontro opcional para reabrir a água'
             : this.player.data.isDead ? 'Retorno automático ao ponto seguro desta tentativa · Recomeçar reinicia a subida'
             : this.player.data.position.y + this.player.data.height > 328 ? 'Piso seco de recuperação · pule pelo degrau à esquerda e reembarque'
             : x < 160 ? 'Subida da Vazão · setas/A D: mover · Espaço: pular · Esc: pausa · M: som'

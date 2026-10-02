@@ -8,6 +8,7 @@ import { STAGES } from '../src/adventure/campaign';
 import { GuairaBullEncounter, GuairaBullLab } from '../src/adventure/experimental/guaira/GuairaBullLab';
 import { BULL_RULES, SkeletonBullModel } from '../src/adventure/experimental/guaira/SkeletonBullModel';
 import { guairaBrowser, Canvas } from './helpers/guairaLabHarness';
+import recording from './helpers/guairaLabReplay.json';
 
 const step = (game: GuairaBullLab, n = 1) => { for (let i = 0; i < n; i++) game.update(BULL_RULES.tickMs); };
 const model = (game: GuairaBullLab) => (game.boss as GuairaBullEncounter).model;
@@ -49,6 +50,7 @@ test('pause via Escape, HUD, blur and visibility freezes and resumes without cam
 test('real toolbar has native 44px bitmap controls, retry resets combat and Enter/Space do not leak', async t => {
     const h = guairaBrowser(t); await import('../src/guaira-lab');
     const game = h.window.worldGame as GuairaBullLab;
+    assert.equal(h.exit.getAttribute('href'), './guaira.html?at=corral');
     for (const [control, name] of [[h.pause, 'Pausar'], [h.retry, 'Tentar novamente'], [h.exit, 'Voltar ao mapa de Guaíra'],
         [h.ascent, 'Subir à Casa da Vazão para observar o desvio da água']] as const) {
         assert.equal(control.getAttribute('aria-label'), name);
@@ -72,11 +74,18 @@ test('real toolbar has native 44px bitmap controls, retry resets combat and Ente
     assert.equal(h.canvas.focused, true); assert.equal(game.elapsed, 0);
     h.frame(); assert.equal(h.ascent.hidden, true); assert.equal(h.pause.hidden, false);
     assert.equal(h.ascent.dispatch('click'), true, 'a stale early activation cannot open Subida');
-    // The real final falling hit exposes the contextual continuation, not an automatic navigation.
-    const b = model(game); b.health = 1; b.state = 'recover'; b.stateTick = 0;
-    game.player.data.position = { x: b.x + 12, y: b.y - game.player.data.height - 1 };
-    game.player.data.velocity = { x: 0, y: 2 }; game.player.data.isGrounded = false;
-    step(game); game.render(); h.frame();
+    // Replay the existing complete encounter through native keys, without manufacturing victory.
+    let held = new Set<string>();
+    for (const [count, keys] of recording.runs as Array<[number, string[]]>) {
+        const next = new Set(keys);
+        for (const code of held) if (!next.has(code)) h.window.dispatch('keyup', { key: code === 'Space' ? ' ' : code, code, target: h.canvas });
+        for (const code of next) if (!held.has(code)) h.window.dispatch('keydown', { key: code === 'Space' ? ' ' : code, code, target: h.canvas });
+        held = next;
+        for (let n = 0; n < count; n++) game.update(recording.stepMs);
+    }
+    game.render();
+    assert.equal(h.exit.dispatch('click'), false, 'return activation reads a victory before RAF');
+    assert.equal(h.exit.getAttribute('href'), './guaira.html?at=corral&visit=bull-clear'); h.frame();
     assert.equal(game.canAdvanceToAscent, true); assert.equal(h.ascent.hidden, false); assert.equal(h.pause.hidden, true);
     assert.equal(game.stage.id, 'guaira-lab', 'winning stays here until the player chooses');
     assert.match(h.status.textContent, /Subir leva à Casa da Vazão/);
@@ -86,12 +95,17 @@ test('real toolbar has native 44px bitmap controls, retry resets combat and Ente
     assert.equal(h.document.activeElement, h.pause, 'focus follows the visible continuation/pause slot');
     assert.equal(h.pause.getAttribute('aria-label'), 'Continuar');
     assert.equal(h.ascent.dispatch('click'), true, 'a queued next activation cannot bypass Pause');
+    assert.equal(h.exit.getAttribute('href'), './guaira.html?at=corral&visit=bull-clear');
+    assert.equal(h.exit.dispatch('click'), false);
     h.key('Escape'); step(game); h.frame();
     assert.equal(game.canAdvanceToAscent, true); assert.equal(h.document.activeElement, h.ascent);
-    h.retry.dispatch('click'); h.frame();
+    h.retry.dispatch('click');
+    assert.equal(h.exit.getAttribute('href'), './guaira.html?at=corral', 'Retry clears the result before RAF');
+    assert.equal(h.ascent.dispatch('click'), true, 'the prior continuation is invalid synchronously');
+    h.frame();
     assert.equal(game.canAdvanceToAscent, false); assert.equal(h.ascent.hidden, true); assert.equal(h.pause.hidden, false);
     assert.equal(h.ascent.dispatch('click'), true, 'Retry invalidates an earlier completion action');
-    assert.deepEqual(game.store.save.completed, []);
+    assert.deepEqual(game.store.save.completed, []); assert.deepEqual(h.storageCalls, []);
 });
 
 test('touch owns ordinary move, jump and ground-pound actions and cancel releases them', t => {
