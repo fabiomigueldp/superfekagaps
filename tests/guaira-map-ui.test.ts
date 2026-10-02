@@ -70,15 +70,16 @@ test('actual map entry handles pending loading, selection, arrival, reduced moti
     finishImage(); await ready(); frames(2);
     assert.equal(elements['map-title'].textContent, 'Passarela dos Arrozais');
     assert.equal(elements['map-enter'].disabled, false); assert.equal(elements['map-loading-panel'].hidden, true);
-    assert.equal(elements['map-return'].hidden, true);
-    elements['map-return'].dispatchEvent(new Event('click'));
-    assert.equal(elements['map-title'].textContent, 'Passarela dos Arrozais', 'rice ignores stale context actions');
+    assert.equal(elements['map-return'].hidden, false);
+    assert.equal(elements['map-return'].attributes['aria-label'], 'Passagem dos Respiros: explorar a irrigação, percurso opcional');
     assert.equal(navigations.length, 0); assert.equal(replacements.length, 0);
     assert.equal(elements['map-enter'].attributes['aria-label'], 'Caminhar até o Curral da Comporta');
     elements['map-enter'].click();
     assert.equal(elements['map-title'].textContent, 'Curral da Comporta');
     assert.equal(elements['map-enter'].disabled, true);
     assert.equal(navigations.length, 0, 'contextual continuation walks before entering');
+    elements['map-return'].dispatchEvent(new Event('click'));
+    assert.equal(navigations.length, 0, 'a stale optional entry cannot survive departure');
     assert.equal(key('ArrowRight').defaultPrevented, true); frames(2);
     assert.equal(elements['map-title'].textContent, 'Curral da Comporta'); assert.equal(elements['map-enter'].disabled, true);
     elements['map-enter'].dispatchEvent(new Event('click')); assert.equal(navigations.length, 0, 'even synthetic early Enter cannot navigate');
@@ -155,7 +156,7 @@ test('actual map entry handles pending loading, selection, arrival, reduced moti
 
 test('loading and failure markup retain direct links to every isolated experiment', () => {
     const html = readFileSync(new URL('../guaira.html', import.meta.url), 'utf8');
-    for (const href of ['./guaira-travessia.html', './guaira-lab.html', './guaira-subida.html', './guaira-prefeito.html', './guaira-patio.html']) {
+    for (const href of ['./guaira-travessia.html', './guaira-lab.html', './guaira-subida.html', './guaira-prefeito.html', './guaira-patio.html', './guaira-respiros.html']) {
         assert.equal(html.split(`href="${href}"`).length - 1, 2, `${href} is available during loading and failure`);
     }
     assert.match(html, /id="destination-subida"[^>]*data-map-destination="subida"/);
@@ -184,6 +185,33 @@ test('town shows the optional Patio separately from the primary traversal and va
     elements['map-enter'].dispatchEvent(new Event('click'));
     assert.equal(navigations.length, before + 1, 'closing guards both the primary and optional entries');
     dispose();
+});
+
+test('rice offers optional Respiros while Curral still walks, and checks late activations', async () => {
+    const module = await import('../src/guaira');
+    fetchRaw = raw; imageReady = Promise.resolve(); waterReady = Promise.resolve(); waterFailure = true;
+    motion.matches = false; doc.hidden = false;
+    locationMock.search = '?at=rice&visit=respiros-clear';
+    locationMock.href = 'https://example.test/guaira.html?at=rice&visit=respiros-clear';
+    const dispose = module.startGuairaMap(); await ready(); frames(2);
+    assert.equal(elements['map-enter'].attributes['aria-label'], 'Caminhar até o Curral da Comporta');
+    assert.equal(elements['map-return'].hidden, false);
+    assert.match(elements['map-return'].attributes['aria-label'], /Respiros.*opcional/);
+    assert.match(elements['map-status'].textContent, /Respiros concluída nesta visita/);
+    const before = navigations.length;
+    elements['map-return'].click(); assert.equal(navigations.at(-1), './guaira-respiros.html');
+    assert.equal(elements['map-return'].hidden, true); assert.equal(elements['map-enter'].disabled, true);
+    elements['map-return'].dispatchEvent(new Event('click')); elements['map-enter'].dispatchEvent(new Event('click'));
+    assert.equal(navigations.length, before + 1, 'closed model rejects duplicate optional and primary actions');
+    dispose();
+    const retry = module.startGuairaMap(); await ready(); frames(2);
+    elements['map-enter'].click();
+    assert.equal(elements['map-return'].hidden, true); assert.equal(elements['map-return'].disabled, true);
+    elements['map-return'].dispatchEvent(new Event('click'));
+    assert.equal(navigations.length, before + 1, 'choosing Curral closes optional entry immediately');
+    assert.equal(elements['map-title'].textContent, 'Curral da Comporta');
+    assert.equal(elements['map-enter'].disabled, true);
+    retry();
 });
 
 test('water repaints regions at30Hz without idle marker layout, freezes when hidden/reduced, and ignores late disposal', async () => {

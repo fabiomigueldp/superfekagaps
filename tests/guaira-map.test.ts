@@ -181,7 +181,7 @@ test('Casa action cannot survive a departure selection, reversal, skip, reduced 
 });
 
 test('visit summaries accept only exact outcome/arrival pairs and never become gameplay state', () => {
-    const pairs = [['rice', 'traversal-clear'], ['rice', 'junction-clear'], ['corral', 'bull-clear'], ['vazao', 'ascent-clear'], ['vazao', 'mayor-clear']] as const;
+    const pairs = [['rice', 'traversal-clear'], ['rice', 'junction-clear'], ['rice', 'respiros-clear'], ['corral', 'bull-clear'], ['vazao', 'ascent-clear'], ['vazao', 'mayor-clear']] as const;
     for (const [at, visit] of pairs) {
         const href = guairaReturnHref(at, visit);
         assert.equal(href, `./guaira.html?at=${at}&visit=${visit}`);
@@ -241,4 +241,22 @@ test('rice continuation follows the authored road and is distinct from entering 
     const closed = new GuairaMapModel(metadata, 'rice'); closed.close(); closed.walkToCorral();
     assert.equal(closed.canWalkToCorral, false); assert.equal(closed.selected, null);
     assert.doesNotMatch(GUAIRA_DESTINATIONS.town.description, /leve água ao bairro/);
+});
+
+test('the optional irrigation passage is available only at a neutral rice arrival', () => {
+    for (const reduced of [false, true]) for (const context of [null, 'respiros-clear'] as const) {
+        const model = new GuairaMapModel(metadata, 'rice', context); model.setReducedMotion(reduced);
+        assert.equal(model.respirosHref(), './guaira-respiros.html');
+        assert.equal(model.enterHref(), null); assert.equal(model.canWalkToCorral, true);
+        assert.equal(guairaMapPresentation(model).action, 'CURRAL');
+        assert.match(guairaMapPresentation(model).description, /pressurizada, opcional/);
+        assert.equal(guairaMapPresentation(model).status.includes('Respiros concluída'), context !== null);
+        model.walkToCorral(); assert.equal(model.respirosHref(), null); assert.equal(model.returnContext, null);
+        finish(model); assert.equal(model.respirosHref(), null); assert.equal(model.enterHref(), './guaira-lab.html');
+    }
+    for (const at of ['town', 'corral', 'vazao'] as const) assert.equal(new GuairaMapModel(metadata, at).respirosHref(), null);
+    const closed = new GuairaMapModel(metadata, 'rice'); closed.close(); assert.equal(closed.respirosHref(), null);
+    const departing = new GuairaMapModel(metadata, 'rice'); departing.select('town');
+    assert.equal(departing.arrival, 'rice'); assert.equal(departing.respirosHref(), null, 'selection disables entry before the first walking frame');
+    assert.equal(Object.keys(GUAIRA_DESTINATIONS).length, 3);
 });

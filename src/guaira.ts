@@ -52,10 +52,11 @@ export function startGuairaMap(): () => void {
         element('map-description').textContent = presentation.description;
         status.textContent = presentation.status;
         enter.disabled = !model.canEnter && !model.canWalkToCorral; skip.hidden = !model.moving;
-        returnButton.hidden = !model.canEnterMayor && !model.canEnterJunction;
+        returnButton.hidden = !model.canEnterMayor && !model.canEnterJunction && !model.canEnterRespiros;
         returnButton.disabled = returnButton.hidden;
-        returnArt.setLabel(model.canEnterJunction ? 'PATIO' : 'VOLTAR', model.canEnterJunction
-            ? 'Pátio das Comportas: explorar o percurso opcional de água' : 'Voltar ao curral pela estrada');
+        returnArt.setLabel(model.canEnterJunction ? 'PATIO' : model.canEnterRespiros ? 'RESPIROS' : 'VOLTAR', model.canEnterJunction
+            ? 'Pátio das Comportas: explorar o percurso opcional de água'
+            : model.canEnterRespiros ? 'Passagem dos Respiros: explorar a irrigação, percurso opcional' : 'Voltar ao curral pela estrada');
         enterArt.setLabel(presentation.action, presentation.actionName);
         overviewButton.setAttribute('aria-pressed', String(overview));
         overviewArt.setLabel(overview ? 'VER FEKA' : 'VER MAPA', overview ? 'Acompanhar Feka' : 'Ver mapa inteiro');
@@ -119,8 +120,8 @@ export function startGuairaMap(): () => void {
     }
     for (const button of destinations) button.addEventListener('click', () => select(button.dataset.mapDestination as GuairaDestination), { signal });
     returnButton.addEventListener('click', () => {
-        const junctionHref = model?.junctionHref();
-        if (junctionHref) { model?.close(); reflect(); location.assign(junctionHref); return; }
+        const optionalHref = model?.junctionHref() ?? model?.respirosHref();
+        if (optionalHref) { model?.close(); reflect(); location.assign(optionalHref); return; }
         if (!model?.canEnterMayor) return;
         model.returnToCorral(); clearVisitURL(); previousTime = 0; reflect(); requestFrame();
         destinations.find(button => button.dataset.mapDestination === 'curral' && !markers.includes(button))?.focus();

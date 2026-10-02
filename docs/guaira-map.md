@@ -6,6 +6,8 @@ O experimento não recebe número de mundo de campanha, não usa `parseMapMetada
 
 No início da estrada, **JOGAR** mantém a Travessia principal. A ação secundária **PATIO** abre `/guaira-patio.html`, o Pátio das Comportas: um segundo percurso opcional de seleção A/B da água. A escolha só fica disponível quando Feka está parado no início, nunca durante caminhada ou em outro marco. Isso reutiliza o espaço da ação contextual, sem acrescentar um quarto destino permanente. O Pátio retorna ao início se interrompido e ao arrozal com `visit=junction-clear` quando concluído; o resumo indica o trecho real, sem afirmar que a Travessia principal também foi feita. Links diretos do Pátio permanecem disponíveis nos painéis de carregamento/falha.
 
+No arrozal sem destino selecionado, a ação secundária **RESPIROS** abre `/guaira-respiros.html`, uma passagem opcional de descargas de irrigação. **CURRAL** continua a ação principal e caminha pela estrada antes da entrada na arena. A oferta desaparece imediatamente ao selecionar outro destino; cliques atrasados não podem abrir a fase. MAPA nos Respiros retorna sempre ao arrozal, com `visit=respiros-clear` apenas depois da chegada final real. Os painéis de carregamento/falha também conservam o link direto.
+
 ## Retornos sem save
 
 - `guaira.html?at=town`: Feka na estrada `guaira-1`, pronto para entrar na travessia
@@ -15,7 +17,7 @@ No início da estrada, **JOGAR** mantém a Travessia principal. A ação secund�
 
 Outros valores caem na estrada. O retorno é uma posição de visita, nunca um desbloqueio persistente. Ao chegar a um ponto de partida, `history.replaceState` atualiza `at` na URL atual. Arena e Subida usam a mesma posição de visita `at=corral`. O modelo não navega sozinho; **JOGAR**, **ARENA**, **SUBIR** ou **PREFEITO** são sempre uma ação separada. Recarregar durante uma caminhada restaura a última chegada registrada na URL; não salva uma posição intermediária.
 
-O parâmetro opcional `visit` descreve somente o resultado do trecho que acabou de ser deixado: `traversal-clear` em `rice`, `bull-clear` em `corral`, `ascent-clear` ou `mayor-clear` em `vazao`. Valores desconhecidos, parâmetros duplicados e pares incompatíveis são ignorados. O retorno da travessia no checkpoint não inclui resultado; chegar aos arrozais sozinho não prova conclusão. As quatro cenas derivam esse resumo de seus resultados reais, inclusive na pausa; Recomeçar atualiza o link imediatamente para a versão neutra.
+O parâmetro opcional `visit` descreve somente o resultado do trecho que acabou de ser deixado: `traversal-clear`, `junction-clear` ou `respiros-clear` em `rice`, `bull-clear` em `corral`, `ascent-clear` ou `mayor-clear` em `vazao`. Valores desconhecidos, parâmetros duplicados e pares incompatíveis são ignorados. O retorno da travessia no checkpoint não inclui resultado; chegar aos arrozais sozinho não prova conclusão. As cenas derivam esse resumo de seus resultados reais, inclusive na pausa; Recomeçar atualiza o link imediatamente para a versão neutra.
 
 Esse resumo orienta o próximo passo: **CURRAL** caminha pela estrada após a travessia; a vitória de Ossabravo recomenda **SUBIR** sem mover Feka do curral; **CASA** ao terminar a Subida leva à oferta opcional do Prefeito; a vitória do Prefeito é reconhecida na Casa e a ação vira **REPETIR**. Selecionar outro destino descarta o resumo do modelo e da URL antes da animação. Reload e voltar/avançar podem reconstruir o resumo da URL daquele item do histórico. Copiar uma URL também copia esse texto de visita; não é prova de conquista, não restaura água/máquinas, não transporta capacete/checkpoint e não bloqueia nem libera experimentos. Uma nova entrada inicia a tentativa normal. Não há acumulador de progresso, `localStorage` ou `sessionStorage`.
 
@@ -26,7 +28,7 @@ O laboratório usa **MAPA** / “Voltar ao mapa de Guaíra”, com `href="./guai
 - Casa, `selected=null`, controlador aberto e parado: principal **PREFEITO** habilitado; **VOLTAR** visível; os três destinos permanentes continuam disponíveis
 - **VOLTAR** seleciona `curral`; não muda a posição no clique. O ator percorre `3:4` ao contrário e só então habilita **ARENA**. Apenas **Chegar** ou movimento reduzido pulam a caminhada
 - Selecionar qualquer destino remove imediatamente a ação contextual, mesmo antes do primeiro quadro. Um clique atrasado em **VOLTAR** não substitui uma escolha mais recente; um clique em entrada consulta o estado atual, nunca um `href` antigo
-- Arrozal sem seleção: **CURRAL** inicia somente a caminhada e **VOLTAR** fica oculto. Depois da chegada é necessária outra ação para entrar, inclusive com movimento reduzido. Em movimento: entrada desabilitada e **CHEGAR** disponível. Curral: **ARENA** ou **SUBIR**, conforme a seleção
+- Arrozal sem seleção: **CURRAL** inicia somente a caminhada e **RESPIROS** oferece o desvio opcional no espaço da ação contextual. Depois da chegada é necessária outra ação para entrar, inclusive com movimento reduzido. Em movimento: entrada desabilitada e **CHEGAR** disponível. Curral: **ARENA** ou **SUBIR**, conforme a seleção
 - Carregamento: ações do mapa desabilitadas. Falha: somente links diretos. Saída: modelo fechado, sem segunda navegação em cliques repetidos. Reload e bfcache reconstroem o contexto validado a partir de `at` e `visit`
 
 ## Comportamento
@@ -37,7 +39,7 @@ O ator usa diretamente as matrizes e a paleta originais de Feka. A escala físic
 
 Todos os controles usam botões ou links nativos, com área de pelo menos 44 CSS pixels, nome acessível, foco visível e alternativa textual em alto contraste. Seta esquerda seleciona Travessia, direita seleciona Arena e cima seleciona Subida; Tab e Enter/Espaço operam os controles nativos. Sair, fechar a página e bfcache suspendem/descartam o controlador. Ocultar a aba cancela o quadro pendente e evita salto de tempo ao retornar.
 
-Metadados/imagem inválidos exibem um estado terminal com links para os quatro experimentos, incluindo Prefeito opcional. A validação JSON ocorre antes de aguardar a imagem. Esses links diretos também ficam disponíveis enquanto a cena carrega e podem quebrar linha; não são destinos permanentes da barra. Lentidão sem erro não dispara timeout arbitrário. Uma conclusão tardia de carregamento após sair nunca inicia o mapa.
+Metadados/imagem inválidos exibem um estado terminal com links para os seis experimentos, incluindo Prefeito, Pátio e Respiros opcionais. A validação JSON ocorre antes de aguardar a imagem. Esses links diretos também ficam disponíveis enquanto a cena carrega e podem quebrar linha; não são destinos permanentes da barra. Lentidão sem erro não dispara timeout arbitrário. Uma conclusão tardia de carregamento após sair nunca inicia o mapa.
 
 ## Arte e reprodução
 

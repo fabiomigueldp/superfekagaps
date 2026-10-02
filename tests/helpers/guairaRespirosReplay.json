@@ -1,0 +1,48 @@
+{
+  "evidence": "Frozen keyboard and native-touch replay through isolated GuairaRespiros / WorldGame / Input / Player; offline DOM harness.",
+  "sourceCommit": "c6e5b801dfadd4856d1af4be7e8981cfe0fa4820",
+  "stepMs": 16.666666666666668,
+  "initialSettleFrames": 1,
+  "inputFrames": 1523,
+  "start": {
+    "x": 48,
+    "feetY": 304,
+    "helmet": true
+  },
+  "runs": [
+    [
+      160,
+      []
+    ],
+    [
+      128,
+      [
+        "ArrowRight"
+      ]
+    ],
+    [
+      995,
+      []
+    ],
+    [
+      180,
+      [
+        "ArrowRight"
+      ]
+    ],
+    [
+      60,
+      []
+    ]
+  ],
+  "expected": {
+    "x": 657.3253406888704,
+    "feetY": 304,
+    "grounded": true,
+    "helmet": true,
+    "checkpointIndex": 0,
+    "storageAccesses": 0,
+    "finished": true
+  },
+  "note": "The adapter freezes at the first supported exit-bank arrival. The three-cycle refuge wait demonstrates indefinite safety, not a target first-play duration. No player reposition or direct completion call."
+}

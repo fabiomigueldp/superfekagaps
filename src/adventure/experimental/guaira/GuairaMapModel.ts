@@ -2,9 +2,9 @@
 export type GuairaDestination = 'town' | 'curral' | 'subida';
 export type GuairaArrival = 'town' | 'rice' | 'corral' | 'vazao';
 /** A summary of the visit just left, never saved progress or a world-state flag. */
-export type GuairaReturnContext = 'traversal-clear' | 'junction-clear' | 'bull-clear' | 'ascent-clear' | 'mayor-clear';
+export type GuairaReturnContext = 'traversal-clear' | 'junction-clear' | 'respiros-clear' | 'bull-clear' | 'ascent-clear' | 'mayor-clear';
 const RETURN_ARRIVALS: Record<GuairaReturnContext, GuairaArrival> = {
-    'traversal-clear': 'rice', 'junction-clear': 'rice', 'bull-clear': 'corral', 'ascent-clear': 'vazao', 'mayor-clear': 'vazao',
+    'traversal-clear': 'rice', 'junction-clear': 'rice', 'respiros-clear': 'rice', 'bull-clear': 'corral', 'ascent-clear': 'vazao', 'mayor-clear': 'vazao',
 };
 function validReturnContext(at: GuairaArrival, value: unknown): value is GuairaReturnContext {
     return typeof value === 'string' && Object.prototype.hasOwnProperty.call(RETURN_ARRIVALS, value) &&
@@ -99,6 +99,8 @@ export class GuairaMapModel {
     get canEnterMayor(): boolean { return !this.closed && this.selected === null && this.arrival === 'vazao' && !this.moving; }
     /** Optional second route starts at the town; it is not a new permanent map destination. */
     get canEnterJunction(): boolean { return !this.closed && this.selected === 'town' && this.arrival === 'town' && !this.moving; }
+    /** The irrigation passage is optional at the rice-field arrival, never a global destination. */
+    get canEnterRespiros(): boolean { return !this.closed && this.selected === null && this.arrival === 'rice' && !this.moving; }
     get canWalkToCorral(): boolean { return !this.closed && this.selected === null && this.arrival === 'rice' && !this.moving; }
     get canEnter(): boolean { return this.canEnterMayor || (!this.closed && this.selected !== null && !this.moving); }
     get point(): GuairaPoint { return this.pointAt(this.distance); }
@@ -135,5 +137,6 @@ export class GuairaMapModel {
         return this.canEnter && this.selected ? GUAIRA_DESTINATIONS[this.selected].href : null;
     }
     junctionHref(): string | null { return this.canEnterJunction ? './guaira-patio.html' : null; }
+    respirosHref(): string | null { return this.canEnterRespiros ? './guaira-respiros.html' : null; }
     close(): void { this.closed = true; }
 }

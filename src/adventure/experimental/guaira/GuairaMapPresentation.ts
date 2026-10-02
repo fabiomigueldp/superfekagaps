@@ -16,10 +16,11 @@ export function guairaMapPresentation(model: GuairaMapModel) {
     if (model.arrival === 'rice') {
         const cleared = model.returnContext === 'traversal-clear';
         return { title: 'Passarela dos Arrozais',
-            description: 'O curral fica adiante. Reentrar na Travessia começa outra tentativa.',
-            status: model.returnContext === 'junction-clear' ? 'Pátio concluído. Curral continua pela estrada; entre na arena ao chegar.'
-                : cleared ? 'Travessia concluída. Curral continua pela estrada; entre na arena ao chegar.'
-                : 'Feka está nos arrozais. Curral continua pela estrada; entre na arena ao chegar.',
+            description: 'Curral segue pela estrada. Respiros testa uma passagem de água pressurizada, opcional.',
+            status: model.returnContext === 'respiros-clear' ? 'Passagem dos Respiros concluída nesta visita. Curral continua pela estrada.'
+                : model.returnContext === 'junction-clear' ? 'Pátio concluído. Curral pela estrada; Respiros é opcional.'
+                : cleared ? 'Travessia concluída. Curral pela estrada; Respiros é opcional.'
+                : 'Curral segue pela estrada. Respiros é um desvio opcional.',
             action: 'CURRAL', actionName: 'Caminhar até o Curral da Comporta' };
     }
     const released = model.returnContext === 'mayor-clear';
