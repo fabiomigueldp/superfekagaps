@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prova de arte — chegada ao salão</title>
+<style>
+body{background:#131724;color:#f6d896;font:15px system-ui;margin:16px auto;max-width:960px;padding:0 8px}
+h1{font-size:21px}h2{font-size:16px;margin:20px 0 8px}p{max-width:75ch;line-height:1.5}
+canvas{display:block;width:960px;max-width:100%;height:auto;image-rendering:pixelated;background:#131724}
+button{background:#583341;color:#f6d896;border:1px solid #a08b87;padding:10px 14px;cursor:pointer;margin:4px}
+@media(max-width:975px){canvas{width:640px}}@media(max-width:655px){canvas{width:320px}}
+</style>
+<h1>Fábrica → salão → contenção</h1>
+<p>Prova de arte no patamar real de 3-3, conforme contrato de runtime: porta em (1776,184), 24×40; piso 224. Câmera de revisão (1600,64). Não executa interação nem altera colisões.</p>
+<h2>1 · Anexo do campeonato</h2>
+<canvas id="arrival" width="320" height="180" aria-label="Fábrica, fachada do campeonato e Feka na escala original"></canvas>
+<div><button data-status="open">Aberto</button><button data-status="closed">Fechado</button><button data-status="complete">Concluído</button></div>
+<h2>2 · Salão existente, preservado</h2>
+<canvas id="stage" width="320" height="180" aria-label="Palco original do campeonato"></canvas>
+<h2>3 · Contenção existente, preservada</h2>
+<canvas id="arena" width="320" height="180" aria-label="Arena original de contenção"></canvas>
+<p>Materiais em comum: aço, cobre, vinho e âmbar. O visor roxo antecipa a mistura misteriosa. Sem frutas. A fachada e a sinalização não animam e dispensam texturas.</p>
+<script type="module" src="./preview.ts"></script></html>
