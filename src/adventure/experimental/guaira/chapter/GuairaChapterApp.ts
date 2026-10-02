@@ -159,7 +159,7 @@ export class GuairaChapterApp {
         const retry = document.createElement('button'), exit = document.createElement('button');
         retry.type = exit.type = 'button'; retry.id = 'chapter-map-retry'; retry.textContent = 'TENTAR';
         retry.setAttribute('aria-label', 'Tentar abrir a maquete novamente');
-        exit.textContent = 'SAIR'; exit.setAttribute('aria-label', 'Sair do capítulo e voltar ao jogo principal');
+        exit.textContent = 'SAIR'; exit.setAttribute('aria-label', 'Sair do capítulo e voltar à seleção de experimentos');
         scope.listen(retry, 'click', () => {
             if (!this.current(scope)) return;
             this.advanceNavigation(); this.showMap(arrival, walkToSelection, focusAction);
@@ -168,7 +168,7 @@ export class GuairaChapterApp {
         nav.append(message, retry, exit); this.root.append(nav);
     }
     private changeOpening(opening: GuairaChapterOpening, generation: GuairaChapterGeneration, revision: number, scope: DisposalScope) {
-        if (!this.currentMapAction(scope, generation, revision) || !this.openingAvailable) return;
+        if (!this.currentMapAction(scope, generation, revision) || !this.openingAvailable || this.navigation.target.kind !== 'chapter') return;
         const next = this.session.restartChapter(generation, { opening });
         if (!next) return;
         this.session = next; this.excursionToken = null;

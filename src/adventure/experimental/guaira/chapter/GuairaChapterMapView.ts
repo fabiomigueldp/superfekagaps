@@ -62,7 +62,7 @@ export class GuairaChapterMapView {
     private readonly plaqueArt = new LabToolbarAction(this.plaque);
     private readonly journey = control('JORNADA', 'Ver a jornada de Guaíra');
     private readonly overview = control('VER MAPA', 'Ver mapa inteiro');
-    private readonly exit = control('SAIR', 'Sair do capítulo e voltar ao jogo principal');
+    private readonly exit = control('SAIR', 'Sair do capítulo e voltar à seleção de experimentos');
     private readonly primary = control('ENTRAR', 'Entrar no trecho selecionado', true);
     private readonly skip = control('CHEGAR', 'Chegar agora, pulando a caminhada');
     private readonly returnToChapter = control('RETOMAR', 'Retomar o trecho selecionado');
@@ -259,7 +259,7 @@ export class GuairaChapterMapView {
                 this.options.onSelect({ kind: 'chapter', sceneId: retainedScene }, generation, revision);
         };
         const openingAction = (opening: GuairaChapterOpening) => () => {
-            if (current() && !this.suspended() && this.loadState === 'ready' && this.openingAvailable && !this.snapshot.accepted.length && !this.entryRequested)
+            if (current() && target.kind === 'chapter' && !this.suspended() && this.loadState === 'ready' && this.openingAvailable && !this.snapshot.accepted.length && !this.entryRequested)
                 this.options.onOpening(opening, generation, revision);
         };
         this.traversal.button.onclick = openingAction('guaira-travessia');
@@ -275,7 +275,7 @@ export class GuairaChapterMapView {
         const ready = this.loadState === 'ready', moving = this.moving();
         const canEnter = this.canEnter(target, snapshot.generation, revision);
         const accepted = !optional && snapshot.accepted.some(receipt => receipt.sceneId === snapshot.selectedScene);
-        const opening = this.openingAvailable && !snapshot.accepted.length && !snapshot.activeAttempt;
+        const opening = !optional && this.openingAvailable && !snapshot.accepted.length && !snapshot.activeAttempt;
         const key = `${snapshot.generation.sessionId}:${snapshot.generation.generation}:${revision}:${optional}:${ready}:${this.loadState}:${moving}:${canEnter}:${this.entryRequested}:${this.overviewActive}:${opening}:${snapshot.selectedScene}:${snapshot.accepted.length}:${this.water.released}`;
         if (key === this.presentationKey) return; this.presentationKey = key;
         // hidden=true drops focus in real DOM immediately, so capture ownership first.
@@ -303,7 +303,7 @@ export class GuairaChapterMapView {
         this.returnToChapter.button.hidden = !optional;
         this.returnToChapter.button.disabled = !ready || !this.current(snapshot.generation, revision) || this.entryRequested;
         this.returnToChapter.art.setLabel('RETOMAR', `Retomar ${CHAPTER_SCENES[snapshot.selectedScene].title}, trecho selecionado da jornada`);
-        this.openingRow.hidden = !opening; this.traversal.button.disabled = !ready; this.junction.button.disabled = !ready;
+        this.openingRow.hidden = !opening; this.traversal.button.disabled = !ready || !opening; this.junction.button.disabled = !ready || !opening;
         this.traversal.button.setAttribute('aria-pressed', String(snapshot.opening === 'guaira-travessia'));
         this.junction.button.setAttribute('aria-pressed', String(snapshot.opening === 'guaira-patio-comportas'));
         this.overview.button.disabled = !ready;
