@@ -1,5 +1,5 @@
 {
-  "status": "arcade_r2_authorized_two_music_replacements_and_integration",
+  "status": "r2_generated_by_parent_no_more_requests",
   "pilot_id": "sfg-arcade-r2",
   "request_manifest_sha256": "e56cb980785f660fa4255ea33656f131be22331252bef03fd579343e4350b961",
   "approved_by": "user_instruction_relayed_by_parent",
@@ -29,5 +29,7 @@
   "existing_sfx_reuse_count": 12,
   "game_integration_authorized": true,
   "github_branch_publication_authorized": true,
-  "production_deploy_authorized": false
+  "production_deploy_authorized": false,
+  "remaining_paid_requests": 0,
+  "generation_completion_flow_url": "https://elevenlabs.io/app/flows/l5NIpun9E59Ud2olB4zR"
 }

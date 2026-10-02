@@ -19,8 +19,8 @@ Frase de cinco notas, um compasso de 4/4: graus **1–3–5–2–1**, por exemp
 pontuada. A subida é confiante; o retorno rápido é o pequeno tropeço cômico.
 A resposta pode ser um compasso de silêncio melódico com baixo/percussão.
 
-É uma proposta autoral escrita para este pacote, ainda sem composição gravada
-ou exame de semelhança. As notas nos prompts são orientação, não garantia de
+É uma proposta autoral escrita para este pacote, ainda sem conferência do
+motivo efetivamente gravado ou exame de semelhança. As notas nos prompts são orientação, não garantia de
 execução pelo modelo. Após escolher uma proposta, um editor/compositor confere
 o motivo real e fixa transcrição, andamento, tonalidade e pontos de loop. Não
 gastar tentativas indefinidas buscando precisão nota a nota por prompt.

@@ -300,7 +300,7 @@ export class WorldGame {
         }
         this.change('playing');
         this.audio.pause(false);
-        this.audio.select(stage.world, !!this.boss);
+        this.audio.select(stage.world, !!this.boss, stage.id);
         if (stage.encounter)
             for (const d of stage.dialogues)
                 this.spoken.add(d.id);

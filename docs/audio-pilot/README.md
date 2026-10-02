@@ -8,7 +8,10 @@ franquias. [Direção completa](direcao.md).
 O root já gerou o piloto anterior: duas músicas e 12 SFX. As **duas músicas estão
 rejeitadas como candidatas**; seus originais e histórico devem ser preservados.
 Os 12 SFX ficam candidatos a reaproveitamento depois da audição. A revisão ativa
-é `sfg-arcade-r2` e solicita **somente duas novas músicas de 40 segundos**.
+é `sfg-arcade-r2`: o root informou as **duas músicas substitutas concluídas** no
+[flow arcade](https://elevenlabs.io/app/flows/l5NIpun9E59Ud2olB4zR), com modelo
+real `eleven_music_v2`. Não gerar novamente. Os 14 arquivos ainda não chegaram
+a este ambiente.
 
 | Entrega | Arquivo |
 | --- | --- |
@@ -18,6 +21,7 @@ Os 12 SFX ficam candidatos a reaproveitamento depois da audição. A revisão at
 | Direção e inventário | [direcao.md](direcao.md) · [cues.csv](cues.csv) |
 | Auditoria dos 33 arquivos existentes | [auditoria.md](auditoria.md) · [medições](audit-assets.json) |
 | Preparação local sem rede | [audio_offline.py](../../tools/audio_offline/audio_offline.py) |
+| Integração de samples e limites atuais | [runtime.md](runtime.md) |
 | Operação atual | [operacao.md](operacao.md) |
 | Masters, loops, mixagem e audição | [audicao-e-entrega.md](audicao-e-entrega.md) |
 | Registro por take | [generation-record.example.json](../../tools/audio_offline/generation-record.example.json) |
@@ -47,15 +51,14 @@ Os 12 SFX ficam candidatos a reaproveitamento depois da audição. A revisão at
 python tools/audio_offline/audio_offline.py validate
 python tools/audio_offline/audio_offline.py estimate
 python -m unittest discover -s tools/audio_offline -p 'test_*.py' -v
-python tools/audio_offline/audio_offline.py prepare
 ```
 
-O export ativo é `tools/audio_offline/work/sfg-arcade-r2/`, com **dois** pedidos
-musicais, manifesto/hash e CSV de seleção. Use uma pasta nova com `--output` se
-já existir. Outputs são ignorados pelo Git. O pipeline não contém executor HTTP,
-leitura de segredo, upload ou publicação. Ele valida as descrições dos SFX para
-rastreabilidade mas não as exporta para geração de novo. O schema anterior foi
-invalidado para evitar uso acidental do lote antigo.
+O piloto está marcado `generated_by_parent`: `estimate` informa zero pedidos
+pendentes e `prepare` recusa duplicação. Os dois pedidos musicais antigos em
+`tools/audio_offline/work/sfg-arcade-r2/` são registro histórico, não execução
+pendente. Os campos de modelo no prompt registram a intenção original v2.5;
+o ledger registra o modelo efetivo v2 do plugin. Nenhum SFX será regenerado.
+O pipeline não contém executor HTTP, leitura de segredo, upload ou publicação.
 
 Python 3.10+ basta para preparar; FFmpeg/ffprobe são opcionais para auditoria.
 Nenhuma dependência nova foi adicionada. Os prompts rejeitados ficam preservados

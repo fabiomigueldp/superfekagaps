@@ -22,11 +22,24 @@
   "generation_requests": 0,
   "spend_in_this_task": 0,
   "commercial_license_verified": false,
-  "active_generation_route": "ElevenLabs plugin in parent/root only; parent reported successful creative_get_flow_node_types read.",
+  "active_generation_route": "Parent plugin completed r2; actual model eleven_music_v2. This session has no generation route.",
   "plugin_tools_available_in_this_session": false,
-  "generation_receipts_or_ids": [],
+  "generation_receipts_or_ids": [
+    {
+      "id": "mus_guaira_arcade__a__take01",
+      "title": "Salto de partida",
+      "provider_node_id": "hm9vDDKaLjGeDoFhGAUP",
+      "provider_model_id": "eleven_music_v2"
+    },
+    {
+      "id": "mus_guaira_arcade__b__take01",
+      "title": "Impulso pixel",
+      "provider_node_id": "eFFpzG5UMvU8XTgxZMbSx",
+      "provider_model_id": "eleven_music_v2"
+    }
+  ],
   "local_rest_generation_abandoned": true,
-  "next_step": "Parent generates only two arcade replacement music outputs via connected plugin and delivers those plus the 12 existing SFX through a dedicated assets branch and exact commit. This session performs integration after receipt; no local REST or duplicate SFX generation.",
+  "next_step": "Receive 2 completed arcade music originals and 12 existing SFX through dedicated assets branch and exact commit. Do not generate again. Integrate and measure received files.",
   "active_pilot_id": "sfg-arcade-r2",
   "prior_root_generation_report": "14 outputs already generated in flow aoC2seBLqtH0qywcqdFt; 2 music rejected for direction, 12 SFX to reuse after audition."
 }

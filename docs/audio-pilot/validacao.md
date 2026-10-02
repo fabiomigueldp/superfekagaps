@@ -1,5 +1,28 @@
 # Validação da revisão arcade r2
 
+## Preparação da integração e registro da geração concluída
+
+- `npm run check` passou: **1.254 testes TypeScript + 3 de servidor**, validadores,
+  dois typechecks e Vite build. Oito testes novos cobrem o carregador/fallback e
+  lifecycle, inclusive a ligação com `WorldAudio`.
+- Cinco testes Python passaram; o novo teste impede exportar novamente o piloto
+  marcado `generated_by_parent`. `estimate` informa zero pedidos pendentes.
+- Build: 141 arquivos, **40.579.558 bytes**, abaixo de 45.000.000 bytes. Nenhum
+  novo arquivo de áudio foi incluído. Os 21 arquivos de revisão continuam omitidos.
+- JSON, links locais da documentação e `git diff --check` passaram. Dependências
+  e lockfile não mudaram.
+- O root informou dois nós de música arcade concluídos, modelo real
+  `eleven_music_v2`, registrados no ledger. Nenhuma geração local, novo uso do
+  anexo ou consumo pago nesta rodada.
+- Runtime preparado com catálogo vazio: nenhum asset fictício ou novo som ativo.
+  Os 14 arquivos gerados ainda não chegaram. Não foram medidos nem ouvidos aqui.
+- Alteração fora de áudio: uma linha em `WorldGame.load`, que passa o ID da cena
+  à seleção sonora. Físicas, fases, progresso, chefes e intro Turbosuco não mudaram.
+- Base validada `bc431d5`; o integrador `ab942fee` ainda não está disponível aqui.
+  Conferência com esse trabalho paralelo permanece pendente.
+
+## Evidência da preparação anterior à geração arcade
+
 - Quatro testes Python passaram: export exclusivamente musical (duas saídas),
   rejeição do schema antigo/lote integral, direção arcade, IDs/durações/modelos,
   operação com sockets bloqueados e isolamento/não sobrescrita de saídas.
