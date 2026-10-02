@@ -134,6 +134,22 @@ test('retry retires pending generations; delayed success and rejection cannot re
     app.dispose(); h.checkDisposed();
 });
 
+test('scene import finishing in a hidden tab starts paused and never resumes solely on visibility', async t => {
+    const h = hostBrowser(t), pending = deferred<GuairaChapterSceneFactory>();
+    const factory = await loadGuairaChapterScene('guaira-travessia');
+    const app = h.create({ loadScene: () => pending.promise }); h.enter();
+    h.document.hidden = true; h.document.dispatch('visibilitychange');
+    pending.resolve(factory); await flush();
+    const game = app.activeGame!; assert.ok(game);
+    assert.equal(game.state, 'paused'); assert.equal(h.frames.size, 1, 'Hidden tab has no host reflection frame');
+    const elapsed = game.elapsed;
+    h.document.hidden = false; h.document.dispatch('visibilitychange'); h.frame();
+    assert.equal(game.state, 'paused'); assert.equal(game.elapsed, elapsed);
+    assert.equal(h.byId('chapter-primary').getAttribute('aria-label'), 'Retomar a tentativa');
+    h.byId('chapter-primary').click(); assert.equal(game.state, 'playing');
+    app.dispose(); h.checkDisposed();
+});
+
 test('real scene pause, blur, hidden and retry release input/audio and keep old toolbar callbacks inert', async t => {
     const h = hostBrowser(t), factory = await loadGuairaChapterScene('guaira-travessia');
     const app = h.create({ loadScene: async () => factory }); h.enter(); await flush();

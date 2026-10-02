@@ -192,6 +192,9 @@ export class GuairaChapterApp {
                 if (!document.hidden) frame = requestAnimationFrame(reflect);
             };
             scope.listen(document, 'visibilitychange', () => { stopFrame(); if (!document.hidden) reflect(); });
+            // The tab may have been hidden while the scene import was pending,
+            // before the native visibility listener existed.
+            if (document.hidden && game.state === 'playing') runtime.togglePause();
             reflect(); panel.fit(); game.start(); panel.canvas.focus({ preventScroll: true });
             document.title = `Guaíra · ${info.title} · capítulo`;
         } catch (error) {

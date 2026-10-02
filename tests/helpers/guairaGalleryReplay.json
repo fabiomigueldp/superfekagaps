@@ -1,0 +1,6 @@
+{
+  "description": "Native60Hz input events only; walk, jump and down. No player, tile, checkpoint or completion writes.",
+  "runs": [[61,["ArrowRight"]],[30,[]],[8,["Space"]],[40,["ArrowDown"]],[42,["ArrowRight"]],[30,[]],[68,["ArrowRight"]],[30,[]],[8,["Space"]],[40,["ArrowDown"]],[42,["ArrowRight"]],[30,[]],[26,["ArrowRight","Space"]],[30,[]],[26,["ArrowRight","Space"]],[30,[]],[26,["ArrowRight","Space"]],[30,[]],[20,["ArrowRight"]]],
+  "expected": {"x":657.3760220666115,"feet":192,"helmet":true},
+  "partialRuns": [[49,["ArrowRight"]],[30,[]],[8,["Space"]],[40,["ArrowDown"]],[42,["ArrowRight"]],[30,[]],[79,["ArrowRight"]],[30,[]],[8,["Space"]],[40,["ArrowDown"]],[68,["ArrowRight"]],[30,[]],[26,["ArrowRight","Space"]],[30,[]],[26,["ArrowRight","Space"]],[30,[]],[26,["ArrowRight","Space"]],[30,[]],[20,["ArrowRight"]]]
+}
