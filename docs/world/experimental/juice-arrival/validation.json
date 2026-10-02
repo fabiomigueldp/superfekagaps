@@ -1,0 +1,36 @@
+{
+  "deterministic": true,
+  "invalidBlank": true,
+  "statePreserved": true,
+  "adapterMatches": true,
+  "supportSolid": true,
+  "opaquePixels": 15082,
+  "bounds": {
+    "minX": 88,
+    "minY": 48,
+    "maxX": 231,
+    "maxY": 159
+  },
+  "drawCpuMs": {
+    "median": 0.295,
+    "p95": 0.3529999999993015
+  },
+  "overlay": false,
+  "buttons": 3,
+  "mobile": {
+    "overflow": false,
+    "canvas": {
+      "x": 8,
+      "y": 199,
+      "width": 320,
+      "height": 180,
+      "top": 199,
+      "right": 328,
+      "bottom": 379,
+      "left": 8
+    },
+    "reducedMotion": true
+  },
+  "errors": [],
+  "externalTexturesBlocked": true
+}
