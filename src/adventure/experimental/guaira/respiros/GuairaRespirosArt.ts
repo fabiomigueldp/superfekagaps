@@ -94,6 +94,15 @@ export function drawRespirosBackground(c: CanvasRenderingContext2D, cx: number, 
         }
         r(c, 600 - cameraX, 260 - cameraY, 43, 12, '#b59770');
         pixelText(c, 'CURRAL', 603 - cameraX, 262 - cameraY, '#63594c');
+        // A quiet observation bay, behind the checkpoint and the actor. The
+        // arrow leads the eye to B's real pressure gauge, not to a timed dash.
+        // No bright platform cap, collision, animation or independent clock.
+        r(c, 280 - cameraX, 267 - cameraY, 2, 28, '#927b5f');
+        r(c, 276 - cameraX, 245 - cameraY, 78, 22, '#b59770');
+        pixelText(c, 'PARE E OLHE', 279 - cameraX, 249 - cameraY, '#63594c');
+        line(c, 326 - cameraX, 261 - cameraY, 363 - cameraX, 261 - cameraY, P.ink);
+        line(c, 359 - cameraX, 257 - cameraY, 363 - cameraX, 261 - cameraY, P.ink);
+        line(c, 359 - cameraX, 265 - cameraY, 363 - cameraX, 261 - cameraY, P.ink);
         // Quiet ochre separates decorative channels and feet from the real cap.
         r(c, 0, 295 - cameraY, 320, 9, P.dust);
         for (let x = Math.floor(cameraX / 32) * 32; x < cameraX + 320; x += 32)

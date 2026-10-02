@@ -13,7 +13,7 @@ export function respirosArtStage(): AdventureStage {
         goalPosition: { x: 42, y: 19 }, isBossLevel: false });
     stage.mechanisms = [
         { id: 'proof-a', kind: 'jet', x: 160, y: 176, width: 96, height: 132, period: 4200, phase: 0 },
-        { id: 'proof-b', kind: 'jet', x: 384, y: 176, width: 176, height: 132, period: 4200, phase: 2100 },
+        { id: 'proof-b', kind: 'jet', x: 384, y: 176, width: 176, height: 132, period: 4200, phase: 1200 },
     ];
     stage.foes = []; stage.exits = []; stage.dialogues = []; stage.landmarks = []; stage.pickups = [];
     stage.checkpoints = [{ x: 19, y: 19 }]; stage.route = [];
