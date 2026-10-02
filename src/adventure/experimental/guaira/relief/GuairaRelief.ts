@@ -6,6 +6,9 @@ import type { AdventureStage } from '../../../types';
 import { panel, pixelText } from '../../../../graphics/BitmapFont';
 import { GUAIRA_RELIEF as G, guairaReliefStage, reliefOpen } from './GuairaReliefStage';
 import { drawReliefBackground, drawReliefTerrain, drawReliefObjects } from './GuairaReliefArt';
+import { GuairaReliefChallenge, RELIEF_ROUTE_OBJECTIVES, reliefChallengeMessage,
+    type GuairaReliefOptions, type GuairaReliefReplayKind, type GuairaReliefReplayAction,
+    type GuairaReliefRouteAPI } from './GuairaReliefChallenge';
 
 export { GUAIRA_RELIEF, guairaReliefStage } from './GuairaReliefStage';
 
@@ -14,10 +17,26 @@ export class GuairaRelief extends WorldGame {
     readonly reducedMotion: boolean;
     finished = false;
     private readonly completedAvatar = new CompletedAvatarPresentation();
-    constructor(canvas: HTMLCanvasElement, private readonly status: HTMLElement) {
+    private readonly challenge: GuairaReliefChallenge;
+    readonly routes: GuairaReliefRouteAPI;
+    private replayRevision = 0;
+    private replayPending = false;
+    private routeFocused = true;
+    constructor(canvas: HTMLCanvasElement, private readonly status: HTMLElement, options: GuairaReliefOptions = {}) {
         super(canvas, true);
         try {
-            this.addCleanup(() => { this.finished = false; this.store.save.checkpoint = null; this.input.reset(); });
+            this.challenge = new GuairaReliefChallenge(options.routeGoal ?? null);
+            const game = this;
+            this.routes = Object.freeze({ get revision() { return game.replayRevision; },
+                get snapshot() { return game.challenge.snapshot(); },
+                capture: (kind: GuairaReliefReplayKind) => game.captureReplay(kind) });
+            this.listen(window, 'blur', () => { this.routeFocused = false; this.replayRevision++; });
+            this.listen(window, 'focus', () => { this.routeFocused = true; this.replayRevision++; });
+            this.listen(document, 'visibilitychange', () => { this.replayRevision++; });
+            this.addCleanup(() => {
+                this.replayRevision++; this.challenge.reset();
+                this.finished = false; this.store.save.checkpoint = null; this.input.reset();
+            });
             this.reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
             this.art.background = (c, _island, x, y) => drawReliefBackground(c, this.level, x, y);
             this.art.terrain = (c, level, _island, x, y) => drawReliefTerrain(c, level, x, y);
@@ -37,12 +56,38 @@ export class GuairaRelief extends WorldGame {
     get reliefOpened() { return reliefOpen(this.level); }
     override load(_id: string, resume = false, _custom?: AdventureStage) {
         if (this.isDisposed) return;
+        this.replayRevision++; this.replayPending = false;
+        if (resume) this.challenge.reconstruct(); else this.challenge.reset();
         super.load(G.id, resume, guairaReliefStage());
         this.finished = false; this.time = 0; this.completedAvatar.reset();
         const p = this.player.data;
         p.isGrounded = true; p.facingRight = true; p.respawnRevealTimer = 0;
         if (!this.store.save.checkpoint) p.hasHelmet = true;
         this.frameRelief(true);
+    }
+    /** A host remounts only after consuming a captured action. The closure owns
+     * this scene/revision, so an old click can never authorize a newer visit. */
+    private captureReplay(kind: GuairaReliefReplayKind): GuairaReliefReplayAction | null {
+        const ready = () => !this.isDisposed && !this.replayPending && this.routeFocused && !document.hidden
+            && (kind === 'other-route' ? this.state === 'playing' && this.finished && !this.player.data.isDead
+                : kind === 'retry' && (this.state === 'playing' || this.state === 'paused'));
+        if (!ready()) return null;
+        const revision = this.replayRevision;
+        const goal = kind === 'retry' ? this.challenge.goal : this.reliefOpened ? 'keep-lid-and-helmet' : 'open-relief';
+        const options = Object.freeze({ routeGoal: goal });
+        return Object.freeze({ kind, options, objective: goal === null ? null : RELIEF_ROUTE_OBJECTIVES[goal],
+            consume: () => {
+                if (revision !== this.replayRevision || !ready()) return null;
+                this.replayRevision++; this.replayPending = true;
+                return options;
+            } });
+    }
+    protected override pause() { this.replayRevision++; super.pause(); }
+    protected override resume() { this.replayRevision++; super.resume(); }
+    private observeRoute() {
+        const p = this.player.data;
+        this.challenge.observe({ alive: !p.isDead, hasHelmet: p.hasHelmet,
+            reliefOpened: this.reliefOpened, finished: this.finished });
     }
     private frameRelief(snap = false, previousX = this.camera.x, previousY = this.camera.y) {
         const p = this.player.data, feet = p.position.y + p.height;
@@ -69,7 +114,12 @@ export class GuairaRelief extends WorldGame {
             return;
         }
         const objects = this.objects, previousX = this.camera.x, previousY = this.camera.y, before = objects.time;
+        const wasDead = this.player.data.isDead;
         super.update(dt);
+        if (!wasDead && this.player.data.isDead) this.replayRevision++;
+        // Observe before early returns: native hurt/death and checkpoint rebuild
+        // must remain visible even when this frame cannot produce an arrival.
+        this.observeRoute();
         if (this.objects !== objects || this.state !== 'playing' || this.player.data.isDead || objects.time <= before) return;
         const jet = objects.get(G.jetId)!;
         if (this.reliefOpened && !jet.active) {
@@ -82,6 +132,7 @@ export class GuairaRelief extends WorldGame {
         const p = this.player.data;
         if (p.isGrounded && p.position.x >= G.finishX && Math.abs(p.position.y + p.height - G.floor) < .01) {
             this.finished = true; p.velocity.x = 0; p.isRunning = false; this.input.reset(); this.audio.sfx('victory');
+            this.replayRevision++; this.observeRoute();
         }
     }
     protected override renderPlayer(view: CameraData) {
@@ -110,6 +161,8 @@ export class GuairaRelief extends WorldGame {
             : this.player.data.isDead ? 'Retorno ao ponto seguro desta tentativa · tampa e jato serão reconstruídos'
             : this.reliefOpened ? 'Alívio aberto: a água volta pelo tubo lateral e a grelha ficou sem pressão · siga à direita'
             : 'Duas rotas: siga no intervalo seco da grelha ou suba e rompa a tampa de alívio · pule, depois baixo no ar · morrer ou Tentar restaura tampa e jato';
-        if (this.status.textContent !== message) this.status.textContent = message;
+        const optional = !paused && !this.player.data.isDead ? reliefChallengeMessage(this.routes.snapshot) : null;
+        const text = optional ? `${message} · ${optional}` : message;
+        if (this.status.textContent !== text) this.status.textContent = text;
     }
 }
