@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { PLAYER_PALETTE, PLAYER_SPRITES, PLAYER_WALK } from '../src/assets/playerSpriteSpec';
-import { drawJuiceIntro } from '../src/adventure/experimental/JuiceIntroArt';
+import { drawJuiceIntro, drawJuiceIntroEscort } from '../src/adventure/experimental/JuiceIntroArt';
 import { JuiceIntroDirector, type IntroBeat, type IntroFrame } from '../src/adventure/experimental/JuiceIntroDirector';
 
 interface Fill { x: number; y: number; w: number; h: number; color: string; alpha: number; hero: boolean; }
@@ -138,4 +138,59 @@ test('cast fades in place, clears before the lab reveal and leaves the final han
     for (const t of [750, 1800, 2900]) assert.deepEqual(podiums(at('transition', t).frame), []);
     assert.deepEqual(podiums(at('complete').frame), []);
     assert.equal(at('transition', 1800).frame.stageExit, 1);
+});
+
+/** Rasterize the articulated actor independently, including the exit's mirrored pose. */
+function escortPixels(frame: IntroFrame, reduced = false) {
+    let x = 0, y = 0, sx = 1, sy = 1, color = '';
+    const states: number[][] = [], pixels: Record<string, string> = {};
+    const c = {
+        save() { states.push([x, y, sx, sy]); },
+        restore() { [x, y, sx, sy] = states.pop()!; },
+        translate(dx: number, dy: number) { x += dx * sx; y += dy * sy; },
+        scale(dx: number, dy: number) { sx *= dx; sy *= dy; },
+        set fillStyle(value: string) { color = value; },
+        fillRect(xx: number, yy: number, w: number, h: number) {
+            if (color.length !== 7) return; // The ground shadow is not anatomy.
+            const x0 = Math.min(x + xx * sx, x + (xx + w) * sx);
+            const y0 = Math.min(y + yy * sy, y + (yy + h) * sy);
+            for (let j = 0; j < Math.abs(h * sy); j++) for (let i = 0; i < Math.abs(w * sx); i++) {
+                pixels[`${x0 + i},${y0 + j}`] = color;
+            }
+        },
+    } as unknown as CanvasRenderingContext2D;
+    drawJuiceIntroEscort(c, frame, reduced);
+    assert.equal(states.length, 0);
+    return pixels;
+}
+
+test('escort has planted footsteps, holds still without movement, and freezes decorative gait in reduced motion', () => {
+    const base = { ...at('walk').frame, fekaMoving: true, fekaX: 57, fekaWalkDistance: 21 };
+    const first = escortPixels(base);
+    const later = escortPixels({ ...base, fekaX: 59, fekaWalkDistance: 23 });
+    const sole = (pixels: Record<string, string>) => Object.keys(pixels).filter(key => key.endsWith(',159')).sort();
+    assert.deepEqual(sole(later), sole(first), 'support sole stays planted while the body crosses over it');
+    assert.notDeepEqual(later, first, 'swinging foot and actor advance');
+    const idle = { ...base, fekaMoving: false };
+    assert.deepEqual(escortPixels(idle), escortPixels({ ...idle, timeMs: idle.timeMs + 1300 }));
+    assert.deepEqual(escortPixels(base, true), escortPixels(idle, true));
+});
+
+test('escort keeps connected anatomy through gait, shoulder contact, and the turn before exiting', () => {
+    const frames = [at('walk').frame, at('push', 100).frame, at('push', 350).frame, at('push', 550).frame,
+        { ...at('prepare').frame, elapsedMs: 50 }, { ...at('prepare').frame, elapsedMs: 350 }];
+    for (const frame of frames) {
+        const pixels = escortPixels(frame), unseen = new Set(Object.keys(pixels));
+        const stack = [unseen.values().next().value!]; unseen.delete(stack[0]);
+        while (stack.length) {
+            const [x, y] = stack.pop()!.split(',').map(Number);
+            for (const key of [`${x - 1},${y}`, `${x + 1},${y}`, `${x},${y - 1}`, `${x},${y + 1}`]) {
+                if (unseen.delete(key)) stack.push(key);
+            }
+        }
+        assert.equal(unseen.size, 0, `${frame.beat}: hands, elbows, neck and feet form one connected actor`);
+        if (frame.beat === 'push') assert.ok(pixels[`${Math.round(frame.fekaX) + 3},144`], 'palm meets Feka shoulder');
+    }
+    assert.deepEqual(escortPixels({ ...at('prepare').frame, elapsedMs: 800 }), {});
+    assert.deepEqual(escortPixels(at('reveal').frame), {});
 });

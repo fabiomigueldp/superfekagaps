@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import { JuiceMinibossModel } from '../src/adventure/experimental/JuiceMinibossModel';
 import { drawJuiceMiniboss } from '../src/adventure/experimental/JuiceMinibossArt';
 
-for (const target of [{ x: 7, y: 212 }, { x: 313, y: 212 }, { x: 160, y: 110 }]) {
-    test(`fan painter advertises all five exact locked launch vectors toward ${target.x},${target.y}`, () => {
-        const b = new JuiceMinibossModel(); b.phase = 'warning'; b.attack = 'fan';
+for (const health of [6, 2]) for (const target of [{ x: 7, y: 212 }, { x: 313, y: 212 }, { x: 160, y: 110 }]) {
+    test(`fan painter advertises every locked launch vector toward ${target.x},${target.y}, health ${health}`, () => {
+        const b = new JuiceMinibossModel(); b.phase = 'warning'; b.attack = 'fan'; b.health = health;
         b.targetX = target.x; b.targetY = target.y; b.phaseTime = 320;
         b.facing = target.x < b.x ? -1 : 1;
         const lines: Array<{ start: number[]; end: number[] }> = [];
@@ -18,11 +18,13 @@ for (const target of [{ x: 7, y: 212 }, { x: 313, y: 212 }, { x: 160, y: 110 }])
         }, { get(object, key) { return Reflect.get(object, key) ?? (() => {}); } }) as unknown as CanvasRenderingContext2D;
         const camera = { x: 3, y: 64 }, fan = b.fanLaunch;
         drawJuiceMiniboss(c, b, camera.x, camera.y);
-        assert.ok(lines.length >= 5);
-        lines.slice(0, 5).forEach((line, i) => {
-            const vector = fan.vectors[i], length = 230 + b.progress * 45;
+        assert.ok(lines.length >= fan.vectors.length);
+        lines.slice(0, fan.vectors.length).forEach((line, i) => {
+            const vector = fan.vectors[i];
             assert.deepEqual(line.start, [fan.x - camera.x + vector.vx * 110, fan.y - camera.y + vector.vy * 110]);
-            assert.deepEqual(line.end, [fan.x - camera.x + vector.vx * length, fan.y - camera.y + vector.vy * length]);
+            const dx = line.end[0] - line.start[0], dy = line.end[1] - line.start[1];
+            assert.ok(Math.abs(dx * vector.vy - dy * vector.vx) < 1e-9, 'Warning direction matches the projectile, including its upward bias.');
+            assert.ok(dx * vector.vx + dy * vector.vy > 0, 'Ray points along the shot rather than away from it.');
         });
     });
 }

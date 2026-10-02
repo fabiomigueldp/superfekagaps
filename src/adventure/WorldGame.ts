@@ -657,7 +657,7 @@ export class WorldGame {
         }
         this.updateSparks(dt);
     }
-    private updateSparks(dt: number) {
+    protected updateSparks(dt: number) {
         for (const s of this.sparks) {
             s.life -= dt;
             s.x += s.vx;
@@ -823,17 +823,19 @@ export class WorldGame {
         const count = this.store.save.seals.filter(id => id.startsWith(this.stage.id + ':')).length;
         pixelText(c, this.boss ? fitText(this.boss.name, 70) : `${count}/3`, 246, 8, ART.goldLight, 1, 'center');
         pixelText(c, 'II', 305, 8, ART.paper);
-        if (this.boss) {
-            panel(c, 64, 26, 192, 24);
-            const boss = this.boss;
-            for (let i = 0; i < boss.maxHealth; i++)
-                rect(c, 123 + i * 16, 30, 12, 4, i < boss.health ? '#f1a479' : '#4c5264');
-            pixelText(c, fitText(boss.hint, 184), 160, 40, '#e5d6c3', 1, 'center');
-        }
+        if (this.boss) this.renderEncounterHud(c);
         else if (this.player.data.hasHelmet)
             this.renderer.drawHelmet(283, 4, c);
         if (this.state === 'paused')
             this.renderer.drawPlayerTransition(this.player.data, view, c);
+    }
+    protected renderEncounterHud(c: CanvasRenderingContext2D) {
+        if (!this.boss) return;
+        panel(c, 64, 26, 192, 24);
+        const boss = this.boss;
+        for (let i = 0; i < boss.maxHealth; i++)
+            rect(c, 123 + i * 16, 30, 12, 4, i < boss.health ? '#f1a479' : '#4c5264');
+        pixelText(c, fitText(boss.hint, 184), 160, 40, '#e5d6c3', 1, 'center');
     }
     private renderTitle(c: CanvasRenderingContext2D) {
         this.art.background(c, ISLANDS[0], this.time * .008, 0, this.time);
