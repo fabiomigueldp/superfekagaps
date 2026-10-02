@@ -1,0 +1,99 @@
+.guaira-chapter-map {
+    --chapter-ink: #201f22;
+    --chapter-paper: #fff1cd;
+    --chapter-gold: #edc879;
+    box-sizing: border-box;
+    width: 100%; height: 100%; min-width: 0; min-height: 0;
+    display: grid; grid-template-rows: auto minmax(100px, 1fr) auto;
+    overflow: auto; position: relative; isolation: isolate;
+    color: var(--chapter-paper); background: #183a40;
+    font-family: system-ui, sans-serif;
+}
+.guaira-chapter-map *, .guaira-chapter-map *::before, .guaira-chapter-map *::after { box-sizing: border-box; }
+.guaira-chapter-map [hidden] { display: none !important; }
+.guaira-chapter-map button { font: inherit; touch-action: manipulation; }
+.guaira-chapter-map button:focus-visible { outline: 3px solid #fff4b8; outline-offset: 3px; }
+.guaira-chapter-map button:disabled { cursor: default; }
+.guaira-chapter-map .chapter-map-header {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 12px;
+    min-height: 57px; padding: 5px 12px; background: #142f35; border-bottom: 2px solid #516951;
+}
+.guaira-chapter-map .chapter-map-identity { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; min-width: 0; }
+.guaira-chapter-map .chapter-map-name { font-size: 20px; letter-spacing: .09em; margin: 0; color: var(--chapter-gold); }
+.guaira-chapter-map .chapter-map-count { font-size: 12px; line-height: 1.35; margin: 0; }
+.guaira-chapter-map .chapter-map-navigation, .guaira-chapter-map .chapter-map-actions, .guaira-chapter-map .chapter-map-openings {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px;
+}
+.guaira-chapter-map .chapter-map-control {
+    position: relative; display: inline-flex; justify-content: center; align-items: center;
+    flex: 0 0 auto; min-width: 44px; min-height: 44px; max-width: 100%;
+    margin: 0; border: 0; padding: 0; background: transparent; color: var(--chapter-paper); cursor: pointer;
+}
+.guaira-chapter-map .chapter-map-control:disabled { opacity: .55; }
+.guaira-chapter-map .chapter-map-control[aria-pressed="true"] { outline: 2px solid var(--chapter-gold); outline-offset: 1px; }
+.guaira-chapter-map .lab-action-art { display: block; image-rendering: pixelated; max-width: 100%; }
+.guaira-chapter-map .lab-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.guaira-chapter-map .chapter-map-scene { position: relative; min-width: 0; min-height: 100px; overflow: hidden; }
+.guaira-chapter-map .chapter-map-canvas { display: block; width: 100%; height: 100%; position: absolute; inset: 0; }
+.guaira-chapter-map .chapter-map-plaque { position: absolute; transform: translateX(-50%); pointer-events: none; }
+.guaira-chapter-map .chapter-map-loading, .guaira-chapter-map .chapter-map-failure {
+    position: absolute; z-index: 1; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; padding: 12px; background: #183a40; text-align: center; font-size: 14px; overflow: auto;
+}
+.guaira-chapter-map .chapter-map-failure p { margin: 0; max-width: 34em; }
+.guaira-chapter-map .chapter-map-footer {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px 12px;
+    min-height: 84px; padding: 8px 14px; background: #172d30; border-top: 2px solid #52664a;
+}
+.guaira-chapter-map .chapter-map-information { min-width: 0; overflow-wrap: anywhere; }
+.guaira-chapter-map .chapter-map-title { margin: 0 0 3px; font-size: 16px; line-height: 1.2; color: var(--chapter-gold); }
+.guaira-chapter-map .chapter-map-status { margin: 0; font-size: 12px; line-height: 1.35; }
+.guaira-chapter-map .chapter-map-hint { margin: 2px 0 0; font-size: 11px; line-height: 1.3; color: #dddcbb; }
+.guaira-chapter-map .chapter-map-actions { justify-content: flex-end; }
+.guaira-chapter-map .chapter-map-openings { grid-column: 1 / -1; }
+.guaira-chapter-map .chapter-map-dialog {
+    width: min(620px, calc(100% - 24px)); max-height: calc(100dvh - 24px); margin: auto;
+    border: 2px solid var(--chapter-gold); padding: 16px; background: #19373a; color: var(--chapter-paper);
+    overflow: auto; overscroll-behavior: contain; box-shadow: 0 12px 48px #0008;
+}
+.guaira-chapter-map .chapter-map-dialog::backdrop { background: #091b21b8; }
+.guaira-chapter-map .chapter-map-dialog-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.guaira-chapter-map .chapter-map-dialog-title { margin: 0; font-size: 19px; line-height: 1.25; }
+.guaira-chapter-map .chapter-map-list { list-style: none; padding: 0; margin: 14px 0; display: grid; gap: 7px; }
+.guaira-chapter-map .chapter-map-step-button {
+    display: grid; gap: 4px; width: 100%; min-height: 58px; border: 1px solid #728069;
+    padding: 10px 12px; text-align: left; background: #254448; color: var(--chapter-paper); cursor: pointer;
+    overflow-wrap: anywhere;
+}
+.guaira-chapter-map .chapter-map-step-button[aria-pressed="true"] { border: 2px solid var(--chapter-gold); padding: 9px 11px; }
+.guaira-chapter-map .chapter-map-step-button:disabled { background: #1c373b; color: #b5c0b0; }
+.guaira-chapter-map .chapter-map-step-title { font-size: 14px; font-weight: 700; }
+.guaira-chapter-map .chapter-map-step-state { font-size: 12px; line-height: 1.35; }
+.guaira-chapter-map .chapter-map-dialog-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; justify-content: space-between; }
+.guaira-chapter-map .chapter-map-session-note { margin: 0; flex: 1 1 210px; font-size: 12px; line-height: 1.5; }
+@media (max-width: 540px) {
+    .guaira-chapter-map .chapter-map-header { padding-inline: 8px; gap: 2px 8px; }
+    .guaira-chapter-map .chapter-map-identity { gap: 2px 8px; }
+    .guaira-chapter-map .chapter-map-name { font-size: 16px; }
+    .guaira-chapter-map .chapter-map-navigation { gap: 4px; }
+    .guaira-chapter-map .chapter-map-footer { padding: 7px 8px; gap: 5px 8px; }
+    .guaira-chapter-map .chapter-map-title { font-size: 14px; }
+    .guaira-chapter-map .chapter-map-actions { gap: 4px; }
+    .guaira-chapter-map .chapter-map-plaque { display: none; }
+    .guaira-chapter-map .chapter-map-dialog { padding: 12px; }
+}
+@media (max-width: 360px) {
+    .guaira-chapter-map .chapter-map-header { justify-content: center; }
+    .guaira-chapter-map .chapter-map-identity { width: 100%; justify-content: center; }
+    .guaira-chapter-map .chapter-map-footer { grid-template-columns: minmax(0, 1fr); }
+    .guaira-chapter-map .chapter-map-actions { justify-content: flex-start; }
+}
+@media (forced-colors: active) {
+    .guaira-chapter-map { --chapter-paper: CanvasText; --chapter-gold: Highlight; background: Canvas; color: CanvasText; }
+    .guaira-chapter-map .lab-action-art { display: none; }
+    .guaira-chapter-map .chapter-map-control .lab-sr { position: static; width: auto; height: auto; clip-path: none; margin: 0; overflow: visible; white-space: normal; }
+    .guaira-chapter-map .chapter-map-control { border: 1px solid ButtonText; padding: 6px 10px; background: ButtonFace; color: ButtonText; }
+    .guaira-chapter-map .chapter-map-control[aria-pressed="true"], .guaira-chapter-map .chapter-map-step-button[aria-pressed="true"] { outline: 2px solid Highlight; }
+    .guaira-chapter-map button:disabled { opacity: 1; color: GrayText; border-color: GrayText; }
+    .guaira-chapter-map button:focus-visible { outline-color: Highlight; }
+}

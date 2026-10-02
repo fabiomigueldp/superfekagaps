@@ -41,22 +41,27 @@ export function guairaTraversalStage(): AdventureStage {
 
 /** Real movement and checkpoint/death pipeline, with ephemeral completion. */
 export class GuairaTraversal extends WorldGame {
-    readonly reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    readonly reducedMotion: boolean;
     finished = false;
-    constructor(canvas: HTMLCanvasElement, private readonly status: HTMLElement) {
+    constructor(canvas: HTMLCanvasElement, private readonly status: HTMLElement,
+        private readonly continuationHint = 'CURRAL: ENFRENTE OSSABRAVO') {
         super(canvas, true);
-        this.art.background = (c, _island, cx, cy, time) => drawGuairaTraversalBackground(c, cx, cy, time, this.reducedMotion, !!this.objects.get(GUAIRA_TRAVERSAL.bridgeId)?.active);
-        this.art.terrain = (c, level, _island, cx, cy, time) => drawGuairaTraversalTerrain(c, level, cx, cy, time, this.reducedMotion);
-        this.art.objects = (c, objects, cx, cy, time) => drawGuairaTraversalObjects(c, objects, cx, cy, time, this.reducedMotion);
-        this.store.save.preferences.shake = !this.reducedMotion;
-        this.tutorial.observe = () => {};
-        this.load(GUAIRA_TRAVERSAL.id);
-        window.addEventListener('keydown', e => {
-            if (['ArrowLeft', 'ArrowRight', 'ArrowDown', ' ', 'a', 'd', 'm', 'M'].includes(e.key)) this.audio.unlock();
-        });
-        document.title = 'Super Feka Gaps · Guaíra · Travessia experimental';
+        try {
+            this.reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+            this.art.background = (c, _island, cx, cy, time) => drawGuairaTraversalBackground(c, cx, cy, time, this.reducedMotion, !!this.objects.get(GUAIRA_TRAVERSAL.bridgeId)?.active);
+            this.art.terrain = (c, level, _island, cx, cy, time) => drawGuairaTraversalTerrain(c, level, cx, cy, time, this.reducedMotion);
+            this.art.objects = (c, objects, cx, cy, time) => drawGuairaTraversalObjects(c, objects, cx, cy, time, this.reducedMotion);
+            this.store.save.preferences.shake = !this.reducedMotion;
+            this.tutorial.observe = () => {};
+            this.load(GUAIRA_TRAVERSAL.id);
+            this.listen(window, 'keydown', e => {
+                if (['ArrowLeft', 'ArrowRight', 'ArrowDown', ' ', 'a', 'd', 'm', 'M'].includes(e.key)) this.audio.unlock();
+            });
+            document.title = 'Super Feka Gaps · Guaíra · Travessia experimental';
+        } catch (error) { this.dispose(); throw error; }
     }
     override load(_id: string, resume = false, _custom?: AdventureStage) {
+        if (this.isDisposed) return;
         super.load(GUAIRA_TRAVERSAL.id, resume, guairaTraversalStage());
         this.finished = false; this.time = 0;
         this.player.data.isGrounded = true; this.player.data.facingRight = true;
@@ -78,13 +83,15 @@ export class GuairaTraversal extends WorldGame {
         return guairaReturnHref(this.finished || this.store.save.checkpoint ? 'rice' : 'town', this.finished ? 'traversal-clear' : null);
     }
     get canAdvanceToBoss() {
-        return this.state === 'playing' && !this.player.data.isDead && this.finished;
+        return !this.isDisposed && this.state === 'playing' && !this.player.data.isDead && this.finished;
     }
     toggleTraversalPause() {
+        if (this.isDisposed) return;
         if (this.state === 'paused') this.resume();
         else if (this.state === 'playing') this.pause();
     }
     override update(dt: number) {
+        if (this.isDisposed) return;
         if (!Number.isFinite(dt) || dt <= 0) return;
         if (this.state === 'map' || this.state === 'title' || this.state === 'intro') { this.load(GUAIRA_TRAVERSAL.id); return; }
         if (this.finished) {
@@ -108,6 +115,7 @@ export class GuairaTraversal extends WorldGame {
         }
     }
     override render() {
+        if (this.isDisposed) return;
         const paused = this.state === 'paused';
         // Render the real world without creating campaign pause-menu callbacks.
         if (paused) this.state = 'playing';
@@ -129,7 +137,7 @@ export class GuairaTraversal extends WorldGame {
         } else if (this.finished) {
             panel(c, 27, 40, 266, 43, '#382b35', '#d8ac7a');
             pixelText(c, 'A AGUA CHEGOU AO ARROZAL!', 160, 50, '#f0ddae', 1, 'center');
-            pixelText(c, 'CURRAL: ENFRENTE OSSABRAVO', 160, 65, '#edcaf5', 1, 'center');
+            pixelText(c, this.continuationHint, 160, 65, '#edcaf5', 1, 'center');
         } else if (nearValve && !this.player.data.isDead) {
             panel(c, 42, 29, 236, 19, '#382b35', '#d8ac7a');
             pixelText(c, !valve.active ? 'PULE + BAIXO NA PLACA' : this.bridgeReady ? 'PASSAGEM ABERTA' : 'PONTE SUBINDO...', 160, 35, '#f0ddae', 1, 'center');

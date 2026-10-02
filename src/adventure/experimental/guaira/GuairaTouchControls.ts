@@ -28,59 +28,65 @@ export class GuairaTouchControls {
     private closed = false;
 
     constructor(private readonly options: GuairaTouchControlsOptions) {
-        this.root.id = 'guaira-touch-controls';
-        this.root.className = 'guaira-touch-controls';
-        this.root.setAttribute('role', 'group');
-        this.root.setAttribute('aria-label', 'Controles de toque de Guaíra');
-        this.root.hidden = true;
-        for (const [action, label, name] of ACTIONS) {
-            const button = document.createElement('button');
-            button.type = 'button'; button.className = 'guaira-touch-button';
-            button.setAttribute('data-action', action);
-            button.setAttribute('data-symbol', label);
-            new LabToolbarAction(button).setLabel(label, name);
-            this.buttons.set(action, button); this.root.append(button);
-            this.listen(button, 'pointerdown', event => {
-                const pointer = event as PointerEvent;
-                if (pointer.button !== 0 || !this.available()) return;
-                pointer.preventDefault();
-                const key = `pointer:${pointer.pointerId}`;
-                if (this.gestures.has(key)) return;
-                this.begin(key, button, action, pointer.pointerId);
-            });
-            this.listen(button, 'lostpointercapture', event => this.end(`pointer:${(event as PointerEvent).pointerId}`, true));
-            this.listen(button, 'keydown', event => {
-                const key = event as KeyboardEvent;
-                if (!['Enter', ' '].includes(key.key) || key.ctrlKey || key.altKey || key.metaKey) return;
-                key.preventDefault();
-                if (!key.repeat && this.available()) this.begin(`key:${action}:${key.key}`, button, action);
-            });
-            this.listen(button, 'keyup', event => {
-                const key = event as KeyboardEvent;
-                if (!['Enter', ' '].includes(key.key)) return;
-                key.preventDefault(); this.end(`key:${action}:${key.key}`, !this.available());
-            });
-            this.listen(button, 'blur', () => {
-                for (const [key, gesture] of this.gestures) if (gesture.button === button && gesture.pointerId === undefined) this.end(key, true);
-            });
-            // Pointer and keyboard handlers already own their gestures. A native
-            // assistive click without those events gets one ordinary action tap.
-            this.listen(button, 'click', event => {
-                event.preventDefault();
-                if ((event as MouseEvent).detail !== 0 || !this.available()) return;
-                const key = `click:${action}`;
-                if (this.gestures.has(key)) return;
-                this.begin(key, button, action); this.end(key, !this.available());
-            });
-            this.listen(button, 'contextmenu', event => event.preventDefault());
+        try {
+            this.root.id = 'guaira-touch-controls';
+            this.root.className = 'guaira-touch-controls';
+            this.root.setAttribute('role', 'group');
+            this.root.setAttribute('aria-label', 'Controles de toque de Guaíra');
+            this.root.hidden = true;
+            for (const [action, label, name] of ACTIONS) {
+                const button = document.createElement('button');
+                button.type = 'button'; button.className = 'guaira-touch-button';
+                button.setAttribute('data-action', action);
+                button.setAttribute('data-symbol', label);
+                new LabToolbarAction(button).setLabel(label, name);
+                this.buttons.set(action, button); this.root.append(button);
+                this.listen(button, 'pointerdown', event => {
+                    const pointer = event as PointerEvent;
+                    if (pointer.button !== 0 || !this.available()) return;
+                    pointer.preventDefault();
+                    const key = `pointer:${pointer.pointerId}`;
+                    if (this.gestures.has(key)) return;
+                    this.begin(key, button, action, pointer.pointerId);
+                });
+                this.listen(button, 'lostpointercapture', event => this.end(`pointer:${(event as PointerEvent).pointerId}`, true));
+                this.listen(button, 'keydown', event => {
+                    const key = event as KeyboardEvent;
+                    if (!['Enter', ' '].includes(key.key) || key.ctrlKey || key.altKey || key.metaKey) return;
+                    key.preventDefault();
+                    if (!key.repeat && this.available()) this.begin(`key:${action}:${key.key}`, button, action);
+                });
+                this.listen(button, 'keyup', event => {
+                    const key = event as KeyboardEvent;
+                    if (!['Enter', ' '].includes(key.key)) return;
+                    key.preventDefault(); this.end(`key:${action}:${key.key}`, !this.available());
+                });
+                this.listen(button, 'blur', () => {
+                    for (const [key, gesture] of this.gestures) if (gesture.button === button && gesture.pointerId === undefined) this.end(key, true);
+                });
+                // Pointer and keyboard handlers already own their gestures. A native
+                // assistive click without those events gets one ordinary action tap.
+                this.listen(button, 'click', event => {
+                    event.preventDefault();
+                    if ((event as MouseEvent).detail !== 0 || !this.available()) return;
+                    const key = `click:${action}`;
+                    if (this.gestures.has(key)) return;
+                    this.begin(key, button, action); this.end(key, !this.available());
+                });
+                this.listen(button, 'contextmenu', event => event.preventDefault());
+            }
+            this.listen(window, 'pointerup', event => this.end(`pointer:${(event as PointerEvent).pointerId}`, !this.available()), true);
+            this.listen(window, 'pointercancel', event => this.end(`pointer:${(event as PointerEvent).pointerId}`, true), true);
+            this.listen(window, 'blur', () => this.cancelAll());
+            this.listen(document, 'visibilitychange', () => { if (document.hidden) this.cancelAll(); });
+            if (this.coarse) this.listen(this.coarse, 'change', () => this.sync());
+            (options.parent ?? document.body).append(this.root);
+            this.sync();
+        } catch (error) {
+            // Construction has not returned ownership to its host yet.
+            try { this.dispose(); } catch { /* Preserve the setup failure after detaching resources. */ }
+            throw error;
         }
-        this.listen(window, 'pointerup', event => this.end(`pointer:${(event as PointerEvent).pointerId}`, !this.available()), true);
-        this.listen(window, 'pointercancel', event => this.end(`pointer:${(event as PointerEvent).pointerId}`, true), true);
-        this.listen(window, 'blur', () => this.cancelAll());
-        this.listen(document, 'visibilitychange', () => { if (document.hidden) this.cancelAll(); });
-        if (this.coarse) this.listen(this.coarse, 'change', () => this.sync());
-        (options.parent ?? document.body).append(this.root);
-        this.sync();
     }
 
     get visible(): boolean { return !this.closed && !this.root.hidden; }

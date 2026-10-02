@@ -1,6 +1,7 @@
 // Sistema de Input - Super Feka Gaps
 
 import { InputState } from '../types';
+import { DisposalScope } from './DisposalScope';
 
 export type InputAction = 'left' | 'right' | 'jump' | 'run' | 'down';
 type HeldAction = InputAction;
@@ -46,6 +47,9 @@ const createState = (): InputState => ({
 });
 
 export class Input {
+  private readonly lifetime = new DisposalScope();
+  private attachFrame: number | null = null;
+  get isDisposed(): boolean { return this.lifetime.isDisposed; }
   private state = createState();
   private pressedKeys = new Set<string>();
   private touchActions = new Set<HeldAction>();
@@ -79,15 +83,29 @@ export class Input {
   private konamiIndex = 0;
   private konamiJustTriggered = false;
 
-  constructor() {
-    // Capture gameplay keys before page widgets can stop bubbling.
-    window.addEventListener('keydown', (event) => this.handleKeyDown(event), true);
-    window.addEventListener('keyup', (event) => this.handleKeyUp(event), true);
-    window.addEventListener('blur', () => this.reset());
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) this.reset();
-    });
-    this.setupTouchControls();
+  constructor(canvas?: HTMLCanvasElement) {
+    try {
+      // Capture gameplay keys before page widgets can stop bubbling.
+      this.lifetime.listen(window, 'keydown', (event) => this.handleKeyDown(event), true);
+      this.lifetime.listen(window, 'keyup', (event) => this.handleKeyUp(event), true);
+      this.lifetime.listen(window, 'blur', () => this.reset());
+      this.lifetime.listen(document, 'visibilitychange', () => {
+        if (document.hidden) this.reset();
+      });
+      this.setupTouchControls(canvas);
+    } catch (error) { this.dispose(); throw error; }
+  }
+
+  /** Terminal: releases all gestures and cancels a pending canvas attachment. */
+  dispose(): void {
+    if (this.isDisposed) return;
+    this.lifetime.dispose();
+    if (this.attachFrame !== null) window.cancelAnimationFrame(this.attachFrame);
+    this.attachFrame = null;
+    const notifications = [...this.actionSources.values()];
+    this.actionSources.clear(); this.canvasTouchSuspensions.clear();
+    this.reset();
+    this.notifySourceResets(notifications);
   }
 
   private handleKeyDown(event: KeyboardEvent): void {
@@ -186,18 +204,20 @@ export class Input {
     this.state.down = down;
   }
 
-  private setupTouchControls(): void {
+  private setupTouchControls(ownedCanvas?: HTMLCanvasElement): void {
     const attach = (canvas: HTMLCanvasElement | null): boolean => {
       if (!canvas) return false;
       for (const type of ['touchstart', 'touchmove', 'touchend', 'touchcancel'] as const) {
-        canvas.addEventListener(type, (event) => this.handleTouch(event, type === 'touchcancel'), { passive: false });
+        this.lifetime.listen(canvas, type, (event) => this.handleTouch(event, type === 'touchcancel'), { passive: false });
       }
       return true;
     };
 
     const tryAttach = (): void => {
-      const canvas = document.getElementById('game-canvas') as HTMLCanvasElement | null;
-      if (!attach(canvas)) window.requestAnimationFrame(tryAttach);
+      this.attachFrame = null;
+      if (this.isDisposed) return;
+      const canvas = ownedCanvas ?? document.getElementById('game-canvas') as HTMLCanvasElement | null;
+      if (!attach(canvas)) this.attachFrame = window.requestAnimationFrame(tryAttach);
     };
     tryAttach();
   }
@@ -280,9 +300,9 @@ export class Input {
   /** Opt-in controls use the same owned action path as canvas touches, never fake keys. */
   createActionSource(onReset?: () => void): InputActionSource {
     const owner = Symbol('input-action');
-    this.actionSources.set(owner, onReset);
+    if (!this.isDisposed) this.actionSources.set(owner, onReset);
     const change = (action: HeldAction | null, cancelled: boolean): void => {
-      if (!this.actionSources.has(owner)) return;
+      if (this.isDisposed || !this.actionSources.has(owner)) return;
       const previous = this.touchOwners.get(owner);
       if (action === previous || (!action && !previous)) return;
       const owners = new Map(this.touchOwners);
@@ -310,6 +330,7 @@ export class Input {
 
   /** Scoped suppression; disposing an optional bar restores legacy canvas controls. */
   suspendCanvasTouchControls(): () => void {
+    if (this.isDisposed) return () => {};
     const suspension = Symbol('canvas-touch');
     this.canvasTouchSuspensions.add(suspension);
     const canvasIds = [...new Set([...this.activeCanvasTouches, ...this.touchOwners.keys(),
@@ -322,6 +343,7 @@ export class Input {
   }
 
   update(): void {
+    if (this.isDisposed) return;
     this.refreshHeldActions();
     // External pointer/assistive clicks shorter than a frame retain one movement step.
     if (this.completedSourceTaps.size || this.pendingSourceTaps.size) {
@@ -417,6 +439,12 @@ export class Input {
     this.konamiIndex = 0;
     this.konamiJustTriggered = false;
     // Invalidates active DOM captures too; an old move/up can never re-arm a reset gesture.
-    for (const notify of [...this.actionSources.values()]) notify?.();
+    this.notifySourceResets([...this.actionSources.values()]);
+  }
+
+  private notifySourceResets(notifications: Iterable<(() => void) | undefined>): void {
+    for (const notify of notifications) {
+      try { notify?.(); } catch (error) { console.warn('Input gesture cleanup failed', error); }
+    }
   }
 }

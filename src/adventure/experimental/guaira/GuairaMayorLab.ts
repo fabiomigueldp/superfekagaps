@@ -87,31 +87,35 @@ export class GuairaMayorEncounter extends BossEncounter {
 
 /** Ephemeral scene adapter: no campaign entry, persistence or global Player edits. */
 export class GuairaMayorLab extends WorldGame {
-    readonly reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    readonly reducedMotion: boolean;
     private encounter!: GuairaMayorEncounter;
     constructor(canvas: HTMLCanvasElement, private readonly status: HTMLElement) {
         super(canvas, true);
-        this.art.background = (c, _island, cx, cy, time) => drawGuairaMayorBackground(c, this.mayor, cx, cy, time, this.reducedMotion);
-        this.art.terrain = (c, level, _island, cx, cy) => drawGuairaMayorTerrain(c, level, cx, cy);
-        this.art.objects = (c, objects, cx, cy, time) => {
-            drawGuairaMayorObjects(c, objects, this.mayor, cx, cy, time, this.reducedMotion);
-            drawGuairaMayorStampTarget(c, this.mayor, cx, cy, this.reducedMotion);
-            drawGuairaMayor(c, this.mayor, cx, cy, this.reducedMotion);
-        };
-        this.store.save.preferences.shake = !this.reducedMotion;
-        if (this.reducedMotion) {
-            (this as unknown as { particle: (...args: unknown[]) => void }).particle = () => {};
-            this.renderer.addImpact = () => {};
-        }
-        this.tutorial.observe = () => {};
-        this.load(MAYOR_ARENA.id);
-        window.addEventListener('keydown', e => {
-            if (['ArrowLeft', 'ArrowRight', 'ArrowDown', ' ', 'a', 'd', 'm', 'M'].includes(e.key)) this.audio.unlock();
-        });
-        document.title = 'Super Feka Gaps · Guaíra · Prefeito experimental';
+        try {
+            this.reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+            this.art.background = (c, _island, cx, cy, time) => drawGuairaMayorBackground(c, this.mayor, cx, cy, time, this.reducedMotion);
+            this.art.terrain = (c, level, _island, cx, cy) => drawGuairaMayorTerrain(c, level, cx, cy);
+            this.art.objects = (c, objects, cx, cy, time) => {
+                drawGuairaMayorObjects(c, objects, this.mayor, cx, cy, time, this.reducedMotion);
+                drawGuairaMayorStampTarget(c, this.mayor, cx, cy, this.reducedMotion);
+                drawGuairaMayor(c, this.mayor, cx, cy, this.reducedMotion);
+            };
+            this.store.save.preferences.shake = !this.reducedMotion;
+            if (this.reducedMotion) {
+                (this as unknown as { particle: (...args: unknown[]) => void }).particle = () => {};
+                this.renderer.addImpact = () => {};
+            }
+            this.tutorial.observe = () => {};
+            this.load(MAYOR_ARENA.id);
+            this.listen(window, 'keydown', e => {
+                if (['ArrowLeft', 'ArrowRight', 'ArrowDown', ' ', 'a', 'd', 'm', 'M'].includes(e.key)) this.audio.unlock();
+            });
+            document.title = 'Super Feka Gaps · Guaíra · Prefeito experimental';
+        } catch (error) { this.dispose(); throw error; }
     }
     get mayor() { return this.encounter.model; }
     override load(_id: string, resume = false, _custom?: AdventureStage) {
+        if (this.isDisposed) return;
         super.load(MAYOR_ARENA.id, resume, guairaMayorStage());
         this.encounter = new GuairaMayorEncounter(); this.boss = this.encounter; this.time = 0;
         this.player.data.isGrounded = true; this.player.data.facingRight = true;
@@ -123,10 +127,12 @@ export class GuairaMayorLab extends WorldGame {
         return guairaReturnHref('vazao', this.mayor.publicWaterOpen ? 'mayor-clear' : null);
     }
     toggleLabPause() {
+        if (this.isDisposed) return;
         if (this.state === 'paused') this.resume();
         else if (this.state === 'playing') this.pause();
     }
     override update(dt: number) {
+        if (this.isDisposed) return;
         if (!Number.isFinite(dt) || dt <= 0) return;
         if (this.state === 'map' || this.state === 'title' || this.state === 'intro') { this.load(MAYOR_ARENA.id); return; }
         super.update(dt);
@@ -144,6 +150,7 @@ export class GuairaMayorLab extends WorldGame {
         }
     }
     override render() {
+        if (this.isDisposed) return;
         const paused = this.state === 'paused';
         if (paused) this.state = 'playing';
         // The mayor is painted with the objects, before Feka. Omit the native

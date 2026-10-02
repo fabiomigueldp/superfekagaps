@@ -1,4 +1,5 @@
 import { Input } from '../engine/Input';
+import { DisposalScope } from '../engine/DisposalScope';
 import { Renderer } from '../engine/Renderer';
 import { Player } from '../entities/Player';
 import { GroundPoundState, type CameraData, type InputState, type Rect } from '../types';
@@ -27,8 +28,11 @@ interface Button extends Rect {
     run: () => void;
 }
 export class WorldGame {
-    readonly renderer = new Renderer();
-    readonly input = new Input();
+    private readonly lifetime = new DisposalScope();
+    private frame: number | null = null;
+    private running = false;
+    readonly renderer: Renderer;
+    readonly input: Input;
     readonly art = new WorldArt();
     readonly store: ProgressStore;
     readonly audio: WorldAudio;
@@ -78,54 +82,83 @@ export class WorldGame {
     private deathFeedbackStarted = false;
     constructor(canvas: HTMLCanvasElement, private readonly ephemeral = false) {
         this.mapCanvas = canvas;
-        document.title = ephemeral ? 'Super Feka Gaps World · Estúdio' : 'Super Feka Gaps World';
-        let storage: Storage | null = null;
         try {
-            storage = ephemeral ? null : localStorage;
-        }
-        catch { }
-        this.store = new ProgressStore(storage);
-        this.tutorial = new WorldTutorial(this.store);
-        this.audio = new WorldAudio(this.store.save.preferences);
-        this.selection = Math.max(0, STAGES.findIndex(s => s.id === this.store.save.selected));
-        window.addEventListener('keydown', e => this.menuKey(e));
-        canvas.addEventListener('pointerdown', e => {
-            this.audio.unlock();
-            const r = canvas.getBoundingClientRect();
-            if (this.state === 'playing') {
-                if ((e.clientY - r.top) * 180 / r.height < 23)
-                    this.pause();
-                return;
+            this.renderer = new Renderer(canvas);
+            this.addCleanup(() => this.renderer.dispose());
+            this.input = new Input(canvas);
+            this.addCleanup(() => this.input.dispose());
+            document.title = ephemeral ? 'Super Feka Gaps World · Estúdio' : 'Super Feka Gaps World';
+            let storage: Storage | null = null;
+            try {
+                storage = ephemeral ? null : localStorage;
             }
-            const x = (e.clientX - r.left) * 320 / r.width, y = (e.clientY - r.top) * 180 / r.height;
-            const hit = this.buttons.find(b => x >= b.x && x <= b.x + b.width && y >= b.y && y <= b.y + b.height);
-            hit?.run();
-        });
-        window.addEventListener('blur', () => {
-            if (this.state === 'playing') this.pause();
-        });
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden && this.state === 'playing')
-                this.pause();
-        });
-        (window as unknown as {
-            worldGame: WorldGame;
-        }).worldGame = this;
+            catch { }
+            this.store = new ProgressStore(storage);
+            this.tutorial = new WorldTutorial(this.store);
+            this.audio = new WorldAudio(this.store.save.preferences);
+            this.addCleanup(() => this.audio.dispose());
+            this.addCleanup(() => this.saveImportCleanup?.());
+            this.addCleanup(() => { this.mapView?.dispose(); this.mapView = undefined; });
+            this.selection = Math.max(0, STAGES.findIndex(s => s.id === this.store.save.selected));
+            this.listen(window, 'keydown', e => this.menuKey(e));
+            this.listen(canvas, 'pointerdown', e => {
+                this.audio.unlock();
+                const r = canvas.getBoundingClientRect();
+                if (this.state === 'playing') {
+                    if ((e.clientY - r.top) * 180 / r.height < 23)
+                        this.pause();
+                    return;
+                }
+                const x = (e.clientX - r.left) * 320 / r.width, y = (e.clientY - r.top) * 180 / r.height;
+                const hit = this.buttons.find(b => x >= b.x && x <= b.x + b.width && y >= b.y && y <= b.y + b.height);
+                hit?.run();
+            });
+            this.listen(window, 'blur', () => {
+                if (this.state === 'playing') this.pause();
+            });
+            this.listen(document, 'visibilitychange', () => {
+                if (document.hidden && this.state === 'playing')
+                    this.pause();
+            });
+            (window as unknown as {
+                worldGame: WorldGame;
+            }).worldGame = this;
+        } catch (error) { this.dispose(); throw error; }
     }
-    start() { this.last = performance.now(); requestAnimationFrame(this.loop); }
+    get isDisposed(): boolean { return this.lifetime?.isDisposed ?? false; }
+    /** Own subclass/host resources without overriding terminal disposal. */
+    addCleanup(cleanup: () => void): () => void { return this.lifetime.add(cleanup); }
+    protected readonly listen = this.lifetime.listen.bind(this.lifetime);
+    dispose(): void {
+        if (this.isDisposed) return;
+        this.running = false;
+        if (this.frame !== null) cancelAnimationFrame(this.frame);
+        this.frame = null; this.accumulator = 0; this.buttons = []; this.hitStopInput = null;
+        this.lifetime.dispose();
+        const globals = window as unknown as { worldGame?: WorldGame };
+        if (globals.worldGame === this) delete globals.worldGame;
+    }
+    start(): void {
+        if (this.isDisposed || this.running) return;
+        this.running = true; this.last = performance.now();
+        this.frame = requestAnimationFrame(this.loop);
+    }
     private loop = (now: number) => {
+        if (this.isDisposed || !this.running) return;
+        this.frame = null;
         const dt = document.hidden ? 0 : Math.min(100, now - this.last);
         this.last = now;
         this.accumulator += dt;
-        while (this.accumulator >= 1000 / 60) {
+        while (!this.isDisposed && this.accumulator >= 1000 / 60) {
             this.update(1000 / 60);
             this.accumulator -= 1000 / 60;
         }
+        if (this.isDisposed) return;
         this.renderer.setFrameInterpolation(this.state === 'playing' ? this.accumulator : 0);
         this.render();
-        requestAnimationFrame(this.loop);
+        if (!this.isDisposed && this.running) this.frame = requestAnimationFrame(this.loop);
     };
-    private change(screen: Screen) { if (screen !== 'map') this.mapView?.hide(); this.state = screen; this.hitStopInput = null; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; }
+    private change(screen: Screen) { if (this.isDisposed) return; if (screen !== 'map') this.mapView?.hide(); this.state = screen; this.hitStopInput = null; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; }
     private menuKey(e: KeyboardEvent) {
         const target = e.target;
         if (target instanceof HTMLElement && target.closest('button, a[href]') && (e.key === 'Enter' || e.key === ' ')) return;
@@ -204,6 +237,7 @@ export class WorldGame {
     }
     /** Loads authored campaign data. Public for the in-repo editor and deterministic browser QA. */
     load(id: string, resume = false, custom?: AdventureStage) {
+        if (this.isDisposed) return;
         const stage = custom ?? stageById(id);
         if (!stage)
             throw Error('Fase não encontrada');
@@ -273,8 +307,8 @@ export class WorldGame {
         this.nextMapSelection = undefined;
         this.audio.select(0); this.store.persist();
     }
-    protected pause() { this.change('paused'); this.audio.pause(true); }
-    protected resume() { this.change('playing'); this.audio.pause(false); }
+    protected pause() { if (this.isDisposed) return; this.change('paused'); this.audio.pause(true); }
+    protected resume() { if (this.isDisposed) return; this.change('playing'); this.audio.pause(false); }
     private showDialogue(d: Dialogue) { this.dialog = d; this.dialogueTime = 0; this.spoken.add(d.id); this.change('dialogue'); this.audio.say(d.speaker, d.text, d.clip); }
     private closeDialogue() {
         if (this.dialog && this.dialogueTime < this.dialog.text.length * 34) {
@@ -357,6 +391,7 @@ export class WorldGame {
         this.player.data.respawnRevealTimer = PLAYER_RESPAWN_REVEAL_MS;
     }
     update(dt: number) {
+        if (this.isDisposed) return;
         this.input.setMenuMode(this.state !== 'playing');
         this.input.update();
         if (this.input.consumeMute())
@@ -653,17 +688,18 @@ export class WorldGame {
     private heading(c: CanvasRenderingContext2D, small: string, big: string) { pixelText(c, small, 160, 12, '#c4d7d8', 1, 'center'); pixelText(c, big, 161, 29, '#343651', 2, 'center'); pixelText(c, big, 160, 27, '#ffdf94', 2, 'center'); }
     private text(c: CanvasRenderingContext2D, text: string, x: number, y: number, width: number, color: string = ART.paper) { wrapText(text, width).forEach((line, i) => pixelText(c, line, x, y + i * 10, color)); }
     render() {
+        if (this.isDisposed) return;
         if (this.state === 'map') {
             if (typeof document !== 'undefined' && document.hidden) return;
             this.buttons = [];
             this.mapView ??= new WorldMapView(this.mapCanvas, {
-                select: index => { if (this.state === 'map') this.selectMap(index); },
-                enter: () => { if (this.state === 'map') this.load(STAGES[this.selection].id, true); },
+                select: index => { if (!this.isDisposed && this.state === 'map') this.selectMap(index); },
+                enter: () => { if (!this.isDisposed && this.state === 'map') this.load(STAGES[this.selection].id, true); },
                 arrive: index => {
                     const id = STAGES[index].id;
-                    if (this.state === 'map' && this.store.save.selected !== id) { this.store.save.selected = id; this.store.persist(); }
+                    if (!this.isDisposed && this.state === 'map' && this.store.save.selected !== id) { this.store.save.selected = id; this.store.persist(); }
                 },
-                exit: () => { if (this.state === 'map') this.change('title'); },
+                exit: () => { if (!this.isDisposed && this.state === 'map') this.change('title'); },
                 unlockAudio: () => this.audio.unlock()
             });
             this.mapView.render(this.selection, this.store.save, this.time, this.ephemeral ? '' : this.store.warning, this.toastTimer > 0 ? this.toast : '', this.mapReturn);

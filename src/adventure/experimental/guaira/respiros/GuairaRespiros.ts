@@ -8,28 +8,32 @@ export { GUAIRA_RESPIROS, guairaRespirosStage } from './GuairaRespirosStage';
 
 /** Native movement, jets, damage and checkpoint pipeline; completion is attempt-only. */
 export class GuairaRespiros extends WorldGame {
-    readonly reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    readonly reducedMotion: boolean;
     finished = false;
     constructor(canvas: HTMLCanvasElement, private readonly status: HTMLElement) {
         super(canvas, true);
-        // WorldGame's presentation clock can advance during hit stop/reveal. All
-        // irrigation artwork follows the native hazard clock instead.
-        this.art.background = (c, _island, cx, cy) => drawRespirosBackground(c, cx, cy, this.objects.time, this.reducedMotion);
-        this.art.terrain = (c, level, _island, cx, cy) => drawRespirosTerrain(c, level, cx, cy);
-        this.art.objects = (c, objects, cx, cy) => drawRespirosObjects(c, objects, cx, cy, objects.time, this.reducedMotion);
-        this.store.save.preferences.shake = !this.reducedMotion;
-        if (this.reducedMotion) {
-            (this as unknown as { particle: (...args: unknown[]) => void }).particle = () => {};
-            this.renderer.addImpact = () => {};
-        }
-        this.tutorial.observe = () => {};
-        this.load(G.id);
-        window.addEventListener('keydown', e => {
-            if (['ArrowLeft', 'ArrowRight', 'ArrowDown', ' ', 'a', 'd', 's', 'm', 'M'].includes(e.key)) this.audio.unlock();
-        });
-        document.title = 'Super Feka Gaps · Passagem dos Respiros · protótipo';
+        try {
+            this.reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+            // WorldGame's presentation clock can advance during hit stop/reveal. All
+            // irrigation artwork follows the native hazard clock instead.
+            this.art.background = (c, _island, cx, cy) => drawRespirosBackground(c, cx, cy, this.objects.time, this.reducedMotion);
+            this.art.terrain = (c, level, _island, cx, cy) => drawRespirosTerrain(c, level, cx, cy);
+            this.art.objects = (c, objects, cx, cy) => drawRespirosObjects(c, objects, cx, cy, objects.time, this.reducedMotion);
+            this.store.save.preferences.shake = !this.reducedMotion;
+            if (this.reducedMotion) {
+                (this as unknown as { particle: (...args: unknown[]) => void }).particle = () => {};
+                this.renderer.addImpact = () => {};
+            }
+            this.tutorial.observe = () => {};
+            this.load(G.id);
+            this.listen(window, 'keydown', e => {
+                if (['ArrowLeft', 'ArrowRight', 'ArrowDown', ' ', 'a', 'd', 's', 'm', 'M'].includes(e.key)) this.audio.unlock();
+            });
+            document.title = 'Super Feka Gaps · Passagem dos Respiros · protótipo';
+        } catch (error) { this.dispose(); throw error; }
     }
     override load(_id: string, resume = false, _custom?: AdventureStage) {
+        if (this.isDisposed) return;
         super.load(G.id, resume, guairaRespirosStage());
         this.finished = false; this.time = 0;
         const p = this.player.data;
@@ -48,12 +52,14 @@ export class GuairaRespiros extends WorldGame {
         this.camera.y = 144;
     }
     get mapReturnHref() { return this.finished ? `${G.mapHref}&visit=respiros-clear` : G.mapHref; }
-    get canAdvanceToBoss() { return this.state === 'playing' && !this.player.data.isDead && this.finished; }
+    get canAdvanceToBoss() { return !this.isDisposed && this.state === 'playing' && !this.player.data.isDead && this.finished; }
     toggleRespirosPause() {
+        if (this.isDisposed) return;
         if (this.state === 'paused') this.resume();
         else if (this.state === 'playing') this.pause();
     }
     override update(dt: number) {
+        if (this.isDisposed) return;
         if (!Number.isFinite(dt) || dt <= 0) return;
         if (['map', 'title', 'intro'].includes(this.state)) { this.load(G.id); return; }
         if (this.finished) {
@@ -76,6 +82,7 @@ export class GuairaRespiros extends WorldGame {
         }
     }
     override render() {
+        if (this.isDisposed) return;
         const paused = this.state === 'paused';
         // The native checkpoint flag and external status carry recovery feedback;
         // the generic toast would cover the visible height of the next discharge.

@@ -18,6 +18,9 @@ type Impact = { x:number; y:number; time:number; kind:'land'|'pound'|'spring'|'b
  * The editor calls the same painters with its own context and transform.
  */
 export class Renderer {
+  private disposed=false;
+  private readonly onResize=()=>{if(!this.disposed)this.resize();};
+  get isDisposed():boolean{return this.disposed;}
   private canvas:HTMLCanvasElement;
   private ctx:CanvasRenderingContext2D;
   private offscreenCanvas:HTMLCanvasElement;
@@ -40,8 +43,8 @@ export class Renderer {
   private touchControlsVisible=true;
   private interpolationMs=0;
 
-  constructor() {
-    this.canvas=document.getElementById('game-canvas') as HTMLCanvasElement;
+  constructor(canvas?:HTMLCanvasElement) {
+    this.canvas=canvas??document.getElementById('game-canvas') as HTMLCanvasElement;
     this.ctx=this.canvas.getContext('2d')!;
     this.offscreenCanvas=document.createElement('canvas');
     this.offscreenCanvas.width=GAME_WIDTH;this.offscreenCanvas.height=GAME_HEIGHT;
@@ -52,11 +55,23 @@ export class Renderer {
     this.editorLink=document.getElementById('open-editor');
     this.touch=navigator.maxTouchPoints>0;
     this.debug=location.hash.includes('debug');
+    this.resize();window.addEventListener('resize',this.onResize);
     (window as unknown as {renderer:Renderer}).renderer=this;
-    this.resize();window.addEventListener('resize',()=>this.resize());
+  }
+
+  /** Releases only this renderer; the host owns the visible canvas. */
+  dispose():void {
+    if(this.disposed)return;
+    this.disposed=true;window.removeEventListener('resize',this.onResize);
+    const globals=window as unknown as {renderer?:Renderer};
+    if(globals.renderer===this)delete globals.renderer;
+    this.impacts=[];
+    this.offscreenCanvas.width=this.offscreenCanvas.height=0;
+    this.worldCanvas.width=this.worldCanvas.height=0;
   }
 
   advanceClock(deltaMs:number):void {
+    if(this.disposed)return;
     this.clock.advance(deltaMs);
     this.impacts=this.impacts.filter(p=>this.clock.time-p.time<350);
   }
@@ -99,6 +114,7 @@ export class Renderer {
     this.composed=true;this.offscreenCtx=this.compositeCtx;
   }
   present():void {
+    if(this.disposed)return;
     this.composeWorld();
     if(this.debug)this.screen(c=>{panel(c,2,164,111,14);pixelText(c,'320 × 180  PIXEL',7,168,ART.tealLight);});
     this.ctx.setTransform(1,0,0,1,0,0);this.ctx.imageSmoothingEnabled=false;

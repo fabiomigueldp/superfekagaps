@@ -10,27 +10,31 @@ export { GUAIRA_JUNCTION, guairaJunctionStage } from './GuairaJunctionModel';
 
 /** Native WorldGame/Player/Input slice. Routing only sets native gated-lift targets. */
 export class GuairaJunction extends WorldGame {
-    readonly reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    readonly reducedMotion: boolean;
     routing = new JunctionRouting();
     finished = false;
     constructor(canvas: HTMLCanvasElement, private readonly status: HTMLElement) {
         super(canvas, true);
-        this.art.background = (c, _island, cx, cy, time) => drawJunctionBackground(c, cx, cy, time, this.reducedMotion, this.routing);
-        this.art.terrain = (c, level, _island, cx, cy) => drawJunctionTerrain(c, level, cx, cy);
-        this.art.objects = (c, objects, cx, cy, time) => drawJunctionObjects(c, objects, cx, cy, time, this.reducedMotion, this.routing);
-        this.store.save.preferences.shake = !this.reducedMotion;
-        if (this.reducedMotion) {
-            (this as unknown as { particle: (...args: unknown[]) => void }).particle = () => {};
-            this.renderer.addImpact = () => {};
-        }
-        this.tutorial.observe = () => {};
-        this.load(G.id);
-        window.addEventListener('keydown', e => {
-            if (['ArrowLeft', 'ArrowRight', 'ArrowDown', ' ', 'a', 'd', 's', 'm', 'M'].includes(e.key)) this.audio.unlock();
-        });
-        document.title = 'Super Feka Gaps · Pátio das Comportas · protótipo';
+        try {
+            this.reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+            this.art.background = (c, _island, cx, cy, time) => drawJunctionBackground(c, cx, cy, time, this.reducedMotion, this.routing);
+            this.art.terrain = (c, level, _island, cx, cy) => drawJunctionTerrain(c, level, cx, cy);
+            this.art.objects = (c, objects, cx, cy, time) => drawJunctionObjects(c, objects, cx, cy, time, this.reducedMotion, this.routing);
+            this.store.save.preferences.shake = !this.reducedMotion;
+            if (this.reducedMotion) {
+                (this as unknown as { particle: (...args: unknown[]) => void }).particle = () => {};
+                this.renderer.addImpact = () => {};
+            }
+            this.tutorial.observe = () => {};
+            this.load(G.id);
+            this.listen(window, 'keydown', e => {
+                if (['ArrowLeft', 'ArrowRight', 'ArrowDown', ' ', 'a', 'd', 's', 'm', 'M'].includes(e.key)) this.audio.unlock();
+            });
+            document.title = 'Super Feka Gaps · Pátio das Comportas · protótipo';
+        } catch (error) { this.dispose(); throw error; }
     }
     override load(_id: string, resume = false, _custom?: AdventureStage) {
+        if (this.isDisposed) return;
         super.load(G.id, resume, guairaJunctionStage());
         const checkpoint = !!this.store.save.checkpoint;
         this.routing = new JunctionRouting(checkpoint ? 'a' : 'b');
@@ -63,12 +67,14 @@ export class GuairaJunction extends WorldGame {
     }
     get mapReturnHref() { return guairaReturnHref(this.finished ? 'rice' : 'town', this.finished ? 'junction-clear' : null); }
     toggleJunctionPause() {
+        if (this.isDisposed) return;
         if (this.state === 'paused') this.resume();
         else if (this.state === 'playing') this.pause();
     }
     /** Safe recovery uses the same native checkpoint load; it never records a clear. */
     returnToSafePoint() { this.load(G.id, true); }
     override update(dt: number) {
+        if (this.isDisposed) return;
         if (!Number.isFinite(dt) || dt <= 0) return;
         if (['map', 'title', 'intro'].includes(this.state)) { this.load(G.id); return; }
         if (this.finished) {
@@ -94,6 +100,7 @@ export class GuairaJunction extends WorldGame {
         }
     }
     override render() {
+        if (this.isDisposed) return;
         const paused = this.state === 'paused';
         // This slice supplies its own status/banner below. The generic checkpoint
         // toast sits across the jump apex, so suppress its presentation only.

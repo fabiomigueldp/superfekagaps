@@ -1,5 +1,13 @@
 import { PLAYER_PALETTE, PLAYER_SPRITES, PLAYER_WALK } from '../../../assets/playerSpriteSpec';
-import type { GuairaMetadata, GuairaPoint, GuairaMapModel } from './GuairaMapModel';
+import type { GuairaMetadata, GuairaPoint } from './GuairaMapModel';
+
+/** Rendering consumes the visible actor, independently of the navigation menu. */
+export interface GuairaMapActor {
+    readonly point: GuairaPoint;
+    readonly moving: boolean;
+    readonly facingLeft: boolean;
+    readonly reducedMotion: boolean;
+}
 
 export interface GuairaCamera { x: number; y: number; imageWidth: number; width: number; height: number }
 /** Decorative water owns only authored source-image regions, never navigation. */
@@ -30,7 +38,7 @@ export function approachGuairaCamera(current: GuairaCamera, target: GuairaCamera
     const lerp = (a: number, b: number) => Math.abs(a - b) < .08 ? b : a + (b - a) * t;
     return { ...target, x: lerp(current.x, target.x), y: lerp(current.y, target.y), imageWidth: lerp(current.imageWidth, target.imageWidth) };
 }
-export function paintGuairaMap(ctx: CanvasRenderingContext2D, image: CanvasImageSource, camera: GuairaCamera, model: GuairaMapModel, time: number,
+export function paintGuairaMap(ctx: CanvasRenderingContext2D, image: CanvasImageSource, camera: GuairaCamera, model: GuairaMapActor, time: number,
     water?: { effect: GuairaMapWaterEffect; seconds: number }): void {
     const { width, height } = camera;
     ctx.clearRect(0, 0, width, height);
@@ -55,7 +63,7 @@ export function paintGuairaMap(ctx: CanvasRenderingContext2D, image: CanvasImage
 
 /** A stationary map restores only water regions; Feka is repainted above any overlap. */
 export function paintGuairaWaterFrame(ctx: CanvasRenderingContext2D, image: CanvasImageSource, camera: GuairaCamera,
-    model: GuairaMapModel, time: number, water: { effect: GuairaMapWaterEffect; seconds: number }): void {
+    model: GuairaMapActor, time: number, water: { effect: GuairaMapWaterEffect; seconds: number }): void {
     const scale = camera.imageWidth / 1920;
     ctx.save();
     try {

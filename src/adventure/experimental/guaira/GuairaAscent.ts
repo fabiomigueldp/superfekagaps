@@ -43,28 +43,32 @@ export function guairaAscentStage(): AdventureStage {
 
 /** Native Player, carry, checkpoint and death flow; only scene presentation is local. */
 export class GuairaAscent extends WorldGame {
-    readonly reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    readonly reducedMotion: boolean;
     finished = false;
     constructor(canvas: HTMLCanvasElement, private readonly status: HTMLElement) {
         super(canvas, true);
-        this.art.background = (c, _island, cx, cy, time) => drawGuairaAscentBackground(c, cx, cy, time, this.reducedMotion);
-        this.art.terrain = (c, level, _island, cx, cy, time) => drawGuairaAscentTerrain(c, level, cx, cy, time, this.reducedMotion);
-        this.art.objects = (c, objects, cx, cy, time) => drawGuairaAscentObjects(c, objects, cx, cy, time, this.reducedMotion);
-        this.store.save.preferences.shake = !this.reducedMotion;
-        if (this.reducedMotion) {
-            // WorldGame currently has no particle preference. This instance-only
-            // presentation adapter suppresses cosmetic dust; simulation is untouched.
-            (this as unknown as { particle: (...args: unknown[]) => void }).particle = () => {};
-            this.renderer.addImpact = () => {};
-        }
-        this.tutorial.observe = () => {};
-        this.load(GUAIRA_ASCENT.id);
-        window.addEventListener('keydown', e => {
-            if (['ArrowLeft', 'ArrowRight', ' ', 'a', 'd', 'm', 'M'].includes(e.key)) this.audio.unlock();
-        });
-        document.title = 'Super Feka Gaps · Guaíra · Subida da Vazão experimental';
+        try {
+            this.reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+            this.art.background = (c, _island, cx, cy, time) => drawGuairaAscentBackground(c, cx, cy, time, this.reducedMotion);
+            this.art.terrain = (c, level, _island, cx, cy, time) => drawGuairaAscentTerrain(c, level, cx, cy, time, this.reducedMotion);
+            this.art.objects = (c, objects, cx, cy, time) => drawGuairaAscentObjects(c, objects, cx, cy, time, this.reducedMotion);
+            this.store.save.preferences.shake = !this.reducedMotion;
+            if (this.reducedMotion) {
+                // WorldGame currently has no particle preference. This instance-only
+                // presentation adapter suppresses cosmetic dust; simulation is untouched.
+                (this as unknown as { particle: (...args: unknown[]) => void }).particle = () => {};
+                this.renderer.addImpact = () => {};
+            }
+            this.tutorial.observe = () => {};
+            this.load(GUAIRA_ASCENT.id);
+            this.listen(window, 'keydown', e => {
+                if (['ArrowLeft', 'ArrowRight', ' ', 'a', 'd', 'm', 'M'].includes(e.key)) this.audio.unlock();
+            });
+            document.title = 'Super Feka Gaps · Guaíra · Subida da Vazão experimental';
+        } catch (error) { this.dispose(); throw error; }
     }
     override load(_id: string, resume = false, _custom?: AdventureStage) {
+        if (this.isDisposed) return;
         super.load(GUAIRA_ASCENT.id, resume, guairaAscentStage());
         this.finished = false; this.time = 0;
         this.player.data.isGrounded = true; this.player.data.facingRight = true;
@@ -75,10 +79,12 @@ export class GuairaAscent extends WorldGame {
         return guairaReturnHref(this.finished ? 'vazao' : 'corral', this.finished ? 'ascent-clear' : null);
     }
     toggleAscentPause() {
+        if (this.isDisposed) return;
         if (this.state === 'paused') this.resume();
         else if (this.state === 'playing') this.pause();
     }
     override update(dt: number) {
+        if (this.isDisposed) return;
         if (!Number.isFinite(dt) || dt <= 0) return;
         if (this.state === 'map' || this.state === 'title' || this.state === 'intro') { this.load(GUAIRA_ASCENT.id); return; }
         if (this.finished) {
@@ -101,6 +107,7 @@ export class GuairaAscent extends WorldGame {
         }
     }
     override render() {
+        if (this.isDisposed) return;
         const paused = this.state === 'paused';
         if (paused) this.state = 'playing';
         try { super.render(); } finally { if (paused) this.state = 'paused'; }

@@ -31,6 +31,9 @@ export function musicNotes(theme: number, step: number, boss = false) {
     return { tempo, notes };
 }
 export class WorldAudio {
+    private disposed = false;
+    private readonly sources = new Set<() => void>();
+    get isDisposed(): boolean { return this.disposed; }
     private ctx: AudioContext | null = null;
     private music: GainNode | null = null;
     private effects: GainNode | null = null;
@@ -52,7 +55,7 @@ export class WorldAudio {
     private airBuffer: AudioBuffer | null = null;
     enabled = true;
     constructor(public preferences: Preferences) { }
-    unlock() { if (this.paused) return; if (!this.ctx) {
+    unlock() { if (this.disposed || this.paused) return; if (!this.ctx) {
         try {
             this.ctx = new AudioContext();
             this.music = this.ctx.createGain();
@@ -63,30 +66,63 @@ export class WorldAudio {
             this.volume();
         }
         catch {
+            this.releaseContext();
             return;
         }
-    } void this.ctx.resume(); }
+    } try { void this.ctx.resume().catch(() => {}); } catch { /* Device may have closed. */ } }
+    /** Close only the context and nodes created by this instance. */
+    dispose(): void {
+        if (this.disposed) return;
+        this.disposed = true; this.paused = true;
+        this.cancelSpeech(); this.releaseContext();
+    }
+    private releaseContext(): void {
+        for (const release of [...this.sources]) release();
+        for (const bus of [this.music, this.effects, this.voice]) {
+            try { bus?.disconnect(); } catch { /* Already detached by the device. */ }
+        }
+        const context = this.ctx;
+        this.ctx = null; this.music = this.effects = this.voice = null; this.airBuffer = null;
+        if (context && context.state !== 'closed') {
+            try { void context.close().catch(() => {}); } catch { /* Closing is best effort. */ }
+        }
+    }
+    private ownSource(source: AudioScheduledSourceNode, nodes: AudioNode[]): void {
+        let live = true;
+        const detach = () => {
+            if (!live) return;
+            live = false; this.sources.delete(release); source.onended = null;
+            for (const node of [source, ...nodes]) {
+                try { node.disconnect(); } catch { /* Already detached by the device. */ }
+            }
+        };
+        const release = () => {
+            try { source.stop(); } catch { /* Already ended or not started. */ }
+            detach();
+        };
+        this.sources.add(release); source.onended = detach;
+    }
     /** Read-only route for cancellable lab cues; never creates or resumes a context. */
     getEffectsRoute(): { context: AudioContext; destination: GainNode; enabled: boolean } | null {
-        return this.ctx && this.effects ? { context: this.ctx, destination: this.effects, enabled: this.enabled } : null;
+        return !this.disposed && this.ctx && this.effects ? { context: this.ctx, destination: this.effects, enabled: this.enabled } : null;
     }
-    volume() { if (!this.ctx)
+    volume() { if (this.disposed || !this.ctx)
         return; const now = this.ctx.currentTime; this.music!.gain.setTargetAtTime(this.enabled ? this.preferences.music * .14 * (this.dying ? .15 : 1) : 0, now, .06); this.effects!.gain.setTargetAtTime(this.enabled ? this.preferences.effects * .3 : 0, now, .02); this.voice!.gain.setTargetAtTime(this.enabled ? this.preferences.voice * .22 : 0, now, .02); if (this.clip)
         this.clip.volume = this.enabled ? this.preferences.voice : 0; }
-    setDying(value: boolean) { this.dying = value; this.volume(); }
-    toggle() { this.enabled = !this.enabled; this.volume(); }
-    select(world: number, boss = false) { this.theme = world === 0 ? 6 : Math.max(0, world - 1); this.boss = boss; this.step = 0; this.next = this.ctx?.currentTime ?? 0; this.cancelSpeech(); }
-    pause(value: boolean) { this.paused = value; if (value) {
+    setDying(value: boolean) { if (this.disposed) return; this.dying = value; this.volume(); }
+    toggle() { if (this.disposed) return; this.enabled = !this.enabled; this.volume(); }
+    select(world: number, boss = false) { if (this.disposed) return; this.theme = world === 0 ? 6 : Math.max(0, world - 1); this.boss = boss; this.step = 0; this.next = this.ctx?.currentTime ?? 0; this.cancelSpeech(); }
+    pause(value: boolean) { if (this.disposed) return; this.paused = value; if (value) {
         this.cancelSpeech();
         if (this.ctx)
-            void this.ctx.suspend();
+            try { void this.ctx.suspend().catch(() => {}); } catch { /* Device may have closed. */ }
     }
     else {
         this.unlock();
         this.next = this.ctx?.currentTime ?? 0;
     } }
     private tone(freq: number, seconds: number, type: OscillatorType, gain: number, bus: GainNode | null, when?: number) {
-        if (!this.ctx || !bus || this.ctx.state !== 'running')
+        if (this.disposed || !this.ctx || !bus || this.ctx.state !== 'running')
             return;
         const t = when ?? this.ctx.currentTime;
         const osc = this.ctx.createOscillator(), env = this.ctx.createGain();
@@ -97,12 +133,12 @@ export class WorldAudio {
         env.gain.exponentialRampToValueAtTime(.001, t + seconds);
         osc.connect(env);
         env.connect(bus);
+        this.ownSource(osc, [env]);
         osc.start(t);
         osc.stop(t + seconds + .015);
-        osc.onended = () => { osc.disconnect(); env.disconnect(); };
     }
     private air(seconds: number, frequency: number, gain: number) {
-        if (!this.ctx || !this.effects || this.ctx.state !== 'running') return;
+        if (this.disposed || !this.ctx || !this.effects || this.ctx.state !== 'running') return;
         if (!this.airBuffer) {
             this.airBuffer = this.ctx.createBuffer(1, this.ctx.sampleRate, this.ctx.sampleRate);
             const data = this.airBuffer.getChannelData(0);
@@ -121,10 +157,11 @@ export class WorldAudio {
         env.gain.linearRampToValueAtTime(gain, now + .015);
         env.gain.exponentialRampToValueAtTime(.001, now + seconds);
         source.connect(filter); filter.connect(env); env.connect(this.effects);
+        this.ownSource(source, [filter, env]);
         source.start(now); source.stop(now + seconds + .02);
-        source.onended = () => { source.disconnect(); filter.disconnect(); env.disconnect(); };
     }
     sfx(kind: string) {
+        if (this.disposed) return;
         const combat = combatTones(kind);
         if (combat) {
             if (this.paused || !this.enabled || this.preferences.effects <= 0 || !this.ctx || this.ctx.state !== 'running') return;
@@ -152,6 +189,7 @@ export class WorldAudio {
         ns.forEach((f, i) => this.tone(f, kind === 'death' ? .2 : .12, kind === 'pound' || kind === 'fall' || kind === 'throw' ? 'triangle' : 'square', .22, this.effects, (this.ctx?.currentTime ?? 0) + i * (kind === 'death' ? .14 : .07)));
     }
     say(who: Character, text: string, clip?: string) {
+        if (this.disposed) return;
         this.cancelSpeech();
         if (clip) {
             const audio = new Audio(`${((import.meta as {
@@ -161,7 +199,9 @@ export class WorldAudio {
             }).env?.BASE_URL ?? '/')}assets/audio/vo/joaozao/${clip}_${({ aqui_e_o_joao_namorado_da_yasmin: '1.92', eu_sou_o_namorado_dela: '1.14', para_de_encher_o_saco: '0.96', porra_nenhuma: '0.36', sei_que_voce_quer: '0.66', voce_nao_vai_ter: '0.66' } as Record<string, string>)[clip]}s.ogg`);
             audio.volume = this.enabled ? this.preferences.voice : 0;
             this.clip = audio;
-            audio.play().catch(() => { this.speaking = { who, text, at: 0 }; });
+            audio.play().catch(() => {
+                if (!this.disposed && !this.paused && this.clip === audio) this.speaking = { who, text, at: 0 };
+            });
         }
         else
             this.speaking = { who, text, at: 0 };
@@ -169,7 +209,7 @@ export class WorldAudio {
         this.speechAt = 0;
     }
     private vocal(pitch: number, unit: number) {
-        if (!this.ctx || !this.voice)
+        if (this.disposed || !this.ctx || !this.voice)
             return;
         const now = this.ctx.currentTime, source = this.ctx.createOscillator(), env = this.ctx.createGain();
         source.type = 'sawtooth';
@@ -180,13 +220,19 @@ export class WorldAudio {
         env.gain.linearRampToValueAtTime(.22, now + .012);
         env.gain.exponentialRampToValueAtTime(.001, now + .085);
         env.connect(this.voice);
+        this.ownSource(source, [env, ...filters]);
         source.start(now);
         source.stop(now + .09);
-        source.onended = () => { source.disconnect(); env.disconnect(); filters.forEach(f => f.disconnect()); };
     }
-    cancelSpeech() { this.clip?.pause(); this.clip = null; this.speaking = null; }
+    cancelSpeech() {
+        const clip = this.clip; this.clip = null; this.speaking = null;
+        if (clip) {
+            try { clip.pause(); } catch { /* Device may already be gone. */ }
+            try { clip.removeAttribute('src'); clip.load(); } catch { /* Release remaining media when supported. */ }
+        }
+    }
     tick(dt: number) {
-        if (!this.ctx || this.paused || this.ctx.state !== 'running')
+        if (this.disposed || !this.ctx || this.paused || this.ctx.state !== 'running')
             return;
         const now = this.ctx.currentTime;
         if (this.next < now - .2)

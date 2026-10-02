@@ -59,26 +59,31 @@ export class GuairaBullEncounter extends BossEncounter {
 
 /** Ephemeral adapter: real Feka movement, helmet, death, touch and renderer. */
 export class GuairaBullLab extends WorldGame {
-    reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    constructor(canvas: HTMLCanvasElement, private readonly status: HTMLElement) {
+    reducedMotion: boolean;
+    constructor(canvas: HTMLCanvasElement, private readonly status: HTMLElement,
+        private readonly continuationHint = 'SUBIR: CASA DA VAZAO') {
         super(canvas, true);
-        this.art.boss = (c, boss, cx, cy) => {
-            if (boss instanceof GuairaBullEncounter) drawGuairaBoss(c, boss.model, cx, cy, this.reducedMotion);
-        };
-        this.art.arena = () => {};
-        this.art.background = c => drawGuairaBackground(c);
-        this.art.terrain = (c, _level, _island, _cx, cy) => drawGuairaFloor(c, cy);
-        this.store.save.preferences.shake = !this.reducedMotion;
-        // Basic controls are documented on the page; campaign tutorials would
-        // cover the arena and have no place in this isolated prototype.
-        this.tutorial.observe = () => {};
-        this.load('guaira-lab');
-        window.addEventListener('keydown', e => {
-            if (['ArrowLeft', 'ArrowRight', ' ', 'a', 'd', 'm', 'M'].includes(e.key)) this.audio.unlock();
-        });
-        document.title = 'Super Feka Gaps · Guaíra · Ossabravo experimental';
+        try {
+            this.reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+            this.art.boss = (c, boss, cx, cy) => {
+                if (boss instanceof GuairaBullEncounter) drawGuairaBoss(c, boss.model, cx, cy, this.reducedMotion);
+            };
+            this.art.arena = () => {};
+            this.art.background = c => drawGuairaBackground(c);
+            this.art.terrain = (c, _level, _island, _cx, cy) => drawGuairaFloor(c, cy);
+            this.store.save.preferences.shake = !this.reducedMotion;
+            // Basic controls are documented on the page; campaign tutorials would
+            // cover the arena and have no place in this isolated prototype.
+            this.tutorial.observe = () => {};
+            this.load('guaira-lab');
+            this.listen(window, 'keydown', e => {
+                if (['ArrowLeft', 'ArrowRight', ' ', 'a', 'd', 'm', 'M'].includes(e.key)) this.audio.unlock();
+            });
+            document.title = 'Super Feka Gaps · Guaíra · Ossabravo experimental';
+        } catch (error) { this.dispose(); throw error; }
     }
     override load(_id: string, _resume = false, _custom?: AdventureStage) {
+        if (this.isDisposed) return;
         super.load('guaira-lab', false, guairaLabStage());
         this.boss = new GuairaBullEncounter();
         this.player.data.position = { x: 68, y: 224 - this.player.data.height };
@@ -88,6 +93,7 @@ export class GuairaBullLab extends WorldGame {
         if (this.status) this.status.textContent = 'Protótipo experimental · Guaíra · Ossabravo (nome provisório)';
     }
     toggleLabPause() {
+        if (this.isDisposed) return;
         if (this.state !== 'playing' && this.state !== 'paused') return;
         if (this.state === 'paused') this.resume(); else this.pause();
     }
@@ -95,9 +101,10 @@ export class GuairaBullLab extends WorldGame {
         return guairaReturnHref('corral', this.boss?.phase === 'defeated' ? 'bull-clear' : null);
     }
     get canAdvanceToAscent() {
-        return this.state === 'playing' && !this.player.data.isDead && this.boss?.phase === 'defeated';
+        return !this.isDisposed && this.state === 'playing' && !this.player.data.isDead && this.boss?.phase === 'defeated';
     }
     override update(dt: number) {
+        if (this.isDisposed) return;
         if (!Number.isFinite(dt) || dt <= 0) return;
         if (this.state === 'map' || this.state === 'title' || this.state === 'intro') { this.load('guaira-lab'); return; }
         if (this.boss?.phase === 'defeated') {
@@ -116,6 +123,7 @@ export class GuairaBullLab extends WorldGame {
         super.update(dt);
     }
     override render() {
+        if (this.isDisposed) return;
         const paused = this.state === 'paused';
         // Do not install the campaign pause-menu navigation callbacks.
         if (paused) this.state = 'playing';
@@ -135,7 +143,7 @@ export class GuairaBullLab extends WorldGame {
         } else if (this.boss?.phase === 'defeated') {
             panel(c, 62, 64, 196, 34, '#382b35', '#d8ac7a');
             pixelText(c, 'A OSSADA DESCANSOU!', 160, 72, '#f0ddae', 1, 'center');
-            pixelText(c, 'SUBIR: CASA DA VAZAO', 160, 85, '#edcaf5', 1, 'center');
+            pixelText(c, this.continuationHint, 160, 85, '#edcaf5', 1, 'center');
         }
         this.renderer.present();
         const message = paused ? 'Pausado · Esc ou Continuar para voltar'
