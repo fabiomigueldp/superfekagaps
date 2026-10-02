@@ -1,3 +1,5 @@
+import { reliefChallengeMessage, type GuairaReliefOptions } from '../relief/GuairaReliefChallenge';
+import { installReliefReplayControls } from '../relief/GuairaReliefReplayControls';
 import { DisposalScope } from '../../../../engine/DisposalScope';
 import { LabToolbarAction } from '../../JuiceLabToolbar';
 import { fitGuairaLabCanvas } from '../../../../guaira-lab-layout';
@@ -176,6 +178,12 @@ export class GuairaChapterApp {
         this.advanceNavigation({ kind: 'chapter', sceneId: next.snapshot().selectedScene }); this.showMap('town');
     }
 
+    private keyboardHint() {
+        const hint = document.createElement('p'); hint.id = 'chapter-keyboard-hint';
+        hint.textContent = 'Teclado: ←/→ mover · Espaço pular · ↓ no ar: sentada · Shift correr · Esc pausa';
+        return hint;
+    }
+
     private scenePanel(attempt: GuairaChapterAttempt, scope: DisposalScope) {
         const info = CHAPTER_SCENES[attempt.sceneId], nav = document.createElement('nav');
         nav.className = 'chapter-game-toolbar'; nav.setAttribute('aria-label', 'Controles do capítulo de Guaíra');
@@ -188,7 +196,7 @@ export class GuairaChapterApp {
         new LabToolbarAction(retry).setLabel('TENTAR', `Recomeçar ${info.title} nesta tentativa`);
         new LabToolbarAction(map).setLabel('MAPA', 'Voltar à maquete do capítulo');
         primaryArt.setLabel('PAUSA', 'Pausar'); primary.disabled = true;
-        nav.append(status, primary, retry, map);
+        nav.append(status, primary, retry, map, this.keyboardHint());
         const canvas = document.createElement('canvas'); canvas.id = 'game-canvas'; canvas.tabIndex = 0;
         canvas.contentEditable = 'true'; canvas.spellcheck = false; canvas.setAttribute('inputmode', 'none');
         canvas.setAttribute('aria-label', `${info.title}. ${info.objective} Setas para mover, Espaço para pular, baixo no ar para sentada, Shift para correr e Escape para pausar.`);
@@ -302,17 +310,17 @@ export class GuairaChapterApp {
             && token.navigationRevision === this.navigation.revision && this.navigation.target.kind === 'optional'
             && !this.snapshot.activeAttempt;
     }
-    private beginExcursion(sceneId: GuairaChapterExcursionSceneId = 'gallery') {
+    private beginExcursion(sceneId: GuairaChapterExcursionSceneId = 'gallery', options?: GuairaReliefOptions) {
         this.advanceNavigation({ kind: 'optional', stop: 'bairro' });
         const token: GuairaChapterExcursionToken = Object.freeze({ sceneId, sessionId: this.snapshot.generation.sessionId,
             attemptId: ++this.excursionAttempt, navigationRevision: this.navigation.revision });
-        this.excursionToken = token; void this.showExcursion(token);
+        this.excursionToken = token; void this.showExcursion(token, options);
     }
     private leaveExcursion(token: GuairaChapterExcursionToken, scope: DisposalScope) {
         if (!this.currentExcursion(token, scope)) return;
         this.excursionToken = null; this.advanceNavigation(); this.showMap('bairro', false, true);
     }
-    private excursionPanel(token: GuairaChapterExcursionToken, scope: DisposalScope) {
+    private excursionPanel(token: GuairaChapterExcursionToken, scope: DisposalScope, options?: GuairaReliefOptions) {
         const info = CHAPTER_EXCURSIONS[token.sceneId], nav = document.createElement('nav');
         nav.className = 'chapter-game-toolbar'; nav.setAttribute('aria-label', `Controles de ${info.title}, desvio opcional`);
         const status = document.createElement('span'); status.id = 'lab-status'; status.setAttribute('role', 'status');
@@ -324,32 +332,36 @@ export class GuairaChapterApp {
         new LabToolbarAction(retry).setLabel('TENTAR', `Recomeçar ${info.title} nesta tentativa opcional`);
         new LabToolbarAction(map).setLabel('BAIRRO', 'Voltar ao Bairro da Vala Seca no capítulo');
         primaryArt.setLabel('PAUSA', 'Pausar'); primary.disabled = true;
-        nav.append(status, primary, retry, map);
+        nav.append(status, primary, retry, map, this.keyboardHint());
         const canvas = document.createElement('canvas'); canvas.id = 'game-canvas'; canvas.tabIndex = 0;
         canvas.contentEditable = 'true'; canvas.spellcheck = false; canvas.setAttribute('inputmode', 'none');
         canvas.setAttribute('aria-label', `${info.title}, percurso opcional. ${info.objective}. Setas para mover, Espaço para pular, baixo no ar para sentada, Shift para correr e Escape para pausar.`);
         this.root.append(nav, canvas);
         scope.listen(canvas, 'pointerdown', () => canvas.focus({ preventScroll: true }));
-        scope.listen(retry, 'click', () => { if (this.currentExcursion(token, scope)) this.beginExcursion(token.sceneId); });
+        scope.listen(retry, 'click', () => {
+            if (!this.currentExcursion(token, scope) || (token.sceneId === 'relief' && (!this.focused || document.hidden))) return;
+            if (this.mounted?.kind === 'optional' && this.mounted.runtime.sceneId === 'relief' && this.mounted.runtime.routes) return;
+            this.beginExcursion(token.sceneId, options);
+        });
         scope.listen(map, 'click', () => this.leaveExcursion(token, scope));
         const fit = () => { if (this.current(scope)) fitGuairaLabCanvas(canvas); };
         scope.listen(window, 'resize', fit);
         if (typeof ResizeObserver !== 'undefined') {
             const observer = new ResizeObserver(fit); scope.add(() => observer.disconnect()); observer.observe(nav);
         }
-        fit(); return { canvas, status, primary, primaryArt, fit };
+        fit(); return { canvas, status, primary, retry, primaryArt, fit };
     }
-    private async showExcursion(token: GuairaChapterExcursionToken) {
+    private async showExcursion(token: GuairaChapterExcursionToken, options?: GuairaReliefOptions) {
         if (this.isDisposed) return;
         const scope = this.replaceView('loading'), activity = this.sceneActivity(scope), info = CHAPTER_EXCURSIONS[token.sceneId];
         try {
-            const panel = this.excursionPanel(token, scope);
+            const panel = this.excursionPanel(token, scope, options);
             panel.status.textContent = `Abrindo ${info.title} · desvio opcional…`;
             document.title = `Guaíra · ${info.title} · capítulo`;
             const factory = await this.loadExcursion(token.sceneId);
             if (!this.currentExcursion(token, scope)) return;
             const nativeStatus = document.createElement('span');
-            const runtime = factory(panel.canvas, nativeStatus), game = runtime.game;
+            const runtime = factory(panel.canvas, nativeStatus, options), game = runtime.game;
             // Own the native resources before controls, observers or reflection can fail.
             let ownsAudioPreference = false;
             scope.add(() => { if (ownsAudioPreference) this.audioEnabled = game.audio.enabled; game.dispose(); });
@@ -359,12 +371,18 @@ export class GuairaChapterApp {
             game.audio.enabled = this.audioEnabled; ownsAudioPreference = true; game.audio.volume();
             const controls = installGuairaLabControls(game, panel.canvas, () => runtime.finished);
             scope.add(() => controls.dispose());
-            type PrimaryAction = 'pause' | 'resume' | 'relief' | null;
+            const routes = runtime.sceneId === 'relief' ? runtime.routes : undefined;
+            const replay = routes ? installReliefReplayControls(scope, routes, panel.primary, panel.retry,
+                () => this.currentExcursion(token, scope) && this.focused && !document.hidden && !game.isDisposed
+                    && this.mounted?.kind === 'optional' && this.mounted.token === token,
+                nextOptions => this.beginExcursion('relief', nextOptions)) : null;
+            type PrimaryAction = 'pause' | 'resume' | 'relief' | 'other-route' | null;
             let primaryAction: PrimaryAction = null, primaryRevision = 0, pressedPrimaryRevision: number | null = null, releasePrimary = () => {};
             scope.listen(panel.primary, 'pointerdown', () => { pressedPrimaryRevision = primaryRevision; });
             scope.listen(panel.primary, 'pointercancel', () => { pressedPrimaryRevision = -1; });
             const actionNow = (): PrimaryAction => game.isDisposed ? null : game.state === 'paused' ? 'resume'
-                : game.state !== 'playing' ? null : token.sceneId === 'gallery' && runtime.finished && !game.player.data.isDead ? 'relief' : 'pause';
+                : game.state !== 'playing' ? null : runtime.finished && !game.player.data.isDead
+                    ? token.sceneId === 'gallery' ? 'relief' : routes ? 'other-route' : 'pause' : 'pause';
             const invalidatePrimary = () => {
                 primaryRevision++; primaryAction = null; releasePrimary(); releasePrimary = () => {};
                 panel.primary.disabled = true;
@@ -374,12 +392,12 @@ export class GuairaChapterApp {
             scope.listen(document, 'visibilitychange', () => { if (document.hidden) invalidatePrimary(); });
             const reflect = () => {
                 if (!this.currentExcursion(token, scope) || game.isDisposed) return false;
-                controls.sync();
+                controls.sync(); replay?.sync();
                 const action = actionNow();
                 if (action !== primaryAction) {
                     invalidatePrimary(); primaryAction = action;
                     const revision = primaryRevision;
-                    if (action) releasePrimary = scope.listen(panel.primary, 'click', event => {
+                    if (action && action !== 'other-route') releasePrimary = scope.listen(panel.primary, 'click', event => {
                         if (!this.currentExcursion(token, scope) || !this.focused || document.hidden
                             || this.mounted?.kind !== 'optional' || this.mounted.token !== token
                             || revision !== primaryRevision || actionNow() !== action) return;
@@ -393,16 +411,22 @@ export class GuairaChapterApp {
                     });
                 }
                 panel.primary.disabled = action === null;
-                panel.primaryArt.setLabel(action === 'resume' ? 'CONTINUAR' : action === 'relief' ? 'ALÍVIO' : 'PAUSA',
+                panel.primaryArt.setLabel(action === 'resume' ? 'CONTINUAR' : action === 'other-route' ? 'OUTRA ROTA' : action === 'relief' ? 'ALÍVIO' : 'PAUSA',
                     action === 'resume' ? 'Retomar a tentativa opcional'
+                        : action === 'other-route' ? 'Tentar outra rota na Câmara de Alívio'
                         : action === 'relief' ? 'Seguir para a Câmara de Alívio, continuação opcional' : 'Pausar');
-                const message = game.state === 'paused' ? `Pausado · Continuar volta a ${info.title}`
+                let message = game.state === 'paused' ? `Pausado · Continuar volta a ${info.title}`
                     : game.player.data.isDead ? 'Feka caiu · retorno ao ponto seguro desta tentativa opcional'
                     : runtime.finished ? runtime.sceneId === 'gallery'
                         ? 'Acesso de inspeção aberto · Alívio segue para a Câmara de Alívio; Bairro volta à maquete'
                         : `Passagem inspecionada · ${runtime.reliefOpened ? 'alívio aberto, grelha sem pressão' : 'alívio intacto, grelha mantém o ciclo'} · Bairro volta à maquete`
                     : runtime.sceneId === 'relief' && nativeStatus.textContent && !nativeStatus.textContent.startsWith('Pausado')
                         ? nativeStatus.textContent : `Desvio opcional · ${info.objective}`;
+                if (routes && game.state === 'playing' && !game.player.data.isDead) {
+                    if (runtime.finished) message += ' · Outra rota propõe um novo objetivo opcional';
+                    const optional = reliefChallengeMessage(routes.snapshot);
+                    if (optional && !message.includes(optional)) message += ` · ${optional}`;
+                }
                 if (panel.status.textContent !== message) panel.status.textContent = message;
                 return true;
             };
@@ -411,10 +435,10 @@ export class GuairaChapterApp {
             document.title = `Guaíra · ${info.title} · capítulo`;
         } catch (error) {
             if (!this.currentExcursion(token, scope)) return;
-            this.excursionError(token); console.error('Chapter excursion initialization failed', error);
+            this.excursionError(token, options); console.error('Chapter excursion initialization failed', error);
         }
     }
-    private excursionError(token: GuairaChapterExcursionToken) {
+    private excursionError(token: GuairaChapterExcursionToken, options?: GuairaReliefOptions) {
         const scope = this.replaceView('error'), info = CHAPTER_EXCURSIONS[token.sceneId];
         const nav = document.createElement('nav'), status = document.createElement('p');
         nav.className = 'chapter-game-toolbar'; nav.setAttribute('aria-label', `Recuperar ${info.title}`);
@@ -424,7 +448,11 @@ export class GuairaChapterApp {
         retry.type = map.type = 'button'; retry.id = 'chapter-retry'; map.id = 'chapter-map-return';
         retry.textContent = 'TENTAR'; retry.setAttribute('aria-label', `Tentar abrir ${info.title} novamente`);
         map.textContent = 'BAIRRO'; map.setAttribute('aria-label', 'Voltar ao Bairro da Vala Seca no capítulo');
-        scope.listen(retry, 'click', () => { if (this.currentExcursion(token, scope)) this.beginExcursion(token.sceneId); });
+        scope.listen(retry, 'click', () => {
+            if (!this.currentExcursion(token, scope) || (token.sceneId === 'relief' && (!this.focused || document.hidden))) return;
+            if (this.mounted?.kind === 'optional' && this.mounted.runtime.sceneId === 'relief' && this.mounted.runtime.routes) return;
+            this.beginExcursion(token.sceneId, options);
+        });
         scope.listen(map, 'click', () => this.leaveExcursion(token, scope));
         nav.append(status, retry, map); this.root.append(nav);
     }

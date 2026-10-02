@@ -44,10 +44,12 @@ class Element extends EventSurface {
     get textContent(): string { return this.ownText + this.children.map(child => child.textContent).join(''); }
     set textContent(value: string) { this.ownText = value; this.children = []; }
     hidden = false;
+    disabled = false;
     contentEditable = 'false';
     spellcheck = true;
     style: Record<string, string> = {};
     focused = false;
+    focusCount = 0;
     closest(selector: string): Element | null {
         return this.tagName === 'BUTTON' && selector.includes('button') || this.tagName === 'A' && selector.includes('a[href]') ? this : null;
     }
@@ -56,7 +58,10 @@ class Element extends EventSurface {
     append(...children: Element[]) { this.children.push(...children); }
     setAttribute(key: string, value: string) { this.attributes.set(key, value); }
     getAttribute(key: string) { return this.attributes.get(key) ?? null; }
-    focus() { this.focused = true; }
+    focus() {
+        this.focused = true; this.focusCount++;
+        (document as unknown as { activeElement: Element }).activeElement = this;
+    }
     getBoundingClientRect() { return { left: 0, top: 0, width: 640, height: 360 }; }
 }
 
@@ -95,7 +100,7 @@ export function juiceEpilogueBrowser(t: Pick<TestContext, 'after'>, reducedMotio
         matches: reducedMotion && query === '(prefers-reduced-motion: reduce)', media: query,
     });
     const document = Object.assign(new EventSurface(), {
-        title: '', hidden: false, body: { style: {} }, querySelector: () => null,
+        title: '', hidden: false, activeElement: null as Element | null, body: { style: {} }, querySelector: () => null,
         getElementById: (id: string) => elements.get(id) ?? null,
         createElement: (tag: string) => tag === 'canvas' ? new Canvas() : new Element()
     });

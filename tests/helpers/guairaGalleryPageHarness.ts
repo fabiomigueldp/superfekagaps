@@ -1,3 +1,5 @@
+import { reliefChallengeMessage, type GuairaReliefOptions } from '../../src/adventure/experimental/guaira/relief/GuairaReliefChallenge';
+import { installReliefReplayControls } from '../../src/adventure/experimental/guaira/relief/GuairaReliefReplayControls';
 import assert from 'node:assert/strict';
 import type { TestContext } from 'node:test';
 import { readFileSync } from 'node:fs';
@@ -51,12 +53,14 @@ export async function galleryPageBrowser(t: TestContext) {
     const games: WorldGame[] = [], loads: GuairaInspectionRoomSceneId[] = [];
     let loader = async (id: GuairaInspectionRoomSceneId): Promise<GuairaInspectionRoomFactory> => factories[id];
     const imports: Record<string, unknown> = {
+        './adventure/experimental/guaira/relief/GuairaReliefChallenge': { reliefChallengeMessage },
+        './adventure/experimental/guaira/relief/GuairaReliefReplayControls': { installReliefReplayControls },
         './engine/DisposalScope': { DisposalScope }, './guaira-lab-layout': { fitGuairaLabCanvas },
         './guaira-lab-controls': { installGuairaLabControls }, './adventure/experimental/JuiceLabToolbar': { LabToolbarAction },
         './adventure/experimental/guaira/GuairaInspectionRooms': { INSPECTION_ROOMS,
             loadGuairaInspectionRoom: async (id: GuairaInspectionRoomSceneId) => {
                 loads.push(id); const factory = await loader(id);
-                return (canvas: HTMLCanvasElement, status: HTMLElement) => { const runtime = factory(canvas, status); games.push(runtime.game); return runtime; };
+                return (canvas: HTMLCanvasElement, status: HTMLElement, options?: GuairaReliefOptions) => { const runtime = factory(canvas, status, options); games.push(runtime.game); return runtime; };
             } }
     };
     const source = readFileSync(new URL('../../src/guaira-galeria.ts', import.meta.url), 'utf8');

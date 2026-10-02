@@ -1,3 +1,5 @@
+import { reliefChallengeMessage, type GuairaReliefOptions } from './adventure/experimental/guaira/relief/GuairaReliefChallenge';
+import { installReliefReplayControls } from './adventure/experimental/guaira/relief/GuairaReliefReplayControls';
 import { DisposalScope } from './engine/DisposalScope';
 import { fitGuairaLabCanvas } from './guaira-lab-layout';
 import { installGuairaLabControls } from './guaira-lab-controls';
@@ -39,17 +41,17 @@ export function mountGuairaGalleryPage(dependencies: GuairaGalleryPageDependenci
         if (event.target === primary) primaryKey = primaryRevision;
         else retryKey = actionEpoch;
     }, true);
-    function retryAction(owner: DisposalScope, sceneId: GuairaInspectionRoomSceneId) {
+    function retryAction(owner: DisposalScope, sceneId: GuairaInspectionRoomSceneId, options?: GuairaReliefOptions, allowed = () => true) {
         let release = () => {};
         const bind = () => {
             release();
             const epoch = actionEpoch;
             release = owner.listen(retry, 'click', event => {
-                if (!active(owner) || epoch !== actionEpoch) return;
+                if (!active(owner) || epoch !== actionEpoch || !allowed()) return;
                 const pressed = event.detail === 0 ? retryKey : retryPress;
                 if (event.detail === 0) retryKey = null; else retryPress = null;
                 if (pressed !== null && pressed !== epoch) return;
-                void mount(sceneId);
+                void mount(sceneId, options);
             });
         };
         owner.listen(window, 'focus', bind);
@@ -62,7 +64,7 @@ export function mountGuairaGalleryPage(dependencies: GuairaGalleryPageDependenci
         primary.disabled = true;
         return view;
     }
-    async function mount(sceneId: GuairaInspectionRoomSceneId) {
+    async function mount(sceneId: GuairaInspectionRoomSceneId, options?: GuairaReliefOptions) {
         if (lifetime.isDisposed) return;
         const owner = replace(), info = INSPECTION_ROOMS[sceneId];
         let interrupted = !focused || document.hidden, frame: number | null = null;
@@ -76,10 +78,12 @@ export function mountGuairaGalleryPage(dependencies: GuairaGalleryPageDependenci
         owner.listen(window, 'blur', () => { interrupted = true; stop(); });
         owner.listen(window, 'focus', refresh);
         owner.listen(document, 'visibilitychange', () => { if (document.hidden) interrupted = true; refresh(); });
-        retryAction(owner, sceneId);
+        let routeControlled = false;
+        retryAction(owner, sceneId, options, () => !routeControlled);
         try {
             // Reusing the same three native controls preserves focus and normal exit semantics.
             primary.replaceChildren(); retry.replaceChildren(); map.replaceChildren();
+            retry.disabled = false;
             const primaryArt = new LabToolbarAction(primary, true);
             primaryArt.setLabel('PAUSA', 'Pausar');
             new LabToolbarAction(retry).setLabel('TENTAR', `Recomeçar ${info.title}`);
@@ -93,7 +97,7 @@ export function mountGuairaGalleryPage(dependencies: GuairaGalleryPageDependenci
             const factory = await loadRoom(sceneId);
             if (!current(owner)) return;
             const nativeStatus = document.createElement('span');
-            const runtime = factory(canvas, nativeStatus), game = runtime.game;
+            const runtime = factory(canvas, nativeStatus, options), game = runtime.game;
             let keepAudio = false;
             owner.add(() => { if (keepAudio) audioEnabled = game.audio.enabled; game.dispose(); });
             if (!current(owner)) return;
@@ -101,10 +105,15 @@ export function mountGuairaGalleryPage(dependencies: GuairaGalleryPageDependenci
             game.audio.enabled = audioEnabled; game.audio.volume(); keepAudio = true;
             const controls = installGuairaLabControls(game, canvas, () => runtime.finished);
             owner.add(() => controls.dispose());
-            type Action = 'pause' | 'resume' | 'relief' | null;
+            const routes = runtime.sceneId === 'relief' ? runtime.routes : undefined;
+            routeControlled = !!routes;
+            const replay = routes ? installReliefReplayControls(owner, routes, primary, retry,
+                () => active(owner) && !game.isDisposed, nextOptions => { void mount('relief', nextOptions); }) : null;
+            type Action = 'pause' | 'resume' | 'relief' | 'other-route' | null;
             let action: Action = null, releasePrimary = () => {};
             const actionNow = (): Action => game.isDisposed ? null : game.state === 'paused' ? 'resume'
-                : game.state !== 'playing' ? null : sceneId === 'gallery' && runtime.finished && !game.player.data.isDead ? 'relief' : 'pause';
+                : game.state !== 'playing' ? null : runtime.finished && !game.player.data.isDead
+                    ? sceneId === 'gallery' ? 'relief' : routes ? 'other-route' : 'pause' : 'pause';
             const invalidate = () => {
                 primaryRevision++; action = null; releasePrimary(); releasePrimary = () => {}; primary.disabled = true;
             };
@@ -113,12 +122,12 @@ export function mountGuairaGalleryPage(dependencies: GuairaGalleryPageDependenci
             owner.listen(document, 'visibilitychange', () => { if (document.hidden) invalidate(); });
             reflect = () => {
                 if (!current(owner) || game.isDisposed) return false;
-                controls.sync();
+                controls.sync(); replay?.sync();
                 const next = actionNow();
                 if (next !== action) {
                     invalidate(); action = next;
                     const revision = primaryRevision;
-                    if (next) releasePrimary = owner.listen(primary, 'click', event => {
+                    if (next && next !== 'other-route') releasePrimary = owner.listen(primary, 'click', event => {
                         if (!active(owner) || revision !== primaryRevision || actionNow() !== next) return;
                         const pressed = event.detail === 0 ? primaryKey : primaryPress;
                         if (event.detail === 0) primaryKey = null; else primaryPress = null;
@@ -129,15 +138,21 @@ export function mountGuairaGalleryPage(dependencies: GuairaGalleryPageDependenci
                     });
                 }
                 primary.disabled = next === null;
-                primaryArt.setLabel(next === 'resume' ? 'CONTINUAR' : next === 'relief' ? 'ALÍVIO' : 'PAUSA',
+                primaryArt.setLabel(next === 'resume' ? 'CONTINUAR' : next === 'other-route' ? 'OUTRA ROTA' : next === 'relief' ? 'ALÍVIO' : 'PAUSA',
                     next === 'resume' ? 'Continuar a tentativa'
+                        : next === 'other-route' ? 'Tentar outra rota na Câmara de Alívio'
                         : next === 'relief' ? 'Seguir para a Câmara de Alívio, continuação opcional' : 'Pausar');
-                const message = game.state === 'paused' ? `Pausado · Continuar volta a ${info.title}`
+                let message = game.state === 'paused' ? `Pausado · Continuar volta a ${info.title}`
                     : game.player.data.isDead ? 'Feka caiu · retorno ao ponto seguro desta tentativa'
                     : runtime.finished ? runtime.sceneId === 'gallery'
                         ? 'Acesso de inspeção aberto · Alívio segue para a Câmara de Alívio; Mapa volta ao Bairro da Vala Seca'
                         : `Passagem inspecionada · ${runtime.reliefOpened ? 'alívio aberto, grelha sem pressão' : 'alívio intacto, grelha mantém o ciclo'} · Mapa volta ao Bairro da Vala Seca`
                     : nativeStatus.textContent && !nativeStatus.textContent.startsWith('Pausado') ? nativeStatus.textContent : info.objective;
+                if (routes && game.state === 'playing' && !game.player.data.isDead) {
+                    if (runtime.finished) message += ' · Outra rota propõe um novo objetivo opcional';
+                    const optional = reliefChallengeMessage(routes.snapshot);
+                    if (optional && !message.includes(optional)) message += ` · ${optional}`;
+                }
                 if (status.textContent !== message) status.textContent = message;
                 return true;
             };
@@ -159,7 +174,8 @@ export function mountGuairaGalleryPage(dependencies: GuairaGalleryPageDependenci
             retry.setAttribute('aria-label', `Tentar abrir ${info.title} novamente`);
             status.setAttribute('role', 'alert');
             status.textContent = `Não foi possível abrir ${info.title}. Tentar repete o carregamento; Mapa volta ao Bairro da Vala Seca.`;
-            retryAction(recovery, sceneId);
+            retry.disabled = false;
+            retryAction(recovery, sceneId, options);
             console.error('Inspection room initialization failed', error);
         }
     }

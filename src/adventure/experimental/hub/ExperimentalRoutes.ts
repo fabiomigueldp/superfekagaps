@@ -1,7 +1,7 @@
 /** Closed navigation vocabulary: queries never supply a destination or session data. */
 export const EXPERIMENTAL_HUB_RETURN = './?experiments=1';
 export const EXPERIMENTAL_ROUTES = Object.freeze([
-    { href: './guaira-capitulo.html', label: 'CAPÍTULO DE GUAÍRA', description: 'Cinco resultados nesta sessão', name: 'Jogar o capítulo de Guaíra' },
+    { href: './guaira-capitulo.html', label: 'CAPÍTULO DE GUAÍRA', description: 'Devolva a água ao bairro em cinco etapas', name: 'Jogar o capítulo de Guaíra' },
     { href: './guaira.html', label: 'GUAÍRA LIVRE', description: 'Explore o mapa e escolha percursos', name: 'Explorar Guaíra livremente' },
     { href: './juice-lab.html', label: 'TURBOSUCO', description: 'Teste o desafio da arena', name: 'Jogar o desafio experimental do Turbosuco' }
 ] as const);

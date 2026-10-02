@@ -1,8 +1,9 @@
 # Turbosuco: epílogo do campeonato
 
-Módulo pronto para integração posterior. **Ainda não conectado à página nem ao
-adapter do laboratório.** Não modifica `juice-lab.ts`, `JuiceMinibossLab`,
-`GuairaChapterApp`, combate, física, Input, falas ou áudio.
+Integrado à página `juice-lab.ts` pela subclasse `JuiceLabHost`. O host mantém
+o update de `JuiceMinibossLab` e só substitui a apresentação do resultado após
+o pouso real. Não modifica `JuiceMinibossLab`, `GuairaChapterApp`, combate,
+física, Input, falas ou áudio.
 
 ## Sequência e lore
 
@@ -43,32 +44,30 @@ alteração do relacionamento Yasmin/João. Reutiliza `CalabrezzoStageArt` e
 - `drawJuiceEpilogue(context, frame, reducedMotion)`: pinta uma cena nativa 320×180;
   o ator é cênico. Não escreve posição, equipamento, estado ou Input do Player.
 
-Esboço para o integrador, **não aplicado neste lote**:
+Integração aplicada em `src/adventure/experimental/JuiceLabHost.ts`:
 
 ```ts
-// Criar uma vez por instância e registrar dispose no lifecycle existente.
-const epilogue = new JuiceEpilogue(lab);
-// No ponto que já atualiza o lab, mantendo seu pipeline nativo de resultado:
-lab.update(dt);
-epilogue.update(dt);
-// No ramo de render do resultado, antes do painel genérico de nova luta:
-const frame = epilogue.frame;
-if (frame) {
-    lab.renderer.startScene(1);
-    drawJuiceEpilogue(lab.renderer.getContext(), frame, lab.reducedMotion);
-    // Reaplicar aqui a apresentação de pausa existente, se estiver pausado.
-    lab.renderer.present();
-} else {
-    lab.render();
-}
+// No override de update; o loop e a física são os existentes.
+super.update(dt);
+this.epilogue.update(dt);
+// O override de render consulta this.epilogue.frame. Sem frame, usa
+// super.render(); com frame, pinta a cena, a pausa quando necessária
+// e apresenta uma vez. addCleanup descarta o controlador na saída.
 ```
 
-Esse esboço representa pontos do loop existente, não um segundo loop/RAF.
-Preservar o update nativo de resultado para pausa, mute, áudio e aterrissagem.
-O host controla o botão acessível PULAR, seu foco e sua visibilidade apenas
-durante os quatro beats; TENTAR, replay da introdução e saída continuam existentes.
-Pular não deve reutilizar uma pressão de pulo do combate nem consumir Input novo.
-Não criar autoplay, callback de voz, timer, save ou desbloqueio. O fim segura o
+O update nativo de resultado preserva pausa, mute, áudio e aterrissagem. Não há
+timer nem RAF adicional: os dois callbacks existentes continuam sendo o jogo e
+a atualização da toolbar. O botão nativo `lab-skip` recebe nome acessível
+**Pular epílogo** nos quatro beats, fica desabilitado na pausa e some ao concluir.
+O foco não muda entre beats; se o botão focado desaparecer ao terminar, volta ao
+canvas sem scroll. TENTAR e REVER invalidam o frame e sincronizam os controles
+no próprio clique. Espaço no combate não pula o epílogo.
+
+O host registra o descarte no lifecycle existente. A página remove listeners,
+cancela o RAF da toolbar e desconecta o ResizeObserver. `pagehide` descarta o lab
+na saída definitiva; quando `persisted` indica cache de histórico, mantém a
+instância pausada para voltar pelo navegador e continuar explicitamente.
+Não há autoplay, callback de voz, timer, save ou desbloqueio. O fim segura o
 quadro e mantém as ações existentes; não reinicia a luta sozinho.
 
 ## Evidências e limites
@@ -93,13 +92,30 @@ EPILOGUE_CANVAS_MODULE=/caminho/qa/node_modules/@napi-rs/canvas \
 
 Canvas é dependência opcional de QA externa ao projeto; nenhum pacote/runtime
 asset foi adicionado. As provas são renderizações offline, não capturas de
-navegador. Integração dos controles, foco/pausa na página e toque físico ficam
-para o lote de integração. A trilha e os efeitos integrados na base permanecem
+navegador. A trilha e os efeitos integrados na base permanecem
 intactos; este epílogo não solicita nem gera áudio.
 
-Validação desta entrega sobre `1fad188374d84b46acfec50bbd5a0753e07171a7`:
+`tests/juice-epilogue-host.test.ts` exercita a subclasse e o entrypoint real:
+replay dos seis acertos, snapshots idênticos do combate e de toda a aterrissagem,
+render sem mutação, pausa por Escape/blur/visibilidade, movimento reduzido,
+conclusão natural e skip, nome acessível, foco estável, retry/replay no mesmo
+turno e limpeza terminal dos callbacks e listeners. Junto aos testes existentes
+de epílogo e lifecycle, são 26 testes focados. Esse harness substitui apenas as
+fronteiras do navegador; a QA visual em navegador real continua sendo uma
+verificação separada, e esses testes não afirmam validar toque físico.
+
+Validação histórica do módulo isolado sobre `1fad188374d84b46acfec50bbd5a0753e07171a7`:
 102 testes focados do epílogo/introdução/Turbosuco, os dois projetos TypeScript,
 os três validadores, build Vite e gate de 45 MB passaram. Output: 155 arquivos,
-42.695.227 bytes. Como a API ainda não está conectada, isso não mede seu custo
-futuro no bundle integrado. A prova registra 33 updates de aterrissagem após os
+42.695.227 bytes. Essa medição antecede a integração e não mede seu custo
+no bundle integrado. A prova registra 33 updates de aterrissagem após os
 942 frames da luta; todos os acertos vêm da gravação de inputs existente.
+
+Na integração do host, o build de produção também passou no Chromium: os seis
+acertos foram reproduzidos por eventos DOM de teclado e física nativa a 60 Hz,
+seguidos do pouso e epílogo. Pausa, skip com retorno de foco, fim natural, retry,
+replay, retorno de bfcache pausado e descarte foram verificados em desktop e
+390 × 844 com movimento reduzido. Não houve escrita de vida, posição ou vitória.
+A suíte agregada passou com 1328 testes TypeScript e três do servidor; validadores,
+ambos os projetos TypeScript, build e limite de tamanho passaram. O build integrado
+contém 155 arquivos e 42.729.858 bytes (limite de 45.000.000).
