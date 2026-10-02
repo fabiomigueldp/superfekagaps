@@ -1,0 +1,120 @@
+{
+  "baselineCommit": "c27019374479da44defb57f038d1597b9fd3e549",
+  "exactStructure": {
+    "walk": true,
+    "water": true,
+    "camera": true,
+    "lights": true
+  },
+  "exactNavigation": {
+    "camera": true,
+    "nodes": true,
+    "routes": true,
+    "worldRoutes": true,
+    "routeWidth": true,
+    "futureBossArea": true
+  },
+  "staticAudit": {
+    "baselineCommit": "c27019374479da44defb57f038d1597b9fd3e549",
+    "method": "Evaluated Blender geometry with Blender loop triangulation; both-facing native opaque-pixel union, 5 subpixel rays per pixel; full-body and face included",
+    "routeSamples": 203,
+    "frameCount": 7,
+    "opaquePixelUnionCount": 317,
+    "directions": 2,
+    "pixelSubsamples": 5,
+    "rays": 643510,
+    "foregroundSceneryContacts": 0,
+    "newForegroundContacts": 0,
+    "inheritedFootSurfaceContacts": 6962,
+    "inheritedContactPixelRows": {
+      "25": 5239,
+      "23": 415,
+      "24": 1308
+    },
+    "supportProbes": 609,
+    "inheritedBridgeGapSupportProbes": 2,
+    "newUnsupported": 0,
+    "headroomObstructions": 0,
+    "walkMeshCount": 16,
+    "waterMeshCount": 9,
+    "exactWalkMeshesUnchanged": true,
+    "exactWaterMeshesUnchanged": true,
+    "cameraAndLightsUnchanged": true,
+    "inheritedContactExplanation": "All intersections match baseline object and hit location within 0.0001 world unit. They are in the last three native sprite rows against existing walk clearings/planks or bridge inlet water; two lateral support probes meet the existing gap between bridge planks. The production map painter draws Feka over the base. No head, face, body scenery or newly introduced contact."
+  },
+  "inheritedSupportProbes": [
+    {
+      "route": 2,
+      "segment": 1,
+      "t": 0.6666666666666666,
+      "side": 0,
+      "object": "Bridge lateral clean inlet clean flowing water"
+    },
+    {
+      "route": 2,
+      "segment": 1,
+      "t": 0.6666666666666666,
+      "side": 0.28,
+      "object": "Bridge lateral clean inlet clean flowing water"
+    }
+  ],
+  "inheritedContactObjects": {
+    "walk_guaira-1 clearing": 460,
+    "walk_guaira-2 clearing": 948,
+    "walk_guaira-3 clearing": 952,
+    "walk_paddy bridge plank": 414,
+    "walk_paddy bridge plank.001": 439,
+    "walk_paddy bridge plank.002": 377,
+    "Bridge lateral clean inlet clean flowing water": 273,
+    "walk_paddy bridge plank.003": 327,
+    "walk_paddy bridge plank.004": 354,
+    "walk_paddy bridge plank.005": 436,
+    "walk_paddy bridge plank.006": 535,
+    "walk_guaira-4 clearing": 524,
+    "walk_3": 473,
+    "walk_guaira-5 clearing": 450
+  },
+  "imageAlphaMatchesMasterPNG": true,
+  "navigationMetadataByteIdentical": true,
+  "waterDecorativeDataByteIdentical": true,
+  "atlas": {
+    "size": [
+      516,
+      306
+    ],
+    "bytes": 18804,
+    "regionsUnchanged": true,
+    "packagerCoverageAssertionPassed": true,
+    "changedAlphaPixels": 1343
+  },
+  "targetedTests": {
+    "passed": 21,
+    "failed": 0
+  },
+  "build": {
+    "files": 120,
+    "bytes": 40407227,
+    "budgetBytes": 45000000,
+    "runtimeArtDeltaBytes": 3256,
+    "newFullSizeRuntimeLayer": false
+  },
+  "render": "Blender 4.3.2 / CPU Cycles / 48 samples / 1920x1200 RGBA / AgX Medium High Contrast / no denoising",
+  "productionWaterPainterAudit": {
+    "partialVsFullIdenticalCases": 48,
+    "sourceWaterEffectPixels": 1171,
+    "outsideVisibleMask": 0,
+    "maskDimensions": [
+      516,
+      306
+    ],
+    "scratchDimensions": [
+      344,
+      206
+    ],
+    "sourceSize": [
+      1920,
+      1200
+    ],
+    "scope": "Actual production painter and new image/mask in native offline canvas; not browser/GPU FPS measurement"
+  }
+}

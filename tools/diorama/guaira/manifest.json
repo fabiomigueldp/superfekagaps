@@ -1,7 +1,7 @@
 {
-  "version": 3,
+  "version": 4,
   "scope": "Isolated Gua\u00edra experimental map; no campaign or save-schema changes",
-  "origin": "Original deterministic Blender scene and second procedural geometry/material polish",
+  "origin": "Original deterministic Blender scene; third authored geometry/material craft pass informed by one separately labeled imagegen concept",
   "renderer": "Blender 4.3.2 / Cycles CPU / 48 samples / AgX medium-high contrast / no denoising",
   "runtimeImage": {
     "dimensions": [
@@ -10,29 +10,44 @@
     ],
     "mode": "RGBA",
     "encoding": "WebP quality92, method6, exact alpha",
-    "bytes": 189388,
-    "previousBytes": 195902,
-    "deltaBytes": -6514,
+    "bytes": 193260,
+    "previousBytes": 189388,
+    "deltaBytes": 3872,
     "alphaUnchangedFromMasterPNG": true
   },
   "metadataChanges": "No metadata changes; exact camera, node projections, route projections, worldRoutes, routeWidth and all 16 walk meshes/transforms preserved",
   "visualChanges": [
-    "Crafted civic facade, porch, pediment and bronze water fittings",
-    "Fractured terracotta cliff skin over continuous original clay core, drought cracks, grouped cactus detail, softer dust path material",
-    "Connected earthen irrigation terraces, cyan water, green rice and restrained working tools"
+    "Three village houses with curved overlapping clay tile shells, individual limewash, recessed chestnut doors and teal louvered shutters, grouped masonry wear and stone footings",
+    "Single attached sage repair bay with workbench and spare hydraulic parts; sheltered dry-bank vegetation; restrained mature rice heads and a compact bank-side keeper/harvest group",
+    "Seated reservoir shutter, fitted sandstone outlet throat and return joints, service foothold and bronze pipe supports; original water surfaces retained"
   ],
   "staticAudit": {
-    "routeSamples": 240,
+    "baselineCommit": "c27019374479da44defb57f038d1597b9fd3e549",
+    "method": "Evaluated Blender geometry with Blender loop triangulation; both-facing native opaque-pixel union, 5 subpixel rays per pixel; full-body and face included",
+    "routeSamples": 203,
     "frameCount": 7,
     "opaquePixelUnionCount": 317,
     "directions": 2,
     "pixelSubsamples": 5,
-    "rays": 760800,
-    "occludedSamples": 0,
-    "supportProbes": 720,
-    "unsupported": 0,
+    "rays": 643510,
+    "foregroundSceneryContacts": 0,
+    "newForegroundContacts": 0,
+    "inheritedFootSurfaceContacts": 6962,
+    "inheritedContactPixelRows": {
+      "25": 5239,
+      "23": 415,
+      "24": 1308
+    },
+    "supportProbes": 609,
+    "inheritedBridgeGapSupportProbes": 2,
+    "newUnsupported": 0,
+    "headroomObstructions": 0,
     "walkMeshCount": 16,
-    "exactWalkMeshesUnchanged": true
+    "waterMeshCount": 9,
+    "exactWalkMeshesUnchanged": true,
+    "exactWaterMeshesUnchanged": true,
+    "cameraAndLightsUnchanged": true,
+    "inheritedContactExplanation": "All intersections match baseline object and hit location within 0.0001 world unit. They are in the last three native sprite rows against existing walk clearings/planks or bridge inlet water; two lateral support probes meet the existing gap between bridge planks. The production map painter draws Feka over the base. No head, face, body scenery or newly introduced contact."
   },
   "files": {
     "public/assets/world/experimental/guaira/guaira-diorama.meta.json": {
@@ -40,20 +55,20 @@
       "sha256": "2e02904c2664ab7e6b19687693c057edbb1c3a255281c1934f684f88b9d0ebd1"
     },
     "public/assets/world/experimental/guaira/guaira-diorama.webp": {
-      "bytes": 189388,
-      "sha256": "d49a2fd6654e3ba5fa2e4d5d3af592273fe8b657ade5cfe077b258c73ea8bc62"
+      "bytes": 193260,
+      "sha256": "38c1043fbdbd3a7481c4f5ae71f4763031cd4873bd0af22ff4f081efb5503fc3"
     },
     "tools/diorama/guaira/package_guaira.py": {
       "bytes": 1833,
       "sha256": "8257eff0f15aee3eab5db41b5b355523f11627cff63c32e0077cd25d56c66d17"
     },
     "tools/diorama/guaira/build_guaira.py": {
-      "bytes": 34537,
-      "sha256": "6e925523457bf939074c0897a2d202d2e0d58028f2acae01088ccd2f98d3a89b"
+      "bytes": 34728,
+      "sha256": "5e43949e393a6d541873728442256d2b2dbc1429fb5db93a90787647c686ced2"
     },
     "public/assets/world/experimental/guaira/guaira-water-mask.png": {
-      "bytes": 19420,
-      "sha256": "562056681fd89232d788b29e94f9bb90ceb7c31905a6bda07644380d4c3a49c8"
+      "bytes": 18804,
+      "sha256": "447c8a6e8331ca245d9190caf528d128662e226f9cf25539aa3f90afe7301144"
     },
     "src/adventure/experimental/guaira/GuairaWaterData.json": {
       "bytes": 1516,
@@ -66,6 +81,22 @@
     "tools/diorama/guaira/package_water.py": {
       "bytes": 2913,
       "sha256": "e350f383d302ade00d70757823f71d61165d26fbe8fa5b0a7d07f530d752b48c"
+    },
+    "tools/diorama/guaira/craft_guaira.py": {
+      "bytes": 12676,
+      "sha256": "8607a565797d943b33b5b6a46411ed706f52aaa818defc2cfce89d0378d53eea"
+    },
+    "tools/diorama/guaira/craft-validation.json": {
+      "bytes": 3637,
+      "sha256": "e43ec9579bc75f9529cb980dae2e7f2fa4b1174a1a1ba6ad643bed3926eda03d"
+    },
+    "tools/diorama/guaira/audit_guaira_craft.py": {
+      "bytes": 6283,
+      "sha256": "b6bf24b183831ac23948f26f32f76b442a9d07ea4a1fcfa8a5dbdc6978869d00"
+    },
+    "tools/diorama/guaira/export_guaira_actor.mjs": {
+      "bytes": 984,
+      "sha256": "45d036bfeedbd7227ca65dc7d5b49912fee560be66c1aa1fea1afd5afc588cc0"
     }
   },
   "excludedFromProduction": [
@@ -73,7 +104,7 @@
     "Concept/reference raster",
     "Scratch component scripts, proofs, screenshots, and intermediate renders"
   ],
-  "limitations": "Static art/geometry checks; runtime navigation and focus verification belongs to integration QA",
+  "limitations": "Static evaluated-geometry differential audit and offline production painter review; integration browser navigation/focus verification remains separate. Existing foot/floor contacts and bridge-gap support probes are explicitly reported, not hidden as a clean zero.",
   "waterDecoration": {
     "origin": "Occluded emission mask of authored Blender water surfaces, with one source-pixel inset",
     "maskSize": [
@@ -84,12 +115,46 @@
       344,
       206
     ],
-    "maskBytes": 19420,
+    "maskBytes": 18804,
     "estimatedDecodedAndScratchBytes": 915040,
     "idlePaintCadenceLimitHz": 30,
     "memoryMeasurement": false,
     "fullSizeAdditionalTexture": false,
     "navigationMetadataUnchanged": true,
-    "maskFailure": "Static map remains functional"
+    "maskFailure": "Static map remains functional",
+    "atlasRegeneratedForNewOccluders": true,
+    "sourceSurfaceGeometryUnchanged": true,
+    "decorativeContractByteIdentical": true,
+    "changedAtlasAlphaPixels": 1343,
+    "maskActivePixels": 26785,
+    "maskSourceSHA256": "17fe999bb6e628a51d59e5668f230536a9a5318f5083f20fe14ebb3aa9fb3f71",
+    "productionPainterAudit": {
+      "partialVsFullIdenticalCases": 48,
+      "sourceWaterEffectPixels": 1171,
+      "outsideVisibleMask": 0,
+      "maskDimensions": [
+        516,
+        306
+      ],
+      "scratchDimensions": [
+        344,
+        206
+      ],
+      "sourceSize": [
+        1920,
+        1200
+      ],
+      "scope": "Actual production painter and new image/mask in native offline canvas; not browser/GPU FPS measurement"
+    }
+  },
+  "buildCost": {
+    "files": 120,
+    "bytes": 40408353,
+    "budgetBytes": 45000000,
+    "runtimeArtDeltaBytes": 3256,
+    "newFullSizeRuntimeLayer": false,
+    "candidateBaseCommit": "c27019374479da44defb57f038d1597b9fd3e549",
+    "candidateBytes": 40407227,
+    "integrationBaseCommit": "2b8b57ca04e31083fc7f24911b2a38bdb921f04f"
   }
 }

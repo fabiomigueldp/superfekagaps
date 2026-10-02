@@ -1,4 +1,4 @@
-"""Second polish pass of the original deterministic Guaíra candidate. Blender 4.3+, CPU Cycles.
+"""Third craft pass of the original deterministic Guaíra candidate. Blender 4.3+, CPU Cycles.
 blender -b -t 8 --python source/build_guaira.py -- --output-dir . [--draft]
 No campaign identifiers, no changes outside output directory.
 """
@@ -407,6 +407,9 @@ for k in range(22):
  ob=cube('Reservoir laid rim stone',(xx,yy,2.66),(.29,.19,.22),wetstone,.04);ob.rotation_euler.z=a+math.pi/2
 for x,y,s in [(5.70,-3.63,.66),(5.88,-1.50,.62),(5.76,.0,.66),(4.84,-4.11,.48),(1.03,-4.00,.5),(5.41,2.55,.8),(4.0,4.03,.7)]:
  if clear(x,y,.9):rosette(x,y,1.77 if y<2 else 2.4,s,leaf)
+
+# Portable craft module uses these authored helper functions and fixed geometry.
+exec(compile(open(os.path.join(os.path.dirname(__file__),'craft_guaira.py')).read(),'craft_guaira.py','exec'))
 
 scene=bpy.context.scene;bpy.ops.object.camera_add(location=(11,-20,18.85));cam=bpy.context.object;target=Vector((0,.25,3.0));cam.rotation_euler=(target-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.type='ORTHO';cam.data.ortho_scale=20.6;scene.camera=cam
 world=bpy.data.worlds.new('Warm dry atmosphere');scene.world=world;world.use_nodes=True;world.node_tree.nodes['Background'].inputs[0].default_value=(.62,.58,.80,1);world.node_tree.nodes['Background'].inputs[1].default_value=.55

@@ -41,7 +41,7 @@ Metadados/imagem inválidos exibem um estado terminal com links para os quatro e
 
 ## Arte e reprodução
 
-Asset: `public/assets/world/experimental/guaira/guaira-diorama.webp`, RGBA WebP qualidade 92, 1920×1200, 189.388 bytes. O passe Blender v2 enriquece fachada e tubulações, falésias/solo e margens irrigadas; substitui a base anterior de 195.902 bytes, sem camada ou textura adicional. A codificação conserva exatamente o alpha do novo PNG correspondente; nenhuma concept art foi colocada no runtime. Metadados, incluindo artBounds, câmera, cinco âncoras e quatro rotas, continuam byte-idênticos. O manifesto em `tools/diorama/guaira/manifest.json` registra hashes e proveniência. Fontes Blender/Python ficam em `tools/diorama/guaira`; `.blend`, masters PNG e provas não são enviados ao site.
+Asset: `public/assets/world/experimental/guaira/guaira-diorama.webp`, RGBA WebP qualidade 92, 1920×1200, 193.260 bytes. O passe Blender v3 acrescenta telhas curvas em cursos, três fachadas com portas/venezianas profundas, desgaste agrupado na base, baia de manutenção e grupo de colheita; assenta a garganta da comporta sem mover a água. Substitui a base anterior de 189.388 bytes, sem camada ou textura adicional. A codificação conserva exatamente o alpha do novo PNG correspondente; nenhuma concept art foi colocada no runtime. Metadados, incluindo artBounds, câmera, cinco âncoras e quatro rotas, continuam byte-idênticos. O manifesto em `tools/diorama/guaira/manifest.json` registra hashes e proveniência. Fontes Blender/Python ficam em `tools/diorama/guaira`; `.blend`, masters PNG e provas não são enviados ao site.
 
 Reproduzir fora do repositório de produção, com Blender 4.3.2 e Pillow:
 
@@ -56,7 +56,7 @@ A fonte usa Cycles CPU, 48 amostras e nenhum denoiser. `--draft` não pode ser e
 
 Um passe decorativo acrescenta reflexos curtos ao reservatório/arrozais e movimento na direção real dos canais. A máscara foi derivada das superfícies de água na câmera Blender, usando pedras, arroz, ponte e tubulações como oclusores, com recuo de um pixel. Feka é desenhado depois do efeito. A base, as rotas e os metadados de navegação não mudam.
 
-O atlas PNG mede 516×306 (19.420 bytes); o buffer reutilizável mede 344×206. A estimativa de atlas RGBA decodificado + buffer é 915.040 bytes (~0,873MiB), sem textura adicional de 1920×1200. É orçamento de superfícies, não memória medida do browser/GPU. O manifesto registra proveniência e hashes; o JSON decorativo é compilado no módulo do mapa.
+O atlas PNG mede 516×306 (18.804 bytes); o buffer reutilizável mede 344×206. A estimativa de atlas RGBA decodificado + buffer é 915.040 bytes (~0,873MiB), sem textura adicional de 1920×1200. É orçamento de superfícies, não memória medida do browser/GPU. O manifesto registra proveniência e hashes; o JSON decorativo é compilado no módulo do mapa.
 
 Com câmera e Feka parados, apenas a união dos quatro recortes de água é restaurada, no máximo30 vezes por segundo. As placas não fazem consultas de layout nesse estado. Durante caminhada/enquadramento, o renderer normal recompõe o quadro completo. O tempo da água é acumulado somente enquanto a decoração está ativa; ocultar a aba suspende RAF e preserva a fase, sem salto na retomada. Reduced motion usa um quadro estático e volta ao agendamento sob demanda. O mapa não tem pausa separada: entrar/sair descarta o controlador. A máscara carrega depois da cena sem bloquear destinos; falha mantém a maquete estática, e conclusão tardia após descarte é ignorada.
 
@@ -68,6 +68,14 @@ python tools/diorama/guaira/package_water.py --input /tmp/guaira-water --asset-o
 ```
 
 A fonte nunca salva sobre o `.blend` de entrada. O atlas empacotado e o JSON decorativo foram reproduzidos byte a byte. A prova offline de atualização parcial versus quadro completo teve igualdade em48 casos: quatro chegadas, três viewports, DPR1/2 e movimento normal/reduzido. O efeito alterou somente pixels da água no teste de máscara. Isso não é medição de FPS nem validação em dispositivo físico.
+
+### Recibo do passe de arte v3
+
+A cena foi executada de fato no Blender 4.3.2, preservando câmera/luzes, cinco âncoras, quatro rotas, todos os 16 meshes `walk_` e os nove meshes de água. `craft_guaira.py` é executado pela fonte portátil principal. A máscara foi reexportada para os novos oclusores com os mesmos quatro recortes e dimensões; 1.343 pixels alpha do atlas mudaram. Metadados de navegação e `GuairaWaterData.json` continuam byte-idênticos. O delta de base + máscara é +3.256 bytes; o build integrado tem 40.408.353 bytes, dentro de 45.000.000.
+
+O audit diferencial avalia a geometria Blender, incluindo modificadores/curvas e a triangulação nativa de loops, e dispara 643.510 raios em 203 posições de rota, cobrindo os 317 pixels opacos dos sete frames nativos nos dois sentidos e cinco subamostras por pixel. Não há contato com cenário novo, cabeça/rosto obstruído ou nova falta de apoio. Foram preservados e explicitamente contabilizados 6.962 contatos de pé com as próprias clareiras/tábuas/água já existentes, nas três últimas linhas do sprite; dois dos 609 probes de apoio encontram a água no vão preexistente entre tábuas da ponte. Cada contato coincide com objeto e posição do baseline (tolerância de 0,0001 unidade). Isto não é uma alegação de zero interseções absolutas. O pintor de produção compõe Feka sobre a base.
+
+`export_guaira_actor.mjs` extrai os frames nativos e `audit_guaira_craft.py` compara cenas baseline/candidate reproduzidas pelo Blender; ambos aceitam destinos fora da árvore de produção. `tools/diorama/guaira/craft-validation.json` registra o recibo compacto e `manifest.json` registra hashes, render, custo e limites. As provas de comparação e de Feka nos cinco marcos são renders offline do pintor de produção, não screenshots de navegador. O conceito imagegen, masters, `.blend` e provas permanecem fora do runtime. Os 21 testes focados do candidato e os 26 testes de mapa/UI/água da integração passaram, assim como validadores, typechecks e build. Com a nova base/máscara, o pintor real também passou 48 comparações pixel-a-pixel de atualização parcial versus composição completa (quatro chegadas, três viewports, DPR 1/2 e movimento normal/reduzido). Os 1.171 pixels do efeito amostrado ficaram inteiramente dentro da máscara visível, sem pintar oclusores novos.
 
 ## Verificação e limites
 
