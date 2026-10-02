@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "status": "not_generated",
-  "pilot_id": "sfg-guaira-pilot-01",
+  "pilot_id": "sfg-arcade-r2",
   "cue_id": null,
   "variant": null,
   "attempt": null,
@@ -23,7 +23,24 @@
   "loop_start_sample": null,
   "loop_end_sample_exclusive": null,
   "loop_sample_rate": null,
-  "audition": { "heard": false, "reviewer": null, "date": null, "devices": [], "in_game": false, "decision": "pending", "notes": null },
-  "rights": { "source": "ElevenLabs generation; pending", "plan_at_generation": null, "terms_date": null, "evidence_reference": null, "scope_platforms": [], "monetized_game_use_confirmed": false, "approved_by": null },
-  "publish_allowed": false
+  "audition": {
+    "heard": false,
+    "reviewer": null,
+    "date": null,
+    "devices": [],
+    "in_game": false,
+    "decision": "pending",
+    "notes": null
+  },
+  "rights": {
+    "source": "ElevenLabs generation; pending",
+    "plan_at_generation": null,
+    "terms_date": null,
+    "evidence_reference": null,
+    "scope_platforms": [],
+    "monetized_game_use_confirmed": false,
+    "approved_by": null
+  },
+  "publish_allowed": false,
+  "source_pilot_id": null
 }

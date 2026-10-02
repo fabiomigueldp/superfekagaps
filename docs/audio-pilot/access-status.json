@@ -26,5 +26,7 @@
   "plugin_tools_available_in_this_session": false,
   "generation_receipts_or_ids": [],
   "local_rest_generation_abandoned": true,
-  "next_step": "Parent/root consumes the exact pilot prompts, checks live creative-studio node schema and account/no-overage constraints, then executes the pilot once through the connected plugin. No parallel REST generation or second credential setup."
+  "next_step": "Parent generates only two arcade replacement music outputs via connected plugin and delivers those plus the 12 existing SFX through a dedicated assets branch and exact commit. This session performs integration after receipt; no local REST or duplicate SFX generation.",
+  "active_pilot_id": "sfg-arcade-r2",
+  "prior_root_generation_report": "14 outputs already generated in flow aoC2seBLqtH0qywcqdFt; 2 music rejected for direction, 12 SFX to reuse after audition."
 }

@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "updated_on": "2026-10-02",
+  "generation_owner": "parent_root_plugin_only",
+  "local_generation_count": 0,
+  "local_paid_consumption": 0,
+  "prior_flow": {
+    "url": "https://elevenlabs.io/app/flows/aoC2seBLqtH0qywcqdFt",
+    "reported_by": "parent_root",
+    "reported_generated_outputs": 14,
+    "exact_credits_consumed": null,
+    "provider_ids_pending_delivery": true,
+    "music": {
+      "count": 2,
+      "decision": "rejected_direction",
+      "reason": "User rejected intentionally geographic/regional musical identity. Preserve provider originals and previous commit as history.",
+      "heard_by_this_session": false,
+      "may_integrate": false
+    },
+    "sfx": {
+      "count": 12,
+      "decision": "reuse_candidates_pending_audition",
+      "regenerate": false,
+      "heard_by_this_session": false
+    }
+  },
+  "current_revision": {
+    "pilot_id": "sfg-arcade-r2",
+    "new_music_outputs_planned": 2,
+    "new_sfx_outputs_planned": 0,
+    "generation_started_by_this_session": false,
+    "integration_authorized_by_user": true,
+    "github_branch_publication_authorized": true,
+    "commercial_license_verified": false
+  },
+  "prior_prompt_commit": "7a714a537d4945a38bc4bd2851647bd8815459a6",
+  "parallel_integrator_head_reported": "ab942fee",
+  "parallel_integrator_head_available_locally": false
+}

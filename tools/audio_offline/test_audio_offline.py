@@ -17,10 +17,11 @@ class OfflinePipelineTests(unittest.TestCase):
     def test_budget_counts_all_variants_without_hidden_retries(self):
         requests = pipeline.validate(self.pilot)
         estimate = pipeline.estimate(requests)
-        self.assertEqual(estimate["paid_requests_planned"], 14)
-        self.assertEqual((estimate["music_seconds"], estimate["sfx_seconds"]), (80, 13.5))
-        self.assertEqual(estimate["illustrative_linear_usd_before_tax"], .227)
-        self.assertEqual(estimate["one_minute_per_call_hypothesis_usd_before_tax"], 1.74)
+        self.assertEqual(estimate["paid_requests_planned"], 2)
+        self.assertEqual((estimate["music_seconds"], estimate["sfx_seconds"]), (80, 0))
+        self.assertEqual(estimate["illustrative_linear_usd_before_tax"], .2)
+        self.assertEqual(estimate["one_minute_per_call_hypothesis_usd_before_tax"], .3)
+        self.assertEqual(estimate["existing_sfx_to_reuse"], 12)
         self.assertIsNone(estimate["approved_budget_usd"])
         self.assertIsNone(estimate["estimated_credits"])
 
@@ -33,6 +34,9 @@ class OfflinePipelineTests(unittest.TestCase):
         bad = copy.deepcopy(self.pilot); bad["sfx"][0]["loop"] = "false"; cases.append(bad)
         bad = copy.deepcopy(self.pilot); bad["sfx"][0]["cue_id"] = "../../public/injected"; cases.append(bad)
         bad = copy.deepcopy(self.pilot); bad["sfx"][1]["cue_id"] = bad["sfx"][0]["cue_id"]; cases.append(bad)
+        bad = copy.deepcopy(self.pilot); bad["generation_scope"] = "all_assets"; cases.append(bad)
+        bad = copy.deepcopy(self.pilot); bad["schema_version"] = 1; cases.append(bad)
+        bad = copy.deepcopy(self.pilot); bad["music"][0]["prompt"] += " Brazilian regional style"; cases.append(bad)
         for pilot in cases:
             with self.subTest(pilot=cases.index(pilot)), self.assertRaises(ValueError):
                 pipeline.validate(pilot)
@@ -44,11 +48,13 @@ class OfflinePipelineTests(unittest.TestCase):
             manifest = json.loads((output / "manifest.json").read_text())
             self.assertFalse(manifest["execution_enabled"])
             self.assertFalse(manifest["publish_allowed"])
-            self.assertEqual(len(list((output / "requests").glob("*.json"))), 14)
+            self.assertEqual(len(list((output / "requests").glob("*.json"))), 2)
+            self.assertEqual(manifest["expected_new_outputs"], 2)
             for item in manifest["requests"]:
                 data = (output / item["file"]).read_bytes()
                 self.assertEqual(item["sha256"], pipeline.digest(data))
                 request = json.loads(data)
+                self.assertEqual(request["endpoint"], "https://api.elevenlabs.io/v1/music")
                 self.assertNotIn("headers", request)
                 self.assertNotIn("seed", request["body"])
             with self.assertRaises(FileExistsError):
