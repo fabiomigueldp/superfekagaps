@@ -101,6 +101,17 @@ test('chapter guidance opens with the real objective and retains the native valv
     game.render(); h.frame();
     assert.match(h.byId('lab-status').textContent, /Abra a comporta e atravesse até o arrozal/);
     assert.doesNotMatch(h.byId('lab-status').textContent, /Guaíra fictícia/);
+    const hint = h.byId('chapter-keyboard-hint'), save = structuredClone(game.store.save);
+    assert.match(hint.textContent, /←\/→ mover.*Espaço pular.*↓ no ar: sentada.*Shift correr.*Esc pausa/);
+    h.byId('chapter-primary').click(); game.render(); h.frame();
+    assert.equal(game.state, 'paused');
+    assert.equal(h.byId('chapter-keyboard-hint'), hint, 'Pause keeps the visible key reference in place');
+    assert.equal(hint.hidden, false);
+    assert.match(h.byId('lab-status').textContent, /Pausado/);
+    h.byId('chapter-primary').click();
+    assert.equal(game.state, 'playing');
+    assert.deepEqual(game.store.save, save);
+    assert.equal(h.frames.size, 2, 'Guidance adds no animation loop');
     h.key('keydown', 'ArrowRight'); h.key('keydown', 'ShiftLeft');
     for (let frame = 0; frame < 92; frame++) game.update(1000 / 60);
     h.key('keyup', 'ArrowRight'); h.key('keyup', 'ShiftLeft');

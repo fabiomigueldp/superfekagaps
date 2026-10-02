@@ -311,6 +311,21 @@ test('the real toolbar preserves bitmap names through intro, pause, replay and r
     assert.equal(h.pause.getAttribute('aria-label'), 'Continuar', 'Keyboard pause also refreshes the semantic action.');
     h.key('Escape'); advance(game); h.frame();
     assert.equal(h.pause.getAttribute('aria-label'), 'Pausar');
+    h.skip.dispatch('click'); game.render(); h.frame();
+    game.player.die('hit'); game.render(); h.frame();
+    assert.match(h.status.textContent, /Feka caiu.*reinicia automaticamente/);
+    h.pause.dispatch('click'); game.render(); h.frame();
+    assert.match(h.status.textContent, /Pausado/, 'Pause takes precedence over the death announcement');
+    h.pause.dispatch('click');
+    for (let frame = 0; frame < 240 && game.player.data.isDead; frame++) advance(game);
+    assert.equal(game.player.data.isDead, false, 'The native death pipeline restarted the fight');
+    game.render(); h.frame();
+    assert.match(h.status.textContent, /^Nova tentativa/);
+    encounter(game).model.phase = 'recover'; game.render(); h.frame();
+    assert.match(h.status.textContent, /Nova tentativa.*Abertura/, 'Recovery context retains actionable native combat hints');
+    h.replay.dispatch('click'); game.render(); h.frame();
+    assert.doesNotMatch(h.status.textContent, /Nova tentativa|Feka caiu/, 'Replay retires old fight feedback');
+    assert.equal(h.frames.size, 2, 'Recovery feedback reuses the existing UI loop');
     game.load('juice-lab');
     const initialPlayer = structuredClone(game.player.data);
     const initialBoss = structuredClone(encounter(game).model);
@@ -340,6 +355,9 @@ test('the real toolbar preserves bitmap names through intro, pause, replay and r
         assert.equal(game.player.data.position.x, initialPlayer.position.x, 'Retry discards held gameplay keys.');
         assert.equal(game.state, 'playing');
     }
+    assert.deepEqual(h.storageCalls, [], 'Page feedback never reads or writes campaign saves');
+    game.dispose(); h.frame();
+    assert.equal(h.frames.size, 0, 'Native and toolbar loops stop after disposal');
 });
 
 test('final stomp settles its impact while advancing only the lab outcome without campaign completion', t => {
