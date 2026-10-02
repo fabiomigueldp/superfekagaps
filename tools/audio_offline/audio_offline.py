@@ -55,10 +55,13 @@ def validate(pilot: dict) -> list[dict]:
     if pilot["generation_scope"] != "music_replacements_only":
         raise ValueError("Only the two replacement music proposals may be prepared; existing SFX must not be regenerated.")
     fields(pilot["reused_sfx_from"], {"pilot_id", "flow_url", "status"})
-    if pilot["reused_sfx_from"] != {
+    if pilot["reused_sfx_from"] not in ({
         "pilot_id": "sfg-guaira-pilot-01", "flow_url": "https://elevenlabs.io/app/flows/aoC2seBLqtH0qywcqdFt",
         "status": "generated_reported_by_root_awaiting_files_and_audition",
-    }:
+    }, {
+        "pilot_id": "sfg-guaira-pilot-01", "flow_url": "https://elevenlabs.io/app/flows/aoC2seBLqtH0qywcqdFt",
+        "status": "received_and_hash_verified",
+    }):
         raise ValueError("SFX reuse must reference the already generated pilot.")
     if not isinstance(pilot["music"], list) or not isinstance(pilot["sfx"], list) or len(pilot["music"]) != 2 or len(pilot["sfx"]) != 6:
         raise ValueError("Pilot must contain two music proposals and six SFX pairs.")

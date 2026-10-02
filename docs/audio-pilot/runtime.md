@@ -1,68 +1,73 @@
 # Integração do áudio pré-produzido
 
-O carregador foi integrado ao `WorldAudio`. O catálogo
-[`ArcadeAudioPack.ts`](../../src/adventure/ArcadeAudioPack.ts) está vazio porque
-os arquivos gerados ainda não chegaram. Portanto, esta revisão **não troca o
-som que o jogador ouve** e não faz pedidos para arquivos fictícios. O usuário
-autorizou preencher esse catálogo e publicar a branch após receber o material.
+O catálogo `ArcadeAudioPack.ts` usa arquivos realmente recebidos e medidos.
+`WorldGame.load` passa o ID da cena ao `WorldAudio`, preservando regras de jogo,
+física, progresso, chefes e seus tempos de reação.
 
-## Comportamento preparado
+## Mapeamento ativo
 
-- `WorldGame.load` informa `stage.id` ao selecionar o som. É a única linha
-  alterada fora dos módulos de áudio. Seleções antigas de mapa/campanha e bosses
-  sem uma cena cadastrada continuam com a trilha procedural.
-- `WorldSampleAudio` busca apenas arquivos públicos locais, depois que há um
-  AudioContext desbloqueado e em execução. Não há geração, chave ou SDK de provedor.
-- O sequenciador atual toca durante carregamento ou falha. A música gravada só
-  o substitui depois da decodificação e validação dos limites de loop. Nesse
-  momento as notas antigas são encerradas para não tocar duas trilhas juntas.
-- Efeito que não esteja pronto cai no som procedural imediatamente. Conclusão
-  assíncrona nunca toca aquele efeito atrasado. A/B alternam deterministicamente,
-  sem usar o RNG do gameplay. São no máximo seis vozes; repetição do mesmo cue
-  cancela a anterior. Fades curtos evitam cortes secos nos arquivos entregues.
-- Música e efeitos usam os buses e preferências existentes. Pausa congela a
-  música no AudioContext; efeitos antigos são cancelados. Mute/efeitos em zero,
-  mudança de cena e dispose não deixam one-shots pendentes. Dispose aborta fetches,
-  limpa buffers e desconecta fontes. Uma falha de arquivo não dispara retries
-  a cada frame.
+| Cena/evento | Entrega |
+| --- | --- |
+| Travessia, Pátio e Galeria de Guaíra | Música A: trecho 8–32 s, loop de 24 s |
+| Subida e Respiros | Música B: trecho 6,6667–33,3333 s, loop de 26,6667 s |
+| Guaíra, fábrica 3-1…3-5 e Turbosuco | Salto, aviso e pressão com variantes A/B |
+| Fábrica e Turbosuco | Descarga viscosa A/B em `jet`/`cannon` |
+| Jatos de água limpa de Guaíra | Preservam o efeito procedural; não recebem descarga de suco |
+| Mapa do capítulo, junto à fonte | Água A somente com recibo aceito do Prefeito; Água B disponível para revisão |
+| Turbosuco em combate, junto à máquina | Suco A, ou B no estado de fúria; cancela em morte/resultado/saída |
+| Chefes e cenas sem música cadastrada | Trilha procedural existente |
 
-Os oito testes novos em
-[`world-sample-audio.test.ts`](../../tests/world-sample-audio.test.ts) cobrem
-fallback, variantes, loops, atraso de rede, descarte por cena/dispose, falhas de
-arquivo/decoder, mute/pausa e a ligação real com `WorldAudio`. Os buffers dos
-testes são objetos simulados; nenhum áudio fictício foi colocado em `public/`.
+Loops usam crossfade de preroll sem encurtar o período. Os cortes retiram a
+abertura baixa de B e os encerramentos dos originais. Música foi ajustada por
+ganho linear para aproximadamente −18,5 LUFS antes da compressão; não houve
+compressor de dinâmica. Saltos têm 180 ms; avisos são duas batidas, com a segunda
+transposta três semitons; pressão tem 520 ms; descargas têm 380/280 ms. Os
+parâmetros exatos, formatos, níveis pós-codec e hashes estão no manifesto.
 
-## Preencher somente após receber os assets
+Música: MP3 estéreo, 48 kHz/192 kbps. SFX/ambientes: PCM16 mono/48 kHz; o pequeno
+tamanho permite decodificação simples e evita padding nos loops curtos. Masters
+FLAC 24-bit são preservados fora de `public`, com a limitação da fonte MP3 explícita.
 
-1. Receber SHA exato da branch de assets e verificar cada hash do manifesto.
-   Importar apenas `audio-deliveries/sfg-arcade-r2/`, preservando originais fora
-   de `public`. Não aplicar pacotes de gameplay junto com a entrega sonora.
-2. Medir formato, duração, pico, loudness e silêncio de ataque. Registrar audição,
-   seleção e cortes. Originais MP3 continuam identificados como originais com
-   perdas; conversão para WAV não cria um master lossless da geração.
-3. Produzir derivados de música e efeitos, registrar hashes e edição. Cadastrar
-   caminhos realmente existentes, ganho e limites de loop medidos no buffer
-   decodificado. O campo `maxSeconds` pode limitar cauda de um efeito, mas não
-   deve compensar ataque atrasado: corrigir o arquivo antes.
-4. Selecionar cenas explícitas de Guaíra para a música. Salto, aviso, pressão e
-   descarga devem seguir os eventos existentes. Água e suco são ambientes:
-   aguardam fonte/estado aceito por cena e cancelamento correspondente. **Não**
-   cadastrá-los como one-shots genéricos nem ligá-los globalmente por revisita.
-   A intro Turbosuco e seus cues procedurais não foram alterados.
-5. Calibrar ganhos sobre os multiplicadores atuais (música `.14`, efeitos `.3`).
-   Confirmar em audição; esses fatores vieram do sintetizador e não garantem um
-   mix adequado para gravações. Testar loops reais, mute, sliders, pausa, retorno,
-   morte e dez mudanças rápidas de cena. Executar `npm run check` e size budget.
+## Reprodução e lifecycle
 
-Medição e testes de código não substituem audição. A transição atual encerra a
-faixa anterior e aplica fade-in curto na nova; crossfade musical longo não foi
-implantado. Não há ducking adicional ou nova persistência de preferências.
+O carregador só busca arquivos locais depois que o AudioContext está em execução.
+Carregamento/falha mantém o sintetizador atual. A música gravada o substitui
+somente após decodificação e validação do loop, encerrando notas antigas. Erros
+não causam retries a cada frame. O arredondamento de até dois frames no resample
+do navegador é tolerado; limites de loop incorretos continuam usando fallback.
 
-## Coordenação com trabalho paralelo
+Efeito indisponível toca o fallback imediatamente; terminar de carregar nunca
+reproduz aquele evento atrasado. Variantes alternam sem usar o RNG do gameplay.
+Há limite de seis vozes de efeitos e repetição do mesmo cue encerra a anterior.
+O evento `pressure` toca aviso imediato e agenda a pressão 240 ms depois, como
+edição sonora. Somente o evento real `jet`/`cannon` dispara a descarga e cancela
+aviso/pressão anteriores. Não há timer de áudio governando dano ou progresso.
 
-Base disponível: `bc431d5`. O integrador do root foi informado como `ab942fee`,
-ainda não publicado/disponível aqui. A alteração de `WorldGame` é somente a
-passagem do ID de cena; os outros arquivos novos/alterados pertencem ao áudio,
-testes e documentação. Conferir a mesma linha e o lifecycle de `WorldAudio`
-quando o integrador disponibilizar o commit. Nenhum merge em main, deploy ou
-trabalho Oracle foi feito.
+Pausa, mute, efeitos em zero, morte e troca de cena cancelam efeitos, incluindo
+notas futuras do fallback. Música pausa no relógio do AudioContext. Dispose
+aborta fetches, limpa buffers e desconecta fontes. O áudio de ambiente do mapa
+não cria timer/RAF próprio. O botão SOM/MUDO e a tecla M preservam o mute entre
+mapa e cenas pelo estado já existente do capítulo.
+
+`publicWaterAudioLevel` observa o mesmo recibo aceito usado pela água desenhada,
+o ID da sessão e a distância à fonte. Seleção, visita, vitória ainda não aceita,
+outro capítulo e distância grande não ligam o som. Menus, aba oculta e perda de
+foco suspendem o ambiente. A intro Turbosuco mantém seus cues procedurais.
+
+Os buses e controles existentes continuam valendo: música `.14`, efeitos `.3`,
+voz `.22`, com ganhos adicionais registrados no catálogo. Voz gravada existente
+não foi modificada. Não foi adicionado ducking ou limitação agressiva.
+
+## Trabalho paralelo e limites
+
+A branch de áudio foi reaplicada sobre a integração central
+`ab942feedde5edc0c735ed93b34647c1145c6a42`. O único conflito foi a região do novo
+botão de som ao lado do texto de saída. Foram preservados “seleção de experimentos”
+e os novos guards de abertura/navegação da integração. Todos os demais arquivos
+das nove frentes permanecem intactos em relação à base central.
+
+Além dos módulos de áudio, os pontos de ligação são uma linha em `WorldGame.load`,
+a identificação/ambiente do laboratório Turbosuco e o estado/controle de áudio
+do mapa em `GuairaChapterApp`/`GuairaChapterMapView`. Não há acesso a Oracle,
+merge em main ou deploy. Falta audição artística; não se declara que os loops
+soam naturais ou que o acabamento final foi aprovado só com testes técnicos.

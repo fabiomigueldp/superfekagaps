@@ -36,6 +36,7 @@ export class WorldAudio {
     private disposed = false;
     private readonly sources = new Set<() => void>();
     private readonly musicSources = new Set<() => void>();
+    private readonly effectsSources = new Set<() => void>();
     private readonly samples: WorldSampleAudio;
     get isDisposed(): boolean { return this.disposed; }
     private ctx: AudioContext | null = null;
@@ -98,11 +99,11 @@ export class WorldAudio {
             try { void context.close().catch(() => {}); } catch { /* Closing is best effort. */ }
         }
     }
-    private ownSource(source: AudioScheduledSourceNode, nodes: AudioNode[], music = false): void {
+    private ownSource(source: AudioScheduledSourceNode, nodes: AudioNode[], bus?: 'music' | 'effects'): void {
         let live = true;
         const detach = () => {
             if (!live) return;
-            live = false; this.sources.delete(release); this.musicSources.delete(release); source.onended = null;
+            live = false; this.sources.delete(release); this.musicSources.delete(release); this.effectsSources.delete(release); source.onended = null;
             for (const node of [source, ...nodes]) {
                 try { node.disconnect(); } catch { /* Already detached by the device. */ }
             }
@@ -111,21 +112,28 @@ export class WorldAudio {
             try { source.stop(); } catch { /* Already ended or not started. */ }
             detach();
         };
-        this.sources.add(release); if (music) this.musicSources.add(release); source.onended = detach;
+        this.sources.add(release);
+        if (bus === 'music') this.musicSources.add(release);
+        if (bus === 'effects') this.effectsSources.add(release);
+        source.onended = detach;
+    }
+    private cancelEffects(): void {
+        this.samples.cancelEffects();
+        for (const release of [...this.effectsSources]) release();
     }
     /** Read-only route for cancellable lab cues; never creates or resumes a context. */
     getEffectsRoute(): { context: AudioContext; destination: GainNode; enabled: boolean } | null {
         return !this.disposed && this.ctx && this.effects ? { context: this.ctx, destination: this.effects, enabled: this.enabled } : null;
     }
     volume() { if (this.disposed || !this.ctx)
-        return; if (!this.enabled || this.preferences.effects <= 0) { this.samples.cancelEffects(); this.samples.cancelAmbience(); } const now = this.ctx.currentTime; this.music!.gain.setTargetAtTime(this.enabled ? this.preferences.music * .14 * (this.dying ? .15 : 1) : 0, now, .06); this.effects!.gain.setTargetAtTime(this.enabled ? this.preferences.effects * .3 : 0, now, .02); this.voice!.gain.setTargetAtTime(this.enabled ? this.preferences.voice * .22 : 0, now, .02); if (this.clip)
+        return; if (!this.enabled || this.preferences.effects <= 0) { this.cancelEffects(); this.samples.cancelAmbience(); } const now = this.ctx.currentTime; this.music!.gain.setTargetAtTime(this.enabled ? this.preferences.music * .14 * (this.dying ? .15 : 1) : 0, now, .06); this.effects!.gain.setTargetAtTime(this.enabled ? this.preferences.effects * .3 : 0, now, .02); this.voice!.gain.setTargetAtTime(this.enabled ? this.preferences.voice * .22 : 0, now, .02); if (this.clip)
         this.clip.volume = this.enabled ? this.preferences.voice : 0; }
-    setDying(value: boolean) { if (this.disposed) return; this.dying = value; if (value) { this.samples.cancelEffects(); this.samples.setAmbience(); } this.volume(); }
+    setDying(value: boolean) { if (this.disposed) return; this.dying = value; if (value) { this.cancelEffects(); this.samples.setAmbience(); } this.volume(); }
     ambience(kind?: string, level = 1) { if (!this.disposed) this.samples.setAmbience(this.dying ? undefined : kind, level); }
     toggle() { if (this.disposed) return; this.enabled = !this.enabled; this.volume(); }
-    select(world: number, boss = false, sceneId?: string) { if (this.disposed) return; this.samples.select(sceneId); for (const release of [...this.musicSources]) release(); this.theme = world === 0 ? 6 : Math.max(0, world - 1); this.boss = boss; this.step = 0; this.next = this.ctx?.currentTime ?? 0; this.cancelSpeech(); }
+    select(world: number, boss = false, sceneId?: string) { if (this.disposed) return; this.samples.select(sceneId); this.cancelEffects(); for (const release of [...this.musicSources]) release(); this.theme = world === 0 ? 6 : Math.max(0, world - 1); this.boss = boss; this.step = 0; this.next = this.ctx?.currentTime ?? 0; this.cancelSpeech(); }
     pause(value: boolean) { if (this.disposed) return; this.paused = value; if (value) {
-        this.samples.cancelEffects();
+        this.cancelEffects();
         this.samples.cancelAmbience();
         this.cancelSpeech();
         if (this.ctx)
@@ -147,7 +155,7 @@ export class WorldAudio {
         env.gain.exponentialRampToValueAtTime(.001, t + seconds);
         osc.connect(env);
         env.connect(bus);
-        this.ownSource(osc, [env], bus === this.music);
+        this.ownSource(osc, [env], bus === this.music ? 'music' : bus === this.effects ? 'effects' : undefined);
         osc.start(t);
         osc.stop(t + seconds + .015);
     }
@@ -171,7 +179,7 @@ export class WorldAudio {
         env.gain.linearRampToValueAtTime(gain, now + .015);
         env.gain.exponentialRampToValueAtTime(.001, now + seconds);
         source.connect(filter); filter.connect(env); env.connect(this.effects);
-        this.ownSource(source, [filter, env]);
+        this.ownSource(source, [filter, env], 'effects');
         source.start(now); source.stop(now + seconds + .02);
     }
     sfx(kind: string) {

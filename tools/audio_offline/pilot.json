@@ -76,6 +76,6 @@
   "reused_sfx_from": {
     "pilot_id": "sfg-guaira-pilot-01",
     "flow_url": "https://elevenlabs.io/app/flows/aoC2seBLqtH0qywcqdFt",
-    "status": "generated_reported_by_root_awaiting_files_and_audition"
+    "status": "received_and_hash_verified"
   }
 }

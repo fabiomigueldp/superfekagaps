@@ -161,6 +161,14 @@ test('ambient loops fetch only on a current request; state removal beats late de
     f.audio.setAmbience(); f.route.enabled = true; f.audio.tick(); assert.equal(f.context.nodes.length, count);
 });
 
+test('loop bounds tolerate a decoder rounding one frame down without accepting an invalid range', async t => {
+    const f = fixture(t, { scenes: { test: { music: sample('rounding', { loop: { start: 0, end: 10 } }), effects: {} } } });
+    f.audio.select('test'); f.audio.tick(); f.deliver(0); await settle();
+    Object.assign(f.context.decoded[0], { duration: 10 - 1 / 44100, sampleRate: 44100 });
+    assert.equal(f.audio.tick(), true);
+    assert.equal(f.context.nodes.find(n => n.loop)!.loopEnd, 10 - 1 / 44100);
+});
+
 test('map ambience waits for gesture and respects pause/mute without any independent timer', async t => {
     const net = network(t), original = globalThis.AudioContext;
     Object.assign(globalThis, { AudioContext: Context });
@@ -193,4 +201,16 @@ test('machine pressure has a cancellable warning lead-in; early discharge stops 
     context.currentTime = .1; world.sfx('jet');
     assert.ok(sources.every(n => n.disconnected && n.stops.includes(undefined)));
     const active = context.nodes.filter(n => n.buffer && !n.disconnected); assert.equal(active.length, 1); assert.equal(active[0].starts[0], .1);
+});
+
+test('pause cancels future procedural fallback notes as well as loaded samples', t => {
+    const original = globalThis.AudioContext;
+    Object.assign(globalThis, { AudioContext: Context });
+    t.after(() => { if (original) globalThis.AudioContext = original; else Reflect.deleteProperty(globalThis, 'AudioContext'); });
+    const world = new WorldAudio({ music: .5, effects: .6, voice: .7, shake: true }, { scenes: {} });
+    t.after(() => world.dispose()); world.unlock(); world.sfx('warning');
+    const context = world.getEffectsRoute()!.context as unknown as Context;
+    const sources = context.nodes.filter(n => n.starts.length); assert.equal(sources.length, 2);
+    world.pause(true); assert.ok(sources.every(n => n.disconnected && n.stops.includes(undefined)));
+    const count = context.nodes.length; world.pause(false); assert.equal(context.nodes.length, count);
 });

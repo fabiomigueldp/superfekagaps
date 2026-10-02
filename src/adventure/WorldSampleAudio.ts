@@ -31,6 +31,14 @@ function valid(sample: WorldSample): boolean {
         && Number.isFinite(sample.gain) && sample.gain > 0 && sample.gain <= 2
         && (sample.maxSeconds === undefined || (Number.isFinite(sample.maxSeconds) && sample.maxSeconds > 0 && sample.maxSeconds <= 30));
 }
+function canLoop(sample: WorldSample, buffer: AudioBuffer): boolean {
+    const loop = sample.loop;
+    // Browser resampling can round the last frame down at 44.1 kHz. Clamp at
+    // most two decoded frames; a genuinely wrong edit range still falls back.
+    return !!loop && Number.isFinite(loop.start) && Number.isFinite(loop.end)
+        && loop.start >= 0 && loop.start < Math.min(loop.end, buffer.duration)
+        && (loop.end <= buffer.duration || loop.end - buffer.duration <= 2 / buffer.sampleRate);
+}
 
 /** Owns fetches, decoded buffers and sample sources for one WorldAudio instance. */
 export class WorldSampleAudio {
@@ -66,9 +74,8 @@ export class WorldSampleAudio {
         else this.syncAmbience(route);
         const sample = this.scene?.music;
         if (!this.music && sample && route.musicEnabled) {
-            const buffer = this.buffers.get(sample.path), loop = sample.loop;
-            if (buffer && loop && Number.isFinite(loop.start) && Number.isFinite(loop.end)
-                && loop.start >= 0 && loop.end > loop.start && loop.end <= buffer.duration) {
+            const buffer = this.buffers.get(sample.path);
+            if (buffer && canLoop(sample, buffer)) {
                 this.music = this.start('music', sample, buffer, route.music, route.context, true);
             }
         }
@@ -104,6 +111,7 @@ export class WorldSampleAudio {
     setAmbience(kind?: string, level = 1): void {
         const amount = Number.isFinite(level) ? Math.min(1, Math.max(0, level)) : 0;
         if (!kind || amount === 0) { this.ambientRequest = undefined; this.cancelAmbience(); return; }
+        if (this.ambientRequest?.kind === kind && this.ambientRequest.level === amount) return;
         if (this.ambientRequest?.kind !== kind) this.cancelAmbience();
         this.ambientRequest = { kind, level: amount }; this.ambience?.level(amount);
     }
@@ -113,9 +121,8 @@ export class WorldSampleAudio {
         const request = this.ambientRequest, sample = request && this.scene?.ambience?.[request.kind];
         if (!request || !sample) { this.cancelAmbience(); return; }
         this.load(sample, route.context);
-        const buffer = this.buffers.get(sample.path), loop = sample.loop;
-        if (!this.ambience && buffer && loop && Number.isFinite(loop.start) && Number.isFinite(loop.end)
-            && loop.start >= 0 && loop.end > loop.start && loop.end <= buffer.duration) {
+        const buffer = this.buffers.get(sample.path);
+        if (!this.ambience && buffer && canLoop(sample, buffer)) {
             this.ambience = this.start(request.kind, sample, buffer, route.effects, route.context, true, request.level);
         }
     }
@@ -181,7 +188,7 @@ export class WorldSampleAudio {
             const now = context.currentTime + delay;
             env.gain.setValueAtTime(0, now);
             if (looped) {
-                source.loopStart = sample.loop!.start; source.loopEnd = sample.loop!.end;
+                source.loopStart = sample.loop!.start; source.loopEnd = Math.min(sample.loop!.end, buffer.duration);
                 env.gain.linearRampToValueAtTime(sample.gain * level, now + .08);
             } else {
                 const duration = Math.min(buffer.duration, sample.maxSeconds ?? buffer.duration);

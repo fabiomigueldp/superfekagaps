@@ -1,9 +1,9 @@
 {
-  "status": "r2_generated_by_parent_no_more_requests",
+  "status": "technical_game_integration_and_dedicated_branch_authorized",
   "pilot_id": "sfg-arcade-r2",
   "request_manifest_sha256": "e56cb980785f660fa4255ea33656f131be22331252bef03fd579343e4350b961",
   "approved_by": "user_instruction_relayed_by_parent",
-  "approval_scope": "User approved original arcade direction, production, game integration and dedicated GitHub branch publication. Generate only two replacement music outputs through parent plugin; reuse 12 existing SFX candidates. No purchase, top-up, plan change, extra billing, main merge or deploy.",
+  "approval_scope": "User approved original arcade production, game integration and dedicated GitHub branch publication. Parent completed generation. Zero new generations requested; use the 14 verified originals. No purchase, top-up, plan change, extra billing, main merge or deploy.",
   "approved_at_utc": null,
   "account_plan_confirmed_by_user": null,
   "billing_unit_confirmed": null,

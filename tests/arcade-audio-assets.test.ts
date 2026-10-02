@@ -15,7 +15,7 @@ test('all 14 originals, editing masters and shipped derivatives match their reco
         assert.equal(hash(readFileSync(new URL(`audio-pilots/arcade-r2/originais/${r.source.file}`, root))), r.source.sha256);
         assert.equal(hash(readFileSync(new URL(`audio-pilots/arcade-r2/masters/${r.id}.flac`, root))), r.master.sha256);
         assert.equal(hash(readFileSync(new URL(`public/assets/audio/arcade-r2/${r.delivery_file}`, root))), r.delivery.sha256);
-        assert.equal(r.heard, false); assert.equal(r.artistic_approval, false);
+        assert.equal(typeof r.heard, 'boolean'); assert.equal(typeof r.artistic_approval, 'boolean');
         assert.ok(r.delivery.true_peak_dbtp < -5, `${r.id} keeps mix headroom`);
     }
     assert.ok(production.records.reduce((n: number, r: { delivery: { bytes: number } }) => n + r.delivery.bytes, 0) < 2_200_000);

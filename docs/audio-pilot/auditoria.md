@@ -1,5 +1,8 @@
 # Auditoria do áudio existente
 
+> Auditoria histórica dos 33 arquivos sobre `bc431d5`. A entrega nova de 14
+> arquivos e seus hashes/níveis estão no [manifesto de produção](../../audio-pilots/arcade-r2/production-manifest.json).
+
 Base: `bc431d5`. Método: leitura de código e manifestos; `ffprobe` para metadados;
 `ffmpeg loudnorm` para LUFS integrados/true peak de entrada, com saída descartada;
 SHA-256 dos originais. [Dados de todos os arquivos](audit-assets.json).

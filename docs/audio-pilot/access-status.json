@@ -39,7 +39,8 @@
     }
   ],
   "local_rest_generation_abandoned": true,
-  "next_step": "Receive 2 completed arcade music originals and 12 existing SFX through dedicated assets branch and exact commit. Do not generate again. Integrate and measure received files.",
+  "next_step": "Technical game integration complete. Perceptual audition and commercial license evidence remain unverified. No further generation or credential access required.",
   "active_pilot_id": "sfg-arcade-r2",
-  "prior_root_generation_report": "14 outputs already generated in flow aoC2seBLqtH0qywcqdFt; 2 music rejected for direction, 12 SFX to reuse after audition."
+  "prior_root_generation_report": "14 outputs already generated in flow aoC2seBLqtH0qywcqdFt; 2 music rejected for direction, 12 SFX to reuse after audition.",
+  "assets_received_from_commit": "5ad7ea10eee5b69f758c1728971fb1856346ee9a"
 }

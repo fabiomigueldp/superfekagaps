@@ -1,6 +1,45 @@
 # Validação da revisão arcade r2
 
-## Preparação da integração e registro da geração concluída
+## Entrega reconciliada com a integração central
+
+Base: `ab942feedde5edc0c735ed93b34647c1145c6a42`. Assets recebidos do commit
+`5ad7ea10eee5b69f758c1728971fb1856346ee9a`. Nenhum pacote das nove frentes foi
+sobrescrito; 36 arquivos da integração foram conferidos byte a byte e os dois
+pontos compartilhados ficaram restritos às ligações de áudio. O conflito de texto ao lado do botão de som foi resolvido mantendo
+a saída para experimentos e os guards de navegação da integração central.
+
+| Verificação | Resultado |
+| --- | --- |
+| `npm run check` sobre a base conjunta | **1.300 testes TypeScript + 3 testes de servidor**, zero falhas; validadores, dois typechecks e Vite build |
+| Python/FFmpeg | **7 testes passaram**, incluindo duração exata do loop após crossfade e recusa de nova geração do piloto concluído |
+| Proveniência | 14 originais, 14 masters e 14 derivados conferidos por SHA-256 |
+| Entrega de áudio | 2.105.748 bytes; masters de edição 10.022.420 bytes fora do build |
+| Build final | **155 arquivos / 42.695.227 bytes**, limite 45.000.000; margem 2.304.773 bytes; 21 arquivos de revisão omitidos |
+| Navegador | Chromium 151 headless; 14 derivados decodificados a 48 kHz; música real da Travessia e ambiente de água também verificados a 44,1 kHz |
+| Loops | Dez emendas de cada uma das seis faixas em OfflineAudioContext; sem clipping e sem intervalo agendado entre ciclos; não equivale a aprovação perceptual |
+| Lifecycle | Música substituiu o sintetizador (zero fontes procedurais musicais restantes); mute e pausa testados; descarte de eventos/fetches atrasados e de fallback coberto nos testes |
+| UI | Home, Travessia, mapa do capítulo e controle SOM/MUDO renderizados; mapa em viewport 390 px sem overflow horizontal |
+| Geração/segredo | Zero novas gerações, chamadas autenticadas, instalação de credencial ou consumo nesta integração |
+
+Evidência reproduzível: [manifesto de produção](../../audio-pilots/arcade-r2/production-manifest.json),
+[QA do navegador](../../audio-pilots/arcade-r2/browser-qa.json) e testes versionados.
+O script de edição usa somente Python stdlib + FFmpeg/ffprobe; nenhuma dependência
+ou lockfile do jogo mudou. Agent-browser foi instalado em cache temporário para
+QA, com Chromium já disponível, sem alterar o projeto.
+
+A primeira edição experimental local revelou que um uso de `acrossfade` com
+dois blocos do tamanho exato da sobreposição encurtava o período. A versão
+entregue usa fades complementares e mistura, preserva o número exato de samples
+e possui teste de regressão que verifica esse resultado. O arredondamento de
+resample do navegador também recebeu um teste específico.
+
+Não houve audição perceptual, aprovação artística, teste em dispositivo móvel
+real ou Safari/iOS, verificação de licença comercial, main/deploy ou Oracle.
+O render offline não certifica emenda musical natural nem ausência de fadiga.
+A página A/B e o CSV de seleção permitem concluir essa revisão sobre hashes
+estáveis, sem gerar novamente.
+
+## Histórico: preparação anterior ao recebimento dos assets
 
 - `npm run check` passou: **1.254 testes TypeScript + 3 de servidor**, validadores,
   dois typechecks e Vite build. Oito testes novos cobrem o carregador/fallback e

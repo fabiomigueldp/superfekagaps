@@ -39,49 +39,25 @@ combinam com a música nova antes da comparação. Se faltar qualidade, comunica
 o cue específico ao root; não regenerar os 12 em bloco. Os alertas visuais e
 toda a lógica do jogo permanecem autoridades de timing.
 
-## Transferência dos assets entre ambientes
+## Transferência recebida — contrato histórico
 
-O root deve disponibilizar somente arquivos e registros de áudio numa branch
-dedicada, por exemplo `codex/audio-generated-arcade-r2`, sem merge em `main`.
-Enviar o SHA exato para que esta sessão possa buscar esse commit e importar
-somente a pasta `audio-deliveries/sfg-arcade-r2/`. Não incluir os nove pacotes de
-gameplay ainda locais ao integrador. Não depender de disco compartilhado.
+Recebido de `origin/codex/audio-arcade-r2-assets`, SHA
+`5ad7ea10eee5b69f758c1728971fb1856346ee9a`, somente
+`audio-pilots/arcade-r2/`. Os 14 MP3 conferiram com o manifesto: 2.408.946 bytes.
+O README e manifesto recebidos foram preservados junto dos originais.
 
-A Library deste ambiente expõe apenas envio (`create_library_file`,
-`prepare_uploads`, `finalize_uploads`, `replace_library_file`). Não há
-`prepare_materialize`/leitura de arquivos neste catálogo. Um Library ID isolado
-não basta para baixar aqui; preferir a branch de assets. Um objeto completo de
-transferência preparado pela Library no root poderá ser tentado com o helper
-oficial, se disponibilizado, sem copiar links assinados para o Git.
+A entrega e a integração estão descritas no [README](README.md). Não há bloqueio
+de transferência ou credencial. A Library não foi necessária; o transporte por
+GitHub funcionou. Não houve geração adicional, instalação de segredo ou gasto.
 
-Estrutura esperada:
-
-```text
-audio-deliveries/sfg-arcade-r2/
-  manifest.json
-  originals/mus_guaira_arcade__a__take01.mp3
-  originals/mus_guaira_arcade__b__take01.mp3
-  originals/sfx_feka_jump__a__take01.mp3
-  ... restantes SFX A/B com os IDs anteriores ...
-```
-
-Usar a extensão realmente recebida. Cada registro do manifesto precisa de `id`,
-`relative_path`, `sha256`, `source_pilot_id`, `flow_id`, `provider_node_id`,
-`provider_model_id` real, duração/formato medidos se disponíveis e estado da
-audição. Custos e IDs ausentes devem ser `null`, sem inventar recibos. Não
-versionar links assinados, credenciais ou respostas completas de conta. Originais
-das duas músicas rejeitadas continuam preservados no armazenamento do root/flow.
-
-Depois do recebimento: medir e ouvir, selecionar/cortar/ajustar loops, derivar
-arquivos de entrega, integrar carregamento/lifecycle/ganhos e testar no jogo.
-O usuário autorizou integração e publicação no GitHub. Isso não implica deploy
-ou merge automático; a licença comercial segue sob responsabilidade do usuário
-e não foi verificada por esta sessão.
+**Divergência de metadado:** a mensagem inicial informou o nó B como
+`eFFpzG5UMvU8XTgxZMbSx`; o manifesto recebido informa `FFpzG5UMvU8XTgxZMbSx`.
+Ambos foram preservados no ledger para o root reconciliar. O arquivo B foi
+identificado pelo SHA-256 verificado, sem depender dessa grafia nem chamar a API.
 
 ## Trabalho paralelo
 
-O root informou o integrador em `ab942fee`, com nove pacotes ainda não publicados.
-Esse commit não está disponível neste ambiente; `origin/main` ainda é `bc431d5`.
-Não afirmar compatibilidade com arquivos que não foram recebidos. Esta revisão
-de prompts/pipeline não toca gameplay. A futura integração sonora terá diff
-concentrado no áudio e deverá ser reaplicada/conferida contra o SHA do integrador.
+A integração central `ab942feedde5edc0c735ed93b34647c1145c6a42` foi recebida e
+incorporada como base da branch de áudio. O conflito no cabeçalho do mapa foi
+resolvido preservando o texto de saída e os guards novos. O restante dos nove
+pacotes foi mantido intacto; ver [runtime.md](runtime.md) e [validação](validacao.md).

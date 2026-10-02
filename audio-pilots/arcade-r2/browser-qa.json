@@ -1,0 +1,253 @@
+{
+  "browser": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36",
+  "decoded": [
+    {
+      "channels": 2,
+      "duration": 24,
+      "frames": 1152000,
+      "id": "music-a",
+      "sampleRate": 48000
+    },
+    {
+      "channels": 2,
+      "duration": 26.666666666666668,
+      "frames": 1280000,
+      "id": "music-b",
+      "sampleRate": 48000
+    },
+    {
+      "channels": 1,
+      "duration": 0.18,
+      "frames": 8640,
+      "id": "jump-a",
+      "sampleRate": 48000
+    },
+    {
+      "channels": 1,
+      "duration": 0.18,
+      "frames": 8640,
+      "id": "jump-b",
+      "sampleRate": 48000
+    },
+    {
+      "channels": 1,
+      "duration": 1.68,
+      "frames": 80640,
+      "id": "water-a",
+      "sampleRate": 48000
+    },
+    {
+      "channels": 1,
+      "duration": 1.68,
+      "frames": 80640,
+      "id": "water-b",
+      "sampleRate": 48000
+    },
+    {
+      "channels": 1,
+      "duration": 1.68,
+      "frames": 80640,
+      "id": "juice-a",
+      "sampleRate": 48000
+    },
+    {
+      "channels": 1,
+      "duration": 1.68,
+      "frames": 80640,
+      "id": "juice-b",
+      "sampleRate": 48000
+    },
+    {
+      "channels": 1,
+      "duration": 0.22410416666666663,
+      "frames": 10757,
+      "id": "warning-a",
+      "sampleRate": 48000
+    },
+    {
+      "channels": 1,
+      "duration": 0.22410416666666663,
+      "frames": 10757,
+      "id": "warning-b",
+      "sampleRate": 48000
+    },
+    {
+      "channels": 1,
+      "duration": 0.52,
+      "frames": 24960,
+      "id": "pressure-a",
+      "sampleRate": 48000
+    },
+    {
+      "channels": 1,
+      "duration": 0.52,
+      "frames": 24960,
+      "id": "pressure-b",
+      "sampleRate": 48000
+    },
+    {
+      "channels": 1,
+      "duration": 0.38,
+      "frames": 18240,
+      "id": "discharge-a",
+      "sampleRate": 48000
+    },
+    {
+      "channels": 1,
+      "duration": 0.28,
+      "frames": 13440,
+      "id": "discharge-b",
+      "sampleRate": 48000
+    }
+  ],
+  "loops": [
+    {
+      "boundaryDeltaDbfs": -52.12112716360701,
+      "gapFramesInserted": 0,
+      "id": "music-a",
+      "joins": 10,
+      "outputPeakDbfs": -23.493554771041303
+    },
+    {
+      "boundaryDeltaDbfs": -53.01082167255579,
+      "gapFramesInserted": 0,
+      "id": "music-b",
+      "joins": 10,
+      "outputPeakDbfs": -22.26939639360898
+    },
+    {
+      "boundaryDeltaDbfs": -68.38888458489166,
+      "gapFramesInserted": 0,
+      "id": "water-a",
+      "joins": 10,
+      "outputPeakDbfs": -26.81842976043827
+    },
+    {
+      "boundaryDeltaDbfs": -87.87780211597985,
+      "gapFramesInserted": 0,
+      "id": "water-b",
+      "joins": 10,
+      "outputPeakDbfs": -26.47361218494998
+    },
+    {
+      "boundaryDeltaDbfs": -98.7589376042732,
+      "gapFramesInserted": 0,
+      "id": "juice-a",
+      "joins": 10,
+      "outputPeakDbfs": -28.470864242791116
+    },
+    {
+      "boundaryDeltaDbfs": -51.48665816383197,
+      "gapFramesInserted": 0,
+      "id": "juice-b",
+      "joins": 10,
+      "outputPeakDbfs": -28.61933124527948
+    }
+  ],
+  "perceptualAudition": false,
+  "sourceCommit": "5ad7ea10eee5b69f758c1728971fb1856346ee9a",
+  "checked_at_utc": "2026-10-02T20:14:23.057109+00:00",
+  "integrator_base_commit": "ab942feedde5edc0c735ed93b34647c1145c6a42",
+  "runtime_traversal": {
+    "buffers": [
+      {
+        "channels": 1,
+        "path": "assets/audio/arcade-r2/warning-a.wav",
+        "rate": 44100,
+        "seconds": 0.2240816326530612
+      },
+      {
+        "channels": 1,
+        "path": "assets/audio/arcade-r2/jump-b.wav",
+        "rate": 44100,
+        "seconds": 0.17997732426303856
+      },
+      {
+        "channels": 1,
+        "path": "assets/audio/arcade-r2/pressure-a.wav",
+        "rate": 44100,
+        "seconds": 0.5199773242630386
+      },
+      {
+        "channels": 1,
+        "path": "assets/audio/arcade-r2/jump-a.wav",
+        "rate": 44100,
+        "seconds": 0.17997732426303856
+      },
+      {
+        "channels": 1,
+        "path": "assets/audio/arcade-r2/warning-b.wav",
+        "rate": 44100,
+        "seconds": 0.2240816326530612
+      },
+      {
+        "channels": 1,
+        "path": "assets/audio/arcade-r2/pressure-b.wav",
+        "rate": 44100,
+        "seconds": 0.5199773242630386
+      },
+      {
+        "channels": 2,
+        "path": "assets/audio/arcade-r2/music-a.mp3",
+        "rate": 44100,
+        "seconds": 24
+      }
+    ],
+    "context": "running",
+    "failed": [],
+    "music": true,
+    "pending": 0,
+    "stage": "guaira-travessia",
+    "synthSources": 0
+  },
+  "manual_browser_observations": {
+    "home_renders": true,
+    "traversal_music_started": true,
+    "mute_effects_cancelled": true,
+    "pause_context_suspended": true,
+    "map_mute_button_changed_label": true,
+    "water_module_started_at_44100_hz": true,
+    "water_module_pause_cancelled_loop": true,
+    "water_module_dispose_released_context": true,
+    "perceptual_audition": false,
+    "mobile_device_tested": false,
+    "mobile_viewport_width": 390,
+    "mobile_viewport_horizontal_overflow": false,
+    "review_page_players": 14,
+    "review_ab_switch_stopped_previous": true,
+    "review_stop_all_paused_players": true
+  },
+  "loop_render_gain": {
+    "music": 0.154,
+    "ambience_probe": 0.189,
+    "note": "Ambient probe uses a conservative .9 cue gain; actual juice gains are lower."
+  },
+  "runtime_turbosuco": {
+    "active": true,
+    "ambient": {
+      "kind": "juice",
+      "level": 0.4125
+    },
+    "buffers": [
+      "assets/audio/arcade-r2/jump-b.wav",
+      "assets/audio/arcade-r2/jump-a.wav",
+      "assets/audio/arcade-r2/warning-a.wav",
+      "assets/audio/arcade-r2/warning-b.wav",
+      "assets/audio/arcade-r2/pressure-a.wav",
+      "assets/audio/arcade-r2/pressure-b.wav",
+      "assets/audio/arcade-r2/discharge-a.wav",
+      "assets/audio/arcade-r2/discharge-b.wav",
+      "assets/audio/arcade-r2/juice-a.wav"
+    ],
+    "context": "running",
+    "failed": [],
+    "mode": "combat",
+    "scene": "juice-lab"
+  },
+  "runtime_turbosuco_paused": {
+    "ambient": false,
+    "context": "suspended",
+    "effects": 0,
+    "state": "paused"
+  }
+}

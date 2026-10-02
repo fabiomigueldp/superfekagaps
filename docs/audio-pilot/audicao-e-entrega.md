@@ -1,10 +1,10 @@
 # Masters, mixagem e critérios de aceitação
 
-Esta é uma especificação de produção e integração. O root informou 14 saídas do
-lote anterior; os arquivos ainda não chegaram a este ambiente. Duas músicas
-foram rejeitadas pela direção; as duas substitutas arcade também já foram
-geradas pelo root. Os 14 candidatos finais aguardam transferência e audição.
-Nenhuma audição foi realizada por esta sessão.
+Os 14 originais já foram recebidos e conferidos, editados e integrados como
+candidatos técnicos. Originais, masters, derivados e resultados do navegador
+estão ligados no [README](README.md). Esta sessão não teve ferramenta de audição
+perceptual; `heard=false` continua correto. As etapas abaixo orientam a revisão
+artística que falta, sem repetir geração nem desfazer a integração autorizada.
 
 ## Originais e edição
 

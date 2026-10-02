@@ -1,65 +1,43 @@
-# Super Feka Gaps — áudio arcade r2
+# Super Feka Gaps — áudio arcade integrado
 
-Direção corrigida conforme pedido do usuário: aventura arcade original, alto
-acabamento, motivos memoráveis, synth/FM/pulse e efeitos 8-bit quando úteis.
-A identidade musical não é geográfica. Não copiar melodias ou identidade de
-franquias. [Direção completa](direcao.md).
+Pacote técnico integrado em `codex/audio-arcade-r2-integration`, reconciliado
+sobre `ab942feedde5edc0c735ed93b34647c1145c6a42` da integração central. Direção
+arcade original, synth/FM/pulse e efeitos 8-bit pontuais; nenhuma identidade
+regional intencional. As músicas anteriores rejeitadas não estão neste pacote.
 
-O root já gerou o piloto anterior: duas músicas e 12 SFX. As **duas músicas estão
-rejeitadas como candidatas**; seus originais e histórico devem ser preservados.
-Os 12 SFX ficam candidatos a reaproveitamento depois da audição. A revisão ativa
-é `sfg-arcade-r2`: o root informou as **duas músicas substitutas concluídas** no
-[flow arcade](https://elevenlabs.io/app/flows/l5NIpun9E59Ud2olB4zR), com modelo
-real `eleven_music_v2`. Não gerar novamente. Os 14 arquivos ainda não chegaram
-a este ambiente.
+Foram recebidos e conferidos os **14 originais** do commit
+`5ad7ea10eee5b69f758c1728971fb1856346ee9a`: duas músicas arcade e seis pares de
+SFX. O modelo musical efetivamente informado é `eleven_music_v2`; v2.5 era a
+preferência do pedido, não o modelo executado pelo plugin.
 
-| Entrega | Arquivo |
+Há 14 masters de edição FLAC preservados e **14 derivados de entrega, 2.105.748
+bytes**. Os masters são edições de fontes MP3 com perdas. Somente os derivados
+em `public/assets/audio/arcade-r2/` entram no build. Nenhuma nova geração,
+credencial ou despesa foi necessária nesta integração.
+
+| Entrega | Referência |
 | --- | --- |
-| Dois prompts musicais arcade exatos | [pilot.json](../../tools/audio_offline/pilot.json) |
-| Modelo, parâmetros, reaproveitamento e transferência ao integrador | [handoff-plugin.md](handoff-plugin.md) |
-| Estado das gerações, sem inventar recibos | [generation-ledger.json](generation-ledger.json) |
+| Mapeamento, comportamento e reconciliação | [runtime.md](runtime.md) |
+| Originais, masters e registros | [audio-pilots/arcade-r2](../../audio-pilots/arcade-r2/) |
+| Cortes, ganhos, hashes e medições | [production-manifest.json](../../audio-pilots/arcade-r2/production-manifest.json) |
+| Comparação A/B local | [review.html](../../audio-pilots/arcade-r2/review.html) |
+| Registro de audição por arquivo | [selection.csv](../../audio-pilots/arcade-r2/selection.csv) |
+| QA do navegador | [browser-qa.json](../../audio-pilots/arcade-r2/browser-qa.json) |
 | Direção e inventário | [direcao.md](direcao.md) · [cues.csv](cues.csv) |
-| Auditoria dos 33 arquivos existentes | [auditoria.md](auditoria.md) · [medições](audit-assets.json) |
-| Preparação local sem rede | [audio_offline.py](../../tools/audio_offline/audio_offline.py) |
-| Integração de samples e limites atuais | [runtime.md](runtime.md) |
-| Operação atual | [operacao.md](operacao.md) |
-| Masters, loops, mixagem e audição | [audicao-e-entrega.md](audicao-e-entrega.md) |
-| Registro por take | [generation-record.example.json](../../tools/audio_offline/generation-record.example.json) |
-| Autorizações e limites | [approval.example.json](../../tools/audio_offline/approval.example.json) |
-| Fontes e validação | [fontes.md](fontes.md) · [validacao.md](validacao.md) |
+| Gerações e divergência de ID do provedor | [generation-ledger.json](generation-ledger.json) |
+| Reprodução da edição offline | [finish_arcade.py](../../tools/audio_offline/finish_arcade.py) · [arcade-edits.json](../../tools/audio_offline/arcade-edits.json) |
+| Validação | [validacao.md](validacao.md) |
 
-## Coordenação e escopo
+Para ouvir os comparativos, executar `npm run dev` e abrir
+`/audio-pilots/arcade-r2/review.html` no mesmo servidor. Essa página de revisão
+não é publicada pelo build. Guaíra e Turbosuco podem ser abertos pelos experimentos.
 
-- Geração exclusivamente pelo plugin conectado do root. Nenhum áudio ou consumo
-  foi produzido nesta sessão; as ferramentas ElevenLabs não estão disponíveis aqui.
-- Os arquivos gerados no root ainda não estão neste ambiente. Transferir por
-  branch dedicada de assets e SHA exato; ver o contrato no handoff.
-- O usuário autorizou produção, integração ao jogo e envio ao GitHub. Não é
-  autorização de merge em main, deploy ou gasto adicional fora do saldo existente.
-- Branch isolada `codex/audio-offline-pilot`. O integrador informou HEAD `ab942fee`,
-  ainda indisponível aqui; base local/runtime auditado é `bc431d5`. Nenhum pacote
-  paralelo de gameplay foi alterado por esta revisão.
-- O anexo não será usado novamente. A tentativa anterior de leitura de quota,
-  feita após autorização específica, foi bloqueada pelo proxy e a cópia removida;
-  [registro histórico de acesso](access-status.json). Não contornar o 403.
-- Audição e licença comercial não foram verificadas por esta sessão. A licença
-  continua sob responsabilidade do usuário; arquivos rejeitados não entram no jogo.
+A audição perceptual e a aprovação artística **não foram realizadas**. Os
+arquivos estão integrados como candidatos técnicos: medição, decodificação e
+testes de reprodução não certificam identidade, naturalidade da emenda ou
+fadiga. A licença comercial permanece sob responsabilidade do usuário e não
+foi verificada. Não houve merge em main ou deploy.
 
-## Comandos locais sem credencial
-
-```sh
-python tools/audio_offline/audio_offline.py validate
-python tools/audio_offline/audio_offline.py estimate
-python -m unittest discover -s tools/audio_offline -p 'test_*.py' -v
-```
-
-O piloto está marcado `generated_by_parent`: `estimate` informa zero pedidos
-pendentes e `prepare` recusa duplicação. Os dois pedidos musicais antigos em
-`tools/audio_offline/work/sfg-arcade-r2/` são registro histórico, não execução
-pendente. Os campos de modelo no prompt registram a intenção original v2.5;
-o ledger registra o modelo efetivo v2 do plugin. Nenhum SFX será regenerado.
-O pipeline não contém executor HTTP, leitura de segredo, upload ou publicação.
-
-Python 3.10+ basta para preparar; FFmpeg/ffprobe são opcionais para auditoria.
-Nenhuma dependência nova foi adicionada. Os prompts rejeitados ficam preservados
-no histórico do commit `7a714a5`, não na configuração ativa.
+O piloto está marcado `generated_by_parent`; `prepare` recusa duplicação e
+`estimate` indica zero pedidos pendentes. As instruções de geração anteriores
+são histórico. Não usar novamente o anexo nem regenerar o lote.
