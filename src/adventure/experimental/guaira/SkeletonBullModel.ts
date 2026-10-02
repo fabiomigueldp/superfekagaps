@@ -24,6 +24,13 @@ export class SkeletonBullModel implements Box {
         this.arena = Object.freeze({ ...arena }); this.x = arena.right - this.width - 20; this.y = arena.floor - this.height;
     }
     get vulnerable() { return (this.state === 'brake' || this.state === 'recover') && !this.hitThisOpening; }
+    /** Read-only feedback clock: braking and recovery form one uninterrupted opening. */
+    get openingTicksRemaining() {
+        if (!this.vulnerable) return 0;
+        return Math.max(0, this.state === 'brake'
+            ? BULL_RULES.brake - this.stateTick + BULL_RULES.recover
+            : BULL_RULES.recover - this.stateTick);
+    }
     get warningTicks() { return this.state === 'rattle' ? BULL_RULES.rattle : BULL_RULES.tell; }
     get warningProgress() { return Math.min(1, this.stateTick / this.warningTicks); }
     get hazards(): readonly Box[] { return this.frameHazards; }
