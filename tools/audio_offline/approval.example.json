@@ -1,9 +1,9 @@
 {
-  "status": "pilot_authorized_existing_balance_only_handoff_to_parent_connected_plugin",
-  "pilot_id": "sfg-guaira-pilot-01",
-  "request_manifest_sha256": null,
+  "status": "arcade_r2_authorized_two_music_replacements_and_integration",
+  "pilot_id": "sfg-arcade-r2",
+  "request_manifest_sha256": "e56cb980785f660fa4255ea33656f131be22331252bef03fd579343e4350b961",
   "approved_by": "user_instruction_relayed_by_parent",
-  "approval_scope": "Two music proposals and six SFX pairs using existing balance only; no purchase, top-up, plan change or additional billing.",
+  "approval_scope": "User approved original arcade direction, production, game integration and dedicated GitHub branch publication. Generate only two replacement music outputs through parent plugin; reuse 12 existing SFX candidates. No purchase, top-up, plan change, extra billing, main merge or deploy.",
   "approved_at_utc": null,
   "account_plan_confirmed_by_user": null,
   "billing_unit_confirmed": null,
@@ -18,12 +18,16 @@
   "local_rest_execution_allowed": false,
   "quota_read_attempt_status": "proxy_tunnel_blocked_403_after_later_explicit_user_authorization_to_use_attachment",
   "provider_overage_disabled_confirmed": false,
-  "max_paid_requests": 14,
+  "max_paid_requests": 2,
   "automatic_retries": 0,
   "secure_setup_confirmed_by_user": false,
   "network_secret_key_name": "ELEVENLABS_API_KEY",
   "allowed_domain": "api.elevenlabs.io",
-  "generation_for_private_review_only": true,
+  "generation_for_private_review_only": false,
   "commercial_game_license_verified": false,
-  "publish_allowed": false
+  "publish_allowed": false,
+  "existing_sfx_reuse_count": 12,
+  "game_integration_authorized": true,
+  "github_branch_publication_authorized": true,
+  "production_deploy_authorized": false
 }

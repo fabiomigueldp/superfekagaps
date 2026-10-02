@@ -1,9 +1,16 @@
 # Direção sonora
 
-Uma aventura cômica instrumental híbrida: o mundo tem textura física, Feka tem
-uma frase memorável e o humor aparece na atuação rítmica. O som sustenta a
-clareza do pulo, do perigo e da resolução. Instrumentos não fingem ser alertas.
-Evitar referência a artistas, celebridades, músicas existentes ou vozes reais.
+Uma aventura arcade instrumental com melodias marcantes, ritmo ágil, baixo
+definido, bateria precisa e produção detalhada. Timbres de synth, FM e pulse
+8-bit aparecem onde ajudam a ação; dinâmica, profundidade e estéreo continuam
+modernos. Feka tem uma frase memorável e o humor aparece nas pausas e respostas.
+O alvo de acabamento alto não autoriza copiar trilhas, melodias ou identidades
+de franquias. Não há identidade nacional, geográfica ou folclórica intencional.
+
+Esta revisão substitui a direção anterior por correção explícita do usuário.
+As duas músicas antigas ficam rejeitadas como candidatas, sem apagar originais
+ou histórico. Os 12 SFX já gerados permanecem candidatos à audição, sem nova
+geração. Ver [registro de coordenação](generation-ledger.json).
 
 ## Motivo Feka proposto
 
@@ -22,14 +29,14 @@ gastar tentativas indefinidas buscando precisão nota a nota por prompt.
 
 | Núcleo | Instrumentação e gesto | Espaço para gameplay |
 | --- | --- | --- |
-| Guaíra | Violão de nylon/viola caipira secos, baixo redondo, madeira, pequenos metais abafados; assobios breves em respostas | Pouco reverb, frases separadas e transientes leves |
-| Fábrica | Funk eletrônico industrial, baixo elástico, motor afinado discreto, síncopes mecânicas e timbre líquido grave | Percussão musical não usa os dois pips do aviso; máquina real fica legível |
+| Guaíra | Lead de synth dedilhado, respostas de mallets/teclas FM, baixo ágil, bateria precisa e acentos pulse 8-bit | Motivo em primeiro plano; deixar ataques de salto e avisos descobertos |
+| Fábrica | Groove eletrônico industrial, baixo elástico, motor afinado discreto, síncopes mecânicas e timbre líquido grave | Percussão musical não usa os dois pips do aviso; máquina real fica legível |
 | Turbosuco | Mesma família da fábrica; ostinato mais denso, registro e contratempo mais intensos | Intensidade vem do arranjo, sem ganho brusco; abre espaço para aviso e vulnerabilidade |
 | Prefeito da Vazão | Marcha pomposa cômica, metais curtos/tuba leve, caixa abafada, pequenas pausas de constrangimento | Carimbo, registro e lacre continuam reconhecíveis; evitar fanfarra contínua |
-| Mapa / vitória | Motivo Feka abreviado em cordas e madeira; resolução curta | Navegação recebe pouca densidade; vitória não dispara em cada revisita |
+| Mapa / vitória | Motivo Feka abreviado em teclas FM/pulse suaves; resolução curta | Navegação recebe pouca densidade; vitória não dispara em cada revisita |
 
-Guaíra mantém escala humana, sem clichê de festa ou caricatura regional. Água
-pública tem movimento leve, claro e irregular; o suco roxo é denso, grave,
+Guaíra é cenário da aventura e não determina uma tradição musical. Água pública
+tem movimento leve, claro e irregular; o suco roxo é denso, grave,
 borbulhante e viscoso. Cor não produz som: a diferença vem de viscosidade,
 ritmo das bolhas e duração do escoamento. Nada de corte, esmagamento, mastigação
 ou espremedor de fruta. Tubo, válvula e líquido são a identidade industrial.
@@ -38,16 +45,17 @@ ou espremedor de fruta. Tubo, válvula e líquido são a identidade industrial.
 
 | Proposta | Alvo | Comparação desejada |
 | --- | --- | --- |
-| A — Caminho de casa | 40 s, cerca de 96 BPM, viola/violão respondendo, caminhada calorosa, baixo simples | Espaço, identificação do motivo e resistência à repetição |
-| B — Pátio em movimento | 40 s, cerca de 108 BPM, síncope mais ágil, baixo com respostas, pequenos cliques metálicos | Movimento e humor sem perder a clareza dos efeitos |
+| A — Salto de partida | 40 s, 120 BPM, synth dedilhado, baixo articulado, mallets e acentos de cordas curtas; pulse 8-bit nos finais de frase | Gancho memorável, clareza e variedade de resposta |
+| B — Impulso pixel | 40 s, 144 BPM, lead pulse, teclas FM, baixo sincopado, bateria firme e stabs de synth | Mais impulso e contraste, sem excesso de notas agudas |
 
 Os prompts completos e parâmetros são a fonte única em
 [pilot.json](../../tools/audio_offline/pilot.json). São **duas propostas totais**,
 não duas propostas com duas gerações cada. Os trechos têm abertura, desenvolvimento
 e retorno para facilitar edição. Nenhum loop perfeito está prometido pelo texto.
-O assobio é textura não verbal e esparsa; nenhum canto, fala ou coro.
+Sem assobios, canto, fala ou coro. Sons 8-bit são acentos e cores expressivas,
+sem degradar a mix inteira ou disputar cada aviso com arpejos contínuos.
 
-## Seis efeitos, duas variantes cada
+## Seis efeitos já gerados, duas variantes para avaliar
 
 | Cue | Pedido por variante | Papel e diferença A/B |
 | --- | --- | --- |
@@ -80,7 +88,7 @@ e no [endpoint de Voice Design](https://elevenlabs.io/docs/api-reference/text-to
 
 | Personagem | Brief para futura voz original, sem referência pessoal |
 | --- | --- |
-| Feka | Adulto brasileiro, registro médio, articulação ágil, confiança que vacila por um instante; humor pela pausa |
+| Feka | Adulto, registro médio, articulação ágil, confiança que vacila por um instante; humor pela pausa, sem caricatura de sotaque |
 | Prefeito fictício | Adulto, registro médio-grave, dicção formal exageradamente cuidadosa, pompa que se desmonta; sem político real |
 | Turbosuco | Esforços mecânicos e reações instrumentais no piloto; fala só se a cena futura precisar |
 

@@ -49,9 +49,17 @@ def identifier(value: object) -> bool:
 
 
 def validate(pilot: dict) -> list[dict]:
-    fields(pilot, {"schema_version", "pilot_id", "status", "music", "sfx"})
-    if pilot["schema_version"] != 1 or pilot["status"] != "prepared_not_generated" or not identifier(pilot["pilot_id"]):
+    fields(pilot, {"schema_version", "pilot_id", "status", "generation_scope", "reused_sfx_from", "music", "sfx"})
+    if pilot["schema_version"] != 2 or pilot["status"] != "prepared_not_generated" or not identifier(pilot["pilot_id"]):
         raise ValueError("Invalid pilot identity or status.")
+    if pilot["generation_scope"] != "music_replacements_only":
+        raise ValueError("Only the two replacement music proposals may be prepared; existing SFX must not be regenerated.")
+    fields(pilot["reused_sfx_from"], {"pilot_id", "flow_url", "status"})
+    if pilot["reused_sfx_from"] != {
+        "pilot_id": "sfg-guaira-pilot-01", "flow_url": "https://elevenlabs.io/app/flows/aoC2seBLqtH0qywcqdFt",
+        "status": "generated_reported_by_root_awaiting_files_and_audition",
+    }:
+        raise ValueError("SFX reuse must reference the already generated pilot.")
     if not isinstance(pilot["music"], list) or not isinstance(pilot["sfx"], list) or len(pilot["music"]) != 2 or len(pilot["sfx"]) != 6:
         raise ValueError("Pilot must contain two music proposals and six SFX pairs.")
     requests = []
@@ -63,11 +71,14 @@ def validate(pilot: dict) -> list[dict]:
             raise ValueError("Pilot music must be 30–45 seconds.")
         if not isinstance(item["prompt"], str) or not 1 <= len(item["prompt"]) <= 4100:
             raise ValueError("Music prompt exceeds API limits.")
+        if re.search(r"\b(?:brazil\w*|brasil\w*|caipira|nintendo)\b", item["prompt"], re.I):
+            raise ValueError("Music prompts must use the original arcade direction without regional or franchise references.")
         requests.append(request(item, "/v1/music", item["output_format"], {
             "model_id": item["model_id"], "prompt": item["prompt"],
             "music_length_ms": round(item["duration_seconds"] * 1000),
             "force_instrumental": True, "store_for_inpainting": False,
         }))
+    sfx_ids = []
     for item in pilot["sfx"]:
         fields(item, {"cue_id", "title", "duration_seconds", "loop", "a", "b"})
         if not number(item["duration_seconds"], .5, 30) or type(item["loop"]) is not bool:
@@ -75,14 +86,17 @@ def validate(pilot: dict) -> list[dict]:
         for variant in ("a", "b"):
             if not isinstance(item[variant], str) or not item[variant].strip():
                 raise ValueError("Every SFX variant needs a prompt.")
-            requests.append(request({**item, "variant": variant}, "/v1/sound-generation", "mp3_44100_128", {
+            # Validate the legacy descriptions for identity and mapping, but do
+            # not export them as fresh requests or accidentally charge twice.
+            reused = request({**item, "variant": variant}, "/v1/sound-generation", "mp3_44100_128", {
                 "model_id": SFX_MODEL, "text": item[variant],
                 "duration_seconds": item["duration_seconds"], "loop": item["loop"], "prompt_influence": .35,
-            }))
+            })
+            sfx_ids.append(reused["id"])
     ids = [r["id"] for r in requests]
     if len(ids) != len(set(ids)):
         raise ValueError("Duplicate request identity.")
-    if len({r["cue_id"] for r in requests if r["endpoint"].endswith("sound-generation")}) != 6:
+    if len(set(sfx_ids)) != 12:
         raise ValueError("SFX cue IDs must be distinct.")
     if {r["variant"] for r in requests[:2]} != {"a", "b"}:
         raise ValueError("Music proposals require variants a and b.")
@@ -108,7 +122,8 @@ def estimate(requests: list[dict]) -> dict:
         "network_calls_made": 0, "paid_requests_planned": len(requests), "automatic_retries": 0,
         "music_seconds": float(music), "sfx_seconds": float(sfx), "voices_planned": 0,
         "quote_confirmed_for_account": False, "approved_budget_usd": None, "estimated_credits": None,
-        "spending_authority": "Approved pilot using existing balance only; secure setup, quota and no-overage verification still pending.",
+        "spending_authority": "Two arcade replacement music outputs via parent plugin only, existing balance; reuse all 12 prior SFX candidates without regeneration.",
+        "existing_sfx_to_reuse": 12,
         "reference_rates_usd_per_minute": {"music": .15, "sfx": .12},
         "illustrative_linear_usd_before_tax": float((music * Decimal('.15') + sfx * Decimal('.12')) / 60),
         "one_minute_per_call_hypothesis_usd_before_tax": float(music_calls * Decimal('.15') + sfx_calls * Decimal('.12')),
@@ -138,6 +153,8 @@ def prepare(pilot: dict, output: Path) -> dict:
     output.mkdir(parents=True, exist_ok=False)
     manifest = {
         "pilot_id": pilot["pilot_id"], "execution_enabled": False, "publish_allowed": False,
+        "generation_scope": pilot["generation_scope"], "reused_sfx_from": pilot["reused_sfx_from"],
+        "generation_owner": "parent_root_plugin_only", "expected_new_outputs": 2,
         "network_secret_key_name_for_future_runner": "ELEVENLABS_API_KEY",
         "allowed_domain_for_future_runner": "api.elevenlabs.io",
         "auth_header_name_for_future_runner": "xi-api-key",

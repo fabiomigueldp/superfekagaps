@@ -1,4 +1,18 @@
-# Validação da entrega
+# Validação da revisão arcade r2
+
+- Quatro testes Python passaram: export exclusivamente musical (duas saídas),
+  rejeição do schema antigo/lote integral, direção arcade, IDs/durações/modelos,
+  operação com sockets bloqueados e isolamento/não sobrescrita de saídas.
+- Os 12 prompts SFX permanecem iguais aos do lote anterior e não são exportados
+  como novas requisições. As duas músicas foram reescritas; IDs têm sufixo arcade.
+- Export r2: 80 s de música e zero SFX novos. Manifesto SHA-256:
+  `e56cb980785f660fa4255ea33656f131be22331252bef03fd579343e4350b961`.
+- Nenhuma geração, chamada com anexo ou consumo nesta rodada. Plugin ausente aqui.
+- Nenhuma alteração de gameplay nesta revisão; integração depende dos arquivos
+  do root e conferência contra o integrador `ab942fee`, ainda não recebido.
+
+## Evidência anterior, preservada como histórico
+
 
 Executada em 02/10/2026, sobre `bc431d5`, no worktree
 `/workspace/superfekagaps-audio`, branch `codex/audio-offline-pilot`.

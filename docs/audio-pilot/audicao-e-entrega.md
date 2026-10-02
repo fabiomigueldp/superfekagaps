@@ -1,7 +1,9 @@
 # Masters, mixagem e critérios de aceitação
 
-Esta é uma especificação de produção para depois da geração. Não há sample novo
-para ouvir nesta entrega; todos os resultados auditivos e decisões estão pendentes.
+Esta é uma especificação de produção e integração. O root informou 14 saídas do
+lote anterior; os arquivos ainda não chegaram a este ambiente. Duas músicas
+foram rejeitadas pela direção e terão substitutas arcade; 12 SFX aguardam audição.
+Nenhuma audição foi realizada por esta sessão.
 
 ## Originais e edição
 
@@ -109,7 +111,7 @@ a audição. Até lá, `heard=false`.
 3. Testar cada SFX com a música baixa/média/alta, alternando variantes. O ataque
    deve ocorrer no começo útil do arquivo, sem pre-roll perceptível. Variantes
    preservam significado e volume próximo, sem alterar duração do gameplay.
-4. Depois da seleção privada e autorização de integração, ouvir no jogo em
+4. Com a integração já autorizada pelo usuário, selecionar e ouvir no jogo em
    desktop e dispositivo móvel, incluindo Safari/iOS se suportados: salto repetido,
    sentada, moeda, dano/capacete, aviso→pressão→descarga, água pública após vitória
    aceita, intro Turbosuco/pular/repetir, morrer/respawn, mapa e troca de faixa.
