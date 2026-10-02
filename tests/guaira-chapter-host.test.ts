@@ -372,7 +372,11 @@ for (const completed of [0, 1, 5]) test(`optional ownership preserves ${complete
     for (let step = 0; step < completed; step++) { h.enter(); await flush(); h.byId('chapter-primary').click(); }
     if (completed) chooseRequired(h, opening); // Retain an earned replay, which differs from recommendation.
     const before = app.snapshot, openingAvailable = h.currentMap().options.openingAvailable;
-    chooseGallery(h); assert.deepEqual(app.snapshot, before); h.enter(); await flush();
+    chooseGallery(h); assert.deepEqual(app.snapshot, before);
+    const optionalMap = h.currentMap();
+    optionalMap.options.onOpening('guaira-patio-comportas', before.generation, optionalMap.navigation.revision);
+    assert.deepEqual(app.snapshot, before, 'Even current optional callbacks cannot change the opening');
+    h.enter(); await flush();
     const first = app.activeGame as GuairaGallery;
     assert.equal(first.stage.id, 'guaira-galeria'); assert.deepEqual(app.snapshot, before);
     assert.equal(h.byId('chapter-map-return').getAttribute('aria-label'), 'Voltar ao Bairro da Vala Seca no capítulo');
@@ -400,6 +404,12 @@ for (const completed of [0, 1, 5]) test(`optional ownership preserves ${complete
     chooseRequired(h); assert.deepEqual(app.snapshot, before);
     assert.deepEqual(h.currentMap().navigation.target, { kind: 'chapter', sceneId: before.selectedScene });
     assert.equal(app.snapshot.nextRecommendedScene, before.nextRecommendedScene);
+    if (!completed) {
+        const resumed = h.currentMap(), alternative = opening === 'guaira-travessia' ? 'guaira-patio-comportas' : 'guaira-travessia';
+        resumed.options.onOpening(alternative, resumed.snapshot.generation, resumed.navigation.revision);
+        assert.equal(app.snapshot.opening, alternative, 'Returning from the optional rooms did not lock the opening');
+        assert.equal(app.snapshot.accepted.length, 0);
+    }
     app.dispose(); h.checkDisposed();
 });
 

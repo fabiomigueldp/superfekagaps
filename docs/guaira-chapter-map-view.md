@@ -16,9 +16,9 @@ new GuairaChapterMapView(root, {
         // Required targets also need session.canEnterScene(target.sceneId, generation).
         // Optional targets use the host's separate Gallery ownership.
     },
-    onOpening(opening, generation, revision) { /* validate both tokens and first-entry latch */ },
+    onOpening(opening, generation, revision) { /* validate both tokens, required target and first-entry latch */ },
     onRestart(generation, revision) { /* validate, dispose old view and replace session */ },
-    onExit(generation, revision) { /* validate, dispose the chapter and navigate to the main game */ }
+    onExit(generation, revision) { /* validate, dispose the chapter and return to experiment selection */ }
 });
 view.update(snapshot, walkToSelection = false, openingAvailable = previousOpeningAvailable, navigation);
 view.canEnter(target, generation, revision): boolean;
@@ -32,6 +32,8 @@ Import `chapter/guaira-chapter-map.css` in the chapter host entrypoint. The styl
 Pass the physical arrival returned by the native scene on map construction. An update without walking freezes the current physical position even if the selected scene changes. CAMINHAR then starts a real road walk. Passing `true` requests walking to the target's actual anchor (`bairro`/`guaira-2` for Gallery, or `CHAPTER_SCENES[target.sceneId].arrival` for a required scene); changing selection reverses from the current point. ENTRAR/REPETIR remain unavailable until the selected physical anchor is reached. CHEGAR and reduced motion skip travel only, never enter or award a result. Reduced motion requested while hidden or behind the journey dialog is applied on resume.
 
 The host must latch `openingAvailable` false on the first entry, including an attempt later abandoned with no receipt. The default permits opening choice only for an empty generation-zero session. All rendered actions capture both the session generation and independent navigation revision displayed when installed; stale callbacks are rejected locally, and the host must still revalidate. Older generations of the same session and older navigation revisions cannot overwrite the view. A stationary Bairro actor only enables GALERIA when the optional target is selected. Passing through, arrival, CHEGAR and reduced motion never enter it.
+
+Opening availability is separate from presentation: while the optional Bairro target is selected, TRAVESSIA/PÁTIO are hidden and disabled, and both view and host reject opening callbacks. RETOMAR reveals them again if no required scene has been entered, including after a Gallery/Relief visit. The optional visit never changes `openingAvailable`, the selected required scene, receipts or public-water state. This replaces the previous test requirement that both choices remain visible during the detour: at 472×303 their extra footer row caused vertical overflow and reduced the map to its 100px minimum. The controls retain their 44px targets.
 
 The view uses `GuairaChapterTravel`, `loadGuairaScene`, the existing diorama/mask, `paintGuairaMap`, `paintGuairaWaterFrame` and `LabToolbarAction`. It introduces no raster art. One selected-target plaque can appear only with safe scene clearance; compact layouts hide it. The footer keeps the selected action available.
 
@@ -49,7 +51,11 @@ The view uses `GuairaChapterTravel`, `loadGuairaScene`, the existing diorama/mas
 
 `tests/guaira-chapter-map-view.test.ts` runs the production session, travel, loader, view and map/water painters against substituted browser device boundaries: EventTarget DOM, canvas context, frame clock, image decode, network and media query. It covers captured/stale/repeated actions, actual walking and direction reversal, preserve-position updates, menu/hidden suspension, reduced-motion arrival, optional water failure, invalid metadata/retry, late decode/disposal, completed/replay presentation and opening lock after abandonment. Optional cases cover both openings, five-row grouping, the actual Bairro anchor, pass-through rejection, same-generation revision retirement, exact retained replay, 5/5 title/count preservation, modal/hidden/blur/resize/reduced-motion suspension, visible focus return without time catch-up, blurred asset readiness, repeated activation, asset retry and ready-focus ownership. Its hidden setter clears focus immediately to model the browser behavior that motivated the focus repair. Getters forbid location, history and browser storage access.
 
-These tests are DOM-boundary integration checks, not real-browser layout, rendering, native focus-trap, touch or screenshot proof. CSS assertions check scoped rules and wrapping intent only. A browser still needs to verify native dialog focus/Tab, 320px and compact landscape overflow, screenshots and actual chapter host integration. No browser, deployment or publication is part of this map-view patch.
+These tests are DOM-boundary integration checks, not real-browser layout, rendering, native focus-trap, touch or screenshot proof. CSS assertions check scoped rules and wrapping intent only.
+
+The optional-opening correction was also checked in Chromium 151 with keyboard and CDP-emulated touch. Both openings were exercised at 472×303 and 320×480 through Bairro → Gallery → Bairro → RETOMAR, followed by changing the opening. Optional controls remained 44px tall, the count stayed 0/5, and opening choices reappeared after RETOMAR. At 472×303 the map shell changed from 316px content in a 303px viewport to 303px content, while the map grew from 100px to 128.72px. SAIR now announces the experiment selection destination, including map-load recovery. This does not establish physical-device, screen-reader, audible-audio or FPS validation.
+
+Against base `bc431d5`, 190 focused chapter/hub/touch/gallery tests, both TypeScript projects, level/player/world validation, Vite and the size gate passed. The build contains 141 files and 40,575,069 bytes (+95 bytes), below 45,000,000. The complete five-result journeys and post-victory water remain covered by native replays with simulated browser boundaries; no production publication is part of this correction.
 
 Run the focused test without the tsx CLI IPC server:
 
