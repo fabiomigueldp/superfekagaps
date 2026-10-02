@@ -60,7 +60,7 @@ test('Respiros clones a continuous native floor and two ungated jets without sto
     assert.equal(g.player.data.hasHelmet, true); assert.equal(g.boss, null);
     assert.deepEqual(g.stage.foes, []); assert.deepEqual(g.stage.exits, []); assert.deepEqual(g.stage.pickups, []);
     assert.deepEqual(g.stage.mechanisms.map(b => [b.kind, b.x, b.y, b.width, b.height, b.phase, b.period, b.gated]),
-        [['jet',160,176,96,132,0,4200,undefined], ['jet',384,176,176,132,2100,4200,undefined]]);
+        [['jet',160,176,96,132,0,4200,undefined], ['jet',384,176,176,132,1200,4200,undefined]]);
     for (let x = 0; x < G.width; x++) assert.notEqual(g.stage.level.tiles[19][x], 0);
     const altered = guairaRespirosStage(); altered.level.tiles[19][0] = 0;
     assert.notEqual(guairaRespirosStage().level.tiles[19][0], 0);
@@ -85,7 +85,7 @@ for (const touch of [false, true]) test(`${touch ? 'native touch' : 'keyboard'} 
 test('252 native departure phases expose generous but different walking windows on both grates', t => {
     const h = guairaRespirosBrowser(t), g = h.create();
     for (const [start, target, expectedCount, walkFrames, spans] of [
-        [128,304,157,91,[[0,41],[137,251]]], [304,608,117,155,[[0,103],[239,251]]]
+        [128,304,157,91,[[0,41],[137,251]]], [304,608,117,155,[[41,157]]]
     ] as const) {
         const safe: number[] = [];
         for (let phase = 0; phase < 252; phase++) {
@@ -118,7 +118,7 @@ test('observing retraction solves all252 starting phases while blind walking, ru
         }
         assert.ok(safe > 0 && safe < 252); blindCounts.push(safe);
     }
-    assert.deepEqual(blindCounts, [117,119,130]);
+    assert.deepEqual(blindCounts, [89,87,100]);
     for (let phase = 0; phase < 252; phase++) {
         departure(h, g, G.spawnX, phase);
         walkUntil(h, g, 128); waitForRetraction(h, g, G.firstJetId);
@@ -126,6 +126,41 @@ test('observing retraction solves all252 starting phases while blind walking, ru
         walkUntil(h, g, G.finishX);
         assert.equal(g.finished, true, `observed policy at phase${phase}`);
         assert.equal(g.player.data.hasHelmet, true, `no forced damage at phase${phase}`);
+    }
+});
+
+for (const options of [{}, { touch: true }, { reducedMotion: true }])
+test(`the refuge teaches B's full warning after A, with native braking ${JSON.stringify(options)}`, t => {
+    const h = guairaRespirosBrowser(t, options), g = h.create();
+    for (const initialWait of [0, 30, 120, 251]) {
+        // Continuous route from the authored spawn. Vary the player's initial
+        // hesitation, then observe A; never relocate Feka or alter the clock.
+        h.keys([]); g.load(G.id); h.run(g, initialWait + 1);
+        walkUntil(h, g, 128); waitForRetraction(h, g, G.firstJetId);
+        walkUntil(h, g, G.checkpointX);
+        const b = g.objects.get(G.secondJetId)!;
+        assert.equal(jetCycle(b, g.objects.time).phase, 'idle', 'arrive before the warning');
+        // The same native arrival at the old phase already met a discharge.
+        assert.ok(jetCycle({ ...b, phase: 2100 }, g.objects.time).danger,
+            'baseline comparison: the old rhythm skipped observation of the warning');
+        let chargingFrames = 0;
+        const seen = new Set<string>();
+        for (let frame = 0; frame < 252; frame++) {
+            h.run(g, 1); // release direction; native friction settles in the refuge
+            const state = jetCycle(b, g.objects.time);
+            seen.add(state.phase);
+            if (state.phase === 'charging') chargingFrames++;
+            assert.ok(g.player.data.position.x >= G.firstEnd);
+            assert.ok(g.player.data.position.x + g.player.data.width <= G.secondStart);
+            assert.equal(g.player.data.hasHelmet, true);
+            if (state.phase === 'venting') break;
+        }
+        assert.ok(chargingFrames >= 47, 'observe essentially the full native 800ms warning');
+        assert.deepEqual([...seen], ['idle', 'charging', 'rising', 'flowing', 'falling', 'venting']);
+        // A deliberate 600ms reaction after retraction still leaves ample time
+        // to walk the long grate; neither running nor jumping is needed.
+        h.run(g, 36); walkUntil(h, g, G.finishX);
+        assert.equal(g.finished, true); assert.equal(g.player.data.hasHelmet, true);
     }
 });
 
@@ -210,7 +245,7 @@ test('checkpoint equipment is native and full retry clears checkpoint, result, w
 for (const touch of [false, true]) test(`${touch ? 'native touch' : 'keyboard'} can jump over the optional checkpoint and still clear intact`, t => {
     const h = guairaRespirosBrowser(t, { touch }), g = h.create();
     const blocks: Array<[number, string[]]> = [[161,[]], [110,['ArrowRight']],
-        [40,['ArrowRight','Space']], [217,[]], [180,['ArrowRight']]];
+        [40,['ArrowRight','Space']], [271,[]], [180,['ArrowRight']]];
     let frames = 0;
     for (const [count, keys] of blocks) for (let i = 0; i < count; i++, frames++) {
         h.run(g, 1, keys);
