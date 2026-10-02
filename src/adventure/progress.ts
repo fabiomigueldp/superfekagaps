@@ -17,7 +17,9 @@ export function parseSave(raw: string): AdventureSave {
     result.completed = list('completed', validId);
     result.secrets = list('secrets', v => typeof v === 'string' && /^[1-6]-3$/.test(v));
     result.seals = list('seals', v => typeof v === 'string' && /^[1-6]-[1-4]:s[123]$/.test(v));
-    result.seen = list('seen', v => typeof v === 'string' && v.length < 100).slice(0, 200);
+    // Reserve one additional journal slot for the optional factory result, so
+    // importing a full legacy v1 journal does not evict an existing story flag.
+    result.seen = list('seen', v => typeof v === 'string' && v.length < 100).slice(0, 201);
     result.selected = validId(o.selected) ? o.selected : '1-1';
     if (o.times && typeof o.times === 'object')
         for (const [id, n] of Object.entries(o.times))

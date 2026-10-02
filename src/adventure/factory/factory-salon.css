@@ -1,0 +1,10 @@
+.factory-salon-enter { position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); z-index: 20; min-height: 44px; }
+.factory-salon { box-sizing: border-box; width: min(100vw, 720px); max-width: 100vw; max-height: 100dvh; padding: 8px; border: 2px solid #cb91ef; background: #171523; color: #fff1c9; overflow: auto; }
+.factory-salon::backdrop { background: #080611e8; }
+.factory-salon nav { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.factory-salon button { min-height: 44px; padding: 6px 10px; background: #49324d; color: #fff1c9; border: 1px solid #cb91ef; cursor: pointer; }
+.factory-salon button:focus-visible { outline: 3px solid #f2de8c; }
+.factory-salon canvas { display: block; width: 100% !important; height: auto !important; aspect-ratio: 16 / 9; image-rendering: pixelated; }
+.factory-salon p { margin: 8px 0 0; }
+.factory-salon [hidden], .factory-salon-enter[hidden] { display: none; }
+.factory-salon { margin: auto; }

@@ -2,6 +2,7 @@
 
 import { Game } from './game/Game';
 import { WorldGame } from './adventure/WorldGame';
+import { FactoryCampaign } from './adventure/factory/FactoryCampaign';
 import { WorldEditor } from './adventure/WorldEditor';
 import './game/scoreboard.css';
 import './adventure/map.css';
@@ -26,7 +27,7 @@ window.addEventListener('DOMContentLoaded', () => {
     canvas.setAttribute('inputmode', 'none');
   }
   const classic = new URLSearchParams(window.location.search).get('classic') === 'true';
-  const game = isEditor || classic ? new Game(canvas) : new WorldGame(canvas);
+  const game = isEditor || classic ? new Game(canvas) : new FactoryCampaign(canvas);
   game.start();
   if (!isEditor) {
     canvas.addEventListener('pointerdown', () => canvas.focus({ preventScroll: true }));

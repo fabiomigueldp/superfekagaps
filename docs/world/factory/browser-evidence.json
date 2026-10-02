@@ -1,0 +1,53 @@
+{
+  "browser": "Chromium",
+  "checks": [
+    "old checkpoint",
+    "walk to entrance",
+    "modal",
+    "full intro with walk and pose",
+    "compact controls",
+    "Escape",
+    "abort/return",
+    "reentry",
+    "native death/retry",
+    "six-hit victory",
+    "landing",
+    "shared epilogue",
+    "blur",
+    "natural ending",
+    "optional persistence",
+    "no duplicate reward"
+  ],
+  "combat": "deterministic real Input replay in browser; not manual victory",
+  "hits": [
+    {
+      "frame": 143,
+      "health": 5
+    },
+    {
+      "frame": 283,
+      "health": 4
+    },
+    {
+      "frame": 433,
+      "health": 3
+    },
+    {
+      "frame": 563,
+      "health": 2
+    },
+    {
+      "frame": 789,
+      "health": 1
+    },
+    {
+      "frame": 941,
+      "health": 0
+    }
+  ],
+  "reducedMotion": false,
+  "viewport": [
+    360,
+    640
+  ]
+}
