@@ -33,7 +33,9 @@ export function startGuairaMap(): () => void {
     new LabToolbarAction(dismiss).setLabel('VOLTAR', 'Fechar desvios e voltar ao mapa');
     const destinations = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-map-destination]'));
     const markers = destinations.filter(button => button.classList.contains('guaira-marker'));
-    new LabToolbarAction(element('map-exit')).setLabel('SAIR', 'Sair para o jogo principal');
+    new LabToolbarAction(element('map-exit')).setLabel('SAIR', 'Voltar aos experimentos');
+    const chapterLink = element('map-chapter');
+    if (chapterLink) new LabToolbarAction(chapterLink).setLabel('CAPÍTULO', 'Jogar o capítulo de Guaíra: cinco resultados nesta sessão');
     const enterArt = new LabToolbarAction(enter, true);
     enterArt.setLabel('ENTRAR', 'Entrar no destino selecionado');
     new LabToolbarAction(skip).setLabel('CHEGAR', 'Chegar agora, pulando a caminhada');
@@ -253,7 +255,7 @@ export function startGuairaMap(): () => void {
     for (const button of destinations.filter(button => !markers.includes(button))) button.addEventListener('click', () => select(button.dataset.mapDestination as GuairaSelection), { signal });
     detours.addEventListener('cancel', event => { event.preventDefault(); dismissDetours(); }, { signal });
     detours.addEventListener('close', () => { if (!detours.open) dismissDetours(); }, { signal });
-    element('map-exit').addEventListener('click', disposeMap, { signal });
+    // Navigation owns pagehide disposal. Modified clicks must leave this visit alive.
     overviewButton.addEventListener('click', () => { if (!live() || menuOpen) return; overview = !overview; reflect(); requestFrame(); }, { signal });
     document.addEventListener('keydown', event => {
         if (menuOpen || !live() || event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.repeat) return;

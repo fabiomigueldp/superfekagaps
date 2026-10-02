@@ -35,7 +35,7 @@ class Element extends EventTarget {
     click() { if (!this.disabled) this.dispatchEvent(new Event('click')); }
 }
 class Media extends EventTarget { matches = false; }
-const ids = ['guaira-canvas', 'map-loading', 'map-loading-panel', 'map-status', 'map-enter', 'map-skip', 'map-return', 'map-overview', 'map-exit', 'map-title', 'map-description', 'map-error', 'map-detours', 'map-detour-patio', 'map-detour-bairro', 'map-detours-close'];
+const ids = ['guaira-canvas', 'map-loading', 'map-loading-panel', 'map-status', 'map-enter', 'map-skip', 'map-return', 'map-overview', 'map-exit', 'map-chapter', 'map-title', 'map-description', 'map-error', 'map-detours', 'map-detour-patio', 'map-detour-bairro', 'map-detours-close'];
 const elements = Object.fromEntries(ids.map(id => [id, new Element()]));
 const destinations = ['town', 'curral', 'subida', 'town', 'curral', 'bairro'].map((id, i) => { const e = new Element(); e.dataset.mapDestination = id; e.marker = i > 2; return e; });
 const scene = new Element(), doc = new EventTarget() as EventTarget & Record<string, unknown>, win = new EventTarget();
@@ -487,4 +487,22 @@ test('the optional neighborhood marker keeps its authored anchor and hides inste
     assert.match(html, /id="map-detour-patio"[^>]*autofocus[^>]*>Entrar no Pátio/);
     assert.match(html, /id="map-detour-bairro"[^>]*>Caminhar ao Bairro da Vala Seca/);
     assert.equal((html.match(/data-map-destination="bairro"/g) ?? []).length, 1);
+});
+
+
+test('modified exit and chapter links retain the current map visit until pagehide', async () => {
+    win.dispatchEvent(Object.assign(new Event('pageshow'), { persisted: true }));
+    await ready(); frames(2);
+    for (const id of ['map-exit', 'map-chapter']) {
+        for (const flags of [{ ctrlKey: true, button: 0 }, { metaKey: true, button: 0 }, { button: 1 }]) {
+            const event = Object.assign(new Event(flags.button === 1 ? 'auxclick' : 'click', { cancelable: true }), flags);
+            elements[id].dispatchEvent(event);
+            assert.equal(event.defaultPrevented, false);
+        }
+    }
+    // Even a normal click can have navigation cancelled by the browser. Teardown
+    // belongs to pagehide; a modified click must leave this map able to walk.
+    elements['map-exit'].click(); destinations[1].click(); frames(1);
+    assert.equal(elements['map-title'].textContent, 'Curral da Comporta');
+    win.dispatchEvent(new Event('pagehide')); assert.equal(queue.size, 0);
 });

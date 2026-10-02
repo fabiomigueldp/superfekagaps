@@ -1,3 +1,4 @@
+import { ExperimentalHub } from './experimental/hub/ExperimentalHub';
 import { Input } from '../engine/Input';
 import { DisposalScope } from '../engine/DisposalScope';
 import { Renderer } from '../engine/Renderer';
@@ -80,6 +81,7 @@ export class WorldGame {
     private mapCanvas: HTMLCanvasElement;
     private saveImportCleanup?: () => void;
     private deathFeedbackStarted = false;
+    private experimentalHub?: ExperimentalHub;
     constructor(canvas: HTMLCanvasElement, private readonly ephemeral = false) {
         this.mapCanvas = canvas;
         try {
@@ -102,6 +104,7 @@ export class WorldGame {
             this.selection = Math.max(0, STAGES.findIndex(s => s.id === this.store.save.selected));
             this.listen(window, 'keydown', e => this.menuKey(e));
             this.listen(canvas, 'pointerdown', e => {
+                if (this.experimentalHub?.isOpen) return;
                 this.audio.unlock();
                 const r = canvas.getBoundingClientRect();
                 if (this.state === 'playing') {
@@ -124,6 +127,15 @@ export class WorldGame {
                 worldGame: WorldGame;
             }).worldGame = this;
         } catch (error) { this.dispose(); throw error; }
+    }
+    /** Opt-in only from the main entry. Labs/editor never mount title navigation. */
+    enableExperimentalHub(search = ''): void {
+        if (this.ephemeral || this.isDisposed) return;
+        if (!this.experimentalHub) {
+            this.experimentalHub = new ExperimentalHub(this.mapCanvas, { input: this.input, isTitle: () => this.state === 'title' });
+            this.addCleanup(() => { this.experimentalHub?.dispose(); this.experimentalHub = undefined; });
+        }
+        this.experimentalHub.openFromSearch(search);
     }
     get isDisposed(): boolean { return this.lifetime?.isDisposed ?? false; }
     /** Own subclass/host resources without overriding terminal disposal. */
@@ -158,8 +170,9 @@ export class WorldGame {
         this.render();
         if (!this.isDisposed && this.running) this.frame = requestAnimationFrame(this.loop);
     };
-    private change(screen: Screen) { if (this.isDisposed) return; if (screen !== 'map') this.mapView?.hide(); this.state = screen; this.hitStopInput = null; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; }
+    private change(screen: Screen) { if (this.isDisposed) return; if (screen !== 'map') this.mapView?.hide(); this.state = screen; this.hitStopInput = null; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; this.experimentalHub?.sync(); }
     private menuKey(e: KeyboardEvent) {
+        if (this.experimentalHub?.isOpen) return;
         const target = e.target;
         if (target instanceof HTMLElement && target.closest('button, a[href]') && (e.key === 'Enter' || e.key === ' ')) return;
         if (target instanceof HTMLElement && target.closest('.world-map')) return;
@@ -392,6 +405,7 @@ export class WorldGame {
     }
     update(dt: number) {
         if (this.isDisposed) return;
+        if (this.experimentalHub?.isOpen) { this.input.reset(); return; }
         this.input.setMenuMode(this.state !== 'playing');
         this.input.update();
         if (this.input.consumeMute())
@@ -689,6 +703,7 @@ export class WorldGame {
     private text(c: CanvasRenderingContext2D, text: string, x: number, y: number, width: number, color: string = ART.paper) { wrapText(text, width).forEach((line, i) => pixelText(c, line, x, y + i * 10, color)); }
     render() {
         if (this.isDisposed) return;
+        this.experimentalHub?.sync();
         if (this.state === 'map') {
             if (typeof document !== 'undefined' && document.hidden) return;
             this.buttons = [];
@@ -808,7 +823,7 @@ export class WorldGame {
             this.art.foe(c, e, cx, cy, this.time);
         if (this.boss)
             this.art.boss(c, this.boss, cx, cy, this.time);
-        this.renderer.drawPlayer(this.player.data, view);
+        this.renderPlayer(view);
         this.renderer.drawFallingPlatforms(this.level.getFallingPlatformRenderData(), view);
         this.renderer.drawWorldEffects(view);
         for (const s of this.sparks) {
@@ -828,6 +843,9 @@ export class WorldGame {
             this.renderer.drawHelmet(283, 4, c);
         if (this.state === 'paused')
             this.renderer.drawPlayerTransition(this.player.data, view, c);
+    }
+    protected renderPlayer(view: CameraData) {
+        this.renderer.drawPlayer(this.player.data, view);
     }
     protected renderEncounterHud(c: CanvasRenderingContext2D) {
         if (!this.boss) return;
@@ -851,7 +869,7 @@ export class WorldGame {
         this.button(c, 'GALERIA', 80, 124, 76, () => this.change('gallery'));
         this.button(c, 'OPÇÕES', 164, 124, 76, () => this.settings('title'));
         this.button(c, 'JOGAR O ORIGINAL', 99, 149, 122, () => { location.href = '?classic=true'; });
-        pixelText(c, 'ENTER PARA CONFIRMAR · SETAS PARA ESCOLHER', 160, 172, '#d1d6c2', 1, 'center');
+        pixelText(c, this.experimentalHub ? 'SETAS/ENTER: MENU · TAB: EXPERIMENTOS' : 'ENTER PARA CONFIRMAR · SETAS PARA ESCOLHER', 160, 172, '#d1d6c2', 1, 'center');
     }
     private renderStory(c: CanvasRenderingContext2D) {
         this.art.background(c, ISLANDS[this.state === 'ending' ? 5 : 0], 0, 0, this.time);

@@ -36,3 +36,7 @@ button,a{touch-action:manipulation}.guaira-header button,.guaira-header a,.guair
 #map-detours-close{display:flex;min-width:44px;min-height:44px;padding:0;border:0;background:#75503b;cursor:pointer}
 @media(max-height:360px){#map-detours{padding:10px}#map-detours h2{font-size:16px;margin-bottom:4px}#map-detours p{margin-bottom:8px}.guaira-detour-choices{gap:6px;margin-bottom:8px}.guaira-detour-choices button{padding:6px 9px;min-height:44px}.guaira-detour-choices span{margin-top:2px}}
 @media(forced-colors:active){#map-detours,.guaira-detour-choices button{background:Canvas;color:CanvasText;border-color:ButtonText}#map-detours p,.guaira-detour-choices span{color:CanvasText}}
+
+/* Chapter access keeps all three 44px header controls inside a narrow viewport. */
+.guaira-header nav{flex-wrap:wrap;max-width:100%}
+@media(max-width:420px){.guaira-header{flex-wrap:wrap}.guaira-header nav{flex-basis:100%;justify-content:flex-end}}

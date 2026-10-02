@@ -74,7 +74,8 @@ for (const touch of [false,true]) for (const reducedMotion of [false,true]) test
     assert.equal(g.store.save.checkpoint?.index,0); assert.equal(g.coins,0); assert.equal(campaignCompletions,0);
     assert.deepEqual(g.store.save.completed,[]); assert.deepEqual(g.store.save.times,{}); assert.equal(g.mapReturnHref,G.mapHref);
     const frozen=snapshot(g), idle=g.player.data.animationTimer; h.run(g,60,['ArrowLeft','Space','ArrowDown']); g.render();
-    assert.deepEqual(snapshot(g),frozen); assert.ok(g.player.data.animationTimer>idle);
+    assert.deepEqual(snapshot(g),frozen);
+    assert.equal(g.player.data.animationTimer,idle,'Completed avatar paint uses its own clock; native PlayerData stays frozen');
     assert.match(h.status.textContent,/ACESSO DE INSPEÇÃO ABERTO/);
     if(reducedMotion) assert.deepEqual((g as unknown as {sparks:unknown[]}).sparks,[]);
     h.keys([]); g.load(G.id); replay(h,g); assert.deepEqual(snapshot(g),frozen,'same input remains deterministic');

@@ -1,4 +1,6 @@
 import { WorldGame } from '../../../WorldGame';
+import type { CameraData } from '../../../../types';
+import { CompletedAvatarPresentation } from '../CompletedAvatarPresentation';
 import { jetCycle } from '../../../WorldMachineState';
 import type { AdventureStage } from '../../../types';
 import { panel, pixelText } from '../../../../graphics/BitmapFont';
@@ -11,6 +13,7 @@ export { GUAIRA_RELIEF, guairaReliefStage } from './GuairaReliefStage';
 export class GuairaRelief extends WorldGame {
     readonly reducedMotion: boolean;
     finished = false;
+    private readonly completedAvatar = new CompletedAvatarPresentation();
     constructor(canvas: HTMLCanvasElement, private readonly status: HTMLElement) {
         super(canvas, true);
         try {
@@ -35,7 +38,7 @@ export class GuairaRelief extends WorldGame {
     override load(_id: string, resume = false, _custom?: AdventureStage) {
         if (this.isDisposed) return;
         super.load(G.id, resume, guairaReliefStage());
-        this.finished = false; this.time = 0;
+        this.finished = false; this.time = 0; this.completedAvatar.reset();
         const p = this.player.data;
         p.isGrounded = true; p.facingRight = true; p.respawnRevealTimer = 0;
         if (!this.store.save.checkpoint) p.hasHelmet = true;
@@ -62,7 +65,7 @@ export class GuairaRelief extends WorldGame {
             if (this.input.consumeMute()) this.audio.toggle();
             this.audio.tick(dt);
             if (this.state === 'playing' && this.input.consumePause()) this.toggleReliefPause();
-            if (this.state === 'playing') this.player.data.animationTimer += dt;
+            if (this.state === 'playing') this.completedAvatar.advance(dt);
             return;
         }
         const objects = this.objects, previousX = this.camera.x, previousY = this.camera.y, before = objects.time;
@@ -80,6 +83,10 @@ export class GuairaRelief extends WorldGame {
         if (p.isGrounded && p.position.x >= G.finishX && Math.abs(p.position.y + p.height - G.floor) < .01) {
             this.finished = true; p.velocity.x = 0; p.isRunning = false; this.input.reset(); this.audio.sfx('victory');
         }
+    }
+    protected override renderPlayer(view: CameraData) {
+        if (this.finished) this.completedAvatar.draw(this.renderer, this.player.data, view);
+        else super.renderPlayer(view);
     }
     override render() {
         if (this.isDisposed) return;

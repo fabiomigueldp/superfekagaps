@@ -1,4 +1,6 @@
 import { WorldGame } from '../../../WorldGame';
+import type { CameraData } from '../../../../types';
+import { CompletedAvatarPresentation } from '../CompletedAvatarPresentation';
 import type { AdventureStage } from '../../../types';
 import { panel, pixelText } from '../../../../graphics/BitmapFont';
 import { GUAIRA_GALLERY as G, guairaGalleryStage } from './GuairaGalleryStage';
@@ -12,6 +14,7 @@ export { galleryArrival, galleryOpenings, galleryReceivingY } from './GuairaGall
 export class GuairaGallery extends WorldGame {
     readonly reducedMotion: boolean;
     finished = false;
+    private readonly completedAvatar = new CompletedAvatarPresentation();
     constructor(canvas: HTMLCanvasElement, private readonly status: HTMLElement) {
         super(canvas, true);
         try {
@@ -37,7 +40,7 @@ export class GuairaGallery extends WorldGame {
         if (this.isDisposed) return;
         const checkpoint = resume && this.store.save.checkpoint?.stage === G.id && this.store.save.checkpoint.index === 0;
         super.load(G.id, resume, guairaGalleryStage(checkpoint));
-        this.finished = false; this.time = 0;
+        this.finished = false; this.time = 0; this.completedAvatar.reset();
         const p = this.player.data;
         p.isGrounded = true; p.facingRight = true; p.respawnRevealTimer = 0;
         if (!checkpoint) p.hasHelmet = true;
@@ -72,8 +75,7 @@ export class GuairaGallery extends WorldGame {
             if (this.input.consumeMute()) this.audio.toggle();
             this.audio.tick(dt);
             if (this.state === 'playing' && this.input.consumePause()) this.toggleGalleryPause();
-            // Only the native sprite's idle presentation advances after arrival.
-            if (this.state === 'playing') this.player.data.animationTimer += dt;
+            if (this.state === 'playing') this.completedAvatar.advance(dt);
             return;
         }
         const previousX = this.camera.x, previousY = this.camera.y, objects = this.objects, before = objects.time;
@@ -84,6 +86,10 @@ export class GuairaGallery extends WorldGame {
             this.finished = true; this.player.data.velocity.x = 0; this.player.data.isRunning = false;
             this.input.reset(); this.audio.sfx('victory');
         }
+    }
+    protected override renderPlayer(view: CameraData) {
+        if (this.finished) this.completedAvatar.draw(this.renderer, this.player.data, view);
+        else super.renderPlayer(view);
     }
     override render() {
         if (this.isDisposed) return;

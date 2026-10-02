@@ -5,6 +5,7 @@ import { WorldGame } from './adventure/WorldGame';
 import { WorldEditor } from './adventure/WorldEditor';
 import './game/scoreboard.css';
 import './adventure/map.css';
+import './adventure/experimental/hub/experimental-hub.css';
 
 // Inicializa o jogo quando a página carregar
 window.addEventListener('DOMContentLoaded', () => {
@@ -31,6 +32,9 @@ window.addEventListener('DOMContentLoaded', () => {
     canvas.addEventListener('pointerdown', () => canvas.focus({ preventScroll: true }));
     canvas.focus({ preventScroll: true });
   }
+
+  // Auto-open after the initial canvas focus so the modal owns focus.
+  if (game instanceof WorldGame) game.enableExperimentalHub(window.location.search);
 
   console.log('✅ Jogo iniciado!');
   console.log('📋 Controles:');

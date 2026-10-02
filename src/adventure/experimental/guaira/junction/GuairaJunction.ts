@@ -1,4 +1,6 @@
 import { WorldGame } from '../../../WorldGame';
+import type { CameraData } from '../../../../types';
+import { CompletedAvatarPresentation } from '../CompletedAvatarPresentation';
 import type { AdventureStage } from '../../../types';
 import { pixelText, panel } from '../../../../graphics/BitmapFont';
 import { supportsStanding } from '../../../../world/tileRules';
@@ -13,6 +15,7 @@ export class GuairaJunction extends WorldGame {
     readonly reducedMotion: boolean;
     routing = new JunctionRouting();
     finished = false;
+    private readonly completedAvatar = new CompletedAvatarPresentation();
     constructor(canvas: HTMLCanvasElement, private readonly status: HTMLElement) {
         super(canvas, true);
         try {
@@ -38,7 +41,7 @@ export class GuairaJunction extends WorldGame {
         super.load(G.id, resume, guairaJunctionStage());
         const checkpoint = !!this.store.save.checkpoint;
         this.routing = new JunctionRouting(checkpoint ? 'a' : 'b');
-        this.finished = false; this.time = 0;
+        this.finished = false; this.time = 0; this.completedAvatar.reset();
         for (const id of [G.entryPlateId, G.middlePlateId]) {
             const plate = this.objects.get(id)!;
             plate.active = plate.observedActive = checkpoint;
@@ -83,6 +86,7 @@ export class GuairaJunction extends WorldGame {
             this.audio.tick(dt);
             if (this.state !== 'playing') return;
             if (this.input.consumePause()) this.toggleJunctionPause();
+            if (this.state === 'playing') this.completedAvatar.advance(dt);
             return;
         }
         const objects = this.objects, before = objects.time;
@@ -98,6 +102,10 @@ export class GuairaJunction extends WorldGame {
             this.store.save.checkpoint?.stage === G.id && this.routing.supplied === 'b' && !this.routing.warning) {
             this.finished = true; p.velocity.x = 0; p.isRunning = false; this.input.reset(); this.audio.sfx('victory');
         }
+    }
+    protected override renderPlayer(view: CameraData) {
+        if (this.finished) this.completedAvatar.draw(this.renderer, this.player.data, view);
+        else super.renderPlayer(view);
     }
     override render() {
         if (this.isDisposed) return;
