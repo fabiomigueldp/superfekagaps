@@ -1,0 +1,30 @@
+{
+  "checked_on": "2026-10-02",
+  "initial_instruction": "Do not read the attached credential; prepare offline only.",
+  "later_user_instruction": "User explicitly provided elevenkey.txt in this task and authorized its use as needed.",
+  "credential_handling": "Authorized attachment staged for a local process, mode 0600; value never printed or copied to repository/environment config; staged file removed in finally.",
+  "authenticated_read_attempt": {
+    "method": "GET",
+    "endpoint": "https://api.elevenlabs.io/v1/user/subscription",
+    "result": "proxy_tunnel_blocked_before_api",
+    "proxy_status": 403,
+    "account_response_received": false
+  },
+  "unauthenticated_connectivity_probes": {
+    "endpoint": "https://api.elevenlabs.io/v1/models",
+    "default_permissions": "proxy_tunnel_blocked_403",
+    "additional_network_permission": "proxy_tunnel_blocked_403"
+  },
+  "network_secret_configured": false,
+  "credential_validity_verified": false,
+  "quota_verified": false,
+  "overage_disabled_verified": false,
+  "generation_requests": 0,
+  "spend_in_this_task": 0,
+  "commercial_license_verified": false,
+  "active_generation_route": "ElevenLabs plugin in parent/root only; parent reported successful creative_get_flow_node_types read.",
+  "plugin_tools_available_in_this_session": false,
+  "generation_receipts_or_ids": [],
+  "local_rest_generation_abandoned": true,
+  "next_step": "Parent/root consumes the exact pilot prompts, checks live creative-studio node schema and account/no-overage constraints, then executes the pilot once through the connected plugin. No parallel REST generation or second credential setup."
+}

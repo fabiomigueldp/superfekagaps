@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "pilot_id": "sfg-guaira-pilot-01",
+  "status": "prepared_not_generated",
+  "music": [
+    {
+      "cue_id": "mus_guaira",
+      "variant": "a",
+      "title": "Caminho de casa",
+      "model_id": "music_v2_5",
+      "duration_seconds": 40,
+      "output_format": "mp3_48000_192",
+      "prompt": "Original instrumental score for a warm, playful Brazilian small-town platform adventure. 40 seconds, approximately 96 BPM, 4/4, D major with an occasional gentle mixolydian color. Dry nylon-string acoustic guitar and Brazilian viola caipira trade short phrases; warm rounded electric bass; light wooden blocks and muted metal taps. A modest hero who is brave, slightly clumsy and lovable. Introduce this proposed five-note Feka motif clearly on plucked strings: D4 F-sharp4 A4 E4 D4, with eighth, eighth, quarter, eighth, dotted-quarter rhythm. Leave answering rests; exact notation is a guide. Occasional short, soft nonverbal whistles only between string phrases, never a continuous whistled lead. First 5 seconds establish the walk, 5-20 seconds state and answer the motif, 20-35 seconds gently vary bass and accompaniment, last 5 seconds return to the opening harmony with a clean edit-friendly tail. Keep percussion sparse and the midrange open for short gameplay warning sounds. Close, tactile, intimate sound; restrained stereo width, stable center bass. Comic warmth comes from pauses and small rhythmic surprises. No sung or spoken words, no choir, no imitation of any artist, no recognizable existing melody, no cinematic risers, no big trailer drums, no fruit sounds. This is a listening proposal; a seamless loop will be edited and verified separately."
+    },
+    {
+      "cue_id": "mus_guaira",
+      "variant": "b",
+      "title": "Pátio em movimento",
+      "model_id": "music_v2_5",
+      "duration_seconds": 40,
+      "output_format": "mp3_48000_192",
+      "prompt": "Original instrumental score for the same warm, comic Brazilian small-town platform adventure. 40 seconds, approximately 108 BPM, 4/4, D major. A more nimble, syncopated alternative: dry Brazilian viola caipira answers muted nylon guitar, elastic but rounded electric bass, wooden rim taps, small muted metallic clicks and a very light shaker. Keep the local acoustic identity foregrounded. Proposed Feka motif: D4 F-sharp4 A4 E4 D4, eighth, eighth, quarter, eighth, dotted-quarter rhythm; playful compact phrasing and short gaps, not a nonstop solo. First 4 seconds launch the groove, 4-18 seconds present the motif, 18-32 seconds respond with bass and viola, 32-40 seconds bring back the opening figure and provide an edit-friendly tail. One or two brief soft nonverbal whistle answers, never human words. Make the comedy confident and lightly awkward through offbeat accents, not slapstick crashes. Leave room around the attack of gameplay warnings and jumps. Dry close sound, gentle stereo placement, mono-compatible centered bass. No lyrics, speech, choir, artist imitation, familiar copyrighted melody, epic orchestration, busy cymbals or fruit sounds. This is a contrasting listening proposal, not a promised seamless loop."
+    }
+  ],
+  "sfx": [
+    {
+      "cue_id": "sfx_feka_jump", "title": "Salto do Feka", "duration_seconds": 0.5, "loop": false,
+      "a": "One short stylized platform-game jump: a tiny dry wooden tick into a soft rising elastic air flick, immediate attack and fast clean decay. Friendly and agile, no musical phrase. One event only, near-field, centered mono-compatible. No voice, music, fruit, water or reverb tail.",
+      "b": "One short stylized platform-game jump: a light muted metal tap with a rounded upward rubbery pitch flick. Slightly brighter than a wooden jump, still soft and quick. One immediate event, clean ending, centered mono-compatible. No voice, music, fruit, water or reverb tail."
+    },
+    {
+      "cue_id": "sfx_water_clean", "title": "Água pública limpa", "duration_seconds": 1.5, "loop": true,
+      "a": "Seamless short loop of a modest clean freshwater stream trickling through a small open stone channel. Fine bright irregular splashes, thin freely flowing liquid, relaxed airy detail, close but quiet. Steady texture with no start or stop gesture. No thick bubbles, suction, syrup, fruit, machinery, voice or music. Centered mono-compatible.",
+      "b": "Seamless short loop of clean tap water gently flowing into a shallow channel. Light clear pattering droplets and a soft continuous transparent flow, no deep gurgle. Slightly more individual drops, same quiet intensity. Steady texture without opening or closing tap sounds. No viscous liquid, fruit, machinery, voice or music. Centered mono-compatible."
+    },
+    {
+      "cue_id": "sfx_juice_viscous", "title": "Suco roxo viscoso", "duration_seconds": 1.5, "loop": true,
+      "a": "Seamless short loop of fictional thick purple industrial liquid slowly circulating in a squat metal pipe. Low rounded glugs, sticky pulling texture, slow heavy bubbles collapsing, slightly rubbery viscosity. Restrained comic texture, no horror. Constant motion without start or stop gesture. Clearly thicker and darker than clean running water. No fruit cutting, chewing, squeezing or pouring from a bottle; no voice or music. Centered mono-compatible.",
+      "b": "Seamless short loop of fictional dense purple machine fluid moving through a narrow chamber. Soft suction pulses and muffled sticky bubble pops with slow syrup-like drag, a little elastic but not a cartoon voice. Continuous even texture, no discrete discharge. Distinct from thin sparkling water. No fruit processing, eating, horror, speech or music. Centered mono-compatible."
+    },
+    {
+      "cue_id": "sfx_machine_warning", "title": "Máquina: aviso", "duration_seconds": 0.75, "loop": false,
+      "a": "One clear short machine warning cue for a friendly industrial platform game: two crisp hollow metal ticks, the second a little higher, followed by brief silence. Immediate first transient, compact midrange, dry clean end. Communicates prepare to dodge, not an impact. No pressure hiss, liquid discharge, police siren, fruit, voice or music. Centered mono-compatible.",
+      "b": "One clear short machine warning cue: two muted resonant metal pips with a slightly brighter second strike, precisely separated and quickly damped. Same two-event rising warning identity, moderate intensity, immediate attack. No continuous alarm, pressure hiss, liquid impact, fruit, speech or music. Dry and centered mono-compatible."
+    },
+    {
+      "cue_id": "sfx_machine_pressure", "title": "Máquina: pressão", "duration_seconds": 1.5, "loop": false,
+      "a": "A compact industrial machine charging pressure: subdued low air tension rises under three small rounded valve pulses, growing denser, then stops cleanly before release. One build-up only; no discharge or bang. Tactile metal housing, restrained bass audible on small speakers through mid harmonics. No warning bell, fruit, voice, musical beat or long reverb. Centered mono-compatible.",
+      "b": "A small fictional pump building pressure: soft compressed-air friction climbs with three dry mechanical pulses and a gentle elastic metal creak, ending ready to release without actually firing. One short rising build, no explosion or tail. Same readable pressure identity, slightly more mechanical than airy. No warning pips, fruit, voice or music. Centered mono-compatible."
+    },
+    {
+      "cue_id": "sfx_machine_discharge", "title": "Máquina: descarga", "duration_seconds": 1.0, "loop": false,
+      "a": "One brief fictional purple-fluid machine discharge: immediate rounded pneumatic thump, a short thick viscous gush, then a tiny wet sticky tail that stops cleanly. Readable force without explosive loudness. Distinct from clear water and from a warning or charging sound. No debris shower, fruit, eating, speech, music or cavern reverb. Centered mono-compatible.",
+      "b": "One short industrial valve release carrying dense fictional purple liquid: immediate dry valve clack, compact pressurized chuff and low rubbery glug, rapidly decaying with a small sticky finish. Same clear discharge timing, slightly more metal detail. No extended hiss, explosion, clear-water spray, fruit, voice or music. Centered mono-compatible."
+    }
+  ]
+}
