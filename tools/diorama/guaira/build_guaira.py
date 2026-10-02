@@ -1,4 +1,4 @@
-"""Original, deterministic Guaíra candidate. Blender 4.3+, CPU Cycles.
+"""Second polish pass of the original deterministic Guaíra candidate. Blender 4.3+, CPU Cycles.
 blender -b -t 8 --python source/build_guaira.py -- --output-dir . [--draft]
 No campaign identifiers, no changes outside output directory.
 """
@@ -162,6 +162,252 @@ for a in [0,math.pi/3,2*math.pi/3]:beam('Cart wheel spoke',(x-.17*math.cos(a),y,
 # A light worn material texture at prop scale, never over the route.
 for m in [soil,sun,plaster,roof]:
  nt=m.node_tree;p=nt.nodes.get('Principled BSDF');n=nt.nodes.new('ShaderNodeTexNoise');n.inputs['Scale'].default_value=7;b=nt.nodes.new('ShaderNodeBump');b.inputs['Strength'].default_value=.12;b.inputs['Distance'].default_value=.04;nt.links.new(n.outputs['Fac'],b.inputs['Height']);nt.links.new(b.outputs[0],p.inputs['Normal'])
+# Second authored pass: civic craft, geological strata, and connected irrigation.
+# Walk geometry and camera contract are deliberately untouched.
+random.seed(61027)
+def remove_prefix(*prefixes):
+ for o in list(bpy.data.objects):
+  if any(o.name.startswith(p) for p in prefixes):bpy.data.objects.remove(o,do_unlink=True)
+cream=mat('Civic limestone trim','E3C394');warmwhite=mat('Weathered civic stucco','D7BA8B');claydark=mat('Iron-rich clay seams','90442C');claylight=mat('Fresh terracotta breaks','C86C39');sand=mat('Weathered dry crust','CB8850');bank=mat('Compacted irrigation banks','9E7847');wetstone=mat('Old canal sandstone','9A9474');patina=mat('Bronze aged patina','567568',.52,.45);tiledeep=mat('Curved tile shadow','93442A');fadedpurple=mat('Civic plum cloth','805180');leafdark=mat('Cactus shaded ribs','405D30');leaflight=mat('Cactus sun ribs','759747');reed=mat('Golden rice tips','C6BA60');crackmat=mat('Fine deep drought fissures','874C32');waterdeep=mat('Irrigated cyan shallows','348F9B',.22)
+def set_color(material,h):
+ c=[int(h[k:k+2],16)/255 for k in (0,2,4)];c=[v/12.92 if v<=.04045 else ((v+.055)/1.055)**2.4 for v in c];material.diffuse_color=(*c,1);material.node_tree.nodes.get('Principled BSDF').inputs['Base Color'].default_value=(*c,1)
+set_color(water,'168F9B');set_color(rice,'3D7228');set_color(ricehi,'66932E');set_color(reed,'A99C45')
+for material in [water,rice,ricehi]:material.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].default_value=.14
+water.node_tree.nodes.get('Principled BSDF').inputs['Roughness'].default_value=.38
+# Fine deterministic tonal finish replaces the flat-looking top and paved ribbon.
+def color_noise(m,colors,scale,detail=2):
+ nt=m.node_tree;bs=nt.nodes.get('Principled BSDF');noise=nt.nodes.new('ShaderNodeTexNoise');noise.inputs['Scale'].default_value=scale;noise.inputs['Detail'].default_value=detail;noise.inputs['Roughness'].default_value=.68
+ ramp=nt.nodes.new('ShaderNodeValToRGB');ramp.color_ramp.elements.remove(ramp.color_ramp.elements[1]);
+ for i,(pos,h) in enumerate(colors):
+  el=ramp.color_ramp.elements[0] if i==0 else ramp.color_ramp.elements.new(pos);el.position=pos;c=[int(h[k:k+2],16)/255 for k in (0,2,4)];el.color=(*[s/12.92 if s<=.04045 else ((s+.055)/1.055)**2.4 for s in c],1)
+ nt.links.new(noise.outputs['Fac'],ramp.inputs['Fac']);nt.links.new(ramp.outputs['Color'],bs.inputs['Base Color'])
+color_noise(soil,[(.2,'A94F2B'),(.8,'CA7242')],3.2)
+color_noise(sun,[(.18,'B35A31'),(.82,'D78145')],4.2)
+color_noise(trail,[(.2,'C98B52'),(.52,'D39B60'),(.8,'E0AD72')],8)
+color_noise(bank,[(.2,'916D46'),(.8,'B28D58')],6)
+color_noise(plaster,[(.18,'D8B888'),(.82,'EAD2A4')],5)
+# Additional very fine dry grit on the walk material is shading, never topology.
+nt=trail.node_tree;no=nt.nodes.new('ShaderNodeTexNoise');no.inputs['Scale'].default_value=85;b=nt.nodes.new('ShaderNodeBump');b.inputs['Strength'].default_value=.17;b.inputs['Distance'].default_value=.012;nt.links.new(no.outputs['Fac'],b.inputs['Height']);nt.links.new(b.outputs['Normal'],nt.nodes.get('Principled BSDF').inputs['Normal'])
+# Feathered dust coloration softens the engineered mesh outline. This only
+# edits the walk material; every authored vertex and support face stays intact.
+nt=trail.node_tree;nodes=nt.nodes;links=nt.links;bs=nodes.get('Principled BSDF')
+oldcolor=bs.inputs['Base Color'].links[0].from_socket
+geom=nodes.new('ShaderNodeNewGeometry');split=nodes.new('ShaderNodeSeparateXYZ');links.new(geom.outputs['Position'],split.inputs[0]);xy=nodes.new('ShaderNodeCombineXYZ');links.new(split.outputs['X'],xy.inputs['X']);links.new(split.outputs['Y'],xy.inputs['Y'])
+def vop(op,a,b=None):
+ n=nodes.new('ShaderNodeVectorMath');n.operation=op
+ if hasattr(a,'node'):links.new(a,n.inputs[0])
+ else:n.inputs[0].default_value=a
+ if b is not None:
+  if hasattr(b,'node'):links.new(b,n.inputs[1])
+  else:n.inputs[1].default_value=b
+ return n
+nearest=None
+for rr in ROUTES:
+ for aa,bb in zip(rr,rr[1:]):
+  aa=Vector((aa[0],aa[1],0));bb=Vector((bb[0],bb[1],0));dv=bb-aa
+  rel=vop('SUBTRACT',xy.outputs[0],aa);dot=vop('DOT_PRODUCT',rel.outputs[0],dv/dv.length_squared)
+  clamp=nodes.new('ShaderNodeClamp');links.new(dot.outputs['Value'],clamp.inputs['Value'])
+  mul=vop('SCALE',dv);links.new(clamp.outputs[0],mul.inputs['Scale']);delta=vop('SUBTRACT',rel.outputs[0],mul.outputs[0]);dist=vop('LENGTH',delta.outputs[0]).outputs['Value']
+  if nearest is None:nearest=dist
+  else:
+   mn=nodes.new('ShaderNodeMath');mn.operation='MINIMUM';links.new(nearest,mn.inputs[0]);links.new(dist,mn.inputs[1]);nearest=mn.outputs[0]
+for pp in NODES.values():
+ d=vop('DISTANCE',xy.outputs[0],(pp[0],pp[1],0)).outputs['Value'];sub=nodes.new('ShaderNodeMath');sub.operation='SUBTRACT';links.new(d,sub.inputs[0]);sub.inputs[1].default_value=.27
+ mn=nodes.new('ShaderNodeMath');mn.operation='MINIMUM';links.new(nearest,mn.inputs[0]);links.new(sub.outputs[0],mn.inputs[1]);nearest=mn.outputs[0]
+ramp=nodes.new('ShaderNodeMapRange');links.new(nearest,ramp.inputs['Value']);ramp.inputs['From Min'].default_value=.27;ramp.inputs['From Max'].default_value=.49;ramp.inputs['To Min'].default_value=0;ramp.inputs['To Max'].default_value=.82
+mix=nodes.new('ShaderNodeMixRGB');links.new(ramp.outputs['Result'],mix.inputs[0]);links.new(oldcolor,mix.inputs[1]);mix.inputs[2].default_value=sun.diffuse_color;links.new(mix.outputs[0],bs.inputs['Base Color'])
+# Remove regular rim pegs, replacing them with an irregular continuous sediment face.
+remove_prefix('Faceted edge ')
+base=bpy.data.objects['Continuous clay island'];N=9
+ring=[Vector(v.co) for v in base.data.vertices[18:27]]
+# Keep the original continuous solid clay core behind the fractured skin.
+# This closes all joints, including the left platform and low front seams.
+# Interlocking angular cliff panels match the original top contour. The
+# silhouette uses shared seams and irregular chips, never a repeated peg ring.
+for face in range(9):
+ pa,pb=ring[face],ring[(face+1)%9];tangent=(pb-pa).normalized();normal=Vector((tangent.y,-tangent.x,0));normal.normalize()
+ steps=5 if (pb-pa).length>4 else 4
+ cuts=[0]+sorted([i/steps+random.uniform(-.052,.052) for i in range(1,steps)])+[1]
+ for bay,(ta,tb) in enumerate(zip(cuts,cuts[1:])):
+  a,b=pa.lerp(pb,ta),pa.lerp(pb,tb);mid=(a+b)/2
+  top=random.uniform(1.69,1.78);zz=random.uniform(.15,.30);bulge=random.uniform(.05,.24);split=random.uniform(.69,1.14)
+  # Wide angular slabs fit the core face, with a broken bevel on each side.
+  vs=[tuple(a+Vector((0,0,top-a.z))),tuple(b+Vector((0,0,top-b.z))),
+      tuple(b*1.115+normal*bulge+Vector((0,0,split-b.z*1.115))),tuple(mid*1.135+normal*bulge+Vector((0,0,split*.91-mid.z*1.135))),
+      tuple(a*1.115+normal*bulge+Vector((0,0,split-a.z*1.115))),
+      tuple(a/0.9+Vector((0,0,zz-a.z/0.9))),tuple(b/0.9+Vector((0,0,zz-b.z/0.9))),
+      tuple(a*.95+Vector((0,0,top+.015-a.z*.95))),tuple(b*.95+Vector((0,0,top+.015-b.z*.95)))]
+  ob=mesh('Fitted fractured cliff %d %d'%(face,bay),vs,[(0,1,3),(1,2,3),(0,3,4),(4,3,5),(3,2,6,5),(0,7,8,1)],soil)
+  ob.data.materials.append(claylight);ob.data.materials.append(claydark)
+  for poly in ob.data.polygons:poly.material_index=1 if poly.index in [0,5] else 2 if (bay+poly.index)%4==0 else 0
+  bevel(ob,.008)
+  if bay%2==0:
+   # One angular sediment break is embedded in each alternating face.
+   seam=[(v[0],v[1],v[2]) for v in vs[2:5]]
+   curve('Broken horizontal sediment seam',seam,.017,claydark)
+# Layered smaller exposed shoulders within the island and at the civic terrace.
+for x,y,rx,ry in [(-3.25,-3.56,.66,.32),(-1.6,-3.63,.56,.28),(-5.5,1.85,.43,.45),(-1.7,1.82,.72,.29),(.05,1.25,.60,.28),(5.62,.85,.36,.62)]:
+ if clear(x,y,1.10):
+  rock('Low eroded shoulder',x,y,1.67,rx,ry,.22)
+  rock('Shoulder broken cap',x-.06,y+.03,1.84,rx*.65,ry*.65,.15)
+# Coherent branching drought fissures in generous dry interior patches.
+for ci,(x,y,sx,sy) in enumerate([(-2.8,-2.65,.6,.45),(-.7,-.12,1.0,.75),(-1.15,1.0,.60,.35),(-4.1,-3.55,.45,.25),(-5.2,.35,.35,.48),(.35,-3.70,.42,.22),(-3.45,2.8,.4,.3)]):
+ for k in range(8):
+  xx=x+random.uniform(-sx,sx);yy=y+random.uniform(-sy,sy)
+  if not clear(xx,yy,.69):continue
+  aa=random.uniform(0,math.tau);ps=[(xx,yy,1.764)]
+  for j in range(3):
+   aa+=random.uniform(-.6,.6);xx+=math.cos(aa)*random.uniform(.12,.25);yy+=math.sin(aa)*random.uniform(.12,.25)
+   if not clear(xx,yy,.65):break
+   ps.append((xx,yy,1.765+random.uniform(0,.002)))
+  if len(ps)>1:
+   curve('Branched soil fissure',ps,.009 if k%3 else .014,crackmat)
+   mid=ps[len(ps)//2];curve('Fissure fine branch',[mid,(mid[0]+.13*math.cos(aa+1.1),mid[1]+.13*math.sin(aa+1.1),1.766)],.007,crackmat)
+# Natural cactus groups have tapered stems and longitudinal ribs.
+def cactustip(n,p,r):
+ bpy.ops.mesh.primitive_uv_sphere_add(segments=10,ring_count=6,radius=r,location=p);ob=bpy.context.object;ob.name=n;ob.scale.z=.70;assign(ob,leaf)
+def cactus_ribbed(x,y,z,h,r=.10):
+ beam('Cluster cactus stem',(x,y,z),(x,y,z+h),r,leaf);cactustip('Rounded cactus tip',(x,y,z+h),r)
+ for k in range(7):
+  a=k*math.tau/7;curve('Long cactus rib',[(x+math.cos(a)*r,y+math.sin(a)*r,z+.08),(x+math.cos(a)*r*.98,y+math.sin(a)*r*.98,z+h-.035)],.012,leaflight if k%2 else leafdark)
+ for sg,f in [(-1,.43),(1,.66)]:
+  reach=r*2.3;beam('Curved cactus arm',(x,y,z+h*f),(x+sg*reach,y,z+h*f+.05),r*.62,leaf);beam('Cluster upright',(x+sg*reach,y,z+h*f+.05),(x+sg*reach,y,z+h*(f+.23)),r*.62,leaf);cactustip('Cactus arm tip',(x+sg*reach,y,z+h*(f+.23)),r*.62)
+def rosette(x,y,z,s,matl=leaflight):
+ for i in range(7):
+  a=i*math.tau/7;dx,dy=math.cos(a),math.sin(a);v=(-dy*.055*s,dx*.055*s,0)
+  mesh('Dry agave blade',[(x-v[0],y-v[1],z),(x+v[0],y+v[1],z),(x+dx*.22*s,y+dy*.22*s,z+.11*s),(x+dx*.32*s,y+dy*.32*s,z+.16*s)],[(0,1,2),(0,2,3)],matl)
+for gi,(x,y,h) in enumerate([(-5.58,.92,1.0),(-3.83,-3.15,.68),(-.86,-3.59,.64),(.34,.94,.79),(-1.89,3.33,.76),(5.71,1.10,.85)]):
+ if clear(x,y,1.05):
+  cactus_ribbed(x+.1,y,1.76,h,.085)
+  cactus_ribbed(x-.18,y+.1,1.76,h*.48,.065)
+  for j in range(3):
+   dx,dy=[(-.30,-.13),(.20,.22),(.34,-.06)][j]
+   if clear(x+dx,y+dy,1):rock('Cactus family stones',x+dx,y+dy,1.755,.11+.02*j,.08,.08+.03*j)
+  rosette(x+.28,y+.15,1.765,.6)
+# Civic facade: local stucco, projecting cornices, arched porch, and water crest.
+remove_prefix('Civic portico column','Civic portico beam','Civic ceramic water plaque','Casa da Vazao window')
+cube('Civic base plinth',(.6,3.53,2.48),(2.43,.35,.14),stone,.035)
+for x in [-.45,.6,1.65]:
+ cube('Porch column foot',(x,3.12,2.51),(.24,.25,.17),cream,.022)
+ cube('Porch stucco pier',(x,3.12,2.97),(.16,.19,.88),cream,.018)
+ cube('Porch column capital',(x,3.12,3.41),(.26,.26,.12),cream,.016)
+def arch(n,x,y,z,w,h,thick,material):
+ # Semicircular ring in the facade plane with actual empty opening.
+ vs=[]
+ for yy in [y-.045,y+.045]:
+  for r in [w/2,w/2+thick]:
+   for k in range(13):
+    a=k*math.pi/12;vs.append((x+r*math.cos(a),yy,z+h+r*math.sin(a)))
+ fs=[]
+ for k in range(12):fs.extend([(k,k+1,13+k+1,13+k),(26+k,39+k,39+k+1,26+k+1),(k,26+k,26+k+1,k+1),(13+k,13+k+1,39+k+1,39+k)])
+ mesh(n,vs,fs,material)
+for x in [.075,1.125]:arch('Porch open arc',x,3.12,2.4,.86,.73,.11,cream)
+cube('Civic porch entablature',(.6,3.12,3.62),(2.46,.30,.18),cream,.018)
+cube('Porch shadow cornice',(.6,3.08,3.76),(2.52,.34,.095),roof,.016)
+# Two shuttered upper windows and windowed side wall give the building all-around craft.
+for x in [-.16,1.33]:
+ cube('Upper dark window',(x,3.294,3.67),(.31,.05,.35),dark,.025)
+ for xx in [x-.13,x+.13]:cube('Civic teal shutters',(xx,3.245,3.67),(.11,.07,.32),patina,.012)
+ cube('Upper carved sill',(x,3.22,3.48),(.41,.15,.065),cream,.012)
+for y in [3.65,4.17]:
+ cube('Side recessed tall window',(1.768,y,3.29),(.035,.27,.62),dark,.018)
+ for yy in [y-.15,y+.15]:cube('Side window jamb',(1.798,yy,3.29),(.065,.045,.67),cream,.010)
+ cube('Side window lintel',(1.80,y,3.63),(.08,.35,.065),cream,.010)
+ cube('Side window transom',(1.805,y,3.35),(.065,.27,.034),timber,.004)
+# Modest central pediment rises from the existing roof rather than a boss-sized palace.
+vs=[(-.06,3.16,3.82),(1.26,3.16,3.82),(.6,3.16,4.48),(-.06,3.34,3.82),(1.26,3.34,3.82),(.6,3.34,4.48)]
+mesh('Civic central triangular pediment',vs,[(0,1,2),(3,5,4),(0,3,4,1),(0,2,5,3),(1,4,5,2)],plaster)
+for a,b in [((-.11,3.11,3.84),(.6,3.11,4.53)),((.6,3.11,4.53),(1.31,3.11,3.84))]:beam('Pediment terracotta coping',a,b,.065,roof)
+cube('Civic crest ceramic field',(.6,3.095,4.13),(.30,.055,.27),deep,.025)
+# Three bronze wavelets read as a water seal without baked text.
+for zz in [4.07,4.13,4.19]:curve('Bronze water crest',[(.49,3.058,zz),(.55,3.057,zz+.025),(.61,3.057,zz),(.67,3.057,zz-.022),(.72,3.057,zz)],.014,brass)
+# Small banners on the two side piers, short enough to keep every arrival visible.
+for x in [-.43,1.64]:
+ cube('Restrained civic cloth',(x,3.27,3.31),(.12,.035,.39),fadedpurple,.006)
+ beam('Banner brass rod',(x-.11,3.25,3.54),(x+.11,3.25,3.54),.018,brass)
+# Tile course joins turn the flat roof strips into a crafted clay roof.
+for obj in list(bpy.data.objects):
+ if obj.name.startswith(('Casa da Vazao ridge tile','Casa da Vazao back tile')):
+  obj.data.materials[0]=tiledeep
+for y,z in [(3.37,3.99),(3.55,4.10),(3.73,4.21),(4.10,4.21),(4.29,4.10),(4.48,3.99)]:
+ beam('Civic overlapping tile course',(-.66,y,z),(1.86,y,z),.025,roofhi)
+# Bronze manifold has flanges, brackets and a legible meter, independent of the mystery tank.
+for x,y,z in [(2.80,3.7,3.0),(3.40,3.0,2.8),(4.08,3.0,2.8)]:
+ for dx in [-.055,.055]:
+  ob=cyl('Diversion flanged collar',(x+dx,y,z),.10,.025,brass);ob.rotation_euler.y=math.pi/2
+for x,y,z in [(2.80,3.7,3.0),(3.40,3.0,2.8)]:
+ beam('Pipe support bracket',(x,y,2.1),(x,y,z),.038,wood)
+# Dial faces toward the same viewing camera; no written labels.
+beam('Civic meter neck',(1.85,3.7,3.0),(1.85,3.7,3.30),.035,brass)
+ob=cyl('Civic bronze pressure gauge',(1.85,3.64,3.34),.14,.055,brass,24);ob.rotation_euler.x=math.pi/2
+ob=cyl('Pressure gauge ivory face',(1.85,3.605,3.34),.11,.015,bone,24);ob.rotation_euler.x=math.pi/2
+beam('Pressure gauge needle',(1.85,3.59,3.34),(1.81,3.59,3.40),.012,dark)
+# Mysterious purple material stays sealed and visibly separate from the clean supply.
+bpy.data.materials['Separate clandestine juice tank'].name='Sealed mysterious purple slime'
+for xx in [-1.18,-.82]:beam('Mystery tank cage',(xx,3.65,2.60),(xx,3.65,3.41),.026,brass)
+for z in [2.73,3.20]:
+ ob=cyl('Mystery tank thin bronze collar',(-1,3.8,z),.247,.022,brass,20)
+# Irrigation: three larger ponds share an earthen terrace and common cyan channels.
+remove_prefix('Paddy ','Rice tuft','Paddy earthen bank','Lower paddy feed','Paddy lateral inlet','Lower return','Field feeder')
+# Low contiguous banks retain the island surface, avoiding separate tray silhouettes.
+terraces=[('Upper',[(3.72,-.38),(5.58,-.38),(5.77,-1.32),(5.55,-1.91),(3.70,-1.91)]),('Lower',[(3.77,-2.04),(5.55,-2.04),(5.65,-3.64),(5.30,-3.94),(3.74,-3.93)]),('Cross',[(1.13,-3.39),(3.49,-3.36),(3.78,-3.64),(3.52,-4.26),(1.03,-4.25)])]
+def patch(n,points,z,material):return mesh(n,[(x,y,z) for x,y in points],[tuple(range(len(points)))],material)
+for name,pts in terraces:
+ patch('Connected '+name+' earth terrace',pts,1.787,bank)
+ # Water inset uses a shared bank material rather than a raised toy frame.
+ cx=sum(p[0] for p in pts)/len(pts);cy=sum(p[1] for p in pts)/len(pts);inner=[(cx+(x-cx)*.89,cy+(y-cy)*.86) for x,y in pts]
+ patch(name+' cyan irrigated paddy',inner,1.81,water)
+ # Broken, modest-height sandstone blocks sit in the broad earthen banks.
+ for a,b in zip(pts,pts[1:]+pts[:1]):
+  av,bv=Vector(a),Vector(b);ll=(bv-av).length;steps=max(1,round(ll/.30))
+  for i in range(steps):
+   p=av.lerp(bv,(i+.5)/steps)
+   if not clear(p.x,p.y,.56):continue
+   ob=cube('Embedded old paddy bank stone',(p.x,p.y,1.835),(.27,.14,.105),wetstone,.026);ob.rotation_euler.z=math.atan2(b[1]-a[1],b[0]-a[0]);ob.rotation_euler.z+=random.uniform(-.035,.035)
+ # Ordered but hand-planted rice clumps; readable channels remain between rows.
+ xmin,xmax=min(x for x,y in inner),max(x for x,y in inner);ymin,ymax=min(y for x,y in inner),max(y for x,y in inner)
+ for row in range(round((ymax-ymin)/.24)):
+  for col in range(round((xmax-xmin)/.24)):
+   xx=xmin+.12+col*.24+random.uniform(-.025,.025);yy=ymin+.12+row*.24+random.uniform(-.025,.025)
+   if xx>xmax-.1 or yy>ymax-.1:continue
+   # Polygon inside test; keeps rice entirely inside the water bank.
+   inside=False;j=len(inner)-1
+   for i in range(len(inner)):
+    xi,yi=inner[i];xj,yj=inner[j]
+    if (yi>yy)!=(yj>yy) and xx<(xj-xi)*(yy-yi)/(yj-yi)+xi:inside=not inside
+    j=i
+   if not inside:continue
+   for blade in range(5):
+    a=blade*2.4;h=random.uniform(.18,.32);lean=.075+random.random()*.035
+    mesh('Curved rice leaves',[(xx-.031,yy,1.82),(xx+.031,yy,1.82),(xx+math.cos(a)*lean*.45,yy+math.sin(a)*lean*.45,1.82+h*.75),(xx+math.cos(a)*lean,yy+math.sin(a)*lean,1.82+h)],[(0,1,2),(0,2,3)],rice if blade%2 else ricehi)
+   if (row+col)%4==0:beam('Rice grain head',(xx,yy,2.02),(xx+.035,yy,2.08),.012,reed)
+# All irrigated beds connect to the existing water descent and crossing.
+channel('Shared field supply',(4.5,1.55,1.86),(4.5,-.30,1.82),.48)
+channel('Eastern communicating canal',(5.45,-.55,1.825),(5.45,-3.88,1.825),.24)
+channel('Lower shared outflow',(5.42,-3.85,1.825),(3.38,-3.85,1.825),.27)
+channel('Bridge lateral clean inlet',(4.35,-1.74,1.825),(2.56,-1.74,1.825),.40)
+# Canal banks stop outside the unchanged crossing, preserving all sprite feet.
+remove_prefix('Bridge lateral clean inlet retaining lip')
+for yy in [-1.94,-1.54]:beam('Bridge bank stops before walk',(4.35,yy,1.825),(3.68,yy,1.825),.055,stone)
+# Subtle short ripples reinforce flow without busy animated-looking decoration.
+for x,y,ll in [(4.50,1.15,.18),(4.50,.62,.18),(5.46,-1.64,.13),(5.46,-2.52,.13),(4.1,-3.85,.20)]:
+ curve('Quiet canal glint',[(x-ll/2,y,1.837),(x,y-.017,1.839),(x+ll/2,y,1.837)],.007,white)
+# Bank-side tools make irrigation feel worked, kept away from the walk crossing.
+for x,y in [(5.60,-.17),(5.78,-2.02),(4.14,-4.13)]:
+ cyl('Water keeper bucket',(x,y,1.88),.085,.19,timber,12)
+ for zz in [1.815,1.95]:cyl('Bucket bronze hoop',(x,y,zz),.09,.019,brass,12)
+ curve('Bucket loop handle',[(x-.083,y,1.98),(x-.055,y,2.07),(x+.055,y,2.07),(x+.083,y,1.98)],.012,dark)
+beam('Irrigation rake handle',(5.68,-2.24,1.80),(5.82,-2.05,2.18),.018,timber)
+beam('Irrigation rake head',(5.63,-2.29,1.80),(5.78,-2.29,1.80),.018,wood)
+for xx in [5.64,5.68,5.72,5.76]:beam('Rake teeth',(xx,-2.29,1.8),(xx,-2.35,1.8),.010,wood)
+# The reservoir receives laid masonry, a low cyan lip, and bank vegetation.
+for k in range(22):
+ a=k*math.tau/22;xx=4.5+math.cos(a)*1.0;yy=3.2+math.sin(a)*1.0
+ if yy<2.40 and abs(xx-4.5)<.35:continue
+ ob=cube('Reservoir laid rim stone',(xx,yy,2.66),(.29,.19,.22),wetstone,.04);ob.rotation_euler.z=a+math.pi/2
+for x,y,s in [(5.70,-3.63,.66),(5.88,-1.50,.62),(5.76,.0,.66),(4.84,-4.11,.48),(1.03,-4.00,.5),(5.41,2.55,.8),(4.0,4.03,.7)]:
+ if clear(x,y,.9):rosette(x,y,1.77 if y<2 else 2.4,s,leaf)
+
 scene=bpy.context.scene;bpy.ops.object.camera_add(location=(11,-20,18.85));cam=bpy.context.object;target=Vector((0,.25,3.0));cam.rotation_euler=(target-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.type='ORTHO';cam.data.ortho_scale=20.6;scene.camera=cam
 world=bpy.data.worlds.new('Warm dry atmosphere');scene.world=world;world.use_nodes=True;world.node_tree.nodes['Background'].inputs[0].default_value=(.62,.58,.80,1);world.node_tree.nodes['Background'].inputs[1].default_value=.55
 for n,p,e,s,c in [('golden key',(-8,-10,19),2400,9,(1,.83,.65)),('lilac fill',(8,3,13),1700,8,(.73,.70,1)),('warm rim',(-4,10,17),1800,7,(.96,.90,1))]:

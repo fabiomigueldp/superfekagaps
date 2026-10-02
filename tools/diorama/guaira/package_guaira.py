@@ -7,6 +7,7 @@ from PIL import Image
 parser = argparse.ArgumentParser()
 parser.add_argument('--input', type=Path, required=True)
 parser.add_argument('--output', type=Path, required=True)
+parser.add_argument('--quality', type=int, default=92, choices=range(1, 101), help='WebP quality; 92 preserves the polish within the original payload budget')
 args = parser.parse_args()
 image = Image.open(args.input / 'guaira-diorama.png').convert('RGBA')
 assert image.size == (1920, 1200), 'Never package a --draft render'
@@ -22,6 +23,6 @@ metadata['artBounds'] = dict(zip(['left', 'top', 'right', 'bottom'], [bounds[0] 
 metadata['status'] = 'experimental-isolated-map'
 metadata['note'] = 'Projected Blender geometry for the isolated Guaíra experiment. No campaign world number, save schema, or persistent progress.'
 args.output.mkdir(parents=True, exist_ok=True)
-image.save(args.output / 'guaira-diorama.webp', quality=94, method=6, exact=True)
+image.save(args.output / 'guaira-diorama.webp', quality=args.quality, method=6, exact=True)
 (args.output / 'guaira-diorama.meta.json').write_text(json.dumps(metadata, indent=2, ensure_ascii=False))
 print('Packaged 1920×1200 RGBA image and exact camera metadata.')
