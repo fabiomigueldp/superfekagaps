@@ -1,4 +1,5 @@
 import type { WorldGame } from '../../WorldGame';
+import type { GuairaReliefOptions, GuairaReliefRouteAPI } from './relief/GuairaReliefChallenge';
 
 export type GuairaInspectionRoomSceneId = 'gallery' | 'relief';
 export const INSPECTION_ROOMS = {
@@ -13,17 +14,19 @@ interface ExcursionRuntime {
 }
 export type GuairaInspectionRoomRuntime = ExcursionRuntime & (
     | { readonly sceneId: 'gallery' }
-    | { readonly sceneId: 'relief'; readonly reliefOpened: boolean }
+    | { readonly sceneId: 'relief'; readonly reliefOpened: boolean; readonly routes?: GuairaReliefRouteAPI }
 );
-export type GuairaInspectionRoomFactory = (canvas: HTMLCanvasElement, status: HTMLElement) => GuairaInspectionRoomRuntime;
+/** Third argument is only for a consumed Relief replay action; normal entries
+ * omit it. Optional routes in the structural runtime retain old host fixtures. */
+export type GuairaInspectionRoomFactory = (canvas: HTMLCanvasElement, status: HTMLElement, options?: GuairaReliefOptions) => GuairaInspectionRoomRuntime;
 
 /** Native optional rooms shared by chapter and free-map owners; no persistence. */
 export async function loadGuairaInspectionRoom(sceneId: GuairaInspectionRoomSceneId = 'gallery'): Promise<GuairaInspectionRoomFactory> {
     if (sceneId === 'relief') {
         const { GuairaRelief } = await import('./relief/GuairaRelief');
-        return (canvas, status) => {
-            const game = new GuairaRelief(canvas, status);
-            return { sceneId, game, get finished() { return !game.isDisposed && game.finished; },
+        return (canvas, status, options) => {
+            const game = new GuairaRelief(canvas, status, options);
+            return { sceneId, game, routes: game.routes, get finished() { return !game.isDisposed && game.finished; },
                 get reliefOpened() { return !game.isDisposed && game.reliefOpened; }, togglePause: () => game.toggleReliefPause() };
         };
     }
