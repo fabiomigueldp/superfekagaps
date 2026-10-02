@@ -78,7 +78,7 @@ export function drawGuairaBoss(c: CanvasRenderingContext2D, b: SkeletonBullModel
     c.save(); c.translate(-cx, -cy);
     drawBullWarning(c, b);
     drawSkeletonBull(c, b, reducedMotion);
-    for (const bone of b.bones) {
+    for (const bone of b.visibleBones) {
         rect(c, '#493444', bone.x - 1, bone.y - 1, 12, 9);
         rect(c, '#f0ddae', bone.x + 2, bone.y + 2, 6, 3);
         rect(c, '#f0ddae', bone.x, bone.y, 3, 7);

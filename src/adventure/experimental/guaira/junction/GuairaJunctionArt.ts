@@ -68,7 +68,7 @@ export function drawJunctionBackground(c: CanvasRenderingContext2D, cx: number, 
         pipe(c, 652 - cameraX, 208 - cameraY, 180, routing.supplied === 'b', t, reduced, true);
         r(c, 291 - cameraX, 270 - cameraY, 26, 23, P.pipe);
         r(c, 293 - cameraX, 272 - cameraY, 22, 19, P.bronze);
-        pixelText(c, routing.selected.toUpperCase(), 301 - cameraX, 277 - cameraY, routing.warning ? P.warning : P.ink);
+        pixelText(c, routing.supplied.toUpperCase(), 301 - cameraX, 277 - cameraY, routing.warning ? P.warning : P.ink);
         sign(c, 279 - cameraX, 308 - cameraY, 'A', 18);
         sign(c, 631 - cameraX, 180 - cameraY, 'B', 18);
         sign(c, 42 - cameraX, 264 - cameraY, 'BAIRRO', 47);
@@ -114,7 +114,7 @@ export function drawJunctionObjects(c: CanvasRenderingContext2D, objects: WorldO
                 // Raised border and ↓ shape identify an impact plate independently of state.
                 r(c, x - 2, y + 4, b.width + 4, 4, P.pipe); r(c, x, y + 2, b.width, 4, P.bronze);
                 r(c, x + 2, y + 1, b.width - 4, 2, routing.warning ? P.warning : P.deck);
-                pixelText(c, routing.selected.toUpperCase(), x + 13, y - 8, P.ink);
+                pixelText(c, 'A/B', x + 13, y - 8, P.ink);
                 r(c, x + 4, y - 5, 1, 4, P.ink); r(c, x + 2, y - 2, 5, 1, P.ink); r(c, x + 3, y - 1, 3, 1, P.ink);
                 continue;
             }
@@ -135,8 +135,18 @@ export function drawJunctionObjects(c: CanvasRenderingContext2D, objects: WorldO
                 line(c, x + 30, arrowY, x + 27, arrowY + 3 * d, P.ink);
             }
         }
-        for (const [x, y, kind] of [[108,296,'pump'],[421,248,'pump'],[848,200,'rice']] as const)
-            if (x > cameraX - 20 && x < cameraX + 340) drawGuairaWorker(c, x - cameraX, y - cameraY, kind,
-                { activeTimeMs: time, valveActive: routing.supplied === 'b', bridgeRise: routing.warning ? .5 : 1, reducedMotion: reduced });
+        for (const [x, y, kind, deckId] of [[108,296,'pump',G.liftAId],[421,248,'pump',G.liftBId],[848,200,'rice',G.liftBId]] as const) {
+            if (x <= cameraX - 20 || x >= cameraX + 340) continue;
+            const deck = objects.get(deckId)!;
+            const moving = Math.abs(deck.y - (deck.active ? deck.to!.y : G.dockY)) > .01;
+            const extension = (G.dockY - deck.y) / (G.dockY - deck.to!.y);
+            // Adapt the existing attention poses to this worker's actual deck.
+            // Warning uses "notice"; motion follows real target progress in either
+            // direction, then raised/docked decks relax/resume ordinary work.
+            drawGuairaWorker(c, x - cameraX, y - cameraY, kind, {
+                activeTimeMs: time, valveActive: routing.warning || moving || deck.active,
+                bridgeRise: routing.warning ? 0 : deck.active ? extension : 1 - extension, reducedMotion: reduced,
+            });
+        }
     });
 }

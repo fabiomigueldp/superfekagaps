@@ -14,6 +14,7 @@ export class SkeletonBullModel implements Box {
     x: number; y: number; state: BullState = 'intro'; stateTick = 0; tick = 0;
     health: number = BULL_RULES.health; facing: -1 | 1 = -1; cycle = 0;
     bones: Bone[] = []; events: BullEvent[] = []; private frameHazards: Box[] = [];
+    private departedBonePoses: Box[] = [];
     private chargeSweeps: Box[] = [];
     private remainder = 0; private hitThisOpening = false;
     private boneFlightTicks = 0;
@@ -26,6 +27,8 @@ export class SkeletonBullModel implements Box {
     get warningTicks() { return this.state === 'rattle' ? BULL_RULES.rattle : BULL_RULES.tell; }
     get warningProgress() { return Math.min(1, this.stateTick / this.warningTicks); }
     get hazards(): readonly Box[] { return this.frameHazards; }
+    /** Render-only endpoints of departed bones live as long as this update's sweeps. */
+    get visibleBones(): readonly Box[] { return [...this.bones, ...this.departedBonePoses]; }
     get chargeLane(): Box { return { x: this.arena.left + 12, y: this.arena.floor - 28, width: this.arena.right - this.arena.left - 24, height: 28 }; }
     private enter(state: BullState) { this.state = state; this.stateTick = 0; }
     private emit(kind: BullEvent['kind']) { this.events.push({ kind, tick: this.tick }); }
@@ -51,7 +54,7 @@ export class SkeletonBullModel implements Box {
     }
     /** Maximum 100ms catch-up: tab resumption cannot silently consume an entire tell. */
     update(dtMs: number, player: Box) {
-        this.events = []; this.frameHazards = []; this.chargeSweeps = [];
+        this.events = []; this.frameHazards = []; this.chargeSweeps = []; this.departedBonePoses = [];
         if (!Number.isFinite(dtMs) || dtMs <= 0) return;
         this.remainder += Math.min(dtMs, 100);
         while (this.remainder + 1e-7 >= BULL_RULES.tickMs) {
@@ -65,7 +68,12 @@ export class SkeletonBullModel implements Box {
         this.tick++; this.stateTick++;
         if (this.state === 'defeated') return;
         for (const bone of this.bones) { const oldX = bone.x; bone.x += bone.vx; bone.life--; this.frameHazards.push(swept(bone, oldX)); }
-        this.bones = this.bones.filter(b => b.life > 0 && b.x > this.arena.left && b.x + b.width < this.arena.right);
+        this.bones = this.bones.filter(b => {
+            const active = b.life > 0 && b.x > this.arena.left && b.x + b.width < this.arena.right;
+            // Keep each last pose across all fixed steps in this update, just like its sweep.
+            if (!active) this.departedBonePoses.push({ x: b.x, y: b.y, width: b.width, height: b.height });
+            return active;
+        });
         switch (this.state) {
             case 'intro': if (this.stateTick >= 60) this.enter('idle'); break;
             case 'idle': if (this.stateTick >= 24) this.warn(player); break;
@@ -81,20 +89,20 @@ export class SkeletonBullModel implements Box {
                 break;
             }
             case 'brake': if (this.stateTick >= BULL_RULES.brake) this.enter('recover'); break;
-            case 'recover': if (this.stateTick >= BULL_RULES.recover) { this.bones = []; this.enter('idle'); } break;
+            case 'recover': if (this.stateTick >= BULL_RULES.recover) { this.bones = []; this.departedBonePoses = []; this.enter('idle'); } break;
             case 'rattle': if (this.stateTick >= BULL_RULES.rattle) {
                 const origin = this.x + this.width / 2;
                 this.bones = [0, BONE.spacing].map(offset => ({ x: origin - this.facing * offset, y: this.arena.floor - 9, width: BONE.width, height: 7, vx: this.facing * BONE.speed, life: this.boneFlightTicks }));
                 this.enter('bones'); this.emit('bones');
             } break;
-            case 'bones': if (this.stateTick >= this.boneFlightTicks) { this.bones = []; this.frameHazards = []; this.enter('recover'); } break;
+            case 'bones': if (this.stateTick >= this.boneFlightTicks) { this.bones = []; this.frameHazards = []; this.departedBonePoses = []; this.enter('recover'); } break;
             case 'hurt': if (this.stateTick >= BULL_RULES.hurt) this.enter('idle'); break;
         }
     }
     /** Only a falling top contact from the real Player can punish an opening. */
     private tryHit(attack: Box): boolean {
         if (!this.vulnerable || !intersects(this, attack)) return false;
-        this.hitThisOpening = true; this.health--; this.bones = []; this.frameHazards = [];
+        this.hitThisOpening = true; this.health--; this.bones = []; this.frameHazards = []; this.departedBonePoses = [];
         this.emit(this.health <= 0 ? 'defeated' : 'hit'); this.enter(this.health <= 0 ? 'defeated' : 'hurt'); return true;
     }
     contact(player: Box, previous: Box, falling: boolean): 'none' | 'hurt' | 'bounce' | 'hit' | 'defeated' {

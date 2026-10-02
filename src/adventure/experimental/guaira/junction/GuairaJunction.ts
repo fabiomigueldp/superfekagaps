@@ -1,6 +1,7 @@
 import { WorldGame } from '../../../WorldGame';
 import type { AdventureStage } from '../../../types';
 import { pixelText, panel } from '../../../../graphics/BitmapFont';
+import { supportsStanding } from '../../../../world/tileRules';
 import { guairaReturnHref } from '../GuairaMapModel';
 import { GUAIRA_JUNCTION as G, JunctionRouting, guairaJunctionStage } from './GuairaJunctionModel';
 import { drawJunctionBackground, drawJunctionTerrain, drawJunctionObjects } from './GuairaJunctionArt';
@@ -107,6 +108,16 @@ export class GuairaJunction extends WorldGame {
         pixelText(c, `AGUA ${this.routing.supplied.toUpperCase()}`, 224, 8, '#aad9d2');
         pixelText(c, 'II', 305, 8, '#f3ddb1');
         const p = this.player.data, feet = p.position.y + p.height;
+        // Observe native support, including a partial overlap at a deck edge.
+        // Height alone confuses the low part of a successful ride with a fall.
+        const deck = p.isGrounded ? [G.liftAId, G.liftBId].map(id => this.objects.get(id)!).find(b =>
+            Math.abs(feet - b.y) < .01 && p.position.x + p.width > b.x && p.position.x < b.x + b.width) : undefined;
+        const supportRow = this.level.worldToRow(feet + .01);
+        let onRecovery = false;
+        if (p.isGrounded && !deck && feet > 336 && Math.abs(feet - this.level.rowToWorldY(supportRow)) < .01)
+            for (let col = this.level.worldToCol(p.position.x); col <= this.level.worldToCol(p.position.x + p.width - .1); col++)
+                if (supportsStanding(this.level.getTile(col, supportRow))) onRecovery = true;
+        const nextOutlet = this.routing.selected === 'a' ? 'B' : 'A';
         const nearPlate = p.position.x < 216 && feet <= 320 || p.position.x >= 410 && p.position.x < 565 && feet <= 272;
         const playerTop = p.position.y - Math.round(this.camera.y) - 4;
         const bannerWouldCoverPlayer = playerTop < 47 && feet - Math.round(this.camera.y) > 28;
@@ -118,18 +129,19 @@ export class GuairaJunction extends WorldGame {
         } else if (!bannerWouldCoverPlayer && (this.finished || this.routing.warning || this.moving || nearPlate)) {
             panel(c, 19, 28, 282, 19, '#382f36', '#d8b485');
             const text = this.finished ? 'DO BAIRRO AO ARROZAL!' : this.routing.warning ? `DESVIO PARA ${this.routing.selected.toUpperCase()}...` :
-                this.moving ? `${this.routing.supplied.toUpperCase()} SOBE / ${this.routing.supplied === 'a' ? 'B' : 'A'} DESCE` : 'PULE + BAIXO: TROCAR A / B';
+                this.moving ? `${this.routing.supplied.toUpperCase()} SOBE / ${this.routing.supplied === 'a' ? 'B' : 'A'} DESCE` : `PULE + BAIXO: AGUA PARA ${nextOutlet}`;
             pixelText(c, text, 160, 34, '#f3ddb1', 1, 'center');
         }
         this.renderer.present();
         const message = paused ? 'Pausado · Esc ou Continuar para voltar'
             : this.finished ? 'Pátio concluído · água limpa no ramal B · Mapa volta ao arrozal · protótipo sem progresso salvo'
             : p.isDead ? 'Retorno automático ao ponto seguro · Recomeçar limpa esta tentativa'
-            : feet > 336 ? 'Piso seco de recuperação · volte à esquerda e pule pelo degrau até a entrada'
             : this.routing.warning ? `Desvio pedido para ${this.routing.selected.toUpperCase()} · os dois tabuleiros vão se mover · sem prazo para atravessar`
+            : deck ? `No tabuleiro ${deck.id === G.liftAId ? 'A' : 'B'} · ${Math.abs(deck.y - (deck.active ? deck.to!.y : G.dockY)) > .01 ? deck.active ? 'subindo' : 'descendo' : deck.active ? 'no alto' : 'na doca'} · água no ramal ${this.routing.supplied.toUpperCase()} · pode esperar apoiado`
+            : onRecovery ? 'Piso seco de recuperação · volte à esquerda e pule pelo degrau até a entrada'
             : this.moving ? `Água no ramal ${this.routing.supplied.toUpperCase()} · ${this.routing.supplied.toUpperCase()} sobe, ${this.routing.supplied === 'a' ? 'B' : 'A'} desce · espere ou embarque`
-            : p.position.x < 384 ? 'Uma entrada, dois ramais · pule e aperte baixo na placa para dar água a A · a outra plataforma desce'
-            : p.position.x < 736 ? 'Ponto seguro nesta tentativa · dê água a B com uma sentada na segunda placa · pode trocar quantas vezes quiser'
+            : p.position.x < 384 ? `Uma entrada, dois ramais · pule e aperte baixo na placa para dar água a ${nextOutlet} · a outra plataforma desce`
+            : p.position.x < 736 ? `Ponto seguro nesta tentativa · dê água a ${nextOutlet} com uma sentada na segunda placa · pode trocar quantas vezes quiser`
             : 'Siga à direita até o arrozal · sair e reentrar reinicia o protótipo';
         if (this.status.textContent !== message) this.status.textContent = message;
     }
