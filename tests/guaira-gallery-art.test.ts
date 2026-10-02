@@ -108,3 +108,20 @@ test('painters preserve input and Canvas state and do not animate static route s
     assert.deepEqual(render(2300,false),render(2300,false));
     assert.equal(JSON.stringify({level,objects}),before);
 });
+
+test('inspection daylight stays recessed and moves with the wall, never becoming a safe cap', () => {
+    const a = new Raster(), b = new Raster();
+    drawGalleryBackground(a.context,384,80,0,false);
+    drawGalleryBackground(b.context,373,87,90000,true);
+    for (let y = 54; y < 112; y++) for (let x = 190; x < 306; x++) {
+        assert.equal(a.at(x,y),b.at(x+11,y-7),'world-anchored wall lighting');
+        assert.notEqual(a.at(x,y),P.cap,'scenery cannot advertise a landing');
+    }
+    const field = a.calls.filter(([color]) => color === '#9d9c7b');
+    assert.ok(field.length > 0,'inspection window shows the field');
+    for (const [,x,y,w,h] of field) {
+        assert.ok(x+384 >= 629 && x+w+384 <= 653 && y+80 >= 122 && y+h+80 <= 147,
+            'olive field colour remains inside the window, not in the dry shaft');
+    }
+    assert.ok(a.pixels.slice(0,320*23).every(color=>color===''));
+});

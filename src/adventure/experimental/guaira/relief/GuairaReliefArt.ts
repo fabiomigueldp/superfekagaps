@@ -110,6 +110,12 @@ export function drawReliefBackground(c: CanvasRenderingContext2D, level: WorldLe
         drawWorkshopWallBay(c, 16 - x, 153 - y, 171, 183);
         drawWorkshopWallBay(c, 303 - x, 194 - y, 204, 142);
         drawWorkshopWallBay(c, 518 - x, 202 - y, 116, 134);
+        // Field light falls only on the inspection wall beyond the live jet.
+        // Keep the mullion gap and stop short of the real floor's pale cap.
+        for (const [left, right] of [[536,573],[578,614]] as const) {
+            polygon(c, [[left - x,291 - y],[right - x,291 - y],
+                [right - 10 - x,328 - y],[left - 10 - x,328 - y]], '#d9b68e');
+        }
         drawWorkshopToolNiche(c, 357 - x, 220 - y);
         // Broad hand-smoothed patches, few and low contrast, keep jump paths quiet.
         for (const [xx, yy, w, h] of [[29,243,28,17],[76,179,25,11],[192,188,17,8],
@@ -124,6 +130,14 @@ export function drawReliefBackground(c: CanvasRenderingContext2D, level: WorldLe
         pixelText(c, 'OFICINA', 25 - x, 222 - y, P.pipeShade);
         pixelText(c, 'DAS AGUAS', 20 - x, 233 - y, P.pipeShade);
         irrigationWindow(c, 530 - x, 240 - y);
+        // Old mineral traces hug the return outlet and feed joints. These dry,
+        // broken vertical stains never borrow cyan, foam or a landing edge;
+        // draw before hardware so pipe silhouettes and labels remain intact.
+        for (const [xx, yy, height] of [[292,289,9],[303,291,6],[341,289,8],
+            [286,312,10],[403,312,7],[445,322,8]] as const) {
+            r(c, xx - x, yy - y, 3, height, '#bfa180');
+            r(c, xx + 1 - x, yy + height - y, 1, 2, '#c6aa88');
+        }
         reliefCollector(c, x, y, open);
         pipe(c, 264 - x, 304 - y, 184);
         pipe(c, 442 - x, 308 - y, 28, true);
