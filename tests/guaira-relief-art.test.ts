@@ -108,3 +108,23 @@ test('all art restores Canvas state, respects clipping, repeats and mutates no l
     };
     assert.deepEqual(render(),render());assert.equal(JSON.stringify({level,objects}),before);
 });
+
+test('inspection light and dry mineral traces stay behind hardware and outside the jet lane', () => {
+    const {level,objects}=fixture(), c=new Raster();
+    drawReliefBackground(c.context,level,320,176);
+    const daylight=c.calls.filter(([color])=>color==='#d9b68e');
+    assert.ok(daylight.length>0);
+    for(const [,x,y,,h] of daylight) {
+        assert.ok(x+320>G.jetEnd && y+h+176<G.floor,
+            'field light must not mark dangerous water or imitate the floor cap');
+    }
+    // The decorative stains sit behind the production pipe, including its
+    // lower edge; the open/closed valve signal remains readable in both states.
+    for(const open of [false,true]) {
+        if(open)level.data.tiles[10][15]=T.EMPTY;
+        const background=new Raster();drawReliefBackground(background.context,level,240,176);
+        assert.equal(background.at(49,137),P.pipe,'feed pipe edge stays intact');
+        assert.equal(background.at(82,129),P.brass,'valve plate stays opaque');
+    }
+    assert.equal(objects.get(G.jetId)!.active,false);
+});

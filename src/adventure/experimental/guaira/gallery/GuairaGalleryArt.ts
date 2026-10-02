@@ -215,6 +215,12 @@ export function drawGalleryBackground(c: CanvasRenderingContext2D, cx: number, c
         for (const [wx, wy, width, height] of [[249,168,124,120],[472,180,78,204],[574,107,116,85]] as const) {
             drawWorkshopWallBay(c, wx - cameraX, wy - cameraY, width, height);
         }
+        // Raking daylight stays on the inspection wall, above the true landing.
+        // Two separated panes leave a mullion shadow, not a glowing route edge.
+        for (const [left, right] of [[629,639],[642,653]] as const) {
+            polygon(c, [[left - cameraX,147 - cameraY],[right - cameraX,147 - cameraY],
+                [right - 15 - cameraX,183 - cameraY],[left - 15 - cameraX,183 - cameraY]], '#d9b68e');
+        }
         drawWorkshopToolNiche(c, 273 - cameraX, 215 - cameraY);
         // Hand-smoothed plaster seams are short and broken, never route arrows.
         for (const [wx, wy, w, h] of [[338,232,15,9],[247,250,13,6],[502,255,20,8],[479,306,10,7],[583,158,15,6],[663,143,16,12]] as const) {
@@ -240,8 +246,16 @@ export function drawGalleryBackground(c: CanvasRenderingContext2D, cx: number, c
         r(c, wx, wy, 32, 35, '#b39876'); r(c, wx + 2, wy + 2, 28, 31, '#e3c49a');
         r(c, wx + 4, wy + 4, 24, 25, '#d4ac83');
         r(c, wx + 4, wy + 4, 24, 12, '#eac799');
+        // The same dry field horizon as the water workshop, seen through a
+        // smaller opening. Muted olive belongs inside the aperture only.
+        polygon(c, [[wx + 4,wy + 20],[wx + 10,wy + 16],[wx + 19,wy + 20],
+            [wx + 27,wy + 18],[wx + 27,wy + 28],[wx + 4,wy + 28]], '#b49a77');
+        r(c, wx + 5, wy + 24, 21, 2, '#9d9c7b');
         r(c, wx + 14, wy + 3, 3, 28, '#c0a17a');
         r(c, wx + 4, wy + 16, 24, 2, '#c0a17a');
+        // Recessed upper/left reveal gives the aperture depth without a sill.
+        r(c, wx + 2, wy + 2, 2, 29, '#a58a68');
+        r(c, wx + 4, wy + 2, 24, 2, '#b39876');
     });
 }
 
