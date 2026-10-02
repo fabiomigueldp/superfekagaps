@@ -83,20 +83,136 @@ function feka(c: CanvasRenderingContext2D, f: IntroFrame, reduced: boolean) {
     }
     if (f.beat === 'resolve' && f.elapsedMs > 750 && f.elapsedMs < 1000) { c.fillStyle = '#e6bd79'; c.fillRect(x + 9, floor - 1, 8, 1); }
 }
-/** Foreground escort shares the hero's floor so the shove has a visible source. */
-function usher(c: CanvasRenderingContext2D, frame: IntroFrame) {
+// The escort is a small, authored pixel puppet, not a stretched rectangle. All
+// skin, cloth and shoes share this limited ramp; limbs articulate behind the torso.
+const ESCORT = {
+    K: '#211a29', H: '#392b30', h: '#665044', D: '#86513f', S: '#b97954',
+    M: '#d59a68', L: '#f1be87', F: '#ffdcaa', T: '#274a53', t: '#3d7074',
+    A: '#68a3a1', W: '#e5d4ad', B: '#8a765f', _: '',
+};
+const ESCORT_HEAD = [
+    '___KKKKKKK___',
+    '__KHHhhHHHK__',
+    '_KHHHHHHHHHK_',
+    '_KHHHHHhHHHK_',
+    '_KHHDMMMMMMK_',
+    '_KHDSLLMLKKK_',
+    '_KHDMLLMFKSK_',
+    '__KDMLMMMLMSK',
+    '__KDDSMMMMSK_',
+    '___KDDMMKKK__',
+    '____KDDMMK___',
+    '____KDSMLK___',
+] as const;
+const ESCORT_TORSO = [
+    '______KKKKKKKKK______',
+    '___KKKSDDMLLMMDKKK___',
+    '__KSMLLLMDDMLLLLMSK__',
+    '_KSMLLFFLMDMLFFLLMSK_',
+    'KDSMLLLLMDDMLLLLMSDKK',
+    'KDSMMMLLMDDMLLMMMSDKK',
+    '_KDSSMMMSDDSSMMMSDKK_',
+    '__KDSSSSDDDDSSSSDKK__',
+    '___KDSMMLDDLMMSDKK___',
+    '___KDDMLMDDMLMDDK____',
+    '____KDSMMDDSMSDK_____',
+    '____KDMLMDDMLMDK_____',
+    '_____KSMMDDSMSK______',
+    '_____KDSMMMMDSK______',
+    '_____KDDSSSSDDK______',
+] as const;
+function escortSprite(c: CanvasRenderingContext2D, rows: readonly string[], x: number, y: number) {
+    rows.forEach((row, yy) => [...row].forEach((key, xx) => {
+        const color = ESCORT[key as keyof typeof ESCORT];
+        if (color) { c.fillStyle = color; c.fillRect(x + xx, y + yy, 1, 1); }
+    }));
+}
+/** Stepped, tapered bones preserve a single connected pixel silhouette at any pose. */
+function escortBone(c: CanvasRenderingContext2D, ax: number, ay: number, bx: number, by: number, width: number, color: string) {
+    const steps = Math.max(Math.abs(bx - ax), Math.abs(by - ay), 1);
+    c.fillStyle = color;
+    for (let i = 0; i <= steps; i++) {
+        const size = Math.max(1, Math.round(width - i / steps));
+        c.fillRect(Math.round(ax + (bx - ax) * i / steps) - Math.floor(size / 2),
+            Math.round(ay + (by - ay) * i / steps) - Math.floor(size / 2), size, size);
+    }
+}
+/** Foreground actor shares Feka's floor; the shove comes from a connected hand. */
+export function drawJuiceIntroEscort(c: CanvasRenderingContext2D, frame: IntroFrame, reducedMotion = false) {
     if (!['establish', 'walk', 'push', 'prepare'].includes(frame.beat)) return;
     if (frame.beat === 'prepare' && frame.elapsedMs > 750) return;
-    const x = frame.beat === 'establish' ? 8 : frame.beat === 'walk' ? frame.fekaX - 30
-        : frame.beat === 'push' ? 76 : 76 - Math.min(1, frame.elapsedMs / 750) * 108;
-    c.save(); c.translate(Math.round(x), 160);
-    const r = (x: number,y: number,w: number,h: number,color: string) => { c.fillStyle=color;c.fillRect(x,y,w,h); };
-    r(-10,-33,21,22,'#171523'); r(-9,-32,19,19,'#ba8265'); r(-8,-31,8,7,'#dfa47b');
-    r(-5,-43,12,11,'#171523'); r(-4,-41,10,8,'#c78d68'); r(-4,-43,10,3,'#43302d'); r(3,-37,2,1,'#171523');
-    r(-8,-14,16,6,'#566e7d'); r(-8,-9,6,9,'#b58268'); r(3,-9,6,9,'#b58268');
-    r(-10,-2,9,3,'#2a2332');r(2,-2,10,3,'#2a2332');
-    const reach = frame.beat === 'push' ? Math.round(10 + 8 * Math.sin(Math.min(1,frame.elapsedMs / 650)*Math.PI)) : 6;
-    r(9,-29,reach,6,'#171523');r(10,-28,reach-1,4,'#dfa47b');
+    const leaving = frame.beat === 'prepare';
+    const retreat = clamp((frame.elapsedMs - 100) / 650);
+    const retreatDistance = leaving ? retreat * retreat * (3 - 2 * retreat) * 108 : 0;
+    // Continuous x at every authored cut: walk -> shove -> turn -> exit.
+    const x = (leaving ? 86 : frame.fekaX - 26) - retreatDistance;
+    const moving = leaving ? retreat > 0 && retreat < 1 : frame.beat === 'walk' && frame.fekaMoving
+        || frame.beat === 'push' && frame.fekaMoving;
+    const distance = leaving ? retreatDistance : frame.fekaX - 36;
+    const gait = moving && !reducedMotion ? distance * Math.PI / 10 : 0;
+    const stride = moving && !reducedMotion ? Math.sin(gait) : 0;
+    const turn = leaving && frame.elapsedMs >= 100 ? -1 : 1;
+    const bob = moving && !reducedMotion ? Math.round(Math.abs(Math.sin(gait)) * .7) : 0;
+    const pushing = frame.beat === 'push';
+    const reach = pushing ? 1 : frame.beat === 'walk' ? clamp((frame.fekaX - 86) / 12)
+        : leaving ? 1 - clamp(frame.elapsedMs / 100) : 0;
+    const push = pushing ? Math.sin(clamp(frame.elapsedMs / 650) * Math.PI) : 0;
+    c.save(); c.translate(Math.round(x), 160); c.scale(turn, 1);
+    const r = (xx: number, y: number, w: number, h: number, color: string) => {
+        c.fillStyle = color; c.fillRect(Math.round(xx), Math.round(y), w, h);
+    };
+    r(-12, -1, 25, 2, '#15132170');
+    const leg = (side: -1 | 1, rear: boolean) => {
+        const phase = ((distance / 20 + (rear ? .5 : 0)) % 1 + 1) % 1;
+        const walking = moving && !reducedMotion;
+        // During stance, the foot moves back by exactly the body's displacement.
+        // The other foot clears the floor on its return arc; one sole always plants.
+        const offset = !walking ? 0 : phase < .5 ? 5 - phase * 20 : -5 + (phase - .5) * 20;
+        const lift = walking && phase >= .5 ? Math.round(Math.sin((phase - .5) * Math.PI * 2) * 4) : 0;
+        const hip = side * 4, foot = hip + Math.round(offset);
+        const knee = hip + Math.round(offset * .4), ky = -7 - lift;
+        for (const [color, width] of [[ESCORT.K, 6], [rear ? ESCORT.D : ESCORT.M, 4]] as const) {
+            escortBone(c, hip, -12 - bob, knee, ky, width, color);
+            escortBone(c, knee, ky, foot, -3 - lift, width - 1, color);
+        }
+        // Socks and low trainers have a heel, instep, toe and a continuous sole.
+        r(foot - 2, -5 - lift, 4, 3, rear ? ESCORT.B : ESCORT.W);
+        r(foot - 3, -3 - lift, 8, 3, ESCORT.K);
+        r(foot - 2, -3 - lift, 5, 2, rear ? ESCORT.T : ESCORT.t);
+        r(foot + 3, -2 - lift, 2, 1, ESCORT.W);
+        r(foot - 2, -1 - lift, 8, 1, rear ? ESCORT.B : ESCORT.W);
+        if (!rear) r(foot, -3 - lift, 2, 1, ESCORT.W);
+    };
+    const arm = (rear: boolean) => {
+        const side = rear ? -1 : 1;
+        const shoulderX = rear ? -7 : 7, shoulderY = -29 - bob;
+        const swing = stride * (rear ? 1 : -1);
+        const elbowX = rear ? -11 + Math.round(swing * 2) : Math.round(10 + swing * 2 + reach * (5 - swing * 2));
+        const elbowY = !rear && reach > 0 ? -22 - Math.round(push * 2) : -22 - bob;
+        // Feka is 26 px in front. The palm meets the authored shoulder at x+3.
+        const restingHandX = side * 10 + Math.round(swing * 5);
+        const handX = rear ? restingHandX : Math.round(restingHandX + (29 - restingHandX) * reach);
+        const handY = !rear && reach > 0 ? -16 : -15 - bob;
+        for (const [color, width] of [[ESCORT.K, 7], [rear ? ESCORT.S : ESCORT.M, 5]] as const) {
+            escortBone(c, shoulderX, shoulderY, elbowX, elbowY, width, color);
+            escortBone(c, elbowX, elbowY, handX, handY, width - 1, color);
+        }
+        escortBone(c, shoulderX - 1, shoulderY - 1, elbowX - 1, elbowY - 1, 2, rear ? ESCORT.M : ESCORT.L);
+        escortBone(c, elbowX, elbowY - 1, handX, handY - 1, 2, rear ? ESCORT.S : ESCORT.L);
+        r(handX - 2, handY - 2, 4, 4, ESCORT.K);
+        r(handX - 1, handY - 2, 3, 3, rear ? ESCORT.M : ESCORT.L);
+        r(handX, handY, 2, 1, ESCORT.S);
+    };
+    leg(-1, true); arm(true); leg(1, false);
+    escortSprite(c, ESCORT_TORSO, -10, -33 - bob);
+    // Tailored shorts, curved leg openings, side seam and a tiny competition badge.
+    r(-7, -19 - bob, 15, 8, ESCORT.K); r(-6, -18 - bob, 13, 6, ESCORT.T);
+    r(-6, -18 - bob, 13, 2, ESCORT.W); r(-5, -15 - bob, 5, 3, ESCORT.t);
+    r(2, -15 - bob, 4, 3, ESCORT.t); r(-6, -16 - bob, 1, 4, ESCORT.A);
+    r(6, -16 - bob, 1, 4, ESCORT.A); r(0, -14 - bob, 2, 3, ESCORT.K);
+    r(2, -17 - bob, 3, 3, ESCORT.W); r(3, -16 - bob, 1, 1, ESCORT.K);
+    escortSprite(c, ESCORT_HEAD, -6, -43 - bob);
+    arm(false);
     c.restore();
 }
 export function drawJuiceIntro(c: CanvasRenderingContext2D, frame: IntroFrame, reducedMotion = false) {
@@ -111,7 +227,7 @@ export function drawJuiceIntro(c: CanvasRenderingContext2D, frame: IntroFrame, r
         : closeFeka ? frame.fekaX + 7 : beat === 'invite' ? 244 : 160;
     c.fillStyle = '#211a31'; c.fillRect(0, 0, 320, 180);
     c.save(); c.translate(160, 150); c.scale(zoom, zoom); c.translate(-focus, -150);
-    drawJuiceLabBackground(c, timeMs);
+    drawJuiceLabBackground(c, reducedMotion ? 0 : timeMs);
     c.save(); c.translate(0, -Math.round(stageExit * 180)); drawCalabrezzoStageBackground(c, s); c.restore();
     drawJuiceLabFloor(c, 64);
     if (stageExit < 1) { c.save(); c.globalAlpha = 1 - stageExit; drawCalabrezzoStageFloor(c, 160, s); c.restore(); }
@@ -121,14 +237,26 @@ export function drawJuiceIntro(c: CanvasRenderingContext2D, frame: IntroFrame, r
         c.lineTo(frame.fekaX + 43, 160); c.lineTo(frame.fekaX - 28, 160); c.fill();
     }
     if (s.castOpacity! > 0) drawCalabrezzoStageCast(c, s);
-    usher(c, frame);
+    drawJuiceIntroEscort(c, frame, reducedMotion);
     feka(c, frame, reducedMotion);
     if (frame.bossReveal > 0) {
         visualBoss.time = timeMs; visualBoss.phase = 'intro'; visualBoss.phaseTime = 0;
         const reveal = frame.bossReveal;
         const scale = (beat === 'emerge' ? 1.35 : beat === 'transition' ? 1.35 - .35 * stageExit : 1.35);
-        c.save(); c.translate(271, 160); c.scale(scale, Math.max(.08, reveal) * scale); c.translate(-271, -160);
-        c.globalAlpha = Math.min(1, reveal * 3); drawJuiceMiniboss(c, visualBoss, 0, 64); c.restore();
+        const bossCenter = visualBoss.x + visualBoss.width / 2;
+        if (beat === 'emerge') {
+            // The silhouette rises out of the same heavy pool, with a settling wake.
+            c.save(); c.globalAlpha = Math.min(1, reveal * 5);
+            c.fillStyle = '#210d32'; c.beginPath(); c.ellipse(bossCenter, 159, 20 + reveal * 9, 3, 0, 0, Math.PI * 2); c.fill();
+            c.fillStyle = '#9337b9'; c.beginPath(); c.ellipse(bossCenter - 1, 158.5, 17 + reveal * 9, 1.7, 0, 0, Math.PI * 2); c.fill();
+            if (!reducedMotion && reveal < .95) {
+                c.strokeStyle = '#da91e8'; c.lineWidth = 1; c.globalAlpha *= 1 - reveal;
+                c.beginPath(); c.ellipse(bossCenter, 159, 20 + reveal * 25, 3 + reveal * 3, 0, 0, Math.PI * 2); c.stroke();
+            }
+            c.restore();
+        }
+        c.save(); c.translate(bossCenter, 160); c.scale(scale, Math.max(.08, reveal) * scale); c.translate(-bossCenter, -160);
+        c.globalAlpha = Math.min(1, reveal * 3); drawJuiceMiniboss(c, visualBoss, 0, 64, reducedMotion); c.restore();
     }
     c.restore();
     // Letterbox is thin and retracts fully before the first attack.

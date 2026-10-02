@@ -8,6 +8,7 @@ import { freshSave, SAVE_KEY } from '../src/adventure/progress';
 import { WorldGame } from '../src/adventure/WorldGame';
 import { JuiceMinibossLab } from '../src/adventure/experimental/JuiceMinibossLab';
 import type { JuiceMinibossModel } from '../src/adventure/experimental/JuiceMinibossModel';
+import type { JuiceIntroAudio } from '../src/adventure/experimental/JuiceIntroAudio';
 
 const STEP = 1000 / 60;
 type Listener = (event: Record<string, unknown>) => void;
@@ -19,6 +20,11 @@ class EventSurface {
         const capture = typeof options === 'boolean' ? options : options?.capture ?? false;
         this.listeners.set(type, [...(this.listeners.get(type) ?? []), { listener, capture }]);
     }
+    removeEventListener(type: string, listener: Listener, options?: boolean | { capture?: boolean }) {
+        const capture = typeof options === 'boolean' ? options : options?.capture ?? false;
+        this.listeners.set(type, (this.listeners.get(type) ?? []).filter(entry => entry.listener !== listener || entry.capture !== capture));
+    }
+    get listenerCount() { return [...this.listeners.values()].reduce((count, entries) => count + entries.length, 0); }
     dispatch(type: string, data: Record<string, unknown> = {}) {
         let prevented = false;
         const event = { target: this, currentTarget: this, repeat: false,
@@ -73,7 +79,7 @@ class Canvas extends Element {
     getContext() { return this.context; }
 }
 
-function browser(t: TestContext) {
+function browser(t: TestContext, reducedMotion = false) {
     const canvas = new Canvas(); canvas.id = 'game-canvas';
     const status = new Element(); status.id = 'lab-status';
     const retry = new Element(); retry.id = 'lab-retry';
@@ -87,13 +93,17 @@ function browser(t: TestContext) {
     const frames = new Map<number, FrameRequestCallback>();
     let nextFrame = 0;
     const requestFrame = (callback: FrameRequestCallback) => { frames.set(++nextFrame, callback); return nextFrame; };
+    const cancelFrame = (id: number) => { frames.delete(id); };
+    const matchMedia = (query: string) => Object.assign(new EventSurface(), {
+        matches: reducedMotion && query === '(prefers-reduced-motion: reduce)', media: query,
+    });
     const document = Object.assign(new EventSurface(), {
         title: '', hidden: false, body: { style: {} }, querySelector: () => null,
         getElementById: (id: string) => elements.get(id) ?? null,
         createElement: (tag: string) => tag === 'canvas' ? new Canvas() : new Element()
     });
     const window = Object.assign(new EventSurface(), {
-        innerWidth: 640, innerHeight: 440, devicePixelRatio: 1, requestAnimationFrame: requestFrame,
+        innerWidth: 640, innerHeight: 440, devicePixelRatio: 1, requestAnimationFrame: requestFrame, cancelAnimationFrame: cancelFrame, matchMedia,
         worldGame: undefined as WorldGame | undefined
     });
     const savedCampaign = JSON.stringify({ ...freshSave(), completed: ['1-1'], selected: '1-2' });
@@ -118,7 +128,7 @@ function browser(t: TestContext) {
     });
     for (const [name, value] of Object.entries({ document, window, HTMLElement: Element,
         navigator: { maxTouchPoints: 0 }, location: { hash: '' },
-        innerWidth: window.innerWidth, innerHeight: window.innerHeight, requestAnimationFrame: requestFrame }))
+        innerWidth: window.innerWidth, innerHeight: window.innerHeight, requestAnimationFrame: requestFrame, cancelAnimationFrame: cancelFrame, matchMedia }))
         global(name, { writable: true, value });
     const storageDescriptor = { get() { storageCalls.push('localStorage'); return storage; } };
     global('localStorage', storageDescriptor);
@@ -154,6 +164,23 @@ function defeat(game: JuiceMinibossLab) {
     assert.equal(boss.contact(player, { ...player, y: model.y - player.height - 2 }, true), 'defeated');
     assert.equal(boss.phase, 'defeated');
 }
+
+test('fan audio follows actual projectile release and finishing a fan cannot shake the arena', t => {
+    const h = browser(t), game = h.create(), boss = encounter(game), b = boss.model;
+    b.phase = 'attack'; b.attack = 'fan'; b.targetX = 80; b.targetY = 210;
+    let releases = 0;
+    for (let i = 0; i < 40; i++) {
+        const before = b.drops.length;
+        boss.update(STEP, game.player.getRect(), game.objects, game.level);
+        if (boss.released) {
+            releases++;
+            assert.equal(before, 0); assert.equal(b.drops.length, 7, 'the sound is attached to the actual spit');
+        }
+        assert.equal(boss.impact, false, 'exhaling is not a floor impact');
+    }
+    assert.equal(releases, 1);
+    assert.equal(b.phase, 'recover');
+});
 
 test('real lab constructor loads a cloned standalone arena without reading campaign storage', t => {
     const h = browser(t), authored = structuredClone(STAGES), game = h.create();
@@ -292,6 +319,7 @@ test('the real toolbar preserves bitmap names through intro, pause, replay and r
         advance(game, 30);
         oldBoss.model.health = 2;
         oldBoss.model.drops.push({ x: 90, y: 150, width: 8, height: 8, vx: .1, vy: 0, life: 500 });
+        oldBoss.model.geysers.push({ x: 149, y: 160, width: 22, height: 64, phase: 'warning', phaseTime: 430, progress: .48 });
         oldPlayer.data.position.x = 120; oldPlayer.data.velocity.x = 4;
         oldPlayer.data.hasHelmet = true; oldPlayer.die('hit');
         if (afterVictory) defeat(game);
@@ -314,9 +342,9 @@ test('the real toolbar preserves bitmap names through intro, pause, replay and r
     }
 });
 
-test('defeat advances only the lab outcome and never invokes campaign completion or persistence', t => {
+test('final stomp settles its impact while advancing only the lab outcome without campaign completion', t => {
     const h = browser(t), game = h.create();
-    const internals = game as unknown as { complete(secret: boolean): void };
+    const internals = game as unknown as { complete(secret: boolean): void; sparks: Array<{ life: number }> };
     let completions = 0, persists = 0;
     const complete = internals.complete;
     internals.complete = function(secret) { completions++; return complete.call(game, secret); };
@@ -330,10 +358,14 @@ test('defeat advances only the lab outcome and never invokes campaign completion
     advance(game);
     assert.equal(boss.phase, 'defeated', 'The real WorldGame update resolves the final falling stomp.');
     assert.equal(model.health, 0);
+    assert.ok(game.camera.shakeTimer > 0, 'The actual final stomp starts camera feedback.');
+    assert.ok(internals.sparks.length > 0, 'The actual final stomp emits particles.');
     advance(game, 240); game.render();
     assert.equal(game.state, 'playing');
     assert.equal(encounter(game).phase, 'defeated');
     assert.ok(encounter(game).timer > 1150, 'Observe beyond the inherited campaign completion timeout.');
+    assert.equal(game.camera.shakeTimer, 0, 'The victory screen must settle instead of shaking forever.');
+    assert.deepEqual(internals.sparks, [], 'Final-hit particles expire while the result remains open.');
     assert.equal(completions, 0);
     assert.equal(persists, 0);
     assert.deepEqual(game.store.save, save);
@@ -480,4 +512,89 @@ test('toolbar intro pause clears pending presentation and impact input while pre
     game.toggleLabPause();
     assert.equal(game.state, 'playing'); assert.equal(audioStates.at(-1), false);
     assert.equal(internals.pendingPresentation, false); assert.equal(internals.hitStopInput, null);
+});
+
+
+test('pausing during second-stage floor warnings freezes every timer and retry removes them', t => {
+    const h = browser(t), game = h.create(), model = encounter(game).model;
+    model.health = 2; model.phase = 'rest'; model.cycle = 0;
+    advance(game, 28);
+    assert.equal(model.phase, 'warning'); assert.equal(model.geysers.length, 2);
+    assert.ok(model.geysers.every(g => g.phase === 'warning'));
+    game.toggleLabPause(); const frozen = snapshot(game);
+    advance(game, 90); game.render();
+    assert.deepEqual(snapshot(game), frozen);
+    game.toggleLabPause(); advance(game);
+    assert.ok(model.geysers[0].phaseTime > frozen.model.geysers[0].phaseTime);
+    game.load('juice-lab');
+    assert.equal(encounter(game).model.health, 6);
+    assert.equal(encounter(game).model.enraged, false);
+    assert.deepEqual(encounter(game).model.geysers, []);
+    assert.deepEqual(encounter(game).model.drops, []);
+});
+
+
+for (const reduced of [false, true]) {
+    test(`combat impact camera honors the browser motion preference (${reduced ? 'reduced' : 'ordinary'})`, t => {
+        const h = browser(t, reduced), game = h.create();
+        assert.equal(game.reducedMotion, reduced);
+        assert.equal(game.store.save.preferences.shake, !reduced);
+        const views: number[] = [], drawPlayer = game.renderer.drawPlayer.bind(game.renderer);
+        game.renderer.drawPlayer = (player, camera, ...args) => {
+            views.push(camera.x); return drawPlayer(player, camera, ...args);
+        };
+        game.camera.shakeTimer = 180;
+        game.time = 0; game.render(); game.time = 40; game.render();
+        assert.equal(views.length, 2);
+        if (reduced) assert.deepEqual(views, [game.camera.x, game.camera.x], 'Impact renders keep a stationary view.');
+        else assert.notEqual(views[0], views[1], 'Ordinary motion retains impact feedback.');
+        game.dispose();
+    });
+}
+
+test('disposing an active introduction cancels voices, releases global callbacks and permits a clean remount', t => {
+    const h = browser(t), surfaces = [h.window, h.document, h.canvas];
+    const baseline = surfaces.map(surface => surface.listenerCount);
+    const game = h.create(true), introAudio = (game as unknown as { introAudio: JuiceIntroAudio }).introAudio;
+    const mounted = surfaces.map(surface => surface.listenerCount);
+    assert.ok(mounted.some((count, i) => count > baseline[i]));
+    // Stub WebAudio device nodes only. The real score schedules and owns its voices.
+    const parameter = () => ({ setValueAtTime() {}, linearRampToValueAtTime() {}, exponentialRampToValueAtTime() {} });
+    const nodes: Array<{ disconnected: boolean; stops: Array<number | undefined> }> = [];
+    const makeNode = () => {
+        const node = { gain: parameter(), frequency: parameter(), type: '', onended: null,
+            disconnected: false, stops: [] as Array<number | undefined>,
+            connect() {}, disconnect() { this.disconnected = true; }, start() {},
+            stop(when?: number) { this.stops.push(when); },
+        };
+        nodes.push(node); return node;
+    };
+    const route = { context: { state: 'running', currentTime: 0, createGain: makeNode, createOscillator: makeNode },
+        destination: {}, enabled: true };
+    game.audio.getEffectsRoute = () => route as unknown as ReturnType<typeof game.audio.getEffectsRoute>;
+    assert.equal(introAudio.play('resolve'), true);
+    assert.ok(introAudio.activeVoiceCount > 0);
+    let unlocks = 0, cancellations = 0;
+    const unlock = game.audio.unlock.bind(game.audio), cancel = introAudio.cancel.bind(introAudio);
+    game.audio.unlock = () => { unlocks++; unlock(); };
+    introAudio.cancel = () => { cancellations++; cancel(); };
+    game.start(); assert.ok(h.frames.size > 0);
+    game.dispose();
+    assert.equal(game.isDisposed, true);
+    assert.equal(introAudio.activeVoiceCount, 0);
+    assert.ok(nodes.every(node => node.disconnected), 'Scheduled envelopes and sources disconnect immediately.');
+    assert.ok(nodes.some(node => node.stops.includes(undefined)), 'Future score voices receive an immediate stop.');
+    assert.deepEqual(surfaces.map(surface => surface.listenerCount), baseline, 'No canvas or global callback retains the discarded lab.');
+    assert.equal(h.frames.size, 0); assert.equal(h.window.worldGame, undefined);
+    assert.equal(introAudio.play('resolve'), false, 'Disposal is terminal even when an audio route remains available.');
+    const cancelled = cancellations, oldState = game.state;
+    h.key('ArrowRight'); h.window.dispatch('blur'); h.window.dispatch('pagehide'); h.hidden(true);
+    assert.equal(unlocks, 0); assert.equal(cancellations, cancelled); assert.equal(game.state, oldState);
+    h.hidden(false);
+    const replacement = h.create(true);
+    assert.deepEqual(surfaces.map(surface => surface.listenerCount), mounted, 'Remount installs exactly one scene worth of listeners.');
+    h.window.dispatch('blur'); assert.equal(replacement.state, 'paused');
+    assert.equal(game.state, oldState); assert.equal(cancellations, cancelled);
+    replacement.dispose(); game.dispose();
+    assert.deepEqual(surfaces.map(surface => surface.listenerCount), baseline);
 });
