@@ -1,0 +1,33 @@
+cue_id,kind,context,event_or_reference,current_state,priority,target_seconds,loop,variants,pilot,integration_note
+mus_guaira_arcade,music,Guaíra travessia e subida,WorldAudio.select; GuairaTraversal; GuairaAscent,candidatos arcade A/B integrados,3,40,edit_after_selection,2,yes,A 24s em Travessia/Pátio/Galeria; B 26.6667s em Subida/Respiros; audição pendente
+mus_factory,music,Fábrica,WorldAudio.select(3),tema procedural,3,60-90,yes,1,no,Funk eletrônico industrial; manter máquina separada
+mus_turbosuco,music,Turbosuco,"JuiceMinibossLab.restart; audio.select(3,true)",variação de boss World,3,45-60,yes,1,no,Intensificar arranjo; não aumentar nível bruscamente
+mus_mayor,music,Prefeito da Vazão,GuairaMayorLab; WorldGame.load,sem marcha específica,3,45-60,yes,1,no,Mapear cena futura sem mudar bosses da campanha
+mus_map,music,Mapa,WorldAudio.select(0),tema procedural,4,30-45,yes,1,no,Motivo Feka com baixa densidade
+stg_victory,stinger,Conclusão aceita,WorldAudio.sfx(victory); capítulo,quatro notas procedurais,2,1-2,no,1,no,Disparo por evento aceito; nunca por revisita de mapa
+sfx_feka_jump,sfx,Mobilidade,WorldGame.updatePlayer; WorldAudio.sfx(jump),samples A/B editados com fallback procedural,2,0.12-0.22 edited from 0.5,no,2,reuse_existing_only,Ataque imediato; duração do áudio não controla física
+sfx_feka_land,sfx,Mobilidade,WorldAudio.sfx(land),dois tons graves,2,0.08-0.15,no,2,no,Preservar cooldown/condição atuais; madeira/piso
+sfx_feka_pound,sfx,Sentada,WorldAudio.sfx(pound),triângulos graves,2,0.15-0.3,no,2,no,Separar do dano e da descarga
+sfx_feka_hit,sfx,Dano,WorldAudio.sfx(hit),tons procedurais,1,0.12-0.25,no,2,no,Não substituir por fala
+sfx_helmet_loss,sfx,Capacete,WorldCombatFeedback.combatTones(helmetLoss),metal procedural distinto,1,0.16-0.25,no,2,no,Preservar distinção de pisão bloqueado
+sfx_blocked_stomp,sfx,Defesa,WorldCombatFeedback.combatTones(blockedStomp),metal procedural breve,1,0.075-0.15,no,2,no,Não confundir com acerto bem-sucedido
+sfx_coin,sfx,Coleta,WorldAudio.sfx(coin),dois tons agudos,2,0.12-0.2,no,2,no,Leve e suportável em sequência
+sfx_checkpoint,sfx,Checkpoint,WorldAudio.sfx(checkpoint),três tons,2,0.3-0.6,no,2,no,Não compartilhar integralmente com lacre
+sfx_seal,sfx,Lacre,WorldAudio.sfx(seal); GuairaMayorModel,tons procedurais,2,0.4-0.7,no,2,no,Validar evento real do Prefeito antes de adapter
+sfx_switch,sfx,Registro e acionador,WorldObjects.events switch; WorldAudio.sfx(switch),três tons,2,0.12-0.25,no,2,no,Confirma ação já aceita; não alterar mecanismo
+sfx_water_clean,ambience,Água pública,GuairaChapterMapView; estado de água aceito,A ativa perto da fonte com recibo aceito; B para revisão,4,1.5 generated; longer edit later,yes,2,reuse_existing_only,Observar recibo aceito; não emitir em bairro ainda seco
+sfx_juice_viscous,ambience,Suco roxo,WorldObjects; futura camada ambiente,"A/B no combate Turbosuco, por estado e distância",4,1.5 generated; longer edit later,yes,2,reuse_existing_only,Viscoso e grave; distinto da água; sem fruta
+sfx_machine_warning,sfx,Máquina e perigo,WorldObjects.events warning; Turbosuco geyser-warning,samples A/B editados com fallback procedural,1,0.75 generated; trim after review,no,2,reuse_existing_only,Preservar janela visual; warning não embute descarga
+sfx_machine_pressure,sfx,Máquina,WorldAudio.sfx(pressure); Turbosuco enrage,samples A/B editados com fallback procedural,1,1.5 generated; adapt to state,no,2,reuse_existing_only,Cancelar por fim do estado; não controlar estado pelo sample
+sfx_machine_discharge,sfx,Máquina,WorldAudio.sfx(jet/cannon); Turbosuco geyser,samples A/B editados com fallback procedural,1,1.0 generated; trim after review,no,2,reuse_existing_only,Ataque pneumático mais suco viscoso; uma descarga
+sfx_barrel_land,sfx,Barril,WorldAudio.sfx(barrelLand),ruído + grave,2,0.1-0.25,no,2,no,Preservar peso sem explosão
+sfx_barrel_break,sfx,Barril,WorldAudio.sfx(barrelBreak),mesma família do pouso,2,0.2-0.4,no,2,no,Distinguir quebra do contato
+sfx_death,sfx,Morte,WorldAudio.sfx(death/fall); setDying,descida tonal e duck na música,1,0.4-0.8,no,2,no,Cauda não atravessa respawn/cena
+sfx_mayor_stamp,sfx,Prefeito,GuairaMayorModel.events stamp; WorldGame boss impact,feedback nativo de impacto,1,0.2-0.4,no,2,no,Carimbo pomposo mas ataque claro; sem mudar colisão
+sfx_mayor_vulnerable,sfx,Prefeito,GuairaMayorModel.vulnerable; GuairaMayorEncounter.sync,estado visual/mecânico existente,1,0.15-0.3,no,2,no,Proposta de cue novo só após hook explícito revisado
+intro_fanfare,stinger,Intro Turbosuco,JuiceIntroAudio fanfare/resolve,partitura procedural cancelável,3,1.2-1.5,no,1,no,Preservar skip/replay/pausa/dispose
+intro_comic_pause,sfx,Intro Turbosuco,JuiceIntroAudio awkward,sino silêncio rangido,3,0.9,no,1,no,Preservar pausa cômica e timeline atual
+intro_pressure,sfx,Intro Turbosuco,JuiceIntroAudio pressure,pressão procedural em partitura,2,3,no,1,no,Cue de cena separado do ataque; não reaproveitar timeline cegamente
+vo_feka_original,voice,Feka,WorldAudio.say(feka),vocalização procedural,2,script dependent,no,0,no,Voice Design original e v4 em etapa posterior
+vo_mayor_original,voice,Prefeito fictício,GuairaMayorLab texto/status,texto sem voz específica,2,script dependent,no,0,no,Não imitar político/pessoa real; legendas preservadas
+vo_joao_existing,voice,João,joaozaoVoiceManifest; WorldAudio.say clip,seis gravações OGG,2,0.42-1.98 measured,no,6,no,Preservar arquivos; não usar como referência de clonagem

@@ -42,6 +42,8 @@ export class GuairaMayorModel implements Rect {
     get registerOpenedThisCycle() { return this.freshOpening; }
     get accessRequested() { return this.freshOpening && this.valveActive; }
     get vulnerable() { return this.state === 'recover' && this.freshOpening && this.accessReady; }
+    /** Includes lift travel and seam pressure: reopening never grants extra time. */
+    get recoveryProgress() { return this.state === 'recover' ? Math.min(1, this.stateTick / MAYOR_RULES.recover) : 0; }
     get warningProgress() { return Math.min(1, this.stateTick / MAYOR_RULES.warning); }
     get counterpressure(): Readonly<MayorCounterpressure> | null {
         if (!this.pressurePhase) return null;

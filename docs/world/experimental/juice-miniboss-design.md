@@ -113,3 +113,51 @@ The liquid renderer samples bounded emissions from the simulation clock; pause f
 The changes stay within the experimental lab and its introduction, art, model, adapter, documentation and tests. Campaign mechanics, campaign data, Player behavior, save schema and deployment configuration remain outside this revision.
 
 Before promotion, review the local preview in an actual browser, play all three patterns and stage two, check keyboard/touch and narrow-screen layout, and assess human difficulty. Do not silently add the encounter to the campaign or its saved stage list. Earlier five-droplet, three-health phase-two rules and the 1,098-frame airborne-seed replay are historical versions superseded by the contract above.
+
+## Stage-two warning-volume review (2026-10-02)
+
+Reviewed on `f410694`, preserving the authored combat and animation from `435d8e4`.
+The three attacks already ask for different responses: jump the dash, leave the
+locked pounce landing, and read the aimed fan. Stage two adds vent placement and
+an extra fan between movement attacks. Its 900ms warning and safe floor during
+recovery provide distinct anticipation, pressure and counterattack beats. This
+code/replay review does not establish human difficulty or justify new patterns.
+
+The concrete readability gap was vertical: the vent warning marked the floor,
+but activation immediately made the entire 22×64 column dangerous. It did not
+show the clearance a jumping player would need. The warning now projects that
+exact future volume from its first frame, with a faint gold interior, broken
+sides and a height marker. The floor countdown remains the activation cue;
+solid purple still means a live jet. Reduced motion retains both the volume
+and the countdown. No attack selection, target, damage, timing, movement,
+introduction, audio or shared renderer code changed.
+
+Validation for this revision:
+
+- Baseline: 91 focused tests passed. Six new geometry regressions fail before
+  the change; all 98 focused tests pass afterward. They compare the visible
+  volume with subsequent live collision for fan, pounce and dash, through the
+  full warning, including camera offsets and reduced motion.
+- `npm run check`: 1,246 TypeScript tests and three server tests passed, followed
+  by level/player/world validation, both TypeScript checks and production build.
+- Chromium replay: the same 942 ordinary-input frames win with zero deaths,
+  unchanged hit frames (143, 283, 433, 563, 789, 941), one transformation, 62
+  active-geyser frames and unchanged localStorage. No browser errors were logged.
+- Before/after visual inspection used the same replay frame 717. The warning
+  also renders at 390×844 with reduced motion, a 320×180 game canvas below the
+  toolbar and no horizontal overflow.
+- Build: 40,572,532 → 40,572,801 bytes (+269 bytes), within the 45,000,000-byte
+  budget. No new assets or dependencies.
+
+Browser replay drives the existing InputState through the mounted game; it is
+not a physical keyboard/touch test, a human playtest, an auditory review or a
+frame-rate benchmark. No deployment or campaign promotion was performed.
+
+The delivery branch was subsequently reconciled with main `bc431d5` (Bairro
+post-victory water). That commit has no file overlap with this change. On the
+reconciled base, `npm run check` passed 1,253 TypeScript tests, three server
+tests, validation, type checks and build; output is 40,575,243 bytes. The mounted
+Chromium replay was repeated with the same victory, hit frames, 62 active-jet
+frames, unchanged storage and no browser errors. The original authoring commit
+and the incoming main commit remain in history; integration should use the
+three-file Turbosuco delta against `bc431d5`.

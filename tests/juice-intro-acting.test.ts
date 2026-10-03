@@ -140,6 +140,32 @@ test('cast fades in place, clears before the lab reveal and leaves the final han
     assert.equal(at('transition', 1800).frame.stageExit, 1);
 });
 
+test('Feka vows with hand to chest then raises a fist on the second caption, preserving his head and feet', () => {
+    const vow = at('defy', 1200).frame, payoff = at('defy', 3500).frame;
+    const first = heroPixels(vow), second = heroPixels(payoff);
+    assert.notDeepEqual(first, second, 'two lines have distinct readable silhouettes');
+    assert.equal(first['8,12'], PLAYER_PALETTE.L, 'left hand rests on chest');
+    assert.equal(second['19,3'], PLAYER_PALETTE.L, 'right fist rises toward the boss');
+    for (const [key, color] of Object.entries(spritePixels(PLAYER_SPRITES.idle))) {
+        const y = Number(key.split(',')[1]);
+        if (y < 11 || y >= 22) {
+            assert.equal(first[key], color, `vow preserves ${key}`);
+            assert.equal(second[key], color, `payoff preserves ${key}`);
+        }
+    }
+    assert.deepEqual(heroPixels(vow, true), first, 'essential gesture remains in reduced motion');
+    assert.deepEqual(heroPixels(payoff, true), second);
+    assert.deepEqual(heroPixels(at('transition').frame), second, 'gesture is continuous into the transition');
+});
+
+test('speaker marker follows the captioned judge and disappears in the comic pause', () => {
+    const markers = (f: IntroFrame) => paint(f, true).filter(r => r.y === 84 && r.w === 5 && r.h === 1 && r.color === '#edc785');
+    assert.deepEqual(markers(at('judges', 500).frame).map(r => r.x), [203]);
+    assert.deepEqual(markers(at('judges', 2350).frame), []);
+    assert.deepEqual(markers(at('judges', 3000).frame).map(r => r.x), [235]);
+    assert.deepEqual(markers(at('resolve').frame), []);
+});
+
 /** Rasterize the articulated actor independently, including the exit's mirrored pose. */
 function escortPixels(frame: IntroFrame, reduced = false) {
     let x = 0, y = 0, sx = 1, sy = 1, color = '';

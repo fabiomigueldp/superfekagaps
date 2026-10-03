@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { GuairaTraversal, GUAIRA_TRAVERSAL as G } from '../src/adventure/experimental/guaira/GuairaTraversal';
 import { loadGuairaChapterScene } from '../src/adventure/experimental/guaira/chapter/GuairaChapterScenes';
 import { guairaTraversalBrowser } from './helpers/guairaTraversalHarness';
+import { drawGuairaTraversalObjects } from '../src/adventure/experimental/guaira/GuairaTraversalArt';
 import { pixelText, textWidth } from '../src/graphics/BitmapFont';
 
 /** Observe the real overlay painter; retain native input, actor, camera and world. */
@@ -27,7 +28,7 @@ for (const reducedMotion of [false, true]) test(`native held jump clears the ban
     const h = guairaTraversalBrowser(t, { reducedMotion }), game = h.create(), paint = watchOverlay(t, game);
     h.run(game, 92, ['ArrowRight', 'ShiftLeft']); h.run(game, 12);
     assert.equal(paint().valveBanner, true);
-    assert.ok(textWidth('PULE. NO AR, APERTE BAIXO') <= 232, 'ordered instruction fits inside the native panel');
+    assert.ok(textWidth('PULE SOBRE A PLACA. BAIXO NO AR') <= 232, 'ordered instruction fits inside the native panel');
     const expected = new Map([[7, true], [8, false], [9, false], [17, false], [22, false], [29, false], [30, true], [45, true]]);
     for (let frame = 1; frame <= 45; frame++) {
         h.run(game, 1, ['Space']);
@@ -78,4 +79,32 @@ for (const chapter of [false, true]) test(`native completed route retains ${chap
     assert.match(h.status.textContent, /Travessia concluída/);
     game.toggleTraversalPause(); paint(); assert.equal(game.canAdvanceToBoss, false); assert.match(h.status.textContent, /Pausado/);
     game.toggleTraversalPause(); assert.deepEqual(paint().calls.filter(([,,,,color]) => color === '#edcaf5'), expected);
+});
+
+test('unsolved plate has a static downward target cue, removed by the native sentada', t => {
+    const h = guairaTraversalBrowser(t), game = h.create();
+    h.run(game, 92, ['ArrowRight', 'ShiftLeft']); h.run(game, 12);
+    const valve = game.objects.get(G.valveId)!;
+    const before = structuredClone(valve);
+    const cue = (time = game.time) => {
+        const calls: Array<[number, number, number, number, string]> = [];
+        const c = game.renderer.getContext();
+        const original = c.fillRect.bind(c);
+        c.fillRect = (x, y, w, h) => { calls.push([x, y, w, h, c.fillStyle as string]); original(x, y, w, h); };
+        try { drawGuairaTraversalObjects(c, game.objects, game.camera.x, game.camera.y, time, false); }
+        finally { c.fillRect = original; }
+        return calls.filter(([,,,,color]) => color === '#ffe7a3');
+    };
+    const initial = cue();
+    const x = Math.round(valve.x) - Math.round(game.camera.x) + Math.floor(valve.width / 2);
+    const y = Math.round(valve.y) - Math.round(game.camera.y);
+    assert.deepEqual(initial, [
+        [x - 1, y - 14, 3, 7, '#ffe7a3'], [x - 4, y - 8, 9, 1, '#ffe7a3'],
+        [x - 2, y - 7, 5, 2, '#ffe7a3'], [x, y - 5, 1, 2, '#ffe7a3'],
+    ]);
+    assert.deepEqual(valve, before, 'cue never changes the mechanism');
+    assert.deepEqual(cue(game.time + 500), initial, 'target does not pulse or shift');
+    h.run(game, 17, ['Space']); h.run(game, 1, ['ArrowDown']); h.run(game, 50);
+    assert.equal(valve.active, true);
+    assert.deepEqual(cue(), [], 'the solved plate no longer asks for another action');
 });

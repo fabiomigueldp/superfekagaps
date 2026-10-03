@@ -7,7 +7,7 @@ import { loadMapSignAtlas, loadMapFactorySignAtlas, loadMapFactoryLeftSignAtlas,
     type MapSignAtlas, type MapFactorySignAtlas, type MapTravelSign, type MapIslandSignAtlas } from './WorldMapSignArt';
 
 export const WORLD_MAP_TRAVEL_ACTION_IDS = ['ferry-costa-porto', 'ferry-porto-costa', 'bridge-porto-factory', 'bridge-factory-porto',
-    'walk-factory-serra', 'walk-serra-factory', 'cable-serra-reserva', 'cable-reserva-serra',
+    'cable-serra-reserva', 'cable-reserva-serra',
     'ferry-reserva-dominio', 'ferry-dominio-reserva'] as const;
 export type WorldMapTravelActionId = typeof WORLD_MAP_TRAVEL_ACTION_IDS[number];
 export interface WorldMapTravelAction extends MapTravelSign {
@@ -27,8 +27,6 @@ export const WORLD_MAP_TRAVEL_ACTIONS: Readonly<Record<WorldMapTravelActionId, W
     'ferry-porto-costa': { id: 'ferry-porto-costa', fromWorld: 2, toWorld: 1, mode: 'ferry', label: 'COSTA', direction: 'left', width: 104, height: 56 },
     'bridge-porto-factory': { id: 'bridge-porto-factory', fromWorld: 2, toWorld: 3, mode: 'bridge', label: 'FÁBRICA', direction: 'right', wide: true, width: 128, height: 56 },
     'bridge-factory-porto': { id: 'bridge-factory-porto', fromWorld: 3, toWorld: 2, mode: 'bridge', label: 'PORTO', direction: 'left', width: 104, height: 56 },
-    'walk-factory-serra': { id: 'walk-factory-serra', fromWorld: 3, toWorld: 4, mode: 'walk', label: 'SERRA', direction: 'right', width: 104, height: 56 },
-    'walk-serra-factory': { id: 'walk-serra-factory', fromWorld: 4, toWorld: 3, mode: 'walk', label: 'FÁBRICA', direction: 'left', wide: true, width: 128, height: 56 },
     'cable-serra-reserva': { id: 'cable-serra-reserva', fromWorld: 4, toWorld: 5, toStage: '5-1', requiresStage: '5-1', mode: 'cable', label: 'RESERVA', direction: 'left', wide: true, width: 128, height: 56 },
     'cable-reserva-serra': { id: 'cable-reserva-serra', fromWorld: 5, toWorld: 4, toStage: '4-5', requiresStage: '5-1', mode: 'cable', label: 'SERRA', direction: 'right', width: 104, height: 56 },
     'ferry-reserva-dominio': { id: 'ferry-reserva-dominio', fromWorld: 5, toWorld: 6, toStage: '6-1', requiresStage: '6-1', mode: 'ferry', label: 'DOMÍNIO', direction: 'left', wide: true, width: 128, height: 56 },
@@ -40,6 +38,7 @@ export type WorldMapMotionState = 'idle' | 'walking' | 'boarding' | 'sailing' | 
 export interface WorldMapHudCallbacks {
     selectStage(index: number): void;
     selectWorld(world: number): void;
+    selectGuaira?(): void;
     /** A named island in the panorama opens its close view. */
     selectOverviewWorld?(world: number): void;
     /** Route-specific action; omitted callbacks retain destination-world selection. */
@@ -58,7 +57,7 @@ export interface WorldMapHudState {
     open: readonly boolean[];
     completed: readonly boolean[];
     seals: readonly number[];
-    globalProgress: { completed: number; seals: number };
+    globalProgress: { completed: number; seals: number; guaira?: number };
     motionState: WorldMapMotionState;
     canEnter: boolean;
     hint: string;
@@ -255,7 +254,7 @@ export class WorldMapHud {
         this.regionButton.setAttribute('aria-expanded', 'false');
         this.regionMenu.id = `world-map-regions-${id}`;
         this.regionButton.setAttribute('aria-controls', this.regionMenu.id);
-        this.regionMenu.setAttribute('aria-label', 'As seis ilhas'); this.regionMenu.hidden = true;
+        this.regionMenu.setAttribute('aria-label', 'As sete regiões'); this.regionMenu.hidden = true;
         this.overviewButton = action('world-map-tool world-map-overview', 'MAPA', () => this.run(() => callbacks.overview()));
         this.overviewButton.setAttribute('aria-label', 'Ver panorama'); this.overviewButton.title = 'Ver panorama';
         this.overviewButton.setAttribute('aria-pressed', 'false');
@@ -310,6 +309,12 @@ export class WorldMapHud {
                 this.closeRegionMenu(true); callbacks.selectWorld(island.id);
             }));
             this.regionButtons.push(button); this.regionStates.push(status); this.regionMenu.append(button);
+            if (island.id === 3 && callbacks.selectGuaira) {
+                const guaira = element('button', 'world-map-region'); guaira.type = 'button';
+                guaira.textContent = 'Guaíra · canais e aeródromo';
+                guaira.addEventListener('click', () => this.run(() => { this.closeRegionMenu(true); callbacks.selectGuaira?.(); }));
+                this.regionMenu.append(guaira);
+            }
         }
         const copy = element('div', 'world-map-stage-copy');
         copy.append(this.stageDetails, this.status, this.location, this.hint);
@@ -421,7 +426,7 @@ export class WorldMapHud {
         if (!island || !stage) return;
         const local = stage.number - 1, open = !!state.open[local], completed = !!state.completed[local];
         const prerequisite = state.preview && !open ? STAGES.find(entry => entry.id === state.prerequisiteStage) : undefined;
-        const prerequisiteHint = prerequisite ? `Conclua ${prerequisite.id}: ${prerequisite.name} para visitar esta fase.` : '';
+        const prerequisiteHint = state.prerequisiteStage === 'guaira-prefeito' ? 'Conclua o capítulo de Guaíra: libere a água com o Prefeito para seguir à Serra.' : prerequisite ? `Conclua ${prerequisite.id}: ${prerequisite.name} para visitar esta fase.` : '';
         const traveling = state.motionState !== 'idle';
         const canEnter = state.canEnter && open && !state.preview && !traveling;
         const canReturn = !!state.preview && !state.overview && !traveling && !!this.callbacks.returnToFeka;
@@ -491,7 +496,7 @@ export class WorldMapHud {
         this.root.classList.toggle('is-preview', !!state.preview);
         this.root.classList.toggle('is-overview', !!state.overview);
         this.nodeLayer.setAttribute('aria-label', state.overview ? 'Ilhas do arquipélago' : 'Fases e transportes do mapa');
-        this.globalProgress.textContent = `${state.globalProgress.completed}/30 fases · ${state.globalProgress.seals}/72 selos`;
+        this.globalProgress.textContent = `${state.globalProgress.completed + (state.globalProgress.guaira ?? 0)}/35 trechos · ${state.globalProgress.seals}/72 selos`;
         const warnings = state.warnings?.filter(Boolean).join(' ') ?? '';
         this.warning.textContent = warnings; this.warning.hidden = !warnings;
         for (let n = 0; n < 5; n++) {

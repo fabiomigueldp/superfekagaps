@@ -1,3 +1,4 @@
+import type { GuairaChapterProgress } from './experimental/guaira/chapter/GuairaChapterProgress';
 import type { LevelData, Rect, Vector2 } from '../types';
 export type Character = 'feka' | 'joao' | 'biel' | 'calabrezzo' | 'yasmin';
 export type EncounterId = 'J1' | 'B1' | 'C1' | 'B2' | 'C2' | 'J2';
@@ -98,6 +99,9 @@ export interface Preferences {
 }
 export interface AdventureSave {
     version: 1;
+    guaira: GuairaChapterProgress;
+    /** Existing players retain the Serra access they already earned. */
+    legacySerraAccess?: boolean;
     completed: string[];
     seals: string[];
     secrets: string[];

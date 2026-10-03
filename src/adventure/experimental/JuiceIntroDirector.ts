@@ -10,6 +10,13 @@ export interface IntroFrame {
     subtitle: IntroSubtitle | null; prompt: string; bossReveal: number; stageExit: number;
 }
 export interface IntroBeatSpec { id: IntroBeat; durationMs: number; hold?: 'walkToMark' | 'present'; cue?: IntroCue; }
+/** Shared acting marks keep gestures, captions and reactions on the same beat. */
+export const JUICE_INTRO_TIMING = {
+    judgeLaughMs: 1400,
+    judgePauseMs: 2250,
+    secondJudgeMs: 2550,
+    defyEmphasisMs: 2800,
+} as const;
 /** Edit pacing and holds here; rendering and integration consume the same named beat. */
 export const JUICE_INTRO_SCRIPT: readonly IntroBeatSpec[] = [
     { id: 'establish', durationMs: 3000, cue: 'fanfare' },
@@ -17,7 +24,7 @@ export const JUICE_INTRO_SCRIPT: readonly IntroBeatSpec[] = [
     { id: 'push', durationMs: 650, cue: 'footstep' },
     { id: 'prepare', durationMs: Infinity, hold: 'present' },
     { id: 'reveal', durationMs: 2500, cue: 'pose' },
-    { id: 'judges', durationMs: 4500, cue: 'laugh' },
+    { id: 'judges', durationMs: 5100 },
     { id: 'resolve', durationMs: 2500, cue: 'boo' },
     { id: 'emerge', durationMs: 4500, cue: 'pressure' },
     { id: 'invite', durationMs: 4500, cue: 'invitation' },
@@ -38,6 +45,7 @@ export class JuiceIntroDirector {
     private fekaWalkDistance = 0;
     private pending: IntroCue[] = ['fanfare'];
     private awkwardPlayed = false;
+    private laughPlayed = false;
     private presentBufferMs = 0;
     get complete() { return this.beat === 'complete'; }
     drainCues(): IntroCue[] { const cues = this.pending; this.pending = []; return cues; }
@@ -64,7 +72,8 @@ export class JuiceIntroDirector {
         const step = Math.min(dt, 100);
         this.elapsedMs += step; this.timeMs += step;
         this.presentBufferMs = Math.max(0, this.presentBufferMs - step);
-        if (input.presentPressed && (this.beat === 'prepare' || this.beat === 'push' && this.elapsedMs > 450)) this.presentBufferMs = 200;
+        // A late shove tap must survive the remaining shove AND the 150 ms prompt settle.
+        if (input.presentPressed && (this.beat === 'prepare' || this.beat === 'push' && this.elapsedMs > 450)) this.presentBufferMs = 400;
         if (this.beat === 'walk') {
             this.moveFeka(clamp(this.fekaX + ((input.right ? 1 : 0) - (input.left ? 1 : 0)) * step * .055, 28, 98));
             if (this.fekaX >= 97.9) this.enter('push');
@@ -79,6 +88,9 @@ export class JuiceIntroDirector {
         if (this.beat === 'reveal' && this.elapsedMs >= 1000 && !this.awkwardPlayed) {
             this.awkwardPlayed = true; this.pending.push('awkward');
         }
+        if (this.beat === 'judges' && this.elapsedMs >= JUICE_INTRO_TIMING.judgeLaughMs && !this.laughPlayed) {
+            this.laughPlayed = true; this.pending.push('laugh');
+        }
         if (this.elapsedMs >= SPEC[this.beat].durationMs) this.enter(ORDER[ORDER.indexOf(this.beat) + 1]);
     }
     get frame(): IntroFrame {
@@ -86,11 +98,11 @@ export class JuiceIntroDirector {
         let subtitle: IntroSubtitle | null = null;
         if (b === 'establish') subtitle = { speaker: 'LOCUTOR', text: 'Calabrezzo apresenta: o próximo competidor!' };
         if (b === 'push' || b === 'prepare') subtitle = { speaker: 'COMPETIDOR', text: 'Vai, campeão. Mostra o shape.' };
-        if (b === 'judges') subtitle = t < 2250
+        if (b === 'judges' && (t < JUICE_INTRO_TIMING.judgePauseMs || t >= JUICE_INTRO_TIMING.secondJudgeMs)) subtitle = t < JUICE_INTRO_TIMING.judgePauseMs
             ? { speaker: 'JURADO 1', text: 'Isso é pose ou intervalo?' }
             : { speaker: 'JURADO 2', text: 'Nota: falta preencher.' };
         if (b === 'invite') subtitle = { speaker: 'TURBOSUCO', text: 'venha fazer amor com o suco' };
-        if (b === 'defy') subtitle = { speaker: 'FEKA', text: t < 2800 ? 'Eu vou defender até a morte' : 'meus gaps e meu shape patético!' };
+        if (b === 'defy') subtitle = { speaker: 'FEKA', text: t < JUICE_INTRO_TIMING.defyEmphasisMs ? 'Eu vou defender até a morte' : 'meus gaps e meu shape patético!' };
         const index = ORDER.indexOf(b);
         return { beat: b, timeMs: this.timeMs, elapsedMs: t, progress: clamp(t / SPEC[b].durationMs), fekaX: this.fekaX,
             fekaMoving: this.fekaMoving, fekaWalkDistance: this.fekaWalkDistance,

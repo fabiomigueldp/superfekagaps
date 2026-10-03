@@ -1,3 +1,9 @@
+import { importProgressFile, progressImportMessage } from './ProgressImport';
+import { JournalAccessibility } from './JournalAccessibility';
+import { campaignJournal } from './CampaignJournal';
+import { CanvasMenuAccessibility } from './CanvasMenuAccessibility';
+import { runGuairaFlight } from './WorldGuairaFlight';
+import { ExperimentalHub, EXTRAS_LABEL } from './experimental/hub/ExperimentalHub';
 import { Input } from '../engine/Input';
 import { DisposalScope } from '../engine/DisposalScope';
 import { Renderer } from '../engine/Renderer';
@@ -10,7 +16,7 @@ import { ART } from '../graphics/palette';
 import { PLAYER_SPRITES, PLAYER_PALETTE } from '../assets/playerSpriteSpec';
 import { YASMIN_FRAMES, SPRITE_PALETTE } from '../graphics/sprites';
 import { ISLANDS, STAGES, stageById } from './campaign';
-import { ProgressStore, isUnlocked, finishStage, parseSave } from './progress';
+import { ProgressStore, isUnlocked, finishStage, isGuairaUnlocked, canContinueFromGuaira } from './progress';
 import { WorldArt, rect } from './WorldArt';
 import { drawLandmarks } from './WorldScenery';
 import { WorldAudio } from './WorldAudio';
@@ -25,6 +31,7 @@ import { WorldMapView, moveJourneySelection } from './WorldMapView';
 import { clampMapSelection } from './WorldMapModel';
 type Screen = 'title' | 'intro' | 'map' | 'playing' | 'paused' | 'dialogue' | 'clear' | 'ending' | 'gallery' | 'settings';
 interface Button extends Rect {
+    label: string;
     run: () => void;
 }
 export class WorldGame {
@@ -52,6 +59,8 @@ export class WorldGame {
     private accumulator = 0;
     private last = 0;
     private buttons: Button[] = [];
+    private menuAccessibility?: CanvasMenuAccessibility;
+    private journalAccessibility?: JournalAccessibility;
     private selection = 0;
     private menuSelection = 0;
     private checkpoint = -1;
@@ -75,11 +84,14 @@ export class WorldGame {
     private introPage = 0;
     private galleryWorld = 0;
     private mapView?: WorldMapView;
+    private flightCleanup?: () => void;
+    private guairaArrivalPrompt = false;
     private mapReturn?: { playedStage: string; nextSelected: string };
     private nextMapSelection?: string;
     private mapCanvas: HTMLCanvasElement;
     private saveImportCleanup?: () => void;
     private deathFeedbackStarted = false;
+    private experimentalHub?: ExperimentalHub;
     constructor(canvas: HTMLCanvasElement, private readonly ephemeral = false) {
         this.mapCanvas = canvas;
         try {
@@ -96,12 +108,24 @@ export class WorldGame {
             this.store = new ProgressStore(storage);
             this.tutorial = new WorldTutorial(this.store);
             this.audio = new WorldAudio(this.store.save.preferences);
+            if (!ephemeral && typeof document.body?.append === 'function') {
+                this.journalAccessibility = new JournalAccessibility(canvas);
+                this.addCleanup(() => this.journalAccessibility?.dispose());
+                this.menuAccessibility = new CanvasMenuAccessibility(canvas, {
+                    select: index => { this.menuSelection = index; },
+                    activate: index => { this.audio.unlock(); this.buttons[index]?.run(); },
+                    escape: () => this.menuKey(new KeyboardEvent('keydown', { key: 'Escape', cancelable: true })),
+                    resetInput: () => this.input.reset(),
+                });
+                this.addCleanup(() => this.menuAccessibility?.dispose());
+            }
             this.addCleanup(() => this.audio.dispose());
             this.addCleanup(() => this.saveImportCleanup?.());
             this.addCleanup(() => { this.mapView?.dispose(); this.mapView = undefined; });
             this.selection = Math.max(0, STAGES.findIndex(s => s.id === this.store.save.selected));
             this.listen(window, 'keydown', e => this.menuKey(e));
             this.listen(canvas, 'pointerdown', e => {
+                if (this.experimentalHub?.isOpen) return;
                 this.audio.unlock();
                 const r = canvas.getBoundingClientRect();
                 if (this.state === 'playing') {
@@ -125,6 +149,18 @@ export class WorldGame {
             }).worldGame = this;
         } catch (error) { this.dispose(); throw error; }
     }
+    /** Opt-in only from the main entry. Labs/editor never mount title navigation. */
+    enableExperimentalHub(search = ''): void {
+        if (this.ephemeral || this.isDisposed) return;
+        if (!this.experimentalHub) {
+            this.experimentalHub = new ExperimentalHub(this.mapCanvas, { input: this.input, isTitle: () => this.state === 'title' });
+            this.addCleanup(() => { this.experimentalHub?.dispose(); this.experimentalHub = undefined; });
+        }
+        this.experimentalHub.openFromSearch(search);
+        if (new URLSearchParams(search).get('guairaReturn') === '1') {
+            this.audio.enabled = this.store.save.guaira.audioEnabled; this.audio.volume(); this.toMap();
+        }
+    }
     get isDisposed(): boolean { return this.lifetime?.isDisposed ?? false; }
     /** Own subclass/host resources without overriding terminal disposal. */
     addCleanup(cleanup: () => void): () => void { return this.lifetime.add(cleanup); }
@@ -134,6 +170,7 @@ export class WorldGame {
         this.running = false;
         if (this.frame !== null) cancelAnimationFrame(this.frame);
         this.frame = null; this.accumulator = 0; this.buttons = []; this.hitStopInput = null;
+        this.flightCleanup?.();
         this.lifetime.dispose();
         const globals = window as unknown as { worldGame?: WorldGame };
         if (globals.worldGame === this) delete globals.worldGame;
@@ -158,11 +195,12 @@ export class WorldGame {
         this.render();
         if (!this.isDisposed && this.running) this.frame = requestAnimationFrame(this.loop);
     };
-    private change(screen: Screen) { if (this.isDisposed) return; if (screen !== 'map') this.mapView?.hide(); this.state = screen; this.hitStopInput = null; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; }
+    private change(screen: Screen) { if (this.isDisposed) return; this.menuAccessibility?.clear(); this.journalAccessibility?.clear(); if (screen !== 'map') this.mapView?.hide(); this.state = screen; this.hitStopInput = null; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; this.experimentalHub?.sync(); }
     private menuKey(e: KeyboardEvent) {
+        if (this.experimentalHub?.isOpen || this.flightCleanup) return;
         const target = e.target;
         if (target instanceof HTMLElement && target.closest('button, a[href]') && (e.key === 'Enter' || e.key === ' ')) return;
-        if (target instanceof HTMLElement && target.closest('.world-map')) return;
+        if (target instanceof HTMLElement && target.closest('.world-map, .canvas-menu-accessibility')) return;
         if (target instanceof HTMLElement && target.id !== 'game-canvas' && (target.matches('input,textarea,select') || target.isContentEditable))
             return;
         if (this.state === 'playing')
@@ -287,7 +325,7 @@ export class WorldGame {
         }
         this.change('playing');
         this.audio.pause(false);
-        this.audio.select(stage.world, !!this.boss);
+        this.audio.select(stage.world, !!this.boss, stage.id);
         if (stage.encounter)
             for (const d of stage.dialogues)
                 this.spoken.add(d.id);
@@ -392,6 +430,7 @@ export class WorldGame {
     }
     update(dt: number) {
         if (this.isDisposed) return;
+        if (this.experimentalHub?.isOpen) { this.input.reset(); return; }
         this.input.setMenuMode(this.state !== 'playing');
         this.input.update();
         if (this.input.consumeMute())
@@ -676,6 +715,9 @@ export class WorldGame {
         this.store.persist(); this.clearSecret = secret; this.clearTimer = 0; this.change('clear'); this.audio.sfx('victory');
     }
     private afterClear() {
+        if (this.stage.id === '3-5' && !canContinueFromGuaira(this.store.save)) {
+            this.nextMapSelection = '3-5'; this.toMap(); this.guairaArrivalPrompt = true; return;
+        }
         if (this.stage.id === '6-5') {
             this.change('ending');
             this.audio.select(6);
@@ -684,15 +726,30 @@ export class WorldGame {
         else
             this.toMap();
     }
-    private button(c: CanvasRenderingContext2D, label: string, x: number, y: number, w: number, run: () => void, accent = ART.goldLight) { const selected = this.buttons.length === this.menuSelection; panel(c, x, y, w, 17, selected ? '#334b62' : '#202d43', selected ? accent : '#637888'); pixelText(c, fitText(label, w - 10), x + w / 2, y + 5, selected ? accent : ART.paper, 1, 'center'); this.buttons.push({ x, y, width: w, height: 17, run }); }
+    private button(c: CanvasRenderingContext2D, label: string, x: number, y: number, w: number, run: () => void, accent = ART.goldLight) { const selected = this.buttons.length === this.menuSelection; panel(c, x, y, w, 17, selected ? '#334b62' : '#202d43', selected ? accent : '#637888'); pixelText(c, fitText(label, w - 10), x + w / 2, y + 5, selected ? accent : ART.paper, 1, 'center'); this.buttons.push({ label, x, y, width: w, height: 17, run }); }
     private heading(c: CanvasRenderingContext2D, small: string, big: string) { pixelText(c, small, 160, 12, '#c4d7d8', 1, 'center'); pixelText(c, big, 161, 29, '#343651', 2, 'center'); pixelText(c, big, 160, 27, '#ffdf94', 2, 'center'); }
     private text(c: CanvasRenderingContext2D, text: string, x: number, y: number, width: number, color: string = ART.paper) { wrapText(text, width).forEach((line, i) => pixelText(c, line, x, y + i * 10, color)); }
     render() {
         if (this.isDisposed) return;
+        this.experimentalHub?.sync();
+        this.journalAccessibility?.sync(this.state === 'gallery' && !this.experimentalHub?.isOpen && !this.flightCleanup ? this.galleryWorld : null, this.store.save);
         if (this.state === 'map') {
+            this.menuAccessibility?.clear({ restoreFocus: false });
             if (typeof document !== 'undefined' && document.hidden) return;
             this.buttons = [];
             this.mapView ??= new WorldMapView(this.mapCanvas, {
+                guaira: from => {
+                    if (this.isDisposed || this.state !== 'map' || this.flightCleanup || !isGuairaUnlocked(this.store.save)) return;
+                    this.audio.pause(true);
+                    this.flightCleanup = runGuairaFlight({ from, to: 'guaira', preferences: this.store.save.preferences, soundEnabled: this.audio.enabled,
+                        onCancel: () => { this.flightCleanup = undefined; this.audio.pause(false); },
+                        onArrive: () => {
+                            this.store.save.guaira.audioEnabled = this.audio.enabled;
+                            if (!this.store.persist()) return false;
+                            this.flightCleanup = undefined; location.assign('./guaira-capitulo.html?campaign=1'); return true;
+                        },
+                    });
+                },
                 select: index => { if (!this.isDisposed && this.state === 'map') this.selectMap(index); },
                 enter: () => { if (!this.isDisposed && this.state === 'map') this.load(STAGES[this.selection].id, true); },
                 arrive: index => {
@@ -704,6 +761,7 @@ export class WorldGame {
             });
             this.mapView.render(this.selection, this.store.save, this.time, this.ephemeral ? '' : this.store.warning, this.toastTimer > 0 ? this.toast : '', this.mapReturn);
             this.mapReturn = undefined;
+            if (this.guairaArrivalPrompt) { this.guairaArrivalPrompt = false; this.mapView.openGuairaRegion(); }
             return;
         }
         this.mapView?.hide();
@@ -760,6 +818,9 @@ export class WorldGame {
             this.renderer.drawPlayerTransition(this.player.data, this.camera);
         }
         this.renderer.present();
+        if (this.experimentalHub?.isOpen || this.flightCleanup || (typeof document !== 'undefined' && document.hidden) || this.state === 'playing')
+            this.menuAccessibility?.clear({ restoreFocus: false });
+        else this.menuAccessibility?.sync(this.state, this.state === 'title' ? 'Menu principal' : this.state === 'settings' ? 'Opções' : this.state === 'paused' ? 'Pausa' : 'Aventura', this.buttons, this.menuSelection);
     }
     private renderLevel(c: CanvasRenderingContext2D) {
         const shake = this.store.save.preferences.shake && this.camera.shakeTimer > 0 ? (Math.floor(this.time / 40) % 2 ? 1 : -1) : 0;
@@ -808,7 +869,7 @@ export class WorldGame {
             this.art.foe(c, e, cx, cy, this.time);
         if (this.boss)
             this.art.boss(c, this.boss, cx, cy, this.time);
-        this.renderer.drawPlayer(this.player.data, view);
+        this.renderPlayer(view);
         this.renderer.drawFallingPlatforms(this.level.getFallingPlatformRenderData(), view);
         this.renderer.drawWorldEffects(view);
         for (const s of this.sparks) {
@@ -829,6 +890,9 @@ export class WorldGame {
         if (this.state === 'paused')
             this.renderer.drawPlayerTransition(this.player.data, view, c);
     }
+    protected renderPlayer(view: CameraData) {
+        this.renderer.drawPlayer(this.player.data, view);
+    }
     protected renderEncounterHud(c: CanvasRenderingContext2D) {
         if (!this.boss) return;
         panel(c, 64, 26, 192, 24);
@@ -844,14 +908,14 @@ export class WorldGame {
         this.heading(c, 'TORBWARE APRESENTA', 'SUPER FEKA GAPS');
         pixelText(c, 'WORLD', 161, 55, '#395472', 3, 'center');
         pixelText(c, 'WORLD', 160, 53, '#faf0b8', 3, 'center');
-        pixelText(c, 'SEIS ILHAS. UMA GRANDE MISSÃO?', 160, 86, '#30475b', 1, 'center');
+        pixelText(c, 'SETE REGIÕES. UMA GRANDE MISSÃO?', 160, 86, '#30475b', 1, 'center');
         this.art.atlas.draw(c, PLAYER_SPRITES.idle, PLAYER_PALETTE, 32, 130);
         this.art.atlas.draw(c, bossFrame('joao', 'idle'), WORLD_PALETTE, 252, 99);
         this.button(c, this.store.save.completed.length ? 'CONTINUAR AVENTURA' : 'COMEÇAR AVENTURA', 80, 103, 160, () => this.begin());
         this.button(c, 'GALERIA', 80, 124, 76, () => this.change('gallery'));
         this.button(c, 'OPÇÕES', 164, 124, 76, () => this.settings('title'));
         this.button(c, 'JOGAR O ORIGINAL', 99, 149, 122, () => { location.href = '?classic=true'; });
-        pixelText(c, 'ENTER PARA CONFIRMAR · SETAS PARA ESCOLHER', 160, 172, '#d1d6c2', 1, 'center');
+        pixelText(c, this.experimentalHub ? `SETAS/ENTER: MENU · TAB: ${EXTRAS_LABEL}` : 'ENTER PARA CONFIRMAR · SETAS PARA ESCOLHER', 160, 172, '#d1d6c2', 1, 'center');
     }
     private renderStory(c: CanvasRenderingContext2D) {
         this.art.background(c, ISLANDS[this.state === 'ending' ? 5 : 0], 0, 0, this.time);
@@ -865,8 +929,13 @@ export class WorldGame {
         pixelText(c, ending ? 'UMA VITÓRIA E TANTO!' : 'UMA GRANDE AVENTURA', 160, 23, ART.goldLight, 1, 'center');
         const text = ending ? 'FEKA SALVOU YASMIN?' : this.introPage === 0 ? 'João e Yasmin partiram para o arquipélago. Feka sabe o que precisa fazer.' : 'Feka ajeita os óculos e parte. Nenhum gap vai impedir essa grande missão!';
         this.text(c, text, 31, 44, 258);
-        if (ending)
-            pixelText(c, `${this.store.save.completed.length}/30 FASES · ${this.store.save.seals.length}/72 SELOS`, 160, 69, '#b2d4d4', 1, 'center');
+        if (ending) {
+            const journal = campaignJournal(this.store.save);
+            pixelText(c, `${journal.completed}/${journal.total} TRECHOS · ${this.store.save.seals.length}/72 SELOS`, 160, 69, '#b2d4d4', 1, 'center');
+            panel(c, 18, 84, 284, 24, '#25344c', '#d2bb8e');
+            pixelText(c, journal.waterReleased ? 'GUAÍRA: ÁGUA LIBERADA' : 'GUAÍRA: A ÁGUA AINDA ESPERA', 160, 88, ART.paper, 1, 'center');
+            pixelText(c, `${journal.optionalCompleted}/3 DESVIOS OPCIONAIS CONCLUÍDOS`, 160, 99, ART.goldLight, 1, 'center');
+        }
         this.button(c, ending ? 'CONTINUAR EXPLORANDO' : 'SEGUIR VIAGEM', 72, 151, 176, () => ending ? this.toMap() : this.nextIntro());
     }
     private backGallery() {
@@ -880,6 +949,20 @@ export class WorldGame {
             this.change('title');
     }
     private renderGallery(c: CanvasRenderingContext2D) {
+        if (this.galleryWorld === 7) {
+            const journal = campaignJournal(this.store.save);
+            rect(c, 0, 0, 320, 180, '#1e2f45');
+            panel(c, 10, 10, 300, 135);
+            pixelText(c, 'GUAÍRA · CADERNO DOS CAMINHOS', 160, 19, ART.goldLight, 1, 'center');
+            journal.entries.forEach((entry, i) => pixelText(c,
+                fitText(`${entry.complete ? 'OK' : '--'}  ${entry.title}`, 280), 20, 36 + i * 12,
+                entry.complete ? '#b2d4d4' : ART.paper));
+            pixelText(c, journal.waterReleased ? 'ÁGUA LIBERADA · SERRA ABERTA' : 'ÁGUA: CONCLUA O PREFEITO DA VAZÃO', 20, 101, ART.goldLight);
+            journal.optional.forEach((entry, i) => pixelText(c,
+                fitText(`${entry.complete ? 'OK' : '--'} ${entry.title} (opcional)`, 280), 20, 114 + i * 9, ART.paper));
+            this.button(c, 'VOLTAR AO CADERNO', 80, 153, 160, () => this.backGallery());
+            return;
+        }
         if (this.galleryWorld) {
             const w = ISLANDS[this.galleryWorld - 1];
             this.art.background(c, w, 0, 0, this.time);
@@ -891,13 +974,13 @@ export class WorldGame {
             return;
         }
         rect(c, 0, 0, 320, 180, '#1e2f45');
-        this.heading(c, 'CADERNO DA AVENTURA', 'AS SEIS ILHAS');
+        this.heading(c, 'CADERNO DA AVENTURA', 'SETE REGIÕES');
         for (let i = 0; i < 6; i++) {
-            const w = ISLANDS[i], x = 10 + (i % 3) * 104, y = 58 + Math.floor(i / 3) * 44, count = this.store.save.seals.filter(id => id.startsWith(`${i + 1}-`)).length;
-            panel(c, x, y, 96, 38, this.menuSelection === i ? '#435f72' : '#2c4156', w.accent);
+            const w = ISLANDS[i], x = 10 + (i % 3) * 104, y = 54 + Math.floor(i / 3) * 36, count = this.store.save.seals.filter(id => id.startsWith(`${i + 1}-`)).length;
+            panel(c, x, y, 96, 32, this.menuSelection === i ? '#435f72' : '#2c4156', w.accent);
             pixelText(c, fitText(w.name, 86), x + 48, y + 6, w.accent, 1, 'center');
             pixelText(c, `${count}/12 SELOS`, x + 48, y + 20, ART.paper, 1, 'center');
-            this.buttons.push({ x, y, width: 96, height: 38, run: () => {
+            this.buttons.push({ label: `${w.name}, ${count}/12 selos`, x, y, width: 96, height: 32, run: () => {
                     if (count === 12) {
                         this.galleryWorld = i + 1;
                         this.menuSelection = 0;
@@ -908,6 +991,9 @@ export class WorldGame {
                     }
                 } });
         }
+        this.button(c, `GUAÍRA · ${this.store.save.guaira.completed.length}/5 · EXTRAS`, 50, 129, 220, () => {
+            this.galleryWorld = 7; this.menuSelection = 0;
+        });
         this.button(c, 'VOLTAR', 114, 153, 92, () => this.backGallery());
     }
     private settings(from: Screen) { this.settingReturn = from; this.pausedAudio = from === 'paused'; this.audio.pause(false); this.change('settings'); }
@@ -949,19 +1035,15 @@ export class WorldGame {
             if (!file) { cleanup(); return; }
             input.onchange = null;
             try {
-                const text = await file.text();
-                if (!active) return;
-                parseSave(text);
-                this.store.import(text);
-                this.audio.preferences = this.store.save.preferences;
-                this.audio.volume();
-                this.toast = 'Progresso importado.';
-                this.toastTimer = 2500;
-            }
-            catch {
-                if (!active) return;
-                this.toast = 'Arquivo de progresso inválido.';
-                this.toastTimer = 3000;
+                const result = await importProgressFile(file, this.store, () => active);
+                if (!active || result === 'cancelled') return;
+                this.toast = progressImportMessage(result);
+                this.toastTimer = result === 'imported' ? 2500 : 5000;
+                if (result === 'imported') {
+                    this.audio.preferences = this.store.save.preferences;
+                    // Audio failure must not mislabel an already saved import as a bad file.
+                    try { this.audio.volume(); } catch { }
+                }
             }
             finally { cleanup(); }
         };

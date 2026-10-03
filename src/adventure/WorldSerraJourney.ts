@@ -66,9 +66,10 @@ export interface SerraMaintenanceCable {
     frame: CableAtlasFrame;
 }
 export interface SerraJourneyOptions {
+    /** Historical metadata input only; no direct Factory–Serra route is built. */
     factorySerraLink?: FactorySerraLink | null;
     factorySerraLinkReady?: boolean;
-    /** Derived by the controller from isUnlocked('4-1'), never from artwork. */
+    /** Historical compatibility input; does not authorize a connection. */
     factorySerraLinkOpen?: boolean;
     maintenanceCable?: SerraMaintenanceCable | null;
     maintenanceCableReady?: boolean;
@@ -205,29 +206,13 @@ export function parseSerraMaintenanceCable(value: unknown, metadata: MapArtMetad
         atlas: { path: atlas.path, width: atlas.width, height: atlas.height }, frame };
 }
 
-/** Add only the two explicit Serra connections. Readiness is supplied after
- * matching image dimensions; a missing new asset never removes existing edges.
+/** Build the local Serra maintenance cable only. Fábrica connects via Guaíra.
  * Cabin direction permissions are separately derived from the session pair state.
  */
 export function buildSerraJourney(options: SerraJourneyOptions & { islands: readonly JourneyIsland[]; secrets: readonly string[] }): JourneyNetwork {
     const nodes: Record<string, MapPoint> = {}, edges: JourneyEdge[] = [];
-    const factory = options.islands.find(island => island.world === 3), serra = options.islands.find(island => island.world === 4);
-    const link = options.factorySerraLink;
-    if (link && options.factorySerraLinkReady && options.factorySerraLinkOpen && factory?.ready && serra?.ready &&
-        worlds.every(world => {
-            const island = world === 3 ? factory : serra, landing = link.landings[world], stage = SERRA_LINK_NODES[world].join;
-            return island.metadata.world === world && landing.join.node === stage && !!island.metadata.nodes[stage] && near(landing.join, island.metadata.nodes[stage]) &&
-                matchingPlacement(link.placements[world], island.placement);
-        }) && joined(link.walkRoute, localToAtlas(link.landings[3].landing, factory.placement), localToAtlas(link.landings[4].landing, serra.placement))) {
-        for (const world of worlds) {
-            const placement = world === 3 ? factory.placement : serra.placement, landing = link.landings[world], ids = SERRA_LINK_NODES[world];
-            nodes[ids.landing] = localToAtlas(landing.landing, placement);
-            edges.push({ id: ids.approach, from: ids.join, to: ids.landing, mode: 'walk', duration: landing.approachDurationSeconds,
-                points: landing.junctionToLanding.map(point => localToAtlas(point, placement)) });
-        }
-        edges.push({ id: FACTORY_SERRA_LINK_EDGE, from: SERRA_LINK_NODES[3].landing, to: SERRA_LINK_NODES[4].landing,
-            mode: 'walk', duration: link.walkDuration, points: link.walkRoute.map(point => ({ ...point })) });
-    }
+    // Fábrica and Serra connect only through Guaíra flights, including legacy saves.
+    const serra = options.islands.find(island => island.world === 4);
     const cable = options.maintenanceCable;
     if (cable && options.maintenanceCableReady && serra?.ready && serra.metadata.world === 4 && options.secrets.includes('4-3') &&
         serra.metadata.secretTransport === 'maintenance-cable' && serra.metadata.secretRoute.length === 0 && terminals.every(terminal => {

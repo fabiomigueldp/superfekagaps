@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "pilot_id": "sfg-arcade-r2",
+  "status": "generated_by_parent",
+  "music": [
+    {
+      "cue_id": "mus_guaira_arcade",
+      "variant": "a",
+      "title": "Salto de partida",
+      "model_id": "music_v2_5",
+      "duration_seconds": 40,
+      "output_format": "mp3_48000_192",
+      "prompt": "Original premium arcade platform-adventure instrumental. 40 seconds, 120 BPM, 4/4, bright D major. Exuberant forward motion, playful heroic confidence and a clear memorable melody. Main palette: expressive plucked synth lead, rounded articulate synth bass, crisp acoustic-electronic drums, short mallet answers and light staccato string accents. Tasteful 8-bit pulse-wave flourishes punctuate phrase endings; modern full-frequency production with clean transients, controlled highs, punch and depth. Introduce this compact proposed Feka motif: D4 F-sharp4 A4 E4 D4, with eighth, eighth, quarter, eighth, dotted-quarter rhythm; notation is guidance. Develop it with a distinct answering phrase and a short playful harmonic detour, then bring it back clearly. At 0-4 seconds establish the groove immediately, 4-16 present the hook, 16-28 vary and answer it, 28-36 deliver a satisfying reprise, 36-40 return toward the opening harmony with an edit-friendly tail. Musical comedy through precise rests and unexpected small accents. Leave space for gameplay cues; keep decorative high notes sparse. Tight low end, focused center, lively but mono-compatible stereo image. Instrumental only: no singing, speech, choir or whistling. Entirely original melody and arrangement; do not imitate an existing game soundtrack, artist or franchise. No acoustic-folk ensemble, national or regional musical styling, lo-fi degradation, trailer risers or fruit sounds. A polished listening proposal; seamless looping will be edited and verified separately."
+    },
+    {
+      "cue_id": "mus_guaira_arcade",
+      "variant": "b",
+      "title": "Impulso pixel",
+      "model_id": "music_v2_5",
+      "duration_seconds": 40,
+      "output_format": "mp3_48000_192",
+      "prompt": "Original premium arcade platform-adventure instrumental, a more kinetic alternative for the same charming comic hero. 40 seconds, 144 BPM, 4/4, bright D major with playful passing chords. A catchy expressive pulse-wave lead trades phrases with sparkling FM keys, agile rounded synth bass, a tight punchy drum-kit groove, short brass-synth stabs and a restrained arpeggiated countermelody. Use selective 8-bit timbres inside a detailed modern mix, never constant high-register beeping or imitation hardware distortion. Proposed Feka motif: D4 F-sharp4 A4 E4 D4, eighth, eighth, quarter, eighth, dotted-quarter rhythm; use it as melodic guidance and give it a confident answer. At 0-3 seconds start with an immediate playable groove, 3-16 establish the hook, 16-27 contrast with a lighter response, 27-37 return with extra rhythmic energy, 37-40 turn back toward the opening harmony with a clean edit-friendly tail. Bounce and humor come from syncopation and precise stops, while the melody stays easy to remember. Preserve headroom and leave space for jump, impact and warning sounds. Defined bass, crisp non-harsh highs, stable mono-compatible center and carefully placed stereo details. Instrumental only: no vocals, speech, choir or whistling. Original composition with no quotation or imitation of any existing game melody, artist or franchise. No folk or geographic musical identity, acoustic regional ensemble, cinematic trailer climax or fruit sounds. A fully produced listening proposal; a seamless loop is a later editing and listening task."
+    }
+  ],
+  "sfx": [
+    {
+      "cue_id": "sfx_feka_jump",
+      "title": "Salto do Feka",
+      "duration_seconds": 0.5,
+      "loop": false,
+      "a": "One short stylized platform-game jump: a tiny dry wooden tick into a soft rising elastic air flick, immediate attack and fast clean decay. Friendly and agile, no musical phrase. One event only, near-field, centered mono-compatible. No voice, music, fruit, water or reverb tail.",
+      "b": "One short stylized platform-game jump: a light muted metal tap with a rounded upward rubbery pitch flick. Slightly brighter than a wooden jump, still soft and quick. One immediate event, clean ending, centered mono-compatible. No voice, music, fruit, water or reverb tail."
+    },
+    {
+      "cue_id": "sfx_water_clean",
+      "title": "Água pública limpa",
+      "duration_seconds": 1.5,
+      "loop": true,
+      "a": "Seamless short loop of a modest clean freshwater stream trickling through a small open stone channel. Fine bright irregular splashes, thin freely flowing liquid, relaxed airy detail, close but quiet. Steady texture with no start or stop gesture. No thick bubbles, suction, syrup, fruit, machinery, voice or music. Centered mono-compatible.",
+      "b": "Seamless short loop of clean tap water gently flowing into a shallow channel. Light clear pattering droplets and a soft continuous transparent flow, no deep gurgle. Slightly more individual drops, same quiet intensity. Steady texture without opening or closing tap sounds. No viscous liquid, fruit, machinery, voice or music. Centered mono-compatible."
+    },
+    {
+      "cue_id": "sfx_juice_viscous",
+      "title": "Suco roxo viscoso",
+      "duration_seconds": 1.5,
+      "loop": true,
+      "a": "Seamless short loop of fictional thick purple industrial liquid slowly circulating in a squat metal pipe. Low rounded glugs, sticky pulling texture, slow heavy bubbles collapsing, slightly rubbery viscosity. Restrained comic texture, no horror. Constant motion without start or stop gesture. Clearly thicker and darker than clean running water. No fruit cutting, chewing, squeezing or pouring from a bottle; no voice or music. Centered mono-compatible.",
+      "b": "Seamless short loop of fictional dense purple machine fluid moving through a narrow chamber. Soft suction pulses and muffled sticky bubble pops with slow syrup-like drag, a little elastic but not a cartoon voice. Continuous even texture, no discrete discharge. Distinct from thin sparkling water. No fruit processing, eating, horror, speech or music. Centered mono-compatible."
+    },
+    {
+      "cue_id": "sfx_machine_warning",
+      "title": "Máquina: aviso",
+      "duration_seconds": 0.75,
+      "loop": false,
+      "a": "One clear short machine warning cue for a friendly industrial platform game: two crisp hollow metal ticks, the second a little higher, followed by brief silence. Immediate first transient, compact midrange, dry clean end. Communicates prepare to dodge, not an impact. No pressure hiss, liquid discharge, police siren, fruit, voice or music. Centered mono-compatible.",
+      "b": "One clear short machine warning cue: two muted resonant metal pips with a slightly brighter second strike, precisely separated and quickly damped. Same two-event rising warning identity, moderate intensity, immediate attack. No continuous alarm, pressure hiss, liquid impact, fruit, speech or music. Dry and centered mono-compatible."
+    },
+    {
+      "cue_id": "sfx_machine_pressure",
+      "title": "Máquina: pressão",
+      "duration_seconds": 1.5,
+      "loop": false,
+      "a": "A compact industrial machine charging pressure: subdued low air tension rises under three small rounded valve pulses, growing denser, then stops cleanly before release. One build-up only; no discharge or bang. Tactile metal housing, restrained bass audible on small speakers through mid harmonics. No warning bell, fruit, voice, musical beat or long reverb. Centered mono-compatible.",
+      "b": "A small fictional pump building pressure: soft compressed-air friction climbs with three dry mechanical pulses and a gentle elastic metal creak, ending ready to release without actually firing. One short rising build, no explosion or tail. Same readable pressure identity, slightly more mechanical than airy. No warning pips, fruit, voice or music. Centered mono-compatible."
+    },
+    {
+      "cue_id": "sfx_machine_discharge",
+      "title": "Máquina: descarga",
+      "duration_seconds": 1.0,
+      "loop": false,
+      "a": "One brief fictional purple-fluid machine discharge: immediate rounded pneumatic thump, a short thick viscous gush, then a tiny wet sticky tail that stops cleanly. Readable force without explosive loudness. Distinct from clear water and from a warning or charging sound. No debris shower, fruit, eating, speech, music or cavern reverb. Centered mono-compatible.",
+      "b": "One short industrial valve release carrying dense fictional purple liquid: immediate dry valve clack, compact pressurized chuff and low rubbery glug, rapidly decaying with a small sticky finish. Same clear discharge timing, slightly more metal detail. No extended hiss, explosion, clear-water spray, fruit, voice or music. Centered mono-compatible."
+    }
+  ],
+  "generation_scope": "music_replacements_only",
+  "reused_sfx_from": {
+    "pilot_id": "sfg-guaira-pilot-01",
+    "flow_url": "https://elevenlabs.io/app/flows/aoC2seBLqtH0qywcqdFt",
+    "status": "received_and_hash_verified"
+  }
+}

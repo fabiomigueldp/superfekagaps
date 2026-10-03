@@ -149,6 +149,21 @@ export function drawJuiceGeysers(c: CanvasRenderingContext2D, b: JuiceMinibossMo
     for (const g of b.geysers) {
         const x = g.x - cx, floor = b.arena.floor - cy, middle = x + g.width / 2;
         if (g.phase === 'warning') {
+            // Show the whole future danger column, including its jump clearance.
+            // Gold, broken edges and a translucent interior distinguish this
+            // harmless projection from the solid purple jet. Never grow its
+            // height with the countdown: the full extent matters from frame one.
+            const top = g.y - cy;
+            c.fillStyle = '#f3c979'; c.globalAlpha = .12;
+            c.fillRect(x, top, g.width, g.height);
+            c.globalAlpha = .8;
+            rect(c, x, top, g.width, 1, '#f3c979');
+            for (let dy = 0; dy < g.height; dy += 8) {
+                const dashHeight = Math.min(3, g.height - dy);
+                rect(c, x, top + dy, 1, dashHeight, '#f3c979');
+                rect(c, x + g.width - 1, top + dy, 1, dashHeight, '#f3c979');
+            }
+            c.globalAlpha = 1;
             fluidPuddle(c, middle, floor, 11, 1.5, g.x, true);
             rect(c, x - 3, floor - 2, g.width + 6, 1, '#f3c979');
             rect(c, x - 3, floor - 5, 1, 5, '#fff0c9'); rect(c, x + g.width + 2, floor - 5, 1, 5, '#fff0c9');

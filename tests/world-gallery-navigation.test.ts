@@ -31,7 +31,7 @@ function harness(t: TestContext) {
     }
     function openGallery() {
         game.render(); key('ArrowDown'); key('Enter'); game.render();
-        assert.equal(game.state, 'gallery'); assert.equal(game.galleryWorld, 0); assert.equal(game.buttons.length, 7);
+        assert.equal(game.state, 'gallery'); assert.equal(game.galleryWorld, 0); assert.equal(game.buttons.length, 8);
     }
     return { game, store, writes, audio, key, openGallery };
 }
@@ -47,8 +47,8 @@ test('gallery grid Escape matches its visible back button and keyboard activatio
         h.store.save.completed = ['1-1']; h.store.save.seen = ['dialogue:visited'];
         const before = structuredClone(h.store.save);
         h.openGallery();
-        if (action === 'button') h.game.buttons[6].run();
-        else { h.game.menuSelection = 6; assert.equal(h.key(action), true); }
+        if (action === 'button') h.game.buttons[7].run();
+        else { h.game.menuSelection = 7; assert.equal(h.key(action), true); }
         assert.equal(h.game.state, 'title'); assert.equal(h.game.galleryWorld, 0);
         assert.deepEqual(h.game.buttons, [], 'Discard gallery actions before the title is painted.');
         h.key('Enter'); assert.equal(h.game.state, 'title', 'An input before the next frame cannot activate a stale button.');
@@ -57,13 +57,13 @@ test('gallery grid Escape matches its visible back button and keyboard activatio
     });
 });
 
-test('every island detail returns to its own grid selection through Escape, the visible button or Enter', async t => {
+test('every island and Guaira detail returns to its own grid selection through Escape, the visible button or Enter', async t => {
     for (const action of ['Escape', 'button', 'Enter'] as const) await t.test(action, child => {
         const h = harness(child);
         h.store.save.seals = ISLANDS.flatMap((_, index) => sealIds(index + 1));
         const before = structuredClone(h.store.save);
         h.openGallery();
-        for (let index = 0; index < ISLANDS.length; index++) {
+        for (let index = 0; index < ISLANDS.length + 1; index++) {
             h.game.buttons[index].run(); h.game.render();
             assert.equal(h.game.galleryWorld, index + 1); assert.equal(h.game.buttons.length, 1);
             assert.equal(h.key('Escape', true), false); assert.equal(h.game.galleryWorld, index + 1, 'Held Escape does not navigate.');
@@ -71,7 +71,7 @@ test('every island detail returns to its own grid selection through Escape, the 
             assert.equal(h.game.state, 'gallery'); assert.equal(h.game.galleryWorld, 0); assert.equal(h.game.menuSelection, index);
             assert.deepEqual(h.game.buttons, [], 'Remove the old detail callback before accepting another action.');
             h.key('Enter'); assert.equal(h.game.state, 'gallery'); assert.equal(h.game.galleryWorld, 0);
-            h.game.render(); assert.equal(h.game.buttons.length, 7);
+            h.game.render(); assert.equal(h.game.buttons.length, 8);
             h.key('Enter'); h.game.render(); assert.equal(h.game.galleryWorld, index + 1, 'Enter reopens the island that was just viewed.');
             h.key('Escape'); h.game.render();
             assert.deepEqual(h.store.save, before); assert.deepEqual(h.writes, []);

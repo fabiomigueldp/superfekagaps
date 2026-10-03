@@ -162,7 +162,8 @@ export class Renderer {
     c.save();c.globalAlpha*=.35;c.fillStyle=ART.ink;c.fillRect(Math.round(x),Math.round(y)-1,w,2);
     c.fillRect(Math.round(x)+2,Math.round(y)-2,Math.max(1,w-4),1);c.restore();
   }
-  drawPlayer(p:PlayerData,camera:CameraData,ctx=this.offscreenCtx):void {
+  /** A sprite-only elapsed offset leaves scenery/effects on the native clock. */
+  drawPlayer(p:PlayerData,camera:CameraData,ctx=this.offscreenCtx,presentationElapsedMs=0):void {
     const position=p.isDead?(p.deathOrigin??p.position):p.position;
     const x=Math.round(position.x)-Math.round(camera.x)-1,y=Math.round(position.y)-Math.round(camera.y)-2;
     if(p.isDead){
@@ -194,7 +195,7 @@ export class Renderer {
     else if((p.landingTimer??0)>0){frame=PLAYER_SPRITES.land;headY=7;}
     else if(Math.abs(p.velocity.x)>.1){
       const i=animationIndex(p.animationTimer,6,p.isRunning?65:100);frame=PLAYER_WALK[i];headY=i%3===1?1:0;
-    }else if(this.clock.time%3400>3260)frame=PLAYER_SPRITES.blink;
+    }else if((this.clock.time+presentationElapsedMs)%3400>3260)frame=PLAYER_SPRITES.blink;
     if(p.isGrounded)this.shadow(ctx,x+3,y+26,12);
     // Flash between complete palette variants; silhouette remains readable during invulnerability.
     const tint=!(p.respawnRevealTimer!>0)&&p.invincibleTimer>0&&animationIndex(p.invincibleTimer,2,90)===1?ART.paper:undefined;
@@ -202,7 +203,7 @@ export class Renderer {
     if(p.hasHelmet)this.atlas.draw(ctx,PLAYER_SPRITES.helmet,PLAYER_PALETTE,x,y+headY-2,!p.facingRight);
     if(p.miniFantaTimer>0){
       for(let i=0;i<3;i++){
-        const step=animationIndex(this.clock.time+i*140,8,90),sx=x-3+(i*11)%23,sy=y+24-step*3;
+        const step=animationIndex(this.clock.time+presentationElapsedMs+i*140,8,90),sx=x-3+(i*11)%23,sy=y+24-step*3;
         ctx.fillStyle=i===1?ART.orangeLight:ART.gold;ctx.fillRect(sx,sy,1,2);
       }
     }

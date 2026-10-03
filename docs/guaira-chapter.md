@@ -32,6 +32,33 @@ Conclusões duram apenas nesta página. Recarregar, sair ou voltar a uma página
 restaurada pelo histórico inicia uma sessão vazia. Não há armazenamento local,
 restauração por query string, novos selos de campanha ou migração de save.
 
+## Desvio opcional pelo Bairro
+
+JORNADA mantém seus cinco trechos e oferece à parte o Bairro da Vala Seca /
+Galeria dos Remendos. A seleção caminha pela estrada existente; GALERIA só abre
+o percurso após a chegada física e uma ação explícita. CHEGAR e movimento
+reduzido não entram no jogo. A visita opcional está disponível antes do primeiro
+trecho, entre trechos e depois de 5/5.
+
+- BAIRRO retorna à maquete na mesma página, parado no Bairro e com GALERIA
+  disponível para outra visita. Também funciona durante carregamento, erro,
+  pausa, morte e conclusão local
+- RETOMAR restaura a seleção obrigatória que estava retida, inclusive um replay
+  já concluído; caminha até ela sem entrar automaticamente
+- TENTAR cria uma Galeria nativa nova, descartando as tampas abertas e o
+  checkpoint local. PAUSA / CONTINUAR só pausa ou retoma a Galeria
+- Acesso de inspeção aberto é feedback local. Não há sexto resultado, selo de
+  visita, histórico opcional ou mudança de recomendação e recibos
+- Para fazer o desvio a partir de uma tentativa obrigatória, primeiro use MAPA.
+  Essa ação continua aceitando o resultado real ou abandonando a tentativa
+  incompleta; não suspende equipamento/checkpoint para retomá-los depois
+
+Uma visita opcional antes do primeiro trecho não fixa a abertura. Falhas de
+carregamento da Galeria oferecem TENTAR e BAIRRO; falhas da maquete oferecem
+TENTAR sem apagar a sessão ou a chegada. O retorno interno não muda URL nem
+histórico. Recarregar, sair da página ou restaurá-la pelo Voltar/Avançar do
+navegador continua iniciando uma sessão vazia.
+
 ## Montagem e descarte
 
 `GuairaChapterApp` possui a sessão e um escopo de visualização. Ao trocar de
@@ -43,6 +70,14 @@ carregados depois de MAPA, TENTAR ou saída não podem criar um jogo tardio.
 entrypoints das páginas. Seu `sample()` relê o resultado no instante da ação.
 `GuairaChapterSession` valida sessão, geração e tentativa. `GuairaChapterMapView`
 cuida apenas da apresentação e chegada pela estrada autoral.
+
+`GuairaChapterNavigation` separa o destino da maquete da seleção obrigatória.
+Cada ação captura geração da sessão e revisão imutável da navegação; até
+selecionar novamente o Bairro invalida ações antigas. `GuairaChapterExcursions`
+carrega somente a classe nativa da Galeria, com identidade própria por tentativa
+e sem adaptador de resultado. O host distingue os dois tipos de runtime,
+registra o descarte antes de instalar controles e mantém a preferência de áudio
+em memória. Imports concluídos com a página oculta começam pausados.
 
 O capítulo reutiliza a imagem, máscara de água, poses e controles bitmap
 existentes. Não adiciona texturas. O orçamento do output continua em
@@ -56,6 +91,12 @@ usam pintura e estrada reais com fronteiras DOM/canvas substituídas. A jornada
 nativa executa os replays reais das duas aberturas até o Prefeito com o Player e
 Input de produção, incluindo uma derrota natural, pausa, abandono, replay e
 descarte. Nenhuma vitória é obtida escrevendo flags de conclusão.
+
+Os testes do host usam fábricas nativas e injetam resultados de forma explícita
+para provar preservação dos mesmos recibos, seleção e recomendação em 0/5, 1/5
+e 5/5 nas duas aberturas. Essas fixtures não provam vitória jogada. O mesmo
+harness verifica revisões obsoletas, imports tardios, tentativas repetidas,
+retorno durante carga, falhas parciais e descarte de recursos.
 
 Essas provas não equivalem a jogar todo o capítulo em um telefone físico. O gate
 de navegador deve registrar separadamente foco/modal, entrada e retorno,

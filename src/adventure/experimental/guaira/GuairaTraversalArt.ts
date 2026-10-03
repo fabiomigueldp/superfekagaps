@@ -386,6 +386,19 @@ export function drawGuairaTraversalObjects(c: CanvasRenderingContext2D, objects:
             r(c, mx - 3, y + 2, 7, 1, '#edcb88');
             r(c, mx, y + 2, 1, Math.min(4, h - 2), '#edcb88');
             r(c, x + 3, y + h - 2, w - 6, 1, '#685248');
+            // A static downward marker connects the jump instruction to the real
+            // pressure plate, not the nearby worker or the gap. It disappears
+            // when solved and never moves or changes the collision body.
+            if (!valve.active) {
+                r(c, mx - 2, y - 15, 5, 8, P.ink);
+                r(c, mx - 5, y - 9, 11, 3, P.ink);
+                r(c, mx - 3, y - 6, 7, 2, P.ink);
+                r(c, mx - 1, y - 4, 3, 2, P.ink);
+                r(c, mx - 1, y - 14, 3, 7, '#ffe7a3');
+                r(c, mx - 4, y - 8, 9, 1, '#ffe7a3');
+                r(c, mx - 2, y - 7, 5, 2, '#ffe7a3');
+                r(c, mx, y - 5, 1, 2, '#ffe7a3');
+            }
         }
     });
 }

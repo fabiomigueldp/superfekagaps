@@ -4,7 +4,7 @@ import type { AdventureStage } from '../../../types';
 
 export const GUAIRA_RESPIROS = Object.freeze({
     id: 'guaira-respiros', width: 44, height: 24, floor: 304,
-    spawnX: 48, checkpointX: 304, finishX: 656, period: 4200,
+    spawnX: 48, checkpointX: 304, finishX: 656, period: 4200, secondPhase: 1200,
     firstJetId: 'guaira-respiro-a', secondJetId: 'guaira-respiro-b',
     firstStart: 160, firstEnd: 256, secondStart: 384, secondEnd: 560,
     jetTop: 176, jetHeight: 132, mapHref: './guaira.html?at=rice', bossHref: './guaira-lab.html'
@@ -28,7 +28,9 @@ export function guairaRespirosStage(): AdventureStage {
         { id: G.firstJetId, kind: 'jet', x: G.firstStart, y: G.jetTop, width: G.firstEnd - G.firstStart,
             height: G.jetHeight, period: G.period, phase: 0 },
         { id: G.secondJetId, kind: 'jet', x: G.secondStart, y: G.jetTop, width: G.secondEnd - G.secondStart,
-            height: G.jetHeight, period: G.period, phase: G.period / 2 }
+            // After observing A, walking to the refuge arrives before B charges.
+            // Its full warning can be watched from safety before the longer crossing.
+            height: G.jetHeight, period: G.period, phase: G.secondPhase }
     ];
     stage.foes = []; stage.exits = []; stage.dialogues = []; stage.landmarks = []; stage.pickups = [];
     stage.checkpoints = [{ x: G.checkpointX / 16, y: G.floor / 16 }];

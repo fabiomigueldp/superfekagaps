@@ -1,0 +1,23 @@
+{
+  "source_commit": "5ad7ea10eee5b69f758c1728971fb1856346ee9a",
+  "source_folder": "audio-pilots/arcade-r2",
+  "sample_rate": 48000,
+  "heard": false,
+  "selection_status": "technical_candidate_pending_perceptual_review",
+  "edits": [
+    {"id":"music-a","source_number":1,"kind":"music","start":8,"end":32,"crossfade":0.04,"lufs":-18.5,"peak_ceiling":-1.5},
+    {"id":"music-b","source_number":2,"kind":"music","start":6.6666666667,"end":33.3333333333,"crossfade":0.04,"lufs":-18.5,"peak_ceiling":-1.5},
+    {"id":"jump-a","source_number":3,"kind":"effect","start":0.105,"end":0.285,"rms":-25,"peak_ceiling":-10},
+    {"id":"jump-b","source_number":4,"kind":"effect","start":0,"end":0.18,"rms":-25,"peak_ceiling":-10},
+    {"id":"water-a","source_number":5,"kind":"ambience","start":0.12,"end":1.80,"crossfade":0.08,"peak_ceiling":-12},
+    {"id":"water-b","source_number":6,"kind":"ambience","start":0.12,"end":1.80,"crossfade":0.08,"peak_ceiling":-12},
+    {"id":"juice-a","source_number":7,"kind":"ambience","start":0.12,"end":1.80,"crossfade":0.08,"peak_ceiling":-14},
+    {"id":"juice-b","source_number":8,"kind":"ambience","start":0.12,"end":1.80,"crossfade":0.08,"peak_ceiling":-14},
+    {"id":"warning-a","source_number":9,"kind":"warning","start":0,"end":0.10,"rms":-20,"peak_ceiling":-7},
+    {"id":"warning-b","source_number":10,"kind":"warning","start":0,"end":0.10,"rms":-20,"peak_ceiling":-7},
+    {"id":"pressure-a","source_number":11,"kind":"effect","start":0.12,"end":0.64,"rms":-24,"peak_ceiling":-12,"fade_in":0.12},
+    {"id":"pressure-b","source_number":12,"kind":"effect","start":0.78,"end":1.30,"rms":-24,"peak_ceiling":-12,"fade_in":0.08},
+    {"id":"discharge-a","source_number":13,"kind":"effect","start":0,"end":0.38,"rms":-23,"peak_ceiling":-8},
+    {"id":"discharge-b","source_number":14,"kind":"effect","start":0,"end":0.28,"rms":-23,"peak_ceiling":-8}
+  ]
+}

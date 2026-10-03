@@ -1,93 +1,208 @@
 import assert from 'node:assert/strict';
-import test, { type TestContext } from 'node:test';
+import test from 'node:test';
 import { readFileSync } from 'node:fs';
-import { transpileModule, ModuleKind, ScriptTarget } from 'typescript';
-import { DisposalScope } from '../src/engine/DisposalScope';
-import { GuairaGallery, GUAIRA_GALLERY } from '../src/adventure/experimental/guaira/gallery/GuairaGallery';
-import { LabToolbarAction } from '../src/adventure/experimental/JuiceLabToolbar';
-import { fitGuairaLabCanvas } from '../src/guaira-lab-layout';
-import { installGuairaLabControls } from '../src/guaira-lab-controls';
-import { sceneLifecycleBrowser, LifecycleElement } from './helpers/sceneLifecycleHarness';
+import { GuairaGallery } from '../src/adventure/experimental/guaira/gallery/GuairaGallery';
+import { GuairaRelief } from '../src/adventure/experimental/guaira/relief/GuairaRelief';
+import type { GuairaInspectionRoomFactory } from '../src/adventure/experimental/guaira/GuairaInspectionRooms';
+import { galleryPageBrowser, flushGalleryPage, savedClick, invokeSaved, deferred } from './helpers/guairaGalleryPageHarness';
+import { LifecycleElement } from './helpers/sceneLifecycleHarness';
 
-/** Page ownership proof using the real native Gallery. Gameplay has its own
- * replay gates; the supplied result below is not evidence of victory. */
-function page(t: TestContext) {
-    const restore: Array<() => void> = [];
-    const h = sceneLifecycleBrowser({ after: (fn: () => void) => restore.push(fn) } as Pick<TestContext, 'after'>);
-    const all = (node: LifecycleElement = h.body): LifecycleElement[] => [node, ...node.children.flatMap(all)];
-    h.document.getElementById = id => all().find(n => n.id === id) ?? null;
-    Object.assign(h.document, { querySelector: (selector: string) => selector === 'nav' ? nav : null });
-    const nav = h.document.createElement('nav');
-    const pause = h.document.createElement('button'), retry = h.document.createElement('button'), map = h.document.createElement('a');
-    h.status.id = 'lab-status'; pause.id = 'lab-pause'; retry.id = 'lab-retry'; map.id = 'lab-exit';
-    Object.assign(map, { href: './guaira.html?at=town' });
-    h.body.replaceChildren(nav, h.canvas); nav.append(h.status, pause, retry, map);
-    for (const [name, value] of Object.entries({ innerWidth: 640, innerHeight: 440 })) {
-        const old = Object.getOwnPropertyDescriptor(globalThis, name);
-        Object.defineProperty(globalThis, name, { configurable: true, writable: true, value });
-        restore.push(() => { if (old) Object.defineProperty(globalThis, name, old); else Reflect.deleteProperty(globalThis, name); });
-    }
-    const games: GalleryBoundary[] = [];
-    class GalleryBoundary extends GuairaGallery {
-        constructor(canvas: HTMLCanvasElement, status: HTMLElement) { super(canvas, status); games.push(this); }
-    }
-    const imports: Record<string, unknown> = {
-        './engine/DisposalScope': { DisposalScope }, './guaira-lab-layout': { fitGuairaLabCanvas },
-        './guaira-lab-controls': { installGuairaLabControls },
-        './adventure/experimental/JuiceLabToolbar': { LabToolbarAction },
-        './adventure/experimental/guaira/gallery/GuairaGallery': { GuairaGallery: GalleryBoundary, GUAIRA_GALLERY }
-    };
-    const source = readFileSync(new URL('../src/guaira-galeria.ts', import.meta.url), 'utf8');
-    const compiled = transpileModule(source, { compilerOptions: { module: ModuleKind.CommonJS, target: ScriptTarget.ES2022 } }).outputText;
-    const boot = () => new Function('require', 'exports', compiled)((path: string) => { assert.ok(path in imports, path); return imports[path]; }, {});
-    t.after(() => { h.window.dispatch('pagehide'); games.forEach(game => game.dispose()); restore.forEach(fn => fn()); });
-    return { ...h, all, pause, retry, map, nav, games, boot };
+type Harness = Awaited<ReturnType<typeof galleryPageBrowser>>;
+const reliefName = 'Seguir para a Câmara de Alívio, continuação opcional';
+/** Ownership-only fixture. Native victory is proven separately without state writes. */
+function finishFixture(h: Harness) {
+    const game = h.activeGame(); assert.ok(game instanceof GuairaGallery);
+    game.finished = true; h.reflect(); assert.equal(h.primary.getAttribute('aria-label'), reliefName); return game;
 }
 
-test('gallery page owns one scene, preserves native pause/retry and always exits to Estrada without a result URL', t => {
-    const h = page(t); h.boot(); const game = h.games[0];
-    assert.ok(game); assert.equal(h.frames.size, 2);
+test('free page owns exactly three 44px toolbar actions and native pause/retry/ordinary Bairro exit', async t => {
+    const h = await galleryPageBrowser(t); await h.boot(); const first = h.activeGame()!;
+    assert.ok(first instanceof GuairaGallery); assert.equal(h.frames.size, 2);
     const listeners = h.listenerCount();
-    h.pause.click(); assert.equal(game.state, 'paused'); assert.equal(h.pause.getAttribute('aria-label'), 'Continuar a tentativa');
-    h.pause.click(); assert.equal(game.state, 'playing');
-    h.key('keydown', 'ArrowRight'); game.input.update(); assert.equal(game.input.getState().right, true);
-    game.finished = true; h.retry.click();
-    assert.equal(game.finished, false); assert.equal(game.input.getState().right, false);
-    h.retry.click(); assert.equal(h.games.length, 1); assert.equal(h.listenerCount(), listeners); assert.equal(h.frames.size, 2);
-    game.finished = true; h.map.click();
-    assert.equal((h.map as unknown as HTMLAnchorElement).href, './guaira.html?at=town');
-    assert.equal(game.store.save.completed.length, 0);
+    h.primary.click(); assert.equal(first.state, 'paused'); assert.equal(h.primary.getAttribute('aria-label'), 'Continuar a tentativa');
+    h.primary.click(); assert.equal(first.state, 'playing');
+    h.key('keydown', 'ArrowRight'); first.input.update(); assert.equal(first.input.getState().right, true);
+    h.retry.click(); assert.equal(first.isDisposed, true); assert.equal(first.input.isDisposed, true); assert.equal(first.audio.isDisposed, true);
+    await flushGalleryPage(); const second = h.activeGame()!;
+    assert.ok(second instanceof GuairaGallery); assert.equal(second.finished, false); assert.equal(second.input.getState().right, false);
+    h.retry.click(); await flushGalleryPage(); assert.equal(h.games.length, 3); assert.equal(h.listenerCount(), listeners); assert.equal(h.frames.size, 2);
+    assert.equal(h.nav.children.filter(n => n.tagName === 'BUTTON' || n.tagName === 'A').length, 3);
+    const html = readFileSync(new URL('../guaira-galeria.html', import.meta.url), 'utf8');
+    assert.match(html, /min-height:44px;min-width:44px/); assert.match(html, /aria-live="polite" aria-atomic="true"/);
+    for (const node of [h.primary, h.retry, h.map]) assert.equal(node.children.filter(n => n.className === 'lab-action-art').length, 1);
+    assert.equal(h.mapHref(), './guaira.html?at=bairro');
+    assert.equal(h.map.dispatch('click', { detail: 1, ctrlKey: true }).defaultPrevented, false, 'Ordinary link navigation stays native');
 });
 
-test('gallery pagehide retires every scene resource; bfcache and repeated restoration create fresh attempts', t => {
-    const h = page(t); h.boot(); const first = h.games[0], oldRetry = h.retry.listeners.find(n => n.type === 'click')!.callback;
-    const frames = [...h.frames.values()]; first.finished = true;
-    h.window.dispatch('pagehide', { persisted: true });
-    assert.equal(first.isDisposed, true); assert.equal(h.frames.size, 0); assert.equal(h.listenerCount(), 2, 'Only document bootstrap pagehide/pageshow remain');
-    assert.equal(h.all().filter(n => n.id === 'guaira-touch-controls').length, 0);
-    for (const frame of frames) frame(performance.now() + 1000);
-    if (typeof oldRetry === 'function') oldRetry(new Event('click')); else oldRetry.handleEvent(new Event('click'));
-    assert.equal(h.frames.size, 0); assert.equal(first.finished, false, 'Disposed attempts discard their result');
-    h.window.dispatch('pageshow', { persisted: true }); const second = h.games[1];
-    assert.equal(second.finished, false); assert.equal(second.state, 'playing'); assert.equal(h.frames.size, 2);
-    h.window.dispatch('pageshow', { persisted: true }); const third = h.games[2];
-    assert.equal(second.isDisposed, true); assert.equal(third.finished, false); assert.equal(h.frames.size, 2);
-    h.window.dispatch('pagehide'); assert.equal(h.listenerCount(), 2); assert.equal(h.frames.size, 0);
-    assert.ok(h.contexts.every(context => context.state === 'closed'));
-});
-
-test('gallery toolbar setup failure leaves plain retry/exit and cleans the partial native scene', t => {
-    const h = page(t); t.mock.method(console, 'error', () => {});
-    const observe = ResizeObserver.prototype.observe; let fail = true;
-    t.mock.method(ResizeObserver.prototype, 'observe', function (this: ResizeObserver, target: Element) {
-        observe.call(this, target);
-        if (fail && (target as unknown) === h.nav) throw Error('Toolbar observation failed');
+test('Gallery requires a living finish and fresh explicit primary; held pointer and Space cannot become ALÍVIO', async t => {
+    const h = await galleryPageBrowser(t);
+    await h.boot(async id => {
+        if (id === 'relief') {
+            assert.equal(h.games[0].isDisposed, true); assert.equal(h.games[0].input.isDisposed, true); assert.equal(h.games[0].audio.isDisposed, true);
+            assert.equal(h.frames.size, 0); assert.ok(h.observers.every(o => o.disconnected));
+            assert.equal(h.all().filter(n => n.id === 'guaira-touch-controls').length, 0);
+        }
+        return h.factories[id];
     });
-    h.boot(); assert.equal(h.games[0].isDisposed, true); assert.equal(h.frames.size, 0);
-    assert.equal(h.status.getAttribute('role'), 'alert'); assert.equal(h.retry.textContent, 'TENTAR'); assert.equal(h.map.textContent, 'MAPA');
+    h.primary.click(); assert.equal(h.activeGame()!.state, 'paused'); h.primary.click(); assert.deepEqual(h.loads, ['gallery']);
+    h.primary.dispatch('pointerdown', { pointerId: 9 });
+    h.window.dispatch('keydown', { key: ' ', code: 'Space', target: h.primary, repeat: false });
+    const game = finishFixture(h); h.primary.dispatch('click', { detail: 1 }); assert.deepEqual(h.loads, ['gallery']);
+    h.primary.click(); assert.deepEqual(h.loads, ['gallery'], 'Space held from PAUSA cannot activate ALÍVIO');
+    const old = savedClick(h.primary); game.player.data.isDead = true; invokeSaved(old); assert.deepEqual(h.loads, ['gallery']);
+    game.player.data.isDead = false; assert.equal(h.nativeKey('Enter', h.primary, true).defaultPrevented, true);
+    game.toggleGalleryPause(); h.reflect(); invokeSaved(old); assert.equal(game.state, 'paused');
+    h.primary.click(); assert.equal(game.state, 'playing'); assert.equal(h.activeGame(), game);
+    invokeSaved(old); assert.equal(h.activeGame(), game);
+    h.nativeKey('Enter'); await flushGalleryPage(); assert.ok(h.activeGame() instanceof GuairaRelief);
+    invokeSaved(old); assert.deepEqual(h.loads, ['gallery', 'relief']);
+});
+
+for (const interrupt of ['blur', 'hidden'] as const)
+test(`${interrupt} invalidates stale primary/retry and held input; fresh resume and retry remain usable`, async t => {
+    const h = await galleryPageBrowser(t); await h.boot(); const game = finishFixture(h);
+    const oldPrimary = savedClick(h.primary), oldRetry = savedClick(h.retry);
+    h.primary.dispatch('pointerdown', { pointerId: 9 }); h.retry.dispatch('pointerdown', { pointerId: 10 });
+    game.audio.enabled = false;
+    if (interrupt === 'blur') h.window.dispatch('blur'); else { h.document.hidden = true; h.document.dispatch('visibilitychange'); }
+    invokeSaved(oldPrimary); invokeSaved(oldRetry); assert.deepEqual(h.loads, ['gallery']);
+    if (interrupt === 'blur') h.window.dispatch('focus'); else { h.document.hidden = false; h.document.dispatch('visibilitychange'); }
+    h.reflect(); invokeSaved(oldPrimary); invokeSaved(oldRetry);
+    h.primary.dispatch('click', { detail: 1 }); h.retry.dispatch('click', { detail: 1 }); assert.deepEqual(h.loads, ['gallery']);
+    assert.equal(game.state, 'paused');
+    h.primary.click(); assert.equal(game.state, 'playing'); h.primary.click(); await flushGalleryPage();
+    assert.ok(h.activeGame() instanceof GuairaRelief); assert.equal(h.activeGame()!.audio.enabled, false);
+    if (interrupt === 'blur') { h.window.dispatch('blur'); h.window.dispatch('focus'); }
+    else { h.document.hidden = true; h.document.dispatch('visibilitychange'); h.document.hidden = false; h.document.dispatch('visibilitychange'); }
+    h.retry.click(); await flushGalleryPage(); assert.deepEqual(h.loads, ['gallery', 'relief', 'relief']);
+});
+
+for (const sceneId of ['gallery', 'relief'] as const)
+for (const interruption of ['blur', 'hidden'] as const)
+test(`${sceneId} pending load remembers ${interruption} and mounts paused even if focus returns first`, async t => {
+    const h = await galleryPageBrowser(t), pending = deferred<GuairaInspectionRoomFactory>();
+    await h.boot(id => id === sceneId ? pending.promise : Promise.resolve(h.factories[id]));
+    if (sceneId === 'relief') { finishFixture(h); h.primary.click(); }
+    if (interruption === 'blur') { h.window.dispatch('blur'); h.window.dispatch('focus'); }
+    else { h.document.hidden = true; h.document.dispatch('visibilitychange'); h.document.hidden = false; h.document.dispatch('visibilitychange'); }
+    pending.resolve(h.factories[sceneId]); await flushGalleryPage(); const game = h.activeGame()!;
+    assert.equal(game.state, 'paused'); const elapsed = game.elapsed; h.reflect(); assert.equal(game.elapsed, elapsed);
+    h.primary.click(); assert.equal(game.state, 'playing');
+    h.retry.click(); await flushGalleryPage(); assert.notEqual(h.activeGame(), game);
+});
+
+for (const exit of ['retry', 'pagehide', 'bfcache'] as const)
+test(`late Relief import cannot replace current view after ${exit}`, async t => {
+    const h = await galleryPageBrowser(t), pending = deferred<GuairaInspectionRoomFactory>(); let reliefLoads = 0, stale = 0;
+    await h.boot(id => id === 'gallery' ? Promise.resolve(h.factories.gallery) : ++reliefLoads === 1 ? pending.promise : Promise.resolve(h.factories.relief));
+    finishFixture(h); const oldPrimary = savedClick(h.primary); h.primary.click(); const oldRetry = savedClick(h.retry);
+    if (exit === 'retry') { h.retry.click(); await flushGalleryPage(); assert.ok(h.activeGame() instanceof GuairaRelief); }
+    else { h.window.dispatch('pagehide', { persisted: true }); if (exit === 'bfcache') { h.window.dispatch('pageshow', { persisted: true }); await flushGalleryPage(); assert.ok(h.activeGame() instanceof GuairaGallery); } }
+    const game = h.activeGame(); invokeSaved(oldPrimary); invokeSaved(oldRetry);
+    pending.resolve(() => { stale++; throw Error('Retired factory'); }); await flushGalleryPage();
+    assert.equal(stale, 0); assert.equal(h.activeGame(), game);
+    if (exit === 'pagehide') h.checkDisposed();
+});
+
+for (const failure of ['import', 'constructor', 'controls', 'toolbar', 'bitmap', 'wrong-room'] as const)
+test(`Relief ${failure} failure retires ownership and TENTAR retries the current room`, async t => {
+    const h = await galleryPageBrowser(t); t.mock.method(console, 'error', () => {}); let fail = true;
+    await h.boot(async id => {
+        if (id === 'gallery') return h.factories.gallery;
+        if (failure === 'import' && fail) throw Error('Import failed');
+        return failure === 'wrong-room' && fail ? h.factories.gallery : h.factories.relief;
+    });
+    finishFixture(h); let restore = () => {};
+    if (failure === 'constructor') {
+        const patch = t.mock.method(GuairaRelief.prototype, 'load', () => { throw Error('Stage failed'); }); restore = () => patch.mock.restore();
+    } else if (failure === 'bitmap') {
+        const patch = t.mock.method(LifecycleElement.prototype, 'getContext', () => { throw Error('Canvas failed'); }); restore = () => patch.mock.restore();
+    } else if (failure === 'controls' || failure === 'toolbar') {
+        const observe = ResizeObserver.prototype.observe;
+        const patch = t.mock.method(ResizeObserver.prototype, 'observe', function (this: ResizeObserver, target: Element) {
+            observe.call(this, target); const node = target as unknown as LifecycleElement;
+            if (failure === 'controls' ? node.id === 'guaira-touch-controls' : node.tagName === 'NAV') throw Error('Observation failed');
+        }); restore = () => patch.mock.restore();
+    }
+    h.primary.click(); await flushGalleryPage();
+    assert.equal(h.activeGame(), undefined); assert.equal(h.status.getAttribute('role'), 'alert'); assert.equal(h.frames.size, 0);
+    assert.match(h.status.textContent, /Câmara de Alívio/); assert.equal(h.retry.textContent, 'TENTAR'); assert.equal(h.map.textContent, 'MAPA');
+    assert.equal(h.mapHref(), './guaira.html?at=bairro'); assert.ok(h.contexts.every(c => c.state === 'closed')); assert.ok(h.observers.every(o => o.disconnected));
     assert.equal(h.all().filter(n => n.id === 'guaira-touch-controls').length, 0);
-    assert.equal(h.listenerCount(), 3, 'Only the retry and document bootstrap callbacks survive');
-    fail = false; h.retry.click(); assert.equal(h.games.length, 2); assert.equal(h.games[1].isDisposed, false);
+    restore(); fail = false; h.retry.click(); await flushGalleryPage(); assert.ok(h.activeGame() instanceof GuairaRelief);
     assert.equal(h.status.getAttribute('role'), 'status'); assert.equal(h.frames.size, 2);
-    h.window.dispatch('pagehide'); assert.equal(h.listenerCount(), 2);
+});
+
+test('pagehide and repeated bfcache restore always create fresh Gallery attempts and retire all callbacks/resources', async t => {
+    const h = await galleryPageBrowser(t); await h.boot(); finishFixture(h); h.primary.click(); await flushGalleryPage();
+    const first = h.activeGame()!, oldRetry = savedClick(h.retry), frames = [...h.frames.values()];
+    h.window.dispatch('pagehide', { persisted: true }); assert.equal(first.isDisposed, true); h.checkDisposed();
+    for (const frame of frames) frame(performance.now() + 1000); invokeSaved(oldRetry); h.checkDisposed();
+    h.window.dispatch('pageshow', { persisted: true }); await flushGalleryPage(); const second = h.activeGame();
+    assert.ok(second instanceof GuairaGallery); assert.equal(second.finished, false); assert.equal(second.state, 'playing');
+    h.window.dispatch('pageshow', { persisted: true }); await flushGalleryPage(); assert.equal(second.isDisposed, true);
+    assert.ok(h.activeGame() instanceof GuairaGallery); assert.equal(h.frames.size, 2);
+});
+
+test('reentrant factory retires itself and cannot replace newer Relief attempt', async t => {
+    const h = await galleryPageBrowser(t); let count = 0;
+    await h.boot(async id => id === 'gallery' || ++count > 1 ? h.factories[id] : (canvas, status) => {
+        const runtime = h.factories.relief(canvas, status); h.retry.click(); return runtime;
+    });
+    finishFixture(h); h.primary.click(); await flushGalleryPage();
+    assert.ok(h.activeGame() instanceof GuairaRelief); assert.equal(h.games[1].isDisposed, true); assert.equal(h.games.length, 3); assert.equal(h.frames.size, 2);
+});
+
+for (const interrupt of ['blur', 'hidden'] as const)
+for (const phase of ['loading', 'error'] as const)
+test(`${phase} retry recovers after ${interrupt} with a fresh press while saved/held activation remains retired`, async t => {
+    const h = await galleryPageBrowser(t), pending = deferred<GuairaInspectionRoomFactory>(); let attempts = 0;
+    t.mock.method(console, 'error', () => {});
+    await h.boot(async id => {
+        if (++attempts > 1) return h.factories[id];
+        if (phase === 'error') throw Error('Load failed');
+        return pending.promise;
+    });
+    const oldRetry = savedClick(h.retry);
+    h.retry.dispatch('pointerdown', { pointerId: 10 });
+    h.window.dispatch('keydown', { key: ' ', code: 'Space', target: h.retry, repeat: false });
+    if (interrupt === 'blur') h.window.dispatch('blur'); else { h.document.hidden = true; h.document.dispatch('visibilitychange'); }
+    if (interrupt === 'blur') h.window.dispatch('focus'); else { h.document.hidden = false; h.document.dispatch('visibilitychange'); }
+    invokeSaved(oldRetry); h.retry.dispatch('click', { detail: 1 }); h.retry.click(); assert.equal(attempts, 1);
+    h.nativeKey('Enter', h.retry); await flushGalleryPage(); assert.ok(h.activeGame() instanceof GuairaGallery);
+    pending.resolve(() => { assert.fail('Retired load must not be constructed'); }); await flushGalleryPage();
+    assert.equal(attempts, 2);
+});
+
+for (const failure of ['wrong-room', 'reentrant'] as const)
+test(`muted Gallery preference survives ${failure} factory disposal before runtime acceptance`, async t => {
+    const h = await galleryPageBrowser(t); let attempts = 0;
+    t.mock.method(console, 'error', () => {});
+    await h.boot(async id => {
+        if (id === 'gallery' || ++attempts > 1) return h.factories[id];
+        if (failure === 'wrong-room') return h.factories.gallery;
+        return (canvas, status) => { const runtime = h.factories.relief(canvas, status); h.retry.click(); return runtime; };
+    });
+    const first = finishFixture(h); first.audio.enabled = false; h.primary.click(); await flushGalleryPage();
+    if (failure === 'wrong-room') { assert.equal(h.status.getAttribute('role'), 'alert'); h.retry.click(); await flushGalleryPage(); }
+    assert.ok(h.activeGame() instanceof GuairaRelief); assert.equal(h.activeGame()!.audio.enabled, false);
+    assert.ok(h.games.slice(0, -1).every(game => game.isDisposed));
+});
+
+for (const kind of ['pointer', 'keyboard'] as const)
+test(`primary and retry gestures held across retry cannot act on the replacement scene (${kind})`, async t => {
+    const h = await galleryPageBrowser(t); await h.boot(); finishFixture(h);
+    if (kind === 'pointer') {
+        h.primary.dispatch('pointerdown', { pointerId: 7 }); h.retry.dispatch('pointerdown', { pointerId: 8 });
+    } else {
+        h.window.dispatch('keydown', { key: ' ', code: 'Space', target: h.primary, repeat: false });
+        h.window.dispatch('keydown', { key: ' ', code: 'Space', target: h.retry, repeat: false });
+    }
+    const retry = savedClick(h.retry);
+    // A second, explicit modality requests restart while the original remains held.
+    if (kind === 'pointer') h.retry.click(); else h.retry.dispatch('click', { detail: 1 });
+    await flushGalleryPage(); const game = h.activeGame()!; assert.equal(game.state, 'playing');
+    h.primary.dispatch('click', { detail: kind === 'pointer' ? 1 : 0 });
+    h.retry.dispatch('click', { detail: kind === 'pointer' ? 1 : 0 }); invokeSaved(retry);
+    assert.equal(h.activeGame(), game); assert.equal(game.state, 'playing'); assert.deepEqual(h.loads, ['gallery', 'gallery']);
 });

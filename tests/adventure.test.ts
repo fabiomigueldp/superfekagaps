@@ -1,3 +1,4 @@
+import { guairaChapterRoute } from '../src/adventure/experimental/guaira/chapter/GuairaChapterProgress';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { STAGES, stageById } from '../src/adventure/campaign';
@@ -39,6 +40,10 @@ test('normal and secret routes require all six bosses while keeping skipped stag
             if (w < 6)
                 assert.equal(isUnlocked(`${w + 1}-1`, save), false);
             finishStage(save, `${w}-5`, 'normal', 60);
+            if (w === 3) {
+                assert.equal(isUnlocked('4-1', save), false);
+                save.guaira.completed = guairaChapterRoute(save.guaira.opening);
+            }
         }
         assert.equal(save.completed.length, useSecrets ? 24 : 30);
     }

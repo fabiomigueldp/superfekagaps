@@ -9,7 +9,7 @@ import { mapToScreen, screenToMap, type MapCamera } from '../src/adventure/World
 import { atlasCableBounds, paintCableLines, validCableFrame, type AtlasCableCar, type CableAtlasFrame } from '../src/adventure/WorldCableArt';
 import { parseMaritimeBuoys } from '../src/adventure/WorldMaritimeArt';
 
-interface Call { name: string; args: unknown[]; color?: unknown }
+interface Call { name: string; args: unknown[]; color?: unknown; stroke?: unknown }
 function recordingContext() {
     const calls: Call[] = [];
     const target: Record<string, unknown> = {};
@@ -17,7 +17,7 @@ function recordingContext() {
         if (key in object) return object[key];
         if (key === 'createLinearGradient' || key === 'createRadialGradient') return () => ({ addColorStop() {} });
         return (...args: unknown[]) => { calls.push({ name: key, args,
-            color: typeof object.fillStyle === 'object' ? 'gradient' : object.fillStyle }); };
+            color: typeof object.fillStyle === 'object' ? 'gradient' : object.fillStyle, stroke: object.strokeStyle }); };
     }, set: (object, key: string, value: unknown) => { object[key] = value; return true; } }) as unknown as CanvasRenderingContext2D;
     return { context, calls };
 }
@@ -378,4 +378,66 @@ test('parked cabin paint stays deterministic and a remote-region preview never i
     state.cableCars = [cable('a', 3.3, -.4), cable('b', 3.4, -.5)]; state.actor.visible = false;
     paintWorldAtlas(a.context, state); paintWorldAtlas(b.context, { ...state, time: 99999 });
     assert.equal(actorPixels(a.calls).length, 0); assert.deepEqual(a.calls, b.calls);
+});
+
+function wakeScene(speed: number, heading = 0) {
+    const state = scene();
+    state.reducedMotion = false;
+    state.islands = [];
+    state.actor.visible = false;
+    state.boats![0].motion = { speed, screenHeading: heading, waterline: { x: .9, y: .8 } };
+    return state;
+}
+function wakeCalls(state: AtlasPaintState) {
+    const { context, calls } = recordingContext();
+    paintWorldAtlas(context, state);
+    return calls.filter(call => ['moveTo', 'quadraticCurveTo', 'stroke'].includes(call.name) &&
+        typeof call.stroke === 'string' && call.stroke.startsWith('rgba(229,247,233,'));
+}
+
+test('ferry wake grows continuously from rest and keeps its full-speed stern silhouette in every heading', () => {
+    for (let frame = 0; frame < 64; frame++) {
+        const heading = frame * Math.PI / 32, scale = atlasActorScale(camera, wakeScene(1).boats![0].frame);
+        let previousAlpha = 0, previousLength = 0;
+        for (const speed of [.001, .009, .011, .1, .5, 1]) {
+            const calls = wakeCalls(wakeScene(speed, heading));
+            assert.equal(calls.length, 6, 'Two bounded curves, including below the former .01 cutoff.');
+            const alpha = Number((calls[0].stroke as string).slice(17, -1));
+            const start = calls[0].args as number[], end = calls[1].args as number[];
+            const length = Math.hypot(end[2] - start[0], end[3] - start[1]) / scale;
+            assert.ok(alpha > previousAlpha && alpha <= .32);
+            assert.ok(length > previousLength);
+            if (speed < .012) { assert.ok(alpha < .00014); assert.ok(length < .01); }
+            if (speed === 1) {
+                assert.equal(alpha, .32);
+                assert.ok(Math.abs(length - Math.hypot(22, 5)) < 1e-10);
+                const water = mapToScreen({ x: .9, y: .8 }, camera);
+                assert.ok(Math.abs((start[0] - water.x) * Math.cos(heading) +
+                    (start[1] - water.y) * Math.sin(heading) + 15 * scale) < 1e-10);
+            }
+            previousAlpha = alpha; previousLength = length;
+        }
+    }
+});
+
+test('wake suppression, reduced motion and invalid hulls leave no detached foam', () => {
+    for (const speed of [0, -1, NaN, Infinity]) assert.deepEqual(wakeCalls(wakeScene(speed)), []);
+    const reduced = wakeScene(1); reduced.reducedMotion = true;
+    assert.deepEqual(wakeCalls(reduced), []);
+    const missing = wakeScene(1); missing.boats![0].assets.rear = null;
+    assert.deepEqual(wakeCalls(missing), []);
+    const invalid = wakeScene(1); invalid.boats![0].frame = { ...frame, width: NaN };
+    assert.deepEqual(wakeCalls(invalid), []);
+    assert.deepEqual(wakeCalls(wakeScene(1, NaN)), []);
+    assert.deepEqual(wakeCalls(wakeScene(2)), wakeCalls(wakeScene(1)), 'Overspeed cannot expand the visual envelope.');
+});
+
+test('wake speed changes neither terrain nor the authored hull and passenger painting', () => {
+    const paintings = [0, .01, .5, 1].map(speed => {
+        const state = scene(); state.reducedMotion = false;
+        state.boats![0].motion = { speed, screenHeading: 0, waterline: { x: .9, y: .8 } };
+        const { context, calls } = recordingContext(); paintWorldAtlas(context, state);
+        return calls.filter(call => call.name === 'drawImage' || call.name === 'fillRect').map(({ stroke, ...call }) => call);
+    });
+    for (const painting of paintings.slice(1)) assert.deepEqual(painting, paintings[0]);
 });

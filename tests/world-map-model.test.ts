@@ -67,6 +67,7 @@ test('each island boss gate takes precedence, then the selected local prerequisi
         for (let number = 1; number <= 5; number++)
             assert.equal(mapStagePrerequisite(`${world}-${number}`, save), `${world - 1}-5`);
         finishStage(save, `${world - 1}-5`, 'normal', 10);
+        if (world === 4) save.legacySerraAccess = true; // this generic stage-rule matrix uses an earned legacy crossing
         assert.equal(mapStagePrerequisite(`${world}-1`, save), null);
         for (let number = 2; number <= 5; number++)
             assert.equal(mapStagePrerequisite(`${world}-${number}`, save), `${world}-${number - 1}`);
@@ -83,6 +84,7 @@ test('an already open secret boss has no lock explanation, while its island gate
         if (world > 1) {
             assert.equal(mapStagePrerequisite(`${world}-5`, save), `${world - 1}-5`);
             finishStage(save, `${world - 1}-5`, 'normal', 10);
+        if (world === 4) save.legacySerraAccess = true; // this generic stage-rule matrix uses an earned legacy crossing
         }
         assert.equal(isUnlocked(`${world}-5`, save), true);
         assert.equal(mapStagePrerequisite(`${world}-5`, save), null);

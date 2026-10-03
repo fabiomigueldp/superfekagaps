@@ -1,5 +1,7 @@
 import type { Character, Preferences } from './types';
 import { combatTones } from './WorldCombatFeedback';
+import { WorldSampleAudio, type WorldSamplePack } from './WorldSampleAudio';
+import { ARCADE_AUDIO_PACK } from './ArcadeAudioPack';
 export const MELODIES = [
     [0, 4, 7, 9, 7, 4, 2, 4, 0, 4, 7, 12, 11, 7, 4, 2, 5, 9, 12, 14, 12, 9, 7, 5, 4, 7, 11, 9, 7, 4, 2, -1],
     [0, 0, 7, 4, 0, 2, 4, 7, 9, 7, 4, 2, 0, -1, 2, 4, 5, 5, 12, 9, 5, 7, 9, 12, 11, 7, 4, 2, 0, -1, 7, -1],
@@ -33,6 +35,10 @@ export function musicNotes(theme: number, step: number, boss = false) {
 export class WorldAudio {
     private disposed = false;
     private readonly sources = new Set<() => void>();
+    private readonly musicSources = new Set<() => void>();
+    private readonly effectsSources = new Set<() => void>();
+    private readonly voiceSources = new Set<() => void>();
+    private readonly samples: WorldSampleAudio;
     get isDisposed(): boolean { return this.disposed; }
     private ctx: AudioContext | null = null;
     private music: GainNode | null = null;
@@ -54,7 +60,13 @@ export class WorldAudio {
     } | null = null;
     private airBuffer: AudioBuffer | null = null;
     enabled = true;
-    constructor(public preferences: Preferences) { }
+    constructor(public preferences: Preferences, samplePack: WorldSamplePack = ARCADE_AUDIO_PACK) {
+        this.samples = new WorldSampleAudio(() => this.ctx && this.music && this.effects ? {
+            context: this.ctx, music: this.music, effects: this.effects,
+            enabled: this.enabled && !this.paused, musicEnabled: this.preferences.music > 0,
+            effectsEnabled: this.preferences.effects > 0,
+        } : null, samplePack);
+    }
     unlock() { if (this.disposed || this.paused) return; if (!this.ctx) {
         try {
             this.ctx = new AudioContext();
@@ -74,9 +86,10 @@ export class WorldAudio {
     dispose(): void {
         if (this.disposed) return;
         this.disposed = true; this.paused = true;
-        this.cancelSpeech(); this.releaseContext();
+        this.samples.dispose(); this.cancelSpeech(); this.releaseContext();
     }
     private releaseContext(): void {
+        this.samples.reset();
         for (const release of [...this.sources]) release();
         for (const bus of [this.music, this.effects, this.voice]) {
             try { bus?.disconnect(); } catch { /* Already detached by the device. */ }
@@ -87,11 +100,11 @@ export class WorldAudio {
             try { void context.close().catch(() => {}); } catch { /* Closing is best effort. */ }
         }
     }
-    private ownSource(source: AudioScheduledSourceNode, nodes: AudioNode[]): void {
+    private ownSource(source: AudioScheduledSourceNode, nodes: AudioNode[], bus?: 'music' | 'effects' | 'voice'): void {
         let live = true;
         const detach = () => {
             if (!live) return;
-            live = false; this.sources.delete(release); source.onended = null;
+            live = false; this.sources.delete(release); this.musicSources.delete(release); this.effectsSources.delete(release); this.voiceSources.delete(release); source.onended = null;
             for (const node of [source, ...nodes]) {
                 try { node.disconnect(); } catch { /* Already detached by the device. */ }
             }
@@ -100,26 +113,39 @@ export class WorldAudio {
             try { source.stop(); } catch { /* Already ended or not started. */ }
             detach();
         };
-        this.sources.add(release); source.onended = detach;
+        this.sources.add(release);
+        if (bus === 'music') this.musicSources.add(release);
+        if (bus === 'effects') this.effectsSources.add(release);
+        if (bus === 'voice') this.voiceSources.add(release);
+        source.onended = detach;
+    }
+    private cancelEffects(): void {
+        this.samples.cancelEffects();
+        for (const release of [...this.effectsSources]) release();
     }
     /** Read-only route for cancellable lab cues; never creates or resumes a context. */
     getEffectsRoute(): { context: AudioContext; destination: GainNode; enabled: boolean } | null {
         return !this.disposed && this.ctx && this.effects ? { context: this.ctx, destination: this.effects, enabled: this.enabled } : null;
     }
     volume() { if (this.disposed || !this.ctx)
-        return; const now = this.ctx.currentTime; this.music!.gain.setTargetAtTime(this.enabled ? this.preferences.music * .14 * (this.dying ? .15 : 1) : 0, now, .06); this.effects!.gain.setTargetAtTime(this.enabled ? this.preferences.effects * .3 : 0, now, .02); this.voice!.gain.setTargetAtTime(this.enabled ? this.preferences.voice * .22 : 0, now, .02); if (this.clip)
+        return; if (!this.enabled || this.preferences.effects <= 0) { this.cancelEffects(); this.samples.cancelAmbience(); } const now = this.ctx.currentTime; this.music!.gain.setTargetAtTime(this.enabled ? this.preferences.music * .14 * (this.dying ? .15 : 1) : 0, now, .06); this.effects!.gain.setTargetAtTime(this.enabled ? this.preferences.effects * .3 : 0, now, .02); this.voice!.gain.setTargetAtTime(this.enabled ? this.preferences.voice * .22 : 0, now, .02); if (this.clip)
         this.clip.volume = this.enabled ? this.preferences.voice : 0; }
-    setDying(value: boolean) { if (this.disposed) return; this.dying = value; this.volume(); }
+    setDying(value: boolean) { if (this.disposed) return; this.dying = value; if (value) { this.cancelEffects(); this.samples.setAmbience(); } this.volume(); }
+    ambience(kind?: string, level = 1) { if (!this.disposed) this.samples.setAmbience(this.dying ? undefined : kind, level); }
     toggle() { if (this.disposed) return; this.enabled = !this.enabled; this.volume(); }
-    select(world: number, boss = false) { if (this.disposed) return; this.theme = world === 0 ? 6 : Math.max(0, world - 1); this.boss = boss; this.step = 0; this.next = this.ctx?.currentTime ?? 0; this.cancelSpeech(); }
+    select(world: number, boss = false, sceneId?: string) { if (this.disposed) return; this.samples.select(sceneId); this.cancelEffects(); for (const release of [...this.musicSources]) release(); this.theme = world === 0 ? 6 : Math.max(0, world - 1); this.boss = boss; this.step = 0; this.next = this.ctx?.currentTime ?? 0; this.cancelSpeech(); }
     pause(value: boolean) { if (this.disposed) return; this.paused = value; if (value) {
+        this.cancelEffects();
+        this.samples.cancelAmbience();
         this.cancelSpeech();
         if (this.ctx)
             try { void this.ctx.suspend().catch(() => {}); } catch { /* Device may have closed. */ }
     }
     else {
         this.unlock();
-        this.next = this.ctx?.currentTime ?? 0;
+        // AudioContext time freezes during suspension. Keep the scheduled beat
+        // cursor so resumed notes are not overlaid with a second fresh beat.
+        // tick() already catches up if a device interruption advanced its clock.
     } }
     private tone(freq: number, seconds: number, type: OscillatorType, gain: number, bus: GainNode | null, when?: number) {
         if (this.disposed || !this.ctx || !bus || this.ctx.state !== 'running')
@@ -133,7 +159,7 @@ export class WorldAudio {
         env.gain.exponentialRampToValueAtTime(.001, t + seconds);
         osc.connect(env);
         env.connect(bus);
-        this.ownSource(osc, [env]);
+        this.ownSource(osc, [env], bus === this.music ? 'music' : bus === this.effects ? 'effects' : undefined);
         osc.start(t);
         osc.stop(t + seconds + .015);
     }
@@ -157,11 +183,17 @@ export class WorldAudio {
         env.gain.linearRampToValueAtTime(gain, now + .015);
         env.gain.exponentialRampToValueAtTime(.001, now + seconds);
         source.connect(filter); filter.connect(env); env.connect(this.effects);
-        this.ownSource(source, [filter, env]);
+        this.ownSource(source, [filter, env], 'effects');
         source.start(now); source.stop(now + seconds + .02);
     }
     sfx(kind: string) {
-        if (this.disposed) return;
+        if (this.disposed || this.paused || !this.enabled || this.preferences.effects <= 0) return;
+        if (kind === 'jet' || kind === 'cannon') { this.samples.cancelEffect('pressure'); this.samples.cancelEffect('warning'); }
+        if (kind === 'pressure' && this.samples.play('pressure', .24)) {
+            this.sfx('warning'); // Audio-only lead-in; the simulation still owns discharge timing.
+            return;
+        }
+        if (this.samples.play(kind)) return;
         const combat = combatTones(kind);
         if (combat) {
             if (this.paused || !this.enabled || this.preferences.effects <= 0 || !this.ctx || this.ctx.state !== 'running') return;
@@ -220,11 +252,12 @@ export class WorldAudio {
         env.gain.linearRampToValueAtTime(.22, now + .012);
         env.gain.exponentialRampToValueAtTime(.001, now + .085);
         env.connect(this.voice);
-        this.ownSource(source, [env, ...filters]);
+        this.ownSource(source, [env, ...filters], 'voice');
         source.start(now);
         source.stop(now + .09);
     }
     cancelSpeech() {
+        for (const release of [...this.voiceSources]) release();
         const clip = this.clip; this.clip = null; this.speaking = null;
         if (clip) {
             try { clip.pause(); } catch { /* Device may already be gone. */ }
@@ -232,12 +265,17 @@ export class WorldAudio {
         }
     }
     tick(dt: number) {
+        const sampledMusic = this.samples.tick();
         if (this.disposed || !this.ctx || this.paused || this.ctx.state !== 'running')
             return;
         const now = this.ctx.currentTime;
         if (this.next < now - .2)
             this.next = now;
-        while (this.next < now + .07) {
+        if (sampledMusic) {
+            for (const release of [...this.musicSources]) release();
+            this.next = now;
+        }
+        while (!sampledMusic && this.next < now + .07) {
             const plan = musicNotes(this.theme, this.step, this.boss);
             for (const n of plan.notes)
                 this.tone(n.frequency, n.duration, n.type, n.volume, this.music, this.next);

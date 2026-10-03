@@ -30,7 +30,7 @@ function harness(t: TestContext, failClick = false) {
     const game = Object.create(WorldGame.prototype) as any;
     let imports = 0, volumeUpdates = 0;
     const importSave = store.import.bind(store);
-    store.import = (raw: string) => { imports++; importSave(raw); };
+    store.import = (raw: string) => { imports++; return importSave(raw); };
     Object.assign(game, { store, selection: 17, state: 'settings', toast: 'Existing message', toastTimer: 123,
         audio: { preferences: store.save.preferences, volume() { volumeUpdates++; } } });
     t.after(() => {
@@ -69,7 +69,7 @@ test('invalid content is parsed before store import and read errors clean up wit
         input.files = [{ text: async () => { if (kind === 'read failure') throw Error('Unreadable file'); return kind === 'invalid JSON' ? '{' : '{"version":99}'; } }];
         await input.onchange!();
         assert.deepEqual(h.store.save, before); assert.equal(h.game.audio.preferences, preferences); assert.equal(h.imports, 0); assert.equal(h.volumeUpdates, 0);
-        assert.equal(h.writes.length, 0); assert.equal(h.children.length, 0); assert.equal(h.game.toast, 'Arquivo de progresso inválido.');
+        assert.equal(h.writes.length, 0); assert.equal(h.children.length, 0); assert.equal(h.game.toast, kind === 'read failure' ? 'Falha ao ler. Selecione de novo.' : 'Save inválido ou incompatível.');
     });
 });
 
@@ -106,4 +106,24 @@ test('a chooser-opening error cleans the attached input and preserves the save',
     assert.equal(input.attached, false); assert.equal(h.children.length, 0); assert.equal(h.game.saveImportCleanup, undefined);
     assert.deepEqual(h.store.save, before); assert.equal(h.imports, 0); assert.equal(h.writes.length, 0);
     assert.match(h.game.toast, /Não foi possível abrir/);
+});
+
+ test('audio update failure cannot turn a committed import into a file error', async t => {
+    const h = harness(t), input = h.open();
+    h.game.audio.volume = () => { throw Error('Audio unavailable'); };
+    const save = freshSave(); save.completed = ['1-1'];
+    input.files = [{ text: async () => JSON.stringify(save) }];
+    await input.onchange!();
+    assert.deepEqual(h.store.save, save); assert.equal(h.writes.length, 1);
+    assert.equal(h.game.toast, 'Progresso importado.'); assert.equal(h.children.length, 0);
+});
+
+test('a refused storage commit reports failure without success feedback or audio changes', async t => {
+    const h = harness(t), input = h.open(), before = h.store.save, preferences = h.game.audio.preferences;
+    h.store.import = () => false;
+    input.files = [{ text: async () => JSON.stringify({ ...freshSave(), completed: ['1-1'] }) }];
+    await input.onchange!();
+    assert.equal(h.store.save, before); assert.equal(h.game.audio.preferences, preferences); assert.equal(h.volumeUpdates, 0);
+    assert.equal(h.game.toast, 'Falha ao salvar. Progresso mantido.'); assert.equal(h.game.toastTimer, 5000);
+    assert.equal(h.writes.length, 0); assert.equal(h.children.length, 0);
 });

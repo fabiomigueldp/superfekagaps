@@ -43,7 +43,7 @@ const samples = [
     { label: 'REGUA EM CARGA / SEM DANO', time: 1600, x: 128, cx: 80 },
     { label: 'DESCARGA / ALTURA 128PX', time: 2100, x: 128, cx: 80 },
     { label: 'REFUGIO / MARGEM VISIVEL', time: 4050, x: 309, cx: 261 },
-    { label: 'RETRACAO / ALTURA REAL', time: 350, x: 309, cx: 261 },
+    { label: 'RETRACAO / ALTURA REAL', time: 1250, x: 309, cx: 261 },
     { label: 'MARGEM FINAL / POSE', time: 4800, x: 660, cx: 384 },
 ];
 function render(time: number, x: number, cameraX: number) {
@@ -74,8 +74,8 @@ writeFileSync(join(output, 'contact-sheet.png'), sheet.toBuffer('image/png'));
 game.renderer.setTouchControlsVisible(true);
 const fallback = createCanvas(1280,776), fc = fallback.getContext('2d');
 fc.fillStyle = '#493c43'; fc.fillRect(0,0,1280,776); fc.imageSmoothingEnabled = false;
-for (const [i, sample] of [{ label: 'AVISO A', time: 1600, x: 128, cx: 80 }, { label: 'AVISO B', time: 3700, x: 309, cx: 261 },
-    { label: 'DESCARGA B', time: 4050, x: 309, cx: 261 }, { label: 'RETRACAO B', time: 350, x: 309, cx: 261 }].entries()) {
+for (const [i, sample] of [{ label: 'AVISO A', time: 1600, x: 128, cx: 80 }, { label: 'AVISO B', time: 4600, x: 309, cx: 261 },
+    { label: 'DESCARGA B', time: 4950, x: 309, cx: 261 }, { label: 'RETRACAO B', time: 1250, x: 309, cx: 261 }].entries()) {
     reduced = true; render(sample.time, sample.x, sample.cx);
     const x = i % 2 * 640, y = Math.floor(i / 2) * 388;
     pixelText(fc, `OFFLINE / FALLBACK TOUCH / ${sample.label}`, x + 8, y + 8, '#f0d29a');
@@ -121,7 +121,7 @@ for (let frame = 0; frame <= 84; frame++) {
 const recordingPath = resolve(dirname(enginePath), '../../../../../tests/helpers/guairaRespirosReplay.json');
 const recording = JSON.parse(readFileSync(recordingPath, 'utf8')) as { initialSettleFrames: number; stepMs: number; inputFrames: number; runs: [number,string[]][] };
 game.load('guaira-respiros'); reduced = false;
-const replaySamples = new Map([[0,'entrada'],[90,'carga'],[126,'descarga'],[300,'refugio'],[1283,'espera-segura'],[1370,'segunda-passagem'],[1523,'conclusao']]);
+const replaySamples = new Map([[0,'entrada'],[90,'carga'],[126,'descarga'],[300,'refugio'],[336,'espera-segura'],[425,'segunda-passagem'],[recording.inputFrames,'conclusao']]);
 const replayImages: Array<{ frame: number; file: string; x: number; time: number; finished: boolean }> = [];
 function captureReplay(frame: number) {
     if (!replaySamples.has(frame)) return;

@@ -1,9 +1,9 @@
 {
   "evidence": "Frozen keyboard and native-touch replay through isolated GuairaRespiros / WorldGame / Input / Player; offline DOM harness.",
-  "sourceCommit": "c6e5b801dfadd4856d1af4be7e8981cfe0fa4820",
+  "baselineCommit": "bc431d5c492079a4565fe39fe96742f8dd790057",
   "stepMs": 16.666666666666668,
   "initialSettleFrames": 1,
-  "inputFrames": 1523,
+  "inputFrames": 576,
   "start": {
     "x": 48,
     "feetY": 304,
@@ -21,7 +21,7 @@
       ]
     ],
     [
-      995,
+      48,
       []
     ],
     [
@@ -44,5 +44,5 @@
     "storageAccesses": 0,
     "finished": true
   },
-  "note": "The adapter freezes at the first supported exit-bank arrival. The three-cycle refuge wait demonstrates indefinite safety, not a target first-play duration. No player reposition or direct completion call."
+  "note": "Short authored route after the second-jet phase changed from 2100 to 1200ms: wait for A, walk to the refuge, brake and watch B, then walk out. No player reposition or direct completion call. Long refuge safety is covered separately across three cycles."
 }

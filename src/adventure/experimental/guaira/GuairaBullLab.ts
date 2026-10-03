@@ -61,7 +61,7 @@ export class GuairaBullEncounter extends BossEncounter {
 export class GuairaBullLab extends WorldGame {
     reducedMotion: boolean;
     constructor(canvas: HTMLCanvasElement, private readonly status: HTMLElement,
-        private readonly continuationHint = 'SUBIR: CASA DA VAZAO') {
+        private readonly continuationHint = 'SUBIR: CASA DA VAZAO', private readonly encounterLabel: 'LAB' | 'CHEFE' = 'LAB') {
         super(canvas, true);
         try {
             this.reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -122,6 +122,29 @@ export class GuairaBullLab extends WorldGame {
         }
         super.update(dt);
     }
+    protected override renderEncounterHud(c: CanvasRenderingContext2D) {
+        const boss = this.boss;
+        if (!boss) return;
+        // Keep every combat instruction in the existing 23px header. The
+        // campaign panel at y26 covers Feka (including his helmet) near the
+        // apex of an ordinary jump in this fixed-camera arena.
+        c.fillStyle = '#382b35'; c.fillRect(0, 0, 320, 23);
+        c.fillStyle = '#d8ac7a'; c.fillRect(0, 22, 320, 1);
+        pixelText(c, 'GUAIRA', 8, 3, '#f0ddae');
+        pixelText(c, boss.name, 60, 3, '#f0ddae');
+        for (let i = 0; i < boss.maxHealth; i++) {
+            const x = 123 + i * 16;
+            c.fillStyle = i < boss.health ? '#f1a479' : '#66505a';
+            c.fillRect(x, 5, 12, 3);
+            c.fillRect(x, 4, 2, 5); c.fillRect(x + 10, 4, 2, 5);
+        }
+        pixelText(c, this.encounterLabel, 235, 3, '#dcbceb');
+        // Full 1x bitmap text stays present during jumps and attack warnings;
+        // the adjacent accessible status repeats it without replacing it.
+        pixelText(c, boss.hint, 8, 13, '#f0ddae');
+        if (this.player.data.hasHelmet) this.renderer.drawHelmet(279, 4, c);
+        pixelText(c, 'II', 305, 8, '#f0ddae');
+    }
     override render() {
         if (this.isDisposed) return;
         const paused = this.state === 'paused';
@@ -129,12 +152,8 @@ export class GuairaBullLab extends WorldGame {
         if (paused) this.state = 'playing';
         try { super.render(); } finally { if (paused) this.state = 'paused'; }
         const c = this.renderer.getContext();
-        c.fillStyle = '#382b35'; c.fillRect(0, 0, 320, 23);
-        c.fillStyle = '#d8ac7a'; c.fillRect(0, 22, 320, 1);
-        pixelText(c, 'GUAIRA', 8, 8, '#f0ddae');
-        pixelText(c, 'LAB EXPERIMENTAL', 60, 8, '#dcbceb');
-        if (this.player.data.hasHelmet) this.renderer.drawHelmet(279, 4, c);
-        pixelText(c, 'II', 305, 8, '#f0ddae');
+        // Preserve the local header above the native death/respawn transition.
+        this.renderEncounterHud(c);
         if (paused) {
             c.fillStyle = '#211b2bbd'; c.fillRect(0, 23, 320, 157);
             panel(c, 62, 70, 196, 43, '#382b35', '#d8ac7a');
@@ -149,7 +168,7 @@ export class GuairaBullLab extends WorldGame {
         const message = paused ? 'Pausado · Esc ou Continuar para voltar'
             : this.player.data.isDead ? 'Feka caiu · reinício automático · Tentar para recomeçar já'
             : this.boss?.phase === 'defeated' ? 'Vitória! Ossabravo descansou · Subir leva à Casa da Vazão para observar o desvio da água · Tentar repete a luta'
-            : 'Ossabravo · setas/A D: mover · Espaço: pular · baixo no ar: sentada · Shift: correr · Esc: pausa · M: som';
+            : `Ossabravo · ${this.boss?.hint ?? ''} · setas/A D: mover · Espaço: pular · baixo no ar: sentada · Shift: correr · Esc: pausa · M: som`;
         if (this.status.textContent !== message) this.status.textContent = message;
     }
 }

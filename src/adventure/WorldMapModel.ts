@@ -1,4 +1,4 @@
-import { isUnlocked } from './progress';
+import { isUnlocked, canContinueFromGuaira } from './progress';
 import type { AdventureSave } from './types';
 
 /** Positions are normalized against the authored 1920 × 1200 map. */
@@ -31,6 +31,7 @@ export function mapStageState(stageId: string, save: AdventureSave): MapStageSta
 export function mapStagePrerequisite(stageId: string, save: AdventureSave): string | null {
     if (!/^[1-6]-[1-5]$/.test(stageId) || isUnlocked(stageId, save)) return null;
     const [world, number] = stageId.split('-').map(Number);
+    if (world === 4 && save.completed.includes('3-5') && !canContinueFromGuaira(save)) return 'guaira-prefeito';
     const islandGate = `${world - 1}-5`;
     if (world > 1 && !save.completed.includes(islandGate)) return islandGate;
     return number > 1 ? `${world}-${number - 1}` : null;

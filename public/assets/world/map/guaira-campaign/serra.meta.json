@@ -1,0 +1,133 @@
+{
+  "regionKey": "serra",
+  "replacesBase": true,
+  "camera": {
+    "position": [
+      11.0,
+      -20.0,
+      18.850000381469727
+    ],
+    "target": [
+      0.0,
+      0.25,
+      3.5999999046325684
+    ],
+    "orthoScale": 20.6
+  },
+  "terminal": {
+    "groundAnchor": {
+      "x": 0.2933,
+      "y": 0.787849
+    },
+    "runwayStart": {
+      "x": 0.247658,
+      "y": 0.765957
+    },
+    "runwayEnd": {
+      "x": 0.432787,
+      "y": 0.854753
+    },
+    "boardingPath": [
+      {
+        "x": 0.165515,
+        "y": 0.65367
+      },
+      {
+        "x": 0.203722,
+        "y": 0.744884
+      },
+      {
+        "x": 0.2933,
+        "y": 0.787849
+      }
+    ],
+    "groundAnchorWorld": [
+      -2.7,
+      -3.7,
+      0.6
+    ],
+    "runwayStartWorld": [
+      -3.77,
+      -3.7,
+      0.6
+    ],
+    "runwayEndWorld": [
+      0.5699999999999998,
+      -3.7,
+      0.6
+    ],
+    "boardingPathWorld": [
+      [
+        -5.75,
+        -3.6,
+        1.65
+      ],
+      [
+        -4.8,
+        -3.7,
+        0.6
+      ],
+      [
+        -2.7,
+        -3.7,
+        0.6
+      ]
+    ],
+    "surface": "dry-compacted-earth",
+    "clearSpanMeters": 3.35,
+    "usableLengthMeters": 4.34
+  },
+  "supportFootprint": {
+    "center": [
+      -1.6,
+      -3.7
+    ],
+    "width": 7.7,
+    "depth": 3.7,
+    "terrainMode": "existing-island-ground",
+    "bottomZ": 0.1,
+    "topZ": 0.6,
+    "walkWidth": 0.65,
+    "walkSegments": [
+      [
+        -5.75,
+        -3.6,
+        1.65
+      ],
+      [
+        -4.8,
+        -3.7,
+        0.6
+      ],
+      [
+        -2.7,
+        -3.7,
+        0.6
+      ]
+    ]
+  },
+  "assetFrame": {
+    "left": 0,
+    "top": 0,
+    "widthInMap": 1,
+    "heightInMap": 1
+  },
+  "validation": {
+    "walkSupportSamples": 42,
+    "allSupported": true,
+    "numericCampaignIdsChanged": false,
+    "objects": 3945
+  },
+  "artBounds": {
+    "left": 0.11145833333333334,
+    "top": 0.08333333333333333,
+    "right": 0.8416666666666667,
+    "bottom": 1.0
+  },
+  "image": {
+    "path": "/assets/world/map/guaira-campaign/serra.webp",
+    "width": 1920,
+    "height": 1200,
+    "bytes": 289868
+  }
+}

@@ -1,0 +1,8 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Guaíra campaign art verification</title>
+<style>html,body{margin:0;background:#143d48;color:#f9e6c3;font:16px system-ui;height:100%;overflow:hidden}header{position:absolute;top:24px;left:28px;right:24px}h1{font-size:26px;letter-spacing:.03em;margin:0 0 5px}p{margin:0;color:#b9d9d7;font-size:13px}canvas{display:block;width:100%;height:100%}footer{position:absolute;bottom:24px;left:28px;font-size:12px;letter-spacing:.1em;color:#a9cece}@media(max-width:500px){header{left:20px;top:24px}h1{font-size:23px}footer{left:20px;right:20px;line-height:1.8;font-size:10px}}</style>
+<header><h1>GUAÍRA</h1><p>Bairro da Vala Seca · Arrozais · Casa da Vazão</p></header><canvas id="view"></canvas><footer>FÁBRICA → GUAÍRA → SERRA · CORREIO AÉREO</footer>
+<script type="module">
+import {paintCampaignRegion,loadCampaignRegionImage} from '/src/adventure/GuairaCampaignArt.ts';
+const canvas=document.querySelector('canvas'),c=canvas.getContext('2d');const image=await loadCampaignRegionImage('guaira');
+function paint(){const w=innerWidth,h=innerHeight,d=devicePixelRatio||1;canvas.width=w*d;canvas.height=h*d;c.setTransform(d,0,0,d,0,0);const g=c.createLinearGradient(0,0,0,h);g.addColorStop(0,'#143d48');g.addColorStop(1,'#326772');c.fillStyle=g;c.fillRect(0,0,w,h);const base=Math.min(w/1.6,h);paintCampaignRegion(c,{width:w,height:h,center:{x:.49,y:.49},zoom:Math.min((w-16)/(1.6*base), (h-140)/base)},'guaira',image);document.body.dataset.ready='true'}paint();addEventListener('resize',paint);
+</script>

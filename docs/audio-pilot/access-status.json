@@ -1,0 +1,52 @@
+{
+  "checked_on": "2026-10-02",
+  "initial_instruction": "Do not read the attached credential; prepare offline only.",
+  "later_user_instruction": "User explicitly provided elevenkey.txt in this task and authorized its use as needed.",
+  "credential_handling": "Authorized attachment staged for a local process, mode 0600; value never printed or copied to repository/environment config; staged file removed in finally.",
+  "authenticated_read_attempt": {
+    "method": "GET",
+    "endpoint": "https://api.elevenlabs.io/v1/user/subscription",
+    "result": "proxy_tunnel_blocked_before_api",
+    "proxy_status": 403,
+    "account_response_received": false
+  },
+  "unauthenticated_connectivity_probes": {
+    "endpoint": "https://api.elevenlabs.io/v1/models",
+    "default_permissions": "proxy_tunnel_blocked_403",
+    "additional_network_permission": "proxy_tunnel_blocked_403"
+  },
+  "network_secret_configured": false,
+  "credential_validity_verified": false,
+  "quota_verified": false,
+  "overage_disabled_verified": false,
+  "generation_requests": 0,
+  "spend_in_this_task": 0,
+  "commercial_license_verified": false,
+  "active_generation_route": "Parent plugin completed r2; actual model eleven_music_v2. This session has no generation route.",
+  "plugin_tools_available_in_this_session": false,
+  "generation_receipts_or_ids": [
+    {
+      "id": "mus_guaira_arcade__a__take01",
+      "title": "Salto de partida",
+      "provider_node_id": "hm9vDDKaLjGeDoFhGAUP",
+      "provider_model_id": "eleven_music_v2"
+    },
+    {
+      "id": "mus_guaira_arcade__b__take01",
+      "title": "Impulso pixel",
+      "provider_node_id": "FFpzG5UMvU8XTgxZMbSx",
+      "provider_model_id": "eleven_music_v2"
+    }
+  ],
+  "local_rest_generation_abandoned": true,
+  "next_step": "Technical game integration complete. Perceptual audition and commercial license evidence remain unverified. No further generation or credential access required.",
+  "active_pilot_id": "sfg-arcade-r2",
+  "prior_root_generation_report": "14 outputs already generated in flow aoC2seBLqtH0qywcqdFt; 2 music rejected for direction, 12 SFX to reuse after audition.",
+  "assets_received_from_commit": "5ad7ea10eee5b69f758c1728971fb1856346ee9a",
+  "generation_flow_id": "l5NIpun9E59Ud2olB4zR",
+  "generation_session_ids": [
+    "DO6kt310RtoQE7KsrFQy",
+    "48LqOmokDEZEuyXErBrb"
+  ],
+  "generation_metadata_confirmation": "parent_root_explicit_followup; music B leading-e transcription typo resolved"
+}

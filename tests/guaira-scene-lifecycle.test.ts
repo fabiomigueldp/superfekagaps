@@ -24,7 +24,9 @@ test('all six real adapters mount and discard twice with one live runtime and no
     const h = sceneLifecycleBrowser(t);
     for (let pass = 0; pass < 2; pass++) for (const Scene of scenes) {
         const game = h.create(Scene);
-        assert.equal(h.listenerCount(), 14, `${Scene.name}: exact scene-owned listeners`);
+        assert.equal(h.listenerCount(), 16, `${Scene.name}: exact scene-owned listeners`);
+        assert.equal(h.window.listeners.filter(listener => listener.type === 'pagehide').length, 1);
+        assert.equal(h.window.listeners.filter(listener => listener.type === 'orientationchange').length, 1);
         const controls = new GuairaTouchControls({ input: game.input,
             isPlaying: () => !game.isDisposed && game.state === 'playing', onInteract: () => game.audio.unlock() });
         game.addCleanup(() => controls.dispose());
@@ -91,7 +93,7 @@ test('blur/hidden release gestures; disposal never clears a newer scene referenc
     const fresh = h.create(GuairaRespiros), freshContext = h.contexts.at(-1)!;
     old.dispose();
     assert.equal(h.window.worldGame, fresh); assert.equal(h.window.renderer, fresh.renderer);
-    assert.notEqual(freshContext.state, 'closed'); assert.equal(h.listenerCount(), 14);
+    assert.notEqual(freshContext.state, 'closed'); assert.equal(h.listenerCount(), 16);
     fresh.start(); h.frame(); assert.equal(h.frames.size, 1);
     fresh.dispose(); assert.equal(h.listenerCount(), 0);
 });

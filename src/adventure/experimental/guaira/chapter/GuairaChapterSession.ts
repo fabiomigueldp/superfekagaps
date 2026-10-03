@@ -1,3 +1,4 @@
+import { sanitizeGuairaChapterProgress, type GuairaChapterProgress } from './GuairaChapterProgress';
 /** The chapter owns only receipts and navigation, never native scene/save state. */
 export type GuairaChapterOpening = 'guaira-travessia' | 'guaira-patio-comportas';
 export type GuairaChapterSceneId = GuairaChapterOpening | 'guaira-respiros' | 'guaira-lab'
@@ -6,6 +7,7 @@ export type GuairaChapterTraversalId = GuairaChapterOpening | 'guaira-respiros' 
 
 export interface GuairaChapterOptions {
     readonly opening?: GuairaChapterOpening;
+    readonly progress?: GuairaChapterProgress;
 }
 
 /** Capture this when installing map/restart callbacks; never look it up in an old callback. */
@@ -42,7 +44,7 @@ export interface GuairaChapterReceipt {
     readonly sceneId: GuairaChapterSceneId;
     readonly attempt: GuairaChapterAttempt;
     readonly result: GuairaChapterResult;
-    readonly acceptedVia: 'continue' | 'map';
+    readonly acceptedVia: 'continue' | 'map' | 'runtime' | 'restored';
 }
 
 export interface GuairaChapterSnapshot {
@@ -70,7 +72,7 @@ export interface GuairaChapterTransition {
 let nextSessionId = 1;
 
 /**
- * Five-scene, memory-only journey. Mutation methods reject stale handles with
+ * Five-scene journey with durable receipt hydration and process-local attempt leases. Mutation methods reject stale handles with
  * null, without changing state. A successful transition retires its attempt
  * before returning; the host then disposes the old runtime and mounts its next
  * map/scene. This model never mounts, resumes or resets native gameplay itself.
@@ -87,13 +89,24 @@ export class GuairaChapterSession {
     private readonly route: readonly GuairaChapterSceneId[];
     private selectedScene: GuairaChapterSceneId;
 
-    constructor({ opening = 'guaira-travessia' }: GuairaChapterOptions = {}) {
+    constructor({ opening = 'guaira-travessia', progress }: GuairaChapterOptions = {}) {
+        const restored = progress ? sanitizeGuairaChapterProgress(progress) : null;
+        if (restored) opening = restored.opening;
         if (opening !== 'guaira-travessia' && opening !== 'guaira-patio-comportas')
             throw new Error('Unknown Guaíra chapter opening');
         this.opening = opening;
         this.selectedScene = opening;
         this.route = Object.freeze([opening, 'guaira-respiros', 'guaira-lab', 'guaira-subida', 'guaira-prefeito']);
         this.currentGeneration = this.makeGeneration();
+        if (restored) {
+            for (const sceneId of restored.completed) {
+                const result: GuairaChapterResult = sceneId === 'guaira-lab' ? { sceneId, kind: 'defeated-bull' }
+                    : sceneId === 'guaira-prefeito' ? { sceneId, kind: 'mayor-water-released' } : { sceneId, kind: 'reached-finish' };
+                this.accepted.set(sceneId, Object.freeze({ sceneId, result: Object.freeze(result), acceptedVia: 'restored',
+                    attempt: Object.freeze({ ...this.currentGeneration, sceneId, attemptGeneration: 0 }) }));
+            }
+            this.selectedScene = restored.selectedScene;
+        }
     }
 
     snapshot(): GuairaChapterSnapshot {
@@ -144,6 +157,14 @@ export class GuairaChapterSession {
     /** Readiness is not latched: acceptance always needs a fresh live sample. */
     canContinue(attempt: GuairaChapterAttempt, live: GuairaChapterLiveResult): boolean {
         return live.state === 'playing' && this.hasLiveCompletion(attempt, live);
+    }
+
+    /** Latch actual runtime victory immediately, without retiring the live attempt. */
+    acceptCompletion(attempt: GuairaChapterAttempt, live: GuairaChapterLiveResult): boolean {
+        if (!this.hasLiveCompletion(attempt, live) || this.accepted.has(attempt.sceneId)) return false;
+        this.accepted.set(attempt.sceneId, Object.freeze({ sceneId: attempt.sceneId, attempt,
+            result: Object.freeze({ ...live.result! }), acceptedVia: 'runtime' }));
+        return true;
     }
 
     /** Returns to the host with the next recommendation; does not auto-enter it. */
@@ -240,7 +261,7 @@ export class GuairaChapterSession {
             }
         }
         this.activeAttempt = null;
-        if (action === 'continue' || newlyAccepted) this.selectedScene = this.nextRecommendedScene() ?? attempt.sceneId;
+        if (action === 'continue' || newlyAccepted || (receipt?.acceptedVia === 'runtime' && receipt.attempt === attempt)) this.selectedScene = this.nextRecommendedScene() ?? attempt.sceneId;
         this.advanceGeneration();
         return Object.freeze({ action, receipt, newlyAccepted, snapshot: this.snapshot() });
     }

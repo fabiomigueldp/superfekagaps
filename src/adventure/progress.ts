@@ -1,6 +1,7 @@
+import { freshGuairaChapterProgress, sanitizeGuairaChapterProgress, mergeGuairaChapterProgress, type GuairaChapterProgress } from './experimental/guaira/chapter/GuairaChapterProgress';
 import type { AdventureSave, AdventureStage } from './types';
 export const SAVE_KEY = 'super_feka_gaps_world_v1';
-export const freshSave = (): AdventureSave => ({ version: 1, completed: [], seals: [], secrets: [], seen: [], selected: '1-1', checkpoint: null, times: {}, preferences: { music: .55, effects: .7, voice: .8, shake: true } });
+export const freshSave = (): AdventureSave => ({ version: 1, guaira: freshGuairaChapterProgress(), completed: [], seals: [], secrets: [], seen: [], selected: '1-1', checkpoint: null, times: {}, preferences: { music: .55, effects: .7, voice: .8, shake: true } });
 /** Fresh editor previews need a new read-through. Never call for an in-game retry. */
 export function resetPreviewGuidance(save: AdventureSave): void {
     save.seen = save.seen.filter(id => !id.startsWith('dialogue:') && !id.startsWith('control:'));
@@ -15,9 +16,14 @@ export function parseSave(raw: string): AdventureSave {
     const o = data as Record<string, unknown>, result = freshSave();
     const list = (key: string, predicate: (v: unknown) => boolean) => Array.isArray(o[key]) ? [...new Set((o[key] as unknown[]).filter(predicate))] as string[] : [];
     result.completed = list('completed', validId);
+    result.guaira = sanitizeGuairaChapterProgress(o.guaira);
+    // A pre-chapter save earned Serra by completing 3-5. Preserve that promise.
+    if (o.legacySerraAccess === true || (!o.guaira && result.completed.includes('3-5'))) result.legacySerraAccess = true;
     result.secrets = list('secrets', v => typeof v === 'string' && /^[1-6]-3$/.test(v));
     result.seals = list('seals', v => typeof v === 'string' && /^[1-6]-[1-4]:s[123]$/.test(v));
-    result.seen = list('seen', v => typeof v === 'string' && v.length < 100).slice(0, 200);
+    // Reserve one additional journal slot for the optional factory result, so
+    // importing a full legacy v1 journal does not evict an existing story flag.
+    result.seen = list('seen', v => typeof v === 'string' && v.length < 100).slice(0, 201);
     result.selected = validId(o.selected) ? o.selected : '1-1';
     if (o.times && typeof o.times === 'object')
         for (const [id, n] of Object.entries(o.times))
@@ -41,10 +47,15 @@ export function parseSave(raw: string): AdventureSave {
             result.completed.push(id);
     return result;
 }
+export function isGuairaUnlocked(save: AdventureSave): boolean { return save.completed.includes('3-5'); }
+export function canContinueFromGuaira(save: AdventureSave): boolean {
+    return save.legacySerraAccess === true || save.guaira?.completed.includes('guaira-prefeito') === true;
+}
 export function isUnlocked(id: string, save: AdventureSave): boolean {
     if (!validId(id))
         return false;
     const [w, n] = id.split('-').map(Number);
+    if (w === 4 && !canContinueFromGuaira(save)) return false;
     if (w > 1 && !save.completed.includes(`${w - 1}-5`))
         return false;
     if (n === 1)
@@ -83,12 +94,18 @@ export class ProgressStore {
             this.protected = true;
         }
     }
-    persist(): boolean {
+    persist(mergeChapter = true): boolean {
         if (this.protected)
             return false;
         try {
             if (!this.storage)
                 throw Error();
+            const existing = this.storage.getItem(SAVE_KEY);
+            if (existing && mergeChapter) {
+                const latest = parseSave(existing);
+                this.save.guaira = mergeGuairaChapterProgress(latest.guaira, this.save.guaira);
+                if (latest.legacySerraAccess) this.save.legacySerraAccess = true;
+            }
             this.storage.setItem(SAVE_KEY, JSON.stringify(this.save));
             this.warning = '';
             return true;
@@ -98,7 +115,34 @@ export class ProgressStore {
             return false;
         }
     }
-    import(raw: string): void { const next = parseSave(raw); this.save = next; this.protected = false; this.persist(); }
+    /** Chapter writes merge with the latest campaign state, never overwrite it from a stale page. */
+    updateGuaira(next: GuairaChapterProgress): boolean {
+        if (this.protected) return false;
+        try {
+            const raw = this.storage?.getItem(SAVE_KEY);
+            if (raw) this.save = parseSave(raw);
+        } catch {
+            this.warning = 'Não foi possível atualizar o progresso. Exporte uma cópia antes de substituir.';
+            this.protected = true; return false;
+        }
+        this.save.guaira = mergeGuairaChapterProgress(this.save.guaira, next);
+        return this.persist();
+    }
+    /** Import replaces progress only after the browser has saved the complete replacement. */
+    import(raw: string): boolean {
+        const next = parseSave(raw);
+        try {
+            if (!this.storage) throw Error('Storage unavailable');
+            this.storage.setItem(SAVE_KEY, JSON.stringify(next));
+        } catch {
+            this.warning = 'Importação não salva. Progresso anterior mantido.';
+            return false;
+        }
+        this.save = next;
+        this.protected = false;
+        this.warning = '';
+        return true;
+    }
     /** First-time guidance survives retries, map returns and browser reloads. */
     markSeen(id: string): boolean {
         if (this.save.seen.includes(id))

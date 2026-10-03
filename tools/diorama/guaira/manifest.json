@@ -1,7 +1,7 @@
 {
-  "version": 4,
+  "version": 5,
   "scope": "Isolated Gua\u00edra experimental map; no campaign or save-schema changes",
-  "origin": "Original deterministic Blender scene; third authored geometry/material craft pass informed by one separately labeled imagegen concept",
+  "origin": "Original deterministic Blender scene; third craft pass plus one bounded dry Bairro public standpipe and stone receiver",
   "renderer": "Blender 4.3.2 / Cycles CPU / 48 samples / AgX medium-high contrast / no denoising",
   "runtimeImage": {
     "dimensions": [
@@ -10,16 +10,17 @@
     ],
     "mode": "RGBA",
     "encoding": "WebP quality92, method6, exact alpha",
-    "bytes": 193260,
-    "previousBytes": 189388,
-    "deltaBytes": 3872,
+    "bytes": 193538,
+    "previousBytes": 193260,
+    "deltaBytes": 278,
     "alphaUnchangedFromMasterPNG": true
   },
   "metadataChanges": "No metadata changes; exact camera, node projections, route projections, worldRoutes, routeWidth and all 16 walk meshes/transforms preserved",
   "visualChanges": [
     "Three village houses with curved overlapping clay tile shells, individual limewash, recessed chestnut doors and teal louvered shutters, grouped masonry wear and stone footings",
     "Single attached sage repair bay with workbench and spare hydraulic parts; sheltered dry-bank vegetation; restrained mature rice heads and a compact bank-side keeper/harvest group",
-    "Seated reservoir shutter, fitted sandstone outlet throat and return joints, service foothold and bronze pipe supports; original water surfaces retained"
+    "Seated reservoir shutter, fitted sandstone outlet throat and return joints, service foothold and bronze pipe supports; original water surfaces retained",
+    "One grounded dry carved-sandstone receiver and buried bronze standpipe beside the repair bay; chapter-local vector water is separately derived from actual visible source geometry"
   ],
   "staticAudit": {
     "baselineCommit": "c27019374479da44defb57f038d1597b9fd3e549",
@@ -55,16 +56,16 @@
       "sha256": "2e02904c2664ab7e6b19687693c057edbb1c3a255281c1934f684f88b9d0ebd1"
     },
     "public/assets/world/experimental/guaira/guaira-diorama.webp": {
-      "bytes": 193260,
-      "sha256": "38c1043fbdbd3a7481c4f5ae71f4763031cd4873bd0af22ff4f081efb5503fc3"
+      "bytes": 193538,
+      "sha256": "c2079e61d833233b2535f1f036d2e3c9836bfb80448fb73efea1ab2bd3852279"
     },
     "tools/diorama/guaira/package_guaira.py": {
       "bytes": 1833,
       "sha256": "8257eff0f15aee3eab5db41b5b355523f11627cff63c32e0077cd25d56c66d17"
     },
     "tools/diorama/guaira/build_guaira.py": {
-      "bytes": 34728,
-      "sha256": "5e43949e393a6d541873728442256d2b2dbc1429fb5db93a90787647c686ced2"
+      "bytes": 34853,
+      "sha256": "3b32adc1eef9525be6a1b039ee758abd9379dece26de2c4ebed1a543a2bd928f"
     },
     "public/assets/world/experimental/guaira/guaira-water-mask.png": {
       "bytes": 18804,
@@ -97,6 +98,22 @@
     "tools/diorama/guaira/export_guaira_actor.mjs": {
       "bytes": 984,
       "sha256": "45d036bfeedbd7227ca65dc7d5b49912fee560be66c1aa1fea1afd5afc588cc0"
+    },
+    "tools/diorama/guaira/bairro_water_guaira.py": {
+      "bytes": 5523,
+      "sha256": "7da4392d0b9d56950217489870fae0aab98b56066591c3ccfb3ce7fad99fb94f"
+    },
+    "tools/diorama/guaira/export_bairro_water.py": {
+      "bytes": 7149,
+      "sha256": "61dc5a108a399826ca7b1ac894208a586b448eb301839d947fd1b87d30c7ce29"
+    },
+    "tools/diorama/guaira/package_bairro_water.py": {
+      "bytes": 3817,
+      "sha256": "f477c3037b4ce07365c68b0dfd1e61ad4221f2413a3aae43268272744137dfd8"
+    },
+    "tools/diorama/guaira/bairro-water-validation.json": {
+      "bytes": 4465,
+      "sha256": "a08f2fe8db30fc6fd4ada7e15a56c7c873cd7feb63230db1220463623d98e932"
     }
   },
   "excludedFromProduction": [
@@ -155,6 +172,53 @@
     "newFullSizeRuntimeLayer": false,
     "candidateBaseCommit": "c27019374479da44defb57f038d1597b9fd3e549",
     "candidateBytes": 40407227,
-    "integrationBaseCommit": "2b8b57ca04e31083fc7f24911b2a38bdb921f04f"
+    "integrationBaseCommit": "2b8b57ca04e31083fc7f24911b2a38bdb921f04f",
+    "note": "Historical third-craft integration build measurement; remeasure complete build after integrating chapter payoff code. New authored base-image delta alone is +278 bytes."
+  },
+  "bairroPublicWater": {
+    "validationFile": "tools/diorama/guaira/bairro-water-validation.json",
+    "baselineCommit": "f4106941e97a30e9e8911f30428319d6ddb92635",
+    "baseEnvelope": [
+      884,
+      566,
+      80,
+      80
+    ],
+    "sourcePixelsOutsideEnvelopeUnchanged": true,
+    "sourceAndEncodedAlphaUnchanged": true,
+    "lossyRGBOutsideEnvelope": {
+      "changedPixels": 141765,
+      "maxChannelDelta": 14,
+      "pixelsAbove4": 7595,
+      "pixelsAbove8": 233,
+      "meanMaximumChannelDelta": 0.13378003133704736,
+      "percentilesMaximumChannelDelta": {
+        "50": 0.0,
+        "90": 0.0,
+        "95": 1.0,
+        "99": 3.0,
+        "99.9": 6.0,
+        "100": 14.0
+      },
+      "nonzeroMeanMaximumChannelDelta": 2.1681867879942156,
+      "explanation": "VP8 lossy re-encoding propagates RGB quantization changes beyond a local master edit. It is codec drift, not source scenery changes. Alpha is exact."
+    },
+    "runtimeWaterBounds": [
+      908,
+      597,
+      37,
+      18
+    ],
+    "runtimeWaterVectorBytes": 220,
+    "runtimeWaterVectorGzipBytes": 153,
+    "newTextureCount": 0,
+    "sourceModule": "tools/diorama/guaira/bairro_water_guaira.py",
+    "sourceExporter": "tools/diorama/guaira/export_bairro_water.py",
+    "localPackager": "tools/diorama/guaira/package_bairro_water.py",
+    "allOriginalObjectsUnchanged": 2448,
+    "allUsedOriginalMaterialsUnchanged": 49,
+    "nativeActorNewContacts": 0,
+    "nativeActorNewUnsupported": 0,
+    "scope": "Art geometry and packaging only; accepted-receipt behavior belongs to chapter runtime tests"
   }
 }

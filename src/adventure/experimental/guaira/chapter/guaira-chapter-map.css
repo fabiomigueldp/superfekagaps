@@ -63,15 +63,18 @@
 .guaira-chapter-map .chapter-map-dialog-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .guaira-chapter-map .chapter-map-dialog-title { margin: 0; font-size: 19px; line-height: 1.25; }
 .guaira-chapter-map .chapter-map-list { list-style: none; padding: 0; margin: 14px 0; display: grid; gap: 7px; }
-.guaira-chapter-map .chapter-map-step-button {
+.guaira-chapter-map .chapter-map-step-button, .guaira-chapter-map .chapter-map-optional-button {
     display: grid; gap: 4px; width: 100%; min-height: 58px; border: 1px solid #728069;
     padding: 10px 12px; text-align: left; background: #254448; color: var(--chapter-paper); cursor: pointer;
     overflow-wrap: anywhere;
 }
-.guaira-chapter-map .chapter-map-step-button[aria-pressed="true"] { border: 2px solid var(--chapter-gold); padding: 9px 11px; }
+.guaira-chapter-map .chapter-map-step-button[aria-pressed="true"], .guaira-chapter-map .chapter-map-optional-button[aria-pressed="true"] { border: 2px solid var(--chapter-gold); padding: 9px 11px; }
 .guaira-chapter-map .chapter-map-step-button:disabled { background: #1c373b; color: #b5c0b0; }
 .guaira-chapter-map .chapter-map-step-title { font-size: 14px; font-weight: 700; }
 .guaira-chapter-map .chapter-map-step-state { font-size: 12px; line-height: 1.35; }
+.guaira-chapter-map .chapter-map-optional { border-top: 1px solid #728069; padding-top: 10px; margin-bottom: 14px; }
+.guaira-chapter-map .chapter-map-optional-title { margin: 0 0 7px; color: var(--chapter-gold); font-size: 13px; line-height: 1.35; }
+.guaira-chapter-map .chapter-map-optional-button { min-height: 54px; }
 .guaira-chapter-map .chapter-map-dialog-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; justify-content: space-between; }
 .guaira-chapter-map .chapter-map-session-note { margin: 0; flex: 1 1 210px; font-size: 12px; line-height: 1.5; }
 @media (max-width: 540px) {
@@ -79,9 +82,9 @@
     .guaira-chapter-map .chapter-map-identity { gap: 2px 8px; }
     .guaira-chapter-map .chapter-map-name { font-size: 16px; }
     .guaira-chapter-map .chapter-map-navigation { gap: 4px; }
-    .guaira-chapter-map .chapter-map-footer { padding: 7px 8px; gap: 5px 8px; }
+    .guaira-chapter-map .chapter-map-footer { grid-template-columns: minmax(0, 1fr); padding: 7px 8px; gap: 5px 8px; }
     .guaira-chapter-map .chapter-map-title { font-size: 14px; }
-    .guaira-chapter-map .chapter-map-actions { gap: 4px; }
+    .guaira-chapter-map .chapter-map-actions { justify-content: flex-start; gap: 4px; }
     .guaira-chapter-map .chapter-map-plaque { display: none; }
     .guaira-chapter-map .chapter-map-dialog { padding: 12px; }
 }
@@ -96,7 +99,7 @@
     .guaira-chapter-map .lab-action-art { display: none; }
     .guaira-chapter-map .chapter-map-control .lab-sr { position: static; width: auto; height: auto; clip-path: none; margin: 0; overflow: visible; white-space: normal; }
     .guaira-chapter-map .chapter-map-control { border: 1px solid ButtonText; padding: 6px 10px; background: ButtonFace; color: ButtonText; }
-    .guaira-chapter-map .chapter-map-control[aria-pressed="true"], .guaira-chapter-map .chapter-map-step-button[aria-pressed="true"] { outline: 2px solid Highlight; }
+    .guaira-chapter-map .chapter-map-control[aria-pressed="true"], .guaira-chapter-map .chapter-map-step-button[aria-pressed="true"], .guaira-chapter-map .chapter-map-optional-button[aria-pressed="true"] { outline: 2px solid Highlight; }
     .guaira-chapter-map button:disabled { opacity: 1; color: GrayText; border-color: GrayText; }
     .guaira-chapter-map button:focus-visible { outline-color: Highlight; }
 }

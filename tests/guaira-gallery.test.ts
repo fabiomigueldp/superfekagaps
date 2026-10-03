@@ -54,7 +54,7 @@ test('gallery is an isolated native level with only six real breakable tiles and
     assert.equal(g.player.data.position.x,48); assert.equal(feet(g),176); assert.equal(g.player.data.hasHelmet,true);
     assert.equal(g.stage.level.tiles.flat().filter(tile => tile === T.BRICK_BREAKABLE).length,6);
     for (const key of ['exits','foes','mechanisms','pickups','dialogues','landmarks'] as const) assert.deepEqual(g.stage[key],[]);
-    assert.equal(g.boss,null); assert.equal(g.mapReturnHref,'./guaira.html?at=town');
+    assert.equal(g.boss,null); assert.equal(g.mapReturnHref,'./guaira.html?at=bairro');
     for (let row=0;row<15;row++) assert.equal(g.level.getTile(14,row),T.GROUND);
     for (let row=0;row<21;row++) assert.equal(g.level.getTile(28,row),T.GROUND);
     assert.equal(g.level.getTile(27,19),T.EMPTY,'B lip must not seal the underpass');
@@ -74,7 +74,8 @@ for (const touch of [false,true]) for (const reducedMotion of [false,true]) test
     assert.equal(g.store.save.checkpoint?.index,0); assert.equal(g.coins,0); assert.equal(campaignCompletions,0);
     assert.deepEqual(g.store.save.completed,[]); assert.deepEqual(g.store.save.times,{}); assert.equal(g.mapReturnHref,G.mapHref);
     const frozen=snapshot(g), idle=g.player.data.animationTimer; h.run(g,60,['ArrowLeft','Space','ArrowDown']); g.render();
-    assert.deepEqual(snapshot(g),frozen); assert.ok(g.player.data.animationTimer>idle);
+    assert.deepEqual(snapshot(g),frozen);
+    assert.equal(g.player.data.animationTimer,idle,'Completed avatar paint uses its own clock; native PlayerData stays frozen');
     assert.match(h.status.textContent,/ACESSO DE INSPEÇÃO ABERTO/);
     if(reducedMotion) assert.deepEqual((g as unknown as {sparks:unknown[]}).sparks,[]);
     h.keys([]); g.load(G.id); replay(h,g); assert.deepEqual(snapshot(g),frozen,'same input remains deterministic');

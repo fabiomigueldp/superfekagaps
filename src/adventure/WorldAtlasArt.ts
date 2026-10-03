@@ -138,16 +138,22 @@ export function paintWorldAtlas(c: CanvasRenderingContext2D, state: AtlasPaintSt
     paintMaritimeBuoys(c, state.camera, state.buoys ?? []);
     if (!state.reducedMotion) for (const boat of state.boats ?? []) {
         const motion = boat.motion;
-        if (!motion || motion.speed <= .01) continue;
+        if (!motion || !boat.assets.rear || !validFrame(boat.frame) ||
+            ![motion.speed, motion.screenHeading, motion.waterline.x, motion.waterline.y].every(Number.isFinite) || motion.speed <= 0) continue;
+        // Fade from rest with the ferry's measured speed. A fixed-opacity wake
+        // used to pop on at .01 speed, already eight Feka pixels long. Keep the
+        // authored cruise silhouette, with no second animation clock or trail.
+        const speed = Math.min(1, motion.speed), strength = speed * speed * (3 - 2 * speed);
         const water = mapToScreen(motion.waterline, state.camera), scale = atlasActorScale(state.camera, boat.frame);
         const dx = Math.cos(motion.screenHeading), dy = Math.sin(motion.screenHeading);
-        const stern = 15 * scale, length = (8 + 14 * motion.speed) * scale;
-        c.save(); c.strokeStyle = 'rgba(229,247,233,.32)'; c.lineWidth = .7 * scale;
+        const stern = 15 * scale, length = 22 * strength * scale;
+        c.save(); c.strokeStyle = `rgba(229,247,233,${.32 * strength})`; c.lineWidth = .7 * scale;
         for (const side of [-1, 1]) {
             c.beginPath(); c.moveTo(water.x - dx * stern - dy * side * 3 * scale, water.y - dy * stern + dx * side * 3 * scale);
-            c.quadraticCurveTo(water.x - dx * (stern + length * .55) - dy * side * 5 * scale,
-                water.y - dy * (stern + length * .55) + dx * side * 5 * scale,
-                water.x - dx * (stern + length) - dy * side * 8 * scale, water.y - dy * (stern + length) + dx * side * 8 * scale);
+            c.quadraticCurveTo(water.x - dx * (stern + length * .55) - dy * side * (3 + 2 * strength) * scale,
+                water.y - dy * (stern + length * .55) + dx * side * (3 + 2 * strength) * scale,
+                water.x - dx * (stern + length) - dy * side * (3 + 5 * strength) * scale,
+                water.y - dy * (stern + length) + dx * side * (3 + 5 * strength) * scale);
             c.stroke();
         }
         c.restore();

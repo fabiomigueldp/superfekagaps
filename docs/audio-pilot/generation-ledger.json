@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "updated_on": "2026-10-02",
+  "generation_owner": "parent_root_plugin_only",
+  "local_generation_count": 0,
+  "local_paid_consumption": 0,
+  "prior_flow": {
+    "url": "https://elevenlabs.io/app/flows/aoC2seBLqtH0qywcqdFt",
+    "reported_by": "parent_root",
+    "reported_generated_outputs": 14,
+    "exact_credits_consumed": null,
+    "provider_ids_pending_delivery": true,
+    "music": {
+      "count": 2,
+      "decision": "rejected_direction",
+      "reason": "User rejected intentionally geographic/regional musical identity. Preserve provider originals and previous commit as history.",
+      "heard_by_this_session": false,
+      "may_integrate": false
+    },
+    "sfx": {
+      "count": 12,
+      "decision": "reuse_candidates_pending_audition",
+      "regenerate": false,
+      "heard_by_this_session": false
+    }
+  },
+  "current_revision": {
+    "pilot_id": "sfg-arcade-r2",
+    "new_music_outputs_planned": 0,
+    "new_sfx_outputs_planned": 0,
+    "generation_started_by_this_session": false,
+    "integration_authorized_by_user": true,
+    "github_branch_publication_authorized": true,
+    "commercial_license_verified": false,
+    "status": "integrated_technical_candidate_pending_audition",
+    "flow_url": "https://elevenlabs.io/app/flows/l5NIpun9E59Ud2olB4zR",
+    "reported_by": "parent_root",
+    "new_music_outputs_reported_generated": 2,
+    "reported_assets": [
+      {
+        "id": "mus_guaira_arcade__a__take01",
+        "title": "Salto de partida",
+        "provider_node_id": "hm9vDDKaLjGeDoFhGAUP",
+        "provider_model_id": "eleven_music_v2"
+      },
+      {
+        "id": "mus_guaira_arcade__b__take01",
+        "title": "Impulso pixel",
+        "provider_node_id": "FFpzG5UMvU8XTgxZMbSx",
+        "provider_model_id": "eleven_music_v2"
+      }
+    ],
+    "requested_model_id": "music_v2_5",
+    "actual_plugin_model_id": "eleven_music_v2",
+    "model_difference_reason": "Parent reports plugin enum lacks eleven_music_v2_5 despite catalog advertising it; no regeneration.",
+    "exact_credits_consumed": null,
+    "heard_by_this_session": false,
+    "assets_received": true,
+    "source_commit": "5ad7ea10eee5b69f758c1728971fb1856346ee9a",
+    "delivery_manifest": "audio-pilots/arcade-r2/production-manifest.json",
+    "originals_verified": 14,
+    "delivery_files": 14,
+    "delivery_bytes": 2105748,
+    "editing_masters_preserved": 14,
+    "provider_session_ids": [
+      "DO6kt310RtoQE7KsrFQy",
+      "48LqOmokDEZEuyXErBrb"
+    ],
+    "provider_metadata_confirmed_by": "parent_root_explicit_followup"
+  },
+  "prior_prompt_commit": "7a714a537d4945a38bc4bd2851647bd8815459a6",
+  "parallel_integrator_head_reported": "ab942fee",
+  "parallel_integrator_head_available_locally": true,
+  "provider_id_discrepancy": {
+    "asset": "mus_guaira_arcade__b__take01",
+    "earlier_parent_message": "eFFpzG5UMvU8XTgxZMbSx",
+    "received_manifest": "FFpzG5UMvU8XTgxZMbSx",
+    "decision": "The leading e in the earlier parent message was a transcription typo. The received manifest already had the correct ID. Corrected documentation only; no provider call, generation or audio change.",
+    "status": "resolved_transcription_typo",
+    "confirmed_provider_node_id": "FFpzG5UMvU8XTgxZMbSx",
+    "confirmed_by": "parent_root_explicit_followup",
+    "confirmed_original_sha256": "21dc9f1af39ac0fc6987f197eea995c2f5c43287fac32765949d597392cfd93c"
+  },
+  "parallel_integrator_reconciled_commit": "ab942feedde5edc0c735ed93b34647c1145c6a42"
+}

@@ -103,7 +103,7 @@ export class JuiceMinibossLab extends WorldGame {
         this.player.data.respawnRevealTimer = 0;
         this.camera.x = 0; this.camera.y = 64;
         this.input.reset(); this.input.setMenuMode(paused);
-        this.audio.select(3, true); this.audio.pause(paused);
+        this.audio.select(3, true, 'juice-lab'); this.audio.pause(paused);
         this.introAudio?.setPaused(paused); this.introAudio?.play('combat'); this.onIntroCue?.('combat');
     }
     private emitIntroCues() {
@@ -170,6 +170,7 @@ export class JuiceMinibossLab extends WorldGame {
         }
         if (this.state === 'map' || this.state === 'title' || this.state === 'intro') { this.load('juice-lab'); return; }
         if (this.boss instanceof LabEncounter && this.boss.phase === 'defeated') {
+            this.audio.ambience();
             this.labMode = 'result';
             // Never call campaign completion with an experimental identifier.
             // Keep pause/mute alive, including after the final stomp.
@@ -187,6 +188,9 @@ export class JuiceMinibossLab extends WorldGame {
             return;
         }
         const model = this.boss instanceof LabEncounter ? this.boss.model : null;
+        this.audio.ambience(model && model.phase !== 'defeated' && !this.player.data.isDead
+            ? model.enraged ? 'juice-enraged' : 'juice' : undefined,
+            model ? Math.max(0, 1 - Math.abs(this.player.data.position.x - model.x) / 320) : 0);
         const before = model?.time;
         super.update(dt);
         // Sound follows simulation events, so pause or hit-stop cannot repeat a cue.
@@ -241,15 +245,14 @@ export class JuiceMinibossLab extends WorldGame {
                     c.fillStyle = b.phaseTime < 80 ? '#fff1c9' : '#e6a383'; c.fillRect(x + 1, 7, 13 * chip, 5);
                 }
             }
-            pixelText(c, this.boss!.hint, 160, 23, b.vulnerable ? '#ddef96' : '#d8cbd7', 1, 'center');
             if (b.phase === 'enrage') {
                 const alpha = Math.min(1, b.phaseTime / 140, (b.enrageMs - b.phaseTime) / 160);
                 c.save(); c.globalAlpha = Math.max(0, alpha);
-                panel(c, 66, 48, 188, 27, '#211d30', '#d99089');
-                pixelText(c, 'PRESSAO MAXIMA', 160, 54, '#ffcfb0', 1, 'center');
-                pixelText(c, 'SAIA DAS MARCAS NO CHAO', 160, 65, '#e9d4ec', 1, 'center');
+                // Keep the moving player visible while the phase changes.
+                pixelText(c, 'PRESSAO MAXIMA', 160, 16, '#ffcfb0', 1, 'center');
+                pixelText(c, 'SAIA DAS MARCAS NO CHAO', 160, 25, '#e9d4ec', 1, 'center');
                 c.restore();
-            }
+            } else pixelText(c, this.boss!.hint, 160, 23, b.vulnerable ? '#ddef96' : '#d8cbd7', 1, 'center');
         }
         if (paused) {
             c.fillStyle = '#171324bb'; c.fillRect(0, 23, 320, 157);

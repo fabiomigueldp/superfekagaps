@@ -3,8 +3,8 @@ import { pixelText, panel, wrapText } from '../../graphics/BitmapFont';
 import { drawCalabrezzoStageBackground, drawCalabrezzoStageCast, drawCalabrezzoStageFloor, type CalabrezzoStageState } from './CalabrezzoStageArt';
 import { drawJuiceMiniboss, drawJuiceLabBackground, drawJuiceLabFloor } from './JuiceMinibossArt';
 import { JuiceMinibossModel } from './JuiceMinibossModel';
-import type { IntroFrame } from './JuiceIntroDirector';
 import { drawFluidImpact, fluidPuddle } from './JuiceFluid';
+import { JUICE_INTRO_TIMING, type IntroFrame } from './JuiceIntroDirector';
 const visualBoss = new JuiceMinibossModel();
 function sprite(c: CanvasRenderingContext2D, rows: readonly string[], x: number, y: number) {
     rows.forEach((row, yy) => [...row].forEach((key, xx) => { const color = PLAYER_PALETTE[key]; if (color) { c.fillStyle = color; c.fillRect(Math.round(x + xx), Math.round(y + yy), 1, 1); } }));
@@ -46,6 +46,29 @@ function shirtHands(c: CanvasRenderingContext2D, x: number, clothX: number, clot
         }
     }
 }
+/** Hand to heart for the vow; a small raised fist delivers the self-deprecating payoff. */
+function defiantHands(c: CanvasRenderingContext2D, x: number, f: IntroFrame) {
+    const emphasis = f.beat === 'transition' ? 1 : clamp((f.elapsedMs - JUICE_INTRO_TIMING.defyEmphasisMs) / 300);
+    const settle = f.beat === 'transition' ? clamp(f.elapsedMs / 750) : 0;
+    const limb = (ax: number, ay: number, bx: number, by: number, size: number) => {
+        const steps = Math.max(Math.abs(bx - ax), Math.abs(by - ay), 1);
+        for (let i = 0; i <= steps; i++) c.fillRect(Math.round(x + ax + (bx - ax) * i / steps) - (size >> 1),
+            Math.round(ay + (by - ay) * i / steps) - (size >> 1), size, size);
+    };
+    for (const side of [-1, 1]) {
+        const shoulder = side < 0 ? 5 : 9;
+        const elbow = side < 0 ? 1 : 15;
+        const handX = side < 0 ? 7 - settle * 3 : 14 + emphasis * 4;
+        const handY = side < 0 ? 146 + settle * 8 : 153 - emphasis * 16 * (1 - settle);
+        for (const [color, size] of [[PLAYER_PALETTE.K!, 3], [PLAYER_PALETTE.S!, 1]] as const) {
+            c.fillStyle = color;
+            limb(shoulder, 147, elbow, 151 - (side > 0 ? emphasis * 4 * (1 - settle) : 0), size);
+            limb(elbow, 151 - (side > 0 ? emphasis * 4 * (1 - settle) : 0), handX, handY, size);
+        }
+        c.fillStyle = PLAYER_PALETTE.K!; c.fillRect(Math.round(x + handX) - 1, Math.round(handY) - 1, 3, 3);
+        c.fillStyle = PLAYER_PALETTE.L!; c.fillRect(Math.round(x + handX), Math.round(handY), 1, 1);
+    }
+}
 /** Scenic acting derives directly from Feka's authored palette/head/clothes. */
 function feka(c: CanvasRenderingContext2D, f: IntroFrame, reduced: boolean) {
     const x = Math.round(f.fekaX), floor = 160;
@@ -59,7 +82,7 @@ function feka(c: CanvasRenderingContext2D, f: IntroFrame, reduced: boolean) {
     const bare = ['reveal','judges','resolve','emerge','invite','defy','transition'].includes(f.beat)
         && !(f.beat === 'reveal' && f.elapsedMs < 100)
         && !(f.beat === 'transition' && f.elapsedMs >= 750);
-    const frame = lifting ? SLIM_LIFT : bare ? down ? SLIM_BLINK : flex || defiant ? SLIM_POSE : stepping ? SLIM_WALK[step] : SLIM_IDLE
+    const frame = lifting || defiant ? SLIM_LIFT : bare ? down ? SLIM_BLINK : flex ? SLIM_POSE : stepping ? SLIM_WALK[step] : SLIM_IDLE
         : down ? PLAYER_SPRITES.blink : flex || defiant ? PLAYER_SPRITES.celebrate : stepping ? PLAYER_WALK[step] : PLAYER_SPRITES.idle;
     // Walk frames already contain the authored head/leg motion; keep the feet on their floor.
     sprite(c, frame, x - 1, floor - 26);
@@ -73,6 +96,7 @@ function feka(c: CanvasRenderingContext2D, f: IntroFrame, reduced: boolean) {
         // At the first lift pixel this covers the whole torso, then exposes it from the hem up.
         shirt(c, clothX, clothY, clothH);
     }
+    if (defiant) defiantHands(c, x, f);
     // Thin upward forearms extend the existing celebration pose without replacing identity.
     if (flex) {
         const tremble = !reduced && f.elapsedMs > 900 ? Math.floor(f.timeMs / 120) % 2 : 0;
@@ -221,7 +245,8 @@ export function drawJuiceIntro(c: CanvasRenderingContext2D, frame: IntroFrame, r
     const s: CalabrezzoStageState = { time: timeMs, floorY: 160, reducedMotion,
         // Clear the cast before the lab is exposed, avoiding lingering translucent people.
         castOpacity: Math.max(0, 1 - stageExit * 3),
-        reaction: beat === 'judges' || beat === 'resolve' ? 'mock' : ['emerge', 'invite', 'defy', 'transition'].includes(beat) ? 'shock' : 'neutral' };
+        reaction: beat === 'judges' && frame.elapsedMs >= JUICE_INTRO_TIMING.judgeLaughMs || beat === 'resolve' ? 'mock'
+            : ['emerge', 'invite', 'defy', 'transition'].includes(beat) ? 'shock' : 'neutral' };
     const closeFeka = ['reveal', 'resolve', 'defy'].includes(beat);
     const zoom = reducedMotion ? 1 : beat === 'transition' ? 1 + (1 - stageExit) : closeFeka ? 2 : beat === 'invite' ? 1.5 : 1;
     const focus = reducedMotion ? 160 : beat === 'transition' ? (frame.fekaX + 7) * (1 - stageExit) + 160 * stageExit
@@ -238,6 +263,12 @@ export function drawJuiceIntro(c: CanvasRenderingContext2D, frame: IntroFrame, r
         c.lineTo(frame.fekaX + 43, 160); c.lineTo(frame.fekaX - 28, 160); c.fill();
     }
     if (s.castOpacity! > 0) drawCalabrezzoStageCast(c, s);
+    // A quiet speaker mark connects each caption to its judge, even without sound.
+    if (beat === 'judges' && frame.subtitle) {
+        const judgeX = frame.elapsedMs < JUICE_INTRO_TIMING.secondJudgeMs ? 205 : 237;
+        c.fillStyle = '#edc785';
+        c.fillRect(judgeX - 2, 84, 5, 1); c.fillRect(judgeX - 1, 85, 3, 1); c.fillRect(judgeX, 86, 1, 1);
+    }
     drawJuiceIntroEscort(c, frame, reducedMotion);
     feka(c, frame, reducedMotion);
     if (frame.bossReveal > 0) {
