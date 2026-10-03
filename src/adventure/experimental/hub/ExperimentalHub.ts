@@ -27,21 +27,21 @@ export class ExperimentalHub {
         this.originalInert = canvas.inert;
         try {
             this.rail.className = 'experimental-entry'; this.rail.hidden = true;
-            this.rail.setAttribute('aria-label', 'Conteúdo em desenvolvimento');
+            this.rail.setAttribute('aria-label', 'Extras opcionais');
             this.entry.id = 'open-experiments'; this.entry.type = 'button';
             this.entry.setAttribute('aria-haspopup', 'dialog');
             this.entry.setAttribute('aria-controls', 'experimental-hub');
             this.entry.setAttribute('aria-expanded', 'false');
-            new LabToolbarAction(this.entry, true).setLabel('EXPERIMENTOS', 'Abrir experimentos: Guaíra e Turbosuco');
+            new LabToolbarAction(this.entry, true).setLabel('EXTRAS', 'Abrir extras opcionais: acesso direto a Guaíra e treino do Turbosuco');
             this.rail.append(this.entry);
             this.dialog.id = 'experimental-hub'; this.dialog.className = 'experimental-hub';
             this.dialog.setAttribute('aria-labelledby', 'experimental-hub-title');
             this.dialog.setAttribute('aria-describedby', 'experimental-hub-note');
             const heading = document.createElement('h1'); heading.id = 'experimental-hub-title';
-            heading.textContent = 'ROTAS EM CONSTRUÇÃO';
+            heading.textContent = 'EXTRAS OPCIONAIS';
             const intro = document.createElement('p'); intro.className = 'experimental-hub-intro';
-            intro.textContent = 'Guaíra e Turbosuco · experimentos jogáveis';
-            const routes = document.createElement('nav'); routes.setAttribute('aria-label', 'Escolher experimento');
+            intro.textContent = 'Guaíra e Turbosuco fazem parte da aventura. Aqui você pode visitá-los diretamente.';
+            const routes = document.createElement('nav'); routes.setAttribute('aria-label', 'Escolher acesso opcional');
             for (const [index, route] of EXPERIMENTAL_ROUTES.entries()) {
                 const link = document.createElement('a'), plate = document.createElement('span'), detail = document.createElement('span');
                 link.href = route.href; link.className = 'experimental-route';
@@ -52,9 +52,9 @@ export class ExperimentalHub {
                 link.append(plate, detail); routes.append(link); this.links.push(link);
             }
             const note = document.createElement('p'); note.id = 'experimental-hub-note';
-            note.textContent = 'Sair ou recarregar reinicia o capítulo. Sem progresso salvo entre visitas.';
+            note.textContent = 'Para seguir a viagem completa, volte ao título e escolha a aventura. O capítulo de Guaíra salva seu progresso neste navegador; Guaíra livre e a arena são visitas de treino.';
             this.closeButton.type = 'button'; this.closeButton.id = 'close-experiments';
-            new LabToolbarAction(this.closeButton).setLabel('VOLTAR AO TÍTULO', 'Fechar experimentos e voltar ao título');
+            new LabToolbarAction(this.closeButton).setLabel('VOLTAR AO TÍTULO', 'Fechar extras e voltar ao título');
             this.dialog.append(heading, intro, routes, note, this.closeButton);
             document.body.append(this.rail, this.dialog);
             this.lifetime.listen(this.entry, 'click', () => this.open());

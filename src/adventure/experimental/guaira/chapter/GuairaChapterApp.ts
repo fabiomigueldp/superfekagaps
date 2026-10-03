@@ -1,3 +1,4 @@
+import { chapterExitPresentation, chapterGuidance, chapterTitle } from './GuairaChapterPresentation';
 import { ProgressStore } from '../../../progress';
 import { freshGuairaChapterProgress, type GuairaChapterProgress } from './GuairaChapterProgress';
 import { reliefChallengeMessage, type GuairaReliefOptions } from '../relief/GuairaReliefChallenge';
@@ -167,7 +168,7 @@ export class GuairaChapterApp {
         if (this.isDisposed) return;
         const scope = this.replaceView('map'), node = document.createElement('div');
         node.id = 'guaira-chapter-map'; this.root.append(node);
-        document.title = 'Guaíra · Capítulo';
+        document.title = chapterTitle();
         const options: GuairaChapterMapOptions = {
             audioEnabled: () => this.audioEnabled, onAudioEnabled: enabled => { this.audioEnabled = enabled; this.persistProgress(); },
             storageMessage: () => this.storageMessage(), optionalProgress: () => this.progress.optional,
@@ -220,11 +221,12 @@ export class GuairaChapterApp {
         const scope = this.replaceView('error');
         const nav = document.createElement('nav'), message = document.createElement('p');
         nav.className = 'chapter-game-toolbar'; nav.setAttribute('aria-label', 'Recuperar a maquete de Guaíra');
-        message.id = 'lab-status'; message.setAttribute('role', 'alert'); message.textContent = 'Não foi possível abrir a maquete. Sua sessão continua aqui. Tentar repete o carregamento.';
+        message.id = 'lab-status'; message.setAttribute('role', 'alert'); message.textContent = 'Não foi possível abrir o mapa de Guaíra. Sua sessão continua aqui. Tentar repete o carregamento.';
         const retry = document.createElement('button'), exit = document.createElement('button');
         retry.type = exit.type = 'button'; retry.id = 'chapter-map-retry'; retry.textContent = 'TENTAR';
         retry.setAttribute('aria-label', 'Tentar abrir a maquete novamente');
-        exit.textContent = 'SAIR'; exit.setAttribute('aria-label', 'Sair do capítulo e voltar à seleção de experimentos');
+        const destination = chapterExitPresentation(this.campaign);
+        exit.textContent = destination.label; exit.setAttribute('aria-label', destination.description);
         scope.listen(retry, 'click', () => {
             if (!this.current(scope)) return;
             this.advanceNavigation(); this.showMap(arrival, walkToSelection, focusAction);
@@ -256,7 +258,7 @@ export class GuairaChapterApp {
         primary.id = 'chapter-primary'; retry.id = 'chapter-retry'; map.id = 'chapter-map-return';
         const primaryArt = new LabToolbarAction(primary, true);
         new LabToolbarAction(retry).setLabel('TENTAR', `Recomeçar ${info.title} nesta tentativa`);
-        new LabToolbarAction(map).setLabel('MAPA', 'Voltar à maquete do capítulo');
+        new LabToolbarAction(map).setLabel('MAPA', 'Voltar ao mapa de Guaíra');
         primaryArt.setLabel('PAUSA', 'Pausar'); primary.disabled = true;
         nav.append(status, primary, retry, map, this.keyboardHint());
         const canvas = document.createElement('canvas'); canvas.id = 'game-canvas'; canvas.tabIndex = 0;
@@ -295,13 +297,14 @@ export class GuairaChapterApp {
         try {
             const panel = this.scenePanel(attempt, scope);
             panel.status.textContent = `Abrindo ${info.title}…`;
-            document.title = `Guaíra · ${info.title} · capítulo`;
+            document.title = chapterTitle(info.title);
             const factory = await this.loadScene(attempt.sceneId);
             if (!this.current(scope) || this.snapshot.activeAttempt !== attempt) return;
             // Native hints go to a detached node. The chapter changes only page
             // guidance; the actual canvas/character/mechanisms remain native.
             const nativeStatus = document.createElement('span');
             const runtime = factory(panel.canvas, nativeStatus), game = runtime.game;
+            game.stage = { ...game.stage, name: info.title, subtitle: info.objective };
             let ownsAudioPreference = false;
             scope.add(() => { if (ownsAudioPreference) this.audioEnabled = game.audio.enabled; game.dispose(); });
             if (!this.current(scope) || this.snapshot.activeAttempt !== attempt) return;
@@ -321,15 +324,12 @@ export class GuairaChapterApp {
                 }
                 panel.primary.disabled = game.state !== 'playing' && game.state !== 'paused';
                 panel.primaryArt.setLabel(game.state === 'paused' || complete ? 'CONTINUAR' : 'PAUSA',
-                    game.state === 'paused' ? 'Retomar a tentativa' : complete ? 'Continuar a jornada pela maquete' : 'Pausar');
+                    game.state === 'paused' ? 'Retomar a tentativa' : complete ? 'Continuar a jornada pelo mapa' : 'Pausar');
                 const step = this.snapshot.route.indexOf(attempt.sceneId) + 1;
-                const native = nativeStatus.textContent?.split(/ · setas\/A D:| · setas:| · Esc:/)[0] || info.objective;
-                // The free-lab introduction names the fictional setting. In the
-                // chapter this line should tell the player what to do next.
-                const guidance = native === 'Guaíra fictícia' ? info.objective : native;
+                const guidance = chapterGuidance(nativeStatus.textContent, info.objective);
                 const message = game.state === 'paused' ? 'Pausado · Continuar volta à tentativa'
                     : !live.alive ? 'Feka caiu · retorno ao ponto seguro desta tentativa'
-                    : complete ? 'Trecho concluído · Continuar volta à maquete'
+                    : complete ? 'Trecho concluído · Continuar volta ao mapa de Guaíra'
                     : `Etapa ${step}/5 · ${game.boss?.hint ?? guidance}`;
                 const statusMessage = `${message} · ${this.storageMessage()}`;
                 if (panel.status.textContent !== statusMessage) panel.status.textContent = statusMessage;
@@ -337,7 +337,7 @@ export class GuairaChapterApp {
             };
             if (activity.shouldPause() && game.state === 'playing') runtime.togglePause();
             activity.observe(reflect); panel.fit(); game.start(); panel.canvas.focus({ preventScroll: true });
-            document.title = `Guaíra · ${info.title} · capítulo`;
+            document.title = chapterTitle(info.title);
         } catch (error) {
             if (!this.current(scope)) return;
             // Retire any partially mounted controls/runtime before installing a
@@ -352,11 +352,11 @@ export class GuairaChapterApp {
         const nav = document.createElement('nav'), status = document.createElement('p');
         nav.className = 'chapter-game-toolbar'; nav.setAttribute('aria-label', 'Recuperar o trecho de Guaíra');
         status.id = 'lab-status'; status.setAttribute('role', 'alert');
-        status.textContent = 'Não foi possível abrir este trecho. Tentar repete o carregamento; Mapa volta à maquete.';
+        status.textContent = 'Não foi possível abrir este trecho. Tentar repete o carregamento; Mapa volta ao mapa de Guaíra.';
         const retry = document.createElement('button'), map = document.createElement('button');
         retry.type = map.type = 'button'; retry.id = 'chapter-retry'; map.id = 'chapter-map-return';
         retry.textContent = 'TENTAR'; retry.setAttribute('aria-label', 'Tentar abrir este trecho novamente');
-        map.textContent = 'MAPA'; map.setAttribute('aria-label', 'Voltar à maquete do capítulo');
+        map.textContent = 'MAPA'; map.setAttribute('aria-label', 'Voltar ao mapa de Guaíra');
         scope.listen(retry, 'click', () => {
             if (!this.current(scope)) return;
             const next = this.session.retry(attempt);
@@ -427,11 +427,12 @@ export class GuairaChapterApp {
         try {
             const panel = this.excursionPanel(token, scope, options);
             panel.status.textContent = `Abrindo ${info.title} · desvio opcional…`;
-            document.title = `Guaíra · ${info.title} · capítulo`;
+            document.title = chapterTitle(info.title);
             const factory = await this.loadExcursion(token.sceneId);
             if (!this.currentExcursion(token, scope)) return;
             const nativeStatus = document.createElement('span');
             const runtime = factory(panel.canvas, nativeStatus, options), game = runtime.game;
+            game.stage = { ...game.stage, name: info.title, subtitle: info.objective };
             // Own the native resources before controls, observers or reflection can fail.
             let ownsAudioPreference = false;
             scope.add(() => { if (ownsAudioPreference) this.audioEnabled = game.audio.enabled; game.dispose(); });
@@ -493,8 +494,8 @@ export class GuairaChapterApp {
                 let message = game.state === 'paused' ? `Pausado · Continuar volta a ${info.title}`
                     : game.player.data.isDead ? 'Feka caiu · retorno ao ponto seguro desta tentativa opcional'
                     : runtime.finished ? runtime.sceneId === 'gallery'
-                        ? 'Acesso de inspeção aberto · Alívio segue para a Câmara de Alívio; Bairro volta à maquete'
-                        : `Passagem inspecionada · ${runtime.reliefOpened ? 'alívio aberto, grelha sem pressão' : 'alívio intacto, grelha mantém o ciclo'} · Bairro volta à maquete`
+                        ? 'Acesso de inspeção aberto · Alívio segue para a Câmara de Alívio; Bairro volta ao mapa de Guaíra'
+                        : `Passagem inspecionada · ${runtime.reliefOpened ? 'alívio aberto, grelha sem pressão' : 'alívio intacto, grelha mantém o ciclo'} · Bairro volta ao mapa de Guaíra`
                     : runtime.sceneId === 'relief' && nativeStatus.textContent && !nativeStatus.textContent.startsWith('Pausado')
                         ? nativeStatus.textContent : `Desvio opcional · ${info.objective}`;
                 if (routes && game.state === 'playing' && !game.player.data.isDead) {
@@ -508,7 +509,7 @@ export class GuairaChapterApp {
             };
             if (activity.shouldPause() && game.state === 'playing') runtime.togglePause();
             activity.observe(reflect); panel.fit(); game.start(); panel.canvas.focus({ preventScroll: true });
-            document.title = `Guaíra · ${info.title} · capítulo`;
+            document.title = chapterTitle(info.title);
         } catch (error) {
             if (!this.currentExcursion(token, scope)) return;
             this.excursionError(token, options); console.error('Chapter excursion initialization failed', error);

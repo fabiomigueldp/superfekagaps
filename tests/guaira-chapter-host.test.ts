@@ -109,6 +109,8 @@ test('chapter guidance opens with the real objective and retains the native valv
     const h = hostBrowser(t), factory = await loadGuairaChapterScene('guaira-travessia');
     const app = h.create({ loadScene: async () => factory }); h.enter(); await flush();
     const game = app.activeGame!;
+    assert.equal(game.stage.name, 'Travessia da Vala Seca');
+    assert.doesNotMatch(game.stage.subtitle, /protótipo|experimental/i);
     game.render(); h.frame();
     assert.match(h.byId('lab-status').textContent, /Abra a comporta e atravesse até o arrozal/);
     assert.doesNotMatch(h.byId('lab-status').textContent, /Guaíra fictícia/);
@@ -848,4 +850,15 @@ test('interrupted persisted chapter restarts the selected native scene without r
     assert.equal(restored.mode, 'game'); assert.equal(restored.activeGame!.player.data.position.x, startX);
     assert.equal(restored.snapshot.accepted.length, 0); assert.notEqual(restored.snapshot.activeAttempt!.sessionId, oldAttempt.sessionId);
     restored.dispose(); h.checkDisposed();
+});
+
+
+test('campaign map recovery returns to the journey without leaving through extras', t => {
+    const h = hostBrowser(t); let exits = 0;
+    const app = h.create({ campaign: true, createMap: () => { throw Error('Injected map failure'); }, exit: () => { exits++; } });
+    assert.equal(app.mode, 'error');
+    const back = h.all().find(node => node.getAttribute('aria-label') === 'Voltar à Fábrica e continuar a viagem');
+    assert.ok(back); assert.equal(back.textContent, 'FÁBRICA');
+    back.click(); assert.equal(exits, 1);
+    assert.equal(app.isDisposed, false, 'The campaign owns travel/cancel and disposal');
 });

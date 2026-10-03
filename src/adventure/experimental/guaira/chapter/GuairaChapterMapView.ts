@@ -1,3 +1,4 @@
+import { chapterExitPresentation } from './GuairaChapterPresentation';
 import { LabToolbarAction } from '../../JuiceLabToolbar';
 import { approachGuairaCamera, guairaCamera, guairaScreenPoint, paintGuairaMap, paintGuairaWaterFrame, type GuairaCamera } from '../GuairaMapArt';
 import { loadGuairaScene } from '../GuairaMapLoader';
@@ -134,14 +135,15 @@ export class GuairaChapterMapView {
         identity.append(element('h1', 'chapter-map-name', 'GUAÍRA'), this.count);
         const navigation = element('nav', 'chapter-map-navigation'); navigation.setAttribute('aria-label', 'Controles do mapa');
         navigation.append(this.journey.button, this.overview.button, this.sound.button, this.exit.button);
+        const destination = chapterExitPresentation(!!this.options.campaign);
+        this.exit.art.setLabel(destination.label, destination.description);
         if (this.options.campaign) {
-            this.exit.art.setLabel('FÁBRICA', 'Voltar à Fábrica');
             navigation.append(this.campaignContinue.button);
         }
         this.header.append(identity, navigation);
         this.canvas.setAttribute('role', 'img'); this.canvas.setAttribute('aria-label', 'Maquete de Guaíra com Feka na estrada');
         this.loading.setAttribute('role', 'status'); this.failure.setAttribute('role', 'alert');
-        this.failure.append(element('p', '', 'A maquete não carregou. Tente novamente ou use SAIR.'), this.retry.button);
+        this.failure.append(element('p', '', `O mapa de Guaíra não carregou. Tente novamente ou use ${destination.label}.`), this.retry.button);
         this.plaque.setAttribute('aria-hidden', 'true');
         this.scene.append(this.canvas, this.plaque, this.loading, this.failure);
         const information = element('div', 'chapter-map-information'); information.append(this.title, this.status, this.hint);

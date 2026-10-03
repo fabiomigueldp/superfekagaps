@@ -103,6 +103,9 @@ test('modal traps boundary Tab, keeps native links and rejects repeated activati
     const h = browser(t); h.game.enableExperimentalHub('?experiments=1');
     const dialog = h.byId('experimental-hub'), nav = dialog.children.find(element => element.tagName === 'NAV')!;
     assert.equal(nav.children.length, 3);
+    assert.equal(h.byId('experimental-hub-title').textContent, 'EXTRAS OPCIONAIS');
+    assert.match(h.byId('experimental-hub-note').textContent, /capítulo de Guaíra salva seu progresso/);
+    assert.doesNotMatch(h.byId('experimental-hub-note').textContent, /Sem progresso salvo/);
     assert.deepEqual(nav.children.map(link => (link as unknown as { href: string }).href), EXPERIMENTAL_ROUTES.map(route => route.href));
     const first = nav.children[0], close = h.byId('close-experiments');
     assert.equal(h.doc.activeElement, first);

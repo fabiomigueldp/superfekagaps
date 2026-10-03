@@ -1,9 +1,9 @@
 /** Closed navigation vocabulary: queries never supply a destination or session data. */
 export const EXPERIMENTAL_HUB_RETURN = './?experiments=1';
 export const EXPERIMENTAL_ROUTES = Object.freeze([
-    { href: './guaira-capitulo.html', label: 'CAPÍTULO DE GUAÍRA', description: 'Devolva a água ao bairro em cinco etapas', name: 'Jogar o capítulo de Guaíra' },
+    { href: './guaira-capitulo.html', label: 'CAPÍTULO DE GUAÍRA', description: 'Acesso direto ao capítulo, com progresso salvo', name: 'Jogar o capítulo de Guaíra' },
     { href: './guaira.html', label: 'GUAÍRA LIVRE', description: 'Explore o mapa e escolha percursos', name: 'Explorar Guaíra livremente' },
-    { href: './juice-lab.html', label: 'TURBOSUCO', description: 'Teste o desafio da arena', name: 'Jogar o desafio experimental do Turbosuco' }
+    { href: './juice-lab.html', label: 'TREINO TURBOSUCO', description: 'Repita a arena fora da viagem', name: 'Treinar o desafio do Turbosuco' }
 ] as const);
 export function requestsExperimentalHub(search: string): boolean {
     const params = new URLSearchParams(search);
