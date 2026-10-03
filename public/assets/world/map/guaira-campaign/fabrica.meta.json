@@ -1,5 +1,6 @@
 {
   "regionKey": "fabrica",
+  "replacesBase": false,
   "camera": {
     "position": [
       11.0,
@@ -15,16 +16,16 @@
   },
   "terminal": {
     "groundAnchor": {
-      "x": 0.822504,
-      "y": 0.853256
+      "x": 0.567776,
+      "y": 0.762592
     },
     "runwayStart": {
-      "x": 0.836196,
-      "y": 0.920797
+      "x": 0.371557,
+      "y": 0.668477
     },
     "runwayEnd": {
-      "x": 1.005348,
-      "y": 0.645844
+      "x": 0.636027,
+      "y": 0.795328
     },
     "boardingPath": [
       {
@@ -32,28 +33,28 @@
         "y": 0.735356
       },
       {
-        "x": 0.737191,
-        "y": 0.812336
+        "x": 0.645664,
+        "y": 0.770683
       },
       {
-        "x": 0.822504,
-        "y": 0.853256
+        "x": 0.567776,
+        "y": 0.762592
       }
     ],
     "groundAnchorWorld": [
-      9,
-      -2.4,
-      1.18
+      3.3,
+      -2.9,
+      1.07
     ],
     "runwayStartWorld": [
-      10,
-      -3.65,
-      1.18
+      -1.3,
+      -2.9,
+      1.07
     ],
     "runwayEndWorld": [
-      10,
-      3.65,
-      1.18
+      4.9,
+      -2.9,
+      1.07
     ],
     "boardingPathWorld": [
       [
@@ -62,30 +63,31 @@
         1.18
       ],
       [
-        7,
-        -2.4,
-        1.18
+        4.8,
+        -2.3,
+        1.07
       ],
       [
-        9,
-        -2.4,
-        1.18
+        3.3,
+        -2.9,
+        1.07
       ]
     ],
     "surface": "dry-compacted-earth",
-    "clearSpanMeters": 5.2,
-    "usableLengthMeters": 7.3
+    "clearSpanMeters": 3.35,
+    "usableLengthMeters": 6.2
   },
   "supportFootprint": {
     "center": [
-      10,
-      0
+      1.8,
+      -2.9
     ],
-    "width": 6.0,
-    "depth": 8.8,
+    "width": 7.7,
+    "depth": 3.7,
+    "terrainMode": "existing-island-ground",
     "bottomZ": 0.1,
-    "topZ": 1.18,
-    "walkWidth": 1.15,
+    "topZ": 1.07,
+    "walkWidth": 0.65,
     "walkSegments": [
       [
         4.25,
@@ -93,33 +95,33 @@
         1.18
       ],
       [
-        7,
-        -2.4,
-        1.18
+        4.8,
+        -2.3,
+        1.07
       ],
       [
-        9,
-        -2.4,
-        1.18
+        3.3,
+        -2.9,
+        1.07
       ]
     ]
   },
   "assetFrame": {
-    "left": 0.6072916666666666,
-    "top": 0.5633333333333332,
-    "widthInMap": 0.54375,
-    "heightInMap": 0.5133333333333333
+    "left": 0.3375,
+    "top": 0.6283333333333334,
+    "widthInMap": 0.39895833333333336,
+    "heightInMap": 0.2
   },
   "validation": {
     "walkSupportSamples": 42,
     "allSupported": true,
     "numericCampaignIdsChanged": false,
-    "objects": 97
+    "objects": 31
   },
   "image": {
     "path": "/assets/world/map/guaira-campaign/fabrica.webp",
-    "width": 522,
-    "height": 308,
-    "bytes": 20506
+    "width": 383,
+    "height": 120,
+    "bytes": 8044
   }
 }

@@ -6,6 +6,7 @@ import { freshSave as freshCampaignSave, ProgressStore, SAVE_KEY } from '../src/
 import { WorldGame } from '../src/adventure/WorldGame';
 import { COSTA_ART_BOUNDS, FALLBACK_POINTS, fallbackMapMetadata, parseMapMetadata, paintMapActor } from '../src/adventure/WorldMapArt';
 import { WorldMapView } from '../src/adventure/WorldMapView';
+import { GUAIRA_CAMPAIGN_ART } from '../src/adventure/GuairaCampaignArt';
 import { WORLD_MAP_TRAVEL_ACTIONS } from '../src/adventure/WorldMapHud';
 import { mapToScreen, type MapPoint } from '../src/adventure/WorldMapModel';
 import { atlasIslandBounds, WORLD_ATLAS_PLACEMENTS } from '../src/adventure/WorldAtlasModel';
@@ -351,7 +352,7 @@ test('the ferry pair loads first; an explicit Factory preview loads its own cont
     h.view.render(10, save, 100, '');
     assert.equal(h.fetches.filter(request => request.url.endsWith('fabrica-diorama.meta.json')).length, 1);
     assert.equal(h.fetches.filter(request => request.url.endsWith('port-factory-bridge.meta.json')).length, 1);
-    h.view.render(15, save, 116, ''); // First Serra inspection may request its own optional return sign.
+    h.view.render(15, save, 116, ''); // First Serra inspection may request its passenger sign art.
     assert.ok(!h.fetches.some(request => /reserva/.test(request.url)));
     h.view.render(20, save, 120, ''); // A locked Reserva preview still lazily loads its own authored scene.
     assert.equal(h.fetches.filter(request => request.url.endsWith('reserva-diorama.meta.json')).length, 1);
@@ -811,12 +812,12 @@ async function readyConnectedFactory(h: ReturnType<typeof mapDOM>, save = openSa
 
 async function finishSerra(h: ReturnType<typeof mapDOM>, failAsset = '') {
     await finishWorld(h, 4, actualMetadata(4), failAsset !== 'serra-diorama.webp');
-    const link = JSON.parse(readFileSync(new URL('../public/assets/world/map/factory-serra-link.meta.json', import.meta.url), 'utf8'));
     const cable = JSON.parse(readFileSync(new URL('../public/assets/world/map/serra-maintenance-cable.meta.json', import.meta.url), 'utf8'));
-    for (const [name, data] of [['factory-serra-link', link], ['serra-maintenance-cable', cable]] as const)
-        h.fetches.find(request => request.url.endsWith(`${name}.meta.json`))!.resolve({ ok: true, json: async () => data });
+    h.fetches.find(request => request.url.endsWith('serra-maintenance-cable.meta.json'))!.resolve({ ok: true, json: async () => cable });
+    assert.ok(h.fetches.every(request => !request.url.includes('factory-serra-link')), 'Removed bridge metadata must never be requested.');
+    assert.ok(h.images.every(image => !image.src.includes('factory-serra-link')), 'Removed bridge overlays must never be requested.');
     await flushAssets();
-    for (const size of [link.overlays.open, link.overlays.closed, cable.atlas]) {
+    for (const size of [cable.atlas]) {
         const image = h.images.find(image => image.src.endsWith(size.path.split('/').pop()));
         if (failAsset === 'serra-diorama.webp') { assert.equal(image, undefined); continue; }
         assert.ok(image, `Expected Serra visual ${size.path}`);
@@ -826,11 +827,11 @@ async function finishSerra(h: ReturnType<typeof mapDOM>, failAsset = '') {
     await flushAssets();
 }
 
-async function readySerra(h: ReturnType<typeof mapDOM>, save = { ...openSave('4-3'), secrets: ['4-3'] }, failAsset = '', coastFail = '') {
+async function readySerra(h: ReturnType<typeof mapDOM>, save = { ...openSave('4-3'), secrets: ['4-3'] }, failAsset = '', coastFail = '', factoryFail = '') {
     await readyConnection(h, save, coastFail);
     const selection = STAGES.findIndex(stage => stage.id === save.selected);
     h.get('world-map-overview').click(); h.view.render(selection, save, 32, '');
-    await finishFactory(h); await finishSerra(h, failAsset); h.view.render(selection, save, 48, '');
+    await finishFactory(h, factoryFail); await finishSerra(h, failAsset); h.view.render(selection, save, 48, '');
     h.get('world-map-overview').click(); h.view.render(selection, save, 64, '');
 }
 
@@ -973,8 +974,9 @@ test('all six owned overview labels select their own region and open its close v
             assert.ok(button.getAttribute('aria-label')!.includes(`Ilha ${index + 1}: ${names[index]}.`));
         });
         h.internal.hud.overviewButtons[world - 1].click();
-        assert.equal(h.internal.overview, false); assert.equal(h.internal.controlSelection, (world - 1) * 5);
-        assert.equal(h.internal.journey.arrived, `${world}-1`);
+        assert.equal(h.internal.overview, false); assert.equal(h.internal.controlSelection, world === 4 ? 17 : (world - 1) * 5);
+        assert.equal(h.internal.journey.arrived, world <= 4 ? '4-3' : `${world}-1`);
+        if (world <= 3) assert.equal(h.internal.journey.blocked, 'no-route');
         assert.equal(h.events.entered, 0);
     }
 });
@@ -1048,7 +1050,7 @@ test('compact overview fits the actual actor and all attached badges at fresh Co
     });
 });
 
-test('normal-motion travel and overview settling retain actual actor framing through Costa, Factory and Domínio', async t => {
+test('normal-motion travel and overview settling retain actor framing within both disconnected regional chains', async t => {
     const h = mapDOM(t), save = openSave('1-1'); await readyDominio(h, save);
     h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width: 472, height: 303 };
     h.get('world-map-header').bounds = { x: 12, y: 6, left: 12, top: 6, width: 448, height: 44 };
@@ -1070,6 +1072,11 @@ test('normal-motion travel and overview settling retain actual actor framing thr
         }
     };
     for (const destination of [0, 12, 25]) {
+        if (destination === 25) {
+            // The Serra–Domínio chain is entered through its saved arrival, never the removed bridge.
+            h.view.hide(); save.selected = '5-5'; h.view.render(24, save, time += 100, '');
+            assert.equal(h.internal.journey.arrived, '5-5');
+        }
         selection = destination;
         if (selection) {
             h.internal.hud.regionButton.click();
@@ -1278,27 +1285,27 @@ test('a natural heated-dock crossing moves only its own hull and preserves expli
     assert.equal(h.internal.journey.arrived, '6-1'); assert.equal(h.internal.dominioFerry.mooredWorld, 6);
 });
 
-test('both ferries and cable pairs survive full-world skips, reversals and reload at the saved arrival', async t => {
-    const h = mapDOM(t), save = { ...openSave('1-5'), secrets: ['1-3', '4-3', '5-3', '6-3'] }; await readyDominio(h, save);
+test('the Serra–Domínio ferry and cable pairs survive regional skips, reversals and reload at the saved arrival', async t => {
+    const h = mapDOM(t), save = { ...openSave('4-3'), secrets: ['1-3', '4-3', '5-3', '6-3'] }; await readyDominio(h, save);
     h.view.render(25, save, 100, '');
-    for (const edge of ['coast-port-sail', 'reserva-dominio-sail'])
+    for (const edge of ['serra-maintenance-cable-a', 'serra-reserva-passenger-a', 'reserva-dominio-sail'])
         assert.ok(h.internal.journey.legs.some((leg: any) => leg.id === edge));
     h.internal.hud.skipButton.click();
     assert.equal(h.internal.journey.arrived, '6-1'); assert.equal(h.internal.coastFerry.mooredWorld, 2);
     assert.equal(h.internal.dominioFerry.mooredWorld, 6); assert.equal(h.events.entered, 0);
-    save.selected = '6-1'; h.view.render(0, save, 200, '');
+    save.selected = '6-1'; h.view.render(17, save, 200, '');
     let time = 200;
     while (h.internal.journey.legs[0]?.id !== 'reserva-dominio-sail' && time < 10000) {
-        h.paint.calls.length = 0; h.view.render(0, save, time += 100, '');
+        h.paint.calls.length = 0; h.view.render(17, save, time += 100, '');
     }
     assert.equal(h.internal.journey.legs[0]?.id, 'reserva-dominio-sail');
     const foot = { ...h.internal.marker }; h.view.selectDestination(26);
     assert.deepEqual(h.internal.marker, foot); assert.equal(h.internal.journey.legs[0].direction, 1);
-    h.view.selectDestination(0); assert.deepEqual(h.internal.marker, foot);
+    h.view.selectDestination(17); assert.deepEqual(h.internal.marker, foot);
     h.view.hide(); h.view.render(25, save, time += 100, '');
     assert.equal(h.internal.journey.arrived, '6-1'); assert.equal(h.internal.dominioFerry.mooredWorld, 6);
-    h.media.matches = true; h.view.render(0, save, time += 100, '');
-    assert.equal(h.internal.journey.arrived, '1-1'); assert.equal(h.internal.coastFerry.mooredWorld, 1);
+    h.media.matches = true; h.view.render(17, save, time += 100, '');
+    assert.equal(h.internal.journey.arrived, '4-3'); assert.equal(h.internal.coastFerry.mooredWorld, 2);
     assert.equal(h.internal.dominioFerry.mooredWorld, 5); assert.equal(h.events.entered, 0);
 });
 
@@ -1341,11 +1348,11 @@ test('late heated dock readiness waits for a safe arrival without resetting the 
     assert.equal(h.fetches.filter(request => request.url.endsWith('journey-boat.meta.json')).length, 1);
 });
 
-test('the complete six-region route frames every occupied vehicle and keeps overview targets separate', async t => {
+test('the Serra–Reserva–Domínio route frames every occupied vehicle and keeps overview targets separate', async t => {
     const { atlasCableBounds } = await import('../src/adventure/WorldCableArt');
     const { atlasBoatBounds } = await import('../src/adventure/WorldAtlasArt');
     for (const [width, height] of [[320, 568], [472, 303], [590, 378], [740, 320]]) await t.test(`${width}x${height}`, async child => {
-        const h = mapDOM(child), save = { ...openSave('1-5'), secrets: ['1-3', '4-3', '5-3', '6-3'] }; await readyDominio(h, save);
+        const h = mapDOM(child), save = { ...openSave('4-3'), secrets: ['1-3', '4-3', '5-3', '6-3'] }; await readyDominio(h, save);
         h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width, height };
         h.get('world-map-header').bounds = { x: 8, y: 6, left: 8, top: 6, width: width - 16, height: 44 };
         h.get('world-map-tools').bounds = h.get('world-map-header').bounds;
@@ -1355,7 +1362,7 @@ test('the complete six-region route frames every occupied vehicle and keeps over
         while (h.internal.journey.destination && time < 150000) {
             h.paint.calls.length = 0; h.view.render(29, save, time += 100, '');
             const active = h.internal.journey.legs[0]; if (!active) continue;
-            assert.equal(h.internal.journey.arrived, '1-5');
+            assert.equal(h.internal.journey.arrived, '4-3');
             const actor = mapToScreen(h.internal.marker, h.internal.camera);
             assert.ok(actor.x >= 0 && actor.x <= width && actor.y >= h.internal.frameInsets.top && actor.y <= height - h.internal.frameInsets.bottom,
                 `${active.id}: actor outside ${width}x${height}: ${JSON.stringify(actor)}`);
@@ -1370,7 +1377,7 @@ test('the complete six-region route frames every occupied vehicle and keeps over
                 `${active.id}: carrier outside ${width}x${height}: ${JSON.stringify({ a, b })}`);
         }
         assert.equal(h.internal.journey.arrived, '6-5'); assert.equal(h.events.entered, 0);
-        assert.deepEqual([...vehicles].sort(), ['coast-port-sail', 'maintenance', 'passenger', 'reserva-dominio-sail']);
+        assert.deepEqual([...vehicles].sort(), ['maintenance', 'passenger', 'reserva-dominio-sail']);
         h.get('world-map-overview').click(); tick(h, 29, save, time, 3000);
         const entries = nativeControlEntries(h);
         const boxes = entries.flatMap(({ button, width: wide, height: tall }) => {
@@ -1900,24 +1907,44 @@ test('close views own their departure signs while panorama names the islands the
     assert.equal(h.internal.hud.overviewButtons.filter((button: Button) => !button.hidden).length, 6);
 });
 
-test('Factory reaches Serra over its supported link while the ferry stays at Porto and entry remains explicit', async t => {
-    const h = mapDOM(t), save = { ...openSave('3-5'), secrets: [] as string[] }; await readySerra(h, save);
-    assert.equal(h.internal.factorySerraActive, true); assert.equal(h.internal.maintenanceActive, true);
-    const boat = { ...h.internal.currentBoat().foot }; h.view.render(15, save, 100, '');
-    assert.ok(h.internal.journey.legs.some((leg: { id: string }) => leg.id === 'factory-serra-link'));
-    let sawSpan = false;
-    for (let time = 200; time < 13000; time += 100) {
-        h.paint.calls.length = 0; h.view.render(15, save, time, '');
-        assert.deepEqual(h.internal.currentBoat().foot, boat);
-        if (h.internal.journey.destination) {
-            assert.equal(h.internal.journey.arrived, '3-5'); assert.deepEqual(h.events.arrived, []);
-            assert.equal(h.view.enterSelected(15), false);
-            assert.ok(Object.values(h.internal.hud.travelButtons).every((button: any) => button.hidden));
+test('the full Serra campaign replacement paints once and preserves its base fallback until ready', async t => {
+    const h = mapDOM(t, true), save = openSave('4-3'); await readySerra(h, save);
+    const base = h.internal.activeArt.get(4).assets.island;
+    assert.ok(base); assert.equal(h.internal.campaignImages.has('serra'), false);
+    h.paint.calls.length = 0; h.internal.paintDirty = true; h.view.render(17, save, 100, '');
+    assert.equal(h.paint.calls.filter(call => call.method === 'drawImage' && call.args[0] === base).length, 1,
+        'Pending or unavailable campaign art must retain the ready canonical Serra bitmap.');
+
+    assert.equal(GUAIRA_CAMPAIGN_ART.serra.replacesBase, true);
+    const replacement = Object.assign(new Image(), { src: GUAIRA_CAMPAIGN_ART.serra.path, naturalWidth: 1920, naturalHeight: 1200 });
+    h.internal.campaignImages.set('serra', replacement);
+    h.paint.calls.length = 0; h.internal.paintDirty = true; h.view.render(17, save, 200, '');
+    assert.equal(h.paint.calls.filter(call => call.method === 'drawImage' && call.args[0] === replacement).length, 1,
+        'The complete scene is the island layer, never a second connection overlay.');
+    assert.equal(h.paint.calls.filter(call => call.method === 'drawImage' && call.args[0] === base).length, 0,
+        'The canonical Serra scene must not remain underneath the complete replacement.');
+    assert.equal(h.internal.activeArt.get(4).assets.island, base, 'Replacing the render layer preserves the cached fallback.');
+});
+
+test('Factory–Serra selections stay previews without loading, rendering or traversing the removed bridge', async t => {
+    for (const [from, selection] of [['3-5', 15], ['4-1', 14]] as const) await t.test(`${from} toward ${STAGES[selection].id}`, async child => {
+        const h = mapDOM(child), save = { ...openSave(from), secrets: [] as string[] }; await readySerra(h, save);
+        assert.equal(h.internal.maintenanceActive, true);
+        const origin = { ...h.internal.marker }, boat = { ...h.internal.currentBoat().foot };
+        for (const time of [100, 200, 1000, 13000]) {
+            h.paint.calls.length = 0; h.view.render(selection, save, time, '');
+            assert.equal(h.internal.journey.arrived, from); assert.equal(h.internal.journey.destination, null);
+            assert.equal(h.internal.journey.blocked, 'no-route'); assert.deepEqual(h.internal.journey.legs, []);
+            assert.match(h.get('world-map-hint').textContent, /Guaíra/);
+            assert.deepEqual(h.internal.marker, origin); assert.deepEqual(h.internal.currentBoat().foot, boat);
+            assert.equal(h.view.enterSelected(selection), false); assert.deepEqual(h.events.arrived, []);
+            assert.ok(h.paint.calls.every(call => call.method !== 'drawImage' || !(call.args[0] as any)?.src?.includes('factory-serra-link')));
         }
-        if (h.internal.journey.legs[0]?.id === 'factory-serra-link') sawSpan = true;
-    }
-    assert.ok(sawSpan); assert.equal(h.internal.journey.arrived, '4-1'); assert.deepEqual(h.events.arrived, [15]);
-    assert.equal(h.events.entered, 0); assert.equal(h.view.enterSelected(15), true);
+        assert.ok(h.internal.network.edges.every((edge: { id: string }) => edge.id !== 'factory-serra-link'));
+        assert.equal(Object.prototype.hasOwnProperty.call(h.internal.hud.travelButtons, 'walk-factory-serra'), false);
+        assert.equal(Object.prototype.hasOwnProperty.call(h.internal.hud.travelButtons, 'walk-serra-factory'), false);
+        assert.equal(h.events.entered, 0);
+    });
 });
 
 test('the actual cabin trip uses its measured doorway, carries Feka and moves its empty countercar', async t => {
@@ -1985,7 +2012,7 @@ test('cabin failure or an undiscovered shortcut leaves supported Serra walks and
     for (const failed of [false, true]) await t.test(failed ? 'missing cabin art' : 'not discovered', async child => {
         const h = mapDOM(child), save = { ...openSave('4-3'), secrets: failed ? ['4-3'] : [] };
         await readySerra(h, save, failed ? 'serra-maintenance-cabin.webp' : '');
-        assert.equal(h.internal.connectionActive, true); assert.equal(h.internal.bridgeActive, true); assert.equal(h.internal.factorySerraActive, true);
+        assert.equal(h.internal.connectionActive, true); assert.equal(h.internal.bridgeActive, true); assert.ok(h.internal.network.edges.every((edge: { id: string }) => edge.id !== 'factory-serra-link'));
         assert.ok(h.internal.network.edges.every((edge: { mode: string }) => edge.mode !== 'cable' && edge.mode !== 'cable-board'));
         h.view.render(19, save, 100, ''); assert.ok(h.internal.journey.legs.every((leg: { mode: string }) => leg.mode === 'walk'));
         h.internal.hud.skipButton.click(); assert.equal(h.internal.journey.arrived, '4-5'); assert.equal(h.events.entered, 0);
@@ -1994,14 +2021,18 @@ test('cabin failure or an undiscovered shortcut leaves supported Serra walks and
     });
 });
 
-test('a failed Factory exit does not disable the ready local maintenance ride or relocate the ferry', async t => {
-    const h = mapDOM(t), save = { ...openSave('4-3'), secrets: ['4-3'] }; await readySerra(h, save, 'factory-serra-link-open.webp');
-    assert.equal(h.internal.factorySerraStatus, 'failed'); assert.equal(h.internal.maintenanceActive, true);
+test('failed Factory bridge art cannot bypass Guaíra or disable the local maintenance ride', async t => {
+    const h = mapDOM(t), save = { ...openSave('4-3'), secrets: ['4-3'] }; await readySerra(h, save, '', '', 'bridge-open.webp');
+    assert.equal(h.internal.bridgeStatus, 'failed');
+    assert.equal(h.internal.maintenanceActive, true);
     const boat = { ...h.internal.currentBoat().foot };
     h.view.render(19, save, 100, ''); assert.ok(h.internal.journey.legs.some((leg: { mode: string }) => leg.mode === 'cable'));
-    h.internal.hud.skipButton.click(); h.view.render(10, save, 200, '');
-    assert.equal(h.internal.journey.arrived, '3-1'); assert.deepEqual(h.internal.currentBoat().foot, boat);
-    assert.equal(h.internal.connectionActive, true); assert.equal(h.internal.bridgeActive, true); assert.equal(h.events.entered, 0);
+    h.internal.hud.skipButton.click();
+    h.view.render(10, save, 200, '');
+    assert.equal(h.internal.journey.arrived, '4-5'); assert.equal(h.internal.journey.destination, null);
+    assert.equal(h.internal.journey.blocked, 'no-route'); assert.deepEqual(h.internal.currentBoat().foot, boat);
+    assert.deepEqual(h.events.arrived, [19]); assert.equal(h.events.entered, 0);
+    assert.equal(h.view.enterSelected(10), false);
 });
 
 test('late cabin imagery activates only after the already supported walk reaches its selected stage', async t => {
@@ -2020,7 +2051,7 @@ test('late cabin imagery activates only after the already supported walk reaches
     assert.ok(h.internal.journey.legs.some((leg: { mode: string }) => leg.mode === 'cable'));
 });
 
-test('cabin framing and all six travel signs remain usable in narrow, portrait and short map layouts', async t => {
+test('cabin framing and remaining travel signs remain usable in narrow, portrait and short map layouts', async t => {
     const { atlasCableBounds } = await import('../src/adventure/WorldCableArt');
     const h = mapDOM(t, true), save = { ...openSave('4-3'), secrets: ['4-3'] }; await readySerra(h, save);
     for (const [width, height] of [[320, 568], [400, 606], [590, 378], [740, 320]]) {
@@ -2057,18 +2088,18 @@ test('cabin framing and all six travel signs remain usable in narrow, portrait a
     assert.ok(riding > 5);
 });
 
-test('mixed Costa and Serra trips keep Feka and each occupied vehicle in frame throughout camera easing', async t => {
+test('local Serra trips in both directions keep Feka and each occupied vehicle in frame throughout camera easing', async t => {
     const { atlasCableBounds } = await import('../src/adventure/WorldCableArt');
     for (const [width, height] of [[320,568],[400,606],[590,378],[740,320]]) for (const reverse of [false,true])
-        await t.test(`${width}x${height} ${reverse ? 'Serra to Costa' : 'Costa to Serra'}`, async child => {
-            const h = mapDOM(child), save = { ...openSave(reverse ? '4-5' : '1-5'), secrets: ['4-3'] };
+        await t.test(`${width}x${height} ${reverse ? 'upper to lower' : 'lower to upper'}`, async child => {
+            const h = mapDOM(child), save = { ...openSave(reverse ? '4-5' : '4-1'), secrets: ['4-3'] };
             await readySerra(h, save);
             h.get('world-map-scene').bounds = { x:0,y:0,left:0,top:0,width,height };
             h.get('world-map-header').bounds = { x:8,y:6,left:8,top:6,width:width-16,height:44 };
             h.get('world-map-tools').bounds = h.get('world-map-header').bounds;
             h.get('world-map-footer').bounds = { x:8,y:height-76,left:8,top:height-76,width:width-16,height:68 };
             h.observers[0].callback();
-            const selection = reverse ? 4 : 19;
+            const selection = reverse ? 15 : 19;
             h.view.render(selection, save, 100, '');
             const modes = new Set<string>();
             for (let time=200; h.internal.journey.destination && time < 120000; time+=100) {
@@ -2094,8 +2125,8 @@ test('mixed Costa and Serra trips keep Feka and each occupied vehicle in frame t
                 }
                 assert.equal(h.internal.journey.arrived,save.selected);
             }
-            assert.equal(h.internal.journey.arrived, reverse?'1-5':'4-5');
-            for (const mode of ['walking','boarding','sailing','riding','arriving']) assert.ok(modes.has(mode),mode);
+            assert.equal(h.internal.journey.arrived, reverse?'4-1':'4-5');
+            for (const mode of ['walking','boarding','riding','arriving']) assert.ok(modes.has(mode),mode);
             assert.equal(h.events.entered,0);
         });
 });
@@ -2162,7 +2193,7 @@ test('failed passenger visuals preserve older transport and permit regional reco
         await t.test(failAsset, async child => {
             const h = mapDOM(child), save = { ...openSave('4-3'), secrets: ['4-3'] }; await readyReserva(h, save, failAsset);
             assert.equal(h.internal.passengerActive, false); assert.equal(h.internal.passengerStatus, 'failed');
-            assert.equal(h.internal.maintenanceActive, true); assert.equal(h.internal.factorySerraActive, true);
+            assert.equal(h.internal.maintenanceActive, true); assert.ok(h.internal.network.edges.every((edge: { id: string }) => edge.id !== 'factory-serra-link'));
             assert.equal(h.internal.bridgeActive, true); assert.equal(h.internal.connectionActive, true);
             const boat = { ...h.internal.currentBoat().foot }; h.view.render(19, save, 100, '');
             assert.ok(h.internal.journey.legs.some((leg: any) => leg.id === 'serra-maintenance-cable-a'));

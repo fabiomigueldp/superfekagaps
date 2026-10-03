@@ -11,6 +11,7 @@ export const GUAIRA_CAMPAIGN_IMAGE = GUAIRA_CAMPAIGN_ART.guaira.path;
 export function showGuairaRegion(save: AdventureSave, arrived: string, callbacks: {
     fly(from: 'factory' | 'serra'): void;
     goToFactory(): void;
+    goToSerra(): void;
 }): () => void {
     const dialog = document.createElement('dialog'); dialog.className = 'guaira-region';
     dialog.setAttribute('aria-labelledby', 'guaira-region-title');
@@ -34,14 +35,14 @@ export function showGuairaRegion(save: AdventureSave, arrived: string, callbacks
     optional.textContent = 'Galeria e Câmara são passeios opcionais no Bairro da Vala Seca. Os trechos concluídos podem ser revisitados; suas conquistas continuam no caderno.';
     const controls = document.createElement('nav'); controls.setAttribute('aria-label', 'Viagem a Guaíra');
     const fly = document.createElement('button'), back = document.createElement('button');
-    const from = arrived.startsWith('4-') ? 'serra' : 'factory';
+    const from = Number(arrived.split('-')[0]) >= 4 ? 'serra' : 'factory';
     const atAirRegion = arrived.startsWith('3-') || arrived.startsWith('4-');
-    fly.textContent = atAirRegion ? `Voar da ${from === 'serra' ? 'Serra' : 'Fábrica'} para Guaíra` : 'Ir à Fábrica para embarcar';
+    fly.textContent = atAirRegion ? `Voar da ${from === 'serra' ? 'Serra' : 'Fábrica'} para Guaíra` : `Ir à ${from === 'serra' ? 'Serra' : 'Fábrica'} para embarcar`;
     fly.disabled = !isGuairaUnlocked(save);
     back.textContent = 'Voltar ao mapa';
     const previous = document.activeElement;
     const close = () => { dialog.close(); dialog.remove(); if (previous instanceof HTMLElement && previous.isConnected) previous.focus(); };
-    fly.addEventListener('click', () => { close(); if (atAirRegion) callbacks.fly(from); else callbacks.goToFactory(); });
+    fly.addEventListener('click', () => { close(); if (atAirRegion) callbacks.fly(from); else if (from === 'serra') callbacks.goToSerra(); else callbacks.goToFactory(); });
     back.addEventListener('click', close);
     dialog.addEventListener('cancel', event => { event.preventDefault(); close(); });
     dialog.addEventListener('keydown', event => event.stopPropagation());

@@ -6,7 +6,7 @@ import { cableCarAt, cableEdgeDirections, createCablePair, updateCablePairAfterT
 import { advanceJourney, canEnterJourney, createJourney, journeySaveSelection, selectJourney, skipJourney } from '../src/adventure/WorldJourneyModel';
 import { buildJourneyNetwork, parseJourneyBridge, parseJourneyConnection, type JourneyIsland } from '../src/adventure/WorldJourneyNetwork';
 import { fallbackMapMetadata, parseMapMetadata, type MapArtMetadata } from '../src/adventure/WorldMapArt';
-import { FACTORY_SERRA_LINK_EDGE, SERRA_CABLE_PAIR, SERRA_CABLE_STATIONS, SERRA_LINK_NODES,
+import { FACTORY_SERRA_LINK_EDGE, SERRA_CABLE_PAIR, SERRA_CABLE_STATIONS,
     buildSerraJourney, matchesSerraAssetSize, parseFactorySerraLink, parseSerraMaintenanceCable } from '../src/adventure/WorldSerraJourney';
 
 const read = (name: string) => JSON.parse(readFileSync(new URL(`../public/assets/world/map/${name}.meta.json`, import.meta.url), 'utf8'));
@@ -158,10 +158,11 @@ test('asset readiness requires exact bitmap dimensions independently for each li
     }
 });
 
-test('authored link approach timings are required and honored without an implicit fallback pace', () => {
+test('legacy link metadata still validates authored approach timings without creating a runtime crossing', () => {
     const f = fixture(), additions = buildSerraJourney(f.options);
-    assert.equal(additions.edges.find(edge => edge.id === SERRA_LINK_NODES[3].approach)!.duration, 2.7);
-    assert.equal(additions.edges.find(edge => edge.id === SERRA_LINK_NODES[4].approach)!.duration, .72);
+    assert.equal(f.link.landings[3].approachDurationSeconds, 2.7);
+    assert.equal(f.link.landings[4].approachDurationSeconds, .72);
+    assert.ok(additions.edges.every(edge => !edge.id.includes('factory-serra') && !edge.id.includes('link')));
     Reflect.deleteProperty(f.rawLink.islands.fabrica, 'approachDurationSeconds');
     assert.equal(parseFactorySerraLink(f.rawLink, factory, f.serra, placements), null);
 });
@@ -181,9 +182,9 @@ test('both shipped Factory–Serra overlay bitmaps match their native-resolution
     }
 });
 
-test('unready, closed or stale Factory–Serra links leave the entire released graph unchanged', () => {
+test('ready, unready, closed or stale legacy Factory–Serra links never change the runtime graph', () => {
     const f = fixture(), base = { ...f.options, maintenanceCableReady: false };
-    const cases = [
+    const cases = [base,
         { ...base, factorySerraLink: null }, { ...base, factorySerraLinkReady: false }, { ...base, factorySerraLinkOpen: false },
         { ...base, islands: f.islands.map(island => ({ ...island, ready: island.world !== 4 })) },
         { ...base, islands: f.islands.map(island => island.world === 4 ? { ...island, placement: { origin: point(4, 1), scale: 1 } } : island) },
@@ -197,14 +198,16 @@ test('unready, closed or stale Factory–Serra links leave the entire released g
     }
 });
 
-test('missing or undiscovered cabin leaves the supported Serra paths and independent Factory connection intact', () => {
+test('missing or undiscovered cabin preserves local Serra walks and the independent Costa–Factory chain', () => {
     const f = fixture();
     const cases = [{ ...f.options, maintenanceCable: null }, { ...f.options, maintenanceCableReady: false }, { ...f.options, secrets: [] },
         { ...f.options, islands: f.islands.map(island => island.world === 4 ? { ...island, metadata: { ...f.serra,
             nodes: { ...f.serra.nodes, '4-3': point(.41, .65) } } } : island) }];
     for (const options of cases) {
         const graph = buildJourneyNetwork(options);
-        assert.ok(graph.edges.some(edge => edge.id === FACTORY_SERRA_LINK_EDGE));
+        assert.ok(!graph.edges.some(edge => edge.id === FACTORY_SERRA_LINK_EDGE));
+        assert.ok(graph.edges.some(edge => edge.id === 'port-factory-bridge'));
+        assert.ok(graph.edges.some(edge => edge.id === 'coast-port-sail'));
         assert.ok(!graph.edges.some(edge => edge.mode === 'cable' || edge.mode === 'cable-board' || edge.id === '4-secret'));
         assert.deepEqual(graph.edges.filter(edge => /^4-[1-5]:4-[1-5]$/.test(edge.id)).map(edge => edge.duration), [2, 2.5, 2.5, 3]);
         assert.equal(advanceJourney(selectJourney(createJourney('4-3', graph, f.capabilities), '4-5', graph, f.capabilities), 100).arrived, '4-5');
@@ -219,8 +222,8 @@ test('Serra additions preserve all prior edge geometry and create only two platf
     const graph = buildJourneyNetwork(f.options), additions = buildSerraJourney(f.options);
     assert.deepEqual(graph.edges.slice(0, baseline.edges.length), baseline.edges);
     for (const [id, point] of Object.entries(baseline.nodes)) assert.deepEqual(graph.nodes[id], point);
-    assert.equal(Object.keys(additions.nodes).length, 8, 'Two link landings plus two platforms and four berths.');
-    assert.equal(additions.edges.length, 11, 'Three supported-link legs and eight cable/approach legs.');
+    assert.equal(Object.keys(additions.nodes).length, 6, 'Only two maintenance platforms and four berths remain.');
+    assert.equal(additions.edges.length, 8, 'Only the cable ride, boarding and approach legs remain.');
     assert.equal(graph.edges.filter(edge => edge.mode === 'sail').length, 1);
     assert.equal(graph.edges.filter(edge => edge.mode === 'board').length, 2);
     assert.equal(graph.edges.filter(edge => edge.mode === 'cable').length, 2);
@@ -232,23 +235,22 @@ test('Serra additions preserve all prior edge geometry and create only two platf
     assert.deepEqual(graph.nodes[SERRA_CABLE_STATIONS.lower.platform], localToAtlas(f.cable.stations.lower.platform, placements[4]));
 });
 
-test('mixed Costa→Serra travel uses the existing ferry/bridge and new walk link, without intermediate saved arrivals', () => {
+test('north and south remain disconnected even with a valid, ready and open legacy Factory–Serra link', () => {
     const f = fixture(), graph = buildJourneyNetwork(f.options), cap = { ...f.capabilities,
         edgeDirections: cableEdgeDirections(createCablePair(), SERRA_CABLE_PAIR, true) };
-    let state = selectJourney(createJourney('1-5', graph, cap), '4-1', graph, cap);
-    const ids = state.legs.map(leg => leg.id);
-    assert.ok(ids.indexOf('coast-port-sail') < ids.indexOf('port-factory-bridge'));
-    assert.ok(ids.indexOf('port-factory-bridge') < ids.indexOf(FACTORY_SERRA_LINK_EDGE));
-    const newLink = state.legs.findIndex(leg => leg.id === FACTORY_SERRA_LINK_EDGE);
-    state = advanceJourney(state, state.legs.slice(0, newLink).reduce((sum, leg) => sum + leg.duration, 0) + 2);
-    assert.equal(state.legs[0].id, FACTORY_SERRA_LINK_EDGE); assert.equal(journeySaveSelection(state), '1-5');
-    assert.equal(canEnterJourney(state, cap), false);
-    const feet = state.point; state = selectJourney(state, '3-5', graph, cap);
-    assert.deepEqual(state.point, feet); assert.equal(state.legs[0].direction, -1);
-    assert.equal(skipJourney(state).arrived, '3-5');
-    const reverse = selectJourney(createJourney('4-1', graph, cap), '1-1', graph, cap);
-    assert.equal(reverse.legs.find(leg => leg.id === FACTORY_SERRA_LINK_EDGE)!.direction, -1);
-    assert.equal(advanceJourney(reverse, 100).arrived, '1-1');
+    for (const [from, to] of [['1-5', '4-1'], ['3-5', '4-1'], ['4-1', '3-5'], ['4-5', '1-1']]) {
+        const initial = createJourney(from, graph, cap), trip = selectJourney(initial, to, graph, cap);
+        assert.equal(trip.blocked, 'no-route'); assert.equal(trip.destination, null); assert.deepEqual(trip.legs, []);
+        assert.deepEqual(trip.point, initial.point); assert.equal(journeySaveSelection(trip), from);
+        assert.equal(canEnterJourney(trip, cap), false);
+        assert.equal(advanceJourney(trip, 100).arrived, from); assert.equal(skipJourney(trip).arrived, from);
+    }
+    assert.ok(!graph.edges.some(edge => edge.id === FACTORY_SERRA_LINK_EDGE));
+    assert.equal(graph.nodes['3-serra-landing'], undefined); assert.equal(graph.nodes['4-factory-landing'], undefined);
+    const factoryTrip = selectJourney(createJourney('1-5', graph, cap), '3-5', graph, cap);
+    assert.ok(factoryTrip.legs.some(leg => leg.id === 'coast-port-sail'));
+    assert.ok(factoryTrip.legs.some(leg => leg.id === 'port-factory-bridge'));
+    assert.equal(skipJourney(factoryTrip).arrived, '3-5');
 });
 
 test('both pair phases and directions choose the discovered cabin through valid destination disembark edges', () => {
@@ -315,13 +317,15 @@ test('real authored cabin timing naturally beats the supported detour for both c
     }
 });
 
-test('the shipped Costa→Serra graph uses each released crossing once and never fabricates a walking cable', () => {
+test('the shipped graph preserves separate Costa–Factory and Serra cable journeys without a walking connector', () => {
     const f = shipped(), cap = { ...f.capabilities, edgeDirections: cableEdgeDirections(createCablePair(), SERRA_CABLE_PAIR, true) };
-    const trip = selectJourney(createJourney('1-5', f.graph, cap), '4-5', f.graph, cap);
-    for (const id of ['coast-port-sail', 'port-factory-bridge', FACTORY_SERRA_LINK_EDGE])
-        assert.equal(trip.legs.filter(leg => leg.id === id).length, 1);
-    assert.equal(trip.legs.filter(leg => leg.mode === 'cable').length, 1);
-    assert.equal(f.graph.edges.some(edge => edge.id === '4-secret'), false);
-    assert.equal(journeySaveSelection(trip), '1-5');
-    assert.equal(skipJourney(trip).arrived, '4-5');
+    const factoryTrip = selectJourney(createJourney('1-5', f.graph, cap), '3-5', f.graph, cap);
+    for (const id of ['coast-port-sail', 'port-factory-bridge']) assert.equal(factoryTrip.legs.filter(leg => leg.id === id).length, 1);
+    assert.equal(skipJourney(factoryTrip).arrived, '3-5');
+    const serraTrip = selectJourney(createJourney('4-3', f.graph, cap), '4-5', f.graph, cap);
+    assert.equal(serraTrip.legs.filter(leg => leg.mode === 'cable').length, 1);
+    assert.equal(skipJourney(serraTrip).arrived, '4-5');
+    const across = selectJourney(createJourney('1-5', f.graph, cap), '4-5', f.graph, cap);
+    assert.equal(across.blocked, 'no-route'); assert.equal(journeySaveSelection(across), '1-5');
+    assert.equal(f.graph.edges.some(edge => edge.id === FACTORY_SERRA_LINK_EDGE || edge.id === '4-secret'), false);
 });

@@ -8,7 +8,7 @@ for region in ['guaira','fabrica','serra']:
  image=Image.open(OUT/f'{region}.png').convert('RGBA')
  meta=json.loads((OUT/f'{region}.meta.json').read_text())
  bounds=image.getchannel('A').getbbox();assert bounds and image.size==(1920,1200)
- if region!='guaira':
+ if region=='fabrica':
   # Keep two transparent pixels for bilinear filtering.
   x0,y0,x1,y1=bounds;x0=max(0,x0-2);y0=max(0,y0-2);x1=min(1920,x1+2);y1=min(1200,y1+2)
   frame={'left':-.5,'top':-.5,'widthInMap':2,'heightInMap':2};meta['assetFrame']={'left':frame['left']+x0/1920*frame['widthInMap'],'top':frame['top']+y0/1200*frame['heightInMap'],'widthInMap':(x1-x0)/1920*frame['widthInMap'],'heightInMap':(y1-y0)/1200*frame['heightInMap']}

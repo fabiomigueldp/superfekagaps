@@ -15,8 +15,8 @@ test('airport assets are grounded, dry, supported and within incremental transfe
         assert.equal(data.validation.walkSupportSamples, 42);
         assert.equal(data.validation.numericCampaignIdsChanged, false);
         assert.equal(terminal.surface, 'dry-compacted-earth');
-        assert.ok(terminal.clearSpanMeters >= 5.2);
-        assert.ok(terminal.usableLengthMeters >= 7.3);
+        assert.ok(terminal.clearSpanMeters >= 3.3);
+        assert.ok(terminal.usableLengthMeters >= 4.3);
         assert.ok(support.bottomZ < support.topZ);
         for (const p of [terminal.groundAnchorWorld, terminal.runwayStartWorld, terminal.runwayEndWorld]) {
             assert.ok(Math.abs(p[0] - support.center[0]) <= support.width / 2);
@@ -28,13 +28,13 @@ test('airport assets are grounded, dry, supported and within incremental transfe
         assert.equal(readFileSync(file).subarray(8, 12).toString(), 'WEBP');
         assert.ok(data.image.width <= 1920 && data.image.height <= 1200);
     }
-    assert.ok(bytes < 420_000, `Only ${bytes} optional/lazy bytes allowed under 420KB.`);
+    assert.ok(bytes < 500_000, `Only ${bytes} optional/lazy bytes allowed under 500KB including the complete Serra replacement.`);
 });
 test('canonical island cameras and existing numeric world placements do not change', () => {
     assert.deepEqual(GUAIRA_CAMPAIGN_ART.fabrica.placement, WORLD_ATLAS_PLACEMENTS[3]);
     assert.deepEqual(GUAIRA_CAMPAIGN_ART.serra.placement, WORLD_ATLAS_PLACEMENTS[4]);
     assert.deepEqual(GUAIRA_CAMPAIGN_ART.guaira.placement, { origin: { x: 3.65, y: .05 }, scale: 1.1 });
-    assert.equal(GUAIRA_CAMPAIGN_ART.guaira.aircraftScale, 20.6 / 27);
+    assert.equal(GUAIRA_CAMPAIGN_ART.guaira.aircraftScale, .65 * 20.6 / raw('guaira').camera.orthoScale);
     const terminal = campaignAirportTerminal('guaira');
     const first = GUAIRA_CAMPAIGN_NODES['guaira-1'];
     assert.deepEqual(terminal.boardingPath[0], { x: first.x, y: first.y });

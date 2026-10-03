@@ -181,24 +181,29 @@ test('builder rejects cached connections after either snapshot, placement or sha
     assert.deepEqual(buildDominioJourney({ ...f.options, dominioConnection: stale }), { nodes: {}, edges: [] });
 });
 
-test('full 1→6 and 6→1 trips use both independent ferries and passenger line with explicit final entry', () => {
+test('Serra↔Domínio trips preserve both cable lines and their ferry with explicit final entry', () => {
     const f = fixture(), network = buildJourneyNetwork(f.options);
-    for (const [from, to] of [['1-1', '6-1'], ['6-1', '1-1']]) {
+    for (const [from, to] of [['4-3', '6-1'], ['6-1', '4-3']]) {
         const ferries = [COAST_PORT_FERRY, DOMINIO_FERRY].map(definition => createFerry(definition, Number(from[0])));
         const capabilities = { availableStages: f.islands.flatMap(island => Object.keys(island.metadata.nodes)),
             edgeDirections: { ...ferryEdgeDirections(ferries[0], COAST_PORT_FERRY, true), ...ferryEdgeDirections(ferries[1], DOMINIO_FERRY, true),
                 ...cableEdgeDirections(createCablePair(), SERRA_CABLE_PAIR, true), ...cableEdgeDirections(createCablePair(), PASSENGER_CABLE_PAIR, true) } };
         const trip = selectJourney(createJourney(from, network, capabilities), to, network, capabilities);
         assert.equal(trip.blocked, null);
-        assert.deepEqual(trip.legs.filter(leg => leg.mode === 'sail').map(leg => leg.id), from === '1-1'
-            ? [COAST_PORT_FERRY.sailEdge, DOMINIO_FERRY.sailEdge] : [DOMINIO_FERRY.sailEdge, COAST_PORT_FERRY.sailEdge]);
+        assert.deepEqual(trip.legs.filter(leg => leg.mode === 'sail').map(leg => leg.id), [DOMINIO_FERRY.sailEdge]);
+        assert.equal(trip.legs.filter(leg => leg.mode === 'cable').length, 2);
         assert.ok(trip.legs.some(leg => leg.id.startsWith('serra-reserva-passenger')));
+        assert.ok(trip.legs.every(leg => leg.id !== 'factory-serra-link'));
         for (const reached of [advanceJourney(trip, 1000), skipJourney(trip), advanceJourney(trip, 0, true)]) {
             assert.equal(reached.arrived, to); assert.equal(reached.entered, null); assert.equal(canEnterJourney(reached, capabilities), true);
-            assert.equal(updateFerryAfterTravel(ferries[0], COAST_PORT_FERRY, trip, reached).mooredWorld, to === '1-1' ? 1 : 2);
-            assert.equal(updateFerryAfterTravel(ferries[1], DOMINIO_FERRY, trip, reached).mooredWorld, to === '1-1' ? 5 : 6);
+            assert.deepEqual(updateFerryAfterTravel(ferries[0], COAST_PORT_FERRY, trip, reached), ferries[0]);
+            assert.equal(updateFerryAfterTravel(ferries[1], DOMINIO_FERRY, trip, reached).mooredWorld, to === '4-3' ? 5 : 6);
         }
+        const across = selectJourney(createJourney(from, network, capabilities), '1-1', network, capabilities);
+        assert.equal(across.blocked, 'no-route'); assert.equal(skipJourney(across).arrived, from);
     }
+    assert.ok(network.edges.some(edge => edge.id === COAST_PORT_FERRY.sailEdge));
+    assert.ok(network.edges.some(edge => edge.id === 'port-factory-bridge'));
 });
 
 test('overlay bitmaps must match declared native dimensions before the controller marks the ferry ready', () => {

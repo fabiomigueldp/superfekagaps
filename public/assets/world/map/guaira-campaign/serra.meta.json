@@ -1,5 +1,6 @@
 {
   "regionKey": "serra",
+  "replacesBase": true,
   "camera": {
     "position": [
       11.0,
@@ -15,16 +16,16 @@
   },
   "terminal": {
     "groundAnchor": {
-      "x": 0.100635,
-      "y": 0.759131
+      "x": 0.2933,
+      "y": 0.787849
     },
     "runwayStart": {
-      "x": -0.078232,
-      "y": 0.722118
+      "x": 0.247658,
+      "y": 0.765957
     },
     "runwayEnd": {
-      "x": 0.23316,
-      "y": 0.871474
+      "x": 0.432787,
+      "y": 0.854753
     },
     "boardingPath": [
       {
@@ -32,28 +33,28 @@
         "y": 0.65367
       },
       {
-        "x": 0.148137,
-        "y": 0.681919
+        "x": 0.203722,
+        "y": 0.744884
       },
       {
-        "x": 0.100635,
-        "y": 0.759131
+        "x": 0.2933,
+        "y": 0.787849
       }
     ],
     "groundAnchorWorld": [
-      -5.75,
-      -6.4,
-      1.65
+      -2.7,
+      -3.7,
+      0.6
     ],
     "runwayStartWorld": [
-      -9.4,
-      -7.4,
-      1.65
+      -3.77,
+      -3.7,
+      0.6
     ],
     "runwayEndWorld": [
-      -2.1,
-      -7.4,
-      1.65
+      0.5699999999999998,
+      -3.7,
+      0.6
     ],
     "boardingPathWorld": [
       [
@@ -62,30 +63,31 @@
         1.65
       ],
       [
-        -5.75,
-        -4.35,
-        1.65
+        -4.8,
+        -3.7,
+        0.6
       ],
       [
-        -5.75,
-        -6.4,
-        1.65
+        -2.7,
+        -3.7,
+        0.6
       ]
     ],
     "surface": "dry-compacted-earth",
-    "clearSpanMeters": 5.2,
-    "usableLengthMeters": 7.3
+    "clearSpanMeters": 3.35,
+    "usableLengthMeters": 4.34
   },
   "supportFootprint": {
     "center": [
-      -5.75,
-      -7.4
+      -1.6,
+      -3.7
     ],
-    "width": 8.8,
-    "depth": 6.0,
+    "width": 7.7,
+    "depth": 3.7,
+    "terrainMode": "existing-island-ground",
     "bottomZ": 0.1,
-    "topZ": 1.65,
-    "walkWidth": 1.15,
+    "topZ": 0.6,
+    "walkWidth": 0.65,
     "walkSegments": [
       [
         -5.75,
@@ -93,33 +95,39 @@
         1.65
       ],
       [
-        -5.75,
-        -4.35,
-        1.65
+        -4.8,
+        -3.7,
+        0.6
       ],
       [
-        -5.75,
-        -6.4,
-        1.65
+        -2.7,
+        -3.7,
+        0.6
       ]
     ]
   },
   "assetFrame": {
-    "left": -0.18020833333333336,
-    "top": 0.56,
-    "widthInMap": 0.5145833333333333,
-    "heightInMap": 0.5366666666666666
+    "left": 0,
+    "top": 0,
+    "widthInMap": 1,
+    "heightInMap": 1
   },
   "validation": {
     "walkSupportSamples": 42,
     "allSupported": true,
     "numericCampaignIdsChanged": false,
-    "objects": 97
+    "objects": 3945
+  },
+  "artBounds": {
+    "left": 0.11145833333333334,
+    "top": 0.08333333333333333,
+    "right": 0.8416666666666667,
+    "bottom": 1.0
   },
   "image": {
     "path": "/assets/world/map/guaira-campaign/serra.webp",
-    "width": 494,
-    "height": 322,
-    "bytes": 18162
+    "width": 1920,
+    "height": 1200,
+    "bytes": 289868
   }
 }

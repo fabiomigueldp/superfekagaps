@@ -666,48 +666,39 @@ test('failed Factory decoration preserves its readable fallback and leaves all e
     assert.equal(resources.requests.length, 2);
 });
 
-test('Serra walking signs preserve directional route availability and destination fallback without boat copy', t => {
+test('removed Factory–Serra walking actions have no descriptors, DOM controls or callbacks', t => {
     const { hud, state, calls } = fixture(t);
-    hud.update({ ...state, world: 3, stage: 10, worldAvailability: [true, true, true, false, false, false] });
-    assert.equal(hud.travelButtons['walk-factory-serra'].hidden, true);
-    assert.equal(hud.travelButtons['walk-serra-factory'].hidden, true);
-    hud.positionTravelActions({ 'walk-factory-serra': { x: 180, y: 210, available: false } });
-    const outward = hud.travelButtons['walk-factory-serra'], inward = hud.travelButtons['walk-serra-factory'];
-    assert.match(outward.getAttribute('aria-label')!, /Caminho.*Serra.*Passagem bloqueada/);
-    assert.doesNotMatch(outward.getAttribute('aria-label')!, /barco|Cais|Ponte/);
-    assert.match(outward.title, /SERRA →.*caminho/);
-    assert.equal(inward.hidden, true);
-    outward.click(); assert.deepEqual(calls, ['world:4']);
-    hud.update({ ...state, world: 4, stage: 15 });
-    hud.positionTravelActions({ 'walk-serra-factory': { x: 90, y: 190, available: true } });
-    assert.equal(outward.hidden, true); assert.equal(inward.hidden, false);
-    assert.match(inward.getAttribute('aria-label')!, /Caminho.*Fábrica.*Caminhar pela passagem/);
-    assert.doesNotMatch(inward.getAttribute('aria-label')!, /barco|Cais|Ponte/);
-    assert.match(inward.title, /FÁBRICA ←.*caminho/);
-    inward.click(); assert.deepEqual(calls, ['world:4', 'world:3']);
-    hud.positionTravelActions({}); assert.equal(inward.hidden, true);
+    for (const id of ['walk-factory-serra', 'walk-serra-factory']) {
+        assert.equal(Object.prototype.hasOwnProperty.call(WORLD_MAP_TRAVEL_ACTIONS, id), false);
+        assert.equal(Object.prototype.hasOwnProperty.call(hud.travelButtons, id), false);
+        assert.ok(!WORLD_MAP_TRAVEL_ACTION_IDS.some(action => String(action) === id));
+    }
+    for (const world of [3, 4]) {
+        hud.update({ ...state, world, stage: (world - 1) * 5 });
+        hud.positionTravelActions({});
+        assert.ok(Object.values(hud.travelButtons).every(button => button.hidden));
+    }
+    assert.deepEqual(calls, []);
 });
 
-test('the left Factory supplement stays out of initial Costa and Factory requests and paints only its own arrow', async t => {
+test('the left supplement is lazy and still paints the Serra passenger arrow after bridge removal', async t => {
     const resources = signResources(t), { hud, state } = fixture(t);
     await resources.metadata(); resources.images[0].onload!(); await resources.settle();
     hud.update({ ...state, world: 3, stage: 10 });
-    hud.positionTravelActions({ 'walk-factory-serra': { x: 180, y: 210, available: true } });
     assert.equal(resources.requests.length, 2);
     assert.ok(resources.requests.every(request => !request.url.includes('factory-left')));
-    const outward = asElement(hud.travelButtons['walk-factory-serra']).children[0];
-    assert.equal(outward.width, 208); assert.equal(outward.draws.at(-1)![0], resources.images[0]);
-    hud.update({ ...state, world: 4, stage: 15 });
+    hud.update({ ...state, world: 4, stage: 19 });
+    hud.positionTravelActions({ 'cable-serra-reserva': { x: 180, y: 210, available: true } });
     assert.equal(resources.requests.length, 3); assert.match(resources.requests[2].url, /signs-factory-left.meta.json$/);
     resources.requests[2].resolve({ ok: true, json: async () => JSON.parse(readFileSync(new URL('../public/assets/world/map/signs-factory-left.meta.json', import.meta.url), 'utf8')) });
     await resources.settle();
     const image = resources.images[1]; image.naturalWidth = 256; image.naturalHeight = 112;
     image.onload!(); await resources.settle();
-    const inward = asElement(hud.travelButtons['walk-serra-factory']).children[0];
-    assert.equal(inward.width, 256); assert.equal(inward.height, 112);
-    assert.equal(inward.style.transform, 'translate(0px, 10px)'); assert.equal(inward.draws.at(-1)![0], image);
+    const outgoing = asElement(hud.travelButtons['cable-serra-reserva']).children[0];
+    assert.equal(outgoing.width, 256); assert.equal(outgoing.height, 112);
+    assert.equal(outgoing.style.transform, 'translate(0px, 10px)'); assert.equal(outgoing.draws.at(-1)![0], image);
     hud.setVisible(false); hud.setVisible(true);
-    hud.positionTravelActions({ 'walk-serra-factory': { x: 90, y: 190, available: false } });
+    hud.positionTravelActions({ 'cable-serra-reserva': { x: 90, y: 190, available: false } });
     hud.update({ ...state, world: 4, stage: 16 });
     assert.equal(resources.requests.length, 3); assert.equal(resources.images.length, 2);
     assert.equal(asElement(hud.stageButtons[4]).children[0].width, 112);
@@ -721,25 +712,25 @@ test('hidden Serra waits for visibility and disposal aborts its independently lo
     resources.requests[1].resolve({ ok: true, json: async () => JSON.parse(readFileSync(new URL('../public/assets/world/map/signs-factory-left.meta.json', import.meta.url), 'utf8')) });
     await resources.settle();
     const image = resources.images[0], lateLoad = image.onload!;
-    const inward = asElement(hud.travelButtons['walk-serra-factory']).children[0];
+    const inward = asElement(hud.travelButtons['cable-serra-reserva']).children[0];
     hud.dispose(); assert.equal(resources.requests[1].signal.aborted, true);
     assert.equal(image.onload, null); assert.equal(image.onerror, null);
     image.naturalWidth = 256; image.naturalHeight = 112; lateLoad(); await resources.settle();
     assert.equal(inward.width, 128); assert.equal(inward.draws.length, 0);
 });
 
-test('failed left-supplement decoration keeps Serra phases and both walking actions readable without retries', async t => {
+test('failed left-supplement decoration keeps Serra phases and passenger actions readable without retries', async t => {
     const resources = signResources(t), { hud, state, calls } = fixture(t);
     await resources.metadata(); resources.images[0].onload!(); await resources.settle();
-    hud.positionTravelActions({ 'walk-serra-factory': { x: 90, y: 190, available: true } });
+    hud.positionTravelActions({ 'cable-serra-reserva': { x: 90, y: 190, available: true } });
     assert.equal(resources.requests.length, 2); assert.match(resources.requests[1].url, /signs-factory-left.meta.json$/);
     resources.requests[1].resolve({ ok: false }); await resources.settle();
     for (let n = 0; n < 10; n++) hud.update({ ...state, world: 4, stage: 15 + n % 5 });
-    const inward = asElement(hud.travelButtons['walk-serra-factory']).children[0];
+    const inward = asElement(hud.travelButtons['cable-serra-reserva']).children[0];
     assert.equal(inward.width, 128); assert.equal(inward.style.transform, '');
-    assert.equal(asElement(hud.travelButtons['walk-factory-serra']).children[0].width, 208);
+    assert.equal(asElement(hud.travelButtons['cable-reserva-serra']).children[0].width, 208);
     assert.equal(asElement(hud.stageButtons[0]).children[0].width, 112);
-    hud.travelButtons['walk-serra-factory'].click(); assert.deepEqual(calls, ['world:3']);
+    hud.travelButtons['cable-serra-reserva'].click(); assert.deepEqual(calls, ['world:5']);
     assert.equal(resources.requests.length, 2);
 });
 

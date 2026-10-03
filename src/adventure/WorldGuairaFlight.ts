@@ -1,12 +1,14 @@
+import { sampleAircraftCamera } from './WorldAircraftCamera';
+import { campaignAircraftRoute, campaignAircraftScale } from './WorldAircraftTerminalRoute';
 import { paintFlightLandscape, paintFlightAtmosphere } from './WorldFlightScenery';
 import { WorldAudio } from './WorldAudio';
 import { WorldAircraftAudio } from './WorldAircraftAudio';
 import type { Preferences } from './types';
 import { loadAircraftAssets, paintAircraftTravel, type AircraftAssets } from './WorldAircraftArt';
-import { sampleAircraftTravel, AIRCRAFT_TRAVEL_DURATION, AIRCRAFT_REDUCED_DURATION, type AircraftRoute } from './WorldAircraftModel';
-import { campaignMapAsset, campaignAirportTerminal, loadCampaignRegionImage, paintCampaignRegion, type GuairaCampaignRegion } from './GuairaCampaignArt';
+import { sampleAircraftTravel, AIRCRAFT_TRAVEL_DURATION, AIRCRAFT_REDUCED_DURATION } from './WorldAircraftModel';
+import { GUAIRA_CAMPAIGN_ART, campaignMapAsset, loadCampaignRegionImage, paintCampaignRegion, type GuairaCampaignRegion } from './GuairaCampaignArt';
 import { mapToScreen, type MapCamera } from './WorldMapModel';
-import { WORLD_ATLAS_PLACEMENTS } from './WorldAtlasModel';
+import { localToAtlas, WORLD_ATLAS_PLACEMENTS } from './WorldAtlasModel';
 export type GuairaAirTerminal = 'factory' | 'guaira' | 'serra';
 export interface GuairaFlightOptions {
     from: GuairaAirTerminal;
@@ -76,9 +78,7 @@ export function runGuairaFlight(options: GuairaFlightOptions): () => void {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const duration = reduced ? AIRCRAFT_REDUCED_DURATION : AIRCRAFT_TRAVEL_DURATION;
     const source = artRegion(options.from), destination = artRegion(options.to);
-    const from = campaignAirportTerminal(source, true), to = campaignAirportTerminal(destination, true);
-    const route: AircraftRoute = { departureStart: from.runwayStart, departureLift: from.runwayEnd,
-        arrivalTouchdown: to.runwayEnd, arrivalStop: to.runwayStart, altitude: .24, scale: .8 };
+    const route = campaignAircraftRoute(source, destination);
     const images = new Map<GuairaCampaignRegion, HTMLImageElement>(), bases = new Map<GuairaCampaignRegion, HTMLImageElement>();
     const paintBackground = (ctx: CanvasRenderingContext2D, camera: MapCamera) => {
         const sea = ctx.createLinearGradient(0, 0, 0, 540); sea.addColorStop(0, '#477f91'); sea.addColorStop(1, '#75aeb1');
@@ -86,7 +86,7 @@ export function runGuairaFlight(options: GuairaFlightOptions): () => void {
         paintFlightLandscape(ctx, camera);
         for (const region of [source, destination]) {
             const base = bases.get(region);
-            if (base && region !== 'guaira') {
+            if (base && region !== 'guaira' && !(GUAIRA_CAMPAIGN_ART[region].replacesBase && images.has(region))) {
                 const placement = WORLD_ATLAS_PLACEMENTS[region === 'fabrica' ? 3 : 4];
                 const a = mapToScreen(placement.origin, camera), b = mapToScreen({ x: placement.origin.x + 1, y: placement.origin.y + 1 }, camera);
                 ctx.drawImage(base, a.x, a.y, b.x - a.x, b.y - a.y);
@@ -99,12 +99,13 @@ export function runGuairaFlight(options: GuairaFlightOptions): () => void {
         if (!document.hidden && focused) elapsed += Math.min(.05, Math.max(0, (now - previous) / 1000));
         previous = now;
         const pose = sampleAircraftTravel(route, elapsed, reduced), ctx = canvas.getContext('2d');
+        pose.scale = campaignAircraftScale(source, destination, pose.progress);
         if (!engineStarted && !document.hidden && focused) engineStarted = engine.start(pose);
         engine.sync(pose);
         if (ctx) {
-            const center = reduced ? { x: (route.departureStart.x + route.arrivalStop.x) / 2, y: (route.departureStart.y + route.arrivalStop.y) / 2 }
-                : { x: pose.position.x, y: pose.position.y - .04 };
-            const camera: MapCamera = { center, width: 960, height: 540, zoom: reduced ? .52 : 1.22 };
+            const camera = sampleAircraftCamera(route, elapsed, { width: 960, height: 540, reducedMotion: reduced,
+                departureFocus: localToAtlas({ x: .5, y: .5 }, GUAIRA_CAMPAIGN_ART[source].placement),
+                arrivalFocus: localToAtlas({ x: .5, y: .5 }, GUAIRA_CAMPAIGN_ART[destination].placement) });
             paintBackground(ctx, camera); paintFlightAtmosphere(ctx, camera, pose); paintAircraftTravel(ctx, camera, pose, assets, elapsed);
         }
         const phases = { boarding: 'Embarcando no aeródromo', 'takeoff-roll': 'Decolando', climb: 'Ganhando altitude', cruise: 'Sobrevoando os canais', approach: 'Aproximação', 'landing-roll': 'Pousando', arrived: 'Chegada confirmada' };

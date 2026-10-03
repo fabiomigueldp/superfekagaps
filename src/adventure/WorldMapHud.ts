@@ -7,7 +7,7 @@ import { loadMapSignAtlas, loadMapFactorySignAtlas, loadMapFactoryLeftSignAtlas,
     type MapSignAtlas, type MapFactorySignAtlas, type MapTravelSign, type MapIslandSignAtlas } from './WorldMapSignArt';
 
 export const WORLD_MAP_TRAVEL_ACTION_IDS = ['ferry-costa-porto', 'ferry-porto-costa', 'bridge-porto-factory', 'bridge-factory-porto',
-    'walk-factory-serra', 'walk-serra-factory', 'cable-serra-reserva', 'cable-reserva-serra',
+    'cable-serra-reserva', 'cable-reserva-serra',
     'ferry-reserva-dominio', 'ferry-dominio-reserva'] as const;
 export type WorldMapTravelActionId = typeof WORLD_MAP_TRAVEL_ACTION_IDS[number];
 export interface WorldMapTravelAction extends MapTravelSign {
@@ -27,8 +27,6 @@ export const WORLD_MAP_TRAVEL_ACTIONS: Readonly<Record<WorldMapTravelActionId, W
     'ferry-porto-costa': { id: 'ferry-porto-costa', fromWorld: 2, toWorld: 1, mode: 'ferry', label: 'COSTA', direction: 'left', width: 104, height: 56 },
     'bridge-porto-factory': { id: 'bridge-porto-factory', fromWorld: 2, toWorld: 3, mode: 'bridge', label: 'FÁBRICA', direction: 'right', wide: true, width: 128, height: 56 },
     'bridge-factory-porto': { id: 'bridge-factory-porto', fromWorld: 3, toWorld: 2, mode: 'bridge', label: 'PORTO', direction: 'left', width: 104, height: 56 },
-    'walk-factory-serra': { id: 'walk-factory-serra', fromWorld: 3, toWorld: 4, mode: 'walk', label: 'SERRA', direction: 'right', width: 104, height: 56 },
-    'walk-serra-factory': { id: 'walk-serra-factory', fromWorld: 4, toWorld: 3, mode: 'walk', label: 'FÁBRICA', direction: 'left', wide: true, width: 128, height: 56 },
     'cable-serra-reserva': { id: 'cable-serra-reserva', fromWorld: 4, toWorld: 5, toStage: '5-1', requiresStage: '5-1', mode: 'cable', label: 'RESERVA', direction: 'left', wide: true, width: 128, height: 56 },
     'cable-reserva-serra': { id: 'cable-reserva-serra', fromWorld: 5, toWorld: 4, toStage: '4-5', requiresStage: '5-1', mode: 'cable', label: 'SERRA', direction: 'right', width: 104, height: 56 },
     'ferry-reserva-dominio': { id: 'ferry-reserva-dominio', fromWorld: 5, toWorld: 6, toStage: '6-1', requiresStage: '6-1', mode: 'ferry', label: 'DOMÍNIO', direction: 'left', wide: true, width: 128, height: 56 },

@@ -259,6 +259,26 @@ test('physical passenger travel uses both supported approaches, boards and disem
     }
 });
 
+test('passenger and maintenance lines connect Serra and Reserva without reopening Factory–Serra', () => {
+    const f = fixture(), graph = buildJourneyNetwork(f.options);
+    const capabilities = { availableStages: f.islands.flatMap(island => Object.keys(island.metadata.nodes)),
+        edgeDirections: { ...cableEdgeDirections(createCablePair(), SERRA_CABLE_PAIR, true),
+            ...cableEdgeDirections(createCablePair(), PASSENGER_CABLE_PAIR, true) } };
+    for (const [from, to] of [['4-3', '5-1'], ['5-1', '4-3']]) {
+        const trip = selectJourney(createJourney(from, graph, capabilities), to, graph, capabilities);
+        assert.equal(trip.blocked, null); assert.equal(trip.legs.filter(leg => leg.mode === 'cable').length, 2);
+        assert.equal(advanceJourney(trip, 100).arrived, to);
+    }
+    for (const [from, to] of [['3-5', '5-1'], ['5-1', '3-5']]) {
+        const trip = selectJourney(createJourney(from, graph, capabilities), to, graph, capabilities);
+        assert.equal(trip.blocked, 'no-route'); assert.deepEqual(trip.legs, []);
+        assert.equal(advanceJourney(trip, 100).arrived, from);
+    }
+    assert.ok(!graph.edges.some(edge => edge.id === 'factory-serra-link'));
+    assert.ok(graph.edges.some(edge => edge.id === 'coast-port-sail'));
+    assert.ok(graph.edges.some(edge => edge.id === 'port-factory-bridge'));
+});
+
 test('authored Reserva walking durations apply while released Serra timing and Costa–Factory cadences stay unchanged', () => {
     const f = fixture();
     const islands = f.islands.map(island => island.world === 4 || island.world === 5 ? island : { ...island,
