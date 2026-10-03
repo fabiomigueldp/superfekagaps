@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync, statSync } from 'node:fs';
-import { GUAIRA_CAMPAIGN_ART, GUAIRA_CAMPAIGN_NODES, campaignAirportTerminal, campaignArtBounds,
+import { campaignMapAsset, GUAIRA_CAMPAIGN_ART, GUAIRA_CAMPAIGN_NODES, campaignAirportTerminal, campaignArtBounds,
     campaignArtOverlay, paintCampaignRegion, type GuairaCampaignRegion } from '../src/adventure/GuairaCampaignArt';
 import { WORLD_ATLAS_PLACEMENTS } from '../src/adventure/WorldAtlasModel';
 
@@ -59,5 +59,12 @@ test('pure renderer and overlay share exact bounds at desktop and compact sizes'
         assert.equal(overlay.widthInMap, bounds.right - bounds.left);
         paintCampaignRegion(context, camera, 'guaira', null);
         assert.equal(calls.length, 1, 'Missing optional art must be harmless.');
+    }
+});
+
+test('campaign assets remain under the immutable preview base', () => {
+    for (const file of ['journey-aircraft.webp', 'journey-aircraft.meta.json', 'guaira-campaign/guaira.webp', 'guaira-campaign/fabrica.webp', 'guaira-campaign/serra.webp', 'fabrica-diorama.webp', 'serra-diorama.webp']) {
+        assert.equal(campaignMapAsset(file, './'), `./assets/world/map/${file}`);
+        assert.equal(campaignMapAsset(file, '/world/releases/candidate/'), `/world/releases/candidate/assets/world/map/${file}`);
     }
 });

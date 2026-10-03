@@ -3,7 +3,7 @@ import { WorldAircraftAudio } from './WorldAircraftAudio';
 import type { Preferences } from './types';
 import { loadAircraftAssets, paintAircraftTravel, type AircraftAssets } from './WorldAircraftArt';
 import { sampleAircraftTravel, AIRCRAFT_TRAVEL_DURATION, AIRCRAFT_REDUCED_DURATION, type AircraftRoute } from './WorldAircraftModel';
-import { campaignAirportTerminal, loadCampaignRegionImage, paintCampaignRegion, type GuairaCampaignRegion } from './GuairaCampaignArt';
+import { campaignMapAsset, campaignAirportTerminal, loadCampaignRegionImage, paintCampaignRegion, type GuairaCampaignRegion } from './GuairaCampaignArt';
 import { mapToScreen, type MapCamera } from './WorldMapModel';
 import { WORLD_ATLAS_PLACEMENTS } from './WorldAtlasModel';
 export type GuairaAirTerminal = 'factory' | 'guaira' | 'serra';
@@ -109,7 +109,7 @@ export function runGuairaFlight(options: GuairaFlightOptions): () => void {
         loading = true; retry.hidden = true; status.textContent = 'Preparando o avião e os aeródromos…';
         const loaded = await Promise.all([loadAircraftAssets(controller.signal), ...[source, destination].map(async region => {
             const overlay = await loadCampaignRegionImage(region); if (overlay) images.set(region, overlay);
-            if (region !== 'guaira') { const base = await loadImage(`/assets/world/map/${region === 'fabrica' ? 'fabrica' : 'serra'}-diorama.webp`); if (base) bases.set(region, base); }
+            if (region !== 'guaira') { const base = await loadImage(campaignMapAsset(`${region === 'fabrica' ? 'fabrica' : 'serra'}-diorama.webp`)); if (base) bases.set(region, base); }
             return !!overlay && (region === 'guaira' || bases.has(region));
         })]);
         loading = false; if (stopped) return;

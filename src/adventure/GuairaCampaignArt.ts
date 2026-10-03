@@ -1,8 +1,13 @@
+import { mapAssetPrefix } from './WorldMapArt';
 import guairaMetadata from '../../public/assets/world/map/guaira-campaign/guaira.meta.json';
 import factoryMetadata from '../../public/assets/world/map/guaira-campaign/fabrica.meta.json';
 import serraMetadata from '../../public/assets/world/map/guaira-campaign/serra.meta.json';
 import { localToAtlas, WORLD_ATLAS_PLACEMENTS, type AtlasBounds, type AtlasPlacement } from './WorldAtlasModel';
 import { mapToScreen, type MapCamera, type MapPoint } from './WorldMapModel';
+
+export function campaignMapAsset(file: string, base = (import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/'): string {
+    return `${mapAssetPrefix(base)}${file}`;
+}
 
 /** Region keys never consume or renumber a numeric campaign world/stage ID. */
 export type GuairaCampaignRegion = 'fabrica' | 'guaira' | 'serra';
@@ -27,7 +32,7 @@ export interface CampaignRegionArt {
 }
 export const GUAIRA_CAMPAIGN_PLACEMENT: AtlasPlacement = Object.freeze({ origin: Object.freeze({ x: 3.65, y: .05 }), scale: 1.1 });
 const descriptor = (regionKey: GuairaCampaignRegion, metadata: typeof guairaMetadata | typeof factoryMetadata | typeof serraMetadata,
-    placement: AtlasPlacement): CampaignRegionArt => ({ regionKey, path: `/assets/world/map/guaira-campaign/${regionKey}.webp`,
+    placement: AtlasPlacement): CampaignRegionArt => ({ regionKey, path: campaignMapAsset(`guaira-campaign/${regionKey}.webp`),
     frame: metadata.assetFrame, placement, terminal: metadata.terminal, aircraftScale: 20.6 / metadata.camera.orthoScale });
 export const GUAIRA_CAMPAIGN_ART: Readonly<Record<GuairaCampaignRegion, CampaignRegionArt>> = Object.freeze({
     fabrica: descriptor('fabrica', factoryMetadata, WORLD_ATLAS_PLACEMENTS[3]),

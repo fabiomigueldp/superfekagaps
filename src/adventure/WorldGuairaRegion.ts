@@ -1,9 +1,10 @@
+import { GUAIRA_CAMPAIGN_ART } from './GuairaCampaignArt';
 import type { AdventureSave } from './types';
 import { canContinueFromGuaira, isGuairaUnlocked } from './progress';
 
 export const CAMPAIGN_REGION_ORDER = ['costa', 'porto', 'factory', 'guaira', 'serra', 'reserva', 'dominio'] as const;
 export const GUAIRA_ATLAS = { left: 3.65, top: .05, widthInMap: 1.1, heightInMap: 1.1 };
-export const GUAIRA_CAMPAIGN_IMAGE = '/assets/world/map/guaira-campaign/guaira.webp';
+export const GUAIRA_CAMPAIGN_IMAGE = GUAIRA_CAMPAIGN_ART.guaira.path;
 
 /** A region has a chapter host, not five invented numeric campaign stages. */
 export function showGuairaRegion(save: AdventureSave, arrived: string, callbacks: {

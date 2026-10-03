@@ -19,7 +19,7 @@ const createChapter = () => {
             const previous = progressStore.save.selected;
             progressStore.save.selected = to === 'factory' ? '3-5' : '4-1';
             if (!progressStore.persist()) { progressStore.save.selected = previous; return false; }
-            flight = null; chapter.dispose(); location.assign('/?guairaReturn=1'); return true;
+            flight = null; chapter.dispose(); location.assign('./?guairaReturn=1'); return true;
         } });
     };
     return new GuairaChapterApp(root, { progressStore, campaign,

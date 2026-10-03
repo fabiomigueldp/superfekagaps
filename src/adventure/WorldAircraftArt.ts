@@ -1,3 +1,4 @@
+import { campaignMapAsset } from './GuairaCampaignArt';
 import { mapToScreen, type MapCamera, type MapPoint } from './WorldMapModel';
 import type { AircraftPose } from './WorldAircraftModel';
 export interface AircraftFrame {
@@ -29,7 +30,7 @@ export function parseAircraftMetadata(value: unknown): AircraftMetadata | null {
     if (!data || data.version !== 1 || data.kind !== 'stol-courier' || data.headingCount !== 32 || !frame || !atlas ||
         !finite(frame.width) || frame.width < 1 || frame.width > 512 || !finite(frame.height) || frame.height < 1 || frame.height > 512 ||
         !finite(frame.widthInMap) || frame.widthInMap <= 0 || frame.widthInMap > 1 ||
-        atlas.path !== '/assets/world/map/journey-aircraft.webp' || atlas.width !== frame.width * 8 || atlas.height !== frame.height * 4 ||
+        (typeof atlas.path !== 'string' || atlas.path.replace(/^\/+/, '') !== 'assets/world/map/journey-aircraft.webp') || atlas.width !== frame.width * 8 || atlas.height !== frame.height * 4 ||
         !Array.isArray(data.frames) || data.frames.length !== 32) return null;
     for (const [index, raw] of data.frames.entries()) {
         const f = record(raw), source = record(f?.source);
@@ -50,7 +51,7 @@ export async function loadAircraftAssets(signal?: AbortSignal): Promise<Aircraft
     if (signal?.aborted) controller.abort();
     const timeout = setTimeout(abort, 12000);
     try {
-        const response = await fetch('/assets/world/map/journey-aircraft.meta.json', { signal: controller.signal });
+        const response = await fetch(campaignMapAsset('journey-aircraft.meta.json'), { signal: controller.signal });
         if (!response.ok) return null;
         const metadata = parseAircraftMetadata(await response.json());
         if (!metadata || controller.signal.aborted) return null;
@@ -62,7 +63,7 @@ export async function loadAircraftAssets(signal?: AbortSignal): Promise<Aircraft
             const canceled = () => { img.src = ''; finish(null); };
             controller.signal.addEventListener('abort', canceled, { once: true });
             img.onload = () => finish(img.naturalWidth === metadata.atlas.width && img.naturalHeight === metadata.atlas.height ? img : null);
-            img.onerror = () => finish(null); img.src = metadata.atlas.path;
+            img.onerror = () => finish(null); img.src = campaignMapAsset('journey-aircraft.webp');
         });
         return image ? { image, metadata } : null;
     } catch { return null; }
