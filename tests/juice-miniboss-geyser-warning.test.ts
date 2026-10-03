@@ -35,15 +35,29 @@ for (const cycle of [0, 1, 3]) for (const reducedMotion of [false, true]) {
             const cx = 3, cy = 64;
             const fills = paint(boss, cx, cy, reducedMotion);
             for (const hazard of locked) assert.ok(fills.some(fill =>
-                fill.x === hazard.x - cx && fill.y === hazard.y - cy
-                && fill.width === hazard.width && fill.height === hazard.height
+                fill.x === hazard.x - cx - 3 && fill.y === hazard.y - cy
+                && fill.width === hazard.width + 6 && fill.height === hazard.height
                 && fill.alpha > 0 && fill.alpha < .3),
             'From the first warning frame, a translucent projection shows the entire eventual danger volume.');
             assert.equal(JSON.stringify(boss), before, 'Rendering cannot advance or retarget the encounter.');
             boss.update(step, { ...player, x: 280, y: 100 });
         }
         assert.ok(boss.time - started >= boss.geyserWarningMs);
-        assert.deepEqual(boss.hazards, locked, 'The visible warning and live collision occupy exactly the same volume.');
+        assert.equal(boss.hazards.length, 0, 'The pressure front starts at the floor.');
+        let reachedTop = false;
+        while (boss.phase === 'attack') {
+            for (const g of boss.geysers.filter(g => g.phase === 'active')) {
+                const onlyJet = new JuiceMinibossModel(); onlyJet.phase = 'attack'; onlyJet.geysers = [g];
+                for (const h of onlyJet.hazards) {
+                    assert.ok(locked.some(v => h.x >= v.x - 3 && h.x + h.width <= v.x + v.width + 3
+                        && h.y >= v.y && h.y + h.height <= v.y + v.height),
+                    'Every moving collision span stays inside the initially advertised volume.');
+                    if (h.y === g.y) reachedTop = true;
+                }
+            }
+            boss.update(step, player);
+        }
+        assert.ok(reachedTop, 'The growing jet reaches the advertised height before shutoff.');
     });
 }
 

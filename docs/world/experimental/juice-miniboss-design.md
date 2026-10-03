@@ -1,6 +1,6 @@
 # Turbosuco: isolated experimental juice miniboss
 
-Status: playable experimental lab at `/juice-lab.html` through local Vite. The dedicated entry preserves the normal `index.html` app. This encounter is not part of the campaign and this work does not deploy to the Oracle-hosted game.
+Status: playable at `/juice-lab.html` and through the optional Factory salon in campaign stage `3-3`. `FactorySalonSession` reuses this encounter, introduction, pixel material and fluid effects. The standalone lab remains ephemeral; the campaign host owns the return journey and optional victory record. This revision is prepared for GitHub integration and publication to the Oracle-hosted game at `https://superfekagaps.torbware.space/`.
 
 ## Calabrezzo championship introduction
 
@@ -59,7 +59,7 @@ Stage one repeats dash → fan → pounce. Stage two restarts its sequence at fa
 
 Every stage-two attack warning activates up to two of the permanent vents at x48, 104, 160, 216 and 272. Selection favors a vent near the player's locked position and another at least 96 pixels away, while keeping every selected vent at least 48 pixels from the boss's future landing/recovery center.
 
-Each geyser has a fixed 22×64 footprint and three public states: `warning`, `active` and `recede`, with a phase timer and normalized progress. The full warning lasts 900ms and causes no damage. The active column can hurt Feka for up to 520ms. Receding fluid lasts 260ms and is harmless. When an attack finishes, any remaining active column immediately starts receding, leaving the stomp approach clear of floor jets. Fan droplets may still be airborne, so players must continue reading their trajectories.
+Each geyser retains a nominal 22×64 vent region and three public states: `warning`, `active` and `recede`, with a phase timer and normalized progress. The full warning lasts 900ms and causes no damage. Pressure raises the fluid front over 160ms; its opaque, tapered scanlines drive collision, so there is no invisible full-height rectangle ahead of the liquid. Moving packets swell and narrow inside the marked floor region. The active jet can hurt Feka for up to 520ms. On shutoff, its remaining mass falls under gravity and the detached spray finishes landing during a harmless 460ms tail. When an attack finishes, any remaining active jet immediately starts receding, leaving the stomp approach clear. `releaseTime` preserves the actual shutoff time when an attack ends early. Fan droplets may still be airborne, so players must continue reading their trajectories.
 
 At most two geysers and nine droplets exist at once. Hit, transformation and defeat cleanup prevent old hazards from leaking into the next encounter beat. Semantic `geyser-warning`, `geyser` and `enrage` events let presentation react without introducing a separate collision clock.
 
@@ -69,7 +69,7 @@ At most two geysers and nine droplets exist at once. Hit, transformation and def
 
 The replay reproduces the same final state twice and verifies all three attack patterns, exactly one transformation and more than 15 frames of active geysers. This establishes mechanical reachability with the real movement and collision pipeline; it is not a human difficulty verdict or browser performance measurement.
 
-The final focused command passes **89 tests**, covering combat, art, introduction, audio and lifecycle:
+The latest focused command passes **95 tests**, covering combat, art, introduction, audio, liquid motion and lifecycle:
 
 ```sh
 node --import tsx --test tests/juice-miniboss*.test.ts tests/juice-intro*.test.ts tests/juiceIntroAudio.test.ts
@@ -98,11 +98,21 @@ Reduced motion disables camera shake, ambient motion, trails and decorative spla
 
 The updated browser recording is `output/turbosuco/revisao-visual.mp4`, with the initial idle capture removed in `output/turbosuco/revisao-final.mp4`. The same 942-frame normal-input replay still wins without a death after these presentation changes. During this local Chromium capture, simulation plus drawing averaged 1.58ms per sampled frame (p95 2.5ms, maximum 13.7ms); this measures local CPU work, not physical-device or GPU presentation performance. The cosmetic pool was empty after the result settled, and the browser reported no console errors.
 
+### Pixel material and liquid revision
+
+`JuicePixelSurface` renders the animated body into a small reusable world-resolution surface, then resolves its coverage and colors into opaque pixel clusters with a fixed material palette. Nearest-neighbor enlargement preserves those clusters in the introduction as well as combat. The body has delayed cheek/skirt deformation, mouth strands that stretch and pinch, and droplets that settle at the feet. Browser rendering uses OffscreenCanvas; environments without it retain the direct Canvas painter.
+
+`JuiceFluid` supplies integer scanline drawing, the shared geyser collision profile and analytic ballistic flights. Pressure packets travel from each nozzle upward, briefly connected necks separate at the crown, falling globs accelerate and turn into flattened deposits with small secondary splashes. Impacts start with a spreading sheet and finish as lobed puddles rather than expanding rings. The introduction, transformation, landing, projectiles and defeat share this material. Projectiles now impact when their bottom touches the floor, instead of disappearing after sinking below it.
+
+The liquid renderer samples bounded emissions from the simulation clock; pause freezes the full effect. When a stomp clears combat hazards, the effect pool retains the geysers' existing falling age so the harmless residue finishes naturally. Reduced motion omits detached spray and idle dripping while keeping the functional rising front and danger boundary visible. The effect pool remains capped at 24 bursts. Tests cover rising-front collision, harmless shutoff, ballistic landing, integer pixel spans, palette cutouts, non-mutating drawing, residue expiry and the full ordinary-input victory. All 95 focused tests and the production build pass. The replay still wins at frames 143, 283, 433, 563, 789 and 941, with no deaths.
+
+`output/turbosuco/gosma-pixel.mp4` is a 17.2-second preview exported from the real browser renderer at 30 frames per second, using the ordinary-input replay. Browser checks also cover the enlarged introduction, phase two, reduced-motion rendering and a 390×844 viewport without horizontal overflow. Rendering preserved the model state and the browser reported no console errors.
+
 ## Scope and promotion
 
-The changes stay within the experimental lab and its introduction, art, model, adapter, documentation and tests. Campaign mechanics, campaign data, Player behavior, save schema and deployment configuration remain outside this revision.
+The refinements stay within the shared encounter, introduction, art, model, adapter, documentation and tests. Merging the current main preserves its Factory salon integration, audio handoffs, epilogue, Player behavior and save schema.
 
-Before promotion, review the local preview in an actual browser, play all three patterns and stage two, check keyboard/touch and narrow-screen layout, and assess human difficulty. Do not silently add the encounter to the campaign or its saved stage list. Earlier five-droplet, three-health phase-two rules and the 1,098-frame airborne-seed replay are historical versions superseded by the contract above.
+Publication uses the user's explicit request to merge and deploy to Oracle. Verify both the standalone lab and the existing campaign salon, including returning to the suspended campaign. Earlier five-droplet, three-health phase-two rules and the 1,098-frame airborne-seed replay are historical versions superseded by the contract above.
 
 ## Stage-two warning-volume review (2026-10-02)
 

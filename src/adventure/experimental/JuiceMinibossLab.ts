@@ -40,7 +40,7 @@ class LabEncounter extends BossEncounter {
         const previousDrops = this.model.drops.slice();
         this.model.update(dt, player); this.sync();
         this.effects.advance(this.model.time);
-        for (const d of previousDrops) if (!this.model.drops.includes(d) && d.y >= this.model.arena.floor)
+        for (const d of previousDrops) if (!this.model.drops.includes(d) && d.y + d.height >= this.model.arena.floor)
             this.effects.add('drip', d.x + d.width / 2, this.model.arena.floor, this.model.time);
         for (const e of this.model.events) {
             if (e.kind === 'spit') this.effects.add('spit', e.x, e.y, this.model.time, this.model.facing);
@@ -52,8 +52,10 @@ class LabEncounter extends BossEncounter {
         this.impactPoint = { x: this.x + this.width / 2, y: this.model.arena.floor };
     }
     override contact(p: Rect, previous: Rect, falling: boolean) {
+        const retiringGeysers = this.model.geysers;
         const result = this.model.contact(p, previous, falling); this.sync();
         if (result === 'hit' || result === 'defeated') {
+            this.effects.releaseGeysers(retiringGeysers, this.model.time);
             this.effects.add('hit', this.x + this.width / 2, this.y, this.model.time);
             if (result === 'defeated') this.effects.add('defeat', this.x + this.width / 2, this.model.arena.floor, this.model.time);
         }

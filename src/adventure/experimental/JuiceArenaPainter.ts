@@ -1,5 +1,6 @@
 import type { JuiceMinibossModel } from './JuiceMinibossModel';
 import { pixelText } from '../../graphics/BitmapFont';
+import { drawFluidGeyser, fluidOval, fluidPuddle } from './JuiceFluid';
 
 const C = { ink: '#131724', copper: '#9a6652' };
 function rect(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, color: string) {
@@ -142,10 +143,9 @@ export function drawJuiceLabFloor(c: CanvasRenderingContext2D, cy: number, boss?
     }
 }
 
-/** The full live jet contains its exact hazard rect; gold warnings cannot hurt. */
+/** Gold pressure marks stay harmless; the visible fluid profile owns live collision. */
 export function drawJuiceGeysers(c: CanvasRenderingContext2D, b: JuiceMinibossModel, cx: number, cy: number, reducedMotion = false) {
     c.save();
-    const time = reducedMotion ? 0 : b.time;
     for (const g of b.geysers) {
         const x = g.x - cx, floor = b.arena.floor - cy, middle = x + g.width / 2;
         if (g.phase === 'warning') {
@@ -155,61 +155,28 @@ export function drawJuiceGeysers(c: CanvasRenderingContext2D, b: JuiceMinibossMo
             // height with the countdown: the full extent matters from frame one.
             const top = g.y - cy;
             c.fillStyle = '#f3c979'; c.globalAlpha = .12;
-            c.fillRect(x, top, g.width, g.height);
+            c.fillRect(x - 3, top, g.width + 6, g.height);
             c.globalAlpha = .8;
-            rect(c, x, top, g.width, 1, '#f3c979');
+            rect(c, x - 3, top, g.width + 6, 1, '#f3c979');
             for (let dy = 0; dy < g.height; dy += 8) {
                 const dashHeight = Math.min(3, g.height - dy);
-                rect(c, x, top + dy, 1, dashHeight, '#f3c979');
-                rect(c, x + g.width - 1, top + dy, 1, dashHeight, '#f3c979');
+                rect(c, x - 3, top + dy, 1, dashHeight, '#f3c979');
+                rect(c, x + g.width + 2, top + dy, 1, dashHeight, '#f3c979');
             }
             c.globalAlpha = 1;
-            oval(c, middle, floor - 1, g.width / 2 + 4, 3, '#1b142b'); rect(c, x - 3, floor - 2, g.width + 6, 2, '#f3c979');
+            fluidPuddle(c, middle, floor, 11, 1.5, g.x, true);
+            rect(c, x - 3, floor - 2, g.width + 6, 1, '#f3c979');
             rect(c, x - 3, floor - 5, 1, 5, '#fff0c9'); rect(c, x + g.width + 2, floor - 5, 1, 5, '#fff0c9');
             rect(c, middle - 1, floor - 16, 2, 7, '#f3c979'); rect(c, middle - 1, floor - 7, 2, 2, '#f3c979');
             rect(c, x, floor + 4, g.width, 2, '#352f40'); rect(c, x, floor + 4, g.width * g.progress, 2, '#f3c979');
-            for (let i = 0; i < 3; i++) oval(c, x + 4 + i * 7, floor - 2 - Math.sin(g.progress * Math.PI * 3 + i) ** 2 * 3, 2, 1, '#b76acc');
-            continue;
-        }
-        const receding = g.phase === 'recede', amount = receding ? 1 - g.progress : 1, top = floor - g.height * amount;
-        c.globalAlpha = receding ? amount * .65 : 1;
-        // Billowing edges always stay outside the rectangular danger core.
-        c.save(); c.beginPath(); c.moveTo(x, top);
-        for (let y = top; y < floor; y += 12) {
-            const end = Math.min(floor, y + 12), swell = 2 + Math.sin(time * .014 + y) ** 2 * 2;
-            c.bezierCurveTo(x - swell, y + (end - y) / 3, x - swell, end - 2, x, end);
-        }
-        c.lineTo(x + g.width, floor);
-        for (let y = floor; y > top; y -= 12) {
-            const end = Math.max(top, y - 12), swell = 2 + Math.cos(time * .014 + y) ** 2 * 2;
-            c.bezierCurveTo(x + g.width + swell, y - (y - end) / 3, x + g.width + swell, end + 2, x + g.width, end);
-        }
-        c.closePath(); c.fillStyle = '#4a1d70'; c.strokeStyle = '#241132'; c.lineWidth = 1.5; c.fill(); c.stroke(); c.clip();
-        rect(c, x, top, g.width, floor - top, '#a844cc');
-        for (let i = 0; i < 3; i++) {
-            const streamX = x + 3 + i * 7;
-            c.beginPath(); c.moveTo(streamX, floor);
-            for (let y = floor; y > top; y -= 8) c.lineTo(streamX + Math.sin(y * .17 + time * .013 + i) * 2, Math.max(top, y - 8));
-            c.lineWidth = i === 1 ? 4 : 2; c.strokeStyle = i === 1 ? '#d86fe7' : '#742da9'; c.stroke();
-        }
-        for (let i = 0; i < 5; i++) {
-            const py = floor - ((time * .16 + i * 15) % Math.max(1, floor - top));
-            oval(c, x + 4 + (i % 3) * 6, py, 1.5, 4, '#efa6f2');
-        }
-        c.restore();
-        // Foamy, broken crown and airborne droplets replace a rigid flat cap.
-        for (let i = 0; i < 6; i++) {
-            const bx = x + 1 + i * 4, by = top + Math.sin(time * .02 + i * 1.7) * 2;
-            oval(c, bx, by, 3, 3.5, '#ce6bdf'); oval(c, bx - .5, by - 1, 1.8, 1.1, '#f4c3f7');
-        }
-        if (!reducedMotion && !receding) for (const side of [-1, 1]) for (let i = 0; i < 3; i++) {
-            const age = (time / 420 + i / 3) % 1;
-            const dx = middle + side * (g.width / 2 + age * (7 + i * 2));
-            const dy = top - 8 * Math.sin(age * Math.PI) + age * age * 19;
-            oval(c, dx, dy, 1.5, 2, '#b865d6'); oval(c, dx, dy - .5, .6, .7, '#f4c3f7');
-        }
-        oval(c, middle, floor - 1, g.width / 2 + 5, 3, '#9a48bd');
-        oval(c, middle - 4, floor - 2, 5, 1, '#d88de9'); c.globalAlpha = 1;
+            if (!reducedMotion) for (let i = 0; i < 3; i++) {
+                const phase = (g.phaseTime / (260 - i * 23) + i * .31) % 1;
+                const swell = Math.sin(phase * Math.PI) * (1 + g.progress * 1.5);
+                const bx = x + 4 + i * 7;
+                fluidOval(c, bx, floor - 1 - swell * .3, 1.5 + swell * .5, .6 + swell, '#9837bd');
+                fluidOval(c, bx - .5, floor - 1 - swell, 1, .65, '#ed9bf3');
+            }
+        } else drawFluidGeyser(c, g, cx, cy, reducedMotion);
     }
     c.restore();
 }
