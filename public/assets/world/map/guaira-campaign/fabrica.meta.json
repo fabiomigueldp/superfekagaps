@@ -114,12 +114,12 @@
     "walkSupportSamples": 42,
     "allSupported": true,
     "numericCampaignIdsChanged": false,
-    "objects": 79
+    "objects": 97
   },
   "image": {
     "path": "/assets/world/map/guaira-campaign/fabrica.webp",
     "width": 522,
     "height": 308,
-    "bytes": 18276
+    "bytes": 20506
   }
 }

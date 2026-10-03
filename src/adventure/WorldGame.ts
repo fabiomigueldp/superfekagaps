@@ -1,3 +1,4 @@
+import { campaignJournal } from './CampaignJournal';
 import { CanvasMenuAccessibility } from './CanvasMenuAccessibility';
 import { runGuairaFlight } from './WorldGuairaFlight';
 import { ExperimentalHub } from './experimental/hub/ExperimentalHub';
@@ -922,8 +923,13 @@ export class WorldGame {
         pixelText(c, ending ? 'UMA VITÓRIA E TANTO!' : 'UMA GRANDE AVENTURA', 160, 23, ART.goldLight, 1, 'center');
         const text = ending ? 'FEKA SALVOU YASMIN?' : this.introPage === 0 ? 'João e Yasmin partiram para o arquipélago. Feka sabe o que precisa fazer.' : 'Feka ajeita os óculos e parte. Nenhum gap vai impedir essa grande missão!';
         this.text(c, text, 31, 44, 258);
-        if (ending)
-            pixelText(c, `${this.store.save.completed.length + this.store.save.guaira.completed.length}/35 TRECHOS · ${this.store.save.seals.length}/72 SELOS`, 160, 69, '#b2d4d4', 1, 'center');
+        if (ending) {
+            const journal = campaignJournal(this.store.save);
+            pixelText(c, `${journal.completed}/${journal.total} TRECHOS · ${this.store.save.seals.length}/72 SELOS`, 160, 69, '#b2d4d4', 1, 'center');
+            panel(c, 18, 84, 284, 24, '#25344c', '#d2bb8e');
+            pixelText(c, journal.waterReleased ? 'GUAÍRA: ÁGUA LIBERADA' : 'GUAÍRA: A ÁGUA AINDA ESPERA', 160, 88, ART.paper, 1, 'center');
+            pixelText(c, `${journal.optionalCompleted}/3 DESVIOS OPCIONAIS CONCLUÍDOS`, 160, 99, ART.goldLight, 1, 'center');
+        }
         this.button(c, ending ? 'CONTINUAR EXPLORANDO' : 'SEGUIR VIAGEM', 72, 151, 176, () => ending ? this.toMap() : this.nextIntro());
     }
     private backGallery() {
@@ -937,6 +943,20 @@ export class WorldGame {
             this.change('title');
     }
     private renderGallery(c: CanvasRenderingContext2D) {
+        if (this.galleryWorld === 7) {
+            const journal = campaignJournal(this.store.save);
+            rect(c, 0, 0, 320, 180, '#1e2f45');
+            panel(c, 10, 10, 300, 135);
+            pixelText(c, 'GUAÍRA · CADERNO DOS CAMINHOS', 160, 19, ART.goldLight, 1, 'center');
+            journal.entries.forEach((entry, i) => pixelText(c,
+                fitText(`${entry.complete ? 'OK' : '--'}  ${entry.title}`, 280), 20, 36 + i * 12,
+                entry.complete ? '#b2d4d4' : ART.paper));
+            pixelText(c, journal.waterReleased ? 'ÁGUA LIBERADA · SERRA ABERTA' : 'ÁGUA: CONCLUA O PREFEITO DA VAZÃO', 20, 101, ART.goldLight);
+            journal.optional.forEach((entry, i) => pixelText(c,
+                fitText(`${entry.complete ? 'OK' : '--'} ${entry.title} (opcional)`, 280), 20, 114 + i * 9, ART.paper));
+            this.button(c, 'VOLTAR AO CADERNO', 80, 153, 160, () => this.backGallery());
+            return;
+        }
         if (this.galleryWorld) {
             const w = ISLANDS[this.galleryWorld - 1];
             this.art.background(c, w, 0, 0, this.time);
@@ -948,13 +968,13 @@ export class WorldGame {
             return;
         }
         rect(c, 0, 0, 320, 180, '#1e2f45');
-        this.heading(c, 'CADERNO DA AVENTURA', 'AS SEIS ILHAS');
+        this.heading(c, 'CADERNO DA AVENTURA', 'SETE REGIÕES');
         for (let i = 0; i < 6; i++) {
-            const w = ISLANDS[i], x = 10 + (i % 3) * 104, y = 58 + Math.floor(i / 3) * 44, count = this.store.save.seals.filter(id => id.startsWith(`${i + 1}-`)).length;
-            panel(c, x, y, 96, 38, this.menuSelection === i ? '#435f72' : '#2c4156', w.accent);
+            const w = ISLANDS[i], x = 10 + (i % 3) * 104, y = 54 + Math.floor(i / 3) * 36, count = this.store.save.seals.filter(id => id.startsWith(`${i + 1}-`)).length;
+            panel(c, x, y, 96, 32, this.menuSelection === i ? '#435f72' : '#2c4156', w.accent);
             pixelText(c, fitText(w.name, 86), x + 48, y + 6, w.accent, 1, 'center');
             pixelText(c, `${count}/12 SELOS`, x + 48, y + 20, ART.paper, 1, 'center');
-            this.buttons.push({ label: `${w.name}, ${count}/12 selos`, x, y, width: 96, height: 38, run: () => {
+            this.buttons.push({ label: `${w.name}, ${count}/12 selos`, x, y, width: 96, height: 32, run: () => {
                     if (count === 12) {
                         this.galleryWorld = i + 1;
                         this.menuSelection = 0;
@@ -965,6 +985,9 @@ export class WorldGame {
                     }
                 } });
         }
+        this.button(c, `GUAÍRA · ${this.store.save.guaira.completed.length}/5 · EXTRAS`, 50, 129, 220, () => {
+            this.galleryWorld = 7; this.menuSelection = 0;
+        });
         this.button(c, 'VOLTAR', 114, 153, 92, () => this.backGallery());
     }
     private settings(from: Screen) { this.settingReturn = from; this.pausedAudio = from === 'paused'; this.audio.pause(false); this.change('settings'); }

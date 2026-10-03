@@ -106,20 +106,20 @@
   },
   "assetFrame": {
     "left": -0.18020833333333336,
-    "top": 0.5616666666666668,
+    "top": 0.56,
     "widthInMap": 0.5145833333333333,
-    "heightInMap": 0.535
+    "heightInMap": 0.5366666666666666
   },
   "validation": {
     "walkSupportSamples": 42,
     "allSupported": true,
     "numericCampaignIdsChanged": false,
-    "objects": 79
+    "objects": 97
   },
   "image": {
     "path": "/assets/world/map/guaira-campaign/serra.webp",
     "width": 494,
-    "height": 321,
-    "bytes": 16156
+    "height": 322,
+    "bytes": 18162
   }
 }

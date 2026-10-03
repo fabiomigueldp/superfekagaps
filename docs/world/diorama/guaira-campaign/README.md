@@ -64,10 +64,10 @@ Raw PNG and temporary Blender caches are reproduction artifacts, not runtime ass
 
 - 42 support ray casts per terminal, all passed; tests also check parking/runway
   endpoints lie within their closed physical support footprints.
-- Three focused tests passed: support/asset budget; unchanged numeric placements
+- Four focused tests passed: support/asset budget; unchanged numeric placements
   and exact projected attachments; renderer/overlay contract at desktop/compact.
 - New pure TypeScript module passes isolated compiler check.
-- Three WebP files total 176,384 bytes, lazy loaded.
+- Three WebP files total 187,474 bytes, lazy loaded.
 - `render-desktop.jpg` and `render-compact.jpg` are inspected Blender artwork
   composites at 960×600 and 390×640. They are render proof, not browser screenshots.
   Local Chromium screenshot startup was blocked by the executor's socket policy;
@@ -75,3 +75,22 @@ Raw PNG and temporary Blender caches are reproduction artifacts, not runtime ass
   remains the campaign integrator's responsibility.
 
 No full suite, main merge, Oracle access or Vercel deployment was performed.
+
+## Airfield readability polish
+
+The same three terminals now have graded shoulders, thin ivory landing-lane
+edges and more legible threshold bars. Roof seams, an ivory canopy fascia and
+one small gold boarding-arrow plate relate the terminals to the handcrafted
+neighborhood. Subtle procedural soil/stone grain and sun-faded color variation
+break up the previously featureless retaining faces. No new gameplay objects,
+landmarks, textures, routes, physics or progression state were introduced.
+
+The original and updated 960×600 Blender composites were inspected, along with
+the 390×640 compact composite and both isolated terminal layers. These are actual
+Cycles artwork renders, not integrated game/browser screenshots. All camera,
+terminal (parking, runway endpoints and boarding path), support, landmark and
+route metadata compare exactly to the preceding release. Serra’s transparent
+crop extends upward by one master pixel for the raised roof edge; its explicit
+frame compensates exactly, so there is no shift or scale change. All 126 support
+raycasts passed in generation, and all four focused campaign-art tests passed
+after packaging. Transfer cost is 11,090 bytes above the preceding artwork.

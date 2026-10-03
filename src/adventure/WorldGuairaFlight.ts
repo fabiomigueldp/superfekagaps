@@ -32,10 +32,15 @@ export function runGuairaFlight(options: GuairaFlightOptions): () => void {
     const canvas = document.createElement('canvas'); canvas.width = 960; canvas.height = 540;
     canvas.setAttribute('aria-hidden', 'true');
     const status = document.createElement('p'); status.setAttribute('aria-live', 'polite');
+    status.setAttribute('aria-atomic', 'true');
+    const heading = document.createElement('h2');
+    heading.textContent = `${names[options.from]} → ${names[options.to]}`;
     const nav = document.createElement('nav'), skip = document.createElement('button'), cancel = document.createElement('button'), retry = document.createElement('button');
     skip.textContent = 'Pular viagem'; skip.disabled = true; retry.textContent = 'Tentar carregar novamente'; retry.hidden = true;
-    cancel.textContent = `Cancelar · voltar à ${names[options.from]}`;
-    nav.append(skip, cancel, retry); dialog.append(canvas, status, nav); document.body.append(dialog); dialog.showModal();
+    cancel.textContent = 'Cancelar voo';
+    cancel.setAttribute('aria-label', `Cancelar voo e voltar para ${names[options.from]}`);
+    nav.setAttribute('aria-label', 'Controles da viagem');
+    nav.append(skip, cancel, retry); dialog.append(canvas, status, nav, heading); document.body.append(dialog); dialog.showModal();
     let frame = 0, stopped = false, elapsed = 0, previous = performance.now(), assets: AircraftAssets | null = null, loading = false;
     const controller = new AbortController();
     const sound = options.preferences && options.soundEnabled !== false ? new WorldAudio({ ...options.preferences, music: 0, voice: 0 }) : null;
@@ -53,6 +58,7 @@ export function runGuairaFlight(options: GuairaFlightOptions): () => void {
         if (arrived && options.onArrive() === false) {
             cancelAnimationFrame(frame); engine.cancel();
             status.textContent = 'Não foi possível salvar a viagem. Seu progresso continua nesta página. Libere espaço/armazenamento e tente salvar novamente, ou cancele para continuar aqui.';
+            canvas.setAttribute('style', 'opacity: 1');
             skip.textContent = 'Tentar salvar e continuar'; return;
         }
         stopped = true; cancelAnimationFrame(frame); controller.abort(); engine.dispose(); sound?.dispose();
@@ -100,7 +106,9 @@ export function runGuairaFlight(options: GuairaFlightOptions): () => void {
             paintBackground(ctx, camera); paintAircraftTravel(ctx, camera, pose, assets, elapsed);
         }
         const phases = { boarding: 'Embarcando no aeródromo', 'takeoff-roll': 'Decolando', climb: 'Ganhando altitude', cruise: 'Sobrevoando os canais', approach: 'Aproximação', 'landing-roll': 'Pousando', arrived: 'Chegada confirmada' };
-        const message = `${names[options.from]} → ${names[options.to]} · ${phases[pose.stage]}`;
+        // A short dissolve belongs to presentation only; the canonical trip clock and arrival stay unchanged.
+        if (!reduced) canvas.setAttribute('style', `opacity: ${Math.min(1, Math.max(0, (duration - elapsed) / .22))}`);
+        const message = phases[pose.stage];
         if (status.textContent !== message) status.textContent = message;
         if (elapsed >= duration) close(true); else frame = requestAnimationFrame(tick);
     };
@@ -117,6 +125,7 @@ export function runGuairaFlight(options: GuairaFlightOptions): () => void {
         if (!assets || !loaded.slice(1).every(Boolean)) {
             assets = null; status.textContent = 'A viagem não carregou. Seu progresso e o ponto de partida foram preservados.'; retry.hidden = false; return;
         }
+        dialog.setAttribute('data-ready', 'true');
         skip.disabled = false; previous = performance.now(); frame = requestAnimationFrame(tick);
     };
     retry.addEventListener('click', () => { void load(); }); void load();

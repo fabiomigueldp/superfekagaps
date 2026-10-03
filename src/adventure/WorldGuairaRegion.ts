@@ -1,6 +1,7 @@
 import { GUAIRA_CAMPAIGN_ART } from './GuairaCampaignArt';
 import type { AdventureSave } from './types';
-import { canContinueFromGuaira, isGuairaUnlocked } from './progress';
+import { isGuairaUnlocked } from './progress';
+import { campaignJournal } from './CampaignJournal';
 
 export const CAMPAIGN_REGION_ORDER = ['costa', 'porto', 'factory', 'guaira', 'serra', 'reserva', 'dominio'] as const;
 export const GUAIRA_ATLAS = { left: 3.65, top: .05, widthInMap: 1.1, heightInMap: 1.1 };
@@ -16,12 +17,21 @@ export function showGuairaRegion(save: AdventureSave, arrived: string, callbacks
     const title = document.createElement('h2'); title.id = 'guaira-region-title'; title.textContent = 'Guaíra · entre a Fábrica e a Serra';
     const art = document.createElement('img'); art.src = GUAIRA_CAMPAIGN_IMAGE;
     art.alt = 'Guaíra: aeródromo, arrozais, canais e a cidade do Prefeito';
+    const journal = campaignJournal(save);
     const summary = document.createElement('p');
     summary.textContent = `${save.guaira.completed.length}/5 trechos concluídos · Galeria ${save.guaira.optional.gallery ? 'concluída' : 'opcional'} · Câmara ${save.guaira.optional.relief ? 'concluída' : 'opcional'}`;
     const hint = document.createElement('p');
-    hint.textContent = !isGuairaUnlocked(save) ? 'Conclua Controle de Qualidade na Fábrica para embarcar.'
-        : canContinueFromGuaira(save) ? 'A rota aérea entre Fábrica, Guaíra e Serra está aberta. Seu progresso fica salvo.'
-        : 'Atravesse os canais, vença Ossabravo e faça o Prefeito liberar a água para seguir à Serra.';
+    hint.textContent = journal.objective;
+    const receipts = document.createElement('ol'); receipts.className = 'guaira-receipts';
+    receipts.setAttribute('aria-label', 'Caderno de Guaíra');
+    for (const entry of journal.entries) {
+        const item = document.createElement('li');
+        item.textContent = `${entry.complete ? 'Concluído' : entry.id === journal.next?.id ? 'Próximo' : 'À frente'} · ${entry.title}`;
+        item.dataset.complete = String(entry.complete); receipts.append(item);
+    }
+    const reward = document.createElement('p'); reward.textContent = journal.water;
+    const optional = document.createElement('p'); optional.className = 'guaira-optional-note';
+    optional.textContent = 'Galeria e Câmara são passeios opcionais no Bairro da Vala Seca. Os trechos concluídos podem ser revisitados; suas conquistas continuam no caderno.';
     const controls = document.createElement('nav'); controls.setAttribute('aria-label', 'Viagem a Guaíra');
     const fly = document.createElement('button'), back = document.createElement('button');
     const from = arrived.startsWith('4-') ? 'serra' : 'factory';
@@ -35,6 +45,6 @@ export function showGuairaRegion(save: AdventureSave, arrived: string, callbacks
     back.addEventListener('click', close);
     dialog.addEventListener('cancel', event => { event.preventDefault(); close(); });
     dialog.addEventListener('keydown', event => event.stopPropagation());
-    controls.append(fly, back); dialog.append(title, art, summary, hint, controls); document.body.append(dialog); dialog.showModal();
+    controls.append(fly, back); dialog.append(title, art, summary, hint, receipts, reward, optional, controls); document.body.append(dialog); dialog.showModal();
     return close;
 }

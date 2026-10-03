@@ -40,6 +40,21 @@ def rod(n,a,b,r,m):
 def label(n,body,p,size,m):
  c=bpy.data.curves.new(n,'FONT');c.body=body;c.align_x='CENTER';c.align_y='CENTER';c.size=size;c.extrude=.005;o=bpy.data.objects.new('STOL '+n,c);bpy.context.collection.objects.link(o);o.location=p;o.rotation_euler=(math.pi/2,0,0);c.materials.append(m)
 
+# Broad material variation remains readable after atlas downsampling; fine grain
+# only breaks the sterile slab highlight. All treatment is visual, not geometry.
+shoulder=material('graded gravel shoulder','B9A17D' if REGION!='serra' else 'A39F8B')
+for mat,scale,strength in [(dry,7,.12),(clay,4,.17)]:
+ nodes=mat.node_tree.nodes;links=mat.node_tree.links
+ noise=nodes.new('ShaderNodeTexNoise');noise.inputs['Scale'].default_value=scale;noise.inputs['Detail'].default_value=2
+ bump=nodes.new('ShaderNodeBump');bump.inputs['Strength'].default_value=strength;bump.inputs['Distance'].default_value=.045
+ links.new(noise.outputs['Fac'],bump.inputs['Height']);links.new(bump.outputs['Normal'],nodes['Principled BSDF'].inputs['Normal'])
+ if mat==clay:
+  # Sun-faded, compacted soil variation instead of a featureless vertical face.
+  ramp=nodes.new('ShaderNodeValToRGB');base=list(mat.diffuse_color)
+  ramp.color_ramp.elements[0].position=.20;ramp.color_ramp.elements[0].color=tuple(v*.68 for v in base[:3])+(1,)
+  ramp.color_ramp.elements[1].position=.80;ramp.color_ramp.elements[1].color=tuple(min(1,v*1.13) for v in base[:3])+(1,)
+  links.new(noise.outputs['Fac'],ramp.inputs['Fac']);links.new(ramp.outputs['Color'],nodes['Principled BSDF'].inputs['Base Color'])
+
 # Runway, full-depth embankment, apron and walkway exist before any decoration.
 # Every footpath segment is a closed solid down to the same bedrock datum.
 config={
@@ -50,6 +65,13 @@ config={
 cx,cy,z=config['center'];is_y=config['axis']=='y';dims=(5.6,8.4) if is_y else (8.4,5.6)
 box('continuous runway embankment',(cx,cy,(z-.02)/2),(dims[0]+.4,dims[1]+.4,z-.22),clay,.18)
 box('runway flat dry surface',(cx,cy,z-.055),(dims[0],dims[1],.11),dry,0)
+# A compacted lane sits inside graded shoulders, keeping the original flat
+# surface and the full unobstructed 5.2 m swept span intact.
+for sign in [-1,1]:
+ p=(cx+sign*2.32,cy,z+.001) if is_y else (cx,cy+sign*2.32,z+.001)
+ box('graded runway shoulder',p,(.94,8.38,.002) if is_y else (8.38,.94,.002),shoulder,0)
+ p=(cx+sign*1.80,cy,z+.004) if is_y else (cx,cy+sign*1.80,z+.004)
+ box('painted landing lane edge',p,(.055,7.70,.006) if is_y else (7.70,.055,.006),ivory,.002)
 # Visible retaining footings bond the runway to solid terrain, never floating slabs.
 for i in range(9):
  a=-3.8+i*.95
@@ -60,11 +82,11 @@ runway_start=(cx,cy-3.65,z) if is_y else (cx-3.65,cy,z)
 runway_end=(cx,cy+3.65,z) if is_y else (cx+3.65,cy,z)
 for t in [-3,-1.5,0,1.5,3]:
  p=(cx,cy+t,z+.012) if is_y else (cx+t,cy,z+.012)
- box('runway center dash',p,(.10,.65,.02) if is_y else (.65,.10,.02),ivory,.002)
+ box('runway center dash',p,(.13,.72,.02) if is_y else (.72,.13,.02),ivory,.002)
 for sign in [-1,1]:
  for side in [-.7,-.35,.35,.7]:
   p=(cx+side,cy+sign*3.35,z+.012) if is_y else (cx+sign*3.35,cy+side,z+.012)
-  box('threshold bar',p,(.16,.38,.02) if is_y else (.38,.16,.02),ivory,.002)
+  box('threshold bar',p,(.19,.48,.02) if is_y else (.48,.19,.02),ivory,.002)
 
 path_layer=0
 def supported_path(a,b,width=1.15):
@@ -87,8 +109,18 @@ box('terminal teal service office',(tx+.49,ty,z+.55),(.65,.75,1.1),teal)
 box('office recessed window',(tx+.49,ty-.389,z+.68),(.41,.035,.35),glass)
 for dx in [-.88,.05]:rod('terminal canopy column',(tx+dx,ty-.55,z),(tx+dx,ty-.55,z+1.2),.05,teal)
 canopy=box('terminal sloping canopy',(tx,ty,z+1.23),(2.15,1.48,.16),roof);canopy.rotation_euler.x=.10
+# Raised roof seams echo the handcrafted terracotta buildings behind Guaíra;
+# industrial Fábrica keeps its simple standing-seam metal canopy.
+for dx in [-.96,-.72,-.48,-.24,0,.24,.48,.72,.96]:
+ rod('canopy roof seam',(tx+dx,ty-.70,z+1.23+.08-.07),(tx+dx,ty+.70,z+1.23+.08+.07),.027 if REGION=='fabrica' else .042,roof)
+box('canopy ivory fascia',(tx,ty-.737,z+1.155),(2.17,.06,.105),ivory,.01)
 box('departure sign',(tx-.22,ty-.73,z+.97),(1.45,.075,.27),teal)
-label('terminal destination',{'guaira':'GUAÍRA','fabrica':'FÁBRICA','serra':'SERRA'}[REGION],(tx-.22,ty-.777,z+.97),.20,ivory)
+label('terminal destination',{'guaira':'GUAÍRA','fabrica':'FÁBRICA','serra':'SERRA'}[REGION],(tx-.08,ty-.777,z+.97),.18,ivory)
+# One strong boarding symbol works at map size without more labels or props.
+box('boarding sign plate',(tx-.66,ty-.785,z+.96),(.24,.025,.22),gold,.008)
+rod('boarding arrow shaft',(tx-.74,ty-.805,z+.96),(tx-.59,ty-.805,z+.96),.012,teal)
+rod('boarding arrow upper',(tx-.64,ty-.805,z+1.01),(tx-.59,ty-.805,z+.96),.012,teal)
+rod('boarding arrow lower',(tx-.64,ty-.805,z+.91),(tx-.59,ty-.805,z+.96),.012,teal)
 label('terminal subline','CORREIO AÉREO',(tx,ty+.253,z+.73),.12,teal)
 box('passenger bench',(tx-.30,ty+.06,z+.32),(.65,.30,.12),wood)
 for dx in [-.53,-.1]:box('bench legs',(tx+dx,ty+.06,z+.15),(.09,.24,.30),teal)
