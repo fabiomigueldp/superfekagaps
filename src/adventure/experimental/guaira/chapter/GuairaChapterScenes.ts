@@ -62,7 +62,7 @@ export async function loadGuairaChapterScene(sceneId: GuairaChapterSceneId): Pro
         }
         case 'guaira-lab': {
             const { GuairaBullLab } = await import('../GuairaBullLab');
-            return (canvas, status) => { const game = new GuairaBullLab(canvas, status, 'CONTINUAR: VOLTAR A MAQUETE');
+            return (canvas, status) => { const game = new GuairaBullLab(canvas, status, 'CONTINUAR: VOLTAR A MAQUETE', 'CHEFE');
                 return bind(game, sceneId, () => game.boss?.phase === 'defeated', () => game.mapReturnHref, () => game.toggleLabPause()); };
         }
         case 'guaira-subida': {

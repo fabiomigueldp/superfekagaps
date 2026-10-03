@@ -61,7 +61,7 @@ export class GuairaBullEncounter extends BossEncounter {
 export class GuairaBullLab extends WorldGame {
     reducedMotion: boolean;
     constructor(canvas: HTMLCanvasElement, private readonly status: HTMLElement,
-        private readonly continuationHint = 'SUBIR: CASA DA VAZAO') {
+        private readonly continuationHint = 'SUBIR: CASA DA VAZAO', private readonly encounterLabel: 'LAB' | 'CHEFE' = 'LAB') {
         super(canvas, true);
         try {
             this.reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -138,7 +138,7 @@ export class GuairaBullLab extends WorldGame {
             c.fillRect(x, 5, 12, 3);
             c.fillRect(x, 4, 2, 5); c.fillRect(x + 10, 4, 2, 5);
         }
-        pixelText(c, 'LAB', 235, 3, '#dcbceb');
+        pixelText(c, this.encounterLabel, 235, 3, '#dcbceb');
         // Full 1x bitmap text stays present during jumps and attack warnings;
         // the adjacent accessible status repeats it without replacing it.
         pixelText(c, boss.hint, 8, 13, '#f0ddae');

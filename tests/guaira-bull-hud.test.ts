@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { GuairaBullEncounter, GuairaBullLab } from '../src/adventure/experimental/guaira/GuairaBullLab';
+import { loadGuairaChapterScene } from '../src/adventure/experimental/guaira/chapter/GuairaChapterScenes';
 import { BULL_RULES } from '../src/adventure/experimental/guaira/SkeletonBullModel';
 import { PLAYER_RENDER_OFFSET_Y } from '../src/assets/playerSpriteSpec';
 import { pixelText, textWidth } from '../src/graphics/BitmapFont';
@@ -105,4 +106,17 @@ test('local header remains above the native player transition as before', t => {
     game.render();
     assert.ok(calls.includes('transition'));
     assert.ok(calls.lastIndexOf('header') > calls.lastIndexOf('transition'));
+});
+
+
+test('chapter Ossabravo paints CHEFE between health and helmet while standalone retains LAB', async t => {
+    const h = guairaBrowser(t), factory = await loadGuairaChapterScene('guaira-lab');
+    const runtime = factory(h.canvas as unknown as HTMLCanvasElement, h.status as unknown as HTMLElement);
+    for (const [game, label] of [[runtime.game as GuairaBullLab, 'CHEFE'], [h.create(), 'LAB']] as const) {
+        const actual = raster(), expected = raster(); drawHud(game, actual.c);
+        pixelText(expected.c, label, 235, 3, '#dcbceb');
+        assert.ok(235 + textWidth(label) < 279, 'the full label clears the helmet');
+        for (const [pixel, color] of expected.pixels) assert.equal(actual.pixels.get(pixel), color);
+        for (let i = 0; i < 6; i++) assert.equal(actual.pixels.get(`${123 + i * 16},5`), '#f1a479');
+    }
 });
