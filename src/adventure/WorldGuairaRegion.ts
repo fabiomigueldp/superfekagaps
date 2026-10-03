@@ -1,6 +1,6 @@
 import { GUAIRA_CAMPAIGN_ART } from './GuairaCampaignArt';
 import type { AdventureSave } from './types';
-import { isGuairaUnlocked } from './progress';
+import { guairaTravelDirections } from './CampaignWayfinding';
 import { campaignJournal } from './CampaignJournal';
 
 export const CAMPAIGN_REGION_ORDER = ['costa', 'porto', 'factory', 'guaira', 'serra', 'reserva', 'dominio'] as const;
@@ -22,7 +22,8 @@ export function showGuairaRegion(save: AdventureSave, arrived: string, callbacks
     const summary = document.createElement('p');
     summary.textContent = `${save.guaira.completed.length}/5 trechos concluídos · Galeria ${save.guaira.optional.gallery ? 'concluída' : 'opcional'} · Câmara ${save.guaira.optional.relief ? 'concluída' : 'opcional'}`;
     const hint = document.createElement('p');
-    hint.textContent = journal.objective;
+    const directions = guairaTravelDirections(save, arrived);
+    hint.textContent = `${directions.route} ${journal.objective}`;
     const receipts = document.createElement('ol'); receipts.className = 'guaira-receipts';
     receipts.setAttribute('aria-label', 'Caderno de Guaíra');
     for (const entry of journal.entries) {
@@ -35,10 +36,9 @@ export function showGuairaRegion(save: AdventureSave, arrived: string, callbacks
     optional.textContent = 'Galeria e Câmara são passeios opcionais no Bairro da Vala Seca. Os trechos concluídos podem ser revisitados; suas conquistas continuam no caderno.';
     const controls = document.createElement('nav'); controls.setAttribute('aria-label', 'Viagem a Guaíra');
     const fly = document.createElement('button'), back = document.createElement('button');
-    const from = Number(arrived.split('-')[0]) >= 4 ? 'serra' : 'factory';
-    const atAirRegion = arrived.startsWith('3-') || arrived.startsWith('4-');
-    fly.textContent = atAirRegion ? `Voar da ${from === 'serra' ? 'Serra' : 'Fábrica'} para Guaíra` : `Ir à ${from === 'serra' ? 'Serra' : 'Fábrica'} para embarcar`;
-    fly.disabled = !isGuairaUnlocked(save);
+    const { from, atAirRegion } = directions;
+    fly.textContent = directions.action;
+    fly.disabled = !directions.available;
     back.textContent = 'Voltar ao mapa';
     const previous = document.activeElement;
     const close = () => { dialog.close(); dialog.remove(); if (previous instanceof HTMLElement && previous.isConnected) previous.focus(); };

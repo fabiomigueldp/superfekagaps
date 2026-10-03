@@ -1,3 +1,4 @@
+import { campaignMapDirection, guairaTravelDirections } from './CampaignWayfinding';
 import { showGuairaRegion } from './WorldGuairaRegion';
 import { GUAIRA_CAMPAIGN_ART, campaignArtBounds, campaignArtOverlay, loadCampaignRegionImage, type GuairaCampaignRegion } from './GuairaCampaignArt';
 import { STAGES } from './campaign';
@@ -243,7 +244,7 @@ export class WorldMapView {
         if (!this.save || !this.journey || this.journey.destination) return;
         this.guairaDialog?.();
         this.guairaDialog = showGuairaRegion(this.save, this.journey.arrived, {
-            fly: from => this.callbacks.guaira?.(from), goToFactory: () => this.select(14), goToSerra: () => this.select(19),
+            fly: from => this.callbacks.guaira?.(from), goToFactory: () => this.select(14), goToSerra: () => this.select(indexOf(guairaTravelDirections(this.save!, this.journey!.arrived).approach)),
         });
     }
     constructor(private readonly gameCanvas: HTMLCanvasElement, private readonly callbacks: MapCallbacks) {
@@ -666,7 +667,7 @@ export class WorldMapView {
                     : world === 4 ? 'Preparando a passagem da Serra… Você pode escolher outra fase ou voltar ao menu.'
                     : world === 3 ? 'Preparando a ponte de carga… Você pode escolher outra fase ou voltar ao menu.'
                     : 'Preparando o barco e os cais… Você pode escolher outra fase ou voltar ao menu.'
-                : this.journey.blocked === 'no-route' && ((world <= 3) !== (worldOf(this.journey.arrived) <= 3)) ? 'A passagem entre Fábrica e Serra é por Guaíra. Abra Guaíra · aeródromo para embarcar.' : journeyBlockReason(this.journey) || (this.save.secrets.includes(`${world}-3`) ? 'Atalho 3 → 5 descoberto!' : ''),
+                : this.journey.blocked === 'no-route' && ((world <= 3) !== (worldOf(this.journey.arrived) <= 3)) ? 'A passagem entre Fábrica e Serra é por Guaíra. Abra Guaíra · aeródromo para embarcar.' : journeyBlockReason(this.journey) || campaignMapDirection(this.save, this.journey.arrived, stage.id, !!this.journey.destination) || (this.save.secrets.includes(`${world}-3`) ? 'Atalho 3 → 5 descoberto!' : ''),
             warnings: [toast || warning, this.assetWarning], worldAvailability: Array.from({ length: 6 }, (_, n) => isUnlocked(`${n + 1}-1`, this.save!)),
             preview: !!this.journey.blocked, overview: this.overview,
         });

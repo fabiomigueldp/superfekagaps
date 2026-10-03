@@ -128,7 +128,21 @@ export class ProgressStore {
         this.save.guaira = mergeGuairaChapterProgress(this.save.guaira, next);
         return this.persist();
     }
-    import(raw: string): void { const next = parseSave(raw); this.save = next; this.protected = false; this.persist(false); }
+    /** Import replaces progress only after the browser has saved the complete replacement. */
+    import(raw: string): boolean {
+        const next = parseSave(raw);
+        try {
+            if (!this.storage) throw Error('Storage unavailable');
+            this.storage.setItem(SAVE_KEY, JSON.stringify(next));
+        } catch {
+            this.warning = 'Importação não salva. Progresso anterior mantido.';
+            return false;
+        }
+        this.save = next;
+        this.protected = false;
+        this.warning = '';
+        return true;
+    }
     /** First-time guidance survives retries, map returns and browser reloads. */
     markSeen(id: string): boolean {
         if (this.save.seen.includes(id))

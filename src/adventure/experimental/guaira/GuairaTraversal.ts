@@ -144,7 +144,7 @@ export class GuairaTraversal extends WorldGame {
             pixelText(c, this.continuationHint, 160, 65, '#edcaf5', 1, 'center');
         } else if (nearValve && !this.player.data.isDead && !bannerWouldCoverPlayer) {
             panel(c, 42, 29, 236, 19, '#382b35', '#d8ac7a');
-            pixelText(c, !valve.active ? 'PULE. NO AR, APERTE BAIXO' : this.bridgeReady ? 'PASSAGEM ABERTA' : 'PONTE SUBINDO...', 160, 35, '#f0ddae', 1, 'center');
+            pixelText(c, !valve.active ? 'PULE SOBRE A PLACA. BAIXO NO AR' : this.bridgeReady ? 'PASSAGEM ABERTA' : 'PONTE SUBINDO...', 160, 35, '#f0ddae', 1, 'center');
         }
         this.renderer.present();
         const message = paused ? 'Pausado · Esc ou Continuar para voltar'

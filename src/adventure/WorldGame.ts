@@ -1,3 +1,4 @@
+import { importProgressFile, progressImportMessage } from './ProgressImport';
 import { JournalAccessibility } from './JournalAccessibility';
 import { campaignJournal } from './CampaignJournal';
 import { CanvasMenuAccessibility } from './CanvasMenuAccessibility';
@@ -15,7 +16,7 @@ import { ART } from '../graphics/palette';
 import { PLAYER_SPRITES, PLAYER_PALETTE } from '../assets/playerSpriteSpec';
 import { YASMIN_FRAMES, SPRITE_PALETTE } from '../graphics/sprites';
 import { ISLANDS, STAGES, stageById } from './campaign';
-import { ProgressStore, isUnlocked, finishStage, parseSave, isGuairaUnlocked, canContinueFromGuaira } from './progress';
+import { ProgressStore, isUnlocked, finishStage, isGuairaUnlocked, canContinueFromGuaira } from './progress';
 import { WorldArt, rect } from './WorldArt';
 import { drawLandmarks } from './WorldScenery';
 import { WorldAudio } from './WorldAudio';
@@ -1034,19 +1035,15 @@ export class WorldGame {
             if (!file) { cleanup(); return; }
             input.onchange = null;
             try {
-                const text = await file.text();
-                if (!active) return;
-                parseSave(text);
-                this.store.import(text);
-                this.audio.preferences = this.store.save.preferences;
-                this.audio.volume();
-                this.toast = 'Progresso importado.';
-                this.toastTimer = 2500;
-            }
-            catch {
-                if (!active) return;
-                this.toast = 'Arquivo de progresso inválido.';
-                this.toastTimer = 3000;
+                const result = await importProgressFile(file, this.store, () => active);
+                if (!active || result === 'cancelled') return;
+                this.toast = progressImportMessage(result);
+                this.toastTimer = result === 'imported' ? 2500 : 5000;
+                if (result === 'imported') {
+                    this.audio.preferences = this.store.save.preferences;
+                    // Audio failure must not mislabel an already saved import as a bad file.
+                    try { this.audio.volume(); } catch { }
+                }
             }
             finally { cleanup(); }
         };

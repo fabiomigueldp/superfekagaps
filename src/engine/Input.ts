@@ -89,6 +89,8 @@ export class Input {
       this.lifetime.listen(window, 'keydown', (event) => this.handleKeyDown(event), true);
       this.lifetime.listen(window, 'keyup', (event) => this.handleKeyUp(event), true);
       this.lifetime.listen(window, 'blur', () => this.reset());
+      this.lifetime.listen(window, 'pagehide', () => this.reset());
+      this.lifetime.listen(window, 'orientationchange', () => this.reset());
       this.lifetime.listen(document, 'visibilitychange', () => {
         if (document.hidden) this.reset();
       });
@@ -208,7 +210,7 @@ export class Input {
     const attach = (canvas: HTMLCanvasElement | null): boolean => {
       if (!canvas) return false;
       for (const type of ['touchstart', 'touchmove', 'touchend', 'touchcancel'] as const) {
-        this.lifetime.listen(canvas, type, (event) => this.handleTouch(event, type === 'touchcancel'), { passive: false });
+        this.lifetime.listen(canvas, type, (event) => this.handleTouch(event, type), { passive: false });
       }
       return true;
     };
@@ -222,7 +224,8 @@ export class Input {
     tryAttach();
   }
 
-  private handleTouch(event: TouchEvent, cancelled = false): void {
+  private handleTouch(event: TouchEvent, phase: 'touchstart' | 'touchmove' | 'touchend' | 'touchcancel'): void {
+    const cancelled = phase === 'touchcancel';
     if (this.canvasTouchSuspensions.size) return;
     event.preventDefault();
     const canvas = event.currentTarget as HTMLCanvasElement;
@@ -230,11 +233,20 @@ export class Input {
     if (rect.width <= 0 || rect.height <= 0) return;
     const owners = new Map([...this.touchOwners].filter(([id]) => typeof id === 'symbol'));
     const activeIds = new Set<ActionOwner>(owners.keys());
+    // Only a new touchstart can own a gesture. After reset/suspension, stale
+    // move/end events (including fingers alongside a fresh touch) stay inert.
+    const admitted = new Set(this.activeCanvasTouches);
+    if (phase === 'touchstart') {
+      const started = event.changedTouches ?? event.touches;
+      for (let i = 0; i < started.length; i++) {
+        if (started[i].target === canvas) admitted.add(started[i].identifier ?? i);
+      }
+    }
     // Rebuild from remaining fingers. Real Touch objects always have identifiers;
     // the fallback supports older synthetic event adapters.
     for (let i = 0; i < event.touches.length; i++) {
       const touch = event.touches[i];
-      if (touch.target !== canvas) continue;
+      if (touch.target !== canvas || !admitted.has(touch.identifier ?? i)) continue;
       activeIds.add(touch.identifier ?? i);
       const x = (touch.clientX - rect.left) / rect.width;
       const y = (touch.clientY - rect.top) / rect.height;

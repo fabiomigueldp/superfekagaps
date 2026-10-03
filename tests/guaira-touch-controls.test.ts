@@ -259,3 +259,34 @@ test('dispose removes every owned listener/capture, restores legacy touch and is
     h.down('jump'); h.buttons.jump.dispatch('click', { detail: 0 }); assert.equal(h.step().jumpPressed, false);
     h.canvas.dispatch('touchstart', { touches: [finger(h.canvas, 1)] }); assert.equal(h.step().jumpPressed, true);
 });
+
+test('reset canvas gestures cannot re-arm on stale move/end or another finger starting', t => {
+    const h = fixture(t, 5, false);
+    const old = finger(h.canvas, 10), fresh = finger(h.canvas, 11, .1);
+    h.canvas.dispatch('touchstart', { touches: [old], changedTouches: [old] });
+    assert.equal(h.step().jump, true);
+    h.input.reset();
+    h.canvas.dispatch('touchmove', { touches: [old], changedTouches: [old] });
+    assert.equal(h.step().jumpPressed, false);
+    h.canvas.dispatch('touchstart', { touches: [old, fresh], changedTouches: [fresh] });
+    let state = h.step(); assert.equal(state.left, true); assert.equal(state.jump, false);
+    h.canvas.dispatch('touchend', { touches: [old], changedTouches: [fresh] });
+    state = h.step(); assert.equal(state.left, false); assert.equal(state.jump, false);
+    h.canvas.dispatch('touchend', { touches: [], changedTouches: [old] });
+    h.canvas.dispatch('touchstart', { touches: [old], changedTouches: [old] });
+    assert.equal(h.step().jumpPressed, true, 'a fresh gesture can reuse the identifier');
+});
+
+test('page hide and orientation changes cancel held pointers, keyboard and queued taps', t => {
+    const h = fixture(t);
+    for (const event of ['pagehide', 'orientationchange']) {
+        h.down('jump', 1); h.down('right', 2); h.key('keydown', 'x');
+        h.win.dispatch(event);
+        const state = h.step();
+        assert.equal(state.jump, false); assert.equal(state.jumpPressed, false);
+        assert.equal(state.jumpReleased, false); assert.equal(state.right, false); assert.equal(state.run, false);
+        assert.equal(h.buttons.jump.captures.size, 0); assert.equal(h.buttons.right.captures.size, 0);
+        h.up(1); h.up(2); assert.equal(h.step().jumpReleased, false);
+    }
+    h.down('jump', 3); assert.equal(h.step().jumpPressed, true);
+});

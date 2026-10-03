@@ -37,6 +37,7 @@ export class WorldAudio {
     private readonly sources = new Set<() => void>();
     private readonly musicSources = new Set<() => void>();
     private readonly effectsSources = new Set<() => void>();
+    private readonly voiceSources = new Set<() => void>();
     private readonly samples: WorldSampleAudio;
     get isDisposed(): boolean { return this.disposed; }
     private ctx: AudioContext | null = null;
@@ -99,11 +100,11 @@ export class WorldAudio {
             try { void context.close().catch(() => {}); } catch { /* Closing is best effort. */ }
         }
     }
-    private ownSource(source: AudioScheduledSourceNode, nodes: AudioNode[], bus?: 'music' | 'effects'): void {
+    private ownSource(source: AudioScheduledSourceNode, nodes: AudioNode[], bus?: 'music' | 'effects' | 'voice'): void {
         let live = true;
         const detach = () => {
             if (!live) return;
-            live = false; this.sources.delete(release); this.musicSources.delete(release); this.effectsSources.delete(release); source.onended = null;
+            live = false; this.sources.delete(release); this.musicSources.delete(release); this.effectsSources.delete(release); this.voiceSources.delete(release); source.onended = null;
             for (const node of [source, ...nodes]) {
                 try { node.disconnect(); } catch { /* Already detached by the device. */ }
             }
@@ -115,6 +116,7 @@ export class WorldAudio {
         this.sources.add(release);
         if (bus === 'music') this.musicSources.add(release);
         if (bus === 'effects') this.effectsSources.add(release);
+        if (bus === 'voice') this.voiceSources.add(release);
         source.onended = detach;
     }
     private cancelEffects(): void {
@@ -141,7 +143,9 @@ export class WorldAudio {
     }
     else {
         this.unlock();
-        this.next = this.ctx?.currentTime ?? 0;
+        // AudioContext time freezes during suspension. Keep the scheduled beat
+        // cursor so resumed notes are not overlaid with a second fresh beat.
+        // tick() already catches up if a device interruption advanced its clock.
     } }
     private tone(freq: number, seconds: number, type: OscillatorType, gain: number, bus: GainNode | null, when?: number) {
         if (this.disposed || !this.ctx || !bus || this.ctx.state !== 'running')
@@ -248,11 +252,12 @@ export class WorldAudio {
         env.gain.linearRampToValueAtTime(.22, now + .012);
         env.gain.exponentialRampToValueAtTime(.001, now + .085);
         env.connect(this.voice);
-        this.ownSource(source, [env, ...filters]);
+        this.ownSource(source, [env, ...filters], 'voice');
         source.start(now);
         source.stop(now + .09);
     }
     cancelSpeech() {
+        for (const release of [...this.voiceSources]) release();
         const clip = this.clip; this.clip = null; this.speaking = null;
         if (clip) {
             try { clip.pause(); } catch { /* Device may already be gone. */ }
