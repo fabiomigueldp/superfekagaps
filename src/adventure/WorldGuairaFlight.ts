@@ -1,3 +1,4 @@
+import { paintFlightLandscape, paintFlightAtmosphere } from './WorldFlightScenery';
 import { WorldAudio } from './WorldAudio';
 import { WorldAircraftAudio } from './WorldAircraftAudio';
 import type { Preferences } from './types';
@@ -82,6 +83,7 @@ export function runGuairaFlight(options: GuairaFlightOptions): () => void {
     const paintBackground = (ctx: CanvasRenderingContext2D, camera: MapCamera) => {
         const sea = ctx.createLinearGradient(0, 0, 0, 540); sea.addColorStop(0, '#477f91'); sea.addColorStop(1, '#75aeb1');
         ctx.fillStyle = sea; ctx.fillRect(0, 0, 960, 540);
+        paintFlightLandscape(ctx, camera);
         for (const region of [source, destination]) {
             const base = bases.get(region);
             if (base && region !== 'guaira') {
@@ -103,7 +105,7 @@ export function runGuairaFlight(options: GuairaFlightOptions): () => void {
             const center = reduced ? { x: (route.departureStart.x + route.arrivalStop.x) / 2, y: (route.departureStart.y + route.arrivalStop.y) / 2 }
                 : { x: pose.position.x, y: pose.position.y - .04 };
             const camera: MapCamera = { center, width: 960, height: 540, zoom: reduced ? .52 : 1.22 };
-            paintBackground(ctx, camera); paintAircraftTravel(ctx, camera, pose, assets, elapsed);
+            paintBackground(ctx, camera); paintFlightAtmosphere(ctx, camera, pose); paintAircraftTravel(ctx, camera, pose, assets, elapsed);
         }
         const phases = { boarding: 'Embarcando no aeródromo', 'takeoff-roll': 'Decolando', climb: 'Ganhando altitude', cruise: 'Sobrevoando os canais', approach: 'Aproximação', 'landing-roll': 'Pousando', arrived: 'Chegada confirmada' };
         // A short dissolve belongs to presentation only; the canonical trip clock and arrival stay unchanged.

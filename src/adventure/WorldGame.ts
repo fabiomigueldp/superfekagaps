@@ -1,3 +1,4 @@
+import { JournalAccessibility } from './JournalAccessibility';
 import { campaignJournal } from './CampaignJournal';
 import { CanvasMenuAccessibility } from './CanvasMenuAccessibility';
 import { runGuairaFlight } from './WorldGuairaFlight';
@@ -58,6 +59,7 @@ export class WorldGame {
     private last = 0;
     private buttons: Button[] = [];
     private menuAccessibility?: CanvasMenuAccessibility;
+    private journalAccessibility?: JournalAccessibility;
     private selection = 0;
     private menuSelection = 0;
     private checkpoint = -1;
@@ -106,6 +108,8 @@ export class WorldGame {
             this.tutorial = new WorldTutorial(this.store);
             this.audio = new WorldAudio(this.store.save.preferences);
             if (!ephemeral && typeof document.body?.append === 'function') {
+                this.journalAccessibility = new JournalAccessibility(canvas);
+                this.addCleanup(() => this.journalAccessibility?.dispose());
                 this.menuAccessibility = new CanvasMenuAccessibility(canvas, {
                     select: index => { this.menuSelection = index; },
                     activate: index => { this.audio.unlock(); this.buttons[index]?.run(); },
@@ -190,7 +194,7 @@ export class WorldGame {
         this.render();
         if (!this.isDisposed && this.running) this.frame = requestAnimationFrame(this.loop);
     };
-    private change(screen: Screen) { if (this.isDisposed) return; this.menuAccessibility?.clear(); if (screen !== 'map') this.mapView?.hide(); this.state = screen; this.hitStopInput = null; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; this.experimentalHub?.sync(); }
+    private change(screen: Screen) { if (this.isDisposed) return; this.menuAccessibility?.clear(); this.journalAccessibility?.clear(); if (screen !== 'map') this.mapView?.hide(); this.state = screen; this.hitStopInput = null; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; this.experimentalHub?.sync(); }
     private menuKey(e: KeyboardEvent) {
         if (this.experimentalHub?.isOpen || this.flightCleanup) return;
         const target = e.target;
@@ -727,6 +731,7 @@ export class WorldGame {
     render() {
         if (this.isDisposed) return;
         this.experimentalHub?.sync();
+        this.journalAccessibility?.sync(this.state === 'gallery' && !this.experimentalHub?.isOpen && !this.flightCleanup ? this.galleryWorld : null, this.store.save);
         if (this.state === 'map') {
             this.menuAccessibility?.clear({ restoreFocus: false });
             if (typeof document !== 'undefined' && document.hidden) return;
