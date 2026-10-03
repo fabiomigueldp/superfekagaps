@@ -49,6 +49,7 @@ export function drawJunctionBackground(c: CanvasRenderingContext2D, cx: number, 
         roof(c, hx - 6, hy - 16, 106, 18); r(c, hx + 19, hy + 25, 20, 36, '#796454');
         r(c, hx + 60, hy + 18, 20, 20, '#749a90'); r(c, hx + 69, hy + 18, 2, 20, '#d7b98b');
         for (let row = 0; row < 3; row++) for (let x = 760; x < 960; x += 20) {
+            if (x >= G.exitGapStartX && x < G.exitGapEndX) continue;
             const y = 168 + row * 10;
             line(c, x - cameraX, y - cameraY, x + 17 - cameraX, y - cameraY, '#89a89a', 2);
             line(c, x + 8 - cameraX, y - 6 - cameraY, x + 8 - cameraX, y - cameraY, P.darkGreen);
@@ -72,13 +73,26 @@ export function drawJunctionBackground(c: CanvasRenderingContext2D, cx: number, 
         sign(c, 279 - cameraX, 308 - cameraY, 'A', 18);
         sign(c, 631 - cameraX, 180 - cameraY, 'B', 18);
         sign(c, 42 - cameraX, 264 - cameraY, 'BAIRRO', 47);
-        sign(c, 811 - cameraX, 166 - cameraY, 'ARROZAL', 53);
+        sign(c, 862 - cameraX, 166 - cameraY, 'ARROZAL', 53);
+        // This reward is an authored A-side choice, not a third water outlet.
+        // Hang the clue below its perch: the fixed HUD otherwise covers a sign
+        // above the coins while Feka is deciding from raised A.
+        for (const x of [179, 218]) r(c, x - cameraX, G.maintenanceY + 8 - cameraY, 2, 8, P.wood);
+        r(c, 170 - cameraX, 192 - cameraY, 64, 13, P.pipe);
+        r(c, 171 - cameraX, 193 - cameraY, 62, 11, '#d5b68a');
+        pixelText(c, 'A: MOEDAS', 174 - cameraX, 196 - cameraY, P.ink);
+        sign(c, 517 - cameraX, 214 - cameraY, 'B: SIGA', 52);
         sign(c, 472 - cameraX, 359 - cameraY, '< ENTRADA', 70);
         sign(c, 104 - cameraX, 366 - cameraY, 'DEGRAU', 48);
         // Supporting posts stay behind the open recovery route; no painted ledge.
         for (const [x, top] of [[40,304],[200,304],[404,256],[552,256],[768,208],[920,208]]) {
             r(c, x - cameraX, top + 9 - cameraY, 8, 391 - top, '#a58d74');
             r(c, x + 1 - cameraX, top + 10 - cameraY, 2, 387 - top, '#c0a17a');
+        }
+        // Low rails mark the two real terrace lips without painting over the gap.
+        for (const x of [G.exitGapStartX - 7, G.exitGapEndX + 3]) {
+            r(c, x - cameraX, G.terraceY - 10 - cameraY, 3, 10, P.wood);
+            r(c, x - 1 - cameraX, G.terraceY - 11 - cameraY, 5, 2, P.deck);
         }
     });
 }

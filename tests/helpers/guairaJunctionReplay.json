@@ -1,11 +1,22 @@
 {
-  "note": "Deterministic native Input/Player replay at 60 Hz; DOM boundaries stubbed. Not browser or device QA.",
+  "note": "Deterministic native Input/Player replay at 60 Hz; two sentadas, both lifts and the final terrace hop; no optional coins. DOM boundaries stubbed. Not browser or device QA.",
   "stepMs": 16.666666666666668,
   "frames": 893,
   "runs": [
-    [60, ["ArrowRight"]], [14, ["Space"]], [35, ["ArrowDown"]],
-    [40, ["ArrowRight"]], [150, []], [115, ["ArrowRight"]], [20, []],
-    [14, ["Space"]], [35, ["ArrowDown"]], [65, ["ArrowRight"]],
-    [170, []], [160, ["ArrowRight"]], [15, []]
+    [60, ["ArrowRight"]],
+    [14, ["Space"]],
+    [35, ["ArrowDown"]],
+    [40, ["ArrowRight"]],
+    [150, []],
+    [115, ["ArrowRight"]],
+    [20, []],
+    [14, ["Space"]],
+    [35, ["ArrowDown"]],
+    [65, ["ArrowRight"]],
+    [170, []],
+    [82, ["ArrowRight"]],
+    [24, ["ArrowRight", "Space"]],
+    [54, ["ArrowRight"]],
+    [15, []]
   ]
 }

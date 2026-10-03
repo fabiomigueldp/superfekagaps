@@ -7,6 +7,7 @@ export type WaterOutlet = 'a' | 'b';
 export const GUAIRA_JUNCTION = Object.freeze({
     id: 'guaira-patio-comportas', width: 60, height: 28,
     startY: 304, middleY: 256, terraceY: 208, dockY: 400, recoveryY: 400,
+    maintenanceY: 176, exitGapStartX: 800, exitGapEndX: 848,
     entryPlateId: 'junction-entry-plate', middlePlateId: 'junction-middle-plate',
     liftAId: 'junction-deck-a', liftBId: 'junction-deck-b',
     checkpointX: 432, finishX: 880, warningMs: 400,
@@ -42,7 +43,11 @@ export function guairaJunctionStage(): AdventureStage {
     stage.level.tiles = Array.from({ length: g.height }, (_, y) => Array.from({ length: g.width }, (_, x) => {
         if (y >= 25) return T.GROUND;
         // Open underneath: a missed jump always has a dry route back to the inlet.
-        if (y === 19 && x < 14 || y === 16 && x >= 24 && x < 36 || y === 13 && x >= 46) return T.PLATFORM;
+        if (y === 19 && x < 14 || y === 16 && x >= 24 && x < 36 ||
+            y === 13 && (x >= 46 && x < 50 || x >= 53)) return T.PLATFORM;
+        // Optional maintenance perch: keep A raised, or reverse the middle plate
+        // to return here. It never gates the B route or the checkpoint.
+        if (y === 11 && x >= 11 && x < 14) return T.PLATFORM;
         if (y === 22 && x >= 6 && x < 12) return T.PLATFORM;
         return T.EMPTY;
     }));
@@ -57,7 +62,8 @@ export function guairaJunctionStage(): AdventureStage {
         { id: g.liftAId, kind: 'lift', x: 224, y: g.dockY, width: 160, height: 8, to: { x: 224, y: g.middleY }, gated: true },
         { id: g.liftBId, kind: 'lift', x: 576, y: g.dockY, width: 160, height: 8, to: { x: 576, y: g.terraceY }, gated: true },
     ];
-    stage.foes = []; stage.exits = []; stage.dialogues = []; stage.landmarks = []; stage.pickups = [];
+    stage.foes = []; stage.exits = []; stage.dialogues = []; stage.landmarks = [];
+    stage.pickups = [176, 192, 208].map((x, i) => ({ id: `junction-maintenance-coin-${i + 1}`, kind: 'coin' as const, x, y: 154 }));
     stage.checkpoints = [{ x: 27, y: 16 }];
     stage.route = [{ x: 48, y: g.startY }, { x: 176, y: g.startY, switch: g.entryPlateId },
         { x: g.checkpointX, y: g.middleY }, { x: 496, y: g.middleY, switch: g.middlePlateId },

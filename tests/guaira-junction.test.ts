@@ -8,6 +8,7 @@ import { GuairaJunction, GUAIRA_JUNCTION as G, guairaJunctionStage } from '../sr
 import { JunctionRouting } from '../src/adventure/experimental/guaira/junction/GuairaJunctionModel';
 import { guairaJunctionBrowser } from './helpers/guairaJunctionHarness';
 import recording from './helpers/guairaJunctionReplay.json';
+import optionalRecording from './helpers/guairaJunctionOptionalReplay.json';
 
 const feet = (g: GuairaJunction) => g.player.data.position.y + g.player.data.height;
 const snapshot = (g: GuairaJunction) => structuredClone({ player: g.player.data, objects: g.objects, routing: g.routing,
@@ -43,6 +44,11 @@ function middlePlate(h: Harness, g: GuairaJunction) {
     h.run(g, 26, ['ArrowRight']); h.run(g, 20);
 }
 function pound(h: Harness, g: GuairaJunction) { h.run(g, 14, ['Space']); h.run(g, 35, ['ArrowDown']); }
+function crossExit(h: Harness, g: GuairaJunction) {
+    for (let n = 0; n < 200 && g.player.data.position.x < 782; n++) h.run(g, 1, ['ArrowRight']);
+    assert.equal(feet(g), G.terraceY); assert.equal(g.player.data.isGrounded, true);
+    h.run(g, 24, ['ArrowRight', 'Space']); h.run(g, 80, ['ArrowRight']);
+}
 
 test('isolated authored junction uses native objects/player/input and never reads storage or expands campaign', t => {
     const before = structuredClone(STAGES), worlds = structuredClone(ISLANDS), h = guairaJunctionBrowser(t), g = h.create();
@@ -122,14 +128,17 @@ test('the checkpoint plate can reverse A/B repeatedly and the next B crossing st
         assert.equal(g.objects.get(G.entryPlateId)!.active, g.objects.get(G.middlePlateId)!.active);
         assert.equal(g.player.data.isDead, false); assert.equal(feet(g), G.middleY);
     }
-    h.run(g, 25, ['ArrowRight']); h.run(g, 40, ['ArrowRight', 'Space']); h.run(g, 160, ['ArrowRight']);
+    h.run(g, 25, ['ArrowRight']); h.run(g, 40, ['ArrowRight', 'Space']); crossExit(h, g);
     assert.equal(g.finished, true);
 });
 
 test('a skilled jump off rising B finishes on arrival without waiting for the empty decks to settle', t => {
     const h = guairaJunctionBrowser(t), g = h.create(); replay(h, g, true); g.returnToSafePoint();
     middlePlate(h, g); pound(h, g); h.run(g, 111, ['ArrowRight']);
-    h.run(g, 40, ['ArrowRight', 'ShiftLeft', 'Space']);
+    // Brake on the firm landing bay, release jump, then take the short final hop.
+    h.run(g, 24, ['ArrowRight', 'ShiftLeft', 'Space']); h.run(g, 6);
+    assert.equal(g.player.data.isGrounded, true); assert.equal(feet(g), G.terraceY);
+    h.run(g, 24, ['ArrowRight', 'ShiftLeft', 'Space']);
     for (let i = 0; i < 100 && !g.finished; i++) {
         h.run(g, 1, ['ArrowRight', 'ShiftLeft']);
         if (g.player.data.isGrounded && feet(g) === G.terraceY && g.player.data.position.x >= G.finishX)
@@ -204,4 +213,84 @@ test('touch cancellation releases movement and sentada; safe return resets stale
     h.canvas.dispatch('touchcancel', { touches: [], changedTouches: [{ identifier: 1 }, { identifier: 2 }] }); g.update(recording.stepMs);
     assert.equal(g.input.getState().right, false); assert.equal(g.input.getState().jump, false);
     g.returnToSafePoint(); h.run(g, 2); assert.equal(g.player.data.position.x, 48); assert.equal(g.routing.selected, 'b');
+});
+
+for (const touch of [false, true]) test(`${touch ? 'touch' : 'keyboard'} can reverse to A, collect the optional shelf and still finish with B`, t => {
+    const h = guairaJunctionBrowser(t, { touch, reducedMotion: touch }), g = h.create();
+    let frame = 0, shelfFrames = 0, minimumHeadroom = Infinity;
+    const requested: string[] = [];
+    for (const [count, keys] of optionalRecording.runs as Array<[number, string[]]>) {
+        h.keys(keys);
+        for (let n = 0; n < count; n++) {
+            const before = g.routing.selected;
+            g.update(optionalRecording.stepMs); frame++;
+            assert.equal(g.player.data.isDead, false); assert.equal(g.player.data.hasHelmet, true);
+            if (before !== g.routing.selected) requested.push(g.routing.selected);
+            if (frame >= 1118 && frame <= 1202) {
+                minimumHeadroom = Math.min(minimumHeadroom, g.player.data.position.y - Math.round(g.camera.y) - 4);
+                if (g.player.data.isGrounded && feet(g) === G.maintenanceY) shelfFrames++;
+            }
+            if (frame === 1202) {
+                assert.equal(g.coins, 3); assert.equal(feet(g), G.maintenanceY);
+                const standing = structuredClone(g.player.data.position);
+                h.run(g, 1200);
+                assert.deepEqual(g.player.data.position, standing, 'twenty seconds of supported waiting has no penalty');
+                assert.equal(g.routing.supplied, 'a'); assert.equal(g.coins, 3);
+            }
+        }
+    }
+    assert.equal(frame, optionalRecording.frames); assert.deepEqual(requested, ['a', 'b', 'a', 'b']);
+    assert.ok(shelfFrames > 50); assert.ok(minimumHeadroom >= 23, `helmet remains below the HUD: ${minimumHeadroom}`);
+    assert.equal(g.finished, true); assert.equal(g.coins, 3); assert.equal(g.routing.supplied, 'b');
+    assert.equal(g.mapReturnHref, './guaira.html?at=rice&visit=junction-clear');
+    assert.deepEqual(g.store.save.completed, []); assert.equal(h.storageCalls.length, 0);
+});
+
+test('missing the last hop keeps the optional coins and recovers by walking the dry floor to the inlet', t => {
+    const h = guairaJunctionBrowser(t), g = h.create();
+    for (const [count, keys] of optionalRecording.runs.slice(0, -4) as Array<[number, string[]]>) h.run(g, count, keys);
+    h.run(g, 160, ['ArrowRight']); h.run(g, 30);
+    assert.equal(g.finished, false); assert.equal(feet(g), G.recoveryY); assert.equal(g.coins, 3);
+    assert.equal(g.store.save.checkpoint?.index, 0);
+    for (let n = 0; n < 480 && g.player.data.position.x > 150; n++) h.run(g, 1, ['ArrowLeft']);
+    h.run(g, 20); h.run(g, 50, ['Space']); h.run(g, 20);
+    assert.equal(feet(g), G.startY); assert.equal(g.coins, 3); assert.equal(g.player.data.hasHelmet, true);
+});
+
+test('native death and safe return retain the optional coin ledger once; explicit retry clears it', t => {
+    const h = guairaJunctionBrowser(t), g = h.create();
+    // The first nineteen runs reach the shelf and stop safely with all coins.
+    for (const [count, keys] of optionalRecording.runs.slice(0, 19) as Array<[number, string[]]>) h.run(g, count, keys);
+    assert.equal(g.coins, 3); assert.equal(feet(g), G.maintenanceY);
+    const oldPlayer = g.player; g.player.die('fall');
+    for (let n = 0; n < 180 && g.player === oldPlayer; n++) h.run(g, 1);
+    assert.notEqual(g.player, oldPlayer); assert.equal(g.player.data.position.x, G.checkpointX);
+    assert.equal(g.coins, 3); assert.equal(g.routing.supplied, 'a');
+    const ledger = () => [...(g as unknown as { collected: Set<string> }).collected].sort();
+    const earned = ledger(); assert.equal(earned.length, 3);
+    g.returnToSafePoint(); assert.equal(g.coins, 3); assert.deepEqual(ledger(), earned);
+    // Walk from the native checkpoint back onto the same shelf, using no scene edits.
+    h.run(g, 95, ['ArrowLeft']); h.run(g, 20); h.run(g, 14, ['ArrowLeft', 'Space']); h.run(g, 40);
+    h.run(g, 10, ['ArrowLeft']); h.run(g, 20);
+    assert.equal(feet(g), G.maintenanceY); assert.equal(g.coins, 3); assert.deepEqual(ledger(), earned);
+    g.load(G.id); assert.equal(g.coins, 0); assert.deepEqual(ledger(), []); assert.equal(g.store.save.checkpoint, null);
+});
+
+for (const touch of [false, true]) test(`${touch ? 'touch' : 'keyboard'} immediate shelf re-jumps and airborne reversals keep the helmet below the fixed HUD`, t => {
+    const h = guairaJunctionBrowser(t, { touch }), g = h.create();
+    for (const direction of ['', 'ArrowLeft', 'ArrowRight']) {
+        h.keys([]); g.load(G.id); let frame = 0;
+        for (const [count, keys] of optionalRecording.runs as Array<[number, string[]]>) {
+            h.keys(keys);
+            for (let n = 0; n < count && frame < 1143; n++) { g.update(recording.stepMs); frame++; }
+            if (frame === 1143) break;
+        }
+        assert.equal(feet(g), G.maintenanceY); assert.equal(g.player.data.isGrounded, true);
+        for (let n = 0; n < 45; n++) {
+            const steer = n < 10 ? direction : direction === 'ArrowLeft' ? 'ArrowRight' : direction === 'ArrowRight' ? 'ArrowLeft' : '';
+            h.run(g, 1, ['Space', ...(steer ? [steer] : [])]);
+            assert.ok(g.player.data.position.y - Math.round(g.camera.y) - 4 >= 23, `visible helmet at re-jump frame ${n}`);
+            assert.equal(g.player.data.isDead, false); assert.equal(g.player.data.hasHelmet, true);
+        }
+    }
 });
