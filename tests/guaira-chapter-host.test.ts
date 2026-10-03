@@ -1,3 +1,4 @@
+import { ProgressStore, canContinueFromGuaira } from '../src/adventure/progress';
 import assert from 'node:assert/strict';
 import { setImmediate as nextTurn } from 'node:timers/promises';
 import type { WorldGame } from '../src/adventure/WorldGame';
@@ -271,7 +272,7 @@ test('actual entrypoint pagehide/bfcache remount and reload reset the session an
     }
     const source = readFileSync(new URL('../src/guaira-capitulo.ts', import.meta.url), 'utf8');
     const compiled = transpileModule(source, { compilerOptions: { module: ModuleKind.CommonJS, target: ScriptTarget.ES2022 } }).outputText;
-    const entry = () => new Function('require', 'exports', compiled)(() => ({ GuairaChapterApp: InjectedHost }), {});
+    const entry = () => new Function('require', 'exports', compiled)((id: string) => id.endsWith('/progress') ? { ProgressStore, canContinueFromGuaira } : ({ GuairaChapterApp: InjectedHost }), {});
     entry(); const first = h.apps.at(-1)!; h.enter(); await flush();
     const native = (first as unknown as { mounted: { runtime: GuairaChapterRuntime } }).mounted.runtime;
     native.sample = attempt => ({ attempt, alive: true, state: 'playing', result: { sceneId: 'guaira-travessia', kind: 'reached-finish' } });
@@ -814,4 +815,37 @@ test('required muted preference survives an unadopted reentrant factory', async 
     assert.equal(app.mode, 'game'); assert.equal(app.activeGame!.stage.id, 'guaira-travessia');
     assert.equal(app.activeGame!.audio.enabled, false);
     app.dispose(); h.checkDisposed();
+});
+
+test('durable chapter awards live completion before navigation, survives reload, and preserves rewards on restart', async t => {
+    const h = hostBrowser(t), factory = await loadGuairaChapterScene('guaira-travessia');
+    let raw: string | null = null;
+    const storage = { getItem: () => raw, setItem: (_key: string, value: string) => { raw = value; } };
+    const make = () => h.create({ progressStore: new ProgressStore(storage), loadScene: async () => factory });
+    const first = make(); h.enter(); await flush();
+    const runtime = (first as unknown as { mounted: { runtime: GuairaChapterRuntime } }).mounted.runtime;
+    runtime.sample = attempt => ({ attempt, alive: true, state: 'playing', result: { sceneId: 'guaira-travessia', kind: 'reached-finish' } });
+    first.activeGame!.audio.enabled = false; h.frame();
+    assert.deepEqual(new ProgressStore(storage).save.guaira.completed, ['guaira-travessia'], 'No Continue or map click required');
+    assert.equal(new ProgressStore(storage).save.guaira.audioEnabled, false);
+    const oldAttempt = first.snapshot.activeAttempt; first.dispose();
+    const restored = make(); assert.equal(restored.mode, 'map'); assert.equal(restored.snapshot.accepted.length, 1);
+    assert.equal(restored.snapshot.activeAttempt, null); assert.notEqual(restored.snapshot.generation.sessionId, oldAttempt?.sessionId);
+    const map = h.currentMap(); map.options.onRestart(map.snapshot.generation, map.navigation.revision);
+    assert.equal(restored.snapshot.accepted.length, 1); assert.equal(new ProgressStore(storage).save.guaira.completed.length, 1);
+    restored.dispose(); h.checkDisposed();
+});
+
+test('interrupted persisted chapter restarts the selected native scene without restoring tokens or runtime position', async t => {
+    const h = hostBrowser(t), factory = await loadGuairaChapterScene('guaira-travessia');
+    let raw: string | null = null;
+    const storage = { getItem: () => raw, setItem: (_key: string, value: string) => { raw = value; } };
+    const make = () => h.create({ progressStore: new ProgressStore(storage), loadScene: async () => factory });
+    const first = make(); h.enter(); await flush();
+    const startX = first.activeGame!.player.data.position.x, oldAttempt = first.snapshot.activeAttempt!;
+    first.activeGame!.player.data.position.x += 200; first.dispose();
+    const restored = make(); await flush();
+    assert.equal(restored.mode, 'game'); assert.equal(restored.activeGame!.player.data.position.x, startX);
+    assert.equal(restored.snapshot.accepted.length, 0); assert.notEqual(restored.snapshot.activeAttempt!.sessionId, oldAttempt.sessionId);
+    restored.dispose(); h.checkDisposed();
 });

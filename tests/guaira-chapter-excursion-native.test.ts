@@ -85,7 +85,7 @@ for (const [opening, touch] of [['guaira-travessia', false], ['guaira-patio-comp
         assert.equal(relief.isDisposed, true);
         assert.equal(gallery.isDisposed, true); assert.equal(app.mode, 'map');
         assert.deepEqual(app.snapshot, retained);
-        assert.ok(h.all().some(node => node.className === 'chapter-map-count' && node.textContent === '1/5 · nesta sessão'));
+        assert.ok(h.all().some(node => node.className === 'chapter-map-count' && node.textContent === '1/5 · concluídos'));
         assert.equal(h.button('Entrar na Galeria dos Remendos, percurso opcional').disabled, false, 'return is physically Bairro');
         h.button(`Retomar ${CHAPTER_SCENES[opening].title}, trecho selecionado da jornada`).click();
         arrive(h);
@@ -99,7 +99,7 @@ for (const [opening, touch] of [['guaira-travessia', false], ['guaira-patio-comp
             const game: WorldGame = activeGame()!; assert.ok(game); assert.equal(game.stage.id, scene);
             const count: number = app.snapshot.accepted.length;
             h.play(game, chapterRecording(recordings[scene]), touch); h.frames();
-            assert.equal(app.snapshot.accepted.length, count, 'native success is accepted only on explicit Continue');
+            assert.equal(app.snapshot.accepted.length, count + 1, 'native success is persisted before Continue');
             h.byId('chapter-primary').click(); await mapReady(h);
             assert.equal(game.isDisposed, true); assert.equal(app.snapshot.accepted.length, count + 1);
         }
@@ -122,7 +122,7 @@ for (const [opening, touch] of [['guaira-travessia', false], ['guaira-patio-comp
         h.byId('chapter-map-return').click(); await mapReady(h);
         assert.equal(finalRelief.isDisposed, true); assert.deepEqual(app.snapshot, completed);
         completed.accepted.forEach((receipt, index) => assert.equal(app.snapshot.accepted[index], receipt));
-        assert.ok(h.all().some(node => node.className === 'chapter-map-count' && node.textContent === '5/5 · nesta sessão'));
+        assert.ok(h.all().some(node => node.className === 'chapter-map-count' && node.textContent === '5/5 · concluídos'));
         h.button('Entrar na Galeria dos Remendos, percurso opcional').click(); await flushChapter();
         assert.ok(activeGame() instanceof GuairaGallery, 'Later map entry starts a fresh Gallery even after Relief completion');
         assert.equal((activeGame() as GuairaGallery).finished, false);

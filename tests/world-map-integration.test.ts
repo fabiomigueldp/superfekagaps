@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test, { type TestContext } from 'node:test';
 import { STAGES } from '../src/adventure/campaign';
-import { freshSave, ProgressStore, SAVE_KEY } from '../src/adventure/progress';
+import { freshSave as freshCampaignSave, ProgressStore, SAVE_KEY } from '../src/adventure/progress';
 import { WorldGame } from '../src/adventure/WorldGame';
 import { COSTA_ART_BOUNDS, FALLBACK_POINTS, fallbackMapMetadata, parseMapMetadata, paintMapActor } from '../src/adventure/WorldMapArt';
 import { WorldMapView } from '../src/adventure/WorldMapView';
@@ -11,6 +11,10 @@ import { mapToScreen, type MapPoint } from '../src/adventure/WorldMapModel';
 import { atlasIslandBounds, WORLD_ATLAS_PLACEMENTS } from '../src/adventure/WorldAtlasModel';
 import { atlasActorBounds, atlasActorScale, atlasBoatBounds } from '../src/adventure/WorldAtlasArt';
 import { Input } from '../src/engine/Input';
+
+// This matrix verifies already-earned six-region transport. Guaíra's new gate is
+// covered separately in guaira-campaign-progression.test.ts.
+const freshSave = () => ({ ...freshCampaignSave(), legacySerraAccess: true });
 
 type Listener = (event: any) => void;
 /** Browser-order capture and bubbling, without device, network, timer or layout dependencies. */

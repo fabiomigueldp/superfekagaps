@@ -1,3 +1,4 @@
+import { guairaChapterRoute } from '../src/adventure/experimental/guaira/chapter/GuairaChapterProgress';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { STAGES } from '../src/adventure/campaign';
@@ -258,6 +259,7 @@ test('existing 30 stage IDs, 72 seals and progression remain authoritative witho
         assert.equal(enterJourney(state, cap).entered, stage.id);
         assert.equal(JSON.stringify(save), before);
         finishStage(save, stage.id, 'normal', 10);
+        if (stage.id === '3-5') save.guaira.completed = guairaChapterRoute(save.guaira.opening);
     }
     assert.equal(save.completed.length, 30);
 });

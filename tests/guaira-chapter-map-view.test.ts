@@ -130,7 +130,7 @@ test('opening and entry use captured generations; repeated/stale controls cannot
     }, onOpening: opening => openings.push(opening) }));
     await flush(); h.tick();
     assert.equal(view.canEnter(chapterTarget('guaira-travessia'), session.snapshot().generation, 0), true);
-    assert.equal(h.byClass('chapter-map-count').textContent, '0/5 · nesta sessão');
+    assert.equal(h.byClass('chapter-map-count').textContent, '0/5 · concluídos');
     const alternative = h.button('Pátio das Comportas: usar como abertura alternativa');
     const oldOpening = alternative.onclick!; alternative.click(); assert.deepEqual(openings, ['guaira-patio-comportas']);
     const primary = h.button('Entrar: Travessia da Vala Seca'), oldPrimary = primary.onclick!;
@@ -264,7 +264,7 @@ test('completed chapter reports only accepted results and requires explicit new 
     const view = h.create(configuration(complete, { arrival: 'vazao', openingAvailable: false, onEnter: () => { entries++; } }));
     await flush(); h.tick();
     assert.equal(h.byClass('chapter-map-title').textContent, 'CAPÍTULO CONCLUÍDO');
-    assert.equal(h.byClass('chapter-map-count').textContent, '5/5 · nesta sessão');
+    assert.equal(h.byClass('chapter-map-count').textContent, '5/5 · concluídos');
     assert.match(h.byClass('chapter-map-hint').textContent, /A água voltou\. Os gaps continuam\./);
     assert.equal(entries, 0); h.button('Repetir o Prefeito em uma nova tentativa').click(); assert.equal(entries, 1);
     assert.deepEqual(session.snapshot().accepted, complete.accepted); view.dispose();
@@ -308,7 +308,7 @@ test('optional Bairro stays outside five journey rows, walks to guaira-2, and re
         h.tick(15); assert.ok(road(view).distance > 0 && road(view).distance < road(view).targetDistance);
         assert.equal(h.byClass('chapter-map-title').textContent, 'Galeria dos Remendos');
         assert.equal(h.byClass('chapter-map-openings').hidden, true, 'Optional destination hides opening choices without locking the retained opening');
-        assert.equal(h.byClass('chapter-map-count').textContent, '0/5 · nesta sessão');
+        assert.equal(h.byClass('chapter-map-count').textContent, '0/5 · concluídos');
         assert.equal(view.canEnter(optionalTarget, before.generation, revision), false);
         oldPrimary(); assert.deepEqual(entries, [], 'Old required callback cannot enter after an optional selection');
         const skip = h.button('Chegar agora, pulando a caminhada'); skip.focus(); skip.click(); h.tick();
@@ -366,7 +366,7 @@ test('same-state navigation revision retires every retained map action without c
     const oldExit = h.button('Sair do capítulo e voltar à seleção de experimentos').onclick!;
     const oldOpening = h.button('Pátio das Comportas: usar como abertura alternativa').onclick!;
     h.button('Ver a jornada de Guaíra').click();
-    const oldRestart = h.button('Reiniciar o capítulo e descartar as conclusões desta sessão').onclick!;
+    const oldRestart = h.button('Voltar à abertura sem apagar trechos concluídos').onclick!;
     const oldOptional = h.button(OPTIONAL_LABEL).onclick!;
     assert.equal(h.button(OPTIONAL_LABEL).getAttribute('aria-pressed'), 'true');
     assert.ok(h.byClass('chapter-map-list').children.every(item => item.children[0].getAttribute('aria-pressed') === 'false'));
@@ -403,7 +403,7 @@ test('RETOMAR restores the exact retained replay, clears hidden-control focus sa
     oldGallery(); assert.deepEqual(entries, []);
     assert.equal(h.doc.activeElement, h.button('Repetir Travessia da Vala Seca em uma nova tentativa'));
     assert.equal(view.canEnter(chapterTarget('guaira-travessia'), before.generation, revision), true);
-    assert.deepEqual(session.snapshot(), before); assert.equal(h.byClass('chapter-map-count').textContent, '1/5 · nesta sessão');
+    assert.deepEqual(session.snapshot(), before); assert.equal(h.byClass('chapter-map-count').textContent, '1/5 · concluídos');
     h.button('Repetir Travessia da Vala Seca em uma nova tentativa').click();
     assert.deepEqual(entries, [chapterTarget('guaira-travessia')]);
 });
@@ -465,7 +465,7 @@ test('optional target title takes precedence at 5/5 and a natural arrival repair
     assert.equal(road(view).arrival, 'bairro'); assert.equal(skip.hidden, true);
     assert.equal(h.doc.activeElement, h.button(GALLERY_LABEL));
     assert.equal(h.byClass('chapter-map-title').textContent, 'Galeria dos Remendos');
-    assert.equal(h.byClass('chapter-map-count').textContent, '5/5 · nesta sessão');
+    assert.equal(h.byClass('chapter-map-count').textContent, '5/5 · concluídos');
     assert.match(h.byClass('chapter-map-hint').textContent, /A água voltou\. Os gaps continuam\./);
     assert.equal(entries, 0); assert.deepEqual(session.snapshot(), before);
     h.button('Ver a jornada de Guaíra').click(); assert.equal(h.byClass('chapter-map-list').children.length, 5);
@@ -524,7 +524,7 @@ test('blur during the journey rejects row/restart/close callbacks and focus cann
     await flush(); h.tick(9); h.button('Ver a jornada de Guaíra').click();
     const distance = road(view).distance;
     const retained = [h.button(OPTIONAL_LABEL).onclick!, h.byClass('chapter-map-list').children[0].children[0].onclick!,
-        h.button('Reiniciar o capítulo e descartar as conclusões desta sessão').onclick!, h.button('Fechar a jornada e voltar à maquete').onclick!];
+        h.button('Voltar à abertura sem apagar trechos concluídos').onclick!, h.button('Fechar a jornada e voltar à maquete').onclick!];
     h.blur(); retained.forEach(action => action()); h.reduced(true); h.hidden(true); h.hidden(false);
     dispatch(h.byClass('chapter-map-dialog'), 'cancel'); dispatch(h.byClass('guaira-chapter-map'), 'keydown', { key: 'Escape' });
     assert.equal(h.byClass('chapter-map-dialog').open, true); assert.equal(road(view).distance, distance); assert.equal(h.frames.size, 0);
@@ -569,8 +569,8 @@ test('accepted Bairro water uses one existing clock without irrigation, preserve
     const view = h.create(configuration(session.snapshot(), { arrival: 'bairro', navigation: { target: optionalTarget, revision: 1 } }));
     await flush(); h.tick(2);
     assert.equal(h.byClass('chapter-map-title').textContent, 'Galeria dos Remendos');
-    assert.equal(h.byClass('chapter-map-count').textContent, '5/5 · nesta sessão');
-    assert.equal(h.byClass('chapter-map-hint').textContent, 'A água voltou. Os gaps continuam. · 5/5 nesta sessão');
+    assert.equal(h.byClass('chapter-map-count').textContent, '5/5 · concluídos');
+    assert.equal(h.byClass('chapter-map-hint').textContent, 'A água voltou. Os gaps continuam. · 5/5 concluídos · Progresso somente nesta sessão.');
     assert.match(h.byClass('chapter-map-canvas').getAttribute('aria-label')!, /Bica do Bairro com água nesta sessão\./);
     assert.equal(h.button(GALLERY_LABEL).disabled, false); assert.equal(h.frames.size, 1);
     const internals = view as unknown as { water: { released: boolean; draw: (...args: unknown[]) => void }; waterClock: { seconds: number } };
@@ -607,7 +607,7 @@ test('new or disposed sessions have no water text, and late old wet decode canno
     h.images[1].decoded.resolve(); await flush(); h.tick();
     const draws = h.draws(); h.images[0].decoded.resolve(); await flush(); h.tick(30);
     assert.equal(h.draws(), draws); assert.equal(h.frames.size, 0);
-    assert.equal(h.byClass('chapter-map-count').textContent, '0/5 · nesta sessão');
+    assert.equal(h.byClass('chapter-map-count').textContent, '0/5 · concluídos');
     assert.doesNotMatch(h.byClass('chapter-map-hint').textContent, /água voltou/);
     assert.doesNotMatch(h.byClass('chapter-map-canvas').getAttribute('aria-label')!, /Bica do Bairro/);
     assert.equal(h.button(GALLERY_LABEL).disabled, false);

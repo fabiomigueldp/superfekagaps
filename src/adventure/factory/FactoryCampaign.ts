@@ -92,7 +92,11 @@ export class FactoryCampaign extends WorldGame {
         this.campaignCanvas.focus({ preventScroll: true });
     }
     override update(dt: number): void {
-        if (this.salon) { this.salon.update(dt); this.reflect?.(); return; }
+        if (this.salon) {
+            this.salon.update(dt);
+            if (this.salon.victorious && recordSalonVictory(this.store.save)) this.store.persist();
+            this.reflect?.(); return;
+        }
         super.update(dt);
         // Keep the 112px annex below the HUD on this landing. Preserve upward
         // tracking for the secret route; ordinary tracking resumes off the support.

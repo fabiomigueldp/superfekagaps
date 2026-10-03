@@ -1,3 +1,5 @@
+import { showGuairaRegion } from './WorldGuairaRegion';
+import { campaignArtBounds, campaignArtOverlay, loadCampaignRegionImage, type GuairaCampaignRegion } from './GuairaCampaignArt';
 import { STAGES } from './campaign';
 import { isUnlocked } from './progress';
 import type { AdventureSave } from './types';
@@ -23,7 +25,7 @@ import { DOMINIO_FERRY, parseDominioJourney, matchesDominioAssetSize, type Domin
 import { MARITIME_BUOY_SPRITES, parseMaritimeBuoys, type MaritimeBuoyKind, type MaritimeBuoyMetadata } from './WorldMaritimeArt';
 export { journeyPathSegment } from './WorldFerryModel';
 
-interface MapCallbacks { select(index: number): void; enter(): void; exit(): void; unlockAudio(): void; arrive?(index: number): void }
+interface MapCallbacks { guaira?(from: 'factory' | 'serra'): void; select(index: number): void; enter(): void; exit(): void; unlockAudio(): void; arrive?(index: number): void }
 interface CachedMapArt { assets: MapArtAssets; metadata: MapArtMetadata; status: 'loading' | 'ready' | 'failed' }
 interface CableLineView {
     definition: CablePairDefinition;
@@ -237,8 +239,20 @@ export class WorldMapView {
     private compactOverviewKey = '';
     private compactOverviewPositions: MapControlPlacement[] | null = null;
 
+    private readonly campaignImages = new Map<GuairaCampaignRegion, HTMLImageElement>();
+    private guairaDialog?: () => void;
+    private readonly guairaButton = document.createElement('button');
+    openGuairaRegion(): void { this.showGuaira(); }
+    private showGuaira(): void {
+        if (!this.save || !this.journey || this.journey.destination) return;
+        this.guairaDialog?.();
+        this.guairaDialog = showGuairaRegion(this.save, this.journey.arrived, {
+            fly: from => this.callbacks.guaira?.(from), goToFactory: () => this.select(14),
+        });
+    }
     constructor(private readonly gameCanvas: HTMLCanvasElement, private readonly callbacks: MapCallbacks) {
         this.hud = new WorldMapHud({
+            selectGuaira: callbacks.guaira ? () => this.act(() => this.showGuaira()) : undefined,
             selectStage: index => this.act(() => this.select(index)),
             selectWorld: world => this.act(() => {
                 const selection = this.journey && !this.journey.destination && world === worldOf(this.journey.arrived)
@@ -269,6 +283,14 @@ export class WorldMapView {
         this.ctx = this.canvas.getContext('2d', { alpha: false })!;
         this.root.addEventListener('keydown', this.onKey);
         document.body.append(this.root);
+        this.guairaButton.className = 'world-map-guaira'; this.guairaButton.textContent = 'Guaíra · aeródromo';
+        this.guairaButton.addEventListener('click', () => this.act(() => this.showGuaira()));
+        this.scene.append(this.guairaButton);
+        if (callbacks.guaira) {
+            for (const region of ['fabrica', 'guaira', 'serra'] as const) void loadCampaignRegionImage(region).then(image => {
+                if (!this.disposed && image) { this.campaignImages.set(region, image); this.paintDirty = true; }
+            });
+        } else this.guairaButton.hidden = true;
         this.resizeObserver = new ResizeObserver(this.onResize);
         for (const surface of [this.scene, this.hud.header, this.hud.tools, this.hud.footer]) this.resizeObserver.observe(surface);
         window.addEventListener('resize', this.onResize); this.media.addEventListener('change', this.onMotion);
@@ -600,6 +622,7 @@ export class WorldMapView {
         if (this.disposed) return;
         this.hide(); this.disposed = true; this.abort.abort(); this.resizeObserver.disconnect();
         window.removeEventListener('resize', this.onResize); this.media.removeEventListener('change', this.onMotion);
+        this.guairaDialog?.();
         this.root.removeEventListener('keydown', this.onKey); this.hud.dispose();
     }
     private rebuildNetwork(): void {
@@ -659,12 +682,13 @@ export class WorldMapView {
     }
     private refreshHud(warning = '', toast = ''): void {
         if (!this.save || !this.journey) return;
+        this.guairaButton.disabled = !!this.journey.destination;
         const stage = STAGES[this.controlSelection], world = stage.world;
         this.hud.update({ world, stage: this.controlSelection, arrivedWorld: worldOf(this.journey.arrived), arrivedStage: this.journey.arrived,
             open: Array.from({ length: 5 }, (_, n) => isUnlocked(`${world}-${n + 1}`, this.save!)),
             completed: Array.from({ length: 5 }, (_, n) => this.save!.completed.includes(`${world}-${n + 1}`)),
             seals: Array.from({ length: 5 }, (_, n) => this.save!.seals.filter(id => id.startsWith(`${world}-${n + 1}:`)).length),
-            globalProgress: { completed: this.save.completed.length, seals: this.save.seals.length },
+            globalProgress: { completed: this.save.completed.length, guaira: this.save.guaira.completed.length, seals: this.save.seals.length },
             motionState: this.motionState(), canEnter: canEnterJourney(this.journey, this.capabilities),
             prerequisiteStage: this.journey.blocked === 'unavailable' ? mapStagePrerequisite(stage.id, this.save) : null,
             hint: this.journey.blocked === 'no-route' && this.crossingLoading(worldOf(this.journey.arrived), world)
@@ -672,7 +696,7 @@ export class WorldMapView {
                     : world === 4 ? 'Preparando a passagem da Serra… Você pode escolher outra fase ou voltar ao menu.'
                     : world === 3 ? 'Preparando a ponte de carga… Você pode escolher outra fase ou voltar ao menu.'
                     : 'Preparando o barco e os cais… Você pode escolher outra fase ou voltar ao menu.'
-                : journeyBlockReason(this.journey) || (this.save.secrets.includes(`${world}-3`) ? 'Atalho 3 → 5 descoberto!' : ''),
+                : this.journey.blocked === 'no-route' && ((world <= 3) !== (worldOf(this.journey.arrived) <= 3)) ? 'A passagem entre Fábrica e Serra é por Guaíra. Abra Guaíra · aeródromo para embarcar.' : journeyBlockReason(this.journey) || (this.save.secrets.includes(`${world}-3`) ? 'Atalho 3 → 5 descoberto!' : ''),
             warnings: [toast || warning, this.assetWarning], worldAvailability: Array.from({ length: 6 }, (_, n) => isUnlocked(`${n + 1}-1`, this.save!)),
             preview: !!this.journey.blocked, overview: this.overview,
         });
@@ -832,6 +856,7 @@ export class WorldMapView {
         const cablePaths = this.passengerActive && this.passengerCable ? this.passengerCable.cablePolylines : [];
         const connectionBounds = [overlay, serraOverlay, ...passengerLayers, ...dominioLayers].flatMap(layer => layer ? [{ left: layer.left, top: layer.top,
             right: layer.left + layer.widthInMap, bottom: layer.top + layer.heightInMap }] : []);
+        for (const region of this.campaignImages.keys()) connectionBounds.push(campaignArtBounds(region));
         const cablePoints = cablePaths.flat();
         if (cablePoints.length) connectionBounds.push({ left: Math.min(...cablePoints.map(p => p.x)), right: Math.max(...cablePoints.map(p => p.x)),
             top: Math.min(...cablePoints.map(p => p.y)), bottom: Math.max(...cablePoints.map(p => p.y)) });
@@ -857,7 +882,7 @@ export class WorldMapView {
                 const image = this.buoyImages.get(instance.sprite);
                 return ready && image ? [{ point: instance.point, sprite: this.buoyMetadata!.sprites[instance.sprite], image }] : [];
             }),
-            connections: [...(overlay ? [{ ...overlay, image: this.bridgeImages.get(bridgeState)! }] : []),
+            connections: [...Array.from(this.campaignImages, ([region, image]) => ({ ...campaignArtOverlay(region, image), image })), ...(overlay ? [{ ...overlay, image: this.bridgeImages.get(bridgeState)! }] : []),
                 ...(serraOverlay ? [{ ...serraOverlay, image: this.factorySerraImages.get(serraState)! }] : []),
                 ...passengerLayers.map(layer => ({ ...layer, image: this.passengerOverlays.get(layer.path)! })),
                 ...dominioLayers.map(layer => ({ ...layer, image: this.dominioOverlays.get(layer.path)! }))],

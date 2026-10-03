@@ -1,3 +1,5 @@
+import { ProgressStore } from '../../../progress';
+import { freshGuairaChapterProgress, type GuairaChapterProgress } from './GuairaChapterProgress';
 import { reliefChallengeMessage, type GuairaReliefOptions } from '../relief/GuairaReliefChallenge';
 import { installReliefReplayControls } from '../relief/GuairaReliefReplayControls';
 import { DisposalScope } from '../../../../engine/DisposalScope';
@@ -22,13 +24,17 @@ export interface GuairaChapterAppDependencies {
     loadExcursion?: (sceneId: GuairaChapterExcursionSceneId) => Promise<GuairaChapterExcursionFactory>;
     createMap?: (root: HTMLElement, options: GuairaChapterMapOptions) => GuairaChapterMapPort;
     exit?: () => void;
+    progressStore?: ProgressStore;
+    campaign?: boolean;
+    continueCampaign?: () => void;
+    canContinueCampaign?: () => boolean;
 }
 
 type MountedRuntime =
     | { kind: 'chapter'; attempt: GuairaChapterAttempt; runtime: GuairaChapterRuntime }
     | { kind: 'optional'; token: GuairaChapterExcursionToken; runtime: GuairaChapterExcursionRuntime };
 
-/** One owner for the chapter, one mounted map or native game, no persistence. */
+/** One owner for chapter navigation, durable receipts and one mounted native runtime. */
 export class GuairaChapterApp {
     private readonly lifetime = new DisposalScope();
     private view = new DisposalScope();
@@ -46,8 +52,25 @@ export class GuairaChapterApp {
     private readonly loadExcursion: NonNullable<GuairaChapterAppDependencies['loadExcursion']>;
     private readonly createMap: NonNullable<GuairaChapterAppDependencies['createMap']>;
     private readonly exit: () => void;
+    private readonly progressStore: ProgressStore;
+    private progress: GuairaChapterProgress;
+    private saved = false;
+    private readonly campaign: boolean;
+    private readonly continueCampaign?: () => void;
+    private readonly canContinueCampaign?: () => boolean;
 
     constructor(private readonly root: HTMLElement, dependencies: GuairaChapterAppDependencies = {}) {
+        let storage: Storage | null = null;
+        try { storage = window.localStorage; } catch { /* unavailable: session fallback */ }
+        this.progressStore = dependencies.progressStore ?? new ProgressStore(storage);
+        this.progress = this.progressStore.save.guaira ?? freshGuairaChapterProgress();
+        this.session = new GuairaChapterSession({ progress: this.progress });
+        this.audioEnabled = this.progress.audioEnabled;
+        this.openingAvailable = !this.progress.completed.length && this.progress.resumeScene === null;
+        this.navigation = Object.freeze({ target: Object.freeze({ kind: 'chapter', sceneId: this.snapshot.selectedScene }), revision: 0 });
+        this.campaign = dependencies.campaign ?? false;
+        this.continueCampaign = dependencies.continueCampaign;
+        this.canContinueCampaign = dependencies.canContinueCampaign;
         this.loadScene = dependencies.loadScene ?? loadGuairaChapterScene;
         this.loadExcursion = dependencies.loadExcursion ?? loadGuairaChapterExcursion;
         this.createMap = dependencies.createMap ?? ((node, options) => new GuairaChapterMapView(node, options));
@@ -62,7 +85,39 @@ export class GuairaChapterApp {
                 target instanceof HTMLElement && this.root.contains(target) && target.closest('button, a[href]'))
                 event.preventDefault();
         }, true);
-        this.showMap('town');
+        const resume = this.progress.resumeScene;
+        this.persistProgress(resume);
+        if (resume === 'gallery' || resume === 'relief') this.beginExcursion(resume);
+        else if (resume && !this.progress.completed.includes(resume)) {
+            this.session.selectScene(resume, this.snapshot.generation);
+            const attempt = this.session.enterScene(resume, this.snapshot.generation);
+            if (attempt) void this.showScene(attempt); else this.showMap('town');
+        } else this.showMap('town');
+    }
+    private storageMessage() {
+        return this.progressStore.warning || (this.saved ? 'Progresso salvo neste navegador.' : 'Progresso somente nesta sessão.');
+    }
+    private persistProgress(resumeScene: GuairaChapterProgress['resumeScene'] = this.progress.resumeScene) {
+        const snapshot = this.snapshot;
+        this.progress = { ...this.progress, opening: snapshot.opening,
+            completed: snapshot.accepted.map(receipt => receipt.sceneId),
+            selectedScene: snapshot.activeAttempt && snapshot.accepted.some(receipt => receipt.sceneId === snapshot.activeAttempt?.sceneId)
+                ? snapshot.nextRecommendedScene ?? snapshot.selectedScene : snapshot.selectedScene,
+            resumeScene, audioEnabled: this.audioEnabled };
+        this.saved = this.progressStore.updateGuaira(this.progress);
+    }
+    private captureLiveProgress() {
+        if (this.mounted?.kind === 'chapter') {
+            const { attempt, runtime } = this.mounted;
+            this.session.acceptCompletion(attempt, runtime.sample(attempt));
+            this.audioEnabled = runtime.game.audio.enabled;
+        } else if (this.mounted?.kind === 'optional') {
+            const { token, runtime } = this.mounted;
+            if (runtime.finished && !runtime.game.player.data.isDead && ['playing', 'paused'].includes(runtime.game.state))
+                this.progress.optional[token.sceneId] = true;
+            this.audioEnabled = runtime.game.audio.enabled;
+        }
+        this.persistProgress();
     }
     get snapshot() { return this.session.snapshot(); }
     get mode() { return this.phase; }
@@ -112,16 +167,22 @@ export class GuairaChapterApp {
         if (this.isDisposed) return;
         const scope = this.replaceView('map'), node = document.createElement('div');
         node.id = 'guaira-chapter-map'; this.root.append(node);
-        document.title = 'Guaíra · Capítulo nesta sessão';
+        document.title = 'Guaíra · Capítulo';
         const options: GuairaChapterMapOptions = {
-            audioEnabled: () => this.audioEnabled, onAudioEnabled: enabled => { this.audioEnabled = enabled; },
+            audioEnabled: () => this.audioEnabled, onAudioEnabled: enabled => { this.audioEnabled = enabled; this.persistProgress(); },
+            storageMessage: () => this.storageMessage(), optionalProgress: () => this.progress.optional,
+            campaign: this.campaign, canContinueCampaign: () => this.snapshot.chapterComplete || !!this.canContinueCampaign?.(),
+            onContinueCampaign: (generation, revision) => {
+                if (!this.currentMapAction(scope, generation, revision) || !(this.snapshot.chapterComplete || this.canContinueCampaign?.())) return;
+                this.captureLiveProgress(); this.continueCampaign?.();
+            },
             snapshot: this.snapshot, navigation: this.navigation, arrival, walkToSelection, focusAction, openingAvailable: this.openingAvailable,
             onSelect: (target, generation, revision) => {
                 if (!this.currentMapAction(scope, generation, revision)) return;
                 const retained = this.navigation.target.kind === 'optional' && target.kind === 'chapter'
                     && target.sceneId === this.snapshot.selectedScene;
                 if (target.kind === 'chapter' && !retained && !this.session.selectScene(target.sceneId, generation)) return;
-                this.advanceNavigation(target);
+                this.advanceNavigation(target); this.persistProgress(null);
                 this.map?.update(this.snapshot, true, this.openingAvailable, this.navigation);
             },
             onEnter: (target, generation, revision) => {
@@ -135,13 +196,14 @@ export class GuairaChapterApp {
             onOpening: (opening, generation, revision) => this.changeOpening(opening, generation, revision, scope),
             onRestart: (generation, revision) => {
                 if (!this.currentMapAction(scope, generation, revision)) return;
-                const next = this.session.restartChapter(generation);
+                const next = new GuairaChapterSession({ progress: { ...this.progress, selectedScene: this.snapshot.opening, resumeScene: null } });
+                this.session.dispose();
                 if (!next) return;
-                this.session = next; this.excursionToken = null; this.openingAvailable = true;
+                this.session = next; this.excursionToken = null; this.openingAvailable = !this.snapshot.accepted.length; this.persistProgress(null);
                 this.advanceNavigation({ kind: 'chapter', sceneId: next.snapshot().selectedScene }); this.showMap('town');
             },
             onExit: (generation, revision) => {
-                if (this.currentMapAction(scope, generation, revision)) { this.dispose(); this.exit(); }
+                if (this.currentMapAction(scope, generation, revision)) { this.captureLiveProgress(); if (!this.campaign) this.dispose(); this.exit(); }
             }
         };
         try {
@@ -167,14 +229,14 @@ export class GuairaChapterApp {
             if (!this.current(scope)) return;
             this.advanceNavigation(); this.showMap(arrival, walkToSelection, focusAction);
         });
-        scope.listen(exit, 'click', () => { if (this.current(scope)) { this.dispose(); this.exit(); } });
+        scope.listen(exit, 'click', () => { if (this.current(scope)) { this.captureLiveProgress(); if (!this.campaign) this.dispose(); this.exit(); } });
         nav.append(message, retry, exit); this.root.append(nav);
     }
     private changeOpening(opening: GuairaChapterOpening, generation: GuairaChapterGeneration, revision: number, scope: DisposalScope) {
         if (!this.currentMapAction(scope, generation, revision) || !this.openingAvailable || this.navigation.target.kind !== 'chapter') return;
         const next = this.session.restartChapter(generation, { opening });
         if (!next) return;
-        this.session = next; this.excursionToken = null;
+        this.session = next; this.excursionToken = null; this.persistProgress(null);
         this.advanceNavigation({ kind: 'chapter', sceneId: next.snapshot().selectedScene }); this.showMap('town');
     }
 
@@ -227,6 +289,7 @@ export class GuairaChapterApp {
 
     private async showScene(attempt: GuairaChapterAttempt) {
         if (this.isDisposed) return;
+        this.persistProgress(attempt.sceneId);
         const scope = this.replaceView('loading'), activity = this.sceneActivity(scope);
         const info = CHAPTER_SCENES[attempt.sceneId];
         try {
@@ -243,6 +306,9 @@ export class GuairaChapterApp {
             scope.add(() => { if (ownsAudioPreference) this.audioEnabled = game.audio.enabled; game.dispose(); });
             if (!this.current(scope) || this.snapshot.activeAttempt !== attempt) return;
             this.mounted = { kind: 'chapter', attempt, runtime }; this.phase = 'game';
+            const reducedMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            Object.assign(game.store.save.preferences, this.progressStore.save.preferences,
+                { shake: this.progressStore.save.preferences.shake && !reducedMotion });
             game.audio.enabled = this.audioEnabled; ownsAudioPreference = true; game.audio.volume();
             const controls = installGuairaLabControls(game, panel.canvas, () => !!runtime.sample(attempt).result);
             scope.add(() => controls.dispose());
@@ -250,6 +316,9 @@ export class GuairaChapterApp {
                 if (!this.current(scope) || game.isDisposed) return false;
                 controls.sync();
                 const live = runtime.sample(attempt), complete = this.session.canContinue(attempt, live);
+                if (this.session.acceptCompletion(attempt, live) || this.audioEnabled !== game.audio.enabled) {
+                    this.audioEnabled = game.audio.enabled; this.persistProgress();
+                }
                 panel.primary.disabled = game.state !== 'playing' && game.state !== 'paused';
                 panel.primaryArt.setLabel(game.state === 'paused' || complete ? 'CONTINUAR' : 'PAUSA',
                     game.state === 'paused' ? 'Retomar a tentativa' : complete ? 'Continuar a jornada pela maquete' : 'Pausar');
@@ -262,7 +331,8 @@ export class GuairaChapterApp {
                     : !live.alive ? 'Feka caiu · retorno ao ponto seguro desta tentativa'
                     : complete ? 'Trecho concluído · Continuar volta à maquete'
                     : `Etapa ${step}/5 · ${game.boss?.hint ?? guidance}`;
-                if (panel.status.textContent !== message) panel.status.textContent = message;
+                const statusMessage = `${message} · ${this.storageMessage()}`;
+                if (panel.status.textContent !== statusMessage) panel.status.textContent = statusMessage;
                 return true;
             };
             if (activity.shouldPause() && game.state === 'playing') runtime.togglePause();
@@ -303,7 +373,7 @@ export class GuairaChapterApp {
         if (!transition) return;
         const arrival = runtime?.returnArrival() ?? CHAPTER_SCENES[attempt.sceneId].arrival;
         this.advanceNavigation({ kind: 'chapter', sceneId: this.snapshot.selectedScene });
-        this.showMap(arrival, action === 'continue');
+        this.persistProgress(null); this.showMap(arrival, action === 'continue');
     }
     private currentExcursion(token: GuairaChapterExcursionToken, scope: DisposalScope) {
         return this.current(scope) && this.excursionToken === token && token.sessionId === this.snapshot.generation.sessionId
@@ -314,11 +384,11 @@ export class GuairaChapterApp {
         this.advanceNavigation({ kind: 'optional', stop: 'bairro' });
         const token: GuairaChapterExcursionToken = Object.freeze({ sceneId, sessionId: this.snapshot.generation.sessionId,
             attemptId: ++this.excursionAttempt, navigationRevision: this.navigation.revision });
-        this.excursionToken = token; void this.showExcursion(token, options);
+        this.excursionToken = token; this.persistProgress(sceneId); void this.showExcursion(token, options);
     }
     private leaveExcursion(token: GuairaChapterExcursionToken, scope: DisposalScope) {
         if (!this.currentExcursion(token, scope)) return;
-        this.excursionToken = null; this.advanceNavigation(); this.showMap('bairro', false, true);
+        this.captureLiveProgress(); this.persistProgress(null); this.excursionToken = null; this.advanceNavigation(); this.showMap('bairro', false, true);
     }
     private excursionPanel(token: GuairaChapterExcursionToken, scope: DisposalScope, options?: GuairaReliefOptions) {
         const info = CHAPTER_EXCURSIONS[token.sceneId], nav = document.createElement('nav');
@@ -368,6 +438,9 @@ export class GuairaChapterApp {
             if (!this.currentExcursion(token, scope)) return;
             if (runtime.sceneId !== token.sceneId) throw Error('Optional factory returned a different room');
             this.mounted = { kind: 'optional', token, runtime }; this.phase = 'game';
+            const reducedMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            Object.assign(game.store.save.preferences, this.progressStore.save.preferences,
+                { shake: this.progressStore.save.preferences.shake && !reducedMotion });
             game.audio.enabled = this.audioEnabled; ownsAudioPreference = true; game.audio.volume();
             const controls = installGuairaLabControls(game, panel.canvas, () => runtime.finished);
             scope.add(() => controls.dispose());
@@ -393,6 +466,8 @@ export class GuairaChapterApp {
             const reflect = () => {
                 if (!this.currentExcursion(token, scope) || game.isDisposed) return false;
                 controls.sync(); replay?.sync();
+                if ((runtime.finished && !game.player.data.isDead && ['playing', 'paused'].includes(game.state)
+                    && !this.progress.optional[token.sceneId]) || this.audioEnabled !== game.audio.enabled) this.captureLiveProgress();
                 const action = actionNow();
                 if (action !== primaryAction) {
                     invalidatePrimary(); primaryAction = action;
@@ -427,7 +502,8 @@ export class GuairaChapterApp {
                     const optional = reliefChallengeMessage(routes.snapshot);
                     if (optional && !message.includes(optional)) message += ` · ${optional}`;
                 }
-                if (panel.status.textContent !== message) panel.status.textContent = message;
+                const statusMessage = `${message} · ${this.storageMessage()}`;
+                if (panel.status.textContent !== statusMessage) panel.status.textContent = statusMessage;
                 return true;
             };
             if (activity.shouldPause() && game.state === 'playing') runtime.togglePause();
@@ -458,6 +534,7 @@ export class GuairaChapterApp {
     }
     dispose() {
         if (this.isDisposed) return;
+        this.captureLiveProgress();
         this.advanceNavigation(); this.excursionToken = null;
         this.phase = 'disposed'; this.session.dispose(); this.view.dispose(); this.lifetime.dispose();
         this.map = null; this.mounted = null; this.root.replaceChildren();

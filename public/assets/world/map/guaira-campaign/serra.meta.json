@@ -1,0 +1,125 @@
+{
+  "regionKey": "serra",
+  "camera": {
+    "position": [
+      11.0,
+      -20.0,
+      18.850000381469727
+    ],
+    "target": [
+      0.0,
+      0.25,
+      3.5999999046325684
+    ],
+    "orthoScale": 20.6
+  },
+  "terminal": {
+    "groundAnchor": {
+      "x": 0.100635,
+      "y": 0.759131
+    },
+    "runwayStart": {
+      "x": -0.078232,
+      "y": 0.722118
+    },
+    "runwayEnd": {
+      "x": 0.23316,
+      "y": 0.871474
+    },
+    "boardingPath": [
+      {
+        "x": 0.165515,
+        "y": 0.65367
+      },
+      {
+        "x": 0.148137,
+        "y": 0.681919
+      },
+      {
+        "x": 0.100635,
+        "y": 0.759131
+      }
+    ],
+    "groundAnchorWorld": [
+      -5.75,
+      -6.4,
+      1.65
+    ],
+    "runwayStartWorld": [
+      -9.4,
+      -7.4,
+      1.65
+    ],
+    "runwayEndWorld": [
+      -2.1,
+      -7.4,
+      1.65
+    ],
+    "boardingPathWorld": [
+      [
+        -5.75,
+        -3.6,
+        1.65
+      ],
+      [
+        -5.75,
+        -4.35,
+        1.65
+      ],
+      [
+        -5.75,
+        -6.4,
+        1.65
+      ]
+    ],
+    "surface": "dry-compacted-earth",
+    "clearSpanMeters": 5.2,
+    "usableLengthMeters": 7.3
+  },
+  "supportFootprint": {
+    "center": [
+      -5.75,
+      -7.4
+    ],
+    "width": 8.8,
+    "depth": 6.0,
+    "bottomZ": 0.1,
+    "topZ": 1.65,
+    "walkWidth": 1.15,
+    "walkSegments": [
+      [
+        -5.75,
+        -3.6,
+        1.65
+      ],
+      [
+        -5.75,
+        -4.35,
+        1.65
+      ],
+      [
+        -5.75,
+        -6.4,
+        1.65
+      ]
+    ]
+  },
+  "assetFrame": {
+    "left": -0.18020833333333336,
+    "top": 0.5616666666666668,
+    "widthInMap": 0.5145833333333333,
+    "heightInMap": 0.535
+  },
+  "validation": {
+    "walkSupportSamples": 42,
+    "allSupported": true,
+    "numericCampaignIdsChanged": false,
+    "objects": 79
+  },
+  "image": {
+    "path": "/assets/world/map/guaira-campaign/serra.webp",
+    "width": 494,
+    "height": 321,
+    "bytes": 16156
+  }
+}

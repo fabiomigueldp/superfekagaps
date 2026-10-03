@@ -78,7 +78,7 @@ for (const [opening, touch] of [['guaira-travessia', false], ['guaira-patio-comp
             h.button(`Entrar: ${CHAPTER_SCENES[scene].title}`).click(); await flushChapter();
             const game = app.activeGame; assert.ok(game);
             h.play(game, chapterRecording(recordings[scene]), touch); h.frames();
-            assert.equal(app.snapshot.accepted.length, i, 'acceptance remains explicit');
+            assert.equal(app.snapshot.accepted.length, i + 1, 'native completion persists before navigation');
             h.byId('chapter-primary').click(); await mapReady();
             assert.equal(app.snapshot.accepted.length, i + 1);
             if (i === 0 || i === route.length - 1) await excursion();

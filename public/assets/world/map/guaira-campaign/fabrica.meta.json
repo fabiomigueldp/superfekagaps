@@ -1,0 +1,125 @@
+{
+  "regionKey": "fabrica",
+  "camera": {
+    "position": [
+      11.0,
+      -20.0,
+      17.5
+    ],
+    "target": [
+      0.0,
+      0.25,
+      2.25
+    ],
+    "orthoScale": 20.6
+  },
+  "terminal": {
+    "groundAnchor": {
+      "x": 0.822504,
+      "y": 0.853256
+    },
+    "runwayStart": {
+      "x": 0.836196,
+      "y": 0.920797
+    },
+    "runwayEnd": {
+      "x": 1.005348,
+      "y": 0.645844
+    },
+    "boardingPath": [
+      {
+        "x": 0.63263,
+        "y": 0.735356
+      },
+      {
+        "x": 0.737191,
+        "y": 0.812336
+      },
+      {
+        "x": 0.822504,
+        "y": 0.853256
+      }
+    ],
+    "groundAnchorWorld": [
+      9,
+      -2.4,
+      1.18
+    ],
+    "runwayStartWorld": [
+      10,
+      -3.65,
+      1.18
+    ],
+    "runwayEndWorld": [
+      10,
+      3.65,
+      1.18
+    ],
+    "boardingPathWorld": [
+      [
+        4.25,
+        -1.85,
+        1.18
+      ],
+      [
+        7,
+        -2.4,
+        1.18
+      ],
+      [
+        9,
+        -2.4,
+        1.18
+      ]
+    ],
+    "surface": "dry-compacted-earth",
+    "clearSpanMeters": 5.2,
+    "usableLengthMeters": 7.3
+  },
+  "supportFootprint": {
+    "center": [
+      10,
+      0
+    ],
+    "width": 6.0,
+    "depth": 8.8,
+    "bottomZ": 0.1,
+    "topZ": 1.18,
+    "walkWidth": 1.15,
+    "walkSegments": [
+      [
+        4.25,
+        -1.85,
+        1.18
+      ],
+      [
+        7,
+        -2.4,
+        1.18
+      ],
+      [
+        9,
+        -2.4,
+        1.18
+      ]
+    ]
+  },
+  "assetFrame": {
+    "left": 0.6072916666666666,
+    "top": 0.5633333333333332,
+    "widthInMap": 0.54375,
+    "heightInMap": 0.5133333333333333
+  },
+  "validation": {
+    "walkSupportSamples": 42,
+    "allSupported": true,
+    "numericCampaignIdsChanged": false,
+    "objects": 79
+  },
+  "image": {
+    "path": "/assets/world/map/guaira-campaign/fabrica.webp",
+    "width": 522,
+    "height": 308,
+    "bytes": 18276
+  }
+}

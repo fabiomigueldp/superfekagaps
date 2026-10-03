@@ -1,3 +1,4 @@
+import './adventure/guaira-campaign.css';
 // Ponto de entrada - Super Feka Gaps
 
 import { Game } from './game/Game';
