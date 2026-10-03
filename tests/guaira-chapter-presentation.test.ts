@@ -13,3 +13,12 @@ test('host guidance preserves mechanism instructions while replacing standalone 
     assert.equal(chapterGuidance('Siga à direita até o arrozal · sair e reentrar reinicia o protótipo', ''), 'Siga à direita até o arrozal · reentrar reinicia esta tentativa');
     assert.equal(chapterGuidance('No tabuleiro A · subindo · água no ramal A · pode esperar apoiado', ''), 'No tabuleiro A · subindo · água no ramal A · pode esperar apoiado');
 });
+
+import { chapterAttemptSummary, chapterResumeGuidance } from '../src/adventure/experimental/guaira/chapter/GuairaChapterPresentation';
+test('attempt summary never implies banked currency or a restored checkpoint', () => {
+    assert.equal(chapterAttemptSummary(1), '1 moeda coletada nesta tentativa');
+    assert.equal(chapterAttemptSummary(12), '12 moedas coletadas nesta tentativa');
+    for (const value of [NaN, Infinity, -3]) assert.equal(chapterAttemptSummary(value), '0 moedas coletadas nesta tentativa');
+    assert.match(chapterResumeGuidance(), /recarregar reinicia o trecho/);
+    assert.match(chapterResumeGuidance(), /checkpoint só nesta tentativa/);
+});

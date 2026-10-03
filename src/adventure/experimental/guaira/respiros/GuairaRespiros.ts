@@ -51,8 +51,11 @@ export class GuairaRespiros extends WorldGame {
         // Keep a reversing runner visible while the look-ahead eases back.
         this.camera.x = Math.max(0, Math.min(this.camera.x, x - 24));
         // Fixed gallery framing shows the full 128px column and native jump
-        // apex below the 23px HUD, with the dry path at screen y160.
-        this.camera.y = 144;
+        // apex below the 23px HUD. The maintenance bay gains 12px of
+        // headroom for its raised takeoff; the dry path stays visible at y172.
+        // Retaining headroom during an airborne retreat avoids clipping the
+        // helmet when crossing back out of the maintenance bay.
+        this.camera.y = Math.min(x >= G.secondEnd ? 132 : 144, Math.floor(this.player.data.position.y) - 27);
     }
     get mapReturnHref() { return this.finished ? `${G.mapHref}&visit=respiros-clear` : G.mapHref; }
     get canAdvanceToBoss() { return !this.isDisposed && this.state === 'playing' && !this.player.data.isDead && this.finished; }
@@ -115,6 +118,10 @@ export class GuairaRespiros extends WorldGame {
         const message = paused ? 'Pausado · Esc ou Continuar para voltar'
             : this.finished ? 'Passagem do arrozal inspecionada · Curral abre a arena de Ossabravo · Mapa volta ao arrozal · sem progresso salvo'
             : p.isDead ? 'Retorno automático ao ponto seguro desta tentativa · Tentar reinicia a passagem'
+            : p.position.x >= G.thirdEnd && p.position.x + p.width <= G.fourthStart
+                ? 'Ilha seca · os dois respiros têm ritmos próprios · espere o próximo baixar'
+            : p.position.x >= G.secondEnd && p.position.x + p.width <= G.thirdStart
+                ? 'Último ponto seguro · moedas opcionais na prateleira · observe cada respiro separadamente'
             : p.position.x >= G.firstEnd && p.position.x + p.width <= G.secondStart
                 ? 'Ponto seguro nesta tentativa · observe a próxima grelha · pode esperar aqui quanto precisar'
                 : 'Espere a água baixar · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som';

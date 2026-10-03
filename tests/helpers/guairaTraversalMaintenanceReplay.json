@@ -1,6 +1,6 @@
 {
   "stepMs": 16.666666666666668,
-  "frames": 1048,
+  "frames": 1074,
   "runs": [
     [
       92,
@@ -52,32 +52,9 @@
       []
     ],
     [
-      36,
+      25,
       [
-        "ArrowRight",
-        "Space"
-      ]
-    ],
-    [
-      12,
-      []
-    ],
-    [
-      36,
-      [
-        "ArrowRight",
-        "Space"
-      ]
-    ],
-    [
-      12,
-      []
-    ],
-    [
-      44,
-      [
-        "ArrowRight",
-        "Space"
+        "ArrowRight"
       ]
     ],
     [
@@ -86,6 +63,37 @@
     ],
     [
       40,
+      [
+        "ArrowRight"
+      ]
+    ],
+    [
+      12,
+      []
+    ],
+    [
+      40,
+      [
+        "ArrowRight"
+      ]
+    ],
+    [
+      12,
+      []
+    ],
+    [
+      40,
+      [
+        "ArrowRight",
+        "Space"
+      ]
+    ],
+    [
+      12,
+      []
+    ],
+    [
+      25,
       [
         "ArrowRight"
       ]

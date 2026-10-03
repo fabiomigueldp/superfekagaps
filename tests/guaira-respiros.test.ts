@@ -52,15 +52,16 @@ function waitForRetraction(h: Harness, g: GuairaRespiros, id: string) {
     assert.fail('one cycle always contains a completely retracted departure');
 }
 
-test('Respiros clones a continuous native floor and two ungated jets without storage or campaign changes', t => {
+test('Respiros clones a continuous native floor and four ungated jets without storage or campaign changes', t => {
     const campaign = structuredClone(STAGES), islands = structuredClone(ISLANDS), h = guairaRespirosBrowser(t), g = h.create();
     assert.ok(g.player instanceof Player); assert.ok(g.input instanceof Input);
     assert.ok(g.objects instanceof WorldObjects); assert.ok(g.level instanceof WorldLevel);
     assert.equal(g.stage.id, G.id); assert.equal(g.player.data.position.x, G.spawnX); assert.equal(feet(g), G.floor);
     assert.equal(g.player.data.hasHelmet, true); assert.equal(g.boss, null);
-    assert.deepEqual(g.stage.foes, []); assert.deepEqual(g.stage.exits, []); assert.deepEqual(g.stage.pickups, []);
+    assert.deepEqual(g.stage.foes, []); assert.deepEqual(g.stage.exits, []); assert.equal(g.stage.pickups.length, 2);
     assert.deepEqual(g.stage.mechanisms.map(b => [b.kind, b.x, b.y, b.width, b.height, b.phase, b.period, b.gated]),
-        [['jet',160,176,96,132,0,4200,undefined], ['jet',384,176,176,132,1200,4200,undefined]]);
+        [['jet',160,176,96,132,0,4200,undefined], ['jet',384,176,176,132,1200,4200,undefined],
+         ['jet',704,176,80,132,600,4200,undefined], ['jet',880,176,112,132,2700,4200,undefined]]);
     for (let x = 0; x < G.width; x++) assert.notEqual(g.stage.level.tiles[19][x], 0);
     const altered = guairaRespirosStage(); altered.level.tiles[19][0] = 0;
     assert.notEqual(guairaRespirosStage().level.tiles[19][0], 0);
@@ -73,7 +74,7 @@ for (const touch of [false, true]) test(`${touch ? 'native touch' : 'keyboard'} 
     let completions = 0; (g as unknown as { complete(): void }).complete = () => { completions++; };
     assert.equal(replay(h, g), recording.inputFrames + recording.initialSettleFrames);
     assert.equal(g.finished, true); assert.equal(feet(g), G.floor); assert.equal(g.player.data.hasHelmet, true);
-    assert.equal(g.store.save.checkpoint?.index, 0); assert.equal(g.player.data.velocity.x, 0);
+    assert.equal(g.store.save.checkpoint?.index, 1); assert.equal(g.player.data.velocity.x, 0);
     assert.equal(g.player.data.position.x, recording.expected.x);
     assert.equal(g.mapReturnHref, './guaira.html?at=rice&visit=respiros-clear'); assert.equal(g.canAdvanceToBoss, true);
     assert.equal(g.coins, 0); assert.equal(completions, 0); assert.deepEqual(g.store.save.completed, []); assert.deepEqual(g.store.save.times, {});
@@ -105,6 +106,12 @@ test('252 native departure phases expose generous but different walking windows 
     }
 });
 
+function finishPair(h: Harness, g: GuairaRespiros) {
+    walkUntil(h, g, G.finalCheckpointX); waitForRetraction(h, g, G.thirdJetId);
+    walkUntil(h, g, G.finalRefugeX); waitForRetraction(h, g, G.fourthJetId);
+    walkUntil(h, g, G.finishX);
+}
+
 test('observing retraction solves all252 starting phases while blind walking, running and fixed jumps do not', t => {
     const h = guairaRespirosBrowser(t), g = h.create();
     const blindCounts: number[] = [];
@@ -112,9 +119,9 @@ test('observing retraction solves all252 starting phases while blind walking, ru
         let safe = 0;
         for (let phase = 0; phase < 252; phase++) {
             departure(h, g, G.spawnX, phase);
-            for (let frame = 0; frame < 420 && !g.finished && g.player.data.hasHelmet && !g.player.data.isDead; frame++)
+            for (let frame = 0; frame < 420 && g.player.data.position.x < 656 && g.player.data.hasHelmet && !g.player.data.isDead; frame++)
                 h.run(g, 1, ['ArrowRight', ...(policy === 'run' ? ['ShiftLeft'] : []), ...(policy === 'jump' && frame % 48 < 24 ? ['Space'] : [])]);
-            if (g.finished && g.player.data.hasHelmet && !g.player.data.isDead) safe++;
+            if (g.player.data.position.x >= 656 && g.player.data.hasHelmet && !g.player.data.isDead) safe++;
         }
         assert.ok(safe > 0 && safe < 252); blindCounts.push(safe);
     }
@@ -123,7 +130,7 @@ test('observing retraction solves all252 starting phases while blind walking, ru
         departure(h, g, G.spawnX, phase);
         walkUntil(h, g, 128); waitForRetraction(h, g, G.firstJetId);
         walkUntil(h, g, G.checkpointX); waitForRetraction(h, g, G.secondJetId);
-        walkUntil(h, g, G.finishX);
+        finishPair(h, g);
         assert.equal(g.finished, true, `observed policy at phase${phase}`);
         assert.equal(g.player.data.hasHelmet, true, `no forced damage at phase${phase}`);
     }
@@ -159,7 +166,7 @@ test(`the refuge teaches B's full warning after A, with native braking ${JSON.st
         assert.deepEqual([...seen], ['idle', 'charging', 'rising', 'flowing', 'falling', 'venting']);
         // A deliberate 600ms reaction after retraction still leaves ample time
         // to walk the long grate; neither running nor jumping is needed.
-        h.run(g, 36); walkUntil(h, g, G.finishX);
+        h.run(g, 36); finishPair(h, g);
         assert.equal(g.finished, true); assert.equal(g.player.data.hasHelmet, true);
     }
 });
@@ -201,7 +208,7 @@ test('short and held native jumps remain framed below the HUD without mandatory 
             h.run(g,1,frame<hold?['Space']:[]);
             const p=g.player.data; rise=Math.max(rise,G.floor-feet(g));
             assert.ok(p.position.y-g.camera.y>=23, 'native apex remains below HUD');
-            assert.ok(feet(g)-g.camera.y<=160.001); assert.ok(p.position.x-g.camera.x>=24);
+            assert.ok(feet(g)-g.camera.y<=172.001); assert.ok(p.position.x-g.camera.x>=24);
         }
         assert.ok(hold===1?rise<21:rise>102); assert.equal(g.player.data.hasHelmet,true); assert.equal(feet(g),G.floor);
     }
@@ -245,14 +252,15 @@ test('checkpoint equipment is native and full retry clears checkpoint, result, w
 for (const touch of [false, true]) test(`${touch ? 'native touch' : 'keyboard'} can jump over the optional checkpoint and still clear intact`, t => {
     const h = guairaRespirosBrowser(t, { touch }), g = h.create();
     const blocks: Array<[number, string[]]> = [[161,[]], [110,['ArrowRight']],
-        [40,['ArrowRight','Space']], [271,[]], [180,['ArrowRight']]];
+        [40,['ArrowRight','Space']], [271,[]], [140,['ArrowRight']]];
     let frames = 0;
     for (const [count, keys] of blocks) for (let i = 0; i < count; i++, frames++) {
         h.run(g, 1, keys);
         assert.equal(g.player.data.hasHelmet, true, `helmet at ${frames}`);
         assert.equal(g.player.data.isDead, false, `alive at ${frames}`);
-        assert.equal(g.store.save.checkpoint, null, `optional flag bypassed at ${frames}`);
+        assert.notEqual(g.store.save.checkpoint?.index, 0, `first optional flag bypassed at ${frames}`);
     }
+    finishPair(h, g);
     assert.equal(g.finished, true); assert.equal(feet(g), G.floor);
     assert.equal(g.mapReturnHref, './guaira.html?at=rice&visit=respiros-clear');
 });
@@ -293,4 +301,67 @@ test('reduced motion preserves jet heights, native timing and replay while suppr
     const before=snapshot(g);g.render();g.render();assert.deepEqual(snapshot(g),before);
     h.keys([]);g.load(G.id);replay(h,g);assert.equal(g.finished,true);
     assert.deepEqual((g as unknown as {sparks:unknown[]}).sparks,[]);
+});
+
+test('final independently phased outlets resolve all 252 departure phases via the dry island', t => {
+    const h = guairaRespirosBrowser(t), g = h.create();
+    for (let phase = 0; phase < 252; phase++) {
+        departure(h, g, G.finalCheckpointX, phase);
+        finishPair(h, g);
+        assert.equal(g.finished, true, `final pair phase ${phase}`);
+        assert.equal(g.player.data.hasHelmet, true);
+    }
+});
+
+for (const touch of [false, true]) test(`final dry island, native braking and recovery are safe with ${touch ? 'touch' : 'keyboard'}`, t => {
+    const h = guairaRespirosBrowser(t, { touch }), g = h.create();
+    departure(h, g, G.finalCheckpointX);
+    waitForRetraction(h, g, G.thirdJetId); walkUntil(h, g, G.finalRefugeX);
+    h.run(g, 756);
+    assert.ok(g.player.data.position.x >= G.thirdEnd && g.player.data.position.x + g.player.data.width <= G.fourthStart);
+    assert.equal(g.player.data.hasHelmet, true);
+    const previous = g.player;
+    g.player.data.position.x = 920; // Damage-only fixture, not traversal evidence.
+    for (let i = 0; i < 1000 && g.player === previous; i++) h.run(g, 1);
+    assert.notEqual(g.player, previous);
+    assert.equal(g.player.data.position.x, G.finalCheckpointX);
+    assert.equal(g.store.save.checkpoint?.index, 1);
+    assert.equal(g.player.data.hasHelmet, true);
+    finishPair(h, g); assert.equal(g.finished, true);
+});
+
+for (const touch of [false, true]) test(`optional maintenance coins rejoin the intact native route with ${touch ? 'touch' : 'keyboard'}`, t => {
+    const h = guairaRespirosBrowser(t, { touch }), g = h.create();
+    h.run(g, 1); walkUntil(h, g, 128); waitForRetraction(h, g, G.firstJetId);
+    walkUntil(h, g, G.checkpointX); waitForRetraction(h, g, G.secondJetId);
+    walkUntil(h, g, 578); h.run(g, 30);
+    for (let i = 0; i < 60; i++) {
+        h.run(g, 1, i < 30 ? ['Space'] : []);
+        assert.ok(Math.round(g.player.data.position.y) - g.camera.y - 4 >= 23, 'shelf jump stays below HUD');
+        assert.equal(g.player.data.hasHelmet, true);
+    }
+    assert.equal(feet(g), G.shelfTop);
+    assert.equal(g.coins, 2);
+    // A second full shelf jump checks the raised takeoff apex too.
+    for (let i = 0; i < 60; i++) {
+        h.run(g, 1, i < 30 ? ['Space'] : []);
+        assert.ok(Math.round(g.player.data.position.y) - g.camera.y - 4 >= 23);
+    }
+    finishPair(h, g); assert.equal(g.finished, true); assert.equal(g.coins, 2);
+    assert.deepEqual(g.store.save.completed, []); assert.deepEqual(h.storageCalls, []);
+    h.keys([]); g.load(G.id); assert.equal(g.coins, 0);
+});
+
+for (const touch of [false, true]) test(`raised shelf jump retreat keeps the full helmet below HUD with ${touch ? 'touch' : 'keyboard'}`, t => {
+    const h = guairaRespirosBrowser(t, { touch }), g = h.create();
+    departure(h, g, 584); // Controlled camera fixture; complete traversal is tested above.
+    h.run(g, 40, ['Space']); h.run(g, 40);
+    assert.equal(feet(g), G.shelfTop);
+    let crossed = false;
+    for (let i = 0; i < 50; i++) {
+        h.run(g, 1, i < 30 ? ['Space', 'ArrowLeft'] : []);
+        crossed ||= g.player.data.position.x < G.secondEnd;
+        assert.ok(Math.round(g.player.data.position.y) - g.camera.y - 4 >= 23);
+    }
+    assert.equal(crossed, true);
 });

@@ -3,6 +3,7 @@ import { jetCycle, type JetCycle } from '../../../WorldMachineState';
 import type { MovingBody, WorldLevel, WorldObjects } from '../../../WorldPhysics';
 import { pixelText } from '../../../../graphics/BitmapFont';
 import { supportsStanding, isOneWayTile } from '../../../../world/tileRules';
+import { GUAIRA_RESPIROS as G } from './GuairaRespirosStage';
 import { drawGuairaWorker } from '../GuairaWorkerArt';
 
 const P = Object.freeze({
@@ -65,7 +66,7 @@ export function drawRespirosBackground(c: CanvasRenderingContext2D, cx: number, 
             r(c, x + 17, y + 5, 23, 2, '#dab58d');
         }
         r(c, 0, 231 - cameraY, 320, 64, '#c4946c');
-        for (const [x, y, width] of [[120,244,124],[253,234,110],[372,239,120],[502,247,112]] as const) {
+        for (const [x, y, width] of [[120,244,124],[253,234,110],[372,239,120],[502,247,112],[678,240,128],[822,245,148],[980,239,124]] as const) {
             riceBed(c, x - cameraX, y - cameraY, width, 0, t);
             riceBed(c, x - cameraX, y + 19 - cameraY, width, 1, t);
         }
@@ -84,16 +85,17 @@ export function drawRespirosBackground(c: CanvasRenderingContext2D, cx: number, 
         r(c, 98 - cameraX, 260 - cameraY, 12, 25, P.pipe);
         r(c, 100 - cameraX, 261 - cameraY, 8, 22, P.brass); r(c, 102 - cameraX, 263 - cameraY, 3, 16, '#91b4a6');
         // The path to the corral belongs to this same working landscape.
-        const sx = 631 - cameraX, sy = 226 - cameraY;
+        const exitOffset = G.finishX - 656;
+        const sx = 631 + exitOffset - cameraX, sy = 226 - cameraY;
         r(c, sx + 2, sy + 13, 54, 55, '#b49775'); r(c, sx + 3, sy + 14, 44, 53, '#d5b991');
         roof(c, sx - 2, sy, 62, 16); r(c, sx + 15, sy + 37, 18, 30, '#827157');
         r(c, sx + 17, sy + 39, 14, 28, '#675d4e');
         for (const x of [592,613,638,670,695]) {
-            r(c, x - cameraX, 276 - cameraY, 2, 15, '#927b5f');
-            r(c, x - cameraX, 280 - cameraY, 20, 2, '#b49a70');
+            r(c, x + exitOffset - cameraX, 276 - cameraY, 2, 15, '#927b5f');
+            r(c, x + exitOffset - cameraX, 280 - cameraY, 20, 2, '#b49a70');
         }
-        r(c, 600 - cameraX, 260 - cameraY, 43, 12, '#b59770');
-        pixelText(c, 'CURRAL', 603 - cameraX, 262 - cameraY, '#63594c');
+        r(c, 600 + exitOffset - cameraX, 260 - cameraY, 43, 12, '#b59770');
+        pixelText(c, 'CURRAL', 603 + exitOffset - cameraX, 262 - cameraY, '#63594c');
         // A quiet observation bay, behind the checkpoint and the actor. The
         // arrow leads the eye to B's real pressure gauge, not to a timed dash.
         // No bright platform cap, collision, animation or independent clock.
@@ -103,6 +105,15 @@ export function drawRespirosBackground(c: CanvasRenderingContext2D, cx: number, 
         line(c, 326 - cameraX, 261 - cameraY, 363 - cameraX, 261 - cameraY, P.ink);
         line(c, 359 - cameraX, 257 - cameraY, 363 - cameraX, 261 - cameraY, P.ink);
         line(c, 359 - cameraX, 265 - cameraY, 363 - cameraX, 261 - cameraY, P.ink);
+        // Authored final refuge stays visibly dry; signs sit behind the runner.
+        for (const [x, label] of [[624, 'DOIS RITMOS'], [816, 'ILHA SECA']] as const) {
+            r(c, x - 22 - cameraX, 258 - cameraY, 2, 36, P.pipe);
+            r(c, x - 28 - cameraX, 240 - cameraY, 74, 18, '#b59770');
+            pixelText(c, label, x - 25 - cameraX, 246 - cameraY, '#63594c');
+        }
+        // Maintenance brackets belong to the real optional one-way shelf.
+        for (const x of [G.shelfStart + 5, G.shelfEnd - 6])
+            line(c, x - cameraX, G.shelfTop + 7 - cameraY, x + 6 - cameraX, G.floor - cameraY, P.pipe);
         // Quiet ochre separates decorative channels and feet from the real cap.
         r(c, 0, 295 - cameraY, 320, 9, P.dust);
         for (let x = Math.floor(cameraX / 32) * 32; x < cameraX + 320; x += 32)
@@ -231,7 +242,7 @@ export function drawRespirosObjects(c: CanvasRenderingContext2D, objects: WorldO
         }
         // Friendly existing art remains behind safe banks, well clear of the
         // channels, gauges, centre checkpoint and Feka's feet on the bright cap.
-        for (const [x, kind] of [[81, 'pump'], [630, 'rice']] as const) {
+        for (const [x, kind] of [[81, 'pump'], [G.finishX - 26, 'rice']] as const) {
             if (x < cameraX - 20 || x > cameraX + 340) continue;
             drawGuairaWorker(c, x - cameraX, 290 - cameraY, kind,
                 { activeTimeMs: time, valveActive: false, bridgeRise: 0, reducedMotion });

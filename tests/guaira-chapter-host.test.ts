@@ -827,7 +827,8 @@ test('durable chapter awards live completion before navigation, survives reload,
     const first = make(); h.enter(); await flush();
     const runtime = (first as unknown as { mounted: { runtime: GuairaChapterRuntime } }).mounted.runtime;
     runtime.sample = attempt => ({ attempt, alive: true, state: 'playing', result: { sceneId: 'guaira-travessia', kind: 'reached-finish' } });
-    first.activeGame!.audio.enabled = false; h.frame();
+    first.activeGame!.audio.enabled = false; first.activeGame!.coins = 7; h.frame();
+    assert.match(h.byId('lab-status').textContent, /7 moedas coletadas nesta tentativa/);
     assert.deepEqual(new ProgressStore(storage).save.guaira.completed, ['guaira-travessia'], 'No Continue or map click required');
     assert.equal(new ProgressStore(storage).save.guaira.audioEnabled, false);
     const oldAttempt = first.snapshot.activeAttempt; first.dispose();
@@ -861,4 +862,45 @@ test('campaign map recovery returns to the journey without leaving through extra
     assert.ok(back); assert.equal(back.textContent, 'FÁBRICA');
     back.click(); assert.equal(exits, 1);
     assert.equal(app.isDisposed, false, 'The campaign owns travel/cancel and disposal');
+});
+
+for (const optional of [false, true]) test(`sound control works during ${optional ? 'optional' : 'required'} play and pause, persists, and retires with its view`, async t => {
+    const h = hostBrowser(t);
+    let raw: string | null = null;
+    const storage = { getItem: () => raw, setItem: (_key: string, value: string) => { raw = value; } };
+    const app = h.create({ progressStore: new ProgressStore(storage) });
+    if (optional) chooseGallery(h);
+    h.enter(); await waitForGame(app);
+    const game = app.activeGame!, sound = h.byId('chapter-sound');
+    assert.equal(sound.disabled, false);
+    assert.equal(sound.getAttribute('aria-pressed'), 'true');
+    assert.match(h.byId('chapter-keyboard-hint').textContent, /M som/);
+    sound.click();
+    assert.equal(game.audio.enabled, false);
+    assert.equal(sound.getAttribute('aria-pressed'), 'false');
+    assert.equal(new ProgressStore(storage).save.guaira.audioEnabled, false);
+    assert.equal(game.state, 'playing');
+    h.key('keydown', 'KeyM'); game.update(1000 / 60); h.key('keyup', 'KeyM'); h.frame();
+    assert.equal(game.audio.enabled, true); assert.equal(sound.getAttribute('aria-pressed'), 'true');
+    sound.click(); assert.equal(game.audio.enabled, false);
+    h.byId('chapter-primary').click(); h.frame();
+    assert.equal(game.state, 'paused');
+    assert.match(h.byId('lab-status').textContent, /Continuar retoma daqui.*recarregar reinicia o trecho/);
+    sound.click();
+    assert.equal(game.audio.enabled, true); assert.equal(game.state, 'paused');
+    assert.equal(new ProgressStore(storage).save.guaira.audioEnabled, true);
+    const oldAction = sound.listeners.find(item => item.type === 'click')!.callback;
+    h.byId('chapter-map-return').click(); invokeSaved(oldAction);
+    assert.equal(new ProgressStore(storage).save.guaira.audioEnabled, true);
+    app.dispose(); h.checkDisposed();
+});
+
+test('sound control is disabled until a runtime exists and failed loads retain recovery', async t => {
+    const h = hostBrowser(t), pending = deferred<GuairaChapterSceneFactory>();
+    const app = h.create({ loadScene: () => pending.promise }); h.enter();
+    assert.equal(h.byId('chapter-sound').disabled, true);
+    pending.reject(Error('Injected sound loading failure')); await flush();
+    assert.equal(app.mode, 'error');
+    h.byId('chapter-map-return').click(); assert.equal(app.mode, 'map');
+    app.dispose(); h.checkDisposed();
 });

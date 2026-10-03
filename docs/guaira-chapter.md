@@ -1,18 +1,22 @@
-# Guaíra: capítulo experimental nesta sessão
+# Guaíra: capítulo e continuidade
 
 Entrada dedicada: `/guaira-capitulo.html`. A página monta a maquete e uma cena
 nativa por vez. Os experimentos livres continuam disponíveis em suas próprias
-páginas; o capítulo não altera a campanha de seis regiões nem seu save.
+páginas de diagnóstico. Na campanha, Guaíra integra a viagem entre Fábrica e
+Serra; a entrada dedicada continua disponível pelos extras. O host salva os
+recibos de Guaíra no progresso existente, preservando resultados e a elegibilidade
+legada para continuar na Serra.
 
 ## Jornada e resultados
 
 A abertura é Travessia da Vala Seca ou Pátio das Comportas. Depois seguem Passagem
 dos Respiros, Ossabravo, Subida à Casa da Vazão e Prefeito da Vazão. A escolha da
 abertura fica fixada ao entrar na primeira tentativa. Reiniciar o capítulo
-permite escolher novamente.
+preserva as conclusões; a abertura só pode mudar antes de concluir o primeiro trecho.
 
 O contador de cinco trechos só aumenta quando o jogador conclui o objetivo real
-e escolhe CONTINUAR ou MAPA. Os resultados vêm dos mesmos adaptadores jogáveis
+e está vivo em jogo ou pausa. O host registra a conclusão durante a tentativa,
+sem exigir CONTINUAR ou MAPA. Os resultados vêm dos mesmos adaptadores jogáveis
 dos experimentos: chegada ao fim, derrota de Ossabravo ou liberação da água pelo
 Prefeito. Checkpoint, seleção, caminhada, chegada à placa e parâmetros de URL
 nunca representam conclusão.
@@ -23,14 +27,22 @@ nunca representam conclusão.
   o resultado, inclusive quando o jogador pausou; o movimento no mapa continua
   sendo uma escolha explícita
 - TENTAR remonta uma tentativa nova do mesmo trecho. Resultados anteriores da
-  sessão permanecem. Repetir um trecho concluído não duplica seu resultado
+  jornada permanecem. Repetir um trecho concluído não duplica seu resultado
 - JORNADA permite selecionar o próximo trecho ou repetir os já concluídos. Os
   demais explicam o predecessor. ENTRAR depende também da chegada física de Feka
 - CHEGAR e movimento reduzido pulam somente a caminhada, nunca a fase
 
-Conclusões duram apenas nesta página. Recarregar, sair ou voltar a uma página
-restaurada pelo histórico inicia uma sessão vazia. Não há armazenamento local,
-restauração por query string, novos selos de campanha ou migração de save.
+Conclusões, seleção, trecho de retorno e preferência de som ficam salvos neste
+navegador quando o armazenamento está disponível. O aviso da interface informa
+quando só a sessão atual está protegida. Recarregar um trecho incompleto o
+reabre do início: posição, mecanismos, equipamento e checkpoint não são salvos
+pelo host. Morrer usa o ponto seguro nativo da tentativa; CONTINUAR na pausa
+retoma exatamente a tentativa aberta. TENTAR, MAPA e BAIRRO descartam essa tentativa.
+
+SOM/MUDO está disponível nas cenas obrigatórias e opcionais, inclusive pausadas;
+M também controla o som. Não abre o menu de opções da campanha. Ao concluir, a
+interface mostra as moedas realmente coletadas nesta tentativa, sem inventar
+saldo persistente, medalha ou obrigação de coletar todas.
 
 ## Desvio opcional pelo Bairro
 
@@ -47,8 +59,9 @@ trecho, entre trechos e depois de 5/5.
   já concluído; caminha até ela sem entrar automaticamente
 - TENTAR cria uma Galeria nativa nova, descartando as tampas abertas e o
   checkpoint local. PAUSA / CONTINUAR só pausa ou retoma a Galeria
-- Acesso de inspeção aberto é feedback local. Não há sexto resultado, selo de
-  visita, histórico opcional ou mudança de recomendação e recibos
+- Acesso de inspeção aberto salva a conclusão opcional da Galeria. ALÍVIO segue
+  para a Câmara de Alívio, que tem conclusão própria. Não há sexto resultado
+  obrigatório nem mudança de recomendação da jornada
 - Para fazer o desvio a partir de uma tentativa obrigatória, primeiro use MAPA.
   Essa ação continua aceitando o resultado real ou abandonando a tentativa
   incompleta; não suspende equipamento/checkpoint para retomá-los depois
@@ -56,8 +69,8 @@ trecho, entre trechos e depois de 5/5.
 Uma visita opcional antes do primeiro trecho não fixa a abertura. Falhas de
 carregamento da Galeria oferecem TENTAR e BAIRRO; falhas da maquete oferecem
 TENTAR sem apagar a sessão ou a chegada. O retorno interno não muda URL nem
-histórico. Recarregar, sair da página ou restaurá-la pelo Voltar/Avançar do
-navegador continua iniciando uma sessão vazia.
+histórico. Recarregar conserva os recibos disponíveis no armazenamento, mas sempre
+reconstrói a tentativa nativa desde o início.
 
 ## Montagem e descarte
 
@@ -74,10 +87,10 @@ cuida apenas da apresentação e chegada pela estrada autoral.
 `GuairaChapterNavigation` separa o destino da maquete da seleção obrigatória.
 Cada ação captura geração da sessão e revisão imutável da navegação; até
 selecionar novamente o Bairro invalida ações antigas. `GuairaChapterExcursions`
-carrega somente a classe nativa da Galeria, com identidade própria por tentativa
+carrega as classes nativas da Galeria e da Câmara de Alívio, com identidade própria por tentativa
 e sem adaptador de resultado. O host distingue os dois tipos de runtime,
 registra o descarte antes de instalar controles e mantém a preferência de áudio
-em memória. Imports concluídos com a página oculta começam pausados.
+no progresso do capítulo. Imports concluídos com a página oculta começam pausados.
 
 O capítulo reutiliza a imagem, máscara de água, poses e controles bitmap
 existentes. Não adiciona texturas. O orçamento do output continua em

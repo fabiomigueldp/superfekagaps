@@ -15,7 +15,7 @@ const snapshot = (g: GuairaAscent) => structuredClone({ player: g.player.data,
 const feet = (g: GuairaAscent) => g.player.data.position.y + g.player.data.height;
 
 function replay(h: ReturnType<typeof guairaAscentBrowser>, game: GuairaAscent, touch = false, stopAtCheckpoint = false) {
-    let frame = 0, plankFrames = 0, liftFrames = 0;
+    let frame = 0, plankFrames = 0, liftFrames = 0, serviceFrames = 0;
     for (const [count, keys] of recording.runs as Array<[number, string[]]>) {
         if (touch) {
             const touches = keys.map((key, i) => ({ identifier: i + 1, target: h.canvas,
@@ -26,24 +26,27 @@ function replay(h: ReturnType<typeof guairaAscentBrowser>, game: GuairaAscent, t
             game.update(recording.stepMs);
             assert.equal(game.player.data.isDead, false, `alive at ${frame}`);
             assert.equal(game.player.data.hasHelmet, true, `no damage at ${frame}`);
+            if (game.player.data.position.x >= 768) assert.ok(game.player.data.position.y - 10 - game.camera.y >= 23, `helmet clears HUD at ${frame}`);
             if (game.player.data.isGrounded) {
                 for (const b of game.objects.bodies) if (Math.abs(feet(game) - b.y) < .001 &&
                     game.player.data.position.x >= b.x && game.player.data.position.x + game.player.data.width <= b.x + b.width) {
                     if (b.id === G.plankId) plankFrames++;
-                    else liftFrames++;
+                    else if (b.id === G.liftId) liftFrames++;
+                    else serviceFrames++;
                 }
             }
             // Native 320×180 framing shows the receiving bank before disembark,
             // and the upper terrace before the final lift jump.
             if (frame === 299) assert.ok(game.camera.x < 400 && game.camera.x + 320 > 512);
+            if (frame === 958 || frame === 1198) assert.ok(240 - game.camera.y < 174, 'dry gallery is visible before boarding/disembarking');
             if (frame === 783) {
                 assert.ok(game.camera.x < 710 && game.camera.x + 320 > 784);
-                assert.ok(G.terraceY - game.camera.y > 23 && G.terraceY - game.camera.y < 150);
+                assert.ok(144 - game.camera.y > 23 && 144 - game.camera.y < 150);
             }
             if (stopAtCheckpoint && game.store.save.checkpoint) { h.keys([]); return frame; }
         }
     }
-    assert.ok(plankFrames > 150); assert.ok(liftFrames > 150);
+    assert.ok(plankFrames > 150); assert.ok(liftFrames > 150); assert.ok(serviceFrames > 150);
     assert.equal(frame, recording.frames);
     return frame;
 }
@@ -52,9 +55,9 @@ test('isolated ascent clones authored stage and uses native player/input/rendere
     const h = guairaAscentBrowser(t), before = structuredClone(STAGES), worlds = structuredClone(ISLANDS), game = h.create();
     assert.ok(game.player instanceof Player); assert.ok(game.input instanceof Input); assert.ok(game.renderer instanceof Renderer);
     assert.equal(game.stage.id, G.id); assert.equal(game.boss, null); assert.deepEqual(game.stage.exits, []);
-    assert.deepEqual(game.stage.foes, []); assert.equal(game.stage.level.width, 64); assert.equal(game.stage.level.height, 25);
+    assert.deepEqual(game.stage.foes, []); assert.equal(game.stage.level.width, 84); assert.equal(game.stage.level.height, 25);
     assert.equal(game.player.data.position.x, 48); assert.equal(feet(game), 304);
-    assert.deepEqual(game.objects.bodies.map(b => [b.kind, b.x, b.y, b.width, b.height]), [['platform',240,304,80,8],['lift',672,304,80,8]]);
+    assert.deepEqual(game.objects.bodies.map(b => [b.kind, b.x, b.y, b.width, b.height]), [['platform',240,304,80,8],['lift',672,304,80,8],['platform',896,144,80,8]]);
     const changed = guairaAscentStage(); changed.level.tiles[19][0] = 0;
     assert.notEqual(guairaAscentStage().level.tiles[19][0], 0);
     game.render(); assert.ok(h.canvas.drawCalls > 0);
@@ -62,12 +65,12 @@ test('isolated ascent clones authored stage and uses native player/input/rendere
     assert.equal(game.mapReturnHref, './guaira.html?at=corral');
 });
 
-for (const touch of [false, true]) test(`${touch ? 'native touch' : 'keyboard'} completes both vehicles and checkpoint without run/pound/coins`, t => {
+for (const touch of [false, true]) test(`${touch ? 'native touch' : 'keyboard'} completes all three vehicles and both checkpoints without run/pound/coins`, t => {
     const h = guairaAscentBrowser(t, { touch }), game = h.create();
     let completions = 0;
     (game as unknown as { complete(): void }).complete = () => { completions++; };
     replay(h, game, touch);
-    assert.equal(game.finished, true); assert.equal(game.coins, 0); assert.equal(game.store.save.checkpoint?.index, 0);
+    assert.equal(game.finished, true); assert.equal(game.coins, 0); assert.equal(game.store.save.checkpoint?.index, 1);
     assert.equal(feet(game), G.terraceY); assert.equal(game.player.data.velocity.x, 0);
     assert.equal(game.mapReturnHref, './guaira.html?at=vazao&visit=ascent-clear');
     assert.deepEqual(game.store.save.completed, []); assert.deepEqual(game.store.save.times, {}); assert.equal(completions, 0);
@@ -78,7 +81,7 @@ for (const touch of [false, true]) test(`${touch ? 'native touch' : 'keyboard'} 
 
 test('standing still stays carried on each native moving body for two whole cycles', t => {
     const h = guairaAscentBrowser(t), game = h.create();
-    for (const id of [G.plankId, G.liftId]) {
+    for (const id of [G.plankId, G.liftId, G.serviceId]) {
         h.keys([]); game.load(G.id);
         const b = game.objects.get(id)!, p = game.player.data;
         p.position = { x: b.x + 34, y: b.y - p.height }; p.isGrounded = true;
@@ -145,7 +148,7 @@ test('pause, focus loss and hidden tab freeze vehicle carry and clear held input
 
 test('completion requires grounded terrace and stays idle through pause/resume', t => {
     const h = guairaAscentBrowser(t), game = h.create();
-    game.player.data.position = { x: 944, y: 60 }; game.player.data.isGrounded = false;
+    game.player.data.position = { x: G.finishX, y: 20 }; game.player.data.isGrounded = false;
     h.run(game, 1); assert.equal(game.finished, false);
     h.keys([]); game.load(G.id); replay(h, game); game.toggleAscentPause();
     const frozen = snapshot(game); h.run(game, 60); assert.deepEqual(snapshot(game), frozen);
@@ -215,4 +218,57 @@ test('touch cancellation clears held movement/jump before a new boarding attempt
     assert.equal(game.input.getState().right, false); assert.equal(game.input.getState().jump, false);
     h.window.dispatch('blur'); game.load(G.id); h.run(game, 2);
     assert.equal(game.player.data.position.x, 48); assert.equal(feet(game), 304);
+});
+
+
+test('optional inspection coins and two ordinary jumps return to the upper safe landing; death preserves attempt coins', t => {
+    const h = guairaAscentBrowser(t), game = h.create();
+    for (const [n, keys] of recording.runs.slice(0, 10) as Array<[number, string[]]>) h.run(game, n, keys);
+    assert.equal(game.store.save.checkpoint?.index, 1);
+    h.run(game, 104, ['ArrowRight']); h.run(game, 50);
+    assert.equal(feet(game), 240); assert.equal(game.coins, 3);
+    h.run(game, 25, ['ArrowRight']); h.run(game, 80, ['ArrowLeft']); h.run(game, 20);
+    h.run(game, 35, ['Space']); h.run(game, 20);
+    assert.equal(feet(game), 192);
+    h.run(game, 45, ['ArrowLeft', 'Space']); h.run(game, 30);
+    assert.equal(feet(game), 144); assert.ok(game.player.data.position.x < 880);
+    assert.equal(game.player.data.isDead, false); assert.equal(game.player.data.hasHelmet, true);
+    const previous = game.player; previous.die('fall');
+    for (let n = 0; n < 180 && previous === game.player; n++) h.run(game, 1);
+    assert.notEqual(game.player, previous);
+    assert.equal(game.player.data.position.x, G.upperCheckpointX); assert.equal(feet(game), 144);
+    assert.equal(game.objects.time, 0); assert.equal(game.objects.get(G.serviceId)!.x, 896);
+    assert.equal(game.store.save.checkpoint?.index, 1); assert.equal(game.coins, 3);
+    assert.equal([...((game as unknown as { collected: Set<string> }).collected)].filter(id => id.includes('inspection')).length, 3);
+    h.run(game, 30); // Native respawn reveal finishes before fresh boarding input.
+    h.run(game, 28, ['ArrowRight']); h.run(game, 20);
+    h.run(game, 40, ['ArrowRight', 'Space']); h.run(game, 160);
+    h.run(game, 50, ['ArrowRight', 'Space']); h.run(game, 90, ['ArrowRight']);
+    assert.equal(game.finished, true, 'upper checkpoint restores a natively completable crossing');
+    assert.equal(game.coins, 3);
+    game.load(G.id);
+    assert.equal(game.coins, 0); assert.equal(game.store.save.checkpoint, null);
+    assert.equal(game.stage.pickups?.length, 6);
+});
+
+
+test('upper-patamar presentation freezes during pause and focus loss', t => {
+    const h = guairaAscentBrowser(t), game = h.create();
+    for (const [n, keys] of recording.runs.slice(0, 12) as Array<[number, string[]]>) h.run(game, n, keys);
+    for (const pause of [() => game.toggleAscentPause(), () => h.window.dispatch('blur')]) {
+        pause(); const frozen = snapshot(game); h.run(game, 60); game.render();
+        assert.deepEqual(snapshot(game), frozen); game.toggleAscentPause();
+    }
+});
+
+
+test('ordinary jump back toward the lift retains helmet headroom across the upper-bank boundary', t => {
+    const h = guairaAscentBrowser(t), game = h.create();
+    for (const [n, keys] of recording.runs.slice(0, 10) as Array<[number, string[]]>) h.run(game, n, keys);
+    h.run(game, 25, ['ArrowLeft']); h.run(game, 30);
+    for (let n = 0; n < 30; n++) {
+        h.run(game, 1, ['Space', 'ArrowLeft']);
+        assert.ok(game.player.data.position.y - 10 - game.camera.y >= 23);
+        assert.equal(game.player.data.isDead, false);
+    }
 });

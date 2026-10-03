@@ -121,3 +121,18 @@ test('all three painters restore Canvas state, repeat deterministically, and mut
     drawRespirosBackground(a.context, 0, 144, 0, true); drawRespirosBackground(b.context, 0, 144, 9345, true);
     assert.deepEqual(a.calls, b.calls);
 });
+
+test('authored final pair paints its independent envelopes and never paints water across the dry refuge', async () => {
+    const { guairaRespirosStage, GUAIRA_RESPIROS: G } = await import('../src/adventure/experimental/guaira/respiros/GuairaRespirosStage');
+    const objects = new WorldObjects(guairaRespirosStage().mechanisms);
+    for (let frame = 0; frame < 252; frame++) {
+        objects.time = frame * 1000 / 60;
+        for (const reduced of [false, true]) {
+            verifyEnvelope(objects, 648, 132, reduced);
+            verifyEnvelope(objects, 768, 132, reduced);
+            const pixels = paint(objects, 768, 132, reduced).pixels;
+            for (let x = G.thirdEnd; x < G.fourthStart; x++)
+                assert.notEqual(pixels[(G.floor - 133) * 320 + x - 768], 1);
+        }
+    }
+});

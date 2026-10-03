@@ -7,8 +7,8 @@ import { isOneWayTile, supportsStanding } from '../../../world/tileRules';
 
 /** Scenery is presentation only. Tiles and WorldObjects own every supporting surface. */
 export const GUAIRA_ASCENT_ART = Object.freeze({
-    width: 1024, height: 400, departureY: 304, terraceY: 144, recoveryY: 368,
-    plankId: 'guaira-plank', liftId: 'guaira-service-lift',
+    width: 1344, height: 400, departureY: 304, terraceY: 144, recoveryY: 368,
+    plankId: 'guaira-plank', liftId: 'guaira-service-lift', serviceId: 'guaira-inspection-carriage',
     workerFeet: Object.freeze([{ x: 166, y: 296 }, { x: 571, y: 295 }]),
 });
 
@@ -257,7 +257,14 @@ export function drawGuairaAscentBackground(c: CanvasRenderingContext2D, cx: numb
             r(c, 594 - cameraX, 288 - cameraY, 5, 3, '#d0b488');
             r(c, 496 - cameraX, 296 - cameraY, 160, 8, '#cb9467');
         }
-        if (visible(768, 256, cameraX)) bureau(c, cameraX, cameraY, t);
+        if (visible(1088, 256, cameraX)) bureau(c, cameraX - 320, cameraY, t);
+        if (visible(768, 320, cameraX)) {
+            house(c, 778 - cameraX, 136 - cameraY, 56, 60);
+            sign(c, 823 - cameraX, 104 - cameraY, 54, ['VAZAO']);
+            pipe(c, 884 - cameraX, 181 - cameraY, 196);
+            sign(c, 943 - cameraX, 196 - cameraY, 83, ['INSPECAO']);
+            r(c, 883 - cameraX, 232 - cameraY, 202, 8, '#c99870');
+        }
     });
 }
 
@@ -333,7 +340,7 @@ export function drawGuairaAscentTerrain(c: CanvasRenderingContext2D, level: Worl
                 16 - (left ? 3 : 0) - (right ? 3 : 0), 16 - (top ? 4 : 0));
         }
         c.clip();
-        for (const [left, right, top] of [[0,224,304],[496,656,304],[768,1024,144]]) {
+        for (const [left, right, top] of [[0,224,304],[496,656,304],[768,880,144],[1088,1344,144]]) {
             if (visible(left, right - left, cameraX)) cutEarth(c, left, right, top, cameraX, cameraY);
         }
         c.restore();
@@ -359,8 +366,8 @@ function deck(c: CanvasRenderingContext2D, body: MovingBody, cx: number, cy: num
 
 export function drawGuairaAscentObjects(c: CanvasRenderingContext2D, objects: WorldObjects, cx: number, cy: number, _time: number, _reducedMotion: boolean) {
     layer(c, cx, cy, (cameraX, cameraY) => {
-        const plank = objects.get(GUAIRA_ASCENT_ART.plankId), lift = objects.get(GUAIRA_ASCENT_ART.liftId);
-        if (plank) {
+        const lift = objects.get(GUAIRA_ASCENT_ART.liftId);
+        for (const plank of [objects.get(GUAIRA_ASCENT_ART.plankId), objects.get(GUAIRA_ASCENT_ART.serviceId)]) if (plank) {
             const from = plank.home ?? { x: plank.x, y: plank.y }, to = plank.to ?? from;
             const left = Math.min(from.x, to.x), right = Math.max(from.x, to.x) + plank.width, railY = from.y + plank.height + 12;
             if (visible(left - 12, right - left + 24, cameraX)) {

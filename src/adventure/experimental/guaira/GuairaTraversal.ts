@@ -7,35 +7,49 @@ import { panel, pixelText } from '../../../graphics/BitmapFont';
 import { drawGuairaTraversalBackground, drawGuairaTraversalTerrain, drawGuairaTraversalObjects } from './GuairaTraversalArt';
 
 export const GUAIRA_TRAVERSAL = Object.freeze({
-    id: 'guaira-travessia', width: 72, height: 18, floor: 224,
+    id: 'guaira-travessia', width: 96, height: 18, floor: 224,
     pitStart: 416, pitEnd: 624, valveId: 'guaira-valve', bridgeId: 'guaira-bridge',
-    checkpointX: 656, finishX: 1080, bossHref: './guaira-lab.html', mapHref: './guaira.html'
+    checkpointX: 656, finishX: 1472, finalValveId: 'guaira-rice-valve', finalBridgeId: 'guaira-rice-bridge', bossHref: './guaira-lab.html', mapHref: './guaira.html'
 });
 
 /** Local authored data only: never registered as a seventh campaign world. */
 export function guairaTraversalStage(): AdventureStage {
     const stage = structuredClone(STAGES[0]);
     stage.id = GUAIRA_TRAVERSAL.id; stage.name = 'GUAÍRA · TRAVESSIA';
-    stage.subtitle = 'Uma comporta para o arrozal · localidade fictícia';
+    stage.subtitle = 'Comporta, taipas e canal do arroz · localidade fictícia';
     delete stage.encounter;
     stage.level.id = 'experimental-guaira-travessia';
     stage.level.width = GUAIRA_TRAVERSAL.width; stage.level.height = GUAIRA_TRAVERSAL.height;
     stage.level.originX = 0; stage.level.originY = 0;
-    stage.level.tiles = Array.from({ length: 18 }, (_, y) => Array.from({ length: 72 }, (_, x) =>
-        y >= 14 && (x < 26 || x >= 39) ? TileType.GROUND : TileType.EMPTY));
+    stage.level.tiles = Array.from({ length: 18 }, (_, y) => Array.from({ length: GUAIRA_TRAVERSAL.width }, (_, x) => {
+        // Dry street, sluice lesson, rice-bank variations, then a combined crossing.
+        if (x < 26 || (x >= 39 && x < 44) || (x >= 61 && x < 70)) return y >= 14 ? TileType.GROUND : TileType.EMPTY;
+        if (x >= 44 && x < 61) {
+            const bankTop = x < 48 ? 13 : x >= 50 && x < 53 ? 12 : x >= 55 && x < 58 ? 13 : 16;
+            return (y === bankTop || y >= 16) ? TileType.GROUND : TileType.EMPTY;
+        }
+        if (x >= 85) return y >= 12 ? TileType.GROUND : TileType.EMPTY;
+        return TileType.EMPTY;
+    }));
     stage.level.playerSpawn = { x: 3, y: 14 };
     stage.level.enemies = []; stage.level.collectibles = []; stage.level.triggers = [];
-    stage.level.checkpoints = []; stage.level.goalPosition = { x: 69, y: 14 }; stage.level.isBossLevel = false;
+    stage.level.checkpoints = []; stage.level.goalPosition = { x: 93, y: 12 }; stage.level.isBossLevel = false;
     stage.mechanisms = [
         { id: GUAIRA_TRAVERSAL.valveId, kind: 'switch', x: 352, y: 216, width: 32, height: 8, link: GUAIRA_TRAVERSAL.bridgeId },
-        { id: GUAIRA_TRAVERSAL.bridgeId, kind: 'lift', x: 416, y: 336, width: 208, height: 16, to: { x: 416, y: 224 }, gated: true }
+        { id: GUAIRA_TRAVERSAL.bridgeId, kind: 'lift', x: 416, y: 336, width: 208, height: 16, to: { x: 416, y: 224 }, gated: true },
+        { id: GUAIRA_TRAVERSAL.finalValveId, kind: 'switch', x: 1072, y: 216, width: 32, height: 8, link: GUAIRA_TRAVERSAL.finalBridgeId },
+        { id: GUAIRA_TRAVERSAL.finalBridgeId, kind: 'lift', x: 1120, y: 336, width: 240, height: 16, to: { x: 1120, y: 224 }, gated: true }
     ];
     stage.foes = []; stage.exits = []; stage.dialogues = []; stage.landmarks = [];
-    stage.checkpoints = [{ x: 41, y: 14 }];
-    stage.pickups = [112, 224, 360, 456, 520, 584, 744, 824, 904, 984].map((x, i) =>
-        ({ id: `guaira-travessia:coin:${i}`, kind: 'coin', x, y: i === 2 ? 164 : 202 }));
+    stage.checkpoints = [{ x: 41, y: 14 }, { x: 64, y: 14 }, { x: 88, y: 12 }];
+    const coins = [[112,202], [224,202], [360,164], [456,202], [520,202], [584,202],
+        [728,186], [824,170], [904,186], [780,238], [860,238], [948,238],
+        [1088,164], [1184,202], [1280,202], [1400,170], [1456,170]];
+    stage.pickups = coins.map(([x, y], i) => ({ id: `guaira-travessia:coin:${i}`, kind: 'coin', x, y }));
     stage.route = [{ x: 48, y: 224 }, { x: 368, y: 224, switch: GUAIRA_TRAVERSAL.valveId },
-        { x: 656, y: 224 }, { x: 1080, y: 224 }];
+        { x: 656, y: 224 }, { x: 736, y: 208 }, { x: 824, y: 192 }, { x: 904, y: 208 },
+        { x: 1024, y: 224 }, { x: 1088, y: 224, switch: GUAIRA_TRAVERSAL.finalValveId },
+        { x: 1312, y: 224 }, { x: 1408, y: 192 }, { x: 1472, y: 192 }];
     return stage;
 }
 
@@ -72,11 +86,21 @@ export class GuairaTraversal extends WorldGame {
             const bridge = this.objects.get(GUAIRA_TRAVERSAL.bridgeId)!;
             valve.active = valve.observedActive = true;
             bridge.active = bridge.observedActive = true; bridge.y = bridge.py = 224;
+            if (this.store.save.checkpoint.index >= 2) {
+                const finalValve = this.objects.get(GUAIRA_TRAVERSAL.finalValveId)!;
+                const finalBridge = this.objects.get(GUAIRA_TRAVERSAL.finalBridgeId)!;
+                finalValve.active = finalValve.observedActive = true;
+                finalBridge.active = finalBridge.observedActive = true; finalBridge.y = finalBridge.py = 224;
+            }
         }
         this.player.data.respawnRevealTimer = 0;
     }
     get bridgeReady() {
         const bridge = this.objects.get(GUAIRA_TRAVERSAL.bridgeId)!;
+        return bridge.active && bridge.y === GUAIRA_TRAVERSAL.floor;
+    }
+    get finalBridgeReady() {
+        const bridge = this.objects.get(GUAIRA_TRAVERSAL.finalBridgeId)!;
         return bridge.active && bridge.y === GUAIRA_TRAVERSAL.floor;
     }
     get mapReturnHref() {
@@ -110,7 +134,7 @@ export class GuairaTraversal extends WorldGame {
         super.update(dt);
         // There are no campaign exits or boss here: finishStage is unreachable.
         if (this.state === 'playing' && !this.player.data.isDead && this.player.data.isGrounded &&
-            this.player.data.position.x >= GUAIRA_TRAVERSAL.finishX && this.bridgeReady) {
+            this.player.data.position.x >= GUAIRA_TRAVERSAL.finishX && this.bridgeReady && this.finalBridgeReady) {
             this.finished = true; this.input.reset(); this.audio.sfx('victory');
         }
     }
@@ -124,11 +148,13 @@ export class GuairaTraversal extends WorldGame {
         c.fillStyle = '#382b35'; c.fillRect(0, 0, 320, 23);
         c.fillStyle = '#d8ac7a'; c.fillRect(0, 22, 320, 1);
         pixelText(c, 'GUAIRA', 8, 8, '#f0ddae');
-        pixelText(c, this.finished ? 'TRAVESSIA FEITA' : this.player.data.position.x < 416 ? 'RUA DA VALA SECA' : 'PASSARELA DO ARROZ', 57, 8, '#f0ddae');
+        pixelText(c, this.finished ? 'TRAVESSIA FEITA' : this.player.data.position.x < 624 ? 'RUA DA VALA SECA' : this.player.data.position.x < 1024 ? 'TAIPAS DO ARROZ' : 'CANAL DO CURRAL', 57, 8, '#f0ddae');
         if (this.player.data.hasHelmet) this.renderer.drawHelmet(279, 4, c);
         pixelText(c, 'II', 305, 8, '#f0ddae');
-        const valve = this.objects.get(GUAIRA_TRAVERSAL.valveId)!;
-        const nearValve = this.player.data.position.x > 275 && this.player.data.position.x < 416;
+        const finalSection = this.player.data.position.x >= 1024;
+        const valve = this.objects.get(finalSection ? GUAIRA_TRAVERSAL.finalValveId : GUAIRA_TRAVERSAL.valveId)!;
+        const ready = finalSection ? this.finalBridgeReady : this.bridgeReady;
+        const nearValve = (this.player.data.position.x > 275 && this.player.data.position.x < 416) || (this.player.data.position.x > 1024 && this.player.data.position.x < 1120);
         // Match the native painter's rounded camera and include the helmet,
         // feet and panel shadow. Page status keeps the instruction during a jump.
         const playerY = Math.round(this.player.data.position.y) - Math.round(this.camera.y);
@@ -144,14 +170,15 @@ export class GuairaTraversal extends WorldGame {
             pixelText(c, this.continuationHint, 160, 65, '#edcaf5', 1, 'center');
         } else if (nearValve && !this.player.data.isDead && !bannerWouldCoverPlayer) {
             panel(c, 42, 29, 236, 19, '#382b35', '#d8ac7a');
-            pixelText(c, !valve.active ? 'PULE SOBRE A PLACA. BAIXO NO AR' : this.bridgeReady ? 'PASSAGEM ABERTA' : 'PONTE SUBINDO...', 160, 35, '#f0ddae', 1, 'center');
+            pixelText(c, !valve.active ? 'PULE SOBRE A PLACA. BAIXO NO AR' : ready ? 'PASSAGEM ABERTA' : 'PONTE SUBINDO...', 160, 35, '#f0ddae', 1, 'center');
         }
         this.renderer.present();
         const message = paused ? 'Pausado · Esc ou Continuar para voltar'
             : this.finished ? 'Travessia concluída · a água chegou ao arrozal · Curral abre a arena de Ossabravo · Mapa volta ao arrozal na maquete'
             : this.player.data.isDead ? 'Feka caiu · retorno automático ao ponto seguro desta tentativa · Recomeçar reinicia a travessia'
-            : nearValve ? (!valve.active ? 'Pule primeiro. No ar, aperte baixo sobre a placa; espere a ponte subir' : this.bridgeReady ? 'Ponte pronta · atravesse até a bandeira do checkpoint' : 'Água liberada · a ponte está subindo')
-            : this.player.data.position.x >= 624 ? 'Siga à direita até o curral · ponto seguro na bandeira só nesta tentativa · sair e reentrar reinicia a travessia'
+            : nearValve ? (!valve.active ? 'Pule primeiro. No ar, aperte baixo sobre a placa; espere a ponte subir' : ready ? 'Ponte pronta · atravesse até a bandeira do checkpoint' : 'Água liberada · a ponte está subindo')
+            : this.player.data.position.x >= 1120 ? 'Atravesse e pule para a margem alta · bandeira depois do canal'
+            : this.player.data.position.x >= 624 ? 'Pule pelas taipas · moedas no canal baixo são opcionais · ponto seguro só nesta tentativa · sair e reentrar reinicia a travessia'
             : 'Guaíra fictícia · setas/A D: mover · Espaço: pular · baixo no ar: sentada · Shift: correr · Esc: pausa · M: som';
         if (this.status.textContent !== message) this.status.textContent = message;
     }

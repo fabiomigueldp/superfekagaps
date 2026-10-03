@@ -16,3 +16,13 @@ export function chapterGuidance(native: string | null | undefined, objective: st
     return message
         .replace(/ · sair e reentrar reinicia o protótipo$/, ' · reentrar reinicia esta tentativa');
 }
+
+/** Reentry restores durable receipts, not native mechanisms, position or attempt coins. */
+export function chapterResumeGuidance(): string {
+    return 'Sair ou recarregar reinicia o trecho; checkpoint só nesta tentativa';
+}
+
+export function chapterAttemptSummary(coins: number): string {
+    const count = Number.isFinite(coins) ? Math.max(0, Math.floor(coins)) : 0;
+    return `${count} ${count === 1 ? 'moeda coletada' : 'moedas coletadas'} nesta tentativa`;
+}

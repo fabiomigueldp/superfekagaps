@@ -1,4 +1,4 @@
-import { chapterExitPresentation, chapterGuidance, chapterTitle } from './GuairaChapterPresentation';
+import { chapterExitPresentation, chapterGuidance, chapterTitle, chapterAttemptSummary, chapterResumeGuidance } from './GuairaChapterPresentation';
 import { ProgressStore } from '../../../progress';
 import { freshGuairaChapterProgress, type GuairaChapterProgress } from './GuairaChapterProgress';
 import { reliefChallengeMessage, type GuairaReliefOptions } from '../relief/GuairaReliefChallenge';
@@ -96,7 +96,7 @@ export class GuairaChapterApp {
         } else this.showMap('town');
     }
     private storageMessage() {
-        return this.progressStore.warning || (this.saved ? 'Progresso salvo neste navegador.' : 'Progresso somente nesta sessão.');
+        return this.progressStore.warning || (this.saved ? 'Conclusões salvas neste navegador.' : 'Progresso somente nesta sessão.');
     }
     private persistProgress(resumeScene: GuairaChapterProgress['resumeScene'] = this.progress.resumeScene) {
         const snapshot = this.snapshot;
@@ -244,8 +244,28 @@ export class GuairaChapterApp {
 
     private keyboardHint() {
         const hint = document.createElement('p'); hint.id = 'chapter-keyboard-hint';
-        hint.textContent = 'Teclado: ←/→ mover · Espaço pular · ↓ no ar: sentada · Shift correr · Esc pausa';
+        hint.textContent = 'Teclado: ←/→ mover · Espaço pular · ↓ no ar: sentada · Shift correr · Esc pausa · M som';
         return hint;
+    }
+
+    /** Same sound preference in every room; never routes through the campaign menu. */
+    private sceneSound(scope: DisposalScope, canvas: HTMLCanvasElement) {
+        const button = document.createElement('button'); button.type = 'button'; button.id = 'chapter-sound';
+        const art = new LabToolbarAction(button);
+        const sync = () => {
+            const game = this.current(scope) ? this.mounted?.runtime.game : null;
+            button.disabled = !game || game.isDisposed;
+            const enabled = game?.audio.enabled ?? this.audioEnabled;
+            art.setLabel(enabled ? 'SOM' : 'MUDO', enabled ? 'Desativar o som do capítulo' : 'Ativar o som do capítulo');
+            button.setAttribute('aria-pressed', String(enabled));
+        };
+        scope.listen(button, 'click', () => {
+            const game = this.current(scope) && this.focused && !document.hidden ? this.mounted?.runtime.game : null;
+            if (!game || game.isDisposed) return;
+            game.audio.unlock(); game.audio.toggle(); this.audioEnabled = game.audio.enabled;
+            this.persistProgress(); sync(); canvas.focus({ preventScroll: true });
+        });
+        sync(); return { button, sync };
     }
 
     private scenePanel(attempt: GuairaChapterAttempt, scope: DisposalScope) {
@@ -260,10 +280,12 @@ export class GuairaChapterApp {
         new LabToolbarAction(retry).setLabel('TENTAR', `Recomeçar ${info.title} nesta tentativa`);
         new LabToolbarAction(map).setLabel('MAPA', 'Voltar ao mapa de Guaíra');
         primaryArt.setLabel('PAUSA', 'Pausar'); primary.disabled = true;
-        nav.append(status, primary, retry, map, this.keyboardHint());
+
         const canvas = document.createElement('canvas'); canvas.id = 'game-canvas'; canvas.tabIndex = 0;
         canvas.contentEditable = 'true'; canvas.spellcheck = false; canvas.setAttribute('inputmode', 'none');
-        canvas.setAttribute('aria-label', `${info.title}. ${info.objective} Setas para mover, Espaço para pular, baixo no ar para sentada, Shift para correr e Escape para pausar.`);
+        const sound = this.sceneSound(scope, canvas);
+        nav.append(status, primary, retry, map, sound.button, this.keyboardHint());
+        canvas.setAttribute('aria-label', `${info.title}. ${info.objective} Setas para mover, Espaço para pular, baixo no ar para sentada, Shift para correr, Escape para pausar e M para o som.`);
         this.root.append(nav, canvas);
         scope.listen(canvas, 'pointerdown', () => canvas.focus({ preventScroll: true }));
         scope.listen(retry, 'click', () => {
@@ -286,7 +308,7 @@ export class GuairaChapterApp {
             const observer = new ResizeObserver(fit); scope.add(() => observer.disconnect()); observer.observe(nav);
         }
         fit();
-        return { canvas, status, primary, primaryArt, fit };
+        return { canvas, status, primary, primaryArt, sound, fit };
     }
 
     private async showScene(attempt: GuairaChapterAttempt) {
@@ -317,7 +339,7 @@ export class GuairaChapterApp {
             scope.add(() => controls.dispose());
             const reflect = () => {
                 if (!this.current(scope) || game.isDisposed) return false;
-                controls.sync();
+                controls.sync(); panel.sound.sync();
                 const live = runtime.sample(attempt), complete = this.session.canContinue(attempt, live);
                 if (this.session.acceptCompletion(attempt, live) || this.audioEnabled !== game.audio.enabled) {
                     this.audioEnabled = game.audio.enabled; this.persistProgress();
@@ -327,9 +349,9 @@ export class GuairaChapterApp {
                     game.state === 'paused' ? 'Retomar a tentativa' : complete ? 'Continuar a jornada pelo mapa' : 'Pausar');
                 const step = this.snapshot.route.indexOf(attempt.sceneId) + 1;
                 const guidance = chapterGuidance(nativeStatus.textContent, info.objective);
-                const message = game.state === 'paused' ? 'Pausado · Continuar volta à tentativa'
+                const message = game.state === 'paused' ? `Pausado · Continuar retoma daqui · ${chapterResumeGuidance()}`
                     : !live.alive ? 'Feka caiu · retorno ao ponto seguro desta tentativa'
-                    : complete ? 'Trecho concluído · Continuar volta ao mapa de Guaíra'
+                    : complete ? `Trecho concluído · ${chapterAttemptSummary(game.coins)} · Continuar volta ao mapa de Guaíra`
                     : `Etapa ${step}/5 · ${game.boss?.hint ?? guidance}`;
                 const statusMessage = `${message} · ${this.storageMessage()}`;
                 if (panel.status.textContent !== statusMessage) panel.status.textContent = statusMessage;
@@ -402,10 +424,12 @@ export class GuairaChapterApp {
         new LabToolbarAction(retry).setLabel('TENTAR', `Recomeçar ${info.title} nesta tentativa opcional`);
         new LabToolbarAction(map).setLabel('BAIRRO', 'Voltar ao Bairro da Vala Seca no capítulo');
         primaryArt.setLabel('PAUSA', 'Pausar'); primary.disabled = true;
-        nav.append(status, primary, retry, map, this.keyboardHint());
+
         const canvas = document.createElement('canvas'); canvas.id = 'game-canvas'; canvas.tabIndex = 0;
         canvas.contentEditable = 'true'; canvas.spellcheck = false; canvas.setAttribute('inputmode', 'none');
-        canvas.setAttribute('aria-label', `${info.title}, percurso opcional. ${info.objective}. Setas para mover, Espaço para pular, baixo no ar para sentada, Shift para correr e Escape para pausar.`);
+        const sound = this.sceneSound(scope, canvas);
+        nav.append(status, primary, retry, map, sound.button, this.keyboardHint());
+        canvas.setAttribute('aria-label', `${info.title}, percurso opcional. ${info.objective}. Setas para mover, Espaço para pular, baixo no ar para sentada, Shift para correr, Escape para pausar e M para o som.`);
         this.root.append(nav, canvas);
         scope.listen(canvas, 'pointerdown', () => canvas.focus({ preventScroll: true }));
         scope.listen(retry, 'click', () => {
@@ -419,7 +443,7 @@ export class GuairaChapterApp {
         if (typeof ResizeObserver !== 'undefined') {
             const observer = new ResizeObserver(fit); scope.add(() => observer.disconnect()); observer.observe(nav);
         }
-        fit(); return { canvas, status, primary, retry, primaryArt, fit };
+        fit(); return { canvas, status, primary, retry, primaryArt, sound, fit };
     }
     private async showExcursion(token: GuairaChapterExcursionToken, options?: GuairaReliefOptions) {
         if (this.isDisposed) return;
@@ -466,7 +490,7 @@ export class GuairaChapterApp {
             scope.listen(document, 'visibilitychange', () => { if (document.hidden) invalidatePrimary(); });
             const reflect = () => {
                 if (!this.currentExcursion(token, scope) || game.isDisposed) return false;
-                controls.sync(); replay?.sync();
+                controls.sync(); panel.sound.sync(); replay?.sync();
                 if ((runtime.finished && !game.player.data.isDead && ['playing', 'paused'].includes(game.state)
                     && !this.progress.optional[token.sceneId]) || this.audioEnabled !== game.audio.enabled) this.captureLiveProgress();
                 const action = actionNow();
@@ -491,13 +515,14 @@ export class GuairaChapterApp {
                     action === 'resume' ? 'Retomar a tentativa opcional'
                         : action === 'other-route' ? 'Tentar outra rota na Câmara de Alívio'
                         : action === 'relief' ? 'Seguir para a Câmara de Alívio, continuação opcional' : 'Pausar');
-                let message = game.state === 'paused' ? `Pausado · Continuar volta a ${info.title}`
+                let message = game.state === 'paused' ? `Pausado · Continuar retoma daqui · ${chapterResumeGuidance()}`
                     : game.player.data.isDead ? 'Feka caiu · retorno ao ponto seguro desta tentativa opcional'
                     : runtime.finished ? runtime.sceneId === 'gallery'
                         ? 'Acesso de inspeção aberto · Alívio segue para a Câmara de Alívio; Bairro volta ao mapa de Guaíra'
                         : `Passagem inspecionada · ${runtime.reliefOpened ? 'alívio aberto, grelha sem pressão' : 'alívio intacto, grelha mantém o ciclo'} · Bairro volta ao mapa de Guaíra`
                     : runtime.sceneId === 'relief' && nativeStatus.textContent && !nativeStatus.textContent.startsWith('Pausado')
                         ? nativeStatus.textContent : `Desvio opcional · ${info.objective}`;
+                if (runtime.finished && !game.player.data.isDead && game.state === 'playing') message += ` · ${chapterAttemptSummary(game.coins)}`;
                 if (routes && game.state === 'playing' && !game.player.data.isDead) {
                     if (runtime.finished) message += ' · Outra rota propõe um novo objetivo opcional';
                     const optional = reliefChallengeMessage(routes.snapshot);

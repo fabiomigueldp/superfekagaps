@@ -1,48 +1,62 @@
 {
-  "evidence": "Frozen keyboard and native-touch replay through isolated GuairaRespiros / WorldGame / Input / Player; offline DOM harness.",
-  "baselineCommit": "bc431d5c492079a4565fe39fe96742f8dd790057",
+  "evidence": "Frozen native keyboard/touch replay through Input/WorldGame/Player; automated offline DOM harness, no reposition or clock editing.",
+  "baselineCommit": "c0e31ea5c3e5340dcb2a29740b74d9d3231cff8b",
   "stepMs": 16.666666666666668,
   "initialSettleFrames": 1,
-  "inputFrames": 576,
-  "start": {
-    "x": 48,
-    "feetY": 304,
-    "helmet": true
-  },
+  "inputFrames": 877,
   "runs": [
     [
-      160,
-      []
-    ],
-    [
-      128,
+      43,
       [
         "ArrowRight"
       ]
     ],
     [
-      48,
+      106,
       []
     ],
     [
-      180,
+      86,
       [
         "ArrowRight"
       ]
     ],
     [
-      60,
+      94,
       []
+    ],
+    [
+      157,
+      [
+        "ArrowRight"
+      ]
+    ],
+    [
+      132,
+      []
+    ],
+    [
+      94,
+      [
+        "ArrowRight"
+      ]
+    ],
+    [
+      32,
+      []
+    ],
+    [
+      133,
+      [
+        "ArrowRight"
+      ]
     ]
   ],
   "expected": {
-    "x": 657.3253406888704,
+    "x": 1088.4013627554818,
     "feetY": 304,
-    "grounded": true,
     "helmet": true,
-    "checkpointIndex": 0,
-    "storageAccesses": 0,
+    "checkpointIndex": 1,
     "finished": true
-  },
-  "note": "Short authored route after the second-jet phase changed from 2100 to 1200ms: wait for A, walk to the refuge, brake and watch B, then walk out. No player reposition or direct completion call. Long refuge safety is covered separately across three cycles."
+  }
 }
