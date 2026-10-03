@@ -1,0 +1,42 @@
+{
+  "renderer": "paintWorldAtlas",
+  "originalSaveUnchanged": true,
+  "proof": [
+    {
+      "width": 1280,
+      "height": 800,
+      "reducedMotion": false,
+      "changedPixels": 323
+    },
+    {
+      "width": 1280,
+      "height": 800,
+      "reducedMotion": true,
+      "changedPixels": 323
+    },
+    {
+      "width": 390,
+      "height": 540,
+      "reducedMotion": false,
+      "changedPixels": 22
+    },
+    {
+      "width": 390,
+      "height": 540,
+      "reducedMotion": true,
+      "changedPixels": 22
+    },
+    {
+      "width": 640,
+      "height": 360,
+      "reducedMotion": false,
+      "changedPixels": 66
+    },
+    {
+      "width": 640,
+      "height": 360,
+      "reducedMotion": true,
+      "changedPixels": 66
+    }
+  ]
+}

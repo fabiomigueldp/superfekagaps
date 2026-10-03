@@ -1,3 +1,4 @@
+import { campaignWaterRestored, GUAIRA_RESTORED_WATER_IMAGE } from './GuairaCampaignConsequences';
 import { GUAIRA_CAMPAIGN_ART } from './GuairaCampaignArt';
 import type { AdventureSave } from './types';
 import { guairaTravelDirections } from './CampaignWayfinding';
@@ -17,7 +18,18 @@ export function showGuairaRegion(save: AdventureSave, arrived: string, callbacks
     dialog.setAttribute('aria-labelledby', 'guaira-region-title');
     const title = document.createElement('h2'); title.id = 'guaira-region-title'; title.textContent = 'Guaíra · entre a Fábrica e a Serra';
     const art = document.createElement('img'); art.src = GUAIRA_CAMPAIGN_IMAGE;
-    art.alt = 'Guaíra: aeródromo, arrozais, canais e a cidade do Prefeito';
+    art.alt = campaignWaterRestored(save) ? 'Guaíra: água liberada no bebedouro público e nos canais dos arrozais'
+        : 'Guaíra: aeródromo, arrozais, canais e a cidade do Prefeito';
+    const artPanel = document.createElement('div');
+    artPanel.setAttribute('style', 'position:relative;line-height:0');
+    art.setAttribute('style', 'display:block'); artPanel.append(art);
+    if (campaignWaterRestored(save)) {
+        const water = document.createElement('img'); water.src = GUAIRA_RESTORED_WATER_IMAGE; water.alt = '';
+        water.setAttribute('aria-hidden', 'true');
+        water.setAttribute('style', 'position:absolute;inset:0;height:100%;background:transparent;pointer-events:none');
+        water.addEventListener('error', () => water.remove(), { once: true });
+        artPanel.append(water);
+    }
     const journal = campaignJournal(save);
     const summary = document.createElement('p');
     summary.textContent = `${save.guaira.completed.length}/5 trechos concluídos · Galeria ${save.guaira.optional.gallery ? 'concluída' : 'opcional'} · Câmara ${save.guaira.optional.relief ? 'concluída' : 'opcional'}`;
@@ -46,6 +58,6 @@ export function showGuairaRegion(save: AdventureSave, arrived: string, callbacks
     back.addEventListener('click', close);
     dialog.addEventListener('cancel', event => { event.preventDefault(); close(); });
     dialog.addEventListener('keydown', event => event.stopPropagation());
-    controls.append(fly, back); dialog.append(title, art, summary, hint, receipts, reward, optional, controls); document.body.append(dialog); dialog.showModal();
+    controls.append(fly, back); dialog.append(title, artPanel, summary, hint, receipts, reward, optional, controls); document.body.append(dialog); dialog.showModal();
     return close;
 }

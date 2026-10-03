@@ -1,3 +1,4 @@
+import { campaignWaterRestored, campaignWaterOverlay, loadCampaignWaterImage } from './GuairaCampaignConsequences';
 import { campaignMapDirection, guairaTravelDirections } from './CampaignWayfinding';
 import { showGuairaRegion } from './WorldGuairaRegion';
 import { GUAIRA_CAMPAIGN_ART, campaignArtBounds, campaignArtOverlay, loadCampaignRegionImage, type GuairaCampaignRegion } from './GuairaCampaignArt';
@@ -236,6 +237,7 @@ export class WorldMapView {
     private compactOverviewKey = '';
     private compactOverviewPositions: MapControlPlacement[] | null = null;
 
+    private campaignWaterImage: HTMLImageElement | null = null;
     private readonly campaignImages = new Map<GuairaCampaignRegion, HTMLImageElement>();
     private guairaDialog?: () => void;
     private readonly guairaButton = document.createElement('button');
@@ -284,6 +286,9 @@ export class WorldMapView {
         this.guairaButton.addEventListener('click', () => this.act(() => this.showGuaira()));
         this.scene.append(this.guairaButton);
         if (callbacks.guaira) {
+            void loadCampaignWaterImage().then(image => {
+                if (!this.disposed && image) { this.campaignWaterImage = image; this.paintDirty = true; }
+            });
             for (const region of ['fabrica', 'guaira', 'serra'] as const) void loadCampaignRegionImage(region).then(image => {
                 if (!this.disposed && image) { this.campaignImages.set(region, image); this.paintDirty = true; }
             });
@@ -713,7 +718,7 @@ export class WorldMapView {
         if (Math.abs(previous.x - this.marker.x) > 1e-8) this.facingLeft = this.marker.x < previous.x;
         this.reportArrival(); this.refreshHud(warning, toast);
         if (this.dirtySize || this.screenDpr !== (window.devicePixelRatio || 1)) this.measure();
-        const signature = `${progressSignature}|${this.controlSelection}|${save.completed.join(',')}|${save.seals.join(',')}|${warning}|${toast}|${this.overview}|${this.journey.arrived}|${this.journey.destination}|${this.journey.blocked}`;
+        const signature = `${progressSignature}|water:${campaignWaterRestored(save)}|${this.controlSelection}|${save.completed.join(',')}|${save.seals.join(',')}|${warning}|${toast}|${this.overview}|${this.journey.arrived}|${this.journey.destination}|${this.journey.blocked}`;
         if (this.media.matches && !this.paintDirty && !this.geometryDirty && signature === this.lastSignature) return;
         this.lastSignature = signature;
         const stage = STAGES[this.controlSelection];
@@ -855,7 +860,10 @@ export class WorldMapView {
                 const image = this.buoyImages.get(instance.sprite);
                 return ready && image ? [{ point: instance.point, sprite: this.buoyMetadata!.sprites[instance.sprite], image }] : [];
             }),
-            connections: [...Array.from(this.campaignImages).filter(([region]) => !GUAIRA_CAMPAIGN_ART[region].replacesBase).map(([region, image]) => ({ ...campaignArtOverlay(region, image), image })), ...(overlay ? [{ ...overlay, image: this.bridgeImages.get(bridgeState)! }] : []),
+            connections: [...Array.from(this.campaignImages).filter(([region]) => !GUAIRA_CAMPAIGN_ART[region].replacesBase).flatMap(([region, image]) => {
+                const water = region === 'guaira' ? campaignWaterOverlay(save, this.campaignWaterImage) : null;
+                return [campaignArtOverlay(region, image), ...(water ? [water] : [])];
+            }), ...(overlay ? [{ ...overlay, image: this.bridgeImages.get(bridgeState)! }] : []),
                 ...passengerLayers.map(layer => ({ ...layer, image: this.passengerOverlays.get(layer.path)! })),
                 ...dominioLayers.map(layer => ({ ...layer, image: this.dominioOverlays.get(layer.path)! }))],
             actor: { point: actorPoint, walking: !!active && active.mode !== 'sail' && active.mode !== 'cable', facingLeft: this.facingLeft, aboard,

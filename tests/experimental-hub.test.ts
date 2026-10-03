@@ -170,6 +170,9 @@ test('compact title geometry leaves a 44px rail and preserves canvas coordinates
 test('actual entrypoints preserve final focus ordering, return links, and fresh chapter sessions', () => {
     const read = (path: string) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
     const main = read('src/main.ts');
+    const world = read('src/adventure/WorldGame.ts');
+    assert.match(world, /SETAS\/TAB: MENU · ENTER: CONFIRMAR/);
+    assert.doesNotMatch(world, /TAB: \$\{EXTRAS_LABEL\}/, 'Tab traverses native menu controls before Extras');
     assert.ok(main.indexOf('game.enableExperimentalHub') > main.lastIndexOf('canvas.focus('));
     assert.match(main, /if \(game instanceof WorldGame\) game.enableExperimentalHub/);
     assert.match(read('guaira.html'), /id="map-exit" href="\.\/\?experiments=1"/);
