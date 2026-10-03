@@ -155,13 +155,13 @@ export function drawJuiceGeysers(c: CanvasRenderingContext2D, b: JuiceMinibossMo
             // height with the countdown: the full extent matters from frame one.
             const top = g.y - cy;
             c.fillStyle = '#f3c979'; c.globalAlpha = .12;
-            c.fillRect(x, top, g.width, g.height);
+            c.fillRect(x - 3, top, g.width + 6, g.height);
             c.globalAlpha = .8;
-            rect(c, x, top, g.width, 1, '#f3c979');
+            rect(c, x - 3, top, g.width + 6, 1, '#f3c979');
             for (let dy = 0; dy < g.height; dy += 8) {
                 const dashHeight = Math.min(3, g.height - dy);
-                rect(c, x, top + dy, 1, dashHeight, '#f3c979');
-                rect(c, x + g.width - 1, top + dy, 1, dashHeight, '#f3c979');
+                rect(c, x - 3, top + dy, 1, dashHeight, '#f3c979');
+                rect(c, x + g.width + 2, top + dy, 1, dashHeight, '#f3c979');
             }
             c.globalAlpha = 1;
             fluidPuddle(c, middle, floor, 11, 1.5, g.x, true);

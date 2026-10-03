@@ -1,6 +1,6 @@
 # Turbosuco: isolated experimental juice miniboss
 
-Status: playable experimental lab at `/juice-lab.html` through local Vite. The dedicated entry preserves the normal `index.html` app. This encounter is not part of the campaign and this work does not deploy to the Oracle-hosted game.
+Status: playable at `/juice-lab.html` and through the optional Factory salon in campaign stage `3-3`. `FactorySalonSession` reuses this encounter, introduction, pixel material and fluid effects. The standalone lab remains ephemeral; the campaign host owns the return journey and optional victory record. This revision is prepared for GitHub integration and publication to the Oracle-hosted game at `https://superfekagaps.torbware.space/`.
 
 ## Calabrezzo championship introduction
 
@@ -110,9 +110,9 @@ The liquid renderer samples bounded emissions from the simulation clock; pause f
 
 ## Scope and promotion
 
-The changes stay within the experimental lab and its introduction, art, model, adapter, documentation and tests. Campaign mechanics, campaign data, Player behavior, save schema and deployment configuration remain outside this revision.
+The refinements stay within the shared encounter, introduction, art, model, adapter, documentation and tests. Merging the current main preserves its Factory salon integration, audio handoffs, epilogue, Player behavior and save schema.
 
-Before promotion, review the local preview in an actual browser, play all three patterns and stage two, check keyboard/touch and narrow-screen layout, and assess human difficulty. Do not silently add the encounter to the campaign or its saved stage list. Earlier five-droplet, three-health phase-two rules and the 1,098-frame airborne-seed replay are historical versions superseded by the contract above.
+Publication uses the user's explicit request to merge and deploy to Oracle. Verify both the standalone lab and the existing campaign salon, including returning to the suspended campaign. Earlier five-droplet, three-health phase-two rules and the 1,098-frame airborne-seed replay are historical versions superseded by the contract above.
 
 ## Stage-two warning-volume review (2026-10-02)
 
