@@ -1,5 +1,7 @@
 import type { JuiceMinibossModel } from './JuiceMinibossModel';
 import { juicePose } from './JuiceAnimation';
+import { drawJuicePixelBody } from './JuicePixelSurface';
+import { drawFluidImpact, fluidDrop, fluidOval, fluidPuddle } from './JuiceFluid';
 
 // Hand-painted at the game's logical resolution. The dome, brows and gumline
 // share a single liquid material; no detached eyes, horns or humanoid limbs.
@@ -22,25 +24,17 @@ function polygon(c: CanvasRenderingContext2D, points: number[], color: string) {
     for (let i = 2; i < points.length; i += 2) c.lineTo(points[i], points[i + 1]);
     c.closePath(); c.fillStyle = color; c.fill();
 }
-function dome(c: CanvasRenderingContext2D, lean: number, breathe: number) {
+function dome(c: CanvasRenderingContext2D, lean: number, breathe: number, flow = 0) {
     c.beginPath(); c.moveTo(-22, -1);
-    c.bezierCurveTo(-25, -4, -17, -4, -17.5, -12);
-    c.bezierCurveTo(-19.5 - breathe * .5, -22, -18 + lean, -34, -10 + lean, -41);
+    c.bezierCurveTo(-25 - flow, -4, -17 - flow, -4, -17.5 - flow * .6, -12);
+    c.bezierCurveTo(-19.5 - breathe * .5 - flow, -22, -18 + lean, -34, -10 + lean, -41);
     c.bezierCurveTo(-3 + lean, -47 + breathe, 10 + lean, -46 + breathe, 16 + lean, -37);
-    c.bezierCurveTo(21 + lean, -30, 17 + breathe * .7, -20, 19, -12);
-    c.bezierCurveTo(19, -6, 26, -4, 23, -1);
+    c.bezierCurveTo(21 + lean, -30, 17 + breathe * .7 + flow, -20, 19 + flow * .5, -12);
+    c.bezierCurveTo(19 + flow, -6, 26 + flow, -4, 23, -1);
     c.bezierCurveTo(18, 2, 13, -1.5, 7, 0);
     c.bezierCurveTo(1, 2.3, -7, -1.5, -12, 0);
     c.bezierCurveTo(-17, 1.9, -21, 1.1, -22, -1); c.closePath();
 }
-function glob(c: CanvasRenderingContext2D, x: number, y: number, r: number, angle: number, hot = false) {
-    c.save(); c.translate(x, y); c.rotate(angle);
-    oval(c, -.3, 0, r + .7, r, INK);
-    oval(c, 0, -.2, r, r - .6, hot ? '#dd3ac1' : VIOLET);
-    oval(c, -.7, -.9, Math.max(1, r * .55), Math.max(.7, r * .3), GLOSS);
-    c.fillStyle = WHITE; c.fillRect(-1, -1.8, 1, 1); c.restore();
-}
-
 /** Warning geometry is taken directly from the locked combat geometry. */
 function anticipation(c: CanvasRenderingContext2D, b: JuiceMinibossModel, cx: number, cy: number) {
     if (b.phase !== 'warning') return;
@@ -120,11 +114,18 @@ function mouth(c: CanvasRenderingContext2D, lean: number, open: number, time: nu
     // A dim reflected pool sits deep in the throat and stays lower contrast.
     c.save(); c.clip(); oval(c, 1, 12, 8, 3.8, '#52155e'); c.restore();
     for (const [x, y, length] of [[-12, -2, 5], [-5, -4, 6], [3, -4, 4], [11, -2, 7]]) {
-        const drip = length + Math.sin(time * 3 + x) * .55;
+        const cycle = (time * .6 + (x + 20) * .17) % 1;
+        const stretching = Math.min(1, cycle / .72);
+        const drip = length + stretching * 2.6 - Math.max(0, (cycle - .72) / .28) * 3;
         c.beginPath(); c.moveTo(x - 1.3, y); c.lineTo(x - .6, y + drip);
         c.quadraticCurveTo(x + .5, y + drip + 1, x + .8, y + drip - .5); c.lineTo(x + 1.2, y); c.closePath();
         c.fillStyle = defeated ? SHADE : VIOLET; c.fill();
-        c.fillStyle = LILAC; c.fillRect(x - .5, y + 1, .7, Math.max(1, drip - 2));
+        oval(c, x + .1, y + drip - .3, .9, 1.2, VIOLET);
+        c.fillStyle = LILAC; c.fillRect(x - .5, y + 1, .7, Math.max(1, drip - 3));
+        if (cycle > .74 && !defeated) {
+            const falling = (cycle - .74) / .26;
+            oval(c, x + .15, y + length + 3 + falling * falling * 3, .7, 1 - falling * .4, VIOLET);
+        }
     }
     c.restore();
 }
@@ -140,38 +141,29 @@ export function drawJuiceMiniboss(c: CanvasRenderingContext2D, b: JuiceMinibossM
     const rage = b.phase === 'enrage', hot = b.enraged && !defeated;
     const impact = Math.exp(-b.phaseTime / 115);
     const pose = juicePose(b, reducedMotion), { sx, sy, lean } = pose;
+    const settling = recover || hurt ? Math.sin(b.phaseTime * .026) * Math.exp(-b.phaseTime / 170) * 2.6 : 0;
+    const flow = reducedMotion ? 0 : Math.sin(t * 3.6 - 1.1) * .65 + settling;
     c.save(); anticipation(c, b, cx, cy);
     const altitude = Math.max(0, floor - feet), shadow = Math.max(.42, 1 - altitude / 140);
     oval(c, center, floor + 1, b.width * .62 * shadow, 3 * shadow, '#130d2488');
     if (dash && !reducedMotion) {
-        for (let i = 4; i >= 1; i--) {
-            c.globalAlpha = .22 - i * .035;
-            oval(c, center - f * i * 9, feet - 9, b.width * .4 - i, 5, hot ? '#ed52c5' : LILAC);
+        for (let i = 3; i >= 1; i--) {
+            c.globalAlpha = .5 - i * .10;
+            fluidPuddle(c, center - f * (16 + i * 8), floor, 7 - i, 1.3, i, true);
         }
         c.globalAlpha = 1;
     }
     for (const d of b.drops) {
         const x = d.x + d.width / 2 - cx, y = d.y + d.height / 2 - cy;
-        if (!reducedMotion) {
-            c.save(); c.translate(x, y); c.rotate(Math.atan2(d.vy, d.vx));
-            c.globalAlpha = .28; oval(c, -5.5, 0, 4.5, 1.5, LILAC);
-            c.globalAlpha = .15; oval(c, -10, 0, 2, .8, GLOSS); c.restore();
-        }
-        glob(c, x, y, d.width / 2 - .25, Math.atan2(d.vy, d.vx), hot);
+        fluidDrop(c, x, y, d.width / 2 - .25, reducedMotion ? 0 : d.vx * 1000, reducedMotion ? 0 : d.vy * 1000);
     }
     if (!reducedMotion && rage) {
-        const age = b.phaseTime / b.enrageMs;
-        if (age < 1) for (let i = 0; i < 8; i++) {
-            const direction = i < 4 ? -1 : 1;
-            const distance = b.width * .38 + (i % 4) * 3 + age * 18;
-            const py = feet - Math.sin(age * Math.PI) * (5 + i % 3 * 5);
-            c.globalAlpha = 1 - age; glob(c, center + direction * distance, py, 1.2 + i % 2 * .7, direction * age, hot);
-        }
-        c.globalAlpha = 1;
+        drawFluidImpact(c, center, floor, b.phaseTime, 'landing', b.x + 9, 650);
     }
     // Normalized 44×46 body anchored to the model's own feet and dimensions.
+    drawJuicePixelBody(c, center, feet, c => {
     c.save(); c.translate(center, feet - .5); c.scale(b.width / 44 * sx, b.height / 46 * sy);
-    dome(c, lean, pose.surface);
+    dome(c, lean, pose.surface, flow);
     c.fillStyle = SHADE; c.strokeStyle = INK; c.lineWidth = 2; c.fill(); c.stroke();
     c.save(); c.clip();
     oval(c, lean - 1, -29, 19, 23, hot ? '#a32aae' : VIOLET);
@@ -216,7 +208,7 @@ export function drawJuiceMiniboss(c: CanvasRenderingContext2D, b: JuiceMinibossM
     }
     c.restore();
     // The maw is drawn before the brows so the whole face hangs from the dome.
-    mouth(c, lean * .8, pose.mouth, t, defeated);
+    mouth(c, lean * .8 - flow * .2, pose.mouth, t, defeated);
     const blink = !warning && !hot && !recover && !hurt && !defeated && t % 4.6 > 4.47 ? .45 : pose.eyelid;
     eye(c, -1, lean, f * .85, recover || hurt, hot, blink);
     eye(c, 1, lean, f * .85, recover || hurt, hot, blink);
@@ -228,9 +220,27 @@ export function drawJuiceMiniboss(c: CanvasRenderingContext2D, b: JuiceMinibossM
     oval(c, -2.5, -3.4, 2.3, 1.1, LILAC);
     c.fillStyle = GLOSS; c.fillRect(-3.7, -4.2, 1.1, .8);
     if (hurt) {
-        c.globalAlpha = .48 * impact; dome(c, lean, pose.surface); c.fillStyle = WHITE; c.fill(); c.globalAlpha = 1;
+        c.globalAlpha = .48 * impact; dome(c, lean, pose.surface, flow); c.fillStyle = WHITE; c.fill(); c.globalAlpha = 1;
     }
     c.restore();
+    }, b.width, b.height);
+    if (!reducedMotion && !defeated && altitude < 2 && !dash) {
+        // A cheek thread stretches slowly, pinches, then flattens into the skirt.
+        for (const side of [-1, 1]) {
+            const phase = (t * .48 + (side > 0 ? .53 : 0)) % 1;
+            const lipX = center + side * b.width * .45, origin = feet - 12;
+            if (phase < .7) {
+                const length = 2 + phase * 10;
+                fluidOval(c, lipX, origin + length * .45, .8, length * .55, VIOLET);
+                fluidDrop(c, lipX, origin + length, 1.2, 0, 20);
+            } else {
+                const fall = (phase - .7) / .3;
+                const y = Math.min(floor - 1, origin + 9 + fall * fall * 9);
+                if (y < floor - 1) fluidDrop(c, lipX, y, 1.3, 0, 70 * fall);
+                else fluidOval(c, lipX, floor - .5, 2 + fall, .7, VIOLET);
+            }
+        }
+    }
     if (b.vulnerable) {
         const surface = feet - b.height * sy;
         const hover = Math.sin(t * 8) * 1.2;

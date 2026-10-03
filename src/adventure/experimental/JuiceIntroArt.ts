@@ -4,6 +4,7 @@ import { drawCalabrezzoStageBackground, drawCalabrezzoStageCast, drawCalabrezzoS
 import { drawJuiceMiniboss, drawJuiceLabBackground, drawJuiceLabFloor } from './JuiceMinibossArt';
 import { JuiceMinibossModel } from './JuiceMinibossModel';
 import type { IntroFrame } from './JuiceIntroDirector';
+import { drawFluidImpact, fluidPuddle } from './JuiceFluid';
 const visualBoss = new JuiceMinibossModel();
 function sprite(c: CanvasRenderingContext2D, rows: readonly string[], x: number, y: number) {
     rows.forEach((row, yy) => [...row].forEach((key, xx) => { const color = PLAYER_PALETTE[key]; if (color) { c.fillStyle = color; c.fillRect(Math.round(x + xx), Math.round(y + yy), 1, 1); } }));
@@ -247,12 +248,9 @@ export function drawJuiceIntro(c: CanvasRenderingContext2D, frame: IntroFrame, r
         if (beat === 'emerge') {
             // The silhouette rises out of the same heavy pool, with a settling wake.
             c.save(); c.globalAlpha = Math.min(1, reveal * 5);
-            c.fillStyle = '#210d32'; c.beginPath(); c.ellipse(bossCenter, 159, 20 + reveal * 9, 3, 0, 0, Math.PI * 2); c.fill();
-            c.fillStyle = '#9337b9'; c.beginPath(); c.ellipse(bossCenter - 1, 158.5, 17 + reveal * 9, 1.7, 0, 0, Math.PI * 2); c.fill();
-            if (!reducedMotion && reveal < .95) {
-                c.strokeStyle = '#da91e8'; c.lineWidth = 1; c.globalAlpha *= 1 - reveal;
-                c.beginPath(); c.ellipse(bossCenter, 159, 20 + reveal * 25, 3 + reveal * 3, 0, 0, Math.PI * 2); c.stroke();
-            }
+            fluidPuddle(c, bossCenter, 159, 20 + reveal * 9, 2.6, 42);
+            if (!reducedMotion && frame.elapsedMs >= 1500 && frame.elapsedMs < 2150)
+                drawFluidImpact(c, bossCenter, 159, frame.elapsedMs - 1500, 'landing', 42, 650);
             c.restore();
         }
         c.save(); c.translate(bossCenter, 160); c.scale(scale, Math.max(.08, reveal) * scale); c.translate(-bossCenter, -160);

@@ -1,5 +1,6 @@
 import type { Rect } from '../../types';
 import { clamp, overlaps } from '../types';
+import { geyserBands } from './JuiceFluid';
 
 export type JuiceAttack = 'dash' | 'fan' | 'pounce';
 export type JuicePhase = 'intro' | 'rest' | 'warning' | 'attack' | 'recover' | 'hurt' | 'enrage' | 'defeated';
@@ -8,6 +9,8 @@ export interface JuiceGeyser extends Rect {
     phase: 'warning' | 'active' | 'recede';
     phaseTime: number;
     progress: number;
+    /** Pressure time at shutoff, including attacks that end before 520ms. */
+    releaseTime?: number;
 }
 export interface JuiceEvent {
     kind: 'warning' | 'launch' | 'spit' | 'splash' | 'hit' | 'enrage' | 'geyser-warning' | 'geyser' | 'defeated';
@@ -27,7 +30,7 @@ export class JuiceMinibossModel implements Rect {
     readonly fanReleaseMs = 80;
     readonly geyserWarningMs = 900;
     readonly geyserActiveMs = 520;
-    readonly geyserRecedeMs = 260;
+    readonly geyserRecedeMs = 460;
     health = this.maxHealth;
     phase: JuicePhase = 'intro';
     attack: JuiceAttack = 'dash';
@@ -62,7 +65,7 @@ export class JuiceMinibossModel implements Rect {
     get hazards(): Rect[] {
         if (['intro', 'enrage', 'defeated', 'hurt'].includes(this.phase)) return [];
         return [...this.drops.map(d => ({ x: d.x, y: d.y, width: d.width, height: d.height })),
-            ...this.geysers.filter(g => g.phase === 'active').map(g => ({ x: g.x, y: g.y, width: g.width, height: g.height }))];
+            ...this.geysers.filter(g => g.phase === 'active').flatMap(geyserBands)];
     }
     /** One launch description drives both the visible warning and the projectiles. */
     get fanLaunch() {
@@ -137,6 +140,7 @@ export class JuiceMinibossModel implements Rect {
                 g.phase = 'active'; g.phaseTime = 0; g.progress = 0;
                 this.emit('geyser', g.x + g.width / 2, this.arena.floor);
             } else if (g.phase === 'active') {
+                g.releaseTime = g.phaseTime;
                 g.phase = 'recede'; g.phaseTime = 0; g.progress = 0;
             }
         }
@@ -149,7 +153,7 @@ export class JuiceMinibossModel implements Rect {
         for (const d of this.drops) {
             d.x += d.vx * dt; d.y += d.vy * dt; d.vy += 0.00012 * dt; d.life -= dt;
         }
-        this.drops = this.drops.filter(d => d.life > 0 && d.y < this.arena.floor && d.x > this.arena.left - 20 && d.x < this.arena.right + 20);
+        this.drops = this.drops.filter(d => d.life > 0 && d.y + d.height < this.arena.floor && d.x > this.arena.left - 20 && d.x < this.arena.right + 20);
         this.tickGeysers(dt);
         switch (this.phase) {
             case 'intro': if (this.phaseTime >= 850) this.enter('rest'); break;
@@ -182,6 +186,7 @@ export class JuiceMinibossModel implements Rect {
                     this.y = this.arena.floor - this.height;
                     // Recovery is a clear invitation: all floor jets lose collision.
                     for (const g of this.geysers) if (g.phase !== 'recede') {
+                        g.releaseTime = g.phase === 'active' ? g.phaseTime : 0;
                         g.phase = 'recede'; g.phaseTime = 0; g.progress = 0;
                     }
                     this.enter('recover'); this.emit('splash');

@@ -74,8 +74,13 @@ test('geyser targets lock, telegraph for 900ms and only active columns collide',
         assert.deepEqual(b.geysers.map(g => ({ x: g.x, y: g.y, width: g.width, height: g.height })), locked);
     }
     until(b, 'attack'); assert.ok(b.time - started >= b.geyserWarningMs - .001);
-    assert.deepEqual(b.hazards, locked);
+    assert.equal(b.hazards.length, 0, 'The front starts at the floor, not at full height.');
     assert.equal(b.events.filter(e => e.kind === 'geyser').length, 2);
+    b.update(50, player);
+    assert.ok(b.hazards.length > 0);
+    assert.ok(b.hazards.every(h => h.y > b.arena.floor - 64), 'No invisible collision ahead of the rising liquid.');
+    b.update(100, player); b.update(25, player);
+    for (const vent of locked) assert.ok(b.hazards.some(h => h.y === vent.y), 'The front reaches the advertised height.');
     until(b, 'recover'); assert.ok(b.geysers.every(g => g.phase === 'recede'));
     assert.ok(b.hazards.every(h => h.height === 8), 'Receding jets cannot hurt a recovery stomp.');
 });

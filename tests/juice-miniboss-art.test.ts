@@ -5,9 +5,10 @@ import { drawJuiceMiniboss } from '../src/adventure/experimental/JuiceMonsterPai
 
 function record(b: JuiceMinibossModel, reducedMotion = false) {
     const calls: unknown[][] = [];
+    const properties = new Map<PropertyKey, unknown>([['globalAlpha', 1]]);
     const context = new Proxy({}, {
-        get: (_, key) => (...args: unknown[]) => { calls.push([key, ...args]); },
-        set: (_, key, value) => { calls.push(['set', key, value]); return true; },
+        get: (_, key) => properties.has(key) ? properties.get(key) : (...args: unknown[]) => { calls.push([key, ...args]); },
+        set: (_, key, value) => { properties.set(key, value); calls.push(['set', key, value]); return true; },
     }) as CanvasRenderingContext2D;
     drawJuiceMiniboss(context, b, 0, 64, reducedMotion);
     return calls;

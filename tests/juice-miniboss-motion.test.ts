@@ -47,8 +47,9 @@ test('cosmetic particles are bounded, expire on simulation time and never mutate
     const state = JSON.stringify(b), effects = JSON.stringify(fx);
     const record = (reduced: boolean) => {
         const calls: unknown[][] = [];
-        const c = new Proxy({}, { get: (_o, key) => (...args: unknown[]) => calls.push([key, ...args]),
-            set: (_o, key, value) => { calls.push(['set', key, value]); return true; } }) as CanvasRenderingContext2D;
+        const properties = new Map<PropertyKey, unknown>([['globalAlpha', 1]]);
+        const c = new Proxy({}, { get: (_o, key) => properties.has(key) ? properties.get(key) : (...args: unknown[]) => calls.push([key, ...args]),
+            set: (_o, key, value) => { properties.set(key, value); calls.push(['set', key, value]); return true; } }) as CanvasRenderingContext2D;
         fx.draw(c, b, 0, 64, reduced); return calls;
     };
     const a = record(false);
