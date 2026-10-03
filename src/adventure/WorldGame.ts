@@ -3,7 +3,7 @@ import { JournalAccessibility } from './JournalAccessibility';
 import { campaignJournal } from './CampaignJournal';
 import { CanvasMenuAccessibility } from './CanvasMenuAccessibility';
 import { runGuairaFlight } from './WorldGuairaFlight';
-import { ExperimentalHub } from './experimental/hub/ExperimentalHub';
+import { ExperimentalHub, EXTRAS_LABEL } from './experimental/hub/ExperimentalHub';
 import { Input } from '../engine/Input';
 import { DisposalScope } from '../engine/DisposalScope';
 import { Renderer } from '../engine/Renderer';
@@ -915,7 +915,7 @@ export class WorldGame {
         this.button(c, 'GALERIA', 80, 124, 76, () => this.change('gallery'));
         this.button(c, 'OPÇÕES', 164, 124, 76, () => this.settings('title'));
         this.button(c, 'JOGAR O ORIGINAL', 99, 149, 122, () => { location.href = '?classic=true'; });
-        pixelText(c, this.experimentalHub ? 'SETAS/ENTER: MENU · TAB: EXPERIMENTOS' : 'ENTER PARA CONFIRMAR · SETAS PARA ESCOLHER', 160, 172, '#d1d6c2', 1, 'center');
+        pixelText(c, this.experimentalHub ? `SETAS/ENTER: MENU · TAB: ${EXTRAS_LABEL}` : 'ENTER PARA CONFIRMAR · SETAS PARA ESCOLHER', 160, 172, '#d1d6c2', 1, 'center');
     }
     private renderStory(c: CanvasRenderingContext2D) {
         this.art.background(c, ISLANDS[this.state === 'ending' ? 5 : 0], 0, 0, this.time);

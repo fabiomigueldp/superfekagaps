@@ -3,6 +3,8 @@ import type { Input } from '../../../engine/Input';
 import { LabToolbarAction } from '../JuiceLabToolbar';
 import { EXPERIMENTAL_ROUTES, experimentalTitleSize, requestsExperimentalHub } from './ExperimentalRoutes';
 
+export const EXTRAS_LABEL = 'EXTRAS';
+
 export interface ExperimentalHubHost {
     readonly input: Input;
     isTitle(): boolean;
@@ -32,7 +34,7 @@ export class ExperimentalHub {
             this.entry.setAttribute('aria-haspopup', 'dialog');
             this.entry.setAttribute('aria-controls', 'experimental-hub');
             this.entry.setAttribute('aria-expanded', 'false');
-            new LabToolbarAction(this.entry, true).setLabel('EXTRAS', 'Abrir extras opcionais: acesso direto a Guaíra e treino do Turbosuco');
+            new LabToolbarAction(this.entry, true).setLabel(EXTRAS_LABEL, 'Abrir extras opcionais: acesso direto a Guaíra e treino do Turbosuco');
             this.rail.append(this.entry);
             this.dialog.id = 'experimental-hub'; this.dialog.className = 'experimental-hub';
             this.dialog.setAttribute('aria-labelledby', 'experimental-hub-title');
