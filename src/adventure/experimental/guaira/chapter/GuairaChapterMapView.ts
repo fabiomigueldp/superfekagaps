@@ -1,3 +1,4 @@
+import { chapterJourneyStory } from './GuairaChapterStory';
 import { chapterExitPresentation } from './GuairaChapterPresentation';
 import { LabToolbarAction } from '../../JuiceLabToolbar';
 import { approachGuairaCamera, guairaCamera, guairaScreenPoint, paintGuairaMap, paintGuairaWaterFrame, type GuairaCamera } from '../GuairaMapArt';
@@ -333,7 +334,8 @@ export class GuairaChapterMapView {
                 : canEnter ? `Selecionado · Feka ${ARRIVAL_WORDS[selected.arrival]} · pronto para ${accepted ? 'repetir' : 'entrar'}`
                     : `Selecionado: ${selected.title} · caminhe até ${selected.place}`;
         const last = snapshot.accepted[snapshot.accepted.length - 1];
-        this.hint.textContent = snapshot.chapterComplete && this.water.released ? `A água voltou. Os gaps continuam. · ${snapshot.accepted.length}/${snapshot.route.length} concluídos`
+        const story = chapterJourneyStory(snapshot);
+        this.hint.textContent = story ? `${story} · ${snapshot.accepted.length}/${snapshot.route.length} concluídos`
             : last ? `${CHAPTER_SCENES[last.sceneId].title} concluído · ${snapshot.accepted.length}/${snapshot.route.length} concluídos`
                 : optional ? 'Galeria e Câmara de Alívio são opcionais'
                     : 'Devolva a água ao bairro em cinco etapas.';

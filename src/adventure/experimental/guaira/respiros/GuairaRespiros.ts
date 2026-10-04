@@ -5,6 +5,7 @@ import type { AdventureStage } from '../../../types';
 import { panel, pixelText } from '../../../../graphics/BitmapFont';
 import { GUAIRA_RESPIROS as G, guairaRespirosStage } from './GuairaRespirosStage';
 import { drawRespirosBackground, drawRespirosTerrain, drawRespirosObjects } from './GuairaRespirosArt';
+import { drawGuairaCoinReadout } from '../GuairaCoinReadout';
 
 export { GUAIRA_RESPIROS, guairaRespirosStage } from './GuairaRespirosStage';
 
@@ -106,6 +107,7 @@ export class GuairaRespiros extends WorldGame {
         c.fillStyle = '#c2b78a'; c.fillRect(0, 22, 320, 1);
         pixelText(c, 'RESPIROS', 8, 8, '#f3ddb1');
         pixelText(c, this.finished ? 'PASSAGEM FEITA' : 'ESPERE A AGUA BAIXAR', 69, 8, '#b1e8db');
+        drawGuairaCoinReadout(c, this.renderer, this.coins);
         if (p.hasHelmet) this.renderer.drawHelmet(279, 4, c);
         pixelText(c, 'II', 305, 8, '#f3ddb1');
         if (paused) {

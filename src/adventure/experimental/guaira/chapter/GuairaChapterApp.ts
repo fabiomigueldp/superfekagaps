@@ -1,3 +1,4 @@
+import { chapterCompletionStory } from './GuairaChapterStory';
 import { chapterExitPresentation, chapterGuidance, chapterTitle, chapterAttemptSummary, chapterResumeGuidance } from './GuairaChapterPresentation';
 import { ProgressStore } from '../../../progress';
 import { freshGuairaChapterProgress, type GuairaChapterProgress } from './GuairaChapterProgress';
@@ -351,7 +352,7 @@ export class GuairaChapterApp {
                 const guidance = chapterGuidance(nativeStatus.textContent, info.objective);
                 const message = game.state === 'paused' ? `Pausado · Continuar retoma daqui · ${chapterResumeGuidance()}`
                     : !live.alive ? 'Feka caiu · retorno ao ponto seguro desta tentativa'
-                    : complete ? `Trecho concluído · ${chapterAttemptSummary(game.coins)} · Continuar volta ao mapa de Guaíra`
+                    : complete ? `${chapterCompletionStory(this.snapshot, attempt.sceneId) ?? 'Trecho concluído'} · ${chapterAttemptSummary(game.coins)} · Continuar volta ao mapa de Guaíra`
                     : `Etapa ${step}/5 · ${game.boss?.hint ?? guidance}`;
                 const statusMessage = `${message} · ${this.storageMessage()}`;
                 if (panel.status.textContent !== statusMessage) panel.status.textContent = statusMessage;

@@ -61,7 +61,7 @@ test('all four real pages remeasure the toolbar after resize, status wrapping, p
         Object.assign(h.document, { getElementById: (id: string) => id === 'guaira-touch-controls'
             ? { getBoundingClientRect: () => ({ height: 56 }) } : getElement(id) });
         resize!(); close(parseFloat(h.canvas.style.height), 141);
-        assert.equal(nav.style.maxHeight, '247px', 'toolbar scrolling reserves the independent control bar');
+        assert.equal(nav.style.maxHeight, '145px', 'toolbar scrolling reserves the independent control bar and a visible play area');
         assert.equal((h.document.body.style as Record<string, string>).paddingBottom, '56px');
         assert.deepEqual(h.storageCalls, []);
     });

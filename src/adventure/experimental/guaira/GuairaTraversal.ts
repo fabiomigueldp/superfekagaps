@@ -5,6 +5,7 @@ import { TileType } from '../../../constants';
 import type { AdventureStage } from '../../types';
 import { panel, pixelText } from '../../../graphics/BitmapFont';
 import { drawGuairaTraversalBackground, drawGuairaTraversalTerrain, drawGuairaTraversalObjects } from './GuairaTraversalArt';
+import { drawGuairaCoinReadout } from './GuairaCoinReadout';
 
 export const GUAIRA_TRAVERSAL = Object.freeze({
     id: 'guaira-travessia', width: 96, height: 18, floor: 224,
@@ -149,6 +150,7 @@ export class GuairaTraversal extends WorldGame {
         c.fillStyle = '#d8ac7a'; c.fillRect(0, 22, 320, 1);
         pixelText(c, 'GUAIRA', 8, 8, '#f0ddae');
         pixelText(c, this.finished ? 'TRAVESSIA FEITA' : this.player.data.position.x < 624 ? 'RUA DA VALA SECA' : this.player.data.position.x < 1024 ? 'TAIPAS DO ARROZ' : 'CANAL DO CURRAL', 57, 8, '#f0ddae');
+        drawGuairaCoinReadout(c, this.renderer, this.coins);
         if (this.player.data.hasHelmet) this.renderer.drawHelmet(279, 4, c);
         pixelText(c, 'II', 305, 8, '#f0ddae');
         const finalSection = this.player.data.position.x >= 1024;

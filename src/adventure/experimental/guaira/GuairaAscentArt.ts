@@ -4,6 +4,7 @@ import { ART } from '../../../graphics/palette';
 import { PixelGrid, type PixelFrame, type PixelPalette } from '../../../graphics/pixels';
 import { pixelText } from '../../../graphics/BitmapFont';
 import { isOneWayTile, supportsStanding } from '../../../world/tileRules';
+import { ascentMechanicalPose } from './GuairaAscentMotion';
 
 /** Scenery is presentation only. Tiles and WorldObjects own every supporting surface. */
 export const GUAIRA_ASCENT_ART = Object.freeze({
@@ -364,12 +365,31 @@ function deck(c: CanvasRenderingContext2D, body: MovingBody, cx: number, cy: num
     }
 }
 
-export function drawGuairaAscentObjects(c: CanvasRenderingContext2D, objects: WorldObjects, cx: number, cy: number, _time: number, _reducedMotion: boolean) {
+/** A single bright spoke turns within the existing rim; the axle never wobbles. */
+function bearingSpoke(c: CanvasRenderingContext2D, x: number, y: number, turn: number, radius: number) {
+    x = Math.round(x); y = Math.round(y);
+    const dx = Math.round(Math.cos(turn) * radius), dy = Math.round(Math.sin(turn) * radius);
+    line(c, x, y, x + dx, y + dy, '#d6c59a');
+    r(c, x - Math.sign(dx), y - Math.sign(dy), 1, 1, '#766650');
+    r(c, x, y, 1, 1, '#e0c99a');
+}
+
+/** End-stop pistons compress by at most two pixels, entirely below the safe cap. */
+function carriageStop(c: CanvasRenderingContext2D, x: number, y: number, direction: -1 | 1, compression: number) {
+    r(c, x - 1, y - 1, 3, 6, P.ironDark);
+    for (let offset = 2; offset <= 6 - compression; offset += 2)
+        r(c, x + direction * offset, y, 1, 4, '#9b8869');
+    r(c, x + direction * (7 - compression) - 1, y - 1, 3, 6, P.woodShade);
+    r(c, x + direction * (7 - compression), y, 1, 4, P.bronze);
+}
+
+export function drawGuairaAscentObjects(c: CanvasRenderingContext2D, objects: WorldObjects, cx: number, cy: number, _time: number, reducedMotion: boolean) {
     layer(c, cx, cy, (cameraX, cameraY) => {
         const lift = objects.get(GUAIRA_ASCENT_ART.liftId);
         for (const plank of [objects.get(GUAIRA_ASCENT_ART.plankId), objects.get(GUAIRA_ASCENT_ART.serviceId)]) if (plank) {
             const from = plank.home ?? { x: plank.x, y: plank.y }, to = plank.to ?? from;
             const left = Math.min(from.x, to.x), right = Math.max(from.x, to.x) + plank.width, railY = from.y + plank.height + 12;
+            const pose = ascentMechanicalPose(plank, 'x', reducedMotion);
             if (visible(left - 12, right - left + 24, cameraX)) {
                 // Recessed, dark guide rail under the carriage; bright top belongs only to its body.
                 r(c, left - cameraX, railY - cameraY, right - left, 2, '#927956');
@@ -380,10 +400,14 @@ export function drawGuairaAscentObjects(c: CanvasRenderingContext2D, objects: Wo
                     r(c, endpoint - 4 - cameraX, railY - 5 - cameraY, 8, 2, '#9b7b56');
                     r(c, endpoint - 4 - cameraX, railY + 5 - cameraY, 8, 2, '#9b7b56');
                 }
+                carriageStop(c, left - cameraX, railY - 5 - cameraY, 1,
+                    from.x <= to.x ? pose.homeCompression : pose.endCompression);
+                carriageStop(c, right - cameraX, railY - 5 - cameraY, -1,
+                    from.x <= to.x ? pose.endCompression : pose.homeCompression);
                 for (const wx of [plank.x + 13, plank.x + plank.width - 16]) {
                     r(c, wx - cameraX, plank.y + plank.height - cameraY, 3, 10, '#756c58');
                     oval(c, wx - 2 - cameraX, plank.y + plank.height + 7 - cameraY, 7, 6, '#685f51');
-                    r(c, wx - cameraX, plank.y + plank.height + 9 - cameraY, 2, 2, '#c6ac7d');
+                    bearingSpoke(c, wx + 1 - cameraX, plank.y + plank.height + 10 - cameraY, pose.turn, 2);
                 }
             }
             if (visible(plank.x, plank.width, cameraX)) deck(c, plank, cameraX, cameraY, false);
@@ -391,6 +415,7 @@ export function drawGuairaAscentObjects(c: CanvasRenderingContext2D, objects: Wo
         if (lift) {
             const from = lift.home ?? { x: lift.x, y: lift.y }, to = lift.to ?? from;
             const top = Math.min(from.y, to.y), bottom = Math.max(from.y, to.y), left = from.x, right = from.x + lift.width;
+            const pose = ascentMechanicalPose(lift, 'y', reducedMotion);
             if (visible(left - 12, lift.width + 24, cameraX)) {
                 // Thin guides and cables flank an open central silhouette. No false roof or rungs.
                 for (const [wx, cable] of [[left - 7,left + 5],[right + 5,right - 6]]) {
@@ -404,7 +429,19 @@ export function drawGuairaAscentObjects(c: CanvasRenderingContext2D, objects: Wo
                     }
                     oval(c, cable - 4 - cameraX, top - 21 - cameraY, 9, 9, '#8c7356');
                     oval(c, cable - 2 - cameraX, top - 19 - cameraY, 5, 5, '#c6a777');
-                    r(c, cable - cameraX, top - 18 - cameraY, 1, 3, '#766650');
+                    bearingSpoke(c, cable - cameraX, top - 17 - cameraY, pose.turn, 2);
+                }
+                // Two short guide buffers take up the last part of the approach.
+                // Their dark stops remain separate from the walkable deck.
+                for (const [wy, direction, compression] of [
+                    [top + 9, 1, from.y <= to.y ? pose.homeCompression : pose.endCompression],
+                    [bottom - 9, -1, from.y <= to.y ? pose.endCompression : pose.homeCompression]
+                ] as const) {
+                    for (const wx of [left - 7, right + 5]) {
+                        r(c, wx - 1 - cameraX, wy - 1 - cameraY, 5, 3, P.ironDark);
+                        r(c, wx + 1 - cameraX, wy + (direction > 0 ? 1 : compression - 5) - cameraY, 1, 5 - compression, '#9b8869');
+                        r(c, wx - cameraX, wy + direction * (6 - compression) - cameraY, 3, 2, P.bronze);
+                    }
                 }
                 // Brackets travel with the body and stay entirely below its walkable top.
                 for (const wx of [lift.x + 3,lift.x + lift.width - 7]) {

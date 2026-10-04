@@ -5,6 +5,7 @@ import { TileType } from '../../../constants';
 import type { AdventureStage } from '../../types';
 import { panel, pixelText } from '../../../graphics/BitmapFont';
 import { drawGuairaAscentBackground, drawGuairaAscentTerrain, drawGuairaAscentObjects } from './GuairaAscentArt';
+import { drawGuairaCoinReadout } from './GuairaCoinReadout';
 
 export const GUAIRA_ASCENT = Object.freeze({
     id: 'guaira-subida', width: 84, height: 25, floor: 304, recoveryFloor: 368,
@@ -132,6 +133,7 @@ export class GuairaAscent extends WorldGame {
         c.fillStyle = '#d8ac7a'; c.fillRect(0, 22, 320, 1);
         pixelText(c, 'GUAIRA', 8, 8, '#f0ddae');
         pixelText(c, this.finished ? 'DESVIO A VISTA' : x < 496 ? 'PRANCHA DE INSPECAO' : x < 768 ? 'SUBIDA DA VAZAO' : 'TRAVESSIA DE SERVICO', 57, 8, '#f0ddae');
+        drawGuairaCoinReadout(c, this.renderer, this.coins);
         if (this.player.data.hasHelmet) this.renderer.drawHelmet(279, 4, c);
         pixelText(c, 'II', 305, 8, '#f0ddae');
         if (paused) {

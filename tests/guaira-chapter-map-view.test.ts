@@ -265,7 +265,7 @@ test('completed chapter reports only accepted results and requires explicit new 
     await flush(); h.tick();
     assert.equal(h.byClass('chapter-map-title').textContent, 'CAPÍTULO CONCLUÍDO');
     assert.equal(h.byClass('chapter-map-count').textContent, '5/5 · concluídos');
-    assert.match(h.byClass('chapter-map-hint').textContent, /A água voltou\. Os gaps continuam\./);
+    assert.match(h.byClass('chapter-map-hint').textContent, /Ramal público aberto\. Os moradores têm água na bica outra vez\. Os gaps continuam\./);
     assert.equal(entries, 0); h.button('Repetir o Prefeito em uma nova tentativa').click(); assert.equal(entries, 1);
     assert.deepEqual(session.snapshot().accepted, complete.accepted); view.dispose();
     const abandoned = new GuairaChapterSession(), attempt = abandoned.enterScene('guaira-travessia', abandoned.snapshot().generation)!;
@@ -466,7 +466,7 @@ test('optional target title takes precedence at 5/5 and a natural arrival repair
     assert.equal(h.doc.activeElement, h.button(GALLERY_LABEL));
     assert.equal(h.byClass('chapter-map-title').textContent, 'Galeria dos Remendos');
     assert.equal(h.byClass('chapter-map-count').textContent, '5/5 · concluídos');
-    assert.match(h.byClass('chapter-map-hint').textContent, /A água voltou\. Os gaps continuam\./);
+    assert.match(h.byClass('chapter-map-hint').textContent, /Ramal público aberto\. Os moradores têm água na bica outra vez\. Os gaps continuam\./);
     assert.equal(entries, 0); assert.deepEqual(session.snapshot(), before);
     h.button('Ver a jornada de Guaíra').click(); assert.equal(h.byClass('chapter-map-list').children.length, 5);
     assert.equal(h.byClass('chapter-map-optional').textContent.includes('Concluído'), false);
@@ -570,7 +570,7 @@ test('accepted Bairro water uses one existing clock without irrigation, preserve
     await flush(); h.tick(2);
     assert.equal(h.byClass('chapter-map-title').textContent, 'Galeria dos Remendos');
     assert.equal(h.byClass('chapter-map-count').textContent, '5/5 · concluídos');
-    assert.equal(h.byClass('chapter-map-hint').textContent, 'A água voltou. Os gaps continuam. · 5/5 concluídos · Progresso somente nesta sessão.');
+    assert.equal(h.byClass('chapter-map-hint').textContent, 'Ramal público aberto. Os moradores têm água na bica outra vez. Os gaps continuam. · 5/5 concluídos · Progresso somente nesta sessão.');
     assert.match(h.byClass('chapter-map-canvas').getAttribute('aria-label')!, /Bica do Bairro com água nesta sessão\./);
     assert.equal(h.button(GALLERY_LABEL).disabled, false); assert.equal(h.frames.size, 1);
     const internals = view as unknown as { water: { released: boolean; draw: (...args: unknown[]) => void }; waterClock: { seconds: number } };
@@ -608,7 +608,7 @@ test('new or disposed sessions have no water text, and late old wet decode canno
     const draws = h.draws(); h.images[0].decoded.resolve(); await flush(); h.tick(30);
     assert.equal(h.draws(), draws); assert.equal(h.frames.size, 0);
     assert.equal(h.byClass('chapter-map-count').textContent, '0/5 · concluídos');
-    assert.doesNotMatch(h.byClass('chapter-map-hint').textContent, /água voltou/);
+    assert.doesNotMatch(h.byClass('chapter-map-hint').textContent, /moradores têm água/);
     assert.doesNotMatch(h.byClass('chapter-map-canvas').getAttribute('aria-label')!, /Bica do Bairro/);
     assert.equal(h.button(GALLERY_LABEL).disabled, false);
 });

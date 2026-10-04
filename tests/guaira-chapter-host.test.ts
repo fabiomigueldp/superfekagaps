@@ -904,3 +904,40 @@ test('sound control is disabled until a runtime exists and failed loads retain r
     h.byId('chapter-map-return').click(); assert.equal(app.mode, 'map');
     app.dispose(); h.checkDisposed();
 });
+
+for (const [sceneId, prerequisiteCount, recordingName, story] of [
+    ['guaira-lab', 2, 'guairaLabReplay', /Ossabravo descansou\. A água ainda falta no bairro\. Suba à Casa da Vazão\./],
+    ['guaira-prefeito', 4, 'guairaMayorReplay', /Ramal público aberto\. Os moradores têm água na bica outra vez\. Os gaps continuam\./]
+] as const) test(`${sceneId}: story follows the real native result and does not block pause, retry or map`, async t => {
+    const h = hostBrowser(t), factory = await loadGuairaChapterScene(sceneId), store = new ProgressStore(null);
+    const route: GuairaChapterSceneId[] = ['guaira-travessia', 'guaira-respiros', 'guaira-lab', 'guaira-subida', 'guaira-prefeito'];
+    store.updateGuaira({ ...store.save.guaira, completed: route.slice(0, prerequisiteCount), selectedScene: sceneId });
+    const app = h.create({ progressStore: store, loadScene: async () => factory }); h.enter(); await flush();
+    const game = app.activeGame!, record = JSON.parse(readFileSync(new URL(`./helpers/${recordingName}.json`, import.meta.url), 'utf8'));
+    assert.doesNotMatch(h.byId('lab-status').textContent, story);
+    let held = new Set<string>();
+    for (const [count, keys] of [[record.initialSettleFrames ?? 0, []], ...record.runs] as Array<[number, string[]]>) {
+        const next = new Set(keys);
+        for (const code of held) if (!next.has(code)) h.key('keyup', code === 'Space' ? ' ' : code);
+        for (const code of next) if (!held.has(code)) h.key('keydown', code === 'Space' ? ' ' : code);
+        held = next;
+        for (let frame = 0; frame < count; frame++) game.update(record.stepMs);
+    }
+    for (const code of held) h.key('keyup', code === 'Space' ? ' ' : code);
+    game.render(); h.frame();
+    assert.match(h.byId('lab-status').textContent, story);
+    assert.equal(app.snapshot.accepted.length, prerequisiteCount + 1);
+    const receipts = app.snapshot.accepted, rendered = h.byId('lab-status').textContent;
+    h.frame(); assert.equal(h.byId('lab-status').textContent, rendered);
+    assert.deepEqual(app.snapshot.accepted, receipts);
+    assert.equal(h.frames.size, 2, 'Context adds no third RAF or cutscene');
+    (game as WorldGame & { toggleLabPause(): void }).toggleLabPause(); game.render(); h.frame();
+    assert.match(h.byId('lab-status').textContent, /Pausado/); assert.doesNotMatch(h.byId('lab-status').textContent, story);
+    h.byId('chapter-primary').click(); game.render(); h.frame();
+    assert.match(h.byId('lab-status').textContent, story);
+    h.byId('chapter-retry').click(); await flush();
+    assert.doesNotMatch(h.byId('lab-status').textContent, story, 'Fresh replay cannot show a current-attempt victory');
+    assert.deepEqual(app.snapshot.accepted, receipts, 'Retry preserves durable receipts');
+    h.byId('chapter-map-return').click(); assert.equal(app.mode, 'map');
+    assert.deepEqual(app.snapshot.accepted, receipts); app.dispose(); h.checkDisposed();
+});

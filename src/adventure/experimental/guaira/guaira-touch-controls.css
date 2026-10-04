@@ -7,6 +7,8 @@
     left: 0;
     right: 0;
     display: flex;
+    /* Wrap at narrow effective widths instead of clipping fixed-size touch targets. */
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: 8px;
