@@ -23,8 +23,8 @@ export function guairaTravelDirections(save: AdventureSave, arrived: string) {
 /** A cue on the existing map placard, only while resting at the selected stop. */
 export function campaignMapDirection(save: AdventureSave, arrived: string, selected: string, traveling: boolean): string {
     if (traveling || arrived !== selected || !isGuairaUnlocked(save)) return '';
-    if (arrived === '3-5') return `${guairaTravelDirections(save, arrived).route} Abra Guaíra · aeródromo.`;
+    if (arrived === '3-5') return `${guairaTravelDirections(save, arrived).route} Abra Arquipélago → Guaíra.`;
     if (arrived.startsWith('4-') && save.completed.includes(arrived))
-        return 'Revisitar Guaíra ou voltar à Fábrica: abra Guaíra · aeródromo.';
+        return 'Revisitar Guaíra ou voltar à Fábrica: abra Arquipélago → Guaíra.';
     return '';
 }

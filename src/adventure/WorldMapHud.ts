@@ -50,6 +50,8 @@ export interface WorldMapHudCallbacks {
     menu(): void;
 }
 export interface WorldMapHudState {
+    /** Named chapter availability; independent of the legacy numeric worlds. */
+    guairaAvailable?: boolean;
     /** Visible region, 1–6. Stage is a global campaign index, 0–29. */
     world: number;
     stage: number;
@@ -217,6 +219,10 @@ export class WorldMapHud {
     private readonly warning = element('p', 'world-map-warning');
     private readonly announcer = element('p', 'world-map-sr');
     private readonly stageCanvases: HTMLCanvasElement[] = [];
+    private readonly guairaOverview = element('button', 'world-map-island world-map-guaira-island');
+    private readonly guairaCanvas = bitmap(this.guairaOverview);
+    private readonly guairaRegion = element('button', 'world-map-region');
+    private readonly guairaStatus = element('span', 'world-map-region-state');
     private readonly overviewCanvases: HTMLCanvasElement[] = [];
     private readonly travelCanvases = {} as Record<WorldMapTravelActionId, HTMLCanvasElement>;
     private readonly regionButtons: HTMLButtonElement[] = [];
@@ -270,7 +276,12 @@ export class WorldMapHud {
             }));
             button.hidden = true;
             this.overviewButtons.push(button); this.overviewCanvases.push(canvas); this.nodeLayer.append(button);
+            if (island.id === 3 && callbacks.selectGuaira) this.nodeLayer.append(this.guairaOverview);
         }
+        this.guairaOverview.type = 'button'; this.guairaOverview.hidden = true;
+        this.guairaOverview.setAttribute('data-region-key', 'guaira');
+        accessibleText(this.guairaOverview, 'Guaíra');
+        this.guairaOverview.addEventListener('click', () => this.run(() => callbacks.selectGuaira?.()));
         for (let n = 0; n < 5; n++) {
             const button = element('button', 'world-map-node'); button.type = 'button';
             const canvas = bitmap(button); accessibleText(button, `Fase ${n + 1}`);
@@ -310,10 +321,12 @@ export class WorldMapHud {
             }));
             this.regionButtons.push(button); this.regionStates.push(status); this.regionMenu.append(button);
             if (island.id === 3 && callbacks.selectGuaira) {
-                const guaira = element('button', 'world-map-region'); guaira.type = 'button';
-                guaira.textContent = 'Guaíra · canais e aeródromo';
-                guaira.addEventListener('click', () => this.run(() => { this.closeRegionMenu(true); callbacks.selectGuaira?.(); }));
-                this.regionMenu.append(guaira);
+                this.guairaRegion.type = 'button'; this.guairaRegion.setAttribute('data-region-key', 'guaira');
+                const name = element('span', 'world-map-region-name');
+                lettering(bitmap(name), 'GUAÍRA', ART.paper); accessibleText(name, 'Guaíra');
+                this.guairaRegion.append(name, this.guairaStatus);
+                this.guairaRegion.addEventListener('click', () => this.run(() => { this.closeRegionMenu(true); callbacks.selectGuaira?.(); }));
+                this.regionMenu.append(this.guairaRegion);
             }
         }
         const copy = element('div', 'world-map-stage-copy');
@@ -519,6 +532,8 @@ export class WorldMapHud {
             button.classList.toggle('is-current', current);
             this.regionStates[n].textContent = current ? state.preview ? 'Prévia' : 'No mapa' : available ? 'Visitar →' : 'Bloqueada';
         });
+        this.guairaStatus.textContent = state.guairaAvailable ? `${state.globalProgress.guaira ?? 0}/5 trechos · Ver capítulo →` : 'Prévia · conclua 3-5';
+        this.guairaRegion.disabled = traveling;
         this.paintOverview(state);
         for (const id of WORLD_MAP_TRAVEL_ACTION_IDS) this.updateTravel(id, !!state.worldAvailability[WORLD_MAP_TRAVEL_ACTIONS[id].toWorld - 1]);
         const announcedStatus = prerequisite ? `${traveling ? this.status.textContent : 'Prévia'}. ${prerequisiteHint}` : `${this.status.textContent}.`;
@@ -535,8 +550,17 @@ export class WorldMapHud {
             stageSign(this.stageCanvases[index], entry.id, selected, !!state.completed[index], !!state.open[index]);
     }
     private paintOverview(state: WorldMapHudState): void {
-        const signature = `${this.compactOverview}|${state.world}|${state.worldAvailability.join(',')}|${this.compactOverview ? !!this.signAtlas : !!this.islandSignAtlas}`;
+        const signature = `${state.guairaAvailable}|${this.compactOverview}|${state.world}|${state.worldAvailability.join(',')}|${!!this.signAtlas}|${!!this.islandSignAtlas}`;
         const repaint = signature !== this.overviewSignature; this.overviewSignature = signature;
+        if (repaint) {
+            if (!paintPhysicalIslandSign(this.guairaCanvas, this.islandSignAtlas, 'GUAÍRA', false, !!state.guairaAvailable))
+                islandSign(this.guairaCanvas, 'GUAÍRA', false, !!state.guairaAvailable);
+        }
+        this.guairaOverview.disabled = state.motionState !== 'idle';
+        this.guairaOverview.setAttribute('aria-haspopup', 'dialog');
+        this.guairaOverview.setAttribute('aria-label', `Guaíra · entre a Fábrica e a Serra. ${state.guairaAvailable ? `${state.globalProgress.guaira ?? 0} de 5 trechos concluídos. Ver capítulo.` : 'Embarque fechado: conclua 3-5 na Fábrica. Ver prévia.'}`);
+        this.guairaOverview.title = 'Guaíra · Fábrica → Guaíra → Serra';
+        if (!state.overview) this.position(this.guairaOverview, null);
         this.overviewButtons.forEach((button, index) => {
             const selected = state.world === index + 1, open = !!state.worldAvailability[index];
             const label = `${index + 1} ${REGION_NAMES[index]}`;
@@ -576,7 +600,7 @@ export class WorldMapHud {
     }
     private overviewHint(state: WorldMapHudState): string {
         return state.motionState !== 'idle' ? 'Aguarde a chegada ou pule a viagem.' : this.overviewFallback
-            ? 'Abra Arquipélago para escolher uma ilha.' : 'Escolha uma ilha para ver suas fases.';
+            ? `Abra Arquipélago para ver ${REGION_NAMES[state.world - 1]} ou outra região.` : `Ver fases de ${REGION_NAMES[state.world - 1]} ou escolha outra região. Fábrica → Guaíra → Serra.`;
     }
     positionOverviewWorlds(points: readonly (WorldMapHudPoint | null)[], compact = false, fallback = false): void {
         if (this.compactOverview !== compact) {
@@ -591,6 +615,7 @@ export class WorldMapHud {
             }
         }
         this.overviewButtons.forEach((button, index) => this.position(button, this.state?.overview ? points[index] : null));
+        this.position(this.guairaOverview, this.state?.overview && this.callbacks.selectGuaira ? points[6] : null);
     }
     /** Authored departure anchors only. Omitted actions hide; availability belongs to each route. */
     positionTravelActions(points: Readonly<Partial<Record<WorldMapTravelActionId, WorldMapHudPoint | null>>>): void {
@@ -642,7 +667,7 @@ export class WorldMapHud {
         if (!this.state?.overview || this.root.hidden || this.disposed || event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
         if (event.key === 'Escape') {
             event.preventDefault(); event.stopPropagation();
-            const focusedIsland = this.overviewButtons.includes(document.activeElement as HTMLButtonElement);
+            const focusedIsland = [...this.overviewButtons, this.guairaOverview].includes(document.activeElement as HTMLButtonElement);
             this.run(() => { this.callbacks.overview(); if (focusedIsland) this.overviewButton.focus({ preventScroll: true }); });
             return;
         }
@@ -657,8 +682,9 @@ export class WorldMapHud {
         }
         if (direction) {
             event.preventDefault(); event.stopPropagation();
-            const focused = this.overviewButtons.indexOf(event.target as HTMLButtonElement), current = focused < 0 ? this.state.world - 1 : focused;
-            const button = this.overviewButtons[Math.max(0, Math.min(5, current + direction))];
+            const order = [...this.overviewButtons.slice(0, 3), ...(this.callbacks.selectGuaira ? [this.guairaOverview] : []), ...this.overviewButtons.slice(3)];
+            const focused = order.indexOf(event.target as HTMLButtonElement), current = focused < 0 ? order.indexOf(this.overviewButtons[this.state.world - 1]) : focused;
+            const button = order[Math.max(0, Math.min(order.length - 1, current + direction))];
             if (button && !button.hidden) button.focus({ preventScroll: true });
         } else if (activateIsland) {
             event.preventDefault(); event.stopPropagation();

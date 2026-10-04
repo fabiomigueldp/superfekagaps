@@ -223,3 +223,7 @@
     .world-map-node.is-selected { outline: 2px solid Highlight; }
 }
 .world-editor .world-map { right: 340px; }
+
+/* A named chapter stays legible; numeric island IDs remain 1–6. */
+.has-compact-island-names .world-map-guaira-island,
+.has-compact-island-names .world-map-guaira-island .world-map-bitmap { width: 128px; height: 44px; }

@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { parseMapMetadata } from '../src/adventure/WorldMapArt';
-import { COAST_PORT_PLACEMENTS, getAtlasCamera, localToAtlas } from '../src/adventure/WorldAtlasModel';
+import { COAST_PORT_PLACEMENTS, WORLD_ATLAS_PLACEMENTS, atlasIslandBounds, getAtlasCamera, localToAtlas } from '../src/adventure/WorldAtlasModel';
+import { campaignTerrainBounds } from '../src/adventure/GuairaCampaignArt';
 import { mapToScreen } from '../src/adventure/WorldMapModel';
 import { layoutMapControls, layoutCompactIslandControls, type MapControlBounds, type MapControlPlacement } from '../src/adventure/WorldMapView';
 
@@ -108,5 +109,27 @@ test('subpixel camera easing cannot flip a dock sign between equally close free 
         }
         offsets = result.map((point, index) => ({ x: point.x - points[index].x, y: point.y - points[index].y }));
         previousX = result[1].x; side = direction;
+    }
+});
+
+
+test('seven-region panorama keeps named Guaíra targets separate or explicitly falls back on compact screens', () => {
+    const islands = ['costa','porto','fabrica','serra','reserva','dominio'].map((name, index) => ({
+        world: index + 1, metadata: parseMapMetadata(read(`${name}-diorama.meta.json`), index + 1)!, placement: WORLD_ATLAS_PLACEMENTS[index + 1] }));
+    for (const [width, height] of [[1920,850], [1180,720], [640,480], [390,700], [320,568], [844,270]]) {
+        const compact = width < 640 || height < 480;
+        const camera = getAtlasCamera({ mode: 'overview', activeWorld: 1, layers: islands, width, height,
+            insets: { top: 70, bottom: 130, left: 16, right: 16 }, connectionBounds: [campaignTerrainBounds('guaira')] });
+        const boxes = [...islands.map(atlasIslandBounds), campaignTerrainBounds('guaira')];
+        const owners = boxes.map(box => {
+            const a = mapToScreen({ x: box.left, y: box.top }, camera), b = mapToScreen({ x: box.right, y: box.bottom }, camera);
+            return { left: a.x, top: a.y, right: b.x, bottom: b.y };
+        });
+        const points = owners.map((owner, i) => ({ x: (owner.left + owner.right) / 2, y: owner.bottom + (compact ? 8 : 32),
+            width: compact && i < 6 ? 44 : 128, height: 44 }));
+        const bounds = { left: 8, right: width - 8, top: 72, bottom: height - 132 };
+        const result = compact ? layoutCompactIslandControls(points, owners, bounds) : layoutMapControls(points, bounds);
+        if (result) { assert.equal(result.length, 7); assertSeparated(result, bounds); }
+        else assert.ok(compact, 'Wide atlas must keep all seven labels on terrain.');
     }
 });

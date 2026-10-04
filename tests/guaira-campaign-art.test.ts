@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync, statSync } from 'node:fs';
-import { campaignMapAsset, GUAIRA_CAMPAIGN_ART, GUAIRA_CAMPAIGN_NODES, campaignAirportTerminal, campaignArtBounds,
+import { campaignMapAsset, GUAIRA_CAMPAIGN_ART, GUAIRA_CAMPAIGN_NODES, campaignAirportTerminal, campaignArtBounds, campaignTerrainBounds,
     campaignArtOverlay, paintCampaignRegion, type GuairaCampaignRegion } from '../src/adventure/GuairaCampaignArt';
 import { WORLD_ATLAS_PLACEMENTS } from '../src/adventure/WorldAtlasModel';
 
@@ -67,4 +67,13 @@ test('campaign assets remain under the immutable preview base', () => {
         assert.equal(campaignMapAsset(file, './'), `./assets/world/map/${file}`);
         assert.equal(campaignMapAsset(file, '/world/releases/candidate/'), `/world/releases/candidate/assets/world/map/${file}`);
     }
+});
+
+
+test('Guaíra atlas identity uses measured terrain instead of its transparent frame', () => {
+    const box = campaignTerrainBounds('guaira'), frame = campaignArtBounds('guaira');
+    const metadata = raw('guaira'), art = GUAIRA_CAMPAIGN_ART.guaira;
+    assert.equal(box.left, art.placement.origin.x + metadata.artBounds.left * art.placement.scale);
+    assert.equal(box.bottom, art.placement.origin.y + metadata.artBounds.bottom * art.placement.scale);
+    assert.ok(box.left > frame.left && box.right < frame.right && box.top > frame.top && box.bottom < frame.bottom);
 });

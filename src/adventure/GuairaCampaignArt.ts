@@ -44,6 +44,13 @@ export const GUAIRA_CAMPAIGN_ART: Readonly<Record<GuairaCampaignRegion, Campaign
 export const GUAIRA_CAMPAIGN_NODES: Readonly<Record<string, MapPoint>> = guairaMetadata.nodes;
 export const GUAIRA_CAMPAIGN_ROUTES: Readonly<Record<string, readonly MapPoint[]>> = guairaMetadata.routes;
 
+/** Visible terrain bounds, distinct from transparent image framing used for painting. */
+export function campaignTerrainBounds(region: 'guaira'): AtlasBounds {
+    const metadata = guairaMetadata;
+    const a = localToAtlas({ x: metadata.artBounds.left, y: metadata.artBounds.top }, GUAIRA_CAMPAIGN_ART[region].placement);
+    const b = localToAtlas({ x: metadata.artBounds.right, y: metadata.artBounds.bottom }, GUAIRA_CAMPAIGN_ART[region].placement);
+    return { left: a.x, top: a.y, right: b.x, bottom: b.y };
+}
 export function campaignArtBounds(region: GuairaCampaignRegion, atlas = true): AtlasBounds {
     const art = GUAIRA_CAMPAIGN_ART[region], frame = art.frame;
     const placement = atlas ? art.placement : { origin: { x: 0, y: 0 }, scale: 1 };

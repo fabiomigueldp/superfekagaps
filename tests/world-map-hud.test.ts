@@ -164,7 +164,7 @@ test('panorama footer describes an island and opens its phases even when that is
         assert.match(find(root, 'world-map-status').textContent, world === 1 ? /Ilha selecionada · disponível/ : /Ilha selecionada · bloqueada/);
         assert.equal(find(root, 'world-map-location').textContent, 'Feka em 1-2 · Costa');
         assert.equal(find(root, 'world-map-location').hidden, false);
-        assert.equal(find(root, 'world-map-hint').textContent, 'Escolha uma ilha para ver suas fases.');
+        assert.match(find(root, 'world-map-hint').textContent, /Ver fases de .+ ou escolha outra região/);
         assert.equal(find(root, 'world-map-stage-details').hidden, true);
         assert.equal(hud.enterButton.disabled, false); assert.equal(hud.enterButton.hidden, false);
         assert.match(hud.enterButton.getAttribute('aria-label')!, /Ver fases da ilha/);
@@ -195,7 +195,7 @@ test('moving in panorama preserves Skip and last arrival without activating hidd
     assert.equal(hud.skipButton.hidden, true); assert.equal(hud.enterButton.hidden, false);
     assert.equal(document.activeElement, hud.enterButton);
     assert.equal(find(root, 'world-map-location').textContent, 'Feka em 2-1 · Porto');
-    assert.equal(find(root, 'world-map-hint').textContent, 'Escolha uma ilha para ver suas fases.');
+    assert.match(find(root, 'world-map-hint').textContent, /Ver fases de .+ ou escolha outra região/);
     assert.match(hud.enterButton.getAttribute('aria-label')!, /Ver fases/);
 });
 
@@ -535,13 +535,13 @@ test('compact numbers repaint from their own late narrow atlas and stay stationa
     assert.equal(board.draws.length, 1, 'Positioning never repaints a stationary badge.');
     hud.positionOverviewWorlds([], true, true);
     assert.ok(hud.overviewButtons.every(button => button.hidden));
-    assert.equal(find(asElement(hud.root), 'world-map-hint').textContent, 'Abra Arquipélago para escolher uma ilha.');
+    assert.equal(find(asElement(hud.root), 'world-map-hint').textContent, 'Abra Arquipélago para ver Costa ou outra região.');
     const announcement = asElement(hud.root).children.find(child => child.getAttribute('aria-live') === 'polite')!;
     assert.match(announcement.textContent, /Abra Arquipélago/); assert.doesNotMatch(announcement.textContent, /Escolha uma ilha para ver/);
     const activation = asElement(hud.root).dispatch('keydown', { key: 'Enter', target: hud.root });
     assert.equal(activation.defaultPrevented, true); assert.equal(hud.regionMenu.hidden, false);
     hud.closeRegionMenu(); hud.positionOverviewWorlds(points, true);
-    assert.equal(find(asElement(hud.root), 'world-map-hint').textContent, 'Escolha uma ilha para ver suas fases.');
+    assert.equal(find(asElement(hud.root), 'world-map-hint').textContent, 'Ver fases de Costa ou escolha outra região. Fábrica → Guaíra → Serra.');
 });
 
 test('missing atlas image keeps every procedural sign usable and never retries per frame', async t => {
@@ -819,4 +819,35 @@ test('short-screen seal badges use existing title row and the toolbar fits a 320
     // 11 bitmap letters at 12px, horizontal padding22, overview66, menu44, two6px gaps.
     assert.ok(132 + 22 + 66 + 44 + 12 <= 320 - 18);
     assert.match(css, /min-width: 44px;\s*height: 44px;/);
+});
+
+
+test('Guaíra is a named accessible atlas chapter between Factory and Serra without consuming numeric IDs', t => {
+    dom(t); const calls: string[] = [];
+    const hud = new WorldMapHud({ selectStage() {}, selectWorld() {}, selectGuaira: () => calls.push('guaira'),
+        enter() {}, skip() {}, overview() {}, menu() {} });
+    t.after(() => hud.dispose());
+    const state: WorldMapHudState = { world: 3, stage: 14, open: [true, true, true, true, true],
+        completed: [true, true, true, true, true], seals: [0,0,0,0,0], globalProgress: { completed: 15, seals: 0, guaira: 2 },
+        motionState: 'idle', canEnter: true, hint: '', worldAvailability: [true,true,true,false,false,false], overview: true, guairaAvailable: false };
+    hud.update(state); hud.setVisible(true);
+    hud.positionOverviewWorlds(Array.from({ length: 7 }, (_, i) => ({ x: 90 + i * 150, y: 280 })));
+    const root = asElement(hud.root), sign = find(root, 'world-map-guaira-island');
+    assert.equal(hud.overviewButtons.length, 6);
+    assert.equal(sign.attributes.get('data-region-key'), 'guaira');
+    assert.equal(sign.hidden, false); assert.match(sign.attributes.get('aria-label')!, /conclua 3-5/);
+    assert.equal(sign.attributes.get('aria-haspopup'), 'dialog');
+    sign.click(); assert.deepEqual(calls, ['guaira']);
+    root.dispatch('keydown', { key: 'ArrowRight', target: hud.overviewButtons[2] });
+    assert.equal(document.activeElement, sign);
+    root.dispatch('keydown', { key: 'ArrowRight', target: sign });
+    assert.equal(document.activeElement, hud.overviewButtons[3]);
+    hud.update({ ...state, guairaAvailable: true });
+    assert.match(sign.attributes.get('aria-label')!, /2 de 5 trechos/);
+    hud.update({ ...state, motionState: 'sailing' }); sign.click(); assert.equal(calls.length, 1);
+    hud.positionOverviewWorlds([], true, true); assert.equal(sign.hidden, true);
+    const drawer = asElement(hud.regionMenu);
+    const guaira = drawer.children.find(item => item.attributes.get('data-region-key') === 'guaira')!;
+    assert.ok(guaira); assert.match(guaira.children[1].textContent, /Prévia.*3-5/);
+    hud.update({ ...state, guairaAvailable: true }); guaira.click(); assert.equal(calls.length, 2);
 });
