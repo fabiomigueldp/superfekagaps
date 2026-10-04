@@ -319,7 +319,8 @@ export class GuairaChapterMapView {
         const canEnter = this.canEnter(target, snapshot.generation, revision);
         const accepted = !optional && snapshot.accepted.some(receipt => receipt.sceneId === snapshot.selectedScene);
         const opening = !optional && this.openingAvailable && !snapshot.accepted.length && !snapshot.activeAttempt;
-        const key = `${snapshot.generation.sessionId}:${snapshot.generation.generation}:${revision}:${optional}:${ready}:${this.loadState}:${moving}:${canEnter}:${this.entryRequested}:${this.overviewActive}:${opening}:${snapshot.selectedScene}:${snapshot.accepted.length}:${this.water.released}:${this.options.storageMessage?.()}:${this.options.canContinueCampaign?.()}`;
+        const canContinueCampaign = !!this.options.canContinueCampaign?.();
+        const key = `${snapshot.generation.sessionId}:${snapshot.generation.generation}:${revision}:${optional}:${ready}:${this.loadState}:${moving}:${canEnter}:${this.entryRequested}:${this.overviewActive}:${opening}:${snapshot.selectedScene}:${snapshot.accepted.length}:${this.water.released}:${this.options.storageMessage?.()}:${canContinueCampaign}`;
         if (key === this.presentationKey) return; this.presentationKey = key;
         // hidden=true drops focus in real DOM immediately, so capture ownership first.
         const focusedSkip = document.activeElement === this.skip.button;
@@ -331,6 +332,10 @@ export class GuairaChapterMapView {
             : moving ? `A caminho de ${selected.place}`
                 : optional && canEnter ? 'Desvio opcional · Feka no Bairro da Vala Seca · Galeria disponível'
                     : optional ? 'Desvio opcional · caminhe até o Bairro da Vala Seca'
+                // The final return should point onward, not imply a mandatory boss replay.
+                // Standalone extras, walking and deliberately selected earlier replays keep their own guidance.
+                : this.options.campaign && canContinueCampaign && snapshot.chapterComplete && snapshot.selectedScene === 'guaira-prefeito'
+                    ? 'Serra do Mar liberada · escolha SERRA para seguir viagem.'
                 : canEnter ? `Selecionado · Feka ${ARRIVAL_WORDS[selected.arrival]} · pronto para ${accepted ? 'repetir' : 'entrar'}`
                     : `Selecionado: ${selected.title} · caminhe até ${selected.place}`;
         const last = snapshot.accepted[snapshot.accepted.length - 1];
@@ -342,7 +347,7 @@ export class GuairaChapterMapView {
         this.hint.textContent += ` · ${this.options.storageMessage?.() ?? 'Progresso somente nesta sessão.'}`;
         const extras = this.options.optionalProgress?.();
         if (extras?.gallery || extras?.relief) this.hint.textContent += ` · Opcionais: ${extras.gallery ? 'Galeria concluída' : ''}${extras.gallery && extras.relief ? ', ' : ''}${extras.relief ? 'Câmara concluída' : ''}`;
-        this.campaignContinue.button.disabled = !this.options.canContinueCampaign?.();
+        this.campaignContinue.button.disabled = !canContinueCampaign;
         this.primary.art.setLabel(optional ? canEnter ? 'GALERIA' : 'CAMINHAR' : canEnter && accepted ? 'REPETIR' : !canEnter && !moving && ready ? 'CAMINHAR' : 'ENTRAR',
             optional ? canEnter ? 'Entrar na Galeria dos Remendos, percurso opcional' : 'Caminhar até Bairro da Vala Seca'
                 : canEnter && accepted ? snapshot.selectedScene === 'guaira-prefeito' ? 'Repetir o Prefeito em uma nova tentativa' : `Repetir ${selected.title} em uma nova tentativa`

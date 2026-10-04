@@ -42,6 +42,8 @@ export class Renderer {
   private touch=false;
   private touchControlsVisible=true;
   private interpolationMs=0;
+  // Read the live preference without adding a listener, timer or render loop.
+  private readonly landingMotion=typeof matchMedia==='function'?matchMedia('(prefers-reduced-motion: reduce)'):null;
 
   constructor(canvas?:HTMLCanvasElement) {
     this.canvas=canvas??document.getElementById('game-canvas') as HTMLCanvasElement;
@@ -192,7 +194,13 @@ export class Renderer {
     if(p.groundPoundState===GroundPoundState.WINDUP){frame=PLAYER_SPRITES.windup;headY=3;}
     else if(p.groundPoundState===GroundPoundState.FALL||p.groundPoundState===GroundPoundState.RECOVERY){frame=PLAYER_SPRITES.sit;headY=7;}
     else if(!p.isGrounded)frame=p.velocity.y<0?PLAYER_SPRITES.jump:PLAYER_SPRITES.fall;
-    else if((p.landingTimer??0)>0){frame=PLAYER_SPRITES.land;headY=7;}
+    else if((p.landingTimer??0)>0){
+      // Settle within the existing contact timer; never move the feet or hitbox.
+      if(!this.landingMotion?.matches){
+        const compressed=p.landingTimer!>45;
+        frame=compressed?PLAYER_SPRITES.land:PLAYER_SPRITES.landSettle;headY=compressed?2:1;
+      }
+    }
     else if(Math.abs(p.velocity.x)>.1){
       const i=animationIndex(p.animationTimer,6,p.isRunning?65:100);frame=PLAYER_WALK[i];headY=i%3===1?1:0;
     }else if((this.clock.time+presentationElapsedMs)%3400>3260)frame=PLAYER_SPRITES.blink;

@@ -1,4 +1,5 @@
 import { campaignWaterRestored, campaignWaterOverlay, loadCampaignWaterImage } from './GuairaCampaignConsequences';
+import { GuairaCampaignWaterMotion } from './GuairaCampaignWaterMotion';
 import { campaignMapDirection, guairaTravelDirections } from './CampaignWayfinding';
 import { showGuairaRegion } from './WorldGuairaRegion';
 import { GUAIRA_CAMPAIGN_ART, campaignTerrainBounds, campaignArtBounds, campaignArtOverlay, loadCampaignRegionImage, type GuairaCampaignRegion } from './GuairaCampaignArt';
@@ -238,6 +239,8 @@ export class WorldMapView {
     private compactOverviewPositions: MapControlPlacement[] | null = null;
 
     private campaignWaterImage: HTMLImageElement | null = null;
+    private campaignWaterMotion: GuairaCampaignWaterMotion | null = null;
+    private campaignWaterSeconds = 0;
     private readonly campaignImages = new Map<GuairaCampaignRegion, HTMLImageElement>();
     private guairaDialog?: () => void;
     openGuairaRegion(): void { this.showGuaira(); }
@@ -283,7 +286,11 @@ export class WorldMapView {
         document.body.append(this.root);
         if (callbacks.guaira) {
             void loadCampaignWaterImage().then(image => {
-                if (!this.disposed && image) { this.campaignWaterImage = image; this.paintDirty = true; }
+                if (!this.disposed && image) {
+                    this.campaignWaterImage = image;
+                    this.campaignWaterMotion = new GuairaCampaignWaterMotion(image, () => document.createElement('canvas'));
+                    this.paintDirty = true;
+                }
             });
             for (const region of ['fabrica', 'guaira', 'serra'] as const) void loadCampaignRegionImage(region).then(image => {
                 if (!this.disposed && image) { this.campaignImages.set(region, image); this.paintDirty = true; }
@@ -850,6 +857,9 @@ export class WorldMapView {
         this.camera = this.blendAtlasCamera(target, dt, trackedCabin ? atlasCableBounds(trackedCabin)
             : trackedBoat ? atlasBoatBounds(trackedBoat.foot, trackedBoat.frame) : undefined, overviewActorBounds, actorPoint);
         const aboard = !!occupiedCabin || !!occupiedBoat;
+        const waterRestored = campaignWaterRestored(save);
+        // Reuse the visible map cadence; hidden or reduced-motion time never catches up.
+        if (waterRestored && !this.media.matches) this.campaignWaterSeconds += Math.min(50, dt) / 1000;
         paintWorldAtlas(this.ctx, { camera: this.camera, time, reducedMotion: this.media.matches, islands,
             buoys: this.buoyMetadata?.instances.flatMap(instance => {
                 const ready = instance.route === 'coast-port' ? this.connectionActive : this.dominioActive;
@@ -858,7 +868,8 @@ export class WorldMapView {
             }),
             connections: [...Array.from(this.campaignImages).filter(([region]) => !GUAIRA_CAMPAIGN_ART[region].replacesBase).flatMap(([region, image]) => {
                 const water = region === 'guaira' ? campaignWaterOverlay(save, this.campaignWaterImage) : null;
-                return [campaignArtOverlay(region, image), ...(water ? [water] : [])];
+                const motion = water ? this.campaignWaterMotion?.overlays(waterRestored, this.camera, this.campaignWaterSeconds, this.media.matches) ?? [] : [];
+                return [campaignArtOverlay(region, image), ...(water ? [water, ...motion] : [])];
             }), ...(overlay ? [{ ...overlay, image: this.bridgeImages.get(bridgeState)! }] : []),
                 ...passengerLayers.map(layer => ({ ...layer, image: this.passengerOverlays.get(layer.path)! })),
                 ...dominioLayers.map(layer => ({ ...layer, image: this.dominioOverlays.get(layer.path)! }))],

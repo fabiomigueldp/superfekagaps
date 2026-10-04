@@ -75,8 +75,9 @@ export function runGuairaFlight(options: GuairaFlightOptions): () => void {
     dialog.addEventListener('cancel', event => { event.preventDefault(); close(false); });
     dialog.addEventListener('keydown', event => event.stopPropagation());
     skip.addEventListener('click', () => { if (assets) close(true); }); cancel.addEventListener('click', () => close(false));
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const duration = reduced ? AIRCRAFT_REDUCED_DURATION : AIRCRAFT_TRAVEL_DURATION;
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let reduced = motion.matches;
+    let duration = reduced ? AIRCRAFT_REDUCED_DURATION : AIRCRAFT_TRAVEL_DURATION;
     const source = artRegion(options.from), destination = artRegion(options.to);
     const route = campaignAircraftRoute(source, destination);
     const images = new Map<GuairaCampaignRegion, HTMLImageElement>(), bases = new Map<GuairaCampaignRegion, HTMLImageElement>();
@@ -96,6 +97,12 @@ export function runGuairaFlight(options: GuairaFlightOptions): () => void {
     };
     const tick = (now: number) => {
         if (stopped || !assets) return;
+        if (reduced !== motion.matches) {
+            reduced = motion.matches;
+            const nextDuration = reduced ? AIRCRAFT_REDUCED_DURATION : AIRCRAFT_TRAVEL_DURATION;
+            // Keep progress when the preference changes, without an instant arrival or restart.
+            elapsed = elapsed / duration * nextDuration; duration = nextDuration;
+        }
         if (!document.hidden && focused) elapsed += Math.min(.05, Math.max(0, (now - previous) / 1000));
         previous = now;
         const pose = sampleAircraftTravel(route, elapsed, reduced), ctx = canvas.getContext('2d');
@@ -110,7 +117,7 @@ export function runGuairaFlight(options: GuairaFlightOptions): () => void {
         }
         const phases = { boarding: 'Embarcando no aeródromo', 'takeoff-roll': 'Decolando', climb: 'Ganhando altitude', cruise: 'Sobrevoando os canais', approach: 'Aproximação', 'landing-roll': 'Pousando', arrived: 'Chegada confirmada' };
         // A short dissolve belongs to presentation only; the canonical trip clock and arrival stay unchanged.
-        if (!reduced) canvas.setAttribute('style', `opacity: ${Math.min(1, Math.max(0, (duration - elapsed) / .22))}`);
+        canvas.setAttribute('style', `opacity: ${reduced ? 1 : Math.min(1, Math.max(0, (duration - elapsed) / .22))}`);
         const message = phases[pose.stage];
         if (status.textContent !== message) status.textContent = message;
         if (elapsed >= duration) close(true); else frame = requestAnimationFrame(tick);

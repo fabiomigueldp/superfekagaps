@@ -7,6 +7,7 @@ import { GuairaChapterSession, type GuairaChapterSceneId, type GuairaChapterSnap
 import type { GuairaChapterMapTarget, GuairaChapterNavigation } from '../src/adventure/experimental/guaira/chapter/GuairaChapterNavigation';
 import type { GuairaChapterTravel } from '../src/adventure/experimental/guaira/chapter/GuairaChapterTravel';
 import { GUAIRA_WATER_CONTRACT } from '../src/adventure/experimental/guaira/GuairaWaterMotion';
+import { freshGuairaChapterProgress } from '../src/adventure/experimental/guaira/chapter/GuairaChapterProgress';
 
 const metadata = JSON.parse(readFileSync(new URL('../public/assets/world/experimental/guaira/guaira-diorama.meta.json', import.meta.url), 'utf8'));
 function dispatch(target: EventTarget, type: string, values = {}) {
@@ -563,6 +564,62 @@ function acceptedWaterSession() {
     }
     return session;
 }
+
+test('completed campaign return names the unlocked onward action without repeating the outcome or navigating automatically', async t => {
+    const h = browser(t), session = acceptedWaterSession(), before = session.snapshot();
+    let continuations = 0, entries = 0;
+    const view = h.create(configuration(before, { arrival: 'vazao', campaign: true, canContinueCampaign: () => true,
+        onContinueCampaign: () => { continuations++; }, onEnter: () => { entries++; } }));
+    await flush(); h.tick();
+    const status = h.byClass('chapter-map-status');
+    assert.equal(status.textContent, 'Serra do Mar liberada · escolha SERRA para seguir viagem.');
+    assert.equal(status.getAttribute('role'), 'status'); assert.equal(status.getAttribute('aria-live'), 'polite');
+    assert.equal(h.byClass('chapter-map-hint').textContent, 'Ramal público aberto. Os moradores têm água na bica outra vez. Os gaps continuam. · 5/5 concluídos · Progresso somente nesta sessão.');
+    const onward = h.button('Seguir viagem para Serra do Mar'), repeat = h.button('Repetir o Prefeito em uma nova tentativa');
+    assert.equal(onward.disabled, false); assert.equal(repeat.disabled, false);
+    assert.equal(continuations, 0); assert.equal(entries, 0); assert.deepEqual(session.snapshot(), before);
+    for (const mode of ['hidden', 'blur', 'menu'] as const) {
+        if (mode === 'hidden') h.hidden(true); else if (mode === 'blur') h.blur(); else h.button('Ver a jornada de Guaíra').click();
+        onward.onclick!(); assert.equal(continuations, 0, `${mode} must keep the existing action interruption guard`);
+        if (mode === 'hidden') h.hidden(false); else if (mode === 'blur') h.focus(); else h.button('Fechar a jornada e voltar à maquete').click();
+    }
+    onward.click(); assert.equal(continuations, 1); assert.equal(entries, 0); assert.deepEqual(session.snapshot(), before);
+    view.dispose(); onward.onclick?.(); assert.equal(continuations, 1);
+});
+
+test('onward completion copy survives restored progress without claiming persistence', async t => {
+    const h = browser(t), earned = acceptedWaterSession().snapshot();
+    const session = new GuairaChapterSession({ progress: { ...freshGuairaChapterProgress(),
+        completed: [...earned.route], selectedScene: 'guaira-prefeito' } });
+    const before = session.snapshot();
+    h.create(configuration(before, { campaign: true, canContinueCampaign: () => true,
+        storageMessage: () => 'Progresso somente nesta sessão.' }));
+    await flush(); h.tick();
+    assert.equal(h.byClass('chapter-map-status').textContent, 'Serra do Mar liberada · escolha SERRA para seguir viagem.');
+    assert.match(h.byClass('chapter-map-hint').textContent, /Progresso somente nesta sessão\./);
+    assert.doesNotMatch(h.byClass('chapter-map-status').textContent, /salv[ao]/i);
+    assert.deepEqual(session.snapshot(), before);
+});
+
+test('standalone, locked, incomplete, optional and earlier replay selections keep their own map guidance', async t => {
+    for (const mode of ['standalone', 'locked', 'incomplete', 'optional', 'replay', 'walking'] as const) await t.test(mode, async subtest => {
+        const h = browser(subtest), session = mode === 'incomplete' ? new GuairaChapterSession() : acceptedWaterSession();
+        if (mode === 'replay') session.selectScene('guaira-travessia', session.snapshot().generation);
+        const before = session.snapshot();
+        h.create(configuration(before, { arrival: mode === 'optional' ? 'bairro' : mode === 'walking' ? 'town' : 'vazao',
+            campaign: mode !== 'standalone', canContinueCampaign: () => mode !== 'locked',
+            navigation: mode === 'optional' ? { target: optionalTarget, revision: 1 } : navigation(before),
+            walkToSelection: mode === 'walking' }));
+        await flush(); h.tick();
+        const status = h.byClass('chapter-map-status').textContent;
+        assert.doesNotMatch(status, /Serra do Mar liberada/);
+        if (mode === 'optional') assert.match(status, /Desvio opcional/);
+        else if (mode === 'walking') assert.match(status, /A caminho de Casa da Vazão/);
+        else assert.match(status, /Selecionado/);
+        if (mode === 'standalone') assert.equal(h.all().some(node => node.getAttribute('aria-label') === 'Seguir viagem para Serra do Mar'), false);
+        assert.deepEqual(session.snapshot(), before);
+    });
+});
 
 test('accepted Bairro water uses one existing clock without irrigation, preserves optional priority, and freezes on every suspension', async t => {
     const h = browser(t), session = acceptedWaterSession();

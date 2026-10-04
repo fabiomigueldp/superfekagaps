@@ -21,12 +21,18 @@ type Pose = 'idle' | 'walk' | 'jump' | 'fall' | 'windup' | 'sit' | 'land' | 'hur
 function hero(pose: Pose, frame = 0): string[] {
   const g = new PixelGrid(16, 26);
   const dying = pose.startsWith('death');
-  const seated = pose === 'sit' || pose === 'land' || pose === 'deathCrouch';
-  const headY = seated ? 7 : pose === 'deathRecoil' ? 4 : pose === 'windup' ? 3 : pose === 'deathImpact' ? 2 : pose === 'deathApex' ? 1 : pose === 'walk' && frame % 3 === 1 ? 1 : 0;
-  const hipY = seated ? 23 : pose === 'deathRecoil' ? 21 : 19;
+  const seated = pose === 'sit' || pose === 'deathCrouch';
+  const landingBend = pose === 'land' ? (frame === 0 ? 2 : 1) : 0;
+  const headY = seated ? 7 : pose === 'land' ? landingBend : pose === 'deathRecoil' ? 4 : pose === 'windup' ? 3 : pose === 'deathImpact' ? 2 : pose === 'deathApex' ? 1 : pose === 'walk' && frame % 3 === 1 ? 1 : 0;
+  const hipY = seated ? 23 : pose === 'deathRecoil' ? 21 : 19 + landingBend;
   if (seated) {
     g.rect(3,21,11,4,'K').rect(4,21,9,2,'D').rect(2,24,5,2,'K').rect(10,24,5,2,'K');
     g.rect(3,24,3,1,'G').rect(11,24,3,1,'G');
+  } else if (landingBend) {
+    // Bend the knees inside the original silhouette; both soles stay on row 25.
+    g.rect(3,19+landingBend,5,5-landingBend,'K').rect(4,20+landingBend,3,3-landingBend,'D');
+    g.rect(10,19+landingBend,5,5-landingBend,'K').rect(11,20+landingBend,3,3-landingBend,'B');
+    g.rect(3,24,5,2,'K').rect(10,24,6,2,'K').rect(4,24,3,1,'G').rect(11,24,3,1,'G');
   } else if (pose === 'deathRecoil') {
     g.rect(3,20,5,4,'K').rect(4,21,3,2,'D').rect(2,24,6,2,'K').rect(3,24,4,1,'G');
     g.rect(9,20,5,4,'K').rect(10,21,3,2,'B').rect(9,24,6,2,'K').rect(10,24,4,1,'G');
@@ -111,7 +117,7 @@ export const PLAYER_SPRITES = {
   walk1: hero('walk',0), walk2: hero('walk',1), walk3: hero('walk',2),
   walk4: hero('walk',3), walk5: hero('walk',4), walk6: hero('walk',5),
   jump: hero('jump'), fall: hero('fall'), windup: hero('windup'), sit: hero('sit'),
-  land: hero('land'), hurt: hero('hurt'),
+  land: hero('land'), landSettle: hero('land',1), hurt: hero('hurt'),
   deathImpact: hero('deathImpact'), deathCrouch: hero('deathCrouch'),
   deathRecoil: hero('deathRecoil'), deathLaunch: hero('deathLaunch'),
   deathRise: hero('deathRise'), deathApex: hero('deathApex'), deathFall: hero('deathFall'),

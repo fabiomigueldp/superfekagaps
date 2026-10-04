@@ -102,6 +102,57 @@ test('lateral pressure bars remain above the native fallback touch band and adva
     for (const [,x,y,w,h] of late) { assert.ok(x >= 68 && x + w < 80); assert.ok(y + h <= 140); }
 });
 
+test('standpipe plate distinguishes charge, actual danger and dry recovery without a second clock', () => {
+    const objects = new WorldObjects(respirosArtStage().mechanisms.slice(0, 1));
+    const plate = (time: number, reduced = false) => {
+        objects.time = time;
+        return paint(objects, 80, 144, reduced, -99000).calls
+            .filter(([,x,y,w,h]) => x >= 66 && x + w <= 79 && y >= 96 && y + h <= 109);
+    };
+    const dry = plate(0), charge = plate(1000), danger = plate(2100);
+    assert.notDeepEqual(charge, dry); assert.notDeepEqual(danger, dry); assert.notDeepEqual(danger, charge);
+    for (const time of [1000,1100,1600,1799,1800,1800.4]) {
+        assert.equal(jetCycle(objects.bodies[0], time).danger, null);
+        assert.deepEqual(plate(time), charge, `Imminent pressure remains announced at ${time}`);
+        assert.deepEqual(plate(time, true), charge);
+    }
+    for (const time of [1801,1920,2330,2480,2499]) {
+        assert.ok(jetCycle(objects.bodies[0], time).danger);
+        assert.deepEqual(plate(time), danger, `Even the last dangerous pixel retains its exclamation at ${time}`);
+        assert.deepEqual(plate(time, true), danger);
+    }
+    for (const time of [2499.5,2500,2650,2850,4200]) {
+        assert.equal(jetCycle(objects.bodies[0], time).danger, null);
+        assert.deepEqual(plate(time), dry, `No false danger after the water clears at ${time}`);
+        assert.deepEqual(plate(time, true), dry);
+    }
+    objects.bodies[0].active = true;
+    assert.deepEqual(plate(2100), dry, 'A closed valve never receives a danger marker');
+});
+
+test('each authored jet owns an unobstructive phase plate above touch controls', async () => {
+    const { guairaRespirosStage } = await import('../src/adventure/experimental/guaira/respiros/GuairaRespirosStage');
+    const objects = new WorldObjects(guairaRespirosStage().mechanisms);
+    for (const body of objects.bodies) for (const cy of [132,144]) for (const time of [0,1100,2100,2499,2500]) {
+        const solo = new WorldObjects([{ ...body, phase: 0 }]); solo.time = time;
+        const cx = body.x - 80, py = Math.ceil(body.y + body.height - 4 - cy) - 64;
+        const plate = paint(solo, cx, cy).calls.filter(([,x,y,w,h]) => x >= 66 && x + w <= 79 && y >= py && y + h <= py + 13);
+        assert.ok(plate.length >= 6);
+        for (const [color,x,y,w,h] of plate) {
+            assert.ok(x + w < body.x - cx, 'Plate never hides the liquid collision boundary');
+            assert.ok(y >= 23 && y + h < 145, 'Plate stays between the HUD and fallback touch band');
+            assert.ok(!water.has(color), 'Only real dangerous liquid uses the water palette');
+        }
+        solo.bodies[0].phase = body.phase;
+        const ownPlate = () => paint(solo, cx, cy).calls
+            .filter(([,x,y,w,h]) => x >= 66 && x + w <= 79 && y >= py && y + h <= py + 13);
+        assert.deepEqual(ownPlate(), (() => {
+            solo.bodies[0].phase = 0; solo.time = time + (body.phase ?? 0);
+            return ownPlate();
+        })(), 'Each plate follows its own authored cycle offset');
+    }
+});
+
 test('all three painters restore Canvas state, repeat deterministically, and mutate no input', () => {
     const stage = respirosArtStage(), level = new WorldLevel(stage.level), objects = new WorldObjects(stage.mechanisms);
     for (const time of [0,1400,1801,2100,2499,2600]) for (const reduced of [false, true]) {

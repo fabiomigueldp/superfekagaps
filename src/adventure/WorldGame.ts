@@ -18,6 +18,7 @@ import { YASMIN_FRAMES, SPRITE_PALETTE } from '../graphics/sprites';
 import { ISLANDS, STAGES, stageById } from './campaign';
 import { ProgressStore, isUnlocked, finishStage, isGuairaUnlocked, canContinueFromGuaira } from './progress';
 import { WorldArt, rect } from './WorldArt';
+import { drawWorldCheckpoint } from './WorldCheckpointArt';
 import { drawLandmarks } from './WorldScenery';
 import { WorldAudio } from './WorldAudio';
 import { combatSparks, type CombatCue, type WorldSpark } from './WorldCombatFeedback';
@@ -835,11 +836,8 @@ export class WorldGame {
         this.art.terrain(c, this.level, island, cx, cy, this.time);
         drawLandmarks(c, this.stage, cx, cy, this.time, true);
         this.art.objects(c, this.objects, cx, cy, this.time, this.stage.world);
-        for (const cp of this.stage.checkpoints) {
-            const x = cp.x * 16 - cx, y = cp.y * 16 - cy;
-            rect(c, x, y - 35, 2, 35, '#f0dbc0');
-            rect(c, x + 2, y - 34, 15, 10, this.checkpoint >= this.stage.checkpoints.indexOf(cp) ? '#86d2ad' : '#788b9a');
-        }
+        this.stage.checkpoints.forEach((cp, i) =>
+            drawWorldCheckpoint(c, cp.x * 16 - cx, cp.y * 16 - cy, this.checkpoint >= i));
         for (const exit of this.stage.exits) {
             const x = exit.x - cx, y = exit.y - cy;
             if (exit.requires && !this.objects.get(exit.requires)?.active) {
@@ -919,23 +917,24 @@ export class WorldGame {
         pixelText(c, this.experimentalHub ? 'SETAS/TAB: MENU · ENTER: CONFIRMAR' : 'ENTER PARA CONFIRMAR · SETAS PARA ESCOLHER', 160, 172, '#d1d6c2', 1, 'center');
     }
     private renderStory(c: CanvasRenderingContext2D) {
-        this.art.background(c, ISLANDS[this.state === 'ending' ? 5 : 0], 0, 0, this.time);
-        rect(c, 0, 135, 320, 45, '#556d66');
-        rect(c, 0, 134, 320, 2, '#bfd0a0');
         const ending = this.state === 'ending';
-        this.art.atlas.draw(c, ending ? PLAYER_SPRITES.celebrate : PLAYER_SPRITES.idle, PLAYER_PALETTE, ending ? 125 : 54, 108);
-        this.art.atlas.draw(c, YASMIN_FRAMES[Math.floor(this.time / 600) % 2], SPRITE_PALETTE, ending ? 169 : 225, 104);
-        this.art.atlas.draw(c, bossFrame('joao', ending ? 'hurt' : 'idle'), WORLD_PALETTE, ending ? 262 : 252, 79);
-        panel(c, 18, 12, 284, 68, '#25344c', '#d2bb8e');
-        pixelText(c, ending ? 'UMA VITÓRIA E TANTO!' : 'UMA GRANDE AVENTURA', 160, 23, ART.goldLight, 1, 'center');
+        // Keep the earned receipts above the cast: João's recovery must remain visible.
+        const groundY = ending ? 141 : 134;
+        this.art.background(c, ISLANDS[ending ? 5 : 0], 0, 0, this.time);
+        rect(c, 0, groundY + 1, 320, 180 - groundY - 1, '#556d66');
+        rect(c, 0, groundY, 320, 2, '#bfd0a0');
+        this.art.atlas.draw(c, ending ? PLAYER_SPRITES.celebrate : PLAYER_SPRITES.idle, PLAYER_PALETTE, ending ? 125 : 54, groundY - 26);
+        this.art.atlas.draw(c, YASMIN_FRAMES[Math.floor(this.time / 600) % 2], SPRITE_PALETTE, ending ? 169 : 225, groundY - 30);
+        this.art.atlas.draw(c, bossFrame('joao', ending ? 'hurt' : 'idle'), WORLD_PALETTE, ending ? 262 : 252, groundY - 55);
+        panel(c, 18, 12, 284, ending ? 72 : 68, '#25344c', '#d2bb8e');
+        pixelText(c, ending ? 'UMA VITÓRIA E TANTO!' : 'UMA GRANDE AVENTURA', 160, ending ? 21 : 23, ART.goldLight, 1, 'center');
         const text = ending ? 'FEKA SALVOU YASMIN?' : this.introPage === 0 ? 'João e Yasmin partiram para o arquipélago. Feka sabe o que precisa fazer.' : 'Feka ajeita os óculos e parte. Nenhum gap vai impedir essa grande missão!';
-        this.text(c, text, 31, 44, 258);
+        this.text(c, text, 31, ending ? 35 : 44, 258);
         if (ending) {
             const journal = campaignJournal(this.store.save);
-            pixelText(c, `${journal.completed}/${journal.total} TRECHOS · ${this.store.save.seals.length}/72 SELOS`, 160, 69, '#b2d4d4', 1, 'center');
-            panel(c, 18, 84, 284, 24, '#25344c', '#d2bb8e');
-            pixelText(c, journal.waterReleased ? 'GUAÍRA: ÁGUA LIBERADA' : 'GUAÍRA: A ÁGUA AINDA ESPERA', 160, 88, ART.paper, 1, 'center');
-            pixelText(c, `${journal.optionalCompleted}/3 DESVIOS OPCIONAIS CONCLUÍDOS`, 160, 99, ART.goldLight, 1, 'center');
+            pixelText(c, `${journal.completed}/${journal.total} TRECHOS · ${this.store.save.seals.length}/72 SELOS`, 160, 50, '#b2d4d4', 1, 'center');
+            pixelText(c, journal.waterReleased ? 'GUAÍRA: ÁGUA LIBERADA' : 'GUAÍRA: A ÁGUA AINDA ESPERA', 160, 61, ART.paper, 1, 'center');
+            pixelText(c, `${journal.optionalCompleted}/3 DESVIOS OPCIONAIS CONCLUÍDOS`, 160, 73, ART.goldLight, 1, 'center');
         }
         this.button(c, ending ? 'CONTINUAR EXPLORANDO' : 'SEGUIR VIAGEM', 72, 151, 176, () => ending ? this.toMap() : this.nextIntro());
     }

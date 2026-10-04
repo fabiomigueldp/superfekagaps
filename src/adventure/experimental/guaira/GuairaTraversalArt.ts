@@ -126,6 +126,30 @@ function riceTerrace(c: CanvasRenderingContext2D, x: number, y: number, width: n
     }
 }
 
+/** A working-landscape clue at the first optional drop, behind real terrain.
+ * The short return leads the eye into the maintenance passage without a sign,
+ * arrow, reward marker or pale edge that could read as another platform.
+ */
+function maintenanceDownpipe(c: CanvasRenderingContext2D, cx: number, cy: number) {
+    const x = 758 - cx, y = 216 - cy;
+    r(c, x, y, 8, 29, '#72584d');
+    r(c, x + 1, y, 6, 28, '#a07b56');
+    r(c, x + 2, y, 1, 26, '#c09a6b');
+    // A low, rounded return belongs to the lower corridor, not the jump arc.
+    r(c, x + 2, y + 28, 6, 3, '#72584d');
+    r(c, x + 6, y + 26, 13, 8, '#72584d');
+    r(c, x + 4, y + 26, 13, 6, '#a07b56');
+    r(c, x + 7, y + 27, 10, 1, '#b38e62');
+    // Sparse, dull collars keep it ordinary plumbing rather than a ladder.
+    for (const yy of [9, 22]) {
+        r(c, x - 1, y + yy, 10, 3, '#806651');
+        r(c, x + 1, y + yy, 2, 2, '#b39368');
+    }
+    r(c, x + 14, y + 25, 4, 10, '#806651');
+    r(c, x + 15, y + 26, 2, 7, '#b39368');
+    r(c, x + 18, y + 28, 2, 4, '#665449');
+}
+
 /** Broad clay seams and sloping facets continue across tiles, like the map's cut island. */
 function cutBank(c: CanvasRenderingContext2D, left: number, right: number, cx: number, cy: number, irrigated: boolean) {
     const x = left - cx, w = right - left;
@@ -203,6 +227,9 @@ export function drawGuairaTraversalBackground(c: CanvasRenderingContext2D, cx: n
         if (visible(694, 52, cameraX)) {
             pot(c, 703 - cameraX, 210 - cameraY, 10);
         }
+        // The first rice-bank descent is a usable maintenance passage. Its
+        // downpipe stays behind the native tile painter, which owns every lip.
+        if (visible(757, 22, cameraX)) maintenanceDownpipe(c, cameraX, cameraY);
         // A shaded farm shed and open corral mark the route's end, leaving the exit lane clear.
         if (visible(976, 176, (cameraX - 416))) {
             house(c, 987 - (cameraX - 416), 205 - (cameraY + 32), 57, 55, 1);

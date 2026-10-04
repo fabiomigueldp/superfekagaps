@@ -190,9 +190,22 @@ function grate(c: CanvasRenderingContext2D, b: MovingBody, s: JetCycle, cx: numb
         r(c, gx + 6, gy + 23 - i * 3, 1, 1, P.cap);
     }
     r(c, gx + 2, gy - 2, 5, 2, P.brassLight);
-    if (s.phase === 'charging') {
-        r(c, gx + 3, gy - 9, 3, 1, P.ink); r(c, gx + 2, gy - 8, 5, 1, P.ink);
-        r(c, gx + 1, gy - 7, 7, 1, P.ink); r(c, gx + 3, gy - 6, 3, 3, P.ink);
+    // A small enamel plate backs the existing upward warning against the rice.
+    // Its complete silhouette stays outside the liquid and above touch controls.
+    // The exclamation follows actual danger, including the last falling pixel;
+    // a dry dash is deliberately not a promise of a long enough crossing window.
+    const px = gx - 2, py = gy - 15;
+    r(c, px + 2, py, 9, 13, P.pipe); r(c, px, py + 2, 13, 9, P.pipe);
+    r(c, px + 2, py + 1, 9, 11, P.brass); r(c, px + 1, py + 2, 11, 9, P.brass);
+    r(c, px + 2, py + 2, 9, 9, P.ink);
+    if (s.danger) {
+        r(c, px + 5, py + 3, 3, 4, P.cap); r(c, px + 5, py + 9, 3, 2, P.cap);
+    } else if (s.phase === 'charging' || s.phase === 'rising') {
+        // A zero-height first rising frame still announces imminent discharge.
+        r(c, px + 5, py + 3, 3, 1, P.cap); r(c, px + 4, py + 4, 5, 1, P.cap);
+        r(c, px + 3, py + 5, 7, 1, P.cap); r(c, px + 5, py + 6, 3, 3, P.cap);
+    } else {
+        r(c, px + 4, py + 6, 5, 1, P.brassLight);
     }
 }
 
