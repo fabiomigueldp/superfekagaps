@@ -665,11 +665,12 @@ export class WorldGame {
                 this.checkpoint = i;
                 this.checkpointHelmet = this.player.data.hasHelmet;
                 this.store.save.checkpoint = { stage: this.stage.id, index: i, helmet: this.checkpointHelmet };
-                this.store.persist();
+                const saved = this.store.persist();
                 this.audio.sfx('checkpoint');
                 if (!this.boss) {
-                    this.toast = this.ephemeral ? 'PONTO SEGURO NESTA TENTATIVA' : 'CAMINHO GUARDADO';
-                    this.toastTimer = 1500;
+                    this.toast = this.ephemeral ? 'PONTO SEGURO NESTA TENTATIVA'
+                        : saved ? 'CAMINHO GUARDADO' : 'PONTO SEGURO SÓ NESTA SESSÃO';
+                    this.toastTimer = !this.ephemeral && !saved ? 4000 : 1500;
                 }
             }
         });
