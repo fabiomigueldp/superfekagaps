@@ -23,6 +23,7 @@
 .guaira-touch-controls[hidden] { display: none !important; }
 .guaira-touch-button {
     box-sizing: border-box;
+    position: relative;
     display: inline-flex;
     flex: 0 0 44px;
     align-items: center;
@@ -41,15 +42,35 @@
     -webkit-touch-callout: none;
 }
 .guaira-touch-button .lab-action-art { display: block; width: 44px; height: 44px; image-rendering: pixelated; pointer-events: none; }
+.guaira-touch-button .lab-action-art[hidden] { display: none; }
 .guaira-touch-button .lab-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .guaira-touch-button[data-held] .lab-action-art { transform: translateY(2px); }
 .guaira-touch-button:focus-visible { outline: 2px solid #ffe29a; outline-offset: 2px; }
 .guaira-touch-button:disabled { opacity: .5; cursor: default; }
+.guaira-touch-button::before,
+.guaira-touch-button::after { display: none; pointer-events: none; }
+.guaira-touch-button::before {
+    content: attr(data-symbol);
+    font: 700 24px/1 monospace;
+}
+.guaira-touch-button::after {
+    content: attr(data-caption);
+    position: absolute;
+    bottom: 5px;
+    left: 0;
+    right: 0;
+    font: 700 11px/1 sans-serif;
+    text-align: center;
+}
+.guaira-touch-button:not([data-caption=""])::before { transform: translateY(-6px); }
+.guaira-touch-button[data-art-unavailable]::before,
+.guaira-touch-button[data-art-unavailable]::after { display: block; }
 @media (forced-colors: active) {
     .guaira-touch-button { border: 1px solid ButtonText; }
     .guaira-touch-button .lab-action-art { display: none; }
     .guaira-touch-button .lab-sr { position: absolute; width: 1px; height: 1px; margin: -1px; clip-path: inset(50%); white-space: nowrap; overflow: hidden; }
-    .guaira-touch-button::after { content: attr(data-symbol); color: ButtonText; font: 700 24px/1 monospace; }
+    .guaira-touch-button::before,
+    .guaira-touch-button::after { display: block; color: ButtonText; }
     .guaira-touch-button:focus-visible { outline-color: Highlight; }
     .guaira-touch-button[data-held] { border-width: 3px; }
 }

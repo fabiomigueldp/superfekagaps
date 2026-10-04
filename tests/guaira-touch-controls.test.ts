@@ -50,12 +50,16 @@ class Element extends Surface {
 class Media extends Surface { matches = false; }
 
 /** DOM/event boundaries only; Input and the complete control helper are production classes. */
-function fixture(t: TestContext, touch = 5, pointer = true) {
+function fixture(t: TestContext, touch = 5, pointer = true, canvasAvailable = true) {
     const win = new Surface(), doc = Object.assign(new Surface(), { hidden: false });
     const media = new Media(), body = new Element(), canvas = new Element('CANVAS'); canvas.id = 'game-canvas';
     const globals: Record<string, unknown> = {
         window: Object.assign(win, { requestAnimationFrame() { assert.fail('The canvas already exists; no retry loop should start.'); } }),
-        document: Object.assign(doc, { body, getElementById: () => canvas, createElement: (tag: string) => new Element(tag.toUpperCase()) }),
+        document: Object.assign(doc, { body, getElementById: () => canvas, createElement: (tag: string) => {
+            const element = new Element(tag.toUpperCase());
+            if (!canvasAvailable && tag === 'canvas') Object.assign(element, { getContext: () => null });
+            return element;
+        } }),
         HTMLElement: Element, PointerEvent: pointer ? class {} : undefined,
         navigator: { maxTouchPoints: touch }, matchMedia: () => media
     };
@@ -92,6 +96,8 @@ test('five semantic bitmap plates stay44×44 outside canvas scale and fit320CSSp
     assert.equal(h.root.id, 'guaira-touch-controls'); assert.equal(h.root.getAttribute('role'), 'group');
     assert.equal(h.root.children.length, 5);
     assert.deepEqual(h.root.children.map(button => button.getAttribute('data-symbol')), ['←', '→', '↓', 'X', '↑']);
+    assert.deepEqual(h.root.children.map(button => button.getAttribute('data-caption')), ['', '', 'Golpe', 'Correr', 'Pular']);
+    assert.equal(h.buttons.down.getAttribute('aria-label'), 'Golpe de sentada: atacar para baixo no ar');
     for (const button of h.root.children) {
         assert.equal(button.tagName, 'BUTTON'); assert.equal(button.type, 'button'); assert.equal(button.disabled, false);
         assert.ok(button.getAttribute('aria-label')); assert.equal(button.children[0].getAttribute('aria-hidden'), 'true');
@@ -102,7 +108,24 @@ test('five semantic bitmap plates stay44×44 outside canvas scale and fit320CSSp
     assert.match(css, /flex: 0 0 44px/); assert.match(css, /position: fixed/);
     assert.match(css, /gap: 8px/); assert.match(css, /forced-colors: active/);
     assert.match(css, /content: attr\(data-symbol\)/, 'high contrast shows a short symbol while the full accessible name stays available');
+    assert.match(css, /content: attr\(data-caption\)/, 'the concise captions also remain available in high contrast');
     assert.equal(5 * 44 + 4 * 8 + 2 * 6, 264, 'The CSS dimensions require264px without safe-area insets, independent of canvas dimensions.');
+});
+
+test('unavailable canvas keeps short symbol/caption fallback and complete accessible names', t => {
+    const h = fixture(t, 5, true, false);
+    for (const button of h.root.children) {
+        assert.equal(button.getAttribute('data-art-unavailable'), 'true');
+        assert.equal(button.children[0].hidden, true);
+        assert.equal(button.children[1].className, 'lab-sr', 'long descriptions do not overflow a 44px plate');
+        assert.equal(button.children[1].textContent, button.getAttribute('aria-label'));
+        assert.equal(button.title, button.getAttribute('aria-label'));
+    }
+    h.down('run'); assert.equal(h.step().run, true);
+    h.up(); assert.equal(h.step().run, false);
+    const css = readFileSync(new URL('../src/adventure/experimental/guaira/guaira-touch-controls.css', import.meta.url), 'utf8');
+    assert.match(css, /\[data-art-unavailable\]::before,\s*\.guaira-touch-button\[data-art-unavailable\]::after\s*\{ display: block; \}/);
+    assert.match(css, /\.lab-action-art\[hidden\]\s*\{ display: none; \}/, 'the normal art display rule cannot override a hidden fallback canvas');
 });
 
 test('fine-pointer desktop stays hidden; coarse capability enables and restores canvas controls', t => {

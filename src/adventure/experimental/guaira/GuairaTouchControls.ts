@@ -1,9 +1,10 @@
 import { Input, type InputAction, type InputActionSource } from '../../../engine/Input';
-import { LabToolbarAction } from '../JuiceLabToolbar';
+import { decorateGuairaTouchAction } from './GuairaTouchAction';
 
-const ACTIONS: ReadonlyArray<readonly [InputAction, string, string]> = [
-    ['left', '←', 'Andar para a esquerda'], ['right', '→', 'Andar para a direita'],
-    ['down', '↓', 'Sentada: atacar para baixo no ar'], ['run', 'X', 'Correr'], ['jump', '↑', 'Pular']
+const ACTIONS: ReadonlyArray<readonly [InputAction, string, string, string]> = [
+    ['left', '←', '', 'Andar para a esquerda'], ['right', '→', '', 'Andar para a direita'],
+    ['down', '↓', 'Golpe', 'Golpe de sentada: atacar para baixo no ar'],
+    ['run', 'X', 'Correr', 'Correr'], ['jump', '↑', 'Pular', 'Pular']
 ];
 
 export interface GuairaTouchControlsOptions {
@@ -34,12 +35,11 @@ export class GuairaTouchControls {
             this.root.setAttribute('role', 'group');
             this.root.setAttribute('aria-label', 'Controles de toque de Guaíra');
             this.root.hidden = true;
-            for (const [action, label, name] of ACTIONS) {
+            for (const [action, symbol, caption, name] of ACTIONS) {
                 const button = document.createElement('button');
                 button.type = 'button'; button.className = 'guaira-touch-button';
                 button.setAttribute('data-action', action);
-                button.setAttribute('data-symbol', label);
-                new LabToolbarAction(button).setLabel(label, name);
+                decorateGuairaTouchAction(button, symbol, caption, name);
                 this.buttons.set(action, button); this.root.append(button);
                 this.listen(button, 'pointerdown', event => {
                     const pointer = event as PointerEvent;

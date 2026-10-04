@@ -20,13 +20,14 @@ O callback de visibilidade pode executar durante o construtor, após anexar a ra
 
 ## Layout e arte
 
-- Cinco botões nativos, em ordem: ←, →, ↓, X, ↑. Os nomes acessíveis são em português; a arte bitmap decorativa usa o mesmo `LabToolbarAction` das placas da cena
+- Cinco botões nativos, em ordem: ←, →, ↓, X, ↑. ↓, X e ↑ incluem as legendas visíveis **Golpe**, **Correr** e **Pular**, sem depender de hover para explicar as ações menos óbvias. Os nomes acessíveis são completos em português; a sentada continua descrita como ataque para baixo no ar
+- `GuairaTouchAction` reaproveita a placa de madeira de `paintLabAction`, centraliza os símbolos na escala original de 2px e pinta legendas curtas na fonte bitmap de 1px, dentro dos mesmos 44px. Setas de direção dispensam legenda. A arte não contém estado de jogo
 - Cada alvo ocupa **44 × 44 CSS px**, com `flex-shrink: 0`, independentemente da escala do canvas. Cinco alvos, quatro intervalos de 8px e margens internas de 6px requerem **264px** antes de insets laterais de área segura; cabem nos 320px comuns em retrato
 - Raiz fixa no rodapé, altura normal **58px** (44 + 6 + 6 + borda 2); insets de área segura podem aumentá-la. Medir a altura real, nunca deduzir a partir da resolução 320 × 180 do jogo
 - O helper `fitGuairaLabCanvas` deve descontar essa altura, além do nav superior, ao definir a área do jogo; também reservar `paddingBottom` e observar a raiz via `ResizeObserver`
 - Em alturas extremas, limitar a altura rolável do nav superior à altura da viewport menos a barra, para o nav não cobrir os alvos. Nenhum controle deve ser reduzido para fazer o canvas caber
 - A barra aparece somente com Pointer Events e ao menos uma indicação de toque (`maxTouchPoints > 0`) ou ponteiro grosseiro (`any-pointer: coarse`). Em desktops finos fica `hidden`; sem Pointer Events preserva os controles legados
-- Durante Pausa/conclusão, os botões ficam desabilitados e a altura permanece estável. `forced-colors` mostra glifos curtos nativos dentro dos44px; o nome completo continua acessível e não precisa ser espremido no botão
+- Durante Pausa/conclusão, os botões ficam desabilitados e a altura permanece estável. `forced-colors` e canvas indisponível mostram símbolos e legendas curtas nativos dentro dos 44px; o nome completo continua acessível e não precisa ser espremido no botão
 
 ## Entrada, fontes e descarte
 
@@ -43,6 +44,8 @@ Enquanto visível, a barra adquire `Input.suspendCanvasTouchControls()`. Essa su
 ## Verificação e limites
 
 `tests/guaira-touch-controls.test.ts` usa as classes reais de Input/helper e substitui somente as fronteiras DOM/eventos. Cobre capacidades, dimensões declaradas, múltiplos dedos, teclado, bordas, toques curtos de todas as ações, cancelamentos, restauração, desabilitação, resets, descarte e ativação nativa. Os testes antigos de toque permanecem aplicáveis.
+
+`tests/guaira-touch-action-art.test.ts` verifica os retângulos reais pintados: símbolos na escala original, legendas inteiras centralizadas, separação entre símbolo e legenda, margens e ausência de pixels fora da placa. O recorte raster de revisão mede 320 × 58px, na escala nativa, e não representa uma captura de navegador ou comprovação de legibilidade num telefone.
 
 `guaira-dom-controls.integration.test.ts` completa o replay de1.065quadros do touro através dos botões DOM, preservando os seis acertos, capacete e isolamento da campanha com Input/Player/WorldGame/Renderer reais. Também cobre ponteiro preso durante pausa/retry, reset, blur, ocultação e reconstrução repetida pelo histórico sem duplicar controles. As fronteiras DOM/captura de ponteiro continuam simuladas; isso não substitui aparelho físico.
 

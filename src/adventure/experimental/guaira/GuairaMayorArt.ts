@@ -110,7 +110,33 @@ function coat(b:Brush,lean=0){
     b.poly([[4,-29],[8,-28],[-8,-16],[-10,-18]],P.sash);b.line(4,-28,-6,-18,P.sashLight);
     b.rect(2,-20,2,2,P.bronze);b.rect(3,-16,2,2,P.bronzeShade);
 }
-function neutral(b:Brush,pose:MayorPose,tick:number,reduced:boolean){
+/** Three authored arm silhouettes share the existing warning deadline.
+ * The carimbo is already raised on the first tick. Feet, torso and head stay
+ * planted; reduced motion holds the familiar fully raised warning throughout.
+ */
+function warningArm(b:Brush,progress:number|undefined,reduced:boolean){
+    const {rect:r}=b;
+    const beat=reduced||!Number.isFinite(progress)?2:Math.min(2,Math.floor(Math.max(0,Math.min(1,progress!))*3));
+    if(beat===0){
+        b.poly([[7,-29],[12,-26],[19,-29],[20,-37],[15,-38],[15,-32],[10,-33]],P.ink);
+        b.poly([[8,-29],[12,-28],[17,-30],[18,-36],[16,-36],[16,-31],[10,-31]],P.cream);
+        r(15,-37,5,4,P.skin);r(16,-37,3,2,P.skinLight);
+    }else if(beat===1){
+        b.poly([[7,-29],[13,-27],[18,-33],[16,-40],[12,-42],[9,-39],[13,-35],[11,-33]],P.ink);
+        b.poly([[8,-29],[12,-29],[16,-34],[14,-39],[12,-40],[11,-39],[14,-35],[11,-31]],P.cream);
+        r(12,-40,5,4,P.skin);r(13,-40,3,2,P.skinLight);
+    }else{
+        // Elbow and forearm create an open triangle, not a rotated idle arm.
+        b.poly([[7,-29],[13,-27],[15,-36],[11,-42],[7,-40],[10,-35]],P.ink);
+        b.poly([[8,-29],[12,-29],[13,-35],[10,-40],[8,-39],[11,-35]],P.cream);
+        r(8,-42,5,4,P.skin);r(9,-42,3,2,P.skinLight);
+    }
+    const x=[12,9,5][beat],y=[-44,-48,-50][beat];
+    stamp(b,x,y);
+    // Solid marks accompany the raised tool, never blink or imply new danger.
+    r(x+15,y+3,2,4,P.warning);r(x+18,y+7,4,2,P.warning);r(x+16,y+11,2,2,P.warning);
+}
+function neutral(b:Brush,pose:MayorPose,tick:number,reduced:boolean,warningProgress?:number){
     const {rect:r}=b;standingLegs(b,pose==='warning');
     key(b,-25,-40);
     coat(b);
@@ -118,13 +144,8 @@ function neutral(b:Brush,pose:MayorPose,tick:number,reduced:boolean){
     b.poly([[-10,-28],[-15,-27],[-18,-17],[-12,-15],[-8,-23]],P.ink);b.poly([[-11,-27],[-14,-26],[-16,-18],[-12,-17],[-9,-23]],P.cream);
     r(-17,-18,5,4,P.skinShade);r(-17,-18,4,2,P.skinLight);
     if(pose==='warning'){
-        // Elbow and forearm create an open triangle, not a rotated idle arm.
-        b.poly([[7,-29],[13,-27],[15,-36],[11,-42],[7,-40],[10,-35]],P.ink);
-        b.poly([[8,-29],[12,-29],[13,-35],[10,-40],[8,-39],[11,-35]],P.cream);r(8,-42,5,4,P.skin);r(9,-42,3,2,P.skinLight);
-        stamp(b,5,-50);
+        warningArm(b,warningProgress,reduced);
         face(b,-6,-40,'frown');
-        // Three fixed blocks communicate the warning even with motion reduced.
-        r(20,-47,2,4,P.warning);r(23,-43,4,2,P.warning);r(21,-39,2,2,P.warning);
     }else{
         b.poly([[7,-28],[12,-26],[14,-16],[8,-15],[5,-23]],P.ink);b.poly([[8,-27],[11,-25],[12,-18],[8,-17],[6,-23]],P.cream);
         r(9,-18,5,4,P.skin);r(10,-18,3,2,P.skinLight);stamp(b,9,-14);
@@ -243,7 +264,7 @@ export function drawGuairaMayor(c:CanvasRenderingContext2D,m:GuairaMayorArtState
         recovering(b,false);
         // Clear recoil face and separated hands, no whole-body rotation or flashing.
         face(b,4,-36,'surprise');b.rect(20,-18,4,3,P.skinLight);b.rect(-17,-25,4,3,P.skin);
-    }else neutral(b,m.state,m.tick,reducedMotion);
+    }else neutral(b,m.state,m.tick,reducedMotion,m.warningProgress);
     c.restore();
     c.save();openingCue(c,m,cx,cy);c.restore();
 }
