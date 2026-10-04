@@ -70,3 +70,45 @@ test('cannon rendering is deterministic, grid-aligned and does not mutate simula
         assert.ok(c1.pixels.every(p => p[2] > 0 && p[3] > 0));
     }
 });
+
+function warningPlate(b: ReturnType<typeof model>, cx = 0, cy = 120) {
+    const c = new Capture();
+    drawCannon(c as unknown as CanvasRenderingContext2D, b, new CapturedAtlas(), cx, cy, 1000, 3);
+    return c.pixels.filter(p => p[2] === 8 && p[3] === 11 && p[4] === '#192c44');
+}
+
+test('the complete non-color cannon warning stays inside either edge, with camera offsets and facings', () => {
+    for (const direction of [-1, 1]) for (const cx of [0, 123.25, 1840]) {
+        for (const [screenX, expectedX] of [[-15, 1], [0, 4], [160, 164], [312, 311], [319, 311]]) {
+            const b = model(direction); b.x = cx + screenX; b.timer = 500;
+            const before = structuredClone(b), plates = warningPlate(b, cx);
+            assert.equal(plates.length, 1);
+            assert.equal(plates[0][0], expectedX);
+            assert.ok(plates[0][0] >= 1 && plates[0][0] + plates[0][2] <= 319);
+            assert.deepEqual(b, before, 'Clamping is presentation-only.');
+            assert.deepEqual(warningPlate(b, cx), plates, 'A paused tell remains completely static.');
+        }
+    }
+});
+
+test('clamping never reveals a cannon outside the scene or behind the HUD', () => {
+    for (const cx of [0, 1000]) for (const screenX of [-100, -16, 320, 400]) {
+        const b = model(); b.x = cx + screenX; b.timer = 500;
+        assert.deepEqual(warningPlate(b, cx), []);
+    }
+    for (const screenY of [-32, 7, 180, 230]) {
+        const b = model(); b.x = 319; b.y = screenY + 120; b.timer = 500;
+        assert.deepEqual(warningPlate(b), []);
+    }
+});
+
+test('edge warnings use exactly the existing charge phase and keep their vertical anchor', () => {
+    const b = model(); b.x = 319;
+    for (const timer of [650, 500, 1, 0]) {
+        b.timer = timer;
+        assert.deepEqual(warningPlate(b), [[311, 65, 8, 11, '#192c44']]);
+    }
+    b.timer = 651; assert.deepEqual(warningPlate(b), []);
+    b.timer = 3200; b.firedAt = 1000;
+    assert.deepEqual(warningPlate(b), [], 'The discharge clears the existing plate immediately.');
+});

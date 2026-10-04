@@ -4,6 +4,7 @@ import { WORLD_PALETTE } from './WorldAssets';
 import { cannonCycle, cannonMuzzle } from './WorldMachineState';
 import type { MovingBody } from './WorldPhysics';
 import { box as r, oval, pixelLine as line, polygon } from './WorldPainting';
+import { GAME_WIDTH, GAME_HEIGHT } from '../constants';
 
 const clamp = (n: number) => Math.max(0, Math.min(1, n));
 /** A pure presentation of the existing simulation; drawing never advances a clock. */
@@ -127,9 +128,15 @@ export function drawCannon(c: CanvasRenderingContext2D, b: MovingBody, atlas: Sp
     for (let i = 0; i < 3; i++) box(19 + i * 3, 30, 2, 1, s.charge > i / 3 ? '#f4d68a' : '#526b72');
     if (s.pose === 'charge') {
         // A dark plate keeps the non-color warning readable against cold room door handles.
-        r(c, x + 20, y - 11, 8, 11, '#192c44');
-        r(c, x + 21, y - 10, 6, 9, '#304756');
-        pixelText(c, '!', x + 24, y - 9, '#ffe6a0', 1, 'center');
+        // Keep the complete existing tell when its cannon straddles a screen edge.
+        // Never turn it into a tracker for machines outside the playable viewport.
+        const bodyX = Math.round(b.x - cx), bodyY = Math.round(b.y - cy);
+        if (bodyX + b.width > 0 && bodyX < GAME_WIDTH && bodyY + b.height > 23 && bodyY < GAME_HEIGHT) {
+            const warningX = Math.max(1, Math.min(GAME_WIDTH - 9, x + 20));
+            r(c, warningX, y - 11, 8, 11, '#192c44');
+            r(c, warningX + 1, y - 10, 6, 9, '#304756');
+            pixelText(c, '!', warningX + 4, y - 9, '#ffe6a0', 1, 'center');
+        }
         const mouth = mx - dir * s.recoil;
         r(c, mouth - 1, my - 3, 2, 5, s.charge > .65 ? '#d8a5eb' : '#8f55b1');
         // Inward pressure marks suggest compression, never a spurious outgoing projectile.
