@@ -529,9 +529,15 @@ export class GuairaChapterApp {
                     && this.mounted?.kind === 'optional' && this.mounted.token === token,
                 nextOptions => this.beginExcursion('relief', nextOptions)) : null;
             type PrimaryAction = 'pause' | 'resume' | 'relief' | 'other-route' | null;
-            let primaryAction: PrimaryAction = null, primaryRevision = 0, pressedPrimaryRevision: number | null = null, releasePrimary = () => {};
+            let primaryAction: PrimaryAction = null, primaryRevision = 0, releasePrimary = () => {};
+            let pressedPrimaryRevision: number | null = null, keyedPrimaryRevision: number | null = null;
             scope.listen(panel.primary, 'pointerdown', () => { pressedPrimaryRevision = primaryRevision; });
             scope.listen(panel.primary, 'pointercancel', () => { pressedPrimaryRevision = -1; });
+            scope.listen(window, 'keydown', event => {
+                if (event.target !== panel.primary || !['Enter', ' ', 'Spacebar'].includes(event.key)) return;
+                if (event.repeat) { event.preventDefault(); return; }
+                keyedPrimaryRevision = primaryRevision;
+            }, true);
             const actionNow = (): PrimaryAction => game.isDisposed ? null : game.state === 'paused' ? 'resume'
                 : game.state !== 'playing' ? null : runtime.finished && !game.player.data.isDead
                     ? token.sceneId === 'gallery' ? 'relief' : routes ? 'other-route' : 'pause' : 'pause';
@@ -554,9 +560,12 @@ export class GuairaChapterApp {
                     if (action && action !== 'other-route') releasePrimary = scope.listen(panel.primary, 'click', event => {
                         if (!this.currentExcursion(token, scope) || !this.focused || document.hidden
                             || this.mounted?.kind !== 'optional' || this.mounted.token !== token
-                            || revision !== primaryRevision || actionNow() !== action) return;
-                        const pressedRevision = pressedPrimaryRevision; pressedPrimaryRevision = null;
-                        if (event.detail !== 0 && pressedRevision !== null && pressedRevision !== revision) return;
+                            || revision !== primaryRevision) return;
+                        const pressedRevision = event.detail === 0 ? keyedPrimaryRevision : pressedPrimaryRevision;
+                        if (event.detail === 0) keyedPrimaryRevision = null; else pressedPrimaryRevision = null;
+                        // Consume this owner's release even before reflection catches up,
+                        // so it cannot also reject the next fresh accessible click.
+                        if (actionNow() !== action || (pressedRevision !== null && pressedRevision !== revision)) return;
                         // Every action is leased to its displayed state. A saved ALÍVIO
                         // callback cannot turn into Resume, or survive interruption.
                         invalidatePrimary();
