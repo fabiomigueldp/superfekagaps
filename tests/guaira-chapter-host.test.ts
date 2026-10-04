@@ -1,3 +1,4 @@
+import { freshGuairaChapterProgress } from '../src/adventure/experimental/guaira/chapter/GuairaChapterProgress';
 import { ProgressStore, canContinueFromGuaira } from '../src/adventure/progress';
 import assert from 'node:assert/strict';
 import { setImmediate as nextTurn } from 'node:timers/promises';
@@ -43,9 +44,19 @@ function hostBrowser(t: TestContext) {
     const h = sceneLifecycleBrowser({ after: (callback: () => void) => restore.push(callback) } as Pick<TestContext, 'after'>);
     const apps: GuairaChapterApp[] = [];
     const all = (at: LifecycleElement = h.body): LifecycleElement[] => [at, ...at.children.flatMap(child => all(child))];
+    // Native removal releases a focused descendant to body without a focusin event.
+    // A detached/disabled element cannot acquire focus; programmatic focus does bubble.
+    let activeElement: LifecycleElement | null = null;
+    Object.defineProperty(h.document, 'activeElement', { configurable: true, get: () => {
+        if (activeElement && !all().includes(activeElement)) activeElement = null;
+        return activeElement ?? h.body;
+    } });
     const decorate = (node: LifecycleElement) => {
         Object.assign(node, { contains: (candidate: LifecycleElement) => all(node).includes(candidate),
-            focus: () => { Object.assign(h.document, { activeElement: node }); },
+            focus: () => {
+                if (!all().includes(node) || node.disabled || node.hidden || activeElement === node) return;
+                activeElement = node; h.document.dispatch('focusin', { target: node });
+            },
             open: false, showModal() { Object.assign(node, { open: true }); }, close() { Object.assign(node, { open: false }); } });
         return node;
     };
@@ -250,7 +261,7 @@ test('all six real scene factories are owned once; host acceptance uses live sam
         assert.equal(app.snapshot.selectedScene, id); h.enter(); await flush(); const game = app.activeGame!;
         assert.equal(game.stage.id, id); assert.equal(h.frames.size, 2);
         assert.equal(h.contexts.filter(context => context.state !== 'closed').length, 1);
-        const runtime = [...resultAllowed.keys()].at(-1)!; resultAllowed.set(runtime, true);
+        const runtime = [...resultAllowed.keys()].at(-1)!; resultAllowed.set(runtime, true); h.frame();
         h.byId('chapter-primary').click();
         assert.equal(app.mode, 'map'); assert.equal(game.isDisposed, true); assert.equal(h.frames.size, 0);
         assert.equal(h.contexts.filter(context => context.state !== 'closed').length, 0);
@@ -278,6 +289,7 @@ test('actual entrypoint pagehide/bfcache remount and reload reset the session an
     entry(); const first = h.apps.at(-1)!; h.enter(); await flush();
     const native = (first as unknown as { mounted: { runtime: GuairaChapterRuntime } }).mounted.runtime;
     native.sample = attempt => ({ attempt, alive: true, state: 'playing', result: { sceneId: 'guaira-travessia', kind: 'reached-finish' } });
+    h.frame();
     h.byId('chapter-primary').click(); assert.equal(first.snapshot.accepted.length, 1);
     h.enter(); assert.equal(first.mode, 'loading'); const firstSession = first.snapshot.generation.sessionId;
     h.window.dispatch('pagehide', { persisted: true }); assert.equal(first.isDisposed, true);
@@ -940,4 +952,155 @@ for (const [sceneId, prerequisiteCount, recordingName, story] of [
     assert.deepEqual(app.snapshot.accepted, receipts, 'Retry preserves durable receipts');
     h.byId('chapter-map-return').click(); assert.equal(app.mode, 'map');
     assert.deepEqual(app.snapshot.accepted, receipts); app.dispose(); h.checkDisposed();
+});
+
+for (const kind of ['map', 'chapter', 'gallery', 'relief'] as const)
+test(`${kind} failure gives the mounted plain retry keyboard focus`, async t => {
+    const h = hostBrowser(t); t.mock.method(console, 'error', () => {});
+    const pending = deferred<never>();
+    const store = new ProgressStore(null);
+    if (kind === 'relief') store.updateGuaira({ ...freshGuairaChapterProgress(), resumeScene: 'relief' });
+    const app = h.create({ progressStore: store,
+        createMap: kind === 'map' ? () => { throw Error('Map failed'); } : h.createMap,
+        loadScene: () => pending.promise, loadExcursion: () => pending.promise });
+    if (kind !== 'map') {
+        if (kind !== 'relief') {
+            if (kind === 'gallery') chooseGallery(h);
+            h.currentMap().button.focus(); h.enter();
+            assert.equal(h.document.activeElement, h.body, 'Removed map control must not retain synthetic focus');
+        }
+        const canvas = h.byId('game-canvas'); canvas.focus();
+        pending.reject(Error('Load failed')); await flush();
+        assert.ok(!h.all().includes(canvas));
+    }
+    assert.equal(app.mode, 'error');
+    assert.equal(h.document.activeElement, h.byId(kind === 'map' ? 'chapter-map-retry' : 'chapter-retry'));
+    app.dispose(); h.checkDisposed();
+});
+
+function pendingRecovery(h: ReturnType<typeof hostBrowser>, kind: 'chapter' | 'gallery' | 'relief') {
+    const loads: Array<ReturnType<typeof deferred<never>>> = [], store = new ProgressStore(null);
+    if (kind === 'relief') store.updateGuaira({ ...freshGuairaChapterProgress(), resumeScene: 'relief' });
+    const load = () => { const next = deferred<never>(); loads.push(next); return next.promise; };
+    const app = h.create({ progressStore: store, loadScene: load, loadExcursion: load });
+    if (kind !== 'relief') { if (kind === 'gallery') chooseGallery(h); h.enter(); }
+    return { app, loads };
+}
+
+for (const kind of ['chapter', 'gallery', 'relief'] as const)
+for (const interruption of ['external', 'removed-external', 'outside-pointer', 'blur', 'hidden', 'blur-return', 'hidden-return'] as const)
+test(`${kind} recovery focus never steals after ${interruption}`, async t => {
+    const h = hostBrowser(t); t.mock.method(console, 'error', () => {});
+    const { app, loads } = pendingRecovery(h, kind), before = app.snapshot;
+    h.byId('game-canvas').focus();
+    const external = h.document.createElement('button'); h.body.append(external);
+    if (interruption.includes('external')) { external.focus(); if (interruption === 'removed-external') external.remove(); }
+    else if (interruption === 'outside-pointer') h.document.dispatch('pointerdown', { target: h.body });
+    else if (interruption.startsWith('blur')) { h.window.dispatch('blur'); if (interruption.endsWith('return')) h.window.dispatch('focus'); }
+    else { h.document.hidden = true; h.document.dispatch('visibilitychange');
+        if (interruption.endsWith('return')) { h.document.hidden = false; h.document.dispatch('visibilitychange'); } }
+    loads[0].reject(Error('Load failed after interruption')); await flush();
+    assert.equal(app.mode, 'error'); assert.deepEqual(app.snapshot, before);
+    const expected = interruption === 'external' ? external : h.body;
+    assert.equal(h.document.activeElement, expected);
+    h.document.hidden = false; h.document.dispatch('visibilitychange'); h.window.dispatch('focus'); h.frame();
+    assert.equal(h.document.activeElement, expected, 'Returning must not run deferred recovery focus');
+    const map = h.byId('chapter-map-return'); map.focus(); h.window.dispatch('focus'); h.document.dispatch('visibilitychange');
+    assert.equal(h.document.activeElement, map, 'A later recovery choice remains the user’s');
+    assert.equal(app.activeGame, null); assert.equal(h.frames.size, 0);
+    app.dispose(); h.checkDisposed();
+});
+
+for (const kind of ['map', 'chapter', 'gallery', 'relief'] as const)
+test(`${kind} recovery focus preserves a meaningful external control present at entry`, async t => {
+    const h = hostBrowser(t); t.mock.method(console, 'error', () => {});
+    const external = h.document.createElement('button'); h.body.append(external); external.focus();
+    let app: GuairaChapterApp;
+    if (kind === 'map') app = h.create({ createMap: () => { throw Error('Map failed'); } });
+    else { const pending = pendingRecovery(h, kind); app = pending.app; pending.loads[0].reject(Error('Load failed')); await flush(); }
+    assert.equal(app.mode, 'error'); assert.equal(h.document.activeElement, external);
+    app.dispose(); h.checkDisposed();
+});
+
+for (const kind of ['chapter', 'gallery', 'relief'] as const)
+test(`${kind} recovery focus follows each fresh retry but ignores a retired rejection and held Enter`, async t => {
+    const h = hostBrowser(t); t.mock.method(console, 'error', () => {});
+    const { app, loads } = pendingRecovery(h, kind);
+    h.byId('chapter-retry').focus(); h.byId('chapter-retry').click();
+    const canvas = h.byId('game-canvas'); canvas.focus();
+    loads[0].reject(Error('Retired load failed')); await flush();
+    assert.equal(app.mode, 'loading'); assert.equal(h.document.activeElement, canvas);
+    loads[1].reject(Error('Current load failed')); await flush();
+    const retry = h.byId('chapter-retry'), saved = savedClick(retry);
+    assert.equal(h.document.activeElement, retry);
+    assert.equal(h.nativeKey('Enter', retry, true).defaultPrevented, true); assert.equal(loads.length, 2);
+    h.nativeKey('Enter', retry); assert.equal(loads.length, 3);
+    assert.equal(h.document.activeElement, h.body, 'Replacing focused recovery action resets native focus');
+    retry.click(); invokeSaved(saved); assert.equal(loads.length, 3);
+    loads[2].reject(Error('Fresh retry failed')); await flush();
+    assert.equal(h.document.activeElement, h.byId('chapter-retry'));
+    assert.notEqual(h.document.activeElement, retry); assert.equal(app.snapshot.accepted.length, 0);
+    app.dispose(); h.checkDisposed();
+});
+
+for (const kind of ['chapter', 'gallery', 'relief'] as const)
+for (const navigation of ['map', 'dispose'] as const)
+test(`${kind} recovery focus cannot survive ${navigation} before late rejection`, async t => {
+    const h = hostBrowser(t); t.mock.method(console, 'error', () => {});
+    const { app, loads } = pendingRecovery(h, kind);
+    h.byId('game-canvas').focus();
+    if (navigation === 'map') { h.byId('chapter-map-return').click(); h.currentMap().button.focus(); }
+    else app.dispose();
+    const active = h.document.activeElement, before = app.snapshot;
+    loads[0].reject(Error('Retired load failed')); await flush();
+    h.window.dispatch('focus'); h.document.dispatch('visibilitychange');
+    assert.equal(h.document.activeElement, active); assert.deepEqual(app.snapshot, before);
+    assert.equal(app.mode, navigation === 'map' ? 'map' : 'disposed');
+    app.dispose(); h.checkDisposed();
+});
+
+test('map recovery focus follows repeated failures and keeps retired retry actions inert', t => {
+    const h = hostBrowser(t); t.mock.method(console, 'error', () => {}); let constructions = 0;
+    const app = h.create({ createMap: (root) => {
+        constructions++; const transient = h.document.createElement('button');
+        (root as unknown as LifecycleElement).append(transient); transient.focus(); throw Error('Map failed');
+    } });
+    const retry = h.byId('chapter-map-retry'), saved = savedClick(retry);
+    assert.equal(h.document.activeElement, retry);
+    h.nativeKey('Enter', retry, true); assert.equal(constructions, 1);
+    h.nativeKey('Enter', retry); assert.equal(constructions, 2);
+    const next = h.byId('chapter-map-retry'); assert.notEqual(next, retry); assert.equal(h.document.activeElement, next);
+    retry.click(); invokeSaved(saved); assert.equal(constructions, 2); assert.equal(h.document.activeElement, next);
+    h.nativeKey('Enter', next); assert.equal(constructions, 3); assert.equal(h.document.activeElement, h.byId('chapter-map-retry'));
+    app.dispose(); h.checkDisposed();
+});
+
+for (const interruption of ['blur', 'hidden'] as const)
+test(`map recovery focus does not run on ${interruption} or subsequent return`, t => {
+    const h = hostBrowser(t); t.mock.method(console, 'error', () => {});
+    const app = h.create({ createMap: () => {
+        if (interruption === 'blur') h.window.dispatch('blur');
+        else { h.document.hidden = true; h.document.dispatch('visibilitychange'); }
+        throw Error('Map failed during interruption');
+    } });
+    assert.equal(app.mode, 'error'); assert.equal(h.document.activeElement, h.body);
+    h.document.hidden = false; h.document.dispatch('visibilitychange'); h.window.dispatch('focus');
+    assert.equal(h.document.activeElement, h.body);
+    app.dispose(); h.checkDisposed();
+});
+
+test('chapter recovery focus preserves a control chosen during partial-runtime cleanup', async t => {
+    const h = hostBrowser(t), factory = await loadGuairaChapterScene('guaira-travessia');
+    t.mock.method(console, 'error', () => {});
+    const external = h.document.createElement('button'); h.body.append(external);
+    const app = h.create({ loadScene: async () => (canvas, status) => {
+        const runtime = factory(canvas, status), dispose = runtime.game.dispose.bind(runtime.game);
+        t.mock.method(runtime.game, 'start', () => { throw Error('Start failed after ownership'); });
+        t.mock.method(runtime.game, 'dispose', () => { dispose(); external.focus(); });
+        return runtime;
+    } });
+    h.enter(); h.byId('game-canvas').focus(); await flush();
+    assert.equal(app.mode, 'error'); assert.equal(app.activeGame, null);
+    assert.equal(h.document.activeElement, external, 'Cleanup focus is checked again after the error view is appended');
+    app.dispose(); h.checkDisposed();
 });
