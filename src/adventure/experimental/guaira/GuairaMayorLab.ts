@@ -69,7 +69,9 @@ export class GuairaMayorEncounter extends BossEncounter {
     override contact(p: Rect, previous: Rect, falling: boolean) {
         const result = this.model.contact(p, previous, falling); this.sync(); return result;
     }
-    override get shockWarning() { return false; }
+    // WorldGame edge-triggers the existing warning SFX without changing the
+    // vulnerable phase. Rendering uses this scene's own hydraulic painter.
+    override get shockWarning() { return this.model.counterpressure?.phase === 'warning'; }
     override get name() { return 'AGUA PUBLICA'; }
     override get hint() {
         const b = this.model;
