@@ -1,6 +1,6 @@
 Integration reconciliation — 2026-10-05
 
-This follow-up closes the Factory tooling omission found after PR #2 and incorporates the newly published touch-rotation fix from 256d501. Modern ScreenOrientation changes cancel held and queued game input; the legacy window event remains the fallback. Disposal removes the modern listener, and a delayed legacy event cannot cancel a fresh gesture in the modern path.
+This follow-up closes the Factory tooling omission found after PR #2 and reconciles the audited historical branches. It also incorporates main through 34460c5, including the reviewed touch-rotation fix, corrected Guaíra/Serra flights, compact chapter panels, selector-aware gameplay fixture and simplified Extras chooser. These runtime changes were published to main during reconciliation; this PR's remaining file changes concern Factory reproduction, tests and evidence.
 
 The original Factory branch is merged with its four recovered helpers adapted to current atlas functions and source-matched caches. Five conflicts were resolved with the current runtime image, metadata, WorldMapView, integration fixture and canonical scene as the reference. Its image/metadata budget and transparency assertions are also recovered. The original pre-atlas proof files remain in eab1a34 history; current measurements and proof summaries are regenerated from current source.
 
@@ -10,13 +10,16 @@ The new model correctly exposes raster overdraw in narrow phone panoramas. The 1
 
 Historical branch reconciliation records ancestry for the fifteen other audited remote branches. Thirteen have equivalent patches already reapplied to main; arcade audio assets are byte-identical and the full-height Turbosuco warning is incorporated and refined. Their reconciliation deliberately preserves the current file tree. This avoids repeating the old patches against later versions while retaining all original commits in reachable history. No remote branch or local backup is deleted.
 
+The integrated Serra flight model, route, scene generator, metadata and art match the reviewed remote hashes after text line-ending normalization. An independent replay against the actual a701b76 model, route, campaign art and metadata confirms all 890 Factory-pair poses exactly and 325 Guaíra-terminal poses on the Serra pair. At 5.1s, only the speed has the documented 5.55×10⁻¹⁷ rounding difference. The local Windows/Node 24 replay's raw JSON digest differs from the remote manifest; the remote poses.json payload is not tracked or available locally, so byte-identical replay is not established by this integration. Details are retained in integration-flight-verification-2026-10-05.json. The new offshore Serra corridor and sampled wheel support correction are included; the remaining silhouette/depth and reconstructed-wheel limits are documented in docs/world/serra-flight-corridor/, rather than described as an all-airport certification.
+
 Validation completed before merge:
 
-- npm run check: 1,826 TypeScript tests and three Node tests, all content validators, both typechecks and the production build passed.
+- npm run check: 1,855 TypeScript tests and three Node tests, all content validators, both typechecks and the production build passed against the latest integrated main.
 - Python Factory regression suite: nine tests passed, covering stale source/metadata, projection drift, clipped or modified renders, payload packaging and LF/CRLF portability.
 - The current actor painter stays inside the published envelopes across idle/walking frames, both facings, subpixel anchors and all twenty viewport/mode scenarios.
 - Blender 5.2.1 rebuilt the 1,055-object scene, passed the physical checks and verified twelve of twelve connected guardrail chains.
 - The source-matched cache rendered a full 1920×1200 image at 192 samples. Packaging and the route-overlay review completed; the 179,548-byte candidate pair is below the 350,000-byte limit. Published runtime art/metadata remain unchanged.
-- Production build: 210 files, 50,982,967 bytes, with 2,017,033 bytes of headroom below the 53,000,000-byte budget.
+- Production build: 210 files, 51,000,388 bytes, with 1,999,612 bytes of headroom below the 53,000,000-byte budget.
+- Local production preview: home, Extras and Guaíra chapter load without page/console errors. The chapter map, journey dialog and final Extras chooser were visually reviewed at desktop/phone sizes (1264×625 and 390×640); native Escape closes the journey and restores the map. Both phone dialogs stay within the viewport, with no horizontal document overflow, and the Extras chapter link reaches its actual destination. This local check does not replace the immutable-preview review required before production promotion.
 
 The compact native evidence is in docs/world/diorama/fabrica-reconciliation-verification.json. Reproduction commands and scope limits are in docs/world/diorama/fabrica.md. Large images, Blender caches and detailed per-ray reports remain in .cache/; the original Delicia safety snapshot remains in refs/backups/delicia-before-integration-20261005 and stash@{0}.

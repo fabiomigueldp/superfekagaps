@@ -12,7 +12,7 @@
     "src/adventure/WorldAtlasModel.ts": "08aec86444beff853975be56405f239461a345060a8e924640366cff4dcf1934",
     "src/adventure/WorldMapArt.ts": "ea180a5a8a1374926a3085f9f0d0466fea82be542fc8bb26a81b7b1831e76ffe",
     "src/adventure/WorldMapModel.ts": "dac756bb2d1488a0b8a0d49cc7c97d2886f539c82e0a57f462543460983f3360",
-    "src/adventure/GuairaCampaignArt.ts": "0a418942ae3769dd4768c53c67ffab4e1e7c297afc2e84031043e35047918576",
+    "src/adventure/GuairaCampaignArt.ts": "dbfcdaa97230b8249597aebf760a3450be97729b4d4967ea3eb7eac6be99350d",
     "src/adventure/delicia/DeliciaIsland.ts": "af0521577b80cce44ad13cab2e18ecfd76bf0dd2c1688ced3464e518437aed8a",
     "public/assets/world/map/costa-diorama.meta.json": "889ca6e3c4cb64558d5c22d8a8f898189ff36b14604db989287b959c00738b18",
     "public/assets/world/map/porto-diorama.meta.json": "9ab92d40237767c133ff8ac0a951f21ae3b61dfa714d758cade2ebd55f25004c",
@@ -21,8 +21,8 @@
     "public/assets/world/map/reserva-diorama.meta.json": "975d503cf5e496adf34391170357f16ef299c836cdb83d47b7ad4de3f6837559",
     "public/assets/world/map/dominio-diorama.meta.json": "de2becb7944244ad08951540825991d8df900b7d5503648768c52eb24271e058",
     "public/assets/world/map/guaira-campaign/fabrica.meta.json": "e444e10575df311176bc774580441347b4c07cf64429fb6091dcda202a51bd00",
-    "public/assets/world/map/guaira-campaign/guaira.meta.json": "7a547710efdf754406fa780805fdc08265bfafb50b73790836a882f25e4c8039",
-    "public/assets/world/map/guaira-campaign/serra.meta.json": "01e585b9e4badccdbbae58ac31d268f4ffb3f00486e1c6d4e24051f88fa7e342",
+    "public/assets/world/map/guaira-campaign/guaira.meta.json": "063e79637cd0392b8a7dee1d1c4d11ed93b7121201e5563d62353e2b20cf6a92",
+    "public/assets/world/map/guaira-campaign/serra.meta.json": "4597642f304cc8f4bf27a67c54de52284b9326ed2be8dd6d767284b94abcdec9",
     "public/assets/world/map/port-factory-bridge.meta.json": "d5d1916785aa266510a25cb0a143326d01e7df4281e07ac73404281e33f24606"
   },
   "sourceGeometry": {

@@ -1,0 +1,36 @@
+{
+  "baselineCommit": "a701b76200bbf5945c1ed5dd8ecf131109281370",
+  "integrationBaseCommit": "34460c5b77fc066082f0f34ddbcbe259f8ef49d9",
+  "reviewedSerraSourcesAndAssetsMatch": true,
+  "sourceInputs": {
+    "src/adventure/WorldAircraftModel.ts": "7a4a7aabcda520bb955c3539e8e37a0c4f2046f8b7cfd464f13f43dc64890319",
+    "src/adventure/WorldAircraftTerminalRoute.ts": "db0187d7a0e4f7c76eb9cea26dd4669d78f2937687f4171377ee302a1dea3fe2",
+    "tools/diorama/guaira_campaign/build.py": "3ec8c7964f521a3927ad87ec0a3d488afab20521b488e4607485d00cde41f92a",
+    "public/assets/world/map/guaira-campaign/serra.meta.json": "4597642f304cc8f4bf27a67c54de52284b9326ed2be8dd6d767284b94abcdec9",
+    "public/assets/world/map/guaira-campaign/serra.webp": "d7be76ad3b3bcd1bde9ab4be6defbde9554ac6a03c093e8e86367c8bdc6ed6c5"
+  },
+  "preservation": {
+    "exactFactoryPoses": 890,
+    "exactGuairaTerminalPoses": 325,
+    "boundaryWithin1e12": [
+      {
+        "source": "serra",
+        "destination": "guaira",
+        "elapsed": 5.1,
+        "delta": {
+          "speed": -5.551115123125783e-17
+        }
+      }
+    ],
+    "failures": []
+  },
+  "poseReplay": {
+    "platform": "win32",
+    "node": "v24.13.0",
+    "records": 890,
+    "localSha256": "ad5f16937cbad9e3c409a89fc4de8f83fef9962f129efb50c68147a6f6349668",
+    "reviewedSha256": "9ed0d5cf1ccdcd905199bc9a4a777740bae6b791de3ebf664625b8ba00032e66",
+    "byteEqualityEstablished": false,
+    "scope": "Runtime source/art integrity and local preservation checks. A raw digest mismatch without the original payload is not evidence of changed geometry; no new native flight clearance or browser/device check is claimed."
+  }
+}
