@@ -50,11 +50,12 @@ class Element extends Surface {
 class Media extends Surface { matches = false; }
 
 /** DOM/event boundaries only; Input and the complete control helper are production classes. */
-function fixture(t: TestContext, touch = 5, pointer = true, canvasAvailable = true) {
+function fixture(t: TestContext, touch = 5, pointer = true, canvasAvailable = true, modernOrientation = false) {
+    const orientation = new Surface();
     const win = new Surface(), doc = Object.assign(new Surface(), { hidden: false });
     const media = new Media(), body = new Element(), canvas = new Element('CANVAS'); canvas.id = 'game-canvas';
     const globals: Record<string, unknown> = {
-        window: Object.assign(win, { requestAnimationFrame() { assert.fail('The canvas already exists; no retry loop should start.'); } }),
+        window: Object.assign(win, { screen: modernOrientation ? { orientation } : {}, requestAnimationFrame() { assert.fail('The canvas already exists; no retry loop should start.'); } }),
         document: Object.assign(doc, { body, getElementById: () => canvas, createElement: (tag: string) => {
             const element = new Element(tag.toUpperCase());
             if (!canvasAvailable && tag === 'canvas') Object.assign(element, { getContext: () => null });
@@ -72,7 +73,7 @@ function fixture(t: TestContext, touch = 5, pointer = true, canvasAvailable = tr
     const root = bar.root as unknown as Element;
     const buttons = Object.fromEntries(root.children.map(button => [button.getAttribute('data-action')!, button])) as Record<InputAction, Element>;
     t.after(() => {
-        bar.dispose();
+        bar.dispose(); input.dispose();
         for (const [name, descriptor] of original) { if (descriptor) Object.defineProperty(globalThis, name, descriptor); else Reflect.deleteProperty(globalThis, name); }
     });
     function down(action: InputAction, id = 1) { return buttons[action].dispatch('pointerdown', { pointerId: id }); }
@@ -84,7 +85,7 @@ function fixture(t: TestContext, touch = 5, pointer = true, canvasAvailable = tr
         return globalPrevented || localPrevented;
     }
     function step() { input.update(); return input.getState(); }
-    return { win, doc, media, body, canvas, input, bar, root, buttons, down, up, key, step, visibility, beforeListeners,
+    return { win, doc, media, orientation, body, canvas, input, bar, root, buttons, down, up, key, step, visibility, beforeListeners,
         setPlaying: (value: boolean) => { playing = value; }, interactions: () => interactions };
 }
 
@@ -312,4 +313,48 @@ test('page hide and orientation changes cancel held pointers, keyboard and queue
         h.up(1); h.up(2); assert.equal(h.step().jumpReleased, false);
     }
     h.down('jump', 3); assert.equal(h.step().jumpPressed, true);
+});
+
+test('modern screen rotation cancels held captures and queued actions without a legacy window event', t => {
+    const h = fixture(t, 5, true, true, true);
+    h.down('jump', 1); h.down('right', 2); h.key('keydown', 'x');
+    h.down('down', 3); h.up(3);
+    h.orientation.dispatch('change');
+    const state = h.step();
+    assert.equal(state.jump, false); assert.equal(state.jumpPressed, false);
+    assert.equal(state.jumpReleased, false); assert.equal(state.right, false);
+    assert.equal(state.run, false); assert.equal(state.downPressed, false);
+    assert.equal(h.buttons.jump.captures.size, 0); assert.equal(h.buttons.right.captures.size, 0);
+    assert.ok(h.root.children.every(button => !button.getAttribute('data-held')));
+    h.buttons.jump.dispatch('lostpointercapture', { pointerId: 1 }); h.up(1, true); h.up(2);
+    h.buttons.jump.dispatch('pointermove', { pointerId: 1 });
+    assert.equal(h.step().jumpPressed, false); assert.equal(h.step().jumpReleased, false);
+    h.down('jump', 4); assert.equal(h.step().jumpPressed, true);
+    h.win.dispatch('orientationchange');
+    assert.equal(h.step().jump, true, 'A delayed duplicate legacy event cannot cancel a fresh modern gesture.');
+    h.up(4); assert.equal(h.step().jumpReleased, true);
+});
+
+test('modern screen rotation invalidates canvas touches and requires a fresh gesture', t => {
+    const h = fixture(t, 5, false, true, true);
+    const old = finger(h.canvas, 10), fresh = finger(h.canvas, 11, .1);
+    h.canvas.dispatch('touchstart', { touches: [old], changedTouches: [old] });
+    assert.equal(h.step().jump, true);
+    h.orientation.dispatch('change');
+    assert.equal(h.step().jump, false); assert.equal(h.step().jumpReleased, false);
+    h.canvas.dispatch('touchmove', { touches: [old], changedTouches: [old] });
+    h.canvas.dispatch('touchstart', { touches: [old, fresh], changedTouches: [fresh] });
+    const state = h.step(); assert.equal(state.jump, false); assert.equal(state.left, true);
+    h.canvas.dispatch('touchend', { touches: [], changedTouches: [old, fresh] });
+    h.canvas.dispatch('touchstart', { touches: [old], changedTouches: [old] });
+    assert.equal(h.step().jumpPressed, true);
+});
+
+test('disposing Input removes its modern rotation listener and leaves no captured action', t => {
+    const h = fixture(t, 5, true, true, true);
+    assert.equal(h.orientation.listenerCount, 1);
+    h.down('jump', 1); h.input.dispose(); h.input.dispose();
+    assert.equal(h.orientation.listenerCount, 0); assert.equal(h.buttons.jump.captures.size, 0);
+    h.orientation.dispatch('change'); h.up(1);
+    assert.equal(h.input.getState().jumpPressed, false); assert.equal(h.input.getState().jump, false);
 });
