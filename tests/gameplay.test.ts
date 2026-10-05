@@ -233,7 +233,7 @@ test('the gameplay canvas accepts D while ordinary editable fields stay isolated
   assert.equal(input.getState().right, false);
 });
 
-test('gameplay canvas keys yield only to their actual open dialog and resume after dismissal', (t) => {
+test('owned gameplay canvas keys work inside an open dialog while its native UI stays isolated', (t) => {
   const { input, key, canvas, dialog } = inputHarness(t);
   canvas.id = 'game-canvas';
   dialog.open = true;
@@ -241,8 +241,12 @@ test('gameplay canvas keys yield only to their actual open dialog and resume aft
   assert.equal(input.getState().right, true, 'An unrelated open dialog does not suppress this target');
   key('keyup', 'KeyD', { key: 'd' });
   canvas.dialog = dialog;
-  assert.equal(key('keydown', 'KeyD', { key: 'd' }), false, 'Native modal input retains its default');
-  assert.equal(input.getState().right, false, 'An actual dialog ancestor owns this key');
+  assert.equal(key('keydown', 'KeyD', { key: 'd' }), true, 'An owned gameplay canvas remains playable inside a dialog');
+  assert.equal(input.getState().right, true);
+  key('keyup', 'KeyD', { key: 'd' });
+  dialog.dialog = dialog;
+  assert.equal(key('keydown', 'KeyD', { key: 'd', target: dialog }), false, 'Native modal input retains its default');
+  assert.equal(input.getState().right, false, 'Dialog UI remains isolated from gameplay');
   dialog.open = false;
   key('keydown', 'KeyD', { key: 'd' });
   assert.equal(input.getState().right, true, 'Closing the dialog restores fresh gameplay input');

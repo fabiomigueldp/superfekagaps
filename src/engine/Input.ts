@@ -49,6 +49,7 @@ const createState = (): InputState => ({
 export class Input {
   private readonly lifetime = new DisposalScope();
   private attachFrame: number | null = null;
+  private gameplayCanvas: HTMLCanvasElement | null = null;
   get isDisposed(): boolean { return this.lifetime.isDisposed; }
   private state = createState();
   private pressedKeys = new Set<string>();
@@ -119,9 +120,10 @@ export class Input {
     if (target instanceof HTMLElement && target.id !== 'game-canvas' && target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) {
       return;
     }
-    // Open native dialogs own Escape, scrolling and control activation. Keyup
-    // still releases keys held before the dialog opened.
-    if (target instanceof HTMLElement && target.closest('dialog[open]')) return;
+    // Dialog UI owns Escape, scrolling and activation. The factory salon also
+    // hosts gameplay: only its own Input may capture its exact canvas, never the
+    // suspended campaign's Input. Keyup still releases keys across focus changes.
+    if (target instanceof HTMLElement && target.closest('dialog[open]') && target !== this.gameplayCanvas) return;
     // Native activation belongs to focused page controls, not jump/start.
     if (target instanceof HTMLElement && target.closest('button, a[href], summary') &&
       ['Enter', 'Space'].includes(controlCode(event))) return;
@@ -219,6 +221,7 @@ export class Input {
       for (const type of ['touchstart', 'touchmove', 'touchend', 'touchcancel'] as const) {
         this.lifetime.listen(canvas, type, (event) => this.handleTouch(event, type), { passive: false });
       }
+      this.gameplayCanvas = canvas;
       return true;
     };
 
