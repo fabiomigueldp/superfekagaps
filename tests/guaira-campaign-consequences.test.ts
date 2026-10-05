@@ -30,6 +30,8 @@ class Element extends EventTarget {
     className = ''; id = ''; src = ''; alt = ''; dataset: Record<string, string> = {};
     append(...children: Element[]) { this.children.push(...children); }
     setAttribute() {} showModal() {} close() {} focus() {}
+    getContext() { return null; }
+    get firstElementChild() { return this.children[0] ?? null; }
     remove() { this.isConnected = false; }
 }
 test('region preview layers the same earned water and removes a missing optional image', t => {
@@ -40,11 +42,11 @@ test('region preview layers the same earned water and removes a missing optional
     const save = freshSave(), callbacks = { fly() {}, goToFactory() {}, goToSerra() {} };
     save.legacySerraAccess = true;
     showGuairaRegion(save, '4-1', callbacks);
-    assert.equal(body.children.at(-1)!.children[1].children.length, 1);
+    assert.equal(body.children.at(-1)!.children[0].children[1].children.length, 1);
     save.guaira.completed = ['guaira-prefeito'];
     showGuairaRegion(save, '4-1', callbacks);
-    const images = body.children.at(-1)!.children[1].children;
-    assert.equal(images.length, 2); assert.match(images[0].alt, /água liberada/);
+    const images = body.children.at(-1)!.children[0].children[1].children;
+    assert.equal(images.length, 2); assert.equal(images[0].alt, '', 'The thumbnail is decorative; earned water is described in the panel.');
     assert.match(images[1].src, /guaira-water-restored.webp$/);
     images[1].dispatchEvent(new Event('error'));
     assert.equal(images[1].isConnected, false);

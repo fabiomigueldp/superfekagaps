@@ -8,6 +8,7 @@ import type { GuairaChapterMapTarget, GuairaChapterNavigation } from '../src/adv
 import type { GuairaChapterTravel } from '../src/adventure/experimental/guaira/chapter/GuairaChapterTravel';
 import { GUAIRA_WATER_CONTRACT } from '../src/adventure/experimental/guaira/GuairaWaterMotion';
 import { freshGuairaChapterProgress } from '../src/adventure/experimental/guaira/chapter/GuairaChapterProgress';
+import { labActionSize } from '../src/adventure/experimental/JuiceLabToolbar';
 
 const metadata = JSON.parse(readFileSync(new URL('../public/assets/world/experimental/guaira/guaira-diorama.meta.json', import.meta.url), 'utf8'));
 function dispatch(target: EventTarget, type: string, values = {}) {
@@ -121,6 +122,27 @@ function clearOpening(session: GuairaChapterSession) {
     return session.continueFrom(attempt, { attempt, alive: true, state: 'playing', result: { sceneId: state.opening, kind: 'reached-finish' } })!.snapshot;
 }
 
+test('map copy keeps progress in the header and explains returning to the beginning without erasing it', async t => {
+    const h = browser(t, { width: 320 }), session = new GuairaChapterSession();
+    const snapshot = clearOpening(session);
+    let restarts = 0;
+    h.create(configuration(snapshot, { onRestart: () => { restarts++; }, storageMessage: () => 'Progresso somente nesta sessão.' }));
+    assert.equal(h.byClass('chapter-map-loading').textContent, 'Carregando o mapa…');
+    await flush(); h.tick();
+    assert.equal(h.byClass('chapter-map-count').textContent, '1/5 · concluídos');
+    assert.doesNotMatch(h.byClass('chapter-map-hint').textContent, /\d\/5/);
+    assert.match(h.byClass('chapter-map-hint').textContent, /Progresso somente nesta sessão\./);
+    assert.match(h.byClass('chapter-map-canvas').getAttribute('aria-label')!, /^Mapa de Guaíra\./);
+    h.button('Ver a jornada de Guaíra').click();
+    assert.equal(h.byClass('chapter-map-session-note').textContent, 'Voltar ao início mantém os trechos concluídos. Cada nova tentativa começa do início.');
+    const restart = h.button('Voltar ao início sem apagar trechos concluídos');
+    const art = restart.children.find(child => child.className === 'lab-action-art')!;
+    assert.equal(art.width, labActionSize('VOLTAR AO INÍCIO').width * 2);
+    assert.equal(art.height, 44);
+    assert.ok(art.width <= 268, 'The complete bitmap label fits the dialog content at 320 CSS pixels');
+    restart.click(); assert.equal(restarts, 1); assert.deepEqual(session.snapshot(), snapshot);
+});
+
 test('opening and entry use captured generations; repeated/stale controls cannot enter or switch a retired session', async t => {
     const h = browser(t), session = new GuairaChapterSession();
     const entered: GuairaChapterSceneId[] = [], openings: string[] = [];
@@ -155,7 +177,7 @@ test('CAMINHAR follows the authored road; modal and hidden freeze it, CHEGAR onl
     const delayedFrame = [...h.frames.values()][0];
     h.button('Ver a jornada de Guaíra').click(); assert.equal(h.frames.size, 0);
     delayedFrame(300_000); assert.equal(road(view).distance, travelled);
-    assert.equal(h.doc.activeElement, h.button('Fechar a jornada e voltar à maquete'));
+    assert.equal(h.doc.activeElement, h.button('Fechar a jornada e voltar ao mapa'));
     h.reduced(true); assert.equal(road(view).distance, travelled, 'Changing reduced motion behind the modal must not move Feka');
     dispatch(h.byClass('guaira-chapter-map'), 'keydown', { key: 'Escape' });
     assert.equal(h.byClass('chapter-map-dialog').open, false);
@@ -205,11 +227,14 @@ test('load failure leaves the session untouched and offers retry/exit; late deco
     const view = h.create(configuration(initial, { onExit: () => { exits++; }, onSelect: () => { selected++; } }));
     await flush();
     assert.equal(h.byClass('chapter-map-failure').hidden, false);
+    assert.equal(h.byClass('chapter-map-status').textContent, 'O mapa está indisponível. Sua sessão continua aqui.');
+    const retryArt = h.button('Tentar carregar o mapa novamente').children.find(child => child.className === 'lab-action-art')!;
+    assert.equal(retryArt.width, labActionSize('TENTAR').width * 2, 'Loading retries remain distinct from restarting a playable attempt');
     assert.equal(view.canEnter(chapterTarget(initial.selectedScene), initial.generation, 0), false);
     assert.equal(h.button('Ver a jornada de Guaíra').disabled, true);
     h.button('Sair do capítulo e voltar aos extras').click(); assert.equal(exits, 1);
     assert.deepEqual(session.snapshot(), initial); assert.equal(selected, 0);
-    h.repairMetadata(); h.button('Tentar carregar a maquete novamente').click(); await flush(); h.tick();
+    h.repairMetadata(); h.button('Tentar carregar o mapa novamente').click(); await flush(); h.tick();
     assert.equal(h.byClass('chapter-map-failure').hidden, true); assert.equal(view.canEnter(chapterTarget(initial.selectedScene), initial.generation, 0), true);
     view.dispose(); const draws = h.draws(); h.hidden(true); h.hidden(false); h.reduced(true); dispatch(h.win, 'resize');
     assert.equal(h.draws(), draws); assert.equal(h.root.children.length, 0);
@@ -367,7 +392,7 @@ test('same-state navigation revision retires every retained map action without c
     const oldExit = h.button('Sair do capítulo e voltar aos extras').onclick!;
     const oldOpening = h.button('Pátio das Comportas: usar como abertura alternativa').onclick!;
     h.button('Ver a jornada de Guaíra').click();
-    const oldRestart = h.button('Voltar à abertura sem apagar trechos concluídos').onclick!;
+    const oldRestart = h.button('Voltar ao início sem apagar trechos concluídos').onclick!;
     const oldOptional = h.button(OPTIONAL_LABEL).onclick!;
     assert.equal(h.button(OPTIONAL_LABEL).getAttribute('aria-pressed'), 'true');
     assert.ok(h.byClass('chapter-map-list').children.every(item => item.children[0].getAttribute('aria-pressed') === 'false'));
@@ -378,7 +403,7 @@ test('same-state navigation revision retires every retained map action without c
     assert.deepEqual(session.snapshot(), before);
     view.update(before, true, true, { target: chapterTarget(before.selectedScene), revision: 1 });
     assert.equal(h.button(OPTIONAL_LABEL).getAttribute('aria-pressed'), 'true', 'Older navigation cannot overwrite the optional target');
-    h.button('Fechar a jornada e voltar à maquete').click();
+    h.button('Fechar a jornada e voltar ao mapa').click();
     assert.equal(view.canEnter(optionalTarget, before.generation, 1), false);
     assert.equal(view.canEnter(optionalTarget, before.generation, 2), true);
 });
@@ -427,7 +452,7 @@ test('optional travel suspends behind journey/hidden/resize and reduced motion o
     const gallery = h.button(GALLERY_LABEL), retained = gallery.onclick!;
     h.hidden(true); retained(); assert.equal(entries, 0);
     h.hidden(false); h.button('Ver a jornada de Guaíra').click(); retained(); assert.equal(entries, 0);
-    h.button('Fechar a jornada e voltar à maquete').click(); assert.equal(entries, 0);
+    h.button('Fechar a jornada e voltar ao mapa').click(); assert.equal(entries, 0);
     gallery.click(); assert.equal(entries, 1);
 });
 
@@ -440,7 +465,7 @@ test('Gallery return restores action focus after ready/visible without stealing 
         if (condition === 'other-focus') h.button('Sair do capítulo e voltar aos extras').focus();
         if (condition === 'failed') {
             await flush(); assert.equal(h.byClass('chapter-map-failure').hidden, false);
-            h.repairMetadata(); h.button('Tentar carregar a maquete novamente').click();
+            h.repairMetadata(); h.button('Tentar carregar o mapa novamente').click();
         } else h.images[0].decoded.resolve();
         await flush(); h.tick();
         if (condition === 'hidden') { assert.equal(h.doc.activeElement, null); h.hidden(false); }
@@ -491,7 +516,7 @@ test('held activation keys are suppressed on native map buttons and arrivals nev
     const exit = h.button('Sair do capítulo e voltar aos extras').onclick!;
     h.hidden(true); exit(); assert.equal(exits, 0); h.hidden(false);
     h.button('Ver a jornada de Guaíra').click(); exit(); assert.equal(exits, 0);
-    h.button('Fechar a jornada e voltar à maquete').click(); exit(); assert.equal(exits, 1);
+    h.button('Fechar a jornada e voltar ao mapa').click(); exit(); assert.equal(exits, 1);
 });
 
 test('window blur freezes actual road and water while visible, rejects retained actions, and resumes without elapsed catch-up', async t => {
@@ -525,14 +550,14 @@ test('blur during the journey rejects row/restart/close callbacks and focus cann
     await flush(); h.tick(9); h.button('Ver a jornada de Guaíra').click();
     const distance = road(view).distance;
     const retained = [h.button(OPTIONAL_LABEL).onclick!, h.byClass('chapter-map-list').children[0].children[0].onclick!,
-        h.button('Voltar à abertura sem apagar trechos concluídos').onclick!, h.button('Fechar a jornada e voltar à maquete').onclick!];
+        h.button('Voltar ao início sem apagar trechos concluídos').onclick!, h.button('Fechar a jornada e voltar ao mapa').onclick!];
     h.blur(); retained.forEach(action => action()); h.reduced(true); h.hidden(true); h.hidden(false);
     dispatch(h.byClass('chapter-map-dialog'), 'cancel'); dispatch(h.byClass('guaira-chapter-map'), 'keydown', { key: 'Escape' });
     assert.equal(h.byClass('chapter-map-dialog').open, true); assert.equal(road(view).distance, distance); assert.equal(h.frames.size, 0);
     assert.deepEqual({ selected, restarts }, { selected: 0, restarts: 0 });
     h.focus(); h.tick(30); assert.equal(h.byClass('chapter-map-dialog').open, true);
     assert.equal(road(view).distance, distance); assert.equal(h.frames.size, 0);
-    h.button('Fechar a jornada e voltar à maquete').click(); assert.equal(road(view).arrival, 'bairro');
+    h.button('Fechar a jornada e voltar ao mapa').click(); assert.equal(road(view).arrival, 'bairro');
     assert.equal(view.canEnter(optionalTarget, before.generation, 2), true);
 });
 
@@ -574,14 +599,14 @@ test('completed campaign return names the unlocked onward action without repeati
     const status = h.byClass('chapter-map-status');
     assert.equal(status.textContent, 'Serra do Mar liberada · escolha SERRA para seguir viagem.');
     assert.equal(status.getAttribute('role'), 'status'); assert.equal(status.getAttribute('aria-live'), 'polite');
-    assert.equal(h.byClass('chapter-map-hint').textContent, 'Ramal público aberto. Os moradores têm água na bica outra vez. Os gaps continuam. · 5/5 concluídos · Progresso somente nesta sessão.');
+    assert.equal(h.byClass('chapter-map-hint').textContent, 'Ramal público aberto. Os moradores têm água na bica outra vez. Os gaps continuam. · Progresso somente nesta sessão.');
     const onward = h.button('Seguir viagem para Serra do Mar'), repeat = h.button('Repetir o Prefeito em uma nova tentativa');
     assert.equal(onward.disabled, false); assert.equal(repeat.disabled, false);
     assert.equal(continuations, 0); assert.equal(entries, 0); assert.deepEqual(session.snapshot(), before);
     for (const mode of ['hidden', 'blur', 'menu'] as const) {
         if (mode === 'hidden') h.hidden(true); else if (mode === 'blur') h.blur(); else h.button('Ver a jornada de Guaíra').click();
         onward.onclick!(); assert.equal(continuations, 0, `${mode} must keep the existing action interruption guard`);
-        if (mode === 'hidden') h.hidden(false); else if (mode === 'blur') h.focus(); else h.button('Fechar a jornada e voltar à maquete').click();
+        if (mode === 'hidden') h.hidden(false); else if (mode === 'blur') h.focus(); else h.button('Fechar a jornada e voltar ao mapa').click();
     }
     onward.click(); assert.equal(continuations, 1); assert.equal(entries, 0); assert.deepEqual(session.snapshot(), before);
     view.dispose(); onward.onclick?.(); assert.equal(continuations, 1);
@@ -627,7 +652,7 @@ test('accepted Bairro water uses one existing clock without irrigation, preserve
     await flush(); h.tick(2);
     assert.equal(h.byClass('chapter-map-title').textContent, 'Galeria dos Remendos');
     assert.equal(h.byClass('chapter-map-count').textContent, '5/5 · concluídos');
-    assert.equal(h.byClass('chapter-map-hint').textContent, 'Ramal público aberto. Os moradores têm água na bica outra vez. Os gaps continuam. · 5/5 concluídos · Progresso somente nesta sessão.');
+    assert.equal(h.byClass('chapter-map-hint').textContent, 'Ramal público aberto. Os moradores têm água na bica outra vez. Os gaps continuam. · Progresso somente nesta sessão.');
     assert.match(h.byClass('chapter-map-canvas').getAttribute('aria-label')!, /Bica do Bairro com água nesta sessão\./);
     assert.equal(h.button(GALLERY_LABEL).disabled, false); assert.equal(h.frames.size, 1);
     const internals = view as unknown as { water: { released: boolean; draw: (...args: unknown[]) => void }; waterClock: { seconds: number } };
@@ -641,7 +666,7 @@ test('accepted Bairro water uses one existing clock without irrigation, preserve
         if (mode === 'hidden') h.hidden(true); else if (mode === 'blur') h.blur(); else h.button('Ver a jornada de Guaíra').click();
         const draws = h.draws();
         pending(900_000); h.tick(90); assert.equal(h.frames.size, 0); assert.equal(h.draws(), draws); assert.equal(paints, paintsBefore); assert.equal(internals.waterClock.seconds, seconds);
-        if (mode === 'hidden') h.hidden(false); else if (mode === 'blur') h.focus(); else h.button('Fechar a jornada e voltar à maquete').click();
+        if (mode === 'hidden') h.hidden(false); else if (mode === 'blur') h.focus(); else h.button('Fechar a jornada e voltar ao mapa').click();
         h.tick(); assert.equal(internals.waterClock.seconds, seconds, 'resume resets the timestamp without consuming hidden time');
         assert.equal(h.frames.size, 1); h.tick(2);
     }

@@ -18,6 +18,7 @@ import { GuairaGallery } from '../src/adventure/experimental/guaira/gallery/Guai
 import { GuairaTraversal } from '../src/adventure/experimental/guaira/GuairaTraversal';
 import { DisposalScope } from '../src/engine/DisposalScope';
 import { sceneLifecycleBrowser, LifecycleElement } from './helpers/sceneLifecycleHarness';
+import { labActionSize } from '../src/adventure/experimental/JuiceLabToolbar';
 
 function deferred<T>() {
     let resolve!: (value: T) => void, reject!: (error: unknown) => void;
@@ -1121,6 +1122,10 @@ for (const initiallyPaused of [false, true]) test(`chapter controls help preserv
     const h = hostBrowser(t), factory = await loadGuairaChapterScene('guaira-travessia');
     const app = h.create({ loadScene: async () => factory }); h.enter(); await flush();
     const game = app.activeGame!, attempt = app.snapshot.activeAttempt;
+    const retryArt = h.byId('chapter-retry').children.find(child => child.className === 'lab-action-art')!;
+    assert.equal(retryArt.width, labActionSize('RECOMEÇAR').width * 2);
+    assert.equal(retryArt.height, 44);
+    assert.ok(retryArt.width <= 296, 'The full retry label fits a 320px toolbar with compact padding');
     if (initiallyPaused) h.byId('chapter-primary').click();
     const opener = h.byId('chapter-controls');
     assert.equal(opener.tagName, 'BUTTON'); assert.equal(opener.disabled, false);
@@ -1151,7 +1156,8 @@ for (const initiallyPaused of [false, true]) test(`chapter controls help preserv
     assert.deepEqual(game.player.data, position); assert.equal(game.elapsed, elapsed);
     assert.deepEqual(game.store.save, save); assert.deepEqual(app.snapshot, snapshot);
     const text = h.all().filter(node => (dialog as unknown as HTMLElement).contains(node as unknown as Node)).map(node => node.textContent).join(' ');
-    for (const instruction of ['A / D', 'W, Z', 'Shift ou X', 'Golpe', 'Correr', 'Pular', 'Tentar', 'Mapa', 'continua pausada'])
+    assert.ok(text.includes('Recomeçar inicia este trecho do zero. Os trechos já concluídos continuam salvos.'));
+    for (const instruction of ['A / D', 'W, Z', 'Shift ou X', 'Golpe', 'Correr', 'Pular', 'Recomeçar', 'Mapa', 'continua pausada'])
         assert.ok(text.includes(instruction), instruction);
     h.byId('chapter-controls-help-close').click();
     assert.equal(game.state, 'paused'); assert.equal(h.document.activeElement, opener);
@@ -1187,8 +1193,11 @@ test('optional chapter controls help explains Bairro and survives hidden/disposa
     const h = hostBrowser(t), factory = await loadGuairaChapterExcursion('gallery');
     const app = h.create({ loadExcursion: async () => factory }); chooseGallery(h); h.enter(); await flush();
     const game = app.activeGame!, opener = h.byId('chapter-controls');
+    const retryArt = h.byId('chapter-retry').children.find(child => child.className === 'lab-action-art')!;
+    assert.equal(retryArt.width, labActionSize('RECOMEÇAR').width * 2);
     opener.focus(); opener.click(); const dialog = h.byId('chapter-controls-help');
     const text = h.all().filter(node => (dialog as unknown as HTMLElement).contains(node as unknown as Node)).map(node => node.textContent).join(' ');
+    assert.ok(text.includes('Recomeçar inicia este trecho do zero. Os trechos já concluídos continuam salvos.'));
     assert.match(text, /Bairro/); assert.match(text, /opcional/);
     assert.equal(game.state, 'paused'); assert.equal(app.snapshot.activeAttempt, null);
     h.window.dispatch('blur'); h.document.hidden = true; h.document.dispatch('visibilitychange');

@@ -41,8 +41,11 @@ class Element extends EventSurface {
     spellcheck = true;
     style: Record<string, string> = {};
     focused = false;
+    modalOpen = false;
     closest(selector: string): Element | null {
-        return this.tagName === 'BUTTON' && selector.includes('button') || this.tagName === 'A' && selector.includes('a[href]') ? this : null;
+        if (selector === 'dialog[open]' && this.modalOpen) return this;
+        return this.tagName === 'BUTTON' && selector.includes('button') || this.tagName === 'A' && selector.includes('a[href]') ||
+            this.tagName === 'SUMMARY' && selector.includes('summary') ? this : null;
     }
     matches() { return false; }
     get isContentEditable() { return this.contentEditable === 'true'; }
@@ -235,4 +238,35 @@ test('cancelling movement does not create edges from untouched remaining fingers
     assert.equal(input.getState().left, false);
     h.window.dispatch('blur'); input.update();
     assert.equal(input.getState().jump, false); assert.equal(input.getState().jumpReleased, false);
+});
+
+
+test('open native dialogs retain Escape, scrolling and activation without feeding game input', t => {
+    const h = browser(t), input = new Input(), summary = new Element(); summary.tagName = 'SUMMARY'; summary.modalOpen = true;
+    for (const [key, code] of [['Escape', 'Escape'], [' ', 'Space'], ['Enter', 'Enter'], ['ArrowDown', 'ArrowDown'], ['ArrowLeft', 'ArrowLeft'], ['m', 'KeyM']]) {
+        assert.equal(h.window.dispatch('keydown', { key, code, target: summary }), false, `${code} retains its native default`);
+        h.window.dispatch('keyup', { key, code, target: summary });
+    }
+    input.update();
+    assert.equal(input.consumePause(), false); assert.equal(input.consumeStart(), false);
+    assert.equal(input.getState().jump, false); assert.equal(input.getState().jumpPressed, false);
+    assert.equal(input.getState().left, false); assert.equal(input.getState().down, false);
+    summary.modalOpen = false;
+    assert.equal(h.window.dispatch('keydown', { key: ' ', code: 'Space', target: summary }), false, 'Details outside a modal also retain Space activation');
+    h.window.dispatch('keyup', { key: ' ', code: 'Space', target: summary });
+    input.update(); assert.equal(input.getState().jumpPressed, false);
+    assert.equal(h.window.dispatch('keydown', { key: ' ', code: 'Space', target: h.canvas }), true);
+    input.update(); assert.equal(input.getState().jumpPressed, true, 'Fresh canvas gameplay is unchanged after dismissal');
+});
+
+test('key release inside a modal clears movement held before it opened', t => {
+    const h = browser(t), input = new Input(), button = new Element(); button.tagName = 'BUTTON';
+    h.window.dispatch('keydown', { key: 'ArrowRight', code: 'ArrowRight', target: h.canvas });
+    input.update(); assert.equal(input.getState().right, true);
+    button.modalOpen = true;
+    h.window.dispatch('keyup', { key: 'ArrowRight', code: 'ArrowRight', target: button });
+    input.update(); assert.equal(input.getState().right, false);
+    button.modalOpen = false;
+    h.window.dispatch('keydown', { key: 'ArrowRight', code: 'ArrowRight', target: h.canvas });
+    input.update(); assert.equal(input.getState().right, true);
 });

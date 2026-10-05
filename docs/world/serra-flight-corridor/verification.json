@@ -1,0 +1,111 @@
+{
+  "baseCommit": "3505e59ff63a993a825e360bfee702d1c251c262",
+  "baseTree": "26c06e684c6254e74a052d267a72ea349ed31775",
+  "baselineNativeInputsMatchExactBase": true,
+  "sourceScene": {
+    "sha256": "9e915c0fff2e36df64f4fece84529c0aee8088868f3337acf97186c1fc70a7d4",
+    "topology": {
+      "vertices": 230,
+      "polygons": 127,
+      "triangles": 456,
+      "polygonEdges": {
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0,
+        "directedEdgeMismatches": 0
+      },
+      "triangleEdges": {
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 1,
+        "directedEdgeMismatches": 0
+      },
+      "signedVolume": 70.9803400428704
+    },
+    "authoredWheelSamples": 615,
+    "unsupportedWheels": 0,
+    "maximumAbsoluteWheelGapMeters": 0.0,
+    "supportCoreAreaSquareMeters": 3.959755115693709,
+    "supportWithShoulderAreaSquareMeters": 7.141445675360399,
+    "supportScope": "615 sampled three-wheel contacts on the new 1.879 m roll; not certification of inherited runway/usable-length compatibility metadata",
+    "geometryIdenticalToWindingCorrected": true
+  },
+  "native": {
+    "resolution": [
+      960,
+      540
+    ],
+    "frames": 890,
+    "method": "Actual runtime motion, camera, scale and painters; two full 7.4 s sequences at 60 Hz. Native Canvas, not browser or device QA.",
+    "compactResolution": [
+      390,
+      640
+    ],
+    "compactFrames": 890,
+    "nativePoseSha256": "9ed0d5cf1ccdcd905199bc9a4a777740bae6b791de3ebf664625b8ba00032e66",
+    "compactPoseSha256": "9ed0d5cf1ccdcd905199bc9a4a777740bae6b791de3ebf664625b8ba00032e66"
+  },
+  "motion": {
+    "v4": {
+      "guaira": {
+        "maxHeadingDegreesPerFrame": 3.804103433255268,
+        "maximumSpeed": 0.8045972452646071,
+        "maximumScalarAcceleration": 0.8772013986457039,
+        "maximumVectorAcceleration": 1.7232658748291056,
+        "minimumCentralSpeed": 0.26245970636739285
+      },
+      "serra": {
+        "maxHeadingDegreesPerFrame": 3.7953041595908563,
+        "maximumSpeed": 0.8914492487036808,
+        "maximumScalarAcceleration": 1.0914682556288713,
+        "maximumVectorAcceleration": 1.772437925358713,
+        "minimumCentralSpeed": 0.30012675640802094
+      }
+    },
+    "candidate": {
+      "guaira": {
+        "maxHeadingDegreesPerFrame": 3.699663328153312,
+        "maximumSpeed": 0.9918081414388784,
+        "maximumScalarAcceleration": 1.392609228313617,
+        "maximumVectorAcceleration": 1.4625214099155674,
+        "minimumCentralSpeed": 0.2693610175258431
+      },
+      "serra": {
+        "maxHeadingDegreesPerFrame": 3.6990507756737605,
+        "maximumSpeed": 1.0389447174583895,
+        "maximumScalarAcceleration": 1.5229042276283256,
+        "maximumVectorAcceleration": 1.5893770263662224,
+        "minimumCentralSpeed": 0.28090358751881245
+      }
+    }
+  },
+  "preservation": {
+    "exactFactoryPoses": 890,
+    "exactGuairaTerminalPoses": 325,
+    "boundaryWithin1e12": [
+      {
+        "source": "serra",
+        "destination": "guaira",
+        "elapsed": 5.1,
+        "delta": {
+          "speed": 5.551115123125783e-17
+        }
+      }
+    ],
+    "failures": []
+  },
+  "checks": {
+    "focusedTests": 45,
+    "focusedFailures": 0,
+    "typeScriptProjectsPassed": 2,
+    "fullSuiteRun": false,
+    "browserOrDeviceTested": false,
+    "performanceTested": false,
+    "published": false
+  },
+  "finalRuntimeInputs": {
+    "src/adventure/WorldAircraftModel.ts": "7a4a7aabcda520bb955c3539e8e37a0c4f2046f8b7cfd464f13f43dc64890319",
+    "src/adventure/WorldAircraftTerminalRoute.ts": "db0187d7a0e4f7c76eb9cea26dd4669d78f2937687f4171377ee302a1dea3fe2",
+    "tools/diorama/guaira_campaign/build.py": "3ec8c7964f521a3927ad87ec0a3d488afab20521b488e4607485d00cde41f92a",
+    "public/assets/world/map/guaira-campaign/serra.meta.json": "4597642f304cc8f4bf27a67c54de52284b9326ed2be8dd6d767284b94abcdec9",
+    "public/assets/world/map/guaira-campaign/serra.webp": "d7be76ad3b3bcd1bde9ab4be6defbde9554ac6a03c093e8e86367c8bdc6ed6c5"
+  }
+}

@@ -68,7 +68,7 @@ export class GuairaChapterMapView {
     private readonly status = element('p', 'chapter-map-status');
     private readonly hint = element('p', 'chapter-map-hint');
     private readonly openingRow = element('div', 'chapter-map-openings');
-    private readonly loading = element('div', 'chapter-map-loading', 'Carregando a maquete…');
+    private readonly loading = element('div', 'chapter-map-loading', 'Carregando o mapa…');
     private readonly failure = element('div', 'chapter-map-failure');
     private readonly plaque = element('div', 'chapter-map-plaque');
     private readonly plaqueArt = new LabToolbarAction(this.plaque);
@@ -81,7 +81,7 @@ export class GuairaChapterMapView {
     private readonly primary = control('ENTRAR', 'Entrar no trecho selecionado', true);
     private readonly skip = control('CHEGAR', 'Chegar agora, pulando a caminhada');
     private readonly returnToChapter = control('RETOMAR', 'Retomar o trecho selecionado');
-    private readonly retry = control('TENTAR', 'Tentar carregar a maquete novamente');
+    private readonly retry = control('TENTAR', 'Tentar carregar o mapa novamente');
     private readonly traversal = control('TRAVESSIA', 'Travessia da Vala Seca: usar como abertura');
     private readonly junction = control('PATIO', 'Pátio das Comportas: usar como abertura alternativa');
     private readonly dialog = element('dialog', 'chapter-map-dialog');
@@ -89,8 +89,8 @@ export class GuairaChapterMapView {
     private readonly list = element('ol', 'chapter-map-list');
     private readonly optionalGroup = element('section', 'chapter-map-optional');
     private readonly optionalButton = element('button', 'chapter-map-optional-button');
-    private readonly close = control('FECHAR', 'Fechar a jornada e voltar à maquete');
-    private readonly restart = control('REINICIAR', 'Voltar à abertura sem apagar trechos concluídos');
+    private readonly close = control('FECHAR', 'Fechar a jornada e voltar ao mapa');
+    private readonly restart = control('VOLTAR AO INÍCIO', 'Voltar ao início sem apagar trechos concluídos');
     private readonly lifecycle = new AbortController();
     private readonly motion = matchMedia('(prefers-reduced-motion: reduce)');
     private observer: ResizeObserver | null = null;
@@ -142,7 +142,7 @@ export class GuairaChapterMapView {
             navigation.append(this.campaignContinue.button);
         }
         this.header.append(identity, navigation);
-        this.canvas.setAttribute('role', 'img'); this.canvas.setAttribute('aria-label', 'Maquete de Guaíra com Feka na estrada');
+        this.canvas.setAttribute('role', 'img'); this.canvas.setAttribute('aria-label', 'Mapa de Guaíra com Feka na estrada');
         this.loading.setAttribute('role', 'status'); this.failure.setAttribute('role', 'alert');
         this.failure.append(element('p', '', `O mapa de Guaíra não carregou. Tente novamente ou use ${destination.label}.`), this.retry.button);
         this.plaque.setAttribute('aria-hidden', 'true');
@@ -167,7 +167,7 @@ export class GuairaChapterMapView {
         this.optionalButton.append(element('span', 'chapter-map-step-title', 'Bairro da Vala Seca'), element('span', 'chapter-map-step-state', 'Galeria dos Remendos · fora das cinco etapas'));
         this.optionalGroup.append(optionalTitle, this.optionalButton);
         const dialogFooter = element('div', 'chapter-map-dialog-footer');
-        dialogFooter.append(element('p', 'chapter-map-session-note', 'Os trechos concluídos são guardados neste navegador. Retomar uma tentativa recarrega seu início; reiniciar preserva conquistas.'), this.restart.button);
+        dialogFooter.append(element('p', 'chapter-map-session-note', 'Voltar ao início mantém os trechos concluídos. Cada nova tentativa começa do início.'), this.restart.button);
         this.dialog.append(dialogHeader, this.dialogCount, this.list, this.optionalGroup, dialogFooter);
         this.shell.append(this.header, this.scene, this.footer, this.dialog);
         try {
@@ -328,7 +328,7 @@ export class GuairaChapterMapView {
         this.count.textContent = `${snapshot.accepted.length}/${snapshot.route.length} · concluídos`;
         this.dialogCount.textContent = this.count.textContent;
         this.title.textContent = optional ? selected.title : snapshot.chapterComplete ? 'CAPÍTULO CONCLUÍDO' : opening ? 'ESCOLHA A ABERTURA' : selected.title;
-        this.status.textContent = !ready ? this.loadState === 'failed' ? 'A maquete está indisponível. Sua sessão continua aqui.' : 'Carregando a maquete…'
+        this.status.textContent = !ready ? this.loadState === 'failed' ? 'O mapa está indisponível. Sua sessão continua aqui.' : 'Carregando o mapa…'
             : moving ? `A caminho de ${selected.place}`
                 : optional && canEnter ? 'Desvio opcional · Feka no Bairro da Vala Seca · Galeria disponível'
                     : optional ? 'Desvio opcional · caminhe até o Bairro da Vala Seca'
@@ -340,8 +340,8 @@ export class GuairaChapterMapView {
                     : `Selecionado: ${selected.title} · caminhe até ${selected.place}`;
         const last = snapshot.accepted[snapshot.accepted.length - 1];
         const story = chapterJourneyStory(snapshot);
-        this.hint.textContent = story ? `${story} · ${snapshot.accepted.length}/${snapshot.route.length} concluídos`
-            : last ? `${CHAPTER_SCENES[last.sceneId].title} concluído · ${snapshot.accepted.length}/${snapshot.route.length} concluídos`
+        this.hint.textContent = story ? story
+            : last ? `${CHAPTER_SCENES[last.sceneId].title} concluído`
                 : optional ? 'Galeria e Câmara de Alívio são opcionais'
                     : 'Devolva a água ao bairro em cinco etapas.';
         this.hint.textContent += ` · ${this.options.storageMessage?.() ?? 'Progresso somente nesta sessão.'}`;
@@ -367,8 +367,8 @@ export class GuairaChapterMapView {
         this.loading.hidden = this.loadState !== 'loading'; this.failure.hidden = this.loadState !== 'failed';
         this.plaqueArt.setLabel(selected.short, selected.title);
         this.plaque.hidden = true; this.paintedCamera = null;
-        this.canvas.setAttribute('aria-label', (moving ? `Maquete de Guaíra. Feka a caminho de ${selected.place}.`
-            : this.travel?.arrival ? `Maquete de Guaíra. Feka ${ARRIVAL_WORDS[this.travel.arrival]}.` : 'Maquete de Guaíra. Feka na estrada.')
+        this.canvas.setAttribute('aria-label', (moving ? `Mapa de Guaíra. Feka a caminho de ${selected.place}.`
+            : this.travel?.arrival ? `Mapa de Guaíra. Feka ${ARRIVAL_WORDS[this.travel.arrival]}.` : 'Mapa de Guaíra. Feka na estrada.')
             + (this.water.released && !moving && this.travel?.arrival === 'bairro' ? ' Bica do Bairro com água nesta sessão.' : ''));
         if (!this.suspended() && ((focusedSkip && this.skip.button.hidden) || (focusedReturn && this.returnToChapter.button.hidden))) this.focusMapAction();
     }

@@ -28,6 +28,66 @@ elif REGION=='serra':
   if v.co.y<-.3:
    weight=min(1,max(0,(-v.co.y-.3)/2.0));v.co.y-=1.2*weight
  foot.data.update()
+ # The short offshore roll rests on one compact limestone continuation of the
+ # existing foot. Its core is the exact two-direction three-wheel swept hull
+ # plus 12 cm; the irregular shoulder narrows/tapers into the old coastline.
+ # No separate runway slab, paint, buildings, or scenery relocation.
+ from mathutils.bvhtree import BVHTree
+ bpy.context.view_layer.update();deps=bpy.context.evaluated_depsgraph_get()
+ ev=foot.evaluated_get(deps);me=ev.to_mesh();me.calc_loop_triangles()
+ support_tree=BVHTree.FromPolygons([ev.matrix_world@v.co for v in me.vertices],
+   [tuple(t.vertices) for t in me.loop_triangles],all_triangles=True);ev.to_mesh_clear()
+ def coastal_hull(points):
+  points=sorted(points,key=lambda p:(p[0],p[1]));lo=[];hi=[]
+  def cross(a,b,c):return (b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0])
+  for p in points:
+   while len(lo)>1 and cross(lo[-2],lo[-1],p)<=0:lo.pop()
+   lo.append(p)
+  for p in reversed(points):
+   while len(hi)>1 and cross(hi[-2],hi[-1],p)<=0:hi.pop()
+   hi.append(p)
+  return lo[:-1]+hi[:-1]
+ wheel_points=[]
+ for x,y in [(-1.6,-4.0),(.1,-4.8)]:
+  for frame in (30,14):
+   a=frame*math.tau/32;c=math.cos(a);ss=math.sin(a)
+   for wx,wy in [(.43,-.65),(.43,.65),(-1.8,0)]:
+    wheel_points.append((x+.65*(c*wx-ss*wy),y+.65*(ss*wx+c*wy)))
+ core=coastal_hull([(p[0]+.12*math.cos(k*math.tau/24),p[1]+.12*math.sin(k*math.tau/24),p[0],p[1],k)
+   for p in coastal_hull(wheel_points) for k in range(24)])
+ outer=[]
+ for p in core:
+  radius=.42+.065*math.sin(p[4]*1.7);a=p[4]*math.tau/24
+  x,y=p[2]+radius*math.cos(a),p[3]+radius*math.sin(a)
+  hit,_,_,_=support_tree.ray_cast(Vector((x,y,10)),Vector((0,0,-1)),20)
+  outer.append((x,y,hit.z-.035 if hit is not None else -.20))
+ n=len(core);vertices=[(p[0],p[1],.6) for p in core]+outer+[(p[0],p[1],-.24) for p in outer]
+ faces=[tuple(range(n)),tuple(reversed(range(2*n,3*n)))]
+ for ring in range(2):
+  faces.extend([(ring*n+i,(ring+1)*n+i,(ring+1)*n+(i+1)%n,ring*n+(i+1)%n) for i in range(n)])
+ coastal_mesh=bpy.data.meshes.new('Serra grounded coastal roll mesh');coastal_mesh.from_pydata(vertices,[],faces);coastal_mesh.update()
+ # Each shared edge must be traversed in opposite directions. A merely closed
+ # surface can still have inward shoulder faces and produce a dark union slit.
+ from collections import Counter
+ directed=Counter((face.vertices[i],face.vertices[(i+1)%len(face.vertices)])
+   for face in coastal_mesh.polygons for i in range(len(face.vertices)))
+ assert all(directed[(b,a)]==count for (a,b),count in directed.items()),'Inconsistent coastal support face winding'
+ coastal_mesh.calc_loop_triangles()
+ volume=sum(coastal_mesh.vertices[t.vertices[0]].co.dot(coastal_mesh.vertices[t.vertices[1]].co.cross(
+   coastal_mesh.vertices[t.vertices[2]].co)) for t in coastal_mesh.loop_triangles)/6
+ assert volume>0,'Coastal support must face outward'
+ coastal=bpy.data.objects.new('Serra compact coastal roll union',coastal_mesh);bpy.context.collection.objects.link(coastal)
+ for mat in foot.data.materials:coastal.data.materials.append(mat)
+ for face in coastal.data.polygons:face.material_index=1 if face.index==0 or face.normal.z>.75 else 2 if face.normal.x>.35 else 0
+ # Apply the old weathering first. Union yields a single closed ground object;
+ # the wing-support core stays level while the lower rim keeps the rock taper.
+ bpy.context.view_layer.objects.active=foot;foot.select_set(True)
+ for modifier in list(foot.modifiers):bpy.ops.object.modifier_apply(modifier=modifier.name)
+ union=foot.modifiers.new('Compact coastal terminal support','BOOLEAN');union.operation='UNION';union.solver='EXACT';union.object=coastal
+ bpy.ops.object.modifier_apply(modifier=union.name);bpy.data.objects.remove(coastal,do_unlink=True)
+ foot['terminal_roll_support']='closed compact coastal union; original scenery unchanged'
+ coastal_support={'core':[[p[0],p[1],.6] for p in core],'shoulder':outer,'wheelMarginMeters':.12,
+   'method':'closed irregular limestone union into existing mountain foot'}
  for ob in bpy.context.scene.objects:
   if ob.name.startswith('maintenance carrier'):ob.hide_render=True
 else:
@@ -177,6 +237,12 @@ if REGION=='guaira':
  meta['flightClearance']={'method':'inset western roll and aligned low-altitude corridor',
    'campaignVegetationSetback':clearance_vegetation,'chapterArtUnchanged':True}
  meta['nodes']={k:{**project(p),'world':p} for k,p in namespace['NODES'].items()};meta['routes']={str(i):[project(p) for p in r] for i,r in enumerate(namespace['ROUTES'])}
+elif REGION=='serra':
+ roll_start=(-1.6,-4.0,z);roll_end=(.1,-4.8,z)
+ meta['terminal'].update({'rollStart':project(roll_start),'rollEnd':project(roll_end),
+   'rollStartWorld':roll_start,'rollEndWorld':roll_end,'rollLengthMeters':math.hypot(1.7,.8)})
+ meta['flightClearance']={'method':'supported coastal roll and shallow offshore corridor','support':coastal_support,
+   'physicalStripAndBoardingUnchanged':True}
 elif REGION=='fabrica':
  cam.data.ortho_scale*=2
  meta['assetFrame']={'left':-.5,'top':-.5,'widthInMap':2,'heightInMap':2}
