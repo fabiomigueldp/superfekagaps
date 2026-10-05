@@ -1,0 +1,527 @@
+{
+  "provenance": {
+    "label": "v3 bounded600Hzwingtip/home closest-witness interval",
+    "auditStartedUtc": "2026-10-05T18:50:24.586931+00:00",
+    "posesSha256": "484a0537ae8480bedae1840d40fe3da2b03eeed1e8d0ace53f7f4898d0722f2d",
+    "posesSnapshot": "/tmp/guaira-flight-corridor/v3/audit-inputs/poses-484a0537ae8480be.json",
+    "blendSha256": "c4f475489061d6bedbb4475ea31835af204bf19f956d771c27030305e727137e",
+    "blendSnapshot": "/tmp/guaira-flight-corridor/v3/audit-inputs/campaign-c4f475489061d6be.blend",
+    "auditScriptSha256": "7fffaef1a328de3d003ed995bcc0c04c399ecf9e0ef1e8147a0584017221d2c7"
+  },
+  "scope": "Bounded closest known terminal-structure witness: Serra\u2192Gua\u00edra5.95\u20136.0166667s,41actual600Hzposes, coral swept wingtip.001 against every evaluated Neighborhood home component. No full-scene or other-airport recertification.",
+  "method": "Source/sprite-calibrated poses. Exact triangle intersections; minimum distance via vertex/triangle and edge/edge features with safe triangle-AABB pruning. Precision~1e-5m.",
+  "notContinuousGuarantee": "These are600Hzsamples within one0.0667sinterval, not an analytic swept-path guarantee. Frame indices recorded to detect a discrete heading boundary.",
+  "minimumObservedDistanceMeters": 0.10749423423913905,
+  "minimumAt": {
+    "elapsed": 5.988333333333333,
+    "frame": 24,
+    "aircraft": "coral swept wingtip.001",
+    "minimumDistanceMeters": 0.10749423423913905,
+    "triangleIntersections": 0,
+    "exactFeaturePairsExamined": 202,
+    "witness": {
+      "prop": "Neighborhood home tile end thickness",
+      "aircraftTriangle": 184,
+      "propTriangle": 402
+    }
+  },
+  "intersectionSamples": 0,
+  "headingFrames": [
+    24
+  ],
+  "results": [
+    {
+      "elapsed": 5.95,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.12540017068386078,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 162,
+      "witness": null
+    },
+    {
+      "elapsed": 5.951666666666667,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.12430368083871336,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 154,
+      "witness": {
+        "prop": "Neighborhood home curved clay tile",
+        "aircraftTriangle": 185,
+        "propTriangle": 390
+      }
+    },
+    {
+      "elapsed": 5.953333333333333,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.12323220074176788,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 162,
+      "witness": null
+    },
+    {
+      "elapsed": 5.955,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.122186079621315,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 160,
+      "witness": null
+    },
+    {
+      "elapsed": 5.956666666666667,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.12116605788469315,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 168,
+      "witness": null
+    },
+    {
+      "elapsed": 5.958333333333333,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.12017448067348824,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 168,
+      "witness": {
+        "prop": "Neighborhood home curved clay tile",
+        "aircraftTriangle": 185,
+        "propTriangle": 390
+      }
+    },
+    {
+      "elapsed": 5.96,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.11920911073684692,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 168,
+      "witness": null
+    },
+    {
+      "elapsed": 5.961666666666667,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.11827345873435063,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 170,
+      "witness": {
+        "prop": "Neighborhood home curved clay tile",
+        "aircraftTriangle": 156,
+        "propTriangle": 390
+      }
+    },
+    {
+      "elapsed": 5.963333333333333,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.11736857504980408,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 194,
+      "witness": {
+        "prop": "Neighborhood home curved clay tile",
+        "aircraftTriangle": 5,
+        "propTriangle": 390
+      }
+    },
+    {
+      "elapsed": 5.965,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.11649317219554547,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 198,
+      "witness": {
+        "prop": "Neighborhood home curved clay tile",
+        "aircraftTriangle": 185,
+        "propTriangle": 390
+      }
+    },
+    {
+      "elapsed": 5.966666666666667,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.1156509316469446,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 212,
+      "witness": {
+        "prop": "Neighborhood home curved clay tile",
+        "aircraftTriangle": 156,
+        "propTriangle": 390
+      }
+    },
+    {
+      "elapsed": 5.968333333333334,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.1148316817466795,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 220,
+      "witness": {
+        "prop": "Neighborhood home curved clay tile",
+        "aircraftTriangle": 109,
+        "propTriangle": 390
+      }
+    },
+    {
+      "elapsed": 5.97,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.11402675721537057,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 220,
+      "witness": {
+        "prop": "Neighborhood home curved clay tile",
+        "aircraftTriangle": 184,
+        "propTriangle": 390
+      }
+    },
+    {
+      "elapsed": 5.971666666666667,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.11323355740076099,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 228,
+      "witness": {
+        "prop": "Neighborhood home curved clay tile",
+        "aircraftTriangle": 184,
+        "propTriangle": 390
+      }
+    },
+    {
+      "elapsed": 5.973333333333334,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.11246904702344776,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 246,
+      "witness": {
+        "prop": "Neighborhood home curved clay tile",
+        "aircraftTriangle": 184,
+        "propTriangle": 390
+      }
+    },
+    {
+      "elapsed": 5.975,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.11174008697494893,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 246,
+      "witness": {
+        "prop": "Neighborhood home curved clay tile",
+        "aircraftTriangle": 184,
+        "propTriangle": 390
+      }
+    },
+    {
+      "elapsed": 5.976666666666667,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.111047295063166,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 272,
+      "witness": {
+        "prop": "Neighborhood home curved clay tile",
+        "aircraftTriangle": 184,
+        "propTriangle": 390
+      }
+    },
+    {
+      "elapsed": 5.9783333333333335,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.11039116881079086,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 300,
+      "witness": {
+        "prop": "Neighborhood home curved clay tile",
+        "aircraftTriangle": 184,
+        "propTriangle": 390
+      }
+    },
+    {
+      "elapsed": 5.98,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.10977524992210372,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 328,
+      "witness": {
+        "prop": "Neighborhood home curved clay tile",
+        "aircraftTriangle": 184,
+        "propTriangle": 390
+      }
+    },
+    {
+      "elapsed": 5.9816666666666665,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.10919787734746933,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 324,
+      "witness": {
+        "prop": "Neighborhood home curved clay tile",
+        "aircraftTriangle": 184,
+        "propTriangle": 390
+      }
+    },
+    {
+      "elapsed": 5.983333333333333,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.10866256803274155,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 308,
+      "witness": null
+    },
+    {
+      "elapsed": 5.985,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.10816799619553864,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 296,
+      "witness": {
+        "prop": "Neighborhood home curved clay tile",
+        "aircraftTriangle": 184,
+        "propTriangle": 390
+      }
+    },
+    {
+      "elapsed": 5.986666666666666,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.10771583723001754,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 244,
+      "witness": {
+        "prop": "Neighborhood home curved clay tile",
+        "aircraftTriangle": 184,
+        "propTriangle": 390
+      }
+    },
+    {
+      "elapsed": 5.988333333333333,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.10749423423913905,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 202,
+      "witness": {
+        "prop": "Neighborhood home tile end thickness",
+        "aircraftTriangle": 184,
+        "propTriangle": 402
+      }
+    },
+    {
+      "elapsed": 5.99,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.10790089339852874,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 164,
+      "witness": {
+        "prop": "Neighborhood home tile end thickness",
+        "aircraftTriangle": 184,
+        "propTriangle": 402
+      }
+    },
+    {
+      "elapsed": 5.991666666666666,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.1089311428122388,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 232,
+      "witness": {
+        "prop": "Neighborhood home tile end thickness",
+        "aircraftTriangle": 184,
+        "propTriangle": 402
+      }
+    },
+    {
+      "elapsed": 5.993333333333333,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.11056145280599594,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 280,
+      "witness": null
+    },
+    {
+      "elapsed": 5.995,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.11256238768811318,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 282,
+      "witness": {
+        "prop": "Neighborhood home tile end thickness",
+        "aircraftTriangle": 182,
+        "propTriangle": 402
+      }
+    },
+    {
+      "elapsed": 5.996666666666667,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.11476429448708048,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 290,
+      "witness": {
+        "prop": "Neighborhood home tile end thickness",
+        "aircraftTriangle": 182,
+        "propTriangle": 402
+      }
+    },
+    {
+      "elapsed": 5.998333333333333,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.11745504289865494,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 321,
+      "witness": null
+    },
+    {
+      "elapsed": 6,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.12061410224617726,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 318,
+      "witness": {
+        "prop": "Neighborhood home tile end thickness",
+        "aircraftTriangle": 182,
+        "propTriangle": 402
+      }
+    },
+    {
+      "elapsed": 6.001666666666667,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.12419629096984863,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 339,
+      "witness": null
+    },
+    {
+      "elapsed": 6.003333333333333,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.1281595079335623,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 340,
+      "witness": {
+        "prop": "Neighborhood home tile end thickness",
+        "aircraftTriangle": 182,
+        "propTriangle": 402
+      }
+    },
+    {
+      "elapsed": 6.005,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.1324626776649389,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 343,
+      "witness": {
+        "prop": "Neighborhood home tile end thickness",
+        "aircraftTriangle": 182,
+        "propTriangle": 402
+      }
+    },
+    {
+      "elapsed": 6.006666666666667,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.13704910216948096,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 360,
+      "witness": {
+        "prop": "Neighborhood home tile end thickness",
+        "aircraftTriangle": 181,
+        "propTriangle": 402
+      }
+    },
+    {
+      "elapsed": 6.008333333333334,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.14172654062683834,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 387,
+      "witness": {
+        "prop": "Neighborhood home tile end thickness",
+        "aircraftTriangle": 181,
+        "propTriangle": 402
+      }
+    },
+    {
+      "elapsed": 6.01,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.14644016325473785,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 398,
+      "witness": null
+    },
+    {
+      "elapsed": 6.011666666666667,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.15133594990470733,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 396,
+      "witness": {
+        "prop": "Neighborhood home tile end thickness",
+        "aircraftTriangle": 181,
+        "propTriangle": 402
+      }
+    },
+    {
+      "elapsed": 6.013333333333334,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.15640287073621528,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 396,
+      "witness": {
+        "prop": "Neighborhood home tile end thickness",
+        "aircraftTriangle": 181,
+        "propTriangle": 402
+      }
+    },
+    {
+      "elapsed": 6.015,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.16162268704092891,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 394,
+      "witness": {
+        "prop": "Neighborhood home tile end thickness",
+        "aircraftTriangle": 181,
+        "propTriangle": 402
+      }
+    },
+    {
+      "elapsed": 6.016666666666667,
+      "frame": 24,
+      "aircraft": "coral swept wingtip.001",
+      "minimumDistanceMeters": 0.16690522154648493,
+      "triangleIntersections": 0,
+      "exactFeaturePairsExamined": 394,
+      "witness": {
+        "prop": "Neighborhood home tile end thickness",
+        "aircraftTriangle": 120,
+        "propTriangle": 402
+      }
+    }
+  ]
+}

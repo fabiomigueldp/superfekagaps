@@ -75,7 +75,26 @@
     ],
     "surface": "dry-compacted-earth",
     "clearSpanMeters": 3.35,
-    "usableLengthMeters": 4.65
+    "usableLengthMeters": 4.65,
+    "rollStart": {
+      "x": 0.25951,
+      "y": 0.547549
+    },
+    "rollEnd": {
+      "x": 0.299406,
+      "y": 0.475743
+    },
+    "rollStartWorld": [
+      -6.85,
+      -2.1,
+      1.8
+    ],
+    "rollEndWorld": [
+      -6.85,
+      0.1,
+      1.8
+    ],
+    "rollLengthMeters": 2.2
   },
   "supportFootprint": {
     "center": [
@@ -111,6 +130,52 @@
     "top": 0,
     "widthInMap": 1,
     "heightInMap": 1
+  },
+  "flightClearance": {
+    "method": "inset western roll and aligned low-altitude corridor",
+    "campaignVegetationSetback": [
+      "Cactus stem",
+      "Cactus arm",
+      "Cactus upright",
+      "Cactus arm.001",
+      "Cactus upright.001",
+      "Cactus stem.001",
+      "Cactus arm.002",
+      "Cactus upright.002",
+      "Cactus arm.003",
+      "Cactus upright.003",
+      "Cluster cactus stem",
+      "Rounded cactus tip",
+      "Long cactus rib",
+      "Long cactus rib.001",
+      "Long cactus rib.002",
+      "Long cactus rib.003",
+      "Long cactus rib.004",
+      "Long cactus rib.005",
+      "Long cactus rib.006",
+      "Curved cactus arm",
+      "Cluster upright",
+      "Cactus arm tip",
+      "Curved cactus arm.001",
+      "Cluster upright.001",
+      "Cactus arm tip.001",
+      "Cluster cactus stem.001",
+      "Rounded cactus tip.001",
+      "Long cactus rib.007",
+      "Long cactus rib.008",
+      "Long cactus rib.009",
+      "Long cactus rib.010",
+      "Long cactus rib.011",
+      "Long cactus rib.012",
+      "Long cactus rib.013",
+      "Curved cactus arm.002",
+      "Cluster upright.002",
+      "Cactus arm tip.002",
+      "Curved cactus arm.003",
+      "Cluster upright.003",
+      "Cactus arm tip.003"
+    ],
+    "chapterArtUnchanged": true
   },
   "nodes": {
     "guaira-1": {
@@ -257,6 +322,6 @@
     "path": "/assets/world/map/guaira-campaign/guaira.webp",
     "width": 1920,
     "height": 1200,
-    "bytes": 148340
+    "bytes": 146446
   }
 }

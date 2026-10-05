@@ -1,0 +1,1726 @@
+{
+  "body": {
+    "method": "Actual runtime pose billboard-aligned source reconstruction. All visible solid props included, with explicit support/ground/water exclusions. Surface triangle intersections plus two-ray closed-solid containment. Orthographic depth is authored embedding, not gameplay physics.",
+    "marginMeters": 0.05,
+    "marginMeaning": "Triangle-AABB minimum separation is a conservative lower bound. No unresolved pair means surfaces certified at least margin apart under this embedding (and no contained solid). Unresolved does not prove closeness; sparse vertex-nearest values are upper bounds and cannot certify margin. Explicit exclusions and sampled60Hz time coverage remain limitations.",
+    "supportMeaning": "Authored true wheel contact centers against only actual terrain; nominal tolerance -0.02..0.06m. Camera-aligned contacts recorded separately as diagnostics, never substituted as physical wheel proof.",
+    "visibleProps": 1738,
+    "aircraftParts": 48,
+    "excludedObjects": [
+      {
+        "name": "walk_0",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_1",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_2",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_3",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_guaira-1 clearing",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_guaira-2 clearing",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_guaira-3 clearing",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_guaira-4 clearing",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_guaira-5 clearing",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Reservoir support",
+        "reason": "support terrain, audited separately"
+      },
+      {
+        "name": "Reservoir clean water",
+        "reason": "water surface"
+      },
+      {
+        "name": "Gravity supply clean flowing water",
+        "reason": "water surface"
+      },
+      {
+        "name": "walk_paddy bridge plank",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_paddy bridge plank.001",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_paddy bridge plank.002",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_paddy bridge plank.003",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_paddy bridge plank.004",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_paddy bridge plank.005",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_paddy bridge plank.006",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Sparse dry crack",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Sparse dry crack.001",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Sparse dry crack.002",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Sparse dry crack.003",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Sparse dry crack.004",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Sparse dry crack.005",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Sparse dry crack.006",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Sparse dry crack.007",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Sparse dry crack.008",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Low eroded shoulder",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Low eroded shoulder.001",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Low eroded shoulder.002",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Low eroded shoulder.003",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Low eroded shoulder.004",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Low eroded shoulder.005",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.001",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.001",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.002",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.002",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.003",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.003",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.004",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.004",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.005",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.005",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.006",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.006",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.007",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.007",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.008",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.008",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.009",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.009",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.010",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.010",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.011",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.011",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.012",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.012",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.013",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.013",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.014",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.014",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.015",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.015",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.016",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.016",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.017",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.017",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.018",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.018",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.019",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.019",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.020",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.020",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.021",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.021",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.022",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.022",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.023",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.023",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.024",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.024",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.025",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.025",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.027",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.027",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.028",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.028",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.032",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.032",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.033",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.033",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.034",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.034",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.035",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.035",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.036",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.036",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.037",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.037",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.038",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.038",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.039",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.039",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.040",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.040",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.041",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.041",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.042",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.042",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.043",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.043",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.044",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.044",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.045",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.045",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.046",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.046",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.047",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.047",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.048",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.048",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.049",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.049",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.050",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.050",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.051",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.051",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.052",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.052",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.053",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.053",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Continuous clay island",
+        "reason": "support terrain, audited separately"
+      },
+      {
+        "name": "Fitted fractured cliff 00 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 01 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Broken horizontal sediment seam",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 02 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 03 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 04 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 05 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Broken horizontal sediment seam.001",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 05 01",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 06 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 06 01",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 07 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 08 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 09 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Broken horizontal sediment seam.002",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 10 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 11 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 12 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 13 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Broken horizontal sediment seam.003",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 13 01",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 14 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 15 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 16 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 17 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Broken horizontal sediment seam.004",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 18 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 19 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 19 01",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 20 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 20 01",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 21 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Broken horizontal sediment seam.005",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 21 01",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 22 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 22 01",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 23 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 24 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 25 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Broken horizontal sediment seam.006",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 26 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 27 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Civic terrace",
+        "reason": "support terrain, audited separately"
+      },
+      {
+        "name": "Civic continuous earthen ascent",
+        "reason": "support terrain, audited separately"
+      },
+      {
+        "name": "STOL continuous irregular landing meadow",
+        "reason": "support terrain, audited separately"
+      },
+      {
+        "name": "STOL graded dirt clearing",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "STOL earth boarding trail",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "STOL earth boarding trail.001",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "STOL earth boarding trail.002",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Connected Upper earth terrace",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Upper cyan irrigated paddy",
+        "reason": "water surface"
+      },
+      {
+        "name": "Connected Lower earth terrace",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Lower cyan irrigated paddy",
+        "reason": "water surface"
+      },
+      {
+        "name": "Connected Cross earth terrace",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Cross cyan irrigated paddy",
+        "reason": "water surface"
+      },
+      {
+        "name": "Shared field supply clean flowing water",
+        "reason": "water surface"
+      },
+      {
+        "name": "Upper paddy lateral feed clean flowing water",
+        "reason": "water surface"
+      },
+      {
+        "name": "Eastern communicating canal clean flowing water",
+        "reason": "water surface"
+      },
+      {
+        "name": "Lower paddy lateral feed clean flowing water",
+        "reason": "water surface"
+      },
+      {
+        "name": "Lower paddy drain clean flowing water",
+        "reason": "water surface"
+      },
+      {
+        "name": "Lower shared outflow clean flowing water",
+        "reason": "water surface"
+      },
+      {
+        "name": "Bridge lateral clean inlet clean flowing water",
+        "reason": "water surface"
+      },
+      {
+        "name": "Bridge inlet drop clean flowing water",
+        "reason": "water surface"
+      },
+      {
+        "name": "Bridge contained culvert clean flowing water",
+        "reason": "water surface"
+      },
+      {
+        "name": "Keeper compacted working bank",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Keeper canal-side work path",
+        "reason": "authored ground/surface layer"
+      }
+    ],
+    "summary": {
+      "final:guaira->serra": {
+        "samples": 445,
+        "collisionSamples": 0,
+        "conservativeMarginUnresolvedSamples": 0,
+        "wheelSamples": 378,
+        "unsupportedWheelSamples": 0,
+        "minTriangleAabbLowerBound": null,
+        "minSampledSurfaceUpperBound": null,
+        "stages": {}
+      },
+      "final:guaira->fabrica": {
+        "samples": 445,
+        "collisionSamples": 0,
+        "conservativeMarginUnresolvedSamples": 0,
+        "wheelSamples": 378,
+        "unsupportedWheelSamples": 0,
+        "minTriangleAabbLowerBound": null,
+        "minSampledSurfaceUpperBound": null,
+        "stages": {}
+      },
+      "final:serra->guaira": {
+        "samples": 445,
+        "collisionSamples": 0,
+        "conservativeMarginUnresolvedSamples": 0,
+        "wheelSamples": 237,
+        "unsupportedWheelSamples": 0,
+        "minTriangleAabbLowerBound": null,
+        "minSampledSurfaceUpperBound": null,
+        "stages": {}
+      },
+      "final:fabrica->guaira": {
+        "samples": 445,
+        "collisionSamples": 0,
+        "conservativeMarginUnresolvedSamples": 0,
+        "wheelSamples": 237,
+        "unsupportedWheelSamples": 0,
+        "minTriangleAabbLowerBound": null,
+        "minSampledSurfaceUpperBound": null,
+        "stages": {}
+      }
+    },
+    "provenance": {
+      "label": "v3: rollEnd y0.1; 1s aligned climb/approach; speed1x-to2x; C2 degree7 cruise",
+      "posesSha256": "786e1bb5572a9ca7ad0f46e774558e14f88c4c3c36fab467e1dd1946d91accac",
+      "blendSha256": "c4f475489061d6bedbb4475ea31835af204bf19f956d771c27030305e727137e",
+      "auditScriptSha256": "15622e1643858309b224d99c17226bdaae98c2ce751d50714c6d061a5af7f9fd"
+    }
+  },
+  "animatedPropellerAndFlaps": {
+    "method": "Actual runtime pose billboard-aligned source reconstruction. All visible solid props included, with explicit support/ground/water exclusions. Surface triangle intersections plus two-ray closed-solid containment. Orthographic depth is authored embedding, not gameplay physics.",
+    "marginMeters": 0.05,
+    "marginMeaning": "Triangle-AABB minimum separation is a conservative lower bound. No unresolved pair means surfaces certified at least margin apart under this embedding (and no contained solid). Unresolved does not prove closeness; sparse vertex-nearest values are upper bounds and cannot certify margin. Explicit exclusions and sampled60Hz time coverage remain limitations.",
+    "supportMeaning": "Authored true wheel contact centers against only actual terrain; nominal tolerance -0.02..0.06m. Camera-aligned contacts recorded separately as diagnostics, never substituted as physical wheel proof.",
+    "visibleProps": 1738,
+    "aircraftParts": 3,
+    "excludedObjects": [
+      {
+        "name": "walk_0",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_1",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_2",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_3",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_guaira-1 clearing",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_guaira-2 clearing",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_guaira-3 clearing",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_guaira-4 clearing",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_guaira-5 clearing",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Reservoir support",
+        "reason": "support terrain, audited separately"
+      },
+      {
+        "name": "Reservoir clean water",
+        "reason": "water surface"
+      },
+      {
+        "name": "Gravity supply clean flowing water",
+        "reason": "water surface"
+      },
+      {
+        "name": "walk_paddy bridge plank",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_paddy bridge plank.001",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_paddy bridge plank.002",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_paddy bridge plank.003",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_paddy bridge plank.004",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_paddy bridge plank.005",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "walk_paddy bridge plank.006",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Sparse dry crack",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Sparse dry crack.001",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Sparse dry crack.002",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Sparse dry crack.003",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Sparse dry crack.004",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Sparse dry crack.005",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Sparse dry crack.006",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Sparse dry crack.007",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Sparse dry crack.008",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Low eroded shoulder",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Low eroded shoulder.001",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Low eroded shoulder.002",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Low eroded shoulder.003",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Low eroded shoulder.004",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Low eroded shoulder.005",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.001",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.001",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.002",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.002",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.003",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.003",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.004",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.004",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.005",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.005",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.006",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.006",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.007",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.007",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.008",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.008",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.009",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.009",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.010",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.010",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.011",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.011",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.012",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.012",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.013",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.013",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.014",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.014",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.015",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.015",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.016",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.016",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.017",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.017",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.018",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.018",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.019",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.019",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.020",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.020",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.021",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.021",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.022",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.022",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.023",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.023",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.024",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.024",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.025",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.025",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.027",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.027",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.028",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.028",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.032",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.032",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.033",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.033",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.034",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.034",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.035",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.035",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.036",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.036",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.037",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.037",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.038",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.038",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.039",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.039",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.040",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.040",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.041",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.041",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.042",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.042",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.043",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.043",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.044",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.044",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.045",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.045",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.046",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.046",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.047",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.047",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.048",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.048",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.049",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.049",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.050",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.050",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.051",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.051",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.052",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.052",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Branched soil fissure.053",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fissure fine branch.053",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Continuous clay island",
+        "reason": "support terrain, audited separately"
+      },
+      {
+        "name": "Fitted fractured cliff 00 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 01 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Broken horizontal sediment seam",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 02 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 03 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 04 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 05 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Broken horizontal sediment seam.001",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 05 01",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 06 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 06 01",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 07 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 08 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 09 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Broken horizontal sediment seam.002",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 10 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 11 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 12 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 13 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Broken horizontal sediment seam.003",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 13 01",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 14 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 15 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 16 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 17 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Broken horizontal sediment seam.004",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 18 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 19 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 19 01",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 20 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 20 01",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 21 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Broken horizontal sediment seam.005",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 21 01",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 22 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 22 01",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 23 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 24 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 25 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Broken horizontal sediment seam.006",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 26 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Fitted fractured cliff 27 00",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Civic terrace",
+        "reason": "support terrain, audited separately"
+      },
+      {
+        "name": "Civic continuous earthen ascent",
+        "reason": "support terrain, audited separately"
+      },
+      {
+        "name": "STOL continuous irregular landing meadow",
+        "reason": "support terrain, audited separately"
+      },
+      {
+        "name": "STOL graded dirt clearing",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "STOL earth boarding trail",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "STOL earth boarding trail.001",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "STOL earth boarding trail.002",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Connected Upper earth terrace",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Upper cyan irrigated paddy",
+        "reason": "water surface"
+      },
+      {
+        "name": "Connected Lower earth terrace",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Lower cyan irrigated paddy",
+        "reason": "water surface"
+      },
+      {
+        "name": "Connected Cross earth terrace",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Cross cyan irrigated paddy",
+        "reason": "water surface"
+      },
+      {
+        "name": "Shared field supply clean flowing water",
+        "reason": "water surface"
+      },
+      {
+        "name": "Upper paddy lateral feed clean flowing water",
+        "reason": "water surface"
+      },
+      {
+        "name": "Eastern communicating canal clean flowing water",
+        "reason": "water surface"
+      },
+      {
+        "name": "Lower paddy lateral feed clean flowing water",
+        "reason": "water surface"
+      },
+      {
+        "name": "Lower paddy drain clean flowing water",
+        "reason": "water surface"
+      },
+      {
+        "name": "Lower shared outflow clean flowing water",
+        "reason": "water surface"
+      },
+      {
+        "name": "Bridge lateral clean inlet clean flowing water",
+        "reason": "water surface"
+      },
+      {
+        "name": "Bridge inlet drop clean flowing water",
+        "reason": "water surface"
+      },
+      {
+        "name": "Bridge contained culvert clean flowing water",
+        "reason": "water surface"
+      },
+      {
+        "name": "Keeper compacted working bank",
+        "reason": "authored ground/surface layer"
+      },
+      {
+        "name": "Keeper canal-side work path",
+        "reason": "authored ground/surface layer"
+      }
+    ],
+    "summary": {
+      "final:guaira->serra": {
+        "samples": 445,
+        "collisionSamples": 0,
+        "conservativeMarginUnresolvedSamples": 0,
+        "wheelSamples": 378,
+        "unsupportedWheelSamples": 0,
+        "minTriangleAabbLowerBound": null,
+        "minSampledSurfaceUpperBound": null,
+        "stages": {}
+      },
+      "final:guaira->fabrica": {
+        "samples": 445,
+        "collisionSamples": 0,
+        "conservativeMarginUnresolvedSamples": 0,
+        "wheelSamples": 378,
+        "unsupportedWheelSamples": 0,
+        "minTriangleAabbLowerBound": null,
+        "minSampledSurfaceUpperBound": null,
+        "stages": {}
+      },
+      "final:serra->guaira": {
+        "samples": 445,
+        "collisionSamples": 0,
+        "conservativeMarginUnresolvedSamples": 0,
+        "wheelSamples": 237,
+        "unsupportedWheelSamples": 0,
+        "minTriangleAabbLowerBound": null,
+        "minSampledSurfaceUpperBound": null,
+        "stages": {}
+      },
+      "final:fabrica->guaira": {
+        "samples": 445,
+        "collisionSamples": 0,
+        "conservativeMarginUnresolvedSamples": 0,
+        "wheelSamples": 237,
+        "unsupportedWheelSamples": 0,
+        "minTriangleAabbLowerBound": null,
+        "minSampledSurfaceUpperBound": null,
+        "stages": {}
+      }
+    },
+    "provenance": {
+      "label": "v3: runtime propeller/flap conservative swept envelopes",
+      "posesSha256": "786e1bb5572a9ca7ad0f46e774558e14f88c4c3c36fab467e1dd1946d91accac",
+      "blendSha256": "c4f475489061d6bedbb4475ea31835af204bf19f956d771c27030305e727137e",
+      "auditScriptSha256": "1d52955d3740478050dd19f1274df6ad9ff8e23bb689ffac7c8d6e9c8f35b2d7"
+    }
+  }
+}

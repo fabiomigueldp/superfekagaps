@@ -1,0 +1,96 @@
+{
+  "sourceBase": "b396534cb2e3c80e8a699a5ccd74bdb85db8cd51",
+  "posesSHA256": "786e1bb5572a9ca7ad0f46e774558e14f88c4c3c36fab467e1dd1946d91accac",
+  "sceneSHA256": "c4f475489061d6bedbb4475ea31835af204bf19f956d771c27030305e727137e",
+  "guardOnlyChangeKeepsExactPoses": true,
+  "sourceAndAssetSHA256": {
+    "src/adventure/WorldAircraftModel.ts": "f62e4839d35c3869c51b8ab544858e064643e05cb9ea0dab4045ddc3bd8dddac",
+    "src/adventure/WorldAircraftTerminalRoute.ts": "8aa03323df509ac42781d843dae332e544eb2538445007ffcf365f840f7cf81c",
+    "src/adventure/GuairaCampaignArt.ts": "dbfcdaa97230b8249597aebf760a3450be97729b4d4967ea3eb7eac6be99350d",
+    "src/adventure/WorldAircraftCamera.ts": "17e9edb5c02e58b01951231d44761383cd4d6426f5eec60db170cbc7c044d40f",
+    "src/adventure/WorldAircraftArt.ts": "0f1601321026e02b1d76c3faec5cc5bb3e1a7eef444a806fa575311d8ad1733e",
+    "src/adventure/WorldAtlasModel.ts": "08aec86444beff853975be56405f239461a345060a8e924640366cff4dcf1934",
+    "src/adventure/WorldMapModel.ts": "dac756bb2d1488a0b8a0d49cc7c97d2886f539c82e0a57f462543460983f3360",
+    "src/adventure/WorldMapArt.ts": "ea180a5a8a1374926a3085f9f0d0466fea82be542fc8bb26a81b7b1831e76ffe",
+    "src/adventure/WorldFlightScenery.ts": "8d54d5251ba0d39b834a10ac8af65d50a9ef7c9af7880bf46aa99050df674760",
+    "src/adventure/GuairaCampaignWaterData.json": "c039c09728e0e86d05453ec9abebc23ad2a9d65a09be77fef2abc2c43195bf61",
+    "public/assets/world/map/journey-aircraft.webp": "e320059fafd79764290ca484bc47f0cb48e05df9f8d6d70c3b368b01b0c614e5",
+    "public/assets/world/map/journey-aircraft.meta.json": "7a31a297371960edf8260d29f8975299a48e212127c0e4f75074340d616ff27d",
+    "public/assets/world/map/fabrica-diorama.webp": "9e0e55d42c176f3e5159311a88b0a263adca4fc9e15edb50048d14865a0ab748",
+    "public/assets/world/map/serra-diorama.webp": "0c670a3a8675e726ab6f464b5e7e5a32adc6909e1cf880db922c1838c4d86daf",
+    "public/assets/world/map/guaira-campaign/guaira-water-restored.webp": "db9c4ea825607109989c9facfa4d73a7f270eee13e3b591c043e3203623fb7c9",
+    "public/assets/world/map/guaira-campaign/guaira.webp": "db10baab83e425503797087220a6b66d5d545f5a164a4df796f99a91cfe17d2f",
+    "public/assets/world/map/guaira-campaign/guaira.meta.json": "063e79637cd0392b8a7dee1d1c4d11ed93b7121201e5563d62353e2b20cf6a92",
+    "public/assets/world/map/guaira-campaign/fabrica.webp": "39f9bb6a2fe4cfbb651db13d99aea704c96be28afeb43355e959193528e81c14",
+    "public/assets/world/map/guaira-campaign/fabrica.meta.json": "e444e10575df311176bc774580441347b4c07cf64429fb6091dcda202a51bd00",
+    "public/assets/world/map/guaira-campaign/serra.webp": "a50dea699d7cae376f7b2c8155f9a82de152f6cd4740c64f9ef92ab33bd9320a",
+    "public/assets/world/map/guaira-campaign/serra.meta.json": "dc9cca0243d79b61929b5767dc5c35145068b2e5dd948eb3d37b4ee63a352764"
+  },
+  "native": {
+    "native": {
+      "samples": 1780,
+      "poseAndFrameEquivalence": true,
+      "viewport": [
+        960,
+        540
+      ]
+    },
+    "compact": {
+      "samples": 1780,
+      "poseAndFrameEquivalence": true,
+      "viewport": [
+        390,
+        640
+      ]
+    }
+  },
+  "checks": {
+    "typeScriptTests": {
+      "passed": 1794,
+      "failed": 0
+    },
+    "javaScriptTests": {
+      "passed": 3,
+      "failed": 0
+    },
+    "finalFocusedTests": {
+      "passed": 36,
+      "failed": 0
+    },
+    "levelValidation": "passed",
+    "playerAssetValidation": "passed",
+    "worldValidation": "passed",
+    "bothTypeScriptProjects": "passed",
+    "productionBuild": "passed",
+    "buildSizeBytes": 43567564,
+    "buildSizeMaxBytes": 45000000
+  },
+  "visualMethod": "Contact sheets and sequential critical frames inspected; generated normal/quarter-speed playback artifacts, not browser/device playback QA",
+  "water": {
+    "sameAlpha": true,
+    "sameEightMotionCrops": true,
+    "scratchPixels": 2266,
+    "visibleRGBPixelsChanged": 1,
+    "maximumChannelChange": 3
+  },
+  "proofFilesSHA256": {
+    "docs/world/guaira-flight-corridor/four-routes-4x-slow.mp4": "8181cbb2fced04f23ede4d4c4b1be06d67d6b4d8cbf812bb1f1ea40a3897d8eb",
+    "docs/world/guaira-flight-corridor/four-routes-full-speed.mp4": "f755af6e037639926b3682108cd416dba294c1c42ca76338980ee25348df479b"
+  },
+  "provenanceNote": "Manifest broadened after native rendering to include every region asset and runtime painter dependency. Gua\u00edra poses remain byte-identical after validation guards; other listed source/art files were unchanged.",
+  "localRefinement": {
+    "samples": 41,
+    "hertz": 600,
+    "intervalSeconds": [
+      5.95,
+      6.016666666666667
+    ],
+    "minimumExactSampledDistanceMeters": 0.10749423423913905,
+    "minimumAtSeconds": 5.988333333333333,
+    "spriteFrame": 24,
+    "intersections": 0,
+    "scope": "Serra-to-Guaira closest known wingtip/Neighborhood home witness only; not a continuous swept-path proof"
+  },
+  "artifactCommit": "e0a64834e589d21e26e80df7cd5b05bb9e3c043f",
+  "note": "Historical v3 evidence; listed paths and hashes apply to that commit, not the revised current files."
+}

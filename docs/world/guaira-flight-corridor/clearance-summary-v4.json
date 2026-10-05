@@ -1,0 +1,106 @@
+{
+  "candidate": "v4: baseline opposite-terminal poses retained through3.1s/from5.1s; C2 quintic blend with velocity derivative only in middle; approved1s Guaira corridors unchanged",
+  "status": "Scoped clearance approval for the Guaira correction and elimination of named v3 opposite-end deltas. Inherited Serra contacts remain; not all-airport collision-free certification.",
+  "posesSha256": "777b1552d412c3043d75b7a061c1458559ecbeb9bdd1bda3955864cbd5f45014",
+  "frozenModelSha256": "a87521dbebe5c9bc8de6ff89a798d7768ca2e3a87dc59e41ef2726ebb99a13e4",
+  "reviewedGuardOnlyModelSha256": "f41257e69b712864d7868bbcbc496904a2e4aaf12b0597e06108461ba83067fb",
+  "reviewedModelPoseBytesIdentical": true,
+  "terminalRouteSha256": "66c6be6e18afc1ac46d8f5eb4838f5741ee9a193b92de77c968df2518fc48eb4",
+  "densePosesSha256": "484a0537ae8480bedae1840d40fe3da2b03eeed1e8d0ace53f7f4898d0722f2d",
+  "independentEquality": {
+    "oppositeEndpointsExactlyBaseline": 652,
+    "guairaEndpointsExactlyApprovedV3": 652,
+    "mismatches": 0,
+    "unchangedMiddlePosesReusedFromV3": 238,
+    "changedMiddlePosesAudited": 238
+  },
+  "guairaCoveragePartition": {
+    "reusedV3EndpointPoses": 652,
+    "reusedV3UnchangedMiddlePoses": 238,
+    "newMiddleAuditedPoses": 238,
+    "restoredOppositePosesOutsideAggregateGuairaBounds": 652,
+    "total": 1780,
+    "restoredOppositeMinimumAggregateSeparationMeters": 10.68441390991211,
+    "sampledSurfaceMarginMeters": 0.05,
+    "runtimePropellerAndFlapEnvelopesIncluded": true,
+    "note": "The1780 count is a partition of reused exact evidence plus targeted new checks, not a redundant full rerun."
+  },
+  "authoredWheelSupportReused": {
+    "samples": 1230,
+    "unsupported": 0,
+    "nominalGapMeters": 0.027
+  },
+  "boundedTemporalRefinementReused": {
+    "byteIdenticalDensePoses": 41,
+    "rateHz": 600,
+    "timeRangeSeconds": [
+      5.95,
+      6.0166666667
+    ],
+    "minimumObservedDistanceMeters": 0.10749423423913905,
+    "minimumTimeSeconds": 5.988333333333333,
+    "pair": "coral swept wingtip.001 / Neighborhood home tile end thickness",
+    "headingFrame": 24,
+    "continuousGuarantee": false
+  },
+  "changedMiddleResults": {
+    "guaira": {
+      "sourceBlendSha256": "c4f475489061d6bedbb4475ea31835af204bf19f956d771c27030305e727137e",
+      "overlaySha256": null,
+      "poses": 238,
+      "visibleProps": 1738,
+      "aircraftPartsIncludingEnvelopes": 51,
+      "intersectionSamples": 0,
+      "unresolvedConservative5cmSamples": 0,
+      "interpretation": "No intersections or unresolved5cm bounds"
+    },
+    "factory": {
+      "sourceBlendSha256": "e9b437eaba0ea1535e3890f818a525206dc47924c652635ccf30e6da7afdcded",
+      "overlaySha256": "c97fb03d1e2ab2f3c4a744a40b6484fcc420b8f8efe3512af7755a9584dd4174",
+      "poses": 238,
+      "visibleProps": 1035,
+      "aircraftPartsIncludingEnvelopes": 51,
+      "intersectionSamples": 0,
+      "unresolvedConservative5cmSamples": 0,
+      "interpretation": "No intersections or unresolved5cm bounds"
+    },
+    "serra": {
+      "sourceBlendSha256": "e4dcb7e2b80c0beacb1d0c9cc7c17b923e2e8f20c1f4bad1fbbcaf48ada6f98b",
+      "overlaySha256": null,
+      "poses": 238,
+      "visibleProps": 3858,
+      "aircraftPartsIncludingEnvelopes": 51,
+      "intersectionSamples": 12,
+      "unresolvedConservative5cmSamples": 17,
+      "interpretation": "Inherited; see Serra comparison"
+    }
+  },
+  "serraClassification": {
+    "comparedWitnessTimestamps": 17,
+    "baselineAndV4AggregateAircraftPropPairsIdentical": true,
+    "newObstaclePairsAcrossReviewedWindow": 0,
+    "arrivalIntersectionSamplesBaselineAndV4": 2,
+    "departureIntersectionSamplesBaseline": 13,
+    "departureIntersectionSamplesV4": 10,
+    "retimedInheritedTouches": [
+      {
+        "timeSeconds": 3.25,
+        "pair": "coral swept wingtip.001 / main trail3 anchored timber post.009",
+        "note": "Same pair already intersects earlier baseline poses; one later60Hz sampled touch."
+      },
+      {
+        "timeSeconds": 3.2333333333333334,
+        "pair": "ivory tailplane / enrich_cliff_juniper_6_6 folded alpine leaf.020",
+        "note": "Same pair already intersects baseline at3.216667s; one later sampled touch."
+      }
+    ],
+    "note": "These are inherited source-embedded Serra contacts, not a clean-airport result. Native comparison shows the same inherited post/crag region."
+  },
+  "limitations": [
+    "All margins and collision statements refer to sampled poses in the calibrated authored billboard embedding; orthographic hidden depth is not uniquely determined and this is not game collision physics.",
+    "The600Hz local refinement is not an analytic continuous swept-path guarantee.",
+    "Existing Factory/Serra endpoint clipping is preserved by exact baseline poses, not repaired by this scope.",
+    "No browser, device, performance, save, lifecycle, build or deployment certification is claimed by this geometry report.",
+    "Terrain/surface/water exclusions are explicit in the underlying audit helper and reports."
+  ]
+}
