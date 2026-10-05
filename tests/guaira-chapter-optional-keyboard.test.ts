@@ -4,6 +4,7 @@ import { GuairaRelief } from '../src/adventure/experimental/guaira/relief/Guaira
 import reliefRecordings from './helpers/guairaReliefReplay.json';
 import type { LifecycleElement } from './helpers/sceneLifecycleHarness';
 import { GuairaGallery } from '../src/adventure/experimental/guaira/gallery/GuairaGallery';
+import { loadGuairaChapterExcursion } from '../src/adventure/experimental/guaira/chapter/GuairaChapterExcursions';
 import { chapterExcursionBrowser, chapterRecording, flushChapter } from './helpers/chapterExcursionHarness';
 
 // The real host, Player and route mechanisms run recorded inputs; only device,
@@ -12,7 +13,13 @@ import { chapterExcursionBrowser, chapterRecording, flushChapter } from './helpe
 type Harness = ReturnType<typeof chapterExcursionBrowser>;
 
 async function gallery(t: TestContext) {
-    const h = chapterExcursionBrowser(t), app = h.create();
+    const h = chapterExcursionBrowser(t);
+    // Resolve real lazy factories before the microtask-only interaction flushes;
+    // those flushes cannot wait for module loading on every supported Node runtime.
+    const [galleryFactory, reliefFactory] = await Promise.all([
+        loadGuairaChapterExcursion('gallery'), loadGuairaChapterExcursion('relief')
+    ]);
+    const app = h.create({ loadExcursion: async id => id === 'gallery' ? galleryFactory : reliefFactory });
     await flushChapter(); h.frames(2);
     h.button('Ver a jornada de Guaíra').click();
     h.button('Bairro da Vala Seca / Galeria dos Remendos: desvio opcional').click();
