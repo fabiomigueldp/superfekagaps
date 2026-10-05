@@ -1,13 +1,23 @@
 import type { MapPoint } from './WorldMapModel';
 
 /** Ground coordinates use the same 8:5 atlas metric as the island artwork. */
-export interface AircraftRoute {
+export interface AircraftRunwayContacts {
     departureStart: MapPoint;
     departureLift: MapPoint;
     arrivalTouchdown: MapPoint;
     arrivalStop: MapPoint;
+}
+export interface AircraftRoute extends AircraftRunwayContacts {
     /** Optional authored airborne handles; default handles preserve runway velocity. */
     cruiseControls?: readonly [MapPoint, MapPoint];
+    /** Straight low-altitude extensions in seconds; turns start/end above these corridors. */
+    runwayCorridors?: {
+        departure: number;
+        arrival: number;
+        bendControls?: readonly [MapPoint, MapPoint];
+        /** Preserve the other airport's established low-altitude route exactly. */
+        oppositeTerminalContacts?: AircraftRunwayContacts;
+    };
     /** Vertical screen/map displacement, not a world z coordinate. */
     altitude?: number;
     scale?: number;
@@ -43,7 +53,17 @@ const finitePoint = (p: MapPoint) => !!p && Number.isFinite(p.x) && Number.isFin
 export function validAircraftRoute(route: AircraftRoute): boolean {
     return !!route && [route.departureStart, route.departureLift, route.arrivalTouchdown, route.arrivalStop].every(finitePoint) &&
         metric(delta(route.departureStart, route.departureLift)) > .001 && metric(delta(route.arrivalTouchdown, route.arrivalStop)) > .001 &&
-        (!route.cruiseControls || route.cruiseControls.length === 2 && route.cruiseControls.every(finitePoint)) &&
+        (!route.cruiseControls || Array.isArray(route.cruiseControls) && route.cruiseControls.length === 2 && route.cruiseControls.every(finitePoint)) &&
+        (!route.runwayCorridors || !route.cruiseControls &&
+            [route.runwayCorridors.departure, route.runwayCorridors.arrival].every(n => Number.isFinite(n) && n >= 0 && n <= 1) &&
+            route.runwayCorridors.departure + route.runwayCorridors.arrival > 0 &&
+            (!route.runwayCorridors.bendControls || Array.isArray(route.runwayCorridors.bendControls) && route.runwayCorridors.bendControls.length === 2 && route.runwayCorridors.bendControls.every(finitePoint)) &&
+            (!route.runwayCorridors.oppositeTerminalContacts || validAircraftRoute({
+                departureStart: route.runwayCorridors.oppositeTerminalContacts.departureStart,
+                departureLift: route.runwayCorridors.oppositeTerminalContacts.departureLift,
+                arrivalTouchdown: route.runwayCorridors.oppositeTerminalContacts.arrivalTouchdown,
+                arrivalStop: route.runwayCorridors.oppositeTerminalContacts.arrivalStop,
+            }))) &&
         (route.altitude === undefined || Number.isFinite(route.altitude) && route.altitude >= 0 && route.altitude <= 2) &&
         (route.scale === undefined || Number.isFinite(route.scale) && route.scale > 0 && route.scale <= 8);
 }
@@ -56,6 +76,77 @@ function tangent(a: MapPoint, b: MapPoint, c: MapPoint, d: MapPoint, t: number):
     const q = 1 - t;
     return { x: 3 * q * q * (b.x - a.x) + 6 * q * t * (c.x - b.x) + 3 * t * t * (d.x - c.x),
         y: 3 * q * q * (b.y - a.y) + 6 * q * t * (c.y - b.y) + 3 * t * t * (d.y - c.y) };
+}
+/** Runway-aligned acceleration through the low corridor. The central Bézier has
+ * matching first derivatives and zero second derivatives at both straight joins,
+ * so the aircraft cannot sweep a turning wing across a terminal at low altitude. */
+function alignedCorridorFlight(route: AircraftRoute, seconds: number): { ground: MapPoint; velocity: MapPoint } {
+    const { departure, arrival } = route.runwayCorridors!;
+    const take = delta(route.departureStart, route.departureLift), land = delta(route.arrivalTouchdown, route.arrivalStop);
+    const v = { x: take.x * 2 / 1.55, y: take.y * 2 / 1.55 };
+    const w = { x: land.x * 2 / 1.3, y: land.y * 2 / 1.3 };
+    const advance = (p: MapPoint, speed: MapPoint, time: number) => ({ x: p.x + speed.x * time, y: p.y + speed.y * time });
+    // Airspeed grows gently to twice roll speed while climbing straight, and
+    // reverses that easing on final approach. Endpoint acceleration is zero.
+    const corridorDistance = (time: number, duration: number) => {
+        const u = time / duration;
+        return duration * (u + u ** 3 - .5 * u ** 4);
+    };
+    if (departure && seconds <= departure) return {
+        ground: advance(route.departureLift, v, corridorDistance(seconds, departure)),
+        velocity: { x: v.x * (1 + smooth(seconds / departure)), y: v.y * (1 + smooth(seconds / departure)) },
+    };
+    if (arrival && seconds >= 4 - arrival) return {
+        ground: advance(route.arrivalTouchdown, w, -corridorDistance(4 - seconds, arrival)),
+        velocity: { x: w.x * (1 + smooth((4 - seconds) / arrival)), y: w.y * (1 + smooth((4 - seconds) / arrival)) },
+    };
+    const duration = 4 - departure - arrival, t = (seconds - departure) / duration;
+    const a = advance(route.departureLift, v, 1.5 * departure), b = advance(route.arrivalTouchdown, w, -1.5 * arrival);
+    if (departure) { v.x *= 2; v.y *= 2; }
+    if (arrival) { w.x *= 2; w.y *= 2; }
+    const controls = route.runwayCorridors!.bendControls, degree = controls ? 7 : 5;
+    const points = [a, advance(a, v, duration / degree), advance(a, v, 2 * duration / degree),
+        ...(controls ?? []), advance(b, w, -2 * duration / degree), advance(b, w, -duration / degree), b];
+    const bezier = (controls: MapPoint[]): MapPoint => {
+        const work = controls.map(p => ({ ...p }));
+        for (let count = work.length - 1; count > 0; count--) for (let i = 0; i < count; i++) work[i] = mix(work[i], work[i + 1], t);
+        return work[0];
+    };
+    return { ground: bezier(points), velocity: bezier(points.slice(1).map((p, i) => ({
+        x: (p.x - points[i].x) * degree / duration, y: (p.y - points[i].y) * degree / duration,
+    }))) };
+}
+/** Weight one in the Guaíra corridor, zero throughout the opposite terminal's
+ * first/last airborne second. Value, first and second derivatives match at joins. */
+function corridorBlend(route: AircraftRoute, seconds: number): { weight: number; derivative: number } {
+    const corridor = route.runwayCorridors!;
+    if (!corridor.oppositeTerminalContacts || corridor.departure && corridor.arrival) return { weight: 1, derivative: 0 };
+    const increasing = !corridor.departure, u = clamp(increasing ? seconds - 1 : seconds - 2);
+    const eased = u ** 3 * (10 + u * (-15 + 6 * u));
+    const slope = 30 * u ** 2 * (1 - u) ** 2;
+    return { weight: increasing ? eased : 1 - eased, derivative: increasing ? slope : -slope };
+}
+function originalTerminalRoute(route: AircraftRoute): AircraftRoute {
+    const contacts = route.runwayCorridors!.oppositeTerminalContacts!;
+    // Copy only the validated contact contract; unrelated options must not
+    // change baseline motion or recursively introduce another corridor route.
+    return { departureStart: contacts.departureStart, departureLift: contacts.departureLift,
+        arrivalTouchdown: contacts.arrivalTouchdown, arrivalStop: contacts.arrivalStop,
+        altitude: route.altitude, scale: route.scale };
+}
+function corridorFlight(route: AircraftRoute, seconds: number): { ground: MapPoint; velocity: MapPoint } {
+    const current = alignedCorridorFlight(route, seconds), { weight, derivative } = corridorBlend(route, seconds);
+    if (weight === 1) return current;
+    const baseline = originalTerminalRoute(route), take = delta(baseline.departureStart, baseline.departureLift), land = delta(baseline.arrivalTouchdown, baseline.arrivalStop);
+    const b = { x: baseline.departureLift.x + take.x * 8 / (1.55 * 3), y: baseline.departureLift.y + take.y * 8 / (1.55 * 3) };
+    const c = { x: baseline.arrivalTouchdown.x - land.x * 8 / (1.3 * 3), y: baseline.arrivalTouchdown.y - land.y * 8 / (1.3 * 3) };
+    const ground = cubic(baseline.departureLift, b, c, baseline.arrivalTouchdown, seconds / 4);
+    const tangentVector = tangent(baseline.departureLift, b, c, baseline.arrivalTouchdown, seconds / 4);
+    const velocity = { x: tangentVector.x / 4, y: tangentVector.y / 4 };
+    return { ground: mix(ground, current.ground, weight), velocity: {
+        x: velocity.x + (current.velocity.x - velocity.x) * weight + (current.ground.x - ground.x) * derivative,
+        y: velocity.y + (current.velocity.y - velocity.y) * weight + (current.ground.y - ground.y) * derivative,
+    } };
 }
 /** Default transition travels across a fixed camera. Reverse endpoints produce a
  * genuinely reversed route, rather than mirroring a perspective sprite. */
@@ -73,6 +164,11 @@ export function sampleAircraftTravel(route: AircraftRoute, elapsedSeconds: numbe
     const duration = reducedMotion ? AIRCRAFT_REDUCED_DURATION : AIRCRAFT_TRAVEL_DURATION;
     const elapsed = Number.isFinite(elapsedSeconds) ? clamp(elapsedSeconds, 0, duration) : elapsedSeconds === Infinity ? duration : 0;
     const progress = elapsed / duration, complete = elapsed >= duration;
+    const corridor = route.runwayCorridors;
+    if (!reducedMotion && corridor?.oppositeTerminalContacts &&
+        (!corridor.departure && elapsed <= 3.1 || !corridor.arrival && elapsed >= 5.1)) {
+        return sampleAircraftTravel(originalTerminalRoute(route), elapsed);
+    }
     const take = delta(route.departureStart, route.departureLift), land = delta(route.arrivalTouchdown, route.arrivalStop);
     let ground: MapPoint, velocity = take, stage: AircraftStage, altitude = 0, bank = 0, pitch = 0, suspension = 0, dust = 0, airWisps = 0, speed = 0;
     let propellerSpeed = 0;
@@ -94,18 +190,38 @@ export function sampleAircraftTravel(route: AircraftRoute, elapsedSeconds: numbe
         dust = smooth(t * 2) * (1 - smooth((t - .85) / .15));
     } else if (elapsed < 6.1) {
         const t = (elapsed - 2.1) / 4;
-        const [b, c] = route.cruiseControls ?? [
-            { x: route.departureLift.x + take.x * 8 / (1.55 * 3), y: route.departureLift.y + take.y * 8 / (1.55 * 3) },
-            { x: route.arrivalTouchdown.x - land.x * 8 / (1.3 * 3), y: route.arrivalTouchdown.y - land.y * 8 / (1.3 * 3) },
-        ];
-        ground = cubic(route.departureLift, b, c, route.arrivalTouchdown, t);
-        velocity = tangent(route.departureLift, b, c, route.arrivalTouchdown, t);
-        speed = metric(velocity) / 4;
-        const headingAt = (u: number) => { const v = tangent(route.departureLift, b, c, route.arrivalTouchdown, clamp(u)); return Math.atan2(v.y, v.x * 1.6); };
-        const turn = Math.atan2(Math.sin(headingAt(t + .025) - headingAt(t - .025)), Math.cos(headingAt(t + .025) - headingAt(t - .025)));
-        bank = clamp(turn * 1.25, -.14, .14) * Math.sin(Math.PI * t);
-        altitude = (route.altitude ?? .20) * Math.sin(Math.PI * t) ** 2;
-        pitch = -.065 * Math.sin(t * Math.PI * 2);
+        if (route.runwayCorridors) {
+            const seconds = elapsed - 2.1, corridor = route.runwayCorridors;
+            ({ ground, velocity } = corridorFlight(route, seconds));
+            speed = metric(velocity);
+            const headingAt = (u: number) => { const v = corridorFlight(route, clamp(u, 0, 4)).velocity; return Math.atan2(v.y, v.x * 1.6); };
+            const turn = Math.atan2(Math.sin(headingAt(seconds + .1) - headingAt(seconds - .1)), Math.cos(headingAt(seconds + .1) - headingAt(seconds - .1)));
+            const turnWindow = smooth((seconds - corridor.departure) / .25) * smooth((4 - corridor.arrival - seconds) / .25);
+            bank = clamp(turn * 1.25, -.14, .14) * Math.sin(Math.PI * t) * turnWindow;
+            if (corridor.oppositeTerminalContacts && corridorBlend(route, seconds).weight < 1) {
+                const original = sampleAircraftTravel(originalTerminalRoute(route), elapsed);
+                bank = original.bank + (bank - original.bank) * corridorBlend(route, seconds).weight;
+            }
+            // Reach normal cruise altitude while still aligned. On the opposite
+            // airport half retain the original rise/descent profile exactly.
+            const endSeconds = t < .5 ? seconds : 4 - seconds;
+            const corridorSeconds = t < .5 ? corridor.departure : corridor.arrival;
+            altitude = (route.altitude ?? .20) * (corridorSeconds ? smooth(endSeconds / corridorSeconds) : Math.sin(Math.PI * t) ** 2);
+            pitch = -.065 * Math.sin(t * Math.PI * 2) - (corridor.departure ? .038 * (1 - smooth(seconds / .3)) : 0);
+        } else {
+            const [b, c] = route.cruiseControls ?? [
+                { x: route.departureLift.x + take.x * 8 / (1.55 * 3), y: route.departureLift.y + take.y * 8 / (1.55 * 3) },
+                { x: route.arrivalTouchdown.x - land.x * 8 / (1.3 * 3), y: route.arrivalTouchdown.y - land.y * 8 / (1.3 * 3) },
+            ];
+            ground = cubic(route.departureLift, b, c, route.arrivalTouchdown, t);
+            velocity = tangent(route.departureLift, b, c, route.arrivalTouchdown, t);
+            speed = metric(velocity) / 4;
+            const headingAt = (u: number) => { const v = tangent(route.departureLift, b, c, route.arrivalTouchdown, clamp(u)); return Math.atan2(v.y, v.x * 1.6); };
+            const turn = Math.atan2(Math.sin(headingAt(t + .025) - headingAt(t - .025)), Math.cos(headingAt(t + .025) - headingAt(t - .025)));
+            bank = clamp(turn * 1.25, -.14, .14) * Math.sin(Math.PI * t);
+            altitude = (route.altitude ?? .20) * Math.sin(Math.PI * t) ** 2;
+            pitch = -.065 * Math.sin(t * Math.PI * 2);
+        }
         propellerSpeed = 37 - 10 * smooth(t);
         stage = t < .26 ? 'climb' : t > .73 ? 'approach' : 'cruise';
         airWisps = Math.sin(Math.PI * t) ** 2 * Math.min(1, Math.abs(bank) * 6 + .10);

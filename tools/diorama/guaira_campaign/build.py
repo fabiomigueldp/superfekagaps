@@ -105,6 +105,21 @@ if REGION=='guaira':terrain('continuous irregular landing meadow',outline,z-.027
 # The landing lane is narrow earth, with irregular soft shoulders. Unpainted.
 if REGION!='serra':terrain('graded dirt clearing',[xy(w,l) for w,l in [(-1.28,-3.5),(-1.48,-2.3),(-1.34,.5),(-1.18,3.45),(-.3,3.62),(1.1,3.35),(1.35,1.7),(1.28,-1.9),(1.10,-3.45)]],z-.016 if REGION=='guaira' else z+.003,dry,False)
 runway_start=(*xy(0,-3.1),z);runway_end=(*xy(0,3.1),z)
+# Reserve the western wing envelope in this campaign-only clearing. These two
+# cactus clusters originally grew through the aircraft; chapter vegetation and
+# every building/terrain mesh stay untouched. Inset wheel contacts use the actual
+# supported meadow, while the physical strip keeps its original 4.65m extent.
+clearance_vegetation=[]
+if REGION=='guaira':
+ cactus_parts=('Cactus stem','Cactus arm','Cactus upright','Cluster cactus stem','Rounded cactus tip',
+               'Long cactus rib','Curved cactus arm','Cluster upright','Cactus arm tip')
+ for ob in bpy.context.scene.objects:
+  if ob.name.startswith(cactus_parts):
+   bounds=[ob.matrix_world@Vector(p) for p in ob.bound_box]
+   if max(p.x for p in bounds)<-5.15:
+    ob.hide_render=True;clearance_vegetation.append(ob.name)
+ roll_start=(-6.85,-2.1,z);roll_end=(-6.85,.1,z)
+
 walk=[config['join'],config['gate'],config['park']]
 path_layer=0
 def supported_path(a,b,width=.65):
@@ -157,6 +172,10 @@ def project(p):
 # packed back into that same canonical space, so existing routes never move.
 meta={'regionKey':REGION,'replacesBase':REGION=='serra','camera':{'position':list(cam.location),'target':list(target),'orthoScale':config['scale']},'terminal':{'groundAnchor':project(config['park']),'runwayStart':project(runway_start),'runwayEnd':project(runway_end),'boardingPath':[project(p) for p in walk],'groundAnchorWorld':config['park'],'runwayStartWorld':runway_start,'runwayEndWorld':runway_end,'boardingPathWorld':walk,'surface':'dry-compacted-earth','clearSpanMeters':3.35,'usableLengthMeters':4.65 if REGION=='guaira' else 4.34 if REGION=='serra' else 6.2},'supportFootprint':{'center':[cx,cy],'width':dims[0],'depth':dims[1],'terrainMode':'existing-island-ground' if REGION!='guaira' else 'blended-clay-shoulder','bottomZ':.1,'topZ':z,'walkWidth':.65,'walkSegments':walk},'assetFrame':{'left':0,'top':0,'widthInMap':1,'heightInMap':1}}
 if REGION=='guaira':
+ meta['terminal'].update({'rollStart':project(roll_start),'rollEnd':project(roll_end),
+   'rollStartWorld':roll_start,'rollEndWorld':roll_end,'rollLengthMeters':2.2})
+ meta['flightClearance']={'method':'inset western roll and aligned low-altitude corridor',
+   'campaignVegetationSetback':clearance_vegetation,'chapterArtUnchanged':True}
  meta['nodes']={k:{**project(p),'world':p} for k,p in namespace['NODES'].items()};meta['routes']={str(i):[project(p) for p in r] for i,r in enumerate(namespace['ROUTES'])}
 elif REGION=='fabrica':
  cam.data.ortho_scale*=2

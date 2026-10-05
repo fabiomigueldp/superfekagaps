@@ -1,0 +1,142 @@
+{
+  "baseCommit": "e0a64834e589d21e26e80df7cd5b05bb9e3c043f",
+  "nativeArtCommit": "92c9b3fa4e748c5f3dbccba1821a0c286f89b89d",
+  "sourceFilesSHA256": {
+    "src/adventure/WorldAircraftModel.ts": "f41257e69b712864d7868bbcbc496904a2e4aaf12b0597e06108461ba83067fb",
+    "src/adventure/WorldAircraftTerminalRoute.ts": "66c6be6e18afc1ac46d8f5eb4838f5741ee9a193b92de77c968df2518fc48eb4",
+    "tests/world-aircraft-terminal-route.test.ts": "c94eaff155b1ef08156048912fe985a858a5617f82d2fa6a3345e38b636359b0",
+    "tests/world-aircraft-travel.test.ts": "3d4cb0e27b64242b73e5b026d9b381a34b9f0a67fe05c86b6921f2e75a1a10bd"
+  },
+  "posesSHA256": "777b1552d412c3043d75b7a061c1458559ecbeb9bdd1bda3955864cbd5f45014",
+  "equality": {
+    "actualBaselineOppositeEndpointPosesAt60Hz": 652,
+    "approvedGuairaEndpointPosesAt60Hz": 652,
+    "knownOppositeWitnesses": 88
+  },
+  "focusedTests": 42,
+  "typecheck": "passed",
+  "broaderSuite": "Not rerun for v4; v3 evidence retained separately",
+  "motion": {
+    "preserveOriginalOppositeEndpointSeconds": {
+      "departure": [
+        0,
+        3.1
+      ],
+      "arrival": [
+        5.1,
+        7.4
+      ]
+    },
+    "C2BlendSeconds": {
+      "towardGuaira": [
+        3.1,
+        4.1
+      ],
+      "fromGuaira": [
+        4.1,
+        5.1
+      ]
+    },
+    "maxHeadingDegreesPer60HzFrame": 3.805,
+    "centralMinSpeedLowerBound": 0.25,
+    "inheritedOppositeLiftPitchJump": "Preserved exactly, not claimed fixed"
+  },
+  "native": {
+    "native": {
+      "viewport": [
+        960,
+        540
+      ],
+      "records": 1780,
+      "exactPoseEquivalence": true,
+      "actualRenderInputsSHA256": {
+        "src/adventure/WorldAircraftModel.ts": "a87521dbebe5c9bc8de6ff89a798d7768ca2e3a87dc59e41ef2726ebb99a13e4",
+        "src/adventure/WorldAircraftTerminalRoute.ts": "66c6be6e18afc1ac46d8f5eb4838f5741ee9a193b92de77c968df2518fc48eb4",
+        "src/adventure/GuairaCampaignArt.ts": "dbfcdaa97230b8249597aebf760a3450be97729b4d4967ea3eb7eac6be99350d",
+        "src/adventure/WorldAircraftCamera.ts": "17e9edb5c02e58b01951231d44761383cd4d6426f5eec60db170cbc7c044d40f",
+        "src/adventure/WorldAircraftArt.ts": "0f1601321026e02b1d76c3faec5cc5bb3e1a7eef444a806fa575311d8ad1733e",
+        "src/adventure/WorldAtlasModel.ts": "08aec86444beff853975be56405f239461a345060a8e924640366cff4dcf1934",
+        "src/adventure/WorldMapModel.ts": "dac756bb2d1488a0b8a0d49cc7c97d2886f539c82e0a57f462543460983f3360",
+        "src/adventure/WorldMapArt.ts": "ea180a5a8a1374926a3085f9f0d0466fea82be542fc8bb26a81b7b1831e76ffe",
+        "src/adventure/WorldFlightScenery.ts": "8d54d5251ba0d39b834a10ac8af65d50a9ef7c9af7880bf46aa99050df674760",
+        "src/adventure/GuairaCampaignWaterData.json": "c039c09728e0e86d05453ec9abebc23ad2a9d65a09be77fef2abc2c43195bf61",
+        "public/assets/world/map/journey-aircraft.webp": "e320059fafd79764290ca484bc47f0cb48e05df9f8d6d70c3b368b01b0c614e5",
+        "public/assets/world/map/journey-aircraft.meta.json": "7a31a297371960edf8260d29f8975299a48e212127c0e4f75074340d616ff27d",
+        "public/assets/world/map/fabrica-diorama.webp": "9d4852556bb9aa88cc7601076e6c3b3e3e4e1b873d19a51705591cd8ec38eb32",
+        "public/assets/world/map/serra-diorama.webp": "dcdffbccfa8cd599989d56c84e36ae9d54511a088d1841189b5505125f574b58",
+        "public/assets/world/map/guaira-campaign/guaira.webp": "db10baab83e425503797087220a6b66d5d545f5a164a4df796f99a91cfe17d2f",
+        "public/assets/world/map/guaira-campaign/guaira.meta.json": "063e79637cd0392b8a7dee1d1c4d11ed93b7121201e5563d62353e2b20cf6a92",
+        "public/assets/world/map/guaira-campaign/fabrica.webp": "39f9bb6a2fe4cfbb651db13d99aea704c96be28afeb43355e959193528e81c14",
+        "public/assets/world/map/guaira-campaign/fabrica.meta.json": "e444e10575df311176bc774580441347b4c07cf64429fb6091dcda202a51bd00",
+        "public/assets/world/map/guaira-campaign/serra.webp": "ea6345edcce9dfc478f9025774f913a98dc0bc3535573748ee4bb474cadd2aa9",
+        "public/assets/world/map/guaira-campaign/serra.meta.json": "01e585b9e4badccdbbae58ac31d268f4ffb3f00486e1c6d4e24051f88fa7e342",
+        "public/assets/world/map/guaira-campaign/guaira-water-restored.webp": "db9c4ea825607109989c9facfa4d73a7f270eee13e3b591c043e3203623fb7c9"
+      },
+      "reportSHA256": "e9ed54a577a56af76b1655f4b5e0ad191efee82529425c61a158d5a703f27a72"
+    },
+    "compact": {
+      "viewport": [
+        390,
+        640
+      ],
+      "records": 1780,
+      "exactPoseEquivalence": true,
+      "actualRenderInputsSHA256": {
+        "src/adventure/WorldAircraftModel.ts": "a87521dbebe5c9bc8de6ff89a798d7768ca2e3a87dc59e41ef2726ebb99a13e4",
+        "src/adventure/WorldAircraftTerminalRoute.ts": "66c6be6e18afc1ac46d8f5eb4838f5741ee9a193b92de77c968df2518fc48eb4",
+        "src/adventure/GuairaCampaignArt.ts": "dbfcdaa97230b8249597aebf760a3450be97729b4d4967ea3eb7eac6be99350d",
+        "src/adventure/WorldAircraftCamera.ts": "17e9edb5c02e58b01951231d44761383cd4d6426f5eec60db170cbc7c044d40f",
+        "src/adventure/WorldAircraftArt.ts": "0f1601321026e02b1d76c3faec5cc5bb3e1a7eef444a806fa575311d8ad1733e",
+        "src/adventure/WorldAtlasModel.ts": "08aec86444beff853975be56405f239461a345060a8e924640366cff4dcf1934",
+        "src/adventure/WorldMapModel.ts": "dac756bb2d1488a0b8a0d49cc7c97d2886f539c82e0a57f462543460983f3360",
+        "src/adventure/WorldMapArt.ts": "ea180a5a8a1374926a3085f9f0d0466fea82be542fc8bb26a81b7b1831e76ffe",
+        "src/adventure/WorldFlightScenery.ts": "8d54d5251ba0d39b834a10ac8af65d50a9ef7c9af7880bf46aa99050df674760",
+        "src/adventure/GuairaCampaignWaterData.json": "c039c09728e0e86d05453ec9abebc23ad2a9d65a09be77fef2abc2c43195bf61",
+        "public/assets/world/map/journey-aircraft.webp": "e320059fafd79764290ca484bc47f0cb48e05df9f8d6d70c3b368b01b0c614e5",
+        "public/assets/world/map/journey-aircraft.meta.json": "7a31a297371960edf8260d29f8975299a48e212127c0e4f75074340d616ff27d",
+        "public/assets/world/map/fabrica-diorama.webp": "9d4852556bb9aa88cc7601076e6c3b3e3e4e1b873d19a51705591cd8ec38eb32",
+        "public/assets/world/map/serra-diorama.webp": "dcdffbccfa8cd599989d56c84e36ae9d54511a088d1841189b5505125f574b58",
+        "public/assets/world/map/guaira-campaign/guaira.webp": "db10baab83e425503797087220a6b66d5d545f5a164a4df796f99a91cfe17d2f",
+        "public/assets/world/map/guaira-campaign/guaira.meta.json": "063e79637cd0392b8a7dee1d1c4d11ed93b7121201e5563d62353e2b20cf6a92",
+        "public/assets/world/map/guaira-campaign/fabrica.webp": "39f9bb6a2fe4cfbb651db13d99aea704c96be28afeb43355e959193528e81c14",
+        "public/assets/world/map/guaira-campaign/fabrica.meta.json": "e444e10575df311176bc774580441347b4c07cf64429fb6091dcda202a51bd00",
+        "public/assets/world/map/guaira-campaign/serra.webp": "ea6345edcce9dfc478f9025774f913a98dc0bc3535573748ee4bb474cadd2aa9",
+        "public/assets/world/map/guaira-campaign/serra.meta.json": "01e585b9e4badccdbbae58ac31d268f4ffb3f00486e1c6d4e24051f88fa7e342",
+        "public/assets/world/map/guaira-campaign/guaira-water-restored.webp": "db9c4ea825607109989c9facfa4d73a7f270eee13e3b591c043e3203623fb7c9"
+      },
+      "reportSHA256": "b03228a20685e9c0ceff9e44a8fcb03e0a3ad6fb0ecb057e816c36f2f0b8b9f3"
+    }
+  },
+  "finalGuardChange": {
+    "description": "Explicitly copy only four contact fields; ignore extra trajectory options",
+    "renderModelSHA256": "a87521dbebe5c9bc8de6ff89a798d7768ca2e3a87dc59e41ef2726ebb99a13e4",
+    "finalModelSHA256": "f41257e69b712864d7868bbcbc496904a2e4aaf12b0597e06108461ba83067fb",
+    "all1780PosesByteIdentical": true
+  },
+  "denseGuairaWitnessReuse": {
+    "records": 41,
+    "posesSHA256": "484a0537ae8480bedae1840d40fe3da2b03eeed1e8d0ace53f7f4898d0722f2d",
+    "byteIdenticalToV3": true,
+    "minimumDistanceMetersFromOriginalExactCheck": 0.10749423423913905
+  },
+  "visualReviewLimit": "Native critical-frame/contact-sheet review only. Generated videos are not browser/device playback or performance QA.",
+  "typesAfterFinalContactGuard": "passed",
+  "proofFilesSHA256": {
+    "docs/world/guaira-flight-corridor/four-routes-4x-slow.mp4": "dcd022555a36b8ea14f7395543c3e7f3397387fdb898af428086a4ef9c7c9607",
+    "docs/world/guaira-flight-corridor/four-routes-full-speed.mp4": "c053e23185f4da753f88568c117df965084ebb6c32070abd3e867f2cc5d80815"
+  },
+  "remainingSerraOverlap": {
+    "status": "Inherited contact pairs remain and may be retimed; separate terminal correction required",
+    "reviewedDepartureSeconds": [
+      3.1166666667,
+      3.3166666667
+    ],
+    "reviewedArrivalSeconds": [
+      5.0333333333,
+      5.0833333333
+    ],
+    "notAllAirportClearance": true
+  },
+  "proofToolSHA256": "ad439502542446c993d1ea54aaa3d35996fc82afbf343b20a9fa4509fb1ad32f",
+  "clearanceSummarySHA256": "62f9a02a807e42f33618eaf43d5ef945735c5ea932658dfa3799cc218f38d6b9"
+}

@@ -90,3 +90,49 @@ test('renderer balances canvas transforms and has bounded drawing at every stage
     }
     assert.equal(drawCount, 7);
 });
+
+test('corridor parameters are bounded and reject incompatible or malformed controls', () => {
+    for (const runwayCorridors of [{ departure: NaN, arrival: 0 }, { departure: -1, arrival: 0 },
+        { departure: 1.01, arrival: 0 }, { departure: 0, arrival: 0 },
+        { departure: .5, arrival: 0, bendControls: [{ x: 0, y: 0 }, { x: Infinity, y: 0 }] as const }]) {
+        assert.equal(validAircraftRoute({ ...route, runwayCorridors }), false);
+    }
+    assert.equal(validAircraftRoute({ ...route, runwayCorridors: { departure: 1, arrival: 1 } }), true);
+    assert.equal(validAircraftRoute({ ...route, runwayCorridors: { departure: 1, arrival: 0 }, cruiseControls: [{ x: 0, y: 0 }, { x: 1, y: 1 }] }), false);
+    const calmRoute = { ...route, runwayCorridors: { departure: 1, arrival: 1 } };
+    for (let i = 0; i <= 69; i++) assert.deepEqual(sampleAircraftTravel(calmRoute, i / 60, true), sampleAircraftTravel(route, i / 60, true));
+});
+
+
+test('untyped malformed flight control containers fail validation without throwing', () => {
+    for (const controls of ['ab', { length: 2 }, [null, null]]) {
+        const malformed = controls as unknown as NonNullable<ReturnType<typeof createAircraftRoute>['cruiseControls']>;
+        assert.equal(validAircraftRoute({ ...route, cruiseControls: malformed }), false);
+        assert.equal(validAircraftRoute({ ...route, runwayCorridors: { departure: 1, arrival: 0, bendControls: malformed } }), false);
+    }
+});
+
+test('opposite-terminal contact snapshots reject missing, nonfinite and degenerate runways', () => {
+    const contacts = createAircraftRoute();
+    for (const bad of [{}, { ...contacts, arrivalStop: { x: NaN, y: 0 } },
+        { ...contacts, departureLift: contacts.departureStart }, { ...contacts, arrivalTouchdown: contacts.arrivalStop }]) {
+        const invalid = { ...route, runwayCorridors: { departure: 1, arrival: 0,
+            oppositeTerminalContacts: bad as typeof contacts } };
+        assert.equal(validAircraftRoute(invalid), false);
+        assert.throws(() => sampleAircraftTravel(invalid, 3.5), RangeError);
+    }
+});
+
+
+test('opposite-terminal snapshots ignore extra trajectory options', () => {
+    for (const extras of [{ cruiseControls: 'ab' },
+        { cruiseControls: [{ x: 100, y: 100 }, { x: 200, y: 200 }] },
+        { runwayCorridors: { departure: 1, arrival: 1 } }]) {
+        const contacts = { ...route, ...extras };
+        for (const [departure, arrival, time] of [[1, 0, 5.8], [0, 1, 2.2]]) {
+            const preserved = { ...route, runwayCorridors: { departure, arrival, oppositeTerminalContacts: contacts } };
+            assert.equal(validAircraftRoute(preserved), true);
+            assert.deepEqual(sampleAircraftTravel(preserved, time), sampleAircraftTravel(route, time));
+        }
+    }
+});

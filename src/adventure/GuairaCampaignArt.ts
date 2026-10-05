@@ -16,6 +16,9 @@ export interface CampaignAirportTerminal {
     groundAnchor: MapPoint;
     runwayStart: MapPoint;
     runwayEnd: MapPoint;
+    /** Inset wheel contacts, separate from the physical strip extent. */
+    rollStart?: MapPoint;
+    rollEnd?: MapPoint;
     boardingPath: readonly MapPoint[];
     surface: string;
     clearSpanMeters: number;
@@ -67,7 +70,9 @@ export function campaignAirportTerminal(region: GuairaCampaignRegion, atlas = fa
     const art = GUAIRA_CAMPAIGN_ART[region], terminal = art.terminal;
     const transform = (p: MapPoint) => atlas ? localToAtlas(p, art.placement) : { ...p };
     return { ...terminal, groundAnchor: transform(terminal.groundAnchor), runwayStart: transform(terminal.runwayStart),
-        runwayEnd: transform(terminal.runwayEnd), boardingPath: terminal.boardingPath.map(transform) };
+        runwayEnd: transform(terminal.runwayEnd),
+        ...(terminal.rollStart ? { rollStart: transform(terminal.rollStart) } : {}),
+        ...(terminal.rollEnd ? { rollEnd: transform(terminal.rollEnd) } : {}), boardingPath: terminal.boardingPath.map(transform) };
 }
 /** Optional lazy art: failure returns null, leaving controls/flight state usable. */
 export function loadCampaignRegionImage(region: GuairaCampaignRegion): Promise<HTMLImageElement | null> {
