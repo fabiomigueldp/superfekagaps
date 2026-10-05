@@ -1,0 +1,65 @@
+{
+  "method": "Actual WorldMapView render/measure and WorldMapHud key handlers/bitmap surfaces; declared CSS bounds and offline DOM compositing. No browser, real DOM-layout or device QA.",
+  "records": [
+    {
+      "width": 390,
+      "height": 640,
+      "declaredInsets": {
+        "top": 104,
+        "bottom": 152
+      },
+      "defaultOverview": false,
+      "camera": {
+        "width": 390,
+        "height": 640,
+        "zoom": 0.1890900094671359,
+        "center": {
+          "x": 2.3187241250000006,
+          "y": 0.1856708698602893
+        }
+      },
+      "canvas": {
+        "width": 390,
+        "height": 640
+      },
+      "loadedWorlds": 6,
+      "physicalLabelsVisible": 0,
+      "compactSelectorFallback": true,
+      "keyPrevented": true,
+      "drawerVisible": false,
+      "focus": "Mapa do arquipélago",
+      "calls": [],
+      "actualNativePainters": true
+    },
+    {
+      "width": 640,
+      "height": 360,
+      "declaredInsets": {
+        "top": 64,
+        "bottom": 84
+      },
+      "defaultOverview": false,
+      "camera": {
+        "width": 640,
+        "height": 360,
+        "zoom": 0.1862917050645535,
+        "center": {
+          "x": 2.3187241249999997,
+          "y": -0.1859326241134717
+        }
+      },
+      "canvas": {
+        "width": 640,
+        "height": 360
+      },
+      "loadedWorlds": 6,
+      "physicalLabelsVisible": 6,
+      "compactSelectorFallback": false,
+      "keyPrevented": true,
+      "drawerVisible": false,
+      "focus": "guaira",
+      "calls": [],
+      "actualNativePainters": true
+    }
+  ]
+}

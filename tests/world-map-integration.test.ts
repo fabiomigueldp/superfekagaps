@@ -112,7 +112,7 @@ function canvasContext() {
     return { context, calls };
 }
 
-function mapDOM(t: TestContext, reducedMotion = false) {
+function mapDOM(t: TestContext, reducedMotion = false, withGuaira = false) {
     const paint = canvasContext();
     let active: Element | null = null;
     const focused = (element: Element) => { active = element; };
@@ -155,6 +155,7 @@ function mapDOM(t: TestContext, reducedMotion = false) {
     }
     const events = { selected: [] as number[], arrived: [] as number[], entered: 0, exited: 0, unlocked: 0 };
     const view = new WorldMapView(gameCanvas as unknown as HTMLCanvasElement, {
+        ...(withGuaira ? { guaira() {} } : {}),
         select: index => { events.selected.push(index); }, enter: () => { events.entered++; },
         arrive: index => { events.arrived.push(index); }, exit: () => { events.exited++; }, unlockAudio: () => { events.unlocked++; }
     });
@@ -2302,4 +2303,51 @@ test('preview cannot return to Feka during a journey', async t => {
     assert.equal(h.internal.journey.destination, destination);
     assert.equal(h.internal.controlSelection, 25);
     assert.equal(h.events.entered, 0);
+});
+
+
+test('measured compact fallback owns keyboard and native activation without mutating camera, save or gameplay input', async t => {
+    for (const reducedMotion of [false, true]) await t.test(`reducedMotion=${reducedMotion}`, async child => {
+        const h = mapDOM(child, reducedMotion, true), save = openSave('3-5'); await readyDominio(h, save);
+        const input = new Input(); child.after(() => input.dispose()); input.setMenuMode(true);
+        const game = worldHarness().game; let stray = 0; game.enterSelected = () => { stray++; };
+        h.windowMock.addEventListener('keydown', event => game.menuKey(event));
+        h.get('world-map-scene').bounds = { x: 0, y: 0, left: 0, top: 0, width: 390, height: 640 };
+        h.get('world-map-header').bounds = { x: 12, y: 10, left: 12, top: 10, width: 366, height: 80 };
+        h.get('world-map-tools').bounds = h.get('world-map-header').bounds;
+        h.get('world-map-footer').bounds = { x: 12, y: 500, left: 12, top: 500, width: 366, height: 128 };
+        h.observers[0].callback(); h.get('world-map-overview').click(); h.view.render(14, save, 100, '');
+        assert.equal(h.internal.hud.overviewFallback, true);
+        assert.equal(h.get('world-map-art').width, 780, 'Responsive map uses CSS scene dimensions and capped DPR.');
+        const camera = structuredClone(h.internal.camera), journey = structuredClone(h.internal.journey), saved = structuredClone(save);
+        const rows = h.internal.hud.regionMenu.children.filter((element: Element) => element.classList.contains('world-map-region')) as Button[];
+        h.root.focus(); const arrow = h.root.dispatch('keydown', { key: 'ArrowRight', code: 'ArrowRight' });
+        assert.equal(arrow.defaultPrevented, true); assert.equal(h.internal.hud.regionMenu.hidden, false);
+        assert.equal(h.active, rows[3]); assert.equal(h.active!.getAttribute('data-region-key'), 'guaira');
+        rows[3].dispatch('keydown', { key: 'ArrowRight', code: 'ArrowRight', repeat: true }); assert.equal(h.active, rows[3]);
+        rows[3].dispatch('keyup', { key: 'ArrowRight', code: 'ArrowRight' });
+        rows[3].dispatch('keydown', { key: 'ArrowRight', code: 'ArrowRight' }); assert.equal(h.active, rows[4]);
+        assert.deepEqual(h.internal.camera, camera); assert.deepEqual(h.internal.journey, journey); assert.deepEqual(save, saved);
+        assert.deepEqual(h.events.selected, []); assert.equal(h.events.entered, 0);
+        rows[4].dispatch('keydown', { key: 'Escape', code: 'Escape' });
+        assert.equal(h.internal.hud.regionMenu.hidden, true); assert.equal(h.active, h.internal.hud.regionButton);
+        assert.equal(h.internal.overview, true); assert.equal(h.events.exited, 0);
+        h.active!.dispatch('keydown', { key: 'Escape', code: 'Escape' }); assert.equal(h.internal.overview, false); assert.equal(h.events.exited, 0);
+        for (const key of ['Enter', ' ']) {
+            h.internal.hud.regionButton.click(); const button = rows[2]; button.focus();
+            const code = key === ' ' ? 'Space' : 'Enter';
+            assert.equal(button.dispatch('keydown', { key, code }).defaultPrevented, false);
+            const count: number = h.events.selected.length; button.click();
+            assert.equal(h.events.selected.length, count + 1); assert.equal(h.internal.controlSelection, 14);
+            assert.equal(h.internal.overview, false); assert.equal(h.internal.hud.regionMenu.hidden, true);
+            assert.equal(h.active!.dispatch('keydown', { key, code, repeat: true }).defaultPrevented, true);
+            h.active!.dispatch('keyup', { key, code }); assert.equal(h.events.selected.length, count + 1);
+            assert.equal(h.internal.hud.regionMenu.hidden, true);
+        }
+        input.update(); assert.equal(input.getState().jumpPressed, false); assert.equal(input.getState().right, false);
+        assert.equal(input.consumeStart(), false); assert.equal(h.events.entered, 0); assert.equal(stray, 0);
+        h.view.hide(); input.setMenuMode(false);
+        h.gameCanvas.dispatch('keyup', { key: ' ', code: 'Space' }); input.update(); assert.equal(input.getState().jumpPressed, false);
+        assert.deepEqual(save, saved); assert.equal(h.internal.journey.arrived, '3-5');
+    });
 });

@@ -16,6 +16,8 @@ class Element {
     listeners = new Map<string, Listener[]>();
     focusCount = 0;
     draws: unknown[][] = [];
+    scrolls: unknown[] = [];
+    scrollIntoView(options: unknown) { this.scrolls.push(options); }
     readonly classList = { toggle: (name: string, on: boolean) => {
         const classes = new Set(this.className.split(' ').filter(Boolean));
         if (on) classes.add(name); else classes.delete(name);
@@ -43,11 +45,12 @@ function dom(t: TestContext) {
     Object.defineProperty(globalThis, 'document', { configurable: true, value: { activeElement: null, createElement: (tag: string) => new Element(tag) } });
     t.after(() => { if (previous) Object.defineProperty(globalThis, 'document', previous); else Reflect.deleteProperty(globalThis, 'document'); });
 }
-function fixture(t: TestContext, overviewCallback = false) {
+function fixture(t: TestContext, overviewCallback = false, guairaCallback = false) {
     dom(t);
     const calls: Array<string | number> = [];
     const hud = new WorldMapHud({ selectStage: index => calls.push(index), selectWorld: world => calls.push(`world:${world}`),
         selectOverviewWorld: overviewCallback ? world => calls.push(`overview-world:${world}`) : undefined,
+        selectGuaira: guairaCallback ? () => calls.push('guaira') : undefined,
         enter: () => calls.push('enter'), skip: () => calls.push('skip'), overview: () => calls.push('overview'), menu: () => calls.push('menu') });
     const state: WorldMapHudState = { world: 1, stage: 0, open: [true, true, false, false, false],
         completed: [true, false, false, false, false], seals: [3, 1, 0, 0, 0], globalProgress: { completed: 1, seals: 4 },
@@ -535,7 +538,7 @@ test('compact numbers repaint from their own late narrow atlas and stay stationa
     assert.equal(board.draws.length, 1, 'Positioning never repaints a stationary badge.');
     hud.positionOverviewWorlds([], true, true);
     assert.ok(hud.overviewButtons.every(button => button.hidden));
-    assert.equal(find(asElement(hud.root), 'world-map-hint').textContent, 'Abra Arquipélago para ver Costa ou outra região.');
+    assert.equal(find(asElement(hud.root), 'world-map-hint').textContent, 'Abra Arquipélago ou use as setas para escolher uma região.');
     const announcement = asElement(hud.root).children.find(child => child.getAttribute('aria-live') === 'polite')!;
     assert.match(announcement.textContent, /Abra Arquipélago/); assert.doesNotMatch(announcement.textContent, /Escolha uma ilha para ver/);
     const activation = asElement(hud.root).dispatch('keydown', { key: 'Enter', target: hud.root });
@@ -850,4 +853,92 @@ test('Guaíra is a named accessible atlas chapter between Factory and Serra with
     const guaira = drawer.children.find(item => item.attributes.get('data-region-key') === 'guaira')!;
     assert.ok(guaira); assert.match(guaira.children[1].textContent, /Prévia.*3-5/);
     hud.update({ ...state, guairaAvailable: true }); guaira.click(); assert.equal(calls.length, 2);
+});
+
+test('compact panorama arrows reveal the visible region picker instead of targeting hidden signs', t => {
+    const { hud, calls, state } = fixture(t, true);
+    hud.update({ ...state, overview: true });
+    hud.positionOverviewWorlds([], true, true);
+    hud.root.focus();
+    const event = asElement(hud.root).dispatch('keydown', { key: 'ArrowRight', target: hud.root });
+    assert.equal(event.defaultPrevented, true);
+    assert.equal(hud.regionMenu.hidden, false, 'Directional input must expose its visible choices.');
+    assert.equal(document.activeElement, asElement(hud.regionMenu).children.filter(child => child.className.split(' ').includes('world-map-region'))[1]);
+    assert.ok(hud.overviewButtons.every(button => button.hidden));
+    assert.deepEqual(calls, [], 'Focus is a preview, never a silent region change or trip.');
+});
+
+const regionRows = (hud: WorldMapHud) => asElement(hud.regionMenu).children.filter(child => child.className.split(' ').includes('world-map-region'));
+
+test('fallback and drawer arrows expose all seven regions in route order without selecting any', t => {
+    const { hud, calls, state } = fixture(t, true, true), root = asElement(hud.root), rows = regionRows(hud);
+    hud.update({ ...state, world: 3, stage: 14, overview: true }); hud.positionOverviewWorlds([], true, true);
+    const names = ['Costa', 'Porto', 'Fábrica', 'Guaíra', 'Serra', 'Reserva', 'Domínio'];
+    assert.equal(rows.length, 7);
+    rows.forEach((row, index) => assert.match(row.getAttribute('aria-label') ?? row.children[0].children[1].textContent, new RegExp(names[index])));
+    root.dispatch('keydown', { key: 'ArrowRight', target: hud.root });
+    assert.equal(document.activeElement, rows[3], 'Fábrica advances to the named Guaíra chapter.');
+    for (let index = 4; index < 7; index++) {
+        root.dispatch('keydown', { key: 's', target: document.activeElement }); assert.equal(document.activeElement, rows[index]);
+    }
+    root.dispatch('keydown', { key: 'ArrowDown', target: document.activeElement }); assert.equal(document.activeElement, rows[6]);
+    for (let index = 5; index >= 0; index--) {
+        root.dispatch('keydown', { key: 'ArrowLeft', target: document.activeElement }); assert.equal(document.activeElement, rows[index]);
+        assert.deepEqual(rows[index].scrolls.at(-1), { block: 'nearest', inline: 'nearest' }, 'Short drawers expose the focused row.');
+    }
+    root.dispatch('keydown', { key: 'w', target: document.activeElement }); assert.equal(document.activeElement, rows[0]);
+    assert.deepEqual(calls, []); assert.equal(hud.regionButton.getAttribute('aria-expanded'), 'true');
+});
+
+test('native Enter and Space activate every fallback row once and suppress held activation after close', t => {
+    const { hud, calls, state } = fixture(t, true, true), root = asElement(hud.root), rows = regionRows(hud);
+    hud.update({ ...state, overview: true }); hud.positionOverviewWorlds([], true, true);
+    for (const key of ['Enter', ' ']) for (const [index, row] of rows.entries()) {
+        hud.regionButton.click(); row.focus();
+        const down = root.dispatch('keydown', { key, target: row });
+        assert.equal(down.defaultPrevented, false, 'The native button owns the initial activation.');
+        const count = calls.length;
+        row.click(); // Browser-native activation boundary, not a second application handler.
+        assert.equal(calls.length, count + 1);
+        assert.equal(calls.at(-1), index === 3 ? 'guaira' : `world:${index < 3 ? index + 1 : index}`);
+        assert.equal(hud.regionMenu.hidden, true); assert.equal(document.activeElement, hud.regionButton);
+        const held = root.dispatch('keydown', { key, target: hud.regionButton, repeat: true });
+        assert.equal(held.defaultPrevented, true, 'A held Enter cannot reopen the drawer on its restored trigger.');
+        root.dispatch('keyup', { key, target: hud.regionButton });
+        assert.equal(calls.length, count + 1); assert.equal(hud.regionMenu.hidden, true);
+    }
+});
+
+test('fallback Escape and resize retain visible focus without automatically choosing or opening a region', t => {
+    const { hud, calls, state } = fixture(t, true, true), root = asElement(hud.root);
+    hud.update({ ...state, overview: true });
+    hud.positionOverviewWorlds(Array.from({ length: 7 }, (_, n) => ({ x: 80 + n * 140, y: 200 })));
+    hud.overviewButtons[2].focus(); hud.positionOverviewWorlds([], true, true);
+    assert.equal(document.activeElement, hud.regionButton); assert.equal(hud.regionMenu.hidden, true);
+    root.dispatch('keydown', { key: 'ArrowRight', target: hud.regionButton });
+    assert.equal(hud.regionMenu.hidden, false);
+    root.dispatch('keydown', { key: 'Escape', target: document.activeElement });
+    assert.equal(hud.regionMenu.hidden, true); assert.equal(document.activeElement, hud.regionButton);
+    assert.equal(hud.regionButton.getAttribute('aria-expanded'), 'false'); assert.deepEqual(calls, []);
+    root.dispatch('keydown', { key: 'Escape', target: hud.regionButton }); assert.deepEqual(calls, ['overview']);
+    assert.equal(document.activeElement, hud.regionButton);
+    hud.regionButton.click(); find(root, 'world-map-region-close').click();
+    assert.equal(hud.regionMenu.hidden, true); assert.equal(document.activeElement, hud.regionButton);
+});
+
+test('fallback ignores held arrows and modifiers, traveling blocks the picker, hidden HUD stays inactive', t => {
+    const { hud, calls, state } = fixture(t, true, true), root = asElement(hud.root);
+    hud.update({ ...state, overview: true }); hud.positionOverviewWorlds([], true, true); hud.root.focus();
+    for (const extra of [{ repeat: true }, { ctrlKey: true }, { metaKey: true }, { altKey: true }]) {
+        root.dispatch('keydown', { key: 'ArrowRight', target: hud.root, ...extra });
+        assert.equal(hud.regionMenu.hidden, true); assert.equal(document.activeElement, hud.root);
+    }
+    hud.update({ ...state, overview: true, motionState: 'sailing', canEnter: false });
+    for (const key of ['ArrowRight', 'Enter', ' ']) {
+        assert.equal(root.dispatch('keydown', { key, target: hud.root }).defaultPrevented, true);
+        assert.equal(hud.regionMenu.hidden, true);
+    }
+    hud.update({ ...state, overview: true }); hud.setVisible(false);
+    root.dispatch('keydown', { key: 'ArrowRight', target: hud.root }); assert.equal(hud.regionMenu.hidden, true);
+    assert.deepEqual(calls, []);
 });

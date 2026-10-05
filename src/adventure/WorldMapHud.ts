@@ -600,7 +600,7 @@ export class WorldMapHud {
     }
     private overviewHint(state: WorldMapHudState): string {
         return state.motionState !== 'idle' ? 'Aguarde a chegada ou pule a viagem.' : this.overviewFallback
-            ? `Abra Arquipélago para ver ${REGION_NAMES[state.world - 1]} ou outra região.` : `Ver fases de ${REGION_NAMES[state.world - 1]} ou escolha outra região. Fábrica → Guaíra → Serra.`;
+            ? 'Abra Arquipélago ou use as setas para escolher uma região.' : `Ver fases de ${REGION_NAMES[state.world - 1]} ou escolha outra região. Fábrica → Guaíra → Serra.`;
     }
     positionOverviewWorlds(points: readonly (WorldMapHudPoint | null)[], compact = false, fallback = false): void {
         if (this.compactOverview !== compact) {
@@ -614,6 +614,10 @@ export class WorldMapHud {
                 this.announce(`${this.stageTitleText.textContent}. ${this.status.textContent}. ${this.location.textContent}. ${this.hint.textContent}`);
             }
         }
+        // Resizing can replace a focused terrain sign with the drawer fallback.
+        // Keep focus visible on its persistent entry, without opening a menu by itself.
+        if (fallback && [...this.overviewButtons, this.guairaOverview].includes(document.activeElement as HTMLButtonElement))
+            this.regionButton.focus({ preventScroll: true });
         this.overviewButtons.forEach((button, index) => this.position(button, this.state?.overview ? points[index] : null));
         this.position(this.guairaOverview, this.state?.overview && this.callbacks.selectGuaira ? points[6] : null);
     }
@@ -653,26 +657,49 @@ export class WorldMapHud {
         this.regionMenu.hidden = true; this.regionButton.setAttribute('aria-expanded', 'false');
         if (restoreFocus) this.regionButton.focus({ preventScroll: true });
     }
+    private regionChoices(): HTMLButtonElement[] {
+        return [...this.regionButtons.slice(0, 3), ...(this.callbacks.selectGuaira ? [this.guairaRegion] : []),
+            ...this.regionButtons.slice(3)].filter(button => !button.disabled && !button.hidden);
+    }
+    private focusRegion(direction = 0, from: EventTarget | null = null): void {
+        const choices = this.regionChoices(), focused = choices.indexOf(from as HTMLButtonElement);
+        const current = focused < 0 ? choices.indexOf(this.regionButtons[(this.state?.world ?? 1) - 1]) : focused;
+        const button = choices[Math.max(0, Math.min(choices.length - 1, current + direction))];
+        button?.focus({ preventScroll: true });
+        // A short viewport scrolls the drawer to the focused row, never the camera.
+        button?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+    }
+    private openRegionMenu(direction = 0): void {
+        this.regionMenu.hidden = false; this.regionButton.setAttribute('aria-expanded', 'true');
+        this.focusRegion(direction);
+    }
     private toggleRegionMenu(): void {
         if (this.root.hidden) return;
         if (!this.regionMenu.hidden) { this.closeRegionMenu(true); return; }
-        this.regionMenu.hidden = false; this.regionButton.setAttribute('aria-expanded', 'true');
-        this.regionButtons[(this.state?.world ?? 1) - 1]?.focus({ preventScroll: true });
+        this.openRegionMenu();
     }
     private readonly onKey = (event: KeyboardEvent) => {
-        if (!this.regionMenu.hidden) {
-            if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); this.closeRegionMenu(true); }
+        if (this.root.hidden || this.disposed || event.ctrlKey || event.metaKey || event.altKey) return;
+        if (event.repeat) {
+            // Native buttons still own the initial Enter/Space. A held key must
+            // not reopen the picker after its first activation restored focus.
+            if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); event.stopPropagation(); }
             return;
         }
-        if (!this.state?.overview || this.root.hidden || this.disposed || event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
+        const key = event.key.toLowerCase(), direction = ['arrowright', 'arrowdown', 'd', 's'].includes(key) ? 1
+            : ['arrowleft', 'arrowup', 'a', 'w'].includes(key) ? -1 : 0;
+        if (!this.regionMenu.hidden) {
+            if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); this.closeRegionMenu(true); }
+            else if (direction) { event.preventDefault(); event.stopPropagation(); this.focusRegion(direction, event.target); }
+            return;
+        }
+        if (!this.state?.overview) return;
         if (event.key === 'Escape') {
             event.preventDefault(); event.stopPropagation();
             const focusedIsland = [...this.overviewButtons, this.guairaOverview].includes(document.activeElement as HTMLButtonElement);
             this.run(() => { this.callbacks.overview(); if (focusedIsland) this.overviewButton.focus({ preventScroll: true }); });
             return;
         }
-        const key = event.key.toLowerCase(), direction = ['arrowright', 'arrowdown', 'd', 's'].includes(key) ? 1
-            : ['arrowleft', 'arrowup', 'a', 'w'].includes(key) ? -1 : 0;
         const activateIsland = (event.key === 'Enter' || event.key === ' ') && event.target === this.root;
         // The camera hides island boards during a journey. Keep these keys in
         // the panorama without focusing or activating its invisible controls.
@@ -682,6 +709,7 @@ export class WorldMapHud {
         }
         if (direction) {
             event.preventDefault(); event.stopPropagation();
+            if (this.overviewFallback) { this.openRegionMenu(direction); return; }
             const order = [...this.overviewButtons.slice(0, 3), ...(this.callbacks.selectGuaira ? [this.guairaOverview] : []), ...this.overviewButtons.slice(3)];
             const focused = order.indexOf(event.target as HTMLButtonElement), current = focused < 0 ? order.indexOf(this.overviewButtons[this.state.world - 1]) : focused;
             const button = order[Math.max(0, Math.min(order.length - 1, current + direction))];
