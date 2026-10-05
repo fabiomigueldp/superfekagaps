@@ -29,9 +29,17 @@ export function juiceLabStage(): AdventureStage {
 class LabEncounter extends BossEncounter {
     readonly model = new JuiceMinibossModel();
     readonly effects = new JuiceCombatEffects();
+    private blockedStompAt = -Infinity;
+    /** Feedback follows simulation time, so pause and hit-stop cannot consume it. */
+    get blockedStompFeedback() {
+        return ['rest', 'warning', 'attack'].includes(this.model.phase)
+            && this.model.time - this.blockedStompAt < 1000;
+    }
     constructor() { super('J1'); this.character = 'yasmin'; this.sync(); }
     private sync() {
         const b = this.model;
+        // An opening or successful hit supersedes the failed attempt immediately.
+        if (!['rest', 'warning', 'attack'].includes(b.phase)) this.blockedStompAt = -Infinity;
         this.x = b.x; this.y = b.y; this.width = b.width; this.height = b.height;
         this.health = b.health; this.maxHealth = b.maxHealth; this.timer = b.phaseTime;
         this.phase = b.phase === 'recover' ? 'open' : b.phase === 'intro' || b.phase === 'enrage' ? 'rest' : b.phase;
@@ -54,6 +62,7 @@ class LabEncounter extends BossEncounter {
     override contact(p: Rect, previous: Rect, falling: boolean) {
         const retiringGeysers = this.model.geysers;
         const result = this.model.contact(p, previous, falling); this.sync();
+        if (result === 'bounce') this.blockedStompAt = this.model.time;
         if (result === 'hit' || result === 'defeated') {
             this.effects.releaseGeysers(retiringGeysers, this.model.time);
             this.effects.add('hit', this.x + this.width / 2, this.y, this.model.time);
@@ -228,7 +237,9 @@ export class JuiceMinibossLab extends WorldGame {
         if (paused) this.state = 'playing';
         try { super.render(); } finally { if (paused) this.state = 'paused'; }
         const c = this.renderer.getContext();
-        const b = this.boss instanceof LabEncounter ? this.boss.model : null;
+        const encounter = this.boss instanceof LabEncounter ? this.boss : null;
+        const b = encounter?.model;
+        const blockedStomp = !this.player.data.isDead && encounter?.blockedStompFeedback;
         const accent = b?.enraged ? '#eaa17f' : '#bc8ee1';
         c.fillStyle = '#161c2a'; c.fillRect(0, 0, 320, 34);
         c.fillStyle = '#4e425d'; c.fillRect(0, 33, 320, 1);
@@ -252,6 +263,10 @@ export class JuiceMinibossLab extends WorldGame {
                 pixelText(c, 'PRESSAO MAXIMA', 160, 16, '#ffcfb0', 1, 'center');
                 pixelText(c, 'SAIA DAS MARCAS NO CHAO', 160, 25, '#e9d4ec', 1, 'center');
                 c.restore();
+            } else if (blockedStomp) {
+                pixelText(c, 'SEM DANO: ESPERE A COROA', 160, 16, '#ffcfb0', 1, 'center');
+                // Keep the live dodge instruction visible below the explanation.
+                pixelText(c, this.boss!.hint, 160, 25, '#d8cbd7', 1, 'center');
             } else pixelText(c, this.boss!.hint, 160, 23, b.vulnerable ? '#ddef96' : '#d8cbd7', 1, 'center');
         }
         if (paused) {
@@ -271,6 +286,8 @@ export class JuiceMinibossLab extends WorldGame {
             : this.boss?.phase === 'defeated' ? 'Vitória! Use Tentar novamente para uma nova luta'
             : b?.phase === 'enrage' ? 'Fase 2 · Pressão máxima! Os gêiseres mostram um aviso dourado antes de subir.'
             : b?.vulnerable ? 'Abertura! Pule sobre o Turbosuco para atacar.'
+            : blockedStomp ? `Sem dano: espere a coroa aparecer para atacar. ${b?.geysers.some(g => g.phase === 'warning')
+                ? 'Saia das marcas douradas no chão.' : this.boss!.hint}`
             : b?.geysers.some(g => g.phase === 'warning') ? 'Saídas pressurizando! Saia das marcas douradas no chão.'
             : 'Setas / A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som';
         if (this.status.textContent !== message) this.status.textContent = message;

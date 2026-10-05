@@ -1,3 +1,4 @@
+import { GuairaChapterControlsHelp } from './GuairaChapterControlsHelp';
 import { chapterCompletionStory } from './GuairaChapterStory';
 import { chapterExitPresentation, chapterGuidance, chapterTitle, chapterAttemptSummary, chapterResumeGuidance } from './GuairaChapterPresentation';
 import { ProgressStore } from '../../../progress';
@@ -275,7 +276,7 @@ export class GuairaChapterApp {
     }
 
     /** Same sound preference in every room; never routes through the campaign menu. */
-    private sceneSound(scope: DisposalScope, canvas: HTMLCanvasElement) {
+    private sceneSound(scope: DisposalScope, canvas: HTMLCanvasElement, help: GuairaChapterControlsHelp) {
         const button = document.createElement('button'); button.type = 'button'; button.id = 'chapter-sound';
         const art = new LabToolbarAction(button);
         const sync = () => {
@@ -285,13 +286,22 @@ export class GuairaChapterApp {
             art.setLabel(enabled ? 'SOM' : 'MUDO', enabled ? 'Desativar o som do capítulo' : 'Ativar o som do capítulo');
             button.setAttribute('aria-pressed', String(enabled));
         };
-        scope.listen(button, 'click', () => {
+        const canActivate = help.guardAction(button);
+        scope.listen(button, 'click', event => {
+            if (!canActivate(event)) return;
             const game = this.current(scope) && this.focused && !document.hidden ? this.mounted?.runtime.game : null;
             if (!game || game.isDisposed) return;
             game.audio.unlock(); game.audio.toggle(); this.audioEnabled = game.audio.enabled;
             this.persistProgress(); sync(); canvas.focus({ preventScroll: true });
         });
         sync(); return { button, sync };
+    }
+
+    private sceneControlsHelp(scope: DisposalScope, canvas: HTMLCanvasElement, optional: boolean) {
+        const help = new GuairaChapterControlsHelp(canvas, () => this.current(scope) && this.focused && !document.hidden
+            ? this.mounted?.runtime ?? null : null, optional);
+        scope.add(() => help.dispose());
+        return help;
     }
 
     private scenePanel(attempt: GuairaChapterAttempt, scope: DisposalScope) {
@@ -309,24 +319,28 @@ export class GuairaChapterApp {
 
         const canvas = document.createElement('canvas'); canvas.id = 'game-canvas'; canvas.tabIndex = 0;
         canvas.contentEditable = 'true'; canvas.spellcheck = false; canvas.setAttribute('inputmode', 'none');
-        const sound = this.sceneSound(scope, canvas);
-        nav.append(status, primary, retry, map, sound.button, this.keyboardHint());
+        const help = this.sceneControlsHelp(scope, canvas, false);
+        const sound = this.sceneSound(scope, canvas, help);
+        const canRetry = help.guardAction(retry), canReturn = help.guardAction(map), canPrimary = help.guardAction(primary);
+        // Install before native primary/replay handlers, including already-paused Resume.
+        scope.listen(primary, 'click', event => { canPrimary(event); });
+        nav.append(status, primary, help.button, retry, map, sound.button, this.keyboardHint());
         canvas.setAttribute('aria-label', `${info.title}. ${info.objective} Setas para mover, Espaço para pular, baixo no ar para sentada, Shift para correr, Escape para pausar e M para o som.`);
         this.root.append(nav, canvas);
         scope.listen(canvas, 'pointerdown', () => canvas.focus({ preventScroll: true }));
-        scope.listen(retry, 'click', () => {
-            if (!this.current(scope)) return;
+        scope.listen(retry, 'click', event => {
+            if (!canRetry(event) || !this.current(scope)) return;
             const next = this.session.retry(attempt);
             if (next) { this.advanceNavigation(); void this.showScene(next); }
         });
-        scope.listen(map, 'click', () => this.leaveScene(attempt, 'map', scope));
+        scope.listen(map, 'click', event => { if (canReturn(event)) this.leaveScene(attempt, 'map', scope); });
         const fit = () => { if (this.current(scope)) fitGuairaLabCanvas(canvas); };
         scope.listen(window, 'resize', fit);
         if (typeof ResizeObserver !== 'undefined') {
             const observer = new ResizeObserver(fit); scope.add(() => observer.disconnect()); observer.observe(nav);
         }
         fit();
-        return { canvas, status, primary, primaryArt, sound, fit };
+        return { canvas, status, primary, primaryArt, sound, help, fit };
     }
 
     private async showScene(attempt: GuairaChapterAttempt) {
@@ -346,7 +360,7 @@ export class GuairaChapterApp {
             const runtime = factory(panel.canvas, nativeStatus), game = runtime.game;
             game.stage = { ...game.stage, name: info.title, subtitle: info.objective };
             let ownsAudioPreference = false;
-            scope.add(() => { if (ownsAudioPreference) this.audioEnabled = game.audio.enabled; game.dispose(); });
+            scope.add(() => { panel.help.dispose(); if (ownsAudioPreference) this.audioEnabled = game.audio.enabled; game.dispose(); });
             if (!this.current(scope) || this.snapshot.activeAttempt !== attempt) return;
             this.mounted = { kind: 'chapter', attempt, runtime }; this.phase = 'game';
             const reducedMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -358,6 +372,7 @@ export class GuairaChapterApp {
             type PrimaryAction = 'pause' | 'resume' | 'continue' | null;
             let primaryAction: PrimaryAction = null, primaryRevision = 0, releasePrimary = () => {};
             let pressedPrimaryRevision: number | null = null, keyedPrimaryRevision: number | null = null;
+            panel.help.onInterrupt(() => { pressedPrimaryRevision = null; keyedPrimaryRevision = null; });
             scope.listen(panel.primary, 'pointerdown', () => { pressedPrimaryRevision = primaryRevision; });
             scope.listen(panel.primary, 'pointercancel', () => { pressedPrimaryRevision = -1; });
             scope.listen(window, 'keydown', event => {
@@ -375,7 +390,7 @@ export class GuairaChapterApp {
             scope.listen(document, 'visibilitychange', () => { if (document.hidden) invalidatePrimary(); });
             const reflect = () => {
                 if (!this.current(scope) || game.isDisposed) return false;
-                controls.sync(); panel.sound.sync();
+                controls.sync(); panel.sound.sync(); panel.help.sync();
                 const live = runtime.sample(attempt), complete = this.session.canContinue(attempt, live);
                 if (this.session.acceptCompletion(attempt, live) || this.audioEnabled !== game.audio.enabled) {
                     this.audioEnabled = game.audio.enabled; this.persistProgress();
@@ -385,7 +400,7 @@ export class GuairaChapterApp {
                     invalidatePrimary(); primaryAction = action;
                     const revision = primaryRevision;
                     if (action) releasePrimary = scope.listen(panel.primary, 'click', event => {
-                        if (!this.current(scope) || !this.focused || document.hidden
+                        if (panel.help.isOpen || !this.current(scope) || !this.focused || document.hidden
                             || this.mounted?.kind !== 'chapter' || this.mounted.attempt !== attempt
                             || revision !== primaryRevision) return;
                         const pressedRevision = event.detail === 0 ? keyedPrimaryRevision : pressedPrimaryRevision;
@@ -481,23 +496,27 @@ export class GuairaChapterApp {
 
         const canvas = document.createElement('canvas'); canvas.id = 'game-canvas'; canvas.tabIndex = 0;
         canvas.contentEditable = 'true'; canvas.spellcheck = false; canvas.setAttribute('inputmode', 'none');
-        const sound = this.sceneSound(scope, canvas);
-        nav.append(status, primary, retry, map, sound.button, this.keyboardHint());
+        const help = this.sceneControlsHelp(scope, canvas, true);
+        const sound = this.sceneSound(scope, canvas, help);
+        const canRetry = help.guardAction(retry), canReturn = help.guardAction(map), canPrimary = help.guardAction(primary);
+        // Install before native primary/replay handlers, including already-paused Resume.
+        scope.listen(primary, 'click', event => { canPrimary(event); });
+        nav.append(status, primary, help.button, retry, map, sound.button, this.keyboardHint());
         canvas.setAttribute('aria-label', `${info.title}, percurso opcional. ${info.objective}. Setas para mover, Espaço para pular, baixo no ar para sentada, Shift para correr, Escape para pausar e M para o som.`);
         this.root.append(nav, canvas);
         scope.listen(canvas, 'pointerdown', () => canvas.focus({ preventScroll: true }));
-        scope.listen(retry, 'click', () => {
-            if (!this.currentExcursion(token, scope) || (token.sceneId === 'relief' && (!this.focused || document.hidden))) return;
+        scope.listen(retry, 'click', event => {
+            if (!canRetry(event) || !this.currentExcursion(token, scope) || (token.sceneId === 'relief' && (!this.focused || document.hidden))) return;
             if (this.mounted?.kind === 'optional' && this.mounted.runtime.sceneId === 'relief' && this.mounted.runtime.routes) return;
             this.beginExcursion(token.sceneId, options);
         });
-        scope.listen(map, 'click', () => this.leaveExcursion(token, scope));
+        scope.listen(map, 'click', event => { if (canReturn(event)) this.leaveExcursion(token, scope); });
         const fit = () => { if (this.current(scope)) fitGuairaLabCanvas(canvas); };
         scope.listen(window, 'resize', fit);
         if (typeof ResizeObserver !== 'undefined') {
             const observer = new ResizeObserver(fit); scope.add(() => observer.disconnect()); observer.observe(nav);
         }
-        fit(); return { canvas, status, primary, retry, primaryArt, sound, fit };
+        fit(); return { canvas, status, primary, retry, primaryArt, sound, help, fit };
     }
     private async showExcursion(token: GuairaChapterExcursionToken, options?: GuairaReliefOptions) {
         if (this.isDisposed) return;
@@ -513,7 +532,7 @@ export class GuairaChapterApp {
             game.stage = { ...game.stage, name: info.title, subtitle: info.objective };
             // Own the native resources before controls, observers or reflection can fail.
             let ownsAudioPreference = false;
-            scope.add(() => { if (ownsAudioPreference) this.audioEnabled = game.audio.enabled; game.dispose(); });
+            scope.add(() => { panel.help.dispose(); if (ownsAudioPreference) this.audioEnabled = game.audio.enabled; game.dispose(); });
             if (!this.currentExcursion(token, scope)) return;
             if (runtime.sceneId !== token.sceneId) throw Error('Optional factory returned a different room');
             this.mounted = { kind: 'optional', token, runtime }; this.phase = 'game';
@@ -525,12 +544,14 @@ export class GuairaChapterApp {
             scope.add(() => controls.dispose());
             const routes = runtime.sceneId === 'relief' ? runtime.routes : undefined;
             const replay = routes ? installReliefReplayControls(scope, routes, panel.primary, panel.retry,
-                () => this.currentExcursion(token, scope) && this.focused && !document.hidden && !game.isDisposed
+                () => !panel.help.isOpen && this.currentExcursion(token, scope) && this.focused && !document.hidden && !game.isDisposed
                     && this.mounted?.kind === 'optional' && this.mounted.token === token,
                 nextOptions => this.beginExcursion('relief', nextOptions)) : null;
+            if (replay) panel.help.onInterrupt(replay.interrupt);
             type PrimaryAction = 'pause' | 'resume' | 'relief' | 'other-route' | null;
             let primaryAction: PrimaryAction = null, primaryRevision = 0, releasePrimary = () => {};
             let pressedPrimaryRevision: number | null = null, keyedPrimaryRevision: number | null = null;
+            panel.help.onInterrupt(() => { pressedPrimaryRevision = null; keyedPrimaryRevision = null; });
             scope.listen(panel.primary, 'pointerdown', () => { pressedPrimaryRevision = primaryRevision; });
             scope.listen(panel.primary, 'pointercancel', () => { pressedPrimaryRevision = -1; });
             scope.listen(window, 'keydown', event => {
@@ -550,7 +571,7 @@ export class GuairaChapterApp {
             scope.listen(document, 'visibilitychange', () => { if (document.hidden) invalidatePrimary(); });
             const reflect = () => {
                 if (!this.currentExcursion(token, scope) || game.isDisposed) return false;
-                controls.sync(); panel.sound.sync(); replay?.sync();
+                controls.sync(); panel.sound.sync(); panel.help.sync(); replay?.sync();
                 if ((runtime.finished && !game.player.data.isDead && ['playing', 'paused'].includes(game.state)
                     && !this.progress.optional[token.sceneId]) || this.audioEnabled !== game.audio.enabled) this.captureLiveProgress();
                 const action = actionNow();
@@ -558,7 +579,7 @@ export class GuairaChapterApp {
                     invalidatePrimary(); primaryAction = action;
                     const revision = primaryRevision;
                     if (action && action !== 'other-route') releasePrimary = scope.listen(panel.primary, 'click', event => {
-                        if (!this.currentExcursion(token, scope) || !this.focused || document.hidden
+                        if (panel.help.isOpen || !this.currentExcursion(token, scope) || !this.focused || document.hidden
                             || this.mounted?.kind !== 'optional' || this.mounted.token !== token
                             || revision !== primaryRevision) return;
                         const pressedRevision = event.detail === 0 ? keyedPrimaryRevision : pressedPrimaryRevision;

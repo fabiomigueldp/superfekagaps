@@ -1085,7 +1085,8 @@ export class Game {
             ART.redLight,
             5
           );
-        } else if (prevGp === GroundPoundState.FALL) {
+        } else if (this.player.isGroundPoundFalling() || prevGp === GroundPoundState.FALL) {
+          // Include the first WINDUP -> FALL step and the landing FALL -> RECOVERY step.
           // Ground pound em cima do minion: mata sem bounce
           minion.stomp();
           this.audio.playStomp();

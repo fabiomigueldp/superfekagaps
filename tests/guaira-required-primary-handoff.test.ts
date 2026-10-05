@@ -54,7 +54,7 @@ for (const interruption of ['blur', 'hidden'] as const)
 test(`required primary cannot resume from a background click after ${interruption}`, async t => {
     const { h, app, game, primary } = await mount(t);
     const before = app.snapshot;
-    const saved = primary.listeners.find(listener => listener.type === 'click')!.callback;
+    const saved = primary.listeners.filter(listener => listener.type === 'click').at(-1)!.callback;
     const invokeSaved = () => {
         if (typeof saved === 'function') saved(new Event('click')); else saved.handleEvent(new Event('click'));
     };
@@ -94,7 +94,7 @@ test('required primary rejects pointercancel and saved callbacks; fresh Enter/Sp
     const { h, game, primary } = await mount(t);
     const requestFrame = requestAnimationFrame; let framesRequested = 0;
     t.mock.method(globalThis, 'requestAnimationFrame', (callback: FrameRequestCallback) => { framesRequested++; return requestFrame(callback); });
-    const savedPause = primary.listeners.find(listener => listener.type === 'click')!.callback;
+    const savedPause = primary.listeners.filter(listener => listener.type === 'click').at(-1)!.callback;
     const activate = (key: 'Enter' | ' ', repeat = false) => {
         const event = h.window.dispatch('keydown', { key, code: key === ' ' ? 'Space' : key, target: primary, repeat });
         if (key === ' ') h.window.dispatch('keyup', { key, code: 'Space', target: primary });

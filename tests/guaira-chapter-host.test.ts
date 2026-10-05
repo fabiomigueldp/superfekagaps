@@ -52,12 +52,13 @@ function hostBrowser(t: TestContext) {
         return activeElement ?? h.body;
     } });
     const decorate = (node: LifecycleElement) => {
+        Object.defineProperty(node, 'isConnected', { get: () => all().includes(node) });
         Object.assign(node, { contains: (candidate: LifecycleElement) => all(node).includes(candidate),
             focus: () => {
                 if (!all().includes(node) || node.disabled || node.hidden || activeElement === node) return;
                 activeElement = node; h.document.dispatch('focusin', { target: node });
             },
-            open: false, showModal() { Object.assign(node, { open: true }); }, close() { Object.assign(node, { open: false }); } });
+            open: false, showModal() { Object.assign(node, { open: true }); }, close() { Object.assign(node, { open: false }); node.dispatch('close'); } });
         return node;
     };
     const originalCreate = h.document.createElement;
@@ -195,7 +196,7 @@ test('real scene pause, blur, hidden and retry release input/audio and keep old 
     const h = hostBrowser(t), factory = await loadGuairaChapterScene('guaira-travessia');
     const app = h.create({ loadScene: async () => factory }); h.enter(); await flush();
     const old = app.activeGame!; const oldMap = h.byId('chapter-map-return'), oldPrimary = h.byId('chapter-primary');
-    const oldHandlers = [oldMap, oldPrimary, h.byId('chapter-retry')].map(node => node.listeners.find(item => item.type === 'click')!.callback);
+    const oldHandlers = [oldMap, oldPrimary, h.byId('chapter-retry')].flatMap(node => node.listeners.filter(item => item.type === 'click').map(item => item.callback));
     const count = h.listenerCount();
     h.key('keydown', 'ArrowRight'); old.input.update(); assert.equal(old.input.getState().right, true);
     h.window.dispatch('blur'); assert.equal(old.state, 'paused'); assert.equal(old.input.getState().right, false);
@@ -502,7 +503,7 @@ test('optional retry retires pending attempts and saved buttons before late succ
     const app = h.create({ loadExcursion: () => { const next = deferred<GuairaChapterExcursionFactory>(); loads.push(next); return next.promise; } });
     chooseGallery(h); const before = app.snapshot; h.enter();
     const oldRetry = h.byId('chapter-retry'), oldReturn = h.byId('chapter-map-return');
-    const callbacks = [oldRetry, oldReturn].map(node => node.listeners.find(item => item.type === 'click')!.callback);
+    const callbacks = [oldRetry, oldReturn].flatMap(node => node.listeners.filter(item => item.type === 'click').map(item => item.callback));
     oldRetry.click(); oldRetry.click(); oldReturn.click(); callbacks.forEach(callback => invokeSaved(callback));
     assert.equal(loads.length, 2); assert.equal(app.mode, 'loading');
     h.byId('chapter-retry').click(); loads[2].resolve(factory); await flush(); const newest = app.activeGame;
@@ -590,13 +591,13 @@ test('required and optional pending mounts cannot cross over into one another th
     const app = h.create({ loadScene: () => ++requiredLoads === 1 ? requiredPending.promise : Promise.resolve(required),
         loadExcursion: () => optionalPending.promise });
     h.enter(); const requiredButtons = ['chapter-retry', 'chapter-map-return'].map(id => h.byId(id));
-    const requiredCallbacks = requiredButtons.map(node => node.listeners.find(item => item.type === 'click')!.callback);
+    const requiredCallbacks = requiredButtons.flatMap(node => node.listeners.filter(item => item.type === 'click').map(item => item.callback));
     h.byId('chapter-map-return').click(); chooseGallery(h); const before = app.snapshot; h.enter();
     requiredCallbacks.forEach(callback => invokeSaved(callback)); requiredButtons.forEach(button => button.click());
     requiredPending.resolve(() => { stale++; throw Error('Old required factory'); }); await flush();
     assert.equal(stale, 0); assert.equal(app.mode, 'loading'); assert.deepEqual(app.snapshot, before);
     const optionalButtons = ['chapter-retry', 'chapter-map-return'].map(id => h.byId(id));
-    const optionalCallbacks = optionalButtons.map(node => node.listeners.find(item => item.type === 'click')!.callback);
+    const optionalCallbacks = optionalButtons.flatMap(node => node.listeners.filter(item => item.type === 'click').map(item => item.callback));
     h.byId('chapter-map-return').click(); chooseRequired(h); assert.deepEqual(app.snapshot, before); h.enter(); await flush();
     const newest = app.activeGame; optionalCallbacks.forEach(callback => invokeSaved(callback)); optionalButtons.forEach(button => button.click());
     optionalPending.reject(Error('Old optional import')); await flush();
@@ -943,6 +944,16 @@ for (const [sceneId, prerequisiteCount, recordingName, story] of [
     h.frame(); assert.equal(h.byId('lab-status').textContent, rendered);
     assert.deepEqual(app.snapshot.accepted, receipts);
     assert.equal(h.frames.size, 2, 'Context adds no third RAF or cutscene');
+    const completedAttempt = app.snapshot.activeAttempt;
+    h.byId('chapter-controls').click(); h.frame();
+    assert.equal(game.state, 'paused', 'Help also pauses a genuinely completed native scene');
+    h.byId('chapter-primary').click();
+    assert.equal(app.snapshot.activeAttempt, completedAttempt, 'Help cannot consume completed Continue');
+    h.byId('chapter-controls-help-close').click(); h.frame();
+    assert.equal(game.state, 'paused'); assert.deepEqual(app.snapshot.accepted, receipts);
+    h.byId('chapter-primary').click(); game.render(); h.frame();
+    assert.equal(game.state, 'playing'); assert.equal(app.snapshot.activeAttempt, completedAttempt);
+    assert.equal(h.byId('chapter-primary').getAttribute('aria-label'), 'Continuar a jornada pelo mapa');
     (game as WorldGame & { toggleLabPause(): void }).toggleLabPause(); game.render(); h.frame();
     assert.match(h.byId('lab-status').textContent, /Pausado/); assert.doesNotMatch(h.byId('lab-status').textContent, story);
     h.byId('chapter-primary').click(); game.render(); h.frame();
@@ -1102,5 +1113,233 @@ test('chapter recovery focus preserves a control chosen during partial-runtime c
     h.enter(); h.byId('game-canvas').focus(); await flush();
     assert.equal(app.mode, 'error'); assert.equal(app.activeGame, null);
     assert.equal(h.document.activeElement, external, 'Cleanup focus is checked again after the error view is appended');
+    app.dispose(); h.checkDisposed();
+});
+
+
+for (const initiallyPaused of [false, true]) test(`chapter controls help preserves the real attempt from ${initiallyPaused ? 'pause' : 'play'}`, async t => {
+    const h = hostBrowser(t), factory = await loadGuairaChapterScene('guaira-travessia');
+    const app = h.create({ loadScene: async () => factory }); h.enter(); await flush();
+    const game = app.activeGame!, attempt = app.snapshot.activeAttempt;
+    if (initiallyPaused) h.byId('chapter-primary').click();
+    const opener = h.byId('chapter-controls');
+    assert.equal(opener.tagName, 'BUTTON'); assert.equal(opener.disabled, false);
+    assert.equal(opener.getAttribute('aria-label'), 'Abrir controles e ajuda da tentativa');
+    assert.equal(opener.getAttribute('aria-haspopup'), 'dialog');
+    const touches = h.byId('guaira-touch-controls');
+    const jump = touches.children.find(button => button.getAttribute('data-action') === 'jump')!;
+    if (!initiallyPaused) jump.dispatch('pointerdown', { pointerId: 71, button: 0 });
+    const save = structuredClone(game.store.save), snapshot = app.snapshot;
+    opener.focus(); h.nativeKey('Enter', opener);
+    const dialog = h.byId('chapter-controls-help');
+    assert.equal((dialog as unknown as HTMLDialogElement).open, true);
+    assert.equal(opener.getAttribute('aria-expanded'), 'true');
+    assert.equal((h.document as unknown as { activeElement: LifecycleElement | null }).activeElement?.id, 'chapter-controls-help-title');
+    assert.equal(game.state, 'paused'); assert.equal(jump.captures.size, 0);
+    const position = structuredClone(game.player.data), elapsed = game.elapsed;
+    for (const key of ['ArrowRight', 'ArrowDown', ' ', 'm', 'Tab', 'PageDown']) {
+        const event = h.window.dispatch('keydown', { key, code: key === ' ' ? 'Space' : key === 'm' ? 'KeyM' : key, target: dialog, repeat: false });
+        assert.equal(event.defaultPrevented, false, `${key} retains native scrolling/focus defaults`);
+        game.update(1000 / 60); game.input.update();
+        assert.ok(Object.values(game.input.getState()).every(value => value === false), `${key} cannot reach gameplay`);
+        h.window.dispatch('keyup', { key, code: key, target: dialog });
+    }
+    h.frame();
+    for (const id of ['chapter-primary', 'chapter-retry', 'chapter-map-return']) h.byId(id).click();
+    assert.equal(app.activeGame, game, 'Background actions cannot replace or resume the attempt while help owns the modal');
+    assert.equal(game.state, 'paused');
+    assert.deepEqual(game.player.data, position); assert.equal(game.elapsed, elapsed);
+    assert.deepEqual(game.store.save, save); assert.deepEqual(app.snapshot, snapshot);
+    const text = h.all().filter(node => (dialog as unknown as HTMLElement).contains(node as unknown as Node)).map(node => node.textContent).join(' ');
+    for (const instruction of ['A / D', 'W, Z', 'Shift ou X', 'Golpe', 'Correr', 'Pular', 'Tentar', 'Mapa', 'continua pausada'])
+        assert.ok(text.includes(instruction), instruction);
+    h.byId('chapter-controls-help-close').click();
+    assert.equal(game.state, 'paused'); assert.equal(h.document.activeElement, opener);
+    assert.equal(opener.getAttribute('aria-expanded'), 'false');
+    assert.equal(app.snapshot.activeAttempt, attempt);
+    h.nativeKey('Enter', h.byId('chapter-retry'), true);
+    assert.equal(app.snapshot.activeAttempt, attempt, 'A held activation cannot become retry after closing help');
+    h.frame(); h.byId('chapter-primary').click();
+    assert.equal(game.state, 'playing'); assert.equal(app.activeGame, game);
+    assert.equal(app.snapshot.activeAttempt, attempt);
+    app.dispose(); h.checkDisposed();
+});
+
+test('chapter controls help Escape, native cancel and repeated open never resume or mutate the attempt', async t => {
+    const h = hostBrowser(t), factory = await loadGuairaChapterScene('guaira-travessia');
+    const app = h.create({ loadScene: async () => factory }); h.enter(); await flush();
+    const game = app.activeGame!, attempt = app.snapshot.activeAttempt, opener = h.byId('chapter-controls');
+    opener.focus(); opener.click(); const dialog = h.byId('chapter-controls-help');
+    h.window.dispatch('keydown', { key: 'Escape', code: 'Escape', target: dialog, repeat: true });
+    assert.equal((dialog as unknown as HTMLDialogElement).open, true);
+    assert.equal(h.window.dispatch('keydown', { key: 'Escape', code: 'Escape', target: dialog }).defaultPrevented, true);
+    assert.equal((dialog as unknown as HTMLDialogElement).open, false);
+    assert.equal(game.state, 'paused'); game.update(16); assert.equal(game.state, 'paused');
+    opener.click(); opener.click();
+    assert.equal(h.all().filter(node => node.id === 'chapter-controls-help').length, 1);
+    assert.equal(dialog.dispatch('cancel').defaultPrevented, true);
+    assert.equal((dialog as unknown as HTMLDialogElement).open, false);
+    assert.equal(game.state, 'paused'); assert.equal(app.snapshot.activeAttempt, attempt);
+    app.dispose(); h.checkDisposed();
+});
+
+test('optional chapter controls help explains Bairro and survives hidden/disposal without a stale scene action', async t => {
+    const h = hostBrowser(t), factory = await loadGuairaChapterExcursion('gallery');
+    const app = h.create({ loadExcursion: async () => factory }); chooseGallery(h); h.enter(); await flush();
+    const game = app.activeGame!, opener = h.byId('chapter-controls');
+    opener.focus(); opener.click(); const dialog = h.byId('chapter-controls-help');
+    const text = h.all().filter(node => (dialog as unknown as HTMLElement).contains(node as unknown as Node)).map(node => node.textContent).join(' ');
+    assert.match(text, /Bairro/); assert.match(text, /opcional/);
+    assert.equal(game.state, 'paused'); assert.equal(app.snapshot.activeAttempt, null);
+    h.window.dispatch('blur'); h.document.hidden = true; h.document.dispatch('visibilitychange');
+    h.byId('chapter-controls-help-close').click();
+    assert.notEqual(h.document.activeElement, opener, 'Closing while hidden cannot steal focus');
+    h.document.hidden = false; h.document.dispatch('visibilitychange'); h.window.dispatch('focus'); h.frame();
+    assert.equal(game.state, 'paused');
+    opener.click(); const staleClose = h.byId('chapter-controls-help-close');
+    app.dispose(); assert.equal(game.isDisposed, true);
+    opener.click(); staleClose.click();
+    assert.equal(h.document.getElementById('chapter-controls-help'), null);
+    h.checkDisposed();
+});
+
+
+test('chapter controls help retires across loading, scene replacement and failed imports', async t => {
+    const h = hostBrowser(t), pending = deferred<GuairaChapterSceneFactory>();
+    const factory = await loadGuairaChapterScene('guaira-travessia');
+    const app = h.create({ loadScene: () => pending.promise }); h.enter();
+    const opener = h.byId('chapter-controls'), dialog = h.byId('chapter-controls-help');
+    assert.equal(opener.disabled, true); opener.click();
+    assert.equal((dialog as unknown as HTMLDialogElement).open, false);
+    pending.resolve(factory); await flush();
+    const game = app.activeGame!; assert.equal(opener.disabled, false);
+    opener.focus(); opener.click();
+    const close = h.byId('chapter-controls-help-close');
+    const dispose = game.dispose.bind(game);
+    t.mock.method(game, 'dispose', () => {
+        assert.equal(h.document.getElementById('chapter-controls-help'), null, 'Help retires before the native runtime');
+        dispose();
+    });
+    // Exercise the host's actual view replacement boundary, even with an open modal.
+    const owner = app as unknown as { view: DisposalScope; leaveScene: (attempt: NonNullable<typeof app.snapshot.activeAttempt>, action: 'map', scope: DisposalScope) => void };
+    owner.leaveScene(app.snapshot.activeAttempt!, 'map', owner.view);
+    assert.equal(app.mode, 'map'); assert.equal(game.isDisposed, true);
+    assert.equal(h.document.getElementById('chapter-controls-help'), null);
+    const mapSnapshot = app.snapshot;
+    opener.click(); close.click(); assert.deepEqual(app.snapshot, mapSnapshot);
+    h.enter(); await flush(); const next = app.activeGame!;
+    assert.notEqual(next, game); assert.notEqual(h.byId('chapter-controls'), opener);
+    opener.click(); close.click(); assert.equal(next.state, 'playing');
+    app.dispose(); h.checkDisposed();
+
+    t.mock.method(console, 'error', () => {});
+    const failed = h.create({ loadScene: async () => { throw Error('Help loading failure'); } });
+    h.enter(); await flush();
+    assert.equal(failed.mode, 'error'); assert.equal(h.document.getElementById('chapter-controls-help'), null);
+    assert.equal(h.document.getElementById('chapter-controls'), null);
+    failed.dispose(); h.checkDisposed();
+});
+
+test('relief chapter controls help cannot consume replay actions or change the optional objective', async t => {
+    const h = hostBrowser(t), factory = await loadGuairaChapterExcursion('relief');
+    const progressStore = new ProgressStore(null);
+    progressStore.save.guaira.resumeScene = 'relief';
+    const app = h.create({ progressStore, loadExcursion: async () => factory }); await flush();
+    const game = app.activeGame as GuairaRelief;
+    const original = game.routes.snapshot;
+    const retry = h.byId('chapter-retry');
+    const staleRetries = retry.listeners.filter(item => item.type === 'click').map(item => item.callback);
+    const opener = h.byId('chapter-controls'); opener.focus(); opener.click(); h.frame();
+    retry.click(); staleRetries.forEach(callback => invokeSaved(callback));
+    h.byId('chapter-primary').click(); h.byId('chapter-map-return').click();
+    assert.equal(app.activeGame, game); assert.equal(game.state, 'paused');
+    assert.deepEqual(game.routes.snapshot, original);
+    h.byId('chapter-controls-help-close').click(); h.frame();
+    assert.equal(game.state, 'paused');
+    h.byId('chapter-primary').click(); assert.equal(game.state, 'playing');
+    h.frame(); retry.click(); await flush();
+    assert.notEqual(app.activeGame, game, 'A fresh explicit retry still works after leaving help');
+    app.dispose(); h.checkDisposed();
+});
+
+
+test('chapter controls help failed acquisition and pagehide release modal ownership without resuming', async t => {
+    const h = hostBrowser(t), factory = await loadGuairaChapterScene('guaira-travessia');
+    const app = h.create({ loadScene: async () => factory }); h.enter(); await flush();
+    const game = app.activeGame!, attempt = app.snapshot.activeAttempt;
+    const opener = h.byId('chapter-controls'), dialog = h.byId('chapter-controls-help') as unknown as HTMLDialogElement;
+    const canvas = h.byId('game-canvas') as unknown as HTMLCanvasElement; canvas.inert = false;
+    const suspensions = () => (game.input as unknown as { canvasTouchSuspensions: Set<symbol> }).canvasTouchSuspensions.size;
+    const ownedBefore = suspensions(), show = dialog.showModal;
+    dialog.showModal = () => { throw Error('Modal device failure'); };
+    opener.focus();
+    // Invoke the production click callback directly so the expected exception
+    // does not escape Node EventTarget as an unrelated asynchronous test error.
+    assert.throws(() => invokeSaved(opener.listeners.find(item => item.type === 'click')!.callback), /Modal device failure/);
+    assert.equal(dialog.open, false); assert.equal(canvas.inert, false);
+    assert.equal(opener.getAttribute('aria-expanded'), 'false'); assert.equal(h.document.activeElement, opener);
+    assert.equal(suspensions(), ownedBefore); assert.equal(game.state, 'paused');
+    assert.equal(app.snapshot.activeAttempt, attempt);
+    dialog.showModal = show; opener.click(); assert.equal(dialog.open, true);
+    h.window.dispatch('pagehide', { persisted: true });
+    assert.equal(dialog.open, false); assert.equal(canvas.inert, false);
+    assert.equal(opener.getAttribute('aria-expanded'), 'false');
+    assert.notEqual(h.document.activeElement, opener, 'Page exit does not restore focus');
+    h.window.dispatch('pageshow', { persisted: true }); h.frame();
+    assert.equal(game.state, 'paused'); assert.equal(dialog.open, false);
+    opener.click(); assert.equal(dialog.open, true);
+    h.byId('chapter-controls-help-close').click(); h.byId('chapter-retry').click(); await flush();
+    assert.notEqual(app.activeGame, game); assert.equal(game.isDisposed, true);
+    assert.equal(h.all().filter(node => node.id === 'chapter-controls-help').length, 1);
+    app.dispose(); h.checkDisposed();
+});
+
+for (const gesture of ['pointer', 'Space'] as const)
+for (const id of ['chapter-primary', 'chapter-retry', 'chapter-map-return', 'chapter-sound'])
+test(`chapter controls help retires a ${gesture} press on ${id} begun before reading help`, async t => {
+    const h = hostBrowser(t), factory = await loadGuairaChapterScene('guaira-travessia');
+    const app = h.create({ loadScene: async () => factory }); h.enter(); await flush();
+    const game = app.activeGame!, attempt = app.snapshot.activeAttempt, audio = game.audio.enabled;
+    const action = h.byId(id), opener = h.byId('chapter-controls');
+    if (id === 'chapter-primary') { action.click(); h.frame(); }
+    if (gesture === 'pointer') action.dispatch('pointerdown', { pointerId: 81, button: 0 });
+    else h.window.dispatch('keydown', { key: ' ', code: 'Space', target: action, repeat: false });
+    opener.click(); h.byId('chapter-controls-help-close').click();
+    action.dispatch('click', { detail: gesture === 'pointer' ? 1 : 0 });
+    assert.equal(app.activeGame, game); assert.equal(app.snapshot.activeAttempt, attempt);
+    assert.equal(game.state, 'paused'); assert.equal(game.audio.enabled, audio);
+    action.click();
+    if (id === 'chapter-primary') assert.equal(game.state, 'playing');
+    if (id === 'chapter-retry') { await flush(); assert.notEqual(app.activeGame, game); }
+    if (id === 'chapter-map-return') assert.equal(app.mode, 'map');
+    if (id === 'chapter-sound') assert.notEqual(game.audio.enabled, audio);
+    app.dispose(); h.checkDisposed();
+});
+
+test('chapter controls help discards a playing primary Space press without rejecting the next assistive Resume', async t => {
+    const h = hostBrowser(t), factory = await loadGuairaChapterScene('guaira-travessia');
+    const app = h.create({ loadScene: async () => factory }); h.enter(); await flush();
+    const game = app.activeGame!, primary = h.byId('chapter-primary');
+    h.window.dispatch('keydown', { key: ' ', code: 'Space', target: primary, repeat: false });
+    h.byId('chapter-controls').click(); h.frame();
+    h.byId('chapter-controls-help-close').click();
+    primary.click(); assert.equal(game.state, 'paused', 'Pre-help Space release must remain stale');
+    primary.click(); assert.equal(game.state, 'playing', 'A fresh assistive Resume must work immediately');
+    app.dispose(); h.checkDisposed();
+});
+
+for (const gesture of ['pointer', 'Space'] as const)
+test(`relief chapter controls help clears replay metadata after rejecting an old ${gesture} Retry`, async t => {
+    const h = hostBrowser(t), factory = await loadGuairaChapterExcursion('relief');
+    const store = new ProgressStore(null); store.save.guaira.resumeScene = 'relief';
+    const app = h.create({ progressStore: store, loadExcursion: async () => factory }); await flush();
+    const game = app.activeGame!, retry = h.byId('chapter-retry');
+    if (gesture === 'pointer') retry.dispatch('pointerdown', { pointerId: 82, button: 0 });
+    else h.window.dispatch('keydown', { key: ' ', code: 'Space', target: retry, repeat: false });
+    h.byId('chapter-controls').click(); h.frame();
+    h.byId('chapter-controls-help-close').click(); h.frame();
+    retry.dispatch('click', { detail: gesture === 'pointer' ? 1 : 0 });
+    assert.equal(app.activeGame, game);
+    retry.click(); await flush(); assert.notEqual(app.activeGame, game, 'Fresh assistive Retry must work immediately');
     app.dispose(); h.checkDisposed();
 });

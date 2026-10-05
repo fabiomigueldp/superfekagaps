@@ -51,5 +51,14 @@ export function installReliefReplayControls(scope: DisposalScope, routes: Guaira
     }
     scope.listen(window, 'focus', sync);
     scope.listen(document, 'visibilitychange', () => { invalidate(); sync(); });
-    return { sync };
+    // A host-owned modal has its own stale-gesture gate. Retire this helper's
+    // metadata too, so the next fresh assistive click is not rejected twice.
+    const interrupt = () => {
+        for (const button of [primary, retry]) {
+            const press = presses.get(button);
+            if (press) { press.pointer = null; press.key = null; }
+        }
+        invalidate();
+    };
+    return { sync, interrupt };
 }
