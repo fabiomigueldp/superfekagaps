@@ -244,7 +244,7 @@
     "walkSupportSamples": 42,
     "allSupported": true,
     "numericCampaignIdsChanged": false,
-    "objects": 2483
+    "objects": 2513
   },
   "artBounds": {
     "left": 0.19895833333333332,
@@ -256,7 +256,7 @@
     "path": "/assets/world/map/guaira-campaign/guaira.webp",
     "width": 1920,
     "height": 1200,
-    "bytes": 149034
+    "bytes": 143356
   },
   "replacesBase": false
 }

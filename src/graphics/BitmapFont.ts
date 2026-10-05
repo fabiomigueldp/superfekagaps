@@ -33,11 +33,29 @@ const GLYPHS: Record<string, string> = {
   '★':'00100/00100/11111/01110/01010/10001/00000',
   '♥':'01010/11111/11111/11111/01110/00100/00000',
 };
-const rows = new Map(Object.entries(GLYPHS).map(([key, value]) => [key, value.split('/')]));
-const advance = (c: string) => c === ' ' ? 4 : (rows.get(c.normalize('NFD')[0])?.[0].length ?? 5) + 1;
+// Compile the finite authored alphabet once. Keep one draw per pixel, in its
+// original order: joining pixels or caching rendered text changes compositing.
+// These tiny immutable tables retain no strings, colors, canvases or contexts
+// supplied by callers, so dynamic HUD text never grows a runtime cache.
+const glyphs = new Map(Object.entries(GLYPHS).map(([key, value]) => {
+  const rows = value.split('/'), pixels: number[] = [];
+  rows.forEach((row, y) => {
+    for (let x = 0; x < row.length; x++) if (row[x] === '1') pixels.push(x, y);
+  });
+  return [key, { pixels: new Uint8Array(pixels), advance: rows[0].length + 1 }];
+}));
+const marks: Readonly<Record<string, readonly number[]>> = {
+  '\u0301': [3, -2, 2, -1],
+  '\u0300': [1, -2, 2, -1],
+  '\u0302': [2, -2, 1, -1, 3, -1],
+  '\u0303': [1, -2, 2, -2, 3, -1, 4, -2],
+  '\u0327': [2, 7, 1, 8],
+};
+const advance = (c: string) => c === ' ' ? 4 : (glyphs.get(c.normalize('NFD')[0])?.advance ?? 6);
 export function textWidth(value: string, scale = 1): number {
-  const chars = [...value.toLocaleUpperCase('pt-BR')];
-  return Math.max(0, chars.reduce((sum, c) => sum + advance(c), 0) - 1) * scale;
+  let width = 0;
+  for (const c of value.toLocaleUpperCase('pt-BR')) width += advance(c);
+  return Math.max(0, width - 1) * scale;
 }
 export function fitText(value: string, width: number, scale = 1): string {
   if (textWidth(value, scale) <= width) return value;
@@ -65,14 +83,12 @@ export function pixelText(ctx: CanvasRenderingContext2D, value: string, x: numbe
   for (const c of value.toLocaleUpperCase('pt-BR')) {
     if (c !== ' ') {
       const [base, mark] = c.normalize('NFD');
-      const glyph = rows.get(base) ?? rows.get('?')!;
-      glyph.forEach((row, yy) => [...row].forEach((v, xx) => { if (v === '1') ctx.fillRect(x + xx * scale, y + yy * scale, scale, scale); }));
-      const dot = (xx: number, yy: number) => ctx.fillRect(x + xx * scale, y + yy * scale, scale, scale);
-      if (mark === '\u0301') { dot(3,-2); dot(2,-1); }
-      if (mark === '\u0300') { dot(1,-2); dot(2,-1); }
-      if (mark === '\u0302') { dot(2,-2); dot(1,-1); dot(3,-1); }
-      if (mark === '\u0303') { dot(1,-2); dot(2,-2); dot(3,-1); dot(4,-2); }
-      if (mark === '\u0327') { dot(2,7); dot(1,8); }
+      const pixels = (glyphs.get(base) ?? glyphs.get('?')!).pixels;
+      for (let i = 0; i < pixels.length; i += 2)
+        ctx.fillRect(x + pixels[i] * scale, y + pixels[i + 1] * scale, scale, scale);
+      const accent = marks[mark];
+      if (accent) for (let i = 0; i < accent.length; i += 2)
+        ctx.fillRect(x + accent[i] * scale, y + accent[i + 1] * scale, scale, scale);
     }
     x += advance(c) * scale;
   }

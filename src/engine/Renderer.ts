@@ -3,6 +3,7 @@ import { CameraData, PlayerData, EnemyData, CollectibleData, FlagData, Particle,
 import { PLAYER_PALETTE, PLAYER_SPRITES, PLAYER_WALK } from '../assets/playerSpriteSpec';
 import { playerDeathMotion, deathIrisProgress, DEATH_HIT_STOP_MS } from '../graphics/playerDeathMotion';
 import { drawRespawnArrival } from '../graphics/playerRespawnArt';
+import { drawPlayerProtection } from '../graphics/playerProtectionArt';
 import { ART, hashAt } from '../graphics/palette';
 import { SpriteAtlas, VisualClock, animationIndex, PixelFrame, sceneZoom } from '../graphics/pixels';
 import { TilePainter } from '../graphics/TilePainter';
@@ -213,8 +214,10 @@ export class Renderer {
       const i=animationIndex(p.animationTimer,6,p.isRunning?65:100);frame=PLAYER_WALK[i];headY=i%3===1?1:0;
     }else if((this.clock.time+presentationElapsedMs)%3400>3260)frame=PLAYER_SPRITES.blink;
     if(p.isGrounded)this.shadow(ctx,x+3,y+26,12);
-    // Flash between complete palette variants; silhouette remains readable during invulnerability.
-    const tint=!respawning&&p.invincibleTimer>0&&animationIndex(p.invincibleTimer,2,90)===1?ART.paper:undefined;
+    const protectedPlayer=!respawning&&p.invincibleTimer>0;
+    const reducedMotion=this.landingMotion?.matches??false;
+    // Reduced motion keeps face/clothing readable; stationary marks carry the same protection state.
+    const tint=protectedPlayer&&!reducedMotion&&animationIndex(p.invincibleTimer,2,90)===1?ART.paper:undefined;
     this.atlas.draw(ctx,frame,PLAYER_PALETTE,x,y,!p.facingRight,1,tint);
     if(p.hasHelmet)this.atlas.draw(ctx,PLAYER_SPRITES.helmet,PLAYER_PALETTE,x,y+headY-2,!p.facingRight);
     if(p.miniFantaTimer>0){
@@ -227,8 +230,8 @@ export class Renderer {
       ctx.fillStyle=ART.paper;ctx.fillRect(x-2,y+9,1,6);ctx.fillRect(x+18,y+5,1,8);
     }
     if(respawning){
-      drawRespawnArrival(ctx,x+8,y+13,Math.min(1,1-(p.respawnRevealTimer!-(this.interpolationMs??0))/PLAYER_RESPAWN_REVEAL_MS),this.landingMotion?.matches??false);
-    }
+      drawRespawnArrival(ctx,x+8,y+13,Math.min(1,1-(p.respawnRevealTimer!-(this.interpolationMs??0))/PLAYER_RESPAWN_REVEAL_MS),reducedMotion);
+    }else if(protectedPlayer&&reducedMotion)drawPlayerProtection(ctx,x+8,y+13);
   }
   private drawDeathImpact(c:CanvasRenderingContext2D,x:number,y:number,elapsed:number):void {
     c.save();c.globalAlpha*=1-elapsed/260;

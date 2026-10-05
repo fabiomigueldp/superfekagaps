@@ -411,6 +411,7 @@ for x,y,s in [(5.70,-3.63,.66),(5.88,-1.50,.62),(5.76,.0,.66),(4.84,-4.11,.48),(
 # Portable craft module uses these authored helper functions and fixed geometry.
 exec(compile(open(os.path.join(os.path.dirname(__file__),'craft_guaira.py')).read(),'craft_guaira.py','exec'))
 exec(compile(open(os.path.join(os.path.dirname(__file__),'bairro_water_guaira.py')).read(),'bairro_water_guaira.py','exec'))
+exec(compile(open(os.path.join(os.path.dirname(__file__),'terrace_guaira.py')).read(),'terrace_guaira.py','exec'))
 
 scene=bpy.context.scene;bpy.ops.object.camera_add(location=(11,-20,18.85));cam=bpy.context.object;target=Vector((0,.25,3.0));cam.rotation_euler=(target-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.type='ORTHO';cam.data.ortho_scale=20.6;scene.camera=cam
 world=bpy.data.worlds.new('Warm dry atmosphere');scene.world=world;world.use_nodes=True;world.node_tree.nodes['Background'].inputs[0].default_value=(.62,.58,.80,1);world.node_tree.nodes['Background'].inputs[1].default_value=.55

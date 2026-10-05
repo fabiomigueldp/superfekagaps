@@ -357,11 +357,15 @@ export class Input {
   update(): void {
     if (this.isDisposed) return;
     this.refreshHeldActions();
+    // Queued taps are a fallback, never a replacement for a surviving owner.
+    // Two opposite touch holds intentionally resolve to neutral, but still own
+    // horizontal input until one is released or cancelled.
+    const horizontalHeld = this.state.left || this.state.right ||
+      this.touchActions.has('left') || this.touchActions.has('right');
     // External pointer/assistive clicks shorter than a frame retain one movement step.
     if (this.completedSourceTaps.size || this.pendingSourceTaps.size) {
       const taps = new Set([...this.completedSourceTaps, ...this.pendingSourceTaps.values()]);
-      const keyboardDirection = [...this.pressedKeys].some(code => KEY_ACTIONS[code] === 'left' || KEY_ACTIONS[code] === 'right');
-      if (!keyboardDirection && !this.state.left && !this.state.right) {
+      if (!horizontalHeld) {
         this.state.left = taps.has('left') && !taps.has('right');
         this.state.right = taps.has('right') && !taps.has('left');
       }
@@ -370,11 +374,11 @@ export class Input {
       this.pendingSourceTaps.clear();
     }
     // A tap shorter than 1/60 s still moves for one simulation step.
-    if (this.pendingHorizontal) {
+    if (this.pendingHorizontal && !horizontalHeld) {
       this.state.left = this.pendingHorizontal === 'left';
       this.state.right = this.pendingHorizontal === 'right';
-      this.pendingHorizontal = null;
     }
+    this.pendingHorizontal = null;
     // Keep short taps that start and end between two simulation updates.
     this.state.start = this.pendingStart;
     this.state.pause = this.pendingPause;

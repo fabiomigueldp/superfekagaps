@@ -1,0 +1,156 @@
+{
+  "baselineCommit": "c1bd522463b23998e68272542f13558dbf63edc6",
+  "scope": "Existing civic terrace retaining-face material/geometry refinement; no game logic changes",
+  "renderer": "Blender 4.3.2 / Cycles CPU / AgX Medium High Contrast; chapter 48 samples, atlas 32; source camera and lighting retained",
+  "sourceReproduction": {
+    "freshChapterAndCampaignBuildersPassed": true,
+    "freshChapterAndCampaignMasksPassed": true,
+    "chapterCameraAndNavigationExact": true,
+    "campaignCanonicalMetadataExact": true,
+    "campaignOnlyMetadataUpdates": [
+      "image.bytes",
+      "validation.objects"
+    ],
+    "sourceHelperIsolation": "Terrace owns its mesh builder, independent of Bairro helper overrides"
+  },
+  "assets": {
+    "chapter": {
+      "baselineSHA256": "c2079e61d833233b2535f1f036d2e3c9836bfb80448fb73efea1ab2bd3852279",
+      "outputSHA256": "b8970131ee41972d07b11230b957840807a96f44ce8172f2a3b6ea1d09a09235",
+      "size": [
+        1920,
+        1200
+      ],
+      "quality": 92,
+      "baselineBytes": 193538,
+      "outputBytes": 186150,
+      "deltaBytes": -7388,
+      "visibleFacingBoundsXYXY": [
+        924,
+        463,
+        1178,
+        675
+      ],
+      "sourcePatchBoundsXYXY": [
+        915,
+        463,
+        1187,
+        684
+      ],
+      "sourcePatchPixels": 23237,
+      "sourcePixelsOutsidePatchExact": true,
+      "sourceAndEncodedAlphaExact": true,
+      "protectedBairroWaterEnvelopeXYWH": [
+        908,
+        597,
+        37,
+        18
+      ],
+      "protectedBairroSourcePixelsExact": true,
+      "codecDriftOutsidePatch": {
+        "changedPixels": 483027,
+        "meanMaxChannelDelta": 0.5789751061377267,
+        "maxChannelDelta": 28,
+        "pixelsAbove8": 9993,
+        "note": "Lossy WebP RGB re-encoding only; source RGB outside the facing neighborhood is exact."
+      },
+      "wholeEncodedChangedRGBPixels": 505348
+    },
+    "atlas": {
+      "baselineSHA256": "a19515eddae719c5697d54581ba576ca1fe19b61d32b20c75d2a444440f72d92",
+      "outputSHA256": "fd62a3e811630351825de1c83dbbf8b8ede4011f55d561266bf334a55573aa4a",
+      "size": [
+        1920,
+        1200
+      ],
+      "quality": 91,
+      "baselineBytes": 149034,
+      "outputBytes": 143356,
+      "deltaBytes": -5678,
+      "visibleFacingBoundsXYXY": [
+        1014,
+        511,
+        1227,
+        685
+      ],
+      "sourcePatchBoundsXYXY": [
+        1005,
+        511,
+        1236,
+        694
+      ],
+      "sourcePatchPixels": 17356,
+      "sourcePixelsOutsidePatchExact": true,
+      "sourceAndEncodedAlphaExact": true,
+      "protectedBairroWaterEnvelopeXYWH": null,
+      "protectedBairroSourcePixelsExact": null,
+      "codecDriftOutsidePatch": {
+        "changedPixels": 365269,
+        "meanMaxChannelDelta": 0.44782178598854916,
+        "maxChannelDelta": 27,
+        "pixelsAbove8": 7822,
+        "note": "Lossy WebP RGB re-encoding only; source RGB outside the facing neighborhood is exact."
+      },
+      "wholeEncodedChangedRGBPixels": 381881
+    }
+  },
+  "unchangedFiles": {
+    "public/assets/world/experimental/guaira/guaira-diorama.meta.json": "2e02904c2664ab7e6b19687693c057edbb1c3a255281c1934f684f88b9d0ebd1",
+    "public/assets/world/experimental/guaira/guaira-water-mask.png": "447c8a6e8331ca245d9190caf528d128662e226f9cf25539aa3f90afe7301144",
+    "public/assets/world/map/guaira-campaign/guaira-water-restored.webp": "25434143ce11f54ddd2101cd7856c7168934488e1cb3a0a86a88cfa2d419e456",
+    "src/adventure/experimental/guaira/GuairaWaterData.json": "854a748f1a343ae5cf1390719026d37964b83047be9b2fbab5d98e738593f3a1",
+    "src/adventure/experimental/guaira/chapter/GuairaBairroWaterData.json": "e690e994ddf030eb1f815a7fcd9f798cd78d26650c75cd09a3677875139e32d1",
+    "src/adventure/experimental/guaira/chapter/GuairaChapterWater.ts": "f21186c205bf4c47b44a5080865dc25c7cbeacede8c3409bb95a5c1494d618ef",
+    "src/adventure/GuairaCampaignWaterMotion.ts": "bdf9dbd9e4a955db9507b2b7698bb667fbf268a0265f05a7e44a33dbc414abf1",
+    "src/adventure/GuairaCampaignArt.ts": "0a418942ae3769dd4768c53c67ffab4e1e7c297afc2e84031043e35047918576",
+    "tools/diorama/guaira/craft_guaira.py": "8607a565797d943b33b5b6a46411ed706f52aaa818defc2cfce89d0378d53eea",
+    "tools/diorama/guaira/bairro_water_guaira.py": "7da4392d0b9d56950217489870fae0aab98b56066591c3ccfb3ce7fad99fb94f"
+  },
+  "geometry": {
+    "exactStructure": {
+      "walk": true,
+      "water": true,
+      "camera": true,
+      "lights": true
+    },
+    "exactNavigation": {
+      "camera": true,
+      "nodes": true,
+      "routes": true,
+      "worldRoutes": true,
+      "routeWidth": true,
+      "futureBossArea": true
+    },
+    "originalObjectCount": 2456,
+    "originalUsedMaterialsCount": 55,
+    "newObjectCount": 30,
+    "changedOriginalObjects": [],
+    "changedOriginalMaterials": [],
+    "walkMeshCount": 16,
+    "waterMeshCount": 9,
+    "nativeSpriteFrames": 7,
+    "opaquePixelUnion": 317,
+    "routeSamples": 203,
+    "opaquePixelRays": 643510,
+    "floorProbes": 609,
+    "inheritedFootFloorContacts": 6962,
+    "inheritedUnsupportedProbes": 2,
+    "newForegroundContacts": 0,
+    "newUnsupportedProbes": 0,
+    "newHeadroomObstructions": 0
+  },
+  "budget": {
+    "runtimeArtDeltaBytes": -13066,
+    "campaignArtBytes": 441268,
+    "campaignArtBudgetBytes": 500000,
+    "newRuntimeTextureCount": 0,
+    "newJavaScriptBytes": 0
+  },
+  "verification": {
+    "targetedTestsPassed": 33,
+    "pythonSourcesParse": true,
+    "browserOrDeviceValidation": false,
+    "fullSuiteRun": false,
+    "publicationPerformed": false
+  }
+}

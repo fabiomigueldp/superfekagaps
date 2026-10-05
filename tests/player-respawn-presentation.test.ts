@@ -115,21 +115,21 @@ for (const reducedMotion of [false, true]) for (const kind of ['hit', 'fall'] as
         game.update(1);
         assert.equal(player.data.respawnRevealTimer, 0); assert.deepEqual(player.data.position, spawn);
         h.draw(player.data); assert.equal(h.calls[0].frame, PLAYER_SPRITES.idle, 'The zero-timer frozen boundary cannot flicker back to a fall.');
-        assert.equal(h.paints.length, 0, 'The arrival decoration ends on time even while the upright pose bridges the boundary.');
+        assert.equal(h.paints.length, reducedMotion ? 12 : 0, 'The burst ends on time; reduced-motion protection marks continue through the frozen boundary.');
         game.update(1000 / 60); h.draw(player.data);
         assert.equal(player.data.isGrounded, true);
         assert.equal(h.calls[0].frame, reducedMotion ? PLAYER_SPRITES.idle : PLAYER_SPRITES.land, 'Existing first-contact presentation resumes immediately.');
         assert.ok(player.data.invincibleTimer < protection);
-        assert.equal(h.paints.length, 2, 'Only the ordinary contact shadow remains after arrival.');
+        assert.equal(h.paints.length, reducedMotion ? 14 : 2, 'The contact shadow returns; reduced-motion protection marks remain while the player is protected.');
         // A truly airborne restart must use the actual first physics result, without a sticky arrival pose.
         player.respawn({ x: cp.x, y: cp.y - 4 });
         player.update(PLAYER_RESPAWN_REVEAL_MS, { ...idle, right: true }, game.level);
         const suspended = { ...player.data.position };
-        h.draw(player.data); assert.equal(h.calls[0].frame, PLAYER_SPRITES.idle); assert.equal(h.paints.length, 0);
+        h.draw(player.data); assert.equal(h.calls[0].frame, PLAYER_SPRITES.idle); assert.equal(h.paints.length, reducedMotion ? 12 : 0);
         player.update(1000 / 60, { ...idle, right: true }, game.level);
         assert.equal(player.data.isGrounded, false); assert.ok(player.data.position.y > suspended.y);
         assert.ok(player.data.position.x > suspended.x); h.draw(player.data);
-        assert.equal(h.calls[0].frame, PLAYER_SPRITES.fall); assert.equal(h.paints.length, 0);
+        assert.equal(h.calls[0].frame, PLAYER_SPRITES.fall); assert.equal(h.paints.length, reducedMotion ? 12 : 0);
     });
 
 for (const reducedMotion of [false, true]) test(`arrival boundary guard excludes initial spawns and active gameplay (${reducedMotion})`, () => {
