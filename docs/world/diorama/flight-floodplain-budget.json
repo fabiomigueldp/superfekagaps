@@ -1,0 +1,20 @@
+{
+  "current": {
+    "calls": 1171,
+    "fills": 35,
+    "gradients": 5,
+    "nativeRasterMedianMs": {
+      "normal": 0.659,
+      "reduced": 0.625
+    }
+  },
+  "baseline": {
+    "calls": 1033,
+    "fills": 130,
+    "gradients": 7,
+    "nativeRasterMedianMs": {
+      "normal": 0.473,
+      "reduced": 0.529
+    }
+  }
+}

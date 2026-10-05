@@ -3,6 +3,7 @@ import { JournalAccessibility } from './JournalAccessibility';
 import { campaignJournal } from './CampaignJournal';
 import { CanvasMenuAccessibility } from './CanvasMenuAccessibility';
 import { WorldControlsHelp } from './WorldControlsHelp';
+import { advanceCampaignCamera } from './WorldCampaignCamera';
 import { runGuairaFlight } from './WorldGuairaFlight';
 import { ExperimentalHub } from './experimental/hub/ExperimentalHub';
 import { Input } from '../engine/Input';
@@ -701,12 +702,8 @@ export class WorldGame {
             }
         if (this.state === 'playing')
             this.updateComment(dt);
-        if (!this.boss) {
-            this.camera.x += (clamp(p.x - 125 + this.player.data.velocity.x * 12, 0, Math.max(0, this.level.data.width * 16 - 320)) - this.camera.x) * .12;
-            const screenY = p.y - this.camera.y;
-            const targetY = this.player.data.isGrounded ? p.y - 108 : screenY < 48 ? p.y - 48 : screenY > 132 ? p.y - 132 : this.camera.y;
-            this.camera.y += (clamp(targetY, 0, this.level.data.height * 16 - 180) - this.camera.y) * .12;
-        }
+        if (!this.boss)
+            advanceCampaignCamera(this.camera, { position: p, velocity: this.player.data.velocity, isGrounded: this.player.data.isGrounded }, this.level.data);
         this.updateSparks(dt);
     }
     protected updateSparks(dt: number) {

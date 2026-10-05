@@ -2,6 +2,7 @@ import { GAME_WIDTH, GAME_HEIGHT, TILE_SIZE, TileType, FALLING_PLATFORM_FALL_MS,
 import { CameraData, PlayerData, EnemyData, CollectibleData, FlagData, Particle, Firework, EnemyType, CollectibleType, GroundPoundState, SpeechBubbleRenderState, FallingPlatformPhase, LevelTheme, PaletteItem, LevelTrigger, TriggerType } from '../types';
 import { PLAYER_PALETTE, PLAYER_SPRITES, PLAYER_WALK } from '../assets/playerSpriteSpec';
 import { playerDeathMotion, deathIrisProgress, DEATH_HIT_STOP_MS } from '../graphics/playerDeathMotion';
+import { drawRespawnArrival } from '../graphics/playerRespawnArt';
 import { ART, hashAt } from '../graphics/palette';
 import { SpriteAtlas, VisualClock, animationIndex, PixelFrame, sceneZoom } from '../graphics/pixels';
 import { TilePainter } from '../graphics/TilePainter';
@@ -190,8 +191,15 @@ export class Renderer {
       ctx.restore();
       return;
     }
+    const respawning=(p.respawnRevealTimer??0)>0;
+    // The final reveal update reaches zero before returning, still without a support check.
+    // Reset animation age distinguishes that boundary from any subsequent airborne frame.
+    const awaitingRespawnStep=p.respawnRevealTimer===0&&p.animationTimer===0&&p.invincibleTimer>0&&
+      !p.isGrounded&&!p.isJumping&&p.velocity.x===0&&p.velocity.y===0&&p.groundPoundState===GroundPoundState.NONE;
     let frame:PixelFrame=PLAYER_SPRITES.idle,headY=0;
-    if(p.groundPoundState===GroundPoundState.WINDUP){frame=PLAYER_SPRITES.windup;headY=3;}
+    // Physics is frozen before the first support check; reveal a neutral arrival, not a fall.
+    if(respawning||awaitingRespawnStep)frame=PLAYER_SPRITES.idle;
+    else if(p.groundPoundState===GroundPoundState.WINDUP){frame=PLAYER_SPRITES.windup;headY=3;}
     else if(p.groundPoundState===GroundPoundState.FALL||p.groundPoundState===GroundPoundState.RECOVERY){frame=PLAYER_SPRITES.sit;headY=7;}
     else if(!p.isGrounded)frame=p.velocity.y<0?PLAYER_SPRITES.jump:PLAYER_SPRITES.fall;
     else if((p.landingTimer??0)>0){
@@ -206,7 +214,7 @@ export class Renderer {
     }else if((this.clock.time+presentationElapsedMs)%3400>3260)frame=PLAYER_SPRITES.blink;
     if(p.isGrounded)this.shadow(ctx,x+3,y+26,12);
     // Flash between complete palette variants; silhouette remains readable during invulnerability.
-    const tint=!(p.respawnRevealTimer!>0)&&p.invincibleTimer>0&&animationIndex(p.invincibleTimer,2,90)===1?ART.paper:undefined;
+    const tint=!respawning&&p.invincibleTimer>0&&animationIndex(p.invincibleTimer,2,90)===1?ART.paper:undefined;
     this.atlas.draw(ctx,frame,PLAYER_PALETTE,x,y,!p.facingRight,1,tint);
     if(p.hasHelmet)this.atlas.draw(ctx,PLAYER_SPRITES.helmet,PLAYER_PALETTE,x,y+headY-2,!p.facingRight);
     if(p.miniFantaTimer>0){
@@ -218,8 +226,8 @@ export class Renderer {
     if(p.groundPoundState===GroundPoundState.FALL){
       ctx.fillStyle=ART.paper;ctx.fillRect(x-2,y+9,1,6);ctx.fillRect(x+18,y+5,1,8);
     }
-    if((p.respawnRevealTimer??0)>0){
-      this.drawRespawnBurst(ctx,x+8,y+13,Math.min(1,1-(p.respawnRevealTimer!-(this.interpolationMs??0))/PLAYER_RESPAWN_REVEAL_MS));
+    if(respawning){
+      drawRespawnArrival(ctx,x+8,y+13,Math.min(1,1-(p.respawnRevealTimer!-(this.interpolationMs??0))/PLAYER_RESPAWN_REVEAL_MS),this.landingMotion?.matches??false);
     }
   }
   private drawDeathImpact(c:CanvasRenderingContext2D,x:number,y:number,elapsed:number):void {
@@ -232,20 +240,6 @@ export class Renderer {
     if(elapsed<DEATH_HIT_STOP_MS){
       c.fillStyle=ART.paper;c.fillRect(x-5,y-1,11,2);c.fillRect(x-1,y-5,2,11);
     }
-    c.restore();
-  }
-  private drawRespawnBurst(c:CanvasRenderingContext2D,x:number,y:number,progress:number):void {
-    const radius=Math.round(4+20*progress);
-    c.save();c.globalAlpha*=Math.sin(Math.PI*progress);
-    for(let i=0;i<8;i++){
-      const angle=i*Math.PI/4;
-      const px=Math.round(x+Math.cos(angle)*radius),py=Math.round(y+Math.sin(angle)*radius);
-      c.fillStyle=i%2?ART.goldLight:ART.paper;
-      c.fillRect(px,py,i%2?2:3,2);
-    }
-    c.fillStyle=ART.tealLight;
-    c.fillRect(x-radius-2,y,3,1);c.fillRect(x+radius,y,3,1);
-    c.fillRect(x,y-radius-2,1,3);c.fillRect(x,y+radius,1,3);
     c.restore();
   }
   drawPlayerTransition(p:PlayerData,camera:CameraData,ctx?:CanvasRenderingContext2D):void {

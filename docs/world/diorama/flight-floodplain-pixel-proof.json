@@ -1,0 +1,202 @@
+{
+  "width": 960,
+  "height": 540,
+  "frames": 32,
+  "replayIdentical": 32,
+  "minChangedPercent": 0.0,
+  "maxChangedPercent": 28.62,
+  "records": [
+    {
+      "frame": "normal-factory-guaira-0.05.png",
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "replayIdentical": true
+    },
+    {
+      "frame": "normal-factory-guaira-1.80.png",
+      "changedPixels": 4220,
+      "changedPercent": 0.81,
+      "replayIdentical": true
+    },
+    {
+      "frame": "normal-factory-guaira-3.40.png",
+      "changedPixels": 136823,
+      "changedPercent": 26.39,
+      "replayIdentical": true
+    },
+    {
+      "frame": "normal-factory-guaira-4.80.png",
+      "changedPixels": 132986,
+      "changedPercent": 25.65,
+      "replayIdentical": true
+    },
+    {
+      "frame": "normal-factory-guaira-6.70.png",
+      "changedPixels": 113667,
+      "changedPercent": 21.93,
+      "replayIdentical": true
+    },
+    {
+      "frame": "normal-guaira-factory-0.05.png",
+      "changedPixels": 117686,
+      "changedPercent": 22.7,
+      "replayIdentical": true
+    },
+    {
+      "frame": "normal-guaira-factory-1.80.png",
+      "changedPixels": 118306,
+      "changedPercent": 22.82,
+      "replayIdentical": true
+    },
+    {
+      "frame": "normal-guaira-factory-3.40.png",
+      "changedPixels": 148386,
+      "changedPercent": 28.62,
+      "replayIdentical": true
+    },
+    {
+      "frame": "normal-guaira-factory-4.80.png",
+      "changedPixels": 111078,
+      "changedPercent": 21.43,
+      "replayIdentical": true
+    },
+    {
+      "frame": "normal-guaira-factory-6.70.png",
+      "changedPixels": 60,
+      "changedPercent": 0.01,
+      "replayIdentical": true
+    },
+    {
+      "frame": "normal-guaira-serra-0.05.png",
+      "changedPixels": 114657,
+      "changedPercent": 22.12,
+      "replayIdentical": true
+    },
+    {
+      "frame": "normal-guaira-serra-1.80.png",
+      "changedPixels": 111918,
+      "changedPercent": 21.59,
+      "replayIdentical": true
+    },
+    {
+      "frame": "normal-guaira-serra-3.40.png",
+      "changedPixels": 105952,
+      "changedPercent": 20.44,
+      "replayIdentical": true
+    },
+    {
+      "frame": "normal-guaira-serra-4.80.png",
+      "changedPixels": 116549,
+      "changedPercent": 22.48,
+      "replayIdentical": true
+    },
+    {
+      "frame": "normal-guaira-serra-6.70.png",
+      "changedPixels": 44467,
+      "changedPercent": 8.58,
+      "replayIdentical": true
+    },
+    {
+      "frame": "normal-serra-guaira-0.05.png",
+      "changedPixels": 38487,
+      "changedPercent": 7.42,
+      "replayIdentical": true
+    },
+    {
+      "frame": "normal-serra-guaira-1.80.png",
+      "changedPixels": 75607,
+      "changedPercent": 14.58,
+      "replayIdentical": true
+    },
+    {
+      "frame": "normal-serra-guaira-3.40.png",
+      "changedPixels": 109707,
+      "changedPercent": 21.16,
+      "replayIdentical": true
+    },
+    {
+      "frame": "normal-serra-guaira-4.80.png",
+      "changedPixels": 104229,
+      "changedPercent": 20.11,
+      "replayIdentical": true
+    },
+    {
+      "frame": "normal-serra-guaira-6.70.png",
+      "changedPixels": 109929,
+      "changedPercent": 21.21,
+      "replayIdentical": true
+    },
+    {
+      "frame": "reduced-factory-guaira-0.05.png",
+      "changedPixels": 55373,
+      "changedPercent": 10.68,
+      "replayIdentical": true
+    },
+    {
+      "frame": "reduced-factory-guaira-0.57.png",
+      "changedPixels": 55254,
+      "changedPercent": 10.66,
+      "replayIdentical": true
+    },
+    {
+      "frame": "reduced-factory-guaira-1.10.png",
+      "changedPixels": 55373,
+      "changedPercent": 10.68,
+      "replayIdentical": true
+    },
+    {
+      "frame": "reduced-guaira-factory-0.05.png",
+      "changedPixels": 55373,
+      "changedPercent": 10.68,
+      "replayIdentical": true
+    },
+    {
+      "frame": "reduced-guaira-factory-0.57.png",
+      "changedPixels": 55175,
+      "changedPercent": 10.64,
+      "replayIdentical": true
+    },
+    {
+      "frame": "reduced-guaira-factory-1.10.png",
+      "changedPixels": 55373,
+      "changedPercent": 10.68,
+      "replayIdentical": true
+    },
+    {
+      "frame": "reduced-guaira-serra-0.05.png",
+      "changedPixels": 69971,
+      "changedPercent": 13.5,
+      "replayIdentical": true
+    },
+    {
+      "frame": "reduced-guaira-serra-0.57.png",
+      "changedPixels": 69913,
+      "changedPercent": 13.49,
+      "replayIdentical": true
+    },
+    {
+      "frame": "reduced-guaira-serra-1.10.png",
+      "changedPixels": 69971,
+      "changedPercent": 13.5,
+      "replayIdentical": true
+    },
+    {
+      "frame": "reduced-serra-guaira-0.05.png",
+      "changedPixels": 69971,
+      "changedPercent": 13.5,
+      "replayIdentical": true
+    },
+    {
+      "frame": "reduced-serra-guaira-0.57.png",
+      "changedPixels": 69901,
+      "changedPercent": 13.48,
+      "replayIdentical": true
+    },
+    {
+      "frame": "reduced-serra-guaira-1.10.png",
+      "changedPixels": 69971,
+      "changedPercent": 13.5,
+      "replayIdentical": true
+    }
+  ]
+}

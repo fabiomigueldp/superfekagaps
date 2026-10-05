@@ -293,8 +293,10 @@ export class Player {
       this.data.velocity.y = Math.min(this.data.velocity.y, PLAYER_JUMP_FORCE * 0.9);
     }
 
-    // Soltou o pulo - corta a altura
-    if (input.jumpReleased && this.data.velocity.y < 0) {
+    // A buffered tap can release before landing, or release/repress on launch.
+    // Sample its latest held intent at launch; keep airborne release cuts edge-based.
+    const released = started ? !input.jump : input.jumpReleased;
+    if (released && this.data.velocity.y < 0) {
       this.data.velocity.y *= 0.5;
       this.data.isJumping = false;
     }

@@ -71,7 +71,7 @@ for (const touch of [false, true]) for (const reducedMotion of [false, true])
         h.keys([]); g.load(g.stage.id); assert.equal(g.finished, false);
         // A fresh attempt cannot inherit the prior completed clock or decayed tint.
         g.player.data.invincibleTimer = 150; g.player.data.landingTimer = 90;
-        g.render(); assert.deepEqual(paint(), { tint: ART.paper, pose: 'land' });
+        g.render(); assert.deepEqual(paint(), { tint: ART.paper, pose: reducedMotion ? 'idle' : 'land' });
         assert.deepEqual(h.storageCalls, []);
     });
 

@@ -6,75 +6,131 @@ type Polygon = readonly (readonly [number, number])[];
  * elapsed-time scrolling, or integration drift: camera velocity is travel velocity.
  * These low floodplain banks occupy the channels between the authored terminals. */
 export const FLIGHT_BANKS: readonly Polygon[] = [
-    [[3.81,-.16],[3.94,-.22],[4.09,-.16],[4.16,-.04],[4.07,.04],[3.90,.02],[3.79,-.06]],
-    [[3.48,.13],[3.57,.05],[3.68,.07],[3.72,.14],[3.66,.20],[3.53,.20]],
-    [[3.10,.48],[3.27,.35],[3.45,.39],[3.58,.51],[3.49,.62],[3.25,.65],[3.11,.59]],
-    [[3.29,.76],[3.50,.65],[3.74,.69],[3.80,.84],[3.67,.98],[3.41,.99],[3.25,.89]],
-    [[3.63,.23],[3.78,.19],[3.91,.27],[3.94,.39],[3.83,.49],[3.65,.43],[3.57,.32]],
-    [[3.09,-.15],[3.26,-.23],[3.49,-.18],[3.54,-.03],[3.41,.08],[3.21,.05]],
-    [[3.70,1.12],[3.90,1.01],[4.12,1.08],[4.19,1.25],[3.97,1.36],[3.73,1.29]],
+    // The eastern bank has two broad lobes joined by a narrow, recessed neck.
+    // Its inlet faces the western spit, giving the water a readable bend.
+    [[3.81,-.16],[3.92,-.21],[4.05,-.16],[4.13,-.08],[4.09,-.01],[3.98,.035],
+        [3.89,.02],[3.84,.07],[3.86,.15],[3.91,.25],[3.93,.35],[3.86,.44],
+        [3.76,.46],[3.62,.39],[3.59,.31],[3.69,.24],[3.77,.22],[3.78,.12],
+        [3.76,.035],[3.80,-.055]],
+    // A low upstream shoal, not another miniature farm tile.
+    [[3.49,.13],[3.56,.08],[3.63,.075],[3.70,.13],[3.66,.16],[3.59,.15],[3.53,.18]],
+    // West-facing spit with a sheltered bite in its southern shore.
+    [[3.08,.49],[3.18,.44],[3.27,.36],[3.35,.38],[3.41,.42],[3.44,.47],
+        [3.53,.50],[3.56,.55],[3.48,.60],[3.39,.62],[3.34,.59],[3.31,.555],
+        [3.26,.58],[3.20,.615],[3.10,.59],[3.07,.54]],
+    // One long southern floodplain replaces the two unrelated lower cutouts.
+    // A narrow neck and a deep eastern inlet leave the river corridor open.
+    [[3.26,.79],[3.40,.72],[3.52,.67],[3.67,.71],[3.77,.75],[3.80,.84],
+        [3.74,.91],[3.69,.95],[3.72,1.035],[3.80,1.09],[3.91,1.04],[4.07,1.10],
+        [4.15,1.21],[4.08,1.29],[3.96,1.33],[3.81,1.30],[3.70,1.24],
+        [3.67,1.12],[3.64,1.04],[3.57,.985],[3.42,.97],[3.29,.92],[3.24,.87]],
+    // A quiet, darker foothill shelf remains behind the mountain terminal.
+    [[3.08,-.14],[3.18,-.20],[3.29,-.23],[3.42,-.19],[3.50,-.12],
+        [3.53,-.03],[3.45,.015],[3.38,.07],[3.30,.04],[3.20,.06],[3.13,.005]],
 ];
-// Small erosion cuts remain inside the authored footprints. Compute them once;
-// neither the frame clock nor the camera may crawl or regenerate the shoreline.
-const BANK_SHORES: readonly Polygon[] = FLIGHT_BANKS.map((bank, index) => {
-    const cx = bank.reduce((sum, point) => sum + point[0], 0) / bank.length;
-    const cy = bank.reduce((sum, point) => sum + point[1], 0) / bank.length;
-    return bank.flatMap(([x, y], i) => {
-        if ((i + index) % 3 !== 0) return [[x, y]];
-        const [nx, ny] = bank[(i + 1) % bank.length], t = (i + index) % 2 ? .39 : .62;
-        const mx = x + (nx - x) * t, my = y + (ny - y) * t;
-        const inset = .045 + (i % 2) * .02;
-        return [[x, y], [mx + (cx - mx) * inset, my + (cy - my) * inset]] as const;
+type ShoreSegment = { start: readonly [number, number]; control: readonly [number, number]; end: readonly [number, number] };
+type Shore = { segments: readonly ShoreSegment[]; shadedRuns: readonly (readonly ShoreSegment[])[]; litRuns: readonly (readonly ShoreSegment[])[]; top: number; bottom: number };
+const insetCorner = (corner: readonly [number, number], neighbor: readonly [number, number]): readonly [number, number] => [corner[0]+(neighbor[0]-corner[0])*.24,corner[1]+(neighbor[1]-corner[1])*.24];
+const midpoint = (a: readonly [number, number], b: readonly [number, number]): readonly [number, number] => [(a[0]+b[0])/2,(a[1]+b[1])/2];
+// One quadratic per authored corner: gently rounded headlands and concave inlets,
+// not random erosion or per-frame tessellation. Reused by every material layer.
+const BANK_SHORES: readonly Shore[] = FLIGHT_BANKS.map(bank => {
+    const segments=bank.map((control,i) => ({ start:insetCorner(control,bank[(i+bank.length-1)%bank.length]),control,
+        end:insetCorner(control,bank[(i+1)%bank.length]) }));
+    const faces=segments.flatMap((segment,i) => {
+        const previous=segments[(i+segments.length-1)%segments.length].end;
+        return [{start:previous,control:midpoint(previous,segment.start),end:segment.start},segment];
     });
+    const runs = (accept:(face:ShoreSegment)=>boolean): ShoreSegment[][] => {
+        const result: ShoreSegment[][]=[];
+        for (const face of faces) {
+            if (!accept(face)) continue;
+            const last=result.at(-1), end=last?.at(-1)?.end;
+            if (end && end[0]===face.start[0] && end[1]===face.start[1]) last!.push(face); else result.push([face]);
+        }
+        return result;
+    };
+    return { segments,
+        shadedRuns:runs(({start,end})=>end[0]<start[0] && Math.abs(end[1]-start[1])>(start[0]-end[0])*.5),
+        litRuns:runs(({start,end})=>end[0]>start[0]),
+        top:Math.min(...bank.map(p=>p[1])),bottom:Math.max(...bank.map(p=>p[1])) };
 });
 const FIELDS: readonly Polygon[] = [
-    [[3.88,-.12],[3.96,-.16],[4.04,-.11],[3.96,-.06]],
-    [[3.98,-.03],[4.06,-.08],[4.10,-.03],[4.05,.01]],
-    [[3.55,.13],[3.59,.09],[3.65,.11],[3.61,.16]],
-    [[3.20,.48],[3.29,.41],[3.40,.44],[3.34,.52]],
-    [[3.36,.53],[3.43,.45],[3.51,.51],[3.46,.58]],
-    [[3.32,.80],[3.47,.73],[3.57,.76],[3.42,.87]],
-    [[3.45,.89],[3.60,.78],[3.72,.80],[3.64,.93]],
-    [[3.66,.28],[3.76,.25],[3.83,.30],[3.73,.35]],
+    [[3.87,-.12],[3.95,-.16],[4.025,-.12],[4.055,-.08],[3.965,-.055],[3.90,-.075]],
+    [[3.20,.475],[3.285,.41],[3.355,.435],[3.38,.47],[3.33,.52],[3.255,.53]],
+    [[3.385,.525],[3.435,.49],[3.505,.525],[3.475,.56],[3.42,.575]],
+    [[3.32,.81],[3.455,.745],[3.555,.775],[3.525,.81],[3.425,.875]],
+    [[3.47,.90],[3.59,.81],[3.71,.81],[3.695,.865],[3.625,.925]],
+    [[3.66,.315],[3.74,.265],[3.815,.30],[3.84,.34],[3.75,.365]],
 ];
+// Broad flood-deposited margins occupy only the inside of the lower bank bends.
+// They follow the land's shape instead of outlining every edge with a foam ring.
+const SILT: readonly Polygon[] = [
+    [[3.49,.135],[3.56,.105],[3.63,.105],[3.685,.13],[3.635,.137],[3.575,.128],[3.53,.155]],
+    [[3.105,.535],[3.16,.56],[3.22,.565],[3.27,.545],[3.305,.53],[3.28,.565],[3.22,.592],[3.145,.572]],
+    [[3.705,.985],[3.73,1.05],[3.81,1.12],[3.91,1.08],[3.97,1.09],[3.90,1.115],
+        [3.81,1.15],[3.755,1.12],[3.715,1.07]],
+];
+const TREES = [[3.86,-.08],[3.89,-.045],[3.93,-.02],[4.03,-.13],[4.06,-.10],[3.585,.11],[3.61,.12],[3.16,.52],[3.19,.535],[3.23,.54],[3.43,.595],[3.47,.575],
+        [3.32,.87],[3.35,.895],[3.39,.92],[3.72,.86],[3.69,.89],[3.675,1.025],[3.71,1.085],[3.73,1.11],
+        [3.65,.35],[3.68,.38],[3.80,.39],[3.83,.36],[3.79,.14],[3.81,.17],[3.85,.215],[3.91,1.20],[3.97,1.23]] as const;
 const CLOUDS = [[3.04,.18,.085],[3.51,-.20,.11],[3.91,.09,.075],[3.33,.93,.095],[4.19,.67,.10]] as const;
 function polygon(ctx: CanvasRenderingContext2D, camera: MapCamera, points: Polygon, fill: string | CanvasGradient, dy = 0) {
     ctx.beginPath();
     points.forEach(([x,y], i) => { const p = mapToScreen({x,y: y + dy}, camera); if (i) ctx.lineTo(p.x,p.y); else ctx.moveTo(p.x,p.y); });
     ctx.closePath(); ctx.fillStyle = fill; ctx.fill();
 }
-/** A low earthen bank, with its water contact below the turf. Relief and lighting
- * belong to atlas space, so the return trip sees the same shore from the same sun.
- * Keep the original footprint: these are floodplain islands, not new terminals. */
-function paintBank(ctx: CanvasRenderingContext2D, camera: MapCamera, bank: Polygon, index: number, scale: number) {
-    const depth = .014;
-    polygon(ctx, camera, bank, 'rgba(30,65,62,.16)', depth + .009);
-    polygon(ctx, camera, bank, '#697e73', depth);
-    // Submerged shallows soften the water/soil junction without a white foam ring.
-    ctx.strokeStyle = 'rgba(151,186,167,.24)'; ctx.lineWidth = scale * .015; ctx.stroke();
-    // Only front-facing edges expose earth. The diagonal faces catch less light
-    // than the broad south bank, avoiding the old uniformly outlined cardboard rim.
-    bank.forEach(([x, y], i) => {
-        const [nx, ny] = bank[(i + 1) % bank.length];
-        if (nx >= x) return;
-        const shade = Math.abs(ny - y) > (x - nx) * .5 ? '#697967' : '#85836a';
-        polygon(ctx, camera, [[x,y],[nx,ny],[nx,ny+depth],[x,y+depth]], shade);
-    });
-    const top = Math.min(...bank.map(p => p[1])), bottom = Math.max(...bank.map(p => p[1]));
-    const a = mapToScreen({ x: bank[0][0], y: top }, camera), b = mapToScreen({ x: bank[0][0], y: bottom }, camera);
-    const turf = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
-    turf.addColorStop(0, index === 5 ? '#81998a' : '#a0ab8d');
-    turf.addColorStop(1, index === 5 ? '#708b7c' : '#839b80');
-    polygon(ctx, camera, bank, turf);
-    // Restrained sun-facing turf lip, not a luminous outline around every edge.
+function shorePath(ctx: CanvasRenderingContext2D, camera: MapCamera, shore: Shore, dy = 0) {
     ctx.beginPath();
-    bank.forEach(([x, y], i) => {
-        const [nx, ny] = bank[(i + 1) % bank.length];
-        if (nx <= x) return;
-        const a = mapToScreen({ x, y }, camera), b = mapToScreen({ x: nx, y: ny }, camera);
-        ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
-    });
-    ctx.strokeStyle = 'rgba(218,218,168,.36)'; ctx.lineWidth = scale * .002; ctx.stroke();
+    const start = mapToScreen({ x: shore.segments[0].start[0], y: shore.segments[0].start[1]+dy },camera);
+    ctx.moveTo(start.x,start.y);
+    for (const {start,control,end} of shore.segments) {
+        const a=mapToScreen({x:start[0],y:start[1]+dy},camera); ctx.lineTo(a.x,a.y);
+        const c = mapToScreen({x:control[0],y:control[1]+dy},camera), p = mapToScreen({x:end[0],y:end[1]+dy},camera);
+        ctx.quadraticCurveTo(c.x,c.y,p.x,p.y);
+    }
+    ctx.closePath();
+}
+/** A low earthen bank, with its water contact below the turf. Relief and lighting
+ * belong to atlas space, so the return trip sees the same shore from the same sun. */
+function paintBank(ctx: CanvasRenderingContext2D, camera: MapCamera, shore: Shore, index: number, scale: number) {
+    const depth = .014;
+    shorePath(ctx,camera,shore,depth+.009); ctx.fillStyle='rgba(30,65,62,.16)'; ctx.fill();
+    shorePath(ctx,camera,shore,depth); ctx.fillStyle='#85836a'; ctx.fill();
+    ctx.strokeStyle = 'rgba(151,186,167,.24)'; ctx.lineWidth = scale * .015; ctx.stroke();
+    // The lowered footprint supplies the sun-facing earth. Shade only steeper
+    // exposed faces, batched into one path per bank; keep their curved contour.
+    ctx.beginPath();
+    for (const run of shore.shadedRuns) {
+        const a=mapToScreen({x:run[0].start[0],y:run[0].start[1]},camera), d=depth*scale;
+        ctx.moveTo(a.x,a.y);
+        for (const {control,end} of run) {
+            const c=mapToScreen({x:control[0],y:control[1]},camera), b=mapToScreen({x:end[0],y:end[1]},camera);
+            ctx.quadraticCurveTo(c.x,c.y,b.x,b.y);
+        }
+        const end=run[run.length-1].end, b=mapToScreen({x:end[0],y:end[1]},camera);
+        ctx.lineTo(b.x,b.y+d);
+        for (let i=run.length-1;i>=0;i--) {
+            const {start,control}=run[i], c=mapToScreen({x:control[0],y:control[1]},camera), a=mapToScreen({x:start[0],y:start[1]},camera);
+            ctx.quadraticCurveTo(c.x,c.y+d,a.x,a.y+d);
+        }
+        ctx.closePath();
+    }
+    ctx.fillStyle='#697967'; ctx.fill();
+    const a=mapToScreen({x:0,y:shore.top},camera), b=mapToScreen({x:0,y:shore.bottom},camera);
+    const turf=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+    turf.addColorStop(0,index===4?'#81998a':'#a0ab8d');
+    turf.addColorStop(1,index===4?'#708b7c':'#839b80');
+    shorePath(ctx,camera,shore); ctx.fillStyle=turf; ctx.fill();
+    ctx.beginPath();
+    for (const run of shore.litRuns) {
+        const a=mapToScreen({x:run[0].start[0],y:run[0].start[1]},camera); ctx.moveTo(a.x,a.y);
+        for (const {control,end} of run) {
+            const c=mapToScreen({x:control[0],y:control[1]},camera), b=mapToScreen({x:end[0],y:end[1]},camera);
+            ctx.quadraticCurveTo(c.x,c.y,b.x,b.y);
+        }
+    }
+    ctx.strokeStyle='rgba(218,218,168,.36)'; ctx.lineWidth=scale*.002; ctx.stroke();
 }
 /** Ground first, then the existing airport artwork. Runways and scenery therefore
  * retain their existing ownership/layering; this never changes water-state art. */
@@ -82,23 +138,30 @@ export function paintFlightLandscape(ctx: CanvasRenderingContext2D, camera: MapC
     ctx.save();
     const scale = Math.min(camera.width / 1.6, camera.height) * camera.zoom;
     BANK_SHORES.forEach((bank, i) => paintBank(ctx, camera, bank, i, scale));
-    FIELDS.forEach((field, i) => polygon(ctx, camera, field, ['#a5b08c','#789989','#b8b28b'][i % 3]));
+    SILT.forEach(bank => polygon(ctx,camera,bank,'rgba(192,184,137,.38)'));
+    FIELDS.forEach((field, i) => polygon(ctx, camera, field, ['#a5b08c','#b3b18a','#789989'][i % 3]));
     // Quiet rows on the cultivated floodplain. Gaps between banks remain canals.
     for (let i = 0; i < 5; i++) {
         const a = mapToScreen({x:3.47 + i*.025,y:.88-i*.018}, camera);
         const b = mapToScreen({x:3.56 + i*.025,y:.91-i*.018}, camera);
         ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
-        ctx.strokeStyle='rgba(67,105,86,.22)';ctx.lineWidth=2;ctx.stroke();
+        ctx.strokeStyle='rgba(67,105,86,.22)';ctx.lineWidth=scale*.003;ctx.stroke();
     }
     // Sparse low trees/reeds use the same top-lit, shallow isometric relief as
     // the islands. Authored clusters, not per-frame random noise.
-    for (const [x,y] of [[3.84,-.08],[3.87,-.04],[3.91,-.02],[4.03,-.13],[4.06,-.11],[3.53,.15],[3.55,.17],[3.18,.55],[3.21,.57],[3.25,.58],[3.45,.61],[3.48,.58],
-        [3.32,.87],[3.35,.90],[3.38,.92],[3.70,.87],[3.68,.90],
-        [3.65,.35],[3.68,.38],[3.80,.39],[3.83,.36],[3.91,1.13],[3.97,1.16]] as const) {
-        const p = mapToScreen({x,y},camera), r=scale*.008;
-        ctx.fillStyle='rgba(34,67,56,.20)';ctx.beginPath();ctx.ellipse(p.x+r,p.y+r,r*1.8,r*.65,0,0,Math.PI*2);ctx.fill();
-        ctx.fillStyle='#527965';ctx.beginPath();ctx.ellipse(p.x,p.y-r*.65,r,r*1.25,0,0,Math.PI*2);ctx.fill();
-        ctx.fillStyle='#759780';ctx.beginPath();ctx.ellipse(p.x-r*.25,p.y-r*1.15,r*.7,r*.75,0,0,Math.PI*2);ctx.fill();
+    const trees = TREES.map(([x,y])=>mapToScreen({x,y},camera));
+    const r=scale*.008;
+    // Three bounded compound paths keep the authored foliage cheap, even when
+    // the static reduced-motion camera can see the entire river landscape.
+    for (const [color,dx,dy,rx,ry] of [
+        ['rgba(34,67,56,.20)',1,1,1.8,.65],['#527965',0,-.65,1,1.25],['#759780',-.25,-1.15,.7,.75],
+    ] as const) {
+        ctx.fillStyle=color; ctx.beginPath();
+        for (const p of trees) {
+            ctx.moveTo(p.x+(dx+rx)*r,p.y+dy*r);
+            ctx.ellipse(p.x+dx*r,p.y+dy*r,rx*r,ry*r,0,0,Math.PI*2);
+        }
+        ctx.fill();
     }
     // Northern foothills stay in the atlas north of the floodplain, never scrolling
     // into a runway as a screen-space decoration.

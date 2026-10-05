@@ -15,7 +15,7 @@ test('fixed finite geography is deterministic and independent of trip direction 
     const a=recorder(),b=recorder();paintFlightLandscape(a.ctx,camera);paintFlightLandscape(b.ctx,camera);
     assert.deepEqual(a.calls,b.calls);
     assert.ok(FLIGHT_BANKS.flat().every(p=>p.every(Number.isFinite)));
-    assert.ok(a.calls.length<1200,'bounded landscape work including seven shoreline materials');
+    assert.ok(a.calls.length<1200,'bounded landscape work including rounded shores, relief and batched foliage');
     assert.equal(a.calls.filter(c=>c[0]==='save').length,a.calls.filter(c=>c[0]==='restore').length);
 });
 test('bank lighting and water contact stay attached to atlas geography as the camera pans',()=>{
@@ -56,4 +56,49 @@ test('atmosphere is absent on runways and reduced motion excludes directional sp
     paintFlightAtmosphere(air.ctx,camera,sampleAircraftTravel(route,4));
     assert.equal(air.calls.filter(c=>c[0]==='lineTo').length,3);
     assert.equal(air.calls.filter(c=>c[0]==='save').length,air.calls.filter(c=>c[0]==='restore').length);
+});
+
+type Point=readonly [number,number];
+function contains(bank:readonly Point[],point:Point):boolean {
+    let inside=false;
+    for(let i=0,j=bank.length-1;i<bank.length;j=i++) {
+        const [x,y]=bank[i],[px,py]=bank[j];
+        if((y>point[1])!==(py>point[1]) && point[0]<(px-x)*(point[1]-y)/(py-y)+x) inside=!inside;
+    }
+    return inside;
+}
+const cross=(a:Point,b:Point,c:Point)=>(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
+test('authored floodplain has distinct shoal, spit and connected banks without crossing shorelines',()=>{
+    const areas=FLIGHT_BANKS.map(bank=>Math.abs(bank.reduce((sum,a,i)=>{
+        const b=bank[(i+1)%bank.length]; return sum+a[0]*b[1]-b[0]*a[1];
+    },0))/2);
+    assert.ok(Math.min(...areas)<Math.max(...areas)*.08,'the upstream shoal stays subordinate to the broad bank');
+    const concave=FLIGHT_BANKS.filter(bank=>bank.some((a,i)=>cross(a,bank[(i+1)%bank.length],bank[(i+2)%bank.length])<-.0001));
+    assert.ok(concave.length>=3,'inlets and headlands break the repeated convex tile silhouette');
+    for(const bank of FLIGHT_BANKS) for(let i=0;i<bank.length;i++) for(let j=i+2;j<bank.length;j++) {
+        if(i===0 && j===bank.length-1) continue;
+        const a=bank[i],b=bank[(i+1)%bank.length],c=bank[j],d=bank[(j+1)%bank.length];
+        assert.ok(!(cross(a,b,c)*cross(a,b,d)<0 && cross(c,d,a)*cross(c,d,b)<0),'shoreline must not cross itself');
+    }
+});
+test('river corridor remains open through the composed banks',()=>{
+    const channel:Point[]=[[3.0,.25],[3.35,.28],[3.55,.30],[3.57,.45],[3.63,.52],[3.80,.60],[4.0,.70]];
+    for(let i=0;i<channel.length-1;i++) for(let step=0;step<=20;step++) {
+        const t=step/20,a=channel[i],b=channel[i+1];
+        const p:Point=[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];
+        assert.ok(FLIGHT_BANKS.every(bank=>!contains(bank,p)),`water corridor blocked at ${p}`);
+    }
+});
+test('rounded shores retain world-space control points and batch material fills',()=>{
+    const a=recorder(),b=recorder(); paintFlightLandscape(a.ctx,camera);
+    paintFlightLandscape(b.ctx,{...camera,zoom:camera.zoom*.4});
+    const curves=(calls:unknown[][])=>calls.filter(c=>c[0]==='quadraticCurveTo');
+    assert.ok(curves(a.calls).length>0);
+    curves(a.calls).forEach((curve,i)=>{
+        for(let coordinate=1;coordinate<=4;coordinate++) {
+            const center=coordinate%2?camera.width/2:camera.height/2;
+            assert.ok(Math.abs(Number(curves(b.calls)[i][coordinate])-center-(Number(curve[coordinate])-center)*.4)<1e-8);
+        }
+    });
+    assert.ok(a.calls.filter(c=>c[0]==='fill').length<40,'shore materials and foliage use compound fills');
 });
