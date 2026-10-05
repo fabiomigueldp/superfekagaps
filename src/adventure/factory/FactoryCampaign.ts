@@ -2,6 +2,7 @@ import { WorldGame } from '../WorldGame';
 import { FactorySalonSession } from './FactorySalonSession';
 import { atFactorySalon, FACTORY_SALON, recordSalonVictory } from './FactorySalon';
 import { drawFactorySalon } from './FactorySalonArt';
+import { LabToolbarAction } from '../experimental/JuiceLabToolbar';
 import './factory-salon.css';
 
 /** Suspends the live campaign instead of copying or reloading its run/save. */
@@ -51,15 +52,17 @@ export class FactoryCampaign extends WorldGame {
         const lab = new FactorySalonSession(canvas, nativeStatus); this.salon = lab;
         lab.inheritCampaignAudio(this.audio);
         document.title = 'Super Feka Gaps · Salão da Fábrica';
-        const button = (label: string, run: () => void) => {
-            const b = document.createElement('button'); b.textContent = label;
-            b.addEventListener('click', () => { run(); if (this.salon) canvas.focus(); }); nav.append(b); return b;
+        const button = (label: string, name: string, run: () => void, primary = false) => {
+            const b = document.createElement('button');
+            const art = new LabToolbarAction(b, primary); art.setLabel(label, name);
+            b.addEventListener('click', () => { run(); if (this.salon) canvas.focus(); }); nav.append(b);
+            return { control: b, art };
         };
-        const pose = button('Apresentar pose', () => lab.presentIntro());
-        const skip = button('Pular cena', () => { if (lab.labMode === 'intro') lab.skipIntro(); else lab.epilogue.skip(); });
-        const retry = button('Tentar novamente', () => lab.load('juice-lab'));
-        const pause = button('Pausar', () => lab.toggleLabPause());
-        button('Voltar à fase', () => this.leaveSalon());
+        const { control: pose } = button('POSE', 'Apresentar pose', () => lab.presentIntro(), true);
+        const { control: skip } = button('PULAR CENA', 'Pular cena', () => { if (lab.labMode === 'intro') lab.skipIntro(); else lab.epilogue.skip(); });
+        const { control: retry } = button('REINICIAR', 'Reiniciar tentativa', () => lab.load('juice-lab'));
+        const { art: pause } = button('PAUSA', 'Pausar', () => lab.toggleLabPause());
+        button('VOLTAR', 'Voltar à fase', () => this.leaveSalon());
         shell.addEventListener('keydown', e => {
             // Input captures keys first. Keep the two WorldGame menu listeners from
             // handling one Escape twice or resuming the suspended campaign.
@@ -75,7 +78,7 @@ export class FactoryCampaign extends WorldGame {
             pose.hidden = lab.intro?.beat !== 'prepare';
             skip.hidden = lab.labMode !== 'intro' && (!lab.epilogue.frame || lab.victorious);
             retry.hidden = lab.labMode === 'intro' || !!lab.epilogue.frame;
-            pause.textContent = lab.state === 'paused' ? 'Continuar' : 'Pausar';
+            pause.setLabel(lab.state === 'paused' ? 'CONTINUAR' : 'PAUSA', lab.state === 'paused' ? 'Continuar' : 'Pausar');
             lab.reflectCampaignStatus(status, nativeStatus.textContent ?? '');
         };
         this.reflect(); canvas.focus();
