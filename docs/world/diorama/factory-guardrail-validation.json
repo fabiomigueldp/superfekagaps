@@ -1,0 +1,297 @@
+{
+  "baseCommit": "e6c3dfc7d2db6d06194b04a6f857c357df442a4f",
+  "scope": "Factory ramp guardrail mounting shoes and short ties only",
+  "source": {
+    "tools/diorama/factory_enrichment.py": "1428af108df6c97ab4baf6755b6d2aa06f74f68048886bf79ce94c001e0ce28e",
+    "tools/diorama/check_factory_guardrail_mounts.py": "b03f817ea99d277c75522f3c1c2a09227828e49e323cf6d7baeaf9cff027b466"
+  },
+  "baseline": {
+    "connectedChains": 0,
+    "postCount": 12,
+    "vertexToSlabGapRange": [
+      0.052,
+      0.11894
+    ]
+  },
+  "candidateContactAudit": {
+    "method": "World-space BVH intersections of evaluated mesh triangles; no AABB-only approval",
+    "postCount": 12,
+    "socketCount": 12,
+    "outriggerCount": 12,
+    "connectedCount": 12,
+    "posts": [
+      {
+        "post": "maintenance rail upright",
+        "slab": "walk_dry maintenance catwalk",
+        "socket": "enrich_ramp_guardrail_mounts guardrail post socket.006",
+        "outrigger": "enrich_ramp_guardrail_mounts guardrail slab outrigger.006",
+        "unchangedUprightToSlabVertexGap": 0.055295,
+        "intersectingTrianglePairs": {
+          "postToSocket": 14,
+          "socketToOutrigger": 34,
+          "outriggerToSlab": 32
+        },
+        "connected": true
+      },
+      {
+        "post": "maintenance rail upright.001",
+        "slab": "walk_dry maintenance catwalk",
+        "socket": "enrich_ramp_guardrail_mounts guardrail post socket.007",
+        "outrigger": "enrich_ramp_guardrail_mounts guardrail slab outrigger.007",
+        "unchangedUprightToSlabVertexGap": 0.056334,
+        "intersectingTrianglePairs": {
+          "postToSocket": 17,
+          "socketToOutrigger": 43,
+          "outriggerToSlab": 41
+        },
+        "connected": true
+      },
+      {
+        "post": "maintenance rail upright.002",
+        "slab": "walk_dry maintenance catwalk",
+        "socket": "enrich_ramp_guardrail_mounts guardrail post socket.008",
+        "outrigger": "enrich_ramp_guardrail_mounts guardrail slab outrigger.008",
+        "unchangedUprightToSlabVertexGap": 0.057506,
+        "intersectingTrianglePairs": {
+          "postToSocket": 19,
+          "socketToOutrigger": 23,
+          "outriggerToSlab": 20
+        },
+        "connected": true
+      },
+      {
+        "post": "maintenance rail upright.003",
+        "slab": "walk_dry maintenance catwalk",
+        "socket": "enrich_ramp_guardrail_mounts guardrail post socket.009",
+        "outrigger": "enrich_ramp_guardrail_mounts guardrail slab outrigger.009",
+        "unchangedUprightToSlabVertexGap": 0.097891,
+        "intersectingTrianglePairs": {
+          "postToSocket": 18,
+          "socketToOutrigger": 26,
+          "outriggerToSlab": 24
+        },
+        "connected": true
+      },
+      {
+        "post": "maintenance rail upright.004",
+        "slab": "walk_dry maintenance catwalk",
+        "socket": "enrich_ramp_guardrail_mounts guardrail post socket.010",
+        "outrigger": "enrich_ramp_guardrail_mounts guardrail slab outrigger.010",
+        "unchangedUprightToSlabVertexGap": 0.100709,
+        "intersectingTrianglePairs": {
+          "postToSocket": 18,
+          "socketToOutrigger": 26,
+          "outriggerToSlab": 22
+        },
+        "connected": true
+      },
+      {
+        "post": "maintenance rail upright.005",
+        "slab": "walk_dry maintenance catwalk",
+        "socket": "enrich_ramp_guardrail_mounts guardrail post socket.011",
+        "outrigger": "enrich_ramp_guardrail_mounts guardrail slab outrigger.011",
+        "unchangedUprightToSlabVertexGap": 0.103429,
+        "intersectingTrianglePairs": {
+          "postToSocket": 16,
+          "socketToOutrigger": 26,
+          "outriggerToSlab": 22
+        },
+        "connected": true
+      },
+      {
+        "post": "quality access rail upright",
+        "slab": "walk_main inspection lane 3",
+        "socket": "enrich_ramp_guardrail_mounts guardrail post socket",
+        "outrigger": "enrich_ramp_guardrail_mounts guardrail slab outrigger",
+        "unchangedUprightToSlabVertexGap": 0.05203,
+        "intersectingTrianglePairs": {
+          "postToSocket": 14,
+          "socketToOutrigger": 20,
+          "outriggerToSlab": 20
+        },
+        "connected": true
+      },
+      {
+        "post": "quality access rail upright.001",
+        "slab": "walk_main inspection lane 3",
+        "socket": "enrich_ramp_guardrail_mounts guardrail post socket.001",
+        "outrigger": "enrich_ramp_guardrail_mounts guardrail slab outrigger.001",
+        "unchangedUprightToSlabVertexGap": 0.052,
+        "intersectingTrianglePairs": {
+          "postToSocket": 13,
+          "socketToOutrigger": 30,
+          "outriggerToSlab": 32
+        },
+        "connected": true
+      },
+      {
+        "post": "quality access rail upright.002",
+        "slab": "walk_main inspection lane 3",
+        "socket": "enrich_ramp_guardrail_mounts guardrail post socket.002",
+        "outrigger": "enrich_ramp_guardrail_mounts guardrail slab outrigger.002",
+        "unchangedUprightToSlabVertexGap": 0.053003,
+        "intersectingTrianglePairs": {
+          "postToSocket": 14,
+          "socketToOutrigger": 18,
+          "outriggerToSlab": 20
+        },
+        "connected": true
+      },
+      {
+        "post": "quality access rail upright.003",
+        "slab": "walk_main inspection lane 3",
+        "socket": "enrich_ramp_guardrail_mounts guardrail post socket.003",
+        "outrigger": "enrich_ramp_guardrail_mounts guardrail slab outrigger.003",
+        "unchangedUprightToSlabVertexGap": 0.11894,
+        "intersectingTrianglePairs": {
+          "postToSocket": 15,
+          "socketToOutrigger": 24,
+          "outriggerToSlab": 30
+        },
+        "connected": true
+      },
+      {
+        "post": "quality access rail upright.004",
+        "slab": "walk_main inspection lane 3",
+        "socket": "enrich_ramp_guardrail_mounts guardrail post socket.004",
+        "outrigger": "enrich_ramp_guardrail_mounts guardrail slab outrigger.004",
+        "unchangedUprightToSlabVertexGap": 0.085295,
+        "intersectingTrianglePairs": {
+          "postToSocket": 15,
+          "socketToOutrigger": 24,
+          "outriggerToSlab": 26
+        },
+        "connected": true
+      },
+      {
+        "post": "quality access rail upright.005",
+        "slab": "walk_main inspection lane 3",
+        "socket": "enrich_ramp_guardrail_mounts guardrail post socket.005",
+        "outrigger": "enrich_ramp_guardrail_mounts guardrail slab outrigger.005",
+        "unchangedUprightToSlabVertexGap": 0.062446,
+        "intersectingTrianglePairs": {
+          "postToSocket": 14,
+          "socketToOutrigger": 20,
+          "outriggerToSlab": 26
+        },
+        "connected": true
+      }
+    ]
+  },
+  "sceneComparison": {
+    "objectCount": 1055,
+    "changedObjects": [],
+    "addedObjects": [
+      "enrich_ramp_guardrail_mounts guardrail post socket",
+      "enrich_ramp_guardrail_mounts guardrail post socket.001",
+      "enrich_ramp_guardrail_mounts guardrail post socket.002",
+      "enrich_ramp_guardrail_mounts guardrail post socket.003",
+      "enrich_ramp_guardrail_mounts guardrail post socket.004",
+      "enrich_ramp_guardrail_mounts guardrail post socket.005",
+      "enrich_ramp_guardrail_mounts guardrail post socket.006",
+      "enrich_ramp_guardrail_mounts guardrail post socket.007",
+      "enrich_ramp_guardrail_mounts guardrail post socket.008",
+      "enrich_ramp_guardrail_mounts guardrail post socket.009",
+      "enrich_ramp_guardrail_mounts guardrail post socket.010",
+      "enrich_ramp_guardrail_mounts guardrail post socket.011",
+      "enrich_ramp_guardrail_mounts guardrail slab outrigger",
+      "enrich_ramp_guardrail_mounts guardrail slab outrigger.001",
+      "enrich_ramp_guardrail_mounts guardrail slab outrigger.002",
+      "enrich_ramp_guardrail_mounts guardrail slab outrigger.003",
+      "enrich_ramp_guardrail_mounts guardrail slab outrigger.004",
+      "enrich_ramp_guardrail_mounts guardrail slab outrigger.005",
+      "enrich_ramp_guardrail_mounts guardrail slab outrigger.006",
+      "enrich_ramp_guardrail_mounts guardrail slab outrigger.007",
+      "enrich_ramp_guardrail_mounts guardrail slab outrigger.008",
+      "enrich_ramp_guardrail_mounts guardrail slab outrigger.009",
+      "enrich_ramp_guardrail_mounts guardrail slab outrigger.010",
+      "enrich_ramp_guardrail_mounts guardrail slab outrigger.011"
+    ],
+    "onlyTwentyFourSmallRailMountsAdded": true,
+    "allOtherGeometryTransformsAndMaterialSlotsExact": true,
+    "cameraAndLightingExact": true,
+    "metadataExactBetweenBuilds": true,
+    "publishedAnchorAndRouteContractExact": true
+  },
+  "clearance": {
+    "route": {
+      "method": "Read-only rays at route center and both edges, every <=0.13 world unit. Support is an authored walk_ surface within 0.16 under the foot; headroom checked to0.88.",
+      "sampleCount": 660,
+      "headroomRayCount": 660,
+      "supportRayCount": 660,
+      "obstructionCount": 0,
+      "unsupportedCount": 0,
+      "maxAdjacentSampleRise": 0.0793,
+      "obstructions": [],
+      "unsupported": []
+    },
+    "projection": {
+      "method": "Actual camera-facing ray intersections from actor silhouette samples, rather than overlapping screen bounding boxes. Every route step uses three lateral samples and four body heights.",
+      "actorWorldEnvelope": {
+        "halfWidth": 0.26,
+        "height": 0.98,
+        "lowestTestHeight": 0.22
+      },
+      "sampleCount": 2640,
+      "conflictCount": 0,
+      "conflicts": []
+    }
+  },
+  "billboard": {
+    "method": "Foreground camera-directed rays through each measured upright projected actor rectangle. Three horizontal samples and five vertical body fractions at every <=0.13 world-unit route step. Rear geometry is excluded by ray direction; support/guardrail contacts are reported separately, never silently discarded.",
+    "scope": "Five stage selections, opening factors 0.84 and 1, fitted close/panorama targets. Does not claim a universal bound over arbitrary tiny viewports or resize/camera interpolation transients.",
+    "footNote": "The lowest billboard sample is10% of its height. Foot raster overshoot belongs to the independent world support test. Rectangle edge contacts are conservative and need the actual sprite browser review.",
+    "sampleCount": 52800,
+    "equipmentContactCount": 0,
+    "pathEdgeContactCount": 449
+  },
+  "render": {
+    "engine": "Blender 4.3.2 Cycles",
+    "samples": 192,
+    "size": [
+      1920,
+      1200
+    ],
+    "webpQuality": 91,
+    "webpMethod": 6,
+    "alphaBoundsPx": [
+      246,
+      196,
+      1602,
+      1094
+    ],
+    "frameEdgesTransparent": true,
+    "alphaExactAgainstBaselineRender": false,
+    "alphaExactAgainstPublishedAsset": false,
+    "alphaDifferenceFromBaseline": {
+      "changedPixels": 2,
+      "maxByteDelta": 1,
+      "note": "Two distant inspection-booth antialias pixels differ by one alpha byte; silhouette bounds and transparent frame edges remain exact."
+    },
+    "webpAlphaExactAgainstPng": true
+  },
+  "assets": {
+    "fabrica-diorama.webp": {
+      "oldBytes": 174128,
+      "bytes": 167644,
+      "deltaBytes": -6484,
+      "sha256": "9d4852556bb9aa88cc7601076e6c3b3e3e4e1b873d19a51705591cd8ec38eb32"
+    },
+    "fabrica-diorama.meta.json": {
+      "unchanged": true,
+      "sha256": "042d6d20b289a3282784b4b706a82bc995d9d01e69320bd22798ee5999cde12b"
+    },
+    "campaignAirportOverlayUnchanged": true,
+    "campaignAirportMetadataUnchanged": true
+  },
+  "proofImages": {
+    "factory-guardrail-before-after.jpg": "28f2e7aeaeeaf3d050d3d3fadd32e796ab66592d1bf615b1fceea63c04c67c73",
+    "factory-full-campaign-before-after.jpg": "d5063999294e5f9d6339cf5100631106d2a25c8d5079bbf460167d462f594571"
+  },
+  "browserVerification": "Not run; browser retry blocked. Native Blender and packaged-overlay compositing proof only.",
+  "focusedTests": {
+    "command": "node --import tsx --test tests/world-map-assets.test.ts tests/world-atlas-art.test.ts tests/world-map-integration.test.ts",
+    "passed": 185,
+    "failed": 0
+  }
+}

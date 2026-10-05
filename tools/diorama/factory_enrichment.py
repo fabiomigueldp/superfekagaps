@@ -103,6 +103,26 @@ def apply(ns):
      for dx in [-.15,.15]:beam('roof header trestle leg',(x+dx,3.2,3.02),(x+dx,3.2,3.86),.035,blue)
      beam('roof header trestle top',(x-.20,3.2,3.83),(x+.20,3.2,3.83),.045,blue)
      beam('roof trestle diagonal',(x-.15,3.2,3.10),(x+.15,3.2,3.78),.023,blue)
+    # Guardrail posts stand 0.08 units outside their ramp edges. Compact
+    # socket shoes and transverse ties connect them to the supported ramp
+    # slabs instead of leaving their lower ends suspended beside the lane.
+    # Existing posts, ramps, landings and route coordinates remain exact.
+    group='ramp_guardrail_mounts'
+    bpy.context.view_layer.update();deps=bpy.context.evaluated_depsgraph_get()
+    for a,b,width,slab_name in [(ns['MAIN'][3][1],ns['MAIN'][3][2],1.04,'walk_main inspection lane 3'),(ns['SECRET'][1],ns['SECRET'][2],.80,'walk_dry maintenance catwalk')]:
+     a,b=Vector(a),Vector(b);side=Vector((-(b-a).y,(b-a).x,0)).normalized()
+     slab=bpy.data.objects[slab_name].evaluated_get(deps)
+     for sg in [-1,1]:
+      for t in [.12,.5,.86]:
+       p=a.lerp(b,t);outer=p+side*(width/2+.08)*sg;inner=p+side*(width/2-.045)*sg
+       beam('guardrail post socket',outer-Vector((0,0,.10)),outer+Vector((0,0,.035)),.044,blue)
+       # Mitered ramp edges are not all at the route center's z. Seat the
+       # inner tip into the actual slab rather than guessing that height.
+       hit,contact,normal,face=slab.ray_cast(slab.matrix_world.inverted()@(inner+Vector((0,0,.5))),Vector((0,0,-1)),distance=1)
+       assert hit,'Missing ramp support for guardrail mount'
+       inner.z=(slab.matrix_world@contact).z-.045
+       beam('guardrail slab outrigger',inner,outer-Vector((0,0,.060)),.038,blue)
+    group='anchored_pipework'
     # Visible anchored process connection links the side of the small vessel to the line.
     curve('mixing to filling copper feed',[(-1.57,1.32,2.57),(-1.92,1.32,2.57),(-2.08,1.32,2.41),(-2.51,1.05,2.41)],.065,copper)
     for x,y,z in [(-1.89,1.32,2.57),(-2.3,1.15,2.41)]:torus('feed flange',(x,y,z),.09,.025,copperhi,(0,math.pi/2,0))
