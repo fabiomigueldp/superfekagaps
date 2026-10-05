@@ -5,7 +5,10 @@ import { runGuairaFlight } from '../src/adventure/WorldGuairaFlight';
 
 class Element extends EventTarget {
     attributes = new Map<string, string>();
-    children: Element[] = []; textContent = ''; disabled = false; hidden = false; removed = false;
+    children: Element[] = []; className = ''; private text = '';
+    get textContent(): string { return this.text + this.children.map(child => child.textContent).join(''); }
+    set textContent(value: string) { this.text = value; this.children = []; }
+    disabled = false; hidden = false; removed = false;
     append(...children: Element[]) { this.children.push(...children); }
     setAttribute(name: string, value: string) { this.attributes.set(name, value); } showModal() {} close() {} remove() { this.removed = true; }
     getContext() { return null; }
@@ -34,14 +37,16 @@ test('flight skip, cancel and failed-save retry commit only a confirmed arrival'
     await ready();
     const dialog = document.body.children.at(-1)!, skip = dialog.children[2].children[0];
     assert.equal(skip.disabled, false);
-    assert.equal(dialog.children[3].textContent, 'Fábrica → Guaíra');
-    assert.equal(dialog.children[1].attributes.get('aria-atomic'), 'true');
+    assert.equal(dialog.children[1].children[0].textContent, 'Fábrica → Guaíra');
+    assert.equal(dialog.children[1].children[1].attributes.get('aria-atomic'), 'true');
     assert.equal(dialog.children[2].attributes.get('aria-label'), 'Controles da viagem');
-    assert.equal(dialog.children[2].children[1].textContent, 'Cancelar voo');
+    assert.equal(dialog.children[2].children[1].textContent, 'Cancelar voo e voltar para Fábrica');
     assert.match(dialog.children[2].children[1].attributes.get('aria-label')!, /voltar para Fábrica/);
     assert.equal(dialog.attributes.get('data-ready'), 'true');
     skip.click(); assert.equal(attempts, 1); assert.equal(committed, 0); assert.equal(dialog.removed, false);
-    assert.match(dialog.children[1].textContent, /Não foi possível salvar/);
+    assert.match(dialog.children[1].children[1].textContent, /Não foi possível salvar/);
+    assert.equal(skip.attributes.get('aria-label'), 'Tentar salvar e continuar');
+    assert.equal(skip.children[1].textContent, 'Tentar salvar e continuar');
     assert.equal(dialog.children[0].attributes.get('style'), 'opacity: 1', 'failed save restores the scenic image');
     storageReady = true; skip.click(); skip.click(); cleanup();
     assert.equal(committed, 1); assert.equal(canceled, 0); assert.equal(dialog.removed, true);
