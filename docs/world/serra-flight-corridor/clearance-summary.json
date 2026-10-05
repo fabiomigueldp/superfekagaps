@@ -1,0 +1,55 @@
+{
+  "sourceSha256": "9e915c0fff2e36df64f4fece84529c0aee8088868f3337acf97186c1fc70a7d4",
+  "sampledPoseCount": 890,
+  "sourcePropsIncludingWalkDecks": 3916,
+  "aircraftPartsAndArticulationEnvelopes": 51,
+  "propCollisionSamples": 0,
+  "unresolvedPropMargins": 0,
+  "conservativePropMarginMeters": 0.05,
+  "changedPosesCheckedAgainstEachOtherScene": 565,
+  "otherScenes": [
+    "guaira",
+    "fabrica"
+  ],
+  "otherSceneNewContacts": 0,
+  "authoredWheelContactSamples": 615,
+  "unsupportedAuthoredWheelContacts": 0,
+  "maximumAuthoredWheelGapMeters": 0,
+  "sourcePolygonTopology": {
+    "boundaryEdges": 0,
+    "nonManifoldEdges": 0,
+    "directedEdgeMismatches": 0
+  },
+  "nonWheelTerrainContacts": 0,
+  "minimumNonWheelVerticalSeparationMeters": 0.009804844856262207,
+  "billboardWheelMeshContactLimit": {
+    "part": "tailwheel",
+    "route": "guaira to serra",
+    "seconds": 6.216666666666667,
+    "maximumVerticalIntrusionMeters": 0.0802384614944458,
+    "scope": "Reconstructed tyre/tailwheel meshes, including a small takeoff/approach window; authored wheel-center support is a distinct model."
+  },
+  "pillarDepth": {
+    "witnessFrames": 10,
+    "sharedRays": 11538,
+    "aircraftBehindSamples": 0,
+    "minimumWholeObjectForegroundGap": 0.7555370330810547,
+    "minimumSharedRayForegroundGap": 2.795381546020508
+  },
+  "retainedTessellationDiagnostic": {
+    "oppositeTinyTrianglePairAreaEach": 1.85996e-07,
+    "location": [
+      1.645,
+      -5.369,
+      -0.199
+    ],
+    "triangleEdgeIncidenceWarningCount": 1,
+    "meaning": "Closed, consistently oriented polygon shell; one cancelling bottom-toe n-gon tessellation pair remains. It is unrelated to the support top or aircraft corridor."
+  },
+  "limits": [
+    "Calibrated authored billboard/source embedding, not gameplay physics.",
+    "60 Hz pose sampling is not continuous swept-time coverage.",
+    "Ground support and tyre contact are separate from the 5 cm solid-prop margin.",
+    "Native screenshots and videos do not establish browser/device behavior or performance."
+  ]
+}

@@ -40,8 +40,13 @@ class Surface {
 function inputHarness(t: TestContext) {
   class Element extends Surface {
     id = '';
+    open = false;
+    dialog: Element | null = null;
     constructor(private editable = false) { super(); }
-    closest(): Element | null { return this.editable ? this : null; }
+    closest(selector: string): Element | null {
+      if (selector === 'dialog[open]') return this.dialog?.open ? this.dialog : null;
+      return this.editable && selector.includes('[contenteditable]') ? this : null;
+    }
     getBoundingClientRect() { return { left: 0, top: 0, width: 100, height: 100 }; }
   }
   const canvas = new Element();
@@ -69,7 +74,7 @@ function inputHarness(t: TestContext) {
       touches: points.map(([clientX, clientY], identifier) => ({ identifier, clientX, clientY, target: canvas }))
     });
   };
-  return { input, key, touch, canvas, windowSurface, documentSurface, editable: new Element(true) };
+  return { input, key, touch, canvas, windowSurface, documentSurface, editable: new Element(true), dialog: new Element() };
 }
 
 test('touch ground pound has a press edge and can be combined with direction', (t) => {
@@ -218,11 +223,30 @@ test('D accepts the typed character when code differs and recovers from stale ke
 test('the gameplay canvas accepts D while ordinary editable fields stay isolated', (t) => {
   const { input, key, canvas, editable, windowSurface } = inputHarness(t);
   canvas.id = 'game-canvas';
-  canvas.closest = () => canvas;
+  // Simulate editable ancestry only, never an unrelated native modal or button.
+  canvas.closest = (selector: string) => selector.includes('[contenteditable]') ? canvas : null;
+  assert.equal(canvas.closest('dialog[open]'), null);
   key('keydown', 'KeyD', { key: 'd' });
   assert.equal(input.getState().right, true);
   key('keyup', 'KeyD', { key: 'd' });
   windowSurface.emit('keydown', { code: 'KeyD', key: 'd', target: editable, repeat: false, preventDefault() {} });
+  assert.equal(input.getState().right, false);
+});
+
+test('gameplay canvas keys yield only to their actual open dialog and resume after dismissal', (t) => {
+  const { input, key, canvas, dialog } = inputHarness(t);
+  canvas.id = 'game-canvas';
+  dialog.open = true;
+  key('keydown', 'KeyD', { key: 'd' });
+  assert.equal(input.getState().right, true, 'An unrelated open dialog does not suppress this target');
+  key('keyup', 'KeyD', { key: 'd' });
+  canvas.dialog = dialog;
+  assert.equal(key('keydown', 'KeyD', { key: 'd' }), false, 'Native modal input retains its default');
+  assert.equal(input.getState().right, false, 'An actual dialog ancestor owns this key');
+  dialog.open = false;
+  key('keydown', 'KeyD', { key: 'd' });
+  assert.equal(input.getState().right, true, 'Closing the dialog restores fresh gameplay input');
+  key('keyup', 'KeyD', { key: 'd' });
   assert.equal(input.getState().right, false);
 });
 

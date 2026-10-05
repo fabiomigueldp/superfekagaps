@@ -136,3 +136,13 @@ test('opposite-terminal snapshots ignore extra trajectory options', () => {
         }
     }
 });
+
+
+test('offshore climb options reject malformed flags', () => {
+    for (const flag of [null, 1, 'true', {}]) {
+        for (const key of ['departureOffshoreClimb', 'arrivalOffshoreClimb']) {
+            const invalid = { ...route, runwayCorridors: { departure: .6, arrival: 1, [key]: flag } };
+            assert.equal(validAircraftRoute(invalid), false);
+        }
+    }
+});

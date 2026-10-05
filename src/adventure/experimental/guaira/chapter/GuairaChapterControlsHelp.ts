@@ -37,7 +37,7 @@ export class GuairaChapterControlsHelp {
             closeLabel: 'FECHAR AJUDA · MANTER PAUSA',
             navigation: [
                 'A tentativa continua pausada ao fechar esta ajuda. Continuar ou Esc retoma do mesmo ponto.',
-                'Tentar recomeça este trecho e perde os avanços desta tentativa. As conclusões anteriores do capítulo são mantidas.',
+                'Recomeçar inicia este trecho do zero. Os trechos já concluídos continuam salvos.',
                 optional ? 'Bairro volta ao mapa de Guaíra. Ao entrar novamente, o percurso opcional começa do início.'
                     : 'Mapa volta ao mapa de Guaíra. Ao entrar novamente, o trecho começa do início. Após concluir, Continuar segue a jornada pelo mapa.',
                 'Nos botões: Tab ou Shift + Tab para escolher; Enter ou Espaço para ativar. Esc fecha esta ajuda sem retomar o jogo.',

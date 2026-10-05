@@ -246,11 +246,11 @@ export class GuairaChapterApp {
     private mapError(arrival: GuairaArrival, walkToSelection: boolean, focusAction: boolean, recoverFocus: boolean) {
         const scope = this.replaceView('error');
         const nav = document.createElement('nav'), message = document.createElement('p');
-        nav.className = 'chapter-game-toolbar'; nav.setAttribute('aria-label', 'Recuperar a maquete de Guaíra');
+        nav.className = 'chapter-game-toolbar'; nav.setAttribute('aria-label', 'Recuperar o mapa de Guaíra');
         message.id = 'lab-status'; message.setAttribute('role', 'alert'); message.textContent = 'Não foi possível abrir o mapa de Guaíra. Sua sessão continua aqui. Tentar repete o carregamento.';
         const retry = document.createElement('button'), exit = document.createElement('button');
         retry.type = exit.type = 'button'; retry.id = 'chapter-map-retry'; retry.textContent = 'TENTAR';
-        retry.setAttribute('aria-label', 'Tentar abrir a maquete novamente');
+        retry.setAttribute('aria-label', 'Tentar abrir o mapa novamente');
         const destination = chapterExitPresentation(this.campaign);
         exit.textContent = destination.label; exit.setAttribute('aria-label', destination.description);
         scope.listen(retry, 'click', () => {
@@ -313,7 +313,7 @@ export class GuairaChapterApp {
         primary.type = retry.type = map.type = 'button';
         primary.id = 'chapter-primary'; retry.id = 'chapter-retry'; map.id = 'chapter-map-return';
         const primaryArt = new LabToolbarAction(primary, true);
-        new LabToolbarAction(retry).setLabel('TENTAR', `Recomeçar ${info.title} nesta tentativa`);
+        new LabToolbarAction(retry).setLabel('RECOMEÇAR', `Recomeçar ${info.title} nesta tentativa`);
         new LabToolbarAction(map).setLabel('MAPA', 'Voltar ao mapa de Guaíra');
         primaryArt.setLabel('PAUSA', 'Pausar'); primary.disabled = true;
 
@@ -490,7 +490,7 @@ export class GuairaChapterApp {
         primary.type = retry.type = map.type = 'button';
         primary.id = 'chapter-primary'; retry.id = 'chapter-retry'; map.id = 'chapter-map-return';
         const primaryArt = new LabToolbarAction(primary, true);
-        new LabToolbarAction(retry).setLabel('TENTAR', `Recomeçar ${info.title} nesta tentativa opcional`);
+        new LabToolbarAction(retry).setLabel('RECOMEÇAR', `Recomeçar ${info.title} nesta tentativa opcional`);
         new LabToolbarAction(map).setLabel('BAIRRO', 'Voltar ao Bairro da Vala Seca no capítulo');
         primaryArt.setLabel('PAUSA', 'Pausar'); primary.disabled = true;
 

@@ -119,8 +119,11 @@ export class Input {
     if (target instanceof HTMLElement && target.id !== 'game-canvas' && target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) {
       return;
     }
+    // Open native dialogs own Escape, scrolling and control activation. Keyup
+    // still releases keys held before the dialog opened.
+    if (target instanceof HTMLElement && target.closest('dialog[open]')) return;
     // Native activation belongs to focused page controls, not jump/start.
-    if (target instanceof HTMLElement && target.closest('button, a[href]') &&
+    if (target instanceof HTMLElement && target.closest('button, a[href], summary') &&
       ['Enter', 'Space'].includes(controlCode(event))) return;
 
     // Semantic map controls own native Enter/Space and directional navigation.

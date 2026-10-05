@@ -14,6 +14,9 @@ export interface AircraftRoute extends AircraftRunwayContacts {
     runwayCorridors?: {
         departure: number;
         arrival: number;
+        /** Build offshore clearance with a two-second squared smoothstep before cruise height. */
+        departureOffshoreClimb?: boolean;
+        arrivalOffshoreClimb?: boolean;
         bendControls?: readonly [MapPoint, MapPoint];
         /** Preserve the other airport's established low-altitude route exactly. */
         oppositeTerminalContacts?: AircraftRunwayContacts;
@@ -57,6 +60,7 @@ export function validAircraftRoute(route: AircraftRoute): boolean {
         (!route.runwayCorridors || !route.cruiseControls &&
             [route.runwayCorridors.departure, route.runwayCorridors.arrival].every(n => Number.isFinite(n) && n >= 0 && n <= 1) &&
             route.runwayCorridors.departure + route.runwayCorridors.arrival > 0 &&
+            [route.runwayCorridors.departureOffshoreClimb, route.runwayCorridors.arrivalOffshoreClimb].every(n => n === undefined || typeof n === 'boolean') &&
             (!route.runwayCorridors.bendControls || Array.isArray(route.runwayCorridors.bendControls) && route.runwayCorridors.bendControls.length === 2 && route.runwayCorridors.bendControls.every(finitePoint)) &&
             (!route.runwayCorridors.oppositeTerminalContacts || validAircraftRoute({
                 departureStart: route.runwayCorridors.oppositeTerminalContacts.departureStart,
@@ -202,11 +206,13 @@ export function sampleAircraftTravel(route: AircraftRoute, elapsedSeconds: numbe
                 const original = sampleAircraftTravel(originalTerminalRoute(route), elapsed);
                 bank = original.bank + (bank - original.bank) * corridorBlend(route, seconds).weight;
             }
-            // Reach normal cruise altitude while still aligned. On the opposite
-            // airport half retain the original rise/descent profile exactly.
+            // Guaíra reaches cruise height while aligned. Rocky coastal terminals
+            // climb gradually offshore, meeting that same height at mid-flight.
+            // An unmodified opposite airport retains its original profile.
             const endSeconds = t < .5 ? seconds : 4 - seconds;
             const corridorSeconds = t < .5 ? corridor.departure : corridor.arrival;
-            altitude = (route.altitude ?? .20) * (corridorSeconds ? smooth(endSeconds / corridorSeconds) : Math.sin(Math.PI * t) ** 2);
+            const offshoreClimb = t < .5 ? corridor.departureOffshoreClimb : corridor.arrivalOffshoreClimb;
+            altitude = (route.altitude ?? .20) * (offshoreClimb ? smooth(endSeconds / 2) ** 2 : corridorSeconds ? smooth(endSeconds / corridorSeconds) : Math.sin(Math.PI * t) ** 2);
             pitch = -.065 * Math.sin(t * Math.PI * 2) - (corridor.departure ? .038 * (1 - smooth(seconds / .3)) : 0);
         } else {
             const [b, c] = route.cruiseControls ?? [

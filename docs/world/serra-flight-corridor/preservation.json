@@ -1,0 +1,15 @@
+{
+  "exactFactoryPoses": 890,
+  "exactGuairaTerminalPoses": 325,
+  "boundaryWithin1e12": [
+    {
+      "source": "serra",
+      "destination": "guaira",
+      "elapsed": 5.1,
+      "delta": {
+        "speed": 5.551115123125783e-17
+      }
+    }
+  ],
+  "failures": []
+}
