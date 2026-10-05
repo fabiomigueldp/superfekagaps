@@ -14,9 +14,9 @@ The bounded correction adds twelve blue-enamel socket shoes and twelve short tra
 Reproduce the scene with the existing canonical Factory renderer, then audit its disposable Blender scene:
 
 ```sh
-blender -b -t 8 --python-exit-code 1 -P tools/diorama/render_fabrica_map.py -- --final
-blender -b /tmp/fabrica-map-prototype.blend -t 4 --python-exit-code 1 \
-  -P tools/diorama/check_factory_guardrail_mounts.py -- --output-dir /tmp/factory-rail-audit
+blender -b -t 8 --python-exit-code 1 -P tools/diorama/render_fabrica_map.py -- --scene-only --output-dir .cache/diorama/fabrica
+blender -b .cache/diorama/fabrica/fabrica-map-prototype.blend -t 4 --python-exit-code 1 \
+  -P tools/diorama/check_factory_guardrail_mounts.py -- --output-dir .cache/diorama/fabrica/audit
 ```
 
-Use an isolated checkout for generation. The canonical renderer writes its PNG and audit metadata into that checkout; only the reviewed quality-91/method-6 WebP belongs in the runtime replacement. Retain the published metadata after verifying its camera, nodes, routes and alpha bounds against the new render. PNGs, Blender files and side-by-side review media remain outside Git. Native renders and compositing are visual proof; no browser verification is claimed.
+The canonical renderer stages its scene, PNG and audit metadata under the chosen output directory. See fabrica.md for the current cache provenance, render, packaging and review commands. Only the reviewed quality-91/method-6 WebP belongs in a runtime replacement; packaging preserves published camera, nodes, routes and metadata after verifying alpha bounds. PNGs, Blender files and side-by-side review media remain outside Git. Native renders and compositing are visual proof; no browser verification is claimed.

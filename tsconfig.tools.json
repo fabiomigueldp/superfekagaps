@@ -3,5 +3,5 @@
   "compilerOptions": {
     "types": ["node", "wicg-file-system-access"]
   },
-  "include": ["scripts", "tests", "vite.config.ts"]
+  "include": ["scripts", "tests", "tools/diorama/measure_fabrica_envelopes.ts", "vite.config.ts"]
 }
