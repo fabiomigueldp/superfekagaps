@@ -1,0 +1,18 @@
+{
+  "atlasBytes": 18227,
+  "contractBytes": 2440,
+  "atlasSize": [
+    282,
+    450
+  ],
+  "scratchSize": [
+    282,
+    236
+  ],
+  "decodedAtlasBytes": 507600,
+  "scratchCanvasBytes": 266208,
+  "croppedSourcePixels": 112752,
+  "activeSourcePixels": 32495,
+  "allVisiblePixelsPreserved": true,
+  "maskSourceSHA256": "8cfe7d82f80eda2c66a1bb5fe75cdd890be70eda1baccb25982e1449d375a526"
+}

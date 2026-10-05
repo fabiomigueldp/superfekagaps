@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { paintWorldAtlas } from '../../src/adventure/WorldAtlasArt';
 import { campaignArtOverlay, campaignArtBounds } from '../../src/adventure/GuairaCampaignArt';
 import { campaignWaterOverlay } from '../../src/adventure/GuairaCampaignConsequences';
-import { GuairaCampaignWaterMotion } from '../../src/adventure/GuairaCampaignWaterMotion';
+import { GuairaCampaignWaterMotion, GUAIRA_CAMPAIGN_WATER_PATCHES } from '../../src/adventure/GuairaCampaignWaterMotion';
 import { freshSave } from '../../src/adventure/progress';
 const { createCanvas, loadImage } = createRequire(import.meta.url)(process.env.WATER_CANVAS_MODULE ?? '@napi-rs/canvas');
 const root = resolve(import.meta.dirname, '../..'), out = resolve(process.argv[2] ?? '/tmp/guaira-campaign-water-motion');
@@ -65,16 +65,19 @@ for (const [width, height, native] of [[1920, 1200, true], [1280, 800, false], [
 const contact = createCanvas(900, 300), c = contact.getContext('2d');
 for (let i = 0; i < 3; i++) {
     const source = render(1920, 1200, i === 1 ? 1.2 : 3.6, i === 0 ? 'before' : 'after', true);
-    c.drawImage(source, 985, 602, 70, 58, i * 300, 0, 300, 249);
-    c.drawImage(source, 1367, 748, 36, 16, i * 300 + 12, 249, 126, 51);
-    c.drawImage(source, 1288, 936, 24, 17, i * 300 + 162, 249, 72, 51);
+    const [x, y, w, h] = GUAIRA_CAMPAIGN_WATER_PATCHES[0];
+    c.drawImage(source, x - 8, y - 8, w + 16, h + 16, i * 300, 0, 300, 249);
+    for (let j = 1; j <= 2 && j < GUAIRA_CAMPAIGN_WATER_PATCHES.length; j++) {
+        const [gx, gy, gw, gh] = GUAIRA_CAMPAIGN_WATER_PATCHES[j];
+        c.drawImage(source, gx - 2, gy - 2, gw + 4, gh + 4, i * 300 + 12 + (j - 1) * 150, 249, 126, 51);
+    }
 }
 writeFileSync(`${out}/native-water-details-before-after-later.png`, contact.toBuffer('image/png'));
 const timings = [];
 for (let i = 0; i < 600; i++) { const start = performance.now(); effect.overlays(true, camera(1280, 800), i / 60, false); timings.push(performance.now() - start); }
 timings.sort((a, b) => a - b);
 const result = { proof: 'actual paintWorldAtlas, native Canvas; no browser/device FPS claim', cases: report, allocations,
-    scratchPixels: 1245, detailPaintMedianMs: timings[300], detailPaintP95Ms: timings[570], newAssets: 0 };
+    scratchPixels: GUAIRA_CAMPAIGN_WATER_PATCHES.reduce((sum, [, , w, h]) => sum + w * h, 0), detailPaintMedianMs: timings[300], detailPaintP95Ms: timings[570], newAssets: 0 };
 writeFileSync(`${out}/report.json`, JSON.stringify(result, null, 2)); console.log(JSON.stringify(result, null, 2));
 // Optional review frames are enlarged crops of the real renderer, not runtime zoom.
 if (process.argv.includes('--motion-frames')) {

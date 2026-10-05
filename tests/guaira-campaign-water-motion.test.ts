@@ -5,6 +5,7 @@ import { campaignWaterRestored } from '../src/adventure/GuairaCampaignConsequenc
 import { freshSave, parseSave } from '../src/adventure/progress';
 import { guairaChapterRoute } from '../src/adventure/experimental/guaira/chapter/GuairaChapterProgress';
 
+const count = GUAIRA_CAMPAIGN_WATER_PATCHES.length;
 const camera = { width: 1280, height: 800, center: { x: 4.21, y: .67 }, zoom: 1.1 };
 function fixture() {
     let allocations = 0;
@@ -28,19 +29,21 @@ test('motion requires the real mayor outcome and never changes campaign progress
     assert.equal(allocated(), 0);
     save.guaira.completed = guairaChapterRoute(save.guaira.opening);
     const before = JSON.stringify(save), reloaded = parseSave(before);
-    assert.equal(effect.overlays(campaignWaterRestored(reloaded), camera, 10, false).length, 4);
+    assert.equal(effect.overlays(campaignWaterRestored(reloaded), camera, 10, false).length, count);
     assert.equal(JSON.stringify(save), before);
 });
 
 test('live reduced-motion changes immediately remove all animated detail and retain reusable crops', () => {
     const { effect, calls, allocated } = fixture();
     assert.deepEqual(effect.overlays(true, camera, 10, true), []); assert.equal(allocated(), 0);
-    const first = effect.overlays(true, camera, 10, false); assert.equal(allocated(), 4);
+    const first = effect.overlays(true, camera, 10, false); assert.equal(allocated(), count);
     calls.length = 0;
     assert.deepEqual(effect.overlays(true, camera, 90, true), []); assert.equal(calls.length, 0);
     const resumed = effect.overlays(true, camera, 10, false);
-    assert.deepEqual(first, resumed); assert.equal(allocated(), 4);
-    assert.equal(GUAIRA_CAMPAIGN_WATER_PATCHES.reduce((sum, [, , w, h]) => sum + w * h, 0), 1245);
+    assert.deepEqual(first, resumed); assert.equal(allocated(), count);
+    assert.ok(count > 0 && count <= 16);
+    assert.ok(GUAIRA_CAMPAIGN_WATER_PATCHES.reduce((sum, [, , w, h]) => sum + w * h, 0) <= 8192);
+    assert.ok(GUAIRA_CAMPAIGN_WATER_PATCHES.every(([x, y, w, h]) => x >= 0 && y >= 0 && w > 0 && h > 0 && x + w <= 1920 && y + h <= 1200));
 });
 
 test('same visible time is deterministic, invalid time is stable, and water stays in the authored alpha', () => {
@@ -51,8 +54,8 @@ test('same visible time is deterministic, invalid time is stable, and water stay
     effect.overlays(true, camera, NaN, false); assert.equal(JSON.stringify(calls), zero); calls.length = 0;
     effect.overlays(true, camera, -5, false); assert.equal(JSON.stringify(calls), zero); calls.length = 0;
     effect.overlays(true, camera, 3.6, false); assert.notEqual(JSON.stringify(calls), a);
-    assert.equal(calls.filter(call => call[0] === 'globalCompositeOperation' && call[1] === 'destination-in').length, 4);
-    assert.equal(calls.filter(call => call[0] === 'drawImage').length, 4);
+    assert.equal(calls.filter(call => call[0] === 'globalCompositeOperation' && call[1] === 'destination-in').length, count);
+    assert.equal(calls.filter(call => call[0] === 'drawImage').length, count);
 });
 
 test('offscreen water is culled before allocating or painting', () => {

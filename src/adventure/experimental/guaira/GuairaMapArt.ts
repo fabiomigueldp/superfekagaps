@@ -68,25 +68,34 @@ export function paintGuairaMap(ctx: CanvasRenderingContext2D, image: CanvasImage
     }
 }
 
-/** A stationary map restores only water regions; Feka is repainted above any overlap. */
+/** Restore water regions and the small stationary actor footprint as one damage area. */
 export function paintGuairaWaterFrame(ctx: CanvasRenderingContext2D, image: CanvasImageSource, camera: GuairaCamera,
     model: GuairaMapActor, time: number, water: { effect: GuairaMapWaterEffect; seconds: number }): void {
     ctx.save();
     try {
-        clipWaterRegions(ctx, camera, water.effect);
+        clipWaterRegions(ctx, camera, water.effect, model);
         paintGuairaMap(ctx, image, camera, model, time, water);
     } finally {
         ctx.restore();
     }
 }
 
-function clipWaterRegions(ctx: CanvasRenderingContext2D, camera: GuairaCamera, effect: GuairaMapWaterEffect): void {
+function clipWaterRegions(ctx: CanvasRenderingContext2D, camera: GuairaCamera, effect: GuairaMapWaterEffect, actor?: GuairaMapActor): void {
     const scale = camera.imageWidth / 1920;
     ctx.beginPath();
     for (const { bounds: [x, y, width, height] } of effect.regions) {
         // The small border includes interpolation pixels without widening the water mask.
         const left = Math.floor(camera.x + x * scale) - 2, top = Math.floor(camera.y + y * scale) - 2;
         const right = Math.ceil(camera.x + (x + width) * scale) + 2, bottom = Math.ceil(camera.y + (y + height) * scale) + 2;
+        ctx.rect(left, top, right - left, bottom - top);
+    }
+    if (actor) {
+        // A crop through the ellipse changes antialiased shadow-edge coverage.
+        // Restore/repaint the complete tiny actor footprint instead; the inner
+        // water clip remains mask-only. No full-frame surface is allocated.
+        const p = guairaScreenPoint(actor.point, camera), pixel = camera.imageWidth * GUAIRA_FEKA_PIXEL_WIDTH;
+        const left = Math.floor(p.x - 9 * pixel) - 2, top = Math.floor(p.y - 26 * pixel) - 2;
+        const right = Math.ceil(p.x + 9 * pixel) + 2, bottom = Math.ceil(p.y + 3 * pixel) + 2;
         ctx.rect(left, top, right - left, bottom - top);
     }
     ctx.clip();

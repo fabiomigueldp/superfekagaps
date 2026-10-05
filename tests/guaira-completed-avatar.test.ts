@@ -33,8 +33,9 @@ function observeBody(t: TestContext) {
 }
 
 for (const touch of [false, true]) for (const reducedMotion of [false, true])
-    test(`real white Relief arrival settles with ${touch ? 'touch' : 'keys'}, reduced motion ${reducedMotion}`, t => {
+    test(`real protected Relief arrival settles with ${touch ? 'touch' : 'keys'}, reduced motion ${reducedMotion}`, t => {
         const h = guairaReliefBrowser(t, { touch, reducedMotion }), g = h.create(), paint = observeBody(t);
+        const arrivalTint = reducedMotion ? undefined : ART.paper;
         h.run(g, 47); h.keys(['ArrowRight', 'ShiftLeft']);
         let frame = 47, helmetLost = 0;
         while (!g.finished && frame < 300) {
@@ -44,11 +45,11 @@ for (const touch of [false, true]) for (const reducedMotion of [false, true])
         assert.equal(helmetLost, 163); assert.equal(frame, 213);
         assert.equal(g.finished, true); assert.equal(g.player.data.isDead, false);
         assert.ok(Math.abs(g.player.data.invincibleTimer - 1000 / 6) < .0001);
-        g.render(); assert.equal(paint().tint, ART.paper, 'preserve the actual arrival frame');
+        g.render(); assert.equal(paint().tint, arrivalTint, 'preserve the actual arrival palette in each motion mode');
         const atFinish = frozen(g);
         const update = t.mock.method(g.player, 'update');
         h.key('Escape'); g.update(dt); assert.equal(g.state, 'paused');
-        h.run(g, 120); g.render(); assert.equal(paint().tint, ART.paper);
+        h.run(g, 120); g.render(); assert.equal(paint().tint, arrivalTint);
         assert.deepEqual(frozen(g), atFinish, 'pause does not advance even the sprite feedback');
         const enabled = g.audio.enabled;
         h.key('m'); g.update(dt); assert.equal(g.audio.enabled, !enabled);
@@ -71,7 +72,7 @@ for (const touch of [false, true]) for (const reducedMotion of [false, true])
         h.keys([]); g.load(g.stage.id); assert.equal(g.finished, false);
         // A fresh attempt cannot inherit the prior completed clock or decayed tint.
         g.player.data.invincibleTimer = 150; g.player.data.landingTimer = 90;
-        g.render(); assert.deepEqual(paint(), { tint: ART.paper, pose: reducedMotion ? 'idle' : 'land' });
+        g.render(); assert.deepEqual(paint(), { tint: arrivalTint, pose: reducedMotion ? 'idle' : 'land' });
         assert.deepEqual(h.storageCalls, []);
     });
 

@@ -1,0 +1,195 @@
+{
+  "baselineCommit": "5c3e6d624270b17e3b41e765fc1eea8239736804",
+  "scope": "Grounded Guaíra terrain, architecture, rice irrigation, chapter/campaign exports and bounded native redraw correction. No save/world identity changes.",
+  "renderer": "Blender 4.3.2 / Cycles CPU / AgX Medium High Contrast; chapter48 samples, campaign32;1920×1200 RGBA",
+  "navigation": {
+    "worldRoutesExact": true,
+    "routeWidthExact": true,
+    "nodeIdsExact": true,
+    "nodeWorldCoordinatesExact": true,
+    "walkMeshesExact": true,
+    "chapterCameraTranslationZ": -0.65,
+    "chapterScale": 20.600000381469727,
+    "campaignCameraExact": true,
+    "campaignTerminalExact": true,
+    "campaignNodesAndRoutesExact": true
+  },
+  "geometry": {
+    "terrainFootprintProbes": 1452,
+    "terrainUnsupported": 0,
+    "routeUnderbodyProbes": 1470,
+    "routeUnderbodyFailures": 0,
+    "clearingPerimeterProbes": 160,
+    "terrainIntrusionProbes": 4998,
+    "terrainIntrusions": 0,
+    "closedTerrainSolids": 3,
+    "chapterFootingProbes": 170,
+    "chapterFootingFailures": 0,
+    "campaignFootingAndBoardingProbes": 225,
+    "campaignFootingFailures": 0,
+    "nativeActorRays": 358210,
+    "nativeActorObstructions": 0,
+    "nativeActorHeadroomFailures": 0,
+    "roadShoulderOverhangs": 7,
+    "shoulderExplanation": "Seven wide road-shoulder probes see the existing civic porch above them; the real actor corridor and every native opaque body pixel remain clear.",
+    "riceSupportProbes": 420,
+    "closedAgriculturalVolumes": 43,
+    "unobstructedChannelProbes": 513,
+    "rootedRiceClumps": 70,
+    "outsideBankContainmentProbes": 65
+  },
+  "water": {
+    "chapterAllVisiblePixelsPreserved": true,
+    "chapterVisibleSourcePixels": 32495,
+    "chapterAtlasAndScratchBytes": 773808,
+    "campaignCrops": 8,
+    "campaignScratchPixels": 2266,
+    "campaignWaterMaskEscapes": 0,
+    "bairroVisibleWaterProbes": 1038,
+    "bairroBlockedWaterProbes": 0,
+    "protectedSceneryOcclusions": 0,
+    "structuralLegPixelsBehindExistingReceiver": 22,
+    "retainingFacingPixelsBehindExistingReceiver": 13
+  },
+  "nativeComposition": {
+    "chapterRouteCases": 36,
+    "lockedRestoredVillageCases": 8,
+    "bitExactFullPartialCases": 30,
+    "boundedShadowEdgeCases": 14,
+    "shadowEdgeTolerance": {
+      "maxPixelsPerFrame": 2,
+      "maxRGBDelta": 2,
+      "boundaryFringePixels": 0.03,
+      "reason": "Native Canvas compound-clip ellipse antialiasing only; alpha, body, scenery, water and all other pixels exact"
+    },
+    "consecutiveRedrawComparisons": 400,
+    "repeatedRedrawSequences": [
+      {
+        "label": "guaira-1",
+        "facingLeft": false,
+        "reducedMotion": false,
+        "consecutiveFrames": 100,
+        "maxPixels": 1,
+        "maxRGBDelta": 1,
+        "mismatchedLocations": [
+          "61,236"
+        ],
+        "alphaAndAllOtherPixelsExact": true
+      },
+      {
+        "label": "guaira-1",
+        "facingLeft": false,
+        "reducedMotion": true,
+        "consecutiveFrames": 100,
+        "maxPixels": 1,
+        "maxRGBDelta": 1,
+        "mismatchedLocations": [
+          "61,236"
+        ],
+        "alphaAndAllOtherPixelsExact": true
+      },
+      {
+        "label": "route-2:3",
+        "facingLeft": true,
+        "reducedMotion": false,
+        "consecutiveFrames": 100,
+        "maxPixels": 1,
+        "maxRGBDelta": 2,
+        "mismatchedLocations": [
+          "194,308"
+        ],
+        "alphaAndAllOtherPixelsExact": true
+      },
+      {
+        "label": "route-2:3",
+        "facingLeft": true,
+        "reducedMotion": true,
+        "consecutiveFrames": 100,
+        "maxPixels": 1,
+        "maxRGBDelta": 2,
+        "mismatchedLocations": [
+          "194,308"
+        ],
+        "alphaAndAllOtherPixelsExact": true
+      }
+    ],
+    "escapedEffectPixels": 0,
+    "campaignWaterSizes": 4,
+    "atlasAndBoardingCases": 6,
+    "method": "Actual Guaira map painter, actor frames, camera, masks and partial redraw in native Canvas; not browser/device FPS"
+  },
+  "verification": {
+    "focusedTypeScriptTestsPassed": 121,
+    "focusedTestFiles": 13,
+    "waterCropUnitTestsPassed": 3,
+    "bothTypeScriptProjectsPassed": true,
+    "worldValidationPassed": true,
+    "productionBuildPassed": true,
+    "productionOutputBytes": 43565358,
+    "productionOutputBudgetBytes": 45000000,
+    "campaignArtBytes": 446252,
+    "campaignArtBudgetBytes": 500000,
+    "fixtureCorrections": [
+      "Map-UI image stub now reads measured water atlas dimensions; all10 native controller tests pass.",
+      "Two reduced-motion arrival expectations reproduced on published main; updated only the exact tint assertions to the existing untinted reduced-motion contract, retaining ordinary-motion paper tint. All18 avatar/protection tests pass."
+    ]
+  },
+  "verifiedSourceAndAssetHashes": {
+    "src/adventure/experimental/guaira/GuairaMapArt.ts": {
+      "bytes": 6395,
+      "sha256": "216d6a5ff0d52480718006363c89e80e823c0a9f863f1e56b604fddd6a77d3cd"
+    },
+    "src/adventure/experimental/guaira/GuairaWaterData.json": {
+      "bytes": 2440,
+      "sha256": "31fa62c46665d02f28462cc274f0c95e50e8c2139c6ba7ee4332d08527323e6c"
+    },
+    "src/adventure/experimental/guaira/chapter/GuairaBairroWaterData.json": {
+      "bytes": 220,
+      "sha256": "a57de2b6005ff980fed6355a71f323aea7c9b2d9a7bef2ee1b0a8f873c44fbdf"
+    },
+    "src/adventure/GuairaCampaignWaterMotion.ts": {
+      "bytes": 4705,
+      "sha256": "301cf7db222860c0a6b550e87dc9390645d7dadb5d6d113f84e9a25bb49d3170"
+    },
+    "src/adventure/GuairaCampaignWaterData.json": {
+      "bytes": 278,
+      "sha256": "9fccae0a2512cd922953d755117eca3dfabeec71a0620418b46d9a1ce5b876b0"
+    },
+    "public/assets/world/experimental/guaira/guaira-diorama.webp": {
+      "bytes": 193328,
+      "sha256": "3e194be8c7dc4a0020e16e4a0785ab4bf6a3db903d3b25a3220fbbacef9c8eaa"
+    },
+    "public/assets/world/experimental/guaira/guaira-diorama.meta.json": {
+      "bytes": 4227,
+      "sha256": "87c9a2ac39edd937b4fbafc7bde390236fec7ffb9a518b8e2387fa2e8c1220cd"
+    },
+    "public/assets/world/experimental/guaira/guaira-water-mask.png": {
+      "bytes": 18227,
+      "sha256": "7afc3da8601c0f7f81a572006a062f1c513366c56c15dc1dcab2d448ec8769a3"
+    },
+    "public/assets/world/map/guaira-campaign/guaira.webp": {
+      "bytes": 148340,
+      "sha256": "a261bc8a6b61f3a3ff285bf498d3b1bdb02287cfa1616d8eed89da85dc4a46e8"
+    },
+    "public/assets/world/map/guaira-campaign/guaira.meta.json": {
+      "bytes": 3961,
+      "sha256": "7a547710efdf754406fa780805fdc08265bfafb50b73790836a882f25e4c8039"
+    },
+    "public/assets/world/map/guaira-campaign/guaira-water-restored.webp": {
+      "bytes": 2794,
+      "sha256": "551e2a8fffaefbdddbddf821931585e14b9db8d5fb71d1902850faf2d99966aa"
+    },
+    "tools/guaira/render_redesign_routes.mts": {
+      "bytes": 11415,
+      "sha256": "2480c30bde69a0e52e346731469059d710ef1aaa1e491c48a193f48fdeaa1a76"
+    }
+  },
+  "nativeChapterReportSHA256": "170c834fb34195474627eb86d07f7ca56b2dab5a1e764b6bf64b84607d1dde89",
+  "limitations": [
+    "No browser, DOM/CSS layout, touch-usability, GPU or physical-device QA.",
+    "The unrelated full suite was not rerun.",
+    "Native compound-clip antialias rounding is explicitly bounded to the shadow edge; no tolerance applies to alpha, water escape, scenery, actor body or growing redraw error.",
+    "Inherited aircraft corridor clearance and compact atlas navigation are separate follow-up work.",
+    "No Oracle access or Vercel deployment."
+  ]
+}

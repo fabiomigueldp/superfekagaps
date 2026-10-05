@@ -9,7 +9,7 @@ from bpy_extras.object_utils import world_to_camera_view
 ROOT=Path(__file__).resolve().parents[3]
 ARGS=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
 REGION=ARGS[ARGS.index('--region')+1] if '--region' in ARGS else 'guaira'
-OUT=ROOT/'public/assets/world/map/guaira-campaign';OUT.mkdir(parents=True,exist_ok=True)
+OUT=Path(ARGS[ARGS.index('--output-dir')+1]).resolve() if '--output-dir' in ARGS else ROOT/'public/assets/world/map/guaira-campaign';OUT.mkdir(parents=True,exist_ok=True)
 if REGION=='guaira':
  source=ROOT/'tools/diorama/guaira/build_guaira.py'
  namespace={'__file__':str(source),'__name__':'guaira_campaign_source'}
@@ -136,12 +136,20 @@ for l in ([] if REGION=='serra' else [-3.05,3.05]):
  for w in [-1.35,1.35]:
   x,y=xy(w,l);box('white landing edge stone',(x,y,z+.06),(.13,.16,.12),ivory,.04)
 
+# Fill the boarding trails down into the actual meadow/core while preserving
+# their authored top, horizontal footprint and every boarding anchor.
+if REGION=='guaira':
+ for _trail in bpy.context.scene.objects:
+  if _trail.name.startswith('STOL earth boarding trail'):
+   namespace['_gb_lower_box'](_trail,z-.065)
+ namespace['ground_campaign_shelter'](tx,ty,z)
+
 scene=bpy.context.scene;bpy.ops.object.camera_add(location=config['cam']);cam=bpy.context.object;target=Vector(config['target']);cam.rotation_euler=(target-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.type='ORTHO';cam.data.ortho_scale=config['scale'];scene.camera=cam
 if REGION!='serra':
  world=bpy.data.worlds.new('Warm archipelago daylight');scene.world=world;world.use_nodes=True;world.node_tree.nodes['Background'].inputs[0].default_value=(.57,.65,.76,1);world.node_tree.nodes['Background'].inputs[1].default_value=.6
  for n,p,e,size,color in [('warm key',(-8,-10,19),2400,9,(1,.84,.67)),('sky fill',(8,3,13),1450,8,(.73,.82,1)),('rim',(-4,10,17),1600,7,(1,.94,.8))]:
   bpy.ops.object.light_add(type='AREA',location=p);o=bpy.context.object;o.name=n;o.data.energy=e;o.data.size=size;o.data.color=color;o.rotation_euler=(Vector((0,0,2))-o.location).to_track_quat('-Z','Y').to_euler()
-scene.render.engine='CYCLES';scene.cycles.samples=32;scene.cycles.use_denoising=False;scene.cycles.max_bounces=5;scene.render.resolution_x=1920;scene.render.resolution_y=1200;scene.render.resolution_percentage=100;scene.render.film_transparent=True;scene.render.image_settings.file_format='PNG';scene.render.image_settings.color_mode='RGBA';scene.view_settings.view_transform='AgX';scene.view_settings.look='AgX - Medium High Contrast';scene.view_settings.exposure=.3
+scene.render.engine='CYCLES';scene.cycles.samples=int(ARGS[ARGS.index('--samples')+1]) if '--samples' in ARGS else 32;scene.cycles.use_denoising=False;scene.cycles.max_bounces=5;scene.render.resolution_x=1920;scene.render.resolution_y=1200;scene.render.resolution_percentage=100;scene.render.film_transparent=True;scene.render.image_settings.file_format='PNG';scene.render.image_settings.color_mode='RGBA';scene.view_settings.view_transform='AgX';scene.view_settings.look='AgX - Medium High Contrast';scene.view_settings.exposure=.3
 bpy.context.view_layer.update()
 def project(p):
  v=world_to_camera_view(scene,cam,Vector(p));return {'x':round(v.x,6),'y':round(1-v.y,6)}
@@ -166,6 +174,6 @@ assert all(checks),'Disconnected passenger path'
 meta['validation']={'walkSupportSamples':len(checks),'allSupported':all(checks),'numericCampaignIdsChanged':False,'objects':len(scene.objects)}
 json.dump(meta,open(OUT/f'{REGION}.meta.json','w'),indent=2,ensure_ascii=False)
 scene.render.filepath=str(OUT/f'{REGION}.png')
-bpy.ops.wm.save_as_mainfile(filepath=f'/tmp/feka-{REGION}-campaign.blend')
-bpy.ops.render.render(write_still=True)
+bpy.ops.wm.save_as_mainfile(filepath=str(OUT/f'{REGION}-campaign.blend') if '--output-dir' in ARGS else f'/tmp/feka-{REGION}-campaign.blend')
+if '--build-only' not in ARGS:bpy.ops.render.render(write_still=True)
 print('CAMPAIGN_TERMINAL_READY='+REGION)

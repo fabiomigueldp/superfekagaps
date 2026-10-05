@@ -1,17 +1,12 @@
+import waterData from './GuairaCampaignWaterData.json';
 import { campaignArtBounds } from './GuairaCampaignArt';
 import { mapToScreen, type MapCamera } from './WorldMapModel';
 import type { AtlasConnectionOverlay } from './WorldAtlasArt';
 
-/** Existing restored-water alpha components, with two transparent filtering pixels.
- * Source camera: guaira-campaign/guaira-water-restored.webp, 1920 × 1200.
- * These are crops of that authored mask, never new water surfaces or route geometry.
+/** Crops generated from the current restored-water alpha, in its source camera.
+ * The public receiver is first; subsequent crops are visible irrigation glints.
  */
-export const GUAIRA_CAMPAIGN_WATER_PATCHES = [
-    [1001, 621, 35, 19], // public trough
-    [1372, 751, 24, 13], // upper channel
-    [1329, 899, 12, 9],  // rice-channel branch
-    [1292, 940, 16, 10], // lower channel
-] as const;
+export const GUAIRA_CAMPAIGN_WATER_PATCHES = waterData.patches as [number, number, number, number][];
 
 type Surface = Pick<HTMLCanvasElement, 'width' | 'height' | 'getContext'>;
 interface Patch { surface: Surface; context: CanvasRenderingContext2D; overlay: AtlasConnectionOverlay }
@@ -25,7 +20,7 @@ const overlays = GUAIRA_CAMPAIGN_WATER_PATCHES.map(([x, y, width, height]) => ({
 
 /** Optional, bounded decoration on top of the unchanged earned-water layer.
  * The caller owns visible time and reduced-motion changes. No timers, random values,
- * full-island canvas, new textures or progress writes. Four reusable crops total 1245px.
+ * full-island canvas, new textures or progress writes. Only the measured alpha crops allocate reusable surfaces.
  */
 export class GuairaCampaignWaterMotion {
     private patches: Patch[] | null = null;
@@ -62,7 +57,7 @@ export class GuairaCampaignWaterMotion {
                 c.strokeStyle = '#d8eeee'; c.lineWidth = .8; c.lineCap = 'round';
                 for (let n = 0; n < 2; n++) {
                     const phase = (time / 4.8 + n * .5) % 1;
-                    const px = 9 + n * 11, py = 4.8 + n * 3.5 + phase * 3;
+                    const px = width * (.26 + n * .31), py = height * (.25 + n * .18 + phase * .16);
                     c.globalAlpha = .32 * Math.sin(phase * Math.PI) ** 2;
                     c.beginPath(); c.moveTo(px - 3, py); c.lineTo(px + 3, py + 1.8); c.stroke();
                 }

@@ -15,7 +15,7 @@ test('authored water atlas stays in four small regions and matches its PNG dimen
     }
     assert.ok(data.channels.every(c => [...c.a, ...c.b, ...c.edge, c.velocity].every(Number.isFinite) && c.velocity > 0));
     assert.ok(data.channels.every(c => Math.hypot(...c.a.map((n, i) => n - c.b[i])) > 0));
-    const bytes = (data.atlasSize[0] * data.atlasSize[1] + 344 * 206) * 4;
+    const bytes = (data.atlasSize[0] * data.atlasSize[1] + Math.max(...data.regions.map(r => r.bounds[2])) * Math.max(...data.regions.map(r => r.bounds[3]))) * 4;
     assert.ok(bytes < 1024 * 1024, 'atlas decode plus reusable scratch remain below one MiB');
 });
 
@@ -35,7 +35,8 @@ test('water painting is finite, deterministic in reduced motion, and leaves main
     const context = new Proxy({}, { get: (_target, key) => (...args: unknown[]) => { commands.push([key, ...args]); } });
     const canvas = { width: 0, height: 0, getContext: () => context } as unknown as HTMLCanvasElement;
     const effect = new GuairaWaterMotion({} as CanvasImageSource, GUAIRA_WATER_CONTRACT, canvas);
-    assert.equal(canvas.width, 344); assert.equal(canvas.height, 206);
+    assert.equal(canvas.width, Math.max(...GUAIRA_WATER_CONTRACT.regions.map(r => r.bounds[2])));
+    assert.equal(canvas.height, Math.max(...GUAIRA_WATER_CONTRACT.regions.map(r => r.bounds[3])));
     const paint = (seconds: number, reduced: boolean) => {
         commands.length = 0;
         effect.draw(context as CanvasRenderingContext2D, { x: 0, y: 0, imageWidth: 1920 }, seconds, reduced);

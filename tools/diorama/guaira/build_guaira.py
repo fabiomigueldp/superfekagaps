@@ -1,4 +1,4 @@
-"""Third craft pass of the original deterministic Guaíra candidate. Blender 4.3+, CPU Cycles.
+"""Grounded landscape redesign of the deterministic Guaíra diorama. Blender 4.3+, CPU Cycles.
 blender -b -t 8 --python source/build_guaira.py -- --output-dir . [--draft]
 No campaign identifiers, no changes outside output directory.
 """
@@ -413,15 +413,23 @@ exec(compile(open(os.path.join(os.path.dirname(__file__),'craft_guaira.py')).rea
 exec(compile(open(os.path.join(os.path.dirname(__file__),'bairro_water_guaira.py')).read(),'bairro_water_guaira.py','exec'))
 exec(compile(open(os.path.join(os.path.dirname(__file__),'terrace_guaira.py')).read(),'terrace_guaira.py','exec'))
 
-scene=bpy.context.scene;bpy.ops.object.camera_add(location=(11,-20,18.85));cam=bpy.context.object;target=Vector((0,.25,3.0));cam.rotation_euler=(target-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.type='ORTHO';cam.data.ortho_scale=20.6;scene.camera=cam
+# The coordinated redesign runs on the complete authored scene. Each pass owns
+# distinct structures and shares the chapter/campaign geometry exactly.
+for _redesign in ['redesign_terrain.py', 'redesign_buildings.py', 'redesign_rice.py']:
+ exec(compile(open(os.path.join(os.path.dirname(__file__), _redesign)).read(), _redesign, 'exec'))
+
+# Translate camera and aim equally down to frame the expanded inhabited shore.
+# Orthographic scale and view direction remain exact for native actor sizing.
+scene=bpy.context.scene;bpy.ops.object.camera_add(location=(11,-20,18.20));cam=bpy.context.object;target=Vector((0,.25,2.35));cam.rotation_euler=(target-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.type='ORTHO';cam.data.ortho_scale=20.6;scene.camera=cam
 world=bpy.data.worlds.new('Warm dry atmosphere');scene.world=world;world.use_nodes=True;world.node_tree.nodes['Background'].inputs[0].default_value=(.62,.58,.80,1);world.node_tree.nodes['Background'].inputs[1].default_value=.55
 for n,p,e,s,c in [('golden key',(-8,-10,19),2400,9,(1,.83,.65)),('lilac fill',(8,3,13),1700,8,(.73,.70,1)),('warm rim',(-4,10,17),1800,7,(.96,.90,1))]:
  bpy.ops.object.light_add(type='AREA',location=p);o=bpy.context.object;o.name=n;o.data.energy=e;o.data.shape='DISK';o.data.size=s;o.data.color=c;o.rotation_euler=(Vector((0,0,2))-o.location).to_track_quat('-Z','Y').to_euler()
-scene.render.engine='CYCLES';scene.cycles.samples=16 if '--draft' in A else 48;scene.cycles.use_denoising=False;scene.cycles.max_bounces=5;scene.render.resolution_x=1920;scene.render.resolution_y=1200;scene.render.resolution_percentage=50 if '--draft' in A else 100;scene.render.film_transparent=True;scene.render.image_settings.file_format='PNG';scene.render.image_settings.color_mode='RGBA';scene.view_settings.view_transform='AgX';scene.view_settings.look='AgX - Medium High Contrast';scene.view_settings.exposure=.30
+scene.render.engine='CYCLES';scene.cycles.samples=int(A[A.index('--samples')+1]) if '--samples' in A else 16 if '--draft' in A else 48;scene.cycles.use_denoising=False;scene.cycles.max_bounces=5;scene.render.resolution_x=1920;scene.render.resolution_y=1200;scene.render.resolution_percentage=50 if '--draft' in A else 100;scene.render.film_transparent=True;scene.render.image_settings.file_format='PNG';scene.render.image_settings.color_mode='RGBA';scene.view_settings.view_transform='AgX';scene.view_settings.look='AgX - Medium High Contrast';scene.view_settings.exposure=.30
 bpy.context.view_layer.update()
 def project(p):
  v=world_to_camera_view(scene,cam,Vector(p));return {'x':round(v.x,6),'y':round(1-v.y,6)}
 meta={'version':1,'worldId':'guaira','status':'experimental-isolated-map','campaignIntegrated':False,'size':{'width':1920,'height':1200},'coordinateSystem':'Normalized top-left coordinates in complete frame; projected from authored Blender camera','camera':{'position':list(cam.location),'target':list(target),'orthoScale':cam.data.ortho_scale},'nodes':{key:{**project(p),'world':list(p),'label':NAMES[i],'clearingRadius':.76} for i,(key,p) in enumerate(NODES.items())},'routes':{f'{i}:{i+1}':[project(p) for p in r] for i,r in enumerate(ROUTES)},'worldRoutes':ROUTES,'routeWidth':.98,'futureBossArea':{'localNode':'guaira-4','status':'reserved-empty-arena','bossModelIncluded':False},'fictionalSetting':True,'note':'Projected Blender geometry for the isolated Guaíra experiment. No campaign world number, save schema, or persistent progress.'}
 json.dump(meta,open(os.path.join(OUT,'guaira-diorama.meta.json'),'w'),indent=2,ensure_ascii=False)
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(OUT,'guaira-diorama.blend'))
-scene.render.filepath=os.path.join(OUT,'guaira-draft.png' if '--draft' in A else 'guaira-diorama.png');bpy.ops.render.render(write_still=True)
+scene.render.filepath=os.path.join(OUT,'guaira-draft.png' if '--draft' in A else 'guaira-diorama.png')
+if '--build-only' not in A:bpy.ops.render.render(write_still=True)

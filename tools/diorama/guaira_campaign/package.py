@@ -1,12 +1,18 @@
 """Crop transparent terminal layers without changing their projection contract."""
 from pathlib import Path
-import json
+import argparse, json
 from PIL import Image
 ROOT=Path(__file__).resolve().parents[3]
 OUT=ROOT/'public/assets/world/map/guaira-campaign'
-for region in ['guaira','fabrica','serra']:
- image=Image.open(OUT/f'{region}.png').convert('RGBA')
- meta=json.loads((OUT/f'{region}.meta.json').read_text())
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--region', choices=['guaira','fabrica','serra'], action='append', help='Package only the named freshly rendered region; repeat to select several')
+parser.add_argument('--input-dir',type=Path,default=OUT)
+parser.add_argument('--output-dir',type=Path,default=OUT)
+args=parser.parse_args()
+OUT=args.output_dir;OUT.mkdir(parents=True,exist_ok=True)
+for region in args.region or ['guaira','fabrica','serra']:
+ image=Image.open(args.input_dir/f'{region}.png').convert('RGBA')
+ meta=json.loads((args.input_dir/f'{region}.meta.json').read_text())
  bounds=image.getchannel('A').getbbox();assert bounds and image.size==(1920,1200)
  if region=='fabrica':
   # Keep two transparent pixels for bilinear filtering.

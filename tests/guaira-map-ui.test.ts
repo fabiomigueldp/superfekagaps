@@ -2,6 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { GUAIRA_WATER_CONTRACT } from '../src/adventure/experimental/guaira/GuairaWaterMotion';
 const raw = JSON.parse(readFileSync(new URL('../public/assets/world/experimental/guaira/guaira-diorama.meta.json', import.meta.url), 'utf8'));
 const noop = () => {};
 let basePaints = 0, markerReads = 0, regionClips = 0, sceneWidth = 390, sceneHeight = 450;
@@ -54,8 +55,8 @@ Object.assign(globalThis, {
     ResizeObserver: class { observe() {} disconnect() { observerDisconnected++; } },
     Image: class {
         src = '';
-        get naturalWidth() { return this.src.endsWith('guaira-water-mask.png') ? 516 : 1920; }
-        get naturalHeight() { return this.src.endsWith('guaira-water-mask.png') ? 306 : 1200; }
+        get naturalWidth() { return this.src.endsWith('guaira-water-mask.png') ? GUAIRA_WATER_CONTRACT.atlasSize[0] : 1920; }
+        get naturalHeight() { return this.src.endsWith('guaira-water-mask.png') ? GUAIRA_WATER_CONTRACT.atlasSize[1] : 1200; }
         async decode() {
             if (this.src.endsWith('guaira-water-mask.png')) { await waterReady; if (waterFailure) throw new Error('Optional mask unavailable'); }
             else await imageReady;
