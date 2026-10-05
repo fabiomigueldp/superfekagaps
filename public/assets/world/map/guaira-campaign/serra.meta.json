@@ -116,7 +116,7 @@
     "walkSupportSamples": 42,
     "allSupported": true,
     "numericCampaignIdsChanged": false,
-    "objects": 3945
+    "objects": 3949
   },
   "artBounds": {
     "left": 0.11145833333333334,
@@ -128,6 +128,6 @@
     "path": "/assets/world/map/guaira-campaign/serra.webp",
     "width": 1920,
     "height": 1200,
-    "bytes": 289868
+    "bytes": 289438
   }
 }

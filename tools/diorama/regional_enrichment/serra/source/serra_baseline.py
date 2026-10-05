@@ -199,8 +199,13 @@ for stationname,berths in [('lower maintenance terminal',BERTHS_A),('upper maint
   cube(stationname+' stone anchor '+str(lane),(p.x,p.y,.40),(.54,.54,1.40),stone,.035)
   post_top=1.68 if stationname.startswith('upper') and lane==1 else 2.0
   beam(stationname+' side blue support '+str(lane),(p.x,p.y,.4),p+Vector((0,0,post_top)),.10,steel)
-  beam(stationname+' short sheave support '+str(lane),p+Vector((0,0,post_top)),q+Vector((0,0,2.0)),.055,steel)
-  o=cyl(stationname+' sheave',q+Vector((0,0,1.72)),.18,.13,gold,20);o.rotation_euler.x=math.pi/2
+  # The unchanged cable runs under the sheave rim, not through a floating hub.
+  # A rear cantilever and transverse axle close the load path to the blue upright.
+  path=RIDES[lane];tangent=(Vector(path[1])-Vector(path[0]) if stationname.startswith('lower') else Vector(path[-1])-Vector(path[-2])).normalized()
+  hub=q+Vector((0,0,1.70))+tangent.cross(perp)*.20; bearing=hub+perp*.16
+  beam(stationname+' short sheave support '+str(lane),p+Vector((0,0,post_top)),bearing,.055,steel)
+  beam(stationname+' sheave axle '+str(lane),hub-perp*.085,bearing+perp*.045,.045,steel)
+  o=cyl(stationname+' sheave',hub,.18,.13,gold,20);o.rotation_euler=perp.to_track_quat('Z','Y').to_euler()
 for lane,ride in enumerate(RIDES):curve('maintenance paired cable lane '+str(lane),[(x,y,z+1.70) for x,y,z in ride],.026,steel)
 PHASE=1 if '--pair-phase1' in sys.argv else 0
 cabin('maintenance carrier A',*BERTHS_A[PHASE],1.0);cabin('maintenance carrier B',*BERTHS_B[1-PHASE],1.0)

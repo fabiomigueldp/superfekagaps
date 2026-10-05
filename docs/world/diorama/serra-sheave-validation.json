@@ -1,0 +1,389 @@
+{
+  "status": "PASS",
+  "scope": "Four Serra maintenance sheave mounts, both enriched fallback base and campaign replacement. No gameplay, route, cabin, camera, scale, crop or other regional changes.",
+  "baselineCommit": "e6c3dfc7d2db6d06194b04a6f857c357df442a4f",
+  "baseline": {
+    "status": "Expected failure reproduced",
+    "detachedSheaves": 4,
+    "mounts": [
+      {
+        "terminal": "lower",
+        "lane": 0,
+        "checks": {
+          "uprightToCantilever": true,
+          "cantileverToAxle": false,
+          "axleToSheave": false,
+          "cableAtLowerRim": false
+        },
+        "directArmWheelSeparation": 0.0455904,
+        "cableCenterToRim": 0.0649999,
+        "hubWorld": [
+          -1.2117377519607544,
+          2.012172222137451,
+          5.470000267028809
+        ]
+      },
+      {
+        "terminal": "lower",
+        "lane": 1,
+        "checks": {
+          "uprightToCantilever": true,
+          "cantileverToAxle": false,
+          "axleToSheave": false,
+          "cableAtLowerRim": false
+        },
+        "directArmWheelSeparation": 0.0455904,
+        "cableCenterToRim": 0.065,
+        "hubWorld": [
+          0.912225604057312,
+          -0.6427818536758423,
+          5.470000267028809
+        ]
+      },
+      {
+        "terminal": "upper",
+        "lane": 0,
+        "checks": {
+          "uprightToCantilever": true,
+          "cantileverToAxle": false,
+          "axleToSheave": false,
+          "cableAtLowerRim": false
+        },
+        "directArmWheelSeparation": 0.0455904,
+        "cableCenterToRim": 0.0650001,
+        "hubWorld": [
+          0.538262128829956,
+          3.4121720790863037,
+          7.170000076293945
+        ]
+      },
+      {
+        "terminal": "upper",
+        "lane": 1,
+        "checks": {
+          "uprightToCantilever": true,
+          "cantileverToAxle": false,
+          "axleToSheave": false,
+          "cableAtLowerRim": false
+        },
+        "directArmWheelSeparation": 0.0205289,
+        "cableCenterToRim": 0.065,
+        "hubWorld": [
+          2.6622254848480225,
+          0.7572181820869446,
+          7.170000076293945
+        ]
+      }
+    ],
+    "nonRunningCarrierContacts": 12
+  },
+  "final": {
+    "status": "PASS",
+    "scene": "serra-campaign.blend",
+    "scope": "Four Serra maintenance mounts only; other scenery and browser behavior not re-audited.",
+    "mounts": [
+      {
+        "terminal": "lower",
+        "lane": 0,
+        "checks": {
+          "uprightToCantilever": true,
+          "cantileverToAxle": true,
+          "axleToSheave": true,
+          "cableAtLowerRim": true
+        },
+        "directArmWheelSeparation": 0.0846239,
+        "cableCenterToRim": 0.0219938,
+        "hubWorld": [
+          -1.2891170978546143,
+          1.9502687454223633,
+          5.623724937438965
+        ]
+      },
+      {
+        "terminal": "lower",
+        "lane": 1,
+        "checks": {
+          "uprightToCantilever": true,
+          "cantileverToAxle": true,
+          "axleToSheave": true,
+          "cableAtLowerRim": true
+        },
+        "directArmWheelSeparation": 0.0846241,
+        "cableCenterToRim": 0.0219938,
+        "hubWorld": [
+          0.8348463177680969,
+          -0.7046852707862854,
+          5.623724937438965
+        ]
+      },
+      {
+        "terminal": "upper",
+        "lane": 0,
+        "checks": {
+          "uprightToCantilever": true,
+          "cantileverToAxle": true,
+          "axleToSheave": true,
+          "cableAtLowerRim": true
+        },
+        "directArmWheelSeparation": 0.0820477,
+        "cableCenterToRim": 0.0221409,
+        "hubWorld": [
+          0.4308938682079315,
+          3.326277494430542,
+          7.295238018035889
+        ]
+      },
+      {
+        "terminal": "upper",
+        "lane": 1,
+        "checks": {
+          "uprightToCantilever": true,
+          "cantileverToAxle": true,
+          "axleToSheave": true,
+          "cableAtLowerRim": true
+        },
+        "directArmWheelSeparation": 0.0816771,
+        "cableCenterToRim": 0.022141,
+        "hubWorld": [
+          2.5548572540283203,
+          0.6713235378265381,
+          7.295238018035889
+        ]
+      }
+    ],
+    "carrierSweep": {
+      "hulls": 624,
+      "collisionCount": 0,
+      "collisions": [],
+      "runningInterfaceContactCount": 12,
+      "runningInterfaceContacts": [
+        {
+          "lane": 0,
+          "interval": 0,
+          "part": "maintenance carrier A cable grip",
+          "hardware": "lower maintenance terminal sheave"
+        },
+        {
+          "lane": 0,
+          "interval": 1,
+          "part": "maintenance carrier A cable grip",
+          "hardware": "lower maintenance terminal sheave"
+        },
+        {
+          "lane": 0,
+          "interval": 2,
+          "part": "maintenance carrier A cable grip",
+          "hardware": "lower maintenance terminal sheave"
+        },
+        {
+          "lane": 0,
+          "interval": 22,
+          "part": "maintenance carrier A cable grip",
+          "hardware": "upper maintenance terminal sheave"
+        },
+        {
+          "lane": 0,
+          "interval": 23,
+          "part": "maintenance carrier A cable grip",
+          "hardware": "upper maintenance terminal sheave"
+        },
+        {
+          "lane": 0,
+          "interval": 23,
+          "part": "maintenance carrier A hanger",
+          "hardware": "upper maintenance terminal sheave"
+        },
+        {
+          "lane": 1,
+          "interval": 0,
+          "part": "maintenance carrier A cable grip",
+          "hardware": "lower maintenance terminal sheave.001"
+        },
+        {
+          "lane": 1,
+          "interval": 1,
+          "part": "maintenance carrier A cable grip",
+          "hardware": "lower maintenance terminal sheave.001"
+        },
+        {
+          "lane": 1,
+          "interval": 2,
+          "part": "maintenance carrier A cable grip",
+          "hardware": "lower maintenance terminal sheave.001"
+        },
+        {
+          "lane": 1,
+          "interval": 22,
+          "part": "maintenance carrier A cable grip",
+          "hardware": "upper maintenance terminal sheave.001"
+        },
+        {
+          "lane": 1,
+          "interval": 23,
+          "part": "maintenance carrier A cable grip",
+          "hardware": "upper maintenance terminal sheave.001"
+        },
+        {
+          "lane": 1,
+          "interval": 23,
+          "part": "maintenance carrier A hanger",
+          "hardware": "upper maintenance terminal sheave.001"
+        }
+      ]
+    },
+    "headFaceRaster": [
+      {
+        "profile": "desktop",
+        "poses": 5474,
+        "rays": 3100638,
+        "headContactPoses": 0,
+        "faceContactPoses": 0,
+        "contacts": []
+      },
+      {
+        "profile": "portrait",
+        "poses": 5474,
+        "rays": 423595,
+        "headContactPoses": 0,
+        "faceContactPoses": 0,
+        "contacts": []
+      },
+      {
+        "profile": "landscape",
+        "poses": 5474,
+        "rays": 865585,
+        "headContactPoses": 0,
+        "faceContactPoses": 0,
+        "contacts": []
+      }
+    ],
+    "unchangedRuntimeContracts": {
+      "camera": true,
+      "nodes": true,
+      "routes": true,
+      "secretTransport": true,
+      "secretRoute": true,
+      "routeDurationsSeconds": true,
+      "size": true
+    },
+    "metadataSha256": "7d621187079cc2e1207ab618b669c9eb68653e4fc48e6b9ab6a6c0866e3d7a8e"
+  },
+  "sceneDelta": {
+    "status": "PASS",
+    "checks": {
+      "onlyFourSheavesAndCantileversChanged": true,
+      "onlyFourAxlesAdded": true,
+      "noObjectsRemoved": true,
+      "completeSerraMetadataUnchanged": true
+    },
+    "beforeObjects": 3945,
+    "afterObjects": 3949,
+    "modified": [
+      "lower maintenance terminal sheave",
+      "lower maintenance terminal sheave.001",
+      "lower maintenance terminal short sheave support 0",
+      "lower maintenance terminal short sheave support 1",
+      "upper maintenance terminal sheave",
+      "upper maintenance terminal sheave.001",
+      "upper maintenance terminal short sheave support 0",
+      "upper maintenance terminal short sheave support 1"
+    ],
+    "added": [
+      "lower maintenance terminal sheave axle 0",
+      "lower maintenance terminal sheave axle 1",
+      "upper maintenance terminal sheave axle 0",
+      "upper maintenance terminal sheave axle 1"
+    ],
+    "removed": [],
+    "metadataSha256": "7d621187079cc2e1207ab618b669c9eb68653e4fc48e6b9ab6a6c0866e3d7a8e"
+  },
+  "sources": {
+    "tools/diorama/render_serra_map.py": "112eacf8e8b5a46cd24085b6df00cc925f0dfc3c558ef7861e0b965569df569a",
+    "tools/diorama/regional_enrichment/serra/source/serra_baseline.py": "112eacf8e8b5a46cd24085b6df00cc925f0dfc3c558ef7861e0b965569df569a",
+    "tools/diorama/check_serra_sheave_mounts.py": "6c69979e69e25bf7466de0f026ef6198717a051ae483f0856d1f36a8930acd39"
+  },
+  "limitations": [
+    "Focused changed-hardware proof, not a fresh all-scenery clearance audit.",
+    "Browser behavior and broad gameplay suites not rerun for this art-only patch.",
+    "Gold sheave contact is allowed only for the authored cable clamp and hanger running interface; other cabin component contacts fail."
+  ],
+  "fallbackSceneDelta": {
+    "status": "PASS",
+    "checks": {
+      "onlyFourSheavesAndCantileversChanged": true,
+      "onlyFourAxlesAdded": true,
+      "noObjectsRemoved": true,
+      "completeSerraMetadataUnchanged": true
+    },
+    "beforeObjects": 3924,
+    "afterObjects": 3928,
+    "modified": [
+      "lower maintenance terminal sheave",
+      "lower maintenance terminal sheave.001",
+      "lower maintenance terminal short sheave support 0",
+      "lower maintenance terminal short sheave support 1",
+      "upper maintenance terminal sheave",
+      "upper maintenance terminal sheave.001",
+      "upper maintenance terminal short sheave support 0",
+      "upper maintenance terminal short sheave support 1"
+    ],
+    "added": [
+      "lower maintenance terminal sheave axle 0",
+      "lower maintenance terminal sheave axle 1",
+      "upper maintenance terminal sheave axle 0",
+      "upper maintenance terminal sheave axle 1"
+    ],
+    "removed": [],
+    "metadataSha256": "7d621187079cc2e1207ab618b669c9eb68653e4fc48e6b9ab6a6c0866e3d7a8e"
+  },
+  "assets": {
+    "public/assets/world/map/serra-diorama.webp": {
+      "bytes": 208130,
+      "sha256": "dcdffbccfa8cd599989d56c84e36ae9d54511a088d1841189b5505125f574b58",
+      "size": [
+        1920,
+        1200
+      ],
+      "alphaBounds": [
+        238,
+        100,
+        1617,
+        1172
+      ],
+      "boundaryAlphaByteIdentical": true
+    },
+    "public/assets/world/map/serra-diorama.meta.json": {
+      "bytes": 2907,
+      "sha256": "111c3dd96a86cc4abfa7028c4621b30e3ff97c75f69833718452b2a21603f6da"
+    },
+    "public/assets/world/map/guaira-campaign/serra.webp": {
+      "bytes": 289438,
+      "sha256": "ea6345edcce9dfc478f9025774f913a98dc0bc3535573748ee4bb474cadd2aa9",
+      "size": [
+        1920,
+        1200
+      ],
+      "alphaBounds": [
+        214,
+        100,
+        1616,
+        1200
+      ],
+      "boundaryAlphaByteIdentical": true
+    },
+    "public/assets/world/map/guaira-campaign/serra.meta.json": {
+      "bytes": 2118,
+      "sha256": "01e585b9e4badccdbbae58ac31d268f4ffb3f00486e1c6d4e24051f88fa7e342"
+    }
+  },
+  "assetContracts": {
+    "fallbackMetadataByteIdentical": true,
+    "campaignMetadataOnlyChanges": [
+      "image.bytes",
+      "validation.objects"
+    ],
+    "canonicalFramePreserved": true,
+    "alphaBoundsAndBoundaryPixelsUnchanged": true,
+    "existingCampaignBottomEdgeCoveragePreserved": true
+  }
+}
