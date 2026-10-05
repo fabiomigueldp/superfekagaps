@@ -1,0 +1,135 @@
+{
+  "provider": "ElevenLabs",
+  "assets": [
+    {
+      "name": "orchard-air",
+      "status": "generated",
+      "file": "docs/world/delicia/audio/orchard-air.mp3",
+      "model": "eleven_text_to_sound_v2",
+      "prompt": "Seamless peaceful tropical citrus orchard ambience, light breeze rustling orange leaves, distant birds, soft trickling water, subtle clean game ambience, no speech no music",
+      "bytes": 193141,
+      "sha256": "31f54375c3ae0984861ae734931c9af5b595f9823e18d52165896703e956c9e9",
+      "request_id": null
+    },
+    {
+      "name": "collect",
+      "status": "generated",
+      "file": "docs/world/delicia/audio/collect.mp3",
+      "model": "eleven_text_to_sound_v2",
+      "prompt": "One delightful magical citrus crystal pickup, bright glass chime and juicy tiny bubble pop, crisp playful console platformer sound, no music",
+      "bytes": 17180,
+      "sha256": "0b754b672b807728b31ff0e29d3cea7913d0c79f09956cfc7d36c933232c334b",
+      "request_id": null
+    },
+    {
+      "name": "dash",
+      "status": "generated",
+      "file": "docs/world/delicia/audio/dash.mp3",
+      "model": "eleven_text_to_sound_v2",
+      "prompt": "One quick energetic orange juice dash whoosh, fizzy fluid rush with sparkling trailing droplets, crisp clean platformer movement effect",
+      "bytes": 17180,
+      "sha256": "c2718c6b2f7399e1c3cf95571182778116fe2bc18c302fc5b5a2ad0bac9040be",
+      "request_id": null
+    },
+    {
+      "name": "seed",
+      "status": "generated",
+      "file": "docs/world/delicia/audio/seed.mp3",
+      "model": "eleven_text_to_sound_v2",
+      "prompt": "One springy cartoon citrus seed slingshot, wooden click with quick whistling zip and tiny juicy pop, clean action game effect",
+      "bytes": 17180,
+      "sha256": "28757fd36df348c9b0b8451e89b5eca0b3011630df0d45a3ccc2b928f7d0fee1",
+      "request_id": null
+    },
+    {
+      "name": "parry",
+      "status": "generated",
+      "file": "docs/world/delicia/audio/parry.mp3",
+      "model": "eleven_text_to_sound_v2",
+      "prompt": "One satisfying perfect parry against a brass machine, bright metallic clang, glass citrus chime and short sparkling magical tail, console action game",
+      "bytes": 24703,
+      "sha256": "e961e9fbeff030cfed9c078171b9919e8271c474f0d41f8305f6f30ec09e9a83",
+      "request_id": null
+    },
+    {
+      "name": "pound",
+      "status": "generated",
+      "file": "docs/world/delicia/audio/pound.mp3",
+      "model": "eleven_text_to_sound_v2",
+      "prompt": "One heavy cartoon ground pound on sandstone, bassy punch, crunchy rock crack, scattered pebbles and splashing orange juice, punchy action game effect",
+      "bytes": 33062,
+      "sha256": "90b981198b0b7b1ffdbe35fde5e12e630953847307a0e838a038543ccbddfcee",
+      "request_id": null
+    },
+    {
+      "name": "pressure",
+      "status": "generated",
+      "file": "docs/world/delicia/audio/pressure.mp3",
+      "model": "eleven_text_to_sound_v2",
+      "prompt": "Brass orange juice refinery valve opening, short squeaky wheel twist, building pneumatic hiss and powerful liquid burst with settling drips, no speech",
+      "bytes": 48945,
+      "sha256": "2841ae6493ee23adb83ad8183ea19d7c18cd9d5248cc247d54667db8419e849b",
+      "request_id": null
+    },
+    {
+      "name": "warning",
+      "status": "generated",
+      "file": "docs/world/delicia/audio/warning.mp3",
+      "model": "eleven_text_to_sound_v2",
+      "prompt": "One clearly audible friendly dangerous machine warning, rising mechanical whistle with three short brass pulses, game attack telegraph, no speech",
+      "bytes": 24703,
+      "sha256": "500189daf8773495d2284fd6ce2df244d72341eeaafc5585c8a8d8f459d8172e",
+      "request_id": null
+    },
+    {
+      "name": "boss-hit",
+      "status": "generated",
+      "file": "docs/world/delicia/audio/boss-hit.mp3",
+      "model": "eleven_text_to_sound_v2",
+      "prompt": "One powerful satisfying hit on armored cartoon villain, deep brass clang and pulpy citrus splat, tight game impact with sparkling tail, no voice",
+      "bytes": 24703,
+      "sha256": "5d00839a6fb588f3c5860bd36334228405a0d2c19fd8b1987a4188574b73e5ec",
+      "request_id": null
+    },
+    {
+      "name": "victory",
+      "status": "generated",
+      "file": "docs/world/delicia/audio/victory.mp3",
+      "model": "eleven_text_to_sound_v2",
+      "prompt": "Joyful short fantasy platformer victory flourish, celesta arpeggio, triumphant brass chord, marimba and bright magical citrus sparkle, polished four second reward jingle",
+      "bytes": 65245,
+      "sha256": "4439e531d2996aac42dd5c209976b5cc44c671e3dd6a70563f817accedd24041",
+      "request_id": null
+    },
+    {
+      "name": "orchard",
+      "status": "generated",
+      "file": "docs/world/delicia/audio/orchard.mp3",
+      "model": "music_v2",
+      "prompt": "Original instrumental console platformer exploration music, sunny Brazilian citrus island, playful marimba and cavaquinho, expressive flute melody, warm upright bass, light samba percussion, sophisticated playful orchestration, 116 BPM, seamless repeating musical phrases with a short introduction, bright adventure and discovery, no vocals, 60 seconds",
+      "bytes": 960515,
+      "sha256": "19ef5ffb1e8ffb911d8d0b2aa01ae8b01b27465e901818608579738a3911a86a",
+      "request_id": null
+    },
+    {
+      "name": "reservoir",
+      "status": "generated",
+      "file": "docs/world/delicia/audio/reservoir.mp3",
+      "model": "music_v2",
+      "prompt": "Original instrumental fantasy platformer music for an ancient orange juice aqueduct at twilight, lyrical celesta and flute, watery harp arpeggios, warm strings, Brazilian hand percussion, mysterious beautiful melodic exploration, 100 BPM, clear looping musical phrases, restrained rich arrangement, no vocals, 60 seconds",
+      "bytes": 960515,
+      "sha256": "f6f8dfdc17ad52369cd5ebf4fbf09b86cc51d2c146cb98207d088b21b025a49b",
+      "request_id": null
+    },
+    {
+      "name": "guina",
+      "status": "generated",
+      "file": "docs/world/delicia/audio/guina.mp3",
+      "model": "music_v2",
+      "prompt": "Original instrumental challenging platformer boss battle music, fictional citrus refinery tyrant, dramatic low brass and strings, punchy Brazilian percussion, marimba motif answering imposing brass melody, driving 146 BPM, playful theatrical menace, powerful rhythmic pulse, polished console soundtrack, recurring orange island melodic motif, no vocals, 60 seconds",
+      "bytes": 960515,
+      "sha256": "fba59e4fef009a05fdd0f598b814d2129d546898fa4e8455e0f0d14b2b896c21",
+      "request_id": null
+    }
+  ]
+}

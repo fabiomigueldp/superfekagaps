@@ -1,5 +1,24 @@
 # Pacote de publicação
 
+## Atualização — segunda produção da Delícia, 5 de outubro de 2026
+
+A expansão agora publica 13 WebP e 20 áudios Opus. Seis novos assets imagegen e o diorama são empacotados em formatos de runtime; os mestres ficam em `docs/world/delicia/`. O [modelo reconstruído, revisão 3](world/delicia/modelo-v3.md), usa um WebP de 3.200 × 2.000. O build atualizado tem **51.429.046 bytes**, abaixo do limite de **53.000.000 bytes**; [medição](world/delicia/build-size-v3.json). As 21 exclusões anteriores permanecem iguais. [Conteúdo e validação da campanha](world/delicia/entrega-v2.md).
+
+As medições abaixo são históricas; a medição atual é produzida por `npm run size:build`.
+
+## Atualização — Império da Delícia, 4 de outubro de 2026
+
+A nova entrada `delicia.html` publica a expansão com sete WebP, vinte áudios Opus
+e metadados do mapa. Os mestres PNG, MP3, Blender e GLB ficam em
+`docs/world/delicia/`, fora de `public/`. O orçamento foi atualizado para
+50.000.000 bytes para comportar esse conteúdo solicitado. A lista anterior de
+21 exclusões permanece inalterada, e nenhuma fonte anterior foi recomprimida.
+
+A medição consolidada é 201 arquivos e 48.835.589 bytes; a margem é 1.164.411 bytes.
+Veja o [relatório da expansão](world/delicia/entrega.md) e a
+[medição detalhada](world/delicia/build-size.json). Os valores abaixo documentam
+as auditorias históricas anteriores à expansão.
+
 O build copia os assets de `public/` por meio de `scripts/build_output_policy.ts`.
 A lista de exclusão contém **21 caminhos exatos** revisados; novos arquivos são
 incluídos por padrão. O filtro só roda no build. Nenhum original é removido ou

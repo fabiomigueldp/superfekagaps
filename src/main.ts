@@ -6,6 +6,7 @@ import { FactoryCampaign } from './adventure/factory/FactoryCampaign';
 import './adventure/map.css';
 import './adventure/world-controls-help.css';
 import './adventure/experimental/hub/experimental-hub.css';
+import './adventure/delicia/map-link.css';
 
 // Inicializa o jogo quando a página carregar
 window.addEventListener('DOMContentLoaded', async () => {
@@ -17,6 +18,12 @@ window.addEventListener('DOMContentLoaded', async () => {
     return;
   }
   const params = new URLSearchParams(window.location.search);
+  if (params.get('delicia') === 'true') {
+    const container = document.getElementById('game-container');
+    if (container) container.hidden = true;
+    await import('./adventure/delicia/entry');
+    return;
+  }
   // Optional tools/Classic must not join World's first-load dependency graph.
   // World still starts synchronously; only the selected optional mode waits.
   async function optionalMode<T>(load: () => Promise<T>): Promise<T | null> {
