@@ -5,8 +5,8 @@ import { AIRCRAFT_TRAVEL_DURATION, type AircraftRoute } from './WorldAircraftMod
  * of slowing to a pivot. Coordinates use the fixed atlas/camera contract; the
  * first/last three controls are derived from the runway to preserve C2 joins. */
 const CAMPAIGN_FLIGHT_BENDS = {
-    'guaira:fabrica': [{ x: 3.774336, y: -0.179560 }, { x: 3.475730, y: 0.334151 }],
-    'fabrica:guaira': [{ x: 3.492586, y: 0.155663 }, { x: 3.756852, y: -0.208959 }],
+    'guaira:fabrica': [{ x: 3.901460, y: -0.501432 }, { x: 3.431835, y: 0.971253 }],
+    'fabrica:guaira': [{ x: 3.425376, y: 0.955866 }, { x: 3.878875, y: -0.620914 }],
     'guaira:serra': [{ x: 3.829484, y: -0.234646 }, { x: 3.920664, y: 1.037330 }],
     'serra:guaira': [{ x: 3.921638, y: 1.026759 }, { x: 3.813935, y: -0.328134 }],
 } as const;
@@ -17,13 +17,11 @@ export function campaignAircraftRoute(source: GuairaCampaignRegion, destination:
     return { departureStart: from.rollStart ?? from.runwayStart, departureLift: from.rollEnd ?? from.runwayEnd,
         arrivalTouchdown: to.rollEnd ?? to.runwayEnd, arrivalStop: to.rollStart ?? to.runwayStart, altitude: .24,
         ...(source === 'guaira' || destination === 'guaira' ? { runwayCorridors: {
-            departure: source === 'guaira' ? 1 : source === 'serra' ? .6 : 0,
-            arrival: destination === 'guaira' ? 1 : destination === 'serra' ? .6 : 0,
+            departure: source === 'guaira' ? 1 : .6,
+            arrival: destination === 'guaira' ? 1 : .6,
             ...(source === 'serra' ? { departureOffshoreClimb: true } : {}),
             ...(destination === 'serra' ? { arrivalOffshoreClimb: true } : {}),
             bendControls: CAMPAIGN_FLIGHT_BENDS[`${source}:${destination}` as keyof typeof CAMPAIGN_FLIGHT_BENDS],
-            ...(source === 'fabrica' || destination === 'fabrica' ? { oppositeTerminalContacts: { departureStart: from.runwayStart, departureLift: from.runwayEnd,
-                arrivalTouchdown: to.runwayEnd, arrivalStop: to.runwayStart } } : {}),
         } } : {}),
         scale: campaignAircraftScale(source, destination, 0) };
 }

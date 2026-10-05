@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { campaignAircraftRoute, campaignAircraftScale } from '../src/adventure/WorldAircraftTerminalRoute';
 import { campaignAirportTerminal, GUAIRA_CAMPAIGN_ART } from '../src/adventure/GuairaCampaignArt';
 import { sampleAircraftTravel } from '../src/adventure/WorldAircraftModel';
+import factoryMetadata from '../public/assets/world/map/guaira-campaign/fabrica.meta.json';
 
 for (const [source, destination] of [['fabrica', 'guaira'], ['guaira', 'fabrica'], ['guaira', 'serra'], ['serra', 'guaira']] as const) {
     test(`${source} to ${destination} uses authored contact points and physical endpoint scales`, () => {
@@ -33,8 +34,7 @@ for (const [source, destination] of [['fabrica', 'guaira'], ['guaira', 'fabrica'
             assert.ok(angleDistance(a.heading, b.heading) < .0001, `heading at ${boundary}`);
             assert.ok(Math.abs(a.altitude - b.altitude) < .00001, `altitude at ${boundary}`);
             assert.ok(Math.abs(a.bank - b.bank) < .00001, `bank at ${boundary}`);
-            // The opposite terminal deliberately retains its original lift attitude.
-            if (leaving || boundary !== 2.1) assert.ok(Math.abs(a.pitch - b.pitch) < .00001, `pitch at ${boundary}`);
+            assert.ok(Math.abs(a.pitch - b.pitch) < .00001, `pitch at ${boundary}`);
         }
         const join = leaving ? 2.1 + corridor.departure : 6.1 - corridor.arrival, h = .0001;
         const p = (time: number) => sampleAircraftTravel(route, time).ground;
@@ -94,34 +94,53 @@ test('a single optional inset contact is still projected into atlas coordinates'
 
 
 for (const [source, destination] of [['fabrica', 'guaira'], ['guaira', 'fabrica']] as const) {
-    test(`${source} to ${destination} preserves opposite-terminal poses and C2 mid-flight joins`, () => {
-        const route = campaignAircraftRoute(source, destination), corridor = route.runwayCorridors!;
-        const original = { ...corridor.oppositeTerminalContacts!, altitude: route.altitude, scale: route.scale };
-        const approvedGuaira = { ...route, runwayCorridors: { ...corridor, oppositeTerminalContacts: undefined } };
+    test(`${source} to ${destination} preserves the approved Guaíra terminal`, () => {
+        const from = campaignAirportTerminal(source, true), to = campaignAirportTerminal(destination, true);
+        const route = campaignAircraftRoute(source, destination), leaving = source === 'guaira';
+        // Freeze the previously shipped route rather than deriving expectations
+        // from the changed Factory contacts or new middle bend controls.
+        const baseline = { ...route, departureStart: leaving ? from.rollStart! : from.runwayStart,
+            departureLift: leaving ? from.rollEnd! : from.runwayEnd,
+            arrivalTouchdown: leaving ? to.runwayEnd : to.rollEnd!, arrivalStop: leaving ? to.runwayStart : to.rollStart!,
+            runwayCorridors: { departure: leaving ? 1 : 0, arrival: leaving ? 0 : 1,
+                bendControls: (leaving ? [{ x: 3.774336, y: -.179560 }, { x: 3.475730, y: .334151 }]
+                    : [{ x: 3.492586, y: .155663 }, { x: 3.756852, y: -.208959 }]) as readonly [{ x: number; y: number }, { x: number; y: number }],
+                oppositeTerminalContacts: { departureStart: from.runwayStart, departureLift: from.runwayEnd,
+                    arrivalTouchdown: to.runwayEnd, arrivalStop: to.runwayStart } } };
         for (let tick = 0; tick <= 444; tick++) {
-            const time = tick / 60, pose = sampleAircraftTravel(route, time);
-            if (source !== 'guaira' && time <= 3.1 || destination !== 'guaira' && time >= 5.1) {
-                assert.deepEqual(pose, sampleAircraftTravel(original, time), `exact original terminal pose at ${time}`);
-            }
-            if (source === 'guaira' && time <= 3.1 || destination === 'guaira' && time >= 5.1) {
-                assert.deepEqual(pose, sampleAircraftTravel(approvedGuaira, time), `approved Guaíra corridor at ${time}`);
-            }
+            const time = tick / 60;
+            if (!(leaving ? time <= 3.1 : time >= 5.1)) continue;
+            const actual = sampleAircraftTravel(route, time), expected = sampleAircraftTravel(baseline, time);
+            // The binary64 5.1 - 2.1 join can leave one ulp of central-curve dust.
+            for (const key of ['heading', 'speed', 'bank'] as const) assert.ok(Math.abs(actual[key] - expected[key]) <= 1e-12);
+            assert.deepEqual({ ...actual, heading: 0, speed: 0, bank: 0 }, { ...expected, heading: 0, speed: 0, bank: 0 });
         }
-        const h = .0001, ground = (time: number) => sampleAircraftTravel(route, time).ground;
-        for (const join of source === 'guaira' ? [4.1, 5.1] : [3.1, 4.1]) {
-            const p = ground(join), left = sampleAircraftTravel(route, join - h), right = sampleAircraftTravel(route, join + h);
-            assert.ok(metricDistance(left.ground, right.ground) < .0005, `position at ${join}`);
-            assert.ok(Math.abs(left.speed - right.speed) < .003, `speed at ${join}`);
-            assert.ok(angleDistance(left.heading, right.heading) < .003, `heading at ${join}`);
-            const acceleration = (side: number) => ({
-                x: (ground(join + side * 2 * h).x - 2 * ground(join + side * h).x + p.x) / h ** 2,
-                y: (ground(join + side * 2 * h).y - 2 * ground(join + side * h).y + p.y) / h ** 2,
-            });
-            assert.ok(metricDistance(acceleration(-1), acceleration(1)) < .03, `C2 acceleration at ${join}`);
-            assert.ok(Math.abs(left.bank - right.bank) < .001, `bank at ${join}`);
-            assert.ok(Math.abs(left.altitude - right.altitude) < .0001, `altitude at ${join}`);
+    });
+
+    test(`${source} to ${destination} uses the compact Factory roll and smooth aligned joins`, () => {
+        const route = campaignAircraftRoute(source, destination), departing = source === 'fabrica';
+        assert.equal(route.runwayCorridors!.oppositeTerminalContacts, undefined);
+        const start = departing ? 2.1 : 5.5, end = departing ? 2.7 : 6.1;
+        const heading = sampleAircraftTravel(route, departing ? 2.1 : 6.1).heading;
+        for (let tick = 0; tick <= 36; tick++) {
+            const pose = sampleAircraftTravel(route, start + tick / 60);
+            assert.ok(angleDistance(pose.heading, heading) < 1e-12);
+            assert.ok(Math.abs(pose.bank) < 1e-12);
         }
-        for (let tick = 0; tick <= 69; tick++) assert.deepEqual(sampleAircraftTravel(route, tick / 60, true), sampleAircraftTravel(approvedGuaira, tick / 60, true));
+        const h = .0001;
+        for (const join of [2.1, 2.7, 5.5, 6.1]) {
+            const a = sampleAircraftTravel(route, join - h), b = sampleAircraftTravel(route, join + h);
+            assert.ok(metricDistance(a.position, b.position) < .0005);
+            assert.ok(Math.abs(a.speed - b.speed) < .0005);
+            assert.ok(angleDistance(a.heading, b.heading) < .001);
+            assert.ok(Math.abs(a.pitch - b.pitch) < .001);
+        }
+        assert.equal(sampleAircraftTravel(route, departing ? end : start).altitude, .24);
+        for (let tick = 0; tick <= 69; tick++) {
+            const calm = sampleAircraftTravel(route, tick / 60, true);
+            assert.equal(calm.altitude + calm.bank + calm.pitch + calm.suspension + calm.propellerSpeed + calm.dust + calm.airWisps, 0);
+            assert.equal(calm.complete, tick === 69);
+        }
     });
 }
 
@@ -177,5 +196,34 @@ for (const [source, destination] of [['serra', 'guaira'], ['guaira', 'serra']] a
         assert.ok(angleDistance(a.heading, b.heading) < .00001);
         assert.ok(sampleAircraftTravel(route, join).altitude < .012);
         assert.equal(sampleAircraftTravel(route, 4.1).altitude, .24);
+    });
+}
+
+
+test('Factory contacts stay inside the existing foundation without changing the strip or passenger anchors', () => {
+    const terminal = factoryMetadata.terminal;
+    assert.deepEqual(terminal.rollStartWorld, [.9, -2.94, 1.07]);
+    assert.deepEqual(terminal.rollEndWorld, [2.2, -2.94, 1.07]);
+    assert.equal(terminal.rollLengthMeters, 1.3);
+    assert.equal(terminal.usableLengthMeters, 6.2);
+    assert.deepEqual(terminal.runwayStartWorld, [-1.3, -2.9, 1.07]);
+    assert.deepEqual(terminal.runwayEndWorld, [4.9, -2.9, 1.07]);
+    assert.deepEqual(terminal.boardingPathWorld, [[4.25, -1.85, 1.18], [4.8, -2.3, 1.07], [3.3, -2.9, 1.07]]);
+    assert.equal(factoryMetadata.image.bytes, 8044);
+});
+
+for (const [source, destination] of [['fabrica', 'guaira'], ['guaira', 'fabrica']] as const) {
+    test(`${source} to ${destination} avoids abrupt acceleration or speeding past scenery`, () => {
+        const route = campaignAircraftRoute(source, destination);
+        const velocity = (pose: ReturnType<typeof sampleAircraftTravel>) => ({
+            x: Math.cos(pose.heading) * pose.speed, y: Math.sin(pose.heading) * pose.speed,
+        });
+        for (let tick = 1; tick <= 444; tick++) {
+            const before = sampleAircraftTravel(route, (tick - 1) / 60), now = sampleAircraftTravel(route, tick / 60);
+            const a = velocity(before), b = velocity(now);
+            assert.ok(Math.hypot(b.x - a.x, b.y - a.y) * 60 < 3.0, 'bounded vector acceleration');
+            assert.ok(now.speed < 2.1, 'below either old Factory-route peak speed');
+            assert.ok(angleDistance(now.heading, before.heading) < 3.66 * Math.PI / 180, 'smooth turn');
+        }
     });
 }

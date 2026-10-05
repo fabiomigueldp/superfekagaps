@@ -244,6 +244,14 @@ elif REGION=='serra':
  meta['flightClearance']={'method':'supported coastal roll and shallow offshore corridor','support':coastal_support,
    'physicalStripAndBoardingUnchanged':True}
 elif REGION=='fabrica':
+ # Reserve the ground-supported wheel lane before the shelter and raised yard
+ # pads. The 4 cm southern inset also clears the inspection-walkway edge.
+ # Keep the physical strip, passenger path and every scene object unchanged.
+ roll_start=(.9,-2.94,z);roll_end=(2.2,-2.94,z)
+ meta['terminal'].update({'rollStart':project(roll_start),'rollEnd':project(roll_end),
+   'rollStartWorld':roll_start,'rollEndWorld':roll_end,'rollLengthMeters':1.3})
+ meta['flightClearance']={'method':'inset supported roll and aligned short climb before the shelter',
+   'physicalStripAndBoardingUnchanged':True,'support':'existing factory foundation; no terrain or scenery changes'}
  cam.data.ortho_scale*=2
  meta['assetFrame']={'left':-.5,'top':-.5,'widthInMap':2,'heightInMap':2}
 if REGION=='fabrica':
