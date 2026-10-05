@@ -90,7 +90,11 @@ export class Input {
       this.lifetime.listen(window, 'keyup', (event) => this.handleKeyUp(event), true);
       this.lifetime.listen(window, 'blur', () => this.reset());
       this.lifetime.listen(window, 'pagehide', () => this.reset());
-      this.lifetime.listen(window, 'orientationchange', () => this.reset());
+      // Modern rotation events belong to ScreenOrientation, not window. Keep
+      // the legacy event only as a fallback so one rotation does not reset twice.
+      const orientation = window.screen?.orientation;
+      if (typeof orientation?.addEventListener === 'function') this.lifetime.listen(orientation, 'change', () => this.reset());
+      else this.lifetime.listen(window, 'orientationchange', () => this.reset());
       this.lifetime.listen(document, 'visibilitychange', () => {
         if (document.hidden) this.reset();
       });
