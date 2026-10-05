@@ -1,8 +1,11 @@
 import assert from 'node:assert/strict';
 import test, { type TestContext } from 'node:test';
 import { readFileSync } from 'node:fs';
-import { ExperimentalHub } from '../src/adventure/experimental/hub/ExperimentalHub';
+import { ExperimentalHub, EXTRAS_LABEL } from '../src/adventure/experimental/hub/ExperimentalHub';
 import { EXPERIMENTAL_HUB_RETURN, EXPERIMENTAL_ROUTES, experimentalTitleSize, requestsExperimentalHub } from '../src/adventure/experimental/hub/ExperimentalRoutes';
+import { labActionSize } from '../src/adventure/experimental/JuiceLabToolbar';
+import { pixelText, textWidth } from '../src/graphics/BitmapFont';
+import { ART } from '../src/graphics/palette';
 import { WorldGame } from '../src/adventure/WorldGame';
 import { freshSave, SAVE_KEY } from '../src/adventure/progress';
 import { sceneLifecycleBrowser, LifecycleElement } from './helpers/sceneLifecycleHarness';
@@ -103,9 +106,8 @@ test('modal traps boundary Tab, keeps native links and rejects repeated activati
     const h = browser(t); h.game.enableExperimentalHub('?experiments=1');
     const dialog = h.byId('experimental-hub'), nav = dialog.children.find(element => element.tagName === 'NAV')!;
     assert.equal(nav.children.length, 3);
-    assert.equal(h.byId('experimental-hub-title').textContent, 'EXTRAS OPCIONAIS');
-    assert.match(h.byId('experimental-hub-note').textContent, /capítulo de Guaíra salva seu progresso/);
-    assert.doesNotMatch(h.byId('experimental-hub-note').textContent, /Sem progresso salvo/);
+    assert.equal(h.byId('experimental-hub-title').children.find(child => child.tagName === 'SPAN')?.textContent, 'EXTRAS');
+    assert.equal(h.byId('experimental-hub-note').textContent, 'Para seguir a campanha, volte ao título.');
     assert.deepEqual(nav.children.map(link => (link as unknown as { href: string }).href), EXPERIMENTAL_ROUTES.map(route => route.href));
     const first = nav.children[0], close = h.byId('close-experiments');
     assert.equal(h.doc.activeElement, first);
@@ -119,6 +121,114 @@ test('modal traps boundary Tab, keeps native links and rejects repeated activati
     assert.equal(h.gameHub().isOpen, true, 'Modified link activation leaves the existing session open');
     h.window.dispatch('pagehide'); assert.equal(h.gameHub().isOpen, false);
     h.window.dispatch('pageshow', { persisted: true }); assert.equal(h.gameHub().isOpen, true);
+});
+
+test('chooser has one useful description per route, full accessible labels and no repeated introduction', t => {
+    const h = browser(t); h.game.enableExperimentalHub();
+    const dialog = h.byId('experimental-hub'), nav = dialog.children.find(element => element.tagName === 'NAV')!;
+    assert.deepEqual(dialog.children.map(child => child.tagName), ['H1', 'NAV', 'P', 'BUTTON']);
+    assert.equal(dialog.getAttribute('aria-labelledby'), 'experimental-hub-title');
+    assert.equal(dialog.getAttribute('aria-describedby'), 'experimental-hub-note');
+    const choices = [
+        ['./guaira-capitulo.html', 'CAPÍTULO DE GUAÍRA', 'Progresso salvo neste navegador.'],
+        ['./guaira.html', 'GUAÍRA LIVRE', 'Explore percursos em treino, sem salvar.'],
+        ['./juice-lab.html', 'TREINO TURBOSUCO', 'Treine a arena, sem salvar progresso.']
+    ];
+    assert.deepEqual(EXPERIMENTAL_ROUTES.map(({ href, label, description }) => [href, label, description]), choices);
+    for (const [index, [href, label, description]] of choices.entries()) {
+        const link = nav.children[index], [plate, detail] = link.children;
+        assert.equal((link as unknown as { href: string }).href, href);
+        assert.equal(link.getAttribute('aria-label'), `${label}. ${description}`);
+        assert.equal(plate.children.find(child => child.tagName === 'SPAN')?.textContent, label);
+        assert.equal(detail.textContent, description);
+        assert.equal(link.children.length, 2, 'one label and one description');
+    }
+    for (const [id, label] of [['open-experiments', EXTRAS_LABEL], ['close-experiments', 'VOLTAR AO TÍTULO']]) {
+        const button = h.byId(id);
+        assert.equal(button.getAttribute('aria-label'), label);
+        assert.equal(button.children.find(child => child.tagName === 'SPAN')?.textContent, label);
+    }
+    assert.deepEqual(h.writes, [], 'chooser copy and artwork do not change saved progress');
+});
+
+test('heading uses native bitmap glyphs and full labels fit their canvases and narrow chooser contracts', t => {
+    const h = browser(t), create = h.doc.createElement;
+    type Pixel = { color: string; x: number; y: number; width: number; height: number };
+    const paintings = new Map<LifecycleElement, Pixel[]>();
+    h.doc.createElement = tag => {
+        const element = create(tag);
+        if (tag === 'canvas') {
+            const pixels: Pixel[] = []; paintings.set(element, pixels);
+            const ctx = element.getContext(); let scale = 1;
+            ctx.setTransform = (a?: number | DOMMatrix2DInit, _b?: number, _c?: number, d?: number) => {
+                assert.ok(typeof a === 'number'); assert.equal(a, d); scale = a;
+            };
+            ctx.fillRect = (x, y, width, height) => pixels.push({ color: String(ctx.fillStyle), x: x * scale, y: y * scale, width: width * scale, height: height * scale });
+        }
+        return element;
+    };
+    h.game.enableExperimentalHub();
+    const heading = h.byId('experimental-hub-title').children.find(child => child.tagName === 'CANVAS')!;
+    assert.equal(heading.width, textWidth(EXTRAS_LABEL, 2)); assert.equal(heading.height, 14);
+    assert.equal(heading.getAttribute('aria-hidden'), 'true');
+    const expected: Pixel[] = [];
+    pixelText({ fillRect: (x: number, y: number, width: number, height: number) => expected.push({ color: ART.goldLight, x, y, width, height }) } as unknown as CanvasRenderingContext2D,
+        EXTRAS_LABEL, 0, 0, ART.goldLight, 2);
+    assert.deepEqual(paintings.get(heading), expected, 'small shared-font heading has no decorative plate or replacement art');
+    for (const [canvas, pixels] of paintings) {
+        assert.ok(pixels.length > 0);
+        for (const { x, y, width, height } of pixels) {
+            assert.ok(x >= 0 && y >= 0 && x + width <= canvas.width && y + height <= canvas.height,
+                'every actual painted rectangle stays inside its bitmap');
+        }
+    }
+    const nav = h.byId('experimental-hub').children.find(element => element.tagName === 'NAV')!;
+    for (const [index, route] of EXPERIMENTAL_ROUTES.entries()) {
+        const canvas = nav.children[index].children[0].children.find(child => child.tagName === 'CANVAS')!;
+        assert.equal(canvas.width, labActionSize(route.label).width * 2);
+        assert.equal(canvas.height, 44);
+        assert.ok(textWidth(route.label, 2) + 12 <= canvas.width, 'complete bitmap label keeps its side padding');
+        // CSS contract arithmetic only; native browser layout is checked separately.
+        for (const viewport of [240, 280, 320, 472]) {
+            const available = Math.min(440, viewport - 20) - 6 - 24 - 6 - 16;
+            const displayedWidth = Math.min(canvas.width, available);
+            assert.ok(displayedWidth <= available);
+            assert.ok(canvas.height * displayedWidth / canvas.width <= 44, 'art scales proportionally inside the unchanged 62px link target');
+        }
+    }
+    const css = readFileSync(new URL('../src/adventure/experimental/hub/experimental-hub.css', import.meta.url), 'utf8');
+    assert.match(css, /\.experimental-route-plate \{[^}]*max-width: 100%/);
+    assert.match(css, /\.experimental-route-plate \.lab-action-art \{ height: auto; \}/);
+    assert.match(css, /\.experimental-entry \.lab-action-art, \.experimental-hub \.lab-action-art \{[^}]*max-width: 100%/);
+    assert.match(css, /\.experimental-route \{[^}]*min-height: 62px/);
+    assert.match(css, /\.experimental-entry button, \.experimental-hub button \{[^}]*min-height: 44px; min-width: 44px/);
+    assert.match(css, /\.experimental-hub button \{ max-width: 100%; \}/);
+});
+
+test('canvas-unavailable and forced-colors fallbacks retain readable heading and complete control names', t => {
+    const h = browser(t), create = h.doc.createElement;
+    h.doc.createElement = tag => {
+        const element = create(tag);
+        if (tag === 'canvas') element.getContext = () => null as unknown as CanvasRenderingContext2D;
+        return element;
+    };
+    h.game.enableExperimentalHub('?experiments=1');
+    const heading = h.byId('experimental-hub-title');
+    const nav = h.byId('experimental-hub').children.find(element => element.tagName === 'NAV')!;
+    const controls = [h.byId('open-experiments'), heading, ...nav.children.map(link => link.children[0]), h.byId('close-experiments')];
+    const labels = [EXTRAS_LABEL, EXTRAS_LABEL, ...EXPERIMENTAL_ROUTES.map(route => route.label), 'VOLTAR AO TÍTULO'];
+    for (const [index, control] of controls.entries()) {
+        assert.equal(control.children.find(child => child.tagName === 'CANVAS')?.hidden, true);
+        const text = control.children.find(child => child.tagName === 'SPAN')!;
+        assert.equal(text.textContent, labels[index]); assert.equal(text.className, '', 'fallback text is visible');
+    }
+    assert.equal(h.key('Escape').defaultPrevented, true); assert.equal(h.gameHub().isOpen, false);
+    const css = readFileSync(new URL('../src/adventure/experimental/hub/experimental-hub.css', import.meta.url), 'utf8');
+    assert.match(css, /\.experimental-heading-art\[hidden\] \{ display: none; \}/);
+    assert.match(css, /\.experimental-entry \.lab-action-art\[hidden\], \.experimental-hub \.lab-action-art\[hidden\]/);
+    const forced = css.slice(css.indexOf('@media (forced-colors: active)'));
+    assert.match(forced, /\.experimental-heading-art \{ display: none; \}/);
+    assert.match(forced, /\.experimental-hub \.lab-sr \{[^}]*position: static;[^}]*clip-path: none;[^}]*white-space: normal;[^}]*overflow-wrap: anywhere/);
 });
 
 test('title-only styling, stale callbacks and disposal do not touch other scenes', t => {
