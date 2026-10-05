@@ -1,0 +1,15 @@
+{
+  "checks": [
+    "Escape from a focused volume slider returns to the title",
+    "Map keyboard selection respects locks; Space resumes after nested menus preserve the run",
+    "Import failure is visible and keeps existing progress",
+    "Virtual controller navigates title, settings, map, dialogue and pause",
+    "Death, retry, completion and ending actions remain usable",
+    "390px, 320px and landscape: actual pin taps, 44px targets, readable footer, no page overflow"
+  ],
+  "errors": [],
+  "arrangedCases": [
+    "A virtual standard controller exercises menu navigation. Result screens and unlocked phases are arranged in an isolated profile."
+  ],
+  "passed": true
+}

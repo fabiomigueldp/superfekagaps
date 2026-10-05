@@ -1,0 +1,283 @@
+{
+  "images": [
+    {
+      "source": "docs/world/delicia/key-art.png",
+      "file": "public/assets/delicia/key-art.webp",
+      "bytes": 585936,
+      "sha256": "5ad5a2743c46fb101a6a1400ca3dfeae6037f0294347993bfe97ad4f9a79f3ac",
+      "width": 1586,
+      "height": 992,
+      "alpha": false
+    },
+    {
+      "source": "docs/world/delicia/backdrop.png",
+      "file": "public/assets/delicia/backdrop.webp",
+      "bytes": 291716,
+      "sha256": "7254003e5376434848565022a9a6468d6d268cff8d9172d4d15f473121927a16",
+      "width": 1672,
+      "height": 941,
+      "alpha": false
+    },
+    {
+      "source": "docs/world/delicia/environment-atlas.png",
+      "file": "public/assets/delicia/environment-atlas.webp",
+      "bytes": 434460,
+      "sha256": "b1bf0f7b67d9691fd99ed4a30a3bc4e32b8007a341547dc64368adbd572f491f",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false
+    },
+    {
+      "source": "docs/world/delicia/portraits.png",
+      "file": "public/assets/delicia/portraits.webp",
+      "bytes": 381858,
+      "sha256": "eab20dd10ade6b14d694b26af29b2a996260eeed7899cf3ffe890841d21a42c2",
+      "width": 1536,
+      "height": 1024,
+      "alpha": true
+    },
+    {
+      "source": "docs/world/delicia/props-v5.png",
+      "file": "public/assets/delicia/props.webp",
+      "bytes": 222920,
+      "sha256": "53c2a0b56154df0ebd262fd9031cc0cf236d0cd050fdc5c919bf49330ec35be7",
+      "width": 1536,
+      "height": 1024,
+      "alpha": true
+    },
+    {
+      "source": "docs/world/delicia/boss-atlas.png",
+      "file": "public/assets/delicia/boss-atlas.webp",
+      "bytes": 297798,
+      "sha256": "5c77a51f646717abfa025d43e7054bedecf34201cabc7b1520858784a5f164cb",
+      "width": 1024,
+      "height": 1536,
+      "alpha": true
+    },
+    {
+      "source": "docs/world/delicia/island-render-v4.png",
+      "file": "public/assets/delicia/island.webp",
+      "bytes": 277354,
+      "sha256": "059669c2d05781fb8519138545114105e2e789c43c895c55a13f314ee8eeb3ad",
+      "width": 2560,
+      "height": 1600,
+      "alpha": true
+    },
+    {
+      "source": "docs/world/delicia/world-concept-v2.png",
+      "file": "public/assets/delicia/world-concept-v2.webp",
+      "bytes": 490794,
+      "sha256": "5c2d203763f20c82cd3d67bcb28fe4f6a36a482cd097aa386d09e5eba18f8fed",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false
+    },
+    {
+      "source": "docs/world/delicia/enemies-v2.png",
+      "file": "public/assets/delicia/enemies-v2.webp",
+      "bytes": 324788,
+      "sha256": "42125b3aeca173a169553ca143032e8ee98c3fc997be5a982a2ebcf6bb2ddca5",
+      "width": 1536,
+      "height": 1024,
+      "alpha": true
+    },
+    {
+      "source": "docs/world/delicia/jaja-motion-v2.png",
+      "file": "public/assets/delicia/jaja-motion-v2.webp",
+      "bytes": 304798,
+      "sha256": "0a7faf0fe52bc4c9404b1d42dccf26982207683e0179c6ca63cc4bf17db48547",
+      "width": 1536,
+      "height": 1024,
+      "alpha": true
+    },
+    {
+      "source": "docs/world/delicia/guina-motion-v2.png",
+      "file": "public/assets/delicia/guina-motion-v2.webp",
+      "bytes": 309592,
+      "sha256": "7fa5148d80b3c94d5836c987e2670f917029385d5bb089404c0c65a68fbe1d3e",
+      "width": 1536,
+      "height": 1024,
+      "alpha": true
+    },
+    {
+      "source": "docs/world/delicia/landmarks-v5.png",
+      "file": "public/assets/delicia/landmarks-v2.webp",
+      "bytes": 371610,
+      "sha256": "bd4a29752ddcebdd9c8a4dc2557121c9a0a9adfeb8d688e15ec8c20b14138f45",
+      "width": 1224,
+      "height": 1285,
+      "alpha": true
+    },
+    {
+      "source": "docs/world/delicia/terrain-v2.png",
+      "file": "public/assets/delicia/terrain-v2.webp",
+      "bytes": 310180,
+      "sha256": "d34d46bcdb0f1ff3ce539964414d755f6a3fb28de6b26d2877fdb9934ac713ca",
+      "width": 1254,
+      "height": 1254,
+      "alpha": false
+    }
+  ],
+  "audio": [
+    {
+      "source": "docs/world/delicia/audio/boss-hit.mp3",
+      "file": "public/assets/delicia/audio/boss-hit.ogg",
+      "bytes": 13554,
+      "sha256": "f21162139b5d5abd2dcebdd1418e78b553e7cb9616ac51d58a907144d05414bc",
+      "codec": "Opus",
+      "bitrate": "80k VBR"
+    },
+    {
+      "source": "docs/world/delicia/audio/collect.mp3",
+      "file": "public/assets/delicia/audio/collect.ogg",
+      "bytes": 10383,
+      "sha256": "80d235d6fa537ec174a884b32700d306675f22794828cf29bb840e5323c3c97e",
+      "codec": "Opus",
+      "bitrate": "80k VBR"
+    },
+    {
+      "source": "docs/world/delicia/audio/dash.mp3",
+      "file": "public/assets/delicia/audio/dash.ogg",
+      "bytes": 8972,
+      "sha256": "7e2d3f45cc843f73e626d4759f2f6062559c45435f3d6c1d22abd51b526e2a90",
+      "codec": "Opus",
+      "bitrate": "80k VBR"
+    },
+    {
+      "source": "docs/world/delicia/audio/guina-final.mp3",
+      "file": "public/assets/delicia/audio/guina-final.ogg",
+      "bytes": 56678,
+      "sha256": "c357851866ca9f23cf3a95bdc775afa8371e15b3db468cb6a0026273e66b3a70",
+      "codec": "Opus",
+      "bitrate": "80k VBR"
+    },
+    {
+      "source": "docs/world/delicia/audio/guina-fugir.mp3",
+      "file": "public/assets/delicia/audio/guina-fugir.ogg",
+      "bytes": 39947,
+      "sha256": "ff4c3e9ef8c9d1c4533a0f96459ba96e20cfac6b93dd28df7c006413a9fe7bdf",
+      "codec": "Opus",
+      "bitrate": "80k VBR"
+    },
+    {
+      "source": "docs/world/delicia/audio/guina-namoro.mp3",
+      "file": "public/assets/delicia/audio/guina-namoro.ogg",
+      "bytes": 45971,
+      "sha256": "c2dc7540bb19d331e50e36a00293486e8cc2619701b1bbac3b7f86a8a61175ce",
+      "codec": "Opus",
+      "bitrate": "80k VBR"
+    },
+    {
+      "source": "docs/world/delicia/audio/guina-oco.mp3",
+      "file": "public/assets/delicia/audio/guina-oco.ogg",
+      "bytes": 52143,
+      "sha256": "f05d1fcd412eca35862e4fa1cefa8b4063883efaa3a55d98a1a573428282f050",
+      "codec": "Opus",
+      "bitrate": "80k VBR"
+    },
+    {
+      "source": "docs/world/delicia/audio/guina-reserva.mp3",
+      "file": "public/assets/delicia/audio/guina-reserva.ogg",
+      "bytes": 36594,
+      "sha256": "8aa7ab08b1d94aacdce7cbacae42c6c8bd1c3a7ea19f0d582700c93f2b690f6d",
+      "codec": "Opus",
+      "bitrate": "80k VBR"
+    },
+    {
+      "source": "docs/world/delicia/audio/guina.mp3",
+      "file": "public/assets/delicia/audio/guina.ogg",
+      "bytes": 622318,
+      "sha256": "08249206d8559b998c0ae01e4d51ee5ac033e96492a5d9a503926dd7b6022a72",
+      "codec": "Opus",
+      "bitrate": "80k VBR"
+    },
+    {
+      "source": "docs/world/delicia/audio/jaja-delicia.mp3",
+      "file": "public/assets/delicia/audio/jaja-delicia.ogg",
+      "bytes": 42225,
+      "sha256": "cd713f6059bbbcd082fe7c2179cb20ad9c617c7335d4ceda30f7d99763da3590",
+      "codec": "Opus",
+      "bitrate": "80k VBR"
+    },
+    {
+      "source": "docs/world/delicia/audio/jaja-promessa.mp3",
+      "file": "public/assets/delicia/audio/jaja-promessa.ogg",
+      "bytes": 46223,
+      "sha256": "a1dbfdad988ebe803919595846c7a3621cb7f2a2f70b9e869da70a6a0787f4c4",
+      "codec": "Opus",
+      "bitrate": "80k VBR"
+    },
+    {
+      "source": "docs/world/delicia/audio/orchard-air.mp3",
+      "file": "public/assets/delicia/audio/orchard-air.ogg",
+      "bytes": 110623,
+      "sha256": "6eedae7c01e0241cd5cdafb0aca7c7dbf8ced099eaa32b51b485ac1bfa1b7729",
+      "codec": "Opus",
+      "bitrate": "80k VBR"
+    },
+    {
+      "source": "docs/world/delicia/audio/orchard.mp3",
+      "file": "public/assets/delicia/audio/orchard.ogg",
+      "bytes": 669695,
+      "sha256": "4b0fe244256ccb46107d1b8a7a407fd9529c062fd72879fd896e931f4c15b4ec",
+      "codec": "Opus",
+      "bitrate": "80k VBR"
+    },
+    {
+      "source": "docs/world/delicia/audio/parry.mp3",
+      "file": "public/assets/delicia/audio/parry.ogg",
+      "bytes": 11962,
+      "sha256": "209e05c4c5d92e01cb6d82708591e0ca35fce812f61ed4c9d3b3bcca18b90d49",
+      "codec": "Opus",
+      "bitrate": "80k VBR"
+    },
+    {
+      "source": "docs/world/delicia/audio/pound.mp3",
+      "file": "public/assets/delicia/audio/pound.ogg",
+      "bytes": 16148,
+      "sha256": "e47d6d285e34a5799c19ce0cd66a567a563de7e1564daf9ed969568537edf125",
+      "codec": "Opus",
+      "bitrate": "80k VBR"
+    },
+    {
+      "source": "docs/world/delicia/audio/pressure.mp3",
+      "file": "public/assets/delicia/audio/pressure.ogg",
+      "bytes": 24541,
+      "sha256": "6fd449a4ceff4567f809d1802beb42eff76b3eedf43076c1de7cb628ac71f510",
+      "codec": "Opus",
+      "bitrate": "80k VBR"
+    },
+    {
+      "source": "docs/world/delicia/audio/reservoir.mp3",
+      "file": "public/assets/delicia/audio/reservoir.ogg",
+      "bytes": 767886,
+      "sha256": "ac0c78e86f6deb110f860054570f6aacd024967f4741bb850ca4f633a1374dfb",
+      "codec": "Opus",
+      "bitrate": "80k VBR"
+    },
+    {
+      "source": "docs/world/delicia/audio/seed.mp3",
+      "file": "public/assets/delicia/audio/seed.ogg",
+      "bytes": 11466,
+      "sha256": "3d779945a2dccc91179afd549772e979488d0ad781a41bdef03c085101a07df2",
+      "codec": "Opus",
+      "bitrate": "80k VBR"
+    },
+    {
+      "source": "docs/world/delicia/audio/victory.mp3",
+      "file": "public/assets/delicia/audio/victory.ogg",
+      "bytes": 47536,
+      "sha256": "fc9ac47f6366ebe963e8114e34db33b2459ef260ed8504abcd046ba7682d7842",
+      "codec": "Opus",
+      "bitrate": "80k VBR"
+    },
+    {
+      "source": "docs/world/delicia/audio/warning.mp3",
+      "file": "public/assets/delicia/audio/warning.ogg",
+      "bytes": 16836,
+      "sha256": "6ad5f7d74327faa24e01b1b29aa95d4fd96d12fabdce7c72d2eda619be501f6a",
+      "codec": "Opus",
+      "bitrate": "80k VBR"
+    }
+  ]
+}

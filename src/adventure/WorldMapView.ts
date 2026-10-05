@@ -1,6 +1,8 @@
 import { campaignWaterRestored, campaignWaterOverlay, loadCampaignWaterImage } from './GuairaCampaignConsequences';
 import { GuairaCampaignWaterMotion } from './GuairaCampaignWaterMotion';
 import { campaignMapDirection, guairaTravelDirections } from './CampaignWayfinding';
+import { DELICIA_ATLAS, DELICIA_ENTRY, DELICIA_MAP_IMAGE } from './delicia/DeliciaIsland';
+import { lettering } from './delicia/DeliciaUI';
 import { showGuairaRegion } from './WorldGuairaRegion';
 import { GUAIRA_CAMPAIGN_ART, campaignTerrainBounds, campaignArtBounds, campaignArtOverlay, loadCampaignRegionImage, type GuairaCampaignRegion } from './GuairaCampaignArt';
 import { STAGES } from './campaign';
@@ -243,6 +245,9 @@ export class WorldMapView {
     private campaignWaterSeconds = 0;
     private readonly campaignImages = new Map<GuairaCampaignRegion, HTMLImageElement>();
     private guairaDialog?: () => void;
+    private deliciaImage?: HTMLImageElement;
+    private deliciaStarted = false;
+    private readonly deliciaPin = document.createElement('a');
     openGuairaRegion(): void { this.showGuaira(); }
     private showGuaira(): void {
         if (!this.save || !this.journey || this.journey.destination) return;
@@ -284,6 +289,12 @@ export class WorldMapView {
         this.ctx = this.canvas.getContext('2d', { alpha: false })!;
         this.root.addEventListener('keydown', this.onKey);
         document.body.append(this.root);
+        const deliciaLink = document.createElement('a');
+        deliciaLink.href = DELICIA_ENTRY; deliciaLink.className = 'world-map-delicia';
+        deliciaLink.setAttribute('aria-label', 'Império da Delícia');
+        const dlLabel = lettering('Império da Delícia', ART.goldLight); deliciaLink.append(dlLabel); this.scene.append(deliciaLink);
+        this.deliciaPin.href = DELICIA_ENTRY; this.deliciaPin.className = 'world-map-delicia-island';
+        this.deliciaPin.setAttribute('aria-label', 'Império da Delícia'); this.deliciaPin.append(lettering('Império da Delícia', ART.goldLight)); this.deliciaPin.hidden = true; this.scene.append(this.deliciaPin);
         if (callbacks.guaira) {
             void loadCampaignWaterImage().then(image => {
                 if (!this.disposed && image) {
@@ -376,6 +387,12 @@ export class WorldMapView {
         if (inAtlas(world)) this.pairLoads.set(world, this.loadAssets(world, cached));
     }
     private ensureArt(world: number): void {
+        if (this.overview && !this.deliciaStarted) {
+            this.deliciaStarted = true;
+            void this.loadImage(DELICIA_MAP_IMAGE).then(image => {
+                if (image && !this.disposed) { this.deliciaImage = image; this.paintDirty = true; }
+            });
+        }
         if (inAtlas(world)) {
             if (!this.buoysStarted) void this.loadBuoys();
             this.ensureWorld(1); this.ensureWorld(2);
@@ -838,6 +855,8 @@ export class WorldMapView {
         const connectionBounds = [overlay, ...passengerLayers, ...dominioLayers].flatMap(layer => layer ? [{ left: layer.left, top: layer.top,
             right: layer.left + layer.widthInMap, bottom: layer.top + layer.heightInMap }] : []);
         for (const region of this.campaignImages.keys()) connectionBounds.push(region === 'guaira' ? campaignTerrainBounds(region) : campaignArtBounds(region));
+        if (this.deliciaImage) connectionBounds.push({ left: DELICIA_ATLAS.left, top: DELICIA_ATLAS.top,
+            right: DELICIA_ATLAS.left + DELICIA_ATLAS.widthInMap, bottom: DELICIA_ATLAS.top + DELICIA_ATLAS.heightInMap });
         const cablePoints = cablePaths.flat();
         if (cablePoints.length) connectionBounds.push({ left: Math.min(...cablePoints.map(p => p.x)), right: Math.max(...cablePoints.map(p => p.x)),
             top: Math.min(...cablePoints.map(p => p.y)), bottom: Math.max(...cablePoints.map(p => p.y)) });
@@ -856,6 +875,12 @@ export class WorldMapView {
             travelPoints, connectionBounds, focusBounds });
         this.camera = this.blendAtlasCamera(target, dt, trackedCabin ? atlasCableBounds(trackedCabin)
             : trackedBoat ? atlasBoatBounds(trackedBoat.foot, trackedBoat.frame) : undefined, overviewActorBounds, actorPoint);
+        this.deliciaPin.hidden = !this.overview || !this.deliciaImage;
+        if (!this.deliciaPin.hidden) {
+            const point = mapToScreen({ x: DELICIA_ATLAS.left + DELICIA_ATLAS.widthInMap * .5,
+                y: DELICIA_ATLAS.top + DELICIA_ATLAS.heightInMap * .87 }, this.camera);
+            this.deliciaPin.style.left = `${point.x}px`; this.deliciaPin.style.top = `${point.y}px`;
+        }
         const aboard = !!occupiedCabin || !!occupiedBoat;
         const waterRestored = campaignWaterRestored(save);
         // Reuse the visible map cadence; hidden or reduced-motion time never catches up.
@@ -871,6 +896,7 @@ export class WorldMapView {
                 const motion = water ? this.campaignWaterMotion?.overlays(waterRestored, this.camera, this.campaignWaterSeconds, this.media.matches) ?? [] : [];
                 return [campaignArtOverlay(region, image), ...(water ? [water, ...motion] : [])];
             }), ...(overlay ? [{ ...overlay, image: this.bridgeImages.get(bridgeState)! }] : []),
+                ...(this.deliciaImage ? [{ ...DELICIA_ATLAS, image: this.deliciaImage }] : []),
                 ...passengerLayers.map(layer => ({ ...layer, image: this.passengerOverlays.get(layer.path)! })),
                 ...dominioLayers.map(layer => ({ ...layer, image: this.dominioOverlays.get(layer.path)! }))],
             actor: { point: actorPoint, walking: !!active && active.mode !== 'sail' && active.mode !== 'cable', facingLeft: this.facingLeft, aboard,

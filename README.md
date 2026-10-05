@@ -12,6 +12,8 @@ Jogo de plataforma 2D em TypeScript, com engine própria, Canvas, Web Audio e ed
 
 **Super Feka Gaps World:** a versão local abre a sequência com seis mundos, 30 fases, novos chefes, mapa, progresso salvo e assets próprios. Veja o [estado da implementação](docs/world/implementacao.md), a [galeria de produção](docs/world/capturas/index.html) e o [documento de direção](docs/world/README.md). Use `?classic=true` para jogar o remaster original e `?worldEditor=true` para editar fases World. O endereço online acima não foi atualizado por esta implementação.
 
+**Expansão — Império da Delícia:** abra `delicia.html`, `?delicia=true` ou o acesso no mapa World. A nova ilha tem 12 fases, dois santuários opcionais, Jajá e Paulo Guina com três fases de combate, 20 memórias, arte gerada, modelo Blender e áudio original ElevenLabs. [Como jogar, história, assets e verificações](docs/world/delicia/README.md). A [segunda produção](docs/world/delicia/entrega-v2.md) redesenha a exploração em 48 setores e acrescenta máquinas, oito famílias de inimigos, novas animações e medalhas. O [modelo da ilha foi reconstruído](docs/world/delicia/modelo-v3.md), com arquitetura detalhada, relevo contínuo e nova projeção dos destinos.
+
 ### Rodar o projeto
 
 Use uma versão do Node.js que atenda ao campo `engines` de [package.json](package.json).

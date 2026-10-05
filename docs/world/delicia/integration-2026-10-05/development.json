@@ -1,0 +1,153 @@
+{
+  "url": "http://127.0.0.1:3040",
+  "checks": [
+    {
+      "name": "Native map has twelve pins and first stage is available"
+    },
+    {
+      "name": "Original music decodes and starts after the user gesture"
+    },
+    {
+      "name": "All twenty shipped Opus clips decode successfully",
+      "clips": 20
+    },
+    {
+      "name": "Mute output state",
+      "muted": true,
+      "gain": 0,
+      "state": "running"
+    },
+    {
+      "name": "Mute silences the common output for music, ambience, speech and effects"
+    },
+    {
+      "name": "Physical keyboard moves and jumps",
+      "before": {
+        "x": 90,
+        "y": 396
+      },
+      "jumped": {
+        "x": 124.71036618025006,
+        "y": 310.4583333333333
+      }
+    },
+    {
+      "name": "Settings and journal return to pause without resetting or advancing the run"
+    },
+    {
+      "name": "Pause freezes simulation and the native button resumes it"
+    },
+    {
+      "name": "Walking into a real terrain gap costs a heart and returns Feka to safety",
+      "health": 3,
+      "x": 90,
+      "message": "Um gap!"
+    },
+    {
+      "name": "Reload restores checkpoint and opened valves",
+      "checkpoint": 0,
+      "valves": [
+        "v5"
+      ]
+    },
+    {
+      "name": "Guina opens an actual collision gap, which costs health and respawns Feka",
+      "gap": {
+        "x": 340,
+        "w": 180
+      },
+      "healthBefore": 4,
+      "healthAfter": 3,
+      "respawnX": 130
+    },
+    {
+      "name": "Reduced motion control persists and optional destinations are exposed"
+    },
+    {
+      "name": "Assets loaded",
+      "decoded": [
+        "collect",
+        "seed",
+        "dash",
+        "parry",
+        "pound",
+        "warning",
+        "pressure",
+        "boss-hit",
+        "victory",
+        "orchard",
+        "orchard-air",
+        "guina",
+        "guina-oco"
+      ],
+      "images": [
+        "world-concept-v2",
+        "backdrop",
+        "environment-atlas",
+        "portraits",
+        "island",
+        "props",
+        "key-art",
+        "boss-atlas",
+        "enemies-v2",
+        "jaja-motion-v2",
+        "guina-motion-v2",
+        "landmarks-v2",
+        "terrain-v2"
+      ]
+    },
+    {
+      "name": "Query entry hides the base canvas and starts the expansion"
+    },
+    {
+      "name": "The panorama camera fits the complete fixed expansion footprint",
+      "left": {
+        "x": 27.935008220737473,
+        "y": 168.80636135335465
+      },
+      "right": {
+        "x": 522.0266476032991,
+        "y": 477.61363596745565
+      },
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "name": "The released World panorama shows the giant island and its native link enters the expansion",
+      "visible": true,
+      "href": "./delicia.html"
+    },
+    {
+      "name": "Mobile control state",
+      "state": {
+        "screen": "playing",
+        "hidden": false,
+        "display": "flex",
+        "coarse": true
+      }
+    },
+    {
+      "name": "Mobile exposes eight touch controls without horizontal overflow"
+    }
+  ],
+  "errors": [],
+  "screenshots": [
+    "title.png",
+    "map.png",
+    "harbor.png",
+    "feka-gap.png",
+    "jaja.png",
+    "guina.png",
+    "map-complete-preview.png",
+    "settings.png",
+    "world-atlas.png",
+    "mobile-map.png",
+    "mobile-game.png"
+  ],
+  "arrangedCases": [
+    "Checkpoint contact uses the real simulation with an arranged position; then reload verifies persisted valves.",
+    "Player positioned inside an already naturally spawned Guina gap to verify collision.",
+    "Guina screenshot frames a warning pose; it is a staged visual review, not a completed playthrough."
+  ],
+  "passed": true
+}

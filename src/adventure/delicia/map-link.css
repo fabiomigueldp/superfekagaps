@@ -1,0 +1,8 @@
+.world-map-delicia, .world-map-delicia-island { position: absolute; z-index: 5; display: grid; place-items: center; min-height: 44px; padding: 7px 12px; color: #ffe29a; background: #191f35ed; border: 2px solid #648591; border-bottom: 3px solid #e9ad4c; text-decoration: none; box-shadow: 2px 2px 0 #191f3570; }
+.world-map-delicia { left: 12px; bottom: 118px; }
+.world-map-delicia-island { transform: translate(-50%, -50%); }
+.world-map-delicia:hover, .world-map-delicia-island:hover { background: #303650; border-color: #ffe29a; }
+.world-map-delicia:focus-visible, .world-map-delicia-island:focus-visible { outline: 3px solid #fff9e6; outline-offset: 3px; }
+.world-map-delicia .dl-bitmap, .world-map-delicia-island .dl-bitmap { display: block; width: auto; max-width: 204px; height: auto; image-rendering: pixelated; }
+.world-map-delicia .dl-sr-only, .world-map-delicia-island .dl-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 620px) { .world-map-delicia { bottom: 132px; }.world-map-delicia .dl-bitmap, .world-map-delicia-island .dl-bitmap { max-width: 162px; } }

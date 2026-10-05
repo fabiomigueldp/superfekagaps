@@ -1,0 +1,125 @@
+{
+  "files": 201,
+  "bytes": 48835589,
+  "maxBytes": 50000000,
+  "headroomBytes": 1164411,
+  "byExtension": [
+    {
+      "extension": ".wav",
+      "files": 17,
+      "bytes": 29687064
+    },
+    {
+      "extension": ".webm",
+      "files": 6,
+      "bytes": 6346260
+    },
+    {
+      "extension": ".webp",
+      "files": 46,
+      "bytes": 6189880
+    },
+    {
+      "extension": ".ogg",
+      "files": 26,
+      "bytes": 2737903
+    },
+    {
+      "extension": ".mp3",
+      "files": 2,
+      "bytes": 1218904
+    },
+    {
+      "extension": ".js",
+      "files": 36,
+      "bytes": 994008
+    },
+    {
+      "extension": ".png",
+      "files": 14,
+      "bytes": 941432
+    },
+    {
+      "extension": ".json",
+      "files": 28,
+      "bytes": 550503
+    },
+    {
+      "extension": ".css",
+      "files": 8,
+      "bytes": 59978
+    },
+    {
+      "extension": ".woff2",
+      "files": 1,
+      "bytes": 52348
+    },
+    {
+      "extension": ".html",
+      "files": 12,
+      "bytes": 47356
+    },
+    {
+      "extension": ".md",
+      "files": 2,
+      "bytes": 4589
+    },
+    {
+      "extension": ".txt",
+      "files": 1,
+      "bytes": 4478
+    },
+    {
+      "extension": ".ico",
+      "files": 1,
+      "bytes": 507
+    },
+    {
+      "extension": ".webmanifest",
+      "files": 1,
+      "bytes": 379
+    }
+  ],
+  "largestFiles": [
+    {
+      "path": "assets/audio/music/boss.wav",
+      "bytes": 5760044
+    },
+    {
+      "path": "assets/audio/music/ending.wav",
+      "bytes": 5760044
+    },
+    {
+      "path": "assets/audio/music/game.wav",
+      "bytes": 5760044
+    },
+    {
+      "path": "assets/audio/music/powerup.wav",
+      "bytes": 5760044
+    },
+    {
+      "path": "assets/audio/music/theme.wav",
+      "bytes": 5760044
+    },
+    {
+      "path": "assets_delicia/boss_delicia_149.191s.webm",
+      "bytes": 2401904
+    },
+    {
+      "path": "assets_delicia/super_feka_world_delicia_92.051s.webm",
+      "bytes": 1480972
+    },
+    {
+      "path": "assets_delicia/super_feka_gaps_delicia_theme_75.577s.webm",
+      "bytes": 1214650
+    },
+    {
+      "path": "assets_delicia/delicia_ending_53.090s.webm",
+      "bytes": 850150
+    },
+    {
+      "path": "assets/delicia/audio/reservoir.ogg",
+      "bytes": 767886
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+{
+  "url": "http://127.0.0.1:3041/world/releases/integration-20261005",
+  "checks": [
+    "Developer global is absent in production",
+    "Island render dimensions match the camera metadata",
+    "Cais do Primeiro Gole renders, runs and pauses through native controls",
+    "Pomares da Partilha renders, runs and pauses through native controls",
+    "Arquivo Fermentado renders, runs and pauses through native controls",
+    "Jajá, Guardião da Nascente renders, runs and pauses through native controls",
+    "Engrenagens da Polpa renders, runs and pauses through native controls",
+    "Paulo Guina, Barão da Delícia renders, runs and pauses through native controls",
+    "Journal shows the collected memory without nineteen locked placeholders",
+    "Expansion image, map and audio requests stay inside the served release",
+    "Query entry loads the production expansion and hides the World canvas",
+    "The native return link reaches World inside the same release"
+  ],
+  "errors": [],
+  "arrangedCases": [
+    "All twelve main stages are unlocked through a synthetic save in an isolated browser profile. This is visual and input validation, not an earned campaign completion."
+  ],
+  "island": {
+    "width": 2560,
+    "height": 1600,
+    "url": "http://127.0.0.1:3041/world/releases/integration-20261005/assets/delicia/island.webp?v=4",
+    "revision": 4,
+    "pins": 12
+  },
+  "resources": [
+    {
+      "url": "island-map.json?v=4",
+      "bytes": 1027
+    },
+    {
+      "url": "world-concept-v2.webp",
+      "bytes": 491094
+    },
+    {
+      "url": "backdrop.webp",
+      "bytes": 292016
+    },
+    {
+      "url": "environment-atlas.webp",
+      "bytes": 434760
+    },
+    {
+      "url": "portraits.webp",
+      "bytes": 382158
+    },
+    {
+      "url": "island.webp?v=4",
+      "bytes": 277654
+    },
+    {
+      "url": "key-art.webp",
+      "bytes": 586236
+    },
+    {
+      "url": "props.webp?v=5",
+      "bytes": 223220
+    },
+    {
+      "url": "boss-atlas.webp",
+      "bytes": 298098
+    },
+    {
+      "url": "enemies-v2.webp",
+      "bytes": 325088
+    },
+    {
+      "url": "guina-motion-v2.webp",
+      "bytes": 309892
+    },
+    {
+      "url": "jaja-motion-v2.webp",
+      "bytes": 305098
+    },
+    {
+      "url": "landmarks-v2.webp?v=5",
+      "bytes": 371910
+    },
+    {
+      "url": "terrain-v2.webp",
+      "bytes": 310480
+    },
+    {
+      "url": "audio/orchard.ogg",
+      "bytes": 669995
+    },
+    {
+      "url": "audio/collect.ogg",
+      "bytes": 10683
+    },
+    {
+      "url": "audio/dash.ogg",
+      "bytes": 9272
+    },
+    {
+      "url": "audio/seed.ogg",
+      "bytes": 11766
+    },
+    {
+      "url": "audio/parry.ogg",
+      "bytes": 12262
+    },
+    {
+      "url": "audio/pound.ogg",
+      "bytes": 16448
+    },
+    {
+      "url": "audio/pressure.ogg",
+      "bytes": 24841
+    },
+    {
+      "url": "audio/warning.ogg",
+      "bytes": 17136
+    },
+    {
+      "url": "audio/boss-hit.ogg",
+      "bytes": 13854
+    },
+    {
+      "url": "audio/victory.ogg",
+      "bytes": 47836
+    },
+    {
+      "url": "audio/orchard-air.ogg",
+      "bytes": 110923
+    },
+    {
+      "url": "audio/reservoir.ogg",
+      "bytes": 768186
+    },
+    {
+      "url": "audio/guina.ogg",
+      "bytes": 622618
+    },
+    {
+      "url": "audio/guina-oco.ogg",
+      "bytes": 52443
+    }
+  ],
+  "passed": true
+}

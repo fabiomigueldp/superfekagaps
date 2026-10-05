@@ -18,8 +18,10 @@ export const REVIEW_ONLY_ASSETS = [
         .map(name => `assets/audio/vo/joaozao/${name}.webm`),
 ] as const;
 const excluded = new Set<string>(REVIEW_ONLY_ASSETS);
-// Repository budget, not a hosting quota: about 4.6 MB of headroom after this audit.
-export const BUILD_SIZE_LIMIT = 45_000_000;
+// Includes the Delícia expansion's lazy WebP/Opus assets. Original PNG, MP3,
+// Blender and GLB authoring masters stay outside the published public directory.
+// The second production pass adds six generated atlases and the enriched diorama.
+export const BUILD_SIZE_LIMIT = 53_000_000;
 
 function filesIn(directory: string, prefix = ''): string[] {
     return readdirSync(join(directory, prefix), { withFileTypes: true }).flatMap(entry => {

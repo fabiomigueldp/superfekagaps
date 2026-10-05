@@ -74,3 +74,8 @@ env/
 
 # Historical local geometry audit, not a release artifact
 /docs/world/diorama/porto-prototype-initial-clearance.json
+
+# Generated local review captures; production assets and editable sources live
+# under public/, docs/ and tools/. Existing tracked review files remain tracked.
+/output/
+*.blend[0-9]

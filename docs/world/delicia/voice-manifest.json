@@ -1,0 +1,58 @@
+[
+  {
+    "name": "guina-oco",
+    "file": "docs/world/delicia/audio/guina-oco.mp3",
+    "text": "Vou te deixar oco, Feka! Você vai tomar o maior gap desta ilha!",
+    "voice": "CstacWqMhJQlnfLPxRG4",
+    "model": "eleven_multilingual_v2",
+    "performance": "Original library-voice performance; not a clone of either actor."
+  },
+  {
+    "name": "guina-namoro",
+    "file": "docs/world/delicia/audio/guina-namoro.mp3",
+    "text": "Feka, namora comigo. Eu até divido o suco com você.",
+    "voice": "CstacWqMhJQlnfLPxRG4",
+    "model": "eleven_multilingual_v2",
+    "performance": "Original library-voice performance; not a clone of either actor."
+  },
+  {
+    "name": "guina-fugir",
+    "file": "docs/world/delicia/audio/guina-fugir.mp3",
+    "text": "Vai fugir, Feka? Olha o gap que eu vou abrir!",
+    "voice": "CstacWqMhJQlnfLPxRG4",
+    "model": "eleven_multilingual_v2",
+    "performance": "Original library-voice performance; not a clone of either actor."
+  },
+  {
+    "name": "guina-reserva",
+    "file": "docs/world/delicia/audio/guina-reserva.mp3",
+    "text": "Ninguém encosta na minha reserva! Pressão máxima!",
+    "voice": "CstacWqMhJQlnfLPxRG4",
+    "model": "eleven_multilingual_v2",
+    "performance": "Original library-voice performance; not a clone of either actor."
+  },
+  {
+    "name": "jaja-delicia",
+    "file": "docs/world/delicia/audio/jaja-delicia.mp3",
+    "text": "Ai, que delícia! Mas cuidado com a pressão da caneca!",
+    "voice": "CstacWqMhJQlnfLPxRG4",
+    "model": "eleven_multilingual_v2",
+    "performance": "Original library-voice performance; not a clone of either actor."
+  },
+  {
+    "name": "jaja-promessa",
+    "file": "docs/world/delicia/audio/jaja-promessa.mp3",
+    "text": "Eu prometi proteger a partilha. Acabei protegendo o portão.",
+    "voice": "CstacWqMhJQlnfLPxRG4",
+    "model": "eleven_multilingual_v2",
+    "performance": "Original library-voice performance; not a clone of either actor."
+  },
+  {
+    "name": "guina-final",
+    "file": "docs/world/delicia/audio/guina-final.mp3",
+    "text": "Tá bom. Sem gap, sem ameaça. Mas ainda posso te chamar para um suco?",
+    "voice": "CstacWqMhJQlnfLPxRG4",
+    "model": "eleven_multilingual_v2",
+    "performance": "Original library-voice performance; not a clone of either actor."
+  }
+]
