@@ -52,13 +52,18 @@ export function guairaAscentStage(): AdventureStage {
 export class GuairaAscent extends WorldGame {
     readonly reducedMotion: boolean;
     finished = false;
+    private renderingPaused = false;
     constructor(canvas: HTMLCanvasElement, private readonly status: HTMLElement) {
         super(canvas, true);
         try {
             this.reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
             this.art.background = (c, _island, cx, cy, time) => drawGuairaAscentBackground(c, cx, cy, time, this.reducedMotion);
             this.art.terrain = (c, level, _island, cx, cy, time) => drawGuairaAscentTerrain(c, level, cx, cy, time, this.reducedMotion);
-            this.art.objects = (c, objects, cx, cy, time) => drawGuairaAscentObjects(c, objects, cx, cy, time, this.reducedMotion);
+            this.art.objects = (c, objects, cx, cy, time) => {
+                const running = this.state === 'playing' && !this.renderingPaused && !this.finished &&
+                    !this.player.data.isDead && !((this.player.data.respawnRevealTimer ?? 0) > 0);
+                drawGuairaAscentObjects(c, objects, cx, cy, time, this.reducedMotion, running);
+            };
             this.store.save.preferences.shake = !this.reducedMotion;
             if (this.reducedMotion) {
                 // WorldGame currently has no particle preference. This instance-only
@@ -126,8 +131,14 @@ export class GuairaAscent extends WorldGame {
     override render() {
         if (this.isDisposed) return;
         const paused = this.state === 'paused';
+        // The base renderer needs a playing scene behind our custom pause panel,
+        // but mechanism indicators must still see the genuine paused state.
+        this.renderingPaused = paused;
         if (paused) this.state = 'playing';
-        try { super.render(); } finally { if (paused) this.state = 'paused'; }
+        try { super.render(); } finally {
+            this.renderingPaused = false;
+            if (paused) this.state = 'paused';
+        }
         const c = this.renderer.getContext(), x = this.player.data.position.x;
         c.fillStyle = '#382b35'; c.fillRect(0, 0, 320, 23);
         c.fillStyle = '#d8ac7a'; c.fillRect(0, 22, 320, 1);

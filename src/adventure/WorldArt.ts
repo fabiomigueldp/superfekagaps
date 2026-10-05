@@ -15,6 +15,7 @@ export const rect = (c: CanvasRenderingContext2D, x: number, y: number, w: numbe
 export class WorldArt {
     atlas = new SpriteAtlas();
     private backdrop = new WorldBackdrop();
+    private readonly foeMotion = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
     background(c: CanvasRenderingContext2D, island: Island, cx: number, cy: number, time: number, variant = 0) {
         this.backdrop.draw(c, island, cx, cy, time, variant);
     }
@@ -62,9 +63,12 @@ export class WorldArt {
             rect(c, x + 10, y - 10, 2, 12, '#a4b3b9');
         }
         if (e.phase === 'warning') {
-            pixelText(c, '!', x + e.width / 2, y - 12, '#fff0b6', 1, 'center');
-            rect(c, x - 1, y - 4, e.width + 2, 2, '#3c344c');
-            rect(c, x, y - 4, e.width * Math.min(1, e.timer / 800), 2, '#edbb68');
+            // The charger's 36 px artwork reaches above its 27 px contact box.
+            // Anchor its tell to the painted head so the meter never masks the brace.
+            const warningY = e.spec.kind === 'charger' ? y + e.height - foeFrame('charger', 'warning', 0).length : y;
+            pixelText(c, '!', x + e.width / 2, warningY - 12, '#fff0b6', 1, 'center');
+            rect(c, x - 1, warningY - 4, e.width + 2, 2, '#3c344c');
+            rect(c, x, warningY - 4, e.width * Math.min(1, e.timer / 800), 2, '#edbb68');
             if (e.spec.kind === 'charger')
                 for (let i = 1; i <= 3; i++)
                     pixelText(c, e.facing > 0 ? '→' : '←', x + e.width / 2 + e.facing * i * 18, y + e.height - 4, '#f4c895', 1, 'center');
@@ -78,7 +82,7 @@ export class WorldArt {
         else if (e.flash > 0 && Math.floor(e.flash / 45) % 2)
             c.globalAlpha = .55;
         const frames = e.spec.kind === 'minion' ? MINION_FRAMES : null;
-        const frame = frames ? e.dead ? MINION_SQUASH : frames[Math.floor(e.age / 150) % frames.length] : foeFrame(e.spec.kind as Exclude<typeof e.spec.kind, 'minion'>, e.dead ? 'stunned' : e.phase, e.phase === 'walk' ? e.age : e.timer, e.armor);
+        const frame = frames ? e.dead ? MINION_SQUASH : frames[Math.floor(e.age / 150) % frames.length] : foeFrame(e.spec.kind as Exclude<typeof e.spec.kind, 'minion'>, e.dead ? 'stunned' : e.phase, e.phase === 'walk' ? e.age : e.timer, e.armor, this.foeMotion?.matches ?? false);
         const xx = x + e.width / 2 - frame[0].length / 2, yy = y + e.height - frame.length - (e.dead ? Math.sin(e.deadTimer / 360 * Math.PI) * 12 : 0);
         this.atlas.draw(c, frame, frames ? SPRITE_PALETTE : WORLD_PALETTE, xx, yy, e.facing > 0);
         if (e.spec.kind === 'helmet' && !e.armor && e.phase === 'stunned') {

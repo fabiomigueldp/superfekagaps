@@ -5,6 +5,7 @@ import { PixelGrid, type PixelFrame, type PixelPalette } from '../../../graphics
 import { pixelText } from '../../../graphics/BitmapFont';
 import { isOneWayTile, supportsStanding } from '../../../world/tileRules';
 import { ascentMechanicalPose } from './GuairaAscentMotion';
+import { ascentTravelDirection } from './GuairaAscentTravelCue';
 
 /** Scenery is presentation only. Tiles and WorldObjects own every supporting surface. */
 export const GUAIRA_ASCENT_ART = Object.freeze({
@@ -383,7 +384,30 @@ function carriageStop(c: CanvasRenderingContext2D, x: number, y: number, directi
     r(c, x + direction * (7 - compression), y, 1, 4, P.bronze);
 }
 
-export function drawGuairaAscentObjects(c: CanvasRenderingContext2D, objects: WorldObjects, cx: number, cy: number, _time: number, reducedMotion: boolean) {
+/** A small mechanical direction dial hangs below the real supporting edge.
+ * Shape, not colour or blinking, distinguishes both directions and a neutral rest.
+ */
+function travelDial(c: CanvasRenderingContext2D, body: MovingBody, cx: number, cy: number, axis: 'x' | 'y', running: boolean) {
+    const x = Math.round(body.x) + Math.floor(body.width / 2) - cx;
+    const y = Math.round(body.y) + body.height + 5 - cy;
+    const direction = ascentTravelDirection(body, axis, running);
+    r(c, x - 6, y - 5, 13, 11, P.ink);
+    r(c, x - 5, y - 4, 11, 9, P.ironDark);
+    r(c, x - 5, y, 1, 1, P.bronze); r(c, x + 5, y, 1, 1, P.bronze);
+    const face = '#e0c99a';
+    if (!direction) { r(c, x - 1, y - 1, 3, 3, face); return; }
+    if (axis === 'x') {
+        line(c, x - 3, y, x + 3, y, face);
+        line(c, x + direction, y - 2, x + direction * 3, y, face);
+        line(c, x + direction, y + 2, x + direction * 3, y, face);
+    } else {
+        line(c, x, y - 3, x, y + 3, face);
+        line(c, x - 2, y + direction, x, y + direction * 3, face);
+        line(c, x + 2, y + direction, x, y + direction * 3, face);
+    }
+}
+
+export function drawGuairaAscentObjects(c: CanvasRenderingContext2D, objects: WorldObjects, cx: number, cy: number, _time: number, reducedMotion: boolean, running = true) {
     layer(c, cx, cy, (cameraX, cameraY) => {
         const lift = objects.get(GUAIRA_ASCENT_ART.liftId);
         for (const plank of [objects.get(GUAIRA_ASCENT_ART.plankId), objects.get(GUAIRA_ASCENT_ART.serviceId)]) if (plank) {
@@ -410,7 +434,10 @@ export function drawGuairaAscentObjects(c: CanvasRenderingContext2D, objects: Wo
                     bearingSpoke(c, wx + 1 - cameraX, plank.y + plank.height + 10 - cameraY, pose.turn, 2);
                 }
             }
-            if (visible(plank.x, plank.width, cameraX)) deck(c, plank, cameraX, cameraY, false);
+            if (visible(plank.x, plank.width, cameraX)) {
+                deck(c, plank, cameraX, cameraY, false);
+                travelDial(c, plank, cameraX, cameraY, 'x', running);
+            }
         }
         if (lift) {
             const from = lift.home ?? { x: lift.x, y: lift.y }, to = lift.to ?? from;
@@ -449,7 +476,10 @@ export function drawGuairaAscentObjects(c: CanvasRenderingContext2D, objects: Wo
                     line(c, wx - cameraX, lift.y + lift.height + 9 - cameraY, wx + (wx < lift.x + lift.width / 2 ? 12 : -10) - cameraX, lift.y + lift.height - cameraY, '#a99167', 2);
                 }
             }
-            if (visible(lift.x, lift.width, cameraX)) deck(c, lift, cameraX, cameraY, true);
+            if (visible(lift.x, lift.width, cameraX)) {
+                deck(c, lift, cameraX, cameraY, true);
+                travelDial(c, lift, cameraX, cameraY, 'y', running);
+            }
         }
         GUAIRA_ASCENT_ART.workerFeet.forEach((p, i) => { if (visible(p.x - 8, 24, cameraX)) worker(c, p.x - cameraX, p.y - cameraY, i); });
     });

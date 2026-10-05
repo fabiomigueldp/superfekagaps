@@ -215,7 +215,11 @@ function enemy(kind: EnemyLook, pose: EnemyPose, f: number): PixelFrame {
         }
     }
     else if (kind === 'charger') {
-        const lean = attack ? -5 : warning ? 3 : 0, dy = rest ? 3 : attack ? 2 : 0;
+        // Both feet stay planted while the shoulders pull back into the charge.
+        // Recovery keeps the guard down for the entire punishable phase.
+        const recovering = pose === 'rest';
+        const lean = attack ? -5 : warning ? [1, 3, 4][f] : recovering ? [-2, -1, 0][f] : 0;
+        const dy = warning ? f : recovering ? 5 - f : rest ? 3 : attack ? 2 : 0;
         g.rect(8 - step, 27, 7, 7, 'K').rect(23 + step, 27, 7, 7, 'K').rect(5 - step, 32, 11, 3, 'K').rect(22 + step, 32, 11, 3, 'K').rect(7 - step, 32, 7, 1, 'E').rect(23 + step, 32, 7, 1, 'E');
         shape(g, [[8 + lean, 13 + dy], [24 + lean, 11 + dy], [31, 20 + dy], [28, 30], [9, 30], [4, 22 + dy]], 'K');
         ellipse(g, 6 + lean, 14 + dy, 23, 15, 'R');
@@ -223,12 +227,23 @@ function enemy(kind: EnemyLook, pose: EnemyPose, f: number): PixelFrame {
         ellipse(g, 10 + lean, 2 + dy, 18, 15, 'K');
         ellipse(g, 11 + lean, 4 + dy, 16, 12, 'S');
         g.rect(12 + lean, 5 + dy, 9, 3, 'f').rect(10 + lean, 2 + dy, 17, 4, 'h').rect(12 + lean, 1 + dy, 9, 2, 'a');
-        g.rect(11 + lean, 8 + dy, 6, 3, 'W').rect(20 + lean, 8 + dy, 5, 3, 'W').dot(11 + lean, 9 + dy, 'K').dot(20 + lean, 9 + dy, 'K').line(10 + lean, 6 + dy, 17 + lean, 8 + dy, 'h').line(20 + lean, 8 + dy, 26 + lean, 6 + dy, 'h').rect(13 + lean, 13 + dy, 8, 2, rest ? 'K' : 's');
-        ellipse(g, attack ? 0 : 3, attack ? 18 : 20 + dy, 10, 10, 'K');
-        ellipse(g, attack ? 1 : 4, attack ? 19 : 21 + dy, 8, 7, 'S');
-        g.rect(attack ? 2 : 5, attack ? 19 : 21 + dy, 4, 2, 'f');
-        ellipse(g, 27, 19 + dy, 8, 10, 'K');
-        ellipse(g, 28, 20 + dy, 6, 7, 's');
+        if (recovering) {
+            // Heavy lids and a slack mouth read as an opening, even without motion.
+            g.rect(11 + lean, 9 + dy, 6, 2, 'W').rect(20 + lean, 9 + dy, 5, 2, 'W');
+            g.line(10 + lean, 8 + dy, 17 + lean, 10 + dy, 'h').line(20 + lean, 10 + dy, 26 + lean, 8 + dy, 'h');
+            g.dot(12 + lean, 10 + dy, 'K').dot(21 + lean, 10 + dy, 'K').rect(14 + lean, 13 + dy, 5, 3, 'K').rect(15 + lean, 15 + dy, 3, 1, 's');
+        }
+        else {
+            g.rect(11 + lean, 8 + dy, 6, 3, 'W').rect(20 + lean, 8 + dy, 5, 3, 'W').dot(11 + lean, 9 + dy, 'K').dot(20 + lean, 9 + dy, 'K').line(10 + lean, 6 + dy, 17 + lean, 8 + dy, 'h').line(20 + lean, 8 + dy, 26 + lean, 6 + dy, 'h').rect(13 + lean, 13 + dy, 8, 2, rest ? 'K' : 's');
+        }
+        const handX = attack ? 0 : warning ? 6 + f * 2 : recovering ? 4 : 3;
+        const handY = attack ? 18 : warning ? 20 - f : recovering ? 25 - f : 20 + dy;
+        ellipse(g, handX, handY, 10, 10, 'K');
+        ellipse(g, handX + 1, handY + 1, 8, 7, 'S');
+        g.rect(handX + 2, handY + 1, 4, 2, 'f');
+        const backHandY = warning ? 18 - f * 3 : recovering ? 25 - f : 19 + dy;
+        ellipse(g, 27, backHandY, 8, 10, 'K');
+        ellipse(g, 28, backHandY + 1, 6, 7, 's');
         if (rest)
             g.rect(29, 10 + f, 2, 3, 'Z');
     }
@@ -296,7 +311,14 @@ function enemy(kind: EnemyLook, pose: EnemyPose, f: number): PixelFrame {
     return g.finish();
 }
 export const FOE_FRAMES = Object.fromEntries((['helmet', 'loader', 'charger', 'rail', 'agitator'] as EnemyLook[]).map(kind => [kind, enemyPoses.flatMap(p => [0, 1, 2].map(f => enemy(kind, p, f)))])) as Record<EnemyLook, PixelFrame[]>;
-export function foeFrame(kind: EnemyLook, phase: string, time: number, armor = true): PixelFrame {
+export function foeFrame(kind: EnemyLook, phase: string, time: number, armor = true, reducedMotion = false): PixelFrame {
     const pose: EnemyPose = phase === 'stunned' ? 'stunned' : kind === 'helmet' && !armor ? 'bare' : enemyPoses.includes(phase as EnemyPose) ? phase as EnemyPose : phase === 'recoil' ? 'attack' : 'walk';
-    return FOE_FRAMES[kind][enemyPoses.indexOf(pose) * 3 + (phase === 'warning' ? Math.min(2, Math.floor(time / 260)) : Math.floor(time / (phase === 'attack' ? 75 : 190)) % 3)];
+    let index = phase === 'warning' ? Math.min(2, Math.floor(time / 260)) : Math.floor(time / (phase === 'attack' ? 75 : 190)) % 3;
+    if (kind === 'charger') {
+        // A phase clock, never a loop: recovery must not snap back to its impact pose.
+        if (pose === 'rest') index = Math.min(2, Math.floor(Math.max(0, time) / 470));
+        // Hold recognizable silhouettes instead of removing the gameplay tell.
+        if (reducedMotion) index = pose === 'warning' ? 2 : 1;
+    }
+    return FOE_FRAMES[kind][enemyPoses.indexOf(pose) * 3 + index];
 }

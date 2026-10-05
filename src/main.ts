@@ -4,6 +4,7 @@ import './adventure/guaira-campaign.css';
 import { WorldGame } from './adventure/WorldGame';
 import { FactoryCampaign } from './adventure/factory/FactoryCampaign';
 import './adventure/map.css';
+import './adventure/world-controls-help.css';
 import './adventure/experimental/hub/experimental-hub.css';
 
 // Inicializa o jogo quando a página carregar

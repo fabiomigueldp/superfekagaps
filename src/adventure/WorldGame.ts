@@ -2,6 +2,7 @@ import { importProgressFile, progressImportMessage } from './ProgressImport';
 import { JournalAccessibility } from './JournalAccessibility';
 import { campaignJournal } from './CampaignJournal';
 import { CanvasMenuAccessibility } from './CanvasMenuAccessibility';
+import { WorldControlsHelp } from './WorldControlsHelp';
 import { runGuairaFlight } from './WorldGuairaFlight';
 import { ExperimentalHub } from './experimental/hub/ExperimentalHub';
 import { Input } from '../engine/Input';
@@ -61,6 +62,7 @@ export class WorldGame {
     private last = 0;
     private buttons: Button[] = [];
     private menuAccessibility?: CanvasMenuAccessibility;
+    private controlsHelp?: WorldControlsHelp;
     private journalAccessibility?: JournalAccessibility;
     private selection = 0;
     private menuSelection = 0;
@@ -98,6 +100,15 @@ export class WorldGame {
         try {
             this.renderer = new Renderer(canvas);
             this.addCleanup(() => this.renderer.dispose());
+            // Mount the modal's capture boundary before gameplay Input.
+            if (!ephemeral && typeof document.body?.append === 'function') {
+                this.controlsHelp = new WorldControlsHelp(canvas, {
+                    canOpen: () => !this.isDisposed && this.state === 'settings',
+                    resetInput: () => this.input?.reset(),
+                    suspendTouch: () => this.input.suspendCanvasTouchControls(),
+                });
+                this.addCleanup(() => this.controlsHelp?.dispose());
+            }
             this.input = new Input(canvas);
             this.addCleanup(() => this.input.dispose());
             document.title = ephemeral ? 'Super Feka Gaps World · Estúdio' : 'Super Feka Gaps World';
@@ -126,7 +137,7 @@ export class WorldGame {
             this.selection = Math.max(0, STAGES.findIndex(s => s.id === this.store.save.selected));
             this.listen(window, 'keydown', e => this.menuKey(e));
             this.listen(canvas, 'pointerdown', e => {
-                if (this.experimentalHub?.isOpen) return;
+                if (this.experimentalHub?.isOpen || this.controlsHelp?.isOpen) return;
                 this.audio.unlock();
                 const r = canvas.getBoundingClientRect();
                 if (this.state === 'playing') {
@@ -196,9 +207,9 @@ export class WorldGame {
         this.render();
         if (!this.isDisposed && this.running) this.frame = requestAnimationFrame(this.loop);
     };
-    private change(screen: Screen) { if (this.isDisposed) return; this.menuAccessibility?.clear(); this.journalAccessibility?.clear(); if (screen !== 'map') this.mapView?.hide(); this.state = screen; this.hitStopInput = null; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; this.experimentalHub?.sync(); }
+    private change(screen: Screen) { if (this.isDisposed) return; this.controlsHelp?.close(false); this.menuAccessibility?.clear(); this.journalAccessibility?.clear(); if (screen !== 'map') this.mapView?.hide(); this.state = screen; this.hitStopInput = null; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; this.experimentalHub?.sync(); }
     private menuKey(e: KeyboardEvent) {
-        if (this.experimentalHub?.isOpen || this.flightCleanup) return;
+        if (this.experimentalHub?.isOpen || this.controlsHelp?.isOpen || this.flightCleanup) return;
         const target = e.target;
         if (target instanceof HTMLElement && target.closest('button, a[href]') && (e.key === 'Enter' || e.key === ' ')) return;
         if (target instanceof HTMLElement && target.closest('.world-map, .canvas-menu-accessibility')) return;
@@ -431,7 +442,7 @@ export class WorldGame {
     }
     update(dt: number) {
         if (this.isDisposed) return;
-        if (this.experimentalHub?.isOpen) { this.input.reset(); return; }
+        if (this.experimentalHub?.isOpen || this.controlsHelp?.isOpen) { this.input.reset(); return; }
         this.input.setMenuMode(this.state !== 'playing');
         this.input.update();
         if (this.input.consumeMute())
@@ -732,7 +743,7 @@ export class WorldGame {
     private heading(c: CanvasRenderingContext2D, small: string, big: string) { pixelText(c, small, 160, 12, '#c4d7d8', 1, 'center'); pixelText(c, big, 161, 29, '#343651', 2, 'center'); pixelText(c, big, 160, 27, '#ffdf94', 2, 'center'); }
     private text(c: CanvasRenderingContext2D, text: string, x: number, y: number, width: number, color: string = ART.paper) { wrapText(text, width).forEach((line, i) => pixelText(c, line, x, y + i * 10, color)); }
     render() {
-        if (this.isDisposed) return;
+        if (this.isDisposed || this.controlsHelp?.isOpen) return;
         this.experimentalHub?.sync();
         this.journalAccessibility?.sync(this.state === 'gallery' && !this.experimentalHub?.isOpen && !this.flightCleanup ? this.galleryWorld : null, this.store.save);
         if (this.state === 'map') {
@@ -1011,6 +1022,7 @@ export class WorldGame {
         this.button(c, 'EXPORTAR SAVE', 10, 127, 98, () => this.exportSave());
         this.button(c, 'IMPORTAR SAVE', 112, 127, 98, () => this.importSave());
         this.button(c, prefs.shake ? 'TREMOR: SIM' : 'TREMOR: NÃO', 214, 127, 96, () => { prefs.shake = !prefs.shake; this.store.persist(); });
+        if (this.controlsHelp) this.button(c, 'CONTROLES', 10, 153, 98, () => this.controlsHelp?.open());
         this.button(c, 'VOLTAR', 114, 153, 92, () => this.closeSettings());
     }
     private exportSave() { const url = URL.createObjectURL(new Blob([JSON.stringify(this.store.save, null, 2)], { type: 'application/json' })); const a = document.createElement('a'); a.href = url; a.download = 'super-feka-gaps-world-save.json'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); }

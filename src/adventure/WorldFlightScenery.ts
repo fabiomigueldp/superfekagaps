@@ -14,6 +14,19 @@ export const FLIGHT_BANKS: readonly Polygon[] = [
     [[3.09,-.15],[3.26,-.23],[3.49,-.18],[3.54,-.03],[3.41,.08],[3.21,.05]],
     [[3.70,1.12],[3.90,1.01],[4.12,1.08],[4.19,1.25],[3.97,1.36],[3.73,1.29]],
 ];
+// Small erosion cuts remain inside the authored footprints. Compute them once;
+// neither the frame clock nor the camera may crawl or regenerate the shoreline.
+const BANK_SHORES: readonly Polygon[] = FLIGHT_BANKS.map((bank, index) => {
+    const cx = bank.reduce((sum, point) => sum + point[0], 0) / bank.length;
+    const cy = bank.reduce((sum, point) => sum + point[1], 0) / bank.length;
+    return bank.flatMap(([x, y], i) => {
+        if ((i + index) % 3 !== 0) return [[x, y]];
+        const [nx, ny] = bank[(i + 1) % bank.length], t = (i + index) % 2 ? .39 : .62;
+        const mx = x + (nx - x) * t, my = y + (ny - y) * t;
+        const inset = .045 + (i % 2) * .02;
+        return [[x, y], [mx + (cx - mx) * inset, my + (cy - my) * inset]] as const;
+    });
+});
 const FIELDS: readonly Polygon[] = [
     [[3.88,-.12],[3.96,-.16],[4.04,-.11],[3.96,-.06]],
     [[3.98,-.03],[4.06,-.08],[4.10,-.03],[4.05,.01]],
@@ -25,21 +38,50 @@ const FIELDS: readonly Polygon[] = [
     [[3.66,.28],[3.76,.25],[3.83,.30],[3.73,.35]],
 ];
 const CLOUDS = [[3.04,.18,.085],[3.51,-.20,.11],[3.91,.09,.075],[3.33,.93,.095],[4.19,.67,.10]] as const;
-function polygon(ctx: CanvasRenderingContext2D, camera: MapCamera, points: Polygon, fill: string, dy = 0) {
+function polygon(ctx: CanvasRenderingContext2D, camera: MapCamera, points: Polygon, fill: string | CanvasGradient, dy = 0) {
     ctx.beginPath();
     points.forEach(([x,y], i) => { const p = mapToScreen({x,y: y + dy}, camera); if (i) ctx.lineTo(p.x,p.y); else ctx.moveTo(p.x,p.y); });
     ctx.closePath(); ctx.fillStyle = fill; ctx.fill();
+}
+/** A low earthen bank, with its water contact below the turf. Relief and lighting
+ * belong to atlas space, so the return trip sees the same shore from the same sun.
+ * Keep the original footprint: these are floodplain islands, not new terminals. */
+function paintBank(ctx: CanvasRenderingContext2D, camera: MapCamera, bank: Polygon, index: number, scale: number) {
+    const depth = .014;
+    polygon(ctx, camera, bank, 'rgba(30,65,62,.16)', depth + .009);
+    polygon(ctx, camera, bank, '#697e73', depth);
+    // Submerged shallows soften the water/soil junction without a white foam ring.
+    ctx.strokeStyle = 'rgba(151,186,167,.24)'; ctx.lineWidth = scale * .015; ctx.stroke();
+    // Only front-facing edges expose earth. The diagonal faces catch less light
+    // than the broad south bank, avoiding the old uniformly outlined cardboard rim.
+    bank.forEach(([x, y], i) => {
+        const [nx, ny] = bank[(i + 1) % bank.length];
+        if (nx >= x) return;
+        const shade = Math.abs(ny - y) > (x - nx) * .5 ? '#697967' : '#85836a';
+        polygon(ctx, camera, [[x,y],[nx,ny],[nx,ny+depth],[x,y+depth]], shade);
+    });
+    const top = Math.min(...bank.map(p => p[1])), bottom = Math.max(...bank.map(p => p[1]));
+    const a = mapToScreen({ x: bank[0][0], y: top }, camera), b = mapToScreen({ x: bank[0][0], y: bottom }, camera);
+    const turf = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
+    turf.addColorStop(0, index === 5 ? '#81998a' : '#a0ab8d');
+    turf.addColorStop(1, index === 5 ? '#708b7c' : '#839b80');
+    polygon(ctx, camera, bank, turf);
+    // Restrained sun-facing turf lip, not a luminous outline around every edge.
+    ctx.beginPath();
+    bank.forEach(([x, y], i) => {
+        const [nx, ny] = bank[(i + 1) % bank.length];
+        if (nx <= x) return;
+        const a = mapToScreen({ x, y }, camera), b = mapToScreen({ x: nx, y: ny }, camera);
+        ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
+    });
+    ctx.strokeStyle = 'rgba(218,218,168,.36)'; ctx.lineWidth = scale * .002; ctx.stroke();
 }
 /** Ground first, then the existing airport artwork. Runways and scenery therefore
  * retain their existing ownership/layering; this never changes water-state art. */
 export function paintFlightLandscape(ctx: CanvasRenderingContext2D, camera: MapCamera): void {
     ctx.save();
-    FLIGHT_BANKS.forEach((bank, i) => {
-        polygon(ctx, camera, bank, 'rgba(38,77,73,.18)', .024);
-        polygon(ctx, camera, bank, '#537e78', .012);
-        polygon(ctx, camera, bank, i === 5 ? '#73948c' : '#88a18b');
-        ctx.strokeStyle = 'rgba(215,214,167,.38)'; ctx.lineWidth = 2; ctx.stroke();
-    });
+    const scale = Math.min(camera.width / 1.6, camera.height) * camera.zoom;
+    BANK_SHORES.forEach((bank, i) => paintBank(ctx, camera, bank, i, scale));
     FIELDS.forEach((field, i) => polygon(ctx, camera, field, ['#a5b08c','#789989','#b8b28b'][i % 3]));
     // Quiet rows on the cultivated floodplain. Gaps between banks remain canals.
     for (let i = 0; i < 5; i++) {
@@ -50,7 +92,6 @@ export function paintFlightLandscape(ctx: CanvasRenderingContext2D, camera: MapC
     }
     // Sparse low trees/reeds use the same top-lit, shallow isometric relief as
     // the islands. Authored clusters, not per-frame random noise.
-    const scale = Math.min(camera.width / 1.6, camera.height) * camera.zoom;
     for (const [x,y] of [[3.84,-.08],[3.87,-.04],[3.91,-.02],[4.03,-.13],[4.06,-.11],[3.53,.15],[3.55,.17],[3.18,.55],[3.21,.57],[3.25,.58],[3.45,.61],[3.48,.58],
         [3.32,.87],[3.35,.90],[3.38,.92],[3.70,.87],[3.68,.90],
         [3.65,.35],[3.68,.38],[3.80,.39],[3.83,.36],[3.91,1.13],[3.97,1.16]] as const) {

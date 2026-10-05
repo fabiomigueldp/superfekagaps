@@ -20,11 +20,15 @@ export function drawSkeletonBull(ctx: CanvasRenderingContext2D, b: SkeletonBullM
     // Three deliberate beats, never a faster attack: all cues use the existing clocks.
     // Reduced motion holds the committed silhouette, without hoof/jaw oscillation.
     const preparation = reducedMotion ? 2 : Math.min(2, Math.floor(b.warningProgress * 3));
+    // Arrest, compress, settle inside the existing brake clock. Hooves stay on
+    // the floor, and the final pose is recovery itself: no snap at the boundary.
+    // Reduced motion holds that exposed-core pose throughout the opening.
+    const settling = reducedMotion ? 2 : Math.min(2, Math.floor(b.stateTick * 3 / BULL_RULES.brake));
     const recoil = hurt ? (reducedMotion ? 1 : Math.max(0, 3 - Math.floor(b.stateTick / 10))) : 0;
     const frame = moving && !reducedMotion ? Math.floor(b.stateTick / 3) % GALLOP.length : 0;
     const pulse = !reducedMotion ? Math.floor(b.stateTick / 8) % 2 : 0;
-    const bodyY = anticipation ? 8 + preparation : hurt ? 8 - recoil : moving ? [8, 7, 6, 7, 8, 8][frame] : braking ? 7 : open ? 9 : 8;
-    const headDrop = anticipation ? 2 + preparation * 2 : hurt ? -2 - recoil : moving ? 5 : braking ? 1 : open ? 8 : boneTell ? -2 : 0;
+    const bodyY = anticipation ? 8 + preparation : hurt ? 8 - recoil : moving ? [8, 7, 6, 7, 8, 8][frame] : braking ? [7, 10, 9][settling] : open ? 9 : 8;
+    const headDrop = anticipation ? 2 + preparation * 2 : hurt ? -2 - recoil : moving ? 5 : braking ? [1, 5, 8][settling] : open ? 8 : boneTell ? -2 : 0;
     ctx.save(); ctx.translate(Math.round(b.x + b.width / 2), Math.round(b.y)); ctx.scale(b.facing, 1);
     const r = (color: string, x: number, y: number, w: number, h: number) => { ctx.fillStyle = color; ctx.fillRect(x, y, w, h); };
     const line = (x: number, y: number, xx: number, yy: number, color: string, size = 1) => pixelLine(ctx, x, y, xx, yy, color, size);
@@ -36,7 +40,7 @@ export function drawSkeletonBull(ctx: CanvasRenderingContext2D, b: SkeletonBullM
     }
     function leg(hip: number, index: number, near: boolean) {
         const [reach, lift] = moving ? GALLOP[frame][index]
-            : braking ? [hip > 0 ? 5 : -4, 0]
+            : braking ? [hip > 0 ? 5 - settling : settling === 2 ? -3 : -4, 0]
             : anticipation ? [hip > 0 ? -2 - preparation : -4, hip > 0 && preparation === 1 ? 3 : 0]
             : hurt ? [hip > 0 ? -3 : 3, 0]
             : open ? [hip > 0 ? 3 : -3, 0] : [0, 0];
@@ -77,7 +81,8 @@ export function drawSkeletonBull(ctx: CanvasRenderingContext2D, b: SkeletonBullM
     if (boneTell) r(p.core, 29, 21 + headDrop, 3, 2);
     r(p.horn, 18, 2 + headDrop, 4, 9); r(p.horn, 21, 1 + headDrop, 6, 3); r(p.bone, 25, headDrop, 3, 3);
     r(p.horn, 27, 5 + headDrop, 4, 6); r(p.horn, 30, 3 + headDrop, 5, 3);
-    if (braking) for (let i = 0; i < 3; i++) r('#DB9C68', -27 - i * 5, 31 - i % 2, 3, 2);
+    if (braking && settling < 2) for (let i = 0; i < 3 - settling; i++)
+        r('#DB9C68', -27 - settling * 3 - i * 5, 31 - i % 2, 3 - settling, 2);
     if (open) {
         // Three small costal marks drain only in recovery's final 52 ticks.
         // Discrete information remains available with reduced motion; ribs and
