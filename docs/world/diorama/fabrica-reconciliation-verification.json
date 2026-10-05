@@ -1,0 +1,135 @@
+{
+  "status": "verified",
+  "date": "2026-10-05",
+  "originalToolingCommit": "eab1a34addb278a898e95a1c9e77bcd8b2de68e6",
+  "runtimeModel": "world-atlas",
+  "hashEncoding": "UTF-8 text with LF line endings, excluding BOM",
+  "sourceHashes": {
+    "tools/diorama/render_fabrica_map.py": "6e1823e21be5ea8d0ccd6254e575e3e2aac674cfb0b0bfd68ad189e14712dcd1",
+    "tools/diorama/factory_enrichment.py": "1428af108df6c97ab4baf6755b6d2aa06f74f68048886bf79ce94c001e0ce28e",
+    "tools/diorama/check_fabrica_clearance.py": "308e544c4f5c8f350731983f7797386ba12c1e2a30d2a99e328f50b08ea76d00",
+    "tools/diorama/check_fabrica_billboard.py": "17769a80cc0cab5e9127d8b423d4f561f209f22006e56476143fc2da33531ad2",
+    "tools/diorama/fabrica_tools.py": "00713b42b5fe04fa0737df673758ea9f51eb719ebd2332465f8ff0a86416b676",
+    "docs/world/diorama/fabrica-runtime-envelopes.json": "966af42caa63336f0c493d468bae8c7057408c6f85b6682f582e19545fda7b93"
+  },
+  "runtimeHashes": {
+    "tools/diorama/measure_fabrica_envelopes.ts": "e8484c4d5de19336cce4243cb7b471e8a92b944918ac6038adcf3656cdc70f14",
+    "src/assets/playerSpriteSpec.ts": "6a08f9d187cc0c5fa384ecae00ba743c2491580ecc06260b4a611279a07740e0",
+    "src/adventure/WorldAtlasArt.ts": "7efd826013ec02b1bd4f6fa09f845615f623d3ecab278756673bfb2d02c4f49d",
+    "src/adventure/WorldAtlasModel.ts": "08aec86444beff853975be56405f239461a345060a8e924640366cff4dcf1934",
+    "src/adventure/WorldMapArt.ts": "ea180a5a8a1374926a3085f9f0d0466fea82be542fc8bb26a81b7b1831e76ffe",
+    "src/adventure/WorldMapModel.ts": "dac756bb2d1488a0b8a0d49cc7c97d2886f539c82e0a57f462543460983f3360",
+    "src/adventure/GuairaCampaignArt.ts": "0a418942ae3769dd4768c53c67ffab4e1e7c297afc2e84031043e35047918576",
+    "src/adventure/delicia/DeliciaIsland.ts": "af0521577b80cce44ad13cab2e18ecfd76bf0dd2c1688ced3464e518437aed8a",
+    "public/assets/world/map/costa-diorama.meta.json": "889ca6e3c4cb64558d5c22d8a8f898189ff36b14604db989287b959c00738b18",
+    "public/assets/world/map/porto-diorama.meta.json": "9ab92d40237767c133ff8ac0a951f21ae3b61dfa714d758cade2ebd55f25004c",
+    "public/assets/world/map/fabrica-diorama.meta.json": "042d6d20b289a3282784b4b706a82bc995d9d01e69320bd22798ee5999cde12b",
+    "public/assets/world/map/serra-diorama.meta.json": "111c3dd96a86cc4abfa7028c4621b30e3ff97c75f69833718452b2a21603f6da",
+    "public/assets/world/map/reserva-diorama.meta.json": "975d503cf5e496adf34391170357f16ef299c836cdb83d47b7ad4de3f6837559",
+    "public/assets/world/map/dominio-diorama.meta.json": "de2becb7944244ad08951540825991d8df900b7d5503648768c52eb24271e058",
+    "public/assets/world/map/guaira-campaign/fabrica.meta.json": "e444e10575df311176bc774580441347b4c07cf64429fb6091dcda202a51bd00",
+    "public/assets/world/map/guaira-campaign/guaira.meta.json": "7a547710efdf754406fa780805fdc08265bfafb50b73790836a882f25e4c8039",
+    "public/assets/world/map/guaira-campaign/serra.meta.json": "01e585b9e4badccdbbae58ac31d268f4ffb3f00486e1c6d4e24051f88fa7e342",
+    "public/assets/world/map/port-factory-bridge.meta.json": "d5d1916785aa266510a25cb0a143326d01e7df4281e07ac73404281e33f24606"
+  },
+  "blender": {
+    "version": "5.2.1 LTS",
+    "objectCount": 1055,
+    "samples": 192,
+    "rendered": true,
+    "renderFiles": {
+      "fabrica-diorama.png": "aa5177f2716d8aa135cb0e0ba5cb06a4cfbeae67a690763cf43a5300b83a965c",
+      "fabrica-diorama.meta.json": "1ccdf2b6212d64141a2490a6e91a542b4eafd7f77327a3f1bafc121384f53114"
+    }
+  },
+  "geometry": {
+    "cameraNodesAndRoutesPreserved": true,
+    "alphaBounds": [
+      246,
+      196,
+      1602,
+      1094
+    ],
+    "supportAndHeadroom": {
+      "sampleCount": 660,
+      "headroomRayCount": 660,
+      "supportRayCount": 660,
+      "obstructionCount": 0,
+      "unsupportedCount": 0,
+      "maxAdjacentSampleRise": 0.0793
+    },
+    "projectedActor": {
+      "sampleCount": 2640,
+      "conflictCount": 0
+    },
+    "physicalBillboard": {
+      "sampleCount": 3300,
+      "equipmentContactCount": 0,
+      "pathEdgeContactCount": 28,
+      "rasterSampleCount": 59400,
+      "rasterEquipmentContactCount": 71
+    },
+    "guardrails": {
+      "posts": 12,
+      "sockets": 12,
+      "ties": 12,
+      "connected": 12
+    }
+  },
+  "rasterDiagnostics": {
+    "meaning": "Conservative full-grid overdraw from rounded CSS pixels in small panorama views; reported separately from physical equipment clearance and not an opaque-pixel collision claim.",
+    "equipmentContacts": 71,
+    "profiles": [
+      {
+        "profile": "portrait",
+        "mode": "panorama",
+        "equipmentContacts": 7
+      },
+      {
+        "profile": "narrow-portrait",
+        "mode": "panorama",
+        "equipmentContacts": 54
+      },
+      {
+        "profile": "tall-portrait",
+        "mode": "panorama",
+        "equipmentContacts": 10
+      }
+    ]
+  },
+  "package": {
+    "runtimeBytes": 179548,
+    "budgetBytes": 350000,
+    "publishedMetadataPreserved": true,
+    "installed": false,
+    "candidateAssets": {
+      "fabrica-diorama.webp": {
+        "sha256": "8fae7adcc6b086c1f0c59fd1b50c5f0b775e117ee1ccde119c00caf8eb8b2d22",
+        "bytes": 173916
+      },
+      "fabrica-diorama.meta.json": {
+        "sha256": "e9143ab0189e6dc1b999b167c7781125dc69665083957488f3e75bc5e2a202e5",
+        "bytes": 5632
+      }
+    }
+  },
+  "tests": {
+    "typescript": 1826,
+    "node": 3,
+    "python": 9,
+    "failures": 0,
+    "validatorsTypechecksAndBuild": "passed"
+  },
+  "build": {
+    "files": 210,
+    "bytes": 50982967,
+    "budgetBytes": 53000000,
+    "headroomBytes": 2017033
+  },
+  "reviewArtifacts": {
+    "sourceScene": ".cache/diorama/fabrica-reconciliation/fabrica-map-prototype.blend",
+    "renderedPackage": ".cache/diorama/fabrica-reconciliation-cached/package",
+    "routeOverlay": ".cache/diorama/fabrica-reconciliation-cached/review/fabrica-path-review.png"
+  },
+  "scope": "Native scene and model verification, not a new browser test. Published runtime images and metadata were preserved; the rendering and package are reproduction evidence."
+}

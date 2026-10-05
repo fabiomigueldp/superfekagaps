@@ -1,5 +1,6 @@
 """Original Blender Fábrica de Suco diorama. No borrowed meshes or Boolean terrain.
-blender -b -t 12 -P tools/diorama/render_fabrica_map.py [-- --final | --audit-only]
+blender -b -t 12 --python-exit-code 1 -P tools/diorama/render_fabrica_map.py -- --final
+Exports, audit reports and the scene cache are staged under .cache/diorama/fabrica.
 """
 import bpy, math, os, json, random, sys, runpy, tempfile
 from mathutils import Vector
@@ -284,17 +285,36 @@ assert all(mod.type!='BOOLEAN' for ob in scene.objects for mod in ob.modifiers)
 enrichment=runpy.run_path(os.path.join(ROOT,'tools/diorama/factory_enrichment.py'))['apply'](globals())
 scene['factory_enrichment_invariants']=json.dumps(enrichment)
 # Always audit fresh in-memory coordinates; never let a prior metadata file approve a new build.
-audit_out=tempfile.mkdtemp(prefix='fabrica-source-audit-') if AUDIT_ONLY else OUT
-audit=runpy.run_path(os.path.join(ROOT,'tools/diorama/check_fabrica_clearance.py'),init_globals={'FABRICA_META':meta,'FABRICA_OUT':audit_out,'FABRICA_DOC':audit_out if AUDIT_ONLY else DOC},run_name='__main__');meta=audit['meta']
-if AUDIT_ONLY:
- print('FABRICA_AUDIT_ONLY_COMPLETE='+json.dumps({'reports':audit_out,'rendered':False}));sys.exit(0)
+import argparse
+from pathlib import Path
+sys.path.insert(0,os.path.dirname(__file__))
+from fabrica_tools import DEFAULT_OUTPUT, source_hashes, stage_render_record, write_json
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--output-dir',type=Path,default=DEFAULT_OUTPUT)
+parser.add_argument('--final',action='store_true')
+parser.add_argument('--audit-only',action='store_true')
+parser.add_argument('--scene-only',action='store_true')
+options=parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
+output=options.output_dir.resolve();OUT=str(output/'export');DOC=str(output/'audit')
+os.makedirs(OUT,exist_ok=True);os.makedirs(DOC,exist_ok=True)
+scene.cycles.samples=192 if options.final else 16
+scene.render.resolution_percentage=100 if options.final else 50
+audit=runpy.run_path(os.path.join(ROOT,'tools/diorama/check_fabrica_clearance.py'),init_globals={'FABRICA_META':meta,'FABRICA_OUT':OUT,'FABRICA_DOC':DOC},run_name='__main__');meta=audit['meta']
+if options.audit_only:
+ stage_render_record(output,meta,scene,bpy.app.version_string,False)
+ print('FABRICA_AUDIT_ONLY_COMPLETE='+json.dumps({'reports':DOC,'rendered':False}));sys.exit(0)
 scene['fabrica_metadata']=json.dumps(meta)
-bpy.ops.wm.save_as_mainfile(filepath='/tmp/fabrica-map-prototype.blend')
-scene.render.filepath=os.path.join(OUT,'fabrica-diorama.png' if FINAL else 'fabrica-diorama-preview.png');bpy.ops.render.render(write_still=True)
+scene['fabrica_source_hashes']=json.dumps(source_hashes())
+bpy.ops.wm.save_as_mainfile(filepath=str(output/'fabrica-map-prototype.blend'))
+if options.scene_only:
+ stage_render_record(output,meta,scene,bpy.app.version_string,False)
+ print('FABRICA_SCENE_ONLY_COMPLETE='+json.dumps({'reports':DOC,'scene':str(output/'fabrica-map-prototype.blend')}));sys.exit(0)
+scene.render.filepath=os.path.join(OUT,'fabrica-diorama.png');bpy.ops.render.render(write_still=True)
 from array import array
 im=bpy.data.images.load(scene.render.filepath,check_existing=False);w,h=im.size;px=array('f',[0])*(w*h*4);im.pixels.foreach_get(px);xs=[];ys=[]
 for i in range(w*h):
  if px[i*4+3]>0:xs.append(i%w);ys.append(i//w)
 meta['artBounds']={'top':round(1-(max(ys)+1)/h,6),'bottom':round(1-min(ys)/h,6),'left':round(min(xs)/w,6),'right':round((max(xs)+1)/w,6)}
-json.dump(meta,open(os.path.join(OUT,'fabrica-diorama.meta.json'),'w'),indent=2)
+write_json(Path(OUT)/'fabrica-diorama.meta.json',meta)
+stage_render_record(output,meta,scene,bpy.app.version_string,True)
 print('FABRICA_RENDER='+scene.render.filepath)

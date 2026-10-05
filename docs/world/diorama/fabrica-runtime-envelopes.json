@@ -1,15 +1,346 @@
 {
-  "units": "Sprite/frame and HUD measurements use CSS pixels, independent of devicePixelRatio. Normalized coordinates use the full 1920×1200 exported image, x right and y down. Bounds are relative to the foot anchor.",
-  "scope": "Five stage selections, opening factors 0.84 and 1, fitted close/panorama targets. Does not claim a universal bound over arbitrary tiny viewports or resize/camera interpolation transients.",
-  "formula": "S=min(viewportWidth/1.6,viewportHeight)*camera.zoom; x CSS pixels divide by 1.6*S and y CSS pixels by S. Use rasterGridBoundsFromFootNormalized for precisely anchored camera-ray tests; reportedEnvelopeNormalized is a padded width/height summary.",
-  "support": "Blender support/headroom audits are separate world-space checks. Their 0.52-unit support footprint must not be equated with this camera-facing 16×26 sprite grid.",
-  "source": "public/assets/world/map/fabrica-diorama.meta.json",
-  "metadataSha256": "5cef59dc45724b19c443231049e25d7f2bf7b9909f6e125d7326ed557d8e0dd5",
-  "artBoundsUsed": {
-    "top": 0.163333,
-    "bottom": 0.898333
-  },
+  "version": 2,
+  "model": "world-atlas",
   "sourceScript": "tools/diorama/measure_fabrica_envelopes.ts",
+  "source": "public/assets/world/map/fabrica-diorama.meta.json",
+  "hashEncoding": "UTF-8 text with LF line endings, excluding BOM",
+  "metadataSha256": "042d6d20b289a3282784b4b706a82bc995d9d01e69320bd22798ee5999cde12b",
+  "sourceHashes": {
+    "tools/diorama/measure_fabrica_envelopes.ts": "e8484c4d5de19336cce4243cb7b471e8a92b944918ac6038adcf3656cdc70f14",
+    "src/assets/playerSpriteSpec.ts": "6a08f9d187cc0c5fa384ecae00ba743c2491580ecc06260b4a611279a07740e0",
+    "src/adventure/WorldAtlasArt.ts": "7efd826013ec02b1bd4f6fa09f845615f623d3ecab278756673bfb2d02c4f49d",
+    "src/adventure/WorldAtlasModel.ts": "08aec86444beff853975be56405f239461a345060a8e924640366cff4dcf1934",
+    "src/adventure/WorldMapArt.ts": "ea180a5a8a1374926a3085f9f0d0466fea82be542fc8bb26a81b7b1831e76ffe",
+    "src/adventure/WorldMapModel.ts": "dac756bb2d1488a0b8a0d49cc7c97d2886f539c82e0a57f462543460983f3360",
+    "src/adventure/GuairaCampaignArt.ts": "0a418942ae3769dd4768c53c67ffab4e1e7c297afc2e84031043e35047918576",
+    "src/adventure/delicia/DeliciaIsland.ts": "af0521577b80cce44ad13cab2e18ecfd76bf0dd2c1688ced3464e518437aed8a",
+    "public/assets/world/map/costa-diorama.meta.json": "889ca6e3c4cb64558d5c22d8a8f898189ff36b14604db989287b959c00738b18",
+    "public/assets/world/map/porto-diorama.meta.json": "9ab92d40237767c133ff8ac0a951f21ae3b61dfa714d758cade2ebd55f25004c",
+    "public/assets/world/map/fabrica-diorama.meta.json": "042d6d20b289a3282784b4b706a82bc995d9d01e69320bd22798ee5999cde12b",
+    "public/assets/world/map/serra-diorama.meta.json": "111c3dd96a86cc4abfa7028c4621b30e3ff97c75f69833718452b2a21603f6da",
+    "public/assets/world/map/reserva-diorama.meta.json": "975d503cf5e496adf34391170357f16ef299c836cdb83d47b7ad4de3f6837559",
+    "public/assets/world/map/dominio-diorama.meta.json": "de2becb7944244ad08951540825991d8df900b7d5503648768c52eb24271e058",
+    "public/assets/world/map/guaira-campaign/fabrica.meta.json": "e444e10575df311176bc774580441347b4c07cf64429fb6091dcda202a51bd00",
+    "public/assets/world/map/guaira-campaign/guaira.meta.json": "7a547710efdf754406fa780805fdc08265bfafb50b73790836a882f25e4c8039",
+    "public/assets/world/map/guaira-campaign/serra.meta.json": "01e585b9e4badccdbbae58ac31d268f4ffb3f00486e1c6d4e24051f88fa7e342",
+    "public/assets/world/map/port-factory-bridge.meta.json": "d5d1916785aa266510a25cb0a143326d01e7df4281e07ac73404281e33f24606"
+  },
+  "sourceGeometry": {
+    "world": 3,
+    "size": {
+      "width": 1920,
+      "height": 1200
+    },
+    "camera": {
+      "position": [
+        11,
+        -20,
+        17.5
+      ],
+      "target": [
+        0,
+        0.25,
+        2.25
+      ],
+      "orthoScale": 20.600000381469727
+    },
+    "nodes": {
+      "3-1": {
+        "x": 0.210478,
+        "y": 0.568483,
+        "world": [
+          -5.25,
+          -2.58,
+          1.18
+        ],
+        "clearingRadius": 0.64
+      },
+      "3-2": {
+        "x": 0.302901,
+        "y": 0.48111,
+        "world": [
+          -4.55,
+          0.12,
+          1.18
+        ],
+        "clearingRadius": 0.64
+      },
+      "3-3": {
+        "x": 0.442809,
+        "y": 0.64431,
+        "world": [
+          -0.2,
+          -1.85,
+          1.18
+        ],
+        "clearingRadius": 0.64
+      },
+      "3-4": {
+        "x": 0.63263,
+        "y": 0.735356,
+        "world": [
+          4.25,
+          -1.85,
+          1.18
+        ],
+        "clearingRadius": 0.64
+      },
+      "3-5": {
+        "x": 0.705057,
+        "y": 0.509121,
+        "world": [
+          3.9,
+          1.92,
+          2.37
+        ],
+        "clearingRadius": 0.64
+      }
+    },
+    "routes": {
+      "0:1": [
+        {
+          "x": 0.210478,
+          "y": 0.568483
+        },
+        {
+          "x": 0.254041,
+          "y": 0.497673
+        },
+        {
+          "x": 0.302901,
+          "y": 0.48111
+        }
+      ],
+      "1:2": [
+        {
+          "x": 0.302901,
+          "y": 0.48111
+        },
+        {
+          "x": 0.37755,
+          "y": 0.516915
+        },
+        {
+          "x": 0.364816,
+          "y": 0.582512
+        },
+        {
+          "x": 0.442809,
+          "y": 0.64431
+        }
+      ],
+      "2:3": [
+        {
+          "x": 0.442809,
+          "y": 0.64431
+        },
+        {
+          "x": 0.536653,
+          "y": 0.689321
+        },
+        {
+          "x": 0.63263,
+          "y": 0.735356
+        }
+      ],
+      "3:4": [
+        {
+          "x": 0.63263,
+          "y": 0.735356
+        },
+        {
+          "x": 0.693218,
+          "y": 0.713199
+        },
+        {
+          "x": 0.731451,
+          "y": 0.573974
+        },
+        {
+          "x": 0.756244,
+          "y": 0.533673
+        },
+        {
+          "x": 0.705057,
+          "y": 0.509121
+        }
+      ]
+    },
+    "secretRoute": [
+      {
+        "x": 0.442809,
+        "y": 0.64431
+      },
+      {
+        "x": 0.513455,
+        "y": 0.614783
+      },
+      {
+        "x": 0.545895,
+        "y": 0.484974
+      },
+      {
+        "x": 0.609079,
+        "y": 0.463086
+      },
+      {
+        "x": 0.705057,
+        "y": 0.509121
+      }
+    ],
+    "worldRoutes": {
+      "main": [
+        {
+          "from": "3-1",
+          "to": "3-2",
+          "world": [
+            [
+              -5.25,
+              -2.58,
+              1.18
+            ],
+            [
+              -5.25,
+              -0.7,
+              1.18
+            ],
+            [
+              -4.55,
+              0.12,
+              1.18
+            ]
+          ]
+        },
+        {
+          "from": "3-2",
+          "to": "3-3",
+          "world": [
+            [
+              -4.55,
+              0.12,
+              1.18
+            ],
+            [
+              -2.8,
+              0.12,
+              1.18
+            ],
+            [
+              -2.3,
+              -1.35,
+              1.18
+            ],
+            [
+              -0.2,
+              -1.85,
+              1.18
+            ]
+          ]
+        },
+        {
+          "from": "3-3",
+          "to": "3-4",
+          "world": [
+            [
+              -0.2,
+              -1.85,
+              1.18
+            ],
+            [
+              2,
+              -1.85,
+              1.18
+            ],
+            [
+              4.25,
+              -1.85,
+              1.18
+            ]
+          ]
+        },
+        {
+          "from": "3-4",
+          "to": "3-5",
+          "world": [
+            [
+              4.25,
+              -1.85,
+              1.18
+            ],
+            [
+              5.1,
+              -0.8,
+              1.18
+            ],
+            [
+              5.1,
+              0.85,
+              2.37
+            ],
+            [
+              5.1,
+              1.92,
+              2.37
+            ],
+            [
+              3.9,
+              1.92,
+              2.37
+            ]
+          ]
+        }
+      ],
+      "secret": [
+        {
+          "from": "3-3",
+          "to": "3-5",
+          "world": [
+            [
+              -0.2,
+              -1.85,
+              1.18
+            ],
+            [
+              0.75,
+              -0.55,
+              1.18
+            ],
+            [
+              0.75,
+              0.85,
+              2.37
+            ],
+            [
+              1.65,
+              1.92,
+              2.37
+            ],
+            [
+              3.9,
+              1.92,
+              2.37
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "physicalNormalized": {
+    "left": -0.012591019417475728,
+    "right": 0.012591019417475728,
+    "top": -0.06547330097087378,
+    "bottom": 0
+  },
+  "units": "CSS pixels, independent of devicePixelRatio; normalized offsets use the full Factory image and its unit-scale atlas placement. physicalNormalized is the camera-independent actor body before pixel rounding.",
+  "scope": "Ten fixed viewport/HUD scenarios, five Factory selections, settled island and terrain panorama cameras. Panorama includes six dioramas, cargo bridge, Guaira terrain/airports and Delicia. These are deterministic model inputs, not fresh browser HUD measurements. Vehicle-dependent focus bounds, channel travel, interpolation and arbitrary other viewports are outside this proof.",
+  "formula": "atlasActorBounds supplies the physical 16x26 body. atlasActorScale(getAtlasCamera(...)) supplies the rounded pixel envelope normalized against the rendered Factory span. Each profile unions every selection and both facings. Raster overdraw at small panorama scales is reported separately from physical clearance. Shadow and foot support are separate checks.",
+  "support": "World support/headroom and ground shadow audits are independent of the upright actor billboard; the lowest billboard ray is 10% of its height.",
+  "artBoundsUsed": {
+    "left": 0.128125,
+    "top": 0.163333,
+    "right": 0.834375,
+    "bottom": 0.911667
+  },
   "profiles": [
     {
       "profile": "desktop",
@@ -22,16 +353,79 @@
         "bottom": 206
       },
       "mode": "close",
-      "selectedStage": "3-1",
-      "opening": 1,
       "normalized": {
-        "left": -0.010058708564247468,
-        "right": 0.010940141788949564,
-        "top": -0.0504387200582471,
-        "bottom": 0.0022398773710076837
+        "left": -0.013149144417475727,
+        "right": 0.013807766990291263,
+        "top": -0.06636630097087377,
+        "bottom": 0.0019467961165048563
       },
-      "actorScale": 1.15,
-      "cameraZoom": 0.8172360229492188
+      "candidates": [
+        {
+          "selectedStage": "3-1",
+          "camera": {
+            "width": 1180,
+            "height": 757,
+            "zoom": 0.7592005618084154,
+            "center": {
+              "x": 2.4569099999999997,
+              "y": 0.655014
+            }
+          },
+          "actorScale": 1.4099685797845154
+        },
+        {
+          "selectedStage": "3-2",
+          "camera": {
+            "width": 1180,
+            "height": 757,
+            "zoom": 0.7592005618084154,
+            "center": {
+              "x": 2.4569099999999997,
+              "y": 0.655014
+            }
+          },
+          "actorScale": 1.4099685797845154
+        },
+        {
+          "selectedStage": "3-3",
+          "camera": {
+            "width": 1180,
+            "height": 757,
+            "zoom": 0.7592005618084154,
+            "center": {
+              "x": 2.4569099999999997,
+              "y": 0.655014
+            }
+          },
+          "actorScale": 1.4099685797845154
+        },
+        {
+          "selectedStage": "3-4",
+          "camera": {
+            "width": 1180,
+            "height": 757,
+            "zoom": 0.7592005618084154,
+            "center": {
+              "x": 2.4569099999999997,
+              "y": 0.655014
+            }
+          },
+          "actorScale": 1.4099685797845154
+        },
+        {
+          "selectedStage": "3-5",
+          "camera": {
+            "width": 1180,
+            "height": 757,
+            "zoom": 0.7592005618084154,
+            "center": {
+              "x": 2.4569099999999997,
+              "y": 0.655014
+            }
+          },
+          "actorScale": 1.4099685797845154
+        }
+      ]
     },
     {
       "profile": "desktop",
@@ -44,16 +438,79 @@
         "bottom": 206
       },
       "mode": "panorama",
-      "selectedStage": "3-1",
-      "opening": 1,
       "normalized": {
-        "left": -0.012266717761277399,
-        "right": 0.013341636327987273,
-        "top": -0.06151063421737451,
-        "bottom": 0.0027315577695215657
+        "left": -0.015830913211959754,
+        "right": 0.020736823373743336,
+        "top": -0.07065713104204822,
+        "bottom": 0.013033286330028173
       },
-      "actorScale": 1.15,
-      "cameraZoom": 0.6701335388183594
+      "candidates": [
+        {
+          "selectedStage": "3-1",
+          "camera": {
+            "width": 1180,
+            "height": 757,
+            "zoom": 0.1307847850694142,
+            "center": {
+              "x": 0.941640625,
+              "y": -0.46869298635823814
+            }
+          },
+          "actorScale": 0.24289028082710915
+        },
+        {
+          "selectedStage": "3-2",
+          "camera": {
+            "width": 1180,
+            "height": 757,
+            "zoom": 0.1307847850694142,
+            "center": {
+              "x": 0.941640625,
+              "y": -0.46869298635823814
+            }
+          },
+          "actorScale": 0.24289028082710915
+        },
+        {
+          "selectedStage": "3-3",
+          "camera": {
+            "width": 1180,
+            "height": 757,
+            "zoom": 0.1307847850694142,
+            "center": {
+              "x": 0.941640625,
+              "y": -0.46869298635823814
+            }
+          },
+          "actorScale": 0.24289028082710915
+        },
+        {
+          "selectedStage": "3-4",
+          "camera": {
+            "width": 1180,
+            "height": 757,
+            "zoom": 0.1307847850694142,
+            "center": {
+              "x": 0.941640625,
+              "y": -0.46869298635823814
+            }
+          },
+          "actorScale": 0.24289028082710915
+        },
+        {
+          "selectedStage": "3-5",
+          "camera": {
+            "width": 1180,
+            "height": 757,
+            "zoom": 0.1307847850694142,
+            "center": {
+              "x": 0.941640625,
+              "y": -0.46869298635823814
+            }
+          },
+          "actorScale": 0.24289028082710915
+        }
+      ]
     },
     {
       "profile": "browser-desktop",
@@ -66,16 +523,79 @@
         "bottom": 206
       },
       "mode": "close",
-      "selectedStage": "3-1",
-      "opening": 1,
       "normalized": {
-        "left": -0.010058657808513366,
-        "right": 0.010940086585548042,
-        "top": -0.050438465547019605,
-        "bottom": 0.002239866068699884
+        "left": -0.01314914441747573,
+        "right": 0.013807766990291277,
+        "top": -0.0663663009708738,
+        "bottom": 0.0019467961165048776
       },
-      "actorScale": 1.15,
-      "cameraZoom": 0.8165481567382813
+      "candidates": [
+        {
+          "selectedStage": "3-1",
+          "camera": {
+            "width": 1181,
+            "height": 757,
+            "zoom": 0.7585577162861354,
+            "center": {
+              "x": 2.4569100000000006,
+              "y": 0.6550140000000004
+            }
+          },
+          "actorScale": 1.4099685797845087
+        },
+        {
+          "selectedStage": "3-2",
+          "camera": {
+            "width": 1181,
+            "height": 757,
+            "zoom": 0.7585577162861354,
+            "center": {
+              "x": 2.4569100000000006,
+              "y": 0.6550140000000004
+            }
+          },
+          "actorScale": 1.4099685797845087
+        },
+        {
+          "selectedStage": "3-3",
+          "camera": {
+            "width": 1181,
+            "height": 757,
+            "zoom": 0.7585577162861354,
+            "center": {
+              "x": 2.4569100000000006,
+              "y": 0.6550140000000004
+            }
+          },
+          "actorScale": 1.4099685797845087
+        },
+        {
+          "selectedStage": "3-4",
+          "camera": {
+            "width": 1181,
+            "height": 757,
+            "zoom": 0.7585577162861354,
+            "center": {
+              "x": 2.4569100000000006,
+              "y": 0.6550140000000004
+            }
+          },
+          "actorScale": 1.4099685797845087
+        },
+        {
+          "selectedStage": "3-5",
+          "camera": {
+            "width": 1181,
+            "height": 757,
+            "zoom": 0.7585577162861354,
+            "center": {
+              "x": 2.4569100000000006,
+              "y": 0.6550140000000004
+            }
+          },
+          "actorScale": 1.4099685797845087
+        }
+      ]
     },
     {
       "profile": "browser-desktop",
@@ -88,16 +608,79 @@
         "bottom": 206
       },
       "mode": "panorama",
-      "selectedStage": "3-1",
-      "opening": 1,
       "normalized": {
-        "left": -0.012266655864040691,
-        "right": 0.013341569006765905,
-        "top": -0.061510323837828784,
-        "bottom": 0.002731543986219371
+        "left": -0.0158280333063647,
+        "right": 0.020728183656958176,
+        "top": -0.07065252319309615,
+        "bottom": 0.013019462783171919
       },
-      "actorScale": 1.15,
-      "cameraZoom": 0.6695694885253907
+      "candidates": [
+        {
+          "selectedStage": "3-1",
+          "camera": {
+            "width": 1181,
+            "height": 757,
+            "zoom": 0.1307903024004365,
+            "center": {
+              "x": 0.9416406249999993,
+              "y": -0.46914455555554246
+            }
+          },
+          "actorScale": 0.24310637538300184
+        },
+        {
+          "selectedStage": "3-2",
+          "camera": {
+            "width": 1181,
+            "height": 757,
+            "zoom": 0.1307903024004365,
+            "center": {
+              "x": 0.9416406249999993,
+              "y": -0.46914455555554246
+            }
+          },
+          "actorScale": 0.24310637538300184
+        },
+        {
+          "selectedStage": "3-3",
+          "camera": {
+            "width": 1181,
+            "height": 757,
+            "zoom": 0.1307903024004365,
+            "center": {
+              "x": 0.9416406249999993,
+              "y": -0.46914455555554246
+            }
+          },
+          "actorScale": 0.24310637538300184
+        },
+        {
+          "selectedStage": "3-4",
+          "camera": {
+            "width": 1181,
+            "height": 757,
+            "zoom": 0.1307903024004365,
+            "center": {
+              "x": 0.9416406249999993,
+              "y": -0.46914455555554246
+            }
+          },
+          "actorScale": 0.24310637538300184
+        },
+        {
+          "selectedStage": "3-5",
+          "camera": {
+            "width": 1181,
+            "height": 757,
+            "zoom": 0.1307903024004365,
+            "center": {
+              "x": 0.9416406249999993,
+              "y": -0.46914455555554246
+            }
+          },
+          "actorScale": 0.24310637538300184
+        }
+      ]
     },
     {
       "profile": "portrait",
@@ -110,16 +693,79 @@
         "bottom": 193
       },
       "mode": "close",
-      "selectedStage": "3-1",
-      "opening": 0.84,
       "normalized": {
-        "left": -0.023095238095238092,
-        "right": 0.025119047619047617,
-        "top": -0.1158095238095238,
-        "bottom": 0.0051428571428571435
+        "left": -0.013630161859336196,
+        "right": 0.014134569315872668,
+        "top": -0.06713592887785053,
+        "bottom": 0.002469679837435104
       },
-      "actorScale": 1.15,
-      "cameraZoom": 1.05
+      "candidates": [
+        {
+          "selectedStage": "3-1",
+          "camera": {
+            "width": 400,
+            "height": 606,
+            "zoom": 1.2029149706964277,
+            "center": {
+              "x": 2.4569099999999997,
+              "y": 0.7121486279069773
+            }
+          },
+          "actorScale": 0.7572962876805484
+        },
+        {
+          "selectedStage": "3-2",
+          "camera": {
+            "width": 400,
+            "height": 606,
+            "zoom": 1.2029149706964277,
+            "center": {
+              "x": 2.4569099999999997,
+              "y": 0.7121486279069773
+            }
+          },
+          "actorScale": 0.7572962876805484
+        },
+        {
+          "selectedStage": "3-3",
+          "camera": {
+            "width": 400,
+            "height": 606,
+            "zoom": 1.2029149706964277,
+            "center": {
+              "x": 2.4569099999999997,
+              "y": 0.7121486279069773
+            }
+          },
+          "actorScale": 0.7572962876805484
+        },
+        {
+          "selectedStage": "3-4",
+          "camera": {
+            "width": 400,
+            "height": 606,
+            "zoom": 1.2029149706964277,
+            "center": {
+              "x": 2.4569099999999997,
+              "y": 0.7121486279069773
+            }
+          },
+          "actorScale": 0.7572962876805484
+        },
+        {
+          "selectedStage": "3-5",
+          "camera": {
+            "width": 400,
+            "height": 606,
+            "zoom": 1.2029149706964277,
+            "center": {
+              "x": 2.4569099999999997,
+              "y": 0.7121486279069773
+            }
+          },
+          "actorScale": 0.7572962876805484
+        }
+      ]
     },
     {
       "profile": "portrait",
@@ -132,16 +778,79 @@
         "bottom": 193
       },
       "mode": "panorama",
-      "selectedStage": "3-1",
-      "opening": 0.84,
       "normalized": {
-        "left": -0.028164924506387915,
-        "right": 0.03063298490127758,
-        "top": -0.14123112659698026,
-        "bottom": 0.0062717770034843206
+        "left": -0.02317718402503417,
+        "right": 0.04277563581296658,
+        "top": -0.08241116434296729,
+        "bottom": 0.04829538623278536
       },
-      "actorScale": 1.15,
-      "cameraZoom": 0.861
+      "candidates": [
+        {
+          "selectedStage": "3-1",
+          "camera": {
+            "width": 400,
+            "height": 606,
+            "zoom": 0.11807864758757951,
+            "center": {
+              "x": 0.9416406249999999,
+              "y": 0.4968857800388016
+            }
+          },
+          "actorScale": 0.07433652722822436
+        },
+        {
+          "selectedStage": "3-2",
+          "camera": {
+            "width": 400,
+            "height": 606,
+            "zoom": 0.11807864758757951,
+            "center": {
+              "x": 0.9416406249999999,
+              "y": 0.4968857800388016
+            }
+          },
+          "actorScale": 0.07433652722822436
+        },
+        {
+          "selectedStage": "3-3",
+          "camera": {
+            "width": 400,
+            "height": 606,
+            "zoom": 0.11807864758757951,
+            "center": {
+              "x": 0.9416406249999999,
+              "y": 0.4968857800388016
+            }
+          },
+          "actorScale": 0.07433652722822436
+        },
+        {
+          "selectedStage": "3-4",
+          "camera": {
+            "width": 400,
+            "height": 606,
+            "zoom": 0.11807864758757951,
+            "center": {
+              "x": 0.9416406249999999,
+              "y": 0.4968857800388016
+            }
+          },
+          "actorScale": 0.07433652722822436
+        },
+        {
+          "selectedStage": "3-5",
+          "camera": {
+            "width": 400,
+            "height": 606,
+            "zoom": 0.11807864758757951,
+            "center": {
+              "x": 0.9416406249999999,
+              "y": 0.4968857800388016
+            }
+          },
+          "actorScale": 0.07433652722822436
+        }
+      ]
     },
     {
       "profile": "landscape",
@@ -154,16 +863,79 @@
         "bottom": 97
       },
       "mode": "close",
-      "selectedStage": "3-1",
-      "opening": 1,
       "normalized": {
-        "left": -0.02092010430026678,
-        "right": 0.022753309316269538,
-        "top": -0.10490246115102847,
-        "bottom": 0.004658497452430541
+        "left": -0.013828344152925469,
+        "right": 0.014729116196640484,
+        "top": -0.06745302054759338,
+        "bottom": 0.0034209548466636085
       },
-      "actorScale": 1.15,
-      "cameraZoom": 0.7392678833007813
+      "candidates": [
+        {
+          "selectedStage": "3-1",
+          "camera": {
+            "width": 846,
+            "height": 392,
+            "zoom": 0.6442883219830385,
+            "center": {
+              "x": 2.45691,
+              "y": 0.5971957936507938
+            }
+          },
+          "actorScale": 0.6360001469672374
+        },
+        {
+          "selectedStage": "3-2",
+          "camera": {
+            "width": 846,
+            "height": 392,
+            "zoom": 0.6442883219830385,
+            "center": {
+              "x": 2.45691,
+              "y": 0.5971957936507938
+            }
+          },
+          "actorScale": 0.6360001469672374
+        },
+        {
+          "selectedStage": "3-3",
+          "camera": {
+            "width": 846,
+            "height": 392,
+            "zoom": 0.6442883219830385,
+            "center": {
+              "x": 2.45691,
+              "y": 0.5971957936507938
+            }
+          },
+          "actorScale": 0.6360001469672374
+        },
+        {
+          "selectedStage": "3-4",
+          "camera": {
+            "width": 846,
+            "height": 392,
+            "zoom": 0.6442883219830385,
+            "center": {
+              "x": 2.45691,
+              "y": 0.5971957936507938
+            }
+          },
+          "actorScale": 0.6360001469672374
+        },
+        {
+          "selectedStage": "3-5",
+          "camera": {
+            "width": 846,
+            "height": 392,
+            "zoom": 0.6442883219830385,
+            "center": {
+              "x": 2.45691,
+              "y": 0.5971957936507938
+            }
+          },
+          "actorScale": 0.6360001469672374
+        }
+      ]
     },
     {
       "profile": "landscape",
@@ -176,16 +948,79 @@
         "bottom": 97
       },
       "mode": "panorama",
-      "selectedStage": "3-1",
-      "opening": 1,
       "normalized": {
-        "left": -0.02551232231739851,
-        "right": 0.027747938190572606,
-        "top": -0.12792983067198593,
-        "bottom": 0.005681094454183587
+        "left": -0.019347936304601004,
+        "right": 0.031287892651667086,
+        "top": -0.07628436799027423,
+        "bottom": 0.029914997174706182
       },
-      "actorScale": 1.15,
-      "cameraZoom": 0.6061996643066406
+      "candidates": [
+        {
+          "selectedStage": "3-1",
+          "camera": {
+            "width": 846,
+            "height": 392,
+            "zoom": 0.1179818977898048,
+            "center": {
+              "x": 0.9416406249999998,
+              "y": -0.8145423280423266
+            }
+          },
+          "actorScale": 0.11646416949299421
+        },
+        {
+          "selectedStage": "3-2",
+          "camera": {
+            "width": 846,
+            "height": 392,
+            "zoom": 0.1179818977898048,
+            "center": {
+              "x": 0.9416406249999998,
+              "y": -0.8145423280423266
+            }
+          },
+          "actorScale": 0.11646416949299421
+        },
+        {
+          "selectedStage": "3-3",
+          "camera": {
+            "width": 846,
+            "height": 392,
+            "zoom": 0.1179818977898048,
+            "center": {
+              "x": 0.9416406249999998,
+              "y": -0.8145423280423266
+            }
+          },
+          "actorScale": 0.11646416949299421
+        },
+        {
+          "selectedStage": "3-4",
+          "camera": {
+            "width": 846,
+            "height": 392,
+            "zoom": 0.1179818977898048,
+            "center": {
+              "x": 0.9416406249999998,
+              "y": -0.8145423280423266
+            }
+          },
+          "actorScale": 0.11646416949299421
+        },
+        {
+          "selectedStage": "3-5",
+          "camera": {
+            "width": 846,
+            "height": 392,
+            "zoom": 0.1179818977898048,
+            "center": {
+              "x": 0.9416406249999998,
+              "y": -0.8145423280423266
+            }
+          },
+          "actorScale": 0.11646416949299421
+        }
+      ]
     },
     {
       "profile": "compact-boundary",
@@ -198,16 +1033,79 @@
         "bottom": 193
       },
       "mode": "close",
-      "selectedStage": "3-1",
-      "opening": 0.84,
       "normalized": {
-        "left": -0.014514501130511415,
-        "right": 0.01578639040483458,
-        "top": -0.07278199329773972,
-        "bottom": 0.0032320950971035734
+        "left": -0.01341735996517891,
+        "right": 0.013496163633400811,
+        "top": -0.06679544584719888,
+        "bottom": 0.001448230745480134
       },
-      "actorScale": 1.15,
-      "cameraZoom": 1.044214324951172
+      "candidates": [
+        {
+          "selectedStage": "3-1",
+          "camera": {
+            "width": 640,
+            "height": 606,
+            "zoom": 0.945433456184,
+            "center": {
+              "x": 2.45691,
+              "y": 0.6825266042402831
+            }
+          },
+          "actorScale": 0.9523176803795145
+        },
+        {
+          "selectedStage": "3-2",
+          "camera": {
+            "width": 640,
+            "height": 606,
+            "zoom": 0.945433456184,
+            "center": {
+              "x": 2.45691,
+              "y": 0.6825266042402831
+            }
+          },
+          "actorScale": 0.9523176803795145
+        },
+        {
+          "selectedStage": "3-3",
+          "camera": {
+            "width": 640,
+            "height": 606,
+            "zoom": 0.945433456184,
+            "center": {
+              "x": 2.45691,
+              "y": 0.6825266042402831
+            }
+          },
+          "actorScale": 0.9523176803795145
+        },
+        {
+          "selectedStage": "3-4",
+          "camera": {
+            "width": 640,
+            "height": 606,
+            "zoom": 0.945433456184,
+            "center": {
+              "x": 2.45691,
+              "y": 0.6825266042402831
+            }
+          },
+          "actorScale": 0.9523176803795145
+        },
+        {
+          "selectedStage": "3-5",
+          "camera": {
+            "width": 640,
+            "height": 606,
+            "zoom": 0.945433456184,
+            "center": {
+              "x": 2.45691,
+              "y": 0.6825266042402831
+            }
+          },
+          "actorScale": 0.9523176803795145
+        }
+      ]
     },
     {
       "profile": "compact-boundary",
@@ -220,16 +1118,79 @@
         "bottom": 193
       },
       "mode": "panorama",
-      "selectedStage": "3-1",
-      "opening": 0.84,
       "normalized": {
-        "left": -0.017700611134770016,
-        "right": 0.019251695615651924,
-        "top": -0.0887585284118777,
-        "bottom": 0.003941579386711675
+        "left": -0.018826705419188083,
+        "right": 0.029724199995428333,
+        "top": -0.07545039857361356,
+        "bottom": 0.027413088924724164
       },
-      "actorScale": 1.15,
-      "cameraZoom": 0.8562557464599609
+      "candidates": [
+        {
+          "selectedStage": "3-1",
+          "camera": {
+            "width": 640,
+            "height": 606,
+            "zoom": 0.12528693712054523,
+            "center": {
+              "x": 0.9416406250000005,
+              "y": -0.10870084189497313
+            }
+          },
+          "actorScale": 0.12619922064326766
+        },
+        {
+          "selectedStage": "3-2",
+          "camera": {
+            "width": 640,
+            "height": 606,
+            "zoom": 0.12528693712054523,
+            "center": {
+              "x": 0.9416406250000005,
+              "y": -0.10870084189497313
+            }
+          },
+          "actorScale": 0.12619922064326766
+        },
+        {
+          "selectedStage": "3-3",
+          "camera": {
+            "width": 640,
+            "height": 606,
+            "zoom": 0.12528693712054523,
+            "center": {
+              "x": 0.9416406250000005,
+              "y": -0.10870084189497313
+            }
+          },
+          "actorScale": 0.12619922064326766
+        },
+        {
+          "selectedStage": "3-4",
+          "camera": {
+            "width": 640,
+            "height": 606,
+            "zoom": 0.12528693712054523,
+            "center": {
+              "x": 0.9416406250000005,
+              "y": -0.10870084189497313
+            }
+          },
+          "actorScale": 0.12619922064326766
+        },
+        {
+          "selectedStage": "3-5",
+          "camera": {
+            "width": 640,
+            "height": 606,
+            "zoom": 0.12528693712054523,
+            "center": {
+              "x": 0.9416406250000005,
+              "y": -0.10870084189497313
+            }
+          },
+          "actorScale": 0.12619922064326766
+        }
+      ]
     },
     {
       "profile": "desktop-boundary",
@@ -242,16 +1203,79 @@
         "bottom": 193
       },
       "mode": "close",
-      "selectedStage": "3-1",
-      "opening": 0.84,
       "normalized": {
-        "left": -0.01732212145628682,
-        "right": 0.018840039315858346,
-        "top": -0.08686061728183413,
-        "bottom": 0.0038572971490288188
+        "left": -0.01341735996517891,
+        "right": 0.013496163633400806,
+        "top": -0.06679544584719888,
+        "bottom": 0.001448230745480128
       },
-      "actorScale": 1.15,
-      "cameraZoom": 0.8736
+      "candidates": [
+        {
+          "selectedStage": "3-1",
+          "camera": {
+            "width": 641,
+            "height": 606,
+            "zoom": 0.9439585209949468,
+            "center": {
+              "x": 2.4569099999999997,
+              "y": 0.682526604240283
+            }
+          },
+          "actorScale": 0.9523176803795159
+        },
+        {
+          "selectedStage": "3-2",
+          "camera": {
+            "width": 641,
+            "height": 606,
+            "zoom": 0.9439585209949468,
+            "center": {
+              "x": 2.4569099999999997,
+              "y": 0.682526604240283
+            }
+          },
+          "actorScale": 0.9523176803795159
+        },
+        {
+          "selectedStage": "3-3",
+          "camera": {
+            "width": 641,
+            "height": 606,
+            "zoom": 0.9439585209949468,
+            "center": {
+              "x": 2.4569099999999997,
+              "y": 0.682526604240283
+            }
+          },
+          "actorScale": 0.9523176803795159
+        },
+        {
+          "selectedStage": "3-4",
+          "camera": {
+            "width": 641,
+            "height": 606,
+            "zoom": 0.9439585209949468,
+            "center": {
+              "x": 2.4569099999999997,
+              "y": 0.682526604240283
+            }
+          },
+          "actorScale": 0.9523176803795159
+        },
+        {
+          "selectedStage": "3-5",
+          "camera": {
+            "width": 641,
+            "height": 606,
+            "zoom": 0.9439585209949468,
+            "center": {
+              "x": 2.4569099999999997,
+              "y": 0.682526604240283
+            }
+          },
+          "actorScale": 0.9523176803795159
+        }
+      ]
     },
     {
       "profile": "desktop-boundary",
@@ -264,16 +1288,79 @@
         "bottom": 193
       },
       "mode": "panorama",
-      "selectedStage": "3-1",
-      "opening": 0.84,
       "normalized": {
-        "left": -0.02112453836132539,
-        "right": 0.022975657702266276,
-        "top": -0.10592758205101722,
-        "bottom": 0.004704020913449779
+        "left": -0.018816046126877595,
+        "right": 0.02969222211849686,
+        "top": -0.07543334370591677,
+        "bottom": 0.02736192432163382
       },
-      "actorScale": 1.15,
-      "cameraZoom": 0.716352
+      "candidates": [
+        {
+          "selectedStage": "3-1",
+          "camera": {
+            "width": 641,
+            "height": 606,
+            "zoom": 0.1253056794230204,
+            "center": {
+              "x": 0.941640625,
+              "y": -0.11018461538459359
+            }
+          },
+          "actorScale": 0.126415315199161
+        },
+        {
+          "selectedStage": "3-2",
+          "camera": {
+            "width": 641,
+            "height": 606,
+            "zoom": 0.1253056794230204,
+            "center": {
+              "x": 0.941640625,
+              "y": -0.11018461538459359
+            }
+          },
+          "actorScale": 0.126415315199161
+        },
+        {
+          "selectedStage": "3-3",
+          "camera": {
+            "width": 641,
+            "height": 606,
+            "zoom": 0.1253056794230204,
+            "center": {
+              "x": 0.941640625,
+              "y": -0.11018461538459359
+            }
+          },
+          "actorScale": 0.126415315199161
+        },
+        {
+          "selectedStage": "3-4",
+          "camera": {
+            "width": 641,
+            "height": 606,
+            "zoom": 0.1253056794230204,
+            "center": {
+              "x": 0.941640625,
+              "y": -0.11018461538459359
+            }
+          },
+          "actorScale": 0.126415315199161
+        },
+        {
+          "selectedStage": "3-5",
+          "camera": {
+            "width": 641,
+            "height": 606,
+            "zoom": 0.1253056794230204,
+            "center": {
+              "x": 0.941640625,
+              "y": -0.11018461538459359
+            }
+          },
+          "actorScale": 0.126415315199161
+        }
+      ]
     },
     {
       "profile": "editor",
@@ -286,16 +1373,79 @@
         "bottom": 134
       },
       "mode": "close",
-      "selectedStage": "3-2",
-      "opening": 1,
       "normalized": {
-        "left": -0.028388784069053753,
-        "right": 0.03087646102355846,
-        "top": -0.14235365537306954,
-        "bottom": 0.00632162614321197
+        "left": -0.014043531063438468,
+        "right": 0.015374676928179482,
+        "top": -0.06779731960441418,
+        "bottom": 0.004453852017126006
       },
-      "actorScale": 1.15,
-      "cameraZoom": 0.6752652888436045
+      "candidates": [
+        {
+          "selectedStage": "3-1",
+          "camera": {
+            "width": 506,
+            "height": 392,
+            "zoom": 0.6802990497437061,
+            "center": {
+              "x": 2.4559461273291925,
+              "y": 0.7092651366459635
+            }
+          },
+          "actorScale": 0.5417779029720907
+        },
+        {
+          "selectedStage": "3-2",
+          "camera": {
+            "width": 506,
+            "height": 392,
+            "zoom": 0.6802990497437061,
+            "center": {
+              "x": 2.4559461273291925,
+              "y": 0.7092651366459635
+            }
+          },
+          "actorScale": 0.5417779029720907
+        },
+        {
+          "selectedStage": "3-3",
+          "camera": {
+            "width": 506,
+            "height": 392,
+            "zoom": 0.6802990497437061,
+            "center": {
+              "x": 2.4559461273291925,
+              "y": 0.7092651366459635
+            }
+          },
+          "actorScale": 0.5417779029720907
+        },
+        {
+          "selectedStage": "3-4",
+          "camera": {
+            "width": 506,
+            "height": 392,
+            "zoom": 0.6802990497437061,
+            "center": {
+              "x": 2.4559461273291925,
+              "y": 0.7092651366459635
+            }
+          },
+          "actorScale": 0.5417779029720907
+        },
+        {
+          "selectedStage": "3-5",
+          "camera": {
+            "width": 506,
+            "height": 392,
+            "zoom": 0.6802990497437061,
+            "center": {
+              "x": 2.4559461273291925,
+              "y": 0.7092651366459635
+            }
+          },
+          "actorScale": 0.5417779029720907
+        }
+      ]
     },
     {
       "profile": "editor",
@@ -308,16 +1458,79 @@
         "bottom": 134
       },
       "mode": "panorama",
-      "selectedStage": "3-2",
-      "opening": 1,
       "normalized": {
-        "left": -0.03462046837689482,
-        "right": 0.03765422076043715,
-        "top": -0.1736020187476458,
-        "bottom": 0.007709300174648745
+        "left": -0.020683554139698124,
+        "right": 0.03529474615695845,
+        "top": -0.07842135652642963,
+        "bottom": 0.03632596278317236
       },
-      "actorScale": 1.15,
-      "cameraZoom": 0.5537175368517556
+      "candidates": [
+        {
+          "selectedStage": "3-1",
+          "camera": {
+            "width": 506,
+            "height": 392,
+            "zoom": 0.12210541275487441,
+            "center": {
+              "x": 0.9416406249999996,
+              "y": -0.18687694444442762
+            }
+          },
+          "actorScale": 0.09724255015320114
+        },
+        {
+          "selectedStage": "3-2",
+          "camera": {
+            "width": 506,
+            "height": 392,
+            "zoom": 0.12210541275487441,
+            "center": {
+              "x": 0.9416406249999996,
+              "y": -0.18687694444442762
+            }
+          },
+          "actorScale": 0.09724255015320114
+        },
+        {
+          "selectedStage": "3-3",
+          "camera": {
+            "width": 506,
+            "height": 392,
+            "zoom": 0.12210541275487441,
+            "center": {
+              "x": 0.9416406249999996,
+              "y": -0.18687694444442762
+            }
+          },
+          "actorScale": 0.09724255015320114
+        },
+        {
+          "selectedStage": "3-4",
+          "camera": {
+            "width": 506,
+            "height": 392,
+            "zoom": 0.12210541275487441,
+            "center": {
+              "x": 0.9416406249999996,
+              "y": -0.18687694444442762
+            }
+          },
+          "actorScale": 0.09724255015320114
+        },
+        {
+          "selectedStage": "3-5",
+          "camera": {
+            "width": 506,
+            "height": 392,
+            "zoom": 0.12210541275487441,
+            "center": {
+              "x": 0.9416406249999996,
+              "y": -0.18687694444442762
+            }
+          },
+          "actorScale": 0.09724255015320114
+        }
+      ]
     },
     {
       "profile": "narrow-portrait",
@@ -330,16 +1543,79 @@
         "bottom": 203
       },
       "mode": "close",
-      "selectedStage": "3-1",
-      "opening": 0.84,
       "normalized": {
-        "left": -0.028869047619047617,
-        "right": 0.03139880952380952,
-        "top": -0.14476190476190476,
-        "bottom": 0.006428571428571429
+        "left": -0.01394505350838482,
+        "right": 0.015079244263018538,
+        "top": -0.06763975551632834,
+        "bottom": 0.003981159752868497
       },
-      "actorScale": 1.15,
-      "cameraZoom": 1.05
+      "candidates": [
+        {
+          "selectedStage": "3-1",
+          "camera": {
+            "width": 320,
+            "height": 568,
+            "zoom": 1.153959128865762,
+            "center": {
+              "x": 2.45691,
+              "y": 0.7776460909090912
+            }
+          },
+          "actorScale": 0.5811808719408874
+        },
+        {
+          "selectedStage": "3-2",
+          "camera": {
+            "width": 320,
+            "height": 568,
+            "zoom": 1.153959128865762,
+            "center": {
+              "x": 2.45691,
+              "y": 0.7776460909090912
+            }
+          },
+          "actorScale": 0.5811808719408874
+        },
+        {
+          "selectedStage": "3-3",
+          "camera": {
+            "width": 320,
+            "height": 568,
+            "zoom": 1.153959128865762,
+            "center": {
+              "x": 2.45691,
+              "y": 0.7776460909090912
+            }
+          },
+          "actorScale": 0.5811808719408874
+        },
+        {
+          "selectedStage": "3-4",
+          "camera": {
+            "width": 320,
+            "height": 568,
+            "zoom": 1.153959128865762,
+            "center": {
+              "x": 2.45691,
+              "y": 0.7776460909090912
+            }
+          },
+          "actorScale": 0.5811808719408874
+        },
+        {
+          "selectedStage": "3-5",
+          "camera": {
+            "width": 320,
+            "height": 568,
+            "zoom": 1.153959128865762,
+            "center": {
+              "x": 2.45691,
+              "y": 0.7776460909090912
+            }
+          },
+          "actorScale": 0.5811808719408874
+        }
+      ]
     },
     {
       "profile": "narrow-portrait",
@@ -352,16 +1628,419 @@
         "bottom": 203
       },
       "mode": "panorama",
-      "selectedStage": "3-1",
-      "opening": 0.84,
       "normalized": {
-        "left": -0.035206155632984903,
-        "right": 0.03829123112659698,
-        "top": -0.1765389082462253,
-        "bottom": 0.007839721254355402
+        "left": -0.026385112693991145,
+        "right": 0.05239942181983752,
+        "top": -0.08754385021329845,
+        "bottom": 0.06369344384377887
       },
-      "actorScale": 1.15,
-      "cameraZoom": 0.861
+      "candidates": [
+        {
+          "selectedStage": "3-1",
+          "camera": {
+            "width": 320,
+            "height": 568,
+            "zoom": 0.11327312123227207,
+            "center": {
+              "x": 0.9416406250000003,
+              "y": 1.1641349431818597
+            }
+          },
+          "actorScale": 0.05704896275654479
+        },
+        {
+          "selectedStage": "3-2",
+          "camera": {
+            "width": 320,
+            "height": 568,
+            "zoom": 0.11327312123227207,
+            "center": {
+              "x": 0.9416406250000003,
+              "y": 1.1641349431818597
+            }
+          },
+          "actorScale": 0.05704896275654479
+        },
+        {
+          "selectedStage": "3-3",
+          "camera": {
+            "width": 320,
+            "height": 568,
+            "zoom": 0.11327312123227207,
+            "center": {
+              "x": 0.9416406250000003,
+              "y": 1.1641349431818597
+            }
+          },
+          "actorScale": 0.05704896275654479
+        },
+        {
+          "selectedStage": "3-4",
+          "camera": {
+            "width": 320,
+            "height": 568,
+            "zoom": 0.11327312123227207,
+            "center": {
+              "x": 0.9416406250000003,
+              "y": 1.1641349431818597
+            }
+          },
+          "actorScale": 0.05704896275654479
+        },
+        {
+          "selectedStage": "3-5",
+          "camera": {
+            "width": 320,
+            "height": 568,
+            "zoom": 0.11327312123227207,
+            "center": {
+              "x": 0.9416406250000003,
+              "y": 1.1641349431818597
+            }
+          },
+          "actorScale": 0.05704896275654479
+        }
+      ]
+    },
+    {
+      "profile": "tall-portrait",
+      "width": 390,
+      "height": 740,
+      "headerBottom": 92,
+      "footerTop": 559,
+      "hudInsetsCssPx": {
+        "top": 106,
+        "bottom": 193
+      },
+      "mode": "close",
+      "normalized": {
+        "left": -0.013661273908493693,
+        "right": 0.01422790546334516,
+        "top": -0.06718570815650253,
+        "bottom": 0.002619017673391093
+      },
+      "candidates": [
+        {
+          "selectedStage": "3-1",
+          "camera": {
+            "width": 390,
+            "height": 740,
+            "zoom": 1.1978938587137966,
+            "center": {
+              "x": 2.45691,
+              "y": 0.7164794251497009
+            }
+          },
+          "actorScale": 0.7352818607130915
+        },
+        {
+          "selectedStage": "3-2",
+          "camera": {
+            "width": 390,
+            "height": 740,
+            "zoom": 1.1978938587137966,
+            "center": {
+              "x": 2.45691,
+              "y": 0.7164794251497009
+            }
+          },
+          "actorScale": 0.7352818607130915
+        },
+        {
+          "selectedStage": "3-3",
+          "camera": {
+            "width": 390,
+            "height": 740,
+            "zoom": 1.1978938587137966,
+            "center": {
+              "x": 2.45691,
+              "y": 0.7164794251497009
+            }
+          },
+          "actorScale": 0.7352818607130915
+        },
+        {
+          "selectedStage": "3-4",
+          "camera": {
+            "width": 390,
+            "height": 740,
+            "zoom": 1.1978938587137966,
+            "center": {
+              "x": 2.45691,
+              "y": 0.7164794251497009
+            }
+          },
+          "actorScale": 0.7352818607130915
+        },
+        {
+          "selectedStage": "3-5",
+          "camera": {
+            "width": 390,
+            "height": 740,
+            "zoom": 1.1978938587137966,
+            "center": {
+              "x": 2.45691,
+              "y": 0.7164794251497009
+            }
+          },
+          "actorScale": 0.7352818607130915
+        }
+      ]
+    },
+    {
+      "profile": "tall-portrait",
+      "width": 390,
+      "height": 740,
+      "headerBottom": 92,
+      "footerTop": 559,
+      "hudInsetsCssPx": {
+        "top": 106,
+        "bottom": 193
+      },
+      "mode": "panorama",
+      "normalized": {
+        "left": -0.02349413506118832,
+        "right": 0.04372648892142904,
+        "top": -0.08291828600081394,
+        "bottom": 0.049816751206325297
+      },
+      "candidates": [
+        {
+          "selectedStage": "3-1",
+          "camera": {
+            "width": 390,
+            "height": 740,
+            "zoom": 0.11758577308960232,
+            "center": {
+              "x": 0.9416406250000002,
+              "y": 0.5410053642714594
+            }
+          },
+          "actorScale": 0.07217558166926628
+        },
+        {
+          "selectedStage": "3-2",
+          "camera": {
+            "width": 390,
+            "height": 740,
+            "zoom": 0.11758577308960232,
+            "center": {
+              "x": 0.9416406250000002,
+              "y": 0.5410053642714594
+            }
+          },
+          "actorScale": 0.07217558166926628
+        },
+        {
+          "selectedStage": "3-3",
+          "camera": {
+            "width": 390,
+            "height": 740,
+            "zoom": 0.11758577308960232,
+            "center": {
+              "x": 0.9416406250000002,
+              "y": 0.5410053642714594
+            }
+          },
+          "actorScale": 0.07217558166926628
+        },
+        {
+          "selectedStage": "3-4",
+          "camera": {
+            "width": 390,
+            "height": 740,
+            "zoom": 0.11758577308960232,
+            "center": {
+              "x": 0.9416406250000002,
+              "y": 0.5410053642714594
+            }
+          },
+          "actorScale": 0.07217558166926628
+        },
+        {
+          "selectedStage": "3-5",
+          "camera": {
+            "width": 390,
+            "height": 740,
+            "zoom": 0.11758577308960232,
+            "center": {
+              "x": 0.9416406250000002,
+              "y": 0.5410053642714594
+            }
+          },
+          "actorScale": 0.07217558166926628
+        }
+      ]
+    },
+    {
+      "profile": "short-landscape",
+      "width": 844,
+      "height": 390,
+      "headerBottom": 68,
+      "footerTop": 305,
+      "hudInsetsCssPx": {
+        "top": 82,
+        "bottom": 97
+      },
+      "mode": "close",
+      "normalized": {
+        "left": -0.013841577572555948,
+        "right": 0.01476881645553192,
+        "top": -0.06747419401900213,
+        "bottom": 0.003484475260889905
+      },
+      "candidates": [
+        {
+          "selectedStage": "3-1",
+          "camera": {
+            "width": 844,
+            "height": 390,
+            "zoom": 0.6407395354042147,
+            "center": {
+              "x": 2.45691,
+              "y": 0.5975133957219253
+            }
+          },
+          "actorScale": 0.6292699866818698
+        },
+        {
+          "selectedStage": "3-2",
+          "camera": {
+            "width": 844,
+            "height": 390,
+            "zoom": 0.6407395354042147,
+            "center": {
+              "x": 2.45691,
+              "y": 0.5975133957219253
+            }
+          },
+          "actorScale": 0.6292699866818698
+        },
+        {
+          "selectedStage": "3-3",
+          "camera": {
+            "width": 844,
+            "height": 390,
+            "zoom": 0.6407395354042147,
+            "center": {
+              "x": 2.45691,
+              "y": 0.5975133957219253
+            }
+          },
+          "actorScale": 0.6292699866818698
+        },
+        {
+          "selectedStage": "3-4",
+          "camera": {
+            "width": 844,
+            "height": 390,
+            "zoom": 0.6407395354042147,
+            "center": {
+              "x": 2.45691,
+              "y": 0.5975133957219253
+            }
+          },
+          "actorScale": 0.6292699866818698
+        },
+        {
+          "selectedStage": "3-5",
+          "camera": {
+            "width": 844,
+            "height": 390,
+            "zoom": 0.6407395354042147,
+            "center": {
+              "x": 2.45691,
+              "y": 0.5975133957219253
+            }
+          },
+          "actorScale": 0.6292699866818698
+        }
+      ]
+    },
+    {
+      "profile": "short-landscape",
+      "width": 844,
+      "height": 390,
+      "headerBottom": 68,
+      "footerTop": 305,
+      "hudInsetsCssPx": {
+        "top": 82,
+        "bottom": 97
+      },
+      "mode": "panorama",
+      "normalized": {
+        "left": -0.01942020279537247,
+        "right": 0.031504692123981486,
+        "top": -0.07639999437550857,
+        "bottom": 0.030261876330409217
+      },
+      "candidates": [
+        {
+          "selectedStage": "3-1",
+          "camera": {
+            "width": 844,
+            "height": 390,
+            "zoom": 0.11733204498146466,
+            "center": {
+              "x": 0.9416406250000001,
+              "y": -0.8128079322638113
+            }
+          },
+          "actorScale": 0.11523174441899303
+        },
+        {
+          "selectedStage": "3-2",
+          "camera": {
+            "width": 844,
+            "height": 390,
+            "zoom": 0.11733204498146466,
+            "center": {
+              "x": 0.9416406250000001,
+              "y": -0.8128079322638113
+            }
+          },
+          "actorScale": 0.11523174441899303
+        },
+        {
+          "selectedStage": "3-3",
+          "camera": {
+            "width": 844,
+            "height": 390,
+            "zoom": 0.11733204498146466,
+            "center": {
+              "x": 0.9416406250000001,
+              "y": -0.8128079322638113
+            }
+          },
+          "actorScale": 0.11523174441899303
+        },
+        {
+          "selectedStage": "3-4",
+          "camera": {
+            "width": 844,
+            "height": 390,
+            "zoom": 0.11733204498146466,
+            "center": {
+              "x": 0.9416406250000001,
+              "y": -0.8128079322638113
+            }
+          },
+          "actorScale": 0.11523174441899303
+        },
+        {
+          "selectedStage": "3-5",
+          "camera": {
+            "width": 844,
+            "height": 390,
+            "zoom": 0.11733204498146466,
+            "center": {
+              "x": 0.9416406250000001,
+              "y": -0.8128079322638113
+            }
+          },
+          "actorScale": 0.11523174441899303
+        }
+      ]
     }
   ]
 }
