@@ -59,6 +59,7 @@ class Element extends Surface {
     type = '';
     id = '';
     title = '';
+    href = '';
     hidden = false;
     disabled = false;
     tabIndex = 0;
@@ -89,7 +90,8 @@ class Element extends Surface {
     getContext() { return this.context; }
     focus() { this.focusCount++; this.focused(this); }
     click() { if (!this.disabled) this.dispatch('click'); }
-    matches(selector: string) { return selector.split(',').some(item => item.trim().toUpperCase() === this.tagName); }
+    matches(selector: string) { return selector.split(',').some(item => item.trim() === 'a[href]'
+        ? this.tagName === 'A' && !!this.href : item.trim().toUpperCase() === this.tagName); }
     closest(selector: string): Element | null {
         for (let current: Surface | null = this; current instanceof Element; current = current.parent)
             if (selector === '.world-map' ? current.classList.contains('world-map') : current.matches(selector)) return current;
@@ -633,6 +635,41 @@ test('capture-phase gameplay Input and global menus preserve native map activati
     h.root.dispatch('keydown', { key: 'm', code: 'KeyM' }); input.update(); assert.equal(input.consumeMute(), true);
     h.view.hide(); input.setMenuMode(false); h.gameCanvas.dispatch('keydown', { key: 'ArrowRight', code: 'ArrowRight' }); input.update();
     assert.equal(input.getState().right, true);
+});
+
+test('native map links retain activation after drawer dismissal and map reopening without entering a phase', async t => {
+    for (const overview of [false, true]) await t.test(`overview=${overview}`, async child => {
+        const h = mapDOM(child), save = openSave(); await readyLand(h, save);
+        const input = new Input(); child.after(() => input.dispose()); input.setMenuMode(true);
+        const game = worldHarness().game; let stray = 0; game.enterSelected = () => { stray++; };
+        h.windowMock.addEventListener('keydown', event => game.menuKey(event));
+        if (overview) h.get('world-map-overview').click();
+        const link = h.get('world-map-delicia'), saved = structuredClone(save);
+        assert.equal(link.href, './delicia.html');
+        for (let visit = 0; visit < 2; visit++) {
+            h.view.render(0, save, 100 + visit * 100, '');
+            h.internal.hud.regionButton.click();
+            h.active!.dispatch('keydown', { key: 'Escape', code: 'Escape' });
+            assert.equal(h.internal.hud.regionMenu.hidden, true); assert.equal(h.internal.overview, overview);
+            link.focus(); const journey = structuredClone(h.internal.journey);
+            for (const key of ['Enter', ' ']) {
+                const code = key === ' ' ? 'Space' : 'Enter';
+                const down = link.dispatch('keydown', { key, code });
+                assert.equal(h.events.entered, 0, 'A focused link must never start the selected phase.');
+                assert.equal(down.defaultPrevented, false, 'Native link activation and browser shortcuts retain their default.');
+                assert.equal(link.dispatch('keydown', { key, code, repeat: true }).defaultPrevented, true);
+                link.dispatch('keyup', { key, code });
+                assert.equal(h.active, link); assert.deepEqual(h.internal.journey, journey);
+            }
+            input.update(); assert.equal(input.getState().jumpPressed, false); assert.equal(input.consumeStart(), false);
+            assert.equal(stray, 0); assert.equal(h.events.exited, 0); assert.deepEqual(h.events.selected, []);
+            assert.deepEqual(save, saved); h.view.hide();
+        }
+        h.view.render(0, save, 400, '');
+        if (overview) h.get('world-map-overview').click();
+        h.root.focus(); h.root.dispatch('keydown', { key: 'Enter', code: 'Enter' });
+        assert.equal(h.events.entered, 1, 'Explicit phase entry from the map still works.');
+    });
 });
 
 test('capped backing resolution responds to DPR and resize without resizing each idle frame', t => {

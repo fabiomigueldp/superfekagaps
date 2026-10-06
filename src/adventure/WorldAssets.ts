@@ -266,7 +266,12 @@ function enemy(kind: EnemyLook, pose: EnemyPose, f: number): PixelFrame {
             ellipse(g, 19, 23 - lift, 7, 3, 'S');
         }
         else {
-            g.rect(1 + f, 19 + f, 17, 7, 'K').rect(2 + f, 20 + f, 15, 5, 'S').rect(3 + f, 20 + f, 7, 1, 'f');
+            // Follow the released barrel with an empty hand, then lower and retract
+            // the arm once. The planted feet and torso retain the contact anchor.
+            const handX = attack ? [1, 5, 10][f] : 1 + f;
+            const handY = attack ? [19, 21, 24][f] : 19 + f;
+            const handWidth = attack ? [17, 13, 8][f] : 17;
+            g.rect(handX, handY, handWidth, 7, 'K').rect(handX + 1, handY + 1, handWidth - 2, 5, 'S').rect(handX + 2, handY + 1, Math.min(7, handWidth - 4), 1, 'f');
             ellipse(g, 26, 23, 8, 6, 'K');
             ellipse(g, 27, 24, 6, 4, 's');
         }
@@ -318,6 +323,12 @@ export function foeFrame(kind: EnemyLook, phase: string, time: number, armor = t
         // A phase clock, never a loop: recovery must not snap back to its impact pose.
         if (pose === 'rest') index = Math.min(2, Math.floor(Math.max(0, time) / 470));
         // Hold recognizable silhouettes instead of removing the gameplay tell.
+        if (reducedMotion) index = pose === 'warning' ? 2 : 1;
+    }
+    if (kind === 'loader') {
+        // Its 400 ms recoil needs all three poses; the generic 190 ms cadence
+        // barely showed the last one. Settle once and hold until rest reloads.
+        if (phase === 'recoil') index = Math.min(2, Math.floor(Math.max(0, time) / 130));
         if (reducedMotion) index = pose === 'warning' ? 2 : 1;
     }
     return FOE_FRAMES[kind][enemyPoses.indexOf(pose) * 3 + index];

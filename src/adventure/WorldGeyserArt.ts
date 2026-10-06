@@ -110,7 +110,12 @@ export function drawGeyser(c: CanvasRenderingContext2D, b: MovingBody, atlas: Sp
         // Every collidable pixel has opaque purple fluid, even at the narrow neck.
         // The richer winding core changes texture, never the collision envelope.
         r(c, x, top, w, height, JUICE.edge);
-        for (let yy = 0; yy < height; yy++) {
+        // World and its editor paint into an untransformed native buffer. Keep
+        // the original row index so clipping cannot shift the liquid's texture.
+        const viewHeight = c.canvas?.height;
+        const firstRow = viewHeight === undefined ? 0 : Math.max(0, -top);
+        const endRow = Math.min(height, (viewHeight ?? Infinity) - top);
+        for (let yy = firstRow; yy < endRow; yy++) {
             const y = top + yy;
             const bend = Math.round(Math.sin((mouth - y) * .2 + clock / 95) * 2);
             const swell = Math.round((1 + Math.sin(yy * .32 + clock / 83)) * (yy < height - 4 ? 1 : .3));

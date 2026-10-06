@@ -13,6 +13,7 @@ function recorder() {
     const methods = new Set(['fillRect', 'save', 'restore', 'beginPath', 'rect', 'clip']);
     const context = new Proxy({}, {
         get(_target, key) {
+            if (key === 'canvas') return undefined; // This command recorder is intentionally unbounded.
             if (methods.has(String(key))) return (...args: unknown[]) => calls.push([key, ...args]);
             throw new Error(`Unexpected canvas method: ${String(key)}`);
         },

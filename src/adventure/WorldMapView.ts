@@ -364,7 +364,9 @@ export class WorldMapView {
             event.preventDefault(); event.stopPropagation(); this.act(() => this.callbacks.exit());
         } else if (event.key === 'Enter' && event.target === this.hud.stageButtons[this.controlSelection % 5]) {
             event.preventDefault(); event.stopPropagation(); this.act(() => this.enterSelected(this.controlSelection));
-        } else if ((event.key === 'Enter' || event.key === ' ') && !(event.target instanceof HTMLButtonElement)) {
+        } else if ((event.key === 'Enter' || event.key === ' ') &&
+            !(event.target instanceof HTMLElement && event.target.closest('button, a[href]'))) {
+            // Native links and buttons own activation; map shortcuts must not launch a phase behind them.
             event.preventDefault(); event.stopPropagation(); this.act(() => this.enterSelected(this.controlSelection));
         }
     };

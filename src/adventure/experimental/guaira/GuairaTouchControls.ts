@@ -75,6 +75,12 @@ export class GuairaTouchControls {
                 });
                 this.listen(button, 'contextmenu', event => event.preventDefault());
             }
+            this.listen(window, 'pointermove', event => {
+                const pointer = event as PointerEvent;
+                // Chorded mouse/pen buttons emit pointerup only for the last
+                // release. Stop this primary-button gesture as soon as it ends.
+                if ((pointer.buttons & 1) === 0) this.end(`pointer:${pointer.pointerId}`, !this.available());
+            }, true);
             this.listen(window, 'pointerup', event => this.end(`pointer:${(event as PointerEvent).pointerId}`, !this.available()), true);
             this.listen(window, 'pointercancel', event => this.end(`pointer:${(event as PointerEvent).pointerId}`, true), true);
             this.listen(window, 'blur', () => this.cancelAll());

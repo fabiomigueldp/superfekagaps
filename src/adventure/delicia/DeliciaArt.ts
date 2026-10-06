@@ -50,6 +50,8 @@ export class DeliciaArt {
         this.gate(c,stage.gate,sim.gateOpen,time);
         if(sim.boss)this.boss(c,sim.boss,time);
         const p=sim.player;c.save();c.imageSmoothingEnabled=false;ellipse(c,p.x+p.w*.5,p.y+p.h+2,21,5,'#102b3766');
+        // The stopped decorative clock suppresses blinking, not the protection cue.
+        if(reduced&&p.invincible>0){c.beginPath();c.ellipse(p.x+p.w/2,p.y+p.h/2,25,33,0,0,TAU);c.strokeStyle='#173738';c.lineWidth=5;c.stroke();c.strokeStyle='#f2cf89';c.lineWidth=2;c.stroke();}
         if(p.parryTime>0){c.strokeStyle='#a5f2e2';c.lineWidth=3;c.beginPath();c.arc(p.x+17,p.y+25,38,0,TAU);c.stroke();for(let i=0;i<3;i++){const a=time*12+i*TAU/3;ellipse(c,p.x+17+Math.cos(a)*38,p.y+25+Math.sin(a)*38,4,4,'#fff7d6');}}
         if(p.invincible<=0||Math.floor(time*13)%2===0){
             const sprite=p.pounding?PLAYER_SPRITES.sit:!p.grounded?(p.vy<0?PLAYER_SPRITES.jump:PLAYER_SPRITES.fall):Math.abs(p.vx)>15?PLAYER_WALK[Math.floor(p.walk)%PLAYER_WALK.length]:PLAYER_SPRITES.idle;

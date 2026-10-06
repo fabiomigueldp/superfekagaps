@@ -1,4 +1,5 @@
 import { ALL_DELICIA_STAGES, DELICIA_STAGES } from './DeliciaContent';
+import { assertSaveCampaign } from '../saveCampaign';
 export const DELICIA_SAVE_KEY = 'super_feka_delicia_v1';
 export interface DeliciaSave {
     version: 1; completed: string[]; collected: string[]; lore: string[]; selected: string;
@@ -18,6 +19,7 @@ const valid = (id: unknown): id is string => typeof id === 'string' && ALL_DELIC
 export function parseDeliciaSave(raw:string): DeliciaSave {
     const d:unknown=JSON.parse(raw); if(!d||typeof d!=='object'||(d as {version?:unknown}).version!==1) throw new Error('Progresso da Delícia inválido.');
     const data=d as Record<string,unknown>, s=freshDeliciaSave();
+    assertSaveCampaign(data, 'delicia');
     for(const key of ['completed','collected','lore'] as const) if(Array.isArray(data[key])) s[key]=[...new Set((data[key] as unknown[]).filter((v):v is string=>typeof v==='string'&&v.length<100&&(key!=='completed'||valid(v))))].slice(0,2000);
     if(valid(data.selected)) s.selected=data.selected;
     if(data.times&&typeof data.times==='object') for(const [id,time] of Object.entries(data.times)) if(valid(id)&&typeof time==='number'&&Number.isFinite(time)&&time>0) s.times[id]=time;

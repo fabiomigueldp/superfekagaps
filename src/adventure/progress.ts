@@ -1,5 +1,6 @@
 import { freshGuairaChapterProgress, sanitizeGuairaChapterProgress, mergeGuairaChapterProgress, type GuairaChapterProgress } from './experimental/guaira/chapter/GuairaChapterProgress';
 import type { AdventureSave, AdventureStage } from './types';
+import { assertSaveCampaign } from './saveCampaign';
 export const SAVE_KEY = 'super_feka_gaps_world_v1';
 export const freshSave = (): AdventureSave => ({ version: 1, guaira: freshGuairaChapterProgress(), completed: [], seals: [], secrets: [], seen: [], selected: '1-1', checkpoint: null, times: {}, preferences: { music: .55, effects: .7, voice: .8, shake: true } });
 /** Fresh editor previews need a new read-through. Never call for an in-game retry. */
@@ -14,6 +15,7 @@ export function parseSave(raw: string): AdventureSave {
     }).version !== 1)
         throw Error('Versão de progresso não reconhecida.');
     const o = data as Record<string, unknown>, result = freshSave();
+    assertSaveCampaign(o, 'world');
     const list = (key: string, predicate: (v: unknown) => boolean) => Array.isArray(o[key]) ? [...new Set((o[key] as unknown[]).filter(predicate))] as string[] : [];
     result.completed = list('completed', validId);
     result.guaira = sanitizeGuairaChapterProgress(o.guaira);

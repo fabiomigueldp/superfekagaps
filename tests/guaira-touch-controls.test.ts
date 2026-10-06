@@ -193,6 +193,50 @@ test('lost capture and failed capture both release reliably without a cancelled 
     h.down('run', 3); h.up(3, true); assert.equal(h.step().run, false);
 });
 
+for (const capture of [true, false]) for (const action of ['left', 'right', 'run', 'down', 'jump'] as const) {
+    test(`chorded primary release ends ${action} with ${capture ? 'capture' : 'window fallback'}`, t => {
+        const h = fixture(t), button = h.buttons[action];
+        button.failCapture = !capture;
+        h.down(action, 12); assert.equal(h.step()[action], true);
+        // Pointer Events reports intermediate button changes as pointermove.
+        // Only releasing the last button produces pointerup.
+        for (const buttons of [3, 1, 5]) {
+            h.win.dispatch('pointermove', { pointerId: 12, pointerType: 'mouse', buttons });
+            assert.equal(h.step()[action], true, 'Adding/releasing another button preserves the primary hold');
+        }
+        h.win.dispatch('pointermove', { pointerId: 12, pointerType: 'mouse', button: 0, buttons: 4 });
+        const released = h.step();
+        assert.equal(released[action], false, 'The action ends as soon as primary is released');
+        assert.equal(released.jumpReleased, action === 'jump');
+        assert.equal(button.getAttribute('data-held'), null); assert.equal(button.captures.size, 0);
+        h.up(12); assert.equal(h.step().jumpReleased, false, 'The later final-button up cannot release twice');
+        h.down(action, 12); assert.equal(h.step()[action], true, 'A fresh primary press can reuse the pointer');
+    });
+}
+
+test('chorded short primary taps survive once while touch and keyboard owners remain held', t => {
+    const h = fixture(t);
+    h.down('right', 20); h.key('keydown', 'x'); h.step();
+    h.down('jump', 21);
+    h.win.dispatch('pointermove', { pointerId: 20, pointerType: 'touch', buttons: 1 });
+    h.win.dispatch('pointermove', { pointerId: 21, pointerType: 'pen', button: 0, buttons: 2 });
+    let state = h.step();
+    assert.equal(state.jump, false); assert.equal(state.jumpPressed, true); assert.equal(state.jumpReleased, true);
+    assert.equal(state.right, true); assert.equal(state.run, true);
+    h.up(21); state = h.step();
+    assert.equal(state.jumpPressed, false); assert.equal(state.jumpReleased, false);
+    assert.equal(state.right, true); assert.equal(state.run, true);
+});
+
+test('primary release during live pause cancels its pending command before UI reflection', t => {
+    const h = fixture(t); h.down('jump', 30); h.setPlaying(false);
+    h.win.dispatch('pointermove', { pointerId: 30, pointerType: 'mouse', button: 0, buttons: 2 });
+    const state = h.step();
+    assert.equal(state.jump, false); assert.equal(state.jumpPressed, false); assert.equal(state.jumpReleased, false);
+    assert.equal(h.buttons.jump.getAttribute('data-held'), null); assert.equal(h.buttons.jump.captures.size, 0);
+    h.setPlaying(true); h.up(30); assert.equal(h.step().jumpPressed, false);
+});
+
 test('pause/retry reset invalidates captures so old move/up/click cannot re-arm the game', t => {
     const h = fixture(t); h.down('jump', 7); h.down('right', 8);
     h.input.reset(); assert.equal(h.buttons.jump.captures.size, 0); assert.equal(h.buttons.right.captures.size, 0);

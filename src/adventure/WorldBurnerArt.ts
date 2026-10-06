@@ -81,7 +81,12 @@ export function drawBurner(c: CanvasRenderingContext2D, b: MovingBody, atlas: Sp
         // This warm continuous envelope is deliberate: the physics is a rectangle.
         // Tongues may brighten or break up inside it, but cannot erase a dangerous corner.
         r(c, x, top, w, height, '#b4513e');
-        for (let yy = top; yy < bottom; yy++) {
+        // Clip only texture scanlines, retaining their original depth/phase.
+        // The game and editor both use an untransformed native world buffer.
+        const viewHeight = c.canvas?.height;
+        const firstRow = viewHeight === undefined ? top : Math.max(0, top);
+        const endRow = Math.min(bottom, viewHeight ?? Infinity);
+        for (let yy = firstRow; yy < endRow; yy++) {
             const depth = (yy - top) / Math.max(1, height), motion = Math.sin((yy - top) * .43 + time / 94);
             const left = x + 1 + (motion > .45 ? 1 : 0), right = x + w - 1 - (motion < -.45 ? 1 : 0);
             r(c, left, yy, Math.max(1, right - left), 1, '#e98343');

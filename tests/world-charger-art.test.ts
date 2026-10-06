@@ -70,10 +70,9 @@ test('all charger frames retain native dimensions, palette and floor anchor', ()
     }
 });
 
-test('other campaign enemy artwork is pixel-identical and reduced motion does not change its selector', () => {
+test('unmodified campaign enemy artwork is pixel-identical and reduced motion does not change its selector', () => {
     const hashes = {
         helmet: 'ddf99c88d466ff7c3a027eb15e2481319092f1102f6f5b0e8421920f47bbce74',
-        loader: '048c9095cc89b85d664142396f4cbca416399b596a85dbeda471117efd0944e3',
         rail: '93f54403e1c17c06cb6afd96ceb474cc368e28768a86173a6eb233c4e684426b',
         agitator: '8bc8d59be3ab332a28623af01893d29b651dc6c9c743d70e0567c5d112fc36b0',
     };
