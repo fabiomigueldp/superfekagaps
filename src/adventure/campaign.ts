@@ -1,5 +1,6 @@
 import { TileType as T } from '../constants';
 import { EnemyType } from '../types';
+import { CARGO_CARRIER_PROFILE, SERRA_CARRIER_PROFILE } from './WorldCarrierMotion';
 import type { AdventureStage, Island, MechanismSpec, FoeKind, EncounterId, Character, Landmark, Dialogue } from './types';
 export const ISLANDS: Island[] = [
     { id: 1, name: 'Costa dos Gaps', accent: '#83d8ba', sky: ['#65bee7', '#c9eddf'], soil: ['#77a84d', '#a17755', '#594c46'], map: [42, 94], description: 'Toda grande aventura começa com um gap.', boss: 'joao' },
@@ -18,6 +19,47 @@ const NAMES = [
     ['Jardins Pizzarino', 'Fornos e Passarelas', 'Passagem dos Fundos', 'A Última Travessia', 'O Grande Gap']
 ];
 const ENCOUNTERS: EncounterId[] = ['J1', 'B1', 'C1', 'B2', 'C2', 'J2'];
+/** Fixed equipment feet/bolts attach to actual authored solid geometry, never backdrop cranes.
+ * Keys are existing stage/mechanism identities; coordinates are world pixels.
+ * Rail pairs are home/arrival mounts; guided lifts/supports are left/right mounts. */
+const CARRIER_MOUNTS: Record<string, MechanismSpec['mounts']> = {
+    '2-1:p1': [{ x: 440, y: 192, kind: 'ground' }, { x: 560, y: 224, kind: 'ground' }],
+    '2-1:p2': [{ x: 1248, y: 320, kind: 'ground' }, { x: 1488, y: 320, kind: 'ground' }],
+    '2-2:l1': [{ x: 388, y: 224, kind: 'ground' }, { x: 442, y: 320, kind: 'ground' }],
+    '2-2:l2': [{ x: 1172, y: 192, kind: 'ground' }, { x: 1226, y: 320, kind: 'ground' }],
+    '2-2:l3': [{ x: 1940, y: 192, kind: 'ground' }, { x: 1994, y: 320, kind: 'ground' }],
+    '2-3:p1': [{ x: 504, y: 176, kind: 'ground' }, { x: 640, y: 224, kind: 'ground' }],
+    '2-3:p2': [{ x: 1096, y: 160, kind: 'ground' }, { x: 1248, y: 208, kind: 'ground' }],
+    '2-3:secretLift': [{ x: 1640, y: 144, kind: 'ground' }, { x: 1856, y: 224, kind: 'ground' }],
+    '2-4:p1': [{ x: 320, y: 320, kind: 'ground' }, { x: 528, y: 320, kind: 'ground' }],
+    '2-4:p2': [{ x: 1536, y: 320, kind: 'ground' }, { x: 1792, y: 320, kind: 'ground' }],
+    '2-5:left': [{ x: 84, y: 224, kind: 'ground' }, { x: 138, y: 224, kind: 'ground' }],
+    '2-5:right': [{ x: 244, y: 224, kind: 'ground' }, { x: 298, y: 224, kind: 'ground' }],
+    '3-2:crate1': [{ x: 688, y: 304, kind: 'ground' }, { x: 736, y: 304, kind: 'ground' }],
+    '3-2:crate2': [{ x: 1408, y: 304, kind: 'ground' }, { x: 1456, y: 304, kind: 'ground' }],
+    '3-3:sl': [{ x: 1672, y: 224, kind: 'ground' }, { x: 1824, y: 224, kind: 'ground' }],
+    '3-5:access': [{ x: 228, y: 224, kind: 'ground' }, { x: 282, y: 224, kind: 'ground' }],
+    '4-1:cab1': [{ x: 304, y: 336, kind: 'ground' }, { x: 544, y: 336, kind: 'ground' }],
+    '4-1:cab2': [{ x: 1408, y: 336, kind: 'ground' }, { x: 1648, y: 336, kind: 'ground' }],
+    '4-2:l1': [{ x: 372, y: 224, kind: 'ground' }, { x: 426, y: 336, kind: 'ground' }],
+    '4-2:l2': [{ x: 1140, y: 192, kind: 'ground' }, { x: 1194, y: 336, kind: 'ground' }],
+    '4-2:l3': [{ x: 1956, y: 192, kind: 'ground' }, { x: 2010, y: 336, kind: 'ground' }],
+    '4-3:cab1': [{ x: 304, y: 336, kind: 'ground' }, { x: 560, y: 336, kind: 'ground' }],
+    '4-3:cab2': [{ x: 1456, y: 336, kind: 'ground' }, { x: 1744, y: 336, kind: 'ground' }],
+    '4-3:sl': [{ x: 1976, y: 144, kind: 'ground' }, { x: 2280, y: 224, kind: 'ground' }],
+    '4-4:p1': [{ x: 288, y: 336, kind: 'ground' }, { x: 544, y: 336, kind: 'ground' }],
+    '4-4:p2': [{ x: 1472, y: 336, kind: 'ground' }, { x: 1744, y: 336, kind: 'ground' }],
+    '4-5:left': [{ x: 84, y: 224, kind: 'ground' }, { x: 138, y: 224, kind: 'ground' }],
+    '4-5:right': [{ x: 244, y: 224, kind: 'ground' }, { x: 298, y: 224, kind: 'ground' }],
+    '4-5:transfer': [{ x: 144, y: 224, kind: 'ground' }, { x: 272, y: 224, kind: 'ground' }],
+    '5-5:access': [{ x: 228, y: 224, kind: 'ground' }, { x: 282, y: 224, kind: 'ground' }],
+    '6-1:sup1': [{ x: 1416, y: 200, kind: 'wall' }, { x: 1528, y: 200, kind: 'wall' }],
+    '6-3:l1': [{ x: 356, y: 224, kind: 'ground' }, { x: 410, y: 320, kind: 'ground' }],
+    '6-3:sl': [{ x: 1796, y: 224, kind: 'ground' }, { x: 1850, y: 320, kind: 'ground' }],
+    '6-4:p1': [{ x: 304, y: 336, kind: 'ground' }, { x: 544, y: 336, kind: 'ground' }],
+    '6-5:left': [{ x: 84, y: 224, kind: 'ground' }, { x: 138, y: 224, kind: 'ground' }],
+    '6-5:right': [{ x: 228, y: 224, kind: 'ground' }, { x: 282, y: 224, kind: 'ground' }],
+};
 /** Authoring coordinates use tiles; runtime mechanisms and exits use pixels. No random terrain. */
 class Draft {
     s: AdventureStage;
@@ -60,9 +102,9 @@ class Draft {
         return this;
     }
     seal(index: number, x: number, y: number) { this.s.pickups.push({ id: `${this.s.id}:s${index}`, kind: 'seal', x: x * 16, y: y * 16 }); return this; }
-    m(kind: MechanismSpec['kind'], id: string, x: number, y: number, w: number, h: number, extra: Partial<MechanismSpec> = {}) { this.s.mechanisms.push({ kind, id, x: x * 16, y: y * 16, width: w * 16, height: h * 16, ...extra }); return this; }
+    m(kind: MechanismSpec['kind'], id: string, x: number, y: number, w: number, h: number, extra: Partial<MechanismSpec> = {}) { this.s.mechanisms.push({ kind, id, x: x * 16, y: y * 16, width: w * 16, height: h * 16, mounts: CARRIER_MOUNTS[`${this.s.id}:${id}`], ...extra }); return this; }
     lift(id: string, x: number, y: number, toY: number, link?: string) { return this.m('lift', id, x, y, 4, .5, { to: { x: x * 16, y: toY * 16 }, period: 4000, link }); }
-    move(id: string, x: number, y: number, toX: number, toY = y, period = 5000) { return this.m('platform', id, x, y, 4, .5, { to: { x: toX * 16, y: toY * 16 }, period }); }
+    move(id: string, x: number, y: number, toX: number, toY = y, period = 5000) { return this.m('platform', id, x, y, 4, .5, { to: { x: toX * 16, y: toY * 16 }, period, motion: this.s.world === 4 ? SERRA_CARRIER_PROFILE : CARGO_CARRIER_PROFILE }); }
     sw(id: string, x: number, y: number, link: string) { return this.m('switch', id, x, y - .3, 1.5, .3, { link }); }
     belt(id: string, x: number, y: number, w: number, dir = 1) { return this.m('belt', id, x, y - .2, w, .2, { direction: dir }); }
     jet(id: string, x: number, y = 14, phase = 0) { return this.m('jet', id, x, y - 3, .8, 3, { period: 4200, phase }); }
@@ -128,7 +170,7 @@ function course(w: number, n: number): AdventureStage {
     }
     if (w === 2 && n === 1) {
         d.land(0, 14, 17).land(17, 12, 11, 6).land(33, 14, 13).land(46, 11, 10, 7).land(64, 13, 12).land(95, 11, 13, 7).land(108, 14, 15).land(123, 11, 12, 7).land(143, 14, 17);
-        d.platform(57, 12, 5).move('p1', 27, 12, 33, 12).move('p2', 76, 13, 92, 11, 5400).platform(136, 12, 4).land(76, 20, 19, 3).platform(91, 17, 4).cp(66, 13).cp(111).foe('helmet', 51, 11, 34).foe('minion', 116, 14, 32).seal(1, 21, 10).seal(2, 88, 18).seal(3, 130, 9).item('helmet', 67, 12).arc(55, 9, 10).coins(97, 9, 4);
+        d.platform(57, 12, 5).move('p1', 28, 12, 33, 12).move('p2', 76, 13, 91, 11, 7400).platform(136, 12, 4).land(76, 20, 19, 3).platform(91, 17, 4).cp(66, 13).cp(111).foe('helmet', 51, 11, 34).foe('minion', 116, 14, 32).seal(1, 21, 10).seal(2, 88, 18).seal(3, 130, 9).item('helmet', 67, 12).arc(55, 9, 10).coins(97, 9, 4);
         d.art('container', 17, 18, 11, 6, '02').art('container', 46, 18, 10, 7, 'BIEL').art('container', 95, 18, 13, 7, 'CARGA').art('container', 123, 18, 12, 7, '07').art('crane', 70, 13, 24, 10).talk(8, 'biel', 'João avisou que você vinha. A passagem fechou.');
         d.cue(23, 12).cue(39, 14).cue(51, 11).cue(69, 13).cue(99, 11).cue(115, 14).cue(129, 11).cue(148, 14);
     }
@@ -141,14 +183,14 @@ function course(w: number, n: number): AdventureStage {
     }
     if (w === 2 && n === 3) {
         d.land(0, 14, 19).land(19, 11, 13, 7).land(38, 14, 16).land(54, 10, 15, 8).land(76, 13, 15).land(91, 9, 12, 9).land(111, 14, 16).land(127, 11, 12, 7).land(143, 14, 17);
-        d.platform(24, 7, 9).move('p1', 32, 11, 38, 12).platform(59, 6, 7).move('p2', 68, 10, 76, 11).platform(96, 5, 10).move('secretLift', 103, 9, 114, 5).platform(116, 5, 14).secret(127, 5);
+        d.platform(24, 7, 9).move('p1', 32, 11, 38, 12).platform(59, 6, 7).move('p2', 69, 10, 76, 11).platform(96, 5, 10).move('secretLift', 103, 9, 114, 5, 5800).platform(116, 5, 14).secret(127, 5);
         d.platform(139, 12, 4);
         d.cp(40).cp(113).foe('helmet', 63, 10, 43).foe('minion', 83, 13, 44).seal(1, 27, 5).seal(2, 62, 4).seal(3, 98, 3).item('helmet', 41).arc(32, 9, 7).arc(103, 7, 9).art('container', 19, 18, 13, 7, '01').art('container', 54, 18, 15, 8, '03').art('container', 91, 18, 12, 9, '05').art('crane', 102, 10, 29, 11);
         d.cue(25, 11).cue(44, 14).cue(62, 10).cue(83, 13).cue(98, 9).cue(116, 14).cue(133, 11).cue(148, 14);
     }
     if (w === 2 && n === 4) {
         d.land(0, 14, 18).land(35, 12, 13, 6).land(48, 9, 14, 9).land(68, 14, 16).land(84, 11, 10, 7).land(114, 10, 16, 8).land(137, 13, 15).land(152, 10, 13, 8).land(170, 14, 14);
-        d.move('p1', 18, 13, 31, 12).move('p2', 94, 11, 110, 9).platform(131, 11, 4).platform(166, 12, 4).land(18, 20, 17, 3).platform(31, 17, 4).land(94, 20, 20, 3).platform(110, 17, 4);
+        d.move('p1', 18, 13, 31, 12, 6300).move('p2', 94, 11, 110, 9, 7400).platform(131, 11, 4).platform(166, 12, 4).land(18, 20, 17, 3).platform(31, 17, 4).land(94, 20, 20, 3).platform(110, 17, 4);
         d.cp(70).cp(140, 13).foe('charger', 54, 9, 50).foe('helmet', 120, 10, 38).foe('loader', 159, 10, 32).seal(1, 54, 7).seal(2, 104, 18).seal(3, 158, 8).item('helmet', 71).arc(59, 7, 10).arc(128, 8, 10).art('crane', 17, 14, 23, 11).art('container', 48, 18, 14, 9, 'EXPEDIÇÃO').art('crane', 92, 12, 27, 12).art('container', 114, 18, 16, 8, 'CARGA').art('container', 152, 18, 13, 8, 'BIEL');
         d.cue(41, 12).cue(55, 9).cue(75, 14).cue(89, 11).cue(122, 10).cue(144, 13).cue(158, 10).cue(176, 14);
     }
@@ -174,7 +216,7 @@ function course(w: number, n: number): AdventureStage {
     if (w === 3 && n === 3) {
         d.land(0, 14, 18).land(18, 12, 12).land(35, 10, 12).land(51, 14, 17).land(68, 11, 12).land(85, 9, 13).land(104, 14, 16).land(120, 11, 14).land(140, 14, 20);
         d.jet('j1', 24, 12).jet('j2', 41, 10, 2100).platform(31, 11, 3).platform(48, 12, 3).platform(81, 10, 3).jet('j3', 74, 11, 900).jet('j4', 91, 9, 2600).platform(99, 11, 4).platform(135, 12, 4);
-        d.platform(72, 7, 6).platform(87, 5, 8).move('sl', 100, 8, 112, 5).platform(116, 5, 16).secret(129, 5);
+        d.platform(72, 7, 6).platform(87, 5, 8).move('sl', 100, 8, 112, 5, 6000).platform(116, 5, 16).secret(129, 5);
         d.cp(54).cp(107).seal(1, 39, 7).seal(2, 89, 3).seal(3, 124, 3).item('helmet', 55).art('tank', 18, 12, 12, 10, 'A').art('tank', 35, 10, 12, 9, 'B').art('tank', 68, 11, 12, 10, 'C').art('tank', 85, 9, 13, 8, 'D').art('pipe', 97, 14, 22, 8).talk(14, 'feka', 'Primeiro treme... depois espirra.', undefined, 'dialogue');
         d.cue(25, 12).cue(41, 10).cue(57, 14).cue(74, 11).cue(91, 9).cue(111, 14).cue(127, 11).cue(145, 14);
     }
@@ -186,7 +228,7 @@ function course(w: number, n: number): AdventureStage {
     }
     if (w === 4 && n === 1) {
         d.land(0, 14, 18).land(35, 11, 14, 4).land(55, 9, 11, 4).land(73, 13, 13, 4).land(104, 10, 13, 4).land(123, 8, 12, 4).land(141, 14, 19);
-        d.move('cab1', 17, 13, 32, 10).move('cab2', 86, 12, 101, 9).platform(50, 10, 4).platform(67, 11, 5).platform(118, 9, 4).platform(136, 10, 4);
+        d.move('cab1', 17, 13, 32, 10, 7800).move('cab2', 86, 12, 101, 9, 7800).platform(50, 10, 4).platform(67, 11, 5).platform(118, 9, 4).platform(136, 10, 4);
         d.land(18, 21, 17, 2).platform(31, 17, 4).land(86, 21, 18, 2).platform(100, 17, 4).cp(37, 11).cp(106, 10).foe('rail', 60, 8, 28).foe('rail', 129, 7, 28).seal(1, 41, 9).seal(2, 93, 19).seal(3, 129, 5).item('helmet', 38, 10).art('station', 3, 14, 13, 7, 'ESTAÇÃO 01').art('pine', 35, 11, 10, 7).art('station', 104, 10, 13, 7, 'MIRANTE').art('pine', 124, 8, 9, 7).talk(13, 'feka', 'Próxima parada: Yasmin!');
         d.cue(41, 11).cue(60, 9).cue(79, 13).cue(110, 10).cue(129, 8).cue(148, 14);
     }
@@ -198,14 +240,14 @@ function course(w: number, n: number): AdventureStage {
     }
     if (w === 4 && n === 3) {
         d.land(0, 14, 17).land(36, 10, 12, 4).land(56, 7, 12, 4).land(76, 13, 13, 4).land(110, 9, 14, 4).land(142, 14, 18);
-        d.move('cab1', 17, 13, 33, 9).platform(49, 9, 5).platform(69, 10, 5).move('cab2', 89, 12, 107, 8).move('sl', 123, 8, 135, 5).platform(134, 5, 10).secret(141, 5);
+        d.move('cab1', 17, 13, 33, 9, 8200).platform(49, 9, 5).platform(69, 10, 5).move('cab2', 89, 12, 107, 8, 9000).move('sl', 123, 8, 135, 5, 6600).platform(134, 5, 10).secret(141, 5);
         d.platform(127, 11, 5).platform(136, 12, 5);
         d.land(17, 21, 19, 2).platform(32, 17, 4).land(89, 21, 21, 2).platform(106, 17, 4).cp(38, 10).cp(79, 13).foe('rail', 63, 6, 27).foe('rail', 117, 8, 28).seal(1, 41, 7).seal(2, 99, 19).seal(3, 138, 3).item('helmet', 80, 12).art('station', 1, 14, 14, 7, 'CABOS CRUZADOS').art('pine', 56, 7, 10, 6).art('station', 76, 13, 13, 7, 'SERVIÇO').art('station', 110, 9, 14, 7, 'CARGA').talk(105, 'biel', 'Essa cabine não é de passageiros.');
         d.cue(42, 10).cue(62, 7).cue(82, 13).cue(117, 9).cue(131, 11).cue(147, 14);
     }
     if (w === 4 && n === 4) {
         d.land(0, 14, 16).land(35, 10, 13, 4).land(55, 8, 13, 4).land(75, 13, 15).land(110, 9, 14, 4).land(130, 7, 12, 4).land(149, 11, 12, 4).land(168, 14, 16);
-        d.move('p1', 16, 13, 32, 9).platform(49, 9, 5).platform(69, 10, 5).move('p2', 90, 12, 107, 8).platform(125, 8, 4).platform(143, 9, 5).platform(162, 12, 5);
+        d.move('p1', 16, 13, 32, 9, 8200).platform(49, 9, 5).platform(69, 10, 5).move('p2', 90, 12, 107, 8, 8600).platform(125, 8, 4).platform(143, 9, 5).platform(162, 12, 5);
         d.land(16, 21, 19, 2).platform(31, 17, 4).land(90, 21, 20, 2).platform(106, 17, 4).cp(38, 10).cp(78, 13).cp(152, 11).foe('rail', 61, 7, 25).foe('rail', 117, 8, 30).foe('charger', 136, 7, 32).seal(1, 41, 7).seal(2, 100, 19).seal(3, 136, 4).item('helmet', 79, 12).art('station', 1, 14, 14, 7, 'ÚLTIMA SUBIDA').art('pine', 55, 8, 12, 7).art('station', 75, 13, 15, 7, 'ENTRONCAMENTO').art('pine', 130, 7, 10, 6).art('station', 168, 14, 15, 8, 'BIEL');
         d.cue(41, 10).cue(61, 8).cue(82, 13).cue(117, 9).cue(136, 7).cue(154, 11).cue(176, 14);
     }
@@ -253,7 +295,7 @@ function course(w: number, n: number): AdventureStage {
     }
     if (w === 6 && n === 4) {
         d.land(0, 14, 17).land(35, 10, 14).land(56, 8, 13).land(76, 14, 17).land(93, 11, 21).land(121, 9, 13).land(142, 13, 12).land(164, 10, 8).land(177, 14, 7);
-        d.move('p1', 17, 13, 32, 9).platform(50, 9, 5).platform(70, 10, 5).belt('b1', 93, 11, 21, -1).jet('j1', 104, 11).platform(115, 10, 5).platform(135, 11, 6, T.PLATFORM_FALLING).platform(154, 13, 5, T.PLATFORM_FALLING).platform(160, 11, 4, T.PLATFORM_FALLING).platform(173, 12, 4);
+        d.move('p1', 17, 13, 32, 9, 7200).platform(50, 9, 5).platform(70, 10, 5).belt('b1', 93, 11, 21, -1).jet('j1', 104, 11).platform(115, 10, 5).platform(135, 11, 6, T.PLATFORM_FALLING).platform(154, 13, 5, T.PLATFORM_FALLING).platform(160, 11, 4, T.PLATFORM_FALLING).platform(173, 12, 4);
         d.land(17, 21, 18, 2).platform(31, 17, 4).cp(38, 10).cp(79).cp(145, 13).foe('charger', 63, 8, 40).foe('helmet', 129, 9, 35).seal(1, 42, 7).seal(2, 99, 8).seal(3, 167, 7).item('helmet', 80).arc(66, 6, 11).arc(132, 7, 10).art('arch', 35, 10, 14, 9, 'ÚLTIMA TRAVESSIA').art('banner', 56, 8, 13, 7, 'JP').art('oven', 93, 11, 21, 10, 'FORNALHA').art('rope', 154, 13, 10, 7).art('arch', 164, 10, 8, 9).talk(139, 'joao', 'Você não vai ter!', 'voce_nao_vai_ter');
         d.cue(42, 10).cue(63, 8).cue(83, 14).cue(99, 11).cue(127, 9).cue(148, 13).cue(167, 10).cue(180, 14);
     }
@@ -281,7 +323,7 @@ function arena(w: number): AdventureStage {
         d.m('platform','dais',12.75,10.6875,2.625,.3125);
         d.lift('left', 5, 13, 10).lift('right', 15, 13, 10).sw('a', 3, 14, 'left').sw('b', 18, 14, 'right');
         if (type === 'B2')
-            d.move('transfer', 7, 9, 15, 9, 4200);
+            d.move('transfer', 7, 9, 15, 9, 4800);
     }
     if (type === 'C1' || type === 'C2') {
         d.m('platform','dais',16,12.5625,3.5625,.3125);

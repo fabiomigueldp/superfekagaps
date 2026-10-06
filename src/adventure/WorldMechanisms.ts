@@ -1,17 +1,19 @@
 import { SpriteAtlas } from '../graphics/pixels';
 import { pixelText } from '../graphics/BitmapFont';
 import { BARRELS, PRESSURE_BARRELS, WORLD_PALETTE } from './WorldAssets';
-import type { MovingBody, WorldObjects } from './WorldPhysics';
+import type { MovingBody, WorldObjects, WorldLevel } from './WorldPhysics';
 import { box as r, pixelLine as line, oval, polygon, rivet, ink } from './WorldPainting';
 import { drawJet, drawCannon } from './WorldMachineArt';
 import { drawCannonBarrelEffects } from './WorldCannonEffects';
+import { carrierFamily, carrierRailClearance, carrierSceneHeadroom } from './WorldCarrierStructure';
 import { drawCarrier, drawCarrierTrack, drawBelt, drawSwitch, drawSupport } from './WorldTransportArt';
 function identities(bodies: readonly MovingBody[]) {
-    const ids = new Map<string, number>();
+    const ids = new Map<string, number>(), carriers: MovingBody[] = [];
     for (const b of bodies) {
+        if (b.to && ['platform', 'lift', 'swing', 'support'].includes(b.kind)) carriers.push(b);
         if (b.kind === 'switch' && b.link && !ids.has(b.link)) ids.set(b.link, ids.size + 1);
     }
-    return ids;
+    return { ids, headroom: carrierSceneHeadroom(carriers) };
 }
 function badge(c: CanvasRenderingContext2D, x: number, y: number, n: number, active: boolean) {
     if (!n)
@@ -20,18 +22,29 @@ function badge(c: CanvasRenderingContext2D, x: number, y: number, n: number, act
     r(c, x - 4, y, 8, 8, active ? '#a9d38a' : '#e9bb68');
     pixelText(c, String(n), x, y + 1, '#223c53', 1, 'center');
 }
-export function drawWorldObjects(c: CanvasRenderingContext2D, objects: WorldObjects, atlas: SpriteAtlas, cx: number, cy: number, time: number, world: number) {
+/** Fixed equipment is behind terrain so its rear posts never obscure a landing edge. */
+export function drawWorldCarrierStructures(c: CanvasRenderingContext2D, objects: WorldObjects, cx: number, cy: number, level?: WorldLevel) {
+    const headroom = carrierSceneHeadroom(objects.bodies);
+    for (const body of objects.bodies) drawCarrierTrack(c, body, cx, cy, level, headroom.get(body.id));
+}
+export function drawWorldObjects(c: CanvasRenderingContext2D, objects: WorldObjects, atlas: SpriteAtlas, cx: number, cy: number, time: number, world: number, level?: WorldLevel, includeStructures = true) {
     // Moving parts use the physics clock, including hit stop and paused previews.
     time = objects.time;
     // Resolve shared badge numbers once, only when a visible body can use them.
     // Keep this draw-local so editor relinks and body replacements take effect immediately.
-    let marks: Map<string, number> | undefined;
+    let marks: ReturnType<typeof identities> | undefined;
     for (const b of objects.bodies) {
         const x = Math.round(b.x - cx), y = Math.round(b.y - cy), w = b.width, h = b.height;
-        drawCarrierTrack(c, b, cx, cy);
-        if (x + w < -30 || x > 350 || y > 200 || y + h < -30) continue;
+        if (includeStructures) {
+            const headroom = b.to && carrierFamily(b) === 'hoist' && x + w >= -160 && x <= 480
+                ? (marks ??= identities(objects.bodies)).headroom.get(b.id) : undefined;
+            drawCarrierTrack(c, b, cx, cy, level, headroom);
+        }
+        const overhead = b.to && ['platform', 'lift', 'swing', 'support'].includes(b.kind) && carrierFamily(b) === 'rail'
+            ? carrierRailClearance(b) + 12 : 0;
+        if (x + w < -30 || x > 350 || y - overhead > 200 || y + h < -30) continue;
         const mark = b.kind === 'target' || b.kind === 'launcher' ? 0
-            : (marks ??= identities(objects.bodies)).get(b.kind === 'switch' ? b.link ?? '' : b.id) ?? 0;
+            : (marks ??= identities(objects.bodies)).ids.get(b.kind === 'switch' ? b.link ?? '' : b.id) ?? 0;
         if (['platform', 'lift', 'swing'].includes(b.kind)) {
             drawCarrier(c, b, cx, cy, time, world);
             badge(c, x + w / 2, y + h + 8, mark, b.active);

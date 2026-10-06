@@ -65,6 +65,7 @@ export class GuairaTraversal extends WorldGame {
             this.reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
             this.art.background = (c, _island, cx, cy, time) => drawGuairaTraversalBackground(c, cx, cy, time, this.reducedMotion, !!this.objects.get(GUAIRA_TRAVERSAL.bridgeId)?.active);
             this.art.terrain = (c, level, _island, cx, cy, time) => drawGuairaTraversalTerrain(c, level, cx, cy, time, this.reducedMotion);
+            this.art.genericStructures = false;
             this.art.objects = (c, objects, cx, cy, time) => drawGuairaTraversalObjects(c, objects, cx, cy, time, this.reducedMotion);
             this.store.save.preferences.shake = !this.reducedMotion;
             this.tutorial.observe = () => {};

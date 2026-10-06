@@ -3,8 +3,11 @@ import type { LevelData, Rect, Vector2 } from '../types';
 import type { MechanismSpec } from './types';
 import { overlaps } from './types';
 import { cannonMuzzle, jetCycle } from './WorldMachineState';
+import { sampleCarrierMotion } from './WorldCarrierMotion';
 /** Pixels per fixed physics step, also used by the visible conveyor tread. */
 export const BELT_CARRY_SPEED = 1.2;
+const autonomousCarrier = (body: MechanismSpec, bodies: readonly MechanismSpec[]) => body.kind === 'platform' || body.kind === 'swing'
+    || body.kind === 'lift' && !body.gated && !bodies.some(s => s.link === body.id);
 export interface MovingBody extends MechanismSpec {
     px: number;
     py: number;
@@ -98,7 +101,17 @@ export class WorldObjects {
         x: number;
         y: number;
     }[] = [];
-    constructor(specs: MechanismSpec[]) { this.bodies = specs.map(s => ({ ...structuredClone(s), px: s.x, py: s.y, home:{x:s.x,y:s.y}, active: false, observedActive: false, beltOffset: 0, timer: s.kind === 'launcher' ? 1200 : 0 })); }
+    constructor(specs: MechanismSpec[]) {
+        this.bodies = specs.map(s => {
+            const body = { ...structuredClone(s), px: s.x, py: s.y, home: { x: s.x, y: s.y },
+                active: false, observedActive: false, beltOffset: 0, timer: s.kind === 'launcher' ? 1200 : 0 };
+            // A phased authored shuttle starts in its real pose, not with a
+            // one-frame teleport carrying a passenger from the home terminal.
+            const pose = s.motion && autonomousCarrier(s, specs) ? sampleCarrierMotion(body, 0) : null;
+            if (pose) { body.x = body.px = pose.position.x; body.y = body.py = pose.position.y; }
+            return body;
+        });
+    }
     get(id: string) { return this.bodies.find(b => b.id === id); }
     private recordChange(b: MovingBody) {
         if (b.active === b.observedActive) return;
@@ -169,18 +182,18 @@ export class WorldObjects {
                 });
                 home.home ??= { x: b.x, y: b.y };
                 let targetX = home.home.x, targetY = home.home.y;
-                if (b.kind === 'platform' || b.kind === 'swing' || (b.kind === 'lift' && !b.gated && !this.bodies.some(s => s.link === b.id))) {
-                    const p = (1 - Math.cos(this.time / (b.period ?? 5000) * Math.PI * 2)) / 2;
-                    targetX = home.home.x + (b.to.x - home.home.x) * p;
-                    targetY = home.home.y + (b.to.y - home.home.y) * p;
+                if (autonomousCarrier(b, this.bodies)) {
+                    const pose = sampleCarrierMotion(b, this.time);
+                    if (pose) { b.x = pose.position.x; b.y = pose.position.y; }
                 }
-                else if (b.active) {
-                    targetX = b.to.x;
-                    targetY = b.to.y;
+                else {
+                    if (b.active) { targetX = b.to.x; targetY = b.to.y; }
+                    // Switch/encounter-controlled hoists and lowering supports
+                    // retain their proven 55 px/s timing and held endpoints.
+                    const max = dt * .055;
+                    b.x += Math.max(-max, Math.min(max, targetX - b.x));
+                    b.y += Math.max(-max, Math.min(max, targetY - b.y));
                 }
-                const max = dt * .055;
-                b.x += Math.max(-max, Math.min(max, targetX - b.x));
-                b.y += Math.max(-max, Math.min(max, targetY - b.y));
             }
             if (b.kind === 'launcher' && b.timer === 0 && Math.abs(b.x - playerX) < 480) {
                 const muzzle = cannonMuzzle(b), direction = b.direction ?? -1;

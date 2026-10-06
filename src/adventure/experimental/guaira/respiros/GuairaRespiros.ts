@@ -22,6 +22,7 @@ export class GuairaRespiros extends WorldGame {
             // irrigation artwork follows the native hazard clock instead.
             this.art.background = (c, _island, cx, cy) => drawRespirosBackground(c, cx, cy, this.objects.time, this.reducedMotion);
             this.art.terrain = (c, level, _island, cx, cy) => drawRespirosTerrain(c, level, cx, cy);
+            this.art.genericStructures = false;
             this.art.objects = (c, objects, cx, cy) => drawRespirosObjects(c, objects, cx, cy, objects.time, this.reducedMotion);
             this.store.save.preferences.shake = !this.reducedMotion;
             if (this.reducedMotion) {

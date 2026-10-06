@@ -4,6 +4,7 @@ import { resetPreviewGuidance, validateStage } from './progress';
 import type { AdventureStage, MechanismKind } from './types';
 import { TileType } from '../constants';
 import { rect } from './WorldArt';
+import { editorCarrierDefaults, translateEditorMechanism } from './WorldMechanismDefaults';
 import './editor.css';
 /** World authoring uses the exact runtime scene, with an isolated save and explicit JSON export. */
 export class WorldEditor {
@@ -123,7 +124,7 @@ export class WorldEditor {
             }
             else {
                 const kind = this.tool as MechanismKind, id = `${kind}-${Date.now().toString(36)}`, x = Math.floor(p.x / 16) * 16, y = Math.floor(p.y / 16) * 16;
-                this.draft.mechanisms.push({ id, kind, x, y, width: kind === 'switch' ? 24 : kind === 'jet' ? 12 : kind === 'launcher' ? 16 : 64, height: kind === 'jet' ? 48 : kind === 'launcher' ? 16 : 8, ...(['platform', 'lift', 'support'].includes(kind) ? { to: { x: x + 64, y: y - 32 }, period: 4000 } : {}), ...(kind === 'belt' ? { direction: 1 } : {}), ...(kind === 'launcher' ? { direction: -1, period: 3200 } : {}) });
+                this.draft.mechanisms.push({ id, kind, x, y, width: kind === 'switch' ? 24 : kind === 'jet' ? 12 : kind === 'launcher' ? 16 : 64, height: kind === 'jet' ? 48 : kind === 'launcher' ? 16 : 8, ...editorCarrierDefaults(kind, x, y, this.draft.world), ...(kind === 'belt' ? { direction: 1 } : {}), ...(kind === 'launcher' ? { direction: -1, period: 3200 } : {}) });
                 this.selected = this.draft.mechanisms.length - 1;
             }
             this.reload();
@@ -132,8 +133,8 @@ export class WorldEditor {
             if (!dragging || this.preview || this.selected < 0)
                 return;
             const p = point(e), m = this.draft.mechanisms[this.selected];
-            m.x = Math.round((originX + p.x - startX) / 8) * 8;
-            m.y = Math.round((originY + p.y - startY) / 8) * 8;
+            Object.assign(m, translateEditorMechanism(m, Math.round((originX + p.x - startX) / 8) * 8,
+                Math.round((originY + p.y - startY) / 8) * 8));
             this.reload(false);
         });
         canvas.addEventListener('pointerup', () => { dragging = false; this.inspect(); });
@@ -193,6 +194,8 @@ export class WorldEditor {
         this.reload();
     }
     private reload(inspect = true) {
+        const errors = validateStage(this.draft);
+        if (errors.length) this.preview = false;
         const maxX = Math.max(0, this.draft.level.width * 16 - 320);
         this.pan.max = String(maxX);
         const camera = { x: Math.min(maxX, this.game.camera.x), y: this.draft.encounter ? 64 : 88 };
@@ -209,7 +212,8 @@ export class WorldEditor {
         this.json.value = JSON.stringify(this.draft, null, 2);
         if (inspect)
             this.inspect();
-        this.message(this.preview ? 'Prévia jogável · Esc para pausar.' : 'Edição · alterações em memória até exportar.');
+        this.message(errors.length ? `Revise a fase antes de jogar ou exportar: ${errors.join(' · ')}`
+            : this.preview ? 'Prévia jogável · Esc para pausar.' : 'Edição · alterações em memória até exportar.');
     }
     private inspect() {
         this.inspector.replaceChildren();
@@ -227,6 +231,8 @@ export class WorldEditor {
                 const values = m as unknown as Record<string, unknown>;
                 if (input.value === '')
                     delete values[key];
+                else if (key === 'x' || key === 'y')
+                    Object.assign(m, translateEditorMechanism(m, key === 'x' ? Number(input.value) : m.x, key === 'y' ? Number(input.value) : m.y));
                 else
                     values[key] = input.type === 'number' ? Number(input.value) : input.value;
                 this.reload();

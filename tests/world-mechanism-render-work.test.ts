@@ -36,13 +36,15 @@ function capture(objects: WorldObjects, cx: number, cy: number, world: number) {
     return { reads, calls: paint.calls, hash: digest(JSON.stringify(paint.calls)) };
 }
 
-// Exact command fingerprints recorded before this optimization, at e951929.
+// Exact command fingerprints: unchanged families retain their e951929 values.
+// Transport scenes were intentionally refreshed for anchored rail/hoist equipment,
+// native bearing spokes and immutable multi-equipment headroom (2026-10-06).
 // They cover style writes, every primitive, clipping and full sprite frames/palettes.
 const baseline = [
-    ['3-2', 8651, '9212a4e95cb2459c470dfc2cfa9a1c7f74f984f72f357c93856999a74fdf1b37'],
+    ['3-2', 11259, '3939d7569c4b1bb260d69d4d8fde804750b8b011b78ba5316cab641c7080114f'],
     ['5-3', 3848, 'aa76a79a2d8dd6f2a9d07293acd7935163834b6e1de239e2ed66aeef3a95ed23'],
-    ['5-5', 6520, '303c2c0411e89cdda97ed78261c4a393d3dbe5eb2c996e17b549c8dc51ea9476'],
-    ['4-2', 2148, '71b5dcd9612fd414fa209f1e2e607c3d38bd1e0e4e002589416b7bb6e2291f79'],
+    ['5-5', 10032, 'aa129d6d871605557fff90e5e3c993cfea6856920c10ee02947bb67323f72d42'],
+    ['4-2', 8876, 'ec65fff3ab082cbedcd82562241e7a1a6cb55d1d51352f8d5e4e264e38ab5f74'],
     ['3-4', 5416, 'bec078808b590a360777de79d4c23472e646dced97f0a2c8b39254e0ec3d6a55'],
 ] as const;
 

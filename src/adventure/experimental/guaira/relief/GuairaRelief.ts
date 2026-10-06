@@ -40,6 +40,7 @@ export class GuairaRelief extends WorldGame {
             this.reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
             this.art.background = (c, _island, x, y) => drawReliefBackground(c, this.level, x, y);
             this.art.terrain = (c, level, _island, x, y) => drawReliefTerrain(c, level, x, y);
+            this.art.genericStructures = false;
             this.art.objects = (c, objects, x, y) => drawReliefObjects(c, objects, x, y, this.reducedMotion);
             this.store.save.preferences.shake = !this.reducedMotion;
             if (this.reducedMotion) {

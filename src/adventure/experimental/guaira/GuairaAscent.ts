@@ -59,6 +59,7 @@ export class GuairaAscent extends WorldGame {
             this.reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
             this.art.background = (c, _island, cx, cy, time) => drawGuairaAscentBackground(c, cx, cy, time, this.reducedMotion);
             this.art.terrain = (c, level, _island, cx, cy, time) => drawGuairaAscentTerrain(c, level, cx, cy, time, this.reducedMotion);
+            this.art.genericStructures = false;
             this.art.objects = (c, objects, cx, cy, time) => {
                 const running = this.state === 'playing' && !this.renderingPaused && !this.finished &&
                     !this.player.data.isDead && !((this.player.data.respawnRevealTimer ?? 0) > 0);

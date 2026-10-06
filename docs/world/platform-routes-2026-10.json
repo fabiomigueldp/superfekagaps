@@ -1,0 +1,7727 @@
+{
+  "date": "2026-10-06",
+  "baseline": "1be0bf0f09fe155a412ac5e7e6263243a9ec3866 (production platform source same as85cb4eab)",
+  "world": {
+    "stageCount": 30,
+    "movingBodyCount": 36,
+    "staticDaises": 5,
+    "fallingSurfaceRuns": 20,
+    "fallingTiles": 110,
+    "belts": 15,
+    "swingUses": 0,
+    "mechanisms": [
+      {
+        "key": "2-1:p1",
+        "stage": "2-1",
+        "name": "Carga Chegando",
+        "encounter": null,
+        "spec": {
+          "kind": "platform",
+          "id": "p1",
+          "x": 448,
+          "y": 192,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 440,
+              "y": 192,
+              "kind": "ground"
+            },
+            {
+              "x": 560,
+              "y": 224,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 528,
+            "y": 192
+          },
+          "period": 5000,
+          "motion": {
+            "kind": "shuttle",
+            "maxSpeed": 90,
+            "rampMs": 350,
+            "dwellMs": 450
+          }
+        },
+        "before": {
+          "home": {
+            "x": 432,
+            "y": 192
+          },
+          "to": {
+            "x": 528,
+            "y": 192
+          },
+          "period": 5000,
+          "maxLineDeviationPx": 0,
+          "minEndpointDistancePx": 0
+        },
+        "after": {
+          "periodMs": 5000,
+          "maxSpeedPxS": 47.05882352941176,
+          "endpointDwellMs": 450
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 736,
+              "y": 176,
+              "width": 160,
+              "tile": 1
+            },
+            {
+              "x": 272,
+              "y": 192,
+              "width": 176,
+              "tile": 1
+            },
+            {
+              "x": 0,
+              "y": 224,
+              "width": 272,
+              "tile": 1
+            },
+            {
+              "x": 528,
+              "y": 224,
+              "width": 208,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [],
+          "pickups": [
+            {
+              "id": "2-1:s1",
+              "kind": "seal",
+              "x": 336,
+              "y": 160
+            },
+            {
+              "id": "2-1:c18",
+              "kind": "coin",
+              "x": 384,
+              "y": 160
+            },
+            {
+              "id": "2-1:c19",
+              "kind": "coin",
+              "x": 608,
+              "y": 192
+            },
+            {
+              "id": "2-1:c20",
+              "kind": "coin",
+              "x": 640,
+              "y": 192
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [],
+          "routeCues": [
+            {
+              "x": 368,
+              "y": 192
+            },
+            {
+              "x": 624,
+              "y": 224
+            }
+          ]
+        }
+      },
+      {
+        "key": "2-1:p2",
+        "stage": "2-1",
+        "name": "Carga Chegando",
+        "encounter": null,
+        "spec": {
+          "kind": "platform",
+          "id": "p2",
+          "x": 1216,
+          "y": 208,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 1248,
+              "y": 320,
+              "kind": "ground"
+            },
+            {
+              "x": 1488,
+              "y": 320,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 1456,
+            "y": 176
+          },
+          "period": 7400,
+          "motion": {
+            "kind": "shuttle",
+            "maxSpeed": 90,
+            "rampMs": 350,
+            "dwellMs": 450
+          }
+        },
+        "before": {
+          "home": {
+            "x": 1216,
+            "y": 208
+          },
+          "to": {
+            "x": 1472,
+            "y": 176
+          },
+          "period": 5400,
+          "maxLineDeviationPx": 15.523,
+          "minEndpointDistancePx": 54.345
+        },
+        "after": {
+          "periodMs": 7400,
+          "maxSpeedPxS": 83.49101214025686,
+          "endpointDwellMs": 450
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 1520,
+              "y": 176,
+              "width": 208,
+              "tile": 1
+            },
+            {
+              "x": 1024,
+              "y": 208,
+              "width": 192,
+              "tile": 1
+            },
+            {
+              "x": 1456,
+              "y": 272,
+              "width": 64,
+              "tile": 3
+            },
+            {
+              "x": 1216,
+              "y": 320,
+              "width": 304,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [
+            {
+              "x": 66,
+              "y": 13
+            }
+          ],
+          "pickups": [
+            {
+              "id": "2-1:s2",
+              "kind": "seal",
+              "x": 1408,
+              "y": 288
+            },
+            {
+              "id": "2-1:i3",
+              "kind": "helmet",
+              "x": 1072,
+              "y": 192
+            },
+            {
+              "id": "2-1:c14",
+              "kind": "coin",
+              "x": 1552,
+              "y": 144
+            },
+            {
+              "id": "2-1:c15",
+              "kind": "coin",
+              "x": 1584,
+              "y": 128
+            },
+            {
+              "id": "2-1:c16",
+              "kind": "coin",
+              "x": 1616,
+              "y": 144
+            },
+            {
+              "id": "2-1:c17",
+              "kind": "coin",
+              "x": 1648,
+              "y": 144
+            },
+            {
+              "id": "2-1:c23",
+              "kind": "coin",
+              "x": 1120,
+              "y": 176
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [],
+          "routeCues": [
+            {
+              "x": 1104,
+              "y": 208
+            },
+            {
+              "x": 1584,
+              "y": 176
+            }
+          ]
+        }
+      },
+      {
+        "key": "2-2:l1",
+        "stage": "2-2",
+        "name": "Peso e Contrapeso",
+        "encounter": null,
+        "spec": {
+          "kind": "lift",
+          "id": "l1",
+          "x": 384,
+          "y": 208,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 388,
+              "y": 224,
+              "kind": "ground"
+            },
+            {
+              "x": 442,
+              "y": 320,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 384,
+            "y": 96
+          },
+          "period": 4000
+        },
+        "before": {
+          "home": {
+            "x": 384,
+            "y": 208
+          },
+          "to": {
+            "x": 384,
+            "y": 96
+          },
+          "period": null,
+          "maxLineDeviationPx": 0,
+          "minEndpointDistancePx": 0
+        },
+        "after": {
+          "periodMs": null,
+          "maxSpeedPxS": 55,
+          "endpointDwellMs": null
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 464,
+              "y": 112,
+              "width": 80,
+              "tile": 3
+            },
+            {
+              "x": 544,
+              "y": 112,
+              "width": 304,
+              "tile": 1
+            },
+            {
+              "x": 0,
+              "y": 224,
+              "width": 400,
+              "tile": 1
+            },
+            {
+              "x": 432,
+              "y": 272,
+              "width": 64,
+              "tile": 3
+            },
+            {
+              "x": 400,
+              "y": 320,
+              "width": 144,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [],
+          "pickups": [
+            {
+              "id": "2-2:c4",
+              "kind": "coin",
+              "x": 400,
+              "y": 64
+            },
+            {
+              "id": "2-2:c5",
+              "kind": "coin",
+              "x": 432,
+              "y": 64
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [
+            {
+              "id": "s1",
+              "kind": "switch",
+              "x": 320,
+              "y": 219.2
+            }
+          ],
+          "routeCues": [
+            {
+              "x": 336,
+              "y": 224,
+              "switch": "s1"
+            },
+            {
+              "x": 416,
+              "y": 96
+            }
+          ]
+        }
+      },
+      {
+        "key": "2-2:l2",
+        "stage": "2-2",
+        "name": "Peso e Contrapeso",
+        "encounter": null,
+        "spec": {
+          "kind": "lift",
+          "id": "l2",
+          "x": 1168,
+          "y": 176,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 1172,
+              "y": 192,
+              "kind": "ground"
+            },
+            {
+              "x": 1226,
+              "y": 320,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 1168,
+            "y": 80
+          },
+          "period": 4000
+        },
+        "before": {
+          "home": {
+            "x": 1168,
+            "y": 176
+          },
+          "to": {
+            "x": 1168,
+            "y": 80
+          },
+          "period": null,
+          "maxLineDeviationPx": 0,
+          "minEndpointDistancePx": 0
+        },
+        "after": {
+          "periodMs": null,
+          "maxSpeedPxS": 55,
+          "endpointDwellMs": null
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 1248,
+              "y": 96,
+              "width": 80,
+              "tile": 3
+            },
+            {
+              "x": 1328,
+              "y": 96,
+              "width": 304,
+              "tile": 1
+            },
+            {
+              "x": 912,
+              "y": 192,
+              "width": 272,
+              "tile": 1
+            },
+            {
+              "x": 1216,
+              "y": 256,
+              "width": 64,
+              "tile": 3
+            },
+            {
+              "x": 1184,
+              "y": 320,
+              "width": 144,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [],
+          "pickups": [
+            {
+              "id": "2-2:c8",
+              "kind": "coin",
+              "x": 1008,
+              "y": 160
+            },
+            {
+              "id": "2-2:c9",
+              "kind": "coin",
+              "x": 1184,
+              "y": 48
+            },
+            {
+              "id": "2-2:c10",
+              "kind": "coin",
+              "x": 1216,
+              "y": 48
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [
+            {
+              "id": "s2",
+              "kind": "switch",
+              "x": 1088,
+              "y": 187.2
+            }
+          ],
+          "routeCues": [
+            {
+              "x": 1104,
+              "y": 192,
+              "switch": "s2"
+            },
+            {
+              "x": 1200,
+              "y": 80
+            }
+          ]
+        }
+      },
+      {
+        "key": "2-2:l3",
+        "stage": "2-2",
+        "name": "Peso e Contrapeso",
+        "encounter": null,
+        "spec": {
+          "kind": "lift",
+          "id": "l3",
+          "x": 1936,
+          "y": 176,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 1940,
+              "y": 192,
+              "kind": "ground"
+            },
+            {
+              "x": 1994,
+              "y": 320,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 1936,
+            "y": 112
+          },
+          "period": 4000
+        },
+        "before": {
+          "home": {
+            "x": 1936,
+            "y": 176
+          },
+          "to": {
+            "x": 1936,
+            "y": 112
+          },
+          "period": null,
+          "maxLineDeviationPx": 0,
+          "minEndpointDistancePx": 0
+        },
+        "after": {
+          "periodMs": null,
+          "maxSpeedPxS": 55,
+          "endpointDwellMs": null
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 2016,
+              "y": 128,
+              "width": 80,
+              "tile": 3
+            },
+            {
+              "x": 2096,
+              "y": 128,
+              "width": 192,
+              "tile": 1
+            },
+            {
+              "x": 1696,
+              "y": 192,
+              "width": 256,
+              "tile": 1
+            },
+            {
+              "x": 1984,
+              "y": 256,
+              "width": 64,
+              "tile": 3
+            },
+            {
+              "x": 1952,
+              "y": 320,
+              "width": 144,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [],
+          "pickups": [
+            {
+              "id": "2-2:c13",
+              "kind": "coin",
+              "x": 1776,
+              "y": 160
+            },
+            {
+              "id": "2-2:c14",
+              "kind": "coin",
+              "x": 1808,
+              "y": 160
+            },
+            {
+              "id": "2-2:c15",
+              "kind": "coin",
+              "x": 1952,
+              "y": 80
+            },
+            {
+              "id": "2-2:c16",
+              "kind": "coin",
+              "x": 1984,
+              "y": 80
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [
+            {
+              "id": "s3",
+              "kind": "switch",
+              "x": 1856,
+              "y": 187.2
+            }
+          ],
+          "routeCues": [
+            {
+              "x": 1792,
+              "y": 192
+            },
+            {
+              "x": 1872,
+              "y": 192,
+              "switch": "s3"
+            },
+            {
+              "x": 1968,
+              "y": 112
+            }
+          ]
+        }
+      },
+      {
+        "key": "2-3:p1",
+        "stage": "2-3",
+        "name": "Entre os Contêineres",
+        "encounter": null,
+        "spec": {
+          "kind": "platform",
+          "id": "p1",
+          "x": 512,
+          "y": 176,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 504,
+              "y": 176,
+              "kind": "ground"
+            },
+            {
+              "x": 640,
+              "y": 224,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 608,
+            "y": 192
+          },
+          "period": 5000,
+          "motion": {
+            "kind": "shuttle",
+            "maxSpeed": 90,
+            "rampMs": 350,
+            "dwellMs": 450
+          }
+        },
+        "before": {
+          "home": {
+            "x": 512,
+            "y": 176
+          },
+          "to": {
+            "x": 608,
+            "y": 192
+          },
+          "period": 5000,
+          "maxLineDeviationPx": 0.391,
+          "minEndpointDistancePx": 0
+        },
+        "after": {
+          "periodMs": 5000,
+          "maxSpeedPxS": 57.249529696924405,
+          "endpointDwellMs": 450
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 384,
+              "y": 112,
+              "width": 144,
+              "tile": 3
+            },
+            {
+              "x": 304,
+              "y": 176,
+              "width": 208,
+              "tile": 1
+            },
+            {
+              "x": 608,
+              "y": 224,
+              "width": 256,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [
+            {
+              "x": 40,
+              "y": 14
+            }
+          ],
+          "pickups": [
+            {
+              "id": "2-3:s1",
+              "kind": "seal",
+              "x": 432,
+              "y": 80
+            },
+            {
+              "id": "2-3:i3",
+              "kind": "helmet",
+              "x": 656,
+              "y": 208
+            },
+            {
+              "id": "2-3:c4",
+              "kind": "coin",
+              "x": 512,
+              "y": 144
+            },
+            {
+              "id": "2-3:c5",
+              "kind": "coin",
+              "x": 528,
+              "y": 128
+            },
+            {
+              "id": "2-3:c6",
+              "kind": "coin",
+              "x": 544,
+              "y": 116.28718707889797
+            },
+            {
+              "id": "2-3:c7",
+              "kind": "coin",
+              "x": 560,
+              "y": 112
+            },
+            {
+              "id": "2-3:c8",
+              "kind": "coin",
+              "x": 576,
+              "y": 116.28718707889796
+            },
+            {
+              "id": "2-3:c9",
+              "kind": "coin",
+              "x": 592,
+              "y": 128
+            },
+            {
+              "id": "2-3:c10",
+              "kind": "coin",
+              "x": 608,
+              "y": 144
+            },
+            {
+              "id": "2-3:c20",
+              "kind": "coin",
+              "x": 384,
+              "y": 144
+            },
+            {
+              "id": "2-3:c21",
+              "kind": "coin",
+              "x": 416,
+              "y": 144
+            },
+            {
+              "id": "2-3:c22",
+              "kind": "coin",
+              "x": 688,
+              "y": 192
+            },
+            {
+              "id": "2-3:c23",
+              "kind": "coin",
+              "x": 720,
+              "y": 192
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [],
+          "routeCues": [
+            {
+              "x": 400,
+              "y": 176
+            },
+            {
+              "x": 704,
+              "y": 224
+            }
+          ]
+        }
+      },
+      {
+        "key": "2-3:p2",
+        "stage": "2-3",
+        "name": "Entre os Contêineres",
+        "encounter": null,
+        "spec": {
+          "kind": "platform",
+          "id": "p2",
+          "x": 1104,
+          "y": 160,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 1096,
+              "y": 160,
+              "kind": "ground"
+            },
+            {
+              "x": 1248,
+              "y": 208,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 1216,
+            "y": 176
+          },
+          "period": 5000,
+          "motion": {
+            "kind": "shuttle",
+            "maxSpeed": 90,
+            "rampMs": 350,
+            "dwellMs": 450
+          }
+        },
+        "before": {
+          "home": {
+            "x": 1088,
+            "y": 160
+          },
+          "to": {
+            "x": 1216,
+            "y": 176
+          },
+          "period": 5000,
+          "maxLineDeviationPx": 2.705,
+          "minEndpointDistancePx": 0.657
+        },
+        "after": {
+          "periodMs": 5000,
+          "maxSpeedPxS": 66.55122646461624,
+          "endpointDwellMs": 450
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 944,
+              "y": 96,
+              "width": 112,
+              "tile": 3
+            },
+            {
+              "x": 864,
+              "y": 160,
+              "width": 240,
+              "tile": 1
+            },
+            {
+              "x": 1216,
+              "y": 208,
+              "width": 240,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [],
+          "pickups": [
+            {
+              "id": "2-3:s2",
+              "kind": "seal",
+              "x": 992,
+              "y": 64
+            },
+            {
+              "id": "2-3:c24",
+              "kind": "coin",
+              "x": 976,
+              "y": 128
+            },
+            {
+              "id": "2-3:c25",
+              "kind": "coin",
+              "x": 1008,
+              "y": 128
+            },
+            {
+              "id": "2-3:c26",
+              "kind": "coin",
+              "x": 1312,
+              "y": 176
+            },
+            {
+              "id": "2-3:c27",
+              "kind": "coin",
+              "x": 1344,
+              "y": 176
+            }
+          ],
+          "foes": [
+            {
+              "id": "e0",
+              "kind": "helmet",
+              "x": 1008,
+              "y": 160,
+              "range": 43
+            },
+            {
+              "id": "e1",
+              "kind": "minion",
+              "x": 1328,
+              "y": 208,
+              "range": 44
+            }
+          ],
+          "otherMechanisms": [],
+          "routeCues": [
+            {
+              "x": 992,
+              "y": 160
+            },
+            {
+              "x": 1328,
+              "y": 208
+            }
+          ]
+        }
+      },
+      {
+        "key": "2-3:secretLift",
+        "stage": "2-3",
+        "name": "Entre os Contêineres",
+        "encounter": null,
+        "spec": {
+          "kind": "platform",
+          "id": "secretLift",
+          "x": 1648,
+          "y": 144,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 1640,
+              "y": 144,
+              "kind": "ground"
+            },
+            {
+              "x": 1856,
+              "y": 224,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 1824,
+            "y": 80
+          },
+          "period": 5800,
+          "motion": {
+            "kind": "shuttle",
+            "maxSpeed": 90,
+            "rampMs": 350,
+            "dwellMs": 450
+          }
+        },
+        "before": {
+          "home": {
+            "x": 1648,
+            "y": 144
+          },
+          "to": {
+            "x": 1824,
+            "y": 80
+          },
+          "period": 5000,
+          "maxLineDeviationPx": 20.762,
+          "minEndpointDistancePx": 20.483
+        },
+        "after": {
+          "periodMs": 5800,
+          "maxSpeedPxS": 89.17866598643525,
+          "endpointDwellMs": 450
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 1536,
+              "y": 80,
+              "width": 160,
+              "tile": 3
+            },
+            {
+              "x": 1856,
+              "y": 80,
+              "width": 224,
+              "tile": 3
+            },
+            {
+              "x": 1456,
+              "y": 144,
+              "width": 192,
+              "tile": 1
+            },
+            {
+              "x": 2032,
+              "y": 176,
+              "width": 192,
+              "tile": 1
+            },
+            {
+              "x": 1776,
+              "y": 224,
+              "width": 256,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [
+            {
+              "x": 113,
+              "y": 14
+            }
+          ],
+          "pickups": [
+            {
+              "id": "2-3:s3",
+              "kind": "seal",
+              "x": 1568,
+              "y": 48
+            },
+            {
+              "id": "2-3:c11",
+              "kind": "coin",
+              "x": 1648,
+              "y": 112
+            },
+            {
+              "id": "2-3:c12",
+              "kind": "coin",
+              "x": 1664,
+              "y": 99.75413016431713
+            },
+            {
+              "id": "2-3:c13",
+              "kind": "coin",
+              "x": 1680,
+              "y": 89.37258300203048
+            },
+            {
+              "id": "2-3:c14",
+              "kind": "coin",
+              "x": 1696,
+              "y": 82.43585495963882
+            },
+            {
+              "id": "2-3:c15",
+              "kind": "coin",
+              "x": 1712,
+              "y": 80
+            },
+            {
+              "id": "2-3:c16",
+              "kind": "coin",
+              "x": 1728,
+              "y": 82.43585495963882
+            },
+            {
+              "id": "2-3:c17",
+              "kind": "coin",
+              "x": 1744,
+              "y": 89.37258300203048
+            },
+            {
+              "id": "2-3:c18",
+              "kind": "coin",
+              "x": 1760,
+              "y": 99.75413016431712
+            },
+            {
+              "id": "2-3:c19",
+              "kind": "coin",
+              "x": 1776,
+              "y": 112
+            },
+            {
+              "id": "2-3:c28",
+              "kind": "coin",
+              "x": 1552,
+              "y": 112
+            },
+            {
+              "id": "2-3:c29",
+              "kind": "coin",
+              "x": 1584,
+              "y": 112
+            },
+            {
+              "id": "2-3:c30",
+              "kind": "coin",
+              "x": 1840,
+              "y": 192
+            },
+            {
+              "id": "2-3:c31",
+              "kind": "coin",
+              "x": 1872,
+              "y": 192
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [],
+          "routeCues": [
+            {
+              "x": 1568,
+              "y": 144
+            },
+            {
+              "x": 1856,
+              "y": 224
+            }
+          ]
+        }
+      },
+      {
+        "key": "2-4:p1",
+        "stage": "2-4",
+        "name": "Expediente Pesado",
+        "encounter": null,
+        "spec": {
+          "kind": "platform",
+          "id": "p1",
+          "x": 288,
+          "y": 208,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 320,
+              "y": 320,
+              "kind": "ground"
+            },
+            {
+              "x": 528,
+              "y": 320,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 496,
+            "y": 192
+          },
+          "period": 6300,
+          "motion": {
+            "kind": "shuttle",
+            "maxSpeed": 90,
+            "rampMs": 350,
+            "dwellMs": 450
+          }
+        },
+        "before": {
+          "home": {
+            "x": 288,
+            "y": 208
+          },
+          "to": {
+            "x": 496,
+            "y": 192
+          },
+          "period": 5000,
+          "maxLineDeviationPx": 6.842,
+          "minEndpointDistancePx": 35.471
+        },
+        "after": {
+          "periodMs": 6300,
+          "maxSpeedPxS": 88.77211785807863,
+          "endpointDwellMs": 450
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 560,
+              "y": 192,
+              "width": 208,
+              "tile": 1
+            },
+            {
+              "x": 0,
+              "y": 224,
+              "width": 288,
+              "tile": 1
+            },
+            {
+              "x": 496,
+              "y": 272,
+              "width": 64,
+              "tile": 3
+            },
+            {
+              "x": 288,
+              "y": 320,
+              "width": 272,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [],
+          "pickups": [
+            {
+              "id": "2-4:c24",
+              "kind": "coin",
+              "x": 640,
+              "y": 160
+            },
+            {
+              "id": "2-4:c25",
+              "kind": "coin",
+              "x": 672,
+              "y": 160
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [],
+          "routeCues": [
+            {
+              "x": 656,
+              "y": 192
+            }
+          ]
+        }
+      },
+      {
+        "key": "2-4:p2",
+        "stage": "2-4",
+        "name": "Expediente Pesado",
+        "encounter": null,
+        "spec": {
+          "kind": "platform",
+          "id": "p2",
+          "x": 1504,
+          "y": 176,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 1536,
+              "y": 320,
+              "kind": "ground"
+            },
+            {
+              "x": 1792,
+              "y": 320,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 1760,
+            "y": 144
+          },
+          "period": 7400,
+          "motion": {
+            "kind": "shuttle",
+            "maxSpeed": 90,
+            "rampMs": 350,
+            "dwellMs": 450
+          }
+        },
+        "before": {
+          "home": {
+            "x": 1504,
+            "y": 176
+          },
+          "to": {
+            "x": 1760,
+            "y": 144
+          },
+          "period": 5000,
+          "maxLineDeviationPx": 16.572,
+          "minEndpointDistancePx": 59.877
+        },
+        "after": {
+          "periodMs": 7400,
+          "maxSpeedPxS": 88.9628441191564,
+          "endpointDwellMs": 450
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 1824,
+              "y": 160,
+              "width": 256,
+              "tile": 1
+            },
+            {
+              "x": 1344,
+              "y": 176,
+              "width": 160,
+              "tile": 1
+            },
+            {
+              "x": 1088,
+              "y": 224,
+              "width": 256,
+              "tile": 1
+            },
+            {
+              "x": 1760,
+              "y": 272,
+              "width": 64,
+              "tile": 3
+            },
+            {
+              "x": 1504,
+              "y": 320,
+              "width": 320,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [],
+          "pickups": [
+            {
+              "id": "2-4:s2",
+              "kind": "seal",
+              "x": 1664,
+              "y": 288
+            },
+            {
+              "id": "2-4:c29",
+              "kind": "coin",
+              "x": 1408,
+              "y": 144
+            },
+            {
+              "id": "2-4:c30",
+              "kind": "coin",
+              "x": 1440,
+              "y": 144
+            },
+            {
+              "id": "2-4:c31",
+              "kind": "coin",
+              "x": 1936,
+              "y": 128
+            },
+            {
+              "id": "2-4:c32",
+              "kind": "coin",
+              "x": 1968,
+              "y": 128
+            }
+          ],
+          "foes": [
+            {
+              "id": "e1",
+              "kind": "helmet",
+              "x": 1920,
+              "y": 160,
+              "range": 38
+            }
+          ],
+          "otherMechanisms": [],
+          "routeCues": [
+            {
+              "x": 1424,
+              "y": 176
+            },
+            {
+              "x": 1952,
+              "y": 160
+            }
+          ]
+        }
+      },
+      {
+        "key": "2-5:left",
+        "stage": "2-5",
+        "name": "Mestre das Cargas",
+        "encounter": "B1",
+        "spec": {
+          "kind": "lift",
+          "id": "left",
+          "x": 80,
+          "y": 208,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 84,
+              "y": 224,
+              "kind": "ground"
+            },
+            {
+              "x": 138,
+              "y": 224,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 80,
+            "y": 160
+          },
+          "period": 4000
+        },
+        "before": {
+          "home": {
+            "x": 80,
+            "y": 208
+          },
+          "to": {
+            "x": 80,
+            "y": 160
+          },
+          "period": null,
+          "maxLineDeviationPx": 0,
+          "minEndpointDistancePx": 0
+        },
+        "after": {
+          "periodMs": null,
+          "maxSpeedPxS": 55,
+          "endpointDwellMs": null
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 0,
+              "y": 224,
+              "width": 320,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [
+            {
+              "x": 2,
+              "y": 14
+            }
+          ],
+          "pickups": [
+            {
+              "id": "2-5:i0",
+              "kind": "helmet",
+              "x": 48,
+              "y": 208
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [
+            {
+              "id": "dais",
+              "kind": "platform",
+              "x": 204,
+              "y": 171
+            },
+            {
+              "id": "right",
+              "kind": "lift",
+              "x": 240,
+              "y": 208
+            },
+            {
+              "id": "a",
+              "kind": "switch",
+              "x": 48,
+              "y": 219.2
+            },
+            {
+              "id": "b",
+              "kind": "switch",
+              "x": 288,
+              "y": 219.2
+            }
+          ]
+        }
+      },
+      {
+        "key": "2-5:right",
+        "stage": "2-5",
+        "name": "Mestre das Cargas",
+        "encounter": "B1",
+        "spec": {
+          "kind": "lift",
+          "id": "right",
+          "x": 240,
+          "y": 208,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 244,
+              "y": 224,
+              "kind": "ground"
+            },
+            {
+              "x": 298,
+              "y": 224,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 240,
+            "y": 160
+          },
+          "period": 4000
+        },
+        "before": {
+          "home": {
+            "x": 240,
+            "y": 208
+          },
+          "to": {
+            "x": 240,
+            "y": 160
+          },
+          "period": null,
+          "maxLineDeviationPx": 0,
+          "minEndpointDistancePx": 0
+        },
+        "after": {
+          "periodMs": null,
+          "maxSpeedPxS": 55,
+          "endpointDwellMs": null
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 0,
+              "y": 224,
+              "width": 320,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [],
+          "pickups": [],
+          "foes": [],
+          "otherMechanisms": [
+            {
+              "id": "dais",
+              "kind": "platform",
+              "x": 204,
+              "y": 171
+            },
+            {
+              "id": "left",
+              "kind": "lift",
+              "x": 80,
+              "y": 208
+            },
+            {
+              "id": "b",
+              "kind": "switch",
+              "x": 288,
+              "y": 219.2
+            }
+          ]
+        }
+      },
+      {
+        "key": "3-2:crate1",
+        "stage": "3-2",
+        "name": "Linha de Envase",
+        "encounter": null,
+        "spec": {
+          "kind": "platform",
+          "id": "crate1",
+          "x": 656,
+          "y": 208,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 688,
+              "y": 304,
+              "kind": "ground"
+            },
+            {
+              "x": 736,
+              "y": 304,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 704,
+            "y": 208
+          },
+          "period": 3600,
+          "motion": {
+            "kind": "shuttle",
+            "maxSpeed": 90,
+            "rampMs": 350,
+            "dwellMs": 450
+          }
+        },
+        "before": {
+          "home": {
+            "x": 656,
+            "y": 208
+          },
+          "to": {
+            "x": 704,
+            "y": 208
+          },
+          "period": 3600,
+          "maxLineDeviationPx": 0,
+          "minEndpointDistancePx": 0
+        },
+        "after": {
+          "periodMs": 3600,
+          "maxSpeedPxS": 48,
+          "endpointDwellMs": 450
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 272,
+              "y": 192,
+              "width": 384,
+              "tile": 1
+            },
+            {
+              "x": 752,
+              "y": 224,
+              "width": 192,
+              "tile": 1
+            },
+            {
+              "x": 720,
+              "y": 256,
+              "width": 32,
+              "tile": 3
+            },
+            {
+              "x": 656,
+              "y": 304,
+              "width": 96,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [
+            {
+              "x": 49,
+              "y": 14
+            }
+          ],
+          "pickups": [
+            {
+              "id": "3-2:i8",
+              "kind": "helmet",
+              "x": 800,
+              "y": 208
+            },
+            {
+              "id": "3-2:c10",
+              "kind": "coin",
+              "x": 832,
+              "y": 192
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [
+            {
+              "id": "b1",
+              "kind": "belt",
+              "x": 336,
+              "y": 188.8
+            },
+            {
+              "id": "launch39",
+              "kind": "launcher",
+              "x": 624,
+              "y": 176
+            },
+            {
+              "id": "s2",
+              "kind": "switch",
+              "x": 880,
+              "y": 219.2
+            }
+          ],
+          "routeCues": [
+            {
+              "x": 816,
+              "y": 224
+            },
+            {
+              "x": 896,
+              "y": 224,
+              "switch": "s2"
+            }
+          ]
+        }
+      },
+      {
+        "key": "3-2:crate2",
+        "stage": "3-2",
+        "name": "Linha de Envase",
+        "encounter": null,
+        "spec": {
+          "kind": "platform",
+          "id": "crate2",
+          "x": 1376,
+          "y": 192,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 1408,
+              "y": 304,
+              "kind": "ground"
+            },
+            {
+              "x": 1456,
+              "y": 304,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 1424,
+            "y": 192
+          },
+          "period": 3900,
+          "motion": {
+            "kind": "shuttle",
+            "maxSpeed": 90,
+            "rampMs": 350,
+            "dwellMs": 450
+          }
+        },
+        "before": {
+          "home": {
+            "x": 1376,
+            "y": 192
+          },
+          "to": {
+            "x": 1424,
+            "y": 192
+          },
+          "period": 3900,
+          "maxLineDeviationPx": 0,
+          "minEndpointDistancePx": 0
+        },
+        "after": {
+          "periodMs": 3900,
+          "maxSpeedPxS": 41.73913043478261,
+          "endpointDwellMs": 450
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 944,
+              "y": 176,
+              "width": 432,
+              "tile": 1
+            },
+            {
+              "x": 1472,
+              "y": 224,
+              "width": 192,
+              "tile": 1
+            },
+            {
+              "x": 1440,
+              "y": 256,
+              "width": 32,
+              "tile": 3
+            },
+            {
+              "x": 1376,
+              "y": 304,
+              "width": 96,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [
+            {
+              "x": 95,
+              "y": 14
+            }
+          ],
+          "pickups": [
+            {
+              "id": "3-2:s2",
+              "kind": "seal",
+              "x": 1216,
+              "y": 128
+            },
+            {
+              "id": "3-2:c13",
+              "kind": "coin",
+              "x": 1280,
+              "y": 144
+            },
+            {
+              "id": "3-2:c14",
+              "kind": "coin",
+              "x": 1312,
+              "y": 144
+            },
+            {
+              "id": "3-2:c15",
+              "kind": "coin",
+              "x": 1536,
+              "y": 192
+            },
+            {
+              "id": "3-2:c16",
+              "kind": "coin",
+              "x": 1568,
+              "y": 192
+            }
+          ],
+          "foes": [
+            {
+              "id": "e0",
+              "kind": "agitator",
+              "x": 1168,
+              "y": 176,
+              "range": 48
+            }
+          ],
+          "otherMechanisms": [
+            {
+              "id": "b2",
+              "kind": "belt",
+              "x": 992,
+              "y": 172.8
+            },
+            {
+              "id": "launch84",
+              "kind": "launcher",
+              "x": 1344,
+              "y": 160
+            },
+            {
+              "id": "s3",
+              "kind": "switch",
+              "x": 1600,
+              "y": 219.2
+            }
+          ],
+          "routeCues": [
+            {
+              "x": 1296,
+              "y": 176
+            },
+            {
+              "x": 1552,
+              "y": 224
+            }
+          ]
+        }
+      },
+      {
+        "key": "3-3:sl",
+        "stage": "3-3",
+        "name": "Tanques de Mistura",
+        "encounter": null,
+        "spec": {
+          "kind": "platform",
+          "id": "sl",
+          "x": 1600,
+          "y": 128,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 1672,
+              "y": 224,
+              "kind": "ground"
+            },
+            {
+              "x": 1824,
+              "y": 224,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 1792,
+            "y": 80
+          },
+          "period": 6000,
+          "motion": {
+            "kind": "shuttle",
+            "maxSpeed": 90,
+            "rampMs": 350,
+            "dwellMs": 450
+          }
+        },
+        "before": {
+          "home": {
+            "x": 1600,
+            "y": 128
+          },
+          "to": {
+            "x": 1792,
+            "y": 80
+          },
+          "period": 5000,
+          "maxLineDeviationPx": 18.146,
+          "minEndpointDistancePx": 28.254
+        },
+        "after": {
+          "periodMs": 6000,
+          "maxSpeedPxS": 89.95866819529441,
+          "endpointDwellMs": 450
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 1392,
+              "y": 80,
+              "width": 128,
+              "tile": 3
+            },
+            {
+              "x": 1856,
+              "y": 80,
+              "width": 256,
+              "tile": 3
+            },
+            {
+              "x": 1360,
+              "y": 144,
+              "width": 208,
+              "tile": 1
+            },
+            {
+              "x": 1584,
+              "y": 176,
+              "width": 64,
+              "tile": 3
+            },
+            {
+              "x": 1920,
+              "y": 176,
+              "width": 224,
+              "tile": 1
+            },
+            {
+              "x": 1664,
+              "y": 224,
+              "width": 256,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [
+            {
+              "x": 107,
+              "y": 14
+            }
+          ],
+          "pickups": [
+            {
+              "id": "3-3:s3",
+              "kind": "seal",
+              "x": 1984,
+              "y": 48
+            },
+            {
+              "id": "3-3:c10",
+              "kind": "coin",
+              "x": 1440,
+              "y": 112
+            },
+            {
+              "id": "3-3:c11",
+              "kind": "coin",
+              "x": 1472,
+              "y": 112
+            },
+            {
+              "id": "3-3:c12",
+              "kind": "coin",
+              "x": 1760,
+              "y": 192
+            },
+            {
+              "id": "3-3:c13",
+              "kind": "coin",
+              "x": 1792,
+              "y": 192
+            },
+            {
+              "id": "3-3:c14",
+              "kind": "coin",
+              "x": 2016,
+              "y": 144
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [
+            {
+              "id": "j4",
+              "kind": "jet",
+              "x": 1456,
+              "y": 96
+            }
+          ],
+          "routeCues": [
+            {
+              "x": 1456,
+              "y": 144
+            },
+            {
+              "x": 1776,
+              "y": 224
+            }
+          ]
+        }
+      },
+      {
+        "key": "3-5:access",
+        "stage": "3-5",
+        "name": "Controle de Qualidade",
+        "encounter": "C1",
+        "spec": {
+          "kind": "lift",
+          "id": "access",
+          "x": 224,
+          "y": 208,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 228,
+              "y": 224,
+              "kind": "ground"
+            },
+            {
+              "x": 282,
+              "y": 224,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 224,
+            "y": 160
+          },
+          "gated": true
+        },
+        "before": {
+          "home": {
+            "x": 224,
+            "y": 208
+          },
+          "to": {
+            "x": 224,
+            "y": 160
+          },
+          "period": null,
+          "maxLineDeviationPx": 0,
+          "minEndpointDistancePx": 0
+        },
+        "after": {
+          "periodMs": null,
+          "maxSpeedPxS": 55,
+          "endpointDwellMs": null
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 0,
+              "y": 224,
+              "width": 320,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [],
+          "pickups": [],
+          "foes": [],
+          "otherMechanisms": [
+            {
+              "id": "dais",
+              "kind": "platform",
+              "x": 256,
+              "y": 201
+            },
+            {
+              "id": "bossBelt",
+              "kind": "belt",
+              "x": 112,
+              "y": 220.8
+            },
+            {
+              "id": "a",
+              "kind": "switch",
+              "x": 64,
+              "y": 219.2
+            },
+            {
+              "id": "bossJet",
+              "kind": "jet",
+              "x": 160,
+              "y": 176
+            }
+          ]
+        }
+      },
+      {
+        "key": "4-1:cab1",
+        "stage": "4-1",
+        "name": "Estação de Subida",
+        "encounter": null,
+        "spec": {
+          "kind": "platform",
+          "id": "cab1",
+          "x": 272,
+          "y": 208,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 304,
+              "y": 336,
+              "kind": "ground"
+            },
+            {
+              "x": 544,
+              "y": 336,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 512,
+            "y": 160
+          },
+          "period": 7800,
+          "motion": {
+            "kind": "shuttle",
+            "maxSpeed": 80,
+            "rampMs": 350,
+            "dwellMs": 450
+          }
+        },
+        "before": {
+          "home": {
+            "x": 272,
+            "y": 208
+          },
+          "to": {
+            "x": 512,
+            "y": 160
+          },
+          "period": 5000,
+          "maxLineDeviationPx": 23.268,
+          "minEndpointDistancePx": 52.535
+        },
+        "after": {
+          "periodMs": 7800,
+          "maxSpeedPxS": 78.95256021046893,
+          "endpointDwellMs": 450
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 560,
+              "y": 176,
+              "width": 224,
+              "tile": 1
+            },
+            {
+              "x": 0,
+              "y": 224,
+              "width": 288,
+              "tile": 1
+            },
+            {
+              "x": 496,
+              "y": 272,
+              "width": 64,
+              "tile": 3
+            },
+            {
+              "x": 288,
+              "y": 336,
+              "width": 272,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [
+            {
+              "x": 37,
+              "y": 11
+            }
+          ],
+          "pickups": [
+            {
+              "id": "4-1:s1",
+              "kind": "seal",
+              "x": 656,
+              "y": 144
+            },
+            {
+              "id": "4-1:i3",
+              "kind": "helmet",
+              "x": 608,
+              "y": 160
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [],
+          "routeCues": [
+            {
+              "x": 656,
+              "y": 176
+            }
+          ]
+        }
+      },
+      {
+        "key": "4-1:cab2",
+        "stage": "4-1",
+        "name": "Estação de Subida",
+        "encounter": null,
+        "spec": {
+          "kind": "platform",
+          "id": "cab2",
+          "x": 1376,
+          "y": 192,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 1408,
+              "y": 336,
+              "kind": "ground"
+            },
+            {
+              "x": 1648,
+              "y": 336,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 1616,
+            "y": 144
+          },
+          "period": 7800,
+          "motion": {
+            "kind": "shuttle",
+            "maxSpeed": 80,
+            "rampMs": 350,
+            "dwellMs": 450
+          }
+        },
+        "before": {
+          "home": {
+            "x": 1376,
+            "y": 192
+          },
+          "to": {
+            "x": 1616,
+            "y": 144
+          },
+          "period": 5000,
+          "maxLineDeviationPx": 23.268,
+          "minEndpointDistancePx": 52.535
+        },
+        "after": {
+          "periodMs": 7800,
+          "maxSpeedPxS": 78.95256021046893,
+          "endpointDwellMs": 450
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 1664,
+              "y": 160,
+              "width": 208,
+              "tile": 1
+            },
+            {
+              "x": 1168,
+              "y": 208,
+              "width": 208,
+              "tile": 1
+            },
+            {
+              "x": 1600,
+              "y": 272,
+              "width": 64,
+              "tile": 3
+            },
+            {
+              "x": 1376,
+              "y": 336,
+              "width": 288,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [
+            {
+              "x": 106,
+              "y": 10
+            }
+          ],
+          "pickups": [
+            {
+              "id": "4-1:s2",
+              "kind": "seal",
+              "x": 1488,
+              "y": 304
+            },
+            {
+              "id": "4-1:c6",
+              "kind": "coin",
+              "x": 1248,
+              "y": 176
+            },
+            {
+              "id": "4-1:c7",
+              "kind": "coin",
+              "x": 1280,
+              "y": 176
+            },
+            {
+              "id": "4-1:c8",
+              "kind": "coin",
+              "x": 1744,
+              "y": 128
+            },
+            {
+              "id": "4-1:c9",
+              "kind": "coin",
+              "x": 1776,
+              "y": 128
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [],
+          "routeCues": [
+            {
+              "x": 1264,
+              "y": 208
+            },
+            {
+              "x": 1760,
+              "y": 160
+            }
+          ]
+        }
+      },
+      {
+        "key": "4-2:l1",
+        "stage": "4-2",
+        "name": "Contrapeso nas Nuvens",
+        "encounter": null,
+        "spec": {
+          "kind": "lift",
+          "id": "l1",
+          "x": 368,
+          "y": 208,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 372,
+              "y": 224,
+              "kind": "ground"
+            },
+            {
+              "x": 426,
+              "y": 336,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 368,
+            "y": 96
+          },
+          "period": 4000
+        },
+        "before": {
+          "home": {
+            "x": 368,
+            "y": 208
+          },
+          "to": {
+            "x": 368,
+            "y": 96
+          },
+          "period": null,
+          "maxLineDeviationPx": 0,
+          "minEndpointDistancePx": 0
+        },
+        "after": {
+          "periodMs": null,
+          "maxSpeedPxS": 55,
+          "endpointDwellMs": null
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 448,
+              "y": 112,
+              "width": 96,
+              "tile": 3
+            },
+            {
+              "x": 544,
+              "y": 112,
+              "width": 256,
+              "tile": 1
+            },
+            {
+              "x": 0,
+              "y": 224,
+              "width": 384,
+              "tile": 1
+            },
+            {
+              "x": 432,
+              "y": 272,
+              "width": 64,
+              "tile": 3
+            },
+            {
+              "x": 384,
+              "y": 336,
+              "width": 160,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [],
+          "pickups": [
+            {
+              "id": "4-2:c4",
+              "kind": "coin",
+              "x": 384,
+              "y": 64
+            },
+            {
+              "id": "4-2:c5",
+              "kind": "coin",
+              "x": 416,
+              "y": 64
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [
+            {
+              "id": "s1",
+              "kind": "switch",
+              "x": 304,
+              "y": 219.2
+            }
+          ],
+          "routeCues": [
+            {
+              "x": 320,
+              "y": 224,
+              "switch": "s1"
+            },
+            {
+              "x": 400,
+              "y": 96
+            }
+          ]
+        }
+      },
+      {
+        "key": "4-2:l2",
+        "stage": "4-2",
+        "name": "Contrapeso nas Nuvens",
+        "encounter": null,
+        "spec": {
+          "kind": "lift",
+          "id": "l2",
+          "x": 1136,
+          "y": 176,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 1140,
+              "y": 192,
+              "kind": "ground"
+            },
+            {
+              "x": 1194,
+              "y": 336,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 1136,
+            "y": 64
+          },
+          "period": 4000
+        },
+        "before": {
+          "home": {
+            "x": 1136,
+            "y": 176
+          },
+          "to": {
+            "x": 1136,
+            "y": 64
+          },
+          "period": null,
+          "maxLineDeviationPx": 0,
+          "minEndpointDistancePx": 0
+        },
+        "after": {
+          "periodMs": null,
+          "maxSpeedPxS": 55,
+          "endpointDwellMs": null
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 1232,
+              "y": 80,
+              "width": 96,
+              "tile": 3
+            },
+            {
+              "x": 1328,
+              "y": 80,
+              "width": 272,
+              "tile": 1
+            },
+            {
+              "x": 896,
+              "y": 192,
+              "width": 256,
+              "tile": 1
+            },
+            {
+              "x": 1216,
+              "y": 256,
+              "width": 64,
+              "tile": 3
+            },
+            {
+              "x": 1152,
+              "y": 336,
+              "width": 176,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [],
+          "pickups": [
+            {
+              "id": "4-2:c7",
+              "kind": "coin",
+              "x": 976,
+              "y": 160
+            },
+            {
+              "id": "4-2:c8",
+              "kind": "coin",
+              "x": 1008,
+              "y": 160
+            },
+            {
+              "id": "4-2:c9",
+              "kind": "coin",
+              "x": 1152,
+              "y": 32
+            },
+            {
+              "id": "4-2:c10",
+              "kind": "coin",
+              "x": 1184,
+              "y": 32
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [
+            {
+              "id": "s2",
+              "kind": "switch",
+              "x": 1056,
+              "y": 187.2
+            }
+          ],
+          "routeCues": [
+            {
+              "x": 992,
+              "y": 192
+            },
+            {
+              "x": 1072,
+              "y": 192,
+              "switch": "s2"
+            },
+            {
+              "x": 1168,
+              "y": 64
+            }
+          ]
+        }
+      },
+      {
+        "key": "4-2:l3",
+        "stage": "4-2",
+        "name": "Contrapeso nas Nuvens",
+        "encounter": null,
+        "spec": {
+          "kind": "lift",
+          "id": "l3",
+          "x": 1952,
+          "y": 176,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 1956,
+              "y": 192,
+              "kind": "ground"
+            },
+            {
+              "x": 2010,
+              "y": 336,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 1952,
+            "y": 96
+          },
+          "period": 4000
+        },
+        "before": {
+          "home": {
+            "x": 1952,
+            "y": 176
+          },
+          "to": {
+            "x": 1952,
+            "y": 96
+          },
+          "period": null,
+          "maxLineDeviationPx": 0,
+          "minEndpointDistancePx": 0
+        },
+        "after": {
+          "periodMs": null,
+          "maxSpeedPxS": 55,
+          "endpointDwellMs": null
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 2048,
+              "y": 112,
+              "width": 80,
+              "tile": 3
+            },
+            {
+              "x": 2128,
+              "y": 112,
+              "width": 192,
+              "tile": 1
+            },
+            {
+              "x": 1680,
+              "y": 192,
+              "width": 288,
+              "tile": 1
+            },
+            {
+              "x": 2032,
+              "y": 256,
+              "width": 64,
+              "tile": 3
+            },
+            {
+              "x": 1968,
+              "y": 336,
+              "width": 160,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [],
+          "pickups": [
+            {
+              "id": "4-2:c14",
+              "kind": "coin",
+              "x": 1808,
+              "y": 160
+            },
+            {
+              "id": "4-2:c15",
+              "kind": "coin",
+              "x": 1968,
+              "y": 64
+            },
+            {
+              "id": "4-2:c16",
+              "kind": "coin",
+              "x": 2000,
+              "y": 64
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [
+            {
+              "id": "s3",
+              "kind": "switch",
+              "x": 1872,
+              "y": 187.2
+            }
+          ],
+          "routeCues": [
+            {
+              "x": 1792,
+              "y": 192
+            },
+            {
+              "x": 1888,
+              "y": 192,
+              "switch": "s3"
+            },
+            {
+              "x": 1984,
+              "y": 96
+            }
+          ]
+        }
+      },
+      {
+        "key": "4-3:cab1",
+        "stage": "4-3",
+        "name": "Cabos Cruzados",
+        "encounter": null,
+        "spec": {
+          "kind": "platform",
+          "id": "cab1",
+          "x": 272,
+          "y": 208,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 304,
+              "y": 336,
+              "kind": "ground"
+            },
+            {
+              "x": 560,
+              "y": 336,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 528,
+            "y": 144
+          },
+          "period": 8200,
+          "motion": {
+            "kind": "shuttle",
+            "maxSpeed": 80,
+            "rampMs": 350,
+            "dwellMs": 450
+          }
+        },
+        "before": {
+          "home": {
+            "x": 272,
+            "y": 208
+          },
+          "to": {
+            "x": 528,
+            "y": 144
+          },
+          "period": 5000,
+          "maxLineDeviationPx": 32.405,
+          "minEndpointDistancePx": 61.243
+        },
+        "after": {
+          "periodMs": 8200,
+          "maxSpeedPxS": 79.96326061803947,
+          "endpointDwellMs": 450
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 576,
+              "y": 160,
+              "width": 192,
+              "tile": 1
+            },
+            {
+              "x": 0,
+              "y": 224,
+              "width": 272,
+              "tile": 1
+            },
+            {
+              "x": 512,
+              "y": 272,
+              "width": 64,
+              "tile": 3
+            },
+            {
+              "x": 272,
+              "y": 336,
+              "width": 304,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [
+            {
+              "x": 38,
+              "y": 10
+            }
+          ],
+          "pickups": [
+            {
+              "id": "4-3:s1",
+              "kind": "seal",
+              "x": 656,
+              "y": 112
+            },
+            {
+              "id": "4-3:c4",
+              "kind": "coin",
+              "x": 688,
+              "y": 128
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [],
+          "routeCues": [
+            {
+              "x": 672,
+              "y": 160
+            }
+          ]
+        }
+      },
+      {
+        "key": "4-3:cab2",
+        "stage": "4-3",
+        "name": "Cabos Cruzados",
+        "encounter": null,
+        "spec": {
+          "kind": "platform",
+          "id": "cab2",
+          "x": 1424,
+          "y": 192,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 1456,
+              "y": 336,
+              "kind": "ground"
+            },
+            {
+              "x": 1744,
+              "y": 336,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 1712,
+            "y": 128
+          },
+          "period": 9000,
+          "motion": {
+            "kind": "shuttle",
+            "maxSpeed": 80,
+            "rampMs": 350,
+            "dwellMs": 450
+          }
+        },
+        "before": {
+          "home": {
+            "x": 1424,
+            "y": 192
+          },
+          "to": {
+            "x": 1712,
+            "y": 128
+          },
+          "period": 5000,
+          "maxLineDeviationPx": 35.556,
+          "minEndpointDistancePx": 79.171
+        },
+        "after": {
+          "periodMs": 9000,
+          "maxSpeedPxS": 79.73660071172229,
+          "endpointDwellMs": 450
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 1760,
+              "y": 144,
+              "width": 224,
+              "tile": 1
+            },
+            {
+              "x": 1216,
+              "y": 208,
+              "width": 208,
+              "tile": 1
+            },
+            {
+              "x": 1696,
+              "y": 272,
+              "width": 64,
+              "tile": 3
+            },
+            {
+              "x": 1424,
+              "y": 336,
+              "width": 336,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [
+            {
+              "x": 79,
+              "y": 13
+            }
+          ],
+          "pickups": [
+            {
+              "id": "4-3:s2",
+              "kind": "seal",
+              "x": 1584,
+              "y": 304
+            },
+            {
+              "id": "4-3:i3",
+              "kind": "helmet",
+              "x": 1280,
+              "y": 192
+            },
+            {
+              "id": "4-3:c7",
+              "kind": "coin",
+              "x": 1328,
+              "y": 176
+            },
+            {
+              "id": "4-3:c8",
+              "kind": "coin",
+              "x": 1856,
+              "y": 112
+            },
+            {
+              "id": "4-3:c9",
+              "kind": "coin",
+              "x": 1888,
+              "y": 112
+            }
+          ],
+          "foes": [
+            {
+              "id": "e1",
+              "kind": "rail",
+              "x": 1872,
+              "y": 128,
+              "range": 28
+            }
+          ],
+          "otherMechanisms": [],
+          "routeCues": [
+            {
+              "x": 1312,
+              "y": 208
+            },
+            {
+              "x": 1872,
+              "y": 144
+            }
+          ]
+        }
+      },
+      {
+        "key": "4-3:sl",
+        "stage": "4-3",
+        "name": "Cabos Cruzados",
+        "encounter": null,
+        "spec": {
+          "kind": "platform",
+          "id": "sl",
+          "x": 1968,
+          "y": 128,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 1976,
+              "y": 144,
+              "kind": "ground"
+            },
+            {
+              "x": 2280,
+              "y": 224,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 2160,
+            "y": 80
+          },
+          "period": 6600,
+          "motion": {
+            "kind": "shuttle",
+            "maxSpeed": 80,
+            "rampMs": 350,
+            "dwellMs": 450
+          }
+        },
+        "before": {
+          "home": {
+            "x": 1968,
+            "y": 128
+          },
+          "to": {
+            "x": 2160,
+            "y": 80
+          },
+          "period": 5000,
+          "maxLineDeviationPx": 18.146,
+          "minEndpointDistancePx": 28.254
+        },
+        "after": {
+          "periodMs": 6600,
+          "maxSpeedPxS": 79.16362801185909,
+          "endpointDwellMs": 450
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 2144,
+              "y": 80,
+              "width": 160,
+              "tile": 3
+            },
+            {
+              "x": 1760,
+              "y": 144,
+              "width": 224,
+              "tile": 1
+            },
+            {
+              "x": 2032,
+              "y": 176,
+              "width": 80,
+              "tile": 3
+            },
+            {
+              "x": 2176,
+              "y": 192,
+              "width": 80,
+              "tile": 3
+            },
+            {
+              "x": 2272,
+              "y": 224,
+              "width": 288,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [],
+          "pickups": [
+            {
+              "id": "4-3:s3",
+              "kind": "seal",
+              "x": 2208,
+              "y": 48
+            },
+            {
+              "id": "4-3:c8",
+              "kind": "coin",
+              "x": 1856,
+              "y": 112
+            },
+            {
+              "id": "4-3:c9",
+              "kind": "coin",
+              "x": 1888,
+              "y": 112
+            },
+            {
+              "id": "4-3:c10",
+              "kind": "coin",
+              "x": 2080,
+              "y": 144
+            },
+            {
+              "id": "4-3:c11",
+              "kind": "coin",
+              "x": 2112,
+              "y": 144
+            },
+            {
+              "id": "4-3:c12",
+              "kind": "coin",
+              "x": 2336,
+              "y": 192
+            },
+            {
+              "id": "4-3:c13",
+              "kind": "coin",
+              "x": 2368,
+              "y": 192
+            }
+          ],
+          "foes": [
+            {
+              "id": "e1",
+              "kind": "rail",
+              "x": 1872,
+              "y": 128,
+              "range": 28
+            }
+          ],
+          "otherMechanisms": [],
+          "routeCues": [
+            {
+              "x": 1872,
+              "y": 144
+            },
+            {
+              "x": 2096,
+              "y": 176
+            },
+            {
+              "x": 2352,
+              "y": 224
+            }
+          ]
+        }
+      },
+      {
+        "key": "4-4:p1",
+        "stage": "4-4",
+        "name": "Travessia do Alto",
+        "encounter": null,
+        "spec": {
+          "kind": "platform",
+          "id": "p1",
+          "x": 256,
+          "y": 208,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 288,
+              "y": 336,
+              "kind": "ground"
+            },
+            {
+              "x": 544,
+              "y": 336,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 512,
+            "y": 144
+          },
+          "period": 8200,
+          "motion": {
+            "kind": "shuttle",
+            "maxSpeed": 80,
+            "rampMs": 350,
+            "dwellMs": 450
+          }
+        },
+        "before": {
+          "home": {
+            "x": 256,
+            "y": 208
+          },
+          "to": {
+            "x": 512,
+            "y": 144
+          },
+          "period": 5000,
+          "maxLineDeviationPx": 32.405,
+          "minEndpointDistancePx": 61.243
+        },
+        "after": {
+          "periodMs": 8200,
+          "maxSpeedPxS": 79.96326061803947,
+          "endpointDwellMs": 450
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 560,
+              "y": 160,
+              "width": 208,
+              "tile": 1
+            },
+            {
+              "x": 0,
+              "y": 224,
+              "width": 256,
+              "tile": 1
+            },
+            {
+              "x": 496,
+              "y": 272,
+              "width": 64,
+              "tile": 3
+            },
+            {
+              "x": 256,
+              "y": 336,
+              "width": 304,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [
+            {
+              "x": 38,
+              "y": 10
+            }
+          ],
+          "pickups": [
+            {
+              "id": "4-4:s1",
+              "kind": "seal",
+              "x": 656,
+              "y": 112
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [],
+          "routeCues": [
+            {
+              "x": 656,
+              "y": 160
+            }
+          ]
+        }
+      },
+      {
+        "key": "4-4:p2",
+        "stage": "4-4",
+        "name": "Travessia do Alto",
+        "encounter": null,
+        "spec": {
+          "kind": "platform",
+          "id": "p2",
+          "x": 1440,
+          "y": 192,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 1472,
+              "y": 336,
+              "kind": "ground"
+            },
+            {
+              "x": 1744,
+              "y": 336,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 1712,
+            "y": 128
+          },
+          "period": 8600,
+          "motion": {
+            "kind": "shuttle",
+            "maxSpeed": 80,
+            "rampMs": 350,
+            "dwellMs": 450
+          }
+        },
+        "before": {
+          "home": {
+            "x": 1440,
+            "y": 192
+          },
+          "to": {
+            "x": 1712,
+            "y": 128
+          },
+          "period": 5000,
+          "maxLineDeviationPx": 34.059,
+          "minEndpointDistancePx": 69.891
+        },
+        "after": {
+          "periodMs": 8600,
+          "maxSpeedPxS": 79.83656775576219,
+          "endpointDwellMs": 450
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 1760,
+              "y": 144,
+              "width": 224,
+              "tile": 1
+            },
+            {
+              "x": 1200,
+              "y": 208,
+              "width": 240,
+              "tile": 1
+            },
+            {
+              "x": 1696,
+              "y": 272,
+              "width": 64,
+              "tile": 3
+            },
+            {
+              "x": 1440,
+              "y": 336,
+              "width": 320,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [],
+          "pickups": [
+            {
+              "id": "4-4:s2",
+              "kind": "seal",
+              "x": 1600,
+              "y": 304
+            },
+            {
+              "id": "4-4:c6",
+              "kind": "coin",
+              "x": 1296,
+              "y": 176
+            },
+            {
+              "id": "4-4:c7",
+              "kind": "coin",
+              "x": 1328,
+              "y": 176
+            },
+            {
+              "id": "4-4:c8",
+              "kind": "coin",
+              "x": 1856,
+              "y": 112
+            },
+            {
+              "id": "4-4:c9",
+              "kind": "coin",
+              "x": 1888,
+              "y": 112
+            }
+          ],
+          "foes": [
+            {
+              "id": "e1",
+              "kind": "rail",
+              "x": 1872,
+              "y": 128,
+              "range": 30
+            }
+          ],
+          "otherMechanisms": [],
+          "routeCues": [
+            {
+              "x": 1312,
+              "y": 208
+            },
+            {
+              "x": 1872,
+              "y": 144
+            }
+          ]
+        }
+      },
+      {
+        "key": "4-5:left",
+        "stage": "4-5",
+        "name": "Revanche nas Alturas",
+        "encounter": "B2",
+        "spec": {
+          "kind": "lift",
+          "id": "left",
+          "x": 80,
+          "y": 208,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 84,
+              "y": 224,
+              "kind": "ground"
+            },
+            {
+              "x": 138,
+              "y": 224,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 80,
+            "y": 160
+          },
+          "period": 4000
+        },
+        "before": {
+          "home": {
+            "x": 80,
+            "y": 208
+          },
+          "to": {
+            "x": 80,
+            "y": 160
+          },
+          "period": null,
+          "maxLineDeviationPx": 0,
+          "minEndpointDistancePx": 0
+        },
+        "after": {
+          "periodMs": null,
+          "maxSpeedPxS": 55,
+          "endpointDwellMs": null
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 0,
+              "y": 224,
+              "width": 320,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [
+            {
+              "x": 2,
+              "y": 14
+            }
+          ],
+          "pickups": [
+            {
+              "id": "4-5:i0",
+              "kind": "helmet",
+              "x": 48,
+              "y": 208
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [
+            {
+              "id": "dais",
+              "kind": "platform",
+              "x": 204,
+              "y": 171
+            },
+            {
+              "id": "right",
+              "kind": "lift",
+              "x": 240,
+              "y": 208
+            },
+            {
+              "id": "a",
+              "kind": "switch",
+              "x": 48,
+              "y": 219.2
+            },
+            {
+              "id": "b",
+              "kind": "switch",
+              "x": 288,
+              "y": 219.2
+            },
+            {
+              "id": "transfer",
+              "kind": "platform",
+              "x": 112,
+              "y": 144
+            }
+          ]
+        }
+      },
+      {
+        "key": "4-5:right",
+        "stage": "4-5",
+        "name": "Revanche nas Alturas",
+        "encounter": "B2",
+        "spec": {
+          "kind": "lift",
+          "id": "right",
+          "x": 240,
+          "y": 208,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 244,
+              "y": 224,
+              "kind": "ground"
+            },
+            {
+              "x": 298,
+              "y": 224,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 240,
+            "y": 160
+          },
+          "period": 4000
+        },
+        "before": {
+          "home": {
+            "x": 240,
+            "y": 208
+          },
+          "to": {
+            "x": 240,
+            "y": 160
+          },
+          "period": null,
+          "maxLineDeviationPx": 0,
+          "minEndpointDistancePx": 0
+        },
+        "after": {
+          "periodMs": null,
+          "maxSpeedPxS": 55,
+          "endpointDwellMs": null
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 0,
+              "y": 224,
+              "width": 320,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [],
+          "pickups": [],
+          "foes": [],
+          "otherMechanisms": [
+            {
+              "id": "dais",
+              "kind": "platform",
+              "x": 204,
+              "y": 171
+            },
+            {
+              "id": "left",
+              "kind": "lift",
+              "x": 80,
+              "y": 208
+            },
+            {
+              "id": "b",
+              "kind": "switch",
+              "x": 288,
+              "y": 219.2
+            },
+            {
+              "id": "transfer",
+              "kind": "platform",
+              "x": 112,
+              "y": 144
+            }
+          ]
+        }
+      },
+      {
+        "key": "4-5:transfer",
+        "stage": "4-5",
+        "name": "Revanche nas Alturas",
+        "encounter": "B2",
+        "spec": {
+          "kind": "platform",
+          "id": "transfer",
+          "x": 112,
+          "y": 144,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 144,
+              "y": 224,
+              "kind": "ground"
+            },
+            {
+              "x": 272,
+              "y": 224,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 240,
+            "y": 144
+          },
+          "period": 4800,
+          "motion": {
+            "kind": "shuttle",
+            "maxSpeed": 80,
+            "rampMs": 350,
+            "dwellMs": 450
+          }
+        },
+        "before": {
+          "home": {
+            "x": 112,
+            "y": 144
+          },
+          "to": {
+            "x": 240,
+            "y": 144
+          },
+          "period": 4200,
+          "maxLineDeviationPx": 0,
+          "minEndpointDistancePx": 6.881
+        },
+        "after": {
+          "periodMs": 4800,
+          "maxSpeedPxS": 80,
+          "endpointDwellMs": 450
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 0,
+              "y": 224,
+              "width": 320,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [
+            {
+              "x": 2,
+              "y": 14
+            }
+          ],
+          "pickups": [
+            {
+              "id": "4-5:i0",
+              "kind": "helmet",
+              "x": 48,
+              "y": 208
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [
+            {
+              "id": "dais",
+              "kind": "platform",
+              "x": 204,
+              "y": 171
+            },
+            {
+              "id": "left",
+              "kind": "lift",
+              "x": 80,
+              "y": 208
+            },
+            {
+              "id": "right",
+              "kind": "lift",
+              "x": 240,
+              "y": 208
+            },
+            {
+              "id": "a",
+              "kind": "switch",
+              "x": 48,
+              "y": 219.2
+            },
+            {
+              "id": "b",
+              "kind": "switch",
+              "x": 288,
+              "y": 219.2
+            }
+          ]
+        }
+      },
+      {
+        "key": "5-5:access",
+        "stage": "5-5",
+        "name": "Calabrezzo: Reserva Especial",
+        "encounter": "C2",
+        "spec": {
+          "kind": "lift",
+          "id": "access",
+          "x": 224,
+          "y": 208,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 228,
+              "y": 224,
+              "kind": "ground"
+            },
+            {
+              "x": 282,
+              "y": 224,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 224,
+            "y": 160
+          },
+          "gated": true
+        },
+        "before": {
+          "home": {
+            "x": 224,
+            "y": 208
+          },
+          "to": {
+            "x": 224,
+            "y": 160
+          },
+          "period": null,
+          "maxLineDeviationPx": 0,
+          "minEndpointDistancePx": 0
+        },
+        "after": {
+          "periodMs": null,
+          "maxSpeedPxS": 55,
+          "endpointDwellMs": null
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 0,
+              "y": 224,
+              "width": 128,
+              "tile": 1
+            },
+            {
+              "x": 128,
+              "y": 224,
+              "width": 80,
+              "tile": 15
+            },
+            {
+              "x": 208,
+              "y": 224,
+              "width": 112,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [],
+          "pickups": [],
+          "foes": [],
+          "otherMechanisms": [
+            {
+              "id": "dais",
+              "kind": "platform",
+              "x": 256,
+              "y": 201
+            },
+            {
+              "id": "bossBelt",
+              "kind": "belt",
+              "x": 112,
+              "y": 220.8
+            },
+            {
+              "id": "a",
+              "kind": "switch",
+              "x": 64,
+              "y": 219.2
+            },
+            {
+              "id": "bossJet",
+              "kind": "jet",
+              "x": 160,
+              "y": 176
+            },
+            {
+              "id": "b",
+              "kind": "switch",
+              "x": 288,
+              "y": 219.2
+            },
+            {
+              "id": "iceLeft",
+              "kind": "target",
+              "x": 128,
+              "y": 176
+            },
+            {
+              "id": "iceRight",
+              "kind": "target",
+              "x": 288,
+              "y": 176
+            }
+          ]
+        }
+      },
+      {
+        "key": "6-1:sup1",
+        "stage": "6-1",
+        "name": "Jardins Pizzarino",
+        "encounter": null,
+        "spec": {
+          "kind": "support",
+          "id": "sup1",
+          "x": 1424,
+          "y": 144,
+          "width": 96,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 1416,
+              "y": 200,
+              "kind": "wall"
+            },
+            {
+              "x": 1528,
+              "y": 200,
+              "kind": "wall"
+            }
+          ],
+          "to": {
+            "x": 1424,
+            "y": 192
+          }
+        },
+        "before": {
+          "home": {
+            "x": 1424,
+            "y": 144
+          },
+          "to": {
+            "x": 1424,
+            "y": 192
+          },
+          "period": null,
+          "maxLineDeviationPx": 0,
+          "minEndpointDistancePx": 0
+        },
+        "after": {
+          "periodMs": null,
+          "maxSpeedPxS": 55,
+          "endpointDwellMs": null
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 1520,
+              "y": 144,
+              "width": 240,
+              "tile": 1
+            },
+            {
+              "x": 1200,
+              "y": 176,
+              "width": 224,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [],
+          "pickups": [
+            {
+              "id": "6-1:s2",
+              "kind": "seal",
+              "x": 1312,
+              "y": 128
+            },
+            {
+              "id": "6-1:s3",
+              "kind": "seal",
+              "x": 1648,
+              "y": 96
+            },
+            {
+              "id": "6-1:c7",
+              "kind": "coin",
+              "x": 1280,
+              "y": 144
+            },
+            {
+              "id": "6-1:c8",
+              "kind": "coin",
+              "x": 1616,
+              "y": 112
+            }
+          ],
+          "foes": [
+            {
+              "id": "e2",
+              "kind": "minion",
+              "x": 1648,
+              "y": 144,
+              "range": 40
+            }
+          ],
+          "otherMechanisms": [
+            {
+              "id": "s1",
+              "kind": "switch",
+              "x": 1344,
+              "y": 171.2
+            }
+          ],
+          "routeCues": [
+            {
+              "x": 1296,
+              "y": 176
+            },
+            {
+              "x": 1632,
+              "y": 144
+            }
+          ]
+        }
+      },
+      {
+        "key": "6-3:l1",
+        "stage": "6-3",
+        "name": "Passagem dos Fundos",
+        "encounter": null,
+        "spec": {
+          "kind": "lift",
+          "id": "l1",
+          "x": 352,
+          "y": 208,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 356,
+              "y": 224,
+              "kind": "ground"
+            },
+            {
+              "x": 410,
+              "y": 320,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 352,
+            "y": 96
+          },
+          "period": 4000
+        },
+        "before": {
+          "home": {
+            "x": 352,
+            "y": 208
+          },
+          "to": {
+            "x": 352,
+            "y": 96
+          },
+          "period": null,
+          "maxLineDeviationPx": 0,
+          "minEndpointDistancePx": 0
+        },
+        "after": {
+          "periodMs": null,
+          "maxSpeedPxS": 55,
+          "endpointDwellMs": null
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 448,
+              "y": 112,
+              "width": 96,
+              "tile": 3
+            },
+            {
+              "x": 544,
+              "y": 112,
+              "width": 288,
+              "tile": 1
+            },
+            {
+              "x": 0,
+              "y": 224,
+              "width": 368,
+              "tile": 1
+            },
+            {
+              "x": 432,
+              "y": 272,
+              "width": 64,
+              "tile": 3
+            },
+            {
+              "x": 368,
+              "y": 320,
+              "width": 176,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [],
+          "pickups": [
+            {
+              "id": "6-3:c4",
+              "kind": "coin",
+              "x": 368,
+              "y": 64
+            },
+            {
+              "id": "6-3:c5",
+              "kind": "coin",
+              "x": 400,
+              "y": 64
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [
+            {
+              "id": "s1",
+              "kind": "switch",
+              "x": 288,
+              "y": 219.2
+            }
+          ],
+          "routeCues": [
+            {
+              "x": 304,
+              "y": 224,
+              "switch": "s1"
+            },
+            {
+              "x": 384,
+              "y": 96
+            }
+          ]
+        }
+      },
+      {
+        "key": "6-3:sl",
+        "stage": "6-3",
+        "name": "Passagem dos Fundos",
+        "encounter": null,
+        "spec": {
+          "kind": "lift",
+          "id": "sl",
+          "x": 1792,
+          "y": 208,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 1796,
+              "y": 224,
+              "kind": "ground"
+            },
+            {
+              "x": 1850,
+              "y": 320,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 1792,
+            "y": 112
+          },
+          "period": 4000
+        },
+        "before": {
+          "home": {
+            "x": 1792,
+            "y": 208
+          },
+          "to": {
+            "x": 1792,
+            "y": 112
+          },
+          "period": null,
+          "maxLineDeviationPx": 0,
+          "minEndpointDistancePx": 0
+        },
+        "after": {
+          "periodMs": null,
+          "maxSpeedPxS": 55,
+          "endpointDwellMs": null
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 1888,
+              "y": 128,
+              "width": 80,
+              "tile": 3
+            },
+            {
+              "x": 1968,
+              "y": 128,
+              "width": 288,
+              "tile": 1
+            },
+            {
+              "x": 1568,
+              "y": 224,
+              "width": 240,
+              "tile": 1
+            },
+            {
+              "x": 1872,
+              "y": 272,
+              "width": 64,
+              "tile": 3
+            },
+            {
+              "x": 1808,
+              "y": 320,
+              "width": 160,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [],
+          "pickups": [
+            {
+              "id": "6-3:c10",
+              "kind": "coin",
+              "x": 1664,
+              "y": 192
+            },
+            {
+              "id": "6-3:c11",
+              "kind": "coin",
+              "x": 1696,
+              "y": 192
+            },
+            {
+              "id": "6-3:c12",
+              "kind": "coin",
+              "x": 1808,
+              "y": 80
+            },
+            {
+              "id": "6-3:c13",
+              "kind": "coin",
+              "x": 1840,
+              "y": 80
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [
+            {
+              "id": "ss",
+              "kind": "switch",
+              "x": 1728,
+              "y": 219.2
+            }
+          ],
+          "routeCues": [
+            {
+              "x": 1680,
+              "y": 224
+            },
+            {
+              "x": 1744,
+              "y": 224,
+              "switch": "ss"
+            },
+            {
+              "x": 1824,
+              "y": 112
+            }
+          ]
+        }
+      },
+      {
+        "key": "6-4:p1",
+        "stage": "6-4",
+        "name": "A Última Travessia",
+        "encounter": null,
+        "spec": {
+          "kind": "platform",
+          "id": "p1",
+          "x": 272,
+          "y": 208,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 304,
+              "y": 336,
+              "kind": "ground"
+            },
+            {
+              "x": 544,
+              "y": 336,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 512,
+            "y": 144
+          },
+          "period": 7200,
+          "motion": {
+            "kind": "shuttle",
+            "maxSpeed": 90,
+            "rampMs": 350,
+            "dwellMs": 450
+          }
+        },
+        "before": {
+          "home": {
+            "x": 272,
+            "y": 208
+          },
+          "to": {
+            "x": 512,
+            "y": 144
+          },
+          "period": 5000,
+          "maxLineDeviationPx": 30.571,
+          "minEndpointDistancePx": 53.315
+        },
+        "after": {
+          "periodMs": 7200,
+          "maxSpeedPxS": 88.70956969291443,
+          "endpointDwellMs": 450
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 560,
+              "y": 160,
+              "width": 224,
+              "tile": 1
+            },
+            {
+              "x": 0,
+              "y": 224,
+              "width": 272,
+              "tile": 1
+            },
+            {
+              "x": 496,
+              "y": 272,
+              "width": 64,
+              "tile": 3
+            },
+            {
+              "x": 272,
+              "y": 336,
+              "width": 288,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [
+            {
+              "x": 38,
+              "y": 10
+            }
+          ],
+          "pickups": [
+            {
+              "id": "6-4:s1",
+              "kind": "seal",
+              "x": 672,
+              "y": 112
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [],
+          "routeCues": [
+            {
+              "x": 672,
+              "y": 160
+            }
+          ]
+        }
+      },
+      {
+        "key": "6-5:left",
+        "stage": "6-5",
+        "name": "O Grande Gap",
+        "encounter": "J2",
+        "spec": {
+          "kind": "support",
+          "id": "left",
+          "x": 80,
+          "y": 160,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 84,
+              "y": 224,
+              "kind": "ground"
+            },
+            {
+              "x": 138,
+              "y": 224,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 80,
+            "y": 208
+          }
+        },
+        "before": {
+          "home": {
+            "x": 80,
+            "y": 160
+          },
+          "to": {
+            "x": 80,
+            "y": 208
+          },
+          "period": null,
+          "maxLineDeviationPx": 0,
+          "minEndpointDistancePx": 0
+        },
+        "after": {
+          "periodMs": null,
+          "maxSpeedPxS": 55,
+          "endpointDwellMs": null
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 0,
+              "y": 224,
+              "width": 320,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [
+            {
+              "x": 2,
+              "y": 14
+            }
+          ],
+          "pickups": [
+            {
+              "id": "6-5:i0",
+              "kind": "helmet",
+              "x": 48,
+              "y": 208
+            }
+          ],
+          "foes": [],
+          "otherMechanisms": [
+            {
+              "id": "dais",
+              "kind": "platform",
+              "x": 264,
+              "y": 189
+            },
+            {
+              "id": "right",
+              "kind": "support",
+              "x": 224,
+              "y": 160
+            }
+          ]
+        }
+      },
+      {
+        "key": "6-5:right",
+        "stage": "6-5",
+        "name": "O Grande Gap",
+        "encounter": "J2",
+        "spec": {
+          "kind": "support",
+          "id": "right",
+          "x": 224,
+          "y": 160,
+          "width": 64,
+          "height": 8,
+          "mounts": [
+            {
+              "x": 228,
+              "y": 224,
+              "kind": "ground"
+            },
+            {
+              "x": 282,
+              "y": 224,
+              "kind": "ground"
+            }
+          ],
+          "to": {
+            "x": 224,
+            "y": 208
+          }
+        },
+        "before": {
+          "home": {
+            "x": 224,
+            "y": 160
+          },
+          "to": {
+            "x": 224,
+            "y": 208
+          },
+          "period": null,
+          "maxLineDeviationPx": 0,
+          "minEndpointDistancePx": 0
+        },
+        "after": {
+          "periodMs": null,
+          "maxSpeedPxS": 55,
+          "endpointDwellMs": null
+        },
+        "nearby": {
+          "surfaces": [
+            {
+              "x": 0,
+              "y": 224,
+              "width": 320,
+              "tile": 1
+            }
+          ],
+          "checkpoints": [],
+          "pickups": [],
+          "foes": [],
+          "otherMechanisms": [
+            {
+              "id": "dais",
+              "kind": "platform",
+              "x": 264,
+              "y": 189
+            },
+            {
+              "id": "left",
+              "kind": "support",
+              "x": 80,
+              "y": 160
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "delicia": {
+    "scope": "All DELICIA_STAGES and both shrines; separate engine, no World motion conclusions apply",
+    "counts": {
+      "stages": 14,
+      "moving": 28,
+      "lifts": 9,
+      "crumble": 11,
+      "belts": 16
+    },
+    "player": {
+      "width": 34,
+      "height": 54,
+      "gravityPxS2": 1750,
+      "jumpPxS": -610,
+      "walkPxS": 290,
+      "airVelocityApproachRate": 10,
+      "dashPxS": 720,
+      "dashSeconds": 0.18
+    },
+    "reach": [
+      {
+        "startingSpeed": 0,
+        "releaseFrame": 1,
+        "maxRise": 31.368,
+        "flightMs": 366.667,
+        "sameLevelHorizontal": 82.604
+      },
+      {
+        "startingSpeed": 0,
+        "releaseFrame": 4,
+        "maxRise": 51.194,
+        "flightMs": 450,
+        "sameLevelHorizontal": 106.509
+      },
+      {
+        "startingSpeed": 0,
+        "releaseFrame": 999,
+        "maxRise": 101.25,
+        "flightMs": 683.333,
+        "sameLevelHorizontal": 174.014
+      },
+      {
+        "startingSpeed": 290,
+        "releaseFrame": 1,
+        "maxRise": 31.368,
+        "flightMs": 366.667,
+        "sameLevelHorizontal": 106.333
+      },
+      {
+        "startingSpeed": 290,
+        "releaseFrame": 4,
+        "maxRise": 51.194,
+        "flightMs": 450,
+        "sameLevelHorizontal": 130.5
+      },
+      {
+        "startingSpeed": 290,
+        "releaseFrame": 999,
+        "maxRise": 101.25,
+        "flightMs": 683.333,
+        "sameLevelHorizontal": 198.167
+      }
+    ],
+    "mechanisms": [
+      {
+        "key": "delicia-1:floor-9",
+        "stage": "delicia-1",
+        "name": "Cais do Primeiro Gole",
+        "number": 1,
+        "optional": false,
+        "biome": "harbor",
+        "index": 9,
+        "spec": {
+          "x": 3166,
+          "y": 467,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 30,
+          "speed": 1.6,
+          "phase": 2
+        },
+        "route": {
+          "min": {
+            "x": 3166,
+            "y": 467
+          },
+          "max": {
+            "x": 3196,
+            "y": 467
+          },
+          "initial": {
+            "x": 3194.639461402385,
+            "y": 467,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 30,
+            "speed": 1.6,
+            "phase": 2
+          },
+          "length": 30,
+          "periodMs": 3926.991,
+          "maxSpeedPxS": 24,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 2640,
+            "y": 450,
+            "w": 520,
+            "h": 450,
+            "material": "wood",
+            "index": 7
+          },
+          {
+            "x": 2895,
+            "y": 355,
+            "w": 145,
+            "h": 20,
+            "material": "wood",
+            "index": 8
+          },
+          {
+            "x": 3166,
+            "y": 467,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 30,
+            "speed": 1.6,
+            "phase": 2,
+            "index": 9
+          },
+          {
+            "x": 3260,
+            "y": 420,
+            "w": 310,
+            "h": 480,
+            "material": "wood",
+            "index": 10
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-1:floor-11",
+        "stage": "delicia-1",
+        "name": "Cais do Primeiro Gole",
+        "number": 1,
+        "optional": false,
+        "biome": "harbor",
+        "index": 11,
+        "spec": {
+          "x": 3576,
+          "y": 437,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 30,
+          "speed": 1.6,
+          "phase": 2.7
+        },
+        "route": {
+          "min": {
+            "x": 3576,
+            "y": 437
+          },
+          "max": {
+            "x": 3606,
+            "y": 437
+          },
+          "initial": {
+            "x": 3597.4106982035073,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 30,
+            "speed": 1.6,
+            "phase": 2.7
+          },
+          "length": 30,
+          "periodMs": 3926.991,
+          "maxSpeedPxS": 24,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 3260,
+            "y": 420,
+            "w": 310,
+            "h": 480,
+            "material": "wood",
+            "index": 10
+          },
+          {
+            "x": 3576,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 30,
+            "speed": 1.6,
+            "phase": 2.7,
+            "index": 11
+          },
+          {
+            "x": 3670,
+            "y": 450,
+            "w": 350,
+            "h": 450,
+            "material": "wood",
+            "index": 12
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-1:floor-13",
+        "stage": "delicia-1",
+        "name": "Cais do Primeiro Gole",
+        "number": 1,
+        "optional": false,
+        "biome": "harbor",
+        "index": 13,
+        "spec": {
+          "x": 4026,
+          "y": 467,
+          "w": 49,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 4,
+          "speed": 1.6,
+          "phase": 3.4
+        },
+        "route": {
+          "min": {
+            "x": 4026,
+            "y": 467
+          },
+          "max": {
+            "x": 4030,
+            "y": 467
+          },
+          "initial": {
+            "x": 4027.4889177959462,
+            "y": 467,
+            "w": 49,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 4,
+            "speed": 1.6,
+            "phase": 3.4
+          },
+          "length": 4,
+          "periodMs": 3926.991,
+          "maxSpeedPxS": 3.2,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 3670,
+            "y": 450,
+            "w": 350,
+            "h": 450,
+            "material": "wood",
+            "index": 12
+          },
+          {
+            "x": 4026,
+            "y": 467,
+            "w": 49,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 4,
+            "speed": 1.6,
+            "phase": 3.4,
+            "index": 13
+          },
+          {
+            "x": 4085,
+            "y": 430,
+            "w": 520,
+            "h": 470,
+            "material": "wood",
+            "index": 14
+          }
+        ],
+        "nearbyValves": [
+          {
+            "id": "v11",
+            "x": 4190,
+            "y": 430,
+            "label": "FONTE DO CAIS"
+          }
+        ],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-4:floor-1",
+        "stage": "delicia-4",
+        "name": "Cascatas de Âmbar",
+        "number": 4,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 1,
+        "spec": {
+          "x": 446,
+          "y": 467,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 25,
+          "speed": 1.2,
+          "phase": 0
+        },
+        "route": {
+          "min": {
+            "x": 446,
+            "y": 467
+          },
+          "max": {
+            "x": 471,
+            "y": 467
+          },
+          "initial": {
+            "x": 458.5,
+            "y": 467,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 25,
+            "speed": 1.2,
+            "phase": 0
+          },
+          "length": 25,
+          "periodMs": 5235.988,
+          "maxSpeedPxS": 15,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 0,
+            "y": 450,
+            "w": 440,
+            "h": 450,
+            "material": "stone",
+            "index": 0
+          },
+          {
+            "x": 446,
+            "y": 467,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 25,
+            "speed": 1.2,
+            "phase": 0,
+            "index": 1
+          },
+          {
+            "x": 535,
+            "y": 420,
+            "w": 300,
+            "h": 480,
+            "material": "stone",
+            "index": 2
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-4:floor-3",
+        "stage": "delicia-4",
+        "name": "Cascatas de Âmbar",
+        "number": 4,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 3,
+        "spec": {
+          "x": 841,
+          "y": 437,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 30,
+          "speed": 1.2,
+          "phase": 0.7
+        },
+        "route": {
+          "min": {
+            "x": 841,
+            "y": 437
+          },
+          "max": {
+            "x": 871,
+            "y": 437
+          },
+          "initial": {
+            "x": 865.6632653085653,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 30,
+            "speed": 1.2,
+            "phase": 0.7
+          },
+          "length": 30,
+          "periodMs": 5235.988,
+          "maxSpeedPxS": 18,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 535,
+            "y": 420,
+            "w": 300,
+            "h": 480,
+            "material": "stone",
+            "index": 2
+          },
+          {
+            "x": 841,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 30,
+            "speed": 1.2,
+            "phase": 0.7,
+            "index": 3
+          },
+          {
+            "x": 935,
+            "y": 450,
+            "w": 300,
+            "h": 450,
+            "material": "stone",
+            "index": 4
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-4:floor-5",
+        "stage": "delicia-4",
+        "name": "Cascatas de Âmbar",
+        "number": 4,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 5,
+        "spec": {
+          "x": 1241,
+          "y": 467,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 40,
+          "speed": 1.2,
+          "phase": 1.4
+        },
+        "route": {
+          "min": {
+            "x": 1241,
+            "y": 467
+          },
+          "max": {
+            "x": 1281,
+            "y": 467
+          },
+          "initial": {
+            "x": 1280.7089945997693,
+            "y": 467,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 40,
+            "speed": 1.2,
+            "phase": 1.4
+          },
+          "length": 40,
+          "periodMs": 5235.988,
+          "maxSpeedPxS": 24,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 935,
+            "y": 450,
+            "w": 300,
+            "h": 450,
+            "material": "stone",
+            "index": 4
+          },
+          {
+            "x": 1241,
+            "y": 467,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 40,
+            "speed": 1.2,
+            "phase": 1.4,
+            "index": 5
+          },
+          {
+            "x": 1345,
+            "y": 420,
+            "w": 520,
+            "h": 480,
+            "material": "stone",
+            "index": 6
+          },
+          {
+            "x": 1515,
+            "y": 408,
+            "w": 64,
+            "h": 12,
+            "material": "stone",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 0.9,
+            "index": 8
+          }
+        ],
+        "nearbyValves": [
+          {
+            "id": "v5",
+            "x": 1450,
+            "y": 420,
+            "label": "FONTE DO BAIRRO"
+          }
+        ],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-4:floor-8",
+        "stage": "delicia-4",
+        "name": "Cascatas de Âmbar",
+        "number": 4,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 8,
+        "spec": {
+          "x": 1515,
+          "y": 408,
+          "w": 64,
+          "h": 12,
+          "material": "stone",
+          "kind": "lift",
+          "travel": 88,
+          "speed": 1.1,
+          "phase": 0.9
+        },
+        "route": {
+          "min": {
+            "x": 1515,
+            "y": 320
+          },
+          "max": {
+            "x": 1515,
+            "y": 408
+          },
+          "initial": {
+            "x": 1515,
+            "y": 329.5336159763907,
+            "w": 64,
+            "h": 12,
+            "material": "stone",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 0.9
+          },
+          "length": 88,
+          "periodMs": 5711.987,
+          "maxSpeedPxS": 48.4,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 1345,
+            "y": 420,
+            "w": 520,
+            "h": 480,
+            "material": "stone",
+            "index": 6
+          },
+          {
+            "x": 1600,
+            "y": 325,
+            "w": 145,
+            "h": 20,
+            "material": "stone",
+            "index": 7
+          },
+          {
+            "x": 1515,
+            "y": 408,
+            "w": 64,
+            "h": 12,
+            "material": "stone",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 0.9,
+            "index": 8
+          }
+        ],
+        "nearbyValves": [
+          {
+            "id": "v5",
+            "x": 1450,
+            "y": 420,
+            "label": "FONTE DO BAIRRO"
+          }
+        ],
+        "supports": "Two rails with feet on containing full ground; top travel+24px above lower floor; deck ropes follow movingFloor."
+      },
+      {
+        "key": "delicia-4:floor-9",
+        "stage": "delicia-4",
+        "name": "Cascatas de Âmbar",
+        "number": 4,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 9,
+        "spec": {
+          "x": 1871,
+          "y": 437,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 35,
+          "speed": 1.2,
+          "phase": 1
+        },
+        "route": {
+          "min": {
+            "x": 1871,
+            "y": 437
+          },
+          "max": {
+            "x": 1906,
+            "y": 437
+          },
+          "initial": {
+            "x": 1903.2257422341381,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 35,
+            "speed": 1.2,
+            "phase": 1
+          },
+          "length": 35,
+          "periodMs": 5235.988,
+          "maxSpeedPxS": 21,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 1345,
+            "y": 420,
+            "w": 520,
+            "h": 480,
+            "material": "stone",
+            "index": 6
+          },
+          {
+            "x": 1600,
+            "y": 325,
+            "w": 145,
+            "h": 20,
+            "material": "stone",
+            "index": 7
+          },
+          {
+            "x": 1871,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 35,
+            "speed": 1.2,
+            "phase": 1,
+            "index": 9
+          },
+          {
+            "x": 1970,
+            "y": 390,
+            "w": 280,
+            "h": 510,
+            "material": "stone",
+            "index": 10
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-4:floor-11",
+        "stage": "delicia-4",
+        "name": "Cascatas de Âmbar",
+        "number": 4,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 11,
+        "spec": {
+          "x": 2256,
+          "y": 407,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 45,
+          "speed": 1.2,
+          "phase": 1.7
+        },
+        "route": {
+          "min": {
+            "x": 2256,
+            "y": 407
+          },
+          "max": {
+            "x": 2301,
+            "y": 407
+          },
+          "initial": {
+            "x": 2300.8124582351807,
+            "y": 407,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 45,
+            "speed": 1.2,
+            "phase": 1.7
+          },
+          "length": 45,
+          "periodMs": 5235.988,
+          "maxSpeedPxS": 27,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 1970,
+            "y": 390,
+            "w": 280,
+            "h": 510,
+            "material": "stone",
+            "index": 10
+          },
+          {
+            "x": 2256,
+            "y": 407,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 45,
+            "speed": 1.2,
+            "phase": 1.7,
+            "index": 11
+          },
+          {
+            "x": 2365,
+            "y": 450,
+            "w": 370,
+            "h": 450,
+            "material": "stone",
+            "index": 12
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-4:floor-13",
+        "stage": "delicia-4",
+        "name": "Cascatas de Âmbar",
+        "number": 4,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 13,
+        "spec": {
+          "x": 2741,
+          "y": 467,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 25,
+          "speed": 1.2,
+          "phase": 2.4
+        },
+        "route": {
+          "min": {
+            "x": 2741,
+            "y": 467
+          },
+          "max": {
+            "x": 2766,
+            "y": 467
+          },
+          "initial": {
+            "x": 2761.9432897568895,
+            "y": 467,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 25,
+            "speed": 1.2,
+            "phase": 2.4
+          },
+          "length": 25,
+          "periodMs": 5235.988,
+          "maxSpeedPxS": 15,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 2365,
+            "y": 450,
+            "w": 370,
+            "h": 450,
+            "material": "stone",
+            "index": 12
+          },
+          {
+            "x": 2741,
+            "y": 467,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 25,
+            "speed": 1.2,
+            "phase": 2.4,
+            "index": 13
+          },
+          {
+            "x": 2830,
+            "y": 420,
+            "w": 520,
+            "h": 480,
+            "material": "stone",
+            "index": 14
+          },
+          {
+            "x": 3000,
+            "y": 408,
+            "w": 64,
+            "h": 12,
+            "material": "stone",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 1.8,
+            "index": 16
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-4:floor-16",
+        "stage": "delicia-4",
+        "name": "Cascatas de Âmbar",
+        "number": 4,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 16,
+        "spec": {
+          "x": 3000,
+          "y": 408,
+          "w": 64,
+          "h": 12,
+          "material": "stone",
+          "kind": "lift",
+          "travel": 88,
+          "speed": 1.1,
+          "phase": 1.8
+        },
+        "route": {
+          "min": {
+            "x": 3000,
+            "y": 320
+          },
+          "max": {
+            "x": 3000,
+            "y": 408
+          },
+          "initial": {
+            "x": 3000,
+            "y": 321.15070424135945,
+            "w": 64,
+            "h": 12,
+            "material": "stone",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 1.8
+          },
+          "length": 88,
+          "periodMs": 5711.987,
+          "maxSpeedPxS": 48.4,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 2830,
+            "y": 420,
+            "w": 520,
+            "h": 480,
+            "material": "stone",
+            "index": 14
+          },
+          {
+            "x": 3085,
+            "y": 325,
+            "w": 145,
+            "h": 20,
+            "material": "stone",
+            "index": 15
+          },
+          {
+            "x": 3000,
+            "y": 408,
+            "w": 64,
+            "h": 12,
+            "material": "stone",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 1.8,
+            "index": 16
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two rails with feet on containing full ground; top travel+24px above lower floor; deck ropes follow movingFloor."
+      },
+      {
+        "key": "delicia-4:floor-17",
+        "stage": "delicia-4",
+        "name": "Cascatas de Âmbar",
+        "number": 4,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 17,
+        "spec": {
+          "x": 3356,
+          "y": 437,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 40,
+          "speed": 1.2,
+          "phase": 2
+        },
+        "route": {
+          "min": {
+            "x": 3356,
+            "y": 437
+          },
+          "max": {
+            "x": 3396,
+            "y": 437
+          },
+          "initial": {
+            "x": 3394.1859485365135,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 40,
+            "speed": 1.2,
+            "phase": 2
+          },
+          "length": 40,
+          "periodMs": 5235.988,
+          "maxSpeedPxS": 24,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 2830,
+            "y": 420,
+            "w": 520,
+            "h": 480,
+            "material": "stone",
+            "index": 14
+          },
+          {
+            "x": 3085,
+            "y": 325,
+            "w": 145,
+            "h": 20,
+            "material": "stone",
+            "index": 15
+          },
+          {
+            "x": 3356,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 40,
+            "speed": 1.2,
+            "phase": 2,
+            "index": 17
+          },
+          {
+            "x": 3460,
+            "y": 390,
+            "w": 260,
+            "h": 510,
+            "material": "stone",
+            "index": 18
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-4:floor-19",
+        "stage": "delicia-4",
+        "name": "Cascatas de Âmbar",
+        "number": 4,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 19,
+        "spec": {
+          "x": 3726,
+          "y": 407,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 50,
+          "speed": 1.2,
+          "phase": 2.7
+        },
+        "route": {
+          "min": {
+            "x": 3726,
+            "y": 407
+          },
+          "max": {
+            "x": 3776,
+            "y": 407
+          },
+          "initial": {
+            "x": 3761.6844970058455,
+            "y": 407,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 50,
+            "speed": 1.2,
+            "phase": 2.7
+          },
+          "length": 50,
+          "periodMs": 5235.988,
+          "maxSpeedPxS": 30,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 3460,
+            "y": 390,
+            "w": 260,
+            "h": 510,
+            "material": "stone",
+            "index": 18
+          },
+          {
+            "x": 3726,
+            "y": 407,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 50,
+            "speed": 1.2,
+            "phase": 2.7,
+            "index": 19
+          },
+          {
+            "x": 3840,
+            "y": 420,
+            "w": 360,
+            "h": 480,
+            "material": "stone",
+            "index": 20
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-4:floor-21",
+        "stage": "delicia-4",
+        "name": "Cascatas de Âmbar",
+        "number": 4,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 21,
+        "spec": {
+          "x": 4206,
+          "y": 437,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 30,
+          "speed": 1.2,
+          "phase": 3.4
+        },
+        "route": {
+          "min": {
+            "x": 4206,
+            "y": 437
+          },
+          "max": {
+            "x": 4236,
+            "y": 437
+          },
+          "initial": {
+            "x": 4217.166883469597,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 30,
+            "speed": 1.2,
+            "phase": 3.4
+          },
+          "length": 30,
+          "periodMs": 5235.988,
+          "maxSpeedPxS": 18,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 3840,
+            "y": 420,
+            "w": 360,
+            "h": 480,
+            "material": "stone",
+            "index": 20
+          },
+          {
+            "x": 4206,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 30,
+            "speed": 1.2,
+            "phase": 3.4,
+            "index": 21
+          },
+          {
+            "x": 4300,
+            "y": 450,
+            "w": 520,
+            "h": 450,
+            "material": "stone",
+            "index": 22
+          },
+          {
+            "x": 4470,
+            "y": 438,
+            "w": 64,
+            "h": 12,
+            "material": "stone",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 2.7,
+            "index": 24
+          }
+        ],
+        "nearbyValves": [
+          {
+            "id": "v11",
+            "x": 4405,
+            "y": 450,
+            "label": "FONTE DO CAIS"
+          }
+        ],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-4:floor-24",
+        "stage": "delicia-4",
+        "name": "Cascatas de Âmbar",
+        "number": 4,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 24,
+        "spec": {
+          "x": 4470,
+          "y": 438,
+          "w": 64,
+          "h": 12,
+          "material": "stone",
+          "kind": "lift",
+          "travel": 88,
+          "speed": 1.1,
+          "phase": 2.7
+        },
+        "route": {
+          "min": {
+            "x": 4470,
+            "y": 350
+          },
+          "max": {
+            "x": 4470,
+            "y": 438
+          },
+          "initial": {
+            "x": 4470,
+            "y": 375.19528526971146,
+            "w": 64,
+            "h": 12,
+            "material": "stone",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 2.7
+          },
+          "length": 88,
+          "periodMs": 5711.987,
+          "maxSpeedPxS": 48.4,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 4300,
+            "y": 450,
+            "w": 520,
+            "h": 450,
+            "material": "stone",
+            "index": 22
+          },
+          {
+            "x": 4555,
+            "y": 355,
+            "w": 145,
+            "h": 20,
+            "material": "stone",
+            "index": 23
+          },
+          {
+            "x": 4470,
+            "y": 438,
+            "w": 64,
+            "h": 12,
+            "material": "stone",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 2.7,
+            "index": 24
+          }
+        ],
+        "nearbyValves": [
+          {
+            "id": "v11",
+            "x": 4405,
+            "y": 450,
+            "label": "FONTE DO CAIS"
+          }
+        ],
+        "supports": "Two rails with feet on containing full ground; top travel+24px above lower floor; deck ropes follow movingFloor."
+      },
+      {
+        "key": "delicia-4:floor-25",
+        "stage": "delicia-4",
+        "name": "Cascatas de Âmbar",
+        "number": 4,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 25,
+        "spec": {
+          "x": 4826,
+          "y": 467,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 30,
+          "speed": 1.2,
+          "phase": 3
+        },
+        "route": {
+          "min": {
+            "x": 4826,
+            "y": 467
+          },
+          "max": {
+            "x": 4856,
+            "y": 467
+          },
+          "initial": {
+            "x": 4843.116800120898,
+            "y": 467,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 30,
+            "speed": 1.2,
+            "phase": 3
+          },
+          "length": 30,
+          "periodMs": 5235.988,
+          "maxSpeedPxS": 18,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 4300,
+            "y": 450,
+            "w": 520,
+            "h": 450,
+            "material": "stone",
+            "index": 22
+          },
+          {
+            "x": 4555,
+            "y": 355,
+            "w": 145,
+            "h": 20,
+            "material": "stone",
+            "index": 23
+          },
+          {
+            "x": 4826,
+            "y": 467,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 30,
+            "speed": 1.2,
+            "phase": 3,
+            "index": 25
+          },
+          {
+            "x": 4920,
+            "y": 420,
+            "w": 310,
+            "h": 480,
+            "material": "stone",
+            "index": 26
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-4:floor-27",
+        "stage": "delicia-4",
+        "name": "Cascatas de Âmbar",
+        "number": 4,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 27,
+        "spec": {
+          "x": 5236,
+          "y": 437,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 25,
+          "speed": 1.2,
+          "phase": 3.7
+        },
+        "route": {
+          "min": {
+            "x": 5236,
+            "y": 437
+          },
+          "max": {
+            "x": 5261,
+            "y": 437
+          },
+          "initial": {
+            "x": 5241.8770482386435,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 25,
+            "speed": 1.2,
+            "phase": 3.7
+          },
+          "length": 25,
+          "periodMs": 5235.988,
+          "maxSpeedPxS": 15,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 4920,
+            "y": 420,
+            "w": 310,
+            "h": 480,
+            "material": "stone",
+            "index": 26
+          },
+          {
+            "x": 5236,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 25,
+            "speed": 1.2,
+            "phase": 3.7,
+            "index": 27
+          },
+          {
+            "x": 5325,
+            "y": 450,
+            "w": 500,
+            "h": 450,
+            "material": "stone",
+            "index": 28
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-7:floor-1",
+        "stage": "delicia-7",
+        "name": "Maré de Laranja",
+        "number": 7,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 1,
+        "spec": {
+          "x": 446,
+          "y": 467,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 40,
+          "speed": 1.2,
+          "phase": 0
+        },
+        "route": {
+          "min": {
+            "x": 446,
+            "y": 467
+          },
+          "max": {
+            "x": 486,
+            "y": 467
+          },
+          "initial": {
+            "x": 466,
+            "y": 467,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 40,
+            "speed": 1.2,
+            "phase": 0
+          },
+          "length": 40,
+          "periodMs": 5235.988,
+          "maxSpeedPxS": 24,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 0,
+            "y": 450,
+            "w": 440,
+            "h": 450,
+            "material": "stone",
+            "index": 0
+          },
+          {
+            "x": 446,
+            "y": 467,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 40,
+            "speed": 1.2,
+            "phase": 0,
+            "index": 1
+          },
+          {
+            "x": 550,
+            "y": 450,
+            "w": 280,
+            "h": 450,
+            "material": "stone",
+            "index": 2
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-7:floor-3",
+        "stage": "delicia-7",
+        "name": "Maré de Laranja",
+        "number": 7,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 3,
+        "spec": {
+          "x": 836,
+          "y": 467,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 45,
+          "speed": 1.2,
+          "phase": 0.7
+        },
+        "route": {
+          "min": {
+            "x": 836,
+            "y": 467
+          },
+          "max": {
+            "x": 881,
+            "y": 467
+          },
+          "initial": {
+            "x": 872.9948979628481,
+            "y": 467,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 45,
+            "speed": 1.2,
+            "phase": 0.7
+          },
+          "length": 45,
+          "periodMs": 5235.988,
+          "maxSpeedPxS": 27,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 550,
+            "y": 450,
+            "w": 280,
+            "h": 450,
+            "material": "stone",
+            "index": 2
+          },
+          {
+            "x": 836,
+            "y": 467,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 45,
+            "speed": 1.2,
+            "phase": 0.7,
+            "index": 3
+          },
+          {
+            "x": 945,
+            "y": 420,
+            "w": 330,
+            "h": 480,
+            "material": "stone",
+            "index": 4
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-7:floor-5",
+        "stage": "delicia-7",
+        "name": "Maré de Laranja",
+        "number": 7,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 5,
+        "spec": {
+          "x": 1281,
+          "y": 437,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 35,
+          "speed": 1.2,
+          "phase": 1.4
+        },
+        "route": {
+          "min": {
+            "x": 1281,
+            "y": 437
+          },
+          "max": {
+            "x": 1316,
+            "y": 437
+          },
+          "initial": {
+            "x": 1315.745370274798,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 35,
+            "speed": 1.2,
+            "phase": 1.4
+          },
+          "length": 35,
+          "periodMs": 5235.988,
+          "maxSpeedPxS": 21,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 945,
+            "y": 420,
+            "w": 330,
+            "h": 480,
+            "material": "stone",
+            "index": 4
+          },
+          {
+            "x": 1281,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 35,
+            "speed": 1.2,
+            "phase": 1.4,
+            "index": 5
+          },
+          {
+            "x": 1380,
+            "y": 450,
+            "w": 520,
+            "h": 450,
+            "material": "stone",
+            "index": 6
+          },
+          {
+            "x": 1550,
+            "y": 438,
+            "w": 64,
+            "h": 12,
+            "material": "stone",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 0.9,
+            "index": 8
+          }
+        ],
+        "nearbyValves": [
+          {
+            "id": "v5",
+            "x": 1485,
+            "y": 450,
+            "label": "FONTE DO BAIRRO"
+          }
+        ],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-7:floor-8",
+        "stage": "delicia-7",
+        "name": "Maré de Laranja",
+        "number": 7,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 8,
+        "spec": {
+          "x": 1550,
+          "y": 438,
+          "w": 64,
+          "h": 12,
+          "material": "stone",
+          "kind": "lift",
+          "travel": 88,
+          "speed": 1.1,
+          "phase": 0.9
+        },
+        "route": {
+          "min": {
+            "x": 1550,
+            "y": 350
+          },
+          "max": {
+            "x": 1550,
+            "y": 438
+          },
+          "initial": {
+            "x": 1550,
+            "y": 359.5336159763907,
+            "w": 64,
+            "h": 12,
+            "material": "stone",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 0.9
+          },
+          "length": 88,
+          "periodMs": 5711.987,
+          "maxSpeedPxS": 48.4,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 1380,
+            "y": 450,
+            "w": 520,
+            "h": 450,
+            "material": "stone",
+            "index": 6
+          },
+          {
+            "x": 1635,
+            "y": 355,
+            "w": 145,
+            "h": 20,
+            "material": "stone",
+            "index": 7
+          },
+          {
+            "x": 1550,
+            "y": 438,
+            "w": 64,
+            "h": 12,
+            "material": "stone",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 0.9,
+            "index": 8
+          }
+        ],
+        "nearbyValves": [
+          {
+            "id": "v5",
+            "x": 1485,
+            "y": 450,
+            "label": "FONTE DO BAIRRO"
+          }
+        ],
+        "supports": "Two rails with feet on containing full ground; top travel+24px above lower floor; deck ropes follow movingFloor."
+      },
+      {
+        "key": "delicia-7:floor-9",
+        "stage": "delicia-7",
+        "name": "Maré de Laranja",
+        "number": 7,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 9,
+        "spec": {
+          "x": 1906,
+          "y": 467,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 45,
+          "speed": 1.2,
+          "phase": 1
+        },
+        "route": {
+          "min": {
+            "x": 1906,
+            "y": 467
+          },
+          "max": {
+            "x": 1951,
+            "y": 467
+          },
+          "initial": {
+            "x": 1947.4330971581776,
+            "y": 467,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 45,
+            "speed": 1.2,
+            "phase": 1
+          },
+          "length": 45,
+          "periodMs": 5235.988,
+          "maxSpeedPxS": 27,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 1380,
+            "y": 450,
+            "w": 520,
+            "h": 450,
+            "material": "stone",
+            "index": 6
+          },
+          {
+            "x": 1635,
+            "y": 355,
+            "w": 145,
+            "h": 20,
+            "material": "stone",
+            "index": 7
+          },
+          {
+            "x": 1906,
+            "y": 467,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 45,
+            "speed": 1.2,
+            "phase": 1,
+            "index": 9
+          },
+          {
+            "x": 2015,
+            "y": 420,
+            "w": 290,
+            "h": 480,
+            "material": "stone",
+            "index": 10
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-7:floor-11",
+        "stage": "delicia-7",
+        "name": "Maré de Laranja",
+        "number": 7,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 11,
+        "spec": {
+          "x": 2311,
+          "y": 437,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 50,
+          "speed": 1.2,
+          "phase": 1.7
+        },
+        "route": {
+          "min": {
+            "x": 2311,
+            "y": 437
+          },
+          "max": {
+            "x": 2361,
+            "y": 437
+          },
+          "initial": {
+            "x": 2360.791620261312,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 50,
+            "speed": 1.2,
+            "phase": 1.7
+          },
+          "length": 50,
+          "periodMs": 5235.988,
+          "maxSpeedPxS": 30,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 2015,
+            "y": 420,
+            "w": 290,
+            "h": 480,
+            "material": "stone",
+            "index": 10
+          },
+          {
+            "x": 2311,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 50,
+            "speed": 1.2,
+            "phase": 1.7,
+            "index": 11
+          },
+          {
+            "x": 2425,
+            "y": 450,
+            "w": 370,
+            "h": 450,
+            "material": "stone",
+            "index": 12
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-7:floor-13",
+        "stage": "delicia-7",
+        "name": "Maré de Laranja",
+        "number": 7,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 13,
+        "spec": {
+          "x": 2801,
+          "y": 467,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 40,
+          "speed": 1.2,
+          "phase": 2.4
+        },
+        "route": {
+          "min": {
+            "x": 2801,
+            "y": 467
+          },
+          "max": {
+            "x": 2841,
+            "y": 467
+          },
+          "initial": {
+            "x": 2834.509263611023,
+            "y": 467,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 40,
+            "speed": 1.2,
+            "phase": 2.4
+          },
+          "length": 40,
+          "periodMs": 5235.988,
+          "maxSpeedPxS": 24,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 2425,
+            "y": 450,
+            "w": 370,
+            "h": 450,
+            "material": "stone",
+            "index": 12
+          },
+          {
+            "x": 2801,
+            "y": 467,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 40,
+            "speed": 1.2,
+            "phase": 2.4,
+            "index": 13
+          },
+          {
+            "x": 2905,
+            "y": 420,
+            "w": 520,
+            "h": 480,
+            "material": "stone",
+            "index": 14
+          },
+          {
+            "x": 3075,
+            "y": 408,
+            "w": 64,
+            "h": 12,
+            "material": "stone",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 1.8,
+            "index": 16
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-7:floor-16",
+        "stage": "delicia-7",
+        "name": "Maré de Laranja",
+        "number": 7,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 16,
+        "spec": {
+          "x": 3075,
+          "y": 408,
+          "w": 64,
+          "h": 12,
+          "material": "stone",
+          "kind": "lift",
+          "travel": 88,
+          "speed": 1.1,
+          "phase": 1.8
+        },
+        "route": {
+          "min": {
+            "x": 3075,
+            "y": 320
+          },
+          "max": {
+            "x": 3075,
+            "y": 408
+          },
+          "initial": {
+            "x": 3075,
+            "y": 321.15070424135945,
+            "w": 64,
+            "h": 12,
+            "material": "stone",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 1.8
+          },
+          "length": 88,
+          "periodMs": 5711.987,
+          "maxSpeedPxS": 48.4,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 2905,
+            "y": 420,
+            "w": 520,
+            "h": 480,
+            "material": "stone",
+            "index": 14
+          },
+          {
+            "x": 3160,
+            "y": 325,
+            "w": 145,
+            "h": 20,
+            "material": "stone",
+            "index": 15
+          },
+          {
+            "x": 3075,
+            "y": 408,
+            "w": 64,
+            "h": 12,
+            "material": "stone",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 1.8,
+            "index": 16
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two rails with feet on containing full ground; top travel+24px above lower floor; deck ropes follow movingFloor."
+      },
+      {
+        "key": "delicia-7:floor-17",
+        "stage": "delicia-7",
+        "name": "Maré de Laranja",
+        "number": 7,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 17,
+        "spec": {
+          "x": 3431,
+          "y": 437,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 45,
+          "speed": 1.2,
+          "phase": 2
+        },
+        "route": {
+          "min": {
+            "x": 3431,
+            "y": 437
+          },
+          "max": {
+            "x": 3476,
+            "y": 437
+          },
+          "initial": {
+            "x": 3473.959192103578,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 45,
+            "speed": 1.2,
+            "phase": 2
+          },
+          "length": 45,
+          "periodMs": 5235.988,
+          "maxSpeedPxS": 27,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 2905,
+            "y": 420,
+            "w": 520,
+            "h": 480,
+            "material": "stone",
+            "index": 14
+          },
+          {
+            "x": 3160,
+            "y": 325,
+            "w": 145,
+            "h": 20,
+            "material": "stone",
+            "index": 15
+          },
+          {
+            "x": 3431,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 45,
+            "speed": 1.2,
+            "phase": 2,
+            "index": 17
+          },
+          {
+            "x": 3540,
+            "y": 390,
+            "w": 270,
+            "h": 510,
+            "material": "stone",
+            "index": 18
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-7:floor-19",
+        "stage": "delicia-7",
+        "name": "Maré de Laranja",
+        "number": 7,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 19,
+        "spec": {
+          "x": 3816,
+          "y": 407,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 55,
+          "speed": 1.2,
+          "phase": 2.7
+        },
+        "route": {
+          "min": {
+            "x": 3816,
+            "y": 407
+          },
+          "max": {
+            "x": 3871,
+            "y": 407
+          },
+          "initial": {
+            "x": 3855.2529467064305,
+            "y": 407,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 55,
+            "speed": 1.2,
+            "phase": 2.7
+          },
+          "length": 55,
+          "periodMs": 5235.988,
+          "maxSpeedPxS": 33,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 3540,
+            "y": 390,
+            "w": 270,
+            "h": 510,
+            "material": "stone",
+            "index": 18
+          },
+          {
+            "x": 3816,
+            "y": 407,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 55,
+            "speed": 1.2,
+            "phase": 2.7,
+            "index": 19
+          },
+          {
+            "x": 3935,
+            "y": 420,
+            "w": 350,
+            "h": 480,
+            "material": "stone",
+            "index": 20
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-7:floor-21",
+        "stage": "delicia-7",
+        "name": "Maré de Laranja",
+        "number": 7,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 21,
+        "spec": {
+          "x": 4291,
+          "y": 437,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 40,
+          "speed": 1.2,
+          "phase": 3.4
+        },
+        "route": {
+          "min": {
+            "x": 4291,
+            "y": 437
+          },
+          "max": {
+            "x": 4331,
+            "y": 437
+          },
+          "initial": {
+            "x": 4305.889177959463,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 40,
+            "speed": 1.2,
+            "phase": 3.4
+          },
+          "length": 40,
+          "periodMs": 5235.988,
+          "maxSpeedPxS": 24,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 3935,
+            "y": 420,
+            "w": 350,
+            "h": 480,
+            "material": "stone",
+            "index": 20
+          },
+          {
+            "x": 4291,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 40,
+            "speed": 1.2,
+            "phase": 3.4,
+            "index": 21
+          },
+          {
+            "x": 4395,
+            "y": 450,
+            "w": 520,
+            "h": 450,
+            "material": "stone",
+            "index": 22
+          },
+          {
+            "x": 4565,
+            "y": 438,
+            "w": 64,
+            "h": 12,
+            "material": "stone",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 2.7,
+            "index": 24
+          }
+        ],
+        "nearbyValves": [
+          {
+            "id": "v11",
+            "x": 4500,
+            "y": 450,
+            "label": "FONTE DO CAIS"
+          }
+        ],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-7:floor-24",
+        "stage": "delicia-7",
+        "name": "Maré de Laranja",
+        "number": 7,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 24,
+        "spec": {
+          "x": 4565,
+          "y": 438,
+          "w": 64,
+          "h": 12,
+          "material": "stone",
+          "kind": "lift",
+          "travel": 88,
+          "speed": 1.1,
+          "phase": 2.7
+        },
+        "route": {
+          "min": {
+            "x": 4565,
+            "y": 350
+          },
+          "max": {
+            "x": 4565,
+            "y": 438
+          },
+          "initial": {
+            "x": 4565,
+            "y": 375.19528526971146,
+            "w": 64,
+            "h": 12,
+            "material": "stone",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 2.7
+          },
+          "length": 88,
+          "periodMs": 5711.987,
+          "maxSpeedPxS": 48.4,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 4395,
+            "y": 450,
+            "w": 520,
+            "h": 450,
+            "material": "stone",
+            "index": 22
+          },
+          {
+            "x": 4650,
+            "y": 355,
+            "w": 145,
+            "h": 20,
+            "material": "stone",
+            "index": 23
+          },
+          {
+            "x": 4565,
+            "y": 438,
+            "w": 64,
+            "h": 12,
+            "material": "stone",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 2.7,
+            "index": 24
+          }
+        ],
+        "nearbyValves": [
+          {
+            "id": "v11",
+            "x": 4500,
+            "y": 450,
+            "label": "FONTE DO CAIS"
+          }
+        ],
+        "supports": "Two rails with feet on containing full ground; top travel+24px above lower floor; deck ropes follow movingFloor."
+      },
+      {
+        "key": "delicia-7:floor-25",
+        "stage": "delicia-7",
+        "name": "Maré de Laranja",
+        "number": 7,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 25,
+        "spec": {
+          "x": 4921,
+          "y": 467,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 40,
+          "speed": 1.2,
+          "phase": 3
+        },
+        "route": {
+          "min": {
+            "x": 4921,
+            "y": 467
+          },
+          "max": {
+            "x": 4961,
+            "y": 467
+          },
+          "initial": {
+            "x": 4943.822400161197,
+            "y": 467,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 40,
+            "speed": 1.2,
+            "phase": 3
+          },
+          "length": 40,
+          "periodMs": 5235.988,
+          "maxSpeedPxS": 24,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 4395,
+            "y": 450,
+            "w": 520,
+            "h": 450,
+            "material": "stone",
+            "index": 22
+          },
+          {
+            "x": 4650,
+            "y": 355,
+            "w": 145,
+            "h": 20,
+            "material": "stone",
+            "index": 23
+          },
+          {
+            "x": 4921,
+            "y": 467,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 40,
+            "speed": 1.2,
+            "phase": 3,
+            "index": 25
+          },
+          {
+            "x": 5025,
+            "y": 420,
+            "w": 290,
+            "h": 480,
+            "material": "stone",
+            "index": 26
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-7:floor-27",
+        "stage": "delicia-7",
+        "name": "Maré de Laranja",
+        "number": 7,
+        "optional": false,
+        "biome": "reservoir",
+        "index": 27,
+        "spec": {
+          "x": 5321,
+          "y": 437,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 45,
+          "speed": 1.2,
+          "phase": 3.7
+        },
+        "route": {
+          "min": {
+            "x": 5321,
+            "y": 437
+          },
+          "max": {
+            "x": 5366,
+            "y": 437
+          },
+          "initial": {
+            "x": 5331.578686829559,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 45,
+            "speed": 1.2,
+            "phase": 3.7
+          },
+          "length": 45,
+          "periodMs": 5235.988,
+          "maxSpeedPxS": 27,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 5025,
+            "y": 420,
+            "w": 290,
+            "h": 480,
+            "material": "stone",
+            "index": 26
+          },
+          {
+            "x": 5321,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 45,
+            "speed": 1.2,
+            "phase": 3.7,
+            "index": 27
+          },
+          {
+            "x": 5430,
+            "y": 450,
+            "w": 520,
+            "h": 450,
+            "material": "stone",
+            "index": 28
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-11:floor-5",
+        "stage": "delicia-11",
+        "name": "A Escadaria da Reserva",
+        "number": 11,
+        "optional": false,
+        "biome": "citadel",
+        "index": 5,
+        "spec": {
+          "x": 1921,
+          "y": 437,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 35,
+          "speed": 1.6,
+          "phase": 1
+        },
+        "route": {
+          "min": {
+            "x": 1921,
+            "y": 437
+          },
+          "max": {
+            "x": 1956,
+            "y": 437
+          },
+          "initial": {
+            "x": 1953.2257422341381,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 35,
+            "speed": 1.6,
+            "phase": 1
+          },
+          "length": 35,
+          "periodMs": 3926.991,
+          "maxSpeedPxS": 28,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 1395,
+            "y": 420,
+            "w": 520,
+            "h": 480,
+            "material": "brass",
+            "index": 3
+          },
+          {
+            "x": 1650,
+            "y": 325,
+            "w": 145,
+            "h": 20,
+            "material": "brass",
+            "index": 4
+          },
+          {
+            "x": 1921,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 35,
+            "speed": 1.6,
+            "phase": 1,
+            "index": 5
+          },
+          {
+            "x": 2020,
+            "y": 390,
+            "w": 280,
+            "h": 510,
+            "material": "brass",
+            "kind": "belt",
+            "beltSpeed": 100,
+            "index": 6
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-11:floor-7",
+        "stage": "delicia-11",
+        "name": "A Escadaria da Reserva",
+        "number": 11,
+        "optional": false,
+        "biome": "citadel",
+        "index": 7,
+        "spec": {
+          "x": 2306,
+          "y": 407,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 50,
+          "speed": 1.6,
+          "phase": 1.7
+        },
+        "route": {
+          "min": {
+            "x": 2306,
+            "y": 407
+          },
+          "max": {
+            "x": 2356,
+            "y": 407
+          },
+          "initial": {
+            "x": 2355.791620261312,
+            "y": 407,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 50,
+            "speed": 1.6,
+            "phase": 1.7
+          },
+          "length": 50,
+          "periodMs": 3926.991,
+          "maxSpeedPxS": 40,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 2020,
+            "y": 390,
+            "w": 280,
+            "h": 510,
+            "material": "brass",
+            "kind": "belt",
+            "beltSpeed": 100,
+            "index": 6
+          },
+          {
+            "x": 2306,
+            "y": 407,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 50,
+            "speed": 1.6,
+            "phase": 1.7,
+            "index": 7
+          },
+          {
+            "x": 2420,
+            "y": 420,
+            "w": 380,
+            "h": 480,
+            "material": "brass",
+            "index": 8
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-11:floor-9",
+        "stage": "delicia-11",
+        "name": "A Escadaria da Reserva",
+        "number": 11,
+        "optional": false,
+        "biome": "citadel",
+        "index": 9,
+        "spec": {
+          "x": 2806,
+          "y": 437,
+          "w": 58,
+          "h": 16,
+          "material": "wood",
+          "kind": "moving",
+          "travel": 35,
+          "speed": 1.6,
+          "phase": 2.4
+        },
+        "route": {
+          "min": {
+            "x": 2806,
+            "y": 437
+          },
+          "max": {
+            "x": 2841,
+            "y": 437
+          },
+          "initial": {
+            "x": 2835.320605659645,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 35,
+            "speed": 1.6,
+            "phase": 2.4
+          },
+          "length": 35,
+          "periodMs": 3926.991,
+          "maxSpeedPxS": 28,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 2420,
+            "y": 420,
+            "w": 380,
+            "h": 480,
+            "material": "brass",
+            "index": 8
+          },
+          {
+            "x": 2806,
+            "y": 437,
+            "w": 58,
+            "h": 16,
+            "material": "wood",
+            "kind": "moving",
+            "travel": 35,
+            "speed": 1.6,
+            "phase": 2.4,
+            "index": 9
+          },
+          {
+            "x": 2905,
+            "y": 450,
+            "w": 520,
+            "h": 450,
+            "material": "brass",
+            "index": 10
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two posts, located18px outside full route+deck, bottom automatically grounded to containing bank. Fixed horizontal rail85px above deck, two hangers follow movingFloor."
+      },
+      {
+        "key": "delicia-relogio:floor-5",
+        "stage": "delicia-relogio",
+        "name": "Sino da Última Safra",
+        "number": 10,
+        "optional": true,
+        "biome": "refinery",
+        "index": 5,
+        "spec": {
+          "x": 1525,
+          "y": 408,
+          "w": 64,
+          "h": 12,
+          "material": "brass",
+          "kind": "lift",
+          "travel": 88,
+          "speed": 1.1,
+          "phase": 0.9
+        },
+        "route": {
+          "min": {
+            "x": 1525,
+            "y": 320
+          },
+          "max": {
+            "x": 1525,
+            "y": 408
+          },
+          "initial": {
+            "x": 1525,
+            "y": 329.5336159763907,
+            "w": 64,
+            "h": 12,
+            "material": "brass",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 0.9
+          },
+          "length": 88,
+          "periodMs": 5711.987,
+          "maxSpeedPxS": 48.4,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 1355,
+            "y": 420,
+            "w": 520,
+            "h": 480,
+            "material": "brass",
+            "index": 3
+          },
+          {
+            "x": 1610,
+            "y": 325,
+            "w": 145,
+            "h": 20,
+            "material": "brass",
+            "index": 4
+          },
+          {
+            "x": 1525,
+            "y": 408,
+            "w": 64,
+            "h": 12,
+            "material": "brass",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 0.9,
+            "index": 5
+          }
+        ],
+        "nearbyValves": [
+          {
+            "id": "v5",
+            "x": 1460,
+            "y": 420,
+            "label": "FONTE DO BAIRRO"
+          }
+        ],
+        "supports": "Two rails with feet on containing full ground; top travel+24px above lower floor; deck ropes follow movingFloor."
+      },
+      {
+        "key": "delicia-relogio:floor-10",
+        "stage": "delicia-relogio",
+        "name": "Sino da Última Safra",
+        "number": 10,
+        "optional": true,
+        "biome": "refinery",
+        "index": 10,
+        "spec": {
+          "x": 3020,
+          "y": 378,
+          "w": 64,
+          "h": 12,
+          "material": "brass",
+          "kind": "lift",
+          "travel": 88,
+          "speed": 1.1,
+          "phase": 1.8
+        },
+        "route": {
+          "min": {
+            "x": 3020,
+            "y": 290
+          },
+          "max": {
+            "x": 3020,
+            "y": 378
+          },
+          "initial": {
+            "x": 3020,
+            "y": 291.15070424135945,
+            "w": 64,
+            "h": 12,
+            "material": "brass",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 1.8
+          },
+          "length": 88,
+          "periodMs": 5711.987,
+          "maxSpeedPxS": 48.4,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 2850,
+            "y": 390,
+            "w": 520,
+            "h": 510,
+            "material": "brass",
+            "index": 8
+          },
+          {
+            "x": 3105,
+            "y": 295,
+            "w": 145,
+            "h": 20,
+            "material": "brass",
+            "index": 9
+          },
+          {
+            "x": 3020,
+            "y": 378,
+            "w": 64,
+            "h": 12,
+            "material": "brass",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 1.8,
+            "index": 10
+          }
+        ],
+        "nearbyValves": [],
+        "supports": "Two rails with feet on containing full ground; top travel+24px above lower floor; deck ropes follow movingFloor."
+      },
+      {
+        "key": "delicia-relogio:floor-15",
+        "stage": "delicia-relogio",
+        "name": "Sino da Última Safra",
+        "number": 10,
+        "optional": true,
+        "biome": "refinery",
+        "index": 15,
+        "spec": {
+          "x": 4485,
+          "y": 408,
+          "w": 64,
+          "h": 12,
+          "material": "brass",
+          "kind": "lift",
+          "travel": 88,
+          "speed": 1.1,
+          "phase": 2.7
+        },
+        "route": {
+          "min": {
+            "x": 4485,
+            "y": 320
+          },
+          "max": {
+            "x": 4485,
+            "y": 408
+          },
+          "initial": {
+            "x": 4485,
+            "y": 345.19528526971146,
+            "w": 64,
+            "h": 12,
+            "material": "brass",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 2.7
+          },
+          "length": 88,
+          "periodMs": 5711.987,
+          "maxSpeedPxS": 48.4,
+          "exactEndpointDwellMs": 0,
+          "motion": "analytic sinusoidal scalar; reaches each endpoint; y for lift, x for moving"
+        },
+        "solidFloorConflicts": [],
+        "someRiderPositionsConflict": [],
+        "nearbyFloors": [
+          {
+            "x": 4315,
+            "y": 420,
+            "w": 520,
+            "h": 480,
+            "material": "brass",
+            "index": 13
+          },
+          {
+            "x": 4570,
+            "y": 325,
+            "w": 145,
+            "h": 20,
+            "material": "brass",
+            "index": 14
+          },
+          {
+            "x": 4485,
+            "y": 408,
+            "w": 64,
+            "h": 12,
+            "material": "brass",
+            "kind": "lift",
+            "travel": 88,
+            "speed": 1.1,
+            "phase": 2.7,
+            "index": 15
+          }
+        ],
+        "nearbyValves": [
+          {
+            "id": "v11",
+            "x": 4420,
+            "y": 420,
+            "label": "FONTE DO CAIS"
+          }
+        ],
+        "supports": "Two rails with feet on containing full ground; top travel+24px above lower floor; deck ropes follow movingFloor."
+      }
+    ]
+  },
+  "verification": {
+    "suites": [
+      "tests/world-carrier-route-authoring.test.ts",
+      "tests/adventure.test.ts"
+    ],
+    "passedTests": 27,
+    "localTransferCases": "27 non-arena movers, both walk/run; all 18 non-arena autonomous movers also reverse boarding/landing and delayed next-cycle boarding. Each search admits only hazard-clean local witnesses, excludes overlapping static support when boarding, and verifies at least 8 px of genuine autonomous carry.",
+    "limits": [
+      "Not a browser/visual proof",
+      "Not an exhaustive search over all input or hazard phases",
+      "Not an end-to-end all-collectibles playthrough",
+      "Checkpoint test verifies canonical object reconstruction; existing save/route tests preserve IDs and progression"
+    ]
+  }
+}

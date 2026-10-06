@@ -1,7 +1,7 @@
 import { SpriteAtlas } from '../graphics/pixels';
 import { drawWorldSeal } from './WorldSealArt';
 import { WorldBackdrop } from './WorldBackdrop';
-import { drawWorldObjects } from './WorldMechanisms';
+import { drawWorldObjects, drawWorldCarrierStructures } from './WorldMechanisms';
 import { drawArena, drawIsland } from './WorldStageArt';
 import { container, wheel, pixelLine, polygon, oval } from './WorldPainting';
 import { drawWorldTerrain } from './WorldTerrain';
@@ -14,6 +14,8 @@ import type { WorldFoe } from './WorldEnemies';
 import type { BossEncounter } from './BossEncounter';
 export const rect = (c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, color: string) => { c.fillStyle = color; c.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
 export class WorldArt {
+    /** Fully custom chapter painters explicitly own their support structures. */
+    genericStructures = true;
     atlas = new SpriteAtlas();
     private backdrop = new WorldBackdrop();
     private readonly foeMotion = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
@@ -50,8 +52,13 @@ export class WorldArt {
     terrain(c: CanvasRenderingContext2D, level: WorldLevel, island: Island, cx: number, cy: number, time: number) {
         drawWorldTerrain(c, level, island, cx, cy, time);
     }
-    objects(c: CanvasRenderingContext2D, objects: WorldObjects, cx: number, cy: number, time: number, world = 3) {
-        drawWorldObjects(c, objects, this.atlas, cx, cy, time, world);
+    structures(c: CanvasRenderingContext2D, objects: WorldObjects, cx: number, cy: number, level?: WorldLevel) {
+        // Guaíra chapters replace objects with their complete local equipment art.
+        // Do not add generic structures behind those existing custom painters.
+        if (this.genericStructures) drawWorldCarrierStructures(c, objects, cx, cy, level);
+    }
+    objects(c: CanvasRenderingContext2D, objects: WorldObjects, cx: number, cy: number, time: number, world = 3, level?: WorldLevel, includeStructures = true) {
+        drawWorldObjects(c, objects, this.atlas, cx, cy, time, world, level, includeStructures);
     }
     foe(c: CanvasRenderingContext2D, e: WorldFoe, cx: number, cy: number, _time: number) {
         if (e.dead && e.deadTimer > 360)

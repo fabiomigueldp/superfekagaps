@@ -1,14 +1,24 @@
 import type { GuairaChapterProgress } from './experimental/guaira/chapter/GuairaChapterProgress';
 import type { LevelData, Rect, Vector2 } from '../types';
+import type { CarrierMotionProfile } from './WorldCarrierMotion';
 export type Character = 'feka' | 'joao' | 'biel' | 'calabrezzo' | 'yasmin';
 export type EncounterId = 'J1' | 'B1' | 'C1' | 'B2' | 'C2' | 'J2';
 export type MechanismKind = 'platform' | 'lift' | 'swing' | 'belt' | 'switch' | 'jet' | 'launcher' | 'target' | 'support';
+export interface MechanismMount {
+    x: number;
+    y: number;
+    kind: 'ground' | 'wall';
+}
 export interface MechanismSpec extends Rect {
     id: string;
     kind: MechanismKind;
     to?: Vector2;
     period?: number;
     phase?: number;
+    /** Explicit shuttle timing; absent preserves the legacy sinusoidal cycle. */
+    motion?: CarrierMotionProfile;
+    /** Fixed world-pixel feet/bolts: home/end for rails, left/right for hoists. */
+    mounts?: [MechanismMount, MechanismMount];
     link?: string;
     direction?: number;
     pressurized?: boolean;

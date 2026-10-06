@@ -938,9 +938,10 @@ export class WorldGame {
             drawLandmarks(c, this.stage, cx, cy, this.time);
         else
             this.art.arena(c, this.boss, cx, cy, this.time);
+        this.art.structures(c, this.objects, cx, cy, this.level);
         this.art.terrain(c, this.level, island, cx, cy, this.time);
         drawLandmarks(c, this.stage, cx, cy, this.time, true);
-        this.art.objects(c, this.objects, cx, cy, this.time, this.stage.world);
+        this.art.objects(c, this.objects, cx, cy, this.time, this.stage.world, this.level, false);
         this.stage.checkpoints.forEach((cp, i) =>
             drawWorldCheckpoint(c, cp.x * 16 - cx, cp.y * 16 - cy, this.checkpoint >= i));
         for (const exit of this.stage.exits) {

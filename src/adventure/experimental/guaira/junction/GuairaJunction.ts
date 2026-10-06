@@ -22,6 +22,7 @@ export class GuairaJunction extends WorldGame {
             this.reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
             this.art.background = (c, _island, cx, cy, time) => drawJunctionBackground(c, cx, cy, time, this.reducedMotion, this.routing);
             this.art.terrain = (c, level, _island, cx, cy) => drawJunctionTerrain(c, level, cx, cy);
+            this.art.genericStructures = false;
             this.art.objects = (c, objects, cx, cy, time) => drawJunctionObjects(c, objects, cx, cy, time, this.reducedMotion, this.routing);
             this.store.save.preferences.shake = !this.reducedMotion;
             if (this.reducedMotion) {

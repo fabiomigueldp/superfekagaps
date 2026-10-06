@@ -97,6 +97,7 @@ export class GuairaMayorLab extends WorldGame {
             this.reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
             this.art.background = (c, _island, cx, cy, time) => drawGuairaMayorBackground(c, this.mayor, cx, cy, time, this.reducedMotion);
             this.art.terrain = (c, level, _island, cx, cy) => drawGuairaMayorTerrain(c, level, cx, cy);
+            this.art.genericStructures = false;
             this.art.objects = (c, objects, cx, cy, time) => {
                 drawGuairaMayorObjects(c, objects, this.mayor, cx, cy, time, this.reducedMotion);
                 drawGuairaMayorStampTarget(c, this.mayor, cx, cy, this.reducedMotion);

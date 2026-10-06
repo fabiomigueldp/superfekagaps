@@ -1,6 +1,9 @@
 import { freshGuairaChapterProgress, sanitizeGuairaChapterProgress, mergeGuairaChapterProgress, type GuairaChapterProgress } from './experimental/guaira/chapter/GuairaChapterProgress';
 import type { AdventureSave, AdventureStage } from './types';
 import { assertSaveCampaign } from './saveCampaign';
+import { carrierMotionErrors } from './WorldCarrierMotion';
+import { isSolidTile } from '../world/tileRules';
+import { TILE_SIZE } from '../constants';
 export const SAVE_KEY = 'super_feka_gaps_world_v1';
 export const freshSave = (): AdventureSave => ({ version: 1, guaira: freshGuairaChapterProgress(), completed: [], seals: [], secrets: [], seen: [], selected: '1-1', checkpoint: null, times: {}, preferences: { music: .55, effects: .7, voice: .8, shake: true } });
 /** Fresh editor previews need a new read-through. Never call for an in-game retry. */
@@ -158,6 +161,8 @@ export class ProgressStore {
 }
 export function validateStage(stage: AdventureStage): string[] {
     const errors: string[] = [];
+    const solidAt = (x: number, y: number) => isSolidTile(stage.level.tiles[Math.floor(y / TILE_SIZE) - (stage.level.originY ?? 0)]
+        ?.[Math.floor(x / TILE_SIZE) - (stage.level.originX ?? 0)]);
     const ids = new Set<string>();
     if (!validId(stage.id))
         errors.push('ID inválido');
@@ -169,6 +174,31 @@ export function validateStage(stage: AdventureStage): string[] {
         ids.add(m.id);
         if (![m.x, m.y, m.width, m.height].every(Number.isFinite) || m.width <= 0 || m.height <= 0)
             errors.push(`Geometria inválida: ${m.id}`);
+        const carrier = ['platform', 'lift', 'swing', 'support'].includes(m.kind);
+        if (carrier) {
+            const controlled = m.kind === 'support' || m.kind === 'lift' && (m.gated || stage.mechanisms.some(s => s.link === m.id));
+            if (controlled) {
+                if (m.to && ![m.to.x, m.to.y].every(Number.isFinite)) errors.push(`Destino deve ter coordenadas finitas: ${m.id}`);
+                if (m.motion) errors.push(`Perfil automático não se aplica a equipamento controlado: ${m.id}`);
+            } else errors.push(...carrierMotionErrors(m, stage.world === 4 ? 80 : 90).map(e => `${e}: ${m.id}`));
+            if ((m.kind === 'lift' || m.kind === 'support') && m.to && m.to.x !== m.x)
+                errors.push(`Guia vertical exige destino X igual à origem; use plataforma para trilho inclinado: ${m.id}`);
+            if (m.kind === 'support' && m.to && m.to.y < m.y)
+                errors.push(`Suporte de descida exige destino abaixo da origem; use elevador para subir: ${m.id}`);
+            if (m.mounts) {
+                if (!Array.isArray(m.mounts) || m.mounts.length !== 2 || m.mounts.some(mount => !mount
+                    || ![mount.x, mount.y].every(Number.isFinite) || !['ground', 'wall'].includes(mount.kind)))
+                    errors.push(`Apoios precisam de dois pontos fixos de solo ou parede: ${m.id}`);
+                else for (const [index, mount] of m.mounts.entries()) {
+                    // Match the actual 12 px foot / 6×14 px wall plate. Moving an
+                    // assembly never manufactures terrain beneath its anchors.
+                    const supported = mount.kind === 'ground'
+                        ? [mount.x - 6, mount.x, mount.x + 5].every(x => solidAt(x, mount.y + 1) && !solidAt(x, mount.y - 1))
+                        : [mount.x - 3, mount.x + 2].every(x => [mount.y - 7, mount.y + 6].every(y => solidAt(x, y)));
+                    if (!supported) errors.push(`Apoio ${index + 1} sem base sólida; reposicione o apoio no terreno: ${m.id}`);
+                }
+            }
+        }
     }
     for (const m of stage.mechanisms)
         if (m.link && !ids.has(m.link))
