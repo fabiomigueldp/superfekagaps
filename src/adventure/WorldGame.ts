@@ -37,6 +37,20 @@ interface Button extends Rect {
     label: string;
     run: () => void;
 }
+interface FrozenMenuPaint {
+    screen: Screen;
+    selection: number;
+    toast: string | null;
+    music: number;
+    effects: number;
+    voice: number;
+    shake: boolean;
+    reducedMotion: boolean;
+    cameraX: number;
+    cameraY: number;
+    cameraShake: boolean;
+    time: number;
+}
 export class WorldGame {
     private readonly lifetime = new DisposalScope();
     private frame: number | null = null;
@@ -96,6 +110,11 @@ export class WorldGame {
     private saveImportCleanup?: () => void;
     private deathFeedbackStarted = false;
     private experimentalHub?: ExperimentalHub;
+    private frozenMenuOwner?: () => boolean;
+    private frozenMenuMotion: MediaQueryList | null = null;
+    private frozenMenuPaint: FrozenMenuPaint | null = null;
+    private frozenMenuSave: ProgressStore['save'] | null = null;
+    private frozenMenuPreferences: ProgressStore['save']['preferences'] | null = null;
     constructor(canvas: HTMLCanvasElement, private readonly ephemeral = false) {
         this.mapCanvas = canvas;
         try {
@@ -107,6 +126,7 @@ export class WorldGame {
                     canOpen: () => !this.isDisposed && this.state === 'settings',
                     resetInput: () => this.input?.reset(),
                     suspendTouch: () => this.input.suspendCanvasTouchControls(),
+                    onOpenChange: () => this.invalidateFrozenMenuPaint(),
                 });
                 this.addCleanup(() => this.controlsHelp?.dispose());
             }
@@ -154,6 +174,7 @@ export class WorldGame {
                 if (this.state === 'playing') this.pause();
             });
             this.listen(document, 'visibilitychange', () => {
+                this.invalidateFrozenMenuPaint();
                 if (document.hidden) {
                     if (this.state === 'playing') this.pause();
                     this.cancelFrame();
@@ -180,6 +201,25 @@ export class WorldGame {
     /** Own subclass/host resources without overriding terminal disposal. */
     addCleanup(cleanup: () => void): () => void { return this.lifetime.add(cleanup); }
     protected readonly listen = this.lifetime.listen.bind(this.lifetime);
+    /** Explicitly opt in only an owner of the complete ordinary campaign canvas.
+     * Labs/editor and hosts that compose their own overlays retain full rendering.
+     * WorldArt is synchronous; asynchronous map/salon artwork never uses this cache.
+     */
+    protected enableFrozenMenuPaint(ownsCanvas: () => boolean): void {
+        if (this.isDisposed || this.frozenMenuOwner) return;
+        this.frozenMenuOwner = ownsCanvas;
+        this.frozenMenuMotion = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
+        // Renderer resets the backing canvas even when its dimensions are unchanged.
+        this.listen(window, 'resize', () => this.invalidateFrozenMenuPaint());
+        this.listen(this.mapCanvas, 'contextrestored', () => this.invalidateFrozenMenuPaint());
+        this.addCleanup(() => {
+            this.frozenMenuOwner = undefined; this.frozenMenuMotion = null;
+            this.invalidateFrozenMenuPaint();
+        });
+    }
+    protected invalidateFrozenMenuPaint(): void {
+        this.frozenMenuPaint = null; this.frozenMenuSave = null; this.frozenMenuPreferences = null;
+    }
     dispose(): void {
         if (this.isDisposed) return;
         this.running = false;
@@ -226,7 +266,7 @@ export class WorldGame {
         this.render();
         this.requestFrame();
     };
-    private change(screen: Screen) { if (this.isDisposed) return; this.controlsHelp?.close(false); this.menuAccessibility?.clear(); this.journalAccessibility?.clear(); if (screen !== 'map') this.mapView?.hide(); this.state = screen; this.hitStopInput = null; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; this.experimentalHub?.sync(); }
+    private change(screen: Screen) { if (this.isDisposed) return; this.invalidateFrozenMenuPaint(); this.controlsHelp?.close(false); this.menuAccessibility?.clear(); this.journalAccessibility?.clear(); if (screen !== 'map') this.mapView?.hide(); this.state = screen; this.hitStopInput = null; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; this.experimentalHub?.sync(); }
     private menuKey(e: KeyboardEvent) {
         if (e.ctrlKey || e.metaKey || e.altKey) return;
         if (this.experimentalHub?.isOpen || this.controlsHelp?.isOpen || this.flightCleanup) return;
@@ -794,6 +834,34 @@ export class WorldGame {
             return;
         }
         this.mapView?.hide();
+        this.paintCanvasIfNeeded();
+        if (this.experimentalHub?.isOpen || this.flightCleanup || (typeof document !== 'undefined' && document.hidden) || this.state === 'playing')
+            this.menuAccessibility?.clear({ restoreFocus: false });
+        else this.menuAccessibility?.sync(this.state, this.state === 'title' ? 'Menu principal' : this.state === 'settings' ? 'Opções' : this.state === 'paused' ? 'Pausa' : 'Aventura', this.buttons, this.menuSelection);
+    }
+    private paintCanvasIfNeeded(): void {
+        if (!this.frozenMenuOwner?.() || (this.state !== 'paused' && this.state !== 'settings')) {
+            this.invalidateFrozenMenuPaint(); this.paintCanvas(); return;
+        }
+        const previous = this.frozenMenuPaint, save = this.store.save, preferences = save.preferences;
+        // Only the toast's presence/text is painted. Its timer still expires in update().
+        const toast = this.toastTimer > 0 ? this.toast : null;
+        const reducedMotion = this.frozenMenuMotion?.matches ?? false, cameraShake = this.camera.shakeTimer > 0;
+        if (previous && this.frozenMenuSave === save && this.frozenMenuPreferences === preferences
+            && previous.screen === this.state && previous.selection === this.menuSelection && previous.toast === toast
+            && previous.music === preferences.music && previous.effects === preferences.effects && previous.voice === preferences.voice
+            && previous.shake === preferences.shake && previous.reducedMotion === reducedMotion
+            && previous.cameraX === this.camera.x && previous.cameraY === this.camera.y && previous.cameraShake === cameraShake
+            && previous.time === this.time) return;
+        this.paintCanvas();
+        // One bounded scalar snapshot, allocated only after a paint. Keep identities separately:
+        // an imported save/replaced preferences object must also replace captured button actions.
+        this.frozenMenuPaint = { screen: this.state, selection: this.menuSelection, toast,
+            music: preferences.music, effects: preferences.effects, voice: preferences.voice,
+            shake: preferences.shake, reducedMotion, cameraX: this.camera.x, cameraY: this.camera.y, cameraShake, time: this.time };
+        this.frozenMenuSave = save; this.frozenMenuPreferences = preferences;
+    }
+    private paintCanvas(): void {
         this.renderer.startScene();
         this.buttons = [];
         const c = this.renderer.getContext();
@@ -847,9 +915,6 @@ export class WorldGame {
             this.renderer.drawPlayerTransition(this.player.data, this.camera);
         }
         this.renderer.present();
-        if (this.experimentalHub?.isOpen || this.flightCleanup || (typeof document !== 'undefined' && document.hidden) || this.state === 'playing')
-            this.menuAccessibility?.clear({ restoreFocus: false });
-        else this.menuAccessibility?.sync(this.state, this.state === 'title' ? 'Menu principal' : this.state === 'settings' ? 'Opções' : this.state === 'paused' ? 'Pausa' : 'Aventura', this.buttons, this.menuSelection);
     }
     private renderLevel(c: CanvasRenderingContext2D) {
         const shake = this.store.save.preferences.shake && this.camera.shakeTimer > 0 ? (Math.floor(this.time / 40) % 2 ? 1 : -1) : 0;

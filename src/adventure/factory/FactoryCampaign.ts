@@ -29,6 +29,8 @@ export class FactoryCampaign extends WorldGame {
             if (e.key.toLowerCase() === 'e' && !e.repeat) this.enterSalon();
         });
         this.addCleanup(() => { this.salon?.dispose(); this.shell?.remove(); this.enterButton.remove(); });
+        // A paused campaign may still own a live salon. Only its ordinary canvas is reusable.
+        if (new.target === FactoryCampaign) this.enableFrozenMenuPaint(() => !this.salon);
     }
     private get canEnter() {
         return !this.salon && this.state === 'playing' && !this.player.data.isDead &&
