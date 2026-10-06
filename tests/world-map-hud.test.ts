@@ -794,15 +794,30 @@ test('compact title badges expose zero, partial and complete seals while encount
     hud.update({ ...state, overview: true }); assert.equal(badge.hidden, true);
 });
 
+test('panorama toggle initially names its visible MAPA action consistently', t => {
+    dom(t);
+    const noop = () => {};
+    const hud = new WorldMapHud({ selectStage: noop, selectWorld: noop, enter: noop, skip: noop, overview: noop, menu: noop });
+    t.after(() => hud.dispose());
+    const toggle = find(asElement(hud.root), 'world-map-overview');
+    assert.equal(toggle.getAttribute('aria-label'), 'Ver mapa');
+    assert.equal(toggle.title, 'Ver mapa');
+    assert.equal(toggle.children[1].textContent, 'Ver mapa');
+    assert.equal(toggle.getAttribute('aria-pressed'), 'false');
+});
+
 test('panorama toggle synchronizes bitmap face, accessible action, tooltip and pressed state including Escape', t => {
     const { hud, state, calls } = fixture(t), toggle = find(asElement(hud.root), 'world-map-overview');
+    toggle.focus();
     for (const overview of [false, true, false]) {
         hud.update({ ...state, overview });
-        const label = overview ? 'Ver ilha' : 'Ver panorama';
+        const label = overview ? 'Ver ilha' : 'Ver mapa';
         assert.equal(toggle.getAttribute('aria-label'), label);
         assert.equal(toggle.title, label);
         assert.equal(toggle.children[1].textContent, label);
         assert.equal(toggle.getAttribute('aria-pressed'), String(overview));
+        assert.equal(document.activeElement as unknown, toggle, 'Changing the action label retains keyboard focus.');
+        assert.equal(toggle.focusCount, 1, 'State updates do not refocus the toggle.');
         toggle.click(); assert.equal(calls.at(-1), 'overview');
     }
     hud.update({ ...state, overview: true });

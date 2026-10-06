@@ -262,7 +262,8 @@ export class WorldMapHud {
         this.regionButton.setAttribute('aria-controls', this.regionMenu.id);
         this.regionMenu.setAttribute('aria-label', 'As sete regiões'); this.regionMenu.hidden = true;
         this.overviewButton = action('world-map-tool world-map-overview', 'MAPA', () => this.run(() => callbacks.overview()));
-        this.overviewButton.setAttribute('aria-label', 'Ver panorama'); this.overviewButton.title = 'Ver panorama';
+        this.overviewButton.setAttribute('aria-label', 'Ver mapa'); this.overviewButton.title = 'Ver mapa';
+        (this.overviewButton.children[1] as HTMLElement).textContent = 'Ver mapa';
         this.overviewButton.setAttribute('aria-pressed', 'false');
         const menu = action('world-map-tool world-map-menu', 'II', () => this.run(() => callbacks.menu()));
         menu.setAttribute('aria-label', 'Menu do jogo'); menu.title = 'Menu do jogo';
@@ -500,7 +501,7 @@ export class WorldMapHud {
             if (canAct && !traveling) this.focusEnter(); else this.root.focus({ preventScroll: true });
         }
         this.overviewButton.setAttribute('aria-pressed', String(!!state.overview));
-        const overviewLabel = state.overview ? 'Ver ilha' : 'Ver panorama';
+        const overviewLabel = state.overview ? 'Ver ilha' : 'Ver mapa';
         lettering(this.overviewButton.children[0] as HTMLCanvasElement, state.overview ? 'ILHA' : 'MAPA');
         (this.overviewButton.children[1] as HTMLElement).textContent = overviewLabel;
         this.overviewButton.setAttribute('aria-label', overviewLabel);
