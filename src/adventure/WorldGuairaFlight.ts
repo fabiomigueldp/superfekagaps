@@ -96,6 +96,8 @@ export function runGuairaFlight(options: GuairaFlightOptions): () => void {
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     let reduced = motion.matches;
     let duration = reduced ? AIRCRAFT_REDUCED_DURATION : AIRCRAFT_TRAVEL_DURATION;
+    let scenePainted = false, sceneReduced = reduced, sceneWidth = canvas.width, sceneHeight = canvas.height;
+    canvas.addEventListener('contextrestored', () => { scenePainted = false; }, { signal: controller.signal });
     const source = artRegion(options.from), destination = artRegion(options.to);
     const route = campaignAircraftRoute(source, destination);
     const images = new Map<GuairaCampaignRegion, HTMLImageElement>(), bases = new Map<GuairaCampaignRegion, HTMLImageElement>();
@@ -121,17 +123,22 @@ export function runGuairaFlight(options: GuairaFlightOptions): () => void {
             // Keep progress when the preference changes, without an instant arrival or restart.
             elapsed = elapsed / duration * nextDuration; duration = nextDuration;
         }
-        if (!document.hidden && focused) elapsed += Math.min(.05, Math.max(0, (now - previous) / 1000));
+        const active = !document.hidden && focused;
+        if (active) elapsed += Math.min(.05, Math.max(0, (now - previous) / 1000));
         previous = now;
         const pose = sampleAircraftTravel(route, elapsed, reduced), ctx = canvas.getContext('2d');
         pose.scale = campaignAircraftScale(source, destination, pose.progress);
-        if (!engineStarted && !document.hidden && focused) engineStarted = engine.start(pose);
+        if (!engineStarted && active) engineStarted = engine.start(pose);
         engine.sync(pose);
-        if (ctx) {
+        // A paused clock leaves the complete scene unchanged. Retain that bitmap,
+        // but repaint every active callback (including focus return), new motion
+        // mode, first asset-ready frame, and cleared/restored backing store.
+        if (ctx && (active || !scenePainted || sceneReduced !== reduced || sceneWidth !== canvas.width || sceneHeight !== canvas.height)) {
             const camera = sampleAircraftCamera(route, elapsed, { width: 960, height: 540, reducedMotion: reduced,
                 departureFocus: localToAtlas({ x: .5, y: .5 }, GUAIRA_CAMPAIGN_ART[source].placement),
                 arrivalFocus: localToAtlas({ x: .5, y: .5 }, GUAIRA_CAMPAIGN_ART[destination].placement) });
             paintBackground(ctx, camera); paintFlightAtmosphere(ctx, camera, pose); paintAircraftTravel(ctx, camera, pose, assets, elapsed);
+            scenePainted = true; sceneReduced = reduced; sceneWidth = canvas.width; sceneHeight = canvas.height;
         }
         const phases = { boarding: 'Embarcando no aeródromo', 'takeoff-roll': 'Decolando', climb: 'Ganhando altitude', cruise: 'Sobrevoando os canais', approach: 'Aproximação', 'landing-roll': 'Pousando', arrived: 'Chegada confirmada' };
         // A short dissolve belongs to presentation only; the canonical trip clock and arrival stay unchanged.

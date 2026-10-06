@@ -95,8 +95,14 @@ export class WorldControlsHelp {
         this.canvas.inert = this.originalInert;
         this.releaseTouch?.(); this.releaseTouch = undefined; this.host.resetInput();
         const target = this.restoreFocus; this.restoreFocus = null;
-        if (restore && !document.hidden && this.host.canOpen() && !this.lifetime.isDisposed)
-            (target?.isConnected ? target : this.canvas).focus({ preventScroll: true });
+        if (restore && !document.hidden && this.host.canOpen() && !this.lifetime.isDisposed) {
+            const destination = target?.isConnected && target !== document.body ? target : this.canvas;
+            destination.focus({ preventScroll: true });
+            // A connected opener may now be hidden, disabled or inside an inert
+            // region. Restore keyboard control even when its focus is refused.
+            if (destination !== this.canvas && document.activeElement !== destination)
+                this.canvas.focus({ preventScroll: true });
+        }
     }
 
     dispose(): void { this.close(false); this.lifetime.dispose(); }

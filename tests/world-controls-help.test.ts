@@ -157,6 +157,37 @@ test('return from a hidden document tolerates a removed menu opener', t => {
     h.game.render(); assert.notEqual(h.button('CONTROLES'), entry); assert.equal(h.game.state, 'settings');
 });
 
+test('opening help without a focused control returns to the canvas instead of body', t => {
+    const h = setup(t); h.settings();
+    h.doc.activeElement = h.body;
+    h.button('CONTROLES').click();
+    assert.equal(h.help.isOpen, true);
+    h.key('Escape');
+    assert.ok(h.doc.activeElement === h.canvas, 'Body is not a usable keyboard return target');
+    assert.equal(h.game.state, 'settings');
+    assert.equal((h.canvas as unknown as HTMLElement).inert, false);
+});
+
+for (const unavailable of ['disabled', 'hidden'] as const) test(`closing help recovers when its connected opener becomes ${unavailable}`, t => {
+    const h = setup(t); h.settings(); const entry = h.open();
+    const focus = entry.focus;
+    const canvasFocus = t.mock.method(h.canvas, 'focus');
+    entry[unavailable] = true;
+    // Browsers refuse focus on disabled/hidden controls. Supply that boundary
+    // explicitly rather than treating the fixture's permissive focus as native QA.
+    entry.focus = () => {};
+    h.help.closeButton.click();
+    assert.ok(h.doc.activeElement === h.canvas, 'A refused focus must return to the canvas');
+    assert.deepEqual(canvasFocus.mock.calls[0].arguments, [{ preventScroll: true }]);
+    assert.equal(h.game.state, 'settings');
+    assert.equal((h.game.input as unknown as { canvasTouchSuspensions: Set<symbol> }).canvasTouchSuspensions.size, 0);
+
+    entry[unavailable] = false; entry.focus = focus;
+    entry.focus(); entry.click(); h.help.close();
+    assert.equal(h.doc.activeElement, entry, 'The next opening restores its own usable opener');
+    assert.equal(h.help.isOpen, false);
+});
+
 test('ephemeral scenes do not gain campaign help and the stylesheet keeps a scrollable body and visible exit', t => {
     const h = sceneLifecycleBrowser(t); const game = new WorldGame(h.canvas as unknown as HTMLCanvasElement, true);
     assert.equal((game as unknown as { controlsHelp?: WorldControlsHelp }).controlsHelp, undefined);

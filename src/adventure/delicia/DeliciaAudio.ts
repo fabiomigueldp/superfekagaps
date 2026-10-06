@@ -8,7 +8,13 @@ export class DeliciaAudio {
     musicVolume=.45;effectsVolume=.7;muted=false;
     async unlock():Promise<void>{
         if(this.disposed)return;
-        try{if(!this.context){this.context=new AudioContext();this.masterGain=this.context.createGain();this.masterGain.gain.value=this.muted?0:1;this.masterGain.connect(this.context.destination);}await this.context.resume();for(const name of ['collect','dash','seed','parry','pound','pressure','warning','boss-hit','victory'])void this.load(name);if(this.track&&!this.musicSource)this.music(this.track);}catch{/* Silent gameplay remains usable on devices without audio. */}
+        try{
+            if(!this.context){this.context=new AudioContext();this.masterGain=this.context.createGain();this.masterGain.gain.value=this.muted?0:1;this.masterGain.connect(this.context.destination);}
+            // The sound checkbox also unlocks audio from the pause menu; keep its playheads frozen.
+            await (this.paused?this.context.suspend():this.context.resume());
+            for(const name of ['collect','dash','seed','parry','pound','pressure','warning','boss-hit','victory'])void this.load(name);
+            if(this.track&&!this.musicSource)this.music(this.track);
+        }catch{/* Silent gameplay remains usable on devices without audio. */}
     }
     private async load(name:string):Promise<AudioBuffer|null>{
         if(!this.context||this.disposed)return null;const existing=this.buffers.get(name);if(existing)return existing;const pending=this.pending.get(name);if(pending)return pending;

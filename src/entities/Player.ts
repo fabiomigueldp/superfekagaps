@@ -63,6 +63,7 @@ export class Player {
 
     // Salva estado anterior para sweep tests de contato
     const prevRect = this.getRect();
+    const firstStepAfterSpawn = this.prevRectForContacts === null;
     this.prevRectForContacts = { ...prevRect };
     this.prevVelocityForContacts = { ...this.data.velocity };
     this.prevGroundPoundStateForContacts = this.data.groundPoundState;
@@ -73,7 +74,7 @@ export class Player {
     this.data.animationTimer += deltaTime;
 
     // Processa Ground Pound
-    const gpResult = this.handleGroundPound(input, deltaTime, level);
+    const gpResult = this.handleGroundPound(input, deltaTime, level, firstStepAfterSpawn);
     const gpImpact = gpResult.impact;
     const gpStarted = gpResult.started;
 
@@ -308,11 +309,19 @@ export class Player {
     return started;
   }
 
-  private handleGroundPound(input: InputState, deltaTime: number, _level: Level): { impact: { x: number, y: number, col: number, row: number } | null, started: boolean } {
+  private handleGroundPound(input: InputState, deltaTime: number, level: Level, firstStepAfterSpawn: boolean): { impact: { x: number, y: number, col: number, row: number } | null, started: boolean } {
     let started = false;
+    let airborne = !this.data.isGrounded;
+    if (airborne && input.downPressed && firstStepAfterSpawn && this.data.velocity.y === 0) {
+      // A reveal has not simulated support yet. Down on a planted spawn must
+      // not become an airborne attack; normal collision still settles this step.
+      const rect = this.getRect();
+      const support = level.resolveCollision(rect, { x: 0, y: 1 }, rect);
+      airborne = !(support.grounded && support.position.y <= rect.y);
+    }
 
     // Gatilho: no ar, apertou baixo, não está em ground pound
-    if (this.data.groundPoundState === GroundPoundState.NONE && !this.data.isGrounded && input.downPressed) {
+    if (this.data.groundPoundState === GroundPoundState.NONE && airborne && input.downPressed) {
       this.data.groundPoundState = GroundPoundState.WINDUP;
       this.data.groundPoundTimer = GP_WINDUP_MS;
       this.data.velocity.y = 0; // Pausa vertical

@@ -1,4 +1,5 @@
 import { WorldGame } from '../WorldGame';
+import { DisposalScope } from '../../engine/DisposalScope';
 import { FactorySalonSession } from './FactorySalonSession';
 import { atFactorySalon, FACTORY_SALON, recordSalonVictory } from './FactorySalon';
 import { drawFactorySalon } from './FactorySalonArt';
@@ -8,6 +9,7 @@ import './factory-salon.css';
 /** Suspends the live campaign instead of copying or reloading its run/save. */
 export class FactoryCampaign extends WorldGame {
     private salon?: FactorySalonSession;
+    private salonEvents?: DisposalScope;
     private shell?: HTMLDialogElement;
     private reflect?: () => void;
     private readonly enterButton: HTMLButtonElement;
@@ -28,7 +30,7 @@ export class FactoryCampaign extends WorldGame {
         this.listen(campaignCanvas, 'keydown', e => {
             if (e.key.toLowerCase() === 'e' && !e.repeat) this.enterSalon();
         });
-        this.addCleanup(() => { this.salon?.dispose(); this.shell?.remove(); this.enterButton.remove(); });
+        this.addCleanup(() => { this.salonEvents?.dispose(); this.salon?.dispose(); this.shell?.remove(); this.enterButton.remove(); });
         // A paused campaign may still own a live salon. Only its ordinary canvas is reusable.
         if (new.target === FactoryCampaign) this.enableFrozenMenuPaint(() => !this.salon);
     }
@@ -54,10 +56,12 @@ export class FactoryCampaign extends WorldGame {
         const lab = new FactorySalonSession(canvas, nativeStatus); this.salon = lab;
         lab.inheritCampaignAudio(this.audio);
         document.title = 'Super Feka Gaps · Salão da Fábrica';
+        // Detached controls and queued dispatches belong only to this visit.
+        const events = this.salonEvents = new DisposalScope();
         const button = (label: string, name: string, run: () => void, primary = false) => {
             const b = document.createElement('button');
             const art = new LabToolbarAction(b, primary); art.setLabel(label, name);
-            b.addEventListener('click', () => { run(); if (this.salon) canvas.focus(); }); nav.append(b);
+            events.listen(b, 'click', () => { run(); if (this.salon) canvas.focus(); }); nav.append(b);
             return { control: b, art };
         };
         const { control: pose } = button('POSE', 'Apresentar pose', () => lab.presentIntro(), true);
@@ -65,7 +69,7 @@ export class FactoryCampaign extends WorldGame {
         const { control: retry } = button('REINICIAR', 'Reiniciar tentativa', () => lab.load('juice-lab'));
         const { art: pause } = button('PAUSA', 'Pausar', () => lab.toggleLabPause());
         button('VOLTAR', 'Voltar à fase', () => this.leaveSalon());
-        shell.addEventListener('keydown', e => {
+        events.listen(shell, 'keydown', e => {
             // Input captures keys first. Keep the two WorldGame menu listeners from
             // handling one Escape twice or resuming the suspended campaign.
             e.stopPropagation();
@@ -74,8 +78,8 @@ export class FactoryCampaign extends WorldGame {
                 if (!e.repeat) lab.toggleLabPause();
             }
         });
-        shell.addEventListener('cancel', e => { e.preventDefault(); lab.toggleLabPause(); });
-        canvas.addEventListener('pointerdown', () => canvas.focus({ preventScroll: true }));
+        events.listen(shell, 'cancel', e => { e.preventDefault(); lab.toggleLabPause(); });
+        events.listen(canvas, 'pointerdown', () => canvas.focus({ preventScroll: true }));
         this.reflect = () => {
             pose.hidden = lab.intro?.beat !== 'prepare';
             skip.hidden = lab.labMode !== 'intro' && (!lab.epilogue.frame || lab.victorious);
@@ -88,6 +92,7 @@ export class FactoryCampaign extends WorldGame {
     leaveSalon(): void {
         if (!this.salon) return;
         if (this.salon.victorious && recordSalonVictory(this.store.save)) this.store.persist();
+        this.salonEvents?.dispose(); this.salonEvents = undefined;
         this.salon.dispose(); this.salon = undefined; this.reflect = undefined;
         this.shell?.close(); this.shell?.remove(); this.shell = undefined;
         this.campaignCanvas.id = 'game-canvas';
