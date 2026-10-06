@@ -4,7 +4,7 @@ import test from 'node:test';
 import { WorldArt } from '../src/adventure/WorldArt';
 import { FOE_FRAMES, foeFrame, WORLD_PALETTE } from '../src/adventure/WorldAssets';
 import { WorldFoe } from '../src/adventure/WorldEnemies';
-import { WorldObjects, type WorldLevel } from '../src/adventure/WorldPhysics';
+import { WorldObjects, type WorldLevel, type Barrel } from '../src/adventure/WorldPhysics';
 import type { PixelFrame } from '../src/graphics/pixels';
 
 const loader = () => new WorldFoe({ id: 'loader-art-test', kind: 'loader', x: 120, y: 224 });
@@ -98,7 +98,7 @@ test('loader keeps exact activation, 850 ms windup, projectile release and 400 m
     for (const facing of [-1, 1]) {
         e.timer = 0;
         const target = { ...player, x: e.x + facing * 60 };
-        const count = objects.barrels.length;
+        const count: number = objects.barrels.length;
         for (const [dt, phase, timer] of [[1500, 'rest', 1500], [1, 'warning', 0], [850, 'warning', 850], [1, 'recoil', 0],
             [129, 'recoil', 129], [1, 'recoil', 130], [130, 'recoil', 260], [140, 'recoil', 400], [1, 'rest', 0]] as const) {
             e.update(dt, level, objects, target);
@@ -106,7 +106,7 @@ test('loader keeps exact activation, 850 ms windup, projectile release and 400 m
             capture(art, e);
             if (phase === 'recoil') {
                 assert.equal(objects.barrels.length, count + 1);
-                const barrel = objects.barrels[count];
+                const barrel: Barrel = objects.barrels[count];
                 assert.equal(barrel.x, e.x + (facing < 0 ? -14 : e.width));
                 assert.equal(barrel.y, e.y - 4);
                 assert.equal(barrel.vx, facing * 1.8); assert.equal(barrel.vy, -2.5);
