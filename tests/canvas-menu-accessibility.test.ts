@@ -78,3 +78,90 @@ test('geometry follows resized canvas and hidden document removes reachable cont
     h.document.hidden = true; h.document.dispatch('visibilitychange'); assert.equal(h.root.hidden, true);
     assert.equal(h.root.children.length, 0); h.menu.sync('title', 'Menu principal', h.choices, 0); assert.equal(h.root.hidden, true);
 });
+
+function propertyWrites<T extends object, K extends keyof T>(target: T, keys: readonly K[]): K[] {
+    const writes: K[] = [];
+    for (const key of keys) {
+        let value = target[key];
+        Object.defineProperty(target, key, {
+            configurable: true, enumerable: true,
+            get: () => value,
+            set: next => { value = next; writes.push(key); }
+        });
+    }
+    return writes;
+}
+
+test('unchanged native menu frames avoid geometry and visibility writes without losing focused controls', t => {
+    const h = setup(t); h.menu.sync('paused', 'Pausa', h.choices, 0);
+    const controls = [...h.root.children]; controls[1].focus();
+    const before = h.stats();
+    const geometry = controls.map(button => propertyWrites(button.style, ['left', 'top', 'width', 'height']));
+    const visibility = propertyWrites(h.root, ['hidden']);
+    for (let frame = 0; frame < 600; frame++)
+        h.menu.sync('paused', 'Pausa', h.choices.map(choice => ({ ...choice })), 1);
+    const counts = { geometry: geometry.reduce((sum, writes) => sum + writes.length, 0), visibility: visibility.length };
+    t.diagnostic(`600 unchanged menu frames: ${JSON.stringify(counts)}`);
+    assert.deepEqual(counts, { geometry: 0, visibility: 0 });
+    assert.deepEqual(h.root.children, controls);
+    assert.equal(h.doc.activeElement, controls[1]);
+    assert.deepEqual(h.stats(), before, 'Unchanged sync must not refocus or reset native input');
+});
+
+test('menu geometry mutations and labels apply immediately while canvas relocation still follows every sync', t => {
+    const h = setup(t); h.menu.sync('settings', 'Opções', h.choices, 0);
+    const [first, second] = h.root.children; second.focus();
+    const firstGeometry = propertyWrites(first.style, ['left', 'top', 'width', 'height']);
+    const secondGeometry = propertyWrites(second.style, ['left', 'top', 'width', 'height']);
+    // The caller can reuse and mutate its choices instead of replacing them.
+    h.choices[1].x = 80; h.choices[1].y = 100;
+    h.choices[1].width = 160; h.choices[1].height = 18;
+    h.choices[1].label = 'MÚSICA: 100%';
+    h.canvas.getBoundingClientRect = () => ({ left: 18, top: 24, width: 800, height: 450, x: 18, y: 24, right: 818, bottom: 474 });
+    h.menu.sync('settings', 'Opções de som', h.choices, 1);
+    assert.deepEqual(firstGeometry, []);
+    assert.deepEqual(secondGeometry, ['left', 'top', 'width', 'height']);
+    assert.equal(second.style.left, '25%'); assert.equal(second.style.top, `${100 / 180 * 100}%`);
+    assert.equal(second.style.width, '50%'); assert.equal(second.style.height, '10%');
+    assert.equal(second.textContent, 'MÚSICA: 100%'); assert.equal(h.root.getAttribute('aria-label'), 'Opções de som');
+    assert.equal(h.root.style.left, '18px'); assert.equal(h.root.style.top, '24px');
+    assert.equal(h.root.style.width, '800px'); assert.equal(h.root.style.height, '450px');
+    assert.equal(h.doc.activeElement, second);
+    h.menu.sync('settings', 'Opções de som', h.choices, 1);
+    assert.equal(secondGeometry.length, 4, 'The mutation is applied only once');
+    // Clearing recreates native controls; every new button still gets its full geometry.
+    h.menu.clear(); h.menu.sync('settings', 'Opções de som', h.choices, 1);
+    const replacement = h.root.children[1];
+    assert.notEqual(replacement, second); assert.equal(replacement.style.left, '25%');
+    assert.equal(replacement.style.top, second.style.top); assert.equal(replacement.style.width, '50%');
+    assert.equal(replacement.style.height, '10%'); assert.equal(h.doc.activeElement, replacement);
+});
+
+test('normalized CSS geometry stays quiet and external inline changes are repaired', t => {
+    const h = setup(t); h.menu.sync('paused', 'Pausa', h.choices, 0);
+    const [first, second] = h.root.children; second.focus();
+    let normalizedTop = '0%', writes = 0;
+    // A browser may serialize a fractional percentage with fewer decimal digits.
+    Object.defineProperty(first.style, 'top', {
+        configurable: true, enumerable: true,
+        get: () => normalizedTop,
+        set: value => { writes++; normalizedTop = `${Number.parseFloat(value).toFixed(4)}%`; }
+    });
+    h.menu.sync('paused', 'Pausa', h.choices, 1);
+    assert.equal(normalizedTop, '37.7778%'); assert.equal(writes, 1);
+    for (let frame = 0; frame < 600; frame++) h.menu.sync('paused', 'Pausa', h.choices, 1);
+    assert.equal(writes, 1, 'Serialized percentages must not cause continuous rewrites');
+    first.style.left = '0%'; h.root.hidden = true;
+    h.menu.sync('paused', 'Pausa', h.choices, 1);
+    assert.equal(first.style.left, '26.25%'); assert.equal(writes, 2);
+    assert.equal(h.root.hidden, false); assert.equal(h.doc.activeElement, second);
+    (h.canvas as unknown as HTMLCanvasElement).inert = true;
+    h.menu.sync('paused', 'Pausa', h.choices, 1);
+    assert.equal(h.root.hidden, true); assert.equal(h.root.children.length, 0);
+    (h.canvas as unknown as HTMLCanvasElement).inert = false;
+    h.menu.sync('paused', 'Pausa', h.choices, 1);
+    assert.notEqual(h.root.children[0], first);
+    assert.equal(h.root.children[0].style.left, '26.25%');
+    assert.equal(h.root.children[0].style.top, `${68 / 180 * 100}%`);
+    assert.equal(h.root.hidden, false);
+});

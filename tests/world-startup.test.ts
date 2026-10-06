@@ -44,6 +44,7 @@ function boot(search: string, fail = false) {
     class WorldGame {
         constructor() { calls.push('world'); }
         start() { calls.push('start'); }
+        enableGamepadControls() { calls.push('gamepad'); }
         enableExperimentalHub() { calls.push('hub'); }
     }
     class Game {
@@ -81,7 +82,7 @@ function boot(search: string, fail = false) {
 
 test('default World paints synchronously without optional imports or a loading overlay', async () => {
     const h = boot('');
-    assert.deepEqual(h.calls, ['world', 'start', 'focus', 'hub']);
+    assert.deepEqual(h.calls, ['world', 'gamepad', 'start', 'focus', 'hub']);
     assert.equal(h.statuses.length, 0);
     await h.done;
 });
@@ -95,6 +96,7 @@ test('explicit optional routes load only their chosen mode and keep focus behavi
         await h.done;
         assert.ok(h.calls.includes(mode));
         assert.equal(h.calls.includes('world'), false);
+        assert.equal(h.calls.includes('gamepad'), false, 'Optional modes retain their own input owners');
         assert.equal(h.calls.includes('focus'), focus);
         assert.equal(h.calls.filter(call => call.startsWith('import:')).length, 1);
         assert.equal(h.statuses[0].removed, true);

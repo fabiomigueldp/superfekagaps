@@ -24,6 +24,10 @@ export class CanvasMenuAccessibility {
     private screen = '';
     private pendingFocus = false;
     private bounds = '';
+    private readonly controlBounds = new WeakMap<HTMLButtonElement, {
+        x: number; y: number; width: number; height: number;
+        left: string; top: string; cssWidth: string; cssHeight: string;
+    }>();
 
     constructor(private readonly canvas: HTMLCanvasElement, private readonly host: CanvasMenuHost) {
         this.root.className = 'canvas-menu-accessibility';
@@ -58,12 +62,9 @@ export class CanvasMenuAccessibility {
         choices.forEach((choice, index) => {
             const button = this.controls[index];
             if (button.textContent !== choice.label) button.textContent = choice.label;
-            Object.assign(button.style, {
-                left: `${choice.x / 320 * 100}%`, top: `${choice.y / 180 * 100}%`,
-                width: `${choice.width / 320 * 100}%`, height: `${choice.height / 180 * 100}%`
-            });
+            this.positionControl(button, choice);
         });
-        this.root.hidden = false;
+        if (this.root.hidden) this.root.hidden = false;
         this.fit();
         const active = this.controls[Math.max(0, Math.min(selected, this.controls.length - 1))];
         // Returning from a native menu action retains focus; opening a modal or
@@ -89,6 +90,25 @@ export class CanvasMenuAccessibility {
     }
 
     dispose(): void { this.clear({ restoreFocus: false }); this.lifetime.dispose(); }
+
+    private positionControl(button: HTMLButtonElement, choice: CanvasMenuChoice): void {
+        const style = button.style;
+        const previous = this.controlBounds.get(button);
+        if (previous && previous.x === choice.x && previous.y === choice.y
+            && previous.width === choice.width && previous.height === choice.height
+            && previous.left === style.left && previous.top === style.top
+            && previous.cssWidth === style.width && previous.cssHeight === style.height) return;
+        Object.assign(style, {
+            left: `${choice.x / 320 * 100}%`, top: `${choice.y / 180 * 100}%`,
+            width: `${choice.width / 320 * 100}%`, height: `${choice.height / 180 * 100}%`
+        });
+        // CSSOM can normalize fractional percentages. Remember its actual values,
+        // while still repairing external inline edits and observing in-place choices.
+        this.controlBounds.set(button, {
+            x: choice.x, y: choice.y, width: choice.width, height: choice.height,
+            left: style.left, top: style.top, cssWidth: style.width, cssHeight: style.height
+        });
+    }
 
     private ownsFocus(): boolean { return this.controls.some(button => button === document.activeElement); }
     private ownsKey(event: KeyboardEvent): boolean {

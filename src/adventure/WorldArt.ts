@@ -1,4 +1,5 @@
 import { SpriteAtlas } from '../graphics/pixels';
+import { drawWorldSeal } from './WorldSealArt';
 import { WorldBackdrop } from './WorldBackdrop';
 import { drawWorldObjects } from './WorldMechanisms';
 import { drawArena, drawIsland } from './WorldStageArt';
@@ -6,7 +7,7 @@ import { container, wheel, pixelLine, polygon, oval } from './WorldPainting';
 import { drawWorldTerrain } from './WorldTerrain';
 import { pixelText } from '../graphics/BitmapFont';
 import { MINION_FRAMES, MINION_SQUASH, SPRITE_PALETTE } from '../graphics/sprites';
-import { BOSS_LOOPS, WORLD_PALETTE, SEALS, foeFrame, bossFrame, type BossPose } from './WorldAssets';
+import { BOSS_LOOPS, WORLD_PALETTE, foeFrame, bossFrame, type BossPose } from './WorldAssets';
 import type { Island } from './types';
 import type { WorldLevel, WorldObjects } from './WorldPhysics';
 import type { WorldFoe } from './WorldEnemies';
@@ -173,11 +174,7 @@ export class WorldArt {
         }
     }
     seal(c: CanvasRenderingContext2D, x: number, y: number, time: number, collected = false) {
-        c.save();
-        if (collected)
-            c.globalAlpha = .25;
-        this.atlas.draw(c, SEALS[Math.floor(time / 160) % 4], WORLD_PALETTE, x, y + Math.round(Math.sin(time / 320) * 2));
-        c.restore();
+        drawWorldSeal(c, this.atlas, x, y, time, collected);
     }
     island(c: CanvasRenderingContext2D, w: Island, selected: boolean, time: number) { drawIsland(c, w, selected, time); }
 }

@@ -7,6 +7,7 @@ import { advanceCampaignCamera } from './WorldCampaignCamera';
 import { runGuairaFlight } from './WorldGuairaFlight';
 import { ExperimentalHub } from './experimental/hub/ExperimentalHub';
 import { Input } from '../engine/Input';
+import { StandardGamepad } from '../engine/StandardGamepad';
 import { DisposalScope } from '../engine/DisposalScope';
 import { Renderer } from '../engine/Renderer';
 import { Player } from '../entities/Player';
@@ -57,6 +58,7 @@ export class WorldGame {
     private running = false;
     readonly renderer: Renderer;
     readonly input: Input;
+    private gamepad?: StandardGamepad;
     readonly art = new WorldArt();
     readonly store: ProgressStore;
     readonly audio: WorldAudio;
@@ -184,6 +186,12 @@ export class WorldGame {
                 worldGame: WorldGame;
             }).worldGame = this;
         } catch (error) { this.dispose(); throw error; }
+    }
+    /** Main entry only: optional scenes retain their existing input owners. */
+    enableGamepadControls(): void {
+        if (this.isDisposed || this.gamepad) return;
+        const gamepad = this.gamepad = new StandardGamepad(this.input);
+        this.addCleanup(() => { gamepad.dispose(); this.gamepad = undefined; });
     }
     /** Opt-in only from the main entry. Labs/editor never mount title navigation. */
     enableExperimentalHub(search = ''): void {
@@ -503,6 +511,11 @@ export class WorldGame {
     update(dt: number) {
         if (this.isDisposed) return;
         if (this.experimentalHub?.isOpen || this.controlsHelp?.isOpen) { this.input.reset(); return; }
+        const gamepadMode = !this.flightCleanup && (this.state === 'playing' || this.state === 'paused') ? this.state : 'inactive';
+        if (this.gamepad?.update(gamepadMode)) {
+            if (this.state === 'playing') this.pause(); else if (this.state === 'paused') this.resume();
+            return;
+        }
         this.input.setMenuMode(this.state !== 'playing');
         this.input.update();
         if (this.input.consumeMute())

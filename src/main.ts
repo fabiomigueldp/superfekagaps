@@ -63,6 +63,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     game = new mode.Game(canvas);
   } else {
     game = new FactoryCampaign(canvas);
+    game.enableGamepadControls();
   }
   game.start();
   if (!isEditor) {

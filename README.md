@@ -132,6 +132,8 @@ Ferramentas opcionais: `python tools/scanner.py` cria uma visão textual do proj
 
 No toque, use as setas para andar, **X** para correr, **↑** para pular e **↓** no ar para a sentada. Toque no topo para pausar; nos menus, toque para confirmar. O golpe que abre buracos do Joãozão sinaliza e fixa a área antes do impacto: sair da faixa evita o buraco, e acertar o chefe durante a preparação interrompe o ataque. Licença: MIT.
 
+Na campanha World principal, controles reconhecidos pelo navegador como **Standard Gamepad** usam o analógico esquerdo ou direcional para andar, **A/× (botão inferior)** para pular, **X/□ (botão esquerdo)** para correr, **direcional ↓** para a sentada e **Start/Options** para pausar/continuar. O analógico tem zona morta de 25%; sua direção vertical não ataca. Ao conectar, voltar à página ou trocar de tela, solte esses controles antes de apertar novamente. Menus, diálogos, mapa, salão e modos opcionais continuam com seus controles próprios de teclado/toque; Start só continua a pausa comum. Teclado e toque continuam disponíveis em paralelo.
+
 ## English
 
 **Play online:** [superfekagaps.torbware.space](https://superfekagaps.torbware.space/). After a personal-best finish, you can choose a name and opt in to the [global leaderboard](docs/scoreboard.md).
@@ -157,3 +159,5 @@ Dimensions and entity/spawn/checkpoint/goal positions use **16-pixel world tiles
 `npx tsx scripts/normalize_tiles.ts --check` checks source grid dimensions without writing. Omit `--check` to pad missing rows/cells with air or trim excess tiles to the declared dimensions, preserving other level fields. Review the resulting diff.
 
 Game controls: **A/D or Left/Right** move, **W/Space/Z/Up** jump, **Shift/X** run, **S/Down** ground pound in the air, **Enter** confirm, **Esc** pause, **M** mute. The latest horizontal key pressed takes priority until released. Touch controls are also available. License: MIT.
+
+The main World campaign also accepts browser-recognized **Standard Gamepads**: left stick/D-pad moves, **A/Cross (bottom face button)** jumps, **X/Square (left face button)** runs, **D-pad Down** ground-pounds, and **Start/Options** pauses/resumes ordinary gameplay. The stick has a 25% deadzone; vertical stick movement does not attack. Release mapped controls after connecting, returning to the page or changing screens before pressing again. Menus, dialogue, map, salon and optional modes keep their own keyboard/touch controls; Start never activates their menus. Keyboard and touch remain usable alongside the controller.
