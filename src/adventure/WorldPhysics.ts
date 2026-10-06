@@ -195,6 +195,9 @@ export class WorldObjects {
         level.bodies = this.bodies;
         for (const p of this.barrels) {
             p.life -= dt;
+            // Retired or expiring barrels cannot move, hit targets, or emit impacts.
+            if (p.life <= 0)
+                continue;
             const belt = this.bodies.find(b => b.kind === 'belt' && p.x + p.width > b.x && p.x < b.x + b.width && Math.abs(p.y + p.height - (b.y + b.height)) < 6);
             if (belt) {
                 const dir = (belt.direction ?? 1) * (belt.active ? -1 : 1);

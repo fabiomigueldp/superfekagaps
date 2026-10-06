@@ -374,10 +374,16 @@ export class WorldMapView {
         return new Promise(resolve => {
             if (signal.aborted) { resolve(null); return; }
             const image = new Image(); image.decoding = 'async';
+            let settled = false;
             const finish = (result: HTMLImageElement | null) => {
+                if (settled) return;
+                settled = true; clearTimeout(timeout);
                 image.onload = null; image.onerror = null; signal.removeEventListener('abort', aborted); resolve(result);
             };
             const aborted = () => finish(null);
+            // A stalled dock, hull or island must reach the same usable fallback as an explicit image failure.
+            const timeout = setTimeout(() => finish(null), 12_000);
+            (timeout as unknown as { unref?: () => void }).unref?.();
             signal.addEventListener('abort', aborted, { once: true });
             image.onload = () => finish(image); image.onerror = () => finish(null); image.src = path;
         });

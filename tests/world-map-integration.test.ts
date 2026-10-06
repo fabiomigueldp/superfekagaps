@@ -427,6 +427,53 @@ test('a failed required asset settles its island pair while the other asset stay
         });
 });
 
+test('a stalled island image settles its pair even when metadata has not responded', async t => {
+    for (const metadataReady of [false, true]) await t.test(metadataReady ? 'metadata ready' : 'metadata pending', async child => {
+        child.mock.timers.enable({ apis: ['setTimeout'] });
+        const h = mapDOM(child, true), save = { ...freshSave(), selected: '1-5', completed: STAGES.filter(stage => stage.world === 1).map(stage => stage.id) };
+        h.view.render(4, save, 0, ''); await finishWorld(h, 1);
+        const image = h.images.find(image => image.src.endsWith('porto-diorama.webp'))!;
+        const request = h.fetches.find(request => request.url.endsWith('porto-diorama.meta.json'))!;
+        const lateSuccess = image.onload!;
+        if (metadataReady) request.resolve({ ok: true, json: async () => fixtureMapMetadata(2) });
+        await flushAssets(); h.view.render(5, save, 16, '');
+        assert.equal(h.view.enterSelected(5), false);
+        child.mock.timers.tick(12_000); await flushAssets();
+        assert.equal(h.internal.artCache.get(2).status, 'failed'); assert.equal(request.signal.aborted, true);
+        assert.equal(image.onload, null); assert.equal(image.onerror, null);
+        h.view.render(5, save, 12_016, '');
+        assert.equal(h.internal.journey.arrived, '2-1'); assert.equal(h.internal.hud.enterButton.disabled, false);
+        assert.equal(currentArt(h, 1).status, 'ready'); assert.equal(currentArt(h, 2).assets.island, null);
+        request.resolve({ ok: true, json: async () => fixtureMapMetadata(2) }); lateSuccess(); await flushAssets();
+        assert.equal(h.internal.artCache.get(2).status, 'failed'); assert.equal(h.internal.artCache.get(2).assets.island, null);
+    });
+});
+
+test('image completion, failure and disposal each clear their deadline and listeners once', async t => {
+    for (const outcome of ['load', 'error', 'abort', 'dispose'] as const) await t.test(outcome, async child => {
+        child.mock.timers.enable({ apis: ['setTimeout'] });
+        const h = mapDOM(child), controller = new AbortController();
+        const signal: AbortSignal = outcome === 'dispose' ? h.internal.abort.signal : controller.signal;
+        const scheduled = child.mock.method(globalThis, 'setTimeout'), cleared = child.mock.method(globalThis, 'clearTimeout');
+        const removed = child.mock.method(signal, 'removeEventListener');
+        const loading: Promise<HTMLImageElement | null> = h.internal.loadImage('/test-map-image.webp', signal);
+        const image = h.images.at(-1)!, lateSuccess = image.onload!, lateError = image.onerror!;
+        const timer = scheduled.mock.calls.at(-1)!.result;
+        assert.equal(scheduled.mock.calls.at(-1)!.arguments[1], 12_000);
+        if (outcome === 'load') image.onload!();
+        else if (outcome === 'error') image.onerror!();
+        else if (outcome === 'dispose') h.view.dispose();
+        else controller.abort();
+        assert.equal(await loading, outcome === 'load' ? image : null);
+        assert.equal(image.onload, null); assert.equal(image.onerror, null);
+        assert.equal(cleared.mock.calls.length, 1); assert.equal(cleared.mock.calls[0].arguments[0], timer);
+        assert.equal(removed.mock.calls.length, 1); assert.equal(removed.mock.calls[0].arguments[0], 'abort');
+        lateSuccess(); lateError(); child.mock.timers.tick(24_000); await flushAssets();
+        assert.equal(cleared.mock.calls.length, 1); assert.equal(removed.mock.calls.length, 1);
+        assert.equal(await loading, outcome === 'load' ? image : null);
+    });
+});
+
 test('pending island pairs survive reentry but disposal prevents late art from reaching a replacement view', async t => {
     for (const first of ['neither', 'image', 'metadata'] as const) await t.test(first, async child => {
         const h = mapDOM(child, true), save = freshSave(); h.view.render(0, save, 0, '');
@@ -804,7 +851,7 @@ test('WorldGame lazy map creation is reused and arrival callback persists exactl
 
 const actualMetadata = (world: number) => JSON.parse(readFileSync(new URL(`../public/assets/world/map/${dioramaName(world)}.meta.json`, import.meta.url), 'utf8'));
 const actualBoatMetadata = () => JSON.parse(readFileSync(new URL('../public/assets/world/map/journey-boat.meta.json', import.meta.url), 'utf8'));
-async function readyConnection(h: ReturnType<typeof mapDOM>, save = openSave('1-5'), failAsset = '') {
+async function readyConnection(h: ReturnType<typeof mapDOM>, save = openSave('1-5'), failAsset = '', holdAsset = '') {
     const selection = STAGES.findIndex(stage => stage.id === save.selected);
     h.view.render(selection, save, 0, ''); await finishWorld(h, 1, actualMetadata(1)); await finishWorld(h, 2, actualMetadata(2));
     for (const name of ['coast-port-journey', 'journey-boat']) {
@@ -818,6 +865,7 @@ async function readyConnection(h: ReturnType<typeof mapDOM>, save = openSave('1-
         const image = h.images.find(image => image.src.endsWith(size.path.split('/').pop()))!;
         assert.ok(image, `Expected validated journey image ${size.path}`);
         Object.assign(image, { naturalWidth: size.width, naturalHeight: size.height });
+        if (holdAsset && size.path.includes(holdAsset)) continue;
         if (size.path.includes(failAsset) && failAsset) image.onerror?.(); else image.onload?.();
     }
     await flushAssets(); h.view.render(selection, save, 16, '');
@@ -1481,6 +1529,39 @@ test('failed crossing art exposes a clear usable region fallback without inventi
     assert.equal(h.internal.journey.arrived, '2-1'); assert.equal(h.internal.journey.destination, null); assert.equal(h.events.entered, 0);
     assert.ok(h.internal.network.edges.every((edge: { mode: string }) => edge.mode !== 'sail'));
     assert.match(h.get('world-map-warning').textContent, /travessia visual não carregou/); assert.equal(h.internal.hud.enterButton.disabled, false);
+});
+
+test('a stalled ferry image releases the loading gate without retrying or accepting late art', async t => {
+    const connection = JSON.parse(readFileSync(new URL('../public/assets/world/map/coast-port-journey.meta.json', import.meta.url), 'utf8'));
+    const paths: string[] = [connection.islands.costa.overlay.path, connection.islands.porto.overlay.path, actualBoatMetadata().atlas.path];
+    for (const path of paths) await t.test(path, async child => {
+        child.mock.timers.enable({ apis: ['setTimeout'] });
+        const h = mapDOM(child, true), save = { ...freshSave(), selected: '1-5', completed: STAGES.filter(stage => stage.world === 1).map(stage => stage.id) };
+        const before = structuredClone(save);
+        await readyConnection(h, save, '', path.split('/').pop()!);
+        const image = h.images.find(image => image.src.endsWith(path.split('/').pop()!))!;
+        const lateSuccess = image.onload!, requests = [h.images.length, h.fetches.length];
+        h.view.render(5, save, 50, '');
+        assert.equal(h.internal.connectionStatus, 'loading');
+        assert.equal(h.internal.journey.arrived, '1-5'); assert.equal(h.view.enterSelected(5), false);
+        assert.match(h.get('world-map-hint').textContent, /Preparando/);
+        child.mock.timers.tick(11_999); await flushAssets();
+        assert.equal(h.internal.connectionStatus, 'loading', 'Slow images retain their full loading window.');
+        child.mock.timers.tick(1); await flushAssets();
+        assert.equal(h.internal.connectionStatus, 'failed', 'A silent image request must not gate an unlocked stage forever.');
+        assert.equal(image.onload, null); assert.equal(image.onerror, null);
+        h.view.render(5, save, 12_050, '');
+        assert.equal(h.internal.journey.arrived, '2-1'); assert.equal(h.internal.journey.destination, null);
+        assert.equal(h.internal.hud.enterButton.disabled, false); assert.equal(h.events.entered, 0);
+        assert.match(h.get('world-map-warning').textContent, /travessia visual não carregou/);
+        assert.ok(h.internal.network.edges.every((edge: { mode: string }) => edge.mode !== 'sail'));
+        assert.equal(h.internal.artCache.get(1).status, 'ready'); assert.equal(h.internal.artCache.get(2).status, 'ready');
+        lateSuccess(); await flushAssets();
+        h.view.hide(); h.view.render(5, save, 12_100, '');
+        assert.equal(h.internal.connectionStatus, 'failed'); assert.equal(h.internal.connectionActive, false);
+        assert.deepEqual([h.images.length, h.fetches.length], requests, 'Rendering and reopening do not retry expired images.');
+        assert.equal(h.view.enterSelected(5), true); assert.equal(h.events.entered, 1); assert.deepEqual(save, before);
+    });
 });
 
 test('a phase clear crossing and reloading mid-sail both begin at the played Costa arrival', async t => {
