@@ -52,16 +52,17 @@ export function atlasFrames(image:HTMLImageElement,columns:number,rows:number,la
  let grids=cache.get(image);if(!grids){grids=new Map();cache.set(image,grids);}
  const key=`${columns}:${rows}:${layout??''}`,known=grids.get(key);if(known)return known;
  const canvas=document.createElement('canvas');canvas.width=image.naturalWidth;canvas.height=image.naturalHeight;
+ const width=canvas.width,height=canvas.height;
  const c=canvas.getContext('2d',{willReadFrequently:true})!;c.drawImage(image,0,0);
- const {data}=c.getImageData(0,0,canvas.width,canvas.height),frames:SpriteFrame[]=[];
+ const {data}=c.getImageData(0,0,width,height),frames:SpriteFrame[]=[];
  for(let index=0;index<columns*rows;index++){
   const region=layout?LANDMARK_REGIONS[index]:undefined;
-  const left=region?Math.round(region[0]*canvas.width/1224):Math.round(index%columns*canvas.width/columns);
-  const right=region?Math.round((region[0]+region[2])*canvas.width/1224):Math.round((index%columns+1)*canvas.width/columns);
-  const top=region?Math.round(region[1]*canvas.height/1285):Math.round(Math.floor(index/columns)*canvas.height/rows);
-  const bottom=region?Math.round((region[1]+region[3])*canvas.height/1285):Math.round((Math.floor(index/columns)+1)*canvas.height/rows);
+  const left=region?Math.round(region[0]*width/1224):Math.round(index%columns*width/columns);
+  const right=region?Math.round((region[0]+region[2])*width/1224):Math.round((index%columns+1)*width/columns);
+  const top=region?Math.round(region[1]*height/1285):Math.round(Math.floor(index/columns)*height/rows);
+  const bottom=region?Math.round((region[1]+region[3])*height/1285):Math.round((Math.floor(index/columns)+1)*height/rows);
   let x0=right,x1=left,y0=bottom,y1=top;
-  for(let y=top;y<bottom;y++)for(let x=left;x<right;x++)if(data[(y*canvas.width+x)*4+3]>32){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);}
+  for(let y=top;y<bottom;y++)for(let x=left;x<right;x++)if(data[(y*width+x)*4+3]>32){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);}
   frames.push(x0<=x1&&y0<=y1?{x:x0,y:y0,w:x1-x0+1,h:y1-y0+1}:{x:left,y:top,w:right-left,h:bottom-top});
  }
  grids.set(key,frames);return frames;
