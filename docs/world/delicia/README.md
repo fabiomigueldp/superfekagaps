@@ -44,6 +44,10 @@ Celulares têm oito botões de toque, com suporte a comandos simultâneos. As op
 oferecem volume separado, redução de tremor e efeitos, seis corações e avisos mais
 longos na **Travessia tranquila**. O desafio padrão tem quatro corações.
 
+A redução de movimento acompanha a preferência do sistema, inclusive quando ela
+muda durante o jogo. **Sempre reduzir movimento** mantém a redução ligada só neste
+jogo; desmarcar volta a seguir o sistema. Isso não muda a física nem os avisos de perigo.
+
 ## A história
 
 Antes da fábrica, a Delícia era uma tradição: cada família plantava uma árvore

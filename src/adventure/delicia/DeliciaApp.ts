@@ -20,7 +20,8 @@ export class DeliciaApp {
     private held=new Set<string>();private pressed=new Set<string>();private released=new Set<string>();private sources=new Map<string,string>();private buttonKeys=new Map<string,HTMLButtonElement>();
     private lines:readonly SceneLine[]=[];private lineIndex=0;private dialogueDone:()=>void=()=>{};
     private journalReturn:()=>void=()=>this.showMap();private settingsReturn:()=>void=()=>this.showMap();
-    private listOpen=false;private settingsMessage?:HTMLParagraphElement;
+    private listOpen=false;private settingsMessage?:HTMLParagraphElement;private motionHint?:HTMLElement;
+    private readonly systemMotion=typeof matchMedia==='function'?matchMedia('(prefers-reduced-motion: reduce)'):null;
     private mapNodes:Record<string,{x:number;y:number}>={};private mapSelection='delicia-1';private toast='';private toastTime=0;private shake=0;private hudKey='';
     private cleanups:(()=>void)[]=[];private mapCanvas?:HTMLCanvasElement;private mapControls:HTMLButtonElement[]=[];
     private hitStop=0;private zoneBanner='';private zoneBannerTime=0;private gamepadPause=false;
@@ -37,6 +38,11 @@ export class DeliciaApp {
         this.listen(window,'pointerup',(e:PointerEvent)=>this.releaseInput(`pointer:${e.pointerId}`));this.listen(window,'pointercancel',(e:PointerEvent)=>this.releaseInput(`pointer:${e.pointerId}`,true));
         this.listen(this.canvas,'pointerdown',()=>this.canvas.focus({preventScroll:true}));this.listen(window,'pagehide',()=>this.dispose());
         this.listen(window,'resize',()=>{if(this.screen==='map')this.fitMapTitle();});
+        if(this.systemMotion){
+            const changed=()=>{if(!this.disposed)this.updateMotionHint();};
+            if(typeof this.systemMotion.addEventListener==='function')this.listen(this.systemMotion,'change',changed);
+            else{this.systemMotion.addListener(changed);this.cleanups.push(()=>this.systemMotion?.removeListener(changed));}
+        }
         void this.art.load();void fetch(DELICIA_MAP_METADATA).then(r=>r.ok?r.json():null).then((data:unknown)=>{
             if(this.disposed||!data||typeof data!=='object')return;const nodes=(data as {nodes?:unknown}).nodes;
             if(nodes&&typeof nodes==='object')for(const s of DELICIA_STAGES){const p=(nodes as Record<string,unknown>)[s.id] as {x?:unknown;y?:unknown};if(p&&typeof p.x==='number'&&typeof p.y==='number'&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&p.x>=0&&p.x<=1&&p.y>=0&&p.y<=1)this.mapNodes[s.id]={x:p.x,y:p.y};}
@@ -46,6 +52,13 @@ export class DeliciaApp {
         if((import.meta as ImportMeta & {env:{DEV:boolean}}).env.DEV)(window as unknown as {deliciaGame:DeliciaApp}).deliciaGame=this;
     }
     private listen<E extends Event>(target:EventTarget,event:string,handler:(event:E)=>void):void{const listener:EventListener=e=>handler(e as E);target.addEventListener(event,listener);this.cleanups.push(()=>target.removeEventListener(event,listener));}
+    // The save is a manual opt-in; system changes never overwrite it.
+    private get reducedMotion():boolean{return this.store.save.reducedMotion||!!this.systemMotion?.matches;}
+    private updateMotionHint():void{
+        if(this.motionHint)this.motionHint.textContent=this.systemMotion?.matches
+            ?this.store.save.reducedMotion?'Redução ativa pelo sistema e neste jogo.':'Redução ativa pelo sistema. Marque para manter no jogo.'
+            :this.store.save.reducedMotion?'Redução ativa neste jogo.':'Tremores e animações seguem o sistema.';
+    }
     private keyDown=(event:KeyboardEvent):void=>{
         const key=event.key.toLowerCase();if(this.disposed)return;
         if(event.repeat){if(this.screen!=='playing'&&(key==='enter'||key===' '))event.preventDefault();return;}
@@ -155,7 +168,7 @@ export class DeliciaApp {
         this.panel.removeAttribute('role');this.panel.removeAttribute('aria-modal');this.panel.removeAttribute('aria-labelledby');
         this.hud.hidden=screen!=='playing'&&screen!=='dialogue';this.canvas.hidden=!['playing','pause','dialogue','dead','clear'].includes(screen);this.playfield.hidden=this.canvas.hidden;
         this.playfield.inert=screen!=='playing';
-        this.touch.hidden=screen!=='playing';this.listOpen=false;this.settingsMessage=undefined;this.resetInput();
+        this.touch.hidden=screen!=='playing';this.listOpen=false;this.settingsMessage=undefined;this.motionHint=undefined;this.resetInput();
     }
     private focusFirst():void{this.panel.querySelector<HTMLElement>('button:not(:disabled),a[href],summary,input')?.focus({preventScroll:true});}
     private menuFocusables():HTMLElement[]{
@@ -286,7 +299,7 @@ export class DeliciaApp {
     }
     private paintMap(time:number):void{
         const canvas=this.mapCanvas,c=canvas?.getContext('2d');if(!canvas||!c)return;c.fillStyle='#286c75';c.fillRect(0,0,960,700);const gradient=c.createLinearGradient(0,0,960,700);gradient.addColorStop(0,'#153f55');gradient.addColorStop(1,'#419ba0');c.fillStyle=gradient;c.fillRect(0,0,960,700);
-        c.strokeStyle='#c6e7cf25';c.lineWidth=1;const t=this.store.save.reducedMotion?0:time;
+        c.strokeStyle='#c6e7cf25';c.lineWidth=1;const t=this.reducedMotion?0:time;
         for(let row=0;row<20;row++){c.beginPath();for(let x=0;x<=960;x+=10){const y=row*38+Math.sin(x*.012+t*.6+row)*5;if(!x)c.moveTo(x,y);else c.lineTo(x,y);}c.stroke();}
     }
     loadStage(id:string,retry=false):boolean{
@@ -300,7 +313,7 @@ export class DeliciaApp {
         else this.sim.startBoss();this.announce(stage.name+'. '+stage.mechanic);return true;
     }
     private renderGame():void {
-        const sim=this.sim;if(!sim)return;this.ctx.save();if(this.shake>0&&!this.store.save.reducedMotion){this.ctx.translate(Math.sin(sim.time*95)*this.shake*22,Math.cos(sim.time*71)*this.shake*15);}this.art.draw(this.ctx,sim,this.store.save.reducedMotion);this.ctx.restore();
+        const sim=this.sim;if(!sim)return;const reduced=this.reducedMotion;this.ctx.save();if(this.shake>0&&!reduced){this.ctx.translate(Math.sin(sim.time*95)*this.shake*22,Math.cos(sim.time*71)*this.shake*15);}this.art.draw(this.ctx,sim,reduced);this.ctx.restore();
         const scale=Math.max(2,Math.ceil(11*960/(Math.max(1,this.canvas.clientWidth)*7))),lineHeight=scale*11;
         if(this.toastTime>0){
             const lines=wrapText(this.toast,Math.floor(840/scale)),width=Math.max(...lines.map(line=>textWidth(line)))*scale+28,height=lines.length*lineHeight+18;
@@ -401,8 +414,9 @@ export class DeliciaApp {
         const play=element('fieldset','dl-setting-group');play.append(element('legend','','Jogo'));
         for(const key of ['reducedMotion','assists'] as const){
             const label=element('label','dl-setting'),input=element('input');input.type='checkbox';input.checked=this.store.save[key];
-            input.addEventListener('change',()=>{this.store.save[key]=input.checked;this.store.persist();});
-            label.append(element('span','',key==='reducedMotion'?'Reduzir movimento':'Mais vida e avisos longos'),input);play.append(label);
+            input.addEventListener('change',()=>{this.store.save[key]=input.checked;this.store.persist();if(key==='reducedMotion')this.updateMotionHint();});
+            label.append(element('span','',key==='reducedMotion'?'Sempre reduzir movimento':'Mais vida e avisos longos'),input);play.append(label);
+            if(key==='reducedMotion'){const hint=element('small','dl-muted');hint.id='dl-motion-hint';hint.setAttribute('aria-live','polite');input.setAttribute('aria-describedby',hint.id);play.append(hint);this.motionHint=hint;this.updateMotionHint();}
             if(key==='assists'){const hint=element('small','dl-muted','Ajuda: vale na próxima fase. Desativa recordes e medalhas.');hint.id='dl-assists-hint';input.setAttribute('aria-describedby',hint.id);play.append(hint);}
         }
         this.panel.append(play);
