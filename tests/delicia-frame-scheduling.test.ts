@@ -50,8 +50,9 @@ function fixture(t: TestContext) {
         setPointerCapture() { if (this.captureFails) throw new DOMException('Capture unavailable'); }
     }
     const body = new Element('body'), window = new EventTarget();
-    const document = Object.assign(new EventTarget(), { body, hidden: false, title: '',
+    const document = Object.assign(new EventTarget(), { body, hidden: false, title: '', activeElement: null as Element | null,
         createElement: (tag: string) => new Element(tag) });
+    // Define the live focus getter after assigning the document's typed shape.
     Object.defineProperty(document, 'activeElement', { get: () => activeElement });
     const frames = new Map<number, FrameRequestCallback>();
     let frameId = 0, now = 1000, polls = 0;
