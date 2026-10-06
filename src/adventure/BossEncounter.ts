@@ -29,6 +29,7 @@ export class BossEncounter implements Rect {
     private releasedExtra = false;
     private resetAfterHit = false;
     private retryAt = 0;
+    private throwPoseAt: number | null = null;
     constructor(readonly id: EncounterId) {
         this.character = id[0] === 'J' ? 'joao' : id[0] === 'B' ? 'biel' : 'calabrezzo';
         this.health = this.maxHealth = id.endsWith('2') ? 4 : 3;
@@ -54,6 +55,7 @@ export class BossEncounter implements Rect {
         this.phase = phase;
         this.timer = 0;
         this.danger = null;
+        this.throwPoseAt = null;
         if (phase === 'hurt')
             this.resetAfterHit = false;
     }
@@ -72,6 +74,7 @@ export class BossEncounter implements Rect {
         this.released = true;
         this.pose = 'shoot';
         this.poseTime = 0;
+        this.throwPoseAt = this.timer;
     }
     get shockWarning() { return this.id === 'J2' && this.health <= 2 && this.phase === 'rest' && this.timer < 650; }
     get secondTarget() { return clamp(this.targetX + (this.targetX > 155 ? -76 : 76), 28, 272); }
@@ -180,7 +183,13 @@ export class BossEncounter implements Rect {
             }
         }
         else if (this.phase === 'attack') {
-            this.pose = this.character === 'calabrezzo' ? (this.timer < 430 ? 'shoot' : 'idle') : 'smash';
+            this.pose = this.character === 'calabrezzo' ? 'idle' : 'smash';
+            // Every released barrel gets the same follow-through, including retries.
+            // The attack clock still owns all windups, projectiles and hit windows.
+            if (this.character === 'calabrezzo' && this.throwPoseAt !== null && this.timer - this.throwPoseAt < 430) {
+                this.pose = 'shoot';
+                this.poseTime = this.timer - this.throwPoseAt;
+            }
             if (this.character === 'joao') {
                 if (this.pattern === 'leap') {
                     const t = Math.min(1, this.timer / 650);
@@ -231,10 +240,6 @@ export class BossEncounter implements Rect {
                         this.throwBarrel(objects);
                         this.releasedExtra = true;
                     }
-                }
-                if (this.phase === 'attack' && this.pattern === 'volley' && this.releasedExtra && this.timer >= 1200 && this.timer < 1630) {
-                    this.pose = 'shoot';
-                    this.poseTime = this.timer - 1200;
                 }
                 if (this.phase === 'attack' && this.id === 'C2' && this.timer > 1800 && (this.timer < 5400 || this.retryAt > 0) && !objects.barrels.some(b => b.boss)) {
                     this.retryAt ||= this.timer + 750;

@@ -60,7 +60,7 @@ export class WorldGame {
     coins = 0;
     private recordEligible = true;
     private accumulator = 0;
-    private last = 0;
+    private last: number | null = null;
     private buttons: Button[] = [];
     private menuAccessibility?: CanvasMenuAccessibility;
     private controlsHelp?: WorldControlsHelp;
@@ -154,8 +154,10 @@ export class WorldGame {
                 if (this.state === 'playing') this.pause();
             });
             this.listen(document, 'visibilitychange', () => {
-                if (document.hidden && this.state === 'playing')
-                    this.pause();
+                if (document.hidden) {
+                    if (this.state === 'playing') this.pause();
+                    this.cancelFrame();
+                } else this.requestFrame();
             });
             (window as unknown as {
                 worldGame: WorldGame;
@@ -181,8 +183,8 @@ export class WorldGame {
     dispose(): void {
         if (this.isDisposed) return;
         this.running = false;
-        if (this.frame !== null) cancelAnimationFrame(this.frame);
-        this.frame = null; this.accumulator = 0; this.buttons = []; this.hitStopInput = null;
+        this.cancelFrame();
+        this.accumulator = 0; this.buttons = []; this.hitStopInput = null;
         this.flightCleanup?.();
         this.lifetime.dispose();
         const globals = window as unknown as { worldGame?: WorldGame };
@@ -190,26 +192,43 @@ export class WorldGame {
     }
     start(): void {
         if (this.isDisposed || this.running) return;
-        this.running = true; this.last = performance.now();
-        this.frame = requestAnimationFrame(this.loop);
+        if (document.hidden && this.state === 'playing') this.pause();
+        this.running = true; this.last = document.hidden ? null : performance.now();
+        this.requestFrame();
+    }
+    private cancelFrame(): void {
+        if (this.frame !== null) cancelAnimationFrame(this.frame);
+        this.frame = null; this.last = null;
+    }
+    private requestFrame(): void {
+        if (this.isDisposed || !this.running || document.hidden || this.frame !== null) return;
+        const frame = requestAnimationFrame(now => {
+            // A canceled callback must not consume or fork a newer visible chain.
+            if (this.frame !== frame) return;
+            this.frame = null;
+            this.loop(now);
+        });
+        this.frame = frame;
     }
     private loop = (now: number) => {
         if (this.isDisposed || !this.running) return;
-        this.frame = null;
-        const dt = document.hidden ? 0 : Math.min(100, now - this.last);
+        if (document.hidden) { this.cancelFrame(); return; }
+        // Retain the fixed-step remainder, but never add time spent hidden.
+        const dt = this.last === null ? 0 : Math.min(100, now - this.last);
         this.last = now;
         this.accumulator += dt;
-        while (!this.isDisposed && this.accumulator >= 1000 / 60) {
+        while (!this.isDisposed && !document.hidden && this.accumulator >= 1000 / 60) {
             this.update(1000 / 60);
             this.accumulator -= 1000 / 60;
         }
-        if (this.isDisposed) return;
+        if (this.isDisposed || document.hidden) return;
         this.renderer.setFrameInterpolation(this.state === 'playing' ? this.accumulator : 0);
         this.render();
-        if (!this.isDisposed && this.running) this.frame = requestAnimationFrame(this.loop);
+        this.requestFrame();
     };
     private change(screen: Screen) { if (this.isDisposed) return; this.controlsHelp?.close(false); this.menuAccessibility?.clear(); this.journalAccessibility?.clear(); if (screen !== 'map') this.mapView?.hide(); this.state = screen; this.hitStopInput = null; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; this.experimentalHub?.sync(); }
     private menuKey(e: KeyboardEvent) {
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
         if (this.experimentalHub?.isOpen || this.controlsHelp?.isOpen || this.flightCleanup) return;
         const target = e.target;
         if (target instanceof HTMLElement && target.closest('button, a[href]') && (e.key === 'Enter' || e.key === ' ')) return;
@@ -902,6 +921,7 @@ export class WorldGame {
     }
     protected renderEncounterHud(c: CanvasRenderingContext2D) {
         if (!this.boss) return;
+        if (this.player.data.hasHelmet) this.renderer.drawHelmet(283, 4, c);
         panel(c, 64, 26, 192, 24);
         const boss = this.boss;
         for (let i = 0; i < boss.maxHealth; i++)

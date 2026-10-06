@@ -6,9 +6,12 @@ import { box as r, pixelLine as line, oval, polygon, rivet, ink } from './WorldP
 import { drawJet, drawCannon } from './WorldMachineArt';
 import { drawCannonBarrelEffects } from './WorldCannonEffects';
 import { drawCarrier, drawCarrierTrack, drawBelt, drawSwitch, drawSupport } from './WorldTransportArt';
-function identity(objects: WorldObjects, b: MovingBody) {
-    const ids = [...new Set(objects.bodies.filter(s => s.kind === 'switch' && s.link).map(s => s.link!))];
-    return ids.indexOf(b.kind === 'switch' ? b.link ?? '' : b.id) + 1;
+function identities(bodies: readonly MovingBody[]) {
+    const ids = new Map<string, number>();
+    for (const b of bodies) {
+        if (b.kind === 'switch' && b.link && !ids.has(b.link)) ids.set(b.link, ids.size + 1);
+    }
+    return ids;
 }
 function badge(c: CanvasRenderingContext2D, x: number, y: number, n: number, active: boolean) {
     if (!n)
@@ -20,10 +23,15 @@ function badge(c: CanvasRenderingContext2D, x: number, y: number, n: number, act
 export function drawWorldObjects(c: CanvasRenderingContext2D, objects: WorldObjects, atlas: SpriteAtlas, cx: number, cy: number, time: number, world: number) {
     // Moving parts use the physics clock, including hit stop and paused previews.
     time = objects.time;
+    // Resolve shared badge numbers once, only when a visible body can use them.
+    // Keep this draw-local so editor relinks and body replacements take effect immediately.
+    let marks: Map<string, number> | undefined;
     for (const b of objects.bodies) {
-        const x = Math.round(b.x - cx), y = Math.round(b.y - cy), w = b.width, h = b.height, mark = identity(objects, b);
+        const x = Math.round(b.x - cx), y = Math.round(b.y - cy), w = b.width, h = b.height;
         drawCarrierTrack(c, b, cx, cy);
         if (x + w < -30 || x > 350 || y > 200 || y + h < -30) continue;
+        const mark = b.kind === 'target' || b.kind === 'launcher' ? 0
+            : (marks ??= identities(objects.bodies)).get(b.kind === 'switch' ? b.link ?? '' : b.id) ?? 0;
         if (['platform', 'lift', 'swing'].includes(b.kind)) {
             drawCarrier(c, b, cx, cy, time, world);
             badge(c, x + w / 2, y + h + 8, mark, b.active);

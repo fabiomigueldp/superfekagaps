@@ -277,8 +277,10 @@ export class WorldAudio {
         }
         while (!sampledMusic && this.next < now + .07) {
             const plan = musicNotes(this.theme, this.step, this.boss);
-            for (const n of plan.notes)
-                this.tone(n.frequency, n.duration, n.type, n.volume, this.music, this.next);
+            // Advance silent beats too, without creating inaudible source graphs.
+            if (this.enabled && this.preferences.music > 0)
+                for (const n of plan.notes)
+                    this.tone(n.frequency, n.duration, n.type, n.volume, this.music, this.next);
             this.step++;
             this.next += plan.tempo;
         }
