@@ -18,6 +18,23 @@ function boat(c: CanvasRenderingContext2D, x: number, y: number, size: number) {
 /** Each biome has its own silhouette, atmosphere and three cached native parallax planes. */
 export class WorldBackdrop {
     private cache = new Map<string, HTMLCanvasElement[]>();
+    private skyCache: { top: string; bottom: string; colors: string[] } | null = null;
+    /** Only the palette changes these 60 native bands. Keep the last pair,
+     * comparing values so editor/in-place color changes are visible immediately.
+     * Reuse colors, not a raster surface: each original rectangle is still drawn.
+     */
+    private skyColors(sky: Island['sky']): readonly string[] {
+        const [top, bottom] = sky;
+        if (this.skyCache?.top === top && this.skyCache.bottom === bottom) return this.skyCache.colors;
+        const channels = (s: string) => [1, 3, 5].map(i => parseInt(s.slice(i, i + 2), 16));
+        const a = channels(top), b = channels(bottom), colors: string[] = [];
+        for (let y = 0; y < 180; y += 3) {
+            const t = y / 180;
+            colors.push(`rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * t)).join(',')})`);
+        }
+        this.skyCache = { top, bottom, colors };
+        return colors;
+    }
     private layers(world: number, variant: number): HTMLCanvasElement[] {
         const key = `${world}:${variant}`;
         const cached = this.cache.get(key);
@@ -204,12 +221,8 @@ export class WorldBackdrop {
         return layers;
     }
     draw(c: CanvasRenderingContext2D, island: Island, cx: number, cy: number, time: number, variant = 0) {
-        const channels = (s: string) => [1, 3, 5].map(i => parseInt(s.slice(i, i + 2), 16));
-        const a = channels(island.sky[0]), b = channels(island.sky[1]);
-        for (let y = 0; y < 180; y += 3) {
-            const t = y / 180;
-            box(c, 0, y, 320, 3, `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * t)).join(',')})`);
-        }
+        const sky = this.skyColors(island.sky);
+        for (let y = 0; y < 180; y += 3) box(c, 0, y, 320, 3, sky[y / 3]);
         this.layers(island.id, variant).forEach((layer, i) => {
             const f = [.055, .16, .31][i], x = -(((cx * f + (i === 0 && island.id !== 5 ? time * .00065 : 0)) % 640 + 640) % 640), y = Math.round(-cy * [.035, .09, .14][i]);
             c.drawImage(layer, Math.round(x), y);
