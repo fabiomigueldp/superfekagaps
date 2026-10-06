@@ -56,7 +56,7 @@ function fixture(t: TestContext, mode: 'QuotaExceededError' | 'SecurityError' | 
         store: new DeliciaStore(storage), sim: new DeliciaSimulation(), screen: 'playing',
         root: new Element('main'), panel: new Element('section'), status: new Element('p'),
         hud: new Element('div'), canvas: new Element('canvas'), playfield: new Element('div'), touch: new Element('div'),
-        held: new Set(), pressed: new Set(), released: new Set(), sources: new Map(),
+        held: new Set(), pressed: new Set(), released: new Set(), sources: new Map(), buttonKeys: new Map(),
         audio: { effect() {}, pause() {}, unlock: async () => {}, music() {}, voice() {}, muted: false },
         // HUD painting is independent of save feedback; actual notify/announce/menu rendering execute.
         updateHud() {}

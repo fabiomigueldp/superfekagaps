@@ -8,6 +8,7 @@ import { ART } from '../../graphics/palette';
 import { panel as pixelPanel, pixelText, textWidth, wrapText } from '../../graphics/BitmapFont';
 import { button, element, formatTime, heading, lettering, worldLink } from './DeliciaUI';
 import './delicia.css';
+const INPUT_KEYS:Record<string,string>={arrowleft:'arrowleft',a:'arrowleft','pad-left':'arrowleft',arrowright:'arrowright',d:'arrowright','pad-right':'arrowright',' ':' ',w:' ',z:' ',arrowup:' ','pad-jump':' ',shift:'shift',x:'shift','pad-dash':'shift',s:'s',arrowdown:'s','pad-pound':'s',j:'j','pad-seed':'j',q:'q','pad-parry':'q',e:'e','pad-interact':'e'};
 type Screen='title'|'map'|'menu'|'playing'|'pause'|'dialogue'|'clear'|'journal'|'settings'|'ending'|'dead';
 export class DeliciaApp {
     readonly store:DeliciaStore;readonly audio=new DeliciaAudio();readonly art=new DeliciaArt();
@@ -16,7 +17,7 @@ export class DeliciaApp {
     readonly playfield=element('div','dl-playfield');
     readonly touch=element('div','dl-touch');screen:Screen='title';sim:DeliciaSimulation|null=null;
     private ctx:CanvasRenderingContext2D;private frame=0;private last=0;private accumulator=0;private disposed=false;
-    private held=new Set<string>();private pressed=new Set<string>();private released=new Set<string>();private sources=new Map<number,string>();
+    private held=new Set<string>();private pressed=new Set<string>();private released=new Set<string>();private sources=new Map<string,string>();private buttonKeys=new Map<string,HTMLButtonElement>();
     private lines:readonly SceneLine[]=[];private lineIndex=0;private dialogueDone:()=>void=()=>{};
     private journalReturn:()=>void=()=>this.showMap();private settingsReturn:()=>void=()=>this.showMap();
     private listOpen=false;private settingsMessage?:HTMLParagraphElement;
@@ -33,6 +34,7 @@ export class DeliciaApp {
         this.hud.hidden=true;this.touch.hidden=true;this.playfield.append(this.canvas,this.hud);this.surface.append(this.playfield,this.panel,this.touch);this.root.append(this.surface,this.status);host.append(this.root);
         this.audio.setVolume(this.store.save.music,this.store.save.effects);this.canvas.hidden=true;this.buildTouch();this.showTitle();
         this.listen(window,'keydown',this.keyDown);this.listen(window,'keyup',this.keyUp);this.listen(window,'blur',()=>this.loseFocus());this.listen(document,'visibilitychange',()=>{if(document.hidden)this.loseFocus();});
+        this.listen(window,'pointerup',(e:PointerEvent)=>this.releaseInput(`pointer:${e.pointerId}`));this.listen(window,'pointercancel',(e:PointerEvent)=>this.releaseInput(`pointer:${e.pointerId}`,true));
         this.listen(this.canvas,'pointerdown',()=>this.canvas.focus({preventScroll:true}));this.listen(window,'pagehide',()=>this.dispose());
         this.listen(window,'resize',()=>{if(this.screen==='map')this.fitMapTitle();});
         void this.art.load();void fetch(DELICIA_MAP_METADATA).then(r=>r.ok?r.json():null).then((data:unknown)=>{
@@ -50,7 +52,7 @@ export class DeliciaApp {
         if(key==='escape'){event.preventDefault();this.goBack();return;}
         const editable=(event.target as HTMLElement)?.closest('input,textarea,select');if(editable){if(key==='tab')this.menuKeyboard(event);return;}
         const active=(this.screen==='playing'&&!(event.target as HTMLElement)?.closest('button,a,summary'))||event.target===this.canvas;
-        if(['arrowleft','arrowright','arrowup','arrowdown',' ','shift','j','q','e','s','a','d','w','z','x'].includes(key)&&active){event.preventDefault();if(!this.held.has(key))this.pressed.add(key);this.held.add(key);}
+        if(INPUT_KEYS[key]&&active){event.preventDefault();this.holdInput(`key:${this.physicalKey(event)}`,key);}
         if((key==='enter'||key===' ')&&event.target===this.canvas&&this.screen==='dialogue'){event.preventDefault();this.advanceDialogue();}
         if(this.screen==='map'&&!this.listOpen){
             if(['arrowleft','arrowright','arrowup','arrowdown'].includes(key)){
@@ -61,11 +63,25 @@ export class DeliciaApp {
         if(this.screen!=='playing'&&(this.screen!=='map'||this.listOpen))this.menuKeyboard(event);
         if(key==='m'){this.audio.toggleMute();this.announce(this.audio.muted?'Som desligado.':'Som ligado.');}if(key==='r'&&this.screen==='dead')this.retry();
     };
-    private keyUp=(event:KeyboardEvent):void=>{const key=event.key.toLowerCase();this.held.delete(key);this.released.add(key);};
+    private physicalKey(event:KeyboardEvent):string{return(event.code&&event.code!=='Unidentified'?event.code:event.key).toLowerCase();}
+    private keyUp=(event:KeyboardEvent):void=>{
+        const physical=this.physicalKey(event);this.releaseInput(`key:${physical}`);this.releaseInput(`button:${physical}`);this.buttonKeys.delete(physical);
+    };
+    // A logical action stays down until its last keyboard, button, pointer or pad owner ends.
+    private holdInput(source:string,key:string):void{
+        if(this.disposed||this.screen!=='playing'||this.sources.has(source))return;
+        const action=INPUT_KEYS[key];if(!action)return;this.sources.set(source,action);
+        if(!this.held.has(action)){this.pressed.add(action);this.released.delete(action);}this.held.add(action);
+    }
+    private releaseInput(source:string,cancel=false):void{
+        const action=this.sources.get(source);if(action===undefined)return;this.sources.delete(source);
+        if([...this.sources.values()].includes(action))return;
+        this.held.delete(action);this.released.add(action);if(cancel)this.pressed.delete(action);
+    }
     private goBack():void {
         if(this.screen==='playing')this.pause();else if(this.screen==='pause')this.resume();else if(this.screen==='dialogue')this.advanceDialogue();else if(this.screen==='journal')this.closeJournal();else if(this.screen==='settings')this.settingsReturn();else if(this.screen==='menu')this.showMap();else if(this.screen==='map'){if(this.listOpen)this.toggleStageList();else this.showMenu();}
     }
-    private loseFocus():void{this.held.clear();this.pressed.clear();this.sources.clear();if(this.screen==='playing')this.pause();}
+    private loseFocus():void{this.resetInput();if(this.screen==='playing')this.pause();}
     private input():DeliciaInput{
         const down=(...keys:string[])=>keys.some(k=>this.held.has(k)),tap=(...keys:string[])=>keys.some(k=>this.pressed.has(k));
         return{left:down('arrowleft','a','pad-left'),right:down('arrowright','d','pad-right'),jump:down(' ','w','z','arrowup','pad-jump'),jumpPressed:tap(' ','w','z','arrowup','pad-jump'),jumpReleased:[' ','w','z','arrowup','pad-jump'].some(k=>this.released.has(k)),dash:tap('shift','x','pad-dash'),pound:tap('s','arrowdown','pad-pound'),seed:tap('j','pad-seed'),parry:tap('q','pad-parry'),interact:tap('e','pad-interact')};
@@ -91,8 +107,9 @@ export class DeliciaApp {
         const state:Record<string,boolean>={'pad-left':(pad?.axes[0]??0)<-.25||down(14),'pad-right':(pad?.axes[0]??0)>.25||down(15),'pad-jump':down(0),'pad-dash':down(1),'pad-seed':down(2),'pad-parry':down(3),'pad-pound':down(4)||down(13),'pad-interact':down(5)};
         for(const [key,active] of Object.entries(state)){
             if(wasMenu&&active)this.padMenuLatch.add(key);else if(!active)this.padMenuLatch.delete(key);
-            if(this.padMenuLatch.has(key)){this.held.delete(key);continue;}
-            if(active){if(!this.held.has(key))this.pressed.add(key);this.held.add(key);}else if(this.held.delete(key))this.released.add(key);
+            const source=`gamepad:${key}`;
+            if(this.padMenuLatch.has(key)){this.releaseInput(source,true);continue;}
+            if(active)this.holdInput(source,key);else this.releaseInput(source);
         }
         const pause=down(9);if(pause&&!this.gamepadPause){if(this.screen==='playing')this.pause();else if(this.screen==='pause')this.resume();else this.goBack();}this.gamepadPause=pause;
     }
@@ -130,7 +147,9 @@ export class DeliciaApp {
         if(sim.dead){this.setScreen('dead');this.showDeath();}
         this.updateHud();
     }
-    private resetInput():void{this.held.clear();this.pressed.clear();this.released.clear();this.sources.clear();this.accumulator=0;}
+    private resetInput():void{
+        for(const source of this.sources.keys())if(source.startsWith('gamepad:'))this.padMenuLatch.add(source.slice(8));
+        this.held.clear();this.pressed.clear();this.released.clear();this.sources.clear();this.buttonKeys.clear();this.accumulator=0;}
     private setScreen(screen:Screen):void{
         this.screen=screen;this.root.dataset.screen=screen;this.panel.replaceChildren();this.panel.className='dl-panel';this.panel.hidden=false;
         this.panel.removeAttribute('role');this.panel.removeAttribute('aria-modal');this.panel.removeAttribute('aria-labelledby');
@@ -403,11 +422,19 @@ export class DeliciaApp {
         this.touch.append(directions,actions);
         for(const [label,key,name] of [['←','arrowleft','Esquerda'],['→','arrowright','Direita'],['Semente','j','Semente'],['Rebater','q','Rebater'],['Abrir','e','Abrir'],['↓','s','Sentada'],['Impulso','shift','Impulso'],['↑',' ','Pular']]){
             const b=element('button','dl-touch-button');b.append(lettering(label,ART.paper,label.length===1?3:1));b.dataset.key=key;b.setAttribute('aria-label',name);b.type='button';
-            b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);this.sources.set(e.pointerId,key);this.held.add(key);this.pressed.add(key);});
-            b.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&!e.repeat){e.preventDefault();this.held.add(key);this.pressed.add(key);}});
-            b.addEventListener('keyup',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();this.held.delete(key);this.released.add(key);}});
-            const release=(e:PointerEvent)=>{const action=this.sources.get(e.pointerId);this.sources.delete(e.pointerId);if(action&&![...this.sources.values()].includes(action)){this.held.delete(action);this.released.add(action);}};
-            b.addEventListener('pointerup',release);b.addEventListener('pointercancel',release);b.addEventListener('lostpointercapture',release);(key.startsWith('arrow')?directions:actions).append(b);
+            this.listen(b,'pointerdown',(e:PointerEvent)=>{
+                if(this.disposed||this.screen!=='playing'||e.button!==0)return;e.preventDefault();this.holdInput(`pointer:${e.pointerId}`,key);
+                try{b.setPointerCapture(e.pointerId);}catch{/* Window terminal events still release this owner. */}
+            });
+            this.listen(b,'keydown',(e:KeyboardEvent)=>{
+                if(this.disposed||this.screen!=='playing'||(e.key!=='Enter'&&e.key!==' '))return;e.preventDefault();if(e.repeat)return;
+                const physical=this.physicalKey(e);this.buttonKeys.set(physical,b);this.holdInput(`button:${physical}`,key);
+            });
+            this.listen(b,'keyup',(e:KeyboardEvent)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();this.keyUp(e);}});
+            this.listen(b,'blur',()=>{for(const [physical,button] of this.buttonKeys)if(button===b){this.releaseInput(`button:${physical}`,true);this.buttonKeys.delete(physical);}});
+            this.listen(b,'pointerup',(e:PointerEvent)=>this.releaseInput(`pointer:${e.pointerId}`));
+            for(const event of ['pointercancel','lostpointercapture'])this.listen(b,event,(e:PointerEvent)=>this.releaseInput(`pointer:${e.pointerId}`,true));
+            (key.startsWith('arrow')?directions:actions).append(b);
         }
     }
     dispose():void{if(this.disposed)return;this.disposed=true;cancelAnimationFrame(this.frame);this.cleanups.forEach(fn=>fn());this.cleanups=[];this.audio.dispose();this.art.dispose();this.resetInput();this.root.remove();}
