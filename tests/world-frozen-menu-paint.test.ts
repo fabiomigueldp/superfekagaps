@@ -32,6 +32,7 @@ function fixture(t: TestContext) {
     const h = sceneLifecycleBrowser({ after: callback => { cleanups.push(callback as () => void); } });
     t.after(() => { games.reverse().forEach(game => game.dispose()); cleanups.reverse().forEach(cleanup => cleanup()); });
     let trace: unknown[][] = [], nextId = 0, canvases = 0, gradientId = 0;
+    const canvasSurfaces: LifecycleElement[] = [];
     const ids = new WeakMap<object, number>(), gradients = new WeakMap<object, string>();
     const id = (object: object) => { if (!ids.has(object)) ids.set(object, ++nextId); return ids.get(object)!; };
     const arg = (value: unknown): unknown => value && typeof value === 'object' ? gradients.get(value) ?? `surface:${id(value)}` : value;
@@ -79,7 +80,11 @@ function fixture(t: TestContext) {
         return element;
     };
     const create = doc.createElement;
-    doc.createElement = tag => { if (tag === 'canvas') canvases++; return decorate(create(tag)); };
+    doc.createElement = tag => {
+        const element = decorate(create(tag));
+        if (tag === 'canvas') { canvases++; canvasSurfaces.push(element); }
+        return element;
+    };
     decorate(h.canvas); decorate(h.body);
     const writes: string[] = [];
     Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: { getItem: () => null, setItem: (_key: string, value: string) => writes.push(value) } });
@@ -90,8 +95,9 @@ function fixture(t: TestContext) {
     const present = t.mock.method(game.renderer, 'present'), input = t.mock.method(game.input, 'update'), audio = t.mock.method(game.audio, 'tick');
     const menus = t.mock.method(internal.menuAccessibility, 'sync');
     const capture = (run: () => void) => {
-        trace = []; gradientId = 0; const before = h.drawCount(); run();
-        return { hash: createHash('sha256').update(JSON.stringify(trace)).digest('hex'), commands: trace.length, draws: h.drawCount() - before };
+        trace = []; gradientId = 0; const before = h.drawCount(), beforeSurfaces = canvasSurfaces.length; run();
+        return { hash: createHash('sha256').update(JSON.stringify(trace)).digest('hex'), commands: trace.length, draws: h.drawCount() - before,
+            trace, newCanvases: canvasSurfaces.slice(beforeSurfaces).map(canvas => ({ surface: id(canvas), width: canvas.width, height: canvas.height })) };
     };
     const frame = (dt = STEP) => capture(() => { now += dt; callbacks += h.frames.size; h.frame(now); });
     const render = () => capture(() => game.render());
@@ -171,8 +177,41 @@ test('equal-valued replacement saves/preferences rebuild captured settings actio
     assert.ok(chooser); let resolve!: (text: string) => void;
     chooser.files = [{ text: () => new Promise<string>(yes => { resolve = yes; }) }]; const pending = chooser.onchange();
     h.button('VOLTAR').click(); h.frame(); assert.equal(h.game.state, 'paused'); const player = JSON.stringify(h.game.player.data);
-    const next = freshSave(); next.preferences.shake = false; next.seals = ['1-1:s1']; resolve(JSON.stringify(next)); await pending;
-    const changed = h.frame(); assert.ok(changed.commands > 0); assert.equal(h.repaint().hash, changed.hash);
+    const seal = h.game.stage.pickups.find(item => item.id === '1-1:s1')!;
+    assert.ok(!h.game.store.save.seals.includes(seal.id));
+    h.game.camera.x = seal.x - 40; h.game.camera.y = seal.y - 88;
+    h.repaint(); // Show the unearned seal in-viewport before importing its new palette.
+    const next = freshSave(); next.preferences.shake = false; next.seals = [seal.id]; resolve(JSON.stringify(next)); await pending;
+    const changed = h.frame(); assert.ok(changed.commands > 0, 'The first post-import frame must repaint');
+    const forced = h.repaint();
+    // Import first introduces the earned-seal palette. Its cached bitmap is built
+    // synchronously before drawing; a later repaint reuses that same bitmap.
+    // Keep all other tests' raw trace hashes, and validate this cold-cache work
+    // before comparing every main/offscreen composition command without it.
+    assert.equal(changed.newCanvases.length, 1);
+    const earned = changed.newCanvases[0];
+    assert.deepEqual([earned.width, earned.height], [16, 18]);
+    assert.deepEqual(forced.newCanvases, [], 'Forced repaint must reuse the earned-seal surface');
+    const raster = changed.trace.filter(command => command[0] === earned.surface);
+    assert.ok(raster.length > 0); assert.equal(raster.length % 2, 0);
+    for (let i = 0; i < raster.length; i += 2) {
+        const style = raster[i], pixel = raster[i + 1];
+        assert.deepEqual(style.slice(0, 2), [earned.surface, 'fillStyle=']);
+        assert.equal(style.length, 3); assert.equal(typeof style[2], 'string');
+        assert.equal(pixel.length, 6);
+        assert.deepEqual([pixel[0], pixel[1], pixel[4], pixel[5]], [earned.surface, 'fillRect', 1, 1]);
+        const x = pixel[2], y = pixel[3];
+        assert.ok(typeof x === 'number' && Number.isInteger(x) && x >= 0 && x < earned.width);
+        assert.ok(typeof y === 'number' && Number.isInteger(y) && y >= 0 && y < earned.height);
+    }
+    const firstDraw = changed.trace.findIndex(command => command[1] === 'drawImage' && command[2] === `surface:${earned.surface}`);
+    assert.ok(firstDraw >= 0, 'The first import repaint actually uses the newly rasterized seal');
+    assert.deepEqual(changed.trace[firstDraw].slice(3), [40, 88, 16, 18], 'The earned seal is visible outside the opaque pause panel');
+    assert.ok(changed.trace.every((command, index) => command[0] !== earned.surface || index < firstDraw),
+        'The complete bitmap exists before its first draw and stays unchanged');
+    assert.ok(forced.trace.every(command => command[0] !== earned.surface), 'The forced repaint never changes the cached pixels');
+    assert.deepEqual(changed.trace.filter(command => command[0] !== earned.surface), forced.trace,
+        'First import and forced repaint issue identical composition commands with the same complete bitmap');
     assert.equal(h.frame().commands, 0); assert.equal(JSON.stringify(h.game.player.data), player);
     assert.equal(h.internal.toast, 'Progresso importado.'); assert.equal(h.game.audio.preferences, h.game.store.save.preferences);
 });
