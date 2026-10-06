@@ -1,15 +1,7 @@
 .world-controls-help {
-    --controls-help-top: max(12px, env(safe-area-inset-top, 0px));
-    --controls-help-right: max(12px, env(safe-area-inset-right, 0px));
-    --controls-help-bottom: max(12px, env(safe-area-inset-bottom, 0px));
-    --controls-help-left: max(12px, env(safe-area-inset-left, 0px));
-    /* Center inside the usable screen, including an asymmetric landscape notch. */
-    position: fixed;
-    inset: var(--controls-help-top) var(--controls-help-right) var(--controls-help-bottom) var(--controls-help-left);
     box-sizing: border-box; margin: auto;
-    width: min(480px, calc(100vw - var(--controls-help-left) - var(--controls-help-right)));
-    height: fit-content; max-width: none;
-    max-height: calc(100dvh - var(--controls-help-top) - var(--controls-help-bottom));
+    width: min(480px, calc(100vw - 24px));
+    max-height: calc(100dvh - 24px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
     padding: 0; overflow: hidden;
     border: 3px solid #bc845d; background: #202d43; color: #f5efd3;
     font: 14px/1.5 monospace;
