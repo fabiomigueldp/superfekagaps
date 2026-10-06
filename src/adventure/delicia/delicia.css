@@ -128,6 +128,8 @@ html:has(.delicia), body:has(.delicia) { margin: 0; width: 100%; height: 100%; o
 .dl-save-message { color: var(--dl-gold); margin-top: 12px !important; }
 .dl-save-message:empty { display: none; }
 .dl-save-warning { position: absolute; z-index: 6; bottom: 12px; right: 12px; max-width: min(380px,calc(100% - 24px)); padding: 10px; background: var(--dl-ink); border: 2px solid #f28b6b; font-size: 13px; }
+.dl-save-recovery { position: static; max-width: 100%; }
+.dl-save-recovery .dl-save-actions { flex-wrap: wrap; margin-bottom: 0; }
 .dl-lore-entries { margin-top: 14px; }
 .dl-lore-entry { border-top: 1px solid #36566a; }
 .dl-lore-entry summary { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 10px 6px; cursor: pointer; list-style: none; }

@@ -114,7 +114,7 @@ export class DeliciaApp {
             if(event.kind==='echo'){this.notify(event.text??'');continue;}
             if(event.kind==='jet'){this.audio.effect('pressure',.35);continue;}
             if(event.kind==='collect'&&event.pickup){const p=event.pickup;this.audio.effect('collect',p.kind==='orange'?.4:1);if(p.kind!=='orange'&&p.kind!=='heart')this.store.collect(p.id,p.lore);if(p.kind==='memory'){const lore=DELICIA_LORE.find(l=>l.id===p.lore);this.notify('Memória encontrada: '+(lore?.title??'O eco da ilha'));}if(p.kind==='seal')this.notify('Selo encontrado.');}
-            else if(event.kind==='checkpoint'){this.store.save.checkpoint={stage:sim.stage.id,index:sim.checkpoint,valves:[...sim.valves]};this.store.persist();this.audio.effect('collect');this.notify('Checkpoint salvo.');}
+            else if(event.kind==='checkpoint'){this.store.save.checkpoint={stage:sim.stage.id,index:sim.checkpoint,valves:[...sim.valves]};const saved=this.store.persist();this.audio.effect('collect');this.notify(saved?'Checkpoint salvo.':'Checkpoint só nesta sessão.');if(!saved)this.toastTime=5;}
             else if(event.kind==='valve'){if(this.store.save.checkpoint?.stage===sim.stage.id){this.store.save.checkpoint.valves=[...sim.valves];this.store.persist();}this.audio.effect('pressure');this.notify(sim.boss?'Pressão liberada!':`${sim.valves.size}/${sim.stage.valves.length} fontes abertas.`);}
             else if(event.kind==='tell'){this.audio.effect('warning',.7);if(event.attack==='order')this.notify('Abra primeiro a fonte do bairro.');if(sim.boss?.character==='guina')this.audio.voice(event.attack==='court'?'guina-namoro':event.attack==='gap'?'guina-oco':event.attack==='overload'?'guina-reserva':'guina-fugir');}
             else if(event.kind==='phase'){this.audio.effect('pressure');this.zoneBanner=sim.boss?.phaseTitle??'';this.zoneBannerTime=2.6;this.shake=.18;this.notify(sim.boss?.character==='guina'?'Guina aumentou a pressão!':'Jajá mudou o ritmo!');}
@@ -171,8 +171,18 @@ export class DeliciaApp {
         content.append(brand,title,actions);this.panel.append(image,content);
         this.saveWarning();this.focusFirst();
     }
-    private saveWarning():void {
-        if(this.store.warning){const warning=element('p','dl-save-warning',this.store.warning);warning.setAttribute('role','alert');this.panel.append(warning);}
+    private saveWarning(recovery=false):void {
+        if(!this.store.warning)return;
+        const warning=element('div','dl-save-warning'+(recovery?' dl-save-recovery':''));
+        const message=element('p','',this.store.warning);message.setAttribute('role','alert');warning.append(message);
+        if(recovery){
+            const actions=element('div','dl-save-actions');
+            actions.append(button('Exportar cópia',()=>this.exportSave()),button('Tentar salvar',()=>{
+                if(this.store.persist()){warning.remove();this.announce('Progresso salvo.');this.focusFirst();}
+                else{message.textContent=this.store.warning;this.announce(this.store.warning);}
+            }));warning.append(actions);
+        }
+        this.panel.append(warning);
     }
     showMap(id=this.store.save.selected):void {
         this.setScreen('map');this.audio.pause(false);this.audio.music('orchard');
@@ -320,7 +330,7 @@ export class DeliciaApp {
     pause():void{if(this.screen!=='playing')return;this.pauseMenu();}
     private pauseMenu():void {
         this.setScreen('pause');this.audio.pause(true);this.menuPanel('Pausa');
-        this.panel.append(button('Continuar',()=>this.resume(),'dl-button dl-primary'),button('Opções',()=>this.showSettings(()=>this.pauseMenu())),button('Memórias',()=>this.openJournal(()=>this.pauseMenu())),button('Voltar ao mapa',()=>this.showMap()));this.focusFirst();
+        this.panel.append(button('Continuar',()=>this.resume(),'dl-button dl-primary'),button('Opções',()=>this.showSettings(()=>this.pauseMenu())),button('Memórias',()=>this.openJournal(()=>this.pauseMenu())),button('Voltar ao mapa',()=>this.showMap()));this.saveWarning(true);this.focusFirst();
     }
     private resume():void{if(this.screen!=='pause')return;this.setScreen('playing');this.panel.hidden=true;this.audio.pause(false);this.canvas.focus({preventScroll:true});}
     private showDeath():void {
@@ -334,13 +344,13 @@ export class DeliciaApp {
             this.panel.append(element('p','dl-result',`${formatTime(sim.elapsed)} · ${sim.coins} laranjas${sim.stage.boss?'':` · ${sim.stage.pickups.filter(p=>p.kind==='seal'&&sim.collected.has(p.id)).length}/3 selos`}`));
             if(medals.length)this.panel.append(element('p','dl-medal-list',medals.map(m=>DELICIA_MEDALS[m as keyof typeof DELICIA_MEDALS]).join(' · ')));
             if(!sim.recordEligible)this.panel.append(element('small','dl-muted','Sem recorde nesta tentativa.'));
-            this.panel.append(button(sim.stage.id==='delicia-12'?'Continuar':'Voltar ao mapa',()=>sim.stage.id==='delicia-12'?this.showEnding():this.showMap(),'dl-button dl-primary'),button('Jogar de novo',()=>this.loadStage(sim.stage.id,true)));this.focusFirst();
+            this.panel.append(button(sim.stage.id==='delicia-12'?'Continuar':'Voltar ao mapa',()=>sim.stage.id==='delicia-12'?this.showEnding():this.showMap(),'dl-button dl-primary'),button('Jogar de novo',()=>this.loadStage(sim.stage.id,true)));this.saveWarning(true);this.focusFirst();
         };
         if(sim.stage.outro.length)this.showDialogue(sim.stage.outro,finish,sim.stage);else finish();
     }
     private showEnding():void {
         this.showDialogue(DELICIA_ENDING,()=>{
-            this.setScreen('ending');this.menuPanel('Ilha concluída!');this.panel.append(element('p','','As fontes voltaram a correr.'),button('Voltar ao mapa',()=>this.showMap(),'dl-button dl-primary'),button('Memórias',()=>this.openJournal(()=>this.showMap())));this.audio.music('orchard');this.focusFirst();
+            this.setScreen('ending');this.menuPanel('Ilha concluída!');this.panel.append(element('p','','As fontes voltaram a correr.'),button('Voltar ao mapa',()=>this.showMap(),'dl-button dl-primary'),button('Memórias',()=>this.openJournal(()=>this.showMap())));this.audio.music('orchard');this.saveWarning(true);this.focusFirst();
         });
     }
     private openJournal(back:()=>void=()=>this.showMap()):void {
@@ -382,7 +392,7 @@ export class DeliciaApp {
         for(const label of ['Ação','Teclado','Controle']){const cell=element('th','',label);cell.scope='col';tr.append(cell);}thead.append(tr);table.append(caption,thead);
         const tbody=element('tbody');for(const row of [['Mover','← → / A D','Direcional'],['Pular','Espaço / W','A'],['Impulso','Shift / X','B'],['Sentada','↓ / S','LB'],['Semente','J','X'],['Rebater','Q','Y'],['Válvula','E','RB'],['Pausa','Esc','Menu']]){const tr=element('tr');row.forEach(text=>tr.append(element('td','',text)));tbody.append(tr);}table.append(tbody);controls.append(table);
         const progress=element('details','dl-options-details');progress.append(element('summary','','Progresso'));const actions=element('div','dl-save-actions');actions.append(button('Exportar',()=>this.exportSave()),button('Importar',()=>this.importSave()));progress.append(actions);
-        this.settingsMessage=element('p','dl-save-message');this.settingsMessage.setAttribute('role','status');this.panel.append(controls,progress,this.settingsMessage);this.focusFirst();
+        this.settingsMessage=element('p','dl-save-message');this.settingsMessage.setAttribute('role','status');this.panel.append(controls,progress,this.settingsMessage);this.saveWarning(true);this.focusFirst();
     }
     private exportSave():void{const url=URL.createObjectURL(new Blob([JSON.stringify(this.store.save,null,2)],{type:'application/json'})),a=element('a');a.href=url;a.download='feka-imperio-delicia-save.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),500);}
     private importSave():void{
