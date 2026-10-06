@@ -460,6 +460,27 @@ export class Level {
     return tiles;
   }
 
+  /** Read-only view for painters. Untouched rows remain live; only rows with
+   * temporary gaps or separately painted falling platforms need copying.
+   * No persistent cache: edits, expiry and reset are reflected on every call.
+   * Call getModifiedTiles instead when an independent mutable snapshot is needed.
+   */
+  getRenderTiles(): readonly (readonly number[])[] {
+    if (!this.dynamicTiles.size && !this.fallingPlatforms.size) return this.data.tiles;
+
+    const source = this.data.tiles, tiles = source.slice();
+    const mask = (_: unknown, key: string) => {
+      const [col, row] = key.split(',').map(Number);
+      if (row >= 0 && row < tiles.length && col >= 0 && col < tiles[0].length) {
+        if (tiles[row] === source[row]) tiles[row] = source[row].slice();
+        tiles[row][col] = TileType.EMPTY;
+      }
+    };
+    this.dynamicTiles.forEach(mask);
+    this.fallingPlatforms.forEach(mask);
+    return tiles;
+  }
+
   // Lista plataformas instaveis para renderizacao especial
   getFallingPlatformRenderData(): { col: number; row: number; phase: FallingPlatformPhase; timer: number; contact: number }[] {
     const list: { col: number; row: number; phase: FallingPlatformPhase; timer: number; contact: number }[] = [];

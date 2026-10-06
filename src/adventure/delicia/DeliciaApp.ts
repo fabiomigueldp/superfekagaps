@@ -16,7 +16,8 @@ export class DeliciaApp {
     readonly hud=element('div','dl-hud');readonly panel=element('section','dl-panel');readonly status=element('p','dl-status');
     readonly playfield=element('div','dl-playfield');
     readonly touch=element('div','dl-touch');screen:Screen='title';sim:DeliciaSimulation|null=null;
-    private ctx:CanvasRenderingContext2D;private frame=0;private last=0;private accumulator=0;private disposed=false;
+    private ctx:CanvasRenderingContext2D;private frame:number|null=null;private frameGeneration=0;private last=0;private accumulator=0;private disposed=false;
+    private pausedPaint:{toastTime:number;toast:string;shake:number;zoneBannerTime:number;zoneBanner:string;reducedMotion:boolean;images:number}|null=null;
     private held=new Set<string>();private pressed=new Set<string>();private released=new Set<string>();private sources=new Map<string,string>();private buttonKeys=new Map<string,HTMLButtonElement>();
     private lines:readonly SceneLine[]=[];private lineIndex=0;private dialogueDone:()=>void=()=>{};
     private journalReturn:()=>void=()=>this.showMap();private settingsReturn:()=>void=()=>this.showMap();
@@ -34,21 +35,23 @@ export class DeliciaApp {
         this.ctx=this.canvas.getContext('2d',{alpha:false})!;this.status.setAttribute('role','status');this.status.setAttribute('aria-live','polite');
         this.hud.hidden=true;this.touch.hidden=true;this.playfield.append(this.canvas,this.hud);this.surface.append(this.playfield,this.panel,this.touch);this.root.append(this.surface,this.status);host.append(this.root);
         this.audio.setVolume(this.store.save.music,this.store.save.effects);this.canvas.hidden=true;this.buildTouch();this.showTitle();
-        this.listen(window,'keydown',this.keyDown);this.listen(window,'keyup',this.keyUp);this.listen(window,'blur',()=>this.loseFocus());this.listen(document,'visibilitychange',()=>{if(document.hidden)this.loseFocus();});
+        this.listen(window,'keydown',this.keyDown);this.listen(window,'keyup',this.keyUp);this.listen(window,'blur',()=>this.loseFocus());this.listen(document,'visibilitychange',()=>{
+            this.stopFrames();if(document.hidden)this.loseFocus();else{this.invalidatePausedPaint();this.requestFrame();}
+        });
         this.listen(window,'pointerup',(e:PointerEvent)=>this.releaseInput(`pointer:${e.pointerId}`));this.listen(window,'pointercancel',(e:PointerEvent)=>this.releaseInput(`pointer:${e.pointerId}`,true));
         this.listen(this.canvas,'pointerdown',()=>this.canvas.focus({preventScroll:true}));this.listen(window,'pagehide',()=>this.dispose());
-        this.listen(window,'resize',()=>{if(this.screen==='map')this.fitMapTitle();});
+        this.listen(window,'resize',()=>{this.invalidatePausedPaint();if(this.screen==='map')this.fitMapTitle();});
         if(this.systemMotion){
-            const changed=()=>{if(!this.disposed)this.updateMotionHint();};
+            const changed=()=>{if(!this.disposed){this.invalidatePausedPaint();this.updateMotionHint();}};
             if(typeof this.systemMotion.addEventListener==='function')this.listen(this.systemMotion,'change',changed);
             else{this.systemMotion.addListener(changed);this.cleanups.push(()=>this.systemMotion?.removeListener(changed));}
         }
-        void this.art.load();void fetch(DELICIA_MAP_METADATA).then(r=>r.ok?r.json():null).then((data:unknown)=>{
+        void this.art.load().then(()=>{if(!this.disposed)this.invalidatePausedPaint();});void fetch(DELICIA_MAP_METADATA).then(r=>r.ok?r.json():null).then((data:unknown)=>{
             if(this.disposed||!data||typeof data!=='object')return;const nodes=(data as {nodes?:unknown}).nodes;
             if(nodes&&typeof nodes==='object')for(const s of DELICIA_STAGES){const p=(nodes as Record<string,unknown>)[s.id] as {x?:unknown;y?:unknown};if(p&&typeof p.x==='number'&&typeof p.y==='number'&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&p.x>=0&&p.x<=1&&p.y>=0&&p.y<=1)this.mapNodes[s.id]={x:p.x,y:p.y};}
             if(this.screen==='map')this.showMap(this.mapSelection);
         }).catch(()=>{});
-        this.frame=requestAnimationFrame(this.loop);document.title='Império da Delícia · Super Feka Gaps World';
+        this.requestFrame();document.title='Império da Delícia · Super Feka Gaps World';
         if((import.meta as ImportMeta & {env:{DEV:boolean}}).env.DEV)(window as unknown as {deliciaGame:DeliciaApp}).deliciaGame=this;
     }
     private listen<E extends Event>(target:EventTarget,event:string,handler:(event:E)=>void):void{const listener:EventListener=e=>handler(e as E);target.addEventListener(event,listener);this.cleanups.push(()=>target.removeEventListener(event,listener));}
@@ -126,16 +129,37 @@ export class DeliciaApp {
         }
         const pause=down(9);if(pause&&!this.gamepadPause){if(this.screen==='playing')this.pause();else if(this.screen==='pause')this.resume();else this.goBack();}this.gamepadPause=pause;
     }
+    private invalidatePausedPaint():void{this.pausedPaint=null;}
+    private stopFrames():void{
+        ++this.frameGeneration;if(this.frame!==null)cancelAnimationFrame(this.frame);this.frame=null;this.last=0;
+    }
+    private requestFrame():void{
+        if(this.disposed||document.hidden||this.frame!==null)return;
+        const generation=++this.frameGeneration;
+        this.frame=requestAnimationFrame(now=>{
+            if(this.disposed||generation!==this.frameGeneration)return;this.frame=null;this.loop(now);
+        });
+    }
+    private paintPausedGame():void{
+        // Simulation time is frozen; only feedback, loaded art or display changes can alter this scene.
+        const previous=this.pausedPaint,reducedMotion=this.reducedMotion,images=this.art.images.size;
+        if(previous&&previous.toastTime===this.toastTime&&previous.toast===this.toast&&previous.shake===this.shake
+            &&previous.zoneBannerTime===this.zoneBannerTime&&previous.zoneBanner===this.zoneBanner
+            &&previous.reducedMotion===reducedMotion&&previous.images===images)return;
+        this.renderGame();
+        this.pausedPaint={toastTime:this.toastTime,toast:this.toast,shake:this.shake,zoneBannerTime:this.zoneBannerTime,zoneBanner:this.zoneBanner,reducedMotion,images};
+    }
     private loop=(now:number):void=>{
-        if(this.disposed)return;const dt=this.last?Math.min(.05,(now-this.last)/1000):0;this.last=now;this.pollGamepad();
+        if(this.disposed||document.hidden)return;const dt=this.last?Math.min(.05,(now-this.last)/1000):0;this.last=now;this.pollGamepad();
+        if(this.disposed||document.hidden)return;
         if(this.screen==='playing'&&this.sim){
             if(this.hitStop>0){this.hitStop=Math.max(0,this.hitStop-dt);this.accumulator=0;}else this.accumulator+=dt;
             let first=true;while(this.accumulator>=1/120){this.step(1/120,first?this.input():{...this.input(),jumpPressed:false,jumpReleased:false,dash:false,pound:false,seed:false,parry:false,interact:false});this.accumulator-=1/120;first=false;if(this.screen!=='playing'||this.hitStop>0){this.accumulator=0;break;}}
             if(!first){this.pressed.clear();this.released.clear();}this.renderGame();
         }else if(this.screen==='map')this.paintMap(now/1000);
-        else if(this.sim&&!this.canvas.hidden)this.renderGame();
+        else if(this.sim&&!this.canvas.hidden){if(this.screen==='pause')this.paintPausedGame();else this.renderGame();}
         this.toastTime=Math.max(0,this.toastTime-dt);this.shake=Math.max(0,this.shake-dt);this.zoneBannerTime=Math.max(0,this.zoneBannerTime-dt);
-        this.frame=requestAnimationFrame(this.loop);
+        this.requestFrame();
     };
     private step(dt:number,input:DeliciaInput):void{
         const sim=this.sim!;sim.update(dt,input);
@@ -164,6 +188,7 @@ export class DeliciaApp {
         for(const source of this.sources.keys())if(source.startsWith('gamepad:'))this.padMenuLatch.add(source.slice(8));
         this.held.clear();this.pressed.clear();this.released.clear();this.sources.clear();this.buttonKeys.clear();this.accumulator=0;}
     private setScreen(screen:Screen):void{
+        this.invalidatePausedPaint();
         this.screen=screen;this.root.dataset.screen=screen;this.panel.replaceChildren();this.panel.className='dl-panel';this.panel.hidden=false;
         this.panel.removeAttribute('role');this.panel.removeAttribute('aria-modal');this.panel.removeAttribute('aria-labelledby');
         this.hud.hidden=screen!=='playing'&&screen!=='dialogue';this.canvas.hidden=!['playing','pause','dialogue','dead','clear'].includes(screen);this.playfield.hidden=this.canvas.hidden;
@@ -451,5 +476,5 @@ export class DeliciaApp {
             (key.startsWith('arrow')?directions:actions).append(b);
         }
     }
-    dispose():void{if(this.disposed)return;this.disposed=true;cancelAnimationFrame(this.frame);this.cleanups.forEach(fn=>fn());this.cleanups=[];this.audio.dispose();this.art.dispose();this.resetInput();this.root.remove();}
+    dispose():void{if(this.disposed)return;this.disposed=true;this.stopFrames();this.cleanups.forEach(fn=>fn());this.cleanups=[];this.audio.dispose();this.art.dispose();this.resetInput();this.root.remove();}
 }

@@ -27,7 +27,7 @@ function platform(c: CanvasRenderingContext2D, x: number, y: number, world: numb
         polygon(c, [[x + (left ? 1 : 15), y + 7], [x + (left ? 7 : 9), y + 7], [x + (left ? 1 : 15), y + 13]], metal ? '#36596f' : '#795945');
 }
 export function drawWorldTerrain(c: CanvasRenderingContext2D, level: WorldLevel, island: Island, cx: number, cy: number, time: number) {
-    const tiles = level.getModifiedTiles(), world = island.id;
+    const tiles = level.getRenderTiles(), world = island.id;
     for (let row = Math.max(0, Math.floor(cy / 16)); row < Math.min(tiles.length, Math.ceil((cy + 180) / 16) + 1); row++)
         for (let col = Math.max(0, Math.floor(cx / 16)); col < Math.min(level.data.width, Math.ceil((cx + 320) / 16) + 1); col++) {
             const t = tiles[row][col];

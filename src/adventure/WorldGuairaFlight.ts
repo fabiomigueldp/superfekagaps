@@ -145,8 +145,10 @@ export function runGuairaFlight(options: GuairaFlightOptions): () => void {
         loading = true; retry.hidden = true; status.textContent = 'Preparando o avião e os aeródromos…';
         const loaded = await Promise.all([loadAircraftAssets(controller.signal), ...[source, destination].map(async region => {
             const overlay = await loadCampaignRegionImage(region); if (overlay) images.set(region, overlay);
-            if (region !== 'guaira') { const base = await loadImage(campaignMapAsset(`${region === 'fabrica' ? 'fabrica' : 'serra'}-diorama.webp`)); if (base) bases.set(region, base); }
-            return !!overlay && (region === 'guaira' || bases.has(region));
+            // A complete replacement is the only terrain painted on a successful flight.
+            const needsBase = region !== 'guaira' && !GUAIRA_CAMPAIGN_ART[region].replacesBase;
+            if (needsBase) { const base = await loadImage(campaignMapAsset(`${region}-diorama.webp`)); if (base) bases.set(region, base); }
+            return !!overlay && (!needsBase || bases.has(region));
         })]);
         loading = false; if (stopped) return;
         assets = loaded[0] as AircraftAssets | null;

@@ -2,18 +2,18 @@ import { TileType } from '../constants';
 import { ART, Biome, hashAt, mixColor } from './palette';
 
 const full = new Set<number>([TileType.GROUND,TileType.BRICK,TileType.BRICK_BREAKABLE,TileType.BLOCK_USED,TileType.POWERUP_BLOCK_HELMET,TileType.POWERUP_BLOCK_MINI_FANTA,TileType.CAVE_STONE,TileType.ICE,TileType.LAVA_TOP,TileType.LAVA_FILL]);
-export function terrainMask(tiles:number[][],row:number,col:number):number {
+export function terrainMask(tiles:readonly (readonly number[])[],row:number,col:number):number {
   return (full.has(tiles[row-1]?.[col])?1:0)|(full.has(tiles[row]?.[col+1])?2:0)|
     (full.has(tiles[row+1]?.[col])?4:0)|(full.has(tiles[row]?.[col-1])?8:0);
 }
-export function lavaOffset(tiles:number[][],row:number,col:number):number {
+export function lavaOffset(tiles:readonly (readonly number[])[],row:number,col:number):number {
   return row>0 && tiles[row-1]?.[col]===TileType.EMPTY?4:0;
 }
 
 /** Small bounded material atlas: neighbour mask × biome × variation × animation frame. */
 export class TilePainter {
   private cache=new Map<string,HTMLCanvasElement>();
-  draw(ctx:CanvasRenderingContext2D,type:number,x:number,y:number,tiles:number[][],row:number,col:number,
+  draw(ctx:CanvasRenderingContext2D,type:number,x:number,y:number,tiles:readonly (readonly number[])[],row:number,col:number,
     biome:Biome,timeMs:number,worldCol=col,worldRow=row):void {
     if(type===TileType.EMPTY||type===TileType.HIDDEN_BLOCK)return;
     const mask=terrainMask(tiles,row,col), variant=hashAt(worldCol,worldRow)%16;

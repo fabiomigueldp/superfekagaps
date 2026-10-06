@@ -6,7 +6,6 @@ import type { DeliciaBoss, BossMissile } from './DeliciaBoss';
 import { drawLandmarks, drawMachine, drawAtmosphere, drawSetDressing } from './DeliciaScenery';
 import { drawPlatformSupports, drawTerrain } from './DeliciaTerrain';
 import { characterFrames, drawCharacterFrame } from './DeliciaSpriteFrames';
-import { DELICIA_MAP_IMAGE } from './DeliciaIsland';
 import { panel, pixelText } from '../../graphics/BitmapFont';
 import { ART } from '../../graphics/palette';
 const TAU=Math.PI*2;
@@ -18,7 +17,8 @@ function circle(c:CanvasRenderingContext2D,x:number,y:number,r:number,a:string,b
 export class DeliciaArt {
     readonly atlas=new SpriteAtlas();readonly images=new Map<string,HTMLImageElement>();private disposed=false;
     private poses=new WeakMap<DeliciaBoss,{pose:number;from:number;at:number}>();
-    async load():Promise<void>{await Promise.all(['backdrop','environment-atlas','portraits','island','key-art','props','boss-atlas','enemies-v2','jaja-motion-v2','guina-motion-v2','world-concept-v2','landmarks-v2','terrain-v2'].map(name=>new Promise<void>(resolve=>{const img=new Image();img.onload=()=>{if(!this.disposed)this.images.set(name,img);resolve();};img.onerror=()=>resolve();img.src=name==='island'?DELICIA_MAP_IMAGE:DELICIA_ASSETS+name+'.webp'+(name==='landmarks-v2'||name==='props'?'?v=5':'');})));}
+    // Title, island and portraits belong to their DOM/CSS views, not this gameplay cache.
+    async load():Promise<void>{await Promise.all(['backdrop','environment-atlas','props','boss-atlas','enemies-v2','jaja-motion-v2','guina-motion-v2','landmarks-v2','terrain-v2'].map(name=>new Promise<void>(resolve=>{const img=new Image();img.onload=()=>{if(!this.disposed)this.images.set(name,img);resolve();};img.onerror=()=>resolve();img.src=DELICIA_ASSETS+name+'.webp'+(name==='landmarks-v2'||name==='props'?'?v=5':'');})));}
     dispose():void{this.disposed=true;this.images.clear();}
     draw(c:CanvasRenderingContext2D,sim:DeliciaSimulation,reduced=false):void{
         const {stage}=sim,time=reduced?0:sim.time,cx=sim.cameraX,cy=sim.cameraY;c.clearRect(0,0,960,540);c.imageSmoothingEnabled=true;
