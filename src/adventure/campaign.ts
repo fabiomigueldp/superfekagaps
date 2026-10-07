@@ -176,7 +176,8 @@ function course(w: number, n: number): AdventureStage {
     if (w === 1 && n === 4) {
         d.land(0, 14, 14).land(21, 12, 10).land(38, 10, 11).land(56, 13, 13).land(84, 11, 13).land(109, 14, 12).land(131, 11, 13).land(150, 9, 10).land(166, 14, 18);
         d.platform(14, 14, 4, T.PLATFORM_FALLING).platform(32, 11, 3, T.PLATFORM_FALLING).platform(49, 12, 4, T.PLATFORM_FALLING).platform(69, 13, 6, T.PLATFORM_FALLING).platform(78, 12, 6, T.PLATFORM_FALLING).platform(98, 12, 7, T.PLATFORM_FALLING).platform(122, 13, 5, T.PLATFORM_FALLING).platform(145, 11, 4);
-        d.land(69, 20, 15, 3).platform(80, 16, 4).land(121, 19, 10, 4).platform(127, 16, 4).cp(60, 13).cp(113).foe('minion', 44, 10, 32).foe('charger', 138, 11, 50).seal(1, 42, 8).seal(2, 76, 18).seal(3, 153, 7).item('helmet', 61, 12).arc(28, 10, 8).arc(94, 9, 9).art('palms', 57, 13, 10, 7).art('rope', 69, 13, 15, 7).art('lighthouse', 150, 9, 8, 9);
+        // Leave a solid landing margin to observe the first charge and its vulnerable rest.
+        d.land(69, 20, 15, 3).platform(80, 16, 4).land(121, 19, 10, 4).platform(127, 16, 4).cp(60, 13).cp(113).foe('minion', 44, 10, 32).foe('charger', 142, 11, 50).seal(1, 42, 8).seal(2, 76, 18).seal(3, 153, 7).item('helmet', 61, 12).arc(28, 10, 8).arc(94, 9, 9).art('palms', 57, 13, 10, 7).art('rope', 69, 13, 15, 7).art('lighthouse', 150, 9, 8, 9);
         d.cue(26, 12).cue(44, 10).cue(61, 13).cue(90, 11).cue(115, 14).cue(137, 11).cue(154, 9).cue(172, 14);
     }
     if (w === 2 && n === 1) {
@@ -253,13 +254,15 @@ function course(w: number, n: number): AdventureStage {
         d.land(0, 14, 17).land(36, 10, 12, 4).land(56, 7, 12, 4).land(76, 13, 13, 4).land(110, 9, 14, 4).land(142, 14, 18);
         d.move('cab1', 17, 13, 33, 9, 8200).platform(49, 9, 5).platform(69, 10, 5).move('cab2', 89, 12, 107, 8, 9000).move('sl', 123, 8, 135, 5, 6600).platform(134, 5, 10).secret(141, 5);
         d.platform(127, 11, 5).platform(136, 12, 5);
-        d.land(17, 21, 19, 2).platform(32, 17, 4).land(89, 21, 21, 2).platform(106, 17, 4).cp(38, 10).cp(79, 13).foe('rail', 63, 6, 27).foe('rail', 117, 8, 28).seal(1, 41, 7).seal(2, 99, 19).seal(3, 138, 3).item('helmet', 80, 12).art('station', 1, 14, 14, 7, 'CABOS CRUZADOS').art('pine', 56, 7, 10, 6).art('station', 76, 13, 13, 7, 'SERVIÇO').art('station', 110, 9, 14, 7, 'CARGA').talk(105, 'biel', 'Essa cabine não é de passageiros.');
+        // The optional seal returns by three 64 px hops, below the unchanged cabin rail.
+        d.land(17, 21, 19, 2).platform(32, 17, 4).land(89, 21, 21, 2).platform(106, 17, 4).platform(107, 13, 3).cp(38, 10).cp(79, 13).foe('rail', 63, 6, 27).foe('rail', 117, 8, 28).seal(1, 41, 7).seal(2, 99, 19).seal(3, 138, 3).item('helmet', 80, 12).art('station', 1, 14, 14, 7, 'CABOS CRUZADOS').art('pine', 56, 7, 10, 6).art('station', 76, 13, 13, 7, 'SERVIÇO').art('station', 110, 9, 14, 7, 'CARGA').talk(105, 'biel', 'Essa cabine não é de passageiros.');
         d.cue(42, 10).cue(62, 7).cue(82, 13).cue(117, 9).cue(131, 11).cue(147, 14);
     }
     if (w === 4 && n === 4) {
         d.land(0, 14, 16).land(35, 10, 13, 4).land(55, 8, 13, 4).land(75, 13, 15).land(110, 9, 14, 4).land(130, 7, 12, 4).land(149, 11, 12, 4).land(168, 14, 16);
         d.move('p1', 16, 13, 32, 9, 8200).platform(49, 9, 5).platform(69, 10, 5).move('p2', 90, 12, 107, 8, 8600).platform(125, 8, 4).platform(143, 9, 5).platform(162, 12, 5);
-        d.land(16, 21, 19, 2).platform(31, 17, 4).land(90, 21, 20, 2).platform(106, 17, 4).cp(38, 10).cp(78, 13).cp(152, 11).foe('rail', 61, 7, 25).foe('rail', 117, 8, 30).foe('charger', 136, 7, 32).seal(1, 41, 7).seal(2, 100, 19).seal(3, 136, 4).item('helmet', 79, 12).art('station', 1, 14, 14, 7, 'ÚLTIMA SUBIDA').art('pine', 55, 8, 12, 7).art('station', 75, 13, 15, 7, 'ENTRONCAMENTO').art('pine', 130, 7, 10, 6).art('station', 168, 14, 15, 8, 'BIEL');
+        // Keep the lower reward deliberate without requiring a timed off-edge cabin jump.
+        d.land(16, 21, 19, 2).platform(31, 17, 4).land(90, 21, 20, 2).platform(106, 17, 4).platform(107, 13, 3).cp(38, 10).cp(78, 13).cp(152, 11).foe('rail', 61, 7, 25).foe('rail', 117, 8, 30).foe('charger', 136, 7, 32).seal(1, 41, 7).seal(2, 100, 19).seal(3, 136, 4).item('helmet', 79, 12).art('station', 1, 14, 14, 7, 'ÚLTIMA SUBIDA').art('pine', 55, 8, 12, 7).art('station', 75, 13, 15, 7, 'ENTRONCAMENTO').art('pine', 130, 7, 10, 6).art('station', 168, 14, 15, 8, 'BIEL');
         d.cue(41, 10).cue(61, 8).cue(82, 13).cue(117, 9).cue(136, 7).cue(154, 11).cue(176, 14);
     }
     if (w === 5 && n === 1) {
