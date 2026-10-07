@@ -1,6 +1,6 @@
 import { chapterJourneyStory } from './GuairaChapterStory';
 import { chapterExitPresentation } from './GuairaChapterPresentation';
-import { LabToolbarAction } from '../../JuiceLabToolbar';
+import { GuairaChapterAction } from './GuairaChapterAction';
 import { approachGuairaCamera, guairaCamera, guairaScreenPoint, paintGuairaMap, paintGuairaWaterFrame, type GuairaCamera } from '../GuairaMapArt';
 import { loadGuairaScene } from '../GuairaMapLoader';
 import type { GuairaArrival, GuairaMetadata } from '../GuairaMapModel';
@@ -52,7 +52,7 @@ function element<K extends keyof HTMLElementTagNameMap>(tag: K, className: strin
 }
 function control(label: string, name: string, primary = false) {
     const button = element('button', 'chapter-map-control'); button.type = 'button';
-    const art = new LabToolbarAction(button, primary); art.setLabel(label, name);
+    const art = new GuairaChapterAction(button, primary); art.setLabel(label, name);
     return { button, art };
 }
 
@@ -71,7 +71,7 @@ export class GuairaChapterMapView {
     private readonly loading = element('div', 'chapter-map-loading', 'Carregando o mapa…');
     private readonly failure = element('div', 'chapter-map-failure');
     private readonly plaque = element('div', 'chapter-map-plaque');
-    private readonly plaqueArt = new LabToolbarAction(this.plaque);
+    private readonly plaqueArt = new GuairaChapterAction(this.plaque);
     private readonly journey = control('JORNADA', 'Ver a jornada de Guaíra');
     private readonly overview = control('VER MAPA', 'Ver mapa inteiro');
     private readonly sound = control('SOM', 'Ativar ou desativar o som do capítulo');
@@ -86,6 +86,7 @@ export class GuairaChapterMapView {
     private readonly junction = control('PATIO', 'Pátio das Comportas: usar como abertura alternativa');
     private readonly dialog = element('dialog', 'chapter-map-dialog');
     private readonly dialogCount = element('p', 'chapter-map-count');
+    private readonly story = element('p', 'chapter-map-story');
     private readonly list = element('ol', 'chapter-map-list');
     private readonly optionalGroup = element('section', 'chapter-map-optional');
     private readonly optionalButton = element('button', 'chapter-map-optional-button');
@@ -133,18 +134,20 @@ export class GuairaChapterMapView {
         this.walkRequested = options.walkToSelection ?? false;
         this.shell.setAttribute('aria-label', 'Mapa do capítulo de Guaíra');
         const identity = element('div', 'chapter-map-identity');
-        identity.append(element('h1', 'chapter-map-name', 'GUAÍRA'), this.count);
+        const name = element('h1', 'chapter-map-name'); new GuairaChapterAction(name, false, true).setLabel('GUAÍRA', 'Guaíra');
+        identity.append(name, this.count);
         const navigation = element('nav', 'chapter-map-navigation'); navigation.setAttribute('aria-label', 'Controles do mapa');
-        navigation.append(this.journey.button, this.overview.button, this.sound.button, this.exit.button);
+        // Keep exploration on the map. Settings, travel exits and alternative
+        // openings belong to its one native modal rather than a lab toolbar.
+        navigation.append(this.journey.button);
+        this.journey.button.setAttribute('aria-haspopup', 'dialog');
+        this.journey.button.setAttribute('aria-expanded', 'false');
         const destination = chapterExitPresentation(!!this.options.campaign);
         this.exit.art.setLabel(destination.label, destination.description);
-        if (this.options.campaign) {
-            navigation.append(this.campaignContinue.button);
-        }
         this.header.append(identity, navigation);
         this.canvas.setAttribute('role', 'img'); this.canvas.setAttribute('aria-label', 'Mapa de Guaíra com Feka na estrada');
         this.loading.setAttribute('role', 'status'); this.failure.setAttribute('role', 'alert');
-        this.failure.append(element('p', '', `O mapa de Guaíra não carregou. Tente novamente ou use ${destination.label}.`), this.retry.button);
+        this.failure.append(element('p', '', `O mapa de Guaíra não carregou. Tente novamente ou abra Jornada para ${destination.label}.`), this.retry.button);
         this.plaque.setAttribute('aria-hidden', 'true');
         this.scene.append(this.canvas, this.plaque, this.loading, this.failure);
         const information = element('div', 'chapter-map-information'); information.append(this.title, this.status, this.hint);
@@ -152,13 +155,17 @@ export class GuairaChapterMapView {
         const actions = element('div', 'chapter-map-actions'); actions.append(this.returnToChapter.button, this.skip.button, this.primary.button);
         this.openingRow.setAttribute('role', 'group'); this.openingRow.setAttribute('aria-label', 'Escolha a abertura do capítulo');
         this.openingRow.append(this.traversal.button, this.junction.button);
-        this.footer.append(information, actions, this.openingRow);
+        this.footer.append(information, actions);
         const dialogHeader = element('div', 'chapter-map-dialog-header');
         const dialogTitle = element('h2', 'chapter-map-dialog-title', 'Jornada de Guaíra');
         dialogTitle.id = `guaira-chapter-journey-${nextViewId++}`;
         this.dialog.setAttribute('aria-labelledby', dialogTitle.id);
         this.dialog.setAttribute('aria-modal', 'true');
+        this.dialog.id = `${dialogTitle.id}-dialog`;
+        this.journey.button.setAttribute('aria-controls', this.dialog.id);
         dialogHeader.append(dialogTitle, this.close.button);
+        const openingTitle = element('p', 'chapter-map-opening-title', 'Abertura da jornada');
+        this.openingRow.replaceChildren(openingTitle, this.traversal.button, this.junction.button);
         const optionalTitle = element('h3', 'chapter-map-optional-title', 'Desvio opcional');
         optionalTitle.id = `${dialogTitle.id}-optional`;
         this.optionalGroup.setAttribute('aria-labelledby', optionalTitle.id);
@@ -168,19 +175,24 @@ export class GuairaChapterMapView {
         this.optionalGroup.append(optionalTitle, this.optionalButton);
         const dialogFooter = element('div', 'chapter-map-dialog-footer');
         dialogFooter.append(element('p', 'chapter-map-session-note', 'Voltar ao início mantém os trechos concluídos. Cada nova tentativa começa do início.'), this.restart.button);
-        this.dialog.append(dialogHeader, this.dialogCount, this.list, this.optionalGroup, dialogFooter);
+        const utilities = element('nav', 'chapter-map-utilities'); utilities.setAttribute('aria-label', 'Opções e viagens de Guaíra');
+        utilities.append(this.overview.button, this.sound.button, this.exit.button);
+        if (this.options.campaign) utilities.append(this.campaignContinue.button);
+        this.dialog.append(dialogHeader, this.dialogCount, this.story, this.openingRow, this.list, this.optionalGroup, utilities, dialogFooter);
         this.shell.append(this.header, this.scene, this.footer, this.dialog);
         try {
             root.append(this.shell);
             const { signal } = this.lifecycle;
-            this.sound.button.addEventListener('click', () => this.toggleSound(), { signal });
             this.shell.addEventListener('pointerdown', () => { if (!this.suspended()) this.ambient.unlock(); }, { signal });
             this.dialog.addEventListener('cancel', event => { event.preventDefault(); if (this.windowFocused) this.closeMenu(); }, { signal });
             this.shell.addEventListener('keydown', event => {
                 if (!event.repeat && !event.altKey && !event.ctrlKey && !event.metaKey && event.key?.toLowerCase() === 'm') this.toggleSound();
                 else if (!this.suspended()) this.ambient.unlock();
                 if (event.repeat && ['Enter', ' ', 'Spacebar'].includes(event.key) && (event.target as HTMLElement | null)?.tagName === 'BUTTON') event.preventDefault();
-                if (event.key === 'Escape' && this.menuOpen && this.windowFocused) { event.preventDefault(); this.closeMenu(); }
+                if (event.key === 'Escape' && !event.repeat && !event.altKey && !event.ctrlKey && !event.metaKey && this.windowFocused) {
+                    event.preventDefault();
+                    if (this.menuOpen) this.closeMenu(); else this.openMenu();
+                }
             }, { signal });
             this.motion.addEventListener('change', () => {
                 if (this.closed) return;
@@ -233,6 +245,7 @@ export class GuairaChapterMapView {
         this.traversal.button.onclick = null; this.junction.button.onclick = null; this.restart.button.onclick = null;
         this.returnToChapter.button.onclick = null; this.optionalButton.onclick = null;
         this.journey.button.onclick = null; this.close.button.onclick = null; this.overview.button.onclick = null;
+        this.sound.button.onclick = null;
         this.campaignContinue.button.onclick = null; this.exit.button.onclick = null; this.retry.button.onclick = null; this.pendingFocus = undefined;
         if (this.dialog.open) this.dialog.close(); this.shell.remove();
     }
@@ -255,17 +268,23 @@ export class GuairaChapterMapView {
         // Never read a fresh token from a retained callback, even after same-target reselection.
         const generation = this.snapshot.generation, { target, revision } = this.navigation, menuVersion = this.menuVersion;
         const current = () => this.current(generation, revision, target);
+        const menuAction = () => current() && this.menuOpen && this.windowFocused && !document.hidden && menuVersion === this.menuVersion;
         this.journey.button.onclick = () => { if (current()) this.openMenu(); };
+        this.sound.button.onclick = () => { if (menuAction()) this.toggleSound(); };
         this.close.button.onclick = () => { if (current() && this.windowFocused && menuVersion === this.menuVersion) this.closeMenu(); };
         this.overview.button.onclick = () => {
-            if (current() && !this.suspended() && this.loadState === 'ready') {
-                this.overviewActive = !this.overviewActive; this.reflect(); this.requestFrame();
+            if (menuAction() && this.loadState === 'ready') {
+                this.overviewActive = !this.overviewActive; this.closeMenu(); this.reflect(); this.requestFrame();
             }
         };
         this.campaignContinue.button.onclick = () => {
-            if (current() && !this.suspended() && this.options.canContinueCampaign?.()) this.options.onContinueCampaign?.(generation, revision);
+            if (menuAction() && this.options.canContinueCampaign?.()) {
+                this.closeMenu(false); this.options.onContinueCampaign?.(generation, revision);
+            }
         };
-        this.exit.button.onclick = () => { if (current() && !this.suspended()) this.options.onExit(generation, revision); };
+        this.exit.button.onclick = () => {
+            if (menuAction()) { this.closeMenu(false); this.options.onExit(generation, revision); }
+        };
         this.retry.button.onclick = () => { if (current() && !this.suspended() && this.loadState === 'failed') void this.load(); };
         this.primary.button.onclick = () => {
             if (!current() || this.suspended() || this.entryRequested || this.loadState !== 'ready' || !this.targetSelectable(target)) return;
@@ -286,8 +305,9 @@ export class GuairaChapterMapView {
                 this.options.onSelect({ kind: 'chapter', sceneId: retainedScene }, generation, revision);
         };
         const openingAction = (opening: GuairaChapterOpening) => () => {
-            if (current() && target.kind === 'chapter' && !this.suspended() && this.loadState === 'ready' && this.openingAvailable && !this.snapshot.accepted.length && !this.entryRequested)
-                this.options.onOpening(opening, generation, revision);
+            if (menuAction() && target.kind === 'chapter' && this.loadState === 'ready' && this.openingAvailable && !this.snapshot.accepted.length && !this.entryRequested) {
+                this.closeMenu(false); this.options.onOpening(opening, generation, revision);
+            }
         };
         this.traversal.button.onclick = openingAction('guaira-travessia');
         this.junction.button.onclick = openingAction('guaira-patio-comportas');
@@ -320,14 +340,14 @@ export class GuairaChapterMapView {
         const accepted = !optional && snapshot.accepted.some(receipt => receipt.sceneId === snapshot.selectedScene);
         const opening = !optional && this.openingAvailable && !snapshot.accepted.length && !snapshot.activeAttempt;
         const canContinueCampaign = !!this.options.canContinueCampaign?.();
-        const key = `${snapshot.generation.sessionId}:${snapshot.generation.generation}:${revision}:${optional}:${ready}:${this.loadState}:${moving}:${canEnter}:${this.entryRequested}:${this.overviewActive}:${opening}:${snapshot.selectedScene}:${snapshot.accepted.length}:${this.water.released}:${this.options.storageMessage?.()}:${canContinueCampaign}`;
+        const key = `${snapshot.generation.sessionId}:${snapshot.generation.generation}:${revision}:${optional}:${ready}:${this.loadState}:${moving}:${canEnter}:${this.entryRequested}:${this.overviewActive}:${opening}:${snapshot.selectedScene}:${snapshot.accepted.length}:${this.water.released}:${this.options.storageMessage?.()}:${canContinueCampaign}:${this.menuOpen}`;
         if (key === this.presentationKey) return; this.presentationKey = key;
         // hidden=true drops focus in real DOM immediately, so capture ownership first.
         const focusedSkip = document.activeElement === this.skip.button;
         const focusedReturn = document.activeElement === this.returnToChapter.button;
         this.count.textContent = `${snapshot.accepted.length}/${snapshot.route.length} · concluídos`;
         this.dialogCount.textContent = this.count.textContent;
-        this.title.textContent = optional ? selected.title : snapshot.chapterComplete ? 'CAPÍTULO CONCLUÍDO' : opening ? 'ESCOLHA A ABERTURA' : selected.title;
+        this.title.textContent = optional ? selected.title : snapshot.chapterComplete ? 'CAPÍTULO CONCLUÍDO' : selected.title;
         this.status.textContent = !ready ? this.loadState === 'failed' ? 'O mapa está indisponível. Sua sessão continua aqui.' : 'Carregando o mapa…'
             : moving ? `A caminho de ${selected.place}`
                 : optional && canEnter ? 'Desvio opcional · Feka no Bairro da Vala Seca · Galeria disponível'
@@ -335,18 +355,23 @@ export class GuairaChapterMapView {
                 // The final return should point onward, not imply a mandatory boss replay.
                 // Standalone extras, walking and deliberately selected earlier replays keep their own guidance.
                 : this.options.campaign && canContinueCampaign && snapshot.chapterComplete && snapshot.selectedScene === 'guaira-prefeito'
-                    ? 'Serra do Mar liberada · escolha SERRA para seguir viagem.'
-                : canEnter ? `Selecionado · Feka ${ARRIVAL_WORDS[selected.arrival]} · pronto para ${accepted ? 'repetir' : 'entrar'}`
-                    : `Selecionado: ${selected.title} · caminhe até ${selected.place}`;
+                    ? 'Serra do Mar liberada · siga viagem pela Jornada.'
+                : canEnter ? `Feka ${ARRIVAL_WORDS[selected.arrival]} · ${accepted ? 'trecho concluído' : 'pronto para entrar'}`
+                    : `Caminhe até ${selected.place}`;
         const last = snapshot.accepted[snapshot.accepted.length - 1];
         const story = chapterJourneyStory(snapshot);
-        this.hint.textContent = story ? story
+        this.story.textContent = story ? story
             : last ? `${CHAPTER_SCENES[last.sceneId].title} concluído`
                 : optional ? 'Galeria e Câmara de Alívio são opcionais'
                     : 'Devolva a água ao bairro em cinco etapas.';
-        this.hint.textContent += ` · ${this.options.storageMessage?.() ?? 'Progresso somente nesta sessão.'}`;
+        const storage = this.options.storageMessage?.() ?? 'Progresso somente nesta sessão.';
+        this.story.textContent += ` · ${storage}`;
+        // Only a persistence warning competes with the live destination. The
+        // successful-save receipt and story remain available in Jornada.
+        this.hint.textContent = storage === 'Conclusões salvas neste navegador.' ? '' : storage;
+        this.hint.hidden = !this.hint.textContent;
         const extras = this.options.optionalProgress?.();
-        if (extras?.gallery || extras?.relief) this.hint.textContent += ` · Opcionais: ${extras.gallery ? 'Galeria concluída' : ''}${extras.gallery && extras.relief ? ', ' : ''}${extras.relief ? 'Câmara concluída' : ''}`;
+        if (extras?.gallery || extras?.relief) this.story.textContent += ` · Opcionais: ${extras.gallery ? 'Galeria concluída' : ''}${extras.gallery && extras.relief ? ', ' : ''}${extras.relief ? 'Câmara concluída' : ''}`;
         this.campaignContinue.button.disabled = !canContinueCampaign;
         this.primary.art.setLabel(optional ? canEnter ? 'GALERIA' : 'CAMINHAR' : canEnter && accepted ? 'REPETIR' : !canEnter && !moving && ready ? 'CAMINHAR' : 'ENTRAR',
             optional ? canEnter ? 'Entrar na Galeria dos Remendos, percurso opcional' : 'Caminhar até Bairro da Vala Seca'
@@ -361,7 +386,9 @@ export class GuairaChapterMapView {
         this.traversal.button.setAttribute('aria-pressed', String(snapshot.opening === 'guaira-travessia'));
         this.junction.button.setAttribute('aria-pressed', String(snapshot.opening === 'guaira-patio-comportas'));
         this.overview.button.disabled = !ready;
-        this.journey.button.disabled = !ready || !this.current(snapshot.generation, revision) || this.entryRequested;
+        // Exit must remain available even while an asset is loading or failed.
+        this.journey.button.disabled = !this.current(snapshot.generation, revision) || this.entryRequested;
+        this.journey.button.setAttribute('aria-expanded', String(this.menuOpen));
         this.overview.button.setAttribute('aria-pressed', String(this.overviewActive));
         this.overview.art.setLabel(this.overviewActive ? 'VER FEKA' : 'VER MAPA', this.overviewActive ? 'Acompanhar Feka' : 'Ver mapa inteiro');
         this.loading.hidden = this.loadState !== 'loading'; this.failure.hidden = this.loadState !== 'failed';
@@ -412,7 +439,7 @@ export class GuairaChapterMapView {
         this.bindActions();
     }
     private openMenu() {
-        if (this.closed || this.menuOpen || document.hidden || !this.windowFocused || this.loadState !== 'ready' || this.entryRequested || !this.current(this.snapshot.generation, this.navigation.revision)) return;
+        if (this.closed || this.menuOpen || document.hidden || !this.windowFocused || this.entryRequested || !this.current(this.snapshot.generation, this.navigation.revision)) return;
         this.renderList(); this.menuOpen = true; this.suspendFrames(); this.reflect();
         this.dialog.showModal(); this.close.button.focus();
     }

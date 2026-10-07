@@ -74,7 +74,13 @@ test('transition removes stale actions, restores menu focus, and respects extern
 test('geometry follows resized canvas and hidden document removes reachable controls', t => {
     const h = setup(t); h.menu.sync('title', 'Menu principal', h.choices, 0);
     h.canvas.getBoundingClientRect = () => ({ left: 12, top: 20, width: 320, height: 180, x: 12, y: 20, right: 332, bottom: 200 });
-    h.window.dispatch('resize'); assert.equal(h.root.style.left, '12px'); assert.equal(h.root.style.width, '320px');
+    h.window.innerWidth = 360; h.window.innerHeight = 640;
+    h.window.dispatch('resize'); assert.equal(h.root.style.left, '12px'); assert.equal(h.root.style.width, '336px');
+    assert.equal(h.root.getAttribute('data-compact'), 'true');
+    assert.ok(h.root.children.every(button => button.style.minHeight === '44px'));
+    h.canvas.getBoundingClientRect = () => ({ left: 0, top: 0, width: 640, height: 360, x: 0, y: 0, right: 640, bottom: 360 });
+    h.window.innerWidth = 640; h.window.dispatch('resize');
+    assert.equal(h.root.getAttribute('data-compact'), 'false'); assert.equal(h.root.style.width, '640px');
     h.document.hidden = true; h.document.dispatch('visibilitychange'); assert.equal(h.root.hidden, true);
     assert.equal(h.root.children.length, 0); h.menu.sync('title', 'Menu principal', h.choices, 0); assert.equal(h.root.hidden, true);
 });
@@ -179,4 +185,80 @@ test('controller focus is visible and selects without cancelling its own repeat,
     assert.equal(h.doc.activeElement, external);
     h.canvas.focus(); h.menu.clear(); assert.equal(h.menu.focusFromController(0), false);
     h.menu.dispose(); assert.equal(h.menu.canControl(), false);
+});
+
+test('short compact menus reveal keyboard/controller focus instantly without scrolling desktop overlays', t => {
+    const h = setup(t);
+    h.window.innerWidth = 360; h.window.innerHeight = 240;
+    h.canvas.getBoundingClientRect = () => ({ left: 20, top: 30, width: 320, height: 180, x: 20, y: 30, right: 340, bottom: 210 });
+    const choices = Array.from({ length: 8 }, (_, index) => ({ ...h.choices[0], label: `OPÇÃO ${index + 1}`, y: 30 + index * 15 }));
+    h.menu.sync('settings', 'Opções', choices, 0);
+    const reveals: Array<{ index: number; options: ScrollIntoViewOptions }> = [];
+    h.root.children.forEach((button, index) => Object.assign(button, {
+        scrollIntoView: (options: ScrollIntoViewOptions) => { reveals.push({ index, options }); }
+    }));
+    h.root.children[0].focus();
+    for (let index = 1; index < choices.length; index++) h.root.dispatch('keydown', { key: 'ArrowDown' });
+    assert.equal(h.doc.activeElement, h.root.children[7]);
+    assert.deepEqual(reveals.map(call => call.index), [0, 1, 2, 3, 4, 5, 6, 7]);
+    assert.ok(reveals.every(call => call.options.block === 'nearest' && call.options.inline === 'nearest' && call.options.behavior === 'instant'));
+    const before = h.stats();
+    assert.equal(h.menu.focusFromController(6), true);
+    assert.equal(reveals.at(-1)?.index, 6);
+    assert.equal(h.stats().resets, before.resets, 'Controller reveal must not reset held-direction ownership');
+    const current = reveals.length;
+    h.menu.sync('settings', 'Opções', choices, 6);
+    assert.equal(reveals.length, current, 'Unchanged frames do not repeatedly scroll');
+    h.window.innerHeight = 220; h.window.dispatch('resize');
+    assert.equal(reveals.length, current + 1, 'A newly shorter layout reveals its current focused row');
+    h.canvas.getBoundingClientRect = () => ({ left: 0, top: 0, width: 640, height: 360, x: 0, y: 0, right: 640, bottom: 360 });
+    h.window.innerWidth = 640; h.window.innerHeight = 440; h.window.dispatch('resize');
+    const desktop = reveals.length;
+    h.root.dispatch('keydown', { key: 'ArrowUp' }); h.menu.focusFromController(7);
+    assert.equal(reveals.length, desktop, 'Desktop canvas overlays keep their no-page-scroll behavior');
+});
+
+
+test('compact gallery list reflows but detail Back control leaves painted content visible', t => {
+    const h = setup(t);
+    h.window.innerWidth = 360; h.window.innerHeight = 640;
+    h.canvas.getBoundingClientRect = () => ({ left: 20, top: 30, width: 320, height: 180, x: 20, y: 30, right: 340, bottom: 210 });
+    h.menu.sync('gallery:0', 'Galeria', h.choices, 1);
+    assert.equal(h.root.getAttribute('data-compact'), 'true');
+    h.root.children[1].focus();
+    const back = [{ label: 'VOLTAR', x: 8, y: 155, width: 64, height: 18 }];
+    h.menu.sync('gallery:1', 'Aventura', back, 0);
+    assert.equal(h.root.getAttribute('data-compact'), 'false');
+    assert.equal(h.root.style.left, '20px'); assert.equal(h.root.style.top, '30px');
+    assert.equal(h.root.style.height, '180px'); assert.equal(h.root.children[0].style.background, 'transparent');
+    assert.equal(h.doc.activeElement, h.root.children[0]);
+    h.menu.sync('gallery:0', 'Galeria', h.choices, 1);
+    assert.equal(h.root.getAttribute('data-compact'), 'true'); assert.equal(h.doc.activeElement, h.root.children[1]);
+});
+
+
+test('compact panels expose complete changing status without taking focus, then remove expired feedback', t => {
+    const h = setup(t);
+    const message = 'Não foi possível importar: o arquivo JSON é inválido. Seu progresso anterior foi preservado.';
+    h.menu.sync('settings', 'Opções', h.choices, 0, message);
+    assert.equal(h.root.children.length, 2, 'Desktop continues to use its painted toast');
+    h.window.innerWidth = 360; h.window.innerHeight = 240;
+    h.canvas.getBoundingClientRect = () => ({ left: 20, top: 30, width: 320, height: 180, x: 20, y: 30, right: 340, bottom: 210 });
+    h.window.dispatch('resize');
+    const status = h.root.children[2];
+    assert.equal(status.textContent, message); assert.equal(status.getAttribute('role'), 'status');
+    assert.equal(status.getAttribute('aria-live'), 'polite');
+    h.root.children[1].focus(); const focused = h.doc.activeElement;
+    let reveals = 0; Object.assign(status, { scrollIntoView() { reveals++; } });
+    for (const text of ['Não foi possível ler o arquivo.', 'Não foi possível salvar. Progresso anterior preservado.', 'Progresso importado com sucesso.']) {
+        h.menu.sync('settings', 'Opções', h.choices, 1, text);
+        assert.equal(status.textContent, text); assert.equal(h.doc.activeElement, focused);
+    }
+    assert.equal(reveals, 3);
+    h.menu.sync('settings', 'Opções', h.choices, 1);
+    assert.equal(h.root.children.length, 2); assert.equal(status.parent, null);
+    h.menu.sync('gallery:0', 'Galeria', h.choices, 0, 'Encontre mais selos para liberar esta ilha.');
+    assert.equal(h.root.children[2].textContent, 'Encontre mais selos para liberar esta ilha.');
+    h.canvas.getBoundingClientRect = () => ({ left: 0, top: 0, width: 640, height: 360, x: 0, y: 0, right: 640, bottom: 360 });
+    h.window.dispatch('resize'); assert.equal(h.root.children.length, 2);
 });

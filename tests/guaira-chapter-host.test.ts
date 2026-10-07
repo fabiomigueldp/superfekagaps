@@ -1388,3 +1388,27 @@ test('development chapter host retains free stage selection after navigation and
     assert.deepEqual(store.save.completed, []); assert.deepEqual(store.save.guaira.completed, []);
     assert.deepEqual(store.save.seen, []);
 });
+
+test('integrated chapter play keeps secondary controls in pause and restores owned focus when it collapses', async t => {
+    const h = hostBrowser(t), factory = await loadGuairaChapterScene('guaira-travessia');
+    const app = h.create({ loadScene: async () => factory }); h.enter(); await flush();
+    const game = app.activeGame!, options = h.byId('chapter-pause-options'), primary = h.byId('chapter-primary');
+    const before = app.snapshot;
+    assert.equal(options.hidden, true);
+    assert.equal(primary.getAttribute('aria-expanded'), 'false');
+    for (const id of ['chapter-controls', 'chapter-retry', 'chapter-map-return', 'chapter-sound', 'chapter-keyboard-hint'])
+        assert.equal(h.byId(id).parent, options, `${id} is available inside pause rather than filling the play HUD`);
+    assert.equal(h.byId('guaira-touch-controls').hidden, false, 'Compact host chrome does not remove touch input');
+    primary.click(); assert.equal(game.state, 'paused'); assert.equal(options.hidden, false);
+    assert.equal(primary.getAttribute('aria-expanded'), 'true');
+    h.byId('chapter-retry').focus();
+    assert.ok(game instanceof GuairaTraversal); game.toggleTraversalPause(); h.frame();
+    assert.equal(options.hidden, true); assert.equal(h.document.activeElement, h.byId('game-canvas'));
+    assert.equal(game.state, 'playing'); assert.deepEqual(app.snapshot, before);
+    primary.click(); h.byId('chapter-controls').click();
+    assert.equal(game.state, 'paused'); assert.equal((h.byId('chapter-controls-help') as LifecycleElement & { open: boolean }).open, true);
+    h.byId('chapter-controls-help').dispatch('cancel'); h.frame();
+    assert.equal(game.state, 'paused'); assert.equal(options.hidden, false);
+    primary.click(); assert.equal(options.hidden, true);
+    app.dispose(); h.checkDisposed();
+});

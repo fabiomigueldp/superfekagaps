@@ -161,7 +161,7 @@ test('native focus, keyboard selection and settings changes refresh retained act
     h.internal.pause(); assert.ok(h.frame().commands > 0); assert.equal(h.frame().commands, 0);
 });
 
-test('equal-valued replacement saves/preferences rebuild captured settings actions and delayed imports refresh pause', async t => {
+test('replacement saves rebuild cached paint and leaving Settings cancels delayed imports', async t => {
     const h = fixture(t); h.pause(); h.internal.settings('paused'); h.repaint();
     const previousPreferences = h.game.store.save.preferences, value = previousPreferences.music;
     assert.equal(h.game.store.import(JSON.stringify(h.game.store.save)), true);
@@ -172,7 +172,8 @@ test('equal-valued replacement saves/preferences rebuild captured settings actio
     h.game.store.save.preferences = { ...importedPreferences }; assert.ok(h.render().commands > 0);
     h.button('EFEITOS:').click(); h.render(); assert.equal(importedPreferences.effects, effects);
     assert.notEqual(h.game.store.save.preferences.effects, effects);
-    h.button('IMPORTAR SAVE').click();
+    const audioPreferences = h.game.audio.preferences;
+    h.button('IMPORTAR').click();
     const chooser = h.all().find(node => node.id === 'world-save-import') as unknown as { files: Array<{ text(): Promise<string> }>; onchange(): Promise<void> };
     assert.ok(chooser); let resolve!: (text: string) => void;
     chooser.files = [{ text: () => new Promise<string>(yes => { resolve = yes; }) }]; const pending = chooser.onchange();
@@ -182,6 +183,10 @@ test('equal-valued replacement saves/preferences rebuild captured settings actio
     h.game.camera.x = seal.x - 40; h.game.camera.y = seal.y - 88;
     h.repaint(); // Show the unearned seal in-viewport before importing its new palette.
     const next = freshSave(); next.preferences.shake = false; next.seals = [seal.id]; resolve(JSON.stringify(next)); await pending;
+    assert.equal(h.game.store.save.seals.includes(seal.id), false, 'A cancelled chooser cannot replace the paused run');
+    assert.equal(h.frame().commands, 0, 'A cancelled read cannot invalidate unchanged pause paint');
+    // Independently exercise external store replacement and the earned-seal cache.
+    assert.equal(h.game.store.import(JSON.stringify(next)), true);
     const changed = h.frame(); assert.ok(changed.commands > 0, 'The first post-import frame must repaint');
     const forced = h.repaint();
     // Import first introduces the earned-seal palette. Its cached bitmap is built
@@ -213,7 +218,7 @@ test('equal-valued replacement saves/preferences rebuild captured settings actio
     assert.deepEqual(changed.trace.filter(command => command[0] !== earned.surface), forced.trace,
         'First import and forced repaint issue identical composition commands with the same complete bitmap');
     assert.equal(h.frame().commands, 0); assert.equal(JSON.stringify(h.game.player.data), player);
-    assert.equal(h.internal.toast, 'Progresso importado.'); assert.equal(h.game.audio.preferences, h.game.store.save.preferences);
+    assert.equal(h.internal.toast, '', 'A cancelled import cannot report success'); assert.equal(h.game.audio.preferences, audioPreferences, 'A cancelled read cannot replace audio preferences');
 });
 
 test('same-size resize, context restoration, motion and visibility invalidate without changing pause ownership', t => {

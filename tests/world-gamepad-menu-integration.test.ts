@@ -19,8 +19,10 @@ function setup(t: TestContext) {
         element.focus = () => {
             if (doc.activeElement === element) return;
             doc.activeElement?.dispatch('blur'); doc.activeElement = element; element.dispatch('focus');
+            h.document.dispatch('focusin', { target: element });
         };
         Object.assign(element, { inert: false, open: false,
+            blur() { if (doc.activeElement === element) { element.dispatch('blur'); doc.activeElement = h.body; } },
             showModal() { (element as unknown as HTMLDialogElement).open = true; },
             close() { (element as unknown as HTMLDialogElement).open = false; element.dispatch('close'); } });
         return element;
@@ -56,7 +58,7 @@ test('title and story pages need fresh confirms, and stale rendered gallery acti
     h.step(1000); assert.equal(h.internal.introPage, 0);
     h.tap(0); assert.equal(h.internal.introPage, 1); h.step(1000); assert.equal(h.internal.introPage, 1);
     // Returning to title through a real menu transition starts a fresh owner.
-    h.internal.change('title'); h.world.render(); h.neutral(); h.tap(13); h.tap(0);
+    h.internal.change('title'); h.world.render(); h.neutral(); h.tap(13); h.tap(13); h.tap(0);
     assert.equal(h.world.state, 'gallery'); assert.equal(h.internal.galleryWorld, 0);
     h.neutral(); h.nav().children[6].focus(); h.neutral();
     const old = h.internal.buttons[6]; let staleCalls = 0; old.run = () => { staleCalls++; };
@@ -80,7 +82,7 @@ test('direction hold repeats through real native focus without resetting the ada
 
 test('pause/settings navigation preserves gameplay and resumes only after a neutral gesture', t => {
     const h = setup(t); h.world.load('1-1'); h.world.render(); h.neutral(); h.tap(9);
-    assert.equal(h.world.state, 'paused'); h.tap(13); h.tap(13); h.tap(0);
+    assert.equal(h.world.state, 'paused'); h.tap(13); h.tap(0);
     assert.equal(h.world.state, 'settings');
     const before = h.world.store.save.preferences.music; h.tap(0);
     assert.notEqual(h.world.store.save.preferences.music, before);
@@ -164,4 +166,70 @@ test('native menu Escape still unlocks audio and invokes its existing return act
     h.world.audio.unlock = () => { unlocks++; unlock(); };
     h.nav().children[0].focus(); h.nav().dispatch('keydown', { key: 'Escape' });
     assert.equal(unlocks, 1); assert.equal(h.world.state, 'title');
+});
+
+for (const screen of ['title', 'paused', 'settings']) for (const heldButton of [13, 0, 1, 9]) {
+    test(`${screen} restores owned native selection after tab visibility with held button ${heldButton}`, t => {
+        const h = setup(t);
+        if (screen !== 'title') { h.world.load('1-1'); h.world.render(); h.tap(9); }
+        if (screen === 'settings') { h.tap(13); h.tap(0); }
+        h.tap(13);
+        const selection = h.internal.menuSelection, old = h.nav().children[selection];
+        assert.equal(h.doc.activeElement, old);
+        const save = structuredClone(h.world.store.save), writes = h.writes.length;
+        h.neutral(); h.button(heldButton);
+        for (let cycle = 0; cycle < 2; cycle++) {
+            h.document.hidden = true; h.document.dispatch('visibilitychange');
+            assert.equal(h.nav().children.length, 0); assert.equal(h.doc.activeElement, h.body);
+            h.step(1000); // Hidden paint must not discard the pending ownership.
+            h.document.hidden = false; h.document.dispatch('visibilitychange'); h.step(1000); h.step(1000);
+            assert.equal(h.doc.activeElement, h.nav().children[selection]);
+            assert.equal(h.internal.menuSelection, selection, 'Held direction must not repeat across visibility');
+            assert.equal(h.world.state, screen);
+        }
+        assert.notEqual(h.doc.activeElement, old);
+        assert.deepEqual(h.world.store.save, save); assert.equal(h.writes.length, writes);
+        h.neutral(); h.button(13); h.step();
+        assert.equal(h.internal.menuSelection, (selection + 1) % h.nav().children.length);
+        h.tap(1);
+        assert.equal(h.world.state, screen === 'settings' ? 'paused' : screen === 'paused' ? 'playing' : 'title');
+    });
+}
+
+for (const interruption of ['external', 'external-then-body', 'dialog', 'inert', 'changed-screen', 'unowned']) {
+    test(`visibility recovery never steals ownership after ${interruption}`, t => {
+        const h = setup(t); h.tap(13);
+        if (interruption === 'unowned') h.body.focus();
+        h.document.hidden = true; h.document.dispatch('visibilitychange');
+        let expected = h.body;
+        if (interruption.startsWith('external')) {
+            const input = h.doc.createElement('input'); h.body.append(input); input.focus(); expected = input;
+            if (interruption === 'external-then-body') { h.body.focus(); expected = h.body; }
+        }
+        if (interruption === 'dialog') {
+            const dialog = h.doc.createElement('dialog'); h.body.append(dialog);
+            (dialog as unknown as HTMLDialogElement).showModal();
+        }
+        if (interruption === 'inert') (h.canvas as unknown as HTMLCanvasElement).inert = true;
+        if (interruption === 'changed-screen') { h.internal.change('settings'); h.internal.change('title'); }
+        h.document.hidden = false; h.document.dispatch('visibilitychange'); h.step();
+        assert.equal(h.doc.activeElement, expected);
+        h.neutral(); h.button(0); h.step(); assert.equal(h.doc.activeElement, expected);
+        if (interruption === 'inert') (h.canvas as unknown as HTMLCanvasElement).inert = false;
+        if (interruption === 'dialog') (h.elements.find(e => e.tagName === 'DIALOG' && (e as unknown as HTMLDialogElement).open) as unknown as HTMLDialogElement).close();
+        h.step(); assert.equal(h.doc.activeElement, expected, 'A discarded claim cannot revive after the interruption ends');
+    });
+}
+
+test('help opened before the visible menu paint revokes the old visibility focus claim', t => {
+    const h = setup(t); h.internal.settings('title'); h.world.render(); h.tap(13);
+    h.document.hidden = true; h.document.dispatch('visibilitychange');
+    h.document.hidden = false; h.document.dispatch('visibilitychange');
+    h.internal.controlsHelp.open();
+    assert.equal(h.internal.controlsHelp.isOpen, true);
+    const helpFocus = h.doc.activeElement;
+    h.step(); assert.equal(h.doc.activeElement, helpFocus);
+    h.internal.controlsHelp.close(false); h.body.focus(); h.step();
+    assert.equal(h.doc.activeElement, h.body);
+    h.neutral(); h.button(0); h.step(); assert.equal(h.doc.activeElement, h.body);
 });

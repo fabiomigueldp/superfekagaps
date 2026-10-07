@@ -163,7 +163,8 @@ export function juiceSnapshot(game: JuiceMinibossLab): string {
         input: game.input.getState(), save: game.store.save, mode: game.labMode });
 }
 /** Replays ordinary key transitions through production Input, not injected flags. */
-export function replayJuiceVictory(h: ReturnType<typeof juiceEpilogueBrowser>, game: JuiceMinibossLab, afterStep?: () => void): string[] {
+export function replayJuiceVictory(h: { window: { dispatch(type: string, data?: Record<string, unknown>): unknown }; canvas: unknown },
+    game: JuiceMinibossLab, afterStep?: () => void, advance: (dt: number) => void = dt => game.update(dt)): string[] {
     const mapping: Record<string, string> = { left: 'ArrowLeft', right: 'ArrowRight', run: 'ShiftLeft', jump: 'Space' };
     let held = new Set<string>(), frame = 0, health = game.boss!.health;
     const snapshots: string[] = [], hits: Array<{ frame: number; health: number }> = [];
@@ -175,7 +176,7 @@ export function replayJuiceVictory(h: ReturnType<typeof juiceEpilogueBrowser>, g
     for (const [count, bits] of recording.runs) {
         keys(new Set(recording.keys.flatMap((key, i) => bits & (1 << i) && mapping[key] ? [mapping[key]] : [])));
         for (let n = 0; n < count; n++, frame++) {
-            game.update(STEP); afterStep?.();
+            advance(STEP); afterStep?.();
             assert.equal(game.player.data.isDead, false, `native replay died at ${frame}`);
             if (game.boss!.health !== health) { health = game.boss!.health; hits.push({ frame, health }); }
             snapshots.push(juiceSnapshot(game));

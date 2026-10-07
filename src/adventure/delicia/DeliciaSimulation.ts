@@ -68,22 +68,28 @@ export class DeliciaSimulation {
             for(const e of this.enemies)if(e.state!=='dead'&&Math.abs(e.x-p.x)<125&&Math.abs(e.y-p.y)<90){e.state='stun';e.timer=1.5;}}
         if(p.grounded&&!previous.grounded){p.land=.13;this.burst(p.x+p.w/2,p.y+p.h,'#e5bf85',5);}
         p.walk+=Math.abs(p.vx)*dt*.07;
-        this.updateEnemies(dt,previous);this.boss?.update(dt,p);this.updateProjectiles(dt);
+        // Contacts resolve in order. Keep consequences already earned, but a
+        // lethal contact ends this step before later combat or progression.
+        this.updateEnemies(dt,previous);if(this.dead)return;
+        this.boss?.update(dt,p);this.updateProjectiles(dt);if(this.dead)return;
         if(this.boss){
-            for(const m of this.boss.missiles)this.missileContact(m);
-            for(const danger of this.boss.danger)if(intersects(p,danger))this.hurt(danger.x+danger.w/2);
+            for(const m of this.boss.missiles){this.missileContact(m);if(this.dead)return;}
+            for(const danger of this.boss.danger)if(intersects(p,danger)){this.hurt(danger.x+danger.w/2);if(this.dead)return;}
             if(p.y+p.h>447&&this.boss.gaps.some(g=>p.x+p.w>g.x+7&&p.x<g.x+g.w-7))this.fallIntoGap();
+            if(this.dead)return;
             if(intersects(p,this.boss.rect)&&this.boss.beat!=='defeated'){
                 if(previous.y+previous.h<=this.boss.y+30&&p.vy>0){if(this.boss.hit(p.pounding?2:1)){this.emit('boss-hit',this.boss.x,this.boss.y);this.burst(this.boss.x+48,this.boss.y,'#ffe7a9',26);}p.vy=-510;p.pounding=false;p.y=this.boss.y-p.h;}
                 // The crouched charge uses its telegraphed lower hitbox. Applying
                 // the upright body here would make the advertised jump impossible.
                 else if(this.boss.beat==='attack'&&this.boss.attack!=='charge'||this.boss.beat==='idle'&&this.boss.beatTime>.22)this.hurt(this.boss.x+this.boss.w/2);
             }
+            if(this.dead)return;
             for(const event of this.boss.events){if(event.kind==='tell')this.emit('tell',event.x,event.y,{attack:event.attack});if(event.kind==='impact'){this.emit('pound',event.x,event.y);this.burst(event.x,450,'#ffc270',20);}if(event.kind==='phase')this.emit('phase',event.x,event.y);if(event.kind==='defeat')this.emit('defeat',event.x,event.y);}
         }
-        for(const h of this.stage.hazards){if((h.kind==='thorns'||h.kind==='steam'&&steamPhase(this.time,h.period,h.phase)==='active')&&intersects(p,h))this.hurt(h.x);if(h.kind==='juice'&&intersects(p,h))this.fallIntoGap();}
-        this.updateMachines(dt);
+        for(const h of this.stage.hazards){if((h.kind==='thorns'||h.kind==='steam'&&steamPhase(this.time,h.period,h.phase)==='active')&&intersects(p,h))this.hurt(h.x);if(this.dead)return;if(h.kind==='juice'&&intersects(p,h))this.fallIntoGap();if(this.dead)return;}
+        this.updateMachines(dt);if(this.dead)return;
         if(p.y>this.stage.height-60)this.fallIntoGap();
+        if(this.dead)return;
         for(const pickup of this.stage.pickups)if(!this.collected.has(pickup.id)&&Math.hypot(p.x+p.w*.5-pickup.x,p.y+p.h*.5-pickup.y)<35){
             this.collected.add(pickup.id);if(pickup.kind==='orange')this.coins++;if(pickup.kind==='heart')p.health=Math.min(this.assists?6:4,p.health+1);
             this.emit('collect',pickup.x,pickup.y,{pickup});this.burst(pickup.x,pickup.y,pickup.kind==='memory'?'#a5e6d2':'#ffc552',12);
@@ -126,6 +132,7 @@ export class DeliciaSimulation {
             this.machineStates.set(machine.id,phase);
             if(disabled||!intersects(p,machine))continue;
             if(machine.kind==='press'&&phase==='active')this.hurt(machine.x+machine.w/2);
+            if(this.dead)return;
             if(machine.kind==='jet'&&phase==='active'&&this.jetCooldown===0){p.vy=-(machine.power??800);p.grounded=false;p.pounding=false;this.jetCooldown=.55;this.emit('jet',machine.x,machine.y);this.burst(p.x,p.y+45,'#ffdc85',20);}
             if(machine.kind==='wind'){p.vx+=(machine.power??0)*dt;if(!p.pounding&&p.vy> -180)p.vy=Math.max(-180,p.vy-2300*dt);}
         }
@@ -158,6 +165,7 @@ export class DeliciaSimulation {
             if(p.parryTime>0&&e.state==='attack'){e.state='stun';e.timer=1.8;this.parries++;this.emit('parry',e.x,e.y);continue;}
             if(previous.y+previous.h<=e.y+20&&p.vy>0){if(e.kind==='sentinel'&&!p.pounding&&e.state!=='stun'){e.state='stun';e.timer=1.6;}else this.hitEnemy(e,p.pounding?2:1);p.y=e.y-p.h;p.vy=-455;p.pounding=false;}
             else if(e.state!=='stun')this.hurt(e.x);
+            if(this.dead)return;
         }
     }
     private hitEnemy(e:DeliciaEnemy,power:number):void {e.hp-=power;e.flash=.16;this.burst(e.x,e.y,'#ffa84a',15);this.emit('enemy',e.x,e.y);e.state=e.hp<=0?'dead':'stun';if(e.state==='dead')this.enemiesDefeated++;e.timer=1.2;}
@@ -167,6 +175,7 @@ export class DeliciaSimulation {
                 for(const e of this.enemies)if(e.state!=='dead'&&intersects(m,e)){if(e.kind!=='sentinel'||e.state==='stun')this.hitEnemy(e,1);else{e.state='stun';e.timer=1;}m.life=0;break;}
                 if(this.boss&&intersects(m,this.boss.rect)){if(this.boss.hit()){this.emit('boss-hit',m.x,m.y);this.burst(m.x,m.y,'#ffdc87',20);}m.life=0;}
             }else this.missileContact(m);
+            if(this.dead)return;
         }
         this.projectiles=this.projectiles.filter(m=>m.life>0&&m.y<850);
     }

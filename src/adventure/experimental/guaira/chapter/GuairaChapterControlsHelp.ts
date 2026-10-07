@@ -1,7 +1,7 @@
 import { DisposalScope } from '../../../../engine/DisposalScope';
 import { WorldControlsHelp } from '../../../WorldControlsHelp';
 import type { WorldGame } from '../../../WorldGame';
-import { LabToolbarAction } from '../../JuiceLabToolbar';
+import { GuairaChapterAction } from './GuairaChapterAction';
 
 interface SceneControlsRuntime {
     readonly game: WorldGame;
@@ -22,7 +22,7 @@ export class GuairaChapterControlsHelp {
         this.button.setAttribute('aria-haspopup', 'dialog');
         this.button.setAttribute('aria-controls', 'chapter-controls-help');
         this.button.setAttribute('aria-expanded', 'false');
-        new LabToolbarAction(this.button).setLabel('CONTROLES', 'Abrir controles e ajuda da tentativa');
+        new GuairaChapterAction(this.button).setLabel('CONTROLES', 'Abrir controles e ajuda da tentativa');
         this.help = new WorldControlsHelp(canvas, {
             canOpen: () => this.available()?.game.state === 'paused',
             resetInput: () => this.runtime()?.game.input.reset(),

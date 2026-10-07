@@ -29,7 +29,7 @@ for (const [opening, touch] of [['guaira-travessia', false], ['guaira-patio-comp
         const mapReady = async () => { await flushChapter(); h.frames(2); };
         const choose = (name: string) => { h.button('Ver a jornada de Guaíra').click(); h.button(name).click(); };
         await mapReady();
-        if (opening === 'guaira-patio-comportas') { h.button('Pátio das Comportas: usar como abertura alternativa').click(); await mapReady(); }
+        if (opening === 'guaira-patio-comportas') { h.button('Ver a jornada de Guaíra').click(); h.button('Pátio das Comportas: usar como abertura alternativa').click(); await mapReady(); }
         const route = [...app.snapshot.route];
         async function excursion() {
             const before = app.snapshot, water = before.accepted.length === 5;

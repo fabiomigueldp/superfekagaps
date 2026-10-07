@@ -53,6 +53,7 @@ test('campaign session earns result through six real hits, landing and existing 
     game.skipIntro();
     replayJuiceVictory(h, game);
     assert.equal(game.victorious, false);
+    assert.equal(game.earnedVictory, true, 'A real defeated boss remains earned during the final bounce');
     for (let n = 0; n < 120 && !game.epilogue.frame; n++) game.update(STEP);
     assert.ok(game.epilogue.frame);
     h.window.dispatch('blur');
@@ -73,10 +74,12 @@ test('campaign session earns result through six real hits, landing and existing 
         game.reflectCampaignStatus(liveStatus, h.status.textContent);
     }
     assert.equal(liveWrites, 1, 'completed epilogue must not repeatedly mutate the live region');
-    assert.match(liveText, /Volte à fase/);
+    assert.match(liveText, /Voltando à fase/);
     assert.notEqual(h.status.textContent, liveText, 'native lab and campaign status remain separate');
     game.load('juice-lab');
     assert.equal(game.victorious, false);
+    assert.equal(game.readyToReturn, false);
+    assert.equal(game.earnedVictory, true, 'Retry cannot revoke an earned win');
     assert.equal(game.epilogue.skip(), false);
     game.replayIntro();
     assert.equal(game.labMode, 'intro');

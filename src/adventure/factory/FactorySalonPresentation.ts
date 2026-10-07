@@ -12,6 +12,7 @@ export class FactorySalonPresentation {
     private readonly pose: HTMLButtonElement;
     private readonly skip: HTMLButtonElement;
     private readonly retry: HTMLButtonElement;
+    private readonly finish: HTMLButtonElement;
     private readonly help: WorldControlsHelp;
     private readonly controls: HTMLButtonElement[] = [];
     private readonly objective = document.createElement('p');
@@ -51,12 +52,17 @@ export class FactorySalonPresentation {
         this.resume = button('CONTINUAR', 'Continuar', () => lab.toggleLabPause());
         this.pose = button('POSE', 'Apresentar pose', () => { lab.toggleLabPause(); lab.presentIntro(); });
         this.skip = button('PULAR CENA', 'Pular cena', () => {
-            if (lab.labMode === 'intro') lab.skipIntro(); else lab.epilogue.skip();
+            // The epilogue accepts only active-play skips. Resume first, as
+            // the native pause-menu action otherwise silently does nothing.
             lab.toggleLabPause();
+            if (lab.labMode === 'intro') lab.skipIntro(); else lab.epilogue.skip();
         });
         this.retry = button('REINICIAR', 'Reiniciar tentativa', () => lab.load('juice-lab'));
         button('CONTROLES', 'Controles', () => this.help.open());
         button('VOLTAR', 'Voltar à fase', leave);
+        this.finish = button('SEGUIR VIAGEM', 'Seguir viagem e voltar à fase', leave, shell);
+        this.finish.className = 'factory-salon-result';
+        this.finish.hidden = true;
         shell.append(this.menu);
         this.help = new WorldControlsHelp(canvas, {
             canOpen: () => !events.isDisposed && lab.state === 'paused',
@@ -76,6 +82,9 @@ export class FactorySalonPresentation {
             // same Escape or act on the suspended campaign underneath this visit.
             e.stopPropagation();
             if (e.ctrlKey || e.metaKey || e.altKey) return;
+            if (lab.state === 'playing' && lab.victorious && e.key === 'Enter' && e.target === canvas) {
+                e.preventDefault(); if (!e.repeat) leave(); return;
+            }
             if (e.key === 'Escape') {
                 e.preventDefault(); lab.input.consumePause();
                 if (!e.repeat) { lab.toggleLabPause(); this.sync(); }
@@ -104,6 +113,7 @@ export class FactorySalonPresentation {
         const paused = this.lab.state === 'paused';
         this.menu.hidden = !paused;
         this.pause.hidden = paused;
+        this.finish.hidden = paused || !this.lab.epilogue.frame;
         this.pose.hidden = this.lab.intro?.beat !== 'prepare';
         this.skip.hidden = this.lab.labMode !== 'intro' && (!this.lab.epilogue.frame || this.lab.victorious);
         this.retry.hidden = this.lab.labMode === 'intro' || !!this.lab.epilogue.frame;

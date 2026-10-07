@@ -37,6 +37,7 @@
     overflow: hidden; clip-path: inset(50%); white-space: nowrap;
 }
 .factory-salon-pause:focus { position: absolute; top: max(12px, env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); }
+.factory-salon-result { position: absolute; bottom: max(8px, env(safe-area-inset-bottom, 0px)); right: max(8px, env(safe-area-inset-right, 0px)); }
 .factory-salon [hidden], .factory-salon-enter[hidden] { display: none; }
 @media (max-height: 340px) {
     .factory-salon-menu { grid-template-columns: repeat(2, minmax(0, 180px)); }
@@ -47,4 +48,19 @@
     .factory-salon :is(button, .factory-salon-objective) .lab-sr { position: static; width: auto; height: auto; margin: 0; clip-path: none; white-space: normal; overflow-wrap: anywhere; min-width: 0; }
     .factory-salon button { border: 1px solid ButtonText; padding: 6px; }
     .factory-salon button:focus-visible { outline-color: Highlight; }
+}
+
+/* Native focus/touch target shares the authored doorway plaque. */
+.factory-salon-enter.world-entrance {
+    bottom: auto; margin: 0; padding: 0; min-width: 44px; min-height: 44px;
+    transform: translate(-50%, -50%); border: 0; box-shadow: none;
+    color: transparent; background: transparent; font-size: 0;
+    cursor: pointer; touch-action: manipulation;
+}
+.factory-salon-enter.world-entrance:focus-visible { outline: 2px solid #f6d896; outline-offset: 2px; }
+@media (forced-colors: active) {
+    .factory-salon-enter.world-entrance {
+        color: ButtonText; background: ButtonFace; border: 1px solid ButtonText; font-size: 14px;
+        width: auto !important; height: auto !important; max-width: min(80vw, 220px); padding: 6px;
+    }
 }

@@ -12,7 +12,10 @@ export interface CampaignJumpPlan {
 }
 const walk = (x: number, feetY: number): JumpWitness => ({ x, feetY, run: false, hold: 60, approachFrames: 7 });
 const run = (x: number, feetY: number): JumpWitness => ({ x, feetY, run: true, hold: 60, approachFrames: 12 });
-/** Deliberate local traversal choices, never inferred from a decorative curve.
+/** Historical local-witness inventory from the first calibration.
+ * Ordinary groups are superseded by campaignNaturalGuides; only the secret carrier
+ * still uses this original witness. Retained to reproduce the historical audit.
+ * Deliberate local traversal choices, never inferred from a decorative curve.
  * Most hold jump through landing; no frame-perfect release is required. */
 export const CAMPAIGN_JUMP_PLANS: CampaignJumpPlan[] = [
     { stage: '1-1', name: 'First recoverable gap', firstCoin: 4, count: 7, witness: walk(400,192), landing: [496,784,224] },

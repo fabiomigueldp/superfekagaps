@@ -277,12 +277,34 @@ test('compact title geometry leaves a 44px rail and preserves canvas coordinates
     assert.equal(experimentalTitleSize(640, 360).height, 300, 'Reserve rail space without dropping a whole integer scale');
 });
 
+test('title exposes its native menu before Extras and leaves Tab traversal to the browser', t => {
+    const h = browser(t); h.canvas.focus(); h.game.render(); h.game.enableExperimentalHub();
+    const hub = h.gameHub(), entry = h.byId('open-experiments');
+    const menu = h.body.children.find(element => element.className === 'canvas-menu-accessibility');
+    assert.ok(menu); assert.equal(menu.hidden, false); assert.equal(hub.rail.hidden, false);
+    assert.deepEqual(menu.children.map(button => button.textContent), ['CONTINUAR', 'OPÇÕES', 'GALERIA', 'ORIGINAL']);
+    assert.ok(h.body.children.indexOf(menu) < h.body.children.indexOf(hub.rail as unknown as LifecycleElement),
+        'Native title controls precede Extras in document/tab order.');
+    for (const button of [...menu.children, entry]) {
+        assert.equal(button.tagName, 'BUTTON'); assert.equal(button.disabled, false); assert.equal(button.tabIndex, 0);
+        button.focus();
+        for (const shiftKey of [false, true]) {
+            // The DOM harness does not implement browser Tab focus movement. Check
+            // both event owners leave it native instead of faking that movement.
+            if (button !== entry) assert.equal(menu.dispatch('keydown', { key: 'Tab', shiftKey, target: button }).defaultPrevented, false);
+            assert.equal(h.key('Tab', { shiftKey }).defaultPrevented, false);
+            assert.equal(hub.isOpen, false, 'Tab must not become an Extras activation shortcut.');
+            assert.equal(h.game.state, 'title');
+        }
+    }
+    entry.click(); assert.equal(hub.isOpen, true, 'The separately focusable Extras control still opens the chooser.');
+    assert.deepEqual(h.writes, []); assert.equal(h.stored.get(SAVE_KEY), h.save);
+    h.game.dispose();
+});
+
 test('actual entrypoints preserve final focus ordering, return links, and fresh chapter sessions', () => {
     const read = (path: string) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
     const main = read('src/main.ts');
-    const world = read('src/adventure/WorldGame.ts');
-    assert.match(world, /SETAS\/TAB: MENU · ENTER: CONFIRMAR/);
-    assert.doesNotMatch(world, /TAB: \$\{EXTRAS_LABEL\}/, 'Tab traverses native menu controls before Extras');
     assert.ok(main.indexOf('game.enableExperimentalHub') > main.lastIndexOf('canvas.focus('));
     assert.match(main, /if \(game instanceof WorldGame\) game.enableExperimentalHub/);
     assert.match(read('guaira.html'), /id="map-exit" href="\.\/\?experiments=1"/);

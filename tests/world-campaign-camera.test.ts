@@ -74,8 +74,9 @@ test('native 1-1 beach drop reveals the landing before contact and removes the l
     assert.ok(rows[landing - 3].beachBefore > 180, 'The old camera still hides the landing.');
     assert.ok(rows[landing - 3].beachAfter < 180, 'The landing is visible three physics frames earlier.');
     assert.ok(rows[landing].accelerationBefore > 2.9, 'The baseline reproduces the grounded-target jump.');
-    assert.ok(Math.abs(rows[landing].accelerationAfter) < .1, 'Landing keeps the existing scroll velocity.');
-    assert.ok(Math.max(...rows.map(r => Math.abs(r.accelerationAfter))) < .6);
+    assert.ok(rows[landing].accelerationAfter <= 0, 'Contact decelerates toward the same target instead of kicking downward.');
+    assert.ok(Math.max(...rows.map(r => r.accelerationAfter)) < 1, 'Catch-up adds less than one pixel/frame of downward acceleration.');
+    assert.ok(rows.every(r => r.dyAfter >= -1e-9), 'The drop and its settling never reverse.');
     t.diagnostic(JSON.stringify({ maxFeetBefore, maxFeetAfter, landing: rows[landing],
         beforeLanding: rows.slice(landing - 3, landing) }));
 });

@@ -26,7 +26,7 @@ function setup(t: TestContext, screen: Menu = 'title') {
     }
     game.render();
     if (screen === 'settings') {
-        tap('ArrowDown'); tap('ArrowDown'); tap('Enter');
+        tap('ArrowDown'); tap('Enter');
     } else if (screen === 'paused') {
         game.load('1-1'); tap('Escape'); game.update(1000 / 60);
     }
@@ -60,7 +60,7 @@ test('plain arrows/W/S, Enter, Space and Escape keep their existing canvas menu 
     h.tap('s'); assert.equal(h.selected(), 2);
     h.tap('ArrowUp'); assert.equal(h.selected(), 1);
     h.tap('w'); assert.equal(h.selected(), 0);
-    h.tap('ArrowDown'); h.tap('ArrowDown'); h.tap('Enter'); h.game.render();
+    h.tap('ArrowDown'); h.tap('Enter'); h.game.render();
     assert.equal(h.game.state, 'settings');
     const before = h.game.store.save.preferences.music;
     h.tap(' ');

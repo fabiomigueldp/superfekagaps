@@ -36,7 +36,7 @@ for (const [opening, touch] of [['guaira-travessia', false], ['guaira-patio-comp
         const activeGame = (): WorldGame | null => app.activeGame;
         await mapReady(h);
         if (opening === 'guaira-patio-comportas') {
-            h.button('Pátio das Comportas: usar como abertura alternativa').click(); await mapReady(h);
+            h.button('Ver a jornada de Guaíra').click(); h.button('Pátio das Comportas: usar como abertura alternativa').click(); await mapReady(h);
         }
         const route = [...app.snapshot.route]; assert.equal(route.length, 5); assert.equal(route[0], opening);
         h.button(`Entrar: ${CHAPTER_SCENES[opening].title}`).click(); await flushChapter();

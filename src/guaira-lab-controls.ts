@@ -8,14 +8,16 @@ export function installGuairaLabControls(game: WorldGame, canvas: HTMLCanvasElem
     const lifetime = new DisposalScope();
     let mounted = new DisposalScope();
     let controls: GuairaTouchControls | null = null;
-    const fit = () => fitGuairaLabCanvas(canvas);
     function mount() {
         // Older touch browsers keep the original canvas controls as a fallback.
-        if (lifetime.isDisposed || controls || typeof PointerEvent === 'undefined') return;
+        if (lifetime.isDisposed || game.isDisposed || controls || typeof PointerEvent === 'undefined') return;
+        const owner = mounted;
+        const current = () => !lifetime.isDisposed && !owner.isDisposed && owner === mounted && !game.isDisposed;
+        const fit = () => { if (current()) fitGuairaLabCanvas(canvas); };
         const next = new GuairaTouchControls({ input: game.input,
             isPlaying: () => game.state === 'playing' && !game.player.data.isDead && !isComplete(),
             onInteract: () => game.audio.unlock(),
-            onVisibilityChange: visible => { game.renderer.setTouchControlsVisible(!visible); fit(); }
+            onVisibilityChange: visible => { if (current()) { game.renderer.setTouchControlsVisible(!visible); fit(); } }
         });
         controls = next;
         mounted.add(() => { controls = null; next.dispose(); });
@@ -28,7 +30,7 @@ export function installGuairaLabControls(game: WorldGame, canvas: HTMLCanvasElem
     }
     function suspend() {
         mounted.dispose(); mounted = new DisposalScope();
-        game.renderer.setTouchControlsVisible(true); fit();
+        if (!game.isDisposed) { game.renderer.setTouchControlsVisible(true); fitGuairaLabCanvas(canvas); }
     }
     const restore = (event: PageTransitionEvent) => {
         if (!event.persisted) return;

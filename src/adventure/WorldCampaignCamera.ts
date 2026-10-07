@@ -3,19 +3,18 @@ import type { CameraData, LevelData, PlayerData } from '../types';
 import { clamp } from './types';
 
 const FOLLOW = .12;
-const FALL_LAG = 40;
+const FALL_LAG = 4;
 const FALL_CATCHUP = .4;
 const GROUND_LINE = 108;
 const RISE_LINE = 48;
 
 /** Essential campaign framing, advanced only with the fixed-step simulation.
- * Falling and grounded tracking share a framing line: switching on contact must
- * not suddenly move the target 24 px and accelerate the camera after landing.
- * Extra downward catch-up starts only when lag would put Feka's 24 px body
- * within 8 px of the lower edge. It grows continuously from zero, without a
- * hard viewport snap, velocity prediction, or a landing-state target switch.
- * The rising dead zone, horizontal lead and settled framing stay unchanged.
- * No cosmetic motion, anticipation, oscillation or presentation clock is added.
+ * Reserve 36 px of the former 40 px downward lag for landing anticipation.
+ * Catch-up begins just below the shared ground/fall line, rather than waiting
+ * until only Feka's body fits. Its maximum gain is still .52, and the current
+ * grounded target bounds all travel: no prediction overshoot or landing reversal.
+ * The 4 px allowance preserves load settling; ascent and short-hop dead zones,
+ * horizontal lead, world bounds and the settled framing remain unchanged.
  */
 export function advanceCampaignCamera(
     camera: Pick<CameraData, 'x' | 'y'>,

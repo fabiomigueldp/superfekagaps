@@ -17,7 +17,7 @@ function recordHelmetDraws(game: WorldGame) {
         assert.equal(JSON.stringify({ player: game.player.data, boss: game.boss,
             save: game.store.save, time: game.time, elapsed: game.elapsed, state: game.state }), before,
         'Rendering equipment status must not alter the simulation or save.');
-        return draws.filter(([, y]) => y === 4);
+        return draws.filter(([, y]) => y === 0 || y === 4);
     };
 }
 
@@ -35,14 +35,14 @@ for (const reducedMotion of [false, true]) for (const world of [1, 2, 3, 4, 5, 6
         for (let frame = 0; frame < 20 && !game.player.data.hasHelmet; frame++) game.update(1000 / 60);
         h.window.dispatch('keyup', { code: 'ArrowRight', key: 'ArrowRight', target: h.canvas });
         assert.equal(game.player.data.hasHelmet, true, 'Collect the real authored pickup using production input and physics.');
-        for (let repeat = 0; repeat < 3; repeat++) assert.deepEqual(render(), [[283, 4]]);
+        for (let repeat = 0; repeat < 3; repeat++) assert.deepEqual(render(), [[143, 0]]);
 
-        // The widest authored boss name and the pause glyph keep their original positions.
+        // The boss name moved to its contextual row; equipment fits the compact plaque.
         const label = fitText(game.boss!.name, 70);
         assert.equal(label, game.boss!.name);
-        assert.ok(Math.round(246 - textWidth(label) / 2) + textWidth(label) < 283);
-        assert.ok(283 + PLAYER_SPRITES.helmet[0].length < 305);
-        assert.ok(4 + 4 + PLAYER_SPRITES.helmet.length < 22);
+        assert.ok(72 + textWidth(label) < 169);
+        assert.ok(143 + PLAYER_SPRITES.helmet[0].length < 164);
+        assert.ok(4 + PLAYER_SPRITES.helmet.length < 16);
 
         assert.deepEqual(game.player.takeDamage(), { damaged: false, helmetUsed: true });
         assert.equal(game.player.data.hasHelmet, false);
@@ -61,7 +61,7 @@ test('ordinary campaign stage retains the same single marker for pickup and dama
     game.player.data.velocity = { x: 0, y: 0 };
     game.update(1000 / 60);
     assert.equal(game.player.data.hasHelmet, true);
-    assert.deepEqual(render(), [[283, 4]]);
+    assert.deepEqual(render(), [[143, 0]]);
     assert.deepEqual(game.player.takeDamage(), { damaged: false, helmetUsed: true });
     assert.deepEqual(render(), []);
 });

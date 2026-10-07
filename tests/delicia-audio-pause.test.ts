@@ -129,3 +129,76 @@ test('disposed audio cannot unlock again and fresh entry owns an independent con
     assert.deepEqual(sources(contexts[1]).map(node => node.buffer?.name), ['orchard', 'orchard-air']);
     assert.deepEqual(context.events, events, 'reentry cannot resume the disposed chapter context');
 });
+
+test('a track decoded during pause is selected once on resume instead of retaining the previous scene music', async t => {
+    const { audio, contexts } = fixture(t);
+    audio.music('orchard'); await audio.unlock(); await settle();
+    const context = contexts[0], original = sources(context);
+    let finishDecode!: () => void;
+    const decoding = new Promise<void>(resolve => { finishDecode = resolve; });
+    const decode = context.decodeAudioData.bind(context);
+    t.mock.method(context, 'decodeAudioData', async (bytes: ArrayBuffer) => {
+        if (new TextDecoder().decode(bytes) === 'reservoir') await decoding;
+        return decode(bytes);
+    });
+    audio.music('reservoir'); await settle(); audio.pause(true);
+    finishDecode(); await settle();
+    assert.deepEqual(sources(context), original, 'a paused decode cannot start the next track');
+    audio.toggleMute(); audio.pause(false); await settle();
+    assert.equal(sources(context).filter(node => node.buffer?.name === 'reservoir').length, 1);
+    assert.ok(original.every(node => node.stops.length === 1), 'old music and orchard ambience must be retired');
+    const reservoir = sources(context).find(node => node.buffer?.name === 'reservoir')!;
+    assert.deepEqual(reservoir.destinations[0].gain.events.at(-1), ['linear', 0, .65], 'resuming must preserve mute');
+    for (let index = 0; index < 3; index++) { audio.pause(true); audio.pause(false); await audio.unlock(); }
+    await settle();
+    assert.equal(sources(context).filter(node => node.buffer?.name === 'reservoir').length, 1);
+});
+
+test('orchard ambience decoded during pause starts once on resume without restarting music', async t => {
+    const { audio, contexts } = fixture(t);
+    await audio.unlock(); await settle();
+    const context = contexts[0];
+    let finishDecode!: () => void;
+    const decoding = new Promise<void>(resolve => { finishDecode = resolve; });
+    const decode = context.decodeAudioData.bind(context);
+    t.mock.method(context, 'decodeAudioData', async (bytes: ArrayBuffer) => {
+        if (new TextDecoder().decode(bytes) === 'orchard-air') await decoding;
+        return decode(bytes);
+    });
+    audio.music('orchard'); await settle();
+    assert.deepEqual(sources(context).map(node => node.buffer?.name), ['orchard']);
+    audio.pause(true); finishDecode(); await settle();
+    assert.equal(sources(context).length, 1);
+    audio.pause(false); audio.pause(false); await audio.unlock(); await settle();
+    assert.deepEqual(sources(context).map(node => node.buffer?.name), ['orchard', 'orchard-air']);
+});
+
+test('returning to the playing scene supersedes an older pending transition', async t => {
+    const { audio, contexts } = fixture(t);
+    audio.music('orchard'); await audio.unlock(); await settle();
+    const context = contexts[0], original = sources(context);
+    let finishDecode!: () => void;
+    const decoding = new Promise<void>(resolve => { finishDecode = resolve; });
+    const decode = context.decodeAudioData.bind(context);
+    t.mock.method(context, 'decodeAudioData', async (bytes: ArrayBuffer) => {
+        if (new TextDecoder().decode(bytes) === 'reservoir') await decoding;
+        return decode(bytes);
+    });
+    audio.music('reservoir'); await settle(); audio.music('orchard');
+    finishDecode(); await settle();
+    assert.deepEqual(sources(context), original);
+    assert.ok(original.every(node => node.stops.length === 0));
+});
+
+for (const voice of ['jaja-delicia', 'guina-oco'])
+    test(`stage-entry unlock preserves the pending ${voice} intro and starts boss music once`, async t => {
+        const { audio, contexts } = fixture(t);
+        audio.music('orchard'); await audio.unlock(); await settle();
+        const context = contexts[0];
+        // DeliciaApp.loadStage: resume, fire-and-forget unlock, select the boss
+        // track, then showDialogue queues its first voice before unlock resolves.
+        audio.pause(false); const unlocking = audio.unlock(); audio.music('guina'); audio.voice(voice);
+        await unlocking; await settle();
+        assert.equal(sources(context).filter(node => node.buffer?.name === voice).length, 1);
+        assert.equal(sources(context).filter(node => node.buffer?.name === 'guina').length, 1);
+    });

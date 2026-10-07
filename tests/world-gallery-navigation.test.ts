@@ -11,8 +11,9 @@ function harness(t: TestContext) {
         if (original) Object.defineProperty(globalThis, 'HTMLElement', original);
         else Reflect.deleteProperty(globalThis, 'HTMLElement');
     });
-    const writes: string[] = [], audio: string[] = [];
-    const store = new ProgressStore({ getItem: () => null, setItem(key, value) { assert.equal(key, SAVE_KEY); writes.push(value); } });
+    const writes: string[] = [], audio: string[] = [], saved = new Map<string, string>();
+    const store = new ProgressStore({ getItem: key => saved.get(key) ?? null,
+        setItem(key, value) { assert.equal(key, SAVE_KEY); saved.set(key, value); writes.push(value); } });
     const game = Object.create(WorldGame.prototype) as any;
     const context = { fillStyle: '', fillRect() {} };
     Object.assign(game, { store, state: 'title', stage: STAGES[0], selection: 17, time: 0, toast: '', toastTimer: 0,
@@ -30,7 +31,14 @@ function harness(t: TestContext) {
         return prevented;
     }
     function openGallery() {
-        game.render(); key('ArrowDown'); key('Enter'); game.render();
+        game.render();
+        const galleryIndex = game.buttons.findIndex((button: { label: string }) => button.label === 'GALERIA');
+        assert.ok(galleryIndex >= 0, 'The title exposes a labeled Gallery action.');
+        for (let step = 0; game.menuSelection !== galleryIndex && step < game.buttons.length; step++) {
+            assert.equal(key('ArrowDown'), true, 'The title accepts keyboard navigation.');
+        }
+        assert.equal(game.menuSelection, galleryIndex, 'Keyboard navigation reaches Gallery.');
+        assert.equal(key('Enter'), true); game.render();
         assert.equal(game.state, 'gallery'); assert.equal(game.galleryWorld, 0); assert.equal(game.buttons.length, 8);
     }
     return { game, store, writes, audio, key, openGallery };

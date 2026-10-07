@@ -2,6 +2,8 @@ import { importProgressFile, progressImportMessage } from './ProgressImport';
 import { JournalAccessibility } from './JournalAccessibility';
 import { campaignJournal } from './CampaignJournal';
 import { CanvasMenuAccessibility } from './CanvasMenuAccessibility';
+import { WorldHudAccessibility } from './WorldHudAccessibility';
+import { drawWorkshopHud, workshopPanel, workshopButton, WORKSHOP_UI, WORLD_HUD_HELMET } from './WorldWorkshopUI';
 import { WorldControlsHelp } from './WorldControlsHelp';
 import { advanceCampaignCamera } from './WorldCampaignCamera';
 import { runGuairaFlight } from './WorldGuairaFlight';
@@ -36,6 +38,7 @@ import { clampMapSelection } from './WorldMapModel';
 type Screen = 'title' | 'intro' | 'map' | 'playing' | 'paused' | 'dialogue' | 'clear' | 'ending' | 'gallery' | 'settings';
 interface Button extends Rect {
     label: string;
+    ariaLabel?: string;
     run: () => void;
     nativeActivation?: boolean;
 }
@@ -81,6 +84,7 @@ export class WorldGame {
     private buttons: Button[] = [];
     private buttonsOwner = '';
     private menuAccessibility?: CanvasMenuAccessibility;
+    private hudAccessibility?: WorldHudAccessibility;
     private controlsHelp?: WorldControlsHelp;
     private journalAccessibility?: JournalAccessibility;
     private selection = 0;
@@ -156,6 +160,12 @@ export class WorldGame {
                     resetInput: () => this.input.reset(),
                 });
                 this.addCleanup(() => this.menuAccessibility?.dispose());
+                this.hudAccessibility = new WorldHudAccessibility(canvas, () => {
+                    if (this.state !== 'playing') return;
+                    this.input.reset(); this.audio.unlock(); this.pause();
+                    this.menuAccessibility?.requestFocusFromCanvas();
+                });
+                this.addCleanup(() => this.hudAccessibility?.dispose());
             }
             this.addCleanup(() => this.audio.dispose());
             this.addCleanup(() => this.saveImportCleanup?.());
@@ -874,12 +884,18 @@ export class WorldGame {
         else
             this.toMap();
     }
-    private button(c: CanvasRenderingContext2D, label: string, x: number, y: number, w: number, run: () => void, accent = ART.goldLight, nativeActivation = false) { const selected = this.buttons.length === this.menuSelection; panel(c, x, y, w, 17, selected ? '#334b62' : '#202d43', selected ? accent : '#637888'); pixelText(c, fitText(label, w - 10), x + w / 2, y + 5, selected ? accent : ART.paper, 1, 'center'); this.buttons.push({ label, x, y, width: w, height: 17, run, nativeActivation }); }
+    private button(c: CanvasRenderingContext2D, label: string, x: number, y: number, w: number,
+        run: () => void, accent: string = WORKSHOP_UI.light, nativeActivation = false, height = 20, accessibleLabel = label) {
+        workshopButton(c, label, x, y, w, height, this.buttons.length === this.menuSelection, accent);
+        this.buttons.push({ label, ariaLabel: accessibleLabel, x, y, width: w, height, run, nativeActivation });
+    }
     private heading(c: CanvasRenderingContext2D, small: string, big: string) { pixelText(c, small, 160, 12, '#c4d7d8', 1, 'center'); pixelText(c, big, 161, 29, '#343651', 2, 'center'); pixelText(c, big, 160, 27, '#ffdf94', 2, 'center'); }
     private text(c: CanvasRenderingContext2D, text: string, x: number, y: number, width: number, color: string = ART.paper) { wrapText(text, width).forEach((line, i) => pixelText(c, line, x, y + i * 10, color)); }
     render() {
         if (this.isDisposed || this.controlsHelp?.isOpen) return;
         this.experimentalHub?.sync();
+        this.hudAccessibility?.sync(this.state === 'playing' && !this.experimentalHub?.isOpen && !this.flightCleanup,
+            this.stage.id, this.coins, this.store.save.seals.filter(id => id.startsWith(this.stage.id + ':')).length, this.player.data.hasHelmet);
         this.journalAccessibility?.sync(this.state === 'gallery' && !this.experimentalHub?.isOpen && !this.flightCleanup ? this.galleryWorld : null, this.store.save);
         if (this.state === 'map') {
             this.menuAccessibility?.clear({ restoreFocus: false });
@@ -916,7 +932,7 @@ export class WorldGame {
         this.paintCanvasIfNeeded();
         if (this.experimentalHub?.isOpen || this.flightCleanup || (typeof document !== 'undefined' && document.hidden) || this.state === 'playing')
             this.menuAccessibility?.clear({ restoreFocus: false });
-        else this.menuAccessibility?.sync(this.menuIdentity(), this.state === 'title' ? 'Menu principal' : this.state === 'settings' ? 'Opções' : this.state === 'paused' ? 'Pausa' : 'Aventura', this.buttons, this.menuSelection);
+        else this.menuAccessibility?.sync(this.menuIdentity(), this.state === 'title' ? 'Menu principal' : this.state === 'settings' ? 'Opções' : this.state === 'paused' ? `Pausa · ${this.stage.id} · ${this.stage.name}` : 'Aventura', this.buttons, this.menuSelection, this.toastTimer > 0 ? this.toast : '');
     }
     private paintCanvasIfNeeded(): void {
         if (!this.frozenMenuOwner?.() || (this.state !== 'paused' && this.state !== 'settings')) {
@@ -955,13 +971,14 @@ export class WorldGame {
         else
             this.renderSettings(c);
         if (this.state === 'paused') {
-            rect(c, 0, 0, 320, 180, '#172338cc');
-            panel(c, 63, 29, 194, 128);
-            pixelText(c, 'UM RESPIRO', 160, 42, ART.goldLight, 2, 'center');
-            this.button(c, 'CONTINUAR', 84, 68, 152, () => this.resume());
-            this.button(c, 'VOLTAR AO MAPA', 84, 90, 152, () => this.toMap());
-            this.button(c, 'OPÇÕES', 84, 112, 152, () => this.settings('paused'));
-            this.button(c, 'EXPORTAR PROGRESSO', 84, 134, 152, () => this.exportSave(), ART.goldLight, true);
+            rect(c, 0, 0, 320, 180, '#101d29c9');
+            const stageLines = wrapText(`${this.stage.id} · ${this.stage.name}`, 132);
+            workshopPanel(c, 86, 31, 148, 118 + (stageLines.length - 1) * 10);
+            pixelText(c, 'PAUSA', 160, 39, WORKSHOP_UI.paper, 2, 'center');
+            this.button(c, 'CONTINUAR', 98, 59, 124, () => this.resume(), WORKSHOP_UI.light, false, 20);
+            this.button(c, 'OPÇÕES', 98, 83, 124, () => this.settings('paused'), WORKSHOP_UI.light, false, 20);
+            this.button(c, 'VOLTAR AO MAPA', 98, 107, 124, () => this.toMap(), WORKSHOP_UI.light, false, 20);
+            stageLines.forEach((line, index) => pixelText(c, line, 160, 136 + index * 10, WORKSHOP_UI.muted, 1, 'center'));
         }
         if (this.state === 'dialogue' && this.dialog) {
             panel(c, 12, 104, 296, 69, '#202d43', '#aac1cd');
@@ -1057,16 +1074,11 @@ export class WorldGame {
             rect(c, s.x - cx, s.y - cy, 2, 2, s.color);
         }
         c.globalAlpha = 1;
-        rect(c, 0, 0, 320, 23, '#1b2940');
-        rect(c, 0, 22, 320, 1, island.accent);
-        pixelText(c, this.stage.id, 8, 8, island.accent);
-        pixelText(c, fitText(this.stage.name, this.boss ? 150 : 170), 40, 8, ART.paper);
         const count = this.store.save.seals.filter(id => id.startsWith(this.stage.id + ':')).length;
-        pixelText(c, this.boss ? fitText(this.boss.name, 70) : `${count}/3`, 246, 8, ART.goldLight, 1, 'center');
-        pixelText(c, 'II', 305, 8, ART.paper);
+        if (!this.hudAccessibility?.showsReadableStrip) drawWorkshopHud(c, this.stage.id, this.coins, count);
         if (this.boss) this.renderEncounterHud(c);
-        else if (this.player.data.hasHelmet)
-            this.renderer.drawHelmet(283, 4, c);
+        else if (this.player.data.hasHelmet && !this.hudAccessibility?.showsReadableStrip)
+            this.renderer.drawHelmet(WORLD_HUD_HELMET.x, WORLD_HUD_HELMET.y, c);
         if (this.state === 'paused')
             this.renderer.drawPlayerTransition(this.player.data, view, c);
     }
@@ -1075,28 +1087,33 @@ export class WorldGame {
     }
     protected renderEncounterHud(c: CanvasRenderingContext2D) {
         if (!this.boss) return;
-        if (this.player.data.hasHelmet) this.renderer.drawHelmet(283, 4, c);
-        panel(c, 64, 26, 192, 24);
+        if (this.player.data.hasHelmet && !this.hudAccessibility?.showsReadableStrip) this.renderer.drawHelmet(WORLD_HUD_HELMET.x, WORLD_HUD_HELMET.y, c);
+        workshopPanel(c, 64, 20, 192, 30);
+        pixelText(c, fitText(this.boss.name, 86), 72, 25, WORKSHOP_UI.paper);
         const boss = this.boss;
         for (let i = 0; i < boss.maxHealth; i++)
-            rect(c, 123 + i * 16, 30, 12, 4, i < boss.health ? '#f1a479' : '#4c5264');
+            rect(c, 169 + i * 13, 27, 10, 4, i < boss.health ? '#f1a479' : '#4c5264');
         pixelText(c, fitText(boss.hint, 184), 160, 40, '#e5d6c3', 1, 'center');
     }
     private renderTitle(c: CanvasRenderingContext2D) {
         this.art.background(c, ISLANDS[0], this.time * .008, 0, this.time);
         rect(c, 0, 157, 320, 23, '#364d57');
         rect(c, 0, 155, 320, 3, '#a7c784');
-        this.heading(c, 'TORBWARE APRESENTA', 'SUPER FEKA GAPS');
-        pixelText(c, 'WORLD', 161, 55, '#395472', 3, 'center');
-        pixelText(c, 'WORLD', 160, 53, '#faf0b8', 3, 'center');
-        pixelText(c, 'SETE REGIÕES. UMA GRANDE MISSÃO?', 160, 86, '#30475b', 1, 'center');
+        // The original Oficina sign keeps FEKA as its dominant word.
+        for (const x of [103, 210]) {
+            rect(c, x, 5, 7, 156, '#694b32'); rect(c, x + 1, 6, 3, 153, '#a27845');
+            rect(c, x + 4, 8, 1, 148, '#473b31');
+        }
+        workshopPanel(c, 94, 9, 132, 65);
+        pixelText(c, 'SUPER', 160, 16, WORKSHOP_UI.paper, 2, 'center');
+        pixelText(c, 'FEKA', 160, 32, WORKSHOP_UI.gold, 3, 'center');
+        pixelText(c, 'GAPS', 160, 55, WORKSHOP_UI.paper, 2, 'center');
         this.art.atlas.draw(c, PLAYER_SPRITES.idle, PLAYER_PALETTE, 32, 130);
         this.art.atlas.draw(c, bossFrame('joao', 'idle'), WORLD_PALETTE, 252, 99);
-        this.button(c, this.store.save.completed.length ? 'CONTINUAR AVENTURA' : 'COMEÇAR AVENTURA', 80, 103, 160, () => this.begin());
-        this.button(c, 'GALERIA', 80, 124, 76, () => this.change('gallery'));
-        this.button(c, 'OPÇÕES', 164, 124, 76, () => this.settings('title'));
-        this.button(c, 'JOGAR O ORIGINAL', 99, 149, 122, () => { location.href = '?classic=true'; });
-        pixelText(c, this.experimentalHub ? 'SETAS/TAB: MENU · ENTER: CONFIRMAR' : 'ENTER PARA CONFIRMAR · SETAS PARA ESCOLHER', 160, 172, '#d1d6c2', 1, 'center');
+        this.button(c, this.store.save.completed.length ? 'CONTINUAR' : 'JOGAR', 102, 80, 116, () => this.begin(), WORKSHOP_UI.light, false, 22);
+        this.button(c, 'OPÇÕES', 102, 105, 116, () => this.settings('title'), WORKSHOP_UI.light, false, 22);
+        this.button(c, 'GALERIA', 102, 130, 116, () => this.change('gallery'), WORKSHOP_UI.light, false, 22);
+        this.button(c, 'ORIGINAL', 114, 156, 92, () => { location.href = '?classic=true'; }, WORKSHOP_UI.light, false, 17);
     }
     private renderStory(c: CanvasRenderingContext2D) {
         const ending = this.state === 'ending';
@@ -1180,18 +1197,21 @@ export class WorldGame {
     }
     private settings(from: Screen) { this.settingReturn = from; this.pausedAudio = from === 'paused'; this.audio.pause(false); this.change('settings'); }
     private closeSettings() {
+        // A delayed file read must not replace progress after gameplay resumes.
+        this.saveImportCleanup?.();
         this.store.persist();
         this.change(this.settingReturn);
         if (this.pausedAudio)
             this.audio.pause(true);
     }
     private renderSettings(c: CanvasRenderingContext2D) {
-        rect(c, 0, 0, 320, 180, '#1e2e44');
-        this.heading(c, 'DO SEU JEITO', 'OPÇÕES');
+        rect(c, 0, 0, 320, 180, WORKSHOP_UI.ink);
+        workshopPanel(c, 62, 11, 196, 30);
+        pixelText(c, 'OPÇÕES', 160, 20, WORKSHOP_UI.paper, 2, 'center');
         const prefs = this.store.save.preferences;
         (['music', 'effects', 'voice'] as const).forEach((key, i) => { const label = ['MÚSICA', 'EFEITOS', 'VOZES'][i]; this.button(c, `${label}: ${Math.round(prefs[key] * 100)}%`, 62, 55 + i * 23, 196, () => { prefs[key] = prefs[key] >= .99 ? 0 : Math.min(1, Math.round((prefs[key] + .25) * 100) / 100); this.audio.volume(); this.store.persist(); }); });
-        this.button(c, 'EXPORTAR SAVE', 10, 127, 98, () => this.exportSave(), ART.goldLight, true);
-        this.button(c, 'IMPORTAR SAVE', 112, 127, 98, () => this.importSave(), ART.goldLight, true);
+        this.button(c, 'EXPORTAR', 10, 127, 98, () => this.exportSave(), ART.goldLight, true, 20, 'EXPORTAR PROGRESSO');
+        this.button(c, 'IMPORTAR', 112, 127, 98, () => this.importSave(), ART.goldLight, true, 20, 'IMPORTAR PROGRESSO');
         this.button(c, prefs.shake ? 'TREMOR: SIM' : 'TREMOR: NÃO', 214, 127, 96, () => { prefs.shake = !prefs.shake; this.store.persist(); });
         if (this.controlsHelp) this.button(c, 'CONTROLES', 10, 153, 98, () => this.controlsHelp?.open());
         this.button(c, 'VOLTAR', 114, 153, 92, () => this.closeSettings());
@@ -1223,6 +1243,14 @@ export class WorldGame {
                 this.toast = progressImportMessage(result);
                 this.toastTimer = result === 'imported' ? 2500 : 5000;
                 if (result === 'imported') {
+                    // The imported save supersedes the whole attempt, not just storage.
+                    // Return through title/map so normal load() rebuilds the stage,
+                    // checkpoint and collected IDs without writing old run state back.
+                    this.settingReturn = 'title';
+                    this.pausedAudio = false;
+                    this.mapReturn = undefined;
+                    this.nextMapSelection = undefined;
+                    this.selection = Math.max(0, STAGES.findIndex(s => s.id === this.store.save.selected));
                     this.audio.preferences = this.store.save.preferences;
                     // Audio failure must not mislabel an already saved import as a bad file.
                     try { this.audio.volume(); } catch { }

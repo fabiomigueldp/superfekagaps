@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
 import test, { type TestContext } from 'node:test';
 import { WorldGame } from '../src/adventure/WorldGame';
-import { ProgressStore, freshSave, SAVE_KEY } from '../src/adventure/progress';
+import { STAGES, stageById } from '../src/adventure/campaign';
+import { WorldTutorial } from '../src/adventure/WorldTutorial';
+import { ProgressStore, freshSave, parseSave, SAVE_KEY } from '../src/adventure/progress';
 
 class SaveInput {
     type = ''; accept = ''; id = ''; hidden = false;
@@ -32,7 +34,12 @@ function harness(t: TestContext, failClick = false) {
     const importSave = store.import.bind(store);
     store.import = (raw: string) => { imports++; return importSave(raw); };
     Object.assign(game, { store, selection: 17, state: 'settings', toast: 'Existing message', toastTimer: 123,
-        audio: { preferences: store.save.preferences, volume() { volumeUpdates++; } } });
+        audio: { preferences: store.save.preferences, volume() { volumeUpdates++; },
+            pause() {}, cancelSpeech() {}, setDying() {}, select() {}, unlock() {}, sfx() {}, say() {}, tick() {} },
+        input: { reset() {}, setMenuMode() {}, update() {}, consumeMute: () => false, consumePause: () => false,
+            getState: () => ({ left: false, right: false, run: false, jump: false, down: false, jumpPressed: false }) },
+        tutorial: new WorldTutorial(store), camera: { x: 0, y: 0, shakeTimer: 0 },
+        renderer: { advanceClock() {}, addImpact() {} }, time: 0, buttons: [] });
     t.after(() => {
         game.saveImportCleanup?.();
         if (original) Object.defineProperty(globalThis, 'document', original); else Reflect.deleteProperty(globalThis, 'document');
@@ -56,9 +63,9 @@ test('save chooser stays attached through a delayed handoff and read, then impor
     assert.equal(input.attached, true); assert.equal(h.imports, 0);
     const save = freshSave(); save.selected = '1-5'; save.completed = ['1-1', '1-2', '1-3', '1-4']; save.preferences.music = .25;
     file.resolve(JSON.stringify(save)); await importing;
-    assert.deepEqual(h.store.save, save); assert.deepEqual(JSON.parse(h.writes[0]), save); assert.equal(h.imports, 1);
+    assert.deepEqual(h.store.save, save); assert.deepEqual(parseSave(h.writes[0]), save); assert.equal(h.imports, 1);
     assert.equal(h.game.audio.preferences, h.store.save.preferences); assert.equal(h.volumeUpdates, 1);
-    assert.equal(h.game.selection, 17, 'Import retains normal selection handling until the existing screen navigation resumes.');
+    assert.equal(h.game.selection, STAGES.findIndex(s => s.id === save.selected), 'Map selection follows imported progress.');
     assert.equal(h.game.state, 'settings'); assert.equal(h.game.toast, 'Progresso importado.'); assert.equal(h.game.toastTimer, 2500);
     assert.equal(h.children.length, 0); assert.equal(input.onchange, null); assert.equal(input.oncancel, null); assert.equal(h.game.saveImportCleanup, undefined);
 });
@@ -126,4 +133,70 @@ test('a refused storage commit reports failure without success feedback or audio
     assert.equal(h.store.save, before); assert.equal(h.game.audio.preferences, preferences); assert.equal(h.volumeUpdates, 0);
     assert.equal(h.game.toast, 'Falha ao salvar. Progresso mantido.'); assert.equal(h.game.toastTimer, 5000);
     assert.equal(h.writes.length, 0); assert.equal(h.children.length, 0);
+});
+
+function pausedRun(h: ReturnType<typeof harness>) {
+    h.game.load('1-1', false, { ...stageById('1-1')!, dialogues: [], foes: [] });
+    const coin = h.game.stage.pickups.find((p: any) => p.kind === 'coin');
+    const seal = h.game.stage.pickups.find((p: any) => p.kind === 'seal');
+    h.game.collected = new Set([coin.id, seal.id]); h.game.coins = 1; h.game.elapsed = 73;
+    h.store.save.seals = [seal.id]; h.game.checkpoint = 1; h.game.checkpointHelmet = false;
+    h.store.save.checkpoint = { stage: '1-1', index: 1, helmet: false };
+    h.game.mapReturn = { playedStage: '1-1', nextSelected: '1-2' }; h.game.nextMapSelection = '1-2';
+    h.game.pause(); h.game.settings('paused');
+    return { player: h.game.player, collected: h.game.collected, coin, seal };
+}
+
+test('import ends the paused attempt; normal reentry uses imported stage/checkpoint and fresh pickups', async t => {
+    for (const id of ['1-1', '2-1']) await t.test(id, async child => {
+        const h = harness(child), old = pausedRun(h), save = freshSave();
+        save.selected = id; save.seen = ['opening']; save.completed = ['1-1', '1-2', '1-3', '1-4', '1-5'];
+        save.checkpoint = { stage: id, index: 0, helmet: true };
+        const input = h.open(); input.files = [{ text: async () => JSON.stringify(save) }]; await input.onchange!();
+        assert.equal(h.game.settingReturn, 'title', 'Back must never expose the superseded paused attempt.');
+        assert.equal(h.game.pausedAudio, false); assert.equal(h.game.mapReturn, undefined); assert.equal(h.game.nextMapSelection, undefined);
+        assert.equal(h.game.selection, STAGES.findIndex(s => s.id === id));
+        h.game.closeSettings(); assert.equal(h.game.state, 'title');
+        h.game.begin(); assert.equal(h.game.state, 'map'); assert.equal(STAGES[h.game.selection].id, id);
+        assert.deepEqual(h.store.save, save, 'Leaving Settings and continuing must preserve the imported save.');
+        h.game.load(id, true, { ...stageById(id)!, dialogues: [], foes: [] });
+        assert.notEqual(h.game.player, old.player); assert.equal(h.game.stage.id, id); assert.equal(h.game.checkpoint, 0);
+        assert.equal(h.game.player.data.hasHelmet, true); assert.equal(h.game.coins, 0); assert.equal(h.game.elapsed, 0);
+        assert.equal(h.game.collected.size, 0); assert.equal(h.store.save.seals.length, 0);
+        assert.equal(h.game.player.data.position.x, stageById(id)!.checkpoints[0].x * 16);
+        h.game.restart(); assert.deepEqual(h.store.save.checkpoint, save.checkpoint);
+        const coin = h.game.stage.pickups.find((p: any) => p.kind === 'coin');
+        const seal = h.game.stage.pickups.find((p: any) => p.kind === 'seal');
+        for (const item of [coin, seal]) {
+            h.game.player.data.position = { x: item.x, y: item.y }; h.game.player.data.velocity = { x: 0, y: 0 };
+            h.game.player.data.respawnRevealTimer = 0; h.game.update(1000 / 60);
+            assert.equal(h.game.collected.has(item.id), true, `${item.kind} must be collectible in the imported run`);
+        }
+        assert.equal(h.game.coins, 1); assert.ok(h.store.save.seals.includes(seal.id));
+    });
+});
+
+test('failed and cancelled imports retain the live paused attempt and its retry accounting', async t => {
+    for (const kind of ['invalid', 'read failure', 'storage failure', 'cancel']) await t.test(kind, async child => {
+        const h = harness(child), old = pausedRun(h), before = structuredClone(h.store.save), input = h.open();
+        if (kind === 'storage failure') h.store.import = () => false;
+        if (kind === 'cancel') input.oncancel!();
+        else {
+            input.files = [{ text: async () => { if (kind === 'read failure') throw Error('unreadable'); return kind === 'invalid' ? '{' : JSON.stringify(freshSave()); } }];
+            await input.onchange!();
+        }
+        assert.deepEqual(h.store.save, before); assert.equal(h.game.settingReturn, 'paused'); assert.equal(h.game.pausedAudio, true);
+        h.game.closeSettings(); assert.equal(h.game.state, 'paused'); assert.equal(h.game.player, old.player);
+        assert.equal(h.game.collected, old.collected); h.game.resume(); h.game.restart();
+        assert.equal(h.game.checkpoint, 1); assert.equal(h.game.coins, 1); assert.equal(h.game.elapsed, 73);
+        assert.equal(h.game.collected.has(old.coin.id), true); assert.deepEqual(h.store.save.seals, [old.seal.id]);
+    });
+});
+
+test('leaving Settings during an asynchronous read cancels it before it can replace a resumed run', async t => {
+    const h = harness(t), old = pausedRun(h), before = structuredClone(h.store.save), input = h.open(), file = deferredText();
+    input.files = [file]; const pending = input.onchange!();
+    h.game.closeSettings(); h.game.resume(); file.resolve(JSON.stringify(freshSave())); await pending;
+    assert.deepEqual(h.store.save, before); assert.equal(h.game.state, 'playing'); assert.equal(h.game.player, old.player);
+    assert.equal(h.game.collected, old.collected); assert.equal(h.imports, 0); assert.equal(h.children.length, 0);
 });

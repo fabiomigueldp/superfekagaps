@@ -5,15 +5,17 @@ import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
 import { FACTORY_SALON } from '../src/adventure/factory/FactorySalon';
 import type { FactorySalonSession } from '../src/adventure/factory/FactorySalonSession';
+import { replayJuiceVictory, STEP } from './helpers/juiceEpilogueHarness';
 import { labActionSize } from '../src/adventure/experimental/JuiceLabToolbar';
 import { sceneLifecycleBrowser, LifecycleElement } from './helpers/sceneLifecycleHarness';
 
 function browser(t: TestContext, canvasAvailable = true) {
     let dispose = () => {};
     t.after(() => dispose());
-    const h = sceneLifecycleBrowser(t), writes: string[] = [];
+    const h = sceneLifecycleBrowser(t), writes: string[] = [], saved = new Map<string, string>();
     Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: {
-        getItem: () => null, setItem: (key: string) => writes.push(key)
+        getItem: (key: string) => saved.get(key) ?? null,
+        setItem: (key: string, value: string) => { saved.set(key, value); writes.push(key); }
     } });
     const doc = h.document as unknown as { activeElement: LifecycleElement | null };
     const decorate = (element: LifecycleElement) => {
@@ -43,7 +45,16 @@ function browser(t: TestContext, canvasAvailable = true) {
     const menu = () => shell().children.find(child => child.className === 'factory-salon-menu')!;
     const pause = () => { if (session().state !== 'paused') button('Pausar').click(); };
     const leave = () => { pause(); button('Voltar à fase').click(); };
-    return { ...h, game, doc, writes, shell, button, session, menu, pause, leave };
+    const animatedEnter = () => {
+        const entrance = h.body.children.find(child => child.className.split(' ').includes('factory-salon-enter'))!;
+        entrance.click();
+        for (let frame = 0; frame < 40; frame++) {
+            if (!(game as unknown as { entry?: { active: boolean } }).entry?.active) break;
+            game.update(STEP); game.render();
+        }
+        assert.ok(session(), 'The real entry control completes its covered handoff');
+    };
+    return { ...h, game, doc, writes, shell, button, session, menu, pause, leave, animatedEnter };
 }
 
 test('full-play salon keeps native actions in pause only and preserves retry/return behavior', t => {
@@ -106,7 +117,8 @@ test('fullscreen host keeps native scaling and pause actions retain 44px targets
     assert.match(forced, /border: 1px solid ButtonText/);
     assert.match(css, /\.factory-salon \{[^}]*width: 100vw; height: 100dvh; max-width: none; max-height: none/);
     assert.match(css, /\.factory-salon \{[^}]*padding: 0; border: 0/);
-    assert.doesNotMatch(css, /720px|width: 100% !important|height: auto !important/);
+    assert.doesNotMatch(css, /720px|width: 100% !important/);
+    assert.doesNotMatch(css.match(/\.factory-salon > canvas \{[^}]*\}/)![0], /height: auto !important/);
     assert.match(css, /max-width: min\(100vw, calc\(100dvh \* 16 \/ 9\)\)/);
     assert.match(css, /\.factory-salon-pause:not\(:focus\)/);
     assert.match(css, /@media \(max-height: 340px\)/);
@@ -291,7 +303,7 @@ test('early exit leaves progression locked while pause-menu skip persists before
 test('grandfathered routes show their actual open passage without inventing a championship pose', t => {
     const h = browser(t), writes = h.writes.length;
     h.game.store.save.completed = ['3-3']; h.game.update(1000 / 60);
-    const entrance = h.body.children.find(child => child.className === 'factory-salon-enter')!;
+    const entrance = h.body.children.find(child => child.className.split(' ').includes('factory-salon-enter'))!;
     assert.equal(entrance.textContent, 'E · Revisitar salão');
     h.game.enterSalon(); h.pause();
     assert.equal(h.session().presentedAtChampionship, false);
@@ -301,4 +313,108 @@ test('grandfathered routes show their actual open passage without inventing a ch
     assert.match((h.game as unknown as { toast: string }).toast, /PASSAGEM LIBERADA/);
     assert.equal(h.game.store.save.seen.includes(FACTORY_SALON.passage), false);
     assert.equal(h.writes.length, writes, 'Old earned access does not fabricate participation or rewrite the save');
+});
+
+
+for (const reduced of [false, true]) test(`actual six-hit campaign victory resolves and returns without a hidden menu (reduced=${reduced})`, t => {
+    const h = browser(t); h.media.matches = reduced;
+    const before = JSON.stringify(h.game.store.save), writes = h.writes.length;
+    const campaignPosition = { ...h.game.player.data.position }, camera = { x: h.game.camera.x, y: h.game.camera.y };
+    const player = h.game.player, level = h.game.level;
+    h.animatedEnter(); const salon = h.session(), canvas = h.doc.activeElement!;
+    h.pause(); h.button('Pular cena').click();
+    replayJuiceVictory({ window: h.window, canvas }, salon, undefined, dt => h.game.update(dt));
+    assert.equal(salon.boss?.health, 0);
+    assert.equal(salon.player.data.isGrounded, false, 'The sixth real stomp still bounces');
+    assert.equal(h.game.store.save.seen.filter(flag => flag === FACTORY_SALON.victory).length, 1,
+        'Real victory is safely recorded before landing or a possible early departure');
+    assert.equal(h.writes.length, writes + 2, 'Participation and real victory each persist exactly once');
+    for (let frame = 0; frame < 720 && h.session(); frame++) { h.game.update(STEP); h.game.render(); }
+    assert.equal(h.session(), undefined, 'A completed real fight must return to campaign automatically');
+    assert.equal(h.shell(), undefined); assert.equal(salon.isDisposed, true);
+    assert.equal(h.game.player, player); assert.equal(h.game.level, level);
+    assert.deepEqual(h.game.player.data.position, campaignPosition);
+    assert.deepEqual({ x: h.game.camera.x, y: h.game.camera.y }, camera);
+    assert.equal(h.game.state, 'playing'); assert.equal(h.doc.activeElement, h.canvas);
+    assert.equal(h.canvas.id, 'game-canvas'); assert.equal(h.window.worldGame, h.game);
+    assert.ok(Object.values(h.game.input.getState()).every(value => value === false));
+    const expected = JSON.parse(before); expected.seen.unshift(FACTORY_SALON.passage); expected.seen.unshift(FACTORY_SALON.victory);
+    assert.deepEqual(h.game.store.save, expected);
+    assert.equal(h.writes.length, writes + 2);
+    h.key('keydown', 'd'); h.game.update(STEP); h.key('keyup', 'd');
+    assert.ok(h.game.player.data.position.x > campaignPosition.x, 'The returned campaign accepts new movement');
+});
+
+test('pause-menu skip really ends the epilogue and pause freezes the automatic return', t => {
+    const h = browser(t); h.game.enterSalon();
+    const salon = h.session(), canvas = h.doc.activeElement!;
+    h.pause(); h.button('Pular cena').click();
+    replayJuiceVictory({ window: h.window, canvas }, salon, undefined, dt => h.game.update(dt));
+    for (let frame = 0; frame < 120 && !salon.epilogue.frame; frame++) h.game.update(STEP);
+    assert.equal(salon.epilogue.frame?.beat, 'return');
+    h.pause(); h.button('Pular cena').click();
+    assert.equal(salon.epilogue.frame?.beat, 'complete', 'Resume must precede active-only epilogue.skip');
+    assert.equal(salon.state, 'playing');
+    h.pause(); for (let frame = 0; frame < 200; frame++) h.game.update(100);
+    assert.equal(h.session(), salon, 'Paused result never returns behind the menu or controls');
+    h.button('Continuar').click();
+    for (let frame = 0; frame < 120 && h.session(); frame++) h.game.update(STEP);
+    assert.equal(h.session(), undefined);
+});
+
+
+test('winning then leaving during the final bounce preserves the win once through reentry and early retry exit', t => {
+    const h = browser(t), writes = h.writes.length;
+    h.game.enterSalon(); const salon = h.session(), canvas = h.doc.activeElement!;
+    h.pause(); h.button('Pular cena').click();
+    replayJuiceVictory({ window: h.window, canvas }, salon, undefined, dt => h.game.update(dt));
+    assert.equal(salon.epilogue.frame, null);
+    h.leave(); assert.equal(salon.isDisposed, true);
+    assert.equal(h.game.store.save.seen.filter(flag => flag === FACTORY_SALON.victory).length, 1);
+    assert.equal(h.writes.length, writes + 2);
+    h.game.enterSalon(); const next = h.session();
+    assert.equal(next.earnedVictory, false, 'Revisiting starts a fresh optional exhibition');
+    h.pause(); h.button('Pular cena').click(); h.game.update(STEP);
+    h.pause(); h.button('Reiniciar tentativa').click();
+    for (let frame = 0; frame < 20; frame++) h.game.update(STEP);
+    assert.equal(h.session(), next, 'No completed-result timer leaks into the fresh attempt');
+    h.leave();
+    assert.equal(h.writes.length, writes + 2);
+});
+
+test('visible epilogue return is usable before completion and a detached result button cannot close a new visit', t => {
+    const h = browser(t); h.game.enterSalon(); const salon = h.session(), canvas = h.doc.activeElement!;
+    const finish = h.button('Seguir viagem e voltar à fase');
+    assert.equal(finish.hidden, true); finish.click(); assert.equal(h.session(), salon);
+    h.pause(); h.button('Pular cena').click();
+    replayJuiceVictory({ window: h.window, canvas }, salon, undefined, dt => h.game.update(dt));
+    for (let frame = 0; frame < 120 && !salon.epilogue.frame; frame++) h.game.update(STEP);
+    assert.equal(finish.hidden, false); assert.equal(h.menu().hidden, true);
+    const callback = finish.listeners.find(listener => listener.type === 'click')!.callback;
+    finish.click(); assert.equal(h.session(), undefined); assert.equal(h.doc.activeElement, h.canvas);
+    h.game.enterSalon(); const current = h.session(), currentFocus = h.doc.activeElement;
+    finish.click();
+    if (typeof callback === 'function') callback(new Event('click')); else callback.handleEvent(new Event('click'));
+    assert.equal(h.session(), current); assert.equal(h.doc.activeElement, currentFocus);
+});
+
+test('complete result supports fresh Enter, top-touch pause and hidden-tab interruption without a second return', t => {
+    const h = browser(t); h.game.enterSalon(); const salon = h.session(), canvas = h.doc.activeElement!;
+    h.pause(); h.button('Pular cena').click();
+    replayJuiceVictory({ window: h.window, canvas }, salon, undefined, dt => h.game.update(dt));
+    for (let frame = 0; frame < 120 && !salon.epilogue.frame; frame++) h.game.update(STEP);
+    h.pause(); h.button('Pular cena').click();
+    canvas.dispatch('pointerdown', { clientX: 100, clientY: 10, pointerType: 'touch', isPrimary: true });
+    assert.equal(salon.state, 'paused'); assert.equal(h.doc.activeElement, h.button('Continuar'));
+    h.button('Continuar').click();
+    h.document.hidden = true; h.document.dispatch('visibilitychange');
+    for (let frame = 0; frame < 100; frame++) h.game.update(100);
+    assert.equal(h.session(), salon); assert.equal(salon.state, 'paused');
+    h.document.hidden = false; h.document.dispatch('visibilitychange');
+    h.button('Continuar').click();
+    h.shell().dispatch('keydown', { key: 'Enter', target: canvas, repeat: true });
+    assert.equal(h.session(), salon, 'A held confirm cannot dismiss a fresh result');
+    h.shell().dispatch('keydown', { key: 'Enter', target: canvas, repeat: false });
+    assert.equal(h.session(), undefined); assert.equal(h.game.state, 'playing');
+    assert.equal(h.window.worldGame, h.game);
 });

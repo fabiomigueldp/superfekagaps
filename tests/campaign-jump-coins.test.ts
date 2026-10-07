@@ -8,7 +8,9 @@ import { traceJump, traceCarrierRide, sampleJumpCoins, collectedOnTrace } from '
 import { isSolidTile } from '../src/world/tileRules';
 import baseline from './fixtures/campaign-pickups-before-jump-coins.json';
 
-for (const plan of CAMPAIGN_JUMP_PLANS) {
+// The carrier keeps its original ride proof. Native incoming-route coverage for
+// all24 ordinary groups now lives in campaign-natural-coin-approaches.test.ts.
+for (const plan of CAMPAIGN_JUMP_PLANS.filter(plan => 'carrier' in plan.witness)) {
     test(`${plan.stage}: ${plan.name} follows the real traversal and lands safely`, () => {
         const stage = stageById(plan.stage)!;
         const trace = 'carrier' in plan.witness ? traceCarrierRide(stage, plan.witness) : traceJump(stage, plan.witness);

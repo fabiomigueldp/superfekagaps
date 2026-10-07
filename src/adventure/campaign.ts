@@ -175,7 +175,7 @@ function course(w: number, n: number): AdventureStage {
     }
     if (w === 1 && n === 4) {
         d.land(0, 14, 14).land(21, 12, 10).land(38, 10, 11).land(56, 13, 13).land(84, 11, 13).land(109, 14, 12).land(131, 11, 13).land(150, 9, 10).land(166, 14, 18);
-        d.platform(14, 14, 4, T.PLATFORM_FALLING).platform(32, 11, 3, T.PLATFORM_FALLING).platform(49, 12, 4, T.PLATFORM_FALLING).platform(69, 13, 6, T.PLATFORM_FALLING).platform(78, 12, 6, T.PLATFORM_FALLING).platform(98, 12, 7, T.PLATFORM_FALLING).platform(122, 13, 5, T.PLATFORM_FALLING).platform(145, 11, 4);
+        d.platform(14, 14, 4, T.PLATFORM_FALLING).platform(32, 11, 6, T.PLATFORM_FALLING).platform(49, 12, 4, T.PLATFORM_FALLING).platform(69, 13, 6, T.PLATFORM_FALLING).platform(78, 12, 6, T.PLATFORM_FALLING).platform(98, 12, 7, T.PLATFORM_FALLING).platform(122, 13, 5, T.PLATFORM_FALLING).platform(145, 11, 4);
         // Leave a solid landing margin to observe the first charge and its vulnerable rest.
         d.land(69, 20, 15, 3).platform(80, 16, 4).land(121, 19, 10, 4).platform(127, 16, 4).cp(60, 13).cp(113).foe('minion', 44, 10, 32).foe('charger', 142, 11, 50).seal(1, 42, 8).seal(2, 76, 18).seal(3, 153, 7).item('helmet', 61, 12).arc(28, 10, 8).arc(94, 9, 9).art('palms', 57, 13, 10, 7).art('rope', 69, 13, 15, 7).art('lighthouse', 150, 9, 8, 9);
         d.cue(26, 12).cue(44, 10).cue(61, 13).cue(90, 11).cue(115, 14).cue(137, 11).cue(154, 9).cue(172, 14);
@@ -270,7 +270,7 @@ function course(w: number, n: number): AdventureStage {
     }
     if (w === 5 && n === 1) {
         d.land(0, 14, 19).land(19, 12, 16).land(41, 14, 16).land(57, 11, 18).land(82, 14, 16).land(98, 12, 18).land(123, 9, 14).land(143, 14, 17);
-        d.platform(19, 12, 16, T.ICE).platform(57, 11, 18, T.ICE).platform(98, 12, 18, T.ICE).platform(123, 9, 14, T.ICE).platform(36, 13, 4).platform(76, 12, 5).platform(117, 11, 5).platform(138, 11, 4);
+        d.platform(19, 12, 16, T.ICE).platform(57, 11, 18, T.ICE).platform(98, 12, 18, T.ICE).platform(123, 9, 14, T.ICE).platform(36, 13, 4).platform(76, 12, 5).platform(117, 11, 6).platform(138, 11, 4);
         d.cp(44).cp(85).foe('helmet', 68, 11, 45).foe('loader', 130, 9).seal(1, 26, 9).seal(2, 65, 8).seal(3, 130, 6).item('helmet', 45).arc(32, 10, 10).arc(112, 10, 11).art('freezer', 19, 12, 16, 10, 'ESTOQUE 01').art('freezer', 57, 11, 18, 10, '-18°').art('freezer', 98, 12, 18, 10, 'RESERVA').talk(13, 'feka', 'No gelo, soltar não basta. Preciso frear para o outro lado.', undefined, 'dialogue');
         d.cue(27, 12).cue(46, 14).cue(66, 11).cue(88, 14).cue(108, 12).cue(130, 9).cue(148, 14);
     }
@@ -290,7 +290,7 @@ function course(w: number, n: number): AdventureStage {
     }
     if (w === 5 && n === 4) {
         d.land(0, 14, 17).land(17, 12, 18).land(42, 9, 14).land(63, 14, 16).land(79, 11, 23).land(109, 9, 13).land(128, 14, 15).land(143, 11, 20).land(170, 14, 14);
-        d.platform(17, 12, 18, T.ICE).platform(36, 11, 5).jet('j1', 48, 9).platform(57, 11, 5).belt('b1', 79, 11, 23, -1).sw('s1', 75, 14, 'b1').loader(100, 11, true).platform(103, 10, 5).platform(109, 9, 13, T.ICE).platform(123, 11, 4).platform(143, 11, 20, T.ICE).jet('j2', 152, 11, 1900).platform(164, 12, 5);
+        d.platform(17, 12, 18, T.ICE).platform(36, 11, 6).jet('j1', 48, 9).platform(57, 11, 5).belt('b1', 79, 11, 23, -1).sw('s1', 75, 14, 'b1').loader(100, 11, true).platform(103, 10, 5).platform(109, 9, 13, T.ICE).platform(123, 11, 4).platform(143, 11, 20, T.ICE).jet('j2', 152, 11, 1900).platform(164, 12, 5);
         d.cp(66).cp(131).foe('agitator', 94, 11).seal(1, 48, 6).seal(2, 87, 8).seal(3, 155, 8).item('helmet', 67).arc(32, 10, 10).arc(119, 7, 10).art('freezer', 17, 12, 18, 10, 'FRIO').art('pipe', 42, 9, 14, 6).art('freezer', 79, 11, 23, 10, 'RESERVA').art('freezer', 143, 11, 20, 10, 'CALABREZZO');
         d.cue(26, 12).cue(49, 9).cue(70, 14).cue(88, 11).cue(116, 9).cue(135, 14).cue(154, 11).cue(177, 14);
     }

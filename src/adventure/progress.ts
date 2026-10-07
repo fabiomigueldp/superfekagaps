@@ -93,13 +93,37 @@ export class ProgressStore {
     save = freshSave();
     warning = '';
     private protected = false;
+    // Storage-only replacement marker, deliberately excluded from exported saves.
+    // An import/reset must not let an older tab resurrect the replaced campaign.
+    private replacementId: string | undefined;
+    private hadStoredSave = false;
+    private readReplacementId(raw: string): string | undefined {
+        const value = JSON.parse(raw)?.replacementId;
+        if (value === undefined) return undefined; // Existing v1 saves have no marker.
+        if (typeof value !== 'string' || !value.startsWith('v1:') || value.length <= 3 || value.length > 128)
+            throw Error('Unrecognized progress replacement marker');
+        return value;
+    }
+    private acceptsStoredSave(raw: string | null): boolean {
+        if ((!raw && this.hadStoredSave) || (raw && this.readReplacementId(raw) !== this.replacementId)) {
+            this.warning = 'Progresso substituído em outra aba. Recarregue antes de continuar; exporte esta sessão se precisar.';
+            return false;
+        }
+        return true;
+    }
+    private newReplacementId(): string {
+        return `v1:${globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`}`;
+    }
     private readonly storage: Pick<Storage, 'getItem' | 'setItem'> | null;
     constructor(storage: Pick<Storage, 'getItem' | 'setItem'> | null, private readonly developmentUnlocked = siteDevelopmentUnlockEnabled()) {
         this.storage = developmentProfileStorage(storage, SAVE_KEY, developmentUnlocked);
         try {
             const raw = this.storage?.getItem(SAVE_KEY);
-            if (raw)
+            if (raw) {
                 this.save = parseSave(raw, this.developmentUnlocked);
+                this.replacementId = this.readReplacementId(raw);
+                this.hadStoredSave = true;
+            }
         }
         catch {
             this.warning = 'Não foi possível abrir o progresso. Exporte uma cópia antes de substituir.';
@@ -111,6 +135,20 @@ export class ProgressStore {
         withDevelopmentAccess(this.save, this.developmentUnlocked);
         withDevelopmentAccess(this.save.guaira, this.developmentUnlocked);
     }
+    private mergeEarnedCampaignProgress(earned: AdventureSave): void {
+        // Only earned facts are monotonic. The active writer still owns
+        // stage/checkpoint, preferences and deliberate guidance resets.
+        for (const key of ['completed', 'seals', 'secrets'] as const)
+            this.save[key] = [...new Set([...earned[key], ...this.save[key]])];
+        // These two journal slots are earned campaign facts, unlike
+        // dialogue/control guidance that editor previews may reset.
+        for (const id of [FACTORY_SALON.passage, FACTORY_SALON.victory])
+            if (earned.seen.includes(id) && !this.save.seen.includes(id)) this.save.seen.push(id);
+        for (const [id, seconds] of Object.entries(earned.times))
+            this.save.times[id] = Math.min(this.save.times[id] ?? Infinity, seconds);
+        if (earned.legacySerraAccess) this.save.legacySerraAccess = true;
+    }
+    /** false explicitly replaces the campaign and invalidates older tab sessions. */
     persist(mergeChapter = true): boolean {
         if (this.protected)
             return false;
@@ -118,13 +156,17 @@ export class ProgressStore {
             if (!this.storage)
                 throw Error();
             const existing = this.storage.getItem(SAVE_KEY);
+            if (mergeChapter && !this.acceptsStoredSave(existing)) return false;
             if (existing && mergeChapter) {
                 const latest = parseSave(existing, this.developmentUnlocked);
+                this.mergeEarnedCampaignProgress(latest);
                 this.save.guaira = mergeGuairaChapterProgress(latest.guaira, this.save.guaira, this.developmentUnlocked);
-                if (latest.legacySerraAccess) this.save.legacySerraAccess = true;
             }
             this.applyDevelopmentAccess();
-            this.storage.setItem(SAVE_KEY, JSON.stringify(this.save));
+            const replacementId = mergeChapter ? this.replacementId : this.newReplacementId();
+            this.storage.setItem(SAVE_KEY, JSON.stringify({ ...this.save, replacementId }));
+            this.replacementId = replacementId;
+            this.hadStoredSave = true;
             this.warning = '';
             return true;
         }
@@ -138,7 +180,14 @@ export class ProgressStore {
         if (this.protected) return false;
         try {
             const raw = this.storage?.getItem(SAVE_KEY);
-            if (raw) this.save = parseSave(raw, this.developmentUnlocked);
+            if (!this.acceptsStoredSave(raw ?? null)) return false;
+            if (raw) {
+                const local = this.save;
+                this.save = parseSave(raw, this.developmentUnlocked);
+                // A previous quota/storage failure may have left real earnings
+                // only in memory. Retain them while refreshing campaign navigation.
+                this.mergeEarnedCampaignProgress(local);
+            }
         } catch {
             this.warning = 'Não foi possível atualizar o progresso. Exporte uma cópia antes de substituir.';
             this.protected = true; return false;
@@ -150,14 +199,17 @@ export class ProgressStore {
     /** Import replaces progress only after the browser has saved the complete replacement. */
     import(raw: string): boolean {
         const next = parseSave(raw, this.developmentUnlocked);
+        const replacementId = this.newReplacementId();
         try {
             if (!this.storage) throw Error('Storage unavailable');
-            this.storage.setItem(SAVE_KEY, JSON.stringify(next));
+            this.storage.setItem(SAVE_KEY, JSON.stringify({ ...next, replacementId }));
         } catch {
             this.warning = 'Importação não salva. Progresso anterior mantido.';
             return false;
         }
         this.save = next;
+        this.replacementId = replacementId;
+        this.hadStoredSave = true;
         this.applyDevelopmentAccess();
         this.protected = false;
         this.warning = '';

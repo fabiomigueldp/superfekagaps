@@ -240,13 +240,13 @@ export class Input {
     event.preventDefault();
     const canvas = event.currentTarget as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
-    if (rect.width <= 0 || rect.height <= 0) return;
+    const hasLayout = rect.width > 0 && rect.height > 0;
     const owners = new Map([...this.touchOwners].filter(([id]) => typeof id === 'symbol'));
     const activeIds = new Set<ActionOwner>(owners.keys());
     // Only a new touchstart can own a gesture. After reset/suspension, stale
     // move/end events (including fingers alongside a fresh touch) stay inert.
     const admitted = new Set(this.activeCanvasTouches);
-    if (phase === 'touchstart') {
+    if (phase === 'touchstart' && hasLayout) {
       const started = event.changedTouches ?? event.touches;
       for (let i = 0; i < started.length; i++) {
         if (started[i].target === canvas) admitted.add(started[i].identifier ?? i);
@@ -258,6 +258,14 @@ export class Input {
       const touch = event.touches[i];
       if (touch.target !== canvas || !admitted.has(touch.identifier ?? i)) continue;
       activeIds.add(touch.identifier ?? i);
+      // Layout can disappear before the final touch event (for example when a
+      // canvas is hidden). Still retire ended/cancelled owners; without usable
+      // geometry, keep only the existing action of each surviving finger.
+      if (!hasLayout) {
+        const previous = this.touchOwners.get(touch.identifier ?? i);
+        if (previous) owners.set(touch.identifier ?? i, previous);
+        continue;
+      }
       const x = (touch.clientX - rect.left) / rect.width;
       const y = (touch.clientY - rect.top) / rect.height;
       if (x < 0 || x > 1 || y < 0 || y > 1) continue;

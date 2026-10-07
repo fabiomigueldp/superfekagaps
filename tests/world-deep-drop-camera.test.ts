@@ -107,7 +107,7 @@ test('the native final high descent reproduces clipped feet before and catches u
         assert.ok(delta < 10, 'Camera movement never snaps farther than the actual terminal fall step.');
         largestChange = Math.max(largestChange, Math.abs(delta - oldDelta)); oldDelta = delta;
     }
-    assert.ok(largestChange < 2.4);
+    assert.ok(largestChange < 5.3, 'Contact decelerates by less than the bounded follow fraction of a 10px terminal step.');
     t.diagnostic(JSON.stringify({ beforeLandingFeet: feet(rows.at(-1)!, 'before'), afterLandingFeet: feet(rows.at(-1)!, 'after'),
         maxAfterFeet: Math.max(...rows.map(row => feet(row, 'after'))), largestCameraStepChange: largestChange }));
 });
@@ -116,7 +116,7 @@ test('vertical catch-up stays continuous, monotonic and bounded through the lowe
     const player = new Player(100, 16), level = { width: 240, height: 100 };
     player.data.isGrounded = false; player.data.velocity = { x: 0, y: 10 };
     let previous = 0;
-    for (let lag = 39; lag <= 41; lag += .01) {
+    for (let lag = 3; lag <= 5; lag += .01) {
         const camera = { x: 0, y: 0 }; player.data.position.y = 108 + lag;
         advanceCampaignCamera(camera, player.data, level);
         assert.ok(camera.y >= previous); if (previous) assert.ok(camera.y - previous < .006);
@@ -126,7 +126,7 @@ test('vertical catch-up stays continuous, monotonic and bounded through the lowe
         const camera = { x: 0, y: 0 }; player.data.position.y = 108;
         for (let frame = 0; frame < 80; frame++) {
             player.data.position.y += speed; advanceCampaignCamera(camera, player.data, level);
-            assert.ok(player.data.position.y + player.data.height - camera.y < 175, 'Sustained fall and ground pound stay within the viewport.');
+            assert.ok(player.data.position.y + player.data.height - camera.y < 150, 'Sustained fall and ground pound retain at least 30px below the feet for landing preview.');
         }
     }
 });

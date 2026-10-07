@@ -1,5 +1,7 @@
 # Campaign jump-coin audit
 
+Historical first-pass audit. Its fixed local witnesses were insufficient gameplay acceptance and are superseded by [the natural-approach correction](campaign-natural-coin-audit.md). The original observations below are retained for traceability.
+
 Base: `d50b51123abbf903f47ee5c427be3c0c8699d046`. Scope: all 25 legacy arc groups in 13 campaign courses, 212 existing coins. Campaign total stays 542 coins.
 
 ## Finding and correction
