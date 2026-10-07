@@ -10,6 +10,7 @@ import {
 } from '../constants';
 import { LevelData, Rect, Vector2, FallingPlatformPhase } from '../types';
 import { blocksHead, isOneWayTile, isSolidTile } from './tileRules';
+import { BlockImpacts, type BlockImpact } from './BlockImpacts';
 
 interface FallingPlatformState {
   phase: FallingPlatformPhase;
@@ -19,6 +20,7 @@ interface FallingPlatformState {
 
 export class Level {
   data: LevelData;
+  readonly blockImpacts = new BlockImpacts();
   private dynamicTiles: Map<string, { originalTile: number; timer: number }> = new Map();
   private fallingPlatforms: Map<string, FallingPlatformState> = new Map();
   private fallingPlatformTouches: Set<string> = new Set();
@@ -384,6 +386,7 @@ export class Level {
   }
   // Atualiza tiles dinâmicos
   updateDynamicTiles(deltaTime: number): void {
+    this.blockImpacts.update(deltaTime);
     this.dynamicTiles.forEach((v, key) => {
       v.timer -= deltaTime;
       if (v.timer <= 0) {
@@ -508,8 +511,13 @@ export class Level {
     this.data.tiles[row][col] = tile;
   }
 
+  /** A held brick recoils visually; its solid grid cell stays unchanged. */
+  bumpTile(col: number, row: number): void {
+    if (this.getTile(col, row) === TileType.BRICK) this.blockImpacts.add(col, row, 'bump');
+  }
+
   // Quebra um tile se for quebrável
-  breakTile(col: number, row: number, hasHelmet: boolean = false): { success: boolean, type: number } {
+  breakTile(col: number, row: number, hasHelmet: boolean = false, direction: BlockImpact['direction'] = 'up'): { success: boolean, type: number } {
     if (row < 0 || row >= this.data.tiles.length || col < 0 || col >= this.data.tiles[0].length) {
       return { success: false, type: TileType.EMPTY };
     }
@@ -525,6 +533,7 @@ export class Level {
 
     if (canBreak) {
       this.setTile(col, row, TileType.EMPTY);
+      this.blockImpacts.add(col, row, 'break', direction);
       return { success: true, type: tile };
     }
 
@@ -533,6 +542,7 @@ export class Level {
 
   // Reset do nível
   reset(): void {
+    this.blockImpacts.clear();
     this.dynamicTiles.clear();
     this.fallingPlatforms.clear();
     this.fallingPlatformTouches.clear();

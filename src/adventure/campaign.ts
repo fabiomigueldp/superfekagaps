@@ -1,4 +1,5 @@
 import { TileType as T } from '../constants';
+import { CAMPAIGN_JUMP_COINS } from './campaignJumpCoins';
 import { EnemyType } from '../types';
 import { CARGO_CARRIER_PROFILE, SERRA_CARRIER_PROFILE } from './WorldCarrierMotion';
 import type { AdventureStage, Island, MechanismSpec, FoeKind, EncounterId, Character, Landmark, Dialogue } from './types';
@@ -117,9 +118,17 @@ class Draft {
             this.s.level.tiles[r][c] = T.GROUND; return this; }
     art(kind: Landmark['kind'], x: number, y: number, width: number, height: number, label?: string, variant = 0) { (this.s.landmarks ??= []).push({ kind, x: x * 16, y: y * 16, width: width * 16, height: height * 16, label, variant }); return this; }
     cue(x: number, y: number, button?: string) { (this.s.route ??= []).push({ x: x * 16, y: y * 16, switch: button }); return this; }
+    // Historical seeds reserve existing pickup identities and route-cue exclusions.
+    // done() replaces only these coordinates with engine-measured authored paths.
+    // Keeping allocation separate prevents moving an arc from renumbering later coins.
     arc(x: number, y: number, count = 5) { for (let i = 0; i < count; i++)
         this.s.pickups.push({ id: `${this.s.id}:c${this.s.pickups.length}`, kind: 'coin', x: (x + i) * 16, y: (y - Math.sin(i / (count - 1) * Math.PI) * 2) * 16 }); return this; }
-    done() { this.s.level.checkpoints = this.s.checkpoints; this.s.level.enemies = this.s.foes.filter(f => f.kind === 'minion').map(f => ({ type: EnemyType.MINION, position: { x: f.x / 16, y: f.y / 16 } })); return this.s; }
+    done() {
+        for (const [id, x, y] of CAMPAIGN_JUMP_COINS[this.s.id] ?? []) {
+            const pickup = this.s.pickups.find(p => p.id === id && p.kind === 'coin');
+            if (pickup) { pickup.x = x; pickup.y = y; }
+        }
+        this.s.level.checkpoints = this.s.checkpoints; this.s.level.enemies = this.s.foes.filter(f => f.kind === 'minion').map(f => ({ type: EnemyType.MINION, position: { x: f.x / 16, y: f.y / 16 } })); return this.s; }
 }
 function course(w: number, n: number): AdventureStage {
     const d = new Draft(w, n, n === 4 ? 184 : 160);

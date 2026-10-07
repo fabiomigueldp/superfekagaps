@@ -6,6 +6,9 @@ import { drawRespawnArrival } from '../graphics/playerRespawnArt';
 import { drawPlayerProtection } from '../graphics/playerProtectionArt';
 import { ART, hashAt } from '../graphics/palette';
 import { SpriteAtlas, VisualClock, animationIndex, PixelFrame, sceneZoom } from '../graphics/pixels';
+import { drawBlockImpacts } from '../graphics/blockImpactArt';
+import type { Level } from '../world/Level';
+import type { BlockImpacts } from '../world/BlockImpacts';
 import { TilePainter } from '../graphics/TilePainter';
 import { BackgroundScene } from '../graphics/BackgroundScene';
 import { GameUI } from '../graphics/GameUI';
@@ -46,6 +49,8 @@ export class Renderer {
   private interpolationMs=0;
   // Read the live preference without adding a listener, timer or render loop.
   private readonly landingMotion=typeof matchMedia==='function'?matchMedia('(prefers-reduced-motion: reduce)'):null;
+
+  get reducedMotion():boolean {return this.landingMotion?.matches??false;}
 
   constructor(canvas?:HTMLCanvasElement) {
     this.canvas=canvas??document.getElementById('game-canvas') as HTMLCanvasElement;
@@ -136,15 +141,20 @@ export class Renderer {
   drawBackground(camera:CameraData,ctx=this.offscreenCtx,width=GAME_WIDTH,height=GAME_HEIGHT):void {
     this.background.draw(ctx,Math.round(camera.x),Math.round(camera.y),width,height,this.clock.time);
   }
-  drawTiles(tiles:number[][],camera:CameraData,originX=0,originY=0):void {
+  drawTiles(tiles:number[][],camera:CameraData,originX=0,originY=0,impacts?:BlockImpacts):void {
     const cx=Math.round(camera.x),cy=Math.round(camera.y);
     const startCol=Math.max(0,Math.floor(cx/TILE_SIZE)-originX-1);
     const endCol=Math.min(tiles[0]?.length??0,Math.ceil((cx+GAME_WIDTH/this.zoom)/TILE_SIZE)-originX+1);
     const startRow=Math.max(0,Math.floor(cy/TILE_SIZE)-originY-1);
     const endRow=Math.min(tiles.length,Math.ceil((cy+GAME_HEIGHT/this.zoom)/TILE_SIZE)-originY+1);
     for(let row=startRow;row<endRow;row++)for(let col=startCol;col<endCol;col++){
-      this.drawTile(tiles[row][col],(col+originX)*TILE_SIZE-cx,(row+originY)*TILE_SIZE-cy,tiles,row,col,undefined,col+originX,row+originY);
+      const offset=tiles[row][col]===TileType.BRICK&&impacts?.active.length?impacts.offset(col,row,this.landingMotion?.matches??false):0;
+      this.drawTile(tiles[row][col],(col+originX)*TILE_SIZE-cx,(row+originY)*TILE_SIZE-cy+offset,tiles,row,col,undefined,col+originX,row+originY);
     }
+  }
+  drawBlockImpacts(level:Level,camera:CameraData):void {
+    drawBlockImpacts(this.offscreenCtx,level.blockImpacts,camera.x,camera.y,this.background.theme.biome??'meadow',
+      this.landingMotion?.matches??false,level.originX,level.originY,GAME_WIDTH/this.zoom,GAME_HEIGHT/this.zoom);
   }
   drawTile(type:number,x:number,y:number,tiles:number[][],row:number,col:number,ctx=this.offscreenCtx,worldCol=col,worldRow=row):void {
     this.tiles.draw(ctx,type,x,y,tiles,row,col,this.background.theme.biome??'meadow',this.clock.time,worldCol,worldRow);

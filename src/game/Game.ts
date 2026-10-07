@@ -253,7 +253,10 @@ export class Game {
     if (this.player.data.isDead) {
       this.player.advanceDeath(deltaTime);
       this.deathTimer = this.player.data.deathTimer;
-      if (this.player.data.deathTimerMax - this.deathTimer >= DEATH_HIT_STOP_MS) this.updateParticles(deltaTime);
+      if (this.player.data.deathTimerMax - this.deathTimer >= DEATH_HIT_STOP_MS) {
+        this.updateParticles(deltaTime);
+        this.level.blockImpacts.update(deltaTime);
+      }
       if (this.deathTimer <= 0) {
         this.handlePlayerDeath();
       }
@@ -311,17 +314,16 @@ export class Game {
 
         if (tileType === TileType.BRICK_BREAKABLE) {
           // Quebra o bloco
-          this.level.setTile(gridCol, gridRow, TileType.EMPTY);
-          this.spawnParticles(th.col * TILE_SIZE + TILE_SIZE / 2, th.row * TILE_SIZE + TILE_SIZE / 2, ART.soilTop, 10);
+          this.level.breakTile(gridCol, gridRow);
           this.audio.playBlockBreak();
           this.score += BLOCK_BREAK_SCORE;
         } else if (tileType === TileType.BRICK) {
           if (this.player.data.hasHelmet) {
-            this.level.setTile(gridCol, gridRow, TileType.EMPTY);
-            this.spawnParticles(th.col * TILE_SIZE + TILE_SIZE / 2, th.row * TILE_SIZE + TILE_SIZE / 2, ART.soilTop, 10);
+            this.level.breakTile(gridCol, gridRow, true);
             this.audio.playBlockBreak();
             this.score += BLOCK_BREAK_SCORE;
           } else {
+            this.level.bumpTile(gridCol, gridRow);
             this.audio.playBlockBump();
           }
         } else if (tileType === TileType.HIDDEN_BLOCK) {
@@ -593,7 +595,8 @@ export class Game {
     this.renderer.drawBackground(this.camera, undefined, GAME_WIDTH / zoom, GAME_HEIGHT / zoom);
 
     // Tiles (pass origin offset for proper world coordinate rendering)
-    this.renderer.drawTiles(this.level.getModifiedTiles(), this.camera, this.level.originX, this.level.originY);
+    this.renderer.drawTiles(this.level.getModifiedTiles(), this.camera, this.level.originX, this.level.originY, this.level.blockImpacts);
+    this.renderer.drawBlockImpacts(this.level, this.camera);
     this.renderer.drawFallingPlatforms(this.level.getFallingPlatformRenderData(), this.camera, this.level.originX, this.level.originY);
 
     // Fogos (se o boss está morto/morrendo)
@@ -1324,14 +1327,8 @@ export class Game {
           8
         );
       } else {
-        const res = this.level.breakTile(gridCol, gridRow, hasHelmet);
+        const res = this.level.breakTile(gridCol, gridRow, hasHelmet, 'down');
         if (res.success) {
-          this.spawnParticles(
-            targetCol * TILE_SIZE + TILE_SIZE / 2,
-            targetRow * TILE_SIZE + TILE_SIZE / 2,
-            ART.soilTop,
-            8
-          );
           this.score += BLOCK_BREAK_SCORE;
         }
       }
@@ -1449,6 +1446,7 @@ export class Game {
 
       const spawnPos = this.activeCheckpoint || this.level.data.playerSpawn;
       this.player.respawn(spawnPos);
+      this.level.blockImpacts.clear();
       this.activeCameraOverride = null;
       // The opening iris must reveal the checkpoint, even when it is far from the death camera.
       if (this.camera) {

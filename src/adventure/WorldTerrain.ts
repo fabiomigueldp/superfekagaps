@@ -1,4 +1,5 @@
 import { TileType as T } from '../constants';
+import { drawBlockImpacts } from '../graphics/blockImpactArt';
 import { TilePainter } from '../graphics/TilePainter';
 import type { Island } from './types';
 import type { WorldLevel } from './WorldPhysics';
@@ -26,7 +27,7 @@ function platform(c: CanvasRenderingContext2D, x: number, y: number, world: numb
     if (left || right)
         polygon(c, [[x + (left ? 1 : 15), y + 7], [x + (left ? 7 : 9), y + 7], [x + (left ? 1 : 15), y + 13]], metal ? '#36596f' : '#795945');
 }
-export function drawWorldTerrain(c: CanvasRenderingContext2D, level: WorldLevel, island: Island, cx: number, cy: number, time: number) {
+export function drawWorldTerrain(c: CanvasRenderingContext2D, level: WorldLevel, island: Island, cx: number, cy: number, time: number, reducedMotion = false) {
     const tiles = level.getRenderTiles(), world = island.id;
     for (let row = Math.max(0, Math.floor(cy / 16)); row < Math.min(tiles.length, Math.ceil((cy + 180) / 16) + 1); row++)
         for (let col = Math.max(0, Math.floor(cx / 16)); col < Math.min(level.data.width, Math.ceil((cx + 320) / 16) + 1); col++) {
@@ -53,7 +54,7 @@ export function drawWorldTerrain(c: CanvasRenderingContext2D, level: WorldLevel,
                 continue;
             }
             if (t !== T.GROUND) {
-                original.draw(c, t, x, y, tiles, row, col, world === 6 ? 'citadel' : world === 5 ? 'ember' : 'meadow', time, col, row);
+                original.draw(c, t, x, y + (t === T.BRICK ? level.blockImpacts.offset(col, row, reducedMotion) : 0), tiles, row, col, world === 6 ? 'citadel' : world === 5 ? 'ember' : 'meadow', time, col, row);
                 continue;
             }
             const top = above !== T.GROUND && above !== T.ICE;
@@ -186,4 +187,5 @@ export function drawWorldTerrain(c: CanvasRenderingContext2D, level: WorldLevel,
                 }
             }
         }
+    drawBlockImpacts(c, level.blockImpacts, cx, cy, world === 6 ? 'citadel' : 'meadow', reducedMotion);
 }

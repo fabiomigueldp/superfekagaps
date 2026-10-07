@@ -49,8 +49,8 @@ export class WorldArt {
             }
         }
     }
-    terrain(c: CanvasRenderingContext2D, level: WorldLevel, island: Island, cx: number, cy: number, time: number) {
-        drawWorldTerrain(c, level, island, cx, cy, time);
+    terrain(c: CanvasRenderingContext2D, level: WorldLevel, island: Island, cx: number, cy: number, time: number, reducedMotion = false) {
+        drawWorldTerrain(c, level, island, cx, cy, time, reducedMotion);
     }
     structures(c: CanvasRenderingContext2D, objects: WorldObjects, cx: number, cy: number, level?: WorldLevel) {
         // Guaíra chapters replace objects with their complete local equipment art.

@@ -107,6 +107,13 @@ export class Player {
     // Resolve colisões (passando prevRect para plataformas one-way corretas)
     const collisionResult = this.resolveCollisions(level, prevRect);
 
+    // An underside collision ends the ascent. Otherwise held jump reapplies
+    // its upward boost on the next step and pins Feka to a low ceiling.
+    // Use resolved motion so World mechanism ceilings work without tileHit.
+    if (this.data.velocity.y < 0 && collisionResult.velocity.y === 0) {
+      this.data.isJumping = false;
+    }
+
     // Aplica resultado
     this.data.position = collisionResult.position;
     this.data.velocity = collisionResult.velocity;

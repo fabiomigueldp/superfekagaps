@@ -235,6 +235,7 @@ export class WorldGame {
         this.running = false;
         this.cancelFrame();
         this.accumulator = 0; this.buttons = []; this.hitStopInput = null;
+        this.level.blockImpacts.clear();
         this.flightCleanup?.();
         this.lifetime.dispose();
         const globals = window as unknown as { worldGame?: WorldGame };
@@ -616,8 +617,10 @@ export class WorldGame {
         if (this.player.data.isDead) {
             this.beginDeathFeedback();
             this.player.advanceDeath(dt);
-            if (this.player.data.deathTimerMax - this.player.data.deathTimer >= DEATH_HIT_STOP_MS)
+            if (this.player.data.deathTimerMax - this.player.data.deathTimer >= DEATH_HIT_STOP_MS) {
                 this.updateSparks(dt);
+                this.level.blockImpacts.update(dt);
+            }
             if (this.player.data.deathTimer <= 0)
                 this.restart();
             return;
@@ -666,14 +669,16 @@ export class WorldGame {
             this.audio.sfx('pound');
             this.particle(p.x, p.y, '#ecc78e');
             for (let col = p.col - 1; col <= p.col + 1; col++)
-                if (this.level.getTile(col, p.row) === T.BRICK_BREAKABLE)
-                    this.level.breakTile(col, p.row);
+                if (this.level.getTile(col - this.level.originX, p.row - this.level.originY) === T.BRICK_BREAKABLE)
+                    this.level.breakTile(col - this.level.originX, p.row - this.level.originY, false, 'down');
         }
         if (result.tileHit?.side === 'top') {
             const h = result.tileHit;
             if (h.type === T.BRICK_BREAKABLE) {
-                this.level.breakTile(h.col, h.row);
+                this.level.breakTile(h.col - this.level.originX, h.row - this.level.originY);
                 this.audio.sfx('break');
+            } else if (h.type === T.BRICK) {
+                this.level.bumpTile(h.col - this.level.originX, h.row - this.level.originY);
             }
         }
         const p = this.player.getRect();
@@ -986,7 +991,7 @@ export class WorldGame {
         else
             this.art.arena(c, this.boss, cx, cy, this.time);
         this.art.structures(c, this.objects, cx, cy, this.level);
-        this.art.terrain(c, this.level, island, cx, cy, this.time);
+        this.art.terrain(c, this.level, island, cx, cy, this.time, this.renderer.reducedMotion);
         drawLandmarks(c, this.stage, cx, cy, this.time, true);
         this.art.objects(c, this.objects, cx, cy, this.time, this.stage.world, this.level, false);
         this.stage.checkpoints.forEach((cp, i) =>

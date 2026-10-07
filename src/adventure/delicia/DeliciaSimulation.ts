@@ -47,8 +47,11 @@ export class DeliciaSimulation {
         const axis=Number(input.right)-Number(input.left);if(axis)p.facing=axis;
         if(input.dash&&p.dashCooldown===0&&!p.pounding){p.dashTime=.18;p.dashCooldown=.75;p.vy=0;p.invincible=Math.max(p.invincible,.18);this.emit('dash');}
         if(input.parry&&p.parryCooldown===0){p.parryTime=this.assists?.32:.21;p.parryCooldown=.55;this.emit('guard');}
-        if(p.buffer>0&&p.coyote>0){p.vy=-610;p.grounded=false;p.coyote=0;p.buffer=0;p.pounding=false;this.emit('jump');}
-        if(input.jumpReleased&&p.vy<-200)p.vy*=.5;
+        const jumpStarted=p.buffer>0&&p.coyote>0;
+        if(jumpStarted){p.vy=-610;p.grounded=false;p.coyote=0;p.buffer=0;p.pounding=false;this.emit('jump');}
+        // A buffered tap can be released before landing. At launch use the
+        // latest held intent; once airborne preserve the ordinary release edge.
+        if((jumpStarted?!input.jump:input.jumpReleased)&&p.vy<-200)p.vy*=.5;
         if(input.pound&&!p.grounded&&p.dashTime===0){p.pounding=true;p.vy=920;}
         if(input.seed&&p.seedCooldown===0){p.seedCooldown=.42;this.projectiles.push({x:p.x+p.w*.5,y:p.y+19,w:12,h:10,vx:p.facing*640,vy:-35,gravity:85,kind:'seed',life:1.4,friendly:true});this.emit('seed');}
         if(input.interact)this.useValve();
