@@ -7,7 +7,7 @@ import { STAGES } from '../src/adventure/campaign';
 import { TileType } from '../src/constants';
 import { juiceEpilogueBrowser, replayJuiceVictory, STEP } from './helpers/juiceEpilogueHarness';
 
-test('optional entrance occupies an existing safe checkpoint landing; campaign boss and secret remain intact', () => {
+test('salon entrance occupies an existing safe checkpoint landing; campaign boss and secret remain intact', () => {
     const stage = STAGES.find(s => s.id === FACTORY_SALON.stage)!;
     const { door, support } = FACTORY_SALON;
     for (let x = support.x; x < support.x + support.width; x += 16)

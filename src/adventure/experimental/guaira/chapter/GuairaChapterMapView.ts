@@ -242,7 +242,7 @@ export class GuairaChapterMapView {
             && revision === this.navigation.revision && sameChapterMapTarget(target, this.navigation.target);
     }
     private selectable(sceneId: GuairaChapterSceneId) {
-        return this.snapshot.route.includes(sceneId) && (sceneId === this.snapshot.nextRecommendedScene || this.snapshot.accepted.some(receipt => receipt.sceneId === sceneId));
+        return this.snapshot.route.includes(sceneId) && (this.snapshot.developmentUnlocked || sceneId === this.snapshot.nextRecommendedScene || this.snapshot.accepted.some(receipt => receipt.sceneId === sceneId));
     }
     private targetSelectable(target: GuairaChapterMapTarget) {
         return target.kind === 'optional' || (this.snapshot.selectedScene === target.sceneId && this.selectable(target.sceneId));
@@ -390,7 +390,7 @@ export class GuairaChapterMapView {
         this.snapshot.route.forEach((sceneId, index) => {
             const scene = CHAPTER_SCENES[sceneId], item = element('li', 'chapter-map-step');
             const accepted = this.snapshot.accepted.some(receipt => receipt.sceneId === sceneId);
-            const state = accepted ? 'Concluído · repetir' : sceneId === this.snapshot.nextRecommendedScene ? 'Próximo trecho' : `Depois de ${CHAPTER_SCENES[this.snapshot.route[index - 1]].title}`;
+            const state = accepted ? 'Concluído · repetir' : sceneId === this.snapshot.nextRecommendedScene ? 'Próximo trecho' : this.snapshot.developmentUnlocked ? 'Disponível' : `Depois de ${CHAPTER_SCENES[this.snapshot.route[index - 1]].title}`;
             const row = element('button', 'chapter-map-step-button'); row.type = 'button';
             row.append(element('span', 'chapter-map-step-title', `${index + 1}. ${scene.title}`), element('span', 'chapter-map-step-state', state));
             row.disabled = !this.selectable(sceneId) || !this.current(generation, revision, target);

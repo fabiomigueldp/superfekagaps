@@ -143,7 +143,7 @@ export class WorldGame {
                 storage = ephemeral ? null : localStorage;
             }
             catch { }
-            this.store = new ProgressStore(storage);
+            this.store = new ProgressStore(storage, ephemeral ? false : undefined);
             this.tutorial = new WorldTutorial(this.store);
             this.audio = new WorldAudio(this.store.save.preferences);
             if (!ephemeral && typeof document.body?.append === 'function') {
@@ -458,6 +458,8 @@ export class WorldGame {
         this.change('playing');
         this.audio.pause(false);
         this.audio.select(stage.world, !!this.boss, stage.id);
+        if (this.requiresCampaignPassage())
+            this.showCampaignNotice('SALÃO: APRESENTE-SE PARA SEGUIR', 4500);
         if (stage.encounter)
             for (const d of stage.dialogues)
                 this.spoken.add(d.id);
@@ -476,6 +478,11 @@ export class WorldGame {
         this.selection = Math.max(0, STAGES.findIndex(s => s.id === (this.mapReturn?.nextSelected ?? this.store.save.selected)));
         this.nextMapSelection = undefined;
         this.audio.select(0); this.store.persist();
+    }
+    /** Only a host with the real salon can require its story action. Editor previews stay playable. */
+    protected requiresCampaignPassage(): boolean { return false; }
+    protected showCampaignNotice(text: string, duration = 3500): void {
+        this.toast = text; this.toastTimer = duration;
     }
     protected pause() { if (this.isDisposed) return; this.change('paused'); this.audio.pause(true); }
     protected resume() { if (this.isDisposed) return; this.change('playing'); this.audio.pause(false); }
@@ -816,6 +823,10 @@ export class WorldGame {
         });
         for (const exit of this.stage.exits)
             if (overlaps(p, exit) && (!exit.requires || this.objects.get(exit.requires)?.active)) {
+                if (this.requiresCampaignPassage()) {
+                    this.showCampaignNotice('APRESENTE-SE NO SALÃO ←');
+                    continue;
+                }
                 this.complete(exit.id === 'secret');
                 return;
             }
@@ -1014,7 +1025,8 @@ export class WorldGame {
             const x = exit.x - cx, y = exit.y - cy;
             if (x < -48 || x > 335 || y < -48 || y > 184) continue;
             const complete = this.state === 'clear' && (exit.id === 'secret') === this.clearSecret;
-            drawWorldGoal(c, x, y, exit.id === 'secret', !!exit.requires && !this.objects.get(exit.requires)?.active, complete, {
+            drawWorldGoal(c, x, y, exit.id === 'secret', this.requiresCampaignPassage()
+                || !!exit.requires && !this.objects.get(exit.requires)?.active, complete, {
                 time: this.time, reducedMotion: this.renderer.reducedMotion, activationAge: complete ? this.clearTimer : null,
             });
         }

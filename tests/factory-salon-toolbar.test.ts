@@ -18,7 +18,8 @@ function browser(t: TestContext, canvasAvailable = true) {
     const doc = h.document as unknown as { activeElement: LifecycleElement | null };
     const decorate = (element: LifecycleElement) => {
         element.focus = () => { doc.activeElement = element; };
-        Object.assign(element, { showModal() {}, close() {} });
+        Object.assign(element, { open: false, showModal() { this.open = true; }, close() { this.open = false; } });
+        Object.defineProperty(element, 'isConnected', { get: () => !!element.parent });
         if (!canvasAvailable) element.getContext = () => (element.className === 'lab-action-art'
             ? null : element.context) as unknown as CanvasRenderingContext2D;
         return element;
@@ -39,16 +40,19 @@ function browser(t: TestContext, canvasAvailable = true) {
     const shell = () => h.body.children.find(child => child.className === 'factory-salon')!;
     const button = (name: string) => descendants(shell()).find(child => child.tagName === 'BUTTON' && child.getAttribute('aria-label') === name)!;
     const session = () => (game as unknown as { salon: FactorySalonSession }).salon;
-    return { ...h, game, doc, writes, shell, button, session };
+    const menu = () => shell().children.find(child => child.className === 'factory-salon-menu')!;
+    const pause = () => { if (session().state !== 'paused') button('Pausar').click(); };
+    const leave = () => { pause(); button('Voltar à fase').click(); };
+    return { ...h, game, doc, writes, shell, button, session, menu, pause, leave };
 }
 
-test('real salon toolbar retains native actions, bitmap labels and pause/retry/return behavior', t => {
+test('full-play salon keeps native actions in pause only and preserves retry/return behavior', t => {
     const h = browser(t), initialSave = JSON.stringify(h.game.store.save), initialWrites = h.writes.length;
     for (let visit = 0; visit < 2; visit++) {
         h.game.enterSalon();
         const salon = h.session(), canvas = h.shell().children.find(child => child.tagName === 'CANVAS')!;
         for (const [name, label] of [['Apresentar pose', 'POSE'], ['Pular cena', 'PULAR CENA'],
-            ['Reiniciar tentativa', 'REINICIAR'], ['Pausar', 'PAUSA'], ['Voltar à fase', 'VOLTAR']]) {
+            ['Reiniciar tentativa', 'REINICIAR'], ['Pausar', 'PAUSA'], ['Continuar', 'CONTINUAR'], ['Controles', 'CONTROLES'], ['Voltar à fase', 'VOLTAR']]) {
             const button = h.button(name), [art, text] = button.children;
             assert.ok(button.getAttribute('aria-label')!.toLocaleLowerCase('pt-BR').includes(label.toLocaleLowerCase('pt-BR')),
                 `The accessible name must contain the visible ${label} label for voice activation`);
@@ -56,7 +60,9 @@ test('real salon toolbar retains native actions, bitmap labels and pause/retry/r
             assert.equal(art.getAttribute('aria-hidden'), 'true');
             assert.equal(art.width, labActionSize(label).width * 2); assert.equal(art.height, 44);
         }
+        assert.equal(h.menu().hidden, true, 'No toolbar reserves running play space');
         assert.equal(h.button('Reiniciar tentativa').hidden, true);
+        h.pause(); assert.equal(h.menu().hidden, false);
         h.button('Pular cena').click(); h.game.render();
         assert.equal(salon.labMode, 'combat'); assert.equal(h.doc.activeElement, canvas);
         assert.equal(h.button('Pular cena').hidden, true); assert.equal(h.button('Reiniciar tentativa').hidden, false);
@@ -65,13 +71,15 @@ test('real salon toolbar retains native actions, bitmap labels and pause/retry/r
         assert.ok(h.button('Continuar').getAttribute('aria-label')!.toLocaleLowerCase('pt-BR').includes('CONTINUAR'.toLocaleLowerCase('pt-BR')));
         h.button('Continuar').click(); h.game.render();
         assert.equal(salon.state, 'playing'); assert.equal(h.button('Pausar').children.length, 2);
-        h.button('Reiniciar tentativa').click(); h.game.render();
+        h.pause(); h.button('Reiniciar tentativa').click(); h.game.render();
         assert.equal(salon.labMode, 'combat'); assert.equal(salon.state, 'playing');
-        h.button('Voltar à fase').click();
+        h.leave();
         assert.equal(h.shell(), undefined); assert.equal(h.doc.activeElement, h.canvas);
         assert.equal(h.game.state, 'playing'); assert.equal(h.canvas.id, 'game-canvas');
     }
-    assert.equal(JSON.stringify(h.game.store.save), initialSave); assert.equal(h.writes.length, initialWrites);
+    const expected = JSON.parse(initialSave); expected.seen.unshift(FACTORY_SALON.passage);
+    assert.equal(JSON.stringify(h.game.store.save), JSON.stringify(expected));
+    assert.equal(h.writes.length, initialWrites + 1, 'A real presentation persists once, including after reentry');
 });
 
 test('canvas-unavailable toolbar exposes the full native button names', t => {
@@ -84,11 +92,11 @@ test('canvas-unavailable toolbar exposes the full native button names', t => {
     assert.equal(h.button('Continuar').children[1].textContent, 'Continuar');
 });
 
-test('toolbar art keeps native dimensions, 44px targets, focus and forced-colors names', () => {
+test('fullscreen host keeps native scaling and pause actions retain 44px targets and forced-colors names', () => {
     const css = readFileSync(new URL('../src/adventure/factory/factory-salon.css', import.meta.url), 'utf8');
     assert.match(css, /\.factory-salon > canvas \{[^}]*aspect-ratio: 16 \/ 9/);
     assert.doesNotMatch(css, /\.factory-salon canvas\s*\{/);
-    assert.match(css, /\.factory-salon nav \{[^}]*flex-wrap: wrap/);
+    assert.match(css, /\.factory-salon-menu \{[^}]*grid-template-columns: minmax\(0, 280px\)/);
     assert.match(css, /\.factory-salon button \{[^}]*min-width: 44px; min-height: 44px/);
     assert.match(css, /\.factory-salon button:focus-visible \{[^}]*outline: 3px[^}]*outline-offset: 2px/);
     assert.match(css, /\.factory-salon \[hidden\]/);
@@ -96,9 +104,12 @@ test('toolbar art keeps native dimensions, 44px targets, focus and forced-colors
     assert.match(forced, /\.lab-action-art \{ display: none/);
     assert.match(forced, /\.lab-sr \{[^}]*position: static;[^}]*clip-path: none;[^}]*white-space: normal;[^}]*overflow-wrap: anywhere/);
     assert.match(forced, /border: 1px solid ButtonText/);
-    for (const labels of [['PULAR CENA', 'PAUSA', 'VOLTAR'], ['REINICIAR', 'PAUSA', 'VOLTAR']])
-        assert.ok(labels.reduce((width, label) => width + labActionSize(label).width * 2, 0) + 12 + 20 <= 320,
-            'ordinary three-control rows fit 320px; longer paused/pose rows can wrap');
+    assert.match(css, /\.factory-salon \{[^}]*width: 100vw; height: 100dvh; max-width: none; max-height: none/);
+    assert.match(css, /\.factory-salon \{[^}]*padding: 0; border: 0/);
+    assert.doesNotMatch(css, /720px|width: 100% !important|height: auto !important/);
+    assert.match(css, /max-width: min\(100vw, calc\(100dvh \* 16 \/ 9\)\)/);
+    assert.match(css, /\.factory-salon-pause:not\(:focus\)/);
+    assert.match(css, /@media \(max-height: 340px\)/);
 });
 
 
@@ -116,7 +127,7 @@ test('retired salon Return cannot close a newer visit through a detached button 
     if (typeof callback === 'function') callback(event); else callback.handleEvent(event);
     assert.ok(h.session() === current, 'A retained dispatch callback cannot close the replacement visit');
     assert.equal(h.shell(), shell); assert.equal(current.isDisposed, false);
-    h.button('Voltar à fase').click();
+    h.leave();
     assert.equal(h.shell(), undefined); assert.equal(h.game.state, 'playing');
 });
 
@@ -180,4 +191,97 @@ test('all retired salon dispatches stay inert while the current dialog keeps foc
     assert.equal(disposeCurrent.mock.callCount(), 1); assert.equal(disposePrevious.mock.callCount(), 1);
     assert.equal(h.listenerCount(), 0); assert.equal(h.frames.size, 0);
     assert.equal(JSON.stringify(h.game.store.save), initialSave); assert.equal(h.writes.length, initialWrites);
+});
+
+
+test('pause keyboard navigation, help dismissal and repeated visits keep one focus owner', t => {
+    const h = browser(t), saved = JSON.stringify(h.game.store.save), writes = h.writes.length;
+    h.game.enterSalon(); const lab = h.session(), canvas = h.doc.activeElement!;
+    h.shell().dispatch('keydown', { key: 'Escape', repeat: false });
+    assert.equal(lab.state, 'paused'); assert.equal(h.menu().hidden, false);
+    assert.equal(h.doc.activeElement, h.button('Continuar'));
+    h.shell().dispatch('keydown', { key: 'Escape', repeat: true });
+    assert.equal(lab.state, 'paused', 'Held Escape never resumes a just-opened pause');
+    h.shell().dispatch('keydown', { key: 'ArrowDown', repeat: false });
+    assert.equal(h.doc.activeElement, h.button('Pular cena'));
+    const helpButton = h.button('Controles'); helpButton.focus(); helpButton.click();
+    const help = h.body.children.find(child => child.id === 'factory-salon-controls')!;
+    assert.equal((help as unknown as { open: boolean }).open, true);
+    const heading = h.doc.activeElement; h.game.render();
+    assert.equal(h.doc.activeElement, heading, 'Frame reflections cannot steal focus from help');
+    const time = lab.time; h.game.update(100); assert.equal(lab.time, time);
+    help.dispatch('cancel');
+    assert.equal((help as unknown as { open: boolean }).open, false);
+    assert.equal(h.doc.activeElement, helpButton); assert.equal(lab.state, 'paused');
+    h.shell().dispatch('keydown', { key: 'Escape', repeat: false });
+    assert.equal(lab.state, 'playing'); assert.equal(h.menu().hidden, true);
+    assert.equal(h.doc.activeElement, canvas);
+    h.button('Pular cena').click(); h.button('Voltar à fase').click();
+    assert.equal(lab.labMode, 'intro', 'Hidden menu commands cannot activate behind live play');
+    assert.equal(h.session(), lab);
+    h.leave(); assert.equal(h.doc.activeElement, h.canvas);
+    assert.equal(h.body.children.filter(child => child.id === 'factory-salon-controls').length, 0);
+    assert.equal(JSON.stringify(h.game.store.save), saved); assert.equal(h.writes.length, writes);
+});
+
+test('top canvas touch opens the same pause without leaving held movement or repeating actions', t => {
+    const h = browser(t); h.game.enterSalon(); const lab = h.session();
+    const canvas = h.doc.activeElement!;
+    canvas.dispatch('pointerdown', { clientX: 100, clientY: 10 });
+    assert.equal(lab.state, 'paused'); assert.equal(h.menu().hidden, false);
+    assert.equal(h.doc.activeElement, h.button('Continuar'));
+    assert.ok(Object.values(lab.input.getState()).every(value => value === false));
+    h.button('Continuar').click();
+    assert.equal(lab.state, 'playing'); assert.equal(h.doc.activeElement, canvas);
+    const event = h.shell().dispatch('keydown', { key: 'Escape', repeat: false, ctrlKey: true });
+    assert.equal(event.defaultPrevented, false); assert.equal(lab.state, 'playing');
+});
+
+test('real campaign host records the walked presentation once and preserves it across pause, exit and reentry', t => {
+    const h = browser(t), initialWrites = h.writes.length;
+    h.game.enterSalon(); const lab = h.session(), canvas = h.doc.activeElement!;
+    const objective = () => h.menu().children.find(child => child.className === 'factory-salon-objective')!.children[1].textContent;
+    assert.match(objective(), /Apresente-se/);
+    for (let n = 0; n < 31; n++) h.game.update(100);
+    h.window.dispatch('keydown', { key: 'ArrowRight', code: 'ArrowRight', target: canvas });
+    for (let n = 0; n < 25; n++) h.game.update(100);
+    h.window.dispatch('keyup', { key: 'ArrowRight', code: 'ArrowRight', target: canvas });
+    assert.equal(lab.intro?.beat, 'prepare'); assert.equal(h.writes.length, initialWrites);
+    h.window.dispatch('keydown', { key: ' ', code: 'Space', target: canvas }); h.game.update(100);
+    h.window.dispatch('keyup', { key: ' ', code: 'Space', target: canvas });
+    assert.equal(lab.intro?.beat, 'reveal'); assert.equal(lab.victorious, false);
+    assert.ok(h.game.store.save.seen.includes(FACTORY_SALON.passage));
+    assert.equal(h.writes.length, initialWrites + 1); assert.match(objective(), /Passagem liberada/);
+    h.pause(); h.game.update(100); h.game.render();
+    assert.equal(h.writes.length, initialWrites + 1);
+    h.leave(); h.game.enterSalon();
+    assert.equal(h.session().presentedAtChampionship, true); assert.match(objective(), /Passagem liberada/);
+    h.leave(); assert.equal(h.writes.length, initialWrites + 1);
+});
+
+test('early exit leaves progression locked while pause-menu skip persists before the next game tick', t => {
+    const h = browser(t), initialWrites = h.writes.length;
+    h.game.enterSalon(); h.leave();
+    assert.equal(h.game.store.save.seen.includes(FACTORY_SALON.passage), false);
+    assert.equal(h.writes.length, initialWrites);
+    h.game.enterSalon(); h.pause(); h.button('Pular cena').click();
+    assert.equal(h.writes.length, initialWrites + 1, 'The action itself commits passage, without a frame race');
+    assert.equal(h.game.store.save.seen.includes(FACTORY_SALON.passage), true);
+    assert.equal(h.game.store.save.seen.includes(FACTORY_SALON.victory), false);
+    h.game.dispose(); assert.equal(h.writes.length, initialWrites + 1);
+});
+
+test('grandfathered routes show their actual open passage without inventing a championship pose', t => {
+    const h = browser(t), writes = h.writes.length;
+    h.game.store.save.completed = ['3-3']; h.game.update(1000 / 60);
+    const entrance = h.body.children.find(child => child.className === 'factory-salon-enter')!;
+    assert.equal(entrance.textContent, 'E · Revisitar salão');
+    h.game.enterSalon(); h.pause();
+    assert.equal(h.session().presentedAtChampionship, false);
+    const objective = h.menu().children.find(child => child.className === 'factory-salon-objective')!.children[1];
+    assert.match(objective.textContent, /Passagem liberada/);
+    h.leave();
+    assert.match((h.game as unknown as { toast: string }).toast, /PASSAGEM LIBERADA/);
+    assert.equal(h.game.store.save.seen.includes(FACTORY_SALON.passage), false);
+    assert.equal(h.writes.length, writes, 'Old earned access does not fabricate participation or rewrite the save');
 });

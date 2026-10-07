@@ -212,11 +212,13 @@ export class JuiceMinibossLab extends WorldGame {
     protected override renderEncounterHud(_c: CanvasRenderingContext2D) {
         // The lab draws a compact integrated HUD after the world render.
     }
+    /** Campaign hosts may frame the shared performance with their own story objective. */
+    protected introFrameForPresentation() { return this.intro!.frame; }
     override render() {
         if (this.labMode === 'intro' && this.intro) {
             this.renderer.startScene();
             const c = this.renderer.getContext();
-            drawJuiceIntro(c, this.intro.frame, this.reducedMotion);
+            drawJuiceIntro(c, this.introFrameForPresentation(), this.reducedMotion);
             if (this.state === 'playing' && (this.intro.beat === 'walk' || this.intro.beat === 'prepare'))
                 this.renderer.drawIntroTouchControls(this.intro.beat);
             if (this.state === 'paused') {
@@ -226,7 +228,7 @@ export class JuiceMinibossLab extends WorldGame {
                 pixelText(c, 'ESC OU CONTINUAR', 160, 100, '#fff0cc', 1, 'center');
             }
             this.renderer.present();
-            const f = this.intro.frame;
+            const f = this.introFrameForPresentation();
             const message = this.state === 'paused' ? 'Pausado · Esc ou Continuar para voltar'
                 : f.subtitle ? `${f.subtitle.speaker}: ${f.subtitle.text}` : f.prompt || 'Apresentação Calabrezzo · Esc pausa · M som';
             if (this.introStatus !== message) { this.status.textContent = message; this.introStatus = message; }

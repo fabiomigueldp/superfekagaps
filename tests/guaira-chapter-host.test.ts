@@ -1374,3 +1374,17 @@ test(`relief chapter controls help clears replay metadata after rejecting an old
     retry.click(); await flush(); assert.notEqual(app.activeGame, game, 'Fresh assistive Retry must work immediately');
     app.dispose(); h.checkDisposed();
 });
+
+test('development chapter host retains free stage selection after navigation and restart without awarding receipts', async t => {
+    const h = hostBrowser(t), store = new ProgressStore(null, true), app = h.create({ progressStore: store });
+    assert.equal(app.snapshot.developmentUnlocked, true); assert.equal(app.snapshot.accepted.length, 0);
+    let map = h.currentMap();
+    map.options.onSelect({ kind: 'chapter', sceneId: 'guaira-prefeito' }, map.snapshot.generation, map.navigation.revision);
+    assert.equal(app.snapshot.selectedScene, 'guaira-prefeito'); assert.equal(app.snapshot.accepted.length, 0);
+    map = h.currentMap();
+    map.options.onRestart(map.snapshot.generation, map.navigation.revision);
+    assert.equal(app.snapshot.developmentUnlocked, true); assert.equal(app.snapshot.accepted.length, 0);
+    assert.equal(app.snapshot.selectedScene, 'guaira-travessia');
+    assert.deepEqual(store.save.completed, []); assert.deepEqual(store.save.guaira.completed, []);
+    assert.deepEqual(store.save.seen, []);
+});

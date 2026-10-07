@@ -1,3 +1,4 @@
+import { developmentProfileStorage, hasDevelopmentAccess, siteDevelopmentUnlockEnabled, withDevelopmentAccess } from '../DevelopmentProgress';
 import { ALL_DELICIA_STAGES, DELICIA_STAGES } from './DeliciaContent';
 import { assertSaveCampaign } from '../saveCampaign';
 export const DELICIA_SAVE_KEY = 'super_feka_delicia_v1';
@@ -30,6 +31,7 @@ export function parseDeliciaSave(raw:string): DeliciaSave {
     if(!s.lore.includes('carta'))s.lore.unshift('carta'); return s;
 }
 export function deliciaUnlocked(id:string, save:DeliciaSave):boolean {
+    if (hasDevelopmentAccess(save)) return valid(id);
     const i=DELICIA_STAGES.findIndex(s=>s.id===id);
     if(i>=0) return i===0||save.completed.includes(DELICIA_STAGES[i-1].id)||save.completed.includes(id);
     return id==='delicia-raizes'?save.completed.includes('delicia-3'):id==='delicia-relogio'?save.completed.includes('delicia-9'):false;
@@ -45,8 +47,11 @@ export function completeDeliciaStage(save:DeliciaSave,id:string,seconds:number,r
 }
 export class DeliciaStore {
     save=freshDeliciaSave(); warning=''; private protected=false;
-    constructor(private readonly storage:Pick<Storage,'getItem'|'setItem'>|null) {
-        try{const raw=storage?.getItem(DELICIA_SAVE_KEY);if(raw)this.save=parseDeliciaSave(raw);}catch{this.protected=true;this.warning='Progresso não pôde ser lido. Exporte uma cópia antes de importar outro.';}
+    private readonly storage:Pick<Storage,'getItem'|'setItem'>|null;
+    constructor(storage:Pick<Storage,'getItem'|'setItem'>|null, private readonly developmentUnlocked=siteDevelopmentUnlockEnabled()) {
+        this.storage=developmentProfileStorage(storage,DELICIA_SAVE_KEY,developmentUnlocked);
+        try{const raw=this.storage?.getItem(DELICIA_SAVE_KEY);if(raw)this.save=parseDeliciaSave(raw);}catch{this.protected=true;this.warning='Progresso não pôde ser lido. Exporte uma cópia antes de importar outro.';}
+        withDevelopmentAccess(this.save,developmentUnlocked);
     }
     persist():boolean {
         if(this.protected)return false;
@@ -54,7 +59,7 @@ export class DeliciaStore {
     }
     import(raw:string):boolean {
         const next=parseDeliciaSave(raw);try{if(!this.storage)throw Error();this.storage.setItem(DELICIA_SAVE_KEY,JSON.stringify(next));}catch{this.warning='Importação não foi salva. Progresso anterior mantido.';return false;}
-        this.save=next;this.protected=false;this.warning='';return true;
+        this.save=withDevelopmentAccess(next,this.developmentUnlocked);this.protected=false;this.warning='';return true;
     }
     collect(id:string,lore?:string):void {if(!this.save.collected.includes(id))this.save.collected.push(id);if(lore&&!this.save.lore.includes(lore))this.save.lore.push(lore);this.persist();}
 }

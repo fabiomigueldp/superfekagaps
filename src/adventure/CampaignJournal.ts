@@ -1,6 +1,6 @@
 import type { AdventureSave } from './types';
 import { STAGES } from './campaign';
-import { FACTORY_SALON } from './factory/FactorySalon';
+import { FACTORY_SALON, requiresSalonPassage } from './factory/FactorySalon';
 import { CHAPTER_SCENES } from './experimental/guaira/chapter/GuairaChapterScenes';
 import { guairaChapterRoute, sanitizeGuairaChapterProgress } from './experimental/guaira/chapter/GuairaChapterProgress';
 
@@ -19,7 +19,10 @@ export function campaignJournal(save: AdventureSave) {
     const water = waterReleased ? 'Guaíra: água liberada · caminho da Serra aberto'
         : save.legacySerraAccess ? 'Guaíra: água pendente · acesso antigo à Serra mantido'
         : 'Guaíra: libere a água para seguir à Serra';
-    const objective = !save.completed.includes('3-5') ? 'Conclua Controle de Qualidade na Fábrica para embarcar.'
+    const objective = (save.selected === FACTORY_SALON.stage || save.completed.includes('3-2'))
+        && requiresSalonPassage(FACTORY_SALON.stage, save)
+        ? 'Apresente-se no salão de Tanques de Mistura para liberar o caminho ao Controle de Qualidade.'
+        : !save.completed.includes('3-5') ? 'Conclua Controle de Qualidade na Fábrica para embarcar.'
         : next ? `Próxima parada: ${next.title}. ${next.objective}`
         : 'Água liberada! Siga à Serra pelo aeródromo ou revisite os caminhos de Guaíra.';
     return { entries, next, waterReleased, water, objective, optional,

@@ -694,3 +694,17 @@ test('new or disposed sessions have no water text, and late old wet decode canno
     assert.doesNotMatch(h.byClass('chapter-map-canvas').getAttribute('aria-label')!, /Bica do Bairro/);
     assert.equal(h.button(GALLERY_LABEL).disabled, false);
 });
+
+test('development chapter exposes existing stage choices without completed badges or new controls', async t => {
+    const h = browser(t), session = new GuairaChapterSession({ developmentUnlocked: true });
+    let selected: GuairaChapterMapTarget | null = null;
+    h.create(configuration(session.snapshot(), { onSelect: target => { selected = target; } }));
+    await flush(); h.tick();
+    assert.equal(h.byClass('chapter-map-count').textContent, '0/5 · concluídos');
+    h.button('Ver a jornada de Guaíra').click();
+    const rows = h.all().filter(node => node.className === 'chapter-map-step-button');
+    assert.equal(rows.length, 5);
+    for (const row of rows) { assert.equal(row.disabled, false); assert.doesNotMatch(row.textContent, /Concluído|Depois de/); }
+    rows[4].click(); assert.deepEqual(selected, chapterTarget('guaira-prefeito'));
+    assert.equal(session.snapshot().accepted.length, 0);
+});

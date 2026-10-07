@@ -1,9 +1,11 @@
+import { developmentProfileStorage, hasDevelopmentAccess, siteDevelopmentUnlockEnabled, withDevelopmentAccess } from './DevelopmentProgress';
 import { freshGuairaChapterProgress, sanitizeGuairaChapterProgress, mergeGuairaChapterProgress, type GuairaChapterProgress } from './experimental/guaira/chapter/GuairaChapterProgress';
 import type { AdventureSave, AdventureStage } from './types';
 import { assertSaveCampaign } from './saveCampaign';
 import { carrierMotionErrors } from './WorldCarrierMotion';
 import { isSolidTile } from '../world/tileRules';
 import { TILE_SIZE } from '../constants';
+import { FACTORY_SALON } from './factory/FactorySalon';
 export const SAVE_KEY = 'super_feka_gaps_world_v1';
 export const freshSave = (): AdventureSave => ({ version: 1, guaira: freshGuairaChapterProgress(), completed: [], seals: [], secrets: [], seen: [], selected: '1-1', checkpoint: null, times: {}, preferences: { music: .55, effects: .7, voice: .8, shake: true } });
 /** Fresh editor previews need a new read-through. Never call for an in-game retry. */
@@ -11,7 +13,7 @@ export function resetPreviewGuidance(save: AdventureSave): void {
     save.seen = save.seen.filter(id => !id.startsWith('dialogue:') && !id.startsWith('control:'));
 }
 const validId = (s: unknown): s is string => typeof s === 'string' && /^[1-6]-[1-5]$/.test(s);
-export function parseSave(raw: string): AdventureSave {
+export function parseSave(raw: string, developmentUnlocked = false): AdventureSave {
     const data: unknown = JSON.parse(raw);
     if (!data || typeof data !== 'object' || (data as {
         version?: unknown;
@@ -21,14 +23,16 @@ export function parseSave(raw: string): AdventureSave {
     assertSaveCampaign(o, 'world');
     const list = (key: string, predicate: (v: unknown) => boolean) => Array.isArray(o[key]) ? [...new Set((o[key] as unknown[]).filter(predicate))] as string[] : [];
     result.completed = list('completed', validId);
-    result.guaira = sanitizeGuairaChapterProgress(o.guaira);
+    result.guaira = sanitizeGuairaChapterProgress(o.guaira, developmentUnlocked);
     // A pre-chapter save earned Serra by completing 3-5. Preserve that promise.
     if (o.legacySerraAccess === true || (!o.guaira && result.completed.includes('3-5'))) result.legacySerraAccess = true;
     result.secrets = list('secrets', v => typeof v === 'string' && /^[1-6]-3$/.test(v));
     result.seals = list('seals', v => typeof v === 'string' && /^[1-6]-[1-4]:s[123]$/.test(v));
-    // Reserve one additional journal slot for the optional factory result, so
-    // importing a full legacy v1 journal does not evict an existing story flag.
-    result.seen = list('seen', v => typeof v === 'string' && v.length < 100).slice(0, 201);
+    // Dedicated story/result slots survive even a full legacy journal or a late
+    // append. Keep the old 201 ordinary slots and the original relative order.
+    const seen = list('seen', v => typeof v === 'string' && v.length < 100);
+    let ordinary = 0;
+    result.seen = seen.filter(id => id === FACTORY_SALON.passage || id === FACTORY_SALON.victory || ordinary++ < 201);
     result.selected = validId(o.selected) ? o.selected : '1-1';
     if (o.times && typeof o.times === 'object')
         for (const [id, n] of Object.entries(o.times))
@@ -52,13 +56,14 @@ export function parseSave(raw: string): AdventureSave {
             result.completed.push(id);
     return result;
 }
-export function isGuairaUnlocked(save: AdventureSave): boolean { return save.completed.includes('3-5'); }
+export function isGuairaUnlocked(save: AdventureSave): boolean { return hasDevelopmentAccess(save) || save.completed.includes('3-5'); }
 export function canContinueFromGuaira(save: AdventureSave): boolean {
-    return save.legacySerraAccess === true || save.guaira?.completed.includes('guaira-prefeito') === true;
+    return hasDevelopmentAccess(save) || save.legacySerraAccess === true || save.guaira?.completed.includes('guaira-prefeito') === true;
 }
 export function isUnlocked(id: string, save: AdventureSave): boolean {
     if (!validId(id))
         return false;
+    if (hasDevelopmentAccess(save)) return true;
     const [w, n] = id.split('-').map(Number);
     if (w === 4 && !canContinueFromGuaira(save)) return false;
     if (w > 1 && !save.completed.includes(`${w - 1}-5`))
@@ -88,16 +93,23 @@ export class ProgressStore {
     save = freshSave();
     warning = '';
     private protected = false;
-    constructor(private storage: Pick<Storage, 'getItem' | 'setItem'> | null) {
+    private readonly storage: Pick<Storage, 'getItem' | 'setItem'> | null;
+    constructor(storage: Pick<Storage, 'getItem' | 'setItem'> | null, private readonly developmentUnlocked = siteDevelopmentUnlockEnabled()) {
+        this.storage = developmentProfileStorage(storage, SAVE_KEY, developmentUnlocked);
         try {
-            const raw = storage?.getItem(SAVE_KEY);
+            const raw = this.storage?.getItem(SAVE_KEY);
             if (raw)
-                this.save = parseSave(raw);
+                this.save = parseSave(raw, this.developmentUnlocked);
         }
         catch {
             this.warning = 'Não foi possível abrir o progresso. Exporte uma cópia antes de substituir.';
             this.protected = true;
         }
+        this.applyDevelopmentAccess();
+    }
+    private applyDevelopmentAccess(): void {
+        withDevelopmentAccess(this.save, this.developmentUnlocked);
+        withDevelopmentAccess(this.save.guaira, this.developmentUnlocked);
     }
     persist(mergeChapter = true): boolean {
         if (this.protected)
@@ -107,10 +119,11 @@ export class ProgressStore {
                 throw Error();
             const existing = this.storage.getItem(SAVE_KEY);
             if (existing && mergeChapter) {
-                const latest = parseSave(existing);
-                this.save.guaira = mergeGuairaChapterProgress(latest.guaira, this.save.guaira);
+                const latest = parseSave(existing, this.developmentUnlocked);
+                this.save.guaira = mergeGuairaChapterProgress(latest.guaira, this.save.guaira, this.developmentUnlocked);
                 if (latest.legacySerraAccess) this.save.legacySerraAccess = true;
             }
+            this.applyDevelopmentAccess();
             this.storage.setItem(SAVE_KEY, JSON.stringify(this.save));
             this.warning = '';
             return true;
@@ -125,17 +138,18 @@ export class ProgressStore {
         if (this.protected) return false;
         try {
             const raw = this.storage?.getItem(SAVE_KEY);
-            if (raw) this.save = parseSave(raw);
+            if (raw) this.save = parseSave(raw, this.developmentUnlocked);
         } catch {
             this.warning = 'Não foi possível atualizar o progresso. Exporte uma cópia antes de substituir.';
             this.protected = true; return false;
         }
-        this.save.guaira = mergeGuairaChapterProgress(this.save.guaira, next);
+        this.save.guaira = mergeGuairaChapterProgress(this.save.guaira, next, this.developmentUnlocked);
+        this.applyDevelopmentAccess();
         return this.persist();
     }
     /** Import replaces progress only after the browser has saved the complete replacement. */
     import(raw: string): boolean {
-        const next = parseSave(raw);
+        const next = parseSave(raw, this.developmentUnlocked);
         try {
             if (!this.storage) throw Error('Storage unavailable');
             this.storage.setItem(SAVE_KEY, JSON.stringify(next));
@@ -144,6 +158,7 @@ export class ProgressStore {
             return false;
         }
         this.save = next;
+        this.applyDevelopmentAccess();
         this.protected = false;
         this.warning = '';
         return true;

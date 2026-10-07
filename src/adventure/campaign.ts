@@ -230,6 +230,9 @@ function course(w: number, n: number): AdventureStage {
         d.jet('j1', 24, 12).jet('j2', 41, 10, 2100).platform(31, 11, 3).platform(48, 12, 3).platform(81, 10, 3).jet('j3', 74, 11, 900).jet('j4', 91, 9, 2600).platform(99, 11, 4).platform(135, 12, 4);
         d.platform(72, 7, 6).platform(87, 5, 8).move('sl', 100, 8, 112, 5, 6000).platform(116, 5, 16).secret(129, 5);
         d.cp(54).cp(107).seal(1, 39, 7).seal(2, 89, 3).seal(3, 124, 3).item('helmet', 55).art('tank', 18, 12, 12, 10, 'A').art('tank', 35, 10, 12, 9, 'B').art('tank', 68, 11, 12, 10, 'C').art('tank', 85, 9, 13, 8, 'D').art('pipe', 97, 14, 22, 8).talk(14, 'feka', 'Primeiro treme... depois espirra.', undefined, 'dialogue');
+        // Establish the factory's story detour before the lower/secret routes split.
+        d.talk(57, 'calabrezzo', 'Só passa ao Controle de Qualidade quem se apresenta no meu campeonato!')
+            .talk(108, 'feka', 'Uma pose no salão e sigo pra Yasmin. Ganhar a luta é outra história.');
         d.cue(25, 12).cue(41, 10).cue(57, 14).cue(74, 11).cue(91, 9).cue(111, 14).cue(127, 11).cue(145, 14);
     }
     if (w === 3 && n === 4) {

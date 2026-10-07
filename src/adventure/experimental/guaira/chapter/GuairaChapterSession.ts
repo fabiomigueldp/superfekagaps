@@ -8,6 +8,8 @@ export type GuairaChapterTraversalId = GuairaChapterOpening | 'guaira-respiros' 
 export interface GuairaChapterOptions {
     readonly opening?: GuairaChapterOpening;
     readonly progress?: GuairaChapterProgress;
+    /** Access only; completion still requires a live native result. */
+    readonly developmentUnlocked?: boolean;
 }
 
 /** Capture this when installing map/restart callbacks; never look it up in an old callback. */
@@ -57,6 +59,7 @@ export interface GuairaChapterSnapshot {
     readonly nextRecommendedScene: GuairaChapterSceneId | null;
     readonly chapterComplete: boolean;
     readonly disposed: boolean;
+    readonly developmentUnlocked: boolean;
 }
 
 export interface GuairaChapterTransition {
@@ -88,9 +91,11 @@ export class GuairaChapterSession {
     private readonly opening: GuairaChapterOpening;
     private readonly route: readonly GuairaChapterSceneId[];
     private selectedScene: GuairaChapterSceneId;
+    private readonly developmentUnlocked: boolean;
 
-    constructor({ opening = 'guaira-travessia', progress }: GuairaChapterOptions = {}) {
-        const restored = progress ? sanitizeGuairaChapterProgress(progress) : null;
+    constructor({ opening = 'guaira-travessia', progress, developmentUnlocked = false }: GuairaChapterOptions = {}) {
+        this.developmentUnlocked = developmentUnlocked;
+        const restored = progress ? sanitizeGuairaChapterProgress(progress, developmentUnlocked) : null;
         if (restored) opening = restored.opening;
         if (opening !== 'guaira-travessia' && opening !== 'guaira-patio-comportas')
             throw new Error('Unknown Guaíra chapter opening');
@@ -118,7 +123,7 @@ export class GuairaChapterSession {
                 return receipt ? [receipt] : [];
             })),
             selectedScene: this.selectedScene, activeAttempt: this.activeAttempt, nextRecommendedScene,
-            chapterComplete: nextRecommendedScene === null, disposed: this.closed
+            chapterComplete: nextRecommendedScene === null, disposed: this.closed, developmentUnlocked: this.developmentUnlocked
         });
     }
 
@@ -126,7 +131,7 @@ export class GuairaChapterSession {
     canSelectScene(sceneId: GuairaChapterSceneId, from: GuairaChapterGeneration): boolean {
         return this.isCurrentGeneration(from) && this.activeAttempt === null
             && this.route.includes(sceneId)
-            && (sceneId === this.nextRecommendedScene() || this.accepted.has(sceneId));
+            && (this.developmentUnlocked || sceneId === this.nextRecommendedScene() || this.accepted.has(sceneId));
     }
 
     /** Even reselecting retires existing contextual buttons before returning. */
@@ -187,7 +192,7 @@ export class GuairaChapterSession {
     restartChapter(from: GuairaChapterGeneration, options: GuairaChapterOptions = {}): GuairaChapterSession | null {
         if (!this.isCurrentGeneration(from)) return null;
         // Validate/create before closing: malformed runtime options cannot destroy the current session.
-        const replacement = new GuairaChapterSession({ opening: options.opening ?? this.opening });
+        const replacement = new GuairaChapterSession({ opening: options.opening ?? this.opening, developmentUnlocked: this.developmentUnlocked });
         this.dispose();
         return replacement;
     }

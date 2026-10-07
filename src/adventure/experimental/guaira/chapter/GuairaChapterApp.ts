@@ -1,3 +1,4 @@
+import { hasDevelopmentAccess } from '../../../DevelopmentProgress';
 import { GuairaChapterControlsHelp } from './GuairaChapterControlsHelp';
 import { chapterCompletionStory } from './GuairaChapterStory';
 import { chapterExitPresentation, chapterGuidance, chapterTitle, chapterAttemptSummary, chapterResumeGuidance } from './GuairaChapterPresentation';
@@ -67,7 +68,7 @@ export class GuairaChapterApp {
         try { storage = window.localStorage; } catch { /* unavailable: session fallback */ }
         this.progressStore = dependencies.progressStore ?? new ProgressStore(storage);
         this.progress = this.progressStore.save.guaira ?? freshGuairaChapterProgress();
-        this.session = new GuairaChapterSession({ progress: this.progress });
+        this.session = new GuairaChapterSession({ progress: this.progress, developmentUnlocked: hasDevelopmentAccess(this.progressStore.save) });
         this.audioEnabled = this.progress.audioEnabled;
         this.openingAvailable = !this.progress.completed.length && this.progress.resumeScene === null;
         this.navigation = Object.freeze({ target: Object.freeze({ kind: 'chapter', sceneId: this.snapshot.selectedScene }), revision: 0 });
@@ -223,7 +224,7 @@ export class GuairaChapterApp {
             onOpening: (opening, generation, revision) => this.changeOpening(opening, generation, revision, scope),
             onRestart: (generation, revision) => {
                 if (!this.currentMapAction(scope, generation, revision)) return;
-                const next = new GuairaChapterSession({ progress: { ...this.progress, selectedScene: this.snapshot.opening, resumeScene: null } });
+                const next = new GuairaChapterSession({ progress: { ...this.progress, selectedScene: this.snapshot.opening, resumeScene: null }, developmentUnlocked: hasDevelopmentAccess(this.progressStore.save) });
                 this.session.dispose();
                 if (!next) return;
                 this.session = next; this.excursionToken = null; this.openingAvailable = !this.snapshot.accepted.length; this.persistProgress(null);
