@@ -1,3 +1,4 @@
+import type { GamepadMenuCommand } from '../engine/StandardGamepad';
 import { ISLANDS, STAGES } from './campaign';
 import { fitText, panel, pixelText, textWidth, wrapText } from '../graphics/BitmapFont';
 import { ART } from '../graphics/palette';
@@ -228,6 +229,8 @@ export class WorldMapHud {
     private readonly regionButtons: HTMLButtonElement[] = [];
     private readonly regionStates: HTMLSpanElement[] = [];
     private readonly overviewButton: HTMLButtonElement;
+    private readonly menuButton: HTMLButtonElement;
+    private readonly regionClose: HTMLButtonElement;
     private readonly playCanvas: HTMLCanvasElement;
     private readonly playText: HTMLSpanElement;
     private state: WorldMapHudState | null = null;
@@ -265,7 +268,7 @@ export class WorldMapHud {
         this.overviewButton.setAttribute('aria-label', 'Ver mapa'); this.overviewButton.title = 'Ver mapa';
         (this.overviewButton.children[1] as HTMLElement).textContent = 'Ver mapa';
         this.overviewButton.setAttribute('aria-pressed', 'false');
-        const menu = action('world-map-tool world-map-menu', 'II', () => this.run(() => callbacks.menu()));
+        const menu = this.menuButton = action('world-map-tool world-map-menu', 'II', () => this.run(() => callbacks.menu()));
         menu.setAttribute('aria-label', 'Menu do jogo'); menu.title = 'Menu do jogo';
         this.tools.append(this.regionButton, this.overviewButton, menu); this.header.append(this.title, this.tools);
         for (const island of ISLANDS) {
@@ -307,7 +310,7 @@ export class WorldMapHud {
         const drawerHeading = element('div', 'world-map-region-heading');
         const drawerTitle = element('h2', 'world-map-region-title');
         lettering(bitmap(drawerTitle), 'ARQUIPÉLAGO', ART.goldLight); accessibleText(drawerTitle, 'Arquipélago');
-        const close = action('world-map-tool world-map-region-close', '×', () => this.closeRegionMenu(true));
+        const close = this.regionClose = action('world-map-tool world-map-region-close', '×', () => this.closeRegionMenu(true));
         close.setAttribute('aria-label', 'Fechar arquipélago');
         drawerHeading.append(drawerTitle, close); this.regionMenu.append(drawerHeading, this.globalProgress);
         for (const island of ISLANDS) {
@@ -336,12 +339,7 @@ export class WorldMapHud {
         this.enterButton = element('button', 'world-map-enter'); this.enterButton.type = 'button';
         this.playCanvas = bitmap(this.enterButton); this.playText = accessibleText(this.enterButton, 'Entrar');
         this.enterButton.addEventListener('click', event => this.run(() => {
-            if (!this.state || event.detail > 1) return;
-            if (this.state.preview && !this.state.overview && this.state.motionState === 'idle' && callbacks.returnToFeka) {
-                callbacks.returnToFeka();
-            } else if (this.state.overview) {
-                if (callbacks.selectOverviewWorld) callbacks.selectOverviewWorld(this.state.world); else callbacks.selectWorld(this.state.world);
-            } else if (this.state.canEnter && !this.state.preview && !this.state.overview && this.state.motionState === 'idle' && this.state.open[this.state.stage % 5]) callbacks.enter();
+            if (!(event.detail > 1)) this.activatePrimary();
         }));
         this.skipButton = action('world-map-skip', 'Pular →', () => this.run(() => {
             if (this.state && this.state.motionState !== 'idle') callbacks.skip();
@@ -357,6 +355,7 @@ export class WorldMapHud {
         this.footer.append(this.stageTitle, copy, actions, this.warning);
         this.root.append(this.scene, this.header, this.footer, this.regionMenu, this.announcer);
         this.root.addEventListener('keydown', this.onKey);
+        this.root.addEventListener('pointerdown', this.onPointer);
     }
 
     /** Mount is explicit so the game controls ownership and canvas focus restoration. */
@@ -649,6 +648,97 @@ export class WorldMapHud {
             : `Cais para ${destination}. ${available ? 'Marcar destino da travessia de barco.' : 'Travessia bloqueada. Ver prévia.'}`);
         button.title = `${sign.label} ${sign.direction === 'left' ? '←' : '→'} · ${sign.mode === 'bridge' ? 'ponte de carga' : sign.mode === 'walk' ? 'caminho' : sign.mode === 'cable' ? 'teleférico' : 'barco'}`;
     }
+    private activatePrimary(): void {
+        const state = this.state;
+        if (!state) return;
+        if (state.preview && !state.overview && state.motionState === 'idle' && this.callbacks.returnToFeka)
+            this.callbacks.returnToFeka();
+        else if (state.overview) this.selectOverview(state.world);
+        else if (state.canEnter && !state.preview && state.motionState === 'idle' && state.open[state.stage % 5]) this.callbacks.enter();
+    }
+    private selectOverview(world: number): void {
+        if (this.callbacks.selectOverviewWorld) this.callbacks.selectOverviewWorld(world); else this.callbacks.selectWorld(world);
+    }
+    private overviewChoices(): HTMLButtonElement[] {
+        return [...this.overviewButtons.slice(0, 3), ...(this.callbacks.selectGuaira ? [this.guairaOverview] : []), ...this.overviewButtons.slice(3)]
+            .filter(button => !button.hidden && !button.disabled);
+    }
+    /** Only the current map layer's own controls can grant controller focus. */
+    controllerOwner(): string | null {
+        if (this.disposed || this.root.hidden || !this.state || document.hidden || this.root.inert
+            || document.querySelector?.('dialog[open]')) return null;
+        const drawer = !this.regionMenu.hidden;
+        const choices = drawer ? [this.regionClose, ...this.regionChoices()]
+            : [this.regionButton, this.overviewButton, this.menuButton, this.enterButton, this.skipButton,
+                ...(this.state.overview ? this.overviewChoices() : [...this.stageButtons, ...Object.values(this.travelButtons)])];
+        const active = document.activeElement;
+        if (active !== this.root && !choices.some(button => button === active && !button.hidden && !button.disabled)) return null;
+        return `${drawer ? 'regions' : this.state.overview ? 'overview' : 'island'}:${this.state.motionState === 'idle' ? 'idle' : 'travel'}`;
+    }
+    /** Returns false only for island directions/back, which belong to WorldMapView. */
+    control(command: GamepadMenuCommand): boolean {
+        if (!this.controllerOwner()) return false;
+        this.root.classList.toggle('is-gamepad-navigation', true);
+        const direction = command === 'left' || command === 'up' ? -1 : command === 'right' || command === 'down' ? 1 : 0;
+        if (command === 'regions') { this.toggleRegionMenu(); return true; }
+        if (!this.regionMenu.hidden) {
+            if (command === 'back') this.closeRegionMenu(true);
+            else if (direction) this.focusRegion(direction, document.activeElement);
+            else if (command === 'confirm') this.confirmController();
+            return true;
+        }
+        if (command === 'overview') { this.run(() => this.callbacks.overview()); this.root.focus({ preventScroll: true }); return true; }
+        if (this.state?.overview) {
+            if (command === 'back') { this.run(() => this.callbacks.overview()); this.overviewButton.focus({ preventScroll: true }); }
+            else if (direction && this.state.motionState === 'idle') {
+                if (this.overviewFallback) this.openRegionMenu(direction);
+                else {
+                    const choices = this.overviewChoices(), focused = choices.indexOf(document.activeElement as HTMLButtonElement);
+                    const current = focused < 0 ? choices.indexOf(this.overviewButtons[this.state.world - 1]) : focused;
+                    choices[Math.max(0, Math.min(choices.length - 1, current + direction))]?.focus({ preventScroll: true });
+                }
+            } else if (command === 'confirm') this.confirmController();
+            return true;
+        }
+        if (command === 'confirm') { this.confirmController(); return true; }
+        return command !== 'back' && !direction;
+    }
+    private confirmController(): void {
+        const active = document.activeElement, state = this.state;
+        if (!state) return;
+        if (!this.regionMenu.hidden) {
+            if (active === this.regionClose) { this.closeRegionMenu(true); return; }
+            if (active === this.guairaRegion && !this.guairaRegion.disabled) {
+                this.closeRegionMenu(true); this.run(() => this.callbacks.selectGuaira?.()); return;
+            }
+            const region = this.regionButtons.indexOf(active as HTMLButtonElement);
+            if (region >= 0) { this.closeRegionMenu(true); this.run(() => this.callbacks.selectWorld(region + 1)); }
+            return;
+        }
+        if (active === this.regionButton) { this.toggleRegionMenu(); return; }
+        if (active === this.overviewButton) { this.run(() => this.callbacks.overview()); return; }
+        if (active === this.menuButton) { this.run(() => this.callbacks.menu()); return; }
+        if (active === this.guairaOverview) { this.run(() => this.callbacks.selectGuaira?.()); return; }
+        if (state.motionState !== 'idle' && (active === this.root || active === this.skipButton)) {
+            if (!this.skipButton.hidden) this.run(() => this.callbacks.skip()); return;
+        }
+        if (state.overview) {
+            if (state.motionState !== 'idle') return;
+            if (this.overviewFallback) { this.openRegionMenu(); return; }
+            const island = this.overviewButtons.indexOf(active as HTMLButtonElement);
+            this.run(() => this.selectOverview(island >= 0 ? island + 1 : state.world)); return;
+        }
+        for (const id of WORLD_MAP_TRAVEL_ACTION_IDS) if (active === this.travelButtons[id]) {
+            this.run(() => this.callbacks.selectTravel ? this.callbacks.selectTravel(id) : this.callbacks.selectWorld(WORLD_MAP_TRAVEL_ACTIONS[id].toWorld)); return;
+        }
+        const phase = this.stageButtons.indexOf(active as HTMLButtonElement);
+        if (phase >= 0 && phase !== state.stage % 5) {
+            this.run(() => this.callbacks.selectStage((state.world - 1) * 5 + phase)); return;
+        }
+        if (state.motionState !== 'idle') { if (!this.skipButton.hidden) this.run(() => this.callbacks.skip()); return; }
+        if (!this.enterButton.hidden && !this.enterButton.disabled) this.run(() => this.activatePrimary());
+    }
+    private readonly onPointer = () => this.root.classList.toggle('is-gamepad-navigation', false);
     focusStage(globalIndex: number): void {
         if (this.state && Math.floor(globalIndex / 5) === this.state.world - 1) this.stageButtons[globalIndex % 5]?.focus({ preventScroll: true });
     }
@@ -680,6 +770,7 @@ export class WorldMapHud {
         this.openRegionMenu();
     }
     private readonly onKey = (event: KeyboardEvent) => {
+        this.root.classList.toggle('is-gamepad-navigation', false);
         if (this.root.hidden || this.disposed || event.ctrlKey || event.metaKey || event.altKey) return;
         if (event.repeat) {
             // Native buttons still own the initial Enter/Space. A held key must
@@ -724,6 +815,6 @@ export class WorldMapHud {
     };
     dispose(): void {
         this.disposed = true; this.root.hidden = true; this.assetAbort.abort();
-        this.root.removeEventListener('keydown', this.onKey); this.root.remove();
+        this.root.removeEventListener('keydown', this.onKey); this.root.removeEventListener('pointerdown', this.onPointer); this.root.remove();
     }
 }

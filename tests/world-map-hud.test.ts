@@ -957,3 +957,48 @@ test('fallback ignores held arrows and modifiers, traveling blocks the picker, h
     root.dispatch('keydown', { key: 'ArrowRight', target: hud.root }); assert.equal(hud.regionMenu.hidden, true);
     assert.deepEqual(calls, []);
 });
+
+test('controller layers own focused native actions and never activate hidden or external controls', t => {
+    const { hud, calls, state } = fixture(t, true, true);
+    hud.root.focus(); assert.equal(hud.controllerOwner(), 'island:idle');
+    assert.equal(hud.control('regions'), true); assert.equal(hud.regionMenu.hidden, false);
+    assert.equal(hud.controllerOwner(), 'regions:idle');
+    hud.control('down'); hud.control('confirm'); assert.deepEqual(calls, ['world:2']);
+    assert.equal(hud.regionMenu.hidden, true); assert.equal(document.activeElement, hud.regionButton);
+    hud.control('confirm'); assert.equal(hud.regionMenu.hidden, false, 'A follows the focused Arquipélago control');
+    hud.control('back'); assert.equal(hud.regionMenu.hidden, true); assert.deepEqual(calls, ['world:2']);
+    hud.root.focus(); hud.control('overview'); assert.equal(calls.at(-1), 'overview');
+    hud.update({ ...state, overview: true });
+    hud.positionOverviewWorlds(hud.overviewButtons.map((_, n) => ({ x: 100 + n * 100, y: 150 })), false);
+    hud.root.focus(); hud.control('right'); hud.control('confirm'); assert.equal(calls.at(-1), 'overview-world:2');
+    hud.control('back'); assert.equal(calls.at(-1), 'overview');
+    const external = document.createElement('input'); external.focus();
+    const count = calls.length; assert.equal(hud.controllerOwner(), null); assert.equal(hud.control('confirm'), false);
+    assert.equal(calls.length, count); assert.equal(document.activeElement, external);
+    hud.setVisible(false); hud.root.focus(); assert.equal(hud.controllerOwner(), null);
+});
+
+test('controller primary action respects journey state and the exact focused phase', t => {
+    const { hud, calls, state } = fixture(t);
+    hud.stageButtons.forEach(button => { button.hidden = false; });
+    hud.stageButtons[1].focus(); hud.control('confirm'); assert.deepEqual([...calls], [1], 'A different focused phase first selects its destination');
+    hud.update({ ...state, stage: 1, motionState: 'walking', canEnter: false });
+    hud.root.focus(); assert.equal(hud.controllerOwner(), 'island:travel'); hud.control('confirm'); assert.equal(calls.at(-1), 'skip');
+    assert.equal(calls.includes('enter'), false);
+    hud.update({ ...state, stage: 1 }); hud.root.focus(); assert.equal(hud.controllerOwner(), 'island:idle');
+    hud.control('confirm'); assert.equal(calls.at(-1), 'enter');
+    hud.update({ ...state, stage: 2, preview: true, canEnter: false }); hud.root.focus();
+    const count = calls.length; hud.control('confirm'); assert.equal(calls.length, count, 'A blocked preview cannot enter');
+});
+
+test('controller overview fallback and moving primary action keep the visible layer as owner', t => {
+    const { hud, state, calls } = fixture(t, true, true);
+    hud.update({ ...state, overview: true }); hud.positionOverviewWorlds([], true, true); hud.root.focus();
+    hud.control('right'); assert.equal(hud.regionMenu.hidden, false);
+    assert.equal(hud.controllerOwner(), 'regions:idle'); hud.control('back'); assert.equal(hud.regionMenu.hidden, true);
+    hud.update({ ...state, overview: true, motionState: 'sailing', canEnter: false }); hud.root.focus();
+    assert.equal(hud.controllerOwner(), 'overview:travel'); hud.control('right'); assert.equal(hud.regionMenu.hidden, true);
+    hud.control('confirm'); assert.equal(calls.at(-1), 'skip');
+    hud.skipButton.focus(); hud.control('confirm'); assert.equal(calls.filter(call => call === 'skip').length, 2);
+    assert.equal(calls.includes('enter'), false);
+});

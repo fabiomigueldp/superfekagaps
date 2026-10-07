@@ -46,7 +46,12 @@ export class WorldControlsHelp {
                 const term = document.createElement('dt'), description = document.createElement('dd');
                 term.textContent = action; description.textContent = keys; list.append(term, description);
             }
-            const navigation = (contentOptions.navigation ?? ['Menus: Tab ou ↑/↓ para escolher; Enter ou Espaço para confirmar; Esc para voltar.'])
+            const navigation = (contentOptions.navigation ?? [
+                'Menus: Tab ou ↑/↓ para escolher; Enter ou Espaço para confirmar; Esc para voltar.',
+                'Controle na campanha principal: direcional/analógico escolhe; A/× confirma; B/○ volta; Start pausa/continua.',
+                'Mapa: ←/→ fases; ↑/↓ regiões; X/□ arquipélago; Y/△ panorama. A/× usa a ação selecionada ou pula a viagem.',
+                'Solte os controles ao trocar de tela. Diálogos, esta ajuda, Guaíra, Extras, salão, voos e modos opcionais usam teclado/toque. Arquivos: Enter ou toque.',
+            ])
                 .map(text => { const paragraph = document.createElement('p'); paragraph.textContent = text; return paragraph; });
             const touchTitle = document.createElement('h3'); touchTitle.textContent = 'NA TELA DE TOQUE';
             const touch = document.createElement('p');

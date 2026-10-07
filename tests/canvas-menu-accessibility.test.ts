@@ -165,3 +165,18 @@ test('normalized CSS geometry stays quiet and external inline changes are repair
     assert.equal(h.root.children[0].style.top, `${68 / 180 * 100}%`);
     assert.equal(h.root.hidden, false);
 });
+
+test('controller focus is visible and selects without cancelling its own repeat, but native focus still resets', t => {
+    const h = setup(t); h.menu.sync('title:0', 'Menu principal', h.choices, 0); h.canvas.focus();
+    const before = h.stats().resets;
+    assert.equal(h.menu.canControl(), true); assert.equal(h.menu.focusFromController(1), true);
+    assert.equal(h.stats().selected, 1); assert.equal(h.stats().resets, before);
+    assert.equal(h.root.children[1].style.outline, '2px solid #fff3be');
+    assert.equal(h.menu.focusFromController(0), true); assert.equal(h.stats().resets, before);
+    h.root.children[1].focus(); assert.equal(h.stats().resets, before + 1);
+    const external = h.doc.createElement('input'); external.focus();
+    assert.equal(h.menu.canControl(), false); assert.equal(h.menu.focusFromController(0), false);
+    assert.equal(h.doc.activeElement, external);
+    h.canvas.focus(); h.menu.clear(); assert.equal(h.menu.focusFromController(0), false);
+    h.menu.dispose(); assert.equal(h.menu.canControl(), false);
+});

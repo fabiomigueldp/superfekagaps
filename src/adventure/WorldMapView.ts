@@ -1,3 +1,4 @@
+import type { GamepadMenuCommand } from '../engine/StandardGamepad';
 import { campaignWaterRestored, campaignWaterOverlay, loadCampaignWaterImage } from './GuairaCampaignConsequences';
 import { GuairaCampaignWaterMotion } from './GuairaCampaignWaterMotion';
 import { campaignMapDirection, guairaTravelDirections } from './CampaignWayfinding';
@@ -352,6 +353,17 @@ export class WorldMapView {
                 ...(this.passengerActive ? cableEdgeDirections(this.passengerPair, PASSENGER_CABLE_PAIR,
                     isUnlocked('5-1', this.save), this.journey?.legs[0]) : {}),
             } };
+    }
+    controllerOwner(): string | null {
+        return this.visible && !this.disposed ? this.hud.controllerOwner() : null;
+    }
+    control(command: GamepadMenuCommand): void {
+        if (!this.controllerOwner() || this.hud.control(command)) return;
+        if (command === 'back') { this.act(() => this.callbacks.exit()); return; }
+        const key = ({ left: 'ArrowLeft', right: 'ArrowRight', up: 'ArrowUp', down: 'ArrowDown' } as const)[command as 'left' | 'right' | 'up' | 'down'];
+        if (!key) return;
+        const next = moveJourneySelection(this.controlSelection, key);
+        if (next !== this.controlSelection) { this.act(() => this.select(next)); this.hud.focusStage(next); }
     }
     private readonly onKey = (event: KeyboardEvent) => {
         if (!this.visible || event.defaultPrevented || !this.hud.regionMenu.hidden || event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;

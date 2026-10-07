@@ -23,6 +23,7 @@ export class CanvasMenuAccessibility {
     private controlLifetime = new DisposalScope();
     private screen = '';
     private pendingFocus = false;
+    private controllerFocus = false;
     private bounds = '';
     private readonly controlBounds = new WeakMap<HTMLButtonElement, {
         x: number; y: number; width: number; height: number;
@@ -72,6 +73,24 @@ export class CanvasMenuAccessibility {
         if ((hadFocus && rebuild || this.pendingFocus && document.activeElement === this.canvas) && !document.hidden)
             active?.focus({ preventScroll: true });
         this.pendingFocus = false;
+    }
+
+    /** Only this visible menu or its canvas can hand focus to a controller. */
+    canControl(): boolean {
+        return !this.lifetime.isDisposed && !this.root.hidden && !document.hidden && !this.canvas.inert
+            && (document.activeElement === this.canvas || this.ownsFocus());
+    }
+
+    focusFromController(index: number): boolean {
+        if (!this.canControl()) return false;
+        const button = this.controls[index];
+        if (!button || button.hidden || button.disabled) return false;
+        // Native focus still synchronizes the painted selection. Its usual
+        // Input reset would otherwise cancel the controller's own repeat.
+        this.controllerFocus = true;
+        try { button.focus({ preventScroll: true }); }
+        finally { this.controllerFocus = false; }
+        return document.activeElement === button;
     }
 
     /** Clear immediately on a state change, before the next animation frame. */
@@ -138,7 +157,8 @@ export class CanvasMenuAccessibility {
             pointerEvents: 'auto', cursor: 'pointer', touchAction: 'manipulation'
         });
         this.controlLifetime.listen(button, 'focus', () => {
-            this.host.resetInput(); this.host.select(index);
+            if (!this.controllerFocus) this.host.resetInput();
+            this.host.select(index);
             button.style.outline = '2px solid #fff3be'; button.style.outlineOffset = '2px';
         });
         this.controlLifetime.listen(button, 'blur', () => { button.style.outline = ''; button.style.outlineOffset = ''; });

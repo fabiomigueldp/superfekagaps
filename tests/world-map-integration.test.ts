@@ -12,6 +12,7 @@ import { mapToScreen, type MapPoint } from '../src/adventure/WorldMapModel';
 import { atlasIslandBounds, WORLD_ATLAS_PLACEMENTS } from '../src/adventure/WorldAtlasModel';
 import { atlasActorBounds, atlasActorScale, atlasBoatBounds } from '../src/adventure/WorldAtlasArt';
 import { Input } from '../src/engine/Input';
+import { StandardGamepad } from '../src/engine/StandardGamepad';
 
 // This matrix verifies already-earned six-region transport. Guaíra's new gate is
 // covered separately in guaira-campaign-progression.test.ts.
@@ -2468,4 +2469,49 @@ test('measured compact fallback owns keyboard and native activation without muta
         h.gameCanvas.dispatch('keyup', { key: ' ', code: 'Space' }); input.update(); assert.equal(input.getState().jumpPressed, false);
         assert.deepEqual(save, saved); assert.equal(h.internal.journey.arrived, '3-5');
     });
+});
+
+
+test('controller map route uses the real journey gate, consumes skip and requires a new arrival confirm', async t => {
+    const h = mapDOM(t), save = openSave(); await readyLand(h, save);
+    const original = structuredClone(save), input = new Input(), adapter = new StandardGamepad(input);
+    const pad = { index: 0, id: 'map controller fixture', connected: true, mapping: 'standard', axes: [0, 0],
+        buttons: Array.from({ length: 17 }, () => ({ pressed: false })) };
+    const navigatorBefore = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+    Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { getGamepads: () => [pad] } });
+    t.after(() => { adapter.dispose(); input.dispose();
+        if (navigatorBefore) Object.defineProperty(globalThis, 'navigator', navigatorBefore); else Reflect.deleteProperty(globalThis, 'navigator'); });
+    let now = 0;
+    const step = (elapsed = 17) => { const command = adapter.updateMenu(h.view.controllerOwner(), now += elapsed); if (command) h.view.control(command); };
+    const neutral = () => { pad.buttons.forEach(b => { b.pressed = false; }); step(); };
+    const tap = (index: number) => { neutral(); pad.buttons[index].pressed = true; step(); };
+    h.root.focus(); step(); tap(15);
+    assert.equal(h.events.selected.at(-1), 1); assert.equal(h.view.controllerOwner(), 'island:travel');
+    assert.equal(h.internal.journey.arrived, '1-1'); assert.equal(h.events.entered, 0);
+    tap(0); assert.equal(h.internal.journey.arrived, '1-2'); assert.equal(h.events.entered, 0, 'A skips travel but never also enters');
+    assert.equal(h.view.controllerOwner(), 'island:idle');
+    for (let n = 0; n < 10; n++) step(500);
+    assert.equal(h.events.entered, 0, 'Holding A across arrival cannot enter');
+    tap(0); assert.equal(h.events.entered, 1); tap(0); assert.equal(h.events.entered, 1, 'Existing entry gate is single use');
+    assert.deepEqual(save, original, 'Only the owning campaign may persist actual arrival');
+});
+
+test('controller map layers preserve preview locks, focused links and native modal ownership', async t => {
+    const h = mapDOM(t, true), save = freshSave(); await readyLand(h, save);
+    const before = structuredClone(save);
+    h.root.focus(); h.view.control('right'); assert.equal(h.events.selected.at(-1), 1);
+    assert.equal(h.internal.journey.arrived, '1-1'); h.view.control('confirm'); assert.equal(h.events.entered, 0);
+    h.root.focus(); h.view.control('regions'); assert.equal(h.internal.hud.regionMenu.hidden, false);
+    h.view.control('down'); h.view.control('back'); assert.equal(h.events.exited, 0);
+    assert.equal(h.active, h.internal.hud.regionButton);
+    h.root.focus(); h.view.control('overview'); assert.equal(h.internal.overview, true);
+    h.view.control('back'); assert.equal(h.internal.overview, false); assert.equal(h.events.exited, 0);
+    const link = h.get('world-map-delicia'); link.focus();
+    const selected = h.events.selected.length; assert.equal(h.view.controllerOwner(), null);
+    h.view.control('right'); h.view.control('confirm'); h.view.control('back');
+    assert.equal(h.events.selected.length, selected); assert.equal(h.events.entered, 0); assert.equal(h.events.exited, 0);
+    h.root.focus(); Object.assign(h.documentMock, { querySelector: () => ({ open: true }) });
+    assert.equal(h.view.controllerOwner(), null); h.view.control('confirm'); assert.equal(h.events.entered, 0);
+    Object.assign(h.documentMock, { querySelector: () => null }); h.view.control('back'); assert.equal(h.events.exited, 1);
+    assert.deepEqual(save, before); h.view.hide(); assert.equal(h.view.controllerOwner(), null);
 });

@@ -62,7 +62,7 @@ function worldFixture(t: TestContext) {
         getItem: () => null, setItem: (_key: string, value: string) => writes.push(value)
     } });
     const make = <T extends WorldGame>(Scene: new (canvas: HTMLCanvasElement) => T) => {
-        const game = new Scene(h.canvas as unknown as HTMLCanvasElement); h.own(() => game.dispose()); return game;
+        const game = new Scene(h.canvas as unknown as HTMLCanvasElement); h.own(() => game.dispose()); h.canvas.focus(); return game;
     };
     const game = make(WorldGame); game.enableGamepadControls();
     const step = () => game.update(STEP);
@@ -206,7 +206,7 @@ test('immediate keyboard pause and resume invalidate a held controller between s
     h.neutral(); h.step(); h.button(0); h.step(); assert.equal(h.game.input.getState().jumpPressed, true);
 });
 
-for (const screen of ['title', 'intro', 'map', 'settings', 'dialogue', 'clear', 'ending', 'gallery'] as const) {
+for (const screen of ['dialogue'] as const) {
     test(`${screen} never polls a controller or receives menu activation`, t => {
         const h = worldFixture(t); h.play();
         (h.game as unknown as { change(screen: string): void }).change(screen);

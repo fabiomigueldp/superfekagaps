@@ -7,7 +7,7 @@ import { advanceCampaignCamera } from './WorldCampaignCamera';
 import { runGuairaFlight } from './WorldGuairaFlight';
 import { ExperimentalHub } from './experimental/hub/ExperimentalHub';
 import { Input } from '../engine/Input';
-import { StandardGamepad } from '../engine/StandardGamepad';
+import { StandardGamepad, type GamepadMenuCommand } from '../engine/StandardGamepad';
 import { DisposalScope } from '../engine/DisposalScope';
 import { Renderer } from '../engine/Renderer';
 import { Player } from '../entities/Player';
@@ -37,6 +37,7 @@ type Screen = 'title' | 'intro' | 'map' | 'playing' | 'paused' | 'dialogue' | 'c
 interface Button extends Rect {
     label: string;
     run: () => void;
+    nativeActivation?: boolean;
 }
 interface FrozenMenuPaint {
     screen: Screen;
@@ -78,6 +79,7 @@ export class WorldGame {
     private accumulator = 0;
     private last: number | null = null;
     private buttons: Button[] = [];
+    private buttonsOwner = '';
     private menuAccessibility?: CanvasMenuAccessibility;
     private controlsHelp?: WorldControlsHelp;
     private journalAccessibility?: JournalAccessibility;
@@ -149,7 +151,7 @@ export class WorldGame {
                 this.menuAccessibility = new CanvasMenuAccessibility(canvas, {
                     select: index => { this.menuSelection = index; },
                     activate: index => { this.audio.unlock(); this.buttons[index]?.run(); },
-                    escape: () => this.menuKey(new KeyboardEvent('keydown', { key: 'Escape', cancelable: true })),
+                    escape: () => { this.audio.unlock(); this.backMenu(); },
                     resetInput: () => this.input.reset(),
                 });
                 this.addCleanup(() => this.menuAccessibility?.dispose());
@@ -298,25 +300,72 @@ export class WorldGame {
                 this.change('title');
             return;
         }
-        if (e.key === 'Escape') {
-            if (this.state === 'paused')
-                this.resume();
-            else if (this.state === 'settings')
-                this.closeSettings();
-            else if (this.state === 'dialogue')
-                this.closeDialogue();
-            else if (this.state === 'gallery')
-                this.backGallery();
-            else
-                this.toMap();
-            return;
-        }
+        if (e.key === 'Escape') { this.backMenu(); return; }
         if (e.key === 'ArrowDown' || e.key === 's')
             this.menuSelection = (this.menuSelection + 1) % Math.max(1, this.buttons.length);
         else if (e.key === 'ArrowUp' || e.key === 'w')
             this.menuSelection = (this.menuSelection + this.buttons.length - 1) % Math.max(1, this.buttons.length);
         else if (e.key === 'Enter' || e.key === ' ')
             this.buttons[this.menuSelection]?.run();
+    }
+    private backMenu(): void {
+        if (this.state === 'paused') this.resume();
+        else if (this.state === 'settings') this.closeSettings();
+        else if (this.state === 'dialogue') this.closeDialogue();
+        else if (this.state === 'gallery') this.backGallery();
+        else this.toMap();
+    }
+    private menuIdentity(): string {
+        return `${this.state}:${this.state === 'intro' ? this.introPage : this.state === 'gallery' ? this.galleryWorld : 0}`;
+    }
+    private controllerMenuOwner(): string | null {
+        if (this.state === 'playing' || this.state === 'dialogue' || this.mapCanvas.inert) return null;
+        if (this.state === 'map') {
+            const owner = this.mapView?.controllerOwner();
+            return owner ? `map:${owner}` : null;
+        }
+        return document.activeElement === this.mapCanvas || this.menuAccessibility?.canControl() ? this.menuIdentity() : null;
+    }
+    private controllerMenu(command: GamepadMenuCommand, owner: string): void {
+        // Re-check the live owner, never dispatch to an earlier rendered page.
+        if (owner !== this.controllerMenuOwner()) return;
+        if (this.state === 'map') { this.mapView?.control(command); return; }
+        if (command === 'pause') { if (this.state === 'paused') this.resume(); return; }
+        if (command === 'back') { if (this.state !== 'title') this.backMenu(); return; }
+        if (this.buttonsOwner !== this.menuIdentity() || !this.menuAccessibility?.canControl()) return;
+        if (command === 'confirm') {
+            const button = this.buttons[this.menuSelection];
+            if (!button || !this.menuAccessibility.focusFromController(this.menuSelection)) return;
+            if (button.nativeActivation) {
+                this.toast = 'Use Enter ou toque neste botão.'; this.toastTimer = 3500;
+                return;
+            }
+            this.audio.unlock(); button.run();
+        } else if (['up', 'down', 'left', 'right'].includes(command) && this.buttons.length) {
+            const direction = command === 'up' || command === 'left' ? -1 : 1;
+            const next = (this.menuSelection + direction + this.buttons.length) % this.buttons.length;
+            this.menuAccessibility.focusFromController(next);
+        }
+    }
+    private updateController(): boolean {
+        const gamepad = this.gamepad;
+        if (!gamepad) return false;
+        if (this.experimentalHub?.isOpen || this.controlsHelp?.isOpen || this.flightCleanup || this.saveImportCleanup
+            || document.querySelector?.('dialog[open]')) {
+            gamepad.update('inactive'); return false;
+        }
+        if (this.state === 'playing') {
+            if (gamepad.update('playing')) { this.pause(); return true; }
+            return false;
+        }
+        const owner = this.controllerMenuOwner(), command = gamepad.updateMenu(owner);
+        if (command && owner) {
+            this.controllerMenu(command, owner);
+            // Focus/repeat and ignored buttons must not steal simulation/audio time.
+            // Only an actual owner handoff ends this fixed step early.
+            return owner !== this.controllerMenuOwner();
+        }
+        return false;
     }
     private begin() {
         this.audio.unlock();
@@ -510,12 +559,10 @@ export class WorldGame {
     }
     update(dt: number) {
         if (this.isDisposed) return;
-        if (this.experimentalHub?.isOpen || this.controlsHelp?.isOpen) { this.input.reset(); return; }
-        const gamepadMode = !this.flightCleanup && (this.state === 'playing' || this.state === 'paused') ? this.state : 'inactive';
-        if (this.gamepad?.update(gamepadMode)) {
-            if (this.state === 'playing') this.pause(); else if (this.state === 'paused') this.resume();
-            return;
+        if (this.experimentalHub?.isOpen || this.controlsHelp?.isOpen) {
+            this.gamepad?.update('inactive'); this.input.reset(); return;
         }
+        if (this.updateController()) return;
         this.input.setMenuMode(this.state !== 'playing');
         this.input.update();
         if (this.input.consumeMute())
@@ -808,7 +855,7 @@ export class WorldGame {
         else
             this.toMap();
     }
-    private button(c: CanvasRenderingContext2D, label: string, x: number, y: number, w: number, run: () => void, accent = ART.goldLight) { const selected = this.buttons.length === this.menuSelection; panel(c, x, y, w, 17, selected ? '#334b62' : '#202d43', selected ? accent : '#637888'); pixelText(c, fitText(label, w - 10), x + w / 2, y + 5, selected ? accent : ART.paper, 1, 'center'); this.buttons.push({ label, x, y, width: w, height: 17, run }); }
+    private button(c: CanvasRenderingContext2D, label: string, x: number, y: number, w: number, run: () => void, accent = ART.goldLight, nativeActivation = false) { const selected = this.buttons.length === this.menuSelection; panel(c, x, y, w, 17, selected ? '#334b62' : '#202d43', selected ? accent : '#637888'); pixelText(c, fitText(label, w - 10), x + w / 2, y + 5, selected ? accent : ART.paper, 1, 'center'); this.buttons.push({ label, x, y, width: w, height: 17, run, nativeActivation }); }
     private heading(c: CanvasRenderingContext2D, small: string, big: string) { pixelText(c, small, 160, 12, '#c4d7d8', 1, 'center'); pixelText(c, big, 161, 29, '#343651', 2, 'center'); pixelText(c, big, 160, 27, '#ffdf94', 2, 'center'); }
     private text(c: CanvasRenderingContext2D, text: string, x: number, y: number, width: number, color: string = ART.paper) { wrapText(text, width).forEach((line, i) => pixelText(c, line, x, y + i * 10, color)); }
     render() {
@@ -850,7 +897,7 @@ export class WorldGame {
         this.paintCanvasIfNeeded();
         if (this.experimentalHub?.isOpen || this.flightCleanup || (typeof document !== 'undefined' && document.hidden) || this.state === 'playing')
             this.menuAccessibility?.clear({ restoreFocus: false });
-        else this.menuAccessibility?.sync(this.state, this.state === 'title' ? 'Menu principal' : this.state === 'settings' ? 'Opções' : this.state === 'paused' ? 'Pausa' : 'Aventura', this.buttons, this.menuSelection);
+        else this.menuAccessibility?.sync(this.menuIdentity(), this.state === 'title' ? 'Menu principal' : this.state === 'settings' ? 'Opções' : this.state === 'paused' ? 'Pausa' : 'Aventura', this.buttons, this.menuSelection);
     }
     private paintCanvasIfNeeded(): void {
         if (!this.frozenMenuOwner?.() || (this.state !== 'paused' && this.state !== 'settings')) {
@@ -876,7 +923,7 @@ export class WorldGame {
     }
     private paintCanvas(): void {
         this.renderer.startScene();
-        this.buttons = [];
+        this.buttons = []; this.buttonsOwner = this.menuIdentity();
         const c = this.renderer.getContext();
         if (['playing', 'paused', 'dialogue', 'clear'].includes(this.state))
             this.renderLevel(c);
@@ -895,7 +942,7 @@ export class WorldGame {
             this.button(c, 'CONTINUAR', 84, 68, 152, () => this.resume());
             this.button(c, 'VOLTAR AO MAPA', 84, 90, 152, () => this.toMap());
             this.button(c, 'OPÇÕES', 84, 112, 152, () => this.settings('paused'));
-            this.button(c, 'EXPORTAR PROGRESSO', 84, 134, 152, () => this.exportSave());
+            this.button(c, 'EXPORTAR PROGRESSO', 84, 134, 152, () => this.exportSave(), ART.goldLight, true);
         }
         if (this.state === 'dialogue' && this.dialog) {
             panel(c, 12, 104, 296, 69, '#202d43', '#aac1cd');
@@ -1115,8 +1162,8 @@ export class WorldGame {
         this.heading(c, 'DO SEU JEITO', 'OPÇÕES');
         const prefs = this.store.save.preferences;
         (['music', 'effects', 'voice'] as const).forEach((key, i) => { const label = ['MÚSICA', 'EFEITOS', 'VOZES'][i]; this.button(c, `${label}: ${Math.round(prefs[key] * 100)}%`, 62, 55 + i * 23, 196, () => { prefs[key] = prefs[key] >= .99 ? 0 : Math.min(1, Math.round((prefs[key] + .25) * 100) / 100); this.audio.volume(); this.store.persist(); }); });
-        this.button(c, 'EXPORTAR SAVE', 10, 127, 98, () => this.exportSave());
-        this.button(c, 'IMPORTAR SAVE', 112, 127, 98, () => this.importSave());
+        this.button(c, 'EXPORTAR SAVE', 10, 127, 98, () => this.exportSave(), ART.goldLight, true);
+        this.button(c, 'IMPORTAR SAVE', 112, 127, 98, () => this.importSave(), ART.goldLight, true);
         this.button(c, prefs.shake ? 'TREMOR: SIM' : 'TREMOR: NÃO', 214, 127, 96, () => { prefs.shake = !prefs.shake; this.store.persist(); });
         if (this.controlsHelp) this.button(c, 'CONTROLES', 10, 153, 98, () => this.controlsHelp?.open());
         this.button(c, 'VOLTAR', 114, 153, 92, () => this.closeSettings());
