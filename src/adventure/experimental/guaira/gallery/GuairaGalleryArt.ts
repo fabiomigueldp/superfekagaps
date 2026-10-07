@@ -3,6 +3,7 @@ import type { WorldLevel, WorldObjects } from '../../../WorldPhysics';
 import { TileType } from '../../../../constants';
 import { supportsStanding, isOneWayTile } from '../../../../world/tileRules';
 import { pixelText } from '../../../../graphics/BitmapFont';
+import { blockFragmentPose } from '../../../../graphics/blockImpactArt';
 
 /** Existing Guaíra clay, plaster, wood and iron hues; no texture payloads. */
 export const GALLERY_MATERIAL_COLORS = Object.freeze({
@@ -39,6 +40,43 @@ function clayCover(c: CanvasRenderingContext2D, x: number, y: number, alternate:
     line(c, x + (alternate ? 9 : 5), y + 7, x + (alternate ? 14 : 1), y + 9, P.fracture);
     r(c, x + 2, y + 14, 3, 1, P.clayLight);
     r(c, x + 10, y + 14, 3, 1, P.clayLight);
+}
+
+// Thin, irregular flakes with a pale exposed edge, never miniature brick tiles.
+// Pixel rotations are prepared once, without canvas/DOM assets or per-hit state.
+const clayShardTurns = [['__ll__', '_lccs_', 'lccss_', '_css__', '__s___', '______']];
+for (let turn = 1; turn < 4; turn++) {
+    const previous = clayShardTurns[turn - 1];
+    clayShardTurns.push(previous[0].split('').map((_, x) => previous.map(row => row[x]).reverse().join('')));
+}
+const clayShardColors: Record<string, string> = { l: P.fractureLight, c: P.clay, s: P.clayShade };
+
+/** Native collision already erased the cover. Reuse its bounded, simulation-aged
+ * event only for loose clay, so paint cannot restore support or delay the hole. */
+function drawClayImpacts(c: CanvasRenderingContext2D, level: WorldLevel, cx: number, cy: number, reducedMotion: boolean) {
+    for (const impact of level.blockImpacts.active) {
+        if (impact.kind !== 'break' || reducedMotion && impact.age >= 120) continue;
+        const x = level.colToWorldX(impact.col) - cx, y = level.rowToWorldY(impact.row) - cy;
+        // Include downward pieces entering from a cover above the viewport.
+        if (x < -64 || x > 368 || y < -128 || y > 212) continue;
+        c.save();
+        for (let i = 0; i < 4; i++) {
+            const pose = blockFragmentPose(impact, i, reducedMotion);
+            c.globalAlpha = pose.alpha;
+            const frame = clayShardTurns[pose.turn];
+            for (let yy = 0; yy < frame.length; yy++) for (let xx = 0; xx < frame[yy].length; xx++) {
+                const color = clayShardColors[frame[yy][xx]];
+                if (color) r(c, x + pose.x + xx, y + pose.y + yy, 1, 1, color);
+            }
+        }
+        if (!reducedMotion && impact.age < 90) {
+            c.globalAlpha = 1 - impact.age / 90;
+            const edge = y + (impact.direction === 'down' ? 0 : 16);
+            r(c, x + 5, edge, 2, 1, P.fractureLight);
+            r(c, x + 10, edge, 1, 1, P.clayLight);
+        }
+        c.restore();
+    }
 }
 
 function returnBoard(c: CanvasRenderingContext2D, x: number, y: number, left: boolean, right: boolean) {
@@ -101,7 +139,7 @@ function servicePartition(c: CanvasRenderingContext2D, x: number, y: number, row
 
 /** Presentation reads native tiles on every render, so partial holes and head
  * bumps cannot leave an obsolete cover or an invented support on screen. */
-export function drawGalleryTerrain(c: CanvasRenderingContext2D, level: WorldLevel, cx: number, cy: number) {
+export function drawGalleryTerrain(c: CanvasRenderingContext2D, level: WorldLevel, cx: number, cy: number, reducedMotion = false) {
     layer(c, cx, cy, (cameraX, cameraY) => {
         const firstCol = Math.max(0, level.worldToCol(cameraX)), lastCol = Math.min(level.data.width - 1, level.worldToCol(cameraX + 319));
         const firstRow = Math.max(0, level.worldToRow(cameraY + 23)), lastRow = Math.min(level.data.height - 1, level.worldToRow(cameraY + 179));
@@ -131,6 +169,7 @@ export function drawGalleryTerrain(c: CanvasRenderingContext2D, level: WorldLeve
             if (upperPartition) { servicePartition(c,x,y,row,!solid(col,row + 1)); continue; }
             masonry(c, x, y, col, row, !solid(col, row - 1), !solid(col - 1, row), !solid(col + 1, row), !solid(col, row + 1));
         }
+        drawClayImpacts(c, level, cameraX, cameraY, reducedMotion);
     });
 }
 

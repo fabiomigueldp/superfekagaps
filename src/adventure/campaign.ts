@@ -1,5 +1,6 @@
 import { TileType as T } from '../constants';
 import { CAMPAIGN_JUMP_COINS } from './campaignJumpCoins';
+import { CAMPAIGN_FINISH_REWARDS } from './campaignFinishRewards';
 import { EnemyType } from '../types';
 import { CARGO_CARRIER_PROFILE, SERRA_CARRIER_PROFILE } from './WorldCarrierMotion';
 import type { AdventureStage, Island, MechanismSpec, FoeKind, EncounterId, Character, Landmark, Dialogue } from './types';
@@ -124,7 +125,8 @@ class Draft {
     arc(x: number, y: number, count = 5) { for (let i = 0; i < count; i++)
         this.s.pickups.push({ id: `${this.s.id}:c${this.s.pickups.length}`, kind: 'coin', x: (x + i) * 16, y: (y - Math.sin(i / (count - 1) * Math.PI) * 2) * 16 }); return this; }
     done() {
-        for (const [id, x, y] of CAMPAIGN_JUMP_COINS[this.s.id] ?? []) {
+        const finishReward = CAMPAIGN_FINISH_REWARDS[this.s.id];
+        for (const [id, x, y] of [...(CAMPAIGN_JUMP_COINS[this.s.id] ?? []), ...(finishReward ? [finishReward] : [])]) {
             const pickup = this.s.pickups.find(p => p.id === id && p.kind === 'coin');
             if (pickup) { pickup.x = x; pickup.y = y; }
         }

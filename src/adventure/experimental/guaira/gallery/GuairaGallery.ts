@@ -21,7 +21,7 @@ export class GuairaGallery extends WorldGame {
             this.addCleanup(() => { this.finished = false; this.store.save.checkpoint = null; this.input.reset(); });
             this.reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
             this.art.background = (c, _island, cx, cy, time) => drawGalleryBackground(c, cx, cy, time, this.reducedMotion);
-            this.art.terrain = (c, level, _island, cx, cy) => drawGalleryTerrain(c, level, cx, cy);
+            this.art.terrain = (c, level, _island, cx, cy, _time, reducedMotion) => drawGalleryTerrain(c, level, cx, cy, reducedMotion);
             this.art.genericStructures = false;
             this.art.objects = (c, objects, cx, cy, time) => drawGalleryObjects(c, objects, cx, cy, time, this.reducedMotion);
             this.store.save.preferences.shake = !this.reducedMotion;

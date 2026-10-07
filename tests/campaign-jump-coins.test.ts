@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { STAGES, stageById } from '../src/adventure/campaign';
 import { CAMPAIGN_JUMP_COINS } from '../src/adventure/campaignJumpCoins';
+import { CAMPAIGN_FINISH_REWARDS } from '../src/adventure/campaignFinishRewards';
 import { CAMPAIGN_JUMP_PLANS } from '../scripts/lib/campaignJumpPlans';
 import { traceJump, traceCarrierRide, sampleJumpCoins, collectedOnTrace } from '../scripts/lib/jumpCoinTrajectory';
 import { isSolidTile } from '../src/world/tileRules';
@@ -50,13 +51,16 @@ for (const plan of CAMPAIGN_JUMP_PLANS) {
     }
 }
 
-test('calibration preserves every existing pickup ID/count and all non-arc placements', () => {
+test('calibration preserves every pickup ID/count and non-arc placements except reviewed finish rewards', () => {
     assert.equal(CAMPAIGN_JUMP_PLANS.length, 25);
     assert.equal(Object.keys(CAMPAIGN_JUMP_COINS).length, 13);
     for (const stage of STAGES) {
         const old = (baseline as Record<string, (string | number)[][]>)[stage.id];
         const moved = new Set((CAMPAIGN_JUMP_COINS[stage.id] ?? []).map(([id]) => id));
         assert.deepEqual(stage.pickups.map(p => [p.id, p.kind]), old.map(p => p.slice(0, 2)), `${stage.id}: IDs and ordering are stable`);
-        assert.deepEqual(stage.pickups.filter(p => !moved.has(p.id)).map(p => [p.id, p.kind, p.x, p.y]), old.filter(p => !moved.has(String(p[0]))), `${stage.id}: preserve seals, equipment, intentional trails and route cues`);
+        assert.deepEqual(stage.pickups.filter(p => !moved.has(p.id)).map(p => [p.id, p.kind, p.x, p.y]), old.filter(p => !moved.has(String(p[0]))).map(p => {
+            const finish = CAMPAIGN_FINISH_REWARDS[stage.id];
+            return finish && p[0] === finish[0] ? [p[0], p[1], finish[1], finish[2]] : p;
+        }), `${stage.id}: preserve seals, equipment, intentional trails and every other route cue`);
     }
 });

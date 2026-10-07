@@ -21,7 +21,7 @@ import { YASMIN_FRAMES, SPRITE_PALETTE } from '../graphics/sprites';
 import { ISLANDS, STAGES, stageById } from './campaign';
 import { ProgressStore, isUnlocked, finishStage, isGuairaUnlocked, canContinueFromGuaira } from './progress';
 import { WorldArt, rect } from './WorldArt';
-import { drawWorldCheckpoint } from './WorldCheckpointArt';
+import { drawWorldCheckpoint, drawWorldGoal } from './WorldCheckpointArt';
 import { drawLandmarks } from './WorldScenery';
 import { WorldAudio } from './WorldAudio';
 import { combatSparks, type CombatCue, type WorldSpark } from './WorldCombatFeedback';
@@ -87,6 +87,7 @@ export class WorldGame {
     private menuSelection = 0;
     private checkpoint = -1;
     private checkpointHelmet = false;
+    private checkpointActivatedAt: number | null = null;
     private collected = new Set<string>();
     private spoken = new Set<string>();
     private sparks: WorldSpark[] = [];
@@ -427,6 +428,7 @@ export class WorldGame {
         this.tutorial.resetAttempt();
         this.checkpoint = -1;
         this.checkpointHelmet = false;
+        this.checkpointActivatedAt = null;
         this.elapsed = 0;
         this.coins = 0;
         this.recordEligible = true;
@@ -800,6 +802,7 @@ export class WorldGame {
         this.stage.checkpoints.forEach((cp, i) => {
             if (i > this.checkpoint && Math.abs(p.x - cp.x * 16) < 20 && Math.abs(p.y + p.height - cp.y * 16) < 24) {
                 this.checkpoint = i;
+                this.checkpointActivatedAt = this.time;
                 this.checkpointHelmet = this.player.data.hasHelmet;
                 this.store.save.checkpoint = { stage: this.stage.id, index: i, helmet: this.checkpointHelmet };
                 const saved = this.store.persist();
@@ -962,6 +965,11 @@ export class WorldGame {
             pixelText(c, `${Math.round(this.elapsed)} S  ·  ${this.coins} MOEDAS`, 160, 94, '#a7c9d0', 1, 'center');
             if (!this.recordEligible)
                 pixelText(c, 'TEMPO PARCIAL · SEM RECORDE', 160, 106, '#a7c9d0', 1, 'center');
+            // The immediate result panel covers the world flag; keep its earned
+            // celebration visible here without delaying completion or rewards.
+            drawWorldGoal(c, 237, 101, this.clearSecret, false, true, {
+                time: this.time, reducedMotion: this.renderer.reducedMotion, activationAge: this.clearTimer,
+            });
             this.button(c, this.stage.id === '6-5' ? 'O GRANDE FINAL' : 'SEGUIR VIAGEM', 86, 120, 148, () => this.afterClear());
         }
         const cue = this.state === 'playing' && this.toastTimer <= 0 ? this.tutorial.cue(this.stage, this.player.data, this.touch) : null;
@@ -994,18 +1002,21 @@ export class WorldGame {
         this.art.terrain(c, this.level, island, cx, cy, this.time, this.renderer.reducedMotion);
         drawLandmarks(c, this.stage, cx, cy, this.time, true);
         this.art.objects(c, this.objects, cx, cy, this.time, this.stage.world, this.level, false);
-        this.stage.checkpoints.forEach((cp, i) =>
-            drawWorldCheckpoint(c, cp.x * 16 - cx, cp.y * 16 - cy, this.checkpoint >= i));
+        this.stage.checkpoints.forEach((cp, i) => {
+            const x = cp.x * 16 - cx, y = cp.y * 16 - cy;
+            if (x < -40 || x > 335 || y < -16 || y > 224) return;
+            drawWorldCheckpoint(c, x, y, this.checkpoint >= i, {
+                time: this.time, reducedMotion: this.renderer.reducedMotion,
+                activationAge: i === this.checkpoint && this.checkpointActivatedAt != null ? this.time - this.checkpointActivatedAt : null,
+            });
+        });
         for (const exit of this.stage.exits) {
             const x = exit.x - cx, y = exit.y - cy;
-            if (exit.requires && !this.objects.get(exit.requires)?.active) {
-                rect(c, x, y, 20, 36, '#547187');
-                pixelText(c, '↓', x + 10, y + 8, '#f5dca0', 1, 'center');
-                continue;
-            }
-            rect(c, x + 8, y, 2, 40, '#f2dcc0');
-            rect(c, x + 10, y + 1, 17, 12, exit.id === 'secret' ? '#b48ddc' : '#e57e76');
-            pixelText(c, exit.id === 'secret' ? '?' : '★', x + 18, y + 4, '#fff1c9', 1, 'center');
+            if (x < -48 || x > 335 || y < -48 || y > 184) continue;
+            const complete = this.state === 'clear' && (exit.id === 'secret') === this.clearSecret;
+            drawWorldGoal(c, x, y, exit.id === 'secret', !!exit.requires && !this.objects.get(exit.requires)?.active, complete, {
+                time: this.time, reducedMotion: this.renderer.reducedMotion, activationAge: complete ? this.clearTimer : null,
+            });
         }
         for (const item of this.stage.pickups) {
             if (this.collected.has(item.id))

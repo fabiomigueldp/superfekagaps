@@ -27,6 +27,10 @@ export class DeliciaSimulation {
         this.boss=stage.boss?new DeliciaBoss(stage.boss,assists):null;
         this.enemies=stage.enemies.map((e,i)=>({...e,w:e.kind==='roller'?46:38,h:e.kind==='wasp'?30:44,home:e.x,vx:i%2?-55:55,hp:e.kind==='sentinel'?3:e.kind==='mimic'?2:1,timer:0,state:'walk',phase:i*.73}));
         if(checkpoint>=0&&checkpoint<stage.checkpoints.length){this.checkpoint=checkpoint;this.safeX=stage.checkpoints[checkpoint].x;this.safeY=stage.checkpoints[checkpoint].y;this.player.x=this.safeX;this.player.y=this.safeY;}
+        // Resume at the normal resting frame before the first paint. Starting at
+        // the stage origin hides distant checkpoints while the live game runs.
+        this.cameraX=Math.max(0,Math.min(Math.max(0,stage.width-960),this.player.x-350));
+        this.cameraY=this.boss?0:Math.max(0,Math.min(Math.max(0,stage.height-540),this.player.y-390));
     }
     startBoss():void{this.boss?.start();}
     get gateOpen():boolean{return this.boss?this.boss.hp<=0:this.stage.valves.every(v=>this.valves.has(v.id));}
