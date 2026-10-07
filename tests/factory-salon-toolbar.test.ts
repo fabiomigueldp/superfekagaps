@@ -224,18 +224,35 @@ test('pause keyboard navigation, help dismissal and repeated visits keep one foc
     assert.equal(JSON.stringify(h.game.store.save), saved); assert.equal(h.writes.length, writes);
 });
 
-test('top canvas touch opens the same pause without leaving held movement or repeating actions', t => {
-    const h = browser(t); h.game.enterSalon(); const lab = h.session();
-    const canvas = h.doc.activeElement!;
-    canvas.dispatch('pointerdown', { clientX: 100, clientY: 10 });
-    assert.equal(lab.state, 'paused'); assert.equal(h.menu().hidden, false);
-    assert.equal(h.doc.activeElement, h.button('Continuar'));
-    assert.ok(Object.values(lab.input.getState()).every(value => value === false));
-    h.button('Continuar').click();
-    assert.equal(lab.state, 'playing'); assert.equal(h.doc.activeElement, canvas);
-    const event = h.shell().dispatch('keydown', { key: 'Escape', repeat: false, ctrlKey: true });
-    assert.equal(event.defaultPrevented, false); assert.equal(lab.state, 'playing');
-});
+for (const pointerType of ['mouse', 'touch', 'pen']) {
+    test(`top canvas ${pointerType} pause keeps menu focus after pointer default dispatch`, t => {
+        const h = browser(t); h.game.enterSalon(); const lab = h.session();
+        const canvas = h.doc.activeElement!;
+        const pointer = (clientY: number) => {
+            const event = canvas.dispatch('pointerdown', { clientX: 100, clientY, pointerType, isPrimary: true });
+            // Browsers apply pointer default focus after listeners finish. The
+            // native EventTarget harness has no UA default actions of its own.
+            if (!event.defaultPrevented) canvas.focus();
+            return event;
+        };
+        for (let pause = 0; pause < 2; pause++) {
+            const event = pointer(10);
+            assert.equal(lab.state, 'paused'); assert.equal(h.menu().hidden, false);
+            assert.equal(h.doc.activeElement, h.button('Continuar'), 'Default pointer focus must not reclaim the canvas');
+            assert.equal(event.defaultPrevented, true);
+            assert.ok(Object.values(lab.input.getState()).every(value => value === false));
+            h.shell().dispatch('keydown', { key: 'ArrowDown', repeat: false });
+            assert.equal(h.doc.activeElement, h.button('Pular cena'), 'Keyboard navigation starts from Continuar immediately');
+            h.button('Continuar').click();
+            assert.equal(lab.state, 'playing'); assert.equal(h.doc.activeElement, canvas);
+        }
+        const gameplay = pointer(100);
+        assert.equal(gameplay.defaultPrevented, false, 'Ordinary gameplay pointer defaults remain available');
+        assert.equal(lab.state, 'playing'); assert.equal(h.doc.activeElement, canvas);
+        const shortcut = h.shell().dispatch('keydown', { key: 'Escape', repeat: false, ctrlKey: true });
+        assert.equal(shortcut.defaultPrevented, false); assert.equal(lab.state, 'playing');
+    });
+}
 
 test('real campaign host records the walked presentation once and preserves it across pause, exit and reentry', t => {
     const h = browser(t), initialWrites = h.writes.length;

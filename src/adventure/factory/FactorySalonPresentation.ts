@@ -91,7 +91,10 @@ export class FactorySalonPresentation {
             } else if (e.repeat && (e.key === 'Enter' || e.key === ' ')) e.preventDefault();
         });
         events.listen(shell, 'cancel', e => { e.preventDefault(); lab.toggleLabPause(); this.sync(); });
-        events.listen(canvas, 'pointerdown', () => {
+        events.listen(canvas, 'pointerdown', event => {
+            // WorldGame's earlier handler pauses on a top-zone press. Cancel
+            // the browser's later canvas focus so it cannot undo menu focus.
+            if (lab.state === 'paused') event.preventDefault();
             this.sync(); if (lab.state === 'playing') canvas.focus({ preventScroll: true });
         });
     }
