@@ -195,6 +195,7 @@ export class WorldMapHud {
     readonly header = element('header', 'world-map-header');
     readonly tools = element('div', 'world-map-tools');
     readonly footer = element('footer', 'world-map-footer');
+    readonly chapterLinks = element('div', 'world-map-chapter-links');
     readonly stageButtons: HTMLButtonElement[] = [];
     readonly overviewButtons: HTMLButtonElement[] = [];
     /** Legacy destination order: Costa, Porto. Both are ferry actions. */
@@ -352,7 +353,7 @@ export class WorldMapHud {
         this.announcer.setAttribute('role', 'status'); this.announcer.setAttribute('aria-live', 'polite');
         this.announcer.setAttribute('aria-atomic', 'true');
         this.stageTitle.append(this.compactDetails);
-        this.footer.append(this.stageTitle, copy, actions, this.warning);
+        this.footer.append(this.chapterLinks, this.stageTitle, copy, actions, this.warning);
         this.root.append(this.scene, this.header, this.footer, this.regionMenu, this.announcer);
         this.root.addEventListener('keydown', this.onKey);
         this.root.addEventListener('pointerdown', this.onPointer);

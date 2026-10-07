@@ -293,7 +293,7 @@ export class WorldMapView {
         const deliciaLink = document.createElement('a');
         deliciaLink.href = DELICIA_ENTRY; deliciaLink.className = 'world-map-delicia';
         deliciaLink.setAttribute('aria-label', 'Império da Delícia');
-        const dlLabel = lettering('Império da Delícia', ART.goldLight); deliciaLink.append(dlLabel); this.scene.append(deliciaLink);
+        const dlLabel = lettering('Império da Delícia', ART.goldLight); deliciaLink.append(dlLabel); this.hud.chapterLinks.append(deliciaLink);
         this.deliciaPin.href = DELICIA_ENTRY; this.deliciaPin.className = 'world-map-delicia-island';
         this.deliciaPin.setAttribute('aria-label', 'Império da Delícia'); this.deliciaPin.append(lettering('Império da Delícia', ART.goldLight)); this.deliciaPin.hidden = true; this.scene.append(this.deliciaPin);
         if (callbacks.guaira) {

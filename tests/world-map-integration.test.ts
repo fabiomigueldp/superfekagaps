@@ -694,6 +694,9 @@ test('native map links retain activation after drawer dismissal and map reopenin
         if (overview) h.get('world-map-overview').click();
         const link = h.get('world-map-delicia'), saved = structuredClone(save);
         assert.equal(link.href, './delicia.html');
+        assert.equal(link.parent, h.get('world-map-chapter-links'));
+        assert.equal(link.parent?.parent, h.get('world-map-footer'), 'Shortcut must participate in the observed footer height.');
+        assert.equal(h.get('world-map-footer').children[0], link.parent, 'Shortcut precedes stage content in visual and keyboard order.');
         for (let visit = 0; visit < 2; visit++) {
             h.view.render(0, save, 100 + visit * 100, '');
             h.internal.hud.regionButton.click();
