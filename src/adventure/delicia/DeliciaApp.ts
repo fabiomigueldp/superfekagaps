@@ -28,6 +28,8 @@ export class DeliciaApp {
     private cleanups:(()=>void)[]=[];private mapCanvas?:HTMLCanvasElement;private mapControls:HTMLButtonElement[]=[];
     private hitStop=0;private zoneBanner='';private zoneBannerTime=0;private gamepadPause=false;
     private menuPad=new Set<string>();
+    private windowFocused=typeof document.hasFocus!=='function'||document.hasFocus();
+    private padArmed=false;private padDevice:string|null=null;
     private padMenuLatch=new Set<string>();
     constructor(host:HTMLElement=document.body){
         if(navigator.maxTouchPoints>0)this.root.classList.add('dl-has-touch');
@@ -36,8 +38,11 @@ export class DeliciaApp {
         this.ctx=this.canvas.getContext('2d',{alpha:false})!;this.status.setAttribute('role','status');this.status.setAttribute('aria-live','polite');
         this.hud.hidden=true;this.touch.hidden=true;this.playfield.append(this.canvas,this.hud);this.surface.append(this.playfield,this.panel,this.touch);this.root.append(this.surface,this.status);host.append(this.root);
         this.audio.setVolume(this.store.save.music,this.store.save.effects);this.canvas.hidden=true;this.buildTouch();this.showTitle();
-        this.listen(window,'keydown',this.keyDown);this.listen(window,'keyup',this.keyUp);this.listen(window,'blur',()=>this.loseFocus());this.listen(document,'visibilitychange',()=>{
-            this.stopFrames();if(document.hidden)this.loseFocus();else{this.invalidatePausedPaint();this.requestFrame();}
+        this.listen(window,'keydown',this.keyDown);this.listen(window,'keyup',this.keyUp);this.listen(window,'blur',()=>{this.windowFocused=false;this.loseFocus();});
+        this.listen(window,'focus',()=>{this.windowFocused=true;this.disarmGamepad();});
+        for(const event of ['gamepadconnected','gamepaddisconnected'])this.listen(window,event,()=>{this.padDevice=null;this.disarmGamepad();});
+        this.listen(document,'visibilitychange',()=>{
+            this.stopFrames();this.disarmGamepad();if(document.hidden)this.loseFocus();else{this.invalidatePausedPaint();this.requestFrame();}
         });
         this.listen(window,'pointerup',(e:PointerEvent)=>this.releaseInput(`pointer:${e.pointerId}`));this.listen(window,'pointercancel',(e:PointerEvent)=>this.releaseInput(`pointer:${e.pointerId}`,true));
         this.listen(this.canvas,'pointerdown',()=>this.canvas.focus({preventScroll:true}));this.listen(window,'pagehide',()=>this.dispose());
@@ -98,13 +103,30 @@ export class DeliciaApp {
     private goBack():void {
         if(this.screen==='playing')this.pause();else if(this.screen==='pause')this.resume();else if(this.screen==='dialogue')this.advanceDialogue();else if(this.screen==='journal')this.closeJournal();else if(this.screen==='settings')this.settingsReturn();else if(this.screen==='menu')this.showMap();else if(this.screen==='map'){if(this.listOpen)this.toggleStageList();else this.showMenu();}
     }
-    private loseFocus():void{this.resetInput();if(this.screen==='playing')this.pause();}
+    private loseFocus():void{this.disarmGamepad();this.resetInput();if(this.screen==='playing')this.pause();}
     private input():DeliciaInput{
         const down=(...keys:string[])=>keys.some(k=>this.held.has(k)),tap=(...keys:string[])=>keys.some(k=>this.pressed.has(k));
         return{left:down('arrowleft','a','pad-left'),right:down('arrowright','d','pad-right'),jump:down(' ','w','z','arrowup','pad-jump'),jumpPressed:tap(' ','w','z','arrowup','pad-jump'),jumpReleased:[' ','w','z','arrowup','pad-jump'].some(k=>this.released.has(k)),dash:tap('shift','x','pad-dash'),pound:tap('s','arrowdown','pad-pound'),seed:tap('j','pad-seed'),parry:tap('q','pad-parry'),interact:tap('e','pad-interact')};
     }
+    /** Interrupt only this controller; keyboard/touch owners retain their inputs. */
+    private disarmGamepad():void{
+        this.padArmed=false;this.gamepadPause=false;this.menuPad.clear();this.padMenuLatch.clear();
+        for(const source of this.sources.keys())if(source.startsWith('gamepad:'))this.releaseInput(source,true);
+    }
     private pollGamepad():void {
-        let pad:Gamepad|undefined;try{pad=Array.from(navigator.getGamepads?.()??[]).find((p):p is Gamepad=>!!p&&p.mapping==='standard');}catch{}
+        if(this.disposed)return;
+        if(document.hidden||!this.windowFocused||(typeof document.hasFocus==='function'&&!document.hasFocus())){this.disarmGamepad();return;}
+        let pad:Gamepad|undefined;try{pad=Array.from(navigator.getGamepads?.()??[]).find((p):p is Gamepad=>!!p&&p.connected!==false&&p.mapping==='standard');}catch{}
+        if(!pad){this.padDevice=null;this.disarmGamepad();return;}
+        const device=`${pad.index}:${pad.id}`;
+        if(device!==this.padDevice){this.padDevice=device;this.disarmGamepad();}
+        // Returning/connecting with controls held must never activate a menu or
+        // resume gameplay. Require raw neutral, including opposed directions.
+        if(!this.padArmed){
+            this.padArmed=![0,1,2,3,4,5,9,12,13,14,15].some(index=>pad.buttons[index]?.pressed)
+                &&[0,1].every(index=>Math.abs(pad.axes[index]??0)<=.25);
+            return;
+        }
         const down=(i:number)=>!!pad?.buttons[i]?.pressed,wasMenu=this.screen!=='playing';
         const menuKeys:Record<string,boolean>={up:(pad?.axes[1]??0)<-.5||down(12),down:(pad?.axes[1]??0)>.5||down(13),left:(pad?.axes[0]??0)<-.5||down(14),right:(pad?.axes[0]??0)>.5||down(15),accept:down(0),back:down(1)};
         const taps=new Set(Object.keys(menuKeys).filter(key=>menuKeys[key]&&!this.menuPad.has(key)));this.menuPad=new Set(Object.keys(menuKeys).filter(key=>menuKeys[key]));

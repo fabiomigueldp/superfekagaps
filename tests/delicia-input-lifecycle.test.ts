@@ -7,7 +7,8 @@ import ts from 'typescript';
 import type { DeliciaInput, DeliciaSimulation } from '../src/adventure/delicia/DeliciaSimulation';
 
 /** DOM/event boundaries only. Constructor, registered handlers, loop and simulation are real. */
-function fixture(t: TestContext) {
+function fixture(t: TestContext, initiallyFocused = true) {
+    let focused = initiallyFocused;
     let activeElement: Element | null = null;
     class Element extends EventTarget {
         className = ''; dataset: Record<string, string> = {}; hidden = false; disabled = false;
@@ -41,11 +42,11 @@ function fixture(t: TestContext) {
     }
     const body = new Element('body'), window = new EventTarget();
     const document = Object.assign(new EventTarget(), { body, hidden: false, title: '',
-        createElement: (tag: string) => new Element(tag) });
+        hasFocus: () => focused, createElement: (tag: string) => new Element(tag) });
     Object.defineProperty(document, 'activeElement', { get: () => activeElement });
     let nextFrame: FrameRequestCallback = () => {}, now = 1000;
     let connected = true;
-    const pad = { mapping: 'standard', axes: [0, 0], buttons: Array.from({ length: 16 }, () => ({ pressed: false })) };
+    const pad = { index: 0, id: 'test-pad', connected: true, mapping: 'standard', axes: [0, 0], buttons: Array.from({ length: 16 }, () => ({ pressed: false })) };
     const original = new Map<string, PropertyDescriptor | undefined>();
     for (const [name, value] of Object.entries({ window, document,
         navigator: { maxTouchPoints: 1, getGamepads: () => connected ? [pad] : [] },
@@ -97,7 +98,9 @@ function fixture(t: TestContext) {
     const button = (key: string) => { const b = app.touch.all().find(node => node.dataset.key === key); assert.ok(b); return b; };
     const frame = () => { now += 1000 / 60; nextFrame(now); };
     frame();
-    return { app, create, window, document, body, key, pointer, button, frame, pad, disconnect: () => { connected = false; } };
+    return { app, create, window, document, body, key, pointer, button, frame, pad,
+        focus: (value: boolean, notify = true) => { focused = value; if (notify) window.dispatchEvent(new Event(value ? 'focus' : 'blur')); },
+        disconnect: () => { connected = false; }, connect: () => { connected = true; } };
 }
 function neutral(input: DeliciaInput) { assert.ok(Object.values(input).every(value => value === false), JSON.stringify(input)); }
 
@@ -213,4 +216,84 @@ test('disposal removes retained button handlers and a new visit starts without s
     h.key('keydown', 'Enter', oldJump); h.pointer('pointerdown', oldJump); h.key('keyup', ' '); neutral(h.app.input());
     const next = h.create(); h.key('keyup', 'Enter'); h.pointer('pointerup', oldJump); h.frame(); neutral(next.input());
     h.key('keydown', 'w', next.canvas); assert.equal(next.input().jumpPressed, true); neutral(h.app.input());
+});
+
+for (const index of [0, 1, 9]) test(`unfocused controller button ${index} cannot resume and requires neutral after return`, t => {
+    const h = fixture(t); h.focus(false); const position = h.app.sim.player.x;
+    h.pad.buttons[index].pressed = true; h.frame(); h.frame();
+    assert.equal(h.app.screen, 'pause'); assert.equal(h.app.sim.player.x, position); neutral(h.app.input());
+    h.focus(true); h.frame(); assert.equal(h.app.screen, 'pause'); neutral(h.app.input());
+    h.pad.buttons[index].pressed = false; h.frame();
+    h.pad.buttons[index].pressed = true; h.frame(); assert.equal(h.app.screen, 'playing');
+});
+
+for (const index of [0, 1, 9]) test(`button ${index} held while hidden cannot activate on visibility return`, t => {
+    const h = fixture(t); h.document.hidden = true; h.document.dispatchEvent(new Event('visibilitychange'));
+    h.pad.buttons[index].pressed = true; h.document.hidden = false; h.document.dispatchEvent(new Event('visibilitychange')); h.frame();
+    assert.equal(h.app.screen, 'pause'); neutral(h.app.input());
+    h.pad.buttons[index].pressed = false; h.frame(); h.pad.buttons[index].pressed = true; h.frame();
+    assert.equal(h.app.screen, 'playing');
+});
+
+for (const held of ['dpad', 'stick-x', 'stick-y', 'opposed']) test(`interruption requires raw ${held} neutral before accepting another controller action`, t => {
+    const h = fixture(t); h.focus(false);
+    if (held === 'dpad' || held === 'opposed') h.pad.buttons[15].pressed = true;
+    if (held === 'opposed') h.pad.buttons[14].pressed = true;
+    if (held === 'stick-x') h.pad.axes[0] = .6;
+    if (held === 'stick-y') h.pad.axes[1] = -.6;
+    h.focus(true); h.frame(); h.pad.buttons[9].pressed = true; h.frame();
+    assert.equal(h.app.screen, 'pause'); neutral(h.app.input());
+    h.pad.buttons.forEach(button => button.pressed = false); h.pad.axes.fill(0); h.frame();
+    h.pad.buttons[9].pressed = true; h.frame(); assert.equal(h.app.screen, 'playing');
+});
+
+for (const index of [0, 1, 9]) test(`reconnected controller button ${index} requires neutral and preserves keyboard ownership`, t => {
+    const h = fixture(t); h.disconnect(); h.frame(); h.app.pause(); h.pad.buttons[index].pressed = true; h.connect(); h.frame();
+    assert.equal(h.app.screen, 'pause'); neutral(h.app.input());
+    h.pad.buttons[index].pressed = false; h.frame(); h.pad.buttons[index].pressed = true; h.frame();
+    assert.equal(h.app.screen, 'playing');
+    h.key('keydown', 'd'); h.disconnect(); h.frame(); assert.equal(h.app.input().right, true);
+    h.key('keyup', 'd');
+});
+
+test('a newly constructed unfocused app ignores controller actions until focus and neutral', t => {
+    const h = fixture(t, false); h.app.pause(); h.pad.buttons[9].pressed = true; h.frame();
+    assert.equal(h.app.screen, 'pause'); h.focus(true); h.frame(); assert.equal(h.app.screen, 'pause');
+    h.pad.buttons[9].pressed = false; h.frame(); h.pad.buttons[9].pressed = true; h.frame();
+    assert.equal(h.app.screen, 'playing');
+});
+
+for (const index of [0, 1, 9]) test(`ordinary focused pause button ${index} retains its behavior`, t => {
+    const h = fixture(t); h.app.pause(); h.pad.buttons[index].pressed = true; h.frame();
+    assert.equal(h.app.screen, 'playing');
+});
+
+test('disposed app stays inert through focus and connection events', t => {
+    const h = fixture(t); h.focus(false); h.app.dispose(); const screen = h.app.screen;
+    h.pad.buttons[9].pressed = true; h.focus(true); h.window.dispatchEvent(new Event('gamepadconnected')); h.frame();
+    assert.equal(h.app.screen, screen); neutral(h.app.input());
+});
+
+test('connection events disarm held controls even when disconnect and reconnect occur between frames', t => {
+    const h = fixture(t); h.app.pause();
+    h.pad.buttons[9].pressed = true; h.window.dispatchEvent(new Event('gamepaddisconnected')); h.window.dispatchEvent(new Event('gamepadconnected')); h.frame();
+    assert.equal(h.app.screen, 'pause');
+    h.pad.buttons[9].pressed = false; h.frame(); h.pad.buttons[9].pressed = true; h.frame();
+    assert.equal(h.app.screen, 'playing');
+});
+
+test('controller rearming does not suppress fresh keyboard or touch gameplay after manual resume', t => {
+    const h = fixture(t); h.focus(false); h.pad.buttons[0].pressed = true; h.focus(true); h.app.resume();
+    h.key('keydown', 'd'); h.pointer('pointerdown', h.button(' ')); h.frame();
+    assert.equal(h.app.input().right, true); assert.equal(h.app.input().jump, true);
+    h.key('keyup', 'd'); h.pointer('pointerup', h.button(' ')); h.frame(); neutral(h.app.input());
+    h.pad.buttons[0].pressed = false; h.frame(); h.pad.buttons[0].pressed = true; h.frame();
+    assert.equal(h.app.input().jump, true);
+});
+
+test('current document focus blocks controller activation even without a blur notification', t => {
+    const h = fixture(t); h.app.pause(); h.focus(false, false); h.pad.buttons[9].pressed = true; h.frame();
+    assert.equal(h.app.screen, 'pause'); h.focus(true, false); h.frame(); assert.equal(h.app.screen, 'pause');
+    h.pad.buttons[9].pressed = false; h.frame(); h.pad.buttons[9].pressed = true; h.frame();
+    assert.equal(h.app.screen, 'playing');
 });
