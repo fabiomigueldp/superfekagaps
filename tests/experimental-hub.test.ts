@@ -282,10 +282,14 @@ test('title exposes its native menu before Extras and leaves Tab traversal to th
     const hub = h.gameHub(), entry = h.byId('open-experiments');
     const menu = h.body.children.find(element => element.className === 'canvas-menu-accessibility');
     assert.ok(menu); assert.equal(menu.hidden, false); assert.equal(hub.rail.hidden, false);
-    assert.deepEqual(menu.children.map(button => button.textContent), ['CONTINUAR', 'OPÇÕES', 'GALERIA', 'ORIGINAL']);
+    const controls = menu.children.filter(element => element.tagName === 'BUTTON');
+    assert.deepEqual(controls.map(button => button.textContent), ['CONTINUAR', 'OPÇÕES', 'GALERIA', 'ORIGINAL']);
+    const statuses = menu.children.filter(element => element.getAttribute('role') === 'status');
+    assert.equal(statuses.length, 1); assert.equal(statuses[0].textContent, '');
+    assert.equal(statuses[0].hidden, false); assert.equal(statuses[0].getAttribute('aria-live'), 'polite');
     assert.ok(h.body.children.indexOf(menu) < h.body.children.indexOf(hub.rail as unknown as LifecycleElement),
         'Native title controls precede Extras in document/tab order.');
-    for (const button of [...menu.children, entry]) {
+    for (const button of [...controls, entry]) {
         assert.equal(button.tagName, 'BUTTON'); assert.equal(button.disabled, false); assert.equal(button.tabIndex, 0);
         button.focus();
         for (const shiftKey of [false, true]) {

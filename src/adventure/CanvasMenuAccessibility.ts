@@ -27,6 +27,11 @@ const COMPACT_MENU_STYLE = `
 .canvas-menu-accessibility[data-compact="true"] button:first-child { border-color: #98703b !important; background: #ffe29a !important; color: #101d29 !important; }
 .canvas-menu-accessibility[data-compact="true"][data-screen="title"] button:last-of-type { width: 72% !important; justify-self: center; }
 .canvas-menu-accessibility .canvas-menu-status {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; border: 0;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+.canvas-menu-accessibility[data-compact="true"] .canvas-menu-status:not(:empty) {
+  position: static; width: auto; height: auto; overflow: visible; clip-path: none; white-space: normal;
   grid-column: 1 / -1; margin: 4px 0 0; padding: 10px; border: 1px solid #e9ad4c;
   color: #ffe29a; background: #101d29; font: 13px/1.5 monospace; overflow-wrap: anywhere;
 }
@@ -112,7 +117,7 @@ export class CanvasMenuAccessibility {
             this.root.setAttribute('data-screen', this.compactScreen);
             this.bounds = '';
             this.controls = choices.map((_, index) => this.makeButton(index));
-            this.root.replaceChildren(...this.controls); this.statusAttached = false;
+            this.root.replaceChildren(...this.controls, this.status); this.statusAttached = true;
         }
         if (this.root.getAttribute('aria-label') !== label) this.root.setAttribute('aria-label', label);
         choices.forEach((choice, index) => {
@@ -252,17 +257,18 @@ export class CanvasMenuAccessibility {
         button.scrollIntoView?.({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
     }
     private syncStatus(): void {
-        const text = this.root.getAttribute('data-compact') === 'true' ? this.statusText : '';
-        if (!text) {
-            if (this.statusAttached) this.status.remove();
-            this.statusAttached = false; this.status.textContent = ''; return;
-        }
+        // Keep an empty live region mounted before feedback arrives. Desktop
+        // uses a visually hidden equivalent of its canvas toast; compact menus
+        // expose that same region visibly, without duplicating announcements.
+        const text = this.statusText;
         if (!this.statusAttached) { this.root.append(this.status); this.statusAttached = true; }
         if (this.status.textContent !== text) {
             this.status.textContent = text;
-            this.status.scrollIntoView?.({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
+            if (text && this.root.getAttribute('data-compact') === 'true')
+                this.status.scrollIntoView?.({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
         }
     }
+
     private fit(): void {
         if (this.root.hidden || this.lifetime.isDisposed) return;
         const box = this.canvas.getBoundingClientRect();

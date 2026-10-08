@@ -25,7 +25,8 @@ export class DeliciaBoss {
         if(this.attack==='geyser')return[0,1,2].map(i=>({x:350+i*270,y:190,w:65,h:260}));
         if(this.attack==='overload')return[{x:650,y:0,w:45,h:450}];
         if(this.attack==='gap')return[this.target];
-        if(this.attack==='charge')return[{x:Math.min(this.x,this.chargeEnd),y:420,w:Math.abs(this.x-this.chargeEnd)+this.w,h:30}];
+        // Keep the floor-lane width, but show the same jump clearance as the lower charge hitbox.
+        if(this.attack==='charge')return[{x:Math.min(this.x,this.chargeEnd),y:this.y+60,w:Math.abs(this.x-this.chargeEnd)+this.w,h:this.h-60}];
         return[];
     }
     get tellDuration():number{return(this.character==='jaja'?1.05:1.15)-.12*(this.phase-1)+(this.assist?.35:0);}

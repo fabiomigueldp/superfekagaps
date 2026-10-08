@@ -77,7 +77,7 @@ test('geometry follows resized canvas and hidden document removes reachable cont
     h.window.innerWidth = 360; h.window.innerHeight = 640;
     h.window.dispatch('resize'); assert.equal(h.root.style.left, '12px'); assert.equal(h.root.style.width, '336px');
     assert.equal(h.root.getAttribute('data-compact'), 'true');
-    assert.ok(h.root.children.every(button => button.style.minHeight === '44px'));
+    assert.ok(h.root.children.filter(button => button.tagName === 'BUTTON').every(button => button.style.minHeight === '44px'));
     h.canvas.getBoundingClientRect = () => ({ left: 0, top: 0, width: 640, height: 360, x: 0, y: 0, right: 640, bottom: 360 });
     h.window.innerWidth = 640; h.window.dispatch('resize');
     assert.equal(h.root.getAttribute('data-compact'), 'false'); assert.equal(h.root.style.width, '640px');
@@ -100,7 +100,7 @@ function propertyWrites<T extends object, K extends keyof T>(target: T, keys: re
 
 test('unchanged native menu frames avoid geometry and visibility writes without losing focused controls', t => {
     const h = setup(t); h.menu.sync('paused', 'Pausa', h.choices, 0);
-    const controls = [...h.root.children]; controls[1].focus();
+    const controls = h.root.children.filter(button => button.tagName === 'BUTTON'); controls[1].focus();
     const before = h.stats();
     const geometry = controls.map(button => propertyWrites(button.style, ['left', 'top', 'width', 'height']));
     const visibility = propertyWrites(h.root, ['hidden']);
@@ -109,7 +109,7 @@ test('unchanged native menu frames avoid geometry and visibility writes without 
     const counts = { geometry: geometry.reduce((sum, writes) => sum + writes.length, 0), visibility: visibility.length };
     t.diagnostic(`600 unchanged menu frames: ${JSON.stringify(counts)}`);
     assert.deepEqual(counts, { geometry: 0, visibility: 0 });
-    assert.deepEqual(h.root.children, controls);
+    assert.deepEqual(h.root.children.filter(button => button.tagName === 'BUTTON'), controls);
     assert.equal(h.doc.activeElement, controls[1]);
     assert.deepEqual(h.stats(), before, 'Unchanged sync must not refocus or reset native input');
 });
@@ -237,11 +237,12 @@ test('compact gallery list reflows but detail Back control leaves painted conten
 });
 
 
-test('compact panels expose complete changing status without taking focus, then remove expired feedback', t => {
+test('compact panels expose complete changing status without taking focus, then clear expired feedback', t => {
     const h = setup(t);
     const message = 'Não foi possível importar: o arquivo JSON é inválido. Seu progresso anterior foi preservado.';
     h.menu.sync('settings', 'Opções', h.choices, 0, message);
-    assert.equal(h.root.children.length, 2, 'Desktop continues to use its painted toast');
+    assert.equal(h.root.children.length, 3, 'Desktop retains accessible feedback alongside its painted toast');
+    assert.equal(h.root.children[2].textContent, message);
     h.window.innerWidth = 360; h.window.innerHeight = 240;
     h.canvas.getBoundingClientRect = () => ({ left: 20, top: 30, width: 320, height: 180, x: 20, y: 30, right: 340, bottom: 210 });
     h.window.dispatch('resize');
@@ -256,9 +257,60 @@ test('compact panels expose complete changing status without taking focus, then 
     }
     assert.equal(reveals, 3);
     h.menu.sync('settings', 'Opções', h.choices, 1);
-    assert.equal(h.root.children.length, 2); assert.equal(status.parent, null);
+    assert.equal(h.root.children.length, 3); assert.equal(status.parent, h.root);
+    assert.equal(status.textContent, '', 'The mounted live region is cleared when feedback expires');
     h.menu.sync('gallery:0', 'Galeria', h.choices, 0, 'Encontre mais selos para liberar esta ilha.');
     assert.equal(h.root.children[2].textContent, 'Encontre mais selos para liberar esta ilha.');
     h.canvas.getBoundingClientRect = () => ({ left: 0, top: 0, width: 640, height: 360, x: 0, y: 0, right: 640, bottom: 360 });
-    h.window.dispatch('resize'); assert.equal(h.root.children.length, 2);
+    h.window.dispatch('resize'); assert.equal(h.root.children.length, 3);
+    assert.equal(h.root.children[2], status);
+    assert.equal(status.textContent, 'Encontre mais selos para liberar esta ilha.');
+});
+
+test('desktop feedback uses a pre-mounted live region and unchanged frames or resizing never reannounce it', t => {
+    const h = setup(t);
+    h.menu.sync('settings', 'Opções', h.choices, 0);
+    const status = h.root.children[2];
+    assert.equal(status.textContent, '');
+    assert.equal(status.getAttribute('role'), 'status');
+    assert.equal(status.getAttribute('aria-live'), 'polite');
+    assert.equal(status.getAttribute('aria-atomic'), 'true');
+    assert.equal(status.hidden, false);
+    const writes = propertyWrites(status, ['textContent']);
+    let scrolls = 0; Object.assign(status, { scrollIntoView() { scrolls++; } });
+    h.root.children[1].focus(); const focused = h.doc.activeElement;
+    const messages = ['Não foi possível importar: JSON inválido.', 'Não foi possível ler o arquivo.',
+        'Não foi possível salvar. Progresso anterior preservado.', 'Progresso importado com sucesso.'];
+    for (const message of messages) {
+        h.menu.sync('settings', 'Opções', h.choices, 1, message);
+        assert.equal(status.textContent, message); assert.equal(h.doc.activeElement, focused);
+    }
+    assert.equal(writes.length, messages.length); assert.equal(scrolls, 0);
+    for (let frame = 0; frame < 600; frame++) h.menu.sync('settings', 'Opções', h.choices, 1, messages.at(-1));
+    h.window.innerWidth = 360;
+    h.canvas.getBoundingClientRect = () => ({ left: 0, top: 0, width: 320, height: 180, x: 0, y: 0, right: 320, bottom: 180 });
+    h.window.dispatch('resize');
+    assert.equal(h.root.children[2], status); assert.equal(writes.length, messages.length);
+    assert.equal(scrolls, 0, 'Viewport changes must not repeat feedback or scroll its status');
+    assert.equal(h.doc.activeElement, focused);
+    h.menu.sync('settings', 'Opções', h.choices, 1);
+    assert.equal(status.textContent, ''); assert.equal(writes.length, messages.length + 1);
+    h.menu.sync('gallery:0', 'Galeria', h.choices, 0, 'Encontre os 12 selos desta ilha.');
+    assert.equal(h.root.children[2], status); assert.equal(status.textContent, 'Encontre os 12 selos desta ilha.');
+    (h.canvas as unknown as HTMLCanvasElement).inert = true;
+    h.menu.sync('gallery:0', 'Galeria', h.choices, 0, 'Encontre os 12 selos desta ilha.');
+    assert.equal(status.parent, null); assert.equal(status.textContent, ''); assert.equal(h.root.hidden, true);
+    (h.canvas as unknown as HTMLCanvasElement).inert = false;
+    h.menu.sync('settings', 'Opções', h.choices, 0);
+    assert.equal(status.parent, h.root); assert.equal(status.textContent, '');
+    h.menu.dispose(); assert.equal(status.parent, null); assert.equal(h.root.parent, null);
+});
+
+test('status styling visually hides desktop and empty feedback without hiding it from accessibility', t => {
+    const h = setup(t);
+    const styles = h.body.children.find(element => element.tagName === 'STYLE')!.textContent;
+    const hidden = styles.match(/\.canvas-menu-accessibility \.canvas-menu-status \{([^}]+)\}/)![1];
+    assert.match(hidden, /position: absolute/); assert.match(hidden, /clip-path: inset\(50%\)/);
+    assert.doesNotMatch(hidden, /display:\s*none|visibility:\s*hidden/);
+    assert.match(styles, /\[data-compact="true"\] \.canvas-menu-status:not\(:empty\)/);
 });
