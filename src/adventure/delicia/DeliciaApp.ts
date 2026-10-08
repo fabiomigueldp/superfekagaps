@@ -14,7 +14,7 @@ import { button, element, formatTime, heading, lettering, worldLink } from './De
 import './delicia.css';
 const INPUT_KEYS:Record<string,string>={arrowleft:'arrowleft',a:'arrowleft','pad-left':'arrowleft',arrowright:'arrowright',d:'arrowright','pad-right':'arrowright',' ':' ',w:' ',z:' ',arrowup:' ','pad-jump':' ',shift:'shift',x:'shift','pad-dash':'shift',s:'s',arrowdown:'s','pad-pound':'s',j:'j','pad-seed':'j',q:'q','pad-parry':'q',e:'e','pad-interact':'e'};
 type Screen='title'|'map'|'menu'|'playing'|'pause'|'dialogue'|'clear'|'journal'|'settings'|'ending'|'dead';
-export interface DeliciaAppOptions { store?: DeliciaStore; initialStage?: string; returnToWorldMap?: () => void; preferences?: Preferences; savePreferences?: () => void }
+export interface DeliciaAppOptions { store?: DeliciaStore; initialStage?: string; startPaused?: boolean; returnToWorldMap?: () => void; preferences?: Preferences; savePreferences?: () => void }
 export class DeliciaApp {
     readonly store:DeliciaStore;readonly audio=new DeliciaAudio();readonly art=new DeliciaArt();
     readonly root=element('main','delicia');readonly surface=element('section','dl-surface');readonly canvas=element('canvas','dl-canvas');
@@ -71,6 +71,9 @@ export class DeliciaApp {
             if(nodes&&typeof nodes==='object')for(const s of DELICIA_STAGES){const p=(nodes as Record<string,unknown>)[s.id] as {x?:unknown;y?:unknown};if(p&&typeof p.x==='number'&&typeof p.y==='number'&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&p.x>=0&&p.x<=1&&p.y>=0&&p.y<=1)this.mapNodes[s.id]={x:p.x,y:p.y};}
             if(this.screen==='map')this.showMap(this.mapSelection);
         }).catch(()=>{});
+        // A lazy replay may be born after the browser's interruption event already fired.
+        // Preserve a new stage's dialogue; only active gameplay needs a pause menu.
+        if(options.startPaused||!this.windowFocused||document.hidden)this.loseFocus();
         this.requestFrame();document.title='Império da Delícia · Super Feka Gaps World';
         if((import.meta as ImportMeta & {env:{DEV:boolean}}).env.DEV)(window as unknown as {deliciaGame:DeliciaApp}).deliciaGame=this;
     }

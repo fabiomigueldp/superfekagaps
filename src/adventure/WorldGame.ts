@@ -1005,6 +1005,16 @@ export class WorldGame {
         this.input.reset(); this.gamepad?.update('inactive'); this.audio.pause(true);
         this.store.save.guaira.audioEnabled = this.audio.enabled;
         const view = this.mapView, controller = new AbortController();
+        // Own interruptions across both lazy imports, even if focus returns before construction.
+        let entryInterrupted = document.hidden || (typeof document.hasFocus === 'function' && !document.hasFocus());
+        const interruptEntry = () => { entryInterrupted = true; };
+        const entryVisibility = () => { if (document.hidden) interruptEntry(); };
+        window.addEventListener('blur', interruptEntry);
+        document.addEventListener('visibilitychange', entryVisibility);
+        const releaseEntryActivity = () => {
+            window.removeEventListener('blur', interruptEntry);
+            document.removeEventListener('visibilitychange', entryVisibility);
+        };
         const originalId = this.mapCanvas.id;
         this.mapCanvas.id = 'world-game-canvas-suspended';
         this.mapCanvas.hidden = true; view.root.hidden = true; view.root.inert = true;
@@ -1016,7 +1026,7 @@ export class WorldGame {
         let disposeRuntime: (() => void) | undefined;
         const close = () => {
             if (controller.signal.aborted) return;
-            window.removeEventListener('pagehide', close);
+            window.removeEventListener('pagehide', close); releaseEntryActivity();
             controller.abort(); disposeRuntime?.(); host.remove(); this.chapterActive = false; this.chapterCleanup = undefined;
             this.mapCanvas.id = originalId; this.mapCanvas.hidden = false;
             view.root.hidden = false; view.root.inert = false;
@@ -1036,7 +1046,7 @@ export class WorldGame {
         try {
             const { mountWorldChapter } = await import('./WorldChapterHost');
             if (controller.signal.aborted || this.isDisposed) return;
-            const cleanup = await mountWorldChapter(chapter, stage, host, this.store, view.deliciaStore, close, controller.signal);
+            const cleanup = await mountWorldChapter(chapter, stage, host, this.store, view.deliciaStore, close, controller.signal, () => entryInterrupted);
             if (controller.signal.aborted) cleanup(); else { disposeRuntime = cleanup; loading.remove(); back.remove(); }
         } catch (error) {
             if (controller.signal.aborted) return;
@@ -1045,7 +1055,7 @@ export class WorldGame {
             const retry = document.createElement('button'); retry.type = 'button'; retry.textContent = 'Tentar novamente';
             retry.addEventListener('click', () => { close(); void this.mountChapter(chapter, stage); });
             host.append(retry, back); back.focus();
-        }
+        } finally { releaseEntryActivity(); }
     }
     private paintCanvasIfNeeded(): void {
         if (!this.frozenMenuOwner?.() || (this.state !== 'paused' && this.state !== 'settings')) {

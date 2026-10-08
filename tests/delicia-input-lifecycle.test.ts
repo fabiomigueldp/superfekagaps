@@ -5,6 +5,8 @@ import { readFileSync } from 'node:fs';
 import { runInThisContext } from 'node:vm';
 import ts from 'typescript';
 import type { DeliciaInput, DeliciaSimulation } from '../src/adventure/delicia/DeliciaSimulation';
+import { DeliciaStore } from '../src/adventure/delicia/DeliciaProgress';
+import { ProgressStore } from '../src/adventure/progress';
 import type { DeliciaAppOptions } from '../src/adventure/delicia/DeliciaApp';
 
 /** DOM/event boundaries only. Constructor, registered handlers, loop and simulation are real. */
@@ -80,10 +82,11 @@ function fixture(t: TestContext, initiallyFocused = true) {
         input(): DeliciaInput; loadStage(id: string, retry: boolean): boolean; pause(): void; resume(): void; dispose(): void;
         store: { save: unknown }; dialogueTime: number; menu: { text: string; choices: { label: string; run(): void }[] };
     }
-    const apps: App[] = [];
+    const apps: App[] = [], nativeCleanups: (() => void)[] = [];
     const create = (options?: DeliciaAppOptions) => { const app = new DeliciaApp(body as unknown as HTMLElement, options) as unknown as App; apps.push(app);
         if (!options?.initialStage) assert.equal(app.loadStage('delicia-1', true), true); return app; };
     t.after(() => {
+        nativeCleanups.forEach(cleanup => cleanup());
         apps.forEach(app => app.dispose());
         if (css) require.extensions['.css'] = css; else delete require.extensions['.css'];
         for (const [name, descriptor] of original) {
@@ -104,7 +107,68 @@ function fixture(t: TestContext, initiallyFocused = true) {
     const button = (key: string) => { const b = app.touch.all().find(node => node.dataset.key === key); assert.ok(b); return b; };
     const frame = () => { now += 1000 / 60; nextFrame(now); };
     frame();
-    return { app, create, window, document, body, key, pointer, button, frame, pad,
+    /** Execute the actual outer owner method and native host, with only module delivery delayed. */
+    function nativeEntry(completed: boolean, delay: 'outer' | 'inner' = 'inner') {
+        app.dispose();
+        const store = new DeliciaStore(null), progress = new ProgressStore(null);
+        if (completed) store.save.completed.push('delicia-1');
+        let mounted: App | undefined;
+        class ObservedApp extends DeliciaApp {
+            constructor(...args: ConstructorParameters<typeof DeliciaApp>) {
+                super(...args); mounted = this as unknown as App; apps.push(mounted);
+            }
+        }
+        let release!: () => void, reject!: (error: Error) => void;
+        const gate = new Promise<void>((resolve, fail) => { release = resolve; reject = fail; });
+        let importing!: () => void;
+        const importStarted = new Promise<void>(resolve => { importing = resolve; });
+        const tracked = new Map<EventTarget, Set<EventListenerOrEventListenerObject>>();
+        for (const target of [window, document]) {
+            const listeners = new Set<EventListenerOrEventListenerObject>(); tracked.set(target, listeners);
+            const add = target.addEventListener.bind(target), remove = target.removeEventListener.bind(target);
+            t.mock.method(target, 'addEventListener', (type: string, listener: EventListenerOrEventListenerObject | null, options?: AddEventListenerOptions | boolean) => {
+                if (listener && (type === 'blur' || type === 'visibilitychange')) listeners.add(listener);
+                add(type, listener, options);
+            });
+            t.mock.method(target, 'removeEventListener', (type: string, listener: EventListenerOrEventListenerObject | null, options?: EventListenerOptions | boolean) => {
+                if (listener && (type === 'blur' || type === 'visibilitychange')) listeners.delete(listener);
+                remove(type, listener, options);
+            });
+        }
+        function compile(source: string, path: URL, load: (name: string) => unknown) {
+            const output = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
+            const result = { exports: {} as Record<string, any> };
+            runInThisContext(`(function(require,module,exports){${output}\n})`, { filename: path.pathname })(load, result, result.exports);
+            return result.exports;
+        }
+        const hostUrl = new URL('../src/adventure/WorldChapterHost.ts', import.meta.url);
+        const host = compile(readFileSync(hostUrl, 'utf8'), hostUrl, name => {
+            if (name.endsWith('.css')) return {};
+            if (delay === 'inner') { importing(); return gate.then(() => ({ DeliciaApp: ObservedApp })); }
+            return { DeliciaApp: ObservedApp };
+        });
+        const ownerUrl = new URL('../src/adventure/WorldGame.ts', import.meta.url);
+        const source = ts.createSourceFile(ownerUrl.pathname, readFileSync(ownerUrl, 'utf8'), ts.ScriptTarget.Latest, true);
+        const ownerClass = source.statements.find(ts.isClassDeclaration)!;
+        const method = ownerClass.members.find(member => ts.isMethodDeclaration(member) && member.name.getText(source) === 'mountChapter')!;
+        const ownerType = compile(`export class NativeOwner { ${method.getText(source)} }`, ownerUrl,
+            () => { if (delay === 'outer') { importing(); return gate.then(() => host); } return host; }).NativeOwner;
+        const mapRoot = new Element('section'), mapCanvas = new Element('canvas'); body.append(mapRoot, mapCanvas);
+        let returned = 0, disposed = false;
+        const owner = Object.assign(new ownerType(), {
+            chapterActive: false, running: true, input: { reset() {} }, audio: { enabled: true, pause() {}, volume() {} },
+            store: progress, mapCanvas, renderer: {}, cancelFrame() {}, requestFrame() {},
+            mapView: { root: mapRoot, deliciaStore: store, openChapter() { returned++; }, hud: { focusEnter() {} } },
+        });
+        Object.defineProperty(owner, 'isDisposed', { get: () => disposed });
+        const pending: Promise<void> = owner.mountChapter('delicia', 'delicia-1');
+        nativeCleanups.push(() => owner.chapterCleanup?.());
+        return { pending, importStarted, release, reject, mounted: () => mounted, returned: () => returned, owner,
+            activityListeners: () => [...tracked.values()].reduce((sum, listeners) => sum + listeners.size, 0),
+            mountAgain: () => owner.mountChapter('delicia', 'delicia-1') as Promise<void>,
+            close: () => owner.chapterCleanup?.(), dispose: () => { disposed = true; owner.chapterCleanup?.(); } };
+    }
+    return { app, create, nativeEntry, window, document, body, key, pointer, button, frame, pad,
         focus: (value: boolean, notify = true) => { focused = value; if (notify) window.dispatchEvent(new Event(value ? 'focus' : 'blur')); },
         disconnect: () => { connected = false; }, connect: () => { connected = true; } };
 }
@@ -319,4 +383,68 @@ test('current document focus blocks controller activation even without a blur no
     assert.equal(h.app.screen, 'pause'); h.focus(true, false); h.frame(); assert.equal(h.app.screen, 'pause');
     h.pad.buttons[9].pressed = false; h.frame(); h.pad.buttons[9].pressed = true; h.frame();
     assert.equal(h.app.screen, 'playing');
+});
+
+for (const delay of ['outer', 'inner'] as const) for (const interrupt of ['blur', 'hidden', 'blur-return'] as const)
+test(`native completed entry pauses after ${interrupt} during ${delay} import`, async t => {
+    const h = fixture(t), entry = h.nativeEntry(true, delay);
+    await entry.importStarted; h.pad.buttons[9].pressed = true;
+    if (interrupt === 'hidden') { h.document.hidden = true; h.document.dispatchEvent(new Event('visibilitychange')); }
+    else { h.focus(false); if (interrupt === 'blur-return') h.focus(true); }
+    entry.release(); await entry.pending;
+    const app = entry.mounted()!; assert.ok(app); assert.equal(app.screen, 'pause');
+    assert.equal(entry.activityListeners(), 3, 'Only the app and its accessible menus keep their activity listeners');
+    const elapsed = app.sim.elapsed;
+    for (let i = 0; i < 8; i++) h.frame();
+    assert.equal(app.sim.elapsed, elapsed);
+    h.pad.buttons[9].pressed = true;
+    if (interrupt === 'hidden') { h.document.hidden = false; h.document.dispatchEvent(new Event('visibilitychange')); }
+    if (interrupt !== 'blur-return') h.focus(true);
+    h.frame(); h.frame(); assert.equal(app.screen, 'pause');
+    h.pad.buttons[9].pressed = false; h.frame(); h.pad.buttons[9].pressed = true; h.frame();
+    assert.equal(app.screen, 'playing', 'Only a released controller followed by fresh intent resumes');
+    for (let i = 0; i < 8; i++) h.frame(); assert.ok(app.sim.elapsed > elapsed);
+});
+for (const completed of [false, true]) test(`focused native entry preserves ${completed ? 'replay' : 'introduction'}`, async t => {
+    const h = fixture(t), entry = h.nativeEntry(completed); entry.release(); await entry.pending;
+    assert.equal(entry.mounted()?.screen, completed ? 'playing' : 'dialogue');
+});
+test('interrupted new stage keeps its introduction and needs fresh confirmation', async t => {
+    const h = fixture(t), entry = h.nativeEntry(false); h.focus(false); entry.release(); await entry.pending;
+    const app = entry.mounted()!; assert.equal(app.screen, 'dialogue'); const text = app.menu.text;
+    h.pad.buttons[0].pressed = true; h.focus(true); h.frame(); h.frame();
+    assert.equal(app.menu.text, text); assert.equal(app.sim.elapsed, 0);
+    h.pad.buttons[0].pressed = false; h.frame(); h.pad.buttons[0].pressed = true; h.frame();
+    assert.equal(app.dialogueTime, Infinity);
+});
+for (const delay of ['outer', 'inner'] as const) for (const cancel of ['close', 'dispose'] as const)
+test(`${cancel} during ${delay} chapter import prevents late construction`, async t => {
+    const h = fixture(t), entry = h.nativeEntry(true, delay);
+    await entry.importStarted; entry[cancel]();
+    h.focus(false); h.focus(true); entry.release(); await entry.pending;
+    assert.equal(entry.mounted(), undefined); assert.equal(entry.owner.chapterActive, false); assert.equal(entry.returned(), 1);
+    assert.equal(entry.activityListeners(), 0);
+});
+
+for (const delay of ['outer', 'inner'] as const) test(`failed ${delay} import releases the entry activity lease`, async t => {
+    const h = fixture(t), entry = h.nativeEntry(true, delay);
+    t.mock.method(console, 'error', () => {});
+    entry.reject(new Error('Test module delivery failure')); await entry.pending;
+    assert.equal(entry.mounted(), undefined); assert.equal(entry.activityListeners(), 0);
+    assert.ok(h.body.all().some(node => node.textContent === 'Tentar novamente'));
+    entry.close(); assert.equal(entry.activityListeners(), 0);
+});
+test('an interrupted entry does not pause the next focused visit', async t => {
+    const h = fixture(t), entry = h.nativeEntry(true); h.focus(false); h.focus(true);
+    entry.release(); await entry.pending; assert.equal(entry.mounted()?.screen, 'pause');
+    entry.close(); assert.equal(entry.activityListeners(), 0);
+    await entry.mountAgain(); assert.equal(entry.mounted()?.screen, 'playing');
+    assert.equal(entry.activityListeners(), 3); entry.close(); assert.equal(entry.activityListeners(), 0);
+});
+for (const state of ['unfocused', 'hidden'] as const) test(`native replay constructor detects already ${state} document`, t => {
+    const h = fixture(t); h.app.dispose();
+    if (state === 'hidden') h.document.hidden = true; else h.focus(false, false);
+    const store = new DeliciaStore(null); store.save.completed.push('delicia-1');
+    const app = h.create({store, initialStage: 'delicia-1', returnToWorldMap: () => {}});
+    assert.equal(app.screen, 'pause');
 });
