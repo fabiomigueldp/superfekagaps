@@ -21,6 +21,7 @@ export class DeliciaApp {
     private held=new Set<string>();private pressed=new Set<string>();private released=new Set<string>();private sources=new Map<string,string>();private buttonKeys=new Map<string,HTMLButtonElement>();
     private lines:readonly SceneLine[]=[];private lineIndex=0;private dialogueDone:()=>void=()=>{};
     private journalReturn:()=>void=()=>this.showMap();private settingsReturn:()=>void=()=>this.showMap();
+    private saveImportCleanup?:()=>void;
     private listOpen=false;private settingsMessage?:HTMLParagraphElement;private motionHint?:HTMLElement;
     private readonly systemMotion=typeof matchMedia==='function'?matchMedia('(prefers-reduced-motion: reduce)'):null;
     private mapNodes:Record<string,{x:number;y:number}>={};private mapSelection='delicia-1';private toast='';private toastTime=0;private shake=0;private hudKey='';
@@ -188,6 +189,7 @@ export class DeliciaApp {
         for(const source of this.sources.keys())if(source.startsWith('gamepad:'))this.padMenuLatch.add(source.slice(8));
         this.held.clear();this.pressed.clear();this.released.clear();this.sources.clear();this.buttonKeys.clear();this.accumulator=0;}
     private setScreen(screen:Screen):void{
+        this.saveImportCleanup?.();
         this.invalidatePausedPaint();
         this.screen=screen;this.root.dataset.screen=screen;this.panel.replaceChildren();this.panel.className='dl-panel';this.panel.hidden=false;
         this.panel.removeAttribute('role');this.panel.removeAttribute('aria-modal');this.panel.removeAttribute('aria-labelledby');
@@ -242,7 +244,9 @@ export class DeliciaApp {
         this.panel.append(warning);
     }
     showMap(id=this.store.save.selected):void {
-        this.setScreen('map');this.audio.pause(false);this.audio.music('orchard');
+        this.setScreen('map');
+        // Audio availability must not prevent navigation after a durable import.
+        try{this.audio.pause(false);this.audio.music('orchard');}catch{}
         this.mapSelection=deliciaStageById(id)?id:'delicia-1';this.store.save.selected=this.mapSelection;this.store.persist();
         this.panel.classList.add('dl-map');
         const top=element('header','dl-map-header'),title=heading('Império da Delícia');
@@ -454,7 +458,29 @@ export class DeliciaApp {
     }
     private exportSave():void{const url=URL.createObjectURL(new Blob([JSON.stringify(this.store.save,null,2)],{type:'application/json'})),a=element('a');a.href=url;a.download='feka-imperio-delicia-save.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),500);}
     private importSave():void{
-        const input=element('input');input.type='file';input.accept='.json';input.hidden=true;this.root.append(input);input.oncancel=()=>input.remove();input.onchange=async()=>{const file=input.files?.[0];try{if(file&&file.size<1_000_000){const raw=await file.text();if(this.disposed)return;if(this.store.import(raw)){this.audio.setVolume(this.store.save.music,this.store.save.effects);this.showMap();this.announce('Progresso importado.');}else this.announce(this.store.warning);}else this.announce('Escolha um arquivo de progresso válido.');}catch{this.announce('Arquivo inválido. Progresso atual mantido.');}finally{input.remove();}};input.click();
+        this.saveImportCleanup?.();if(this.disposed||this.screen!=='settings')return;
+        const input=element('input');input.type='file';input.accept='.json';input.hidden=true;
+        let active=true,reading=false;
+        const cleanup=()=>{active=false;input.onchange=null;input.oncancel=null;input.remove();if(this.saveImportCleanup===cleanup)this.saveImportCleanup=undefined;};
+        const isActive=()=>active&&!this.disposed&&this.screen==='settings'&&this.saveImportCleanup===cleanup;
+        this.saveImportCleanup=cleanup;this.root.append(input);input.oncancel=cleanup;
+        input.onchange=async()=>{
+            if(!isActive()||reading)return;reading=true;
+            const file=input.files?.[0];if(!file){cleanup();return;}
+            if(!(file.size<1_000_000)){cleanup();this.announce('Escolha um arquivo de progresso válido.');return;}
+            let imported=false;
+            try{
+                const raw=await file.text();if(!isActive())return;
+                imported=this.store.import(raw);
+            }catch{
+                if(isActive())this.announce('Arquivo inválido. Progresso atual mantido.');return;
+            }finally{cleanup();}
+            if(!imported){this.announce(this.store.warning);return;}
+            // The durable commit already succeeded; optional audio cannot make the file invalid.
+            try{this.audio.setVolume(this.store.save.music,this.store.save.effects);}catch{}
+            this.showMap();this.announce('Progresso importado.');
+        };
+        try{input.click();}catch{cleanup();this.announce('Não foi possível abrir o arquivo. Tente novamente.');}
     }
     private buildTouch():void{
         const directions=element('div','dl-touch-group'),actions=element('div','dl-touch-group dl-touch-actions');
@@ -476,5 +502,5 @@ export class DeliciaApp {
             (key.startsWith('arrow')?directions:actions).append(b);
         }
     }
-    dispose():void{if(this.disposed)return;this.disposed=true;this.stopFrames();this.cleanups.forEach(fn=>fn());this.cleanups=[];this.audio.dispose();this.art.dispose();this.resetInput();this.root.remove();}
+    dispose():void{if(this.disposed)return;this.disposed=true;this.saveImportCleanup?.();this.stopFrames();this.cleanups.forEach(fn=>fn());this.cleanups=[];this.audio.dispose();this.art.dispose();this.resetInput();this.root.remove();}
 }
