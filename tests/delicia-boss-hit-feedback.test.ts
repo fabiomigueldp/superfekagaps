@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { GroundPoundState } from '../src/types';
 import { bossPhase, type BossMissile } from '../src/adventure/delicia/DeliciaBoss';
 import { DELICIA_STAGES } from '../src/adventure/delicia/DeliciaContent';
 import { DeliciaSimulation, noDeliciaInput } from '../src/adventure/delicia/DeliciaSimulation';
@@ -19,6 +20,7 @@ function contact(sim: DeliciaSimulation, source: Source): { x: number; y: number
     const boss = sim.boss!;
     if (source === 'stomp' || source === 'pound') {
         Object.assign(sim.player, { x: boss.x + 20, y: boss.y - sim.player.h - 1, grounded: false, vy: 300, pounding: source === 'pound' });
+        sim.nativePlayer.data.groundPoundState = source === 'pound' ? GroundPoundState.FALL : GroundPoundState.NONE;
         return { x: boss.x, y: boss.y };
     }
     const missile: BossMissile = { x: boss.x + 5, y: boss.y + 50, w: 12, h: 10,
@@ -41,7 +43,7 @@ for (const source of sources) for (const outcome of ['normal', 'phase', 'fatal']
         const stomp = source === 'stomp' || source === 'pound', color = stomp ? '#ffe7a9' : '#ffdc87';
         assert.equal(sim.particles.filter(particle => particle.color === color).length, stomp ? 26 : 20);
         assert.deepEqual(sim.events.map(event => event.kind), outcome === 'normal' ? ['boss-hit'] : ['boss-hit', outcome === 'phase' ? 'phase' : 'defeat']);
-        if (stomp) { assert.equal(sim.player.vy, -510); assert.equal(sim.player.pounding, false); }
+        if (stomp) { assert.equal(sim.player.vy, -1260); assert.equal(sim.player.pounding, false); }
         else assert.equal(impact.life, 0, 'Accepted projectile is consumed.');
         sim.update(DT, noDeliciaInput());
         assert.equal(sim.events.filter(event => event.kind === 'boss-hit').length, 0, 'No replay on the next step.');

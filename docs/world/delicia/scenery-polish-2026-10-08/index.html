@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Império da Delícia · novos cenários</title>
+<style>
+:root{color-scheme:dark;color:#f5efd3;background:#191f35;font:16px/1.6 system-ui,sans-serif}*{box-sizing:border-box}body{margin:0}main{max-width:1400px;margin:auto;padding:42px 28px 70px}h1{font-size:clamp(30px,5vw,54px);line-height:1.08;letter-spacing:-.035em;margin:12px 0 24px}h2{font-size:25px;line-height:1.25;margin:48px 0 18px}p{max-width:870px;color:#bfd0d0}a{color:#ffe29a;text-underline-offset:4px}.eyebrow{color:#9ce3cf;font-size:13px;letter-spacing:.1em;text-transform:uppercase}.links,.controls{display:flex;flex-wrap:wrap;gap:16px;margin:24px 0}.controls{align-items:end}.controls label{display:grid;gap:5px;font-size:14px;color:#bfd0d0}button,select{font:inherit;min-height:44px;color:#f5efd3;background:#203547;border:1px solid #648591;padding:8px 12px;max-width:100%}button{cursor:pointer}button[aria-pressed=true]{color:#191f35;background:#ffe29a;border-color:#ffe29a}button:disabled{opacity:.4;cursor:default}button:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #9ce3cf;outline-offset:4px}.frames{display:grid;grid-template-columns:1fr 1fr;gap:20px}figure{margin:0}img{display:block;width:100%;height:auto;background:#191f35;image-rendering:pixelated}figcaption{font-size:14px;color:#b8cccc;margin:10px 0}.single{display:block}.single figure{max-width:960px;margin:auto}.single .before{display:none}.grid{display:grid;grid-template-columns:1fr 1fr;gap:30px 20px}.note{font-size:14px;color:#9eb6be}.proof{border-top:1px solid #435567;border-bottom:1px solid #435567;display:flex;flex-wrap:wrap;gap:20px 40px;margin:30px 0;padding:18px 0}.proof b{color:#ffe29a}footer{margin-top:44px;padding-top:20px;border-top:1px solid #435567}#scene-name{color:#f5efd3}.badge{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#9ce3cf;margin-bottom:8px}.lightbox{display:block;margin-top:12px}
+@media(max-width:700px){main{padding:26px 16px}.frames,.grid{grid-template-columns:1fr}.controls label{width:100%}.controls select{width:100%}h2{margin-top:36px}}
+</style>
+<main>
+<p style="padding:14px 18px;margin:16px;border:1px solid #648591;background:#203547;color:#f5efd3">Nova revisão: <a style="color:#ffe29a" href="../living-world-2026-10-08/index.html">cenários, materiais e animações — ver a revisão atual</a>.</p>
+<div class="eyebrow">Super Feka Gaps World · revisão de 8 de outubro</div>
+<h1>Uma ilha com mais vida.</h1>
+<p>Fundos e cenários redesenhados nas 14 fases do Império da Delícia. A arquitetura, a vegetação e os materiais agora distinguem cada região, com profundidade e detalhes na mesma grade de pixels do jogo.</p>
+<div class="links"><a href="../../../../?chapter=delicia">Jogar no World</a><a href="#regioes">Ver os ambientes</a><a href="README.md">Notas da revisão</a></div>
+<div class="proof"><span><b>7</b> ambientes</span><span><b>14</b> fases</span><span><b>50</b> enquadramentos</span><span><b>320 × 180</b> pixels nativos</span></div>
+<h2>Antes e depois, no mesmo ponto.</h2>
+<div class="controls">
+<label>Fase<select id="stage" aria-label="Fase"><option value="delicia-1">Cais do Primeiro Gole</option></select></label>
+<label>Trecho<select id="zone" aria-label="Trecho"><option value="0">O cais de copos vazios</option></select></label>
+<button id="previous" aria-label="Trecho anterior">←</button><button id="next" aria-label="Próximo trecho">→</button>
+<button id="mode" aria-pressed="false">Ampliar o depois</button>
+</div>
+<p id="scene-name" aria-live="polite">Cais do Primeiro Gole · O cais de copos vazios</p>
+<div class="frames" id="frames">
+<figure class="before"><div class="badge">Antes desta revisão</div><a class="lightbox" id="before-link" href="antes/delicia-1-0.png"><img id="before" src="antes/delicia-1-0.png" alt="Cais antes do polimento de cenários" width="960" height="540"></a><figcaption>Base já integrada ao World, com cenários simples e repetitivos.</figcaption></figure>
+<figure><div class="badge">Depois</div><a class="lightbox" id="after-link" href="depois/delicia-1-0.png"><img id="after" src="depois/delicia-1-0.png" alt="Cais com arquitetura, barcos, mercado e madeira trabalhada" width="960" height="540"></a><figcaption>Arte nativa, materiais próprios e camadas de profundidade.</figcaption></figure>
+</div>
+<p class="note">As capturas usam o renderizador real, com a mesma câmera e posições preparadas para revisão visual. Não representam partidas completas. Clique nas imagens para ver o arquivo em tamanho integral.</p>
+<h2 id="regioes">Cada região conta uma parte da história.</h2>
+<div class="grid">
+<figure><img src="depois/delicia-1-2.png" alt="Porto com barcos à vela, guindaste, mercado e pontes" loading="lazy" width="960" height="540"><figcaption><b>Cais.</b> Barcos à vela, guindaste de carga, telhados, sacadas, mercado e píeres de madeira.</figcaption></figure>
+<figure><img src="depois/delicia-9-1.png" alt="Pomar com estufa, raízes, copas e pérgola" loading="lazy" width="960" height="540"><figcaption><b>Pomares.</b> Copas sobrepostas, terraços de cultivo, moinhos, estufa, pérgolas e solo com raízes.</figcaption></figure>
+<figure><img src="depois/delicia-3-2.png" alt="Aqueduto com dois andares de arcos e canais" loading="lazy" width="960" height="540"><figcaption><b>Aqueduto.</b> Arcos em dois níveis, pedra talhada, tubulações e canais entre bairros.</figcaption></figure>
+<figure><img src="depois/delicia-4-0.png" alt="Cascatas descendo entre paredões com vegetação e fonte" loading="lazy" width="960" height="540"><figcaption><b>Reservatório.</b> Paredões, quedas d'água, vegetação e fontes; a nascente de Jajá tem seu próprio santuário.</figcaption></figure>
+<figure><img src="depois/delicia-5-1.png" alt="Adega com abóbadas, livros, garrafas e iluminação quente" loading="lazy" width="960" height="540"><figcaption><b>Arquivo.</b> Abóbadas, livros, garrafas, barris e lamparinas, com prateleiras variadas.</figcaption></figure>
+<figure><img src="depois/delicia-10-1.png" alt="Refinaria com caldeiras, tubulações, fornalhas e passarelas" loading="lazy" width="960" height="540"><figcaption><b>Refinaria.</b> Tanques de cobre, soldas, medidores, chaminés, fornalhas e passarelas.</figcaption></figure>
+<figure><img src="depois/delicia-11-0.png" alt="Cidadela com torres, portões, estandartes e telhados" loading="lazy" width="960" height="540"><figcaption><b>Cidadela.</b> Torres, portões, estandartes e detalhes de pedra e latão sob o céu do fim da tarde.</figcaption></figure>
+<figure><img src="depois/delicia-12-0.png" alt="Guina diante do vitral com uma coroa" loading="lazy" width="960" height="540"><figcaption><b>Salão do barão.</b> Vitral da coroa e arquitetura própria para o confronto final.</figcaption></figure>
+</div>
+<h2>Dentro do jogo.</h2>
+<div class="grid"><figure><img src="desktop-delicia-dialogue.png" alt="Novo cais durante o diálogo com Dona Casca, usando a interface do World" loading="lazy"><figcaption>Diálogos e HUD compartilhados com o World.</figcaption></figure><figure><img src="landscape-delicia-play.png" alt="Novo cais com os controles de toque em tela horizontal" loading="lazy"><figcaption>Revisão também em tela pequena, com controles de toque.</figcaption></figure></div>
+<p>Foram feitas duas passadas de acabamento e uma revisão final de cor, composição e rolagem. O fundo tem contraste mais baixo para preservar a leitura de Feka, dos inimigos e das bordas das plataformas.</p>
+<p class="note">Build aprovado; 136 testes passaram, com 1 teste opcional ignorado. A revisão de apresentação produziu 60 capturas em cinco tamanhos de tela, sem erros no navegador. A inspeção de rolagem verificou 700 quadros nas 14 fases.</p>
+<footer><a href="native-report.json">Grade de pixels</a> · <a href="scenery-report.json">Rolagem e cenários</a> · <a href="presentation-report.json">Janela e interfaces</a> · <a href="gameplay-report.json">Teclado e toque</a> · <a href="../presentation-integration-2026-10-08/index.html">Revisão da integração</a></footer>
+</main>
+<script>
+const stage=document.getElementById('stage'),zone=document.getElementById('zone'),prev=document.getElementById('previous'),next=document.getElementById('next');
+let stages=[];
+function paint(){const selected=stages.find(s=>s.id===stage.value),i=Number(zone.value),file=selected.id+'-'+i+'.png';for(const [id,folder] of [['before','antes'],['after','depois']]){document.getElementById(id).src=folder+'/'+file;document.getElementById(id).alt=selected.name+' · '+(selected.zones[i]||'Arena')+' · '+(id==='before'?'antes':'depois');document.getElementById(id+'-link').href=folder+'/'+file;}document.getElementById('scene-name').textContent=selected.name+' · '+(selected.zones[i]||'Arena');prev.disabled=i===0&&stages.indexOf(selected)===0;next.disabled=i===zone.options.length-1&&stages.indexOf(selected)===stages.length-1;}
+function fillZones(){const s=stages.find(s=>s.id===stage.value);zone.replaceChildren(...(s.zones.length?s.zones:['Arena']).map((name,i)=>new Option(name,String(i))));paint();}
+fetch('stages.json').then(r=>{if(!r.ok)throw Error('Não foi possível carregar as fases.');return r.json();}).then(data=>{stages=data;stage.replaceChildren(...data.map(s=>new Option(s.name,s.id)));fillZones();}).catch(e=>document.getElementById('scene-name').textContent=e.message);
+stage.addEventListener('change',fillZones);zone.addEventListener('change',paint);
+for(const [button,dir] of [[prev,-1],[next,1]])button.addEventListener('click',()=>{let i=Number(zone.value)+dir;if(i<0||i>=zone.options.length){stage.selectedIndex+=dir;fillZones();i=dir<0?zone.options.length-1:0;}zone.value=String(i);paint();});
+document.getElementById('mode').addEventListener('click',e=>{const active=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',String(active));e.currentTarget.textContent=active?'Comparar lado a lado':'Ampliar o depois';document.getElementById('frames').classList.toggle('single',active);});
+</script>
+</html>

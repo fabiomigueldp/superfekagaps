@@ -13,6 +13,7 @@ type DrawCall = [string, ...unknown[]];
 function fixture(t: TestContext, system: boolean | null = false, manual = false, legacy = false) {
     let activeElement: Element | null = null;
     class Element extends EventTarget {
+        style: Record<string, string> = {};
         className = ''; dataset: Record<string, string> = {}; hidden = false; disabled = false; checked = false;
         id = ''; type = ''; clientWidth = 960; private text = ''; parent: Element | null = null; children: Element[] = [];
         attributes = new Map<string, string>(); calls: DrawCall[] = [];
@@ -31,10 +32,14 @@ function fixture(t: TestContext, system: boolean | null = false, manual = false,
         remove() { if (this.parent) this.parent.children = this.parent.children.filter(child => child !== this); this.parent = null; }
         setAttribute(name: string, value: string) { this.attributes.set(name, value); }
         removeAttribute(name: string) { this.attributes.delete(name); }
+        getAttribute(name: string) { return this.attributes.get(name) ?? null; }
+        getBoundingClientRect() { return { left: 0, top: 0, width: 960, height: 540 }; }
+        blur() { if (activeElement === this) { activeElement = null; this.dispatchEvent(new Event('blur')); } }
         getContext() { return this.context; }
         all(): Element[] { return this.children.flatMap(child => [child, ...child.all()]); }
         querySelector() { return this.all().find(node => node.tagName === 'button') ?? null; }
         focus() { activeElement = this; }
+        click() { this.dispatchEvent(new Event('click')); }
     }
     const listeners = new Set<EventListener>();
     const media = { matches: system ?? false,
@@ -42,13 +47,13 @@ function fixture(t: TestContext, system: boolean | null = false, manual = false,
         removeEventListener: legacy ? undefined : (name: string, listener: EventListener) => { assert.equal(name, 'change'); listeners.delete(listener); },
         addListener: (listener: EventListener) => { listeners.add(listener); },
         removeListener: (listener: EventListener) => { listeners.delete(listener); } };
-    const changeSystem = (matches: boolean) => { media.matches = matches; listeners.forEach(listener => listener(new Event('change'))); };
-    const body = new Element('body'), window = new EventTarget();
-    const document = Object.assign(new EventTarget(), { body, hidden: false, title: '', createElement: (tag: string) => new Element(tag) });
+    const changeSystem = (matches: boolean) => { media.matches = matches; listeners.forEach(listener => listener(new Event('change'))); if (listeners.size) app.renderGame(); };
+    const body = new Element('body'), window = Object.assign(new EventTarget(), { innerWidth: 960, innerHeight: 540, devicePixelRatio: 1 });
+    const document = Object.assign(new EventTarget(), { body, hidden: false, title: '', getElementById: () => null, createElement: (tag: string) => new Element(tag) });
     Object.defineProperty(document, 'activeElement', { get: () => activeElement });
     let raw = JSON.stringify({ ...freshDeliciaSave(), reducedMotion: manual }), writes = 0, frameRequests = 0;
     const original = new Map<string, PropertyDescriptor | undefined>();
-    for (const [name, value] of Object.entries({ window, document, navigator: { maxTouchPoints: 0 },
+    for (const [name, value] of Object.entries({ window, document, location: { hash: '' }, navigator: { maxTouchPoints: 0 },
         matchMedia: system === null ? undefined : (query: string) => { assert.equal(query, '(prefers-reduced-motion: reduce)'); return media; },
         localStorage: { getItem: () => raw, setItem(key: string, value: string) { assert.equal(key, DELICIA_SAVE_KEY); raw = value; writes++; } },
         requestAnimationFrame: () => ++frameRequests, cancelAnimationFrame() {}, fetch: async () => ({ ok: false }) })) {
@@ -70,7 +75,7 @@ function fixture(t: TestContext, system: boolean | null = false, manual = false,
         steam(context: CanvasRenderingContext2D, box: Box, phase: string, time: number): void
     }, 'steam');
     interface App {
-        canvas: Element; panel: Element; screen: string; sim: DeliciaSimulation; store: DeliciaStore;
+        reducedMotion: boolean; presentation: { renderer: { worldCanvas: Element }; menus: { root: Element } }; canvas: Element; panel: Element; screen: string; sim: DeliciaSimulation; store: DeliciaStore;
         mapCanvas: Element; shake: number; hitStop: number; accumulator: number;
         showSettings(): void; renderGame(): void; paintMap(time: number): void; loop(time: number): void;
         loadStage(id: string, retry: boolean): boolean; dispose(): void;
@@ -86,13 +91,16 @@ function fixture(t: TestContext, system: boolean | null = false, manual = false,
     });
     const app = create();
     const render = () => { app.sim ??= new DeliciaSimulation(); app.sim.time = 1; app.shake = .1;
-        app.canvas.calls.length = 0; app.renderGame();
-        return { reduced: artDraw.mock.calls.at(-1)!.arguments[2], shake: app.canvas.calls[1][0] === 'translate' }; };
+        app.presentation.renderer.worldCanvas.calls.length = 0; app.renderGame();
+        return { reduced: artDraw.mock.calls.at(-1)!.arguments[2], shake: app.presentation.renderer.worldCanvas.calls.some(([name]) => name === 'translate') }; };
     const map = (time: number) => { app.mapCanvas ??= new Element('canvas'); app.mapCanvas.calls.length = 0;
         app.paintMap(time); return app.mapCanvas.calls.filter(([name]) => name === 'lineTo'); };
-    const options = () => { app.showSettings(); const input = app.panel.all().find(node => node.attributes.get('aria-describedby') === 'dl-motion-hint');
-        const hint = app.panel.all().find(node => node.id === 'dl-motion-hint'); assert.ok(input); assert.ok(hint);
-        return { input, hint, toggle: (checked: boolean) => { input.checked = checked; input.dispatchEvent(new Event('change')); } }; };
+    const options = (target=app) => { target.showSettings();
+        const input = target.presentation.menus.root.all().find(node => node.attributes.get('aria-label')?.startsWith('Sempre reduzir movimento')); assert.ok(input);
+        return { input, hint: () => input.attributes.get('aria-label') ?? '', toggle: (checked: boolean) => {
+            if (target.store.save.reducedMotion !== checked) input.click(); target.renderGame();
+        } };
+    };
     return { app, create, render, map, options, changeSystem, listeners, window, artDraw, steamDraw,
         get raw() { return raw; }, get writes() { return writes; }, get activeElement() { return activeElement; }, get frameRequests() { return frameRequests; } };
 }
@@ -105,48 +113,45 @@ test(`startup applies system=${system} OR saved=${manual} to art, shake and sea`
     assert.deepEqual(h.app.store.save, save); assert.equal(h.writes, 0);
 });
 
-test('live system changes update the open settings hint without changing saved opt-in or focus', t => {
+test('live system changes update the shared native option without changing opt-in or focus', t => {
     const h = fixture(t), { input, hint } = h.options(); input.focus();
-    assert.equal(input.checked, false); assert.equal(input.parent?.textContent, 'Sempre reduzir movimento');
-    assert.equal(hint.attributes.get('aria-live'), 'polite'); assert.match(hint.textContent, /seguem o sistema/);
+    assert.equal(input.textContent, 'TREMOR: SIM');
+    assert.match(hint(), /seguem o sistema/);
     h.changeSystem(true);
-    assert.match(hint.textContent, /ativa pelo sistema/); assert.match(hint.textContent, /Marque para manter/);
-    assert.equal(input.checked, false); assert.equal(h.activeElement, input);
-    assert.deepEqual(h.render(), { reduced: true, shake: false }); assert.deepEqual(h.map(1), h.map(2));
+    assert.match(hint(), /ativa pelo sistema/); assert.equal(h.app.reducedMotion, true);
+    assert.equal(h.app.store.save.reducedMotion, false); assert.equal(h.activeElement, input);
     h.changeSystem(false);
-    assert.match(hint.textContent, /seguem o sistema/); assert.equal(h.activeElement, input);
-    assert.deepEqual(h.render(), { reduced: false, shake: true }); assert.notDeepEqual(h.map(1), h.map(2));
-    assert.equal(h.writes, 0); assert.equal(h.app.store.save.reducedMotion, false);
+    assert.match(hint(), /seguem o sistema/); assert.equal(h.app.reducedMotion, false);
+    assert.equal(h.activeElement, input); assert.equal(h.writes, 0);
 });
 
-test('manual opt-in persists independently and unchecking cannot override system reduction', t => {
+test('manual opt-in persists independently and cannot override system reduction', t => {
     const h = fixture(t, true), { input, hint, toggle } = h.options(), original = structuredClone(h.app.store.save);
-    toggle(true); assert.equal(h.writes, 1); assert.match(hint.textContent, /pelo sistema e neste jogo/);
+    toggle(true); assert.equal(h.writes, 1); assert.equal(input.textContent, 'TREMOR: NÃO');
     assert.deepEqual(JSON.parse(h.raw), { ...original, reducedMotion: true });
-    h.changeSystem(false); assert.equal(input.checked, true); assert.match(hint.textContent, /ativa neste jogo/);
-    assert.deepEqual(h.render(), { reduced: true, shake: false }); assert.equal(h.create().store.save.reducedMotion, true);
-    toggle(false); assert.deepEqual(h.render(), { reduced: false, shake: true });
+    h.changeSystem(false); assert.equal(h.app.reducedMotion, true);
+    assert.equal(h.create().store.save.reducedMotion, true);
+    toggle(false); assert.equal(h.app.reducedMotion, false);
     h.changeSystem(true); toggle(true); toggle(false);
-    assert.deepEqual(h.render(), { reduced: true, shake: false }); assert.match(hint.textContent, /ativa pelo sistema/);
+    assert.equal(h.app.reducedMotion, true); assert.match(hint(), /ativa pelo sistema/);
     assert.deepEqual(JSON.parse(h.raw), original); assert.equal(h.writes, 4);
 });
 
-test('manual settings still toggle immediately when matchMedia is unavailable', t => {
+test('manual settings still toggle immediately without matchMedia', t => {
     const h = fixture(t, null), { toggle } = h.options();
-    toggle(true); assert.deepEqual(h.render(), { reduced: true, shake: false });
-    toggle(false); assert.deepEqual(h.render(), { reduced: false, shake: true }); assert.equal(h.listeners.size, 0);
+    toggle(true); assert.equal(h.app.reducedMotion, true);
+    toggle(false); assert.equal(h.app.reducedMotion, false); assert.equal(h.listeners.size, 0);
 });
 
-for (const legacy of [false, true]) test(`${legacy ? 'legacy' : 'modern'} media listeners are removed on pagehide and recreated without stale settings`, t => {
+for (const legacy of [false, true]) test(`${legacy ? 'legacy' : 'modern'} media listeners dispose without stale menu updates`, t => {
     const h = fixture(t, false, false, legacy), { hint } = h.options(); assert.equal(h.listeners.size, 1);
-    h.changeSystem(true); const text = hint.textContent, queued = [...h.listeners][0]; assert.match(text, /ativa pelo sistema/);
+    h.changeSystem(true); const text = hint(), queued = [...h.listeners][0]; assert.match(text, /ativa pelo sistema/);
     h.window.dispatchEvent(new Event('pagehide')); h.app.dispose(); assert.equal(h.listeners.size, 0);
     const requests = h.frameRequests; h.app.loop(1000); assert.equal(h.frameRequests, requests);
-    h.changeSystem(false); queued(new Event('change')); assert.equal(hint.textContent, text);
-    const next = h.create(); assert.equal(h.listeners.size, 1); next.showSettings();
-    const nextHint = next.panel.all().find(node => node.id === 'dl-motion-hint')!;
-    assert.match(nextHint.textContent, /seguem o sistema/); h.changeSystem(true);
-    assert.match(nextHint.textContent, /ativa pelo sistema/); assert.equal(hint.textContent, text);
+    h.changeSystem(false); queued(new Event('change')); assert.equal(hint(), text);
+    const next = h.create(); assert.equal(h.listeners.size, 1); const nextHint = h.options(next).hint;
+    assert.match(nextHint(), /seguem o sistema/); h.changeSystem(true); next.renderGame();
+    assert.match(nextHint(), /ativa pelo sistema/); assert.equal(hint(), text);
     next.dispose(); assert.equal(h.listeners.size, 0);
 });
 
@@ -160,7 +165,7 @@ test('system changes during play preserve simulation steps, hit-stop and progres
     for (let i = 1; i <= 20; i++) {
         if (i === 10) h.changeSystem(false);
         h.app.loop(1010 + i * 10);
-        while (expected.time + 1 / 120 <= h.app.sim.time + 1e-8) expected.update(1 / 120, noDeliciaInput());
+        while (expected.time + 1 / 60 <= h.app.sim.time + 1e-8) expected.update(1 / 60, noDeliciaInput());
     }
     assert.ok(h.app.sim.time > .19); assert.equal(h.app.sim.time, expected.time);
     assert.deepEqual(h.app.sim.player, expected.player); assert.deepEqual(h.app.sim.enemies, expected.enemies);

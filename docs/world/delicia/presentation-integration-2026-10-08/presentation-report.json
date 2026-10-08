@@ -1,0 +1,208 @@
+{
+  "errors": [],
+  "checks": [
+    {
+      "viewport": {
+        "name": "desktop",
+        "width": 1366,
+        "height": 900,
+        "deviceScaleFactor": 1
+      },
+      "world": {
+        "x": 43,
+        "y": 90,
+        "width": 1280,
+        "height": 720
+      },
+      "chapter": {
+        "x": 43,
+        "y": 90,
+        "width": 1280,
+        "height": 720
+      },
+      "renderer": "shared",
+      "player": "shared",
+      "pausePixels": "identical",
+      "settingsPixels": "identical",
+      "input": "passed",
+      "preferences": "shared",
+      "returnAndReentry": "passed"
+    },
+    {
+      "viewport": {
+        "name": "wide",
+        "width": 1920,
+        "height": 1080,
+        "deviceScaleFactor": 1
+      },
+      "world": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "chapter": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "renderer": "shared",
+      "player": "shared",
+      "pausePixels": "identical",
+      "settingsPixels": "identical",
+      "input": "passed",
+      "preferences": "shared",
+      "returnAndReentry": "passed"
+    },
+    {
+      "viewport": {
+        "name": "fractional-dpr",
+        "width": 1536,
+        "height": 864,
+        "deviceScaleFactor": 1.25
+      },
+      "world": {
+        "x": 128,
+        "y": 72,
+        "width": 1280,
+        "height": 720
+      },
+      "chapter": {
+        "x": 128,
+        "y": 72,
+        "width": 1280,
+        "height": 720
+      },
+      "renderer": "shared",
+      "player": "shared",
+      "pausePixels": "identical",
+      "settingsPixels": "identical",
+      "input": "passed",
+      "preferences": "shared",
+      "returnAndReentry": "passed"
+    },
+    {
+      "viewport": {
+        "name": "portrait",
+        "width": 390,
+        "height": 844,
+        "deviceScaleFactor": 3,
+        "hasTouch": true
+      },
+      "world": {
+        "x": 35,
+        "y": 332,
+        "width": 320,
+        "height": 180
+      },
+      "chapter": {
+        "x": 35,
+        "y": 332,
+        "width": 320,
+        "height": 180
+      },
+      "renderer": "shared",
+      "player": "shared",
+      "pausePixels": "identical",
+      "settingsPixels": "identical",
+      "input": "passed",
+      "preferences": "shared",
+      "returnAndReentry": "passed"
+    },
+    {
+      "viewport": {
+        "name": "landscape",
+        "width": 844,
+        "height": 390,
+        "deviceScaleFactor": 3,
+        "hasTouch": true
+      },
+      "world": {
+        "x": 102,
+        "y": 15,
+        "width": 640,
+        "height": 360
+      },
+      "chapter": {
+        "x": 102,
+        "y": 15,
+        "width": 640,
+        "height": 360
+      },
+      "renderer": "shared",
+      "player": "shared",
+      "pausePixels": "identical",
+      "settingsPixels": "identical",
+      "input": "passed",
+      "preferences": "shared",
+      "returnAndReentry": "passed"
+    },
+    {
+      "legacyEntry": "http://localhost:3000/?chapter=delicia",
+      "sharedMap": true
+    }
+  ],
+  "screenshots": [
+    "desktop-world-play.png",
+    "desktop-world-dialogue.png",
+    "desktop-world-pause.png",
+    "desktop-world-settings.png",
+    "desktop-delicia-dialogue.png",
+    "desktop-delicia-play.png",
+    "desktop-delicia-pause.png",
+    "desktop-delicia-settings.png",
+    "desktop-delicia-controls.png",
+    "desktop-delicia-journal.png",
+    "desktop-delicia-6-phase-1.png",
+    "desktop-delicia-6-phase-2.png",
+    "desktop-delicia-6-phase-3.png",
+    "desktop-delicia-12-phase-1.png",
+    "desktop-delicia-12-phase-2.png",
+    "desktop-delicia-12-phase-3.png",
+    "desktop-delicia-clear.png",
+    "desktop-delicia-retry.png",
+    "desktop-delicia-memory-found.png",
+    "desktop-delicia-save-recovery.png",
+    "wide-world-play.png",
+    "wide-world-dialogue.png",
+    "wide-world-pause.png",
+    "wide-world-settings.png",
+    "wide-delicia-dialogue.png",
+    "wide-delicia-play.png",
+    "wide-delicia-pause.png",
+    "wide-delicia-settings.png",
+    "wide-delicia-controls.png",
+    "wide-delicia-journal.png",
+    "fractional-dpr-world-play.png",
+    "fractional-dpr-world-dialogue.png",
+    "fractional-dpr-world-pause.png",
+    "fractional-dpr-world-settings.png",
+    "fractional-dpr-delicia-dialogue.png",
+    "fractional-dpr-delicia-play.png",
+    "fractional-dpr-delicia-pause.png",
+    "fractional-dpr-delicia-settings.png",
+    "fractional-dpr-delicia-controls.png",
+    "fractional-dpr-delicia-journal.png",
+    "portrait-world-play.png",
+    "portrait-world-dialogue.png",
+    "portrait-world-pause.png",
+    "portrait-world-settings.png",
+    "portrait-delicia-dialogue.png",
+    "portrait-delicia-play.png",
+    "portrait-delicia-pause.png",
+    "portrait-delicia-settings.png",
+    "portrait-delicia-controls.png",
+    "portrait-delicia-journal.png",
+    "landscape-world-play.png",
+    "landscape-world-dialogue.png",
+    "landscape-world-pause.png",
+    "landscape-world-settings.png",
+    "landscape-delicia-dialogue.png",
+    "landscape-delicia-play.png",
+    "landscape-delicia-pause.png",
+    "landscape-delicia-settings.png",
+    "landscape-delicia-controls.png",
+    "landscape-delicia-journal.png"
+  ]
+}

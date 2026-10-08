@@ -24,6 +24,8 @@ export interface GuairaChapterMapPort {
     dispose(): void;
 }
 export interface GuairaChapterAppDependencies {
+    initialScene?: GuairaChapterSceneId | 'gallery' | 'relief';
+    returnToWorldMap?: () => void;
     loadScene?: (sceneId: GuairaChapterSceneId) => Promise<GuairaChapterSceneFactory>;
     loadExcursion?: (sceneId: GuairaChapterExcursionSceneId) => Promise<GuairaChapterExcursionFactory>;
     createMap?: (root: HTMLElement, options: GuairaChapterMapOptions) => GuairaChapterMapPort;
@@ -62,12 +64,15 @@ export class GuairaChapterApp {
     private readonly campaign: boolean;
     private readonly continueCampaign?: () => void;
     private readonly canContinueCampaign?: () => boolean;
+    private readonly returnToWorldMap?: () => void;
 
     constructor(private readonly root: HTMLElement, dependencies: GuairaChapterAppDependencies = {}) {
         let storage: Storage | null = null;
         try { storage = window.localStorage; } catch { /* unavailable: session fallback */ }
         this.progressStore = dependencies.progressStore ?? new ProgressStore(storage);
         this.progress = this.progressStore.save.guaira ?? freshGuairaChapterProgress();
+        if (!this.progress.completed.length && (dependencies.initialScene === 'guaira-travessia' || dependencies.initialScene === 'guaira-patio-comportas'))
+            this.progress = { ...this.progress, opening: dependencies.initialScene, selectedScene: dependencies.initialScene, resumeScene: null };
         this.session = new GuairaChapterSession({ progress: this.progress, developmentUnlocked: hasDevelopmentAccess(this.progressStore.save) });
         this.audioEnabled = this.progress.audioEnabled;
         this.openingAvailable = !this.progress.completed.length && this.progress.resumeScene === null;
@@ -75,6 +80,7 @@ export class GuairaChapterApp {
         this.campaign = dependencies.campaign ?? false;
         this.continueCampaign = dependencies.continueCampaign;
         this.canContinueCampaign = dependencies.canContinueCampaign;
+        this.returnToWorldMap = dependencies.returnToWorldMap;
         this.loadScene = dependencies.loadScene ?? loadGuairaChapterScene;
         this.loadExcursion = dependencies.loadExcursion ?? loadGuairaChapterExcursion;
         this.createMap = dependencies.createMap ?? ((node, options) => new GuairaChapterMapView(node, options));
@@ -89,10 +95,10 @@ export class GuairaChapterApp {
                 target instanceof HTMLElement && this.root.contains(target) && target.closest('button, a[href]'))
                 event.preventDefault();
         }, true);
-        const resume = this.progress.resumeScene;
+        const resume = dependencies.initialScene ?? this.progress.resumeScene;
         this.persistProgress(resume);
         if (resume === 'gallery' || resume === 'relief') this.beginExcursion(resume);
-        else if (resume && !this.progress.completed.includes(resume)) {
+        else if (resume && (dependencies.initialScene || !this.progress.completed.includes(resume))) {
             this.session.selectScene(resume, this.snapshot.generation);
             const attempt = this.session.enterScene(resume, this.snapshot.generation);
             if (attempt) void this.showScene(attempt); else this.showMap('town');
@@ -193,6 +199,7 @@ export class GuairaChapterApp {
     }
     private showMap(arrival: GuairaArrival, walkToSelection = false, focusAction = false) {
         if (this.isDisposed) return;
+        if (this.returnToWorldMap) { queueMicrotask(() => { if (!this.isDisposed) this.returnToWorldMap?.(); }); return; }
         const scope = this.replaceView('map'), recovery = this.recoveryFocus(scope), node = document.createElement('div');
         node.id = 'guaira-chapter-map'; this.root.append(node);
         document.title = chapterTitle();

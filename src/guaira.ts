@@ -33,7 +33,7 @@ export function startGuairaMap(): () => void {
     new LabToolbarAction(dismiss).setLabel('VOLTAR', 'Fechar desvios e voltar ao mapa');
     const destinations = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-map-destination]'));
     const markers = destinations.filter(button => button.classList.contains('guaira-marker'));
-    new LabToolbarAction(element('map-exit')).setLabel('SAIR', 'Voltar aos experimentos');
+    new LabToolbarAction(element('map-exit')).setLabel('VOLTAR', 'Voltar ao jogo');
     const chapterLink = element('map-chapter');
     if (chapterLink) new LabToolbarAction(chapterLink).setLabel('CAPÍTULO', 'Jogar o capítulo de Guaíra: cinco resultados nesta sessão');
     const enterArt = new LabToolbarAction(enter, true);

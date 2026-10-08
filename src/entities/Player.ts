@@ -8,8 +8,11 @@ import {
   GP_WINDUP_MS, GP_RECOVERY_MS, GP_FALL_SPEED, GP_HORIZONTAL_MULT
 } from '../constants';
 import { PlayerData, InputState, Vector2, Rect, GroundPoundState } from '../types';
-import { Level } from '../world/Level';
+import type { Level } from '../world/Level';
 import { PLAYER_HITBOX_W, PLAYER_HITBOX_H } from '../assets/playerSpriteSpec';
+
+/** Terrain contract shared by tile stages and authored chapter platforms. */
+export type PlayerCollisionWorld = Pick<Level, 'resolveCollision' | 'isInGap' | 'worldToCol' | 'worldToRow' | 'getTile'>;
 
 export class Player {
   data: PlayerData;
@@ -46,7 +49,7 @@ export class Player {
     };
   }
 
-  update(deltaTime: number, input: InputState, level: Level): {
+  update(deltaTime: number, input: InputState, level: PlayerCollisionWorld, stepScale = 1): {
     tileHit?: { type: number; col: number; row: number; side: 'top' | 'bottom' | 'left' | 'right' } | null,
     groundPoundImpact?: { x: number, y: number, col: number, row: number } | null,
     groundPoundStarted?: boolean,
@@ -81,10 +84,10 @@ export class Player {
     // Processa input horizontal (se não estiver em windup/recovery)
     const friction = this.getGroundFriction(level);
     if (this.data.groundPoundState === GroundPoundState.NONE || this.data.groundPoundState === GroundPoundState.FALL) {
-      this.handleHorizontalMovement(input, friction);
+      this.handleHorizontalMovement(input, friction, stepScale);
     } else {
       // Em windup ou recovery, velocidade horizontal cai drasticamente
-      this.data.velocity.x *= 0.8;
+      this.data.velocity.x *= Math.pow(0.8, stepScale);
     }
 
     // Processa pulo (bloqueado durante ground pound)
@@ -95,7 +98,7 @@ export class Player {
 
     // Aplica gravidade (se não estiver em windup ou recovery)
     if (this.data.groundPoundState === GroundPoundState.NONE || this.data.groundPoundState === GroundPoundState.FALL) {
-      this.applyGravity();
+      this.applyGravity(stepScale);
     } else if (this.data.groundPoundState === GroundPoundState.WINDUP) {
       // Pausa no ar durante windup
       this.data.velocity.y = 0;
@@ -105,7 +108,7 @@ export class Player {
     }
 
     // Resolve colisões (passando prevRect para plataformas one-way corretas)
-    const collisionResult = this.resolveCollisions(level, prevRect);
+    const collisionResult = this.resolveCollisions(level, prevRect, stepScale);
 
     // An underside collision ends the ascent. Otherwise held jump reapplies
     // its upward boost on the next step and pins Feka to a low ceiling.
@@ -216,7 +219,7 @@ export class Player {
     }
   }
 
-  private getGroundFriction(level: Level): number {
+  private getGroundFriction(level: PlayerCollisionWorld): number {
     if (!this.data.isGrounded) return PLAYER_FRICTION;
     const footX = this.data.position.x + this.data.width / 2;
     const footY = this.data.position.y + this.data.height + 1;
@@ -227,7 +230,7 @@ export class Player {
     return PLAYER_FRICTION;
   }
 
-  private handleHorizontalMovement(input: InputState, friction: number): void {
+  private handleHorizontalMovement(input: InputState, friction: number, stepScale: number): void {
     this.data.isRunning = input.run;
 
     // Velocidade máxima baseada em correr e café
@@ -248,7 +251,7 @@ export class Player {
 
     // Aceleração/desaceleração suave
     if (targetVelX !== 0) {
-      let accel = PLAYER_ACCELERATION;
+      let accel = PLAYER_ACCELERATION * stepScale;
       if (this.data.groundPoundState === GroundPoundState.FALL) {
         accel *= GP_HORIZONTAL_MULT;
       }
@@ -265,7 +268,7 @@ export class Player {
       }
     } else {
       // Desacelerando (fricção)
-      this.data.velocity.x *= friction;
+      this.data.velocity.x *= Math.pow(friction, stepScale);
       if (Math.abs(this.data.velocity.x) < 0.1) {
         this.data.velocity.x = 0;
       }
@@ -316,7 +319,7 @@ export class Player {
     return started;
   }
 
-  private handleGroundPound(input: InputState, deltaTime: number, level: Level, firstStepAfterSpawn: boolean): { impact: { x: number, y: number, col: number, row: number } | null, started: boolean } {
+  private handleGroundPound(input: InputState, deltaTime: number, level: PlayerCollisionWorld, firstStepAfterSpawn: boolean): { impact: { x: number, y: number, col: number, row: number } | null, started: boolean } {
     let started = false;
     let airborne = !this.data.isGrounded;
     if (airborne && input.downPressed && firstStepAfterSpawn && this.data.velocity.y === 0) {
@@ -355,19 +358,19 @@ export class Player {
     return { impact: null, started };
   }
 
-  private applyGravity(): void {
-    this.data.velocity.y += GRAVITY;
+  private applyGravity(stepScale: number): void {
+    this.data.velocity.y += GRAVITY * stepScale;
     const cap = (this.data.groundPoundState === GroundPoundState.FALL) ? Math.max(MAX_FALL_SPEED, GP_FALL_SPEED) : MAX_FALL_SPEED;
     this.data.velocity.y = Math.min(this.data.velocity.y, cap);
   }
 
-  private resolveCollisions(level: Level, prevRect: { x: number; y: number; width: number; height: number }): { position: { x: number; y: number }, velocity: { x: number; y: number }, grounded: boolean, tileHit?: { type: number; col: number; row: number; side: 'top' | 'bottom' | 'left' | 'right' } | null } {
+  private resolveCollisions(level: PlayerCollisionWorld, prevRect: { x: number; y: number; width: number; height: number }, stepScale: number): { position: { x: number; y: number }, velocity: { x: number; y: number }, grounded: boolean, tileHit?: { type: number; col: number; row: number; side: 'top' | 'bottom' | 'left' | 'right' } | null } {
     const rect = this.getRect();
-    const result = level.resolveCollision(rect, this.data.velocity, prevRect);
+    const result = level.resolveCollision(rect, { x: this.data.velocity.x * stepScale, y: this.data.velocity.y * stepScale }, prevRect);
 
     return {
       position: result.position,
-      velocity: result.velocity,
+      velocity: { x: result.velocity.x / stepScale, y: result.velocity.y / stepScale },
       grounded: result.grounded,
       tileHit: result.tileHit || null
     };
@@ -478,6 +481,16 @@ export class Player {
     if (this.data.isDead) return;
     this.data.velocity.y = PLAYER_JUMP_FORCE * 0.6;
     this.data.isJumping = true;
+  }
+
+  /** World campaign stomp response, also used by embedded chapters. */
+  bounceFromSurface(surfaceY: number): void {
+    if (this.data.isDead) return;
+    this.data.position.y = surfaceY - this.data.height;
+    this.data.velocity.y = -7;
+    this.data.isGrounded = false;
+    this.data.groundPoundState = GroundPoundState.NONE;
+    this.data.invincibleTimer = Math.max(150, this.data.invincibleTimer);
   }
 
   reset(spawnX: number, spawnY: number): void {

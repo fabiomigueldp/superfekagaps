@@ -118,6 +118,23 @@ function invokeSaved(callback: EventListenerOrEventListenerObject, event = new E
     if (typeof callback === 'function') callback(event); else callback.handleEvent(event);
 }
 
+test('shared world entry starts the requested native scene and returns without building another map', async t => {
+    const h = hostBrowser(t), progressStore = new ProgressStore(null);
+    let returned = 0;
+    const app = h.create({ progressStore, campaign: true, initialScene: 'guaira-patio-comportas',
+        returnToWorldMap: () => { returned++; app.dispose(); } });
+    await waitForGame(app);
+    assert.equal(h.mapPorts.length, 0, 'The world map already owns stage selection');
+    assert.equal(app.snapshot.activeAttempt?.sceneId, 'guaira-patio-comportas');
+    assert.equal(progressStore.save.guaira.opening, 'guaira-patio-comportas');
+    assert.equal(progressStore.save.guaira.resumeScene, 'guaira-patio-comportas');
+    h.byId('chapter-primary').click(); h.byId('chapter-map-return').click(); await flush();
+    assert.equal(returned, 1); assert.equal(h.mapPorts.length, 0);
+    assert.equal(progressStore.save.guaira.resumeScene, null);
+    assert.deepEqual(progressStore.save.guaira.completed, [], 'Returning does not award a completion');
+    h.checkDisposed();
+});
+
 test('chapter guidance opens with the real objective and retains the native valve instruction', async t => {
     const h = hostBrowser(t), factory = await loadGuairaChapterScene('guaira-travessia');
     const app = h.create({ loadScene: async () => factory }); h.enter(); await flush();

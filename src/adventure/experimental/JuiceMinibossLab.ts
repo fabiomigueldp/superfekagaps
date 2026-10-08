@@ -45,14 +45,17 @@ class LabEncounter extends BossEncounter {
         this.phase = b.phase === 'recover' ? 'open' : b.phase === 'intro' || b.phase === 'enrage' ? 'rest' : b.phase;
     }
     override update(dt: number, player: Rect, _objects: WorldObjects, _level: WorldLevel) {
-        const previousDrops = this.model.drops.slice();
         this.model.update(dt, player); this.sync();
         this.effects.advance(this.model.time);
-        for (const d of previousDrops) if (!this.model.drops.includes(d) && d.y + d.height >= this.model.arena.floor)
-            this.effects.add('drip', d.x + d.width / 2, this.model.arena.floor, this.model.time);
         for (const e of this.model.events) {
-            if (e.kind === 'spit') this.effects.add('spit', e.x, e.y, this.model.time, this.model.facing);
-            if (e.kind === 'splash' && this.model.attack !== 'fan') this.effects.add('landing', e.x, e.y, this.model.time);
+            if (e.kind === 'drop-impact') this.effects.impact(e, this.model.arena.floor);
+            if (e.kind === 'spit') {
+                const vectors = this.model.fanLaunch.vectors, aim = vectors[Math.floor(vectors.length / 2)];
+                this.effects.add('spit', e.x, e.y, this.model.time, this.model.facing,
+                    { vx: aim.vx * 1000, vy: aim.vy * 1000 });
+            }
+            if (e.kind === 'splash' && this.model.attack !== 'fan') this.effects.add('landing', e.x, e.y,
+                this.model.time, this.model.facing, { vx: this.model.facing * 35, vy: this.model.attack === 'pounce' ? 300 : 120 });
         }
         this.danger = this.model.hazards.find(r => overlaps(r, player)) ?? null;
         this.impact = this.model.attack === 'pounce' && this.model.events.some(e => e.kind === 'splash');
@@ -61,9 +64,11 @@ class LabEncounter extends BossEncounter {
     }
     override contact(p: Rect, previous: Rect, falling: boolean) {
         const retiringGeysers = this.model.geysers;
+        const retiringDrops = this.model.drops;
         const result = this.model.contact(p, previous, falling); this.sync();
         if (result === 'bounce') this.blockedStompAt = this.model.time;
         if (result === 'hit' || result === 'defeated') {
+            this.effects.releaseDrops(retiringDrops, this.model);
             this.effects.releaseGeysers(retiringGeysers, this.model.time);
             this.effects.add('hit', this.x + this.width / 2, this.y, this.model.time);
             if (result === 'defeated') this.effects.add('defeat', this.x + this.width / 2, this.model.arena.floor, this.model.time);

@@ -38,7 +38,7 @@ The runtime Canvas2D painters retain the existing 320×180 presentation:
 ## Attack set and timing
 
 1. **Pressure dash:** directional chevrons and a floor line, compression, a sweep across the arena and liquid afterimages. Jump over it and punish at the far end.
-2. **Pressure fan:** body inflation and one ray per shot precede seven stage-one droplets or nine stage-two droplets. The spread is locked and each droplet lasts at most 1,700ms; leaving the arena or reaching the floor removes it earlier.
+2. **Pressure fan:** body inflation and one ray per shot precede seven stage-one droplets or nine stage-two droplets. The spread is locked and damage lasts at most 1,700ms. Liquid continues falling afterward until its head touches the floor or a chamber wall; a surface impact takes over its remaining mass.
 3. **Elastic pounce:** crouch, mark the locked landing point, leap in an arc and splash. Leave the mark, then counterattack during the longer recovery.
 
 | Timing | Stage one | Stage two |
@@ -104,7 +104,19 @@ The updated browser recording is `output/turbosuco/revisao-visual.mp4`, with the
 
 `JuiceFluid` supplies integer scanline drawing, the shared geyser collision profile and analytic ballistic flights. Pressure packets travel from each nozzle upward, briefly connected necks separate at the crown, falling globs accelerate and turn into flattened deposits with small secondary splashes. Impacts start with a spreading sheet and finish as lobed puddles rather than expanding rings. The introduction, transformation, landing, projectiles and defeat share this material. Projectiles now impact when their bottom touches the floor, instead of disappearing after sinking below it.
 
-The liquid renderer samples bounded emissions from the simulation clock; pause freezes the full effect. When a stomp clears combat hazards, the effect pool retains the geysers' existing falling age so the harmless residue finishes naturally. Reduced motion omits detached spray and idle dripping while keeping the functional rising front and danger boundary visible. The effect pool remains capped at 24 bursts. Tests cover rising-front collision, harmless shutoff, ballistic landing, integer pixel spans, palette cutouts, non-mutating drawing, residue expiry and the full ordinary-input victory. All 95 focused tests and the production build pass. The replay still wins at frames 143, 283, 433, 563, 789 and 941, with no deaths.
+The liquid renderer samples bounded emissions from the simulation clock; pause freezes the full effect. When a stomp clears combat hazards, the effect pool retains the geysers' existing falling age so the harmless residue finishes naturally. Reduced motion omits detached spray and idle dripping while keeping the functional rising front and danger boundary visible. The effect pool remains capped at 24 bursts. Tests cover rising-front collision, harmless shutoff, ballistic landing, integer pixel spans, palette cutouts, non-mutating drawing, residue expiry and the full ordinary-input victory. All 95 focused tests and the production build passed in that revision. The replay still wins at frames 143, 283, 433, 563, 789 and 941, with no deaths.
+
+### Complete projectile paths and viscous landings (2026-10-07)
+
+Fan droplets retain their existing launch vectors, gravity and 1,700ms damage window. Expired drops stay visible as darker, harmless liquid until contact. Swept floor/wall contacts emit one `drop-impact` with the exact contact position, simulation time and incoming velocity, including every contact inside a single delayed update. The chamber walls sit 16 pixels outside the arena's movement bounds, preserving the player's corner space.
+
+A successful stomp clears collision immediately and hands airborne drops to `JuiceCombatEffects`. Their copied positions and velocities continue under the same gravity, with no timed fade in flight. Floor hits spread into lobed deposits and secondary droplets; wall hits cling, stretch into downward strands and drain to the floor. Only deposited material fades. Reduced motion retains these necessary falling paths with simplified heads and deposits while suppressing decorative spray. Pause freezes the shared clock and retry creates a fresh pool.
+
+Curved ligaments briefly connect new projectiles to the mouth. Landing sheets and delayed spray originate along the monster's skirt, stretch, pinch apart and follow independent ballistic paths. The pounce descends in a stretched pose, compresses after contact, then rebounds and settles through a damped oscillation. Its attack/recovery poses still join continuously; the visible splash follows the same landing event used by sound and camera feedback.
+
+Validation: 176 focused juice/introduction/epilogue/salon tests passed, including 14 new regressions for full fan paths, upward aim, both corners, expiry without extra damage, precise contact events, stomp handoff, reduced motion and elastic settling. The mounted browser replay completed all 942 frames with zero deaths and the same six hit frames, unchanged localStorage and no browser warnings/errors. The observed cosmetic pool peaked at 12 of its 24 slots. Local simulation plus drawing measured a 1.4ms median and 3ms p95 in the initial visual pass; this is a CPU observation rather than a device frame-rate benchmark.
+
+The local animated review and replay capture harness are in `output/turbosuco-fluid/review.html`, served by Vite. Those generated review files are ignored by Git and excluded from the production assets.
 
 `output/turbosuco/gosma-pixel.mp4` is a 17.2-second preview exported from the real browser renderer at 30 frames per second, using the ordinary-input replay. Browser checks also cover the enlarged introduction, phase two, reduced-motion rendering and a 390×844 viewport without horizontal overflow. Rendering preserved the model state and the browser reported no console errors.
 

@@ -19,6 +19,7 @@ class Element extends EventTarget {
                 return this.attributes.has('contenteditable') && this.attributes.get('contenteditable') !== 'false';
             case 'a[href]': return this.tagName === 'A' && this.attributes.has('href');
             case '.world-map': return this.attributes.get('class')?.split(/\s+/).includes('world-map') ?? false;
+            case '.world-chapter-host': return this.attributes.get('class')?.split(/\s+/).includes('world-chapter-host') ?? false;
             case 'input': case 'textarea': case 'select': case 'button': case 'summary':
                 return this.tagName === selector.toUpperCase();
             default: assert.fail(`Unimplemented selector: ${selector}`);
@@ -91,6 +92,16 @@ function assertNeutral(input: Input, message: string) {
     input.update();
     assert.ok(Object.values(input.getState()).every(value => value === false), message);
 }
+
+test('embedded chapter canvas owns input while the world canvas is suspended', t => {
+    const h = browser(t), chapter = h.open();
+    h.dialog.attributes.delete('open'); h.dialog.attributes.set('class', 'world-chapter-host');
+    h.key('keydown', 'ArrowRight'); h.key('keydown', 'Space'); chapter.update();
+    assert.equal(chapter.getState().right, true); assert.equal(chapter.getState().jumpPressed, true);
+    assertNeutral(h.campaign, 'The world must not retain chapter input');
+    h.key('keyup', 'ArrowRight', h.nav); h.key('keyup', 'Space', h.nav);
+    chapter.update(); assert.equal(chapter.getState().right, false); assert.equal(chapter.getState().jump, false);
+});
 
 test('owned editable salon canvas accepts movement, jump and pause through its open dialog ancestor', t => {
     const h = browser(t), salon = h.open();

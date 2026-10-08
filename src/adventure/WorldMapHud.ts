@@ -2,6 +2,7 @@ import type { GamepadMenuCommand } from '../engine/StandardGamepad';
 import { ISLANDS, STAGES } from './campaign';
 import { fitText, panel, pixelText, textWidth, wrapText } from '../graphics/BitmapFont';
 import { ART } from '../graphics/palette';
+import type { ChapterMapStage, WorldChapter } from './WorldChapterMap';
 import { mapAssetPrefix } from './WorldMapArt';
 import { loadMapSignAtlas, loadMapFactorySignAtlas, loadMapFactoryLeftSignAtlas, paintPhysicalTravelSign, paintPhysicalStageSign,
     loadMapIslandSignAtlas, paintPhysicalIslandSign, paintPhysicalIslandBadge, paintIslandSelectionPointer,
@@ -40,6 +41,8 @@ export interface WorldMapHudCallbacks {
     selectStage(index: number): void;
     selectWorld(world: number): void;
     selectGuaira?(): void;
+    selectDelicia?(): void;
+    selectChapterStage?(index: number): void;
     /** A named island in the panorama opens its close view. */
     selectOverviewWorld?(world: number): void;
     /** Route-specific action; omitted callbacks retain destination-world selection. */
@@ -60,12 +63,13 @@ export interface WorldMapHudState {
     open: readonly boolean[];
     completed: readonly boolean[];
     seals: readonly number[];
-    globalProgress: { completed: number; seals: number; guaira?: number };
+    globalProgress: { completed: number; seals: number; guaira?: number; delicia?: { completed: number; stages: number; seals: number; sealTotal: number } };
     motionState: WorldMapMotionState;
     canEnter: boolean;
     hint: string;
     /** Exact progression gate for an unavailable preview, never a missing/loading route. */
     prerequisiteStage?: string | null;
+    previewAction?: 'travel' | 'guaira';
     warnings?: readonly string[];
     /** Six entries, one per region. Locked regions remain inspectable. */
     worldAvailability: readonly boolean[];
@@ -119,7 +123,7 @@ function lettering(canvas: HTMLCanvasElement, text: string, color: string = ART.
 }
 function phaseLettering(canvas: HTMLCanvasElement, text: string): void {
     // Keep every campaign title readable at native pixel size, including 320px screens.
-    const lines = wrapText(text, 140), width = Math.max(...lines.map(line => textWidth(line)));
+    const lines = wrapText(text, 210), width = Math.max(...lines.map(line => textWidth(line)));
     const ctx = context(canvas, width + 2, lines.length * 11 + 1);
     if (ctx) lines.forEach((line, index) => pixelText(ctx, line, 1, 3 + index * 11, ART.paper));
 }
@@ -198,6 +202,12 @@ export class WorldMapHud {
     readonly chapterLinks = element('div', 'world-map-chapter-links');
     readonly stageButtons: HTMLButtonElement[] = [];
     readonly overviewButtons: HTMLButtonElement[] = [];
+    readonly chapterButtons: HTMLButtonElement[] = [];
+    private chapter: WorldChapter | null = null;
+    private chapterKey = '';
+    private readonly deliciaOverview = element('button', 'world-map-island world-map-delicia-island');
+    private readonly deliciaCanvas = bitmap(this.deliciaOverview);
+    private readonly deliciaRegion = element('button', 'world-map-region');
     /** Legacy destination order: Costa, Porto. Both are ferry actions. */
     readonly dockButtons: HTMLButtonElement[] = [];
     readonly travelButtons = {} as Record<WorldMapTravelActionId, HTMLButtonElement>;
@@ -260,18 +270,19 @@ export class WorldMapHud {
         this.canvas.setAttribute('aria-hidden', 'true');
         this.nodeLayer.setAttribute('aria-label', 'Fases e transportes do mapa');
         this.scene.append(this.canvas, this.nodeLayer);
-        this.regionButton = action('world-map-tool world-map-archipelago', 'Arquipélago', () => this.toggleRegionMenu());
+        this.regionButton = action('world-map-tool world-map-archipelago', 'Ilhas', () => this.toggleRegionMenu());
+        this.regionButton.hidden = true;
         this.regionButton.setAttribute('aria-expanded', 'false');
         this.regionMenu.id = `world-map-regions-${id}`;
         this.regionButton.setAttribute('aria-controls', this.regionMenu.id);
         this.regionMenu.setAttribute('aria-label', 'As sete regiões'); this.regionMenu.hidden = true;
-        this.overviewButton = action('world-map-tool world-map-overview', 'MAPA', () => this.run(() => callbacks.overview()));
-        this.overviewButton.setAttribute('aria-label', 'Ver mapa'); this.overviewButton.title = 'Ver mapa';
-        (this.overviewButton.children[1] as HTMLElement).textContent = 'Ver mapa';
+        this.overviewButton = action('world-map-tool world-map-overview', 'Mundo', () => this.run(() => callbacks.overview()));
+        this.overviewButton.setAttribute('aria-label', 'Ver mundo'); this.overviewButton.title = 'Ver mundo';
+        (this.overviewButton.children[1] as HTMLElement).textContent = 'Ver mundo';
         this.overviewButton.setAttribute('aria-pressed', 'false');
         const menu = this.menuButton = action('world-map-tool world-map-menu', 'II', () => this.run(() => callbacks.menu()));
         menu.setAttribute('aria-label', 'Menu do jogo'); menu.title = 'Menu do jogo';
-        this.tools.append(this.regionButton, this.overviewButton, menu); this.header.append(this.title, this.tools);
+        this.tools.append(this.overviewButton, this.regionButton, menu); this.header.append(this.title, this.tools);
         for (const island of ISLANDS) {
             const button = element('button', 'world-map-island'); button.type = 'button';
             button.setAttribute('data-island-world', String(island.id));
@@ -287,6 +298,12 @@ export class WorldMapHud {
         this.guairaOverview.setAttribute('data-region-key', 'guaira');
         accessibleText(this.guairaOverview, 'Guaíra');
         this.guairaOverview.addEventListener('click', () => this.run(() => callbacks.selectGuaira?.()));
+        this.deliciaOverview.type = 'button'; this.deliciaOverview.hidden = true;
+        this.deliciaOverview.setAttribute('aria-label', 'Império da Delícia. Ver ilha.');
+        accessibleText(this.deliciaOverview, 'Império da Delícia');
+        islandSign(this.deliciaCanvas, 'DELÍCIA', false, true);
+        this.deliciaOverview.addEventListener('click', () => this.run(() => callbacks.selectDelicia?.()));
+        if (callbacks.selectDelicia) this.nodeLayer.append(this.deliciaOverview);
         for (let n = 0; n < 5; n++) {
             const button = element('button', 'world-map-node'); button.type = 'button';
             const canvas = bitmap(button); accessibleText(button, `Fase ${n + 1}`);
@@ -333,6 +350,12 @@ export class WorldMapHud {
                 this.guairaRegion.addEventListener('click', () => this.run(() => { this.closeRegionMenu(true); callbacks.selectGuaira?.(); }));
                 this.regionMenu.append(this.guairaRegion);
             }
+        }
+        if (callbacks.selectDelicia) {
+            this.deliciaRegion.type = 'button';
+            lettering(bitmap(this.deliciaRegion), 'IMPÉRIO DA DELÍCIA'); accessibleText(this.deliciaRegion, 'Império da Delícia');
+            this.deliciaRegion.addEventListener('click', () => this.run(() => { this.closeRegionMenu(true); callbacks.selectDelicia?.(); }));
+            this.regionMenu.append(this.deliciaRegion);
         }
         const copy = element('div', 'world-map-stage-copy');
         copy.append(this.stageDetails, this.status, this.location, this.hint);
@@ -392,6 +415,7 @@ export class WorldMapHud {
         void loadMapSignAtlas(prefix, this.assetAbort.signal).then(atlas => {
             if (!atlas || this.disposed) return;
             this.signAtlas = atlas;
+            this.chapterKey = '';
             if (!this.state) return;
             for (let n = 0; n < 5; n++) this.paintStage(n, this.state);
             this.paintOverview(this.state);
@@ -428,6 +452,11 @@ export class WorldMapHud {
 
     update(state: WorldMapHudState): void {
         if (this.disposed) return;
+        if (this.chapter) {
+            this.chapter = null; this.chapterKey = ''; this.signature = '';
+            this.chapterButtons.forEach(button => { button.hidden = true; });
+            this.root.classList.remove('is-chapter');
+        }
         this.state = state;
         if (state.overview) this.loadIslandSignArt();
         if (state.world === 3) this.loadFactorySignArt();
@@ -472,7 +501,7 @@ export class WorldMapHud {
         }
         this.compactDetails.classList.toggle('is-encounter', !!stage.encounter);
         this.status.textContent = state.overview ? traveling ? MOTION_COPY[state.motionState]
-            : `Ilha selecionada · ${state.worldAvailability[state.world - 1] ? 'disponível' : 'bloqueada'}`
+            : 'Escolha uma ilha para explorar'
             : state.preview ? traveling ? `Prévia · ${MOTION_COPY[state.motionState]}`
             : prerequisite ? `Prévia · Conclua ${prerequisite.id}` : 'Prévia · Feka não chegou aqui'
             : traveling ? MOTION_COPY[state.motionState]
@@ -481,19 +510,19 @@ export class WorldMapHud {
             : 'Destino marcado';
         const arrived = STAGES.find(entry => entry.id === state.arrivedStage);
         this.location.textContent = arrived ? `${traveling ? 'Última chegada' : 'Feka em'}${traveling ? ':' : ''} ${arrived.id} · ${REGION_NAMES[arrived.world - 1]}` : '';
-        this.location.hidden = !arrived;
+        this.location.hidden = !arrived || (!state.preview && !state.overview);
         this.hint.textContent = state.overview ? this.overviewHint(state)
             : prerequisiteHint || state.hint || (state.preview || !open ? 'Conclua o caminho anterior para visitar.'
             : traveling ? 'Você pode mudar o destino durante a viagem.' : 'Toque numa placa para caminhar até ela.');
         this.enterButton.disabled = !canAct;
         this.enterButton.classList.toggle('is-return', canReturn);
-        const playLabel = canReturn ? 'Voltar ao Feka' : state.overview ? 'Ver fases' : canEnter ? 'Entrar →' : state.preview ? 'Prévia' : traveling ? 'A caminho' : open ? 'Aguarde' : 'Fechada';
-        if (canReturn) {
+        const playLabel = canReturn ? state.previewAction === 'travel' ? 'Viajar' : state.previewAction === 'guaira' ? 'Guaíra' : 'Voltar ao Feka' : state.overview ? 'Explorar' : canEnter ? 'Jogar' : state.preview ? 'Prévia' : traveling ? 'A caminho' : open ? 'Aguarde' : 'Fechada';
+        if (canReturn && !state.previewAction) {
             const ctx = context(this.playCanvas, 48, 16);
             if (ctx) { pixelText(ctx, 'VOLTAR', 24, 0, ART.ink, 1, 'center'); pixelText(ctx, 'AO FEKA', 24, 8, ART.ink, 1, 'center'); }
         } else lettering(this.playCanvas, playLabel, canAct ? ART.ink : ART.muted);
         this.playText.textContent = playLabel;
-        this.enterButton.setAttribute('aria-label', canReturn ? `Voltar ao Feka na fase ${state.arrivedStage}` : state.overview ? `Ver fases da ilha ${state.world}: ${island.name}`
+        this.enterButton.setAttribute('aria-label', canReturn ? state.previewAction === 'travel' ? `Viajar para ${island.name} por Guaíra` : state.previewAction === 'guaira' ? 'Ir a Guaíra para abrir o caminho' : `Voltar ao Feka na fase ${state.arrivedStage}` : state.overview ? `Ver fases da ilha ${state.world}: ${island.name}`
             : canEnter ? `Entrar na fase ${stage.id}: ${stage.name}` : `${playLabel}. ${this.status.textContent}`);
         this.skipButton.hidden = !traveling;
         this.enterButton.hidden = traveling;
@@ -501,16 +530,18 @@ export class WorldMapHud {
             if (canAct && !traveling) this.focusEnter(); else this.root.focus({ preventScroll: true });
         }
         this.overviewButton.setAttribute('aria-pressed', String(!!state.overview));
-        const overviewLabel = state.overview ? 'Ver ilha' : 'Ver mapa';
-        lettering(this.overviewButton.children[0] as HTMLCanvasElement, state.overview ? 'ILHA' : 'MAPA');
+        const overviewLabel = state.overview ? 'Voltar à ilha' : 'Ver mundo';
+        this.overviewButton.setAttribute('aria-label', overviewLabel); this.overviewButton.title = overviewLabel;
         (this.overviewButton.children[1] as HTMLElement).textContent = overviewLabel;
-        this.overviewButton.setAttribute('aria-label', overviewLabel);
-        this.overviewButton.title = overviewLabel;
+        lettering(this.overviewButton.children[0] as HTMLCanvasElement, state.overview ? '← Voltar' : 'Mundo');
+        this.regionButton.setAttribute('aria-label', 'Lista de ilhas');
+        this.regionButton.hidden = !state.overview;
         this.root.setAttribute('data-motion', state.motionState);
         this.root.classList.toggle('is-preview', !!state.preview);
         this.root.classList.toggle('is-overview', !!state.overview);
         this.nodeLayer.setAttribute('aria-label', state.overview ? 'Ilhas do arquipélago' : 'Fases e transportes do mapa');
-        this.globalProgress.textContent = `${state.globalProgress.completed + (state.globalProgress.guaira ?? 0)}/35 trechos · ${state.globalProgress.seals}/72 selos`;
+        const delicia = state.globalProgress.delicia;
+        this.globalProgress.textContent = `${state.globalProgress.completed + (state.globalProgress.guaira ?? 0) + (delicia?.completed ?? 0)}/${35 + (delicia?.stages ?? 0)} trechos · ${state.globalProgress.seals + (delicia?.seals ?? 0)}/${72 + (delicia?.sealTotal ?? 0)} selos`;
         const warnings = state.warnings?.filter(Boolean).join(' ') ?? '';
         this.warning.textContent = warnings; this.warning.hidden = !warnings;
         for (let n = 0; n < 5; n++) {
@@ -542,6 +573,57 @@ export class WorldMapHud {
             : `${title}. ${announcedStatus} ${this.stageDetails.textContent}.${arrived ? ` ${this.location.textContent}.` : ''}`;
         this.announce(announcement);
     }
+
+    updateChapter(chapter: WorldChapter, name: string, stages: readonly ChapterMapStage[], selected: number, actionLabel = 'Jogar', warning = ''): void {
+        const stage = stages[selected]; if (!stage || this.disposed) return;
+        this.chapter = chapter;
+        const key = JSON.stringify([chapter, stages, selected, actionLabel, warning]);
+        if (key === this.chapterKey) return;
+        this.chapterKey = key; this.signature = '';
+        this.root.classList.add('is-chapter'); this.root.classList.remove('is-overview', 'is-preview');
+        this.root.dataset.motion = 'idle';
+        this.titleText.textContent = name; lettering(this.titleBitmap, name, ART.goldLight, 200);
+        this.stageTitleText.textContent = stage.name; phaseLettering(this.stageTitleBitmap, stage.name);
+        this.stageTitle.title = stage.name;
+        this.stageDetails.textContent = stage.label === 'B' ? 'Outro caminho' : stage.optional ? 'Caminho secreto'
+            : `Fase ${stage.label}${stage.seals === undefined ? '' : ` · ${stage.seals}/${stage.sealTotal ?? 3} selos`}`;
+        this.stageDetails.hidden = false;
+        this.status.textContent = !stage.open ? stage.gate : stage.completed ? 'Concluída' : stage.optional ? 'Exploração opcional' : '';
+        this.location.hidden = true; this.hint.textContent = !stage.open ? stage.gate : '';
+        this.compactDetails.hidden = true;
+        this.enterButton.hidden = false; this.skipButton.hidden = true; this.enterButton.disabled = !stage.open;
+        this.enterButton.classList.remove('is-return');
+        lettering(this.playCanvas, stage.open ? actionLabel : 'Fechada', stage.open ? ART.ink : ART.muted);
+        this.playText.textContent = stage.open ? actionLabel : 'Fechada';
+        this.enterButton.setAttribute('aria-label', stage.open ? `${actionLabel}: ${stage.name}` : stage.gate);
+        this.overviewButton.setAttribute('aria-label', 'Ver mundo'); this.overviewButton.title = 'Ver mundo';
+        this.overviewButton.setAttribute('aria-pressed', 'false'); lettering(this.overviewButton.children[0] as HTMLCanvasElement, 'Mundo');
+        this.regionButton.hidden = true;
+        this.warning.textContent = warning; this.warning.hidden = !warning;
+        this.positionNodes([]); this.positionOverviewWorlds([]); this.positionTravelActions({});
+        while (this.chapterButtons.length < stages.length) {
+            const index = this.chapterButtons.length, button = element('button', 'world-map-node world-map-chapter-node');
+            button.type = 'button'; bitmap(button);
+            button.addEventListener('click', () => this.run(() => this.callbacks.selectChapterStage?.(index)));
+            this.chapterButtons.push(button); this.nodeLayer.append(button);
+        }
+        this.chapterButtons.forEach((button, index) => {
+            const item = stages[index]; button.hidden = !item;
+            if (!item) return;
+            if (!paintPhysicalStageSign(button.firstElementChild as HTMLCanvasElement, this.signAtlas, item.label, index === selected, item.completed, item.open))
+                stageSign(button.firstElementChild as HTMLCanvasElement, item.label, index === selected, item.completed, item.open);
+            button.classList.toggle('is-selected', index === selected);
+            button.classList.toggle('is-locked', !item.open);
+            button.setAttribute('aria-pressed', String(index === selected));
+            button.setAttribute('aria-label', `${item.optional ? 'Segredo' : `Fase ${item.label}`}: ${item.name}. ${item.completed ? 'Concluída.' : item.open ? 'Disponível.' : item.gate}`);
+            button.title = item.name;
+        });
+        this.nodeLayer.setAttribute('aria-label', `Fases de ${name}`);
+        this.announce(`${stage.name}. ${this.status.textContent}`);
+    }
+    positionChapterNodes(points: readonly (WorldMapHudPoint | null)[]): void {
+        this.chapterButtons.forEach((button, index) => this.position(button, points[index]));
+    }
     private announce(message: string): void {
         if (message !== this.announcement) { this.announcement = message; this.announcer.textContent = message; }
     }
@@ -558,10 +640,9 @@ export class WorldMapHud {
                 islandSign(this.guairaCanvas, 'GUAÍRA', false, !!state.guairaAvailable);
         }
         this.guairaOverview.disabled = state.motionState !== 'idle';
-        this.guairaOverview.setAttribute('aria-haspopup', 'dialog');
         this.guairaOverview.setAttribute('aria-label', `Guaíra · entre a Fábrica e a Serra. ${state.guairaAvailable ? `${state.globalProgress.guaira ?? 0} de 5 trechos concluídos. Ver capítulo.` : 'Embarque fechado: conclua 3-5 na Fábrica. Ver prévia.'}`);
         this.guairaOverview.title = 'Guaíra · Fábrica → Guaíra → Serra';
-        if (!state.overview) this.position(this.guairaOverview, null);
+        if (!state.overview) { this.position(this.guairaOverview, null); this.position(this.deliciaOverview, null); }
         this.overviewButtons.forEach((button, index) => {
             const selected = state.world === index + 1, open = !!state.worldAvailability[index];
             const label = `${index + 1} ${REGION_NAMES[index]}`;
@@ -601,7 +682,7 @@ export class WorldMapHud {
     }
     private overviewHint(state: WorldMapHudState): string {
         return state.motionState !== 'idle' ? 'Aguarde a chegada ou pule a viagem.' : this.overviewFallback
-            ? 'Abra Arquipélago ou use as setas para escolher uma região.' : `Ver fases de ${REGION_NAMES[state.world - 1]} ou escolha outra região. Fábrica → Guaíra → Serra.`;
+            ? 'Abra a lista de ilhas ou use as setas para escolher uma região.' : `Ver fases de ${REGION_NAMES[state.world - 1]} ou escolha outra ilha.`;
     }
     positionOverviewWorlds(points: readonly (WorldMapHudPoint | null)[], compact = false, fallback = false): void {
         if (this.compactOverview !== compact) {
@@ -621,6 +702,7 @@ export class WorldMapHud {
             this.regionButton.focus({ preventScroll: true });
         this.overviewButtons.forEach((button, index) => this.position(button, this.state?.overview ? points[index] : null));
         this.position(this.guairaOverview, this.state?.overview && this.callbacks.selectGuaira ? points[6] : null);
+        this.position(this.deliciaOverview, this.state?.overview && this.callbacks.selectDelicia ? points[7] : null);
     }
     /** Authored departure anchors only. Omitted actions hide; availability belongs to each route. */
     positionTravelActions(points: Readonly<Partial<Record<WorldMapTravelActionId, WorldMapHudPoint | null>>>): void {
@@ -650,6 +732,7 @@ export class WorldMapHud {
         button.title = `${sign.label} ${sign.direction === 'left' ? '←' : '→'} · ${sign.mode === 'bridge' ? 'ponte de carga' : sign.mode === 'walk' ? 'caminho' : sign.mode === 'cable' ? 'teleférico' : 'barco'}`;
     }
     private activatePrimary(): void {
+        if (this.chapter) { if (!this.enterButton.disabled) this.callbacks.enter(); return; }
         const state = this.state;
         if (!state) return;
         if (state.preview && !state.overview && state.motionState === 'idle' && this.callbacks.returnToFeka)
@@ -661,7 +744,7 @@ export class WorldMapHud {
         if (this.callbacks.selectOverviewWorld) this.callbacks.selectOverviewWorld(world); else this.callbacks.selectWorld(world);
     }
     private overviewChoices(): HTMLButtonElement[] {
-        return [...this.overviewButtons.slice(0, 3), ...(this.callbacks.selectGuaira ? [this.guairaOverview] : []), ...this.overviewButtons.slice(3)]
+        return [...this.overviewButtons.slice(0, 3), ...(this.callbacks.selectGuaira ? [this.guairaOverview] : []), ...this.overviewButtons.slice(3), ...(this.callbacks.selectDelicia ? [this.deliciaOverview] : [])]
             .filter(button => !button.hidden && !button.disabled);
     }
     /** Only the current map layer's own controls can grant controller focus. */
@@ -671,10 +754,10 @@ export class WorldMapHud {
         const drawer = !this.regionMenu.hidden;
         const choices = drawer ? [this.regionClose, ...this.regionChoices()]
             : [this.regionButton, this.overviewButton, this.menuButton, this.enterButton, this.skipButton,
-                ...(this.state.overview ? this.overviewChoices() : [...this.stageButtons, ...Object.values(this.travelButtons)])];
+                ...(this.chapter ? this.chapterButtons : this.state.overview ? this.overviewChoices() : [...this.stageButtons, ...Object.values(this.travelButtons)])];
         const active = document.activeElement;
         if (active !== this.root && !choices.some(button => button === active && !button.hidden && !button.disabled)) return null;
-        return `${drawer ? 'regions' : this.state.overview ? 'overview' : 'island'}:${this.state.motionState === 'idle' ? 'idle' : 'travel'}`;
+        return `${drawer ? 'regions' : this.chapter ?? (this.state.overview ? 'overview' : 'island')}:${this.chapter || this.state.motionState === 'idle' ? 'idle' : 'travel'}`;
     }
     /** Returns false only for island directions/back, which belong to WorldMapView. */
     control(command: GamepadMenuCommand): boolean {
@@ -689,6 +772,10 @@ export class WorldMapHud {
             return true;
         }
         if (command === 'overview') { this.run(() => this.callbacks.overview()); this.root.focus({ preventScroll: true }); return true; }
+        if (this.chapter) {
+            if (command === 'confirm') { this.confirmController(); return true; }
+            return false;
+        }
         if (this.state?.overview) {
             if (command === 'back') { this.run(() => this.callbacks.overview()); this.overviewButton.focus({ preventScroll: true }); }
             else if (direction && this.state.motionState === 'idle') {
@@ -712,6 +799,9 @@ export class WorldMapHud {
             if (active === this.guairaRegion && !this.guairaRegion.disabled) {
                 this.closeRegionMenu(true); this.run(() => this.callbacks.selectGuaira?.()); return;
             }
+            if (active === this.deliciaRegion && !this.deliciaRegion.disabled) {
+                this.closeRegionMenu(true); this.run(() => this.callbacks.selectDelicia?.()); return;
+            }
             const region = this.regionButtons.indexOf(active as HTMLButtonElement);
             if (region >= 0) { this.closeRegionMenu(true); this.run(() => this.callbacks.selectWorld(region + 1)); }
             return;
@@ -720,6 +810,8 @@ export class WorldMapHud {
         if (active === this.overviewButton) { this.run(() => this.callbacks.overview()); return; }
         if (active === this.menuButton) { this.run(() => this.callbacks.menu()); return; }
         if (active === this.guairaOverview) { this.run(() => this.callbacks.selectGuaira?.()); return; }
+        if (active === this.deliciaOverview) { this.run(() => this.callbacks.selectDelicia?.()); return; }
+        if (this.chapter) { this.run(() => this.activatePrimary()); return; }
         if (state.motionState !== 'idle' && (active === this.root || active === this.skipButton)) {
             if (!this.skipButton.hidden) this.run(() => this.callbacks.skip()); return;
         }
@@ -747,11 +839,11 @@ export class WorldMapHud {
     closeRegionMenu(restoreFocus = false): void {
         if (this.regionMenu.hidden) return;
         this.regionMenu.hidden = true; this.regionButton.setAttribute('aria-expanded', 'false');
-        if (restoreFocus) this.regionButton.focus({ preventScroll: true });
+        if (restoreFocus) (this.regionButton.hidden ? this.overviewButton : this.regionButton).focus({ preventScroll: true });
     }
     private regionChoices(): HTMLButtonElement[] {
         return [...this.regionButtons.slice(0, 3), ...(this.callbacks.selectGuaira ? [this.guairaRegion] : []),
-            ...this.regionButtons.slice(3)].filter(button => !button.disabled && !button.hidden);
+            ...this.regionButtons.slice(3), ...(this.callbacks.selectDelicia ? [this.deliciaRegion] : [])].filter(button => !button.disabled && !button.hidden);
     }
     private focusRegion(direction = 0, from: EventTarget | null = null): void {
         const choices = this.regionChoices(), focused = choices.indexOf(from as HTMLButtonElement);
@@ -786,7 +878,7 @@ export class WorldMapHud {
             else if (direction) { event.preventDefault(); event.stopPropagation(); this.focusRegion(direction, event.target); }
             return;
         }
-        if (!this.state?.overview) return;
+        if (this.chapter || !this.state?.overview) return;
         if (event.key === 'Escape') {
             event.preventDefault(); event.stopPropagation();
             const focusedIsland = [...this.overviewButtons, this.guairaOverview].includes(document.activeElement as HTMLButtonElement);
@@ -803,7 +895,7 @@ export class WorldMapHud {
         if (direction) {
             event.preventDefault(); event.stopPropagation();
             if (this.overviewFallback) { this.openRegionMenu(direction); return; }
-            const order = [...this.overviewButtons.slice(0, 3), ...(this.callbacks.selectGuaira ? [this.guairaOverview] : []), ...this.overviewButtons.slice(3)];
+            const order = this.overviewChoices();
             const focused = order.indexOf(event.target as HTMLButtonElement), current = focused < 0 ? order.indexOf(this.overviewButtons[this.state.world - 1]) : focused;
             const button = order[Math.max(0, Math.min(order.length - 1, current + direction))];
             if (button && !button.hidden) button.focus({ preventScroll: true });

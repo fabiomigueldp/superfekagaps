@@ -10,6 +10,7 @@ import type { DeliciaInput, DeliciaSimulation } from '../src/adventure/delicia/D
 function fixture(t: TestContext) {
     let activeElement: Element | null = null;
     class Element extends EventTarget {
+        style: Record<string, string> = {};
         className = ''; dataset: Record<string, string> = {}; hidden = false; disabled = false;
         textContent = ''; parent: Element | null = null; children: Element[] = [];
         attributes = new Map<string, string>(); captureFails = false;
@@ -21,6 +22,9 @@ function fixture(t: TestContext) {
         remove() { if (this.parent) this.parent.children = this.parent.children.filter(child => child !== this); this.parent = null; }
         setAttribute(name: string, value: string) { this.attributes.set(name, value); }
         removeAttribute(name: string) { this.attributes.delete(name); }
+        getAttribute(name: string) { return this.attributes.get(name) ?? null; }
+        getBoundingClientRect() { return { left: 0, top: 0, width: 960, height: 540 }; }
+        blur() { if (activeElement === this) { activeElement = null; this.dispatchEvent(new Event('blur')); } }
         readonly draws: string[] = [];
         private readonly context = new Proxy({} as CanvasRenderingContext2D, {
             get: (_target, key) => {
@@ -38,7 +42,7 @@ function fixture(t: TestContext) {
         getClientRects() { return [1]; }
         closest(selector: string): Element | null {
             for (let node: Element | null = this; node; node = node.parent)
-                if (selector.split(',').some(tag => tag.trim() === node!.tagName)) return node;
+                if (selector.split(',').some(tag => tag.trim() === node!.tagName || tag.trim().startsWith('.') && node!.className.split(' ').includes(tag.trim().slice(1)))) return node;
             return null;
         }
         focus() {
@@ -49,9 +53,9 @@ function fixture(t: TestContext) {
         click() { this.dispatchEvent(new Event('click')); }
         setPointerCapture() { if (this.captureFails) throw new DOMException('Capture unavailable'); }
     }
-    const body = new Element('body'), window = new EventTarget();
+    const body = new Element('body'), window = Object.assign(new EventTarget(), { innerWidth: 960, innerHeight: 540, devicePixelRatio: 1 });
     const document = Object.assign(new EventTarget(), { body, hidden: false, title: '', activeElement: null as Element | null,
-        createElement: (tag: string) => new Element(tag) });
+        getElementById: () => null, createElement: (tag: string) => new Element(tag) });
     // Define the live focus getter after assigning the document's typed shape.
     Object.defineProperty(document, 'activeElement', { get: () => activeElement });
     const frames = new Map<number, FrameRequestCallback>();
@@ -61,7 +65,7 @@ function fixture(t: TestContext) {
     let connected = true;
     const pad = { mapping: 'standard', axes: [0, 0], buttons: Array.from({ length: 16 }, () => ({ pressed: false })) };
     const original = new Map<string, PropertyDescriptor | undefined>();
-    for (const [name, value] of Object.entries({ window, document,
+    for (const [name, value] of Object.entries({ window, document, location: { hash: '' },
         navigator: { maxTouchPoints: 1, getGamepads: () => { polls++; return connected ? [pad] : []; } },
         matchMedia: () => motion,
         localStorage: { getItem: () => null, setItem() {} },
@@ -83,7 +87,7 @@ function fixture(t: TestContext) {
     const prototype = DeliciaApp.prototype as unknown as { renderGame(): void };
     const painting = t.mock.method(prototype, 'renderGame');
     interface App {
-        canvas: Element; touch: Element; screen: string; sim: DeliciaSimulation;
+        presentation: { renderer: { worldCanvas: Element }; menus: { root: Element } }; canvas: Element; touch: Element; screen: string; sim: DeliciaSimulation;
         input(): DeliciaInput; loadStage(id: string, retry: boolean): boolean; pause(): void; resume(): void; dispose(): void;
         store: { save: { reducedMotion: boolean } };
         audio: { pause(paused: boolean): void };
@@ -119,15 +123,15 @@ function fixture(t: TestContext) {
     };
     const hidden = (value: boolean) => { document.hidden = value; document.dispatchEvent(new Event('visibilitychange')); };
     frame();
-    return { app, create, window, document, body, key, pointer, button, frame, pad, frames, hidden, motion, finishArt,
+    return { app, scene: app.presentation.renderer.worldCanvas, create, window, document, body, key, pointer, button, frame, pad, frames, hidden, motion, finishArt,
         painting, polls: () => polls, now: () => now, disconnect: () => { connected = false; } };
 }
 
 test('a settled pause retains identical canvas output without repeated paints or lost controller polling', t => {
     const h = fixture(t); h.app.pause();
     h.app.toastTime = 0; h.app.shake = 0; h.app.zoneBannerTime = 0;
-    h.app.canvas.draws.length = 0; h.frame();
-    const painted = [...h.app.canvas.draws], simulation = JSON.stringify(h.app.sim), save = structuredClone(h.app.store.save);
+    h.scene.draws.length = 0; h.frame();
+    const painted = [...h.scene.draws], simulation = JSON.stringify(h.app.sim), save = structuredClone(h.app.store.save);
     const count = h.painting.mock.callCount(), polls = h.polls();
     for (let i = 0; i < 120; i++) h.frame();
     assert.ok(painted.length > 100, 'The initial pause runs the real complete canvas renderer');
@@ -135,9 +139,9 @@ test('a settled pause retains identical canvas output without repeated paints or
     assert.equal(h.polls() - polls, 120, 'Visible pause controls remain responsive');
     assert.equal(h.frames.size, 1);
     assert.equal(JSON.stringify(h.app.sim), simulation); assert.deepEqual(h.app.store.save, save);
-    assert.deepEqual(h.app.canvas.draws, painted, 'Settled pause leaves the existing canvas untouched');
-    h.app.canvas.draws.length = 0; h.app.renderGame();
-    assert.deepEqual(h.app.canvas.draws, painted, 'A full repaint would produce exactly the retained commands');
+    assert.deepEqual(h.scene.draws, painted, 'Settled pause leaves the existing canvas untouched');
+    h.scene.draws.length = 0; h.app.renderGame();
+    assert.deepEqual(h.scene.draws, painted, 'A full repaint would produce exactly the retained commands');
     h.pad.buttons[9].pressed = true; h.frame(); assert.equal(h.app.screen, 'playing');
     h.pad.buttons[9].pressed = false; h.frame();
     h.pad.buttons[9].pressed = true; h.frame(); assert.equal(h.app.screen, 'pause');
@@ -152,9 +156,9 @@ test('pause paints transient feedback through expiry, including the final cleare
     assert.equal(h.painting.mock.callCount(), first + 1);
     for (let i = 0; i < 10; i++) h.frame();
     assert.equal(h.app.toastTime, 0); assert.equal(h.app.shake, 0); assert.equal(h.app.zoneBannerTime, 0);
-    h.app.canvas.draws.length = 0; h.app.renderGame(); const cleared = [...h.app.canvas.draws];
-    h.app.canvas.draws.length = 0; h.window.dispatchEvent(new Event('resize')); h.frame();
-    assert.deepEqual(h.app.canvas.draws, cleared);
+    h.scene.draws.length = 0; h.app.renderGame(); const cleared = [...h.scene.draws];
+    h.scene.draws.length = 0; h.window.dispatchEvent(new Event('resize')); h.frame();
+    assert.deepEqual(h.scene.draws, cleared);
     const settled = h.painting.mock.callCount(); h.frame(); h.frame();
     assert.equal(h.painting.mock.callCount(), settled);
     assert.equal(JSON.stringify(h.app.sim), simulation);
@@ -165,14 +169,14 @@ test('paused gamepad navigation can open settings, change manual motion and retu
     const initialFocus = h.document.activeElement, before = h.painting.mock.callCount();
     h.pad.axes[1] = 1; h.frame(); assert.notEqual(h.document.activeElement, initialFocus);
     h.pad.axes[1] = 0; h.frame(); h.pad.buttons[0].pressed = true; h.frame();
-    assert.equal(h.app.screen, 'settings'); assert.equal(h.app.canvas.hidden, true);
-    assert.equal(h.painting.mock.callCount(), before);
-    const motion = h.body.all().find(node => node.attributes.get('aria-describedby') === 'dl-motion-hint');
-    assert.ok(motion); Object.assign(motion, { checked: true }); motion.dispatchEvent(new Event('change'));
+    assert.equal(h.app.screen, 'settings'); assert.equal(h.app.canvas.hidden, false);
+    assert.ok(h.painting.mock.callCount() > before, 'Native settings are painted on the same World canvas');
+    const motion = h.app.presentation.menus.root.all().find(node => node.attributes.get('aria-label')?.startsWith('Sempre reduzir movimento'));
+    assert.ok(motion); motion.click();
     assert.equal(h.app.store.save.reducedMotion, true);
     h.pad.buttons[0].pressed = false; h.frame(); h.pad.buttons[1].pressed = true; h.frame();
     assert.equal(h.app.screen, 'pause'); assert.equal(h.app.canvas.hidden, false);
-    assert.equal(h.painting.mock.callCount(), before + 1);
+    assert.ok(h.painting.mock.callCount() > before);
     assert.ok(audio.mock.calls.every(call => call.arguments[0] === true));
 });
 

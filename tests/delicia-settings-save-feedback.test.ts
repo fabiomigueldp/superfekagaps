@@ -35,6 +35,8 @@ interface App {
     step(dt: number, input: DeliciaInput): void; loadStage(id: string, retry?: boolean): boolean;
     clearStage(): void; pause(): void; showEnding(): void; showSettings(): void;
     dialogueDone(): void; announce(message:string):void;
+    menu: {choices: {label: string | (() => string); run(): void}[]};
+    showControls(): void;
 }
 function fixture(t: TestContext, mode: 'QuotaExceededError' | 'SecurityError' | 'read' | 'ok' = 'ok') {
     const require = createRequire(import.meta.url), css = require.extensions['.css'];
@@ -62,7 +64,8 @@ function fixture(t: TestContext, mode: 'QuotaExceededError' | 'SecurityError' | 
         held: new Set(), pressed: new Set(), released: new Set(), sources: new Map(), buttonKeys: new Map(),
         audio: { effect() {}, pause() {}, unlock: async () => {}, music() {}, voice() {}, setVolume() {}, muted: false },
         // HUD painting is independent of save feedback; actual notify/announce/menu rendering execute.
-        updateHud() {}
+        options: {}, menuEpoch: 0, presentation: {hide() {},menus:{requestFocusFromCanvas() {}}},
+        renderGame() {}, updateHud() {}
     }) as App;
     const button = (name: string) => {
         const result = app.panel.all().find(node => node.tagName === 'button' && node.textContent === name);
@@ -71,68 +74,52 @@ function fixture(t: TestContext, mode: 'QuotaExceededError' | 'SecurityError' | 
     return { app, button, storage, fail() { failure='QuotaExceededError'; }, original, get raw() { return raw; }, get writes() { return writes; },
         recover() { failure = 'ok'; }, warning: () => app.panel.all().find(node => node.className.includes('dl-save-warning')) };
 }
-function control(app:App,type:string,index=0) {
-    const node=app.panel.all().filter(node=>node.tagName==='input'&&node.type===type)[index];
-    assert.ok(node);node.focus();return node;
+
+/** The native settings callbacks execute unchanged; pixel painting is a separate browser check. */
+function choose(app:App,label:string) {
+    const choice=app.menu.choices.find(item=>(typeof item.label==='function'?item.label():item.label).startsWith(label));
+    assert.ok(choice,label);choice.run();
 }
-function slide(node:Element,value:string) {node.value=value;node.dispatchEvent(new Event('input'));}
-function toggle(node:Element) {node.checked=!node.checked;node.dispatchEvent(new Event('change'));}
-
-test('ordinary settings saves remain silent and retain slider focus and output',t=>{
-    const h=fixture(t);h.app.showSettings();const range=control(h.app,'range'),updates=h.app.settingsMessage!.updates;
-    slide(range,'.3');slide(range,'.5');
-    assert.equal(h.app.store.save.music,.5);assert.equal(new DeliciaStore(h.storage).save.music,.5);
-    assert.equal(h.app.settingsMessage!.textContent,'');assert.equal(h.app.settingsMessage!.updates,updates);
-    assert.equal(document.activeElement,range);assert.equal(h.warning(),undefined);
-    assert.equal((range.parent!.children.find(node=>node.tagName==='output')!).value,'50%');
+test('ordinary native settings saves remain silent and keep canvas focus',t=>{
+    const h=fixture(t);h.app.showSettings();const focus=document.activeElement,updates=h.app.status.updates;
+    choose(h.app,'MÚSICA');choose(h.app,'MÚSICA');
+    assert.equal(new DeliciaStore(h.storage).save.music,h.app.store.save.music);
+    assert.equal(h.app.status.textContent,'');assert.equal(h.app.status.updates,updates);
+    assert.equal(document.activeElement,focus);
 });
-
-test('quota failures are immediate, deduplicated, and cleared by the next successful slider save',t=>{
-    const h=fixture(t);h.app.showSettings();h.fail();const range=control(h.app,'range');
-    slide(range,'.2');const message=h.app.store.warning;assert.match(message,/apenas nesta sessão/);
-    assert.equal(h.app.settingsMessage!.textContent,message);assert.equal(h.app.status.textContent,'');
-    const updates=h.app.settingsMessage!.updates;slide(range,'.4');slide(range,'.6');
-    assert.equal(h.app.settingsMessage!.updates,updates);assert.equal(document.activeElement,range);
-    assert.equal(h.raw,h.original);assert.equal(h.app.store.save.music,.6);
-    h.recover();slide(range,'.8');assert.equal(h.app.settingsMessage!.textContent,'');
-    assert.equal(h.app.store.warning,'');assert.equal(new DeliciaStore(h.storage).save.music,.8);
-    assert.equal(document.activeElement,range);
-    h.fail();slide(range,'.9');assert.equal(h.app.settingsMessage!.textContent,message);
+test('quota failures are immediate and deduplicated; successful preference save clears its warning',t=>{
+    const h=fixture(t);h.app.showSettings();h.fail();choose(h.app,'MÚSICA');
+    const message=h.app.store.warning;assert.match(message,/apenas nesta sessão/);
+    assert.equal(h.app.status.textContent,message);const updates=h.app.status.updates;
+    choose(h.app,'MÚSICA');choose(h.app,'MÚSICA');assert.equal(h.app.status.updates,updates);
+    assert.equal(h.raw,h.original);assert.ok(h.app.menu.choices.some(c=>c.label==='REVER PROGRESSO'));
+    h.recover();choose(h.app,'MÚSICA');assert.equal(h.app.status.textContent,'');
+    assert.equal(h.app.store.warning,'');assert.equal(new DeliciaStore(h.storage).save.music,h.app.store.save.music);
 });
-
-test('successful preference retry removes a pre-existing recovery warning without moving focus',t=>{
-    const h=fixture(t,'QuotaExceededError');h.app.store.persist();h.app.showSettings();
-    assert.ok(h.warning());h.button('Exportar cópia');h.button('Tentar salvar');
-    const input=control(h.app,'checkbox',1);toggle(input);assert.equal(h.app.settingsMessage!.textContent,h.app.store.warning);
-    h.recover();toggle(input);assert.equal(h.warning(),undefined);assert.equal(h.app.settingsMessage!.textContent,'');
-    assert.equal(document.activeElement,input);h.button('Exportar');h.button('Importar');
-    assert.equal(new DeliciaStore(h.storage).save.reducedMotion,false);
+test('successful native preference retry clears a pre-existing warning without moving focus',t=>{
+    const h=fixture(t,'QuotaExceededError');h.app.store.persist();h.app.showSettings();const focus=document.activeElement;
+    choose(h.app,'TREMOR');assert.equal(h.app.status.textContent,h.app.store.warning);
+    h.recover();choose(h.app,'TREMOR');assert.equal(h.app.status.textContent,'');
+    assert.equal(document.activeElement,focus);assert.equal(new DeliciaStore(h.storage).save.reducedMotion,false);
 });
-
-test('parallel-store conflict appears on the first preference edit and retains local values without overwriting',t=>{
+test('parallel-store conflict retains local preferences and assistance without overwriting the durable save',t=>{
     const h=fixture(t);h.app.showSettings();const other=new DeliciaStore(h.storage);
     other.save.completed=['delicia-1'];assert.equal(other.persist(),true);const durable=h.raw;
-    const range=control(h.app,'range',1);slide(range,'.2');
-    assert.match(h.app.settingsMessage!.textContent,/outra aba/);const updates=h.app.settingsMessage!.updates;
-    slide(range,'.3');slide(range,'.4');assert.equal(h.app.settingsMessage!.updates,updates);
-    assert.equal(document.activeElement,range);assert.equal(h.app.store.save.effects,.4);assert.equal(h.raw,durable);
-    const input=control(h.app,'checkbox',2);toggle(input);assert.equal(h.app.store.save.assists,true);
-    assert.equal(h.app.settingsMessage!.updates,updates);assert.equal(document.activeElement,input);
+    choose(h.app,'EFEITOS');assert.match(h.app.status.textContent,/outra aba/);const updates=h.app.status.updates;
+    choose(h.app,'EFEITOS');choose(h.app,'EFEITOS');assert.equal(h.app.status.updates,updates);
+    h.app.showControls();choose(h.app,'AJUDA');assert.equal(h.app.store.save.assists,true);
     assert.equal(h.raw,durable);assert.equal(new DeliciaStore(h.storage).save.assists,false);
 });
-
-test('a later conflict replaces an existing quota warning and retry cannot claim success',t=>{
+test('a later conflict replaces quota feedback and native recovery cannot claim success',t=>{
     const h=fixture(t,'QuotaExceededError');h.app.store.persist();h.app.showSettings();h.recover();
     const other=new DeliciaStore(h.storage);other.save.music=.1;assert.equal(other.persist(),true);const durable=h.raw;
-    const range=control(h.app,'range');slide(range,'.8');
-    assert.match(h.warning()!.children[0].textContent,/outra aba/);
-    assert.equal(h.app.settingsMessage!.textContent,h.app.store.warning);h.button('Tentar salvar').click();
-    assert.equal(h.raw,durable);assert.match(h.app.settingsMessage!.textContent,/outra aba/);
+    choose(h.app,'MÚSICA');assert.match(h.app.status.textContent,/outra aba/);
+    choose(h.app,'REVER PROGRESSO');choose(h.app,'TENTAR SALVAR');
+    assert.equal(h.raw,durable);assert.match(h.app.status.textContent,/outra aba/);
 });
-
-test('preference success preserves unrelated status and a subsequent failure restores its warning',t=>{
-    const h=fixture(t);h.app.showSettings();h.fail();const range=control(h.app,'range');slide(range,'.2');
-    h.app.announce('Arquivo inválido. Progresso atual mantido.');h.recover();slide(range,'.3');
-    assert.equal(h.app.settingsMessage!.textContent,'Arquivo inválido. Progresso atual mantido.');
-    h.fail();slide(range,'.4');assert.equal(h.app.settingsMessage!.textContent,h.app.store.warning);
+test('successful native preference save preserves unrelated feedback; a new failure restores its warning',t=>{
+    const h=fixture(t);h.app.showSettings();h.fail();choose(h.app,'MÚSICA');
+    h.app.announce('Arquivo inválido. Progresso atual mantido.');h.recover();choose(h.app,'MÚSICA');
+    assert.equal(h.app.status.textContent,'Arquivo inválido. Progresso atual mantido.');
+    h.fail();choose(h.app,'MÚSICA');assert.equal(h.app.status.textContent,h.app.store.warning);
 });

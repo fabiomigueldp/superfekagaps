@@ -15,8 +15,9 @@ html:has(.delicia), body:has(.delicia) { margin: 0; width: 100%; height: 100%; o
 .delicia button { cursor: pointer; border-radius: 0; }
 .delicia :is(button,a,summary,input):focus-visible { outline: 3px solid #fff9e6; outline-offset: 4px; }
 .dl-surface { position: relative; width: 100%; height: 100%; display: grid; place-items: center; overflow: hidden; }
-.dl-playfield { position: relative; width: min(100%, calc(100dvh * 16 / 9)); aspect-ratio: 16 / 9; }
-.dl-canvas { display: block; width: 100%; height: 100%; outline: none; touch-action: none; }
+.dl-playfield { position: relative; width: max-content; height: max-content; }
+/* Renderer owns CSS and backing-buffer sizes, exactly as in the campaign. */
+.dl-canvas { display: block; outline: none; touch-action: none; image-rendering: pixelated; }
 .dl-panel { position: absolute; }
 .dl-sr-only, .dl-status { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 .dl-lettering { display: inline-flex; vertical-align: middle; max-width: 100%; }
@@ -34,7 +35,7 @@ html:has(.delicia), body:has(.delicia) { margin: 0; width: 100%; height: 100%; o
 .dl-muted { color: var(--dl-muted); font-size: 13px; }
 .dl-small { padding: 6px 10px; }
 .dl-title { inset: 0; display: grid; place-items: center; background: #286279; }
-.dl-key-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.dl-key-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; }
 .dl-title::after { content: ''; position: absolute; inset: 0; background: #191f3538; }
 .dl-title-copy { z-index: 1; display: grid; justify-items: center; gap: 16px; padding: 28px; background: #191f35f2; border: 2px solid var(--dl-edge); box-shadow: 5px 5px 0 #10192b80; max-width: calc(100% - 32px); }
 .dl-title-copy h1 { max-width: 100%; margin-bottom: 12px; }
@@ -79,75 +80,19 @@ html:has(.delicia), body:has(.delicia) { margin: 0; width: 100%; height: 100%; o
 .dl-stage-row:hover, .dl-stage-row[aria-current=true] { background: #334b62; }
 .dl-stage-index { color: var(--dl-gold); font-size: 12px; }
 .dl-row-state { color: #9ce3cf; }
-.dl-hud { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; height: 46px; padding: 0 10px 0 16px; border-bottom: 2px solid #36566a; background: var(--dl-ink); pointer-events: none; }
-.dl-hud-stats, .dl-hud-controls { display: flex; align-items: center; gap: 22px; }
-.dl-health { display: inline-flex; min-width: 44px; }
-.dl-coins { display: inline-flex; align-items: center; gap: 6px; }
-.dl-orange { display: block; width: 12px; height: 12px; background: #ec853e; border: 2px solid #ffc778; box-shadow: 2px 2px 0 #aa4a35; position: relative; }
-.dl-orange::before { content: ''; position: absolute; top: -6px; left: 3px; width: 5px; height: 4px; background: #89b76b; }
-.dl-pause-button { pointer-events: auto; width: 44px; padding: 6px; min-height: 40px; box-shadow: none; border: 0; background: transparent; }
-.dl-boss-hud { position: absolute; left: 50%; top: 52px; translate: -50% 0; display: grid; grid-template-columns: auto minmax(60px,1fr) auto; align-items: center; column-gap: 10px; width: min(440px, calc(100% - 24px)); padding: 7px 12px; background: #191f35ed; border: 1px solid #648591; }
-.dl-boss-phase { font-size: 12px; color: var(--dl-muted); }
-.dl-boss-health { width: 100%; height: 9px; appearance: none; border: 0; background: #4e365f; color: #f28b6b; }
-.dl-boss-health::-webkit-progress-bar { background: #4e365f; }
-.dl-boss-health::-webkit-progress-value { background: #f28b6b; }
-.dl-boss-health::-moz-progress-bar { background: #f28b6b; }
-.dl-boss-cue { grid-column: 1 / -1; color: #ffe29a; font-size: 13px; line-height: 1.4; text-align: center; }
-.dl-pressure-label { font-size: 11px; color: var(--dl-muted); grid-column: 1; white-space: nowrap; }
-.dl-pressure { width: 100%; height: 10px; grid-column: 2 / 4; }
 .dl-overlay { width: min(410px, calc(100% - 32px)); max-height: calc(100% - 32px); overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 26px; border: 2px solid var(--dl-edge); background: var(--dl-ink); box-shadow: 0 0 0 100vmax #191f35b8,4px 4px 0 #10192b; }
 .dl-overlay h1 { text-align: center; margin-bottom: 8px; }
 .dl-overlay > p, .dl-overlay > small { text-align: center; }
-.dl-medal-list { color: var(--dl-gold); font-size: 13px; }
-.dl-dialogue { bottom: max(22px, env(safe-area-inset-bottom)); left: 50%; translate: -50% 0; display: grid; grid-template-columns: 96px minmax(0,1fr); align-items: start; gap: 18px; width: min(860px, calc(100% - 32px)); padding: 18px 20px; background: var(--dl-panel); border: 2px solid #a6c4bd; box-shadow: 4px 4px 0 #10192b; }
-.dl-speaker { display: grid; gap: 6px; }
-.dl-speaker .dl-bitmap { max-width: 96px; }
-.dl-portrait { width: 90px; height: 80px; background: url('/assets/delicia/portraits.webp') no-repeat; background-size: 180px auto; }
-.dl-portrait.guina { background-position: right 8%; }
-.dl-portrait.jaja { background-position: left 8%; }
-.dl-dialogue-copy p { font-size: 16px; line-height: 1.6; }
-.dl-dialogue-actions { display: flex; align-items: center; justify-content: end; gap: 10px; margin-top: 12px; }
-.dl-dialogue-actions .dl-muted { margin-right: auto; }
-.dl-settings, .dl-journal { width: min(580px, calc(100% - 32px)); max-height: calc(100% - 32px); padding: 22px; overflow-y: auto; overscroll-behavior: contain; background: var(--dl-ink); border: 2px solid var(--dl-edge); box-shadow: 4px 4px 0 #10192b; }
-.dl-journal { width: min(720px, calc(100% - 32px)); }
 .dl-section-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; }
-.dl-setting-group { margin: 16px 0; padding: 8px 0 14px; border: 0; border-bottom: 1px solid #36566a; min-width: 0; }
-.dl-setting-group legend { color: var(--dl-gold); font-weight: bold; padding: 0; }
-.dl-setting { display: flex; align-items: center; gap: 12px; min-height: 44px; }
-.dl-setting > span { margin-right: auto; }
-.dl-setting input[type=range] { accent-color: #e9ad4c; width: 150px; max-width: 36%; height: 28px; }
-.dl-setting output { color: var(--dl-muted); width: 38px; font-size: 12px; text-align: right; }
-.dl-setting input[type=checkbox] { appearance: auto; accent-color: #e9ad4c; width: 20px; height: 20px; margin: 12px 0 12px 12px; flex: none; }
-.dl-setting-group > small { display: block; margin-top: 4px; }
-.dl-options-details { border-bottom: 1px solid #36566a; }
-.dl-options-details > summary { padding: 12px 0; cursor: pointer; }
-.dl-controls-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 0 0 16px; }
-.dl-controls-table th, .dl-controls-table td { padding: 7px 4px; border-bottom: 1px solid #303650; text-align: left; }
-.dl-controls-table th { color: var(--dl-muted); font-weight: normal; }
 .dl-save-actions { display: flex; gap: 12px; margin: 8px 0 18px; }
-.dl-save-message { color: var(--dl-gold); margin-top: 12px !important; }
-.dl-save-message:empty { display: none; }
 .dl-save-warning { position: absolute; z-index: 6; bottom: 12px; right: 12px; max-width: min(380px,calc(100% - 24px)); padding: 10px; background: var(--dl-ink); border: 2px solid #f28b6b; font-size: 13px; }
 .dl-save-recovery { position: static; max-width: 100%; }
 .dl-save-recovery .dl-save-actions { flex-wrap: wrap; margin-bottom: 0; }
-.dl-lore-entries { margin-top: 14px; }
-.dl-lore-entry { border-top: 1px solid #36566a; }
-.dl-lore-entry summary { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 10px 6px; cursor: pointer; list-style: none; }
-.dl-lore-entry summary::after { content: '+'; color: var(--dl-gold); margin-left: auto; }
-.dl-lore-entry[open] summary::after { content: '−'; }
-.dl-lore-entry summary::-webkit-details-marker { display: none; }
-.dl-lore-number { color: var(--dl-muted); font-size: 12px; }
-.dl-lore-entry > p { padding: 6px 6px 18px 32px; line-height: 1.7; }
-.dl-lore-entry > small { display: block; margin-left: 32px; }
-.dl-touch { display: none; position: absolute; left: max(12px,env(safe-area-inset-left)); right: max(12px,env(safe-area-inset-right)); bottom: max(12px,env(safe-area-inset-bottom)); justify-content: space-between; align-items: end; gap: 18px; pointer-events: none; }
-.dl-touch-group { display: flex; align-items: end; gap: 6px; }
-.dl-touch-actions { display: grid; grid-template-columns: repeat(3, minmax(44px,58px)); }
-.dl-touch-button { display: grid; place-items: center; min-width: 48px; min-height: 48px; padding: 5px; background: #191f35df; color: var(--dl-paper); border: 2px solid var(--dl-edge); pointer-events: auto; touch-action: none; user-select: none; -webkit-user-select: none; font-size: 10px !important; }
-.dl-touch-button:active { background: #334b62; border-color: #ffe29a; }
-.dl-touch-button[data-key=' '] { border-color: var(--dl-gold); }
-.dl-touch-button .dl-bitmap { max-width: 42px; }
-@media (pointer:coarse) { .dl-touch { display: flex; } }
-.dl-has-touch .dl-touch { display: flex; }
+.dl-touch { display: none; position: absolute; inset: 0; pointer-events: none; }
+.dl-touch-group { display: contents; }
+.dl-touch-button { position: absolute; min-width: 44px; min-height: 44px; padding: 0; background: transparent; color: transparent; border: 0; pointer-events: auto; touch-action: none; user-select: none; -webkit-user-select: none; }
+@media (pointer:coarse) { .dl-touch { display: block; } }
+.dl-has-touch .dl-touch { display: block; }
 @media(max-width:700px) {
     .dl-title-copy { padding: 24px 20px; gap: 12px; }
     .dl-brand .dl-bitmap { max-width: 248px; }
@@ -164,31 +109,6 @@ html:has(.delicia), body:has(.delicia) { margin: 0; width: 100%; height: 100%; o
     .dl-map-detail .dl-primary { padding: 8px 10px; max-width: 118px; }
     .dl-stage-copy h2 .dl-bitmap { max-width: 100%; }
     .dl-map-stats { font-size: 12px; }
-    .dl-hud { height: 38px; padding: 0 5px 0 10px; }
-    .dl-hud-stats { gap: 14px; }
-    .dl-hud-controls { gap: 8px; }
-    .dl-pause-button { min-height: 36px; }
-    .dl-hud .dl-bitmap { max-height: 22px; }
-    .dl-boss-hud { top: 42px; width: min(400px, calc(100% - 16px)); padding: 4px 8px; gap: 0 8px; }
-    .dl-boss-cue { font-size: 11px; }
-    .dl-dialogue { grid-template-columns: 1fr; gap: 8px; padding: 14px; }
-    .dl-speaker { display: flex; align-items: center; }
-    .dl-portrait { width: 40px; height: 40px; background-size: 100px auto; }
-    .dl-dialogue-copy p { font-size: 14px; }
-    .dl-dialogue-actions { gap: 6px; }
-    .dl-dialogue .dl-button { padding: 6px 10px; }
-    .dl-settings, .dl-journal { padding: 16px; }
-    .dl-setting { font-size: 14px; gap: 8px; }
-    .dl-touch { gap: 8px; left: 8px; right: 8px; }
-    .dl-touch-group { gap: 4px; }
-    .dl-touch-actions { grid-template-columns: repeat(3,48px); }
-}
-@media(max-width:700px) and (orientation:portrait) {
-    .dl-playfield { margin-top: -90px; }
-    .dl-hud { top: -38px; }
-    .dl-boss-hud { top: auto; bottom: calc(100% + 8px); }
-    .dl-dialogue { bottom: max(22px,env(safe-area-inset-bottom)); }
-    .dl-touch { bottom: max(28px,env(safe-area-inset-bottom)); }
 }
 @media(max-height:480px) and (orientation:landscape) {
     .dl-title-copy { padding: 14px 24px; gap: 4px; }
@@ -202,7 +122,4 @@ html:has(.delicia), body:has(.delicia) { margin: 0; width: 100%; height: 100%; o
     .dl-stage-copy h2 .dl-bitmap { max-height: 38px; }
     .dl-overlay { padding: 18px; gap: 8px; }
     .dl-overlay h1 { margin-bottom: 0; }
-    .dl-dialogue { bottom: 10px; padding: 10px 14px; }
-    .dl-touch-button { min-height: 42px; }
-    .dl-touch-actions { grid-template-columns: repeat(3,48px); }
 }

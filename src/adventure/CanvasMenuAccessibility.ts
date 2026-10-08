@@ -25,7 +25,6 @@ const COMPACT_MENU_STYLE = `
   outline: 2px solid #ffe29a !important; outline-offset: 2px !important; border-color: #e9ad4c !important;
 }
 .canvas-menu-accessibility[data-compact="true"] button:first-child { border-color: #98703b !important; background: #ffe29a !important; color: #101d29 !important; }
-.canvas-menu-accessibility[data-compact="true"][data-screen="title"] button:last-of-type { width: 72% !important; justify-self: center; }
 .canvas-menu-accessibility .canvas-menu-status {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; border: 0;
   overflow: hidden; clip-path: inset(50%); white-space: nowrap;
@@ -76,7 +75,7 @@ export class CanvasMenuAccessibility {
         left: string; top: string; cssWidth: string; cssHeight: string;
     }>();
 
-    constructor(private readonly canvas: HTMLCanvasElement, private readonly host: CanvasMenuHost) {
+    constructor(private readonly canvas: HTMLCanvasElement, private readonly host: CanvasMenuHost, mount: HTMLElement = document.body) {
         this.status.className = 'canvas-menu-status';
         this.status.setAttribute('role', 'status');
         this.status.setAttribute('aria-live', 'polite');
@@ -85,7 +84,7 @@ export class CanvasMenuAccessibility {
         this.root.hidden = true;
         Object.assign(this.root.style, { position: 'fixed', zIndex: '20', pointerEvents: 'none' });
         const style = document.createElement('style'); style.textContent = COMPACT_MENU_STYLE;
-        document.body.append(style, this.root);
+        mount.append(style, this.root);
         this.lifetime.add(() => style.remove());
         this.lifetime.listen(this.root, 'keydown', event => this.key(event));
         this.lifetime.listen(this.root, 'keyup', event => {
@@ -294,7 +293,8 @@ export class CanvasMenuAccessibility {
             // Reflow these same native controls, with scrolling when needed. No
             // second menu, duplicated actions, modal or clipped tiny hit areas.
             const width = Math.min(380, window.innerWidth - 24);
-            const rows = this.compactScreen === 'settings' ? 6 : this.compactScreen === 'paused' ? 3 : this.compactScreen === 'title' ? 4 : Math.ceil((this.controls.length + 2) / 2);
+            const rows = this.compactScreen === 'settings' ? Math.max(6, 4 + Math.ceil((this.controls.length - 4) / 2))
+                : this.compactScreen === 'paused' ? this.controls.length : this.compactScreen === 'title' ? 4 : Math.ceil((this.controls.length + 2) / 2);
             const height = Math.min(window.innerHeight - 24, (this.compactScreen === 'paused' ? 88 : 66) + rows * 52);
             const top = Math.max(12, Math.min(window.innerHeight - height - 12, this.compactScreen === 'title' ? box.top + box.height * .47 : (window.innerHeight - height) / 2));
             Object.assign(this.root.style, { left: `${Math.round((window.innerWidth - width) / 2)}px`, top: `${Math.round(top)}px`, width: `${width}px`, height: `${height}px` });

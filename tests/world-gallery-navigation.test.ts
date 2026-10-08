@@ -21,6 +21,7 @@ function harness(t: TestContext) {
         input: { reset() {}, setMenuMode() {} },
         audio: { unlock() {}, cancelSpeech() {}, setDying() {}, select() {}, pause(value: boolean) { audio.push(`pause:${value}`); } },
         art: { background() {}, atlas: { draw() {} } },
+        titleScene: { draw() {} },
         renderer: { startScene() {}, getContext: () => context, present() {} },
         mapView: { hide() {} },
         begin() { assert.fail('Gallery navigation must not start the adventure.'); },

@@ -67,37 +67,40 @@ test('a reflected heart changes allegiance and a ground pound hits harder during
     const boss=new DeliciaBoss('guina');const m={x:400,y:380,w:25,h:25,vx:-200,vy:20,gravity:250,kind:'heart' as const,life:3,friendly:false};boss.reflect(m);assert.ok(m.friendly);assert.equal(m.gravity,0);assert.ok(m.vx>0);
     boss.beat='recover';boss.openValve();const hp=boss.hp;assert.ok(boss.hit(2));assert.equal(boss.hp,hp-2);
 });
-test('jump buffering, coyote time, short jump and dash immunity are driven by simulation time',()=>{
+test('native short jumps and held running do not grant attack immunity',()=>{
     const sim=new DeliciaSimulation();for(let i=0;i<30;i++)sim.update(1/120,noDeliciaInput());assert.ok(sim.player.grounded);
     sim.update(1/120,{...noDeliciaInput(),jumpPressed:true,jump:true});assert.ok(sim.player.vy<0);const before=sim.player.vy;sim.update(1/120,{...noDeliciaInput(),jumpReleased:true});assert.ok(sim.player.vy>before*.7);
-    sim.update(1/120,{...noDeliciaInput(),dash:true});assert.ok(sim.player.dashTime>0);const hp=sim.player.health;sim.hurt(sim.player.x+20);assert.equal(sim.player.health,hp);
+    sim.update(1/120,{...noDeliciaInput(),run:true});assert.equal(sim.player.dashTime,0);const hp=sim.player.health;sim.hurt(sim.player.x+20);assert.equal(sim.player.health,hp-1);
 });
 test('steam has a readable warning before danger and moving collision surfaces match their animation',()=>{
     assert.equal(steamPhase(0),'safe');assert.equal(steamPhase(2.6),'tell');assert.equal(steamPhase(3.5),'active');
     const stage=DELICIA_STAGES[3],floor=stage.floors.find(f=>f.kind==='moving')!;assert.notEqual(movingFloor(floor,0).x,movingFloor(floor,1).x);
 });
 test('all traversal routes can be crossed using movement, jumps and valves without terrain warps',()=>{
-    for(const authored of ALL_DELICIA_STAGES.filter(s=>!s.boss)){
+    for(const hz of [60,120])for(const authored of ALL_DELICIA_STAGES.filter(s=>!s.boss)){
         // Geometry audit isolates terrain from enemy challenge. Collision, jumps,
         // moving platforms, belts, checkpoints and gates use the real simulation.
         const stage=structuredClone(authored);stage.enemies=[];stage.hazards=stage.hazards.filter(h=>h.kind==='juice');stage.machines=stage.machines?.filter(m=>m.kind!=='press');
-        const sim=new DeliciaSimulation(stage,true);let stuck=0,lastX=0,gaps=0;
+        const sim=new DeliciaSimulation(stage,true);let stuck=0,lastX=0,gaps=0,jumpHold=0,wasHeld=false;
         for(let step=0;step<60000&&!sim.finished&&!sim.dead;step++){
             const p=sim.player,ground=stage.floors.filter(f=>sim.floorAvailable(f)).map(f=>movingFloor(f,sim.time)).find(f=>p.x+p.w>f.x&&p.x<f.x+f.w&&Math.abs(f.y-(p.y+p.h))<10);
             const next=ground?stage.floors.find(f=>f.x>ground.x):undefined;
             const edge=ground?ground.x+ground.w-(p.x+p.w):999;
             const shouldJump=p.grounded&&((ground&&next&&edge<55)||stuck>25);
-            sim.update(1/120,{...noDeliciaInput(),right:true,jumpPressed:!!shouldJump,jump:!!shouldJump,interact:true});
+            // Hold for a real 150 ms instead of making the route depend on a
+            // one-frame tap whose duration changes with the simulation rate.
+            if(shouldJump)jumpHold=.15;const held=jumpHold>0;jumpHold-=1/hz;
+            sim.update(1/hz,{...noDeliciaInput(),right:true,jumpPressed:!!shouldJump,jump:held,jumpReleased:wasHeld&&!held,interact:true});wasHeld=held;
             gaps+=sim.events.filter(event=>event.kind==='gap').length;
             stuck=Math.abs(p.x-lastX)<.15?stuck+1:0;lastX=p.x;
         }
-        assert.ok(sim.finished,`${authored.id} blocked at x=${sim.player.x.toFixed(1)}, health=${sim.player.health}, valves=${[...sim.valves]}`);
-        assert.equal(gaps,0,`${authored.id} route requires a gap respawn`);
+        assert.ok(sim.finished,`${authored.id} at ${hz} Hz blocked at x=${sim.player.x.toFixed(1)}, health=${sim.player.health}, valves=${[...sim.valves]}`);
+        assert.equal(gaps,0,`${authored.id} at ${hz} Hz route requires a gap respawn`);
     }
 });
 
 test('both encounters are beatable from their authored spawn using real movement, projectiles, valves and collision',()=>{
-    for(const stage of DELICIA_STAGES.filter(s=>s.boss)){
+    for(const hz of [60,120])for(const stage of DELICIA_STAGES.filter(s=>s.boss)){
         const sim=new DeliciaSimulation(stage);sim.startBoss();const phases=new Set([1]);let hits=0;
         for(let step=0;step<36000&&!sim.dead&&!sim.finished;step++){
             const p=sim.player,b=sim.boss!;
@@ -109,21 +112,21 @@ test('both encounters are beatable from their authored spawn using real movement
             const charge=b.attack==='charge'&&b.beat==='attack'&&Math.abs(b.x-p.x)<180;
             const jump=p.grounded&&(gapAhead||incoming||raised||charge);
             const faceBoss=b.hp>0&&Math.abs(approach)<=8&&b.x<p.x&&p.facing>0;
-            sim.update(1/120,{...noDeliciaInput(),right:approach>8,left:approach<-8||faceBoss,jumpPressed:jump,jump:true,seed:p.x>900&&b.hp>0,parry:incoming,interact:true});
+            sim.update(1/hz,{...noDeliciaInput(),right:approach>8,left:approach<-8||faceBoss,jumpPressed:jump,jump:true,seed:p.x>900&&b.hp>0,parry:incoming,interact:true});
             phases.add(b.phase);hits+=sim.events.filter(e=>e.kind==='boss-hit').length;
         }
-        assert.ok(sim.finished,`${stage.id}: ${sim.player.health} player HP, ${sim.boss!.hp} boss HP`);
+        assert.ok(sim.finished,`${stage.id} at ${hz} Hz: ${sim.player.health} player HP, ${sim.boss!.hp} boss HP`);
         assert.equal(sim.boss!.hp,0);assert.ok(sim.player.health>0);assert.ok(hits>0);assert.deepEqual([...phases],[1,2,3]);
     }
 });
 
 test('raised arena platforms make a two-damage ground pound physically reachable',()=>{
     const sim=new DeliciaSimulation(DELICIA_STAGES[11]);sim.startBoss();const b=sim.boss!;
-    b.beat='recover';sim.player.x=1060;sim.player.y=326;sim.player.grounded=true;
+    b.beat='recover';sim.player.x=1060;sim.player.y=380-sim.player.h;sim.player.grounded=true;
     let hit=false;
     for(let step=0;step<240&&!hit;step++){
         const p=sim.player,pound=p.x<b.x+b.w&&p.y+p.h<b.y+20;
-        sim.update(1/120,{...noDeliciaInput(),left:true,jumpPressed:step===0,jump:true,pound,interact:step===0});
+        sim.update(1/60,{...noDeliciaInput(),left:true,jumpPressed:step===0,jump:true,pound,interact:step===0});
         hit=sim.events.some(e=>e.kind==='boss-hit');
     }
     assert.ok(hit);assert.equal(b.hp,b.maxHp-2);

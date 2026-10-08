@@ -10,14 +10,14 @@ export class WorldHudAccessibility {
     private readableStrip = false;
     get showsReadableStrip(): boolean { return !this.root.hidden && this.readableStrip; }
 
-    constructor(private readonly canvas: HTMLCanvasElement, onPause: () => void) {
+    constructor(private readonly canvas: HTMLCanvasElement, onPause: () => void, mount: HTMLElement = document.body) {
         this.root.className = 'world-hud-accessibility'; this.root.hidden = true;
         this.root.setAttribute('role', 'group'); this.status.setAttribute('aria-hidden', 'true');
         this.pause.type = 'button'; this.pause.textContent = 'Ⅱ'; this.pause.setAttribute('aria-label', 'Pausar');
         Object.assign(this.root.style, { position: 'fixed', zIndex: '10', pointerEvents: 'none', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' });
         Object.assign(this.status.style, { color: '#f5efd3', background: '#123547', border: '1px solid #98703b', font: 'bold 12px/1.3 monospace', padding: '7px 9px', marginRight: 'auto' });
         Object.assign(this.pause.style, { width: '44px', height: '44px', flex: '0 0 44px', border: '1px solid #98703b', borderRadius: '0', background: '#123547', color: '#f5efd3', font: 'bold 18px monospace', pointerEvents: 'auto', touchAction: 'manipulation', cursor: 'pointer' });
-        this.root.append(this.status, this.pause); document.body.append(this.root);
+        this.root.append(this.status, this.pause); mount.append(this.root);
         this.lifetime.listen(this.pause, 'click', event => {
             event.stopPropagation();
             if (this.root.hidden || document.hidden || this.canvas.inert || this.lifetime.isDisposed) return;
@@ -30,14 +30,14 @@ export class WorldHudAccessibility {
         this.lifetime.add(() => this.root.remove());
     }
 
-    sync(visible: boolean, stage: string, coins: number, seals: number, helmet: boolean): void {
+    sync(visible: boolean, stage: string, coins: number, seals: number, helmet: boolean, chapterStatus?: string): void {
         const hidden = !visible || document.hidden || this.canvas.inert;
         if (this.root.hidden !== hidden) this.root.hidden = hidden;
         // Inline flex must never overrule hidden in a host stylesheet.
         const display = hidden ? 'none' : 'flex';
         if (this.root.style.display !== display) this.root.style.display = display;
         if (hidden) return;
-        const text = `${stage} · ${coins} moedas · ${seals}/3 selos${helmet ? ' · Capacete' : ''}`;
+        const text = chapterStatus ?? `${stage} · ${coins} moedas · ${seals}/3 selos${helmet ? ' · Capacete' : ''}`;
         if (this.status.textContent !== text) { this.status.textContent = text; this.root.setAttribute('aria-label', text); }
         this.fit();
     }

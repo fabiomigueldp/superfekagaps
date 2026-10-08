@@ -1,9 +1,15 @@
 import { DELICIA_STAGES, type Box, type DeliciaStage, type Floor, type FoeType, type StagePickup } from './DeliciaContent';
 import { DeliciaBoss, intersects, type BossMissile } from './DeliciaBoss';
-export interface DeliciaInput { left:boolean;right:boolean;jump:boolean;jumpPressed:boolean;jumpReleased:boolean;dash:boolean;pound:boolean;seed:boolean;parry:boolean;interact:boolean }
+import { Player } from '../../entities/Player';
+import { GroundPoundState } from '../../types';
+import { TILE_SIZE, TileType } from '../../constants';
+import { DeliciaCollision } from './DeliciaCollision';
+import { DELICIA_UNIT, DELICIA_PLAYER_WIDTH, DELICIA_PLAYER_HEIGHT, DELICIA_CAMERA_TOP } from './DeliciaNative';
+import { advanceCampaignCamera } from '../WorldCampaignCamera';
+export interface DeliciaInput { left:boolean;right:boolean;jump:boolean;jumpPressed:boolean;jumpReleased:boolean;run?:boolean;dash:boolean;pound:boolean;seed:boolean;parry:boolean;interact:boolean }
 export const noDeliciaInput = (): DeliciaInput => ({left:false,right:false,jump:false,jumpPressed:false,jumpReleased:false,dash:false,pound:false,seed:false,parry:false,interact:false});
 export interface DeliciaPlayer extends Box { vx:number;vy:number;grounded:boolean;facing:number;health:number;invincible:number;coyote:number;buffer:number;dashTime:number;dashCooldown:number;seedCooldown:number;parryTime:number;parryCooldown:number;pounding:boolean;walk:number;land:number }
-export interface DeliciaEnemy extends Box { kind:FoeType;home:number;patrol:number;vx:number;hp:number;timer:number;state:'walk'|'tell'|'attack'|'stun'|'dead';phase:number;flash?:number }
+export interface DeliciaEnemy extends Box { kind:FoeType;home:number;patrol:number;vx:number;hp:number;timer:number;state:'walk'|'tell'|'attack'|'stun'|'dead';phase:number;flash?:number;shotAt?:number }
 export interface DeliciaParticle {x:number;y:number;vx:number;vy:number;life:number;max:number;color:string;size:number}
 export interface SimulationEvent {kind:'jump'|'dash'|'seed'|'parry'|'guard'|'hurt'|'gap'|'pound'|'collect'|'valve'|'checkpoint'|'clear'|'enemy'|'boss-hit'|'tell'|'phase'|'defeat'|'jet'|'echo'|'zone';x:number;y:number;pickup?:StagePickup;attack?:string;valve?:string;text?:string}
 export const steamPhase=(time:number,period=4,phase=0):'safe'|'tell'|'active' => {
@@ -14,6 +20,7 @@ export function movingFloor(floor:Floor,time:number):Box {
     return {...floor,x:floor.x+(floor.kind==='moving'?travel:0),y:floor.y-(floor.kind==='lift'?travel:0)};
 }
 export class DeliciaSimulation {
+    readonly nativePlayer = new Player(0, 0);
     readonly player:DeliciaPlayer;readonly boss:DeliciaBoss|null;enemies:DeliciaEnemy[];projectiles:BossMissile[]=[];particles:DeliciaParticle[]=[];
     time=0;elapsed=0;coins=0;checkpoint=-1;finished=false;dead=false;cameraX=0;cameraY=0;
     readonly recordEligible:boolean;
@@ -23,12 +30,14 @@ export class DeliciaSimulation {
     private support=-1;private safeX=90;private safeY=396;private lastValveTimes=new Map<string,number>();
     constructor(readonly stage:DeliciaStage=DELICIA_STAGES[0],readonly assists=false,checkpoint=-1){
         this.recordEligible=!assists&&checkpoint<0;
-        this.player={...stage.spawn,w:34,h:54,vx:0,vy:0,grounded:false,facing:1,health:assists?6:4,invincible:0,coyote:0,buffer:0,dashTime:0,dashCooldown:0,seedCooldown:0,parryTime:0,parryCooldown:0,pounding:false,walk:0,land:0};
+        this.player={...stage.spawn,w:DELICIA_PLAYER_WIDTH,h:DELICIA_PLAYER_HEIGHT,vx:0,vy:0,grounded:false,facing:1,health:assists?6:4,invincible:0,coyote:0,buffer:0,dashTime:0,dashCooldown:0,seedCooldown:0,parryTime:0,parryCooldown:0,pounding:false,walk:0,land:0};
+        this.safeX=stage.spawn.x;this.safeY=stage.spawn.y;
         this.boss=stage.boss?new DeliciaBoss(stage.boss,assists,impact=>{
             this.emit('boss-hit',impact.x,impact.y);
             this.burst(impact.x+(impact.stomp?48:0),impact.y,impact.stomp?'#ffe7a9':'#ffdc87',impact.stomp?26:20);
         }):null;
-        this.enemies=stage.enemies.map((e,i)=>({...e,w:e.kind==='roller'?46:38,h:e.kind==='wasp'?30:44,home:e.x,vx:i%2?-55:55,hp:e.kind==='sentinel'?3:e.kind==='mimic'?2:1,timer:0,state:'walk',phase:i*.73}));
+        this.enemies=stage.enemies.map((e,i)=>{const h=e.kind==='wasp'?42:60;return {...e,y:e.y+44-h,w:e.kind==='roller'?60:54,h,home:e.x,vx:i%2?-55:55,hp:e.kind==='sentinel'?3:e.kind==='mimic'?2:1,timer:0,state:'walk',phase:i*.73};});
+
         if(checkpoint>=0&&checkpoint<stage.checkpoints.length){this.checkpoint=checkpoint;this.safeX=stage.checkpoints[checkpoint].x;this.safeY=stage.checkpoints[checkpoint].y;this.player.x=this.safeX;this.player.y=this.safeY;}
         // Resume at the normal resting frame before the first paint. Starting at
         // the stage origin hides distant checkpoints while the live game runs.
@@ -49,25 +58,13 @@ export class DeliciaSimulation {
     update(dt:number,input:DeliciaInput):void {
         this.events=[];dt=Math.min(.03,Math.max(0,dt));if(this.dead||this.finished)return;
         this.time+=dt;this.elapsed+=dt;const p=this.player,previous={...p};
-        for(const key of ['invincible','dashTime','dashCooldown','seedCooldown','parryTime','parryCooldown','coyote','buffer','land'] as const)p[key]=Math.max(0,p[key]-dt);
-        if(input.jumpPressed)p.buffer=.14;if(p.grounded)p.coyote=.13;
-        const axis=Number(input.right)-Number(input.left);if(axis)p.facing=axis;
-        if(input.dash&&p.dashCooldown===0&&!p.pounding){p.dashTime=.18;p.dashCooldown=.75;p.vy=0;p.invincible=Math.max(p.invincible,.18);this.emit('dash');}
+        for(const key of ['seedCooldown','parryTime','parryCooldown'] as const)p[key]=Math.max(0,p[key]-dt);
         if(input.parry&&p.parryCooldown===0){p.parryTime=this.assists?.32:.21;p.parryCooldown=.55;this.emit('guard');}
-        const jumpStarted=p.buffer>0&&p.coyote>0;
-        if(jumpStarted){p.vy=-610;p.grounded=false;p.coyote=0;p.buffer=0;p.pounding=false;this.emit('jump');}
-        // A buffered tap can be released before landing. At launch use the
-        // latest held intent; once airborne preserve the ordinary release edge.
-        if((jumpStarted?!input.jump:input.jumpReleased)&&p.vy<-200)p.vy*=.5;
-        if(input.pound&&!p.grounded&&p.dashTime===0){p.pounding=true;p.vy=920;}
-        if(input.seed&&p.seedCooldown===0){p.seedCooldown=.42;this.projectiles.push({x:p.x+p.w*.5,y:p.y+19,w:12,h:10,vx:p.facing*640,vy:-35,gravity:85,kind:'seed',life:1.4,friendly:true});this.emit('seed');}
+        if(input.seed&&p.seedCooldown===0){p.seedCooldown=.42;this.projectiles.push({x:p.x+p.w*.5,y:p.y+p.h*.45,w:12,h:10,vx:p.facing*640,vy:-35,gravity:85,kind:'seed',life:1.4,friendly:true});this.emit('seed');}
         if(input.interact)this.useValve();
-        if(p.dashTime>0){p.vx=p.facing*720;p.vy=0;this.burst(p.x+p.w/2,p.y+30,'#f9ba4c',1);}
-        else{const target=axis*290,rate=p.grounded?16:10;p.vx+=(target-p.vx)*Math.min(1,rate*dt);p.vy=Math.min(1020,p.vy+1750*dt);}
         if(this.support>=0&&p.grounded){const f=this.stage.floors[this.support];if(f.kind==='moving'||f.kind==='lift'){const now=movingFloor(f,this.time),before=movingFloor(f,this.time-dt);p.x+=now.x-before.x;p.y+=now.y-before.y;}if(f.kind==='belt')p.x+=(f.beltSpeed??85)*dt;}
-        p.x=Math.max(0,Math.min(this.stage.width-p.w,p.x+p.vx*dt));p.y+=p.vy*dt;p.grounded=false;
-        this.resolveFloors(previous,dt);
-        if(p.grounded&&p.pounding){p.pounding=false;this.emit('pound',p.x+p.w/2,p.y+p.h);this.burst(p.x,p.y+p.h,'#f1c879',18);
+        const impact=this.movePlayer(dt,input);
+        if(impact){this.emit('pound',p.x+p.w/2,p.y+p.h);this.burst(p.x,p.y+p.h,'#f1c879',18);
             for(const e of this.enemies)if(e.state!=='dead'&&Math.abs(e.x-p.x)<125&&Math.abs(e.y-p.y)<90){e.state='stun';e.timer=1.5;}}
         if(p.grounded&&!previous.grounded){p.land=.13;this.burst(p.x+p.w/2,p.y+p.h,'#e5bf85',5);}
         p.walk+=Math.abs(p.vx)*dt*.07;
@@ -81,7 +78,8 @@ export class DeliciaSimulation {
             if(p.y+p.h>447&&this.boss.gaps.some(g=>p.x+p.w>g.x+7&&p.x<g.x+g.w-7))this.fallIntoGap();
             if(this.dead)return;
             if(intersects(p,this.boss.rect)&&this.boss.beat!=='defeated'){
-                if(previous.y+previous.h<=this.boss.y+30&&p.vy>0){this.boss.hit(p.pounding?2:1,{x:this.boss.x,y:this.boss.y,stomp:true});p.vy=-510;p.pounding=false;p.y=this.boss.y-p.h;}
+                if(previous.y+previous.h<=this.boss.y+30&&p.vy>0){this.boss.hit(p.pounding?2:1,{x:this.boss.x,y:this.boss.y,stomp:true});this.bounce(this.boss.y);}
+
                 // The crouched charge uses its telegraphed lower hitbox. Applying
                 // the upright body here would make the advertised jump impossible.
                 else if(this.boss.beat==='attack'&&this.boss.attack!=='charge'||this.boss.beat==='idle'&&this.boss.beatTime>.22)this.hurt(this.boss.x+this.boss.w/2);
@@ -102,29 +100,53 @@ export class DeliciaSimulation {
         const zone=this.stage.zones?.reduce((found,z,index)=>p.x>=z.x?index:found,-1)??-1;if(zone>this.zoneIndex){this.zoneIndex=zone;this.emit('zone',p.x,p.y,{text:this.zone?.name});}
         if(this.gateOpen&&intersects(p,this.stage.gate)){this.finished=true;this.emit('clear',this.stage.gate.x,this.stage.gate.y);}
         for(const part of this.particles){part.life-=dt;part.x+=part.vx*dt;part.y+=part.vy*dt;part.vy+=300*dt;}this.particles=this.particles.filter(part=>part.life>0);
-        const focus=this.boss&&this.boss.hp>0?(p.x+this.boss.x)*.5-480:p.x-350+p.vx*.22;
-        const viewX=Math.max(0,Math.min(this.stage.width-960,focus)),viewY=this.boss?0:Math.max(0,Math.min(this.stage.height-540,p.y-390));
-        this.cameraX+=(viewX-this.cameraX)*(1-Math.exp(-dt*5.5));this.cameraY+=(viewY-this.cameraY)*(1-Math.exp(-dt*6));
-    }
-    private resolveFloors(previous:DeliciaPlayer,dt:number):void {
-        const p=this.player;this.support=-1;
-        for(let index=0;index<this.stage.floors.length;index++){
-            const f=this.stage.floors[index],box=movingFloor(f,this.time),fallen=this.crumble.get(index);
-            if(!this.floorAvailable(f))continue;
-            if(fallen!==undefined&&fallen>1)continue;
-            if(this.boss&&this.boss.gaps.some(g=>p.x+p.w>g.x+7&&p.x<g.x+g.w-7)&&f.y===450)continue;
-            if(p.x+p.w<=box.x||p.x>=box.x+box.w)continue;
-            if(p.vy>=0&&previous.y+previous.h<=box.y+8&&p.y+p.h>=box.y){
-                p.y=box.y-p.h;p.vy=0;p.grounded=true;this.support=index;
-                if(f.kind==='spring'){p.vy=-830;p.grounded=false;this.emit('jump',p.x,box.y);}
-                if(f.kind==='crumble')this.crumble.set(index,(fallen??0)+dt);
-                break;
-            }
-            if(f.h>50&&intersects(p,box)&&previous.y+previous.h>box.y+10){
-                if(previous.x+previous.w<=box.x+10){p.x=box.x-p.w;p.vx=0;}else if(previous.x>=box.x+box.w-10){p.x=box.x+box.w;p.vx=0;}
+        const u=DELICIA_UNIT,top=DELICIA_CAMERA_TOP/u;
+        const camera={x:this.cameraX/u,y:this.cameraY/u-top};
+        advanceCampaignCamera(camera,{position:{x:p.x/u,y:p.y/u-top},velocity:{x:p.vx/(u*60),y:p.vy/(u*60)},isGrounded:p.grounded},
+            {width:this.stage.width/(u*16),height:(this.stage.height/u-top)/16});
+        const blend=Math.min(1,dt*60);
+        this.cameraX+=(camera.x*u-this.cameraX)*blend;this.cameraY+=((camera.y+top)*u-this.cameraY)*blend;
+        if(this.boss&&this.boss.hp>0){
+            const focus=Math.max(0,Math.min(this.stage.width-960,(p.x+this.boss.x)*.5-480));
+            // Arena framing includes the tell but never abandons the player.
+            this.cameraX+=(focus-this.cameraX)*(1-Math.exp(-dt*3));
+            this.cameraX=Math.max(0,Math.min(this.stage.width-960,Math.max(p.x+p.w-900,Math.min(p.x-45,this.cameraX))));
+            // The native boss sprite and shield extend beyond its collision box.
+            // Keep both actors whole whenever their span fits in World's viewport.
+            const center=this.boss.x+this.boss.w/2,left=Math.min(p.x,center-96),right=Math.max(p.x+p.w,center+96);
+            if(right-left<=960){
+                const padding=Math.min(24,(960-(right-left))/2),min=Math.max(0,right+padding-960),max=Math.min(this.stage.width-960,left-padding);
+                if(min<=max)this.cameraX=Math.max(min,Math.min(max,this.cameraX));
             }
         }
+    }
+    private movePlayer(dt:number,input:DeliciaInput):boolean {
+        if(dt<=0)return false;
+        const p=this.player,n=this.nativePlayer.data,u=DELICIA_UNIT,speed=u*60;
+        n.position={x:p.x/u,y:p.y/u};n.velocity={x:p.vx/speed,y:p.vy/speed};
+        n.isGrounded=p.grounded;n.facingRight=p.facing>0;n.coyoteTimer=p.coyote*1000;n.jumpBufferTimer=p.buffer*1000;
+        n.invincibleTimer=p.invincible*1000;n.landingTimer=p.land*1000;
+        // Stomps, springs, jets and damage can end an attack between engine steps.
+        if(!p.pounding&&n.groundPoundState===GroundPoundState.FALL)n.groundPoundState=GroundPoundState.NONE;
+        if(!p.grounded&&p.vy<0&&n.velocity.y<0&&n.groundPoundState===GroundPoundState.RECOVERY)n.groundPoundState=GroundPoundState.NONE;
+        const surfaces=this.stage.floors.flatMap((f,index)=>{
+            if(!this.floorAvailable(f)||(this.crumble.get(index)??0)>1)return [];
+            if(this.boss&&f.y===450&&this.boss.gaps.some(g=>p.x+p.w>g.x+7&&p.x<g.x+g.w-7))return [];
+            const b=movingFloor(f,this.time),old=movingFloor(f,this.time-dt);
+            return [{index,x:b.x/u,y:b.y/u,width:b.w/u,height:b.h/u,previousY:old.y/u,solid:f.h>50,spring:f.kind==='spring'}];
+        });
+        const world=new DeliciaCollision(this.stage.width/u,surfaces);
+        const result=this.nativePlayer.update(dt*1000,{left:input.left,right:input.right,jump:input.jump,
+            jumpPressed:input.jumpPressed,jumpReleased:input.jumpReleased,run:input.run??input.dash,
+            down:input.pound,downPressed:input.pound,start:false,pause:false,mute:false},world,dt*60);
+        p.x=n.position.x*u;p.y=n.position.y*u;p.vx=n.velocity.x*speed;p.vy=n.velocity.y*speed;
+        p.grounded=n.isGrounded;p.facing=n.facingRight?1:-1;p.coyote=n.coyoteTimer/1000;p.buffer=n.jumpBufferTimer/1000;
+        p.invincible=n.invincibleTimer/1000;p.land=(n.landingTimer??0)/1000;p.pounding=n.groundPoundState===GroundPoundState.FALL;
+        this.support=world.support;
+        if(result.jumpStarted||result.tileHit?.type===TileType.SPRING)this.emit('jump');
+        if(this.support>=0&&this.stage.floors[this.support].kind==='crumble')this.crumble.set(this.support,(this.crumble.get(this.support)??0)+dt);
         for(const [index,timer] of this.crumble){if(timer>4.5)this.crumble.delete(index);else if(index!==this.support)this.crumble.set(index,timer+dt);}
+        return !!result.groundPoundImpact;
     }
     private updateMachines(dt:number):void {
         this.jetCooldown=Math.max(0,this.jetCooldown-dt);const p=this.player;
@@ -159,6 +181,7 @@ export class DeliciaSimulation {
             else if(e.kind==='bottler'||e.kind==='bloom'){
                 e.vx=Math.sign(p.x-e.x)||-1;
                 if(e.timer<=0&&Math.abs(e.x-p.x)<650){if(e.state==='tell'){
+                    e.shotAt=this.time;
                     const count=e.kind==='bloom'?3:1;for(let i=0;i<count;i++)this.projectiles.push({x:e.x,y:e.y+10,w:16,h:16,vx:Math.sign(p.x-e.x)*(185+i*38),vy:-180-i*45,gravity:350,kind:e.kind==='bloom'?'seed':'juice',life:4,friendly:false});e.state='walk';e.timer=e.kind==='bloom'?3.6:2.8;
                 }else{e.state='tell';e.timer=e.kind==='bloom'?1.15:.8;this.emit('tell',e.x,e.y);}}
             }else{
@@ -170,10 +193,16 @@ export class DeliciaSimulation {
             }
             if(!intersects(p,e))continue;
             if(p.parryTime>0&&e.state==='attack'){e.state='stun';e.timer=1.8;this.parries++;this.emit('parry',e.x,e.y);continue;}
-            if(previous.y+previous.h<=e.y+20&&p.vy>0){if(e.kind==='sentinel'&&!p.pounding&&e.state!=='stun'){e.state='stun';e.timer=1.6;}else this.hitEnemy(e,p.pounding?2:1);p.y=e.y-p.h;p.vy=-455;p.pounding=false;}
+            if(previous.y+previous.h<=e.y+20&&p.vy>0){if(e.kind==='sentinel'&&!p.pounding&&e.state!=='stun'){e.state='stun';e.timer=1.6;}else this.hitEnemy(e,p.pounding?2:1);this.bounce(e.y);}
             else if(e.state!=='stun')this.hurt(e.x);
             if(this.dead)return;
         }
+    }
+    private bounce(surfaceY:number):void {
+        const p=this.player,n=this.nativePlayer.data,u=DELICIA_UNIT;
+        n.invincibleTimer=p.invincible*1000;
+        this.nativePlayer.bounceFromSurface(surfaceY/u);
+        p.y=n.position.y*u;p.vy=n.velocity.y*u*60;p.grounded=false;p.pounding=false;p.invincible=n.invincibleTimer/1000;
     }
     private hitEnemy(e:DeliciaEnemy,power:number):void {e.hp-=power;e.flash=.16;this.burst(e.x,e.y,'#ffa84a',15);this.emit('enemy',e.x,e.y);e.state=e.hp<=0?'dead':'stun';if(e.state==='dead')this.enemiesDefeated++;e.timer=1.2;}
     private updateProjectiles(dt:number):void {
@@ -193,13 +222,15 @@ export class DeliciaSimulation {
     }
     hurt(sourceX:number):void {
         const p=this.player;if(p.invincible>0||this.dead)return;
+        this.nativePlayer.data.groundPoundState=GroundPoundState.NONE;this.nativePlayer.data.groundPoundTimer=0;this.nativePlayer.data.isJumping=false;
         p.health--;this.damageTaken++;p.invincible=1.5;p.vx=(p.x<sourceX?-1:1)*300;p.vy=-290;p.pounding=false;this.emit('hurt');this.burst(p.x,p.y,'#ec795f',18);
         if(p.health<=0)this.dead=true;
     }
     private fallIntoGap():void{
         const p=this.player;if(p.invincible>0&&p.y<600&&(!this.boss||p.dashTime>0))return;
         this.emit('gap',p.x,p.y);if(p.invincible<=0||p.y>600){p.health--;this.damageTaken++;p.invincible=1.7;}
-        if(p.health<=0){this.dead=true;return;}p.x=this.safeX;p.y=this.safeY;p.vx=0;p.vy=0;p.pounding=false;p.dashTime=0;
+        if(p.health<=0){this.dead=true;return;}p.x=this.safeX;p.y=this.safeY;p.vx=0;p.vy=0;p.pounding=false;p.dashTime=0;p.grounded=false;p.coyote=0;p.buffer=0;
+        this.nativePlayer.reset(p.x/(DELICIA_UNIT*TILE_SIZE),(p.y+p.h)/(DELICIA_UNIT*TILE_SIZE));this.support=-1;
         this.cameraX=Math.max(0,Math.min(this.stage.width-960,p.x-250));
     }
 }

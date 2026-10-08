@@ -13,8 +13,9 @@ function fixture(t: TestContext) {
     let pickerFails = false;
     let activeElement: Element | null = null;
     class Element extends EventTarget {
+        style: Record<string, string> = {};
         className = ''; dataset: Record<string, string> = {}; hidden = false; disabled = false;
-        type = ''; size = 0; style = {}; files: { size: number; text(): Promise<string> }[] = [];
+        type = ''; size = 0; files: { size: number; text(): Promise<string> }[] = [];
         onchange: (() => Promise<void>) | null = null; oncancel: (() => void) | null = null;
         textContent = ''; parent: Element | null = null; children: Element[] = [];
         attributes = new Map<string, string>(); captureFails = false;
@@ -26,7 +27,9 @@ function fixture(t: TestContext) {
         remove() { if (this.parent) this.parent.children = this.parent.children.filter(child => child !== this); this.parent = null; }
         setAttribute(name: string, value: string) { this.attributes.set(name, value); }
         removeAttribute(name: string) { this.attributes.delete(name); }
-        getContext() { return null; }
+        getContext() { return new Proxy({}, { get: () => () => {}, set: () => true }); }
+        getAttribute(name: string) { return this.attributes.get(name) ?? null; }
+        getBoundingClientRect() { return { left: 0, top: 0, width: 960, height: 540 }; }
         all(): Element[] { return this.children.flatMap(child => [child, ...child.all()]); }
         querySelector(selector: string) { return selector.startsWith('#') || selector.startsWith('.') ? null : this.all().find(node => node.tagName === 'button') ?? null; }
         querySelectorAll() { return this.all().filter(node => node.tagName === 'button'); }
@@ -44,13 +47,13 @@ function fixture(t: TestContext) {
         click() { if (this.type === 'file') { assert.ok(this.parent, 'Chooser must remain attached'); if (pickerFails) throw Error('Picker unavailable'); } this.dispatchEvent(new Event('click')); }
         setPointerCapture() { if (this.captureFails) throw new DOMException('Capture unavailable'); }
     }
-    const body = new Element('body'), window = new EventTarget();
+    const body = new Element('body'), window = Object.assign(new EventTarget(), { innerWidth: 960, innerHeight: 540, devicePixelRatio: 1 });
     const document = Object.assign(new EventTarget(), { body, hidden: false, title: '',
-        createElement: (tag: string) => new Element(tag), createElementNS: (_namespace: string, tag: string) => new Element(tag) });
+        getElementById: () => null, createElement: (tag: string) => new Element(tag), createElementNS: (_namespace: string, tag: string) => new Element(tag) });
     Object.defineProperty(document, 'activeElement', { get: () => activeElement });
     let raw = JSON.stringify(freshDeliciaSave()), storageFails = false; const writes: string[] = [];
     const original = new Map<string, PropertyDescriptor | undefined>();
-    for (const [name, value] of Object.entries({ window, document,
+    for (const [name, value] of Object.entries({ window, document, location: { hash: '' },
         navigator: { maxTouchPoints: 1, getGamepads: () => [] },
         localStorage: { getItem: () => raw, setItem(key: string, value: string) { assert.equal(key, DELICIA_SAVE_KEY); if (storageFails) throw Error('quota'); raw = value; writes.push(value); } },
         requestAnimationFrame: (): number => 1,
@@ -69,13 +72,15 @@ function fixture(t: TestContext) {
     const { DeliciaArt } = require('./DeliciaArt') as typeof import('../src/adventure/delicia/DeliciaArt');
     t.mock.method(DeliciaArt.prototype, 'load', async () => {});
     // Rendering is outside the input boundary; all event/lifecycle paths execute unchanged.
-    const prototype = DeliciaApp.prototype as unknown as { renderGame(): void; updateHud(): void };
+    const prototype = DeliciaApp.prototype as unknown as { renderGame(): void; updateHud(): void; paintMap(): void };
     t.mock.method(prototype, 'renderGame', () => {}); t.mock.method(prototype, 'updateHud', () => {});
+    t.mock.method(prototype, 'paintMap', () => {});
     interface App {
         canvas: Element; touch: Element; screen: string; sim: DeliciaSimulation;
         root: Element; panel: Element; status: Element; settingsMessage?: Element; audio: { setVolume(music: number, effects: number): void; pause(paused: boolean): void; music(name: string): void };
         showSettings(back?: () => void): void; showTitle(): void; showMap(): void; goBack(): void; importSave(): void; loadStage(id: string, retry: boolean): boolean; pause(): void; pauseMenu(): void; resume(): void; dispose(): void;
         store: DeliciaStore;
+        menu: { choices: {label: string | (() => string); run(): void}[] };
     }
     const apps: App[] = [];
     const create = () => { const app = new DeliciaApp(body as unknown as HTMLElement) as unknown as App; apps.push(app);
@@ -200,11 +205,11 @@ test('duplicate change callbacks read and commit only once', async t => {
 
 for (const destination of ['title', 'disposed'] as const)
 test(`captured Importar button cannot reopen a chooser after ${destination}`, t => {
-    const h = fixture(t), button = h.app.panel.all().find(node => node.tagName === 'button' && node.all().some(child => child.textContent === 'Importar'));
+    const h = fixture(t), button = h.app.menu.choices.find(choice => choice.label === 'IMPORTAR');
     assert.ok(button);
     if (destination === 'title') h.app.showTitle(); else h.app.dispose();
     const raw = h.raw, writes = h.writes.length, screen = h.app.screen;
-    button.click();
+    button.run();
     assert.equal(h.app.root.children.some(node => node.type === 'file'), false);
     assert.equal(h.raw, raw); assert.equal(h.writes.length, writes); assert.equal(h.app.screen, screen);
 });

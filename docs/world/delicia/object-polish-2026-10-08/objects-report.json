@@ -1,0 +1,104 @@
+{
+  "frames": [
+    {
+      "name": "valve-closed",
+      "stage": "delicia-1",
+      "state": "closed",
+      "phase": "active",
+      "brokenPixels": 0
+    },
+    {
+      "name": "valve-open",
+      "stage": "delicia-1",
+      "state": "open",
+      "phase": "active",
+      "brokenPixels": 0
+    },
+    {
+      "name": "press-safe",
+      "stage": "delicia-8",
+      "state": "safe",
+      "phase": "safe",
+      "brokenPixels": 0
+    },
+    {
+      "name": "press-tell",
+      "stage": "delicia-8",
+      "state": "tell",
+      "phase": "tell",
+      "brokenPixels": 0
+    },
+    {
+      "name": "press-active",
+      "stage": "delicia-8",
+      "state": "active",
+      "phase": "active",
+      "brokenPixels": 0
+    },
+    {
+      "name": "press-disabled",
+      "stage": "delicia-8",
+      "state": "disabled",
+      "phase": "active",
+      "brokenPixels": 0
+    },
+    {
+      "name": "wind-active",
+      "stage": "delicia-2",
+      "state": "active",
+      "phase": "active",
+      "brokenPixels": 0
+    },
+    {
+      "name": "jet-safe",
+      "stage": "delicia-4",
+      "state": "safe",
+      "phase": "safe",
+      "brokenPixels": 0
+    },
+    {
+      "name": "jet-tell",
+      "stage": "delicia-4",
+      "state": "tell",
+      "phase": "tell",
+      "brokenPixels": 0
+    },
+    {
+      "name": "jet-active",
+      "stage": "delicia-4",
+      "state": "active",
+      "phase": "active",
+      "brokenPixels": 0
+    },
+    {
+      "name": "steam-safe",
+      "stage": "delicia-10",
+      "state": "safe",
+      "phase": "safe",
+      "brokenPixels": 0
+    },
+    {
+      "name": "steam-tell",
+      "stage": "delicia-10",
+      "state": "tell",
+      "phase": "tell",
+      "brokenPixels": 0
+    },
+    {
+      "name": "steam-active",
+      "stage": "delicia-10",
+      "state": "active",
+      "phase": "active",
+      "brokenPixels": 0
+    },
+    {
+      "name": "juice-active",
+      "stage": "delicia-1",
+      "state": "active",
+      "phase": "active",
+      "brokenPixels": 0
+    }
+  ],
+  "errors": [],
+  "arranged": true
+}

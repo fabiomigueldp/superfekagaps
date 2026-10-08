@@ -2,9 +2,9 @@ import type { GamepadMenuCommand } from '../engine/StandardGamepad';
 import { campaignWaterRestored, campaignWaterOverlay, loadCampaignWaterImage } from './GuairaCampaignConsequences';
 import { GuairaCampaignWaterMotion } from './GuairaCampaignWaterMotion';
 import { campaignMapDirection, guairaTravelDirections } from './CampaignWayfinding';
-import { DELICIA_ATLAS, DELICIA_ENTRY, DELICIA_MAP_IMAGE } from './delicia/DeliciaIsland';
-import { lettering } from './delicia/DeliciaUI';
-import { showGuairaRegion } from './WorldGuairaRegion';
+import { DELICIA_ATLAS, DELICIA_MAP_IMAGE } from './delicia/DeliciaIsland';
+import { DeliciaStore } from './delicia/DeliciaProgress';
+import { chapterMapStages, chapterSelection, deliciaMapProgress, WORLD_CHAPTER_NAMES, type ChapterMapStage, type WorldChapter } from './WorldChapterMap';
 import { GUAIRA_CAMPAIGN_ART, campaignTerrainBounds, campaignArtBounds, campaignArtOverlay, loadCampaignRegionImage, type GuairaCampaignRegion } from './GuairaCampaignArt';
 import { STAGES } from './campaign';
 import { isUnlocked } from './progress';
@@ -31,7 +31,7 @@ import { DOMINIO_FERRY, parseDominioJourney, matchesDominioAssetSize, type Domin
 import { MARITIME_BUOY_SPRITES, parseMaritimeBuoys, type MaritimeBuoyKind, type MaritimeBuoyMetadata } from './WorldMaritimeArt';
 export { journeyPathSegment } from './WorldFerryModel';
 
-interface MapCallbacks { guaira?(from: 'factory' | 'serra'): void; select(index: number): void; enter(): void; exit(): void; unlockAudio(): void; arrive?(index: number): void }
+interface MapCallbacks { guaira?(from: 'factory' | 'serra'): void; enterChapter?(chapter: WorldChapter, stage: string, from?: 'factory' | 'serra'): void; leaveGuaira?(to: 'factory' | 'serra', selection: number): void; crossGuaira?(from: 'factory' | 'serra', to: 'factory' | 'serra', selection: number): void; select(index: number): void; enter(): void; exit(): void; unlockAudio(): void; arrive?(index: number): void }
 interface CachedMapArt { assets: MapArtAssets; metadata: MapArtMetadata; status: 'loading' | 'ready' | 'failed' }
 interface CableLineView {
     definition: CablePairDefinition;
@@ -245,21 +245,70 @@ export class WorldMapView {
     private campaignWaterMotion: GuairaCampaignWaterMotion | null = null;
     private campaignWaterSeconds = 0;
     private readonly campaignImages = new Map<GuairaCampaignRegion, HTMLImageElement>();
-    private guairaDialog?: () => void;
+    readonly deliciaStore: DeliciaStore;
+    private chapter: WorldChapter | null = null;
+    private chapterIndex = 0;
+    private chapterStages: ChapterMapStage[] = [];
+    private pendingChapterStage: string | null = null;
+    private guairaArrived = false;
+    private pendingIsland: number | null = null;
     private deliciaImage?: HTMLImageElement;
     private deliciaStarted = false;
-    private readonly deliciaPin = document.createElement('a');
     openGuairaRegion(): void { this.showGuaira(); }
+    markGuairaArrival(): void { this.guairaArrived = true; }
+    arriveFromGuaira(terminal: string, selection: number): void {
+        this.guairaArrived = false; this.chapter = null; this.overview = false;
+        this.ensureArt(worldOf(terminal)); this.updateCapabilities();
+        this.journey = createJourney(terminal, this.network, this.capabilities);
+        this.selection = -1; this.reportArrival(); this.select(selection);
+    }
     private showGuaira(): void {
+        this.openChapter('guaira');
+    }
+    openChapter(chapter: WorldChapter, selected?: string): void {
         if (!this.save || !this.journey || this.journey.destination) return;
-        this.guairaDialog?.();
-        this.guairaDialog = showGuairaRegion(this.save, this.journey.arrived, {
-            fly: from => this.callbacks.guaira?.(from), goToFactory: () => this.select(14), goToSerra: () => this.select(indexOf(guairaTravelDirections(this.save!, this.journey!.arrived).approach)),
-        });
+        this.chapter = chapter; this.overview = false; this.pendingChapterStage = null; this.pendingIsland = null;
+        this.chapterStages = chapterMapStages(chapter, this.save, this.deliciaStore.save);
+        this.chapterIndex = chapterSelection(this.chapterStages, selected ?? (chapter === 'guaira' ? this.save.guaira.selectedScene : this.deliciaStore.save.selected));
+        this.paintDirty = true; this.refreshHud(); this.root.focus({ preventScroll: true });
+    }
+    private toggleOverview(): void {
+        if (this.chapter) { this.chapter = null; this.overview = true; }
+        else this.overview = !this.overview;
+        this.pendingChapterStage = null; this.pendingIsland = null; this.paintDirty = true; this.refreshHud();
+    }
+    private selectChapter(index: number): void {
+        this.chapterIndex = Math.max(0, Math.min(this.chapterStages.length - 1, index));
+        this.paintDirty = true; this.refreshHud();
+    }
+    private enterChapter(): void {
+        const stage = this.chapterStages[this.chapterIndex];
+        if (!this.chapter || !stage?.open || !this.save || !this.journey) return;
+        if (this.chapter === 'guaira' && !this.guairaArrived) {
+            const directions = guairaTravelDirections(this.save, this.journey.arrived);
+            if (!directions.atAirRegion) {
+                this.chapter = null; this.overview = false;
+                this.select(indexOf(directions.approach)); this.pendingChapterStage = stage.id; return;
+            }
+            this.callbacks.enterChapter?.('guaira', stage.id, directions.from);
+        } else this.callbacks.enterChapter?.(this.chapter, stage.id);
+    }
+    private crossToIsland(selection: number): void {
+        if (!this.save || !this.journey || !isUnlocked(STAGES[selection].id, this.save)) return;
+        const directions = guairaTravelDirections(this.save, this.journey.arrived);
+        if (!directions.atAirRegion) {
+            this.overview = false; this.select(indexOf(directions.approach)); this.pendingIsland = selection; return;
+        }
+        this.callbacks.crossGuaira?.(directions.from, STAGES[selection].world >= 4 ? 'serra' : 'factory', selection);
     }
     constructor(private readonly gameCanvas: HTMLCanvasElement, private readonly callbacks: MapCallbacks) {
+        let storage: Storage | null = null;
+        try { storage = localStorage; } catch { /* Session-only map and chapter share this store. */ }
+        this.deliciaStore = new DeliciaStore(storage);
         this.hud = new WorldMapHud({
             selectGuaira: callbacks.guaira ? () => this.act(() => this.showGuaira()) : undefined,
+            selectDelicia: callbacks.enterChapter ? () => this.act(() => this.openChapter('delicia')) : undefined,
+            selectChapterStage: index => this.act(() => this.selectChapter(index)),
             selectStage: index => this.act(() => this.select(index)),
             selectWorld: world => this.act(() => {
                 const selection = this.journey && !this.journey.destination && world === worldOf(this.journey.arrived)
@@ -268,6 +317,13 @@ export class WorldMapView {
             }),
             returnToFeka: () => this.act(() => {
                 if (!this.journey || this.journey.destination || !this.journey.blocked) return;
+                if (this.save && this.callbacks.crossGuaira && this.journey.blocked === 'no-route' &&
+                    ((worldOf(this.journey.arrived) <= 3) !== (STAGES[this.controlSelection].world <= 3)) && isUnlocked(STAGES[this.controlSelection].id, this.save)) {
+                    this.crossToIsland(this.controlSelection); return;
+                }
+                if (this.save && this.callbacks.guaira && mapStagePrerequisite(STAGES[this.controlSelection].id, this.save) === 'guaira-prefeito') {
+                    this.openChapter('guaira'); return;
+                }
                 this.overview = false; this.paintDirty = true; this.select(indexOf(this.journey.arrived));
                 this.root.focus({ preventScroll: true });
             }),
@@ -281,21 +337,15 @@ export class WorldMapView {
                 const action = WORLD_MAP_TRAVEL_ACTIONS[id];
                 this.select(action.toStage ? indexOf(action.toStage) : (action.toWorld - 1) * 5);
             }),
-            enter: () => this.act(() => this.enterSelected(this.controlSelection)),
+            enter: () => this.act(() => this.chapter ? this.enterChapter() : this.enterSelected(this.controlSelection)),
             skip: () => this.act(() => this.skip()),
-            overview: () => this.act(() => { this.overview = !this.overview; this.paintDirty = true; this.refreshHud(); }),
+            overview: () => this.act(() => this.toggleOverview()),
             menu: () => this.act(() => callbacks.exit()),
         });
         this.root = this.hud.root; this.scene = this.hud.scene; this.canvas = this.hud.canvas;
         this.ctx = this.canvas.getContext('2d', { alpha: false })!;
         this.root.addEventListener('keydown', this.onKey);
         document.body.append(this.root);
-        const deliciaLink = document.createElement('a');
-        deliciaLink.href = DELICIA_ENTRY; deliciaLink.className = 'world-map-delicia';
-        deliciaLink.setAttribute('aria-label', 'Império da Delícia');
-        const dlLabel = lettering('Império da Delícia', ART.goldLight); deliciaLink.append(dlLabel); this.hud.chapterLinks.append(deliciaLink);
-        this.deliciaPin.href = DELICIA_ENTRY; this.deliciaPin.className = 'world-map-delicia-island';
-        this.deliciaPin.setAttribute('aria-label', 'Império da Delícia'); this.deliciaPin.append(lettering('Império da Delícia', ART.goldLight)); this.deliciaPin.hidden = true; this.scene.append(this.deliciaPin);
         if (callbacks.guaira) {
             void loadCampaignWaterImage().then(image => {
                 if (!this.disposed && image) {
@@ -313,7 +363,12 @@ export class WorldMapView {
         window.addEventListener('resize', this.onResize); this.media.addEventListener('change', this.onMotion);
     }
     private act(action: () => void) { if (this.visible && !this.disposed) { this.callbacks.unlockAudio(); action(); } }
-    private select(index: number) { this.selectDestination(index); this.callbacks.select(this.controlSelection); }
+    private select(index: number) {
+        if (this.guairaArrived && this.save && isUnlocked(STAGES[index].id, this.save) && this.callbacks.leaveGuaira) {
+            this.callbacks.leaveGuaira(STAGES[index].world >= 4 ? 'serra' : 'factory', index); return;
+        }
+        this.chapter = null; this.pendingChapterStage = null; this.pendingIsland = null; this.selectDestination(index); this.callbacks.select(this.controlSelection);
+    }
     selectDestination(index: number): void {
         const selection = clampMapSelection(index);
         this.controlSelection = selection;
@@ -359,6 +414,14 @@ export class WorldMapView {
     }
     control(command: GamepadMenuCommand): void {
         if (!this.controllerOwner() || this.hud.control(command)) return;
+        if (this.chapter) {
+            if (command === 'back') this.act(() => this.toggleOverview());
+            else if (['left', 'up', 'right', 'down'].includes(command)) {
+                this.selectChapter(this.chapterIndex + (command === 'left' || command === 'up' ? -1 : 1));
+                this.hud.chapterButtons[this.chapterIndex]?.focus({ preventScroll: true });
+            }
+            return;
+        }
         if (command === 'back') { this.act(() => this.callbacks.exit()); return; }
         const key = ({ left: 'ArrowLeft', right: 'ArrowRight', up: 'ArrowUp', down: 'ArrowDown' } as const)[command as 'left' | 'right' | 'up' | 'down'];
         if (!key) return;
@@ -367,6 +430,18 @@ export class WorldMapView {
     }
     private readonly onKey = (event: KeyboardEvent) => {
         if (!this.visible || event.defaultPrevented || !this.hud.regionMenu.hidden || event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
+        if (this.chapter) {
+            const key = event.key.toLowerCase();
+            if (['arrowleft', 'arrowright', 'arrowup', 'arrowdown', 'a', 'd', 'w', 's'].includes(key)) {
+                event.preventDefault(); event.stopPropagation();
+                this.selectChapter(this.chapterIndex + (['arrowleft', 'arrowup', 'a', 'w'].includes(key) ? -1 : 1));
+                this.hud.chapterButtons[this.chapterIndex]?.focus({ preventScroll: true });
+            } else if (key === 'escape') { event.preventDefault(); event.stopPropagation(); this.toggleOverview(); }
+            else if ((key === 'enter' || key === ' ') && (event.target === this.root || this.hud.chapterButtons.includes(event.target as HTMLButtonElement))) {
+                event.preventDefault(); event.stopPropagation(); this.act(() => this.enterChapter());
+            }
+            return;
+        }
         const next = moveJourneySelection(this.controlSelection, event.key);
         if (next !== this.controlSelection) {
             event.preventDefault(); event.stopPropagation(); this.act(() => this.select(next)); this.hud.focusStage(next);
@@ -407,7 +482,7 @@ export class WorldMapView {
         if (inAtlas(world)) this.pairLoads.set(world, this.loadAssets(world, cached));
     }
     private ensureArt(world: number): void {
-        if (this.overview && !this.deliciaStarted) {
+        if ((this.overview || this.chapter === 'delicia') && !this.deliciaStarted) {
             this.deliciaStarted = true;
             void this.loadImage(DELICIA_MAP_IMAGE).then(image => {
                 if (image && !this.disposed) { this.deliciaImage = image; this.paintDirty = true; }
@@ -641,7 +716,6 @@ export class WorldMapView {
         if (this.disposed) return;
         this.hide(); this.disposed = true; this.abort.abort(); this.resizeObserver.disconnect();
         window.removeEventListener('resize', this.onResize); this.media.removeEventListener('change', this.onMotion);
-        this.guairaDialog?.();
         this.root.removeEventListener('keydown', this.onKey); this.hud.dispose();
     }
     private rebuildNetwork(): void {
@@ -698,21 +772,32 @@ export class WorldMapView {
     }
     private refreshHud(warning = '', toast = ''): void {
         if (!this.save || !this.journey) return;
+        if (this.chapter) {
+            this.chapterStages = chapterMapStages(this.chapter, this.save, this.deliciaStore.save);
+            const directions = guairaTravelDirections(this.save, this.journey.arrived);
+            const label = this.chapter === 'guaira' && !this.guairaArrived && !directions.atAirRegion ? 'Viajar' : 'Jogar';
+            this.hud.updateChapter(this.chapter, WORLD_CHAPTER_NAMES[this.chapter], this.chapterStages, this.chapterIndex, label,
+                toast || warning || (this.chapter === 'delicia' ? this.deliciaStore.warning : ''));
+            return;
+        }
         const stage = STAGES[this.controlSelection], world = stage.world;
         this.hud.update({ world, stage: this.controlSelection, arrivedWorld: worldOf(this.journey.arrived), arrivedStage: this.journey.arrived,
             open: Array.from({ length: 5 }, (_, n) => isUnlocked(`${world}-${n + 1}`, this.save!)),
             completed: Array.from({ length: 5 }, (_, n) => this.save!.completed.includes(`${world}-${n + 1}`)),
             seals: Array.from({ length: 5 }, (_, n) => this.save!.seals.filter(id => id.startsWith(`${world}-${n + 1}:`)).length),
             guairaAvailable: guairaTravelDirections(this.save, this.journey.arrived).available,
-            globalProgress: { completed: this.save.completed.length, guaira: this.save.guaira.completed.length, seals: this.save.seals.length },
+            globalProgress: { completed: this.save.completed.length, guaira: this.save.guaira.completed.length, seals: this.save.seals.length,
+                delicia: this.callbacks.enterChapter ? deliciaMapProgress(this.deliciaStore.save) : undefined },
             motionState: this.motionState(), canEnter: canEnterJourney(this.journey, this.capabilities),
             prerequisiteStage: this.journey.blocked === 'unavailable' ? mapStagePrerequisite(stage.id, this.save) : null,
+            previewAction: this.callbacks.crossGuaira && this.journey.blocked === 'no-route' && ((world <= 3) !== (worldOf(this.journey.arrived) <= 3)) && isUnlocked(stage.id, this.save)
+                ? 'travel' : this.callbacks.guaira && mapStagePrerequisite(stage.id, this.save) === 'guaira-prefeito' ? 'guaira' : undefined,
             hint: this.journey.blocked === 'no-route' && this.crossingLoading(worldOf(this.journey.arrived), world)
                 ? world === 5 ? 'Preparando a linha de passageiros… Você pode escolher outra fase ou voltar ao menu.'
                     : world === 4 ? 'Preparando a passagem da Serra… Você pode escolher outra fase ou voltar ao menu.'
                     : world === 3 ? 'Preparando a ponte de carga… Você pode escolher outra fase ou voltar ao menu.'
                     : 'Preparando o barco e os cais… Você pode escolher outra fase ou voltar ao menu.'
-                : this.journey.blocked === 'no-route' && ((world <= 3) !== (worldOf(this.journey.arrived) <= 3)) ? 'A passagem entre Fábrica e Serra é por Guaíra. Abra Arquipélago → Guaíra para embarcar.' : journeyBlockReason(this.journey) || campaignMapDirection(this.save, this.journey.arrived, stage.id, !!this.journey.destination) || (this.save.secrets.includes(`${world}-3`) ? 'Atalho 3 → 5 descoberto!' : ''),
+                : this.journey.blocked === 'no-route' && ((world <= 3) !== (worldOf(this.journey.arrived) <= 3)) ? 'A viagem passa por Guaíra.' : journeyBlockReason(this.journey) || campaignMapDirection(this.save, this.journey.arrived, stage.id, !!this.journey.destination) || (this.save.secrets.includes(`${world}-3`) ? 'Atalho 3 → 5 descoberto!' : ''),
             warnings: [toast || warning, this.assetWarning], worldAvailability: Array.from({ length: 6 }, (_, n) => isUnlocked(`${n + 1}-1`, this.save!)),
             preview: !!this.journey.blocked, overview: this.overview,
         });
@@ -757,6 +842,12 @@ export class WorldMapView {
         this.marker = this.journey.point;
         if (Math.abs(previous.x - this.marker.x) > 1e-8) this.facingLeft = this.marker.x < previous.x;
         this.reportArrival(); this.refreshHud(warning, toast);
+        if (this.pendingChapterStage && !this.journey.destination && !this.journey.blocked && guairaTravelDirections(save, this.journey.arrived).atAirRegion) {
+            const id = this.pendingChapterStage; this.openChapter('guaira', id); this.enterChapter();
+        }
+        if (this.pendingIsland !== null && !this.journey.destination && !this.journey.blocked && guairaTravelDirections(save, this.journey.arrived).atAirRegion) {
+            const target = this.pendingIsland; this.pendingIsland = null; this.crossToIsland(target);
+        }
         if (this.dirtySize || this.screenDpr !== (window.devicePixelRatio || 1)) this.measure();
         const signature = `${progressSignature}|water:${campaignWaterRestored(save)}|${this.controlSelection}|${save.completed.join(',')}|${save.seals.join(',')}|${warning}|${toast}|${this.overview}|${this.journey.arrived}|${this.journey.destination}|${this.journey.blocked}`;
         if (this.media.matches && !this.paintDirty && !this.geometryDirty && signature === this.lastSignature) return;
@@ -889,18 +980,20 @@ export class WorldMapView {
             ...(this.overview ? boats.map(boat => atlasBoatBounds(boat.foot, boat.frame))
             : trackedBoat ? [atlasBoatBounds(trackedBoat.foot, trackedBoat.frame)] : []),
             ...(this.overview ? cableCars.map(atlasCableBounds) : trackedCabin ? [atlasCableBounds(trackedCabin)] : [])];
-        const target = getAtlasCamera({ mode: this.overview ? 'overview' : channel ? 'channel' : 'island', activeWorld,
+        let target = getAtlasCamera({ mode: this.overview ? 'overview' : channel ? 'channel' : 'island', activeWorld,
             layers: islands, width: this.width, height: this.height, insets: { ...this.frameInsets, left: 16, right: 16 },
             focus: trackJourney && !this.overview ? actorPoint : undefined,
             travelPoints, connectionBounds, focusBounds });
-        this.camera = this.blendAtlasCamera(target, dt, trackedCabin ? atlasCableBounds(trackedCabin)
-            : trackedBoat ? atlasBoatBounds(trackedBoat.foot, trackedBoat.frame) : undefined, overviewActorBounds, actorPoint);
-        this.deliciaPin.hidden = !this.overview || !this.deliciaImage;
-        if (!this.deliciaPin.hidden) {
-            const point = mapToScreen({ x: DELICIA_ATLAS.left + DELICIA_ATLAS.widthInMap * .5,
-                y: DELICIA_ATLAS.top + DELICIA_ATLAS.heightInMap * .87 }, this.camera);
-            this.deliciaPin.style.left = `${point.x}px`; this.deliciaPin.style.top = `${point.y}px`;
+        if (this.chapter) {
+            const bounds = this.chapter === 'guaira' ? campaignTerrainBounds('guaira') : {
+                left: DELICIA_ATLAS.left + .1 * DELICIA_ATLAS.widthInMap, top: DELICIA_ATLAS.top + .06 * DELICIA_ATLAS.heightInMap,
+                right: DELICIA_ATLAS.left + .94 * DELICIA_ATLAS.widthInMap, bottom: DELICIA_ATLAS.top + .9 * DELICIA_ATLAS.heightInMap };
+            target = getAtlasCamera({ mode: 'overview', activeWorld: 0, layers: [], connectionBounds: [bounds],
+                width: this.width, height: this.height, insets: { ...this.frameInsets, left: 24, right: 24 }, maxZoom: 4 });
         }
+        this.camera = this.chapter ? this.blendAtlasCamera(target, dt)
+            : this.blendAtlasCamera(target, dt, trackedCabin ? atlasCableBounds(trackedCabin)
+                : trackedBoat ? atlasBoatBounds(trackedBoat.foot, trackedBoat.frame) : undefined, overviewActorBounds, actorPoint);
         const aboard = !!occupiedCabin || !!occupiedBoat;
         const waterRestored = campaignWaterRestored(save);
         // Reuse the visible map cadence; hidden or reduced-motion time never catches up.
@@ -921,7 +1014,26 @@ export class WorldMapView {
                 ...dominioLayers.map(layer => ({ ...layer, image: this.dominioOverlays.get(layer.path)! }))],
             actor: { point: actorPoint, walking: !!active && active.mode !== 'sail' && active.mode !== 'cable', facingLeft: this.facingLeft, aboard,
                 visible: actorInAtlas, cableCar: occupiedCabin, boatId: occupiedBoat }, boats, cableCars, cablePaths });
-        this.positionNodes(world, channel || activeWorld !== world, boats, cableCars);
+        if (this.chapter) {
+            const anchors = this.chapterStages.map(stage => mapToScreen(stage.point, this.camera));
+            const settled = Math.abs(this.camera.zoom - target.zoom) < .025;
+            const compact = this.width <= 620 || this.height <= 480;
+            const positions = layoutMapControls(anchors.map(point => ({ ...point, width: compact ? 44 : 56, height: compact ? 46 : 58 })),
+                { left: 12, right: this.width - 12, top: this.frameInsets.top, bottom: this.height - this.frameInsets.bottom }, compact ? 4 : 8);
+            if (settled) positions.forEach((point, index) => {
+                const anchor = anchors[index];
+                if (Math.hypot(point.x - anchor.x, point.y - anchor.y) < 14) return;
+                this.ctx.strokeStyle = '#f5efd36b'; this.ctx.lineWidth = 1;
+                this.ctx.beginPath(); this.ctx.moveTo(point.x, point.y - 3); this.ctx.lineTo(anchor.x, anchor.y); this.ctx.stroke();
+            });
+            this.hud.positionChapterNodes(positions.map(point => settled ? point : null));
+            // A small route marker identifies the selected stop without pretending Feka has flown here yet.
+            const selected = anchors[this.chapterIndex];
+            if (settled && selected) {
+                this.ctx.strokeStyle = ART.goldLight; this.ctx.lineWidth = 2;
+                this.ctx.beginPath(); this.ctx.ellipse(selected.x, selected.y + 4, 18, 7, 0, 0, Math.PI * 2); this.ctx.stroke();
+            }
+        } else this.positionNodes(world, channel || activeWorld !== world, boats, cableCars);
     }
     private blendAtlasCamera(target: MapCamera, dt: number, bounds?: AtlasBounds, actorBounds?: AtlasBounds, actorPoint = this.marker): MapCamera {
         if (this.cameraSnap || this.media.matches) { this.cameraSnap = false; return target; }
@@ -1002,6 +1114,12 @@ export class WorldMapView {
                 const a = mapToScreen({ x: terrain.left, y: terrain.top }, this.camera), b = mapToScreen({ x: terrain.right, y: terrain.bottom }, this.camera);
                 owners.push({ left: a.x, top: a.y, right: b.x, bottom: b.y });
                 names.push({ x: (a.x + b.x) / 2, y: b.y + (compact ? 8 : 32), width: 128, height: 44 });
+            }
+            if (this.callbacks.enterChapter) {
+                const dlTop = mapToScreen({ x: DELICIA_ATLAS.left + .1 * DELICIA_ATLAS.widthInMap, y: DELICIA_ATLAS.top + .06 * DELICIA_ATLAS.heightInMap }, this.camera);
+                const dlBottom = mapToScreen({ x: DELICIA_ATLAS.left + .94 * DELICIA_ATLAS.widthInMap, y: DELICIA_ATLAS.top + .9 * DELICIA_ATLAS.heightInMap }, this.camera);
+                owners.push({ left: dlTop.x, top: dlTop.y, right: dlBottom.x, bottom: dlBottom.y });
+                names.push({ x: (dlTop.x + dlBottom.x) / 2, y: dlBottom.y + (compact ? 8 : 32), width: 128, height: 44 });
             }
             const bounds = { left: 8, right: this.width - 8, top: this.frameInsets.top + 2, bottom: this.height - this.frameInsets.bottom - 2 };
             const layoutKey = JSON.stringify([names, owners, bounds]);

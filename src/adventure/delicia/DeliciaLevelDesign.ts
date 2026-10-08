@@ -1,4 +1,5 @@
 import type { DeliciaStage, Floor, FoeType, StageZone } from './DeliciaContent';
+import { DELICIA_PLAYER_HEIGHT } from './DeliciaNative';
 
 type Setpiece = 'quay' | 'canopy' | 'sluice' | 'falls' | 'cellar' | 'tide' | 'presses' | 'garden' | 'boiler' | 'ascent' | 'roots' | 'clock';
 interface Section { name:string; detail:string; landmark:StageZone['landmark']; spans:readonly (readonly [number,number,number])[] }
@@ -10,7 +11,7 @@ const PLANS:Record<string,RoutePlan> = {
  '1':{piece:'quay',time:90,sections:[
   section('O cais de copos vazios','O primeiro gole sempre foi de quem chegava.','port',[[510,450,45],[270,450,65],[350,425,55]]),
   section('Mercado das Janelas','As bancas estão fechadas. A fonte ainda pode abrir.','port',[[390,425,60],[260,400,65],[370,430,70]]),
-  section('Pontes da Maré Mansa','Espere a balsa se aproximar ou use o impulso.','arches',[[290,450,100],[310,420,100],[350,450,65]]),
+  section('Pontes da Maré Mansa','Espere a balsa se aproximar ou salte em corrida.','arches',[[290,450,100],[310,420,100],[350,450,65]]),
   section('O sino que não toca','Devolva ao cais o som do meio-dia.','bell',[[350,430,75],[290,400,65],[510,450,0]])]},
  '2':{piece:'canopy',time:105,sections:[
   section('Terraços da Primeira Safra','Sementes no chão. Segredos na copa.','mill',[[430,450,75],[280,420,80],[320,390,70]]),
@@ -34,7 +35,7 @@ const PLANS:Record<string,RoutePlan> = {
   section('Arquivo das Vozes Vivas','Leve a lembrança até Jajá.','chalice',[[420,420,95],[300,450,100],[520,450,0]])]},
  '7':{piece:'tide',time:115,sections:[
   section('O Rio Desperto','Jajá abriu a nascente. Agora o caminho se move.','chalice',[[440,450,110],[280,450,115],[330,420,105]]),
-  section('Doca das Balsas Perdidas','Escolha o ritmo do rio para poupar o impulso.','port',[[420,450,115],[290,420,120],[370,450,110]]),
+  section('Doca das Balsas Perdidas','Espere a balsa e salte em direção à margem.','port',[[420,450,115],[290,420,120],[370,450,110]]),
   section('Velas de Casca','As correntes levam sementes e segredos.','mill',[[320,420,115],[270,390,125],[350,420,110]]),
   section('A Enseada da Volta','O primeiro barril livre já alcançou a vila.','port',[[430,450,110],[290,420,115],[520,450,0]])]},
  '8':{piece:'presses',time:124,sections:[
@@ -85,9 +86,9 @@ export function authorDeliciaTraversal(s:DeliciaStage,lore:readonly string[]):vo
    const ground:Floor={x,y,w,h:900-y,material};
    if(industrial&&part===1){ground.kind='belt';ground.beltSpeed=zone%2?100:-85;}
    s.floors.push(ground);
-   if(zone>0&&part===0){s.checkpoints.push({x:x+30,y:y-54});s.pickups.push({id:`${s.id}:heart-${zone}`,x:x+50,y:y-112,kind:'heart'});}
+   if(zone>0&&part===0){s.checkpoints.push({x:x+10,y:y-DELICIA_PLAYER_HEIGHT});s.pickups.push({id:`${s.id}:heart-${zone}`,x:x+50,y:y-128,kind:'heart'});}
    // A quiet landing before each encounter and room to read the next hazard.
-   for(let c=0;c<4;c++)fruit(x+(part===0&&zone>0?155:65)+c*45,y-35-(c%3===1?18:0));
+   for(let c=0;c<4;c++)fruit(x+(part===0&&zone>0?(zone===2?155:235):65)+c*45,y-35-(c%3===1?18:0));
    const steamLane=industrial&&part===1&&(plan.piece==='boiler'||plan.piece==='clock');
    if((part===1||part===2)&&!(zone===0&&part===1)&&!steamLane){
     const pool=kinds[plan.piece],kind=pool[(zone*2+part)%pool.length];
@@ -95,17 +96,19 @@ export function authorDeliciaTraversal(s:DeliciaStage,lore:readonly string[]):vo
     s.enemies.push({kind,x:x+(besidePress?w-80:w*.55),y:y-44,patrol:besidePress?40:Math.min(135,w-135)});
    }
    if(part===0&&zone>0){
-    const lift=citrus||water||plan.piece==='clock',upper=y-95;
+    // Native World jumps reach 103 px held versus 14 px tapped. Rewards now ask
+    // for a deliberate held jump; the lower valve route stays walkable.
+    const lift=citrus||water||plan.piece==='clock',upper=y-(lift?330:210);
     s.floors.push({x:x+255,y:upper,w:145,h:20,material,kind:plan.piece==='cellar'?'crumble':plan.piece==='sluice'?'bridge':undefined,...(plan.piece==='sluice'?{requiresValve:zone<3?'v5':'v11'}:{})});
-    if(lift)s.floors.push({x:x+170,y:y-12,w:64,h:12,material,kind:citrus?'spring':'lift',travel:88,speed:1.1,phase:zone*.9});
+    if(lift)s.floors.push({x:x+170,y:y-12,w:64,h:12,material,kind:citrus?'spring':'lift',travel:320,speed:1.1,phase:zone*.9});
     s.pickups.push({id:`${s.id}:s${zone}`,x:x+382,y:upper-32,kind:'seal'});
     for(let c=0;c<3;c++)fruit(x+265+c*38,upper-30);
     // Vents are helpful movement machines, visually different from dangerous steam.
-    if(water)s.machines!.push({id:`jet-${zone}`,kind:'jet',x:x+425,y:y-100,w:40,h:100,period:4.4,phase:zone*.4,power:800});
+    if(water)s.machines!.push({id:`jet-${zone}`,kind:'jet',x:x+425,y:y-100,w:40,h:100,period:4.4,phase:zone*.4,power:2250});
     if(citrus&&zone===2)s.machines!.push({id:'canopy-wind',kind:'wind',x:x+225,y:y-260,w:175,h:160,period:7,phase:0,power:0});
    }
    if((zone===1||zone===3)&&part===0){
-    const id=zone===1?'v5':'v11';s.valves.push({id,x:x+105,y,label:zone===1?'FONTE DO BAIRRO':'FONTE DO CAIS',...(['sluice','boiler'].includes(plan.piece)?{order:zone===1?1:2}:{})});
+    const id=zone===1?'v5':'v11';s.valves.push({id,x:x+111,y,label:zone===1?'FONTE DO BAIRRO':'FONTE DO CAIS',...(['sluice','boiler'].includes(plan.piece)?{order:zone===1?1:2}:{})});
     s.pickups.push({id:`${s.id}:m${zone===1?5:11}`,x:x+w-35,y:y-34,kind:'memory',lore:lore[zone===1?0:1]});
    }
    if(industrial&&part===1){
@@ -128,5 +131,5 @@ export function authorDeliciaTraversal(s:DeliciaStage,lore:readonly string[]):vo
  });
  s.width=x;s.gate={x:x-115,y:355,w:65,h:95};
  s.echoes=plan.sections.slice(1).map((z,i)=>({id:`${s.id}:echo-${i}`,x:s.zones![i+1].x+125,y:380,speaker:s.number<6?'Dona Casca':'Jajá',text:z.detail}));
- s.mechanic={quay:'Pontes de maré, mercado e a primeira fonte',canopy:'Molas, correntes ascendentes e rotas pela copa',sluice:'Comportas em sequência reconstroem pontes',falls:'Balsas, elevadores e jatos de impulso',cellar:'Barris vivos e passarelas que se recompõem',tide:'Correntes, balsas e impulso sobre o rio',presses:'Esteiras opostas e prensas desligadas pelas fontes',garden:'Flores lançadoras, vento e jardins suspensos',boiler:'Prensas, descargas alternadas e controle de pressão',ascent:'O encontro de todas as mecânicas da ilha',roots:'Molas e vento até o santuário das copas',clock:'Prensas em ritmo, elevadores e o sino'}[plan.piece];
+ s.mechanic={quay:'Pontes de maré, mercado e a primeira fonte',canopy:'Molas, correntes ascendentes e rotas pela copa',sluice:'Comportas em sequência reconstroem pontes',falls:'Balsas, elevadores e jatos de impulso',cellar:'Barris vivos e passarelas que se recompõem',tide:'Correntes, balsas e saltos sobre o rio',presses:'Esteiras opostas e prensas desligadas pelas fontes',garden:'Flores lançadoras, vento e jardins suspensos',boiler:'Prensas, descargas alternadas e controle de pressão',ascent:'O encontro de todas as mecânicas da ilha',roots:'Molas e vento até o santuário das copas',clock:'Prensas em ritmo, elevadores e o sino'}[plan.piece];
 }

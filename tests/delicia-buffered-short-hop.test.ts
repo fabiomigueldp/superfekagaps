@@ -4,7 +4,7 @@ import { DELICIA_STAGES, type DeliciaStage } from '../src/adventure/delicia/Deli
 import { DeliciaSimulation, noDeliciaInput, type DeliciaInput } from '../src/adventure/delicia/DeliciaSimulation';
 
 const near = (actual: number, expected: number) => assert.ok(Math.abs(actual - expected) < 1e-7, `${actual} != ${expected}`);
-function fixture(dt = 1 / 120, spawnY = 396, cliff = false) {
+function fixture(dt = 1 / 120, spawnY = 378, cliff = false) {
     const stage: DeliciaStage = { ...structuredClone(DELICIA_STAGES[0]), width: 3000, height: 900,
         spawn: { x: 90, y: spawnY }, floors: [{ x: 0, y: 450, w: cliff ? 140 : 3000, h: 450, material: 'stone' }],
         enemies: [], pickups: [], hazards: [], checkpoints: [], valves: [], machines: [], echoes: [], zones: [],
@@ -21,7 +21,7 @@ function fixture(dt = 1 / 120, spawnY = 396, cliff = false) {
     const arc = (held: boolean) => {
         const points: Array<[number, number]> = [];
         for (let frame = 0; frame < 180; frame++) {
-            points.push([396 - sim.player.y, sim.player.vy]);
+            points.push([378 - sim.player.y, sim.player.vy]);
             if (sim.player.grounded) return points;
             step({ jump: held });
         }
@@ -30,14 +30,14 @@ function fixture(dt = 1 / 120, spawnY = 396, cliff = false) {
     return { sim, stage, initialStage, step, arc, starts: () => starts };
 }
 
-// The app runs 120 Hz; the simulation also accepts 60 Hz callers.
+// The app shares World at 60 Hz; authored simulations also accept half steps.
 for (const dt of [1 / 120, 1 / 60]) for (const intent of ['released', 'held', 'released then repressed', 'release/repress on launch', 'released on launch'] as const) {
     test(`Delícia ${1 / dt} Hz: ${intent} landing buffer matches the ordinary arc`, () => {
         const h = fixture(dt), p = h.sim.player;
         const held = intent !== 'released' && intent !== 'released on launch';
         h.step({ jumpPressed: true, jump: held, jumpReleased: !held });
         const ordinary = h.arc(held);
-        near(ordinary[0][1], (held ? -610 : -305) + 1750 * dt);
+        near(ordinary[0][1], (held ? -1440 : -720) + 5400 * dt);
         assert.equal(h.starts(), 1);
         h.step({ jumpReleased: true });
         // Approach landing through real motion, without assigning player position or velocity.
@@ -46,7 +46,7 @@ for (const dt of [1 / 120, 1 / 60]) for (const intent of ['released', 'held', 'r
         let queued = false;
         for (let frame = 0; frame < 180; frame++) {
             const gap = 450 - (p.y + p.h);
-            if (!p.grounded && p.vy > 0 && gap > 0 && gap <= (p.vy + 1750 * dt) * dt) {
+            if (!p.grounded && p.vy > 0 && gap > 0 && gap <= (p.vy + 5400 * dt) * dt) {
                 const releasedBefore = intent === 'released' || intent === 'released then repressed';
                 h.step({ jumpPressed: true, jump: !releasedBefore, jumpReleased: releasedBefore });
                 queued = true; break;
@@ -70,13 +70,13 @@ for (const dt of [1 / 120, 1 / 60]) for (const intent of ['released', 'held', 'r
 
 for (const held of [false, true]) for (const waited of [4, 20]) {
     test(`Delícia coyote after ${waited} steps preserves ${held ? 'held' : 'released'} intent`, () => {
-        const h = fixture(1 / 120, 396, true), p = h.sim.player;
+        const h = fixture(1 / 120, 378, true), p = h.sim.player;
         for (let frame = 0; frame < 100 && p.grounded; frame++) h.step({ right: true });
         assert.equal(p.grounded, false);
         for (let frame = 0; frame < waited; frame++) h.step();
         h.step({ jumpPressed: true, jump: held, jumpReleased: !held });
         assert.equal(h.starts(), waited === 4 ? 1 : 0);
-        if (waited === 4) near(p.vy, (held ? -610 : -305) + 1750 / 120);
+        if (waited === 4) near(p.vy, (held ? -1440 : -720) + 5400 / 120);
         else assert.ok(p.vy > 0);
     });
 }
@@ -91,7 +91,7 @@ test('Delícia expired released buffer cannot launch after a long fall', () => {
     assert.equal(h.sim.player.buffer, 0);
     h.step({ jump: true, jumpPressed: true });
     assert.equal(h.starts(), 1);
-    near(h.sim.player.vy, -610 + 1750 / 120);
+    near(h.sim.player.vy, -1440 + 5400 / 120);
 });
 
 test('Delícia release/repress after takeoff keeps the existing edge-based cut', () => {
@@ -99,16 +99,16 @@ test('Delícia release/repress after takeoff keeps the existing edge-based cut',
     h.step({ jump: true, jumpPressed: true });
     const before = h.sim.player.vy;
     h.step({ jump: true, jumpPressed: true, jumpReleased: true });
-    near(h.sim.player.vy, before * .5 + 1750 / 120);
+    near(h.sim.player.vy, before * .5 + 5400 / 120);
     assert.equal(h.starts(), 1);
 });
 
-test('Delícia ordinary full and short jump envelopes remain unchanged at the shipping 120 Hz step', () => {
-    for (const [hold, height, apex, land] of [[0, 25.3125, 20, 41], [1, 29.05902777777777, 21, 43], [60, 103.78125, 41, 83]]) {
-        const h = fixture(); let highest = 0, apexFrame = 0, landingFrame = 0;
+test('Delícia ordinary full and short jump envelopes remain unchanged at the native 60 Hz step', () => {
+    for (const [hold, height, apex, land] of [[0, 42, 7, 16], [1, 59.25, 8, 17], [60, 309, 22, 43]]) {
+        const h = fixture(1 / 60); let highest = 0, apexFrame = 0, landingFrame = 0;
         for (let frame = 0; frame < 180; frame++) {
             h.step({ right: true, jump: frame < hold, jumpPressed: frame === 0, jumpReleased: frame === hold });
-            const rise = 396 - h.sim.player.y;
+            const rise = 378 - h.sim.player.y;
             if (rise > highest) { highest = rise; apexFrame = frame + 1; }
             if (h.sim.player.grounded) { landingFrame = frame + 1; break; }
         }

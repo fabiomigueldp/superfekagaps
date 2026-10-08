@@ -1,8 +1,7 @@
 import assert from 'node:assert/strict';
 import test, { type TestContext } from 'node:test';
 import { createRequire } from 'node:module';
-import { readFileSync } from 'node:fs';
-import { textWidth } from '../src/graphics/BitmapFont';
+import { textWidth, wrapText } from '../src/graphics/BitmapFont';
 import { DELICIA_STAGES } from '../src/adventure/delicia/DeliciaContent';
 import { DELICIA_SAVE_KEY, DeliciaStore, freshDeliciaSave, parseDeliciaSave } from '../src/adventure/delicia/DeliciaProgress';
 import { DeliciaSimulation, noDeliciaInput, type DeliciaInput } from '../src/adventure/delicia/DeliciaSimulation';
@@ -28,7 +27,7 @@ class Element extends EventTarget {
 }
 interface App {
     store: DeliciaStore; sim: DeliciaSimulation; toast: string; toastTime: number; screen: string;
-    panel: Element; status: Element; settingsMessage?: Element;
+    panel: Element; status: Element; settingsMessage?: Element; menu: { id: string; choices: { label: string; run(): void }[] };
     step(dt: number, input: DeliciaInput): void; loadStage(id: string, retry?: boolean): boolean;
     clearStage(): void; pause(): void; showEnding(): void; showSettings(): void;
     dialogueDone(): void;
@@ -53,7 +52,8 @@ function fixture(t: TestContext, mode: 'QuotaExceededError' | 'SecurityError' | 
     } });
     t.after(() => before ? Object.defineProperty(globalThis, 'document', before) : Reflect.deleteProperty(globalThis, 'document'));
     const app = Object.assign(Object.create(DeliciaApp.prototype), {
-        store: new DeliciaStore(storage), sim: new DeliciaSimulation(), screen: 'playing',
+        store: new DeliciaStore(storage), sim: new DeliciaSimulation(), screen: 'playing', options: {}, menuEpoch: 0,
+        presentation: { hide() {}, draw() {}, menus: { requestFocusFromCanvas() {} } },
         root: new Element('main'), panel: new Element('section'), status: new Element('p'),
         hud: new Element('div'), canvas: new Element('canvas'), playfield: new Element('div'), touch: new Element('div'),
         held: new Set(), pressed: new Set(), released: new Set(), sources: new Map(), buttonKeys: new Map(),
@@ -62,11 +62,18 @@ function fixture(t: TestContext, mode: 'QuotaExceededError' | 'SecurityError' | 
         updateHud() {}
     }) as App;
     const button = (name: string) => {
-        const result = app.panel.all().find(node => node.tagName === 'button' && node.textContent === name);
-        assert.ok(result, `Missing ${name} button`); return result;
+        // Persistence runs unchanged; only the canvas/accessibility painting boundary is fake.
+        const review = app.menu.choices.find(choice => choice.label === 'REVER PROGRESSO');
+        if (review) review.run();
+        const label = name === 'Exportar cópia' ? 'EXPORTAR' : name.toUpperCase();
+        const choice = app.menu.choices.find(choice => choice.label === label);
+        assert.ok(choice, `Missing ${name} action`); return { click: () => choice.run() };
     };
     return { app, button, storage, original, get raw() { return raw; }, get writes() { return writes; },
-        recover() { failure = 'ok'; }, warning: () => app.panel.all().find(node => node.className.includes('dl-save-warning')) };
+        recover() { failure = 'ok'; }, warning: () => app.store.warning &&
+            (app.menu.id.startsWith('recovery') || app.menu.choices.some(choice => choice.label === 'REVER PROGRESSO'))
+            ? { textContent: app.store.warning } : undefined };
+
 }
 function reachCheckpoint(app: App, index = 0) {
     const cp = app.sim.stage.checkpoints[index];
@@ -144,12 +151,9 @@ test('options and ending retain save recovery, and a successful retry clears the
     assert.equal(h.app.status.textContent, 'Progresso salvo.'); assert.deepEqual(new DeliciaStore(h.storage).save, h.app.store.save);
 });
 
-// Source/metric coverage only; real compact layout is verified on the release preview.
-test('recovery controls wrap in normal document flow and each bitmap label fits a 320px overlay', () => {
-    const css = readFileSync(new URL('../src/adventure/delicia/delicia.css', import.meta.url), 'utf8');
-    assert.match(css, /\.dl-save-recovery \{ position: static; max-width: 100%; \}/);
-    assert.match(css, /\.dl-save-recovery \.dl-save-actions \{ flex-wrap: wrap;/);
-    const available = 320 - 32 - 2 * (26 + 2) - 2 * (10 + 2);
-    for (const label of ['Exportar cópia', 'Tentar salvar'])
-        assert.ok(textWidth(label) * 2 + 2 * (16 + 2) <= available, label);
+test('native recovery actions and the complete warning fit inside the World panel', () => {
+    for (const [label, width] of [['EXPORTAR', 88], ['TENTAR SALVAR', 106], ['VOLTAR', 70]] as const)
+        assert.ok(textWidth(label) <= width - 26, label);
+    const store = new DeliciaStore({ getItem() { throw new Error('blocked'); }, setItem() {} });
+    assert.ok(wrapText(store.warning, 272).length <= 8, 'The entire warning fits before the native buttons');
 });

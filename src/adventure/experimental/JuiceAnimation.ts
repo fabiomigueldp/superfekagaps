@@ -32,15 +32,26 @@ export function juicePose(b: JuiceMinibossModel, reducedMotion = false) {
             lean = mix(charged.lean, f * mix(3, 1, brake), launch); mouth = .72;
         } else {
             const launch = ease(ms / 95), fall = ease((b.progress - .65) / .35);
-            sx = mix(charged.sx, mix(.97, 1.08, fall), launch);
-            sy = mix(charged.sy, mix(1.065, .91, fall), launch);
+            sx = mix(charged.sx, mix(.97, .94, fall), launch);
+            sy = mix(charged.sy, mix(1.065, 1.13, fall), launch);
             lean = mix(charged.lean, f * (1 - fall), launch); mouth = mix(.66, .95, launch);
         }
     } else if (b.phase === 'recover') {
-        const settle = 1 - ease(ms / (b.attack === 'pounce' ? 340 : 250));
-        sx = 1 + (b.attack === 'pounce' ? .08 : b.attack === 'dash' ? .06 : 0) * settle;
-        sy = 1 - (b.attack === 'pounce' ? .09 : b.attack === 'dash' ? .06 : 0) * settle;
-        lean = b.attack === 'dash' ? f * settle : 0;
+        const settle = 1 - ease(ms / 250);
+        if (b.attack === 'pounce') {
+            // Compression follows contact. The skirt responds after the dome,
+            // then the whole mass rebounds with a decaying elastic oscillation.
+            const rest = ease(ms / 520), compression = Math.sin(clamp(ms / 155) * Math.PI) * Math.exp(-ms / 330);
+            const after = Math.max(0, ms - 155);
+            const wobble = Math.sin(after / 43) * Math.exp(-after / 150) * ease(after / 55);
+            sx = mix(.94, 1, rest) + compression * .40 + wobble * .045;
+            sy = mix(1.13, 1, rest) - compression * .48 - wobble * .055;
+            lean = f * Math.sin(clamp(ms / 250) * Math.PI) * Math.exp(-ms / 230) * 1.4;
+        } else {
+            sx = 1 + (b.attack === 'dash' ? .06 : 0) * settle;
+            sy = 1 - (b.attack === 'dash' ? .06 : 0) * settle;
+            lean = b.attack === 'dash' ? f * settle : 0;
+        }
         mouth = mix(b.attack === 'pounce' ? .95 : b.attack === 'dash' ? .72 : .78, .67, ease(ms / 180));
         eyelid = 1 - .25 * ease(ms / 110);
     } else if (b.phase === 'hurt') {
