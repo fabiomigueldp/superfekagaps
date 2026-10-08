@@ -109,13 +109,14 @@ export class WorldArt {
             pixelText(c, '!', 280 - cx, 202 - cy, '#ffebbb', 1, 'center');
         }
         if (b.phase === 'warning' && b.character !== 'calabrezzo') {
-            const x = b.targetX - cx - 25;
-            rect(c, x, 222 - cy, 50, 2, Math.floor(time / 100) % 2 ? '#ffdb8c' : '#c95f69');
+            // The leap lands across 56 px; its tell must cover both outer edges.
+            const width = b.pattern === 'leap' ? 56 : 50, x = b.targetX - cx - width / 2;
+            rect(c, x, 222 - cy, width, 2, Math.floor(time / 100) % 2 ? '#ffdb8c' : '#c95f69');
             for (let i = 0; i < 5; i++)
-                rect(c, x + i * 11, 216 - cy, 4, 3, '#e7ba73');
+                rect(c, x + i * (width - 6) / 4, 216 - cy, 4, 3, '#e7ba73');
         }
         if (b.pattern === 'leap' && ['warning', 'attack'].includes(b.phase)) {
-            rect(c, b.targetX - cx - 22, 222 - cy, 44, 2, '#eabd7f');
+            rect(c, b.targetX - cx - 28, 222 - cy, 56, 2, '#eabd7f');
             pixelText(c, '↓', b.targetX - cx, 205 - cy, '#ffe0a3', 1, 'center');
         }
         if (b.character === 'biel' && b.pattern === 'doubleCargo' && ['warning', 'attack'].includes(b.phase)) {

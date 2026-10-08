@@ -1,5 +1,6 @@
 import { importProgressFile, progressImportMessage } from './ProgressImport';
 import { JournalAccessibility } from './JournalAccessibility';
+import { WorldResultAccessibility, clearResultReceipt, endingResultReceipt } from './WorldResultAccessibility';
 import { campaignJournal } from './CampaignJournal';
 import { CanvasMenuAccessibility } from './CanvasMenuAccessibility';
 import { WorldHudAccessibility } from './WorldHudAccessibility';
@@ -39,6 +40,7 @@ type Screen = 'title' | 'intro' | 'map' | 'playing' | 'paused' | 'dialogue' | 'c
 interface Button extends Rect {
     label: string;
     ariaLabel?: string;
+    ariaDescribedBy?: string;
     run: () => void;
     nativeActivation?: boolean;
 }
@@ -87,6 +89,7 @@ export class WorldGame {
     private hudAccessibility?: WorldHudAccessibility;
     private controlsHelp?: WorldControlsHelp;
     private journalAccessibility?: JournalAccessibility;
+    private resultAccessibility?: WorldResultAccessibility;
     private selection = 0;
     private menuSelection = 0;
     private checkpoint = -1;
@@ -153,6 +156,8 @@ export class WorldGame {
             if (!ephemeral && typeof document.body?.append === 'function') {
                 this.journalAccessibility = new JournalAccessibility(canvas);
                 this.addCleanup(() => this.journalAccessibility?.dispose());
+                this.resultAccessibility = new WorldResultAccessibility(canvas);
+                this.addCleanup(() => this.resultAccessibility?.dispose());
                 this.menuAccessibility = new CanvasMenuAccessibility(canvas, {
                     select: index => { this.menuSelection = index; },
                     activate: index => { this.audio.unlock(); this.buttons[index]?.run(); },
@@ -288,7 +293,7 @@ export class WorldGame {
         this.render();
         this.requestFrame();
     };
-    private change(screen: Screen) { if (this.isDisposed) return; this.invalidateFrozenMenuPaint(); this.controlsHelp?.close(false); this.menuAccessibility?.clear(); this.journalAccessibility?.clear(); if (screen !== 'map') this.mapView?.hide(); this.state = screen; this.hitStopInput = null; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; this.experimentalHub?.sync(); }
+    private change(screen: Screen) { if (this.isDisposed) return; this.invalidateFrozenMenuPaint(); this.controlsHelp?.close(false); this.menuAccessibility?.clear(); this.journalAccessibility?.clear(); this.resultAccessibility?.clear(); if (screen !== 'map') this.mapView?.hide(); this.state = screen; this.hitStopInput = null; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; this.experimentalHub?.sync(); }
     private menuKey(e: KeyboardEvent) {
         if (e.ctrlKey || e.metaKey || e.altKey) return;
         if (this.experimentalHub?.isOpen || this.controlsHelp?.isOpen || this.flightCleanup) return;
@@ -933,6 +938,11 @@ export class WorldGame {
         }
         this.mapView?.hide();
         this.paintCanvasIfNeeded();
+        const result = this.experimentalHub?.isOpen || this.flightCleanup ? null
+            : this.state === 'clear' ? clearResultReceipt(this.stage.name, this.elapsed, this.coins, this.clearSecret, this.recordEligible)
+            : this.state === 'ending' ? endingResultReceipt(this.store.save) : null;
+        const resultId = this.resultAccessibility?.sync(result);
+        if (this.buttons[0]) this.buttons[0].ariaDescribedBy = resultId;
         if (this.experimentalHub?.isOpen || this.flightCleanup || (typeof document !== 'undefined' && document.hidden) || this.state === 'playing')
             this.menuAccessibility?.clear({ restoreFocus: false });
         else this.menuAccessibility?.sync(this.menuIdentity(), this.state === 'title' ? 'Menu principal' : this.state === 'settings' ? 'Opções' : this.state === 'paused' ? `Pausa · ${this.stage.id} · ${this.stage.name}` : 'Aventura', this.buttons, this.menuSelection, this.toastTimer > 0 ? this.toast : '');

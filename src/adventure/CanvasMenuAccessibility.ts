@@ -42,6 +42,7 @@ const COMPACT_MENU_STYLE = `
 export interface CanvasMenuChoice {
     label: string;
     ariaLabel?: string;
+    ariaDescribedBy?: string;
     x: number;
     y: number;
     width: number;
@@ -111,6 +112,8 @@ export class CanvasMenuAccessibility {
         const hadFocus = this.ownsFocus();
         const rebuild = this.screen !== screen || this.controls.length !== choices.length;
         if (rebuild) {
+            for (const button of this.controls)
+                if (button.getAttribute('aria-describedby') !== null) button.removeAttribute('aria-describedby');
             this.controlLifetime.dispose(); this.controlLifetime = new DisposalScope();
             this.screen = screen;
             this.compactScreen = screen.split(':')[0];
@@ -125,6 +128,10 @@ export class CanvasMenuAccessibility {
             if (button.textContent !== choice.label) button.textContent = choice.label;
             const ariaLabel = choice.ariaLabel ?? choice.label;
             if (button.getAttribute('aria-label') !== ariaLabel) button.setAttribute('aria-label', ariaLabel);
+            if (choice.ariaDescribedBy) {
+                if (button.getAttribute('aria-describedby') !== choice.ariaDescribedBy)
+                    button.setAttribute('aria-describedby', choice.ariaDescribedBy);
+            } else if (button.getAttribute('aria-describedby') !== null) button.removeAttribute('aria-describedby');
             this.positionControl(button, choice);
         });
         if (this.root.hidden) this.root.hidden = false;
@@ -177,6 +184,8 @@ export class CanvasMenuAccessibility {
         this.pendingFocus = restoreFocus && focused;
         this.root.hidden = true;
         this.controlLifetime.dispose(); this.controlLifetime = new DisposalScope();
+        for (const button of this.controls)
+            if (button.getAttribute('aria-describedby') !== null) button.removeAttribute('aria-describedby');
         this.root.replaceChildren();
         this.controls = []; this.screen = ''; this.statusText = ''; this.status.textContent = ''; this.statusAttached = false;
         if (focused) {
