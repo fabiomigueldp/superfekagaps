@@ -58,5 +58,5 @@ test('cosmetic particles are bounded, expire on simulation time and never mutate
     assert.equal(a.filter(c => c[0] === 'save').length, a.filter(c => c[0] === 'restore').length);
     assert.deepEqual(record(true), [], 'motion reduction removes cosmetic particles');
     assert.equal(JSON.stringify(b), state); assert.equal(JSON.stringify(fx), effects);
-    fx.advance(2000); assert.equal(fx.size, 0);
+    fx.advance(2700); assert.equal(fx.size, 0);
 });

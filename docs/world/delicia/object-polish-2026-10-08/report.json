@@ -1,0 +1,306 @@
+{
+  "frames": [
+    {
+      "stage": "delicia-1",
+      "zone": 0,
+      "brokenPixels": 0,
+      "renderMs": 1.5416666666666667
+    },
+    {
+      "stage": "delicia-1",
+      "zone": 1,
+      "brokenPixels": 0,
+      "renderMs": 1.3916666681567829
+    },
+    {
+      "stage": "delicia-1",
+      "zone": 2,
+      "brokenPixels": 0,
+      "renderMs": 1.516666665673256
+    },
+    {
+      "stage": "delicia-1",
+      "zone": 3,
+      "brokenPixels": 0,
+      "renderMs": 2.1166666646798453
+    },
+    {
+      "stage": "delicia-2",
+      "zone": 0,
+      "brokenPixels": 0,
+      "renderMs": 2.9833333318432174
+    },
+    {
+      "stage": "delicia-2",
+      "zone": 1,
+      "brokenPixels": 0,
+      "renderMs": 3.116666667163372
+    },
+    {
+      "stage": "delicia-2",
+      "zone": 2,
+      "brokenPixels": 0,
+      "renderMs": 3.0333333338300386
+    },
+    {
+      "stage": "delicia-2",
+      "zone": 3,
+      "brokenPixels": 0,
+      "renderMs": 2.5250000009934106
+    },
+    {
+      "stage": "delicia-3",
+      "zone": 0,
+      "brokenPixels": 0,
+      "renderMs": 1.116666667163372
+    },
+    {
+      "stage": "delicia-3",
+      "zone": 1,
+      "brokenPixels": 0,
+      "renderMs": 1.1416666681567829
+    },
+    {
+      "stage": "delicia-3",
+      "zone": 2,
+      "brokenPixels": 0,
+      "renderMs": 1.6000000014901161
+    },
+    {
+      "stage": "delicia-3",
+      "zone": 3,
+      "brokenPixels": 0,
+      "renderMs": 1.5833333333333333
+    },
+    {
+      "stage": "delicia-4",
+      "zone": 0,
+      "brokenPixels": 0,
+      "renderMs": 1.8500000014901161
+    },
+    {
+      "stage": "delicia-4",
+      "zone": 1,
+      "brokenPixels": 0,
+      "renderMs": 1.2166666686534882
+    },
+    {
+      "stage": "delicia-4",
+      "zone": 2,
+      "brokenPixels": 0,
+      "renderMs": 1
+    },
+    {
+      "stage": "delicia-4",
+      "zone": 3,
+      "brokenPixels": 0,
+      "renderMs": 1.0249999985098839
+    },
+    {
+      "stage": "delicia-5",
+      "zone": 0,
+      "brokenPixels": 0,
+      "renderMs": 0.8249999980131785
+    },
+    {
+      "stage": "delicia-5",
+      "zone": 1,
+      "brokenPixels": 0,
+      "renderMs": 1.0666666651765506
+    },
+    {
+      "stage": "delicia-5",
+      "zone": 2,
+      "brokenPixels": 0,
+      "renderMs": 0.741666667163372
+    },
+    {
+      "stage": "delicia-5",
+      "zone": 3,
+      "brokenPixels": 0,
+      "renderMs": 0.8583333318432173
+    },
+    {
+      "stage": "delicia-6",
+      "zone": 0,
+      "brokenPixels": 0,
+      "renderMs": 1.1916666651765506
+    },
+    {
+      "stage": "delicia-7",
+      "zone": 0,
+      "brokenPixels": 0,
+      "renderMs": 1.0249999985098839
+    },
+    {
+      "stage": "delicia-7",
+      "zone": 1,
+      "brokenPixels": 0,
+      "renderMs": 1.2250000014901161
+    },
+    {
+      "stage": "delicia-7",
+      "zone": 2,
+      "brokenPixels": 0,
+      "renderMs": 1.133333332836628
+    },
+    {
+      "stage": "delicia-7",
+      "zone": 3,
+      "brokenPixels": 0,
+      "renderMs": 1.1500000009934108
+    },
+    {
+      "stage": "delicia-8",
+      "zone": 0,
+      "brokenPixels": 0,
+      "renderMs": 0.5166666656732559
+    },
+    {
+      "stage": "delicia-8",
+      "zone": 1,
+      "brokenPixels": 0,
+      "renderMs": 0.758333332836628
+    },
+    {
+      "stage": "delicia-8",
+      "zone": 2,
+      "brokenPixels": 0,
+      "renderMs": 0.625
+    },
+    {
+      "stage": "delicia-8",
+      "zone": 3,
+      "brokenPixels": 0,
+      "renderMs": 0.6749999995032946
+    },
+    {
+      "stage": "delicia-9",
+      "zone": 0,
+      "brokenPixels": 0,
+      "renderMs": 2.1083333318432174
+    },
+    {
+      "stage": "delicia-9",
+      "zone": 1,
+      "brokenPixels": 0,
+      "renderMs": 2.125
+    },
+    {
+      "stage": "delicia-9",
+      "zone": 2,
+      "brokenPixels": 0,
+      "renderMs": 2.0333333338300386
+    },
+    {
+      "stage": "delicia-9",
+      "zone": 3,
+      "brokenPixels": 0,
+      "renderMs": 1.9749999990065892
+    },
+    {
+      "stage": "delicia-10",
+      "zone": 0,
+      "brokenPixels": 0,
+      "renderMs": 0.5250000009934107
+    },
+    {
+      "stage": "delicia-10",
+      "zone": 1,
+      "brokenPixels": 0,
+      "renderMs": 0.7666666656732559
+    },
+    {
+      "stage": "delicia-10",
+      "zone": 2,
+      "brokenPixels": 0,
+      "renderMs": 0.6416666681567827
+    },
+    {
+      "stage": "delicia-10",
+      "zone": 3,
+      "brokenPixels": 0,
+      "renderMs": 0.7916666666666666
+    },
+    {
+      "stage": "delicia-11",
+      "zone": 0,
+      "brokenPixels": 0,
+      "renderMs": 0.5249999985098839
+    },
+    {
+      "stage": "delicia-11",
+      "zone": 1,
+      "brokenPixels": 0,
+      "renderMs": 0.8499999990065893
+    },
+    {
+      "stage": "delicia-11",
+      "zone": 2,
+      "brokenPixels": 0,
+      "renderMs": 0.758333332836628
+    },
+    {
+      "stage": "delicia-11",
+      "zone": 3,
+      "brokenPixels": 0,
+      "renderMs": 0.7749999985098839
+    },
+    {
+      "stage": "delicia-12",
+      "zone": 0,
+      "brokenPixels": 0,
+      "renderMs": 1.0833333333333333
+    },
+    {
+      "stage": "delicia-raizes",
+      "zone": 0,
+      "brokenPixels": 0,
+      "renderMs": 1.875
+    },
+    {
+      "stage": "delicia-raizes",
+      "zone": 1,
+      "brokenPixels": 0,
+      "renderMs": 2.3083333323399224
+    },
+    {
+      "stage": "delicia-raizes",
+      "zone": 2,
+      "brokenPixels": 0,
+      "renderMs": 1.9750000014901161
+    },
+    {
+      "stage": "delicia-raizes",
+      "zone": 3,
+      "brokenPixels": 0,
+      "renderMs": 1.8083333348234494
+    },
+    {
+      "stage": "delicia-relogio",
+      "zone": 0,
+      "brokenPixels": 0,
+      "renderMs": 0.8999999985098839
+    },
+    {
+      "stage": "delicia-relogio",
+      "zone": 1,
+      "brokenPixels": 0,
+      "renderMs": 0.8333333333333334
+    },
+    {
+      "stage": "delicia-relogio",
+      "zone": 2,
+      "brokenPixels": 0,
+      "renderMs": 0.6833333348234495
+    },
+    {
+      "stage": "delicia-relogio",
+      "zone": 3,
+      "brokenPixels": 0,
+      "renderMs": 0.866666667163372
+    }
+  ],
+  "errors": [],
+  "arranged": true
+}

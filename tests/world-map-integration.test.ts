@@ -59,6 +59,8 @@ class Element extends Surface {
     set textContent(text: string) { this.ownText = text; this.children = []; }
     type = '';
     id = '';
+    dataset: Record<string, string> = {};
+    get firstElementChild() { return this.children[0] ?? null; }
     title = '';
     href = '';
     hidden = false;
@@ -70,6 +72,8 @@ class Element extends Surface {
     bounds = { x: 0, y: 0, left: 0, top: 0, width: 1200, height: 750 };
     focusCount = 0;
     readonly classList = {
+        add: (...names: string[]) => names.forEach(name => this.classList.toggle(name, true)),
+        remove: (...names: string[]) => names.forEach(name => this.classList.toggle(name, false)),
         contains: (name: string) => this.className.split(/\s+/).includes(name),
         toggle: (name: string, enabled: boolean) => {
             const names = new Set(this.className.split(/\s+/).filter(Boolean));
@@ -115,7 +119,7 @@ function canvasContext() {
     return { context, calls };
 }
 
-function mapDOM(t: TestContext, reducedMotion = false, withGuaira = false) {
+function mapDOM(t: TestContext, reducedMotion = false, withGuaira = false, withChapters = false) {
     const paint = canvasContext();
     let active: Element | null = null;
     const focused = (element: Element) => { active = element; };
@@ -156,9 +160,10 @@ function mapDOM(t: TestContext, reducedMotion = false, withGuaira = false) {
         Object.defineProperty(globalThis, name, { configurable: true, writable: true, value });
         restore.push(() => { if (original) Object.defineProperty(globalThis, name, original); else Reflect.deleteProperty(globalThis, name); });
     }
-    const events = { selected: [] as number[], arrived: [] as number[], entered: 0, exited: 0, unlocked: 0 };
+    const events = { chapters: [] as string[], selected: [] as number[], arrived: [] as number[], entered: 0, exited: 0, unlocked: 0 };
     const view = new WorldMapView(gameCanvas as unknown as HTMLCanvasElement, {
         ...(withGuaira ? { guaira() {} } : {}),
+        ...(withChapters ? { enterChapter(chapter: string, stage: string) { events.chapters.push(`${chapter}:${stage}`); } } : {}),
         select: index => { events.selected.push(index); }, enter: () => { events.entered++; },
         arrive: index => { events.arrived.push(index); }, exit: () => { events.exited++; }, unlockAudio: () => { events.unlocked++; }
     });
@@ -685,42 +690,36 @@ test('capture-phase gameplay Input and global menus preserve native map activati
     assert.equal(input.getState().right, true);
 });
 
-test('native map links retain activation after drawer dismissal and map reopening without entering a phase', async t => {
-    for (const overview of [false, true]) await t.test(`overview=${overview}`, async child => {
-        const h = mapDOM(child), save = openSave(); await readyLand(h, save);
-        const input = new Input(); child.after(() => input.dispose()); input.setMenuMode(true);
-        const game = worldHarness().game; let stray = 0; game.enterSelected = () => { stray++; };
-        h.windowMock.addEventListener('keydown', event => game.menuKey(event));
-        if (overview) h.get('world-map-overview').click();
-        const link = h.get('world-map-delicia'), saved = structuredClone(save);
-        assert.equal(link.href, './delicia.html');
-        assert.equal(link.parent, h.get('world-map-chapter-links'));
-        assert.equal(link.parent?.parent, h.get('world-map-footer'), 'Shortcut must participate in the observed footer height.');
-        assert.equal(h.get('world-map-footer').children[0], link.parent, 'Shortcut precedes stage content in visual and keyboard order.');
-        for (let visit = 0; visit < 2; visit++) {
-            h.view.render(0, save, 100 + visit * 100, '');
-            h.internal.hud.regionButton.click();
-            h.active!.dispatch('keydown', { key: 'Escape', code: 'Escape' });
-            assert.equal(h.internal.hud.regionMenu.hidden, true); assert.equal(h.internal.overview, overview);
-            link.focus(); const journey = structuredClone(h.internal.journey);
-            for (const key of ['Enter', ' ']) {
-                const code = key === ' ' ? 'Space' : 'Enter';
-                const down = link.dispatch('keydown', { key, code });
-                assert.equal(h.events.entered, 0, 'A focused link must never start the selected phase.');
-                assert.equal(down.defaultPrevented, false, 'Native link activation and browser shortcuts retain their default.');
-                assert.equal(link.dispatch('keydown', { key, code, repeat: true }).defaultPrevented, true);
-                link.dispatch('keyup', { key, code });
-                assert.equal(h.active, link); assert.deepEqual(h.internal.journey, journey);
-            }
-            input.update(); assert.equal(input.getState().jumpPressed, false); assert.equal(input.consumeStart(), false);
-            assert.equal(stray, 0); assert.equal(h.events.exited, 0); assert.deepEqual(h.events.selected, []);
-            assert.deepEqual(save, saved); h.view.hide();
-        }
-        h.view.render(0, save, 400, '');
-        if (overview) h.get('world-map-overview').click();
-        h.root.focus(); h.root.dispatch('keydown', { key: 'Enter', code: 'Enter' });
-        assert.equal(h.events.entered, 1, 'Explicit phase entry from the map still works.');
-    });
+test('chapters are explored in the existing map and only an explicit available-stage action enters gameplay', async t => {
+    const h = mapDOM(t, true, true, true), save = openSave(); await readyLand(h, save);
+    const before = structuredClone(save), journey = structuredClone(h.internal.journey);
+    assert.equal(h.get('world-map-delicia'), undefined, 'There is no duplicate expansion link in the footer.');
+    h.get('world-map-overview').click(); h.view.render(0, save, 32, '');
+    h.get('world-map-delicia-island').click();
+    assert.equal(h.internal.chapter, 'delicia');
+    assert.deepEqual(save, before); assert.deepEqual(h.internal.journey, journey);
+    assert.equal(h.internal.hud.chapterButtons.length, 14);
+    h.internal.hud.chapterButtons[1].click();
+    assert.equal(h.internal.hud.enterButton.disabled, true, 'A locked stage remains inspectable.');
+    h.internal.hud.enterButton.click(); assert.deepEqual(h.events.chapters, []);
+    h.internal.hud.chapterButtons[0].click(); h.internal.hud.enterButton.click();
+    assert.deepEqual(h.events.chapters, ['delicia:delicia-1']); assert.equal(h.events.entered, 0);
+    h.root.dispatch('keydown', { key: 'Escape' });
+    assert.equal(h.internal.chapter, null); assert.equal(h.internal.overview, true);
+    assert.deepEqual(save, before); assert.equal(h.events.exited, 0);
+});
+
+test('controller can open the chapter from either island control and activate its focused world control', async t => {
+    const h = mapDOM(t, true, true, true), save = openSave(); await readyLand(h, save);
+    h.get('world-map-overview').click(); h.view.render(0, save, 32, '');
+    h.get('world-map-delicia-island').focus(); h.view.control('confirm');
+    assert.equal(h.internal.chapter, 'delicia'); assert.equal(h.view.controllerOwner(), 'delicia:idle');
+    h.get('world-map-overview').focus(); h.view.control('confirm');
+    assert.equal(h.internal.chapter, null); assert.equal(h.internal.overview, true);
+    assert.deepEqual(h.events.chapters, [], 'Confirming Mundo cannot enter the selected stage');
+    h.root.focus(); h.view.control('regions'); h.internal.hud.deliciaRegion.focus(); h.view.control('confirm');
+    assert.equal(h.internal.chapter, 'delicia'); assert.equal(h.internal.hud.regionMenu.hidden, true);
+    h.root.focus(); h.view.control('confirm'); assert.deepEqual(h.events.chapters, ['delicia:delicia-1']);
 });
 
 test('capped backing resolution responds to DPR and resize without resizing each idle frame', t => {
@@ -1215,7 +1214,7 @@ test('a locked panorama primary action preserves actual arrival and close-view p
     await readyDominio(h, save); h.view.render(25, save, 100, '');
     h.get('world-map-overview').click(); h.view.render(25, save, 200, '');
     assert.equal(h.get('world-map-location').textContent, 'Feka em 1-5 · Costa');
-    assert.match(h.get('world-map-status').textContent, /Ilha selecionada · bloqueada/);
+    assert.match(h.get('world-map-status').textContent, /Escolha uma ilha para explorar/);
     const primary = h.internal.hud.enterButton as Button;
     assert.equal(primary.disabled, false); primary.click();
     assert.equal(h.internal.overview, false); assert.equal(h.internal.controlSelection, 25);
@@ -2452,7 +2451,7 @@ test('measured compact fallback owns keyboard and native activation without muta
         assert.deepEqual(h.internal.camera, camera); assert.deepEqual(h.internal.journey, journey); assert.deepEqual(save, saved);
         assert.deepEqual(h.events.selected, []); assert.equal(h.events.entered, 0);
         rows[4].dispatch('keydown', { key: 'Escape', code: 'Escape' });
-        assert.equal(h.internal.hud.regionMenu.hidden, true); assert.equal(h.active, h.internal.hud.regionButton);
+        assert.equal(h.internal.hud.regionMenu.hidden, true); assert.equal(h.active, h.internal.hud.regionButton.hidden ? h.get('world-map-overview') : h.internal.hud.regionButton);
         assert.equal(h.internal.overview, true); assert.equal(h.events.exited, 0);
         h.active!.dispatch('keydown', { key: 'Escape', code: 'Escape' }); assert.equal(h.internal.overview, false); assert.equal(h.events.exited, 0);
         for (const key of ['Enter', ' ']) {
@@ -2506,10 +2505,10 @@ test('controller map layers preserve preview locks, focused links and native mod
     assert.equal(h.internal.journey.arrived, '1-1'); h.view.control('confirm'); assert.equal(h.events.entered, 0);
     h.root.focus(); h.view.control('regions'); assert.equal(h.internal.hud.regionMenu.hidden, false);
     h.view.control('down'); h.view.control('back'); assert.equal(h.events.exited, 0);
-    assert.equal(h.active, h.internal.hud.regionButton);
+    assert.equal(h.active, h.internal.hud.regionButton.hidden ? h.get('world-map-overview') : h.internal.hud.regionButton);
     h.root.focus(); h.view.control('overview'); assert.equal(h.internal.overview, true);
     h.view.control('back'); assert.equal(h.internal.overview, false); assert.equal(h.events.exited, 0);
-    const link = h.get('world-map-delicia'); link.focus();
+    const external = h.documentMock.createElement('button'); h.body.append(external); external.focus();
     const selected = h.events.selected.length; assert.equal(h.view.controllerOwner(), null);
     h.view.control('right'); h.view.control('confirm'); h.view.control('back');
     assert.equal(h.events.selected.length, selected); assert.equal(h.events.entered, 0); assert.equal(h.events.exited, 0);

@@ -4,10 +4,10 @@ import { campaignJournal } from './CampaignJournal';
 import { CanvasMenuAccessibility } from './CanvasMenuAccessibility';
 import { WorldHudAccessibility } from './WorldHudAccessibility';
 import { drawWorkshopHud, workshopPanel, workshopButton, WORKSHOP_UI, WORLD_HUD_HELMET } from './WorldWorkshopUI';
+import { drawWorldDialogue, drawWorldEncounterHud, drawWorldPause, drawWorldResult, drawWorldSettingsFrame, WORLD_DIALOGUE_ACTION, WORLD_PAUSE_ACTIONS } from './WorldSceneUI';
 import { WorldControlsHelp } from './WorldControlsHelp';
 import { advanceCampaignCamera } from './WorldCampaignCamera';
 import { runGuairaFlight } from './WorldGuairaFlight';
-import { ExperimentalHub } from './experimental/hub/ExperimentalHub';
 import { Input } from '../engine/Input';
 import { StandardGamepad, type GamepadMenuCommand } from '../engine/StandardGamepad';
 import { DisposalScope } from '../engine/DisposalScope';
@@ -23,6 +23,7 @@ import { YASMIN_FRAMES, SPRITE_PALETTE } from '../graphics/sprites';
 import { ISLANDS, STAGES, stageById } from './campaign';
 import { ProgressStore, isUnlocked, finishStage, isGuairaUnlocked, canContinueFromGuaira } from './progress';
 import { WorldArt, rect } from './WorldArt';
+import { WorldTitleScene } from './WorldTitleScene';
 import { drawWorldCheckpoint, drawWorldGoal } from './WorldCheckpointArt';
 import { drawLandmarks } from './WorldScenery';
 import { WorldAudio } from './WorldAudio';
@@ -35,6 +36,7 @@ import { bossFrame, WORLD_PALETTE } from './WorldAssets';
 import { clamp, overlaps, type AdventureStage, type Dialogue } from './types';
 import { WorldMapView, moveJourneySelection } from './WorldMapView';
 import { clampMapSelection } from './WorldMapModel';
+import type { WorldChapter } from './WorldChapterMap';
 type Screen = 'title' | 'intro' | 'map' | 'playing' | 'paused' | 'dialogue' | 'clear' | 'ending' | 'gallery' | 'settings';
 interface Button extends Rect {
     label: string;
@@ -64,6 +66,7 @@ export class WorldGame {
     readonly input: Input;
     private gamepad?: StandardGamepad;
     readonly art = new WorldArt();
+    private titleScene?: WorldTitleScene;
     readonly store: ProgressStore;
     readonly audio: WorldAudio;
     readonly tutorial: WorldTutorial;
@@ -112,13 +115,14 @@ export class WorldGame {
     private galleryWorld = 0;
     private mapView?: WorldMapView;
     private flightCleanup?: () => void;
+    private chapterActive = false;
+    private chapterCleanup?: () => void;
     private guairaArrivalPrompt = false;
     private mapReturn?: { playedStage: string; nextSelected: string };
     private nextMapSelection?: string;
     private mapCanvas: HTMLCanvasElement;
     private saveImportCleanup?: () => void;
     private deathFeedbackStarted = false;
-    private experimentalHub?: ExperimentalHub;
     private frozenMenuOwner?: () => boolean;
     private frozenMenuMotion: MediaQueryList | null = null;
     private frozenMenuPaint: FrozenMenuPaint | null = null;
@@ -173,7 +177,7 @@ export class WorldGame {
             this.selection = Math.max(0, STAGES.findIndex(s => s.id === this.store.save.selected));
             this.listen(window, 'keydown', e => this.menuKey(e));
             this.listen(canvas, 'pointerdown', e => {
-                if (this.experimentalHub?.isOpen || this.controlsHelp?.isOpen) return;
+                if (this.controlsHelp?.isOpen) return;
                 this.audio.unlock();
                 const r = canvas.getBoundingClientRect();
                 if (this.state === 'playing') {
@@ -206,17 +210,19 @@ export class WorldGame {
         const gamepad = this.gamepad = new StandardGamepad(this.input);
         this.addCleanup(() => { gamepad.dispose(); this.gamepad = undefined; });
     }
-    /** Opt-in only from the main entry. Labs/editor never mount title navigation. */
-    enableExperimentalHub(search = ''): void {
+    /** Restore the journey for bookmarks from the former standalone chapter. */
+    restoreGuairaReturn(): void {
         if (this.ephemeral || this.isDisposed) return;
-        if (!this.experimentalHub) {
-            this.experimentalHub = new ExperimentalHub(this.mapCanvas, { input: this.input, isTitle: () => this.state === 'title' });
-            this.addCleanup(() => { this.experimentalHub?.dispose(); this.experimentalHub = undefined; });
-        }
-        this.experimentalHub.openFromSearch(search);
-        if (new URLSearchParams(search).get('guairaReturn') === '1') {
-            this.audio.enabled = this.store.save.guaira.audioEnabled; this.audio.volume(); this.toMap();
-        }
+        this.audio.enabled = this.store.save.guaira.audioEnabled;
+        this.audio.volume();
+        this.toMap();
+    }
+    /** Old Delícia bookmarks enter the same campaign map and chapter host. */
+    openChapterMap(chapter: WorldChapter): void {
+        if (this.isDisposed || this.chapterActive) return;
+        this.toMap(); this.render();
+        const selected = chapter === 'delicia' ? this.mapView?.deliciaStore.save.selected : this.store.save.guaira.selectedScene;
+        this.mapView?.openChapter(chapter, selected);
     }
     get isDisposed(): boolean { return this.lifetime?.isDisposed ?? false; }
     /** Own subclass/host resources without overriding terminal disposal. */
@@ -248,6 +254,7 @@ export class WorldGame {
         this.accumulator = 0; this.buttons = []; this.hitStopInput = null;
         this.level.blockImpacts.clear();
         this.flightCleanup?.();
+        this.chapterCleanup?.();
         this.lifetime.dispose();
         const globals = window as unknown as { worldGame?: WorldGame };
         if (globals.worldGame === this) delete globals.worldGame;
@@ -263,7 +270,7 @@ export class WorldGame {
         this.frame = null; this.last = null;
     }
     private requestFrame(): void {
-        if (this.isDisposed || !this.running || document.hidden || this.frame !== null) return;
+        if (this.isDisposed || !this.running || this.chapterActive || document.hidden || this.frame !== null) return;
         const frame = requestAnimationFrame(now => {
             // A canceled callback must not consume or fork a newer visible chain.
             if (this.frame !== frame) return;
@@ -288,10 +295,10 @@ export class WorldGame {
         this.render();
         this.requestFrame();
     };
-    private change(screen: Screen) { if (this.isDisposed) return; this.invalidateFrozenMenuPaint(); this.controlsHelp?.close(false); this.menuAccessibility?.clear(); this.journalAccessibility?.clear(); if (screen !== 'map') this.mapView?.hide(); this.state = screen; this.hitStopInput = null; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; this.experimentalHub?.sync(); }
+    private change(screen: Screen) { if (this.isDisposed) return; this.invalidateFrozenMenuPaint(); this.controlsHelp?.close(false); this.menuAccessibility?.clear(); this.journalAccessibility?.clear(); if (screen !== 'map') this.mapView?.hide(); this.state = screen; this.hitStopInput = null; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; }
     private menuKey(e: KeyboardEvent) {
         if (e.ctrlKey || e.metaKey || e.altKey) return;
-        if (this.experimentalHub?.isOpen || this.controlsHelp?.isOpen || this.flightCleanup) return;
+        if (this.chapterActive || this.controlsHelp?.isOpen || this.flightCleanup) return;
         const target = e.target;
         if (target instanceof HTMLElement && target.closest('button, a[href]') && (e.key === 'Enter' || e.key === ' ')) return;
         if (target instanceof HTMLElement && target.closest('.world-map, .canvas-menu-accessibility')) return;
@@ -362,7 +369,7 @@ export class WorldGame {
     private updateController(): boolean {
         const gamepad = this.gamepad;
         if (!gamepad) return false;
-        if (this.experimentalHub?.isOpen || this.controlsHelp?.isOpen || this.flightCleanup || this.saveImportCleanup
+        if (this.controlsHelp?.isOpen || this.flightCleanup || this.saveImportCleanup
             || document.querySelector?.('dialog[open]')) {
             gamepad.update('inactive'); return false;
         }
@@ -578,8 +585,8 @@ export class WorldGame {
         this.player.data.respawnRevealTimer = PLAYER_RESPAWN_REVEAL_MS;
     }
     update(dt: number) {
-        if (this.isDisposed) return;
-        if (this.experimentalHub?.isOpen || this.controlsHelp?.isOpen) {
+        if (this.isDisposed || this.chapterActive) return;
+        if (this.controlsHelp?.isOpen) {
             this.gamepad?.update('inactive'); this.input.reset(); return;
         }
         if (this.updateController()) return;
@@ -863,8 +870,7 @@ export class WorldGame {
         }
         this.sparks = this.sparks.filter(s => s.life > 0);
     }
-    private bounce(y: number) { if (this.player.data.isDead)
-        return; this.player.data.position.y = y - this.player.data.height; this.player.data.velocity.y = -7; this.player.data.isGrounded = false; this.player.data.groundPoundState = GroundPoundState.NONE; this.player.data.invincibleTimer = Math.max(150, this.player.data.invincibleTimer); }
+    private bounce(y: number) { this.player.bounceFromSurface(y); }
     private complete(secret: boolean) {
         finishStage(this.store.save, this.stage.id, secret ? 'secret' : 'normal', this.recordEligible ? this.elapsed : null);
         this.nextMapSelection = this.store.save.selected;
@@ -892,11 +898,10 @@ export class WorldGame {
     private heading(c: CanvasRenderingContext2D, small: string, big: string) { pixelText(c, small, 160, 12, '#c4d7d8', 1, 'center'); pixelText(c, big, 161, 29, '#343651', 2, 'center'); pixelText(c, big, 160, 27, '#ffdf94', 2, 'center'); }
     private text(c: CanvasRenderingContext2D, text: string, x: number, y: number, width: number, color: string = ART.paper) { wrapText(text, width).forEach((line, i) => pixelText(c, line, x, y + i * 10, color)); }
     render() {
-        if (this.isDisposed || this.controlsHelp?.isOpen) return;
-        this.experimentalHub?.sync();
-        this.hudAccessibility?.sync(this.state === 'playing' && !this.experimentalHub?.isOpen && !this.flightCleanup,
+        if (this.isDisposed || this.chapterActive || this.controlsHelp?.isOpen) return;
+        this.hudAccessibility?.sync(this.state === 'playing' && !this.flightCleanup,
             this.stage.id, this.coins, this.store.save.seals.filter(id => id.startsWith(this.stage.id + ':')).length, this.player.data.hasHelmet);
-        this.journalAccessibility?.sync(this.state === 'gallery' && !this.experimentalHub?.isOpen && !this.flightCleanup ? this.galleryWorld : null, this.store.save);
+        this.journalAccessibility?.sync(this.state === 'gallery' && !this.flightCleanup ? this.galleryWorld : null, this.store.save);
         if (this.state === 'map') {
             this.menuAccessibility?.clear({ restoreFocus: false });
             if (typeof document !== 'undefined' && document.hidden) return;
@@ -910,9 +915,53 @@ export class WorldGame {
                         onArrive: () => {
                             this.store.save.guaira.audioEnabled = this.audio.enabled;
                             if (!this.store.persist()) return false;
-                            this.flightCleanup = undefined; location.assign('./guaira-capitulo.html?campaign=1'); return true;
+                            this.flightCleanup = undefined; this.mapView?.openGuairaRegion(); this.audio.pause(false); return true;
                         },
                     });
+                },
+                enterChapter: (chapter, stage, from) => {
+                    if (this.isDisposed || this.chapterActive || this.flightCleanup) return;
+                    if (chapter === 'guaira' && from) {
+                        if (!isGuairaUnlocked(this.store.save)) return;
+                        this.audio.pause(true);
+                        this.flightCleanup = runGuairaFlight({ from, to: 'guaira', preferences: this.store.save.preferences, soundEnabled: this.audio.enabled,
+                            onCancel: () => { this.flightCleanup = undefined; this.audio.pause(false); },
+                            onArrive: () => {
+                                this.store.save.guaira.audioEnabled = this.audio.enabled;
+                                this.store.persist(); this.flightCleanup = undefined;
+                                this.mapView?.markGuairaArrival();
+                                queueMicrotask(() => { void this.mountChapter(chapter, stage); }); return true;
+                            } });
+                    } else void this.mountChapter(chapter, stage);
+                },
+                leaveGuaira: (to, selection) => {
+                    if (this.isDisposed || this.flightCleanup || this.chapterActive || (to === 'serra' && !canContinueFromGuaira(this.store.save))) return;
+                    this.audio.pause(true);
+                    this.flightCleanup = runGuairaFlight({ from: 'guaira', to, preferences: this.store.save.preferences, soundEnabled: this.audio.enabled,
+                        onCancel: () => { this.flightCleanup = undefined; this.audio.pause(false); this.mapView?.openGuairaRegion(); },
+                        onArrive: () => {
+                            const terminal = to === 'factory' ? '3-5' : '4-1';
+                            this.store.save.selected = terminal; this.store.persist(); this.flightCleanup = undefined;
+                            this.mapView?.arriveFromGuaira(terminal, selection); this.audio.pause(false); return true;
+                        } });
+                },
+                crossGuaira: (from, to, selection) => {
+                    if (this.isDisposed || this.flightCleanup || this.chapterActive || !isUnlocked(STAGES[selection].id, this.store.save)) return;
+                    this.audio.pause(true);
+                    const cancel = () => { this.flightCleanup = undefined; this.audio.pause(false); };
+                    this.flightCleanup = runGuairaFlight({ from, to: 'guaira', preferences: this.store.save.preferences, soundEnabled: this.audio.enabled,
+                        onCancel: cancel, onArrive: () => {
+                            this.flightCleanup = undefined; this.mapView?.markGuairaArrival();
+                            queueMicrotask(() => {
+                                if (this.isDisposed) return;
+                                this.flightCleanup = runGuairaFlight({ from: 'guaira', to, preferences: this.store.save.preferences, soundEnabled: this.audio.enabled,
+                                    onCancel: () => { cancel(); this.mapView?.openGuairaRegion(); }, onArrive: () => {
+                                        const terminal = to === 'factory' ? '3-5' : '4-1';
+                                        this.store.save.selected = terminal; this.store.persist(); this.flightCleanup = undefined;
+                                        this.mapView?.arriveFromGuaira(terminal, selection); this.audio.pause(false); return true;
+                                    } });
+                            }); return true;
+                        } });
                 },
                 select: index => { if (!this.isDisposed && this.state === 'map') this.selectMap(index); },
                 enter: () => { if (!this.isDisposed && this.state === 'map') this.load(STAGES[this.selection].id, true); },
@@ -920,7 +969,7 @@ export class WorldGame {
                     const id = STAGES[index].id;
                     if (!this.isDisposed && this.state === 'map' && this.store.save.selected !== id) { this.store.save.selected = id; this.store.persist(); }
                 },
-                exit: () => { if (!this.isDisposed && this.state === 'map') this.change('title'); },
+                exit: () => { if (!this.isDisposed && this.state === 'map') this.settings('map'); },
                 unlockAudio: () => this.audio.unlock()
             });
             this.mapView.render(this.selection, this.store.save, this.time, this.ephemeral ? '' : this.store.warning, this.toastTimer > 0 ? this.toast : '', this.mapReturn);
@@ -930,9 +979,58 @@ export class WorldGame {
         }
         this.mapView?.hide();
         this.paintCanvasIfNeeded();
-        if (this.experimentalHub?.isOpen || this.flightCleanup || (typeof document !== 'undefined' && document.hidden) || this.state === 'playing')
+        if (this.flightCleanup || (typeof document !== 'undefined' && document.hidden) || this.state === 'playing')
             this.menuAccessibility?.clear({ restoreFocus: false });
         else this.menuAccessibility?.sync(this.menuIdentity(), this.state === 'title' ? 'Menu principal' : this.state === 'settings' ? 'Opções' : this.state === 'paused' ? `Pausa · ${this.stage.id} · ${this.stage.name}` : 'Aventura', this.buttons, this.menuSelection, this.toastTimer > 0 ? this.toast : '');
+    }
+
+    private async mountChapter(chapter: WorldChapter, stage: string): Promise<void> {
+        if (this.isDisposed || this.chapterActive || !this.mapView) return;
+        this.chapterActive = true; this.cancelFrame(); this.accumulator = 0;
+        this.input.reset(); this.gamepad?.update('inactive'); this.audio.pause(true);
+        this.store.save.guaira.audioEnabled = this.audio.enabled;
+        const view = this.mapView, controller = new AbortController();
+        const originalId = this.mapCanvas.id;
+        this.mapCanvas.id = 'world-game-canvas-suspended';
+        this.mapCanvas.hidden = true; view.root.hidden = true; view.root.inert = true;
+        const host = document.createElement('section'); host.className = 'world-chapter-host';
+        host.setAttribute('aria-label', chapter === 'guaira' ? 'Guaíra' : 'Império da Delícia');
+        const loading = document.createElement('p'); loading.className = 'world-chapter-loading';
+        const back = document.createElement('button'); back.type = 'button'; back.textContent = 'Voltar ao mapa';
+        loading.setAttribute('role', 'status'); loading.textContent = 'Entrando na fase…'; host.append(loading, back); document.body.append(host);
+        let disposeRuntime: (() => void) | undefined;
+        const close = () => {
+            if (controller.signal.aborted) return;
+            window.removeEventListener('pagehide', close);
+            controller.abort(); disposeRuntime?.(); host.remove(); this.chapterActive = false; this.chapterCleanup = undefined;
+            this.mapCanvas.id = originalId; this.mapCanvas.hidden = false;
+            view.root.hidden = false; view.root.inert = false;
+            this.input.reset(); this.audio.enabled = this.store.save.guaira.audioEnabled; this.audio.volume(); this.audio.pause(false);
+            (window as unknown as { worldGame: WorldGame }).worldGame = this;
+            (window as unknown as { renderer: Renderer }).renderer = this.renderer;
+            document.title = 'Super Feka Gaps World';
+            view.openChapter(chapter, chapter === 'guaira' ? this.store.save.guaira.selectedScene : view.deliciaStore.save.selected);
+            view.hud.focusEnter(); this.last = null; this.requestFrame();
+        };
+        this.chapterCleanup = close;
+        back.addEventListener('click', close); back.focus();
+        host.addEventListener('keydown', event => {
+            if (!disposeRuntime && event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); close(); }
+        });
+        window.addEventListener('pagehide', close, { once: true });
+        try {
+            const { mountWorldChapter } = await import('./WorldChapterHost');
+            if (controller.signal.aborted || this.isDisposed) return;
+            const cleanup = await mountWorldChapter(chapter, stage, host, this.store, view.deliciaStore, close, controller.signal);
+            if (controller.signal.aborted) cleanup(); else { disposeRuntime = cleanup; loading.remove(); back.remove(); }
+        } catch (error) {
+            if (controller.signal.aborted) return;
+            console.error('Não foi possível entrar na fase.', error);
+            loading.textContent = 'A fase não carregou.';
+            const retry = document.createElement('button'); retry.type = 'button'; retry.textContent = 'Tentar novamente';
+            retry.addEventListener('click', () => { close(); void this.mountChapter(chapter, stage); });
+            host.append(retry, back); back.focus();
+        }
     }
     private paintCanvasIfNeeded(): void {
         if (!this.frozenMenuOwner?.() || (this.state !== 'paused' && this.state !== 'settings')) {
@@ -971,28 +1069,18 @@ export class WorldGame {
         else
             this.renderSettings(c);
         if (this.state === 'paused') {
-            rect(c, 0, 0, 320, 180, '#101d29c9');
-            const stageLines = wrapText(`${this.stage.id} · ${this.stage.name}`, 132);
-            workshopPanel(c, 86, 31, 148, 118 + (stageLines.length - 1) * 10);
-            pixelText(c, 'PAUSA', 160, 39, WORKSHOP_UI.paper, 2, 'center');
-            this.button(c, 'CONTINUAR', 98, 59, 124, () => this.resume(), WORKSHOP_UI.light, false, 20);
-            this.button(c, 'OPÇÕES', 98, 83, 124, () => this.settings('paused'), WORKSHOP_UI.light, false, 20);
-            this.button(c, 'VOLTAR AO MAPA', 98, 107, 124, () => this.toMap(), WORKSHOP_UI.light, false, 20);
-            stageLines.forEach((line, index) => pixelText(c, line, 160, 136 + index * 10, WORKSHOP_UI.muted, 1, 'center'));
+            drawWorldPause(c, `${this.stage.id} · ${this.stage.name}`);
+            const actions = [() => this.resume(), () => this.settings('paused'), () => this.toMap()];
+            WORLD_PAUSE_ACTIONS.forEach((box, i) => this.button(c, ['CONTINUAR', 'OPÇÕES', 'VOLTAR AO MAPA'][i], box.x, box.y, box.width, actions[i], WORKSHOP_UI.light, false, box.height));
         }
         if (this.state === 'dialogue' && this.dialog) {
-            panel(c, 12, 104, 296, 69, '#202d43', '#aac1cd');
-            pixelText(c, this.dialog.speaker.toUpperCase(), 24, 113, ISLANDS[this.stage.world - 1].accent);
-            this.text(c, this.dialog.text.slice(0, Math.floor(this.dialogueTime / 34)), 24, 127, 270);
-            this.button(c, 'CONTINUAR', 215, 150, 80, () => this.closeDialogue());
+            drawWorldDialogue(c, this.dialog.speaker, this.dialog.text, ISLANDS[this.stage.world - 1].accent, Math.floor(this.dialogueTime / 34));
+            const box = WORLD_DIALOGUE_ACTION;
+            this.button(c, 'CONTINUAR', box.x, box.y, box.width, () => this.closeDialogue(), WORKSHOP_UI.light, false, box.height);
         }
         if (this.state === 'clear') {
-            panel(c, 32, 38, 256, 109);
-            pixelText(c, this.clearSecret ? 'CAMINHO SECRETO!' : 'FASE CONCLUÍDA!', 160, 51, ART.goldLight, 2, 'center');
-            pixelText(c, fitText(this.stage.name, 230), 160, 75, ART.paper, 1, 'center');
-            pixelText(c, `${Math.round(this.elapsed)} S  ·  ${this.coins} MOEDAS`, 160, 94, '#a7c9d0', 1, 'center');
-            if (!this.recordEligible)
-                pixelText(c, 'TEMPO PARCIAL · SEM RECORDE', 160, 106, '#a7c9d0', 1, 'center');
+            drawWorldResult(c, this.clearSecret ? 'CAMINHO SECRETO!' : 'FASE CONCLUÍDA!', this.stage.name,
+                `${Math.round(this.elapsed)} S  ·  ${this.coins} MOEDAS`, this.recordEligible ? '' : 'TEMPO PARCIAL · SEM RECORDE');
             // The immediate result panel covers the world flag; keep its earned
             // celebration visible here without delaying completion or rewards.
             drawWorldGoal(c, 237, 101, this.clearSecret, false, true, {
@@ -1088,17 +1176,12 @@ export class WorldGame {
     protected renderEncounterHud(c: CanvasRenderingContext2D) {
         if (!this.boss) return;
         if (this.player.data.hasHelmet && !this.hudAccessibility?.showsReadableStrip) this.renderer.drawHelmet(WORLD_HUD_HELMET.x, WORLD_HUD_HELMET.y, c);
-        workshopPanel(c, 64, 20, 192, 30);
-        pixelText(c, fitText(this.boss.name, 86), 72, 25, WORKSHOP_UI.paper);
         const boss = this.boss;
-        for (let i = 0; i < boss.maxHealth; i++)
-            rect(c, 169 + i * 13, 27, 10, 4, i < boss.health ? '#f1a479' : '#4c5264');
-        pixelText(c, fitText(boss.hint, 184), 160, 40, '#e5d6c3', 1, 'center');
+        drawWorldEncounterHud(c, boss.name, boss.health, boss.maxHealth, boss.hint);
     }
     private renderTitle(c: CanvasRenderingContext2D) {
-        this.art.background(c, ISLANDS[0], this.time * .008, 0, this.time);
-        rect(c, 0, 157, 320, 23, '#364d57');
-        rect(c, 0, 155, 320, 3, '#a7c784');
+        this.titleScene ??= new WorldTitleScene();
+        this.titleScene.draw(c, this.art.atlas, this.time, this.renderer.reducedMotion);
         // The original Oficina sign keeps FEKA as its dominant word.
         for (const x of [103, 210]) {
             rect(c, x, 5, 7, 156, '#694b32'); rect(c, x + 1, 6, 3, 153, '#a27845');
@@ -1108,12 +1191,9 @@ export class WorldGame {
         pixelText(c, 'SUPER', 160, 16, WORKSHOP_UI.paper, 2, 'center');
         pixelText(c, 'FEKA', 160, 32, WORKSHOP_UI.gold, 3, 'center');
         pixelText(c, 'GAPS', 160, 55, WORKSHOP_UI.paper, 2, 'center');
-        this.art.atlas.draw(c, PLAYER_SPRITES.idle, PLAYER_PALETTE, 32, 130);
-        this.art.atlas.draw(c, bossFrame('joao', 'idle'), WORLD_PALETTE, 252, 99);
         this.button(c, this.store.save.completed.length ? 'CONTINUAR' : 'JOGAR', 102, 80, 116, () => this.begin(), WORKSHOP_UI.light, false, 22);
         this.button(c, 'OPÇÕES', 102, 105, 116, () => this.settings('title'), WORKSHOP_UI.light, false, 22);
         this.button(c, 'GALERIA', 102, 130, 116, () => this.change('gallery'), WORKSHOP_UI.light, false, 22);
-        this.button(c, 'ORIGINAL', 114, 156, 92, () => { location.href = '?classic=true'; }, WORKSHOP_UI.light, false, 17);
     }
     private renderStory(c: CanvasRenderingContext2D) {
         const ending = this.state === 'ending';
@@ -1190,7 +1270,7 @@ export class WorldGame {
                     }
                 } });
         }
-        this.button(c, `GUAÍRA · ${this.store.save.guaira.completed.length}/5 · EXTRAS`, 50, 129, 220, () => {
+        this.button(c, `GUAÍRA · ${this.store.save.guaira.completed.length}/5 TRECHOS`, 50, 129, 220, () => {
             this.galleryWorld = 7; this.menuSelection = 0;
         });
         this.button(c, 'VOLTAR', 114, 153, 92, () => this.backGallery());
@@ -1205,9 +1285,7 @@ export class WorldGame {
             this.audio.pause(true);
     }
     private renderSettings(c: CanvasRenderingContext2D) {
-        rect(c, 0, 0, 320, 180, WORKSHOP_UI.ink);
-        workshopPanel(c, 62, 11, 196, 30);
-        pixelText(c, 'OPÇÕES', 160, 20, WORKSHOP_UI.paper, 2, 'center');
+        drawWorldSettingsFrame(c);
         const prefs = this.store.save.preferences;
         (['music', 'effects', 'voice'] as const).forEach((key, i) => { const label = ['MÚSICA', 'EFEITOS', 'VOZES'][i]; this.button(c, `${label}: ${Math.round(prefs[key] * 100)}%`, 62, 55 + i * 23, 196, () => { prefs[key] = prefs[key] >= .99 ? 0 : Math.min(1, Math.round((prefs[key] + .25) * 100) / 100); this.audio.volume(); this.store.persist(); }); });
         this.button(c, 'EXPORTAR', 10, 127, 98, () => this.exportSave(), ART.goldLight, true, 20, 'EXPORTAR PROGRESSO');

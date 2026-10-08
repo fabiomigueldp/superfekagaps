@@ -1,5 +1,6 @@
 import { authorDeliciaTraversal } from './DeliciaLevelDesign';
 import { deliciaAsset } from './DeliciaIsland';
+import { DELICIA_PLAYER_HEIGHT } from './DeliciaNative';
 /** The expansion is a separate campaign; released World stage IDs stay stable. */
 export const DELICIA_ASSETS = deliciaAsset('');
 export { DELICIA_ATLAS } from './DeliciaIsland';
@@ -56,11 +57,11 @@ const CHAPTERS: readonly ChapterSpec[] = [
     { name: 'Cascatas de Âmbar', biome: 'reservoir', subtitle: 'A nascente canta por baixo do ruído.', mechanic: 'Plataformas flutuantes e jatos sinalizados', map: [.48,.67], heights: [450,420,450,390,420,450,420,390,450,420,450,390,420,390,450,420,450], gaps: [100,110,80,95], kinds: ['wasp','roller','pulp'], lore: ['gota','eco'] },
     { name: 'Arquivo Fermentado', biome: 'cellar', subtitle: 'O que a fábrica esqueceu ganhou vida.', mechanic: 'Passarelas frágeis e barris impostores', map: [.53,.52], heights: [450,450,420,390,420,450,450,420,390,420,450,420,450,390,420,450,450,420], gaps: [85,110,75,100], kinds: ['mimic','pulp','bottler'], lore: ['contrato','fermento'] },
     { name: 'Jajá, Guardião da Nascente', biome: 'reservoir', subtitle: 'Uma promessa não pode fechar uma fonte.', mechanic: 'Leia a caneca, salte a onda e ataque na pausa', map: [.62,.43], heights: [], gaps: [], kinds: [], lore: [], boss: 'jaja' },
-    { name: 'Maré de Laranja', biome: 'reservoir', subtitle: 'O rio voltou. As máquinas resistem.', mechanic: 'Correntes, balsas e impulso cítrico', map: [.63,.65], heights: [450,420,450,450,390,420,450,420,390,420,450,450,420,390,420,450,420,450], gaps: [120,110,100,95], kinds: ['roller','wasp','bottler'], lore: ['jaja','seca'] },
+    { name: 'Maré de Laranja', biome: 'reservoir', subtitle: 'O rio voltou. As máquinas resistem.', mechanic: 'Correntes, balsas e saltos em corrida', map: [.63,.65], heights: [450,420,450,450,390,420,450,420,390,420,450,450,420,390,420,450,420,450], gaps: [120,110,100,95], kinds: ['roller','wasp','bottler'], lore: ['jaja','seca'] },
     { name: 'Engrenagens da Polpa', biome: 'refinery', subtitle: 'Desarme a pressão que alimenta o trono.', mechanic: 'Esteiras, prensas e sementes ricocheteadas', map: [.70,.54], heights: [450,420,450,390,420,450,420,390,450,420,390,420,450,420,390,450,450,420], gaps: [100,110,90,120], kinds: ['sentinel','roller','bottler'], lore: ['filtro','guina'] },
     { name: 'O Jardim Proibido', biome: 'orchard', subtitle: 'Uma safra inteira atrás de um portão.', mechanic: 'Abelhas, copa alta e santuário opcional', map: [.77,.42], heights: [450,420,390,420,360,390,420,450,390,360,390,420,450,390,420,450,420,450], gaps: [100,120,95,85], kinds: ['wasp','beetle','mimic'], lore: ['selo','feka'] },
     { name: 'Caldeira do Último Copo', biome: 'refinery', subtitle: 'Todo excesso procura uma saída.', mechanic: 'Descargas alternadas e passarelas de manutenção', map: [.83,.30], heights: [450,420,390,450,420,390,420,450,420,390,450,420,390,420,450,420,450,390], gaps: [115,90,120,100], kinds: ['bottler','sentinel','roller'], lore: ['coroa','fundadores'] },
-    { name: 'A Escadaria da Reserva', biome: 'citadel', subtitle: 'No alto, o silêncio também pesa.', mechanic: 'Combinação final de válvulas, prensas e impulso', map: [.72,.22], heights: [450,420,390,420,360,390,420,450,420,390,420,360,390,420,450,390,420,450,450], gaps: [110,125,90,115], kinds: ['sentinel','wasp','mimic','bottler'], lore: ['casca','coroa'] },
+    { name: 'A Escadaria da Reserva', biome: 'citadel', subtitle: 'No alto, o silêncio também pesa.', mechanic: 'Combinação final de válvulas, prensas e corrida', map: [.72,.22], heights: [450,420,390,420,360,390,420,450,420,390,420,360,390,420,450,390,420,450,450], gaps: [110,125,90,115], kinds: ['sentinel','wasp','mimic','bottler'], lore: ['casca','coroa'] },
     { name: 'Paulo Guina, Barão da Delícia', biome: 'citadel', subtitle: 'A Delícia é de todos.', mechanic: 'Três fases, pressão crescente e duas válvulas de alívio', map: [.86,.14], heights: [], gaps: [], kinds: [], lore: [], boss: 'guina' },
 ];
 
@@ -68,13 +69,13 @@ const materialFor = (biome: Biome): Floor['material'] => biome === 'orchard' ? '
 function makeStage(spec: ChapterSpec, index: number): DeliciaStage {
     const number = index + 1, id = `delicia-${number}`, material = materialFor(spec.biome);
     const s: DeliciaStage = { id, number, name: spec.name, biome: spec.biome, subtitle: spec.subtitle, mechanic: spec.mechanic,
-        width: 0, height: 900, spawn: { x: 90, y: 390 }, floors: [], enemies: [], valves: [], pickups: [], hazards: [], checkpoints: [],
+        width: 0, height: 900, spawn: { x: 90, y: 450-DELICIA_PLAYER_HEIGHT }, floors: [], enemies: [], valves: [], pickups: [], hazards: [], checkpoints: [],
         gate: { x: 0, y: 360, w: 50, h: 90 }, intro: [], outro: [], map: { x: spec.map[0], y: spec.map[1] }, ...(spec.boss ? { boss: spec.boss } : {}) };
     if (spec.boss) {
         s.width = 1340; s.floors = [{ x: 0, y: 450, w: 1340, h: 450, material },
             { x: 735, y: 380, w: 115, h: 18, material }, { x: 1015, y: 380, w: 120, h: 18, material }];
-        s.gate = { x: 1250, y: 360, w: 60, h: 90 }; s.checkpoints = [{ x: 130, y: 396 }];
-        s.valves = [{ id: 'left', x: 215, y: 450, label: 'ALÍVIO I' }, { id: 'right', x: 1100, y: 380, label: 'ALÍVIO II' }];
+        s.gate = { x: 1250, y: 360, w: 60, h: 90 }; s.checkpoints = [{ x: 130, y: 450-DELICIA_PLAYER_HEIGHT }];
+        s.valves = [{ id: 'left', x: 260, y: 450, label: 'ALÍVIO I' }, { id: 'right', x: 1100, y: 380, label: 'ALÍVIO II' }];
         s.intro = spec.boss === 'jaja' ? [
             { speaker: 'Jajá', text: 'Ai, que delícia! Mas cuidado com a pressão da caneca!' },
             { speaker: 'Jajá', text: 'Guardo esta fonte até existir suco para todos. Foi a minha promessa.' },
@@ -90,7 +91,7 @@ function makeStage(spec: ChapterSpec, index: number): DeliciaStage {
     }
     authorDeliciaTraversal(s,spec.lore);
     s.intro = number === 1 ? [{ speaker: 'Dona Casca', text: 'Bem-vindo à Delícia. Guina levou a safra inteira, e as nossas fontes secaram.' }, { speaker: 'Feka', text: 'Um grande vilão? Finalmente uma missão com suco!' }, { speaker: 'Dona Casca', text: 'Abra as duas válvulas de cada percurso. E ouça as memórias: esta ilha tem mais que um lado.' }]
-        : [{ speaker: number<6?'Dona Casca':'Jajá', text: number===3?'Abra primeiro a fonte do bairro, depois a do cais. O aqueduto precisa voltar a lembrar o trajeto.':number===7?'A nascente voltou a correr! Segure o impulso cítrico nas travessias, e use as balsas quando a distância for grande.':number===8?'As esteiras empurram você e os inimigos. Rebata os projéteis com Q: latão contra latão.':number===11?'O medidor alimenta a armadura de Guina. Abra as válvulas quando ele carregar o ataque.':spec.subtitle }];
+        : [{ speaker: number<6?'Dona Casca':'Jajá', text: number===3?'Abra primeiro a fonte do bairro, depois a do cais. O aqueduto precisa voltar a lembrar o trajeto.':number===7?'A nascente voltou a correr! Segure Shift para correr e salte nas travessias. As balsas ajudam a alcançar a outra margem.':number===8?'As esteiras empurram você e os inimigos. Rebata os projéteis com Q: latão contra latão.':number===11?'O medidor alimenta a armadura de Guina. Abra as válvulas quando ele carregar o ataque.':spec.subtitle }];
     if (number===3) s.secret='delicia-raizes'; if(number===9) s.secret='delicia-relogio';
     return s;
 }

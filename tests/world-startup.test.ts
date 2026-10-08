@@ -22,11 +22,11 @@ function eagerModules(entry: string, seen = new Set<string>()): Set<string> {
     return seen;
 }
 
-test('World boot keeps Classic and authoring modules outside its eager dependency graph', () => {
+test('World boot keeps development tools outside its eager dependency graph and has no extras launcher', () => {
     const root = resolve('src');
     const graph = eagerModules(resolve(root, 'main.ts'));
     for (const file of ['game/Game.ts', 'editor/EditorController.ts', 'adventure/WorldEditor.ts',
-        'voice/VoiceDirector.ts', 'data/levels/index.ts']) {
+        'voice/VoiceDirector.ts', 'data/levels/index.ts', 'adventure/experimental/hub/ExperimentalHub.ts']) {
         assert.equal(graph.has(resolve(root, file)), false, `${file} must load only when selected`);
     }
     assert.ok(graph.has(resolve(root, 'adventure/factory/FactoryCampaign.ts')), 'World remains eager with no new first-frame wait');
@@ -45,7 +45,8 @@ function boot(search: string, fail = false) {
         constructor() { calls.push('world'); }
         start() { calls.push('start'); }
         enableGamepadControls() { calls.push('gamepad'); }
-        enableExperimentalHub() { calls.push('hub'); }
+        restoreGuairaReturn() { calls.push('map'); }
+        openChapterMap(chapter: string) { calls.push('chapter:' + chapter); }
     }
     class Game {
         constructor() { calls.push('classic'); }
@@ -82,9 +83,23 @@ function boot(search: string, fail = false) {
 
 test('default World paints synchronously without optional imports or a loading overlay', async () => {
     const h = boot('');
-    assert.deepEqual(h.calls, ['world', 'gamepad', 'start', 'focus', 'hub']);
+    assert.deepEqual(h.calls, ['world', 'gamepad', 'start', 'focus']);
     assert.equal(h.statuses.length, 0);
     await h.done;
+});
+
+test('old Extras bookmarks start the same game without an intermediate menu', async () => {
+    const h = boot('?experiments=1');
+    await h.done;
+    assert.deepEqual(h.calls, ['world', 'gamepad', 'start', 'focus']);
+    assert.equal(h.statuses.length, 0);
+});
+
+test('legacy Guaira return still restores the journey without loading an extra menu', async () => {
+    const h = boot('?guairaReturn=1');
+    await h.done;
+    assert.deepEqual(h.calls, ['world', 'gamepad', 'map', 'start', 'focus']);
+    assert.equal(h.statuses.length, 0);
 });
 
 test('explicit optional routes load only their chosen mode and keep focus behavior', async () => {
@@ -109,4 +124,10 @@ test('failed optional chunks leave a visible recovery message instead of an empt
     assert.equal(h.calls.includes('start'), false);
     assert.equal(h.statuses[0].removed, false);
     assert.match(h.statuses[0].textContent, /Recarregue/);
+});
+
+for (const search of ['?delicia=true', '?chapter=delicia']) test(`Delícia bookmark ${search} uses World and its shared map`, async () => {
+    const h = boot(search); await h.done;
+    assert.deepEqual(h.calls, ['world', 'gamepad', 'start', 'focus', 'chapter:delicia']);
+    assert.equal(h.statuses.length, 0);
 });

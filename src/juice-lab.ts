@@ -25,7 +25,7 @@ const retryButton = document.getElementById('lab-retry')!;
 for (const [id, label, name] of [
     ['lab-present', 'POSE', 'Apresentar pose'],
     ['lab-replay', 'REVER', 'Rever introdução'], ['lab-retry', 'TENTAR', 'Tentar novamente'],
-    ['lab-exit', 'SAIR', 'Voltar aos experimentos']
+    ['lab-exit', 'VOLTAR', 'Voltar ao jogo']
 ]) {
     const control = document.getElementById(id);
     if (control) new LabToolbarAction(control, id === 'lab-present').setLabel(label, name);

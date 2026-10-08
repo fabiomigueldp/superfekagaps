@@ -1,10 +1,14 @@
 import type { Rect } from '../../types';
 import { clamp, overlaps } from '../types';
-import { geyserBands } from './JuiceFluid';
+import { geyserBands, JUICE_DROP_GRAVITY } from './JuiceFluid';
 
 export type JuiceAttack = 'dash' | 'fan' | 'pounce';
 export type JuicePhase = 'intro' | 'rest' | 'warning' | 'attack' | 'recover' | 'hurt' | 'enrage' | 'defeated';
-export interface JuiceDrop extends Rect { vx: number; vy: number; life: number; }
+export interface JuiceDrop extends Rect {
+    vx: number; vy: number; life: number;
+    /** The material stays attached to the mouth briefly after release. */
+    birth?: { x: number; y: number; at: number };
+}
 export interface JuiceGeyser extends Rect {
     phase: 'warning' | 'active' | 'recede';
     phaseTime: number;
@@ -12,11 +16,18 @@ export interface JuiceGeyser extends Rect {
     /** Pressure time at shutoff, including attacks that end before 520ms. */
     releaseTime?: number;
 }
-export interface JuiceEvent {
+interface JuiceCue {
     kind: 'warning' | 'launch' | 'spit' | 'splash' | 'hit' | 'enrage' | 'geyser-warning' | 'geyser' | 'defeated';
     x: number;
     y: number;
 }
+export interface JuiceDropImpact {
+    kind: 'drop-impact'; x: number; y: number; at: number;
+    /** Pixels per second, sampled at contact rather than at the next render. */
+    vx: number; vy: number; radius: number;
+    side: -1 | 0 | 1;
+}
+export type JuiceEvent = JuiceCue | JuiceDropImpact;
 export interface JuiceArena { left: number; right: number; floor: number; }
 
 /** Standalone encounter: the same locked geometry drives warnings and collision. */
@@ -64,9 +75,11 @@ export class JuiceMinibossModel implements Rect {
     }
     get hazards(): Rect[] {
         if (['intro', 'enrage', 'defeated', 'hurt'].includes(this.phase)) return [];
-        return [...this.drops.map(d => ({ x: d.x, y: d.y, width: d.width, height: d.height })),
+        return [...this.drops.filter(d => d.life > 0).map(d => ({ x: d.x, y: d.y, width: d.width, height: d.height })),
             ...this.geysers.filter(g => g.phase === 'active').flatMap(geyserBands)];
     }
+    /** The chamber walls surround the playable floor, including its corner space. */
+    get fluidBounds() { return { left: this.arena.left - 16, right: this.arena.right + 16, floor: this.arena.floor }; }
     /** One launch description drives both the visible warning and the projectiles. */
     get fanLaunch() {
         const x = this.x + this.width / 2, y = this.y + this.height * .55;
@@ -83,7 +96,7 @@ export class JuiceMinibossModel implements Rect {
         return Array.from({ length: 5 }, (_, i) => this.arena.left + inset + span * i / 4);
     }
     private enter(phase: JuicePhase) { this.phase = phase; this.phaseTime = 0; }
-    private emit(kind: JuiceEvent['kind'], x = this.x + this.width / 2, y = this.y + this.height) {
+    private emit(kind: JuiceCue['kind'], x = this.x + this.width / 2, y = this.y + this.height) {
         this.events.push({ kind, x, y });
     }
     private warnGeysers(playerCenter: number) {
@@ -150,10 +163,7 @@ export class JuiceMinibossModel implements Rect {
         this.time += dt;
         this.phaseTime += dt;
         if (this.phase === 'defeated') return;
-        for (const d of this.drops) {
-            d.x += d.vx * dt; d.y += d.vy * dt; d.vy += 0.00012 * dt; d.life -= dt;
-        }
-        this.drops = this.drops.filter(d => d.life > 0 && d.y + d.height < this.arena.floor && d.x > this.arena.left - 20 && d.x < this.arena.right + 20);
+        this.tickDrops(dt);
         this.tickGeysers(dt);
         switch (this.phase) {
             case 'intro': if (this.phaseTime >= 850) this.enter('rest'); break;
@@ -179,7 +189,8 @@ export class JuiceMinibossModel implements Rect {
                     const fan = this.fanLaunch;
                     this.emit('spit', fan.x, fan.y);
                     for (const vector of fan.vectors) {
-                        this.drops.push({ x: fan.x - 4, y: fan.y - 4, width: 8, height: 8, ...vector, life: 1700 });
+                        this.drops.push({ x: fan.x - 4, y: fan.y - 4, width: 8, height: 8, ...vector, life: 1700,
+                            birth: { x: fan.x, y: fan.y, at: this.time } });
                     }
                 }
                 if (t >= 1) {
@@ -194,6 +205,31 @@ export class JuiceMinibossModel implements Rect {
                 break;
             }
         }
+    }
+    private tickDrops(dt: number) {
+        const bounds = this.fluidBounds;
+        this.drops = this.drops.filter(d => {
+            const fromX = d.x, fromY = d.y;
+            const dx = d.vx * dt, dy = d.vy * dt;
+            d.life -= dt;
+            const floorHit = fromY + d.height >= bounds.floor ? 0
+                : dy > 0 ? (bounds.floor - d.height - fromY) / dy : Infinity;
+            const wallHit = d.vx < 0 ? Math.max(0, (bounds.left - fromX) / dx)
+                : d.vx > 0 ? Math.max(0, (bounds.right - d.width - fromX) / dx) : Infinity;
+            const hit = Math.min(floorHit, wallHit);
+            if (hit <= 1) {
+                const side = floorHit <= wallHit ? 0 : d.vx < 0 ? -1 : 1;
+                d.x = fromX + dx * hit; d.y = fromY + dy * hit;
+                this.events.push({ kind: 'drop-impact', side, radius: d.width / 2,
+                    x: side ? side < 0 ? bounds.left : bounds.right : d.x + d.width / 2,
+                    y: side ? d.y + d.height / 2 : bounds.floor,
+                    at: this.time - dt + dt * hit, vx: d.vx * 1000, vy: (d.vy + JUICE_DROP_GRAVITY / 1e6 * dt * hit) * 1000 });
+                return false;
+            }
+            d.x += dx; d.y += dy; d.vy += JUICE_DROP_GRAVITY / 1e6 * dt;
+            // Losing collision never erases airborne liquid: it still reaches a surface.
+            return true;
+        });
     }
     contact(player: Rect, previous: Rect, falling: boolean): 'none' | 'hurt' | 'bounce' | 'hit' | 'defeated' {
         if (['intro', 'enrage', 'hurt', 'defeated'].includes(this.phase) || !overlaps(player, this)) return 'none';

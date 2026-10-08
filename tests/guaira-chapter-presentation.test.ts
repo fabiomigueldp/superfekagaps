@@ -5,7 +5,7 @@ import { chapterExitPresentation, chapterGuidance, chapterTitle } from '../src/a
 test('chapter presentation identifies the game and preserves explicit return destinations', () => {
     assert.equal(chapterTitle('Ossabravo'), 'Super Feka Gaps · Guaíra · Ossabravo');
     assert.equal(chapterExitPresentation(true).label, 'FÁBRICA');
-    assert.match(chapterExitPresentation(false).description, /extras/);
+    assert.equal(chapterExitPresentation(false).description, 'Voltar ao jogo');
 });
 test('host guidance preserves mechanism instructions while replacing standalone prototype copy', () => {
     assert.equal(chapterGuidance('Guaíra fictícia · setas/A D: mover', 'Abra a comporta'), 'Abra a comporta');

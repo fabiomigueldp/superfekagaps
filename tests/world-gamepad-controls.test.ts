@@ -220,17 +220,17 @@ for (const screen of ['dialogue'] as const) {
     });
 }
 
-test('help, experimental hub and flight ownership suppress controller polling and activation', t => {
+test('help, hosted chapters and flight ownership suppress controller polling and activation', t => {
     const h = worldFixture(t); h.play();
     const internal = h.game as unknown as { change(screen: string): void; controlsHelp: WorldControlsHelp;
-        experimentalHub?: { isOpen: boolean }; flightCleanup?: () => void };
+        chapterActive: boolean; flightCleanup?: () => void };
     internal.change('settings'); internal.controlsHelp.open();
     const save = structuredClone(h.game.store.save), polls = h.polls();
     h.button(9); h.button(0); h.step();
     assert.equal(internal.controlsHelp.isOpen, true); assert.equal(h.game.state, 'settings'); assert.equal(h.polls(), polls);
     internal.controlsHelp.close();
     // These host flags are browser-overlay boundaries; no overlay code is substituted for Input.
-    internal.experimentalHub = { isOpen: true }; h.step(); assert.equal(h.polls(), polls); internal.experimentalHub = undefined;
+    internal.chapterActive = true; h.step(); assert.equal(h.polls(), polls); internal.chapterActive = false;
     internal.change('paused'); internal.flightCleanup = () => {}; h.step();
     assert.equal(h.game.state, 'paused'); assert.equal(h.polls(), polls); internal.flightCleanup = undefined;
     h.step(); assert.equal(h.game.state, 'paused', 'Held Start cannot resume on return from the flight owner');

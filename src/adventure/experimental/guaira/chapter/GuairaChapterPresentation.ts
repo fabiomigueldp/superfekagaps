@@ -2,7 +2,7 @@
 export function chapterExitPresentation(campaign: boolean) {
     return campaign
         ? { label: 'FÁBRICA', description: 'Voltar à Fábrica e continuar a viagem' }
-        : { label: 'SAIR', description: 'Sair do capítulo e voltar aos extras' };
+        : { label: 'VOLTAR', description: 'Voltar ao jogo' };
 }
 
 export function chapterTitle(scene?: string): string {

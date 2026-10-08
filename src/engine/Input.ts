@@ -124,6 +124,7 @@ export class Input {
     // hosts gameplay: only its own Input may capture its exact canvas, never the
     // suspended campaign's Input. Keyup still releases keys across focus changes.
     if (target instanceof HTMLElement && target.closest('dialog[open]') && target !== this.gameplayCanvas) return;
+    if (target instanceof HTMLElement && target.closest('.world-chapter-host') && target !== this.gameplayCanvas) return;
     // Native activation belongs to focused page controls, not jump/start.
     if (target instanceof HTMLElement && target.closest('button, a[href], summary') &&
       ['Enter', 'Space'].includes(controlCode(event))) return;

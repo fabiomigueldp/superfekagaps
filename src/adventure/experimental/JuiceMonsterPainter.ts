@@ -1,7 +1,7 @@
 import type { JuiceMinibossModel } from './JuiceMinibossModel';
 import { juicePose } from './JuiceAnimation';
 import { drawJuicePixelBody } from './JuicePixelSurface';
-import { drawFluidImpact, fluidDrop, fluidOval, fluidPuddle } from './JuiceFluid';
+import { drawFluidImpact, drawFluidProjectile, fluidDrop, fluidOval, fluidPuddle } from './JuiceFluid';
 
 // Hand-painted at the game's logical resolution. The dome, brows and gumline
 // share a single liquid material; no detached eyes, horns or humanoid limbs.
@@ -153,10 +153,6 @@ export function drawJuiceMiniboss(c: CanvasRenderingContext2D, b: JuiceMinibossM
         }
         c.globalAlpha = 1;
     }
-    for (const d of b.drops) {
-        const x = d.x + d.width / 2 - cx, y = d.y + d.height / 2 - cy;
-        fluidDrop(c, x, y, d.width / 2 - .25, reducedMotion ? 0 : d.vx * 1000, reducedMotion ? 0 : d.vy * 1000);
-    }
     if (!reducedMotion && rage) {
         drawFluidImpact(c, center, floor, b.phaseTime, 'landing', b.x + 9, 650);
     }
@@ -224,6 +220,8 @@ export function drawJuiceMiniboss(c: CanvasRenderingContext2D, b: JuiceMinibossM
     }
     c.restore();
     }, b.width, b.height);
+    // Draw the launch neck over the face so its source reads as the mouth.
+    for (const d of b.drops) drawFluidProjectile(c, d, b.time, cx, cy, reducedMotion);
     if (!reducedMotion && !defeated && altitude < 2 && !dash) {
         // A cheek thread stretches slowly, pinches, then flattens into the skirt.
         for (const side of [-1, 1]) {

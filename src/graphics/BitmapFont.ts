@@ -32,6 +32,9 @@ const GLYPHS: Record<string, string> = {
   '°':'010/101/010/000/000/000/000',
   '★':'00100/00100/11111/01110/01010/10001/00000',
   '♥':'01010/11111/11111/11111/01110/00100/00000',
+  '□':'00000/11111/10001/10001/10001/11111/00000',
+  '○':'00000/01110/10001/10001/10001/01110/00000',
+  '△':'00000/00100/01010/01010/10001/11111/00000',
 };
 // Compile the finite authored alphabet once. Keep one draw per pixel, in its
 // original order: joining pixels or caching rendered text changes compositing.

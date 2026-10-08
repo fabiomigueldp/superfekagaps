@@ -1,0 +1,11 @@
+{
+  "comparisons": 50,
+  "animationPlayPause": true,
+  "manualFrame": true,
+  "valveResponse": true,
+  "cameraScroll": true,
+  "reducedMotion": true,
+  "mobileOverflow": false,
+  "nativeMobileWidth": 320,
+  "errors": []
+}

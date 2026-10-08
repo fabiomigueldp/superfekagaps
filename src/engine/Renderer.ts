@@ -12,6 +12,7 @@ import type { BlockImpacts } from '../world/BlockImpacts';
 import { TilePainter } from '../graphics/TilePainter';
 import { BackgroundScene } from '../graphics/BackgroundScene';
 import { GameUI } from '../graphics/GameUI';
+import { drawTouchButtons } from '../graphics/touchControls';
 import { pixelText, panel, textWidth, wrapText, fitText } from '../graphics/BitmapFont';
 import { MINION_FRAMES, MINION_SQUASH, BOSS_FRAMES, YASMIN_FRAMES, COIN_FRAMES, FANTA_SPRITE, PROJECTILE_FRAMES, SPRITE_PALETTE } from '../graphics/sprites';
 
@@ -468,10 +469,7 @@ export class Renderer {
   drawTouchControls():void {
     if(!this.touch||!this.touchControlsVisible)return;
     this.screen(c=>{
-      c.globalAlpha=.72;
-      for(const [x,label] of [[8,'←'],[56,'→'],[144,'↓'],[232,'X'],[280,'↑']] as const){
-        panel(c,x,145,32,29,ART.ink,ART.rockLight);pixelText(c,label,x+16,153,ART.paper,2,'center');
-      }
+      drawTouchButtons(c);
       c.globalAlpha=1;c.fillStyle=ART.paper;c.fillRect(171,7,1,7);c.fillRect(174,7,1,7);
     });
   }

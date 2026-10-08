@@ -5,11 +5,13 @@ import { readFileSync } from 'node:fs';
 import { runInThisContext } from 'node:vm';
 import ts from 'typescript';
 import type { DeliciaInput, DeliciaSimulation } from '../src/adventure/delicia/DeliciaSimulation';
+import type { DeliciaAppOptions } from '../src/adventure/delicia/DeliciaApp';
 
 /** DOM/event boundaries only. Constructor, registered handlers, loop and simulation are real. */
 function fixture(t: TestContext) {
     let activeElement: Element | null = null;
     class Element extends EventTarget {
+        style: Record<string, string> = {};
         className = ''; dataset: Record<string, string> = {}; hidden = false; disabled = false;
         textContent = ''; parent: Element | null = null; children: Element[] = [];
         attributes = new Map<string, string>(); captureFails = false;
@@ -21,14 +23,17 @@ function fixture(t: TestContext) {
         remove() { if (this.parent) this.parent.children = this.parent.children.filter(child => child !== this); this.parent = null; }
         setAttribute(name: string, value: string) { this.attributes.set(name, value); }
         removeAttribute(name: string) { this.attributes.delete(name); }
-        getContext() { return null; }
+        getAttribute(name: string) { return this.attributes.get(name) ?? null; }
+        getBoundingClientRect() { return { left: 0, top: 0, width: 960, height: 540 }; }
+        blur() { if (activeElement === this) { activeElement = null; this.dispatchEvent(new Event('blur')); } }
+        getContext() { return new Proxy({}, { get: () => () => {}, set: () => true }); }
         all(): Element[] { return this.children.flatMap(child => [child, ...child.all()]); }
         querySelector() { return this.all().find(node => node.tagName === 'button') ?? null; }
         querySelectorAll() { return this.all().filter(node => node.tagName === 'button'); }
         getClientRects() { return [1]; }
         closest(selector: string): Element | null {
             for (let node: Element | null = this; node; node = node.parent)
-                if (selector.split(',').some(tag => tag.trim() === node!.tagName)) return node;
+                if (selector.split(',').some(tag => tag.trim() === node!.tagName || tag.trim().startsWith('.') && node!.className.split(' ').includes(tag.trim().slice(1)))) return node;
             return null;
         }
         focus() {
@@ -39,15 +44,15 @@ function fixture(t: TestContext) {
         click() { this.dispatchEvent(new Event('click')); }
         setPointerCapture() { if (this.captureFails) throw new DOMException('Capture unavailable'); }
     }
-    const body = new Element('body'), window = new EventTarget();
+    const body = new Element('body'), window = Object.assign(new EventTarget(), { innerWidth: 960, innerHeight: 540, devicePixelRatio: 1 });
     const document = Object.assign(new EventTarget(), { body, hidden: false, title: '',
-        createElement: (tag: string) => new Element(tag) });
+        getElementById: () => null, createElement: (tag: string) => new Element(tag) });
     Object.defineProperty(document, 'activeElement', { get: () => activeElement });
     let nextFrame: FrameRequestCallback = () => {}, now = 1000;
     let connected = true;
     const pad = { mapping: 'standard', axes: [0, 0], buttons: Array.from({ length: 16 }, () => ({ pressed: false })) };
     const original = new Map<string, PropertyDescriptor | undefined>();
-    for (const [name, value] of Object.entries({ window, document,
+    for (const [name, value] of Object.entries({ window, document, location: { hash: '' },
         navigator: { maxTouchPoints: 1, getGamepads: () => connected ? [pad] : [] },
         localStorage: { getItem: () => null, setItem() {} },
         requestAnimationFrame: (callback: FrameRequestCallback) => { nextFrame = callback; return 1; },
@@ -69,13 +74,13 @@ function fixture(t: TestContext) {
     const prototype = DeliciaApp.prototype as unknown as { renderGame(): void; updateHud(): void };
     t.mock.method(prototype, 'renderGame', () => {}); t.mock.method(prototype, 'updateHud', () => {});
     interface App {
-        canvas: Element; touch: Element; screen: string; sim: DeliciaSimulation;
+        canvas: Element; touch: Element; panel: Element; screen: string; sim: DeliciaSimulation;
         input(): DeliciaInput; loadStage(id: string, retry: boolean): boolean; pause(): void; resume(): void; dispose(): void;
-        store: { save: unknown };
+        store: { save: unknown }; dialogueTime: number; menu: { text: string; choices: { label: string; run(): void }[] };
     }
     const apps: App[] = [];
-    const create = () => { const app = new DeliciaApp(body as unknown as HTMLElement) as unknown as App; apps.push(app);
-        assert.equal(app.loadStage('delicia-1', true), true); return app; };
+    const create = (options?: DeliciaAppOptions) => { const app = new DeliciaApp(body as unknown as HTMLElement, options) as unknown as App; apps.push(app);
+        if (!options?.initialStage) assert.equal(app.loadStage('delicia-1', true), true); return app; };
     t.after(() => {
         apps.forEach(app => app.dispose());
         if (css) require.extensions['.css'] = css; else delete require.extensions['.css'];
@@ -100,6 +105,23 @@ function fixture(t: TestContext) {
     return { app, create, window, document, body, key, pointer, button, frame, pad, disconnect: () => { connected = false; } };
 }
 function neutral(input: DeliciaInput) { assert.ok(Object.values(input).every(value => value === false), JSON.stringify(input)); }
+
+test('shared world entry bypasses the title, waits for a released gamepad and returns through the shared map', t => {
+    const h = fixture(t); h.app.dispose(); h.pad.buttons[0].pressed = true;
+    let returned = 0;
+    const app = h.create({ initialStage: 'delicia-1', returnToWorldMap: () => { returned++; app.dispose(); } });
+    assert.equal(app.screen, 'dialogue');
+    const text = () => app.menu.text, introduction = text();
+    h.frame(); h.frame(); assert.equal(text(), introduction, 'The map confirm cannot consume the introduction');
+    h.pad.buttons[0].pressed = false; h.frame(); h.pad.buttons[0].pressed = true; h.frame();
+    assert.equal(app.dialogueTime, Infinity, 'A fresh confirm reveals the current sentence, just like World');
+    h.pad.buttons[0].pressed = false; h.frame(); h.pad.buttons[0].pressed = true; h.frame();
+    assert.notEqual(text(), introduction, 'The next confirm advances the sentence');
+    h.pad.buttons[0].pressed = false; app.loadStage('delicia-1', true); app.pause();
+    const back = app.menu.choices.find(choice => choice.label === 'VOLTAR AO MAPA');
+    assert.ok(back); back.run(); assert.equal(returned, 1);
+    assert.deepEqual((app.store.save as { completed: string[] }).completed, []);
+});
 
 for (const activation of ['Enter', ' ']) test(`button ${JSON.stringify(activation)} releases when canvas steals focus before keyup`, t => {
     const h = fixture(t), right = h.button('arrowright'); right.focus();

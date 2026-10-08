@@ -1,0 +1,146 @@
+[
+  {
+    "id": "delicia-1",
+    "name": "Cais do Primeiro Gole",
+    "biome": "harbor",
+    "zones": [
+      "O cais de copos vazios",
+      "Mercado das Janelas",
+      "Pontes da Maré Mansa",
+      "O sino que não toca"
+    ]
+  },
+  {
+    "id": "delicia-2",
+    "name": "Pomares da Partilha",
+    "biome": "orchard",
+    "zones": [
+      "Terraços da Primeira Safra",
+      "O Moinho Adormecido",
+      "Correio das Abelhas",
+      "A árvore de outra família"
+    ]
+  },
+  {
+    "id": "delicia-3",
+    "name": "Aqueduto dos Ecos",
+    "biome": "aqueduct",
+    "zones": [
+      "As Duas Assinaturas",
+      "Comporta do Bairro",
+      "Nove Arcos de Memória",
+      "Comporta do Cais"
+    ]
+  },
+  {
+    "id": "delicia-4",
+    "name": "Cascatas de Âmbar",
+    "biome": "reservoir",
+    "zones": [
+      "Mirante das Cinco Quedas",
+      "Elevadores de Âmbar",
+      "Ponte do Arco-Íris",
+      "A Voz da Nascente"
+    ]
+  },
+  {
+    "id": "delicia-5",
+    "name": "Arquivo Fermentado",
+    "biome": "cellar",
+    "zones": [
+      "Catálogo dos Esquecidos",
+      "Prateleiras que Suspiram",
+      "O Contrato Rasurado",
+      "Arquivo das Vozes Vivas"
+    ]
+  },
+  {
+    "id": "delicia-6",
+    "name": "Jajá, Guardião da Nascente",
+    "biome": "reservoir",
+    "zones": []
+  },
+  {
+    "id": "delicia-7",
+    "name": "Maré de Laranja",
+    "biome": "reservoir",
+    "zones": [
+      "O Rio Desperto",
+      "Doca das Balsas Perdidas",
+      "Velas de Casca",
+      "A Enseada da Volta"
+    ]
+  },
+  {
+    "id": "delicia-8",
+    "name": "Engrenagens da Polpa",
+    "biome": "refinery",
+    "zones": [
+      "Portaria da Polpa",
+      "Linha de Engarrafamento",
+      "O Filtro de Lembranças",
+      "A Saída de Emergência"
+    ]
+  },
+  {
+    "id": "delicia-9",
+    "name": "O Jardim Proibido",
+    "biome": "orchard",
+    "zones": [
+      "A Safra que Ninguém Viu",
+      "Estufa de Vidro Verde",
+      "Os Jardins Suspensos",
+      "A Corda Esquecida"
+    ]
+  },
+  {
+    "id": "delicia-10",
+    "name": "Caldeira do Último Copo",
+    "biome": "refinery",
+    "zones": [
+      "A Sala do Medidor",
+      "Fornalha da Última Gota",
+      "Chaminés de Contratempo",
+      "A Válvula sem Coroa"
+    ]
+  },
+  {
+    "id": "delicia-11",
+    "name": "A Escadaria da Reserva",
+    "biome": "citadel",
+    "zones": [
+      "A Escadaria das Sete Safras",
+      "Galeria das Promessas",
+      "O Pátio da Reserva",
+      "À Mesa do Barão"
+    ]
+  },
+  {
+    "id": "delicia-12",
+    "name": "Paulo Guina, Barão da Delícia",
+    "biome": "citadel",
+    "zones": []
+  },
+  {
+    "id": "delicia-raizes",
+    "name": "Santuário das Raízes",
+    "biome": "orchard",
+    "zones": [
+      "Debaixo do Nome das Árvores",
+      "A Capela das Sementes",
+      "Raízes que Fazem Pontes",
+      "A Primeira Mesa"
+    ]
+  },
+  {
+    "id": "delicia-relogio",
+    "name": "Sino da Última Safra",
+    "biome": "refinery",
+    "zones": [
+      "O Sino da Última Safra",
+      "Pêndulos da Colheita",
+      "O Contrapeso de Latão",
+      "Meio-dia Outra Vez"
+    ]
+  }
+]

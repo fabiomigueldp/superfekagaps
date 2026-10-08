@@ -1,0 +1,61 @@
+const {chromium}=require(process.env.PLAYWRIGHT_LIB||'playwright');
+const fs=require('node:fs');const path=require('node:path');const assert=require('node:assert/strict');
+const base=process.env.DELICIA_URL||'http://localhost:3000',out=path.resolve(process.env.DELICIA_OUTPUT||'output/delicia/native-play');
+fs.mkdirSync(out,{recursive:true});
+(async()=>{
+ const browser=await chromium.launch({headless:true,channel:process.env.CHROMIUM_CHANNEL||'msedge'});
+ const report={errors:[],checks:[],screenshots:[]};
+ try{
+  const context=await browser.newContext({viewport:{width:1280,height:800}}),page=await context.newPage();
+  page.on('pageerror',e=>report.errors.push(e.message));
+  const shot=async name=>{await page.screenshot({path:path.join(out,name+'.png')});report.screenshots.push(name);};
+  const enter=async(p)=>{
+   await p.waitForFunction(()=>window.worldGame?.mapView);
+   await p.evaluate(()=>window.worldGame.mapView.hud.enterButton.click());
+   await p.waitForFunction(()=>window.deliciaGame?.screen==='dialogue');
+   for(let i=0;i<8&&await p.evaluate(()=>window.deliciaGame.screen==='dialogue');i++)await p.getByRole('button',{name:'CONTINUAR',exact:true}).click();
+  };
+  await page.goto(base+'/delicia.html');await enter(page);
+  await page.waitForFunction(()=>window.deliciaGame.screen==='playing'&&window.deliciaGame.sim.player.grounded);
+  await shot('01-cais');
+  const stats=()=>page.evaluate(()=>{const s=window.deliciaGame.sim;return{x:s.player.x,y:s.player.y,vx:s.player.vx,health:s.player.health,grounded:s.player.grounded,invincible:s.player.invincible,time:s.time};});
+  await page.keyboard.down('d');await page.waitForTimeout(230);const walk=await stats();
+  await page.keyboard.down('Shift');await page.waitForTimeout(230);const run=await stats();
+  assert.ok(run.vx>walk.vx);assert.equal(run.invincible,0);
+  await page.keyboard.down('Space');await page.waitForTimeout(100);await page.keyboard.up('Space');await page.keyboard.up('d');await page.keyboard.up('Shift');
+  const jump=await stats();assert.ok(jump.y<run.y);await shot('02-salto');
+  await page.keyboard.press('s');await page.waitForTimeout(160);
+  await page.keyboard.press('Escape');const paused=await stats();await page.waitForTimeout(140);assert.deepEqual(await stats(),paused);
+  await shot('03-pausa');await page.getByRole('button',{name:'VOLTAR AO MAPA',exact:true}).click();await page.waitForFunction(()=>!window.worldGame.chapterActive);
+  report.checks.push({name:'Real keyboard: walk, held run, variable jump, pound, pause and map return',walk,run,jump});
+  // Normal World host lifecycle; map selection is arranged in this isolated profile.
+  await page.goto(base+'/');await page.waitForFunction(()=>window.worldGame);
+  await page.evaluate(()=>{window.worldGame.toMap();window.worldGame.render();});await page.waitForFunction(()=>window.worldGame.mapView);
+  await page.evaluate(()=>window.worldGame.mapView.openChapter('delicia','delicia-1'));
+  await page.evaluate(()=>window.worldGame.mapView.hud.enterButton.click());
+  await page.waitForFunction(()=>document.querySelector('.world-chapter-host .delicia'));
+  for(let i=0;i<8&&await page.evaluate(()=>window.deliciaGame.screen==='dialogue');i++)await page.getByRole('button',{name:'CONTINUAR',exact:true}).click();
+  await page.waitForFunction(()=>window.deliciaGame.screen==='playing');await shot('04-world-host');
+  const hosted=await page.evaluate(()=>({native:window.deliciaGame.sim.nativePlayer.constructor===window.worldGame.player.constructor,roots:document.querySelectorAll('.delicia').length,url:location.pathname}));
+  assert.equal(hosted.native,true);assert.equal(hosted.roots,1);assert.equal(hosted.url,'/');
+  await page.keyboard.press('Escape');await page.getByRole('button',{name:'VOLTAR AO MAPA',exact:true}).click();
+  await page.waitForFunction(()=>!document.querySelector('.world-chapter-host')&&window.worldGame.state==='map');
+  await shot('05-world-map-return');report.checks.push({name:'Shared World map enters and disposes native chapter in the same document',...hosted});
+  await context.close();
+  const mobile=await browser.newContext({viewport:{width:844,height:390},hasTouch:true,isMobile:true,deviceScaleFactor:1});const touch=await mobile.newPage();
+  touch.on('pageerror',e=>report.errors.push(e.message));await touch.goto(base+'/delicia.html');
+  await enter(touch);
+  await touch.waitForFunction(()=>window.deliciaGame.sim.player.grounded);
+  const before=await touch.evaluate(()=>window.deliciaGame.sim.player.x);
+  const right=await touch.getByRole('button',{name:'Direita',exact:true}).boundingBox();assert.ok(right);
+  const session=await mobile.newCDPSession(touch);
+  await session.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:right.x+right.width/2,y:right.y+right.height/2,id:1}]});
+  await touch.waitForTimeout(250);await session.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  const after=await touch.evaluate(()=>window.deliciaGame.sim.player.x);assert.ok(after>before+30);
+  await touch.screenshot({path:path.join(out,'06-touch.png')});report.screenshots.push('06-touch');
+  assert.equal(await touch.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+  report.checks.push({name:'Native touch hold, release and landscape layout',before,after});await mobile.close();
+  assert.deepEqual(report.errors,[]);
+  fs.writeFileSync(path.join(out,'report.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));
+ }finally{await browser.close();}
+})().catch(e=>{console.error(e);process.exitCode=1;});

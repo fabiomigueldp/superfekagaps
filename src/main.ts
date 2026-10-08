@@ -1,12 +1,9 @@
 import './adventure/guaira-campaign.css';
 // Ponto de entrada - Super Feka Gaps
 
-import { WorldGame } from './adventure/WorldGame';
 import { FactoryCampaign } from './adventure/factory/FactoryCampaign';
 import './adventure/map.css';
 import './adventure/world-controls-help.css';
-import './adventure/experimental/hub/experimental-hub.css';
-import './adventure/delicia/map-link.css';
 
 // Inicializa o jogo quando a página carregar
 window.addEventListener('DOMContentLoaded', async () => {
@@ -18,12 +15,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     return;
   }
   const params = new URLSearchParams(window.location.search);
-  if (params.get('delicia') === 'true') {
-    const container = document.getElementById('game-container');
-    if (container) container.hidden = true;
-    await import('./adventure/delicia/entry');
-    return;
-  }
   // Optional tools/Classic must not join World's first-load dependency graph.
   // World still starts synchronously; only the selected optional mode waits.
   async function optionalMode<T>(load: () => Promise<T>): Promise<T | null> {
@@ -64,6 +55,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   } else {
     game = new FactoryCampaign(canvas);
     game.enableGamepadControls();
+    if (params.get('guairaReturn') === '1') game.restoreGuairaReturn();
   }
   game.start();
   if (!isEditor) {
@@ -71,8 +63,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     canvas.focus({ preventScroll: true });
   }
 
-  // Auto-open after the initial canvas focus so the modal owns focus.
-  if (game instanceof WorldGame) game.enableExperimentalHub(window.location.search);
+  if (game instanceof FactoryCampaign && (params.get('delicia') === 'true' || params.get('chapter') === 'delicia'))
+    game.openChapterMap('delicia');
 
   console.log('✅ Jogo iniciado!');
   console.log('📋 Controles:');

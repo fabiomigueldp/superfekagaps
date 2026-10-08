@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Delícia · cenários em movimento</title>
+<style>
+:root{color-scheme:dark;background:#191f35;color:#f5efd3;font:16px/1.6 system-ui,sans-serif}*{box-sizing:border-box}body{margin:0}main{max-width:1220px;margin:auto;padding:38px 28px 64px}h1{font-size:clamp(32px,5vw,54px);line-height:1.1;letter-spacing:-.035em;margin:12px 0 20px;max-width:900px}h2{font-size:26px;line-height:1.3;margin:40px 0 18px}p{max-width:920px;color:#bdcfd0}a{color:#ffe29a;text-underline-offset:4px}.eyebrow,.badge{color:#9ce3cf;font-size:12px;letter-spacing:.08em;text-transform:uppercase}.links,.controls{display:flex;flex-wrap:wrap;gap:14px;align-items:end;margin:20px 0}.controls label{display:grid;gap:5px;color:#bdcfd0;font-size:14px}.controls .check{display:flex;align-items:center;min-height:44px;gap:9px}input[type=checkbox]{width:20px;height:20px}button,select{font:inherit;min-height:44px;max-width:100%;border:1px solid #648591;background:#203547;color:#f5efd3;padding:8px 12px}button{cursor:pointer}button:disabled{opacity:.6;cursor:default}button[aria-pressed=true]{background:#ffe29a;color:#191f35}button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #9ce3cf;outline-offset:4px}.live-frame{background:#11182a;display:flex;justify-content:center;border-block:1px solid #435567;padding:18px 0}canvas{display:block;image-rendering:pixelated;max-width:100%;height:auto}img{display:block;width:100%;height:auto;image-rendering:pixelated;background:#203547}.two,.grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}.two.single{grid-template-columns:1fr}.single .before{display:none}figure{margin:0}figcaption,.note{font-size:14px;color:#adc4ca;margin-top:10px}.badge{display:block;margin-bottom:8px}.proof{border-block:1px solid #435567;display:flex;flex-wrap:wrap;gap:14px 28px;margin:26px 0;padding:16px 0}.proof b{color:#ffe29a}.camera{display:flex;gap:14px;align-items:center;margin-top:14px;font-size:14px;color:#bdcfd0}.camera input{flex:1;min-width:80px;min-height:32px;accent-color:#9ce3cf}footer{border-top:1px solid #435567;margin-top:40px;padding-top:20px}#status{min-height:22px}.screen{max-width:960px;margin:auto}.comparison{scroll-margin-top:20px}
+@media(max-width:650px){main{padding:24px 16px}.two,.grid{grid-template-columns:1fr}.controls label:not(.check){width:100%}.controls select{width:100%}.camera{flex-wrap:wrap}.live-frame{padding:10px 0}h2{margin-top:32px}}
+</style>
+<main>
+<div class="eyebrow">Super Feka Gaps World · Império da Delícia · 8 de outubro</div>
+<h1>O vento, a água e as máquinas ganham vida.</h1>
+<p>Mais movimento e acabamento nos cenários do Império: tecidos ao vento, árvores e flores, rodas d’água, fornalhas, lanternas e pequenas peças de cenário. O salão de Guina recebe um vitral facetado, com rosácea e coroa em relevo.</p>
+<nav class="links" aria-label="Revisão"><a href="../../../../?chapter=delicia">Jogar no World</a><a href="#comparacao">Comparar a arte</a><a href="README.md">Notas e verificações</a><a href="../object-polish-2026-10-08/index.html">Revisão anterior</a></nav>
+<div class="proof"><span><b>14</b> fases</span><span><b>7</b> ambientes</span><span><b>50</b> enquadramentos</span><span><b>320 × 180</b> pixels nativos</span></div>
+<h2>Explore os cenários em movimento.</h2>
+<div class="controls">
+<label>Fase<select id="stage" aria-label="Fase"></select></label>
+<label>Trecho<select id="zone" aria-label="Trecho"></select></label>
+<label>Camadas<select id="layers"><option value="all">Cena completa</option><option value="backdrop">Somente cenário de fundo</option></select></label>
+<button id="play" aria-pressed="true">Pausar animação</button><button id="step">Avançar um quadro</button>
+<label class="check"><input type="checkbox" id="flow">Fontes abertas</label>
+</div>
+<div class="live-frame"><canvas id="scene" width="960" height="540" role="img" aria-label="Prévia animada do cenário do Império da Delícia"></canvas></div>
+<label class="camera" for="camera">Percorrer a fase<input type="range" id="camera" min="0" max="100" value="0" step="3"><output id="position" for="camera">0%</output></label>
+<p id="status" class="note" role="status">Carregando os desenhos do jogo…</p>
+<p class="note">Prévia do renderizador real com estados preparados para inspecionar a arte. A simulação está parada; os personagens não percorrem a fase. A preferência de movimento reduzido pausa a animação. Use o controle de câmera para verificar a composição e o paralaxe.</p>
+<h2 id="comparacao" class="comparison">Antes e depois no mesmo ponto.</h2>
+<p class="note">As imagens acompanham a fase e o trecho selecionados acima. Ambas usam o mesmo enquadramento; a comparação parte da revisão anterior de objetos e inimigos.</p>
+<div class="controls"><button id="compare" aria-pressed="false">Ampliar o depois</button></div>
+<div class="two" id="comparison">
+<figure class="before"><span class="badge">Antes desta rodada</span><a id="before-link" href="antes/delicia-1-0.png"><img id="before" src="antes/delicia-1-0.png" alt="Cais na revisão anterior" width="960" height="540"></a></figure>
+<figure><span class="badge">Depois desta rodada</span><a id="after-link" href="depois/delicia-1-0.png"><img id="after" src="depois/delicia-1-0.png" alt="Cais após o refinamento de materiais e cenários" width="960" height="540"></a></figure>
+</div>
+<h2>Acabamento de perto.</h2>
+<div class="grid">
+<figure><img src="depois/delicia-1-1.png" alt="Mercado do cais com toldos, frascos, cestos e cordas" width="960" height="540" loading="lazy"><figcaption><b>Cais.</b> Costuras nas velas, toldos flexíveis, carga suspensa, cordas enroladas e caixas com ferragens.</figcaption></figure>
+<figure><img src="depois/delicia-9-1.png" alt="Pomar com estufa, flores e folhas detalhadas" width="960" height="540" loading="lazy"><figcaption><b>Pomares.</b> Copas com movimento discreto, flores nas pérgolas e plantas menores junto ao caminho.</figcaption></figure>
+<figure><img src="depois/delicia-3-motion.png" alt="Aqueduto com a roda e o fluxo de água restaurados" width="960" height="540" loading="lazy"><figcaption><b>Aqueduto.</b> Rodas e fluxo adicional respondem à mesma fonte que libera a passagem superior.</figcaption></figure>
+<figure><img src="depois/delicia-10-motion.png" alt="Refinaria com máquinas, vapor, correias e polias" width="960" height="540" loading="lazy"><figcaption><b>Refinaria.</b> Polias, correias e bielas conectadas; chaminés, fornalhas e pequenas ventoinhas em movimento.</figcaption></figure>
+<figure><img src="depois/delicia-5-motion.png" alt="Adega com arcos, mesa de leitura, livros e luz de lanternas" width="960" height="540" loading="lazy"><figcaption><b>Adega.</b> Lanternas com chama, mesa de leitura, páginas que se levantam, livros e frascos trabalhados.</figcaption></figure>
+<figure><img src="depois/delicia-12-0.png" alt="Guina diante de um vitral com rosácea, facetas coloridas e coroa" width="960" height="540" loading="lazy"><figcaption><b>Salão de Guina.</b> Rosácea, vidro colorido, divisórias e coroa esculpida, com contraste reservado para o chefe.</figcaption></figure>
+</div>
+<p class="note"><a href="animation-studies.png">Inspecionar quatro instantes dos detalhes animados</a></p>
+<h2>Dentro da janela do World.</h2>
+<figure class="screen"><img src="desktop-delicia-12-phase-2.png" alt="Arte refinada de Guina dentro da janela, HUD e apresentação compartilhados do World" width="1366" height="900" loading="lazy"><figcaption>Mesma janela e interface do jogo. Captura de um estado preparado da segunda fase do chefe.</figcaption></figure>
+<footer><a href="native-report.json">Grade de pixels</a> · <a href="animation-report.json">Animações e fontes</a> · <a href="scenery-report.json">Rolagem</a> · <a href="presentation-report.json">Apresentação no jogo</a></footer>
+</main>
+<script type="module">
+try {
+ const [{ALL_DELICIA_STAGES:stages},{DeliciaSimulation},{DeliciaArt},{drawDeliciaBackdrop}]=await Promise.all([
+  import('/src/adventure/delicia/DeliciaContent.ts'),import('/src/adventure/delicia/DeliciaSimulation.ts'),
+  import('/src/adventure/delicia/DeliciaArt.ts'),import('/src/adventure/delicia/DeliciaPixelBackdrop.ts')]);
+ const $=id=>document.getElementById(id),stage=$('stage'),zone=$('zone'),canvas=$('scene'),c=canvas.getContext('2d'),art=new DeliciaArt();await art.load();
+ const media=matchMedia('(prefers-reduced-motion: reduce)');let playing=!media.matches,sim,time=0,last=0,raf=0;
+ stage.replaceChildren(...stages.map(s=>new Option(s.name,s.id)));
+ function state(){return stages.find(s=>s.id===stage.value);}
+ function controls(){const moving=playing&&!media.matches;$('play').textContent=moving?'Pausar animação':'Reproduzir animação';$('play').setAttribute('aria-pressed',String(moving));$('play').disabled=media.matches;$('status').textContent=state().name+' · '+(state().zones?.[Number(zone.value)]?.name||'Arena')+(media.matches?' · Movimento reduzido ativo.':'');}
+ function place(){
+  sim.cameraX=Number($('camera').value);sim.cameraY=0;sim.player.x=sim.cameraX+100;
+  const floor=sim.stage.floors.find(f=>f.h>50&&f.x<=sim.player.x+10&&f.x+f.w>sim.player.x+30);
+  sim.player.y=(floor?.y??450)-sim.player.h;sim.player.grounded=true;
+  $('position').value=Math.round(sim.cameraX/Math.max(1,Number($('camera').max))*100)+'%';
+ }
+ function flow(){sim.valves.clear();if($('flow').checked)sim.stage.valves.forEach(v=>sim.valves.add(v.id));draw();}
+ function draw(){
+  if(!sim)return;sim.time=time;c.clearRect(0,0,960,540);
+  if($('layers').value==='backdrop'){c.save();c.scale(3,3);drawDeliciaBackdrop(c,sim,time);c.restore();}
+  else art.draw(c,sim,false);
+ }
+ function selectZone(){
+  const s=state();sim=new DeliciaSimulation(s);time=0;$('camera').max=Math.max(0,s.width-960);$('camera').value=s.boss?400:s.zones[Number(zone.value)].x;place();
+  if(sim.boss){sim.boss.start();sim.boss.beat='tell';sim.boss.beatTime=.3;}
+  for(const [id,folder] of [['before','antes'],['after','depois']]){const file=folder+'/'+s.id+'-'+zone.value+'.png';$(id).src=file;$(id).alt=s.name+' · '+(s.zones?.[Number(zone.value)]?.name||'Arena')+' · '+(id==='before'?'antes':'depois');$(id+'-link').href=file;}
+  controls();flow();
+ }
+ function selectStage(){const s=state();zone.replaceChildren(...(s.boss?['Arena']:s.zones.map(z=>z.name)).map((name,i)=>new Option(name,String(i))));selectZone();}
+ stage.addEventListener('change',selectStage);zone.addEventListener('change',selectZone);$('flow').addEventListener('change',flow);$('layers').addEventListener('change',draw);
+ $('camera').addEventListener('input',()=>{place();draw();});$('play').addEventListener('click',()=>{playing=!playing;controls();});$('step').addEventListener('click',()=>{playing=false;time+=.25;controls();draw();});
+ $('compare').addEventListener('click',()=>{const single=$('comparison').classList.toggle('single');$('compare').setAttribute('aria-pressed',String(single));$('compare').textContent=single?'Mostrar antes e depois':'Ampliar o depois';});
+ media.addEventListener('change',()=>{playing=false;controls();draw();});
+ const resize=()=>{const width=canvas.parentElement.clientWidth;canvas.style.width=(width<320?width:Math.min(960,Math.floor(width/320)*320))+'px';};new ResizeObserver(resize).observe(canvas.parentElement);resize();selectStage();
+ function tick(now){const delta=last?Math.min(.1,(now-last)/1000):0;last=now;if(playing&&!media.matches&&!document.hidden){time+=delta;draw();}raf=requestAnimationFrame(tick);}
+ raf=requestAnimationFrame(tick);window.addEventListener('pagehide',()=>{cancelAnimationFrame(raf);art.dispose();},{once:true});
+} catch(error){document.getElementById('status').textContent='Não foi possível carregar a prévia. As capturas abaixo continuam disponíveis.';console.error(error);}
+</script>
+</html>

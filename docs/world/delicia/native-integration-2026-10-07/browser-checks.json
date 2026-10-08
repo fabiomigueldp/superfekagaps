@@ -1,0 +1,54 @@
+{
+  "errors": [],
+  "checks": [
+    {
+      "name": "Real keyboard: walk, held run, variable jump, pound, pause and map return",
+      "walk": {
+        "x": 162.89999999999998,
+        "y": 378,
+        "vx": 360,
+        "health": 4,
+        "grounded": true,
+        "invincible": 0,
+        "time": 0.6000000000000002
+      },
+      "run": {
+        "x": 317.4,
+        "y": 378,
+        "vx": 630,
+        "health": 4,
+        "grounded": true,
+        "invincible": 0,
+        "time": 0.8666666666666677
+      },
+      "jump": {
+        "x": 413.85956250000004,
+        "y": 212.84999999999997,
+        "vx": 386.89875,
+        "health": 4,
+        "grounded": false,
+        "invincible": 0,
+        "time": 1.0333333333333345
+      }
+    },
+    {
+      "name": "Shared World map enters and disposes native chapter in the same document",
+      "native": true,
+      "roots": 1,
+      "url": "/"
+    },
+    {
+      "name": "Native touch hold, release and landscape layout",
+      "before": 90,
+      "after": 246.89999999999995
+    }
+  ],
+  "screenshots": [
+    "01-cais",
+    "02-salto",
+    "03-pausa",
+    "04-world-host",
+    "05-world-map-return",
+    "06-touch"
+  ]
+}

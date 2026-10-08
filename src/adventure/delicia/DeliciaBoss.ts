@@ -4,15 +4,16 @@ export type BossAttack = 'cup'|'wave'|'charge'|'whirlpool'|'geyser'|'gap'|'court
 export interface BossMissile extends Box {vx:number;vy:number;gravity:number;kind:'juice'|'heart'|'seed'|'wave';life:number;friendly:boolean}
 export interface BossEvent {kind:'tell'|'impact'|'shot'|'gap'|'phase'|'defeat';x:number;y:number;w?:number;attack?:BossAttack}
 export const bossPhase = (hp:number,max:number) => hp>max*.66?1:hp>max*.33?2:3;
+const BOSS_HOME_X = 780;
 export const intersects = (a:Box,b:Box):boolean => a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
 /** Attack positions lock during the tell; dangerous gaps never chase the player. */
 export function gapTarget(playerX:number):Box {return{x:Math.max(340,Math.min(760,playerX-90)),y:450,w:180,h:450};}
 export class DeliciaBoss {
     beat:BossBeat='intro'; attack:BossAttack='cup'; hp:number; readonly maxHp:number;
-    x=890;y=305;w=96;h=145;time=0;phase=1;pressure=0;shield=false;direction=-1;
+    x=BOSS_HOME_X;y=305;w=96;h=145;time=0;phase=1;pressure=0;shield=false;direction=-1;
     target:Box={x:500,y:450,w:180,h:450};missiles:BossMissile[]=[];events:BossEvent[]=[];
     danger:Box[]=[];gaps:(Box&{life:number})[]=[];private timer=0;private combo=0;private shot=false;private hitCooldown=0;
-    private startX=890;private relief=0;private pressureShield=false;
+    private startX=BOSS_HOME_X;private relief=0;private pressureShield=false;
     beatTime=0;hitFlash=0;attackSerial=0;private duration=1;private pulses=0;private chargeEnd=290;
     constructor(readonly character:'jaja'|'guina',readonly assist=false){this.maxHp=character==='jaja'?12:24;this.hp=this.maxHp;this.shield=character==='guina';}
     start():void{this.beat='idle';this.timer=.6;}
@@ -37,7 +38,7 @@ export class DeliciaBoss {
         if(this.vulnerable)return 'Ataque! Semente ou sentada.';
         if(this.beat==='recover')return 'Abra uma válvula para tirar a armadura.';
         if(this.beat==='stagger')return 'Pressão liberada. Ataque!';
-        return{cup:'Desvie dos jatos da caneca.',wave:'Pule a onda.',charge:'Pule ou use impulso.',whirlpool:'Pule as ondas em sequência.',geyser:'Fique entre os jatos.',gap:'Saia da marca dourada.',court:'Rebata os corações.',press:'Saia das colunas.',overload:'Abra as válvulas para baixar a pressão.'}[this.attack];
+        return{cup:'Desvie dos jatos da caneca.',wave:'Pule a onda.',charge:'Pule sobre a investida.',whirlpool:'Pule as ondas em sequência.',geyser:'Fique entre os jatos.',gap:'Saia da marca dourada.',court:'Rebata os corações.',press:'Saia das colunas.',overload:'Abra as válvulas para baixar a pressão.'}[this.attack];
     }
     openValve():boolean{
         if(this.hp<=0||this.beat==='intro')return false;
@@ -71,7 +72,7 @@ export class DeliciaBoss {
             if(this.timer<=0){this.beat='recover';this.beatTime=0;this.danger=[];this.timer=(this.assist?1.9:1.25)+(this.attack==='overload'||this.attack==='whirlpool'?.35:0);this.shield=this.character==='guina'&&this.pressureShield&&this.relief<=0;}
         }
         if((this.beat==='recover'||this.beat==='stagger')&&this.timer<=0){this.beat='idle';this.beatTime=0;this.timer=.5;this.shield=this.character==='guina'&&this.relief<=0;}
-        if(this.beat==='idle')this.x+=(890-this.x)*Math.min(1,dt*3);
+        if(this.beat==='idle')this.x+=(BOSS_HOME_X-this.x)*Math.min(1,dt*3);
     }
     private chooseAttack(player:Box):void {
         const jaja:BossAttack[][]=[['cup','wave','charge'],['wave','geyser','cup','whirlpool','charge'],['whirlpool','charge','geyser','cup','wave']];

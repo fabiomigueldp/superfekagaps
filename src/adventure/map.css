@@ -71,7 +71,7 @@
     margin: 0;
     padding: 8px 10px;
     background: #191f35ed;
-    border-left: 3px solid var(--map-gold);
+    border: 1px solid #648591;
     box-shadow: 2px 2px 0 #191f3570;
 }
 .world-map-title .world-map-bitmap { max-width: 100%; }
@@ -101,7 +101,7 @@
     column-gap: 14px;
     padding: 9px 10px 8px 12px;
     background: #191f35f2;
-    border-left: 3px solid var(--map-gold);
+    border: 1px solid #648591;
     box-shadow: 2px 3px 0 #191f3566;
 }
 /* Intrinsic shortcut row is part of the measured footer; an absent/hidden link
@@ -231,3 +231,63 @@
 /* A named chapter stays legible; numeric island IDs remain 1–6. */
 .has-compact-island-names .world-map-guaira-island,
 .has-compact-island-names .world-map-guaira-island .world-map-bitmap { width: 128px; height: 44px; }
+
+/* One quiet navigation frame for every island. The scenery carries the world. */
+.world-map { --map-ink: oklch(24% .035 248); --map-paper: oklch(95% .025 90); }
+.world-map-header { top: max(20px, env(safe-area-inset-top)); left: max(24px, env(safe-area-inset-left)); right: max(24px, env(safe-area-inset-right)); align-items: center; }
+.world-map-title { background: var(--map-ink); border: 0; padding: 10px 14px; box-shadow: 0 3px 0 #10243330; }
+.world-map-tools { gap: 8px; }
+.world-map-tool { border: 1px solid #819b9f80; border-bottom-width: 1px; padding: 8px 12px; background: var(--map-ink); }
+.world-map-overview { width: auto; }
+.world-map-footer { left: 50%; transform: translateX(-50%); bottom: max(20px, env(safe-area-inset-bottom)); width: min(620px, calc(100% - 40px)); padding: 14px 16px; grid-template-columns: minmax(0, 1fr) auto; column-gap: 24px; border: 1px solid #819b9f60; background: var(--map-ink); box-shadow: 0 5px 0 #10243324; }
+.world-map-chapter-links:empty { display: none; }
+.world-map-stage-title { grid-column: 1; grid-row: 1; padding: 0; margin: 0; }
+.world-map-stage-title:has(.is-encounter) { padding-right: 0; }
+.world-map-stage-title > .world-map-bitmap { max-width: 100%; max-height: 46px; width: auto; }
+.world-map-stage-copy { grid-column: 1; grid-row: 2; margin-top: 4px; gap: 3px 10px; }
+.world-map-stage-actions { grid-column: 2; grid-row: 1 / span 2; }
+.world-map-compact-details { display: inline-block; position: static; margin: 8px 10px 0 0; }
+.world-map-compact-details .world-map-bitmap { width: 42px; height: auto; }
+.world-map-stage-details { display: none; }
+.is-chapter .world-map-stage-details { display: inline; color: #cad8d7; }
+.world-map-status:empty, .world-map-hint:empty { display: none; }
+.world-map-location, .world-map-hint { display: none; }
+.is-preview .world-map-hint { display: block; max-width: 48ch; }
+.is-preview .world-map-location { display: none; }
+.world-map-status { color: #cad8d7; font-size: 12px; line-height: 17px; }
+.world-map:not(.is-preview):not(.is-overview):not(.is-chapter)[data-motion='idle'] .world-map-status { display: none; }
+.world-map-enter, .world-map-skip { min-width: 106px; padding: 12px; border-width: 1px 1px 3px; }
+.world-map-enter { transition: transform 140ms ease-out, background-color 140ms ease-out; }
+.world-map-enter:enabled:active { transform: translateY(2px); }
+.world-map-region-menu { top: max(76px, calc(env(safe-area-inset-top) + 60px)); }
+.is-overview .world-map-footer { width: auto; max-width: calc(100% - 40px); display: block; padding: 10px 18px; text-align: center; }
+.is-overview .world-map-stage-title, .is-overview[data-motion='idle'] .world-map-stage-actions, .is-overview .world-map-location, .is-overview .world-map-hint { display: none; }
+.is-overview .world-map-stage-actions { justify-content: center; margin-top: 8px; }
+.is-overview .world-map-stage-copy { margin: 0; }
+.is-overview .world-map-status { font-size: 13px; }
+.has-compact-island-names .world-map-delicia-island, .has-compact-island-names .world-map-delicia-island .world-map-bitmap { width: 128px; height: 44px; }
+.world-chapter-host { position: fixed; inset: 0; z-index: 25; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; overflow: hidden; background: #101d29; color: #f5efd3; font: 15px/1.5 system-ui, sans-serif; animation: chapter-arrival 360ms cubic-bezier(.16,1,.3,1) both; }
+.world-chapter-host > button { min-height: 44px; padding: 8px 16px; background: #203547; color: #f5efd3; border: 1px solid #648591; cursor: pointer; }
+.world-chapter-host .delicia { position: absolute; }
+.world-chapter-loading { margin: 0; }
+@keyframes chapter-arrival { from { opacity: 0; } to { opacity: 1; } }
+@container map (max-width: 620px) {
+    .world-map-chapter-node, .world-map-chapter-node .world-map-bitmap { width: 44px; height: 46px; }
+    .world-map-header { display: flex; gap: 8px; top: max(12px, env(safe-area-inset-top)); left: max(12px, env(safe-area-inset-left)); right: max(12px, env(safe-area-inset-right)); }
+    .world-map-title { padding: 8px; flex: 1; max-width: 55%; }
+    .world-map-title .world-map-bitmap { max-width: 100%; max-height: 24px; }
+    .world-map-footer { width: calc(100% - 24px); left: 50%; bottom: max(12px, env(safe-area-inset-bottom)); padding: 12px; column-gap: 12px; }
+    .world-map-stage-copy { display: flex; }
+    .world-map-stage-title > .world-map-bitmap { max-width: 100%; }
+    .world-map-enter, .world-map-skip { min-width: 86px; }
+    .world-map-region-menu { top: 68px; max-height: calc(100% - 84px); }
+}
+@media (max-height: 480px) {
+    .world-map-chapter-node, .world-map-chapter-node .world-map-bitmap { width: 44px; height: 46px; }
+    .world-map-header { top: max(8px, env(safe-area-inset-top)); }
+    .world-map-title { max-width: 60%; }
+    .world-map-footer { bottom: max(8px, env(safe-area-inset-bottom)); padding: 8px 12px; }
+    .world-map-compact-details { margin-top: 4px; }
+    .world-map-region-menu { top: 58px; max-height: calc(100% - 68px); }
+}
+@media (prefers-reduced-motion: reduce) { .world-chapter-host { animation: none; } }

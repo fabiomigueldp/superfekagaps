@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Delícia · objetos e criaturas</title>
+<style>
+:root{color-scheme:dark;background:#191f35;color:#f5efd3;font:16px/1.6 system-ui,sans-serif}*{box-sizing:border-box}body{margin:0}main{max-width:1260px;margin:auto;padding:38px 28px 68px}h1{font-size:clamp(32px,5vw,54px);line-height:1.12;letter-spacing:-.035em;max-width:900px;margin:12px 0 22px}h2{font-size:26px;line-height:1.3;margin:42px 0 18px}h3{font-size:16px;margin:10px 0 2px}p{color:#bdcfd0;max-width:890px}a{color:#ffe29a;text-underline-offset:4px}.eyebrow{color:#9ce3cf;font-size:13px;letter-spacing:.09em;text-transform:uppercase}.links,.controls{display:flex;gap:16px;flex-wrap:wrap;margin:20px 0;align-items:end}.controls label{display:grid;gap:5px;color:#bdcfd0;font-size:14px}button,select{font:inherit;min-height:44px;max-width:100%;background:#203547;border:1px solid #648591;color:#f5efd3;padding:8px 12px}button{cursor:pointer}button[aria-pressed=true]{background:#ffe29a;color:#191f35}button:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #9ce3cf;outline-offset:4px}.actors{display:grid;grid-template-columns:repeat(8,1fr);gap:12px}.actor{text-align:center;padding:16px 4px 10px;background:#223344;border-bottom:2px solid #4e777f}.actor canvas{display:block;margin:auto;max-width:100%;image-rendering:pixelated}.actor p{font-size:12px;margin:0}.bosses{display:grid;grid-template-columns:1fr 1fr;gap:20px}.boss{display:flex;gap:24px;align-items:center;background:#223344;padding:18px}.boss canvas{image-rendering:pixelated;width:168px;height:180px;flex:none}.boss h3{font-size:22px}.boss p{font-size:14px}.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}.single .before{display:none}.single{grid-template-columns:1fr}figure{margin:0}img{display:block;width:100%;height:auto;image-rendering:pixelated;background:#191f35}figcaption,.note{font-size:14px;color:#adc4ca;margin-top:10px}.badge{display:block;color:#9ce3cf;font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}.proof{border-block:1px solid #435567;display:flex;flex-wrap:wrap;gap:14px 28px;margin:30px 0;padding:16px 0}.proof b{color:#ffe29a}.pickup-strip{display:flex;gap:24px;align-items:center;flex-wrap:wrap;padding:20px;background:#223344}.pickup-strip figure{display:grid;justify-items:center;gap:8px}.pickup-strip canvas{image-rendering:pixelated}.pickup-strip figcaption{font-size:13px;margin:0}footer{border-top:1px solid #435567;margin-top:44px;padding-top:18px}#error{color:#ffe29a}
+@media(max-width:1000px){.actors{grid-template-columns:repeat(4,1fr)}.boss{gap:12px;padding:12px}.boss canvas{width:112px;height:120px}}@media(max-width:650px){main{padding:24px 16px}.two,.bosses{grid-template-columns:1fr}.actors{grid-template-columns:repeat(2,1fr)}.controls label{width:100%}.controls select{width:100%}.boss canvas{width:168px;height:180px}.boss{gap:16px}.pickup-strip{gap:18px}h2{margin-top:34px}}
+</style>
+<main>
+<p style="padding:14px 18px;margin:16px 0;border:1px solid #648591;background:#203547;color:#f5efd3">Nova revisão: <a style="color:#ffe29a" href="../living-world-2026-10-08/index.html">cenários, materiais e animações — ver a revisão atual</a>.</p>
+<div class="eyebrow">Super Feka Gaps World · Império da Delícia</div>
+<h1>Objetos e criaturas com mais personalidade.</h1>
+<p>Inimigos, chefes, coletáveis e máquinas refinados dentro do jogo. Casca, vidro, madeira e metal ganham detalhes próprios, com contornos e iluminação da paleta compartilhada do World.</p>
+<nav class="links" aria-label="Revisão"><a href="../../../../?chapter=delicia">Jogar no World</a><a href="#comparacao">Antes e depois</a><a href="#maquinas">Máquinas nas fases</a><a href="README.md">Notas e verificações</a></nav>
+<div class="proof"><span><b>8</b> inimigos</span><span><b>2</b> chefes</span><span><b>14</b> fases revisadas</span><span><b>64</b> capturas de cenário e objetos</span></div>
+<h2>Movimento e expressão.</h2>
+<div class="controls">
+<label>Pose dos inimigos<select id="pose"><option value="walk">Movimento</option><option value="tell">Alerta</option><option value="attack">Ação</option><option value="stun">Atordoado</option></select></label>
+<label>Pose dos chefes<select id="beat"><option value="idle">Parado</option><option value="tell">Preparação do golpe</option><option value="attack">Golpe</option><option value="recover">Recuperação</option><option value="stagger">Atordoado</option><option value="transition">Mudança de fase</option><option value="defeated">Derrotado</option></select></label>
+<button id="motion" aria-pressed="true">Pausar animações</button><button id="step">Próximo quadro</button>
+</div>
+<p id="error" role="status"></p>
+<div class="actors" id="actors"></div>
+<div class="bosses" id="bosses" style="margin-top:20px"></div>
+<p class="note">Prancha para inspecionar os desenhos. Durante a partida, cada comportamento determina a pose: flores e garrafas reagem ao disparo real, vespas acompanham a direção do voo e barris despertam com a aproximação de Feka. A preferência de movimento reduzido pausa esta prévia.</p>
+<p class="note"><a href="enemy-motion.png">Quadros dos inimigos</a> · <a href="boss-motion.png">Quadros dos chefes</a></p>
+<h2>Pequenos objetos, funções claras.</h2>
+<div class="pickup-strip" id="pickups"></div>
+<p>O selo tem fitas e relevo; a memória é uma gota facetada. O coração de cura e o projétil de Guina usam desenhos diferentes. Os projéteis rebatidos conservam seus contornos e recebem uma trilha própria.</p>
+<h2 id="comparacao">Antes e depois dos personagens.</h2>
+<div class="controls"><button id="compare" aria-pressed="false">Comparar com a arte anterior</button></div>
+<div class="two single" id="sheets">
+<figure class="before"><span class="badge">Antes desta rodada</span><a href="antes/sprites.png"><img src="antes/sprites.png" alt="Sprites dos inimigos, objetos e chefes antes do refinamento" width="1536" height="1080" loading="lazy"></a></figure>
+<figure><span class="badge">Arte em uso no jogo</span><a href="depois/sprites.png"><img src="depois/sprites.png" alt="Novas silhuetas, materiais, expressões e poses de Jajá, Guina e dos oito inimigos" width="1536" height="1080" loading="lazy"></a></figure>
+</div>
+<h2 id="maquinas">Máquinas e objetos nas fases.</h2>
+<div class="controls"><label>Objeto e estado<select id="object"></select></label></div>
+<div class="two">
+<figure><span class="badge">Antes</span><a id="old-link" href="antes/valve-closed.png"><img id="old-object" src="antes/valve-closed.png" alt="Válvula antes do refinamento" width="960" height="540" loading="lazy"></a></figure>
+<figure><span class="badge">Depois</span><a id="new-link" href="depois/valve-closed.png"><img id="new-object" src="depois/valve-closed.png" alt="Válvula refinada com roda, manômetro e base" width="960" height="540" loading="lazy"></a></figure>
+</div>
+<p id="object-note" aria-live="polite">A roda e o manômetro mostram a abertura por posição e cor; a bandeira e as frutas têm seu próprio espaço.</p>
+<p class="note">Capturas do renderizador real em estados preparados para revisão visual. A câmera e a posição de Feka podem variar para mostrar cada objeto. Essas imagens não são gravações de partidas completas.</p>
+<h2>Na mesma janela do World.</h2>
+<div class="two"><figure><img src="desktop-delicia-12-phase-2.png" alt="Guina com a nova arte dentro da janela e do HUD do World" width="1366" height="900" loading="lazy"><figcaption>Guina no cenário, com a interface compartilhada.</figcaption></figure><figure><img src="landscape-delicia-play.png" alt="Arte do cais em tela horizontal com controles de toque" width="2532" height="1170" loading="lazy"><figcaption>Leitura da arte em tela menor.</figcaption></figure></div>
+<footer><a href="../scenery-polish-2026-10-08/index.html">Revisão anterior dos cenários</a> · <a href="../../../../?chapter=delicia">Jogar no World</a></footer>
+</main>
+<script type="module">
+const $=id=>document.getElementById(id),media=matchMedia('(prefers-reduced-motion: reduce)');
+const names={pulp:['Polpa','Casca e folhas'],beetle:['Besouro','Carapaça e antenas'],wasp:['Vespa','Asas e ferrão'],roller:['Rolo','Engrenagem e visor'],sentinel:['Guarda','Elmo e escudo'],bottler:['Garrafa','Vidro e suco'],mimic:['Barril','Aros e dentes'],bloom:['Flor','Pétalas e sementes']};
+const bossInfo={jaja:['Jajá','Avental costurado, barba e caneca de madeira.'],guina:['Guina','Capa, coroa, armadura e taça de ouro.']};
+let running=!media.matches,frame=0,last=0,atlas,items=[];
+function motion(){ $('motion').setAttribute('aria-pressed',String(running));$('motion').textContent=running?'Pausar animações':'Animar'; }
+function paint(canvas,rows){const c=canvas.getContext('2d'),scale=canvas.width/rows[0].length;c.clearRect(0,0,canvas.width,canvas.height);rows.forEach((row,y)=>[...row].forEach((key,x)=>{const color=atlas.palette[key];if(color){c.fillStyle=color;c.fillRect(x*scale,y*scale,scale,scale);}}));}
+function render(){for(const item of items)paint(item.canvas,item.poses[item.boss?$('beat').value:$('pose').value][frame%4]);}
+$('motion').onclick=()=>{running=!running;motion();};$('step').onclick=()=>{running=false;frame++;motion();render();};$('pose').onchange=$('beat').onchange=()=>{frame=0;render();};
+media.addEventListener('change',()=>{if(media.matches){running=false;motion();}});
+$('compare').onclick=()=>{const compare=$('compare').getAttribute('aria-pressed')!=='true';$('compare').setAttribute('aria-pressed',String(compare));$('compare').textContent=compare?'Ampliar a arte atual':'Comparar com a arte anterior';$('sheets').classList.toggle('single',!compare);};
+const objects=[['valve-closed','Válvula · fechada','A roda e o manômetro mostram a abertura por posição e cor; a bandeira e as frutas têm seu próprio espaço.'],['valve-open','Válvula · aberta','Raios diagonais, ponteiro deslocado e confirmação desenhada em pixels.'],['press-safe','Prensa · repouso','Pistão, guias, parafusos e faixa de advertência com materiais definidos.'],['press-tell','Prensa · aviso','O sinal de alerta aparece antes do golpe e continua visível com movimento reduzido.'],['press-active','Prensa · golpe','O pistão desce e os sinais laterais indicam a área perigosa.'],['press-disabled','Prensa · desligada','A válvula interrompe o ciclo e a máquina mostra a confirmação.'],['wind-active','Vento · ativo','Ventilador com pás, tubo de suporte e seta para o fluxo ascendente.'],['jet-safe','Jato · repouso','Bocal metálico e direção do impulso.'],['jet-tell','Jato · preparação','Sinais junto ao bocal avisam a próxima descarga.'],['jet-active','Jato · impulso','Fluxo ascendente e reflexos do suco identificam o impulso.'],['steam-safe','Vapor · repouso','A placa triangular distingue a descarga perigosa do jato de impulso.'],['steam-tell','Vapor · aviso','A exclamação antecipa a descarga.'],['steam-active','Vapor · descarga','A coluna quente preenche a área ativa, com bordas e núcleo legíveis.']];
+for(const [value,label] of objects)$('object').add(new Option(label,value));
+$('object').onchange=()=>{const [id,label,note]=objects.find(o=>o[0]===$('object').value);for(const [prefix,folder] of [['old','antes'],['new','depois']]){$(prefix+'-object').src=folder+'/'+id+'.png';$(prefix+'-object').alt=label+(prefix==='old'?' antes':' depois')+' do refinamento';$(prefix+'-link').href=folder+'/'+id+'.png';}$('object-note').textContent=note;};
+try{
+  const response=await fetch('atlas.json');if(!response.ok)throw Error('atlas');atlas=await response.json();
+  for(const entry of atlas.actors){const card=document.createElement('article');card.className='actor';const canvas=document.createElement('canvas');canvas.width=96;canvas.height=96;canvas.setAttribute('role','img');canvas.setAttribute('aria-label',names[entry.kind][0]+' animado');const name=document.createElement('h3');name.textContent=names[entry.kind][0];const description=document.createElement('p');description.textContent=names[entry.kind][1];card.append(canvas,name,description);$('actors').append(card);items.push({...entry,canvas});}
+  for(const entry of atlas.bosses){const card=document.createElement('article');card.className='boss';const canvas=document.createElement('canvas');canvas.width=168;canvas.height=180;canvas.setAttribute('role','img');canvas.setAttribute('aria-label',bossInfo[entry.kind][0]+' animado');const text=document.createElement('div'),name=document.createElement('h3'),description=document.createElement('p');name.textContent=bossInfo[entry.kind][0];description.textContent=bossInfo[entry.kind][1];text.append(name,description);card.append(canvas,text);$('bosses').append(card);items.push({...entry,canvas,boss:true});}
+  for(const [label,rows] of [['Laranja',atlas.pickups.orange],['Cura',atlas.pickups.heart],['Selo',atlas.pickups.seal],['Memória',atlas.pickups.memory],['Semente',atlas.projectiles.seed[0]],['Suco',atlas.projectiles.juice[0]],['Coração de Guina',atlas.projectiles.heart[0]],['Rebatido',atlas.projectiles.heart[1]]]){const figure=document.createElement('figure'),canvas=document.createElement('canvas'),caption=document.createElement('figcaption');canvas.width=rows[0].length*4;canvas.height=rows.length*4;canvas.setAttribute('role','img');canvas.setAttribute('aria-label',label);caption.textContent=label;paint(canvas,rows);figure.append(canvas,caption);$('pickups').append(figure);}
+  motion();render();document.documentElement.dataset.ready='true';
+  function loop(time){if(running&&!document.hidden&&time-last>=143){frame++;last=time;render();}requestAnimationFrame(loop);}requestAnimationFrame(loop);
+}catch{ $('error').textContent='Não foi possível carregar a prévia animada. As comparações em imagem continuam disponíveis abaixo.'; }
+</script>
+</html>

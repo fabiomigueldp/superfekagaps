@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-08",
+  "tests": {
+    "passed": 2751,
+    "failed": 0,
+    "skipped": 1,
+    "skipReason": "Optional @napi-rs/canvas is not installed"
+  },
+  "build": {
+    "validate": "passed",
+    "typecheck": "passed",
+    "vite": "passed"
+  },
+  "browser": {
+    "viewports": 5,
+    "captures": 60,
+    "errors": 0,
+    "sameViewportGeometry": true,
+    "identicalPausePixels": true,
+    "identicalSettingsHeaderAndVolumesPixels": true
+  },
+  "inputProof": {
+    "keyboard": "passed",
+    "realTouch": "passed",
+    "sharedMapReturn": "passed"
+  }
+}

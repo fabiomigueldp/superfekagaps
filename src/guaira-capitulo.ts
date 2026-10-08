@@ -1,5 +1,4 @@
 import { GuairaChapterApp } from './adventure/experimental/guaira/chapter/GuairaChapterApp';
-import { EXPERIMENTAL_HUB_RETURN } from './adventure/experimental/hub/ExperimentalRoutes';
 import { ProgressStore, canContinueFromGuaira } from './adventure/progress';
 import { runGuairaFlight } from './adventure/WorldGuairaFlight';
 import './adventure/guaira-campaign.css';
@@ -23,7 +22,7 @@ const createChapter = () => {
         } });
     };
     return new GuairaChapterApp(root, { progressStore, campaign,
-        exit: () => campaign ? travel('factory') : location.assign(EXPERIMENTAL_HUB_RETURN),
+        exit: () => campaign ? travel('factory') : location.assign('./'),
         continueCampaign: () => travel('serra'), canContinueCampaign: () => canContinueFromGuaira(progressStore.save) });
 };
 let chapter = createChapter();

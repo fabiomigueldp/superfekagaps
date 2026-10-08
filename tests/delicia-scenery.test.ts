@@ -22,8 +22,9 @@ test('ferry collision surfaces stay between their banks throughout a full cycle'
 test('valves have a foundation and do not occupy checkpoint flags or lift shafts',()=>{
  for(const stage of ALL_DELICIA_STAGES)for(const valve of stage.valves){
   assert.ok(stage.floors.some(f=>f.y===valve.y&&f.x<=valve.x-20&&f.x+f.w>=valve.x+20),`${stage.id}: ${valve.id} floats`);
-  for(const cp of stage.checkpoints)assert.ok(valve.x+36<cp.x-4||valve.x-20>cp.x+35||valve.y<cp.y-26,`${stage.id}: valve overlaps flag`);
-  for(const f of stage.floors.filter(f=>f.kind==='lift'||f.kind==='spring'))assert.ok(valve.x+36<f.x-8||valve.x-20>f.x+f.w+8,`${stage.id}: valve overlaps lift`);
+  // World flags extend 21 native pixels to the right; authoring coordinates use ×3.
+  for(const cp of stage.checkpoints)assert.ok(valve.x+54<cp.x-9||valve.x-30>cp.x+63||valve.y<cp.y-26,`${stage.id}: valve overlaps flag`);
+  for(const f of stage.floors.filter(f=>f.kind==='lift'||f.kind==='spring'))assert.ok(valve.x+54<f.x-3||valve.x-30>f.x+f.w+3,`${stage.id}: valve overlaps lift`);
  }
 });
 
@@ -43,8 +44,8 @@ test('mandatory valve landings can be crossed on foot without forced updrafts',(
 test('collectibles do not hide inside the static valve wheel or duplicate an upper reward',()=>{
  for(const stage of ALL_DELICIA_STAGES){
   for(const p of stage.pickups)for(const valve of stage.valves){
-   const distance=Math.hypot(p.x-valve.x,p.y-(valve.y-42));
-   assert.ok(distance>29,`${stage.id}: ${p.id} overlaps ${valve.id}`);
+   const distance=Math.hypot(p.x-valve.x,p.y-(valve.y-48));
+   assert.ok(distance>48,`${stage.id}: ${p.id} overlaps ${valve.id}`);
   }
   for(const seal of stage.pickups.filter(p=>p.kind==='seal'))for(const other of stage.pickups.filter(p=>p.id!==seal.id)){
    assert.ok(Math.hypot(seal.x-other.x,seal.y-other.y)>24,`${stage.id}: ${seal.id} overlaps ${other.id}`);

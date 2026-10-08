@@ -20,7 +20,8 @@ export function guairaLabToolbarMaxHeight(viewportHeight: number, controlsHeight
 }
 
 export function fitGuairaLabCanvas(canvas: HTMLCanvasElement): void {
-    const nav = document.querySelector<HTMLElement>('nav');
+    const host = canvas.closest?.<HTMLElement>('.world-chapter-host');
+    const nav = host?.querySelector<HTMLElement>('.chapter-game-toolbar') ?? document.querySelector<HTMLElement>('nav');
     const controlsHeight = document.getElementById('guaira-touch-controls')?.getBoundingClientRect().height ?? 0;
     if (nav) {
         let minimumToolbarHeight = 56;
@@ -34,8 +35,9 @@ export function fitGuairaLabCanvas(canvas: HTMLCanvasElement): void {
     }
     const navHeight = nav?.getBoundingClientRect().height ?? 100;
     const size = guairaLabCanvasSize(innerWidth, innerHeight, navHeight, controlsHeight);
-    document.body.style.paddingTop = `${navHeight}px`;
-    document.body.style.paddingBottom = `${controlsHeight}px`;
+    const layout = host ?? document.body;
+    layout.style.paddingTop = `${navHeight}px`;
+    layout.style.paddingBottom = `${controlsHeight}px`;
     canvas.style.width = `${size.width}px`;
     canvas.style.height = `${size.height}px`;
 }

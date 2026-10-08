@@ -5,7 +5,7 @@ export class DeliciaAudio {
     private sources=new Set<AudioBufferSourceNode>();private musicSource:AudioBufferSourceNode|null=null;private musicGain:GainNode|null=null;
     private voiceSource:AudioBufferSourceNode|null=null;private track='';private playingTrack='';private paused=false;private disposed=false;private musicRequest=0;
     private masterGain:GainNode|null=null;private ambienceSource:AudioBufferSourceNode|null=null;private ambienceGain:GainNode|null=null;
-    musicVolume=.45;effectsVolume=.7;muted=false;
+    musicVolume=.45;effectsVolume=.7;voiceVolume=.7;muted=false;
     async unlock():Promise<void>{
         if(this.disposed)return;
         try{
@@ -52,12 +52,12 @@ export class DeliciaAudio {
     }
     voice(name:string):void{
         if(!name)return;const request=this.musicRequest;void this.load(name).then(buffer=>{if(!buffer||this.disposed||this.muted||this.paused||!this.context||request!==this.musicRequest)return;
-            try{this.voiceSource?.stop();}catch{}const source=this.context.createBufferSource(),gain=this.context.createGain();source.buffer=buffer;gain.gain.value=this.effectsVolume*.8;source.connect(gain);gain.connect(this.masterGain??this.context.destination);this.voiceSource=source;
+            try{this.voiceSource?.stop();}catch{}const source=this.context.createBufferSource(),gain=this.context.createGain();source.buffer=buffer;gain.gain.value=this.voiceVolume*.8;source.connect(gain);gain.connect(this.masterGain??this.context.destination);this.voiceSource=source;
             this.musicGain?.gain.setTargetAtTime(this.musicVolume*.23,this.context.currentTime,.07);source.onended=()=>{source.disconnect();gain.disconnect();if(this.voiceSource===source){this.voiceSource=null;if(this.context)this.musicGain?.gain.setTargetAtTime(this.muted?0:this.musicVolume*.7,this.context.currentTime,.15);}};source.start();
         });
     }
-    setVolume(music:number,effects:number):void{this.musicVolume=music;this.effectsVolume=effects;if(this.context){this.musicGain?.gain.setTargetAtTime(this.muted?0:music*.7,this.context.currentTime,.1);if(this.masterGain){this.masterGain.gain.cancelScheduledValues(this.context.currentTime);this.masterGain.gain.value=this.muted?0:1;}this.ambienceGain?.gain.setTargetAtTime(effects*.08,this.context.currentTime,.1);}}
-    toggleMute():void{this.muted=!this.muted;this.setVolume(this.musicVolume,this.effectsVolume);if(this.muted){try{this.voiceSource?.stop();}catch{}}}
+    setVolume(music:number,effects:number,voice=effects):void{this.musicVolume=music;this.effectsVolume=effects;this.voiceVolume=voice;if(this.context){this.musicGain?.gain.setTargetAtTime(this.muted?0:music*.7,this.context.currentTime,.1);if(this.masterGain){this.masterGain.gain.cancelScheduledValues(this.context.currentTime);this.masterGain.gain.value=this.muted?0:1;}this.ambienceGain?.gain.setTargetAtTime(effects*.08,this.context.currentTime,.1);}}
+    toggleMute():void{this.muted=!this.muted;this.setVolume(this.musicVolume,this.effectsVolume,this.voiceVolume);if(this.muted){try{this.voiceSource?.stop();}catch{}}}
     pause(paused:boolean):void{this.paused=paused;if(paused){void this.context?.suspend();}else{void this.context?.resume();if(this.track)this.music(this.track);}}
     dispose():void{this.disposed=true;++this.musicRequest;for(const s of this.sources)try{s.stop();}catch{}for(const s of [this.musicSource,this.voiceSource,this.ambienceSource])try{s?.stop();}catch{}this.sources.clear();this.masterGain?.disconnect();void this.context?.close();this.context=null;this.buffers.clear();}
 }

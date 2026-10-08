@@ -1,0 +1,96 @@
+{
+  "cases": [
+    {
+      "stage": "delicia-1",
+      "movingPixels": 1638,
+      "reducedMotionChangedPixels": 0
+    },
+    {
+      "stage": "delicia-2",
+      "movingPixels": 3028,
+      "reducedMotionChangedPixels": 0
+    },
+    {
+      "stage": "delicia-3",
+      "movingPixels": 1312,
+      "reducedMotionChangedPixels": 0
+    },
+    {
+      "stage": "delicia-4",
+      "movingPixels": 891,
+      "reducedMotionChangedPixels": 0
+    },
+    {
+      "stage": "delicia-5",
+      "movingPixels": 24,
+      "reducedMotionChangedPixels": 0
+    },
+    {
+      "stage": "delicia-6",
+      "movingPixels": 1025,
+      "reducedMotionChangedPixels": 0
+    },
+    {
+      "stage": "delicia-7",
+      "movingPixels": 1309,
+      "reducedMotionChangedPixels": 0
+    },
+    {
+      "stage": "delicia-8",
+      "movingPixels": 1768,
+      "reducedMotionChangedPixels": 0
+    },
+    {
+      "stage": "delicia-9",
+      "movingPixels": 1136,
+      "reducedMotionChangedPixels": 0
+    },
+    {
+      "stage": "delicia-10",
+      "movingPixels": 1881,
+      "reducedMotionChangedPixels": 0
+    },
+    {
+      "stage": "delicia-11",
+      "movingPixels": 354,
+      "reducedMotionChangedPixels": 0
+    },
+    {
+      "stage": "delicia-12",
+      "movingPixels": 382,
+      "reducedMotionChangedPixels": 0
+    },
+    {
+      "stage": "delicia-raizes",
+      "movingPixels": 1242,
+      "reducedMotionChangedPixels": 0
+    },
+    {
+      "stage": "delicia-relogio",
+      "movingPixels": 1752,
+      "reducedMotionChangedPixels": 0
+    }
+  ],
+  "valves": [
+    {
+      "zone": 1,
+      "closedWheelChangedPixels": 0,
+      "unrelatedSourceChangedPixels": 0,
+      "restoredFlowPixels": 99,
+      "restoredWheelMovingPixels": 379
+    },
+    {
+      "zone": 2,
+      "closedWheelChangedPixels": 0,
+      "unrelatedSourceChangedPixels": 0,
+      "restoredFlowPixels": 99,
+      "restoredWheelMovingPixels": 379
+    }
+  ],
+  "animatedFrames": 56,
+  "brokenPixels": 0,
+  "offGrid": [],
+  "stateMutations": 0,
+  "arranged": true,
+  "errors": []
+}

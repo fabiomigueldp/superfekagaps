@@ -266,7 +266,7 @@ test('the real toolbar preserves bitmap names through intro, pause, replay and r
     assert.ok(game instanceof JuiceMinibossLab);
     for (const [control, name] of [[h.pause, 'Pausar'], [h.present, 'Apresentar pose'],
         [h.skip, 'Pular introdução'], [h.replay, 'Rever introdução'],
-        [h.retry, 'Tentar novamente'], [h.exit, 'Voltar aos experimentos']] as const) {
+        [h.retry, 'Tentar novamente'], [h.exit, 'Voltar ao jogo']] as const) {
         assert.equal(control.textContent, name);
         assert.equal(control.getAttribute('aria-label'), name);
         assert.equal(control.title, name, 'Compact bitmap copy has an unabridged tooltip.');
