@@ -47,18 +47,61 @@ export function completeDeliciaStage(save:DeliciaSave,id:string,seconds:number,r
 }
 export class DeliciaStore {
     save=freshDeliciaSave(); warning=''; private protected=false;
+    // Last successfully loaded/written bytes, never advanced by a failed write.
+    // Refuse stale snapshots rather than merging settings, checkpoints or earnings.
+    private storedRaw: string | null = null;
+    // Storage-only marker makes even an identical deliberate import a replacement.
+    private replacementId: string | undefined;
+    private readReplacementId(raw: string): string | undefined {
+        const value = JSON.parse(raw)?.replacementId;
+        if (value === undefined) return undefined; // Existing v1 saves remain valid.
+        if (typeof value !== 'string' || !value.startsWith('v1:') || value.length <= 3 || value.length > 128)
+            throw Error('Unrecognized progress replacement marker');
+        return value;
+    }
     private readonly storage:Pick<Storage,'getItem'|'setItem'>|null;
     constructor(storage:Pick<Storage,'getItem'|'setItem'>|null, private readonly developmentUnlocked=siteDevelopmentUnlockEnabled()) {
         this.storage=developmentProfileStorage(storage,DELICIA_SAVE_KEY,developmentUnlocked);
-        try{const raw=this.storage?.getItem(DELICIA_SAVE_KEY);if(raw)this.save=parseDeliciaSave(raw);}catch{this.protected=true;this.warning='Progresso não pôde ser lido. Exporte uma cópia antes de importar outro.';}
+        try {
+            const raw = this.storage?.getItem(DELICIA_SAVE_KEY) ?? null;
+            if (raw !== null) {
+                const next = parseDeliciaSave(raw);
+                this.replacementId = this.readReplacementId(raw);
+                this.save = next;
+            }
+            this.storedRaw = raw;
+        } catch {this.protected=true;this.warning='Progresso não pôde ser lido. Exporte uma cópia antes de importar outro.';}
         withDevelopmentAccess(this.save,developmentUnlocked);
     }
     persist():boolean {
         if(this.protected)return false;
-        try{if(!this.storage)throw Error();this.storage.setItem(DELICIA_SAVE_KEY,JSON.stringify(this.save));this.warning='';return true;}catch{this.warning='Progresso salvo apenas nesta sessão.';return false;}
+        try {
+            if (!this.storage) throw Error();
+            // localStorage has no atomic compare-and-set: this guards observed stale
+            // writers, not truly simultaneous writes or older unguarded game builds.
+            if (this.storage.getItem(DELICIA_SAVE_KEY) !== this.storedRaw) {
+                this.warning = 'Progresso alterado em outra aba. Exporte esta sessão antes de recarregar.';
+                return false;
+            }
+            const raw = JSON.stringify({ ...this.save, replacementId: this.replacementId });
+            this.storage.setItem(DELICIA_SAVE_KEY, raw);
+            this.storedRaw = raw;
+            this.warning = '';
+            return true;
+        } catch {this.warning='Progresso salvo apenas nesta sessão.';return false;}
     }
+    /** Explicit import can recover protected storage; ordinary autosaves cannot. */
     import(raw:string):boolean {
-        const next=parseDeliciaSave(raw);try{if(!this.storage)throw Error();this.storage.setItem(DELICIA_SAVE_KEY,JSON.stringify(next));}catch{this.warning='Importação não foi salva. Progresso anterior mantido.';return false;}
+        const next = parseDeliciaSave(raw);
+        let replacementId: string, storedRaw: string;
+        try {
+            if (!this.storage) throw Error();
+            replacementId = `v1:${globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`}`;
+            storedRaw = JSON.stringify({ ...next, replacementId });
+            this.storage.setItem(DELICIA_SAVE_KEY, storedRaw);
+        } catch {this.warning='Importação não foi salva. Progresso anterior mantido.';return false;}
+        this.storedRaw = storedRaw;
+        this.replacementId = replacementId;
         this.save=withDevelopmentAccess(next,this.developmentUnlocked);this.protected=false;this.warning='';return true;
     }
     collect(id:string,lore?:string):void {if(!this.save.collected.includes(id))this.save.collected.push(id);if(lore&&!this.save.lore.includes(lore))this.save.lore.push(lore);this.persist();}

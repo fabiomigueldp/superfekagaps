@@ -32,8 +32,12 @@ export class DeliciaSimulation {
         this.recordEligible=!assists&&checkpoint<0;
         this.player={...stage.spawn,w:DELICIA_PLAYER_WIDTH,h:DELICIA_PLAYER_HEIGHT,vx:0,vy:0,grounded:false,facing:1,health:assists?6:4,invincible:0,coyote:0,buffer:0,dashTime:0,dashCooldown:0,seedCooldown:0,parryTime:0,parryCooldown:0,pounding:false,walk:0,land:0};
         this.safeX=stage.spawn.x;this.safeY=stage.spawn.y;
-        this.boss=stage.boss?new DeliciaBoss(stage.boss,assists):null;
+        this.boss=stage.boss?new DeliciaBoss(stage.boss,assists,impact=>{
+            this.emit('boss-hit',impact.x,impact.y);
+            this.burst(impact.x+(impact.stomp?48:0),impact.y,impact.stomp?'#ffe7a9':'#ffdc87',impact.stomp?26:20);
+        }):null;
         this.enemies=stage.enemies.map((e,i)=>{const h=e.kind==='wasp'?42:60;return {...e,y:e.y+44-h,w:e.kind==='roller'?60:54,h,home:e.x,vx:i%2?-55:55,hp:e.kind==='sentinel'?3:e.kind==='mimic'?2:1,timer:0,state:'walk',phase:i*.73};});
+
         if(checkpoint>=0&&checkpoint<stage.checkpoints.length){this.checkpoint=checkpoint;this.safeX=stage.checkpoints[checkpoint].x;this.safeY=stage.checkpoints[checkpoint].y;this.player.x=this.safeX;this.player.y=this.safeY;}
         // Resume at the normal resting frame before the first paint. Starting at
         // the stage origin hides distant checkpoints while the live game runs.
@@ -74,7 +78,8 @@ export class DeliciaSimulation {
             if(p.y+p.h>447&&this.boss.gaps.some(g=>p.x+p.w>g.x+7&&p.x<g.x+g.w-7))this.fallIntoGap();
             if(this.dead)return;
             if(intersects(p,this.boss.rect)&&this.boss.beat!=='defeated'){
-                if(previous.y+previous.h<=this.boss.y+30&&p.vy>0){if(this.boss.hit(p.pounding?2:1)){this.emit('boss-hit',this.boss.x,this.boss.y);this.burst(this.boss.x+48,this.boss.y,'#ffe7a9',26);}this.bounce(this.boss.y);}
+                if(previous.y+previous.h<=this.boss.y+30&&p.vy>0){this.boss.hit(p.pounding?2:1,{x:this.boss.x,y:this.boss.y,stomp:true});this.bounce(this.boss.y);}
+
                 // The crouched charge uses its telegraphed lower hitbox. Applying
                 // the upright body here would make the advertised jump impossible.
                 else if(this.boss.beat==='attack'&&this.boss.attack!=='charge'||this.boss.beat==='idle'&&this.boss.beatTime>.22)this.hurt(this.boss.x+this.boss.w/2);
@@ -167,7 +172,11 @@ export class DeliciaSimulation {
         const p=this.player;
         for(const e of this.enemies){
             if(e.state==='dead'||Math.abs(e.x-p.x)>1250)continue;e.timer-=dt;e.flash=Math.max(0,(e.flash??0)-dt);
-            if(e.state==='stun'){if(e.timer<=0)e.state='walk';}
+            if(e.state==='stun'){if(e.timer<=0){
+                e.state='walk';
+                // A completed or parried charge must not leave its attack speed in patrol.
+                if(e.kind==='roller')e.vx=(e.vx<0?-1:1)*55;
+            }}
             else if(e.kind==='wasp'){e.x=e.home+Math.sin(this.time*1.6+e.phase)*e.patrol*.5;e.y=this.stage.enemies[this.enemies.indexOf(e)].y-60+Math.sin(this.time*2.8+e.phase)*36;}
             else if(e.kind==='bottler'||e.kind==='bloom'){
                 e.vx=Math.sign(p.x-e.x)||-1;
@@ -200,7 +209,7 @@ export class DeliciaSimulation {
         for(const m of this.projectiles){m.life-=dt;m.x+=m.vx*dt;m.y+=m.vy*dt;m.vy+=m.gravity*dt;
             if(m.friendly){
                 for(const e of this.enemies)if(e.state!=='dead'&&intersects(m,e)){if(e.kind!=='sentinel'||e.state==='stun')this.hitEnemy(e,1);else{e.state='stun';e.timer=1;}m.life=0;break;}
-                if(this.boss&&intersects(m,this.boss.rect)){if(this.boss.hit()){this.emit('boss-hit',m.x,m.y);this.burst(m.x,m.y,'#ffdc87',20);}m.life=0;}
+                if(this.boss&&intersects(m,this.boss.rect)){this.boss.hit(1,m);m.life=0;}
             }else this.missileContact(m);
             if(this.dead)return;
         }

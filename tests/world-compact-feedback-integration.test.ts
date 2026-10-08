@@ -38,7 +38,15 @@ function setup(t: TestContext) {
     game.menuAccessibility = menu;
     cleanup = () => { game.saveImportCleanup?.(); menu.dispose(); };
     const root = menu.root as unknown as LifecycleElement;
-    const status = () => root.children.find(child => child.getAttribute('role') === 'status');
+    const status = () => {
+        const statuses = root.children.filter(child => child.getAttribute('role') === 'status');
+        assert.equal(statuses.length, 1, 'An active menu keeps exactly one accessible live region mounted.');
+        const status = statuses[0];
+        assert.equal(status.hidden, false); assert.equal(status.parent, root);
+        assert.equal(status.getAttribute('aria-live'), 'polite');
+        assert.equal(status.getAttribute('aria-atomic'), 'true');
+        return status;
+    };
     return { ...h, game, doc, store, writes, root, status };
 }
 
@@ -46,8 +54,8 @@ test('WorldGame imports report full outcomes through compact native Settings, re
     for (const kind of ['invalid', 'read failure', 'storage failure', 'success'] as const) await t.test(kind, async child => {
         const h = setup(child); h.game.render();
         assert.equal(h.root.getAttribute('data-compact'), 'true');
-        assert.equal(h.status(), undefined);
-        const controls = [...h.root.children];
+        const initialStatus = h.status(); assert.equal(initialStatus.textContent, '');
+        const controls = h.root.children.filter(element => element.tagName === 'BUTTON');
         const importButton = controls.find(button => button.getAttribute('aria-label') === 'IMPORTAR PROGRESSO')!;
         importButton.focus(); importButton.click();
         const input = h.body.children.find(element => element.id === 'world-save-import') as unknown as HTMLInputElement;
@@ -63,16 +71,28 @@ test('WorldGame imports report full outcomes through compact native Settings, re
         const expected = { invalid: 'Save inválido ou incompatível.', 'read failure': 'Falha ao ler. Selecione de novo.',
             'storage failure': 'Falha ao salvar. Progresso mantido.', success: 'Progresso importado.' }[kind];
         const feedback = h.status()!;
-        assert.ok(feedback); assert.equal(feedback.textContent, expected);
+        assert.equal(feedback, initialStatus); assert.equal(feedback.textContent, expected);
         assert.equal(feedback.getAttribute('aria-live'), 'polite'); assert.equal(feedback.getAttribute('aria-atomic'), 'true');
         assert.equal(h.doc.activeElement, importButton, 'Status updates must not steal the triggering control focus.');
         assert.deepEqual(h.root.children.filter(element => element.tagName === 'BUTTON'), controls);
         assert.equal(h.root.children.at(-1), feedback, 'Feedback is a separate flow item, not a replacement for controls.');
         assert.equal(h.writes.length, kind === 'success' ? 1 : 0);
+        h.canvas.getBoundingClientRect = () => ({ left: 0, top: 0, width: 640, height: 360, x: 0, y: 0, right: 640, bottom: 360 });
+        h.window.dispatch('resize');
+        assert.equal(h.root.getAttribute('data-compact'), 'false');
+        assert.equal(h.status(), feedback); assert.equal(feedback.textContent, expected);
+        assert.equal(h.doc.activeElement, importButton);
+        assert.deepEqual(h.root.children.filter(element => element.tagName === 'BUTTON'), controls);
         h.game.update(h.game.toastTimer - 1); h.game.render();
         assert.equal(h.status(), feedback, 'Active feedback survives until its real timer expires.');
         h.game.update(1); h.game.render();
-        assert.equal(h.game.toastTimer, 0); assert.equal(h.status(), undefined); assert.equal(feedback.parent, null);
+        assert.equal(h.game.toastTimer, 0); assert.equal(h.status(), feedback); assert.equal(feedback.textContent, '');
+        assert.deepEqual(h.root.children.filter(element => element.tagName === 'BUTTON'), controls);
+        h.canvas.getBoundingClientRect = () => ({ left: 20, top: 30, width: 320, height: 180, x: 20, y: 30, right: 340, bottom: 210 });
+        h.window.dispatch('resize');
+        assert.equal(h.root.getAttribute('data-compact'), 'true');
+        assert.equal(h.status(), feedback); assert.equal(feedback.textContent, '');
+        assert.deepEqual(h.root.children.filter(element => element.tagName === 'BUTTON'), controls);
         assert.equal(h.doc.activeElement, importButton);
     });
 });
@@ -82,9 +102,13 @@ test('WorldGame locked gallery action exposes its explanation, while detail keep
     const island = h.root.children[0]; island.focus(); island.click(); h.game.render();
     assert.equal(h.game.galleryWorld, 0); assert.equal(h.status()?.textContent, 'Encontre os 12 selos desta ilha.');
     assert.equal(h.doc.activeElement, island);
-    h.game.update(1800); h.game.render(); assert.equal(h.status(), undefined);
+    const feedback = h.status();
+    h.game.update(1800); h.game.render(); assert.equal(h.status(), feedback); assert.equal(feedback.textContent, '');
+    assert.equal(h.root.children[0], island); assert.equal(h.doc.activeElement, island);
     h.game.galleryWorld = 1; h.game.render();
-    assert.equal(h.root.getAttribute('data-compact'), 'false'); assert.equal(h.root.children.length, 1);
+    assert.equal(h.root.getAttribute('data-compact'), 'false');
+    assert.equal(h.root.children.filter(element => element.tagName === 'BUTTON').length, 1);
+    assert.equal(h.status(), feedback); assert.equal(feedback.textContent, '');
     assert.equal(h.root.children[0].textContent, 'OUTRAS ILHAS');
     assert.equal(h.root.children[0].style.background, 'transparent');
     assert.equal(h.root.style.height, '180px');

@@ -785,7 +785,7 @@ function worldHarness(ephemeral = false) {
     const store = new ProgressStore({ getItem: key => values.get(key) ?? null, setItem: (key, value) => { values.set(key, value); writes.push(value); } });
     const game = Object.create(WorldGame.prototype) as any, mapRenders: unknown[][] = [];
     Object.assign(game, { store, ephemeral, state: 'map', stage: STAGES[0], selection: 0, time: 1234, toast: '', toastTimer: 0, elapsed: 9,
-        buttons: [{ run() {} }], menuSelection: 0,
+        buttons: [{ run() {} }], menuSelection: 0, camera: { shakeTimer: 0 },
         input: { reset() { calls.push('reset'); }, setMenuMode(value: boolean) { calls.push(`menu:${value}`); } },
         audio: { cancelSpeech() {}, setDying() {}, pause() {}, select() {}, unlock() { calls.push('unlock'); }, sfx(name: string) { calls.push(`sfx:${name}`); } },
         renderer: { startScene() { calls.push('startScene'); }, getContext: () => canvasContext().context, present() { calls.push('present'); } },
@@ -827,7 +827,9 @@ test('WorldGame navigation changes only session selection, never persisted arriv
 
 test('completion preserves the played arrival in storage while keeping the unlocked next target session-only', () => {
     const h = worldHarness(); h.game.stage = STAGES[4]; h.game.state = 'playing'; h.store.save.completed = STAGES.slice(0, 4).map(stage => stage.id);
+    h.game.camera.shakeTimer = 130;
     h.game.complete(false); assert.equal(h.game.state, 'clear'); assert.equal(h.game.nextMapSelection, '2-1');
+    assert.equal(h.game.camera.shakeTimer, 0);
     assert.equal(h.store.save.selected, '1-5'); assert.equal(JSON.parse(h.values.get(SAVE_KEY)!).selected, '1-5'); assert.ok(h.store.save.completed.includes('1-5'));
     h.game.toMap(); assert.equal(h.game.selection, 5); assert.deepEqual(h.game.mapReturn, { playedStage: '1-5', nextSelected: '2-1' });
     assert.equal(h.store.save.selected, '1-5');

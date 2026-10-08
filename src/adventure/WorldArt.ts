@@ -70,7 +70,7 @@ export class WorldArt {
             rect(c, e.homeX - (e.spec.range ?? 48) - cx, y - 10, (e.spec.range ?? 48) * 2 + 22, 2, '#43596d');
             rect(c, x + 10, y - 10, 2, 12, '#a4b3b9');
         }
-        if (e.phase === 'warning') {
+        if (!e.dead && e.phase === 'warning') {
             // The charger's 36 px artwork reaches above its 27 px contact box.
             // Anchor its tell to the painted head so the meter never masks the brace.
             const warningY = e.spec.kind === 'charger' ? y + e.height - foeFrame('charger', 'warning', 0).length : y;
@@ -81,7 +81,7 @@ export class WorldArt {
                 for (let i = 1; i <= 3; i++)
                     pixelText(c, e.facing > 0 ? '→' : '←', x + e.width / 2 + e.facing * i * 18, y + e.height - 4, '#f4c895', 1, 'center');
         }
-        if (e.phase === 'attack' && e.spec.kind === 'charger')
+        if (!e.dead && e.phase === 'attack' && e.spec.kind === 'charger')
             for (let i = 0; i < 3; i++)
                 rect(c, x - e.facing * (i * 8 + 4), y + e.height - 3, 5 - i, 2, '#d9c094');
         c.save();
@@ -93,11 +93,11 @@ export class WorldArt {
         const frame = frames ? e.dead ? MINION_SQUASH : frames[Math.floor(e.age / 150) % frames.length] : foeFrame(e.spec.kind as Exclude<typeof e.spec.kind, 'minion'>, e.dead ? 'stunned' : e.phase, e.phase === 'walk' ? e.age : e.timer, e.armor, this.foeMotion?.matches ?? false);
         const xx = x + e.width / 2 - frame[0].length / 2, yy = y + e.height - frame.length - (e.dead ? Math.sin(e.deadTimer / 360 * Math.PI) * 12 : 0);
         this.atlas.draw(c, frame, frames ? SPRITE_PALETTE : WORLD_PALETTE, xx, yy, e.facing > 0);
-        if (e.spec.kind === 'helmet' && !e.armor && e.phase === 'stunned') {
+        if (!e.dead && e.spec.kind === 'helmet' && !e.armor && e.phase === 'stunned') {
             rect(c, x - 7, y - 12 - e.timer * .012, 13, 4, '#edc267');
             rect(c, x - 4, y - 15 - e.timer * .012, 7, 3, '#ffe7a4');
         }
-        if (e.phase === 'rest' && e.spec.kind === 'charger')
+        if (!e.dead && e.phase === 'rest' && e.spec.kind === 'charger')
             pixelText(c, '...', x + e.width / 2, y - 9, '#a8d3da', 1, 'center');
         c.restore();
     }
@@ -109,13 +109,14 @@ export class WorldArt {
             pixelText(c, '!', 280 - cx, 202 - cy, '#ffebbb', 1, 'center');
         }
         if (b.phase === 'warning' && b.character !== 'calabrezzo') {
-            const x = b.targetX - cx - 25;
-            rect(c, x, 222 - cy, 50, 2, Math.floor(time / 100) % 2 ? '#ffdb8c' : '#c95f69');
+            // The leap lands across 56 px; its tell must cover both outer edges.
+            const width = b.pattern === 'leap' ? 56 : 50, x = b.targetX - cx - width / 2;
+            rect(c, x, 222 - cy, width, 2, Math.floor(time / 100) % 2 ? '#ffdb8c' : '#c95f69');
             for (let i = 0; i < 5; i++)
-                rect(c, x + i * 11, 216 - cy, 4, 3, '#e7ba73');
+                rect(c, x + i * (width - 6) / 4, 216 - cy, 4, 3, '#e7ba73');
         }
         if (b.pattern === 'leap' && ['warning', 'attack'].includes(b.phase)) {
-            rect(c, b.targetX - cx - 22, 222 - cy, 44, 2, '#eabd7f');
+            rect(c, b.targetX - cx - 28, 222 - cy, 56, 2, '#eabd7f');
             pixelText(c, '↓', b.targetX - cx, 205 - cy, '#ffe0a3', 1, 'center');
         }
         if (b.character === 'biel' && b.pattern === 'doubleCargo' && ['warning', 'attack'].includes(b.phase)) {

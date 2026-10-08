@@ -1,5 +1,6 @@
 import { importProgressFile, progressImportMessage } from './ProgressImport';
 import { JournalAccessibility } from './JournalAccessibility';
+import { WorldResultAccessibility, clearResultReceipt, endingResultReceipt } from './WorldResultAccessibility';
 import { campaignJournal } from './CampaignJournal';
 import { CanvasMenuAccessibility } from './CanvasMenuAccessibility';
 import { WorldHudAccessibility } from './WorldHudAccessibility';
@@ -41,6 +42,7 @@ type Screen = 'title' | 'intro' | 'map' | 'playing' | 'paused' | 'dialogue' | 'c
 interface Button extends Rect {
     label: string;
     ariaLabel?: string;
+    ariaDescribedBy?: string;
     run: () => void;
     nativeActivation?: boolean;
 }
@@ -90,6 +92,7 @@ export class WorldGame {
     private hudAccessibility?: WorldHudAccessibility;
     private controlsHelp?: WorldControlsHelp;
     private journalAccessibility?: JournalAccessibility;
+    private resultAccessibility?: WorldResultAccessibility;
     private selection = 0;
     private menuSelection = 0;
     private checkpoint = -1;
@@ -157,6 +160,8 @@ export class WorldGame {
             if (!ephemeral && typeof document.body?.append === 'function') {
                 this.journalAccessibility = new JournalAccessibility(canvas);
                 this.addCleanup(() => this.journalAccessibility?.dispose());
+                this.resultAccessibility = new WorldResultAccessibility(canvas);
+                this.addCleanup(() => this.resultAccessibility?.dispose());
                 this.menuAccessibility = new CanvasMenuAccessibility(canvas, {
                     select: index => { this.menuSelection = index; },
                     activate: index => { this.audio.unlock(); this.buttons[index]?.run(); },
@@ -295,7 +300,8 @@ export class WorldGame {
         this.render();
         this.requestFrame();
     };
-    private change(screen: Screen) { if (this.isDisposed) return; this.invalidateFrozenMenuPaint(); this.controlsHelp?.close(false); this.menuAccessibility?.clear(); this.journalAccessibility?.clear(); if (screen !== 'map') this.mapView?.hide(); this.state = screen; this.hitStopInput = null; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; }
+    private change(screen: Screen) { if (this.isDisposed) return; this.invalidateFrozenMenuPaint(); this.controlsHelp?.close(false); this.menuAccessibility?.clear(); this.journalAccessibility?.clear(); this.resultAccessibility?.clear(); if (screen !== 'map') this.mapView?.hide(); this.state = screen; this.hitStopInput = null; this.input.reset(); this.input.setMenuMode(screen !== 'playing'); this.menuSelection = 0; this.buttons = []; }
+
     private menuKey(e: KeyboardEvent) {
         if (e.ctrlKey || e.metaKey || e.altKey) return;
         if (this.chapterActive || this.controlsHelp?.isOpen || this.flightCleanup) return;
@@ -465,6 +471,7 @@ export class WorldGame {
         this.deathFeedbackStarted = false;
         this.audio.setDying(false);
         this.player.data.hasHelmet = this.checkpointHelmet;
+        this.camera.shakeTimer = 0;
         this.camera.bounds = this.level.getBounds();
         this.camera.x = clamp(this.player.data.position.x - 100, 0, Math.max(0, this.level.data.width * 16 - 320));
         this.camera.y = clamp(this.player.data.position.y - 112, 0, this.level.data.height * 16 - 180);
@@ -629,6 +636,8 @@ export class WorldGame {
             this.hitStop = Math.max(0, this.hitStop - dt);
             return;
         }
+        // Impact shake resumes after hitstop, including the boss defeat animation.
+        this.camera.shakeTimer = Math.max(0, this.camera.shakeTimer - dt);
         if(this.boss?.phase==='defeated') {
             this.hitStopInput = null;
             this.level.updateDynamicTiles(dt);
@@ -639,7 +648,6 @@ export class WorldGame {
             return;
         }
         this.elapsed += dt / 1000;
-        this.camera.shakeTimer = Math.max(0, this.camera.shakeTimer - dt);
         if (this.player.data.isDead) {
             this.beginDeathFeedback();
             this.player.advanceDeath(dt);
@@ -685,7 +693,7 @@ export class WorldGame {
             this.beginDeathFeedback();
             return;
         }
-        if (beforeV >= 0 && this.player.data.velocity.y < 0 && input.jumpPressed)
+        if (result.jumpStarted)
             this.audio.sfx('jump');
         if (result.groundPoundImpact) {
             const p = result.groundPoundImpact;
@@ -872,6 +880,7 @@ export class WorldGame {
     }
     private bounce(y: number) { this.player.bounceFromSurface(y); }
     private complete(secret: boolean) {
+        this.camera.shakeTimer = 0;
         finishStage(this.store.save, this.stage.id, secret ? 'secret' : 'normal', this.recordEligible ? this.elapsed : null);
         this.nextMapSelection = this.store.save.selected;
         // Unlock the next stage now, but save only the place Feka has reached.
@@ -979,7 +988,13 @@ export class WorldGame {
         }
         this.mapView?.hide();
         this.paintCanvasIfNeeded();
-        if (this.flightCleanup || (typeof document !== 'undefined' && document.hidden) || this.state === 'playing')
+        const result = this.chapterActive || this.flightCleanup ? null
+            : this.state === 'clear' ? clearResultReceipt(this.stage.name, this.elapsed, this.coins, this.clearSecret, this.recordEligible)
+            : this.state === 'ending' ? endingResultReceipt(this.store.save) : null;
+        const resultId = this.resultAccessibility?.sync(result);
+        if (this.buttons[0]) this.buttons[0].ariaDescribedBy = resultId;
+        if (this.chapterActive || this.flightCleanup || (typeof document !== 'undefined' && document.hidden) || this.state === 'playing')
+
             this.menuAccessibility?.clear({ restoreFocus: false });
         else this.menuAccessibility?.sync(this.menuIdentity(), this.state === 'title' ? 'Menu principal' : this.state === 'settings' ? 'Opções' : this.state === 'paused' ? `Pausa · ${this.stage.id} · ${this.stage.name}` : 'Aventura', this.buttons, this.menuSelection, this.toastTimer > 0 ? this.toast : '');
     }
@@ -1106,7 +1121,7 @@ export class WorldGame {
         this.renderer.present();
     }
     private renderLevel(c: CanvasRenderingContext2D) {
-        const shake = this.store.save.preferences.shake && this.camera.shakeTimer > 0 ? (Math.floor(this.time / 40) % 2 ? 1 : -1) : 0;
+        const shake = this.store.save.preferences.shake && !this.renderer.reducedMotion && this.camera.shakeTimer > 0 ? (Math.floor(this.time / 40) % 2 ? 1 : -1) : 0;
         const view = { ...this.camera, x: this.camera.x + shake, y: this.camera.y };
         const cx = Math.round(view.x), cy = Math.round(view.y), island = ISLANDS[this.stage.world - 1];
         this.art.background(c, island, cx, cy, this.time, this.stage.number);

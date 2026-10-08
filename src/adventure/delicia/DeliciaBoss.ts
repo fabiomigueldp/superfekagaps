@@ -2,6 +2,7 @@ import type { Box } from './DeliciaContent';
 export type BossBeat = 'intro'|'idle'|'tell'|'attack'|'recover'|'stagger'|'transition'|'defeated';
 export type BossAttack = 'cup'|'wave'|'charge'|'whirlpool'|'geyser'|'gap'|'court'|'press'|'overload';
 export interface BossMissile extends Box {vx:number;vy:number;gravity:number;kind:'juice'|'heart'|'seed'|'wave';life:number;friendly:boolean}
+export interface BossHit {x:number;y:number;stomp?:boolean}
 export interface BossEvent {kind:'tell'|'impact'|'shot'|'gap'|'phase'|'defeat';x:number;y:number;w?:number;attack?:BossAttack}
 export const bossPhase = (hp:number,max:number) => hp>max*.66?1:hp>max*.33?2:3;
 const BOSS_HOME_X = 780;
@@ -15,7 +16,7 @@ export class DeliciaBoss {
     danger:Box[]=[];gaps:(Box&{life:number})[]=[];private timer=0;private combo=0;private shot=false;private hitCooldown=0;
     private startX=BOSS_HOME_X;private relief=0;private pressureShield=false;
     beatTime=0;hitFlash=0;attackSerial=0;private duration=1;private pulses=0;private chargeEnd=290;
-    constructor(readonly character:'jaja'|'guina',readonly assist=false){this.maxHp=character==='jaja'?12:24;this.hp=this.maxHp;this.shield=character==='guina';}
+    constructor(readonly character:'jaja'|'guina',readonly assist=false,private readonly onHit?:(impact:BossHit)=>void){this.maxHp=character==='jaja'?12:24;this.hp=this.maxHp;this.shield=character==='guina';}
     start():void{this.beat='idle';this.timer=.6;}
     get vulnerable():boolean{return(this.beat==='recover'||this.beat==='stagger')&&!this.shield&&this.hp>0;}
     get progress():number{return this.beat==='tell'?Math.min(1,1-this.timer/this.tellDuration):0;}
@@ -26,7 +27,8 @@ export class DeliciaBoss {
         if(this.attack==='geyser')return[0,1,2].map(i=>({x:350+i*270,y:190,w:65,h:260}));
         if(this.attack==='overload')return[{x:650,y:0,w:45,h:450}];
         if(this.attack==='gap')return[this.target];
-        if(this.attack==='charge')return[{x:Math.min(this.x,this.chargeEnd),y:420,w:Math.abs(this.x-this.chargeEnd)+this.w,h:30}];
+        // Keep the floor-lane width, but show the same jump clearance as the lower charge hitbox.
+        if(this.attack==='charge')return[{x:Math.min(this.x,this.chargeEnd),y:this.y+60,w:Math.abs(this.x-this.chargeEnd)+this.w,h:this.h-60}];
         return[];
     }
     get tellDuration():number{return(this.character==='jaja'?1.05:1.15)-.12*(this.phase-1)+(this.assist?.35:0);}
@@ -46,9 +48,11 @@ export class DeliciaBoss {
         if(this.beat==='recover'){this.beat='stagger';this.timer=1.7;}
         return true;
     }
-    hit(power=1):boolean {
+    hit(power=1,impact:BossHit={x:this.x,y:this.y}):boolean {
         if(!this.vulnerable||this.hitCooldown>0)return false;
         this.hp=Math.max(0,this.hp-power);this.hitCooldown=.8;this.hitFlash=.2;
+        // Report accepted damage immediately, including reflected missiles and final hits.
+        this.onHit?.(impact);
         if(this.hp===0){this.beat='defeated';this.danger=[];this.missiles=[];this.gaps=[];this.events.push({kind:'defeat',x:this.x,y:this.y});return true;}
         const phase=bossPhase(this.hp,this.maxHp);
         if(phase!==this.phase){this.phase=phase;this.events.push({kind:'phase',x:this.x,y:this.y});this.beat='transition';this.timer=1.8;this.beatTime=0;this.shield=false;this.danger=[];this.missiles=[];this.gaps=[];}
@@ -59,7 +63,7 @@ export class DeliciaBoss {
         this.events=[];this.time+=dt;this.beatTime+=dt;this.hitFlash=Math.max(0,this.hitFlash-dt);this.hitCooldown=Math.max(0,this.hitCooldown-dt);this.relief=Math.max(0,this.relief-dt);
         this.gaps=this.gaps.filter(g=>{g.life-=dt;return g.life>0;});
         for(const m of this.missiles){m.life-=dt;m.x+=m.vx*dt;m.y+=m.vy*dt;m.vy+=m.gravity*dt;if(m.friendly&&intersects(m,this.rect)){
-            if(!this.hit()){this.pressure=Math.max(0,this.pressure-30);if(this.pressure<25){this.shield=false;this.relief=4;if(this.beat==='recover'){this.beat='stagger';this.timer=1.1;}}}m.life=0;}}
+            if(!this.hit(1,m)){this.pressure=Math.max(0,this.pressure-30);if(this.pressure<25){this.shield=false;this.relief=4;if(this.beat==='recover'){this.beat='stagger';this.timer=1.1;}}}m.life=0;}}
         this.missiles=this.missiles.filter(m=>m.life>0&&m.y<700&&m.x>-100&&m.x<1440);
         if(this.beat==='intro'||this.beat==='defeated')return;
         this.timer-=dt;this.danger=[];
