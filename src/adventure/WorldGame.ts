@@ -458,6 +458,7 @@ export class WorldGame {
         this.deathFeedbackStarted = false;
         this.audio.setDying(false);
         this.player.data.hasHelmet = this.checkpointHelmet;
+        this.camera.shakeTimer = 0;
         this.camera.bounds = this.level.getBounds();
         this.camera.x = clamp(this.player.data.position.x - 100, 0, Math.max(0, this.level.data.width * 16 - 320));
         this.camera.y = clamp(this.player.data.position.y - 112, 0, this.level.data.height * 16 - 180);
@@ -622,6 +623,8 @@ export class WorldGame {
             this.hitStop = Math.max(0, this.hitStop - dt);
             return;
         }
+        // Impact shake resumes after hitstop, including the boss defeat animation.
+        this.camera.shakeTimer = Math.max(0, this.camera.shakeTimer - dt);
         if(this.boss?.phase==='defeated') {
             this.hitStopInput = null;
             this.level.updateDynamicTiles(dt);
@@ -632,7 +635,6 @@ export class WorldGame {
             return;
         }
         this.elapsed += dt / 1000;
-        this.camera.shakeTimer = Math.max(0, this.camera.shakeTimer - dt);
         if (this.player.data.isDead) {
             this.beginDeathFeedback();
             this.player.advanceDeath(dt);
@@ -866,6 +868,7 @@ export class WorldGame {
     private bounce(y: number) { if (this.player.data.isDead)
         return; this.player.data.position.y = y - this.player.data.height; this.player.data.velocity.y = -7; this.player.data.isGrounded = false; this.player.data.groundPoundState = GroundPoundState.NONE; this.player.data.invincibleTimer = Math.max(150, this.player.data.invincibleTimer); }
     private complete(secret: boolean) {
+        this.camera.shakeTimer = 0;
         finishStage(this.store.save, this.stage.id, secret ? 'secret' : 'normal', this.recordEligible ? this.elapsed : null);
         this.nextMapSelection = this.store.save.selected;
         // Unlock the next stage now, but save only the place Feka has reached.
