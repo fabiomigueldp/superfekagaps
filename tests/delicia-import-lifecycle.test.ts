@@ -15,7 +15,7 @@ function fixture(t: TestContext) {
     class Element extends EventTarget {
         style: Record<string, string> = {};
         className = ''; dataset: Record<string, string> = {}; hidden = false; disabled = false;
-        type = ''; size = 0; style = {}; files: { size: number; text(): Promise<string> }[] = [];
+        type = ''; size = 0; files: { size: number; text(): Promise<string> }[] = [];
         onchange: (() => Promise<void>) | null = null; oncancel: (() => void) | null = null;
         textContent = ''; parent: Element | null = null; children: Element[] = [];
         attributes = new Map<string, string>(); captureFails = false;
