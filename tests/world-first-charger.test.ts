@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { STAGES, stageById } from '../src/adventure/campaign';
 import { WorldGame } from '../src/adventure/WorldGame';
+import { WorldArt } from '../src/adventure/WorldArt';
 import { WorldFoe, type FoePhase } from '../src/adventure/WorldEnemies';
 import { ProgressStore } from '../src/adventure/progress';
 import { WorldTutorial } from '../src/adventure/WorldTutorial';
@@ -142,4 +143,59 @@ test('the first charger remains dangerous if its vulnerable recovery is ignored'
     assert.equal(h.game.player.data.isDead, true, 'The margin teaches one cycle; it is not a permanent safe spot.');
     assert.equal(h.foe.dead, false);
     assert.equal(h.events.filter(e => e.phase === 'attack').length, 2);
+});
+
+/** Capture production paint calls while leaving the existing death sprite/fade intact. */
+function deathCuePaint(foe: WorldFoe) {
+    const art = new WorldArt();
+    const rectangles: { color: string; alpha: number }[] = [], spriteAlpha: number[] = [];
+    let savedAlpha = 1;
+    const context = {
+        fillStyle: '', globalAlpha: 1,
+        save() { savedAlpha = this.globalAlpha; }, restore() { this.globalAlpha = savedAlpha; },
+        fillRect() { rectangles.push({ color: this.fillStyle, alpha: this.globalAlpha }); }
+    };
+    art.atlas.draw = () => { spriteAlpha.push(context.globalAlpha); };
+    art.foe(context as unknown as CanvasRenderingContext2D, foe, foe.x - 120, 0, 0);
+    return { rectangles, spriteAlpha };
+}
+
+test('authored first charger loses warning cues immediately when a ground pound defeats it', () => {
+    const h = firstChargerHarness();
+    arrive(h, { run: true, hold: 9, takeoff: 125.8 }); observeFirstCharge(h); alive(h);
+    for (let frame = 0; frame < 65; frame++) h.step();
+    for (let frame = 0; frame < 90 && !h.foe.dead; frame++) {
+        h.step({ right: h.game.player.data.position.x < h.foe.x + 3,
+            jump: frame < 9, jumpPressed: frame === 0, jumpReleased: frame === 9,
+            down: frame >= 10, downPressed: frame === 10 });
+        alive(h);
+    }
+    assert.equal(h.foe.dead, true);
+    assert.equal(h.foe.phase, 'warning', 'The native kill interrupts the next warning.');
+    assert.ok(h.effects.includes('hit'));
+    for (let frame = 0; frame <= 22; frame++) {
+        const paint = deathCuePaint(h.foe);
+        assert.deepEqual(paint.rectangles, [], 'No warning meter, exclamation or directional arrows may survive defeat.');
+        assert.deepEqual(paint.spriteAlpha, h.foe.deadTimer > 360 ? [] : [Math.max(0, 1 - h.foe.deadTimer / 360)]);
+        h.step(); alive(h);
+    }
+});
+
+test('live foe cues remain visible; defeat suppresses attack, recovery and loose-helmet overlays', () => {
+    for (const phase of ['warning', 'attack', 'rest'] as const) {
+        const foe = new WorldFoe({ id: 'cue', kind: 'charger', x: 120, y: 176 });
+        foe.phase = phase; foe.timer = 300;
+        assert.ok(deathCuePaint(foe).rectangles.length > 0);
+        assert.equal(foe.contact({ x: 122, y: foe.y - 10, width: 14, height: 20 },
+            { x: 122, y: foe.y - 21, width: 14, height: 20 }, true, true), 'kill');
+        assert.deepEqual(deathCuePaint(foe).rectangles, []);
+        assert.deepEqual(deathCuePaint(foe).spriteAlpha, [1]);
+    }
+    const helmet = new WorldFoe({ id: 'helmet-cue', kind: 'helmet', x: 120, y: 176 });
+    const player = { x: 122, y: helmet.y - 10, width: 14, height: 20 };
+    const previous = { ...player, y: helmet.y - 21 };
+    assert.equal(helmet.contact(player, previous, true, false), 'bounce');
+    assert.ok(deathCuePaint(helmet).rectangles.length > 0);
+    assert.equal(helmet.contact(player, previous, true, false), 'kill');
+    assert.deepEqual(deathCuePaint(helmet).rectangles, []);
 });
