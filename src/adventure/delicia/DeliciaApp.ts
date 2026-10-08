@@ -428,6 +428,17 @@ export class DeliciaApp {
         this.panel.append(entries);this.focusFirst();
     }
     private closeJournal():void{this.journalReturn();}
+    private persistSettings():void {
+        const previousWarning=this.store.warning;
+        if(!this.store.persist()){
+            const message=this.panel.querySelector('.dl-save-warning p');
+            if(message&&message.textContent!==this.store.warning)message.textContent=this.store.warning;
+            if(this.settingsMessage?.textContent!==this.store.warning)this.announce(this.store.warning);
+        }else{
+            this.panel.querySelector('.dl-save-warning')?.remove();
+            if(previousWarning&&this.settingsMessage?.textContent===previousWarning)this.announce('');
+        }
+    }
     private showSettings(back:()=>void=()=>this.showMap()):void {
         this.settingsReturn=back;this.setScreen('settings');this.panel.classList.add('dl-settings');
         const head=element('header','dl-section-head');head.append(heading('Opções'),button('Voltar',()=>this.settingsReturn(),'dl-button dl-small'));this.panel.append(head);
@@ -437,13 +448,13 @@ export class DeliciaApp {
         for(const key of ['music','effects'] as const){
             const label=element('label','dl-setting');label.append(element('span','',key==='music'?'Música':'Efeitos e vozes'));const range=element('input'),value=element('output','',`${Math.round(this.store.save[key]*100)}%`);
             range.type='range';range.min='0';range.max='1';range.step='.05';range.value=String(this.store.save[key]);
-            range.addEventListener('input',()=>{this.store.save[key]=Number(range.value);value.value=`${Math.round(Number(range.value)*100)}%`;this.audio.setVolume(this.store.save.music,this.store.save.effects);this.store.persist();});label.append(range,value);audio.append(label);
+            range.addEventListener('input',()=>{this.store.save[key]=Number(range.value);value.value=`${Math.round(Number(range.value)*100)}%`;this.audio.setVolume(this.store.save.music,this.store.save.effects);this.persistSettings();});label.append(range,value);audio.append(label);
         }
         this.panel.append(audio);
         const play=element('fieldset','dl-setting-group');play.append(element('legend','','Jogo'));
         for(const key of ['reducedMotion','assists'] as const){
             const label=element('label','dl-setting'),input=element('input');input.type='checkbox';input.checked=this.store.save[key];
-            input.addEventListener('change',()=>{this.store.save[key]=input.checked;this.store.persist();if(key==='reducedMotion')this.updateMotionHint();});
+            input.addEventListener('change',()=>{this.store.save[key]=input.checked;this.persistSettings();if(key==='reducedMotion')this.updateMotionHint();});
             label.append(element('span','',key==='reducedMotion'?'Sempre reduzir movimento':'Mais vida e avisos longos'),input);play.append(label);
             if(key==='reducedMotion'){const hint=element('small','dl-muted');hint.id='dl-motion-hint';hint.setAttribute('aria-live','polite');input.setAttribute('aria-describedby',hint.id);play.append(hint);this.motionHint=hint;this.updateMotionHint();}
             if(key==='assists'){const hint=element('small','dl-muted','Ajuda: vale na próxima fase. Desativa recordes e medalhas.');hint.id='dl-assists-hint';input.setAttribute('aria-describedby',hint.id);play.append(hint);}
