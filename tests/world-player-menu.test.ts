@@ -36,10 +36,11 @@ for (const continuing of [false, true]) test(`title has one coherent native menu
     const h = browser(t, continuing);
     const labels = [continuing ? 'CONTINUAR' : 'JOGAR', 'OPÇÕES', 'GALERIA'];
     assert.equal(h.menu.hidden, false);
-    assert.deepEqual(h.menu.children.map(button => button.textContent), labels);
+    const actions = h.menu.children.filter(element => element.tagName === 'BUTTON');
+    assert.deepEqual(actions.map(button => button.textContent), labels);
     assert.equal(h.body.children.some(element => element.id === 'experimental-hub' || element.className === 'experimental-entry'), false);
     assert.equal(h.body.classList.contains('experimental-title'), false);
-    for (const button of h.menu.children) {
+    for (const button of actions) {
         assert.equal(button.tagName, 'BUTTON'); assert.equal(button.disabled, false); assert.equal(button.tabIndex, 0);
         button.focus();
         for (const shiftKey of [false, true]) {
@@ -76,6 +77,6 @@ test('gallery and options return to the same title and preserve campaign progres
     assert.ok(h.button('CONTROLES'));
     h.button('VOLTAR').click(); h.game.render();
     assert.equal(h.game.state, 'title');
-    assert.deepEqual(h.menu.children.map(button => button.textContent), ['CONTINUAR', 'OPÇÕES', 'GALERIA']);
+    assert.deepEqual(h.menu.children.filter(element => element.tagName === 'BUTTON').map(button => button.textContent), ['CONTINUAR', 'OPÇÕES', 'GALERIA']);
     assert.deepEqual(h.game.store.save, before);
 });

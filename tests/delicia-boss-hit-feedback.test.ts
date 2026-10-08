@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { GroundPoundState } from '../src/types';
 import { bossPhase, type BossMissile } from '../src/adventure/delicia/DeliciaBoss';
 import { DELICIA_STAGES } from '../src/adventure/delicia/DeliciaContent';
 import { DeliciaSimulation, noDeliciaInput } from '../src/adventure/delicia/DeliciaSimulation';
@@ -19,6 +20,7 @@ function contact(sim: DeliciaSimulation, source: Source): { x: number; y: number
     const boss = sim.boss!;
     if (source === 'stomp' || source === 'pound') {
         Object.assign(sim.player, { x: boss.x + 20, y: boss.y - sim.player.h - 1, grounded: false, vy: 300, pounding: source === 'pound' });
+        sim.nativePlayer.data.groundPoundState = source === 'pound' ? GroundPoundState.FALL : GroundPoundState.NONE;
         return { x: boss.x, y: boss.y };
     }
     const missile: BossMissile = { x: boss.x + 5, y: boss.y + 50, w: 12, h: 10,

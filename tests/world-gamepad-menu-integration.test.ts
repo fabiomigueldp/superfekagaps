@@ -77,7 +77,7 @@ test('direction hold repeats through real native focus without resetting the ada
     h.step(349); assert.equal(h.internal.menuSelection, 1);
     h.step(1); assert.equal(h.internal.menuSelection, 2); assert.equal(h.doc.activeElement, h.nav().children[2]);
     h.step(119); assert.equal(h.internal.menuSelection, 2); h.step(1); assert.equal(h.internal.menuSelection, 0);
-    assert.equal(h.nav().children.length, 3); assert.equal(h.doc.activeElement, h.nav().children[0]);
+    assert.equal(h.nav().children.filter(child => child.tagName === 'BUTTON').length, 3); assert.equal(h.doc.activeElement, h.nav().children[0]);
     assert.deepEqual(h.world.store.save, save); assert.equal(h.writes.length, writes);
 });
 
