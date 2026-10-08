@@ -678,7 +678,7 @@ export class WorldGame {
             this.beginDeathFeedback();
             return;
         }
-        if (beforeV >= 0 && this.player.data.velocity.y < 0 && input.jumpPressed)
+        if (result.jumpStarted)
             this.audio.sfx('jump');
         if (result.groundPoundImpact) {
             const p = result.groundPoundImpact;
@@ -1018,7 +1018,7 @@ export class WorldGame {
         this.renderer.present();
     }
     private renderLevel(c: CanvasRenderingContext2D) {
-        const shake = this.store.save.preferences.shake && this.camera.shakeTimer > 0 ? (Math.floor(this.time / 40) % 2 ? 1 : -1) : 0;
+        const shake = this.store.save.preferences.shake && !this.renderer.reducedMotion && this.camera.shakeTimer > 0 ? (Math.floor(this.time / 40) % 2 ? 1 : -1) : 0;
         const view = { ...this.camera, x: this.camera.x + shake, y: this.camera.y };
         const cx = Math.round(view.x), cy = Math.round(view.y), island = ISLANDS[this.stage.world - 1];
         this.art.background(c, island, cx, cy, this.time, this.stage.number);
