@@ -158,7 +158,11 @@ export class DeliciaSimulation {
             if(disabled||!intersects(p,machine))continue;
             if(machine.kind==='press'&&phase==='active')this.hurt(machine.x+machine.w/2);
             if(this.dead)return;
-            if(machine.kind==='jet'&&phase==='active'&&this.jetCooldown===0){p.vy=-(machine.power??800);p.grounded=false;p.pounding=false;this.jetCooldown=.55;this.emit('jet',machine.x,machine.y);this.burst(p.x,p.y+45,'#ffdc85',20);}
+            if(machine.kind==='jet'&&phase==='active'&&this.jetCooldown===0){
+                // A forced launch ends every native pound phase, including windup.
+                this.nativePlayer.data.groundPoundState=GroundPoundState.NONE;this.nativePlayer.data.groundPoundTimer=0;
+                p.vy=-(machine.power??800);p.grounded=false;p.pounding=false;this.jetCooldown=.55;this.emit('jet',machine.x,machine.y);this.burst(p.x,p.y+45,'#ffdc85',20);
+            }
             if(machine.kind==='wind'){p.vx+=(machine.power??0)*dt;if(!p.pounding&&p.vy> -180)p.vy=Math.max(-180,p.vy-2300*dt);}
         }
     }
