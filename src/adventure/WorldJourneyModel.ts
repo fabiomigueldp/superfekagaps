@@ -18,6 +18,9 @@ export type JourneyEdgeDirection = 'forward' | 'reverse' | 'both' | 'none';
 export interface JourneyCapabilities {
     /** Derive these IDs with the existing progression rules, including secrets. */
     availableStages: readonly string[];
+    /** Named chapters supply their authored stage order; transport junctions
+     * remain ordinary network nodes, never enterable stages. */
+    stageOrder?: readonly string[];
     /** Omit to enable every authored edge; supply to gate shortcuts or crossings. */
     availableEdges?: readonly string[];
     /** Departure permissions relative to each authored from/to pair. Omitted
@@ -39,21 +42,22 @@ export interface JourneyLeg extends JourneyEdge {
 
 const SAIL_BRAKE_SECONDS = .22, SAIL_PAUSE_SECONDS = .1, SAIL_ACCEL_SECONDS = .3;
 const SAIL_MANEUVER_SECONDS = SAIL_BRAKE_SECONDS + SAIL_PAUSE_SECONDS + SAIL_ACCEL_SECONDS;
+const sailThrottle = (value: number) => { const t = Math.max(0, Math.min(1, value)); return t * t * (3 - 2 * t); };
+const integratedThrottle = (t: number) => t ** 3 - t ** 4 / 2;
 /** Signed fraction of the normal sail clock speed, including a retarget brake. */
 export function sailClockVelocity(leg: JourneyLeg): number {
     const maneuver = leg.sailManeuver;
     if (!maneuver) return leg.direction;
     if (maneuver.elapsed < SAIL_BRAKE_SECONDS)
-        return maneuver.initialVelocity * (1 - maneuver.elapsed / SAIL_BRAKE_SECONDS);
+        return maneuver.initialVelocity * (1 - sailThrottle(maneuver.elapsed / SAIL_BRAKE_SECONDS));
     if (maneuver.elapsed <= SAIL_BRAKE_SECONDS + SAIL_PAUSE_SECONDS) return 0;
-    return leg.direction * Math.max(0, Math.min(1,
-        (maneuver.elapsed - SAIL_BRAKE_SECONDS - SAIL_PAUSE_SECONDS) / SAIL_ACCEL_SECONDS));
+    return leg.direction * sailThrottle((maneuver.elapsed - SAIL_BRAKE_SECONDS - SAIL_PAUSE_SECONDS) / SAIL_ACCEL_SECONDS);
 }
 function maneuverDistance(leg: JourneyLeg, elapsed: number): number {
     const brake = Math.min(elapsed, SAIL_BRAKE_SECONDS);
     const accelerate = Math.max(0, Math.min(SAIL_ACCEL_SECONDS, elapsed - SAIL_BRAKE_SECONDS - SAIL_PAUSE_SECONDS));
-    return leg.sailManeuver!.initialVelocity * (brake - brake * brake / (2 * SAIL_BRAKE_SECONDS))
-        + leg.direction * accelerate * accelerate / (2 * SAIL_ACCEL_SECONDS);
+    return leg.sailManeuver!.initialVelocity * (brake - SAIL_BRAKE_SECONDS * integratedThrottle(brake / SAIL_BRAKE_SECONDS))
+        + leg.direction * SAIL_ACCEL_SECONDS * integratedThrottle(accelerate / SAIL_ACCEL_SECONDS);
 }
 
 /** Keep the authored sail clock and polyline, with gentle departure/arrival
@@ -108,18 +112,21 @@ const stageIndex = (id: string) => Number(id[0]) * 5 + Number(id[2]);
 const copy = (point: MapPoint): MapPoint => ({ x: point.x, y: point.y });
 const same = (a: MapPoint, b: MapPoint) => Math.hypot(a.x - b.x, a.y - b.y) < 1e-9;
 const validPoint = (point: MapPoint | undefined): point is MapPoint => !!point && Number.isFinite(point.x) && Number.isFinite(point.y);
-const available = (id: string, capabilities: JourneyCapabilities) => stageId(id) && capabilities.availableStages.includes(id);
+const isStage = (id: string, capabilities: JourneyCapabilities) => capabilities.stageOrder
+    ? capabilities.stageOrder.includes(id) : stageId(id);
+const available = (id: string, capabilities: JourneyCapabilities) => isStage(id, capabilities) && capabilities.availableStages.includes(id);
 
 /** Old saves may point to a locked selection. Recover at the nearest earlier
  * available stage, while retaining the selected ID so the UI can explain its gate.
  * No in-flight position is serialized: reloading during travel returns to arrived.
  */
 export function createJourney(savedSelected: string, network: JourneyNetwork, capabilities: JourneyCapabilities): JourneyState {
-    const stages = capabilities.availableStages.filter(id => stageId(id) && validPoint(network.nodes[id]))
-        .sort((a, b) => stageIndex(a) - stageIndex(b));
+    const order = (id: string) => capabilities.stageOrder ? capabilities.stageOrder.indexOf(id) : stageIndex(id);
+    const stages = capabilities.availableStages.filter(id => isStage(id, capabilities) && validPoint(network.nodes[id]))
+        .sort((a, b) => order(a) - order(b));
     if (!stages.length) throw new Error('Journey needs an available campaign stage with an authored point.');
-    const selected = stageId(savedSelected) ? savedSelected : stages[0];
-    const earlier = stages.filter(id => stageIndex(id) <= stageIndex(selected));
+    const selected = isStage(savedSelected, capabilities) ? savedSelected : stages[0];
+    const earlier = stages.filter(id => order(id) <= order(selected));
     const arrived = stages.includes(selected) ? selected : earlier[earlier.length - 1] ?? stages[0];
     return { selected, arrived, entered: null, destination: null, node: arrived, point: copy(network.nodes[arrived]), legs: [],
         blocked: selected === arrived ? null : available(selected, capabilities) ? 'no-route' : 'unavailable' };

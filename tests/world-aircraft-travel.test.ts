@@ -41,6 +41,37 @@ test('continuous takeoff and landing ground velocity, acceleration and decelerat
     assert.ok(sampleAircraftTravel(route, 6.2).speed > sampleAircraftTravel(route, 7.2).speed * 3);
 });
 
+test('pitch, flaps and propeller remain continuous through liftoff, touchdown and engine shutdown', () => {
+    const eps = .000001;
+    for (const flight of [route, { ...route, runwayCorridors: { departure: 1, arrival: 1 } }]) {
+        for (const boundary of [.55, 2.1, 6.1, 7.4]) {
+            const before = sampleAircraftTravel(flight, boundary - eps), after = sampleAircraftTravel(flight, boundary + eps);
+            for (const key of ['pitch', 'flapDeflection', 'propellerPhase'] as const)
+                assert.ok(Math.abs(before[key] - after[key]) < .0001, `${key} must not snap at ${boundary}`);
+        }
+        for (let time = .05; time < 7.4; time += .1) {
+            const pose = sampleAircraftTravel(flight, time);
+            const rate = (sampleAircraftTravel(flight, time + eps).propellerPhase - sampleAircraftTravel(flight, time - eps).propellerPhase) / (2 * eps);
+            assert.ok(Math.abs(rate - pose.propellerSpeed) < .00001, 'Blade rotation must track motor RPM.');
+            assert.ok(pose.flapDeflection >= 0 && pose.flapDeflection <= 1);
+        }
+    }
+    assert.equal(sampleAircraftTravel(route, 99).propellerPhase, sampleAircraftTravel(route, 7.4).propellerPhase);
+    for (const time of [0, .5, 1, 5]) {
+        assert.equal(sampleAircraftTravel(route, time, true).propellerPhase, .45);
+        assert.equal(sampleAircraftTravel(route, time, true).flapDeflection, 0);
+    }
+});
+
+test('runway thrust and braking build gradually and landing compression dissipates', () => {
+    const eps = .0001;
+    assert.ok(sampleAircraftTravel(route, .55 + eps).speed / eps < .0001);
+    assert.ok(sampleAircraftTravel(route, 7.4 - eps).speed / eps < .0001);
+    const compression = sampleAircraftTravel(route, 6.22).suspension;
+    assert.ok(compression > .001 && compression < .004);
+    assert.ok(Math.abs(sampleAircraftTravel(route, 6.8).suspension) < compression * .05);
+});
+
 test('reversed travel uses real reverse headings; reduced motion excludes animated effects', () => {
     const reverse = createAircraftRoute(route.arrivalStop, route.departureStart);
     assert.ok(Math.cos(sampleAircraftTravel(route, 1).heading - sampleAircraftTravel(reverse, 1).heading) < -.9);

@@ -54,6 +54,8 @@ export interface WorldMapHudCallbacks {
     menu(): void;
 }
 export interface WorldMapHudState {
+    /** Named expansions keep their actual arrival visible in the world view. */
+    locationName?: string;
     /** Named chapter availability; independent of the legacy numeric worlds. */
     guairaAvailable?: boolean;
     /** Visible region, 1–6. Stage is a global campaign index, 0–29. */
@@ -79,6 +81,12 @@ export interface WorldMapHudState {
     /** Last confirmed arrival, distinct from a selected destination or preview. */
     arrivedWorld?: number;
     arrivedStage?: string;
+}
+export interface ChapterJourneyHud {
+    traveling: boolean;
+    canEnter: boolean;
+    arrived: string;
+    blocked: 'unavailable' | 'no-route' | null;
 }
 export interface WorldMapHudPoint {
     /** Scene-relative CSS pixels at the foot of the sign. */
@@ -205,6 +213,8 @@ export class WorldMapHud {
     readonly chapterButtons: HTMLButtonElement[] = [];
     private chapter: WorldChapter | null = null;
     private chapterKey = '';
+    private chapterTraveling = false;
+    private chapterSelection = 0;
     private readonly deliciaOverview = element('button', 'world-map-island world-map-delicia-island');
     private readonly deliciaCanvas = bitmap(this.deliciaOverview);
     private readonly deliciaRegion = element('button', 'world-map-region');
@@ -366,7 +376,7 @@ export class WorldMapHud {
             if (!(event.detail > 1)) this.activatePrimary();
         }));
         this.skipButton = action('world-map-skip', 'Pular →', () => this.run(() => {
-            if (this.state && this.state.motionState !== 'idle') callbacks.skip();
+            if (this.chapter ? this.chapterTraveling : this.state && this.state.motionState !== 'idle') callbacks.skip();
         }));
         this.skipButton.setAttribute('aria-label', 'Pular viagem e chegar ao destino');
         this.skipButton.hidden = true; actions.append(this.enterButton, this.skipButton);
@@ -453,7 +463,7 @@ export class WorldMapHud {
     update(state: WorldMapHudState): void {
         if (this.disposed) return;
         if (this.chapter) {
-            this.chapter = null; this.chapterKey = ''; this.signature = '';
+            this.chapter = null; this.chapterKey = ''; this.chapterTraveling = false; this.signature = '';
             this.chapterButtons.forEach(button => { button.hidden = true; });
             this.root.classList.remove('is-chapter');
         }
@@ -509,7 +519,8 @@ export class WorldMapHud {
             : canEnter ? completed ? 'Concluída · pode entrar de novo' : 'Feka chegou · pode entrar'
             : 'Destino marcado';
         const arrived = STAGES.find(entry => entry.id === state.arrivedStage);
-        this.location.textContent = arrived ? `${traveling ? 'Última chegada' : 'Feka em'}${traveling ? ':' : ''} ${arrived.id} · ${REGION_NAMES[arrived.world - 1]}` : '';
+        this.location.textContent = state.locationName ? `Feka em ${state.locationName}`
+            : arrived ? `${traveling ? 'Última chegada' : 'Feka em'}${traveling ? ':' : ''} ${arrived.id} · ${REGION_NAMES[arrived.world - 1]}` : '';
         this.location.hidden = !arrived || (!state.preview && !state.overview);
         this.hint.textContent = state.overview ? this.overviewHint(state)
             : prerequisiteHint || state.hint || (state.preview || !open ? 'Conclua o caminho anterior para visitar.'
@@ -574,28 +585,41 @@ export class WorldMapHud {
         this.announce(announcement);
     }
 
-    updateChapter(chapter: WorldChapter, name: string, stages: readonly ChapterMapStage[], selected: number, actionLabel = 'Jogar', warning = ''): void {
+    updateChapter(chapter: WorldChapter, name: string, stages: readonly ChapterMapStage[], selected: number, actionLabel = 'Jogar', warning = '', journey?: ChapterJourneyHud): void {
         const stage = stages[selected]; if (!stage || this.disposed) return;
-        this.chapter = chapter;
-        const key = JSON.stringify([chapter, stages, selected, actionLabel, warning]);
+        this.chapter = chapter; this.chapterSelection = selected; this.chapterTraveling = !!journey?.traveling;
+        const key = JSON.stringify([chapter, stages, selected, actionLabel, warning, journey]);
         if (key === this.chapterKey) return;
         this.chapterKey = key; this.signature = '';
-        this.root.classList.add('is-chapter'); this.root.classList.remove('is-overview', 'is-preview');
-        this.root.dataset.motion = 'idle';
+        const focused = document.activeElement, traveling = this.chapterTraveling;
+        const canEnter = stage.open && (!journey || journey.canEnter);
+        this.root.classList.add('is-chapter'); this.root.classList.remove('is-overview');
+        this.root.classList.toggle('is-preview', !!journey?.blocked);
+        this.root.dataset.motion = traveling ? 'walking' : 'idle';
         this.titleText.textContent = name; lettering(this.titleBitmap, name, ART.goldLight, 200);
         this.stageTitleText.textContent = stage.name; phaseLettering(this.stageTitleBitmap, stage.name);
         this.stageTitle.title = stage.name;
         this.stageDetails.textContent = stage.label === 'B' ? 'Outro caminho' : stage.optional ? 'Caminho secreto'
             : `Fase ${stage.label}${stage.seals === undefined ? '' : ` · ${stage.seals}/${stage.sealTotal ?? 3} selos`}`;
         this.stageDetails.hidden = false;
-        this.status.textContent = !stage.open ? stage.gate : stage.completed ? 'Concluída' : stage.optional ? 'Exploração opcional' : '';
-        this.location.hidden = true; this.hint.textContent = !stage.open ? stage.gate : '';
+        this.status.textContent = !stage.open ? stage.gate : traveling ? MOTION_COPY.walking
+            : journey?.blocked === 'no-route' ? 'Caminho indisponível' : canEnter && journey
+                ? stage.completed ? 'Concluída · pode entrar de novo' : 'Feka chegou · pode entrar'
+                : stage.completed ? 'Concluída' : stage.optional ? 'Exploração opcional' : '';
+        const arrived = stages.find(item => item.id === journey?.arrived);
+        this.location.textContent = arrived ? `Feka em ${arrived.name}` : '';
+        this.location.hidden = !journey?.blocked;
+        this.hint.textContent = !stage.open ? stage.gate : traveling ? 'Você pode mudar o destino durante a viagem.' : 'Toque numa placa para caminhar até ela.';
         this.compactDetails.hidden = true;
-        this.enterButton.hidden = false; this.skipButton.hidden = true; this.enterButton.disabled = !stage.open;
+        this.enterButton.hidden = traveling; this.skipButton.hidden = !traveling; this.enterButton.disabled = !canEnter;
         this.enterButton.classList.remove('is-return');
-        lettering(this.playCanvas, stage.open ? actionLabel : 'Fechada', stage.open ? ART.ink : ART.muted);
-        this.playText.textContent = stage.open ? actionLabel : 'Fechada';
-        this.enterButton.setAttribute('aria-label', stage.open ? `${actionLabel}: ${stage.name}` : stage.gate);
+        const playLabel = !stage.open ? 'Fechada' : canEnter ? actionLabel : 'Aguarde';
+        lettering(this.playCanvas, playLabel, canEnter ? ART.ink : ART.muted);
+        this.playText.textContent = playLabel;
+        this.enterButton.setAttribute('aria-label', canEnter ? `${actionLabel}: ${stage.name}` : stage.open ? this.status.textContent : stage.gate);
+        if ((focused === this.skipButton && !traveling) || (focused === this.enterButton && (!canEnter || traveling))) {
+            if (canEnter && !traveling) this.focusEnter(); else this.root.focus({ preventScroll: true });
+        }
         this.overviewButton.setAttribute('aria-label', 'Ver mundo'); this.overviewButton.title = 'Ver mundo';
         this.overviewButton.setAttribute('aria-pressed', 'false'); lettering(this.overviewButton.children[0] as HTMLCanvasElement, 'Mundo');
         this.regionButton.hidden = true;
@@ -615,6 +639,7 @@ export class WorldMapHud {
             button.classList.toggle('is-selected', index === selected);
             button.classList.toggle('is-locked', !item.open);
             button.setAttribute('aria-pressed', String(index === selected));
+            button.setAttribute('aria-current', item.id === journey?.arrived ? 'location' : 'false');
             button.setAttribute('aria-label', `${item.optional ? 'Segredo' : `Fase ${item.label}`}: ${item.name}. ${item.completed ? 'Concluída.' : item.open ? 'Disponível.' : item.gate}`);
             button.title = item.name;
         });
@@ -757,7 +782,7 @@ export class WorldMapHud {
                 ...(this.chapter ? this.chapterButtons : this.state.overview ? this.overviewChoices() : [...this.stageButtons, ...Object.values(this.travelButtons)])];
         const active = document.activeElement;
         if (active !== this.root && !choices.some(button => button === active && !button.hidden && !button.disabled)) return null;
-        return `${drawer ? 'regions' : this.chapter ?? (this.state.overview ? 'overview' : 'island')}:${this.chapter || this.state.motionState === 'idle' ? 'idle' : 'travel'}`;
+        return `${drawer ? 'regions' : this.chapter ?? (this.state.overview ? 'overview' : 'island')}:${(this.chapter ? !this.chapterTraveling : this.state.motionState === 'idle') ? 'idle' : 'travel'}`;
     }
     /** Returns false only for island directions/back, which belong to WorldMapView. */
     control(command: GamepadMenuCommand): boolean {
@@ -811,7 +836,13 @@ export class WorldMapHud {
         if (active === this.menuButton) { this.run(() => this.callbacks.menu()); return; }
         if (active === this.guairaOverview) { this.run(() => this.callbacks.selectGuaira?.()); return; }
         if (active === this.deliciaOverview) { this.run(() => this.callbacks.selectDelicia?.()); return; }
-        if (this.chapter) { this.run(() => this.activatePrimary()); return; }
+        if (this.chapter) {
+            const phase = this.chapterButtons.indexOf(active as HTMLButtonElement);
+            if (phase >= 0 && phase !== this.chapterSelection) this.run(() => this.callbacks.selectChapterStage?.(phase));
+            else if (this.chapterTraveling) this.run(() => this.callbacks.skip());
+            else this.run(() => this.activatePrimary());
+            return;
+        }
         if (state.motionState !== 'idle' && (active === this.root || active === this.skipButton)) {
             if (!this.skipButton.hidden) this.run(() => this.callbacks.skip()); return;
         }

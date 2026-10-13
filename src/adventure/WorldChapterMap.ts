@@ -8,8 +8,7 @@ import { CHAPTER_SCENES } from './experimental/guaira/chapter/GuairaChapterScene
 import { guairaChapterRoute } from './experimental/guaira/chapter/GuairaChapterProgress';
 import { ALL_DELICIA_STAGES, DELICIA_STAGES } from './delicia/DeliciaContent';
 import { deliciaUnlocked, type DeliciaSave } from './delicia/DeliciaProgress';
-import { DELICIA_ATLAS } from './delicia/DeliciaIsland';
-import deliciaMap from '../../public/assets/delicia/island-map.json';
+import { DELICIA_JOURNEY } from './delicia/DeliciaMapJourney';
 
 export type WorldChapter = 'guaira' | 'delicia';
 export interface ChapterMapStage {
@@ -36,13 +35,10 @@ export function deliciaMapProgress(save: DeliciaSave) {
 /** Map inspection never changes a save or awards progress. Runtime entry checks again. */
 export function chapterMapStages(chapter: WorldChapter, save: AdventureSave, delicia: DeliciaSave): ChapterMapStage[] {
     if (chapter === 'delicia') return ALL_DELICIA_STAGES.map(stage => {
-        const point = (deliciaMap.nodes as Record<string, MapPoint>)[stage.id]
-            ?? (stage.id === 'delicia-raizes' ? { x: deliciaMap.nodes['delicia-3'].x - .08, y: deliciaMap.nodes['delicia-3'].y + .08 }
-                : stage.id === 'delicia-relogio' ? { x: deliciaMap.nodes['delicia-9'].x + .07, y: deliciaMap.nodes['delicia-9'].y - .025 } : stage.map);
+        const point = DELICIA_JOURNEY.nodes[stage.id];
         const previous = DELICIA_STAGES[stage.number - 2];
         return { id: stage.id, label: stage.optional ? '★' : String(stage.number), name: stage.name,
-            point: { x: DELICIA_ATLAS.left + point.x * DELICIA_ATLAS.widthInMap,
-                y: DELICIA_ATLAS.top + point.y * DELICIA_ATLAS.heightInMap },
+            point,
             open: deliciaUnlocked(stage.id, delicia), completed: delicia.completed.includes(stage.id), optional: stage.optional,
             seals: stage.boss ? undefined : stage.pickups.filter(p => p.kind === 'seal' && delicia.collected.includes(p.id)).length,
             sealTotal: stage.boss ? undefined : stage.pickups.filter(p => p.kind === 'seal').length,

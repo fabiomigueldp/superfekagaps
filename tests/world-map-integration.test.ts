@@ -13,6 +13,8 @@ import { atlasIslandBounds, WORLD_ATLAS_PLACEMENTS } from '../src/adventure/Worl
 import { atlasActorBounds, atlasActorScale, atlasBoatBounds } from '../src/adventure/WorldAtlasArt';
 import { Input } from '../src/engine/Input';
 import { StandardGamepad } from '../src/engine/StandardGamepad';
+import { ALL_DELICIA_STAGES } from '../src/adventure/delicia/DeliciaContent';
+import { completeDeliciaStage } from '../src/adventure/delicia/DeliciaProgress';
 
 // This matrix verifies already-earned six-region transport. Guaíra's new gate is
 // covered separately in guaira-campaign-progression.test.ts.
@@ -720,6 +722,58 @@ test('controller can open the chapter from either island control and activate it
     h.root.focus(); h.view.control('regions'); h.internal.hud.deliciaRegion.focus(); h.view.control('confirm');
     assert.equal(h.internal.chapter, 'delicia'); assert.equal(h.internal.hud.regionMenu.hidden, true);
     h.root.focus(); h.view.control('confirm'); assert.deepEqual(h.events.chapters, ['delicia:delicia-1']);
+});
+
+test('Delícia uses walking, reversal, arrival persistence and the same single-use controller gate', async t => {
+    const h = mapDOM(t, false, false, true), save = freshSave(); await readyLand(h, save);
+    const store = h.view.deliciaStore;
+    store.save.completed = ALL_DELICIA_STAGES.map(stage => stage.id);
+    h.view.openChapter('delicia');
+    const origin = structuredClone(h.internal.deliciaJourney.point), campaign = structuredClone(save);
+    h.internal.hud.chapterButtons[1].click();
+    assert.equal(h.internal.deliciaJourney.destination, 'delicia-2');
+    assert.equal(h.internal.hud.enterButton.disabled, true); assert.equal(h.internal.hud.skipButton.hidden, false);
+    h.internal.hud.enterButton.click(); assert.deepEqual(h.events.chapters, []);
+    h.view.render(0, save, 200, '');
+    const walking = structuredClone(h.internal.deliciaJourney.point);
+    assert.notDeepEqual(walking, origin); assert.equal(store.save.selected, 'delicia-1');
+    h.internal.hud.chapterButtons[0].click(); assert.deepEqual(h.internal.deliciaJourney.point, walking);
+    assert.equal(h.internal.deliciaJourney.legs[0].direction, -1);
+    h.internal.hud.skipButton.focus(); h.view.control('confirm');
+    assert.equal(h.internal.deliciaJourney.arrived, 'delicia-1'); assert.deepEqual(h.events.chapters, []);
+    h.internal.hud.chapterButtons[1].click(); h.root.focus();
+    assert.equal(h.view.controllerOwner(), 'delicia:travel');
+    h.view.control('confirm');
+    assert.equal(h.internal.deliciaJourney.arrived, 'delicia-2'); assert.equal(store.save.selected, 'delicia-2');
+    assert.equal(h.view.controllerOwner(), 'delicia:idle'); assert.deepEqual(h.events.chapters, []);
+    h.view.control('confirm'); h.view.control('confirm');
+    assert.deepEqual(h.events.chapters, ['delicia:delicia-2']);
+    assert.deepEqual(save, campaign, 'The chapter never changes main World progression.');
+});
+
+test('Delícia returns at the played landing, walks to the earned next phase and respects reduced motion', async t => {
+    for (const reduced of [false, true]) await t.test(`reduced=${reduced}`, async child => {
+        const h = mapDOM(child, reduced, false, true), save = freshSave(); await readyLand(h, save);
+        h.view.openChapter('delicia');
+        const origin = structuredClone(h.internal.deliciaJourney.point);
+        h.internal.hud.enterButton.click();
+        completeDeliciaStage(h.view.deliciaStore.save, 'delicia-1', 60);
+        h.view.openChapter('delicia', 'delicia-2', 'delicia-1');
+        assert.equal(h.internal.deliciaJourney.arrived, reduced ? 'delicia-2' : 'delicia-1');
+        assert.equal(h.internal.deliciaJourney.destination, reduced ? null : 'delicia-2');
+        if (!reduced) {
+            assert.deepEqual(h.internal.deliciaJourney.point, origin);
+            h.internal.hud.overviewButton.click(); h.view.render(0, save, 200, '');
+            assert.equal(h.internal.actorChapter, 'delicia'); assert.notDeepEqual(h.internal.deliciaJourney.point, origin);
+            h.internal.hud.skipButton.click(); assert.equal(h.view.deliciaStore.save.selected, 'delicia-2');
+            h.view.openChapter('delicia');
+        }
+        h.internal.hud.chapterButtons[2].click();
+        assert.equal(h.internal.deliciaJourney.blocked, 'unavailable');
+        assert.equal(h.internal.deliciaJourney.arrived, 'delicia-2');
+        h.internal.hud.enterButton.click(); assert.deepEqual(h.events.chapters, ['delicia:delicia-1']);
+        assert.equal(h.view.deliciaStore.save.selected, 'delicia-2');
+    });
 });
 
 test('capped backing resolution responds to DPR and resize without resizing each idle frame', t => {

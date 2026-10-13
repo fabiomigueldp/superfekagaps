@@ -37,6 +37,9 @@ export interface AircraftPose {
     suspension: number;
     speed: number;
     propellerSpeed: number;
+    /** Integral of engine speed, so changing RPM never jumps the blade angle. */
+    propellerPhase: number;
+    flapDeflection: number;
     dust: number;
     airWisps: number;
     progress: number;
@@ -49,6 +52,18 @@ export const AIRCRAFT_REDUCED_DURATION = 1.15;
 export const AIRCRAFT_TIMING = Object.freeze({ boarding: .55, departure: 1.55, flight: 4, landing: 1.3 });
 const clamp = (n: number, min = 0, max = 1) => Math.max(min, Math.min(max, n));
 const smooth = (n: number) => { const t = clamp(n); return t * t * (3 - 2 * t); };
+const smoothIntegral = (t: number) => t ** 3 - .5 * t ** 4;
+const rollDistance = (t: number) => 2 * smoothIntegral(t);
+function enginePhase(elapsed: number): number {
+    let phase = .45, remaining = elapsed;
+    for (const [duration, rpm, change] of [[.55, 2, 13], [1.55, 15, 22], [4, 37, -10], [1.3, 27, -27]]) {
+        const seconds = Math.min(remaining, duration);
+        phase += rpm * seconds + change * duration * smoothIntegral(seconds / duration);
+        remaining -= seconds;
+        if (remaining <= 0) break;
+    }
+    return phase;
+}
 const mix = (a: MapPoint, b: MapPoint, t: number): MapPoint => ({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
 const delta = (a: MapPoint, b: MapPoint): MapPoint => ({ x: b.x - a.x, y: b.y - a.y });
 const metric = (v: MapPoint) => Math.hypot(v.x * 1.6, v.y);
@@ -187,10 +202,10 @@ export function sampleAircraftTravel(route: AircraftRoute, elapsedSeconds: numbe
         propellerSpeed = 2 + smooth(elapsed / AIRCRAFT_TIMING.boarding) * 13;
     } else if (elapsed < 2.1) {
         const t = (elapsed - .55) / 1.55;
-        ground = mix(route.departureStart, route.departureLift, t * t); stage = 'takeoff-roll';
-        speed = metric(take) * 2 * t / 1.55; propellerSpeed = 15 + 22 * smooth(t);
+        ground = mix(route.departureStart, route.departureLift, rollDistance(t)); stage = 'takeoff-roll';
+        speed = metric(take) * 2 * smooth(t) / 1.55; propellerSpeed = 15 + 22 * smooth(t);
         pitch = -.038 * smooth((t - .58) / .42);
-        suspension = Math.sin(t * 36) * .0012 * Math.sin(Math.PI * t);
+        suspension = Math.sin(rollDistance(t) * 75) * .00065 * smooth(t / .2) * (1 - smooth((t - .8) / .2));
         dust = smooth(t * 2) * (1 - smooth((t - .85) / .15));
     } else if (elapsed < 6.1) {
         const t = (elapsed - 2.1) / 4;
@@ -213,7 +228,7 @@ export function sampleAircraftTravel(route: AircraftRoute, elapsedSeconds: numbe
             const corridorSeconds = t < .5 ? corridor.departure : corridor.arrival;
             const offshoreClimb = t < .5 ? corridor.departureOffshoreClimb : corridor.arrivalOffshoreClimb;
             altitude = (route.altitude ?? .20) * (offshoreClimb ? smooth(endSeconds / 2) ** 2 : corridorSeconds ? smooth(endSeconds / corridorSeconds) : Math.sin(Math.PI * t) ** 2);
-            pitch = -.065 * Math.sin(t * Math.PI * 2) - (corridor.departure ? .038 * (1 - smooth(seconds / .3)) : 0);
+            pitch = -.065 * Math.sin(t * Math.PI * 2);
         } else {
             const [b, c] = route.cruiseControls ?? [
                 { x: route.departureLift.x + take.x * 8 / (1.55 * 3), y: route.departureLift.y + take.y * 8 / (1.55 * 3) },
@@ -228,21 +243,28 @@ export function sampleAircraftTravel(route: AircraftRoute, elapsedSeconds: numbe
             altitude = (route.altitude ?? .20) * Math.sin(Math.PI * t) ** 2;
             pitch = -.065 * Math.sin(t * Math.PI * 2);
         }
+        // Carry takeoff rotation through liftoff; round out the descent before
+        // contact, then let the loaded gear settle during the ground roll.
+        pitch -= .038 * (1 - smooth((elapsed - 2.1) / .42)) + .028 * smooth((elapsed - 5.45) / .65);
         propellerSpeed = 37 - 10 * smooth(t);
         stage = t < .26 ? 'climb' : t > .73 ? 'approach' : 'cruise';
         airWisps = Math.sin(Math.PI * t) ** 2 * Math.min(1, Math.abs(bank) * 6 + .10);
     } else {
         const t = clamp((elapsed - 6.1) / 1.3);
-        ground = mix(route.arrivalTouchdown, route.arrivalStop, 2 * t - t * t); velocity = land;
-        speed = metric(land) * 2 * (1 - t) / 1.3;
+        ground = mix(route.arrivalTouchdown, route.arrivalStop, 1 - rollDistance(1 - t)); velocity = land;
+        speed = metric(land) * 2 * smooth(1 - t) / 1.3;
         stage = complete ? 'arrived' : 'landing-roll';
         // A single damped landing compression; exact zero at arrival.
-        suspension = Math.sin(t * Math.PI * 3) * Math.exp(-t * 7) * .005 * (1 - t);
-        pitch = .026 * Math.sin(t * Math.PI) * Math.exp(-t * 3);
+        suspension = Math.sin(t * 1.3 * 11) * Math.exp(-t * 1.3 * 7) * .0065 * (1 - smooth(t));
+        pitch = -.028 * (1 - smooth(t / .3)) + .018 * Math.sin(t * Math.PI) * Math.exp(-t * 3);
         dust = Math.sin(Math.PI * Math.min(1, t * 2)) * (1 - t);
         propellerSpeed = complete ? 0 : 27 * (1 - smooth(t));
     }
     return { stage, ground, position: { x: ground.x, y: ground.y - altitude + suspension },
         heading: Math.atan2(velocity.y, velocity.x * 1.6), altitude, bank, pitch, suspension, speed, propellerSpeed,
+        propellerPhase: reducedMotion ? .45 : enginePhase(elapsed),
+        flapDeflection: reducedMotion ? 0 : elapsed < 2.1 ? .9 * smooth(elapsed / .55) : elapsed < 6.1
+            ? .9 - .62 * smooth((elapsed - 2.1) / .8) + .72 * smooth((elapsed - 4.9) / 1.2)
+            : 1 - smooth((elapsed - 6.1) / 1.3),
         dust, airWisps, progress, complete, reducedMotion, scale: route.scale ?? 1 };
 }

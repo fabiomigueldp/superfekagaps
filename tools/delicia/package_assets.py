@@ -7,6 +7,7 @@ from pathlib import Path
 import hashlib
 import json
 import subprocess
+import shutil
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -15,6 +16,7 @@ OUT = ROOT / 'public/assets/delicia'
 OUT.mkdir(parents=True, exist_ok=True)
 (OUT / 'audio').mkdir(exist_ok=True)
 manifest = {'images': [], 'audio': []}
+island_depth_master = None
 
 def entry(source, output, **metadata):
     return {'source': source.relative_to(ROOT).as_posix(), 'file': output.relative_to(ROOT).as_posix(),
@@ -22,7 +24,8 @@ def entry(source, output, **metadata):
 
 for name in ['key-art', 'backdrop', 'environment-atlas', 'portraits', 'props', 'boss-atlas', 'island', 'world-concept-v2', 'enemies-v2', 'jaja-motion-v2', 'guina-motion-v2', 'landmarks-v2', 'terrain-v2']:
     if name == 'island':
-        original = next(SOURCE / candidate for candidate in ['island-render-v4.png', 'island-render-v3.png', 'island-render-v2.png', 'island-render.png'] if (SOURCE / candidate).exists())
+        original = next(SOURCE / candidate for candidate in ['island-render-v8.png', 'island-render-v7.png', 'island-render-v6.png', 'island-render-v5.png', 'island-render-v4.png', 'island-render-v3.png', 'island-render-v2.png', 'island-render.png'] if (SOURCE / candidate).exists())
+        island_depth_master = original.with_name(original.name.replace('island-render','island-depth'))
     elif name == 'landmarks-v2' and (SOURCE / 'landmarks-v5.png').exists():
         original = SOURCE / 'landmarks-v5.png'
     elif name == 'props' and (SOURCE / 'props-v5.png').exists():
@@ -32,8 +35,18 @@ for name in ['key-art', 'backdrop', 'environment-atlas', 'portraits', 'props', '
     output = OUT / (name + '.webp')
     img = Image.open(original)
     if not output.exists() or original.stat().st_mtime > output.stat().st_mtime:
-        img.save(output, 'WEBP', quality=84 if name.endswith('-v2') else 86, method=6)
+        img.save(output, 'WEBP', quality=90 if name=='island' else 84 if name.endswith('-v2') else 86, method=6)
     manifest['images'].append(entry(original, output, width=img.width, height=img.height, alpha=img.mode == 'RGBA'))
+    if name == 'island':
+        coordinates = original.with_name(original.stem.replace('island-render','island-map')+'.json')
+        if coordinates.exists(): shutil.copyfile(coordinates,OUT/'island-map.json')
+
+# Camera depth is data: keep its exact 16-bit R:G values, never lossy WebP.
+if island_depth_master and island_depth_master.exists():
+    original=island_depth_master;output=OUT/'island-depth.png'
+    shutil.copyfile(original,output)
+    with Image.open(original) as img:
+        manifest['images'].append(entry(original,output,width=img.width,height=img.height,alpha=False,encoding='rg16-linear-camera-depth'))
 
 for original in sorted((SOURCE / 'audio').glob('*.mp3')):
     output = OUT / 'audio' / (original.stem + '.ogg')

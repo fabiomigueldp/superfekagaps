@@ -1024,9 +1024,10 @@ export class WorldGame {
         const back = document.createElement('button'); back.type = 'button'; back.textContent = 'Voltar ao mapa';
         loading.setAttribute('role', 'status'); loading.textContent = 'Entrando na fase…'; host.append(loading, back); document.body.append(host);
         let disposeRuntime: (() => void) | undefined;
-        const close = () => {
+        const onPageHide = () => close();
+        const close = (playedStage = stage) => {
             if (controller.signal.aborted) return;
-            window.removeEventListener('pagehide', close); releaseEntryActivity();
+            window.removeEventListener('pagehide', onPageHide); releaseEntryActivity();
             controller.abort(); disposeRuntime?.(); host.remove(); this.chapterActive = false; this.chapterCleanup = undefined;
             this.mapCanvas.id = originalId; this.mapCanvas.hidden = false;
             view.root.hidden = false; view.root.inert = false;
@@ -1034,15 +1035,16 @@ export class WorldGame {
             (window as unknown as { worldGame: WorldGame }).worldGame = this;
             (window as unknown as { renderer: Renderer }).renderer = this.renderer;
             document.title = 'Super Feka Gaps World';
-            view.openChapter(chapter, chapter === 'guaira' ? this.store.save.guaira.selectedScene : view.deliciaStore.save.selected);
+            view.openChapter(chapter, chapter === 'guaira' ? this.store.save.guaira.selectedScene : view.deliciaStore.save.selected,
+                chapter === 'delicia' ? playedStage : undefined);
             view.hud.focusEnter(); this.last = null; this.requestFrame();
         };
         this.chapterCleanup = close;
-        back.addEventListener('click', close); back.focus();
+        back.addEventListener('click', () => close()); back.focus();
         host.addEventListener('keydown', event => {
             if (!disposeRuntime && event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); close(); }
         });
-        window.addEventListener('pagehide', close, { once: true });
+        window.addEventListener('pagehide', onPageHide, { once: true });
         try {
             const { mountWorldChapter } = await import('./WorldChapterHost');
             if (controller.signal.aborted || this.isDisposed) return;

@@ -9,6 +9,7 @@ An original dry-runway, high-wing utility plane shared by both directions. Warm 
 - Load failure returns `null`, including bad metadata, wrong image dimensions, abort or a 12-second timeout. Keep the origin selected and show retry/cancel; never commit a failed flight.
 - Sampling is pure and seekable. The host owns requestAnimationFrame, skip, cancel, visibility interruption and persistence. Persist the destination only once successful completion is accepted. A canceled/reloaded flight retains its origin.
 - `AIRCRAFT_TRAVEL_DURATION = 7.4`: .55 s engine settle, 1.55 s accelerating ground roll, 4 s airborne, 1.3 s damped touchdown and deceleration. Airborne labels separate climb/cruise/approach.
+- Ground rolls integrate a smooth thrust/braking ramp, keeping the original contact points and lift/touchdown speeds. Pitch carries through liftoff and landing flare without a pose jump; flap deployment is continuous. Gear compression dissipates after contact.
 - `AIRCRAFT_REDUCED_DURATION = 1.15`: calm ground-level interpolation, with zero bank, pitch, suspension, dust, air wisps and prop spin. Prefer a fixed camera or destination dissolve for this option.
 - The cabin is enclosed. Hide the separate standing Feka during flight; a small green passenger cap is embedded behind both side windows. `passengerAnchor` remains available for effects or attachment alignment, not roof placement.
 
@@ -23,6 +24,8 @@ Artwork uses a true Blender camera at `(11, -20, 17.5)`, orthographic scale 6 fo
 ## Rendering
 
 32 genuine projected headings, never a mirrored image. One WebP atlas, approximately 249 KB, alpha-safe common crop. The renderer adds a ground shadow whose separation/fade expresses lift, projected two-blade propeller with a steady translucent disk at speed, hinged trailing wing flaps, damped landing compression, at most twelve dry-dust motes and two very faint turning air wisps. There is no long high-altitude jet contrail. The prop's plane and flap hinges are projected from the actual 3D model for each heading.
+
+The propeller phase integrates engine speed analytically, including startup and shutdown. Blur fades with RPM and stopped blades retain their final angle. A small airborne bearing correction softens the gaps between the 32 views and fades out at ground contact.
 
 The asset has no runtime library dependency. Model source and packager are `tools/diorama/render_journey_aircraft.py` and `package_journey_aircraft.py`. Blender output (`.blend`, PNG headings and contact sheet) stays under ignored/local build output rather than the shipped runtime; the source regenerates it completely. Example:
 

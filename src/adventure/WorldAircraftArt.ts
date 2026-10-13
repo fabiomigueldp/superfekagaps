@@ -88,7 +88,9 @@ export function paintAircraftTravel(ctx: CanvasRenderingContext2D, camera: MapCa
     const scale = Math.min(camera.width / 1.6, camera.height) * camera.zoom * 1.6 * shape.widthInMap * pose.scale / shape.width;
     if (!Number.isFinite(scale) || scale <= 0) return;
     const elapsed = Number.isFinite(elapsedSeconds) ? Math.max(0, elapsedSeconds) : 0;
-    const rotation = pose.reducedMotion ? 0 : pose.bank + pose.pitch * Math.cos(pose.heading);
+    const bearing = Math.atan2(Math.sin(pose.heading - frame.screenHeading), Math.cos(pose.heading - frame.screenHeading));
+    const rotation = pose.reducedMotion ? 0 : pose.bank + pose.pitch * Math.cos(pose.heading)
+        + bearing * .65 * Math.min(1, pose.altitude * 18);
     ctx.save(); ctx.imageSmoothingEnabled = true;
     // Contact shadow stays on the ground; widening and fading makes lift legible.
     ctx.save(); ctx.translate(ground.x, ground.y); ctx.rotate(pose.heading);
@@ -110,7 +112,7 @@ export function paintAircraftTravel(ctx: CanvasRenderingContext2D, camera: MapCa
     // Projected hinged flaps give the wing a subtle loaded response. The hinge
     // stays fixed; only the trailing edge deflects. No elastic/cartoon wobble.
     if (!pose.reducedMotion && frame.flaps) {
-        const load = pose.stage === 'takeoff-roll' || pose.stage === 'landing-roll' ? .9 : pose.altitude > 0 ? .28 : 0;
+        const load = pose.flapDeflection;
         for (const [sideIndex, flap] of frame.flaps.entries()) {
             const deflect = load * 2 + pose.bank * (sideIndex ? -9 : 9);
             ctx.fillStyle = sideIndex ? '#d6cba7' : '#e1d6b2'; ctx.strokeStyle = 'rgba(48,105,105,.65)'; ctx.lineWidth = .55;
@@ -123,12 +125,13 @@ export function paintAircraftTravel(ctx: CanvasRenderingContext2D, camera: MapCa
     const origin = frame.propeller, up = { x: frame.propellerUp.x - origin.x, y: frame.propellerUp.y - origin.y },
         side = { x: frame.propellerSide.x - origin.x, y: frame.propellerSide.y - origin.y };
     ctx.save(); ctx.transform(side.x, side.y, up.x, up.y, origin.x, origin.y);
-    if (!pose.reducedMotion && pose.propellerSpeed > 12) {
-        ctx.fillStyle = 'rgba(228,217,183,.13)'; ctx.beginPath(); ctx.arc(0, 0, 1, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = 'rgba(244,221,160,.27)'; ctx.lineWidth = .04; ctx.stroke();
-        ctx.globalAlpha = .18;
+    if (!pose.reducedMotion) {
+        const blur = Math.max(0, Math.min(1, (pose.propellerSpeed - 5) / 21));
+        ctx.fillStyle = `rgba(228,217,183,${.13 * blur})`; ctx.beginPath(); ctx.arc(0, 0, 1, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = `rgba(244,221,160,${.27 * blur})`; ctx.lineWidth = .04; ctx.stroke();
+        ctx.globalAlpha *= 1 - blur * .82;
     }
-    const angle = pose.reducedMotion || pose.complete ? .45 : elapsed * 22;
+    const angle = pose.propellerPhase;
     ctx.rotate(angle); ctx.fillStyle = '#394642';
     ctx.fillRect(-.08, -.96, .16, 1.92); ctx.fillStyle = '#e6bd65';
     ctx.fillRect(-.08, -.96, .16, .14); ctx.fillRect(-.08, .82, .16, .14); ctx.restore();

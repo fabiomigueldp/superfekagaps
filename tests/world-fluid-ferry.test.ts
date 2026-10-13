@@ -56,8 +56,10 @@ test('waterline stays fixed while genuine view selection carries Feka through th
         assert.deepEqual(pose.motion!.waterline, poses[0].motion!.waterline);
         const frame = art.frames[pose.frameIndex], unit = frame.widthInMap / frame.width;
         assert.ok(Math.abs(pose.foot.x + (frame.waterlineAnchor!.x - frame.passengerFoot.x) * unit - pose.motion!.waterline.x) < 1e-12);
-        const heave = Math.sin(1000 / 430) * .0012;
-        assert.ok(Math.abs(pose.foot.y + (frame.waterlineAnchor!.y - frame.passengerFoot.y) * unit * 1.6 - pose.motion!.waterline.y - heave) < 1e-12);
+        const heave = pose.state.dynamics!.heave.value;
+        assert.equal(heave, 0, 'A new hull starts at equilibrium; buoyancy needs elapsed time to move its mass.');
+        assert.ok(Math.abs(pose.foot.y + (frame.waterlineAnchor!.y - frame.passengerFoot.y) * unit * 1.6 - pose.motion!.waterline.y) < 1e-12);
+        assert.equal(pose.motion!.heave, heave);
     }
 });
 
@@ -82,13 +84,13 @@ test('a changed heading target preserves the immediate pose and turns progressiv
     assert.ok(Math.abs(Math.atan2(Math.sin(previous - reversed.state.headingRadians!), Math.cos(previous - reversed.state.headingRadians!))) > .5);
 });
 
-test('docking and reduced motion leave exact terminal feet with no wake or heave', () => {
+test('reduced motion leaves exact terminal feet with no wake or heave, including after docking', () => {
     for (const direction of [1, -1] as const) {
         const world = direction === 1 ? 2 : 1, active = { ...leg, direction, progress: direction === 1 ? 1 : 0 };
         const pose = sampleFerry(createFerry(COAST_PORT_FERRY, world), COAST_PORT_FERRY, geometry,
             { active, point: journeyLegPoint(active), time: 9000, reducedMotion: true });
         assert.ok(distance(pose.foot, geometry.berths[world].foot) < 1e-12); assert.equal(pose.motion!.speed, 0);
-        const parked = sampleFerry(pose.state, COAST_PORT_FERRY, geometry, { time: 9016 });
+        const parked = sampleFerry(pose.state, COAST_PORT_FERRY, geometry, { time: 9016, reducedMotion: true });
         assert.deepEqual(parked.foot, geometry.berths[world].foot); assert.equal(parked.motion, undefined);
         assert.equal(parked.frameIndex, pose.frameIndex);
     }
@@ -172,7 +174,7 @@ test('Reserva reversal keeps the hull aligned with its channel, suppresses its w
         const pose = sampleFerry(ferry, definition, geometry, { active: journey.legs[0], point: journey.point, time });
         if (reversed && pose.motion) {
             assert.equal(pose.motion.speed, 0);
-            if (previous?.motion && journey.legs[0].progress > .38 && !journey.legs[0].sailManeuver) {
+            if (previous?.motion && journey.legs[0]?.progress > .38 && !journey.legs[0].sailManeuver) {
                 const velocity = { x: (pose.motion.waterline.x - previous.motion.waterline.x) * 1.6,
                     y: pose.motion.waterline.y - previous.motion.waterline.y };
                 const alignment = Math.cos(Math.atan2(velocity.y, velocity.x) - pose.motion.screenHeading);

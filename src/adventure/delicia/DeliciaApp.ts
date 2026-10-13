@@ -14,7 +14,7 @@ import { button, element, formatTime, heading, lettering, worldLink } from './De
 import './delicia.css';
 const INPUT_KEYS:Record<string,string>={arrowleft:'arrowleft',a:'arrowleft','pad-left':'arrowleft',arrowright:'arrowright',d:'arrowright','pad-right':'arrowright',' ':' ',w:' ',z:' ',arrowup:' ','pad-jump':' ',shift:'shift',x:'shift','pad-dash':'shift',s:'s',arrowdown:'s','pad-pound':'s',j:'j','pad-seed':'j',q:'q','pad-parry':'q',e:'e','pad-interact':'e'};
 type Screen='title'|'map'|'menu'|'playing'|'pause'|'dialogue'|'clear'|'journal'|'settings'|'ending'|'dead';
-export interface DeliciaAppOptions { store?: DeliciaStore; initialStage?: string; startPaused?: boolean; returnToWorldMap?: () => void; preferences?: Preferences; savePreferences?: () => void }
+export interface DeliciaAppOptions { store?: DeliciaStore; initialStage?: string; startPaused?: boolean; returnToWorldMap?: (playedStage?: string) => void; preferences?: Preferences; savePreferences?: () => void }
 export class DeliciaApp {
     readonly store:DeliciaStore;readonly audio=new DeliciaAudio();readonly art=new DeliciaArt();
     readonly root=element('main','delicia');readonly surface=element('section','dl-surface');readonly canvas=element('canvas','dl-canvas');
@@ -317,7 +317,7 @@ export class DeliciaApp {
         this.panel.append(warning);
     }
     showMap(id=this.store.save.selected):void {
-        if(this.options.returnToWorldMap){this.resetInput();this.audio.pause(true);this.options.returnToWorldMap();return;}
+        if(this.options.returnToWorldMap){this.resetInput();this.audio.pause(true);this.options.returnToWorldMap(this.sim?.stage.id);return;}
         this.setScreen('map');
         // Audio availability must not prevent navigation after a durable import.
         try{this.audio.pause(false);this.audio.music('orchard');}catch{}

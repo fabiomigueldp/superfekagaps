@@ -134,7 +134,12 @@ test('raised arena platforms make a two-damage ground pound physically reachable
 
 test('all shipped expansion media match preserved source and runtime manifests',()=>{
     const manifest=JSON.parse(readFileSync('docs/world/delicia/runtime-manifest.json','utf8')) as Record<string,{source:string;file:string;bytes:number;sha256:string}[]>;
-    assert.equal(manifest.images.length,13);assert.equal(manifest.audio.length,20);
+    assert.equal(manifest.images.length,14);assert.equal(manifest.audio.length,20);
+    const depth=manifest.images.find(image=>image.file==='public/assets/delicia/island-depth.png');
+    assert.ok(depth,'The island includes its lossless camera-depth pass.');
+    const png=readFileSync(depth.file);
+    assert.deepEqual([...png.subarray(0,8)],[137,80,78,71,13,10,26,10]);
+    assert.equal(png.readUInt32BE(16),2560);assert.equal(png.readUInt32BE(20),1600);
     for(const a of [...manifest.images,...manifest.audio]){assert.ok(statSync(a.source).size>1000);const bytes=readFileSync(a.file);assert.equal(bytes.length,a.bytes);assert.equal(createHash('sha256').update(bytes).digest('hex'),a.sha256);}
     const original=JSON.parse(readFileSync('docs/world/delicia/audio-manifest.json','utf8')) as {assets:{file:string;sha256:string}[]};
     for(const a of original.assets)assert.equal(createHash('sha256').update(readFileSync(a.file)).digest('hex'),a.sha256);

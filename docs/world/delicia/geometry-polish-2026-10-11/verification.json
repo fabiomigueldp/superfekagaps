@@ -1,0 +1,403 @@
+{
+  "revision": 7,
+  "regressionTests": 219,
+  "assetTests": 14,
+  "build": "passed",
+  "walks": {
+    "trips": [
+      "delicia-2",
+      "delicia-3",
+      "delicia-4",
+      "delicia-5",
+      "delicia-6",
+      "delicia-raizes",
+      "delicia-9",
+      "delicia-relogio",
+      "delicia-10",
+      "delicia-11",
+      "delicia-12"
+    ],
+    "desktop": {
+      "frames": 1688,
+      "offscreen": 0,
+      "overlaps": 0,
+      "depthReads": 1688,
+      "maxFrame": 38
+    },
+    "mobile": {
+      "frames": 126,
+      "offscreen": 0,
+      "overlaps": 0,
+      "depthReads": 126,
+      "maxFrame": 2.800000011920929
+    },
+    "errors": []
+  },
+  "landings": [
+    {
+      "id": "delicia-1",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-2",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-3",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-4",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-5",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-6",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-7",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-8",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-9",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-10",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-11",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-12",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-raizes",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-relogio",
+      "canEnter": true
+    }
+  ],
+  "entryReturn": "passed",
+  "reversal": "passed",
+  "lockedPreview": "passed",
+  "reducedMotion": "passed",
+  "touchHops": 11,
+  "assets": {
+    "island.webp": {
+      "bytes": 349754,
+      "sha256": "e9722e1e6a3cc2728196876997cda8860c907119bd931104a573fd20838e7c0f"
+    },
+    "island-map.json": {
+      "bytes": 131971,
+      "sha256": "a1746f572ea6ce0166e998018133c17f6f3383a966e744e026d818c804f85403"
+    },
+    "island-depth.png": {
+      "bytes": 902410,
+      "sha256": "4a8c1742793d7e400d2e80f0e17a631026472c2069b8cb1084fefe604fd06473"
+    }
+  },
+  "geometry": {
+    "revision": 7,
+    "preservedObjects": [
+      "Grand palace stair",
+      "Grand palace stair.001",
+      "Grand palace stair.002",
+      "Grand palace stair.003",
+      "Grand palace stair.004",
+      "Grand palace stair.005",
+      "Grand palace stair.006",
+      "Grand palace stair.007",
+      "Grand palace stair.008",
+      "Grand palace stair.009",
+      "Grand palace stair.010",
+      "Grand palace stair.011",
+      "Grand palace stair.012",
+      "Grand palace stair.013",
+      "Grand palace stair.014",
+      "Grand palace stair.015",
+      "Grand palace stair.016",
+      "Grand palace stair.017",
+      "Grand palace stair.018",
+      "Grand palace stair.019",
+      "Grand palace stair.020",
+      "Grand palace stair.021",
+      "Grand stair stone parapet coping",
+      "Grand stair stone parapet turned baluster",
+      "Grand stair stone parapet turned baluster.001",
+      "Grand stair stone parapet turned baluster.002",
+      "Grand stair stone parapet turned baluster.003",
+      "Grand stair stone parapet turned baluster.004",
+      "Grand stair stone parapet turned baluster.005",
+      "Grand stair stone parapet turned baluster.006",
+      "Grand stair stone parapet turned baluster.007",
+      "Grand stair stone parapet turned baluster.008",
+      "Grand stair stone parapet coping.001",
+      "Grand stair stone parapet turned baluster.009",
+      "Grand stair stone parapet turned baluster.010",
+      "Grand stair stone parapet turned baluster.011",
+      "Grand stair stone parapet turned baluster.012",
+      "Grand stair stone parapet turned baluster.013",
+      "Grand stair stone parapet turned baluster.014",
+      "Grand stair stone parapet turned baluster.015",
+      "Grand stair stone parapet turned baluster.016",
+      "Grand stair stone parapet turned baluster.017",
+      "Aqueduct east access steps",
+      "Aqueduct east access steps.001",
+      "Aqueduct east access steps.002",
+      "Aqueduct east access steps.003",
+      "Aqueduct east access steps.004",
+      "Aqueduct east access steps.005",
+      "Aqueduct east access steps.006",
+      "Aqueduct east access steps.007",
+      "Aqueduct east access steps.008",
+      "Aqueduct east access steps.009",
+      "Aqueduct east access steps.010",
+      "Aqueduct east access steps.011",
+      "Aqueduct east access steps.012",
+      "Aqueduct east access steps.013",
+      "West aqueduct access",
+      "West aqueduct access.001",
+      "West aqueduct access.002",
+      "West aqueduct access.003",
+      "West aqueduct access.004",
+      "West aqueduct access.005",
+      "West aqueduct access.006",
+      "West aqueduct access.007",
+      "West aqueduct access.008",
+      "West aqueduct access.009",
+      "West aqueduct access.010",
+      "West aqueduct access.011",
+      "West aqueduct access.012",
+      "West aqueduct access.013",
+      "Road from the harbour to the gorge",
+      "Orchard contour path",
+      "Orchard contour path.001",
+      "Orchard contour path.002",
+      "Orchard contour path.003",
+      "Approach to the aqueduct",
+      "Eastern aqueduct walk",
+      "Sanctuary entrance",
+      "Factory inspection road",
+      "Garden approach",
+      "Way to the palace",
+      "archive-approach • limestone walking surface",
+      "archive-approach • bedded path edges",
+      "source-pilgrims • limestone walking surface",
+      "source-pilgrims • bedded path edges",
+      "orange-tide • limestone walking surface",
+      "orange-tide • bedded path edges",
+      "refinery-street • limestone walking surface",
+      "refinery-street • bedded path edges",
+      "refinery-court • limestone walking surface",
+      "refinery-court • bedded path edges",
+      "garden-gate • limestone walking surface",
+      "garden-gate • bedded path edges",
+      "clock-sanctuary • limestone walking surface",
+      "clock-sanctuary • bedded path edges",
+      "boiler-approach • limestone walking surface",
+      "boiler-approach • bedded path edges",
+      "palace-ascent • limestone walking surface",
+      "palace-ascent • bedded path edges",
+      "harbor-orchard • limestone walking surface",
+      "harbor-orchard • bedded path edges",
+      "orchard-aqueduct • limestone walking surface",
+      "orchard-aqueduct • bedded path edges",
+      "west-bank • limestone walking surface",
+      "west-bank • bedded path edges",
+      "roots-sanctuary • limestone walking surface",
+      "roots-sanctuary • bedded path edges",
+      "Walk of the last harvest",
+      "Port lane to the orchard",
+      "delicia-1 arrival paving",
+      "delicia-2 arrival paving",
+      "delicia-3 arrival paving",
+      "delicia-4 arrival paving",
+      "delicia-5 arrival paving",
+      "delicia-6 arrival paving",
+      "delicia-7 arrival paving",
+      "delicia-8 arrival paving",
+      "delicia-9 arrival paving",
+      "delicia-10 arrival paving",
+      "delicia-11 arrival paving",
+      "delicia-raizes arrival paving",
+      "delicia-relogio arrival paving"
+    ],
+    "closedPavingMeshes": [
+      "Unified masonry paving 1",
+      "Unified masonry paving 2",
+      "Unified masonry paving 3",
+      "Unified masonry paving 4",
+      "Unified masonry paving 5",
+      "Unified masonry paving 6"
+    ],
+    "overlapRemovedSquareMeters": 24.557476704940555,
+    "kerbStones": 656,
+    "retainingStones": 702,
+    "terminalPosts": 16,
+    "seatedTerrainVertices": 3012,
+    "restoredTerrainVertices": 443,
+    "relocatedTrees": [
+      "Gnarled orange trunk.003"
+    ],
+    "stairs": [
+      {
+        "name": "Orchard west stair",
+        "treadMeters": 0.2125,
+        "riseMeters": 0.1292,
+        "steps": 12
+      },
+      {
+        "name": "Aqueduct south stair",
+        "treadMeters": 0.205,
+        "riseMeters": 0.1572,
+        "steps": 14
+      },
+      {
+        "name": "Palace lower flight",
+        "treadMeters": 0.2507,
+        "riseMeters": 0.1675,
+        "steps": 13
+      },
+      {
+        "name": "Palace upper flight",
+        "treadMeters": 0.2872,
+        "riseMeters": 0.1557,
+        "steps": 14
+      },
+      {
+        "name": "Archive access stair",
+        "treadMeters": 0.2125,
+        "riseMeters": 0.1998,
+        "steps": 12
+      }
+    ]
+  },
+  "routeVisibility": [
+    {
+      "id": "harbor-orchard",
+      "minBody": 0.311,
+      "headAtWorst": 0.906,
+      "worstIndex": 173,
+      "hiddenHeads": []
+    },
+    {
+      "id": "orchard-aqueduct",
+      "minBody": 0.683,
+      "headAtWorst": 1.0,
+      "worstIndex": 0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "west-bank",
+      "minBody": 0.837,
+      "headAtWorst": 1.0,
+      "worstIndex": 3,
+      "hiddenHeads": []
+    },
+    {
+      "id": "five-harvests-bridge",
+      "minBody": 0.885,
+      "headAtWorst": 1.0,
+      "worstIndex": 47,
+      "hiddenHeads": []
+    },
+    {
+      "id": "archive-approach",
+      "minBody": 0.529,
+      "headAtWorst": 0.531,
+      "worstIndex": 15,
+      "hiddenHeads": []
+    },
+    {
+      "id": "aqueduct-promenade",
+      "minBody": 0.542,
+      "headAtWorst": 0.885,
+      "worstIndex": 172,
+      "hiddenHeads": []
+    },
+    {
+      "id": "source-pilgrims",
+      "minBody": 0.801,
+      "headAtWorst": 1.0,
+      "worstIndex": 57,
+      "hiddenHeads": []
+    },
+    {
+      "id": "roots-sanctuary",
+      "minBody": 0.683,
+      "headAtWorst": 1.0,
+      "worstIndex": 0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "orange-tide",
+      "minBody": 0.865,
+      "headAtWorst": 1.0,
+      "worstIndex": 3,
+      "hiddenHeads": []
+    },
+    {
+      "id": "refinery-street",
+      "minBody": 0.609,
+      "headAtWorst": 0.594,
+      "worstIndex": 15,
+      "hiddenHeads": []
+    },
+    {
+      "id": "refinery-court",
+      "minBody": 1.0,
+      "headAtWorst": 1.0,
+      "worstIndex": 0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "garden-gate",
+      "minBody": 0.529,
+      "headAtWorst": 0.417,
+      "worstIndex": 20,
+      "hiddenHeads": []
+    },
+    {
+      "id": "clock-sanctuary",
+      "minBody": 0.939,
+      "headAtWorst": 1.0,
+      "worstIndex": 17,
+      "hiddenHeads": []
+    },
+    {
+      "id": "boiler-approach",
+      "minBody": 1.0,
+      "headAtWorst": 1.0,
+      "worstIndex": 0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "palace-ascent",
+      "minBody": 0.763,
+      "headAtWorst": 1.0,
+      "worstIndex": 46,
+      "hiddenHeads": []
+    },
+    {
+      "id": "palace-stair",
+      "minBody": 0.821,
+      "headAtWorst": 1.0,
+      "worstIndex": 26,
+      "hiddenHeads": []
+    }
+  ]
+}

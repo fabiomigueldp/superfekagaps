@@ -1,4 +1,5 @@
 import { mapToScreen, type MapCamera, type MapPoint } from './WorldMapModel';
+import { vesselWaterHeight } from './WorldVesselMotion';
 
 export const MARITIME_BUOY_SPRITES = ['coral', 'sage'] as const;
 export type MaritimeBuoyKind = typeof MARITIME_BUOY_SPRITES[number];
@@ -58,7 +59,7 @@ export function parseMaritimeBuoys(value: unknown): MaritimeBuoyMetadata | null 
 }
 
 /** At most four natural-size sprites; their waterlines use the boat's 8:5 map metric. */
-export function paintMaritimeBuoys(c: CanvasRenderingContext2D, camera: MapCamera, buoys: readonly AtlasMaritimeBuoy[]): void {
+export function paintMaritimeBuoys(c: CanvasRenderingContext2D, camera: MapCamera, buoys: readonly AtlasMaritimeBuoy[], time = 0, reducedMotion = true): void {
     if (!buoys.length) return;
     c.save(); c.imageSmoothingEnabled = true;
     for (const { point, sprite, image } of buoys.slice(0, 4)) {
@@ -68,7 +69,14 @@ export function paintMaritimeBuoys(c: CanvasRenderingContext2D, camera: MapCamer
             y: point.y + (sprite.height - sprite.waterlineAnchor.y) * pixelY }, camera);
         // One filtering pixel keeps partially visible artwork intact at viewport edges.
         if (bottom.x < -1 || top.x > camera.width + 1 || bottom.y < -1 || top.y > camera.height + 1) continue;
+        if (!reducedMotion) {
+            c.save();
+            const pivot = mapToScreen(point, camera), wave = vesselWaterHeight(point, time);
+            const heave = wave * Math.min(camera.width / 1.6, camera.height) * camera.zoom * .48;
+            c.translate(pivot.x, pivot.y + heave); c.rotate(wave * 7); c.translate(-pivot.x, -pivot.y);
+        }
         c.drawImage(image, top.x, top.y, bottom.x - top.x, bottom.y - top.y);
+        if (!reducedMotion) c.restore();
     }
     c.restore();
 }
