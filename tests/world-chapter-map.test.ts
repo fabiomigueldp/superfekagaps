@@ -59,3 +59,15 @@ test('the shared map counts only authored seals and main chapter completions', (
     assert.equal(stages[0].seals, 1);
     assert.equal(stages[0].sealTotal, ALL_DELICIA_STAGES[0].pickups.filter(p => p.kind === 'seal').length);
 });
+
+test('Guaíra identifies each modeled place and distinguishes both optional entrances from the opening choice', () => {
+    const save = freshSave(), delicia = freshDeliciaSave(), before = JSON.stringify(save);
+    const stages = chapterMapStages('guaira', save, delicia);
+    assert.ok(stages.every(s => s.place && s.landmarkCue));
+    assert.equal(stages.find(s => s.id === 'guaira-lab')?.place, 'Curral da Comporta');
+    assert.equal(stages.find(s => s.id === 'gallery')?.label, 'G');
+    assert.equal(stages.find(s => s.id === 'relief')?.label, 'A');
+    assert.equal(stages.find(s => s.id === 'guaira-patio-comportas')?.label, 'B');
+    assert.equal(stages.filter(s => !s.optional).length, 5);
+    assert.equal(JSON.stringify(save), before);
+});

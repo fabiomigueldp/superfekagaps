@@ -1,0 +1,28 @@
+{
+  "revision": 4,
+  "files": {
+    "guaira.webp": {
+      "bytes": 137412,
+      "sha256": "887c6d7b3dff1223e3b5ade2eff14906b4866d4063b37429816454e99c9130df"
+    },
+    "guaira-depth.png": {
+      "bytes": 220749,
+      "sha256": "8883e08d0e509d99b2dc83801a5174ea4bd766f69f50b5b8af0f575cab349252"
+    },
+    "guaira-navigation.json": {
+      "bytes": 17053,
+      "sha256": "ba7aed15efff3059a6980ace58d19e85d38430cd050d215cfaf3362d73dda83c"
+    },
+    "guaira-water-restored.webp": {
+      "bytes": 2834,
+      "sha256": "fe98dee9b136358dd83a772fe2118ced3c11ea22c4b10805df319665731edf3a"
+    }
+  },
+  "source": "guaira-landmarks.blend",
+  "renderer": "Blender 5.2.1 LTS, Cycles CPU, 64 samples, paired beauty + linear depth",
+  "navigationChanged": "Ossabravo arrival moved to its own corral branch; main street keeps access to the ascent.",
+  "flightAnchorsChanged": false,
+  "terrainTopChanged": "Only the compacted corral court and its feathered edge.",
+  "phaseLandmarks": 8,
+  "sourceSHA256": "e11b919e9a09ad736e3816c6ae4ed24c5e8d9aaf550c4e18a6429d3a0a9d4d83"
+}

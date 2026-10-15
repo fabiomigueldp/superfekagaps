@@ -10,8 +10,21 @@ ROOT=Path(__file__).resolve().parents[3]
 parser=argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--output-dir',type=Path,default=ROOT/'public/assets/world/map/guaira-campaign')
 args=parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
-OUT=args.output_dir;OUT.mkdir(parents=True,exist_ok=True)
+OUT=args.output_dir.resolve();OUT.mkdir(parents=True,exist_ok=True)
 scene=bpy.context.scene
+# This secondary pass must never overwrite the paired island camera-depth EXR.
+if scene.compositing_node_group:
+    for node in list(scene.compositing_node_group.nodes):
+        if node.type=='OUTPUT_FILE':scene.compositing_node_group.nodes.remove(node)
+foam=bpy.data.materials.get('Foam')
+if foam is None:
+    # A saved Blender file omits unused materials. Recreate the source palette
+    # entry when this pass runs on a preserved editable scene after reopening.
+    foam=bpy.data.materials.new('Foam');foam.use_nodes=True
+    rgb=[int('C4E7DF'[i:i+2],16)/255 for i in (0,2,4)]
+    rgb=[v/12.92 if v<=.04045 else ((v+.055)/1.055)**2.4 for v in rgb]
+    foam.diffuse_color=(*rgb,1);foam.node_tree.nodes['Principled BSDF'].inputs['Base Color'].default_value=(*rgb,1)
+    foam.node_tree.nodes['Principled BSDF'].inputs['Roughness'].default_value=.78
 visible=[]
 for name in ['Bairro public water SOURCE bowl water','Bairro public water SOURCE contained fall']:
     ob=bpy.data.objects[name];ob.hide_render=False;ob.hide_viewport=False;visible.append(ob)

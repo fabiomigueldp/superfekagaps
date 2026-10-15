@@ -1,6 +1,7 @@
 import { journeyLegPoint, sailClockVelocity, sailDistanceProgress, sailPathPoints, type JourneyEdgeDirection, type JourneyLeg, type JourneyState } from './WorldJourneyModel';
 import { samplePath, type MapPoint } from './WorldMapModel';
 import type { BoatAtlasFrame } from './WorldAtlasArt';
+import { advanceVesselWake, dampedMotion, sampleVesselDynamics, VESSEL_MAX_ROTATION, VESSEL_MOORED_SWELL, type VesselDynamics, type VesselMotion, type VesselWakeState } from './WorldVesselMotion';
 
 /** Sail edges run worlds[0] → worlds[1]; both boarding edges run dock → berth. */
 export interface FerryDefinition {
@@ -11,7 +12,12 @@ export interface FerryDefinition {
     berths: Readonly<Record<number, string>>;
 }
 /** Vehicle positions and heading easing belong to this map session, never save. */
-export interface FerryState { mooredWorld: number; headingIndex: number; headingAt: number; headingRadians?: number; poseAt?: number }
+export interface FerryState {
+    mooredWorld: number; headingIndex: number; headingAt: number; headingRadians?: number; poseAt?: number;
+    yawVelocity?: number;
+    dynamics?: VesselDynamics;
+    wake?: VesselWakeState;
+}
 export interface FerryGeometry {
     berths: Readonly<Record<number, { foot: MapPoint; headingFrame: number }>>;
     /** Forward order and reversed path order, respectively. */
@@ -20,8 +26,10 @@ export interface FerryGeometry {
     art?: { frames: readonly (BoatAtlasFrame & { worldHeadingRadians: number; screenHeadingRadians: number })[];
         headingProjection?: { xAxis: MapPoint; yAxis: MapPoint } };
 }
-export interface FerryPose { foot: MapPoint; frameIndex: number; state: FerryState;
-    motion?: { waterline: MapPoint; screenHeading: number; speed: number } }
+export interface FerryPose {
+    /** Authored deck anchor, before the shared hull/passenger visual motion. */
+    foot: MapPoint; frameIndex: number; state: FerryState;
+    motion?: VesselMotion }
 
 /** Preserve the released identifiers used by routing and rendering. */
 export const COAST_PORT_FERRY: FerryDefinition = {
@@ -112,6 +120,8 @@ export function sampleFerry(state: FerryState, definition: FerryDefinition, geom
 const angleDelta = (from: number, to: number) => Math.atan2(Math.sin(to - from), Math.cos(to - from));
 const smooth = (value: number) => { const t = Math.max(0, Math.min(1, value)); return t * t * (3 - 2 * t); };
 const mixAngle = (from: number, to: number, t: number) => from + angleDelta(from, to) * t;
+const hullRotation = (dynamics: VesselDynamics | undefined, heading: number) => Math.max(-VESSEL_MAX_ROTATION, Math.min(VESSEL_MAX_ROTATION,
+    (dynamics?.roll.value ?? 0) * Math.sin(heading) + (dynamics?.pitch.value ?? 0) * Math.cos(heading)));
 function sampleFluidFerry(state: FerryState, definition: FerryDefinition, geometry: FerryGeometry,
     options: { active?: JourneyLeg; point?: MapPoint; time: number; reducedMotion?: boolean }): FerryPose {
     const art = geometry.art!, { active, time, reducedMotion } = options;
@@ -123,9 +133,24 @@ function sampleFluidFerry(state: FerryState, definition: FerryDefinition, geomet
         return { x: (water.x - frame.passengerFoot.x) * pixel, y: (water.y - frame.passengerFoot.y) * pixel * 1.6 };
     };
     const dock = geometry.berths[state.mooredWorld];
+    const elapsed = (time - (state.poseAt ?? time)) / 1000;
+    const dt = elapsed > 0 && elapsed <= .25 ? elapsed : 0;
+    const previousDynamics = elapsed < 0 || elapsed > .25 ? undefined : state.dynamics;
     if (active?.mode !== 'sail' || active.id !== definition.sailEdge) {
         const angle = berthAngle(state.mooredWorld), frameIndex = nearest(angle);
-        return { foot: { ...dock.foot }, frameIndex, state: { ...state, headingIndex: frameIndex, headingAt: time, headingRadians: angle, poseAt: time } };
+        const deck = offset(frameIndex), waterline = { x: dock.foot.x + deck.x, y: dock.foot.y + deck.y };
+        const screenHeading = art.frames[frameIndex].screenHeadingRadians;
+        // Mooring removes propulsion, not buoyancy or momentum. The very same
+        // springs settle the arrival load and keep following sheltered swell.
+        const dynamics = reducedMotion ? undefined : sampleVesselDynamics(previousDynamics,
+            waterline, screenHeading, 0, 0, time, dt, VESSEL_MOORED_SWELL);
+        const wake = !reducedMotion && state.wake ? advanceVesselWake(state.wake,
+            { ...state.wake.emitter, time, speed: 0 }) : undefined;
+        return { foot: { ...dock.foot }, frameIndex,
+            state: { ...state, headingIndex: frameIndex, headingAt: time, headingRadians: angle, poseAt: time,
+                yawVelocity: 0, dynamics, wake: wake?.samples.length ? wake : undefined },
+            motion: reducedMotion ? undefined : { waterline, screenHeading, speed: 0,
+                heave: dynamics!.heave.value, rotation: hullRotation(dynamics, screenHeading), wake: wake?.samples } };
     }
     const distance = sailDistanceProgress(active.progress), path = sailPathPoints(active.points);
     const reference = options.point ?? journeyLegPoint(active), start = offset(nearest(berthAngle(definition.worlds[0]))), end = offset(nearest(berthAngle(definition.worlds[1])));
@@ -160,16 +185,15 @@ function sampleFluidFerry(state: FerryState, definition: FerryDefinition, geomet
     const lastBlend = smooth((distance - departureEnd + (headingDirection === 1 ? .2 : .1)) / (headingDirection === 1 ? .2 : .1));
     target = mixAngle(berthAngle(definition.worlds[0]), target, firstBlend);
     target = mixAngle(target, berthAngle(definition.worlds[1]), lastBlend);
-    const dt = Math.max(0, Math.min(.1, (time - (state.poseAt ?? time)) / 1000));
     let angle = state.headingRadians ?? berthAngle(state.mooredWorld);
-    const delta = angleDelta(angle, target), amount = Math.min(Math.abs(delta) * (1 - Math.exp(-dt / .13)), dt * Math.PI * 1.25);
-    angle += Math.sign(delta) * amount;
+    const steering = dampedMotion({ value: angle, velocity: state.yawVelocity ?? 0 }, angle + angleDelta(angle, target), dt, 8);
+    const amount = Math.max(-dt * 2.4, Math.min(dt * 2.4, steering.value - angle));
+    angle += amount;
+    const yawVelocity = reducedMotion ? 0 : Math.max(-2.4, Math.min(2.4, steering.velocity));
     if (reducedMotion) angle = target;
     const frameIndex = nearest(angle), deckOffset = offset(frameIndex);
     const velocity = sailClockVelocity(active);
     const speed = Math.abs(velocity) * Math.min(1, (1 - Math.cos(Math.PI * Math.min(active.progress, 1 - active.progress, .15) / .15)) / 2);
-    const heave = reducedMotion ? 0 : Math.sin(time / 430) * .0012 * speed;
-    const foot = { x: waterline.x - deckOffset.x, y: waterline.y - deckOffset.y + heave };
     const projected = { x: x.x * Math.cos(angle) + y.x * Math.sin(angle), y: x.y * Math.cos(angle) + y.y * Math.sin(angle) };
     const screenHeading = Math.atan2(projected.y, projected.x);
     const before = Math.max(0, distance - .0001), after = Math.min(1, distance + .0001);
@@ -179,6 +203,19 @@ function sampleFluidFerry(state: FerryState, definition: FerryDefinition, geomet
     // A stern wake would point ahead of an astern departure/retarget. Omit it
     // while braking or manoeuvring, and whenever the bow opposes actual travel.
     const wakeSpeed = !active.sailManeuver && Math.cos(actualHeading - screenHeading) > .5 ? speed : 0;
-    return { foot, frameIndex, state: { ...state, headingIndex: frameIndex, headingAt: time, headingRadians: angle, poseAt: time },
-        motion: { waterline, screenHeading, speed: reducedMotion ? 0 : wakeSpeed } };
+    const swell = VESSEL_MOORED_SWELL + (1 - VESSEL_MOORED_SWELL) * smooth(Math.min(active.progress, 1 - active.progress) / .12);
+    const dynamics = reducedMotion ? undefined : sampleVesselDynamics(previousDynamics,
+        waterline, screenHeading, speed * Math.cos(actualHeading - screenHeading), yawVelocity, time, dt, swell);
+    // Change the forces near the quay, never multiply the resulting displacement
+    // by zero. This preserves position AND velocity across sailing ↔ mooring.
+    const heave = dynamics?.heave.value ?? 0, rotation = hullRotation(dynamics, screenHeading);
+    const foot = { x: waterline.x - deckOffset.x, y: waterline.y - deckOffset.y };
+    const pixel = art.frames[frameIndex].widthInMap * art.frames[frameIndex].passengerPixelScale / art.frames[frameIndex].width;
+    const wake = reducedMotion ? undefined : advanceVesselWake(state.wake, {
+        point: { x: waterline.x - Math.cos(screenHeading) * 15 * pixel, y: waterline.y - Math.sin(screenHeading) * 15 * pixel * 1.6 },
+        heading: screenHeading, speed: wakeSpeed, time,
+    });
+    return { foot, frameIndex, state: { ...state, headingIndex: frameIndex, headingAt: time, headingRadians: angle, poseAt: time,
+        yawVelocity, dynamics, wake },
+        motion: { waterline, screenHeading, speed: reducedMotion ? 0 : wakeSpeed, heave, rotation, wake: wake?.samples } };
 }

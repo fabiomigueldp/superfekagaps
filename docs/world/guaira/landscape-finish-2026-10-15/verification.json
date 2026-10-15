@@ -1,0 +1,152 @@
+{
+  "revision": 3,
+  "date": "2026-10-15",
+  "tests": 581,
+  "testFailures": 0,
+  "buildPassed": true,
+  "sourceSHA256": "bd70f51d656f185e3b6fdd9567d4113b96f7db382ae85d747292fe1f49940fc7",
+  "navigationAndTransportUnchanged": true,
+  "terrainTopMaximumChange": 0.0,
+  "waterMeshesUnchanged": true,
+  "cameraProjection": {
+    "maximumNormalizedError": 4.980049128633368e-08,
+    "maximumDepthErrorMeters": 4.6411132714752057e-07
+  },
+  "closedConnectedMeshes": 189,
+  "newClosedMeshes": 136,
+  "coastContours": 8,
+  "coastContoursValid": true,
+  "channelSupportProbes": 99,
+  "channelObstructions": 0,
+  "seamAndBankProbes": 41,
+  "unsupportedSeamOrBankPoints": 0,
+  "replantedBankAgaves": 2,
+  "routes": {
+    "samples": 571,
+    "supportProbes": 1713,
+    "unsupported": 0,
+    "bodyContacts": 0
+  },
+  "depth": {
+    "samples": 1326,
+    "allEntranceHeadsVisible": true,
+    "minimumHeadVisibilityUnderArrivalShelter": 0.7291666666666666
+  },
+  "aircraft": {
+    "poses": 1780,
+    "wheelContacts": 1230,
+    "marginMeters": 0.05,
+    "summary": {
+      "final:guaira->serra": {
+        "samples": 445,
+        "collisionSamples": 0,
+        "conservativeMarginUnresolvedSamples": 0,
+        "wheelSamples": 378,
+        "unsupportedWheelSamples": 0,
+        "minTriangleAabbLowerBound": null,
+        "minSampledSurfaceUpperBound": null,
+        "stages": {}
+      },
+      "final:guaira->fabrica": {
+        "samples": 445,
+        "collisionSamples": 0,
+        "conservativeMarginUnresolvedSamples": 0,
+        "wheelSamples": 378,
+        "unsupportedWheelSamples": 0,
+        "minTriangleAabbLowerBound": null,
+        "minSampledSurfaceUpperBound": null,
+        "stages": {}
+      },
+      "final:serra->guaira": {
+        "samples": 445,
+        "collisionSamples": 0,
+        "conservativeMarginUnresolvedSamples": 0,
+        "wheelSamples": 237,
+        "unsupportedWheelSamples": 0,
+        "minTriangleAabbLowerBound": null,
+        "minSampledSurfaceUpperBound": null,
+        "stages": {}
+      },
+      "final:fabrica->guaira": {
+        "samples": 445,
+        "collisionSamples": 0,
+        "conservativeMarginUnresolvedSamples": 0,
+        "wheelSamples": 237,
+        "unsupportedWheelSamples": 0,
+        "minTriangleAabbLowerBound": null,
+        "minSampledSurfaceUpperBound": null,
+        "stages": {}
+      }
+    }
+  },
+  "water": {
+    "patches": 8,
+    "scratchPixels": 2266,
+    "footprintUnchanged": true
+  },
+  "browser": {
+    "entries": [
+      {
+        "id": "guaira-travessia",
+        "mounted": "guaira-travessia",
+        "returned": "guaira-travessia"
+      },
+      {
+        "id": "guaira-respiros",
+        "mounted": "guaira-respiros",
+        "returned": "guaira-respiros"
+      },
+      {
+        "id": "guaira-lab",
+        "mounted": "guaira-lab",
+        "returned": "guaira-lab"
+      },
+      {
+        "id": "guaira-subida",
+        "mounted": "guaira-subida",
+        "returned": "guaira-subida"
+      },
+      {
+        "id": "guaira-prefeito",
+        "mounted": "guaira-prefeito",
+        "returned": "guaira-prefeito"
+      },
+      {
+        "id": "guaira-patio-comportas",
+        "mounted": "guaira-patio-comportas",
+        "returned": "guaira-patio-comportas"
+      },
+      {
+        "id": "gallery",
+        "mounted": "guaira-galeria",
+        "returned": "gallery"
+      },
+      {
+        "id": "relief",
+        "mounted": "guaira-camara-alivio",
+        "returned": "relief"
+      }
+    ],
+    "desktop": {
+      "frames": 1412,
+      "offscreen": 0,
+      "plaqueOverlaps": 0
+    },
+    "mobile": {
+      "frames": 807,
+      "offscreen": 0,
+      "plaqueOverlaps": 0
+    },
+    "arrival": {
+      "chapter": "guaira",
+      "arrived": "guaira-travessia",
+      "active": false
+    },
+    "departure": {
+      "guaira": false,
+      "actor": null,
+      "arrived": "3-5"
+    },
+    "errors": []
+  }
+}

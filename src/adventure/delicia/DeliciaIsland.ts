@@ -4,6 +4,7 @@ export const DELICIA_ATLAS = Object.freeze({ left: -2.70, top: -3.02, widthInMap
 export function deliciaAsset(file: string, base = (import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/'): string {
     return `${base.endsWith('/') ? base : `${base}/`}assets/delicia/${file}`;
 }
-export const DELICIA_MAP_IMAGE = deliciaAsset('island.webp?v=4');
-export const DELICIA_MAP_METADATA = deliciaAsset('island-map.json?v=4');
+export const DELICIA_MAP_IMAGE = deliciaAsset('island.webp?v=11');
+export const DELICIA_MAP_METADATA = deliciaAsset('island-map.json?v=11');
+export const DELICIA_MAP_DEPTH = deliciaAsset('island-depth.png?v=11');
 export const DELICIA_ENTRY = './delicia.html';

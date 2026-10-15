@@ -1,0 +1,390 @@
+{
+  "revision": 2,
+  "newClosedMeshes": [
+    {
+      "name": "Continuous clay island",
+      "vertices": 3888,
+      "faces": 5102,
+      "volume": 218.813466
+    },
+    {
+      "name": "Terrain v2 embedded outcrop 0",
+      "vertices": 24,
+      "faces": 18,
+      "volume": 0.052439
+    },
+    {
+      "name": "Terrain v2 embedded outcrop 1",
+      "vertices": 24,
+      "faces": 18,
+      "volume": 0.032379
+    },
+    {
+      "name": "Terrain v2 embedded outcrop 2",
+      "vertices": 24,
+      "faces": 18,
+      "volume": 0.021088
+    },
+    {
+      "name": "Terrain v2 embedded outcrop 3",
+      "vertices": 24,
+      "faces": 18,
+      "volume": 0.042484
+    },
+    {
+      "name": "Terrain v2 embedded outcrop 4",
+      "vertices": 24,
+      "faces": 18,
+      "volume": 0.016183
+    },
+    {
+      "name": "Terrain v2 embedded outcrop 5",
+      "vertices": 24,
+      "faces": 18,
+      "volume": 0.041696
+    },
+    {
+      "name": "Terrain v2 embedded outcrop 6",
+      "vertices": 24,
+      "faces": 18,
+      "volume": 0.024479
+    },
+    {
+      "name": "Terrain v2 embedded outcrop 7",
+      "vertices": 24,
+      "faces": 18,
+      "volume": 0.044676
+    },
+    {
+      "name": "Terrain v2 embedded outcrop 8",
+      "vertices": 24,
+      "faces": 18,
+      "volume": 0.050839
+    },
+    {
+      "name": "Terrain v2 embedded outcrop 9",
+      "vertices": 24,
+      "faces": 18,
+      "volume": 0.033455
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 0-0",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.7e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 0-1",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 2.3e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 0-2",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 2.5e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 0-3",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.6e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 0-4",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 2.3e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 0-5",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 2.7e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 0-6",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.6e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 1-0",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 9e-06
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 1-1",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.3e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 1-2",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.4e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 1-3",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 9e-06
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 1-4",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.3e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 1-5",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.5e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 1-6",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 9e-06
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 2-0",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 8e-06
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 2-1",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.1e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 2-2",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.2e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 2-3",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 8e-06
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 2-4",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.1e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 2-5",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.3e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 2-6",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 8e-06
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 3-0",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.7e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 3-1",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 2.3e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 3-2",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 2.5e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 3-3",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.6e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 3-4",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 2.3e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 3-5",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 2.7e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 3-6",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.6e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 4-0",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 9e-06
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 4-1",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.3e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 4-2",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.4e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 4-3",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 9e-06
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 4-4",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.3e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 4-5",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.5e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 4-6",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 9e-06
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 5-0",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.3e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 5-1",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.8e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 5-2",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.9e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 5-3",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.2e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 5-4",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.7e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 5-5",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 2.1e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 5-6",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 1.2e-05
+    }
+  ],
+  "archivedSourceObjects": [
+    "Low eroded shoulder",
+    "Shoulder broken cap",
+    "Low eroded shoulder.001",
+    "Shoulder broken cap.001",
+    "Low eroded shoulder.002",
+    "Shoulder broken cap.002",
+    "Low eroded shoulder.003",
+    "Shoulder broken cap.003",
+    "Low eroded shoulder.004",
+    "Shoulder broken cap.004",
+    "Low eroded shoulder.005",
+    "Shoulder broken cap.005",
+    "Continuous clay island",
+    "Fitted fractured cliff 00 00",
+    "Fitted fractured cliff 01 00",
+    "Broken horizontal sediment seam",
+    "Fitted fractured cliff 02 00",
+    "Fitted fractured cliff 03 00",
+    "Fitted fractured cliff 04 00",
+    "Fitted fractured cliff 05 00",
+    "Broken horizontal sediment seam.001",
+    "Fitted fractured cliff 05 01",
+    "Fitted fractured cliff 06 00",
+    "Fitted fractured cliff 06 01",
+    "Fitted fractured cliff 07 00",
+    "Fitted fractured cliff 08 00",
+    "Fitted fractured cliff 09 00",
+    "Broken horizontal sediment seam.002",
+    "Fitted fractured cliff 10 00",
+    "Fitted fractured cliff 11 00",
+    "Fitted fractured cliff 12 00",
+    "Fitted fractured cliff 13 00",
+    "Broken horizontal sediment seam.003",
+    "Fitted fractured cliff 13 01",
+    "Fitted fractured cliff 14 00",
+    "Fitted fractured cliff 15 00",
+    "Fitted fractured cliff 16 00",
+    "Fitted fractured cliff 17 00",
+    "Broken horizontal sediment seam.004",
+    "Fitted fractured cliff 18 00",
+    "Fitted fractured cliff 19 00",
+    "Fitted fractured cliff 19 01",
+    "Fitted fractured cliff 20 00",
+    "Fitted fractured cliff 20 01",
+    "Fitted fractured cliff 21 00",
+    "Broken horizontal sediment seam.005",
+    "Fitted fractured cliff 21 01",
+    "Fitted fractured cliff 22 00",
+    "Fitted fractured cliff 22 01",
+    "Fitted fractured cliff 23 00",
+    "Fitted fractured cliff 24 00",
+    "Fitted fractured cliff 25 00",
+    "Broken horizontal sediment seam.006",
+    "Fitted fractured cliff 26 00",
+    "Fitted fractured cliff 27 00",
+    "STOL continuous irregular landing meadow",
+    "STOL graded dirt clearing"
+  ],
+  "groundedFissures": 107,
+  "trimmedCoastalFissures": [
+    "Branched soil fissure.028",
+    "Fissure fine branch.028"
+  ],
+  "coastVertices": 297,
+  "groundArea": 124.581,
+  "allRoutesPreserved": true
+}

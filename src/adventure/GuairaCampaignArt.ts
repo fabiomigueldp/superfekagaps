@@ -87,7 +87,7 @@ export function loadCampaignRegionImage(region: GuairaCampaignRegion): Promise<H
         const timer = setTimeout(() => finish(null), 10_000);
         (timer as unknown as { unref?: () => void }).unref?.();
         image.onload = () => finish(image.naturalWidth > 0 ? image : null); image.onerror = () => finish(null);
-        image.src = GUAIRA_CAMPAIGN_ART[region].path;
+        image.src = GUAIRA_CAMPAIGN_ART[region].path + (region === 'guaira' ? `?v=${guairaMetadata.nativeMapRevision}` : '');
     });
 }
 export function paintCampaignRegion(c: CanvasRenderingContext2D, camera: MapCamera, region: GuairaCampaignRegion,

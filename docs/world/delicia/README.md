@@ -2,7 +2,9 @@
 
 A [revisão da interface](interface-v4.md) alinha a expansão à fonte bitmap, à paleta e aos menus do World, com mapa em tela cheia e textos mais curtos.
 
-**Modelo atual: [polimento do terreno, cachoeiras e praias, revisão 4](modelo-v4.md).** A revisão atual refina o rio de suco, os afloramentos calcários, as enseadas e o encontro da ilha com o mar sobre a [arquitetura da revisão 3](modelo-v3.md). A [segunda produção da campanha](entrega-v2.md) descreve os 48 setores, os seis assets imagegen, oito inimigos, movimentos dos bosses, máquinas e medalhas. O texto abaixo preserva a direção e as especificações da primeira entrega.
+**Modelo atual: [acessos do jardim e do campanário, revisão 11](garden-access-2026-10-13/index.html).** Feka agora entra pelo portão norte e chega à fase 9 dentro do jardim. Três escadas, patamares e uma passagem até a porta do campanário substituem as descidas deformadas. A lateral da pérgola foi recuada e a vegetação replantada para liberar o percurso. As duas rotas afetadas, a imagem e a profundidade são exportadas juntas do [modelo Blender v11](imperio-delicia-v11.blend); as demais 14 rotas e 13 chegadas mantêm suas posições. [Detalhes e verificações](garden-access-2026-10-13/README.md). A [revisão 10](landscape-polish-2026-10-13/index.html) preserva o trabalho nas fundações e muros; a [revisão 9](masonry-polish-2026-10-13/index.html), nas bordas e no mirante.
+
+O [polimento do terreno da revisão 4](modelo-v4.md), a [arquitetura da revisão 3](modelo-v3.md) e a [segunda produção da campanha](entrega-v2.md) registram as entregas anteriores. O texto abaixo preserva a direção e as especificações da primeira entrega.
 
 Expansão jogável de **Super Feka Gaps World**, produzida em 4 de outubro de 2026.
 Uma ilha de pomares, aquedutos, arquivos de memória e refinarias de suco de laranja,
@@ -13,7 +15,7 @@ Os personagens, suas relações e os acontecimentos desta aventura são ficção
 
 ## Entrar na ilha
 
-Com o servidor Vite ativo, abra **`/delicia.html`** ou **`/?delicia=true`**.
+Com o servidor Vite ativo, abra **`/?chapter=delicia`** para o mapa integrado ao World.
 No mapa do World, o acesso **“Império da Delícia”** abre a campanha.
 O botão **“Ver panorama”** mostra a ilha junto ao arquipélago existente.
 O progresso da expansão é independente, em `super_feka_delicia_v1`.

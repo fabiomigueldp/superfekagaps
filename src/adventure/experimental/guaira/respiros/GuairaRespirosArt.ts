@@ -1,10 +1,11 @@
-import { box as r, pixelLine as line, polygon, roof } from '../../../WorldPainting';
+import { box as r, pixelLine as line, roof } from '../../../WorldPainting';
 import { jetCycle, type JetCycle } from '../../../WorldMachineState';
 import type { MovingBody, WorldLevel, WorldObjects } from '../../../WorldPhysics';
 import { pixelText } from '../../../../graphics/BitmapFont';
 import { supportsStanding, isOneWayTile } from '../../../../world/tileRules';
 import { GUAIRA_RESPIROS as G } from './GuairaRespirosStage';
 import { drawGuairaWorker } from '../GuairaWorkerArt';
+import { drawGuairaLandscape, drawGuairaTree, drawGuairaFieldBank, drawGuairaAwning, guairaBreeze } from '../GuairaScenery';
 
 const P = Object.freeze({
     ink: '#493c43', clay: '#b66f50', clayShade: '#985b45', clayLight: '#cd8c5d',
@@ -38,18 +39,25 @@ function pipe(c: CanvasRenderingContext2D, x: number, y: number, width: number) 
     }
 }
 
-function riceBed(c: CanvasRenderingContext2D, x: number, y: number, width: number, row: number, time: number) {
+function riceBed(c: CanvasRenderingContext2D, x: number, y: number, width: number, row: number, time: number, worldX: number) {
     r(c, x, y + 4, width, 10, '#9e9d78');
     r(c, x + 2, y + 5, width - 4, 6, P.channelShade);
     r(c, x + 3, y + 5, width - 6, 3, P.channel);
-    for (let dx = 8; dx < width - 5; dx += 20) {
-        const sway = Math.floor(time / 1200 + dx / 20 + row) % 4 === 0 ? 1 : 0;
-        const h = 9 + (dx + row * 3) % 5;
-        line(c, x + dx, y + 8, x + dx - 4 + sway, y - h + 6, P.leafShade);
-        line(c, x + dx + 1, y + 8, x + dx + 2 + sway, y - h + 2, P.leaf);
-        line(c, x + dx + 2, y + 7, x + dx + 7, y - h + 6, P.leaf);
-        r(c, x + dx + 2 + sway, y - h + 2, 3, 2, P.grain);
-        r(c, x + dx + 5, y + 7, 6, 1, P.channelLight);
+    // Stagger the second row and alternate mature/young clumps. World-based
+    // wind bends the upper stem; the lower stem stays planted in the water.
+    for (let i = 0, dx = 8 + row * 7; dx < width - 9; i++, dx += 17 + i % 3 * 2) {
+        const sway = guairaBreeze(time, worldX + dx + row * 23, 2);
+        const h = 9 + (i * 3 + row + Math.floor(worldX / 13)) % 6, lean = i % 2 ? -1 : 2;
+        line(c, x + dx + 1, y + 8, x + dx, y + 2, P.leafShade);
+        line(c, x + dx, y + 2, x + dx - 4 + sway, y - h + 6, P.leafShade);
+        line(c, x + dx + 1, y + 8, x + dx + 2, y - 1, P.leaf);
+        line(c, x + dx + 2, y - 1, x + dx + lean + sway, y - h + 2, P.leaf);
+        line(c, x + dx + 2, y + 7, x + dx + 6 + sway, y - h + 7, P.leaf);
+        if (i % 3 !== 1) {
+            r(c, x + dx + lean + sway, y - h + 2, 2, 3, P.grain);
+            r(c, x + dx + lean + 1 + sway, y - h + 4, 2, 2, P.grain);
+        }
+        r(c, x + dx + 4, y + 9, 4, 1, P.channelLight);
     }
     r(c, x, y + 12, width, 2, '#b4a283');
     for (let dx = 3; dx < width - 7; dx += 23) r(c, x + dx, y + 12, 12, 1, '#c3b08e');
@@ -59,24 +67,22 @@ function riceBed(c: CanvasRenderingContext2D, x: number, y: number, width: numbe
 export function drawRespirosBackground(c: CanvasRenderingContext2D, cx: number, cy: number, time: number, reducedMotion: boolean) {
     layer(c, cx, cy, (rawX, rawY) => {
         const cameraX = Math.round(rawX), cameraY = Math.round(rawY), t = reducedMotion ? 0 : finite(time);
-        r(c, 0, 23, 320, 157, '#e6bd91'); r(c, 0, 23, 320, 39, '#ebcda4');
-        for (let n = -1; n < 5; n++) {
-            const x = n * 116 - Math.round(cameraX * .14) % 116, y = 106 - Math.round(cameraY * .15);
-            polygon(c, [[x,y + 16],[x + 14,y + 4],[x + 42,y],[x + 57,y + 3],[x + 69,y + 18],[x + 118,y + 29],[x + 118,180],[x,180]], '#cba17e');
-            r(c, x + 17, y + 5, 23, 2, '#dab58d');
-        }
+        drawGuairaLandscape(c, cameraX, cameraY, t, reducedMotion, 'rice');
         r(c, 0, 231 - cameraY, 320, 64, '#c4946c');
         for (const [x, y, width] of [[120,244,124],[253,234,110],[372,239,120],[502,247,112],[678,240,128],[822,245,148],[980,239,124]] as const) {
-            riceBed(c, x - cameraX, y - cameraY, width, 0, t);
-            riceBed(c, x - cameraX, y + 19 - cameraY, width, 1, t);
+            drawGuairaFieldBank(c, x - cameraX, y + 5 - cameraY, width, 295 - cameraY);
+            riceBed(c, x - cameraX, y - cameraY, width, 0, t, x);
+            riceBed(c, x - cameraX, y + 19 - cameraY, width, 1, t, x);
         }
         // Compact municipal pump house: terracotta roof, patched plaster, sight
         // glass and a bolted feed. No background prop receives a walkable cap.
         const hx = 18 - cameraX, hy = 207 - cameraY;
+        drawGuairaTree(c, 5 - cameraX, 282 - cameraY, 70, t, 5, true);
         r(c, hx + 3, hy + 13, 78, 65, '#b79677');
         r(c, hx + 4, hy + 14, 66, 62, '#dac099'); roof(c, hx, hy, 87, 16);
         r(c, hx + 15, hy + 39, 21, 38, '#846b58'); r(c, hx + 17, hy + 40, 17, 35, '#625a50');
         r(c, hx + 18, hy + 40, 2, 35, '#a18763');
+        drawGuairaAwning(c, hx + 13, hy + 36, 25, t, 31);
         r(c, hx + 49, hy + 27, 15, 21, '#957b5e'); r(c, hx + 51, hy + 29, 11, 17, '#668f88');
         r(c, hx + 52, hy + 30, 3, 15, '#a8bdaa'); r(c, hx + 55, hy + 29, 2, 17, '#d4b991');
         r(c, hx + 8, hy + 62, 8, 5, '#c3a280'); r(c, hx + 43, hy + 70, 10, 4, '#c3a280');
@@ -95,6 +101,7 @@ export function drawRespirosBackground(c: CanvasRenderingContext2D, cx: number, 
             r(c, x + exitOffset - cameraX, 280 - cameraY, 20, 2, '#b49a70');
         }
         r(c, 600 + exitOffset - cameraX, 260 - cameraY, 43, 12, '#b59770');
+        r(c, 613 + exitOffset - cameraX, 272 - cameraY, 2, 19, '#927b5f');
         pixelText(c, 'CURRAL', 603 + exitOffset - cameraX, 262 - cameraY, '#63594c');
         // A quiet observation bay, behind the checkpoint and the actor. The
         // arrow leads the eye to B's real pressure gauge, not to a timed dash.

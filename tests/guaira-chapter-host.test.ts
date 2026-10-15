@@ -120,9 +120,9 @@ function invokeSaved(callback: EventListenerOrEventListenerObject, event = new E
 
 test('shared world entry starts the requested native scene and returns without building another map', async t => {
     const h = hostBrowser(t), progressStore = new ProgressStore(null);
-    let returned = 0;
+    let returned = 0, playedStage: string | undefined;
     const app = h.create({ progressStore, campaign: true, initialScene: 'guaira-patio-comportas',
-        returnToWorldMap: () => { returned++; app.dispose(); } });
+        returnToWorldMap: played => { returned++; playedStage = played; app.dispose(); } });
     await waitForGame(app);
     assert.equal(h.mapPorts.length, 0, 'The world map already owns stage selection');
     assert.equal(app.snapshot.activeAttempt?.sceneId, 'guaira-patio-comportas');
@@ -130,6 +130,7 @@ test('shared world entry starts the requested native scene and returns without b
     assert.equal(progressStore.save.guaira.resumeScene, 'guaira-patio-comportas');
     h.byId('chapter-primary').click(); h.byId('chapter-map-return').click(); await flush();
     assert.equal(returned, 1); assert.equal(h.mapPorts.length, 0);
+    assert.equal(playedStage, 'guaira-patio-comportas', 'World receives the physical doorway actually played');
     assert.equal(progressStore.save.guaira.resumeScene, null);
     assert.deepEqual(progressStore.save.guaira.completed, [], 'Returning does not award a completion');
     h.checkDisposed();

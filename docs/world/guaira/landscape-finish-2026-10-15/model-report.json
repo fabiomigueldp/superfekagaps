@@ -1,0 +1,968 @@
+{
+  "revision": 3,
+  "newClosedMeshes": [
+    {
+      "name": "Landscape v3 civic recessed mortar backing 0",
+      "vertices": 28,
+      "faces": 38,
+      "volume": 0.7654371038194884
+    },
+    {
+      "name": "Landscape v3 civic recessed mortar backing 1",
+      "vertices": 12,
+      "faces": 14,
+      "volume": 0.15919188658414346
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 0",
+      "vertices": 12,
+      "faces": 14,
+      "volume": 0.019548300154258298
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 1",
+      "vertices": 8,
+      "faces": 8,
+      "volume": 0.02750590981479372
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 2",
+      "vertices": 12,
+      "faces": 14,
+      "volume": 0.0278314937733408
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 3",
+      "vertices": 8,
+      "faces": 8,
+      "volume": 0.027505907355958606
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 4",
+      "vertices": 12,
+      "faces": 14,
+      "volume": 0.028343349202834833
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 5",
+      "vertices": 8,
+      "faces": 8,
+      "volume": 0.02750591542325133
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 6",
+      "vertices": 8,
+      "faces": 8,
+      "volume": 0.027505914162391176
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 7",
+      "vertices": 12,
+      "faces": 14,
+      "volume": 0.02915433594217938
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 8",
+      "vertices": 12,
+      "faces": 14,
+      "volume": 0.02714546076823872
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 9",
+      "vertices": 14,
+      "faces": 17,
+      "volume": 0.027802503411267377
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 10",
+      "vertices": 8,
+      "faces": 8,
+      "volume": 0.02064583990966337
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 11",
+      "vertices": 8,
+      "faces": 8,
+      "volume": 0.0027956599037713336
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 0",
+      "vertices": 12,
+      "faces": 14,
+      "volume": 0.024557289521983144
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 1",
+      "vertices": 8,
+      "faces": 8,
+      "volume": 0.024119681078466244
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 2",
+      "vertices": 12,
+      "faces": 14,
+      "volume": 0.024355765027371898
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 3",
+      "vertices": 10,
+      "faces": 11,
+      "volume": 0.024119773452711615
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 4",
+      "vertices": 10,
+      "faces": 11,
+      "volume": 0.024718161393368857
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 5",
+      "vertices": 8,
+      "faces": 8,
+      "volume": 0.02411966634346295
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 6",
+      "vertices": 12,
+      "faces": 14,
+      "volume": 0.025314981347778667
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 7",
+      "vertices": 8,
+      "faces": 8,
+      "volume": 0.024119675155289358
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 8",
+      "vertices": 12,
+      "faces": 14,
+      "volume": 0.00794663678036567
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 9",
+      "vertices": 8,
+      "faces": 8,
+      "volume": 0.008224605330398056
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 10",
+      "vertices": 12,
+      "faces": 14,
+      "volume": 0.02454775558206245
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 11",
+      "vertices": 8,
+      "faces": 8,
+      "volume": 0.009811959609202704
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 12",
+      "vertices": 8,
+      "faces": 8,
+      "volume": 0.010239367086048654
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 0",
+      "vertices": 12,
+      "faces": 14,
+      "volume": 0.017271896279830834
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 1",
+      "vertices": 8,
+      "faces": 8,
+      "volume": 0.024699457435142777
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 2",
+      "vertices": 12,
+      "faces": 14,
+      "volume": 0.024884995097043956
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 3",
+      "vertices": 8,
+      "faces": 8,
+      "volume": 0.024699456917264592
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 4",
+      "vertices": 12,
+      "faces": 14,
+      "volume": 0.02517668879610479
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 5",
+      "vertices": 8,
+      "faces": 8,
+      "volume": 0.02469945950795454
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 6",
+      "vertices": 8,
+      "faces": 8,
+      "volume": 0.02469945818249064
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 7",
+      "vertices": 12,
+      "faces": 14,
+      "volume": 0.025638838549553136
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 8",
+      "vertices": 12,
+      "faces": 14,
+      "volume": 0.02449404549635382
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 9",
+      "vertices": 14,
+      "faces": 17,
+      "volume": 0.0247485668066091
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 10",
+      "vertices": 8,
+      "faces": 8,
+      "volume": 0.01866239172253978
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 11",
+      "vertices": 6,
+      "faces": 5,
+      "volume": 0.0021464120596223282
+    },
+    {
+      "name": "Landscape v3 civic fitted course 3 0",
+      "vertices": 14,
+      "faces": 17,
+      "volume": 0.007979392073667444
+    },
+    {
+      "name": "Landscape v3 civic fitted course 3 1",
+      "vertices": 8,
+      "faces": 8,
+      "volume": 0.012026063735461577
+    },
+    {
+      "name": "Landscape v3 civic fitted course 3 2",
+      "vertices": 12,
+      "faces": 14,
+      "volume": 0.011987650097081009
+    },
+    {
+      "name": "Landscape v3 civic fitted course 3 3",
+      "vertices": 10,
+      "faces": 11,
+      "volume": 0.011914140666849147
+    },
+    {
+      "name": "Landscape v3 civic fitted course 3 4",
+      "vertices": 10,
+      "faces": 11,
+      "volume": 0.012030767552687425
+    },
+    {
+      "name": "Landscape v3 civic fitted course 3 5",
+      "vertices": 8,
+      "faces": 8,
+      "volume": 0.012026063474886554
+    },
+    {
+      "name": "Landscape v3 civic fitted course 3 6",
+      "vertices": 12,
+      "faces": 14,
+      "volume": 0.011831583755103525
+    },
+    {
+      "name": "Landscape v3 civic fitted course 3 7",
+      "vertices": 12,
+      "faces": 14,
+      "volume": 0.006283815650665659
+    },
+    {
+      "name": "Landscape v3 civic fitted course 3 8",
+      "vertices": 12,
+      "faces": 14,
+      "volume": 0.011956411375822412
+    },
+    {
+      "name": "Landscape v3 civic fitted course 3 9",
+      "vertices": 8,
+      "faces": 8,
+      "volume": 0.0020944327691810663
+    },
+    {
+      "name": "Landscape v3 civic fitted course 3 10",
+      "vertices": 10,
+      "faces": 11,
+      "volume": 0.0037082635764778497
+    },
+    {
+      "name": "Landscape v3 cistern structural core",
+      "vertices": 128,
+      "faces": 66,
+      "volume": 3.0875611253719826
+    },
+    {
+      "name": "Landscape v3 cistern earth apron",
+      "vertices": 192,
+      "faces": 130,
+      "volume": 1.063073451411594
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-0",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.01533453363246337
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-1",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.015334525998710463
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-2",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.015334525789295103
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-3",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.015334532080956531
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-4",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.015334531726581273
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-5",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.015334532310076518
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-6",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.015334525882322567
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-7",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.01533452802272748
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-8",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.015334526795191393
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-9",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.015334523029544501
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-10",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.015334527863158781
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-11",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.015334524384578066
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-12",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.015334525816215971
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-13",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.015334524357886656
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-14",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.015334529457350784
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-15",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.015334523633983254
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-16",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.015334526661636795
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-17",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.015334530552459716
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-0",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014981682314405262
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-1",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014981672602856724
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-2",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014981665183289895
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-3",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014981670208780384
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-4",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014981669852539965
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-5",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014981669443986143
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-6",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014981671382537753
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-7",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014981667785820448
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-8",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014981670156536647
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-9",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014981666566762995
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-10",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014981671606327983
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-11",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014981670427488603
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-12",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014981668662952804
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-13",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014981669585580816
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-14",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.01498166634024908
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-15",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.01498167244481851
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-16",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014981679881497935
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-17",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.01498166336237649
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-0",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014628806228472138
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-1",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014628817115892812
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-2",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014628811116406196
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-3",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014628807311048458
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-4",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014628811373006173
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-5",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014628813759131908
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-6",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014628820375333348
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-7",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014628816862819007
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-8",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014628816539914255
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-9",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014628812009486826
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-10",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014628818731010025
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-11",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014628822928482617
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-12",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014628818028204836
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-13",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014628808515960812
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-14",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014628812815947186
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-15",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.01462881385337566
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-16",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014628818337148922
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-17",
+      "vertices": 16,
+      "faces": 10,
+      "volume": 0.014628801717496684
+    },
+    {
+      "name": "Landscape v3 founded channel bed",
+      "vertices": 8,
+      "faces": 6,
+      "volume": 0.2189373619125654
+    },
+    {
+      "name": "Landscape v3 channel retaining cheek west",
+      "vertices": 8,
+      "faces": 6,
+      "volume": 0.03569143685277465
+    },
+    {
+      "name": "Landscape v3 channel retaining cheek east",
+      "vertices": 8,
+      "faces": 6,
+      "volume": 0.03569143685277443
+    },
+    {
+      "name": "Landscape v3 service stone shoe",
+      "vertices": 8,
+      "faces": 6,
+      "volume": 0.003731416534940246
+    },
+    {
+      "name": "Landscape v3 seated reservoir deck post",
+      "vertices": 8,
+      "faces": 6,
+      "volume": 0.003843141700142567
+    },
+    {
+      "name": "Landscape v3 service stone shoe.001",
+      "vertices": 8,
+      "faces": 6,
+      "volume": 0.004611182173521744
+    },
+    {
+      "name": "Landscape v3 seated reservoir deck post.001",
+      "vertices": 8,
+      "faces": 6,
+      "volume": 0.00341175451060255
+    },
+    {
+      "name": "Landscape v3 service stone shoe.002",
+      "vertices": 8,
+      "faces": 6,
+      "volume": 0.0024480044402993423
+    },
+    {
+      "name": "Landscape v3 service stone shoe.003",
+      "vertices": 8,
+      "faces": 6,
+      "volume": 0.0024908014918150166
+    },
+    {
+      "name": "Landscape v3 seated reservoir deck post.002",
+      "vertices": 8,
+      "faces": 6,
+      "volume": 0.004092909631842782
+    },
+    {
+      "name": "Landscape v3 service stone shoe.004",
+      "vertices": 8,
+      "faces": 6,
+      "volume": 0.002790265886655839
+    },
+    {
+      "name": "Landscape v3 seated reservoir deck post.003",
+      "vertices": 8,
+      "faces": 6,
+      "volume": 0.00397232363592157
+    },
+    {
+      "name": "Landscape v3 service stone shoe.005",
+      "vertices": 8,
+      "faces": 6,
+      "volume": 0.0024480182209247955
+    },
+    {
+      "name": "Landscape v3 service stair rail post",
+      "vertices": 8,
+      "faces": 6,
+      "volume": 0.0008643599935162065
+    },
+    {
+      "name": "Landscape v3 service stair rail post.001",
+      "vertices": 8,
+      "faces": 6,
+      "volume": 0.0008643599935162065
+    },
+    {
+      "name": "Landscape v3 service stair handrail",
+      "vertices": 8,
+      "faces": 6,
+      "volume": 0.0025868751975599083
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 0-0",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 3.4145356694136215e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 0-1",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 4.5341564815893666e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 0-2",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 4.8158735487392745e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 0-3",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 4.116296289398934e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 0-4",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 3.7948583319269945e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 0-5",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 3.9379373460258355e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 0-6",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 4.255668239181321e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 1-0",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 3.414507393576915e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 1-1",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 4.534122157302822e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 1-2",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 4.815919166153092e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 1-3",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 4.11630636867593e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 1-4",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 3.7948544242330344e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 1-5",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 3.937937346030931e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 1-6",
+      "vertices": 5,
+      "faces": 6,
+      "volume": 4.2556654151722825e-05
+    }
+  ],
+  "archivedSourceObjects": [
+    "Continuous clay island revision 2",
+    "Native fitted civic coping 7-0",
+    "Native fitted civic coping 7-1",
+    "Native fitted civic coping 8-0",
+    "Native fitted civic coping 8-1",
+    "Native fitted civic coping 8-2",
+    "Native fitted civic coping 9-0",
+    "Native fitted civic coping 9-1",
+    "Native fitted civic coping 10-0",
+    "Native fitted civic coping 10-1",
+    "Civic fitted retaining stone 00 0 01",
+    "Civic fitted retaining stone 00 1 01",
+    "Civic fitted retaining stone 00 2 01",
+    "Civic fitted retaining stone 07 0 00",
+    "Civic fitted retaining stone 07 0 01",
+    "Civic fitted retaining stone 07 1 00",
+    "Civic fitted retaining stone 07 1 01",
+    "Civic fitted retaining stone 07 2 00",
+    "Civic fitted retaining stone 07 2 01",
+    "Civic fitted retaining stone 08 0 00",
+    "Civic fitted retaining stone 08 0 01",
+    "Civic fitted retaining stone 08 0 02",
+    "Civic fitted retaining stone 08 1 00",
+    "Civic fitted retaining stone 08 1 01",
+    "Civic fitted retaining stone 08 1 02",
+    "Civic fitted retaining stone 08 2 00",
+    "Civic fitted retaining stone 08 2 01",
+    "Civic fitted retaining stone 08 2 02",
+    "Civic fitted retaining stone 09 0 00",
+    "Civic fitted retaining stone 09 0 01",
+    "Civic fitted retaining stone 09 1 00",
+    "Civic fitted retaining stone 09 1 01",
+    "Civic fitted retaining stone 09 2 00",
+    "Civic fitted retaining stone 09 2 01",
+    "Civic fitted retaining stone 10 0 00",
+    "Civic fitted retaining stone 10 0 01",
+    "Civic fitted retaining stone 10 1 00",
+    "Civic fitted retaining stone 10 1 01",
+    "Civic fitted retaining stone 10 2 00",
+    "Civic fitted retaining stone 10 2 01",
+    "Civic fitted retaining stone 11 0 00",
+    "Civic fitted retaining stone 11 2 00",
+    "Reservoir support",
+    "Gravity supply retaining lip",
+    "Gravity supply retaining lip.001",
+    "Reservoir grounded deck post",
+    "Reservoir grounded deck post.001",
+    "Reservoir grounded deck post.002",
+    "Reservoir grounded deck post.003",
+    "Dry agave blade.077",
+    "Dry agave blade.078",
+    "Dry agave blade.079",
+    "Dry agave blade.080",
+    "Dry agave blade.081",
+    "Dry agave blade.082",
+    "Dry agave blade.083",
+    "Dry agave blade.084",
+    "Dry agave blade.085",
+    "Dry agave blade.086",
+    "Dry agave blade.087",
+    "Dry agave blade.088",
+    "Dry agave blade.089",
+    "Dry agave blade.090"
+  ],
+  "coastBoundaryVertices": 297,
+  "coastLayers": 8,
+  "terrainTopUnchanged": true,
+  "serviceFootings": [
+    {
+      "x": 5.69,
+      "y": 2.51,
+      "bottom": 1.725,
+      "supportMin": 1.75,
+      "supportMax": 1.7971844673156738,
+      "top": 1.8621844673156738
+    },
+    {
+      "x": 5.69,
+      "y": 3.04,
+      "bottom": 1.771433448791504,
+      "supportMin": 1.796433448791504,
+      "supportMax": 1.875962257385254,
+      "top": 1.9409622573852539
+    },
+    {
+      "x": 5.69,
+      "y": 1.69,
+      "bottom": 1.724999761581421,
+      "supportMin": 1.749999761581421,
+      "supportMax": 1.75,
+      "top": 1.815
+    },
+    {
+      "x": 6.01,
+      "y": 2.51,
+      "bottom": 1.724999761581421,
+      "supportMin": 1.749999761581421,
+      "supportMax": 1.751573085784912,
+      "top": 1.816573085784912
+    },
+    {
+      "x": 6.01,
+      "y": 3.04,
+      "bottom": 1.7360108852386475,
+      "supportMin": 1.7610108852386475,
+      "supportMax": 1.7735939025878906,
+      "top": 1.8385939025878906
+    },
+    {
+      "x": 6.01,
+      "y": 1.69,
+      "bottom": 1.724999761581421,
+      "supportMin": 1.749999761581421,
+      "supportMax": 1.750000238418579,
+      "top": 1.815000238418579
+    }
+  ],
+  "replantedBankAgaves": [
+    {
+      "from": [
+        5.41,
+        2.55,
+        2.4
+      ],
+      "to": [
+        5.97,
+        3.75,
+        1.747784387588501
+      ],
+      "archivedLeaves": 7
+    },
+    {
+      "from": [
+        4.0,
+        4.03,
+        2.4
+      ],
+      "to": [
+        3.1,
+        4.1,
+        1.736999761581421
+      ],
+      "archivedLeaves": 7
+    }
+  ],
+  "waterSurfaceUnchanged": true
+}

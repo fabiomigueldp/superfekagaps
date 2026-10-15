@@ -1,0 +1,324 @@
+{
+  "revision": 8,
+  "rendererTests": 41,
+  "journeyTests": 189,
+  "campaignTests": 14,
+  "testsPassed": 244,
+  "build": "passed",
+  "navigation": {
+    "stops": 14,
+    "routes": 16,
+    "positions": "unchanged",
+    "depths": "unchanged",
+    "durations": "unchanged"
+  },
+  "geometry": {
+    "triangleContacts": 48469,
+    "intersectionsBefore": 1770,
+    "maxIntrusionBeforeMeters": 0.348757,
+    "minimumClearanceBeforeMeters": -0.348757,
+    "intersectionsAfter": 0,
+    "minimumClearanceMeters": 0.085,
+    "seatedVertices": 4305,
+    "largestCorrectionMeters": 0.433757
+  },
+  "exportedGeometry": {
+    "triangleContacts": 48297,
+    "intersectionsBefore": 0,
+    "maxIntrusionBeforeMeters": 0,
+    "minimumClearanceBeforeMeters": 0.085,
+    "intersectionsAfter": 0,
+    "minimumClearanceMeters": 0.085,
+    "seatedVertices": 0,
+    "largestCorrectionMeters": 0
+  },
+  "walks": {
+    "trips": [
+      "delicia-2",
+      "delicia-3",
+      "delicia-4",
+      "delicia-5",
+      "delicia-6",
+      "delicia-raizes",
+      "delicia-9",
+      "delicia-relogio",
+      "delicia-10",
+      "delicia-11",
+      "delicia-12"
+    ],
+    "desktop": {
+      "frames": 1703,
+      "offscreen": 0,
+      "overlaps": 0,
+      "depthReads": 1703,
+      "maxFrame": 11.199999988079071
+    },
+    "mobile": {
+      "frames": 125,
+      "offscreen": 0,
+      "overlaps": 0,
+      "depthReads": 125,
+      "maxFrame": 1.899999976158142
+    },
+    "errors": []
+  },
+  "browser": {
+    "walking": {
+      "arrived": "delicia-1",
+      "destination": "delicia-2",
+      "point": {
+        "x": -2.1822951053451165,
+        "y": -1.339827199861712
+      },
+      "disabled": true,
+      "saved": "delicia-1"
+    },
+    "reversal": {
+      "before": {
+        "x": -1.780525904367033,
+        "y": -1.4126067483543694
+      },
+      "after": {
+        "x": -1.780525904367033,
+        "y": -1.4126067483543694
+      },
+      "direction": -1
+    },
+    "returned": {
+      "arrived": "delicia-2",
+      "destination": "delicia-3",
+      "canEnter": false,
+      "chapter": "delicia"
+    },
+    "landings": [
+      {
+        "id": "delicia-1",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -2.1923219200000004,
+          "y": -1.3497522000000002
+        },
+        "buttons": 5
+      },
+      {
+        "id": "delicia-2",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.7556930000000004,
+          "y": -2.068556
+        },
+        "buttons": 7
+      },
+      {
+        "id": "delicia-3",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.7010482800000002,
+          "y": -2.04916572
+        },
+        "buttons": 6
+      },
+      {
+        "id": "delicia-4",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.6871359400000001,
+          "y": -1.5444584
+        },
+        "buttons": 8
+      },
+      {
+        "id": "delicia-5",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.19771376,
+          "y": -1.5853241599999999
+        },
+        "buttons": 10
+      },
+      {
+        "id": "delicia-6",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.34419126,
+          "y": -2.00910076
+        },
+        "buttons": 11
+      },
+      {
+        "id": "delicia-7",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.5034703800000002,
+          "y": -1.21245504
+        },
+        "buttons": 12
+      },
+      {
+        "id": "delicia-8",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.0908579200000001,
+          "y": -1.40075432
+        },
+        "buttons": 7
+      },
+      {
+        "id": "delicia-9",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -0.9362868799999999,
+          "y": -0.9851224799999998
+        },
+        "buttons": 4
+      },
+      {
+        "id": "delicia-10",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -0.8951312200000001,
+          "y": -1.4252551599999999
+        },
+        "buttons": 6
+      },
+      {
+        "id": "delicia-11",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -0.7395022400000002,
+          "y": -1.60125306
+        },
+        "buttons": 5
+      },
+      {
+        "id": "delicia-12",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -0.8947082,
+          "y": -2.01856788
+        },
+        "buttons": 4
+      },
+      {
+        "id": "delicia-raizes",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.7144317800000002,
+          "y": -2.20374326
+        },
+        "buttons": 4
+      },
+      {
+        "id": "delicia-relogio",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -0.83995766,
+          "y": -0.89024744
+        },
+        "buttons": 2
+      }
+    ],
+    "touch": [
+      "delicia-2",
+      "delicia-3",
+      "delicia-4",
+      "delicia-5",
+      "delicia-6",
+      "delicia-7",
+      "delicia-8",
+      "delicia-9",
+      "delicia-10",
+      "delicia-11",
+      "delicia-12"
+    ],
+    "reduced": {
+      "arrived": "delicia-1",
+      "destination": null,
+      "enabled": true
+    },
+    "locked": {
+      "arrived": "delicia-1",
+      "blocked": "unavailable",
+      "enabled": false,
+      "saved": "delicia-1",
+      "active": false
+    },
+    "errors": []
+  },
+  "captures": {
+    "revision": 8,
+    "landings": [
+      {
+        "id": "delicia-1",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-2",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-3",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-4",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-5",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-6",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-7",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-8",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-9",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-10",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-11",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-12",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-raizes",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-relogio",
+        "canEnter": true
+      }
+    ],
+    "errors": []
+  }
+}

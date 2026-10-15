@@ -7,7 +7,7 @@ import './experimental/guaira/guaira-touch-controls.css';
 
 /** Lazy native runtimes share the campaign's map and stores, never another page. */
 export async function mountWorldChapter(chapter: WorldChapter, stage: string, root: HTMLElement,
-    store: ProgressStore, deliciaStore: DeliciaStore, back: () => void, signal: AbortSignal, entryInterrupted: () => boolean = () => false): Promise<() => void> {
+    store: ProgressStore, deliciaStore: DeliciaStore, back: (playedStage?: string) => void, signal: AbortSignal, entryInterrupted: () => boolean = () => false): Promise<() => void> {
     if (chapter === 'delicia') {
         const { DeliciaApp } = await import('./delicia/DeliciaApp');
         if (signal.aborted) return () => {};

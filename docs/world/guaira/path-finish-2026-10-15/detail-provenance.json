@@ -1,0 +1,13 @@
+{
+  "sourceSHA256": "1993480be169eb419e8111196712b556572225ab296edbe0801fe11a8a1fde27",
+  "camera": "unchanged production orthographic camera",
+  "resolutionBeforeCrop": [
+    3840,
+    2400
+  ],
+  "samples": 32,
+  "images": [
+    "detail-bridge.png",
+    "detail-curbs.png"
+  ]
+}

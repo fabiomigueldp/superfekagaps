@@ -1,0 +1,104 @@
+{
+  "routes": [
+    {
+      "id": "arrival",
+      "samples": 71,
+      "minBody": 0.22435897435897437,
+      "minHead": 0.7291666666666666
+    },
+    {
+      "id": "village",
+      "samples": 135,
+      "minBody": 0.9903846153846154,
+      "minHead": 1.0
+    },
+    {
+      "id": "workshop",
+      "samples": 83,
+      "minBody": 1.0,
+      "minHead": 1.0
+    },
+    {
+      "id": "gallery-door",
+      "samples": 31,
+      "minBody": 1.0,
+      "minHead": 1.0
+    },
+    {
+      "id": "relief-door",
+      "samples": 108,
+      "minBody": 1.0,
+      "minHead": 1.0
+    },
+    {
+      "id": "patio-gate",
+      "samples": 78,
+      "minBody": 0.9839743589743589,
+      "minHead": 1.0
+    },
+    {
+      "id": "rice-road",
+      "samples": 331,
+      "minBody": 1.0,
+      "minHead": 1.0
+    },
+    {
+      "id": "rice-bridge",
+      "samples": 249,
+      "minBody": 1.0,
+      "minHead": 1.0
+    },
+    {
+      "id": "corral-gate",
+      "samples": 23,
+      "minBody": 1.0,
+      "minHead": 1.0
+    },
+    {
+      "id": "civic-stairs",
+      "samples": 130,
+      "minBody": 1.0,
+      "minHead": 1.0
+    },
+    {
+      "id": "civic-square",
+      "samples": 87,
+      "minBody": 1.0,
+      "minHead": 1.0
+    }
+  ],
+  "stages": {
+    "guaira-travessia": [
+      0.9935897435897436,
+      1.0
+    ],
+    "guaira-patio-comportas": [
+      0.9839743589743589,
+      1.0
+    ],
+    "gallery": [
+      1.0,
+      1.0
+    ],
+    "relief": [
+      1.0,
+      1.0
+    ],
+    "guaira-respiros": [
+      1.0,
+      1.0
+    ],
+    "guaira-lab": [
+      1.0,
+      1.0
+    ],
+    "guaira-subida": [
+      1.0,
+      1.0
+    ],
+    "guaira-prefeito": [
+      1.0,
+      1.0
+    ]
+  }
+}

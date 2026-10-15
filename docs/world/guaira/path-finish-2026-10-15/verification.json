@@ -1,0 +1,199 @@
+{
+  "revision": 6,
+  "date": "2026-10-15",
+  "sourceSHA256": "1993480be169eb419e8111196712b556572225ab296edbe0801fe11a8a1fde27",
+  "tests": 585,
+  "testFailures": 0,
+  "buildPassed": true,
+  "navigationUnchanged": true,
+  "phaseLocationsUnchanged": true,
+  "terrainMaximumChange": 0.0,
+  "cameraUnchanged": true,
+  "waterMeshesUnchanged": true,
+  "closedConnectedMeshes": 548,
+  "newClosedMeshes": 122,
+  "foundedBases": 25,
+  "unsupportedBases": 0,
+  "curbStones": 58,
+  "curbRuns": 6,
+  "curbJointWidthMeters": 0.003,
+  "bridgeWaterClearanceMeters": 0.020949957084655857,
+  "cameraProjection": {
+    "maximumNormalizedError": 4.980049128633368e-08,
+    "maximumDepthErrorMeters": 4.6411132714752057e-07
+  },
+  "channelProbes": 99,
+  "channelObstructions": 0,
+  "unsupportedChannel": 0,
+  "routes": {
+    "samples": 590,
+    "supportProbes": 1770,
+    "unsupported": 0,
+    "bodyContacts": 0
+  },
+  "depth": {
+    "samples": 1374,
+    "allEntranceHeadsVisible": true,
+    "minimumHeadVisibilityUnderArrivalShelter": 0.7291666666666666
+  },
+  "aircraft": {
+    "poses": 1780,
+    "wheelContacts": 1230,
+    "marginMeters": 0.05,
+    "summary": {
+      "final:guaira->serra": {
+        "samples": 445,
+        "collisionSamples": 0,
+        "conservativeMarginUnresolvedSamples": 0,
+        "wheelSamples": 378,
+        "unsupportedWheelSamples": 0,
+        "minTriangleAabbLowerBound": null,
+        "minSampledSurfaceUpperBound": null,
+        "stages": {}
+      },
+      "final:guaira->fabrica": {
+        "samples": 445,
+        "collisionSamples": 0,
+        "conservativeMarginUnresolvedSamples": 0,
+        "wheelSamples": 378,
+        "unsupportedWheelSamples": 0,
+        "minTriangleAabbLowerBound": null,
+        "minSampledSurfaceUpperBound": null,
+        "stages": {}
+      },
+      "final:serra->guaira": {
+        "samples": 445,
+        "collisionSamples": 0,
+        "conservativeMarginUnresolvedSamples": 0,
+        "wheelSamples": 237,
+        "unsupportedWheelSamples": 0,
+        "minTriangleAabbLowerBound": null,
+        "minSampledSurfaceUpperBound": null,
+        "stages": {}
+      },
+      "final:fabrica->guaira": {
+        "samples": 445,
+        "collisionSamples": 0,
+        "conservativeMarginUnresolvedSamples": 0,
+        "wheelSamples": 237,
+        "unsupportedWheelSamples": 0,
+        "minTriangleAabbLowerBound": null,
+        "minSampledSurfaceUpperBound": null,
+        "stages": {}
+      }
+    }
+  },
+  "water": {
+    "patches": 8,
+    "scratchPixels": 2266,
+    "footprintUnchanged": true
+  },
+  "browser": {
+    "entries": [
+      {
+        "id": "guaira-travessia",
+        "mounted": "guaira-travessia",
+        "returned": "guaira-travessia",
+        "place": "Estrada do Vento"
+      },
+      {
+        "id": "guaira-respiros",
+        "mounted": "guaira-respiros",
+        "returned": "guaira-respiros",
+        "place": "Passarela dos Arrozais"
+      },
+      {
+        "id": "guaira-lab",
+        "mounted": "guaira-lab",
+        "returned": "guaira-lab",
+        "place": "Curral da Comporta"
+      },
+      {
+        "id": "guaira-subida",
+        "mounted": "guaira-subida",
+        "returned": "guaira-subida",
+        "place": "Inspeção da Casa da Vazão"
+      },
+      {
+        "id": "guaira-prefeito",
+        "mounted": "guaira-prefeito",
+        "returned": "guaira-prefeito",
+        "place": "Casa da Vazão"
+      },
+      {
+        "id": "guaira-patio-comportas",
+        "mounted": "guaira-patio-comportas",
+        "returned": "guaira-patio-comportas",
+        "place": "Pátio das Comportas"
+      },
+      {
+        "id": "gallery",
+        "mounted": "guaira-galeria",
+        "returned": "gallery",
+        "place": "Subsolo do Bairro Vala Seca"
+      },
+      {
+        "id": "relief",
+        "mounted": "guaira-camara-alivio",
+        "returned": "relief",
+        "place": "Coletor de Alívio"
+      }
+    ],
+    "desktop": {
+      "frames": 1118,
+      "offscreen": 0,
+      "plaqueOverlaps": 0,
+      "signsOverlap": 0
+    },
+    "mobile": {
+      "frames": 752,
+      "offscreen": 0,
+      "plaqueOverlaps": 0,
+      "signsOverlap": 0
+    },
+    "arrival": {
+      "chapter": "guaira",
+      "arrived": "guaira-travessia",
+      "active": false
+    },
+    "departure": {
+      "guaira": false,
+      "actor": null,
+      "arrived": "3-5"
+    },
+    "errors": []
+  },
+  "chapterLayout": {
+    "cases": 132,
+    "guairaCases": 48,
+    "deliciaCases": 84,
+    "sizes": [
+      [
+        1440,
+        1000
+      ],
+      [
+        1100,
+        760
+      ],
+      [
+        844,
+        390
+      ],
+      [
+        620,
+        480
+      ],
+      [
+        390,
+        844
+      ],
+      [
+        320,
+        568
+      ]
+    ],
+    "failed": [],
+    "errors": []
+  }
+}

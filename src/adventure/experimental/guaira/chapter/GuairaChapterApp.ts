@@ -25,7 +25,7 @@ export interface GuairaChapterMapPort {
 }
 export interface GuairaChapterAppDependencies {
     initialScene?: GuairaChapterSceneId | 'gallery' | 'relief';
-    returnToWorldMap?: () => void;
+    returnToWorldMap?: (playedStage?: string) => void;
     loadScene?: (sceneId: GuairaChapterSceneId) => Promise<GuairaChapterSceneFactory>;
     loadExcursion?: (sceneId: GuairaChapterExcursionSceneId) => Promise<GuairaChapterExcursionFactory>;
     createMap?: (root: HTMLElement, options: GuairaChapterMapOptions) => GuairaChapterMapPort;
@@ -64,7 +64,7 @@ export class GuairaChapterApp {
     private readonly campaign: boolean;
     private readonly continueCampaign?: () => void;
     private readonly canContinueCampaign?: () => boolean;
-    private readonly returnToWorldMap?: () => void;
+    private readonly returnToWorldMap?: (playedStage?: string) => void;
 
     constructor(private readonly root: HTMLElement, dependencies: GuairaChapterAppDependencies = {}) {
         let storage: Storage | null = null;
@@ -199,7 +199,11 @@ export class GuairaChapterApp {
     }
     private showMap(arrival: GuairaArrival, walkToSelection = false, focusAction = false) {
         if (this.isDisposed) return;
-        if (this.returnToWorldMap) { queueMicrotask(() => { if (!this.isDisposed) this.returnToWorldMap?.(); }); return; }
+        if (this.returnToWorldMap) {
+            const played = this.mounted?.kind === 'chapter' ? this.mounted.attempt.sceneId
+                : this.mounted?.kind === 'optional' ? this.mounted.token.sceneId : undefined;
+            queueMicrotask(() => { if (!this.isDisposed) this.returnToWorldMap?.(played); }); return;
+        }
         const scope = this.replaceView('map'), recovery = this.recoveryFocus(scope), node = document.createElement('div');
         node.id = 'guaira-chapter-map'; this.root.append(node);
         document.title = chapterTitle();

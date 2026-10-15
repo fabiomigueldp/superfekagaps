@@ -100,7 +100,7 @@ export interface MapPaintState {
 function ellipse(c: CanvasRenderingContext2D, x: number, y: number, rx: number, ry: number, color: string) {
     c.beginPath(); c.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); c.fillStyle = color; c.fill();
 }
-function linePath(c: CanvasRenderingContext2D, points: MapPoint[], camera: MapCamera) {
+function linePath(c: CanvasRenderingContext2D, points: readonly MapPoint[], camera: MapCamera) {
     c.beginPath(); points.forEach((p, i) => { const q = mapToScreen(p, camera); if (i) c.lineTo(q.x, q.y); else c.moveTo(q.x, q.y); });
 }
 /** The painter has no event listeners, RAF or DOM dependencies. The game owns its clock. */
@@ -150,9 +150,7 @@ export function paintMapIsland(c: CanvasRenderingContext2D, state: MapIslandPain
         // Warm small trail studs are planted in the authored ground route.
         for (const [edge, path] of Object.entries(metadata.routes)) {
             const from = Number(edge.split(':')[0]) + 1;
-            c.save(); c.setLineDash([1, 11]); c.lineCap = 'round'; c.lineWidth = 3;
-            c.strokeStyle = state.completed.includes(`${world}-${from}`) ? '#fff4b6c4' : '#f1e4b658';
-            linePath(c, path, camera); c.stroke(); c.restore();
+            paintMapTrail(c, path, camera, state.completed.includes(`${world}-${from}`));
         }
         if (metadata.secretRoute.length > 1) {
             c.save(); c.setLineDash(state.secret ? [4, 7] : [2, 12]); c.lineCap = 'round';
@@ -168,6 +166,12 @@ export function paintMapIsland(c: CanvasRenderingContext2D, state: MapIslandPain
 }
 
 export type MapActorPaintState = Pick<MapPaintState, 'camera' | 'marker' | 'time' | 'reducedMotion' | 'walking' | 'facingLeft'> & { scale?: number; shadow?: boolean };
+/** Route studs for the base islands; Delícia's modeled roads need no overlay. */
+export function paintMapTrail(c: CanvasRenderingContext2D, points: readonly MapPoint[], camera: MapCamera, open = false, active = false): void {
+    c.save(); c.setLineDash([1, active ? 8 : 11]); c.lineCap = 'round'; c.lineWidth = active ? 3.5 : 3;
+    c.strokeStyle = active ? '#ffe29ae8' : open ? '#fff4b6c4' : '#f1e4b658';
+    linePath(c, points, camera); c.stroke(); c.restore();
+}
 /** Draw the original 16×26 Feka pixels with the supplied point anchored at his feet. */
 export function paintMapActor(c: CanvasRenderingContext2D, state: MapActorPaintState): void {
     const { camera } = state, t = state.reducedMotion ? 0 : state.time;

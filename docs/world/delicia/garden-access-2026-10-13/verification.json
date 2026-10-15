@@ -1,0 +1,783 @@
+{
+  "revision": 11,
+  "testFiles": 17,
+  "testsPassed": 365,
+  "testsFailed": 0,
+  "buildPassed": true,
+  "navigation": {
+    "revision": 11,
+    "nodes": 14,
+    "routes": 16,
+    "unchangedRoutes": [
+      "harbor-orchard",
+      "orchard-aqueduct",
+      "west-bank",
+      "five-harvests-bridge",
+      "archive-approach",
+      "aqueduct-promenade",
+      "source-pilgrims",
+      "roots-sanctuary",
+      "orange-tide",
+      "refinery-street",
+      "refinery-court",
+      "boiler-approach",
+      "palace-ascent",
+      "palace-stair"
+    ],
+    "unchangedNodes": [
+      "delicia-1",
+      "delicia-2",
+      "delicia-3",
+      "delicia-4",
+      "delicia-5",
+      "delicia-6",
+      "delicia-7",
+      "delicia-8",
+      "delicia-10",
+      "delicia-11",
+      "delicia-12",
+      "delicia-raizes",
+      "delicia-relogio"
+    ],
+    "relocatedArrival": "delicia-9"
+  },
+  "access": {
+    "revision": 11,
+    "stairs": [
+      {
+        "name": "Garden north descent",
+        "steps": 10,
+        "rise": 0.1892,
+        "tread": 0.25,
+        "width": 1.06
+      },
+      {
+        "name": "Garden east upper stair",
+        "steps": 9,
+        "rise": 0.1928,
+        "tread": 0.25,
+        "width": 1.12
+      },
+      {
+        "name": "Campanile lower stair",
+        "steps": 8,
+        "rise": 0.155,
+        "tread": 0.2562,
+        "width": 1.12
+      }
+    ],
+    "gardenArrivalBefore": [
+      20.700000762939453,
+      -8.5,
+      2.417686700820923
+    ],
+    "gardenArrivalAfter": [
+      19.350000381469727,
+      -9.0,
+      3.825000047683716
+    ],
+    "unchangedRoutes": 14,
+    "changedRoutes": [
+      "garden-gate",
+      "clock-sanctuary"
+    ],
+    "copingStones": 579,
+    "stairFacingStones": 167,
+    "relocatedTrees": [
+      {
+        "tree": "Cypress trunk.006",
+        "from": [
+          20.299999237060547,
+          -9.600000381469727,
+          1.7776480913162231
+        ],
+        "to": [
+          20.2,
+          -10.7
+        ]
+      },
+      {
+        "tree": "Cypress trunk.007",
+        "from": [
+          20.0,
+          -6.5,
+          4.203492164611816
+        ],
+        "to": [
+          20.65,
+          -6.2
+        ]
+      },
+      {
+        "tree": "Gnarled orange trunk.044",
+        "from": [
+          24.04800033569336,
+          -9.784000396728516,
+          0.6924487948417664
+        ],
+        "to": [
+          25.2,
+          -4.4
+        ]
+      }
+    ],
+    "preservedObjects": [
+      "Unified masonry paving 2",
+      "Unified masonry paving 3",
+      "Unified masonry paving 4",
+      "Unified masonry paving 5",
+      "Unified masonry paving 6",
+      "Unified masonry paving 1 • belvedere joined",
+      "Retaining wall dressed stone.048",
+      "Retaining wall dressed stone.049",
+      "Retaining wall dressed stone.050",
+      "Retaining wall dressed stone.051",
+      "Retaining wall dressed stone.052",
+      "Retaining wall dressed stone.053",
+      "Retaining wall dressed stone.054",
+      "Retaining wall dressed stone.055",
+      "Retaining wall dressed stone.056",
+      "Retaining wall dressed stone.057",
+      "Retaining wall dressed stone.058",
+      "Retaining wall dressed stone.059",
+      "Retaining wall dressed stone.060",
+      "Retaining wall dressed stone.061",
+      "Retaining wall dressed stone.062",
+      "Retaining wall dressed stone.063",
+      "Retaining wall dressed stone.064",
+      "Retaining wall dressed stone.065",
+      "Retaining wall dressed stone.066",
+      "Retaining wall dressed stone.067",
+      "Retaining wall dressed stone.068",
+      "Fitted limestone coping • all paths",
+      "Garden stone balustrade coping.001",
+      "Garden stone balustrade turned baluster.030",
+      "Garden stone balustrade turned baluster.031",
+      "Garden stone balustrade finished end post.003",
+      "Pergola stone column.002",
+      "Pergola stone column.003",
+      "Pergola runner.001",
+      "Pergola oak rafter",
+      "Pergola oak rafter.001",
+      "Pergola oak rafter.002",
+      "Pergola oak rafter.003",
+      "Pergola oak rafter.004",
+      "Pergola oak rafter.005",
+      "Pergola oak rafter.006",
+      "Pergola oak rafter.007",
+      "Pergola oak rafter.008",
+      "Pergola trailing foliage.001 • tucked above pergola",
+      "Pergola trailing foliage.003 • tucked above pergola",
+      "Pergola trailing foliage.005 • tucked above pergola",
+      "Pergola trailing foliage.007 • tucked above pergola",
+      "Pergola trailing foliage.009 • tucked above pergola",
+      "Cypress trunk.006",
+      "Tapering cypress foliage.024",
+      "Tapering cypress foliage.025",
+      "Tapering cypress foliage.026",
+      "Tapering cypress foliage.027",
+      "Cypress trunk.007",
+      "Tapering cypress foliage.028",
+      "Tapering cypress foliage.029",
+      "Tapering cypress foliage.030",
+      "Tapering cypress foliage.031",
+      "Gnarled orange trunk.044",
+      "Citrus branch.220",
+      "Angular leafy crown.220",
+      "Citrus branch.221",
+      "Angular leafy crown.221",
+      "Citrus branch.222",
+      "Angular leafy crown.222",
+      "Citrus branch.223",
+      "Angular leafy crown.223",
+      "Citrus branch.224",
+      "Angular leafy crown.224",
+      "Ripe citrus fruit.572",
+      "Ripe citrus fruit.573",
+      "Ripe citrus fruit.574",
+      "Ripe citrus fruit.575",
+      "Ripe citrus fruit.576",
+      "Ripe citrus fruit.577",
+      "Ripe citrus fruit.578",
+      "Ripe citrus fruit.579",
+      "Ripe citrus fruit.580",
+      "Ripe citrus fruit.581",
+      "Ripe citrus fruit.582",
+      "Ripe citrus fruit.583",
+      "Ripe citrus fruit.584",
+      "Coastal shrub cluster.017"
+    ],
+    "terrain": {
+      "triangleContacts": 130757,
+      "intersectionsBefore": 987,
+      "maxIntrusionBeforeMeters": 0.207861,
+      "minimumClearanceBeforeMeters": -0.207861,
+      "intersectionsAfter": 0,
+      "minimumClearanceMeters": 0.084999,
+      "seatedVertices": 595,
+      "largestCorrectionMeters": 0.292861
+    },
+    "walkingSurfaces": [
+      {
+        "id": "five-harvests-bridge",
+        "maxPavingChangeMeters": 0.01108,
+        "maxFootGapMeters": 0
+      },
+      {
+        "id": "archive-approach",
+        "maxPavingChangeMeters": 0.00035,
+        "maxFootGapMeters": 0
+      },
+      {
+        "id": "aqueduct-promenade",
+        "maxPavingChangeMeters": 0.0007,
+        "maxFootGapMeters": 0
+      },
+      {
+        "id": "source-pilgrims",
+        "maxPavingChangeMeters": 0.00173,
+        "maxFootGapMeters": 0
+      },
+      {
+        "id": "orange-tide",
+        "maxPavingChangeMeters": 0.0034,
+        "maxFootGapMeters": 0
+      },
+      {
+        "id": "refinery-street",
+        "maxPavingChangeMeters": 0.00455,
+        "maxFootGapMeters": 0
+      },
+      {
+        "id": "refinery-court",
+        "maxPavingChangeMeters": 0.01251,
+        "maxFootGapMeters": 0
+      },
+      {
+        "id": "garden-gate",
+        "maxPavingChangeMeters": 0,
+        "maxFootGapMeters": 0.1752
+      },
+      {
+        "id": "clock-sanctuary",
+        "maxPavingChangeMeters": 0,
+        "maxFootGapMeters": 0.15468
+      },
+      {
+        "id": "boiler-approach",
+        "maxPavingChangeMeters": 0.01482,
+        "maxFootGapMeters": 0
+      },
+      {
+        "id": "palace-ascent",
+        "maxPavingChangeMeters": 0.00032,
+        "maxFootGapMeters": 0
+      },
+      {
+        "id": "palace-stair",
+        "maxPavingChangeMeters": 1e-05,
+        "maxFootGapMeters": 0
+      },
+      {
+        "id": "harbor-orchard",
+        "maxPavingChangeMeters": 0.00155,
+        "maxFootGapMeters": 0
+      },
+      {
+        "id": "orchard-aqueduct",
+        "maxPavingChangeMeters": 1e-05,
+        "maxFootGapMeters": 0
+      },
+      {
+        "id": "west-bank",
+        "maxPavingChangeMeters": 0.00558,
+        "maxFootGapMeters": 0
+      },
+      {
+        "id": "roots-sanctuary",
+        "maxPavingChangeMeters": 0.00024,
+        "maxFootGapMeters": 0
+      }
+    ]
+  },
+  "exportedGeometry": {
+    "revision": 11,
+    "closedMeshes": 20,
+    "surface": {
+      "triangleContacts": 130757,
+      "intersectionsBefore": 0,
+      "maxIntrusionBeforeMeters": 0,
+      "minimumClearanceBeforeMeters": 0.084999,
+      "intersectionsAfter": 0,
+      "minimumClearanceMeters": 0.084999,
+      "seatedVertices": 0,
+      "largestCorrectionMeters": 0
+    }
+  },
+  "existingSupports": [
+    {
+      "name": "Garden limestone terrace • grounded stone base",
+      "samples": 734,
+      "minimumEmbedMeters": 0.22
+    },
+    {
+      "name": "Campanile plinth • grounded stone base",
+      "samples": 208,
+      "minimumEmbedMeters": 0.010508270263671848
+    },
+    {
+      "name": "Foundation • grounded stone base",
+      "samples": 310,
+      "minimumEmbedMeters": 0.21999999999999997
+    },
+    {
+      "name": "Foundation.005 • grounded stone base",
+      "samples": 322,
+      "minimumEmbedMeters": 0.22
+    },
+    {
+      "name": "Foundation.007 • grounded stone base",
+      "samples": 280,
+      "minimumEmbedMeters": 0.21999999999999997
+    }
+  ],
+  "depthEnvelope": [
+    {
+      "id": "harbor-orchard",
+      "samples": 1074,
+      "minBody": 0.298,
+      "minimumHead": 0.729,
+      "hiddenHeads": []
+    },
+    {
+      "id": "orchard-aqueduct",
+      "samples": 229,
+      "minBody": 0.683,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "west-bank",
+      "samples": 468,
+      "minBody": 0.837,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "five-harvests-bridge",
+      "samples": 378,
+      "minBody": 0.875,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "archive-approach",
+      "samples": 235,
+      "minBody": 0.529,
+      "minimumHead": 0.49,
+      "hiddenHeads": []
+    },
+    {
+      "id": "aqueduct-promenade",
+      "samples": 819,
+      "minBody": 0.542,
+      "minimumHead": 0.875,
+      "hiddenHeads": []
+    },
+    {
+      "id": "source-pilgrims",
+      "samples": 445,
+      "minBody": 0.792,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "roots-sanctuary",
+      "samples": 139,
+      "minBody": 0.683,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "orange-tide",
+      "samples": 192,
+      "minBody": 0.856,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "refinery-street",
+      "samples": 299,
+      "minBody": 0.545,
+      "minimumHead": 0.531,
+      "hiddenHeads": []
+    },
+    {
+      "id": "refinery-court",
+      "samples": 149,
+      "minBody": 1.0,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "garden-gate",
+      "samples": 217,
+      "minBody": 0.92,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "clock-sanctuary",
+      "samples": 374,
+      "minBody": 0.724,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "boiler-approach",
+      "samples": 94,
+      "minBody": 1.0,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "palace-ascent",
+      "samples": 222,
+      "minBody": 0.747,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "palace-stair",
+      "samples": 399,
+      "minBody": 0.821,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    }
+  ],
+  "walks": {
+    "trips": [
+      "delicia-2",
+      "delicia-3",
+      "delicia-4",
+      "delicia-5",
+      "delicia-6",
+      "delicia-7",
+      "delicia-raizes",
+      "delicia-9",
+      "delicia-relogio",
+      "delicia-10",
+      "delicia-11",
+      "delicia-12"
+    ],
+    "desktop": {
+      "frames": 2609,
+      "offscreen": 0,
+      "overlaps": 0,
+      "depthReads": 2609,
+      "maxFrame": 30.80000001192093
+    },
+    "mobile": {
+      "frames": 314,
+      "offscreen": 0,
+      "overlaps": 0,
+      "depthReads": 314,
+      "maxFrame": 11.200000002980232
+    },
+    "errors": []
+  },
+  "walkingClearance": [
+    {
+      "route": "garden-gate",
+      "samples": 173,
+      "radiusMeters": 0.2,
+      "heightsMeters": [
+        0.4,
+        0.8
+      ],
+      "contacts": []
+    },
+    {
+      "route": "clock-sanctuary",
+      "samples": 235,
+      "radiusMeters": 0.2,
+      "heightsMeters": [
+        0.4,
+        0.8
+      ],
+      "contacts": []
+    }
+  ],
+  "browser": {
+    "walking": {
+      "arrived": "delicia-1",
+      "destination": "delicia-2",
+      "point": {
+        "x": -2.185637402247974,
+        "y": -1.3431354676749652
+      },
+      "disabled": true,
+      "saved": "delicia-1"
+    },
+    "reversal": {
+      "before": {
+        "x": -1.943244659891685,
+        "y": -1.271647557743334
+      },
+      "after": {
+        "x": -1.943244659891685,
+        "y": -1.271647557743334
+      },
+      "direction": -1
+    },
+    "returned": {
+      "arrived": "delicia-2",
+      "destination": "delicia-3",
+      "canEnter": false,
+      "chapter": "delicia"
+    },
+    "landings": [
+      {
+        "id": "delicia-1",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -2.1923219200000004,
+          "y": -1.3497522000000002
+        },
+        "buttons": 5
+      },
+      {
+        "id": "delicia-2",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.7556930000000004,
+          "y": -2.068556
+        },
+        "buttons": 7
+      },
+      {
+        "id": "delicia-3",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.7010482800000002,
+          "y": -2.04916572
+        },
+        "buttons": 6
+      },
+      {
+        "id": "delicia-4",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.6871359400000001,
+          "y": -1.5444584
+        },
+        "buttons": 8
+      },
+      {
+        "id": "delicia-5",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.19771376,
+          "y": -1.5853241599999999
+        },
+        "buttons": 10
+      },
+      {
+        "id": "delicia-6",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.34419126,
+          "y": -2.00910076
+        },
+        "buttons": 11
+      },
+      {
+        "id": "delicia-7",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.5034703800000002,
+          "y": -1.21245504
+        },
+        "buttons": 12
+      },
+      {
+        "id": "delicia-8",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.0908579200000001,
+          "y": -1.40075432
+        },
+        "buttons": 6
+      },
+      {
+        "id": "delicia-9",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -0.9872286800000003,
+          "y": -1.0631895599999999
+        },
+        "buttons": 5
+      },
+      {
+        "id": "delicia-10",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -0.8951312200000001,
+          "y": -1.4252551599999999
+        },
+        "buttons": 5
+      },
+      {
+        "id": "delicia-11",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -0.7395022400000002,
+          "y": -1.60125306
+        },
+        "buttons": 5
+      },
+      {
+        "id": "delicia-12",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -0.8947082,
+          "y": -2.01856788
+        },
+        "buttons": 4
+      },
+      {
+        "id": "delicia-raizes",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.7144317800000002,
+          "y": -2.20374326
+        },
+        "buttons": 4
+      },
+      {
+        "id": "delicia-relogio",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -0.83995766,
+          "y": -0.89024744
+        },
+        "buttons": 2
+      }
+    ],
+    "touch": [
+      "delicia-2",
+      "delicia-3",
+      "delicia-4",
+      "delicia-5",
+      "delicia-6",
+      "delicia-7",
+      "delicia-8",
+      "delicia-9",
+      "delicia-10",
+      "delicia-11",
+      "delicia-12"
+    ],
+    "reduced": {
+      "arrived": "delicia-1",
+      "destination": null,
+      "enabled": true
+    },
+    "locked": {
+      "arrived": "delicia-1",
+      "blocked": "unavailable",
+      "enabled": false,
+      "saved": "delicia-1",
+      "active": false
+    },
+    "errors": []
+  },
+  "gardenEntry": {
+    "nativeStage": "delicia-9",
+    "returned": {
+      "arrived": "delicia-9",
+      "destination": null,
+      "point": {
+        "x": -0.9872286800000003,
+        "y": -1.0631895599999999
+      },
+      "canEnter": true
+    },
+    "errors": []
+  },
+  "captures": {
+    "revision": 11,
+    "landings": [
+      {
+        "id": "delicia-1",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-2",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-3",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-4",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-5",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-6",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-7",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-8",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-9",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-10",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-11",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-12",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-raizes",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-relogio",
+        "canEnter": true
+      }
+    ],
+    "errors": []
+  }
+}

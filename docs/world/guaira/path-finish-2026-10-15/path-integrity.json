@@ -1,0 +1,4952 @@
+{
+  "sourceSHA256": "1993480be169eb419e8111196712b556572225ab296edbe0801fe11a8a1fde27",
+  "navigationUnchanged": true,
+  "landmarkPositionsUnchanged": true,
+  "terrainMaximumChange": 0.0,
+  "cameraUnchanged": true,
+  "waterMeshesUnchanged": true,
+  "waterMaximumChange": 0.0,
+  "maximumProjectionError": 4.980049128633368e-08,
+  "maximumDepthErrorMeters": 4.6411132714752057e-07,
+  "closedMeshes": 548,
+  "meshes": [
+    {
+      "name": "Continuous clay island",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 212.3596117144562
+    },
+    {
+      "name": "Terrain v2 embedded outcrop 0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.05243892590128283
+    },
+    {
+      "name": "Terrain v2 embedded outcrop 1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.032379124738233234
+    },
+    {
+      "name": "Terrain v2 embedded outcrop 2",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.02108770366108927
+    },
+    {
+      "name": "Terrain v2 embedded outcrop 3",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.042484272598091774
+    },
+    {
+      "name": "Terrain v2 embedded outcrop 4",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.01618337486037843
+    },
+    {
+      "name": "Terrain v2 embedded outcrop 5",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.041696060259364676
+    },
+    {
+      "name": "Terrain v2 embedded outcrop 6",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.024479061953425595
+    },
+    {
+      "name": "Terrain v2 embedded outcrop 7",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.044676417135009985
+    },
+    {
+      "name": "Terrain v2 embedded outcrop 8",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.05083925472031964
+    },
+    {
+      "name": "Terrain v2 embedded outcrop 9",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.03345471405833006
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 0-0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.7077408046510967e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 0-1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 2.339128095083182e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 0-2",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 2.5478711034000452e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 0-3",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.6044485400983728e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 0-4",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 2.3084878011799155e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 0-5",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 2.7243815870575238e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 0-6",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.5766553736148363e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 1-0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 9.432444228206494e-06
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 1-1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.2784420679461594e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 1-2",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.4147410288360251e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 1-3",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 8.946445555067361e-06
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 1-4",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.2639975794238867e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 1-5",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.497806155807929e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 1-6",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 8.815566129206071e-06
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 2-0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 8.225377071947827e-06
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 2-1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.1122352259968177e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 2-2",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.2351951011844108e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 2-3",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 7.81812715677484e-06
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 2-4",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.1001477127543053e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 2-5",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.30479880501317e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 2-6",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 7.708510072500301e-06
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 3-0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.707749853765224e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 3-1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 2.3390982190266705e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 3-2",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 2.54782197704217e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 3-3",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.6044663220405025e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 3-4",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 2.308534843525889e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 3-5",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 2.724366430476065e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 3-6",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.5766580122195464e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 4-0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 9.43268662581499e-06
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 4-1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.2784371701563251e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 4-2",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.4147395636192046e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 4-3",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 8.946463317779669e-06
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 4-4",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.2640096378844536e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 4-5",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.497822791151444e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 4-6",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 8.815778369419824e-06
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 5-0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.2906689768746489e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 5-1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.759014864649317e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 5-2",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.930448037815841e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 5-3",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.2181468648774299e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 5-4",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.7374945732368408e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 5-5",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 2.0544695249820333e-05
+    },
+    {
+      "name": "Terrain v2 rooted dry grass 5-6",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.1985713853189181e-05
+    },
+    {
+      "name": "Landscape v3 civic recessed mortar backing 0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.7654371038194884
+    },
+    {
+      "name": "Landscape v3 civic recessed mortar backing 1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.15919188658414346
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.019548300154258298
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.02750590981479372
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 2",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0278314937733408
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 3",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.027505907355958606
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 4",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.028343349202834833
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 5",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.02750591542325133
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 6",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.027505914162391176
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 7",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.02915433594217938
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 8",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.02714546076823872
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 9",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.027802503411267377
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 10",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.02064583990966337
+    },
+    {
+      "name": "Landscape v3 civic fitted course 0 11",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0027956599037713336
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.024557289521983144
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.024119681078466244
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 2",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.024355765027371898
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 3",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.024119773452711615
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 4",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.024718161393368857
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 5",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.02411966634346295
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 6",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.025314981347778667
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 7",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.024119675155289358
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 8",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00794663678036567
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 9",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.008224605330398056
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 10",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.02454775558206245
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 11",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.009811959609202704
+    },
+    {
+      "name": "Landscape v3 civic fitted course 1 12",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.010239367086048654
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.017271896279830834
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.024699457435142777
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 2",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.024884995097043956
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 3",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.024699456917264592
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 4",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.02517668879610479
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 5",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.02469945950795454
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 6",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.02469945818249064
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 7",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.025638838549553136
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 8",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.02449404549635382
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 9",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0247485668066091
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 10",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.01866239172253978
+    },
+    {
+      "name": "Landscape v3 civic fitted course 2 11",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0021464120596223282
+    },
+    {
+      "name": "Landscape v3 civic fitted course 3 0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007979392073667444
+    },
+    {
+      "name": "Landscape v3 civic fitted course 3 1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.012026063735461577
+    },
+    {
+      "name": "Landscape v3 civic fitted course 3 2",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.011987650097081009
+    },
+    {
+      "name": "Landscape v3 civic fitted course 3 3",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.011914140666849147
+    },
+    {
+      "name": "Landscape v3 civic fitted course 3 4",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.012030767552687425
+    },
+    {
+      "name": "Landscape v3 civic fitted course 3 5",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.012026063474886554
+    },
+    {
+      "name": "Landscape v3 civic fitted course 3 6",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.011831583755103525
+    },
+    {
+      "name": "Landscape v3 civic fitted course 3 7",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.006283815650665659
+    },
+    {
+      "name": "Landscape v3 civic fitted course 3 8",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.011956411375822412
+    },
+    {
+      "name": "Landscape v3 civic fitted course 3 9",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0020944327691810663
+    },
+    {
+      "name": "Landscape v3 civic fitted course 3 10",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0037082635764778497
+    },
+    {
+      "name": "Landscape v3 cistern structural core",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 3.0844698249842297
+    },
+    {
+      "name": "Landscape v3 cistern earth apron",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.063073451411594
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.01533453363246337
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.015334525998710463
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-2",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.015334525789295103
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-3",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.015334532080956531
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-4",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.015334531726581273
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-5",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.015334532310076518
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-6",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.015334525882322567
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-7",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.01533452802272748
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-8",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.015334526795191393
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-9",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.015334523029544501
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-10",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.015334527863158781
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-11",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.015334524384578066
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-12",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.015334525816215971
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-13",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.015334524357886698
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-14",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.015334529457350784
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-15",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.015334523633983254
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-16",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.015334526661636795
+    },
+    {
+      "name": "Landscape v3 cistern radial course 0-17",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.015334530552459716
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014981682314405262
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014981672602856724
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-2",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014981665183289895
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-3",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014981670208780384
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-4",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014981669852539965
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-5",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014981669443986143
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-6",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014981671382537753
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-7",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014981667785820448
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-8",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014981670156536647
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-9",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014981666566762995
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-10",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014981671606327983
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-11",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014981670427488603
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-12",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014981668662952804
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-13",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014981669585580781
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-14",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.01498166634024908
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-15",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.01498167244481851
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-16",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014981679881497935
+    },
+    {
+      "name": "Landscape v3 cistern radial course 1-17",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.01498166336237649
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014628806228472138
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014628817115892812
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-2",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014628811116406196
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-3",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014628807311048458
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-4",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014628811373006173
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-5",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014628813759131908
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-6",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014628820375333348
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-7",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014628816862819007
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-8",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014628816539914255
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-9",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014628812009486826
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-10",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014628818731010025
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-11",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014628822928482617
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-12",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014323167015338954
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-13",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.01146918689211027
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-14",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014323161465072145
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-15",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.01462881385337566
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-16",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014628818337148922
+    },
+    {
+      "name": "Landscape v3 cistern radial course 2-17",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014628801717496684
+    },
+    {
+      "name": "Landscape v3 founded channel bed",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.2189373619125654
+    },
+    {
+      "name": "Landscape v3 channel retaining cheek west",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.03569143685277465
+    },
+    {
+      "name": "Landscape v3 channel retaining cheek east",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.03569143685277443
+    },
+    {
+      "name": "Landscape v3 service stone shoe",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.003731416534940246
+    },
+    {
+      "name": "Landscape v3 seated reservoir deck post",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.003843141700142567
+    },
+    {
+      "name": "Landscape v3 service stone shoe.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.004611182173521744
+    },
+    {
+      "name": "Landscape v3 seated reservoir deck post.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00341175451060255
+    },
+    {
+      "name": "Landscape v3 service stone shoe.002",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0024480044402993423
+    },
+    {
+      "name": "Landscape v3 service stone shoe.003",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0024908014918150166
+    },
+    {
+      "name": "Landscape v3 seated reservoir deck post.002",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.004092909631842782
+    },
+    {
+      "name": "Landscape v3 service stone shoe.004",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.002790265886655839
+    },
+    {
+      "name": "Landscape v3 seated reservoir deck post.003",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00397232363592157
+    },
+    {
+      "name": "Landscape v3 service stone shoe.005",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0024480182209247955
+    },
+    {
+      "name": "Landscape v3 service stair rail post",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0008643599935162065
+    },
+    {
+      "name": "Landscape v3 service stair rail post.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0008643599935162065
+    },
+    {
+      "name": "Landscape v3 service stair handrail",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0025868751975599083
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 0-0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 3.4145356694136215e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 0-1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 4.5341564815893666e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 0-2",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 4.8158735487392745e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 0-3",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 4.116296289398934e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 0-4",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 3.7948583319269945e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 0-5",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 3.9379373460258355e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 0-6",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 4.255668239181321e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 1-0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 3.414507393576915e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 1-1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 4.534122157302822e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 1-2",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 4.815919166153092e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 1-3",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 4.11630636867593e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 1-4",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 3.7948544242330344e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 1-5",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 3.937937346030931e-05
+    },
+    {
+      "name": "Landscape v3 rooted bank agave 1-6",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 4.2556654151722825e-05
+    },
+    {
+      "name": "Finish v5 joined ground paving 0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 2.185971314636023
+    },
+    {
+      "name": "Finish v5 joined ground paving 1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.5156144214045755
+    },
+    {
+      "name": "Path v6 fitted curb 0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007512447314155987
+    },
+    {
+      "name": "Path v6 fitted curb 1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007512468209503326
+    },
+    {
+      "name": "Path v6 fitted curb 2",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007512476066906325
+    },
+    {
+      "name": "Path v6 fitted curb 3",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.008029304965312657
+    },
+    {
+      "name": "Path v6 fitted curb 4",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.006995580072546531
+    },
+    {
+      "name": "Path v6 fitted curb 5",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.008029286538677119
+    },
+    {
+      "name": "Path v6 fitted curb 6",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.006995603220537227
+    },
+    {
+      "name": "Path v6 fitted curb 7",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007512448543332363
+    },
+    {
+      "name": "Path v6 fitted curb 8",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007405733331426372
+    },
+    {
+      "name": "Path v6 fitted curb 9",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007512432215622892
+    },
+    {
+      "name": "Path v6 fitted curb 10",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007512444379139657
+    },
+    {
+      "name": "Path v6 fitted curb 11",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00751242389116992
+    },
+    {
+      "name": "Path v6 fitted curb 12",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007512480793940533
+    },
+    {
+      "name": "Path v6 fitted curb 13",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007512436652205398
+    },
+    {
+      "name": "Path v6 fitted curb 14",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007512442475404328
+    },
+    {
+      "name": "Path v6 fitted curb 15",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0075124431405311776
+    },
+    {
+      "name": "Path v6 fitted curb 16",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007512463199537097
+    },
+    {
+      "name": "Path v6 fitted curb 17",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.008029304664975721
+    },
+    {
+      "name": "Path v6 fitted curb 18",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.006995597197955908
+    },
+    {
+      "name": "Path v6 fitted curb 19",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007512420693116056
+    },
+    {
+      "name": "Path v6 fitted curb 20",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007532314782074875
+    },
+    {
+      "name": "Path v6 fitted curb 21",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007532321988778193
+    },
+    {
+      "name": "Path v6 fitted curb 22",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007586296782831122
+    },
+    {
+      "name": "Path v6 fitted curb 23",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00758629492710669
+    },
+    {
+      "name": "Path v6 fitted curb 24",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007586316995560406
+    },
+    {
+      "name": "Path v6 fitted curb 25",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0075863020053322724
+    },
+    {
+      "name": "Path v6 fitted curb 26",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007586267854381608
+    },
+    {
+      "name": "Path v6 fitted curb 27",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007586321584724262
+    },
+    {
+      "name": "Path v6 fitted curb 28",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007586306334923598
+    },
+    {
+      "name": "Path v6 fitted curb 29",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0075863146507417
+    },
+    {
+      "name": "Path v6 fitted curb 30",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007586307271011055
+    },
+    {
+      "name": "Path v6 fitted curb 31",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007586292391480422
+    },
+    {
+      "name": "Path v6 fitted curb 32",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007606178276331917
+    },
+    {
+      "name": "Path v6 fitted curb 33",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007606173800298689
+    },
+    {
+      "name": "Path v6 fitted curb 34",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00669220919522597
+    },
+    {
+      "name": "Path v6 fitted curb 35",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007514531041820667
+    },
+    {
+      "name": "Path v6 fitted curb 36",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00768682625715651
+    },
+    {
+      "name": "Path v6 fitted curb 37",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007362184968709008
+    },
+    {
+      "name": "Path v6 fitted curb 38",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007169972659835908
+    },
+    {
+      "name": "Path v6 fitted curb 39",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007342263274654148
+    },
+    {
+      "name": "Path v6 fitted curb 40",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007342255657693149
+    },
+    {
+      "name": "Path v6 fitted curb 41",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007342286712043372
+    },
+    {
+      "name": "Path v6 fitted curb 42",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007342238405414231
+    },
+    {
+      "name": "Path v6 fitted curb 43",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007342256241281368
+    },
+    {
+      "name": "Path v6 fitted curb 44",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007342278315677353
+    },
+    {
+      "name": "Path v6 fitted curb 45",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007342254986210321
+    },
+    {
+      "name": "Path v6 fitted curb 46",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007362118730830536
+    },
+    {
+      "name": "Path v6 fitted curb 47",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014149019720005332
+    },
+    {
+      "name": "Path v6 fitted curb 48",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007092303638114084
+    },
+    {
+      "name": "Path v6 fitted curb 49",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0071853138319167755
+    },
+    {
+      "name": "Path v6 fitted curb 50",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0064961872639195065
+    },
+    {
+      "name": "Path v6 fitted curb 51",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.006927662253477566
+    },
+    {
+      "name": "Path v6 fitted curb 52",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00686065453485682
+    },
+    {
+      "name": "Path v6 fitted curb 53",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.006840771317432007
+    },
+    {
+      "name": "Path v6 fitted curb 54",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.006860636194649841
+    },
+    {
+      "name": "Path v6 fitted curb 55",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.011732134004114688
+    },
+    {
+      "name": "Path v6 fitted curb 56",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.005863966141316698
+    },
+    {
+      "name": "Path v6 fitted curb 57",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.005883841723577537
+    },
+    {
+      "name": "Path v6 bridge founded head",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00659999423026969
+    },
+    {
+      "name": "Path v6 bridge founded head.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.006599994230269619
+    },
+    {
+      "name": "Path v6 bridge founded head.002",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.006599994230269694
+    },
+    {
+      "name": "Path v6 bridge founded head.003",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.006599994230269659
+    },
+    {
+      "name": "Path v6 bridge continuous bearer",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.005500001430505108
+    },
+    {
+      "name": "Path v6 bridge continuous bearer.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.005500001430505108
+    },
+    {
+      "name": "Path v6 bridge fitted deck 0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.004345997508047693
+    },
+    {
+      "name": "Path v6 bridge deck fastener",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.1560141209715908e-06
+    },
+    {
+      "name": "Path v6 bridge deck fastener.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.1560303336752287e-06
+    },
+    {
+      "name": "Path v6 bridge fitted deck 1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.004345997508047929
+    },
+    {
+      "name": "Path v6 bridge deck fastener.002",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.1560141209681146e-06
+    },
+    {
+      "name": "Path v6 bridge deck fastener.003",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.1560303336752287e-06
+    },
+    {
+      "name": "Path v6 bridge fitted deck 2",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00434599750804761
+    },
+    {
+      "name": "Path v6 bridge deck fastener.004",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.156014120970432e-06
+    },
+    {
+      "name": "Path v6 bridge deck fastener.005",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.1560303336752287e-06
+    },
+    {
+      "name": "Path v6 bridge fitted deck 3",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.004345991189960101
+    },
+    {
+      "name": "Path v6 bridge deck fastener.006",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.156022227314743e-06
+    },
+    {
+      "name": "Path v6 bridge deck fastener.007",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.1560384401386459e-06
+    },
+    {
+      "name": "Path v6 bridge fitted deck 4",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0043459975080475605
+    },
+    {
+      "name": "Path v6 bridge deck fastener.008",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.1560141209692801e-06
+    },
+    {
+      "name": "Path v6 bridge deck fastener.009",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.1560303336729247e-06
+    },
+    {
+      "name": "Path v6 bridge fitted deck 5",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.004345997508047519
+    },
+    {
+      "name": "Path v6 bridge deck fastener.010",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.1560141209715908e-06
+    },
+    {
+      "name": "Path v6 bridge deck fastener.011",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.1560303336729247e-06
+    },
+    {
+      "name": "Path v6 bridge fitted deck 6",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.004345991189960313
+    },
+    {
+      "name": "Path v6 bridge deck fastener.012",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.1560222273158949e-06
+    },
+    {
+      "name": "Path v6 bridge deck fastener.013",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.156038440136342e-06
+    },
+    {
+      "name": "Path v6 bridge fitted deck 7",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.004345997508047443
+    },
+    {
+      "name": "Path v6 bridge deck fastener.014",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.156014120970432e-06
+    },
+    {
+      "name": "Path v6 bridge deck fastener.015",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.1560303336752287e-06
+    },
+    {
+      "name": "Path v6 bridge fitted deck 8",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.004345997508047418
+    },
+    {
+      "name": "Path v6 bridge deck fastener.016",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.156014120970432e-06
+    },
+    {
+      "name": "Path v6 bridge deck fastener.017",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.1560303336752287e-06
+    },
+    {
+      "name": "Path v6 bridge fitted deck 9",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.004345997508047527
+    },
+    {
+      "name": "Path v6 bridge deck fastener.018",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.1560141209698493e-06
+    },
+    {
+      "name": "Path v6 bridge deck fastener.019",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.1560303336752287e-06
+    },
+    {
+      "name": "Path v6 bridge south flush approach",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.015554982199671802
+    },
+    {
+      "name": "Path v6 bridge north flush approach",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.015555000742673214
+    },
+    {
+      "name": "Path v6 bridge tenoned post",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0023953095012647085
+    },
+    {
+      "name": "Path v6 bridge post cap",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0002484295495889981
+    },
+    {
+      "name": "Path v6 bridge post iron shoe",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0004939188672638366
+    },
+    {
+      "name": "Path v6 bridge rail pin",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 7.487999748171325e-06
+    },
+    {
+      "name": "Path v6 bridge rail pin.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 7.488036941396658e-06
+    },
+    {
+      "name": "Path v6 bridge tenoned post.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0023953095012647363
+    },
+    {
+      "name": "Path v6 bridge post cap.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0002484302004716241
+    },
+    {
+      "name": "Path v6 bridge post iron shoe.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0004939195682139106
+    },
+    {
+      "name": "Path v6 bridge rail pin.002",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 7.4879997481782094e-06
+    },
+    {
+      "name": "Path v6 bridge rail pin.003",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 7.488036941394327e-06
+    },
+    {
+      "name": "Path v6 bridge fitted guardrail",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0012423599899399186
+    },
+    {
+      "name": "Path v6 bridge fitted guardrail.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001900079920556535
+    },
+    {
+      "name": "Path v6 bridge diagonal brace",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0004522035847344404
+    },
+    {
+      "name": "Path v6 bridge tenoned post.002",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.002395316917979201
+    },
+    {
+      "name": "Path v6 bridge post cap.002",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0002484295495889799
+    },
+    {
+      "name": "Path v6 bridge post iron shoe.002",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0004939202691640427
+    },
+    {
+      "name": "Path v6 bridge rail pin.004",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 7.4879997481805405e-06
+    },
+    {
+      "name": "Path v6 bridge rail pin.005",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 7.488036941405928e-06
+    },
+    {
+      "name": "Path v6 bridge tenoned post.003",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0023953169179791386
+    },
+    {
+      "name": "Path v6 bridge post cap.003",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00024843020047163366
+    },
+    {
+      "name": "Path v6 bridge post iron shoe.003",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0004939209701160336
+    },
+    {
+      "name": "Path v6 bridge rail pin.006",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 7.487999748173602e-06
+    },
+    {
+      "name": "Path v6 bridge rail pin.007",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 7.488036941403543e-06
+    },
+    {
+      "name": "Path v6 bridge fitted guardrail.002",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0012423599899399186
+    },
+    {
+      "name": "Path v6 bridge fitted guardrail.003",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001900079920556535
+    },
+    {
+      "name": "Path v6 bridge diagonal brace.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0004522035847344404
+    },
+    {
+      "name": "Landmark v4 compacted corral court",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.4554270776017594
+    },
+    {
+      "name": "Landmark v4 corral squared post",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0024800411762429266
+    },
+    {
+      "name": "Landmark v4 corral rail",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0012915993633060507
+    },
+    {
+      "name": "Landmark v4 corral rail.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0012915993633060507
+    },
+    {
+      "name": "Landmark v4 corral squared post.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0024800410649312068
+    },
+    {
+      "name": "Landmark v4 corral rail.002",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001291598920741548
+    },
+    {
+      "name": "Landmark v4 corral rail.003",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001291598920741548
+    },
+    {
+      "name": "Landmark v4 corral squared post.002",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0024800402857491684
+    },
+    {
+      "name": "Landmark v4 corral rail.004",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0012915991862802497
+    },
+    {
+      "name": "Landmark v4 corral rail.005",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0012915991862802497
+    },
+    {
+      "name": "Landmark v4 corral squared post.003",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0024800393952553977
+    },
+    {
+      "name": "Landmark v4 corral rail.006",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0014081683749415622
+    },
+    {
+      "name": "Landmark v4 corral rail.007",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0014081683749415622
+    },
+    {
+      "name": "Landmark v4 corral squared post.004",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0024800390613204703
+    },
+    {
+      "name": "Landmark v4 corral rail.008",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0012301523800652932
+    },
+    {
+      "name": "Landmark v4 corral rail.009",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0012301523800652932
+    },
+    {
+      "name": "Landmark v4 corral squared post.005",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0024800385047622506
+    },
+    {
+      "name": "Landmark v4 corral rail.010",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0012301522915523929
+    },
+    {
+      "name": "Landmark v4 corral rail.011",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0012301522915523929
+    },
+    {
+      "name": "Landmark v4 corral squared post.006",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.002480037614269126
+    },
+    {
+      "name": "Landmark v4 corral rail.012",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0012301521145265918
+    },
+    {
+      "name": "Landmark v4 corral rail.013",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0012301521145265918
+    },
+    {
+      "name": "Landmark v4 corral squared post.007",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.002480037614269173
+    },
+    {
+      "name": "Landmark v4 corral rail.014",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0011109745391995895
+    },
+    {
+      "name": "Landmark v4 corral rail.015",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0011109745391995895
+    },
+    {
+      "name": "Landmark v4 corral squared post.008",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.002480037614269119
+    },
+    {
+      "name": "Landmark v4 corral rail.016",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0011109745391995895
+    },
+    {
+      "name": "Landmark v4 corral rail.017",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0011109745391995895
+    },
+    {
+      "name": "Landmark v4 corral squared post.009",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0024800376142691295
+    },
+    {
+      "name": "Landmark v4 corral rail.018",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001102106166156885
+    },
+    {
+      "name": "Landmark v4 corral rail.019",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001102106166156885
+    },
+    {
+      "name": "Landmark v4 corral squared post.010",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.003582280239046144
+    },
+    {
+      "name": "Landmark v4 corral rail.020",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0012435044625971965
+    },
+    {
+      "name": "Landmark v4 corral rail.021",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0012435044625971965
+    },
+    {
+      "name": "Landmark v4 corral squared post.011",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0035822750939768187
+    },
+    {
+      "name": "Landmark v4 corral rail.022",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001192539442575788
+    },
+    {
+      "name": "Landmark v4 corral rail.023",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001192539442575788
+    },
+    {
+      "name": "Landmark v4 corral squared post.012",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.003582275093976836
+    },
+    {
+      "name": "Landmark v4 corral rail.024",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001192539088524186
+    },
+    {
+      "name": "Landmark v4 corral rail.025",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001192539088524186
+    },
+    {
+      "name": "Landmark v4 corral squared post.013",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.003582275093976869
+    },
+    {
+      "name": "Landmark v4 corral rail.026",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001528901033417959
+    },
+    {
+      "name": "Landmark v4 corral rail.027",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001528901033417959
+    },
+    {
+      "name": "Landmark v4 corral squared post.014",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.003582277666511479
+    },
+    {
+      "name": "Landmark v4 corral rail.028",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001528901033417959
+    },
+    {
+      "name": "Landmark v4 corral rail.029",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001528901033417959
+    },
+    {
+      "name": "Landmark v4 corral squared post.015",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.003582277344944664
+    },
+    {
+      "name": "Landmark v4 corral rail.030",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0015030078235488001
+    },
+    {
+      "name": "Landmark v4 corral rail.031",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0015030078235488001
+    },
+    {
+      "name": "Landmark v4 gate founded stone shoe",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00919999829530662
+    },
+    {
+      "name": "Landmark v4 corral entrance post",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014111988664625146
+    },
+    {
+      "name": "Landmark v4 gate founded stone shoe.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.009199998295306617
+    },
+    {
+      "name": "Landmark v4 corral entrance post.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014111985660553786
+    },
+    {
+      "name": "Landmark v4 corral entrance lintel",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.022099999421834937
+    },
+    {
+      "name": "Finish v5 low corral stone shoe",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0019751603552627664
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0019751602179857953
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.002",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0019751599159764676
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.003",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001975160355262771
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.004",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0019751611240137476
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.005",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0019751607945488613
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.006",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001975160355262391
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.007",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0019751621124083447
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.008",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001975160355262395
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.009",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001975160355262382
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.010",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001975159037404063
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.011",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0019751603552623873
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.012",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001975160355262391
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.013",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001975158598117948
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.014",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001975159476690164
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.015",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00197515947669016
+    },
+    {
+      "name": "Finish v5 carved bovine crest",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0033786900848574867
+    },
+    {
+      "name": "Finish v5 tapered curved horn",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0012874006734737444
+    },
+    {
+      "name": "Finish v5 tapered curved horn.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0012861049831414213
+    },
+    {
+      "name": "Finish v5 corral fitted threshold",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.017632788695718535
+    },
+    {
+      "name": "Finish v5 hollow dry stone trough",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.026671099389723306
+    },
+    {
+      "name": "Finish v5 gate iron joinery strap",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00011191027890911694
+    },
+    {
+      "name": "Finish v5 gate iron joinery strap.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00011191062998146088
+    },
+    {
+      "name": "Finish v5 gate iron joinery strap.002",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00011191027890911694
+    },
+    {
+      "name": "Finish v5 gate iron joinery strap.003",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00011191062998146002
+    },
+    {
+      "name": "Finish v5 rear fence repair brace",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0012853012987705565
+    },
+    {
+      "name": "Finish v5 stored replacement timber",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0015417923893081193
+    },
+    {
+      "name": "Landmark v4 dry sluice inspection face",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.003509999494549703
+    },
+    {
+      "name": "Landmark v4 Vala Seca gate wheel",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0006230111707816676
+    },
+    {
+      "name": "Landmark v4 Vala Seca gate spindle",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00023699346967477044
+    },
+    {
+      "name": "Landmark v4 Vala Seca gate spoke",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 7.88525881588282e-05
+    },
+    {
+      "name": "Landmark v4 Vala Seca gate spoke.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 7.885249105189069e-05
+    },
+    {
+      "name": "Landmark v4 dry sluice stem",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0010080472009653682
+    },
+    {
+      "name": "Landmark v4 paired controls foundation",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.10763992762090265
+    },
+    {
+      "name": "Landmark v4 paired controls bench",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.11063498427152571
+    },
+    {
+      "name": "Landmark v4 control 0 enamel plate",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.003919994459154072
+    },
+    {
+      "name": "Landmark v4 control 0 wheel",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.000538053802135051
+    },
+    {
+      "name": "Landmark v4 control 0 spindle",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00023699331176810137
+    },
+    {
+      "name": "Landmark v4 control 0 spoke",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 6.810017716502069e-05
+    },
+    {
+      "name": "Landmark v4 control 0 spoke.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 6.810017716502091e-05
+    },
+    {
+      "name": "Landmark v4 paired inlet 0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0012866046300667373
+    },
+    {
+      "name": "Landmark v4 control letter A",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.9287474318019533e-05
+    },
+    {
+      "name": "Landmark v4 control letter A.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.9287493205242123e-05
+    },
+    {
+      "name": "Landmark v4 control letter A.002",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.0140031040908172e-05
+    },
+    {
+      "name": "Landmark v4 control 1 enamel plate",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00391999679565363
+    },
+    {
+      "name": "Landmark v4 control 1 wheel",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0005380538021350842
+    },
+    {
+      "name": "Landmark v4 control 1 spindle",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00023699331176810006
+    },
+    {
+      "name": "Landmark v4 control 1 spoke",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 6.81002742724604e-05
+    },
+    {
+      "name": "Landmark v4 control 1 spoke.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 6.810017716502622e-05
+    },
+    {
+      "name": "Landmark v4 paired inlet 1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0012866046300667342
+    },
+    {
+      "name": "Landmark v4 control letter B",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.6900004726648503e-05
+    },
+    {
+      "name": "Landmark v4 control letter B.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.2303374775810284e-05
+    },
+    {
+      "name": "Landmark v4 control letter B.002",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.287065250637838e-05
+    },
+    {
+      "name": "Landmark v4 control letter B.003",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.3360592097022556e-05
+    },
+    {
+      "name": "Landmark v4 control letter B.004",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.3360592097022556e-05
+    },
+    {
+      "name": "Landmark v4 shared paired inlet",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0017922711644432349
+    },
+    {
+      "name": "Landmark v4 vent 0 pressure riser",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0006612615358324823
+    },
+    {
+      "name": "Landmark v4 vent 0 gauge case",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0007073244425565133
+    },
+    {
+      "name": "Landmark v4 vent 0 gauge dial",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00010185510526353829
+    },
+    {
+      "name": "Landmark v4 vent 0 gauge needle",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 9.119460162231606e-06
+    },
+    {
+      "name": "Landmark v4 vent 1 pressure riser",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0006612648378451743
+    },
+    {
+      "name": "Landmark v4 vent 1 gauge case",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0007073235377934373
+    },
+    {
+      "name": "Landmark v4 vent 1 gauge dial",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00010185519340205894
+    },
+    {
+      "name": "Landmark v4 vent 1 gauge needle",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 9.119445559092736e-06
+    },
+    {
+      "name": "Finish v5 respiros founded service bank",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.14388142124367526
+    },
+    {
+      "name": "Finish v5 hollow respiro 0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.01679511965760444
+    },
+    {
+      "name": "Finish v5 seated respiro grille",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00013199952936015103
+    },
+    {
+      "name": "Finish v5 seated respiro grille.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0001319988737126707
+    },
+    {
+      "name": "Finish v5 seated respiro grille.002",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0001319995293601415
+    },
+    {
+      "name": "Finish v5 seated respiro grille.003",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00013199887371273533
+    },
+    {
+      "name": "Finish v5 respiro inlet elbow",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00029299272260231284
+    },
+    {
+      "name": "Finish v5 collector pipe saddle",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00026999922752456683
+    },
+    {
+      "name": "Finish v5 hollow respiro 1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.016795120701659234
+    },
+    {
+      "name": "Finish v5 seated respiro grille.004",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0001320001850075394
+    },
+    {
+      "name": "Finish v5 seated respiro grille.005",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00013199887371271625
+    },
+    {
+      "name": "Finish v5 seated respiro grille.006",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00013199887371267028
+    },
+    {
+      "name": "Finish v5 seated respiro grille.007",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0001320001850076049
+    },
+    {
+      "name": "Finish v5 respiro inlet elbow.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0002929933730976533
+    },
+    {
+      "name": "Finish v5 collector pipe saddle.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00026999879837186214
+    },
+    {
+      "name": "Finish v5 visible shared pressure collector",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.003526712095584924
+    },
+    {
+      "name": "Finish v5 collector fitted collar",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 5.97705214386562e-05
+    },
+    {
+      "name": "Finish v5 collector fitted collar.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 5.9770357475485626e-05
+    },
+    {
+      "name": "Landmark v4 gallery wall lamp bracket",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0006240001339906896
+    },
+    {
+      "name": "Landmark v4 gallery inspection lamp",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0012599997925749219
+    },
+    {
+      "name": "Landmark v4 gallery lamp lens",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 6.119994113444366e-05
+    },
+    {
+      "name": "Finish v5 gallery founded jamb",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.006162497633695821
+    },
+    {
+      "name": "Finish v5 gallery recessed jamb bed",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007673599973010606
+    },
+    {
+      "name": "Finish v5 gallery dressed jamb",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0027496822768596045
+    },
+    {
+      "name": "Finish v5 gallery dressed jamb.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.002749679830684238
+    },
+    {
+      "name": "Finish v5 gallery dressed jamb.002",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0027496773845086635
+    },
+    {
+      "name": "Finish v5 gallery founded jamb.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0061624976336958
+    },
+    {
+      "name": "Finish v5 gallery recessed jamb bed.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0076735999730105295
+    },
+    {
+      "name": "Finish v5 gallery dressed jamb.003",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0027496822768597225
+    },
+    {
+      "name": "Finish v5 gallery dressed jamb.004",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.002749679830684238
+    },
+    {
+      "name": "Finish v5 gallery dressed jamb.005",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0027496773845086912
+    },
+    {
+      "name": "Finish v5 gallery arch stone 0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0014755402385088299
+    },
+    {
+      "name": "Finish v5 gallery arch stone 1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0014755407232433203
+    },
+    {
+      "name": "Finish v5 gallery arch stone 2",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0014755415034492826
+    },
+    {
+      "name": "Finish v5 gallery arch stone 3",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0014755413994491443
+    },
+    {
+      "name": "Finish v5 gallery arch stone 4",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001475541390739004
+    },
+    {
+      "name": "Finish v5 gallery arch stone 5",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0014755394921724483
+    },
+    {
+      "name": "Finish v5 gallery arch stone 6",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0014755419019937812
+    },
+    {
+      "name": "Finish v5 gallery arch stone 7",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0014755418548620938
+    },
+    {
+      "name": "Finish v5 gallery arch stone 8",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0014755398233279558
+    },
+    {
+      "name": "Finish v5 gallery recessed door shadow",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.008248497561691808
+    },
+    {
+      "name": "Finish v5 arched gallery door board 0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001786900129449015
+    },
+    {
+      "name": "Finish v5 arched gallery door board 1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0020125635611897945
+    },
+    {
+      "name": "Finish v5 arched gallery door board 2",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0020716579532700924
+    },
+    {
+      "name": "Finish v5 arched gallery door board 3",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00201256356118977
+    },
+    {
+      "name": "Finish v5 arched gallery door board 4",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0017868996301628713
+    },
+    {
+      "name": "Finish v5 gallery seated threshold",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.02381399184179342
+    },
+    {
+      "name": "Finish v5 gallery fitted door strap",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0001841405645325011
+    },
+    {
+      "name": "Finish v5 gallery fitted door strap.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0001841397515247495
+    },
+    {
+      "name": "Finish v5 gallery door latch spindle",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 3.808822758543138e-05
+    },
+    {
+      "name": "Finish v5 gallery door ring pull",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 5.2655161831636535e-05
+    },
+    {
+      "name": "Finish v5 gallery lantern bracket",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00020625003296881995
+    },
+    {
+      "name": "Finish v5 gallery lantern rain hood",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0007105015763040632
+    },
+    {
+      "name": "Landmark v4 relief pressure meter case",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0025746957090691525
+    },
+    {
+      "name": "Landmark v4 relief pressure meter dial",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00037075600361501565
+    },
+    {
+      "name": "Landmark v4 relief pressure meter needle",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.739899596693443e-05
+    },
+    {
+      "name": "Landmark v4 relief return elbow",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.004638479194622716
+    },
+    {
+      "name": "Landmark v4 relief pipe flange",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0007106921036045247
+    },
+    {
+      "name": "Finish v5 relief collector curb",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.07964848095762653
+    },
+    {
+      "name": "Finish v5 relief rear hinge wall",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.04906799276018102
+    },
+    {
+      "name": "Finish v5 relief inclined hatch frame",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0008500275280970547
+    },
+    {
+      "name": "Finish v5 relief inclined hatch frame.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0008500275280970547
+    },
+    {
+      "name": "Finish v5 relief hatch crossmember",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001075840035386085
+    },
+    {
+      "name": "Finish v5 relief hatch crossmember.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001075840035386085
+    },
+    {
+      "name": "Finish v5 relief open iron grille",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00020329093826026022
+    },
+    {
+      "name": "Finish v5 relief open iron grille.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00020329093826026022
+    },
+    {
+      "name": "Finish v5 relief open iron grille.002",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00020329093826026022
+    },
+    {
+      "name": "Finish v5 relief open iron grille.003",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00020329093826026022
+    },
+    {
+      "name": "Finish v5 relief open iron grille.004",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00020329093826026022
+    },
+    {
+      "name": "Finish v5 relief open iron grille.005",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00020329093826026022
+    },
+    {
+      "name": "Finish v5 relief open iron grille.006",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00020329093826026022
+    },
+    {
+      "name": "Finish v5 relief seated hinge",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00020181030034969135
+    },
+    {
+      "name": "Finish v5 relief seated hinge.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00020180995666905206
+    },
+    {
+      "name": "Finish v5 relief connected gauge stem",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0007408802654916688
+    },
+    {
+      "name": "Finish v5 relief lifting handle",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 8.366428409130647e-05
+    },
+    {
+      "name": "Landmark v4 inspection lift footing",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.06703200198268015
+    },
+    {
+      "name": "Finish v5 inspection boarding step",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.029952016159057765
+    },
+    {
+      "name": "Finish v5 hoist founded shoe",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007344001447676662
+    },
+    {
+      "name": "Finish v5 hoist seated upright",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00709566926277044
+    },
+    {
+      "name": "Finish v5 hoist metal guide",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0007873187551248467
+    },
+    {
+      "name": "Finish v5 hoist carriage shoe",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0008467172670964338
+    },
+    {
+      "name": "Finish v5 hoist platform bearer",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0010890000314712517
+    },
+    {
+      "name": "Finish v5 hoist founded shoe.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.007343991147996734
+    },
+    {
+      "name": "Finish v5 hoist seated upright.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00709566926277044
+    },
+    {
+      "name": "Finish v5 hoist metal guide.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0007873140066010469
+    },
+    {
+      "name": "Finish v5 hoist carriage shoe.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0008467172670964702
+    },
+    {
+      "name": "Finish v5 hoist platform bearer.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0010890000314712517
+    },
+    {
+      "name": "Finish v5 hoist fitted header",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.005799999409913995
+    },
+    {
+      "name": "Finish v5 hoist rear brace left",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0013057625157326998
+    },
+    {
+      "name": "Finish v5 hoist rear brace right",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0013057625157326998
+    },
+    {
+      "name": "Finish v5 hoist deck board",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001821599637793216
+    },
+    {
+      "name": "Finish v5 hoist deck board.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0018215996377933088
+    },
+    {
+      "name": "Finish v5 hoist deck board.002",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0018215996377932532
+    },
+    {
+      "name": "Finish v5 hoist deck board.003",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001821599637793326
+    },
+    {
+      "name": "Finish v5 hoist deck board.004",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.001821599637793216
+    },
+    {
+      "name": "Finish v5 hoist carriage crossbar",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0011000007718801718
+    },
+    {
+      "name": "Finish v5 pulley hanger",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00018502001341342802
+    },
+    {
+      "name": "Finish v5 pulley hanger.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00018502001341342802
+    },
+    {
+      "name": "Finish v5 pulley supported axle",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0002004482369475152
+    },
+    {
+      "name": "Finish v5 hoist sheave",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00027671588426056903
+    },
+    {
+      "name": "Finish v5 hoist pulley spoke",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.859002333104704e-05
+    },
+    {
+      "name": "Finish v5 hoist pulley spoke.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 1.859002333104704e-05
+    },
+    {
+      "name": "Finish v5 hoist winch drum",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0013846878276301852
+    },
+    {
+      "name": "Finish v5 winch drum flange",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.000370756365352051
+    },
+    {
+      "name": "Finish v5 winch drum flange.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00037075636535210325
+    },
+    {
+      "name": "Finish v5 hoist crank axle",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00031739884614683965
+    },
+    {
+      "name": "Finish v5 hoist crank wheel",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0004150724175996829
+    },
+    {
+      "name": "Finish v5 hoist crank spoke",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 3.3319970280526135e-05
+    },
+    {
+      "name": "Finish v5 hoist crank spoke.001",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 3.332001701057053e-05
+    },
+    {
+      "name": "Finish v5 hoist crank grip",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 4.8599888825407345e-05
+    },
+    {
+      "name": "Finish v5 continuous lifting rope",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00023586703181214218
+    },
+    {
+      "name": "Finish v5 carriage lifting eye",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 2.69863302751592e-05
+    },
+    {
+      "name": "Landmark v4 public registration panel",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.014447983078004795
+    },
+    {
+      "name": "Landmark v4 public registration seal 0",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00014579297752784443
+    },
+    {
+      "name": "Landmark v4 public registration seal 1",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.00014579297752784475
+    },
+    {
+      "name": "Landmark v4 public registration seal 2",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0001457929775278391
+    },
+    {
+      "name": "Landmark v4 registration slider",
+      "components": 1,
+      "nonManifoldEdges": 0,
+      "degenerateFaces": 0,
+      "volume": 0.0001999999642372119
+    }
+  ],
+  "footings": [
+    {
+      "name": "Finish v5 low corral stone shoe",
+      "x": -0.4300000071525574,
+      "y": 0.36000001430511475,
+      "bottom": 1.715,
+      "terrainZ": 1.7769484519958496,
+      "unsupported": false
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.001",
+      "x": -0.3933333456516266,
+      "y": -0.07333337515592575,
+      "bottom": 1.715,
+      "terrainZ": 1.776357889175415,
+      "unsupported": false
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.002",
+      "x": -0.3566667139530182,
+      "y": -0.5066666603088379,
+      "bottom": 1.715,
+      "terrainZ": 1.762880802154541,
+      "unsupported": false
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.003",
+      "x": -0.31999996304512024,
+      "y": -0.9399999380111694,
+      "bottom": 1.715,
+      "terrainZ": 1.7555601596832275,
+      "unsupported": false
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.004",
+      "x": 0.10000000149011612,
+      "y": -1.159999966621399,
+      "bottom": 1.715,
+      "terrainZ": 1.7534189224243164,
+      "unsupported": false
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.005",
+      "x": 0.5133333802223206,
+      "y": -1.1333333253860474,
+      "bottom": 1.715,
+      "terrainZ": 1.7642407417297363,
+      "unsupported": false
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.006",
+      "x": 0.9266668558120728,
+      "y": -1.1066666841506958,
+      "bottom": 1.715,
+      "terrainZ": 1.761807918548584,
+      "unsupported": false
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.007",
+      "x": 1.340000033378601,
+      "y": -1.0800000429153442,
+      "bottom": 1.715,
+      "terrainZ": 1.7588839530944824,
+      "unsupported": false
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.008",
+      "x": 1.6349999904632568,
+      "y": -0.8500000834465027,
+      "bottom": 1.715,
+      "terrainZ": 1.7571189403533936,
+      "unsupported": false
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.009",
+      "x": 1.9299999475479126,
+      "y": -0.6200000047683716,
+      "bottom": 1.715,
+      "terrainZ": 1.7552473545074463,
+      "unsupported": false
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.010",
+      "x": 2.0199999809265137,
+      "y": 0.5600000023841858,
+      "bottom": 1.715,
+      "terrainZ": 1.7550320625305176,
+      "unsupported": false
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.011",
+      "x": 1.6999998092651367,
+      "y": 0.8299999237060547,
+      "bottom": 1.715,
+      "terrainZ": 1.7572450637817383,
+      "unsupported": false
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.012",
+      "x": 1.2999999523162842,
+      "y": 0.8650000095367432,
+      "bottom": 1.715,
+      "terrainZ": 1.7617554664611816,
+      "unsupported": false
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.013",
+      "x": 0.8999999761581421,
+      "y": 0.8999999165534973,
+      "bottom": 1.715,
+      "terrainZ": 1.7549514770507812,
+      "unsupported": false
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.014",
+      "x": 0.38999995589256287,
+      "y": 0.8299999237060547,
+      "bottom": 1.715,
+      "terrainZ": 1.7532744407653809,
+      "unsupported": false
+    },
+    {
+      "name": "Finish v5 low corral stone shoe.015",
+      "x": -0.12000000476837158,
+      "y": 0.7599999904632568,
+      "bottom": 1.715,
+      "terrainZ": 1.7583098411560059,
+      "unsupported": false
+    },
+    {
+      "name": "Finish v5 gallery founded jamb",
+      "x": -3.254,
+      "y": 0.755,
+      "bottom": 1.71,
+      "terrainZ": 1.75,
+      "unsupported": false
+    },
+    {
+      "name": "Finish v5 gallery founded jamb.001",
+      "x": -2.674,
+      "y": 0.755,
+      "bottom": 1.71,
+      "terrainZ": 1.75,
+      "unsupported": false
+    },
+    {
+      "name": "Finish v5 respiros founded service bank",
+      "x": 1.96,
+      "y": -3.32,
+      "bottom": 1.69,
+      "terrainZ": 1.75,
+      "unsupported": false
+    },
+    {
+      "name": "Finish v5 hoist founded shoe",
+      "x": 3.57,
+      "y": 1.96,
+      "bottom": 1.7200000000000002,
+      "terrainZ": 1.749999761581421,
+      "unsupported": false
+    },
+    {
+      "name": "Finish v5 hoist founded shoe.001",
+      "x": 4.01,
+      "y": 1.96,
+      "bottom": 1.7200000000000002,
+      "terrainZ": 1.749999761581421,
+      "unsupported": false
+    },
+    {
+      "name": "Path v6 bridge founded head",
+      "x": 2.62,
+      "y": -2.12,
+      "bottom": 1.69,
+      "terrainZ": 1.75,
+      "unsupported": false
+    },
+    {
+      "name": "Path v6 bridge founded head.001",
+      "x": 2.62,
+      "y": -1.38,
+      "bottom": 1.69,
+      "terrainZ": 1.75,
+      "unsupported": false
+    },
+    {
+      "name": "Path v6 bridge founded head.002",
+      "x": 3.58,
+      "y": -2.12,
+      "bottom": 1.69,
+      "terrainZ": 1.7499988079071045,
+      "unsupported": false
+    },
+    {
+      "name": "Path v6 bridge founded head.003",
+      "x": 3.58,
+      "y": -1.38,
+      "bottom": 1.69,
+      "terrainZ": 1.75,
+      "unsupported": false
+    }
+  ],
+  "unsupportedBases": 0,
+  "cavities": [
+    {
+      "name": "Finish v5 hollow dry stone trough",
+      "x": 1.18,
+      "y": 0.63,
+      "rimZ": 2.015,
+      "floorZ": 1.86,
+      "measuredFloor": 1.8600000143051147,
+      "hit": "Finish v5 hollow dry stone trough",
+      "depth": 0.15499998569488538
+    },
+    {
+      "name": "Finish v5 relief collector curb",
+      "x": -1.48,
+      "y": 0.82,
+      "rimZ": 1.98,
+      "floorZ": 1.8,
+      "measuredFloor": 1.7999999523162842,
+      "hit": "Finish v5 relief collector curb",
+      "depth": 0.1800000476837158
+    },
+    {
+      "name": "Finish v5 hollow respiro 0",
+      "x": 1.67,
+      "y": -3.235,
+      "rimZ": 2.045,
+      "floorZ": 1.902,
+      "measuredFloor": 1.9019999504089355,
+      "hit": "Finish v5 hollow respiro 0",
+      "depth": 0.14300004959106438
+    },
+    {
+      "name": "Finish v5 hollow respiro 1",
+      "x": 2.25,
+      "y": -3.235,
+      "rimZ": 2.045,
+      "floorZ": 1.902,
+      "measuredFloor": 1.9019999504089355,
+      "hit": "Finish v5 hollow respiro 1",
+      "depth": 0.14300004959106438
+    }
+  ],
+  "landmarks": [
+    {
+      "id": "guaira-travessia",
+      "meshes": 6,
+      "owned": true,
+      "markerError": 0.0
+    },
+    {
+      "id": "guaira-patio-comportas",
+      "meshes": 23,
+      "owned": true,
+      "markerError": 0.0
+    },
+    {
+      "id": "guaira-respiros",
+      "meshes": 26,
+      "owned": true,
+      "markerError": 0.0
+    },
+    {
+      "id": "guaira-lab",
+      "meshes": 81,
+      "owned": true,
+      "markerError": 0.0
+    },
+    {
+      "id": "guaira-subida",
+      "meshes": 37,
+      "owned": true,
+      "markerError": 0.0
+    },
+    {
+      "id": "guaira-prefeito",
+      "meshes": 5,
+      "owned": true,
+      "markerError": 0.0
+    },
+    {
+      "id": "gallery",
+      "meshes": 35,
+      "owned": true,
+      "markerError": 0.0
+    },
+    {
+      "id": "relief",
+      "meshes": 22,
+      "owned": true,
+      "markerError": 0.0
+    }
+  ],
+  "channelProbes": [
+    {
+      "x": 4.33,
+      "y": 1.55,
+      "waterZ": 1.86,
+      "solidZ": 1.8329999446868896,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 1.575,
+      "waterZ": 1.885,
+      "solidZ": 1.8580002784729004,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 1.6,
+      "waterZ": 1.9100000000000001,
+      "solidZ": 1.883000373840332,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 1.625,
+      "waterZ": 1.935,
+      "solidZ": 1.9079999923706055,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 1.6500000000000001,
+      "waterZ": 1.9600000000000002,
+      "solidZ": 1.933000087738037,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 1.675,
+      "waterZ": 1.985,
+      "solidZ": 1.9579999446868896,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 1.7000000000000002,
+      "waterZ": 2.0100000000000002,
+      "solidZ": 1.9830002784729004,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 1.725,
+      "waterZ": 2.035,
+      "solidZ": 2.008000135421753,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 1.75,
+      "waterZ": 2.06,
+      "solidZ": 2.0329999923706055,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 1.7750000000000001,
+      "waterZ": 2.085,
+      "solidZ": 2.058000087738037,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 1.8,
+      "waterZ": 2.11,
+      "solidZ": 2.0829999446868896,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 1.8250000000000002,
+      "waterZ": 2.1350000000000002,
+      "solidZ": 2.1080000400543213,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 1.85,
+      "waterZ": 2.16,
+      "solidZ": 2.133000373840332,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 1.875,
+      "waterZ": 2.185,
+      "solidZ": 2.1580004692077637,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 1.9000000000000001,
+      "waterZ": 2.21,
+      "solidZ": 2.183000087738037,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 1.925,
+      "waterZ": 2.235,
+      "solidZ": 2.2080001831054688,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 1.9500000000000002,
+      "waterZ": 2.2600000000000002,
+      "solidZ": 2.2330002784729004,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 1.975,
+      "waterZ": 2.285,
+      "solidZ": 2.258000135421753,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 2.0,
+      "waterZ": 2.31,
+      "solidZ": 2.2829999923706055,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 2.025,
+      "waterZ": 2.335,
+      "solidZ": 2.308000087738037,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 2.05,
+      "waterZ": 2.36,
+      "solidZ": 2.3330001831054688,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 2.075,
+      "waterZ": 2.3850000000000002,
+      "solidZ": 2.3580002784729004,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 2.1,
+      "waterZ": 2.41,
+      "solidZ": 2.383000135421753,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 2.125,
+      "waterZ": 2.435,
+      "solidZ": 2.4079999923706055,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 2.1500000000000004,
+      "waterZ": 2.4600000000000004,
+      "solidZ": 2.433000326156616,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 2.175,
+      "waterZ": 2.485,
+      "solidZ": 2.4580001831054688,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 2.2,
+      "waterZ": 2.5100000000000002,
+      "solidZ": 2.4830002784729004,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 2.225,
+      "waterZ": 2.535,
+      "solidZ": 2.507999897003174,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 2.25,
+      "waterZ": 2.56,
+      "solidZ": 2.5329999923706055,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 2.2750000000000004,
+      "waterZ": 2.5850000000000004,
+      "solidZ": 2.558000326156616,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 2.3,
+      "waterZ": 2.61,
+      "solidZ": 2.5830001831054688,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 2.325,
+      "waterZ": 2.6350000000000002,
+      "solidZ": 2.6080002784729004,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.33,
+      "y": 2.35,
+      "waterZ": 2.66,
+      "solidZ": 2.633000135421753,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 1.55,
+      "waterZ": 1.86,
+      "solidZ": 1.8329999446868896,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 1.575,
+      "waterZ": 1.885,
+      "solidZ": 1.8580002784729004,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 1.6,
+      "waterZ": 1.9100000000000001,
+      "solidZ": 1.883000373840332,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 1.625,
+      "waterZ": 1.935,
+      "solidZ": 1.9079999923706055,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 1.6500000000000001,
+      "waterZ": 1.9600000000000002,
+      "solidZ": 1.933000087738037,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 1.675,
+      "waterZ": 1.985,
+      "solidZ": 1.9579999446868896,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 1.7000000000000002,
+      "waterZ": 2.0100000000000002,
+      "solidZ": 1.9830000400543213,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 1.725,
+      "waterZ": 2.035,
+      "solidZ": 2.008000135421753,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 1.75,
+      "waterZ": 2.06,
+      "solidZ": 2.0330002307891846,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 1.7750000000000001,
+      "waterZ": 2.085,
+      "solidZ": 2.058000087738037,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 1.8,
+      "waterZ": 2.11,
+      "solidZ": 2.0830001831054688,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 1.8250000000000002,
+      "waterZ": 2.1350000000000002,
+      "solidZ": 2.107999801635742,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 1.85,
+      "waterZ": 2.16,
+      "solidZ": 2.132999897003174,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 1.875,
+      "waterZ": 2.185,
+      "solidZ": 2.1579999923706055,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 1.9000000000000001,
+      "waterZ": 2.21,
+      "solidZ": 2.183000087738037,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 1.925,
+      "waterZ": 2.235,
+      "solidZ": 2.2080001831054688,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 1.9500000000000002,
+      "waterZ": 2.2600000000000002,
+      "solidZ": 2.2330002784729004,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 1.975,
+      "waterZ": 2.285,
+      "solidZ": 2.258000135421753,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 2.0,
+      "waterZ": 2.31,
+      "solidZ": 2.2829999923706055,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 2.025,
+      "waterZ": 2.335,
+      "solidZ": 2.308000087738037,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 2.05,
+      "waterZ": 2.36,
+      "solidZ": 2.3330001831054688,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 2.075,
+      "waterZ": 2.3850000000000002,
+      "solidZ": 2.3580002784729004,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 2.1,
+      "waterZ": 2.41,
+      "solidZ": 2.383000135421753,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 2.125,
+      "waterZ": 2.435,
+      "solidZ": 2.4080002307891846,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 2.1500000000000004,
+      "waterZ": 2.4600000000000004,
+      "solidZ": 2.433000326156616,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 2.175,
+      "waterZ": 2.485,
+      "solidZ": 2.4580001831054688,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 2.2,
+      "waterZ": 2.5100000000000002,
+      "solidZ": 2.4830002784729004,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 2.225,
+      "waterZ": 2.535,
+      "solidZ": 2.508000135421753,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 2.25,
+      "waterZ": 2.56,
+      "solidZ": 2.5330002307891846,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 2.2750000000000004,
+      "waterZ": 2.5850000000000004,
+      "solidZ": 2.558000326156616,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 2.3,
+      "waterZ": 2.61,
+      "solidZ": 2.5830001831054688,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 2.325,
+      "waterZ": 2.6350000000000002,
+      "solidZ": 2.6080002784729004,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.5,
+      "y": 2.35,
+      "waterZ": 2.66,
+      "solidZ": 2.632999897003174,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 1.55,
+      "waterZ": 1.86,
+      "solidZ": 1.8329999446868896,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 1.575,
+      "waterZ": 1.885,
+      "solidZ": 1.8580002784729004,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 1.6,
+      "waterZ": 1.9100000000000001,
+      "solidZ": 1.883000135421753,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 1.625,
+      "waterZ": 1.935,
+      "solidZ": 1.9079999923706055,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 1.6500000000000001,
+      "waterZ": 1.9600000000000002,
+      "solidZ": 1.933000087738037,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 1.675,
+      "waterZ": 1.985,
+      "solidZ": 1.9580001831054688,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 1.7000000000000002,
+      "waterZ": 2.0100000000000002,
+      "solidZ": 1.9830000400543213,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 1.725,
+      "waterZ": 2.035,
+      "solidZ": 2.008000373840332,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 1.75,
+      "waterZ": 2.06,
+      "solidZ": 2.0330002307891846,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 1.7750000000000001,
+      "waterZ": 2.085,
+      "solidZ": 2.058000087738037,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 1.8,
+      "waterZ": 2.11,
+      "solidZ": 2.0830001831054688,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 1.8250000000000002,
+      "waterZ": 2.1350000000000002,
+      "solidZ": 2.1080002784729004,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 1.85,
+      "waterZ": 2.16,
+      "solidZ": 2.133000373840332,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 1.875,
+      "waterZ": 2.185,
+      "solidZ": 2.1580002307891846,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 1.9000000000000001,
+      "waterZ": 2.21,
+      "solidZ": 2.183000087738037,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 1.925,
+      "waterZ": 2.235,
+      "solidZ": 2.2080001831054688,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 1.9500000000000002,
+      "waterZ": 2.2600000000000002,
+      "solidZ": 2.2330002784729004,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 1.975,
+      "waterZ": 2.285,
+      "solidZ": 2.258000373840332,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 2.0,
+      "waterZ": 2.31,
+      "solidZ": 2.2829999923706055,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 2.025,
+      "waterZ": 2.335,
+      "solidZ": 2.3080005645751953,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 2.05,
+      "waterZ": 2.36,
+      "solidZ": 2.3330001831054688,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 2.075,
+      "waterZ": 2.3850000000000002,
+      "solidZ": 2.3580002784729004,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 2.1,
+      "waterZ": 2.41,
+      "solidZ": 2.382999897003174,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 2.125,
+      "waterZ": 2.435,
+      "solidZ": 2.4080002307891846,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 2.1500000000000004,
+      "waterZ": 2.4600000000000004,
+      "solidZ": 2.433000087738037,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 2.175,
+      "waterZ": 2.485,
+      "solidZ": 2.4580001831054688,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 2.2,
+      "waterZ": 2.5100000000000002,
+      "solidZ": 2.4830002784729004,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 2.225,
+      "waterZ": 2.535,
+      "solidZ": 2.508000135421753,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 2.25,
+      "waterZ": 2.56,
+      "solidZ": 2.5329999923706055,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 2.2750000000000004,
+      "waterZ": 2.5850000000000004,
+      "solidZ": 2.558000326156616,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 2.3,
+      "waterZ": 2.61,
+      "solidZ": 2.5830001831054688,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 2.325,
+      "waterZ": 2.6350000000000002,
+      "solidZ": 2.6080002784729004,
+      "solid": "Landscape v3 founded channel bed"
+    },
+    {
+      "x": 4.67,
+      "y": 2.35,
+      "waterZ": 2.66,
+      "solidZ": 2.633000135421753,
+      "solid": "Landscape v3 founded channel bed"
+    }
+  ],
+  "bridgeWaterClearance": [
+    {
+      "x": 2.67,
+      "y": -1.85,
+      "clearance": 0.020949957084655857,
+      "underside": "Path v6 bridge continuous bearer"
+    },
+    {
+      "x": 2.67,
+      "y": -1.74,
+      "clearance": 0.020949957084655857,
+      "underside": "Path v6 bridge continuous bearer"
+    },
+    {
+      "x": 2.67,
+      "y": -1.63,
+      "clearance": 0.020949957084655857,
+      "underside": "Path v6 bridge continuous bearer"
+    },
+    {
+      "x": 2.7,
+      "y": -1.85,
+      "clearance": 0.020949957084655857,
+      "underside": "Path v6 bridge continuous bearer"
+    },
+    {
+      "x": 2.7,
+      "y": -1.74,
+      "clearance": 0.020949957084655857,
+      "underside": "Path v6 bridge continuous bearer"
+    },
+    {
+      "x": 2.7,
+      "y": -1.63,
+      "clearance": 0.020949957084655857,
+      "underside": "Path v6 bridge continuous bearer"
+    },
+    {
+      "x": 2.73,
+      "y": -1.85,
+      "clearance": 0.020949957084655857,
+      "underside": "Path v6 bridge continuous bearer"
+    },
+    {
+      "x": 2.73,
+      "y": -1.74,
+      "clearance": 0.020949957084655857,
+      "underside": "Path v6 bridge continuous bearer"
+    },
+    {
+      "x": 2.73,
+      "y": -1.63,
+      "clearance": 0.020949957084655857,
+      "underside": "Path v6 bridge continuous bearer"
+    },
+    {
+      "x": 3.47,
+      "y": -1.85,
+      "clearance": 0.020949957084655857,
+      "underside": "Path v6 bridge continuous bearer.001"
+    },
+    {
+      "x": 3.47,
+      "y": -1.74,
+      "clearance": 0.020949957084655857,
+      "underside": "Path v6 bridge continuous bearer.001"
+    },
+    {
+      "x": 3.47,
+      "y": -1.63,
+      "clearance": 0.020949957084655857,
+      "underside": "Path v6 bridge continuous bearer.001"
+    },
+    {
+      "x": 3.5,
+      "y": -1.85,
+      "clearance": 0.020949957084655857,
+      "underside": "Path v6 bridge continuous bearer.001"
+    },
+    {
+      "x": 3.5,
+      "y": -1.74,
+      "clearance": 0.020949957084655857,
+      "underside": "Path v6 bridge continuous bearer.001"
+    },
+    {
+      "x": 3.5,
+      "y": -1.63,
+      "clearance": 0.020949957084655857,
+      "underside": "Path v6 bridge continuous bearer.001"
+    },
+    {
+      "x": 3.53,
+      "y": -1.85,
+      "clearance": 0.020949957084655857,
+      "underside": "Path v6 bridge continuous bearer.001"
+    },
+    {
+      "x": 3.53,
+      "y": -1.74,
+      "clearance": 0.020949957084655857,
+      "underside": "Path v6 bridge continuous bearer.001"
+    },
+    {
+      "x": 3.53,
+      "y": -1.63,
+      "clearance": 0.020949957084655857,
+      "underside": "Path v6 bridge continuous bearer.001"
+    }
+  ],
+  "unsupportedChannel": 0,
+  "channelObstructions": []
+}

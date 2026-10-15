@@ -138,6 +138,9 @@ export class GuairaTraversal extends WorldGame {
         if (this.state === 'playing' && !this.player.data.isDead && this.player.data.isGrounded &&
             this.player.data.position.x >= GUAIRA_TRAVERSAL.finishX && this.bridgeReady && this.finalBridgeReady) {
             this.finished = true; this.input.reset(); this.audio.sfx('victory');
+            // The completion card replaces the last checkpoint notice. The
+            // completed update path no longer advances that notice's timer.
+            this.showCampaignNotice('', 0);
         }
     }
     override render() {

@@ -3,6 +3,7 @@ import { box as r, pixelLine as line, polygon, oval, roof } from '../../WorldPai
 import type { WorldLevel, WorldObjects } from '../../WorldPhysics';
 import { drawGuairaWorker } from './GuairaWorkerArt';
 import { supportsStanding } from '../../../world/tileRules';
+import { drawGuairaLandscape, drawGuairaTree, drawGuairaFieldBank, drawGuairaAwning, drawGuairaPerchedBird, guairaBreeze } from './GuairaScenery';
 
 /** Authored scenery only. The stage and WorldObjects remain the collision/state authority. */
 export const GUAIRA_TRAVERSAL_ART = Object.freeze({
@@ -92,7 +93,7 @@ function house(c: CanvasRenderingContext2D, x: number, floor: number, w: number,
     }
 }
 
-function riceTerrace(c: CanvasRenderingContext2D, x: number, y: number, width: number, row: number, time: number, reducedMotion: boolean, wet: boolean) {
+function riceTerrace(c: CanvasRenderingContext2D, x: number, y: number, width: number, row: number, time: number, reducedMotion: boolean, wet: boolean, worldX: number) {
     // Shallow flooded beds echo the island's stone borders. Their grey, broken
     // rims stay softer than the continuous cream edge of real supporting tiles.
     r(c, x, y + 5, width, 10, '#8c9273');
@@ -114,7 +115,7 @@ function riceTerrace(c: CanvasRenderingContext2D, x: number, y: number, width: n
     for (let group = -row * 17; group < width; group += 57) for (const [offset, height, lean] of clumps) {
         const xx = group + offset;
         if (xx < 6 || xx > width - 7) continue;
-        const sway = Math.floor(time / 1200 + group / 57 + row) % 4 === 0 ? 1 : 0;
+        const sway = guairaBreeze(time, worldX + xx + row * 23, 2);
         const root = y + 10, tip = root - height;
         r(c, x + xx - 2, root, 6, 2, '#6f9180');
         polygon(c, [[x + xx - 1,root],[x + xx - 6,tip + 4],[x + xx - 3,tip + 5],[x + xx + 2,root]], '#587c53');
@@ -176,23 +177,15 @@ function cutBank(c: CanvasRenderingContext2D, left: number, right: number, cx: n
 export function drawGuairaTraversalBackground(c: CanvasRenderingContext2D, cx: number, cy: number, time: number, reducedMotion: boolean, waterActive = false) {
     layer(c, cx, cy, (cameraX, cameraY) => {
         const t = clock(time, reducedMotion);
-        r(c, 0, 0, 320, 180, '#e5b585');
-        r(c, 0, 0, 320, 29, '#eac799');
-        r(c, 0, 29, 320, 32, '#e7bd8d');
-        const sunX = 236 - Math.round(cameraX * .06), sunY = 29 - Math.round(cameraY * .07);
-        oval(c, sunX, sunY, 19, 19, '#f3d6a3');
-        // Low, irregular tablelands retain the warm geography at every camera stop.
-        for (let i = -1; i < 5; i++) {
-            const x = i * 108 - Math.round(cameraX * .16) % 108, y = 94 - Math.round(cameraY * .22);
-            polygon(c, [[x - 14,y + 14],[x + 8,y + 11],[x + 14,y + 2],[x + 44,y],[x + 58,y + 14],[x + 90,y + 16],[x + 116,y + 38],[x - 14,y + 38]], '#c69978');
-            r(c, x + 17, y + 4, 25, 2, '#d4a982');
-        }
-        const horizon = 167 - cameraY;
-        r(c, 0, horizon, 320, 58, '#c38b61');
+        drawGuairaLandscape(c, cameraX, cameraY, t, reducedMotion, 'village');
+        const horizon = 187 - cameraY;
+        r(c, 0, horizon, 320, 180 - horizon, '#c38b61');
         for (let x = -Math.round(cameraX * .45) % 58 - 58; x < 320; x += 58) {
             polygon(c, [[x,horizon + 8],[x + 17,horizon + 1],[x + 42,horizon + 3],[x + 65,horizon + 18],[x + 65,horizon + 26],[x,horizon + 26]], '#c99465');
             r(c, x + 21, horizon + 8, 8, 1, '#d6a270');
         }
+        drawGuairaTree(c, 158 - cameraX, 205 - cameraY, 71, t, 158, true);
+        drawGuairaTree(c, 1153 - cameraX, 190 - cameraY, 59, t, 1153, true);
         // Street landmarks do not borrow the bright top edge used by solid platforms.
         if (visible(14, 30, cameraX)) cactus(c, 22 - cameraX, 211 - cameraY, 43);
         if (visible(44, 90, cameraX)) house(c, 46 - cameraX, 207 - cameraY, 76, 66, 0);
@@ -201,7 +194,12 @@ export function drawGuairaTraversalBackground(c: CanvasRenderingContext2D, cx: n
             cactus(c, 150 - cameraX, 210 - cameraY, 16, false);
         }
         if (visible(166, 100, cameraX)) house(c, 168 - cameraX, 205 - cameraY, 88, 77, 1);
-        if (visible(271, 32, cameraX)) drawGuairaWindPump(c, 286 - cameraX, 186 - cameraY, t, reducedMotion);
+        drawGuairaAwning(c, 181 - cameraX, 172 - cameraY, 24, t, 181);
+        drawGuairaPerchedBird(c, 239 - cameraX, 128 - cameraY, t, 239, -1);
+        if (visible(271, 32, cameraX)) {
+            oval(c, 269 - cameraX, 211 - cameraY, 34, 5, '#ae805b');
+            drawGuairaWindPump(c, 286 - cameraX, 214 - cameraY, t, reducedMotion);
+        }
         if (visible(277, 53, cameraX)) {
             r(c, 280 - cameraX, 206 - cameraY, 15, 8, '#9e755a');
             r(c, 280 - cameraX, 206 - cameraY, 15, 2, '#c49e72');
@@ -220,9 +218,10 @@ export function drawGuairaTraversalBackground(c: CanvasRenderingContext2D, cx: n
         }
         // Three stepped rice plots, with earth berms and a continuous service bank.
         for (const plot of [{ x: 650, y: 174, w: 134 }, { x: 788, y: 163, w: 128 }, { x: 919, y: 154, w: 103 }, { x: 1032, y: 166, w: 78 }, { x: 1370, y: 136, w: 144 }]) {
-            if (!visible(plot.x, plot.w, cameraX)) continue;
-            riceTerrace(c, plot.x - cameraX, plot.y - cameraY, plot.w, 0, t, reducedMotion, waterActive);
-            riceTerrace(c, plot.x - cameraX, plot.y + 18 - cameraY, plot.w, 1, t, reducedMotion, waterActive);
+            if (!visible(plot.x - 10, plot.w + 20, cameraX)) continue;
+            drawGuairaFieldBank(c, plot.x - cameraX, plot.y + 7 - cameraY, plot.w, 223 - cameraY);
+            riceTerrace(c, plot.x - cameraX, plot.y - cameraY, plot.w, 0, t, reducedMotion, waterActive, plot.x);
+            riceTerrace(c, plot.x - cameraX, plot.y + 18 - cameraY, plot.w, 1, t, reducedMotion, waterActive, plot.x);
         }
         if (visible(694, 52, cameraX)) {
             pot(c, 703 - cameraX, 210 - cameraY, 10);
@@ -239,6 +238,9 @@ export function drawGuairaTraversalBackground(c: CanvasRenderingContext2D, cx: n
             }
             r(c, 1054 - (cameraX - 416), 194 - (cameraY + 32), 69, 2, '#b7976d');
             r(c, 1054 - (cameraX - 416), 204 - (cameraY + 32), 69, 2, '#a38361');
+            // The board hangs from the two fence posts, including the gap
+            // above their upper rail; its pictogram never floats on its own.
+            for (const post of [1087,1120]) r(c, post - (cameraX - 416), 184 - (cameraY + 32), 2, 12, '#92745b');
             r(c, 1081 - (cameraX - 416), 175 - (cameraY + 32), 50, 11, '#9e795b');
             r(c, 1082 - (cameraX - 416), 176 - (cameraY + 32), 48, 8, '#d0b082');
             // Carved horn-and-gate pictogram points to Ossabravo; no new interaction target.

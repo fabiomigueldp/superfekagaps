@@ -1,0 +1,241 @@
+{
+  "revision": 6,
+  "regressionTests": 218,
+  "assetTests": 14,
+  "build": "passed",
+  "walks": {
+    "trips": [
+      "delicia-2",
+      "delicia-3",
+      "delicia-4",
+      "delicia-5",
+      "delicia-6",
+      "delicia-raizes",
+      "delicia-9",
+      "delicia-relogio",
+      "delicia-10",
+      "delicia-11",
+      "delicia-12"
+    ],
+    "desktop": {
+      "frames": 1586,
+      "offscreen": 0,
+      "overlaps": 0,
+      "depthReads": 1586,
+      "maxFrame": 11.900000035762787
+    },
+    "mobile": {
+      "frames": 131,
+      "offscreen": 0,
+      "overlaps": 0,
+      "depthReads": 131,
+      "maxFrame": 1.600000023841858
+    },
+    "errors": []
+  },
+  "landings": [
+    {
+      "id": "delicia-1",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-2",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-3",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-4",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-5",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-6",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-7",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-8",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-9",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-10",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-11",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-12",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-raizes",
+      "canEnter": true
+    },
+    {
+      "id": "delicia-relogio",
+      "canEnter": true
+    }
+  ],
+  "entryReturn": "passed",
+  "reversal": "passed",
+  "lockedPreview": "passed",
+  "reducedMotion": "passed",
+  "touchHops": 11,
+  "assets": {
+    "island.webp": {
+      "bytes": 348148,
+      "sha256": "79759d9474cd4cc62a8e746f49a9cd3350e4dda4a46f2eb966dfab4335887048"
+    },
+    "island-map.json": {
+      "bytes": 111098,
+      "sha256": "19aaf0e0492c6fb376a6b22e3596e84fdc551434ea4114d776a32bb486d936a8"
+    },
+    "island-depth.png": {
+      "bytes": 890080,
+      "sha256": "be324f2711ff2ef41559ece1525e3b6c5e5544393b7edbc6a6666b10a723f30e"
+    }
+  },
+  "geometry": {
+    "terrainVerticesSeated": 4127,
+    "maximumCutMeters": 0.9652313827806953,
+    "movedTrees": [
+      {
+        "tree": "Gnarled orange trunk.004",
+        "shift": [
+          -8.258573532104492,
+          12.450002670288086,
+          -4.030031204223633
+        ]
+      },
+      {
+        "tree": "Gnarled orange trunk.005",
+        "shift": [
+          -6.212944030761719,
+          16.20531463623047,
+          -4.294999599456787
+        ]
+      },
+      {
+        "tree": "Gnarled orange trunk.010",
+        "shift": [
+          2.7082326412200928,
+          12.696481704711914,
+          -2.705881118774414
+        ]
+      },
+      {
+        "tree": "Gnarled orange trunk.018",
+        "shift": [
+          2.9058337211608887,
+          7.984875679016113,
+          -1.826429009437561
+        ]
+      },
+      {
+        "tree": "Gnarled orange trunk.022",
+        "shift": [
+          -9.103562355041504,
+          1.3282897472381592,
+          -5.0498433113098145
+        ]
+      }
+    ],
+    "routes": [
+      {
+        "id": "harbor-orchard",
+        "samples": 212,
+        "hidden": 25
+      },
+      {
+        "id": "orchard-aqueduct",
+        "samples": 36,
+        "hidden": 0
+      },
+      {
+        "id": "west-bank",
+        "samples": 82,
+        "hidden": 6
+      },
+      {
+        "id": "five-harvests-bridge",
+        "samples": 56,
+        "hidden": 11
+      },
+      {
+        "id": "archive-approach",
+        "samples": 38,
+        "hidden": 2
+      },
+      {
+        "id": "aqueduct-promenade",
+        "samples": 97,
+        "hidden": 23
+      },
+      {
+        "id": "source-pilgrims",
+        "samples": 77,
+        "hidden": 44
+      },
+      {
+        "id": "roots-sanctuary",
+        "samples": 46,
+        "hidden": 0
+      },
+      {
+        "id": "orange-tide",
+        "samples": 38,
+        "hidden": 3
+      },
+      {
+        "id": "refinery-street",
+        "samples": 47,
+        "hidden": 3
+      },
+      {
+        "id": "refinery-court",
+        "samples": 26,
+        "hidden": 0
+      },
+      {
+        "id": "garden-gate",
+        "samples": 43,
+        "hidden": 10
+      },
+      {
+        "id": "clock-sanctuary",
+        "samples": 23,
+        "hidden": 5
+      },
+      {
+        "id": "boiler-approach",
+        "samples": 19,
+        "hidden": 0
+      },
+      {
+        "id": "palace-ascent",
+        "samples": 62,
+        "hidden": 8
+      },
+      {
+        "id": "palace-stair",
+        "samples": 35,
+        "hidden": 4
+      }
+    ]
+  }
+}

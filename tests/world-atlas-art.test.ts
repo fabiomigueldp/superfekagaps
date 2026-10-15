@@ -4,10 +4,11 @@ import test from 'node:test';
 import { PLAYER_PALETTE, PLAYER_SPRITES } from '../src/assets/playerSpriteSpec';
 import { fallbackMapMetadata, paintMapIsland, paintMapSea, paintWorldMap, parseMapMetadata } from '../src/adventure/WorldMapArt';
 import { atlasIslandCamera, COAST_PORT_PLACEMENTS, getAtlasCamera, localToAtlas } from '../src/adventure/WorldAtlasModel';
-import { atlasActorBounds, atlasActorScale, atlasBoatBounds, paintWorldAtlas, type AtlasPaintState, type BoatAtlasFrame } from '../src/adventure/WorldAtlasArt';
+import { atlasActorBounds, atlasActorScale, atlasBoatBounds, atlasBoatFramingBounds, paintWorldAtlas, type AtlasPaintState, type BoatAtlasFrame } from '../src/adventure/WorldAtlasArt';
 import { mapToScreen, screenToMap, type MapCamera } from '../src/adventure/WorldMapModel';
 import { atlasCableBounds, paintCableLines, validCableFrame, type AtlasCableCar, type CableAtlasFrame } from '../src/adventure/WorldCableArt';
 import { parseMaritimeBuoys } from '../src/adventure/WorldMaritimeArt';
+import { VESSEL_HEAVE_CLEARANCE, VESSEL_MAX_ROTATION } from '../src/adventure/WorldVesselMotion';
 
 interface Call { name: string; args: unknown[]; color?: unknown; stroke?: unknown }
 function recordingContext() {
@@ -440,4 +441,61 @@ test('wake speed changes neither terrain nor the authored hull and passenger pai
         return calls.filter(call => call.name === 'drawImage' || call.name === 'fillRect').map(({ stroke, ...call }) => call);
     });
     for (const painting of paintings.slice(1)) assert.deepEqual(painting, paintings[0]);
+});
+
+test('fixed camera clearance contains the hull through every wave without following its displacement', () => {
+    const foot = { x: .9, y: .8 };
+    for (const hull of [frame, { ...frame, waterlineAnchor: { x: 177, y: 213 } }]) {
+        const envelope = atlasBoatFramingBounds(foot, hull);
+        for (let step = -20; step <= 20; step++) for (const heave of [-VESSEL_HEAVE_CLEARANCE, 0, VESSEL_HEAVE_CLEARANCE]) {
+            const bounds = atlasBoatBounds(foot, hull, VESSEL_MAX_ROTATION * step / 20, heave);
+            assert.ok(bounds.left >= envelope.left && bounds.right <= envelope.right);
+            assert.ok(bounds.top >= envelope.top && bounds.bottom <= envelope.bottom);
+        }
+    }
+});
+
+test('heave and heel move the entire hull/passenger group and its painted bounds about the same waterline', () => {
+    const state = scene(), boat = state.boats![0], rotation = .04, heave = .0014;
+    state.reducedMotion = false;
+    boat.frame = { ...frame, waterlineAnchor: { x: 192, y: 180 } };
+    boat.motion = { waterline: boat.foot, screenHeading: 0, speed: 0, rotation, heave };
+    const { context, calls } = recordingContext(); paintWorldAtlas(context, state);
+    const turn = calls.findIndex(call => call.name === 'rotate' && call.args[0] === rotation);
+    const back = calls.findIndex(call => call.name === 'drawImage' && call.args[0] === rear);
+    const front = calls.findIndex(call => call.name === 'drawImage' && call.args[0] === foreground);
+    const pixels = actorPixels(calls);
+    assert.ok(turn >= 0 && turn < back && back < front);
+    const lift = heave * Math.min(camera.width / 1.6, camera.height) * camera.zoom;
+    assert.ok(calls.slice(0, turn).some(call => call.name === 'translate' && call.args[0] === 0 && call.args[1] === lift));
+    assert.ok(pixels.every(pixel => calls.indexOf(pixel) > back && calls.indexOf(pixel) < front));
+    assert.equal(calls[front + 2].name, 'restore', 'Hull rotation ends after its foreground, before unrelated objects.');
+    const unrotated = atlasBoatBounds(boat.foot, boat.frame), bounds = atlasBoatBounds(boat.foot, boat.frame, rotation, heave);
+    const pivot = { x: boat.foot.x, y: boat.foot.y + (180 - frame.passengerFoot.y) * frame.widthInMap / frame.width * 1.6 };
+    const screenPivot = mapToScreen(pivot, camera), min = mapToScreen({ x: bounds.left, y: bounds.top }, camera), max = mapToScreen({ x: bounds.right, y: bounds.bottom }, camera);
+    for (const x of [unrotated.left, unrotated.right]) for (const y of [unrotated.top, unrotated.bottom]) {
+        const p = mapToScreen({ x, y }, camera), dx = p.x - screenPivot.x, dy = p.y - screenPivot.y;
+        const transformed = { x: screenPivot.x + dx * Math.cos(rotation) - dy * Math.sin(rotation),
+            y: screenPivot.y + dx * Math.sin(rotation) + dy * Math.cos(rotation) + lift };
+        assert.ok(transformed.x >= min.x - 1e-9 && transformed.x <= max.x + 1e-9);
+        assert.ok(transformed.y >= min.y - 1e-9 && transformed.y <= max.y + 1e-9);
+    }
+    const calm = recordingContext(); paintWorldAtlas(calm.context, { ...state, reducedMotion: true });
+    assert.ok(!calm.calls.some(call => call.name === 'rotate' && call.args[0] === rotation));
+    assert.ok(!calm.calls.some(call => call.name === 'translate' && call.args[0] === 0 && call.args[1] === lift));
+});
+
+test('water-space foam persists at zero throttle with bounded paint and disappears in reduced motion', () => {
+    const state = wakeScene(0), boat = state.boats![0];
+    boat.motion!.wake = Array.from({ length: 38 }, (_, i) => ({ point: { x: .82 + i * .001, y: .82 },
+        heading: .1, strength: 1, time: state.time - 2190 + i * 60 }));
+    const foam = (state: AtlasPaintState) => {
+        const { context, calls } = recordingContext(); paintWorldAtlas(context, state);
+        return calls.filter(call => call.name === 'stroke' && String(call.stroke).startsWith('rgba(206,239,220,'));
+    };
+    assert.equal(foam(state).length, 37);
+    assert.deepEqual(foam({ ...state, reducedMotion: true }), []);
+    assert.deepEqual(foam({ ...state, time: state.time + 2300 }), []);
+    boat.assets.foreground = null;
+    assert.deepEqual(foam(state), [], 'Missing hull art must not leave a detached wake.');
 });

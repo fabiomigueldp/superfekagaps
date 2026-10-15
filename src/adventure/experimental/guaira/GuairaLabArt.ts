@@ -1,43 +1,70 @@
 import { drawSkeletonBull } from './SkeletonBullArt';
 import type { SkeletonBullModel } from './SkeletonBullModel';
+import { box as r, pixelLine as line, polygon, oval, roof } from '../../WorldPainting';
+import { drawGuairaLandscape, drawGuairaTree, drawGuairaPerchedBird, guairaBreeze, sceneryTime } from './GuairaScenery';
 
 const rect = (c: CanvasRenderingContext2D, color: string, x: number, y: number, w: number, h: number) => {
     c.fillStyle = color; c.fillRect(Math.round(x), Math.round(y), w, h);
 };
 
-/** Quiet distant rice irrigation behind a dry, horizontal combat plane. */
-export function drawGuairaBackground(c: CanvasRenderingContext2D) {
-    rect(c, '#d9966b', 0, 0, 320, 180);
-    rect(c, '#eac394', 0, 24, 320, 35);
-    rect(c, '#e3ae80', 0, 59, 320, 17);
-    rect(c, '#b98d6b', 0, 76, 320, 20);
-    rect(c, '#98a075', 0, 82, 320, 6);
-    rect(c, '#92b1a5', 0, 88, 320, 3);
-    for (let x = 0; x < 320; x += 13) {
-        rect(c, '#717d55', x, 81, 2, 8);
-        rect(c, '#ab7254', x, 92, 10, 3);
+/** An inhabited corral, with every prop rooted behind a quiet combat lane. */
+export function drawGuairaBackground(c: CanvasRenderingContext2D, cx = 0, cy = 64, time = 0, reducedMotion = false) {
+    const x = Number.isFinite(cx) ? Math.round(cx) : 0, y = Number.isFinite(cy) ? Math.round(cy) : 64;
+    const t = sceneryTime(time, reducedMotion);
+    c.save(); c.beginPath(); c.rect(0, 0, 320, 180); c.clip();
+    c.globalAlpha = 1; c.globalCompositeOperation = 'source-over';
+    drawGuairaLandscape(c, x, y, t, reducedMotion, 'corral');
+    // Far fields follow the same dry banks as the approach to Ossabravo.
+    r(c, 0, 155 - y, 320, 180, '#b8a47b');
+    for (const [left, top, width] of [[-15,155,124],[191,151,143]] as const) {
+        polygon(c, [[left-x,top-y],[left+width-x,top+3-y],[left+width+14-x,top+14-y],[left-5-x,top+11-y]], '#8f9d72');
+        line(c, left + 6 - x, top + 8 - y, left + width - 5 - x, top + 9 - y, '#aeb99a', 2);
+        for (let xx = left + 9; xx < left + width; xx += 17) {
+            const sway = guairaBreeze(t, xx, 1);
+            line(c, xx - x, top + 9 - y, xx - 2 + sway - x, top + 3 - y, '#7e9368');
+            line(c, xx + 1 - x, top + 9 - y, xx + 4 + sway - x, top + 2 - y, '#9caa79');
+        }
     }
-    rect(c, '#b77759', 0, 96, 320, 27);
-    rect(c, '#ad6148', 0, 123, 320, 37);
-    // Irrigation gate belongs to the background, never to the collision plane.
-    rect(c, '#885d50', 137, 63, 52, 47);
-    rect(c, '#574743', 143, 72, 40, 38);
-    rect(c, '#9d8471', 146, 75, 34, 34);
-    for (let y = 79; y < 108; y += 8) rect(c, '#78625a', 146, y, 34, 2);
-    rect(c, '#c7a77c', 162, 61, 2, 49);
-    rect(c, '#665147', 157, 61, 12, 3);
-    for (let x = 8; x < 320; x += 36) rect(c, '#92664f', x, 102, 3, 27);
-    rect(c, '#9d7054', 0, 107, 320, 3);
-    rect(c, '#9d7054', 0, 121, 320, 2);
-    for (const x of [26, 291]) {
-        rect(c, '#64714c', x, 96, 6, 27);
-        rect(c, '#788253', x + 1, 98, 2, 24);
-        rect(c, '#64714c', x - 6, 105, 7, 4);
-        rect(c, '#64714c', x - 6, 99, 3, 9);
-        rect(c, '#64714c', x + 5, 111, 7, 4);
-        rect(c, '#64714c', x + 9, 103, 3, 11);
+    r(c, 0, 174 - y, 320, 180, '#bf926b');
+    polygon(c, [[112-x,174-y],[177-x,174-y],[225-x,209-y],[72-x,209-y]], '#cda177');
+    // Plastered sluice house: thick jambs, roof weight and a fixed spindle.
+    oval(c, 113 - x, 188 - y, 80, 6, '#b18a64');
+    r(c, 121 - x, 137 - y, 62, 53, '#ad8a6b');
+    r(c, 124 - x, 138 - y, 54, 48, '#cfb48a');
+    r(c, 129 - x, 148 - y, 43, 40, '#8b7c67');
+    r(c, 132 - x, 150 - y, 37, 38, '#ad9d7e');
+    for (let yy = 155; yy < 187; yy += 7) {
+        r(c, 133 - x, yy - y, 35, 2, '#8a806c');
+        r(c, 135 - x, yy + 2 - y, 31, 1, '#c0b08b');
     }
-    for (let x = 5; x < 320; x += 37) rect(c, '#bb7352', x, 140 + x % 9, 7, 1);
+    roof(c, 116 - x, 122 - y, 72, 17);
+    drawGuairaPerchedBird(c, 174 - x, 122 - y, t, 174);
+    r(c, 149 - x, 141 - y, 3, 47, '#b79e71');
+    r(c, 145 - x, 142 - y, 11, 3, '#897558');
+    r(c, 124 - x, 180 - y, 5, 5, '#bda078');
+    r(c, 174 - x, 169 - y, 4, 8, '#bda078');
+    // Shade trees frame the arena, never hide the bull's feet or charge warning.
+    drawGuairaTree(c, 18 - x, 194 - y, 90, t, 18);
+    drawGuairaTree(c, 309 - x, 193 - y, 68, t, 309, true);
+    // Worn fence has ordinary dull upper edges, no platform-coloured cap.
+    for (let wx = -7; wx < 340; wx += 37) {
+        oval(c, wx - 3 - x, 196 - y, 12, 3, '#ae8663');
+        r(c, wx - x, 172 - y, 4, 26, '#9c805f');
+        r(c, wx + 1 - x, 174 - y, 1, 23, '#b6a075');
+        r(c, wx - x, 179 - y, 38, 3, '#a48a65');
+        r(c, wx - x, 191 - y, 38, 2, '#a48a65');
+        if (wx % 2) line(c, wx + 5 - x, 190 - y, wx + 34 - x, 182 - y, '#ad946d');
+    }
+    // Compact feed trough belongs to the fence line, with a soil contact shadow.
+    oval(c, 42 - x, 202 - y, 42, 4, '#af865e');
+    polygon(c, [[44-x,191-y],[79-x,191-y],[75-x,202-y],[48-x,202-y]], '#a58a62');
+    r(c, 45 - x, 191 - y, 33, 3, '#8d7a59');
+    r(c, 49 - x, 191 - y, 25, 1, '#b6aa77');
+    // Broad, quiet clay in front keeps the bone silhouettes and tells readable.
+    r(c, 0, 207 - y, 320, 23, '#bb865e');
+    for (const [wx, wy, width] of [[13,214,11],[113,218,18],[190,211,10],[274,216,19]])
+        r(c, wx - x, wy - y, width, 1, '#c5976b');
+    c.restore();
 }
 
 export function drawGuairaFloor(c: CanvasRenderingContext2D, cy: number) {

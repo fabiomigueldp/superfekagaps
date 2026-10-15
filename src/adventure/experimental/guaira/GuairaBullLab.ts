@@ -69,7 +69,7 @@ export class GuairaBullLab extends WorldGame {
                 if (boss instanceof GuairaBullEncounter) drawGuairaBoss(c, boss.model, cx, cy, this.reducedMotion);
             };
             this.art.arena = () => {};
-            this.art.background = c => drawGuairaBackground(c);
+            this.art.background = (c, _island, cx, cy, time) => drawGuairaBackground(c, cx, cy, time, this.reducedMotion);
             this.art.terrain = (c, _level, _island, _cx, cy) => drawGuairaFloor(c, cy);
             this.store.save.preferences.shake = !this.reducedMotion;
             // Basic controls are documented on the page; campaign tutorials would

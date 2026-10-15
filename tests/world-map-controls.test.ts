@@ -26,6 +26,37 @@ function assertSeparated(points: MapControlPlacement[], bounds: MapControlBounds
     });
 }
 
+test('Guaíra gallery signs stay at their entrances while sharing free space with Feka', () => {
+    // Measured at 1440×1000: B used to jump right across the plaza when its
+    // lower corner touched Feka, almost colliding with the gallery sign.
+    const anchors = [[349.529,413.087],[815.790,601.631],[944.412,501.763],[1015.865,473.336],
+        [899.862,322.747],[499.023,438.460],[567.721,375.036],[667.894,413.516]];
+    const scale = 2.887065822, bounds = { left:12, right:1428, top:78, bottom:886 };
+    const signs = anchors.map(([x,y]) => ({ x:x+32+scale*10, y, width:56, height:58 }));
+    for (let frame=0; frame<41; frame++) {
+        const actor = { left:567.721-11*scale, right:567.721+11*scale,
+            top:355.036+frame-28*scale, bottom:355.036+frame+5*scale };
+        const result = layoutMapControls(signs, bounds, 8, [], [actor]);
+        assert.equal(result.length, signs.length);
+        assertSeparated(result, bounds);
+        for (const point of result) {
+            const r=rect(point);
+            assert.ok(r.right+8<=actor.left || r.left>=actor.right+8 || r.bottom+8<=actor.top || r.top>=actor.bottom+8,
+                'The entire actor silhouette, including the feet, must remain clear.');
+        }
+        assert.ok(Math.abs(result[5].x-signs[5].x)<=1, 'B can use nearby vertical space instead of crossing the square.');
+        assert.ok(Math.abs(result[5].y-signs[5].y)<=50, 'Keep the alternative entrance identifiable.');
+        assert.ok(Math.hypot(result[6].x-signs[6].x,result[6].y-signs[6].y)<=9,
+            'Fractional actor edges must not send the nearby gallery sign above the roof.');
+    }
+    assert.deepEqual(signs, anchors.map(([x,y])=>({x:x+32+scale*10,y,width:56,height:58})), 'The layout cannot move authored entrances.');
+});
+
+test('an impossible temporary chapter viewport never packs signs over the actor', () => {
+    const bounds={left:0,right:60,top:0,bottom:60};
+    assert.deepEqual(layoutMapControls([{x:30,y:58,width:56,height:58}],bounds,8,[],[bounds]),[]);
+});
+
 test('compact island targets reject packed rows outside their own shore instead of labeling a neighbor', () => {
     const owners = Array.from({ length: 6 }, (_, n) => ({ left: 190 + n * 4, right: 210 + n * 4, top: 90, bottom: 120 }));
     const points = owners.map(owner => ({ x: (owner.left + owner.right) / 2, y: owner.bottom + 8, width: 44, height: 44 }));

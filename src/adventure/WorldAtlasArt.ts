@@ -3,6 +3,9 @@ import { atlasIslandCamera, localToAtlas, type AtlasBounds, type AtlasIslandDesc
 import { mapToScreen, type MapCamera, type MapPoint } from './WorldMapModel';
 import { paintCableCarLayer, paintCableLines, validCableFrame, type AtlasCableCar } from './WorldCableArt';
 import { paintMaritimeBuoys, type AtlasMaritimeBuoy } from './WorldMaritimeArt';
+import { paintVesselBow, paintVesselWake } from './WorldVesselArt';
+import { VESSEL_HEAVE_CLEARANCE, VESSEL_MAX_ROTATION, type VesselMotion } from './WorldVesselMotion';
+import { clipMapActorDepth, type MapActorOcclusion } from './WorldMapDepth';
 
 export interface AtlasIslandLayer extends AtlasIslandDescriptor {
     assets: MapArtAssets;
@@ -29,6 +32,7 @@ export interface AtlasActor {
     cableCar?: string;
     /** Stable ferry identity; independent lines never borrow another hull. */
     boatId?: string;
+    occlusion?: MapActorOcclusion;
 }
 export interface BoatAtlasCrop { x: number; y: number; w: number; h: number }
 export interface BoatAtlasFrame {
@@ -57,7 +61,7 @@ export interface AtlasBoat {
     assets: BoatAtlasAssets;
     /** Radians in the authored world; the caller chooses the matching frame. */
     heading?: number;
-    motion?: { waterline: MapPoint; screenHeading: number; speed: number };
+    motion?: VesselMotion;
 }
 export interface AtlasPaintState {
     camera: MapCamera;
@@ -94,13 +98,36 @@ function validFrame(frame: BoatAtlasFrame): boolean {
         Number.isFinite(frame.passengerFoot.x) && Number.isFinite(frame.passengerFoot.y);
 }
 /** Bounds share the exact passenger anchor used for drawing, including tall roofs. */
-export function atlasBoatBounds(foot: MapPoint, frame: BoatAtlasFrame): AtlasBounds {
+export function atlasBoatBounds(foot: MapPoint, frame: BoatAtlasFrame, rotation = 0, heave = 0): AtlasBounds {
     if (!validFrame(frame)) return { left: foot.x, top: foot.y, right: foot.x, bottom: foot.y };
+    foot = { x: foot.x, y: foot.y + (Number.isFinite(heave) ? heave : 0) };
     const mapPixelX = frame.widthInMap / frame.width, mapPixelY = mapPixelX * 1.6;
-    return { left: foot.x - frame.passengerFoot.x * mapPixelX,
+    const bounds = { left: foot.x - frame.passengerFoot.x * mapPixelX,
         right: foot.x + (frame.width - frame.passengerFoot.x) * mapPixelX,
         top: foot.y - frame.passengerFoot.y * mapPixelY,
         bottom: foot.y + (frame.height - frame.passengerFoot.y) * mapPixelY };
+    if (!rotation || !Number.isFinite(rotation)) return bounds;
+    const anchor = frame.waterlineAnchor ?? frame.passengerFoot;
+    const pivot = { x: foot.x + (anchor.x - frame.passengerFoot.x) * mapPixelX,
+        y: foot.y + (anchor.y - frame.passengerFoot.y) * mapPixelY };
+    const corners = [bounds.left, bounds.right].flatMap(x => [bounds.top, bounds.bottom].map(y => {
+        const dx = (x - pivot.x) * 1.6, dy = y - pivot.y;
+        return { x: pivot.x + (dx * Math.cos(rotation) - dy * Math.sin(rotation)) / 1.6,
+            y: pivot.y + dx * Math.sin(rotation) + dy * Math.cos(rotation) };
+    }));
+    return { left: Math.min(...corners.map(p => p.x)), right: Math.max(...corners.map(p => p.x)),
+        top: Math.min(...corners.map(p => p.y)), bottom: Math.max(...corners.map(p => p.y)) };
+}
+/** Reserve the full sway envelope so camera fitting never follows each wave. */
+export function atlasBoatFramingBounds(foot: MapPoint, frame: BoatAtlasFrame): AtlasBounds {
+    const bounds = atlasBoatBounds(foot, frame);
+    if (!validFrame(frame)) return bounds;
+    const anchor = frame.waterlineAnchor ?? frame.passengerFoot;
+    const radius = Math.hypot(Math.max(Math.abs(anchor.x), Math.abs(frame.width - anchor.x)),
+        Math.max(Math.abs(anchor.y), Math.abs(frame.height - anchor.y))) * frame.widthInMap / frame.width * 1.6;
+    const sway = 2 * radius * Math.sin(VESSEL_MAX_ROTATION / 2);
+    return { left: bounds.left - sway / 1.6, right: bounds.right + sway / 1.6,
+        top: bounds.top - sway - VESSEL_HEAVE_CLEARANCE, bottom: bounds.bottom + sway + VESSEL_HEAVE_CLEARANCE };
 }
 function paintBoatLayer(c: CanvasRenderingContext2D, camera: MapCamera, boat: AtlasBoat, foreground: boolean): void {
     const source = foreground ? boat.assets.foreground : boat.assets.rear;
@@ -135,16 +162,17 @@ function islandOutsideViewport(camera: MapCamera): boolean {
  */
 export function paintWorldAtlas(c: CanvasRenderingContext2D, state: AtlasPaintState): void {
     paintMapSea(c, state.camera, state.time, state.reducedMotion);
-    paintMaritimeBuoys(c, state.camera, state.buoys ?? []);
     if (!state.reducedMotion) for (const boat of state.boats ?? []) {
         const motion = boat.motion;
-        if (!motion || !boat.assets.rear || !validFrame(boat.frame) ||
-            ![motion.speed, motion.screenHeading, motion.waterline.x, motion.waterline.y].every(Number.isFinite) || motion.speed <= 0) continue;
-        // Fade from rest with the ferry's measured speed. A fixed-opacity wake
-        // used to pop on at .01 speed, already eight Feka pixels long. Keep the
-        // authored cruise silhouette, with no second animation clock or trail.
+        if (!motion || !boat.assets.rear || !boat.assets.foreground || !validFrame(boat.frame) ||
+            ![motion.speed, motion.screenHeading, motion.waterline.x, motion.waterline.y].every(Number.isFinite)) continue;
+        const scale = atlasActorScale(state.camera, boat.frame);
+        paintVesselWake(c, state.camera, motion, scale, state.time);
+        if (motion.speed <= 0) continue;
+        // The near-stern wash stays attached to the hull; the older foam above
+        // remains in world space. Both fade continuously with propeller thrust.
         const speed = Math.min(1, motion.speed), strength = speed * speed * (3 - 2 * speed);
-        const water = mapToScreen(motion.waterline, state.camera), scale = atlasActorScale(state.camera, boat.frame);
+        const water = mapToScreen(motion.waterline, state.camera);
         const dx = Math.cos(motion.screenHeading), dy = Math.sin(motion.screenHeading);
         const stern = 15 * scale, length = 22 * strength * scale;
         c.save(); c.strokeStyle = `rgba(229,247,233,${.32 * strength})`; c.lineWidth = .7 * scale;
@@ -157,7 +185,9 @@ export function paintWorldAtlas(c: CanvasRenderingContext2D, state: AtlasPaintSt
             c.stroke();
         }
         c.restore();
+        paintVesselBow(c, state.camera, motion, scale);
     }
+    paintMaritimeBuoys(c, state.camera, state.buoys ?? [], state.time, state.reducedMotion);
     for (const island of state.islands) {
         const camera = atlasIslandCamera(state.camera, island.placement);
         // Fallback procedural scenery has different extents. Dock overlays may
@@ -192,17 +222,35 @@ export function paintWorldAtlas(c: CanvasRenderingContext2D, state: AtlasPaintSt
     let actorPainted = false;
     const actor = () => {
         actorPainted = true;
+        const occluded = !occupiedCabin && !occupiedBoat ? state.actor.occlusion : undefined;
+        if (occluded) {
+            c.save();
+            clipMapActorDepth(c, state.camera, state.actor.point, atlasActorScale(state.camera), occluded);
+        }
         if (state.actor.visible !== false) paintMapActor(c, { camera: state.camera, marker: state.actor.point, time: state.time,
             reducedMotion: state.reducedMotion, walking: state.actor.walking, facingLeft: state.actor.facingLeft,
             scale: atlasActorScale(state.camera, occupiedCabin?.frame ?? occupiedBoat?.frame),
             shadow: !occupiedCabin && !occupiedBoat });
+        if (occluded) c.restore();
     };
     // Keep each hull's rear, passenger and foreground together. A parked ferry
     // cannot accidentally capture the passenger riding a different connection.
     for (const boat of boats) {
+        c.save();
+        const heave = state.reducedMotion ? 0 : boat.motion?.heave ?? 0;
+        if (heave && Number.isFinite(heave)) c.translate(0, heave * Math.min(state.camera.width / 1.6, state.camera.height) * state.camera.zoom);
+        const rotation = state.reducedMotion ? 0 : boat.motion?.rotation ?? 0;
+        if (rotation && Number.isFinite(rotation)) {
+            const frame = boat.frame, anchor = frame.waterlineAnchor ?? frame.passengerFoot;
+            const pixel = frame.widthInMap / frame.width;
+            const pivot = mapToScreen({ x: boat.foot.x + (anchor.x - frame.passengerFoot.x) * pixel,
+                y: boat.foot.y + (anchor.y - frame.passengerFoot.y) * pixel * 1.6 }, state.camera);
+            c.translate(pivot.x, pivot.y); c.rotate(rotation); c.translate(-pivot.x, -pivot.y);
+        }
         paintBoatLayer(c, state.camera, boat, false);
         if (boat === occupiedBoat) actor();
         paintBoatLayer(c, state.camera, boat, true);
+        c.restore();
     }
     // Caller supplies physical back-to-front lane order. A passenger in the rear
     // car must not be painted artificially over a foreground counterweight car.

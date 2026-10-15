@@ -1,5 +1,31 @@
 # Guaíra campaign integration
 
+## Path finish — 2026-10-15, revision 6
+
+The ground curbs now form six continuous runs of fitted stones, including the small corner segments that previously left gaps. The rice bridge has founded stone heads, connected timber bearers, fitted rails, iron joinery and sloped approaches matching the native walking heights. Chapter signs reserve Feka's silhouette during layout instead of moving into neighboring signs afterwards; outward rounding keeps nearby placements available at fractional camera coordinates. The shared layout was checked at all 22 Guaíra/Delícia entrances across six viewport sizes. [Comparison, detail renders and walking video](guaira/path-finish-2026-10-15/index.html), [editable source and reproduction](guaira/path-finish-2026-10-15/README.md), [verification](guaira/path-finish-2026-10-15/verification.json).
+
+## Entrance finish — 2026-10-15, revision 5
+
+The workshop entrance now has a fitted stone arch, shaped door boards, hardware and a seated threshold. The corral crest is carved, the trough and two vents have real cavities, and the relief collector's inclined grille sits over an opening cleared from the old paving. The inspection hoist has supported machinery, guides, carriage and bracing; its boarding steps meet a joined street apron. Eight phase locations, twelve walking routes, terrain, water surfaces and transport anchors retain revision 4 coordinates. [Comparison, detail renders and walking video](guaira/entrance-finish-2026-10-15/index.html), [editable source and reproduction](guaira/entrance-finish-2026-10-15/README.md), [verification](guaira/entrance-finish-2026-10-15/verification.json).
+
+## Phase landmarks — 2026-10-15, revision 4
+
+Each of the eight phase entrances now has a recognizable modeled place and a named Blender collection/arrival marker. Ossabravo's dry corral has a dedicated gate branch off the main street; the stair approach stays separate. Paired A/B controls, two rice-field pressure vents, patched workshop access, a relief gauge/return pipe and a small inspection hoist connect the map's scenery to the actual phase mechanics. The native panel names the selected place, and G/A signs distinguish the two optional entrances. Seven existing phase positions, airport anchors, camera and water surfaces retain their coordinates. [Interactive phase locations, comparison and video](guaira/phase-landmarks-2026-10-15/index.html), [editable source and reproduction](guaira/phase-landmarks-2026-10-15/README.md), [verification](guaira/phase-landmarks-2026-10-15/verification.json).
+
+## Landscape finish — 2026-10-15, revision 3
+
+The coast now has variable erosion recesses and a more tapered foot. Fitted masonry closes the civic wall against the staircase, and a founded stone cistern replaces the old reservoir boulder. The sloping water outlet is cut through the masonry; the channel, service deck and bank plants have grounded supports. The terrain top, walking/flight anchors, camera and water meshes retain their coordinates. [Comparison and walking video](guaira/landscape-finish-2026-10-15/index.html), [editable source and reproduction](guaira/landscape-finish-2026-10-15/README.md), [verification](guaira/landscape-finish-2026-10-15/verification.json).
+
+## Terrain revision — 2026-10-15
+
+The landing clearing and island now share one closed terrain mesh. Rounded banks, irregular sediment layers and gentle dry relief replace overlapping cliff panels and the separate airport plinth. Walking projections and flight anchors are unchanged; beauty, depth and restored water were exported from the revised Blender source. [Terrain comparison and video](guaira/terrain-polish-2026-10-15/index.html), [editable source and reproduction](guaira/terrain-polish-2026-10-15/README.md), [verification](guaira/terrain-polish-2026-10-15/verification.json).
+
+## Native island revision — 2026-10-13
+
+The integrated World map now walks Feka through an authored Guaíra network, using the shared journey state, actor animation, controls and HUD. Flight arrival starts at the airport path; departure returns there before flying. All eight phase/optional entrances have their own exported 3D position. Returning from a phase restores the entrance actually visited, while stage selection is saved only on physical arrival.
+
+The Blender revision replaces overlapping paths with joined paving, supported stairs and fitted bridge planks. Geometry, projection depth and aircraft clearances were checked together. Browser verification now includes arrival, walking, reversal, all eight phase entries/returns, narrow viewports and departure; the earlier browser limitation below applies to the original integration only. [Review with comparisons and video](guaira/native-map-2026-10-13/index.html), [editable source and reproduction](guaira/native-map-2026-10-13/README.md), [verification evidence](guaira/native-map-2026-10-13/verification.json).
+
 ## Campaign and compatibility
 
 The authored route is Costa → Porto → Fábrica → Guaíra → Serra → Reserva → Domínio. Guaíra is a named chapter region, not a renumbering of the released numeric worlds. The original 30 stage IDs, 72 seals, records and checkpoints remain unchanged. The chapter contributes five completion receipts and optional Galeria/Câmara completion: 35 required campaign sections in total.

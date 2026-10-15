@@ -13,6 +13,9 @@ import { atlasIslandBounds, WORLD_ATLAS_PLACEMENTS } from '../src/adventure/Worl
 import { atlasActorBounds, atlasActorScale, atlasBoatBounds } from '../src/adventure/WorldAtlasArt';
 import { Input } from '../src/engine/Input';
 import { StandardGamepad } from '../src/engine/StandardGamepad';
+import { ALL_DELICIA_STAGES } from '../src/adventure/delicia/DeliciaContent';
+import { completeDeliciaStage } from '../src/adventure/delicia/DeliciaProgress';
+import { withDevelopmentAccess } from '../src/adventure/DevelopmentProgress';
 
 // This matrix verifies already-earned six-region transport. Guaíra's new gate is
 // covered separately in guaira-campaign-progression.test.ts.
@@ -720,6 +723,58 @@ test('controller can open the chapter from either island control and activate it
     h.root.focus(); h.view.control('regions'); h.internal.hud.deliciaRegion.focus(); h.view.control('confirm');
     assert.equal(h.internal.chapter, 'delicia'); assert.equal(h.internal.hud.regionMenu.hidden, true);
     h.root.focus(); h.view.control('confirm'); assert.deepEqual(h.events.chapters, ['delicia:delicia-1']);
+});
+
+test('Delícia uses walking, reversal, arrival persistence and the same single-use controller gate', async t => {
+    const h = mapDOM(t, false, false, true), save = freshSave(); await readyLand(h, save);
+    const store = h.view.deliciaStore;
+    store.save.completed = ALL_DELICIA_STAGES.map(stage => stage.id);
+    h.view.openChapter('delicia');
+    const origin = structuredClone(h.internal.deliciaJourney.point), campaign = structuredClone(save);
+    h.internal.hud.chapterButtons[1].click();
+    assert.equal(h.internal.deliciaJourney.destination, 'delicia-2');
+    assert.equal(h.internal.hud.enterButton.disabled, true); assert.equal(h.internal.hud.skipButton.hidden, false);
+    h.internal.hud.enterButton.click(); assert.deepEqual(h.events.chapters, []);
+    h.view.render(0, save, 200, '');
+    const walking = structuredClone(h.internal.deliciaJourney.point);
+    assert.notDeepEqual(walking, origin); assert.equal(store.save.selected, 'delicia-1');
+    h.internal.hud.chapterButtons[0].click(); assert.deepEqual(h.internal.deliciaJourney.point, walking);
+    assert.equal(h.internal.deliciaJourney.legs[0].direction, -1);
+    h.internal.hud.skipButton.focus(); h.view.control('confirm');
+    assert.equal(h.internal.deliciaJourney.arrived, 'delicia-1'); assert.deepEqual(h.events.chapters, []);
+    h.internal.hud.chapterButtons[1].click(); h.root.focus();
+    assert.equal(h.view.controllerOwner(), 'delicia:travel');
+    h.view.control('confirm');
+    assert.equal(h.internal.deliciaJourney.arrived, 'delicia-2'); assert.equal(store.save.selected, 'delicia-2');
+    assert.equal(h.view.controllerOwner(), 'delicia:idle'); assert.deepEqual(h.events.chapters, []);
+    h.view.control('confirm'); h.view.control('confirm');
+    assert.deepEqual(h.events.chapters, ['delicia:delicia-2']);
+    assert.deepEqual(save, campaign, 'The chapter never changes main World progression.');
+});
+
+test('Delícia returns at the played landing, walks to the earned next phase and respects reduced motion', async t => {
+    for (const reduced of [false, true]) await t.test(`reduced=${reduced}`, async child => {
+        const h = mapDOM(child, reduced, false, true), save = freshSave(); await readyLand(h, save);
+        h.view.openChapter('delicia');
+        const origin = structuredClone(h.internal.deliciaJourney.point);
+        h.internal.hud.enterButton.click();
+        completeDeliciaStage(h.view.deliciaStore.save, 'delicia-1', 60);
+        h.view.openChapter('delicia', 'delicia-2', 'delicia-1');
+        assert.equal(h.internal.deliciaJourney.arrived, reduced ? 'delicia-2' : 'delicia-1');
+        assert.equal(h.internal.deliciaJourney.destination, reduced ? null : 'delicia-2');
+        if (!reduced) {
+            assert.deepEqual(h.internal.deliciaJourney.point, origin);
+            h.internal.hud.overviewButton.click(); h.view.render(0, save, 200, '');
+            assert.equal(h.internal.actorChapter, 'delicia'); assert.notDeepEqual(h.internal.deliciaJourney.point, origin);
+            h.internal.hud.skipButton.click(); assert.equal(h.view.deliciaStore.save.selected, 'delicia-2');
+            h.view.openChapter('delicia');
+        }
+        h.internal.hud.chapterButtons[2].click();
+        assert.equal(h.internal.deliciaJourney.blocked, 'unavailable');
+        assert.equal(h.internal.deliciaJourney.arrived, 'delicia-2');
+        h.internal.hud.enterButton.click(); assert.deepEqual(h.events.chapters, ['delicia:delicia-1']);
+        assert.equal(h.view.deliciaStore.save.selected, 'delicia-2');
+    });
 });
 
 test('capped backing resolution responds to DPR and resize without resizing each idle frame', t => {
@@ -2518,4 +2573,69 @@ test('controller map layers preserve preview locks, focused links and native mod
     assert.equal(h.view.controllerOwner(), null); h.view.control('confirm'); assert.equal(h.events.entered, 0);
     Object.assign(h.documentMock, { querySelector: () => null }); h.view.control('back'); assert.equal(h.events.exited, 1);
     assert.deepEqual(save, before); h.view.hide(); assert.equal(h.view.controllerOwner(), null);
+});
+
+test('Guaíra flight arrival walks to the selected doorway, and Enter skips without entering the phase', async t => {
+    const h = mapDOM(t, false, true, true), save = withDevelopmentAccess(openSave(), true);
+    await readyLand(h, save);
+    h.view.openChapter('guaira', 'gallery');
+    assert.equal(h.internal.guairaJourney, null, 'preview does not teleport the actor');
+    h.view.markGuairaArrival(); h.view.openChapter('guaira', 'gallery');
+    assert.equal(h.internal.guairaJourney.arrived, 'guaira-arrival');
+    assert.equal(h.internal.guairaJourney.destination, 'gallery');
+    assert.equal(h.internal.hud.enterButton.disabled, true);
+    h.root.focus(); h.view.control('confirm');
+    assert.equal(h.internal.guairaJourney.arrived, 'gallery'); assert.deepEqual(h.events.chapters, []);
+    h.view.control('confirm'); assert.deepEqual(h.events.chapters, ['guaira:gallery']);
+    h.view.control('confirm'); assert.deepEqual(h.events.chapters, ['guaira:gallery']);
+    h.view.openChapter('guaira', save.guaira.selectedScene, 'gallery');
+    assert.equal(h.internal.guairaJourney.arrived, 'gallery'); assert.equal(h.internal.guairaJourney.destination, null);
+    assert.equal(h.internal.chapterStages[h.internal.chapterIndex].id, 'gallery');
+});
+
+test('Guaíra reverses on its road, blocks locked entry and returns from a completed phase before walking onward', async t => {
+    const h = mapDOM(t, false, true, true), save = openSave();
+    await readyLand(h, save); h.view.markGuairaArrival(); h.view.openChapter('guaira');
+    h.internal.skip(); const starting = structuredClone(h.internal.guairaJourney.point);
+    h.internal.selectChapter(h.internal.chapterStages.findIndex((s: any) => s.id === 'relief'));
+    h.view.render(0, save, 100, '');
+    const walking = structuredClone(h.internal.guairaJourney.point); assert.notDeepEqual(walking, starting);
+    h.internal.selectChapter(0); assert.deepEqual(h.internal.guairaJourney.point, walking);
+    assert.equal(h.internal.guairaJourney.legs[0].direction, -1); h.internal.skip();
+    h.internal.selectChapter(4); h.internal.enterChapter();
+    assert.equal(h.internal.guairaJourney.blocked, 'unavailable'); assert.deepEqual(h.events.chapters, []);
+    save.guaira.completed.push('guaira-travessia'); save.guaira.selectedScene = 'guaira-respiros';
+    h.view.openChapter('guaira', 'guaira-respiros', 'guaira-travessia');
+    assert.equal(h.internal.guairaJourney.arrived, 'guaira-travessia');
+    assert.equal(h.internal.guairaJourney.destination, 'guaira-respiros');
+    assert.equal(h.internal.hud.enterButton.disabled, true);
+});
+
+test('leaving Guaíra walks back to the aerodrome and can be cancelled by a different phase', async t => {
+    const h = mapDOM(t, false, true, true), save = withDevelopmentAccess(openSave(), true);
+    await readyLand(h, save); h.view.markGuairaArrival(); h.view.openChapter('guaira', 'guaira-prefeito'); h.internal.skip();
+    const flights: string[] = [];
+    h.internal.callbacks.leaveGuaira = (to: string, selection: number) => flights.push(`${to}:${selection}`);
+    h.internal.select(14); assert.equal(h.internal.guairaJourney.destination, 'guaira-arrival'); assert.deepEqual(flights, []);
+    h.internal.selectChapter(0); h.internal.skip(); h.view.render(0, save, 100, ''); assert.deepEqual(flights, []);
+    h.internal.select(14); h.internal.skip(); h.view.render(0, save, 200, '');
+    assert.deepEqual(flights, ['factory:14']); assert.equal(h.internal.guairaJourney.arrived, 'guaira-arrival');
+    h.view.render(0, save, 300, ''); assert.equal(flights.length, 1);
+});
+
+test('Guaíra reports only physical arrivals and compact alternate openings retain the Respiros exit', async t => {
+    const h = mapDOM(t, false, true, true), save = withDevelopmentAccess(openSave(), true);
+    save.guaira.opening = 'guaira-patio-comportas'; save.guaira.selectedScene = save.guaira.opening;
+    await readyLand(h, save);
+    const arrived: string[] = []; h.internal.callbacks.arriveGuaira = (id: string) => arrived.push(id);
+    h.view.markGuairaArrival(); h.view.openChapter('guaira', 'guaira-travessia');
+    assert.deepEqual(arrived, ['guaira-arrival']);
+    assert.ok(h.internal.chapterNeighbours().includes(1), 'the alternative opening connects forward to Respiros even when its array slot is B');
+    h.internal.skip(); assert.deepEqual(arrived, ['guaira-arrival', 'guaira-travessia']);
+    h.internal.selectChapter(1); h.view.render(0, save, 100, '');
+    assert.equal(arrived.at(-1), 'guaira-travessia', 'selection and a partial walk cannot persist a destination');
+    h.internal.skip(); assert.equal(arrived.at(-1), 'guaira-respiros');
+    h.internal.selectChapter(h.internal.chapterStages.findIndex((s: any) => s.id === 'relief')); h.internal.skip();
+    h.internal.toggleOverview(); h.view.openGuairaRegion();
+    assert.equal(h.internal.guairaJourney.arrived, 'relief'); assert.equal(h.internal.guairaJourney.destination, null);
 });
