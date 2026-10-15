@@ -13,9 +13,9 @@ ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / 'docs/world/delicia'
 OUT = ROOT / 'public/assets/delicia'
 parser=argparse.ArgumentParser(description=__doc__)
-parser.add_argument('--revision',type=int,choices=[6,7,8],default=8)
+parser.add_argument('--revision',type=int,choices=[6,7,8,9,10,11],default=11)
 revision=parser.parse_args().revision
-review=ROOT/'output/delicia'/{6:'map-depth-2026-10-10',7:'geometry-polish-2026-10-11',8:'wayfinding-polish-2026-10-11'}[revision]
+review=ROOT/'output/delicia'/{6:'map-depth-2026-10-10',7:'geometry-polish-2026-10-11',8:'wayfinding-polish-2026-10-11',9:'masonry-polish-2026-10-13',10:'landscape-polish-2026-10-13',11:'garden-access-2026-10-13'}[revision]
 metadata = json.loads((SOURCE / f'island-map-v{revision}.json').read_text(encoding='utf-8'))
 assert metadata['revision']==revision
 original = SOURCE / f'island-render-v{revision}.png'

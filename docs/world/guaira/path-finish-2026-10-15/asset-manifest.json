@@ -1,0 +1,29 @@
+{
+  "revision": 6,
+  "files": {
+    "guaira.webp": {
+      "bytes": 138004,
+      "sha256": "26898c74f86db7c75bfeeaef85573507cbf08617bed4161f12694b730a5297df"
+    },
+    "guaira-depth.png": {
+      "bytes": 221804,
+      "sha256": "c1ac73616a9b5707acfa0aa2a7cff6f164237d6dbc37a7677bb52429d8e955ec"
+    },
+    "guaira-navigation.json": {
+      "bytes": 17021,
+      "sha256": "9adc0effae9b8a55963dc1124814499c62e56bbf909cda29b452099470ab3651"
+    },
+    "guaira-water-restored.webp": {
+      "bytes": 2800,
+      "sha256": "49c8facb4edb624e1c3ed440c8687d9b984455985c1e760b248f8058cef40b91"
+    }
+  },
+  "source": "guaira-paths.blend",
+  "sourceSHA256": "1993480be169eb419e8111196712b556572225ab296edbe0801fe11a8a1fde27",
+  "renderer": "Blender 5.2.1 LTS, Cycles CPU, 64 samples, paired beauty + linear depth",
+  "navigationChanged": false,
+  "phaseLocationsChanged": false,
+  "flightAnchorsChanged": false,
+  "terrainChanged": false,
+  "pavingChange": "Continuous fitted curb stones, founded bridge heads, connected bearers and sloped bridge approaches."
+}

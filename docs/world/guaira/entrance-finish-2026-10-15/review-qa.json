@@ -1,0 +1,80 @@
+{
+  "places": [
+    {
+      "id": "guaira-travessia",
+      "place": "Estrada do Vento",
+      "cue": "Atravesse a comporta da vala seca."
+    },
+    {
+      "id": "guaira-patio-comportas",
+      "place": "Pátio das Comportas",
+      "cue": "Dois controles A/B dividem a mesma entrada de água."
+    },
+    {
+      "id": "guaira-respiros",
+      "place": "Passarela dos Arrozais",
+      "cue": "As duas grades de pressão ficam junto aos arrozais."
+    },
+    {
+      "id": "guaira-lab",
+      "place": "Curral da Comporta",
+      "cue": "O portão com chifres abre para o curral seco."
+    },
+    {
+      "id": "guaira-subida",
+      "place": "Inspeção da Casa da Vazão",
+      "cue": "Escada de serviço e pequeno elevador de inspeção."
+    },
+    {
+      "id": "guaira-prefeito",
+      "place": "Casa da Vazão",
+      "cue": "O registro público fica na casa acima da escadaria."
+    },
+    {
+      "id": "gallery",
+      "place": "Subsolo do Bairro Vala Seca",
+      "cue": "Entrada remendada sob a oficina, ao lado da lanterna."
+    },
+    {
+      "id": "relief",
+      "place": "Coletor de Alívio",
+      "cue": "Alçapão com manômetro e tubo de retorno."
+    }
+  ],
+  "video": {
+    "duration": 29.84,
+    "width": 1100,
+    "height": 760
+  },
+  "assets": [
+    {
+      "file": "guaira-entrances.blend",
+      "status": 200,
+      "bytes": 1622125
+    },
+    {
+      "file": "navigation.json",
+      "status": 200,
+      "bytes": 17029
+    },
+    {
+      "file": "asset-manifest.json",
+      "status": 200,
+      "bytes": 1064
+    },
+    {
+      "file": "verification.json",
+      "status": 200,
+      "bytes": 5532
+    },
+    {
+      "file": "README.md",
+      "status": 200,
+      "bytes": 5170
+    }
+  ],
+  "errors": [],
+  "failed": [],
+  "mobileOverflow": false,
+  "keyboardComparison": true
+}

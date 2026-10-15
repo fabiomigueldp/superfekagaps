@@ -1,0 +1,19 @@
+{
+  "revision": 1,
+  "files": {
+    "guaira.webp": {
+      "bytes": 123438,
+      "sha256": "34b705643b24a3cddff819f49be8a5fbc2008abe27706bbf23c7f816c4f5f741"
+    },
+    "guaira-depth.png": {
+      "bytes": 195417,
+      "sha256": "5786a7980dedf3ca610ab5e4f8e6dbc8968ab28c3679ce91cdc0e4e39a048d36"
+    },
+    "guaira-navigation.json": {
+      "bytes": 12481,
+      "sha256": "4c45401a718719cbb3ad14b32efb0c447c1e9626105e8628d0515a5533c2611b"
+    }
+  },
+  "source": "guaira-native.blend",
+  "renderer": "Blender 5.2.1 LTS, Cycles CPU, 48 samples, paired beauty + linear depth"
+}

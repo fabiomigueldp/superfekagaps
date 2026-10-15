@@ -87,6 +87,7 @@ export interface ChapterJourneyHud {
     canEnter: boolean;
     arrived: string;
     blocked: 'unavailable' | 'no-route' | null;
+    destinationName?: string;
 }
 export interface WorldMapHudPoint {
     /** Scene-relative CSS pixels at the foot of the sign. */
@@ -597,10 +598,14 @@ export class WorldMapHud {
         this.root.classList.toggle('is-preview', !!journey?.blocked);
         this.root.dataset.motion = traveling ? 'walking' : 'idle';
         this.titleText.textContent = name; lettering(this.titleBitmap, name, ART.goldLight, 200);
-        this.stageTitleText.textContent = stage.name; phaseLettering(this.stageTitleBitmap, stage.name);
+        const destinationName = journey?.destinationName ?? stage.name;
+        this.stageTitleText.textContent = destinationName; phaseLettering(this.stageTitleBitmap, destinationName);
         this.stageTitle.title = stage.name;
-        this.stageDetails.textContent = stage.label === 'B' ? 'Outro caminho' : stage.optional ? 'Caminho secreto'
-            : `Fase ${stage.label}${stage.seals === undefined ? '' : ` · ${stage.seals}/${stage.sealTotal ?? 3} selos`}`;
+        const stageKind = stage.label === 'B' ? 'Entrada alternativa' : stage.optional
+            ? stage.place ? `Desvio ${stage.label}` : 'Caminho secreto' : `Fase ${stage.label}`;
+        this.stageDetails.textContent = journey?.destinationName ? 'Embarque'
+            : `${stageKind}${stage.place ? ` · ${stage.place}` : ''}${stage.seals === undefined ? '' : ` · ${stage.seals}/${stage.sealTotal ?? 3} selos`}`;
+        this.stageDetails.title = stage.landmarkCue ?? '';
         this.stageDetails.hidden = false;
         this.status.textContent = !stage.open ? stage.gate : traveling ? MOTION_COPY.walking
             : journey?.blocked === 'no-route' ? 'Caminho indisponível' : canEnter && journey
@@ -640,11 +645,12 @@ export class WorldMapHud {
             button.classList.toggle('is-locked', !item.open);
             button.setAttribute('aria-pressed', String(index === selected));
             button.setAttribute('aria-current', item.id === journey?.arrived ? 'location' : 'false');
-            button.setAttribute('aria-label', `${item.optional ? 'Segredo' : `Fase ${item.label}`}: ${item.name}. ${item.completed ? 'Concluída.' : item.open ? 'Disponível.' : item.gate}`);
+            const kind = item.label === 'B' ? 'Entrada alternativa' : item.optional ? item.place ? 'Desvio opcional' : 'Segredo' : `Fase ${item.label}`;
+            button.setAttribute('aria-label', `${kind}: ${item.name}.${item.place ? ` ${item.place}. ${item.landmarkCue ?? ''}` : ''} ${item.completed ? 'Concluída.' : item.open ? 'Disponível.' : item.gate}`);
             button.title = item.name;
         });
         this.nodeLayer.setAttribute('aria-label', `Fases de ${name}`);
-        this.announce(`${stage.name}. ${this.status.textContent}`);
+        this.announce(`${stage.name}.${stage.place ? ` ${stage.place}.` : ''} ${this.status.textContent}`);
     }
     positionChapterNodes(points: readonly (WorldMapHudPoint | null)[]): void {
         this.chapterButtons.forEach((button, index) => this.position(button, points[index]));

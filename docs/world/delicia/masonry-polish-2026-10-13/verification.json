@@ -1,0 +1,482 @@
+{
+  "revision": 9,
+  "testsPassed": 365,
+  "testsFailed": 0,
+  "testFiles": [
+    "tests/delicia-campaign.test.ts",
+    "tests/delicia-map-journey.test.ts",
+    "tests/world-atlas-art.test.ts",
+    "tests/world-atlas-model.test.ts",
+    "tests/world-chapter-map.test.ts",
+    "tests/world-journey-bridge.test.ts",
+    "tests/world-journey-model.test.ts",
+    "tests/world-journey-network.test.ts",
+    "tests/world-map-assets.test.ts",
+    "tests/world-map-controls.test.ts",
+    "tests/world-map-depth.test.ts",
+    "tests/world-map-framing.test.ts",
+    "tests/world-map-hud.test.ts",
+    "tests/world-map-integration.test.ts",
+    "tests/world-map-model.test.ts",
+    "tests/world-map-shortcut-layout.test.ts",
+    "tests/world-map-sign-art.test.ts"
+  ],
+  "build": "passed",
+  "buildIncludes": [
+    "level validation",
+    "player assets validation",
+    "World validation",
+    "TypeScript"
+  ],
+  "navigation": {
+    "revision": 9,
+    "comparedWith": 8,
+    "landings": 14,
+    "routes": 16,
+    "coordinatesDepthsAndTimingPreserved": true
+  },
+  "masonry": {
+    "revision": 9,
+    "fittedStones": 576,
+    "copingRuns": 21,
+    "preservedObjects": 658,
+    "closedPavingMeshes": [
+      "Unified masonry paving 2",
+      "Unified masonry paving 3",
+      "Unified masonry paving 4",
+      "Unified masonry paving 5",
+      "Unified masonry paving 6",
+      "Unified masonry paving 1 • belvedere joined"
+    ],
+    "belvedereLanding": [
+      4.199999809265137,
+      -11.699999809265137,
+      3.3795151710510254
+    ],
+    "northEntranceOpen": true
+  },
+  "terrainFit": {
+    "triangleContacts": 50893,
+    "intersectionsBefore": 832,
+    "maxIntrusionBeforeMeters": 0.427924,
+    "minimumClearanceBeforeMeters": -0.427924,
+    "intersectionsAfter": 0,
+    "minimumClearanceMeters": 0.085,
+    "seatedVertices": 159,
+    "largestCorrectionMeters": 0.512924
+  },
+  "exportedGeometry": {
+    "triangleContacts": 50893,
+    "intersectionsBefore": 0,
+    "maxIntrusionBeforeMeters": 0,
+    "minimumClearanceBeforeMeters": 0.085,
+    "intersectionsAfter": 0,
+    "minimumClearanceMeters": 0.085,
+    "seatedVertices": 0,
+    "largestCorrectionMeters": 0
+  },
+  "depthEnvelope": [
+    {
+      "id": "harbor-orchard",
+      "samples": 1074,
+      "minBody": 0.298,
+      "minimumHead": 0.729,
+      "hiddenHeads": []
+    },
+    {
+      "id": "orchard-aqueduct",
+      "samples": 229,
+      "minBody": 0.683,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "west-bank",
+      "samples": 468,
+      "minBody": 0.837,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "five-harvests-bridge",
+      "samples": 378,
+      "minBody": 0.875,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "archive-approach",
+      "samples": 235,
+      "minBody": 0.529,
+      "minimumHead": 0.49,
+      "hiddenHeads": []
+    },
+    {
+      "id": "aqueduct-promenade",
+      "samples": 819,
+      "minBody": 0.542,
+      "minimumHead": 0.875,
+      "hiddenHeads": []
+    },
+    {
+      "id": "source-pilgrims",
+      "samples": 445,
+      "minBody": 0.792,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "roots-sanctuary",
+      "samples": 139,
+      "minBody": 0.683,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "orange-tide",
+      "samples": 192,
+      "minBody": 0.856,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "refinery-street",
+      "samples": 299,
+      "minBody": 0.545,
+      "minimumHead": 0.531,
+      "hiddenHeads": []
+    },
+    {
+      "id": "refinery-court",
+      "samples": 149,
+      "minBody": 1.0,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "garden-gate",
+      "samples": 246,
+      "minBody": 0.529,
+      "minimumHead": 0.385,
+      "hiddenHeads": []
+    },
+    {
+      "id": "clock-sanctuary",
+      "samples": 133,
+      "minBody": 0.936,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "boiler-approach",
+      "samples": 94,
+      "minBody": 1.0,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "palace-ascent",
+      "samples": 222,
+      "minBody": 0.747,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "palace-stair",
+      "samples": 399,
+      "minBody": 0.821,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    }
+  ],
+  "walks": {
+    "trips": [
+      "delicia-2",
+      "delicia-3",
+      "delicia-4",
+      "delicia-5",
+      "delicia-6",
+      "delicia-7",
+      "delicia-raizes",
+      "delicia-9",
+      "delicia-relogio",
+      "delicia-10",
+      "delicia-11",
+      "delicia-12"
+    ],
+    "desktop": {
+      "frames": 2148,
+      "offscreen": 0,
+      "overlaps": 0,
+      "depthReads": 2148,
+      "maxFrame": 14.300000004470348
+    },
+    "mobile": {
+      "frames": 304,
+      "offscreen": 0,
+      "overlaps": 0,
+      "depthReads": 304,
+      "maxFrame": 1.6999999955296516
+    },
+    "errors": []
+  },
+  "browser": {
+    "walking": {
+      "arrived": "delicia-1",
+      "destination": "delicia-2",
+      "point": {
+        "x": -2.185637402247974,
+        "y": -1.3431354676749652
+      },
+      "disabled": true,
+      "saved": "delicia-1"
+    },
+    "reversal": {
+      "before": {
+        "x": -1.8616227470062043,
+        "y": -1.3133489333742023
+      },
+      "after": {
+        "x": -1.8616227470062043,
+        "y": -1.3133489333742023
+      },
+      "direction": -1
+    },
+    "returned": {
+      "arrived": "delicia-2",
+      "destination": "delicia-3",
+      "canEnter": false,
+      "chapter": "delicia"
+    },
+    "landings": [
+      {
+        "id": "delicia-1",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -2.1923219200000004,
+          "y": -1.3497522000000002
+        },
+        "buttons": 5
+      },
+      {
+        "id": "delicia-2",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.7556930000000004,
+          "y": -2.068556
+        },
+        "buttons": 7
+      },
+      {
+        "id": "delicia-3",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.7010482800000002,
+          "y": -2.04916572
+        },
+        "buttons": 6
+      },
+      {
+        "id": "delicia-4",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.6871359400000001,
+          "y": -1.5444584
+        },
+        "buttons": 8
+      },
+      {
+        "id": "delicia-5",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.19771376,
+          "y": -1.5853241599999999
+        },
+        "buttons": 10
+      },
+      {
+        "id": "delicia-6",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.34419126,
+          "y": -2.00910076
+        },
+        "buttons": 11
+      },
+      {
+        "id": "delicia-7",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.5034703800000002,
+          "y": -1.21245504
+        },
+        "buttons": 12
+      },
+      {
+        "id": "delicia-8",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.0908579200000001,
+          "y": -1.40075432
+        },
+        "buttons": 7
+      },
+      {
+        "id": "delicia-9",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -0.9362868799999999,
+          "y": -0.9851224799999998
+        },
+        "buttons": 4
+      },
+      {
+        "id": "delicia-10",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -0.8951312200000001,
+          "y": -1.4252551599999999
+        },
+        "buttons": 6
+      },
+      {
+        "id": "delicia-11",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -0.7395022400000002,
+          "y": -1.60125306
+        },
+        "buttons": 5
+      },
+      {
+        "id": "delicia-12",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -0.8947082,
+          "y": -2.01856788
+        },
+        "buttons": 4
+      },
+      {
+        "id": "delicia-raizes",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.7144317800000002,
+          "y": -2.20374326
+        },
+        "buttons": 4
+      },
+      {
+        "id": "delicia-relogio",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -0.83995766,
+          "y": -0.89024744
+        },
+        "buttons": 2
+      }
+    ],
+    "touch": [
+      "delicia-2",
+      "delicia-3",
+      "delicia-4",
+      "delicia-5",
+      "delicia-6",
+      "delicia-7",
+      "delicia-8",
+      "delicia-9",
+      "delicia-10",
+      "delicia-11",
+      "delicia-12"
+    ],
+    "reduced": {
+      "arrived": "delicia-1",
+      "destination": null,
+      "enabled": true
+    },
+    "locked": {
+      "arrived": "delicia-1",
+      "blocked": "unavailable",
+      "enabled": false,
+      "saved": "delicia-1",
+      "active": false
+    },
+    "errors": []
+  },
+  "captures": {
+    "revision": 9,
+    "landings": [
+      {
+        "id": "delicia-1",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-2",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-3",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-4",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-5",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-6",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-7",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-8",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-9",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-10",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-11",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-12",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-raizes",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-relogio",
+        "canEnter": true
+      }
+    ],
+    "errors": []
+  }
+}

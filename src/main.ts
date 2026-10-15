@@ -65,6 +65,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   if (game instanceof FactoryCampaign && (params.get('delicia') === 'true' || params.get('chapter') === 'delicia'))
     game.openChapterMap('delicia');
+  if (game instanceof FactoryCampaign && params.get('chapter') === 'guaira')
+    game.openChapterMap('guaira');
 
   console.log('✅ Jogo iniciado!');
   console.log('📋 Controles:');

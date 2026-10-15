@@ -44,9 +44,9 @@ function irrigationWindow(c: CanvasRenderingContext2D, x: number, y: number) {
     r(c, x - 5, y - 7, 102, 65, '#ba9476');
     r(c, x - 3, y - 5, 98, 61, '#d0ac87');
     r(c, x, y, 92, 56, P.recess);
-    r(c, x + 3, y + 3, 86, 50, '#e9c89e');
+    r(c, x + 3, y + 3, 86, 50, '#d6dac1');
     polygon(c, [[x + 3,y + 22],[x + 23,y + 12],[x + 40,y + 18],
-        [x + 63,y + 16],[x + 88,y + 24],[x + 89,y + 53],[x + 3,y + 53]], '#c5a07a');
+        [x + 63,y + 16],[x + 88,y + 24],[x + 89,y + 53],[x + 3,y + 53]], '#b8b39a');
     for (const yy of [34, 46]) {
         r(c, x + 5, y + yy, 81, 4, '#809b88');
         r(c, x + 7, y + yy, 77, 1, '#a8b9a0');

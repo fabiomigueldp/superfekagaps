@@ -1,9 +1,7 @@
 import type { AdventureSave } from './types';
 import type { MapPoint } from './WorldMapModel';
-import { hasDevelopmentAccess } from './DevelopmentProgress';
 import { isGuairaUnlocked } from './progress';
-import { GUAIRA_CAMPAIGN_ART, GUAIRA_CAMPAIGN_NODES } from './GuairaCampaignArt';
-import { localToAtlas } from './WorldAtlasModel';
+import { GUAIRA_JOURNEY, GUAIRA_LANDMARKS, guairaJourneyCapabilities } from './GuairaMapJourney';
 import { CHAPTER_SCENES } from './experimental/guaira/chapter/GuairaChapterScenes';
 import { guairaChapterRoute } from './experimental/guaira/chapter/GuairaChapterProgress';
 import { ALL_DELICIA_STAGES, DELICIA_STAGES } from './delicia/DeliciaContent';
@@ -15,6 +13,8 @@ export interface ChapterMapStage {
     id: string;
     label: string;
     name: string;
+    place?: string;
+    landmarkCue?: string;
     point: MapPoint;
     open: boolean;
     completed: boolean;
@@ -46,24 +46,24 @@ export function chapterMapStages(chapter: WorldChapter, save: AdventureSave, del
                 : previous ? `Conclua ${previous.number}: ${previous.name}.` : '' };
     });
     const progress = save.guaira, route = guairaChapterRoute(progress.opening), available = isGuairaUnlocked(save);
-    const next = route.find(id => !progress.completed.includes(id));
-    const nodes = GUAIRA_CAMPAIGN_NODES;
-    const points = [nodes['guaira-1'], nodes['guaira-3'], nodes['guaira-4'],
-        { x: (nodes['guaira-4'].x + nodes['guaira-5'].x) / 2, y: (nodes['guaira-4'].y + nodes['guaira-5'].y) / 2 }, nodes['guaira-5']];
+    const capabilities = guairaJourneyCapabilities(save);
     const stages: ChapterMapStage[] = route.map((id, index) => ({ id, label: String(index + 1), name: CHAPTER_SCENES[id].title,
-        point: localToAtlas(points[index], GUAIRA_CAMPAIGN_ART.guaira.placement),
-        open: available && (hasDevelopmentAccess(save) || id === next || progress.completed.includes(id)),
+        place: GUAIRA_LANDMARKS[id].place, landmarkCue: GUAIRA_LANDMARKS[id].cue,
+        point: GUAIRA_JOURNEY.nodes[id],
+        open: capabilities.availableStages.includes(id),
         completed: progress.completed.includes(id),
         gate: !available ? 'Conclua 3-5: Controle de Qualidade.' : `Conclua ${CHAPTER_SCENES[route[Math.max(0, index - 1)]].title}.` }));
     if (!progress.completed.length) {
         const alternative = progress.opening === 'guaira-travessia' ? 'guaira-patio-comportas' : 'guaira-travessia';
         stages.push({ id: alternative, label: 'B', name: CHAPTER_SCENES[alternative].title, optional: true,
-            point: localToAtlas({ x: nodes['guaira-1'].x + .07, y: nodes['guaira-1'].y + .055 }, GUAIRA_CAMPAIGN_ART.guaira.placement),
+            place: GUAIRA_LANDMARKS[alternative].place, landmarkCue: GUAIRA_LANDMARKS[alternative].cue,
+            point: GUAIRA_JOURNEY.nodes[alternative],
             open: available, completed: false, gate: 'Conclua 3-5: Controle de Qualidade.' });
     }
-    for (const [id, name, offset] of [['gallery', 'Galeria dos Remendos', -.025], ['relief', 'Câmara de Alívio', .025]] as const) {
-        stages.push({ id, label: '★', name, optional: true, open: available, completed: progress.optional[id],
-            point: localToAtlas({ x: nodes['guaira-2'].x + offset, y: nodes['guaira-2'].y }, GUAIRA_CAMPAIGN_ART.guaira.placement),
+    for (const [id, name] of [['gallery', 'Galeria dos Remendos'], ['relief', 'Câmara de Alívio']] as const) {
+        stages.push({ id, label: id === 'gallery' ? 'G' : 'A', name, optional: true, open: available, completed: progress.optional[id],
+            place: GUAIRA_LANDMARKS[id].place, landmarkCue: GUAIRA_LANDMARKS[id].cue,
+            point: GUAIRA_JOURNEY.nodes[id],
             gate: 'Conclua 3-5: Controle de Qualidade.' });
     }
     return stages;

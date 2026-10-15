@@ -9,6 +9,7 @@ import { drawWorldDialogue, drawWorldEncounterHud, drawWorldPause, drawWorldResu
 import { WorldControlsHelp } from './WorldControlsHelp';
 import { advanceCampaignCamera } from './WorldCampaignCamera';
 import { runGuairaFlight } from './WorldGuairaFlight';
+import { guairaChapterRoute } from './experimental/guaira/chapter/GuairaChapterProgress';
 import { Input } from '../engine/Input';
 import { StandardGamepad, type GamepadMenuCommand } from '../engine/StandardGamepad';
 import { DisposalScope } from '../engine/DisposalScope';
@@ -916,6 +917,11 @@ export class WorldGame {
             if (typeof document !== 'undefined' && document.hidden) return;
             this.buttons = [];
             this.mapView ??= new WorldMapView(this.mapCanvas, {
+                arriveGuaira: stage => {
+                    const scene = guairaChapterRoute(this.store.save.guaira.opening).find(id => id === stage);
+                    if (this.isDisposed || !scene || scene === this.store.save.guaira.selectedScene) return;
+                    this.store.updateGuaira({ ...this.store.save.guaira, selectedScene: scene });
+                },
                 guaira: from => {
                     if (this.isDisposed || this.state !== 'map' || this.flightCleanup || !isGuairaUnlocked(this.store.save)) return;
                     this.audio.pause(true);
@@ -924,7 +930,7 @@ export class WorldGame {
                         onArrive: () => {
                             this.store.save.guaira.audioEnabled = this.audio.enabled;
                             if (!this.store.persist()) return false;
-                            this.flightCleanup = undefined; this.mapView?.openGuairaRegion(); this.audio.pause(false); return true;
+                            this.flightCleanup = undefined; this.mapView?.markGuairaArrival(); this.mapView?.openGuairaRegion(); this.audio.pause(false); return true;
                         },
                     });
                 },
@@ -939,7 +945,7 @@ export class WorldGame {
                                 this.store.save.guaira.audioEnabled = this.audio.enabled;
                                 this.store.persist(); this.flightCleanup = undefined;
                                 this.mapView?.markGuairaArrival();
-                                queueMicrotask(() => { void this.mountChapter(chapter, stage); }); return true;
+                                this.mapView?.openChapter('guaira', stage); this.audio.pause(false); return true;
                             } });
                     } else void this.mountChapter(chapter, stage);
                 },
@@ -1036,7 +1042,7 @@ export class WorldGame {
             (window as unknown as { renderer: Renderer }).renderer = this.renderer;
             document.title = 'Super Feka Gaps World';
             view.openChapter(chapter, chapter === 'guaira' ? this.store.save.guaira.selectedScene : view.deliciaStore.save.selected,
-                chapter === 'delicia' ? playedStage : undefined);
+                playedStage);
             view.hud.focusEnter(); this.last = null; this.requestFrame();
         };
         this.chapterCleanup = close;

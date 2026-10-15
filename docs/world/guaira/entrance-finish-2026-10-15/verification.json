@@ -1,0 +1,204 @@
+{
+  "revision": 5,
+  "date": "2026-10-15",
+  "sourceSHA256": "98138e8ceecea3a355fad7ad211ff762607cfc64123ed6e9bbd7f652b121160e",
+  "tests": 583,
+  "testFailures": 0,
+  "buildPassed": true,
+  "navigationUnchanged": true,
+  "phaseLocationsUnchanged": true,
+  "terrainMaximumChange": 0.0,
+  "cameraUnchanged": true,
+  "waterMeshesUnchanged": true,
+  "closedConnectedMeshes": 496,
+  "newClosedMeshes": 202,
+  "foundedBases": 21,
+  "unsupportedBases": 0,
+  "cavities": [
+    {
+      "name": "Finish v5 hollow dry stone trough",
+      "x": 1.18,
+      "y": 0.63,
+      "rimZ": 2.015,
+      "floorZ": 1.86,
+      "measuredFloor": 1.8600000143051147,
+      "hit": "Finish v5 hollow dry stone trough",
+      "depth": 0.15499998569488538
+    },
+    {
+      "name": "Finish v5 relief collector curb",
+      "x": -1.48,
+      "y": 0.82,
+      "rimZ": 1.98,
+      "floorZ": 1.8,
+      "measuredFloor": 1.7999999523162842,
+      "hit": "Finish v5 relief collector curb",
+      "depth": 0.1800000476837158
+    },
+    {
+      "name": "Finish v5 hollow respiro 0",
+      "x": 1.67,
+      "y": -3.235,
+      "rimZ": 2.045,
+      "floorZ": 1.902,
+      "measuredFloor": 1.9019999504089355,
+      "hit": "Finish v5 hollow respiro 0",
+      "depth": 0.14300004959106438
+    },
+    {
+      "name": "Finish v5 hollow respiro 1",
+      "x": 2.25,
+      "y": -3.235,
+      "rimZ": 2.045,
+      "floorZ": 1.902,
+      "measuredFloor": 1.9019999504089355,
+      "hit": "Finish v5 hollow respiro 1",
+      "depth": 0.14300004959106438
+    }
+  ],
+  "addedPavingArea": 0.2482148671151343,
+  "removedPavingArea": 0.2321459295272028,
+  "cameraProjection": {
+    "maximumNormalizedError": 4.980049128633368e-08,
+    "maximumDepthErrorMeters": 4.6411132714752057e-07
+  },
+  "channelProbes": 99,
+  "channelObstructions": 0,
+  "unsupportedChannel": 0,
+  "routes": {
+    "samples": 590,
+    "supportProbes": 1770,
+    "unsupported": 0,
+    "bodyContacts": 0
+  },
+  "depth": {
+    "samples": 1374,
+    "allEntranceHeadsVisible": true,
+    "minimumHeadVisibilityUnderArrivalShelter": 0.7291666666666666
+  },
+  "aircraft": {
+    "poses": 1780,
+    "wheelContacts": 1230,
+    "marginMeters": 0.05,
+    "summary": {
+      "final:guaira->serra": {
+        "samples": 445,
+        "collisionSamples": 0,
+        "conservativeMarginUnresolvedSamples": 0,
+        "wheelSamples": 378,
+        "unsupportedWheelSamples": 0,
+        "minTriangleAabbLowerBound": null,
+        "minSampledSurfaceUpperBound": null,
+        "stages": {}
+      },
+      "final:guaira->fabrica": {
+        "samples": 445,
+        "collisionSamples": 0,
+        "conservativeMarginUnresolvedSamples": 0,
+        "wheelSamples": 378,
+        "unsupportedWheelSamples": 0,
+        "minTriangleAabbLowerBound": null,
+        "minSampledSurfaceUpperBound": null,
+        "stages": {}
+      },
+      "final:serra->guaira": {
+        "samples": 445,
+        "collisionSamples": 0,
+        "conservativeMarginUnresolvedSamples": 0,
+        "wheelSamples": 237,
+        "unsupportedWheelSamples": 0,
+        "minTriangleAabbLowerBound": null,
+        "minSampledSurfaceUpperBound": null,
+        "stages": {}
+      },
+      "final:fabrica->guaira": {
+        "samples": 445,
+        "collisionSamples": 0,
+        "conservativeMarginUnresolvedSamples": 0,
+        "wheelSamples": 237,
+        "unsupportedWheelSamples": 0,
+        "minTriangleAabbLowerBound": null,
+        "minSampledSurfaceUpperBound": null,
+        "stages": {}
+      }
+    }
+  },
+  "water": {
+    "patches": 8,
+    "scratchPixels": 2266,
+    "footprintUnchanged": true
+  },
+  "browser": {
+    "entries": [
+      {
+        "id": "guaira-travessia",
+        "mounted": "guaira-travessia",
+        "returned": "guaira-travessia",
+        "place": "Estrada do Vento"
+      },
+      {
+        "id": "guaira-respiros",
+        "mounted": "guaira-respiros",
+        "returned": "guaira-respiros",
+        "place": "Passarela dos Arrozais"
+      },
+      {
+        "id": "guaira-lab",
+        "mounted": "guaira-lab",
+        "returned": "guaira-lab",
+        "place": "Curral da Comporta"
+      },
+      {
+        "id": "guaira-subida",
+        "mounted": "guaira-subida",
+        "returned": "guaira-subida",
+        "place": "Inspeção da Casa da Vazão"
+      },
+      {
+        "id": "guaira-prefeito",
+        "mounted": "guaira-prefeito",
+        "returned": "guaira-prefeito",
+        "place": "Casa da Vazão"
+      },
+      {
+        "id": "guaira-patio-comportas",
+        "mounted": "guaira-patio-comportas",
+        "returned": "guaira-patio-comportas",
+        "place": "Pátio das Comportas"
+      },
+      {
+        "id": "gallery",
+        "mounted": "guaira-galeria",
+        "returned": "gallery",
+        "place": "Subsolo do Bairro Vala Seca"
+      },
+      {
+        "id": "relief",
+        "mounted": "guaira-camara-alivio",
+        "returned": "relief",
+        "place": "Coletor de Alívio"
+      }
+    ],
+    "desktop": {
+      "frames": 1276,
+      "offscreen": 0,
+      "plaqueOverlaps": 0
+    },
+    "mobile": {
+      "frames": 852,
+      "offscreen": 0,
+      "plaqueOverlaps": 0
+    },
+    "arrival": {
+      "chapter": "guaira",
+      "arrived": "guaira-travessia",
+      "active": false
+    },
+    "departure": {
+      "guaira": false,
+      "actor": null,
+      "arrived": "3-5"
+    },
+    "errors": []
+  }
+}

@@ -20,6 +20,7 @@ faces = data['terrain']['triangles']
 road_vertices = data['paving']['vertices']
 road_faces = data['paving']['triangles']
 CLEARANCE = .085
+MINIMUM_TERRAIN_HEIGHT = data.get('minimumTerrainHeight', 1)
 
 
 def plane(a, b, c):
@@ -43,7 +44,7 @@ planes = []
 for index, face in enumerate(faces):
     points = [vertices[i] for i in face]
     p = plane(*points)
-    if p is None or max(point[2] for point in points) < 1:
+    if p is None or max(point[2] for point in points) < MINIMUM_TERRAIN_HEIGHT:
         continue
     polygons.append(Polygon([v[:2] for v in points]))
     face_indices.append(index)

@@ -1,4 +1,5 @@
 import { MAYOR_PALETTE as M, type GuairaMayorArtState, type MayorRect } from './GuairaMayorArt';
+import { drawGuairaLandscape, drawGuairaTree, drawGuairaAwning } from './GuairaScenery';
 
 /** The isolated arena uses only GROUND tiles plus the three real WorldObjects below. */
 export const MAYOR_ART_OBJECTS = Object.freeze({valve:'guaira-mayor-register',lift:'guaira-mayor-lift',deck:'guaira-mayor-deck'});
@@ -33,14 +34,18 @@ export function drawGuairaMayorBackground(c:CanvasRenderingContext2D,m:GuairaMay
     layer(c,cx,cy,(cx,cy)=>{
         const r=(x:number,y:number,w:number,h:number,color:string)=>rect(c,x-cx,y-cy,w,h,color);
         const t=reducedMotion||!Number.isFinite(time)?0:Math.max(0,time);
-        rect(c,0,0,320,180,'#e7bd91');rect(c,0,0,320,53,'#edcda4');
-        oval(c,62-cx,80-cy,17,17,'#f4dcaf');
+        drawGuairaLandscape(c,cx,cy,t,reducedMotion,'town');
+        drawGuairaTree(c,209-cx,198-cy,80,t,209,true);
         // Distant township: deliberately soft roofs and no pale playable lips.
         for(const [x,y,w,h] of [[-12,138,63,66],[39,127,44,77],[85,144,61,61],[132,128,67,79]]){
             r(x+3,y+6,w-6,h-6,'#c8a586');r(x,y,w,5,'#bd9079');r(x+6,y-3,w-12,3,'#cb9b80');
             r(x+13,y+20,9,20,'#b29b87');r(x+15,y+22,5,16,'#8eaaa0');
             r(x+w-23,y+19,10,12,'#ad927c');r(x+w-21,y+21,6,8,'#9cb1a1');
+            r(x+8,y+h-4,w-14,3,'#b39b7c');
+            r(x+8,y+8,w-18,1,'#d8b797');
         }
+        drawGuairaAwning(c,52-cx,166-cy,22,t,52);
+        drawGuairaAwning(c,145-cx,168-cy,27,t,145);
         // Quiet service wall, warm stone and sparse vines.
         r(0,195,320,29,'#c4936e');r(0,214,320,10,'#cc9c70');
         for(let x=7;x<320;x+=37){r(x,213,14,1,'#b78967');r(x+6,216,2,3,'#b98b64');}

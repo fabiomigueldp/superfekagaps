@@ -1,0 +1,682 @@
+{
+  "revision": 10,
+  "testsPassed": 365,
+  "testsFailed": 0,
+  "testFiles": [
+    "tests/delicia-campaign.test.ts",
+    "tests/delicia-map-journey.test.ts",
+    "tests/world-atlas-art.test.ts",
+    "tests/world-atlas-model.test.ts",
+    "tests/world-chapter-map.test.ts",
+    "tests/world-journey-bridge.test.ts",
+    "tests/world-journey-model.test.ts",
+    "tests/world-journey-network.test.ts",
+    "tests/world-map-assets.test.ts",
+    "tests/world-map-controls.test.ts",
+    "tests/world-map-depth.test.ts",
+    "tests/world-map-framing.test.ts",
+    "tests/world-map-hud.test.ts",
+    "tests/world-map-integration.test.ts",
+    "tests/world-map-model.test.ts",
+    "tests/world-map-shortcut-layout.test.ts",
+    "tests/world-map-sign-art.test.ts"
+  ],
+  "build": "passed",
+  "buildIncludes": [
+    "level validation",
+    "player assets validation",
+    "World validation",
+    "TypeScript"
+  ],
+  "navigation": {
+    "revision": 10,
+    "comparedWith": 9,
+    "landings": 14,
+    "routes": 16,
+    "coordinatesDepthsAndTimingPreserved": true,
+    "source": "docs/world/delicia/island-map-v10.json"
+  },
+  "landscape": {
+    "revision": 10,
+    "foundations": [
+      {
+        "name": "Garden limestone terrace • grounded stone base",
+        "boundarySamples": 735,
+        "minimumEmbedMeters": 0.22,
+        "previousMaximumGapMeters": 3.1366
+      },
+      {
+        "name": "Campanile plinth • grounded stone base",
+        "boundarySamples": 209,
+        "minimumEmbedMeters": 0.2138,
+        "previousMaximumGapMeters": 1.2228
+      },
+      {
+        "name": "Foundation • grounded stone base",
+        "boundarySamples": 311,
+        "minimumEmbedMeters": 0.22,
+        "previousMaximumGapMeters": 0.3604
+      },
+      {
+        "name": "Foundation.005 • grounded stone base",
+        "boundarySamples": 323,
+        "minimumEmbedMeters": 0.22,
+        "previousMaximumGapMeters": 0.8615
+      },
+      {
+        "name": "Foundation.007 • grounded stone base",
+        "boundarySamples": 281,
+        "minimumEmbedMeters": 0.22,
+        "previousMaximumGapMeters": 0.5443
+      }
+    ],
+    "walls": [
+      {
+        "wall": "Old orchard retaining wall",
+        "run": 1,
+        "samples": 23,
+        "lengthMeters": 2.166
+      },
+      {
+        "wall": "Old orchard retaining wall",
+        "run": 2,
+        "samples": 35,
+        "lengthMeters": 4.035
+      },
+      {
+        "wall": "Old orchard retaining wall",
+        "run": 3,
+        "samples": 8,
+        "lengthMeters": 0.723
+      },
+      {
+        "wall": "Coastal path retaining wall",
+        "run": 1,
+        "samples": 131,
+        "lengthMeters": 14.637
+      }
+    ],
+    "dressedStones": 509,
+    "trimmedVines": 10,
+    "preservedObjects": [
+      "Old orchard retaining wall",
+      "Old orchard retaining wall coping",
+      "Old orchard retaining wall.001",
+      "Old orchard retaining wall coping.001",
+      "Old orchard retaining wall.002",
+      "Old orchard retaining wall coping.002",
+      "Old orchard retaining wall.003",
+      "Old orchard retaining wall coping.003",
+      "Old orchard retaining wall.004",
+      "Old orchard retaining wall coping.004",
+      "Old orchard retaining wall.005",
+      "Old orchard retaining wall coping.005",
+      "Old orchard retaining wall.006",
+      "Old orchard retaining wall coping.006",
+      "Old orchard retaining wall.007",
+      "Old orchard retaining wall coping.007",
+      "Old orchard retaining wall.008",
+      "Old orchard retaining wall coping.008",
+      "Old orchard retaining wall.009",
+      "Old orchard retaining wall coping.009",
+      "Old orchard retaining wall.010",
+      "Old orchard retaining wall coping.010",
+      "Old orchard retaining wall.011",
+      "Old orchard retaining wall coping.011",
+      "Old orchard retaining wall.012",
+      "Old orchard retaining wall coping.012",
+      "Old orchard retaining wall.013",
+      "Old orchard retaining wall coping.013",
+      "Old orchard retaining wall.014",
+      "Old orchard retaining wall coping.014",
+      "Old orchard retaining wall.015",
+      "Old orchard retaining wall coping.015",
+      "Old orchard retaining wall.016",
+      "Old orchard retaining wall coping.016",
+      "Old orchard retaining wall.017",
+      "Old orchard retaining wall coping.017",
+      "Old orchard retaining wall.020",
+      "Old orchard retaining wall coping.020",
+      "Old orchard retaining wall.021",
+      "Old orchard retaining wall coping.021",
+      "Old orchard retaining wall.022",
+      "Old orchard retaining wall coping.022",
+      "Old orchard retaining wall.023",
+      "Old orchard retaining wall coping.023",
+      "Coastal path retaining wall",
+      "Coastal path retaining wall coping",
+      "Coastal path retaining wall.001",
+      "Coastal path retaining wall coping.001",
+      "Coastal path retaining wall.002",
+      "Coastal path retaining wall coping.002",
+      "Coastal path retaining wall.003",
+      "Coastal path retaining wall coping.003",
+      "Coastal path retaining wall.004",
+      "Coastal path retaining wall coping.004",
+      "Coastal path retaining wall.005",
+      "Coastal path retaining wall coping.005",
+      "Coastal path retaining wall.006",
+      "Coastal path retaining wall coping.006",
+      "Coastal path retaining wall.007",
+      "Coastal path retaining wall coping.007",
+      "Coastal path retaining wall.008",
+      "Coastal path retaining wall coping.008",
+      "Coastal path retaining wall.009",
+      "Coastal path retaining wall coping.009",
+      "Coastal path retaining wall.010",
+      "Coastal path retaining wall coping.010",
+      "Coastal path retaining wall.011",
+      "Coastal path retaining wall coping.011",
+      "Coastal path retaining wall.012",
+      "Coastal path retaining wall coping.012",
+      "Coastal path retaining wall.013",
+      "Coastal path retaining wall coping.013",
+      "Coastal path retaining wall.014",
+      "Coastal path retaining wall coping.014",
+      "Coastal path retaining wall.015",
+      "Coastal path retaining wall coping.015",
+      "Coastal path retaining wall.016",
+      "Coastal path retaining wall coping.016",
+      "Coastal path retaining wall.017",
+      "Coastal path retaining wall coping.017",
+      "Coastal path retaining wall.018",
+      "Coastal path retaining wall coping.018",
+      "Coastal path retaining wall.019",
+      "Coastal path retaining wall coping.019",
+      "Coastal path retaining wall.020",
+      "Coastal path retaining wall coping.020",
+      "Coastal path retaining wall.021",
+      "Coastal path retaining wall coping.021",
+      "Coastal path retaining wall.022",
+      "Coastal path retaining wall coping.022",
+      "Coastal path retaining wall.023",
+      "Coastal path retaining wall coping.023",
+      "Pergola trailing foliage",
+      "Pergola trailing foliage.001",
+      "Pergola trailing foliage.002",
+      "Pergola trailing foliage.003",
+      "Pergola trailing foliage.004",
+      "Pergola trailing foliage.005",
+      "Pergola trailing foliage.006",
+      "Pergola trailing foliage.007",
+      "Pergola trailing foliage.008",
+      "Pergola trailing foliage.009"
+    ]
+  },
+  "exportedGeometry": {
+    "revision": 10,
+    "closedNewMeshes": 14,
+    "foundations": [
+      {
+        "name": "Garden limestone terrace • grounded stone base",
+        "boundarySamples": 735,
+        "minimumEmbedMeters": 0.22,
+        "previousMaximumGapMeters": 3.1366
+      },
+      {
+        "name": "Campanile plinth • grounded stone base",
+        "boundarySamples": 209,
+        "minimumEmbedMeters": 0.2138,
+        "previousMaximumGapMeters": 1.2228
+      },
+      {
+        "name": "Foundation • grounded stone base",
+        "boundarySamples": 311,
+        "minimumEmbedMeters": 0.22,
+        "previousMaximumGapMeters": 0.3604
+      },
+      {
+        "name": "Foundation.005 • grounded stone base",
+        "boundarySamples": 323,
+        "minimumEmbedMeters": 0.22,
+        "previousMaximumGapMeters": 0.8615
+      },
+      {
+        "name": "Foundation.007 • grounded stone base",
+        "boundarySamples": 281,
+        "minimumEmbedMeters": 0.22,
+        "previousMaximumGapMeters": 0.5443
+      }
+    ],
+    "paving": {
+      "triangleContacts": 50893,
+      "intersectionsBefore": 0,
+      "maxIntrusionBeforeMeters": 0,
+      "minimumClearanceBeforeMeters": 0.085,
+      "intersectionsAfter": 0,
+      "minimumClearanceMeters": 0.085,
+      "seatedVertices": 0,
+      "largestCorrectionMeters": 0
+    }
+  },
+  "wallClearance": [
+    {
+      "name": "Old orchard retaining wall",
+      "run": 1,
+      "pavingOverlapM2": 0.0,
+      "minimumClearanceM": 0.04374
+    },
+    {
+      "name": "Old orchard retaining wall",
+      "run": 2,
+      "pavingOverlapM2": 0.0,
+      "minimumClearanceM": 0.04021
+    },
+    {
+      "name": "Old orchard retaining wall",
+      "run": 3,
+      "pavingOverlapM2": 0.0,
+      "minimumClearanceM": 0.12
+    },
+    {
+      "name": "Coastal path retaining wall",
+      "run": 1,
+      "pavingOverlapM2": 0.0,
+      "minimumClearanceM": 0.33395
+    }
+  ],
+  "depthEnvelope": [
+    {
+      "id": "harbor-orchard",
+      "samples": 1074,
+      "minBody": 0.298,
+      "minimumHead": 0.729,
+      "hiddenHeads": []
+    },
+    {
+      "id": "orchard-aqueduct",
+      "samples": 229,
+      "minBody": 0.683,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "west-bank",
+      "samples": 468,
+      "minBody": 0.837,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "five-harvests-bridge",
+      "samples": 378,
+      "minBody": 0.875,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "archive-approach",
+      "samples": 235,
+      "minBody": 0.529,
+      "minimumHead": 0.49,
+      "hiddenHeads": []
+    },
+    {
+      "id": "aqueduct-promenade",
+      "samples": 819,
+      "minBody": 0.542,
+      "minimumHead": 0.875,
+      "hiddenHeads": []
+    },
+    {
+      "id": "source-pilgrims",
+      "samples": 445,
+      "minBody": 0.792,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "roots-sanctuary",
+      "samples": 139,
+      "minBody": 0.683,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "orange-tide",
+      "samples": 192,
+      "minBody": 0.856,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "refinery-street",
+      "samples": 299,
+      "minBody": 0.545,
+      "minimumHead": 0.531,
+      "hiddenHeads": []
+    },
+    {
+      "id": "refinery-court",
+      "samples": 149,
+      "minBody": 1.0,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "garden-gate",
+      "samples": 246,
+      "minBody": 0.702,
+      "minimumHead": 0.917,
+      "hiddenHeads": []
+    },
+    {
+      "id": "clock-sanctuary",
+      "samples": 133,
+      "minBody": 0.936,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "boiler-approach",
+      "samples": 94,
+      "minBody": 1.0,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "palace-ascent",
+      "samples": 222,
+      "minBody": 0.747,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    },
+    {
+      "id": "palace-stair",
+      "samples": 399,
+      "minBody": 0.821,
+      "minimumHead": 1.0,
+      "hiddenHeads": []
+    }
+  ],
+  "walks": {
+    "trips": [
+      "delicia-2",
+      "delicia-3",
+      "delicia-4",
+      "delicia-5",
+      "delicia-6",
+      "delicia-7",
+      "delicia-raizes",
+      "delicia-9",
+      "delicia-relogio",
+      "delicia-10",
+      "delicia-11",
+      "delicia-12"
+    ],
+    "desktop": {
+      "frames": 2147,
+      "offscreen": 0,
+      "overlaps": 0,
+      "depthReads": 2147,
+      "maxFrame": 23.200000002980232
+    },
+    "mobile": {
+      "frames": 217,
+      "offscreen": 0,
+      "overlaps": 0,
+      "depthReads": 217,
+      "maxFrame": 1.6000000014901161
+    },
+    "errors": []
+  },
+  "browser": {
+    "walking": {
+      "arrived": "delicia-1",
+      "destination": "delicia-2",
+      "point": {
+        "x": -2.1889796611239873,
+        "y": -1.3464438338374825
+      },
+      "disabled": true,
+      "saved": "delicia-1"
+    },
+    "reversal": {
+      "before": {
+        "x": -1.9084232483725816,
+        "y": -1.2812605040273624
+      },
+      "after": {
+        "x": -1.9084232483725816,
+        "y": -1.2812605040273624
+      },
+      "direction": -1
+    },
+    "returned": {
+      "arrived": "delicia-2",
+      "destination": "delicia-3",
+      "canEnter": false,
+      "chapter": "delicia"
+    },
+    "landings": [
+      {
+        "id": "delicia-1",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -2.1923219200000004,
+          "y": -1.3497522000000002
+        },
+        "buttons": 5
+      },
+      {
+        "id": "delicia-2",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.7556930000000004,
+          "y": -2.068556
+        },
+        "buttons": 7
+      },
+      {
+        "id": "delicia-3",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.7010482800000002,
+          "y": -2.04916572
+        },
+        "buttons": 6
+      },
+      {
+        "id": "delicia-4",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.6871359400000001,
+          "y": -1.5444584
+        },
+        "buttons": 8
+      },
+      {
+        "id": "delicia-5",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.19771376,
+          "y": -1.5853241599999999
+        },
+        "buttons": 10
+      },
+      {
+        "id": "delicia-6",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.34419126,
+          "y": -2.00910076
+        },
+        "buttons": 11
+      },
+      {
+        "id": "delicia-7",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.5034703800000002,
+          "y": -1.21245504
+        },
+        "buttons": 12
+      },
+      {
+        "id": "delicia-8",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.0908579200000001,
+          "y": -1.40075432
+        },
+        "buttons": 7
+      },
+      {
+        "id": "delicia-9",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -0.9362868799999999,
+          "y": -0.9851224799999998
+        },
+        "buttons": 4
+      },
+      {
+        "id": "delicia-10",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -0.8951312200000001,
+          "y": -1.4252551599999999
+        },
+        "buttons": 6
+      },
+      {
+        "id": "delicia-11",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -0.7395022400000002,
+          "y": -1.60125306
+        },
+        "buttons": 5
+      },
+      {
+        "id": "delicia-12",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -0.8947082,
+          "y": -2.01856788
+        },
+        "buttons": 4
+      },
+      {
+        "id": "delicia-raizes",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -1.7144317800000002,
+          "y": -2.20374326
+        },
+        "buttons": 4
+      },
+      {
+        "id": "delicia-relogio",
+        "entered": true,
+        "destination": null,
+        "point": {
+          "x": -0.83995766,
+          "y": -0.89024744
+        },
+        "buttons": 2
+      }
+    ],
+    "touch": [
+      "delicia-2",
+      "delicia-3",
+      "delicia-4",
+      "delicia-5",
+      "delicia-6",
+      "delicia-7",
+      "delicia-8",
+      "delicia-9",
+      "delicia-10",
+      "delicia-11",
+      "delicia-12"
+    ],
+    "reduced": {
+      "arrived": "delicia-1",
+      "destination": null,
+      "enabled": true
+    },
+    "locked": {
+      "arrived": "delicia-1",
+      "blocked": "unavailable",
+      "enabled": false,
+      "saved": "delicia-1",
+      "active": false
+    },
+    "errors": []
+  },
+  "captures": {
+    "revision": 10,
+    "landings": [
+      {
+        "id": "delicia-1",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-2",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-3",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-4",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-5",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-6",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-7",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-8",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-9",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-10",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-11",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-12",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-raizes",
+        "canEnter": true
+      },
+      {
+        "id": "delicia-relogio",
+        "canEnter": true
+      }
+    ],
+    "errors": []
+  }
+}

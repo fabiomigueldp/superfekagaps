@@ -284,11 +284,11 @@ export function drawGalleryBackground(c: CanvasRenderingContext2D, cx: number, c
         const wx = 625 - cameraX, wy = 118 - cameraY;
         r(c, wx, wy, 32, 35, '#b39876'); r(c, wx + 2, wy + 2, 28, 31, '#e3c49a');
         r(c, wx + 4, wy + 4, 24, 25, '#d4ac83');
-        r(c, wx + 4, wy + 4, 24, 12, '#eac799');
+        r(c, wx + 4, wy + 4, 24, 12, '#d6dac1');
         // The same dry field horizon as the water workshop, seen through a
         // smaller opening. Muted olive belongs inside the aperture only.
         polygon(c, [[wx + 4,wy + 20],[wx + 10,wy + 16],[wx + 19,wy + 20],
-            [wx + 27,wy + 18],[wx + 27,wy + 28],[wx + 4,wy + 28]], '#b49a77');
+            [wx + 27,wy + 18],[wx + 27,wy + 28],[wx + 4,wy + 28]], '#b8b39a');
         r(c, wx + 5, wy + 24, 21, 2, '#9d9c7b');
         r(c, wx + 14, wy + 3, 3, 28, '#c0a17a');
         r(c, wx + 4, wy + 16, 24, 2, '#c0a17a');

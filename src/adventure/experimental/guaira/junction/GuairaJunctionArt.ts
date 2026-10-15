@@ -4,6 +4,7 @@ import { pixelText } from '../../../../graphics/BitmapFont';
 import { supportsStanding, isOneWayTile } from '../../../../world/tileRules';
 import { drawGuairaWorker } from '../GuairaWorkerArt';
 import { GUAIRA_JUNCTION as G, type JunctionRouting, type WaterOutlet } from './GuairaJunctionModel';
+import { drawGuairaLandscape, drawGuairaTree, drawGuairaFieldBank, drawGuairaAwning, guairaBreeze, sceneryTime } from '../GuairaScenery';
 
 const P = Object.freeze({ ink: '#4c4144', sky: '#e9c69c', earth: '#b66f50', earthDark: '#875342',
     sand: '#edc78d', wood: '#94785b', bronze: '#b99465', pipe: '#735b4b', dry: '#bd9165',
@@ -15,8 +16,8 @@ function scene(c: CanvasRenderingContext2D, cx: number, cy: number, draw: (x: nu
     draw(Math.round(cx), Math.round(cy)); c.restore();
 }
 
-function sign(c: CanvasRenderingContext2D, x: number, y: number, label: string, width: number) {
-    r(c, x + 5, y + 14, 2, 9, P.wood); r(c, x, y, width, 14, P.pipe);
+function sign(c: CanvasRenderingContext2D, x: number, y: number, label: string, width: number, supportY: number) {
+    r(c, x + Math.floor(width / 2), y + 14, 2, supportY - y - 14, P.wood); r(c, x, y, width, 14, P.pipe);
     r(c, x + 1, y + 1, width - 2, 11, '#d5b68a'); pixelText(c, label, x + 4, y + 4, P.ink);
 }
 
@@ -36,25 +37,29 @@ function pipe(c: CanvasRenderingContext2D, x: number, y: number, length: number,
 /** Backdrop only: every usable edge is rendered by terrain/objects from the engine. */
 export function drawJunctionBackground(c: CanvasRenderingContext2D, cx: number, cy: number, time: number, reduced: boolean, routing: JunctionRouting) {
     scene(c, cx, cy, (cameraX, cameraY) => {
-        const t = reduced ? 0 : time;
-        r(c, 0, 23, 320, 157, P.sky); r(c, 0, 23, 320, 38, '#eed1a7');
-        for (let i = -1; i < 6; i++) {
-            const x = i * 92 - Math.round(cameraX * .14) % 92;
-            r(c, x, 99 - Math.round(cameraY * .2), 75, 28, '#c89c78');
-            r(c, x + 12, 89 - Math.round(cameraY * .2), 48, 12, '#d4ac83');
-        }
+        const t = sceneryTime(time, reduced);
+        drawGuairaLandscape(c, cameraX, cameraY, t, reduced, 'junction');
+        drawGuairaFieldBank(c, 8 - cameraX, 284 - cameraY, 182, 400 - cameraY);
+        drawGuairaTree(c, 125 - cameraX, 289 - cameraY, 75, t, 125, true);
+        drawGuairaTree(c, 718 - cameraX, 206 - cameraY, 61, t, 718, true);
+        for (const [left, right] of [[752, G.exitGapStartX], [G.exitGapEndX, 964]])
+            drawGuairaFieldBank(c, left - cameraX, 166 - cameraY, right - left, 208 - cameraY);
         // The dry neighbourhood and the irrigated rows share an ordinary working landscape.
         const hx = 24 - cameraX, hy = 228 - cameraY;
         r(c, hx, hy, 94, 61, '#c8a784'); r(c, hx + 3, hy + 3, 88, 58, '#e0c29a');
         roof(c, hx - 6, hy - 16, 106, 18); r(c, hx + 19, hy + 25, 20, 36, '#796454');
         r(c, hx + 60, hy + 18, 20, 20, '#749a90'); r(c, hx + 69, hy + 18, 2, 20, '#d7b98b');
+        drawGuairaAwning(c, hx + 17, hy + 23, 24, t, 41);
         for (let row = 0; row < 3; row++) for (let x = 760; x < 960; x += 20) {
             if (x >= G.exitGapStartX && x < G.exitGapEndX) continue;
             const y = 168 + row * 10;
+            const sway = guairaBreeze(t, x + row * 23);
             line(c, x - cameraX, y - cameraY, x + 17 - cameraX, y - cameraY, '#89a89a', 2);
-            line(c, x + 8 - cameraX, y - 6 - cameraY, x + 8 - cameraX, y - cameraY, P.darkGreen);
-            line(c, x + 3 - cameraX, y - 5 - cameraY, x + 8 - cameraX, y - cameraY, P.green);
-            line(c, x + 13 - cameraX, y - 5 - cameraY, x + 8 - cameraX, y - cameraY, P.green);
+            line(c, x + 8 + sway - cameraX, y - 8 - cameraY, x + 8 - cameraX, y - cameraY, P.darkGreen);
+            line(c, x + 3 + sway - cameraX, y - 5 - cameraY, x + 8 - cameraX, y - cameraY, P.green);
+            line(c, x + 13 + sway - cameraX, y - 5 - cameraY, x + 8 - cameraX, y - cameraY, P.green);
+            r(c, x + 8 + sway - cameraX, y - 8 - cameraY, 2, 2, '#b2b87c');
+            r(c, x + 7 - cameraX, y - cameraY, 4, 1, '#779674');
         }
         // One intake, one bifurcation. Distinct A/B labels are redundant with colour.
         pipe(c, 132 - cameraX, 276 - cameraY, 176, true, t, reduced);
@@ -62,7 +67,7 @@ export function drawJunctionBackground(c: CanvasRenderingContext2D, cx: number, 
         r(c, 123 - cameraX, 253 - cameraY, 24, 29, '#d6b98b');
         r(c, 127 - cameraX, 260 - cameraY, 16, 13, P.waterShade);
         r(c, 129 - cameraX, 261 - cameraY, 12, 9, P.water);
-        sign(c, 112 - cameraX, 227 - cameraY, 'AGUA LIMPA', 70);
+        sign(c, 112 - cameraX, 227 - cameraY, 'AGUA LIMPA', 70, 253 - cameraY);
         pipe(c, 300 - cameraX, 284 - cameraY, 104, routing.supplied === 'a', t, reduced, true);
         pipe(c, 300 - cameraX, 200 - cameraY, 361, routing.supplied === 'b', t, reduced);
         pipe(c, 300 - cameraX, 208 - cameraY, 76, routing.supplied === 'b', t, reduced, true);
@@ -70,10 +75,11 @@ export function drawJunctionBackground(c: CanvasRenderingContext2D, cx: number, 
         r(c, 291 - cameraX, 270 - cameraY, 26, 23, P.pipe);
         r(c, 293 - cameraX, 272 - cameraY, 22, 19, P.bronze);
         pixelText(c, routing.supplied.toUpperCase(), 301 - cameraX, 277 - cameraY, routing.warning ? P.warning : P.ink);
-        sign(c, 279 - cameraX, 308 - cameraY, 'A', 18);
-        sign(c, 631 - cameraX, 180 - cameraY, 'B', 18);
-        sign(c, 42 - cameraX, 264 - cameraY, 'BAIRRO', 47);
-        sign(c, 862 - cameraX, 166 - cameraY, 'ARROZAL', 53);
+        r(c, 296 - cameraX, 314 - cameraY, 7, 2, P.wood);
+        sign(c, 279 - cameraX, 308 - cameraY, 'A', 18, 322 - cameraY);
+        sign(c, 631 - cameraX, 180 - cameraY, 'B', 18, 200 - cameraY);
+        sign(c, 42 - cameraX, 264 - cameraY, 'BAIRRO', 47, 296 - cameraY);
+        sign(c, 862 - cameraX, 166 - cameraY, 'ARROZAL', 53, 200 - cameraY);
         // This reward is an authored A-side choice, not a third water outlet.
         // Hang the clue below its perch: the fixed HUD otherwise covers a sign
         // above the coins while Feka is deciding from raised A.
@@ -81,9 +87,13 @@ export function drawJunctionBackground(c: CanvasRenderingContext2D, cx: number, 
         r(c, 170 - cameraX, 192 - cameraY, 64, 13, P.pipe);
         r(c, 171 - cameraX, 193 - cameraY, 62, 11, '#d5b68a');
         pixelText(c, 'A: MOEDAS', 174 - cameraX, 196 - cameraY, P.ink);
-        sign(c, 517 - cameraX, 214 - cameraY, 'B: SIGA', 52);
-        sign(c, 472 - cameraX, 359 - cameraY, '< ENTRADA', 70);
-        sign(c, 104 - cameraX, 366 - cameraY, 'DEGRAU', 48);
+        sign(c, 517 - cameraX, 214 - cameraY, 'B: SIGA', 52, 248 - cameraY);
+        // The bitmap font has no '<' glyph. Draw the return arrow in pixels.
+        sign(c, 472 - cameraX, 359 - cameraY, '  ENTRADA', 70, 392 - cameraY);
+        line(c, 477 - cameraX, 365 - cameraY, 484 - cameraX, 365 - cameraY, P.ink);
+        line(c, 480 - cameraX, 362 - cameraY, 477 - cameraX, 365 - cameraY, P.ink);
+        line(c, 477 - cameraX, 365 - cameraY, 480 - cameraX, 368 - cameraY, P.ink);
+        sign(c, 104 - cameraX, 366 - cameraY, 'DEGRAU', 48, 392 - cameraY);
         // Supporting posts stay behind the open recovery route; no painted ledge.
         for (const [x, top] of [[40,304],[200,304],[404,256],[552,256],[768,208],[920,208]]) {
             r(c, x - cameraX, top + 9 - cameraY, 8, 391 - top, '#a58d74');
@@ -94,6 +104,8 @@ export function drawJunctionBackground(c: CanvasRenderingContext2D, cx: number, 
             r(c, x - cameraX, G.terraceY - 10 - cameraY, 3, 10, P.wood);
             r(c, x - 1 - cameraX, G.terraceY - 11 - cameraY, 5, 2, P.deck);
         }
+        // Dry service yard meets every lower sign and the real recovery floor.
+        r(c, 0, G.recoveryY - 8 - cameraY, 320, 8, '#bda078');
     });
 }
 

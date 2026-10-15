@@ -55,10 +55,10 @@
       "alpha": true
     },
     {
-      "source": "docs/world/delicia/island-render-v8.png",
+      "source": "docs/world/delicia/island-render-v11.png",
       "file": "public/assets/delicia/island.webp",
-      "bytes": 350454,
-      "sha256": "47a23022817de33fbc2f2f25c4296e2db4eb457f00880d5ec39e124ad2428535",
+      "bytes": 354056,
+      "sha256": "cab48527e4c7b8e9059c55667abb50750d40ad6296b469ec8902d2acbfcf80e3",
       "width": 2560,
       "height": 1600,
       "alpha": true
@@ -118,10 +118,10 @@
       "alpha": false
     },
     {
-      "source": "docs/world/delicia/island-depth-v8.png",
+      "source": "docs/world/delicia/island-depth-v11.png",
       "file": "public/assets/delicia/island-depth.png",
-      "bytes": 903729,
-      "sha256": "6bea268c101c6c1ddeb8461cd535defb0965271932985551f8a848e0665033d8",
+      "bytes": 910558,
+      "sha256": "5e3368ef907fe05dfd6ee5db82386671c8d0eab065b2a6b791fc5e52981c73df",
       "width": 2560,
       "height": 1600,
       "alpha": false,

@@ -6,6 +6,7 @@ import { pixelText } from '../../../graphics/BitmapFont';
 import { isOneWayTile, supportsStanding } from '../../../world/tileRules';
 import { ascentMechanicalPose } from './GuairaAscentMotion';
 import { ascentTravelDirection } from './GuairaAscentTravelCue';
+import { drawGuairaLandscape, drawGuairaTree, drawGuairaAwning } from './GuairaScenery';
 
 /** Scenery is presentation only. Tiles and WorldObjects own every supporting surface. */
 export const GUAIRA_ASCENT_ART = Object.freeze({
@@ -43,6 +44,7 @@ function layer(c: CanvasRenderingContext2D, cx: number, cy: number, draw: (x: nu
 }
 
 function cactus(c: CanvasRenderingContext2D, x: number, y: number, h: number) {
+    oval(c, x - 5, y - 1, 17, 3, '#ad8766');
     r(c, x, y - h + 2, 6, h - 2, P.leafShade);
     r(c, x + 1, y - h, 4, h - 2, P.leaf);
     r(c, x + 2, y - h + 2, 1, h - 5, P.leafLight);
@@ -52,10 +54,10 @@ function cactus(c: CanvasRenderingContext2D, x: number, y: number, h: number) {
     r(c, x + 10, y - h + 13, 3, 8, P.leaf);
 }
 
-function sign(c: CanvasRenderingContext2D, x: number, y: number, w: number, rows: readonly string[]) {
+function sign(c: CanvasRenderingContext2D, x: number, y: number, w: number, rows: readonly string[], supportY: number) {
     const h = rows.length * 8 + 5;
-    r(c, x + 5, y + h, 2, 8, '#a58a68');
-    r(c, x + w - 7, y + h, 2, 8, '#a58a68');
+    r(c, x + 5, y + h, 2, supportY - y - h, '#a58a68');
+    r(c, x + w - 7, y + h, 2, supportY - y - h, '#a58a68');
     r(c, x, y, w, h, '#967257');
     r(c, x + 1, y + 1, w - 2, h - 2, '#d7b787');
     r(c, x + 2, y + 2, w - 4, 1, '#e4c79a');
@@ -64,6 +66,7 @@ function sign(c: CanvasRenderingContext2D, x: number, y: number, w: number, rows
 
 function house(c: CanvasRenderingContext2D, x: number, floor: number, w: number, h: number) {
     const top = floor - h;
+    oval(c, x + 1, floor - 2, w, 5, '#ad8766');
     r(c, x + 4, top + 14, w - 8, h - 14, P.plasterShade);
     r(c, x + 5, top + 15, w - 18, h - 16, P.plaster);
     roof(c, x, top, w, 16);
@@ -187,7 +190,7 @@ function bureau(c: CanvasRenderingContext2D, cx: number, cy: number, t: number) 
     for (const yy of [97,121]) r(c, 993 - cx, yy - cy, 21, 3, '#7d6a56');
     oval(c, 992 - cx, 92 - cy, 23, 7, '#cfad79');
     oval(c, 995 - cx, 93 - cy, 17, 3, P.water);
-    sign(c, 948 - cx, 77 - cy, 72, ['PARTICULAR']);
+    sign(c, 948 - cx, 77 - cy, 72, ['PARTICULAR'], 99 - cy);
     // Public branch: shut shutter, cross brace and dry cracked trough. No victory implied.
     r(c, 820 - cx, 108 - cy, 8, 21, '#977858');
     r(c, 821 - cx, 109 - cy, 2, 18, '#c7a377');
@@ -208,15 +211,7 @@ function bureau(c: CanvasRenderingContext2D, cx: number, cy: number, t: number) 
 export function drawGuairaAscentBackground(c: CanvasRenderingContext2D, cx: number, cy: number, time: number, reducedMotion: boolean) {
     layer(c, cx, cy, (cameraX, cameraY) => {
         const t = artTime(time, reducedMotion);
-        r(c, 0, 0, 320, 180, '#e6bc8f');
-        r(c, 0, 0, 320, 36, '#ebcda4');
-        r(c, 0, 36, 320, 33, '#e8c397');
-        oval(c, 250 - Math.round(cameraX * .08), 40 - Math.round(cameraY * .05), 19, 19, '#f2d7a8');
-        for (let i = -1; i < 5; i++) {
-            const x = i * 116 - Math.round(cameraX * .13) % 116, y = 124 - Math.round(cameraY * .3);
-            polygon(c, [[x - 8,y + 18],[x + 12,y + 9],[x + 18,y],[x + 50,y + 2],[x + 63,y + 17],[x + 89,y + 14],[x + 121,y + 38],[x - 8,y + 38]], '#c99b79');
-            r(c, x + 21, y + 4, 22, 2, '#d7ad85');
-        }
+        drawGuairaLandscape(c, cameraX, cameraY, t, reducedMotion, 'heights');
         // The low distant irrigated valley has muted banks; no bright walkable ledges.
         const valley = 246 - Math.round(cameraY * .64);
         r(c, 0, valley, 320, 154, '#c49269');
@@ -238,8 +233,18 @@ export function drawGuairaAscentBackground(c: CanvasRenderingContext2D, cx: numb
             }
             r(c, x, 361 - cameraY, w, 7, '#d1a278');
         }
+        // A broad yard physically joins the architecture to each real bank.
+        // These matte slopes stop at the bank's edge, leaving both pits open.
+        for (const [left, right, top, bottom] of [[0,224,284,304],[496,656,284,304],[768,880,131,144]]) {
+            if (!visible(left, right - left, cameraX)) continue;
+            polygon(c, [[left-cameraX,top+5-cameraY],[left+14-cameraX,top+1-cameraY],
+                [right-18-cameraX,top-cameraY],[right-cameraX,top+6-cameraY],
+                [right-cameraX,bottom-cameraY],[left-cameraX,bottom-cameraY]], '#c49c74');
+        }
         if (visible(0, 224, cameraX)) {
+            drawGuairaTree(c, 149 - cameraX, 288 - cameraY, 58, t, 149, true);
             house(c, 10 - cameraX, 289 - cameraY, 68, 63);
+            drawGuairaAwning(c, 23 - cameraX, 257 - cameraY, 22, t, 23);
             cactus(c, 101 - cameraX, 293 - cameraY, 39);
             for (const wx of [111,137,161]) {
                 r(c, wx - cameraX, 269 - cameraY, 3, 26, '#a18a68');
@@ -247,13 +252,15 @@ export function drawGuairaAscentBackground(c: CanvasRenderingContext2D, cx: numb
             }
             r(c, 111 - cameraX, 276 - cameraY, 53, 2, '#b79b70');
             r(c, 111 - cameraX, 286 - cameraY, 53, 2, '#ac8f68');
-            sign(c, 146 - cameraX, 243 - cameraY, 66, ['ELA VAI', 'E VOLTA']);
+            sign(c, 146 - cameraX, 243 - cameraY, 66, ['ELA VAI', 'E VOLTA'], 296 - cameraY);
             r(c, -cameraX, 296 - cameraY, 224, 8, '#cb9467');
         }
+        // The canopy extends beyond the yard: cull the whole tree, not its bank.
+        drawGuairaTree(c, 520 - cameraX, 290 - cameraY, 76, t, 520, true);
         if (visible(496, 160, cameraX)) {
             // Maintenance nook stays behind and away from the checkpoint and boarding lip.
             house(c, 539 - cameraX, 288 - cameraY, 56, 60);
-            sign(c, 579 - cameraX, 246 - cameraY, 70, ['ELEVADOR', 'MANUTENCAO']);
+            sign(c, 579 - cameraX, 246 - cameraY, 70, ['ELEVADOR', 'MANUTENCAO'], 296 - cameraY);
             r(c, 588 - cameraX, 284 - cameraY, 18, 11, '#9d7858');
             r(c, 590 - cameraX, 285 - cameraY, 14, 2, '#ccb087');
             r(c, 594 - cameraX, 288 - cameraY, 5, 3, '#d0b488');
@@ -262,9 +269,10 @@ export function drawGuairaAscentBackground(c: CanvasRenderingContext2D, cx: numb
         if (visible(1088, 256, cameraX)) bureau(c, cameraX - 320, cameraY, t);
         if (visible(768, 320, cameraX)) {
             house(c, 778 - cameraX, 136 - cameraY, 56, 60);
-            sign(c, 823 - cameraX, 104 - cameraY, 54, ['VAZAO']);
+            drawGuairaAwning(c, 789 - cameraX, 102 - cameraY, 21, t, 789);
+            sign(c, 823 - cameraX, 104 - cameraY, 54, ['VAZAO'], 144 - cameraY);
             pipe(c, 884 - cameraX, 181 - cameraY, 196);
-            sign(c, 943 - cameraX, 196 - cameraY, 83, ['INSPECAO']);
+            sign(c, 943 - cameraX, 196 - cameraY, 83, ['INSPECAO'], 232 - cameraY);
             r(c, 883 - cameraX, 232 - cameraY, 202, 8, '#c99870');
         }
     });

@@ -71,6 +71,7 @@ for (const chapter of [false, true]) test(`native completed route retains ${chap
     const replay = JSON.parse(readFileSync(new URL('./helpers/guairaTraversalReplay.json', import.meta.url), 'utf8')) as { runs: Array<[number, string[]]> };
     for (const [count, keys] of replay.runs) h.run(game, count, keys);
     assert.equal(game.finished, true); assert.equal(game.canAdvanceToBoss, true);
+    assert.equal((game as unknown as { toastTimer: number }).toastTimer, 0, 'The last checkpoint notice cannot remain behind the completion card');
     const { calls, valveBanner } = paint(); assert.equal(valveBanner, false);
     const expected: Array<[number, number, number, number, string]> = [];
     const context = { fillStyle: '', fillRect(x: number, y: number, w: number, h: number) { expected.push([x, y, w, h, this.fillStyle]); } };

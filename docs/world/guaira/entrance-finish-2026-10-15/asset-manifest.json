@@ -1,0 +1,29 @@
+{
+  "revision": 5,
+  "files": {
+    "guaira.webp": {
+      "bytes": 138862,
+      "sha256": "17c023b713be4b12600d191f6a4c10acb39d4d6f3068e530b0e9c74c5465270e"
+    },
+    "guaira-depth.png": {
+      "bytes": 222485,
+      "sha256": "2f77c75ad5f18d501fe5f79e2a66df07952d7498c0cc2a492b25fe1045e60ca3"
+    },
+    "guaira-navigation.json": {
+      "bytes": 17029,
+      "sha256": "6887028704f09f907364d1386c78eaad59548ee022bee6c8b96b5cd8cff953e7"
+    },
+    "guaira-water-restored.webp": {
+      "bytes": 2800,
+      "sha256": "8a6b076a0f8458f72598067d2887db6d38cf30eeab6eefd3743cedea4ebfc390"
+    }
+  },
+  "source": "guaira-entrances.blend",
+  "sourceSHA256": "98138e8ceecea3a355fad7ad211ff762607cfc64123ed6e9bbd7f652b121160e",
+  "renderer": "Blender 5.2.1 LTS, Cycles CPU, 64 samples, paired beauty + linear depth",
+  "navigationChanged": false,
+  "phaseLocationsChanged": false,
+  "flightAnchorsChanged": false,
+  "terrainChanged": false,
+  "pavingChange": "Joined service-hoist apron; collector cavity cut out of the old paving cap."
+}

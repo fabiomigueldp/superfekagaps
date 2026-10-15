@@ -71,9 +71,11 @@ for (const [from, to] of [
     const region = from === 'factory' || to === 'factory' ? 'fabrica' : 'serra';
     const expected = ['journey-aircraft.webp', 'guaira-campaign/guaira.webp', `guaira-campaign/${region}.webp`];
     if (region === 'fabrica') expected.push('fabrica-diorama.webp');
-    assert.deepEqual([...h.requested].sort(), expected.map(file => campaignMapAsset(file)).sort());
+    // Revision queries invalidate paired island artwork without loading a new
+    // region or an obsolete base. Compare actual resource identities here.
+    assert.deepEqual(h.requested.map(path => path.split('?')[0]).sort(), expected.map(file => campaignMapAsset(file)).sort());
     h.step();
-    assert.ok(h.drawn.includes(campaignMapAsset(`guaira-campaign/${from === 'factory' ? 'fabrica' : from}.webp`)));
+    assert.ok(h.drawn.some(path => path.split('?')[0] === campaignMapAsset(`guaira-campaign/${from === 'factory' ? 'fabrica' : from}.webp`)));
     assert.equal(h.drawn.includes(campaignMapAsset('serra-diorama.webp')), false);
     if (from === 'factory') assert.ok(h.drawn.includes(campaignMapAsset('fabrica-diorama.webp')));
 });

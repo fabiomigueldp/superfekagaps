@@ -1,0 +1,26 @@
+{
+  "revision": 2,
+  "files": {
+    "guaira.webp": {
+      "bytes": 133614,
+      "sha256": "db874ca66667957bbd25ab28eeb2d6b39c90e8ece08cc2f6277ca1ca8715a4a0"
+    },
+    "guaira-depth.png": {
+      "bytes": 212482,
+      "sha256": "44bc5782c6dfaf785acbe728df0f652ced627cc17e0ba88f3563799ffac56465"
+    },
+    "guaira-navigation.json": {
+      "bytes": 12486,
+      "sha256": "b4fa4291109f0cb6502f15de262e06b3d71d625b59e5dd9cd31c78e73cbea079"
+    },
+    "guaira-water-restored.webp": {
+      "bytes": 2834,
+      "sha256": "1093a35971b97891b9f909aa15520a8f370c3e59e48f7fb7d6e1ecd6e08f9692"
+    }
+  },
+  "source": "guaira-terrain.blend",
+  "renderer": "Blender 5.2.1 LTS, Cycles CPU, 64 samples, paired beauty + linear depth",
+  "navigationChanged": false,
+  "flightAnchorsChanged": false,
+  "sourceSHA256": "2d256884f3bb504aedf7f3ca9e51a174f9d92f00606a8e2797cf090e12605851"
+}

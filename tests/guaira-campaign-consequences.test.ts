@@ -47,7 +47,7 @@ test('region preview layers the same earned water and removes a missing optional
     showGuairaRegion(save, '4-1', callbacks);
     const images = body.children.at(-1)!.children[0].children[1].children;
     assert.equal(images.length, 2); assert.equal(images[0].alt, '', 'The thumbnail is decorative; earned water is described in the panel.');
-    assert.match(images[1].src, /guaira-water-restored.webp$/);
+    assert.match(images[1].src.split('?')[0], /guaira-water-restored.webp$/);
     images[1].dispatchEvent(new Event('error'));
     assert.equal(images[1].isConnected, false);
 });

@@ -103,7 +103,7 @@
     ],
     "width": 3.7,
     "depth": 7.7,
-    "terrainMode": "blended-clay-shoulder",
+    "terrainMode": "continuous-island-and-landing-ground",
     "bottomZ": 0.1,
     "topZ": 1.8,
     "walkWidth": 0.65,
@@ -313,15 +313,19 @@
     "objects": 1985
   },
   "artBounds": {
-    "left": 0.19895833333333332,
+    "left": 0.196875,
     "top": 0.3,
-    "right": 0.8484375,
-    "bottom": 0.9241666666666667
+    "right": 0.84375,
+    "bottom": 0.9216666666666666
   },
   "image": {
     "path": "/assets/world/map/guaira-campaign/guaira.webp",
     "width": 1920,
     "height": 1200,
-    "bytes": 146446
-  }
+    "bytes": 138004
+  },
+  "nativeMapRevision": 6,
+  "nativeNavigation": "guaira-navigation.json",
+  "nativeDepth": "guaira-depth.png",
+  "terrainRevision": 4
 }

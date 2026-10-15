@@ -1,11 +1,12 @@
 import type { AdventureSave } from './types';
 import { campaignArtOverlay, campaignMapAsset } from './GuairaCampaignArt';
+import waterData from './GuairaCampaignWaterData.json';
 
 /** Earned chapter outcome, never inferred from old Serra access or optional wins. */
 export function campaignWaterRestored(save: Pick<AdventureSave, 'guaira'>): boolean {
     return save.guaira.completed.includes('guaira-prefeito');
 }
-export const GUAIRA_RESTORED_WATER_IMAGE = campaignMapAsset('guaira-campaign/guaira-water-restored.webp');
+export const GUAIRA_RESTORED_WATER_IMAGE = campaignMapAsset(`guaira-campaign/guaira-water-restored.webp?v=${waterData.sourceSHA256.slice(0, 12)}`);
 
 /** Same source camera as the diorama; static even when motion is enabled. */
 export function campaignWaterOverlay(save: Pick<AdventureSave, 'guaira'>, image: CanvasImageSource | null) {

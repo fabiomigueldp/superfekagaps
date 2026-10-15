@@ -24,7 +24,7 @@ def entry(source, output, **metadata):
 
 for name in ['key-art', 'backdrop', 'environment-atlas', 'portraits', 'props', 'boss-atlas', 'island', 'world-concept-v2', 'enemies-v2', 'jaja-motion-v2', 'guina-motion-v2', 'landmarks-v2', 'terrain-v2']:
     if name == 'island':
-        original = next(SOURCE / candidate for candidate in ['island-render-v8.png', 'island-render-v7.png', 'island-render-v6.png', 'island-render-v5.png', 'island-render-v4.png', 'island-render-v3.png', 'island-render-v2.png', 'island-render.png'] if (SOURCE / candidate).exists())
+        original = next(SOURCE / candidate for candidate in ['island-render-v11.png', 'island-render-v10.png', 'island-render-v9.png', 'island-render-v8.png', 'island-render-v7.png', 'island-render-v6.png', 'island-render-v5.png', 'island-render-v4.png', 'island-render-v3.png', 'island-render-v2.png', 'island-render.png'] if (SOURCE / candidate).exists())
         island_depth_master = original.with_name(original.name.replace('island-render','island-depth'))
     elif name == 'landmarks-v2' and (SOURCE / 'landmarks-v5.png').exists():
         original = SOURCE / 'landmarks-v5.png'

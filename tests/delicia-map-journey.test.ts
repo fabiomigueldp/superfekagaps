@@ -10,7 +10,7 @@ test('Blender export grounds all fourteen stops and connects each reachable dest
     const save = freshDeliciaSave(); save.completed = ALL_DELICIA_STAGES.map(s => s.id);
     const caps = deliciaJourneyCapabilities(save);
     assert.equal(Object.keys(metadata.nodes).length, 14);
-    assert.equal(metadata.revision, 8);
+    assert.equal(metadata.revision, 11);
     for (const stage of ALL_DELICIA_STAGES) {
         const origin = createJourney(stage.id, network, caps);
         assert.equal(origin.arrived, stage.id);
