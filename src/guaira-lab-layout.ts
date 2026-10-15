@@ -9,6 +9,13 @@ export function guairaLabCanvasSize(viewportWidth: number, viewportHeight: numbe
     return { width: 320 * scale, height: 180 * scale, scale };
 }
 
+/** A short touch viewport should not discard almost half its usable height. */
+export function guairaSceneCanvasSize(width: number, height: number, controlsHeight = 0) {
+    const fit = Math.max(0, Math.min(width / 320, (height - Math.max(0, controlsHeight) - 12) / 180));
+    const scale = fit >= 2 ? Math.floor(fit) : fit;
+    return { width: 320 * scale, height: 180 * scale, scale };
+}
+
 /** Keep a readable slice of play visible when long guidance makes the toolbar scroll.
  * One complete 44px control and its safe-area padding take priority on tiny viewports.
  */
@@ -23,6 +30,17 @@ export function fitGuairaLabCanvas(canvas: HTMLCanvasElement): void {
     const host = canvas.closest?.<HTMLElement>('.world-chapter-host');
     const nav = host?.querySelector<HTMLElement>('.chapter-game-toolbar') ?? document.querySelector<HTMLElement>('nav');
     const controlsHeight = document.getElementById('guaira-touch-controls')?.getBoundingClientRect().height ?? 0;
+    if (nav?.getAttribute?.('data-scene-overlay') === 'true') {
+        const size = guairaSceneCanvasSize(innerWidth, innerHeight, controlsHeight);
+        const layout = host ?? document.body;
+        layout.style.paddingTop = '0px'; layout.style.paddingBottom = `${controlsHeight}px`;
+        canvas.style.width = `${size.width}px`; canvas.style.height = `${size.height}px`;
+        nav.style.left = `${(innerWidth - size.width) / 2}px`;
+        nav.style.top = `${(innerHeight - controlsHeight - size.height) / 2}px`;
+        nav.style.width = `${size.width}px`; nav.style.height = `${size.height}px`;
+        nav.style.setProperty?.('--scene-touch-height', `${controlsHeight}px`);
+        return;
+    }
     if (nav) {
         let minimumToolbarHeight = 56;
         if (typeof getComputedStyle === 'function') {

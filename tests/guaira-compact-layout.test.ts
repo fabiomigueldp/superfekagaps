@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
-import { fitGuairaLabCanvas, guairaLabCanvasSize, guairaLabToolbarMaxHeight } from '../src/guaira-lab-layout';
+import { fitGuairaLabCanvas, guairaLabCanvasSize, guairaLabToolbarMaxHeight, guairaSceneCanvasSize } from '../src/guaira-lab-layout';
 
 const gameCss = readFileSync(new URL('../src/adventure/experimental/guaira/chapter/guaira-chapter-game.css', import.meta.url), 'utf8');
 const touchCss = readFileSync(new URL('../src/adventure/experimental/guaira/guaira-touch-controls.css', import.meta.url), 'utf8');
@@ -12,6 +12,18 @@ function rule(css: string, selector: string) {
     return css.slice(start + selector.length + 2, css.indexOf('}', start));
 }
 const close = (actual: number, expected: number) => assert.ok(Math.abs(actual - expected) < 1e-8, `${actual} differs from ${expected}`);
+
+test('integrated scenes use short touch viewports without compromising aspect or desktop pixels', () => {
+    for (const [width, height, touch] of [[812, 375, 58], [640, 360, 58], [320, 700, 58], [240, 180, 58]]) {
+        const size = guairaSceneCanvasSize(width, height, touch);
+        assert.ok(size.width <= width + 1e-8 && size.height <= height - touch - 12 + 1e-8);
+        close(size.width * 9, size.height * 16);
+        close(size.scale, Math.min(width / 320, (height - touch - 12) / 180));
+    }
+    assert.equal(guairaSceneCanvasSize(1440, 900).scale, 4);
+    assert.equal(guairaSceneCanvasSize(812, 375, 58).height, 305);
+    assert.equal(guairaSceneCanvasSize(320, 20, 58).height, 0);
+});
 
 test('compact toolbar retains top and side safe-area insets instead of replacing its padding', () => {
     const toolbar = rule(gameCss, '.chapter-game-toolbar');
@@ -23,7 +35,7 @@ test('compact toolbar retains top and side safe-area insets instead of replacing
     assert.match(compact, /--chapter-toolbar-gutter: 6px/);
     assert.doesNotMatch(compact, /(?:^|[;\s])padding(?:-[a-z]+)?:/);
     assert.match(rule(gameCss, '.chapter-game-toolbar #lab-status'), /overflow-wrap: anywhere/);
-    assert.match(rule(gameCss, '.chapter-game-toolbar #chapter-keyboard-hint'), /overflow-wrap: anywhere/);
+
 });
 
 test('touch controls wrap after safe-area padding without shrinking their 44px targets', () => {

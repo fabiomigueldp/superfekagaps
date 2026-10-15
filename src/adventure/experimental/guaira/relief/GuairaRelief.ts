@@ -151,7 +151,7 @@ export class GuairaRelief extends WorldGame {
         pixelText(c, 'CAMARA DE ALIVIO', 8, 8, '#f3ddb1');
         pixelText(c, this.reliefOpened ? 'SEM PRESSAO' : 'DUAS ROTAS', 178, 8, '#b1e8db');
         pixelText(c, 'II', 305, 8, '#f3ddb1');
-        if (paused) {
+        if (paused && !this.externalPauseMenu) {
             c.fillStyle = '#211b2bbd'; c.fillRect(0, 23, 320, 157);
             panel(c, 62, 70, 196, 43, '#283d40', '#c2b78a');
             pixelText(c, 'PAUSADO', 160, 79, '#f3ddb1', 2, 'center');

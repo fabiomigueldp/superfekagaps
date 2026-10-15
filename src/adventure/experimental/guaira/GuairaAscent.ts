@@ -148,7 +148,7 @@ export class GuairaAscent extends WorldGame {
         drawGuairaCoinReadout(c, this.renderer, this.coins);
         if (this.player.data.hasHelmet) this.renderer.drawHelmet(279, 4, c);
         pixelText(c, 'II', 305, 8, '#f0ddae');
-        if (paused) {
+        if (paused && !this.externalPauseMenu) {
             c.fillStyle = '#211b2bbd'; c.fillRect(0, 23, 320, 157);
             panel(c, 62, 70, 196, 43, '#382b35', '#d8ac7a');
             pixelText(c, 'PAUSADO', 160, 79, '#f0ddae', 2, 'center');

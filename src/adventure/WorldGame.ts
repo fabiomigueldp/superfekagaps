@@ -62,6 +62,8 @@ interface FrozenMenuPaint {
     time: number;
 }
 export class WorldGame {
+    /** Embedded rooms use one native host menu, with no second pause card. */
+    externalPauseMenu = false;
     private readonly lifetime = new DisposalScope();
     private frame: number | null = null;
     private running = false;

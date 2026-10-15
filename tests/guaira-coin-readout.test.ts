@@ -11,7 +11,7 @@ type Pixel = [number, number, string];
 function textPixels(label: string) {
     const pixels: Pixel[] = [];
     const c = { fillStyle: '', fillRect(x: number, y: number) { pixels.push([x, y, this.fillStyle]); } };
-    pixelText(c as unknown as CanvasRenderingContext2D, label, 202, 8, '#f5cf82');
+    pixelText(c as unknown as CanvasRenderingContext2D, label, 253, 8, '#f5cf82');
     return pixels;
 }
 
@@ -28,14 +28,14 @@ test('attempt-only readout is bounded, sanitized, static and restores painter st
         drawGuairaCoinReadout(c as unknown as CanvasRenderingContext2D, {
             drawCoin(x, y, time) { calls.push([x, y, time]); }
         }, coins);
-        assert.deepEqual(calls, [[184, 4, 0]], 'native sprite always uses the still frame');
-        assert.deepEqual(pixels, textPixels(`${label} NO TRECHO`));
-        assert.ok(pixels.every(([x, y]) => x >= 202 && x < 279 && y >= 8 && y < 15));
+        assert.deepEqual(calls, [[235, 4, 0]], 'native sprite always uses the still frame');
+        assert.deepEqual(pixels, textPixels(`${label}`));
+        assert.ok(pixels.every(([x, y]) => x >= 253 && x < 279 && y >= 8 && y < 15));
         assert.equal(c.fillStyle, '#123456'); assert.equal(stack.length, 0);
     }
     for (const [x, label] of [[57, 'TRAVESSIA DE SERVICO'], [57, 'PRANCHA DE INSPECAO'],
         [57, 'RUA DA VALA SECA'], [69, 'ESPERE A AGUA BAIXAR']] as const)
-        assert.ok(x + textWidth(label) < 184, 'scene title must not reach the coin slot');
+        assert.ok(x + textWidth(label) < 235, 'scene title must not reach the coin slot');
 });
 
 /** Record actual production HUD pixels after its background has covered the world. */
@@ -45,13 +45,13 @@ function observeReadout(game: WorldGame) {
     const pixels = new Map<string, string>(), sprites: number[][] = [];
     c.fillRect = (x, y, w, h) => {
         for (let yy = Math.max(8, Math.ceil(y)); yy < Math.min(15, y + h); yy++)
-            for (let xx = Math.max(202, Math.ceil(x)); xx < Math.min(279, x + w); xx++)
+            for (let xx = Math.max(253, Math.ceil(x)); xx < Math.min(279, x + w); xx++)
                 pixels.set(`${xx},${yy}`, String(c.fillStyle));
         original(x, y, w, h);
     };
     const drawCoin = game.renderer.drawCoin.bind(game.renderer);
     game.renderer.drawCoin = (x, y, time, context) => {
-        if (x === 184 && y === 4) sprites.push([x, y, time]);
+        if (x === 235 && y === 4) sprites.push([x, y, time]);
         drawCoin(x, y, time, context);
     };
     return () => {
@@ -61,8 +61,8 @@ function observeReadout(game: WorldGame) {
         game.render();
         assert.equal(JSON.stringify({ player: game.player.data, objects: game.objects, camera: game.camera,
             coins: game.coins, time: game.time, elapsed: game.elapsed, save: game.store.save, audio: game.audio.enabled }), before);
-        assert.deepEqual(sprites[sprites.length - 1], [184, 4, 0]);
-        const expected = new Set(textPixels(`${game.coins} NO TRECHO`).map(([x, y]) => `${x},${y}`));
+        assert.deepEqual(sprites[sprites.length - 1], [235, 4, 0]);
+        const expected = new Set(textPixels(`${game.coins}`).map(([x, y]) => `${x},${y}`));
         const actual = new Set([...pixels].filter(([, color]) => color === '#f5cf82').map(([key]) => key));
         assert.deepEqual(actual, expected, 'visible glyphs equal the current native attempt ledger');
     };

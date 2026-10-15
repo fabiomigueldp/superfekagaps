@@ -165,7 +165,7 @@ export class GuairaTraversal extends WorldGame {
         // feet and panel shadow. Page status keeps the instruction during a jump.
         const playerY = Math.round(this.player.data.position.y) - Math.round(this.camera.y);
         const bannerWouldCoverPlayer = playerY - 4 < 50 && playerY + this.player.data.height + 2 > 29;
-        if (paused) {
+        if (paused && !this.externalPauseMenu) {
             c.fillStyle = '#211b2bbd'; c.fillRect(0, 23, 320, 157);
             panel(c, 62, 70, 196, 43, '#382b35', '#d8ac7a');
             pixelText(c, 'PAUSADO', 160, 79, '#f0ddae', 2, 'center');

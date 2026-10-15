@@ -178,7 +178,7 @@ export class GuairaMayorLab extends WorldGame {
             panel(c, 6, 26, 224, 15, '#382b35', '#d8ac7a');
             pixelText(c, this.boss!.hint, 118, 31, '#f0ddae', 1, 'center');
         }
-        if (paused) {
+        if (paused && !this.externalPauseMenu) {
             c.fillStyle = '#211b2bbd'; c.fillRect(0, 23, 320, 157);
             panel(c, 62, 70, 196, 43, '#382b35', '#d8ac7a');
             pixelText(c, 'PAUSADO', 160, 79, '#f0ddae', 2, 'center');

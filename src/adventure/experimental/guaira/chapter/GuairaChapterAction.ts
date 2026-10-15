@@ -8,7 +8,8 @@ export class GuairaChapterAction {
     private readonly text = document.createElement('span');
     private label = '';
 
-    constructor(private readonly control: HTMLElement, private readonly primary = false, private readonly plain = false) {
+    constructor(private readonly control: HTMLElement, private readonly primary = false, private readonly plain = false,
+        private readonly fixedWidth = 0) {
         this.canvas.className = 'lab-action-art'; this.canvas.setAttribute('aria-hidden', 'true');
         this.text.className = 'lab-sr'; control.textContent = '';
         control.append(this.canvas, this.text);
@@ -19,7 +20,7 @@ export class GuairaChapterAction {
         this.text.textContent = accessibleName;
         if (label === this.label) return;
         this.label = label;
-        const { width, height } = labActionSize(label);
+        const size = labActionSize(label), width = Math.max(size.width, this.fixedWidth), height = size.height;
         this.canvas.width = width * 2; this.canvas.height = height * 2;
         const ctx = this.canvas.getContext('2d');
         if (ctx) {

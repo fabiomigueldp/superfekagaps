@@ -15,6 +15,7 @@ export function installGuairaLabControls(game: WorldGame, canvas: HTMLCanvasElem
         const current = () => !lifetime.isDisposed && !owner.isDisposed && owner === mounted && !game.isDisposed;
         const fit = () => { if (current()) fitGuairaLabCanvas(canvas); };
         const next = new GuairaTouchControls({ input: game.input,
+            parent: canvas.closest?.<HTMLElement>('.world-chapter-host') ?? undefined,
             isPlaying: () => game.state === 'playing' && !game.player.data.isDead && !isComplete(),
             onInteract: () => game.audio.unlock(),
             onVisibilityChange: visible => { if (current()) { game.renderer.setTouchControlsVisible(!visible); fit(); } }

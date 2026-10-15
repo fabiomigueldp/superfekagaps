@@ -18,7 +18,6 @@ import { GuairaGallery } from '../src/adventure/experimental/guaira/gallery/Guai
 import { GuairaTraversal } from '../src/adventure/experimental/guaira/GuairaTraversal';
 import { DisposalScope } from '../src/engine/DisposalScope';
 import { sceneLifecycleBrowser, LifecycleElement } from './helpers/sceneLifecycleHarness';
-import { labActionSize } from '../src/adventure/experimental/JuiceLabToolbar';
 
 function deferred<T>() {
     let resolve!: (value: T) => void, reject!: (error: unknown) => void;
@@ -145,12 +144,12 @@ test('chapter guidance opens with the real objective and retains the native valv
     game.render(); h.frame();
     assert.match(h.byId('lab-status').textContent, /Abra a comporta e atravesse até o arrozal/);
     assert.doesNotMatch(h.byId('lab-status').textContent, /Guaíra fictícia/);
-    const hint = h.byId('chapter-keyboard-hint'), save = structuredClone(game.store.save);
-    assert.match(hint.textContent, /←\/→ mover.*Espaço pular.*↓ no ar: sentada.*Shift correr.*Esc pausa/);
+    const save = structuredClone(game.store.save);
+    assert.equal(h.document.getElementById('chapter-keyboard-hint'), null);
     h.byId('chapter-primary').click(); game.render(); h.frame();
     assert.equal(game.state, 'paused');
-    assert.equal(h.byId('chapter-keyboard-hint'), hint, 'Pause keeps the visible key reference in place');
-    assert.equal(hint.hidden, false);
+    assert.equal(h.byId('chapter-options').hidden, false);
+
     assert.match(h.byId('lab-status').textContent, /Pausado/);
     h.byId('chapter-primary').click();
     assert.equal(game.state, 'playing');
@@ -455,7 +454,7 @@ for (const completed of [0, 1, 5]) test(`optional ownership preserves ${complete
     assert.equal(first.stage.id, 'guaira-galeria'); assert.deepEqual(app.snapshot, before);
     assert.equal(h.byId('chapter-map-return').getAttribute('aria-label'), 'Voltar ao Bairro da Vala Seca no capítulo');
     first.finished = true; h.frame(); // Live local finish fixture cannot create a sixth result.
-    assert.match(h.byId('lab-status').textContent, /Acesso de inspeção aberto/);
+    assert.match(h.byId('lab-status').textContent, /Acesso à Câmara de Alívio aberto/);
     assert.equal(h.byId('chapter-primary').getAttribute('aria-label'), 'Seguir para a Câmara de Alívio, continuação opcional');
     first.toggleGalleryPause(); h.frame(); assert.equal(first.state, 'paused'); assert.deepEqual(app.snapshot, before);
     h.byId('chapter-retry').click(); await waitForGame(app);
@@ -928,7 +927,7 @@ for (const optional of [false, true]) test(`sound control works during ${optiona
     const game = app.activeGame!, sound = h.byId('chapter-sound');
     assert.equal(sound.disabled, false);
     assert.equal(sound.getAttribute('aria-pressed'), 'true');
-    assert.match(h.byId('chapter-keyboard-hint').textContent, /M som/);
+    assert.equal(h.byId('chapter-pause-options').hidden, true);
     sound.click();
     assert.equal(game.audio.enabled, false);
     assert.equal(sound.getAttribute('aria-pressed'), 'false');
@@ -939,7 +938,7 @@ for (const optional of [false, true]) test(`sound control works during ${optiona
     sound.click(); assert.equal(game.audio.enabled, false);
     h.byId('chapter-primary').click(); h.frame();
     assert.equal(game.state, 'paused');
-    assert.match(h.byId('lab-status').textContent, /Continuar retoma daqui.*recarregar reinicia o trecho/);
+    assert.match(h.byId('lab-status').textContent, /Pausado/);
     sound.click();
     assert.equal(game.audio.enabled, true); assert.equal(game.state, 'paused');
     assert.equal(new ProgressStore(storage).save.guaira.audioEnabled, true);
@@ -1163,13 +1162,13 @@ for (const initiallyPaused of [false, true]) test(`chapter controls help preserv
     const app = h.create({ loadScene: async () => factory }); h.enter(); await flush();
     const game = app.activeGame!, attempt = app.snapshot.activeAttempt;
     const retryArt = h.byId('chapter-retry').children.find(child => child.className === 'lab-action-art')!;
-    assert.equal(retryArt.width, labActionSize('RECOMEÇAR').width * 2);
+    assert.equal(retryArt.width, 256);
     assert.equal(retryArt.height, 44);
     assert.ok(retryArt.width <= 296, 'The full retry label fits a 320px toolbar with compact padding');
     if (initiallyPaused) h.byId('chapter-primary').click();
     const opener = h.byId('chapter-controls');
     assert.equal(opener.tagName, 'BUTTON'); assert.equal(opener.disabled, false);
-    assert.equal(opener.getAttribute('aria-label'), 'Abrir controles e ajuda da tentativa');
+    assert.equal(opener.getAttribute('aria-label'), 'Controles');
     assert.equal(opener.getAttribute('aria-haspopup'), 'dialog');
     const touches = h.byId('guaira-touch-controls');
     const jump = touches.children.find(button => button.getAttribute('data-action') === 'jump')!;
@@ -1196,8 +1195,8 @@ for (const initiallyPaused of [false, true]) test(`chapter controls help preserv
     assert.deepEqual(game.player.data, position); assert.equal(game.elapsed, elapsed);
     assert.deepEqual(game.store.save, save); assert.deepEqual(app.snapshot, snapshot);
     const text = h.all().filter(node => (dialog as unknown as HTMLElement).contains(node as unknown as Node)).map(node => node.textContent).join(' ');
-    assert.ok(text.includes('Recomeçar inicia este trecho do zero. Os trechos já concluídos continuam salvos.'));
-    for (const instruction of ['A / D', 'W, Z', 'Shift ou X', 'Golpe', 'Correr', 'Pular', 'Recomeçar', 'Mapa', 'continua pausada'])
+    assert.ok(text.includes('Recomeçar reinicia o trecho atual. Trechos concluídos permanecem salvos.'));
+    for (const instruction of ['A / D', 'W, Z', 'Shift ou X', 'Golpe', 'Correr', 'Pular', 'Recomeçar', 'mapa', 'Na pausa'])
         assert.ok(text.includes(instruction), instruction);
     h.byId('chapter-controls-help-close').click();
     assert.equal(game.state, 'paused'); assert.equal(h.document.activeElement, opener);
@@ -1234,11 +1233,11 @@ test('optional chapter controls help explains Bairro and survives hidden/disposa
     const app = h.create({ loadExcursion: async () => factory }); chooseGallery(h); h.enter(); await flush();
     const game = app.activeGame!, opener = h.byId('chapter-controls');
     const retryArt = h.byId('chapter-retry').children.find(child => child.className === 'lab-action-art')!;
-    assert.equal(retryArt.width, labActionSize('RECOMEÇAR').width * 2);
+    assert.equal(retryArt.width, 256);
     opener.focus(); opener.click(); const dialog = h.byId('chapter-controls-help');
     const text = h.all().filter(node => (dialog as unknown as HTMLElement).contains(node as unknown as Node)).map(node => node.textContent).join(' ');
-    assert.ok(text.includes('Recomeçar inicia este trecho do zero. Os trechos já concluídos continuam salvos.'));
-    assert.match(text, /Bairro/); assert.match(text, /opcional/);
+    assert.ok(text.includes('Recomeçar reinicia o trecho atual. Trechos concluídos permanecem salvos.'));
+    assert.match(text, /Voltar ao mapa/); assert.match(text, /opcional/);
     assert.equal(game.state, 'paused'); assert.equal(app.snapshot.activeAttempt, null);
     h.window.dispatch('blur'); h.document.hidden = true; h.document.dispatch('visibilitychange');
     h.byId('chapter-controls-help-close').click();
@@ -1407,26 +1406,33 @@ test('development chapter host retains free stage selection after navigation and
     assert.deepEqual(store.save.seen, []);
 });
 
-test('integrated chapter play keeps secondary controls in pause and restores owned focus when it collapses', async t => {
+test('integrated pause, options and help retain the attempt and return focus to the game', async t => {
     const h = hostBrowser(t), factory = await loadGuairaChapterScene('guaira-travessia');
     const app = h.create({ loadScene: async () => factory }); h.enter(); await flush();
     const game = app.activeGame!, options = h.byId('chapter-pause-options'), primary = h.byId('chapter-primary');
     const before = app.snapshot;
     assert.equal(options.hidden, true);
-    assert.equal(primary.getAttribute('aria-expanded'), 'false');
-    for (const id of ['chapter-controls', 'chapter-retry', 'chapter-map-return', 'chapter-sound', 'chapter-keyboard-hint'])
-        assert.equal(h.byId(id).parent, options, `${id} is available inside pause rather than filling the play HUD`);
+    const settings = h.byId('chapter-options');
+    assert.equal(settings.hidden, true);
+    assert.equal(h.byId('chapter-map-return').hidden, true);
+    for (const id of ['chapter-controls', 'chapter-retry', 'chapter-sound'])
+        assert.equal(h.byId(id).parent, options);
     assert.equal(h.byId('guaira-touch-controls').hidden, false, 'Compact host chrome does not remove touch input');
-    primary.click(); assert.equal(game.state, 'paused'); assert.equal(options.hidden, false);
-    assert.equal(primary.getAttribute('aria-expanded'), 'true');
+    primary.click(); assert.equal(game.state, 'paused'); assert.equal(options.hidden, true);
+    assert.equal(h.document.activeElement, primary);
+    settings.click(); assert.equal(options.hidden, false);
+    assert.equal(settings.getAttribute('aria-expanded'), 'true');
     h.byId('chapter-retry').focus();
     assert.ok(game instanceof GuairaTraversal); game.toggleTraversalPause(); h.frame();
     assert.equal(options.hidden, true); assert.equal(h.document.activeElement, h.byId('game-canvas'));
     assert.equal(game.state, 'playing'); assert.deepEqual(app.snapshot, before);
-    primary.click(); h.byId('chapter-controls').click();
+    primary.click(); settings.click(); h.byId('chapter-controls').click();
     assert.equal(game.state, 'paused'); assert.equal((h.byId('chapter-controls-help') as LifecycleElement & { open: boolean }).open, true);
     h.byId('chapter-controls-help').dispatch('cancel'); h.frame();
     assert.equal(game.state, 'paused'); assert.equal(options.hidden, false);
-    primary.click(); assert.equal(options.hidden, true);
+    h.nativeKey('Escape', h.byId('chapter-controls'));
+    assert.equal(game.state, 'paused'); assert.equal(options.hidden, true);
+    assert.equal(h.document.activeElement, settings);
+    primary.click(); assert.equal(game.state, 'playing');
     app.dispose(); h.checkDisposed();
 });

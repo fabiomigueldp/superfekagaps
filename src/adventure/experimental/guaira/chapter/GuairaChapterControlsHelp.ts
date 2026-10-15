@@ -22,7 +22,7 @@ export class GuairaChapterControlsHelp {
         this.button.setAttribute('aria-haspopup', 'dialog');
         this.button.setAttribute('aria-controls', 'chapter-controls-help');
         this.button.setAttribute('aria-expanded', 'false');
-        new GuairaChapterAction(this.button).setLabel('CONTROLES', 'Abrir controles e ajuda da tentativa');
+        new GuairaChapterAction(this.button, false, false, 128).setLabel('CONTROLES', 'Controles');
         this.help = new WorldControlsHelp(canvas, {
             canOpen: () => this.available()?.game.state === 'paused',
             resetInput: () => this.runtime()?.game.input.reset(),
@@ -34,13 +34,11 @@ export class GuairaChapterControlsHelp {
             },
         }, {
             id: 'chapter-controls-help', regionLabel: 'Controles e ajuda do capítulo de Guaíra',
-            closeLabel: 'FECHAR AJUDA · MANTER PAUSA',
+            closeLabel: 'VOLTAR',
             navigation: [
-                'A tentativa continua pausada ao fechar esta ajuda. Continuar ou Esc retoma do mesmo ponto.',
-                'Recomeçar inicia este trecho do zero. Os trechos já concluídos continuam salvos.',
-                optional ? 'Bairro volta ao mapa de Guaíra. Ao entrar novamente, o percurso opcional começa do início.'
-                    : 'Mapa volta ao mapa de Guaíra. Ao entrar novamente, o trecho começa do início. Após concluir, Continuar segue a jornada pelo mapa.',
-                'Nos botões: Tab ou Shift + Tab para escolher; Enter ou Espaço para ativar. Esc fecha esta ajuda sem retomar o jogo.',
+                'Esc fecha a ajuda. Na pausa, Esc continua a partida.',
+                'Recomeçar reinicia o trecho atual. Trechos concluídos permanecem salvos.',
+                optional ? 'Voltar ao mapa encerra o percurso opcional.' : 'Voltar ao mapa encerra a tentativa atual.',
             ],
             touch: '← / → para andar; Pular (↑) para pular; segure Correr (X) + direção para correr; Golpe (↓) no ar faz a sentada. Use Pausa no topo para parar e Continuar para retomar.',
         });

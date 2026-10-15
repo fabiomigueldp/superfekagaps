@@ -9,7 +9,7 @@ export function drawGuairaCoinReadout(c: CanvasRenderingContext2D,
     renderer: Pick<Renderer, 'drawCoin'>, coins: number): void {
     const count = Number.isFinite(coins) ? Math.max(0, Math.floor(coins)) : 0;
     c.save();
-    renderer.drawCoin(184, 4, 0, c);
-    pixelText(c, `${count > 99 ? '99+' : count} NO TRECHO`, 202, 8, '#f5cf82');
+    renderer.drawCoin(235, 4, 0, c);
+    pixelText(c, `${count > 99 ? '99+' : count}`, 253, 8, '#f5cf82');
     c.restore();
 }

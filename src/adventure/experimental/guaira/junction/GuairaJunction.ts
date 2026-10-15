@@ -149,7 +149,7 @@ export class GuairaJunction extends WorldGame {
         const nearPlate = p.position.x < 216 && feet <= 320 || p.position.x >= 410 && p.position.x < 565 && feet <= 272;
         const playerTop = p.position.y - Math.round(this.camera.y) - 4;
         const bannerWouldCoverPlayer = playerTop < 47 && feet - Math.round(this.camera.y) > 28;
-        if (paused) {
+        if (paused && !this.externalPauseMenu) {
             c.fillStyle = '#211b2bbd'; c.fillRect(0, 23, 320, 157);
             panel(c, 62, 70, 196, 43, '#382f36', '#d8b485');
             pixelText(c, 'PAUSADO', 160, 79, '#f3ddb1', 2, 'center');
