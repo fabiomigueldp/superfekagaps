@@ -4,12 +4,12 @@ const fs = require('node:fs');
 (async()=>{
  fs.mkdirSync('output',{recursive:true});
  const browser=await chromium.launch({headless:true}), results=[];
+ try {
  for(const viewport of [{width:1440,height:900},{width:320,height:700},{width:812,height:375},{width:640,height:360}]) {
   const context=await browser.newContext({viewport,hasTouch:viewport.width<1000,reducedMotion:'reduce'});
   const page=await context.newPage(), errors=[]; page.on('pageerror',e=>errors.push(e.message));
   await page.goto((process.env.FEKA_UI_URL || 'http://127.0.0.1:3000/') + '?chapter=guaira',{waitUntil:'networkidle',timeout:120000});
-  await page.evaluate(async()=>{
- fs.mkdirSync('output',{recursive:true});window.auditCampaign=window.worldGame;await window.worldGame.mountChapter('guaira','guaira-respiros')});
+  await page.evaluate(async()=>{window.auditCampaign=window.worldGame;await window.worldGame.mountChapter('guaira','guaira-respiros')});
   await page.waitForSelector('[data-state="playing"]');
   const canvas=page.locator('#game-canvas'), box=await canvas.boundingBox();
   if(viewport.width<1000) {
@@ -55,5 +55,6 @@ const fs = require('node:fs');
   await context.close();
  }
  fs.writeFileSync('output/ui-verification.json',JSON.stringify(results,null,2));
- console.log(JSON.stringify(results)); await browser.close();
+ console.log(JSON.stringify(results));
+ } finally { await browser.close(); }
 })().catch(e=>{console.error(e);process.exitCode=1});
