@@ -1,0 +1,20 @@
+{
+  "errors": [],
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "width": 390,
+      "height": 844
+    },
+    {
+      "width": 320,
+      "height": 568
+    }
+  ],
+  "images": 32,
+  "videos": 6,
+  "passed": true
+}

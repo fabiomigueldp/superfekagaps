@@ -6,6 +6,7 @@ import { pixelText, textWidth } from '../src/graphics/BitmapFont';
 import { guairaAscentBrowser } from './helpers/guairaAscentHarness';
 import { guairaTraversalBrowser } from './helpers/guairaTraversalHarness';
 import { guairaRespirosBrowser } from './helpers/guairaRespirosHarness';
+import { guairaJunctionBrowser } from './helpers/guairaJunctionHarness';
 
 type Pixel = [number, number, string];
 function textPixels(label: string) {
@@ -69,7 +70,7 @@ function observeReadout(game: WorldGame) {
 }
 
 for (const [scene, browser] of [['ascent', guairaAscentBrowser], ['traversal', guairaTraversalBrowser],
-    ['respiros', guairaRespirosBrowser]] as const) for (const reducedMotion of [false, true])
+    ['respiros', guairaRespirosBrowser], ['junction', guairaJunctionBrowser]] as const) for (const reducedMotion of [false, true])
     test(`${scene}: muted ${reducedMotion ? 'reduced-motion' : 'ordinary'} pickup, pause, death and retry show the native ledger`, t => {
         const h = browser(t, { reducedMotion }), game = h.create(); game.audio.enabled = false;
         const verify = observeReadout(game);

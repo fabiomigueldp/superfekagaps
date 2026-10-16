@@ -1,0 +1,95 @@
+{
+  "images": [
+    {
+      "src": "aberta-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "aberta-after.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "abrindo-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "abrindo-after.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "guardada-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "guardada-after.png",
+      "w": 320,
+      "h": 180
+    }
+  ],
+  "media": [
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/route-recovery-2026-10-16/direct-percurso.mp4",
+      "w": 960,
+      "h": 540,
+      "seconds": 23.533333
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/route-recovery-2026-10-16/optional-percurso.mp4",
+      "w": 960,
+      "h": 540,
+      "seconds": 39.266667
+    }
+  ],
+  "viewports": [
+    {
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "width": 320,
+      "scrollWidth": 320
+    }
+  ],
+  "errors": [],
+  "links": [
+    {
+      "url": "http://127.0.0.1:3000/?chapter=guaira",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3000/docs/world/guaira/route-recovery-2026-10-16/index.html#percursos",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3000/docs/world/guaira/level-design-2026-10-16/index.html",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3000/docs/world/guaira/route-recovery-2026-10-16/detail-verification.json",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3000/docs/world/guaira/route-recovery-2026-10-16/native-browser-verification.json",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3000/docs/world/guaira/route-recovery-2026-10-16/browser-verification.json",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3000/docs/world/guaira/route-recovery-2026-10-16/README.md",
+      "status": 200
+    }
+  ],
+  "sliderKeyboard": true,
+  "passed": true
+}

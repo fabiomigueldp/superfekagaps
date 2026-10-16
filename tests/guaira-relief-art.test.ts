@@ -123,7 +123,7 @@ test('inspection light and dry mineral traces stay behind hardware and outside t
     for(const open of [false,true]) {
         if(open)level.data.tiles[10][15]=T.EMPTY;
         const background=new Raster();drawReliefBackground(background.context,level,240,176);
-        assert.equal(background.at(49,137),P.pipe,'feed pipe edge stays intact');
+        assert.equal(background.at(49,136),P.pipe,'nine-pixel feed pipe edge stays intact');
         assert.equal(background.at(82,129),P.brass,'valve plate stays opaque');
     }
     assert.equal(objects.get(G.jetId)!.active,false);

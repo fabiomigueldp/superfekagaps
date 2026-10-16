@@ -1,0 +1,17 @@
+{
+  "tests": 1011,
+  "failed": 0,
+  "newTests": 15,
+  "build": true,
+  "files": {
+    "GuairaRelief.ts": "1389206547036b06a0d432bff3ae03a0207603602536474432a37b888d11c879",
+    "GuairaReliefStage.ts": "2fbfa517ed5661a7a395dd977da20348fbb0e34546fd56936d75538088c64625",
+    "GuairaReliefArt.ts": "95e778629730df05d39b2499619ed1468a5ed097374cd7a98fab96c691ad2453",
+    "GuairaInspectionRooms.ts": "31f327d86febd663f55cbacefa1f5e09de4fa7f114e76de66e23d88d18dd56ef"
+  },
+  "browserRoutes": true,
+  "eightScenes": true,
+  "review": true,
+  "nativeSimulationHz": 60,
+  "videoFps": 15
+}

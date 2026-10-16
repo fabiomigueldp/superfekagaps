@@ -1,0 +1,97 @@
+{
+  "files": [
+    {
+      "name": "GuairaTraversal",
+      "current": "b605bb186d3aabf4a10bcfbfecb622e9f66ef9f78f4815e158856e3b874b4d78",
+      "before": "cf94ba10751598e253036aeaf3a273cad43d90c05e77b36ea2be2ffe9dc204e2",
+      "match": true
+    },
+    {
+      "name": "GuairaTraversalArt",
+      "current": "6fa2df306c35c08ddb60c45f66a404042ced5bfb100b2908db17164f532e96c1",
+      "before": "5f8bfdbfa0b1091e5ed6d3f40ae6b71a10e1ec40eee72d41ef22c50882b7587f",
+      "match": true
+    },
+    {
+      "name": "GuairaRespiros",
+      "current": "c13d7be716dfd1786620ca0ecc7a5dc271a23e4795ee569897b16fbcfe1e1d8a",
+      "before": "0aafde3fb929f28f6d75393b1b40aec41f55fa2e35843a0df4a966da61c1dade",
+      "match": true
+    },
+    {
+      "name": "GuairaRespirosStage",
+      "current": "4fec6ad92fffdce9df5697edef230ee867b6b461af62d5fbd3fe62e751eec791",
+      "before": "02582d2bf7611c73ab33b61a2e7a218931effd77d63ccf745284bfa361e5f745",
+      "match": true
+    },
+    {
+      "name": "GuairaRespirosArt",
+      "current": "ccb4ea7e76db7092cdacb52562586d366a9e50847232bfe2241cdcdeccc72d26",
+      "before": "9bf0762d7752079e10c0b7d52758ef6b95bbab074599d408823061f1f49e0543",
+      "match": true
+    },
+    {
+      "name": "GuairaGallery",
+      "current": "6f2a3173671bc5825abb9db34fbd493be02e9091cf8a88c7633d5264b06cf5e5",
+      "before": "b60722a23d1390769f6bad62730d613ff7ad8e7ba17650701e16a50a80cee1b1",
+      "match": true
+    },
+    {
+      "name": "GuairaGalleryStage",
+      "current": "c38035cff29d7d568ac5acf47acc53aa5743df5fd62d0e51dff7b6b2332fb60f",
+      "before": "c90eb056c2fac7a8a482f66d08e5bbe363e61fefb698884fe96c2efb4b69b872",
+      "match": true
+    },
+    {
+      "name": "GuairaGalleryModel",
+      "current": "0083ed426e8343340a583439e8a1daa61125f6410277b42a51fcbc9f58f43aa8",
+      "before": "783bb03cbfd53fb7261f01dd402c6fab13a5be7cee229d04e0c30744be2ca409",
+      "match": true
+    },
+    {
+      "name": "GuairaGalleryArt",
+      "current": "2f09a594a2792e0e8fe9379084b5e401b2cf053d48eb7bd110630250f0fc51c7",
+      "before": "851abf6c85e3723bd3623e3314f963a5ba1531ece4d92f9acb0b2e8ce9e373aa",
+      "match": true
+    },
+    {
+      "name": "GuairaAscent",
+      "current": "924b3771ac370c6484072118fcc1d6449d76639b64bf196f42d2635eac8d9252",
+      "before": "b4129a7a84473ae76438ba5717f371138127f674725dd17098ab57eb7d310a93",
+      "match": true
+    },
+    {
+      "name": "GuairaAscentArt",
+      "current": "dd55d131d33cb32c0e24183898f793b3255d98ded387aaaa5ccb3e15b7cf7a99",
+      "before": "b2e5e55eb1878b841a440f866d2476105bfc7038d8fb8b0c5814ed7d32a9a27c",
+      "match": true
+    },
+    {
+      "name": "GuairaRelief",
+      "current": "7907e7fd592f74adbcf8858b85fa42ba4d58b83e87a0c77c9377b00d7aefba59",
+      "before": "616abf89264fcf83d2e664173c0aed533bb42064e274f4e050d8f9de9d6de5d8",
+      "match": true
+    },
+    {
+      "name": "GuairaReliefStage",
+      "current": "c4dcc71cd9f4cdd8469018f09355e88d46fc57ac0b1780bfe011ed90b65d8aa1",
+      "before": "1e6cfd910d2ead674b4f2d91bad7ff1837acca55f8b445fc47826756f6be072d",
+      "match": true
+    },
+    {
+      "name": "GuairaReliefArt",
+      "current": "2aad817852dddf8e96be74a5f88ee83b5ecb8327a268492e515ce2eb71de9370",
+      "before": "9532476cdf236fb98a6722c26be0244183a21f42e3de5af3140d7e5919383c12",
+      "match": true
+    }
+  ],
+  "tests": {
+    "count": 946,
+    "passed": 946,
+    "failed": 0,
+    "new": 22
+  },
+  "build": true,
+  "capturesMatchCurrentSource": true,
+  "baselinePreserved": true
+}

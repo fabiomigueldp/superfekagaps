@@ -143,8 +143,9 @@ test('the former stationary jump-loop win no longer receives free wall-charge op
     }
     // Before the fix this exact input won at 1123 with three zero-distance,
     // one-tick charges. It now fails without reading or responding to the tells.
-    assert.deepEqual(hits, [382, 527, 882, 1006, 1362]); assert.deepEqual(charges, [47, 48, 48, 48, 48, 48]);
-    assert.equal(lastFrame, 1397); assert.equal(b.health, 1); assert.equal(g.player.data.isDead, true);
+    assert.deepEqual(hits, [382, 527, 882, 1006, 1266]);
+    assert.ok(charges.length >= 5 && charges.every(ticks => ticks >= 47), 'every punish follows a full arena crossing');
+    assert.equal(lastFrame, 1301); assert.equal(b.health, 1); assert.equal(g.player.data.isDead, true);
 });
 
 for (const touch of [false, true]) test(`${touch ? 'touch' : 'keyboard'} can follow the newly inward tell and punish it safely after pause`, t => {

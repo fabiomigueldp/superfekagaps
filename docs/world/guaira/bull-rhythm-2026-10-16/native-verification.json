@@ -1,0 +1,640 @@
+{
+  "nativeInputOnly": true,
+  "actorOrClockEdits": false,
+  "captureFps": 60,
+  "routes": {
+    "jump": {
+      "frames": 1267,
+      "hitFrames": [
+        180,
+        338,
+        548,
+        697,
+        961,
+        1177
+      ],
+      "warnings": [
+        84,
+        239,
+        397,
+        607,
+        756,
+        846,
+        1020
+      ],
+      "events": [
+        {
+          "frame": 1,
+          "state": "intro",
+          "phase": 1,
+          "leg": 1,
+          "bx": 248,
+          "px": 68.3
+        },
+        {
+          "frame": 60,
+          "state": "idle",
+          "phase": 1,
+          "leg": 1,
+          "bx": 248,
+          "px": 88.89335150433641
+        },
+        {
+          "frame": 84,
+          "state": "tell",
+          "phase": 1,
+          "leg": 1,
+          "bx": 248,
+          "px": 88.89335150433641
+        },
+        {
+          "frame": 126,
+          "state": "charge",
+          "phase": 1,
+          "leg": 1,
+          "bx": 248,
+          "px": 88.89335150433641
+        },
+        {
+          "frame": 173,
+          "state": "brake",
+          "phase": 1,
+          "leg": 1,
+          "bx": 16,
+          "px": 37.52069152643922
+        },
+        {
+          "frame": 180,
+          "state": "hurt",
+          "phase": 1,
+          "leg": 1,
+          "bx": 16,
+          "px": 36.9578731025659
+        },
+        {
+          "frame": 215,
+          "state": "idle",
+          "phase": 1,
+          "leg": 1,
+          "bx": 16,
+          "px": 119.71250085779687
+        },
+        {
+          "frame": 239,
+          "state": "tell",
+          "phase": 1,
+          "leg": 1,
+          "bx": 16,
+          "px": 203.71250085779687
+        },
+        {
+          "frame": 281,
+          "state": "charge",
+          "phase": 1,
+          "leg": 1,
+          "bx": 16,
+          "px": 222.8924130962637
+        },
+        {
+          "frame": 329,
+          "state": "brake",
+          "phase": 1,
+          "leg": 1,
+          "bx": 256,
+          "px": 267.6981167556838
+        },
+        {
+          "frame": 338,
+          "state": "hurt",
+          "phase": 2,
+          "leg": 1,
+          "bx": 256,
+          "px": 270.24042339815094
+        },
+        {
+          "frame": 373,
+          "state": "idle",
+          "phase": 2,
+          "leg": 1,
+          "bx": 256,
+          "px": 185.46325727409
+        },
+        {
+          "frame": 397,
+          "state": "rattle",
+          "phase": 2,
+          "leg": 1,
+          "bx": 256,
+          "px": 101.46325727409001
+        },
+        {
+          "frame": 445,
+          "state": "bones",
+          "phase": 2,
+          "leg": 1,
+          "bx": 256,
+          "px": 96.38280568968261
+        },
+        {
+          "frame": 545,
+          "state": "recover",
+          "phase": 2,
+          "leg": 1,
+          "bx": 256,
+          "px": 258.69760112408227
+        },
+        {
+          "frame": 548,
+          "state": "hurt",
+          "phase": 2,
+          "leg": 1,
+          "bx": 256,
+          "px": 251.49760112408225
+        },
+        {
+          "frame": 583,
+          "state": "idle",
+          "phase": 2,
+          "leg": 1,
+          "bx": 256,
+          "px": 147.19760112408224
+        },
+        {
+          "frame": 607,
+          "state": "tell",
+          "phase": 2,
+          "leg": 1,
+          "bx": 256,
+          "px": 85.18324212392626
+        },
+        {
+          "frame": 649,
+          "state": "charge",
+          "phase": 2,
+          "leg": 1,
+          "bx": 256,
+          "px": 69.01768888561536
+        },
+        {
+          "frame": 697,
+          "state": "hurt",
+          "phase": 3,
+          "leg": 1,
+          "bx": 16,
+          "px": 42.477619098948715
+        },
+        {
+          "frame": 732,
+          "state": "idle",
+          "phase": 3,
+          "leg": 1,
+          "bx": 16,
+          "px": 128.77761909894872
+        },
+        {
+          "frame": 756,
+          "state": "tell",
+          "phase": 3,
+          "leg": 1,
+          "bx": 16,
+          "px": 212.77761909894872
+        },
+        {
+          "frame": 798,
+          "state": "charge",
+          "phase": 3,
+          "leg": 1,
+          "bx": 16,
+          "px": 231.9575313374156
+        },
+        {
+          "frame": 846,
+          "state": "turn",
+          "phase": 3,
+          "leg": 2,
+          "bx": 256,
+          "px": 273.0411981979227
+        },
+        {
+          "frame": 888,
+          "state": "charge",
+          "phase": 3,
+          "leg": 2,
+          "bx": 256,
+          "px": 177.05088284175207
+        },
+        {
+          "frame": 936,
+          "state": "brake",
+          "phase": 3,
+          "leg": 2,
+          "bx": 16,
+          "px": 40.25581462078127
+        },
+        {
+          "frame": 956,
+          "state": "recover",
+          "phase": 3,
+          "leg": 2,
+          "bx": 16,
+          "px": 38.870970603285166
+        },
+        {
+          "frame": 961,
+          "state": "hurt",
+          "phase": 3,
+          "leg": 2,
+          "bx": 16,
+          "px": 38.870970603285166
+        },
+        {
+          "frame": 996,
+          "state": "idle",
+          "phase": 3,
+          "leg": 2,
+          "bx": 16,
+          "px": 125.17097060328516
+        },
+        {
+          "frame": 1020,
+          "state": "rattle",
+          "phase": 3,
+          "leg": 1,
+          "bx": 16,
+          "px": 209.17097060328516
+        },
+        {
+          "frame": 1068,
+          "state": "bones",
+          "phase": 3,
+          "leg": 1,
+          "bx": 16,
+          "px": 214.25142218769247
+        },
+        {
+          "frame": 1164,
+          "state": "recover",
+          "phase": 3,
+          "leg": 1,
+          "bx": 16,
+          "px": 44.7366267532928
+        },
+        {
+          "frame": 1177,
+          "state": "defeated",
+          "phase": 3,
+          "leg": 1,
+          "bx": 16,
+          "px": 22.6070143423553
+        }
+      ],
+      "damage": [],
+      "minHead": 38,
+      "screens": [
+        {
+          "frame": 110,
+          "file": "jump-110.png",
+          "caption": "ANTECIPACAO"
+        },
+        {
+          "frame": 140,
+          "file": "jump-140.png",
+          "caption": "GALOPADA"
+        },
+        {
+          "frame": 180,
+          "file": "jump-180.png",
+          "caption": "PRIMEIRO ACERTO"
+        },
+        {
+          "frame": 420,
+          "file": "jump-420.png",
+          "caption": "ARCO DOS OSSOS"
+        },
+        {
+          "frame": 463,
+          "file": "jump-463.png",
+          "caption": "OSSOS QUICAM"
+        },
+        {
+          "frame": 756,
+          "file": "jump-756.png",
+          "caption": "IDA E VOLTA"
+        },
+        {
+          "frame": 860,
+          "file": "jump-860.png",
+          "caption": "AVISO DO RETORNO"
+        },
+        {
+          "frame": 918,
+          "file": "jump-918.png",
+          "caption": "SEGUNDO SALTO"
+        },
+        {
+          "frame": 961,
+          "file": "jump-961.png",
+          "caption": "COSTELAS EXPOSTAS"
+        },
+        {
+          "frame": 1177,
+          "file": "jump-1177.png",
+          "caption": "A OSSADA CEDE"
+        },
+        {
+          "frame": 1201,
+          "file": "jump-1201.png",
+          "caption": "PESO NO CHAO"
+        },
+        {
+          "frame": 1267,
+          "file": "jump-1267.png",
+          "caption": "AGUA NO CURRAL"
+        }
+      ],
+      "finished": true
+    },
+    "pound": {
+      "frames": 1251,
+      "hitFrames": [
+        180,
+        338,
+        548,
+        697,
+        945,
+        1161
+      ],
+      "warnings": [
+        84,
+        239,
+        397,
+        607,
+        756,
+        846,
+        1004
+      ],
+      "events": [
+        {
+          "frame": 1,
+          "state": "intro",
+          "phase": 1,
+          "leg": 1,
+          "bx": 248,
+          "px": 68.3
+        },
+        {
+          "frame": 60,
+          "state": "idle",
+          "phase": 1,
+          "leg": 1,
+          "bx": 248,
+          "px": 88.89335150433641
+        },
+        {
+          "frame": 84,
+          "state": "tell",
+          "phase": 1,
+          "leg": 1,
+          "bx": 248,
+          "px": 88.89335150433641
+        },
+        {
+          "frame": 126,
+          "state": "charge",
+          "phase": 1,
+          "leg": 1,
+          "bx": 248,
+          "px": 88.89335150433641
+        },
+        {
+          "frame": 173,
+          "state": "brake",
+          "phase": 1,
+          "leg": 1,
+          "bx": 16,
+          "px": 37.52069152643922
+        },
+        {
+          "frame": 180,
+          "state": "hurt",
+          "phase": 1,
+          "leg": 1,
+          "bx": 16,
+          "px": 36.9578731025659
+        },
+        {
+          "frame": 215,
+          "state": "idle",
+          "phase": 1,
+          "leg": 1,
+          "bx": 16,
+          "px": 119.71250085779687
+        },
+        {
+          "frame": 239,
+          "state": "tell",
+          "phase": 1,
+          "leg": 1,
+          "bx": 16,
+          "px": 203.71250085779687
+        },
+        {
+          "frame": 281,
+          "state": "charge",
+          "phase": 1,
+          "leg": 1,
+          "bx": 16,
+          "px": 222.8924130962637
+        },
+        {
+          "frame": 329,
+          "state": "brake",
+          "phase": 1,
+          "leg": 1,
+          "bx": 256,
+          "px": 267.6981167556838
+        },
+        {
+          "frame": 338,
+          "state": "hurt",
+          "phase": 2,
+          "leg": 1,
+          "bx": 256,
+          "px": 270.24042339815094
+        },
+        {
+          "frame": 373,
+          "state": "idle",
+          "phase": 2,
+          "leg": 1,
+          "bx": 256,
+          "px": 185.46325727409
+        },
+        {
+          "frame": 397,
+          "state": "rattle",
+          "phase": 2,
+          "leg": 1,
+          "bx": 256,
+          "px": 101.46325727409001
+        },
+        {
+          "frame": 445,
+          "state": "bones",
+          "phase": 2,
+          "leg": 1,
+          "bx": 256,
+          "px": 96.38280568968261
+        },
+        {
+          "frame": 545,
+          "state": "recover",
+          "phase": 2,
+          "leg": 1,
+          "bx": 256,
+          "px": 258.69760112408227
+        },
+        {
+          "frame": 548,
+          "state": "hurt",
+          "phase": 2,
+          "leg": 1,
+          "bx": 256,
+          "px": 251.49760112408225
+        },
+        {
+          "frame": 583,
+          "state": "idle",
+          "phase": 2,
+          "leg": 1,
+          "bx": 256,
+          "px": 147.19760112408224
+        },
+        {
+          "frame": 607,
+          "state": "tell",
+          "phase": 2,
+          "leg": 1,
+          "bx": 256,
+          "px": 85.18324212392626
+        },
+        {
+          "frame": 649,
+          "state": "charge",
+          "phase": 2,
+          "leg": 1,
+          "bx": 256,
+          "px": 69.01768888561536
+        },
+        {
+          "frame": 697,
+          "state": "hurt",
+          "phase": 3,
+          "leg": 1,
+          "bx": 16,
+          "px": 42.477619098948715
+        },
+        {
+          "frame": 732,
+          "state": "idle",
+          "phase": 3,
+          "leg": 1,
+          "bx": 16,
+          "px": 128.77761909894872
+        },
+        {
+          "frame": 756,
+          "state": "tell",
+          "phase": 3,
+          "leg": 1,
+          "bx": 16,
+          "px": 212.77761909894872
+        },
+        {
+          "frame": 798,
+          "state": "charge",
+          "phase": 3,
+          "leg": 1,
+          "bx": 16,
+          "px": 231.9575313374156
+        },
+        {
+          "frame": 846,
+          "state": "turn",
+          "phase": 3,
+          "leg": 2,
+          "bx": 256,
+          "px": 273.0411981979227
+        },
+        {
+          "frame": 888,
+          "state": "charge",
+          "phase": 3,
+          "leg": 2,
+          "bx": 256,
+          "px": 177.05088284175207
+        },
+        {
+          "frame": 936,
+          "state": "brake",
+          "phase": 3,
+          "leg": 2,
+          "bx": 16,
+          "px": 40.25581462078127
+        },
+        {
+          "frame": 945,
+          "state": "hurt",
+          "phase": 3,
+          "leg": 2,
+          "bx": 16,
+          "px": 39.118772312543335
+        },
+        {
+          "frame": 980,
+          "state": "idle",
+          "phase": 3,
+          "leg": 2,
+          "bx": 16,
+          "px": 125.41877231254333
+        },
+        {
+          "frame": 1004,
+          "state": "rattle",
+          "phase": 3,
+          "leg": 1,
+          "bx": 16,
+          "px": 209.41877231254333
+        },
+        {
+          "frame": 1052,
+          "state": "bones",
+          "phase": 3,
+          "leg": 1,
+          "bx": 16,
+          "px": 214.49922389695064
+        },
+        {
+          "frame": 1148,
+          "state": "recover",
+          "phase": 3,
+          "leg": 1,
+          "bx": 16,
+          "px": 44.98442846255097
+        },
+        {
+          "frame": 1161,
+          "state": "defeated",
+          "phase": 3,
+          "leg": 1,
+          "bx": 16,
+          "px": 22.85481605161347
+        }
+      ],
+      "damage": [],
+      "minHead": 38,
+      "screens": [],
+      "finished": true
+    }
+  }
+}

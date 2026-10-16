@@ -48,12 +48,14 @@ function replay(h: Harness, g: GuairaGallery, blocks = runs) {
     return { frames, firstDescent, secondDescent, firstBreak, secondBreak };
 }
 
-test('gallery is an isolated native level with only six real breakable tiles and no campaign hooks', t => {
+test('gallery has two required lids, an optional cache and no campaign hooks', t => {
     const stages = structuredClone(STAGES), islands = structuredClone(ISLANDS), h = guairaGalleryBrowser(t), g = h.create();
     assert.ok(g.player instanceof Player); assert.ok(g.input instanceof Input); assert.ok(g.level instanceof WorldLevel);
     assert.equal(g.player.data.position.x,48); assert.equal(feet(g),176); assert.equal(g.player.data.hasHelmet,true);
-    assert.equal(g.stage.level.tiles.flat().filter(tile => tile === T.BRICK_BREAKABLE).length,6);
-    for (const key of ['exits','foes','mechanisms','pickups','dialogues','landmarks'] as const) assert.deepEqual(g.stage[key],[]);
+    assert.equal(g.stage.level.tiles.flat().filter(tile => tile === T.BRICK_BREAKABLE).length,9);
+    assert.equal(g.stage.pickups.length,5);
+    assert.ok(g.stage.pickups.every(p => p.kind === 'coin' && p.y > G.cacheY));
+    for (const key of ['exits','foes','mechanisms','dialogues','landmarks'] as const) assert.deepEqual(g.stage[key],[]);
     assert.equal(g.boss,null); assert.equal(g.mapReturnHref,'./guaira.html?at=bairro');
     for (let row=0;row<15;row++) assert.equal(g.level.getTile(14,row),T.GROUND);
     for (let row=0;row<21;row++) assert.equal(g.level.getTile(28,row),T.GROUND);

@@ -1,0 +1,204 @@
+{
+  "physicalDevice": false,
+  "routes": [
+    {
+      "route": "guairaLabReplay",
+      "touch": false,
+      "frames": 1267,
+      "hits": [
+        180,
+        338,
+        548,
+        697,
+        961,
+        1177
+      ],
+      "minHead": 38,
+      "health": 0,
+      "finished": true,
+      "reduced": false,
+      "renderCpuMs": {
+        "samples": 1207,
+        "median": 3.0999999940395355,
+        "p95": 5.899999976158142
+      }
+    },
+    {
+      "route": "guairaLabReplay",
+      "touch": true,
+      "frames": 1267,
+      "hits": [
+        180,
+        338,
+        548,
+        697,
+        961,
+        1177
+      ],
+      "minHead": 38,
+      "health": 0,
+      "finished": true,
+      "reduced": true,
+      "renderCpuMs": {
+        "samples": 1207,
+        "median": 3.9000000059604645,
+        "p95": 6.5
+      }
+    },
+    {
+      "route": "guairaBullPoundReplay",
+      "touch": false,
+      "frames": 1251,
+      "hits": [
+        180,
+        338,
+        548,
+        697,
+        945,
+        1161
+      ],
+      "minHead": 38,
+      "health": 0,
+      "finished": true,
+      "reduced": false,
+      "renderCpuMs": {
+        "samples": 1191,
+        "median": 4,
+        "p95": 6.199999988079071
+      }
+    },
+    {
+      "route": "guairaBullPoundReplay",
+      "touch": true,
+      "frames": 1251,
+      "hits": [
+        180,
+        338,
+        548,
+        697,
+        945,
+        1161
+      ],
+      "minHead": 38,
+      "health": 0,
+      "finished": true,
+      "reduced": true,
+      "renderCpuMs": {
+        "samples": 1191,
+        "median": 4.0999999940395355,
+        "p95": 7.0999999940395355
+      }
+    },
+    {
+      "route": "guairaBullMissReplay",
+      "touch": false,
+      "frames": 390,
+      "hits": [
+        385
+      ],
+      "minHead": 53,
+      "health": 5,
+      "finished": false,
+      "reduced": false,
+      "renderCpuMs": {
+        "samples": 330,
+        "median": 4.5,
+        "p95": 8.5
+      }
+    },
+    {
+      "route": "guairaBullMissReplay",
+      "touch": true,
+      "frames": 390,
+      "hits": [
+        385
+      ],
+      "minHead": 53,
+      "health": 5,
+      "finished": false,
+      "reduced": true,
+      "renderCpuMs": {
+        "samples": 330,
+        "median": 5.4000000059604645,
+        "p95": 10.900000005960464
+      }
+    }
+  ],
+  "pauses": [
+    {
+      "route": "guairaLabReplay",
+      "target": 860,
+      "expected": "turn",
+      "reduced": false,
+      "paused": true,
+      "pixelsFrozen": true,
+      "stateFrozen": true
+    },
+    {
+      "route": "guairaLabReplay",
+      "target": 1201,
+      "expected": "defeated",
+      "reduced": false,
+      "paused": true,
+      "pixelsFrozen": true,
+      "stateFrozen": true
+    },
+    {
+      "route": "guairaBullMissReplay",
+      "target": 251,
+      "expected": "idle",
+      "reduced": false,
+      "paused": true,
+      "pixelsFrozen": true,
+      "stateFrozen": true
+    },
+    {
+      "route": "guairaLabReplay",
+      "target": 481,
+      "expected": "bones",
+      "reduced": false,
+      "paused": true,
+      "pixelsFrozen": true,
+      "stateFrozen": true
+    },
+    {
+      "route": "guairaLabReplay",
+      "target": 860,
+      "expected": "turn",
+      "reduced": true,
+      "paused": true,
+      "pixelsFrozen": true,
+      "stateFrozen": true
+    },
+    {
+      "route": "guairaLabReplay",
+      "target": 1201,
+      "expected": "defeated",
+      "reduced": true,
+      "paused": true,
+      "pixelsFrozen": true,
+      "stateFrozen": true
+    },
+    {
+      "route": "guairaBullMissReplay",
+      "target": 251,
+      "expected": "idle",
+      "reduced": true,
+      "paused": true,
+      "pixelsFrozen": true,
+      "stateFrozen": true
+    },
+    {
+      "route": "guairaLabReplay",
+      "target": 481,
+      "expected": "bones",
+      "reduced": true,
+      "paused": true,
+      "pixelsFrozen": true,
+      "stateFrozen": true
+    }
+  ],
+  "review": [],
+  "errors": [],
+  "passed": true
+}

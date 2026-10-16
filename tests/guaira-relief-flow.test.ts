@@ -54,8 +54,9 @@ test('one full native cycle preserves every opaque damage pixel and all nonliqui
             }
         }
     }
-    // Frozen aaf1734 nonliquid raster across the complete cycle: hardware and warnings stay unchanged.
-    assert.equal(hardware.digest('hex'),'99fee56906a3685dfa790e1f83e9eddd63148ec796baa46ad053b03023100bb1');
+    // Hardware is unchanged; the zero-height first rising tick now retains !.
+    // The boundary also has a semantic regression test in guaira-hydraulics-art.
+    assert.equal(hardware.digest('hex'),'0b3d7d4baf7deb8bb58817758081568f47a8af29c08dd42930e84a86e0b58f70');
 });
 
 test('streams advect upward one pixel per native 24ms without screen-relative phase changes',()=>{

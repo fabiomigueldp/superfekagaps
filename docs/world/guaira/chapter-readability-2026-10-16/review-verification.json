@@ -1,0 +1,176 @@
+{
+  "widths": [
+    {
+      "width": 1440,
+      "scroll": 1440,
+      "overflow": false
+    },
+    {
+      "width": 844,
+      "scroll": 844,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "scroll": 390,
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "scroll": 320,
+      "overflow": false
+    }
+  ],
+  "comparisons": [
+    {
+      "key": "subida-1038",
+      "images": [
+        {
+          "src": "subida-1038-before.png",
+          "width": 320,
+          "height": 180
+        },
+        {
+          "src": "subida-1038-after.png",
+          "width": 320,
+          "height": 180
+        }
+      ]
+    },
+    {
+      "key": "patio-123",
+      "images": [
+        {
+          "src": "patio-123-before.png",
+          "width": 320,
+          "height": 180
+        },
+        {
+          "src": "patio-123-after.png",
+          "width": 320,
+          "height": 180
+        }
+      ]
+    },
+    {
+      "key": "respiros-379",
+      "images": [
+        {
+          "src": "respiros-379-before.png",
+          "width": 320,
+          "height": 180
+        },
+        {
+          "src": "respiros-379-after.png",
+          "width": 320,
+          "height": 180
+        }
+      ]
+    },
+    {
+      "key": "prefeito-519",
+      "images": [
+        {
+          "src": "prefeito-519-before.png",
+          "width": 320,
+          "height": 180
+        },
+        {
+          "src": "prefeito-519-after.png",
+          "width": 320,
+          "height": 180
+        }
+      ]
+    }
+  ],
+  "videos": [
+    {
+      "key": "travessia",
+      "width": 960,
+      "height": 540,
+      "duration": 17.933333,
+      "time": 0.107872,
+      "source": "http://localhost:3000/docs/world/guaira/chapter-readability-2026-10-16/travessia.mp4"
+    },
+    {
+      "key": "patio",
+      "width": 960,
+      "height": 540,
+      "duration": 30.6,
+      "time": 0.114211,
+      "source": "http://localhost:3000/docs/world/guaira/chapter-readability-2026-10-16/patio.mp4"
+    },
+    {
+      "key": "respiros",
+      "width": 960,
+      "height": 540,
+      "duration": 18.866667,
+      "time": 0.107934,
+      "source": "http://localhost:3000/docs/world/guaira/chapter-readability-2026-10-16/respiros.mp4"
+    },
+    {
+      "key": "lab",
+      "width": 960,
+      "height": 540,
+      "duration": 17.733333,
+      "time": 0.112172,
+      "source": "http://localhost:3000/docs/world/guaira/chapter-readability-2026-10-16/lab.mp4"
+    },
+    {
+      "key": "subida",
+      "width": 960,
+      "height": 540,
+      "duration": 19.533333,
+      "time": 0.109718,
+      "source": "http://localhost:3000/docs/world/guaira/chapter-readability-2026-10-16/subida.mp4"
+    },
+    {
+      "key": "prefeito",
+      "width": 960,
+      "height": 540,
+      "duration": 18.533333,
+      "time": 0.111275,
+      "source": "http://localhost:3000/docs/world/guaira/chapter-readability-2026-10-16/prefeito.mp4"
+    },
+    {
+      "key": "galeria",
+      "width": 960,
+      "height": 540,
+      "duration": 12.6,
+      "time": 0.115989,
+      "source": "http://localhost:3000/docs/world/guaira/chapter-readability-2026-10-16/galeria.mp4"
+    },
+    {
+      "key": "alivio",
+      "width": 960,
+      "height": 540,
+      "duration": 10.2,
+      "time": 0.115125,
+      "source": "http://localhost:3000/docs/world/guaira/chapter-readability-2026-10-16/alivio.mp4"
+    }
+  ],
+  "links": [
+    {
+      "href": "http://localhost:3000/?chapter=guaira",
+      "status": 200
+    },
+    {
+      "href": "http://localhost:3000/docs/world/guaira/chapter-readability-2026-10-16/index.html#percursos",
+      "status": 200
+    },
+    {
+      "href": "http://localhost:3000/docs/world/guaira/relief-routes-2026-10-16/index.html",
+      "status": 200
+    },
+    {
+      "href": "http://localhost:3000/docs/world/guaira/chapter-readability-2026-10-16/README.md",
+      "status": 200
+    },
+    {
+      "href": "http://localhost:3000/docs/world/guaira/chapter-readability-2026-10-16/native-routes.json",
+      "status": 200
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

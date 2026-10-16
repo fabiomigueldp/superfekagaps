@@ -38,7 +38,7 @@ for (const checkpoint of [1,2]) test(`checkpoint ${checkpoint} restores only the
 });
 test('two distinct challenges keep native mechanism and campaign contracts',()=>{
     const s=guairaTraversalStage();
-    assert.equal(s.pickups.length,17); assert.equal(new Set(s.pickups.map(p=>p.id)).size,17);
+    assert.equal(s.pickups.length,21); assert.equal(new Set(s.pickups.map(p=>p.id)).size,21);
     assert.equal(s.mechanisms.filter(m=>m.kind==='switch').length,2);
     assert.equal(s.mechanisms.filter(m=>m.kind==='lift').length,2);
     assert.deepEqual(s.exits,[]); assert.deepEqual(s.foes,[]);

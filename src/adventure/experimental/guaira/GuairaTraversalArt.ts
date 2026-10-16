@@ -1,9 +1,14 @@
-import { drawGuairaWindPump, drawGuairaChannelFlow, drawGuairaRiceFlow, drawGuairaSluiceFlow, drawGuairaPoolFlow } from './GuairaWaterworksArt';
+import { drawGuairaWindPump, drawGuairaChannelFlow, drawGuairaRiceFlow } from './GuairaWaterworksArt';
 import { box as r, pixelLine as line, polygon, oval, roof } from '../../WorldPainting';
 import type { WorldLevel, WorldObjects } from '../../WorldPhysics';
 import { drawGuairaWorker } from './GuairaWorkerArt';
-import { supportsStanding } from '../../../world/tileRules';
-import { drawGuairaLandscape, drawGuairaTree, drawGuairaFieldBank, drawGuairaAwning, drawGuairaPerchedBird, guairaBreeze } from './GuairaScenery';
+import { drawGuairaRicePlant } from './GuairaRiceArt';
+import { drawGuairaClayGrain, drawGuairaPlaster, drawGuairaTimber } from './GuairaMaterials';
+import { drawGuairaBridgeHoists, drawGuairaSluice, drawGuairaSluiceReservoir, guairaSluiceRise } from './GuairaSluiceArt';
+import { guairaInclinedPipeRoute, drawGuairaInclinedPipe, type GuairaPipePalette } from './GuairaPipeArt';
+import { supportsStanding, isOneWayTile } from '../../../world/tileRules';
+import { pixelText } from '../../../graphics/BitmapFont';
+import { drawGuairaLandscape, drawGuairaTree, drawGuairaFieldBank, drawGuairaAwning, drawGuairaPerchedBird } from './GuairaScenery';
 
 /** Authored scenery only. The stage and WorldObjects remain the collision/state authority. */
 export const GUAIRA_TRAVERSAL_ART = Object.freeze({
@@ -58,6 +63,7 @@ function house(c: CanvasRenderingContext2D, x: number, floor: number, w: number,
     oval(c, x - 4, floor - 2, w + 9, 5, '#ad7559');
     r(c, x + 4, top + 16, w - 8, h - 16, P.plasterShade);
     r(c, x + 5, top + 16, w - 18, h - 19, P.plaster);
+    drawGuairaPlaster(c, x + 5, top + 21, w - 21, h - 24, variant);
     r(c, x + 6, top + 20, w - 21, 2, '#efd6ae');
     r(c, x + w - 16, top + 19, 8, h - 22, '#c7a17f');
     roof(c, x, top, w, 17);
@@ -111,18 +117,13 @@ function riceTerrace(c: CanvasRenderingContext2D, x: number, y: number, width: n
     drawGuairaRiceFlow(c, x, y, width, wet, time, reducedMotion, row);
     // Alternating planted clumps leave water between their feet. Neighbouring
     // beds offset their groups; a single repeating grass glyph cannot emerge.
-    const clumps = [[8, 14, -3], [20, 11, 3], [31, 16, -2], [47, 12, 4]] as const;
-    for (let group = -row * 17; group < width; group += 57) for (const [offset, height, lean] of clumps) {
+    const clumps = [[8, 14], [20, 11], [31, 16], [47, 12]] as const;
+    for (let group = -row * 17; group < width; group += 57) for (const [offset, height] of clumps) {
         const xx = group + offset;
         if (xx < 6 || xx > width - 7) continue;
-        const sway = guairaBreeze(time, worldX + xx + row * 23, 2);
-        const root = y + 10, tip = root - height;
+        const root = y + 10;
         r(c, x + xx - 2, root, 6, 2, '#6f9180');
-        polygon(c, [[x + xx - 1,root],[x + xx - 6,tip + 4],[x + xx - 3,tip + 5],[x + xx + 2,root]], '#587c53');
-        polygon(c, [[x + xx,root],[x + xx + lean + sway,tip],[x + xx + lean + 2 + sway,tip + 2],[x + xx + 3,root]], '#799951');
-        polygon(c, [[x + xx + 1,root],[x + xx + 7 + sway,tip + 4],[x + xx + 6,tip + 8],[x + xx + 3,root]], '#6f9251');
-        line(c, x + xx + 1, root - 2, x + xx + lean + 1 + sway, tip + 2, '#a3b56b');
-        line(c, x + xx + 2, root - 3, x + xx + 5 + sway, tip + 6, '#96ab61');
+        drawGuairaRicePlant(c, x + xx, root, time, worldX + xx, row, height);
         r(c, x + xx + 4, root + 1, 3, 1, '#a6c1ab');
     }
 }
@@ -174,7 +175,7 @@ function cutBank(c: CanvasRenderingContext2D, left: number, right: number, cx: n
 }
 
 /** Sunburnt township and fields sit behind the quiet y216–224 running strip. */
-export function drawGuairaTraversalBackground(c: CanvasRenderingContext2D, cx: number, cy: number, time: number, reducedMotion: boolean, waterActive = false) {
+export function drawGuairaTraversalBackground(c: CanvasRenderingContext2D, cx: number, cy: number, time: number, reducedMotion: boolean, waterActive = false, finalWaterActive = waterActive) {
     layer(c, cx, cy, (cameraX, cameraY) => {
         const t = clock(time, reducedMotion);
         drawGuairaLandscape(c, cameraX, cameraY, t, reducedMotion, 'village');
@@ -206,22 +207,15 @@ export function drawGuairaTraversalBackground(c: CanvasRenderingContext2D, cx: n
             r(c, 284 - cameraX, 208 - cameraY, 1, 5, '#d1b381');
         }
         // Reservoir is visibly upstream of the sluice, higher than the destination canal.
-        if (visible(469, 132, cameraX)) {
-            const x = 481 - cameraX, y = 149 - cameraY;
-            polygon(c, [[x - 14,y + 55],[x - 4,y + 18],[x + 14,y + 4],[x + 82,y + 4],[x + 109,y + 49],[x + 117,y + 64]], '#b77756');
-            oval(c, x, y, 83, 24, '#ae8a69');
-            oval(c, x + 3, y + 1, 77, 19, '#d4ba91');
-            oval(c, x + 7, y + 4, 69, 12, P.waterShade);
-            oval(c, x + 9, y + 4, 65, 9, '#83c0bb');
-            r(c, x + 15, y + 7, 18, 1, '#c5dfc8');
-            r(c, x + 60, y + 8, 7, 1, '#c5dfc8');
-        }
+        if (visible(467, 132, cameraX)) drawGuairaSluiceReservoir(c, 481-cameraX, 149-cameraY, waterActive, t, reducedMotion);
+        if (visible(1184, 132, cameraX)) drawGuairaSluiceReservoir(c, 1198-cameraX, 130-cameraY, finalWaterActive, t, reducedMotion);
         // Three stepped rice plots, with earth berms and a continuous service bank.
         for (const plot of [{ x: 650, y: 174, w: 134 }, { x: 788, y: 163, w: 128 }, { x: 919, y: 154, w: 103 }, { x: 1032, y: 166, w: 78 }, { x: 1370, y: 136, w: 144 }]) {
             if (!visible(plot.x - 10, plot.w + 20, cameraX)) continue;
             drawGuairaFieldBank(c, plot.x - cameraX, plot.y + 7 - cameraY, plot.w, 223 - cameraY);
-            riceTerrace(c, plot.x - cameraX, plot.y - cameraY, plot.w, 0, t, reducedMotion, waterActive, plot.x);
-            riceTerrace(c, plot.x - cameraX, plot.y + 18 - cameraY, plot.w, 1, t, reducedMotion, waterActive, plot.x);
+            const irrigated = plot.x >= 1360 ? finalWaterActive : waterActive;
+            riceTerrace(c, plot.x - cameraX, plot.y - cameraY, plot.w, 0, t, reducedMotion, irrigated, plot.x);
+            riceTerrace(c, plot.x - cameraX, plot.y + 18 - cameraY, plot.w, 1, t, reducedMotion, irrigated, plot.x);
         }
         if (visible(694, 52, cameraX)) {
             pot(c, 703 - cameraX, 210 - cameraY, 10);
@@ -229,6 +223,29 @@ export function drawGuairaTraversalBackground(c: CanvasRenderingContext2D, cx: n
         // The first rice-bank descent is a usable maintenance passage. Its
         // downpipe stays behind the native tile painter, which owns every lip.
         if (visible(757, 22, cameraX)) maintenanceDownpipe(c, cameraX, cameraY);
+        // A recessed service corridor makes the optional low route continuous.
+        // Timber bents sit behind Feka; only the actual deck tiles own a pale cap.
+        r(c, 768-cameraX, 224-cameraY, 208, 32, '#a58a65');
+        r(c, 769-cameraX, 226-cameraY, 206, 28, '#b19972');
+        for (let wx=784;wx<976;wx+=32) {
+            r(c,wx-cameraX,230-cameraY,18,1,'#a88e68');
+            r(c,wx+9-cameraX,245-cameraY,15,1,'#a88e68');
+        }
+        for (const [left, right, top] of [[800,848,192],[880,928,208]]) {
+            for (const wx of [left+4,right-7]) {
+                r(c,wx-cameraX,top+8-cameraY,3,256-top-8,'#876e55');
+                r(c,wx+1-cameraX,top+9-cameraY,1,256-top-10,'#b59a6d');
+            }
+            line(c,left+6-cameraX,top+23-cameraY,left+22-cameraX,top+8-cameraY,'#876e55',2);
+            line(c,right-6-cameraX,top+23-cameraY,right-22-cameraX,top+8-cameraY,'#876e55',2);
+        }
+        // Small fixed wayfinding belongs to the corridor, not to a floating HUD.
+        r(c,934-cameraX,210-cameraY,35,11,'#bda078');
+        r(c,938-cameraX,221-cameraY,2,19,'#92775a');
+        pixelText(c,'SAIDA',936-cameraX,212-cameraY,'#66564a');
+        line(c,939-cameraX,233-cameraY,950-cameraX,233-cameraY,'#75634e');
+        line(c,947-cameraX,230-cameraY,950-cameraX,233-cameraY,'#75634e');
+        line(c,947-cameraX,236-cameraY,950-cameraX,233-cameraY,'#75634e');
         // A shaded farm shed and open corral mark the route's end, leaving the exit lane clear.
         if (visible(976, 176, (cameraX - 416))) {
             house(c, 987 - (cameraX - 416), 205 - (cameraY + 32), 57, 55, 1);
@@ -251,6 +268,15 @@ export function drawGuairaTraversalBackground(c: CanvasRenderingContext2D, cx: n
             line(c, 1118 - (cameraX - 416), 177 - (cameraY + 32), 1121 - (cameraX - 416), 180 - (cameraY + 32), P.woodShade);
             line(c, 1118 - (cameraX - 416), 183 - (cameraY + 32), 1121 - (cameraX - 416), 180 - (cameraY + 32), P.woodShade);
         }
+        // Workshop scaffolds share the actual optional deck coordinates. Their
+        // feet meet the street; only the live terrain paints the walkable caps.
+        for (const [left, top] of [[144,176],[224,144]]) {
+            for (const xx of [left + 4, left + 42]) {
+                r(c, xx - cameraX, top + 6 - cameraY, 3, 218 - top, '#957859');
+                r(c, xx + 1 - cameraX, top + 7 - cameraY, 1, 215 - top, '#c3a276');
+                line(c, xx - cameraX, top + 25 - cameraY, xx + (xx === left + 4 ? 14 : -14) - cameraX, top + 7 - cameraY, '#957859');
+            }
+        }
         // A low-contrast, unbroken strip separates decorative bases from walkable terrain.
         for (const [left, right] of [[0, 416], [624, 704], [976, 1120]]) {
             const x = Math.max(left, cameraX), end = Math.min(right, cameraX + 320);
@@ -272,6 +298,12 @@ export function drawGuairaTraversalTerrain(c: CanvasRenderingContext2D, level: W
             const tile = level.data.tiles[row]?.[col];
             if (!supportsStanding(tile ?? 0)) continue;
             const wx = level.colToWorldX(col), wy = level.rowToWorldY(row), x = wx - cameraX, y = wy - cameraY;
+            if (isOneWayTile(tile)) {
+                r(c,x,y,16,2,'#f0d29a'); r(c,x,y+2,16,5,'#997454');
+                r(c,x,y+7,16,1,'#695449'); r(c,x+2,y+3,11,1,'#c3a276');
+                if (col % 3 === 0) {r(c,x+2,y+2,2,5,'#697a78'); r(c,x+2,y+2,1,1,'#bda080');}
+                continue;
+            }
             const top = !supportsStanding(level.data.tiles[row - 1]?.[col] ?? 0), rice = wx >= 624;
             r(c, x, y, 16, 16, rice ? '#aa764f' : '#a55f47');
             if (top) {
@@ -289,7 +321,7 @@ export function drawGuairaTraversalTerrain(c: CanvasRenderingContext2D, level: W
         // walkable cap and retaining edge, including changed test geometry.
         c.save(); c.beginPath();
         for (let row = startRow; row <= endRow; row++) for (let col = startCol; col <= endCol; col++) {
-            if (!supportsStanding(level.data.tiles[row]?.[col] ?? 0)) continue;
+            if (!supportsStanding(level.data.tiles[row]?.[col] ?? 0) || isOneWayTile(level.data.tiles[row]?.[col] ?? 0)) continue;
             const top = !supportsStanding(level.data.tiles[row - 1]?.[col] ?? 0);
             const left = !supportsStanding(level.data.tiles[row]?.[col - 1] ?? 0);
             const right = !supportsStanding(level.data.tiles[row]?.[col + 1] ?? 0);
@@ -299,6 +331,10 @@ export function drawGuairaTraversalTerrain(c: CanvasRenderingContext2D, level: W
         c.clip();
         if (visible(0, 416, cameraX)) cutBank(c, 0, 416, cameraX, cameraY, false);
         if (visible(624, 912, cameraX)) cutBank(c, 624, 1536, cameraX, cameraY, true);
+        for (let row = startRow; row <= endRow; row++) for (let col = startCol; col <= endCol; col++) {
+            if (!supportsStanding(level.data.tiles[row]?.[col] ?? 0) || isOneWayTile(level.data.tiles[row]?.[col] ?? 0)) continue;
+            drawGuairaClayGrain(c, level.colToWorldX(col) - cameraX, level.rowToWorldY(row) - cameraY, col, row);
+        }
         c.restore();
     });
 }
@@ -316,100 +352,53 @@ function channel(c: CanvasRenderingContext2D, left: number, right: number, y: nu
     }
 }
 
-/** Recessed distribution pipes join the sluice shoulders to the two open canals. */
-function distributionBranch(c: CanvasRenderingContext2D, bankX: number, sluiceX: number, cx: number, cy: number) {
-    // The sloped bronze silhouette has no pale horizontal edge to imply a landing.
-    line(c, bankX - cx, 207 - cy, sluiceX - cx, 195 - cy, '#72584d', 7);
-    line(c, bankX + 1 - cx, 208 - cy, sluiceX + 1 - cx, 196 - cy, '#a07b56', 5);
-    line(c, bankX + 1 - cx, 208 - cy, sluiceX + 1 - cx, 196 - cy, '#c09a6b', 1);
-    for (const fraction of [0, .48, 1]) {
-        const x = Math.round(bankX + (sluiceX - bankX) * fraction) - cx;
-        const y = Math.round(207 - 12 * fraction) - cy;
-        r(c, x, y - 1, 4, 9, '#806651');
-        r(c, x + 1, y, 2, 7, '#b39368');
-        r(c, x + 1, y + 1, 1, 1, '#d0af7d');
-    }
-}
+const DISTRIBUTION_PIPE: Readonly<GuairaPipePalette> = Object.freeze({
+    edge: '#72584d', brass: '#b08a60', light: '#ccab7a', shade: '#8b6e52',
+    water: P.water, glint: '#a6d6c8', dry: '#b68c63',
+});
+// Pixel-centred mouths meet the open channel's waterline. Sources point out of
+// the gate, except the final inlet, which receives the first valve's supply.
+const TOWN_OUTLET = guairaInclinedPipeRoute([500,198],[411,210]);
+const RICE_OUTLET = guairaInclinedPipeRoute([546,198],[627,210]);
+const FINAL_INLET = guairaInclinedPipeRoute([1117,210],[1217,179]);
+const FINAL_OUTLET = guairaInclinedPipeRoute([1263,179],[1363,187]);
 
 /** Pure projection of the actual valve/lift, including the intermediate rising position. */
 export function drawGuairaTraversalObjects(c: CanvasRenderingContext2D, objects: WorldObjects, cx: number, cy: number, time: number, reducedMotion: boolean) {
     layer(c, cx, cy, (cameraX, cameraY) => {
         const t = clock(time, reducedMotion), valve = objects.get(GUAIRA_TRAVERSAL_ART.valveId), bridge = objects.get(GUAIRA_TRAVERSAL_ART.bridgeId);
         const wet = !!bridge?.active;
-        const rise = bridge ? Math.max(0, Math.min(1, (336 - bridge.y) / 112)) : 0;
+        const rise = bridge ? guairaSluiceRise(bridge) : 0;
         // Public branch becomes cyan all the way back through the dry neighborhood.
         if (visible(78, 338, cameraX)) channel(c, 78 - cameraX, 416 - cameraX, 207 - cameraY, wet, t, reducedMotion, -1);
         if (visible(624, 70, cameraX)) channel(c, 624 - cameraX, 694 - cameraX, 207 - cameraY, wet, t, reducedMotion, 1);
         if (visible(976, 144, cameraX)) channel(c, 976 - cameraX, 1120 - cameraX, 207 - cameraY, wet, t, reducedMotion, 1);
         // The final canal uses the same water and hoist language as the lesson.
         const finalBridge = objects.get('guaira-rice-bridge');
-        if (visible(1120, 240, cameraX)) {
-            r(c, 1120 - cameraX, 264 - cameraY, 240, 24, P.waterShade);
-            drawGuairaPoolFlow(c, 1120 - cameraX, 1360 - cameraX, 264 - cameraY, !!finalBridge?.active, t, reducedMotion);
-            for (const wx of [1123, 1355]) {
-                r(c, wx - cameraX, 189 - cameraY, 2, 91, '#8a7964');
-                for (let yy = 192; yy < Math.min(279, finalBridge?.y ?? 279); yy += 7)
-                    r(c, wx - cameraX, yy - cameraY, 2, 2, '#b1a18a');
-            }
+        if (visible(1360, 40, cameraX)) channel(c, 1360-cameraX, 1400-cameraX, 184-cameraY, !!finalBridge?.active, t, reducedMotion, 1);
+        if (finalBridge && visible(1100, 280, cameraX)) {
+            drawGuairaInclinedPipe(c, FINAL_INLET, cameraX, cameraY, wet, t, reducedMotion, DISTRIBUTION_PIPE);
+            drawGuairaInclinedPipe(c, FINAL_OUTLET, cameraX, cameraY, finalBridge.active, t, reducedMotion, DISTRIBUTION_PIPE);
+            drawGuairaSluice(c, finalBridge, 1215, 156, cameraX, cameraY, t, reducedMotion);
+            drawGuairaBridgeHoists(c, finalBridge, 224, 192, cameraX, cameraY);
         }
         // Workers stand in front of the shallow background channel, behind Feka's path.
         const workerState = { activeTimeMs: time, valveActive: !!valve?.active, bridgeRise: rise, reducedMotion };
         if (visible(296, 24, cameraX)) drawGuairaWorker(c, 304 - cameraX, 216 - cameraY, 'pump', workerState);
         if (visible(712, 24, cameraX)) drawGuairaWorker(c, 720 - cameraX, 204 - cameraY, 'rice', workerState);
-        if (visible(400, 240, cameraX)) {
+        if (bridge && visible(396, 248, cameraX)) {
             // Both branches pass behind the gate masonry, chains and real moving deck.
-            distributionBranch(c, 411, 500, cameraX, cameraY);
-            distributionBranch(c, 623, 541, cameraX, cameraY);
-            // Pit back wall and vertical sluice have no misleading horizontal landing lip.
-            const x = 498 - cameraX, top = 175 - cameraY;
-            r(c, x, top, 50, 85, '#92745f');
-            r(c, x + 6, top + 5, 38, 80, '#705950');
-            r(c, x + 9, top + 6, 32, 78, '#a08164');
-            r(c, x + 1, top + 1, 4, 83, '#c3ac89');
-            r(c, x + 45, top + 1, 4, 83, '#b49b7a');
-            // Lifted gate tracks real bridge height; animation does not advance simulation.
-            const gateY = top + 14 - Math.round(rise * 11);
-            for (let yy = 0; yy < 35; yy += 7) {
-                r(c, x + 8, gateY + yy, 34, 6, yy % 14 === 0 ? '#a7825d' : '#926c50');
-                r(c, x + 9, gateY + yy, 32, 1, '#c4a074');
-            }
-            r(c, x + 13, gateY, 3, 33, '#665951');
-            r(c, x + 35, gateY, 3, 33, '#665951');
-            r(c, x + 23, top - 9, 3, 44, P.bronze);
-            r(c, x + 14, top - 10, 20, 3, '#745d4f');
-            r(c, x + 14, top - 11, 20, 1, '#d7b580');
-            // Water stays below the service deck and cannot be mistaken for walkable ground.
-            if (wet) {
-                const spillY = gateY + 35;
-                r(c, x + 10, spillY, 30, 269 - cameraY - spillY, P.waterShade);
-                r(c, x + 13, spillY, 23, 269 - cameraY - spillY, P.water);
-                r(c, x + 14, spillY, 3, 269 - cameraY - spillY, '#8bcec7');
-                drawGuairaSluiceFlow(c, x, spillY, 265 - cameraY, wet, t, reducedMotion);
-                r(c, 424 - cameraX, 265 - cameraY, 192, 23, P.waterShade);
-                r(c, 428 - cameraX, 265 - cameraY, 184, 3, P.water);
-                drawGuairaPoolFlow(c, 428 - cameraX, 612 - cameraX, 265 - cameraY, wet, t, reducedMotion, x + 25);
-            } else {
-                r(c, 424 - cameraX, 265 - cameraY, 192, 23, '#8c5e4b');
-                for (let xx = 432; xx < 610; xx += 31) {
-                    line(c, xx - cameraX, 269 - cameraY, xx + 7 - cameraX, 276 - cameraY, '#684b42');
-                    line(c, xx + 7 - cameraX, 276 - cameraY, xx + 3 - cameraX, 284 - cameraY, '#684b42');
-                }
-            }
-            // Hoist chains flank the deck and never cover a central landing silhouette.
-            for (const wx of [420, 617]) {
-                r(c, wx - cameraX, 193 - cameraY, 2, 86, '#8a7964');
-                for (let yy = 195; yy < Math.min(279, bridge?.y ?? 279); yy += 7) r(c, wx - cameraX, yy - cameraY, 2, 2, '#b1a18a');
-            }
+            drawGuairaInclinedPipe(c, TOWN_OUTLET, cameraX, cameraY, wet, t, reducedMotion, DISTRIBUTION_PIPE);
+            drawGuairaInclinedPipe(c, RICE_OUTLET, cameraX, cameraY, wet, t, reducedMotion, DISTRIBUTION_PIPE);
+            drawGuairaSluice(c, bridge, 498, 175, cameraX, cameraY, t, reducedMotion);
+            drawGuairaBridgeHoists(c, bridge, 224, 224, cameraX, cameraY);
         }
         for (const bridge of [objects.get(GUAIRA_TRAVERSAL_ART.bridgeId), objects.get('guaira-rice-bridge')]) if (bridge && visible(bridge.x, bridge.width, cameraX)) {
             const x = Math.round(bridge.x) - cameraX, y = Math.round(bridge.y) - cameraY, w = Math.round(bridge.width), h = Math.round(bridge.height);
             r(c, x, y, w, h, P.woodShade);
             r(c, x, y, w, 2, '#ead19b');
             r(c, x, y + 2, w, Math.max(0, h - 5), P.wood);
-            for (let xx = 0; xx < w; xx += 13) {
-                r(c, x + xx, y + 2, 1, Math.max(0, h - 5), '#6b5142');
-                r(c, x + xx + 2, y + 3, Math.min(8, w - xx - 2), 1, P.woodLight);
-            }
+            drawGuairaTimber(c, x, y + 2, w, h - 5);
             r(c, x, y + h - 3, w, 3, '#716359');
             for (const xx of [2, w - 9]) {
                 r(c, x + xx, y + 2, 7, Math.max(0, h - 2), '#68878a');

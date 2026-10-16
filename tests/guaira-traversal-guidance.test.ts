@@ -20,20 +20,30 @@ function watchOverlay(t: TestContext, game: GuairaTraversal) {
         const snapshot = () => structuredClone({ player: game.player.data, camera: game.camera, objects: game.objects,
             time: game.time, elapsed: game.elapsed, state: game.state, finished: game.finished, save: game.store.save });
         const before = snapshot(); game.render(); assert.deepEqual(snapshot(), before, 'painting cannot change the run');
-        return { calls: [...calls], valveBanner: calls.some(([x, y, w, h]) => x === 44 && y === 31 && w === 236 && h === 19) };
+        return { calls: [...calls], valveBanner: calls.some(([x, y, w, h]) => x === 44 && y === 31 && w === 236 && h === 19),
+            header: calls.filter(([x,y,,,color])=>x>=57&&x<230&&y>=8&&y<16&&color==='#f0ddae') };
     };
 }
 
-for (const reducedMotion of [false, true]) test(`native held jump clears the banner and its shadow, then restores guidance (reduced motion: ${reducedMotion})`, t => {
+function header(title:string) {
+    const calls:Array<[number,number,number,number,string]>=[];
+    const c={fillStyle:'',fillRect(x:number,y:number,w:number,h:number){calls.push([x,y,w,h,this.fillStyle]);}};
+    pixelText(c as unknown as CanvasRenderingContext2D,title,57,8,'#f0ddae');return calls;
+}
+
+for (const reducedMotion of [false, true]) test(`native held jump retains compact HUD guidance and leaves the world unobscured (reduced motion: ${reducedMotion})`, t => {
     const h = guairaTraversalBrowser(t, { reducedMotion }), game = h.create(), paint = watchOverlay(t, game);
     h.run(game, 92, ['ArrowRight', 'ShiftLeft']); h.run(game, 12);
-    assert.equal(paint().valveBanner, true);
-    assert.ok(textWidth('PULE SOBRE A PLACA. BAIXO NO AR') <= 232, 'ordered instruction fits inside the native panel');
-    const expected = new Map([[7, true], [8, false], [9, false], [17, false], [22, false], [29, false], [30, true], [45, true]]);
+    assert.equal(paint().valveBanner, false);
+    assert.ok(textWidth('PULE + BAIXO NA PLACA') <= 173, 'instruction fits before the coin readout');
+    assert.deepEqual(paint().header,header('PULE + BAIXO NA PLACA'));
+    const frames = new Set([7,8,9,17,22,29,30,45]);
     for (let frame = 1; frame <= 45; frame++) {
         h.run(game, 1, ['Space']);
-        if (!expected.has(frame)) continue;
-        assert.equal(paint().valveBanner, expected.get(frame), `jump frame ${frame}`);
+        if (!frames.has(frame)) continue;
+        assert.equal(paint().valveBanner, false, `jump frame ${frame}`);
+        assert.deepEqual(paint().header,header('PULE + BAIXO NA PLACA'));
+        assert.ok(game.player.data.position.y-10-game.camera.y>=23,'entire helmet stays below HUD');
         assert.equal(h.status.textContent, 'Pule primeiro. No ar, aperte baixo sobre a placa; espere a ponte subir');
         assert.ok(!game.player.data.isDead && game.player.data.hasHelmet);
         assert.equal(game.objects.get(G.valveId)!.active, false, 'jump alone cannot open the valve');
@@ -45,22 +55,24 @@ for (const reducedMotion of [false, true]) test(`native held jump clears the ban
     game.toggleTraversalPause(); assert.equal(paint().valveBanner, false); assert.match(h.status.textContent, /Pule.*baixo/);
     h.run(game, 1, ['ArrowDown']); assert.equal(game.player.isGroundPoundActive(), true);
     h.run(game, 50); assert.equal(game.objects.get(G.valveId)!.active, true);
-    assert.equal(paint().valveBanner, true); assert.match(h.status.textContent, /ponte está subindo/);
+    assert.equal(paint().valveBanner, false); assert.deepEqual(paint().header,header('PONTE SUBINDO')); assert.match(h.status.textContent, /ponte está subindo/);
     h.run(game, 150); assert.equal(game.bridgeReady, true);
-    assert.equal(paint().valveBanner, true); assert.match(h.status.textContent, /Ponte pronta/);
+    assert.equal(paint().valveBanner, false); assert.deepEqual(paint().header,header('PASSAGEM ABERTA')); assert.match(h.status.textContent, /Ponte pronta/);
     h.run(game, 17, ['Space']); assert.equal(paint().valveBanner, false);
     assert.match(h.status.textContent, /Ponte pronta/);
 });
 
-test('compact touch jump keeps page instruction while the physical actor passes the banner', t => {
+test('compact touch jump retains page and HUD instruction without a world-space banner', t => {
     const h = guairaTraversalBrowser(t, { touch: true }), game = h.create(), paint = watchOverlay(t, game);
     h.run(game, 92, ['ArrowRight', 'ShiftLeft']); h.run(game, 12);
     h.canvas.dispatch('touchstart', { touches: [{ identifier: 1, clientX: .93 * 640, clientY: 330, target: h.canvas }] });
     for (let frame = 0; frame < 17; frame++) game.update(1000 / 60);
     assert.equal(game.player.data.isGrounded, false); assert.equal(paint().valveBanner, false);
+    assert.deepEqual(paint().header,header('PULE + BAIXO NA PLACA'));
     assert.equal(h.status.textContent, 'Pule primeiro. No ar, aperte baixo sobre a placa; espere a ponte subir');
     h.canvas.dispatch('touchcancel', { touches: [], changedTouches: [] });
-    h.run(game, 60); assert.equal(game.player.data.isGrounded, true); assert.equal(paint().valveBanner, true);
+    h.run(game, 60); assert.equal(game.player.data.isGrounded, true); assert.equal(paint().valveBanner, false);
+    assert.deepEqual(paint().header,header('PULE + BAIXO NA PLACA'));
 });
 
 for (const chapter of [false, true]) test(`native completed route retains ${chapter ? 'chapter' : 'free-lab'} continuation copy`, async t => {

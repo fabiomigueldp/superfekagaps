@@ -3,6 +3,7 @@ import type { CameraData } from '../../../../types';
 import { CompletedAvatarPresentation } from '../CompletedAvatarPresentation';
 import type { AdventureStage } from '../../../types';
 import { panel, pixelText } from '../../../../graphics/BitmapFont';
+import { drawGuairaCoinReadout } from '../GuairaCoinReadout';
 import { GUAIRA_GALLERY as G, guairaGalleryStage } from './GuairaGalleryStage';
 import { galleryArrival, galleryOpenings, galleryReceivingY } from './GuairaGalleryModel';
 import { drawGalleryBackground, drawGalleryTerrain, drawGalleryObjects } from './GuairaGalleryArt';
@@ -56,10 +57,10 @@ export class GuairaGallery extends WorldGame {
         // Anticipate the receiving floor continuously. Never bounce upward while
         // falling across a shaft boundary; limit ordinary reframing to8px/step.
         // Actor safety overrides smoothing during native jumps and fast falls.
-        let targetY = Math.max(0, Math.min(G.height * 16 - 180, receiving - 160, p.position.y - 28));
+        let targetY = Math.max(0, Math.min(G.height * 16 - 180, receiving - 160, p.position.y - 36));
         if (p.velocity.y > 0) targetY = Math.max(previousY, targetY);
         const nextY = snap ? targetY : previousY + Math.max(-8, Math.min(8, targetY - previousY));
-        this.camera.y = Math.max(0, feet - 168, Math.min(p.position.y - 28, G.height * 16 - 180, nextY));
+        this.camera.y = Math.max(0, feet - 168, Math.min(p.position.y - 36, G.height * 16 - 180, nextY));
     }
     get mapReturnHref() { return G.mapHref; }
     get openings() { return galleryOpenings(this.level); }
@@ -103,7 +104,12 @@ export class GuairaGallery extends WorldGame {
         c.fillStyle = '#283d40'; c.fillRect(0, 0, 320, 23);
         c.fillStyle = '#c2b78a'; c.fillRect(0, 22, 320, 1);
         pixelText(c, 'GALERIA', 8, 8, '#f3ddb1');
-        pixelText(c, this.finished ? 'ACESSO ABERTO' : 'PULE. NO AR, BAIXO', 69, 8, '#b1e8db');
+        const x = this.player.data.position.x, feet = this.player.data.position.y + this.player.data.height;
+        const objective = this.finished ? 'ACESSO ABERTO' : x >= G.cacheStart && x < G.serviceEnd && feet > G.cacheY
+            ? 'OFICINA POR BAIXO' : !this.openings.first ? 'ABRA A TAMPA I'
+            : !this.openings.second ? 'SIGA ATE A TAMPA II' : 'SUBA ATE A LUZ';
+        pixelText(c, objective, 69, 8, '#b1e8db');
+        drawGuairaCoinReadout(c, this.renderer, this.coins);
         if (this.player.data.hasHelmet) this.renderer.drawHelmet(279, 4, c);
         pixelText(c, 'II', 305, 8, '#f3ddb1');
         if (paused && !this.externalPauseMenu) {
@@ -115,7 +121,13 @@ export class GuairaGallery extends WorldGame {
         this.renderer.present();
         const message = paused ? 'Pausado · Esc ou Continuar para voltar'
             : this.finished ? 'ACESSO DE INSPEÇÃO ABERTO · Mapa volta ao Bairro da Vala Seca · sem progresso salvo'
-            : this.player.data.isDead ? 'Retorno automático ao ponto seguro desta tentativa · Tentar fecha as duas tampas'
+            : this.player.data.isDead ? 'Retorno automático ao ponto seguro desta tentativa · Tentar restaura as tampas'
+            : this.player.data.position.x >= G.cacheStart && this.player.data.position.x < G.serviceEnd
+                ? this.player.data.position.y + this.player.data.height > G.cacheY
+                    ? 'Oficina por baixo · siga à direita e suba pelos dois tablados; a saída reencontra o ponto seguro antes da tampa II'
+                    : this.player.data.position.x >= G.cacheEnd
+                        ? 'Ponto seguro · a oficina retorna aqui; siga à direita até a tampa II'
+                        : 'Tampa opcional · a oficina por baixo retorna junto à bandeira; a tampa II fica à direita'
             : 'Abra as tampas rachadas e alcance o patamar de inspeção · PULE. NO AR, APERTE BAIXO · setas/A D: mover · Espaço: pular · Esc: pausa · M: som';
         if (this.status.textContent !== message) this.status.textContent = message;
     }

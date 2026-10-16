@@ -1,0 +1,15 @@
+{
+  "checks": [
+    {
+      "route": "retry",
+      "cells": 12,
+      "exactPixels": true
+    },
+    {
+      "route": "ground",
+      "cells": 12,
+      "exactPixels": true
+    }
+  ],
+  "passed": true
+}

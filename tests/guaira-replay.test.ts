@@ -27,7 +27,7 @@ test('frozen ordinary keys win deterministically through real Input, Player and 
         }
         assert.equal(frame, recording.frames); assert.deepEqual(hits, recording.expectedHits);
         assert.equal(game.boss?.phase, 'defeated'); assert.equal(game.boss?.health, 0);
-        for (const state of ['tell', 'charge', 'brake', 'rattle', 'bones', 'recover']) assert.ok(states.has(state), state);
+        for (const state of ['tell', 'turn', 'charge', 'brake', 'rattle', 'bones', 'recover']) assert.ok(states.has(state), state);
         assert.deepEqual(game.store.save.completed, []);
         return { hits, player: structuredClone(game.player.data), boss: structuredClone((game.boss as GuairaBullEncounter).model) };
     }

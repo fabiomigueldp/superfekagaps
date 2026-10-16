@@ -6,11 +6,12 @@ import { STAGES } from '../../campaign';
 import { TileType } from '../../../constants';
 import type { AdventureStage } from '../../types';
 import type { Rect } from '../../../types';
-import { PLAYER_RENDER_OFFSET_X, PLAYER_RENDER_OFFSET_Y, PLAYER_FRAME_W, PLAYER_FRAME_H } from '../../../assets/playerSpriteSpec';
+import { PLAYER_RENDER_OFFSET_Y } from '../../../assets/playerSpriteSpec';
 import { panel, pixelText } from '../../../graphics/BitmapFont';
 import { GuairaMayorModel, MAYOR_ARENA, MAYOR_RULES } from './GuairaMayorModel';
 import { drawGuairaMayor, drawGuairaMayorStampTarget } from './GuairaMayorArt';
 import { drawGuairaMayorBackground, drawGuairaMayorTerrain, drawGuairaMayorObjects } from './GuairaMayorArenaArt';
+import { drawGuairaMayorFeedback } from './GuairaMayorFeedbackArt';
 
 export function guairaMayorStage(): AdventureStage {
     const stage = structuredClone(STAGES[0]);
@@ -24,9 +25,11 @@ export function guairaMayorStage(): AdventureStage {
     stage.level.enemies = []; stage.level.collectibles = []; stage.level.triggers = []; stage.level.checkpoints = [];
     stage.level.goalPosition = { x: 19, y: 14 }; stage.level.isBossLevel = false;
     stage.mechanisms = [
-        { id: MAYOR_ARENA.valveId, kind: 'switch', ...MAYOR_ARENA.valve, link: MAYOR_ARENA.liftId },
+        { id: MAYOR_ARENA.valveId, kind: 'switch', ...MAYOR_ARENA.valve, link: MAYOR_ARENA.upperValveId },
         { id: MAYOR_ARENA.liftId, kind: 'lift', ...MAYOR_ARENA.lift, to: { x: 112, y: MAYOR_ARENA.deckY }, gated: true },
-        { id: MAYOR_ARENA.deckId, kind: 'support', ...MAYOR_ARENA.deck }
+        { id: MAYOR_ARENA.deckId, kind: 'support', ...MAYOR_ARENA.deck },
+        { id: MAYOR_ARENA.upperValveId, kind: 'switch', ...MAYOR_ARENA.upperValve, link: MAYOR_ARENA.valveId },
+        { id: MAYOR_ARENA.refugeId, kind: 'support', ...MAYOR_ARENA.refuge }
     ];
     stage.foes = []; stage.pickups = []; stage.exits = []; stage.dialogues = []; stage.landmarks = [];
     stage.checkpoints = [{ x: 3, y: 14 }];
@@ -44,25 +47,32 @@ export class GuairaMayorEncounter extends BossEncounter {
         this.timer = b.stateTick * MAYOR_RULES.tickMs;
         // 'released' intentionally remains native 'rest': campaign completion is
         // impossible and the real Player may walk/jump back out after victory.
-        this.phase = b.vulnerable ? 'open' : b.state === 'warning' ? 'warning'
-            : b.state === 'stamp' ? 'attack' : b.state === 'hurt' ? 'hurt' : 'rest';
+        this.phase = b.vulnerable ? 'open' : b.state === 'warning' || b.state === 'jetWarning' ? 'warning'
+            : b.state === 'stamp' || b.state === 'leap' || b.state === 'jetBurst' ? 'attack' : b.state === 'hurt' ? 'hurt' : 'rest';
     }
-    override update(dt: number, _player: Rect, objects: WorldObjects, _level: WorldLevel) {
+    override update(dt: number, player: Rect, objects: WorldObjects, _level: WorldLevel) {
         const valve = objects.get(MAYOR_ARENA.valveId)!, lift = objects.get(MAYOR_ARENA.liftId)!;
+        const upper = objects.get(MAYOR_ARENA.upperValveId)!;
+        // The two ordinary switches form a toggle pair. Either operates the lift.
+        lift.active = valve.active && !['warning', 'leap', 'jetWarning', 'jetBurst'].includes(this.model.state);
+        const switched=objects.events.find(e=>e.kind==='switch'&&[valve,upper].some(v=>e.x===v.x&&e.y===v.y));
         this.model.update(dt, { valveActive: valve.active, liftReady: lift.active && lift.y === MAYOR_ARENA.deckY,
-            registerOpened: objects.events.some(e => e.kind === 'switch' && e.x === valve.x && e.y === valve.y) });
+            registerOpened:!!switched,register:switched?.x===upper.x?'upper':'lower',player });
         this.impact = this.model.events.some(e => e.kind === 'stamp'); this.released = false;
-        if (this.impact) {
+        if (this.impact || this.model.events.some(e => e.kind === 'warning' ||
+            (e.kind === 'jetWarning' || e.kind === 'jet') && this.model.salvo?.shot === 1)) {
             // Keep the native toggle pair synchronized. The next sentada opens.
-            for (const body of [valve, lift]) {
+            // Lower during the tell: the aimed landing never passes through a raised lift.
+            for (const body of [valve, upper, lift]) {
                 body.active = body.observedActive = false; body.changedAt = objects.time;
             }
-            valve.timer = 0;
+            valve.timer = upper.timer = 0;
         }
         if (this.model.publicWaterOpen) {
-            valve.active = valve.observedActive = lift.active = lift.observedActive = true;
+            valve.active = valve.observedActive = upper.active = upper.observedActive = lift.active = lift.observedActive = true;
         }
-        this.impactPoint = { x: 278, y: 160 };
+        this.impactPoint = { x: this.model.stampTarget.x + this.model.stampTarget.width / 2,
+            y: this.model.stampTarget.y + this.model.stampTarget.height };
         // Resolve exactly painted water inside contact, after top precedence.
         this.danger = null; this.sync();
     }
@@ -79,9 +89,14 @@ export class GuairaMayorEncounter extends BossEncounter {
         if (b.counterpressure?.phase === 'warning') return 'EMENDA: ESPERE OU PULE';
         if (b.counterpressure?.phase === 'active') return 'AGUA NA EMENDA! ESPERE OU PULE';
         if (b.vulnerable) return 'AGORA! GOLPE POR CIMA';
-        if (b.state === 'warning') return 'CARIMBO ALTO: SAIA DA GRELHA';
-        if (b.state === 'stamp') return 'AGUA NA GRELHA! REGISTRO A ESQUERDA';
-        if (b.state === 'recover') return b.accessRequested ? 'ESPERE A PASSARELA SUBIR' : 'REGISTRO: PULE + BAIXO';
+        if (b.state === 'recover' && b.pressureInterrupted) return 'PRESSAO CORTADA! PASSARELA SUBINDO';
+        if (b.salvo?.phase === 'warning') return b.salvo.lane === 'high' ? 'JATO ALTO: DESCA OU PULE' : 'JATO BAIXO: PULE OU SUBA';
+        if (b.salvo) return 'REGISTRO: CORTE A PRESSAO';
+        if (b.state === 'warning' || b.state === 'leap') return b.strike === 2 ? 'SEGUNDO CARIMBO! SAIA DA MARCA'
+            : b.phaseNumber === 3 ? 'DOIS CARIMBOS! SAIA DA MARCA' : 'CARIMBO: SAIA DA MARCA NO CHAO';
+        if (b.state === 'stamp' && !b.finalStrike) return 'MAIS UM CARIMBO! CONTINUE ANDANDO';
+        if (b.waves.length) return 'PULE A ONDA OU ABRA UM REGISTRO';
+        if (b.canOpenRegister) return b.accessRequested ? 'ESPERE A PASSARELA SUBIR' : 'REGISTRO: PULE + BAIXO';
         if (b.state === 'hurt') return 'UM LACRE DA AGUA SOLTO';
         return 'REABRA A AGUA DO BAIRRO';
     }
@@ -95,11 +110,12 @@ export class GuairaMayorLab extends WorldGame {
         super(canvas, true);
         try {
             this.reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
-            this.art.background = (c, _island, cx, cy, time) => drawGuairaMayorBackground(c, this.mayor, cx, cy, time, this.reducedMotion);
+            this.art.background = (c, _island, cx, cy) => drawGuairaMayorBackground(c, this.mayor, cx, cy, this.objects.time, this.reducedMotion, this.objects);
             this.art.terrain = (c, level, _island, cx, cy) => drawGuairaMayorTerrain(c, level, cx, cy);
             this.art.genericStructures = false;
             this.art.objects = (c, objects, cx, cy, time) => {
                 drawGuairaMayorObjects(c, objects, this.mayor, cx, cy, time, this.reducedMotion);
+                drawGuairaMayorFeedback(c,this.mayor,cx,cy,this.reducedMotion);
                 drawGuairaMayorStampTarget(c, this.mayor, cx, cy, this.reducedMotion);
                 drawGuairaMayor(c, this.mayor, cx, cy, this.reducedMotion);
             };
@@ -138,8 +154,12 @@ export class GuairaMayorLab extends WorldGame {
         if (this.isDisposed) return;
         if (!Number.isFinite(dt) || dt <= 0) return;
         if (this.state === 'map' || this.state === 'title' || this.state === 'intro') { this.load(MAYOR_ARENA.id); return; }
+        const beforeTick = this.mayor.tick, beforePressure = this.mayor.counterpressure?.phase;
         super.update(dt);
-        if (this.player.data.isDead) this.mayor.cancelCounterpressure();
+        if (this.state === 'playing' && !this.player.data.isDead && this.mayor.tick !== beforeTick &&
+            (this.mayor.events.some(e => e.kind === 'stamp' || e.kind === 'waves' || e.kind === 'jet') ||
+                beforePressure !== 'active' && this.mayor.counterpressure?.phase === 'active')) this.audio.sfx('jet');
+        if (this.player.data.isDead) this.mayor.cancelAttacks();
         if (this.state === 'playing' && !this.player.data.isDead) {
             // Native renderer places the body at y-2 and the standing/jumping
             // helmet another 2px above it. Use that conservative visual top,
@@ -164,20 +184,13 @@ export class GuairaMayorLab extends WorldGame {
         const c = this.renderer.getContext(), b = this.mayor;
         c.fillStyle = '#382b35'; c.fillRect(0, 0, 320, 23);
         c.fillStyle = '#d8ac7a'; c.fillRect(0, 22, 320, 1);
-        pixelText(c, 'GUAIRA', 8, 8, '#f0ddae');
-        pixelText(c, `AGUA DO BAIRRO ${MAYOR_RULES.seals - b.sealsRemaining}/3`, 60, 8, '#a6e0df');
+        pixelText(c, 'GUAIRA', 8, 3, '#f0ddae');
+        pixelText(c, `AGUA DO BAIRRO ${MAYOR_RULES.seals - b.sealsRemaining}/3`, 60, 3, '#a6e0df');
         if (this.player.data.hasHelmet) this.renderer.drawHelmet(279, 4, c);
         pixelText(c, 'II', 305, 8, '#f0ddae');
-        const p = this.player.data;
-        const sx = Math.round(p.position.x) - Math.round(this.camera.x) + PLAYER_RENDER_OFFSET_X;
-        const sy = Math.round(p.position.y) - Math.round(this.camera.y) + PLAYER_RENDER_OFFSET_Y - (p.hasHelmet ? 2 : 0);
-        const touchesHint = sx < 232 && sx + PLAYER_FRAME_W > 4 && sy < 43 && sy + PLAYER_FRAME_H + 2 > 24;
-        // The status beside Pause always retains the hint. Hide its duplicate
-        // canvas strip when a legitimate jump crosses it, keeping Feka visible.
-        if (!touchesHint) {
-            panel(c, 6, 26, 224, 15, '#382b35', '#d8ac7a');
-            pixelText(c, this.boss!.hint, 118, 31, '#f0ddae', 1, 'center');
-        }
+        // Match Ossabravo: the complete, persistent cue fits inside the native
+        // header. Jumping no longer removes the warning or covers the arena.
+        pixelText(c, this.boss!.hint, 8, 13, '#f0ddae');
         if (paused && !this.externalPauseMenu) {
             c.fillStyle = '#211b2bbd'; c.fillRect(0, 23, 320, 157);
             panel(c, 62, 70, 196, 43, '#382b35', '#d8ac7a');

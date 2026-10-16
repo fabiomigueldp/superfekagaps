@@ -1,0 +1,120 @@
+{
+  "kind": "isolated-browser-native-chapter-inspection",
+  "checks": [
+    {
+      "stage": "guaira-travessia",
+      "keyboardMoved": true,
+      "pauseFrozen": true,
+      "stableCanvas": true,
+      "returnedToMap": true,
+      "render": {
+        "samples": 90,
+        "medianMs": 1,
+        "p95Ms": 2,
+        "pure": true
+      }
+    },
+    {
+      "stage": "guaira-patio-comportas",
+      "keyboardMoved": true,
+      "pauseFrozen": true,
+      "stableCanvas": true,
+      "returnedToMap": true,
+      "render": {
+        "samples": 90,
+        "medianMs": 1.5,
+        "p95Ms": 2.5999999940395355,
+        "pure": true
+      }
+    },
+    {
+      "stage": "guaira-respiros",
+      "keyboardMoved": true,
+      "pauseFrozen": true,
+      "stableCanvas": true,
+      "returnedToMap": true,
+      "render": {
+        "samples": 90,
+        "medianMs": 2,
+        "p95Ms": 3.7000000178813934,
+        "pure": true
+      },
+      "animatedHazardPaused": true,
+      "hydraulicTime": 1983.3333333333367
+    },
+    {
+      "stage": "guaira-lab",
+      "keyboardMoved": true,
+      "pauseFrozen": true,
+      "stableCanvas": true,
+      "returnedToMap": true,
+      "render": {
+        "samples": 90,
+        "medianMs": 1.7999999821186066,
+        "p95Ms": 2.5,
+        "pure": true
+      }
+    },
+    {
+      "stage": "guaira-subida",
+      "keyboardMoved": true,
+      "pauseFrozen": true,
+      "stableCanvas": true,
+      "returnedToMap": true,
+      "render": {
+        "samples": 90,
+        "medianMs": 1.5999999940395355,
+        "p95Ms": 2.100000023841858,
+        "pure": true
+      }
+    },
+    {
+      "stage": "guaira-prefeito",
+      "keyboardMoved": true,
+      "pauseFrozen": true,
+      "stableCanvas": true,
+      "returnedToMap": true,
+      "render": {
+        "samples": 90,
+        "medianMs": 1.100000023841858,
+        "p95Ms": 2.699999988079071,
+        "pure": true
+      }
+    },
+    {
+      "stage": "gallery",
+      "keyboardMoved": true,
+      "pauseFrozen": true,
+      "stableCanvas": true,
+      "returnedToMap": true,
+      "render": {
+        "samples": 90,
+        "medianMs": 0.9000000059604645,
+        "p95Ms": 2.0999999940395355,
+        "pure": true
+      }
+    },
+    {
+      "stage": "relief",
+      "keyboardMoved": true,
+      "pauseFrozen": true,
+      "stableCanvas": true,
+      "returnedToMap": true,
+      "render": {
+        "samples": 90,
+        "medianMs": 1.199999988079071,
+        "p95Ms": 2.5,
+        "pure": true
+      },
+      "animatedHazardPaused": true,
+      "hydraulicTime": 1983.3333333333294
+    },
+    {
+      "viewport": "844x390",
+      "overflow": false
+    }
+  ],
+  "errors": [],
+  "physicalDevice": false,
+  "passed": true
+}

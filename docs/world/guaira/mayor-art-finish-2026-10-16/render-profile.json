@@ -1,0 +1,27 @@
+{
+  "environment": "Headless Edge on this Windows workspace; CPU submission time for update+render, not a physical-device FPS measurement",
+  "checks": [
+    {
+      "reduced": false,
+      "samples": 1825,
+      "medianMs": 2.2000000178813934,
+      "p95Ms": 3.9000000059604645,
+      "maxMs": 16.700000017881393,
+      "finished": true,
+      "helmet": true,
+      "pausePixelsEqual": true
+    },
+    {
+      "reduced": true,
+      "samples": 1825,
+      "medianMs": 1.5999999940395355,
+      "p95Ms": 3.300000011920929,
+      "maxMs": 13.600000023841858,
+      "finished": true,
+      "helmet": true,
+      "pausePixelsEqual": true
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

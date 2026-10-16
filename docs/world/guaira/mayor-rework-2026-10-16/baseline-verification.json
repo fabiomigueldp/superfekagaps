@@ -1,0 +1,426 @@
+{
+  "nativeInputOnly": true,
+  "actorOrClockEdits": false,
+  "stepMs": 16.666666666666668,
+  "captureFps": 60,
+  "baseline": true,
+  "sourceHashes": {
+    "GuairaMayorLab.ts": "c7720d0fc95b3601bc6c21d402202f6cb23cba3c09caafef97e7c41642c79515",
+    "GuairaMayorModel.ts": "2ad76f80ee4a4f08d31a0ee549174ac922f2d4890d705939fee5559ede6d7d6f",
+    "GuairaMayorArt.ts": "21b423cacec27d17368dadb01b7a049834acce51f15a40a245b298a5c450902a",
+    "GuairaMayorArenaArt.ts": "a99c7ec94824698dd2f6f8328d847c51e245dc5589bc03b92714be9bb21e6a00"
+  },
+  "routes": {
+    "before": {
+      "frames": 1112,
+      "hits": [
+        322,
+        652,
+        982
+      ],
+      "events": [
+        {
+          "frame": 1,
+          "state": "intro:undefined:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 48.3,
+            "y": 200
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 72,
+          "state": "idle:undefined:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 81.02534068887034,
+            "y": 200
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 102,
+          "state": "warning:undefined:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 81.02534068887034,
+            "y": 200
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 162,
+          "state": "stamp:undefined:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 81.02534068887034,
+            "y": 200
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 186,
+          "state": "recover:undefined:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 81.02534068887034,
+            "y": 200
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 322,
+          "state": "hurt:undefined:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 278.07194146353066,
+            "y": 96
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 372,
+          "state": "idle:undefined:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 195.66332606343713,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 402,
+          "state": "warning:undefined:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 135.66332606343713,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 462,
+          "state": "stamp:undefined:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 60.93798537456677,
+            "y": 200
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 486,
+          "state": "recover:undefined:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 60.93798537456677,
+            "y": 200
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 502,
+          "state": "recover:undefined:warning",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 71.23798537456678,
+            "y": 145.30000000000007
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 562,
+          "state": "recover:undefined:active",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 137.96332606343714,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 586,
+          "state": "recover:undefined:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 160.26332606343715,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 652,
+          "state": "hurt:undefined:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 277.98458614922714,
+            "y": 96
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 702,
+          "state": "idle:undefined:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 195.5759707491336,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 732,
+          "state": "warning:undefined:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 135.5759707491336,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 792,
+          "state": "stamp:undefined:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 60.85063006026325,
+            "y": 200
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 816,
+          "state": "recover:undefined:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 60.85063006026325,
+            "y": 200
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 832,
+          "state": "recover:undefined:warning",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 71.15063006026325,
+            "y": 145.30000000000007
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 892,
+          "state": "recover:undefined:active",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 137.87597074913361,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 916,
+          "state": "recover:undefined:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 160.17597074913363,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 982,
+          "state": "released:undefined:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 277.8972308349236,
+            "y": 96
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        }
+      ],
+      "minHead": 27,
+      "damage": [],
+      "screens": [],
+      "videoFrames": 1112,
+      "finished": true
+    }
+  }
+}

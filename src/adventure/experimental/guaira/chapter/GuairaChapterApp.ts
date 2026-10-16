@@ -621,8 +621,10 @@ export class GuairaChapterApp {
                     : runtime.finished ? runtime.sceneId === 'gallery'
                         ? 'Acesso à Câmara de Alívio aberto'
                         : `Passagem inspecionada · ${runtime.reliefOpened ? 'alívio aberto' : 'alívio intacto'}`
-                    : runtime.sceneId === 'relief' && nativeStatus.textContent && !nativeStatus.textContent.startsWith('Pausado')
-                        ? nativeStatus.textContent : `Desvio opcional · ${info.objective}`;
+                    : nativeStatus.textContent && !nativeStatus.textContent.startsWith('Pausado')
+                        ? runtime.sceneId === 'gallery' ? `Desvio opcional · ${chapterGuidance(nativeStatus.textContent, info.objective)}`
+                            : nativeStatus.textContent
+                        : `Desvio opcional · ${info.objective}`;
                 if (runtime.finished && !game.player.data.isDead && game.state === 'playing') message += ` · ${chapterAttemptSummary(game.coins)}`;
                 if (routes && game.state === 'playing' && !game.player.data.isDead) {
                     if (runtime.finished) message += ' · Outra rota propõe um novo objetivo opcional';

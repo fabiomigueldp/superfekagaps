@@ -1,0 +1,329 @@
+{
+  "beforeHashes": {
+    "GuairaAscent.ts": "924b3771ac370c6484072118fcc1d6449d76639b64bf196f42d2635eac8d9252",
+    "GuairaAscentArt.ts": "dd55d131d33cb32c0e24183898f793b3255d98ded387aaaa5ccb3e15b7cf7a99",
+    "GuairaGallery.ts": "6f2a3173671bc5825abb9db34fbd493be02e9091cf8a88c7633d5264b06cf5e5",
+    "GuairaGalleryStage.ts": "c38035cff29d7d568ac5acf47acc53aa5743df5fd62d0e51dff7b6b2332fb60f",
+    "GuairaGalleryModel.ts": "0083ed426e8343340a583439e8a1daa61125f6410277b42a51fcbc9f58f43aa8",
+    "GuairaGalleryArt.ts": "2f09a594a2792e0e8fe9379084b5e401b2cf053d48eb7bd110630250f0fc51c7",
+    "GuairaChapterApp.ts": "6027846faea1349716f24beaba47e599269f8b5dcc2af0356d9c5d585799b808"
+  },
+  "currentHashes": {
+    "GuairaAscent.ts": "1fd7deb123b49219f0f198c202933dd5391f776437574ac087c6e776cc661a21",
+    "GuairaAscentArt.ts": "6ca37b28e68a69189ee381d460c9e5fbec8c953dd8564403f3ece42c389bd8b7",
+    "GuairaGallery.ts": "34330680a152cdd64a705c6e613d13328e5094f770ed05a218496c570787029d",
+    "GuairaGalleryStage.ts": "1b791da05ca2ead0474bd242d20aa99e4d0d2daa8f234e48d73a9430e2b3c27b",
+    "GuairaGalleryModel.ts": "6aed9877149bb939d553c4e3c36d059a5138d52c3114152293f2c429e2cc02f8",
+    "GuairaGalleryArt.ts": "21593af0e2dfce97937595b8fe0024905c51e10a88444ea5b90e643b5f445f66",
+    "GuairaChapterApp.ts": "04b74f1adbb595d3c5928dc23a9fb1651b8453f1fc3eff339ea2cec1cbed98e0"
+  },
+  "comparisons": [
+    {
+      "view": "canal",
+      "before": true,
+      "nativeUpdates": 84,
+      "player": {
+        "x": 210.3,
+        "y": 280
+      },
+      "feet": 304,
+      "camera": {
+        "x": 94.6469204291768,
+        "y": 171.9999131830645
+      },
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "view": "chegada",
+      "before": true,
+      "nativeUpdates": 412,
+      "player": {
+        "x": 634.7724135498346,
+        "y": 280
+      },
+      "feet": 304,
+      "camera": {
+        "x": 519.1057381974748,
+        "y": 171.99921823453795
+      },
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "view": "escolha",
+      "before": true,
+      "nativeUpdates": 958,
+      "player": {
+        "x": 865.5484356164462,
+        "y": 120
+      },
+      "feet": 144,
+      "camera": {
+        "x": 740.5485123950688,
+        "y": 72.51401869158877
+      },
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "view": "canal",
+      "before": false,
+      "nativeUpdates": 84,
+      "player": {
+        "x": 210.3,
+        "y": 280
+      },
+      "feet": 304,
+      "camera": {
+        "x": 94.6469204291768,
+        "y": 198.811653372297
+      },
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "view": "chegada",
+      "before": false,
+      "nativeUpdates": 412,
+      "player": {
+        "x": 634.7724135498346,
+        "y": 280
+      },
+      "feet": 304,
+      "camera": {
+        "x": 519.1057381974748,
+        "y": 199.9999912542225
+      },
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "view": "escolha",
+      "before": false,
+      "nativeUpdates": 958,
+      "player": {
+        "x": 865.5484356164462,
+        "y": 120
+      },
+      "feet": 144,
+      "camera": {
+        "x": 740.5485123950688,
+        "y": 40.838673399763316
+      },
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "view": "oficina",
+      "before": true,
+      "nativeUpdates": 211,
+      "player": {
+        "x": 257.0253406888704,
+        "y": 264
+      },
+      "feet": 288,
+      "camera": {
+        "x": 184.22266748956346,
+        "y": 192
+      },
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "view": "oficina",
+      "before": false,
+      "nativeUpdates": 211,
+      "player": {
+        "x": 257.0253406888704,
+        "y": 264
+      },
+      "feet": 288,
+      "camera": {
+        "x": 184.22266748956346,
+        "y": 192
+      },
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false
+    }
+  ],
+  "replays": [
+    {
+      "key": "subida",
+      "updates": 1174,
+      "completedAt": 1173,
+      "seconds": 19.55,
+      "videoFrames": 294,
+      "videoFps": 15,
+      "coins": 7,
+      "complete": true,
+      "damage": false,
+      "checkpoint": 1,
+      "contacts": {
+        "96": 14,
+        "144": 223,
+        "196": 1,
+        "197": 1,
+        "198": 2,
+        "199": 1,
+        "200": 1,
+        "201": 1,
+        "202": 2,
+        "203": 1,
+        "204": 1,
+        "205": 1,
+        "206": 1,
+        "207": 2,
+        "208": 1,
+        "209": 1,
+        "210": 1,
+        "211": 2,
+        "212": 1,
+        "213": 1,
+        "214": 1,
+        "215": 1,
+        "216": 2,
+        "217": 1,
+        "218": 1,
+        "219": 1,
+        "220": 1,
+        "221": 2,
+        "222": 1,
+        "223": 1,
+        "224": 1,
+        "225": 1,
+        "226": 1,
+        "227": 2,
+        "228": 1,
+        "229": 1,
+        "230": 1,
+        "231": 1,
+        "232": 2,
+        "233": 1,
+        "234": 1,
+        "235": 1,
+        "236": 1,
+        "237": 2,
+        "238": 1,
+        "239": 1,
+        "240": 1,
+        "241": 2,
+        "242": 1,
+        "243": 1,
+        "244": 1,
+        "245": 1,
+        "246": 2,
+        "247": 1,
+        "248": 1,
+        "249": 1,
+        "250": 4,
+        "251": 2,
+        "252": 2,
+        "253": 4,
+        "254": 2,
+        "255": 2,
+        "256": 43,
+        "257": 4,
+        "258": 2,
+        "259": 2,
+        "260": 4,
+        "261": 2,
+        "262": 2,
+        "263": 4,
+        "264": 2,
+        "265": 4,
+        "266": 2,
+        "267": 2,
+        "268": 4,
+        "269": 2,
+        "270": 4,
+        "271": 2,
+        "272": 4,
+        "273": 2,
+        "274": 4,
+        "275": 2,
+        "276": 4,
+        "277": 2,
+        "278": 4,
+        "279": 4,
+        "280": 2,
+        "281": 4,
+        "282": 4,
+        "283": 4,
+        "284": 2,
+        "285": 4,
+        "286": 4,
+        "287": 4,
+        "288": 4,
+        "289": 4,
+        "290": 4,
+        "291": 4,
+        "292": 6,
+        "293": 4,
+        "294": 4,
+        "295": 6,
+        "296": 6,
+        "297": 6,
+        "298": 6,
+        "299": 6,
+        "300": 8,
+        "301": 10,
+        "302": 10,
+        "303": 16,
+        "304": 189,
+        "336": 30,
+        "368": 68
+      },
+      "pickups": {
+        "guaira-subida:coin:0": 128,
+        "guaira-subida:coin:1": 148,
+        "guaira-subida:coin:2": 172,
+        "guaira-subida:overlook:1": 367,
+        "guaira-subida:overlook:0": 414,
+        "guaira-subida:overlook:2": 977,
+        "guaira-subida:overlook:3": 981
+      },
+      "minHelmetTop": 25.999999999999993,
+      "maxFeet": 168,
+      "maxCameraStep": 6.700000000000003,
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false,
+      "renderPure": true
+    },
+    {
+      "key": "galeria",
+      "updates": 759,
+      "completedAt": 751,
+      "seconds": 12.516666666666667,
+      "videoFrames": 190,
+      "videoFps": 15,
+      "coins": 5,
+      "complete": true,
+      "damage": false,
+      "checkpoint": 0,
+      "contacts": {
+        "176": 92,
+        "192": 40,
+        "240": 36,
+        "288": 180,
+        "320": 20,
+        "336": 17,
+        "352": 48,
+        "384": 49
+      },
+      "pickups": {
+        "gallery-service-cache-2": 275,
+        "gallery-service-cache-0": 279,
+        "gallery-service-cache-1": 279,
+        "gallery-service-return-0": 300,
+        "gallery-service-return-1": 332
+      },
+      "minHelmetTop": 26,
+      "maxFeet": 160,
+      "maxCameraStep": 8,
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false,
+      "renderPure": true
+    }
+  ]
+}

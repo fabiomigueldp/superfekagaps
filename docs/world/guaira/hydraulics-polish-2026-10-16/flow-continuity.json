@@ -1,0 +1,21 @@
+{
+  "column": 86,
+  "fromMs": 2030,
+  "toMs": 2100,
+  "results": [
+    {
+      "version": "before",
+      "bestShift": {
+        "shift": 6,
+        "mismatches": 0
+      }
+    },
+    {
+      "version": "after",
+      "bestShift": {
+        "shift": -1,
+        "mismatches": 0
+      }
+    }
+  ]
+}

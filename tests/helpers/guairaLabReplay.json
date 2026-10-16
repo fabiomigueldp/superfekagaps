@@ -1,7 +1,7 @@
 {
-  "description": "Frozen ordinary keyboard input, real GuairaBullLab constructor, Player and Input; no state mutation during replay.",
+  "description": "Native keyboard/touch route through three phases: hopping bones, full warned return charge, recovery hit and gate opening. No actor, health or clock edits.",
   "stepMs": 16.666666666666668,
-  "frames": 1065,
+  "frames": 1267,
   "runs": [
     [
       12,
@@ -378,36 +378,70 @@
       ]
     ],
     [
-      60,
+      50,
       [
         "ShiftLeft",
         "ArrowLeft"
       ]
     ],
     [
-      3,
+      9,
+      [
+        "ShiftLeft",
+        "ArrowLeft",
+        "Space"
+      ]
+    ],
+    [
+      8,
+      [
+        "ShiftLeft",
+        "ArrowLeft"
+      ]
+    ],
+    [
+      32,
       [
         "ShiftLeft"
       ]
     ],
     [
-      14,
+      7,
+      [
+        "ShiftLeft"
+      ]
+    ],
+    [
+      60,
       [
         "ShiftLeft",
         "ArrowRight"
       ]
     ],
     [
-      10,
+      5,
       [
         "ShiftLeft"
       ]
     ],
     [
-      3,
+      11,
       [
         "ShiftLeft",
         "ArrowLeft"
+      ]
+    ],
+    [
+      12,
+      [
+        "ShiftLeft"
+      ]
+    ],
+    [
+      2,
+      [
+        "ShiftLeft",
+        "ArrowRight"
       ]
     ],
     [
@@ -420,22 +454,22 @@
       19,
       [
         "ShiftLeft",
-        "ArrowRight"
+        "ArrowLeft"
       ]
     ],
     [
-      9,
+      15,
       [
         "ShiftLeft",
-        "ArrowRight",
+        "ArrowLeft",
         "Space"
       ]
     ],
     [
-      27,
+      21,
       [
         "ShiftLeft",
-        "ArrowRight"
+        "ArrowLeft"
       ]
     ],
     [
@@ -445,17 +479,28 @@
       ]
     ],
     [
-      12,
+      13,
+      [
+        "ShiftLeft",
+        "ArrowRight"
+      ]
+    ],
+    [
+      22,
+      [
+        "ShiftLeft"
+      ]
+    ],
+    [
+      9,
       [
         "ShiftLeft",
         "ArrowLeft"
       ]
     ],
     [
-      32,
-      [
-        "ShiftLeft"
-      ]
+      96,
+      []
     ]
   ],
   "expectedHits": [
@@ -476,12 +521,21 @@
       "health": 2
     },
     {
-      "frame": 854,
+      "frame": 960,
       "health": 1
     },
     {
-      "frame": 1064,
+      "frame": 1176,
       "health": 0
     }
+  ],
+  "warningFrames": [
+    84,
+    239,
+    397,
+    607,
+    756,
+    846,
+    1020
   ]
 }

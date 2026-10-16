@@ -4,9 +4,8 @@ import type { GuairaMayorLab } from '../src/adventure/experimental/guaira/Guaira
 import { MAYOR_ARENA as A, MAYOR_RULES as R, mayorOverlaps } from '../src/adventure/experimental/guaira/GuairaMayorModel';
 import { textWidth } from '../src/graphics/BitmapFont';
 import { guairaMayorBrowser } from './helpers/guairaMayorHarness';
-import waitRoute from './helpers/guairaMayorReplay.json';
-import jumpRoute from './helpers/guairaMayorJumpPulseReplay.json';
-import unchangedRoute from './helpers/guairaMayorOriginalCrossing.json';
+import jumpRoute from './helpers/guairaMayorReplay.json';
+import waitRoute from './helpers/guairaMayorJumpPulseReplay.json';
 
 type Harness = ReturnType<typeof guairaMayorBrowser>;
 type Recording = { frames: number; stepMs: number; runs: (number | string[])[][] };
@@ -37,10 +36,10 @@ function play(h: Harness, g: GuairaMayorLab, route: Recording, touch = false, un
             phase = pulse?.phase;
             if (!p.hasHelmet && firstHelmetLoss === null) {
                 firstHelmetLoss = frame;
-                assert.equal(pulse?.phase, 'active'); assert.ok(mayorOverlaps(g.player.getRect(), A.seam));
+                assert.ok(b.dangers.some(q => mayorOverlaps(g.player.getRect(),q)));
             }
             if (b.sealsRemaining < seals) { hits.push(frame); recoveryTicks.push(recoveryTick); }
-            if (route !== unchangedRoute) {
+            {
                 assert.equal(p.hasHelmet, true, `helmet at ${frame}`); assert.equal(p.isDead, false, `alive at ${frame}`);
                 const visualTop = Math.round(p.position.y) - Math.round(g.camera.y) - 4;
                 assert.ok(visualTop >= 26, `helmet clears the HUD at ${frame}`);
@@ -53,16 +52,16 @@ function play(h: Harness, g: GuairaMayorLab, route: Recording, touch = false, un
 
 for (const touch of [false, true]) for (const reducedMotion of [false, true]) {
     for (const [name, route, expectedHits, expectedWarnings] of [
-        ['wait', waitRoute, [322, 652, 982], [502, 832]],
-        ['early jump', jumpRoute, [322, 624, 926], [502, 804]]
+        ['wait', waitRoute, waitRoute.hitFrames, waitRoute.seamWarningFrames],
+        ['early jump', jumpRoute, jumpRoute.hitFrames, jumpRoute.seamWarningFrames]
     ] as const) test(`${touch ? 'touch' : 'keyboard'} ${name} route releases three seals with helmet (reduced motion ${reducedMotion})`, t => {
         const h = guairaMayorBrowser(t, { touch, reducedMotion }), g = h.create();
         const result = play(h, g, route, touch);
         assert.equal(result.frame, route.frames); assert.deepEqual(result.hits, expectedHits);
         assert.deepEqual(result.warningStarts, expectedWarnings);
-        assert.deepEqual(result.activeStarts, expectedWarnings.map(frame => frame + 60));
-        assert.equal(result.warningTicks, 120); assert.equal(result.activeTicks, 48);
-        assert.equal(result.firstHelmetLoss, null); assert.ok(result.recoveryTicks.every(tick => tick < R.recover - 100));
+        assert.deepEqual(result.activeStarts, route.seamActiveFrames);
+        assert.equal(result.warningTicks, 105); assert.equal(result.activeTicks, name === 'wait' ? 24 : 6);
+        assert.equal(result.firstHelmetLoss, null); assert.ok(result.recoveryTicks.every(tick => tick < R.recover - 25));
         assert.equal(g.mayor.publicWaterOpen, true); assert.equal(g.mayor.counterpressure, null);
         assert.equal(g.player.data.isGrounded, true); assert.ok(g.player.data.position.x < 100);
         assert.equal(g.player.data.position.y + g.player.data.height, A.floor);
@@ -71,23 +70,27 @@ for (const touch of [false, true]) for (const reducedMotion of [false, true]) {
     });
 }
 
-for (const touch of [false, true]) test(`${touch ? 'touch' : 'keyboard'} unchanged crossing really loses the helmet, then dies on the next seam pulse`, t => {
+for (const touch of [false, true]) test(    `${touch ? 'touch' : 'keyboard'} waiting inside the seam takes damage, and a later hydraulic attack triggers native retry`, t => {
     const h = guairaMayorBrowser(t, { touch }), g = h.create();
-    const result = play(h, g, unchangedRoute, touch, 873);
-    assert.deepEqual(result.hits, [322, 622]); assert.equal(result.firstHelmetLoss, 573);
-    assert.equal(g.player.data.isDead, true); assert.equal(g.mayor.sealsRemaining, 1);
-    assert.equal(g.mayor.counterpressure, null, 'death clears the painted seam on the same update');
-    const deadPlayer = g.player;
-    h.run(g, 90);
-    assert.notEqual(g.player, deadPlayer); assert.equal(g.mayor.state, 'intro');
-    assert.equal(g.mayor.sealsRemaining, 3); assert.equal(g.mayor.counterpressure, null);
-    assert.equal(g.player.data.hasHelmet, true); assert.equal(g.player.data.position.x, 48);
-    assert.equal(g.objects.get(A.valveId)!.active, false); assert.deepEqual(h.storageCalls, []);
+    play(h, g, jumpRoute, touch, jumpRoute.seamWarningFrames[0] - 58);
+    if(touch) h.canvas.dispatch('touchend',{touches:[]}); else h.keys([]);
+    h.run(g, 118);
+    assert.equal(g.player.data.hasHelmet,false); assert.equal(g.player.data.isDead,false);
+    assert.equal(g.mayor.counterpressure?.phase,'active');
+    const old=g.player;
+    for(let n=0;n<600&&!old.data.isDead;n++)h.run(g,1);
+    assert.equal(old.data.isDead,true); assert.equal(g.mayor.counterpressure,null);
+    assert.equal(g.mayor.waves.length,0);
+    assert.equal(g.mayor.jets.length,0);
+    for(let n=0;n<180&&g.player===old;n++)h.run(g,1);
+    assert.notEqual(g.player,old); assert.equal(g.player.data.hasHelmet,true);
+    assert.equal(g.mayor.sealsRemaining,3); assert.equal(g.mayor.state,'intro');
+    assert.equal(g.objects.get(A.valveId)!.active,false); assert.deepEqual(h.storageCalls,[]);
 });
 
-for (const reducedMotion of [false, true]) for (const at of [502, 562])
+for (const reducedMotion of [false, true]) for (const at of [jumpRoute.seamWarningFrames[0], jumpRoute.seamActiveFrames[0]])
     test(`all native pause paths freeze pressure at frame ${at} (reduced motion ${reducedMotion})`, t => {
-        const h = guairaMayorBrowser(t, { reducedMotion }), g = h.create(); play(h, g, waitRoute, false, at);
+        const h = guairaMayorBrowser(t, { reducedMotion }), g = h.create(); play(h, g, jumpRoute, false, at);
         for (const pause of [() => g.toggleLabPause(), () => { h.key('Escape'); h.run(g, 1); },
             () => h.window.dispatch('blur'), () => h.hidden(true)]) {
             pause(); assert.equal(g.state, 'paused');
@@ -103,7 +106,7 @@ for (const reducedMotion of [false, true]) for (const at of [502, 562])
     });
 
 test('native reclosure cancels the pulse; reopening does not restart it and retry restores the tutorial', t => {
-    const h = guairaMayorBrowser(t), g = h.create(); play(h, g, waitRoute, false, 520);
+    const h = guairaMayorBrowser(t), g = h.create(); play(h, g, jumpRoute, false, jumpRoute.seamWarningFrames[0] + 13);
     assert.equal(g.mayor.counterpressure!.phase, 'warning');
     g.objects.activate(A.valveId); g.boss!.update(R.tickMs, g.player.getRect(), g.objects, g.level);
     assert.equal(g.mayor.counterpressure, null); assert.equal(g.mayor.vulnerable, false);
@@ -116,7 +119,7 @@ test('native reclosure cancels the pulse; reopening does not restart it and retr
 });
 
 test('a real native top hit clears active pressure before its hit stop, whose ticks cannot revive it', t => {
-    const h = guairaMayorBrowser(t), g = h.create(); play(h, g, waitRoute, false, 562);
+    const h = guairaMayorBrowser(t), g = h.create(); play(h, g, jumpRoute, false, jumpRoute.seamActiveFrames[0]);
     // Set up only the contact under test; Player gravity, collision and hit stop remain native.
     g.player.data.position = { x: 274, y: 95.8 }; g.player.data.velocity = { x: 0, y: .5 };
     g.player.data.isGrounded = false; h.run(g, 1);

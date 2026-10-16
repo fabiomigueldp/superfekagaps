@@ -1,0 +1,180 @@
+{
+  "hashes": {
+    "GuairaTraversalArt": "35b8a6ff8cff06735b4bfa2a25d00fe88195a6c870c04491c9436eda4dcb340e",
+    "GuairaWaterworksArt": "9e7906310de13aab52c688884c0e07376bb12489bfa18274a940d866efea58dd",
+    "GuairaSluiceArt": "f73c1ab962f0ed6ed3a868d01e1b8cb1d7c9c2106e5716762ef1d97370e23948",
+    "GuairaRespirosArt": "e78df865a1d582e7ba96e3b1bf7b6ed5e271c98f995495a4c1be2847874b61e2"
+  },
+  "snapshots": [
+    {
+      "key": "rua-fechada",
+      "final": false,
+      "active": false,
+      "y": 336,
+      "camera": {
+        "x": 368,
+        "y": 108
+      },
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedStable": true,
+      "authoredPose": true
+    },
+    {
+      "key": "rua-subindo",
+      "final": false,
+      "active": true,
+      "y": 280,
+      "camera": {
+        "x": 368,
+        "y": 108
+      },
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedStable": true,
+      "authoredPose": true
+    },
+    {
+      "key": "rua-pronta",
+      "final": false,
+      "active": true,
+      "y": 224,
+      "camera": {
+        "x": 368,
+        "y": 108
+      },
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedStable": true,
+      "authoredPose": true
+    },
+    {
+      "key": "arroz-fechada",
+      "final": true,
+      "active": false,
+      "y": 336,
+      "camera": {
+        "x": 1088,
+        "y": 96
+      },
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedStable": true,
+      "authoredPose": true
+    },
+    {
+      "key": "arroz-subindo",
+      "final": true,
+      "active": true,
+      "y": 280,
+      "camera": {
+        "x": 1088,
+        "y": 96
+      },
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedStable": true,
+      "authoredPose": true
+    },
+    {
+      "key": "arroz-pronta",
+      "final": true,
+      "active": true,
+      "y": 224,
+      "camera": {
+        "x": 1088,
+        "y": 96
+      },
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedStable": true,
+      "authoredPose": true
+    },
+    {
+      "key": "respiros-seco",
+      "time": 0,
+      "camera": {
+        "x": 0,
+        "y": 144
+      },
+      "deterministic": true,
+      "stateUnchanged": true,
+      "reducedStable": true,
+      "authoredPose": true
+    },
+    {
+      "key": "respiros-aviso",
+      "time": 1799,
+      "camera": {
+        "x": 0,
+        "y": 144
+      },
+      "deterministic": true,
+      "stateUnchanged": true,
+      "reducedStable": true,
+      "authoredPose": true
+    },
+    {
+      "key": "respiros-inicio",
+      "time": 1800,
+      "camera": {
+        "x": 0,
+        "y": 144
+      },
+      "deterministic": true,
+      "stateUnchanged": true,
+      "reducedStable": true,
+      "authoredPose": true
+    },
+    {
+      "key": "respiros-jato",
+      "time": 2100,
+      "camera": {
+        "x": 0,
+        "y": 144
+      },
+      "deterministic": true,
+      "stateUnchanged": true,
+      "reducedStable": true,
+      "authoredPose": true
+    }
+  ],
+  "replays": [
+    {
+      "key": "taipas",
+      "updates": 1048,
+      "images": 262,
+      "fps": 15,
+      "finished": true,
+      "damage": false,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "key": "manutencao",
+      "updates": 1074,
+      "images": 269,
+      "fps": 15,
+      "finished": true,
+      "damage": false,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "key": "respiros",
+      "updates": 877,
+      "images": 220,
+      "fps": 15,
+      "finished": true,
+      "damage": false,
+      "manualPoseOrClockChanges": false
+    }
+  ],
+  "motion": {
+    "authored": true,
+    "fps": 30,
+    "frames": {
+      "rua": 120,
+      "arroz": 120,
+      "respiros": 126
+    }
+  }
+}

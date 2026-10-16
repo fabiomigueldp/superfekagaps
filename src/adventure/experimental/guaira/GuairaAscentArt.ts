@@ -1,12 +1,13 @@
 import { box as r, pixelLine as line, polygon, roof } from '../../WorldPainting';
 import type { WorldLevel, WorldObjects, MovingBody } from '../../WorldPhysics';
-import { ART } from '../../../graphics/palette';
-import { PixelGrid, type PixelFrame, type PixelPalette } from '../../../graphics/pixels';
+import { drawGuairaWorker } from './GuairaWorkerArt';
 import { pixelText } from '../../../graphics/BitmapFont';
 import { isOneWayTile, supportsStanding } from '../../../world/tileRules';
 import { ascentMechanicalPose } from './GuairaAscentMotion';
 import { ascentTravelDirection } from './GuairaAscentTravelCue';
-import { drawGuairaLandscape, drawGuairaTree, drawGuairaAwning } from './GuairaScenery';
+import { drawGuairaClayGrain, drawGuairaPlaster, drawGuairaTimber } from './GuairaMaterials';
+import { drawGuairaLandscape, drawGuairaTree, drawGuairaAwning, guairaBreeze } from './GuairaScenery';
+import { drawGuairaPipe, drawGuairaPipeElbow, drawGuairaPipeFlow, drawGuairaPipeSaddle, guairaPipeRoute } from './GuairaPipeArt';
 
 /** Scenery is presentation only. Tiles and WorldObjects own every supporting surface. */
 export const GUAIRA_ASCENT_ART = Object.freeze({
@@ -26,6 +27,9 @@ const P = {
 
 const visible = (x: number, w: number, cx: number) => x + w >= cx - 2 && x <= cx + 322;
 const artTime = (t: number, reduced: boolean) => reduced || !Number.isFinite(t) ? 0 : Math.max(0, t);
+const PIPE=Object.freeze({edge:'#72584d',brass:'#ab8157',light:'#c7a16d',shade:'#82624c',
+    water:'#80afa7',glint:'#bad0b5',dry:'#b18b62'});
+const PRIVATE_FEED=guairaPipeRoute([[824,77],[824,103],[1003,103]]);
 
 // Round the origin before the local scan conversion; tiny odd wheels must not shimmer on scroll.
 function oval(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, color: string) {
@@ -69,6 +73,7 @@ function house(c: CanvasRenderingContext2D, x: number, floor: number, w: number,
     oval(c, x + 1, floor - 2, w, 5, '#ad8766');
     r(c, x + 4, top + 14, w - 8, h - 14, P.plasterShade);
     r(c, x + 5, top + 15, w - 18, h - 16, P.plaster);
+    drawGuairaPlaster(c, x + 5, top + 18, w - 18, h - 19, w);
     roof(c, x, top, w, 16);
     r(c, x + 13, floor - 27, 16, 26, '#9a765e');
     r(c, x + 15, floor - 26, 12, 25, '#6c5750');
@@ -82,49 +87,54 @@ function house(c: CanvasRenderingContext2D, x: number, floor: number, w: number,
     r(c, x + w - 18, floor - 5, 8, 4, '#bc9677');
 }
 
-const WORKER_PALETTE: PixelPalette = Object.freeze({
-    _: null, K: P.ink, S: ART.skin, s: ART.skinDark, L: ART.skinLight,
-    H: '#e2c48a', h: '#ab895f', T: '#628d80', t: '#46685f',
-    B: '#607b88', b: '#405d6a', W: '#ded2af', Y: '#b89b6f',
-});
-
-function makeWorker(inspector: boolean): PixelFrame {
-    const g = new PixelGrid(24, 29);
-    g.rect(6,24,5,5,'K').rect(14,24,5,5,'K').rect(7,22,4,5,'b').rect(14,22,4,5,'B');
-    g.rect(7,13,11,10,'K').rect(8,14,9,8,'T').rect(8,21,9,3,'B');
-    g.rect(7,8,10,7,'K').rect(8,8,8,6,'S').rect(8,8,7,3,'L').dot(14,10,'K');
-    g.rect(11,13,3,1,'s').dot(15,12,'L');
-    g.rect(6,4,12,5,'h').rect(8,2,8,5,'H').rect(3,7,18,2,'K').rect(4,6,17,2,'H');
-    g.rect(5,15,4,7,'K').rect(6,15,3,5,'T').rect(6,20,3,3,'S');
-    g.rect(17,15,5,4,'K').rect(17,15,4,2,'T').rect(20,16,3,2,'L');
-    g.rect(11,15,2,6,'t').dot(14,17,'W');
-    if (inspector) {
-        g.rect(18,16,6,9,'K').rect(19,17,4,7,'Y').rect(20,18,2,1,'W').rect(20,20,2,1,'W');
-    } else {
-        g.rect(21,13,2,11,'b').rect(19,11,5,3,'B').dot(21,12,'_');
-    }
-    return Object.freeze(g.finish());
-}
-const WORKERS = Object.freeze([makeWorker(false), makeWorker(true)]);
-
-function worker(c: CanvasRenderingContext2D, x: number, y: number, index: number) {
-    const frame = WORKERS[index];
-    oval(c, x - 3, y - 1, 22, 3, '#a17e60');
-    frame.forEach((row, yy) => [...row].forEach((key, xx) => {
-        const color = WORKER_PALETTE[key];
-        if (color) r(c, x + xx - 8, y + yy - frame.length, 1, 1, color);
-    }));
-}
-
 function pipe(c: CanvasRenderingContext2D, x: number, y: number, w: number) {
-    r(c, x, y, w, 9, '#72584d');
-    r(c, x, y + 1, w, 7, '#ab8157');
-    r(c, x + 1, y + 2, w - 2, 2, '#d8b178');
-    r(c, x + 1, y + 6, w - 2, 1, '#82624c');
-    for (let xx = 9; xx < w - 3; xx += 27) {
-        r(c, x + xx, y - 1, 4, 11, '#826652');
-        r(c, x + xx + 1, y, 2, 8, '#c7a16d');
+    drawGuairaPipe(c,x,y,w,false,0,true,false,1,false,PIPE);
+}
+
+/** The workshop stair is part of the lift's maintenance structure. Recessed
+ * supports stop below native caps, and never suggest a solid wall to jump into. */
+function workshopScaffold(c: CanvasRenderingContext2D, cx: number, cy: number, t: number) {
+    if (!visible(540, 128, cx)) return;
+    // Low roof: bearing posts land on the existing workshop, not in empty sky.
+    for (const wx of [550, 582]) {
+        r(c, wx - cx, 200 - cy, 4, 29, '#8d745b');
+        r(c, wx + 1 - cx, 201 - cy, 1, 26, '#bca17a');
+        r(c, wx - 2 - cx, 222 - cy, 8, 4, '#8a7961');
+        r(c, wx - 1 - cx, 223 - cy, 1, 1, '#c0ab82');
     }
+    line(c, 554 - cx, 222 - cy, 581 - cx, 201 - cy, '#987c5c', 2);
+    // High scaffold: both legs meet the boarding balcony at y256. The right
+    // cap ends before the moving deck; no fixed rail crosses the lift's shaft.
+    for (const wx of [612, 650]) {
+        r(c, wx - cx, 152 - cy, 4, 104, '#8d745b');
+        r(c, wx + 1 - cx, 153 - cy, 1, 101, '#bca17a');
+        for (const wy of [155, 220, 247]) {
+            r(c, wx - 2 - cx, wy - cy, 8, 4, '#857962');
+            r(c, wx - 1 - cx, wy + 1 - cy, 1, 1, '#c6ae7d');
+        }
+    }
+    line(c, 616 - cx, 181 - cy, 649 - cx, 154 - cy, '#987c5c', 2);
+    line(c, 616 - cx, 222 - cy, 649 - cx, 252 - cy, '#987c5c', 2);
+    // An open tool rack gives the service route a reason to exist. Its muted
+    // slats are behind the player and do not carry the pale standing edge.
+    r(c, 619 - cx, 166 - cy, 25, 2, '#a58a68');
+    for (const [wx, length] of [[624, 10], [633, 7], [640, 12]]) {
+        r(c, wx - cx, 169 - cy, 2, length, '#758179');
+        r(c, wx - 1 - cx, 168 - cy, 4, 2, '#8f9b8a');
+    }
+    // Small route carvings sit under the actual surfaces, outside jump arcs.
+    r(c, 554 - cx, 202 - cy, 27, 8, '#c1a47c');
+    pixelText(c, 'ALTO', 555 - cx, 204 - cy, '#755f4f');
+    r(c, 620 - cx, 154 - cy, 26, 8, '#c1a47c');
+    line(c, 624 - cx, 158 - cy, 642 - cx, 158 - cy, '#755f4f');
+    line(c, 638 - cx, 155 - cy, 642 - cx, 158 - cy, '#755f4f');
+    line(c, 638 - cx, 161 - cy, 642 - cx, 158 - cy, '#755f4f');
+    // Cloth is tied beneath the cap, never across the receiving edge. It uses
+    // the same breeze/clock as the township and holds still on reduced motion.
+    const sway = guairaBreeze(t, 655, 2);
+    r(c, 655 - cx, 153 - cy, 2, 15, '#ba7860');
+    r(c, 657 - cx, 156 - cy, 2, 7, '#d09671');
+    r(c, 657 + sway - cx, 163 - cy, 2, 6, '#ba7860');
 }
 
 /** The closed public gate and the working private sight glass remain distinct in every state. */
@@ -173,32 +183,28 @@ function bureau(c: CanvasRenderingContext2D, cx: number, cy: number, t: number) 
     oval(c, 790 - cx, 66 - cy, 45, 10, '#d0b892');
     oval(c, 794 - cx, 68 - cy, 37, 6, P.waterShade);
     r(c, 798 - cx, 68 - cy, 28, 3, P.water);
-    r(c, 820 - cx, 76 - cy, 8, 28, '#9a7755');
-    r(c, 821 - cx, 77 - cy, 2, 25, '#d7ad73');
-    pipe(c, 820 - cx, 99 - cy, 178);
-    // The observation window visibly carries clean water to the private tank.
-    r(c, 955 - cx, 100 - cy, 22, 7, P.ironDark);
-    r(c, 957 - cx, 101 - cy, 18, 5, P.waterShade);
-    r(c, 958 - cx, 102 - cy, 16, 3, P.water);
-    r(c, 959 - cx + Math.floor(t / 260) % 9, 102 - cy, 5, 1, P.waterLight);
-    line(c, 965 - cx, 103 - cy, 970 - cx, 103 - cy, P.waterLight);
-    line(c, 968 - cx, 101 - cy, 970 - cx, 103 - cy, P.waterLight);
-    line(c, 968 - cx, 105 - cy, 970 - cx, 103 - cy, P.waterLight);
+    drawGuairaPipe(c,820-cx,77-cy,22,true,t,false,true,1,false,PIPE);
+    drawGuairaPipeElbow(c,820-cx,99-cy,true,false,true,PIPE);
+    drawGuairaPipe(c,829-cx,99-cy,175,true,t,false,false,1,false,PIPE);
+    drawGuairaPipeFlow(c,PRIVATE_FEED,cx,cy,t,false,PIPE.glint);
+    for(const xx of [874,933,984])drawGuairaPipeSaddle(c,xx-cx,103-cy,false,PIPE);
+    drawGuairaPipeSaddle(c,824-cx,87-cy,true,PIPE);
     r(c, 992 - cx, 95 - cy, 23, 35, '#896e56');
     r(c, 994 - cx, 96 - cy, 18, 32, '#b89161');
     r(c, 997 - cx, 98 - cy, 3, 29, '#d4b17d');
     for (const yy of [97,121]) r(c, 993 - cx, yy - cy, 21, 3, '#7d6a56');
     oval(c, 992 - cx, 92 - cy, 23, 7, '#cfad79');
     oval(c, 995 - cx, 93 - cy, 17, 3, P.water);
+    r(c,990-cx,98-cy,3,3,'#aa8e64');r(c,990-cx,106-cy,3,3,'#876d52');
     sign(c, 948 - cx, 77 - cy, 72, ['PARTICULAR'], 99 - cy);
     // Public branch: shut shutter, cross brace and dry cracked trough. No victory implied.
-    r(c, 820 - cx, 108 - cy, 8, 21, '#977858');
-    r(c, 821 - cx, 109 - cy, 2, 18, '#c7a377');
+    drawGuairaPipe(c,820-cx,108-cy,21,false,0,true,true,1,false,PIPE);
     r(c, 815 - cx, 111 - cy, 18, 12, '#66594b');
     r(c, 817 - cx, 112 - cy, 14, 10, '#ad7659');
     line(c, 818 - cx, 113 - cy, 829 - cx, 120 - cy, '#d4ae7b', 2);
     line(c, 829 - cx, 113 - cy, 818 - cx, 120 - cy, '#d4ae7b', 2);
     r(c, 823 - cx, 115 - cy, 3, 4, '#655c4d');
+    for(const xx of [815,831]) {r(c,xx-cx,109-cy,2,16,'#87745b');r(c,xx-cx,110-cy,1,1,'#c6aa7d');}
     r(c, 778 - cx, 128 - cy, 70, 5, '#ad8764');
     r(c, 780 - cx, 129 - cy, 66, 2, '#947051');
     line(c, 790 - cx, 129 - cy, 794 - cx, 131 - cy, '#745846');
@@ -233,6 +239,19 @@ export function drawGuairaAscentBackground(c: CanvasRenderingContext2D, cx: numb
             }
             r(c, x, 361 - cameraY, w, 7, '#d1a278');
         }
+        // Both ends of the first dry canal join real return boards. Recessed
+        // diagonal braces explain their support without hiding the walk below.
+        for (const [left,right] of [[240,288],[448,496]]) {
+            for (const xx of [left+4,right-7]) {
+                r(c,xx-cameraX,344-cameraY,3,24,'#967654');
+                r(c,xx+1-cameraX,345-cameraY,1,22,'#bea17a');
+            }
+            line(c,left+7-cameraX,361-cameraY,right-7-cameraX,344-cameraY,'#967654',2);
+        }
+        sign(c,350-cameraX,327-cameraY,75,['INSPECAO'],361-cameraY);
+        line(c,430-cameraX,351-cameraY,442-cameraX,351-cameraY,'#755f4f');
+        line(c,437-cameraX,347-cameraY,442-cameraX,351-cameraY,'#755f4f');
+        line(c,437-cameraX,355-cameraY,442-cameraX,351-cameraY,'#755f4f');
         // A broad yard physically joins the architecture to each real bank.
         // These matte slopes stop at the bank's edge, leaving both pits open.
         for (const [left, right, top, bottom] of [[0,224,284,304],[496,656,284,304],[768,880,131,144]]) {
@@ -260,20 +279,69 @@ export function drawGuairaAscentBackground(c: CanvasRenderingContext2D, cx: numb
         if (visible(496, 160, cameraX)) {
             // Maintenance nook stays behind and away from the checkpoint and boarding lip.
             house(c, 539 - cameraX, 288 - cameraY, 56, 60);
-            sign(c, 579 - cameraX, 246 - cameraY, 70, ['ELEVADOR', 'MANUTENCAO'], 296 - cameraY);
+            sign(c, 524 - cameraX, 250 - cameraY, 61, ['ELEVADOR'], 296 - cameraY);
             r(c, 588 - cameraX, 284 - cameraY, 18, 11, '#9d7858');
             r(c, 590 - cameraX, 285 - cameraY, 14, 2, '#ccb087');
             r(c, 594 - cameraX, 288 - cameraY, 5, 3, '#d0b488');
             r(c, 496 - cameraX, 296 - cameraY, 160, 8, '#cb9467');
+            // A wall-supported boarding balcony. Timber is deliberately quiet
+            // below the two-pixel native cap; the actor and lift remain in front.
+            for (const xx of [597,649]) {
+                r(c,xx-cameraX,264-cameraY,4,40,'#8d745b');
+                r(c,xx+1-cameraX,265-cameraY,1,37,'#c3a17a');
+            }
+            line(c,601-cameraX,294-cameraY,645-cameraX,264-cameraY,'#8d745b',2);
+            r(c,604-cameraX,270-cameraY,29,8,'#b59673');
+            line(c,610-cameraX,274-cameraY,626-cameraX,274-cameraY,'#755f4f');
+            line(c,622-cameraX,271-cameraY,626-cameraX,274-cameraY,'#755f4f');
+            line(c,622-cameraX,277-cameraY,626-cameraX,274-cameraY,'#755f4f');
         }
+        workshopScaffold(c, cameraX, cameraY, t);
         if (visible(1088, 256, cameraX)) bureau(c, cameraX - 320, cameraY, t);
+        // The lookout lands on a balcony at the same height, visible through
+        // the whole jump. Its brackets meet the real terrace at y144; muted
+        // uprights never impersonate the native one-way cap at y96.
+        if (visible(1072, 48, cameraX)) {
+            for (const xx of [1091,1114]) {
+                r(c,xx-cameraX,104-cameraY,3,40,'#8d745b');
+                r(c,xx+1-cameraX,105-cameraY,1,37,'#c3a17a');
+            }
+            line(c,1077-cameraX,105-cameraY,1091-cameraX,125-cameraY,'#8d745b',2);
+            line(c,1095-cameraX,131-cameraY,1112-cameraX,106-cameraY,'#8d745b',2);
+            r(c,1074-cameraX,108-cameraY,27,8,'#c1a47c');
+            pixelText(c,'CASA',1075-cameraX,110-cameraY,'#755f4f');
+        }
         if (visible(768, 320, cameraX)) {
             house(c, 778 - cameraX, 136 - cameraY, 56, 60);
             drawGuairaAwning(c, 789 - cameraX, 102 - cameraY, 21, t, 789);
             sign(c, 823 - cameraX, 104 - cameraY, 54, ['VAZAO'], 144 - cameraY);
+            for(const xx of [895,1068]) {
+                r(c,xx-2-cameraX,190-cameraY,5,50,'#9a8063');
+                r(c,xx-1-cameraX,191-cameraY,1,47,'#bea17a');
+            }
             pipe(c, 884 - cameraX, 181 - cameraY, 196);
+            for(const xx of [895,1068])drawGuairaPipeSaddle(c,xx-cameraX,185-cameraY,false,PIPE);
             sign(c, 943 - cameraX, 196 - cameraY, 83, ['INSPECAO'], 232 - cameraY);
+            // The new right-hand return is supported by the inspection floor.
+            for (const xx of [1044,1080]) {
+                r(c,xx-cameraX,199-cameraY,3,41,'#9a8063');
+                r(c,xx+1-cameraX,200-cameraY,1,38,'#bea17a');
+            }
+            line(c,1045-cameraX,221-cameraY,1067-cameraX,199-cameraY,'#9a8063',2);
+            // Quiet directional carving; the native stair is the bright edge.
+            line(c,1002-cameraX,220-cameraY,1023-cameraX,220-cameraY,'#755f4f');
+            line(c,1018-cameraX,216-cameraY,1023-cameraX,220-cameraY,'#755f4f');
+            line(c,1018-cameraX,224-cameraY,1023-cameraX,220-cameraY,'#755f4f');
             r(c, 883 - cameraX, 232 - cameraY, 202, 8, '#c99870');
+            // The optional lookout belongs to the same inspection scaffold.
+            // Its open legs sit behind the carriage, not across its live cap.
+            for (const xx of [962,1003]) {
+                r(c,xx-cameraX,104-cameraY,3,128,'#a18a68');
+                r(c,xx+1-cameraX,105-cameraY,1,126,'#bca17a');
+            }
+            line(c,965-cameraX,129-cameraY,1002-cameraX,105-cameraY,'#a18a68',2);
+            r(c,969-cameraX,110-cameraY,26,8,'#c1a47c');
+            pixelText(c,'ALTO',970-cameraX,112-cameraY,'#755f4f');
         }
     });
 }
@@ -353,6 +421,11 @@ export function drawGuairaAscentTerrain(c: CanvasRenderingContext2D, level: Worl
         for (const [left, right, top] of [[0,224,304],[496,656,304],[768,880,144],[1088,1344,144]]) {
             if (visible(left, right - left, cameraX)) cutEarth(c, left, right, top, cameraX, cameraY);
         }
+        for (let row = startRow; row <= endRow; row++) for (let col = startCol; col <= endCol; col++) {
+            const tile = level.data.tiles[row]?.[col] ?? 0;
+            if (!supportsStanding(tile) || isOneWayTile(tile)) continue;
+            drawGuairaClayGrain(c, level.colToWorldX(col) - cameraX, level.rowToWorldY(row) - cameraY, col, row);
+        }
         c.restore();
     });
 }
@@ -363,10 +436,7 @@ function deck(c: CanvasRenderingContext2D, body: MovingBody, cx: number, cy: num
     r(c, x, y, w, h, P.woodShade);
     r(c, x, y, w, Math.min(2, h), P.deck);
     r(c, x, y + 2, w, Math.max(0, h - 4), P.wood);
-    for (let dx = 0; dx < w; dx += 13) {
-        r(c, x + dx, y + 2, 1, Math.max(0, h - 4), '#705344');
-        r(c, x + dx + 2, y + 3, Math.min(8, w - dx - 2), 1, P.woodLight);
-    }
+    drawGuairaTimber(c, x, y + 2, w, h - 4, lift ? 1 : 2);
     r(c, x, y + Math.max(2, h - 2), w, Math.min(2, h), P.ironDark);
     for (const dx of [3, w - 8]) {
         r(c, x + dx, y + 2, 5, Math.max(0, h - 2), lift ? P.bronze : P.iron);
@@ -489,6 +559,20 @@ export function drawGuairaAscentObjects(c: CanvasRenderingContext2D, objects: Wo
                 travelDial(c, lift, cameraX, cameraY, 'y', running);
             }
         }
-        GUAIRA_ASCENT_ART.workerFeet.forEach((p, i) => { if (visible(p.x - 8, 24, cameraX)) worker(c, p.x - cameraX, p.y - cameraY, i); });
+        GUAIRA_ASCENT_ART.workerFeet.forEach((p, i) => {
+            if (!visible(p.x - 8, 24, cameraX)) return;
+            const body = objects.get(i ? GUAIRA_ASCENT_ART.liftId : GUAIRA_ASCENT_ART.plankId);
+            const axis = i ? 'y' : 'x';
+            const from = body?.home?.[axis], to = body?.to?.[axis];
+            const progress = body && from !== undefined && to !== undefined && from !== to
+                ? Math.max(0, Math.min(1, (body[axis] - from) / (to - from))) : 0;
+            // Look up when the real platform is away; resume inspection when it
+            // returns. The object's clock also freezes on pause and completion.
+            // No remembered event, predicted travel or independent render clock.
+            drawGuairaWorker(c, p.x - cameraX, p.y - cameraY, i ? 'inspector' : 'pump', {
+                activeTimeMs: objects.time, valveActive: progress > .35,
+                bridgeRise: .5, reducedMotion,
+            });
+        });
     });
 }

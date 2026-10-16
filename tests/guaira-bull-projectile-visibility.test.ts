@@ -43,7 +43,7 @@ for (const side of ['left', 'right'] as const) for (const reducedMotion of [fals
         const endpoint = { x: side === 'left' ? 4 : 307, y: 215, width: 10, height: 7 };
         assert.deepEqual(b.visibleBones[b.visibleBones.length - 1], endpoint); assert.equal(b.visibleBones.length, 2);
         const calls = paint(b, reducedMotion);
-        assert.ok(calls.some(call => JSON.stringify(call) === JSON.stringify(['#493444', endpoint.x - 1, 214, 12, 9])), 'the unchanged bone painter receives the last endpoint');
+        for (const offset of [-1, 6]) assert.ok(calls.some(call => JSON.stringify(call) === JSON.stringify(['#493444', endpoint.x + offset, 214, 5, 9])), 'both bone joints remain visible at the last damaging endpoint');
         assert.deepEqual(paint(b, reducedMotion), calls);
         g.toggleLabPause(); const paused = JSON.stringify({ boss: b, player: g.player.data });
         for (let tick = 0; tick < 6; tick++) { g.update(100); g.render(); }
@@ -76,7 +76,7 @@ test('all departed endpoints are retained across substeps without reusing or adv
     assert.deepEqual(b.bones, []);
     assert.deepEqual(b.visibleBones, [4, 4].map(x => ({ x, y: 215, width: 10, height: 7 })));
     assert.equal(b.hazards.length, 3, 'retain the existing one- and two-step sweeps only');
-    assert.equal(paint(b).filter(call => call[0] === '#493444').length, 2);
+    assert.equal(paint(b).filter(([color,x,y,w,h]) => color === '#493444' && x === 3 && y === 214 && w === 5 && h === 9).length, 2, 'both retained bones draw their leading joint');
 });
 
 for (const dt of [0, -1, NaN, R.tickMs / 2]) test(`a new update (${dt}) cannot leave an old departed pose without its sweep`, () => {

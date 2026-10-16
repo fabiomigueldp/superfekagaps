@@ -1,0 +1,146 @@
+{
+  "kind": "real-chapter-native-keyboard-relief-routes",
+  "schedulerControlled": true,
+  "stepMs": 16.666666666666668,
+  "physicalDevice": false,
+  "runs": [
+    {
+      "name": "gallery",
+      "updates": 759,
+      "contacts": [
+        176,
+        240,
+        288,
+        352,
+        320,
+        336,
+        384,
+        192
+      ],
+      "minHelmet": 26,
+      "maxFeet": 160,
+      "finished": true,
+      "coins": 5,
+      "decisions": []
+    },
+    {
+      "name": "opened",
+      "updates": 601,
+      "contacts": [
+        336,
+        288,
+        224,
+        160,
+        256
+      ],
+      "minHelmet": 26,
+      "maxFeet": 168,
+      "finished": true,
+      "coins": 5,
+      "challenge": {
+        "goal": null,
+        "objective": null,
+        "verdict": "unselected",
+        "evidence": {
+          "lidOpened": true,
+          "helmetLost": false,
+          "died": false,
+          "reconstructed": false,
+          "arrived": true,
+          "reliefOpenAtArrival": true
+        }
+      },
+      "reliefOpened": true,
+      "decisions": [
+        {
+          "frame": 171,
+          "guidance": "A tampa está acima da plataforma de manutenção. Suba para aliviar a pressão ou volte ao piso e observe o intervalo seco."
+        },
+        {
+          "frame": 396,
+          "guidance": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura."
+        },
+        {
+          "frame": 476,
+          "guidance": "Sacada de inspeção: siga até o patamar abaixo à direita, depois desça ao piso de saída."
+        },
+        {
+          "frame": 536,
+          "guidance": "Patamar de saída: siga à direita para voltar ao piso da oficina."
+        }
+      ]
+    },
+    {
+      "name": "high",
+      "updates": 613,
+      "contacts": [
+        336,
+        288,
+        224,
+        160,
+        256
+      ],
+      "minHelmet": 26,
+      "maxFeet": 168,
+      "finished": true,
+      "coins": 5,
+      "challenge": {
+        "goal": "keep-lid-and-helmet",
+        "objective": "Atravesse mantendo a tampa e o capacete intactos, sem morrer nesta tentativa.",
+        "verdict": "met",
+        "evidence": {
+          "lidOpened": false,
+          "helmetLost": false,
+          "died": false,
+          "reconstructed": false,
+          "arrived": true,
+          "reliefOpenAtArrival": false
+        }
+      },
+      "reliefOpened": false,
+      "decisions": [
+        {
+          "frame": 409,
+          "guidance": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura. · Opcional: Atravesse mantendo a tampa e o capacete intactos, sem morrer nesta tentativa."
+        },
+        {
+          "frame": 488,
+          "guidance": "Sacada de inspeção: siga até o patamar abaixo à direita, depois desça ao piso de saída. · Opcional: Atravesse mantendo a tampa e o capacete intactos, sem morrer nesta tentativa."
+        },
+        {
+          "frame": 548,
+          "guidance": "Patamar de saída: siga à direita para voltar ao piso da oficina. · Opcional: Atravesse mantendo a tampa e o capacete intactos, sem morrer nesta tentativa."
+        }
+      ]
+    },
+    {
+      "name": "interval",
+      "updates": 364,
+      "contacts": [
+        336
+      ],
+      "minHelmet": 126,
+      "maxFeet": 160,
+      "finished": true,
+      "coins": 0,
+      "challenge": {
+        "goal": "keep-lid-and-helmet",
+        "objective": "Atravesse mantendo a tampa e o capacete intactos, sem morrer nesta tentativa.",
+        "verdict": "met",
+        "evidence": {
+          "lidOpened": false,
+          "helmetLost": false,
+          "died": false,
+          "reconstructed": false,
+          "arrived": true,
+          "reliefOpenAtArrival": false
+        }
+      },
+      "reliefOpened": false,
+      "decisions": []
+    }
+  ],
+  "errors": [],
+  "continuation": "gallery -> relief -> other-route -> retry -> map",
+  "passed": true
+}

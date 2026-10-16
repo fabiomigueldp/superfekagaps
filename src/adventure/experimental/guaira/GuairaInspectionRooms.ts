@@ -4,7 +4,7 @@ import type { GuairaReliefOptions, GuairaReliefRouteAPI } from './relief/GuairaR
 export type GuairaInspectionRoomSceneId = 'gallery' | 'relief';
 export const INSPECTION_ROOMS = {
     gallery: { title: 'Galeria dos Remendos', objective: 'Abra as tampas rachadas e alcance o patamar de inspeção' },
-    relief: { title: 'Câmara de Alívio', objective: 'Atravesse a grelha no intervalo seco ou suba e abra a tampa de alívio · pule, depois baixo no ar · morrer ou Tentar restaura tampa e jato' }
+    relief: { title: 'Câmara de Alívio', objective: 'Atravesse no intervalo seco ou suba e abra a tampa de alívio · pule, depois baixo no ar. Pela manutenção, correr e saltar também alcança a sacada sobre a grelha · morrer ou Tentar restaura tampa e jato' }
 } as const;
 
 interface ExcursionRuntime {

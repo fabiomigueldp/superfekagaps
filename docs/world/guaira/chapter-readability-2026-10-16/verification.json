@@ -1,0 +1,614 @@
+{
+  "passed": true,
+  "tests": {
+    "passed": 1029,
+    "failed": 0,
+    "newTests": 18,
+    "logSha256": "6db72895591c6e1d51b1162cf9197f2772f6b9941c8f9eaf80e3f36f092e8b88"
+  },
+  "build": {
+    "passed": true,
+    "validators": true,
+    "typescript": true,
+    "logSha256": "234ec80bb1fc6b5b7da62ecc46a4ff79eaa712610e1e5c1a9d09e6933c643746"
+  },
+  "sources": [
+    {
+      "file": "src/adventure/experimental/guaira/GuairaAscent.ts",
+      "before": "1fd7deb123b49219f0f198c202933dd5391f776437574ac087c6e776cc661a21",
+      "after": "0875110372a77026fd1ebe95832979e3ee38a0beb9b93ef1522f00e911fd8195"
+    },
+    {
+      "file": "src/adventure/experimental/guaira/GuairaAscentArt.ts",
+      "before": "6ca37b28e68a69189ee381d460c9e5fbec8c953dd8564403f3ece42c389bd8b7",
+      "after": "148dce4bdc9b05905b7b75e0ed86841f3ef5216747bc39a028a129d355c81bf4"
+    },
+    {
+      "file": "src/adventure/experimental/guaira/GuairaMayorLab.ts",
+      "before": "9b9de4d094be7dc60e923f8a3e875558f4a4c135ddb5b4fe7919940606ddd976",
+      "after": "c7720d0fc95b3601bc6c21d402202f6cb23cba3c09caafef97e7c41642c79515"
+    },
+    {
+      "file": "src/adventure/experimental/guaira/junction/GuairaJunction.ts",
+      "before": "9eb0f99abec6fd87fdece939b4bdb822cfe026490e1605fbef77260be9653456",
+      "after": "9eff819ec7070e2fecdfa81bf5eadedd47adebb1e0310669170a487953997fa5"
+    },
+    {
+      "file": "src/adventure/experimental/guaira/respiros/GuairaRespiros.ts",
+      "before": "8339fe7b4692bf7b7b9ac82d7ffb297480cb149b8b26ddc378fefe8a637ee4cb",
+      "after": "8de6f4b72c01a8a08906bb1ea150f532cdfdbed784d479987e90da34514fab84"
+    },
+    {
+      "file": "src/adventure/experimental/guaira/chapter/GuairaChapterScenes.ts",
+      "before": "3658760168922a3e09bd305aaf71130ae06d9d35e2db381731bad6b2908f7828",
+      "after": "dff29576db09655149e15d0c3c3d934f4e8ac23b39b739ab68d8a9a2a4054d19"
+    },
+    {
+      "file": "src/adventure/experimental/guaira/chapter/GuairaChapterStory.ts",
+      "before": "2e1409784f3050d1ab83570feed6c87136d42e0b1b27fb86adbbab72aabe664c",
+      "after": "90a736de9e3a2a09832de3097734ac76fdf344db216af5662310e84b8a51c509"
+    },
+    {
+      "file": "src/adventure/experimental/guaira/chapter/GuairaChapterPresentation.ts",
+      "before": "4a1c2e26af7b11c32e652d04071cc633308fde03f266c2e8fde8f8ad191a9190",
+      "after": "494a6c21f555daa110cac90b1a2645e8677ccfb894526de51c896b0d3cce3cfe"
+    }
+  ],
+  "artifacts": [
+    {
+      "file": "alivio-poster.png",
+      "bytes": 4027,
+      "sha256": "f553000fe6b913ca25707a553d5db8a299d3facc4b95b4544b79115ce32d52b7"
+    },
+    {
+      "file": "alivio-sheet.png",
+      "bytes": 51013,
+      "sha256": "971511c5a1398c7863d11c1553eb7f0e6e79b6054cb952c9320c91473b95654a"
+    },
+    {
+      "file": "alivio.mp4",
+      "bytes": 413772,
+      "sha256": "fc810d4b596eac7e5851187ecf0fe48b6103f2ee277e269eb045a2207943637e"
+    },
+    {
+      "file": "chapter-map-complete.png",
+      "bytes": 1074830,
+      "sha256": "76960d09706cae8cfb4324b95671d9aee050c52c749960e2a12b4626672d6790"
+    },
+    {
+      "file": "galeria-poster.png",
+      "bytes": 6170,
+      "sha256": "6d2b13b7c59c3c24b37de02b7300e92cb6d7aaca0008e0effd1396e885ac0752"
+    },
+    {
+      "file": "galeria-sheet.png",
+      "bytes": 68059,
+      "sha256": "30c11f33eef2f18af5c967db300dee70c2245b808e992b4e33aefc97953ee122"
+    },
+    {
+      "file": "galeria.mp4",
+      "bytes": 577757,
+      "sha256": "e7f843debd5adec9a760eaff4d36c422ca082389bcfc409aa31a60631b0524d9"
+    },
+    {
+      "file": "lab-poster.png",
+      "bytes": 7251,
+      "sha256": "15355e613419ea3f95299a680a01768e21a2501e31baedfd000ab2368404e0d3"
+    },
+    {
+      "file": "lab-sheet.png",
+      "bytes": 65224,
+      "sha256": "6ff9a42c57210dce82e0b142e96ba7c7d1cfde0951b794054845f7a8faa2a4e0"
+    },
+    {
+      "file": "lab.mp4",
+      "bytes": 566011,
+      "sha256": "2ee70f82354588929a705bd3d39a61daa12e52a66a3d869a02fa1eb878af185a"
+    },
+    {
+      "file": "patio-123-after.png",
+      "bytes": 7292,
+      "sha256": "907627672f3374439b85c11eb10eeb2172bde5ade1e97c0bb59ca8f11b504911"
+    },
+    {
+      "file": "patio-123-before.png",
+      "bytes": 6721,
+      "sha256": "171ae8e1f4d0a16fef8c329e12b48428e342636c7f219e40528a2522b0859b33"
+    },
+    {
+      "file": "patio-poster.png",
+      "bytes": 7292,
+      "sha256": "907627672f3374439b85c11eb10eeb2172bde5ade1e97c0bb59ca8f11b504911"
+    },
+    {
+      "file": "patio-sheet.png",
+      "bytes": 73906,
+      "sha256": "6dd7d05ccabefef94073a69ceaac540a200fa4a1f521faeb9b6c1ad27447decd"
+    },
+    {
+      "file": "patio.mp4",
+      "bytes": 1357054,
+      "sha256": "c77d921a377f54d498ec663935c4a4a99003581e7695e2ba6d784e94fc968158"
+    },
+    {
+      "file": "prefeito-519-after.png",
+      "bytes": 9201,
+      "sha256": "1d094dcc377efb2c5190c16c5c644079b372924d5d8533af9faf6d54628b62b5"
+    },
+    {
+      "file": "prefeito-519-before.png",
+      "bytes": 9027,
+      "sha256": "3a3fe8e15a91663e610cf11aba7837e36162e26ea9e1b6baeb63ae840c8e661d"
+    },
+    {
+      "file": "prefeito-poster.png",
+      "bytes": 9201,
+      "sha256": "1d094dcc377efb2c5190c16c5c644079b372924d5d8533af9faf6d54628b62b5"
+    },
+    {
+      "file": "prefeito-sheet.png",
+      "bytes": 96975,
+      "sha256": "9b8bd072fac2a627b22286d9e4015287960aaa925d51bf31680abd6aaac6a245"
+    },
+    {
+      "file": "prefeito.mp4",
+      "bytes": 1253409,
+      "sha256": "4623b02c631f28bb974657cf09bff377bbdad9ead40af4e1ceeb8c73bd39aef5"
+    },
+    {
+      "file": "respiros-379-after.png",
+      "bytes": 7626,
+      "sha256": "0b40703c6a7b2689c51d7d4c16a86c8ae505b103348f90ce7b54e19cd4d703df"
+    },
+    {
+      "file": "respiros-379-before.png",
+      "bytes": 7720,
+      "sha256": "e8d5943cfc13f244db69f7ebffb087d25622fb90445f2d513a9f4c6ba04db16d"
+    },
+    {
+      "file": "respiros-poster.png",
+      "bytes": 6836,
+      "sha256": "1f487e161ce42eb586945e8358b8314ac3af65a54e893d66bc9298bc60363223"
+    },
+    {
+      "file": "respiros-sheet.png",
+      "bytes": 81546,
+      "sha256": "04847121c4c183a5b9ca86d9eaccf4ac863016baca2b69802b3350ad93173bc6"
+    },
+    {
+      "file": "respiros.mp4",
+      "bytes": 1175190,
+      "sha256": "7ca9ecc556c0d8abcf027b2a11604375d746f3a47e9e05ee2dd8a8772f38c30c"
+    },
+    {
+      "file": "subida-1038-after.png",
+      "bytes": 4832,
+      "sha256": "6818685e51a6750b7e4e123428e31de0da934cb20de1a92d044cf8589262b921"
+    },
+    {
+      "file": "subida-1038-before.png",
+      "bytes": 4647,
+      "sha256": "9674199b0e89aaf1799ebb113cb0120f763f10f16c9338c4dd34aa79317ae67a"
+    },
+    {
+      "file": "subida-poster.png",
+      "bytes": 7582,
+      "sha256": "f49de2a729ef9cebc0c0452519ce54a508ecb5e8fa9c29de72f774cc54795ce4"
+    },
+    {
+      "file": "subida-sheet.png",
+      "bytes": 93760,
+      "sha256": "1a1b400a00f576822997e170d7d4351a4c175ef123d2cf0116158c9da406b49b"
+    },
+    {
+      "file": "subida.mp4",
+      "bytes": 1477142,
+      "sha256": "3ee148a6331f05fd825c68f643072fa7c2b0b87cae1e4ec2ad26ddfe75df5d5b"
+    },
+    {
+      "file": "travessia-poster.png",
+      "bytes": 10512,
+      "sha256": "4c35f440699dc1f1cb60a0a9346dc727fa3f6aaadd32dd9e773a2900b78dc7f7"
+    },
+    {
+      "file": "travessia-sheet.png",
+      "bytes": 122231,
+      "sha256": "f0c640bf32fb46a9c0ddd629104370ee7e2eaba3fd0a662d33c40cf774c872df"
+    },
+    {
+      "file": "travessia.mp4",
+      "bytes": 1271982,
+      "sha256": "cfac58efb2a1777fec76da32d05397e704e88ae8657affe498b064f4d2d5a07d"
+    }
+  ],
+  "nativeRoutes": {
+    "count": 8,
+    "inputOnly": true,
+    "damage": false,
+    "script": "scripts/prove_guaira_chapter_readability.ts"
+  },
+  "browser": {
+    "kind": "native-campaign-eight-scenes-complete-keyboard-routes",
+    "openingsMountedForInspection": true,
+    "followingEntries": "ordinary map walking and optional continuation",
+    "stepMs": 16.666666666666668,
+    "physicalDevice": false,
+    "checks": [
+      {
+        "frames": 1078,
+        "minHead": 32,
+        "maxFeet": 164.01467144002288,
+        "id": "guaira-travessia",
+        "coins": 14,
+        "finished": true,
+        "status": "O caminho até o arrozal está aberto. A Passagem dos Respiros leva ao curral. · 14 moedas coletadas nesta tentativa"
+      },
+      {
+        "frames": 1134,
+        "minHead": 32,
+        "maxFeet": 160.00001543609795,
+        "id": "guaira-respiros",
+        "coins": 7,
+        "finished": true,
+        "status": "Respiros atravessados. Ossabravo espera no Curral da Comporta. · 7 moedas coletadas nesta tentativa"
+      },
+      {
+        "frames": 1065,
+        "minHead": 53,
+        "maxFeet": 160,
+        "id": "guaira-lab",
+        "coins": 0,
+        "finished": true,
+        "status": "Ossabravo descansou. A água ainda falta no bairro. Suba à Casa da Vazão. · 0 moedas coletadas nesta tentativa"
+      },
+      {
+        "frames": 1174,
+        "minHead": 32,
+        "maxFeet": 168,
+        "id": "guaira-subida",
+        "coins": 7,
+        "finished": true,
+        "status": "Você chegou à Casa da Vazão. O ramal do bairro está fechado; enfrente o Prefeito para reabrir a água. · 7 moedas coletadas nesta tentativa"
+      },
+      {
+        "frames": 1112,
+        "minHead": 27,
+        "maxFeet": 160.00000034053835,
+        "id": "guaira-prefeito",
+        "coins": 0,
+        "finished": true,
+        "status": "Ramal público aberto. Os moradores têm água na bica outra vez. Os gaps continuam. · 0 moedas coletadas nesta tentativa"
+      },
+      {
+        "frames": 759,
+        "minHead": 32,
+        "maxFeet": 160,
+        "id": "guaira-galeria",
+        "coins": 5,
+        "finished": true,
+        "status": "Acesso à Câmara de Alívio aberto · 5 moedas coletadas nesta tentativa"
+      },
+      {
+        "frames": 613,
+        "minHead": 32,
+        "maxFeet": 168,
+        "id": "guaira-camara-alivio",
+        "coins": 5,
+        "finished": true,
+        "status": "Atravesse no intervalo seco ou suba pela oficina para abrir o alívio. A manutenção também leva à passarela sobre a grelha."
+      },
+      {
+        "frames": 1838,
+        "minHead": 32,
+        "maxFeet": 168,
+        "id": "guaira-patio-comportas",
+        "coins": 3,
+        "finished": true,
+        "status": "O caminho até o arrozal está aberto. A Passagem dos Respiros leva ao curral. · 3 moedas coletadas nesta tentativa"
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  "smoke": {
+    "kind": "isolated-browser-native-chapter-inspection",
+    "checks": [
+      {
+        "stage": "guaira-travessia",
+        "keyboardMoved": true,
+        "pauseFrozen": true,
+        "stableCanvas": true,
+        "returnedToMap": true,
+        "render": {
+          "samples": 90,
+          "medianMs": 1,
+          "p95Ms": 2,
+          "pure": true
+        }
+      },
+      {
+        "stage": "guaira-patio-comportas",
+        "keyboardMoved": true,
+        "pauseFrozen": true,
+        "stableCanvas": true,
+        "returnedToMap": true,
+        "render": {
+          "samples": 90,
+          "medianMs": 1.5,
+          "p95Ms": 2.5999999940395355,
+          "pure": true
+        }
+      },
+      {
+        "stage": "guaira-respiros",
+        "keyboardMoved": true,
+        "pauseFrozen": true,
+        "stableCanvas": true,
+        "returnedToMap": true,
+        "render": {
+          "samples": 90,
+          "medianMs": 2,
+          "p95Ms": 3.7000000178813934,
+          "pure": true
+        },
+        "animatedHazardPaused": true,
+        "hydraulicTime": 1983.3333333333367
+      },
+      {
+        "stage": "guaira-lab",
+        "keyboardMoved": true,
+        "pauseFrozen": true,
+        "stableCanvas": true,
+        "returnedToMap": true,
+        "render": {
+          "samples": 90,
+          "medianMs": 1.7999999821186066,
+          "p95Ms": 2.5,
+          "pure": true
+        }
+      },
+      {
+        "stage": "guaira-subida",
+        "keyboardMoved": true,
+        "pauseFrozen": true,
+        "stableCanvas": true,
+        "returnedToMap": true,
+        "render": {
+          "samples": 90,
+          "medianMs": 1.5999999940395355,
+          "p95Ms": 2.100000023841858,
+          "pure": true
+        }
+      },
+      {
+        "stage": "guaira-prefeito",
+        "keyboardMoved": true,
+        "pauseFrozen": true,
+        "stableCanvas": true,
+        "returnedToMap": true,
+        "render": {
+          "samples": 90,
+          "medianMs": 1.100000023841858,
+          "p95Ms": 2.699999988079071,
+          "pure": true
+        }
+      },
+      {
+        "stage": "gallery",
+        "keyboardMoved": true,
+        "pauseFrozen": true,
+        "stableCanvas": true,
+        "returnedToMap": true,
+        "render": {
+          "samples": 90,
+          "medianMs": 0.9000000059604645,
+          "p95Ms": 2.0999999940395355,
+          "pure": true
+        }
+      },
+      {
+        "stage": "relief",
+        "keyboardMoved": true,
+        "pauseFrozen": true,
+        "stableCanvas": true,
+        "returnedToMap": true,
+        "render": {
+          "samples": 90,
+          "medianMs": 1.199999988079071,
+          "p95Ms": 2.5,
+          "pure": true
+        },
+        "animatedHazardPaused": true,
+        "hydraulicTime": 1983.3333333333294
+      },
+      {
+        "viewport": "844x390",
+        "overflow": false
+      }
+    ],
+    "errors": [],
+    "physicalDevice": false,
+    "passed": true
+  },
+  "review": {
+    "widths": [
+      {
+        "width": 1440,
+        "scroll": 1440,
+        "overflow": false
+      },
+      {
+        "width": 844,
+        "scroll": 844,
+        "overflow": false
+      },
+      {
+        "width": 390,
+        "scroll": 390,
+        "overflow": false
+      },
+      {
+        "width": 320,
+        "scroll": 320,
+        "overflow": false
+      }
+    ],
+    "comparisons": [
+      {
+        "key": "subida-1038",
+        "images": [
+          {
+            "src": "subida-1038-before.png",
+            "width": 320,
+            "height": 180
+          },
+          {
+            "src": "subida-1038-after.png",
+            "width": 320,
+            "height": 180
+          }
+        ]
+      },
+      {
+        "key": "patio-123",
+        "images": [
+          {
+            "src": "patio-123-before.png",
+            "width": 320,
+            "height": 180
+          },
+          {
+            "src": "patio-123-after.png",
+            "width": 320,
+            "height": 180
+          }
+        ]
+      },
+      {
+        "key": "respiros-379",
+        "images": [
+          {
+            "src": "respiros-379-before.png",
+            "width": 320,
+            "height": 180
+          },
+          {
+            "src": "respiros-379-after.png",
+            "width": 320,
+            "height": 180
+          }
+        ]
+      },
+      {
+        "key": "prefeito-519",
+        "images": [
+          {
+            "src": "prefeito-519-before.png",
+            "width": 320,
+            "height": 180
+          },
+          {
+            "src": "prefeito-519-after.png",
+            "width": 320,
+            "height": 180
+          }
+        ]
+      }
+    ],
+    "videos": [
+      {
+        "key": "travessia",
+        "width": 960,
+        "height": 540,
+        "duration": 17.933333,
+        "time": 0.107872,
+        "source": "http://localhost:3000/docs/world/guaira/chapter-readability-2026-10-16/travessia.mp4"
+      },
+      {
+        "key": "patio",
+        "width": 960,
+        "height": 540,
+        "duration": 30.6,
+        "time": 0.114211,
+        "source": "http://localhost:3000/docs/world/guaira/chapter-readability-2026-10-16/patio.mp4"
+      },
+      {
+        "key": "respiros",
+        "width": 960,
+        "height": 540,
+        "duration": 18.866667,
+        "time": 0.107934,
+        "source": "http://localhost:3000/docs/world/guaira/chapter-readability-2026-10-16/respiros.mp4"
+      },
+      {
+        "key": "lab",
+        "width": 960,
+        "height": 540,
+        "duration": 17.733333,
+        "time": 0.112172,
+        "source": "http://localhost:3000/docs/world/guaira/chapter-readability-2026-10-16/lab.mp4"
+      },
+      {
+        "key": "subida",
+        "width": 960,
+        "height": 540,
+        "duration": 19.533333,
+        "time": 0.109718,
+        "source": "http://localhost:3000/docs/world/guaira/chapter-readability-2026-10-16/subida.mp4"
+      },
+      {
+        "key": "prefeito",
+        "width": 960,
+        "height": 540,
+        "duration": 18.533333,
+        "time": 0.111275,
+        "source": "http://localhost:3000/docs/world/guaira/chapter-readability-2026-10-16/prefeito.mp4"
+      },
+      {
+        "key": "galeria",
+        "width": 960,
+        "height": 540,
+        "duration": 12.6,
+        "time": 0.115989,
+        "source": "http://localhost:3000/docs/world/guaira/chapter-readability-2026-10-16/galeria.mp4"
+      },
+      {
+        "key": "alivio",
+        "width": 960,
+        "height": 540,
+        "duration": 10.2,
+        "time": 0.115125,
+        "source": "http://localhost:3000/docs/world/guaira/chapter-readability-2026-10-16/alivio.mp4"
+      }
+    ],
+    "links": [
+      {
+        "href": "http://localhost:3000/?chapter=guaira",
+        "status": 200
+      },
+      {
+        "href": "http://localhost:3000/docs/world/guaira/chapter-readability-2026-10-16/index.html#percursos",
+        "status": 200
+      },
+      {
+        "href": "http://localhost:3000/docs/world/guaira/relief-routes-2026-10-16/index.html",
+        "status": 200
+      },
+      {
+        "href": "http://localhost:3000/docs/world/guaira/chapter-readability-2026-10-16/README.md",
+        "status": 200
+      },
+      {
+        "href": "http://localhost:3000/docs/world/guaira/chapter-readability-2026-10-16/native-routes.json",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  "limitations": [
+    "No external-player playtest; fun and final difficulty are not established by automated routes.",
+    "Native browser route openings are mounted for inspection; subsequent access uses ordinary island walking and optional continuation.",
+    "Keyboard events are real browser events; simulation is advanced at controlled 60 Hz. Touch tests use simulated native gestures, not a physical device."
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "kind": "native-art-and-input-verification",
+  "hashes": {
+    "GuairaJunctionArt": "1b8d4bf7669b3efdb5856e3ded8724406eea8d83cc352d4410567e8c5ec0f186",
+    "GuairaJunctionHardwareArt": "15a2483240e3890f3a12bd6c0adacc18e1a40a02826d5368ee2403373a5f056e",
+    "GuairaReliefArt": "0f499f18532d8a173828b3220f8344ae0aaa0bc35d80857e5811f325ce58bd3e",
+    "GuairaReliefFlow": "ba24a3a7af5a7c7a8be56c4a3d67096755f6b9e69eb84b5cf9a9ccbf5bfe070d"
+  },
+  "snapshots": [
+    {
+      "key": "patio-seletor",
+      "cx": 170,
+      "cy": 180,
+      "x": 210,
+      "feet": 304,
+      "time": 1400,
+      "open": false,
+      "supply": "a",
+      "pending": true,
+      "deterministic": true,
+      "stateUnchanged": true,
+      "authoredPose": true
+    },
+    {
+      "key": "patio-curvas",
+      "cx": 240,
+      "cy": 128,
+      "x": 432,
+      "feet": 256,
+      "time": 1600,
+      "open": false,
+      "supply": "b",
+      "pending": false,
+      "deterministic": true,
+      "stateUnchanged": true,
+      "authoredPose": true
+    },
+    {
+      "key": "patio-base",
+      "cx": 240,
+      "cy": 230,
+      "x": 260,
+      "feet": 304,
+      "time": 1600,
+      "open": false,
+      "supply": "a",
+      "pending": false,
+      "deterministic": true,
+      "stateUnchanged": true,
+      "authoredPose": true
+    },
+    {
+      "key": "alivio-rede",
+      "cx": 200,
+      "cy": 176,
+      "x": 352,
+      "feet": 336,
+      "time": 1500,
+      "open": false,
+      "supply": "a",
+      "pending": false,
+      "deterministic": true,
+      "stateUnchanged": true,
+      "authoredPose": true
+    },
+    {
+      "key": "alivio-retorno",
+      "cx": 200,
+      "cy": 176,
+      "x": 352,
+      "feet": 336,
+      "time": 1500,
+      "open": true,
+      "supply": "a",
+      "pending": false,
+      "deterministic": true,
+      "stateUnchanged": true,
+      "authoredPose": true
+    },
+    {
+      "key": "alivio-camara",
+      "cx": 112,
+      "cy": 96,
+      "x": 230,
+      "feet": 160,
+      "time": 3000,
+      "open": true,
+      "supply": "a",
+      "pending": false,
+      "deterministic": true,
+      "stateUnchanged": true,
+      "authoredPose": true
+    }
+  ],
+  "replays": [
+    {
+      "name": "maintenance",
+      "updates": 504,
+      "images": 126,
+      "fps": 15,
+      "finished": true,
+      "damage": false,
+      "openedAt": 295,
+      "shutdownHeight": 0,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "name": "interval",
+      "updates": 364,
+      "images": 91,
+      "fps": 15,
+      "finished": true,
+      "damage": false,
+      "openedAt": null,
+      "shutdownHeight": 0,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "name": "discharge",
+      "updates": 648,
+      "images": 162,
+      "fps": 15,
+      "finished": true,
+      "damage": false,
+      "openedAt": 419,
+      "shutdownHeight": 107,
+      "manualPoseOrClockChanges": false
+    }
+  ],
+  "motion": {
+    "authored": true,
+    "fps": 30,
+    "frames": 126
+  }
+}

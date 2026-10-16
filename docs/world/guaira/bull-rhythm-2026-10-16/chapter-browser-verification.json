@@ -1,0 +1,83 @@
+{
+  "kind": "native-campaign-eight-scenes-complete-keyboard-routes",
+  "openingsMountedForInspection": true,
+  "followingEntries": "ordinary map walking and optional continuation",
+  "stepMs": 16.666666666666668,
+  "physicalDevice": false,
+  "checks": [
+    {
+      "frames": 1078,
+      "minHead": 32,
+      "maxFeet": 164.01467144002288,
+      "id": "guaira-travessia",
+      "coins": 14,
+      "finished": true,
+      "status": "O caminho até o arrozal está aberto. A Passagem dos Respiros leva ao curral. · 14 moedas coletadas nesta tentativa"
+    },
+    {
+      "frames": 1134,
+      "minHead": 32,
+      "maxFeet": 160.00001543609795,
+      "id": "guaira-respiros",
+      "coins": 7,
+      "finished": true,
+      "status": "Respiros atravessados. Ossabravo espera no Curral da Comporta. · 7 moedas coletadas nesta tentativa"
+    },
+    {
+      "frames": 1267,
+      "minHead": 38,
+      "maxFeet": 160,
+      "id": "guaira-lab",
+      "coins": 0,
+      "finished": true,
+      "status": "Ossabravo descansou. A água ainda falta no bairro. Suba à Casa da Vazão. · 0 moedas coletadas nesta tentativa"
+    },
+    {
+      "frames": 910,
+      "minHead": 32,
+      "maxFeet": 168,
+      "id": "guaira-subida",
+      "coins": 12,
+      "finished": true,
+      "status": "Você chegou à Casa da Vazão. O ramal do bairro está fechado; enfrente o Prefeito para reabrir a água. · 12 moedas coletadas nesta tentativa"
+    },
+    {
+      "frames": 1822,
+      "minHead": 27,
+      "maxFeet": 160.0000000049077,
+      "id": "guaira-prefeito",
+      "coins": 0,
+      "finished": true,
+      "status": "Ramal público aberto. Os moradores têm água na bica outra vez. Os gaps continuam. · 0 moedas coletadas nesta tentativa"
+    },
+    {
+      "frames": 759,
+      "minHead": 32,
+      "maxFeet": 160,
+      "id": "guaira-galeria",
+      "coins": 5,
+      "finished": true,
+      "status": "Acesso à Câmara de Alívio aberto · 5 moedas coletadas nesta tentativa"
+    },
+    {
+      "frames": 613,
+      "minHead": 32,
+      "maxFeet": 168,
+      "id": "guaira-camara-alivio",
+      "coins": 5,
+      "finished": true,
+      "status": "Atravesse no intervalo seco ou suba pela oficina para abrir o alívio. A manutenção também leva à passarela sobre a grelha."
+    },
+    {
+      "frames": 1838,
+      "minHead": 32,
+      "maxFeet": 168,
+      "id": "guaira-patio-comportas",
+      "coins": 3,
+      "finished": true,
+      "status": "O caminho até o arrozal está aberto. A Passagem dos Respiros leva ao curral. · 3 moedas coletadas nesta tentativa"
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

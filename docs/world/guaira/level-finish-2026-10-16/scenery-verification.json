@@ -1,0 +1,698 @@
+[
+  {
+    "name": "travessia",
+    "pose": "entry",
+    "camera": {
+      "x": 0,
+      "y": 88
+    },
+    "reducedMotion": false,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": true,
+    "sha256": "6e22cce85b4d7e95d96a9eff61b8ef2d57276e1ab667401d743740b1553a11aa"
+  },
+  {
+    "name": "travessia",
+    "pose": "later",
+    "camera": {
+      "x": 920,
+      "y": 64
+    },
+    "reducedMotion": false,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": true,
+    "sha256": "765fa632d0a68734d7e12cecc56f2024f54ab98475f0af17e0ff90f21b39d566"
+  },
+  {
+    "name": "travessia",
+    "pose": "tour-0",
+    "camera": {
+      "x": 0,
+      "y": 88
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "travessia",
+    "pose": "tour-1",
+    "camera": {
+      "x": 240,
+      "y": 88
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "travessia",
+    "pose": "tour-2",
+    "camera": {
+      "x": 432,
+      "y": 88
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "travessia",
+    "pose": "tour-3",
+    "camera": {
+      "x": 650,
+      "y": 88
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "travessia",
+    "pose": "tour-4",
+    "camera": {
+      "x": 916,
+      "y": 64
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "travessia",
+    "pose": "tour-5",
+    "camera": {
+      "x": 1216,
+      "y": 64
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "travessia",
+    "pose": "native-replay",
+    "updates": 1048,
+    "images": 262,
+    "fps": 15,
+    "finished": true,
+    "damage": false,
+    "manualPoseOrClockChanges": false
+  },
+  {
+    "name": "patio",
+    "pose": "entry",
+    "camera": {
+      "x": 0,
+      "y": 168
+    },
+    "reducedMotion": false,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": true,
+    "sha256": "0194dbeb74401a8d134979ed5a2429728ac3b7d9a706ee23d416f6396a739c88"
+  },
+  {
+    "name": "patio",
+    "pose": "later",
+    "camera": {
+      "x": 650,
+      "y": 70
+    },
+    "reducedMotion": false,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": true,
+    "sha256": "8c5892d74da6d04eacad1061de67fdc215846ed158083fb75ed19f52804fa3b2"
+  },
+  {
+    "name": "patio",
+    "pose": "tour-0",
+    "camera": {
+      "x": 0,
+      "y": 168
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "patio",
+    "pose": "tour-1",
+    "camera": {
+      "x": 160,
+      "y": 60
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "patio",
+    "pose": "tour-2",
+    "camera": {
+      "x": 320,
+      "y": 220
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "patio",
+    "pose": "tour-3",
+    "camera": {
+      "x": 440,
+      "y": 120
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "patio",
+    "pose": "tour-4",
+    "camera": {
+      "x": 592,
+      "y": 70
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "patio",
+    "pose": "tour-5",
+    "camera": {
+      "x": 704,
+      "y": 70
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "patio",
+    "pose": "native-replay",
+    "updates": 893,
+    "images": 224,
+    "fps": 15,
+    "finished": true,
+    "damage": false,
+    "manualPoseOrClockChanges": false
+  },
+  {
+    "name": "respiros",
+    "pose": "entry",
+    "camera": {
+      "x": 0,
+      "y": 144
+    },
+    "reducedMotion": false,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": true,
+    "sha256": "c54b596b62d34514c2171aae09b9f4b4662f1169748b6ae53571b27836d3d2e4"
+  },
+  {
+    "name": "respiros",
+    "pose": "later",
+    "camera": {
+      "x": 520,
+      "y": 144
+    },
+    "reducedMotion": false,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": true,
+    "sha256": "e305ce677ef6691d8351a962e7ae050d2c31f41928d9d48cdfedd7405af4c769"
+  },
+  {
+    "name": "respiros",
+    "pose": "tour-0",
+    "camera": {
+      "x": 0,
+      "y": 144
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "respiros",
+    "pose": "tour-1",
+    "camera": {
+      "x": 160,
+      "y": 144
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "respiros",
+    "pose": "tour-2",
+    "camera": {
+      "x": 352,
+      "y": 144
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "respiros",
+    "pose": "tour-3",
+    "camera": {
+      "x": 520,
+      "y": 144
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "respiros",
+    "pose": "tour-4",
+    "camera": {
+      "x": 688,
+      "y": 144
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "respiros",
+    "pose": "tour-5",
+    "camera": {
+      "x": 864,
+      "y": 144
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "respiros",
+    "pose": "native-replay",
+    "updates": 877,
+    "images": 220,
+    "fps": 15,
+    "finished": true,
+    "damage": false,
+    "manualPoseOrClockChanges": false
+  },
+  {
+    "name": "curral",
+    "pose": "entry",
+    "camera": {
+      "x": 0,
+      "y": 64
+    },
+    "reducedMotion": false,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": true,
+    "sha256": "15b5262d0a701f9ef82758d47d9fe27dc6880fe33eebabeba77bf42a08225763"
+  },
+  {
+    "name": "curral",
+    "pose": "later",
+    "camera": {
+      "x": 0,
+      "y": 64
+    },
+    "reducedMotion": false,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": true,
+    "sha256": "15b5262d0a701f9ef82758d47d9fe27dc6880fe33eebabeba77bf42a08225763"
+  },
+  {
+    "name": "subida",
+    "pose": "entry",
+    "camera": {
+      "x": 0,
+      "y": 168
+    },
+    "reducedMotion": false,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": true,
+    "sha256": "72fbbfda1ddd53309c2b0a5627ba8f7485d6990d512d545776658df93a7dea16"
+  },
+  {
+    "name": "subida",
+    "pose": "later",
+    "camera": {
+      "x": 920,
+      "y": 38
+    },
+    "reducedMotion": false,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": true,
+    "sha256": "4914f176f6956a5cd1c8014638cd2fcc8c44b5756aaa902cd3e6720973c3676b"
+  },
+  {
+    "name": "subida",
+    "pose": "tour-0",
+    "camera": {
+      "x": 0,
+      "y": 168
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "subida",
+    "pose": "tour-1",
+    "camera": {
+      "x": 208,
+      "y": 220
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "subida",
+    "pose": "tour-2",
+    "camera": {
+      "x": 440,
+      "y": 168
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "subida",
+    "pose": "tour-3",
+    "camera": {
+      "x": 560,
+      "y": 86
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "subida",
+    "pose": "tour-4",
+    "camera": {
+      "x": 768,
+      "y": 38
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "subida",
+    "pose": "tour-5",
+    "camera": {
+      "x": 1024,
+      "y": 38
+    },
+    "reducedMotion": false,
+    "stateUnchanged": true
+  },
+  {
+    "name": "subida",
+    "pose": "native-replay",
+    "updates": 1339,
+    "images": 335,
+    "fps": 15,
+    "finished": true,
+    "damage": false,
+    "manualPoseOrClockChanges": false
+  },
+  {
+    "name": "prefeito",
+    "pose": "entry",
+    "camera": {
+      "x": 0,
+      "y": 64
+    },
+    "reducedMotion": false,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": true,
+    "sha256": "2050b6f5b30e4413b83aa5de64942c3d1ed136b68766c529a61183a04099ee6a"
+  },
+  {
+    "name": "prefeito",
+    "pose": "later",
+    "camera": {
+      "x": 0,
+      "y": 64
+    },
+    "reducedMotion": false,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": true,
+    "sha256": "2050b6f5b30e4413b83aa5de64942c3d1ed136b68766c529a61183a04099ee6a"
+  },
+  {
+    "name": "galeria",
+    "pose": "entry",
+    "camera": {
+      "x": 0,
+      "y": 80
+    },
+    "reducedMotion": false,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": false,
+    "sha256": "0aa1a2f75b97d5d5c822fe7f063e6f8d8a247a9042ada2534d87879ccd78d24a"
+  },
+  {
+    "name": "galeria",
+    "pose": "later",
+    "camera": {
+      "x": 430,
+      "y": 70
+    },
+    "reducedMotion": false,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": false,
+    "sha256": "e579b41e98db9a96862963b7ab010c8f09bb69f939821ef82433067bae40be7d"
+  },
+  {
+    "name": "alivio",
+    "pose": "entry",
+    "camera": {
+      "x": 0,
+      "y": 176
+    },
+    "reducedMotion": false,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": false,
+    "sha256": "72208625001a57690d366f2e6c75e38a6b6b3fa717e691cd3b4d10c8c53b2c9f"
+  },
+  {
+    "name": "alivio",
+    "pose": "later",
+    "camera": {
+      "x": 330,
+      "y": 160
+    },
+    "reducedMotion": false,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": false,
+    "sha256": "3b3f62834c348f04a03828d7ad5454eb999bf6697b6822b71ba654e60e6a4081"
+  },
+  {
+    "name": "travessia",
+    "pose": "entry",
+    "camera": {
+      "x": 0,
+      "y": 88
+    },
+    "reducedMotion": true,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": false,
+    "sha256": "465986c6a55e2f0b974f25da7e7636772f624c5fd8cf4d70a2b78a8c6df7b5a4"
+  },
+  {
+    "name": "travessia",
+    "pose": "later",
+    "camera": {
+      "x": 920,
+      "y": 64
+    },
+    "reducedMotion": true,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": false,
+    "sha256": "43bc50f58f9368cbb9aec4f61c2db7c72aa1db1e64fe751b617037973d9499af"
+  },
+  {
+    "name": "patio",
+    "pose": "entry",
+    "camera": {
+      "x": 0,
+      "y": 168
+    },
+    "reducedMotion": true,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": false,
+    "sha256": "bc73c754ae8c1d7b69f292b5005ffd2bc950dbf82fa026d91829dec81c78c992"
+  },
+  {
+    "name": "patio",
+    "pose": "later",
+    "camera": {
+      "x": 650,
+      "y": 70
+    },
+    "reducedMotion": true,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": false,
+    "sha256": "4b60a971d8a3dc3a76351bf84a38292f24e83c2a2ba293e5f2c8022432c8acdf"
+  },
+  {
+    "name": "respiros",
+    "pose": "entry",
+    "camera": {
+      "x": 0,
+      "y": 144
+    },
+    "reducedMotion": true,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": false,
+    "sha256": "616c93233a02ba962b93e2a0dce91713a6b8310cb300ddd149f3027b48520145"
+  },
+  {
+    "name": "respiros",
+    "pose": "later",
+    "camera": {
+      "x": 520,
+      "y": 144
+    },
+    "reducedMotion": true,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": false,
+    "sha256": "253df72b4cdb51bbbc94b0ca6250ddf34e56f35739fb9cef40e954595c5d9f69"
+  },
+  {
+    "name": "curral",
+    "pose": "entry",
+    "camera": {
+      "x": 0,
+      "y": 64
+    },
+    "reducedMotion": true,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": false,
+    "sha256": "83b22ed6a405f5eb4b8f3137943ffce4b78177786a7c802f3d5fcfd2802e0881"
+  },
+  {
+    "name": "curral",
+    "pose": "later",
+    "camera": {
+      "x": 0,
+      "y": 64
+    },
+    "reducedMotion": true,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": false,
+    "sha256": "83b22ed6a405f5eb4b8f3137943ffce4b78177786a7c802f3d5fcfd2802e0881"
+  },
+  {
+    "name": "subida",
+    "pose": "entry",
+    "camera": {
+      "x": 0,
+      "y": 168
+    },
+    "reducedMotion": true,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": false,
+    "sha256": "24c5ca35794a6d889aae2265415d75861ba3d3b6febabe045fcd38bd028797f1"
+  },
+  {
+    "name": "subida",
+    "pose": "later",
+    "camera": {
+      "x": 920,
+      "y": 38
+    },
+    "reducedMotion": true,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": false,
+    "sha256": "58df3f4b5c42d84083f31303c320b9b1419a56d923ac47214f0f0095c2d33f10"
+  },
+  {
+    "name": "prefeito",
+    "pose": "entry",
+    "camera": {
+      "x": 0,
+      "y": 64
+    },
+    "reducedMotion": true,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": false,
+    "sha256": "d690e7cb505d9c5ed2154585a49b722ef3959628b4b783dc040398c722e6cf19"
+  },
+  {
+    "name": "prefeito",
+    "pose": "later",
+    "camera": {
+      "x": 0,
+      "y": 64
+    },
+    "reducedMotion": true,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": false,
+    "sha256": "d690e7cb505d9c5ed2154585a49b722ef3959628b4b783dc040398c722e6cf19"
+  },
+  {
+    "name": "galeria",
+    "pose": "entry",
+    "camera": {
+      "x": 0,
+      "y": 80
+    },
+    "reducedMotion": true,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": false,
+    "sha256": "0aa1a2f75b97d5d5c822fe7f063e6f8d8a247a9042ada2534d87879ccd78d24a"
+  },
+  {
+    "name": "galeria",
+    "pose": "later",
+    "camera": {
+      "x": 430,
+      "y": 70
+    },
+    "reducedMotion": true,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": false,
+    "sha256": "e579b41e98db9a96862963b7ab010c8f09bb69f939821ef82433067bae40be7d"
+  },
+  {
+    "name": "alivio",
+    "pose": "entry",
+    "camera": {
+      "x": 0,
+      "y": 176
+    },
+    "reducedMotion": true,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": false,
+    "sha256": "b5b4935c72026f2990f86baa85d664b6921cb9ab5cfac52100b7155b3f36e38c"
+  },
+  {
+    "name": "alivio",
+    "pose": "later",
+    "camera": {
+      "x": 330,
+      "y": 160
+    },
+    "reducedMotion": true,
+    "repeatable": true,
+    "stateUnchanged": true,
+    "motionVisible": false,
+    "sha256": "3b3f62834c348f04a03828d7ad5454eb999bf6697b6822b71ba654e60e6a4081"
+  }
+]

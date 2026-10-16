@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { GuairaMayorModel, MAYOR_ARENA as A, MAYOR_RULES as R, type MayorAccess } from '../src/adventure/experimental/guaira/GuairaMayorModel';
 
+const volley = 2 * (R.jetWarning + R.jetBeat);
+const finalVolley = 3 * (R.finalJetWarning + R.finalJetBeat);
 const closed: MayorAccess = { valveActive: false, liftReady: false, registerOpened: false };
 const ready: MayorAccess = { valveActive: true, liftReady: true, registerOpened: false };
 const opened: MayorAccess = { ...ready, registerOpened: true };
@@ -14,16 +16,16 @@ function topHit(b: GuairaMayorModel, width = 14) {
 }
 function laterRecovery() {
     const b = new GuairaMayorModel();
-    advance(b, R.intro + R.idle + R.warning + R.stamp);
+    advance(b, R.intro + R.idle + R.warning + R.leap + R.stamp + R.returning);
     b.update(R.tickMs, opened); assert.equal(topHit(b), 'hit');
-    advance(b, R.hurt + R.idle + R.warning + R.stamp);
+    advance(b, R.hurt + R.idle + volley + R.warning + R.leap + R.stamp + R.returning);
     assert.equal(b.state, 'recover'); assert.equal(b.sealsRemaining, 2);
     return b;
 }
 
 test('first seal stays a tutorial and later pressure requires a fresh opening plus actual lift readiness', () => {
     const first = new GuairaMayorModel();
-    advance(first, R.intro + R.idle + R.warning + R.stamp);
+    advance(first, R.intro + R.idle + R.warning + R.leap + R.stamp + R.returning);
     advance(first, 140, opened);
     assert.equal(first.vulnerable, true); assert.equal(first.counterpressure, null); assert.equal(first.danger, null);
     const b = laterRecovery();
@@ -60,7 +62,7 @@ test('one immutable seam receives a full 60-tick warning and exactly 24 ticks of
     }
     assert.equal(b.counterpressure, null); assert.equal(b.danger, null);
     advance(b, 30, opened); assert.equal(b.counterpressure, null, 'fresh events cannot create a second pulse');
-    assert.equal(b.stateTick, 115, 'pressure never extends the 270-tick recovery');
+    assert.equal(b.stateTick, 115, 'pressure never extends the 210-tick recovery');
     assert.deepEqual(signal, { phase: 'warning', rect, ticksRemaining: 60, progress: 0 }, 'previous public snapshots remain unchanged');
 });
 
@@ -70,7 +72,7 @@ for (const age of [0, 30, 60, 70]) test(`manual reclosure at pressure tick ${age
     assert.equal(b.counterpressure, null); assert.equal(b.danger, null); assert.equal(b.vulnerable, false);
     b.update(R.tickMs, opened); advance(b, 90, ready);
     assert.equal(b.counterpressure, null); assert.equal(b.vulnerable, true, 'reopening retains the ordinary valid top hit');
-    advance(b, R.recover - b.stateTick + R.idle + R.warning + R.stamp, ready);
+    advance(b, R.recover - b.stateTick + R.idle + volley + R.warning + R.leap + R.stamp + R.returning, ready);
     assert.equal(b.state, 'recover'); assert.equal(b.registerOpenedThisCycle, false);
     b.update(R.tickMs, opened);
     assert.deepEqual(b.counterpressure, { phase: 'warning', rect: A.seam, ticksRemaining: 60, progress: 0 }, 'next stamped cycle gets one new pulse');
@@ -82,13 +84,17 @@ test('reclosing before lift arrival also consumes the pending pulse and remains 
     assert.equal(b.vulnerable, true); assert.equal(b.counterpressure, null); assert.equal(topHit(b), 'hit');
 });
 
-for (const remaining of [90, 65, 5]) test(`late opening with ${remaining} recovery ticks left expires safely and is replayable`, () => {
+for (const remaining of [90, 65, 5]) test(`late opening with ${remaining} original ticks left grants a complete crossing and still expires`, () => {
     const b = laterRecovery(); advance(b, R.recover - remaining);
     b.update(R.tickMs, opened); assert.equal(b.counterpressure!.phase, 'warning');
-    advance(b, remaining - 1, ready);
+    assert.equal(b.recoveryTicksRemaining,R.minimumOpening);
+    advance(b,R.counterpressureWarning+R.counterpressureActive,ready);
+    assert.equal(b.counterpressure,null);assert.equal(b.vulnerable,true);
+    assert.equal(b.recoveryTicksRemaining,60,'waiting for the full seam still leaves one second for the top hit');
+    advance(b,b.recoveryTicksRemaining,ready);
     assert.equal(b.state, 'idle'); assert.equal(b.counterpressure, null); assert.equal(b.danger, null);
     assert.equal(b.sealsRemaining, 2); assert.equal(b.vulnerable, false);
-    advance(b, R.idle + R.warning + R.stamp, ready);
+    advance(b, R.idle + volley + R.warning + R.leap + R.stamp + R.returning, ready);
     assert.equal(b.registerOpenedThisCycle, false); assert.equal(b.counterpressure, null);
     b.update(R.tickMs, opened); assert.equal(b.counterpressure!.ticksRemaining, 60);
 });
@@ -99,7 +105,7 @@ test('top contact wins over simultaneous water contact; successful hits and rele
     assert.equal(b.contact({ x: 274, y: 130, width: 14, height: 24 }, b, false), 'none', 'body side contact never hurts');
     assert.equal(topHit(b, 80), 'hit', 'falling top hit takes precedence even when the rectangle also intersects water');
     assert.equal(b.counterpressure, null); assert.equal(b.danger, null);
-    advance(b, R.hurt + R.idle + R.warning + R.stamp);
+    advance(b, R.hurt + R.idle + finalVolley + R.warning + R.leap + R.stamp + R.secondWarning + R.secondLeap + R.stamp + R.returning);
     b.update(R.tickMs, opened); advance(b, 60, ready);
     assert.equal(topHit(b), 'defeated'); assert.equal(b.publicWaterOpen, true);
     assert.equal(b.counterpressure, null); advance(b, 360, opened); assert.equal(b.counterpressure, null);

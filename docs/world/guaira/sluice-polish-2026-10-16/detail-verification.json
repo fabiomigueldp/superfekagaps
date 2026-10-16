@@ -1,0 +1,117 @@
+{
+  "hashes": {
+    "GuairaTraversalArt": "5d579af3fd91a742452603fe93364c1b99d9bd596afbe42f57be1f924a23dc13",
+    "GuairaWaterworksArt": "3858ce6c4fa644d6170d46ddf3d8b98cb984952f4387a86a390fa32ef2951fe6"
+  },
+  "snapshots": [
+    {
+      "key": "rua-fechada",
+      "final": false,
+      "active": false,
+      "y": 336,
+      "camera": {
+        "x": 368,
+        "y": 108
+      },
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedStable": true,
+      "authoredPose": true
+    },
+    {
+      "key": "rua-subindo",
+      "final": false,
+      "active": true,
+      "y": 280,
+      "camera": {
+        "x": 368,
+        "y": 108
+      },
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedStable": true,
+      "authoredPose": true
+    },
+    {
+      "key": "rua-pronta",
+      "final": false,
+      "active": true,
+      "y": 224,
+      "camera": {
+        "x": 368,
+        "y": 108
+      },
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedStable": true,
+      "authoredPose": true
+    },
+    {
+      "key": "arroz-fechada",
+      "final": true,
+      "active": false,
+      "y": 336,
+      "camera": {
+        "x": 1088,
+        "y": 96
+      },
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedStable": true,
+      "authoredPose": true
+    },
+    {
+      "key": "arroz-subindo",
+      "final": true,
+      "active": true,
+      "y": 280,
+      "camera": {
+        "x": 1088,
+        "y": 96
+      },
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedStable": true,
+      "authoredPose": true
+    },
+    {
+      "key": "arroz-pronta",
+      "final": true,
+      "active": true,
+      "y": 224,
+      "camera": {
+        "x": 1088,
+        "y": 96
+      },
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedStable": true,
+      "authoredPose": true
+    }
+  ],
+  "replays": [
+    {
+      "key": "taipas",
+      "updates": 1048,
+      "images": 262,
+      "fps": 15,
+      "finished": true,
+      "damage": false,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "key": "manutencao",
+      "updates": 1074,
+      "images": 269,
+      "fps": 15,
+      "finished": true,
+      "damage": false,
+      "manualPoseOrClockChanges": false
+    }
+  ],
+  "motion": {
+    "authored": true,
+    "fps": 30,
+    "frames": 120
+  }
+}

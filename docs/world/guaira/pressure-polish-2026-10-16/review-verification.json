@@ -1,0 +1,151 @@
+{
+  "images": [
+    {
+      "src": "alivio-retorno-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "alivio-retorno-after.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "alivio-rede-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "alivio-rede-after.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "alivio-camara-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "alivio-camara-after.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "patio-base-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "patio-base-after.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "patio-seletor-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "patio-seletor-after.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "patio-curvas-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "patio-curvas-after.png",
+      "w": 320,
+      "h": 180
+    }
+  ],
+  "media": [
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/pressure-polish-2026-10-16/alivio-motion.mp4",
+      "w": 1280,
+      "h": 384,
+      "seconds": 4.2
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/pressure-polish-2026-10-16/patio-motion.mp4",
+      "w": 1280,
+      "h": 384,
+      "seconds": 4.2
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/pressure-polish-2026-10-16/abertura-percurso.mp4",
+      "w": 960,
+      "h": 540,
+      "seconds": 10.8
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/pressure-polish-2026-10-16/intervalo-percurso.mp4",
+      "w": 960,
+      "h": 540,
+      "seconds": 6.066667
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/pressure-polish-2026-10-16/patio-percurso.mp4",
+      "w": 960,
+      "h": 540,
+      "seconds": 14.933333
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/pressure-polish-2026-10-16/patio-motion-mobile.mp4",
+      "w": 640,
+      "h": 768,
+      "seconds": 4.2
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/pressure-polish-2026-10-16/alivio-motion-mobile.mp4",
+      "w": 640,
+      "h": 768,
+      "seconds": 4.2
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/pressure-polish-2026-10-16/patio-motion-mobile.mp4",
+      "w": 640,
+      "h": 768,
+      "seconds": 4.2
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/pressure-polish-2026-10-16/alivio-motion-mobile.mp4",
+      "w": 640,
+      "h": 768,
+      "seconds": 4.2
+    }
+  ],
+  "viewports": [
+    {
+      "width": 1440,
+      "scrollWidth": 1440,
+      "flow": {
+        "src": "http://127.0.0.1:3000/docs/world/guaira/pressure-polish-2026-10-16/alivio-motion.mp4",
+        "width": 1280,
+        "height": 384
+      }
+    },
+    {
+      "width": 390,
+      "scrollWidth": 390,
+      "flow": {
+        "src": "http://127.0.0.1:3000/docs/world/guaira/pressure-polish-2026-10-16/alivio-motion-mobile.mp4",
+        "width": 640,
+        "height": 768
+      }
+    },
+    {
+      "width": 320,
+      "scrollWidth": 320,
+      "flow": {
+        "src": "http://127.0.0.1:3000/docs/world/guaira/pressure-polish-2026-10-16/alivio-motion-mobile.mp4",
+        "width": 640,
+        "height": 768
+      }
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

@@ -1,0 +1,32 @@
+{
+  "capturedSourcesMatch": true,
+  "preservedBaselinesMatch": true,
+  "sources": [
+    "GuairaJunctionArt",
+    "GuairaJunctionHardwareArt",
+    "GuairaPipeArt",
+    "GuairaRespirosArt",
+    "GuairaReliefArt",
+    "GuairaGalleryArt",
+    "GuairaAscentArt",
+    "GuairaMayorArenaArt",
+    "GuairaAscent",
+    "GuairaMayorLab"
+  ],
+  "localLinks": [
+    "../gate-finish-2026-10-16/index.html",
+    "../path-finish-2026-10-15/index.html",
+    "patio-apoios-after.png",
+    "patio-apoios-before.png",
+    "patio-motion.png",
+    "patio-motion-mobile.mp4",
+    "patio-motion.mp4",
+    "patio-start.png",
+    "patio-percurso.mp4",
+    "detail-verification.json",
+    "browser-verification.json",
+    "review-verification.json",
+    "README.md"
+  ],
+  "passed": true
+}

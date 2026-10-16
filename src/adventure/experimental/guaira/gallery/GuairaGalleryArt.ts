@@ -4,6 +4,7 @@ import { TileType } from '../../../../constants';
 import { supportsStanding, isOneWayTile } from '../../../../world/tileRules';
 import { pixelText } from '../../../../graphics/BitmapFont';
 import { blockFragmentPose } from '../../../../graphics/blockImpactArt';
+import { drawGuairaStoneFace, drawGuairaPlaster, drawGuairaTimber } from '../GuairaMaterials';
 
 /** Existing Guaíra clay, plaster, wood and iron hues; no texture payloads. */
 export const GALLERY_MATERIAL_COLORS = Object.freeze({
@@ -84,7 +85,7 @@ function returnBoard(c: CanvasRenderingContext2D, x: number, y: number, left: bo
     // route visibly open: only an eight-pixel board, never a supporting post.
     r(c, x, y, 16, 2, P.cap);
     r(c, x, y + 2, 16, 4, P.wood);
-    r(c, x + 2, y + 3, 11, 1, P.woodLight);
+    drawGuairaTimber(c, x, y + 2, 16, 4);
     r(c, x, y + 6, 16, 2, P.stoneShade);
     if (left || right) {
         const edge = left ? x + 1 : x + 12;
@@ -95,13 +96,7 @@ function returnBoard(c: CanvasRenderingContext2D, x: number, y: number, left: bo
 
 function masonry(c: CanvasRenderingContext2D, x: number, y: number, col: number, row: number,
     top: boolean, left: boolean, right: boolean, bottom: boolean) {
-    r(c, x, y, 16, 16, P.stone);
-    // Broad staggered courses are quieter than the brittle clay's diagonal marks.
-    r(c, x, y + 14, 16, 2, P.stoneShade);
-    const seam = row % 2 ? 3 : 11;
-    r(c, x + seam, y + (top ? 4 : 0), 1, top ? 10 : 14, P.stoneShade);
-    if ((col + row * 3) % 4 === 0) r(c, x + 2, y + 7, 5, 2, P.mortar);
-    if ((col + row) % 3 === 0) r(c, x + 9, y + 10, 4, 1, P.stoneLight);
+    drawGuairaStoneFace(c, x, y, col, row);
     if (left) { r(c, x, y, 2, 16, P.stoneShade); r(c, x + 2, y + 2, 1, 12, P.stoneLight); }
     if (right) r(c, x + 14, y, 2, 16, P.stoneShade);
     if (bottom) r(c, x, y + 14, 16, 2, P.ironShade);
@@ -185,6 +180,7 @@ export function drawWorkshopWallBay(c: CanvasRenderingContext2D, x: number, y: n
     // The broad inside reveal catches light from the workshop; it is not a sill.
     r(c, x + 7, y + 21, 2, h - 21, '#c39e7c');
     r(c, x + w - 5, y + 24, 1, h - 24, '#d8b58e');
+    drawGuairaPlaster(c, x + 10, y + 22, w - 20, h - 25, w + h);
     for (let yy = 27; yy < h - 6; yy += 21) {
         r(c, x + 1, y + yy, 2, 1, '#bc997a');
         r(c, x + w - 3, y + yy + 6, 2, 1, '#bc997a');
@@ -220,6 +216,7 @@ function workshop(c: CanvasRenderingContext2D, cx: number, cy: number) {
     const x = 13 - cx, y = 86 - cy;
     r(c, x + 4, y + 15, 129, 62, '#b6977c');
     r(c, x + 6, y + 16, 122, 58, P.plaster);
+    drawGuairaPlaster(c, x + 7, y + 20, 119, 54, 5);
     r(c, x + 7, y + 19, 118, 2, '#efd6ae');
     roof(c, x, y, 139, 17);
     r(c, x + 12, y + 44, 22, 30, '#9a765e');
@@ -261,6 +258,23 @@ export function drawGalleryBackground(c: CanvasRenderingContext2D, cx: number, c
                 [right - 15 - cameraX,183 - cameraY],[left - 15 - cameraX,183 - cameraY]], '#d9b68e');
         }
         drawWorkshopToolNiche(c, 273 - cameraX, 215 - cameraY);
+        // Optional storage recess continues below the real cracked floor. The
+        // terrain masks its entrance until the player actually breaks a tile.
+        r(c,256-cameraX,288-cameraY,96,64,'#8e755e');
+        r(c,259-cameraX,290-cameraY,90,60,'#b0906e');
+        for (const xx of [260,307,347]) {
+            r(c,xx-cameraX,305-cameraY,3,45,'#97795d');
+            r(c,xx+1-cameraX,306-cameraY,1,43,'#bea17c');
+        }
+        r(c,260-cameraX,345-cameraY,88,7,'#9c7c5e');
+        // The warm inset continues around the corner into the return well.
+        // A single directional carving stays behind the optional coin trail.
+        line(c,295-cameraX,340-cameraY,310-cameraX,340-cameraY,'#695449');
+        line(c,306-cameraX,336-cameraY,310-cameraX,340-cameraY,'#695449');
+        line(c,306-cameraX,344-cameraY,310-cameraX,340-cameraY,'#695449');
+        // Two wall bolts and a shallow label distinguish the service pocket.
+        r(c,260-cameraX,273-cameraY,39,9,'#ab8a67');
+        pixelText(c,'DESVIO',261-cameraX,275-cameraY,'#695449');
         // Hand-smoothed plaster seams are short and broken, never route arrows.
         for (const [wx, wy, w, h] of [[338,232,15,9],[247,250,13,6],[502,255,20,8],[479,306,10,7],[583,158,15,6],[663,143,16,12]] as const) {
             r(c, wx - cameraX, wy - cameraY, w, h, '#c3a280');
@@ -278,6 +292,25 @@ export function drawGalleryBackground(c: CanvasRenderingContext2D, cx: number, c
                 r(c, wx + 7 - cameraX, wy + dy - cameraY, 2, 5, '#a58a68');
                 r(c, wx + 56 - cameraX, wy + dy + 5 - cameraY, 2, 4, '#a58a68');
             }
+        }
+        // Number the two required covers, then show the direction of the
+        // receiving passage. These stencils are recessed wall ink, not ledges.
+        for (const [xx,yy,label] of [[178,158,'I'],[400,270,'II']] as const) {
+            r(c,xx-4-cameraX,yy-3-cameraY,21,13,'#aa896b');
+            pixelText(c,label,xx-cameraX,yy-cameraY,'#584e49');
+        }
+        for (const [xx,yy] of [[211,266],[435,361]]) {
+            line(c,xx-cameraX,yy-cameraY,xx+10-cameraX,yy-cameraY,'#79624f');
+            line(c,xx+6-cameraX,yy-4-cameraY,xx+10-cameraX,yy-cameraY,'#79624f');
+            line(c,xx+6-cameraX,yy+4-cameraY,xx+10-cameraX,yy-cameraY,'#79624f');
+        }
+        // An ascending conduit ties the three masonry landings to the same
+        // destination. It never uses their pale collision edge.
+        const riser = [[475,360],[483,360],[483,322],[516,322],[516,274],[548,274],[548,226],[593,226],[593,178],[615,178]];
+        for (let i=1;i<riser.length;i++) {
+            const [ax,ay]=riser[i-1], [bx,by]=riser[i];
+            line(c,ax-cameraX,ay-cameraY,bx-cameraX,by-cameraY,'#987e65',3);
+            line(c,ax-cameraX,ay-cameraY,bx-cameraX,by-cameraY,'#b99b76');
         }
         // A recessed daylight window marks the inspection landing. Its muted
         // frame never crosses the x608/y192 usable cap or imitates an exit door.

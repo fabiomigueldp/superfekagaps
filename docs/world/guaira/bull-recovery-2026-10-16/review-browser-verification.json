@@ -1,0 +1,63 @@
+{
+  "physicalDevice": false,
+  "routes": [],
+  "pauses": [],
+  "review": [
+    {
+      "width": 1440,
+      "media": {
+        "fits": true,
+        "videos": [
+          {
+            "duration": 6.5,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "duration": 21.116667,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "duration": 4.983333,
+            "width": 960,
+            "height": 540,
+            "error": null
+          }
+        ],
+        "decoded": 3
+      }
+    },
+    {
+      "width": 390,
+      "media": {
+        "fits": true,
+        "videos": [
+          {
+            "duration": 6.5,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "duration": 21.116667,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "duration": 4.983333,
+            "width": 960,
+            "height": 540,
+            "error": null
+          }
+        ],
+        "decoded": 3
+      }
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

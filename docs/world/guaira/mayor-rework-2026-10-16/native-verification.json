@@ -1,0 +1,1664 @@
+{
+  "nativeInputOnly": true,
+  "actorOrClockEdits": false,
+  "stepMs": 16.666666666666668,
+  "captureFps": 60,
+  "baseline": false,
+  "sourceHashes": {},
+  "routes": {
+    "upper": {
+      "frames": 1426,
+      "hits": [
+        407,
+        773,
+        1242
+      ],
+      "events": [
+        {
+          "frame": 1,
+          "state": "intro:1:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 47.7,
+            "y": 200
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 72,
+          "state": "idle:1:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 18.97465931112964,
+            "y": 200
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 102,
+          "state": "warning:1:",
+          "target": {
+            "x": 8,
+            "y": 152,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 18.97465931112964,
+            "y": 200
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 162,
+          "state": "leap:1:",
+          "target": {
+            "x": 8,
+            "y": 152,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 85.99999999999999,
+            "y": 200
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 194,
+          "state": "stamp:1:",
+          "target": {
+            "x": 8,
+            "y": 152,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 85.99999999999999,
+            "y": 200
+          },
+          "boss": {
+            "x": 26,
+            "y": 136
+          }
+        },
+        {
+          "frame": 218,
+          "state": "returning:1:",
+          "target": {
+            "x": 8,
+            "y": 152,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 85.99999999999999,
+            "y": 200
+          },
+          "boss": {
+            "x": 26,
+            "y": 136
+          }
+        },
+        {
+          "frame": 260,
+          "state": "recover:1:",
+          "target": {
+            "x": 8,
+            "y": 152,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 148.29999999999998,
+            "y": 133.60000000000002
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 407,
+          "state": "hurt:1:",
+          "target": {
+            "x": 8,
+            "y": 152,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 277.0760220666111,
+            "y": 96
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 466,
+          "state": "idle:1:",
+          "target": {
+            "x": 8,
+            "y": 152,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 277.0760220666111,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 496,
+          "state": "warning:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 277.0760220666111,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 556,
+          "state": "leap:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 230.05068137774072,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 588,
+          "state": "stamp:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 230.05068137774072,
+            "y": 136
+          },
+          "boss": {
+            "x": 266,
+            "y": 120
+          }
+        },
+        {
+          "frame": 612,
+          "state": "returning:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 230.05068137774072,
+            "y": 136
+          },
+          "boss": {
+            "x": 266,
+            "y": 120
+          }
+        },
+        {
+          "frame": 654,
+          "state": "recover:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 230.05068137774072,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 707,
+          "state": "recover:1:warning",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 230.05068137774072,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 767,
+          "state": "recover:1:active",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 277.4527714618792,
+            "y": 58.499999999999915
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 773,
+          "state": "hurt:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 278.84250240039864,
+            "y": 96
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 832,
+          "state": "idle:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 279.0760220666111,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 862,
+          "state": "warning:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 279.0760220666111,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 922,
+          "state": "leap:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 230.05068137774072,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 954,
+          "state": "stamp:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 230.05068137774072,
+            "y": 136
+          },
+          "boss": {
+            "x": 266,
+            "y": 120
+          }
+        },
+        {
+          "frame": 978,
+          "state": "warning:2:",
+          "target": {
+            "x": 205,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 230.05068137774072,
+            "y": 136
+          },
+          "boss": {
+            "x": 266,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1020,
+          "state": "leap:2:",
+          "target": {
+            "x": 205,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 282.96872924699994,
+            "y": 136
+          },
+          "boss": {
+            "x": 266,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1048,
+          "state": "stamp:2:",
+          "target": {
+            "x": 205,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 283.0760220666111,
+            "y": 136
+          },
+          "boss": {
+            "x": 223,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1072,
+          "state": "returning:2:",
+          "target": {
+            "x": 205,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 283.0760220666111,
+            "y": 136
+          },
+          "boss": {
+            "x": 223,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1114,
+          "state": "recover:2:",
+          "target": {
+            "x": 205,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 230.15797419735182,
+            "y": 87.99999999999999
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1197,
+          "state": "recover:2:warning",
+          "target": {
+            "x": 205,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 229.7115138397895,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1242,
+          "state": "released:2:",
+          "target": {
+            "x": 205,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 278.5033348624474,
+            "y": 96
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        }
+      ],
+      "minHead": 27,
+      "damage": [],
+      "screens": [],
+      "videoFrames": 1426,
+      "finished": true
+    },
+    "wait": {
+      "frames": 1486,
+      "hits": [
+        407,
+        833,
+        1302
+      ],
+      "events": [
+        {
+          "frame": 1,
+          "state": "intro:1:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 47.7,
+            "y": 200
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 72,
+          "state": "idle:1:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 18.97465931112964,
+            "y": 200
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 102,
+          "state": "warning:1:",
+          "target": {
+            "x": 8,
+            "y": 152,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 18.97465931112964,
+            "y": 200
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 162,
+          "state": "leap:1:",
+          "target": {
+            "x": 8,
+            "y": 152,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 85.99999999999999,
+            "y": 200
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 194,
+          "state": "stamp:1:",
+          "target": {
+            "x": 8,
+            "y": 152,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 85.99999999999999,
+            "y": 200
+          },
+          "boss": {
+            "x": 26,
+            "y": 136
+          }
+        },
+        {
+          "frame": 218,
+          "state": "returning:1:",
+          "target": {
+            "x": 8,
+            "y": 152,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 85.99999999999999,
+            "y": 200
+          },
+          "boss": {
+            "x": 26,
+            "y": 136
+          }
+        },
+        {
+          "frame": 260,
+          "state": "recover:1:",
+          "target": {
+            "x": 8,
+            "y": 152,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 148.29999999999998,
+            "y": 133.60000000000002
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 407,
+          "state": "hurt:1:",
+          "target": {
+            "x": 8,
+            "y": 152,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 277.0760220666111,
+            "y": 96
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 466,
+          "state": "idle:1:",
+          "target": {
+            "x": 8,
+            "y": 152,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 277.0760220666111,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 496,
+          "state": "warning:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 277.0760220666111,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 556,
+          "state": "leap:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 230.05068137774072,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 588,
+          "state": "stamp:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 230.05068137774072,
+            "y": 136
+          },
+          "boss": {
+            "x": 266,
+            "y": 120
+          }
+        },
+        {
+          "frame": 612,
+          "state": "returning:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 230.05068137774072,
+            "y": 136
+          },
+          "boss": {
+            "x": 266,
+            "y": 120
+          }
+        },
+        {
+          "frame": 654,
+          "state": "recover:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 234.55068137774072,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 707,
+          "state": "recover:1:warning",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 245.90692446007404,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 767,
+          "state": "recover:1:active",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 245.90692446007404,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 791,
+          "state": "recover:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 245.90692446007404,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 833,
+          "state": "hurt:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 278.9322651489444,
+            "y": 96
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 892,
+          "state": "idle:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 278.9322651489444,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 922,
+          "state": "warning:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 278.9322651489444,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 982,
+          "state": "leap:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 229.90692446007404,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1014,
+          "state": "stamp:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 229.90692446007404,
+            "y": 136
+          },
+          "boss": {
+            "x": 266,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1038,
+          "state": "warning:2:",
+          "target": {
+            "x": 205,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 229.90692446007404,
+            "y": 136
+          },
+          "boss": {
+            "x": 266,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1080,
+          "state": "leap:2:",
+          "target": {
+            "x": 205,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 282.82497232933326,
+            "y": 136
+          },
+          "boss": {
+            "x": 266,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1108,
+          "state": "stamp:2:",
+          "target": {
+            "x": 205,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 282.9322651489444,
+            "y": 136
+          },
+          "boss": {
+            "x": 223,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1132,
+          "state": "returning:2:",
+          "target": {
+            "x": 205,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 282.9322651489444,
+            "y": 136
+          },
+          "boss": {
+            "x": 223,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1174,
+          "state": "recover:2:",
+          "target": {
+            "x": 205,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 230.01421727968514,
+            "y": 87.99999999999999
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1257,
+          "state": "recover:2:warning",
+          "target": {
+            "x": 205,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 229.5677569221228,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1302,
+          "state": "released:2:",
+          "target": {
+            "x": 205,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 278.3595779447807,
+            "y": 96
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        }
+      ],
+      "minHead": 27,
+      "damage": [],
+      "screens": [],
+      "videoFrames": 1486,
+      "finished": true
+    },
+    "ground": {
+      "frames": 1489,
+      "hits": [
+        407,
+        836,
+        1305
+      ],
+      "events": [
+        {
+          "frame": 1,
+          "state": "intro:1:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 47.7,
+            "y": 200
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 72,
+          "state": "idle:1:",
+          "target": {
+            "x": 112,
+            "y": 204,
+            "width": 112,
+            "height": 20
+          },
+          "player": {
+            "x": 18.97465931112964,
+            "y": 200
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 102,
+          "state": "warning:1:",
+          "target": {
+            "x": 8,
+            "y": 152,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 18.97465931112964,
+            "y": 200
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 162,
+          "state": "leap:1:",
+          "target": {
+            "x": 8,
+            "y": 152,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 85.99999999999999,
+            "y": 200
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 194,
+          "state": "stamp:1:",
+          "target": {
+            "x": 8,
+            "y": 152,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 85.99999999999999,
+            "y": 200
+          },
+          "boss": {
+            "x": 26,
+            "y": 136
+          }
+        },
+        {
+          "frame": 218,
+          "state": "returning:1:",
+          "target": {
+            "x": 8,
+            "y": 152,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 85.99999999999999,
+            "y": 200
+          },
+          "boss": {
+            "x": 26,
+            "y": 136
+          }
+        },
+        {
+          "frame": 260,
+          "state": "recover:1:",
+          "target": {
+            "x": 8,
+            "y": 152,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 148.29999999999998,
+            "y": 133.60000000000002
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 407,
+          "state": "hurt:1:",
+          "target": {
+            "x": 8,
+            "y": 152,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 277.0760220666111,
+            "y": 96
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 466,
+          "state": "idle:1:",
+          "target": {
+            "x": 8,
+            "y": 152,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 228.77602206661106,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 496,
+          "state": "warning:1:",
+          "target": {
+            "x": 150,
+            "y": 200,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 175.07589573379855,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 556,
+          "state": "leap:1:",
+          "target": {
+            "x": 150,
+            "y": 200,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 86.58714006980615,
+            "y": 200
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 588,
+          "state": "stamp:1:",
+          "target": {
+            "x": 150,
+            "y": 200,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 86.47984725019504,
+            "y": 200
+          },
+          "boss": {
+            "x": 168,
+            "y": 184
+          }
+        },
+        {
+          "frame": 612,
+          "state": "returning:1:",
+          "target": {
+            "x": 150,
+            "y": 200,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 86.47984725019504,
+            "y": 200
+          },
+          "boss": {
+            "x": 168,
+            "y": 184
+          }
+        },
+        {
+          "frame": 654,
+          "state": "recover:1:",
+          "target": {
+            "x": 150,
+            "y": 200,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 86.47984725019504,
+            "y": 200
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 716,
+          "state": "recover:1:warning",
+          "target": {
+            "x": 150,
+            "y": 200,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 171.50518793906537,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 776,
+          "state": "recover:1:active",
+          "target": {
+            "x": 150,
+            "y": 200,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 250.050295321956,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 800,
+          "state": "recover:1:",
+          "target": {
+            "x": 150,
+            "y": 200,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 253.43052862793573,
+            "y": 121.5
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 836,
+          "state": "hurt:1:",
+          "target": {
+            "x": 150,
+            "y": 200,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 277.5558693168061,
+            "y": 96
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 895,
+          "state": "idle:1:",
+          "target": {
+            "x": 150,
+            "y": 200,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 277.5558693168061,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 925,
+          "state": "warning:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 277.5558693168061,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 985,
+          "state": "leap:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 228.53052862793572,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1017,
+          "state": "stamp:1:",
+          "target": {
+            "x": 248,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 228.53052862793572,
+            "y": 136
+          },
+          "boss": {
+            "x": 266,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1041,
+          "state": "warning:2:",
+          "target": {
+            "x": 204,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 228.53052862793572,
+            "y": 136
+          },
+          "boss": {
+            "x": 266,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1083,
+          "state": "leap:2:",
+          "target": {
+            "x": 204,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 281.44857649719495,
+            "y": 136
+          },
+          "boss": {
+            "x": 266,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1111,
+          "state": "stamp:2:",
+          "target": {
+            "x": 204,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 281.5558693168061,
+            "y": 136
+          },
+          "boss": {
+            "x": 222,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1135,
+          "state": "returning:2:",
+          "target": {
+            "x": 204,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 281.5558693168061,
+            "y": 136
+          },
+          "boss": {
+            "x": 222,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1177,
+          "state": "recover:2:",
+          "target": {
+            "x": 204,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 228.63782144754683,
+            "y": 87.99999999999999
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1260,
+          "state": "recover:2:warning",
+          "target": {
+            "x": 204,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 228.1913610899845,
+            "y": 136
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1305,
+          "state": "released:2:",
+          "target": {
+            "x": 204,
+            "y": 136,
+            "width": 64,
+            "height": 24
+          },
+          "player": {
+            "x": 276.9831821126424,
+            "y": 96
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        }
+      ],
+      "minHead": 27,
+      "damage": [],
+      "screens": [
+        {
+          "frame": 102,
+          "file": "ground-102.png",
+          "caption": "ALVO FIXO"
+        },
+        {
+          "frame": 178,
+          "file": "ground-178.png",
+          "caption": "SALTO"
+        },
+        {
+          "frame": 200,
+          "file": "ground-200.png",
+          "caption": "IMPACTO"
+        },
+        {
+          "frame": 236,
+          "file": "ground-236.png",
+          "caption": "RETORNO"
+        },
+        {
+          "frame": 588,
+          "file": "ground-588.png",
+          "caption": "CARIMBADA NO CHAO"
+        },
+        {
+          "frame": 632,
+          "file": "ground-632.png",
+          "caption": "SALTO SOBRE A ONDA"
+        },
+        {
+          "frame": 646,
+          "file": "ground-646.png",
+          "caption": "PRESSAO DESVIADA"
+        },
+        {
+          "frame": 716,
+          "file": "ground-716.png",
+          "caption": "CONTRA-ATAQUE"
+        },
+        {
+          "frame": 776,
+          "file": "ground-776.png",
+          "caption": "DESCARGA NA EMENDA"
+        },
+        {
+          "frame": 1041,
+          "file": "ground-1041.png",
+          "caption": "SEGUNDO ALVO"
+        },
+        {
+          "frame": 1111,
+          "file": "ground-1111.png",
+          "caption": "SEGUNDA CARIMBADA"
+        },
+        {
+          "frame": 1329,
+          "file": "ground-1329.png",
+          "caption": "AGUA LIBERADA"
+        }
+      ],
+      "videoFrames": 1489,
+      "finished": true
+    }
+  }
+}

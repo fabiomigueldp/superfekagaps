@@ -1,0 +1,145 @@
+{
+  "images": [
+    {
+      "src": "arroz-pronta-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "arroz-pronta-after.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "arroz-subindo-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "arroz-subindo-after.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "arroz-fechada-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "arroz-fechada-after.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "rua-pronta-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "rua-pronta-after.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "rua-subindo-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "rua-subindo-after.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "rua-fechada-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "rua-fechada-after.png",
+      "w": 320,
+      "h": 180
+    }
+  ],
+  "media": [
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/gate-finish-2026-10-16/arroz-motion.mp4",
+      "w": 1280,
+      "h": 384,
+      "seconds": 5
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/gate-finish-2026-10-16/rua-motion.mp4",
+      "w": 1280,
+      "h": 384,
+      "seconds": 5
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/gate-finish-2026-10-16/taipas-percurso.mp4",
+      "w": 960,
+      "h": 540,
+      "seconds": 17.466667
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/gate-finish-2026-10-16/manutencao-percurso.mp4",
+      "w": 960,
+      "h": 540,
+      "seconds": 17.933333
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/gate-finish-2026-10-16/rua-motion-mobile.mp4",
+      "w": 640,
+      "h": 768,
+      "seconds": 5
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/gate-finish-2026-10-16/arroz-motion-mobile.mp4",
+      "w": 640,
+      "h": 768,
+      "seconds": 5
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/gate-finish-2026-10-16/rua-motion-mobile.mp4",
+      "w": 640,
+      "h": 768,
+      "seconds": 5
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/gate-finish-2026-10-16/arroz-motion-mobile.mp4",
+      "w": 640,
+      "h": 768,
+      "seconds": 5
+    }
+  ],
+  "viewports": [
+    {
+      "width": 1440,
+      "scrollWidth": 1440,
+      "flow": {
+        "src": "http://127.0.0.1:3000/docs/world/guaira/gate-finish-2026-10-16/rua-motion.mp4",
+        "width": 1280,
+        "height": 384
+      }
+    },
+    {
+      "width": 390,
+      "scrollWidth": 390,
+      "flow": {
+        "src": "http://127.0.0.1:3000/docs/world/guaira/gate-finish-2026-10-16/rua-motion-mobile.mp4",
+        "width": 640,
+        "height": 768
+      }
+    },
+    {
+      "width": 320,
+      "scrollWidth": 320,
+      "flow": {
+        "src": "http://127.0.0.1:3000/docs/world/guaira/gate-finish-2026-10-16/rua-motion-mobile.mp4",
+        "width": 640,
+        "height": 768
+      }
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

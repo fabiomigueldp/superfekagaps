@@ -1,0 +1,235 @@
+{
+  "date": "2026-10-16",
+  "scope": "Ossabravo: fair recovery after missed openings, continuous rib closure, native walk-out, rib release, cut-out bone silhouettes, four tumble poses and physical hop feedback",
+  "tests": {
+    "passed": 1191,
+    "failed": 0,
+    "newCases": 28,
+    "logHash": "736e0d746160b1e41d246bef9ed5e523f7e5c5089ae36236d129f7d6003bd978",
+    "finalFocusedCases": 28,
+    "finalFocusedLogHash": "3e8dbff6f1a150f7fbffcb240b906fcd1d37da7b84837a8bab91f08f183571ba",
+    "note": "Full suite passed; final focused cases and build also passed after replacing two equivalent assertion expressions to satisfy TypeScript narrowing."
+  },
+  "build": {
+    "passed": true,
+    "command": "npm run build",
+    "logHash": "866c4d3f8bb92e42b2d62696c24572546b9c0cda774c856fe28491ee49a72bab"
+  },
+  "baseline": {
+    "frames": 299,
+    "hitsOneBased": [],
+    "damageFrames": [
+      245
+    ],
+    "minHead": 61,
+    "finished": false,
+    "sameInputsThroughFrame": 299,
+    "sameActorPositionsAndAttackTiming": true,
+    "comparisonFrame": 245,
+    "sourceHashes": {
+      "GuairaBullLab.ts": "489b0c104cd765f2b063696701d5a021bd05eb6ab381befa64b44b037d5f402e",
+      "GuairaLabArt.ts": "e7c4dc7b300c87675e887e5a2e0c1656843399ce682a037d5949e524e6dcc941",
+      "SkeletonBullArt.ts": "57ccb1eade97ee48f2b7edb9666d81736cbf8211bf782b4eb6628efd1ee83fd0",
+      "SkeletonBullModel.ts": "069096bfd6fecdb56b4869efc8d2ef72a8212846c8004651d35bd3e047237a5d"
+    }
+  },
+  "native": {
+    "recovery": {
+      "frames": 390,
+      "hitsOneBased": [
+        385
+      ],
+      "damageFrames": [],
+      "minHead": 53,
+      "finished": false
+    },
+    "completeJump": {
+      "frames": 1267,
+      "hitsOneBased": [
+        180,
+        338,
+        548,
+        697,
+        961,
+        1177
+      ],
+      "damageFrames": [],
+      "minHead": 38,
+      "finished": true
+    }
+  },
+  "mechanics": {
+    "rearmingTicks": 24,
+    "extraCycleTicks": 0,
+    "successfulLateHitPreserved": true,
+    "lateRearmStomp": "bounce",
+    "walkingEscapeBothDirections": true,
+    "healthPhasesTested": [
+      6,
+      4,
+      2
+    ],
+    "closingPoses": 4,
+    "tumblePoses": 4
+  },
+  "browser": {
+    "routes": [
+      {
+        "route": "guairaLabReplay",
+        "touch": false,
+        "frames": 1267,
+        "health": 0,
+        "finished": true,
+        "hits": [
+          180,
+          338,
+          548,
+          697,
+          961,
+          1177
+        ]
+      },
+      {
+        "route": "guairaLabReplay",
+        "touch": true,
+        "frames": 1267,
+        "health": 0,
+        "finished": true,
+        "hits": [
+          180,
+          338,
+          548,
+          697,
+          961,
+          1177
+        ]
+      },
+      {
+        "route": "guairaBullPoundReplay",
+        "touch": false,
+        "frames": 1251,
+        "health": 0,
+        "finished": true,
+        "hits": [
+          180,
+          338,
+          548,
+          697,
+          945,
+          1161
+        ]
+      },
+      {
+        "route": "guairaBullPoundReplay",
+        "touch": true,
+        "frames": 1251,
+        "health": 0,
+        "finished": true,
+        "hits": [
+          180,
+          338,
+          548,
+          697,
+          945,
+          1161
+        ]
+      },
+      {
+        "route": "guairaBullMissReplay",
+        "touch": false,
+        "frames": 390,
+        "health": 5,
+        "finished": false,
+        "hits": [
+          385
+        ]
+      },
+      {
+        "route": "guairaBullMissReplay",
+        "touch": true,
+        "frames": 390,
+        "health": 5,
+        "finished": false,
+        "hits": [
+          385
+        ]
+      }
+    ],
+    "pauseChecks": 8,
+    "allPausePixelsFrozen": true,
+    "chapterScenes": 8,
+    "pageErrors": 0,
+    "reviewViewports": [
+      1440,
+      390
+    ],
+    "videosDecodedPerViewport": 3,
+    "simulatedTouch": true,
+    "physicalDevice": false
+  },
+  "atlas": {
+    "cells": 12,
+    "exactPixelCopies": true
+  },
+  "limits": [
+    "Rehearsed routes validate feasibility; discovery and perceived difficulty still need new-player observation",
+    "Touch simulated in headless Edge; no physical-device or GPU presentation-rate claim",
+    "Capture is 60 Hz, nearest-neighbour scaled, no audio, camera shake disabled for stable comparison"
+  ],
+  "sourceHashes": {
+    "src/adventure/experimental/guaira/SkeletonBullModel.ts": "cbaf7421bf7aeba1344b87d0b2832c607808ccb8a7c495292976da68056261fc",
+    "src/adventure/experimental/guaira/SkeletonBullArt.ts": "2de932c8627f435db71daaac7ecf0d96362427e439a7eee4dc8baaeef9fd070b",
+    "src/adventure/experimental/guaira/SkeletonBullBoneArt.ts": "b3697960dd559894f566bc3dacdf124f42a64c181c1f1805e0880cbee72ec1b5",
+    "src/adventure/experimental/guaira/GuairaLabArt.ts": "f1965a6f548a3e67fa7dff33616b18398c7443afa92f7600f4675b06c6cd13b4",
+    "src/adventure/experimental/guaira/GuairaBullLab.ts": "4c6cc07e1b8ec802d87ef8a5ece926f60c8ddc3cb7a364cd1ebad052ded4e12c",
+    "tests/guaira-bull-recovery.test.ts": "8a56e0e0fb16fb681ca78ea37f8ad4e723257c8dd46fc25ba1f1bfc200b22736",
+    "tests/guaira-bull-projectile-visibility.test.ts": "981f56c566c7a81359eb9501e9de3c189ac6875d0ab96066176d00a35111b1b3",
+    "tests/helpers/guairaBullMissReplay.json": "1130cdedf31d13ed782798ca9f63878ea22b0869a509af2e72052872d437b342",
+    "tests/helpers/guairaLabReplay.json": "1fbc28e1bc903066188c945e8cbbb54e7abc02f02e0b1d592b86deba5c39d728",
+    "tests/helpers/guairaBullPoundReplay.json": "25adc674eed309d158f5403e94d941d401113095756e1f999c903ec512db01f9",
+    "scripts/prove_guaira_bull_recovery.ts": "6a49c8d344c93164aa8081d5d7a0f7f6278bad6b846671b1cc2c1bd75073035b",
+    "scripts/verify_guaira_bull_rhythm.cjs": "46fcb92c734785bdee5bcc8e432f926880c44447b42cb9734926c217a69f5714"
+  },
+  "artifacts": {
+    "index.html": {
+      "sha256": "bbf38ec08f819e95648c7f8997b9bbba7dfb2a65989d80628309e0c2c6d12fd2",
+      "bytes": 7853
+    },
+    "README.md": {
+      "sha256": "8290a0ba39a5abc3799b7fb1c773c3bf096ce623110f0264d7649ecb2bbb3323",
+      "bytes": 4441
+    },
+    "before.png": {
+      "sha256": "3a8fe94668a9100ad1bdfae776cf64832c452132c3bd83ed66c3586fc67ab65b",
+      "bytes": 7719
+    },
+    "after.png": {
+      "sha256": "eb54686e6917b8eee1a4182ab6740c0361230030d915342f3408b6c9b0c499df",
+      "bytes": 8087
+    },
+    "flight.png": {
+      "sha256": "c839148255d9995b1ce754bc161809602fb5602c953e200316e8a2ca8ecc180c",
+      "bytes": 8468
+    },
+    "recovery-atlas.png": {
+      "sha256": "dd16d668bdd4df50db3aa5877f37ac6d6edbd025c2572e71732906db756844ad",
+      "bytes": 27651
+    },
+    "bones-atlas.png": {
+      "sha256": "7e0f468c49627797f4992e99079458334708f06fc25d42713bb19ac4feaa4254",
+      "bytes": 29559
+    },
+    "before.mp4": {
+      "sha256": "1230f471e7db61740c79e6fd0b11fd9a8147eb18881e449028a3264a5af50713",
+      "bytes": 220092
+    },
+    "recovery.mp4": {
+      "sha256": "040d08317491fa0fc606ae2ef7fc884b9ea378cf3e9351a9a16ec6de93be4458",
+      "bytes": 290474
+    },
+    "fight.mp4": {
+      "sha256": "79e0b2378ab31b47e1c04a9173c4505e39792445dc2553e2906e209a18843980",
+      "bytes": 1148723
+    }
+  }
+}

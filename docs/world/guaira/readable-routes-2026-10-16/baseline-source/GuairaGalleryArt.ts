@@ -1,0 +1,311 @@
+import { box as r, pixelLine as line, polygon, roof } from '../../../WorldPainting';
+import type { WorldLevel, WorldObjects } from '../../../WorldPhysics';
+import { TileType } from '../../../../constants';
+import { supportsStanding, isOneWayTile } from '../../../../world/tileRules';
+import { pixelText } from '../../../../graphics/BitmapFont';
+import { blockFragmentPose } from '../../../../graphics/blockImpactArt';
+import { drawGuairaStoneFace, drawGuairaPlaster, drawGuairaTimber } from '../GuairaMaterials';
+
+/** Existing Guaíra clay, plaster, wood and iron hues; no texture payloads. */
+export const GALLERY_MATERIAL_COLORS = Object.freeze({
+    ink: '#493c43', clay: '#b86b4c', clayLight: '#d68b5b', clayShade: '#874a3e',
+    fracture: '#493c43', fractureLight: '#e8b17c',
+    stone: '#8d7968', stoneShade: '#695449', stoneLight: '#bda080',
+    cap: '#f2d69b', mortar: '#a58a68', wood: '#997454', woodLight: '#d1ac77',
+    iron: '#687776', ironShade: '#4e5c5c', plaster: '#e3c49a', plasterShade: '#bf967d',
+});
+const P = GALLERY_MATERIAL_COLORS;
+
+function layer(c: CanvasRenderingContext2D, cx: number, cy: number, draw: (x: number, y: number) => void) {
+    c.save(); c.beginPath(); c.rect(0, 23, 320, 157); c.clip();
+    c.globalAlpha = 1; c.globalCompositeOperation = 'source-over';
+    draw(Number.isFinite(cx) ? Math.round(cx) : 0, Number.isFinite(cy) ? Math.round(cy) : 0);
+    c.restore();
+}
+
+/** An intact tile still fills its collider. The dark fissure is a material mark,
+ * not a painted hole: native destruction alone removes the whole tile. */
+function clayCover(c: CanvasRenderingContext2D, x: number, y: number, alternate: boolean) {
+    r(c, x, y, 16, 16, P.clayShade);
+    r(c, x + 1, y + 1, 14, 13, P.clay);
+    r(c, x + 1, y + 1, 14, 3, P.clayLight);
+    r(c, x + 2, y + 5, 3, 7, P.clayLight);
+    r(c, x + 11, y + 8, 3, 5, P.clayShade);
+    // Branching silhouette reads even without colour; safe masonry never has it.
+    const crack = alternate ? [[9,0],[7,4],[9,7],[6,10],[8,15]] : [[6,0],[8,4],[5,7],[8,11],[6,15]];
+    for (let i = 1; i < crack.length; i++) {
+        const a = crack[i - 1], b = crack[i];
+        line(c, x + a[0] + 1, y + a[1], x + b[0] + 1, y + b[1], P.fractureLight);
+        line(c, x + a[0], y + a[1], x + b[0], y + b[1], P.fracture);
+    }
+    line(c, x + (alternate ? 9 : 5), y + 7, x + (alternate ? 14 : 1), y + 9, P.fracture);
+    r(c, x + 2, y + 14, 3, 1, P.clayLight);
+    r(c, x + 10, y + 14, 3, 1, P.clayLight);
+}
+
+// Thin, irregular flakes with a pale exposed edge, never miniature brick tiles.
+// Pixel rotations are prepared once, without canvas/DOM assets or per-hit state.
+const clayShardTurns = [['__ll__', '_lccs_', 'lccss_', '_css__', '__s___', '______']];
+for (let turn = 1; turn < 4; turn++) {
+    const previous = clayShardTurns[turn - 1];
+    clayShardTurns.push(previous[0].split('').map((_, x) => previous.map(row => row[x]).reverse().join('')));
+}
+const clayShardColors: Record<string, string> = { l: P.fractureLight, c: P.clay, s: P.clayShade };
+
+/** Native collision already erased the cover. Reuse its bounded, simulation-aged
+ * event only for loose clay, so paint cannot restore support or delay the hole. */
+function drawClayImpacts(c: CanvasRenderingContext2D, level: WorldLevel, cx: number, cy: number, reducedMotion: boolean) {
+    for (const impact of level.blockImpacts.active) {
+        if (impact.kind !== 'break' || reducedMotion && impact.age >= 120) continue;
+        const x = level.colToWorldX(impact.col) - cx, y = level.rowToWorldY(impact.row) - cy;
+        // Include downward pieces entering from a cover above the viewport.
+        if (x < -64 || x > 368 || y < -128 || y > 212) continue;
+        c.save();
+        for (let i = 0; i < 4; i++) {
+            const pose = blockFragmentPose(impact, i, reducedMotion);
+            c.globalAlpha = pose.alpha;
+            const frame = clayShardTurns[pose.turn];
+            for (let yy = 0; yy < frame.length; yy++) for (let xx = 0; xx < frame[yy].length; xx++) {
+                const color = clayShardColors[frame[yy][xx]];
+                if (color) r(c, x + pose.x + xx, y + pose.y + yy, 1, 1, color);
+            }
+        }
+        if (!reducedMotion && impact.age < 90) {
+            c.globalAlpha = 1 - impact.age / 90;
+            const edge = y + (impact.direction === 'down' ? 0 : 16);
+            r(c, x + 5, edge, 2, 1, P.fractureLight);
+            r(c, x + 10, edge, 1, 1, P.clayLight);
+        }
+        c.restore();
+    }
+}
+
+function returnBoard(c: CanvasRenderingContext2D, x: number, y: number, left: boolean, right: boolean) {
+    // The native one-way surface has no solid volume below it. Keep the return
+    // route visibly open: only an eight-pixel board, never a supporting post.
+    r(c, x, y, 16, 2, P.cap);
+    r(c, x, y + 2, 16, 4, P.wood);
+    drawGuairaTimber(c, x, y + 2, 16, 4);
+    r(c, x, y + 6, 16, 2, P.stoneShade);
+    if (left || right) {
+        const edge = left ? x + 1 : x + 12;
+        r(c, edge, y + 2, 3, 5, P.ironShade);
+        r(c, edge + 1, y + 3, 1, 1, P.stoneLight);
+    }
+}
+
+function masonry(c: CanvasRenderingContext2D, x: number, y: number, col: number, row: number,
+    top: boolean, left: boolean, right: boolean, bottom: boolean) {
+    drawGuairaStoneFace(c, x, y, col, row);
+    if (left) { r(c, x, y, 2, 16, P.stoneShade); r(c, x + 2, y + 2, 1, 12, P.stoneLight); }
+    if (right) r(c, x + 14, y, 2, 16, P.stoneShade);
+    if (bottom) r(c, x, y + 14, 16, 2, P.ironShade);
+    if (top) {
+        // A continuous two-pixel pale edge is reserved for true safe landings.
+        r(c, x, y, 16, 2, P.cap);
+        r(c, x, y + 2, 16, 2, P.stoneLight);
+    }
+}
+
+/** The narrow barriers are service partitions suspended from the workshop
+ * above, not hanging blocks of masonry. Continuous iron straps lead upward
+ * beyond the view; the closed timber panel has no pale shelf-like lower edge. */
+function servicePartition(c: CanvasRenderingContext2D, x: number, y: number, row: number, bottom: boolean) {
+    r(c, x, y, 16, 16, P.ironShade);
+    r(c, x + 3, y, 10, 16, '#a58a68');
+    r(c, x + 4, y, 3, 16, '#c0a17a');
+    r(c, x + 8, y, 1, 16, '#92745b');
+    r(c, x + 1, y, 2, 16, P.iron);
+    r(c, x + 13, y, 2, 16, P.iron);
+    // Diagonal braces stay inside the real barrier and differ from branching cracks.
+    if (row % 2 === 0) {
+        line(c, x + 4, y + 2, x + 11, y + 13, '#92745b', 2);
+        r(c, x + 3, y + 1, 10, 2, P.ironShade);
+        r(c, x + 2, y + 1, 1, 1, '#b1a18a');
+        r(c, x + 13, y + 1, 1, 1, '#b1a18a');
+    }
+    if (bottom) {
+        r(c, x, y + 12, 16, 4, P.ironShade);
+        r(c, x + 2, y + 13, 12, 1, P.iron);
+        r(c, x + 3, y + 14, 1, 1, '#b1a18a');
+        r(c, x + 12, y + 14, 1, 1, '#b1a18a');
+    }
+}
+
+/** Presentation reads native tiles on every render, so partial holes and head
+ * bumps cannot leave an obsolete cover or an invented support on screen. */
+export function drawGalleryTerrain(c: CanvasRenderingContext2D, level: WorldLevel, cx: number, cy: number, reducedMotion = false) {
+    layer(c, cx, cy, (cameraX, cameraY) => {
+        const firstCol = Math.max(0, level.worldToCol(cameraX)), lastCol = Math.min(level.data.width - 1, level.worldToCol(cameraX + 319));
+        const firstRow = Math.max(0, level.worldToRow(cameraY + 23)), lastRow = Math.min(level.data.height - 1, level.worldToRow(cameraY + 179));
+        const solid = (col: number, row: number) => {
+            const tile = level.data.tiles[row]?.[col] ?? 0;
+            return supportsStanding(tile) && !isOneWayTile(tile);
+        };
+        const partitionEnds = new Map<number, number>();
+        for (let col = firstCol; col <= lastCol; col++) {
+            if (!solid(col,0) || solid(col - 1,0) || solid(col + 1,0)) continue;
+            let end = 1;
+            while (end < level.data.height && solid(col,end)) end++;
+            partitionEnds.set(col,end);
+        }
+        for (let row = firstRow; row <= lastRow; row++) for (let col = firstCol; col <= lastCol; col++) {
+            const tile = level.data.tiles[row]?.[col] ?? 0;
+            if (!supportsStanding(tile)) continue;
+            const x = level.colToWorldX(col) - cameraX, y = level.rowToWorldY(row) - cameraY;
+            if (tile === TileType.BRICK_BREAKABLE) { clayCover(c, x, y, col % 2 === 1); continue; }
+            if (isOneWayTile(tile)) {
+                returnBoard(c, x, y, !isOneWayTile(level.data.tiles[row]?.[col - 1] ?? 0), !isOneWayTile(level.data.tiles[row]?.[col + 1] ?? 0));
+                continue;
+            }
+            // Recognise only a real one-tile column continuous to the stage's
+            // upper boundary. The lower disconnected floor remains masonry.
+            const upperPartition = row < (partitionEnds.get(col) ?? 0);
+            if (upperPartition) { servicePartition(c,x,y,row,!solid(col,row + 1)); continue; }
+            masonry(c, x, y, col, row, !solid(col, row - 1), !solid(col - 1, row), !solid(col + 1, row), !solid(col, row + 1));
+        }
+        drawClayImpacts(c, level, cameraX, cameraY, reducedMotion);
+    });
+}
+
+/** Blind service bay cut into the plaster, with worn stone jambs. All edges are
+ * recessed and muted: only live terrain is allowed a pale, continuous cap. */
+export function drawWorkshopWallBay(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
+    polygon(c, [[x,y + 13],[x + 13,y],[x + w - 14,y],[x + w,y + 13],
+        [x + w,y + h],[x,y + h]], '#c5a17f');
+    polygon(c, [[x + 3,y + 14],[x + 15,y + 3],[x + w - 16,y + 3],[x + w - 3,y + 14],
+        [x + w - 3,y + h],[x + 3,y + h]], '#b99879');
+    polygon(c, [[x + 7,y + 17],[x + 19,y + 7],[x + w - 17,y + 7],[x + w - 4,y + 18],
+        [x + w - 4,y + h],[x + 7,y + h]], '#d0ac87');
+    // The broad inside reveal catches light from the workshop; it is not a sill.
+    r(c, x + 7, y + 21, 2, h - 21, '#c39e7c');
+    r(c, x + w - 5, y + 24, 1, h - 24, '#d8b58e');
+    drawGuairaPlaster(c, x + 10, y + 22, w - 20, h - 25, w + h);
+    for (let yy = 27; yy < h - 6; yy += 21) {
+        r(c, x + 1, y + yy, 2, 1, '#bc997a');
+        r(c, x + w - 3, y + yy + 6, 2, 1, '#bc997a');
+    }
+    // Two old repairs interrupt the masonry without borrowing brittle cracks.
+    r(c, x + 15, y + 8, 7, 3, '#c6a27d');
+    r(c, x + w - 17, y + 14, 6, 3, '#c6a27d');
+}
+
+/** A quiet wall-mounted repair niche, away from the actor and jump corridor.
+ * Muted tools and an inset frame cannot be mistaken for a usable platform. */
+export function drawWorkshopToolNiche(c: CanvasRenderingContext2D, x: number, y: number) {
+    r(c, x, y, 48, 30, '#b6977c');
+    r(c, x + 2, y + 2, 44, 27, '#937e68');
+    r(c, x + 5, y + 4, 40, 24, '#b39876');
+    r(c, x + 7, y + 5, 36, 1, '#a68b6e');
+    // A long brush, a mason's trowel and a spare timber offcut, not collectibles.
+    r(c, x + 10, y + 7, 2, 15, '#92745b');
+    r(c, x + 7, y + 18, 8, 5, '#9f7e61');
+    r(c, x + 8, y + 21, 1, 3, '#c0a17a');
+    r(c, x + 11, y + 21, 1, 3, '#c0a17a');
+    r(c, x + 25, y + 6, 2, 7, '#92745b');
+    polygon(c, [[x + 24,y + 13],[x + 19,y + 22],[x + 29,y + 21]], '#8e8777');
+    r(c, x + 22, y + 20, 5, 1, '#b1a18a');
+    // A spare pipe union hangs beside the masonry tools; it is wall hardware.
+    r(c, x + 34, y + 11, 7, 11, '#947d65');
+    r(c, x + 36, y + 13, 3, 7, '#b39876');
+    r(c, x + 35, y + 10, 5, 2, '#c0a17a');
+    r(c, x + 36, y + 7, 2, 3, '#92745b');
+}
+
+function workshop(c: CanvasRenderingContext2D, cx: number, cy: number) {
+    const x = 13 - cx, y = 86 - cy;
+    r(c, x + 4, y + 15, 129, 62, '#b6977c');
+    r(c, x + 6, y + 16, 122, 58, P.plaster);
+    drawGuairaPlaster(c, x + 7, y + 20, 119, 54, 5);
+    r(c, x + 7, y + 19, 118, 2, '#efd6ae');
+    roof(c, x, y, 139, 17);
+    r(c, x + 12, y + 44, 22, 30, '#9a765e');
+    r(c, x + 14, y + 46, 18, 28, '#816257');
+    r(c, x + 16, y + 47, 2, 26, '#a58a68');
+    r(c, x + 28, y + 59, 1, 2, '#c7a575');
+    r(c, x + 44, y + 26, 62, 11, '#c7a17f');
+    pixelText(c, 'OFICINA', x + 49, y + 28, '#816257');
+    drawWorkshopToolNiche(c, x + 67, y + 41);
+    // Broad new plaster patches convey everyday maintenance, never fresh cracks.
+    r(c, x + 38, y + 60, 17, 9, '#d0a67e');
+    r(c, x + 43, y + 57, 8, 3, '#d0a67e');
+    r(c, x + 112, y + 68, 13, 5, '#c7a17f');
+    // This shadow sits twelve pixels behind the true cap at y176.
+    r(c, x + 4, y + 75, 129, 3, '#b6977c');
+}
+
+/** Authored against the measured descent cameras: the first return surface is
+ * visible at y160 from each cover; no background object enters either shaft.
+ * Only the native terrain layer supplies continuous bright horizontal edges. */
+export function drawGalleryBackground(c: CanvasRenderingContext2D, cx: number, cy: number, _time: number, _reducedMotion: boolean) {
+    layer(c, cx, cy, (cameraX, cameraY) => {
+        r(c, 0, 23, 320, 157, '#e6bc8f');
+        r(c, 0, 23, 320, 24, '#ebcda4');
+        // The view is a dry workshop cutaway. Broad layers become warmer and
+        // darker with depth; there are no water hues, flows or victory changes.
+        r(c, 0, 160 - cameraY, 320, 272, '#c7a17f');
+        r(c, 0, 208 - cameraY, 320, 224, '#bf967d');
+        r(c, 0, 304 - cameraY, 320, 128, '#b6977c');
+        workshop(c, cameraX, cameraY);
+        // The same worn, inset service bays tie the gallery to the water workshop.
+        for (const [wx, wy, width, height] of [[249,168,124,120],[472,180,78,204],[574,107,116,85]] as const) {
+            drawWorkshopWallBay(c, wx - cameraX, wy - cameraY, width, height);
+        }
+        // Raking daylight stays on the inspection wall, above the true landing.
+        // Two separated panes leave a mullion shadow, not a glowing route edge.
+        for (const [left, right] of [[629,639],[642,653]] as const) {
+            polygon(c, [[left - cameraX,147 - cameraY],[right - cameraX,147 - cameraY],
+                [right - 15 - cameraX,183 - cameraY],[left - 15 - cameraX,183 - cameraY]], '#d9b68e');
+        }
+        drawWorkshopToolNiche(c, 273 - cameraX, 215 - cameraY);
+        // Optional storage recess continues below the real cracked floor. The
+        // terrain masks its entrance until the player actually breaks a tile.
+        r(c,256-cameraX,288-cameraY,48,64,'#8e755e');
+        r(c,259-cameraX,290-cameraY,42,60,'#b0906e');
+        r(c,260-cameraX,293-cameraY,3,56,'#bea17c');
+        r(c,297-cameraX,293-cameraY,3,56,'#97795d');
+        r(c,260-cameraX,345-cameraY,40,7,'#9c7c5e');
+        // Two wall bolts and a shallow label distinguish the service pocket.
+        r(c,260-cameraX,273-cameraY,39,9,'#ab8a67');
+        pixelText(c,'DESVIO',261-cameraX,275-cameraY,'#695449');
+        // Hand-smoothed plaster seams are short and broken, never route arrows.
+        for (const [wx, wy, w, h] of [[338,232,15,9],[247,250,13,6],[502,255,20,8],[479,306,10,7],[583,158,15,6],[663,143,16,12]] as const) {
+            r(c, wx - cameraX, wy - cameraY, w, h, '#c3a280');
+            r(c, wx + 3 - cameraX, wy - 2 - cameraY, Math.max(3,w - 8), 2, '#c3a280');
+        }
+        // Each shaft is a shallow, open-backed dry recess. The warm light has
+        // no particles or animation and ends before the actual recovery board.
+        for (const [wx, wy, bottom] of [[160,192,288],[384,304,384]] as const) {
+            r(c, wx - cameraX, wy - cameraY, 64, bottom - wy, '#a48668');
+            r(c, wx + 5 - cameraX, wy - cameraY, 54, bottom - wy, '#b6977c');
+            polygon(c, [[wx + 6 - cameraX,wy - cameraY],[wx + 41 - cameraX,wy - cameraY],
+                [wx + 57 - cameraX,bottom - 12 - cameraY],[wx + 34 - cameraX,bottom - 12 - cameraY]], '#bf967d');
+            // Muted vertical marks explain depth without sketching false stairs.
+            for (let dy = 12; dy < bottom - wy - 10; dy += 24) {
+                r(c, wx + 7 - cameraX, wy + dy - cameraY, 2, 5, '#a58a68');
+                r(c, wx + 56 - cameraX, wy + dy + 5 - cameraY, 2, 4, '#a58a68');
+            }
+        }
+        // A recessed daylight window marks the inspection landing. Its muted
+        // frame never crosses the x608/y192 usable cap or imitates an exit door.
+        const wx = 625 - cameraX, wy = 118 - cameraY;
+        r(c, wx, wy, 32, 35, '#b39876'); r(c, wx + 2, wy + 2, 28, 31, '#e3c49a');
+        r(c, wx + 4, wy + 4, 24, 25, '#d4ac83');
+        r(c, wx + 4, wy + 4, 24, 12, '#d6dac1');
+        // The same dry field horizon as the water workshop, seen through a
+        // smaller opening. Muted olive belongs inside the aperture only.
+        polygon(c, [[wx + 4,wy + 20],[wx + 10,wy + 16],[wx + 19,wy + 20],
+            [wx + 27,wy + 18],[wx + 27,wy + 28],[wx + 4,wy + 28]], '#b8b39a');
+        r(c, wx + 5, wy + 24, 21, 2, '#9d9c7b');
+        r(c, wx + 14, wy + 3, 3, 28, '#c0a17a');
+        r(c, wx + 4, wy + 16, 24, 2, '#c0a17a');
+        // Recessed upper/left reveal gives the aperture depth without a sill.
+        r(c, wx + 2, wy + 2, 2, 29, '#a58a68');
+        r(c, wx + 4, wy + 2, 24, 2, '#b39876');
+    });
+}
+
+/** No new mechanisms or scenery actors in this optional inspection route.
+ * WorldGame retains the native player, checkpoint, impacts and completion UI. */
+export function drawGalleryObjects(_c: CanvasRenderingContext2D, _objects: WorldObjects, _cx: number, _cy: number,
+    _time: number, _reducedMotion: boolean) {}

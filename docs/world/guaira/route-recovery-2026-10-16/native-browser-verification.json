@@ -1,0 +1,38 @@
+{
+  "kind": "real-chapter-browser-keyboard-fixed-step-driver",
+  "schedulerControlled": true,
+  "manualPlayerOrClockEdits": false,
+  "physicalDevice": false,
+  "runs": [
+    {
+      "route": "direct",
+      "updates": 1409,
+      "failed": true,
+      "lower": true,
+      "upper": true,
+      "returned": true,
+      "minX": 491.16903025157455,
+      "coins": 0,
+      "finished": true,
+      "status": "Continuar a jornada pelo mapa",
+      "chapterAcceptedCompletion": true,
+      "continuedToMap": true
+    },
+    {
+      "route": "optional",
+      "updates": 2356,
+      "failed": true,
+      "lower": true,
+      "upper": true,
+      "returned": true,
+      "minX": 491.11834887383384,
+      "coins": 3,
+      "finished": true,
+      "status": "Continuar a jornada pelo mapa",
+      "chapterAcceptedCompletion": true,
+      "continuedToMap": true
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

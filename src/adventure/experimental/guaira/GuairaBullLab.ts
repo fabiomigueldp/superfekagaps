@@ -29,7 +29,7 @@ export class GuairaBullEncounter extends BossEncounter {
         const b = this.model;
         this.x = b.x; this.y = b.y; this.width = b.width; this.height = b.height;
         this.health = b.health; this.maxHealth = BULL_RULES.health; this.timer = b.stateTick * BULL_RULES.tickMs;
-        this.phase = b.vulnerable ? 'open' : b.state === 'tell' || b.state === 'rattle' ? 'warning'
+        this.phase = b.vulnerable ? 'open' : b.state === 'tell' || b.state === 'turn' || b.state === 'rattle' ? 'warning'
             : b.state === 'charge' || b.state === 'bones' ? 'attack'
             : b.state === 'hurt' || b.state === 'defeated' ? b.state : 'rest';
     }
@@ -51,7 +51,12 @@ export class GuairaBullEncounter extends BossEncounter {
         const b = this.model;
         if (b.state === 'defeated') return 'A OSSADA DESCANSOU';
         if (b.vulnerable) return 'AGORA! PULE NAS COSTELAS';
+        if (b.rearming) return 'COSTELAS FECHANDO! RECUE';
+        if(b.state==='rattle'||b.state==='bones')if(b.bouncingBones)return 'OSSOS QUICAM! SALTE O ARCO';
         if (b.state === 'rattle' || b.state === 'bones') return 'OSSOS BAIXOS! PULE';
+        if(b.state==='turn')return 'ELE VAI VOLTAR! PULE OUTRA VEZ';
+        if((b.state==='tell'||b.state==='charge')&&b.chargeCount===2)
+            return b.chargeLeg===1?'DUAS INVESTIDAS! IDA E VOLTA':'ULTIMA INVESTIDA! PULE';
         if (b.state === 'tell' || b.state === 'charge') return 'INVESTIDA! PULE POR CIMA';
         return 'ESPERE A ABERTURA';
     }
@@ -69,9 +74,14 @@ export class GuairaBullLab extends WorldGame {
                 if (boss instanceof GuairaBullEncounter) drawGuairaBoss(c, boss.model, cx, cy, this.reducedMotion);
             };
             this.art.arena = () => {};
-            this.art.background = (c, _island, cx, cy, time) => drawGuairaBackground(c, cx, cy, time, this.reducedMotion);
+            this.art.background = (c, _island, cx, cy, time) => drawGuairaBackground(c, cx, cy, time, this.reducedMotion,
+                this.boss instanceof GuairaBullEncounter?this.boss.model:undefined);
             this.art.terrain = (c, _level, _island, _cx, cy) => drawGuairaFloor(c, cy);
             this.store.save.preferences.shake = !this.reducedMotion;
+            if(this.reducedMotion){
+                (this as unknown as {particle:(...args:unknown[])=>void}).particle=()=>{};
+                this.renderer.addImpact=()=>{};
+            }
             // Basic controls are documented on the page; campaign tutorials would
             // cover the arena and have no place in this isolated prototype.
             this.tutorial.observe = () => {};
@@ -159,7 +169,8 @@ export class GuairaBullLab extends WorldGame {
             panel(c, 62, 70, 196, 43, '#382b35', '#d8ac7a');
             pixelText(c, 'PAUSADO', 160, 79, '#f0ddae', 2, 'center');
             pixelText(c, 'ESC OU CONTINUAR', 160, 100, '#edcaf5', 1, 'center');
-        } else if (this.boss?.phase === 'defeated') {
+        } else if (this.boss instanceof GuairaBullEncounter && this.boss.phase === 'defeated' &&
+            (this.reducedMotion || this.boss.model.stateTick >= BULL_RULES.collapse)) {
             panel(c, 62, 64, 196, 34, '#382b35', '#d8ac7a');
             pixelText(c, 'A OSSADA DESCANSOU!', 160, 72, '#f0ddae', 1, 'center');
             pixelText(c, this.continuationHint, 160, 85, '#edcaf5', 1, 'center');

@@ -6,6 +6,9 @@ import { sceneLifecycleBrowser, type DeviceNode } from './helpers/sceneLifecycle
 import bullRoute from './helpers/guairaLabReplay.json';
 import mayorRoute from './helpers/guairaMayorReplay.json';
 
+const seamFrame = mayorRoute.seamWarningFrames[0];
+const warningsThroughSeam = mayorRoute.warningFrames.filter(frame => frame <= seamFrame);
+
 type Browser = ReturnType<typeof sceneLifecycleBrowser>;
 type Scene = GuairaBullLab | GuairaMayorLab;
 type Route = { stepMs: number; frames: number; runs: (number | string[])[][] };
@@ -58,10 +61,10 @@ for (const reduced of [false, true]) for (const boss of ['bull', 'mayor'] as con
         assert.ok(warnings().every(cue => cue.sources.length === 2 && cue.sources.every(node => node.frequency.value === 180)),
             'pending sample fetches use the real two-tone warning fallback');
         if (game instanceof GuairaMayorLab) {
-            assert.deepEqual(warningFrames, [102, 402, 502, 732, 832]);
-            assert.deepEqual(hits, [322, 652, 982]); assert.equal(game.mayor.publicWaterOpen, true);
+            assert.deepEqual(warningFrames, mayorRoute.warningFrames);
+            assert.deepEqual(hits, mayorRoute.hitFrames); assert.equal(game.mayor.publicWaterOpen, true);
         } else {
-            assert.equal(warningFrames.length, 6);
+            assert.deepEqual(warningFrames,bullRoute.warningFrames);
             assert.deepEqual(hits, bullRoute.expectedHits.map(hit => hit.frame + 1));
             assert.equal(game.boss!.phase, 'defeated');
         }
@@ -71,24 +74,24 @@ for (const reduced of [false, true]) for (const boss of ['bull', 'mayor'] as con
 for (const mode of ['mute', 'effects-off'] as const)
     test(`mayor: ${mode} drops the seam warning and restoring audio never plays it late`, t => {
         const { h, game, run, context, warnings } = fixture(t, GuairaMayorLab, mayorRoute);
-        run.to(501);
+        run.to(seamFrame - 1);
         if (mode === 'mute') { h.key('keydown', 'm'); h.key('keyup', 'm'); }
         else { game.audio.preferences.effects = 0; game.audio.volume(); }
-        run.to(502);
+        run.to(seamFrame);
         assert.equal((game as GuairaMayorLab).mayor.counterpressure?.phase, 'warning');
-        assert.equal(warnings().at(-1)!.frame, 502); assert.deepEqual(warnings().at(-1)!.sources, []);
+        assert.equal(warnings().at(-1)!.frame, seamFrame); assert.deepEqual(warnings().at(-1)!.sources, []);
         const count = context.nodes.filter(node => node.started).length;
         if (mode === 'mute') { h.key('keydown', 'm'); h.key('keyup', 'm'); }
         else { game.audio.preferences.effects = .6; game.audio.volume(); }
-        run.to(503);
+        run.to(seamFrame + 1);
         assert.equal(context.nodes.filter(node => node.started).length, count);
-        assert.deepEqual(warnings().map(cue => cue.frame), [102, 402, 502]);
+        assert.deepEqual(warnings().map(cue => cue.frame), warningsThroughSeam);
     });
 
 test('mayor: pause, blur, hidden and repeated rendering cancel or freeze the seam cue without replay', t => {
     const { h, game, run, context, warnings } = fixture(t, GuairaMayorLab, mayorRoute);
-    run.to(502); const cue = warnings().at(-1)!;
-    assert.equal(cue.frame, 502); assert.equal(cue.sources.length, 2);
+    run.to(seamFrame); const cue = warnings().at(-1)!;
+    assert.equal(cue.frame, seamFrame); assert.equal(cue.sources.length, 2);
     const sharedBoss = t.mock.method(game.art, 'boss');
     const sharedArena = t.mock.method(game.art, 'arena');
     const before = structuredClone({ model: (game as GuairaMayorLab).mayor, player: game.player.data, objects: game.objects });
@@ -104,17 +107,17 @@ test('mayor: pause, blur, hidden and repeated rendering cancel or freeze the sea
     }
     assert.equal(sharedBoss.mock.callCount(), 0, 'the audio getter cannot paint native ground-wave arrows');
     assert.equal(sharedArena.mock.callCount(), 0);
-    assert.deepEqual(warnings().map(cue => cue.frame), [102, 402, 502]);
+    assert.deepEqual(warnings().map(cue => cue.frame), warningsThroughSeam);
     game.update(mayorRoute.stepMs);
-    assert.deepEqual(warnings().map(cue => cue.frame), [102, 402, 502]);
+    assert.deepEqual(warnings().map(cue => cue.frame), warningsThroughSeam);
     assert.equal(context.nodes.filter(node => node.started).length, count);
 });
 
 for (const boundary of ['retry', 'paused-retry', 'dispose', 'mute'] as const)
     test(`mayor: ${boundary} cancels the live seam warning sources`, t => {
         const { h, game, run, context, warnings } = fixture(t, GuairaMayorLab, mayorRoute);
-        run.to(502); const cue = warnings().at(-1)!;
-        assert.equal(cue.frame, 502); assert.equal(cue.sources.length, 2);
+        run.to(seamFrame); const cue = warnings().at(-1)!;
+        assert.equal(cue.frame, seamFrame); assert.equal(cue.sources.length, 2);
         if (boundary === 'retry' || boundary === 'paused-retry') {
             if (boundary === 'paused-retry') game.toggleLabPause();
             game.load(game.stage.id);
@@ -148,9 +151,9 @@ for (const boundary of ['pause', 'retry', 'mute', 'dispose'] as const)
         run.to(1);
         for (const request of h.requests) request.resolve({ ok: true, arrayBuffer: async () => new ArrayBuffer(1) });
         for (let index = 0; index < 8; index++) await Promise.resolve();
-        run.to(502);
+        run.to(seamFrame);
         const cue = warnings().at(-1)!;
-        assert.equal(cue.frame, 502); assert.equal(cue.sources.length, 1); assert.ok(cue.sources[0].buffer);
+        assert.equal(cue.frame, seamFrame); assert.equal(cue.sources.length, 1); assert.ok(cue.sources[0].buffer);
         if (boundary === 'pause') game.toggleLabPause();
         if (boundary === 'retry') game.load(game.stage.id);
         if (boundary === 'mute') { h.key('keydown', 'm'); h.key('keyup', 'm'); game.update(mayorRoute.stepMs); }

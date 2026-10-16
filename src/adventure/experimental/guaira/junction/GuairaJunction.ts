@@ -5,6 +5,7 @@ import type { AdventureStage } from '../../../types';
 import { pixelText, panel } from '../../../../graphics/BitmapFont';
 import { supportsStanding } from '../../../../world/tileRules';
 import { guairaReturnHref } from '../GuairaMapModel';
+import { drawGuairaCoinReadout } from '../GuairaCoinReadout';
 import { GUAIRA_JUNCTION as G, JunctionRouting, guairaJunctionStage } from './GuairaJunctionModel';
 import { drawJunctionBackground, drawJunctionTerrain, drawJunctionObjects } from './GuairaJunctionArt';
 
@@ -20,7 +21,7 @@ export class GuairaJunction extends WorldGame {
         super(canvas, true);
         try {
             this.reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
-            this.art.background = (c, _island, cx, cy, time) => drawJunctionBackground(c, cx, cy, time, this.reducedMotion, this.routing);
+            this.art.background = (c, _island, cx, cy) => drawJunctionBackground(c, cx, cy, this.objects.time, this.reducedMotion, this.routing);
             this.art.terrain = (c, level, _island, cx, cy) => drawJunctionTerrain(c, level, cx, cy);
             this.art.genericStructures = false;
             this.art.objects = (c, objects, cx, cy, time) => drawJunctionObjects(c, objects, cx, cy, time, this.reducedMotion, this.routing);
@@ -48,9 +49,10 @@ export class GuairaJunction extends WorldGame {
             plate.active = plate.observedActive = checkpoint;
         }
         this.applySupply();
+        this.openReturnStair();
         // A checkpoint rebuild is an authored safe configuration, not a new
         // midway motion: A supports the checkpoint approach; B waits at its dock.
-        for (const id of [G.liftAId, G.liftBId]) {
+        for (const id of [G.liftAId, G.liftBId, G.returnUpperId, G.returnLowerId]) {
             const deck = this.objects.get(id)!;
             if (deck.active) deck.y = deck.py = deck.to!.y;
             deck.observedActive = deck.active;
@@ -62,6 +64,11 @@ export class GuairaJunction extends WorldGame {
     private applySupply() {
         this.objects.get(G.liftAId)!.active = this.routing.supplied === 'a';
         this.objects.get(G.liftBId)!.active = this.routing.supplied === 'b';
+    }
+    get returnStairOpen() { return this.store.save.checkpoint?.stage === G.id; }
+    private openReturnStair() {
+        for (const id of [G.returnUpperId, G.returnLowerId])
+            this.objects.get(id)!.active = this.returnStairOpen;
     }
     get moving() {
         return [G.liftAId, G.liftBId].some(id => {
@@ -97,19 +104,31 @@ export class GuairaJunction extends WorldGame {
             if (this.state === 'playing') this.completedAvatar.advance(dt);
             return;
         }
-        const objects = this.objects, before = objects.time;
+        const objects = this.objects, before = objects.time, previousY = this.camera.y;
         super.update(dt);
         if (this.state !== 'playing' || this.player.data.isDead || this.objects !== objects) return;
         const simulated = objects.time - before;
         if (simulated > 0) {
             this.routing.step(objects.get(G.entryPlateId)!.active ? 'a' : 'b', simulated);
             this.applySupply();
+            this.openReturnStair();
         }
         const p = this.player.data;
-        // The optional perch permits an immediate second jump before the native
-        // camera lerp has settled. Keep Feka's helmet below the fixed HUD even
-        // then; this only bounds the presentation, never the jump or its timing.
-        this.camera.y = Math.max(0, Math.min(this.camera.y, p.position.y - 48));
+        if (simulated > 0) {
+            const feet = p.position.y + p.height;
+            // Frame each receiving bank while riding, and the entry/return
+            // stairs on a fall. Reserve the same headroom as the other routes,
+            // so a full jump never pushes the far side of the exit gap away.
+            const receiving = feet > 336 ? G.recoveryY
+                : p.position.x < 224 ? G.startY
+                : p.position.x < 576 ? Math.max(G.middleY, feet)
+                : Math.max(G.terraceY, feet);
+            const target = Math.min(receiving - 168, p.position.y - 36);
+            const next = previousY + Math.max(-6, Math.min(6, (target - previousY) * .18));
+            this.camera.y = Math.max(0, feet - 168, Math.min(p.position.y - 36, next));
+            if (this.returnStairOpen && p.position.x >= 448 && p.position.x < 608 && feet > G.returnUpperY)
+                this.camera.y = Math.min(this.camera.y, G.middleY - 24);
+        }
         if (p.isGrounded && p.position.x >= G.finishX && Math.abs(p.position.y + p.height - G.terraceY) < .01 &&
             this.store.save.checkpoint?.stage === G.id && this.routing.supplied === 'b' && !this.routing.warning) {
             this.finished = true; p.velocity.x = 0; p.isRunning = false; this.input.reset(); this.audio.sfx('victory');
@@ -131,8 +150,10 @@ export class GuairaJunction extends WorldGame {
         const c = this.renderer.getContext();
         c.fillStyle = '#382f36'; c.fillRect(0, 0, 320, 23);
         c.fillStyle = '#d8b485'; c.fillRect(0, 22, 320, 1);
-        pixelText(c, 'PATIO DAS COMPORTAS', 8, 8, '#f3ddb1');
-        pixelText(c, `AGUA ${this.routing.supplied.toUpperCase()}`, 224, 8, '#aad9d2');
+        pixelText(c, 'PATIO', 8, 3, '#f3ddb1');
+        pixelText(c, `AGUA ${this.routing.supplied.toUpperCase()}`, 60, 3, '#aad9d2');
+        drawGuairaCoinReadout(c,this.renderer,this.coins);
+        if (this.player.data.hasHelmet) this.renderer.drawHelmet(279,4,c);
         pixelText(c, 'II', 305, 8, '#f3ddb1');
         const p = this.player.data, feet = p.position.y + p.height;
         // Observe native support, including a partial overlap at a deck edge.
@@ -146,19 +167,29 @@ export class GuairaJunction extends WorldGame {
                 if (supportsStanding(this.level.getTile(col, supportRow))) onRecovery = true;
         const nextOutlet = this.routing.selected === 'a' ? 'B' : 'A';
         const onMaintenance = p.isGrounded && Math.abs(feet - G.maintenanceY) < .01 && p.position.x + p.width > 176 && p.position.x < 224;
+        const onReturnStair = p.isGrounded && [G.returnUpperId, G.returnLowerId].some(id => {
+            const step = this.objects.get(id)!;
+            return step.active && Math.abs(feet-step.y)<.01 && p.position.x+p.width>step.x && p.position.x<step.x+step.width;
+        });
+        const returnDeploying = this.returnStairOpen && [G.returnUpperId,G.returnLowerId].some(id => {
+            const step=this.objects.get(id)!;return Math.abs(step.y-step.to!.y)>.01;
+        });
         const nearPlate = p.position.x < 216 && feet <= 320 || p.position.x >= 410 && p.position.x < 565 && feet <= 272;
-        const playerTop = p.position.y - Math.round(this.camera.y) - 4;
-        const bannerWouldCoverPlayer = playerTop < 47 && feet - Math.round(this.camera.y) > 28;
+        const cue = this.finished ? 'DO BAIRRO AO ARROZAL!' : this.routing.warning ? `DESVIO PARA ${this.routing.selected.toUpperCase()}...`
+            : onMaintenance ? `${this.coins}/3 MOEDAS. VOLTE PELA DIREITA`
+            : onReturnStair ? 'SUBA A ESQUERDA: PONTO SEGURO'
+            : onRecovery ? this.returnStairOpen && p.position.x >= 384 ? 'ESCADA DE RETORNO ACIMA' : 'VOLTE PELO DEGRAU A ESQUERDA'
+            : this.moving ? `${this.routing.supplied.toUpperCase()} SOBE / ${this.routing.supplied === 'a' ? 'B' : 'A'} DESCE`
+            : nearPlate ? `PULE + BAIXO: AGUA PARA ${nextOutlet}`
+            : p.position.x >= 736 && p.position.x < G.exitGapEndX ? 'PULE O VAO: ARROZAL A DIREITA'
+            : p.position.x >= G.exitGapEndX ? 'SIGA ATE O ARROZAL'
+            : 'A: MOEDAS / B: ARROZAL';
+        pixelText(c, cue, 8, 13, '#f3ddb1');
         if (paused && !this.externalPauseMenu) {
             c.fillStyle = '#211b2bbd'; c.fillRect(0, 23, 320, 157);
             panel(c, 62, 70, 196, 43, '#382f36', '#d8b485');
             pixelText(c, 'PAUSADO', 160, 79, '#f3ddb1', 2, 'center');
             pixelText(c, 'ESC OU CONTINUAR', 160, 100, '#aad9d2', 1, 'center');
-        } else if (!bannerWouldCoverPlayer && (this.finished || this.routing.warning || this.moving || nearPlate || onMaintenance)) {
-            panel(c, 19, 28, 282, 19, '#382f36', '#d8b485');
-            const text = this.finished ? 'DO BAIRRO AO ARROZAL!' : onMaintenance ? `${this.coins}/3 MOEDAS. VOLTE PELA DIREITA` : this.routing.warning ? `DESVIO PARA ${this.routing.selected.toUpperCase()}...` :
-                this.moving ? `${this.routing.supplied.toUpperCase()} SOBE / ${this.routing.supplied === 'a' ? 'B' : 'A'} DESCE` : `PULE. NO AR, BAIXO: AGUA PARA ${nextOutlet}`;
-            pixelText(c, text, 160, 34, '#f3ddb1', 1, 'center');
         }
         this.renderer.present();
         const message = paused ? 'Pausado · Esc ou Continuar para voltar'
@@ -167,10 +198,15 @@ export class GuairaJunction extends WorldGame {
             : this.routing.warning ? `Desvio pedido para ${this.routing.selected.toUpperCase()} · os dois tabuleiros vão se mover · sem prazo para atravessar`
             : onMaintenance ? `Desvio de A · ${this.coins}/3 moedas · volte à direita pelo tabuleiro A até a placa do ponto seguro`
             : deck ? `No tabuleiro ${deck.id === G.liftAId ? 'A' : 'B'} · ${Math.abs(deck.y - (deck.active ? deck.to!.y : G.dockY)) > .01 ? deck.active ? 'subindo' : 'descendo' : deck.active ? 'no alto' : 'na doca'} · água no ramal ${this.routing.supplied.toUpperCase()} · pode esperar apoiado`
-            : onRecovery ? 'Piso seco de recuperação · volte à esquerda e pule pelo degrau até a entrada'
+            : onReturnStair ? 'Escada de retorno · salte à esquerda para voltar ao ponto seguro · a seleção A/B permanece como você deixou'
+            : onRecovery ? this.returnStairOpen && p.position.x >= 384
+                ? 'Piso seco de recuperação · escada aberta sob o ponto seguro · suba os degraus para retomar daqui'
+                : 'Piso seco de recuperação · volte à esquerda e pule pelo degrau até a entrada'
             : this.moving ? `Água no ramal ${this.routing.supplied.toUpperCase()} · ${this.routing.supplied.toUpperCase()} sobe, ${this.routing.supplied === 'a' ? 'B' : 'A'} desce · espere ou embarque`
             : p.position.x < 384 ? `Pule primeiro. No ar, aperte baixo na placa: água para ${nextOutlet}; a outra plataforma desce`
-            : p.position.x < 736 ? `Ponto seguro · A dá acesso às moedas no alto à esquerda; B leva ao arrozal · sentada troca A/B, sem prazo`
+            : p.position.x < 736 ? this.returnStairOpen
+                ? `Ponto seguro · escada de retorno ${returnDeploying?'abrindo':'aberta'} abaixo · A dá acesso às moedas; B leva ao arrozal · sentada troca A/B, sem prazo`
+                : 'Ponto seguro acima · alcance a plataforma central pelo tabuleiro A'
             : p.position.x < G.exitGapEndX ? 'Margem firme · observe o vão curto e pule até o arrozal · pode esperar antes do salto'
             : 'Siga à direita até o arrozal · sair e reentrar reinicia o protótipo';
         if (this.status.textContent !== message) this.status.textContent = message;

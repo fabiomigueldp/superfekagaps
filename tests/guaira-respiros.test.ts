@@ -52,16 +52,17 @@ function waitForRetraction(h: Harness, g: GuairaRespiros, id: string) {
     assert.fail('one cycle always contains a completely retracted departure');
 }
 
-test('Respiros clones a continuous native floor and four ungated jets without storage or campaign changes', t => {
+test('Respiros clones four cycling jets and an optional isolation valve without campaign changes', t => {
     const campaign = structuredClone(STAGES), islands = structuredClone(ISLANDS), h = guairaRespirosBrowser(t), g = h.create();
     assert.ok(g.player instanceof Player); assert.ok(g.input instanceof Input);
     assert.ok(g.objects instanceof WorldObjects); assert.ok(g.level instanceof WorldLevel);
     assert.equal(g.stage.id, G.id); assert.equal(g.player.data.position.x, G.spawnX); assert.equal(feet(g), G.floor);
     assert.equal(g.player.data.hasHelmet, true); assert.equal(g.boss, null);
-    assert.deepEqual(g.stage.foes, []); assert.deepEqual(g.stage.exits, []); assert.equal(g.stage.pickups.length, 2);
-    assert.deepEqual(g.stage.mechanisms.map(b => [b.kind, b.x, b.y, b.width, b.height, b.phase, b.period, b.gated]),
+    assert.deepEqual(g.stage.foes, []); assert.deepEqual(g.stage.exits, []); assert.equal(g.stage.pickups.length, 7);
+    assert.deepEqual(g.stage.mechanisms.filter(b => b.kind === 'jet').map(b => [b.kind, b.x, b.y, b.width, b.height, b.phase, b.period, b.gated]),
         [['jet',160,176,96,132,0,4200,undefined], ['jet',384,176,176,132,1200,4200,undefined],
          ['jet',704,176,80,132,600,4200,undefined], ['jet',880,176,112,132,2700,4200,undefined]]);
+    assert.equal(g.stage.mechanisms.find(b => b.id === G.serviceValveId)?.link,G.thirdJetId);
     for (let x = 0; x < G.width; x++) assert.notEqual(g.stage.level.tiles[19][x], 0);
     const altered = guairaRespirosStage(); altered.level.tiles[19][0] = 0;
     assert.notEqual(guairaRespirosStage().level.tiles[19][0], 0);
@@ -210,7 +211,8 @@ test('short and held native jumps remain framed below the HUD without mandatory 
             assert.ok(p.position.y-g.camera.y>=23, 'native apex remains below HUD');
             assert.ok(feet(g)-g.camera.y<=172.001); assert.ok(p.position.x-g.camera.x>=24);
         }
-        assert.ok(hold===1?rise<21:rise>102); assert.equal(g.player.data.hasHelmet,true); assert.equal(feet(g),G.floor);
+        assert.ok(hold===1?rise<21:rise>102); assert.equal(g.player.data.hasHelmet,true);
+        assert.equal(feet(g),x===608 && hold===30 ? 240 : G.floor,'held jump in the service bay lands on its native step');
     }
     departure(h,g,304); h.run(g,100);
     assert.ok(g.camera.x+320 >= G.secondEnd+14,'entire second grate and receiving standing area visible before entry');

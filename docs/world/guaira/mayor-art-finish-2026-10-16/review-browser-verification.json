@@ -1,0 +1,85 @@
+{
+  "physicalDevice": false,
+  "checks": [
+    {
+      "route": "guairaMayorGroundReplay",
+      "touch": false,
+      "reduced": false,
+      "finished": true,
+      "frames": 1885,
+      "minHead": 27
+    },
+    {
+      "route": "guairaMayorGroundReplay",
+      "touch": true,
+      "reduced": true,
+      "finished": true,
+      "frames": 1885,
+      "minHead": 27
+    },
+    {
+      "route": "guairaMayorInterruptReplay",
+      "touch": false,
+      "reduced": false,
+      "finished": true,
+      "frames": 1255,
+      "minHead": 27
+    },
+    {
+      "route": "guairaMayorInterruptReplay",
+      "touch": true,
+      "reduced": true,
+      "finished": true,
+      "frames": 1255,
+      "minHead": 27
+    },
+    {
+      "width": 1440,
+      "media": {
+        "fits": true,
+        "videos": [
+          {
+            "src": "http://127.0.0.1:3000/docs/world/guaira/mayor-art-finish-2026-10-16/after.mp4",
+            "duration": 31.416667,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "src": "http://127.0.0.1:3000/docs/world/guaira/mayor-art-finish-2026-10-16/before.mp4",
+            "duration": 31.416667,
+            "width": 960,
+            "height": 540,
+            "error": null
+          }
+        ],
+        "decoded": 2
+      }
+    },
+    {
+      "width": 390,
+      "media": {
+        "fits": true,
+        "videos": [
+          {
+            "src": "http://127.0.0.1:3000/docs/world/guaira/mayor-art-finish-2026-10-16/after.mp4",
+            "duration": 31.416667,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "src": "http://127.0.0.1:3000/docs/world/guaira/mayor-art-finish-2026-10-16/before.mp4",
+            "duration": 31.416667,
+            "width": 960,
+            "height": 540,
+            "error": null
+          }
+        ],
+        "decoded": 2
+      }
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

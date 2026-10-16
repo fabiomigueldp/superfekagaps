@@ -20,7 +20,20 @@ export function chapterJourneyStory(snapshot: GuairaChapterSnapshot): string | n
 /** Called only for a currently completed, living native attempt. Earlier-scene
  * replays must not describe a dry neighborhood after public water was earned. */
 export function chapterCompletionStory(snapshot: GuairaChapterSnapshot, sceneId: GuairaChapterSceneId): string | null {
+    if (snapshot.disposed) return null;
     if (sceneId === 'guaira-prefeito' && hasAcceptedPublicWater(snapshot)) return WATER_FOR_NEIGHBORS;
     if (sceneId === 'guaira-lab' && snapshot.nextRecommendedScene === 'guaira-subida') return chapterJourneyStory(snapshot);
+    // The caller has observed live native completion. Explain its next step
+    // before leaving the scene, whether its receipt was already persisted or
+    // is awaiting acceptance; replays keep their earned context.
+    const index = snapshot.route.indexOf(sceneId);
+    if (index < 0 || hasAcceptedPublicWater(snapshot) || snapshot.nextRecommendedScene !== sceneId &&
+        snapshot.nextRecommendedScene !== snapshot.route[index + 1]) return null;
+    if (sceneId === 'guaira-lab') return BULL_TO_HOUSE;
+    if (sceneId === 'guaira-travessia' || sceneId === 'guaira-patio-comportas')
+        return 'O caminho até o arrozal está aberto. A Passagem dos Respiros leva ao curral.';
+    if (sceneId === 'guaira-respiros') return 'Respiros atravessados. Ossabravo espera no Curral da Comporta.';
+    if (sceneId === 'guaira-subida') return 'Você chegou à Casa da Vazão. O ramal do bairro está fechado; enfrente o Prefeito para reabrir a água.';
+    if (sceneId === 'guaira-prefeito') return WATER_FOR_NEIGHBORS;
     return null;
 }

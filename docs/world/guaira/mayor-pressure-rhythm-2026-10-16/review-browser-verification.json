@@ -1,0 +1,101 @@
+{
+  "physicalDevice": false,
+  "checks": [
+    {
+      "route": "guairaMayorGroundReplay",
+      "touch": false,
+      "reduced": false,
+      "finished": true,
+      "frames": 1885,
+      "minHead": 27
+    },
+    {
+      "route": "guairaMayorGroundReplay",
+      "touch": true,
+      "reduced": true,
+      "finished": true,
+      "frames": 1885,
+      "minHead": 27
+    },
+    {
+      "route": "guairaMayorInterruptReplay",
+      "touch": false,
+      "reduced": false,
+      "finished": true,
+      "frames": 1255,
+      "minHead": 27
+    },
+    {
+      "route": "guairaMayorInterruptReplay",
+      "touch": true,
+      "reduced": true,
+      "finished": true,
+      "frames": 1255,
+      "minHead": 27
+    },
+    {
+      "route": "guairaMayorRetryReplay",
+      "touch": false,
+      "reduced": false,
+      "finished": true,
+      "frames": 2660,
+      "minHead": 27
+    },
+    {
+      "route": "guairaMayorRetryReplay",
+      "touch": true,
+      "reduced": true,
+      "finished": true,
+      "frames": 2660,
+      "minHead": 27
+    },
+    {
+      "width": 1440,
+      "media": {
+        "fits": true,
+        "videos": [
+          {
+            "src": "http://127.0.0.1:3000/docs/world/guaira/mayor-pressure-rhythm-2026-10-16/interrupt.mp4",
+            "duration": 20.916667,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "src": "http://127.0.0.1:3000/docs/world/guaira/mayor-pressure-rhythm-2026-10-16/retry.mp4",
+            "duration": 44.333333,
+            "width": 960,
+            "height": 540,
+            "error": null
+          }
+        ],
+        "decoded": 2
+      }
+    },
+    {
+      "width": 390,
+      "media": {
+        "fits": true,
+        "videos": [
+          {
+            "src": "http://127.0.0.1:3000/docs/world/guaira/mayor-pressure-rhythm-2026-10-16/interrupt.mp4",
+            "duration": 20.916667,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "src": "http://127.0.0.1:3000/docs/world/guaira/mayor-pressure-rhythm-2026-10-16/retry.mp4",
+            "duration": 44.333333,
+            "width": 960,
+            "height": 540,
+            "error": null
+          }
+        ],
+        "decoded": 2
+      }
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

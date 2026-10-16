@@ -1,0 +1,68 @@
+{
+  "kind": "real-chapter-native-keyboard-routes",
+  "schedulerControlled": true,
+  "stepMs": 16.666666666666668,
+  "physicalDevice": false,
+  "runs": [
+    {
+      "route": "travessia",
+      "updates": 1078,
+      "contacts": [
+        224,
+        208,
+        256,
+        240,
+        192
+      ],
+      "minHelmet": 26,
+      "maxFeet": 164.01467144002288,
+      "finished": true,
+      "coins": 14,
+      "decisions": [
+        {
+          "frame": 429,
+          "guidance": "Etapa 1/5 · Dois percursos · pule pelas passarelas ou desça ao canal de inspeção; os dois chegam à próxima comporta"
+        },
+        {
+          "frame": 608,
+          "guidance": "Etapa 1/5 · Canal de inspeção · siga por baixo das passarelas; o degrau à direita volta à margem e ao ponto seguro"
+        }
+      ],
+      "chapterAcceptedCompletion": true,
+      "continuedTo": "map"
+    },
+    {
+      "route": "respiros",
+      "updates": 1134,
+      "contacts": [
+        304,
+        288,
+        240,
+        192,
+        160
+      ],
+      "minHelmet": 26,
+      "maxFeet": 160.00001543609795,
+      "finished": true,
+      "coins": 7,
+      "decisions": [
+        {
+          "frame": 701,
+          "guidance": "Etapa 2/5 · Respiro C isolado · siga pela passarela alta até o mirante ou desça ao piso; D mantém seu ritmo"
+        },
+        {
+          "frame": 753,
+          "guidance": "Etapa 2/5 · Passarela de inspeção · salte à direita para o mirante seco; o respiro D continua funcionando"
+        },
+        {
+          "frame": 820,
+          "guidance": "Etapa 2/5 · Mirante seco · observe o respiro D; desça na ilha antes da grelha e espere a água recolher"
+        }
+      ],
+      "chapterAcceptedCompletion": true,
+      "continuedTo": "map"
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

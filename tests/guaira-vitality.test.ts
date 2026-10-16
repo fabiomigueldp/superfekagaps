@@ -4,6 +4,9 @@ import { WorldObjects } from '../src/adventure/WorldPhysics';
 import { guairaTraversalStage } from '../src/adventure/experimental/guaira/GuairaTraversal';
 import { drawGuairaTraversalObjects } from '../src/adventure/experimental/guaira/GuairaTraversalArt';
 import { drawGuairaWorker, GUAIRA_WORKER_BOUNDS, type GuairaWorkerKind, type GuairaWorkerVisualState } from '../src/adventure/experimental/guaira/GuairaWorkerArt';
+import { drawGuairaRicePlant } from '../src/adventure/experimental/guaira/GuairaRiceArt';
+import { guairaAscentStage } from '../src/adventure/experimental/guaira/GuairaAscent';
+import { drawGuairaAscentObjects } from '../src/adventure/experimental/guaira/GuairaAscentArt';
 import { drawGuairaWindPump, drawGuairaChannelFlow, drawGuairaRiceFlow, drawGuairaSluiceFlow, drawGuairaPoolFlow } from '../src/adventure/experimental/guaira/GuairaWaterworksArt';
 
 /** Native helpers emit integer fillRect pixels; this recorder applies their rectangular clips. */
@@ -29,9 +32,9 @@ const signature=(pixels:Map<string,string>)=>JSON.stringify([...pixels].sort(([a
 function worker(kind:GuairaWorkerKind,state:GuairaWorkerVisualState) { const r=raster();drawGuairaWorker(r.c,0,0,kind,Object.freeze(state));assert.ok(r.balanced());return r.pixels; }
 
 test('worker articulation keeps fixed boots and a clear running strip for every mechanism pose', () => {
-    for(const kind of ['pump','rice'] as const) {
+    for(const kind of ['pump','rice','inspector'] as const) {
         const base=worker(kind,{activeTimeMs:0,valveActive:false,bridgeRise:0,reducedMotion:false});
-        for(const activeTimeMs of [0,1500,2000,2500,2880,3100,7000]) for(const [valveActive,bridgeRise] of [[false,0],[true,.1],[true,.6],[true,1]] as const) {
+        for(let activeTimeMs=0;activeTimeMs<7200;activeTimeMs+=40) for(const [valveActive,bridgeRise] of [[false,0],[true,.1],[true,.6],[true,1]] as const) {
             const frame=worker(kind,{activeTimeMs,valveActive,bridgeRise,reducedMotion:false});
             for(const key of frame.keys()) {const [x,y]=key.split(',').map(Number);assert.ok(x>=GUAIRA_WORKER_BOUNDS.left&&x<GUAIRA_WORKER_BOUNDS.right&&y>=GUAIRA_WORKER_BOUNDS.top&&y<GUAIRA_WORKER_BOUNDS.bottom);}
             for(let y=-5;y<0;y++) for(const left of [-2,6]) for(let x=left;x<left+5;x++) assert.equal(frame.get(`${x},${y}`),base.get(`${x},${y}`),'work/tool movement cannot overwrite the boots');
@@ -40,12 +43,60 @@ test('worker articulation keeps fixed boots and a clear running strip for every 
 });
 
 test('worker pause and reduced motion are stable, including a restored open checkpoint', () => {
-    for(const kind of ['pump','rice'] as const) for(const valveActive of [false,true]) {
+    for(const kind of ['pump','rice','inspector'] as const) for(const valveActive of [false,true]) {
         const state={activeTimeMs:1500,valveActive,bridgeRise:valveActive?1:0,reducedMotion:false};
         assert.equal(signature(worker(kind,state)),signature(worker(kind,state)));
         assert.equal(signature(worker(kind,{...state,reducedMotion:true,activeTimeMs:0})),signature(worker(kind,{...state,reducedMotion:true,activeTimeMs:99000})));
         assert.equal(signature(worker(kind,{...state,activeTimeMs:NaN})),signature(worker(kind,{...state,activeTimeMs:0})));
     }
+});
+
+test('all workers have intermediate work poses and brief blinks rather than held masked faces', () => {
+    for (const kind of ['pump','rice','inspector'] as const) {
+        const frames = new Set<string>(), rest = worker(kind,{activeTimeMs:0,valveActive:false,bridgeRise:0,reducedMotion:false});
+        let blinkSamples=0;
+        for (let activeTimeMs=0;activeTimeMs<3600;activeTimeMs+=20) {
+            const pose=worker(kind,{activeTimeMs,valveActive:false,bridgeRise:0,reducedMotion:false});
+            frames.add(signature(pose));
+            const changed=[...new Set([...pose.keys(),...rest.keys()])].filter(key=>pose.get(key)!==rest.get(key));
+            if(changed.length===1&&changed[0]==='6,-19')blinkSamples++;
+        }
+        assert.ok(frames.size>=7, `${kind}: preparation, work and recovery need separate silhouettes`);
+        assert.equal(blinkSamples,4,`${kind}: eyelid closes for 80 ms per work cycle, with no other body change`);
+    }
+});
+
+test('ascent workers use the object clock and watch their own platform without changing it', () => {
+    const objects = new WorldObjects(guairaAscentStage().mechanisms);
+    const paint = (time: number, reduced = false) => {
+        const r=raster(), before=JSON.stringify(objects);
+        drawGuairaAscentObjects(r.c,objects,440,168,time,reduced);
+        assert.equal(JSON.stringify(objects),before);assert.ok(r.balanced());
+        return new Map([...r.pixels].filter(([key])=>{const[x,y]=key.split(',').map(Number);return x>=123&&x<147&&y>=98&&y<127;}));
+    };
+    objects.time=0; const rest=signature(paint(0)), reduced=signature(paint(0,true));
+    objects.time=1700;
+    assert.notEqual(signature(paint(0)),rest,'the inspector writes while the lift is at the service level');
+    assert.equal(signature(paint(9e9)),signature(paint(0)),'an unrelated render clock cannot animate the worker');
+    assert.equal(signature(paint(0,true)),reduced);
+    const lift=objects.get('guaira-service-lift')!;lift.y=lift.to!.y;
+    const watching=signature(paint(0));assert.notEqual(watching,rest,'gaze follows the real raised lift');
+    objects.time=6400;assert.equal(signature(paint(0)),watching,'watching holds steady while the lift is away');
+    lift.y=lift.home!.y;assert.notEqual(signature(paint(0)),watching,'returning lift releases the work pose');
+});
+
+test('rice stays rooted, connected and stable under camera translation throughout the breeze', () => {
+    const shapes=new Set<string>();
+    for(const worldX of [8,21,44,94,608,831]) for(const variant of [0,1,2]) for(const time of [0,1200,4600,8900]) {
+        const draw=(x:number,y:number)=>{const r=raster();drawGuairaRicePlant(r.c,x,y,time,worldX,variant,18);return r.pixels;};
+        const pixels=draw(0,0), shifted=draw(-17,31);shapes.add(signature(pixels));
+        for(const [key,color]of pixels){const[x,y]=key.split(',').map(Number);assert.ok(x>=-10&&x<=10&&y>=-20&&y<0);assert.equal(shifted.get(`${x-17},${y+31}`),color);}
+        for(let x=-1;x<3;x++)assert.equal(pixels.get(`${x},-1`),'#587c53','every sway keeps the same planted base');
+        const reached=new Set<string>(),pending=['0,-1'];
+        while(pending.length){const key=pending.pop()!;if(reached.has(key)||!pixels.has(key))continue;reached.add(key);const[x,y]=key.split(',').map(Number);for(const dx of [-1,0,1])for(const dy of [-1,0,1])if(dx||dy)pending.push(`${x+dx},${y+dy}`);}
+        assert.equal(reached.size,pixels.size,'grain and leaves cannot detach from their rooted stalk');
+    }
+    assert.ok(shapes.size>=12,'the field has varied mature and young silhouettes');
 });
 
 test('wind-pump sails progress through distinct poses while tower and axle stay fixed', () => {

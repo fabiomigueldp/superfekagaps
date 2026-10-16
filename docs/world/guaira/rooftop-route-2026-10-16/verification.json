@@ -1,0 +1,135 @@
+{
+  "passed": true,
+  "tests": 1080,
+  "failures": 0,
+  "newTests": 51,
+  "build": true,
+  "nativeInputOnly": true,
+  "sourceHashes": {
+    "GuairaAscent.ts": {
+      "before": "0875110372a77026fd1ebe95832979e3ee38a0beb9b93ef1522f00e911fd8195",
+      "after": "29760200e06c10133fbfdaa0a7441363c4f2eded5ea5a1a9bfc9045b6ca754fb"
+    },
+    "GuairaAscentArt.ts": {
+      "before": "148dce4bdc9b05905b7b75e0ed86841f3ef5216747bc39a028a129d355c81bf4",
+      "after": "13cb64f94b945e9d914528461d0682b5b7fd0435fc04d48bc91c680428c73337"
+    }
+  },
+  "completedBrowserScenes": 8,
+  "browserErrors": [],
+  "review": {
+    "widths": [
+      {
+        "width": 1440,
+        "scroll": 1440,
+        "overflow": false
+      },
+      {
+        "width": 844,
+        "scroll": 844,
+        "overflow": false
+      },
+      {
+        "width": 390,
+        "scroll": 390,
+        "overflow": false
+      },
+      {
+        "width": 320,
+        "scroll": 320,
+        "overflow": false
+      }
+    ],
+    "videos": [
+      {
+        "src": "http://localhost:3000/docs/world/guaira/rooftop-route-2026-10-16/roof.mp4",
+        "width": 960,
+        "height": 540,
+        "time": 0.118243,
+        "duration": 15.133333
+      },
+      {
+        "src": "http://localhost:3000/docs/world/guaira/rooftop-route-2026-10-16/lift.mp4",
+        "width": 960,
+        "height": 540,
+        "time": 0.107682,
+        "duration": 22.266667
+      }
+    ],
+    "links": [
+      {
+        "href": "http://localhost:3000/?chapter=guaira",
+        "status": 200
+      },
+      {
+        "href": "http://localhost:3000/docs/world/guaira/rooftop-route-2026-10-16/index.html#partida",
+        "status": 200
+      },
+      {
+        "href": "http://localhost:3000/docs/world/guaira/chapter-readability-2026-10-16/index.html",
+        "status": 200
+      },
+      {
+        "href": "http://localhost:3000/docs/world/guaira/rooftop-route-2026-10-16/README.md",
+        "status": 200
+      },
+      {
+        "href": "http://localhost:3000/docs/world/guaira/rooftop-route-2026-10-16/native-verification.json",
+        "status": 200
+      },
+      {
+        "href": "http://localhost:3000/docs/world/guaira/rooftop-route-2026-10-16/browser-verification.json",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  "assets": {
+    "choice-after.png": {
+      "sha256": "85a28af8b04ee95e98ec9112c59bf4516e0d6db123611795ceb9c3ad77b3b55a",
+      "bytes": 8016
+    },
+    "choice-before.png": {
+      "sha256": "7df82c037d7158a49002364d84bd77c86fd8f3979611e31a2f5370a5a39e843b",
+      "bytes": 6617
+    },
+    "lift-poster.png": {
+      "sha256": "7ba93afeaceca72ae2a0af4500b729907948778f7881892edf7f883929f042a7",
+      "bytes": 7903
+    },
+    "lift-sheet.png": {
+      "sha256": "ff5a20f99d7452025106d150f03b420616a41d43f1b8d13e5c2501958c956ccb",
+      "bytes": 58060
+    },
+    "lift.mp4": {
+      "sha256": "1afc3f8e8fbe3aa765405b7b9d4e22f9ca568890f0047d0c8d87459f23a4a006",
+      "bytes": 1587038
+    },
+    "roof-488.png": {
+      "sha256": "159d036cfba97a77396c13b26295beec63fcc1348144d0a37edbdad7d2d86737",
+      "bytes": 7750
+    },
+    "roof-548.png": {
+      "sha256": "d1a2861df0e246aaab6f69912dbdd1e3a7dcb1b20288e4b617fc66caa33a345b",
+      "bytes": 7515
+    },
+    "roof-580.png": {
+      "sha256": "c920502a2aa4be0262117b4956e3889b74475de10046e68ce3bd86a4235030d0",
+      "bytes": 5089
+    },
+    "roof-sheet.png": {
+      "sha256": "22eef319a19f0e3f9233ae35352b08f160fd70aef24ae36c552ecf76d1a88746",
+      "bytes": 52451
+    },
+    "roof.mp4": {
+      "sha256": "82d252baf9d7c104dbf8b4913530e9f8927651bf67ebdbd1d9c76abf7bf51366",
+      "bytes": 1305685
+    }
+  },
+  "limitations": [
+    "No external-player playtest",
+    "Touch input is simulated, not a physical-device test",
+    "Openings mounted for inspection; later entries use normal map travel"
+  ]
+}

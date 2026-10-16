@@ -1,0 +1,150 @@
+{
+  "date": "2026-10-16",
+  "scope": "Production art of the Prefeito encounter; model, timings and collision contours unchanged",
+  "tests": {
+    "passed": 1132,
+    "failed": 0,
+    "command": "node --import tsx --test --test-reporter=tap (rg --files tests -g guaira-*.test.ts)",
+    "logHash": "a5f214d5edf954cfc9bf3295dd49bcda3fd9d8bd4adba19445880e12513e8ada"
+  },
+  "build": {
+    "passed": true,
+    "command": "npm run build",
+    "logHash": "55e0149f63d26eb669cacacfc29b806078a11e1e8f0121588cee622009d1c144"
+  },
+  "comparison": {
+    "frames": 1885,
+    "eventsAndPositionsIdentical": true,
+    "hitFrames": [
+      407,
+      1004,
+      1701
+    ],
+    "combatModelAndWaterGeometryUnchanged": true,
+    "damagedFrames": 0
+  },
+  "routes": {
+    "upper": {
+      "frames": 1822,
+      "hitFrames": [
+        407,
+        941,
+        1638
+      ],
+      "damage": 0,
+      "minHead": 27,
+      "finished": true
+    },
+    "wait": {
+      "frames": 1882,
+      "hitFrames": [
+        407,
+        1001,
+        1698
+      ],
+      "damage": 0,
+      "minHead": 27,
+      "finished": true
+    },
+    "ground": {
+      "frames": 1885,
+      "hitFrames": [
+        407,
+        1004,
+        1701
+      ],
+      "damage": 0,
+      "minHead": 27,
+      "finished": true
+    },
+    "interrupt": {
+      "frames": 1255,
+      "hitFrames": [
+        407,
+        690,
+        1063
+      ],
+      "damage": 0,
+      "minHead": 27,
+      "finished": true
+    }
+  },
+  "browser": {
+    "standalone": 4,
+    "chapterScenes": 8,
+    "reviewViewports": [
+      1440,
+      390
+    ],
+    "videosDecodedPerViewport": 2,
+    "pageErrors": 0,
+    "physicalTouchDevice": false
+  },
+  "renderProfile": {
+    "environment": "Headless Edge on this Windows workspace; CPU submission time for update+render, not a physical-device FPS measurement",
+    "checks": [
+      {
+        "reduced": false,
+        "samples": 1825,
+        "medianMs": 2.2000000178813934,
+        "p95Ms": 3.9000000059604645,
+        "maxMs": 16.700000017881393,
+        "finished": true,
+        "helmet": true,
+        "pausePixelsEqual": true
+      },
+      {
+        "reduced": true,
+        "samples": 1825,
+        "medianMs": 1.5999999940395355,
+        "p95Ms": 3.300000011920929,
+        "maxMs": 13.600000023841858,
+        "finished": true,
+        "helmet": true,
+        "pausePixelsEqual": true
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  "sourceHashes": {
+    "src/adventure/experimental/guaira/GuairaMayorArt.ts": "0ed7c4cc501a926be9fd2d65471b76495a9113be10db6bd6ee853bd9b4378cee",
+    "src/adventure/experimental/guaira/GuairaMayorArenaArt.ts": "696710e4f2d6ae13be624c4b53a41869daebb904ec11a2c6a1300d04537502c6",
+    "src/adventure/experimental/guaira/GuairaMayorTownArt.ts": "54719386f32dbab7f8ebc2ca2b5ab6f5ea442d0e25eb4de998cbfee2865ef7bc",
+    "src/adventure/experimental/guaira/GuairaMayorLab.ts": "7b15d1daca93b93a36430e86a01b452e2131926da987e0a6f8547c867dfcb7da",
+    "src/adventure/experimental/guaira/GuairaMayorModel.ts": "c06d00df3fc4990ea43c9d87312ba3d0ede0a8848342adb1761768ee3358edb4",
+    "src/adventure/experimental/guaira/GuairaMayorWater.ts": "d836d61d9ed88ea4a1b86409d3c1a7e7e57ca886e2cf8e77066c41742efe213f",
+    "tests/guaira-mayor-pressure-art.test.ts": "fb907ea7af1748bbf1d998a9531657323dddaf1fc6022877dc4185d640fa75f7",
+    "scripts/prove_guaira_mayor_art_poses.ts": "0f103eb47f1139adbccdd70d46bc6a3deae5250d377e3b66d3d7815b9ee5ea15",
+    "scripts/prove_guaira_mayor_rework.ts": "9b0c85c77f2c8faa9a8226f3ffaa1bc2592e88f4b49a57c67c25384747966da0",
+    "scripts/verify_guaira_mayor_rework.cjs": "372a8ee23cac73e5f0813ee69a7d03061428f34fce94a1f20731a07cea7e12bc",
+    "tests/helpers/guairaMayorGroundReplay.json": "340d74617354a023aadb1f6efe948cb25c4593626d2293b59071e1e4a481a136",
+    "tests/helpers/guairaMayorInterruptReplay.json": "a2db75cc53c341823d74d578959e314a33c85f86f16077702e15bf0d644f8f1b"
+  },
+  "artifacts": {
+    "overview.png": {
+      "sha256": "52ace03a7e58645218e204c378883d7fb9bbfde6b1a71fa907114dc6c373a88d",
+      "bytes": 12856
+    },
+    "before.png": {
+      "sha256": "db3908617fceba3177f11e5eece75449deb8f5b5f018d8d796c7e04a31633660",
+      "bytes": 9730
+    },
+    "poses.png": {
+      "sha256": "7392645d6a36cef8c737b797896ae56cf1a82f62ef54bdaf38f4ae2b41e6a24f",
+      "bytes": 12685
+    },
+    "combat-atlas.png": {
+      "sha256": "ca5623aa24af2e7847f27707bf01c1e802b63543de9d2b533a8f79bf688e10d0",
+      "bytes": 96144
+    },
+    "after.mp4": {
+      "sha256": "bdec903bf597c1578962536b55629514b39fffab96cfda5318d98dbb5cdb5e62",
+      "bytes": 3127155
+    },
+    "before.mp4": {
+      "sha256": "4b41571421eb2e98e1f2b16576d1a356f0ad118506271caf580ccaae48ccbc1f",
+      "bytes": 2621578
+    }
+  }
+}

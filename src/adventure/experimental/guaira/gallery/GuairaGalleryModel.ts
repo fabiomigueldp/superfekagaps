@@ -20,6 +20,7 @@ export function galleryReceivingY(x: number, feet: number): number {
     const progress = (value: number, start: number, end: number) => Math.max(0, Math.min(1, (value - start) / (end - start)));
     // The short one-way shelves do not cover the rightmost lid tile. An edge
     // opening previews the actual lower floor instead of promising a missed shelf.
+    if (x >= G.cacheStart && x < G.serviceEnd && feet >= G.cacheY - 28) return G.cacheFloor;
     if (x < 224) return G.firstLandingY + 48 * Math.max(progress(x,176,192), progress(feet,208,240));
     if (x < 384) return G.galleryY + 48 * progress(x,320,368);
     if (x < 448) return G.secondLandingY + 48 * Math.max(progress(x,400,416), progress(feet,304,336));

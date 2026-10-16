@@ -75,14 +75,39 @@ export function drawGuairaRiceFlow(c: CanvasRenderingContext2D, x: number, y: nu
     });
 }
 
+/** Surface currents converge on the basin's front throat, then descend into the gate.
+ * Only the local valve draws water; a filled but closed basin remains still. */
+export function drawGuairaReservoirFlow(c: CanvasRenderingContext2D, x: number, y: number,
+    flowing: boolean, time: number, reducedMotion: boolean) {
+    if (!flowing) return;
+    const t=clock(time,reducedMotion), drift=Math.floor(t/200)%22;
+    for (const [row,inset] of [[7,14],[11,23]]) for (const side of [-1,1]) {
+        const centre=x+42, left=side<0?x+inset:centre, right=side<0?centre:x+84-inset;
+        waterWindow(c,left,y+row,right-left,1,(_left,top)=>{
+            for (let offset=-22; offset<66; offset+=22) {
+                const distance=offset-drift;
+                r(c,side<0?centre-distance-4:centre+distance,top,4,1,'#beddd0');
+            }
+        });
+    }
+    const fall=Math.floor(t/140)%13;
+    waterWindow(c,x+35,y+13,14,13,(left,top)=>{
+        for (let offset=-13; offset<26; offset+=13) {
+            r(c,left+4,top+offset+fall,5,1,'#b5d7c8');
+            r(c,left+6,top+offset+fall+1,2,2,'#8bbfb6');
+        }
+    });
+}
+
 /** Vertical threads descend within the existing spill; geometry follows the real gate. */
 export function drawGuairaSluiceFlow(c: CanvasRenderingContext2D, x: number, spillY: number, bottomY: number,
-    wet: boolean, time: number, reducedMotion: boolean) {
+    wet: boolean, time: number, reducedMotion: boolean, flowOriginY = spillY) {
     if (!wet) return;
     const drift = Math.floor(clock(time, reducedMotion) / 90) % 19;
     waterWindow(c, x + 17, spillY, 18, bottomY - spillY, (left, top, _w, height) => {
-        for (let offset = -19; offset < height + 19; offset += 19) {
-            const yy = top + offset + drift;
+        const origin = Math.round(flowOriginY);
+        const first = origin + Math.floor((top-origin)/19)*19-19;
+        for (let yy = first+drift; yy < top+height+19; yy += 19) {
             r(c, left + 6, yy, 5, 1, '#a6d6c8');
             r(c, left + 8, yy + 1, 2, 2, '#85c6c1');
             r(c, left + 1, yy + 9, 1, 4, '#8bcec7');
@@ -97,12 +122,33 @@ export function drawGuairaPoolFlow(c: CanvasRenderingContext2D, left: number, ri
     if (!wet) return;
     const drift = Math.floor(clock(time, reducedMotion) / 240) % 27;
     const source = Math.round(Math.max(left, Math.min(right, sourceX)));
-    // Same 9px marks, color and y+3 line as the authored pool. Clip each half separately.
+    // Mirrored fronts originate at the falling stream, not at the pool's left edge.
     for (const direction of [-1, 1] as const) {
         const from = direction < 0 ? left : source, to = direction < 0 ? source : right;
         waterWindow(c, from, y + 3, to - from, 1, (_x, top) => {
-            for (let offset = 6 - 27; offset < right - left + 27; offset += 27)
-                r(c, left + offset + direction * drift, top, 9, 1, '#b0dcce');
+            for (let offset = -27; offset < right - left + 27; offset += 27) {
+                const distance=offset+drift;
+                r(c, direction<0 ? source-distance-9 : source+distance, top, 9, 1, '#b0dcce');
+            }
         });
     }
+}
+
+/** A small, opaque turbulence patch joins the vertical sheet to the receiving water.
+ * Six overlapping poses spread outward, settle, and blend back into the next ripple. */
+export function drawGuairaSluiceImpact(c: CanvasRenderingContext2D, left: number, right: number, y: number,
+    sourceX: number, wet: boolean, time: number, reducedMotion: boolean) {
+    if (!wet) return;
+    const phase=Math.floor(clock(time,reducedMotion)/120)%6;
+    const spread=[0,1,2,2,1,0][phase], source=Math.round(sourceX);
+    waterWindow(c,left,y,right-left,4,(_x,top)=>{
+        r(c,source-10-spread,top,20+spread*2,1,'#8bcec7');
+        r(c,source-7,top+1,14,2,'#a8d6c5');
+        for (const side of [-1,1]) {
+            const distance=4+phase*2;
+            r(c,side<0?source-distance-3:source+distance,top+1+(phase>3?1:0),3,1,
+                phase<4?'#c2dfcb':'#85c6c1');
+        }
+        r(c,source-2,top,4,1,'#d0e5cf');
+    });
 }

@@ -1,0 +1,391 @@
+{
+  "beforeHashes": {
+    "GuairaJunction.ts": "fe5f6ac6a8bbf0d082aaf90c33b4172fa8e327f4563fdc475e10d7be5da2c7af",
+    "GuairaJunctionModel.ts": "6a31437e58b11f3f9261f426c04ed96663e6fa7e486fb04cfac26d6d6c952f9f",
+    "GuairaJunctionArt.ts": "f8dc82486b63fd81f6313615bcc3e03ce11879383a64e4b7f2abb570b3b736f5",
+    "GuairaJunctionHardwareArt.ts": "389ceacc797351a71787e703c26b76a4f9c3009f5413d723527c88067004634e"
+  },
+  "currentHashes": {
+    "GuairaJunction.ts": "9eb0f99abec6fd87fdece939b4bdb822cfe026490e1605fbef77260be9653456",
+    "GuairaJunctionModel.ts": "f25f50ea7d1e77389eea90c7c43d5a76bc70c8badcb7a23fe907b53820fefcba",
+    "GuairaJunctionArt.ts": "16d818a47de5efc2ce64e88ca7092c6dd2785347304c4206c2f0fc4b4189b0af",
+    "GuairaJunctionHardwareArt.ts": "d6d83b10dc66e2c801d0bb9cd67190cdb6c557ac304feffb1aee02bddb9cf68e"
+  },
+  "comparisons": [
+    {
+      "name": "guardada",
+      "version": "before",
+      "authoredPose": true,
+      "camera": [
+        384,
+        232
+      ],
+      "playerFeet": [
+        552,
+        400
+      ],
+      "time": 0,
+      "steps": []
+    },
+    {
+      "name": "abrindo",
+      "version": "before",
+      "authoredPose": true,
+      "camera": [
+        384,
+        232
+      ],
+      "playerFeet": [
+        552,
+        400
+      ],
+      "time": 6783.333333333368,
+      "steps": []
+    },
+    {
+      "name": "aberta",
+      "version": "before",
+      "authoredPose": true,
+      "camera": [
+        384,
+        232
+      ],
+      "playerFeet": [
+        552,
+        400
+      ],
+      "time": 7983.333333333389,
+      "steps": []
+    },
+    {
+      "name": "guardada",
+      "version": "after",
+      "authoredPose": true,
+      "camera": [
+        384,
+        232
+      ],
+      "playerFeet": [
+        552,
+        400
+      ],
+      "time": 0,
+      "steps": [
+        {
+          "id": "junction-return-upper",
+          "y": 264,
+          "active": false
+        },
+        {
+          "id": "junction-return-lower",
+          "y": 264,
+          "active": false
+        }
+      ]
+    },
+    {
+      "name": "abrindo",
+      "version": "after",
+      "authoredPose": true,
+      "camera": [
+        384,
+        232
+      ],
+      "playerFeet": [
+        552,
+        400
+      ],
+      "time": 6783.333333333368,
+      "steps": [
+        {
+          "id": "junction-return-upper",
+          "y": 289.6666666666672,
+          "active": true
+        },
+        {
+          "id": "junction-return-lower",
+          "y": 289.6666666666672,
+          "active": true
+        }
+      ]
+    },
+    {
+      "name": "aberta",
+      "version": "after",
+      "authoredPose": true,
+      "camera": [
+        384,
+        232
+      ],
+      "playerFeet": [
+        552,
+        400
+      ],
+      "time": 7983.333333333389,
+      "steps": [
+        {
+          "id": "junction-return-upper",
+          "y": 304,
+          "active": true
+        },
+        {
+          "id": "junction-return-lower",
+          "y": 336,
+          "active": true
+        }
+      ]
+    }
+  ],
+  "records": [
+    {
+      "route": "direct",
+      "updates": 1409,
+      "images": 353,
+      "fps": 15,
+      "completeAt": 1382,
+      "floorAt": 835,
+      "returnAt": 1153,
+      "recoverySeconds": 5.3,
+      "minimumX": 491.16903025157455,
+      "minHelmetTop": 44,
+      "maxFeet": 168,
+      "used": [
+        "junction-return-lower",
+        "junction-return-upper"
+      ],
+      "coins": 0,
+      "damage": false,
+      "complete": true,
+      "nativeInput": true,
+      "manualPoseOrClockChanges": false,
+      "renderPure": true,
+      "milestones": {
+        "yard": {
+          "frame": 1014,
+          "x": 558.9197116293154,
+          "feet": 400,
+          "camera": {
+            "x": 424.58637227397014,
+            "y": 232,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 960,
+              "minY": 0,
+              "maxY": 448
+            }
+          },
+          "coins": 0
+        },
+        "lower": {
+          "frame": 1074,
+          "x": 538.1943709404449,
+          "feet": 336,
+          "camera": {
+            "x": 413.1730885729645,
+            "y": 222.4800000000002,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 960,
+              "minY": 0,
+              "maxY": 448
+            }
+          },
+          "coins": 0
+        },
+        "upper": {
+          "frame": 1113,
+          "x": 494.1942446076324,
+          "feet": 304,
+          "camera": {
+            "x": 362.97047699804256,
+            "y": 190.4800000000001,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 960,
+              "minY": 0,
+              "maxY": 448
+            }
+          },
+          "coins": 0
+        },
+        "return": {
+          "frame": 1153,
+          "x": 491.16903025157455,
+          "feet": 256,
+          "camera": {
+            "x": 366.1121758519486,
+            "y": 145.12000000000012,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 960,
+              "minY": 0,
+              "maxY": 448
+            }
+          },
+          "coins": 0
+        },
+        "complete": {
+          "frame": 1382,
+          "x": 880.5768958922688,
+          "feet": 208,
+          "camera": {
+            "x": 639.9980378753318,
+            "y": 75.11184529036683,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 960,
+              "minY": 0,
+              "maxY": 448
+            }
+          },
+          "coins": 0
+        }
+      }
+    },
+    {
+      "route": "optional",
+      "updates": 2356,
+      "images": 589,
+      "fps": 15,
+      "completeAt": 2329,
+      "floorAt": 1778,
+      "returnAt": 2100,
+      "recoverySeconds": 5.366666666666666,
+      "minimumX": 491.11834887383384,
+      "minHelmetTop": 44,
+      "maxFeet": 168,
+      "used": [
+        "junction-return-lower",
+        "junction-return-upper"
+      ],
+      "coins": 3,
+      "damage": false,
+      "complete": true,
+      "nativeInput": true,
+      "manualPoseOrClockChanges": false,
+      "renderPure": true,
+      "milestones": {
+        "yard": {
+          "frame": 1961,
+          "x": 558.8690302515747,
+          "feet": 400,
+          "camera": {
+            "x": 424.5356909146307,
+            "y": 232,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 960,
+              "minY": 0,
+              "maxY": 448
+            }
+          },
+          "coins": 3
+        },
+        "lower": {
+          "frame": 2021,
+          "x": 538.1436895627041,
+          "feet": 336,
+          "camera": {
+            "x": 413.1224071952323,
+            "y": 222.4800000000002,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 960,
+              "minY": 0,
+              "maxY": 448
+            }
+          },
+          "coins": 3
+        },
+        "upper": {
+          "frame": 2060,
+          "x": 494.1435632298917,
+          "feet": 304,
+          "camera": {
+            "x": 362.9197956203019,
+            "y": 190.4800000000001,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 960,
+              "minY": 0,
+              "maxY": 448
+            }
+          },
+          "coins": 3
+        },
+        "return": {
+          "frame": 2100,
+          "x": 491.11834887383384,
+          "feet": 256,
+          "camera": {
+            "x": 366.0614944742079,
+            "y": 145.12000000000012,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 960,
+              "minY": 0,
+              "maxY": 448
+            }
+          },
+          "coins": 3
+        },
+        "complete": {
+          "frame": 2329,
+          "x": 880.526214514528,
+          "feet": 208,
+          "camera": {
+            "x": 639.9980312891234,
+            "y": 75.11184529036683,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 960,
+              "minY": 0,
+              "maxY": 448
+            }
+          },
+          "coins": 3
+        }
+      }
+    }
+  ]
+}

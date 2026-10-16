@@ -1,0 +1,184 @@
+{
+  "beforeHashes": {
+    "GuairaRelief.ts": "7907e7fd592f74adbcf8858b85fa42ba4d58b83e87a0c77c9377b00d7aefba59",
+    "GuairaReliefStage.ts": "c4dcc71cd9f4cdd8469018f09355e88d46fc57ac0b1780bfe011ed90b65d8aa1",
+    "GuairaReliefArt.ts": "2aad817852dddf8e96be74a5f88ee83b5ecb8327a268492e515ce2eb71de9370",
+    "GuairaInspectionRooms.ts": "aeeb75a3cb5b1544cf4dd4173d642bf18de93ab60a3768585d91e928917625fe"
+  },
+  "currentHashes": {
+    "GuairaRelief.ts": "1389206547036b06a0d432bff3ae03a0207603602536474432a37b888d11c879",
+    "GuairaReliefStage.ts": "2fbfa517ed5661a7a395dd977da20348fbb0e34546fd56936d75538088c64625",
+    "GuairaReliefArt.ts": "95e778629730df05d39b2499619ed1468a5ed097374cd7a98fab96c691ad2453",
+    "GuairaInspectionRooms.ts": "31f327d86febd663f55cbacefa1f5e09de4fa7f114e76de66e23d88d18dd56ef"
+  },
+  "comparisons": [
+    {
+      "view": "tampa",
+      "before": true,
+      "nativeUpdates": 171,
+      "player": {
+        "x": 172.0506813777407,
+        "y": 200
+      },
+      "feet": 224,
+      "camera": {
+        "x": 107.25056625591431,
+        "y": 168
+      },
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "view": "coletor",
+      "before": true,
+      "nativeUpdates": 227,
+      "player": {
+        "x": 229.07602206661105,
+        "y": 136
+      },
+      "feet": 160,
+      "camera": {
+        "x": 164.27528610718173,
+        "y": 104
+      },
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "view": "passarela",
+      "before": true,
+      "nativeUpdates": 309,
+      "player": {
+        "x": 338.10136275548143,
+        "y": 312
+      },
+      "feet": 336,
+      "camera": {
+        "x": 273.28490203239573,
+        "y": 176
+      },
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "view": "tampa",
+      "before": false,
+      "nativeUpdates": 171,
+      "player": {
+        "x": 172.0506813777407,
+        "y": 200
+      },
+      "feet": 224,
+      "camera": {
+        "x": 107.25056625591431,
+        "y": 108.00074917047381
+      },
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "view": "coletor",
+      "before": false,
+      "nativeUpdates": 227,
+      "player": {
+        "x": 229.07602206661105,
+        "y": 136
+      },
+      "feet": 160,
+      "camera": {
+        "x": 164.27528610718173,
+        "y": 60.00115522367177
+      },
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "view": "passarela",
+      "before": false,
+      "nativeUpdates": 309,
+      "player": {
+        "x": 338.10136275548143,
+        "y": 136
+      },
+      "feet": 160,
+      "camera": {
+        "x": 273.28490203239573,
+        "y": 56.00079867026274
+      },
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false
+    }
+  ],
+  "replays": [
+    {
+      "key": "high",
+      "updates": 613,
+      "completedAt": 590,
+      "seconds": 9.833333333333334,
+      "videoFrames": 154,
+      "videoFps": 15,
+      "coins": 5,
+      "complete": true,
+      "damage": false,
+      "reliefOpened": false,
+      "checkpoint": 0,
+      "contacts": {
+        "160": 216,
+        "224": 22,
+        "256": 48,
+        "288": 10,
+        "336": 93
+      },
+      "pickups": {
+        "relief-maintenance-0": 74,
+        "relief-maintenance-1": 150,
+        "relief-maintenance-2": 204,
+        "relief-maintenance-3": 281,
+        "relief-maintenance-4": 472
+      },
+      "liveWaterFrames": 82,
+      "minHelmetTop": 26,
+      "maxFeet": 168,
+      "maxCameraStep": 6.700000000000003,
+      "maxHorizontalStep": 3.4758945250409283,
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false,
+      "renderPure": true
+    },
+    {
+      "key": "opened",
+      "updates": 601,
+      "completedAt": 574,
+      "seconds": 9.566666666666666,
+      "videoFrames": 151,
+      "videoFps": 15,
+      "coins": 5,
+      "complete": true,
+      "damage": false,
+      "reliefOpened": true,
+      "checkpoint": 0,
+      "contacts": {
+        "160": 160,
+        "224": 27,
+        "256": 49,
+        "288": 10,
+        "336": 97
+      },
+      "pickups": {
+        "relief-maintenance-0": 74,
+        "relief-maintenance-1": 150,
+        "relief-maintenance-2": 204,
+        "relief-maintenance-3": 356,
+        "relief-maintenance-4": 452
+      },
+      "liveWaterFrames": 41,
+      "minHelmetTop": 26,
+      "maxFeet": 168,
+      "maxCameraStep": 6.700000000000003,
+      "maxHorizontalStep": 3.4488533818608857,
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false,
+      "renderPure": true
+    }
+  ]
+}

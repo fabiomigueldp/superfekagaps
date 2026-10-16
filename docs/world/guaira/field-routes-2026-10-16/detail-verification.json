@@ -1,0 +1,225 @@
+{
+  "beforeHashes": {
+    "GuairaTraversal.ts": "b605bb186d3aabf4a10bcfbfecb622e9f66ef9f78f4815e158856e3b874b4d78",
+    "GuairaTraversalArt.ts": "6fa2df306c35c08ddb60c45f66a404042ced5bfb100b2908db17164f532e96c1",
+    "GuairaRespiros.ts": "c13d7be716dfd1786620ca0ecc7a5dc271a23e4795ee569897b16fbcfe1e1d8a",
+    "GuairaRespirosStage.ts": "4fec6ad92fffdce9df5697edef230ee867b6b461af62d5fbd3fe62e751eec791",
+    "GuairaRespirosArt.ts": "ccb4ea7e76db7092cdacb52562586d366a9e50847232bfe2241cdcdeccc72d26"
+  },
+  "currentHashes": {
+    "GuairaTraversal.ts": "cbea971663a7cee9e99bb854a832a03def30e4fa2307447440b9a43605bbd05b",
+    "GuairaTraversalArt.ts": "694fbca9775ecdc9387ab67ed1b90899bb1033289c329262b667df57d315cd72",
+    "GuairaRespiros.ts": "8339fe7b4692bf7b7b9ac82d7ffb297480cb149b8b26ddc378fefe8a637ee4cb",
+    "GuairaRespirosStage.ts": "a2ec706e1d3c2cca778bb75d3af612c1f018a5c9f603553b21c7f95579b143f5",
+    "GuairaRespirosArt.ts": "37ca99f79ce415b2821d290b5b141db36ca37d2a8da72ea251d00c6d8015208d"
+  },
+  "comparisons": [
+    {
+      "view": "comporta",
+      "before": true,
+      "nativeUpdates": 275,
+      "player": {
+        "x": 370.47991223846697,
+        "y": 200
+      },
+      "feet": 224,
+      "camera": {
+        "x": 245.47991224158696,
+        "y": 91.99999997591843
+      },
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "view": "arrozal",
+      "before": true,
+      "nativeUpdates": 429,
+      "player": {
+        "x": 758.0212600857902,
+        "y": 184
+      },
+      "feet": 208,
+      "camera": {
+        "x": 637.3248679888,
+        "y": 73.55759801218618
+      },
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "view": "comporta",
+      "before": false,
+      "nativeUpdates": 275,
+      "player": {
+        "x": 370.47991223846697,
+        "y": 200
+      },
+      "feet": 224,
+      "camera": {
+        "x": 334.4799122355374,
+        "y": 60
+      },
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "view": "arrozal",
+      "before": false,
+      "nativeUpdates": 429,
+      "player": {
+        "x": 758.0212600857902,
+        "y": 184
+      },
+      "feet": 208,
+      "camera": {
+        "x": 674.9508723583091,
+        "y": 91.05293051755716
+      },
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "view": "oficina",
+      "before": true,
+      "nativeUpdates": 701,
+      "player": {
+        "x": 677.1267034443524,
+        "y": 168
+      },
+      "feet": 192,
+      "camera": {
+        "x": 629.1258114152711,
+        "y": 132
+      },
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "view": "mirante",
+      "before": true,
+      "nativeUpdates": 820,
+      "player": {
+        "x": 825.1773848220935,
+        "y": 280
+      },
+      "feet": 304,
+      "camera": {
+        "x": 776.3639328913641,
+        "y": 132
+      },
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "view": "oficina",
+      "before": false,
+      "nativeUpdates": 701,
+      "player": {
+        "x": 677.1267034443524,
+        "y": 168
+      },
+      "feet": 192,
+      "camera": {
+        "x": 629.1258114152711,
+        "y": 79.99613436457244
+      },
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "view": "mirante",
+      "before": false,
+      "nativeUpdates": 820,
+      "player": {
+        "x": 825.1773848220935,
+        "y": 216
+      },
+      "feet": 240,
+      "camera": {
+        "x": 776.3639328913641,
+        "y": 143.9940554093453
+      },
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false
+    }
+  ],
+  "replays": [
+    {
+      "key": "travessia",
+      "updates": 1078,
+      "completedAt": 1021,
+      "seconds": 17.016666666666666,
+      "videoFrames": 270,
+      "videoFps": 15,
+      "coins": 14,
+      "complete": true,
+      "damage": false,
+      "checkpoint": 2,
+      "contacts": {
+        "192": 104,
+        "208": 14,
+        "224": 639,
+        "240": 24,
+        "256": 121
+      },
+      "pickups": {
+        "guaira-travessia:coin:0": 20,
+        "guaira-travessia:coin:1": 52,
+        "guaira-travessia:coin:2": 107,
+        "guaira-travessia:coin:3": 301,
+        "guaira-travessia:coin:4": 320,
+        "guaira-travessia:coin:5": 338,
+        "guaira-travessia:coin:9": 447,
+        "guaira-travessia:coin:10": 485,
+        "guaira-travessia:coin:11": 578,
+        "guaira-travessia:coin:12": 709,
+        "guaira-travessia:coin:13": 885,
+        "guaira-travessia:coin:14": 912,
+        "guaira-travessia:coin:15": 972,
+        "guaira-travessia:coin:16": 1006
+      },
+      "minHelmetTop": 26,
+      "maxFeet": 164.01467144002288,
+      "maxCameraStep": 5.760000000000005,
+      "maxHorizontalStep": 5.907965153966927,
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false,
+      "renderPure": true
+    },
+    {
+      "key": "respiros",
+      "updates": 1134,
+      "completedAt": 1114,
+      "seconds": 18.566666666666666,
+      "videoFrames": 284,
+      "videoFps": 15,
+      "coins": 7,
+      "complete": true,
+      "damage": false,
+      "checkpoint": 1,
+      "contacts": {
+        "160": 27,
+        "192": 41,
+        "240": 70,
+        "288": 20,
+        "304": 770
+      },
+      "pickups": {
+        "respiros-shelf-a": 487,
+        "respiros-shelf-b": 487,
+        "respiros-service-step": 554,
+        "respiros-service-a": 606,
+        "respiros-service-b": 628,
+        "respiros-inspection": 737,
+        "respiros-overlook": 788
+      },
+      "minHelmetTop": 26,
+      "maxFeet": 160.00001543609795,
+      "maxCameraStep": 6.700000000000003,
+      "maxHorizontalStep": 1.9999999050254473,
+      "nativeInputOnly": true,
+      "manualPoseOrClockChanges": false,
+      "renderPure": true
+    }
+  ]
+}

@@ -1,0 +1,182 @@
+{
+  "date": "2026-10-16",
+  "scope": "Guaíra final boss: high/low crosscurrent volleys, register interrupts, native art and controls",
+  "tests": {
+    "passed": 1130,
+    "failed": 0,
+    "newTests": 18,
+    "focusedBossTests": 126
+  },
+  "build": {
+    "passed": true,
+    "validators": [
+      "levels",
+      "player assets",
+      "world",
+      "application TypeScript",
+      "tools TypeScript",
+      "Vite"
+    ]
+  },
+  "native": {
+    "routes": [
+      {
+        "name": "upper",
+        "frames": 1822,
+        "hits": [
+          407,
+          941,
+          1638
+        ],
+        "damage": 0,
+        "minHead": 27
+      },
+      {
+        "name": "wait",
+        "frames": 1882,
+        "hits": [
+          407,
+          1001,
+          1698
+        ],
+        "damage": 0,
+        "minHead": 27
+      },
+      {
+        "name": "ground",
+        "frames": 1885,
+        "hits": [
+          407,
+          1004,
+          1701
+        ],
+        "damage": 0,
+        "minHead": 27
+      },
+      {
+        "name": "interrupt",
+        "frames": 1255,
+        "hits": [
+          407,
+          690,
+          1063
+        ],
+        "damage": 0,
+        "minHead": 27
+      }
+    ],
+    "captureFps": 60,
+    "actorOrClockEdits": false
+  },
+  "browser": {
+    "passed": true,
+    "chapterScenes": 8,
+    "mainReceipts": 5,
+    "openingMountedForInspection": true,
+    "subsequentTravel": "ordinary map walking and scene entries",
+    "standaloneRoutes": [
+      {
+        "route": "guairaMayorGroundReplay",
+        "touch": false,
+        "reduced": false,
+        "finished": true,
+        "frames": 1885,
+        "minHead": 27
+      },
+      {
+        "route": "guairaMayorGroundReplay",
+        "touch": true,
+        "reduced": true,
+        "finished": true,
+        "frames": 1885,
+        "minHead": 27
+      },
+      {
+        "route": "guairaMayorInterruptReplay",
+        "touch": false,
+        "reduced": false,
+        "finished": true,
+        "frames": 1255,
+        "minHead": 27
+      },
+      {
+        "route": "guairaMayorInterruptReplay",
+        "touch": true,
+        "reduced": true,
+        "finished": true,
+        "frames": 1255,
+        "minHead": 27
+      }
+    ],
+    "reviewViewports": [
+      1440,
+      390
+    ],
+    "videoMetadataCount": 5,
+    "allVideoDecode": true,
+    "pauseAndRetry": true,
+    "errors": []
+  },
+  "sourceHashes": {
+    "GuairaMayorModel.ts": "c06d00df3fc4990ea43c9d87312ba3d0ede0a8848342adb1761768ee3358edb4",
+    "GuairaMayorLab.ts": "500bb41ffc1121114a235ad8a17ebca5ac2fbe1bb6d0ee2ccc81c93c3bf2bc7f",
+    "GuairaMayorArt.ts": "0aec5dbfbbf6802615b25418b7c16cca4b302188a19b059a2ea4d4edbc90f4b6",
+    "GuairaMayorArenaArt.ts": "1471d30b740be345e5f08e5482f77888559dc9930a44043cda3b27179196c1e0",
+    "GuairaMayorWater.ts": "d836d61d9ed88ea4a1b86409d3c1a7e7e57ca886e2cf8e77066c41742efe213f"
+  },
+  "inputHashes": {
+    "guairaMayorReplay.json": "9a47df8d892dfe832e35dae10ed70a4925a5867a8039ec2cbc679efb516ea5fa",
+    "guairaMayorJumpPulseReplay.json": "c84de77acd81fa0c9b67f7450fd0020154b1736ccfe6c56235814d08037b349a",
+    "guairaMayorGroundReplay.json": "340d74617354a023aadb1f6efe948cb25c4593626d2293b59071e1e4a481a136",
+    "guairaMayorInterruptReplay.json": "a2db75cc53c341823d74d578959e314a33c85f86f16077702e15bf0d644f8f1b",
+    "guairaMayorFailureReplay.json": "cfa35426016427b817d1537428d5d033c9d7ca9035350b7e4666857b503107ac"
+  },
+  "media": {
+    "before.mp4": {
+      "bytes": 1960751,
+      "sha256": "eab260195f09c4df20d7301869ad6ddfa7641e26145566fb4a30e78538f6a71c"
+    },
+    "combat-atlas.png": {
+      "bytes": 75980,
+      "sha256": "33efa78839b94a95c1837aeca9deeca991f68089468993c31162d78e85a37353"
+    },
+    "ground-650.png": {
+      "bytes": 10020,
+      "sha256": "3458c3bb7d0b65a0befa4f24620f15035be1279bad868e1fd3236572d13c9e7b"
+    },
+    "ground.mp4": {
+      "bytes": 2767972,
+      "sha256": "933625dcd848f7db2858d1564318005ac6e480114940af993464ef0d5e7e1ad2"
+    },
+    "interrupt-553.png": {
+      "bytes": 7207,
+      "sha256": "052d9236023cbce6e3b11b8f993fd68a51b34940a5b443978fa5fccc13a5e89e"
+    },
+    "interrupt-571.png": {
+      "bytes": 9435,
+      "sha256": "be0047471cc88dc76824cd6f789a39181e7529381cb08a4f1508a1fb9ca1b113"
+    },
+    "interrupt-875.png": {
+      "bytes": 9680,
+      "sha256": "65cf3a56e85fc1bf5516b9cd08e3479c5f92b9a359cc7ddd4ba267870bc5c30d"
+    },
+    "interrupt.mp4": {
+      "bytes": 1854338,
+      "sha256": "3fe2cfa5013be6f52ad309f1ad64aac34fba85ba20457b97cc2c7d06c22d9335"
+    },
+    "upper.mp4": {
+      "bytes": 2965817,
+      "sha256": "38875166b75d51969ae2674505906ef55f64ed06979408dc56d7d6536826b8e8"
+    },
+    "wait.mp4": {
+      "bytes": 2937720,
+      "sha256": "b02e0f7bc5ce8c04ea3b63bfdaf277d6d74487ba64d1cc032a7625d885e64412"
+    }
+  },
+  "limits": [
+    "Rehearsed routes, not independent player discovery or difficulty testing.",
+    "Touch uses real DOM control events simulated in Edge, not a physical device.",
+    "Audio timing and lifecycle verified; no listening-based mix evaluation.",
+    "Review videos have no audio."
+  ]
+}

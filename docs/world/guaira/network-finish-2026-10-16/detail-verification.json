@@ -1,0 +1,284 @@
+{
+  "hashes": {
+    "GuairaJunctionArt": "de6bbb1a3cc3b012c62fa45460fd681409a158a9fbfbadcb8548cb9b91f49caa",
+    "GuairaJunctionHardwareArt": "617139ef0bb590a7ffc08311a7b9526f605b9b20186a7a6f3bf8a3286b563a2a",
+    "GuairaPipeArt": "a478c02a8fbbafa73417de54c4ee2693f084eb3e31681cc05e27b74453f89e60",
+    "GuairaRespirosArt": "a53f0908558d2bed6abda5e5c28697b553f57c9de8da6cc01baf216234367eda",
+    "GuairaReliefArt": "a113f1c6b4ef9e652628aabc00fdd461b295c1c4c3d0a80db88a5646764ab026",
+    "GuairaGalleryArt": "851abf6c85e3723bd3623e3314f963a5ba1531ece4d92f9acb0b2e8ce9e373aa",
+    "GuairaAscentArt": "2717e079303294a9006e57a45d0f49168fa19e305ebf755d38da70d3a6d1c456",
+    "GuairaMayorArenaArt": "8ed258ff0252406e97476e01e6286876968e6c6e9ab0c5c1b6736c65bd02f80c",
+    "GuairaAscent": "2ed9314e3da4d4c8892151f7811c3935666e88764303ea442ee2bdf88b53436b",
+    "GuairaMayorLab": "cbc64d1af99cf6ca5d6fca604d3399091a80e425689dd58735286edf8c27d422"
+  },
+  "currentHashes": {
+    "GuairaJunctionArt": "f8dc82486b63fd81f6313615bcc3e03ce11879383a64e4b7f2abb570b3b736f5",
+    "GuairaJunctionHardwareArt": "389ceacc797351a71787e703c26b76a4f9c3009f5413d723527c88067004634e",
+    "GuairaPipeArt": "485225b76a09164d9957e58ca7516cf2a6f0feebae3c367bbc91b210aa49f02a",
+    "GuairaRespirosArt": "9bf0762d7752079e10c0b7d52758ef6b95bbab074599d408823061f1f49e0543",
+    "GuairaReliefArt": "9532476cdf236fb98a6722c26be0244183a21f42e3de5af3140d7e5919383c12",
+    "GuairaGalleryArt": "851abf6c85e3723bd3623e3314f963a5ba1531ece4d92f9acb0b2e8ce9e373aa",
+    "GuairaAscentArt": "b2e5e55eb1878b841a440f866d2476105bfc7038d8fb8b0c5814ed7d32a9a27c",
+    "GuairaMayorArenaArt": "a99c7ec94824698dd2f6f8328d847c51e245dc5589bc03b92714be9bb21e6a00",
+    "GuairaAscent": "b4129a7a84473ae76438ba5717f371138127f674725dd17098ab57eb7d310a93",
+    "GuairaMayorLab": "9b9de4d094be7dc60e923f8a3e875558f4a4c135ddb5b4fe7919940606ddd976"
+  },
+  "snapshots": [
+    {
+      "key": "patio-entrada",
+      "cx": 0,
+      "cy": 168,
+      "x": 170,
+      "feet": 304,
+      "time": 1400,
+      "supply": "a",
+      "stage": "patio",
+      "authoredPose": true,
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedBackgroundStable": true
+    },
+    {
+      "key": "patio-apoios",
+      "cx": 300,
+      "cy": 128,
+      "x": 432,
+      "feet": 256,
+      "time": 1600,
+      "supply": "b",
+      "stage": "patio",
+      "authoredPose": true,
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedBackgroundStable": true
+    },
+    {
+      "key": "patio-curva",
+      "cx": 500,
+      "cy": 128,
+      "x": 700,
+      "feet": 208,
+      "time": 1600,
+      "supply": "b",
+      "stage": "patio",
+      "authoredPose": true,
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedBackgroundStable": true
+    },
+    {
+      "key": "respiros-estacao",
+      "cx": 0,
+      "cy": 144,
+      "x": 120,
+      "feet": 304,
+      "time": 1400,
+      "stage": "respiros",
+      "authoredPose": true,
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedBackgroundStable": true
+    },
+    {
+      "key": "respiros-arrozais",
+      "cx": 320,
+      "cy": 144,
+      "x": 350,
+      "feet": 304,
+      "time": 900,
+      "stage": "respiros",
+      "authoredPose": true,
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedBackgroundStable": true
+    },
+    {
+      "key": "alivio-fechado",
+      "cx": 200,
+      "cy": 176,
+      "x": 352,
+      "feet": 336,
+      "time": 1500,
+      "stage": "alivio",
+      "authoredPose": true,
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedBackgroundStable": true
+    },
+    {
+      "key": "alivio-retorno",
+      "cx": 200,
+      "cy": 176,
+      "x": 352,
+      "feet": 336,
+      "time": 1500,
+      "open": true,
+      "stage": "alivio",
+      "authoredPose": true,
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedBackgroundStable": true
+    },
+    {
+      "key": "alivio-coletor",
+      "cx": 112,
+      "cy": 96,
+      "x": 230,
+      "feet": 160,
+      "time": 3000,
+      "open": true,
+      "stage": "alivio",
+      "authoredPose": true,
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedBackgroundStable": true
+    },
+    {
+      "key": "subida-inspecao",
+      "cx": 824,
+      "cy": 80,
+      "x": 960,
+      "feet": 240,
+      "time": 1400,
+      "stage": "subida",
+      "authoredPose": true,
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedBackgroundStable": true
+    },
+    {
+      "key": "subida-reserva",
+      "cx": 1024,
+      "cy": 0,
+      "x": 1250,
+      "feet": 144,
+      "time": 1400,
+      "stage": "subida",
+      "authoredPose": true,
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedBackgroundStable": true
+    },
+    {
+      "key": "prefeito-lacrado",
+      "cx": 0,
+      "cy": 64,
+      "x": 48,
+      "feet": 224,
+      "time": 1400,
+      "stage": "prefeito",
+      "authoredPose": true,
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedBackgroundStable": true
+    },
+    {
+      "key": "prefeito-aberto",
+      "cx": 0,
+      "cy": 64,
+      "x": 48,
+      "feet": 224,
+      "time": 1400,
+      "open": true,
+      "stage": "prefeito",
+      "authoredPose": true,
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedBackgroundStable": true
+    }
+  ],
+  "motion": [
+    {
+      "stage": "patio",
+      "authored": true,
+      "fps": 30,
+      "frames": 126
+    },
+    {
+      "stage": "respiros",
+      "authored": true,
+      "fps": 30,
+      "frames": 126
+    },
+    {
+      "stage": "alivio",
+      "authored": true,
+      "fps": 30,
+      "frames": 126
+    },
+    {
+      "stage": "subida",
+      "authored": true,
+      "fps": 30,
+      "frames": 126
+    },
+    {
+      "stage": "prefeito",
+      "authored": true,
+      "fps": 30,
+      "frames": 126
+    }
+  ],
+  "replays": [
+    {
+      "key": "patio",
+      "updates": 893,
+      "images": 224,
+      "fps": 15,
+      "complete": true,
+      "damage": false,
+      "nativeArtRestored": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "key": "respiros",
+      "updates": 877,
+      "images": 220,
+      "fps": 15,
+      "complete": true,
+      "damage": false,
+      "nativeArtRestored": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "key": "alivio-abertura",
+      "updates": 504,
+      "images": 126,
+      "fps": 15,
+      "complete": true,
+      "damage": false,
+      "nativeArtRestored": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "key": "alivio-intervalo",
+      "updates": 364,
+      "images": 91,
+      "fps": 15,
+      "complete": true,
+      "damage": false,
+      "nativeArtRestored": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "key": "subida",
+      "updates": 1339,
+      "images": 335,
+      "fps": 15,
+      "complete": true,
+      "damage": false,
+      "nativeArtRestored": true,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "key": "prefeito",
+      "updates": 1112,
+      "images": 278,
+      "fps": 15,
+      "complete": true,
+      "damage": false,
+      "nativeArtRestored": true,
+      "manualPoseOrClockChanges": false
+    }
+  ]
+}

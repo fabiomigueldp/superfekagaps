@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { SkeletonBullModel, BULL_RULES } from '../src/adventure/experimental/guaira/SkeletonBullModel';
-import { drawSkeletonBull } from '../src/adventure/experimental/guaira/SkeletonBullArt';
+import { drawSkeletonBull, BULL_PALETTE } from '../src/adventure/experimental/guaira/SkeletonBullArt';
 import { bullChargeWarningRange, drawBullWarning } from '../src/adventure/experimental/guaira/GuairaLabArt';
 
 function recorder() {
@@ -69,4 +69,24 @@ test('pause repeats the same pose and reduced motion is stable between opening-c
         b.stateTick = state === 'recover' ? 8 : 35; b.tick += 100;
         drawSkeletonBull(later.c, b, true); assert.deepEqual(start.calls, later.calls);
     }
+});
+
+test('gallop moves through intermediate poses with bounded hoof travel, including the cycle seam', () => {
+    const b = new SkeletonBullModel(); b.state = 'charge';
+    const strides = new Set<string>(); let previous: number[][] | undefined;
+    for (let tick = 0; tick <= 18; tick++) {
+        b.stateTick = tick;
+        const r = recorder(); drawSkeletonBull(r.c, b);
+        const feet = r.calls.filter(c => c[0] === BULL_PALETTE.horn && Number(c[2]) > 20 && c[3] === 6 && c[4] === 4)
+            .map(c => [Number(c[1]), Number(c[2])]);
+        assert.equal(feet.length, 4);
+        assert.ok(feet.every(([, y]) => y >= 26 && y <= 30), 'hooves lift from the original floor without sinking');
+        if (previous) feet.forEach(([x,y], i) => {
+            assert.ok(Math.abs(x - previous![i][0]) <= 3, 'no skipped horizontal leg pose');
+            assert.ok(Math.abs(y - previous![i][1]) <= 2, 'no vertical foot snap');
+        });
+        if (tick < 18) strides.add(JSON.stringify(r.calls));
+        previous = feet;
+    }
+    assert.ok(strides.size >= 16, 'the renderer must use the simulation ticks between the six key poses');
 });

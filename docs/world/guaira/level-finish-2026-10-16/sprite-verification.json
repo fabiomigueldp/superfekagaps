@@ -1,0 +1,17 @@
+{
+  "kind": "production-painters-authored-inspection",
+  "baseline": "ea82c8e8e4f8a3550955f5aefa72c8798ebbb004",
+  "gameplayVictory": false,
+  "spriteScale": "integer-nearest-neighbor",
+  "gallopFPS": 60,
+  "gallopTicks": 180,
+  "gallopPoses": {
+    "before": 6,
+    "after": 18
+  },
+  "blinkFPS": 30,
+  "blinkSimulationTicks": 600,
+  "oldBlinkTicks": 120,
+  "newBlinkTicks": 6,
+  "simulationMutatedByPainting": false
+}

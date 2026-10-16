@@ -1,0 +1,127 @@
+{
+  "images": [
+    {
+      "src": "patio-base-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "patio-base-after.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "patio-rede-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "patio-rede-after.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "patio-curva-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "patio-curva-after.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "respiros-carga-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "respiros-carga-after.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "respiros-jato-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "respiros-jato-after.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "respiros-queda-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "respiros-queda-after.png",
+      "w": 320,
+      "h": 180
+    }
+  ],
+  "media": [
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/hydraulics-polish-2026-10-16/respiros-motion.mp4",
+      "w": 1280,
+      "h": 384,
+      "seconds": 4.2
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/hydraulics-polish-2026-10-16/patio-percurso.mp4",
+      "w": 960,
+      "h": 540,
+      "seconds": 14.933333
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/hydraulics-polish-2026-10-16/respiros-percurso.mp4",
+      "w": 960,
+      "h": 540,
+      "seconds": 14.666667
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/hydraulics-polish-2026-10-16/respiros-motion-mobile.mp4",
+      "w": 640,
+      "h": 768,
+      "seconds": 4.2
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/hydraulics-polish-2026-10-16/respiros-motion-mobile.mp4",
+      "w": 640,
+      "h": 768,
+      "seconds": 4.2
+    }
+  ],
+  "viewports": [
+    {
+      "width": 1440,
+      "scrollWidth": 1440,
+      "flow": {
+        "src": "http://127.0.0.1:3000/docs/world/guaira/hydraulics-polish-2026-10-16/respiros-motion.mp4",
+        "width": 1280,
+        "height": 384
+      }
+    },
+    {
+      "width": 390,
+      "scrollWidth": 390,
+      "flow": {
+        "src": "http://127.0.0.1:3000/docs/world/guaira/hydraulics-polish-2026-10-16/respiros-motion-mobile.mp4",
+        "width": 640,
+        "height": 768
+      }
+    },
+    {
+      "width": 320,
+      "scrollWidth": 320,
+      "flow": {
+        "src": "http://127.0.0.1:3000/docs/world/guaira/hydraulics-polish-2026-10-16/respiros-motion-mobile.mp4",
+        "width": 640,
+        "height": 768
+      }
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

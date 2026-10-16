@@ -1,0 +1,111 @@
+{
+  "date": "2026-10-16",
+  "scope": "Final Guaíra boss: native encounter, arena, animation and pressure combat",
+  "tests": {
+    "passed": 1112,
+    "failed": 0,
+    "newTests": 32,
+    "focusedBossTests": 108
+  },
+  "build": {
+    "passed": true,
+    "validators": [
+      "levels",
+      "player assets",
+      "world",
+      "application TypeScript",
+      "tools TypeScript",
+      "Vite"
+    ]
+  },
+  "native": {
+    "routes": [
+      {
+        "name": "upper",
+        "frames": 1426,
+        "hits": [
+          407,
+          773,
+          1242
+        ],
+        "damage": 0,
+        "minHead": 27
+      },
+      {
+        "name": "wait",
+        "frames": 1486,
+        "hits": [
+          407,
+          833,
+          1302
+        ],
+        "damage": 0,
+        "minHead": 27
+      },
+      {
+        "name": "ground",
+        "frames": 1489,
+        "hits": [
+          407,
+          836,
+          1305
+        ],
+        "damage": 0,
+        "minHead": 27
+      }
+    ],
+    "captureFps": 60,
+    "actorOrClockEdits": false
+  },
+  "browser": {
+    "passed": true,
+    "chapterScenes": 8,
+    "mainReceipts": 5,
+    "openingMountedForInspection": true,
+    "subsequentTravel": "ordinary map walking and scene entries",
+    "errors": [],
+    "bossKeyboard": true,
+    "bossDomTouchSimulated": true,
+    "reducedMotion": true,
+    "pauseAndRetry": true,
+    "reviewViewports": [
+      1440,
+      390
+    ],
+    "videoDecode": true
+  },
+  "sourceHashes": {
+    "GuairaMayorModel.ts": "1a4d4816bf0c1ae3b8f5d3b1f9def399d5d0549a2a7d5410905e264c67bab3eb",
+    "GuairaMayorLab.ts": "d2641f6336a0c264cafc384b77ffb8da2e20b85b8feb69eb6bfbe9281436ad52",
+    "GuairaMayorArt.ts": "403f6a201b37fc7cf2155a0fab0f76c961667128c38b6517a5ddc57cf442e665",
+    "GuairaMayorArenaArt.ts": "06a84ff13041bdcdddfb643b373e943ca325aeffdcaa8fd3cdc499154df435c6",
+    "GuairaMayorWater.ts": "7d5c14572a631a0ffca89f5e5517ca0a0cf29114b1afb1bd2949f3a405f7d5ab"
+  },
+  "media": {
+    "ground.mp4": {
+      "bytes": 2116356,
+      "sha256": "17a60fb7c43f4d03b56ffd5f15158b45ad9b078a3d1d1e96fb8faf129b82397b"
+    },
+    "upper.mp4": {
+      "bytes": 1960751,
+      "sha256": "eab260195f09c4df20d7301869ad6ddfa7641e26145566fb4a30e78538f6a71c"
+    },
+    "wait.mp4": {
+      "bytes": 1976921,
+      "sha256": "7d06f091a3b6f72669f3c4e4a1f67fc182675f0ae5b22f454de27e04dd637ab2"
+    },
+    "before.mp4": {
+      "bytes": 1402237,
+      "sha256": "450e282278c855a399fd8df4018b30e5c6d433b94c8c182510830354c3787314"
+    },
+    "combat-atlas.png": {
+      "bytes": 74159,
+      "sha256": "4d0970458e7a4709140905d8cd405bfd01ab17c6fe5fe6c72cc56c7a3e8994d9"
+    }
+  },
+  "limitations": [
+    "No external playtest or physical touch device session.",
+    "Videos are rehearsed routes, without audio; their duration does not estimate a first attempt.",
+    "Audio checks validate event timing and cancellation, not listening quality."
+  ]
+}

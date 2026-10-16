@@ -1,0 +1,171 @@
+{
+  "date": "2026-10-16",
+  "scope": "Guaíra Prefeito: announced phrase variants after missed openings, bounded late lift approach, body/pipe/seal feedback and planted impact feet/tools",
+  "tests": {
+    "passed": 1146,
+    "failed": 0,
+    "newCases": 14,
+    "command": "node --import tsx --test --test-reporter=tap (rg --files tests -g guaira-*.test.ts)",
+    "logHash": "3ad2a97e4f4d1d482bb973c8dff3c39878e626eed27e3231117bf650dde56172"
+  },
+  "build": {
+    "passed": true,
+    "command": "npm run build",
+    "logHash": "9bdc2aadc8c495581ad300aeef8a3ec5fe68e20ad81177043330efcb41c7f6f2"
+  },
+  "routes": {
+    "upper": {
+      "frames": 1822,
+      "hitFrames": [
+        407,
+        941,
+        1638
+      ],
+      "damagedFrames": 0,
+      "finished": true,
+      "minHead": 27
+    },
+    "wait": {
+      "frames": 1882,
+      "hitFrames": [
+        407,
+        1001,
+        1698
+      ],
+      "damagedFrames": 0,
+      "finished": true,
+      "minHead": 27
+    },
+    "ground": {
+      "frames": 1885,
+      "hitFrames": [
+        407,
+        1004,
+        1701
+      ],
+      "damagedFrames": 0,
+      "finished": true,
+      "minHead": 27
+    },
+    "interrupt": {
+      "frames": 1255,
+      "hitFrames": [
+        407,
+        690,
+        1063
+      ],
+      "damagedFrames": 0,
+      "finished": true,
+      "minHead": 27
+    },
+    "retry": {
+      "frames": 2660,
+      "hitFrames": [
+        407,
+        1779,
+        2476
+      ],
+      "damagedFrames": 0,
+      "finished": true,
+      "minHead": 27
+    }
+  },
+  "previousSuccessfulHitFramesPreserved": true,
+  "lateOpening": {
+    "nativeInputOnly": true,
+    "registerFrame": 1589,
+    "previousDeadlineFrame": 1598,
+    "actualLiftReadyFrame": 1659,
+    "minimumUsefulTicks": 144,
+    "seamActiveFrame": 1719,
+    "hitFrame": 1779,
+    "waitIsDeliberateProofInput": true
+  },
+  "failure": {
+    "helmetLostFrame": 935,
+    "deathFrame": 1204,
+    "remainingSeals": 2,
+    "completionReceipt": false,
+    "keyboardAndTouchChapterJourney": true
+  },
+  "browser": {
+    "standaloneRuns": 6,
+    "chapterScenes": 8,
+    "reviewViewports": [
+      1440,
+      390
+    ],
+    "videosDecodedPerViewport": 2,
+    "pageErrors": 0,
+    "physicalTouchDevice": false
+  },
+  "pause": {
+    "checks": 8,
+    "activeInterruptSealReleaseFeedback": true,
+    "normalAndReduced": true,
+    "updatesPerCheck": 90,
+    "allPixelsAndStateFrozen": true
+  },
+  "atlas": {
+    "cells": 24,
+    "exactPixelCopies": true
+  },
+  "limits": [
+    "Rehearsed native input paths, not blind player usability/difficulty assessment",
+    "Headless Edge and simulated touch, not a physical mobile-device performance measurement",
+    "Videos contain no audio"
+  ],
+  "sourceHashes": {
+    "src/adventure/experimental/guaira/GuairaMayorModel.ts": "5414417165ad2e9670bb57074dad10f61173cd0ce0f06d5f66c95b420cc9fd10",
+    "src/adventure/experimental/guaira/GuairaMayorArt.ts": "a3e1eeecc9f379cb7b75717759d169dda9ef0b56a1b17738cf55d336afac220f",
+    "src/adventure/experimental/guaira/GuairaMayorFeedbackArt.ts": "f448791c7dedb4d643ca6a4b8507e53e242b09c6a29372a76877c409d516b13b",
+    "src/adventure/experimental/guaira/GuairaMayorLab.ts": "8787ec4cbb1ce92d2ac39d7f97c1ca8e16de6f44b944cda41ba03f1336c9525f",
+    "src/adventure/experimental/guaira/GuairaMayorArenaArt.ts": "696710e4f2d6ae13be624c4b53a41869daebb904ec11a2c6a1300d04537502c6",
+    "src/adventure/experimental/guaira/GuairaMayorTownArt.ts": "54719386f32dbab7f8ebc2ca2b5ab6f5ea442d0e25eb4de998cbfee2865ef7bc",
+    "src/adventure/experimental/guaira/GuairaMayorWater.ts": "d836d61d9ed88ea4a1b86409d3c1a7e7e57ca886e2cf8e77066c41742efe213f",
+    "tests/guaira-mayor-rhythm.test.ts": "ac79eb4ab4bac536ed708056c5094a28ddb8e678a94678b2f4bbefdcd3408e5e",
+    "tests/guaira-mayor-anticipation.test.ts": "20f87456d375022a2748e5149141034f39c2cbde33f806dbcacf47df21bfec0c",
+    "tests/guaira-mayor-counterpressure.test.ts": "64c79fdbdd988625757f1f838c6a76aeb3872ddad0e4b46c26f0c8cfc0017b70",
+    "tests/guaira-mayor-cues.test.ts": "f967353b802f3d5055bffe67d61ee4e6f485c6305eaeec8e2728d7a100968523",
+    "tests/guaira-mayor.test.ts": "6ce757cc6b5729956177021ff5035625b69253cf28f467fda114ddac639af1b4",
+    "tests/guaira-chapter-native-journey.test.ts": "be1da7019a74555a50ba0e844f4ff38924840de2078c3bf24171a9a94c9d7f2a",
+    "tests/helpers/guairaMayorFailureReplay.json": "d38590320ecce8ca586162d6a8afe5847b29dce34594b9e5064a0087df94661c",
+    "tests/helpers/guairaMayorRetryReplay.json": "98cd5acfed84a294bd8c0b27baf68f65b06afa318ac7fbc198e4408d133a2e4f",
+    "scripts/prove_guaira_mayor_rework.ts": "2f1f41fc5c5d44aec640cab8d2cf17e3e8719a0d1bbc4ee727d75049fbd2d37a",
+    "scripts/verify_guaira_mayor_rework.cjs": "934f6b15ebe3b3b3275fa59ab04da918c8d4ef8d121c4bec5dbc635014e2558f"
+  },
+  "artifacts": {
+    "overview.png": {
+      "sha256": "7f44562e794ae7541931fd876bbe6f471b42cd04555b0bec1c1952f25328225f",
+      "bytes": 13285
+    },
+    "before.png": {
+      "sha256": "8c13fb7a22cb3d169b38b6556860c58001eb7fa51cce12a3e29976c2d1aad7ce",
+      "bytes": 13094
+    },
+    "late-opening.png": {
+      "sha256": "028458b82cd57029995f60ff9703a898bd4adb214edf49977f379148378f4018",
+      "bytes": 13336
+    },
+    "seal-response.png": {
+      "sha256": "f8dc7eb61dbb6a14a0cd0b0f17fcc62bc6109047c77345b95f5748e8c6d69101",
+      "bytes": 12635
+    },
+    "public-flow.png": {
+      "sha256": "e56ef9bd774e2db531b8a03c1d798cc341d97e26d3db16ddfe9bd91a82c0baa3",
+      "bytes": 12275
+    },
+    "retry-atlas.png": {
+      "sha256": "570a1c53676554e15c6761953210695edb95217f4fc9ab9bdd252f2b4b9ab309",
+      "bytes": 88633
+    },
+    "interrupt.mp4": {
+      "sha256": "87a5c137cef83bffcf9740133ed5538987de927ce193ad6c6e8907e54bb9beb6",
+      "bytes": 2107096
+    },
+    "retry.mp4": {
+      "sha256": "ca3a3b48f9d776d7f7a3ef7f2d6f9f131623d1abf95d53363113c4088a16542f",
+      "bytes": 3811787
+    }
+  }
+}

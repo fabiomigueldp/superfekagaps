@@ -1,0 +1,230 @@
+import type { Rect } from '../../../types';
+import { mayorStampWater, mayorWaveWater, mayorJetWater } from './GuairaMayorWater';
+
+/** Local arena, using the game's ordinary Player, supports and switches. */
+export const MAYOR_ARENA = Object.freeze({
+    id: 'guaira-prefeito', width: 320, height: 288, floor: 224, deckY: 160,
+    valveId: 'guaira-mayor-register', liftId: 'guaira-mayor-lift', deckId: 'guaira-mayor-deck',
+    upperValveId: 'guaira-mayor-upper-register', refugeId: 'guaira-mayor-refuge',
+    valve: Object.freeze({ x: 64, y: 216, width: 32, height: 8 }),
+    upperValve: Object.freeze({ x: 232, y: 152, width: 28, height: 8 }),
+    refuge: Object.freeze({ x: 16, y: 176, width: 32, height: 8 }),
+    lift: Object.freeze({ x: 112, y: 224, width: 112, height: 8 }),
+    deck: Object.freeze({ x: 224, y: 160, width: 92, height: 8 }),
+    vent: Object.freeze({ x: 112, y: 204, width: 112, height: 20 }),
+    seam: Object.freeze({ x: 208, y: 140, width: 32, height: 20 })
+});
+export const MAYOR_RULES = Object.freeze({ tickMs: 1000 / 60, intro: 72, idle: 30, warning: 60,
+    leap: 32, secondWarning: 42, secondLeap: 28, stamp: 24, returning: 42,
+    recover: 210, hurt: 54, seals: 3, counterpressureWarning: 60, counterpressureActive: 24,
+    jetWarning: 46, jetBeat: 38, finalJetWarning: 42, finalJetBeat: 34 });
+export type MayorState = 'intro' | 'idle' | 'jetWarning' | 'jetBurst' | 'warning' | 'leap' | 'stamp' | 'returning' | 'recover' | 'hurt' | 'released';
+export interface MayorCounterpressure {
+    readonly phase: 'warning' | 'active'; readonly rect: Readonly<Rect>;
+    readonly ticksRemaining: number; readonly progress: number;
+}
+export interface MayorWave extends Rect { readonly direction: -1 | 1; readonly age: number }
+export interface MayorSalvo {
+    readonly phase: 'warning' | 'active'; readonly lane: 'high' | 'low'; readonly direction: -1 | 1;
+    readonly rect: Readonly<Rect>; readonly shot: number; readonly total: number; readonly progress: number;
+}
+export interface MayorAccess { valveActive: boolean; liftReady: boolean; registerOpened: boolean; player?: Readonly<Rect> }
+export interface MayorEvent { kind: 'warning' | 'jetWarning' | 'jet' | 'interrupt' | 'stamp' | 'waves' | 'drain' | 'hit' | 'released'; tick: number }
+export const mayorOverlaps = (a: Rect, b: Rect) => a.x < b.x + b.width && a.x + a.width > b.x &&
+    a.y < b.y + b.height && a.y + a.height > b.y;
+
+/** One fixed clock drives the tells, physical travel, collision and painted effects. */
+export class GuairaMayorModel implements Rect {
+    x = 264; y = 120; readonly width = 28; readonly height = 40;
+    facing: -1 | 1 = -1;
+    state: MayorState = 'intro'; stateTick = 0; tick = 0; cycle = 0; strike = 1;
+    sealsRemaining: number = MAYOR_RULES.seals;
+    stampTarget: Readonly<Rect> = Object.freeze({ ...MAYOR_ARENA.vent });
+    events: MayorEvent[] = [];
+    private liveWaves: MayorWave[] = [];
+    private liveJets: MayorWave[] = [];
+    private jetIndex = 0;
+    private interrupted = false;
+    private from = { x: 264, y: 120 };
+    private remainder = 0;
+    private freshOpening = false;
+    private accessReady = false;
+    private valveActive = false;
+    private pressurePhase: MayorCounterpressure['phase'] | null = null;
+    private pressureTick = 0;
+    private pressureSpent = false;
+    get opening(): Readonly<Rect> { return Object.freeze({ x: this.x + 10, y: this.y, width: 14, height: 6 }); }
+    get phaseNumber() { return MAYOR_RULES.seals + 1 - this.sealsRemaining; }
+    get finalStrike() { return this.phaseNumber < 3 || this.strike === 2; }
+    get canInterrupt() { return this.state === 'jetBurst' || this.state === 'jetWarning' && this.jetIndex > 0; }
+    get canOpenRegister() { return this.canInterrupt || this.finalStrike && ['stamp', 'returning', 'recover'].includes(this.state); }
+    get pressureInterrupted() { return this.interrupted; }
+    get publicWaterOpen() { return this.state === 'released'; }
+    get registerOpenedThisCycle() { return this.freshOpening; }
+    get accessRequested() { return this.freshOpening && this.valveActive; }
+    get vulnerable() { return this.state === 'recover' && this.freshOpening && this.accessReady; }
+    get recoveryProgress() { return this.state === 'recover' ? Math.min(1, this.stateTick / MAYOR_RULES.recover) : 0; }
+    get warningDuration() { return this.strike === 2 ? MAYOR_RULES.secondWarning : MAYOR_RULES.warning; }
+    get leapDuration() { return this.strike === 2 ? MAYOR_RULES.secondLeap : MAYOR_RULES.leap; }
+    get warningProgress() { return Math.min(1, this.stateTick / this.warningDuration); }
+    get motionProgress() { return Math.min(1, this.stateTick / (this.state === 'returning' ? MAYOR_RULES.returning : this.leapDuration)); }
+    get waveWarning() { return this.phaseNumber >= 2 && this.finalStrike && ['warning', 'leap', 'stamp'].includes(this.state); }
+    get waves(): readonly Readonly<MayorWave>[] { return this.liveWaves.map(w => Object.freeze({ ...w })); }
+    get jets(): readonly Readonly<MayorWave>[] { return this.liveJets.map(j => Object.freeze({ ...j })); }
+    get jetWarningDuration() { return this.phaseNumber >= 3 ? MAYOR_RULES.finalJetWarning : MAYOR_RULES.jetWarning; }
+    get jetBeatDuration() { return this.phaseNumber >= 3 ? MAYOR_RULES.finalJetBeat : MAYOR_RULES.jetBeat; }
+    get salvo(): Readonly<MayorSalvo> | null {
+        if (this.state !== 'jetWarning' && this.state !== 'jetBurst') return null;
+        // The second seal teaches high/right then low/left. The last reverses
+        // that rhythm and ends with a low packet from the opposite side.
+        const high = this.jetIndex === (this.phaseNumber >= 3 ? 1 : 0);
+        const direction = high || this.jetIndex === 2 ? -1 : 1;
+        return Object.freeze({ phase: this.state === 'jetWarning' ? 'warning' : 'active',
+            lane: high ? 'high' : 'low', direction, shot: this.jetIndex + 1, total: this.phaseNumber >= 3 ? 3 : 2,
+            rect: Object.freeze({ x: 8, y: high ? 144 : 208, width: 304, height: 16 }),
+            progress: Math.min(1, this.stateTick / (this.state === 'jetWarning' ? this.jetWarningDuration : this.jetBeatDuration)) });
+    }
+    get counterpressure(): Readonly<MayorCounterpressure> | null {
+        if (!this.pressurePhase) return null;
+        const duration = this.pressurePhase === 'warning' ? MAYOR_RULES.counterpressureWarning : MAYOR_RULES.counterpressureActive;
+        return Object.freeze({ phase: this.pressurePhase, rect: MAYOR_ARENA.seam,
+            ticksRemaining: duration - this.pressureTick, progress: this.pressureTick / duration });
+    }
+    /** Bounding footprint for the tell; actual contact uses the water contours below. */
+    get danger(): Readonly<Rect> | null {
+        return this.state === 'stamp' ? this.stampTarget : this.pressurePhase === 'active' ? MAYOR_ARENA.seam : null;
+    }
+    get dangers(): readonly Readonly<Rect>[] {
+        return [...(this.state === 'stamp' ? mayorStampWater(this.stampTarget) : this.danger ? [this.danger] : []),
+            ...this.waves.flatMap(mayorWaveWater), ...this.jets.flatMap(mayorJetWater)];
+    }
+    cancelCounterpressure() { this.pressurePhase = null; this.pressureTick = 0; this.pressureSpent = true; }
+    cancelAttacks() { this.cancelCounterpressure(); this.liveWaves = []; this.liveJets = []; }
+    private enter(state: MayorState) {
+        this.state = state; this.stateTick = 0;
+        if (state !== 'recover') this.cancelCounterpressure();
+        if (state === 'recover') this.pressureSpent = false;
+    }
+    private emit(kind: MayorEvent['kind']) { this.events.push({ kind, tick: this.tick }); }
+    private warnJet() { this.facing = -1; this.enter('jetWarning'); this.emit('jetWarning'); }
+    private aim(player?: Readonly<Rect>) {
+        const center = player ? player.x + player.width / 2 : 144;
+        // Every strike locks once. A dodge during anticipation never moves its target.
+        const x = Math.round(Math.max(8, Math.min(248, center - 32))), landingX = x + 32;
+        const floor = landingX >= MAYOR_ARENA.deck.x ? MAYOR_ARENA.deckY
+            : landingX <= MAYOR_ARENA.refuge.x + MAYOR_ARENA.refuge.width ? MAYOR_ARENA.refuge.y : MAYOR_ARENA.floor;
+        this.stampTarget = Object.freeze({ x, y: floor - 24, width: 64, height: 24 });
+        this.freshOpening = this.accessReady = this.valveActive = false;
+        this.facing = center < this.x + this.width / 2 ? -1 : 1;
+        this.enter('warning'); this.emit('warning');
+    }
+    private travel(toX: number, toY: number) {
+        const p = this.motionProgress;
+        this.x = this.from.x + (toX - this.from.x) * p;
+        this.y = this.from.y + (toY - this.from.y) * p - Math.sin(p * Math.PI) * 36;
+    }
+    private advanceCounterpressure() {
+        if (!this.vulnerable || this.sealsRemaining === MAYOR_RULES.seals) return;
+        if (!this.pressureSpent) {
+            this.pressureSpent = true; this.pressurePhase = 'warning'; this.pressureTick = 0;
+        } else if (this.pressurePhase) {
+            this.pressureTick++;
+            if (this.pressurePhase === 'warning' && this.pressureTick >= MAYOR_RULES.counterpressureWarning) {
+                this.pressurePhase = 'active'; this.pressureTick = 0;
+            } else if (this.pressurePhase === 'active' && this.pressureTick >= MAYOR_RULES.counterpressureActive) this.cancelCounterpressure();
+        }
+    }
+    update(dt: number, access: MayorAccess) {
+        if (!Number.isFinite(dt) || dt <= 0) return;
+        this.events = [];
+        if (this.canOpenRegister && access.registerOpened && access.valveActive) {
+            this.freshOpening = true;
+            if (this.canInterrupt) {
+                // Only a new native ground-pound AFTER a shot opens the bypass.
+                // Reward the risk: cancel the volley and its follow-up stamps,
+                // give a full recovery, and spend the otherwise automatic seam pulse.
+                this.cancelAttacks(); this.interrupted = true; this.enter('recover');
+                this.pressureSpent = true; this.emit('interrupt');
+            }
+            if (this.liveWaves.length) { this.liveWaves = []; this.emit('drain'); }
+        }
+        this.valveActive = access.valveActive;
+        this.accessReady = access.valveActive && access.liftReady;
+        if (this.freshOpening && !this.valveActive) this.cancelCounterpressure();
+        this.remainder += Math.min(dt, 100);
+        while (this.remainder + 1e-7 >= MAYOR_RULES.tickMs) {
+            this.remainder -= MAYOR_RULES.tickMs;
+            this.tick++; this.stateTick++;
+            const speed = this.phaseNumber >= 3 ? 2.6 : 2.2;
+            this.liveWaves = this.liveWaves.map(w => ({ ...w, x: w.x + w.direction * speed, age: w.age + 1 }))
+                .filter(w => w.x + w.width > 0 && w.x < MAYOR_ARENA.width);
+            const jetSpeed = this.phaseNumber >= 3 ? 4 : 3.4;
+            this.liveJets = this.liveJets.map(j => ({ ...j, x: j.x + j.direction * jetSpeed, age: j.age + 1 }))
+                .filter(j => j.x + j.width > 0 && j.x < MAYOR_ARENA.width);
+            switch (this.state) {
+                case 'intro': if (this.stateTick >= MAYOR_RULES.intro) this.enter('idle'); break;
+                case 'idle':
+                    this.x = 264 + Math.sin(this.stateTick / MAYOR_RULES.idle * Math.PI * 2) * 7;
+                    if (this.stateTick >= MAYOR_RULES.idle) {
+                        this.cycle++; this.strike = 1; this.interrupted = false;
+                        if (this.phaseNumber >= 2) {
+                            this.jetIndex = 0; this.freshOpening = this.accessReady = this.valveActive = false;
+                            this.warnJet();
+                        } else this.aim(access.player);
+                    }
+                    break;
+                case 'jetWarning': if (this.stateTick >= this.jetWarningDuration) {
+                    const shot = this.salvo!;
+                    this.liveJets.push({ x: shot.direction === 1 ? 8 : 282, y: shot.rect.y,
+                        width: 30, height: 16, direction: shot.direction, age: 0 });
+                    this.enter('jetBurst'); this.emit('jet');
+                } break;
+                case 'jetBurst': if (this.stateTick >= this.jetBeatDuration) {
+                    if (this.jetIndex + 1 < this.salvo!.total) { this.jetIndex++; this.warnJet(); }
+                    else this.aim(access.player);
+                } break;
+                case 'warning': if (this.stateTick >= this.warningDuration) {
+                    this.from = { x: this.x, y: this.y }; this.enter('leap');
+                } break;
+                case 'leap':
+                    this.travel(this.stampTarget.x + this.stampTarget.width / 2 - this.width / 2, this.stampTarget.y + this.stampTarget.height - this.height);
+                    if (this.stateTick >= this.leapDuration) {
+                        this.freshOpening = this.accessReady = this.valveActive = false;
+                        this.enter('stamp'); this.emit('stamp');
+                    } break;
+                case 'stamp': if (this.stateTick >= MAYOR_RULES.stamp) {
+                    if (!this.finalStrike) { this.strike++; this.aim(access.player); }
+                    else {
+                        if (this.phaseNumber >= 2 && !this.accessRequested) {
+                            this.liveWaves = ([-1, 1] as const).map(direction => ({
+                                x: direction === -1 ? this.stampTarget.x - 20 : this.stampTarget.x + this.stampTarget.width,
+                                y: 206, width: 20, height: 18, direction, age: 0
+                            })); this.emit('waves');
+                        }
+                        this.from = { x: this.x, y: this.y }; this.facing = this.x < 264 ? 1 : -1; this.enter('returning');
+                    }
+                } break;
+                case 'returning':
+                    this.travel(264, 120);
+                    if (this.stateTick >= MAYOR_RULES.returning) { this.x = 264; this.y = 120; this.facing = -1; this.enter('recover'); }
+                    break;
+                case 'recover': if (this.stateTick >= MAYOR_RULES.recover) this.enter('idle'); break;
+                case 'hurt': if (this.stateTick >= MAYOR_RULES.hurt) this.enter('idle'); break;
+            }
+            this.advanceCounterpressure();
+        }
+    }
+    /** Armor bounces; only the exposed back takes a real native falling contact. */
+    contact(player: Rect, previous: Rect, falling: boolean): 'none' | 'hurt' | 'bounce' | 'hit' | 'defeated' {
+        if (this.state === 'intro' || this.state === 'hurt' || this.state === 'released') return 'none';
+        if (mayorOverlaps(player, this) && falling && previous.y + previous.height <= this.y + 1e-7) {
+            if (!this.vulnerable || !mayorOverlaps(player, this.opening)) return 'bounce';
+            this.sealsRemaining--; this.freshOpening = this.accessReady = false; this.cancelAttacks();
+            const released = this.sealsRemaining === 0;
+            this.enter(released ? 'released' : 'hurt'); this.emit(released ? 'released' : 'hit');
+            return released ? 'defeated' : 'hit';
+        }
+        // Travelling bodies have no surprise side damage. Water is always painted.
+        return this.dangers.some(q => mayorOverlaps(player, q)) ? 'hurt' : 'none';
+    }
+}

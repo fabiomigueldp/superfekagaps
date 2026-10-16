@@ -1,0 +1,89 @@
+{
+  "kind": "production-renderers-authored-inspection",
+  "baseline": "source snapshots before this round",
+  "hashes": {
+    "GuairaJunctionArt": "118b88b09f0d440ede6d186d00f078b7206432423926e56f34799f2a54e8c81c",
+    "GuairaRespirosArt": "dfe00521e1988a12e107e9cb7aff14dc2e7432f767c58d90c5c2a48f49715093"
+  },
+  "snapshots": [
+    {
+      "key": "patio-rede",
+      "time": 2100,
+      "camera": {
+        "x": 240,
+        "y": 128
+      },
+      "repeatable": true,
+      "stateUnchanged": true
+    },
+    {
+      "key": "patio-base",
+      "time": 2100,
+      "camera": {
+        "x": 200,
+        "y": 236
+      },
+      "repeatable": true,
+      "stateUnchanged": true
+    },
+    {
+      "key": "patio-curva",
+      "time": 2100,
+      "camera": {
+        "x": 500,
+        "y": 128
+      },
+      "repeatable": true,
+      "stateUnchanged": true
+    },
+    {
+      "key": "respiros-carga",
+      "time": 1600,
+      "camera": {
+        "x": 80,
+        "y": 144
+      },
+      "repeatable": true,
+      "stateUnchanged": true
+    },
+    {
+      "key": "respiros-jato",
+      "time": 2100,
+      "camera": {
+        "x": 80,
+        "y": 144
+      },
+      "repeatable": true,
+      "stateUnchanged": true
+    },
+    {
+      "key": "respiros-queda",
+      "time": 2400,
+      "camera": {
+        "x": 80,
+        "y": 144
+      },
+      "repeatable": true,
+      "stateUnchanged": true
+    }
+  ],
+  "motion": [
+    {
+      "phase": "patio",
+      "fps": 30,
+      "frames": 126,
+      "seconds": 4.2,
+      "authoredPoses": true,
+      "gameplayVictory": false
+    },
+    {
+      "phase": "respiros",
+      "fps": 30,
+      "frames": 126,
+      "seconds": 4.2,
+      "authoredPoses": true,
+      "gameplayVictory": false
+    }
+  ],
+  "stateUnchanged": true
+}

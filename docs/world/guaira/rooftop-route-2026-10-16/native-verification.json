@@ -1,0 +1,479 @@
+{
+  "nativeInputOnly": true,
+  "actorOrClockEdits": false,
+  "hashes": {
+    "GuairaAscent.ts": {
+      "before": "0875110372a77026fd1ebe95832979e3ee38a0beb9b93ef1522f00e911fd8195",
+      "after": "29760200e06c10133fbfdaa0a7441363c4f2eded5ea5a1a9bfc9045b6ca754fb"
+    },
+    "GuairaAscentArt.ts": {
+      "before": "148dce4bdc9b05905b7b75e0ed86841f3ef5216747bc39a028a129d355c81bf4",
+      "after": "13cb64f94b945e9d914528461d0682b5b7fd0435fc04d48bc91c680428c73337"
+    }
+  },
+  "routes": [
+    {
+      "mode": "roof",
+      "n": 910,
+      "completedAt": 907,
+      "videoFrames": 227,
+      "coins": 12,
+      "supports": [
+        304,
+        336,
+        368,
+        256,
+        192,
+        144,
+        240
+      ],
+      "pickups": {
+        "guaira-subida:coin:0": 128,
+        "guaira-subida:coin:1": 148,
+        "guaira-subida:coin:2": 172,
+        "guaira-subida:overlook:1": 367,
+        "guaira-subida:overlook:0": 414,
+        "guaira-subida:roof:1": 448,
+        "guaira-subida:roof:0": 470,
+        "guaira-subida:roof:2": 519,
+        "guaira-subida:roof:3": 558,
+        "guaira-subida:inspection:0": 688,
+        "guaira-subida:inspection:1": 721,
+        "guaira-subida:inspection:2": 745
+      },
+      "minHead": 26,
+      "maxFeet": 168,
+      "maxStep": 7.46876823917448,
+      "snapshots": [
+        {
+          "n": 200,
+          "file": "roof-200.png",
+          "player": {
+            "x": 413.02534068887036,
+            "y": 344
+          },
+          "feet": 368,
+          "camera": {
+            "x": 289.8922634750365,
+            "y": 200
+          },
+          "status": "Inspeção do canal seco · o degrau da direita leva ao próximo ponto seguro; à esquerda, à entrada"
+        },
+        {
+          "n": 439,
+          "file": "roof-439.png",
+          "player": {
+            "x": 603.0760220666114,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 476.44088632097913,
+            "y": 104.00013601285937
+          },
+          "status": "Sacada de manutenção · elevador à direita; telhado com moedas acima à esquerda oferece outro caminho até o terraço"
+        },
+        {
+          "n": 488,
+          "file": "roof-488.png",
+          "player": {
+            "x": 550.0506813777408,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 424.08870338202297,
+            "y": 103.88365124266171
+          },
+          "status": "Telhado da oficina · salte para o andaime mais alto à direita; as moedas marcam a subida"
+        },
+        {
+          "n": 548,
+          "file": "roof-548.png",
+          "player": {
+            "x": 635.0760220666114,
+            "y": 120
+          },
+          "feet": 144,
+          "camera": {
+            "x": 511.9360332087198,
+            "y": 83.77277404032664
+          },
+          "status": "Andaime da oficina · corra e salte da ponta direita até o terraço; Shift ou botão de correr · o elevador e o piso seco permitem recuperar uma queda"
+        },
+        {
+          "n": 558,
+          "file": "roof-558.png",
+          "player": {
+            "x": 651.5760220666114,
+            "y": 120
+          },
+          "feet": 144,
+          "camera": {
+            "x": 533.6866470054401,
+            "y": 83.96876823917448
+          },
+          "status": "Andaime da oficina · corra e salte da ponta direita até o terraço; Shift ou botão de correr · o elevador e o piso seco permitem recuperar uma queda"
+        },
+        {
+          "n": 580,
+          "file": "roof-580.png",
+          "player": {
+            "x": 728.3760220666113,
+            "y": 16.99999999999997
+          },
+          "feet": 40.99999999999997,
+          "camera": {
+            "x": 619.1477522677295,
+            "y": -19.00000000000003
+          },
+          "status": "Ponto seguro · embarque no elevador pela margem ou suba à sacada; salte à direita perto do terraço"
+        },
+        {
+          "n": 602,
+          "file": "roof-602.png",
+          "player": {
+            "x": 802.5292095666113,
+            "y": 120
+          },
+          "feet": 144,
+          "camera": {
+            "x": 692.3661898170652,
+            "y": 53.2881528444788
+          },
+          "status": "Ponto seguro no patamar · embarque na prancha e salte à direita junto ao terraço · galeria abaixo é opcional"
+        },
+        {
+          "n": 754,
+          "file": "roof-754.png",
+          "player": {
+            "x": 1044.0799155417471,
+            "y": 216
+          },
+          "feet": 240,
+          "camera": {
+            "x": 928.3411569551845,
+            "y": 72
+          },
+          "status": "Galeria de inspeção · moedas opcionais · degraus à direita levam à Casa; à esquerda, ao ponto seguro"
+        },
+        {
+          "n": 910,
+          "file": "roof-910.png",
+          "player": {
+            "x": 1265.32534068887,
+            "y": 120
+          },
+          "feet": 144,
+          "camera": {
+            "x": 1023.9979500743304,
+            "y": 71.99999997089805
+          },
+          "status": "O ramal do bairro segue fechado · CASA volta ao mapa · Prefeito: encontro opcional para reabrir a água"
+        }
+      ]
+    },
+    {
+      "mode": "lift",
+      "n": 1339,
+      "completedAt": 1315,
+      "videoFrames": 334,
+      "coins": 1,
+      "supports": [
+        304,
+        301,
+        302,
+        303,
+        300,
+        299,
+        298,
+        297,
+        296,
+        295,
+        294,
+        293,
+        292,
+        291,
+        290,
+        289,
+        288,
+        287,
+        286,
+        285,
+        284,
+        283,
+        282,
+        281,
+        280,
+        279,
+        278,
+        277,
+        276,
+        275,
+        274,
+        273,
+        272,
+        271,
+        270,
+        269,
+        268,
+        267,
+        266,
+        265,
+        264,
+        263,
+        262,
+        261,
+        260,
+        259,
+        258,
+        257,
+        256,
+        255,
+        254,
+        253,
+        252,
+        251,
+        250,
+        249,
+        248,
+        247,
+        246,
+        245,
+        244,
+        243,
+        242,
+        241,
+        240,
+        239,
+        238,
+        237,
+        236,
+        235,
+        234,
+        233,
+        232,
+        231,
+        230,
+        229,
+        228,
+        227,
+        226,
+        225,
+        224,
+        223,
+        222,
+        221,
+        220,
+        219,
+        218,
+        217,
+        216,
+        215,
+        214,
+        213,
+        212,
+        211,
+        210,
+        209,
+        208,
+        207,
+        206,
+        205,
+        204,
+        203,
+        202,
+        201,
+        200,
+        199,
+        198,
+        197,
+        196,
+        144,
+        96
+      ],
+      "pickups": {
+        "guaira-subida:overlook:1": 537
+      },
+      "minHead": 26,
+      "maxFeet": 168,
+      "maxStep": 9.300000000000011,
+      "snapshots": [
+        {
+          "n": 1,
+          "file": "lift-1.png",
+          "player": {
+            "x": 48.3,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 0,
+            "y": 162.24
+          },
+          "status": "Subida da Vazão · setas/A D: mover · Espaço: pular · Esc: pausa · M: som"
+        },
+        {
+          "n": 168,
+          "file": "lift-168.png",
+          "player": {
+            "x": 351.46730516745146,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 220.69340179456253,
+            "y": 199.9966319164748
+          },
+          "status": "Prancha de inspeção · ela vai e volta · pule para embarcar, solte a direção para viajar"
+        },
+        {
+          "n": 336,
+          "file": "lift-336.png",
+          "player": {
+            "x": 482.7724135498346,
+            "y": 226.7000000000004
+          },
+          "feet": 250.7000000000004,
+          "camera": {
+            "x": 366.9618268022973,
+            "y": 169.3973139547165
+          },
+          "status": "Prancha de inspeção · ela vai e volta · pule para embarcar, solte a direção para viajar"
+        },
+        {
+          "n": 503,
+          "file": "lift-503.png",
+          "player": {
+            "x": 645.4977542387052,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 520.4979677377426,
+            "y": 199.9999999999999
+          },
+          "status": "Ponto seguro · embarque no elevador pela margem ou suba à sacada; salte à direita perto do terraço"
+        },
+        {
+          "n": 670,
+          "file": "lift-670.png",
+          "player": {
+            "x": 710.5230949275757,
+            "y": 259.45158603819317
+          },
+          "feet": 283.45158603819317,
+          "camera": {
+            "x": 585.5231189252673,
+            "y": 141.8484422137605
+          },
+          "status": "Ponto seguro · embarque no elevador pela margem ou suba à sacada; salte à direita perto do terraço"
+        },
+        {
+          "n": 837,
+          "file": "lift-837.png",
+          "player": {
+            "x": 810.8230949275757,
+            "y": 120
+          },
+          "feet": 144,
+          "camera": {
+            "x": 695.1406143387386,
+            "y": 71.53557291041821
+          },
+          "status": "Ponto seguro no patamar · embarque na prancha e salte à direita junto ao terraço · galeria abaixo é opcional"
+        },
+        {
+          "n": 1005,
+          "file": "lift-1005.png",
+          "player": {
+            "x": 947.9235942711703,
+            "y": 120
+          },
+          "feet": 144,
+          "camera": {
+            "x": 829.1956132366047,
+            "y": 21.827127225067457
+          },
+          "status": "Ponto seguro no patamar · embarque na prancha e salte à direita junto ao terraço · galeria abaixo é opcional"
+        },
+        {
+          "n": 1172,
+          "file": "lift-1172.png",
+          "player": {
+            "x": 1036.312364666183,
+            "y": 120
+          },
+          "feet": 144,
+          "camera": {
+            "x": 909.2417775072158,
+            "y": 23.999999999999993
+          },
+          "status": "Ponto seguro no patamar · embarque na prancha e salte à direita junto ao terraço · galeria abaixo é opcional"
+        },
+        {
+          "n": 1339,
+          "file": "lift-1339.png",
+          "player": {
+            "x": 1265.8005041943175,
+            "y": 120
+          },
+          "feet": 144,
+          "camera": {
+            "x": 1023.9981803426281,
+            "y": 71.99991115654191
+          },
+          "status": "O ramal do bairro segue fechado · CASA volta ao mapa · Prefeito: encontro opcional para reabrir a água"
+        }
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "file": "choice-before.png",
+      "n": 439,
+      "player": {
+        "x": 603.0760220666114,
+        "y": 232
+      },
+      "camera": {
+        "x": 476.44088632097913,
+        "y": 104.00013601285937,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 1344,
+          "minY": 0,
+          "maxY": 400
+        }
+      },
+      "coins": 5
+    },
+    {
+      "file": "choice-after.png",
+      "n": 439,
+      "player": {
+        "x": 603.0760220666114,
+        "y": 232
+      },
+      "camera": {
+        "x": 476.44088632097913,
+        "y": 104.00013601285937,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 1344,
+          "minY": 0,
+          "maxY": 400
+        }
+      },
+      "coins": 5
+    }
+  ]
+}

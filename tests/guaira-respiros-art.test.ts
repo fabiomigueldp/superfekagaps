@@ -36,7 +36,7 @@ function paint(objects: WorldObjects, cx = 0, cy = 144, reduced = false, decorat
 }
 function verifyEnvelope(objects: WorldObjects, cx: number, cy: number, reduced: boolean) {
     const rendered = paint(objects, cx, cy, reduced), expected = new Uint8Array(320 * 180);
-    for (const b of objects.bodies) {
+    for (const b of objects.bodies.filter(body => body.kind === 'jet')) {
         const d = jetCycle(b, objects.time).danger;
         if (!d) continue;
         const left = Math.max(0, Math.floor(d.x - cx)), right = Math.min(320, Math.ceil(d.x + d.width - cx));
@@ -133,7 +133,7 @@ test('standpipe plate distinguishes charge, actual danger and dry recovery witho
 test('each authored jet owns an unobstructive phase plate above touch controls', async () => {
     const { guairaRespirosStage } = await import('../src/adventure/experimental/guaira/respiros/GuairaRespirosStage');
     const objects = new WorldObjects(guairaRespirosStage().mechanisms);
-    for (const body of objects.bodies) for (const cy of [132,144]) for (const time of [0,1100,2100,2499,2500]) {
+    for (const body of objects.bodies.filter(b => b.kind === 'jet')) for (const cy of [132,144]) for (const time of [0,1100,2100,2499,2500]) {
         const solo = new WorldObjects([{ ...body, phase: 0 }]); solo.time = time;
         const cx = body.x - 80, py = Math.ceil(body.y + body.height - 4 - cy) - 64;
         const plate = paint(solo, cx, cy).calls.filter(([,x,y,w,h]) => x >= 66 && x + w <= 79 && y >= py && y + h <= py + 13);
@@ -185,5 +185,23 @@ test('authored final pair paints its independent envelopes and never paints wate
             for (let x = G.thirdEnd; x < G.fourthStart; x++)
                 assert.notEqual(pixels[(G.floor - 133) * 320 + x - 768], 1);
         }
+    }
+});
+
+test('native service isolation removes C danger ink while D stays exact, including harmless shutdown drops',async()=>{
+    const {guairaRespirosStage,GUAIRA_RESPIROS:G}=await import('../src/adventure/experimental/guaira/respiros/GuairaRespirosStage');
+    const stage=guairaRespirosStage(),objects=new WorldObjects(stage.mechanisms),level=new WorldLevel(stage.level);
+    objects.time=1500;assert.ok(jetCycle(objects.get(G.thirdJetId)!,objects.time).danger);
+    assert.equal(objects.activate(G.serviceValveId),true);
+    assert.ok(objects.get(G.thirdJetId)!.jetShutdown);
+    for(const elapsed of[0,16,100,299,300,1600])for(const reduced of[false,true]) {
+        objects.time=1500+elapsed;verifyEnvelope(objects,608,132,reduced);
+        assert.equal(jetCycle(objects.get(G.thirdJetId)!,objects.time).danger,null);
+        assert.equal(objects.get(G.fourthJetId)!.active,false);
+    }
+    objects.update(400,level,670);assert.equal(objects.activate(G.serviceValveId),true);
+    const start=objects.time;
+    for(const elapsed of[0,100,799,800,920,1330,1500])for(const reduced of[false,true]) {
+        objects.time=start+elapsed;verifyEnvelope(objects,608,132,reduced);
     }
 });

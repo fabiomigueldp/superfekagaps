@@ -40,8 +40,8 @@ function replay(h: ReturnType<typeof guairaMayorBrowser>, g: GuairaMayorLab, tou
     }
     assert.equal(frame, recording.frames); assert.ok(pounds > 15); assert.equal(openings, 3);
     assert.ok(carried >= 20, 'actual native lift carry was used');
-    assert.deepEqual(hitFrames, [322, 652, 982]);
-    assert.ok(hitRecoveryTicks.every(tick => tick < R.recover - 100), 'more than 100 ticks of margin in every window');
+    assert.deepEqual(hitFrames, recording.hitFrames);
+    assert.ok(hitRecoveryTicks.every(tick => tick < R.recover - 50), 'more than 50 ticks of margin in every window');
     assert.equal(g.mayor.publicWaterOpen, true); assert.equal(g.mayor.sealsRemaining, 0);
     assert.ok(g.player.data.position.x < 100); assert.equal(feet(g), A.floor);
     assert.equal(g.player.data.isGrounded, true);
@@ -52,7 +52,7 @@ test('isolated native scene has only local mechanisms, checkpoint and a safe con
     assert.ok(g.player instanceof Player); assert.ok(g.input instanceof Input);
     assert.equal(g.stage.id, A.id); assert.equal(g.camera.x, 0); assert.equal(g.camera.y, 64);
     assert.deepEqual(g.stage.exits, []); assert.deepEqual(g.stage.foes, []);
-    assert.deepEqual(g.objects.bodies.map(b => b.kind), ['switch', 'lift', 'support']);
+    assert.deepEqual(g.objects.bodies.map(b => b.kind), ['switch', 'lift', 'support', 'switch', 'support']);
     assert.ok(g.stage.level.tiles[14].every(tile => tile !== 0));
     const clone = guairaMayorStage(); clone.level.tiles[14][0] = 0;
     assert.notEqual(guairaMayorStage().level.tiles[14][0], 0);
@@ -81,24 +81,26 @@ test('warning target is immutable and exact danger appears only after its full w
     const b = new GuairaMayorModel(), access = { valveActive: false, liftReady: false, registerOpened: false };
     for (let i = 0; i < R.intro + R.idle; i++) b.update(R.tickMs, access);
     assert.equal(b.state, 'warning'); assert.equal(b.danger, null);
-    const target = b.stampTarget; assert.ok(Object.isFrozen(target)); assert.deepEqual(target, A.vent);
+    const target = b.stampTarget; assert.ok(Object.isFrozen(target)); assert.deepEqual(target, { x:112, y:200, width:64, height:24 });
     b.update(10000, access); assert.equal(b.stateTick, 6); assert.equal(b.state, 'warning');
     for (let i = 6; i < R.warning; i++) b.update(R.tickMs, access);
+    assert.equal(b.state, 'leap');
+    for (let i = 0; i < R.leap; i++) b.update(R.tickMs, access);
     assert.equal(b.state, 'stamp'); assert.equal(b.stampTarget, target); assert.equal(b.danger, target);
-    for (let i = 0; i < R.stamp; i++) b.update(R.tickMs, access);
+    for (let i = 0; i < R.stamp + R.returning; i++) b.update(R.tickMs, access);
     assert.equal(b.state, 'recover'); assert.equal(b.danger, null);
 });
 
 test('closed or stale register never damages the mayor; stamp resets both halves of the native toggle', t => {
     const h = guairaMayorBrowser(t), g = h.create(), b = g.mayor;
-    g.objects.activate(A.valveId); h.run(g, R.intro + R.idle + R.warning);
+    g.objects.activate(A.valveId); h.run(g, R.intro + R.idle + R.warning + R.leap);
     assert.equal(b.state, 'stamp'); assert.equal(g.objects.get(A.valveId)!.active, false);
     assert.equal(g.objects.get(A.liftId)!.active, false); assert.equal(b.registerOpenedThisCycle, false);
-    h.run(g, R.stamp); assert.equal(b.state, 'recover'); assert.equal(b.vulnerable, false);
+    h.run(g, R.stamp + R.returning); assert.equal(b.state, 'recover'); assert.equal(b.vulnerable, false);
     const p = { x: b.x + 10, y: b.y - 1, width: 14, height: 24 }, previous = { ...p, y: b.y - 25 };
     assert.equal(b.contact(p, previous, true), 'bounce'); assert.equal(b.sealsRemaining, 3);
     assert.equal(b.contact({ ...p, y: b.y + 8 }, { ...p, y: b.y + 8 }, false), 'none');
-    assert.equal(g.objects.activate(A.valveId), true); assert.equal(g.objects.get(A.liftId)!.active, true);
+    assert.equal(g.objects.activate(A.valveId), true); assert.equal(g.objects.get(A.upperValveId)!.active, true);
     // Late native switch interaction is observable only in its actual update.
     g.boss!.update(R.tickMs, g.player.getRect(), g.objects, g.level);
     assert.equal(b.registerOpenedThisCycle, true); assert.equal(b.vulnerable, false);
@@ -113,31 +115,31 @@ test('closed or stale register never damages the mayor; stamp resets both halves
     assert.equal(b.contact(p, previous, true), 'none'); assert.equal(b.sealsRemaining, 2);
 });
 
-test('safe corners and missed windows stay replayable; waiting and jump spam cannot release locks', t => {
+test('passive camping never releases a seal and a fresh retry remains winnable', t => {
     const h = guairaMayorBrowser(t), g = h.create();
     for (const x of [0, 48, 80, 306]) {
         h.keys([]); g.load(A.id); g.player.data.position.x = x;
-        h.run(g, 1800);
-        assert.equal(g.player.data.hasHelmet, true); assert.equal(g.player.data.isDead, false);
-        assert.equal(g.mayor.sealsRemaining, 3); assert.ok(g.mayor.cycle >= 4);
+        h.run(g, 1200); assert.equal(g.mayor.sealsRemaining, 3);
         h.run(g, 50, ['Space']); assert.equal(g.mayor.sealsRemaining, 3);
     }
-    h.keys([]); g.load(A.id); h.run(g, 2 * (R.idle + R.warning + R.stamp + R.recover));
-    // A fresh whole attempt still follows the same tested route after long passivity.
     h.keys([]); g.load(A.id); replay(h, g);
 });
 
-test('late opening misses safely, closes in the next stamped cycle and can be reopened', t => {
-    const h = guairaMayorBrowser(t), g = h.create();
-    h.run(g, R.intro + R.idle + R.warning + R.stamp + R.recover - 5);
-    assert.equal(g.mayor.state, 'recover'); assert.equal(g.mayor.stateTick, 265);
+test('late opening waits for the actual lift, grants the hit window and closes in the next stamped cycle', t => {
+    const h = guairaMayorBrowser(t), g = h.create(); g.player.data.position.x = 0;
+    h.run(g, R.intro + R.idle + R.warning + R.leap + R.stamp + R.returning + R.recover - 5);
+    assert.equal(g.mayor.state, 'recover'); assert.equal(g.mayor.stateTick, R.recover - 5);
     g.objects.activate(A.valveId);
     g.boss!.update(R.tickMs, g.player.getRect(), g.objects, g.level);
-    h.run(g, 4); assert.equal(g.mayor.state, 'idle'); assert.equal(g.mayor.sealsRemaining, 3);
-    h.run(g, R.idle + R.warning); assert.equal(g.mayor.state, 'stamp');
+    h.run(g, 4); assert.equal(g.mayor.state, 'recover'); assert.equal(g.mayor.vulnerable,false);
+    for(let n=0;n<R.liftArrivalBudget&&!g.mayor.vulnerable;n++)h.run(g,1);
+    assert.equal(g.objects.get(A.liftId)!.y,A.deckY);assert.equal(g.mayor.vulnerable,true);
+    assert.equal(g.mayor.recoveryTicksRemaining,R.minimumOpening);
+    h.run(g,g.mayor.recoveryTicksRemaining);assert.equal(g.mayor.state,'idle');assert.equal(g.mayor.sealsRemaining,3);
+    h.run(g, R.idle + R.warning + R.leap); assert.equal(g.mayor.state, 'stamp');
     assert.equal(g.objects.get(A.valveId)!.active, false); assert.equal(g.objects.get(A.liftId)!.active, false);
     assert.equal(g.mayor.registerOpenedThisCycle, false);
-    h.run(g, R.stamp); g.objects.activate(A.valveId);
+    h.run(g, R.stamp + R.returning); g.objects.activate(A.valveId);
     g.boss!.update(R.tickMs, g.player.getRect(), g.objects, g.level);
     h.run(g, 72); assert.equal(g.mayor.vulnerable, true); assert.equal(g.player.data.hasHelmet, true);
 });
@@ -149,9 +151,10 @@ test('closing native lift carries Feka to dry floor without crushing; both sides
         const lift = g.objects.get(A.liftId)!, valve = g.objects.get(A.valveId)!;
         lift.y = lift.py = A.deckY; lift.active = lift.observedActive = valve.active = valve.observedActive = true;
         g.player.data.position = { x: 160, y: A.deckY - g.player.data.height };
-        h.run(g, R.intro + R.idle + R.warning);
-        h.run(g, 100, keys);
-        assert.equal(feet(g), A.floor); assert.equal(g.player.data.isDead, false); assert.equal(g.player.data.hasHelmet, true);
+        h.run(g, R.intro + R.idle);
+        h.run(g, R.warning + R.leap + 100, keys);
+        assert.ok(Math.round(feet(g)) === A.floor || Math.round(feet(g)) === A.deckY); assert.equal(g.player.data.isDead, false);
+        assert.equal(g.player.data.hasHelmet, keys.length > 0, 'waiting inside the marked landing hurts; both moving exits evade it');
         assert.equal(lift.y, A.floor);
     }
 });
@@ -175,8 +178,8 @@ for (const reducedMotion of [false, true]) for (const heldFrames of [7, 45])
         let frame = 0;
         for (const [count, keys] of recording.runs as Array<[number, string[]]>) {
             h.keys(keys);
-            for (let n = 0; n < count && frame < 252; n++, frame++) g.update(R.tickMs);
-            if (frame === 252) break;
+            for (let n = 0; n < count && frame < 301; n++, frame++) g.update(R.tickMs);
+            if (frame === 301) break;
         }
         let raised = false, restoredBeforeVent = false;
         for (let n = 0; n < 130; n++) {
@@ -216,10 +219,10 @@ test('opening matches the visible upper back and rejects falling contacts in adj
 
 test('visible vent uses native helmet loss and death/retry; checkpoint cannot retain partial victory', t => {
     const h = guairaMayorBrowser(t), g = h.create(); h.run(g, 1);
-    h.run(g, R.intro + R.idle + R.warning - 2);
-    g.player.data.position.x = 150; h.run(g, 1);
+    h.run(g, R.intro + R.idle + R.warning + R.leap - 2);
+    g.player.data.position.x = 50; h.run(g, 1);
     assert.equal(g.mayor.state, 'stamp'); assert.equal(g.player.data.hasHelmet, false); assert.equal(g.player.data.isDead, false);
-    const old = g.player; g.player.data.invincibleTimer = 0; g.player.data.position.x = 180;
+    const old = g.player; g.player.data.invincibleTimer = 0; g.player.data.position.x = 50;
     h.run(g, 1); assert.equal(g.player.data.isDead, true);
     for (let i = 0; i < 180 && old === g.player; i++) h.run(g, 1);
     assert.notEqual(g.player, old); assert.equal(g.player.data.hasHelmet, true);

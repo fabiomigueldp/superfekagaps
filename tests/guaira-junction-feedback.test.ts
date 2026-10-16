@@ -53,7 +53,7 @@ test('recovery requires real dry support; partial deck overlap, the dock and air
     place(450, G.recoveryY); assert.match(h.status.textContent, /Piso seco de recuperação/, 'another moving deck cannot hide dry recovery');
 });
 
-test('banner prioritizes DESVIO, actual travel at replay frame 500, then the next request at either settled plate', t => {
+test('compact header prioritizes DESVIO, actual travel at replay frame 500, then the next request at either settled plate', t => {
     const h = guairaJunctionBrowser(t), g = h.create();
     g.render(); // The native renderer has now selected its composed HUD surface.
     const context = g.renderer.getContext(), calls: Paint[] = [];
@@ -61,25 +61,25 @@ test('banner prioritizes DESVIO, actual travel at replay frame 500, then the nex
     context.fillRect = (x, y, w, height) => { calls.push([String(context.fillStyle), x, y, w, height]); original(x, y, w, height); };
     const expectBanner = (text: string) => {
         calls.length = 0; g.render();
-        const expected = recorder(); pixelText(expected.c, text, 160, 34, '#f3ddb1', 1, 'center');
+        const expected = recorder(); pixelText(expected.c, text, 8, 13, '#f3ddb1');
         assert.deepEqual(calls.slice(-expected.calls.length), expected.calls);
     };
-    expectBanner('PULE. NO AR, BAIXO: AGUA PARA A');
+    expectBanner('PULE + BAIXO: AGUA PARA A');
     g.routing.step('a', 1); expectBanner('DESVIO PARA A...');
     g.routing.step('a', 399); expectBanner('DESVIO PARA A...');
     g.routing.step('a', 1); g.objects.get(G.liftAId)!.active = true;
     g.objects.get(G.liftBId)!.active = false;
     expectBanner('A SOBE / B DESCE');
     g.objects.get(G.liftAId)!.y = G.middleY; g.objects.get(G.liftBId)!.y = G.dockY;
-    expectBanner('PULE. NO AR, BAIXO: AGUA PARA B');
+    expectBanner('PULE + BAIXO: AGUA PARA B');
     g.player.data.position.x = 490; g.player.data.position.y = G.middleY - g.player.data.height; g.camera.x = 360; g.camera.y = 156;
-    expectBanner('PULE. NO AR, BAIXO: AGUA PARA B');
+    expectBanner('PULE + BAIXO: AGUA PARA B');
     g.routing.step('b', 1); expectBanner('DESVIO PARA B...');
     g.routing.step('b', 400);
     g.objects.get(G.liftAId)!.active = false; g.objects.get(G.liftBId)!.active = true;
     expectBanner('B SOBE / A DESCE');
     g.objects.get(G.liftAId)!.y = G.dockY; g.objects.get(G.liftBId)!.y = G.terraceY;
-    expectBanner('PULE. NO AR, BAIXO: AGUA PARA A');
+    expectBanner('PULE + BAIXO: AGUA PARA A');
     g.load(G.id);
     let frame = 0;
     for (const [count, keys] of recording.runs as Array<[number, string[]]>) {

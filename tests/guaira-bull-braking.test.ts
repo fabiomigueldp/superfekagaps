@@ -29,7 +29,8 @@ function naturalBrake(facing: -1 | 1) {
 const dust = (calls: Paint[]) => calls.filter(([color]) => color === '#DB9C68');
 const marks = (calls: Paint[]) => calls.filter(([color, x, , w, h]) => color === '#fff1bf' && [-11, -3, 5].includes(x) && w === 4 && h === 2);
 const hoofs = (calls: Paint[]) => calls.filter(([color, , y, w, h]) => color === P.horn && y > 20 && w === 6 && h === 4);
-const torsoY = (calls: Paint[]) => calls.find(([color, , , w, h]) => color === P.shade && w === 38 && h === 17)![2];
+// The backbone is the stable torso anchor; the rib cage now has a shaped outline.
+const torsoY = (calls: Paint[]) => calls.find(([color, , , w, h]) => color === P.bone && w === 38 && h === 3)![2];
 
 for (const facing of [-1, 1] as const) test(`natural brake grounds three poses and meets recovery without a snap, facing ${facing}`, () => {
     const b = naturalBrake(facing), x = b.x, poses = new Set<string>(), beats: Paint[][] = [];

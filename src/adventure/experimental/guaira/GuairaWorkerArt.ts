@@ -1,7 +1,7 @@
 import { ART } from '../../../graphics/palette';
 import { PixelGrid, type PixelFrame, type PixelPalette } from '../../../graphics/pixels';
 
-export type GuairaWorkerKind = 'pump' | 'rice';
+export type GuairaWorkerKind = 'pump' | 'rice' | 'inspector';
 
 /** A read-only projection of the mechanism and the existing simulation clock. */
 export interface GuairaWorkerVisualState {
@@ -20,7 +20,7 @@ const PALETTE: PixelPalette = Object.freeze({
     B: '#607b88', b: '#405d6a', W: '#ded2af', Y: '#b89b6f',
 });
 
-type Pose = 'rest' | 'reach' | 'work' | 'recover' | 'notice' | 'watch' | 'open';
+type Pose = 'rest' | 'prepare' | 'reach' | 'press' | 'work' | 'release' | 'recover' | 'blink' | 'notice' | 'watch' | 'open';
 
 /** Boots and trouser cuffs are identical in every pose: neither person slides. */
 function base(rice: boolean, lowered: boolean): PixelGrid {
@@ -31,6 +31,8 @@ function base(rice: boolean, lowered: boolean): PixelGrid {
     g.rect(7, 13 + dy, 11, 10 - dy, 'K').rect(8, 14 + dy, 9, 8 - dy, rice ? 'W' : 'T');
     g.rect(8, 21, 9, 3, 'B').rect(11, 22, 3, 3, 'K');
     g.rect(11, 15 + dy, 2, 6 - dy, rice ? 'Y' : 't').dot(14, 17 + dy, rice ? 'H' : 'W');
+    g.rect(9, 14 + dy, 2, 1, 'W').dot(16, 20, rice ? 'Y' : 't');
+    g.rect(8, 24, 1, 2, 'B').rect(15, 24, 1, 2, 'b');
     return g;
 }
 
@@ -43,6 +45,7 @@ function head(g: PixelGrid, dx: number, dy: number, lookLeft: boolean, blink = f
     g.rect(6 + dx, 4 + dy, 12, 5, 'h').rect(8 + dx, 2 + dy, 8, 5, 'H');
     g.rect(9 + dx, 2 + dy, 5, 1, 'W');
     g.rect(3 + dx, 7 + dy, 18, 2, 'K').rect(4 + dx, 6 + dy, 17, 2, 'H');
+    g.rect(9 + dx, 5 + dy, 7, 1, 'h').dot(6 + dx, 7 + dy, 'W');
 }
 
 function restingArm(g: PixelGrid, rice: boolean): void {
@@ -52,22 +55,26 @@ function restingArm(g: PixelGrid, rice: boolean): void {
 
 /** The pump keeper inspects and works the existing small spanner. */
 function pumpPose(pose: Pose): PixelFrame {
-    const work = pose === 'work', reach = pose === 'reach', recover = pose === 'recover';
+    const work = pose === 'work', reach = pose === 'reach', press = pose === 'press';
+    const prepare = pose === 'prepare', release = pose === 'release';
     const notice = pose === 'notice', watch = pose === 'watch', open = pose === 'open';
     const g = base(false, work);
-    head(g, work ? 1 : 0, work ? 1 : 0, false, recover);
+    head(g, work ? 1 : 0, work ? 1 : 0, false, pose === 'blink');
 
     // Tool movement is only a few pixels; it never resembles an attack or a prompt.
-    const tx = reach || work ? 20 : 21, ty = reach ? 11 : work ? 14 : 13;
+    const tx = reach || press || work || release ? 20 : 21;
+    const ty = reach ? 11 : prepare ? 12 : work || release ? 14 : 13;
     g.rect(tx, ty, 2, 11, 'b').rect(tx - 2, ty - 2, 5, 3, 'B');
     g.dot(tx, ty - 1, '_').dot(tx + 1, ty + 1, 'W');
-    if (work) {
-        g.rect(17, 16, 5, 4, 'K').rect(17, 16, 3, 2, 'T').rect(20, 17, 3, 2, 'L');
+    if (work || press || release) {
+        const armY = work ? 16 : 15;
+        g.rect(17, armY, 5, 4, 'K').rect(17, armY, 3, 2, 'T').rect(20, armY + 1, 3, 2, 'L');
         g.rect(5, 16, 4, 5, 'K').rect(6, 16, 3, 3, 'T');
-        g.rect(8, 18, 6, 3, 'K').rect(9, 18, 5, 2, 'S').dot(13, 18, 'L');
-    } else if (reach) {
+        g.rect(8, work ? 18 : 19, 6, 3, 'K').rect(9, work ? 18 : 19, 5, 2, 'S').dot(13, work ? 18 : 19, 'L');
+    } else if (reach || prepare) {
         restingArm(g, false);
-        g.rect(17, 13, 5, 5, 'K').rect(17, 14, 3, 3, 'T').rect(20, 13, 3, 2, 'L');
+        const armY = prepare ? 14 : 13;
+        g.rect(17, armY, 5, 5, 'K').rect(17, armY + 1, 3, 3, 'T').rect(20, armY, 3, 2, 'L');
     } else {
         g.rect(17, 15, 5, 4, 'K').rect(17, 15, 4, 2, 'T').rect(20, 16, 3, 2, 'L');
         if (notice || watch) {
@@ -86,19 +93,20 @@ function pumpPose(pose: Pose): PixelFrame {
 
 /** The rice worker draws the existing rake through a tiny patch beside the bank. */
 function ricePose(pose: Pose): PixelFrame {
-    const work = pose === 'work', reach = pose === 'reach', recover = pose === 'recover';
+    const work = pose === 'work', reach = pose === 'reach', press = pose === 'press';
+    const prepare = pose === 'prepare', release = pose === 'release';
     const notice = pose === 'notice', watch = pose === 'watch', open = pose === 'open';
     const g = base(true, work);
     // During the lift, this worker looks left toward the same mechanism.
-    head(g, work ? 1 : 0, work ? 1 : 0, notice || watch || open, recover);
-    const shaftTop = reach ? 22 : work ? 20 : 21;
+    head(g, work ? 1 : 0, work ? 1 : 0, notice || watch || open, pose === 'blink');
+    const shaftTop = reach || prepare ? 22 : work || release ? 20 : 21;
     const rakeY = reach ? 25 : 26;
-    g.line(shaftTop, work ? 14 : 12, 23, rakeY, 'Y');
+    g.line(shaftTop, work ? 14 : press || release ? 13 : 12, 23, rakeY, 'Y');
     g.rect(19, rakeY, 5, 2, 'b');
     for (const x of [19, 21, 23]) g.dot(x, rakeY + 2, 'b');
     g.rect(17, work ? 16 : 15, 5, 4, 'K');
     g.rect(17, work ? 16 : 15, 4, 2, 'W').rect(20, work ? 17 : 16, 3, 2, 'L');
-    if (work || reach) {
+    if (work || reach || press || release) {
         g.rect(5, 16, 4, 5, 'K').rect(6, 16, 3, 3, 'W');
         g.rect(8, work ? 19 : 18, 6, 3, 'K').rect(9, work ? 19 : 18, 5, 2, 'S');
     } else if (notice || watch) {
@@ -113,10 +121,36 @@ function ricePose(pose: Pose): PixelFrame {
     return Object.freeze(g.finish());
 }
 
-const POSES: readonly Pose[] = ['rest', 'reach', 'work', 'recover', 'notice', 'watch', 'open'];
+/** A paper ledger stays in the supporting hand while the other hand writes.
+ * Watching the lift is a change of gaze, never a pointing command for Feka. */
+function inspectorPose(pose: Pose): PixelFrame {
+    const writing = pose === 'reach' || pose === 'press' || pose === 'work';
+    const turning = pose === 'prepare' || pose === 'release';
+    const watch = pose === 'notice' || pose === 'watch';
+    const g = base(false, false);
+    head(g, writing ? 1 : 0, writing ? 1 : watch ? -1 : 0, false, pose === 'blink');
+    // Inspector's light vest distinguishes the clipboard from the pump keeper.
+    g.rect(8, 15, 2, 6, 'W').rect(15, 15, 2, 6, 'W').dot(9, 19, 'h');
+    const x = writing ? 14 : turning ? 15 : 16, y = writing ? 14 : turning ? 15 : 16;
+    g.rect(x, y, 8, 8, 'K').rect(x + 1, y + 1, 6, 6, 'h');
+    g.rect(x + 1, y + 1, 5, 5, 'W').rect(x + 3, y, 2, 2, 'b');
+    g.rect(x + 2, y + 3, 3, 1, 'Y').rect(x + 2, y + 5, 2, 1, 'Y');
+    // Far hand supports the outer edge. Pencil and fingertips remain attached.
+    g.rect(x + 5, y + 4, 3, 2, 'S').dot(x + 5, y + 4, 'L');
+    if (writing || turning) {
+        g.rect(5, 16, 4, 5, 'K').rect(6, 16, 3, 3, 'T');
+        const pen = pose === 'press' || pose === 'release' ? 1 : pose === 'work' ? 2 : 0;
+        g.line(8, 19, x + 1 + pen, y + 4, 'K').line(8, 20, x + 2 + pen, y + 5, 'S');
+        g.rect(x, y + 3 + pen, 3, 2, 'L').line(x + 2, y + 1 + pen, x + 4, y + 4 + pen, 'h');
+    } else restingArm(g, false);
+    return Object.freeze(g.finish());
+}
+
+const POSES: readonly Pose[] = ['rest', 'prepare', 'reach', 'press', 'work', 'release', 'recover', 'blink', 'notice', 'watch', 'open'];
 const FRAMES: Readonly<Record<GuairaWorkerKind, Readonly<Record<Pose, PixelFrame>>>> = Object.freeze({
     pump: Object.freeze(Object.fromEntries(POSES.map(pose => [pose, pumpPose(pose)])) as Record<Pose, PixelFrame>),
     rice: Object.freeze(Object.fromEntries(POSES.map(pose => [pose, ricePose(pose)])) as Record<Pose, PixelFrame>),
+    inspector: Object.freeze(Object.fromEntries(POSES.map(pose => [pose, inspectorPose(pose)])) as Record<Pose, PixelFrame>),
 });
 
 /** State selects the reaction directly, so restored checkpoints need no past event. */
@@ -130,12 +164,17 @@ function poseFor(kind: GuairaWorkerKind, state: GuairaWorkerVisualState): Pose {
         return (time + (kind === 'rice' ? 1900 : 0)) % 6200 < 760 ? 'watch' : 'open';
     }
     if (state.reducedMotion) return 'rest';
-    const beat = (time + (kind === 'rice' ? 730 : 0)) % 3600;
+    const beat = (time + (kind === 'rice' ? 730 : kind === 'inspector' ? 390 : 0)) % 3600;
     if (beat < 1400) return 'rest';
+    if (beat < 1580) return 'prepare';
     if (beat < 1840) return 'reach';
-    if (beat < 2360) return 'work';
-    if (beat < 2780) return 'reach';
-    if (beat < 2980) return 'recover';
+    if (beat < 2020) return 'press';
+    if (beat < 2300) return 'work';
+    if (beat < 2480) return 'release';
+    if (beat < 2680) return 'reach';
+    if (beat < 2860) return 'prepare';
+    if (beat < 3020) return 'recover';
+    if (beat < 3100) return 'blink';
     return 'rest';
 }
 

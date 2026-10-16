@@ -1,0 +1,93 @@
+{
+  "physicalDevice": false,
+  "checks": [
+    {
+      "touch": false,
+      "reduced": false,
+      "finished": true,
+      "frames": 1489,
+      "minHead": 27
+    },
+    {
+      "touch": true,
+      "reduced": true,
+      "finished": true,
+      "frames": 1489,
+      "minHead": 27
+    },
+    {
+      "width": 1440,
+      "media": {
+        "fits": true,
+        "videos": [
+          {
+            "src": "http://127.0.0.1:3000/docs/world/guaira/mayor-rework-2026-10-16/ground.mp4",
+            "duration": 24.816667,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "src": "http://127.0.0.1:3000/docs/world/guaira/mayor-rework-2026-10-16/upper.mp4",
+            "duration": 23.766667,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "src": "http://127.0.0.1:3000/docs/world/guaira/mayor-rework-2026-10-16/wait.mp4",
+            "duration": 24.766667,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "src": "http://127.0.0.1:3000/docs/world/guaira/mayor-rework-2026-10-16/before.mp4",
+            "duration": 18.533333,
+            "width": 960,
+            "height": 540,
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "width": 390,
+      "media": {
+        "fits": true,
+        "videos": [
+          {
+            "src": "http://127.0.0.1:3000/docs/world/guaira/mayor-rework-2026-10-16/ground.mp4",
+            "duration": 24.816667,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "src": "http://127.0.0.1:3000/docs/world/guaira/mayor-rework-2026-10-16/upper.mp4",
+            "duration": 23.766667,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "src": "http://127.0.0.1:3000/docs/world/guaira/mayor-rework-2026-10-16/wait.mp4",
+            "duration": 24.766667,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "src": "http://127.0.0.1:3000/docs/world/guaira/mayor-rework-2026-10-16/before.mp4",
+            "duration": 18.533333,
+            "width": 960,
+            "height": 540,
+            "error": null
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

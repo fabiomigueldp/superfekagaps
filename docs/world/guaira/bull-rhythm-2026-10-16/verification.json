@@ -1,0 +1,159 @@
+{
+  "date": "2026-10-16",
+  "scope": "Ossabravo production encounter: three-phase progression, hopping bones, fully warned return charge, corral art, collapse and local trough water",
+  "tests": {
+    "passed": 1163,
+    "failed": 0,
+    "newCases": 17,
+    "logHash": "e3497ae8f4043ddfef7e7eca4daf0af5787ffe8c4043d0cc2c3e1a48888686a9"
+  },
+  "build": {
+    "passed": true,
+    "command": "npm run build",
+    "logHash": "e5cf7d1a6825d720ae03563443d23dfc06aae464e7dc32e8cc97fdf1de1c3acc"
+  },
+  "routes": {
+    "jump": {
+      "frames": 1267,
+      "hitsOneBased": [
+        180,
+        338,
+        548,
+        697,
+        961,
+        1177
+      ],
+      "damageFrames": 0,
+      "finished": true,
+      "minHead": 38,
+      "warningFrames": [
+        84,
+        239,
+        397,
+        607,
+        756,
+        846,
+        1020
+      ]
+    },
+    "pound": {
+      "frames": 1251,
+      "hitsOneBased": [
+        180,
+        338,
+        548,
+        697,
+        945,
+        1161
+      ],
+      "damageFrames": 0,
+      "finished": true,
+      "minHead": 38,
+      "warningFrames": [
+        84,
+        239,
+        397,
+        607,
+        756,
+        846,
+        1004
+      ]
+    }
+  },
+  "baseline": {
+    "frames": 1065,
+    "firstFourHitsPreserved": true,
+    "comparisonFrame": 140,
+    "sourceHashes": {
+      "GuairaBullLab.ts": "695967cd8961e3b4e22282b93fb9f279fe172da67597b8643f218a4bb7eba59e",
+      "GuairaLabArt.ts": "20cf4cebc54bae4d19a2b70c1db69ff16298e734ca40c8701b9e58aeecbb64eb",
+      "SkeletonBullArt.ts": "057ac6117655ae1ad00a544eb4a287843441f7f1de7ebba74e4185ae875427af",
+      "SkeletonBullModel.ts": "2343d8a5dcdc0851b6648280ab7a64e6952ce6ca02442c5c51f61e27fe216c00"
+    }
+  },
+  "browser": {
+    "nativeRoutes": 4,
+    "chapterScenes": 8,
+    "pageErrors": 0,
+    "simulatedTouch": true,
+    "physicalDevice": false,
+    "pauseChecks": 4,
+    "allPausePixelsFrozen": true,
+    "reviewViewports": [
+      1440,
+      390
+    ],
+    "videosDecodedPerViewport": 3
+  },
+  "atlas": {
+    "cells": 12,
+    "exactPixelCopies": true
+  },
+  "returnJumpOffsetsTested": [
+    -3,
+    0,
+    3
+  ],
+  "blindFixedJumpPolicy": {
+    "deathFrameOneBased": 1302,
+    "remainingHealth": 1,
+    "notProofAgainstAllStationaryStrategies": true
+  },
+  "limits": [
+    "Rehearsed native input paths; blind player discovery and difficulty remain unmeasured",
+    "Headless Edge and simulated touch, not a physical device FPS test",
+    "Videos contain no audio"
+  ],
+  "sourceHashes": {
+    "src/adventure/experimental/guaira/SkeletonBullModel.ts": "069096bfd6fecdb56b4869efc8d2ef72a8212846c8004651d35bd3e047237a5d",
+    "src/adventure/experimental/guaira/SkeletonBullArt.ts": "57ccb1eade97ee48f2b7edb9666d81736cbf8211bf782b4eb6628efd1ee83fd0",
+    "src/adventure/experimental/guaira/GuairaLabArt.ts": "e7c4dc7b300c87675e887e5a2e0c1656843399ce682a037d5949e524e6dcc941",
+    "src/adventure/experimental/guaira/GuairaBullLab.ts": "489b0c104cd765f2b063696701d5a021bd05eb6ab381befa64b44b037d5f402e",
+    "tests/guaira-bull-rhythm.test.ts": "679931d62bc49b774710bd5b309ec244273d0449dee6b4cd3f24efa602ad89ed",
+    "tests/guaira-bull-runway.test.ts": "01d295cd19756475182db26aae63764fb62579f713d160dc873af940e8cfdf50",
+    "tests/guaira-replay.test.ts": "599dbfbc69e605798c25a353b9e090882d3a9409735731720b0fabdf16247dac",
+    "tests/guaira-boss-audio-native.test.ts": "a7d04847c727e80ca364d523e258958751044ebee7ca6cb71bfc33e20db13f3f",
+    "tests/helpers/guairaLabReplay.json": "1fbc28e1bc903066188c945e8cbbb54e7abc02f02e0b1d592b86deba5c39d728",
+    "tests/helpers/guairaBullPoundReplay.json": "25adc674eed309d158f5403e94d941d401113095756e1f999c903ec512db01f9",
+    "scripts/prove_guaira_bull_rhythm.ts": "9c7d7f66b7e1e34c93ac4fce6b4f5a06afc85c71653a359f0e72a3d64b1ca9b7",
+    "scripts/verify_guaira_bull_rhythm.cjs": "0b874fc49ac68dc40a3abc1f795c7c3b4c0e8ad6f6dee05003cbc13947b8d596"
+  },
+  "artifacts": {
+    "overview.png": {
+      "sha256": "a29cebb450212022f3a0d29a942d669d2ef08276e06b888c75123939a26a7e56",
+      "bytes": 8269
+    },
+    "before.png": {
+      "sha256": "87cdb481954394d2b1a0b9837b9f1785940e17cca02d918ffc68ed4eb0a496bf",
+      "bytes": 7013
+    },
+    "bone-arcs.png": {
+      "sha256": "d10bdfbd8e1a45bcf7694e49cf91e727a5049313b73cc8d5eecbec662cc5681f",
+      "bytes": 9254
+    },
+    "return-tell.png": {
+      "sha256": "2a05e6245a47e0bad91175ebfb3aa68b464179fa6265f4048ac0f2f80e7ffe4c",
+      "bytes": 8531
+    },
+    "collapse.png": {
+      "sha256": "6c5afc2e9c616c94c0ea92b3b973826b5fb1f15b7a8a13261cdc8c2fd5af3ce3",
+      "bytes": 7619
+    },
+    "combat-atlas.png": {
+      "sha256": "0a66ea56f0f69a462c1aba40728fb61f8d9e85e7bdcadad42cef0478a38229f2",
+      "bytes": 54499
+    },
+    "after.mp4": {
+      "sha256": "df9ce2b2f1b1217a0e02f6bd50d9f8190a3634843ff8ff778828261a69429fe3",
+      "bytes": 1051437
+    },
+    "pound.mp4": {
+      "sha256": "e62ef87ecdc5d40db8751df04724a95349c342f25c7c500183e2fa8c89c809bf",
+      "bytes": 1026989
+    },
+    "before.mp4": {
+      "sha256": "091685db99ee34ac1381e0c4ceaf5a2571fb69978cf4d37ca99ed36e0a14aaf1",
+      "bytes": 791885
+    }
+  }
+}

@@ -1,0 +1,146 @@
+{
+  "checks": [
+    {
+      "target": 577,
+      "kind": "interrupt",
+      "effects": [
+        {
+          "kind": "interrupt",
+          "x": 246,
+          "y": 156,
+          "duration": 42,
+          "age": 7
+        }
+      ],
+      "reduced": false,
+      "pixelsFrozen": true,
+      "stateFrozen": true,
+      "paused": true
+    },
+    {
+      "target": 696,
+      "kind": "seal",
+      "effects": [
+        {
+          "kind": "seal",
+          "x": 251,
+          "y": 193,
+          "seal": 1,
+          "duration": 54,
+          "age": 1
+        }
+      ],
+      "reduced": false,
+      "pixelsFrozen": true,
+      "stateFrozen": true,
+      "paused": true
+    },
+    {
+      "target": 881,
+      "kind": "interrupt",
+      "effects": [
+        {
+          "kind": "interrupt",
+          "x": 80,
+          "y": 220,
+          "duration": 42,
+          "age": 7
+        }
+      ],
+      "reduced": false,
+      "pixelsFrozen": true,
+      "stateFrozen": true,
+      "paused": true
+    },
+    {
+      "target": 1075,
+      "kind": "release",
+      "effects": [
+        {
+          "kind": "release",
+          "x": 244,
+          "y": 193,
+          "seal": 0,
+          "duration": 84,
+          "age": 7
+        }
+      ],
+      "reduced": false,
+      "pixelsFrozen": true,
+      "stateFrozen": true,
+      "paused": true
+    },
+    {
+      "target": 577,
+      "kind": "interrupt",
+      "effects": [
+        {
+          "kind": "interrupt",
+          "x": 246,
+          "y": 156,
+          "duration": 42,
+          "age": 7
+        }
+      ],
+      "reduced": true,
+      "pixelsFrozen": true,
+      "stateFrozen": true,
+      "paused": true
+    },
+    {
+      "target": 696,
+      "kind": "seal",
+      "effects": [
+        {
+          "kind": "seal",
+          "x": 251,
+          "y": 193,
+          "seal": 1,
+          "duration": 54,
+          "age": 1
+        }
+      ],
+      "reduced": true,
+      "pixelsFrozen": true,
+      "stateFrozen": true,
+      "paused": true
+    },
+    {
+      "target": 881,
+      "kind": "interrupt",
+      "effects": [
+        {
+          "kind": "interrupt",
+          "x": 80,
+          "y": 220,
+          "duration": 42,
+          "age": 7
+        }
+      ],
+      "reduced": true,
+      "pixelsFrozen": true,
+      "stateFrozen": true,
+      "paused": true
+    },
+    {
+      "target": 1075,
+      "kind": "release",
+      "effects": [
+        {
+          "kind": "release",
+          "x": 244,
+          "y": 193,
+          "seal": 0,
+          "duration": 84,
+          "age": 7
+        }
+      ],
+      "reduced": true,
+      "pixelsFrozen": true,
+      "stateFrozen": true,
+      "paused": true
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

@@ -1,5 +1,42 @@
 # Guaíra — cenários e movimento ambiente
 
+Continuação de level design em 16/10: [retorno ao desafio no Pátio](world/guaira/route-recovery-2026-10-16/README.md),
+com escada de manutenção, guias articuladas, recuperação local, câmera e HUD
+compartilhado; 961 testes aprovados.
+
+Level design em 16/10: [escolhas, exploração e percursos](guaira-level-design.md),
+com andaimes, registro opcional, bolso escavável, saída da galeria de inspeção
+e recompensas da manutenção; 946 testes aprovados.
+
+Rede pelas fases em 16/10: [Pátio, Respiros, Alívio, Subida e Prefeito](world/guaira/network-finish-2026-10-16/README.md),
+com cavaletes, abraçadeiras, coletores, retorno e reserva particular refinados,
+água contínua nas curvas, relógios integrados e 924 testes aprovados.
+
+Acabamento das comportas de 16/10: [reservatórios e encaixes](world/guaira/gate-finish-2026-10-16/README.md),
+com apoios dos tubos na alvenaria, saída recortada nos reservatórios, correntes
+convergentes, guias e acionamento ligados às pontes; 914 testes aprovados.
+
+Revisão das conexões de 16/10: [tubos e água em movimento](world/guaira/connections-polish-2026-10-16/README.md),
+com visores nos tubos inclinados, ondas a partir da queda, espuma de impacto,
+conexões nos Respiros e 909 testes aprovados.
+
+Revisão das comportas de 16/10: [pontes, roldanas e água](world/guaira/sluice-polish-2026-10-16/README.md),
+com apoios nas margens, correntes ligadas aos tablados, canal final completo,
+irrigação por válvula e 903 testes aprovados.
+
+Continuação hidráulica de 16/10: [água, pressão e mecanismos](world/guaira/pressure-polish-2026-10-16/README.md),
+com alimentação lateral dos pistões, fluxo pelas curvas, retorno de alívio animado,
+aviso de pressão corrigido e 893 testes aprovados.
+
+Revisão hidráulica de 16/10: [tubos, pistões e água em movimento](world/guaira/hydraulics-polish-2026-10-16/README.md),
+com encaixes refinados, fluxo contínuo e 887 testes aprovados.
+
+Continuação de 16/10: [trabalhadores, inspetor e arrozais](world/guaira/life-polish-2026-10-16/README.md),
+com sete poses por ciclo, vegetação variada e 883 testes aprovados.
+
+Atualização de 16/10: [materiais, Ossabravo e olhar do prefeito](world/guaira/level-finish-2026-10-16/README.md),
+com comparações visuais, quatro percursos completos e 880 testes aprovados.
+
 Passagem visual de 15/10/2026 nos renderizadores nativos das fases. A mesma arte
 é usada pelos laboratórios e pelo capítulo; não há cenário paralelo nem novos
 arquivos de imagem para carregar durante o jogo.

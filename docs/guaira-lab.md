@@ -1,6 +1,10 @@
 # Guaíra / Ossabravo experimental lab
 
-Open `/guaira-lab.html` directly. Ossabravo is a provisional name. This is an isolated playable prototype, with no campaign or menu link and no introductory cutscene. It uses the existing `WorldGame`, `Player`, `Input`, `Renderer`, bitmap controls, Feka sprites, helmet, death animation and automatic retry. The ephemeral store never reads or writes campaign storage.
+Current revision: [readable recovery, rib release and bone motion](world/guaira/bull-recovery-2026-10-16/index.html), with [verification and reproduction](world/guaira/bull-recovery-2026-10-16/README.md). A missed opening now closes during the existing 24-tick rest: native walking can leave the body, late stomps bounce, and the next complete warning restores dangerous contact. Projectile movement and successful routes retain their existing timing.
+
+Previous revision: [three phases, hopping bones, return charge and animated conclusion](world/guaira/bull-rhythm-2026-10-16/index.html).
+
+Open `/guaira-lab.html` directly or enter Ossabravo through the Guaíra chapter. Ossabravo is a provisional name. Both entries use the same encounter and existing `WorldGame`, `Player`, `Input`, `Renderer`, bitmap controls, Feka sprites, helmet, death animation and automatic retry. The standalone ephemeral store never reads or writes campaign storage; the chapter host owns its ordinary completion receipt.
 
 The dry red arena has a continuous horizontal floor at world y224, shown at screen y160 by the fixed x0/y64 camera. Cactus, distant irrigated rice and a closed irrigation gate are background scenery. Mysterious purple slime animates the skeletal bull; the prototype defines no ingredients or origin story.
 
@@ -18,6 +22,13 @@ The dry red arena has a continuous horizontal floor at world y224, shown at scre
 Touch-capable Pointer Events devices use the local five-button DOM bar, with44CSSpx targets independent of canvas scale; older devices retain the ordinary engine touch zones. Both use the real Input action path. Page controls use native buttons/links, accessible names and44px-high bitmap faces; native Enter/Space activation remains owned by those controls. Blur/hidden-tab pause requires explicit resume. Reduced-motion preference disables camera shake, decorative bull bob/stride and warning flashing; direction cues and combat timing remain visible.
 
 ## Encounter contract
+
+The rules below describe the original single-pass/low-bone phase. The current
+encounter adds hopping bones at health 4–3 and a fully warned return charge at
+health 2–1. The return keeps the ribs closed until its final brake. Its 42-tick
+warning, 72-tick opening, trajectory and updated complete replays are documented
+in the current revision linked above. Older verification counts and replay
+durations below are historical.
 
 The bull locks direction at the start of a 42-tick charge warning or 48-tick low-bone warning. Each fixed tick is 1/60 second; catch-up is capped at 100ms. Six falling top hits defeat it. Brake/recovery opens the ribs for an ordinary jump or sentada; side contact never damages the boss. The charge's final swept collision is resolved with top contact, so a valid first-braking-frame stomp wins over the residual sweep. A descending player on the trailing swept edge safely bounces but cannot deal damage without touching the present body.
 

@@ -1,0 +1,29 @@
+{
+  "kind": "production-painters-authored-inspection",
+  "baseline": "pre-round source snapshots",
+  "baselineHashes": {
+    "GuairaWorkerArt": "7361095907b4f5f9296416aa555e63826e4ee91a5526ff420bbf4ff1057f2a80",
+    "GuairaAscentArt": "7e7be46ea87db6063d3a2d5cc85ae62c1055b49cd8765af7d3356eecaafafb91"
+  },
+  "gameplayVictory": false,
+  "fps": 30,
+  "seconds": 7.2,
+  "workCycleMs": 3600,
+  "blinkMs": 80,
+  "poses": {
+    "pump": {
+      "before": 4,
+      "after": 7
+    },
+    "rice": {
+      "before": 4,
+      "after": 7
+    },
+    "inspector": {
+      "before": 1,
+      "after": 7
+    }
+  },
+  "spriteScale": "integer-nearest-neighbor",
+  "stateUnchanged": true
+}

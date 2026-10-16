@@ -38,7 +38,7 @@ function replay(h: ReturnType<typeof guairaAscentBrowser>, game: GuairaAscent, t
             // Native 320×180 framing shows the receiving bank before disembark,
             // and the upper terrace before the final lift jump.
             if (frame === 299) assert.ok(game.camera.x < 400 && game.camera.x + 320 > 512);
-            if (frame === 958 || frame === 1198) assert.ok(240 - game.camera.y < 174, 'dry gallery is visible before boarding/disembarking');
+            if (frame === 958 || frame === 1198) assert.ok(192 - game.camera.y < 174, 'receiving inspection step is visible before boarding/disembarking');
             if (frame === 783) {
                 assert.ok(game.camera.x < 710 && game.camera.x + 320 > 784);
                 assert.ok(144 - game.camera.y > 23 && 144 - game.camera.y < 150);
@@ -65,12 +65,12 @@ test('isolated ascent clones authored stage and uses native player/input/rendere
     assert.equal(game.mapReturnHref, './guaira.html?at=corral');
 });
 
-for (const touch of [false, true]) test(`${touch ? 'native touch' : 'keyboard'} completes all three vehicles and both checkpoints without run/pound/coins`, t => {
+for (const touch of [false, true]) test(`${touch ? 'native touch' : 'keyboard'} completes all three vehicles and both checkpoints without run or pound`, t => {
     const h = guairaAscentBrowser(t, { touch }), game = h.create();
     let completions = 0;
     (game as unknown as { complete(): void }).complete = () => { completions++; };
     replay(h, game, touch);
-    assert.equal(game.finished, true); assert.equal(game.coins, 0); assert.equal(game.store.save.checkpoint?.index, 1);
+    assert.equal(game.finished, true); assert.equal(game.coins, 1); assert.equal(game.store.save.checkpoint?.index, 1);
     assert.equal(feet(game), G.terraceY); assert.equal(game.player.data.velocity.x, 0);
     assert.equal(game.mapReturnHref, './guaira.html?at=vazao&visit=ascent-clear');
     assert.deepEqual(game.store.save.completed, []); assert.deepEqual(game.store.save.times, {}); assert.equal(completions, 0);
@@ -107,7 +107,7 @@ for (const id of [G.plankId, G.liftId]) for (const direction of ['ArrowLeft', 'A
         h.run(game, 20); h.run(game, 30, ['Space']); h.run(game, 30);
         assert.ok(feet(game) <= 336, 'a recovery step or returning deck catches the jump');
         h.run(game, 36, ['ArrowLeft', 'Space']); h.run(game, 30);
-        assert.equal(feet(game), 304); assert.equal(p.isGrounded, true); assert.equal(p.isDead, false);
+        assert.equal(feet(game), lift ? 256 : 304); assert.equal(p.isGrounded, true); assert.equal(p.isDead, false);
         assert.ok(p.position.x < (lift ? 656 : 224));
         if (lift) assert.ok(p.position.x >= 496, 'second recovery stays on checkpoint bank');
     });
@@ -226,7 +226,7 @@ test('optional inspection coins and two ordinary jumps return to the upper safe 
     for (const [n, keys] of recording.runs.slice(0, 10) as Array<[number, string[]]>) h.run(game, n, keys);
     assert.equal(game.store.save.checkpoint?.index, 1);
     h.run(game, 104, ['ArrowRight']); h.run(game, 50);
-    assert.equal(feet(game), 240); assert.equal(game.coins, 3);
+    assert.equal(feet(game), 240); assert.equal(game.coins, 4);
     h.run(game, 25, ['ArrowRight']); h.run(game, 80, ['ArrowLeft']); h.run(game, 20);
     h.run(game, 35, ['Space']); h.run(game, 20);
     assert.equal(feet(game), 192);
@@ -238,17 +238,17 @@ test('optional inspection coins and two ordinary jumps return to the upper safe 
     assert.notEqual(game.player, previous);
     assert.equal(game.player.data.position.x, G.upperCheckpointX); assert.equal(feet(game), 144);
     assert.equal(game.objects.time, 0); assert.equal(game.objects.get(G.serviceId)!.x, 896);
-    assert.equal(game.store.save.checkpoint?.index, 1); assert.equal(game.coins, 3);
+    assert.equal(game.store.save.checkpoint?.index, 1); assert.equal(game.coins, 4);
     assert.equal([...((game as unknown as { collected: Set<string> }).collected)].filter(id => id.includes('inspection')).length, 3);
     h.run(game, 30); // Native respawn reveal finishes before fresh boarding input.
     h.run(game, 28, ['ArrowRight']); h.run(game, 20);
     h.run(game, 40, ['ArrowRight', 'Space']); h.run(game, 160);
     h.run(game, 50, ['ArrowRight', 'Space']); h.run(game, 90, ['ArrowRight']);
     assert.equal(game.finished, true, 'upper checkpoint restores a natively completable crossing');
-    assert.equal(game.coins, 3);
+    assert.equal(game.coins, 4);
     game.load(G.id);
     assert.equal(game.coins, 0); assert.equal(game.store.save.checkpoint, null);
-    assert.equal(game.stage.pickups?.length, 6);
+    assert.equal(game.stage.pickups?.length, 14);
 });
 
 

@@ -4,6 +4,7 @@ import { CompletedAvatarPresentation } from '../CompletedAvatarPresentation';
 import { jetCycle } from '../../../WorldMachineState';
 import type { AdventureStage } from '../../../types';
 import { panel, pixelText } from '../../../../graphics/BitmapFont';
+import { drawGuairaCoinReadout } from '../GuairaCoinReadout';
 import { GUAIRA_RELIEF as G, guairaReliefStage, reliefOpen } from './GuairaReliefStage';
 import { drawReliefBackground, drawReliefTerrain, drawReliefObjects } from './GuairaReliefArt';
 import { GuairaReliefChallenge, RELIEF_ROUTE_OBJECTIVES, reliefChallengeMessage,
@@ -38,7 +39,7 @@ export class GuairaRelief extends WorldGame {
                 this.finished = false; this.store.save.checkpoint = null; this.input.reset();
             });
             this.reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
-            this.art.background = (c, _island, x, y) => drawReliefBackground(c, this.level, x, y);
+            this.art.background = (c, _island, x, y) => drawReliefBackground(c, this.level, x, y, this.objects.time, this.reducedMotion);
             this.art.terrain = (c, level, _island, x, y, _time, reducedMotion) => drawReliefTerrain(c, level, x, y, reducedMotion);
             this.art.genericStructures = false;
             this.art.objects = (c, objects, x, y) => drawReliefObjects(c, objects, x, y, this.reducedMotion);
@@ -95,9 +96,38 @@ export class GuairaRelief extends WorldGame {
         const tx = Math.max(0, Math.min(G.width * 16 - 320, p.position.x - 64));
         this.camera.x = snap ? tx : previousX + (tx - previousX) * .12;
         this.camera.x = Math.max(0, Math.min(this.camera.x, p.position.x - 24));
-        const ty = Math.max(0, Math.min(G.floor - 160, p.position.y - 32));
-        const next = snap ? ty : previousY + Math.max(-8, Math.min(8, ty - previousY));
-        this.camera.y = Math.max(0, feet - 168, Math.min(p.position.y - 28, next));
+        // Show the next support before asking for a jump. The lid and the floor
+        // cannot both fit in this viewport: the open collector changes the
+        // middle shelf's destination from the lid above to the safe floor below.
+        let target = G.floor - 160;
+        if (feet < 280 && p.position.x < G.gantryStart) {
+            target = this.reliefOpened ? G.floor - 164 : feet <= 176 ? 60 : p.position.x < G.lidEnd ? 108 : G.floor - 164;
+        } else if (feet < 312 && p.position.x < 192) target = 152;
+        if (p.position.x >= G.gantryStart && p.position.x < G.landingStart && feet <= G.gantryY + 16)
+            target = Math.max(G.landingY, G.floor - 128) - 152;
+        if (p.position.x >= G.landingStart && p.position.x < G.returnStart && feet <= G.landingY + 24)
+            target = G.returnY - 152;
+        // The highest native jump needs three pixels above the stage origin;
+        // the workshop wall continues there, so keep the entire helmet visible.
+        const ty = Math.min(target, p.position.y - 36);
+        const next = snap ? ty : previousY + Math.max(-6, Math.min(6, (ty - previousY) * .18));
+        this.camera.y = Math.max(feet - 168, Math.min(p.position.y - 36, next));
+    }
+    private routeHint() {
+        const p = this.player.data, feet = p.position.y + p.height;
+        if (p.position.x >= G.returnStart && feet <= G.returnY + 8)
+            return ['SAIDA A DIREITA', 'Patamar de saída: siga à direita para voltar ao piso da oficina.'] as const;
+        if (p.position.x >= G.landingStart && feet <= G.landingY + 24)
+            return ['DESCA A DIREITA', 'Sacada de inspeção: siga até o patamar abaixo à direita, depois desça ao piso de saída.'] as const;
+        if (p.position.x >= G.gantryStart - 8 && feet <= G.gantryY + 8)
+            return ['CORRA E SALTE', 'Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura.'] as const;
+        if (!this.reliefOpened && feet <= 176 && p.position.x < G.gantryStart)
+            return ['PULE + BAIXO', 'Tampa de alívio: pule e use baixo no ar para retirar a pressão. A passarela à direita oferece um salto opcional.'] as const;
+        if (!this.reliefOpened && feet <= 256 && p.position.x < G.lidEnd)
+            return ['TAMPA ACIMA', 'A tampa está acima da plataforma de manutenção. Suba para aliviar a pressão ou volte ao piso e observe o intervalo seco.'] as const;
+        return this.reliefOpened
+            ? ['SEM PRESSAO', 'Alívio aberto: a água volta pelo tubo lateral. Desça ao piso seguro ou salte da oficina à passarela acima à direita.'] as const
+            : ['PISO OU OFICINA', 'Atravesse no intervalo seco ou suba pela oficina para abrir o alívio. A manutenção também leva à passarela sobre a grelha.'] as const;
     }
     toggleReliefPause() {
         if (this.isDisposed) return;
@@ -149,7 +179,9 @@ export class GuairaRelief extends WorldGame {
         const c = this.renderer.getContext();
         c.fillStyle = '#283d40'; c.fillRect(0, 0, 320, 23);
         pixelText(c, 'CAMARA DE ALIVIO', 8, 8, '#f3ddb1');
-        pixelText(c, this.reliefOpened ? 'SEM PRESSAO' : 'DUAS ROTAS', 178, 8, '#b1e8db');
+        pixelText(c, this.finished ? 'INSPECIONADO' : this.routeHint()[0], 125, 8, '#b1e8db');
+        drawGuairaCoinReadout(c, this.renderer, this.coins);
+        if (this.player.data.hasHelmet) this.renderer.drawHelmet(279, 4, c);
         pixelText(c, 'II', 305, 8, '#f3ddb1');
         if (paused && !this.externalPauseMenu) {
             c.fillStyle = '#211b2bbd'; c.fillRect(0, 23, 320, 157);
@@ -160,8 +192,7 @@ export class GuairaRelief extends WorldGame {
         const message = paused ? 'Pausado · Esc para continuar'
             : this.finished ? `PASSAGEM INSPECIONADA · ${this.reliefOpened ? 'alívio aberto, grelha sem pressão' : 'alívio intacto, grelha mantém o ciclo'} · sem progresso salvo`
             : this.player.data.isDead ? 'Retorno ao ponto seguro desta tentativa · tampa e jato serão reconstruídos'
-            : this.reliefOpened ? 'Alívio aberto: a água volta pelo tubo lateral e a grelha ficou sem pressão · siga à direita'
-            : 'Duas rotas: siga no intervalo seco da grelha ou suba e rompa a tampa de alívio · pule, depois baixo no ar · morrer ou Tentar restaura tampa e jato';
+            : this.routeHint()[1];
         const optional = !paused && !this.player.data.isDead ? reliefChallengeMessage(this.routes.snapshot) : null;
         const text = optional ? `${message} · ${optional}` : message;
         if (this.status.textContent !== text) this.status.textContent = text;

@@ -11,6 +11,8 @@ export const GUAIRA_JUNCTION = Object.freeze({
     entryPlateId: 'junction-entry-plate', middlePlateId: 'junction-middle-plate',
     liftAId: 'junction-deck-a', liftBId: 'junction-deck-b',
     checkpointX: 432, finishX: 880, warningMs: 400,
+    returnUpperId: 'junction-return-upper', returnLowerId: 'junction-return-lower',
+    returnHomeY: 264, returnUpperY: 304, returnLowerY: 336,
 });
 
 /** A switch requests a route; warning time is readable preparation, never a deadline. */
@@ -61,6 +63,13 @@ export function guairaJunctionStage(): AdventureStage {
         { id: g.middlePlateId, kind: 'switch', x: 480, y: 248, width: 32, height: 8, link: g.entryPlateId },
         { id: g.liftAId, kind: 'lift', x: 224, y: g.dockY, width: 160, height: 8, to: { x: 224, y: g.middleY }, gated: true },
         { id: g.liftBId, kind: 'lift', x: 576, y: g.dockY, width: 160, height: 8, to: { x: 576, y: g.terraceY }, gated: true },
+        // Stowed below the patio, outside its standing/carry tolerance. Reaching
+        // the middle checkpoint lowers the service stair once for this attempt.
+        // Before that, neither tread is reachable from the dry recovery floor.
+        { id: g.returnUpperId, kind: 'lift', x: 480, y: g.returnHomeY, width: 48, height: 8,
+            to: { x: 480, y: g.returnUpperY }, gated: true },
+        { id: g.returnLowerId, kind: 'lift', x: 528, y: g.returnHomeY, width: 48, height: 8,
+            to: { x: 528, y: g.returnLowerY }, gated: true },
     ];
     stage.foes = []; stage.exits = []; stage.dialogues = []; stage.landmarks = [];
     stage.pickups = [176, 192, 208].map((x, i) => ({ id: `junction-maintenance-coin-${i + 1}`, kind: 'coin' as const, x, y: 154 }));

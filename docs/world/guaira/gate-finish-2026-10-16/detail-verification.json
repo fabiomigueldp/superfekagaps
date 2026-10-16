@@ -1,0 +1,128 @@
+{
+  "hashes": {
+    "GuairaTraversalArt": "4134bc8e3f901281bd4a817f3d080b04abf7939bee327f4f63fde1b6e40c1364",
+    "GuairaWaterworksArt": "5de80c031b36b51027d365096547d784042546a2aa65366445f335ae69c25678",
+    "GuairaSluiceArt": "fe96b45425337649599181e69084147de1be1ab0c9cc913f91cf5ac674684973",
+    "GuairaPipeArt": "a478c02a8fbbafa73417de54c4ee2693f084eb3e31681cc05e27b74453f89e60"
+  },
+  "currentHashes": {
+    "GuairaTraversalArt": "5f8bfdbfa0b1091e5ed6d3f40ae6b71a10e1ec40eee72d41ef22c50882b7587f",
+    "GuairaWaterworksArt": "6b7f08a3e0cf686dcb65e3a52d5ca8b0263437dcc039744e72fb0f65b5eee3f9",
+    "GuairaSluiceArt": "acbdc933f46c66668bf5cfeb2065a936a42af4c78da173c7fde76c3a695e9f02",
+    "GuairaPipeArt": "a478c02a8fbbafa73417de54c4ee2693f084eb3e31681cc05e27b74453f89e60"
+  },
+  "snapshots": [
+    {
+      "key": "rua-fechada",
+      "final": false,
+      "active": false,
+      "y": 336,
+      "camera": {
+        "x": 368,
+        "y": 108
+      },
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedStable": true,
+      "authoredPose": true
+    },
+    {
+      "key": "rua-subindo",
+      "final": false,
+      "active": true,
+      "y": 280,
+      "camera": {
+        "x": 368,
+        "y": 108
+      },
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedStable": true,
+      "authoredPose": true
+    },
+    {
+      "key": "rua-pronta",
+      "final": false,
+      "active": true,
+      "y": 224,
+      "camera": {
+        "x": 368,
+        "y": 108
+      },
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedStable": true,
+      "authoredPose": true
+    },
+    {
+      "key": "arroz-fechada",
+      "final": true,
+      "active": false,
+      "y": 336,
+      "camera": {
+        "x": 1088,
+        "y": 96
+      },
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedStable": true,
+      "authoredPose": true
+    },
+    {
+      "key": "arroz-subindo",
+      "final": true,
+      "active": true,
+      "y": 280,
+      "camera": {
+        "x": 1088,
+        "y": 96
+      },
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedStable": true,
+      "authoredPose": true
+    },
+    {
+      "key": "arroz-pronta",
+      "final": true,
+      "active": true,
+      "y": 224,
+      "camera": {
+        "x": 1088,
+        "y": 96
+      },
+      "stateUnchanged": true,
+      "deterministic": true,
+      "reducedStable": true,
+      "authoredPose": true
+    }
+  ],
+  "replays": [
+    {
+      "key": "taipas",
+      "updates": 1048,
+      "images": 262,
+      "fps": 15,
+      "finished": true,
+      "damage": false,
+      "manualPoseOrClockChanges": false
+    },
+    {
+      "key": "manutencao",
+      "updates": 1074,
+      "images": 269,
+      "fps": 15,
+      "finished": true,
+      "damage": false,
+      "manualPoseOrClockChanges": false
+    }
+  ],
+  "motion": {
+    "authored": true,
+    "fps": 30,
+    "frames": {
+      "rua": 150,
+      "arroz": 150
+    }
+  }
+}

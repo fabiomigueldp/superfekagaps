@@ -44,7 +44,10 @@ function route(h: Harness, g: GuairaRelief, blocks: Run[]) {
             }
             if (p.isGrounded && feet(g) === 224) {
                 recoveryLanding = true;
-                assert.ok(G.floor - g.camera.y <= 172, 'lower floor preview before walking off shelf');
+                if (!g.reliefOpened && p.position.x < G.lidEnd)
+                    assert.ok(G.lidY - g.camera.y >= 24 && G.lidY - g.camera.y <= 156, 'next lid visible while climbing');
+                if (g.reliefOpened && p.position.x >= G.lidEnd - 2)
+                    assert.ok(G.floor - g.camera.y <= 176, 'safe floor visible before walking off the opened collector');
             }
             if (g.finished && !finishedAt) finishedAt = frame;
         }
@@ -58,7 +61,9 @@ test('relief uses native authority, isolated tiles and no campaign/save/exit add
     assert.equal(g.player.data.position.x, G.spawnX); assert.equal(feet(g), G.floor);
     assert.equal(g.level.data.tiles.flat().filter(tile => tile === T.BRICK_BREAKABLE).length, 3);
     assert.equal(g.stage.mechanisms.length, 1); assert.equal(g.stage.mechanisms[0].kind, 'jet');
-    for (const key of ['exits','foes','pickups','dialogues','landmarks'] as const) assert.deepEqual(g.stage[key], []);
+    for (const key of ['exits','foes','dialogues','landmarks'] as const) assert.deepEqual(g.stage[key], []);
+    assert.equal(g.stage.pickups.length,5);
+    assert.ok(g.stage.pickups.every(p => p.kind === 'coin' && p.y < 288));
     assert.equal(g.boss, null); assert.equal(g.store.save.checkpoint, null);
     const altered = guairaReliefStage(); altered.level.tiles[10][15] = T.EMPTY;
     assert.equal(guairaReliefStage().level.tiles[10][15], T.BRICK_BREAKABLE);
@@ -75,7 +80,7 @@ for (const touch of [false, true]) for (const reducedMotion of [false, true])
             assert.equal(g.reliefOpened, name === 'maintenance'); assert.equal(jet(g).active, name === 'maintenance');
             assert.equal(trace.openedAt > 0, name === 'maintenance');
             assert.equal(trace.highLanding, name === 'maintenance');
-            assert.equal(g.store.save.checkpoint?.index, 0); assert.equal(g.coins, 0);
+            assert.equal(g.store.save.checkpoint?.index, 0); assert.equal(g.coins, name === 'maintenance' ? 3 : 0);
             assert.deepEqual(g.store.save.completed, []); assert.deepEqual(g.store.save.times, {});
             const frozen = snapshot(g); h.run(g, 60, ['ArrowLeft', 'Space', 'ArrowDown']); g.render();
             assert.deepEqual(snapshot(g), frozen); assert.match(h.status.textContent, /PASSAGEM INSPECIONADA/);

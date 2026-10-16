@@ -1,15 +1,25 @@
 {
   "stepMs": 16.666666666666668,
-  "frames": 1112,
+  "frames": 1822,
   "runs": [
     [
-      14,
+      12,
+      [
+        "ArrowLeft"
+      ]
+    ],
+    [
+      90,
+      []
+    ],
+    [
+      31,
       [
         "ArrowRight"
       ]
     ],
     [
-      148,
+      61,
       []
     ],
     [
@@ -25,143 +35,188 @@
       ]
     ],
     [
-      36,
+      40,
       [
         "ArrowRight",
         "Space"
       ]
+    ],
+    [
+      35,
+      []
+    ],
+    [
+      38,
+      [
+        "ArrowRight",
+        "Space"
+      ]
+    ],
+    [
+      30,
+      []
+    ],
+    [
+      10,
+      [
+        "ArrowRight",
+        "Space"
+      ]
+    ],
+    [
+      35,
+      [
+        "Space"
+      ]
+    ],
+    [
+      25,
+      []
+    ],
+    [
+      56,
+      []
+    ],
+    [
+      30,
+      []
+    ],
+    [
+      34,
+      [
+        "Space"
+      ]
+    ],
+    [
+      104,
+      []
+    ],
+    [
+      5,
+      []
+    ],
+    [
+      21,
+      [
+        "ArrowLeft"
+      ]
+    ],
+    [
+      96,
+      []
+    ],
+    [
+      8,
+      [
+        "Space"
+      ]
+    ],
+    [
+      24,
+      [
+        "ArrowDown"
+      ]
+    ],
+    [
+      86,
+      []
     ],
     [
       22,
-      []
-    ],
-    [
-      32,
-      [
-        "ArrowRight"
-      ]
-    ],
-    [
-      26,
       [
         "ArrowRight",
         "Space"
       ]
-    ],
-    [
-      12,
-      []
-    ],
-    [
-      112,
-      [
-        "ArrowLeft"
-      ]
-    ],
-    [
-      28,
-      []
-    ],
-    [
-      8,
-      [
-        "Space"
-      ]
-    ],
-    [
-      24,
-      [
-        "ArrowDown"
-      ]
-    ],
-    [
-      36,
-      [
-        "ArrowRight",
-        "Space"
-      ]
-    ],
-    [
-      12,
-      []
     ],
     [
       30,
-      []
-    ],
-    [
-      42,
-      [
-        "ArrowRight"
-      ]
-    ],
-    [
-      26,
-      [
-        "ArrowRight",
-        "Space"
-      ]
-    ],
-    [
-      12,
-      []
-    ],
-    [
-      112,
-      [
-        "ArrowLeft"
-      ]
-    ],
-    [
-      28,
-      []
-    ],
-    [
-      8,
       [
         "Space"
       ]
     ],
     [
-      24,
-      [
-        "ArrowDown"
-      ]
-    ],
-    [
-      36,
-      [
-        "ArrowRight",
-        "Space"
-      ]
-    ],
-    [
-      12,
-      []
-    ],
-    [
-      30,
-      []
-    ],
-    [
-      42,
-      [
-        "ArrowRight"
-      ]
-    ],
-    [
-      26,
-      [
-        "ArrowRight",
-        "Space"
-      ]
-    ],
-    [
-      12,
+      74,
       []
     ],
     [
       100,
+      []
+    ],
+    [
+      34,
+      [
+        "Space"
+      ]
+    ],
+    [
+      94,
+      []
+    ],
+    [
+      6,
+      []
+    ],
+    [
+      22,
+      [
+        "ArrowLeft"
+      ]
+    ],
+    [
+      90,
+      []
+    ],
+    [
+      24,
+      [
+        "ArrowRight"
+      ]
+    ],
+    [
+      70,
+      []
+    ],
+    [
+      24,
+      [
+        "ArrowLeft"
+      ]
+    ],
+    [
+      10,
+      []
+    ],
+    [
+      8,
+      [
+        "Space"
+      ]
+    ],
+    [
+      24,
+      [
+        "ArrowDown"
+      ]
+    ],
+    [
+      65,
+      []
+    ],
+    [
+      22,
+      [
+        "ArrowRight",
+        "Space"
+      ]
+    ],
+    [
+      40,
+      [
+        "Space"
+      ]
+    ],
+    [
+      130,
       [
         "ArrowLeft"
       ]
@@ -170,5 +225,38 @@
       30,
       []
     ]
-  ]
+  ],
+  "hitFrames": [
+    407,
+    941,
+    1638
+  ],
+  "warningFrames": [
+    102,
+    496,
+    580,
+    664,
+    875,
+    1030,
+    1106,
+    1182,
+    1258,
+    1374,
+    1593
+  ],
+  "seamWarningFrames": [
+    875,
+    1593
+  ],
+  "seamActiveFrames": [
+    935
+  ],
+  "salvoWarningFrames": [
+    496,
+    580,
+    1030,
+    1106,
+    1182
+  ],
+  "source": "Native inputs only: hydraulic volleys, aimed stamps, counterpressure, actual lift, three back hits and walk out."
 }

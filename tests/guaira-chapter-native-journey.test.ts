@@ -12,7 +12,7 @@ import { sceneLifecycleBrowser } from './helpers/sceneLifecycleHarness';
 
 type Browser = ReturnType<typeof sceneLifecycleBrowser>;
 type Recording = { stepMs: number; frames?: number; inputFrames?: number; initialSettleFrames?: number;
-    runs: Array<[number, string[]]>; expectedHits?: Array<{ frame: number; health: number }> };
+    hitFrames?:number[]; runs: Array<[number, string[]]>; expectedHits?: Array<{ frame: number; health: number }> };
 const readRecording = (name: string): Recording => JSON.parse(readFileSync(new URL(`./helpers/${name}.json`, import.meta.url), 'utf8'));
 const recordings: Record<GuairaChapterSceneId, Recording> = {
     'guaira-travessia': readRecording('guairaTraversalReplay'),
@@ -175,11 +175,11 @@ for (const [opening, touch] of [['guaira-travessia', false], ['guaira-patio-comp
 
             attempt = enter(session, scene); runtime = await mount(h, scene);
             if (scene === 'guaira-prefeito') {
-                // The obsolete crossing fixture really loses its helmet and dies in seam pressure.
-                const failed = play(h, session, runtime, attempt, touch, readRecording('guairaMayorOriginalCrossing'), 873, false);
-                assert.deepEqual(failed.sealFrames, [322, 622]);
+                // Camping takes the seam, then the high jet in the rotated phrase.
+                const failed = play(h, session, runtime, attempt, touch, readRecording('guairaMayorFailureReplay'), readRecording('guairaMayorFailureReplay').frames, false);
+                assert.deepEqual(failed.sealFrames, [407]);
                 assert.equal(failed.firstResult, null); assert.equal(runtime.game.player.data.isDead, true);
-                assert.equal((runtime.game as GuairaMayorLab).mayor.sealsRemaining, 1);
+                assert.equal((runtime.game as GuairaMayorLab).mayor.sealsRemaining, 2);
                 assert.equal(session.canContinue(attempt, runtime.sample(attempt)), false);
                 assert.equal(session.exitToMap(attempt, runtime.sample(attempt))?.receipt, null);
                 assert.equal(session.snapshot().chapterComplete, false); assert.equal(session.snapshot().accepted.length, 4);
@@ -190,7 +190,7 @@ for (const [opening, touch] of [['guaira-travessia', false], ['guaira-patio-comp
             assert.ok(played.firstResult !== null, `${scene}: complete recorded route earns the actual result`);
             if (scene !== 'guaira-lab') assert.equal(played.checkpointBeforeFinish, true, 'a native checkpoint was observed without awarding completion');
             if (scene === 'guaira-lab') assert.deepEqual(played.hits, recordings[scene].expectedHits);
-            if (scene === 'guaira-prefeito') assert.deepEqual(played.sealFrames, [322, 652, 982]);
+            if (scene === 'guaira-prefeito') assert.deepEqual(played.sealFrames, recordings[scene].hitFrames);
             assert.equal(runtime.returnArrival(), arrivals[scene]);
             assert.equal(session.snapshot().accepted.length, index);
             proof.push({ scene, frames: played.frame, resultAt: played.firstResult });

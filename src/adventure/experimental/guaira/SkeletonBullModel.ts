@@ -1,14 +1,19 @@
 /** Isolated Guaíra prototype. Values are logical pixels / fixed 60 Hz ticks. */
 export interface Box { x: number; y: number; width: number; height: number }
 export interface BullArena { left: number; right: number; floor: number }
-export type BullState = 'intro' | 'idle' | 'tell' | 'charge' | 'brake' | 'recover' | 'rattle' | 'bones' | 'hurt' | 'defeated';
+export type BullState = 'intro' | 'idle' | 'tell' | 'turn' | 'charge' | 'brake' | 'recover' | 'rattle' | 'bones' | 'hurt' | 'defeated';
 export interface Bone extends Box { vx: number; life: number }
 export interface BullEvent { kind: 'tell' | 'charge' | 'brake' | 'bones' | 'hit' | 'defeated'; tick: number }
-export const BULL_RULES = Object.freeze({ tickMs: 1000 / 60, tell: 42, rattle: 48, brake: 20, recover: 52, hurt: 30, maxBones: 2, speed: 5, health: 6 });
+export const BULL_RULES = Object.freeze({ tickMs: 1000 / 60, rest: 24, tell: 42, turn: 42, rattle: 48, brake: 20, recover: 52, hurt: 30, maxBones: 2, speed: 5, health: 6,
+    boneHop:36, boneHopHeight:32, collapse:48 });
 export const intersects = (a: Box, b: Box) => a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
 const swept = (a: Box, previousX: number): Box => ({ ...a, x: Math.min(a.x, previousX), width: a.width + Math.abs(a.x - previousX) });
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 const BONE = Object.freeze({ speed: 3, width: 10, spacing: 22 });
+export function bullBoneY(floor:number,age:number,bouncing:boolean){
+    const p=(age%BULL_RULES.boneHop)/BULL_RULES.boneHop;
+    return floor-9-(bouncing?Math.round(4*BULL_RULES.boneHopHeight*p*(1-p)):0);
+}
 export class SkeletonBullModel implements Box {
     readonly width = 48; readonly height = 34;
     x: number; y: number; state: BullState = 'intro'; stateTick = 0; tick = 0;
@@ -18,12 +23,30 @@ export class SkeletonBullModel implements Box {
     private chargeSweeps: Box[] = [];
     private remainder = 0; private hitThisOpening = false;
     private boneFlightTicks = 0;
+    private bouncingVolley = false;
+    private chargeTotal = 1;
+    private chargeIndex = 1;
+    private closingAfterMiss = false;
     readonly arena: Readonly<BullArena>;
     constructor(arena: BullArena = { left: 4, right: 316, floor: 224 }) {
         if (![arena.left, arena.right, arena.floor].every(Number.isFinite) || arena.right - arena.left < 280) throw new Error('Bull arena requires finite bounds and at least 280px of clear floor');
         this.arena = Object.freeze({ ...arena }); this.x = arena.right - this.width - 20; this.y = arena.floor - this.height;
     }
     get vulnerable() { return (this.state === 'brake' || this.state === 'recover') && !this.hitThisOpening; }
+    get phaseNumber() { return this.health > 4 ? 1 : this.health > 2 ? 2 : 3; }
+    get bouncingBones() { return this.bouncingVolley && (this.state === 'rattle' || this.state === 'bones'); }
+    get chargeCount() { return this.chargeTotal; }
+    get chargeLeg() { return this.chargeIndex; }
+    get boneFlightDuration(){return this.boneFlightTicks;}
+    /** A missed opening closes during the existing rest, giving an overlapping
+     * player time to walk out. It awards no hit and adds no time to the cycle. */
+    get rearming() { return this.state === 'idle' && this.closingAfterMiss; }
+    /** Both loose ribs start exactly where their live projectiles will spawn. */
+    get boneLaunchPoses(): readonly Box[] {
+        const origin = this.x + this.width / 2;
+        return [0, BONE.spacing].map(offset => ({ x: origin - this.facing * offset,
+            y: this.arena.floor - 9, width: BONE.width, height: 7 }));
+    }
     /** Read-only feedback clock: braking and recovery form one uninterrupted opening. */
     get openingTicksRemaining() {
         if (!this.vulnerable) return 0;
@@ -31,7 +54,7 @@ export class SkeletonBullModel implements Box {
             ? BULL_RULES.brake - this.stateTick + BULL_RULES.recover
             : BULL_RULES.recover - this.stateTick);
     }
-    get warningTicks() { return this.state === 'rattle' ? BULL_RULES.rattle : BULL_RULES.tell; }
+    get warningTicks() { return this.state === 'rattle' ? BULL_RULES.rattle : this.state==='turn'?BULL_RULES.turn:BULL_RULES.tell; }
     get warningProgress() { return Math.min(1, this.stateTick / this.warningTicks); }
     get hazards(): readonly Box[] { return this.frameHazards; }
     /** Render-only endpoints of departed bones live as long as this update's sweeps. */
@@ -41,9 +64,12 @@ export class SkeletonBullModel implements Box {
     private emit(kind: BullEvent['kind']) { this.events.push({ kind, tick: this.tick }); }
     /** Direction locks when the warning starts. No tracking or attacks without warning. */
     private warn(player: Box) {
+        this.closingAfterMiss = false;
         this.facing = player.x + player.width / 2 < this.x + this.width / 2 ? -1 : 1;
         this.hitThisOpening = false;
         const bones = this.cycle++ % 3 === 2;
+        this.bouncingVolley = bones && this.phaseNumber >= 2;
+        this.chargeIndex = 1; this.chargeTotal = !bones && this.phaseNumber === 3 ? 2 : 1;
         if (!bones) {
             const stop = this.facing < 0 ? this.arena.left + 12 : this.arena.right - this.width - 12;
             // A cornered bull needs one body length of runway. Choose the
@@ -74,7 +100,13 @@ export class SkeletonBullModel implements Box {
     private step(player: Box) {
         this.tick++; this.stateTick++;
         if (this.state === 'defeated') return;
-        for (const bone of this.bones) { const oldX = bone.x; bone.x += bone.vx; bone.life--; this.frameHazards.push(swept(bone, oldX)); }
+        for (const bone of this.bones) {
+            const oldX=bone.x,oldY=bone.y;bone.x+=bone.vx;bone.life--;
+            if(this.bouncingVolley)bone.y=bullBoneY(this.arena.floor,this.boneFlightTicks-bone.life,true);
+            const passage=swept(bone,oldX);
+            passage.y=Math.min(oldY,bone.y);passage.height=bone.height+Math.abs(oldY-bone.y);
+            this.frameHazards.push(passage);
+        }
         this.bones = this.bones.filter(b => {
             const active = b.life > 0 && b.x > this.arena.left && b.x + b.width < this.arena.right;
             // Keep each last pose across all fixed steps in this update, just like its sweep.
@@ -83,23 +115,31 @@ export class SkeletonBullModel implements Box {
         });
         switch (this.state) {
             case 'intro': if (this.stateTick >= 60) this.enter('idle'); break;
-            case 'idle': if (this.stateTick >= 24) this.warn(player); break;
+            case 'idle': if (this.stateTick >= BULL_RULES.rest) this.warn(player); break;
             case 'tell': if (this.stateTick >= BULL_RULES.tell) { this.enter('charge'); this.emit('charge'); } break;
+            case 'turn': if(this.stateTick>=BULL_RULES.turn){this.enter('charge');this.emit('charge');} break;
             case 'charge': {
                 const oldX = this.x;
                 this.x = clamp(this.x + this.facing * BULL_RULES.speed, this.arena.left + 12, this.arena.right - this.width - 12);
                 const passage = swept({ x: this.x + 3, y: this.y + 6, width: 42, height: 28 }, oldX + 3);
                 this.frameHazards.push(passage); this.chargeSweeps.push(passage);
                 if (this.x === this.arena.left + 12 || this.x === this.arena.right - this.width - 12 || this.stateTick >= 66) {
-                    this.enter('brake'); this.emit('brake');
+                    if(this.chargeIndex<this.chargeTotal){
+                        // The return is promised by the first tell, then receives
+                        // another complete stationary tell. Ribs remain closed.
+                        this.chargeIndex++;this.facing=this.facing===-1?1:-1;
+                        this.enter('turn');this.emit('tell');
+                    }else{this.enter('brake');this.emit('brake');}
                 }
                 break;
             }
             case 'brake': if (this.stateTick >= BULL_RULES.brake) this.enter('recover'); break;
-            case 'recover': if (this.stateTick >= BULL_RULES.recover) { this.bones = []; this.departedBonePoses = []; this.enter('idle'); } break;
+            case 'recover': if (this.stateTick >= BULL_RULES.recover) {
+                this.bones = []; this.departedBonePoses = []; this.frameHazards = [];
+                this.closingAfterMiss = true; this.enter('idle');
+            } break;
             case 'rattle': if (this.stateTick >= BULL_RULES.rattle) {
-                const origin = this.x + this.width / 2;
-                this.bones = [0, BONE.spacing].map(offset => ({ x: origin - this.facing * offset, y: this.arena.floor - 9, width: BONE.width, height: 7, vx: this.facing * BONE.speed, life: this.boneFlightTicks }));
+                this.bones = this.boneLaunchPoses.map(pose => ({ ...pose, vx: this.facing * BONE.speed, life: this.boneFlightTicks }));
                 this.enter('bones'); this.emit('bones');
             } break;
             case 'bones': if (this.stateTick >= this.boneFlightTicks) { this.bones = []; this.frameHazards = []; this.departedBonePoses = []; this.enter('recover'); } break;
@@ -109,7 +149,7 @@ export class SkeletonBullModel implements Box {
     /** Only a falling top contact from the real Player can punish an opening. */
     private tryHit(attack: Box): boolean {
         if (!this.vulnerable || !intersects(this, attack)) return false;
-        this.hitThisOpening = true; this.health--; this.bones = []; this.frameHazards = []; this.departedBonePoses = [];
+        this.hitThisOpening = true; this.closingAfterMiss = false; this.health--; this.bones = []; this.frameHazards = []; this.departedBonePoses = [];
         this.emit(this.health <= 0 ? 'defeated' : 'hit'); this.enter(this.health <= 0 ? 'defeated' : 'hurt'); return true;
     }
     contact(player: Box, previous: Box, falling: boolean): 'none' | 'hurt' | 'bounce' | 'hit' | 'defeated' {
@@ -128,7 +168,7 @@ export class SkeletonBullModel implements Box {
         // Only the present body can take damage; bone sweeps are not stompable.
         if (falling && previous.y + previous.height <= this.y + 10 && this.chargeSweeps.some(h => intersects(h, player))) return 'bounce';
         if (this.touches(player)) return 'hurt';
-        return bodyContact && !this.vulnerable ? 'hurt' : 'none';
+        return bodyContact && !this.vulnerable && !this.rearming ? 'hurt' : 'none';
     }
     touches(player: Box) { return this.frameHazards.some(h => intersects(h, player)); }
 }

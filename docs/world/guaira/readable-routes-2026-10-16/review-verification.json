@@ -1,0 +1,43 @@
+{
+  "checks": [
+    {
+      "viewport": 1440,
+      "overflow": false,
+      "comparisons": 4
+    },
+    {
+      "viewport": 844,
+      "overflow": false,
+      "comparisons": 4
+    },
+    {
+      "viewport": 390,
+      "overflow": false,
+      "comparisons": 4
+    },
+    {
+      "viewport": 320,
+      "overflow": false,
+      "comparisons": 4
+    },
+    {
+      "video": {
+        "duration": 19.6,
+        "width": 960,
+        "height": 540,
+        "current": 0.25245
+      }
+    },
+    {
+      "video": {
+        "duration": 12.666667,
+        "width": 960,
+        "height": 540,
+        "current": 0.251394
+      }
+    }
+  ],
+  "errors": [],
+  "links": 6,
+  "passed": true
+}

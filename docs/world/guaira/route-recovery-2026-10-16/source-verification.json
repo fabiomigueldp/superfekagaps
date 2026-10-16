@@ -1,0 +1,35 @@
+{
+  "files": [
+    {
+      "name": "GuairaJunction.ts",
+      "current": "9eb0f99abec6fd87fdece939b4bdb822cfe026490e1605fbef77260be9653456",
+      "before": "fe5f6ac6a8bbf0d082aaf90c33b4172fa8e327f4563fdc475e10d7be5da2c7af",
+      "match": true
+    },
+    {
+      "name": "GuairaJunctionModel.ts",
+      "current": "f25f50ea7d1e77389eea90c7c43d5a76bc70c8badcb7a23fe907b53820fefcba",
+      "before": "6a31437e58b11f3f9261f426c04ed96663e6fa7e486fb04cfac26d6d6c952f9f",
+      "match": true
+    },
+    {
+      "name": "GuairaJunctionArt.ts",
+      "current": "16d818a47de5efc2ce64e88ca7092c6dd2785347304c4206c2f0fc4b4189b0af",
+      "before": "f8dc82486b63fd81f6313615bcc3e03ce11879383a64e4b7f2abb570b3b736f5",
+      "match": true
+    },
+    {
+      "name": "GuairaJunctionHardwareArt.ts",
+      "current": "d6d83b10dc66e2c801d0bb9cd67190cdb6c557ac304feffb1aee02bddb9cf68e",
+      "before": "389ceacc797351a71787e703c26b76a4f9c3009f5413d723527c88067004634e",
+      "match": true
+    }
+  ],
+  "tests": {
+    "total": 961,
+    "passed": 961,
+    "new": 15
+  },
+  "build": true,
+  "baselinePreserved": true
+}

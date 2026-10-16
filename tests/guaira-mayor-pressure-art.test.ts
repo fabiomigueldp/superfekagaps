@@ -78,6 +78,35 @@ test('pressure order articulates hand, stamp and face while keeping the true upp
     assert.equal(poses.size,3,'lift, extended order and downward discharge are distinct authored poses');
 });
 
+test('recovery effort animates below the exposed back with planted feet and a stable reduced-motion pose',()=>{
+    const initial=state(null),base=actor({...initial,stateTick:0}),still=actor(initial,true),poses=new Set<string>();
+    for(let tick=0;tick<210;tick++){
+        const m=Object.freeze({...initial,stateTick:tick,tick:700+tick}),p=actor(m);
+        for(let y=120;y<126;y++)for(let x=264;x<292;x++)
+            assert.equal(p.at(x,y),base.at(x,y),`effort obscured the contact plane at ${x},${y}`);
+        for(let y=153;y<160;y++)for(let x=248;x<304;x++)
+            assert.equal(p.at(x,y),base.at(x,y),'boots and the stuck stamp stay planted');
+        assert.deepEqual(p.pixels,actor(m).pixels,'rendering cannot advance a paused pose');
+        assert.deepEqual(actor(m,true).pixels,still.pixels,'decorative effort freezes without hiding the opening');
+        poses.add(JSON.stringify([...p.pixels]));
+    }
+    assert.ok(poses.size>=3,'recovery cannot be a single static sprite');
+});
+
+test('released pose settles on the simulation clock while its boots and dropped tools remain anchored',()=>{
+    const m:GuairaMayorArtState={...state(null),state:'released',publicWaterOpen:true,sealsRemaining:0};
+    const first=actor({...m,stateTick:0}),still=actor(m,true),poses=new Set<string>();
+    for(const tick of [0,12,24,48,154,180]){
+        const p=actor({...m,stateTick:tick});
+        for(let y=152;y<160;y++)for(let x=230;x<320;x++)
+            assert.equal(p.at(x,y),first.at(x,y),'no hovering boots or sliding tools on defeat');
+        assert.deepEqual(actor({...m,stateTick:tick},true).pixels,still.pixels);
+        assert.deepEqual(p.pixels,actor({...m,stateTick:tick}).pixels);
+        poses.add(JSON.stringify([...p.pixels]));
+    }
+    assert.ok(poses.size>=3);
+});
+
 test('both crossing arrows become wait inlays until the pulse is over',()=>{
     const bodies=new Map([
         [O.lift,{...{x:112,y:160,width:112,height:8},kind:'lift',active:true,home:{x:112,y:224},to:{x:112,y:160}}],

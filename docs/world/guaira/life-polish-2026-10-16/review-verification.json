@@ -1,0 +1,92 @@
+{
+  "images": [
+    {
+      "src": "patio-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "patio-after.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "travessia-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "travessia-after.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "respiros-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "respiros-after.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "subida-before.png",
+      "w": 320,
+      "h": 180
+    },
+    {
+      "src": "subida-after.png",
+      "w": 320,
+      "h": 180
+    }
+  ],
+  "media": [
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/life-polish-2026-10-16/workers.mp4",
+      "w": 720,
+      "h": 480,
+      "seconds": 7.2
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/life-polish-2026-10-16/subida-percurso.mp4",
+      "w": 960,
+      "h": 540,
+      "seconds": 22.333333
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/life-polish-2026-10-16/travessia-percurso.mp4",
+      "w": 960,
+      "h": 540,
+      "seconds": 17.466667
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/life-polish-2026-10-16/patio-percurso.mp4",
+      "w": 960,
+      "h": 540,
+      "seconds": 14.933333
+    },
+    {
+      "src": "http://127.0.0.1:3000/docs/world/guaira/life-polish-2026-10-16/respiros-percurso.mp4",
+      "w": 960,
+      "h": 540,
+      "seconds": 14.666667
+    }
+  ],
+  "viewports": [
+    {
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "width": 320,
+      "scrollWidth": 320
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

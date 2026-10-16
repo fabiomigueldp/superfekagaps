@@ -1,0 +1,48 @@
+{
+  "sources": [
+    {
+      "file": "GuairaTraversal.ts",
+      "matches": true,
+      "baseline": "b605bb186d3aabf4a10bcfbfecb622e9f66ef9f78f4815e158856e3b874b4d78",
+      "current": "cbea971663a7cee9e99bb854a832a03def30e4fa2307447440b9a43605bbd05b"
+    },
+    {
+      "file": "GuairaTraversalArt.ts",
+      "matches": true,
+      "baseline": "6fa2df306c35c08ddb60c45f66a404042ced5bfb100b2908db17164f532e96c1",
+      "current": "694fbca9775ecdc9387ab67ed1b90899bb1033289c329262b667df57d315cd72"
+    },
+    {
+      "file": "GuairaRespiros.ts",
+      "matches": true,
+      "baseline": "c13d7be716dfd1786620ca0ecc7a5dc271a23e4795ee569897b16fbcfe1e1d8a",
+      "current": "8339fe7b4692bf7b7b9ac82d7ffb297480cb149b8b26ddc378fefe8a637ee4cb"
+    },
+    {
+      "file": "GuairaRespirosStage.ts",
+      "matches": true,
+      "baseline": "4fec6ad92fffdce9df5697edef230ee867b6b461af62d5fbd3fe62e751eec791",
+      "current": "a2ec706e1d3c2cca778bb75d3af612c1f018a5c9f603553b21c7f95579b143f5"
+    },
+    {
+      "file": "GuairaRespirosArt.ts",
+      "matches": true,
+      "baseline": "ccb4ea7e76db7092cdacb52562586d366a9e50847232bfe2241cdcdeccc72d26",
+      "current": "37ca99f79ce415b2821d290b5b141db36ca37d2a8da72ea251d00c6d8015208d"
+    }
+  ],
+  "build": true,
+  "failedTests": 0,
+  "verifications": {
+    "native-browser-verification": true,
+    "browser-verification": true,
+    "review-verification": true
+  },
+  "waterCapture": {
+    "nativeUpdate": 969,
+    "sourceFrame": "respiros-replay/0242.png",
+    "editedPixels": false
+  },
+  "fullTests": 996,
+  "passed": true
+}

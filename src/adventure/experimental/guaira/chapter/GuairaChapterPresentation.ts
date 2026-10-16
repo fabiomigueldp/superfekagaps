@@ -14,6 +14,7 @@ export function chapterGuidance(native: string | null | undefined, objective: st
     const message = native?.replace(/ · setas\/A D:.*| · setas:.*| · Esc:.*/, '');
     if (!message || message === 'Guaíra fictícia' || message.startsWith('Protótipo experimental')) return objective;
     return message
+        .replace(/ \(nome provisório\)/g, '')
         .replace(/ · sair e reentrar reinicia o protótipo$/, ' · reentrar reinicia esta tentativa');
 }
 

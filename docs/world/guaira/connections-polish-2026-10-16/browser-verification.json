@@ -1,0 +1,120 @@
+{
+  "kind": "isolated-browser-native-chapter-inspection",
+  "checks": [
+    {
+      "stage": "guaira-travessia",
+      "keyboardMoved": true,
+      "pauseFrozen": true,
+      "stableCanvas": true,
+      "returnedToMap": true,
+      "render": {
+        "samples": 90,
+        "medianMs": 4.299999997019768,
+        "p95Ms": 6,
+        "pure": true
+      }
+    },
+    {
+      "stage": "guaira-patio-comportas",
+      "keyboardMoved": true,
+      "pauseFrozen": true,
+      "stableCanvas": true,
+      "returnedToMap": true,
+      "render": {
+        "samples": 90,
+        "medianMs": 3.5,
+        "p95Ms": 4.5,
+        "pure": true
+      }
+    },
+    {
+      "stage": "guaira-respiros",
+      "keyboardMoved": true,
+      "pauseFrozen": true,
+      "stableCanvas": true,
+      "returnedToMap": true,
+      "render": {
+        "samples": 90,
+        "medianMs": 3.9000000059604645,
+        "p95Ms": 4.799999997019768,
+        "pure": true
+      },
+      "animatedHazardPaused": true,
+      "hydraulicTime": 2000.0000000000034
+    },
+    {
+      "stage": "guaira-lab",
+      "keyboardMoved": true,
+      "pauseFrozen": true,
+      "stableCanvas": true,
+      "returnedToMap": true,
+      "render": {
+        "samples": 90,
+        "medianMs": 3.2999999970197678,
+        "p95Ms": 3.9000000059604645,
+        "pure": true
+      }
+    },
+    {
+      "stage": "guaira-subida",
+      "keyboardMoved": true,
+      "pauseFrozen": true,
+      "stableCanvas": true,
+      "returnedToMap": true,
+      "render": {
+        "samples": 90,
+        "medianMs": 2.7999999970197678,
+        "p95Ms": 3.5,
+        "pure": true
+      }
+    },
+    {
+      "stage": "guaira-prefeito",
+      "keyboardMoved": true,
+      "pauseFrozen": true,
+      "stableCanvas": true,
+      "returnedToMap": true,
+      "render": {
+        "samples": 90,
+        "medianMs": 2.4000000059604645,
+        "p95Ms": 3.2000000029802322,
+        "pure": true
+      }
+    },
+    {
+      "stage": "gallery",
+      "keyboardMoved": true,
+      "pauseFrozen": true,
+      "stableCanvas": true,
+      "returnedToMap": true,
+      "render": {
+        "samples": 90,
+        "medianMs": 1.9000000059604645,
+        "p95Ms": 2.5,
+        "pure": true
+      }
+    },
+    {
+      "stage": "relief",
+      "keyboardMoved": true,
+      "pauseFrozen": true,
+      "stableCanvas": true,
+      "returnedToMap": true,
+      "render": {
+        "samples": 90,
+        "medianMs": 2.4000000059604645,
+        "p95Ms": 2.9000000059604645,
+        "pure": true
+      },
+      "animatedHazardPaused": true,
+      "hydraulicTime": 1983.3333333333294
+    },
+    {
+      "viewport": "844x390",
+      "overflow": false
+    }
+  ],
+  "errors": [],
+  "physicalDevice": false,
+  "passed": true
+}

@@ -1,5 +1,9 @@
 # Pátio das Comportas: escolha no ramal A
 
+Continuação de 16/10/2026: [escada de retorno ao ponto seguro e HUD compartilhado](world/guaira/route-recovery-2026-10-16/README.md).
+Os percursos abaixo permanecem válidos; a nova escada oferece uma recuperação
+local adicional depois da chegada ao patamar central.
+
 ## Conteúdo
 
 A abertura alternativa mantém 60 × 28 tiles, duas placas de sentada, dois

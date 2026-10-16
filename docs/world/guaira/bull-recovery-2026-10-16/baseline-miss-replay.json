@@ -1,0 +1,226 @@
+{
+  "stepMs": 16.666666666666668,
+  "frames": 299,
+  "runs": [
+    [
+      12,
+      [
+        "ShiftLeft",
+        "ArrowRight"
+      ]
+    ],
+    [
+      3,
+      [
+        "ShiftLeft"
+      ]
+    ],
+    [
+      14,
+      [
+        "ShiftLeft",
+        "ArrowLeft"
+      ]
+    ],
+    [
+      11,
+      [
+        "ShiftLeft"
+      ]
+    ],
+    [
+      2,
+      [
+        "ShiftLeft",
+        "ArrowRight"
+      ]
+    ],
+    [
+      84,
+      [
+        "ShiftLeft"
+      ]
+    ],
+    [
+      20,
+      [
+        "ShiftLeft",
+        "ArrowLeft"
+      ]
+    ],
+    [
+      5,
+      [
+        "ShiftLeft"
+      ]
+    ],
+    [
+      1,
+      [
+        "ShiftLeft",
+        "ArrowRight"
+      ]
+    ],
+    [
+      9,
+      [
+        "ShiftLeft",
+        "ArrowRight",
+        "Space"
+      ]
+    ],
+    [
+      23,
+      [
+        "ShiftLeft",
+        "ArrowRight"
+      ]
+    ],
+    [
+      12,
+      []
+    ],
+    [
+      36,
+      [
+        "ArrowLeft"
+      ]
+    ],
+    [
+      13,
+      []
+    ],
+    [
+      24,
+      [
+        "ArrowRight"
+      ]
+    ],
+    [
+      30,
+      []
+    ]
+  ],
+  "expectedHits": [],
+  "warningFrames": [
+    84,
+    269
+  ],
+  "damage": [
+    245
+  ],
+  "events": [
+    {
+      "frame": 1,
+      "state": "intro",
+      "tick": 1,
+      "bx": 248,
+      "face": -1,
+      "leg": 1,
+      "phase": 1,
+      "px": 68.3,
+      "feet": 224,
+      "helmet": true,
+      "dead": false,
+      "health": 6
+    },
+    {
+      "frame": 60,
+      "state": "idle",
+      "tick": 0,
+      "bx": 248,
+      "face": -1,
+      "leg": 1,
+      "phase": 1,
+      "px": 88.9,
+      "feet": 224,
+      "helmet": true,
+      "dead": false,
+      "health": 6
+    },
+    {
+      "frame": 84,
+      "state": "tell",
+      "tick": 0,
+      "bx": 248,
+      "face": -1,
+      "leg": 1,
+      "phase": 1,
+      "px": 88.9,
+      "feet": 224,
+      "helmet": true,
+      "dead": false,
+      "health": 6
+    },
+    {
+      "frame": 126,
+      "state": "charge",
+      "tick": 0,
+      "bx": 248,
+      "face": -1,
+      "leg": 1,
+      "phase": 1,
+      "px": 88.9,
+      "feet": 224,
+      "helmet": true,
+      "dead": false,
+      "health": 6
+    },
+    {
+      "frame": 173,
+      "state": "brake",
+      "tick": 0,
+      "bx": 16,
+      "face": -1,
+      "leg": 1,
+      "phase": 1,
+      "px": 63.5,
+      "feet": 161.4,
+      "helmet": true,
+      "dead": false,
+      "health": 6
+    },
+    {
+      "frame": 193,
+      "state": "recover",
+      "tick": 0,
+      "bx": 16,
+      "face": -1,
+      "leg": 1,
+      "phase": 1,
+      "px": 117.3,
+      "feet": 224,
+      "helmet": true,
+      "dead": false,
+      "health": 6
+    },
+    {
+      "frame": 245,
+      "state": "idle",
+      "tick": 0,
+      "bx": 16,
+      "face": -1,
+      "leg": 1,
+      "phase": 1,
+      "px": 46.2,
+      "feet": 224,
+      "helmet": false,
+      "dead": false,
+      "health": 6
+    },
+    {
+      "frame": 269,
+      "state": "tell",
+      "tick": 0,
+      "bx": 16,
+      "face": 1,
+      "leg": 1,
+      "phase": 1,
+      "px": 87,
+      "feet": 224,
+      "helmet": false,
+      "dead": false,
+      "health": 6
+    }
+  ]
+}

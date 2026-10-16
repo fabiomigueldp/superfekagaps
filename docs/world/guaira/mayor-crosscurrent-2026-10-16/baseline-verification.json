@@ -1,0 +1,20 @@
+{
+  "source": "../mayor-rework-2026-10-16/upper.mp4",
+  "sourceHashes": {
+    "GuairaMayorArenaArt.ts": "06a84ff13041bdcdddfb643b373e943ca325aeffdcaa8fd3cdc499154df435c6",
+    "GuairaMayorArt.ts": "403f6a201b37fc7cf2155a0fab0f76c961667128c38b6517a5ddc57cf442e665",
+    "GuairaMayorLab.ts": "d2641f6336a0c264cafc384b77ffb8da2e20b85b8feb69eb6bfbe9281436ad52",
+    "GuairaMayorModel.ts": "1a4d4816bf0c1ae3b8f5d3b1f9def399d5d0549a2a7d5410905e264c67bab3eb",
+    "GuairaMayorWater.ts": "7d5c14572a631a0ffca89f5e5517ca0a0cf29114b1afb1bd2949f3a405f7d5ab"
+  },
+  "videoSha256": "eab260195f09c4df20d7301869ad6ddfa7641e26145566fb4a30e78538f6a71c",
+  "previousCapture": "baseline-native-verification.json",
+  "route": "upper",
+  "frames": 1426,
+  "hits": [
+    407,
+    773,
+    1242
+  ],
+  "captureFps": 60
+}

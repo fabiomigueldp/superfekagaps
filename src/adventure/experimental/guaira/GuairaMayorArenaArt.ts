@@ -1,8 +1,12 @@
 import { MAYOR_PALETTE as M, type GuairaMayorArtState, type MayorRect } from './GuairaMayorArt';
-import { drawGuairaLandscape, drawGuairaTree, drawGuairaAwning } from './GuairaScenery';
+import { drawGuairaLandscape } from './GuairaScenery';
+import { drawGuairaClayGrain, drawGuairaTimber } from './GuairaMaterials';
+import { drawMayorTown, drawMayorCivicRoom, drawMayorReserve } from './GuairaMayorTownArt';
+import { drawGuairaPipe, drawGuairaPipeElbow, drawGuairaPipeFlow, drawGuairaPipeSaddle, guairaPipeRoute } from './GuairaPipeArt';
+import { drawGuairaPoolFlow } from './GuairaWaterworksArt';
 
-/** The isolated arena uses only GROUND tiles plus the three real WorldObjects below. */
-export const MAYOR_ART_OBJECTS = Object.freeze({valve:'guaira-mayor-register',lift:'guaira-mayor-lift',deck:'guaira-mayor-deck'});
+/** Architecture surrounds the five actual native mechanisms. */
+export const MAYOR_ART_OBJECTS = Object.freeze({valve:'guaira-mayor-register',lift:'guaira-mayor-lift',deck:'guaira-mayor-deck',upperValve:'guaira-mayor-upper-register',refuge:'guaira-mayor-refuge'});
 interface Body extends MayorRect { readonly kind:string; readonly active:boolean; readonly home?:{readonly x:number;readonly y:number};readonly to?:{readonly x:number;readonly y:number} }
 interface Bodies { get(id:string):Body|undefined }
 type MechanismCue='waiting'|'register'|'rising'|'ready'|'released';
@@ -10,77 +14,103 @@ type MechanismCue='waiting'|'register'|'rising'|'ready'|'released';
 function mechanismCue(m:GuairaMayorArtState):MechanismCue {
     if(m.publicWaterOpen)return 'released';
     if(m.state==='recover'&&m.vulnerable)return 'ready';
-    if((m.state==='stamp'||m.state==='recover')&&m.accessRequested)return 'rising';
-    return m.state==='recover'?'register':'waiting';
+    if((m.state==='stamp'||m.state==='returning'||m.state==='recover')&&m.accessRequested)return 'rising';
+    return m.canOpenRegister||m.state==='recover'?'register':'waiting';
 }
 interface GroundLevel {readonly data:{readonly width:number;readonly height:number;readonly tiles:readonly (readonly number[])[]};colToWorldX(c:number):number;rowToWorldY(r:number):number;worldToCol(x:number):number;worldToRow(y:number):number}
-const P={ink:'#493c43',wall:'#d4af87',wallLight:'#e0c299',wallShade:'#bc9276',earth:'#b87955',earthShade:'#925c49',dust:'#e8b17c',wood:'#997454',woodLight:'#d1ac77',woodShade:'#695449',iron:'#697a78',ironDark:'#4e5c5c',deck:'#f2d69b'};
+const P={ink:'#493c43',earth:'#b87955',earthShade:'#925c49',dust:'#e8b17c',wood:'#997454',woodLight:'#d1ac77',woodShade:'#695449',iron:'#697a78',ironDark:'#4e5c5c',deck:'#f2d69b'};
 function rect(c:CanvasRenderingContext2D,x:number,y:number,w:number,h:number,color:string){if(w<=0||h<=0)return;c.fillStyle=color;c.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));}
 function line(c:CanvasRenderingContext2D,x0:number,y0:number,x1:number,y1:number,color:string,width=1){const n=Math.max(Math.abs(x1-x0),Math.abs(y1-y0),1);for(let i=0;i<=n;i++)rect(c,x0+(x1-x0)*i/n,y0+(y1-y0)*i/n,width,width,color);}
 function layer(c:CanvasRenderingContext2D,cx:number,cy:number,fn:(x:number,y:number)=>void){c.save();c.beginPath();c.rect(0,0,320,180);c.clip();fn(Number.isFinite(cx)?Math.round(cx):0,Number.isFinite(cy)?Math.round(cy):0);c.restore();}
 function oval(c:CanvasRenderingContext2D,x:number,y:number,w:number,h:number,color:string){for(let yy=0;yy<h;yy++){const half=Math.sqrt(Math.max(0,1-((yy+.5-h/2)/(h/2))**2))*w/2;rect(c,x+Math.ceil(w/2-half),y+yy,Math.floor(2*half),1,color);}}
 const FONT:Readonly<Record<string,string>>={A:'010101111101101',B:'110101110101110',C:'011100100100011',D:'110101101101110',E:'111100110100111',F:'111100110100100',I:'111010010010111',L:'100100100100111',O:'010101101101010',P:'110101110100100',R:'110101110101101',S:'011100010001110',T:'111010010010010',U:'101101101101111',V:'101101101101010',Z:'111001010100111'};
 function word(c:CanvasRenderingContext2D,text:string,x:number,y:number,color:string){[...text].forEach((letter,i)=>{const bits=FONT[letter]??'000000000000000';for(let n=0;n<15;n++)if(bits[n]==='1')rect(c,x+i*4+n%3,y+Math.floor(n/3),1,1,color);});}
-function pipe(c:CanvasRenderingContext2D,x:number,y:number,w:number){rect(c,x,y,w,7,M.bronzeShade);rect(c,x,y+1,w,4,M.bronze);rect(c,x+1,y+1,w-2,1,M.bronzeLight);for(let dx=10;dx<w-4;dx+=31){rect(c,x+dx,y-1,3,9,P.woodShade);rect(c,x+dx+1,y,1,6,M.bronzeLight);}}
+const PIPE=Object.freeze({edge:'#735b4b',brass:'#b99465',light:'#d4b680',shade:'#997650',
+    water:'#80afa7',glint:'#bad0b5',dry:'#b18b62'});
+const RESERVE_FEED=guairaPipeRoute([[306,166],[306,194],[267,194]]);
+const PUBLIC_FEED=guairaPipeRoute([[306,166],[306,194],[36,194],[36,208]]);
 function waitInlay(c:CanvasRenderingContext2D,x:number,y:number){
     // An amber hourglass replaces the forward arrow while the seam is unsafe.
     rect(c,x,y,7,1,M.warning);rect(c,x,y+4,7,1,M.warning);
     rect(c,x+1,y+1,2,1,M.warning);rect(c,x+4,y+1,2,1,M.warning);
     rect(c,x+3,y+2,1,1,M.warning);rect(c,x+2,y+3,3,1,M.warning);
 }
+function supports(c:CanvasRenderingContext2D,objects:Bodies,cx:number,cy:number){
+    const refuge=objects.get(MAYOR_ART_OBJECTS.refuge),upper=objects.get(MAYOR_ART_OBJECTS.deck);
+    for(const [body,inset] of [[refuge,3],[upper,6]] as const)if(body){
+        for(const xx of [body.x+inset,body.x+body.width-inset-4]){
+            const y=body.y+body.height;
+            rect(c,xx-cx,y-cy,4,224-y,'#8a785c');rect(c,xx+1-cx,y+1-cy,2,222-y,'#b7a077');
+            line(c,xx-cx,y+17-cy,xx+10-cx,y-cy,'#967957',2);
+            rect(c,xx-1-cx,y+1-cy,6,3,P.ironDark);rect(c,xx+1-cx,y+2-cy,2,1,M.bronzeLight);
+            rect(c,xx-2-cx,221-cy,8,3,'#80735b');rect(c,xx-1-cx,221-cy,6,1,'#b5a07b');
+        }
+    }
+}
 
 /** Architecture sits behind the real running surfaces; bright tops are reserved for collision. */
-export function drawGuairaMayorBackground(c:CanvasRenderingContext2D,m:GuairaMayorArtState,cx=0,cy=64,time=0,reducedMotion=false){
+export function drawGuairaMayorBackground(c:CanvasRenderingContext2D,m:GuairaMayorArtState,cx=0,cy=64,time=0,reducedMotion=false,objects?:Bodies){
     layer(c,cx,cy,(cx,cy)=>{
         const r=(x:number,y:number,w:number,h:number,color:string)=>rect(c,x-cx,y-cy,w,h,color);
         const t=reducedMotion||!Number.isFinite(time)?0:Math.max(0,time);
         drawGuairaLandscape(c,cx,cy,t,reducedMotion,'town');
-        drawGuairaTree(c,209-cx,198-cy,80,t,209,true);
-        // Distant township: deliberately soft roofs and no pale playable lips.
-        for(const [x,y,w,h] of [[-12,138,63,66],[39,127,44,77],[85,144,61,61],[132,128,67,79]]){
-            r(x+3,y+6,w-6,h-6,'#c8a586');r(x,y,w,5,'#bd9079');r(x+6,y-3,w-12,3,'#cb9b80');
-            r(x+13,y+20,9,20,'#b29b87');r(x+15,y+22,5,16,'#8eaaa0');
-            r(x+w-23,y+19,10,12,'#ad927c');r(x+w-21,y+21,6,8,'#9cb1a1');
-            r(x+8,y+h-4,w-14,3,'#b39b7c');
-            r(x+8,y+8,w-18,1,'#d8b797');
+        drawMayorTown(c,cx,cy,t,reducedMotion);
+        drawMayorCivicRoom(c,cx,cy,t,reducedMotion);
+        word(c,'VAZAO',259-cx,110-cy,'#67594d');
+        // The real deck's supports stand behind the reservoir and continuous
+        // feed. Drawing them later would cut holes through those connections.
+        if(objects)supports(c,objects,cx,cy);
+        drawMayorReserve(c,cx,cy,t,reducedMotion,m.publicWaterOpen);
+        r(273,211,31,8,'#aa9272');word(c,'RESERVA',275-cx,212-cy,'#6b6250');
+        // The private feed stays pressurised. Only the encounter's final release
+        // wets the public pipe, through one continuous turn into the trough.
+        drawGuairaPipe(c,302-cx,162-cy,28,true,t,reducedMotion,true,1,false,PIPE);
+        drawGuairaPipeElbow(c,302-cx,190-cy,true,true,true,PIPE);
+        drawGuairaPipe(c,267-cx,190-cy,35,true,t,reducedMotion,false,-1,false,PIPE);
+        drawGuairaPipe(c,41-cx,190-cy,226,m.publicWaterOpen,t,reducedMotion,false,-1,false,PIPE);
+        drawGuairaPipeElbow(c,32-cx,190-cy,m.publicWaterOpen,false,false,PIPE);
+        drawGuairaPipe(c,32-cx,199-cy,10,m.publicWaterOpen,t,reducedMotion,true,1,false,PIPE);
+        drawGuairaPipeFlow(c,m.publicWaterOpen?PUBLIC_FEED:RESERVE_FEED,cx,cy,t,reducedMotion,PIPE.glint);
+        for(const xx of [87,189])drawGuairaPipeSaddle(c,xx-cx,194-cy,false,PIPE);
+        drawGuairaPipeSaddle(c,306-cx,178-cy,true,PIPE);
+        // Three real-looking outlets belong to the same reserve line. Their
+        // mouths match the high/right and low/left+right packet spawn points.
+        // No bright platform tops: these are scenery behind the playable floor.
+        for(const [mx,my,dir] of [[312,152,-1],[8,216,1],[312,216,-1]] as const){
+            const px=dir===1?0:312;
+            drawGuairaPipe(c,px-cx,Math.min(my,194)-cy,Math.abs(my-194),false,t,reducedMotion,true,1,false,PIPE);
+            r(px,my-7,8,14,M.bronzeShade);r(px+1,my-6,6,12,M.bronze);
+            r(px+2,my-5,2,10,M.bronzeLight);
+            const lip=mx+(dir===1?-2:-1),active=m.salvo?.direction===dir&&m.salvo.rect.y+8===my;
+            r(lip-1,my-9,3,18,P.ironDark);r(lip,my-8,1,16,active?M.warning:M.bronzeLight);
+            r(mx+(dir===1?-2:0),my-5,2,10,active?M.waterShade:P.woodShade);
+            for(const yy of [-7,6])r(px+5,my+yy,2,1,P.ironDark);
+            if(active){
+                // Pressure gauge and mechanical shutter, fixed at reduced motion.
+                const opening=m.salvo!.phase==='active'?5:Math.floor(m.salvo!.progress*4);
+                r(px+2,my-4,3,8,M.ink);r(px+2,my-4,3,opening*2,M.warning);
+            }
         }
-        drawGuairaAwning(c,52-cx,166-cy,22,t,52);
-        drawGuairaAwning(c,145-cx,168-cy,27,t,145);
-        // Quiet service wall, warm stone and sparse vines.
-        r(0,195,320,29,'#c4936e');r(0,214,320,10,'#cc9c70');
-        for(let x=7;x<320;x+=37){r(x,213,14,1,'#b78967');r(x+6,216,2,3,'#b98b64');}
-        for(const [x,y] of [[7,183],[305,171]]){r(x,y,3,27,'#859467');r(x-4,y+7,5,3,'#839564');r(x+2,y+13,5,3,'#90a06c');}
-        // Modest civic room above the actual upper deck.
-        r(222,103,94,56,P.wallShade);r(224,105,90,52,P.wall);r(227,108,84,2,P.wallLight);
-        r(219,99,99,5,'#ac725b');r(222,95,93,4,'#bd7b60');r(228,92,81,3,'#cd9170');
-        for(let x=226;x<313;x+=12){r(x,99,1,4,'#905b51');r(x+2,96,7,1,'#d49e79');}
-        r(244,106,50,10,'#b58d6b');word(c,'VAZAO',259-cx,108-cy,'#67594d');
-        for(const x of [231,298]){r(x,119,11,25,'#a58269');r(x+2,121,7,21,'#718e89');r(x+3,122,2,18,'#9fb3a1');r(x+5,121,1,21,'#cdb88e');}
-        r(254,120,35,39,'#ab8261');r(257,122,29,36,'#92745c');r(258,123,2,32,'#ba9470');
-        r(279,123,2,32,'#795f50');
-        // Intake and private reserve visibly contain clean cyan water in every cycle.
-        r(302,162,9,44,M.bronzeShade);r(304,164,5,39,M.bronze);r(304,164,1,37,M.bronzeLight);
-        r(276,175,25,31,'#947555');r(278,176,21,28,'#b6915f');r(281,178,3,25,'#d1b17a');
-        r(276,177,25,2,'#806b51');r(276,199,25,3,'#806b51');oval(c,276-cx,171-cy,25,8,'#bda173');oval(c,279-cx,172-cy,19,5,M.waterShade);r(280,173,17,2,M.water);
-        word(c,'RESERVA',273-cx,164-cy,'#76664f');
-        pipe(c,35-cx,190-cy,270);
-        r(284,191,12,5,M.waterShade);r(285,192,10,2,M.water);r(285+Math.floor(t/260)%6,192,3,1,M.waterLight);
+        // Short rear connections meet the existing feed; neither adds a false
+        // walkable ledge or lights the public trough before the third seal.
+        drawGuairaPipe(c,4-cx,190-cy,32,false,t,reducedMotion,false,-1,false,PIPE);
+        drawGuairaPipe(c,305-cx,210-cy,10,false,t,reducedMotion,false,1,false,PIPE);
         // The public branch is closed by three stamped seals until the final release.
         r(238,185,28,18,'#745f50');r(240,187,24,14,'#a77b53');
+        for(const xx of [238,264]) {r(xx,184,2,20,'#897456');r(xx,185,1,2,'#c6aa7d');r(xx,200,1,2,'#c6aa7d');}
         const locks=Math.max(0,Math.min(3,Math.round(m.sealsRemaining)));
         for(let i=0;i<3;i++){
             const x=242+i*7;
             if(i<locks){r(x,188,5,11,M.sash);r(x+1,189,3,3,M.woodLight);r(x+1,196,3,2,M.wood);}
             else{r(x,189,5,1,'#d7b588');r(x,196,5,1,'#d7b588');}
         }
-        if(m.publicWaterOpen){r(240,189,24,10,M.waterShade);r(242,192,20,5,M.water);r(242,192,18,1,M.waterLight);}
-        word(c,'BAIRRO',26-cx,181-cy,'#6c5e4d');
+        if(m.publicWaterOpen){r(240,189,24,10,'#497f7d');r(242,192,20,5,PIPE.water);r(242,192,18,1,PIPE.glint);}
+        word(c,'BAIRRO',46-cx,199-cy,'#6c5e4d');
         // A recessed public trough: dark rim, intentionally no walkable pale highlight.
         r(10,205,92,9,'#9e7859');r(12,206,88,6,'#785e50');r(15,207,82,4,'#b58b62');
-        r(33,195,7,12,M.bronzeShade);r(34,196,4,10,M.bronze);r(34,196,1,8,M.bronzeLight);
         if(m.publicWaterOpen){
-            r(35,203,3,5,M.waterLight);r(16,207,81,4,M.waterShade);r(18,207,77,2,M.water);
-            for(let x=19;x<91;x+=18)r(x+Math.floor(t/300)%5,207,8,1,M.waterLight);
+            r(35,203,3,5,PIPE.glint);r(16,207,81,4,'#497f7d');r(18,207,77,2,PIPE.water);
+            drawGuairaPoolFlow(c,18-cx,95-cx,207-cy,true,t,reducedMotion,36-cx);
         }else{
             line(c,26-cx,207-cy,30-cx,210-cy,'#795e4e');line(c,57-cx,207-cy,62-cx,210-cy,'#795e4e');
             r(31,198,11,6,'#745a4b');r(33,199,7,3,M.sash);
@@ -97,16 +127,21 @@ export function drawGuairaMayorTerrain(c:CanvasRenderingContext2D,level:GroundLe
             if(level.data.tiles[row]?.[col]!==1)continue;
             const x=level.colToWorldX(col)-cx,y=level.rowToWorldY(row)-cy,top=level.data.tiles[row-1]?.[col]!==1;
             rect(c,x,y,16,16,P.earthShade);rect(c,x,y+3,16,13,P.earth);
-            if(top){rect(c,x,y,16,2,P.deck);rect(c,x,y+2,16,2,P.dust);}
-            if((row+col)%3!==0)rect(c,x+2+(col*3)%7,y+9,5,1,'#cc9062');
-            if(col%4===2){rect(c,x+1,y+13,7,1,'#9e664d');rect(c,x+7,y+14,1,2,'#9e664d');}
+            if(top){
+                rect(c,x,y,16,2,P.deck);rect(c,x,y+2,16,2,P.dust);
+                // Paving is flush with collision; dressed edges ground the plaza.
+                rect(c,x,y+4,16,3,'#ad805d');rect(c,x+2,y+4,12,1,'#cf9d6e');
+                if(col%2===0)rect(c,x+14,y+2,1,5,'#a87957');
+            }
+            drawGuairaClayGrain(c,x,y,col,row,'#cb9167','#aa7051');
         }
     });
 }
 function deck(c:CanvasRenderingContext2D,b:Body,cx:number,cy:number,lift:boolean){
     const x=Math.round(b.x)-cx,y=Math.round(b.y)-cy,w=Math.round(b.width),h=Math.round(b.height);
     rect(c,x,y,w,h,P.woodShade);rect(c,x,y,w,Math.min(2,h),P.deck);rect(c,x,y+2,w,Math.max(0,h-4),P.wood);rect(c,x,y+h-2,w,2,P.ironDark);
-    for(let xx=0;xx<w;xx+=14){rect(c,x+xx,y+2,1,Math.max(0,h-4),P.woodShade);rect(c,x+xx+2,y+3,Math.min(8,w-xx-2),1,P.woodLight);}
+    drawGuairaTimber(c,x,y+2,w,h-4,lift?5:6);
+    for(let xx=17;xx<w-10;xx+=19){rect(c,x+xx,y+2,1,Math.max(1,h-4),'#735c49');rect(c,x+xx+1,y+3,1,1,'#c0a176');}
     for(const xx of [2,w-7]){rect(c,x+xx,y+2,5,Math.max(0,h-2),lift?M.bronze:P.iron);rect(c,x+xx+1,y+3,2,1,M.bronzeLight);}
 }
 
@@ -114,8 +149,20 @@ function deck(c:CanvasRenderingContext2D,b:Body,cx:number,cy:number,lift:boolean
 export function drawGuairaMayorObjects(c:CanvasRenderingContext2D,objects:Bodies,m:GuairaMayorArtState,cx=0,cy=64,_time=0,_reducedMotion=false){
     layer(c,cx,cy,(cx,cy)=>{
         const lift=objects.get(MAYOR_ART_OBJECTS.lift),upper=objects.get(MAYOR_ART_OBJECTS.deck),valve=objects.get(MAYOR_ART_OBJECTS.valve);
+        const upperValve=objects.get(MAYOR_ART_OBJECTS.upperValve),refuge=objects.get(MAYOR_ART_OBJECTS.refuge);
         const cue=mechanismCue(m),pressure=cue==='rising'||cue==='ready'||cue==='released';
         const seamBusy=m.state==='recover'&&!!m.counterpressure;
+        if(refuge){
+            deck(c,refuge,cx,cy,false);
+            drawGuairaPipe(c,refuge.x+12-cx,refuge.y+8-cy,22,pressure,_time,_reducedMotion,true,1,false,PIPE);
+        }
+        if(upperValve&&upper){
+            // A second real pedal is plumbed into the same lift, on the upper route.
+            const x=upperValve.x+upperValve.width/2;
+            drawGuairaPipe(c,x-4-cx,upper.y+8-cy,21,pressure,_time,_reducedMotion,true,1,false);
+            drawGuairaPipeElbow(c,x-4-cx,upper.y+29-cy,pressure,false,false);
+            drawGuairaPipe(c,218-cx,upper.y+29-cy,x-222,pressure,_time,_reducedMotion,false,-1,false);
+        }
         if(lift&&valve){
             // The hydraulic connection stays behind the real plate and lift.
             // Its light means a fresh request, never a stale pre-stamp toggle.
@@ -125,9 +172,19 @@ export function drawGuairaMayorObjects(c:CanvasRenderingContext2D,objects:Bodies
         if(lift){
             const a=lift.home??lift,b=lift.to??a,top=Math.min(a.y,b.y),bottom=Math.max(a.y,b.y);
             for(const wx of [a.x+4,a.x+lift.width-5]){
+                // Cylinder shoes terminate at the real floor, with the moving
+                // carriage and pulley angle derived from actual lift travel.
+                rect(c,wx-3-cx,bottom-15-cy,7,15,'#8c7d60');rect(c,wx-2-cx,bottom-14-cy,2,13,'#b9a176');
+                rect(c,wx-4-cx,bottom-3-cy,9,3,P.ironDark);rect(c,wx-3-cx,bottom-3-cy,7,1,P.iron);
                 rect(c,wx-cx,top-17-cy,2,bottom-top+16,'#a58b66');rect(c,wx-cx,top-16-cy,1,bottom-top+15,'#c5ab7c');
                 rect(c,wx-cx,top-12-cy,1,Math.max(0,lift.y-top+12),'#706b5a');
-                oval(c,wx-4-cx,top-22-cy,9,9,'#8e7456');oval(c,wx-2-cx,top-20-cy,5,5,'#c7a572');rect(c,wx-cx,top-19-cy,1,3,'#7e694f');
+                oval(c,wx-4-cx,top-22-cy,9,9,'#786a53');oval(c,wx-3-cx,top-21-cy,7,7,'#c7a572');oval(c,wx-2-cx,top-20-cy,5,5,'#947d58');
+                const spoke=Math.floor((bottom-lift.y)/3)%4;
+                for(const d of [-1,1]){
+                    const offsets=[[3,0],[2,2],[0,3],[-2,2]][spoke];
+                    line(c,wx-cx,top-18-cy,wx+offsets[0]*d-cx,top-18+offsets[1]*d-cy,'#d0b481');
+                }
+                rect(c,wx-cx,top-18-cy,1,1,'#75664e');
             }
             if(pressure){
                 // Pressure climbs the existing guide only as far as the real
@@ -155,9 +212,6 @@ export function drawGuairaMayorObjects(c:CanvasRenderingContext2D,objects:Bodies
         }
         if(upper){
             // Thin one-way platform. Braces are visibly behind and below its physical top.
-            for(const xx of [upper.x+6,upper.x+upper.width-10]){
-                rect(c,xx-cx,upper.y+upper.height-cy,3,23,'#a68a64');line(c,xx-cx,upper.y+upper.height+14-cy,xx+10-cx,upper.y+upper.height-cy,'#967957',2);
-            }
             deck(c,upper,cx,cy,false);
             // The stamp lands on a brass plate flush with the actual deck, no invented pedestal.
             rect(c,upper.x+23-cx,upper.y-cy,13,1,M.bronzeLight);rect(c,upper.x+24-cx,upper.y+1-cy,11,2,M.bronzeShade);
@@ -171,8 +225,8 @@ export function drawGuairaMayorObjects(c:CanvasRenderingContext2D,objects:Bodies
                 }
             }
         }
-        if(valve){
-            const x=Math.round(valve.x)-cx,y=Math.round(valve.y)-cy,w=Math.round(valve.width),h=Math.round(valve.height);
+        for(const control of [valve,upperValve])if(control){
+            const x=Math.round(control.x)-cx,y=Math.round(control.y)-cy,w=Math.round(control.width),h=Math.round(control.height);
             rect(c,x,y,w,h,P.woodShade);rect(c,x+1,y+1,w-2,h-2,M.bronzeShade);rect(c,x+2,y+1,w-4,2,M.bronzeLight);
             rect(c,x+5,y+3,w-10,Math.max(1,h-4),pressure?M.waterShade:M.sash);
             const mx=x+Math.floor(w/2),color=pressure?M.waterLight:M.creamLight;

@@ -1,0 +1,46 @@
+{
+  "sources": [
+    {
+      "source": "src/adventure/experimental/guaira\\GuairaAscent.ts",
+      "currentMatchesCapture": true,
+      "baselineMatchesCapture": true
+    },
+    {
+      "source": "src/adventure/experimental/guaira\\GuairaAscentArt.ts",
+      "currentMatchesCapture": true,
+      "baselineMatchesCapture": true
+    },
+    {
+      "source": "src/adventure/experimental/guaira\\gallery\\GuairaGallery.ts",
+      "currentMatchesCapture": true,
+      "baselineMatchesCapture": true
+    },
+    {
+      "source": "src/adventure/experimental/guaira\\gallery\\GuairaGalleryStage.ts",
+      "currentMatchesCapture": true,
+      "baselineMatchesCapture": true
+    },
+    {
+      "source": "src/adventure/experimental/guaira\\gallery\\GuairaGalleryModel.ts",
+      "currentMatchesCapture": true,
+      "baselineMatchesCapture": true
+    },
+    {
+      "source": "src/adventure/experimental/guaira\\gallery\\GuairaGalleryArt.ts",
+      "currentMatchesCapture": true,
+      "baselineMatchesCapture": true
+    },
+    {
+      "source": "src/adventure/experimental/guaira\\chapter\\GuairaChapterApp.ts",
+      "currentMatchesCapture": true,
+      "baselineMatchesCapture": true
+    }
+  ],
+  "broadSuitePassed": 977,
+  "focusedAfterIntegrationPassed": 152,
+  "newTests": 18,
+  "buildPassed": true,
+  "nativeBrowserPassed": true,
+  "eightSceneInspectionPassed": true,
+  "reviewPassed": true
+}
