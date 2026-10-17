@@ -239,6 +239,7 @@ export class WorldMapHud {
     private readonly hint = element('p', 'world-map-hint');
     private readonly stageDetails = element('span', 'world-map-stage-details');
     private readonly globalProgress = element('p', 'world-map-region-progress');
+    private readonly exploration = element('p', 'world-map-exploration');
     private readonly warning = element('p', 'world-map-warning');
     private readonly announcer = element('p', 'world-map-sr');
     private readonly stageCanvases: HTMLCanvasElement[] = [];
@@ -369,7 +370,8 @@ export class WorldMapHud {
             this.regionMenu.append(this.deliciaRegion);
         }
         const copy = element('div', 'world-map-stage-copy');
-        copy.append(this.stageDetails, this.status, this.location, this.hint);
+        this.exploration.hidden = true;
+        copy.append(this.stageDetails, this.status, this.location, this.hint, this.exploration);
         const actions = element('div', 'world-map-stage-actions');
         this.enterButton = element('button', 'world-map-enter'); this.enterButton.type = 'button';
         this.playCanvas = bitmap(this.enterButton); this.playText = accessibleText(this.enterButton, 'Entrar');
@@ -463,6 +465,7 @@ export class WorldMapHud {
 
     update(state: WorldMapHudState): void {
         if (this.disposed) return;
+        this.exploration.hidden = true;
         if (this.chapter) {
             this.chapter = null; this.chapterKey = ''; this.chapterTraveling = false; this.signature = '';
             this.chapterButtons.forEach(button => { button.hidden = true; });
@@ -615,6 +618,9 @@ export class WorldMapHud {
         this.location.textContent = arrived ? `Feka em ${arrived.name}` : '';
         this.location.hidden = !journey?.blocked;
         this.hint.textContent = !stage.open ? stage.gate : traveling ? 'Você pode mudar o destino durante a viagem.' : 'Toque numa placa para caminhar até ela.';
+        this.exploration.hidden = !stage.open || traveling || !stage.exploration?.length;
+        this.exploration.textContent = (stage.exploration ?? []).map(route =>
+            `${route.name} · ${route.found}/${route.total} moedas`).join('\n');
         this.compactDetails.hidden = true;
         this.enterButton.hidden = traveling; this.skipButton.hidden = !traveling; this.enterButton.disabled = !canEnter;
         this.enterButton.classList.remove('is-return');
@@ -647,6 +653,8 @@ export class WorldMapHud {
             button.setAttribute('aria-current', item.id === journey?.arrived ? 'location' : 'false');
             const kind = item.label === 'B' ? 'Entrada alternativa' : item.optional ? item.place ? 'Desvio opcional' : 'Segredo' : `Fase ${item.label}`;
             button.setAttribute('aria-label', `${kind}: ${item.name}.${item.place ? ` ${item.place}. ${item.landmarkCue ?? ''}` : ''} ${item.completed ? 'Concluída.' : item.open ? 'Disponível.' : item.gate}`);
+            button.setAttribute('aria-description', item.exploration?.length
+                ? 'Desvios: ' + item.exploration.map(route => `${route.name}, ${route.found} de ${route.total} moedas`).join('; ') + '.' : '');
             button.title = item.name;
         });
         this.nodeLayer.setAttribute('aria-label', `Fases de ${name}`);

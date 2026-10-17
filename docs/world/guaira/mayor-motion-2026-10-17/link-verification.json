@@ -1,0 +1,53 @@
+{
+  "passed": true,
+  "links": [
+    {
+      "reference": "/guaira-prefeito.html",
+      "status": 200
+    },
+    {
+      "reference": "/?chapter=guaira",
+      "status": 200
+    },
+    {
+      "reference": "README.md",
+      "status": 200
+    },
+    {
+      "reference": "ground.mp4",
+      "status": 200
+    },
+    {
+      "reference": "motion-atlas.png",
+      "status": 200
+    },
+    {
+      "reference": "interrupt.mp4",
+      "status": 200
+    },
+    {
+      "reference": "upper.mp4",
+      "status": 200
+    },
+    {
+      "reference": "verification.json",
+      "status": 200
+    },
+    {
+      "reference": "native-verification.json",
+      "status": 200
+    },
+    {
+      "reference": "motion-poses.json",
+      "status": 200
+    },
+    {
+      "reference": "../whole-experience-2026-10-16/index.html#prefeito-mobilidade",
+      "status": 200
+    },
+    {
+      "reference": "../mayor-offensive-2026-10-17/index.html",
+      "status": 200
+    }
+  ]
+}

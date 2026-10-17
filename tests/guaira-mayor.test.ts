@@ -127,7 +127,8 @@ test('passive camping never releases a seal and a fresh retry remains winnable',
 
 test('late opening waits for the actual lift, grants the hit window and closes in the next stamped cycle', t => {
     const h = guairaMayorBrowser(t), g = h.create(); g.player.data.position.x = 0;
-    h.run(g, R.intro + R.idle + R.warning + R.leap + R.stamp + R.returning + R.recover - 5);
+    h.run(g,R.intro+R.idle);h.run(g,50,['ArrowRight']);
+    h.run(g, R.warning + R.leap + R.stamp + R.returning + R.recover - 55);
     assert.equal(g.mayor.state, 'recover'); assert.equal(g.mayor.stateTick, R.recover - 5);
     g.objects.activate(A.valveId);
     g.boss!.update(R.tickMs, g.player.getRect(), g.objects, g.level);
@@ -136,7 +137,7 @@ test('late opening waits for the actual lift, grants the hit window and closes i
     assert.equal(g.objects.get(A.liftId)!.y,A.deckY);assert.equal(g.mayor.vulnerable,true);
     assert.equal(g.mayor.recoveryTicksRemaining,R.minimumOpening);
     h.run(g,g.mayor.recoveryTicksRemaining);assert.equal(g.mayor.state,'idle');assert.equal(g.mayor.sealsRemaining,3);
-    h.run(g, R.idle + R.warning + R.leap); assert.equal(g.mayor.state, 'stamp');
+    h.run(g,R.idle);h.run(g,50,['ArrowRight']);h.run(g,R.warning+R.leap-50); assert.equal(g.mayor.state, 'stamp');
     assert.equal(g.objects.get(A.valveId)!.active, false); assert.equal(g.objects.get(A.liftId)!.active, false);
     assert.equal(g.mayor.registerOpenedThisCycle, false);
     h.run(g, R.stamp + R.returning); g.objects.activate(A.valveId);

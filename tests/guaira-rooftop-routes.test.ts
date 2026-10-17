@@ -42,8 +42,8 @@ for(const touch of [false,true])for(const reducedMotion of [false,true])
    if(n===548){visible(g,768,144,48);g.render();assert.match(chapterGuidance(h.status.textContent,''),/corra e salte.*Shift ou botão/);}
    if(n>=558&&n<=602)visible(g,768,144,48);
   });
-  assert.equal(frames,tape.frames);assert.equal(g.finished,true);assert.equal(g.coins,12);assert.equal(liftRides,0);
-  assert.equal(g.store.save.checkpoint?.index,1);
+  assert.equal(frames,tape.frames);assert.equal(g.finished,true);assert.equal(g.coins,tape.coins);assert.equal(liftRides,0);
+  assert.equal(g.store.save.checkpoint?.index,g.stage.checkpoints.length-1);
   for(const top of [368,336,304,256,192,144,240])assert.ok(supports.has(top),`native support ${top} used`);
   const collected=(g as unknown as {collected:Set<string>}).collected;
   assert.equal([...collected].filter(id=>id.startsWith('guaira-subida:roof:')).length,4);

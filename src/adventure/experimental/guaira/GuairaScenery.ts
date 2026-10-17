@@ -1,4 +1,5 @@
 import { box as r, pixelLine as line, polygon, oval } from '../../WorldPainting';
+import { drawGuairaDistantSettlement } from './GuairaDistantScenery';
 
 export type GuairaLandscape = 'village' | 'junction' | 'rice' | 'corral' | 'heights' | 'town';
 
@@ -102,6 +103,7 @@ export function drawGuairaLandscape(c: CanvasRenderingContext2D, cx: number, cy:
             oval(c, left + dx - 4, near + dy - h, 10, 9, '#929e7d');
         }
     }
+    drawGuairaDistantSettlement(c, x, y, t, kind);
     c.restore();
 }
 

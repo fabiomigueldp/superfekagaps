@@ -1,0 +1,84 @@
+{
+  "physicalDevice": false,
+  "mountsForVisualInspection": true,
+  "checks": [
+    {
+      "variant": "respiros",
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-respiros",
+      "finished": true,
+      "coins": 23,
+      "frames": 2609
+    },
+    {
+      "variant": "alivio",
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-camara-alivio",
+      "finished": true,
+      "coins": 21,
+      "frames": 1957
+    },
+    {
+      "variant": "respiros",
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-respiros",
+      "finished": true,
+      "coins": 23,
+      "frames": 2609
+    },
+    {
+      "variant": "alivio",
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-camara-alivio",
+      "finished": true,
+      "coins": 21,
+      "frames": 1957
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

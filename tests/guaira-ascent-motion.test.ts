@@ -85,7 +85,7 @@ test('all three native supporting caps remain exact throughout motion and no new
         objects.update(1000 / 60, level, 700);
         if (frame % 19 !== 0) continue;
         const before = structuredClone(objects);
-        for (const body of objects.bodies) for (const reduced of [false, true]) {
+        for (const body of objects.bodies.filter(b => !b.id.includes(':course:'))) for (const reduced of [false, true]) {
             const cx = Math.round(body.x) - 100, cy = Math.round(body.y) - 70;
             const raster = paint(objects, cx, cy, reduced);
             for (let x = 100; x < 100 + body.width; x++) for (const y of [70,71])
@@ -124,7 +124,7 @@ test('muted reduced-motion keyboard replay still finishes every crossing, freeze
         assert.equal(game.player.data.isDead, false);
     }
     assert.equal(game.finished, true); assert.equal(game.audio.enabled, audio);
-    assert.equal(game.store.save.checkpoint?.index, 1);
+    assert.equal(game.store.save.checkpoint?.index, game.stage.checkpoints.length-1);
     game.toggleAscentPause(); const frozen = paint(game.objects,600,100,true).pixels;
     h.run(game,90); assert.deepEqual(paint(game.objects,600,100,true).pixels,frozen);
     game.load(G.id);

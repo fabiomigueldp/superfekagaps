@@ -158,8 +158,9 @@ test('full directional telegraph locks aim and oversize time steps cannot skip i
 });
 
 test('recovery accepts a falling stomp on the exact braking frame but never side attacks', () => {
-    const b = new SkeletonBullModel(); b.state = 'charge'; b.facing = -1; b.x = 17;
+    const b = new SkeletonBullModel(); b.state = 'tell'; b.stateTick = BULL_RULES.tell - 1; b.facing = -1; b.x = 17;
     const p = { x: 24, y: b.y - 2, width: 14, height: 24 };
+    b.update(BULL_RULES.tickMs, p); assert.equal(b.state, 'charge');
     b.update(BULL_RULES.tickMs, p); assert.equal(b.state, 'brake'); assert.ok(b.hazards.length > 0);
     assert.equal(b.contact(p, { ...p, y: b.y - 25 }, true), 'hit'); assert.equal(b.health, 5);
     assert.equal(b.contact(p, { ...p, y: b.y - 25 }, true), 'none'); assert.equal(b.health, 5);

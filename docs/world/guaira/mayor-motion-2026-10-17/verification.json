@@ -1,0 +1,69 @@
+{
+  "passed": true,
+  "date": "2026-10-17",
+  "revision": "mayor-motion",
+  "tests": {
+    "passed": 3619,
+    "failed": 0,
+    "skipped": 1,
+    "newMotionCases": 15,
+    "skipReason": "Optional shipped-atlas native canvas dependency is absent from project node_modules; production capture uses the bundled canvas runtime."
+  },
+  "build": {
+    "passed": true,
+    "levelValidation": true,
+    "playerAssets": true,
+    "worldAndSprites": true,
+    "bothTypeScriptProjects": true
+  },
+  "native": {
+    "inputOnly": true,
+    "actorOrClockEdits": false,
+    "capturedRoutes": [
+      "upper",
+      "ground",
+      "interrupt"
+    ],
+    "motionPoses": 16
+  },
+  "browser": {
+    "completedFights": 10,
+    "strategies": 5,
+    "keyboard": true,
+    "simulatedTouch": true,
+    "reducedMotion": true,
+    "pauseDuringPursuit": true,
+    "retry": true,
+    "errors": [],
+    "reviewWidths": [
+      1440,
+      390
+    ],
+    "decodedVideos": 6
+  },
+  "campaign": {
+    "normalSave": true,
+    "completedRuns": 9,
+    "distinctScenes": 8,
+    "simulatedGamepad": true,
+    "earnedProgress": true,
+    "mapReturn": true,
+    "reload": true,
+    "errors": []
+  },
+  "hashes": {
+    "src/adventure/experimental/guaira/GuairaMayorModel.ts": "1d7ebfd048443eaf0b12d72dcb8659187c310330ce38f59f5c3c5464fc346cf3",
+    "src/adventure/experimental/guaira/GuairaMayorArt.ts": "e3c765d0ce31b73b4d5575344ae7c77d63ddefd0427e41dfb30be359472d2f29",
+    "src/adventure/experimental/guaira/GuairaMayorArenaArt.ts": "c4497f2ea706ed42e75baebeda917e25ad2643ece1b6daf8f0dd66ac831ae7c2",
+    "src/adventure/experimental/guaira/GuairaMayorFeedbackArt.ts": "c75dc9603a957ef34357fa2e3564a655308ae8de68f1a19b0c1b433afaf24c13",
+    "src/adventure/experimental/guaira/GuairaMayorLab.ts": "453baeacc795c76820a0f2a298e443721c9522dcf37eff2f1e8bba1b5cfe4323",
+    "src/adventure/experimental/guaira/GuairaMayorWater.ts": "439bdbd10a9eda0305fde0d9a5801d6b73fb21bfcd9185e27ffb1553e923a16f",
+    "src/adventure/experimental/guaira/GuairaMayorTownArt.ts": "fb3bdd62a9f5b783d6b70bc0d6b003ad14edcb222ff95ed21e847f03eb97fc46"
+  },
+  "limitations": [
+    "Input routes are rehearsed, not first-play difficulty measurements.",
+    "Touch and gamepad are simulated, not physical-device certification.",
+    "Frame-work timings exclude browser presentation and scheduling.",
+    "The floor can leave the frame at an upper jump apex; nearby threats and the helmet remain visible."
+  ]
+}

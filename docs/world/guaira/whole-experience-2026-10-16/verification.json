@@ -1,0 +1,250 @@
+{
+  "date": "2026-10-16",
+  "scope": "Guaíra whole experience, alternate entrance preservation and workshop presentation",
+  "sourceSHA256": {
+    "src/adventure/GuairaCampaignArt.ts": "fc0c17e49813f35f78272d5b84af9bdf0e9dde728641e3f5253dae1c4565cd01",
+    "src/adventure/GuairaMapJourney.ts": "e9977743808314b3c89c1c0cc7647b5eac9a4225e96cf6096b2618d4b9ccce7c",
+    "src/adventure/WorldChapterMap.ts": "7bf0be9aead3f7c30fbe473fd8246026633380ab7971ce96c9725cf220c35e0d",
+    "src/adventure/WorldGame.ts": "497f0ab4957c119fb7a8080e08ff541f0d2b7540747a2d80a93e176d627bf875",
+    "src/adventure/experimental/guaira/chapter/GuairaChapterProgress.ts": "b0374ccdcf00babdd1a2743d088a4139e4d78fb76a27f7377f42fecf7db97d07",
+    "src/adventure/experimental/guaira/chapter/GuairaChapterSession.ts": "df81235489d9904c7dd5f488394885ca9cfb7299be64455091e6125b638ceec8",
+    "src/adventure/experimental/guaira/chapter/GuairaChapterApp.ts": "86249b6c60def26afa54a11bd85efc6193e37f549fff79e041914d39943f0ec4",
+    "src/adventure/experimental/guaira/chapter/GuairaChapterMapView.ts": "36d56568cff49074d59cbd0f53365286f9e50afc0eaee8b83562fc0f7f98020f",
+    "src/adventure/experimental/guaira/chapter/GuairaChapterScenes.ts": "91bd7bf8b6288945a92385c45bb2abe525a5eafb55b839c808c77cc0025e6d61",
+    "src/adventure/experimental/guaira/chapter/GuairaChapterStory.ts": "bae3d51edbe80b0ea4c56b3bba6e65ef551b540ae96772263f1c256fa81cc024",
+    "src/adventure/experimental/guaira/GuairaWorkshopArt.ts": "44099f29fb60594374e5cb12b9c89ca0e9ece873ba60acaf149ac9750c3dcd7a",
+    "src/adventure/experimental/guaira/gallery/GuairaGalleryArt.ts": "90ec2381127d7d5447a6c88d6169cc8ad1f96bf1db9f15ff942a3855fdc5603e",
+    "src/adventure/experimental/guaira/relief/GuairaReliefArt.ts": "71ad3da04a61f6e01ea7e43cf6fac031103419233217f5da0ff84121d6645795"
+  },
+  "tests": {
+    "passed": 1199,
+    "failed": 0,
+    "log": "output/guaira/whole-experience-2026-10-16/all-tests-final.log",
+    "worldMapTests": "output/guaira/whole-experience-2026-10-16/world-map-tests.log"
+  },
+  "build": {
+    "passed": true,
+    "log": "output/guaira/whole-experience-2026-10-16/build-final.log"
+  },
+  "campaign": {
+    "normalAccess": true,
+    "startingFixture": "Factory prerequisite stages completed in isolated browser; no Guaíra receipts or development access injected",
+    "nativeInputOnly": true,
+    "actorPositionEdits": false,
+    "openingsMountedForInspection": false,
+    "walkEntries": 8,
+    "walkPositions": [
+      {
+        "title": "Travessia da Vala Seca",
+        "positions": 27
+      },
+      {
+        "title": "Pátio das Comportas",
+        "positions": 91
+      },
+      {
+        "title": "Passagem dos Respiros",
+        "positions": 206
+      },
+      {
+        "title": "Ossabravo",
+        "positions": 93
+      },
+      {
+        "title": "Subida à Casa da Vazão",
+        "positions": 40
+      },
+      {
+        "title": "Prefeito da Vazão",
+        "positions": 74
+      },
+      {
+        "title": "Galeria dos Remendos",
+        "positions": 296
+      },
+      {
+        "title": "Pátio das Comportas",
+        "positions": 117
+      }
+    ],
+    "completedRuns": 9,
+    "distinctScenes": 8,
+    "errors": [],
+    "allEightVisitedInOneSave": true
+  },
+  "model": {
+    "revision": 6,
+    "source": "C:\\Users\\fabio\\Projects\\superfekagaps\\docs\\world\\guaira\\path-finish-2026-10-15\\guaira-paths.blend",
+    "sourceSHA256": "1993480be169eb419e8111196712b556572225ab296edbe0801fe11a8a1fde27",
+    "readOnly": true,
+    "closedMeshes": 548,
+    "routeSamples": 590,
+    "supportProbes": 1770,
+    "unsupported": 0,
+    "bodyContacts": 0,
+    "maximumProjectionError": 4.980049128633368e-8,
+    "maximumDepthErrorMeters": 4.6411132714752057e-7
+  },
+  "controls": {
+    "physicalDevice": false,
+    "mountsForVisualInspection": true,
+    "nativeRoutes": [
+      {
+        "touch": false,
+        "reduced": false,
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "pause": {
+          "paused": true,
+          "pixelsFrozen": true,
+          "stateFrozen": true,
+          "fits": true
+        },
+        "id": "guaira-galeria",
+        "finished": true,
+        "coins": 5,
+        "frames": 759
+      },
+      {
+        "touch": false,
+        "reduced": false,
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "pause": {
+          "paused": true,
+          "pixelsFrozen": true,
+          "stateFrozen": true,
+          "fits": true
+        },
+        "id": "guaira-camara-alivio",
+        "finished": true,
+        "coins": 5,
+        "frames": 613
+      },
+      {
+        "touch": true,
+        "reduced": true,
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "pause": {
+          "paused": true,
+          "pixelsFrozen": true,
+          "stateFrozen": true,
+          "fits": true
+        },
+        "id": "guaira-galeria",
+        "finished": true,
+        "coins": 5,
+        "frames": 759
+      },
+      {
+        "touch": true,
+        "reduced": true,
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "pause": {
+          "paused": true,
+          "pixelsFrozen": true,
+          "stateFrozen": true,
+          "fits": true
+        },
+        "id": "guaira-camara-alivio",
+        "finished": true,
+        "coins": 5,
+        "frames": 613
+      }
+    ],
+    "errors": []
+  },
+  "review": {
+    "views": [
+      {
+        "width": 1440,
+        "fits": true,
+        "videos": [
+          {
+            "duration": 12.65,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "duration": 10.216667,
+            "width": 960,
+            "height": 540,
+            "error": null
+          }
+        ]
+      },
+      {
+        "width": 390,
+        "fits": true,
+        "videos": [
+          {
+            "duration": 12.65,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "duration": 10.216667,
+            "width": 960,
+            "height": 540,
+            "error": null
+          }
+        ]
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  "limitations": [
+    "Recorded play routes are rehearsed and do not measure first-time discovery or enjoyment.",
+    "Touch input was simulated in a browser, not measured on physical devices.",
+    "The current island geometry passed its audit; no new Blender geometry was authored in this pass."
+  ],
+  "baselineSourceSHA256": {
+    "GuairaChapterScenes.ts": "dff29576db09655149e15d0c3c3d934f4e8ac23b39b739ab68d8a9a2a4054d19",
+    "GuairaGalleryArt.ts": "21593af0e2dfce97937595b8fe0024905c51e10a88444ea5b90e643b5f445f66",
+    "GuairaReliefArt.ts": "95e778629730df05d39b2499619ed1468a5ed097374cd7a98fab96c691ad2453"
+  },
+  "artifactSHA256": {
+    "campaign-verification.json": "cec7b4f93dd83e92c26b225d8d95b19ed59a0c99a8972c31aab9781d5c447021",
+    "gallery-after.png": "5b1a6a9ddc1f00652270211959ec52230fd6d015526b0564db6ba3dde0710737",
+    "gallery-before.png": "e44a362f450b07fe13cb347a5c826d20a7db36678c8f2ae176738a9502c78a5f",
+    "gallery.mp4": "8028a42de863e8f440e7a4f28b5a05a6c63822d35cfc9730ae05f67f06a249fc",
+    "index.html": "b39be4c836f5b7dc69c69b53891b016d677d6e6aa96afc152917715f96f8ae42",
+    "map-complete.png": "e3ec7527bbe7bbb657b5d2a8cf855958c229723620b53514e532544026dce8a4",
+    "model-verification.json": "4abf0b590145dfdd3023305c1876cd77b459c0459f1b61e906fe4d539518cbe7",
+    "relief-after.png": "c8defeb444ca9f2f2e9a5abe2a96bb2b5e1c646088de3a38665966a81dbbfbfd",
+    "relief-before.png": "319c4dff6a1613b47e8704ba258fd58ed4f2c8070dcb527ea1d7b8f82499670d",
+    "relief.mp4": "032efae2084746edd131fb74f58482afc97eb2949fe178a0aef9a681997c6174",
+    "review-verification.json": "95175a37b3114d93a35e1a462ae36ea85a17978f621dfb5faa7dd5d93758c275",
+    "scene-survey.json": "f6e15762296e38c349bca4d35483e1585eecd5f1886bf82f2ea23491864f764b",
+    "surface-verification.json": "258294d013c74441692dba9e68144c30d491588634e192cc9d9dbc2bc70f2650",
+    "survey-alivio.png": "b332194858489ca4392c39fc69160a150a9be7eb7ab75db9f8cd3614b1600ece",
+    "survey-galeria.png": "3fb935bb38b66a6c2a9e4c6c297ed35531b07884617fb26397e53104ccbd3d03",
+    "survey-lab.png": "81e2cdc2ac5e6dbd3bb407245de65d479d7e3a565ce5220b848b7e953d6f6d71",
+    "survey-patio.png": "e32cb55e12c012a0dae2c0f46cbe965413e31ae042aef366bf8d509a6ddcd452",
+    "survey-prefeito.png": "f3461005fbe33de93d2f5019012a1ba7ca7a1f2b6a37f5fd42ac5c7b5a263c77",
+    "survey-respiros.png": "3a734fe5c50242835bca7c645da50d68e982a8a9c2f1a097df32d4466208db74",
+    "survey-subida.png": "78a21e384bfc3f845635356a599d7684af3942ac1baf17a86d673f1900e6cc42",
+    "survey-travessia.png": "0645d88877372f6e04ff15f14a13c3242d16cf3b649a7bcff0df57d406ed7d34",
+    "view-alivio.png": "c8defeb444ca9f2f2e9a5abe2a96bb2b5e1c646088de3a38665966a81dbbfbfd",
+    "view-galeria.png": "5b1a6a9ddc1f00652270211959ec52230fd6d015526b0564db6ba3dde0710737",
+    "view-lab.png": "b83c78354eec36570688b7bf8df75e307f762595798ce65d4220449bec56ebf6",
+    "view-patio.png": "1f5fd48b581e0665bcef483787111a6e1c9f56d9e830fb72701673e648c707d4",
+    "view-prefeito.png": "e8147494d0615aa1faf8cc8cd824bdd0b4cd3ffff4078272913890e901bb7c88",
+    "view-respiros.png": "1f487e161ce42eb586945e8358b8314ac3af65a54e893d66bc9298bc60363223",
+    "view-subida.png": "0890122c75b78d3183ba4e6a5a08908f27b44e0f51d46853aa5f9f06608978c9",
+    "view-travessia.png": "e81b23645a24fccd335de143621aba7bb0c367aa0df102d258925e51bf858279"
+  }
+}

@@ -1,0 +1,199 @@
+{
+  "revision": "guaira-exploration-polish-2026-10-17",
+  "reviewedAt": "2026-10-17T03:06:56.412Z",
+  "notAFirstPlaytest": true,
+  "scope": "Six native optional upper loops, authored landmarks, eight return decks, relocated checkpoint positions, directional camera and context-sensitive warnings.",
+  "sourceHashes": {
+    "src/adventure/WorldEnemies.ts": "fe368aa25961ed4192256992663f608901c92f5f268f37285b1111cd6511e729",
+    "src/adventure/types.ts": "ab9d7dfbccf4a519995e2aa0a4c347de992eeaa7070d1f9376d48ab39f4a4742",
+    "src/adventure/experimental/guaira/GuairaCourseDesign.ts": "e2e644d1804ebcc764d08f6a2fd57db712efc519c824f01a6f3a48d5399d4d44",
+    "src/adventure/experimental/guaira/GuairaCoursePresentation.ts": "ac7e1afd86c18cbf6138bd41c8f8f8e483e61cd8d7a99f57fcf57f9aae3548c2",
+    "src/adventure/experimental/guaira/GuairaFoeArt.ts": "3e6a97d95be8b9e4e25e92272537de047b8c66c411bc4c3eac9cad7eac42224f",
+    "src/adventure/experimental/guaira/GuairaTraversal.ts": "f895c32c0376e4d7e72cae0c0196893bbfb03ff238eb22c13fd9b5c25ec9599f",
+    "src/adventure/experimental/guaira/GuairaAscent.ts": "3fe74fe7f889782f93964390441c6527461f11bde0770b2ca0ad53e5f34ef912",
+    "src/adventure/experimental/guaira/GuairaTraversalArt.ts": "36fca7228c4ee95254acc127ae6cd33d0af9904df01ac48066974faaeeaa6734",
+    "src/adventure/experimental/guaira/junction/GuairaJunction.ts": "d06ce06e8dfe715cb73308ef2efc491163a5c736d05b3c097bbadad832dcf404",
+    "src/adventure/experimental/guaira/junction/GuairaJunctionModel.ts": "425e6c8b988a913364beed9f294aaa19c1cedbd9d9639be291eb25b047cc4003",
+    "src/adventure/experimental/guaira/respiros/GuairaRespiros.ts": "0a4d63caf89d44e411a30ee294f9dd281ad8cacd1417ce3a57d66976cf13b711",
+    "src/adventure/experimental/guaira/respiros/GuairaRespirosStage.ts": "c2bb55902c9c39f5db017c61a34cdbb5a7d265156721179364e516fdbfcf4ac0",
+    "src/adventure/experimental/guaira/respiros/GuairaRespirosArt.ts": "1eeaa64704c894cbbc065745b4bd078f7978aafcc3f48311fbe2b7565cf4bffa",
+    "src/adventure/experimental/guaira/gallery/GuairaGallery.ts": "0ade70243f31054e448416c97ecd92cfa085c4c2c63940bc172665dbcdd3bf7b",
+    "src/adventure/experimental/guaira/gallery/GuairaGalleryStage.ts": "d950dcae3e46a005626e44824d2d4766213632933d3b6c81529f13af76c01413",
+    "src/adventure/experimental/guaira/relief/GuairaRelief.ts": "159a956f56e334547f29f373b33247af775779dbca46359a437078e081bdccde",
+    "src/adventure/experimental/guaira/relief/GuairaReliefStage.ts": "c78f70c00a16e90dab07a420d4dd3b0140591da2689c69f38c441f0c430ef6a8",
+    "src/adventure/experimental/guaira/GuairaCourseGuidance.ts": "2b2eed0bea63ff7edcbf8b035c59db7e50d05757baf570ffbad9f8f64c406ca7",
+    "src/adventure/experimental/guaira/GuairaCourseLandmarks.ts": "fa01924e3ea4681302da746d79884d9c4564330f9b32dcb2d499b8b0cf62cd1a",
+    "tests/guaira-course-exploration.test.ts": "aac8dc28a4a799983cb94afc7814fceb9c049f768151d3b842c3893a92bd7765",
+    "tests/helpers/guairaExplorationReplays.json": "362eeb0092a3dc7393edfff8f37f341f8130cc16c8e8eaefd6ae3479922e51d0",
+    "tests/helpers/guairaCourseController.ts": "1954457a30aebf56052e69b466a7ef68261f3ed6d405b4297e9ab3ee2f20c74e"
+  },
+  "current": {
+    "ordinaryEnemies": 33,
+    "newDistricts": 22,
+    "newCheckpoints": 22,
+    "widthPixels": {
+      "travessia": 4032,
+      "patio": 3008,
+      "respiros": 3584,
+      "subida": 3648,
+      "galeria": 2432,
+      "alivio": 2400
+    },
+    "enemies": {
+      "travessia": 7,
+      "patio": 6,
+      "respiros": 5,
+      "subida": 6,
+      "galeria": 5,
+      "alivio": 4
+    },
+    "optionalUpperLoops": 6,
+    "newOptionalCoins": 20,
+    "newReturnDecks": 8
+  },
+  "checks": {
+    "guaira": {
+      "tests": 1246,
+      "pass": 1246,
+      "fail": 0
+    },
+    "finalCameraFocused": {
+      "tests": 29,
+      "pass": 29,
+      "fail": 0
+    },
+    "build": true,
+    "typescript": true,
+    "validators": true,
+    "existingInputTapes": {
+      "count": 25,
+      "allFinished": true,
+      "damage": 0,
+      "inputEdits": false
+    },
+    "nativeSceneSurvey": {
+      "scenes": [
+        "travessia",
+        "patio",
+        "respiros",
+        "lab",
+        "subida",
+        "prefeito",
+        "galeria",
+        "alivio"
+      ],
+      "inputOnly": true,
+      "actorOrClockEdits": false
+    },
+    "browserOptionalRoutes": {
+      "checks": 12,
+      "physicalDevice": false,
+      "keyboard": true,
+      "touch": true,
+      "reducedMotion": true,
+      "pauseStateAndPixelsFrozen": true
+    },
+    "campaign": {
+      "checks": 9,
+      "normalCampaign": true,
+      "gamepadApiSimulated": true,
+      "physicalDevice": false
+    },
+    "reviewPage": {
+      "viewports": [
+        1440,
+        390
+      ],
+      "videos": 6,
+      "checks": 12,
+      "passed": true
+    }
+  },
+  "recordings": {
+    "travessia": {
+      "frames": 2066,
+      "coins": 19,
+      "finished": true,
+      "damage": 0,
+      "videoFps": 30,
+      "simulationHz": 60,
+      "maxCameraStepY": 7
+    },
+    "patio": {
+      "frames": 2813,
+      "coins": 7,
+      "finished": true,
+      "damage": 0,
+      "videoFps": 30,
+      "simulationHz": 60,
+      "maxCameraStepY": 9
+    },
+    "respiros": {
+      "frames": 2102,
+      "coins": 15,
+      "finished": true,
+      "damage": 0,
+      "videoFps": 30,
+      "simulationHz": 60,
+      "maxCameraStepY": 7
+    },
+    "lab": {
+      "frames": 1267,
+      "coins": 0,
+      "finished": true,
+      "damage": 0,
+      "videoFps": 30,
+      "simulationHz": 60,
+      "maxCameraStepY": 0
+    },
+    "subida": {
+      "frames": 1915,
+      "coins": 20,
+      "finished": true,
+      "damage": 0,
+      "videoFps": 30,
+      "simulationHz": 60,
+      "maxCameraStepY": 7.46876823917448
+    },
+    "prefeito": {
+      "frames": 1822,
+      "coins": 0,
+      "finished": true,
+      "damage": 0,
+      "videoFps": 30,
+      "simulationHz": 60,
+      "maxCameraStepY": 6.700000000000003
+    },
+    "galeria": {
+      "frames": 1482,
+      "coins": 15,
+      "finished": true,
+      "damage": 0,
+      "videoFps": 30,
+      "simulationHz": 60,
+      "maxCameraStepY": 8
+    },
+    "alivio": {
+      "frames": 1354,
+      "coins": 14,
+      "finished": true,
+      "damage": 0,
+      "videoFps": 30,
+      "simulationHz": 60,
+      "maxCameraStepY": 8.909591118209136
+    }
+  },
+  "artifacts": {
+    "analysis": "exploration-polish.md",
+    "native": "exploration-native-survey.json",
+    "browser": "exploration-surface-verification.json",
+    "campaign": "exploration-campaign-verification.json",
+    "existingRoutes": "exploration-existing-routes.json",
+    "review": "exploration-review-verification.json"
+  },
+  "limits": [
+    "Runs are rehearsed and do not establish first-play discovery, duration, or enjoyment.",
+    "Touch and gamepad are simulated browser inputs, not physical-device tests."
+  ],
+  "supersededBy": "route-clarity-verification.json"
+}

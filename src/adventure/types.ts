@@ -32,6 +32,10 @@ export interface FoeSpec {
     x: number;
     y: number;
     range?: number;
+    /** A sentry defends this approach; it does not acquire a player behind it. */
+    guardFacing?: -1 | 1;
+    /** Canal scavengers use the same contacts/physics with authored attack variants. */
+    behavior?: 'canal';
 }
 export interface Pickup {
     id: string;

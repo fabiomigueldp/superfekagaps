@@ -13,7 +13,7 @@ for (const touch of [false, true]) test(`gallery service-loop guidance reaches t
     const g = app.activeGame; assert.ok(g instanceof GuairaGallery);
     let frame = 0;
     const remaining = (tapes.galeria.runs as Array<[number, string[]]>).map(([n, keys]) => [n, keys] as [number, string[]]);
-    for (const [stop, message] of [[211, /Tampa opcional/], [287, /Oficina por baixo.*dois tablados/], [400, /Ponto seguro.*tampa II/], [759, /Acesso à Câmara de Alívio aberto.*5 moedas/]] as const) {
+    for (const [stop, message] of [[211, /Tampa opcional/], [287, /Oficina por baixo.*dois tablados/], [400, /Ponto seguro.*tampa II/], [tapes.galeria.frames, new RegExp('Acesso à Câmara de Alívio aberto.*'+tapes.galeria.coins+' moedas')]] as const) {
         const blocks: Array<[number, string[]]> = [];
         while (frame < stop) {
             const [count, keys] = remaining[0], n = Math.min(count, stop - frame);

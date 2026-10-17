@@ -25,6 +25,7 @@
 .world-controls-content p { margin: 0; }
 .world-controls-content h3 { margin: 16px 0 6px; color: #ffe29a; font-size: 14px; }
 .world-controls-help footer { flex: none; padding: 8px 12px; border-top: 1px solid #637888; }
+.world-controls-help .world-controls-footer-hint { margin: 0 0 8px; font-size: 12px; line-height: 1.4; color: #ffe29a; }
 .world-controls-help button {
     display: block; min-height: 44px; width: 100%; padding: 8px 12px;
     border: 2px solid #bc845d; background: #334b62; color: #fff3be;

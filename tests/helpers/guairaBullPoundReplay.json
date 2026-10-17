@@ -1,6 +1,7 @@
 {
+  "description": "Ground crossings under the two apices; late jump and ground-pound punish. Native inputs only.",
   "stepMs": 16.666666666666668,
-  "frames": 1251,
+  "frames": 1294,
   "runs": [
     [
       12,
@@ -202,7 +203,7 @@
       ]
     ],
     [
-      19,
+      40,
       [
         "ShiftLeft",
         "ArrowRight"
@@ -217,40 +218,59 @@
       ]
     ],
     [
-      27,
+      3,
+      [
+        "ShiftLeft"
+      ]
+    ],
+    [
+      15,
+      [
+        "ShiftLeft",
+        "ArrowLeft"
+      ]
+    ],
+    [
+      3,
+      [
+        "ShiftLeft"
+      ]
+    ],
+    [
+      10,
       [
         "ShiftLeft",
         "ArrowRight"
       ]
     ],
     [
+      6,
+      [
+        "ShiftLeft"
+      ]
+    ],
+    [
       4,
       [
+        "ShiftLeft",
+        "ArrowLeft"
+      ]
+    ],
+    [
+      34,
+      [
         "ShiftLeft"
       ]
     ],
     [
-      13,
+      52,
       [
         "ShiftLeft",
         "ArrowLeft"
       ]
     ],
     [
-      22,
-      [
-        "ShiftLeft"
-      ]
-    ],
-    [
-      57,
-      [
-        "ShiftLeft",
-        "ArrowLeft"
-      ]
-    ],
-    [
-      44,
+      40,
       [
         "ShiftLeft"
       ]
@@ -399,15 +419,9 @@
       ]
     ],
     [
-      14,
+      39,
       [
         "ShiftLeft"
-      ]
-    ],
-    [
-      9,
-      [
-        "ArrowDown"
       ]
     ],
     [
@@ -450,7 +464,7 @@
       ]
     ],
     [
-      19,
+      40,
       [
         "ShiftLeft",
         "ArrowLeft"
@@ -465,10 +479,43 @@
       ]
     ],
     [
-      21,
+      3,
+      [
+        "ShiftLeft",
+        "Space"
+      ]
+    ],
+    [
+      15,
+      [
+        "ShiftLeft",
+        "ArrowRight"
+      ]
+    ],
+    [
+      3,
+      [
+        "ShiftLeft"
+      ]
+    ],
+    [
+      10,
       [
         "ShiftLeft",
         "ArrowLeft"
+      ]
+    ],
+    [
+      6,
+      [
+        "ShiftLeft"
+      ]
+    ],
+    [
+      4,
+      [
+        "ShiftLeft",
+        "ArrowRight"
       ]
     ],
     [
@@ -478,23 +525,10 @@
       ]
     ],
     [
-      13,
-      [
-        "ShiftLeft",
-        "ArrowRight"
-      ]
-    ],
-    [
-      22,
-      [
-        "ShiftLeft"
-      ]
-    ],
-    [
       9,
       [
         "ShiftLeft",
-        "ArrowLeft"
+        "ArrowDown"
       ]
     ],
     [
@@ -512,19 +546,19 @@
       "health": 4
     },
     {
-      "frame": 547,
+      "frame": 568,
       "health": 3
     },
     {
-      "frame": 696,
+      "frame": 717,
       "health": 2
     },
     {
-      "frame": 944,
+      "frame": 981,
       "health": 1
     },
     {
-      "frame": 1160,
+      "frame": 1197,
       "health": 0
     }
   ],
@@ -532,10 +566,17 @@
     84,
     239,
     397,
-    607,
-    756,
-    846,
-    1004
+    628,
+    777,
+    867,
+    1041
   ],
-  "description": "Native alternate route: punish the final return charge with a ground pound, then finish the hopping bone pattern. No actor, clock or health edits."
+  "expectedFinalHealth": 0,
+  "expectedDamageFrames": [],
+  "markers": {
+    "firstVolley": 445,
+    "finalVolley": 1089,
+    "returnTell": 867,
+    "defeat": 1198
+  }
 }

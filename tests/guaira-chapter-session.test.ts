@@ -57,7 +57,7 @@ for (const opening of openings) test(`${opening}: all five actual results requir
     assert.deepEqual(session.snapshot().accepted.map(receipt => receipt.sceneId), route);
     const otherOpening = openings.find(scene => scene !== opening)!;
     assert.equal(session.snapshot().accepted.some(receipt => receipt.sceneId === otherOpening), false);
-    assert.equal(session.canSelectScene(otherOpening, session.snapshot().generation), false);
+    assert.equal(session.canSelectScene(otherOpening, session.snapshot().generation), true);
 });
 
 test('selection, physical-entry boundary and delayed map buttons use separate generations', () => {

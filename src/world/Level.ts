@@ -381,6 +381,21 @@ export class Level {
     }
   }
 
+  /** Every board supporting the feet bears weight, including an edge under
+   * just one foot. Sampling only the centre leaves an adjacent board solid
+   * forever after the centre board falls away. */
+  markFallingPlatformSupport(rect: Rect): void {
+    const feet = rect.y + rect.height;
+    const row = this.worldToRow(feet + .01);
+    if (Math.abs(this.rowToWorldY(row) - feet) > .1) return;
+    const first = this.worldToCol(rect.x + .01);
+    const last = this.worldToCol(rect.x + rect.width - .01);
+    for (let col = first; col <= last; col++) {
+      if (this.getTile(col, row) === TileType.PLATFORM_FALLING)
+        this.markFallingPlatformContact(col, row);
+    }
+  }
+
   clearFallingPlatformTouches(): void {
     this.fallingPlatformTouches.clear();
   }

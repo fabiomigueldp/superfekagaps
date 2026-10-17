@@ -1,5 +1,6 @@
 import { hasDevelopmentAccess, withDevelopmentAccess } from '../../../DevelopmentProgress';
 import type { GuairaChapterOpening, GuairaChapterSceneId } from './GuairaChapterSession';
+import { mergeGuairaExploration, sanitizeGuairaExploration, type GuairaExplorationProgress } from '../GuairaCourseExploration';
 
 /** Durable facts only. Runtime generations, checkpoints and boss state never cross a reload. */
 export interface GuairaChapterProgress {
@@ -9,10 +10,15 @@ export interface GuairaChapterProgress {
     selectedScene: GuairaChapterSceneId;
     resumeScene: GuairaChapterSceneId | 'gallery' | 'relief' | null;
     optional: { gallery: boolean; relief: boolean };
+    /** The other opening is a side visit; it never becomes a sixth route receipt. */
+    alternateCompleted?: true;
+    exploration?: GuairaExplorationProgress;
     audioEnabled: boolean;
 }
 export const guairaChapterRoute = (opening: GuairaChapterOpening): GuairaChapterSceneId[] =>
     [opening, 'guaira-respiros', 'guaira-lab', 'guaira-subida', 'guaira-prefeito'];
+export const guairaAlternateOpening = (opening: GuairaChapterOpening): GuairaChapterOpening =>
+    opening === 'guaira-travessia' ? 'guaira-patio-comportas' : 'guaira-travessia';
 export const freshGuairaChapterProgress = (): GuairaChapterProgress => ({ version: 1,
     opening: 'guaira-travessia', completed: [], selectedScene: 'guaira-travessia', resumeScene: null,
     optional: { gallery: false, relief: false }, audioEnabled: true });
@@ -32,7 +38,10 @@ export function sanitizeGuairaChapterProgress(value: unknown, developmentUnlocke
         result.completed.push(scene);
     }
     const next = route.find(scene => !result.completed.includes(scene)) ?? route[route.length - 1];
+    const openingComplete = developmentUnlocked || result.completed.includes(result.opening);
+    if (openingComplete && data.alternateCompleted === true) result.alternateCompleted = true;
     const selectable = (scene: unknown): scene is GuairaChapterSceneId =>
+        (openingComplete && scene === guairaAlternateOpening(result.opening)) ||
         (developmentUnlocked && route.includes(scene as GuairaChapterSceneId)) || scene === next || result.completed.includes(scene as GuairaChapterSceneId);
     result.selectedScene = selectable(data.selectedScene) ? data.selectedScene : next;
     result.resumeScene = selectable(data.resumeScene) ? data.resumeScene
@@ -41,6 +50,11 @@ export function sanitizeGuairaChapterProgress(value: unknown, developmentUnlocke
         const optional = data.optional as Record<string, unknown>;
         result.optional = { gallery: optional.gallery === true, relief: optional.relief === true };
     }
+    const exploration = sanitizeGuairaExploration(data.exploration, stageId =>
+        stageId === 'guaira-galeria' ? result.optional.gallery : stageId === 'guaira-camara-alivio' ? result.optional.relief
+        : result.completed.includes(stageId as GuairaChapterSceneId)
+            || !!result.alternateCompleted && stageId === guairaAlternateOpening(result.opening));
+    if (exploration) result.exploration = exploration;
     if (typeof data.audioEnabled === 'boolean') result.audioEnabled = data.audioEnabled;
     return result;
 }
@@ -50,5 +64,7 @@ export function mergeGuairaChapterProgress(earned: GuairaChapterProgress, incomi
     const opening = old.completed.length ? old.opening : next.opening;
     return sanitizeGuairaChapterProgress({ ...next, opening,
         completed: [...new Set([...old.completed, ...next.completed])],
+        alternateCompleted: old.alternateCompleted || next.opening === opening && next.alternateCompleted || undefined,
+        exploration: mergeGuairaExploration(old.exploration, next.exploration),
         optional: { gallery: old.optional.gallery || next.optional.gallery, relief: old.optional.relief || next.optional.relief } }, developmentUnlocked);
 }

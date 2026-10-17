@@ -9,7 +9,7 @@ import type { Rect } from '../../../types';
 import { PLAYER_RENDER_OFFSET_Y } from '../../../assets/playerSpriteSpec';
 import { panel, pixelText } from '../../../graphics/BitmapFont';
 import { GuairaMayorModel, MAYOR_ARENA, MAYOR_RULES } from './GuairaMayorModel';
-import { drawGuairaMayor, drawGuairaMayorStampTarget } from './GuairaMayorArt';
+import { drawGuairaMayor, drawGuairaMayorStampTarget, drawGuairaMayorRushForeground } from './GuairaMayorArt';
 import { drawGuairaMayorBackground, drawGuairaMayorTerrain, drawGuairaMayorObjects } from './GuairaMayorArenaArt';
 import { drawGuairaMayorFeedback } from './GuairaMayorFeedbackArt';
 
@@ -47,19 +47,19 @@ export class GuairaMayorEncounter extends BossEncounter {
         this.timer = b.stateTick * MAYOR_RULES.tickMs;
         // 'released' intentionally remains native 'rest': campaign completion is
         // impossible and the real Player may walk/jump back out after victory.
-        this.phase = b.vulnerable ? 'open' : b.state === 'warning' || b.state === 'jetWarning' ? 'warning'
-            : b.state === 'stamp' || b.state === 'leap' || b.state === 'jetBurst' ? 'attack' : b.state === 'hurt' ? 'hurt' : 'rest';
+        this.phase = b.vulnerable ? 'open' : ['warning', 'jetWarning', 'rushWarning'].includes(b.state) ? 'warning'
+            : ['stamp', 'leap', 'jetBurst', 'vault', 'rush', 'brake'].includes(b.state) ? 'attack' : b.state === 'hurt' ? 'hurt' : 'rest';
     }
     override update(dt: number, player: Rect, objects: WorldObjects, _level: WorldLevel) {
         const valve = objects.get(MAYOR_ARENA.valveId)!, lift = objects.get(MAYOR_ARENA.liftId)!;
         const upper = objects.get(MAYOR_ARENA.upperValveId)!;
         // The two ordinary switches form a toggle pair. Either operates the lift.
-        lift.active = valve.active && !['warning', 'leap', 'jetWarning', 'jetBurst'].includes(this.model.state);
+        lift.active = valve.active && !['warning', 'leap', 'jetWarning', 'jetBurst', 'vault', 'rushWarning', 'rush', 'brake'].includes(this.model.state);
         const switched=objects.events.find(e=>e.kind==='switch'&&[valve,upper].some(v=>e.x===v.x&&e.y===v.y));
         this.model.update(dt, { valveActive: valve.active, liftReady: lift.active && lift.y === MAYOR_ARENA.deckY,
             registerOpened:!!switched,register:switched?.x===upper.x?'upper':'lower',player });
         this.impact = this.model.events.some(e => e.kind === 'stamp'); this.released = false;
-        if (this.impact || this.model.events.some(e => e.kind === 'warning' ||
+        if (this.impact || this.model.events.some(e => e.kind === 'warning' || e.kind === 'vault' ||
             (e.kind === 'jetWarning' || e.kind === 'jet') && this.model.salvo?.shot === 1)) {
             // Keep the native toggle pair synchronized. The next sentada opens.
             // Lower during the tell: the aimed landing never passes through a raised lift.
@@ -89,7 +89,12 @@ export class GuairaMayorEncounter extends BossEncounter {
         if (b.counterpressure?.phase === 'warning') return 'EMENDA: ESPERE OU PULE';
         if (b.counterpressure?.phase === 'active') return 'AGUA NA EMENDA! ESPERE OU PULE';
         if (b.vulnerable) return 'AGORA! GOLPE POR CIMA';
-        if (b.state === 'recover' && b.pressureInterrupted) return 'PRESSAO CORTADA! PASSARELA SUBINDO';
+        if (b.state === 'vault') return b.pressureInterrupted ? 'AGUA CORTADA! ELE VEM ATRAS' : 'ELE DESCE! PREPARE O SALTO';
+        if (b.crossfire) return 'INVESTIDA + JATO ALTO: PULE';
+        if (b.rush?.phase === 'warning') return b.rush.pass === 2 ? 'ELE VOLTA! PULE OU SUBA' : 'INVESTIDA: PULE OU SUBA';
+        if (b.rush?.phase === 'active') return 'PULE A CRISTA!';
+        if (b.rush?.phase === 'brake') return b.rush.pass < b.rush.total ? 'VAI VOLTAR! PREPARE-SE' : 'VAI SALTAR! MUDE DE POSICAO';
+        if (b.state === 'recover' && b.pressureInterrupted && b.accessRequested) return 'PRESSAO CORTADA! PASSARELA SUBINDO';
         if (b.salvo?.phase === 'warning') return b.salvo.lane === 'high' ? 'JATO ALTO: DESCA OU PULE' : 'JATO BAIXO: PULE OU SUBA';
         if (b.salvo) return 'REGISTRO: CORTE A PRESSAO';
         if (b.state === 'warning' || b.state === 'leap') return b.strike === 2 ? 'SEGUNDO CARIMBO! SAIA DA MARCA'
@@ -118,6 +123,7 @@ export class GuairaMayorLab extends WorldGame {
                 drawGuairaMayorFeedback(c,this.mayor,cx,cy,this.reducedMotion);
                 drawGuairaMayorStampTarget(c, this.mayor, cx, cy, this.reducedMotion);
                 drawGuairaMayor(c, this.mayor, cx, cy, this.reducedMotion);
+                drawGuairaMayorRushForeground(c, this.mayor, cx, cy, this.reducedMotion);
             };
             this.store.save.preferences.shake = !this.reducedMotion;
             if (this.reducedMotion) {
@@ -157,8 +163,10 @@ export class GuairaMayorLab extends WorldGame {
         const beforeTick = this.mayor.tick, beforePressure = this.mayor.counterpressure?.phase;
         super.update(dt);
         if (this.state === 'playing' && !this.player.data.isDead && this.mayor.tick !== beforeTick &&
-            (this.mayor.events.some(e => e.kind === 'stamp' || e.kind === 'waves' || e.kind === 'jet') ||
+            (this.mayor.events.some(e => e.kind === 'stamp' || e.kind === 'waves' || e.kind === 'jet' || e.kind === 'rush') ||
                 beforePressure !== 'active' && this.mayor.counterpressure?.phase === 'active')) this.audio.sfx('jet');
+        if (this.state === 'playing' && !this.player.data.isDead && this.mayor.tick !== beforeTick &&
+            this.mayor.events.some(e => e.kind === 'brake')) this.audio.sfx('land');
         if (this.player.data.isDead) this.mayor.cancelAttacks();
         if (this.state === 'playing' && !this.player.data.isDead) {
             // Native renderer places the body at y-2 and the standing/jumping

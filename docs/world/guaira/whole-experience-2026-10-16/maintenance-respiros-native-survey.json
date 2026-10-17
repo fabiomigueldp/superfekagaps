@@ -1,0 +1,5216 @@
+{
+  "nativeInputOnly": true,
+  "actorOrClockEdits": false,
+  "baseline": false,
+  "conservativeTopNote": "minHelmet uses a conservative physics y-10 bound; the real sprite top is y-4, verified separately in browser-verification.json.",
+  "baselineHashes": {},
+  "scenes": {
+    "respiros": {
+      "frames": 2609,
+      "minHelmet": 26,
+      "maxFeet": 168,
+      "maxCameraStepY": 10,
+      "maxCameraStepX": 3.499999999996362,
+      "contacts": [
+        {
+          "n": 1,
+          "x": 48,
+          "feet": 304
+        },
+        {
+          "n": 12,
+          "x": 64,
+          "feet": 304
+        },
+        {
+          "n": 28,
+          "x": 96,
+          "feet": 304
+        },
+        {
+          "n": 44,
+          "x": 128,
+          "feet": 304
+        },
+        {
+          "n": 164,
+          "x": 161,
+          "feet": 304
+        },
+        {
+          "n": 180,
+          "x": 193,
+          "feet": 304
+        },
+        {
+          "n": 196,
+          "x": 225,
+          "feet": 304
+        },
+        {
+          "n": 212,
+          "x": 257,
+          "feet": 304
+        },
+        {
+          "n": 228,
+          "x": 289,
+          "feet": 304
+        },
+        {
+          "n": 335,
+          "x": 321,
+          "feet": 304
+        },
+        {
+          "n": 351,
+          "x": 352,
+          "feet": 304
+        },
+        {
+          "n": 367,
+          "x": 384,
+          "feet": 304
+        },
+        {
+          "n": 383,
+          "x": 416,
+          "feet": 304
+        },
+        {
+          "n": 399,
+          "x": 448,
+          "feet": 304
+        },
+        {
+          "n": 415,
+          "x": 480,
+          "feet": 304
+        },
+        {
+          "n": 431,
+          "x": 512,
+          "feet": 304
+        },
+        {
+          "n": 447,
+          "x": 544,
+          "feet": 304
+        },
+        {
+          "n": 463,
+          "x": 576,
+          "feet": 304
+        },
+        {
+          "n": 526,
+          "x": 591,
+          "feet": 288
+        },
+        {
+          "n": 580,
+          "x": 632,
+          "feet": 240
+        },
+        {
+          "n": 634,
+          "x": 677,
+          "feet": 192
+        },
+        {
+          "n": 740,
+          "x": 743,
+          "feet": 160
+        },
+        {
+          "n": 784,
+          "x": 802,
+          "feet": 240
+        },
+        {
+          "n": 827,
+          "x": 833,
+          "feet": 240
+        },
+        {
+          "n": 850,
+          "x": 858,
+          "feet": 304
+        },
+        {
+          "n": 1002,
+          "x": 865,
+          "feet": 304
+        },
+        {
+          "n": 1018,
+          "x": 897,
+          "feet": 304
+        },
+        {
+          "n": 1034,
+          "x": 929,
+          "feet": 304
+        },
+        {
+          "n": 1050,
+          "x": 961,
+          "feet": 304
+        },
+        {
+          "n": 1066,
+          "x": 993,
+          "feet": 304
+        },
+        {
+          "n": 1082,
+          "x": 1025,
+          "feet": 304
+        },
+        {
+          "n": 1098,
+          "x": 1057,
+          "feet": 304
+        },
+        {
+          "n": 1114,
+          "x": 1089,
+          "feet": 304
+        },
+        {
+          "n": 1146,
+          "x": 1123,
+          "feet": 304
+        },
+        {
+          "n": 1155,
+          "x": 1154,
+          "feet": 304
+        },
+        {
+          "n": 1164,
+          "x": 1186,
+          "feet": 304
+        },
+        {
+          "n": 1173,
+          "x": 1217,
+          "feet": 304
+        },
+        {
+          "n": 1182,
+          "x": 1249,
+          "feet": 304
+        },
+        {
+          "n": 1191,
+          "x": 1280,
+          "feet": 304
+        },
+        {
+          "n": 1201,
+          "x": 1315,
+          "feet": 304
+        },
+        {
+          "n": 1210,
+          "x": 1347,
+          "feet": 304
+        },
+        {
+          "n": 1219,
+          "x": 1378,
+          "feet": 304
+        },
+        {
+          "n": 1228,
+          "x": 1410,
+          "feet": 304
+        },
+        {
+          "n": 1237,
+          "x": 1441,
+          "feet": 304
+        },
+        {
+          "n": 1246,
+          "x": 1473,
+          "feet": 304
+        },
+        {
+          "n": 1290,
+          "x": 1504,
+          "feet": 304
+        },
+        {
+          "n": 1302,
+          "x": 1536,
+          "feet": 304
+        },
+        {
+          "n": 1312,
+          "x": 1571,
+          "feet": 304
+        },
+        {
+          "n": 1321,
+          "x": 1603,
+          "feet": 304
+        },
+        {
+          "n": 1372,
+          "x": 1781,
+          "feet": 304
+        },
+        {
+          "n": 1376,
+          "x": 1795,
+          "feet": 304
+        },
+        {
+          "n": 1385,
+          "x": 1827,
+          "feet": 304
+        },
+        {
+          "n": 1394,
+          "x": 1857,
+          "feet": 304
+        },
+        {
+          "n": 1431,
+          "x": 1918,
+          "feet": 256
+        },
+        {
+          "n": 1469,
+          "x": 1991,
+          "feet": 208
+        },
+        {
+          "n": 1507,
+          "x": 2091,
+          "feet": 160
+        },
+        {
+          "n": 1549,
+          "x": 2204,
+          "feet": 144
+        },
+        {
+          "n": 1622,
+          "x": 2311,
+          "feet": 144
+        },
+        {
+          "n": 1685,
+          "x": 2400,
+          "feet": 224
+        },
+        {
+          "n": 1737,
+          "x": 2456,
+          "feet": 304
+        },
+        {
+          "n": 1777,
+          "x": 2531,
+          "feet": 256
+        },
+        {
+          "n": 1819,
+          "x": 2614,
+          "feet": 192
+        },
+        {
+          "n": 1828,
+          "x": 2624,
+          "feet": 192
+        },
+        {
+          "n": 1872,
+          "x": 2721,
+          "feet": 160
+        },
+        {
+          "n": 2035,
+          "x": 2779,
+          "feet": 160
+        },
+        {
+          "n": 2079,
+          "x": 2842,
+          "feet": 160
+        },
+        {
+          "n": 2153,
+          "x": 2926,
+          "feet": 208
+        },
+        {
+          "n": 2201,
+          "x": 3015,
+          "feet": 256
+        },
+        {
+          "n": 2225,
+          "x": 3042,
+          "feet": 256
+        },
+        {
+          "n": 2246,
+          "x": 3084,
+          "feet": 304
+        },
+        {
+          "n": 2267,
+          "x": 3104,
+          "feet": 304
+        },
+        {
+          "n": 2277,
+          "x": 3137,
+          "feet": 304
+        },
+        {
+          "n": 2316,
+          "x": 3273,
+          "feet": 240
+        },
+        {
+          "n": 2323,
+          "x": 3298,
+          "feet": 240
+        },
+        {
+          "n": 2373,
+          "x": 3473,
+          "feet": 304
+        },
+        {
+          "n": 2378,
+          "x": 3490,
+          "feet": 304
+        },
+        {
+          "n": 2387,
+          "x": 3522,
+          "feet": 304
+        },
+        {
+          "n": 2396,
+          "x": 3553,
+          "feet": 304
+        },
+        {
+          "n": 2405,
+          "x": 3585,
+          "feet": 304
+        },
+        {
+          "n": 2414,
+          "x": 3616,
+          "feet": 304
+        },
+        {
+          "n": 2424,
+          "x": 3651,
+          "feet": 304
+        },
+        {
+          "n": 2433,
+          "x": 3683,
+          "feet": 304
+        },
+        {
+          "n": 2442,
+          "x": 3714,
+          "feet": 304
+        },
+        {
+          "n": 2451,
+          "x": 3746,
+          "feet": 304
+        },
+        {
+          "n": 2460,
+          "x": 3777,
+          "feet": 304
+        },
+        {
+          "n": 2497,
+          "x": 3859,
+          "feet": 256
+        },
+        {
+          "n": 2507,
+          "x": 3872,
+          "feet": 256
+        },
+        {
+          "n": 2517,
+          "x": 3907,
+          "feet": 256
+        },
+        {
+          "n": 2566,
+          "x": 4081,
+          "feet": 304
+        },
+        {
+          "n": 2609,
+          "x": 4232,
+          "feet": 304
+        }
+      ],
+      "hints": [],
+      "snapshots": [
+        {
+          "n": 1,
+          "file": "respiros-1.png",
+          "p": {
+            "x": 48,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 0,
+            "y": 144
+          },
+          "status": "Respiro A · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 10,
+          "file": "respiros-10.png",
+          "p": {
+            "x": 60.3,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 4.521389306494292,
+            "y": 144
+          },
+          "status": "Respiro A · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 20,
+          "file": "respiros-20.png",
+          "p": {
+            "x": 80.3,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 19.55166364466605,
+            "y": 144
+          },
+          "status": "Respiro A · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 30,
+          "file": "respiros-30.png",
+          "p": {
+            "x": 100.3,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 38.16759019734791,
+            "y": 144
+          },
+          "status": "Respiro A · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 40,
+          "file": "respiros-40.png",
+          "p": {
+            "x": 120.3,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 57.78212439140111,
+            "y": 144
+          },
+          "status": "Respiro A · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 50,
+          "file": "respiros-50.png",
+          "p": {
+            "x": 135.35897215625002,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 76.23805605651589,
+            "y": 144
+          },
+          "status": "Respiro A · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 60,
+          "file": "respiros-60.png",
+          "p": {
+            "x": 138.79182102265796,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 86.15946865934366,
+            "y": 144
+          },
+          "status": "Respiro A · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 70,
+          "file": "respiros-70.png",
+          "p": {
+            "x": 139.02534068887036,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 89.66611587655844,
+            "y": 144
+          },
+          "status": "Respiro A · A pressão está subindo; aguarde na margem seca. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 80,
+          "file": "respiros-80.png",
+          "p": {
+            "x": 139.02534068887036,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 90.64679525202529,
+            "y": 144
+          },
+          "status": "Respiro A · A pressão está subindo; aguarde na margem seca. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 90,
+          "file": "respiros-90.png",
+          "p": {
+            "x": 139.02534068887036,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 90.9199154152451,
+            "y": 144
+          },
+          "status": "Respiro A · A pressão está subindo; aguarde na margem seca. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 100,
+          "file": "respiros-100.png",
+          "p": {
+            "x": 139.02534068887036,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 90.99597964726966,
+            "y": 144
+          },
+          "status": "Respiro A · A pressão está subindo; aguarde na margem seca. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 110,
+          "file": "respiros-110.png",
+          "p": {
+            "x": 139.02534068887036,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 91.01716361012792,
+            "y": 144
+          },
+          "status": "Respiro A · Há água na grelha; aguarde na margem seca. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 120,
+          "file": "respiros-120.png",
+          "p": {
+            "x": 139.02534068887036,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 91.02306336445969,
+            "y": 144
+          },
+          "status": "Respiro A · Há água na grelha; aguarde na margem seca. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 130,
+          "file": "respiros-130.png",
+          "p": {
+            "x": 139.02534068887036,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 91.0247064517993,
+            "y": 144
+          },
+          "status": "Respiro A · Há água na grelha; aguarde na margem seca. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 140,
+          "file": "respiros-140.png",
+          "p": {
+            "x": 139.02534068887036,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 91.02516405322704,
+            "y": 144
+          },
+          "status": "Respiro A · A água ainda alcança a grelha; espere recolher completamente. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 150,
+          "file": "respiros-150.png",
+          "p": {
+            "x": 139.02534068887036,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 91.02529149567131,
+            "y": 144
+          },
+          "status": "Respiro A · A água recolheu; a pressão está baixando. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 160,
+          "file": "respiros-160.png",
+          "p": {
+            "x": 153.32534068887037,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 96.7201495782314,
+            "y": 144
+          },
+          "status": "Respiro A · A água recolheu; a pressão está baixando. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 170,
+          "file": "respiros-170.png",
+          "p": {
+            "x": 173.32534068887037,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 112.34680088061455,
+            "y": 144
+          },
+          "status": "Respiro A · A água recolheu; a pressão está baixando. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 175,
+          "file": "respiros-175.png",
+          "p": {
+            "x": 183.32534068887037,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 121.54955244499442,
+            "y": 144
+          },
+          "status": "Respiro A · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 180,
+          "file": "respiros-180.png",
+          "p": {
+            "x": 193.32534068887037,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 131.1288189998988,
+            "y": 144
+          },
+          "status": "Respiro A · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 190,
+          "file": "respiros-190.png",
+          "p": {
+            "x": 213.32534068887037,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 150.78960985735773,
+            "y": 144
+          },
+          "status": "Respiro A · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 200,
+          "file": "respiros-200.png",
+          "p": {
+            "x": 233.32534068887037,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 170.6951397800887,
+            "y": 144
+          },
+          "status": "Respiro A · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 210,
+          "file": "respiros-210.png",
+          "p": {
+            "x": 253.32534068887037,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 190.6688297713656,
+            "y": 144
+          },
+          "status": "Respiro A · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 220,
+          "file": "respiros-220.png",
+          "p": {
+            "x": 273.32534068887037,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 210.66150240825738,
+            "y": 144
+          },
+          "status": "Respiro B · Sem água na grelha; acompanhe o manômetro antes de entrar. · Ponto seguro nesta tentativa · observe a próxima grelha · pode esperar aqui quanto precisar"
+        },
+        {
+          "n": 230,
+          "file": "respiros-230.png",
+          "p": {
+            "x": 293.32534068887037,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 230.6594617304802,
+            "y": 144
+          },
+          "status": "Ponto seguro nesta tentativa · Respiro B · Sem água na grelha; acompanhe o manômetro antes de entrar. · Ponto seguro nesta tentativa · observe a próxima grelha · pode esperar aqui quanto precisar · sair e reentrar reinicia a passagem"
+        },
+        {
+          "n": 240,
+          "file": "respiros-240.png",
+          "p": {
+            "x": 310.74260318887036,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 250.0731936677275,
+            "y": 144
+          },
+          "status": "Ponto seguro nesta tentativa · Respiro B · Sem água na grelha; acompanhe o manômetro antes de entrar. · Ponto seguro nesta tentativa · observe a próxima grelha · pode esperar aqui quanto precisar · sair e reentrar reinicia a passagem"
+        },
+        {
+          "n": 250,
+          "file": "respiros-250.png",
+          "p": {
+            "x": 315.4939511008536,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 261.8407104323067,
+            "y": 144
+          },
+          "status": "Ponto seguro nesta tentativa · Respiro B · A pressão está subindo; aguarde na margem seca. · Ponto seguro nesta tentativa · observe a próxima grelha · pode esperar aqui quanto precisar · sair e reentrar reinicia a passagem"
+        },
+        {
+          "n": 260,
+          "file": "respiros-260.png",
+          "p": {
+            "x": 316.0506813777407,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 266.2913506470999,
+            "y": 144
+          },
+          "status": "Ponto seguro nesta tentativa · Respiro B · A pressão está subindo; aguarde na margem seca. · Ponto seguro nesta tentativa · observe a próxima grelha · pode esperar aqui quanto precisar · sair e reentrar reinicia a passagem"
+        },
+        {
+          "n": 270,
+          "file": "respiros-270.png",
+          "p": {
+            "x": 316.0506813777407,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 267.5607060521339,
+            "y": 144
+          },
+          "status": "Ponto seguro nesta tentativa · Respiro B · A pressão está subindo; aguarde na margem seca. · Ponto seguro nesta tentativa · observe a próxima grelha · pode esperar aqui quanto precisar · sair e reentrar reinicia a passagem"
+        },
+        {
+          "n": 280,
+          "file": "respiros-280.png",
+          "p": {
+            "x": 316.0506813777407,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 267.9142227713387,
+            "y": 144
+          },
+          "status": "Ponto seguro nesta tentativa · Respiro B · A pressão está subindo; aguarde na margem seca. · Ponto seguro nesta tentativa · observe a próxima grelha · pode esperar aqui quanto precisar · sair e reentrar reinicia a passagem"
+        },
+        {
+          "n": 290,
+          "file": "respiros-290.png",
+          "p": {
+            "x": 316.0506813777407,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 268.0126775226729,
+            "y": 144
+          },
+          "status": "Ponto seguro nesta tentativa · Respiro B · Há água na grelha; aguarde na margem seca. · Ponto seguro nesta tentativa · observe a próxima grelha · pode esperar aqui quanto precisar · sair e reentrar reinicia a passagem"
+        },
+        {
+          "n": 300,
+          "file": "respiros-300.png",
+          "p": {
+            "x": 316.0506813777407,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 268.0400972670122,
+            "y": 144
+          },
+          "status": "Ponto seguro nesta tentativa · Respiro B · Há água na grelha; aguarde na margem seca. · Ponto seguro nesta tentativa · observe a próxima grelha · pode esperar aqui quanto precisar · sair e reentrar reinicia a passagem"
+        },
+        {
+          "n": 310,
+          "file": "respiros-310.png",
+          "p": {
+            "x": 316.0506813777407,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 268.0477336925726,
+            "y": 144
+          },
+          "status": "Ponto seguro nesta tentativa · Respiro B · Há água na grelha; aguarde na margem seca. · Ponto seguro nesta tentativa · observe a próxima grelha · pode esperar aqui quanto precisar · sair e reentrar reinicia a passagem"
+        },
+        {
+          "n": 320,
+          "file": "respiros-320.png",
+          "p": {
+            "x": 316.0506813777407,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 268.0498604445444,
+            "y": 144
+          },
+          "status": "Ponto seguro nesta tentativa · Respiro B · A água ainda alcança a grelha; espere recolher completamente. · Ponto seguro nesta tentativa · observe a próxima grelha · pode esperar aqui quanto precisar · sair e reentrar reinicia a passagem"
+        },
+        {
+          "n": 330,
+          "file": "respiros-330.png",
+          "p": {
+            "x": 316.0506813777407,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 268.05045274704423,
+            "y": 144
+          },
+          "status": "Ponto seguro nesta tentativa · Respiro B · A água recolheu; a pressão está baixando. · Ponto seguro nesta tentativa · observe a próxima grelha · pode esperar aqui quanto precisar · sair e reentrar reinicia a passagem"
+        },
+        {
+          "n": 340,
+          "file": "respiros-340.png",
+          "p": {
+            "x": 330.3506813777407,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 273.74544029358356,
+            "y": 144
+          },
+          "status": "Respiro B · A água recolheu; a pressão está baixando. · Ponto seguro nesta tentativa · observe a próxima grelha · pode esperar aqui quanto precisar"
+        },
+        {
+          "n": 349,
+          "file": "respiros-349.png",
+          "p": {
+            "x": 348.3506813777407,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 287.6023248710028,
+            "y": 144
+          },
+          "status": "Respiro B · A água recolheu; a pressão está baixando. · Ponto seguro nesta tentativa · observe a próxima grelha · pode esperar aqui quanto precisar"
+        },
+        {
+          "n": 350,
+          "file": "respiros-350.png",
+          "p": {
+            "x": 350.3506813777407,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 289.37212765181135,
+            "y": 144
+          },
+          "status": "Respiro B · A água recolheu; a pressão está baixando. · Ponto seguro nesta tentativa · observe a próxima grelha · pode esperar aqui quanto precisar"
+        },
+        {
+          "n": 360,
+          "file": "respiros-360.png",
+          "p": {
+            "x": 370.3506813777407,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 308.15415581268354,
+            "y": 144
+          },
+          "status": "Respiro B · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 370,
+          "file": "respiros-370.png",
+          "p": {
+            "x": 390.3506813777407,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 327.81494946673445,
+            "y": 144
+          },
+          "status": "Respiro B · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 379,
+          "file": "respiros-379.png",
+          "p": {
+            "x": 408.3506813777407,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 345.7254527306706,
+            "y": 144
+          },
+          "status": "Respiro B · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 380,
+          "file": "respiros-380.png",
+          "p": {
+            "x": 410.3506813777407,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 347.720480168319,
+            "y": 144
+          },
+          "status": "Respiro B · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 390,
+          "file": "respiros-390.png",
+          "p": {
+            "x": 430.3506813777407,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 367.69417037650743,
+            "y": 144
+          },
+          "status": "Respiro B · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 400,
+          "file": "respiros-400.png",
+          "p": {
+            "x": 450.3506813777407,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 387.68684307380926,
+            "y": 144
+          },
+          "status": "Respiro B · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 410,
+          "file": "respiros-410.png",
+          "p": {
+            "x": 470.3506813777407,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 407.6848024128563,
+            "y": 144
+          },
+          "status": "Respiro B · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 420,
+          "file": "respiros-420.png",
+          "p": {
+            "x": 490.3506813777407,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 427.6842340867892,
+            "y": 144
+          },
+          "status": "Respiro B · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 430,
+          "file": "respiros-430.png",
+          "p": {
+            "x": 510.3506813777407,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 447.68407580742485,
+            "y": 144
+          },
+          "status": "Respiro B · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 440,
+          "file": "respiros-440.png",
+          "p": {
+            "x": 530.3506813777408,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 467.6840317264674,
+            "y": 144
+          },
+          "status": "Respiro B · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 450,
+          "file": "respiros-450.png",
+          "p": {
+            "x": 550.3506813777408,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 487.6840194498778,
+            "y": 144
+          },
+          "status": "Respiro B · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 460,
+          "file": "respiros-460.png",
+          "p": {
+            "x": 570.3506813777408,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 507.68401603083555,
+            "y": 144
+          },
+          "status": "Respiro C · Sem água na grelha; acompanhe o manômetro antes de entrar. · Ponto seguro · siga pelo piso observando os jatos, ou suba à placa para isolar o respiro C"
+        },
+        {
+          "n": 470,
+          "file": "respiros-470.png",
+          "p": {
+            "x": 586.6553545027409,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 526.7251600894691,
+            "y": 144
+          },
+          "status": "Respiro C · Sem água na grelha; acompanhe o manômetro antes de entrar. · Ponto seguro · siga pelo piso observando os jatos, ou suba à placa para isolar o respiro C"
+        },
+        {
+          "n": 480,
+          "file": "respiros-480.png",
+          "p": {
+            "x": 590.6940002279268,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 537.5653513511198,
+            "y": 144
+          },
+          "status": "Ponto seguro nesta tentativa · Respiro C · Sem água na grelha; acompanhe o manômetro antes de entrar. · Ponto seguro · siga pelo piso observando os jatos, ou suba à placa para isolar o respiro C · sair e reentrar reinicia a passagem"
+        },
+        {
+          "n": 490,
+          "file": "respiros-490.png",
+          "p": {
+            "x": 591.0760220666114,
+            "y": 245.40000000000003
+          },
+          "feet": 269.40000000000003,
+          "camera": {
+            "x": 541.5277960784863,
+            "y": 144
+          },
+          "status": "Respiro C · Sem água na grelha; acompanhe o manômetro antes de entrar. · Ponto seguro · siga pelo piso observando os jatos, ou suba à placa para isolar o respiro C"
+        },
+        {
+          "n": 500,
+          "file": "respiros-500.png",
+          "p": {
+            "x": 591.0760220666114,
+            "y": 188.90000000000015
+          },
+          "feet": 212.90000000000015,
+          "camera": {
+            "x": 542.6448396178355,
+            "y": 144
+          },
+          "status": "Respiro C · Sem água na grelha; acompanhe o manômetro antes de entrar. · Ponto seguro · siga pelo piso observando os jatos, ou suba à placa para isolar o respiro C"
+        },
+        {
+          "n": 510,
+          "file": "respiros-510.png",
+          "p": {
+            "x": 591.0760220666114,
+            "y": 179.40000000000026
+          },
+          "feet": 203.40000000000026,
+          "camera": {
+            "x": 542.9559373337892,
+            "y": 141.63066960000023
+          },
+          "status": "Respiro C · Sem água na grelha; acompanhe o manômetro antes de entrar. · Ponto seguro · siga pelo piso observando os jatos, ou suba à placa para isolar o respiro C"
+        },
+        {
+          "n": 520,
+          "file": "respiros-520.png",
+          "p": {
+            "x": 591.0760220666114,
+            "y": 219.90000000000038
+          },
+          "feet": 243.90000000000038,
+          "camera": {
+            "x": 543.0425783513166,
+            "y": 143.67434020093557
+          },
+          "status": "Respiro C · Sem água na grelha; acompanhe o manômetro antes de entrar. · Ponto seguro · siga pelo piso observando os jatos, ou suba à placa para isolar o respiro C"
+        },
+        {
+          "n": 523,
+          "file": "respiros-523.png",
+          "p": {
+            "x": 591.0760220666114,
+            "y": 241.8000000000004
+          },
+          "feet": 265.8000000000004,
+          "camera": {
+            "x": 543.053231111062,
+            "y": 143.82044160790943
+          },
+          "status": "Respiro C · Sem água na grelha; acompanhe o manômetro antes de entrar. · Ponto seguro · siga pelo piso observando os jatos, ou suba à placa para isolar o respiro C"
+        },
+        {
+          "n": 530,
+          "file": "respiros-530.png",
+          "p": {
+            "x": 591.0760220666114,
+            "y": 264
+          },
+          "feet": 288,
+          "camera": {
+            "x": 543.0667079592604,
+            "y": 143.9552387017333
+          },
+          "status": "Respiro C · A pressão está subindo; aguarde na margem seca. · Ponto seguro · siga pelo piso observando os jatos, ou suba à placa para isolar o respiro C"
+        },
+        {
+          "n": 540,
+          "file": "respiros-540.png",
+          "p": {
+            "x": 591.0760220666114,
+            "y": 264
+          },
+          "feet": 288,
+          "camera": {
+            "x": 543.0734280786234,
+            "y": 143.9938476476732
+          },
+          "status": "Respiro C · A pressão está subindo; aguarde na margem seca. · Ponto seguro · siga pelo piso observando os jatos, ou suba à placa para isolar o respiro C"
+        },
+        {
+          "n": 550,
+          "file": "respiros-550.png",
+          "p": {
+            "x": 595.5760220666114,
+            "y": 229.40000000000003
+          },
+          "feet": 253.40000000000003,
+          "camera": {
+            "x": 544.1945580473849,
+            "y": 143.9991543712846
+          },
+          "status": "Respiro C · A pressão está subindo; aguarde na margem seca. · Ponto seguro · siga pelo piso observando os jatos, ou suba à placa para isolar o respiro C"
+        },
+        {
+          "n": 560,
+          "file": "respiros-560.png",
+          "p": {
+            "x": 615.3760220666113,
+            "y": 172.90000000000015
+          },
+          "feet": 196.90000000000015,
+          "camera": {
+            "x": 555.9079955469225,
+            "y": 119.99974292322895
+          },
+          "status": "Respiro C · A pressão está subindo; aguarde na margem seca. · Registro C · pule e aperte baixo sobre a placa para isolar só o próximo respiro"
+        },
+        {
+          "n": 570,
+          "file": "respiros-570.png",
+          "p": {
+            "x": 629.0761483994239,
+            "y": 171.10000000000022
+          },
+          "feet": 195.10000000000022,
+          "camera": {
+            "x": 571.5798851188129,
+            "y": 85.72354185412078
+          },
+          "status": "Respiro C · A pressão está subindo; aguarde na margem seca. · Registro C · pule e aperte baixo sobre a placa para isolar só o próximo respiro"
+        },
+        {
+          "n": 580,
+          "file": "respiros-580.png",
+          "p": {
+            "x": 631.9940699358708,
+            "y": 216
+          },
+          "feet": 240,
+          "camera": {
+            "x": 580.0444599246716,
+            "y": 80.78668956011788
+          },
+          "status": "Respiro C · Há água na grelha; aguarde na margem seca. · Registro C · pule e aperte baixo sobre a placa para isolar só o próximo respiro"
+        },
+        {
+          "n": 590,
+          "file": "respiros-590.png",
+          "p": {
+            "x": 632.1013627554819,
+            "y": 216
+          },
+          "feet": 240,
+          "camera": {
+            "x": 582.9715113575259,
+            "y": 80.10812893131074
+          },
+          "status": "Respiro C · Há água na grelha; aguarde na margem seca. · Registro C · pule e aperte baixo sobre a placa para isolar só o próximo respiro"
+        },
+        {
+          "n": 600,
+          "file": "respiros-600.png",
+          "p": {
+            "x": 633.0013627554819,
+            "y": 201.5
+          },
+          "feet": 225.5,
+          "camera": {
+            "x": 583.9263780384056,
+            "y": 80.01486210873912
+          },
+          "status": "Respiro C · Há água na grelha; aguarde na margem seca. · Registro C · pule e aperte baixo sobre a placa para isolar só o próximo respiro"
+        },
+        {
+          "n": 610,
+          "file": "respiros-610.png",
+          "p": {
+            "x": 650.4013627554818,
+            "y": 137.5000000000001
+          },
+          "feet": 161.5000000000001,
+          "camera": {
+            "x": 592.3410789381358,
+            "y": 80.00204276758768
+          },
+          "status": "Respiro C · A água ainda alcança a grelha; espere recolher completamente. · Registro C · pule e aperte baixo sobre a placa para isolar só o próximo respiro"
+        },
+        {
+          "n": 620,
+          "file": "respiros-620.png",
+          "p": {
+            "x": 669.5463627554819,
+            "y": 114.20000000000013
+          },
+          "feet": 138.20000000000013,
+          "camera": {
+            "x": 608.8832982082239,
+            "y": 77.87200000000013
+          },
+          "status": "Respiro C · A água recolheu; a pressão está baixando. · Registro C · pule e aperte baixo sobre a placa para isolar só o próximo respiro"
+        },
+        {
+          "n": 630,
+          "file": "respiros-630.png",
+          "p": {
+            "x": 676.1226228412721,
+            "y": 145.7000000000002
+          },
+          "feet": 169.7000000000002,
+          "camera": {
+            "x": 621.655050463797,
+            "y": 79.68035622215072
+          },
+          "status": "Respiro C · A água recolheu; a pressão está baixando. · Registro C · pule e aperte baixo sobre a placa para isolar só o próximo respiro"
+        },
+        {
+          "n": 640,
+          "file": "respiros-640.png",
+          "p": {
+            "x": 677.1267034443524,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 626.9543223626342,
+            "y": 79.95606559200583
+          },
+          "status": "Respiro C · Sem água na grelha; acompanhe o manômetro antes de entrar. · Registro C · pule e aperte baixo sobre a placa para isolar só o próximo respiro"
+        },
+        {
+          "n": 650,
+          "file": "respiros-650.png",
+          "p": {
+            "x": 677.1267034443524,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 628.5216931928295,
+            "y": 79.99396130211328
+          },
+          "status": "Respiro C · Sem água na grelha; acompanhe o manômetro antes de entrar. · Registro C · pule e aperte baixo sobre a placa para isolar só o próximo respiro"
+        },
+        {
+          "n": 660,
+          "file": "respiros-660.png",
+          "p": {
+            "x": 677.1267034443524,
+            "y": 120.00000000000003
+          },
+          "feet": 144.00000000000003,
+          "camera": {
+            "x": 628.9582074988076,
+            "y": 79.99916999286363
+          },
+          "status": "Respiro C · Sem água na grelha; acompanhe o manômetro antes de entrar. · Registro C · pule e aperte baixo sobre a placa para isolar só o próximo respiro"
+        },
+        {
+          "n": 670,
+          "file": "respiros-670.png",
+          "p": {
+            "x": 677.1267034443524,
+            "y": 137.3
+          },
+          "feet": 161.3,
+          "camera": {
+            "x": 629.0797771590646,
+            "y": 78.18452
+          },
+          "status": "Respiro C · Sem água na grelha; acompanhe o manômetro antes de entrar. · Registro C · pule e aperte baixo sobre a placa para isolar só o próximo respiro"
+        },
+        {
+          "n": 680,
+          "file": "respiros-680.png",
+          "p": {
+            "x": 677.1267034443524,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 629.1136344280993,
+            "y": 79.75046584807019
+          },
+          "status": "Respiro C · Registro fechado; este respiro está sem pressão. · Respiro C isolado · siga pela passarela alta até o mirante ou desça ao piso; D mantém seu ritmo"
+        },
+        {
+          "n": 690,
+          "file": "respiros-690.png",
+          "p": {
+            "x": 677.1267034443524,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 629.1230637105705,
+            "y": 79.96570202206615
+          },
+          "status": "Respiro C · Registro fechado; este respiro está sem pressão. · Respiro C isolado · siga pela passarela alta até o mirante ou desça ao piso; D mantém seu ritmo"
+        },
+        {
+          "n": 696,
+          "file": "respiros-696.png",
+          "p": {
+            "x": 677.1267034443524,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 629.1250131371092,
+            "y": 79.98957318589176
+          },
+          "status": "Respiro C · Registro fechado; este respiro está sem pressão. · Respiro C isolado · siga pela passarela alta até o mirante ou desça ao piso; D mantém seu ritmo"
+        },
+        {
+          "n": 700,
+          "file": "respiros-700.png",
+          "p": {
+            "x": 677.1267034443524,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 629.1256897749417,
+            "y": 79.99528581045419
+          },
+          "status": "Respiro C · Registro fechado; este respiro está sem pressão. · Respiro C isolado · siga pela passarela alta até o mirante ou desça ao piso; D mantém seu ritmo"
+        },
+        {
+          "n": 710,
+          "file": "respiros-710.png",
+          "p": {
+            "x": 689.4267034443524,
+            "y": 106.60000000000002
+          },
+          "feet": 130.60000000000002,
+          "camera": {
+            "x": 633.6478104429265,
+            "y": 70.60000000000002
+          },
+          "status": "Respiro C · Registro fechado; este respiro está sem pressão. · Respiro C isolado · siga pela passarela alta até o mirante ou desça ao piso; D mantém seu ritmo"
+        },
+        {
+          "n": 720,
+          "file": "respiros-720.png",
+          "p": {
+            "x": 709.4267034443524,
+            "y": 67.1
+          },
+          "feet": 91.1,
+          "camera": {
+            "x": 648.6782884659872,
+            "y": 31.099999999999994
+          },
+          "status": "Respiro C · Registro fechado; este respiro está sem pressão. · Respiro C isolado · siga pela passarela alta até o mirante ou desça ao piso; D mantém seu ritmo"
+        },
+        {
+          "n": 730,
+          "file": "respiros-730.png",
+          "p": {
+            "x": 729.4267034443524,
+            "y": 77.59999999999997
+          },
+          "feet": 101.59999999999997,
+          "camera": {
+            "x": 667.2942717451093,
+            "y": 34.129361657530474
+          },
+          "status": "Respiro C · Registro fechado; este respiro está sem pressão. · Respiro C isolado · siga pela passarela alta até o mirante ou desça ao piso; D mantém seu ritmo"
+        },
+        {
+          "n": 740,
+          "file": "respiros-740.png",
+          "p": {
+            "x": 743.126829777165,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 684.8885270535635,
+            "y": 67.53760220058392
+          },
+          "status": "Respiro C · Registro fechado; este respiro está sem pressão. · Passarela de inspeção · salte à direita para o mirante seco; o respiro D continua funcionando"
+        },
+        {
+          "n": 750,
+          "file": "respiros-750.png",
+          "p": {
+            "x": 746.0447513136119,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 693.8884825933025,
+            "y": 78.28706795674465
+          },
+          "status": "Respiro C · Registro fechado; este respiro está sem pressão. · Passarela de inspeção · salte à direita para o mirante seco; o respiro D continua funcionando"
+        },
+        {
+          "n": 760,
+          "file": "respiros-760.png",
+          "p": {
+            "x": 754.4520441332229,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 699.4926717949776,
+            "y": 79.76456086284227
+          },
+          "status": "Respiro C · Registro fechado; este respiro está sem pressão. · Passarela de inspeção · salte à direita para o mirante seco; o respiro D continua funcionando"
+        },
+        {
+          "n": 770,
+          "file": "respiros-770.png",
+          "p": {
+            "x": 774.4520441332229,
+            "y": 141
+          },
+          "feet": 165,
+          "camera": {
+            "x": 713.9318664594133,
+            "y": 92.49917527409823
+          },
+          "status": "Respiro C · Registro fechado; este respiro está sem pressão. · Mirante seco · observe o respiro D; desça na ilha antes da grelha e acompanhe o manômetro"
+        },
+        {
+          "n": 780,
+          "file": "respiros-780.png",
+          "p": {
+            "x": 794.4520441332229,
+            "y": 188.5
+          },
+          "feet": 212.5,
+          "camera": {
+            "x": 732.3831767460604,
+            "y": 127.34410942157191
+          },
+          "status": "Respiro D · Sem água na grelha; acompanhe o manômetro antes de entrar. · Mirante seco · observe o respiro D; desça na ilha antes da grelha e acompanhe o manômetro"
+        },
+        {
+          "n": 790,
+          "file": "respiros-790.png",
+          "p": {
+            "x": 814.4520441332229,
+            "y": 216
+          },
+          "feet": 240,
+          "camera": {
+            "x": 751.9518651493559,
+            "y": 141.71068062984787
+          },
+          "status": "Respiro D · Sem água na grelha; acompanhe o manômetro antes de entrar. · Mirante seco · observe o respiro D; desça na ilha antes da grelha e acompanhe o manômetro"
+        },
+        {
+          "n": 800,
+          "file": "respiros-800.png",
+          "p": {
+            "x": 823.5541342173616,
+            "y": 216
+          },
+          "feet": 240,
+          "camera": {
+            "x": 767.4453751774986,
+            "y": 143.6853375594733
+          },
+          "status": "Respiro D · Sem água na grelha; acompanhe o manômetro antes de entrar. · Mirante seco · observe o respiro D; desça na ilha antes da grelha e acompanhe o manômetro"
+        },
+        {
+          "n": 810,
+          "file": "respiros-810.png",
+          "p": {
+            "x": 825.1773848220935,
+            "y": 216
+          },
+          "feet": 240,
+          "camera": {
+            "x": 774.2565622727972,
+            "y": 143.95675026701426
+          },
+          "status": "Respiro D · Sem água na grelha; acompanhe o manômetro antes de entrar. · Mirante seco · observe o respiro D; desça na ilha antes da grelha e acompanhe o manômetro"
+        },
+        {
+          "n": 820,
+          "file": "respiros-820.png",
+          "p": {
+            "x": 825.1773848220935,
+            "y": 216
+          },
+          "feet": 240,
+          "camera": {
+            "x": 776.3639328913641,
+            "y": 143.9940554093453
+          },
+          "status": "Respiro D · Sem água na grelha; acompanhe o manômetro antes de entrar. · Mirante seco · observe o respiro D; desça na ilha antes da grelha e acompanhe o manômetro"
+        },
+        {
+          "n": 830,
+          "file": "respiros-830.png",
+          "p": {
+            "x": 839.4773848220934,
+            "y": 216
+          },
+          "feet": 240,
+          "camera": {
+            "x": 782.6456602551635,
+            "y": 143.9991829277174
+          },
+          "status": "Respiro D · Sem água na grelha; acompanhe o manômetro antes de entrar. · Mirante seco · observe o respiro D; desça na ilha antes da grelha e acompanhe o manômetro"
+        },
+        {
+          "n": 840,
+          "file": "respiros-840.png",
+          "p": {
+            "x": 854.5363569783435,
+            "y": 226.5
+          },
+          "feet": 250.5,
+          "camera": {
+            "x": 796.9990394934509,
+            "y": 143.9998876950233
+          },
+          "status": "Respiro D · Sem água na grelha; acompanhe o manômetro antes de entrar. · Mirante seco · observe o respiro D; desça na ilha antes da grelha e acompanhe o manômetro"
+        },
+        {
+          "n": 850,
+          "file": "respiros-850.png",
+          "p": {
+            "x": 857.9692058447516,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 805.7778872412778,
+            "y": 143.99998456390205
+          },
+          "status": "Respiro D · Sem água na grelha; acompanhe o manômetro antes de entrar. · Ilha seca · os dois respiros têm ritmos próprios · observe o próximo manômetro"
+        },
+        {
+          "n": 860,
+          "file": "respiros-860.png",
+          "p": {
+            "x": 858.202725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 808.9663290312209,
+            "y": 143.99999787833872
+          },
+          "status": "Respiro D · Sem água na grelha; acompanhe o manômetro antes de entrar. · Ilha seca · os dois respiros têm ritmos próprios · observe o próximo manômetro"
+        },
+        {
+          "n": 870,
+          "file": "respiros-870.png",
+          "p": {
+            "x": 858.202725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 809.8583878846209,
+            "y": 143.9999997083818
+          },
+          "status": "Respiro D · Sem água na grelha; acompanhe o manômetro antes de entrar. · Ilha seca · os dois respiros têm ritmos próprios · observe o próximo manômetro"
+        },
+        {
+          "n": 880,
+          "file": "respiros-880.png",
+          "p": {
+            "x": 858.202725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 810.1068271459507,
+            "y": 143.99999995991766
+          },
+          "status": "Respiro D · Sem água na grelha; acompanhe o manômetro antes de entrar. · Ilha seca · os dois respiros têm ritmos próprios · observe o próximo manômetro"
+        },
+        {
+          "n": 890,
+          "file": "respiros-890.png",
+          "p": {
+            "x": 858.202725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 810.1760177227101,
+            "y": 143.99999999449076
+          },
+          "status": "Respiro D · Sem água na grelha; acompanhe o manômetro antes de entrar. · Ilha seca · os dois respiros têm ritmos próprios · observe o próximo manômetro"
+        },
+        {
+          "n": 900,
+          "file": "respiros-900.png",
+          "p": {
+            "x": 858.202725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 810.1952873658684,
+            "y": 143.99999999924276
+          },
+          "status": "Respiro D · Sem água na grelha; acompanhe o manômetro antes de entrar. · Ilha seca · os dois respiros têm ritmos próprios · observe o próximo manômetro"
+        },
+        {
+          "n": 910,
+          "file": "respiros-910.png",
+          "p": {
+            "x": 858.202725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 810.2006539802952,
+            "y": 143.99999999989592
+          },
+          "status": "Respiro D · A pressão está subindo; aguarde na margem seca. · Ilha seca · os dois respiros têm ritmos próprios · observe o próximo manômetro"
+        },
+        {
+          "n": 920,
+          "file": "respiros-920.png",
+          "p": {
+            "x": 858.202725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 810.2021485876509,
+            "y": 143.9999999999857
+          },
+          "status": "Respiro D · A pressão está subindo; aguarde na margem seca. · Ilha seca · os dois respiros têm ritmos próprios · observe o próximo manômetro"
+        },
+        {
+          "n": 930,
+          "file": "respiros-930.png",
+          "p": {
+            "x": 858.202725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 810.2025648372583,
+            "y": 143.99999999999804
+          },
+          "status": "Respiro D · A pressão está subindo; aguarde na margem seca. · Ilha seca · os dois respiros têm ritmos próprios · observe o próximo manômetro"
+        },
+        {
+          "n": 940,
+          "file": "respiros-940.png",
+          "p": {
+            "x": 858.202725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 810.2026807631802,
+            "y": 143.99999999999974
+          },
+          "status": "Respiro D · A pressão está subindo; aguarde na margem seca. · Ilha seca · os dois respiros têm ritmos próprios · observe o próximo manômetro"
+        },
+        {
+          "n": 950,
+          "file": "respiros-950.png",
+          "p": {
+            "x": 858.202725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 810.2027130486625,
+            "y": 143.99999999999994
+          },
+          "status": "Respiro D · A pressão está subindo; aguarde na margem seca. · Ilha seca · os dois respiros têm ritmos próprios · observe o próximo manômetro"
+        },
+        {
+          "n": 960,
+          "file": "respiros-960.png",
+          "p": {
+            "x": 858.202725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 810.2027220402009,
+            "y": 143.99999999999994
+          },
+          "status": "Respiro D · Há água na grelha; aguarde na margem seca. · Ilha seca · os dois respiros têm ritmos próprios · observe o próximo manômetro"
+        },
+        {
+          "n": 970,
+          "file": "respiros-970.png",
+          "p": {
+            "x": 858.202725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 810.2027245443531,
+            "y": 143.99999999999994
+          },
+          "status": "Respiro D · Há água na grelha; aguarde na margem seca. · Ilha seca · os dois respiros têm ritmos próprios · observe o próximo manômetro"
+        },
+        {
+          "n": 980,
+          "file": "respiros-980.png",
+          "p": {
+            "x": 858.202725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 810.202725241762,
+            "y": 143.99999999999994
+          },
+          "status": "Respiro D · Há água na grelha; aguarde na margem seca. · Ilha seca · os dois respiros têm ritmos próprios · observe o próximo manômetro"
+        },
+        {
+          "n": 990,
+          "file": "respiros-990.png",
+          "p": {
+            "x": 858.202725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 810.202725435991,
+            "y": 143.99999999999994
+          },
+          "status": "Respiro D · A água ainda alcança a grelha; espere recolher completamente. · Ilha seca · os dois respiros têm ritmos próprios · observe o próximo manômetro"
+        },
+        {
+          "n": 1000,
+          "file": "respiros-1000.png",
+          "p": {
+            "x": 861.202725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 810.860973682084,
+            "y": 143.99999999999994
+          },
+          "status": "Respiro D · A água recolheu; a pressão está baixando. · Ilha seca · os dois respiros têm ritmos próprios · observe o próximo manômetro"
+        },
+        {
+          "n": 1010,
+          "file": "respiros-1010.png",
+          "p": {
+            "x": 880.502725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 821.4711058202242,
+            "y": 143.99999999999994
+          },
+          "status": "Respiro D · A água recolheu; a pressão está baixando. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 1020,
+          "file": "respiros-1020.png",
+          "p": {
+            "x": 900.502725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 838.848422974933,
+            "y": 143.99999999999994
+          },
+          "status": "Respiro D · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 1030,
+          "file": "respiros-1030.png",
+          "p": {
+            "x": 920.502725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 858.1180032427562,
+            "y": 143.99999999999994
+          },
+          "status": "Respiro D · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 1040,
+          "file": "respiros-1040.png",
+          "p": {
+            "x": 940.502725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 877.9145806344484,
+            "y": 143.99999999999994
+          },
+          "status": "Respiro D · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 1044,
+          "file": "respiros-1044.png",
+          "p": {
+            "x": 948.502725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 885.8831479975098,
+            "y": 143.99999999999994
+          },
+          "status": "Respiro D · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 1050,
+          "file": "respiros-1050.png",
+          "p": {
+            "x": 960.502725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 897.8579272394924,
+            "y": 143.99999999999994
+          },
+          "status": "Respiro D · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 1060,
+          "file": "respiros-1060.png",
+          "p": {
+            "x": 980.502725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 917.8421492137029,
+            "y": 143.99999999999994
+          },
+          "status": "Respiro D · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 1070,
+          "file": "respiros-1070.png",
+          "p": {
+            "x": 1000.502725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 937.837755018121,
+            "y": 143.99999999999994
+          },
+          "status": "Respiro E · A pressão está subindo; aguarde na margem seca. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 1080,
+          "file": "respiros-1080.png",
+          "p": {
+            "x": 1020.502725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 957.8365312303627,
+            "y": 143.99999999999994
+          },
+          "status": "Respiro E · A pressão está subindo; aguarde na margem seca. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 1090,
+          "file": "respiros-1090.png",
+          "p": {
+            "x": 1040.502725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 977.8361904042775,
+            "y": 143.99999999999994
+          },
+          "status": "Respiro E · A pressão está subindo; aguarde na margem seca. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 1100,
+          "file": "respiros-1100.png",
+          "p": {
+            "x": 1060.502725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 997.8360954838803,
+            "y": 143.99999999999994
+          },
+          "status": "Respiro E · A pressão está subindo; aguarde na margem seca. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 1110,
+          "file": "respiros-1110.png",
+          "p": {
+            "x": 1080.502725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1017.8360690484569,
+            "y": 143.99999999999994
+          },
+          "status": "Respiro E · A pressão está subindo; aguarde na margem seca. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 1120,
+          "file": "respiros-1120.png",
+          "p": {
+            "x": 1095.5616976672138,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1036.399345954455,
+            "y": 143.99999999999994
+          },
+          "status": "Respiro E · Há água na grelha; aguarde na margem seca. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 1130,
+          "file": "respiros-1130.png",
+          "p": {
+            "x": 1098.9945465336216,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1046.3506543116384,
+            "y": 143.99999999999994
+          },
+          "status": "Respiro E · Há água na grelha; aguarde na margem seca. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 1140,
+          "file": "respiros-1140.png",
+          "p": {
+            "x": 1105.528066199834,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1048.7265749255046,
+            "y": 143.27999999999994
+          },
+          "status": "Respiro E · Há água na grelha; aguarde na margem seca. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 1150,
+          "file": "respiros-1150.png",
+          "p": {
+            "x": 1136.528066199834,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1051.5653445865398,
+            "y": 140.45082954278192
+          },
+          "status": "Respiro E · A água ainda alcança a grelha; espere recolher completamente. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 1160,
+          "file": "respiros-1160.png",
+          "p": {
+            "x": 1171.528066199834,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1077.3994606297013,
+            "y": 140.06196563312346
+          },
+          "status": "Ponto seguro nesta tentativa · Duas descargas independentes: observe cada manômetro a partir da margem seca. · sair e reentrar reinicia a passagem"
+        },
+        {
+          "n": 1170,
+          "file": "respiros-1170.png",
+          "p": {
+            "x": 1206.528066199834,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1109.8467530017328,
+            "y": 140.00851705428332
+          },
+          "status": "Ponto seguro nesta tentativa · Duas descargas independentes: observe cada manômetro a partir da margem seca. · sair e reentrar reinicia a passagem"
+        },
+        {
+          "n": 1180,
+          "file": "respiros-1180.png",
+          "p": {
+            "x": 1241.528066199834,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1144.135821435877,
+            "y": 140.00117065234403
+          },
+          "status": "Duas descargas independentes: observe cada manômetro a partir da margem seca."
+        },
+        {
+          "n": 1190,
+          "file": "respiros-1190.png",
+          "p": {
+            "x": 1276.528066199834,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1178.93782630091,
+            "y": 140.00016090386006
+          },
+          "status": "Duas descargas independentes: observe cada manômetro a partir da margem seca."
+        },
+        {
+          "n": 1200,
+          "file": "respiros-1200.png",
+          "p": {
+            "x": 1311.528066199834,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1213.882684462577,
+            "y": 140.0000221159188
+          },
+          "status": "Duas descargas independentes: observe cada manômetro a partir da margem seca."
+        },
+        {
+          "n": 1210,
+          "file": "respiros-1210.png",
+          "p": {
+            "x": 1346.528066199834,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1248.8673274067821,
+            "y": 140.0000030397895
+          },
+          "status": "Duas descargas independentes: observe cada manômetro a partir da margem seca."
+        },
+        {
+          "n": 1218,
+          "file": "respiros-1218.png",
+          "p": {
+            "x": 1374.528066199834,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1276.8635314011779,
+            "y": 140.0000006213758
+          },
+          "status": "Duas descargas independentes: observe cada manômetro a partir da margem seca."
+        },
+        {
+          "n": 1220,
+          "file": "respiros-1220.png",
+          "p": {
+            "x": 1381.528066199834,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1283.8630504517546,
+            "y": 140.00000041781308
+          },
+          "status": "Duas descargas independentes: observe cada manômetro a partir da margem seca."
+        },
+        {
+          "n": 1230,
+          "file": "respiros-1230.png",
+          "p": {
+            "x": 1416.528066199834,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1318.861859315605,
+            "y": 140.0000000574276
+          },
+          "status": "Duas descargas independentes: observe cada manômetro a partir da margem seca."
+        },
+        {
+          "n": 1240,
+          "file": "respiros-1240.png",
+          "p": {
+            "x": 1451.528066199834,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1353.8615275830252,
+            "y": 140.00000000789333
+          },
+          "status": "Duas descargas independentes: observe cada manômetro a partir da margem seca."
+        },
+        {
+          "n": 1250,
+          "file": "respiros-1250.png",
+          "p": {
+            "x": 1486.003066199834,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1388.7984351951777,
+            "y": 140.0000000010849
+          },
+          "status": "Duas descargas independentes: observe cada manômetro a partir da margem seca."
+        },
+        {
+          "n": 1260,
+          "file": "respiros-1260.png",
+          "p": {
+            "x": 1499.5424251999896,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1414.4681238674257,
+            "y": 140.0000000001491
+          },
+          "status": "Duas descargas independentes: observe cada manômetro a partir da margem seca."
+        },
+        {
+          "n": 1270,
+          "file": "respiros-1270.png",
+          "p": {
+            "x": 1502.2079784383004,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1425.3747401729365,
+            "y": 140.00000000002052
+          },
+          "status": "Duas descargas independentes: observe cada manômetro a partir da margem seca."
+        },
+        {
+          "n": 1280,
+          "file": "respiros-1280.png",
+          "p": {
+            "x": 1502.2079784383004,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1428.8619168641105,
+            "y": 140.0000000000028
+          },
+          "status": "Duas descargas independentes: observe cada manômetro a partir da margem seca."
+        },
+        {
+          "n": 1290,
+          "file": "respiros-1290.png",
+          "p": {
+            "x": 1504.0079784383004,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1430.1720173761196,
+            "y": 140.00000000000037
+          },
+          "status": "Duas descargas independentes: observe cada manômetro a partir da margem seca."
+        },
+        {
+          "n": 1300,
+          "file": "respiros-1300.png",
+          "p": {
+            "x": 1529.0079784383004,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1441.8043921859446,
+            "y": 140.00000000000006
+          },
+          "status": "Duas descargas independentes: observe cada manômetro a partir da margem seca."
+        },
+        {
+          "n": 1310,
+          "file": "respiros-1310.png",
+          "p": {
+            "x": 1564.0079784383004,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1469.2552898790843,
+            "y": 140.00000000000006
+          },
+          "status": "Duas descargas independentes: observe cada manômetro a partir da margem seca."
+        },
+        {
+          "n": 1320,
+          "file": "respiros-1320.png",
+          "p": {
+            "x": 1599.0079784383004,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1502.1528575186287,
+            "y": 140.00000000000006
+          },
+          "status": "Duas descargas independentes: observe cada manômetro a partir da margem seca."
+        },
+        {
+          "n": 1330,
+          "file": "respiros-1330.png",
+          "p": {
+            "x": 1634.0079784383004,
+            "y": 272.5
+          },
+          "feet": 296.5,
+          "camera": {
+            "x": 1536.567328054248,
+            "y": 140.00000000000006
+          },
+          "status": "Duas descargas independentes: observe cada manômetro a partir da margem seca."
+        },
+        {
+          "n": 1340,
+          "file": "respiros-1340.png",
+          "p": {
+            "x": 1669.0079784383004,
+            "y": 206.7000000000001
+          },
+          "feet": 230.7000000000001,
+          "camera": {
+            "x": 1571.4042575269361,
+            "y": 140.00000000000006
+          },
+          "status": "Duas descargas independentes: observe cada manômetro a partir da margem seca."
+        },
+        {
+          "n": 1350,
+          "file": "respiros-1350.png",
+          "p": {
+            "x": 1704.0079784383004,
+            "y": 177.20000000000022
+          },
+          "feet": 201.20000000000022,
+          "camera": {
+            "x": 1606.358842225921,
+            "y": 132.76090641482142
+          },
+          "status": "Duas descargas independentes: observe cada manômetro a partir da margem seca."
+        },
+        {
+          "n": 1360,
+          "file": "respiros-1360.png",
+          "p": {
+            "x": 1739.0079784383004,
+            "y": 197.70000000000033
+          },
+          "feet": 221.70000000000033,
+          "camera": {
+            "x": 1641.3461940202626,
+            "y": 135.49960802395157
+          },
+          "status": "Duas descargas independentes: observe cada manômetro a partir da margem seca."
+        },
+        {
+          "n": 1370,
+          "file": "respiros-1370.png",
+          "p": {
+            "x": 1774.0079784383004,
+            "y": 268.20000000000044
+          },
+          "feet": 292.20000000000044,
+          "camera": {
+            "x": 1676.342671482642,
+            "y": 139.38142998265198
+          },
+          "status": "Duas descargas independentes: observe cada manômetro a partir da margem seca."
+        },
+        {
+          "n": 1380,
+          "file": "respiros-1380.png",
+          "p": {
+            "x": 1809.0079784383004,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1711.3416904524768,
+            "y": 139.91497876887206
+          },
+          "status": "Ponto seguro nesta tentativa · Suba para fechar o registro ou atravesse pelo chão no intervalo seco. · sair e reentrar reinicia a passagem"
+        },
+        {
+          "n": 1390,
+          "file": "respiros-1390.png",
+          "p": {
+            "x": 1844.0079784383004,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1746.341417234618,
+            "y": 139.9883139991597
+          },
+          "status": "Ponto seguro nesta tentativa · Suba para fechar o registro ou atravesse pelo chão no intervalo seco. · sair e reentrar reinicia a passagem"
+        },
+        {
+          "n": 1392,
+          "file": "respiros-1392.png",
+          "p": {
+            "x": 1851.0079784383004,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1753.3413934421687,
+            "y": 139.99214233303496
+          },
+          "status": "Suba para fechar o registro ou atravesse pelo chão no intervalo seco."
+        },
+        {
+          "n": 1400,
+          "file": "respiros-1400.png",
+          "p": {
+            "x": 1878.2579784383004,
+            "y": 238.70000000000005
+          },
+          "feet": 262.70000000000005,
+          "camera": {
+            "x": 1780.9103867507984,
+            "y": 139.9983937821903
+          },
+          "status": "Suba para fechar o registro ou atravesse pelo chão no intervalo seco."
+        },
+        {
+          "n": 1410,
+          "file": "respiros-1410.png",
+          "p": {
+            "x": 1898.2579784383004,
+            "y": 185.70000000000016
+          },
+          "feet": 209.70000000000016,
+          "camera": {
+            "x": 1808.6166637286476,
+            "y": 139.06341922852422
+          },
+          "status": "Suba para fechar o registro ou atravesse pelo chão no intervalo seco."
+        },
+        {
+          "n": 1420,
+          "file": "respiros-1420.png",
+          "p": {
+            "x": 1917.4029784383004,
+            "y": 181.20000000000027
+          },
+          "feet": 205.20000000000027,
+          "camera": {
+            "x": 1830.6285893883778,
+            "y": 130.40891626831618
+          },
+          "status": "Suba para fechar o registro ou atravesse pelo chão no intervalo seco."
+        },
+        {
+          "n": 1430,
+          "file": "respiros-1430.png",
+          "p": {
+            "x": 1918.8114143445503,
+            "y": 226.7000000000004
+          },
+          "feet": 250.7000000000004,
+          "camera": {
+            "x": 1843.332468592894,
+            "y": 138.3315212136551
+          },
+          "status": "Suba para fechar o registro ou atravesse pelo chão no intervalo seco."
+        },
+        {
+          "n": 1440,
+          "file": "respiros-1440.png",
+          "p": {
+            "x": 1923.908072971816,
+            "y": 177.30000000000007
+          },
+          "feet": 201.30000000000007,
+          "camera": {
+            "x": 1846.6632620469838,
+            "y": 136.5990708754911
+          },
+          "status": "Suba para fechar o registro ou atravesse pelo chão no intervalo seco."
+        },
+        {
+          "n": 1450,
+          "file": "respiros-1450.png",
+          "p": {
+            "x": 1953.6058532222066,
+            "y": 132.80000000000018
+          },
+          "feet": 156.80000000000018,
+          "camera": {
+            "x": 1864.197350795159,
+            "y": 94.44400000000017
+          },
+          "status": "Suba para fechar o registro ou atravesse pelo chão no intervalo seco."
+        },
+        {
+          "n": 1460,
+          "file": "respiros-1460.png",
+          "p": {
+            "x": 1973.6058532222066,
+            "y": 138.3000000000003
+          },
+          "feet": 162.3000000000003,
+          "camera": {
+            "x": 1886.1755826202163,
+            "y": 84.71766238087115
+          },
+          "status": "Suba para fechar o registro ou atravesse pelo chão no intervalo seco."
+        },
+        {
+          "n": 1470,
+          "file": "respiros-1470.png",
+          "p": {
+            "x": 1992.7508532222066,
+            "y": 184
+          },
+          "feet": 208,
+          "camera": {
+            "x": 1906.592242114268,
+            "y": 97.41781518665091
+          },
+          "status": "Desvio alto: continue sobre a grelha e não pare nas tábuas rachadas; a varanda tem uma couraça."
+        },
+        {
+          "n": 1480,
+          "file": "respiros-1480.png",
+          "p": {
+            "x": 2021.7208532222064,
+            "y": 116.40000000000006
+          },
+          "feet": 140.40000000000006,
+          "camera": {
+            "x": 1929.3655479370693,
+            "y": 76.71399653292264
+          },
+          "status": "Desvio alto: continue sobre a grelha e não pare nas tábuas rachadas; a varanda tem uma couraça."
+        },
+        {
+          "n": 1490,
+          "file": "respiros-1490.png",
+          "p": {
+            "x": 2056.7208532222066,
+            "y": 81.90000000000003
+          },
+          "feet": 105.90000000000003,
+          "camera": {
+            "x": 1960.5334058842345,
+            "y": 41.85650560000004
+          },
+          "status": "Desvio alto: continue sobre a grelha e não pare nas tábuas rachadas; a varanda tem uma couraça."
+        },
+        {
+          "n": 1500,
+          "file": "respiros-1500.png",
+          "p": {
+            "x": 2076.7208532222066,
+            "y": 97.4
+          },
+          "feet": 121.4,
+          "camera": {
+            "x": 1987.4026398462101,
+            "y": 39.656316184897605
+          },
+          "status": "Desvio alto: continue sobre a grelha e não pare nas tábuas rachadas; a varanda tem uma couraça."
+        },
+        {
+          "n": 1510,
+          "file": "respiros-1510.png",
+          "p": {
+            "x": 2096.7208532222066,
+            "y": 121.5
+          },
+          "feet": 145.5,
+          "camera": {
+            "x": 2009.256169809057,
+            "y": 67.50699944254393
+          },
+          "status": "Desvio alto: continue sobre a grelha e não pare nas tábuas rachadas; a varanda tem uma couraça."
+        },
+        {
+          "n": 1520,
+          "file": "respiros-1520.png",
+          "p": {
+            "x": 2129.9208532222065,
+            "y": 57.49999999999997
+          },
+          "feet": 81.49999999999997,
+          "camera": {
+            "x": 2035.6438771138232,
+            "y": 19.49999999999997
+          },
+          "status": "Desvio alto: continue sobre a grelha e não pare nas tábuas rachadas; a varanda tem uma couraça."
+        },
+        {
+          "n": 1530,
+          "file": "respiros-1530.png",
+          "p": {
+            "x": 2164.9208532222065,
+            "y": 32.99999999999994
+          },
+          "feet": 56.99999999999994,
+          "camera": {
+            "x": 2068.198218684392,
+            "y": -9.670565634560047
+          },
+          "status": "Desvio alto: continue sobre a grelha e não pare nas tábuas rachadas; a varanda tem uma couraça."
+        },
+        {
+          "n": 1540,
+          "file": "respiros-1540.png",
+          "p": {
+            "x": 2186.4208532222065,
+            "y": 58.499999999999915
+          },
+          "feet": 82.49999999999991,
+          "camera": {
+            "x": 2096.5358382246923,
+            "y": -3.5341729972749345
+          },
+          "status": "Desvio alto: continue sobre a grelha e não pare nas tábuas rachadas; a varanda tem uma couraça."
+        },
+        {
+          "n": 1550,
+          "file": "respiros-1550.png",
+          "p": {
+            "x": 2206.1208532222063,
+            "y": 120
+          },
+          "feet": 144,
+          "camera": {
+            "x": 2118.8218734042607,
+            "y": 50.4778151866506
+          },
+          "status": "A tábua está cedendo. Salte para o próximo apoio antes de ela cair."
+        },
+        {
+          "n": 1560,
+          "file": "respiros-1560.png",
+          "p": {
+            "x": 2236.6208532222063,
+            "y": 52.39999999999998
+          },
+          "feet": 76.39999999999998,
+          "camera": {
+            "x": 2143.3473206402587,
+            "y": 14.399999999999977
+          },
+          "status": "Desvio alto: continue sobre a grelha e não pare nas tábuas rachadas; a varanda tem uma couraça."
+        },
+        {
+          "n": 1566,
+          "file": "respiros-1566.png",
+          "p": {
+            "x": 2257.6208532222063,
+            "y": 25.699999999999967
+          },
+          "feet": 49.69999999999997,
+          "camera": {
+            "x": 2161.994375978273,
+            "y": -12.300000000000033
+          },
+          "status": "Desvio alto: continue sobre a grelha e não pare nas tábuas rachadas; a varanda tem uma couraça."
+        },
+        {
+          "n": 1570,
+          "file": "respiros-1570.png",
+          "p": {
+            "x": 2270.1208532222063,
+            "y": 17.89999999999997
+          },
+          "feet": 41.89999999999997,
+          "camera": {
+            "x": 2174.997678685874,
+            "y": -20.10000000000003
+          },
+          "status": "Desvio alto: continue sobre a grelha e não pare nas tábuas rachadas; a varanda tem uma couraça."
+        },
+        {
+          "n": 1580,
+          "file": "respiros-1580.png",
+          "p": {
+            "x": 2288.0248532222063,
+            "y": 23.499999999999975
+          },
+          "feet": 47.49999999999997,
+          "camera": {
+            "x": 2200.692077660206,
+            "y": -14.500000000000025
+          },
+          "status": "Desvio alto: continue sobre a grelha e não pare nas tábuas rachadas; a varanda tem uma couraça."
+        },
+        {
+          "n": 1590,
+          "file": "respiros-1590.png",
+          "p": {
+            "x": 2294.8497140222066,
+            "y": 95.49999999999997
+          },
+          "feet": 119.49999999999997,
+          "camera": {
+            "x": 2214.768888783893,
+            "y": 33.49999999999997
+          },
+          "status": "Desvio alto: continue sobre a grelha e não pare nas tábuas rachadas; a varanda tem uma couraça."
+        },
+        {
+          "n": 1600,
+          "file": "respiros-1600.png",
+          "p": {
+            "x": 2311.9924356222064,
+            "y": 56.5
+          },
+          "feet": 80.5,
+          "camera": {
+            "x": 2228.4980214897646,
+            "y": 18.5
+          },
+          "status": "Desvio alto: continue sobre a grelha e não pare nas tábuas rachadas; a varanda tem uma couraça."
+        },
+        {
+          "n": 1610,
+          "file": "respiros-1610.png",
+          "p": {
+            "x": 2315.2533328378313,
+            "y": 59
+          },
+          "feet": 83,
+          "camera": {
+            "x": 2239.6147221432107,
+            "y": 21
+          },
+          "status": "Desvio alto: continue sobre a grelha e não pare nas tábuas rachadas; a varanda tem uma couraça."
+        },
+        {
+          "n": 1620,
+          "file": "respiros-1620.png",
+          "p": {
+            "x": 2311.3446868111746,
+            "y": 111.5
+          },
+          "feet": 135.5,
+          "camera": {
+            "x": 2240.0792725427063,
+            "y": 54.0052
+          },
+          "status": "Desvio alto: continue sobre a grelha e não pare nas tábuas rachadas; a varanda tem uma couraça."
+        },
+        {
+          "n": 1630,
+          "file": "respiros-1630.png",
+          "p": {
+            "x": 2318.6480876007795,
+            "y": 120
+          },
+          "feet": 144,
+          "camera": {
+            "x": 2241.559023249362,
+            "y": 67.7864604688507
+          },
+          "status": "Desvio alto: continue sobre a grelha e não pare nas tábuas rachadas; a varanda tem uma couraça."
+        },
+        {
+          "n": 1640,
+          "file": "respiros-1640.png",
+          "p": {
+            "x": 2342.8480876007793,
+            "y": 78.69999999999999
+          },
+          "feet": 102.69999999999999,
+          "camera": {
+            "x": 2255.5906536146103,
+            "y": 40.69999999999999
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1650,
+          "file": "respiros-1650.png",
+          "p": {
+            "x": 2370.3480876007793,
+            "y": 25.699999999999967
+          },
+          "feet": 49.69999999999997,
+          "camera": {
+            "x": 2280.77535131034,
+            "y": -12.300000000000033
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1660,
+          "file": "respiros-1660.png",
+          "p": {
+            "x": 2390.3480876007793,
+            "y": 21.199999999999974
+          },
+          "feet": 45.199999999999974,
+          "camera": {
+            "x": 2302.872077707541,
+            "y": -16.800000000000026
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1670,
+          "file": "respiros-1670.png",
+          "p": {
+            "x": 2405.2401713507793,
+            "y": 66.69999999999996
+          },
+          "feet": 90.69999999999996,
+          "camera": {
+            "x": 2321.999275715125,
+            "y": 28.69999999999996
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1680,
+          "file": "respiros-1680.png",
+          "p": {
+            "x": 2400.800435622418,
+            "y": 157.99999999999994
+          },
+          "feet": 181.99999999999994,
+          "camera": {
+            "x": 2328.292286375371,
+            "y": 107.79999999999995
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1690,
+          "file": "respiros-1690.png",
+          "p": {
+            "x": 2401.760410794395,
+            "y": 172.10000000000002
+          },
+          "feet": 196.10000000000002,
+          "camera": {
+            "x": 2328.2537322387834,
+            "y": 132.53609514134502
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1700,
+          "file": "respiros-1700.png",
+          "p": {
+            "x": 2423.4914011312103,
+            "y": 112.60000000000008
+          },
+          "feet": 136.60000000000008,
+          "camera": {
+            "x": 2339.3117909736256,
+            "y": 74.60000000000008
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1710,
+          "file": "respiros-1710.png",
+          "p": {
+            "x": 2443.4914011312103,
+            "y": 98.10000000000005
+          },
+          "feet": 122.10000000000005,
+          "camera": {
+            "x": 2357.5173821297135,
+            "y": 60.10000000000005
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1720,
+          "file": "respiros-1720.png",
+          "p": {
+            "x": 2459.7960742562104,
+            "y": 133.60000000000002
+          },
+          "feet": 157.60000000000002,
+          "camera": {
+            "x": 2376.058782526164,
+            "y": 77.61644960000002
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1730,
+          "file": "respiros-1730.png",
+          "p": {
+            "x": 2457.8020394965984,
+            "y": 218.0000000000001
+          },
+          "feet": 242.0000000000001,
+          "camera": {
+            "x": 2384.228371104943,
+            "y": 76.22217781527381
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1740,
+          "file": "respiros-1740.png",
+          "p": {
+            "x": 2456.197291911988,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 2384.413997015005,
+            "y": 137.79452799999999
+          },
+          "status": "Ponto seguro nesta tentativa · Pelas margens, salte os canais e observe a descarga. Pelos andaimes, enfrente o mexedor e feche o registro da grelha. · sair e reentrar reinicia a passagem"
+        },
+        {
+          "n": 1750,
+          "file": "respiros-1750.png",
+          "p": {
+            "x": 2472.697291911988,
+            "y": 212.4000000000001
+          },
+          "feet": 236.4000000000001,
+          "camera": {
+            "x": 2390.397828748399,
+            "y": 139.69686221543338
+          },
+          "status": "Pelas margens, salte os canais e observe a descarga. Pelos andaimes, enfrente o mexedor e feche o registro da grelha."
+        },
+        {
+          "n": 1760,
+          "file": "respiros-1760.png",
+          "p": {
+            "x": 2499.997291911988,
+            "y": 177.9000000000002
+          },
+          "feet": 201.9000000000002,
+          "camera": {
+            "x": 2411.861055529866,
+            "y": 133.9399274970943
+          },
+          "status": "Pelas margens, salte os canais e observe a descarga. Pelos andaimes, enfrente o mexedor e feche o registro da grelha."
+        },
+        {
+          "n": 1770,
+          "file": "respiros-1770.png",
+          "p": {
+            "x": 2519.997291911988,
+            "y": 193.40000000000032
+          },
+          "feet": 217.40000000000032,
+          "camera": {
+            "x": 2432.921348645253,
+            "y": 134.50599023507985
+          },
+          "status": "Pelas margens, salte os canais e observe a descarga. Pelos andaimes, enfrente o mexedor e feche o registro da grelha."
+        },
+        {
+          "n": 1780,
+          "file": "respiros-1780.png",
+          "p": {
+            "x": 2532.746591911988,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 2451.021012668179,
+            "y": 115.23042319044845
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 1790,
+          "file": "respiros-1790.png",
+          "p": {
+            "x": 2539.2730515682383,
+            "y": 190.70000000000005
+          },
+          "feet": 214.70000000000005,
+          "camera": {
+            "x": 2459.938394908888,
+            "y": 95.1929759346284
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 1800,
+          "file": "respiros-1800.png",
+          "p": {
+            "x": 2570.2730515682383,
+            "y": 137.70000000000016
+          },
+          "feet": 161.70000000000016,
+          "camera": {
+            "x": 2479.034821402635,
+            "y": 91.50250825631782
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 1810,
+          "file": "respiros-1810.png",
+          "p": {
+            "x": 2596.2730515682383,
+            "y": 133.20000000000027
+          },
+          "feet": 157.20000000000027,
+          "camera": {
+            "x": 2506.2882657867085,
+            "y": 82.46926819076764
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 1820,
+          "file": "respiros-1820.png",
+          "p": {
+            "x": 2616.2730515682383,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2528.682285489567,
+            "y": 90.33981646658337
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 1830,
+          "file": "respiros-1830.png",
+          "p": {
+            "x": 2624.410376568238,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2544.929120966904,
+            "y": 91.77181104167549
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 1840,
+          "file": "respiros-1840.png",
+          "p": {
+            "x": 2632.9147778182382,
+            "y": 120.00000000000003
+          },
+          "feet": 144.00000000000003,
+          "camera": {
+            "x": 2552.9421986933676,
+            "y": 82.00000000000003
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 1850,
+          "file": "respiros-1850.png",
+          "p": {
+            "x": 2665.3147778182383,
+            "y": 71
+          },
+          "feet": 95,
+          "camera": {
+            "x": 2573.397017962308,
+            "y": 33
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 1860,
+          "file": "respiros-1860.png",
+          "p": {
+            "x": 2697.3147778182383,
+            "y": 71.49999999999997
+          },
+          "feet": 95.49999999999997,
+          "camera": {
+            "x": 2603.7307873093487,
+            "y": 19.9312955864279
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 1870,
+          "file": "respiros-1870.png",
+          "p": {
+            "x": 2717.3147778182383,
+            "y": 121.99999999999994
+          },
+          "feet": 145.99999999999994,
+          "camera": {
+            "x": 2628.7216297101395,
+            "y": 48.9192868129886
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 1880,
+          "file": "respiros-1880.png",
+          "p": {
+            "x": 2731.014777818238,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 2648.370636789984,
+            "y": 80.71626555365465
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 1890,
+          "file": "respiros-1890.png",
+          "p": {
+            "x": 2731.556504068238,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 2656.412185757377,
+            "y": 85.27376110224783
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 1900,
+          "file": "respiros-1900.png",
+          "p": {
+            "x": 2731.556504068238,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 2658.6808083497795,
+            "y": 85.90017989322436
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 1910,
+          "file": "respiros-1910.png",
+          "p": {
+            "x": 2731.556504068238,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 2659.3126219559604,
+            "y": 85.98627992283595
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 1914,
+          "file": "respiros-1914.png",
+          "p": {
+            "x": 2731.556504068238,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 2659.410249097118,
+            "y": 85.99379685456526
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 1920,
+          "file": "respiros-1920.png",
+          "p": {
+            "x": 2731.556504068238,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 2659.4885826619375,
+            "y": 85.99811420240403
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 1930,
+          "file": "respiros-1930.png",
+          "p": {
+            "x": 2731.556504068238,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 2659.5375878902914,
+            "y": 85.99974080083294
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 1940,
+          "file": "respiros-1940.png",
+          "p": {
+            "x": 2731.556504068238,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 2659.5512358942174,
+            "y": 85.99996437358476
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 1950,
+          "file": "respiros-1950.png",
+          "p": {
+            "x": 2731.556504068238,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 2659.5550368766317,
+            "y": 85.99999510321936
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 1960,
+          "file": "respiros-1960.png",
+          "p": {
+            "x": 2731.556504068238,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 2659.5560954539437,
+            "y": 85.99999932694713
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 1970,
+          "file": "respiros-1970.png",
+          "p": {
+            "x": 2731.556504068238,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 2659.556390268758,
+            "y": 85.9999999074902
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 1980,
+          "file": "respiros-1980.png",
+          "p": {
+            "x": 2739.9565040682382,
+            "y": 87.99999999999999
+          },
+          "feet": 111.99999999999999,
+          "camera": {
+            "x": 2662.0965060868702,
+            "y": 49.999999999999986
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 1990,
+          "file": "respiros-1990.png",
+          "p": {
+            "x": 2759.9565040682382,
+            "y": 51.999999999999964
+          },
+          "feet": 75.99999999999997,
+          "camera": {
+            "x": 2675.7425032258184,
+            "y": 13.999999999999964
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 2000,
+          "file": "respiros-2000.png",
+          "p": {
+            "x": 2770.788212868238,
+            "y": 65.29999999999995
+          },
+          "feet": 89.29999999999995,
+          "camera": {
+            "x": 2690.666845625991,
+            "y": 23.29999999999996
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 2010,
+          "file": "respiros-2010.png",
+          "p": {
+            "x": 2782.0033064166387,
+            "y": 81.5
+          },
+          "feet": 105.5,
+          "camera": {
+            "x": 2701.369866756172,
+            "y": 41.20561658407203
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 2020,
+          "file": "respiros-2020.png",
+          "p": {
+            "x": 2781.906746586975,
+            "y": 69
+          },
+          "feet": 93,
+          "camera": {
+            "x": 2708.662369858394,
+            "y": 31
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 2030,
+          "file": "respiros-2030.png",
+          "p": {
+            "x": 2779.168851627979,
+            "y": 106.5
+          },
+          "feet": 130.5,
+          "camera": {
+            "x": 2708.046675218983,
+            "y": 43.31647296
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 2040,
+          "file": "respiros-2040.png",
+          "p": {
+            "x": 2782.068178437737,
+            "y": 108.1
+          },
+          "feet": 132.1,
+          "camera": {
+            "x": 2707.998938938337,
+            "y": 67.79137756149123
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 2050,
+          "file": "respiros-2050.png",
+          "p": {
+            "x": 2806.3681784377372,
+            "y": 48.599999999999966
+          },
+          "feet": 72.59999999999997,
+          "camera": {
+            "x": 2720.558393260155,
+            "y": 10.599999999999966
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 2060,
+          "file": "respiros-2060.png",
+          "p": {
+            "x": 2826.3681784377372,
+            "y": 34.09999999999994
+          },
+          "feet": 58.09999999999994,
+          "camera": {
+            "x": 2739.9401541021048,
+            "y": -3.9000000000000625
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 2070,
+          "file": "respiros-2070.png",
+          "p": {
+            "x": 2843.7854409377373,
+            "y": 69.59999999999991
+          },
+          "feet": 93.59999999999991,
+          "camera": {
+            "x": 2759.182274161181,
+            "y": 31.59999999999991
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 2080,
+          "file": "respiros-2080.png",
+          "p": {
+            "x": 2841.9029226971124,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 2768.232829729529,
+            "y": 66.49921222513086
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 2087,
+          "file": "respiros-2087.png",
+          "p": {
+            "x": 2841.843576873675,
+            "y": 101.39999999999999
+          },
+          "feet": 125.39999999999999,
+          "camera": {
+            "x": 2769.18530382394,
+            "y": 63.39999999999999
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 2090,
+          "file": "respiros-2090.png",
+          "p": {
+            "x": 2841.843576873675,
+            "y": 81.29999999999998
+          },
+          "feet": 105.29999999999998,
+          "camera": {
+            "x": 2769.3949822219256,
+            "y": 43.29999999999998
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 2100,
+          "file": "respiros-2100.png",
+          "p": {
+            "x": 2841.843576873675,
+            "y": 57.49999999999997
+          },
+          "feet": 81.49999999999997,
+          "camera": {
+            "x": 2769.7186428253303,
+            "y": 19.49999999999997
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 2110,
+          "file": "respiros-2110.png",
+          "p": {
+            "x": 2841.843576873675,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 2769.8087826192736,
+            "y": 66.62160413439999
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 2120,
+          "file": "respiros-2120.png",
+          "p": {
+            "x": 2844.843576873675,
+            "y": 114.8
+          },
+          "feet": 138.8,
+          "camera": {
+            "x": 2770.4921348318644,
+            "y": 76.47253763782436
+          },
+          "status": "Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem."
+        },
+        {
+          "n": 2130,
+          "file": "respiros-2130.png",
+          "p": {
+            "x": 2872.143576873675,
+            "y": 72.05000000000001
+          },
+          "feet": 96.05000000000001,
+          "camera": {
+            "x": 2783.7735980125995,
+            "y": 34.05000000000001
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 2140,
+          "file": "respiros-2140.png",
+          "p": {
+            "x": 2899.643576873675,
+            "y": 91.05000000000007
+          },
+          "feet": 115.05000000000007,
+          "camera": {
+            "x": 2809.76099574972,
+            "y": 37.04184000000002
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 2150,
+          "file": "respiros-2150.png",
+          "p": {
+            "x": 2919.643576873675,
+            "y": 160.05000000000013
+          },
+          "feet": 184.05000000000013,
+          "camera": {
+            "x": 2832.081274891891,
+            "y": 90.81444000000002
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 2160,
+          "file": "respiros-2160.png",
+          "p": {
+            "x": 2931.513576873675,
+            "y": 184
+          },
+          "feet": 208,
+          "camera": {
+            "x": 2850.219841185701,
+            "y": 105.63787861059397
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 2170,
+          "file": "respiros-2170.png",
+          "p": {
+            "x": 2936.385303123675,
+            "y": 149.40000000000003
+          },
+          "feet": 173.40000000000003,
+          "camera": {
+            "x": 2858.2995859305465,
+            "y": 105.8468910652496
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 2180,
+          "file": "respiros-2180.png",
+          "p": {
+            "x": 2965.685303123675,
+            "y": 119.85000000000011
+          },
+          "feet": 143.8500000000001,
+          "camera": {
+            "x": 2875.4487582714896,
+            "y": 81.85000000000011
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 2190,
+          "file": "respiros-2190.png",
+          "p": {
+            "x": 2993.185303123675,
+            "y": 148.85000000000016
+          },
+          "feet": 172.85000000000016,
+          "camera": {
+            "x": 2902.78288154941,
+            "y": 88.80525321600008
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 2200,
+          "file": "respiros-2200.png",
+          "p": {
+            "x": 3013.185303123675,
+            "y": 227.70000000000022
+          },
+          "feet": 251.70000000000022,
+          "camera": {
+            "x": 2925.4782250691105,
+            "y": 134.6208
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 2210,
+          "file": "respiros-2210.png",
+          "p": {
+            "x": 3023.199803123675,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 2942.8239032035567,
+            "y": 139.26063954983763
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 2220,
+          "file": "respiros-2220.png",
+          "p": {
+            "x": 3031.727029373675,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 2951.555119161824,
+            "y": 139.8983763616775
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 2230,
+          "file": "respiros-2230.png",
+          "p": {
+            "x": 3051.727029373675,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 2966.8691587186177,
+            "y": 139.9860320309754
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 2240,
+          "file": "respiros-2240.png",
+          "p": {
+            "x": 3071.727029373675,
+            "y": 250
+          },
+          "feet": 274,
+          "camera": {
+            "x": 2985.5641141616434,
+            "y": 139.99808013015578
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 2250,
+          "file": "respiros-2250.png",
+          "p": {
+            "x": 3091.427029373675,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3005.1646579787907,
+            "y": 138.19151295999998
+          },
+          "status": "O tablado oferece altura contra os arremessos; a grelha continua no próprio ritmo."
+        },
+        {
+          "n": 2260,
+          "file": "respiros-2260.png",
+          "p": {
+            "x": 3095.968755623675,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3018.332796916404,
+            "y": 139.75142701665538
+          },
+          "status": "O tablado oferece altura contra os arremessos; a grelha continua no próprio ritmo."
+        },
+        {
+          "n": 2261,
+          "file": "respiros-2261.png",
+          "p": {
+            "x": 3096.268755623675,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3019.0451119612762,
+            "y": 139.7961701536574
+          },
+          "status": "O tablado oferece altura contra os arremessos; a grelha continua no próprio ritmo."
+        },
+        {
+          "n": 2270,
+          "file": "respiros-2270.png",
+          "p": {
+            "x": 3112.468755623675,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3028.5393198766665,
+            "y": 139.96583413279598
+          },
+          "status": "O tablado oferece altura contra os arremessos; a grelha continua no próprio ritmo."
+        },
+        {
+          "n": 2280,
+          "file": "respiros-2280.png",
+          "p": {
+            "x": 3147.268755623675,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3053.483621371002,
+            "y": 139.99530396881391
+          },
+          "status": "O tablado oferece altura contra os arremessos; a grelha continua no próprio ritmo."
+        },
+        {
+          "n": 2290,
+          "file": "respiros-2290.png",
+          "p": {
+            "x": 3182.268755623675,
+            "y": 218.60000000000008
+          },
+          "feet": 242.60000000000008,
+          "camera": {
+            "x": 3085.683099522718,
+            "y": 139.99935453975837
+          },
+          "status": "O tablado oferece altura contra os arremessos; a grelha continua no próprio ritmo."
+        },
+        {
+          "n": 2300,
+          "file": "respiros-2300.png",
+          "p": {
+            "x": 3217.268755623675,
+            "y": 179.1000000000002
+          },
+          "feet": 203.1000000000002,
+          "camera": {
+            "x": 3119.903151454635,
+            "y": 135.3164883422806
+          },
+          "status": "O tablado oferece altura contra os arremessos; a grelha continua no próprio ritmo."
+        },
+        {
+          "n": 2310,
+          "file": "respiros-2310.png",
+          "p": {
+            "x": 3252.268755623675,
+            "y": 189.6000000000003
+          },
+          "feet": 213.6000000000003,
+          "camera": {
+            "x": 3154.685935156437,
+            "y": 133.30695988206318
+          },
+          "status": "O tablado oferece altura contra os arremessos; a grelha continua no próprio ritmo."
+        },
+        {
+          "n": 2320,
+          "file": "respiros-2320.png",
+          "p": {
+            "x": 3287.268755623675,
+            "y": 216
+          },
+          "feet": 240,
+          "camera": {
+            "x": 3189.625440205384,
+            "y": 139.08005481213698
+          },
+          "status": "O tablado oferece altura contra os arremessos; a grelha continua no próprio ritmo."
+        },
+        {
+          "n": 2330,
+          "file": "respiros-2330.png",
+          "p": {
+            "x": 3322.268755623675,
+            "y": 174.70000000000005
+          },
+          "feet": 198.70000000000005,
+          "camera": {
+            "x": 3224.6085923024725,
+            "y": 135.62023454499126
+          },
+          "status": "O tablado oferece altura contra os arremessos; a grelha continua no próprio ritmo."
+        },
+        {
+          "n": 2340,
+          "file": "respiros-2340.png",
+          "p": {
+            "x": 3357.268755623675,
+            "y": 121.70000000000013
+          },
+          "feet": 145.70000000000013,
+          "camera": {
+            "x": 3259.6039001450677,
+            "y": 83.70000000000013
+          },
+          "status": "O tablado oferece altura contra os arremessos; a grelha continua no próprio ritmo."
+        },
+        {
+          "n": 2350,
+          "file": "respiros-2350.png",
+          "p": {
+            "x": 3392.268755623675,
+            "y": 117.2000000000001
+          },
+          "feet": 141.2000000000001,
+          "camera": {
+            "x": 3294.6025933746505,
+            "y": 67.58694583710734
+          },
+          "status": "O tablado oferece altura contra os arremessos; a grelha continua no próprio ritmo."
+        },
+        {
+          "n": 2360,
+          "file": "respiros-2360.png",
+          "p": {
+            "x": 3427.268755623675,
+            "y": 162.70000000000016
+          },
+          "feet": 186.70000000000016,
+          "camera": {
+            "x": 3329.602229437814,
+            "y": 91.85278879632773
+          },
+          "status": "O tablado oferece altura contra os arremessos; a grelha continua no próprio ritmo."
+        },
+        {
+          "n": 2370,
+          "file": "respiros-2370.png",
+          "p": {
+            "x": 3462.268755623675,
+            "y": 254.00000000000023
+          },
+          "feet": 278.0000000000002,
+          "camera": {
+            "x": 3364.60212808105,
+            "y": 132.14197732548288
+          },
+          "status": "O tablado oferece altura contra os arremessos; a grelha continua no próprio ritmo."
+        },
+        {
+          "n": 2380,
+          "file": "respiros-2380.png",
+          "p": {
+            "x": 3497.268755623675,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3399.6020998530917,
+            "y": 139.00285811772926
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2390,
+          "file": "respiros-2390.png",
+          "p": {
+            "x": 3532.268755623675,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3434.602091991578,
+            "y": 139.86294481131924
+          },
+          "status": "Ponto seguro nesta tentativa · Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar. · sair e reentrar reinicia a passagem"
+        },
+        {
+          "n": 2400,
+          "file": "respiros-2400.png",
+          "p": {
+            "x": 3567.268755623675,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3469.602089802139,
+            "y": 139.98116203413144
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2410,
+          "file": "respiros-2410.png",
+          "p": {
+            "x": 3602.268755623675,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3504.602089192378,
+            "y": 139.997410758677
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2420,
+          "file": "respiros-2420.png",
+          "p": {
+            "x": 3637.268755623675,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3539.602089022559,
+            "y": 139.9996441138775
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2430,
+          "file": "respiros-2430.png",
+          "p": {
+            "x": 3672.268755623675,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3574.6020889752645,
+            "y": 139.99995108415308
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2435,
+          "file": "respiros-2435.png",
+          "p": {
+            "x": 3689.768755623675,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3592.102088966643,
+            "y": 139.9999818649466
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2440,
+          "file": "respiros-2440.png",
+          "p": {
+            "x": 3707.268755623675,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3609.6020889620927,
+            "y": 139.99999327661317
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2450,
+          "file": "respiros-2450.png",
+          "p": {
+            "x": 3742.268755623675,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3644.6020889584242,
+            "y": 139.99999907588372
+          },
+          "status": "A tábua está cedendo. Salte para o próximo apoio antes de ela cair."
+        },
+        {
+          "n": 2460,
+          "file": "respiros-2460.png",
+          "p": {
+            "x": 3777.268755623675,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3679.602088957403,
+            "y": 139.99999987298202
+          },
+          "status": "A tábua está cedendo. Salte para o próximo apoio antes de ela cair."
+        },
+        {
+          "n": 2470,
+          "file": "respiros-2470.png",
+          "p": {
+            "x": 3812.268755623675,
+            "y": 218.60000000000008
+          },
+          "feet": 242.60000000000008,
+          "camera": {
+            "x": 3714.602088957118,
+            "y": 139.99999998254162
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2480,
+          "file": "respiros-2480.png",
+          "p": {
+            "x": 3847.268755623675,
+            "y": 179.1000000000002
+          },
+          "feet": 203.1000000000002,
+          "camera": {
+            "x": 3749.6020889570395,
+            "y": 135.3165770571205
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2490,
+          "file": "respiros-2490.png",
+          "p": {
+            "x": 3858.783255623675,
+            "y": 195.00000000000026
+          },
+          "feet": 219.00000000000026,
+          "camera": {
+            "x": 3775.2158490904285,
+            "y": 135.6211246387201
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2500,
+          "file": "respiros-2500.png",
+          "p": {
+            "x": 3862.7365092709347,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 3784.546553284325,
+            "y": 139.39813220212653
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2510,
+          "file": "respiros-2510.png",
+          "p": {
+            "x": 3879.656600595134,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 3795.9804887902933,
+            "y": 139.91727445605778
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2520,
+          "file": "respiros-2520.png",
+          "p": {
+            "x": 3920.1346827869133,
+            "y": 217.5
+          },
+          "feet": 241.5,
+          "camera": {
+            "x": 3822.8627141855436,
+            "y": 139.98862953684397
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2530,
+          "file": "respiros-2530.png",
+          "p": {
+            "x": 3955.1346827869133,
+            "y": 153.5000000000001
+          },
+          "feet": 177.5000000000001,
+          "camera": {
+            "x": 3857.577939916661,
+            "y": 115.50000000000011
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2540,
+          "file": "respiros-2540.png",
+          "p": {
+            "x": 3990.1346827869133,
+            "y": 129.00000000000023
+          },
+          "feet": 153.00000000000023,
+          "camera": {
+            "x": 3892.498630004835,
+            "y": 91.00000000000023
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2550,
+          "file": "respiros-2550.png",
+          "p": {
+            "x": 4025.1346827869133,
+            "y": 154.50000000000034
+          },
+          "feet": 178.50000000000034,
+          "camera": {
+            "x": 3922.2706172457683,
+            "y": 93.1077870544211
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2560,
+          "file": "respiros-2560.png",
+          "p": {
+            "x": 4060.1346827869133,
+            "y": 230.00000000000045
+          },
+          "feet": 254.00000000000045,
+          "camera": {
+            "x": 3932.17635350294,
+            "y": 130.04833678460528
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2570,
+          "file": "respiros-2570.png",
+          "p": {
+            "x": 4095.1346827869133,
+            "y": 252.10000000000002
+          },
+          "feet": 276.1,
+          "camera": {
+            "x": 3934.9351107186535,
+            "y": 138.6321634825255
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2580,
+          "file": "respiros-2580.png",
+          "p": {
+            "x": 4130.134682786913,
+            "y": 192.60000000000014
+          },
+          "feet": 216.60000000000014,
+          "camera": {
+            "x": 3935.703427295803,
+            "y": 139.8119935634837
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2590,
+          "file": "respiros-2590.png",
+          "p": {
+            "x": 4165.134682786913,
+            "y": 178.10000000000025
+          },
+          "feet": 202.10000000000025,
+          "camera": {
+            "x": 3935.9174042124237,
+            "y": 130.39281833354968
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2600,
+          "file": "respiros-2600.png",
+          "p": {
+            "x": 4200.134682786913,
+            "y": 213.60000000000036
+          },
+          "feet": 237.60000000000036,
+          "camera": {
+            "x": 3935.976996992546,
+            "y": 137.5150760666239
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2609,
+          "file": "respiros-2609.png",
+          "p": {
+            "x": 4231.634682786913,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3935.992720045424,
+            "y": 139.58347816748517
+          },
+          "status": "Passagem do arrozal inspecionada · Curral abre a arena de Ossabravo · Mapa volta ao arrozal · sem progresso salvo"
+        }
+      ],
+      "damage": [],
+      "jumps": [
+        {
+          "start": {
+            "n": 485,
+            "x": 591.0760220666114,
+            "feet": 304,
+            "y": 280,
+            "camX": 540.1422863215519,
+            "camY": 144
+          },
+          "apex": {
+            "n": 507,
+            "x": 591.0760220666114,
+            "feet": 201.00000000000023,
+            "y": 177.00000000000023,
+            "camX": 542.8998083222136,
+            "camY": 141.00000000000023
+          },
+          "end": {
+            "n": 526,
+            "x": 591.0760220666114,
+            "feet": 288,
+            "y": 264,
+            "camX": 543.0604906685512,
+            "camY": 143.9009972484698
+          },
+          "landingAtTakeoff": {
+            "x": 50.933735745059494,
+            "y": 144
+          },
+          "landingAtApex": {
+            "x": 48.17621374439773,
+            "y": 146.99999999999977
+          }
+        },
+        {
+          "start": {
+            "n": 545,
+            "x": 591.0760220666114,
+            "feet": 288,
+            "y": 264,
+            "camX": 543.0746531363583,
+            "camY": 143.99771907786305
+          },
+          "apex": {
+            "n": 565,
+            "x": 624.5210220666114,
+            "feet": 188.1000000000002,
+            "y": 164.1000000000002,
+            "camX": 564.2630998958628,
+            "camY": 95.4381622560949
+          },
+          "end": {
+            "n": 580,
+            "x": 631.9940699358708,
+            "feet": 240,
+            "y": 216,
+            "camX": 580.0444599246716,
+            "camY": 80.78668956011788
+          },
+          "landingAtTakeoff": {
+            "x": 88.91941679951253,
+            "y": 96.00228092213695
+          },
+          "landingAtApex": {
+            "x": 67.73097004000806,
+            "y": 144.5618377439051
+          }
+        },
+        {
+          "start": {
+            "n": 598,
+            "x": 632.1013627554819,
+            "feet": 240,
+            "y": 216,
+            "camX": 583.6950291848772,
+            "camY": 80.0221030766495
+          },
+          "apex": {
+            "n": 619,
+            "x": 668.1013627554819,
+            "feet": 137.80000000000013,
+            "y": 113.80000000000013,
+            "camX": 607.1565166790524,
+            "camY": 77.80000000000013
+          },
+          "end": {
+            "n": 634,
+            "x": 676.89318377814,
+            "feet": 192,
+            "y": 168,
+            "camX": 624.4635522751356,
+            "camY": 79.85548209258573
+          },
+          "landingAtTakeoff": {
+            "x": 93.19815459326287,
+            "y": 111.9778969233505
+          },
+          "landingAtApex": {
+            "x": 69.73666709908764,
+            "y": 114.19999999999987
+          }
+        },
+        {
+          "start": {
+            "n": 653,
+            "x": 677.1267034443524,
+            "feet": 192,
+            "y": 168,
+            "camX": 628.7144058982266,
+            "camY": 79.99667045522358
+          },
+          "apex": {
+            "n": 661,
+            "x": 677.1267034443524,
+            "feet": 137.3,
+            "y": 113.30000000000003,
+            "camX": 628.978427012273,
+            "camY": 77.30000000000003
+          },
+          "end": {
+            "n": 673,
+            "x": 677.1267034443524,
+            "feet": 192,
+            "y": 168,
+            "camX": 629.0947244948647,
+            "camY": 78.99900242336001
+          },
+          "landingAtTakeoff": {
+            "x": 48.41229754612584,
+            "y": 112.00332954477642
+          },
+          "landingAtApex": {
+            "x": 48.148276432079456,
+            "y": 114.69999999999997
+          }
+        },
+        {
+          "start": {
+            "n": 701,
+            "x": 677.1267034443524,
+            "feet": 192,
+            "y": 168,
+            "camX": 629.1258114152711,
+            "camY": 79.99613436457244
+          },
+          "apex": {
+            "n": 723,
+            "x": 715.4267034443524,
+            "feet": 88.99999999999999,
+            "y": 64.99999999999999,
+            "camX": 654.0672715922159,
+            "camY": 28.999999999999986
+          },
+          "end": {
+            "n": 740,
+            "x": 743.126829777165,
+            "feet": 160,
+            "y": 136,
+            "camX": 684.8885270535635,
+            "camY": 67.53760220058392
+          },
+          "landingAtTakeoff": {
+            "x": 114.0010183618939,
+            "y": 80.00386563542756
+          },
+          "landingAtApex": {
+            "x": 89.05955818494908,
+            "y": 131
+          }
+        },
+        {
+          "start": {
+            "n": 1329,
+            "x": 1630.5079784383004,
+            "feet": 304,
+            "y": 280,
+            "camX": 1533.0981484564227,
+            "camY": 140.00000000000006
+          },
+          "apex": {
+            "n": 1351,
+            "x": 1707.5079784383004,
+            "feet": 201.00000000000023,
+            "y": 177.00000000000023,
+            "camX": 1609.8567385714066,
+            "camY": 131.72394326015362
+          },
+          "end": {
+            "n": 1372,
+            "x": 1781.0079784383004,
+            "feet": 304,
+            "y": 280,
+            "camX": 1683.3423647318384,
+            "camY": 139.58407352033518
+          },
+          "landingAtTakeoff": {
+            "x": 247.9098299818777,
+            "y": 163.99999999999994
+          },
+          "landingAtApex": {
+            "x": 171.15123986689377,
+            "y": 172.27605673984638
+          }
+        },
+        {
+          "start": {
+            "n": 1394,
+            "x": 1857.4829784383003,
+            "feet": 304,
+            "y": 280,
+            "camX": 1760.2783750172962,
+            "camY": 139.9947165047327
+          },
+          "apex": {
+            "n": 1416,
+            "x": 1910.2579784383004,
+            "feet": 201.00000000000023,
+            "y": 177.00000000000023,
+            "camX": 1822.209873063727,
+            "camY": 131.72387614415206
+          },
+          "end": {
+            "n": 1431,
+            "x": 1918.1520685211128,
+            "feet": 256,
+            "y": 232,
+            "camX": 1843.6708205842801,
+            "camY": 138.63184739519718
+          },
+          "landingAtTakeoff": {
+            "x": 157.87369350381664,
+            "y": 116.00528349526729
+          },
+          "landingAtApex": {
+            "x": 95.94219545738588,
+            "y": 124.27612385584794
+          }
+        },
+        {
+          "start": {
+            "n": 1432,
+            "x": 1917.591624571191,
+            "feet": 256,
+            "y": 232,
+            "camX": 1843.9013170627095,
+            "camY": 138.8781148640617
+          },
+          "apex": {
+            "n": 1454,
+            "x": 1961.6058532222066,
+            "feet": 153.00000000000023,
+            "y": 129.00000000000023,
+            "camX": 1873.2949203721575,
+            "camY": 86.32943436544019
+          },
+          "end": {
+            "n": 1469,
+            "x": 1991.3058532222067,
+            "feet": 208,
+            "y": 184,
+            "camX": 1904.6615224177308,
+            "camY": 102.11928681298892
+          },
+          "landingAtTakeoff": {
+            "x": 147.40453615949718,
+            "y": 69.1218851359383
+          },
+          "landingAtApex": {
+            "x": 118.01093285004913,
+            "y": 121.67056563455981
+          }
+        },
+        {
+          "start": {
+            "n": 1470,
+            "x": 1992.7508532222066,
+            "feet": 208,
+            "y": 184,
+            "camX": 1906.592242114268,
+            "camY": 97.41781518665091
+          },
+          "apex": {
+            "n": 1492,
+            "x": 2060.7208532222066,
+            "feet": 105.00000000000003,
+            "y": 81.00000000000003,
+            "camX": 1966.6812940036812,
+            "camY": 38.32943436544004
+          },
+          "end": {
+            "n": 1507,
+            "x": 2090.7208532222066,
+            "feet": 160,
+            "y": 136,
+            "camX": 2002.9705641228018,
+            "camY": 62.06556681298865
+          },
+          "landingAtTakeoff": {
+            "x": 184.1286111079387,
+            "y": 62.58218481334909
+          },
+          "landingAtApex": {
+            "x": 124.03955921852548,
+            "y": 121.67056563455996
+          }
+        },
+        {
+          "start": {
+            "n": 1508,
+            "x": 2092.4208532222065,
+            "feet": 160,
+            "y": 136,
+            "camX": 2005.0645988147303,
+            "camY": 64.5737647866507
+          },
+          "apex": {
+            "n": 1530,
+            "x": 2164.9208532222065,
+            "feet": 56.99999999999994,
+            "y": 32.99999999999994,
+            "camX": 2068.198218684392,
+            "camY": -9.670565634560047
+          },
+          "end": {
+            "n": 1549,
+            "x": 2204.4208532222065,
+            "feet": 144,
+            "y": 120,
+            "camX": 2116.7356488836317,
+            "camY": 42.4778151866506
+          },
+          "landingAtTakeoff": {
+            "x": 199.35625440747617,
+            "y": 79.4262352133493
+          },
+          "landingAtApex": {
+            "x": 136.22263453781443,
+            "y": 153.67056563456003
+          }
+        },
+        {
+          "start": {
+            "n": 1550,
+            "x": 2206.1208532222063,
+            "feet": 144,
+            "y": 120,
+            "camX": 2118.8218734042607,
+            "camY": 50.4778151866506
+          },
+          "apex": {
+            "n": 1572,
+            "x": 2274.1208532222063,
+            "feet": 40.99999999999997,
+            "y": 16.99999999999997,
+            "camX": 2180.9054668612703,
+            "camY": -21.00000000000003
+          },
+          "end": {
+            "n": 1622,
+            "x": 2311.0788010262163,
+            "feet": 144,
+            "y": 120,
+            "camX": 2239.866466659428,
+            "camY": 59.171296479999995
+          },
+          "landingAtTakeoff": {
+            "x": 192.25692762195558,
+            "y": 93.5221848133494
+          },
+          "landingAtApex": {
+            "x": 130.17333416494603,
+            "y": 165.00000000000003
+          }
+        },
+        {
+          "start": {
+            "n": 1634,
+            "x": 2326.3480876007793,
+            "feet": 144,
+            "y": 120,
+            "camX": 2245.689064602493,
+            "camY": 68.99921061134721
+          },
+          "apex": {
+            "n": 1656,
+            "x": 2382.3480876007793,
+            "feet": 40.99999999999997,
+            "y": 16.99999999999997,
+            "camX": 2294.331830324354,
+            "camY": -21.00000000000003
+          },
+          "end": {
+            "n": 1685,
+            "x": 2399.523989125241,
+            "feet": 224,
+            "y": 200,
+            "camX": 2328.1041571735286,
+            "camY": 134.48631999999995
+          },
+          "landingAtTakeoff": {
+            "x": 153.83492452274777,
+            "y": 155.00078938865278
+          },
+          "landingAtApex": {
+            "x": 105.19215880088677,
+            "y": 245.00000000000003
+          }
+        },
+        {
+          "start": {
+            "n": 1686,
+            "x": 2399.3712734590717,
+            "feet": 224,
+            "y": 200,
+            "camX": 2328.0162111277937,
+            "camY": 135.47878239999997
+          },
+          "apex": {
+            "n": 1708,
+            "x": 2439.4914011312103,
+            "feet": 121.00000000000006,
+            "y": 97.00000000000006,
+            "camX": 2353.719165850352,
+            "camY": 59.00000000000006
+          },
+          "end": {
+            "n": 1737,
+            "x": 2456.303361728081,
+            "feet": 304,
+            "y": 280,
+            "camX": 2384.5152875200497,
+            "camY": 136
+          },
+          "landingAtTakeoff": {
+            "x": 128.28715060028753,
+            "y": 168.52121760000003
+          },
+          "landingAtApex": {
+            "x": 102.58419587772914,
+            "y": 244.99999999999994
+          }
+        },
+        {
+          "start": {
+            "n": 1740,
+            "x": 2456.197291911988,
+            "feet": 304,
+            "y": 280,
+            "camX": 2384.413997015005,
+            "camY": 137.79452799999999
+          },
+          "apex": {
+            "n": 1762,
+            "x": 2503.997291911988,
+            "feet": 201.00000000000023,
+            "y": 177.00000000000023,
+            "camX": 2416.192590457673,
+            "camY": 131.6959272490463
+          },
+          "end": {
+            "n": 1777,
+            "x": 2531.4145544119883,
+            "feet": 256,
+            "y": 232,
+            "camX": 2446.577664154708,
+            "camY": 132.32978437859566
+          },
+          "landingAtTakeoff": {
+            "x": 147.00055739698337,
+            "y": 118.20547200000001
+          },
+          "landingAtApex": {
+            "x": 115.22196395431547,
+            "y": 124.30407275095371
+          }
+        },
+        {
+          "start": {
+            "n": 1784,
+            "x": 2532.973051568238,
+            "feet": 256,
+            "y": 232,
+            "camX": 2454.9963512371623,
+            "camY": 102.50297981841038
+          },
+          "apex": {
+            "n": 1806,
+            "x": 2588.2730515682383,
+            "feet": 153.00000000000023,
+            "y": 129.00000000000023,
+            "camX": 2496.0733770842967,
+            "camY": 83.8573621379504
+          },
+          "end": {
+            "n": 1819,
+            "x": 2614.2730515682383,
+            "feet": 192,
+            "y": 168,
+            "camX": 2526.556271933385,
+            "camY": 89.97538593485777
+          },
+          "landingAtTakeoff": {
+            "x": 159.27670033107597,
+            "y": 89.49702018158962
+          },
+          "landingAtApex": {
+            "x": 118.19967448394164,
+            "y": 108.1426378620496
+          }
+        },
+        {
+          "start": {
+            "n": 1833,
+            "x": 2624.514777818238,
+            "feet": 192,
+            "y": 168,
+            "camX": 2547.345365072446,
+            "camY": 91.87418391042654
+          },
+          "apex": {
+            "n": 1855,
+            "x": 2682.8147778182383,
+            "feet": 88.99999999999999,
+            "y": 64.99999999999999,
+            "camX": 2588.181992762306,
+            "camY": 22.329434365439994
+          },
+          "end": {
+            "n": 1872,
+            "x": 2721.3147778182383,
+            "feet": 160,
+            "y": 136,
+            "camX": 2633.1562439233267,
+            "camY": 60.151808453053526
+          },
+          "landingAtTakeoff": {
+            "x": 173.9694127457924,
+            "y": 68.12581608957346
+          },
+          "landingAtApex": {
+            "x": 133.13278505593235,
+            "y": 137.67056563456
+          }
+        },
+        {
+          "start": {
+            "n": 1973,
+            "x": 2731.556504068238,
+            "feet": 160,
+            "y": 136,
+            "camX": 2659.5564265170788,
+            "camY": 85.99999994899306
+          },
+          "apex": {
+            "n": 1990,
+            "x": 2759.9565040682382,
+            "feet": 75.99999999999997,
+            "y": 51.999999999999964,
+            "camX": 2675.7425032258184,
+            "camY": 13.999999999999964
+          },
+          "end": {
+            "n": 2035,
+            "x": 2779.068178437737,
+            "feet": 160,
+            "y": 136,
+            "camX": 2707.5845624196872,
+            "camY": 65.61321995156744
+          },
+          "landingAtTakeoff": {
+            "x": 119.5117519206583,
+            "y": 74.00000005100694
+          },
+          "landingAtApex": {
+            "x": 103.32567521191868,
+            "y": 146.00000000000003
+          }
+        },
+        {
+          "start": {
+            "n": 2036,
+            "x": 2779.068178437737,
+            "feet": 160,
+            "y": 136,
+            "camX": 2707.5225963418534,
+            "camY": 69.2828403602853
+          },
+          "apex": {
+            "n": 2058,
+            "x": 2822.3681784377372,
+            "feet": 56.99999999999994,
+            "y": 32.99999999999994,
+            "camX": 2736.009675938212,
+            "camY": -5.000000000000057
+          },
+          "end": {
+            "n": 2079,
+            "x": 2842.26226852055,
+            "feet": 160,
+            "y": 136,
+            "camX": 2768.005089779404,
+            "camY": 62.21855149406202
+          },
+          "landingAtTakeoff": {
+            "x": 134.73967217869676,
+            "y": 90.7171596397147
+          },
+          "landingAtApex": {
+            "x": 106.25259258233837,
+            "y": 165.00000000000006
+          }
+        },
+        {
+          "start": {
+            "n": 2082,
+            "x": 2841.843576873675,
+            "feet": 160,
+            "y": 136,
+            "camX": 2768.596214285248,
+            "camY": 72.88767030017799
+          },
+          "apex": {
+            "n": 2094,
+            "x": 2841.843576873675,
+            "feet": 81.49999999999997,
+            "y": 57.49999999999997,
+            "camX": 2769.5745567425,
+            "camY": 19.49999999999997
+          },
+          "end": {
+            "n": 2108,
+            "x": 2841.843576873675,
+            "feet": 160,
+            "y": 136,
+            "camX": 2769.798646276566,
+            "camY": 57.18025599999997
+          },
+          "landingAtTakeoff": {
+            "x": 73.24736258842677,
+            "y": 87.11232969982201
+          },
+          "landingAtApex": {
+            "x": 72.26902013117478,
+            "y": 140.50000000000003
+          }
+        },
+        {
+          "start": {
+            "n": 2117,
+            "x": 2842.143576873675,
+            "feet": 160,
+            "y": 136,
+            "camX": 2769.8653573110073,
+            "camY": 81.16924746779712
+          },
+          "apex": {
+            "n": 2131,
+            "x": 2875.643576873675,
+            "feet": 95.70000000000002,
+            "y": 71.70000000000002,
+            "camX": 2786.1579954759286,
+            "camY": 33.70000000000002
+          },
+          "end": {
+            "n": 2153,
+            "x": 2925.643576873675,
+            "feet": 208,
+            "y": 184,
+            "camX": 2838.366559817545,
+            "camY": 98.52443215392
+          },
+          "landingAtTakeoff": {
+            "x": 155.7782195626678,
+            "y": 126.83075253220288
+          },
+          "landingAtApex": {
+            "x": 139.4855813977465,
+            "y": 174.29999999999998
+          }
+        },
+        {
+          "start": {
+            "n": 2165,
+            "x": 2931.885303123675,
+            "feet": 208,
+            "y": 184,
+            "camX": 2854.7596408016184,
+            "camY": 107.12426748647223
+          },
+          "apex": {
+            "n": 2179,
+            "x": 2962.185303123675,
+            "feet": 143.7000000000001,
+            "y": 119.7000000000001,
+            "camX": 2872.961956700737,
+            "camY": 81.7000000000001
+          },
+          "end": {
+            "n": 2201,
+            "x": 3015.185303123675,
+            "feet": 256,
+            "y": 232,
+            "camX": 2927.603074435658,
+            "camY": 135.589056
+          },
+          "landingAtTakeoff": {
+            "x": 160.42566232205672,
+            "y": 148.87573251352777
+          },
+          "landingAtApex": {
+            "x": 142.223346422938,
+            "y": 174.2999999999999
+          }
+        },
+        {
+          "start": {
+            "n": 2281,
+            "x": 3150.768755623675,
+            "feet": 304,
+            "y": 280,
+            "camX": 3056.5178374813227,
+            "camY": 139.99614925442742
+          },
+          "apex": {
+            "n": 2303,
+            "x": 3227.768755623675,
+            "feet": 201.00000000000023,
+            "y": 177.00000000000023,
+            "camX": 3130.3072546193907,
+            "camY": 131.72389434430667
+          },
+          "end": {
+            "n": 2316,
+            "x": 3273.268755623675,
+            "feet": 240,
+            "y": 216,
+            "camX": 3175.6410274746845,
+            "camY": 137.96527115203872
+          },
+          "landingAtTakeoff": {
+            "x": 216.75091814235248,
+            "y": 100.00385074557258
+          },
+          "landingAtApex": {
+            "x": 142.9615010042844,
+            "y": 108.27610565569333
+          }
+        },
+        {
+          "start": {
+            "n": 2324,
+            "x": 3301.268755623675,
+            "feet": 240,
+            "y": 216,
+            "camX": 3203.61609259231,
+            "camY": 139.58407276255986
+          },
+          "apex": {
+            "n": 2346,
+            "x": 3378.268755623675,
+            "feet": 137.0000000000001,
+            "y": 113.00000000000011,
+            "camX": 3280.602930080145,
+            "camY": 70.32943436544012
+          },
+          "end": {
+            "n": 2373,
+            "x": 3472.768755623675,
+            "feet": 304,
+            "y": 280,
+            "camX": 3375.102115618947,
+            "camY": 136
+          },
+          "landingAtTakeoff": {
+            "x": 269.15266303136514,
+            "y": 164.41592723744014
+          },
+          "landingAtApex": {
+            "x": 192.16582554353,
+            "y": 233.67056563455986
+          }
+        },
+        {
+          "start": {
+            "n": 2461,
+            "x": 3780.768755623675,
+            "feet": 304,
+            "y": 280,
+            "camX": 3683.1020889573556,
+            "camY": 139.99999989584526
+          },
+          "apex": {
+            "n": 2482,
+            "x": 3852.768755623675,
+            "feet": 201.8000000000002,
+            "y": 177.8000000000002,
+            "camX": 3756.4220889570324,
+            "camY": 132.8689064132079
+          },
+          "end": {
+            "n": 2497,
+            "x": 3859.010481873675,
+            "feet": 256,
+            "y": 232,
+            "camX": 3782.184485162958,
+            "camY": 138.9084099950061
+          },
+          "landingAtTakeoff": {
+            "x": 175.90839291631937,
+            "y": 116.00000010415474
+          },
+          "landingAtApex": {
+            "x": 102.58839291664253,
+            "y": 123.1310935867921
+          }
+        },
+        {
+          "start": {
+            "n": 2518,
+            "x": 3911.892673654493,
+            "feet": 256,
+            "y": 232,
+            "camX": 3815.977698539277,
+            "camY": 139.98308973355736
+          },
+          "apex": {
+            "n": 2540,
+            "x": 3990.1346827869133,
+            "feet": 153.00000000000023,
+            "y": 129.00000000000023,
+            "camX": 3892.498630004835,
+            "camY": 91.00000000000023
+          },
+          "end": {
+            "n": 2566,
+            "x": 4081.1346827869133,
+            "feet": 304,
+            "y": 280,
+            "camX": 3934.224282940348,
+            "camY": 136.97462799075518
+          },
+          "landingAtTakeoff": {
+            "x": 265.1569842476365,
+            "y": 164.01691026644264
+          },
+          "landingAtApex": {
+            "x": 188.63605278207842,
+            "y": 212.99999999999977
+          }
+        },
+        {
+          "start": {
+            "n": 2566,
+            "x": 4081.1346827869133,
+            "feet": 304,
+            "y": 280,
+            "camX": 3934.224282940348,
+            "camY": 136.97462799075518
+          },
+          "apex": {
+            "n": 2588,
+            "x": 4158.134682786913,
+            "feet": 201.00000000000023,
+            "y": 177.00000000000023,
+            "camX": 3935.893342216456,
+            "camY": 131.68551209629626
+          },
+          "end": {
+            "n": 2609,
+            "x": 4231.634682786913,
+            "feet": 304,
+            "y": 280,
+            "camX": 3935.992720045424,
+            "camY": 139.58347816748517
+          },
+          "landingAtTakeoff": {
+            "x": 297.4103998465648,
+            "y": 167.02537200924482
+          },
+          "landingAtApex": {
+            "x": 295.74134057045694,
+            "y": 172.31448790370374
+          }
+        }
+      ],
+      "videoFrames": 1304,
+      "captureFps": 30,
+      "videoWindow": {
+        "firstFrame": 2,
+        "lastFrame": 2608
+      },
+      "finished": true,
+      "coins": 23
+    }
+  }
+}

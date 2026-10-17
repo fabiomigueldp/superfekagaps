@@ -81,14 +81,18 @@ export function drawGuairaMayorBackground(c:CanvasRenderingContext2D,m:GuairaMay
             drawGuairaPipe(c,px-cx,Math.min(my,194)-cy,Math.abs(my-194),false,t,reducedMotion,true,1,false,PIPE);
             r(px,my-7,8,14,M.bronzeShade);r(px+1,my-6,6,12,M.bronze);
             r(px+2,my-5,2,10,M.bronzeLight);
-            const lip=mx+(dir===1?-2:-1),active=m.salvo?.direction===dir&&m.salvo.rect.y+8===my;
-            r(lip-1,my-9,3,18,P.ironDark);r(lip,my-8,1,16,active?M.warning:M.bronzeLight);
-            r(mx+(dir===1?-2:0),my-5,2,10,active?M.waterShade:P.woodShade);
+            const salvo=m.attacksCancelled?null:m.salvo??m.crossfire;
+            const preparing=salvo?.phase==='warning'&&salvo.direction===dir&&salvo.rect.y+8===my;
+            const emitted=m.attacksCancelled?undefined:m.jets?.find(j=>j.direction===dir&&j.y+8===my&&j.age<12);
+            const lip=mx+(dir===1?-2:-1),active=preparing||!!emitted;
+            r(lip-1,my-9,3,18,P.ironDark);r(lip,my-8,1,16,preparing?M.warning:emitted?M.waterLight:M.bronzeLight);
+            r(mx+(dir===1?-2:0),my-5,2,10,emitted?M.waterShade:P.woodShade);
             for(const yy of [-7,6])r(px+5,my+yy,2,1,P.ironDark);
             if(active){
-                // Pressure gauge and mechanical shutter, fixed at reduced motion.
-                const opening=m.salvo!.phase==='active'?5:Math.floor(m.salvo!.progress*4);
-                r(px+2,my-4,3,8,M.ink);r(px+2,my-4,3,opening*2,M.warning);
+                // A crossfire keeps the shutter open while its real packet
+                // leaves the mouth, then closes over eight simulation ticks.
+                const opening=emitted?Math.ceil(4*Math.min(1,(12-emitted.age)/8)):Math.floor(salvo!.progress*4);
+                r(px+2,my-4,3,8,M.ink);r(px+2,my-4,3,opening*2,emitted?M.waterLight:M.warning);
             }
         }
         // Short rear connections meet the existing feed; neither adds a false

@@ -1,3 +1,4 @@
+import { restoreGuairaCoursePassages } from '../GuairaCourseDesign';
 import { WorldGame } from '../../../WorldGame';
 import type { CameraData } from '../../../../types';
 import { CompletedAvatarPresentation } from '../CompletedAvatarPresentation';
@@ -7,6 +8,7 @@ import { drawGuairaCoinReadout } from '../GuairaCoinReadout';
 import { GUAIRA_GALLERY as G, guairaGalleryStage } from './GuairaGalleryStage';
 import { galleryArrival, galleryOpenings, galleryReceivingY } from './GuairaGalleryModel';
 import { drawGalleryBackground, drawGalleryTerrain, drawGalleryObjects } from './GuairaGalleryArt';
+import { installGuairaCourseArt, frameGuairaCourse, drawGuairaCourseHUD, guairaCourseStatus } from '../GuairaCoursePresentation';
 
 export { GUAIRA_GALLERY, guairaGalleryStage } from './GuairaGalleryStage';
 export { galleryArrival, galleryOpenings, galleryReceivingY } from './GuairaGalleryModel';
@@ -25,6 +27,7 @@ export class GuairaGallery extends WorldGame {
             this.art.terrain = (c, level, _island, cx, cy, _time, reducedMotion) => drawGalleryTerrain(c, level, cx, cy, reducedMotion);
             this.art.genericStructures = false;
             this.art.objects = (c, objects, cx, cy, time) => drawGalleryObjects(c, objects, cx, cy, time, this.reducedMotion);
+            installGuairaCourseArt(this, 'galeria');
             this.store.save.preferences.shake = !this.reducedMotion;
             if (this.reducedMotion) {
                 (this as unknown as { particle: (...args: unknown[]) => void }).particle = () => {};
@@ -40,8 +43,9 @@ export class GuairaGallery extends WorldGame {
     }
     override load(_id: string, resume = false, _custom?: AdventureStage) {
         if (this.isDisposed) return;
-        const checkpoint = resume && this.store.save.checkpoint?.stage === G.id && this.store.save.checkpoint.index === 0;
-        super.load(G.id, resume, guairaGalleryStage(checkpoint));
+        const checkpoint = resume && this.store.save.checkpoint?.stage === G.id;
+        super.load(G.id, resume, guairaGalleryStage(checkpoint, !!checkpoint && this.store.save.checkpoint!.index >= 1));
+        if (resume && this.store.save.checkpoint) restoreGuairaCoursePassages(this.objects, this.player.data.position.x);
         this.finished = false; this.time = 0; this.completedAvatar.reset();
         const p = this.player.data;
         p.isGrounded = true; p.facingRight = true; p.respawnRevealTimer = 0;
@@ -49,6 +53,7 @@ export class GuairaGallery extends WorldGame {
         this.frameGallery(true);
     }
     private frameGallery(snap = false, previousX = this.camera.x, previousY = this.camera.y) {
+        if (frameGuairaCourse(this, 'galeria', snap, previousX, previousY)) return;
         const p = this.player.data, feet = p.position.y + p.height;
         const target = Math.max(0, Math.min(G.width * 16 - 320, p.position.x - 72));
         this.camera.x = snap ? target : previousX + (target - previousX) * .12;
@@ -73,6 +78,7 @@ export class GuairaGallery extends WorldGame {
         if (this.isDisposed || !Number.isFinite(dt) || dt <= 0) return;
         if (['map', 'title', 'intro'].includes(this.state)) { this.load(G.id); return; }
         if (this.finished) {
+            if (this.updateController()) return;
             this.input.setMenuMode(this.state !== 'playing'); this.input.update();
             if (this.input.consumeMute()) this.audio.toggle();
             this.audio.tick(dt);
@@ -118,6 +124,7 @@ export class GuairaGallery extends WorldGame {
             pixelText(c, 'PAUSADO', 160, 79, '#f3ddb1', 2, 'center');
             pixelText(c, 'ESC OU CONTINUAR', 160, 100, '#b1e8db', 1, 'center');
         }
+        drawGuairaCourseHUD(this, 'galeria');
         this.renderer.present();
         const message = paused ? 'Pausado · Esc ou Continuar para voltar'
             : this.finished ? 'ACESSO DE INSPEÇÃO ABERTO · Mapa volta ao Bairro da Vala Seca · sem progresso salvo'
@@ -129,6 +136,7 @@ export class GuairaGallery extends WorldGame {
                         ? 'Ponto seguro · a oficina retorna aqui; siga à direita até a tampa II'
                         : 'Tampa opcional · a oficina por baixo retorna junto à bandeira; a tampa II fica à direita'
             : 'Abra as tampas rachadas e alcance o patamar de inspeção · PULE. NO AR, APERTE BAIXO · setas/A D: mover · Espaço: pular · Esc: pausa · M: som';
-        if (this.status.textContent !== message) this.status.textContent = message;
+        const courseStatus = guairaCourseStatus(this, 'galeria', message);
+        if (this.status.textContent !== courseStatus) this.status.textContent = courseStatus;
     }
 }

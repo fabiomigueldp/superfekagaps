@@ -1,10 +1,11 @@
 import { STAGES } from '../../../campaign';
 import { TileType } from '../../../../constants';
 import type { AdventureStage } from '../../../types';
+import { developGuairaCourse, GUAIRA_COURSES } from '../GuairaCourseDesign';
 
 export const GUAIRA_RESPIROS = Object.freeze({
-    id: 'guaira-respiros', width: 72, height: 24, floor: 304,
-    spawnX: 48, checkpointX: 304, finishX: 1088, period: 4200, secondPhase: 1200,
+    id: 'guaira-respiros', width: GUAIRA_COURSES.respiros.end / 16, height: 24, floor: 304,
+    spawnX: 48, checkpointX: 304, finishX: GUAIRA_COURSES.respiros.finish, period: 4200, secondPhase: 1200,
     firstJetId: 'guaira-respiro-a', secondJetId: 'guaira-respiro-b',
     firstStart: 160, firstEnd: 256, secondStart: 384, secondEnd: 560,
     finalCheckpointX: 608, thirdJetId: 'guaira-respiro-c', fourthJetId: 'guaira-respiro-d',
@@ -66,5 +67,5 @@ export function guairaRespirosStage(): AdventureStage {
     ];
     stage.checkpoints = [G.checkpointX, G.finalCheckpointX].map(x => ({ x: x / 16, y: G.floor / 16 }));
     stage.route = [{ x: G.spawnX, y: G.floor }, { x: G.checkpointX, y: G.floor }, { x: G.finalCheckpointX, y: G.floor }, { x: G.finalRefugeX, y: G.floor }, { x: G.finishX, y: G.floor }];
-    return stage;
+    return developGuairaCourse(stage, 'respiros');
 }

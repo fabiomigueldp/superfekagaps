@@ -1,16 +1,17 @@
 import { STAGES } from '../../../campaign';
 import type { AdventureStage } from '../../../types';
 import { TileType as T } from '../../../../constants';
+import { developGuairaCourse, GUAIRA_COURSES } from '../GuairaCourseDesign';
 
 export type WaterOutlet = 'a' | 'b';
 
 export const GUAIRA_JUNCTION = Object.freeze({
-    id: 'guaira-patio-comportas', width: 60, height: 28,
+    id: 'guaira-patio-comportas', width: GUAIRA_COURSES.patio.end / 16, height: 28,
     startY: 304, middleY: 256, terraceY: 208, dockY: 400, recoveryY: 400,
     maintenanceY: 176, exitGapStartX: 800, exitGapEndX: 848,
     entryPlateId: 'junction-entry-plate', middlePlateId: 'junction-middle-plate',
     liftAId: 'junction-deck-a', liftBId: 'junction-deck-b',
-    checkpointX: 432, finishX: 880, warningMs: 400,
+    checkpointX: 432, finishX: GUAIRA_COURSES.patio.finish, warningMs: 400,
     returnUpperId: 'junction-return-upper', returnLowerId: 'junction-return-lower',
     returnHomeY: 264, returnUpperY: 304, returnLowerY: 336,
 });
@@ -77,5 +78,5 @@ export function guairaJunctionStage(): AdventureStage {
     stage.route = [{ x: 48, y: g.startY }, { x: 176, y: g.startY, switch: g.entryPlateId },
         { x: g.checkpointX, y: g.middleY }, { x: 496, y: g.middleY, switch: g.middlePlateId },
         { x: g.finishX, y: g.terraceY }];
-    return stage;
+    return developGuairaCourse(stage, 'patio');
 }

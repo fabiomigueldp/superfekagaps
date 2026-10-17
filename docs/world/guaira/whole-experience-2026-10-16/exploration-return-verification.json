@@ -1,0 +1,439 @@
+{
+  "date": "2026-10-17",
+  "kind": "guaira-exploration-return-and-progress",
+  "passed": true,
+  "scope": {
+    "levels": 6,
+    "trackedDetours": 8,
+    "newRouteCoins": 0,
+    "newEnemies": 0,
+    "physics": "native, unchanged",
+    "record": "unique native pickup identities from completed visits"
+  },
+  "checks": {
+    "typescript": {
+      "total": 3567,
+      "passed": 3566,
+      "failed": 0,
+      "skipped": 1
+    },
+    "optionalNativeAtlas": {
+      "passed": 2,
+      "alreadyInMainSuite": 1
+    },
+    "server": {
+      "passed": 3
+    },
+    "build": true,
+    "returns": {
+      "courses": 6,
+      "reducedMotionVariants": 2,
+      "inputOnly": true,
+      "completedWithoutDamage": true
+    },
+    "hostRecords": {
+      "routes": 8,
+      "pausedCompletion": true,
+      "reload": true,
+      "abandonment": true,
+      "uniqueCrossTabUnion": true
+    },
+    "browser": {
+      "runs": 16,
+      "keyboard": true,
+      "simulatedTouch": true,
+      "physicalDevice": false,
+      "developmentInspectionProfiles": true,
+      "pause": true,
+      "reload": true,
+      "mapFits": true,
+      "errors": 0
+    },
+    "normalCampaign": {
+      "runs": 9,
+      "distinctScenes": 8,
+      "developmentUnlock": false,
+      "simulatedGamepad": true,
+      "earnedProgression": true,
+      "serraAfterMayor": true,
+      "errors": 0
+    },
+    "reviewPage": {
+      "passed": true,
+      "uniqueVideos": 14,
+      "checks": [
+        {
+          "viewport": 1440,
+          "id": "travessia",
+          "kind": "clip",
+          "width": 640,
+          "height": 360,
+          "duration": 5.2
+        },
+        {
+          "viewport": 1440,
+          "id": "travessia",
+          "kind": "full",
+          "width": 640,
+          "height": 360,
+          "duration": 42.466667
+        },
+        {
+          "viewport": 1440,
+          "id": "patio",
+          "kind": "clip",
+          "width": 640,
+          "height": 360,
+          "duration": 5
+        },
+        {
+          "viewport": 1440,
+          "id": "patio",
+          "kind": "full",
+          "width": 640,
+          "height": 360,
+          "duration": 63.966667
+        },
+        {
+          "viewport": 1440,
+          "id": "respiros",
+          "kind": "clip",
+          "width": 640,
+          "height": 360,
+          "duration": 6.233333
+        },
+        {
+          "viewport": 1440,
+          "id": "respiros",
+          "kind": "full",
+          "width": 640,
+          "height": 360,
+          "duration": 44.133333
+        },
+        {
+          "viewport": 1440,
+          "id": "subida",
+          "kind": "clip",
+          "width": 640,
+          "height": 360,
+          "duration": 4.233333
+        },
+        {
+          "viewport": 1440,
+          "id": "subida",
+          "kind": "full",
+          "width": 640,
+          "height": 360,
+          "duration": 43.4
+        },
+        {
+          "viewport": 1440,
+          "id": "galeria",
+          "kind": "clip",
+          "width": 640,
+          "height": 360,
+          "duration": 6.066667
+        },
+        {
+          "viewport": 1440,
+          "id": "galeria",
+          "kind": "full",
+          "width": 640,
+          "height": 360,
+          "duration": 41.9
+        },
+        {
+          "viewport": 1440,
+          "id": "alivio",
+          "kind": "clip",
+          "width": 640,
+          "height": 360,
+          "duration": 8.2
+        },
+        {
+          "viewport": 1440,
+          "id": "alivio",
+          "kind": "full",
+          "width": 640,
+          "height": 360,
+          "duration": 35.766667
+        },
+        {
+          "viewport": 1440,
+          "id": "respiros",
+          "kind": "prior-maintenance",
+          "width": 640,
+          "height": 360,
+          "duration": 14.5
+        },
+        {
+          "viewport": 1440,
+          "id": "alivio",
+          "kind": "prior-maintenance",
+          "width": 640,
+          "height": 360,
+          "duration": 12.933333
+        },
+        {
+          "viewport": 390,
+          "id": "travessia",
+          "kind": "clip",
+          "width": 640,
+          "height": 360,
+          "duration": 5.2
+        },
+        {
+          "viewport": 390,
+          "id": "travessia",
+          "kind": "full",
+          "width": 640,
+          "height": 360,
+          "duration": 42.466667
+        },
+        {
+          "viewport": 390,
+          "id": "patio",
+          "kind": "clip",
+          "width": 640,
+          "height": 360,
+          "duration": 5
+        },
+        {
+          "viewport": 390,
+          "id": "patio",
+          "kind": "full",
+          "width": 640,
+          "height": 360,
+          "duration": 63.966667
+        },
+        {
+          "viewport": 390,
+          "id": "respiros",
+          "kind": "clip",
+          "width": 640,
+          "height": 360,
+          "duration": 6.233333
+        },
+        {
+          "viewport": 390,
+          "id": "respiros",
+          "kind": "full",
+          "width": 640,
+          "height": 360,
+          "duration": 44.133333
+        },
+        {
+          "viewport": 390,
+          "id": "subida",
+          "kind": "clip",
+          "width": 640,
+          "height": 360,
+          "duration": 4.233333
+        },
+        {
+          "viewport": 390,
+          "id": "subida",
+          "kind": "full",
+          "width": 640,
+          "height": 360,
+          "duration": 43.4
+        },
+        {
+          "viewport": 390,
+          "id": "galeria",
+          "kind": "clip",
+          "width": 640,
+          "height": 360,
+          "duration": 6.066667
+        },
+        {
+          "viewport": 390,
+          "id": "galeria",
+          "kind": "full",
+          "width": 640,
+          "height": 360,
+          "duration": 41.9
+        },
+        {
+          "viewport": 390,
+          "id": "alivio",
+          "kind": "clip",
+          "width": 640,
+          "height": 360,
+          "duration": 8.2
+        },
+        {
+          "viewport": 390,
+          "id": "alivio",
+          "kind": "full",
+          "width": 640,
+          "height": 360,
+          "duration": 35.766667
+        },
+        {
+          "viewport": 390,
+          "id": "respiros",
+          "kind": "prior-maintenance",
+          "width": 640,
+          "height": 360,
+          "duration": 14.5
+        },
+        {
+          "viewport": 390,
+          "id": "alivio",
+          "kind": "prior-maintenance",
+          "width": 640,
+          "height": 360,
+          "duration": 12.933333
+        }
+      ],
+      "errors": []
+    }
+  },
+  "nativeScenes": {
+    "travessia": {
+      "frames": 2548,
+      "coins": 23,
+      "finished": true,
+      "minHelmet": 26,
+      "maxFeet": 164.92359717063962,
+      "maxCameraStepX": 21.343957599150826,
+      "maxCameraStepY": 8,
+      "damage": 0
+    },
+    "patio": {
+      "frames": 3839,
+      "coins": 12,
+      "finished": true,
+      "minHelmet": 26,
+      "maxFeet": 168,
+      "maxCameraStepX": 21.386728331226777,
+      "maxCameraStepY": 10,
+      "damage": 0
+    },
+    "respiros": {
+      "frames": 2648,
+      "coins": 21,
+      "finished": true,
+      "minHelmet": 26,
+      "maxFeet": 168,
+      "maxCameraStepX": 21.354594415527572,
+      "maxCameraStepY": 8,
+      "damage": 0
+    },
+    "subida": {
+      "frames": 2605,
+      "coins": 25,
+      "finished": true,
+      "minHelmet": 26,
+      "maxFeet": 168,
+      "maxCameraStepX": 21.206358701110275,
+      "maxCameraStepY": 8,
+      "damage": 0
+    },
+    "galeria": {
+      "frames": 2515,
+      "coins": 19,
+      "finished": true,
+      "minHelmet": 26,
+      "maxFeet": 168,
+      "maxCameraStepX": 21.352438698285596,
+      "maxCameraStepY": 8,
+      "damage": 0
+    },
+    "alivio": {
+      "frames": 2146,
+      "coins": 15,
+      "finished": true,
+      "minHelmet": 26,
+      "maxFeet": 168,
+      "maxCameraStepX": 21.356567359199516,
+      "maxCameraStepY": 8,
+      "damage": 0
+    }
+  },
+  "media": [
+    {
+      "id": "travessia",
+      "full": "docs/world/guaira/whole-experience-2026-10-16/returns-full-travessia.mp4",
+      "clip": "docs/world/guaira/whole-experience-2026-10-16/returns-travessia.mp4",
+      "start": 20.266666666666666,
+      "end": 25.45,
+      "frames": 2548,
+      "coins": 23
+    },
+    {
+      "id": "patio",
+      "full": "docs/world/guaira/whole-experience-2026-10-16/returns-full-patio.mp4",
+      "clip": "docs/world/guaira/whole-experience-2026-10-16/returns-patio.mp4",
+      "start": 33.21666666666667,
+      "end": 38.25,
+      "frames": 3839,
+      "coins": 12
+    },
+    {
+      "id": "respiros",
+      "full": "docs/world/guaira/whole-experience-2026-10-16/returns-full-respiros.mp4",
+      "clip": "docs/world/guaira/whole-experience-2026-10-16/returns-respiros.mp4",
+      "start": 26.2,
+      "end": 32.43333333333333,
+      "frames": 2648,
+      "coins": 21
+    },
+    {
+      "id": "subida",
+      "full": "docs/world/guaira/whole-experience-2026-10-16/returns-full-subida.mp4",
+      "clip": "docs/world/guaira/whole-experience-2026-10-16/returns-subida.mp4",
+      "start": 28.45,
+      "end": 32.7,
+      "frames": 2605,
+      "coins": 25
+    },
+    {
+      "id": "galeria",
+      "full": "docs/world/guaira/whole-experience-2026-10-16/returns-full-galeria.mp4",
+      "clip": "docs/world/guaira/whole-experience-2026-10-16/returns-galeria.mp4",
+      "start": 19.333333333333332,
+      "end": 25.383333333333333,
+      "frames": 2515,
+      "coins": 19
+    },
+    {
+      "id": "alivio",
+      "full": "docs/world/guaira/whole-experience-2026-10-16/returns-full-alivio.mp4",
+      "clip": "docs/world/guaira/whole-experience-2026-10-16/returns-alivio.mp4",
+      "start": 14.55,
+      "end": 22.783333333333335,
+      "frames": 2146,
+      "coins": 15
+    }
+  ],
+  "sources": {
+    "src/adventure/WorldGame.ts": "5ca90c4ba7732641eaf64e8acf75c08bdac77acb2117f2f488c3a6c874f3a265",
+    "src/adventure/WorldChapterMap.ts": "681ea5ea5c491ac01e509fdafd7fcbd982f81989e5aa19dad7a37ee5acdfde38",
+    "src/adventure/WorldMapHud.ts": "19ba9c08848a0e06b893b61621d88e16f9a11863ebadb3c47b9f66310b7ab412",
+    "src/adventure/map.css": "eeee18ad67031b928e2fe9bf798006b7c1c37520d01b457aff393bc9f431ac03",
+    "src/adventure/experimental/guaira/GuairaCourseDesign.ts": "b5457748ea21564fd777c4a9aab3c86fa0797ac26fd978f82c1811a63b52b137",
+    "src/adventure/experimental/guaira/GuairaCourseExploration.ts": "69940dc2c501514285ce0d72c3876fdb62c7de4a861add62f3dd0c3db39a044f",
+    "src/adventure/experimental/guaira/GuairaCourseGuidance.ts": "3b14c2af5ef05b341663e1bd2ce350ae13a781c289438755c42e1025b5c9fe05",
+    "src/adventure/experimental/guaira/GuairaCoursePresentation.ts": "6afb34a70ac1dfc82280fdaf5e70c7750d5c8d03f3c9ec8bebea77efae5be382",
+    "src/adventure/experimental/guaira/chapter/GuairaChapterProgress.ts": "436a778555602b85a72382dc23e3c556a8fdceaf5ced7e4c54aea981fc0ebe0e",
+    "src/adventure/experimental/guaira/chapter/GuairaChapterSession.ts": "2ad79ec0c6a3ad2d191abf6fdf6af1b82806703f4ff7dedb1fe9608bc06307cc",
+    "src/adventure/experimental/guaira/chapter/GuairaChapterApp.ts": "6afc11512912ebdf52579fcd85f418c36b2eb955877894eb8a706f9d88a95b41",
+    "src/adventure/experimental/guaira/chapter/GuairaChapterMapView.ts": "0dc6526b89d5b8268532b597d492fa4e7b26c96260e3ddb5012ddcfa3dc45b69",
+    "src/adventure/experimental/guaira/chapter/guaira-chapter-map.css": "92633e18f6c530109b06b78d1c661301382bf19c01c34275b4b51e7d0aea8dec",
+    "tests/guaira-exploration-progress.test.ts": "62d2b27fa5eb901ae065ce788bb925bd7155da7e955fe5b7cdb3f8d2bef584ce",
+    "tests/guaira-course-returns.test.ts": "cf91ca5dd1406e94d65751f88af43ff1d46be4bc5810d3f22276d1ab5323c28e",
+    "tests/world-chapter-map.test.ts": "b0a730a5c63cc1f14d188c21b95644f5d31fdaa529fd112aa223b7b0e4b0c597",
+    "tests/helpers/guairaReturnReplays.json": "8bfc005d570d340aa074bfd2436161d4f690d89f6aa362b9379af24a080aa548",
+    "scripts/record_guaira_returns.ts": "c26b4c36a988c701e601b03cd01ee98680cd9d25e9aeb238fe6cebef90c6a70a",
+    "scripts/verify_guaira_workshop_surface.cjs": "7d37f8b18b896b11422feb8b30358a2e13ee704d4153fb15ea710127c62b17e2"
+  },
+  "limits": [
+    "Scripted traversal does not establish first-play discovery, subjective difficulty or enjoyment.",
+    "Keyboard, PointerEvents and Gamepad API verification used automated browser input, not physical devices.",
+    "This round improves exploration feedback, return visibility and progress; it does not lengthen the levels."
+  ],
+  "supersededBy": "rice-lock-verification.json",
+  "supersededScope": "Travessia geometry and all course camera horizontal turn smoothing; historical captures retained."
+}

@@ -6,11 +6,13 @@ import type { AdventureStage } from '../../types';
 import { panel, pixelText } from '../../../graphics/BitmapFont';
 import { drawGuairaTraversalBackground, drawGuairaTraversalTerrain, drawGuairaTraversalObjects } from './GuairaTraversalArt';
 import { drawGuairaCoinReadout } from './GuairaCoinReadout';
+import { developGuairaCourse, GUAIRA_COURSES, restoreGuairaCoursePassages } from './GuairaCourseDesign';
+import { installGuairaCourseArt, frameGuairaCourse, drawGuairaCourseHUD, guairaCourseStatus } from './GuairaCoursePresentation';
 
 export const GUAIRA_TRAVERSAL = Object.freeze({
-    id: 'guaira-travessia', width: 96, height: 18, floor: 224,
+    id: 'guaira-travessia', width: GUAIRA_COURSES.travessia.end / 16, height: 18, floor: 224,
     pitStart: 416, pitEnd: 624, valveId: 'guaira-valve', bridgeId: 'guaira-bridge',
-    checkpointX: 656, finishX: 1472, finalValveId: 'guaira-rice-valve', finalBridgeId: 'guaira-rice-bridge', bossHref: './guaira-lab.html', mapHref: './guaira.html'
+    checkpointX: 656, finishX: GUAIRA_COURSES.travessia.finish, finalValveId: 'guaira-rice-valve', finalBridgeId: 'guaira-rice-bridge', bossHref: './guaira-lab.html', mapHref: './guaira.html'
 });
 
 /** Local authored data only: never registered as a seventh campaign world. */
@@ -59,7 +61,7 @@ export function guairaTraversalStage(): AdventureStage {
         { x: 656, y: 224 }, { x: 736, y: 208 }, { x: 824, y: 192 }, { x: 904, y: 208 },
         { x: 1024, y: 224 }, { x: 1088, y: 224, switch: GUAIRA_TRAVERSAL.finalValveId },
         { x: 1312, y: 224 }, { x: 1408, y: 192 }, { x: 1472, y: 192 }];
-    return stage;
+    return developGuairaCourse(stage, 'travessia');
 }
 
 /** Real movement and checkpoint/death pipeline, with ephemeral completion. */
@@ -79,6 +81,7 @@ export class GuairaTraversal extends WorldGame {
             this.art.terrain = (c, level, _island, cx, cy, time) => drawGuairaTraversalTerrain(c, level, cx, cy, time, this.reducedMotion);
             this.art.genericStructures = false;
             this.art.objects = (c, objects, cx, cy) => drawGuairaTraversalObjects(c, objects, cx, cy, this.hydraulicArtTime, this.reducedMotion);
+            installGuairaCourseArt(this, 'travessia');
             this.store.save.preferences.shake = !this.reducedMotion;
             this.tutorial.observe = () => {};
             this.load(GUAIRA_TRAVERSAL.id);
@@ -91,6 +94,7 @@ export class GuairaTraversal extends WorldGame {
     override load(_id: string, resume = false, _custom?: AdventureStage) {
         if (this.isDisposed) return;
         super.load(GUAIRA_TRAVERSAL.id, resume, guairaTraversalStage());
+        if (resume && this.store.save.checkpoint) restoreGuairaCoursePassages(this.objects, this.player.data.position.x);
         this.finished = false; this.time = 0; this.completedArtTime = 0;
         this.player.data.isGrounded = true; this.player.data.facingRight = true;
         if (!resume || !this.store.save.checkpoint) this.player.data.hasHelmet = true;
@@ -111,6 +115,7 @@ export class GuairaTraversal extends WorldGame {
         this.frameRoute(true);
     }
     private frameRoute(snap = false, previousX = this.camera.x, previousY = this.camera.y) {
+        if (frameGuairaCourse(this, 'travessia', snap, previousX, previousY)) return;
         const p = this.player.data, x = p.position.x, feet = p.position.y + p.height;
         // Preview the receiving bank from each pressure plate. In the rice
         // section both the stepping route and the channel floor fit at rest.
@@ -148,6 +153,7 @@ export class GuairaTraversal extends WorldGame {
         if (!Number.isFinite(dt) || dt <= 0) return;
         if (this.state === 'map' || this.state === 'title' || this.state === 'intro') { this.load(GUAIRA_TRAVERSAL.id); return; }
         if (this.finished) {
+            if (this.updateController()) return;
             this.input.setMenuMode(this.state !== 'playing'); this.input.update();
             if (this.input.consumeMute()) this.audio.toggle();
             this.audio.tick(dt);
@@ -168,7 +174,8 @@ export class GuairaTraversal extends WorldGame {
         // There are no campaign exits or boss here: finishStage is unreachable.
         if (this.state === 'playing' && !this.player.data.isDead && this.player.data.isGrounded &&
             this.player.data.position.x >= GUAIRA_TRAVERSAL.finishX && this.bridgeReady && this.finalBridgeReady) {
-            this.finished = true; this.input.reset(); this.audio.sfx('victory');
+            this.finished = true; this.player.data.velocity.x = 0; this.player.data.isRunning = false;
+            this.input.reset(); this.audio.sfx('victory');
             // The completion card replaces the last checkpoint notice. The
             // completed update path no longer advances that notice's timer.
             this.showCampaignNotice('', 0);
@@ -207,6 +214,7 @@ export class GuairaTraversal extends WorldGame {
             pixelText(c, 'A AGUA CHEGOU AO ARROZAL!', 160, 50, '#f0ddae', 1, 'center');
             pixelText(c, this.continuationHint, 160, 65, '#edcaf5', 1, 'center');
         }
+        drawGuairaCourseHUD(this, 'travessia');
         this.renderer.present();
         const message = paused ? 'Pausado · Esc ou Continuar para voltar'
             : this.finished ? 'Travessia concluída · a água chegou ao arrozal · Curral abre a arena de Ossabravo · Mapa volta ao arrozal na maquete'
@@ -216,6 +224,7 @@ export class GuairaTraversal extends WorldGame {
             : lowerRoute ? 'Canal de inspeção · siga por baixo das passarelas; o degrau à direita volta à margem e ao ponto seguro'
             : this.player.data.position.x >= 624 ? 'Dois percursos · pule pelas passarelas ou desça ao canal de inspeção; os dois chegam à próxima comporta'
             : 'Guaíra fictícia · setas/A D: mover · Espaço: pular · baixo no ar: sentada · Shift: correr · Esc: pausa · M: som';
-        if (this.status.textContent !== message) this.status.textContent = message;
+        const courseStatus = guairaCourseStatus(this, 'travessia', message);
+        if (this.status.textContent !== courseStatus) this.status.textContent = courseStatus;
     }
 }

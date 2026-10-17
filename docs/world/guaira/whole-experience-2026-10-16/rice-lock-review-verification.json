@@ -1,0 +1,135 @@
+{
+  "passed": true,
+  "uniqueVideos": 8,
+  "checks": [
+    {
+      "viewport": 1440,
+      "mode": "main",
+      "kind": "clip",
+      "width": 640,
+      "height": 360,
+      "duration": 9.4
+    },
+    {
+      "viewport": 1440,
+      "mode": "main",
+      "kind": "full",
+      "width": 640,
+      "height": 360,
+      "duration": 39.233333
+    },
+    {
+      "viewport": 1440,
+      "mode": "high",
+      "kind": "clip",
+      "width": 640,
+      "height": 360,
+      "duration": 7.9
+    },
+    {
+      "viewport": 1440,
+      "mode": "high",
+      "kind": "full",
+      "width": 640,
+      "height": 360,
+      "duration": 42.466667
+    },
+    {
+      "viewport": 1440,
+      "mode": "recovery",
+      "kind": "clip",
+      "width": 640,
+      "height": 360,
+      "duration": 5.866667
+    },
+    {
+      "viewport": 1440,
+      "mode": "recovery",
+      "kind": "full",
+      "width": 640,
+      "height": 360,
+      "duration": 39.266667
+    },
+    {
+      "viewport": 1440,
+      "mode": "return",
+      "kind": "clip",
+      "width": 640,
+      "height": 360,
+      "duration": 13.2
+    },
+    {
+      "viewport": 1440,
+      "mode": "return",
+      "kind": "full",
+      "width": 640,
+      "height": 360,
+      "duration": 51.533333
+    },
+    {
+      "viewport": 390,
+      "mode": "main",
+      "kind": "clip",
+      "width": 640,
+      "height": 360,
+      "duration": 9.4
+    },
+    {
+      "viewport": 390,
+      "mode": "main",
+      "kind": "full",
+      "width": 640,
+      "height": 360,
+      "duration": 39.233333
+    },
+    {
+      "viewport": 390,
+      "mode": "high",
+      "kind": "clip",
+      "width": 640,
+      "height": 360,
+      "duration": 7.9
+    },
+    {
+      "viewport": 390,
+      "mode": "high",
+      "kind": "full",
+      "width": 640,
+      "height": 360,
+      "duration": 42.466667
+    },
+    {
+      "viewport": 390,
+      "mode": "recovery",
+      "kind": "clip",
+      "width": 640,
+      "height": 360,
+      "duration": 5.866667
+    },
+    {
+      "viewport": 390,
+      "mode": "recovery",
+      "kind": "full",
+      "width": 640,
+      "height": 360,
+      "duration": 39.266667
+    },
+    {
+      "viewport": 390,
+      "mode": "return",
+      "kind": "clip",
+      "width": 640,
+      "height": 360,
+      "duration": 13.2
+    },
+    {
+      "viewport": 390,
+      "mode": "return",
+      "kind": "full",
+      "width": 640,
+      "height": 360,
+      "duration": 51.533333
+    }
+  ],
+  "errors": []
+}

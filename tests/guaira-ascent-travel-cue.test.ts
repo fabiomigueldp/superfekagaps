@@ -56,10 +56,10 @@ test('travel direction uses only actual axis displacement and is neutral at rest
 
 test('all three real mechanisms show both actual directions over two cycles, with no physics mutation', () => {
     const { level, objects } = fixture();
-    const directions = new Map(objects.bodies.map(body => [body.id, new Set<number>()]));
+    const directions = new Map(objects.bodies.filter(b => !b.id.includes(':course:')).map(body => [body.id, new Set<number>()]));
     for (let frame = 0; frame < 1200; frame++) {
         objects.update(1000 / 60, level, 700);
-        for (const body of objects.bodies) {
+        for (const body of objects.bodies.filter(b => !b.id.includes(':course:'))) {
             const axis = body.id === G.liftId ? 'y' : 'x', delta = body[axis] - (axis === 'x' ? body.px : body.py);
             const direction = ascentTravelDirection(body, axis);
             assert.equal(direction, Math.abs(delta) <= 1e-6 ? 0 : Math.sign(delta));
@@ -67,7 +67,7 @@ test('all three real mechanisms show both actual directions over two cycles, wit
         }
         if (frame % 29 !== 0) continue;
         const state = structuredClone(objects);
-        for (const body of objects.bodies) {
+        for (const body of objects.bodies.filter(b => !b.id.includes(':course:'))) {
             const normal = render(objects, body), reduced = render(objects, body, true);
             assert.deepEqual(normal.dial, reduced.dial, 'semantic direction survives reduced motion');
             assert.deepEqual(reduced.dial, render(objects, body, true, true, 9e9).dial, 'no blinking or independent clock');
@@ -114,8 +114,8 @@ for (const reducedMotion of [false, true]) test(`production adapter neutralizes 
     for (const [count, keys] of recording.runs as Array<[number, string[]]>) {
         h.run(game, count, keys); assert.equal(game.player.data.isDead, false);
     }
-    assert.equal(game.finished, true); assert.equal(game.store.save.checkpoint?.index, 1);
-    for (const body of game.objects.bodies) {
+    assert.equal(game.finished, true); assert.equal(game.store.save.checkpoint?.index, game.stage.checkpoints.length-1);
+    for (const body of game.objects.bodies.filter(b => !b.id.includes(':course:'))) {
         assert.deepEqual(bodyDial(body), render(game.objects, body, reducedMotion, false).dial);
     }
     h.keys([]); game.load(G.id);

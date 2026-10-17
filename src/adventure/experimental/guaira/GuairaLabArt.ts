@@ -1,5 +1,6 @@
 import { drawSkeletonBull } from './SkeletonBullArt';
 import { drawBullBones } from './SkeletonBullBoneArt';
+import { drawBullFootfalls } from './SkeletonBullMotionArt';
 import { drawGuairaClayGrain } from './GuairaMaterials';
 import { bullBoneY, BULL_RULES, type SkeletonBullModel } from './SkeletonBullModel';
 import { box as r, pixelLine as line, polygon, oval, roof } from '../../WorldPainting';
@@ -123,20 +124,25 @@ export function drawBullWarning(c: CanvasRenderingContext2D, b: SkeletonBullMode
             if (charge) for (let d = 0; d < 3; d++) {
                 rect(c, '#edcaf5', x + b.facing * d, y - 1 + d, 1, 1);
                 rect(c, '#edcaf5', x + b.facing * d, y + 3 - d, 1, 1);
-            } else {
+            } else if (!b.bouncingBones) {
                 rect(c, '#f0ddae', x - 3, y + 1, 7, 1);
                 rect(c, '#f0ddae', x - 4, y, 2, 3); rect(c, '#f0ddae', x + 3, y, 2, 3);
             }
         }
         if(!charge&&b.bouncingBones){
-            // This is the first bone's actual arc, including clipped corner
-            // flights. No interpolation clock or guessed landing is involved.
-            let px=b.x+b.width/2+5,py=bullBoneY(b.arena.floor,0,true)+3;
-            for(let tick=1;tick<=b.boneFlightDuration;tick++){
-                const xx=b.x+b.width/2+b.facing*tick*3+5,yy=bullBoneY(b.arena.floor,tick,true)+3;
-                if(xx<b.arena.left||xx>b.arena.right)break;
-                line(c,px,py,xx,yy,'#d4ad8c');px=xx;py=yy;
-                if(tick%BULL_RULES.boneHop===0)rect(c,'#edcaf5',xx-2,b.arena.floor-11,5,2);
+            // Both committed paths are shown before either launch. The bright
+            // clay contact marks are real landings, not decorative floor dots.
+            for (const [index,shot] of b.boneShots.entries()) {
+                let px=shot.x+5,py=shot.y+3;
+                for(let age=1;age<=shot.flightTicks;age++){
+                    const xx=shot.x+shot.vx*age+5,yy=bullBoneY(b.arena.floor,age,true,shot.hopHeight,shot.hopTicks)+3;
+                    if(xx<b.arena.left||xx>b.arena.right)break;
+                    line(c,px,py,xx,yy,index?'#b998b3':'#dcc29d');px=xx;py=yy;
+                    if(age%shot.hopTicks===0){
+                        rect(c,index?'#d5b9e1':'#f0ddae',xx-3,b.arena.floor-11,7,2);
+                        rect(c,'#653752',xx-1,b.arena.floor-9,3,4);
+                    }
+                }
             }
         }
     }
@@ -145,6 +151,7 @@ export function drawBullWarning(c: CanvasRenderingContext2D, b: SkeletonBullMode
 export function drawGuairaBoss(c: CanvasRenderingContext2D, b: SkeletonBullModel, cx: number, cy: number, reducedMotion: boolean) {
     c.save(); c.translate(-cx, -cy);
     drawBullWarning(c, b);
+    drawBullFootfalls(c, b, reducedMotion);
     drawSkeletonBull(c, b, reducedMotion);
     if(b.chargeCount===2&&['tell','turn','charge'].includes(b.state)){
         // Two small horn signs promise the complete out-and-back sequence.

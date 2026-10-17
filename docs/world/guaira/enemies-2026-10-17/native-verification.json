@@ -1,0 +1,49 @@
+{
+  "nativeInputOnly": true,
+  "actorOrClockEdits": false,
+  "setup": "ordinary checkpoint loading in test save",
+  "simulationHz": 60,
+  "captureFps": 30,
+  "routes": {
+    "pincer-counter": {
+      "frames": 138,
+      "videoFrames": 69,
+      "damage": [],
+      "killed": false,
+      "checkpoint": 3,
+      "minHead": 40.118808464,
+      "maxFeet": 164.29690941689915
+    },
+    "pincer-hit": {
+      "frames": 99,
+      "videoFrames": 49,
+      "damage": [
+        75
+      ],
+      "killed": false,
+      "checkpoint": 3,
+      "minHead": 136,
+      "maxFeet": 164
+    },
+    "loader-counter": {
+      "frames": 455,
+      "videoFrames": 227,
+      "damage": [],
+      "killed": true,
+      "checkpoint": 6,
+      "minHead": 38.61873064000001,
+      "maxFeet": 164.0007063285438
+    },
+    "loader-hit": {
+      "frames": 353,
+      "videoFrames": 176,
+      "damage": [
+        329
+      ],
+      "killed": false,
+      "checkpoint": 6,
+      "minHead": 40.118808464,
+      "maxFeet": 164
+    }
+  }
+}

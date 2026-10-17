@@ -162,7 +162,7 @@ test(`loose ribs meet both actual launch positions without introducing warning h
         step(b);
     }
     assert.equal(b.state, 'bones');
-    assert.deepEqual(b.bones.map(({ x, y, width, height }) => ({ x, y, width, height })), b.boneLaunchPoses);
+    assert.deepEqual(b.bones.map(({ x, y, width, height }) => ({ x, y, width, height })), b.boneLaunchPoses.slice(0,health>4?2:1));
     const preview = b.boneLaunchPoses; preview[0].x = -999;
     assert.notEqual(b.bones[0].x, -999, 'render launch descriptors cannot modify actual projectiles');
 });
@@ -174,12 +174,11 @@ test(`bone tumble and ground contacts follow the real hop, clear with recovery a
     for (let age = 0; age < b.boneFlightDuration; age++) {
         const calls = paint(b, false, true); assert.deepEqual(paint(b, false, true), calls);
         const bone = b.bones[0];
-        if (age < 20 && bone) shapes.add(JSON.stringify(calls.filter(([color]) => color === '#f0ddae').map(([color, x, y, w, h]) => [color, x - bone.x, y - bone.y, w, h])));
+        if (age < 16 && bone) shapes.add(JSON.stringify(calls.filter(([color]) => color === '#f0ddae').map(([color, x, y, w, h]) => [color, x - Math.round(bone.x), y - Math.round(bone.y), w, h])));
         for (const [color, , , width] of calls) if (color === '#9b6b51') widths.add(width);
         assert.equal(paint(b, true, true).some(([color]) => color === '#d5ab7c'), false, 'reduced motion omits contact dust');
-        if (age === R.boneHop) {
-            for (const p of b.bones) assert.ok(calls.some(([color, x]) => color === '#d5ab7c' && x === p.x + 1), 'bounce dust originates at the actual landing');
-        }
+        for (const p of b.bones) if (p.age>0&&p.age%p.hopTicks===0)
+            assert.ok(calls.some(([color, x]) => color === '#d5ab7c' && x === Math.round(p.x + 1)), 'bounce dust originates at each actual landing');
         step(b);
     }
     assert.equal(shapes.size, 4); assert.ok(widths.has(5) && widths.has(10), 'shadow narrows at the physical apex');

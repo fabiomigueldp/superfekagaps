@@ -1,0 +1,223 @@
+{
+  "date": "2026-10-17",
+  "passed": true,
+  "scope": "Prefeito da Vazão: native physical pursuit, balcony crossfire, meaningful pressure cuts, pixel poses and feedback",
+  "sourceHashes": {
+    "src/adventure/experimental/guaira/GuairaMayorModel.ts": "3aff9b69a526645d666372d003a5825ada237e5f458917289aca7e833198da60",
+    "src/adventure/experimental/guaira/GuairaMayorArt.ts": "bb78a4a41b1c25dec5ac3aa629f9c78e7c13d737573577a49489aa96b053cde2",
+    "src/adventure/experimental/guaira/GuairaMayorArenaArt.ts": "6025223c1f4cc35cbb2b24305fe17f6929a5ddfb6cd67be6d69072fd7cd0e927",
+    "src/adventure/experimental/guaira/GuairaMayorFeedbackArt.ts": "65622dcc892f22359d5ea1d5e31bcd98100216e67a61b2004c795f5708bfbdd7",
+    "src/adventure/experimental/guaira/GuairaMayorWater.ts": "439bdbd10a9eda0305fde0d9a5801d6b73fb21bfcd9185e27ffb1553e923a16f",
+    "src/adventure/experimental/guaira/GuairaMayorLab.ts": "1ae3db1f2c5200f109f2adcacb02dc97cdf0ee804e0cff5ff3bdd6d30376f281",
+    "src/adventure/experimental/guaira/chapter/GuairaChapterScenes.ts": "2b18cd61b53072b39c7d41d9044c72373ee3c4e5504ca838eceb6b5e8f1a93e6",
+    "guaira-prefeito.html": "8c87aba4d5ec25e19c36ccbc0afef8cff3b73a8b0afd1771b9c225a00856bcb1"
+  },
+  "tests": {
+    "scope": "complete TypeScript test suite",
+    "total": 3605,
+    "passed": 3604,
+    "failed": 0,
+    "skipped": 1,
+    "newOffensiveCases": 19,
+    "skippedReason": "optional shipped-atlas canvas dependency is not installed in project node_modules; production combat captures used the bundled native canvas module"
+  },
+  "build": {
+    "passed": true,
+    "checks": [
+      "level validation",
+      "player asset validation",
+      "world validation",
+      "application TypeScript",
+      "tools and tests TypeScript",
+      "Vite production build"
+    ]
+  },
+  "native": {
+    "nativeInputOnly": true,
+    "actorOrClockEdits": false,
+    "physicsHz": 60,
+    "captureFps": 30,
+    "routes": {
+      "upper": {
+        "frames": 2175,
+        "seconds": 36.25,
+        "hitFrames": [
+          407,
+          1076,
+          1991
+        ],
+        "rushes": 3,
+        "interrupts": 0,
+        "damage": [],
+        "minHelmet": 27,
+        "inputSha256": "cd235b530ae885ad710aca7941f0867d902971b0ff58343cf10f2b9fb82ba8ad",
+        "video": "upper.mp4",
+        "videoFrames": 1087,
+        "videoSha256": "edc3f4a9406af829adf2a9d7f4c9db4d55fafbf28cc0dcc88664515b0705188c"
+      },
+      "ground": {
+        "frames": 2238,
+        "seconds": 37.3,
+        "hitFrames": [
+          407,
+          1139,
+          2054
+        ],
+        "rushes": 3,
+        "interrupts": 0,
+        "damage": [],
+        "minHelmet": 27,
+        "inputSha256": "016052b77bb14df80ff8cade0812a6f994290ed1a2b444e6230e90b8b319ff02",
+        "video": "ground.mp4",
+        "videoFrames": 1119,
+        "videoSha256": "c7d0d3d66c6bdbedf00e93aacb5860bf8d18f0ba0d6b5985028c42e25ce0ef62"
+      },
+      "wait": {
+        "frames": 2235,
+        "seconds": 37.25,
+        "hitFrames": [
+          407,
+          1136,
+          2051
+        ],
+        "rushes": 3,
+        "interrupts": 0,
+        "damage": [],
+        "minHelmet": 27,
+        "inputSha256": "91fe81c23911349cab0da018edc717df53642dc1138b81904e1ba4b93930f27f",
+        "video": "wait.mp4",
+        "videoFrames": 1117,
+        "videoSha256": "79e0ab5784a761ef9872f956f7238581ea160a5dacda61f7c1ee2fb91367b6b0"
+      },
+      "interrupt": {
+        "frames": 1936,
+        "seconds": 32.266666666666666,
+        "hitFrames": [
+          407,
+          989,
+          1744
+        ],
+        "rushes": 3,
+        "interrupts": 2,
+        "damage": [],
+        "minHelmet": 27,
+        "inputSha256": "4a4d17fa118a9e301a721cb319e09766b59ff6fd5d5c0880b238e8a01d983aba",
+        "video": "interrupt.mp4",
+        "videoFrames": 968,
+        "videoSha256": "d98b97df7b944cac820873ef61a950fc7eb61e1fc9b0337f19daa71ee2749293"
+      },
+      "retry": {
+        "frames": 3149,
+        "seconds": 52.483333333333334,
+        "hitFrames": [
+          407,
+          2050,
+          2965
+        ],
+        "rushes": 4,
+        "interrupts": 0,
+        "damage": [],
+        "minHelmet": 27,
+        "inputSha256": "dd3e02dd5f358e6e4f913c1a7b9aa3ecdfb6f6a9b2597a80ee8e8b0462d8ef43",
+        "video": "retry.mp4",
+        "videoFrames": 1574,
+        "videoSha256": "9d5f3d02f82d84194bf8ab31e668efcec94f0c66f9080714be0f9edcd02ff38c"
+      }
+    }
+  },
+  "browser": {
+    "passed": true,
+    "completeFights": 10,
+    "inputs": [
+      "keyboard",
+      "simulated touch pointers"
+    ],
+    "reducedMotion": true,
+    "toolbarPauseDuringPursuit": true,
+    "retry": true,
+    "pageErrors": [],
+    "reviewWidths": [
+      1440,
+      390
+    ],
+    "videoDecodeChecks": 10
+  },
+  "campaign": {
+    "passed": true,
+    "completeRuns": 9,
+    "distinctScenes": 8,
+    "developmentUnlock": false,
+    "normalMapWalking": true,
+    "earnedProgress": true,
+    "reloadVerified": true,
+    "input": "simulated standard Gamepad API",
+    "physicalDevice": false,
+    "pageErrors": []
+  },
+  "performance": {
+    "scope": "fixed-step update and draw during pursuit; excludes frame scheduling, presentation, audio and device variability",
+    "measuredP95Ms": [
+      {
+        "route": "guairaMayorGroundReplay",
+        "touch": false,
+        "ms": 3.1999999955296516
+      },
+      {
+        "route": "guairaMayorGroundReplay",
+        "touch": true,
+        "ms": 5.800000004470348
+      },
+      {
+        "route": "guairaMayorReplay",
+        "touch": false,
+        "ms": 2.899999998509884
+      },
+      {
+        "route": "guairaMayorReplay",
+        "touch": true,
+        "ms": 2.2000000029802322
+      },
+      {
+        "route": "guairaMayorInterruptReplay",
+        "touch": false,
+        "ms": 5.800000004470348
+      },
+      {
+        "route": "guairaMayorInterruptReplay",
+        "touch": true,
+        "ms": 7
+      },
+      {
+        "route": "guairaMayorJumpPulseReplay",
+        "touch": false,
+        "ms": 6.600000001490116
+      },
+      {
+        "route": "guairaMayorJumpPulseReplay",
+        "touch": true,
+        "ms": 7
+      },
+      {
+        "route": "guairaMayorRetryReplay",
+        "touch": false,
+        "ms": 7.600000001490116
+      },
+      {
+        "route": "guairaMayorRetryReplay",
+        "touch": true,
+        "ms": 8.600000001490116
+      }
+    ]
+  },
+  "limitations": [
+    "rehearsed routes do not estimate first-play duration or difficulty",
+    "no physical touchscreen or gamepad test",
+    "native videos have no audio",
+    "the floor can leave view during an upper jump apex; nearby actionable water and helmet visibility are tested"
+  ],
+  "evidence": {
+    "native": "native-verification.json",
+    "browser": "browser-verification.json",
+    "campaign": "campaign-verification.json"
+  }
+}

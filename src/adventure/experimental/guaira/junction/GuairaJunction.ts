@@ -1,3 +1,4 @@
+import { restoreGuairaCoursePassages } from '../GuairaCourseDesign';
 import { WorldGame } from '../../../WorldGame';
 import type { CameraData } from '../../../../types';
 import { CompletedAvatarPresentation } from '../CompletedAvatarPresentation';
@@ -8,6 +9,7 @@ import { guairaReturnHref } from '../GuairaMapModel';
 import { drawGuairaCoinReadout } from '../GuairaCoinReadout';
 import { GUAIRA_JUNCTION as G, JunctionRouting, guairaJunctionStage } from './GuairaJunctionModel';
 import { drawJunctionBackground, drawJunctionTerrain, drawJunctionObjects } from './GuairaJunctionArt';
+import { installGuairaCourseArt, frameGuairaCourse, drawGuairaCourseHUD, guairaCourseStatus } from '../GuairaCoursePresentation';
 
 export { GUAIRA_JUNCTION, guairaJunctionStage } from './GuairaJunctionModel';
 
@@ -25,6 +27,7 @@ export class GuairaJunction extends WorldGame {
             this.art.terrain = (c, level, _island, cx, cy) => drawJunctionTerrain(c, level, cx, cy);
             this.art.genericStructures = false;
             this.art.objects = (c, objects, cx, cy, time) => drawJunctionObjects(c, objects, cx, cy, time, this.reducedMotion, this.routing);
+            installGuairaCourseArt(this, 'patio');
             this.store.save.preferences.shake = !this.reducedMotion;
             if (this.reducedMotion) {
                 (this as unknown as { particle: (...args: unknown[]) => void }).particle = () => {};
@@ -41,12 +44,13 @@ export class GuairaJunction extends WorldGame {
     override load(_id: string, resume = false, _custom?: AdventureStage) {
         if (this.isDisposed) return;
         super.load(G.id, resume, guairaJunctionStage());
+        if (resume && this.store.save.checkpoint) restoreGuairaCoursePassages(this.objects, this.player.data.position.x);
         const checkpoint = !!this.store.save.checkpoint;
-        this.routing = new JunctionRouting(checkpoint ? 'a' : 'b');
+        this.routing = new JunctionRouting(checkpoint && this.store.save.checkpoint!.index === 0 ? 'a' : 'b');
         this.finished = false; this.time = 0; this.completedAvatar.reset();
         for (const id of [G.entryPlateId, G.middlePlateId]) {
             const plate = this.objects.get(id)!;
-            plate.active = plate.observedActive = checkpoint;
+            plate.active = plate.observedActive = checkpoint && this.store.save.checkpoint!.index === 0;
         }
         this.applySupply();
         this.openReturnStair();
@@ -60,6 +64,7 @@ export class GuairaJunction extends WorldGame {
         const p = this.player.data;
         p.isGrounded = true; p.facingRight = true; p.respawnRevealTimer = 0;
         if (!checkpoint) p.hasHelmet = true;
+        frameGuairaCourse(this, 'patio', true);
     }
     private applySupply() {
         this.objects.get(G.liftAId)!.active = this.routing.supplied === 'a';
@@ -96,6 +101,7 @@ export class GuairaJunction extends WorldGame {
         if (!Number.isFinite(dt) || dt <= 0) return;
         if (['map', 'title', 'intro'].includes(this.state)) { this.load(G.id); return; }
         if (this.finished) {
+            if (this.updateController()) return;
             this.input.setMenuMode(this.state !== 'playing'); this.input.update();
             if (this.input.consumeMute()) this.audio.toggle();
             this.audio.tick(dt);
@@ -104,7 +110,7 @@ export class GuairaJunction extends WorldGame {
             if (this.state === 'playing') this.completedAvatar.advance(dt);
             return;
         }
-        const objects = this.objects, before = objects.time, previousY = this.camera.y;
+        const objects = this.objects, before = objects.time, previousY = this.camera.y, previousX = this.camera.x;
         super.update(dt);
         if (this.state !== 'playing' || this.player.data.isDead || this.objects !== objects) return;
         const simulated = objects.time - before;
@@ -128,6 +134,7 @@ export class GuairaJunction extends WorldGame {
             this.camera.y = Math.max(0, feet - 168, Math.min(p.position.y - 36, next));
             if (this.returnStairOpen && p.position.x >= 448 && p.position.x < 608 && feet > G.returnUpperY)
                 this.camera.y = Math.min(this.camera.y, G.middleY - 24);
+            frameGuairaCourse(this, 'patio', false, previousX, previousY);
         }
         if (p.isGrounded && p.position.x >= G.finishX && Math.abs(p.position.y + p.height - G.terraceY) < .01 &&
             this.store.save.checkpoint?.stage === G.id && this.routing.supplied === 'b' && !this.routing.warning) {
@@ -191,6 +198,7 @@ export class GuairaJunction extends WorldGame {
             pixelText(c, 'PAUSADO', 160, 79, '#f3ddb1', 2, 'center');
             pixelText(c, 'ESC OU CONTINUAR', 160, 100, '#aad9d2', 1, 'center');
         }
+        drawGuairaCourseHUD(this, 'patio');
         this.renderer.present();
         const message = paused ? 'Pausado · Esc ou Continuar para voltar'
             : this.finished ? 'Pátio concluído · água limpa no ramal B · Mapa volta ao arrozal · protótipo sem progresso salvo'
@@ -209,6 +217,7 @@ export class GuairaJunction extends WorldGame {
                 : 'Ponto seguro acima · alcance a plataforma central pelo tabuleiro A'
             : p.position.x < G.exitGapEndX ? 'Margem firme · observe o vão curto e pule até o arrozal · pode esperar antes do salto'
             : 'Siga à direita até o arrozal · sair e reentrar reinicia o protótipo';
-        if (this.status.textContent !== message) this.status.textContent = message;
+        const courseStatus = guairaCourseStatus(this, 'patio', message);
+        if (this.status.textContent !== courseStatus) this.status.textContent = courseStatus;
     }
 }

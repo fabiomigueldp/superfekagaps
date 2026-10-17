@@ -1,0 +1,261 @@
+{
+  "revision": "guaira-developed-courses-2026-10-16",
+  "scope": "Six traversal levels restructured; two existing bosses verified in the expanded chapter.",
+  "notAFirstPlaytest": true,
+  "sourceHashes": {
+    "src/adventure/WorldEnemies.ts": "fe368aa25961ed4192256992663f608901c92f5f268f37285b1111cd6511e729",
+    "src/adventure/types.ts": "ab9d7dfbccf4a519995e2aa0a4c347de992eeaa7070d1f9376d48ab39f4a4742",
+    "src/adventure/experimental/guaira/GuairaCourseDesign.ts": "2a5391d067fe4c7d14827ca2b33d4a1997c3f003d797b48f89f551bb1504279a",
+    "src/adventure/experimental/guaira/GuairaCoursePresentation.ts": "e72c276f8092ecd1d89299ff3898ef920d95635d322f39db96909b68accc4b0d",
+    "src/adventure/experimental/guaira/GuairaFoeArt.ts": "3e6a97d95be8b9e4e25e92272537de047b8c66c411bc4c3eac9cad7eac42224f",
+    "src/adventure/experimental/guaira/GuairaTraversal.ts": "f895c32c0376e4d7e72cae0c0196893bbfb03ff238eb22c13fd9b5c25ec9599f",
+    "src/adventure/experimental/guaira/GuairaAscent.ts": "3fe74fe7f889782f93964390441c6527461f11bde0770b2ca0ad53e5f34ef912",
+    "src/adventure/experimental/guaira/GuairaTraversalArt.ts": "36fca7228c4ee95254acc127ae6cd33d0af9904df01ac48066974faaeeaa6734",
+    "src/adventure/experimental/guaira/junction/GuairaJunction.ts": "d06ce06e8dfe715cb73308ef2efc491163a5c736d05b3c097bbadad832dcf404",
+    "src/adventure/experimental/guaira/junction/GuairaJunctionModel.ts": "425e6c8b988a913364beed9f294aaa19c1cedbd9d9639be291eb25b047cc4003",
+    "src/adventure/experimental/guaira/respiros/GuairaRespiros.ts": "0a4d63caf89d44e411a30ee294f9dd281ad8cacd1417ce3a57d66976cf13b711",
+    "src/adventure/experimental/guaira/respiros/GuairaRespirosStage.ts": "c2bb55902c9c39f5db017c61a34cdbb5a7d265156721179364e516fdbfcf4ac0",
+    "src/adventure/experimental/guaira/respiros/GuairaRespirosArt.ts": "1eeaa64704c894cbbc065745b4bd078f7978aafcc3f48311fbe2b7565cf4bffa",
+    "src/adventure/experimental/guaira/gallery/GuairaGallery.ts": "0ade70243f31054e448416c97ecd92cfa085c4c2c63940bc172665dbcdd3bf7b",
+    "src/adventure/experimental/guaira/gallery/GuairaGalleryStage.ts": "d950dcae3e46a005626e44824d2d4766213632933d3b6c81529f13af76c01413",
+    "src/adventure/experimental/guaira/relief/GuairaRelief.ts": "159a956f56e334547f29f373b33247af775779dbca46359a437078e081bdccde",
+    "src/adventure/experimental/guaira/relief/GuairaReliefStage.ts": "c78f70c00a16e90dab07a420d4dd3b0140591da2689c69f38c441f0c430ef6a8"
+  },
+  "baseline": {
+    "ordinaryEnemies": 0,
+    "widthPixels": {
+      "travessia": 1536,
+      "patio": 960,
+      "respiros": 1152,
+      "subida": 1344,
+      "galeria": 704,
+      "alivio": 736
+    }
+  },
+  "current": {
+    "ordinaryEnemies": 27,
+    "newDistricts": 22,
+    "newCheckpoints": 22,
+    "widthPixels": {
+      "travessia": 4032,
+      "patio": 3008,
+      "respiros": 3584,
+      "subida": 3648,
+      "galeria": 2432,
+      "alivio": 2400
+    },
+    "enemies": {
+      "travessia": 6,
+      "patio": 5,
+      "respiros": 4,
+      "subida": 5,
+      "galeria": 4,
+      "alivio": 3
+    }
+  },
+  "checks": {
+    "guaira": {
+      "tests": 1232,
+      "pass": 1232,
+      "fail": 0
+    },
+    "sharedEnemiesAndCombat": {
+      "tests": 70,
+      "pass": 70,
+      "fail": 0
+    },
+    "build": true,
+    "levelPlayerAndWorldValidators": true,
+    "appAndToolsTypeScript": true,
+    "checkpointTests": "Each of the 22 new checkpoints: 600 idle native steps without attack; input-only continuation to the real finish without damage; crossed bridges restored.",
+    "nativeFullRoutes": {
+      "travessia": {
+        "frames": 2066,
+        "stepMs": 16.666666666666668,
+        "seconds": 34.43333333333333,
+        "coins": 17,
+        "damage": 0,
+        "finished": true,
+        "minHelmet": 26,
+        "maxFeet": 168.6645916233546
+      },
+      "patio": {
+        "frames": 2560,
+        "stepMs": 16.666666666666668,
+        "seconds": 42.666666666666664,
+        "coins": 5,
+        "damage": 0,
+        "finished": true,
+        "minHelmet": 26,
+        "maxFeet": 168
+      },
+      "respiros": {
+        "frames": 1907,
+        "stepMs": 16.666666666666668,
+        "seconds": 31.783333333333335,
+        "coins": 8,
+        "damage": 0,
+        "finished": true,
+        "minHelmet": 26,
+        "maxFeet": 166.91105663615267
+      },
+      "lab": {
+        "frames": 1267,
+        "stepMs": 16.666666666666668,
+        "seconds": 21.116666666666667,
+        "coins": 0,
+        "damage": 0,
+        "finished": true,
+        "minHelmet": 32.350000000000094,
+        "maxFeet": 160
+      },
+      "subida": {
+        "frames": 2013,
+        "stepMs": 16.666666666666668,
+        "seconds": 33.55,
+        "coins": 10,
+        "damage": 0,
+        "finished": true,
+        "minHelmet": 25.999999999999993,
+        "maxFeet": 168
+      },
+      "prefeito": {
+        "frames": 1822,
+        "stepMs": 16.666666666666668,
+        "seconds": 30.366666666666667,
+        "coins": 0,
+        "damage": 0,
+        "finished": true,
+        "minHelmet": 21,
+        "maxFeet": 160.0000000049077
+      },
+      "galeria": {
+        "frames": 1296,
+        "stepMs": 16.666666666666668,
+        "seconds": 21.6,
+        "coins": 12,
+        "damage": 0,
+        "finished": true,
+        "minHelmet": 26,
+        "maxFeet": 168.6645916233546
+      },
+      "alivio": {
+        "frames": 1085,
+        "stepMs": 16.666666666666668,
+        "seconds": 18.083333333333332,
+        "coins": 8,
+        "damage": 0,
+        "finished": true,
+        "minHelmet": 26,
+        "maxFeet": 168
+      }
+    },
+    "normalCampaign": {
+      "passed": true,
+      "completedExecutions": 9,
+      "distinctScenes": 8,
+      "errors": [],
+      "device": "simulated standard Gamepad API",
+      "worldMapWalking": true,
+      "developmentUnlock": false,
+      "serraReleasedAfterMayor": true
+    },
+    "desktopAndTouch": {
+      "passed": true,
+      "executions": 4,
+      "checks": [
+        {
+          "touch": false,
+          "reduced": false,
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "pause": {
+            "paused": true,
+            "pixelsFrozen": true,
+            "stateFrozen": true,
+            "fits": true
+          },
+          "id": "guaira-galeria",
+          "finished": true,
+          "coins": 12,
+          "frames": 1296
+        },
+        {
+          "touch": false,
+          "reduced": false,
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "pause": {
+            "paused": true,
+            "pixelsFrozen": true,
+            "stateFrozen": true,
+            "fits": true
+          },
+          "id": "guaira-camara-alivio",
+          "finished": true,
+          "coins": 8,
+          "frames": 1085
+        },
+        {
+          "touch": true,
+          "reduced": true,
+          "viewport": {
+            "width": 844,
+            "height": 390
+          },
+          "pause": {
+            "paused": true,
+            "pixelsFrozen": true,
+            "stateFrozen": true,
+            "fits": true
+          },
+          "id": "guaira-galeria",
+          "finished": true,
+          "coins": 12,
+          "frames": 1296
+        },
+        {
+          "touch": true,
+          "reduced": true,
+          "viewport": {
+            "width": 844,
+            "height": 390
+          },
+          "pause": {
+            "paused": true,
+            "pixelsFrozen": true,
+            "stateFrozen": true,
+            "fits": true
+          },
+          "id": "guaira-camara-alivio",
+          "finished": true,
+          "coins": 8,
+          "frames": 1085
+        }
+      ],
+      "errors": []
+    }
+  },
+  "evidence": {
+    "native": "course-native-survey.json",
+    "campaign": "course-campaign-verification.json",
+    "keyboardTouchPause": "course-surface-verification.json",
+    "analysis": "course-design.md"
+  },
+  "limitations": [
+    "Input recordings are rehearsed. Their durations do not estimate discovery time.",
+    "No external first-play or physical-controller session was performed.",
+    "The 3D island was not changed or re-audited in this revision."
+  ],
+  "reproduce": {
+    "tests": "node --import tsx --test tests/guaira-*.test.ts",
+    "build": "npm run build",
+    "capture": "node --import tsx scripts/prove_guaira_chapter_readability.ts OUTPUT CANVAS_MODULE",
+    "campaign": "GUAIRA_NORMAL_CAMPAIGN=1 GUAIRA_GAMEPAD=1 node scripts/verify_guaira_chapter_readability.cjs (normal-campaign Vite server)"
+  },
+  "supersededBy": "exploration-verification.json"
+}

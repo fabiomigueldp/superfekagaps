@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "width": 1440,
+      "decoded": 3,
+      "images": true,
+      "layout": true,
+      "currentValidation": true
+    },
+    {
+      "width": 390,
+      "decoded": 3,
+      "images": true,
+      "layout": true,
+      "currentValidation": true
+    }
+  ],
+  "errors": []
+}

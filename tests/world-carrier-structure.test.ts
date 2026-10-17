@@ -193,7 +193,8 @@ test('custom Guaíra object painters retain ownership of their existing equipmen
     const { WorldArt } = await import('../src/adventure/WorldArt');
     const { guairaAscentStage } = await import('../src/adventure/experimental/guaira/GuairaAscent');
     const stage = guairaAscentStage(), level = new WorldLevel(stage.level), objects = new WorldObjects(stage.mechanisms), art = new WorldArt();
-    assert.equal(objects.bodies.filter(body => body.to).length, 3);
+    assert.equal(objects.bodies.filter(body => body.to&&!body.gated).length, 3);
+    assert.equal(objects.bodies.filter(body => body.to&&body.gated).length, 1,'the developed course includes its authored gate');
     art.genericStructures = false; // Explicitly set by the real custom chapter adapters.
     art.objects = () => {};
     const untouched = recorder(); art.structures(untouched.context, objects, 200, 160, level);

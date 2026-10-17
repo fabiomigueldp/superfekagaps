@@ -109,6 +109,22 @@ test('painters preserve input and Canvas state and do not animate static route s
     assert.equal(JSON.stringify({level,objects}),before);
 });
 
+test('workshop motion stays inside its fixed fan aperture and reduced motion keeps the whole background still', () => {
+    const paint = (cx: number, cy: number, time: number, reduced = false) => {
+        const c = new Raster(); drawGalleryBackground(c.context, cx, cy, time, reduced); return c;
+    };
+    const a = paint(19,38,0), b = paint(19,38,450), moved = paint(8,45,450);
+    let changed = 0;
+    for (let y=23; y<180; y++) for (let x=0; x<320; x++) if(a.at(x,y)!==b.at(x,y)) {
+        changed++;
+        assert.ok(Math.abs(x-294)<=10 && Math.abs(y-70)<=10, 'only the blades move, never route signs or supports');
+    }
+    assert.ok(changed>15, 'the visible fan has distinct pixel poses');
+    for(let y=55;y<85;y++)for(let x=279;x<309;x++)
+        assert.equal(b.at(x,y),moved.at(x+11,y-7),'scrolling does not change the fan phase or its anchor');
+    assert.deepEqual(paint(19,38,0,true).pixels,paint(19,38,15450,true).pixels);
+});
+
 test('inspection daylight stays recessed and moves with the wall, never becoming a safe cap', () => {
     const a = new Raster(), b = new Raster();
     drawGalleryBackground(a.context,384,80,0,false);

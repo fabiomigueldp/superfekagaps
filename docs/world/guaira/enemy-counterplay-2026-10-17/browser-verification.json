@@ -1,0 +1,231 @@
+{
+  "physicalDevice": false,
+  "setup": "isolated prerequisite save, native chapter mounting and ordinary checkpoint load",
+  "routes": [
+    {
+      "name": "helmet-stomps",
+      "input": "keyboard",
+      "frame": 175,
+      "contacts": [
+        {
+          "frame": 87,
+          "result": "bounce",
+          "phase": "walk",
+          "pound": false
+        },
+        {
+          "frame": 115,
+          "result": "kill",
+          "phase": "stunned",
+          "pound": false
+        }
+      ],
+      "minHead": 67.5,
+      "maxFeet": 164,
+      "reduced": false
+    },
+    {
+      "name": "helmet-stomps",
+      "input": "simulated-gamepad",
+      "frame": 175,
+      "contacts": [
+        {
+          "frame": 87,
+          "result": "bounce",
+          "phase": "walk",
+          "pound": false
+        },
+        {
+          "frame": 115,
+          "result": "kill",
+          "phase": "stunned",
+          "pound": false
+        }
+      ],
+      "minHead": 67.5,
+      "maxFeet": 164,
+      "reduced": true
+    },
+    {
+      "name": "charger-counter",
+      "input": "keyboard",
+      "frame": 197,
+      "contacts": [
+        {
+          "frame": 137,
+          "result": "kill",
+          "phase": "rest",
+          "pound": false
+        }
+      ],
+      "minHead": 40.11880846399998,
+      "maxFeet": 164,
+      "reduced": false
+    },
+    {
+      "name": "charger-counter",
+      "input": "simulated-gamepad",
+      "frame": 197,
+      "contacts": [
+        {
+          "frame": 137,
+          "result": "kill",
+          "phase": "rest",
+          "pound": false
+        }
+      ],
+      "minHead": 40.11880846399998,
+      "maxFeet": 164,
+      "reduced": true
+    },
+    {
+      "name": "agitator-counter",
+      "input": "keyboard",
+      "frame": 282,
+      "contacts": [
+        {
+          "frame": 222,
+          "result": "kill",
+          "phase": "rest",
+          "pound": false
+        }
+      ],
+      "minHead": 34,
+      "maxFeet": 164,
+      "reduced": false
+    },
+    {
+      "name": "agitator-counter",
+      "input": "simulated-gamepad",
+      "frame": 282,
+      "contacts": [
+        {
+          "frame": 222,
+          "result": "kill",
+          "phase": "rest",
+          "pound": false
+        }
+      ],
+      "minHead": 34,
+      "maxFeet": 164,
+      "reduced": true
+    },
+    {
+      "name": "rail-window",
+      "input": "keyboard",
+      "frame": 221,
+      "contacts": [
+        {
+          "frame": 161,
+          "result": "kill",
+          "phase": "warning",
+          "pound": false
+        }
+      ],
+      "minHead": 34,
+      "maxFeet": 164,
+      "reduced": false
+    },
+    {
+      "name": "rail-window",
+      "input": "simulated-gamepad",
+      "frame": 221,
+      "contacts": [
+        {
+          "frame": 161,
+          "result": "kill",
+          "phase": "warning",
+          "pound": false
+        }
+      ],
+      "minHead": 34,
+      "maxFeet": 164,
+      "reduced": true
+    },
+    {
+      "name": "rail-pounds",
+      "input": "keyboard",
+      "frame": 263,
+      "contacts": [
+        {
+          "frame": 194,
+          "result": "bounce",
+          "phase": "walk",
+          "pound": false
+        },
+        {
+          "frame": 203,
+          "result": "kill",
+          "phase": "walk",
+          "pound": true
+        }
+      ],
+      "minHead": 34,
+      "maxFeet": 164,
+      "reduced": false
+    },
+    {
+      "name": "rail-pounds",
+      "input": "simulated-gamepad",
+      "frame": 263,
+      "contacts": [
+        {
+          "frame": 194,
+          "result": "bounce",
+          "phase": "walk",
+          "pound": false
+        },
+        {
+          "frame": 203,
+          "result": "kill",
+          "phase": "walk",
+          "pound": true
+        }
+      ],
+      "minHead": 34,
+      "maxFeet": 164,
+      "reduced": true
+    }
+  ],
+  "pauses": [
+    {
+      "name": "charger-counter",
+      "input": "keyboard",
+      "until": 118,
+      "paused": true,
+      "state": true,
+      "pixels": true,
+      "resumed": true
+    },
+    {
+      "name": "charger-counter",
+      "input": "simulated-gamepad",
+      "until": 118,
+      "paused": true,
+      "state": true,
+      "pixels": true,
+      "resumed": true
+    },
+    {
+      "name": "rail-window",
+      "input": "keyboard",
+      "until": 146,
+      "paused": true,
+      "state": true,
+      "pixels": true,
+      "resumed": true
+    },
+    {
+      "name": "rail-window",
+      "input": "simulated-gamepad",
+      "until": 146,
+      "paused": true,
+      "state": true,
+      "pixels": true,
+      "resumed": true
+    }
+  ],
+  "review": [],
+  "errors": [],
+  "passed": true
+}

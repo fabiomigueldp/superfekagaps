@@ -1,0 +1,186 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "viewport": 1440,
+      "kind": "course",
+      "id": "travessia",
+      "width": 640,
+      "height": 360,
+      "duration": 34.433333,
+      "decodedAndPlayed": true
+    },
+    {
+      "viewport": 1440,
+      "kind": "course",
+      "id": "patio",
+      "width": 640,
+      "height": 360,
+      "duration": 46.866667,
+      "decodedAndPlayed": true
+    },
+    {
+      "viewport": 1440,
+      "kind": "course",
+      "id": "respiros",
+      "width": 640,
+      "height": 360,
+      "duration": 35.033333,
+      "decodedAndPlayed": true
+    },
+    {
+      "viewport": 1440,
+      "kind": "course",
+      "id": "subida",
+      "width": 640,
+      "height": 360,
+      "duration": 31.9,
+      "decodedAndPlayed": true
+    },
+    {
+      "viewport": 1440,
+      "kind": "course",
+      "id": "galeria",
+      "width": 640,
+      "height": 360,
+      "duration": 24.7,
+      "decodedAndPlayed": true
+    },
+    {
+      "viewport": 1440,
+      "kind": "course",
+      "id": "alivio",
+      "width": 640,
+      "height": 360,
+      "duration": 22.566667,
+      "decodedAndPlayed": true
+    },
+    {
+      "viewport": 1440,
+      "kind": "recovery",
+      "id": "respiros",
+      "width": 640,
+      "height": 360,
+      "duration": 3.766667,
+      "decodedAndPlayed": true
+    },
+    {
+      "viewport": 1440,
+      "kind": "recovery",
+      "id": "subida",
+      "width": 640,
+      "height": 360,
+      "duration": 3.6,
+      "decodedAndPlayed": true
+    },
+    {
+      "viewport": 1440,
+      "kind": "recovery",
+      "id": "galeria",
+      "width": 640,
+      "height": 360,
+      "duration": 3.766667,
+      "decodedAndPlayed": true
+    },
+    {
+      "viewport": 1440,
+      "kind": "recovery",
+      "id": "alivio",
+      "width": 640,
+      "height": 360,
+      "duration": 3.766667,
+      "decodedAndPlayed": true
+    },
+    {
+      "viewport": 390,
+      "kind": "course",
+      "id": "travessia",
+      "width": 640,
+      "height": 360,
+      "duration": 34.433333,
+      "decodedAndPlayed": true
+    },
+    {
+      "viewport": 390,
+      "kind": "course",
+      "id": "patio",
+      "width": 640,
+      "height": 360,
+      "duration": 46.866667,
+      "decodedAndPlayed": true
+    },
+    {
+      "viewport": 390,
+      "kind": "course",
+      "id": "respiros",
+      "width": 640,
+      "height": 360,
+      "duration": 35.033333,
+      "decodedAndPlayed": true
+    },
+    {
+      "viewport": 390,
+      "kind": "course",
+      "id": "subida",
+      "width": 640,
+      "height": 360,
+      "duration": 31.9,
+      "decodedAndPlayed": true
+    },
+    {
+      "viewport": 390,
+      "kind": "course",
+      "id": "galeria",
+      "width": 640,
+      "height": 360,
+      "duration": 24.7,
+      "decodedAndPlayed": true
+    },
+    {
+      "viewport": 390,
+      "kind": "course",
+      "id": "alivio",
+      "width": 640,
+      "height": 360,
+      "duration": 22.566667,
+      "decodedAndPlayed": true
+    },
+    {
+      "viewport": 390,
+      "kind": "recovery",
+      "id": "respiros",
+      "width": 640,
+      "height": 360,
+      "duration": 3.766667,
+      "decodedAndPlayed": true
+    },
+    {
+      "viewport": 390,
+      "kind": "recovery",
+      "id": "subida",
+      "width": 640,
+      "height": 360,
+      "duration": 3.6,
+      "decodedAndPlayed": true
+    },
+    {
+      "viewport": 390,
+      "kind": "recovery",
+      "id": "galeria",
+      "width": 640,
+      "height": 360,
+      "duration": 3.766667,
+      "decodedAndPlayed": true
+    },
+    {
+      "viewport": 390,
+      "kind": "recovery",
+      "id": "alivio",
+      "width": 640,
+      "height": 360,
+      "duration": 3.766667,
+      "decodedAndPlayed": true
+    }
+  ],
+  "errors": []
+}

@@ -6,6 +6,7 @@ import { drawGuairaBoss } from '../src/adventure/experimental/guaira/GuairaLabAr
 import { guairaBrowser } from './helpers/guairaLabHarness';
 
 const player = { x: 0, y: 200, width: 14, height: 24 };
+const bounds = ({ x, y, width, height }: typeof player) => ({ x, y, width, height });
 function volley(side: 'left' | 'right') {
     const b = new SkeletonBullModel(); b.x = side === 'left' ? 256 : 16;
     b.state = 'idle'; b.stateTick = 23; b.cycle = 2;
@@ -41,7 +42,7 @@ for (const side of ['left', 'right'] as const) for (const reducedMotion of [fals
         assert.equal(b.bones.some(bone => intersects(bone, g.player.getRect())), false);
         assert.equal(b.touches(g.player.getRect()), true, 'the original same-update sweep still damages the real Player');
         const endpoint = { x: side === 'left' ? 4 : 307, y: 215, width: 10, height: 7 };
-        assert.deepEqual(b.visibleBones[b.visibleBones.length - 1], endpoint); assert.equal(b.visibleBones.length, 2);
+        assert.deepEqual(bounds(b.visibleBones[b.visibleBones.length - 1]), endpoint); assert.equal(b.visibleBones.length, 2);
         const calls = paint(b, reducedMotion);
         for (const offset of [-1, 6]) assert.ok(calls.some(call => JSON.stringify(call) === JSON.stringify(['#493444', endpoint.x + offset, 214, 5, 9])), 'both bone joints remain visible at the last damaging endpoint');
         assert.deepEqual(paint(b, reducedMotion), calls);
@@ -61,7 +62,7 @@ for (const side of ['left', 'right'] as const) test(`${side} catch-up retains an
     b.update(100, player);
     assert.equal(b.stateTick, exitTick + 5);
     const endpoint = { x: side === 'left' ? 4 : 307, y: 215, width: 10, height: 7 };
-    assert.deepEqual(b.visibleBones[b.visibleBones.length - 1], endpoint);
+    assert.deepEqual(bounds(b.visibleBones[b.visibleBones.length - 1]), endpoint);
     assert.ok(b.hazards.some(hazard => intersects(hazard, endpoint)), 'the endpoint survives while its earlier substep sweep remains active');
     b.update(100, player); // This catch-up crosses the trailing projectile's safe recovery boundary.
     assert.equal(b.state, 'recover'); assert.deepEqual(b.bones, []);
@@ -71,10 +72,10 @@ for (const side of ['left', 'right'] as const) test(`${side} catch-up retains an
 
 test('all departed endpoints are retained across substeps without reusing or advancing removed objects', () => {
     const b = volley('left');
-    b.bones = [7, 10].map(x => ({ x, y: 215, width: 10, height: 7, vx: -3, life: 20 }));
+    b.bones = [7, 10].map((x, shot) => ({ x, y: 215, width: 10, height: 7, vx: -3, life: 20, age: 0, hopHeight: 0, hopTicks: 36, shot }));
     b.update(100, player);
     assert.deepEqual(b.bones, []);
-    assert.deepEqual(b.visibleBones, [4, 4].map(x => ({ x, y: 215, width: 10, height: 7 })));
+    assert.deepEqual(b.visibleBones.map(bounds), [4, 4].map(x => ({ x, y: 215, width: 10, height: 7 })));
     assert.equal(b.hazards.length, 3, 'retain the existing one- and two-step sweeps only');
     assert.equal(paint(b).filter(([color,x,y,w,h]) => color === '#493444' && x === 3 && y === 214 && w === 5 && h === 9).length, 2, 'both retained bones draw their leading joint');
 });

@@ -1,0 +1,107 @@
+{
+  "nativeInputOnly": true,
+  "actorOrClockEdits": false,
+  "setup": "ordinary checkpoint loading in test save",
+  "simulationHz": 60,
+  "captureFps": 30,
+  "poseStudy": "recovery-atlas is a separate comparison, not player completion",
+  "routes": {
+    "helmet-stomps": {
+      "frames": 175,
+      "videoFrames": 87,
+      "minHead": 67.5,
+      "maxFeet": 164,
+      "hiddenAttackFrames": 0,
+      "checkpoint": 4,
+      "contacts": [
+        {
+          "frame": 87,
+          "result": "bounce",
+          "phase": "walk",
+          "pound": false
+        },
+        {
+          "frame": 115,
+          "result": "kill",
+          "phase": "stunned",
+          "pound": false
+        }
+      ],
+      "damage": []
+    },
+    "charger-counter": {
+      "frames": 197,
+      "videoFrames": 98,
+      "minHead": 40.11880846399998,
+      "maxFeet": 164,
+      "hiddenAttackFrames": 0,
+      "checkpoint": 5,
+      "contacts": [
+        {
+          "frame": 137,
+          "result": "kill",
+          "phase": "rest",
+          "pound": false
+        }
+      ],
+      "damage": []
+    },
+    "agitator-counter": {
+      "frames": 282,
+      "videoFrames": 141,
+      "minHead": 34,
+      "maxFeet": 164,
+      "hiddenAttackFrames": 0,
+      "checkpoint": 4,
+      "contacts": [
+        {
+          "frame": 222,
+          "result": "kill",
+          "phase": "rest",
+          "pound": false
+        }
+      ],
+      "damage": []
+    },
+    "rail-window": {
+      "frames": 221,
+      "videoFrames": 110,
+      "minHead": 34,
+      "maxFeet": 164,
+      "hiddenAttackFrames": 0,
+      "checkpoint": 3,
+      "contacts": [
+        {
+          "frame": 161,
+          "result": "kill",
+          "phase": "warning",
+          "pound": false
+        }
+      ],
+      "damage": []
+    },
+    "rail-pounds": {
+      "frames": 263,
+      "videoFrames": 131,
+      "minHead": 34,
+      "maxFeet": 164,
+      "hiddenAttackFrames": 0,
+      "checkpoint": 3,
+      "contacts": [
+        {
+          "frame": 194,
+          "result": "bounce",
+          "phase": "walk",
+          "pound": false
+        },
+        {
+          "frame": 203,
+          "result": "kill",
+          "phase": "walk",
+          "pound": true
+        }
+      ],
+      "damage": []
+    }
+  }
+}

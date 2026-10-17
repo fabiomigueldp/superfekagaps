@@ -115,12 +115,14 @@ test('phased shuttles initialize px/py in the actual pose and reset without firs
 
 test('all three real Guaíra autonomous routes retain exact legacy poses, deltas and reset state', () => {
     const stage = guairaAscentStage(), originals = structuredClone(stage.mechanisms), objects = new WorldObjects(stage.mechanisms), level = new WorldLevel(stage.level);
-    const legacy = stage.mechanisms.map(spec => ({ x: spec.x, y: spec.y, px: spec.x, py: spec.y }));
+    const autonomous=stage.mechanisms.filter(spec=>spec.to&&!spec.gated&&!stage.mechanisms.some(s=>s.link===spec.id));
+    assert.equal(autonomous.length,3);
+    const legacy = autonomous.map(spec => ({ x: spec.x, y: spec.y, px: spec.x, py: spec.y }));
     let time = 0;
     for (let frame = 0; frame < 1800; frame++) {
         time += DT; objects.update(DT, level, 0);
-        for (let i = 0; i < stage.mechanisms.length; i++) {
-            const spec = stage.mechanisms[i], expected = legacy[i], body = objects.bodies[i];
+        for (let i = 0; i < autonomous.length; i++) {
+            const spec = autonomous[i], expected = legacy[i], body = objects.get(spec.id)!;
             expected.px = expected.x; expected.py = expected.y;
             const p = (1 - Math.cos(time / (spec.period ?? 5000) * Math.PI * 2)) / 2;
             const x = spec.x + (spec.to!.x - spec.x) * p, y = spec.y + (spec.to!.y - spec.y) * p, max = DT * .055;
@@ -128,6 +130,8 @@ test('all three real Guaíra autonomous routes retain exact legacy poses, deltas
             assert.deepEqual({ x: body.x, y: body.y, px: body.px, py: body.py }, expected, `${spec.id}: frame ${frame}`);
         }
     }
+    const gated=objects.bodies.find(b=>b.gated)!;
+    assert.equal(gated.y,originals.find(s=>s.id===gated.id)!.y,'the added gated bridge waits for its plate');
     const restarted = new WorldObjects(stage.mechanisms), fresh = new WorldObjects(originals);
     assert.deepEqual(restarted.bodies, fresh.bodies); assert.deepEqual(stage.mechanisms, originals);
 });

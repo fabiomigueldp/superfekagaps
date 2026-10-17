@@ -1,0 +1,122 @@
+{
+  "passed": true,
+  "date": "2026-10-17",
+  "scope": "Central rice lock in Travessia; shared course camera turn smoothing",
+  "nativeInputOnly": true,
+  "actorOrClockEdits": false,
+  "level": {
+    "width": 4352,
+    "foes": 8,
+    "newRegisteredRoutes": 1,
+    "newRegisteredCoins": 5,
+    "newOrdinaryCoins": 3,
+    "chapterRegisteredRoutes": 9,
+    "chapterRegisteredCoins": 35
+  },
+  "tests": {
+    "typescriptPass": 3585,
+    "typescriptFail": 0,
+    "typescriptSkip": 1,
+    "newCases": 19,
+    "build": "passed",
+    "phaseOffsets": [
+      0,
+      71,
+      137,
+      239
+    ],
+    "longRefugeObservationFrames": 600
+  },
+  "browser": {
+    "surfaceChecks": 8,
+    "campaignRuns": 9,
+    "distinctCampaignScenes": 8,
+    "physicalDevice": false,
+    "pageErrors": [],
+    "mapSaveAndReloadChecks": 4
+  },
+  "nativeCaptures": [
+    {
+      "mode": "main",
+      "frames": 2354,
+      "coins": 23,
+      "full": "sluice-full-main.mp4",
+      "clip": "sluice-main.mp4",
+      "clipFromSeconds": 20.616666666666667,
+      "clipToSeconds": 30.033333333333335,
+      "posterFrame": 1560,
+      "minHelmet": 26,
+      "maxFeet": 168,
+      "maxCameraStepX": 5.907965153966927
+    },
+    {
+      "mode": "high",
+      "frames": 2548,
+      "coins": 27,
+      "full": "sluice-full-high.mp4",
+      "clip": "sluice-high.mp4",
+      "clipFromSeconds": 22.733333333333334,
+      "clipToSeconds": 30.633333333333333,
+      "posterFrame": 1580,
+      "minHelmet": 26,
+      "maxFeet": 168,
+      "maxCameraStepX": 5.907965153966927
+    },
+    {
+      "mode": "recovery",
+      "frames": 2356,
+      "coins": 27,
+      "full": "sluice-full-recovery.mp4",
+      "clip": "sluice-recovery.mp4",
+      "clipFromSeconds": 24.166666666666668,
+      "clipToSeconds": 30.033333333333335,
+      "posterFrame": 1556,
+      "minHelmet": 26,
+      "maxFeet": 168,
+      "maxCameraStepX": 5.907965153966927
+    },
+    {
+      "mode": "return",
+      "frames": 3092,
+      "coins": 30,
+      "full": "sluice-full-return.mp4",
+      "clip": "sluice-return.mp4",
+      "clipFromSeconds": 29.166666666666668,
+      "clipToSeconds": 42.36666666666667,
+      "posterFrame": 1830,
+      "minHelmet": 26,
+      "maxFeet": 168,
+      "maxCameraStepX": 8.000000000000227
+    }
+  ],
+  "limitations": [
+    "Rehearsed routes do not measure discovery, difficulty or enjoyment on a first playthrough.",
+    "This round does not redesign every Guaíra district or boss.",
+    "Touch and gamepad checks use browser APIs, not physical controllers."
+  ],
+  "sourceSha256": {
+    "src/adventure/experimental/guaira/GuairaCourseDesign.ts": "b8c065821e4f85e88bdf7b20a2746557666cb0ae051378aa0b29873af7586ed9",
+    "src/adventure/experimental/guaira/GuairaCourseExploration.ts": "2519b715a2e53aa194a13ba0c4f2512c9c350dbbf65cbbd5a78628c67df047b0",
+    "src/adventure/experimental/guaira/GuairaCourseGuidance.ts": "b75b3be9190e9bc1bc3ac26676506806ae87c0c07d5d8301da6462133deab568",
+    "src/adventure/experimental/guaira/GuairaCoursePresentation.ts": "89b3ad483f3f5e477a9707491441c4dc964e070aecdfb2e552dfd306338b602f",
+    "src/adventure/experimental/guaira/GuairaMaintenanceLandscape.ts": "2b4bbe33f2e160290ac1b08be6028fb0b5f5dc71e441b2b308f397066ff00bff",
+    "src/adventure/experimental/guaira/GuairaRiceLockLandscape.ts": "132ad786a7a1227c0f6c6c22600cb0bc0ce16cdbe8e961df8ffaed0c8e45e49b",
+    "tests/guaira-rice-lock.test.ts": "6ce7a01ef1303e63d5b3ffc22dac412f5b09e983ee8c74ba98aaa42633b19b76",
+    "tests/guaira-course-returns.test.ts": "534960cee5291e5c7d91e9ccf4fbcf829ba07bfca221269493f5a55eea8669c7",
+    "tests/helpers/guairaSluiceController.ts": "04c70781f870ae2d2894f69d0abb8089cc0286ec361a7ae8b59d087257992570",
+    "tests/helpers/guairaSluiceReplays.json": "ce1b04fea857bfe376678db19baaa90c5b71fec89a7bbc2fea68065230508a4b",
+    "tests/helpers/guairaCourseController.ts": "b5d354b14c7b30f8bcb32921af8d26762453c019ff1b92d828420aceae7d8882",
+    "scripts/record_guaira_sluice.ts": "30f5cebc75a1709d61f60ff92bb49f0948d7add31df1741b15d6c687d45f1104",
+    "scripts/verify_guaira_workshop_surface.cjs": "010999e7ca1824485f77b03fdf042cbeb8b64af46a2fd01d1ef6abcf62c946ec"
+  },
+  "review": {
+    "passed": true,
+    "uniqueVideos": 8,
+    "playbackChecks": 16,
+    "widths": [
+      1440,
+      390
+    ],
+    "errors": []
+  }
+}

@@ -1436,3 +1436,17 @@ test('integrated pause, options and help retain the attempt and return focus to 
     primary.click(); assert.equal(game.state, 'playing');
     app.dispose(); h.checkDisposed();
 });
+
+test('a completed alternate opening returns to the chapter map after reload instead of restarting the side visit', async t => {
+    const h = hostBrowser(t), store = new ProgressStore(null, false);
+    store.save.guaira = { ...freshGuairaChapterProgress(), completed: ['guaira-travessia'], alternateCompleted: true,
+        selectedScene: 'guaira-respiros', resumeScene: 'guaira-patio-comportas' };
+    let loads = 0;
+    const app = h.create({ progressStore: store, loadScene: async () => { loads++; throw Error('Completed side visit must remain on map'); } });
+    await flush();
+    assert.equal(app.mode, 'map'); assert.equal(app.activeGame, null); assert.equal(loads, 0);
+    assert.equal(app.snapshot.alternateCompleted, true);
+    assert.equal(app.snapshot.nextRecommendedScene, 'guaira-respiros');
+    assert.equal(app.snapshot.accepted.length, 1); assert.equal(canContinueFromGuaira(store.save), false);
+    app.dispose(); h.checkDisposed();
+});

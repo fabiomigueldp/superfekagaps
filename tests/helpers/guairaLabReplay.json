@@ -1,7 +1,7 @@
 {
-  "description": "Native keyboard/touch route through three phases: hopping bones, full warned return charge, recovery hit and gate opening. No actor, health or clock edits.",
+  "description": "High held jumps cross both taller arcs; native inputs, no actor or clock writes.",
   "stepMs": 16.666666666666668,
-  "frames": 1267,
+  "frames": 1274,
   "runs": [
     [
       12,
@@ -203,14 +203,14 @@
       ]
     ],
     [
-      19,
+      15,
       [
         "ShiftLeft",
         "ArrowRight"
       ]
     ],
     [
-      9,
+      18,
       [
         "ShiftLeft",
         "ArrowRight",
@@ -218,40 +218,66 @@
       ]
     ],
     [
-      27,
+      16,
       [
         "ShiftLeft",
         "ArrowRight"
       ]
     ],
     [
+      3,
+      [
+        "ShiftLeft"
+      ]
+    ],
+    [
+      15,
+      [
+        "ShiftLeft",
+        "ArrowLeft"
+      ]
+    ],
+    [
+      3,
+      [
+        "ShiftLeft"
+      ]
+    ],
+    [
+      10,
+      [
+        "ShiftLeft",
+        "ArrowRight"
+      ]
+    ],
+    [
+      6,
+      [
+        "ShiftLeft"
+      ]
+    ],
+    [
       4,
       [
+        "ShiftLeft",
+        "ArrowLeft"
+      ]
+    ],
+    [
+      17,
+      [
         "ShiftLeft"
       ]
     ],
     [
-      13,
+      52,
       [
         "ShiftLeft",
         "ArrowLeft"
       ]
     ],
     [
-      22,
-      [
-        "ShiftLeft"
-      ]
-    ],
-    [
-      57,
-      [
-        "ShiftLeft",
-        "ArrowLeft"
-      ]
-    ],
-    [
-      44,
+      40,
       [
         "ShiftLeft"
       ]
@@ -400,13 +426,7 @@
       ]
     ],
     [
-      32,
-      [
-        "ShiftLeft"
-      ]
-    ],
-    [
-      7,
+      39,
       [
         "ShiftLeft"
       ]
@@ -451,14 +471,14 @@
       ]
     ],
     [
-      19,
+      12,
       [
         "ShiftLeft",
         "ArrowLeft"
       ]
     ],
     [
-      15,
+      18,
       [
         "ShiftLeft",
         "ArrowLeft",
@@ -466,36 +486,55 @@
       ]
     ],
     [
-      21,
+      25,
       [
         "ShiftLeft",
         "ArrowLeft"
       ]
     ],
     [
-      4,
+      3,
       [
         "ShiftLeft"
       ]
     ],
     [
-      13,
+      15,
       [
         "ShiftLeft",
         "ArrowRight"
       ]
     ],
     [
-      22,
+      3,
       [
         "ShiftLeft"
       ]
     ],
     [
-      9,
+      10,
       [
         "ShiftLeft",
         "ArrowLeft"
+      ]
+    ],
+    [
+      6,
+      [
+        "ShiftLeft"
+      ]
+    ],
+    [
+      4,
+      [
+        "ShiftLeft",
+        "ArrowRight"
+      ]
+    ],
+    [
+      10,
+      [
+        "ShiftLeft"
       ]
     ],
     [
@@ -513,19 +552,19 @@
       "health": 4
     },
     {
-      "frame": 547,
+      "frame": 551,
       "health": 3
     },
     {
-      "frame": 696,
+      "frame": 700,
       "health": 2
     },
     {
-      "frame": 960,
+      "frame": 964,
       "health": 1
     },
     {
-      "frame": 1176,
+      "frame": 1177,
       "health": 0
     }
   ],
@@ -533,9 +572,17 @@
     84,
     239,
     397,
-    607,
-    756,
-    846,
-    1020
-  ]
+    611,
+    760,
+    850,
+    1024
+  ],
+  "expectedFinalHealth": 0,
+  "expectedDamageFrames": [],
+  "markers": {
+    "firstVolley": 445,
+    "finalVolley": 1072,
+    "returnTell": 850,
+    "defeat": 1178
+  }
 }

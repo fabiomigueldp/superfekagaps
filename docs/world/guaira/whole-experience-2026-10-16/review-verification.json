@@ -1,0 +1,42 @@
+{
+  "views": [
+    {
+      "width": 1440,
+      "fits": true,
+      "videos": [
+        {
+          "duration": 12.65,
+          "width": 960,
+          "height": 540,
+          "error": null
+        },
+        {
+          "duration": 10.216667,
+          "width": 960,
+          "height": 540,
+          "error": null
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "fits": true,
+      "videos": [
+        {
+          "duration": 12.65,
+          "width": 960,
+          "height": 540,
+          "error": null
+        },
+        {
+          "duration": 10.216667,
+          "width": 960,
+          "height": 540,
+          "error": null
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

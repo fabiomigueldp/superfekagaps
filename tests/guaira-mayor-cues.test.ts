@@ -100,7 +100,8 @@ test('recovery readout shares the real deadline across lift travel, reclosure, p
     assert.equal(b.vulnerable, true); assert.equal(b.recoveryProgress,2/R.minimumOpening,'reopening cannot refill the back rail');
     assert.equal(b.contact({ x: 274, y: 100, width: 14, height: 24 }, { x: 274, y: 96, width: 14, height: 24 }, true), 'hit');
     assert.equal(b.recoveryProgress, 0, 'a successful contact clears the readout');
-    advance(R.hurt + R.idle + 2 * (R.jetWarning + R.jetBeat) + R.warning + R.leap + R.stamp + R.returning);
+    for(let n=0;n<1600&&b.state!=='recover';n++)advance(1);
+    assert.equal(b.state,'recover');
     advance(1, { valveActive: true, liftReady: true, registerOpened: true });
     assert.equal(b.counterpressure?.phase, 'warning');
     advance(R.counterpressureWarning, { valveActive: true, liftReady: true, registerOpened: false });

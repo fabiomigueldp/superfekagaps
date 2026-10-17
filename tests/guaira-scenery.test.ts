@@ -9,6 +9,7 @@ import { GuairaBullLab } from '../src/adventure/experimental/guaira/GuairaBullLa
 import { GuairaAscent } from '../src/adventure/experimental/guaira/GuairaAscent';
 import { GuairaMayorLab } from '../src/adventure/experimental/guaira/GuairaMayorLab';
 import { drawGuairaAscentBackground } from '../src/adventure/experimental/guaira/GuairaAscentArt';
+import { GUAIRA_DISTANT_COLORS } from '../src/adventure/experimental/guaira/GuairaDistantScenery';
 
 const landscapes: GuairaLandscape[] = ['village', 'junction', 'rice', 'corral', 'heights', 'town'];
 class Raster {
@@ -33,6 +34,7 @@ class Raster {
 
 test('all landscapes are continuous below the horizon, respect the HUD clip and restore Canvas state', () => {
     const land = new Set(['#b8b39a', '#c8bea0', '#a5aa86', '#c0ab87', '#b7b38b', '#8fa58b', '#afbc9d', '#929e7d']);
+    for (const color of Object.values(GUAIRA_DISTANT_COLORS)) land.add(color);
     for (const kind of landscapes) for (const cx of [0, 337, 719.8, 1100, 1500]) {
         const c = new Raster(); drawGuairaLandscape(c.context, cx, 64.2, 6400, false, kind);
         assert.ok(c.pixels.slice(0, 320 * 23).every(color => color === ''));

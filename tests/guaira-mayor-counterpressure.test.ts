@@ -2,13 +2,15 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { GuairaMayorModel, MAYOR_ARENA as A, MAYOR_RULES as R, type MayorAccess } from '../src/adventure/experimental/guaira/GuairaMayorModel';
 
-const volley = 2 * (R.jetWarning + R.jetBeat);
-const finalVolley = 3 * (R.finalJetWarning + R.finalJetBeat);
 const closed: MayorAccess = { valveActive: false, liftReady: false, registerOpened: false };
 const ready: MayorAccess = { valveActive: true, liftReady: true, registerOpened: false };
 const opened: MayorAccess = { ...ready, registerOpened: true };
 function advance(b: GuairaMayorModel, count: number, access = closed) {
     for (let i = 0; i < count; i++) b.update(R.tickMs, access);
+}
+function recover(b: GuairaMayorModel, access = closed) {
+    for (let n = 0; n < 1600 && b.state !== 'recover'; n++) b.update(R.tickMs, access);
+    assert.equal(b.state, 'recover');
 }
 function topHit(b: GuairaMayorModel, width = 14) {
     const p = { x: width === 14 ? 274 : 208, y: 119, width, height: 24 };
@@ -18,7 +20,7 @@ function laterRecovery() {
     const b = new GuairaMayorModel();
     advance(b, R.intro + R.idle + R.warning + R.leap + R.stamp + R.returning);
     b.update(R.tickMs, opened); assert.equal(topHit(b), 'hit');
-    advance(b, R.hurt + R.idle + volley + R.warning + R.leap + R.stamp + R.returning);
+    recover(b);
     assert.equal(b.state, 'recover'); assert.equal(b.sealsRemaining, 2);
     return b;
 }
@@ -72,7 +74,7 @@ for (const age of [0, 30, 60, 70]) test(`manual reclosure at pressure tick ${age
     assert.equal(b.counterpressure, null); assert.equal(b.danger, null); assert.equal(b.vulnerable, false);
     b.update(R.tickMs, opened); advance(b, 90, ready);
     assert.equal(b.counterpressure, null); assert.equal(b.vulnerable, true, 'reopening retains the ordinary valid top hit');
-    advance(b, R.recover - b.stateTick + R.idle + volley + R.warning + R.leap + R.stamp + R.returning, ready);
+    advance(b, b.recoveryTicksRemaining, ready); recover(b, ready);
     assert.equal(b.state, 'recover'); assert.equal(b.registerOpenedThisCycle, false);
     b.update(R.tickMs, opened);
     assert.deepEqual(b.counterpressure, { phase: 'warning', rect: A.seam, ticksRemaining: 60, progress: 0 }, 'next stamped cycle gets one new pulse');
@@ -94,7 +96,7 @@ for (const remaining of [90, 65, 5]) test(`late opening with ${remaining} origin
     advance(b,b.recoveryTicksRemaining,ready);
     assert.equal(b.state, 'idle'); assert.equal(b.counterpressure, null); assert.equal(b.danger, null);
     assert.equal(b.sealsRemaining, 2); assert.equal(b.vulnerable, false);
-    advance(b, R.idle + volley + R.warning + R.leap + R.stamp + R.returning, ready);
+    recover(b, ready);
     assert.equal(b.registerOpenedThisCycle, false); assert.equal(b.counterpressure, null);
     b.update(R.tickMs, opened); assert.equal(b.counterpressure!.ticksRemaining, 60);
 });
@@ -105,7 +107,7 @@ test('top contact wins over simultaneous water contact; successful hits and rele
     assert.equal(b.contact({ x: 274, y: 130, width: 14, height: 24 }, b, false), 'none', 'body side contact never hurts');
     assert.equal(topHit(b, 80), 'hit', 'falling top hit takes precedence even when the rectangle also intersects water');
     assert.equal(b.counterpressure, null); assert.equal(b.danger, null);
-    advance(b, R.hurt + R.idle + finalVolley + R.warning + R.leap + R.stamp + R.secondWarning + R.secondLeap + R.stamp + R.returning);
+    recover(b);
     b.update(R.tickMs, opened); advance(b, 60, ready);
     assert.equal(topHit(b), 'defeated'); assert.equal(b.publicWaterOpen, true);
     assert.equal(b.counterpressure, null); advance(b, 360, opened); assert.equal(b.counterpressure, null);

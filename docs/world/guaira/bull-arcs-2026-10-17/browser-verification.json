@@ -1,0 +1,270 @@
+{
+  "physicalDevice": false,
+  "routes": [
+    {
+      "route": "guairaLabReplay",
+      "touch": false,
+      "frames": 1274,
+      "hits": [
+        180,
+        338,
+        552,
+        701,
+        965,
+        1178
+      ],
+      "damage": [],
+      "minHead": 32,
+      "health": 0,
+      "finished": true,
+      "reduced": false,
+      "renderCpuMs": {
+        "samples": 1214,
+        "median": 1.8999999985098839,
+        "p95": 6.899999998509884
+      }
+    },
+    {
+      "route": "guairaLabReplay",
+      "touch": true,
+      "frames": 1274,
+      "hits": [
+        180,
+        338,
+        552,
+        701,
+        965,
+        1178
+      ],
+      "damage": [],
+      "minHead": 32,
+      "health": 0,
+      "finished": true,
+      "reduced": true,
+      "renderCpuMs": {
+        "samples": 1214,
+        "median": 1.7999999970197678,
+        "p95": 9.600000001490116
+      }
+    },
+    {
+      "route": "guairaBullPoundReplay",
+      "touch": false,
+      "frames": 1294,
+      "hits": [
+        180,
+        338,
+        569,
+        718,
+        982,
+        1198
+      ],
+      "damage": [],
+      "minHead": 32,
+      "health": 0,
+      "finished": true,
+      "reduced": false,
+      "renderCpuMs": {
+        "samples": 1234,
+        "median": 1.7999999970197678,
+        "p95": 9.600000001490116
+      }
+    },
+    {
+      "route": "guairaBullPoundReplay",
+      "touch": true,
+      "frames": 1294,
+      "hits": [
+        180,
+        338,
+        569,
+        718,
+        982,
+        1198
+      ],
+      "damage": [],
+      "minHead": 32,
+      "health": 0,
+      "finished": true,
+      "reduced": true,
+      "renderCpuMs": {
+        "samples": 1234,
+        "median": 1.2000000029802322,
+        "p95": 9.5
+      }
+    },
+    {
+      "route": "guairaBullMissReplay",
+      "touch": false,
+      "frames": 390,
+      "hits": [
+        385
+      ],
+      "damage": [],
+      "minHead": 53,
+      "health": 5,
+      "finished": false,
+      "reduced": false,
+      "renderCpuMs": {
+        "samples": 330,
+        "median": 1.1000000014901161,
+        "p95": 7.399999998509884
+      }
+    },
+    {
+      "route": "guairaBullMissReplay",
+      "touch": true,
+      "frames": 390,
+      "hits": [
+        385
+      ],
+      "damage": [],
+      "minHead": 53,
+      "health": 5,
+      "finished": false,
+      "reduced": true,
+      "renderCpuMs": {
+        "samples": 330,
+        "median": 1.1000000014901161,
+        "p95": 9.099999994039536
+      }
+    },
+    {
+      "route": "guairaBullArcFailureReplay",
+      "touch": false,
+      "frames": 500,
+      "hits": [
+        180,
+        338
+      ],
+      "damage": [
+        474
+      ],
+      "minHead": 53,
+      "health": 4,
+      "finished": false,
+      "reduced": false,
+      "renderCpuMs": {
+        "samples": 440,
+        "median": 1.2000000029802322,
+        "p95": 10.300000004470348
+      }
+    },
+    {
+      "route": "guairaBullArcFailureReplay",
+      "touch": true,
+      "frames": 500,
+      "hits": [
+        180,
+        338
+      ],
+      "damage": [
+        474
+      ],
+      "minHead": 53,
+      "health": 4,
+      "finished": false,
+      "reduced": true,
+      "renderCpuMs": {
+        "samples": 440,
+        "median": 1.1999999955296516,
+        "p95": 10
+      }
+    }
+  ],
+  "pauses": [
+    {
+      "route": "guairaLabReplay",
+      "target": 864,
+      "expected": "turn",
+      "reduced": false,
+      "paused": true,
+      "pixelsFrozen": true,
+      "stateFrozen": true
+    },
+    {
+      "route": "guairaLabReplay",
+      "target": 1202,
+      "expected": "defeated",
+      "reduced": false,
+      "paused": true,
+      "pixelsFrozen": true,
+      "stateFrozen": true
+    },
+    {
+      "route": "guairaBullMissReplay",
+      "target": 251,
+      "expected": "idle",
+      "reduced": false,
+      "paused": true,
+      "pixelsFrozen": true,
+      "stateFrozen": true
+    },
+    {
+      "route": "guairaLabReplay",
+      "target": 481,
+      "expected": "bones",
+      "reduced": false,
+      "paused": true,
+      "pixelsFrozen": true,
+      "stateFrozen": true
+    },
+    {
+      "route": "guairaLabReplay",
+      "target": 455,
+      "expected": "bones",
+      "reduced": false,
+      "paused": true,
+      "pixelsFrozen": true,
+      "stateFrozen": true
+    },
+    {
+      "route": "guairaLabReplay",
+      "target": 864,
+      "expected": "turn",
+      "reduced": true,
+      "paused": true,
+      "pixelsFrozen": true,
+      "stateFrozen": true
+    },
+    {
+      "route": "guairaLabReplay",
+      "target": 1202,
+      "expected": "defeated",
+      "reduced": true,
+      "paused": true,
+      "pixelsFrozen": true,
+      "stateFrozen": true
+    },
+    {
+      "route": "guairaBullMissReplay",
+      "target": 251,
+      "expected": "idle",
+      "reduced": true,
+      "paused": true,
+      "pixelsFrozen": true,
+      "stateFrozen": true
+    },
+    {
+      "route": "guairaLabReplay",
+      "target": 481,
+      "expected": "bones",
+      "reduced": true,
+      "paused": true,
+      "pixelsFrozen": true,
+      "stateFrozen": true
+    },
+    {
+      "route": "guairaLabReplay",
+      "target": 455,
+      "expected": "bones",
+      "reduced": true,
+      "paused": true,
+      "pixelsFrozen": true,
+      "stateFrozen": true
+    }
+  ],
+  "review": [],
+  "errors": [],
+  "passed": true
+}

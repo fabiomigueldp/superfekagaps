@@ -1,0 +1,90 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "viewport": 1440,
+      "id": "travessia",
+      "width": 640,
+      "height": 360,
+      "duration": 34.433333
+    },
+    {
+      "viewport": 1440,
+      "id": "patio",
+      "width": 640,
+      "height": 360,
+      "duration": 42.666667
+    },
+    {
+      "viewport": 1440,
+      "id": "respiros",
+      "width": 640,
+      "height": 360,
+      "duration": 31.766667
+    },
+    {
+      "viewport": 1440,
+      "id": "subida",
+      "width": 640,
+      "height": 360,
+      "duration": 33.533333
+    },
+    {
+      "viewport": 1440,
+      "id": "galeria",
+      "width": 640,
+      "height": 360,
+      "duration": 21.6
+    },
+    {
+      "viewport": 1440,
+      "id": "alivio",
+      "width": 640,
+      "height": 360,
+      "duration": 18.066667
+    },
+    {
+      "viewport": 390,
+      "id": "travessia",
+      "width": 640,
+      "height": 360,
+      "duration": 34.433333
+    },
+    {
+      "viewport": 390,
+      "id": "patio",
+      "width": 640,
+      "height": 360,
+      "duration": 42.666667
+    },
+    {
+      "viewport": 390,
+      "id": "respiros",
+      "width": 640,
+      "height": 360,
+      "duration": 31.766667
+    },
+    {
+      "viewport": 390,
+      "id": "subida",
+      "width": 640,
+      "height": 360,
+      "duration": 33.533333
+    },
+    {
+      "viewport": 390,
+      "id": "galeria",
+      "width": 640,
+      "height": 360,
+      "duration": 21.6
+    },
+    {
+      "viewport": 390,
+      "id": "alivio",
+      "width": 640,
+      "height": 360,
+      "duration": 18.066667
+    }
+  ],
+  "errors": []
+}

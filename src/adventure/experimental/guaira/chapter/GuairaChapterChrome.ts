@@ -1,6 +1,7 @@
 import { DisposalScope } from '../../../../engine/DisposalScope';
 import { GuairaChapterAction } from './GuairaChapterAction';
 import type { GuairaChapterControlsHelp } from './GuairaChapterControlsHelp';
+import type { GamepadMenuCommand } from '../../../../engine/StandardGamepad';
 
 /** A scene keeps its dimensions through play, pause, help and completion. */
 export function chapterSceneChrome(scope: DisposalScope, canvas: HTMLCanvasElement, nav: HTMLElement,
@@ -29,6 +30,9 @@ export function chapterSceneChrome(scope: DisposalScope, canvas: HTMLCanvasEleme
     warning.setAttribute('role', 'alert'); warning.hidden = true; nav.append(warning);
     let state = 'loading', showingOptions = false;
     const active = () => !scope.isDisposed && !help.isOpen && !document.hidden;
+    const ownsFocus = () => document.activeElement === canvas || nav.contains(document.activeElement);
+    const menuButtons = () => (showingOptions ? [sound, help.button, retry, back] : [primary, settings, map])
+        .filter(button => !button.hidden && !button.disabled);
     const focus = (element: HTMLElement) => { if (active()) element.focus({ preventScroll: true }); };
     const showOptions = (show: boolean, moveFocus = true) => {
         showingOptions = show;
@@ -50,15 +54,14 @@ export function chapterSceneChrome(scope: DisposalScope, canvas: HTMLCanvasEleme
         if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) return;
         if (event.target !== canvas && !nav.contains(event.target as Node)) return;
         event.preventDefault(); event.stopImmediatePropagation();
-        const buttons = (showingOptions ? [sound, help.button, retry, back] : [primary, settings, map])
-            .filter(button => !button.hidden && !button.disabled);
+        const buttons = menuButtons();
         const index = buttons.indexOf(document.activeElement as HTMLButtonElement);
         const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1
             : (index + (event.key === 'ArrowUp' ? -1 : 1) + buttons.length) % buttons.length;
         if (buttons[next]) focus(buttons[next]);
     }, true);
     showOptions(false, false);
-    return (paused: boolean, complete = false, storageWarning = '') => {
+    const sync = (paused: boolean, complete = false, storageWarning = '') => {
         if (warning.textContent !== storageWarning) warning.textContent = storageWarning;
         warning.hidden = !storageWarning;
         const next = paused ? 'paused' : complete ? 'complete' : 'playing';
@@ -73,4 +76,32 @@ export function chapterSceneChrome(scope: DisposalScope, canvas: HTMLCanvasEleme
         if (paused && ownedFocus) focus(primary);
         else if (previous === 'paused' && ownedFocus) focus(canvas);
     };
+    const controllerOwner = (): string | null => {
+        if (scope.isDisposed || document.hidden || typeof document.hasFocus === 'function' && !document.hasFocus()) return null;
+        if (help.isOpen) return help.canControl() ? 'help' : null;
+        if (!ownsFocus() || canvas.inert || document.querySelector?.('dialog[open]')) return null;
+        return state === 'playing' ? document.activeElement === canvas ? 'playing' : null
+            : state === 'paused' ? showingOptions ? 'paused:options' : 'paused:main'
+                : state === 'complete' ? 'complete' : null;
+    };
+    const control = (command: GamepadMenuCommand) => {
+        const owner = controllerOwner();
+        if (!owner) return;
+        if (owner === 'help') { help.control(command); return; }
+        if (owner === 'playing') return; // The host owns Start's live pause transition.
+        if (command === 'back' || command === 'pause') {
+            if (showingOptions) showOptions(false);
+            else if (state === 'paused') primary.click();
+            else if (command === 'back') (optional ? map : primary).click();
+            return;
+        }
+        const buttons = menuButtons();
+        const selected = buttons.indexOf(document.activeElement as HTMLButtonElement);
+        if (command === 'confirm') (buttons[selected] ?? buttons[0])?.click();
+        else if (['up', 'down', 'left', 'right'].includes(command) && buttons.length) {
+            const direction = command === 'up' || command === 'left' ? -1 : 1;
+            focus(buttons[(selected + direction + buttons.length) % buttons.length]);
+        }
+    };
+    return Object.assign(sync, { controllerOwner, control });
 }

@@ -1,3 +1,4 @@
+import { introductionReached } from './helpers/guairaCourseTest';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
@@ -19,7 +20,7 @@ function replay(h: ReturnType<typeof guairaAscentBrowser>, game: GuairaAscent, t
     for (const [count, keys] of recording.runs as Array<[number, string[]]>) {
         if (touch) {
             const touches = keys.map((key, i) => ({ identifier: i + 1, target: h.canvas,
-                clientX: (key === 'ArrowRight' ? .22 : .93) * 640, clientY: 330 }));
+                clientX: ({ArrowLeft:.08,ArrowRight:.22,ArrowDown:.5,ShiftLeft:.78,Space:.93}[key as 'Space']) * 640, clientY: 330 }));
             h.canvas.dispatch('touchstart', { touches });
         } else h.keys(keys);
         for (let n = 0; n < count; n++, frame++) {
@@ -55,9 +56,9 @@ test('isolated ascent clones authored stage and uses native player/input/rendere
     const h = guairaAscentBrowser(t), before = structuredClone(STAGES), worlds = structuredClone(ISLANDS), game = h.create();
     assert.ok(game.player instanceof Player); assert.ok(game.input instanceof Input); assert.ok(game.renderer instanceof Renderer);
     assert.equal(game.stage.id, G.id); assert.equal(game.boss, null); assert.deepEqual(game.stage.exits, []);
-    assert.deepEqual(game.stage.foes, []); assert.equal(game.stage.level.width, 84); assert.equal(game.stage.level.height, 25);
+    assert.equal(game.stage.foes.length, 8); assert.equal(game.stage.level.width, G.width); assert.equal(game.stage.level.height, 25);
     assert.equal(game.player.data.position.x, 48); assert.equal(feet(game), 304);
-    assert.deepEqual(game.objects.bodies.map(b => [b.kind, b.x, b.y, b.width, b.height]), [['platform',240,304,80,8],['lift',672,304,80,8],['platform',896,144,80,8]]);
+    assert.deepEqual(game.objects.bodies.filter(b => !b.id.includes(':course:')).map(b => [b.kind, b.x, b.y, b.width, b.height]), [['platform',240,304,80,8],['lift',672,304,80,8],['platform',896,144,80,8]]);
     const changed = guairaAscentStage(); changed.level.tiles[19][0] = 0;
     assert.notEqual(guairaAscentStage().level.tiles[19][0], 0);
     game.render(); assert.ok(h.canvas.drawCalls > 0);
@@ -65,12 +66,12 @@ test('isolated ascent clones authored stage and uses native player/input/rendere
     assert.equal(game.mapReturnHref, './guaira.html?at=corral');
 });
 
-for (const touch of [false, true]) test(`${touch ? 'native touch' : 'keyboard'} completes all three vehicles and both checkpoints without run or pound`, t => {
+for (const touch of [false, true]) test(`${touch ? 'native touch' : 'keyboard'} completes the three-vehicle introduction and the developed rooftop course`, t => {
     const h = guairaAscentBrowser(t, { touch }), game = h.create();
     let completions = 0;
     (game as unknown as { complete(): void }).complete = () => { completions++; };
     replay(h, game, touch);
-    assert.equal(game.finished, true); assert.equal(game.coins, 1); assert.equal(game.store.save.checkpoint?.index, 1);
+    assert.equal(game.finished, true); assert.equal(game.coins, recording.coins); assert.equal(game.store.save.checkpoint?.index, game.stage.checkpoints.length-1);
     assert.equal(feet(game), G.terraceY); assert.equal(game.player.data.velocity.x, 0);
     assert.equal(game.mapReturnHref, './guaira.html?at=vazao&visit=ascent-clear');
     assert.deepEqual(game.store.save.completed, []); assert.deepEqual(game.store.save.times, {}); assert.equal(completions, 0);
@@ -244,11 +245,11 @@ test('optional inspection coins and two ordinary jumps return to the upper safe 
     h.run(game, 28, ['ArrowRight']); h.run(game, 20);
     h.run(game, 40, ['ArrowRight', 'Space']); h.run(game, 160);
     h.run(game, 50, ['ArrowRight', 'Space']); h.run(game, 90, ['ArrowRight']);
-    assert.equal(game.finished, true, 'upper checkpoint restores a natively completable crossing');
+    assert.equal(introductionReached(game), true, 'upper checkpoint restores a natively completable crossing');
     assert.equal(game.coins, 4);
     game.load(G.id);
     assert.equal(game.coins, 0); assert.equal(game.store.save.checkpoint, null);
-    assert.equal(game.stage.pickups?.length, 14);
+    assert.equal(game.stage.pickups.filter(p=>!p.id.includes(':course:')).length, 14);
 });
 
 

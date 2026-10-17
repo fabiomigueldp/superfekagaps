@@ -1,0 +1,61 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "path": "/@vite/client",
+      "status": 200
+    },
+    {
+      "path": "/guaira-prefeito.html",
+      "status": 200
+    },
+    {
+      "path": "/?chapter=guaira",
+      "status": 200
+    },
+    {
+      "path": "README.md",
+      "status": 200
+    },
+    {
+      "path": "ground.mp4",
+      "status": 200
+    },
+    {
+      "path": "upper.mp4",
+      "status": 200
+    },
+    {
+      "path": "upper-atlas.png",
+      "status": 200
+    },
+    {
+      "path": "interrupt.mp4",
+      "status": 200
+    },
+    {
+      "path": "wait.mp4",
+      "status": 200
+    },
+    {
+      "path": "retry.mp4",
+      "status": 200
+    },
+    {
+      "path": "native-verification.json",
+      "status": 200
+    },
+    {
+      "path": "verification.json",
+      "status": 200
+    },
+    {
+      "path": "../whole-experience-2026-10-16/index.html#prefeito-mobilidade",
+      "status": 200
+    },
+    {
+      "path": "../mayor-pressure-rhythm-2026-10-16/index.html",
+      "status": 200
+    }
+  ]
+}

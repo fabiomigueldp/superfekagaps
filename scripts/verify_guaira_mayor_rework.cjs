@@ -5,11 +5,12 @@ const base=process.env.FEKA_UI_URL||'http://127.0.0.1:3000';
 const routes=['tests/helpers/guairaMayorGroundReplay.json'];
 if(process.env.GUAIRA_MAYOR_EXTRA_ROUTE)routes.push(...process.env.GUAIRA_MAYOR_EXTRA_ROUTE.split(',').map(file=>file.trim()).filter(Boolean));
 const review=process.env.GUAIRA_MAYOR_REVIEW_PATH||'/docs/world/guaira/mayor-rework-2026-10-16/index.html';
+const offensive=process.env.GUAIRA_MAYOR_OFFENSIVE==='1';
 (async()=>{const browser=await chromium.launch({headless:true,channel:'msedge'}),report={physicalDevice:false,checks:[],errors:[]};
  try{
   for(const file of routes)for(const touch of [false,true]){
    const tape=JSON.parse(fs.readFileSync(file,'utf8')),route=path.basename(file,'.json');
-   const context=await browser.newContext({viewport:{width:1280,height:800},hasTouch:touch,reducedMotion:touch?'reduce':'no-preference'}),page=await context.newPage();
+   const context=await browser.newContext({viewport:offensive&&touch?{width:844,height:390}:{width:1280,height:800},hasTouch:touch,reducedMotion:touch?'reduce':'no-preference'}),page=await context.newPage();
    page.on('pageerror',e=>report.errors.push(e.message));await page.goto(base+'/guaira-prefeito.html',{waitUntil:'networkidle'});
    await page.waitForFunction(()=>window.worldGame?.mayor);await page.locator('#game-canvas').focus();
    await page.evaluate(()=>{const g=window.worldGame;g.cancelFrame();g.running=false;g.load(g.stage.id);window.__proof={frames:0,minHead:Infinity};});
@@ -24,14 +25,28 @@ const review=process.env.GUAIRA_MAYOR_REVIEW_PATH||'/docs/world/guaira/mayor-rew
      window.__pointerHeld=keys;
     },keys);
     else{const next=new Set(keys);for(const k of held)if(!next.has(k))await page.keyboard.up(k);for(const k of next)if(!held.has(k))await page.keyboard.down(k);held=next;}
-    await page.evaluate(count=>{const g=window.worldGame,p=window.__proof;for(let i=0;i<count;i++){g.update(1000/60);p.frames++;
+    await page.evaluate(({count,offensive})=>{const g=window.worldGame,p=window.__proof;for(let i=0;i<count;i++){const start=performance.now();g.update(1000/60);p.frames++;
      if(g.player.data.isDead||!g.player.data.hasHelmet)throw Error(JSON.stringify({at:p.frames,x:g.player.data.position.x,y:g.player.data.position.y,target:g.mayor.stampTarget,phase:g.mayor.state,input:g.input.getState(),touch:navigator.maxTouchPoints,focused:document.activeElement?.id}));
      p.minHead=Math.min(p.minHead,Math.round(g.player.data.position.y)-Math.round(g.camera.y)-4);
-    }g.render();},count);
+     if(offensive){g.render();if(g.mayor.rush)(p.frameWork??=[]).push(performance.now()-start);}
+    }g.render();},{count,offensive});
+    if(offensive&&keys.length===0&&await page.evaluate(()=>!!window.worldGame.mayor.rush&&!window.__proof.pausedDuringPursuit)){
+     await page.locator('#lab-pause').click();
+     await page.evaluate(()=>{const g=window.worldGame;
+      if(g.state!=='paused')throw Error('toolbar did not pause');
+      const snap=()=>JSON.stringify({m:g.mayor,p:g.player.data,o:g.objects,c:g.camera});
+      const before=snap();for(let n=0;n<90;n++)g.update(1000/60);g.render();
+      if(snap()!==before)throw Error('pursuit advanced while paused');
+      window.__proof.pausedDuringPursuit=g.mayor.state;
+     });
+     await page.locator('#lab-pause').click();await page.locator('#game-canvas').focus();
+    }
    }
    if(!touch)for(const k of held)await page.keyboard.up(k);
-   const state=await page.evaluate(()=>({touch:navigator.maxTouchPoints>0,reduced:window.worldGame.reducedMotion,finished:window.worldGame.mayor.publicWaterOpen,...window.__proof}));
+   const state=await page.evaluate(()=>{const p=window.__proof,samples=[...(p.frameWork??[])].sort((a,b)=>a-b);return{touch:navigator.maxTouchPoints>0,reduced:window.worldGame.reducedMotion,finished:window.worldGame.mayor.publicWaterOpen,...p,
+    frameWork:samples.length?{samples:samples.length,medianMs:samples[Math.floor(samples.length*.5)],p95Ms:samples[Math.floor(samples.length*.95)],maxMs:samples.at(-1),scope:'fixed-step update and draw during pursuit; excludes presentation and frame scheduling'}:null};});
    assert.equal(state.finished,true);assert.equal(state.frames,tape.frames);assert.ok(state.minHead>=26);
+   if(offensive)assert.ok(state.pausedDuringPursuit);
    await page.screenshot({path:path.join(out,route+'-'+(touch?'touch':'keyboard')+'-complete.png')});
    await page.keyboard.press('Escape');await page.evaluate(()=>window.worldGame.update(1000/60));
    assert.equal(await page.evaluate(()=>window.worldGame.state),'paused');

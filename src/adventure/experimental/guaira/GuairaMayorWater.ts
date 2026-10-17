@@ -1,5 +1,16 @@
 import type { Rect } from '../../../types';
 
+/** The crest leads the boots, with a low trailing wake. The entire dangerous
+ * silhouette is painted by the same contours, including the first active tick. */
+export function mayorRushWater(q: Readonly<Rect>, direction: -1 | 1): readonly Readonly<Rect>[] {
+    return [
+        { x: q.x + (direction === 1 ? 24 : 8), y: q.y, width: 12, height: 5 },
+        { x: q.x + (direction === 1 ? 16 : 4), y: q.y + 5, width: 24, height: 7 },
+        { x: q.x + (direction === 1 ? 6 : 0), y: q.y + 12, width: q.width - 6, height: 6 },
+        { x: q.x, y: q.y + 18, width: q.width, height: q.height - 18 }
+    ];
+}
+
 /** Stepped pixel silhouettes shared by collision and paint. The warning bounds
  * enclose the entire burst; the empty upper corners are genuinely safe. */
 export function mayorStampWater(q: Readonly<Rect>): readonly Readonly<Rect>[] {

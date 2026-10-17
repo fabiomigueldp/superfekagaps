@@ -17,7 +17,43 @@ export function drawGuairaMayorFeedback(c:CanvasRenderingContext2D,m:GuairaMayor
     for(const e of m.feedback??[]){
         if(![e.x,e.y,e.age,e.duration].every(Number.isFinite)||e.age<0||e.duration<=0||e.age>=e.duration)continue;
         const p=e.age/e.duration;
-        if(e.kind==='interrupt'||e.kind==='drain'){
+        if(e.kind==='footstep'){
+            // Short heel marks follow real travelled distance, not render FPS.
+            if(!reduced){
+                const dir=-(e.direction??1),spread=e.age*.55;
+                for(let i=0;i<3;i++){
+                    const y=e.y-1-e.age*(.32+i*.12)+e.age*e.age*.028;
+                    if(y<e.y)r(e.x+dir*(6+i*3+spread),y,2,1,i===1?P.cream:P.creamShade);
+                }
+            }
+        }else if(['landing','rush','brake','stamp'].includes(e.kind)){
+            // Warm grit and pale droplets sit behind the damaging cyan crest.
+            // Positions derive from immutable age: no random render-time motion.
+            if(reduced){
+                r(e.x-17,e.y-1,10,1,P.creamLight);r(e.x+8,e.y-1,10,1,P.creamLight);
+            }else if(e.age<28){
+                const spread=2+e.age*.65;
+                for(let i=0;i<8;i++){
+                    const dir=e.kind==='rush'?-(e.direction??1):e.kind==='brake'?(e.direction??1):i%2?1:-1;
+                    const speed=.7+Math.floor(i/2)*.38;
+                    const arc=e.kind==='brake'?.3:e.kind==='rush'?.5:1;
+                    const x=e.x+dir*(7+spread*speed),y=e.y-2-e.age*(.8+i*.09)*arc+e.age*e.age*.046;
+                    if(y>=e.y)continue;
+                    r(x,y,i%3?2:3,2,i%3?P.creamShade:P.creamLight);
+                    if(i%3===0)r(x+dir,y+2,1,2,P.cream);
+                }
+                if(e.age<14){
+                    if(e.kind==='brake'){
+                        const length=Math.min(24,6+e.age),dir=e.direction??1;
+                        r(e.x+(dir===1?-length:0),e.y-1,length,1,P.creamLight);
+                        r(e.x+(dir===1?-length+2:2),e.y-3,length-4,1,P.dust);
+                    }else{
+                        r(e.x-8-spread,e.y-1,Math.max(2,12-e.age*.5),1,P.creamLight);
+                        r(e.x+4+spread,e.y-1,Math.max(2,12-e.age*.5),1,P.creamLight);
+                    }
+                }
+            }
+        }else if(e.kind==='interrupt'||e.kind==='drain'){
             const route=e.y<180?UPPER:LOWER;
             // A restrained pearl reflection travels inside the installed pipe.
             // It is deliberately different from the solid cyan damage volumes.

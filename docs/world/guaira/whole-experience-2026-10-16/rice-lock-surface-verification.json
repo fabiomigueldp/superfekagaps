@@ -1,0 +1,268 @@
+{
+  "physicalDevice": false,
+  "mountsForVisualInspection": true,
+  "checks": [
+    {
+      "variant": "main",
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-travessia",
+      "finished": true,
+      "coins": 23,
+      "frames": 2354
+    },
+    {
+      "variant": "high",
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-travessia",
+      "finished": true,
+      "coins": 27,
+      "frames": 2548,
+      "exploration": {
+        "id": "travessia:maintenance",
+        "total": 5,
+        "name": "PASSADICO DA ECLUSA",
+        "actual": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "saveKey": "super_feka_gaps_world_v1:development-unlocked-v1",
+        "record": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "mapText": "VARANDA DO ARROZ · 3/3 moedas\nPASSADICO DA ECLUSA · 5/5 moedas",
+        "reloaded": true,
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "fits": true
+      }
+    },
+    {
+      "variant": "recovery",
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-travessia",
+      "finished": true,
+      "coins": 27,
+      "frames": 2356
+    },
+    {
+      "variant": "return",
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-travessia",
+      "finished": true,
+      "coins": 30,
+      "frames": 3092,
+      "exploration": {
+        "id": "travessia:maintenance",
+        "total": 5,
+        "name": "PASSADICO DA ECLUSA",
+        "actual": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "saveKey": "super_feka_gaps_world_v1:development-unlocked-v1",
+        "record": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "mapText": "VARANDA DO ARROZ · 3/3 moedas\nPASSADICO DA ECLUSA · 5/5 moedas",
+        "reloaded": true,
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "fits": true
+      }
+    },
+    {
+      "variant": "main",
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-travessia",
+      "finished": true,
+      "coins": 23,
+      "frames": 2354
+    },
+    {
+      "variant": "high",
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-travessia",
+      "finished": true,
+      "coins": 27,
+      "frames": 2548,
+      "exploration": {
+        "id": "travessia:maintenance",
+        "total": 5,
+        "name": "PASSADICO DA ECLUSA",
+        "actual": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "saveKey": "super_feka_gaps_world_v1:development-unlocked-v1",
+        "record": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "mapText": "VARANDA DO ARROZ · 3/3 moedas\nPASSADICO DA ECLUSA · 5/5 moedas",
+        "reloaded": true,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "fits": true
+      }
+    },
+    {
+      "variant": "recovery",
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-travessia",
+      "finished": true,
+      "coins": 27,
+      "frames": 2356
+    },
+    {
+      "variant": "return",
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-travessia",
+      "finished": true,
+      "coins": 30,
+      "frames": 3092,
+      "exploration": {
+        "id": "travessia:maintenance",
+        "total": 5,
+        "name": "PASSADICO DA ECLUSA",
+        "actual": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "saveKey": "super_feka_gaps_world_v1:development-unlocked-v1",
+        "record": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "mapText": "VARANDA DO ARROZ · 3/3 moedas\nPASSADICO DA ECLUSA · 5/5 moedas",
+        "reloaded": true,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "fits": true
+      }
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

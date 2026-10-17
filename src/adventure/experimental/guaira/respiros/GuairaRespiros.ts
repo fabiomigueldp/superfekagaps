@@ -1,3 +1,4 @@
+import { restoreGuairaCoursePassages } from '../GuairaCourseDesign';
 import { WorldGame } from '../../../WorldGame';
 import type { CameraData } from '../../../../types';
 import { CompletedAvatarPresentation } from '../CompletedAvatarPresentation';
@@ -7,6 +8,7 @@ import { GUAIRA_RESPIROS as G, guairaRespirosStage } from './GuairaRespirosStage
 import { drawRespirosBackground, drawRespirosTerrain, drawRespirosObjects } from './GuairaRespirosArt';
 import { drawGuairaCoinReadout } from '../GuairaCoinReadout';
 import { jetCycle } from '../../../WorldMachineState';
+import { installGuairaCourseArt, frameGuairaCourse, drawGuairaCourseHUD, guairaCourseStatus } from '../GuairaCoursePresentation';
 
 export { GUAIRA_RESPIROS, guairaRespirosStage } from './GuairaRespirosStage';
 
@@ -25,6 +27,7 @@ export class GuairaRespiros extends WorldGame {
             this.art.terrain = (c, level, _island, cx, cy) => drawRespirosTerrain(c, level, cx, cy);
             this.art.genericStructures = false;
             this.art.objects = (c, objects, cx, cy) => drawRespirosObjects(c, objects, cx, cy, objects.time, this.reducedMotion);
+            installGuairaCourseArt(this, 'respiros');
             this.store.save.preferences.shake = !this.reducedMotion;
             if (this.reducedMotion) {
                 (this as unknown as { particle: (...args: unknown[]) => void }).particle = () => {};
@@ -41,6 +44,7 @@ export class GuairaRespiros extends WorldGame {
     override load(_id: string, resume = false, _custom?: AdventureStage) {
         if (this.isDisposed) return;
         super.load(G.id, resume, guairaRespirosStage());
+        if (resume && this.store.save.checkpoint) restoreGuairaCoursePassages(this.objects, this.player.data.position.x);
         this.finished = false; this.time = 0; this.completedAvatar.reset();
         const p = this.player.data;
         p.isGrounded = true; p.facingRight = true; p.respawnRevealTimer = 0;
@@ -48,6 +52,7 @@ export class GuairaRespiros extends WorldGame {
         this.frameGallery(true);
     }
     private frameGallery(snap = false, previousX = this.camera.x, previousY = this.camera.y) {
+        if (frameGuairaCourse(this, 'respiros', snap, previousX, previousY)) return;
         const p = this.player.data, x = p.position.x, feet = p.position.y + p.height;
         const target = Math.max(0, Math.min(G.width * 16 - 320, x - 48));
         this.camera.x = snap ? target : previousX + (target - previousX) * .12;
@@ -67,8 +72,8 @@ export class GuairaRespiros extends WorldGame {
      * A dry reading is an observation, never a promise of time to cross. */
     get pressureReading() {
         const p = this.player.data;
-        const outlets = [G.firstJetId, G.secondJetId, G.thirdJetId, G.fourthJetId]
-            .map((id, i) => ({ body: this.objects.get(id)!, letter: 'ABCD'[i] }));
+        const outlets = this.objects.bodies.filter(b => b.kind === 'jet')
+            .map((body, i) => ({ body, letter: String.fromCharCode(65+i) }));
         const outlet = outlets.find(({ body: b }) => p.position.x < b.x + b.width && p.position.x + p.width > b.x)
             ?? (p.facingRight ? outlets.find(({ body: b }) => b.x >= p.position.x + p.width)
                 : outlets.reverse().find(({ body: b }) => b.x + b.width <= p.position.x));
@@ -92,6 +97,7 @@ export class GuairaRespiros extends WorldGame {
         if (!Number.isFinite(dt) || dt <= 0) return;
         if (['map', 'title', 'intro'].includes(this.state)) { this.load(G.id); return; }
         if (this.finished) {
+            if (this.updateController()) return;
             this.input.setMenuMode(this.state !== 'playing'); this.input.update();
             if (this.input.consumeMute()) this.audio.toggle();
             this.audio.tick(dt);
@@ -143,6 +149,7 @@ export class GuairaRespiros extends WorldGame {
             pixelText(c, 'PAUSADO', 160, 79, '#f3ddb1', 2, 'center');
             pixelText(c, 'ESC OU CONTINUAR', 160, 100, '#b1e8db', 1, 'center');
         }
+        drawGuairaCourseHUD(this, 'respiros');
         this.renderer.present();
         const message = paused ? 'Pausado · Esc ou Continuar para voltar'
             : this.finished ? 'Passagem do arrozal inspecionada · Curral abre a arena de Ossabravo · Mapa volta ao arrozal · sem progresso salvo'
@@ -163,6 +170,7 @@ export class GuairaRespiros extends WorldGame {
                 ? 'Ponto seguro nesta tentativa · observe a próxima grelha · pode esperar aqui quanto precisar'
                 : 'Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som';
         const guidance = !paused && !this.finished && !p.isDead && pressure ? `${pressure.detail} · ${message}` : message;
-        if (this.status.textContent !== guidance) this.status.textContent = guidance;
+        const courseStatus = guairaCourseStatus(this, 'respiros', guidance);
+        if (this.status.textContent !== courseStatus) this.status.textContent = courseStatus;
     }
 }

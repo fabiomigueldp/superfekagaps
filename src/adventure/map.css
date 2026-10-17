@@ -255,6 +255,7 @@
 .is-preview .world-map-hint { display: block; max-width: 48ch; }
 .is-preview .world-map-location { display: none; }
 .world-map-status { color: #cad8d7; font-size: 12px; line-height: 17px; }
+.world-map-exploration { flex-basis: 100%; margin: 2px 0 0; color: #e9d59c; font-size: 11px; line-height: 15px; white-space: pre-line; overflow-wrap: anywhere; }
 .world-map:not(.is-preview):not(.is-overview):not(.is-chapter)[data-motion='idle'] .world-map-status { display: none; }
 .world-map-enter, .world-map-skip { min-width: 106px; padding: 12px; border-width: 1px 1px 3px; }
 .world-map-enter { transition: transform 140ms ease-out, background-color 140ms ease-out; }

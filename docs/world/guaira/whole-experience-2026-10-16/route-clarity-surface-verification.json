@@ -1,0 +1,224 @@
+{
+  "physicalDevice": false,
+  "mountsForVisualInspection": true,
+  "checks": [
+    {
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-travessia",
+      "finished": true,
+      "coins": 19,
+      "frames": 2066
+    },
+    {
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-patio-comportas",
+      "finished": true,
+      "coins": 7,
+      "frames": 2813
+    },
+    {
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-respiros",
+      "finished": true,
+      "coins": 15,
+      "frames": 2102
+    },
+    {
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-subida",
+      "finished": true,
+      "coins": 20,
+      "frames": 1915
+    },
+    {
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-galeria",
+      "finished": true,
+      "coins": 15,
+      "frames": 1482
+    },
+    {
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-camara-alivio",
+      "finished": true,
+      "coins": 14,
+      "frames": 1354
+    },
+    {
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-travessia",
+      "finished": true,
+      "coins": 19,
+      "frames": 2066
+    },
+    {
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-patio-comportas",
+      "finished": true,
+      "coins": 7,
+      "frames": 2813
+    },
+    {
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-respiros",
+      "finished": true,
+      "coins": 15,
+      "frames": 2102
+    },
+    {
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-subida",
+      "finished": true,
+      "coins": 20,
+      "frames": 1915
+    },
+    {
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-galeria",
+      "finished": true,
+      "coins": 15,
+      "frames": 1482
+    },
+    {
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-camara-alivio",
+      "finished": true,
+      "coins": 14,
+      "frames": 1354
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

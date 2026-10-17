@@ -1,3 +1,4 @@
+import { introductionReached } from './helpers/guairaCourseTest';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { guairaTraversalBrowser } from './helpers/guairaTraversalHarness';
@@ -61,7 +62,7 @@ test(`${name}: field exploration completes with native ${touch ? 'touch' : 'keyb
             }
         }
     });
-    assert.equal(n,tapes[name].frames); assert.equal(g.finished,true); assert.equal(g.coins,name==='travessia'?14:7);
+    assert.equal(n,tapes[name].frames); assert.equal(g.finished,true); assert.equal(g.coins,tapes[name].coins);
     for (const y of name==='travessia'?[208,256,240,224,192]:[288,240,192,160,304]) assert.ok(contacts.has(y),`support ${y}`);
     assert.deepEqual(g.store.save.completed,[]); assert.deepEqual(h.storageCalls,[]);
     const snapshot=()=>JSON.stringify({p:g.player.data,o:g.objects,camera:g.camera,tiles:g.level.data.tiles,coins:g.coins,t:g.time});
@@ -87,7 +88,7 @@ for (const hold of [1,3,5]) test(`a short inspection jump (${hold} frames) safel
     assert.equal(g.objects.get(R.thirdJetId)!.active,true);
     // Wait for an observed retraction of D; never edit its clock or collision.
     for(let i=0;i<253;i++){const tick=jetCycleTick(g.objects.get(R.fourthJetId)!,g.objects.time);if(tick>=2500&&tick<2534)break;h.run(g,1);}
-    h.run(g,140,['ArrowRight']);assert.equal(g.finished,true);assert.equal(g.player.data.hasHelmet,true);
+    h.run(g,140,['ArrowRight']);assert.equal(introductionReached(g), true);assert.equal(g.player.data.hasHelmet,true);
 });
 
 test('the high deck clears a live C at every native departure phase; the dry return is reached by a second jump',t=>{

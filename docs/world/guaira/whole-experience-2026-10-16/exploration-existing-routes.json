@@ -1,0 +1,264 @@
+[
+  {
+    "file": "guairaAscentReplay",
+    "id": "subida",
+    "frames": 2165,
+    "finished": true,
+    "coins": 5,
+    "previousCoins": 5,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaTraversalReplay",
+    "id": "travessia",
+    "frames": 1876,
+    "finished": true,
+    "coins": 16,
+    "previousCoins": 16,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaTraversalMaintenanceReplay",
+    "id": "travessia",
+    "frames": 2066,
+    "finished": true,
+    "coins": 15,
+    "previousCoins": 15,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaRespirosReplay",
+    "id": "respiros",
+    "frames": 1656,
+    "finished": true,
+    "coins": 1,
+    "previousCoins": 1,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaJunctionReplay",
+    "id": "patio",
+    "frames": 1615,
+    "finished": true,
+    "coins": 4,
+    "previousCoins": 4,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaJunctionOptionalReplay",
+    "id": "patio",
+    "frames": 2560,
+    "finished": true,
+    "coins": 7,
+    "previousCoins": 7,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaRooftopReplay",
+    "id": "subida",
+    "frames": 1748,
+    "finished": true,
+    "coins": 16,
+    "previousCoins": 16,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaGalleryReplay",
+    "id": "galeria",
+    "frames": 1154,
+    "finished": true,
+    "coins": 7,
+    "previousCoins": 7,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaGalleryReplay",
+    "key": "partialRuns",
+    "id": "galeria",
+    "frames": 1179,
+    "finished": true,
+    "coins": 7,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaFieldRoutesReplays",
+    "key": "travessia",
+    "id": "travessia",
+    "frames": 2066,
+    "finished": true,
+    "coins": 17,
+    "previousCoins": 17,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaFieldRoutesReplays",
+    "key": "respiros",
+    "id": "respiros",
+    "frames": 1907,
+    "finished": true,
+    "coins": 8,
+    "previousCoins": 8,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaLevelDesignReplays",
+    "key": "travessia",
+    "id": "travessia",
+    "frames": 2066,
+    "finished": true,
+    "coins": 19,
+    "previousCoins": 19,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaLevelDesignReplays",
+    "key": "respiros",
+    "id": "respiros",
+    "frames": 1907,
+    "finished": true,
+    "coins": 6,
+    "previousCoins": 6,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaLevelDesignReplays",
+    "key": "subida",
+    "id": "subida",
+    "frames": 2069,
+    "finished": true,
+    "coins": 7,
+    "previousCoins": 7,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaLevelDesignReplays",
+    "key": "galeria",
+    "id": "galeria",
+    "frames": 1296,
+    "finished": true,
+    "coins": 12,
+    "previousCoins": 12,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaReadableRoutesReplays",
+    "key": "subida",
+    "id": "subida",
+    "frames": 2013,
+    "finished": true,
+    "coins": 11,
+    "previousCoins": 11,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaReadableRoutesReplays",
+    "key": "galeria",
+    "id": "galeria",
+    "frames": 1296,
+    "finished": true,
+    "coins": 12,
+    "previousCoins": 12,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaJunctionRecoveryReplays",
+    "key": "direct",
+    "id": "patio",
+    "frames": 2131,
+    "finished": true,
+    "coins": 4,
+    "previousCoins": 4,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaJunctionRecoveryReplays",
+    "key": "optional",
+    "id": "patio",
+    "frames": 3078,
+    "finished": true,
+    "coins": 7,
+    "previousCoins": 7,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaReliefRoutesReplays",
+    "key": "high",
+    "id": "alivio",
+    "frames": 1085,
+    "finished": true,
+    "coins": 8,
+    "previousCoins": 8,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaReliefRoutesReplays",
+    "key": "opened",
+    "id": "alivio",
+    "frames": 1071,
+    "finished": true,
+    "coins": 8,
+    "previousCoins": 8,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaReliefReplay",
+    "key": "maintenance",
+    "id": "alivio",
+    "frames": 994,
+    "finished": true,
+    "coins": 6,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaReliefReplay",
+    "key": "interval",
+    "id": "alivio",
+    "frames": 862,
+    "finished": true,
+    "coins": 3,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaReliefReplay",
+    "key": "headBump",
+    "id": "alivio",
+    "frames": 991,
+    "finished": true,
+    "coins": 5,
+    "damage": 0,
+    "deaths": 0
+  },
+  {
+    "file": "guairaReliefReplay",
+    "key": "skipFlag",
+    "id": "alivio",
+    "frames": 844,
+    "finished": true,
+    "coins": 4,
+    "damage": 0,
+    "deaths": 0
+  }
+]

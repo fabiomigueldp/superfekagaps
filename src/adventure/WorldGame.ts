@@ -9,7 +9,7 @@ import { drawWorldDialogue, drawWorldEncounterHud, drawWorldPause, drawWorldResu
 import { WorldControlsHelp } from './WorldControlsHelp';
 import { advanceCampaignCamera } from './WorldCampaignCamera';
 import { runGuairaFlight } from './WorldGuairaFlight';
-import { guairaChapterRoute } from './experimental/guaira/chapter/GuairaChapterProgress';
+import { guairaAlternateOpening, guairaChapterRoute } from './experimental/guaira/chapter/GuairaChapterProgress';
 import { Input } from '../engine/Input';
 import { StandardGamepad, type GamepadMenuCommand } from '../engine/StandardGamepad';
 import { DisposalScope } from '../engine/DisposalScope';
@@ -40,6 +40,13 @@ import { WorldMapView, moveJourneySelection } from './WorldMapView';
 import { clampMapSelection } from './WorldMapModel';
 import type { WorldChapter } from './WorldChapterMap';
 type Screen = 'title' | 'intro' | 'map' | 'playing' | 'paused' | 'dialogue' | 'clear' | 'ending' | 'gallery' | 'settings';
+
+/** A hosted chapter owns its menus while retaining native Input and fixed steps. */
+export interface WorldGamepadHost {
+    /** 'playing' uses native movement; any other identity owns a menu layer. */
+    owner(): string | null;
+    control(command: GamepadMenuCommand): void;
+}
 interface Button extends Rect {
     label: string;
     ariaLabel?: string;
@@ -70,6 +77,7 @@ export class WorldGame {
     readonly renderer: Renderer;
     readonly input: Input;
     private gamepad?: StandardGamepad;
+    private gamepadHost?: WorldGamepadHost;
     readonly art = new WorldArt();
     private titleScene?: WorldTitleScene;
     readonly store: ProgressStore;
@@ -102,6 +110,8 @@ export class WorldGame {
     private checkpointHelmet = false;
     private checkpointActivatedAt: number | null = null;
     private collected = new Set<string>();
+    /** Read-only pickup identity for native chapter exploration and HUDs. */
+    hasCollectedPickup(id: string): boolean { return this.collected.has(id); }
     private spoken = new Set<string>();
     private sparks: WorldSpark[] = [];
     private dialog: Dialogue | null = null;
@@ -212,11 +222,12 @@ export class WorldGame {
             }).worldGame = this;
         } catch (error) { this.dispose(); throw error; }
     }
-    /** Main entry only: optional scenes retain their existing input owners. */
-    enableGamepadControls(): void {
+    /** Opt in the main entry, or a chapter that supplies its own menu owner. */
+    enableGamepadControls(host?: WorldGamepadHost): void {
         if (this.isDisposed || this.gamepad) return;
         const gamepad = this.gamepad = new StandardGamepad(this.input);
-        this.addCleanup(() => { gamepad.dispose(); this.gamepad = undefined; });
+        this.gamepadHost = host;
+        this.addCleanup(() => { gamepad.dispose(); this.gamepad = undefined; this.gamepadHost = undefined; });
     }
     /** Restore the journey for bookmarks from the former standalone chapter. */
     restoreGuairaReturn(): void {
@@ -375,9 +386,22 @@ export class WorldGame {
             this.menuAccessibility.focusFromController(next);
         }
     }
-    private updateController(): boolean {
+    protected updateController(): boolean {
         const gamepad = this.gamepad;
         if (!gamepad) return false;
+        if (this.gamepadHost) {
+            const host = this.gamepadHost, owner = host.owner();
+            if (owner === 'playing') {
+                if (gamepad.update('playing')) { host.control('pause'); return true; }
+                return false;
+            }
+            const command = gamepad.updateMenu(owner);
+            if (command && owner) {
+                host.control(command);
+                return this.isDisposed || owner !== host.owner();
+            }
+            return false;
+        }
         if (this.controlsHelp?.isOpen || this.flightCleanup || this.saveImportCleanup
             || document.querySelector?.('dialog[open]')) {
             gamepad.update('inactive'); return false;
@@ -719,11 +743,7 @@ export class WorldGame {
             }
         }
         const p = this.player.getRect();
-        if (this.player.data.isGrounded) {
-            const c = this.level.worldToCol(p.x + p.width / 2), r = this.level.worldToRow(p.y + p.height + 1);
-            if (this.level.getTile(c, r) === T.PLATFORM_FALLING)
-                this.level.markFallingPlatformContact(c, r);
-        }
+        if (this.player.data.isGrounded) this.level.markFallingPlatformSupport(p);
         this.level.updateFallingPlatforms(dt);
         const bossPhase = this.boss?.phase;
         const shockWarning = this.boss?.shockWarning;
@@ -920,7 +940,8 @@ export class WorldGame {
             this.buttons = [];
             this.mapView ??= new WorldMapView(this.mapCanvas, {
                 arriveGuaira: stage => {
-                    const scene = guairaChapterRoute(this.store.save.guaira.opening).find(id => id === stage);
+                    const opening = this.store.save.guaira.opening;
+                    const scene = [...guairaChapterRoute(opening), guairaAlternateOpening(opening)].find(id => id === stage);
                     if (this.isDisposed || !scene || scene === this.store.save.guaira.selectedScene) return;
                     this.store.updateGuaira({ ...this.store.save.guaira, selectedScene: scene });
                 },

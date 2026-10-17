@@ -5,6 +5,7 @@ import { pixelText } from '../../../../graphics/BitmapFont';
 import { drawGalleryTerrain, drawWorkshopWallBay, drawWorkshopToolNiche } from '../gallery/GuairaGalleryArt';
 import { GUAIRA_RELIEF as G, reliefOpen } from './GuairaReliefStage';
 import { drawReliefFlow } from './GuairaReliefFlow';
+import { drawWorkshopClerestory, drawWorkshopRoofFrame } from '../GuairaWorkshopArt';
 import { drawGuairaPipe, drawGuairaPipeElbow, drawGuairaPipeFlow, drawGuairaPipeSaddle, guairaPipeRoute } from '../GuairaPipeArt';
 
 /** Guaíra's plaster, clay and worn brass; liquid colours belong to the native jet. */
@@ -120,6 +121,9 @@ export function drawReliefBackground(c: CanvasRenderingContext2D, level: WorldLe
         const open = reliefOpen(level);
         r(c, 0, 23, 320, 157, P.wall);
         r(c, 0, 296 - y, 320, 88, '#d2ad87');
+        drawWorkshopClerestory(c, 286 - x, 44 - y, 70, time, reducedMotion, true);
+        drawWorkshopClerestory(c, 421 - x, 34 - y, 65, time, reducedMotion);
+        drawWorkshopClerestory(c, 570 - x, 42 - y, 70, time, reducedMotion);
         // Deep plaster bays organise the cutaway into a repair wall, water
         // service wall and field-facing inspection wall. None is walkable.
         // The vertical reveals meet the actual floor, so no jamb hangs over a
@@ -127,6 +131,7 @@ export function drawReliefBackground(c: CanvasRenderingContext2D, level: WorldLe
         drawWorkshopWallBay(c, 16 - x, 153 - y, 171, 183);
         drawWorkshopWallBay(c, 303 - x, 194 - y, 204, 142);
         drawWorkshopWallBay(c, 518 - x, 138 - y, G.width * 16 - 526, 198);
+        drawWorkshopRoofFrame(c, x, y, 6, 752, 18, 143);
         // Field light falls only on the inspection wall beyond the live jet.
         // Keep the mullion gap and stop short of the real floor's pale cap.
         for (const [left, right] of [[536,573],[578,614]] as const) {

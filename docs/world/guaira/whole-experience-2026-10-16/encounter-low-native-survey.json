@@ -1,0 +1,3151 @@
+{
+  "nativeInputOnly": true,
+  "actorOrClockEdits": false,
+  "baseline": false,
+  "conservativeTopNote": "minHelmet uses a conservative physics y-10 bound; the real sprite top is y-4, verified separately in browser-verification.json.",
+  "baselineHashes": {},
+  "scenes": {
+    "respiros": {
+      "frames": 2359,
+      "minHelmet": 26,
+      "maxFeet": 168,
+      "maxCameraStepY": 10,
+      "maxCameraStepX": 3.4999999647443474,
+      "contacts": [
+        {
+          "n": 1,
+          "x": 48,
+          "feet": 304
+        },
+        {
+          "n": 12,
+          "x": 64,
+          "feet": 304
+        },
+        {
+          "n": 28,
+          "x": 96,
+          "feet": 304
+        },
+        {
+          "n": 44,
+          "x": 128,
+          "feet": 304
+        },
+        {
+          "n": 164,
+          "x": 161,
+          "feet": 304
+        },
+        {
+          "n": 180,
+          "x": 193,
+          "feet": 304
+        },
+        {
+          "n": 196,
+          "x": 225,
+          "feet": 304
+        },
+        {
+          "n": 212,
+          "x": 257,
+          "feet": 304
+        },
+        {
+          "n": 228,
+          "x": 289,
+          "feet": 304
+        },
+        {
+          "n": 335,
+          "x": 321,
+          "feet": 304
+        },
+        {
+          "n": 351,
+          "x": 352,
+          "feet": 304
+        },
+        {
+          "n": 367,
+          "x": 384,
+          "feet": 304
+        },
+        {
+          "n": 383,
+          "x": 416,
+          "feet": 304
+        },
+        {
+          "n": 399,
+          "x": 448,
+          "feet": 304
+        },
+        {
+          "n": 415,
+          "x": 480,
+          "feet": 304
+        },
+        {
+          "n": 431,
+          "x": 512,
+          "feet": 304
+        },
+        {
+          "n": 447,
+          "x": 544,
+          "feet": 304
+        },
+        {
+          "n": 463,
+          "x": 576,
+          "feet": 304
+        },
+        {
+          "n": 526,
+          "x": 591,
+          "feet": 288
+        },
+        {
+          "n": 580,
+          "x": 632,
+          "feet": 240
+        },
+        {
+          "n": 634,
+          "x": 677,
+          "feet": 192
+        },
+        {
+          "n": 740,
+          "x": 743,
+          "feet": 160
+        },
+        {
+          "n": 784,
+          "x": 802,
+          "feet": 240
+        },
+        {
+          "n": 827,
+          "x": 833,
+          "feet": 240
+        },
+        {
+          "n": 850,
+          "x": 858,
+          "feet": 304
+        },
+        {
+          "n": 1002,
+          "x": 865,
+          "feet": 304
+        },
+        {
+          "n": 1018,
+          "x": 897,
+          "feet": 304
+        },
+        {
+          "n": 1034,
+          "x": 929,
+          "feet": 304
+        },
+        {
+          "n": 1050,
+          "x": 961,
+          "feet": 304
+        },
+        {
+          "n": 1066,
+          "x": 993,
+          "feet": 304
+        },
+        {
+          "n": 1082,
+          "x": 1025,
+          "feet": 304
+        },
+        {
+          "n": 1098,
+          "x": 1057,
+          "feet": 304
+        },
+        {
+          "n": 1114,
+          "x": 1089,
+          "feet": 304
+        },
+        {
+          "n": 1146,
+          "x": 1123,
+          "feet": 304
+        },
+        {
+          "n": 1155,
+          "x": 1154,
+          "feet": 304
+        },
+        {
+          "n": 1164,
+          "x": 1186,
+          "feet": 304
+        },
+        {
+          "n": 1173,
+          "x": 1217,
+          "feet": 304
+        },
+        {
+          "n": 1182,
+          "x": 1249,
+          "feet": 304
+        },
+        {
+          "n": 1191,
+          "x": 1280,
+          "feet": 304
+        },
+        {
+          "n": 1201,
+          "x": 1315,
+          "feet": 304
+        },
+        {
+          "n": 1210,
+          "x": 1347,
+          "feet": 304
+        },
+        {
+          "n": 1219,
+          "x": 1378,
+          "feet": 304
+        },
+        {
+          "n": 1228,
+          "x": 1410,
+          "feet": 304
+        },
+        {
+          "n": 1237,
+          "x": 1441,
+          "feet": 304
+        },
+        {
+          "n": 1246,
+          "x": 1473,
+          "feet": 304
+        },
+        {
+          "n": 1290,
+          "x": 1504,
+          "feet": 304
+        },
+        {
+          "n": 1302,
+          "x": 1536,
+          "feet": 304
+        },
+        {
+          "n": 1312,
+          "x": 1571,
+          "feet": 304
+        },
+        {
+          "n": 1321,
+          "x": 1603,
+          "feet": 304
+        },
+        {
+          "n": 1372,
+          "x": 1781,
+          "feet": 304
+        },
+        {
+          "n": 1376,
+          "x": 1795,
+          "feet": 304
+        },
+        {
+          "n": 1385,
+          "x": 1827,
+          "feet": 304
+        },
+        {
+          "n": 1394,
+          "x": 1857,
+          "feet": 304
+        },
+        {
+          "n": 1431,
+          "x": 1918,
+          "feet": 256
+        },
+        {
+          "n": 1469,
+          "x": 1991,
+          "feet": 208
+        },
+        {
+          "n": 1507,
+          "x": 2091,
+          "feet": 160
+        },
+        {
+          "n": 1549,
+          "x": 2204,
+          "feet": 144
+        },
+        {
+          "n": 1622,
+          "x": 2311,
+          "feet": 144
+        },
+        {
+          "n": 1685,
+          "x": 2400,
+          "feet": 224
+        },
+        {
+          "n": 1737,
+          "x": 2456,
+          "feet": 304
+        },
+        {
+          "n": 1745,
+          "x": 2466,
+          "feet": 304
+        },
+        {
+          "n": 1755,
+          "x": 2499,
+          "feet": 304
+        },
+        {
+          "n": 1764,
+          "x": 2531,
+          "feet": 304
+        },
+        {
+          "n": 1812,
+          "x": 2699,
+          "feet": 304
+        },
+        {
+          "n": 1852,
+          "x": 2766,
+          "feet": 304
+        },
+        {
+          "n": 1903,
+          "x": 2898,
+          "feet": 304
+        },
+        {
+          "n": 1907,
+          "x": 2912,
+          "feet": 304
+        },
+        {
+          "n": 1917,
+          "x": 2947,
+          "feet": 304
+        },
+        {
+          "n": 1926,
+          "x": 2979,
+          "feet": 304
+        },
+        {
+          "n": 1935,
+          "x": 3010,
+          "feet": 304
+        },
+        {
+          "n": 1944,
+          "x": 3042,
+          "feet": 304
+        },
+        {
+          "n": 1953,
+          "x": 3073,
+          "feet": 304
+        },
+        {
+          "n": 1962,
+          "x": 3105,
+          "feet": 304
+        },
+        {
+          "n": 1971,
+          "x": 3136,
+          "feet": 304
+        },
+        {
+          "n": 2010,
+          "x": 3273,
+          "feet": 240
+        },
+        {
+          "n": 2036,
+          "x": 3297,
+          "feet": 240
+        },
+        {
+          "n": 2086,
+          "x": 3467,
+          "feet": 304
+        },
+        {
+          "n": 2093,
+          "x": 3491,
+          "feet": 304
+        },
+        {
+          "n": 2102,
+          "x": 3523,
+          "feet": 304
+        },
+        {
+          "n": 2144,
+          "x": 3554,
+          "feet": 304
+        },
+        {
+          "n": 2153,
+          "x": 3585,
+          "feet": 304
+        },
+        {
+          "n": 2162,
+          "x": 3617,
+          "feet": 304
+        },
+        {
+          "n": 2171,
+          "x": 3648,
+          "feet": 304
+        },
+        {
+          "n": 2181,
+          "x": 3683,
+          "feet": 304
+        },
+        {
+          "n": 2190,
+          "x": 3715,
+          "feet": 304
+        },
+        {
+          "n": 2199,
+          "x": 3746,
+          "feet": 304
+        },
+        {
+          "n": 2208,
+          "x": 3778,
+          "feet": 304
+        },
+        {
+          "n": 2250,
+          "x": 3860,
+          "feet": 304
+        },
+        {
+          "n": 2267,
+          "x": 3873,
+          "feet": 304
+        },
+        {
+          "n": 2305,
+          "x": 4005,
+          "feet": 256
+        },
+        {
+          "n": 2357,
+          "x": 4187,
+          "feet": 304
+        },
+        {
+          "n": 2359,
+          "x": 4194,
+          "feet": 304
+        }
+      ],
+      "hints": [],
+      "snapshots": [
+        {
+          "n": 1,
+          "file": "respiros-1.png",
+          "p": {
+            "x": 48,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 0,
+            "y": 144
+          },
+          "status": "Respiro A · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 158,
+          "file": "respiros-158.png",
+          "p": {
+            "x": 149.32534068887037,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 94.48599266376839,
+            "y": 144
+          },
+          "status": "Respiro A · A água recolheu; a pressão está baixando. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 315,
+          "file": "respiros-315.png",
+          "p": {
+            "x": 316.0506813777407,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 268.0491257901968,
+            "y": 144
+          },
+          "status": "Ponto seguro nesta tentativa · Respiro B · Há água na grelha; aguarde na margem seca. · Ponto seguro nesta tentativa · observe a próxima grelha · pode esperar aqui quanto precisar · sair e reentrar reinicia a passagem"
+        },
+        {
+          "n": 379,
+          "file": "respiros-379.png",
+          "p": {
+            "x": 408.3506813777407,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 345.7254527306706,
+            "y": 144
+          },
+          "status": "Respiro B · Sem água na grelha; acompanhe o manômetro antes de entrar. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 473,
+          "file": "respiros-473.png",
+          "p": {
+            "x": 588.5957887606315,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 530.9755685256076,
+            "y": 144
+          },
+          "status": "Ponto seguro nesta tentativa · Respiro C · Sem água na grelha; acompanhe o manômetro antes de entrar. · Ponto seguro · siga pelo piso observando os jatos, ou suba à placa para isolar o respiro C · sair e reentrar reinicia a passagem"
+        },
+        {
+          "n": 630,
+          "file": "respiros-630.png",
+          "p": {
+            "x": 676.1226228412721,
+            "y": 145.7000000000002
+          },
+          "feet": 169.7000000000002,
+          "camera": {
+            "x": 621.655050463797,
+            "y": 79.68035622215072
+          },
+          "status": "Respiro C · A água recolheu; a pressão está baixando. · Registro C · pule e aperte baixo sobre a placa para isolar só o próximo respiro"
+        },
+        {
+          "n": 787,
+          "file": "respiros-787.png",
+          "p": {
+            "x": 808.4520441332229,
+            "y": 216
+          },
+          "feet": 240,
+          "camera": {
+            "x": 746.0296834436172,
+            "y": 139.84792847943274
+          },
+          "status": "Respiro D · Sem água na grelha; acompanhe o manômetro antes de entrar. · Mirante seco · observe o respiro D; desça na ilha antes da grelha e acompanhe o manômetro"
+        },
+        {
+          "n": 944,
+          "file": "respiros-944.png",
+          "p": {
+            "x": 858.202725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 810.2026986759257,
+            "y": 143.9999999999999
+          },
+          "status": "Respiro D · A pressão está subindo; aguarde na margem seca. · Ilha seca · os dois respiros têm ritmos próprios · observe o próximo manômetro"
+        },
+        {
+          "n": 1101,
+          "file": "respiros-1101.png",
+          "p": {
+            "x": 1062.502725510964,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 999.8360910871303,
+            "y": 143.99999999999994
+          },
+          "status": "Respiro E · A pressão está subindo; aguarde na margem seca. · Grelhas do arrozal · setas/A D: mover · Espaço: pular · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 1259,
+          "file": "respiros-1259.png",
+          "p": {
+            "x": 1498.9567238470759,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 1412.6852645948034,
+            "y": 140.00000000018184
+          },
+          "status": "Duas descargas independentes: observe cada manômetro a partir da margem seca."
+        },
+        {
+          "n": 1416,
+          "file": "respiros-1416.png",
+          "p": {
+            "x": 1910.2579784383004,
+            "y": 177.00000000000023
+          },
+          "feet": 201.00000000000023,
+          "camera": {
+            "x": 1822.209873063727,
+            "y": 131.72387614415206
+          },
+          "status": "Suba para fechar o registro ou atravesse pelo chão no intervalo seco."
+        },
+        {
+          "n": 1573,
+          "file": "respiros-1573.png",
+          "p": {
+            "x": 2276.1208532222063,
+            "y": 17.299999999999972
+          },
+          "feet": 41.29999999999997,
+          "camera": {
+            "x": 2183.6913132245827,
+            "y": -20.700000000000028
+          },
+          "status": "Desvio alto: continue sobre a grelha e não pare nas tábuas rachadas; a varanda tem uma couraça."
+        },
+        {
+          "n": 1730,
+          "file": "respiros-1730.png",
+          "p": {
+            "x": 2457.8020394965984,
+            "y": 218.0000000000001
+          },
+          "feet": 242.0000000000001,
+          "camera": {
+            "x": 2384.228371104943,
+            "y": 76.22217781527381
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1887,
+          "file": "respiros-1887.png",
+          "p": {
+            "x": 2842.2476317508836,
+            "y": 183.50000000000028
+          },
+          "feet": 207.50000000000028,
+          "camera": {
+            "x": 2746.3234184136954,
+            "y": 130.96514507735577
+          },
+          "status": "Salte os canais, enfrente os caranguejos e pare antes da próxima descarga."
+        },
+        {
+          "n": 2045,
+          "file": "respiros-2045.png",
+          "p": {
+            "x": 3323.495949644091,
+            "y": 161.30000000000007
+          },
+          "feet": 185.30000000000007,
+          "camera": {
+            "x": 3233.886416032975,
+            "y": 123.30000000000007
+          },
+          "status": "O tablado oferece altura contra os arremessos; a grelha continua no próprio ritmo."
+        },
+        {
+          "n": 2115,
+          "file": "respiros-2115.png",
+          "p": {
+            "x": 3530.9959496440906,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3451.981291787311,
+            "y": 139.98733335174998
+          },
+          "status": "Ponto seguro nesta tentativa · Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar. · sair e reentrar reinicia a passagem"
+        },
+        {
+          "n": 2130,
+          "file": "respiros-2130.png",
+          "p": {
+            "x": 3531.59594964409,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3458.3327342982816,
+            "y": 139.99935453975837
+          },
+          "status": "Ponto seguro nesta tentativa · Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar. · sair e reentrar reinicia a passagem"
+        },
+        {
+          "n": 2145,
+          "file": "respiros-2145.png",
+          "p": {
+            "x": 3557.39594964409,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3470.527128411128,
+            "y": 139.99996710898455
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2160,
+          "file": "respiros-2160.png",
+          "p": {
+            "x": 3609.89594964409,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3513.8162839346323,
+            "y": 139.99999832395733
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2175,
+          "file": "respiros-2175.png",
+          "p": {
+            "x": 3662.39594964409,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3564.9625306242474,
+            "y": 139.9999999145931
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2190,
+          "file": "respiros-2190.png",
+          "p": {
+            "x": 3714.89594964409,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3617.2635642829905,
+            "y": 139.99999999564787
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2202,
+          "file": "respiros-2202.png",
+          "p": {
+            "x": 3756.89594964409,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3659.236676466218,
+            "y": 139.99999999959778
+          },
+          "status": "A tábua está cedendo. Salte para o próximo apoio antes de ela cair."
+        },
+        {
+          "n": 2205,
+          "file": "respiros-2205.png",
+          "p": {
+            "x": 3767.39594964409,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3669.734321433019,
+            "y": 139.99999999977823
+          },
+          "status": "A tábua está cedendo. Salte para o próximo apoio antes de ela cair."
+        },
+        {
+          "n": 2220,
+          "file": "respiros-2220.png",
+          "p": {
+            "x": 3819.89594964409,
+            "y": 206.7000000000001
+          },
+          "feet": 230.7000000000001,
+          "camera": {
+            "x": 3722.2300234986596,
+            "y": 139.9999999999887
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2235,
+          "file": "respiros-2235.png",
+          "p": {
+            "x": 3858.89594964409,
+            "y": 184.80000000000024
+          },
+          "feet": 208.80000000000024,
+          "camera": {
+            "x": 3770.501688451099,
+            "y": 132.56304000000006
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2250,
+          "file": "respiros-2250.png",
+          "p": {
+            "x": 3859.6376758940896,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3785.0908593957024,
+            "y": 139.59530409270988
+          },
+          "status": "A tábua está cedendo. Salte para o próximo apoio antes de ela cair."
+        },
+        {
+          "n": 2265,
+          "file": "respiros-2265.png",
+          "p": {
+            "x": 3868.0376758940897,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3789.8033941700437,
+            "y": 139.97937772385043
+          },
+          "status": "A tábua está cedendo. Salte para o próximo apoio antes de ela cair."
+        },
+        {
+          "n": 2280,
+          "file": "respiros-2280.png",
+          "p": {
+            "x": 3917.93767589409,
+            "y": 201.5000000000001
+          },
+          "feet": 225.5000000000001,
+          "camera": {
+            "x": 3823.5603751063813,
+            "y": 139.9989491411553
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2295,
+          "file": "respiros-2295.png",
+          "p": {
+            "x": 3970.43767589409,
+            "y": 183.50000000000028
+          },
+          "feet": 207.50000000000028,
+          "camera": {
+            "x": 3873.2544600075407,
+            "y": 132.27000000000004
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2310,
+          "file": "respiros-2310.png",
+          "p": {
+            "x": 4022.93767589409,
+            "y": 224.5
+          },
+          "feet": 248.5,
+          "camera": {
+            "x": 3921.1737152145834,
+            "y": 139.55925494009392
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2325,
+          "file": "respiros-2325.png",
+          "p": {
+            "x": 4075.43767589409,
+            "y": 137.70000000000016
+          },
+          "feet": 161.70000000000016,
+          "camera": {
+            "x": 3933.820923786067,
+            "y": 99.70000000000016
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2340,
+          "file": "respiros-2340.png",
+          "p": {
+            "x": 4127.93767589409,
+            "y": 149.70000000000033
+          },
+          "feet": 173.70000000000033,
+          "camera": {
+            "x": 3935.6797327708955,
+            "y": 89.8241792716163
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2355,
+          "file": "respiros-2355.png",
+          "p": {
+            "x": 4180.43767589409,
+            "y": 270.00000000000045
+          },
+          "feet": 294.00000000000045,
+          "camera": {
+            "x": 3935.9529290910605,
+            "y": 135.46074303081897
+          },
+          "status": "Espere o transporte na doca alta ou salte pela passarela rachada. Observe a margem de chegada antes de desembarcar."
+        },
+        {
+          "n": 2359,
+          "file": "respiros-2359.png",
+          "p": {
+            "x": 4194.43767589409,
+            "y": 280
+          },
+          "feet": 304,
+          "camera": {
+            "x": 3935.9717717943176,
+            "y": 137.94770315000162
+          },
+          "status": "Passagem do arrozal inspecionada · Curral abre a arena de Ossabravo · Mapa volta ao arrozal · sem progresso salvo"
+        }
+      ],
+      "damage": [],
+      "jumps": [
+        {
+          "start": {
+            "n": 485,
+            "x": 591.0760220666114,
+            "feet": 304,
+            "y": 280,
+            "camX": 540.1422863215519,
+            "camY": 144
+          },
+          "apex": {
+            "n": 507,
+            "x": 591.0760220666114,
+            "feet": 201.00000000000023,
+            "y": 177.00000000000023,
+            "camX": 542.8998083222136,
+            "camY": 141.00000000000023
+          },
+          "end": {
+            "n": 526,
+            "x": 591.0760220666114,
+            "feet": 288,
+            "y": 264,
+            "camX": 543.0604906685512,
+            "camY": 143.9009972484698
+          },
+          "landingAtTakeoff": {
+            "x": 50.933735745059494,
+            "y": 144
+          },
+          "landingAtApex": {
+            "x": 48.17621374439773,
+            "y": 146.99999999999977
+          }
+        },
+        {
+          "start": {
+            "n": 545,
+            "x": 591.0760220666114,
+            "feet": 288,
+            "y": 264,
+            "camX": 543.0746531363583,
+            "camY": 143.99771907786305
+          },
+          "apex": {
+            "n": 565,
+            "x": 624.5210220666114,
+            "feet": 188.1000000000002,
+            "y": 164.1000000000002,
+            "camX": 564.2630998958628,
+            "camY": 95.4381622560949
+          },
+          "end": {
+            "n": 580,
+            "x": 631.9940699358708,
+            "feet": 240,
+            "y": 216,
+            "camX": 580.0444599246716,
+            "camY": 80.78668956011788
+          },
+          "landingAtTakeoff": {
+            "x": 88.91941679951253,
+            "y": 96.00228092213695
+          },
+          "landingAtApex": {
+            "x": 67.73097004000806,
+            "y": 144.5618377439051
+          }
+        },
+        {
+          "start": {
+            "n": 598,
+            "x": 632.1013627554819,
+            "feet": 240,
+            "y": 216,
+            "camX": 583.6950291848772,
+            "camY": 80.0221030766495
+          },
+          "apex": {
+            "n": 619,
+            "x": 668.1013627554819,
+            "feet": 137.80000000000013,
+            "y": 113.80000000000013,
+            "camX": 607.1565166790524,
+            "camY": 77.80000000000013
+          },
+          "end": {
+            "n": 634,
+            "x": 676.89318377814,
+            "feet": 192,
+            "y": 168,
+            "camX": 624.4635522751356,
+            "camY": 79.85548209258573
+          },
+          "landingAtTakeoff": {
+            "x": 93.19815459326287,
+            "y": 111.9778969233505
+          },
+          "landingAtApex": {
+            "x": 69.73666709908764,
+            "y": 114.19999999999987
+          }
+        },
+        {
+          "start": {
+            "n": 653,
+            "x": 677.1267034443524,
+            "feet": 192,
+            "y": 168,
+            "camX": 628.7144058982266,
+            "camY": 79.99667045522358
+          },
+          "apex": {
+            "n": 661,
+            "x": 677.1267034443524,
+            "feet": 137.3,
+            "y": 113.30000000000003,
+            "camX": 628.978427012273,
+            "camY": 77.30000000000003
+          },
+          "end": {
+            "n": 673,
+            "x": 677.1267034443524,
+            "feet": 192,
+            "y": 168,
+            "camX": 629.0947244948647,
+            "camY": 78.99900242336001
+          },
+          "landingAtTakeoff": {
+            "x": 48.41229754612584,
+            "y": 112.00332954477642
+          },
+          "landingAtApex": {
+            "x": 48.148276432079456,
+            "y": 114.69999999999997
+          }
+        },
+        {
+          "start": {
+            "n": 701,
+            "x": 677.1267034443524,
+            "feet": 192,
+            "y": 168,
+            "camX": 629.1258114152711,
+            "camY": 79.99613436457244
+          },
+          "apex": {
+            "n": 723,
+            "x": 715.4267034443524,
+            "feet": 88.99999999999999,
+            "y": 64.99999999999999,
+            "camX": 654.0672715922159,
+            "camY": 28.999999999999986
+          },
+          "end": {
+            "n": 740,
+            "x": 743.126829777165,
+            "feet": 160,
+            "y": 136,
+            "camX": 684.8885270535635,
+            "camY": 67.53760220058392
+          },
+          "landingAtTakeoff": {
+            "x": 114.0010183618939,
+            "y": 80.00386563542756
+          },
+          "landingAtApex": {
+            "x": 89.05955818494908,
+            "y": 131
+          }
+        },
+        {
+          "start": {
+            "n": 1329,
+            "x": 1630.5079784383004,
+            "feet": 304,
+            "y": 280,
+            "camX": 1533.0981484564227,
+            "camY": 140.00000000000006
+          },
+          "apex": {
+            "n": 1351,
+            "x": 1707.5079784383004,
+            "feet": 201.00000000000023,
+            "y": 177.00000000000023,
+            "camX": 1609.8567385714066,
+            "camY": 131.72394326015362
+          },
+          "end": {
+            "n": 1372,
+            "x": 1781.0079784383004,
+            "feet": 304,
+            "y": 280,
+            "camX": 1683.3423647318384,
+            "camY": 139.58407352033518
+          },
+          "landingAtTakeoff": {
+            "x": 247.9098299818777,
+            "y": 163.99999999999994
+          },
+          "landingAtApex": {
+            "x": 171.15123986689377,
+            "y": 172.27605673984638
+          }
+        },
+        {
+          "start": {
+            "n": 1394,
+            "x": 1857.4829784383003,
+            "feet": 304,
+            "y": 280,
+            "camX": 1760.2783750172962,
+            "camY": 139.9947165047327
+          },
+          "apex": {
+            "n": 1416,
+            "x": 1910.2579784383004,
+            "feet": 201.00000000000023,
+            "y": 177.00000000000023,
+            "camX": 1822.209873063727,
+            "camY": 131.72387614415206
+          },
+          "end": {
+            "n": 1431,
+            "x": 1918.1520685211128,
+            "feet": 256,
+            "y": 232,
+            "camX": 1843.6708205842801,
+            "camY": 138.63184739519718
+          },
+          "landingAtTakeoff": {
+            "x": 157.87369350381664,
+            "y": 116.00528349526729
+          },
+          "landingAtApex": {
+            "x": 95.94219545738588,
+            "y": 124.27612385584794
+          }
+        },
+        {
+          "start": {
+            "n": 1432,
+            "x": 1917.591624571191,
+            "feet": 256,
+            "y": 232,
+            "camX": 1843.9013170627095,
+            "camY": 138.8781148640617
+          },
+          "apex": {
+            "n": 1454,
+            "x": 1961.6058532222066,
+            "feet": 153.00000000000023,
+            "y": 129.00000000000023,
+            "camX": 1873.2949203721575,
+            "camY": 86.32943436544019
+          },
+          "end": {
+            "n": 1469,
+            "x": 1991.3058532222067,
+            "feet": 208,
+            "y": 184,
+            "camX": 1904.6615224177308,
+            "camY": 102.11928681298892
+          },
+          "landingAtTakeoff": {
+            "x": 147.40453615949718,
+            "y": 69.1218851359383
+          },
+          "landingAtApex": {
+            "x": 118.01093285004913,
+            "y": 121.67056563455981
+          }
+        },
+        {
+          "start": {
+            "n": 1470,
+            "x": 1992.7508532222066,
+            "feet": 208,
+            "y": 184,
+            "camX": 1906.592242114268,
+            "camY": 97.41781518665091
+          },
+          "apex": {
+            "n": 1492,
+            "x": 2060.7208532222066,
+            "feet": 105.00000000000003,
+            "y": 81.00000000000003,
+            "camX": 1966.6812940036812,
+            "camY": 38.32943436544004
+          },
+          "end": {
+            "n": 1507,
+            "x": 2090.7208532222066,
+            "feet": 160,
+            "y": 136,
+            "camX": 2002.9705641228018,
+            "camY": 62.06556681298865
+          },
+          "landingAtTakeoff": {
+            "x": 184.1286111079387,
+            "y": 62.58218481334909
+          },
+          "landingAtApex": {
+            "x": 124.03955921852548,
+            "y": 121.67056563455996
+          }
+        },
+        {
+          "start": {
+            "n": 1508,
+            "x": 2092.4208532222065,
+            "feet": 160,
+            "y": 136,
+            "camX": 2005.0645988147303,
+            "camY": 64.5737647866507
+          },
+          "apex": {
+            "n": 1530,
+            "x": 2164.9208532222065,
+            "feet": 56.99999999999994,
+            "y": 32.99999999999994,
+            "camX": 2068.198218684392,
+            "camY": -9.670565634560047
+          },
+          "end": {
+            "n": 1549,
+            "x": 2204.4208532222065,
+            "feet": 144,
+            "y": 120,
+            "camX": 2116.7356488836317,
+            "camY": 42.4778151866506
+          },
+          "landingAtTakeoff": {
+            "x": 199.35625440747617,
+            "y": 79.4262352133493
+          },
+          "landingAtApex": {
+            "x": 136.22263453781443,
+            "y": 153.67056563456003
+          }
+        },
+        {
+          "start": {
+            "n": 1550,
+            "x": 2206.1208532222063,
+            "feet": 144,
+            "y": 120,
+            "camX": 2118.8218734042607,
+            "camY": 50.4778151866506
+          },
+          "apex": {
+            "n": 1572,
+            "x": 2274.1208532222063,
+            "feet": 40.99999999999997,
+            "y": 16.99999999999997,
+            "camX": 2180.9054668612703,
+            "camY": -21.00000000000003
+          },
+          "end": {
+            "n": 1622,
+            "x": 2311.0788010262163,
+            "feet": 144,
+            "y": 120,
+            "camX": 2239.866466659428,
+            "camY": 59.171296479999995
+          },
+          "landingAtTakeoff": {
+            "x": 192.25692762195558,
+            "y": 93.5221848133494
+          },
+          "landingAtApex": {
+            "x": 130.17333416494603,
+            "y": 165.00000000000003
+          }
+        },
+        {
+          "start": {
+            "n": 1634,
+            "x": 2326.3480876007793,
+            "feet": 144,
+            "y": 120,
+            "camX": 2245.689064602493,
+            "camY": 68.99921061134721
+          },
+          "apex": {
+            "n": 1656,
+            "x": 2382.3480876007793,
+            "feet": 40.99999999999997,
+            "y": 16.99999999999997,
+            "camX": 2294.331830324354,
+            "camY": -21.00000000000003
+          },
+          "end": {
+            "n": 1685,
+            "x": 2399.523989125241,
+            "feet": 224,
+            "y": 200,
+            "camX": 2328.1041571735286,
+            "camY": 134.48631999999995
+          },
+          "landingAtTakeoff": {
+            "x": 153.83492452274777,
+            "y": 155.00078938865278
+          },
+          "landingAtApex": {
+            "x": 105.19215880088677,
+            "y": 245.00000000000003
+          }
+        },
+        {
+          "start": {
+            "n": 1686,
+            "x": 2399.3712734590717,
+            "feet": 224,
+            "y": 200,
+            "camX": 2328.0162111277937,
+            "camY": 135.47878239999997
+          },
+          "apex": {
+            "n": 1708,
+            "x": 2439.4914011312103,
+            "feet": 121.00000000000006,
+            "y": 97.00000000000006,
+            "camX": 2353.719165850352,
+            "camY": 59.00000000000006
+          },
+          "end": {
+            "n": 1737,
+            "x": 2456.303361728081,
+            "feet": 304,
+            "y": 280,
+            "camX": 2384.5152875200497,
+            "camY": 136
+          },
+          "landingAtTakeoff": {
+            "x": 128.28715060028753,
+            "y": 168.52121760000003
+          },
+          "landingAtApex": {
+            "x": 102.58419587772914,
+            "y": 244.99999999999994
+          }
+        },
+        {
+          "start": {
+            "n": 1769,
+            "x": 2548.2059055008835,
+            "feet": 304,
+            "y": 280,
+            "camX": 2451.523042243395,
+            "camY": 139.99301601548768
+          },
+          "apex": {
+            "n": 1791,
+            "x": 2625.2059055008835,
+            "feet": 201.00000000000023,
+            "y": 177.00000000000023,
+            "camX": 2527.5983306194175,
+            "camY": 131.72385454291407
+          },
+          "end": {
+            "n": 1812,
+            "x": 2698.7059055008835,
+            "feet": 304,
+            "y": 280,
+            "camX": 2601.0432721592856,
+            "camY": 139.58407214598023
+          },
+          "landingAtTakeoff": {
+            "x": 247.1828632574884,
+            "y": 164.00698398451232
+          },
+          "landingAtApex": {
+            "x": 171.107574881466,
+            "y": 172.27614545708593
+          }
+        },
+        {
+          "start": {
+            "n": 1812,
+            "x": 2698.7059055008835,
+            "feet": 304,
+            "y": 280,
+            "camX": 2601.0432721592856,
+            "camY": 139.58407214598023
+          },
+          "apex": {
+            "n": 1831,
+            "x": 2761.9059055008834,
+            "feet": 205.80000000000018,
+            "y": 181.80000000000018,
+            "camX": 2666.985194329626,
+            "camY": 135.9922545071673
+          },
+          "end": {
+            "n": 1852,
+            "x": 2766.4476317508834,
+            "feet": 304,
+            "y": 280,
+            "camX": 2692.475388931481,
+            "camY": 139.80144599447638
+          },
+          "landingAtTakeoff": {
+            "x": 165.40435959159777,
+            "y": 164.41592785401977
+          },
+          "landingAtApex": {
+            "x": 99.46243742125716,
+            "y": 168.0077454928327
+          }
+        },
+        {
+          "start": {
+            "n": 1860,
+            "x": 2766.4476317508834,
+            "feet": 304,
+            "y": 280,
+            "camX": 2693.7383451417268,
+            "camY": 139.95941276446598
+          },
+          "apex": {
+            "n": 1882,
+            "x": 2824.7476317508836,
+            "feet": 201.00000000000023,
+            "y": 177.00000000000023,
+            "camX": 2730.382742509476,
+            "camY": 131.72342768233554
+          },
+          "end": {
+            "n": 1903,
+            "x": 2898.2476317508836,
+            "feet": 304,
+            "y": 280,
+            "camX": 2800.8063287555624,
+            "camY": 139.58406553330872
+          },
+          "landingAtTakeoff": {
+            "x": 204.5092866091568,
+            "y": 164.04058723553402
+          },
+          "landingAtApex": {
+            "x": 167.86488924140758,
+            "y": 172.27657231766446
+          }
+        },
+        {
+          "start": {
+            "n": 1975,
+            "x": 3150.2476317508836,
+            "feet": 304,
+            "y": 280,
+            "camX": 3052.5809877638644,
+            "camY": 139.9999997408076
+          },
+          "apex": {
+            "n": 1997,
+            "x": 3227.2476317508836,
+            "feet": 201.00000000000023,
+            "y": 177.00000000000023,
+            "camX": 3129.5809664464614,
+            "camY": 131.72394325686105
+          },
+          "end": {
+            "n": 2010,
+            "x": 3272.7476317508836,
+            "feet": 240,
+            "y": 216,
+            "camX": 3175.0809653427577,
+            "camY": 137.9652748588496
+          },
+          "landingAtTakeoff": {
+            "x": 220.16664398701914,
+            "y": 100.0000002591924
+          },
+          "landingAtApex": {
+            "x": 143.16666530442217,
+            "y": 108.27605674313895
+          }
+        },
+        {
+          "start": {
+            "n": 2037,
+            "x": 3298.919401619209,
+            "feet": 240,
+            "y": 216,
+            "camX": 3219.6628702165717,
+            "camY": 139.99041747930977
+          },
+          "apex": {
+            "n": 2059,
+            "x": 3372.495949644091,
+            "feet": 137.0000000000001,
+            "y": 113.00000000000011,
+            "camX": 3276.1749510416976,
+            "camY": 70.32943436544012
+          },
+          "end": {
+            "n": 2086,
+            "x": 3466.995949644091,
+            "feet": 304,
+            "y": 280,
+            "camX": 3369.371937991912,
+            "camY": 136
+          },
+          "landingAtTakeoff": {
+            "x": 247.33307942751935,
+            "y": 164.00958252069023
+          },
+          "landingAtApex": {
+            "x": 190.8209986023935,
+            "y": 233.67056563455986
+          }
+        },
+        {
+          "start": {
+            "n": 2209,
+            "x": 3781.39594964409,
+            "feet": 304,
+            "y": 280,
+            "camX": 3683.7323045158655,
+            "camY": 139.99999999989973
+          },
+          "apex": {
+            "n": 2230,
+            "x": 3853.39594964409,
+            "feet": 201.8000000000002,
+            "y": 177.8000000000002,
+            "camX": 3757.0494892133106,
+            "camY": 132.86890641481986
+          },
+          "end": {
+            "n": 2250,
+            "x": 3859.6376758940896,
+            "feet": 304,
+            "y": 280,
+            "camX": 3785.0908593957024,
+            "camY": 139.59530409270988
+          },
+          "landingAtTakeoff": {
+            "x": 175.90537137822412,
+            "y": 164.00000000010027
+          },
+          "landingAtApex": {
+            "x": 102.58818668077902,
+            "y": 171.13109358518014
+          }
+        },
+        {
+          "start": {
+            "n": 2268,
+            "x": 3876.1376758940896,
+            "feet": 304,
+            "y": 280,
+            "camX": 3793.522774659041,
+            "camY": 139.98862953684397
+          },
+          "apex": {
+            "n": 2290,
+            "x": 3952.93767589409,
+            "feet": 201.00000000000023,
+            "y": 177.00000000000023,
+            "camX": 3856.187100835165,
+            "camY": 132
+          },
+          "end": {
+            "n": 2305,
+            "x": 4005.43767589409,
+            "feet": 256,
+            "y": 232,
+            "camX": 3907.9056507415385,
+            "camY": 138.8111742830179
+          },
+          "landingAtTakeoff": {
+            "x": 211.914901235049,
+            "y": 116.01137046315603
+          },
+          "landingAtApex": {
+            "x": 149.25057505892482,
+            "y": 124
+          }
+        },
+        {
+          "start": {
+            "n": 2309,
+            "x": 4019.43767589409,
+            "feet": 256,
+            "y": 232,
+            "camX": 3919.151949107481,
+            "camY": 139.4625060245048
+          },
+          "apex": {
+            "n": 2331,
+            "x": 4096.43767589409,
+            "feet": 153.00000000000023,
+            "y": 129.00000000000023,
+            "camX": 3934.9880281008354,
+            "camY": 86.32943436544019
+          },
+          "end": {
+            "n": 2357,
+            "x": 4187.43767589409,
+            "feet": 304,
+            "y": 280,
+            "camX": 3935.963548288117,
+            "camY": 136.94780361392267
+          },
+          "landingAtTakeoff": {
+            "x": 268.28572678660885,
+            "y": 164.5374939754952
+          },
+          "landingAtApex": {
+            "x": 252.44964779325437,
+            "y": 217.6705656345598
+          }
+        }
+      ],
+      "videoFrames": 1179,
+      "captureFps": 30,
+      "videoWindow": {
+        "firstFrame": 2,
+        "lastFrame": 2358
+      },
+      "finished": true,
+      "coins": 21
+    },
+    "alivio": {
+      "frames": 1642,
+      "minHelmet": 26,
+      "maxFeet": 168,
+      "maxCameraStepY": 8,
+      "maxCameraStepX": 3.4999999998944986,
+      "contacts": [
+        {
+          "n": 1,
+          "x": 32,
+          "feet": 336
+        },
+        {
+          "n": 19,
+          "x": 64,
+          "feet": 336
+        },
+        {
+          "n": 35,
+          "x": 96,
+          "feet": 336
+        },
+        {
+          "n": 106,
+          "x": 115,
+          "feet": 288
+        },
+        {
+          "n": 150,
+          "x": 170,
+          "feet": 224
+        },
+        {
+          "n": 206,
+          "x": 227,
+          "feet": 160
+        },
+        {
+          "n": 270,
+          "x": 309,
+          "feet": 160
+        },
+        {
+          "n": 276,
+          "x": 321,
+          "feet": 160
+        },
+        {
+          "n": 419,
+          "x": 355,
+          "feet": 160
+        },
+        {
+          "n": 464,
+          "x": 512,
+          "feet": 160
+        },
+        {
+          "n": 465,
+          "x": 515,
+          "feet": 160
+        },
+        {
+          "n": 474,
+          "x": 546,
+          "feet": 160
+        },
+        {
+          "n": 498,
+          "x": 578,
+          "feet": 160
+        },
+        {
+          "n": 525,
+          "x": 625,
+          "feet": 256
+        },
+        {
+          "n": 557,
+          "x": 641,
+          "feet": 256
+        },
+        {
+          "n": 590,
+          "x": 700,
+          "feet": 336
+        },
+        {
+          "n": 615,
+          "x": 704,
+          "feet": 336
+        },
+        {
+          "n": 628,
+          "x": 737,
+          "feet": 336
+        },
+        {
+          "n": 637,
+          "x": 769,
+          "feet": 336
+        },
+        {
+          "n": 646,
+          "x": 800,
+          "feet": 336
+        },
+        {
+          "n": 656,
+          "x": 835,
+          "feet": 336
+        },
+        {
+          "n": 696,
+          "x": 892,
+          "feet": 288
+        },
+        {
+          "n": 734,
+          "x": 968,
+          "feet": 240
+        },
+        {
+          "n": 776,
+          "x": 1078,
+          "feet": 224
+        },
+        {
+          "n": 814,
+          "x": 1170,
+          "feet": 176
+        },
+        {
+          "n": 858,
+          "x": 1224,
+          "feet": 176
+        },
+        {
+          "n": 924,
+          "x": 1281,
+          "feet": 144
+        },
+        {
+          "n": 986,
+          "x": 1336,
+          "feet": 224
+        },
+        {
+          "n": 1036,
+          "x": 1383,
+          "feet": 288
+        },
+        {
+          "n": 1085,
+          "x": 1432,
+          "feet": 336
+        },
+        {
+          "n": 1122,
+          "x": 1541,
+          "feet": 288
+        },
+        {
+          "n": 1130,
+          "x": 1569,
+          "feet": 288
+        },
+        {
+          "n": 1179,
+          "x": 1741,
+          "feet": 336
+        },
+        {
+          "n": 1185,
+          "x": 1762,
+          "feet": 336
+        },
+        {
+          "n": 1194,
+          "x": 1793,
+          "feet": 336
+        },
+        {
+          "n": 1203,
+          "x": 1825,
+          "feet": 336
+        },
+        {
+          "n": 1212,
+          "x": 1856,
+          "feet": 336
+        },
+        {
+          "n": 1222,
+          "x": 1891,
+          "feet": 336
+        },
+        {
+          "n": 1231,
+          "x": 1923,
+          "feet": 336
+        },
+        {
+          "n": 1240,
+          "x": 1954,
+          "feet": 336
+        },
+        {
+          "n": 1281,
+          "x": 2098,
+          "feet": 272
+        },
+        {
+          "n": 1336,
+          "x": 2275,
+          "feet": 336
+        },
+        {
+          "n": 1345,
+          "x": 2306,
+          "feet": 336
+        },
+        {
+          "n": 1354,
+          "x": 2338,
+          "feet": 336
+        },
+        {
+          "n": 1396,
+          "x": 2369,
+          "feet": 336
+        },
+        {
+          "n": 1405,
+          "x": 2400,
+          "feet": 336
+        },
+        {
+          "n": 1415,
+          "x": 2435,
+          "feet": 336
+        },
+        {
+          "n": 1424,
+          "x": 2467,
+          "feet": 336
+        },
+        {
+          "n": 1433,
+          "x": 2498,
+          "feet": 336
+        },
+        {
+          "n": 1442,
+          "x": 2530,
+          "feet": 336
+        },
+        {
+          "n": 1451,
+          "x": 2561,
+          "feet": 336
+        },
+        {
+          "n": 1460,
+          "x": 2593,
+          "feet": 336
+        },
+        {
+          "n": 1469,
+          "x": 2624,
+          "feet": 336
+        },
+        {
+          "n": 1479,
+          "x": 2657,
+          "feet": 336
+        },
+        {
+          "n": 1551,
+          "x": 2691,
+          "feet": 336
+        },
+        {
+          "n": 1560,
+          "x": 2723,
+          "feet": 336
+        },
+        {
+          "n": 1569,
+          "x": 2754,
+          "feet": 336
+        },
+        {
+          "n": 1578,
+          "x": 2786,
+          "feet": 336
+        },
+        {
+          "n": 1587,
+          "x": 2817,
+          "feet": 336
+        },
+        {
+          "n": 1631,
+          "x": 2971,
+          "feet": 336
+        },
+        {
+          "n": 1633,
+          "x": 2978,
+          "feet": 336
+        },
+        {
+          "n": 1642,
+          "x": 3010,
+          "feet": 336
+        }
+      ],
+      "hints": [],
+      "snapshots": [
+        {
+          "n": 1,
+          "file": "alivio-1.png",
+          "p": {
+            "x": 32.3,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 0,
+            "y": 176
+          },
+          "status": "Atravesse no intervalo seco ou suba pela oficina para abrir o alívio. A manutenção também leva à passarela sobre a grelha."
+        },
+        {
+          "n": 110,
+          "file": "alivio-110.png",
+          "p": {
+            "x": 115.02534068887034,
+            "y": 264
+          },
+          "feet": 288,
+          "camera": {
+            "x": 51.02114293079188,
+            "y": 137.84858891200017
+          },
+          "status": "Atravesse no intervalo seco ou suba pela oficina para abrir o alívio. A manutenção também leva à passarela sobre a grelha."
+        },
+        {
+          "n": 220,
+          "file": "alivio-220.png",
+          "p": {
+            "x": 229.07602206661105,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 163.1166783559958,
+            "y": 60.00463413960367
+          },
+          "status": "Tampa de alívio: pule e use baixo no ar para retirar a pressão. A passarela à direita oferece um salto opcional."
+        },
+        {
+          "n": 329,
+          "file": "alivio-329.png",
+          "p": {
+            "x": 338.10136275548143,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 274.03803578090304,
+            "y": 56.000015088447704
+          },
+          "status": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura."
+        },
+        {
+          "n": 439,
+          "file": "alivio-439.png",
+          "p": {
+            "x": 424.40136275548144,
+            "y": 36.799999999999955
+          },
+          "feet": 60.799999999999955,
+          "camera": {
+            "x": 335.9374507172217,
+            "y": 0.7999999999999545
+          },
+          "status": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura."
+        },
+        {
+          "n": 548,
+          "file": "alivio-548.png",
+          "p": {
+            "x": 628.2562102664492,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 563.4440177927166,
+            "y": 175.82407590020765
+          },
+          "status": "Patamar de saída: siga à direita para voltar ao piso da oficina."
+        },
+        {
+          "n": 657,
+          "file": "alivio-657.png",
+          "p": {
+            "x": 838.5815509553197,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 741.113259025241,
+            "y": 172.0000009240453
+          },
+          "status": "O novo ramal tem registro próprio: subir e fazer manutenção abre uma travessia segura."
+        },
+        {
+          "n": 767,
+          "file": "alivio-767.png",
+          "p": {
+            "x": 1060.0805246472632,
+            "y": 138.5000000000001
+          },
+          "feet": 162.5000000000001,
+          "camera": {
+            "x": 970.2977349047121,
+            "y": 72.41724000600146
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 876,
+          "file": "alivio-876.png",
+          "p": {
+            "x": 1253.7447368303174,
+            "y": 54.99999999999997
+          },
+          "feet": 78.99999999999997,
+          "camera": {
+            "x": 1168.3614281515213,
+            "y": 16.99999999999997
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 986,
+          "file": "alivio-986.png",
+          "p": {
+            "x": 1336.1426239846244,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 1264.23438773125,
+            "y": 127.62563452799996
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1095,
+          "file": "alivio-1095.png",
+          "p": {
+            "x": 1447.307048314947,
+            "y": 244.4000000000001
+          },
+          "feet": 268.4000000000001,
+          "camera": {
+            "x": 1365.6741104294974,
+            "y": 171.5655001587345
+          },
+          "status": "O cascudo ocupa a margem. Use a altura e cuide da água entre os apoios."
+        },
+        {
+          "n": 1204,
+          "file": "alivio-1204.png",
+          "p": {
+            "x": 1828.4574722770808,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 1730.790820168436,
+            "y": 171.9786224080365
+          },
+          "status": "O carregador e a grelha pedem uma aproximação por etapas."
+        },
+        {
+          "n": 1314,
+          "file": "alivio-1314.png",
+          "p": {
+            "x": 2197.9508366833306,
+            "y": 151.50000000000028
+          },
+          "feet": 175.50000000000028,
+          "camera": {
+            "x": 2100.757261232953,
+            "y": 99.93129558642816
+          },
+          "status": "O carregador e a grelha pedem uma aproximação por etapas."
+        },
+        {
+          "n": 1365,
+          "file": "alivio-1365.png",
+          "p": {
+            "x": 2345.8508366833303,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2264.9192706424046,
+            "y": 171.98733335174998
+          },
+          "status": "Ponto seguro nesta tentativa · As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída. · sair e reentrar reinicia a câmara"
+        },
+        {
+          "n": 1380,
+          "file": "alivio-1380.png",
+          "p": {
+            "x": 2346.4508366833297,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2272.9058859541246,
+            "y": 171.99935453975837
+          },
+          "status": "Ponto seguro nesta tentativa · As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída. · sair e reentrar reinicia a câmara"
+        },
+        {
+          "n": 1395,
+          "file": "alivio-1395.png",
+          "p": {
+            "x": 2365.3508366833294,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2281.6276546296745,
+            "y": 171.99996710898455
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1410,
+          "file": "alivio-1410.png",
+          "p": {
+            "x": 2417.8508366833294,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2322.233497687034,
+            "y": 171.99999832395733
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1423,
+          "file": "alivio-1423.png",
+          "p": {
+            "x": 2463.3508366833294,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2366.07311317991,
+            "y": 171.99999987298202
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1425,
+          "file": "alivio-1425.png",
+          "p": {
+            "x": 2470.3508366833294,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2372.9853676022813,
+            "y": 171.9999999145931
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1440,
+          "file": "alivio-1440.png",
+          "p": {
+            "x": 2522.8508366833294,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2425.2284381866066,
+            "y": 171.99999999564787
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1455,
+          "file": "alivio-1455.png",
+          "p": {
+            "x": 2575.3508366833294,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2477.6906762802046,
+            "y": 171.99999999977823
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1470,
+          "file": "alivio-1470.png",
+          "p": {
+            "x": 2627.8508366833294,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2530.18512626729,
+            "y": 171.9999999999887
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1485,
+          "file": "alivio-1485.png",
+          "p": {
+            "x": 2664.090433915379,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2576.5620547169933,
+            "y": 171.99999999999943
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1500,
+          "file": "alivio-1500.png",
+          "p": {
+            "x": 2668.0307489217967,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2592.73705114591,
+            "y": 171.99999999999994
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1515,
+          "file": "alivio-1515.png",
+          "p": {
+            "x": 2668.0307489217967,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2595.546661466092,
+            "y": 171.99999999999994
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1530,
+          "file": "alivio-1530.png",
+          "p": {
+            "x": 2668.0307489217967,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2595.9596007228074,
+            "y": 171.99999999999994
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1533,
+          "file": "alivio-1533.png",
+          "p": {
+            "x": 2668.0307489217967,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2595.9822634163347,
+            "y": 171.99999999999994
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1545,
+          "file": "alivio-1545.png",
+          "p": {
+            "x": 2674.330748921797,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2597.7612393966783,
+            "y": 171.99999999999994
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1560,
+          "file": "alivio-1560.png",
+          "p": {
+            "x": 2722.830748921797,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2628.962977702782,
+            "y": 171.99999999999994
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1575,
+          "file": "alivio-1575.png",
+          "p": {
+            "x": 2775.330748921797,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2678.222420559635,
+            "y": 171.99999999999994
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1590,
+          "file": "alivio-1590.png",
+          "p": {
+            "x": 2827.830748921797,
+            "y": 297.5
+          },
+          "feet": 321.5,
+          "camera": {
+            "x": 2729.751526430766,
+            "y": 171.99999999999994
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1605,
+          "file": "alivio-1605.png",
+          "p": {
+            "x": 2880.330748921797,
+            "y": 215.00000000000017
+          },
+          "feet": 239.00000000000017,
+          "camera": {
+            "x": 2748.730056096135,
+            "y": 169.97218480000004
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1620,
+          "file": "alivio-1620.png",
+          "p": {
+            "x": 2932.830748921797,
+            "y": 234.50000000000034
+          },
+          "feet": 258.50000000000034,
+          "camera": {
+            "x": 2751.519403742412,
+            "y": 168.3096785796403
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1635,
+          "file": "alivio-1635.png",
+          "p": {
+            "x": 2985.330748921797,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2751.929364915852,
+            "y": 171.81195058798338
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1642,
+          "file": "alivio-1642.png",
+          "p": {
+            "x": 3009.830748921797,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2751.9711331648614,
+            "y": 171.95312201383544
+          },
+          "status": "PASSAGEM INSPECIONADA · alívio intacto, grelha mantém o ciclo · sem progresso salvo"
+        }
+      ],
+      "damage": [],
+      "jumps": [
+        {
+          "start": {
+            "n": 69,
+            "x": 115.02534068887034,
+            "feet": 336,
+            "y": 312,
+            "camX": 50.232423472005436,
+            "camY": 176
+          },
+          "apex": {
+            "n": 91,
+            "x": 115.02534068887034,
+            "feet": 233.00000000000023,
+            "y": 209.00000000000023,
+            "camX": 50.977714411685525,
+            "camY": 111.97193970477463
+          },
+          "end": {
+            "n": 106,
+            "x": 115.02534068887034,
+            "feet": 288,
+            "y": 264,
+            "camX": 51.018340871365574,
+            "camY": 120.70000000000039
+          },
+          "landingAtTakeoff": {
+            "x": 64.79291721686491,
+            "y": 112
+          },
+          "landingAtApex": {
+            "x": 64.04762627718482,
+            "y": 176.02806029522537
+          }
+        },
+        {
+          "start": {
+            "n": 115,
+            "x": 115.02534068887034,
+            "feet": 288,
+            "y": 264,
+            "camX": 51.023125397953336,
+            "camY": 146.7535080721762
+          },
+          "apex": {
+            "n": 137,
+            "x": 153.32534068887034,
+            "feet": 185.00000000000023,
+            "y": 161.00000000000023,
+            "camX": 75.96582935550471,
+            "camY": 108.63813074839513
+          },
+          "end": {
+            "n": 150,
+            "x": 170.03368196432737,
+            "feet": 224,
+            "y": 200,
+            "camX": 97.40832792900989,
+            "camY": 108.04836038533307
+          },
+          "landingAtTakeoff": {
+            "x": 119.01055656637404,
+            "y": 77.2464919278238
+          },
+          "landingAtApex": {
+            "x": 94.06785260882266,
+            "y": 115.36186925160487
+          }
+        },
+        {
+          "start": {
+            "n": 171,
+            "x": 172.0506813777407,
+            "feet": 224,
+            "y": 200,
+            "camX": 107.25056625591431,
+            "camY": 108.00074917047381
+          },
+          "apex": {
+            "n": 193,
+            "x": 210.3506813777407,
+            "feet": 121.00000000000006,
+            "y": 97.00000000000006,
+            "camX": 132.94324448833422,
+            "camY": 60.98400000000005
+          },
+          "end": {
+            "n": 206,
+            "x": 227.05902265319773,
+            "feet": 160,
+            "y": 136,
+            "camX": 154.4245727970233,
+            "camY": 60.07457189500339
+          },
+          "landingAtTakeoff": {
+            "x": 119.80845639728342,
+            "y": 51.99925082952619
+          },
+          "landingAtApex": {
+            "x": 94.11577816486351,
+            "y": 99.01599999999995
+          }
+        },
+        {
+          "start": {
+            "n": 227,
+            "x": 229.07602206661105,
+            "feet": 160,
+            "y": 136,
+            "camX": 164.27528610718173,
+            "camY": 60.00115522367177
+          },
+          "apex": {
+            "n": 249,
+            "x": 267.3760220666111,
+            "feet": 56.99999999999994,
+            "y": 32.99999999999994,
+            "camX": 189.96854788682526,
+            "camY": -3.000000000000057
+          },
+          "end": {
+            "n": 270,
+            "x": 309.3760220666111,
+            "feet": 160,
+            "y": 136,
+            "camX": 230.79530190851384,
+            "camY": 51.045725921157775
+          },
+          "landingAtTakeoff": {
+            "x": 145.10073595942936,
+            "y": 99.99884477632823
+          },
+          "landingAtApex": {
+            "x": 119.40747417978582,
+            "y": 163.00000000000006
+          }
+        },
+        {
+          "start": {
+            "n": 421,
+            "x": 361.40136275548144,
+            "feet": 160,
+            "y": 136,
+            "camX": 283.7432009472538,
+            "camY": 56.00000000000018
+          },
+          "apex": {
+            "n": 443,
+            "x": 438.40136275548144,
+            "feet": 56.99999999999994,
+            "y": 32.99999999999994,
+            "camX": 349.45598245868894,
+            "camY": -3.000000000000057
+          },
+          "end": {
+            "n": 464,
+            "x": 511.90136275548144,
+            "feet": 160,
+            "y": 136,
+            "camX": 422.28392767637206,
+            "camY": 48.26175260685377
+          },
+          "landingAtTakeoff": {
+            "x": 228.15816180822765,
+            "y": 103.99999999999983
+          },
+          "landingAtApex": {
+            "x": 162.4453802967925,
+            "y": 163.00000000000006
+          }
+        },
+        {
+          "start": {
+            "n": 659,
+            "x": 845.0565509553197,
+            "feet": 336,
+            "y": 312,
+            "camX": 748.0055056846667,
+            "camY": 172.00000062132807
+          },
+          "apex": {
+            "n": 681,
+            "x": 891.5315509553197,
+            "feet": 233.00000000000023,
+            "y": 209.00000000000023,
+            "camX": 804.3261851695635,
+            "camY": 163.72394326804627
+          },
+          "end": {
+            "n": 696,
+            "x": 892.2838989769582,
+            "feet": 288,
+            "y": 264,
+            "camX": 819.7205488685212,
+            "camY": 170.6318508156604
+          },
+          "landingAtTakeoff": {
+            "x": 144.27839329229153,
+            "y": 115.99999937867193
+          },
+          "landingAtApex": {
+            "x": 87.95771380739473,
+            "y": 124.27605673195373
+          }
+        },
+        {
+          "start": {
+            "n": 697,
+            "x": 891.9397163362124,
+            "feet": 288,
+            "y": 264,
+            "camX": 819.7468489646441,
+            "camY": 170.87811766884153
+          },
+          "apex": {
+            "n": 719,
+            "x": 938.7095246472632,
+            "feet": 185.00000000000023,
+            "y": 161.00000000000023,
+            "camX": 850.0974294257958,
+            "camY": 118.32943436544019
+          },
+          "end": {
+            "n": 734,
+            "x": 967.8545246472632,
+            "feet": 240,
+            "y": 216,
+            "camX": 881.6226508484101,
+            "camY": 133.85278879632796
+          },
+          "landingAtTakeoff": {
+            "x": 148.10767568261917,
+            "y": 69.12188233115847
+          },
+          "landingAtApex": {
+            "x": 117.75709522146747,
+            "y": 121.67056563455981
+          }
+        },
+        {
+          "start": {
+            "n": 735,
+            "x": 969.0827746472632,
+            "feet": 240,
+            "y": 216,
+            "camX": 883.4778657042725,
+            "camY": 127.85278879632796
+          },
+          "apex": {
+            "n": 757,
+            "x": 1038.5805246472632,
+            "feet": 137.0000000000001,
+            "y": 113.00000000000011,
+            "camX": 942.22494539388,
+            "camY": 68.50650395102546
+          },
+          "end": {
+            "n": 776,
+            "x": 1078.0805246472632,
+            "feet": 224,
+            "y": 200,
+            "camX": 990.4276723919611,
+            "camY": 75.39945938058008
+          },
+          "landingAtTakeoff": {
+            "x": 194.60265894299073,
+            "y": 96.14721120367204
+          },
+          "landingAtApex": {
+            "x": 135.8555792533832,
+            "y": 155.49349604897452
+          }
+        },
+        {
+          "start": {
+            "n": 777,
+            "x": 1079.7805246472633,
+            "feet": 224,
+            "y": 200,
+            "camX": 992.5100146625973,
+            "camY": 75.50755669207567
+          },
+          "apex": {
+            "n": 799,
+            "x": 1141.7805246472633,
+            "feet": 121.00000000000006,
+            "y": 97.00000000000006,
+            "camX": 1051.5676087561862,
+            "camY": 54.106355492955906
+          },
+          "end": {
+            "n": 814,
+            "x": 1170.1537746472632,
+            "feet": 176,
+            "y": 152,
+            "camX": 1084.2792756651947,
+            "camY": 70.28741739359894
+          },
+          "landingAtTakeoff": {
+            "x": 177.64375998466585,
+            "y": 100.49244330792433
+          },
+          "landingAtApex": {
+            "x": 118.58616589107692,
+            "y": 121.89364450704409
+          }
+        },
+        {
+          "start": {
+            "n": 815,
+            "x": 1171.1977871472632,
+            "feet": 176,
+            "y": 152,
+            "camX": 1086.069497043043,
+            "camY": 71.31568226275114
+          },
+          "apex": {
+            "n": 837,
+            "x": 1215.7618621472632,
+            "feet": 72.99999999999996,
+            "y": 48.99999999999996,
+            "camX": 1129.0835824520514,
+            "camY": 10.999999999999957
+          },
+          "end": {
+            "n": 858,
+            "x": 1223.577472283522,
+            "feet": 176,
+            "y": 152,
+            "camX": 1151.755765407953,
+            "camY": 67.79119051806207
+          },
+          "landingAtTakeoff": {
+            "x": 137.50797524047903,
+            "y": 104.68431773724886
+          },
+          "landingAtApex": {
+            "x": 94.4938898314706,
+            "y": 165.00000000000006
+          }
+        },
+        {
+          "start": {
+            "n": 859,
+            "x": 1223.3288003255832,
+            "feet": 176,
+            "y": 152,
+            "camX": 1151.7045295980686,
+            "camY": 69.26877622481089
+          },
+          "apex": {
+            "n": 881,
+            "x": 1263.7447368303174,
+            "feet": 72.99999999999996,
+            "y": 48.99999999999996,
+            "camX": 1177.7553391345302,
+            "camY": 10.999999999999957
+          },
+          "end": {
+            "n": 924,
+            "x": 1281.4367332038469,
+            "feet": 144,
+            "y": 120,
+            "camX": 1209.4090104485178,
+            "camY": 57.69016
+          },
+          "landingAtTakeoff": {
+            "x": 129.7322036057783,
+            "y": 74.73122377518911
+          },
+          "landingAtApex": {
+            "x": 103.68139406931664,
+            "y": 133.00000000000006
+          }
+        },
+        {
+          "start": {
+            "n": 935,
+            "x": 1295.4367332038469,
+            "feet": 144,
+            "y": 120,
+            "camX": 1215.0887614768749,
+            "camY": 68.61259011527027
+          },
+          "apex": {
+            "n": 957,
+            "x": 1337.8099832038467,
+            "feet": 40.99999999999997,
+            "y": 16.99999999999997,
+            "camX": 1252.8362201943457,
+            "camY": -21.00000000000003
+          },
+          "end": {
+            "n": 986,
+            "x": 1336.1426239846244,
+            "feet": 224,
+            "y": 200,
+            "camX": 1264.23438773125,
+            "camY": 127.62563452799996
+          },
+          "landingAtTakeoff": {
+            "x": 121.0538625077495,
+            "y": 155.38740988472972
+          },
+          "landingAtApex": {
+            "x": 83.30640379027864,
+            "y": 245.00000000000003
+          }
+        },
+        {
+          "start": {
+            "n": 987,
+            "x": 1336.1426239846244,
+            "feet": 224,
+            "y": 200,
+            "camX": 1264.223376081655,
+            "camY": 129.85302031295998
+          },
+          "apex": {
+            "n": 1009,
+            "x": 1374.5426239846242,
+            "feet": 121.00000000000006,
+            "y": 97.00000000000006,
+            "camX": 1289.1751623573582,
+            "camY": 59.00000000000006
+          },
+          "end": {
+            "n": 1036,
+            "x": 1383.4360015266725,
+            "feet": 288,
+            "y": 264,
+            "camX": 1312.1846148005432,
+            "camY": 169.2402126072192
+          },
+          "landingAtTakeoff": {
+            "x": 119.21262544501747,
+            "y": 158.14697968704002
+          },
+          "landingAtApex": {
+            "x": 94.2608391693143,
+            "y": 228.99999999999994
+          }
+        },
+        {
+          "start": {
+            "n": 1037,
+            "x": 1383.3256644578653,
+            "feet": 288,
+            "y": 264,
+            "camX": 1312.0815407594218,
+            "camY": 169.73697433791975
+          },
+          "apex": {
+            "n": 1059,
+            "x": 1421.2429679074075,
+            "feet": 185.00000000000023,
+            "y": 161.00000000000023,
+            "camX": 1335.9438060881716,
+            "camY": 107.1000000000002
+          },
+          "end": {
+            "n": 1085,
+            "x": 1432.0549285042782,
+            "feet": 336,
+            "y": 312,
+            "camX": 1360.2941569147958,
+            "camY": 168.83880636890697
+          },
+          "landingAtTakeoff": {
+            "x": 119.97338774485638,
+            "y": 166.26302566208025
+          },
+          "landingAtApex": {
+            "x": 96.11112241610658,
+            "y": 228.8999999999998
+          }
+        },
+        {
+          "start": {
+            "n": 1085,
+            "x": 1432.0549285042782,
+            "feet": 336,
+            "y": 312,
+            "camX": 1360.2941569147958,
+            "camY": 168.83880636890697
+          },
+          "apex": {
+            "n": 1107,
+            "x": 1488.9574722770808,
+            "feet": 233.00000000000023,
+            "y": 209.00000000000023,
+            "camX": 1394.8249409052012,
+            "camY": 163.68378676037437
+          },
+          "end": {
+            "n": 1122,
+            "x": 1541.4574722770808,
+            "feet": 288,
+            "y": 264,
+            "camX": 1444.3102310948934,
+            "camY": 170.6298045419633
+          },
+          "landingAtTakeoff": {
+            "x": 181.16331536228495,
+            "y": 119.16119363109303
+          },
+          "landingAtApex": {
+            "x": 146.63253137187962,
+            "y": 124.31621323962563
+          }
+        },
+        {
+          "start": {
+            "n": 1131,
+            "x": 1572.9574722770808,
+            "feet": 288,
+            "y": 264,
+            "camX": 1475.4551925472229,
+            "camY": 171.77032845335046
+          },
+          "apex": {
+            "n": 1153,
+            "x": 1649.9574722770808,
+            "feet": 185.00000000000023,
+            "y": 161.00000000000023,
+            "camX": 1552.300679450522,
+            "camY": 118.32943436544019
+          },
+          "end": {
+            "n": 1179,
+            "x": 1740.9574722770808,
+            "feet": 336,
+            "y": 312,
+            "camX": 1643.291161270858,
+            "camY": 168.94780361392267
+          },
+          "landingAtTakeoff": {
+            "x": 265.50227972985795,
+            "y": 164.22967154664954
+          },
+          "landingAtApex": {
+            "x": 188.65679282655879,
+            "y": 217.6705656345598
+          }
+        },
+        {
+          "start": {
+            "n": 1246,
+            "x": 1975.4574722770808,
+            "feet": 336,
+            "y": 312,
+            "camX": 1877.7908056782367,
+            "camY": 171.99999486972573
+          },
+          "apex": {
+            "n": 1268,
+            "x": 2052.457472277081,
+            "feet": 233.00000000000023,
+            "y": 209.00000000000023,
+            "camX": 1954.790805614488,
+            "camY": 163.72394319498395
+          },
+          "end": {
+            "n": 1281,
+            "x": 2097.957472277081,
+            "feet": 272,
+            "y": 248,
+            "camX": 2000.2908056111874,
+            "camY": 169.96527485416024
+          },
+          "landingAtTakeoff": {
+            "x": 220.16666659884413,
+            "y": 100.00000513027427
+          },
+          "landingAtApex": {
+            "x": 143.1666666625929,
+            "y": 108.27605680501605
+          }
+        },
+        {
+          "start": {
+            "n": 1287,
+            "x": 2110.310673550518,
+            "feet": 272,
+            "y": 248,
+            "camX": 2018.7765530802792,
+            "camY": 171.38142998115055
+          },
+          "apex": {
+            "n": 1309,
+            "x": 2180.4508366833306,
+            "feet": 169.00000000000023,
+            "y": 145.00000000000023,
+            "camX": 2083.6806312713816,
+            "camY": 102.32943436544019
+          },
+          "end": {
+            "n": 1336,
+            "x": 2274.9508366833306,
+            "feet": 336,
+            "y": 312,
+            "camX": 2177.3125860642936,
+            "camY": 168
+          },
+          "landingAtTakeoff": {
+            "x": 256.17428360305144,
+            "y": 164.61857001884945
+          },
+          "landingAtApex": {
+            "x": 191.27020541194906,
+            "y": 233.6705656345598
+          }
+        },
+        {
+          "start": {
+            "n": 1588,
+            "x": 2820.830748921797,
+            "feet": 336,
+            "y": 312,
+            "camX": 2723.2700496265056,
+            "camY": 171.99999999999994
+          },
+          "apex": {
+            "n": 1610,
+            "x": 2897.830748921797,
+            "feet": 233.00000000000023,
+            "y": 209.00000000000023,
+            "camX": 2750.274346235785,
+            "camY": 163.72394326015356
+          },
+          "end": {
+            "n": 1631,
+            "x": 2971.330748921797,
+            "feet": 336,
+            "y": 312,
+            "camX": 2751.882215056412,
+            "camY": 171.58407352033518
+          },
+          "landingAtTakeoff": {
+            "x": 248.06069929529122,
+            "y": 164.00000000000006
+          },
+          "landingAtApex": {
+            "x": 221.056402686012,
+            "y": 172.27605673984644
+          }
+        }
+      ],
+      "videoFrames": 821,
+      "captureFps": 30,
+      "videoWindow": {
+        "firstFrame": 2,
+        "lastFrame": 1642
+      },
+      "finished": true,
+      "coins": 16
+    }
+  }
+}

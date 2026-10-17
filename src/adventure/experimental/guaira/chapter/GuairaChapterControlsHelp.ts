@@ -1,4 +1,5 @@
 import { DisposalScope } from '../../../../engine/DisposalScope';
+import type { GamepadMenuCommand } from '../../../../engine/StandardGamepad';
 import { WorldControlsHelp } from '../../../WorldControlsHelp';
 import type { WorldGame } from '../../../WorldGame';
 import { GuairaChapterAction } from './GuairaChapterAction';
@@ -35,7 +36,10 @@ export class GuairaChapterControlsHelp {
         }, {
             id: 'chapter-controls-help', regionLabel: 'Controles e ajuda do capítulo de Guaíra',
             closeLabel: 'VOLTAR',
+            footerHint: '↑/↓ rola o texto · Esc ou B/○ volta',
             navigation: [
+                'Controle: direcional ou analógico para andar; A/× pula; X/□ corre; ↓ no ar faz a sentada; Start pausa.',
+                'Menus: direcional escolhe; A/× confirma; B/○ volta. Na ajuda, ↑/↓ rola o texto e B/○ fecha. Solte os botões ao trocar de tela.',
                 'Esc fecha a ajuda. Na pausa, Esc continua a partida.',
                 'Recomeçar reinicia o trecho atual. Trechos concluídos permanecem salvos.',
                 optional ? 'Voltar ao mapa encerra o percurso opcional.' : 'Voltar ao mapa encerra a tentativa atual.',
@@ -81,6 +85,8 @@ export class GuairaChapterControlsHelp {
     }
 
     get isOpen() { return this.help.isOpen; }
+    canControl() { return this.help.canControl(); }
+    control(command: GamepadMenuCommand) { this.help.control(command); }
     private available() {
         const runtime = this.lifetime.isDisposed || document.hidden ? null : this.runtime();
         return runtime && !runtime.game.isDisposed && ['playing', 'paused'].includes(runtime.game.state) ? runtime : null;

@@ -3,7 +3,9 @@ import { GuairaChapterControlsHelp } from './GuairaChapterControlsHelp';
 import { chapterCompletionStory } from './GuairaChapterStory';
 import { chapterExitPresentation, chapterGuidance, chapterTitle, chapterAttemptSummary } from './GuairaChapterPresentation';
 import { ProgressStore } from '../../../progress';
-import { freshGuairaChapterProgress, type GuairaChapterProgress } from './GuairaChapterProgress';
+import { freshGuairaChapterProgress, guairaAlternateOpening, type GuairaChapterProgress } from './GuairaChapterProgress';
+import { mergeGuairaExploration, sampleGuairaExploration } from '../GuairaCourseExploration';
+import type { WorldGame } from '../../../WorldGame';
 import { reliefChallengeMessage, type GuairaReliefOptions } from '../relief/GuairaReliefChallenge';
 import { installReliefReplayControls } from '../relief/GuairaReliefReplayControls';
 import { DisposalScope } from '../../../../engine/DisposalScope';
@@ -99,7 +101,8 @@ export class GuairaChapterApp {
         const resume = dependencies.initialScene ?? this.progress.resumeScene;
         this.persistProgress(resume);
         if (resume === 'gallery' || resume === 'relief') this.beginExcursion(resume);
-        else if (resume && (dependencies.initialScene || !this.progress.completed.includes(resume))) {
+        else if (resume && (dependencies.initialScene || !this.progress.completed.includes(resume)
+            && !(this.progress.alternateCompleted && resume === guairaAlternateOpening(this.progress.opening)))) {
             this.session.selectScene(resume, this.snapshot.generation);
             const attempt = this.session.enterScene(resume, this.snapshot.generation);
             if (attempt) void this.showScene(attempt); else this.showMap('town');
@@ -110,22 +113,39 @@ export class GuairaChapterApp {
     }
     private persistProgress(resumeScene: GuairaChapterProgress['resumeScene'] = this.progress.resumeScene) {
         const snapshot = this.snapshot;
+        const active = snapshot.activeAttempt?.sceneId;
+        const activeComplete = active && (snapshot.accepted.some(receipt => receipt.sceneId === active)
+            || active === guairaAlternateOpening(snapshot.opening) && snapshot.alternateCompleted);
         this.progress = { ...this.progress, opening: snapshot.opening,
             completed: snapshot.accepted.map(receipt => receipt.sceneId),
-            selectedScene: snapshot.activeAttempt && snapshot.accepted.some(receipt => receipt.sceneId === snapshot.activeAttempt?.sceneId)
+            ...(snapshot.alternateCompleted ? { alternateCompleted: true as const } : {}),
+            selectedScene: activeComplete
                 ? snapshot.nextRecommendedScene ?? snapshot.selectedScene : snapshot.selectedScene,
             resumeScene, audioEnabled: this.audioEnabled };
         this.saved = this.progressStore.updateGuaira(this.progress);
+        // Preserve discoveries merged from another tab, including findings that
+        // remain session-only after a storage failure.
+        this.progress.exploration = mergeGuairaExploration(this.progress.exploration, this.progressStore.save.guaira.exploration);
+    }
+    private captureExploration(game: WorldGame): boolean {
+        const next = mergeGuairaExploration(this.progress.exploration, sampleGuairaExploration(game));
+        if (JSON.stringify(next) === JSON.stringify(this.progress.exploration)) return false;
+        this.progress.exploration = next;
+        return true;
     }
     private captureLiveProgress() {
         if (this.mounted?.kind === 'chapter') {
             const { attempt, runtime } = this.mounted;
-            this.session.acceptCompletion(attempt, runtime.sample(attempt));
+            const live = runtime.sample(attempt);
+            if (this.session.hasLiveCompletion(attempt, live)) this.captureExploration(runtime.game);
+            this.session.acceptCompletion(attempt, live);
             this.audioEnabled = runtime.game.audio.enabled;
         } else if (this.mounted?.kind === 'optional') {
             const { token, runtime } = this.mounted;
-            if (runtime.finished && !runtime.game.player.data.isDead && ['playing', 'paused'].includes(runtime.game.state))
+            if (runtime.finished && !runtime.game.player.data.isDead && ['playing', 'paused'].includes(runtime.game.state)) {
                 this.progress.optional[token.sceneId] = true;
+                this.captureExploration(runtime.game);
+            }
             this.audioEnabled = runtime.game.audio.enabled;
         }
         this.persistProgress();
@@ -211,6 +231,7 @@ export class GuairaChapterApp {
         const options: GuairaChapterMapOptions = {
             audioEnabled: () => this.audioEnabled, onAudioEnabled: enabled => { this.audioEnabled = enabled; this.persistProgress(); },
             storageMessage: () => this.storageMessage(), optionalProgress: () => this.progress.optional,
+            explorationProgress: () => this.progress.exploration,
             campaign: this.campaign, canContinueCampaign: () => this.snapshot.chapterComplete || !!this.canContinueCampaign?.(),
             onContinueCampaign: (generation, revision) => {
                 if (!this.currentMapAction(scope, generation, revision) || !(this.snapshot.chapterComplete || this.canContinueCampaign?.())) return;
@@ -401,7 +422,8 @@ export class GuairaChapterApp {
                 if (!this.current(scope) || game.isDisposed) return false;
                 controls.sync(); panel.sound.sync(); panel.help.sync();
                 const live = runtime.sample(attempt), complete = this.session.canContinue(attempt, live);
-                if (this.session.acceptCompletion(attempt, live) || this.audioEnabled !== game.audio.enabled) {
+                const explored = this.session.hasLiveCompletion(attempt, live) && this.captureExploration(game);
+                if (this.session.acceptCompletion(attempt, live) || explored || this.audioEnabled !== game.audio.enabled) {
                     this.audioEnabled = game.audio.enabled; this.persistProgress();
                 }
                 const action = actionNow();
@@ -431,13 +453,26 @@ export class GuairaChapterApp {
                 const message = game.state === 'paused' ? 'Pausado'
                     : !live.alive ? 'Feka caiu · retorno ao ponto seguro desta tentativa'
                     : complete ? `${chapterCompletionStory(this.snapshot, attempt.sceneId) ?? 'Trecho concluído'} · ${chapterAttemptSummary(game.coins)}`
-                    : `Etapa ${step}/5 · ${game.boss?.hint ?? guidance}`;
+                    : `${step ? `Etapa ${step}/5` : 'Percurso alternativo'} · ${game.boss?.hint ?? guidance}`;
                 const storage = this.storageMessage();
                 const statusMessage = storage !== 'Conclusões salvas neste navegador.'
                     ? `${message} · ${storage}` : message;
                 if (panel.status.textContent !== statusMessage) panel.status.textContent = statusMessage;
                 return true;
             };
+            game.enableGamepadControls({
+                owner: () => {
+                    if (!this.current(scope) || !this.focused || game.isDisposed) return null;
+                    // Sample the displayed owner without advancing its UI lease.
+                    // Keyboard/pointer presses retain their own action until reflection.
+                    return panel.chrome.controllerOwner();
+                },
+                control: command => {
+                    if (!this.current(scope) || !this.focused || game.isDisposed) return;
+                    if (command === 'pause' && game.state === 'playing' && !panel.help.isOpen) { runtime.togglePause(); reflect(); }
+                    else panel.chrome.control(command);
+                },
+            });
             if (activity.shouldPause() && game.state === 'playing') runtime.togglePause();
             activity.observe(reflect); panel.fit(); game.start(); panel.canvas.focus({ preventScroll: true });
             document.title = chapterTitle(info.title);
@@ -473,6 +508,7 @@ export class GuairaChapterApp {
         if (!this.current(scope)) return;
         const runtime = this.mounted?.kind === 'chapter' && this.mounted.attempt === attempt ? this.mounted.runtime : null;
         const live: GuairaChapterLiveResult = runtime?.sample(attempt) ?? { attempt, state: 'loading', alive: false, result: null };
+        if (runtime && this.session.hasLiveCompletion(attempt, live)) this.captureExploration(runtime.game);
         const transition = action === 'continue' ? this.session.continueFrom(attempt, live) : this.session.exitToMap(attempt, live);
         if (!transition) return;
         const arrival = runtime?.returnArrival() ?? CHAPTER_SCENES[attempt.sceneId].arrival;
@@ -586,8 +622,10 @@ export class GuairaChapterApp {
             const reflect = () => {
                 if (!this.currentExcursion(token, scope) || game.isDisposed) return false;
                 controls.sync(); panel.sound.sync(); panel.help.sync(); replay?.sync();
-                if ((runtime.finished && !game.player.data.isDead && ['playing', 'paused'].includes(game.state)
-                    && !this.progress.optional[token.sceneId]) || this.audioEnabled !== game.audio.enabled) this.captureLiveProgress();
+                const complete = runtime.finished && !game.player.data.isDead && ['playing', 'paused'].includes(game.state);
+                const explored = complete && this.captureExploration(game);
+                if (complete && (!this.progress.optional[token.sceneId] || explored)
+                    || this.audioEnabled !== game.audio.enabled) this.captureLiveProgress();
                 const action = actionNow();
                 if (action !== primaryAction) {
                     invalidatePrimary(); primaryAction = action;
@@ -637,6 +675,17 @@ export class GuairaChapterApp {
                 if (panel.status.textContent !== statusMessage) panel.status.textContent = statusMessage;
                 return true;
             };
+            game.enableGamepadControls({
+                owner: () => {
+                    if (!this.currentExcursion(token, scope) || !this.focused || game.isDisposed) return null;
+                    return panel.chrome.controllerOwner();
+                },
+                control: command => {
+                    if (!this.currentExcursion(token, scope) || !this.focused || game.isDisposed) return;
+                    if (command === 'pause' && game.state === 'playing' && !panel.help.isOpen) { runtime.togglePause(); reflect(); }
+                    else panel.chrome.control(command);
+                },
+            });
             if (activity.shouldPause() && game.state === 'playing') runtime.togglePause();
             activity.observe(reflect); panel.fit(); game.start(); panel.canvas.focus({ preventScroll: true });
             document.title = chapterTitle(info.title);

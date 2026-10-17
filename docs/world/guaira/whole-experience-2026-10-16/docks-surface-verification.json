@@ -1,0 +1,122 @@
+{
+  "physicalDevice": false,
+  "mountsForVisualInspection": true,
+  "checks": [
+    {
+      "variant": "travessia-low",
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-travessia",
+      "finished": true,
+      "coins": 22,
+      "frames": 2296
+    },
+    {
+      "variant": "travessia-high",
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-travessia",
+      "finished": true,
+      "coins": 24,
+      "frames": 2357
+    },
+    {
+      "variant": "patio-low",
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-patio-comportas",
+      "finished": true,
+      "coins": 11,
+      "frames": 3431
+    },
+    {
+      "variant": "travessia-low",
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-travessia",
+      "finished": true,
+      "coins": 22,
+      "frames": 2296
+    },
+    {
+      "variant": "travessia-high",
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-travessia",
+      "finished": true,
+      "coins": 24,
+      "frames": 2357
+    },
+    {
+      "variant": "patio-low",
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-patio-comportas",
+      "finished": true,
+      "coins": 11,
+      "frames": 3431
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

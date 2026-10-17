@@ -1,0 +1,292 @@
+{
+  "revision": "guaira-aqueduct-design-2026-10-17",
+  "reviewedAt": "2026-10-17T07:14:32.746Z",
+  "scope": "Expanded Ascent with rising masonry, a fragile span, two defenders and an elevated aqueduct finish. Expanded Gallery with a timed upper corridor and an optional maintenance tunnel, an independent valve, stairs and native backtracking. Scenery, framing, guidance and integrated progression.",
+  "nativeInputOnly": true,
+  "actorOrClockEdits": false,
+  "notAFirstPlaytest": true,
+  "sourceHashes": {
+    "src/adventure/experimental/guaira/GuairaCourseDesign.ts": "3d80dc85c5df2c4502d3b363aaebc46748dc63a85829299210e9aceb41bec195",
+    "src/adventure/experimental/guaira/GuairaCourseGuidance.ts": "8e6a5bcd01f9445b914c22c994985e9e9a9d204486739066daf87711a5d6aaa6",
+    "src/adventure/experimental/guaira/GuairaCoursePresentation.ts": "44234ff7a0c5ca4eb8590749ca4f725d40409ac006a10adb127dee94fed13634",
+    "src/adventure/experimental/guaira/GuairaAqueductLandscape.ts": "af1a59a83212308f7f8e3d103e1cf72f9879d3dd70fd16f9d4a530b93fbe6932",
+    "src/adventure/experimental/guaira/GuairaAscent.ts": "edd0b4ea578dc7f4e3fb6b8a3205bf96cf4b28ef5de9acc50a126c3327631664",
+    "tests/guaira-aqueduct-routes.test.ts": "9fb08c557d55756c3b6f6875af88aa83d3adc1ac2553cc2720f8f05b11b32770",
+    "tests/helpers/guairaAqueductController.ts": "725be61a9915d56eeee8b76353b1bf4bfdd348f3ab5a53f325e2b619de3de46b",
+    "tests/helpers/guairaAqueductReplays.json": "a4eabcccf72cbde146aea7bfe2e8ddd1afb0b3aa946c9a3fa9e374ca16dbed69",
+    "tests/helpers/guairaCourseController.ts": "55165c411d3565a3b05d89f9e1e2e511e2e55810a914502d53c457926d4459ae",
+    "scripts/record_guaira_aqueduct.ts": "c62013bdfbec987999344f0175c32e5a79d9aabd59e465f1508908ed3e0078cd",
+    "scripts/verify_guaira_workshop_surface.cjs": "5afc868c342b53865c979bf66b1e29799ede648358af40c023abffdf52b94752",
+    "tests/guaira-ascent.test.ts": "df48850248405c5af59e2fec3ea49cad310f7ca7f74c28827fb7edf9542c9883",
+    "tests/guaira-ascent-motion.test.ts": "eafc1fe8d78aa8835c8bba161f0fc70c18879bd7407f40fb257a14175707cb31",
+    "tests/guaira-ascent-travel-cue.test.ts": "946c9ab60150898199d7ee108db0bf562864efa0429d052f4f3bd801d12085f3",
+    "tests/guaira-chapter-readability.test.ts": "a6c9b53fe9b892b8a5ce73724b0292c3e2c6ff0fec59cc5c854153afe96d1a9f",
+    "tests/guaira-gallery.test.ts": "c8a0ec74c427e35aa2e7579da484e09f1fb67c2d83873cbc2a47d55d91084677",
+    "tests/guaira-rooftop-routes.test.ts": "7209683d2721901b771e50d248135d3c0a72760235fdef320a2efed4f5f1e8b6",
+    "tests/helpers/guairaAscentReplay.json": "99480b54a68d06396d539d57b7bbdb64381ebfd8cd04a5e3671dc8cde56ad900",
+    "tests/helpers/guairaRooftopReplay.json": "0bb1b14a23afec3859c3dcfdaab04abe022a7b3c3f23c646b49da684c32134d1",
+    "tests/helpers/guairaGalleryReplay.json": "27bfe24139b7af7d80580e4196b6ba9f488419dc1c0060288e36b6708733fe02",
+    "tests/helpers/guairaLevelDesignReplays.json": "2e3c643ea943ead9ef7554423d57e48acaa000a8bb4940c15e2f7558da1f209e",
+    "tests/helpers/guairaReadableRoutesReplays.json": "5c30052c44bee155148f0ffc5c76bc5b6aafc1fff14bdd232fd2a2b9ccac562a",
+    "tests/helpers/guairaExplorationReplays.json": "516dd25cb96e2c65c4c42501b97e3799a319e94e859b81ba8282a31f078f388b"
+  },
+  "levelChanges": {
+    "subida": {
+      "oldWidth": 3648,
+      "width": 4544,
+      "addedPixels": 896,
+      "foes": 8,
+      "finishY": 48,
+      "previousFinishY": 144,
+      "finalCheckpoint": 6
+    },
+    "galeria": {
+      "oldWidth": 2432,
+      "width": 3520,
+      "addedPixels": 1088,
+      "foes": 7,
+      "finalCheckpoint": 4
+    }
+  },
+  "checks": {
+    "typescriptSuite": {
+      "tests": 3534,
+      "pass": 3533,
+      "fail": 0,
+      "skipped": 1,
+      "optionalCase": "Native atlas case passed separately with bundled canvas; its file has 2 passes, 0 skips (one overlaps the full suite)."
+    },
+    "serverTests": {
+      "pass": 3,
+      "fail": 0
+    },
+    "nativeAtlasTests": {
+      "pass": 2,
+      "fail": 0,
+      "skipped": 0
+    },
+    "newRegressionCases": 9,
+    "build": true,
+    "typecheck": true,
+    "validators": true,
+    "focusedCourseTestsAfterFinalGuidancePolish": {
+      "pass": 77,
+      "fail": 0
+    },
+    "arrivalVariations": {
+      "runs": 12,
+      "finished": 12,
+      "damage": 0
+    },
+    "updatedExistingRoutes": {
+      "runs": 10,
+      "inputPrefixPreserved": true,
+      "finished": 10,
+      "damage": 0
+    },
+    "failuresAndRecovery": {
+      "realFailures": 2,
+      "causes": [
+        "fragile collapse into gap",
+        "remaining in active water"
+      ],
+      "earnedCheckpointRestored": true,
+      "subsequentCompletion": true,
+      "subsequentDamage": 0
+    },
+    "maintenanceReturn": {
+      "nativeBacktracking": true,
+      "upperRouteCoinsCollected": 2,
+      "onlyOwnJetClosed": true,
+      "completedWithoutDamage": true
+    },
+    "camera": {
+      "fullAvatar": true,
+      "inspectionStairsVisible": true,
+      "galleryFinalEnemyAndReceivingFloorVisibleThroughoutFight": true,
+      "ascentLoaderWarningVisible": true
+    },
+    "browserRoutes": {
+      "checks": 6,
+      "keyboard": true,
+      "touchSimulated": true,
+      "reducedMotion": true,
+      "physicalDevice": false,
+      "pauseStateAndPixelsFrozen": true
+    },
+    "campaign": {
+      "checks": 9,
+      "scenes": 8,
+      "normalCampaign": true,
+      "gamepadApiSimulated": true,
+      "physicalDevice": false
+    },
+    "reviewPage": {
+      "passed": true,
+      "viewports": [
+        1440,
+        390
+      ],
+      "videos": 20,
+      "checks": 40,
+      "decodedAndPlayed": true
+    }
+  },
+  "recordings": {
+    "subida-main": {
+      "fullRouteFrames": 2485,
+      "prefixFrames": 1915,
+      "excerptSeconds": 9.5,
+      "coins": 26,
+      "finished": true,
+      "damage": 0,
+      "simulationHz": 60,
+      "videoFps": 30
+    },
+    "galeria-main": {
+      "fullRouteFrames": 2088,
+      "prefixFrames": 1482,
+      "excerptSeconds": 10.1,
+      "coins": 19,
+      "finished": true,
+      "damage": 0,
+      "simulationHz": 60,
+      "videoFps": 30
+    },
+    "galeria-tunnel": {
+      "fullRouteFrames": 2258,
+      "prefixFrames": 1482,
+      "excerptSeconds": 12.933333333333334,
+      "coins": 22,
+      "finished": true,
+      "damage": 0,
+      "simulationHz": 60,
+      "videoFps": 30
+    }
+  },
+  "variations": [
+    {
+      "id": "subida",
+      "route": "main",
+      "wait": 0,
+      "frames": 2485,
+      "coins": 26,
+      "finished": true,
+      "damage": []
+    },
+    {
+      "id": "galeria",
+      "route": "main",
+      "wait": 0,
+      "frames": 2088,
+      "coins": 19,
+      "finished": true,
+      "damage": [],
+      "isolated": false
+    },
+    {
+      "id": "galeria",
+      "route": "tunnel",
+      "wait": 0,
+      "frames": 2307,
+      "coins": 22,
+      "finished": true,
+      "damage": [],
+      "isolated": true
+    },
+    {
+      "id": "subida",
+      "route": "main",
+      "wait": 120,
+      "frames": 2605,
+      "coins": 26,
+      "finished": true,
+      "damage": []
+    },
+    {
+      "id": "galeria",
+      "route": "main",
+      "wait": 120,
+      "frames": 2263,
+      "coins": 19,
+      "finished": true,
+      "damage": [],
+      "isolated": false
+    },
+    {
+      "id": "galeria",
+      "route": "tunnel",
+      "wait": 120,
+      "frames": 2427,
+      "coins": 22,
+      "finished": true,
+      "damage": [],
+      "isolated": true
+    },
+    {
+      "id": "subida",
+      "route": "main",
+      "wait": 300,
+      "frames": 2784,
+      "coins": 26,
+      "finished": true,
+      "damage": []
+    },
+    {
+      "id": "galeria",
+      "route": "main",
+      "wait": 300,
+      "frames": 2388,
+      "coins": 19,
+      "finished": true,
+      "damage": [],
+      "isolated": false
+    },
+    {
+      "id": "galeria",
+      "route": "tunnel",
+      "wait": 300,
+      "frames": 2562,
+      "coins": 22,
+      "finished": true,
+      "damage": [],
+      "isolated": true
+    },
+    {
+      "id": "subida",
+      "route": "main",
+      "wait": 570,
+      "frames": 3042,
+      "coins": 26,
+      "finished": true,
+      "damage": []
+    },
+    {
+      "id": "galeria",
+      "route": "main",
+      "wait": 570,
+      "frames": 2767,
+      "coins": 19,
+      "finished": true,
+      "damage": [],
+      "isolated": false
+    },
+    {
+      "id": "galeria",
+      "route": "tunnel",
+      "wait": 570,
+      "frames": 2907,
+      "coins": 22,
+      "finished": true,
+      "damage": [],
+      "isolated": true
+    }
+  ],
+  "limitations": [
+    "Rehearsed routes and visual inspection do not establish first-time discovery, perceived difficulty or fun.",
+    "Touch and Gamepad API checks use simulated input, not physical devices.",
+    "The other four course recordings and the bosses retain their current previous revisions; campaign progression was checked again.",
+    "Island geometry is unchanged."
+  ],
+  "supersededBy": "maintenance-verification.json"
+}

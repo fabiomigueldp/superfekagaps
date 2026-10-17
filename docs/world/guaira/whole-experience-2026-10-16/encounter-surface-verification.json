@@ -1,0 +1,160 @@
+{
+  "physicalDevice": false,
+  "mountsForVisualInspection": true,
+  "checks": [
+    {
+      "variant": "respiros-low",
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-respiros",
+      "finished": true,
+      "coins": 21,
+      "frames": 2359
+    },
+    {
+      "variant": "alivio-low",
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-camara-alivio",
+      "finished": true,
+      "coins": 16,
+      "frames": 1642
+    },
+    {
+      "variant": "respiros-high",
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-respiros",
+      "finished": true,
+      "coins": 19,
+      "frames": 2681
+    },
+    {
+      "variant": "alivio-high",
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-camara-alivio",
+      "finished": true,
+      "coins": 20,
+      "frames": 1726
+    },
+    {
+      "variant": "respiros-low",
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-respiros",
+      "finished": true,
+      "coins": 21,
+      "frames": 2359
+    },
+    {
+      "variant": "alivio-low",
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-camara-alivio",
+      "finished": true,
+      "coins": 16,
+      "frames": 1642
+    },
+    {
+      "variant": "respiros-high",
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-respiros",
+      "finished": true,
+      "coins": 19,
+      "frames": 2681
+    },
+    {
+      "variant": "alivio-high",
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-camara-alivio",
+      "finished": true,
+      "coins": 20,
+      "frames": 1726
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

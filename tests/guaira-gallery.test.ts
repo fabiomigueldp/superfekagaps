@@ -10,6 +10,8 @@ import { GuairaGallery, GUAIRA_GALLERY as G, guairaGalleryStage, galleryArrival 
 import { guairaGalleryBrowser } from './helpers/guairaGalleryHarness';
 import { sceneLifecycleBrowser } from './helpers/sceneLifecycleHarness';
 import recording from './helpers/guairaGalleryReplay.json';
+import {continueGuairaCourse} from './helpers/guairaCourseController';
+import {GUAIRA_COURSES} from '../src/adventure/experimental/guaira/GuairaCourseDesign';
 
 const dt = 1000 / 60;
 const feet = (g: GuairaGallery) => g.player.data.position.y + g.player.data.height;
@@ -52,10 +54,10 @@ test('gallery has two required lids, an optional cache and no campaign hooks', t
     const stages = structuredClone(STAGES), islands = structuredClone(ISLANDS), h = guairaGalleryBrowser(t), g = h.create();
     assert.ok(g.player instanceof Player); assert.ok(g.input instanceof Input); assert.ok(g.level instanceof WorldLevel);
     assert.equal(g.player.data.position.x,48); assert.equal(feet(g),176); assert.equal(g.player.data.hasHelmet,true);
-    assert.equal(g.stage.level.tiles.flat().filter(tile => tile === T.BRICK_BREAKABLE).length,9);
-    assert.equal(g.stage.pickups.length,5);
-    assert.ok(g.stage.pickups.every(p => p.kind === 'coin' && p.y > G.cacheY));
-    for (const key of ['exits','foes','mechanisms','dialogues','landmarks'] as const) assert.deepEqual(g.stage[key],[]);
+    assert.equal(g.stage.level.tiles.flat().filter(tile => tile === T.BRICK_BREAKABLE).length,17);
+    assert.equal(g.stage.pickups.filter(p=>!p.id.includes(':course:')).length,5);
+    assert.ok(g.stage.pickups.filter(p=>!p.id.includes(':course:')).every(p => p.kind === 'coin' && p.y > G.cacheY));
+    for (const key of ['exits','dialogues','landmarks'] as const) assert.deepEqual(g.stage[key],[]);
     assert.equal(g.boss,null); assert.equal(g.mapReturnHref,'./guaira.html?at=bairro');
     for (let row=0;row<15;row++) assert.equal(g.level.getTile(14,row),T.GROUND);
     for (let row=0;row<21;row++) assert.equal(g.level.getTile(28,row),T.GROUND);
@@ -73,7 +75,7 @@ for (const touch of [false,true]) for (const reducedMotion of [false,true]) test
     assert.deepEqual([result.firstBreak,result.firstDescent,result.secondBreak,result.secondDescent],[true,true,true,true]);
     assert.equal(g.finished,true); assert.equal(feet(g),192); assert.equal(g.player.data.position.x,recording.expected.x);
     assert.deepEqual(tiles(g,11,10),[0,0,0]); assert.deepEqual(tiles(g,18,24),[0,0,0]);
-    assert.equal(g.store.save.checkpoint?.index,0); assert.equal(g.coins,0); assert.equal(campaignCompletions,0);
+    assert.equal(g.store.save.checkpoint?.index,g.stage.checkpoints.length-1); assert.equal(g.coins,recording.coins); assert.equal(campaignCompletions,0);
     assert.deepEqual(g.store.save.completed,[]); assert.deepEqual(g.store.save.times,{}); assert.equal(g.mapReturnHref,G.mapHref);
     const frozen=snapshot(g), idle=g.player.data.animationTimer; h.run(g,60,['ArrowLeft','Space','ArrowDown']); g.render();
     assert.deepEqual(snapshot(g),frozen);
@@ -103,7 +105,14 @@ for(const touch of [false,true])test(`right-edge single holes have visible lower
     assert.deepEqual(tiles(g,18,24),[10,10,0]);
     h.run(g,32,['ArrowLeft']);h.run(g,30);assert.equal(feet(g),336);
     h.run(g,55,['ArrowRight']);h.run(g,30);
-    for(const[n,k]of runs.slice(12))h.run(g,n,k);
+    // This intentionally longer entry changes the pressure clock. Retain its
+    // original path, then read the live cycle instead of splicing a timed tape.
+    outer:for(const[n,k]of runs.slice(12))for(let i=0;i<n;i++){
+        if(g.player.data.isGrounded&&g.player.data.position.x>=GUAIRA_COURSES.galeria.start+1664)break outer;
+        h.run(g,1,k);
+    }
+    const result=continueGuairaCourse(g,keys=>h.run(g,1,keys));
+    assert.ok(result.finished&&!result.dead);assert.equal(result.damage,0);
     assert.equal(g.finished,true);assert.equal(g.player.data.hasHelmet,true);assert.equal(g.player.data.isDead,false);
 });
 
@@ -112,7 +121,7 @@ for(const touch of [false,true])test(`native ${touch?'touch':'keyboard'} route c
     const blocks:Run[]=[...runs.slice(0,6),[12,['ArrowRight']],[42,['ArrowRight','Space']],[30,[]],
         [12,['ArrowRight']],[30,[]],...runs.slice(8)];
     for(const[n,k]of blocks)for(let i=0;i<n;i++){
-        h.run(g,1,k);assert.equal(g.store.save.checkpoint,null);assert.equal(g.player.data.hasHelmet,true);
+        h.run(g,1,k);assert.notEqual(g.store.save.checkpoint?.index,0,'the first flag remains optional');assert.equal(g.player.data.hasHelmet,true);
     }
     assert.equal(g.finished,true);assert.equal(feet(g),192);
 });

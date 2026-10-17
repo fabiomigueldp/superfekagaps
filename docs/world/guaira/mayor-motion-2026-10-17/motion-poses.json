@@ -1,0 +1,127 @@
+{
+  "nativeInputOnly": true,
+  "actorOrClockEdits": false,
+  "complete": true,
+  "samples": [
+    {
+      "label": "POUSO",
+      "frame": 696,
+      "state": "rushWarning",
+      "tick": 0,
+      "speed": 0,
+      "distance": 0
+    },
+    {
+      "label": "APOIA O PESO",
+      "frame": 702,
+      "state": "rushWarning",
+      "tick": 6,
+      "speed": 0,
+      "distance": 0
+    },
+    {
+      "label": "PREPARA",
+      "frame": 720,
+      "state": "rushWarning",
+      "tick": 24,
+      "speed": 0,
+      "distance": 0
+    },
+    {
+      "label": "ARRANQUE",
+      "frame": 741,
+      "state": "rush",
+      "tick": 3,
+      "speed": 3.2,
+      "distance": 7.200000000000003
+    },
+    {
+      "label": "PASSADA 1",
+      "frame": 746,
+      "state": "rush",
+      "tick": 8,
+      "speed": 5,
+      "distance": 31
+    },
+    {
+      "label": "PASSADA 2",
+      "frame": 749,
+      "state": "rush",
+      "tick": 11,
+      "speed": 5,
+      "distance": 46
+    },
+    {
+      "label": "PASSADA 3",
+      "frame": 751,
+      "state": "rush",
+      "tick": 13,
+      "speed": 5,
+      "distance": 56
+    },
+    {
+      "label": "PASSADA 4",
+      "frame": 753,
+      "state": "rush",
+      "tick": 15,
+      "speed": 5,
+      "distance": 66
+    },
+    {
+      "label": "DESACELERA",
+      "frame": 773,
+      "state": "rush",
+      "tick": 35,
+      "speed": 5,
+      "distance": 166
+    },
+    {
+      "label": "SEGURA O PESO",
+      "frame": 781,
+      "state": "rush",
+      "tick": 43,
+      "speed": 1.8304877167279139,
+      "distance": 192.2770163543425
+    },
+    {
+      "label": "ASSENTA",
+      "frame": 787,
+      "state": "brake",
+      "tick": 1,
+      "speed": 0,
+      "distance": 196
+    },
+    {
+      "label": "RETOMA A GUARDA",
+      "frame": 798,
+      "state": "brake",
+      "tick": 12,
+      "speed": 0,
+      "distance": 196
+    },
+    {
+      "label": "REARMA",
+      "frame": 830,
+      "state": "warning",
+      "tick": 24
+    },
+    {
+      "label": "RECOLHE OS JOELHOS",
+      "frame": 878,
+      "state": "leap",
+      "tick": 12
+    },
+    {
+      "label": "PREPARA O IMPACTO",
+      "frame": 895,
+      "state": "leap",
+      "tick": 29
+    },
+    {
+      "label": "CARIMBADA",
+      "frame": 900,
+      "state": "stamp",
+      "tick": 2
+    }
+  ]
+}

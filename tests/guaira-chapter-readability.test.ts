@@ -1,3 +1,4 @@
+import { introductionReached } from './helpers/guairaCourseTest';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { pixelText, textWidth } from '../src/graphics/BitmapFont';
@@ -50,8 +51,8 @@ for (const touch of [false, true]) for (const reducedMotion of [false, true])
                 if (g.player.data.isGrounded && g.player.data.position.x > 1058 && feet(g) === 96) landed = n;
             }
         });
-        assert.ok(landed > 1014 && landed < 1070); assert.equal(g.finished, true); assert.equal(g.coins, 7);
-        assert.equal(feet(g), 144, 'walks down to the ordinary final terrace');
+        assert.ok(landed > 1014 && landed < 1070); assert.equal(g.finished, true); assert.equal(g.coins, ascent.subida.coins);
+        assert.equal(feet(g), g.stage.level.goalPosition.y*16, 'arrives on the elevated aqueduct terrace');
     });
 
 for (const hold of [16, 20, 24, 36, 52]) test(`lookout accepts ${hold}-frame jump and reaches the house without a precise release`, t => {
@@ -63,7 +64,7 @@ for (const hold of [16, 20, 24, 36, 52]) test(`lookout accepts ${hold}-frame jum
         if (g.player.data.isGrounded && g.player.data.position.x > 1058 && feet(g) === 96) landed = true;
     });
     assert.equal(landed, true);
-    h.run(g, 130, ['ArrowRight']); assert.equal(g.finished, true); assert.equal(g.player.data.hasHelmet, true);
+    h.run(g, 130, ['ArrowRight']); assert.equal(introductionReached(g), true); assert.equal(g.player.data.hasHelmet, true);
 });
 
 for (const touch of [false, true]) test(`Pátio full optional route retains the far bank through the exit jump, touch=${touch}`, t => {
@@ -73,7 +74,7 @@ for (const touch of [false, true]) test(`Pátio full optional route retains the 
         if (n >= 153 && n <= 182) visible(g, 384, 16, 256);
         if (n >= 1745 && n <= 1788) visible(g, 848, 48, 208);
     });
-    assert.equal(g.finished, true); assert.equal(g.coins, 3);
+    assert.equal(g.finished, true); assert.equal(g.coins, patio.coins);
 });
 
 type Paint = [string, number, number, number, number];

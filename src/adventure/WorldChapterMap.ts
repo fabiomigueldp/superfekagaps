@@ -4,6 +4,7 @@ import { isGuairaUnlocked } from './progress';
 import { GUAIRA_JOURNEY, GUAIRA_LANDMARKS, guairaJourneyCapabilities } from './GuairaMapJourney';
 import { CHAPTER_SCENES } from './experimental/guaira/chapter/GuairaChapterScenes';
 import { guairaChapterRoute } from './experimental/guaira/chapter/GuairaChapterProgress';
+import { guairaExplorationDetails } from './experimental/guaira/GuairaCourseExploration';
 import { ALL_DELICIA_STAGES, DELICIA_STAGES } from './delicia/DeliciaContent';
 import { deliciaUnlocked, type DeliciaSave } from './delicia/DeliciaProgress';
 import { DELICIA_JOURNEY } from './delicia/DeliciaMapJourney';
@@ -21,6 +22,7 @@ export interface ChapterMapStage {
     optional?: boolean;
     seals?: number;
     sealTotal?: number;
+    exploration?: readonly { name: string; found: number; total: number }[];
     gate: string;
 }
 export const WORLD_CHAPTER_NAMES: Record<WorldChapter, string> = {
@@ -53,12 +55,12 @@ export function chapterMapStages(chapter: WorldChapter, save: AdventureSave, del
         open: capabilities.availableStages.includes(id),
         completed: progress.completed.includes(id),
         gate: !available ? 'Conclua 3-5: Controle de Qualidade.' : `Conclua ${CHAPTER_SCENES[route[Math.max(0, index - 1)]].title}.` }));
-    if (!progress.completed.length) {
+    {
         const alternative = progress.opening === 'guaira-travessia' ? 'guaira-patio-comportas' : 'guaira-travessia';
-        stages.push({ id: alternative, label: 'B', name: CHAPTER_SCENES[alternative].title, optional: true,
+        stages.push({ id: alternative, label: progress.completed.length ? 'D' : 'B', name: CHAPTER_SCENES[alternative].title, optional: true,
             place: GUAIRA_LANDMARKS[alternative].place, landmarkCue: GUAIRA_LANDMARKS[alternative].cue,
             point: GUAIRA_JOURNEY.nodes[alternative],
-            open: available, completed: false, gate: 'Conclua 3-5: Controle de Qualidade.' });
+            open: available, completed: progress.alternateCompleted === true, gate: 'Conclua 3-5: Controle de Qualidade.' });
     }
     for (const [id, name] of [['gallery', 'Galeria dos Remendos'], ['relief', 'Câmara de Alívio']] as const) {
         stages.push({ id, label: id === 'gallery' ? 'G' : 'A', name, optional: true, open: available, completed: progress.optional[id],
@@ -66,7 +68,8 @@ export function chapterMapStages(chapter: WorldChapter, save: AdventureSave, del
             point: GUAIRA_JOURNEY.nodes[id],
             gate: 'Conclua 3-5: Controle de Qualidade.' });
     }
-    return stages;
+    return stages.map(stage => ({ ...stage,
+        exploration: stage.open ? guairaExplorationDetails(stage.id, progress.exploration) : undefined }));
 }
 
 export function chapterSelection(stages: readonly ChapterMapStage[], preferred: string): number {

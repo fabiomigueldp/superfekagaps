@@ -55,12 +55,15 @@ for (const side of ['left', 'right'] as const) test(`ordinary corner camping at 
     assert.equal(game.boss?.health, 6); assert.deepEqual(game.store.save.completed, []);
 });
 
-for (const [state, facing, bx, px] of [
-    ['charge', -1, 100, 144], ['brake', -1, 21, 65],
-    ['charge', 1, 95, 85], ['brake', 1, 251, 241],
+for (const [state, facing, bx] of [
+    ['charge', -1, 160], ['brake', -1, 21],
+    ['charge', 1, 95], ['brake', 1, 251],
 ] as const) test(`real falling top safely bounces from trailing sweep: ${state}/${facing}`, t => {
     const h = guairaBrowser(t), game = h.create(), b = (game.boss as GuairaBullEncounter).model;
-    b.state = 'charge'; b.facing = facing; b.x = bx;
+    b.state = 'tell'; b.stateTick = BULL_RULES.tell - 1; b.facing = facing; b.x = bx;
+    b.update(BULL_RULES.tickMs, game.player.getRect());
+    if (state === 'charge') for (let i = 0; i < 6; i++) b.update(BULL_RULES.tickMs, game.player.getRect());
+    const px = facing < 0 ? b.x + 44 : b.x - 10;
     game.player.data.position = { x: px, y: 166 }; game.player.data.velocity = { x: 0, y: 6 };
     game.player.data.isGrounded = false;
     game.update(BULL_RULES.tickMs);

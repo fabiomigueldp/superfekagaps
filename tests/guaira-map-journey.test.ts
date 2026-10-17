@@ -55,7 +55,7 @@ test('all eight modeled entrances have distinct positions, reciprocal routes and
     }
 });
 
-test('locked stops, alternative opening retirement and reduced motion keep native entry semantics', () => {
+test('locked stops, the visitable alternate opening and reduced motion keep native entry semantics', () => {
     const save = freshSave(); assert.deepEqual(guairaJourneyCapabilities(save).availableStages, []);
     save.completed.push('3-5');
     const caps = guairaJourneyCapabilities(save), start = skipJourney(guairaArrivalJourney(save, save.guaira.opening));
@@ -65,7 +65,7 @@ test('locked stops, alternative opening retirement and reduced motion keep nativ
     const reduced = selectJourney(start, 'gallery', GUAIRA_JOURNEY, caps, { reducedMotion: true });
     assert.equal(reduced.destination, null); assert.equal(reduced.arrived, 'gallery'); assert.equal(reduced.entered, null);
     save.guaira.completed.push('guaira-travessia');
-    assert.ok(!guairaJourneyCapabilities(save).availableStages.includes('guaira-patio-comportas'));
+    assert.ok(guairaJourneyCapabilities(save).availableStages.includes('guaira-patio-comportas'));
     assert.ok(guairaJourneyCapabilities(save).availableStages.includes('guaira-respiros'));
 });
 

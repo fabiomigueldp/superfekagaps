@@ -1,4 +1,30 @@
-# Guaíra — revisão de level design, 16/10/2026
+# Guaíra — revisão de level design, 17/10/2026
+
+Revisão atual (17/10/2026): [Fundos — arquitetura, continuidade e profundidade](world/guaira/backgrounds-2026-10-17/README.md). Paisagem distante nas quatro fases externas, oficinas com vãos e fundações na Galeria e no Alívio, arcos de alvenaria no aqueduto e correção do céu duplicado da Travessia. Seis percursos comparados nos mesmos momentos e enquadramentos.
+
+Revisão dos inimigos: [defesas e contra-ataques](world/guaira/enemy-counterplay-2026-10-17/README.md). Teto do vagonete protegido em movimento e aberto na freada, testa do investidor exposta na recuperação e avisos que conservam o alvo abaixo do beiral ou da quicada. Cinco encontros nativos demonstram as respostas sem dano.
+
+Rodada anterior dos inimigos: [ações, movimento e leitura dos perigos](world/guaira/enemies-2026-10-17/README.md). Auditoria de 44 posições e seis famílias, pinçada anunciada, arremessos alternados, couraça exposta mais rápida, motores suaves e sprites articulados. Corrigida a ausência visual dos barris nos distritos ampliados, com provas de esquiva e dano real.
+
+Revisão de Ossabravo: [peso, movimento e apoios no curral](world/guaira/bull-motion-2026-10-17/README.md). Aceleração e frenagem físicas, galopada por distância, seis poses de virada e poeira fixa no chão. As duas rotas completas continuam vencendo com os mesmos comandos e momentos de acerto.
+
+Revisão dos projéteis: [altura, ritmo e leitura do curral](world/guaira/bull-arcs-2026-10-17/README.md). Dois arcos mais altos, lançamentos separados, pisadas e quicadas individuais, com duas respostas verificadas usando a movimentação nativa do Feka.
+
+Revisão anterior: [Prefeito da Vazão — peso, movimento e sinais hidráulicos](world/guaira/mayor-motion-2026-10-17/README.md). Frenagem física, passadas por distância, aterrissagens, crista de água legível, avisos coerentes com os registros e bocais sincronizados. Continuação da [ofensiva e pressão na passarela](world/guaira/mayor-offensive-2026-10-17/README.md).
+
+Revisão das fases: [Eclusa do Arroz — dois percursos, pressão e recuperação](world/guaira/whole-experience-2026-10-16/rice-lock.md). Reconstrução do trecho central da Travessia, novo passadiço com cinco descobertas e câmera mais suave ao retornar.
+
+**Rodadas anteriores:** [exploração, retornos e progresso no mapa](world/guaira/whole-experience-2026-10-16/exploration-return.md)
+· [Registro das Taipas e Passadiço do Coletor](world/guaira/whole-experience-2026-10-16/maintenance-design.md)
+· [aqueduto, túnel e escolhas de manutenção](world/guaira/whole-experience-2026-10-16/aqueduct-design.md)
+· [armazém, cais de transbordo e saltos legíveis](world/guaira/whole-experience-2026-10-16/docks-design.md)
+· [novos desfechos, transporte e contrapressão](world/guaira/whole-experience-2026-10-16/encounter-polish.md)
+· [risco legível, tábuas frágeis, descidas e novas tentativas](world/guaira/whole-experience-2026-10-16/route-clarity.md)
+· [seis desvios altos, cenários, descidas e câmera](world/guaira/whole-experience-2026-10-16/exploration-polish.md)
+· [reestruturação das seis fases e análise completa](world/guaira/whole-experience-2026-10-16/course-design.md)
+· [percursos completos, comparação de extensões e resultados](world/guaira/whole-experience-2026-10-16/index.html#percursos).
+Os estudos abaixo registram as rodadas anteriores; suas saídas e gravações curtas
+não representam a extensão das fases atuais.
 
 [Comparações e percursos](world/guaira/level-design-2026-10-16/index.html)
 · [Evidências e reprodução](world/guaira/level-design-2026-10-16/README.md)
@@ -18,7 +44,7 @@ Revisão da Câmara: [percurso da Câmara de Alívio](world/guaira/relief-routes
 com tampa visível durante a subida, passarela e sacada na mesma altura, salto
 opcional com destino visível e patamar para retornar ao piso.
 
-Rodada mais recente: [Ossabravo — leitura e recuperação](world/guaira/bull-recovery-2026-10-16/index.html).
+Revisão anterior do chefe: [Ossabravo — leitura e recuperação](world/guaira/bull-recovery-2026-10-16/index.html).
 O descanso após uma abertura perdida mostra quatro poses de fechamento e
 permite recuar com a caminhada normal. Os mesmos comandos que antes perdiam
 o capacete agora alcançam o próximo contra-ataque sem dano. Os ossos têm
@@ -176,3 +202,104 @@ dificuldade deve observar descoberta dos desvios, entendimento do registro C,
 tentativas por obstáculo e preferência pelas duas rotas, além de perguntar quais
 trechos os jogadores gostariam de repetir. Esses dados são necessários para
 avaliar diversão e ritmo além da correção técnica.
+
+## Revisão integrada — 16/10/2026
+
+A revisão `whole-experience-2026-10-16` conferiu as oito cenas, a chegada de avião,
+os caminhos da ilha e a progressão sem o desbloqueio de desenvolvimento.
+
+- A abertura não escolhida permanece como desvio D após a primeira conclusão.
+  `alternateCompleted` registra essa visita separadamente dos cinco recibos da
+  rota. Recarregar, repetir ou mesclar uma aba antiga preserva a conquista;
+  nenhuma dessas ações antecipa Ossabravo, o Prefeito ou a Serra.
+- A campanha e o menu do capítulo permitem voltar à segunda abertura. Uma visita
+  já concluída não é reiniciada automaticamente ao recarregar o capítulo.
+- Pátio e Subida usam o mesmo lugar no mapa e no capítulo. As orientações da
+  Subida incluem os telhados; a do Prefeito descreve registros e ataque por cima.
+- Galeria e Alívio receberam janelas altas, ventilação com eixo fixo, tesouras e
+  encaixes de madeira, iluminação na parede e molduras de pedra. A arte mantém
+  as cores de colisão e perigo reservadas aos objetos reais. A segunda inspeção
+  corrigiu luz e relevos que interrompiam visualmente os postes de madeira.
+- A imagem da ilha e a profundidade usam a mesma revisão de cache. A revisão 6
+  do Blender foi auditada sem alterar a geometria: 548 sólidos fechados,
+  590 posições de caminhada, 1.770 sondagens de apoio, nenhum apoio ausente ou
+  contato corporal obstruído, projeções e profundidades concordando com o jogo.
+
+Validação: 1.199 testes de Guaíra e build completo aprovados. A execução de campanha
+normal percorreu oito cenas no mesmo save e outra abertura pelo Pátio, usando
+teclado e caminhada nativa. Galeria e Alívio também passaram com toque simulado,
+pausa sem mudança de pixels, movimento reduzido e viewport 844 × 390.
+O save isolado da conferência começa com os pré-requisitos até a Fábrica; todas
+as conquistas de Guaíra são obtidas pelos percursos nativos.
+
+Página com comparações, dois vídeos a 60 fps e levantamento das oito cenas:
+[Uma ilha, oito percursos](world/guaira/whole-experience-2026-10-16/index.html).
+Os percursos ensaiados comprovam execução e integração; não substituem observação
+de primeiras partidas para avaliar descoberta, diversão e equilíbrio.
+
+## Continuidade de controles e recuperação — 16/10/2026
+
+A conferência de prontidão encontrou uma interrupção real: o controle padrão
+funcionava no mapa, mas os runtimes de Guaíra não assumiam sua entrada. O capítulo
+agora usa `StandardGamepad` e `Input` nativos nas oito cenas, sem um relógio extra.
+A pausa, opções, ajuda, continuação, passagem Galeria → Alívio e Outra rota também
+respondem ao controle. Cada tela exige um gesto novo; desconexão, perda de foco,
+visibilidade e descarte da tentativa cancelam as ações anteriores.
+
+A ajuda pode ser rolada e fechada pelo controle. Um lembrete fixo mantém esses
+comandos visíveis em telas baixas. Teclado e toque conservam seus próprios donos
+de entrada; a amostragem do controle não antecipa a troca de ação de um botão que
+já estava pressionado por teclado ou ponteiro.
+
+Validação atual: 1.212 testes de Guaíra, 286 testes compartilhados de controles,
+ajuda, mapa e menus, e build completo aprovados. A campanha normal no navegador
+completou nove execuções com controle simulado, cobrindo oito cenas, as duas
+aberturas, caminhada nativa, recarregamento e desbloqueio da Serra. A escolha da
+fase usou os botões nativos do mapa; entrada e conclusão usaram A/×.
+Dois percursos adicionais provocaram dano e morte pela água, antes e depois do
+ponto seguro, e terminaram a fase após a recuperação, sem editar ator ou perigo.
+
+Pausa sem alteração de pixels, rolagem da ajuda, foco, reconexão e recomeço foram
+conferidos no navegador em 1440 × 900, 844 × 390 e 390 × 844. As telas menores
+usaram movimento reduzido. A fonte Blender permanece idêntica à auditoria dos
+548 sólidos e 590 pontos de caminhada; não se repetiu uma geração do modelo.
+
+Resultados e hashes atuais em
+[readiness-verification.json](world/guaira/whole-experience-2026-10-16/readiness-verification.json).
+A página integrada foi atualizada no mesmo endereço. Não houve ensaio com
+controle físico nem avaliação cega com jogadores externos; os registros não
+devem ser usados como medida de dificuldade de uma primeira partida.
+
+## Reestruturação dos percursos — 16/10/2026
+
+A revisão de controles acima não resolvia a falta de conteúdo. As seis fases
+de exploração tinham zero inimigos e larguras entre 704 e 1.536 pixels. Suas
+lições iniciais funcionavam, mas frequentemente a fase acabava antes de exigir
+uma aplicação mais complexa da mecânica.
+
+Os seis percursos agora continuam além das antigas saídas, com 22 áreas novas,
+27 inimigos nativos e larguras de 2.400 a 4.032 pixels. A progressão combina
+patrulhas e couraças, pontes acionadas por sentada, descargas independentes,
+rotas altas com registros, canais, túneis com retorno, arremessadores,
+plataformas que cedem e uma investida anunciada antes da Casa da Vazão.
+
+As correções incluem checkpoints fora do alcance de ataques, restauração das
+pontes já vencidas, fornecimento B preservado no Pátio, aberturas necessárias
+preservadas na Galeria, tampa sem fresta que permita ignorar a passagem e
+apoios altos acima da coluna máxima de água. Os novos inimigos têm arte local
+ligada aos estados do combate principal. Os arremessadores e investidores
+vigiam a aproximação frontal, evitando iniciar ataques pelas costas fora da
+câmera.
+
+Passaram 1.232 testes de Guaíra, 70 testes compartilhados de inimigos e combate,
+validadores, TypeScript e build. A campanha normal completou nove execuções no
+navegador com controle simulado, cobrindo as oito cenas e as duas aberturas.
+As gravações atuais atravessam as fases inteiras; os testes antigos de lições
+iniciais já não confundem sua conclusão com a conclusão da fase expandida.
+
+Diagnóstico detalhado, problemas, soluções e papel dos dois chefes:
+[análise dos percursos](world/guaira/whole-experience-2026-10-16/course-design.md).
+Vídeos completos e comparação de extensões:
+[revisão integrada atual](world/guaira/whole-experience-2026-10-16/index.html#percursos).
+Os ensaios comprovam execução e recuperação. A avaliação de diversão e o
+equilíbrio para primeiras partidas ainda dependem de observação de jogadores.

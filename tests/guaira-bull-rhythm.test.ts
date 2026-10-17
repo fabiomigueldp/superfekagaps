@@ -36,7 +36,7 @@ for(const facing of [-1,1] as const)test(`final phase announces both passes and 
         assert.equal(b.health,2);assert.ok(paint(b,false,true).length>0);assert.deepEqual(paint(b,true),reduced);
         poses.add(JSON.stringify(paint(b)));tick(b,1);
     }
-    assert.equal(poses.size,3);assert.equal(b.state,'charge');
+    assert.equal(poses.size,6);assert.equal(b.state,'charge');
     for(let i=0;i<60&&!b.vulnerable;i++){
         assert.ok(b.x>=range.left&&b.x+b.width<=range.right);tick(b,1);
     }
@@ -57,18 +57,18 @@ for(const facing of [-1,1] as const)for(const health of [6,4,2])test(`health ${h
     for(let age=0;age<duration;age++){
         assert.equal(b.state,'bones');assert.equal(b.vulnerable,false);assert.ok(b.bones.length<=2);
         for(const bone of b.bones){
-            assert.equal(bone.y,bullBoneY(b.arena.floor,age,hopping));levels.add(bone.y);
-            assert.ok(bone.y>=b.arena.floor-9-R.boneHopHeight&&bone.y+bone.height<b.arena.floor);
-            assert.equal(bone.vx,facing*3);
+            assert.equal(bone.y,bullBoneY(b.arena.floor,bone.age,hopping,bone.hopHeight,bone.hopTicks));levels.add(bone.y);
+            assert.ok(bone.y>=b.arena.floor-9-bone.hopHeight&&bone.y+bone.height<b.arena.floor);
+            assert.equal(bone.vx,facing*(health>4?3:health>2?3.2:3.4));
         }
         const previous=b.bones.map(bone=>({...bone}));tick(b,1);
         if(b.state==='bones')for(const old of previous){
-            assert.ok(b.hazards.some(q=>q.x<=old.x&&q.x+q.width>=old.x+old.width&&q.y<=old.y&&q.y+q.height>=old.y+old.height),'2D swept contact retains the previous pose');
+            assert.ok(b.hazards.some(q=>q.x<=old.x+1e-8&&q.x+q.width>=old.x+old.width-1e-8&&q.y<=old.y&&q.y+q.height>=old.y+old.height),'2D swept contact retains the previous pose');
         }
     }
     assert.equal(levels.size>1,hopping);assert.equal(b.state,'recover');assert.equal(b.openingTicksRemaining,R.recover);
     assert.deepEqual(b.hazards,[]);assert.deepEqual(b.visibleBones,[]);
-    if(hopping)assert.equal(Math.min(...levels),b.arena.floor-9-R.boneHopHeight);
+    if(hopping)assert.equal(Math.min(...levels),b.arena.floor-9-(health>2?64:80));
 });
 
 test('catch-up cannot swallow the return tell or change the fixed bone arc',()=>{
@@ -119,7 +119,8 @@ for(const touch of [false,true])for(const reducedMotion of [false,true])test(`na
 
 for(const offset of [-3,0,3])test(`native return can be crossed and punished with jump onset shifted ${offset} ticks`,t=>{
     const h=guairaBrowser(t),g=h.create(),keys=controls(h,false);let frame=0;
-    for(const [count,codes]of primary.runs as Array<[number,string[]]>){keys(codes);for(let i=0;i<count&&frame<855;i++){g.update(R.tickMs);frame++;}if(frame===855)break;}
+    const target=primary.markers.returnTell+9;
+    for(const [count,codes]of primary.runs as Array<[number,string[]]>){keys(codes);for(let i=0;i<count&&frame<target;i++){g.update(R.tickMs);frame++;}if(frame===target)break;}
     const runs:Array<[number,string[]]>=[[50+offset,['ShiftLeft','ArrowLeft']],[9,['ShiftLeft','ArrowLeft','Space']],[8,['ShiftLeft','ArrowLeft']],[70,[]]];
     for(const [count,codes]of runs){keys(codes);for(let i=0;i<count;i++){
         g.update(R.tickMs);assert.equal(g.player.data.hasHelmet,true);assert.equal(g.player.data.isDead,false);

@@ -27,6 +27,8 @@ export function chapterCompletionStory(snapshot: GuairaChapterSnapshot, sceneId:
     // before leaving the scene, whether its receipt was already persisted or
     // is awaiting acceptance; replays keep their earned context.
     const index = snapshot.route.indexOf(sceneId);
+    if (index < 0 && (sceneId === 'guaira-travessia' || sceneId === 'guaira-patio-comportas'))
+        return 'Percurso alternativo explorado. Volte à ilha para seguir a jornada.';
     if (index < 0 || hasAcceptedPublicWater(snapshot) || snapshot.nextRecommendedScene !== sceneId &&
         snapshot.nextRecommendedScene !== snapshot.route[index + 1]) return null;
     if (sceneId === 'guaira-lab') return BULL_TO_HOUSE;

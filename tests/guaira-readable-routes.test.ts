@@ -1,3 +1,4 @@
+import { introductionReached } from './helpers/guairaCourseTest';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { guairaAscentBrowser } from './helpers/guairaAscentHarness';
@@ -55,7 +56,7 @@ for (const name of ['subida', 'galeria'] as const) for (const touch of [false, t
             }
         });
         assert.equal(frame, tapes[name].frames); assert.equal(g.finished, true);
-        assert.equal(g.coins, name === 'subida' ? 7 : 5);
+        assert.equal(g.coins, tapes[name].coins);
         for (const y of name === 'subida' ? [368, 336, 304, 256, 144, 96] : [352, 320, 288, 336, 384, 192])
             assert.ok(contacts.has(y), `used actual support at ${y}`);
         assert.deepEqual(g.store.save.completed, []); assert.deepEqual(h.storageCalls, []);
@@ -70,7 +71,7 @@ for (const hold of [2, 4, 8]) test(`missed lookout transfer with ${hold}-frame j
     assert.equal(g.player.data.isDead, false); assert.equal(g.player.data.hasHelmet, true);
     assert.equal(feet(g), 192); visible(g, 1040, 192, 48); visible(g, 1088, 144, 256);
     h.run(g, 40, ['Space', 'ArrowRight']); h.run(g, 120, ['ArrowRight']);
-    assert.equal(g.finished, true); assert.ok(g.coins >= 7); assert.equal(g.store.save.checkpoint?.index, 1);
+    assert.equal(introductionReached(g), true); assert.ok(g.coins >= 7); assert.equal(g.store.save.checkpoint?.index, 2);
 });
 
 for (const hold of [4, 6, 8]) test(`service loop accepts ${hold}-frame jumps without helmet or timing dependence`, t => {

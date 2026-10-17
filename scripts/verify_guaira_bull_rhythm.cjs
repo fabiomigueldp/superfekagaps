@@ -5,13 +5,14 @@ const out=path.resolve(process.env.GUAIRA_OUTPUT||'output/guaira/bull-rhythm-202
 const read=name=>JSON.parse(fs.readFileSync('tests/helpers/'+name+'.json','utf8'));
 const review=process.env.GUAIRA_REVIEW_PATH||'/docs/world/guaira/bull-rhythm-2026-10-16/index.html';
 const recovery=process.env.GUAIRA_BULL_RECOVERY==='1',reviewMinSeconds=Number(process.env.GUAIRA_REVIEW_MIN_SECONDS||17);
+const arcs=process.env.GUAIRA_BULL_ARCS==='1';
 (async()=>{
  const browser=await chromium.launch({headless:true,channel:'msedge'}),report={physicalDevice:false,routes:[],pauses:[],review:[],errors:[]};
  try{
   async function fresh(touch,reduced=touch){
    const context=await browser.newContext({viewport:{width:1280,height:800},hasTouch:touch,reducedMotion:reduced?'reduce':'no-preference'}),page=await context.newPage();
    page.on('pageerror',e=>report.errors.push(e.message));await page.goto(base+'/guaira-lab.html',{waitUntil:'networkidle'});await page.waitForFunction(()=>window.worldGame?.boss?.model);
-   await page.locator('#game-canvas').focus();await page.evaluate(()=>{const g=window.worldGame;g.cancelFrame();g.running=false;g.load('guaira-lab');window.__audit={frames:0,health:6,hits:[],minHead:Infinity,costs:[]};});
+   await page.locator('#game-canvas').focus();await page.evaluate(()=>{const g=window.worldGame;g.cancelFrame();g.running=false;g.load('guaira-lab');window.__audit={frames:0,health:6,hits:[],damage:[],helmet:true,minHead:Infinity,costs:[]};});
    return {context,page};
   }
   async function play(page,tape,touch,until=tape.frames){
@@ -28,18 +29,20 @@ const recovery=process.env.GUAIRA_BULL_RECOVERY==='1',reviewMinSeconds=Number(pr
    for(const [count,codes]of tape.runs){await keys(codes);const n=Math.min(count,until-frame);
     await page.evaluate(n=>{const g=window.worldGame,a=window.__audit;for(let i=0;i<n;i++){
      const start=performance.now();g.update(1000/60);g.render();a.costs.push(performance.now()-start);a.frames++;
-     const p=g.player.data;if(p.isDead||!p.hasHelmet)throw Error('Native damage at '+a.frames);
+     const p=g.player.data;if(p.isDead)throw Error('Native death at '+a.frames);
+     if(a.helmet&&!p.hasHelmet)a.damage.push(a.frames);a.helmet=p.hasHelmet;
      if(g.boss.health<a.health)a.hits.push(a.frames);a.health=g.boss.health;
      a.minHead=Math.min(a.minHead,Math.round(p.position.y)-Math.round(g.camera.y)-4);
     }},n);frame+=n;if(frame===until)break;
    }await keys([]);
-   return page.evaluate(()=>{const g=window.worldGame,a=window.__audit,costs=a.costs.slice(60).sort((a,b)=>a-b);return {frames:a.frames,hits:a.hits,minHead:a.minHead,health:g.boss.health,finished:g.boss.phase==='defeated',reduced:g.reducedMotion,
+   return page.evaluate(()=>{const g=window.worldGame,a=window.__audit,costs=a.costs.slice(60).sort((a,b)=>a-b);return {frames:a.frames,hits:a.hits,damage:a.damage,minHead:a.minHead,health:g.boss.health,finished:g.boss.phase==='defeated',reduced:g.reducedMotion,
     renderCpuMs:{samples:costs.length,median:costs[Math.floor(costs.length*.5)],p95:costs[Math.floor(costs.length*.95)]}};});
   }
   if(mode!=='review'){
-   for(const route of ['guairaLabReplay','guairaBullPoundReplay',...(recovery?['guairaBullMissReplay']:[])])for(const touch of [false,true]){
+   for(const route of ['guairaLabReplay','guairaBullPoundReplay',...(recovery?['guairaBullMissReplay']:[]),...(arcs?['guairaBullArcFailureReplay']:[])])for(const touch of [false,true]){
     const {context,page}=await fresh(touch),tape=read(route),state=await play(page,tape,touch);
     assert.equal(state.health,tape.expectedFinalHealth??0);assert.equal(state.finished,state.health===0);assert.deepEqual(state.hits,tape.expectedHits.map(h=>h.frame+1));assert.ok(state.minHead>=23);
+    assert.deepEqual(state.damage,tape.expectedDamageFrames??[]);
     await page.screenshot({path:path.join(out,route+'-'+(touch?'touch':'keyboard')+'.png')});
     assert.equal(await page.evaluate(()=>window.worldGame.canAdvanceToAscent),state.finished);
     await page.keyboard.press('Escape');await page.evaluate(()=>window.worldGame.update(1000/60));assert.equal(await page.evaluate(()=>window.worldGame.state),'paused');
@@ -47,8 +50,10 @@ const recovery=process.env.GUAIRA_BULL_RECOVERY==='1',reviewMinSeconds=Number(pr
     assert.equal(await page.evaluate(()=>window.worldGame.canAdvanceToAscent),false);
     report.routes.push({route,touch,...state});await context.close();
    }
-   const pauses=[['guairaLabReplay',860,'turn',false],['guairaLabReplay',1201,'defeated',false],
-    ...(recovery?[['guairaBullMissReplay',251,'idle',true],['guairaLabReplay',481,'bones',false]]:[])];
+   const markers=read('guairaLabReplay').markers;
+   const pauses=[['guairaLabReplay',markers.returnTell+14,'turn',false],['guairaLabReplay',markers.defeat+24,'defeated',false],
+    ...(recovery?[['guairaBullMissReplay',251,'idle',true],['guairaLabReplay',markers.firstVolley+36,'bones',false]]:[]),
+    ...(arcs?[['guairaLabReplay',markers.firstVolley+10,'bones',false]]:[])];
    for(const reduced of [false,true])for(const [route,target,expected,closing]of pauses){
     const {context,page}=await fresh(false,reduced);await play(page,read(route),false,target);
     assert.equal(await page.evaluate(()=>window.worldGame.boss.model.state),expected);

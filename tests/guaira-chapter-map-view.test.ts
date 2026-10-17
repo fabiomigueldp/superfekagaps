@@ -210,9 +210,9 @@ test('journey rows show route truth, only accepted/next select, selection walks 
     }, onEnter: () => { enters++; } }));
     await flush(); h.tick(); h.button('Ver a jornada de Guaíra').click();
     const list = h.byClass('chapter-map-list'), rows = list.children.map(item => item.children[0]);
-    assert.equal(rows.length, 5); assert.equal(rows[0].textContent.includes('Pátio das Comportas'), true);
-    assert.equal(rows.some(row => row.textContent.includes('Travessia da Vala Seca')), false);
-    assert.deepEqual(rows.map(row => row.disabled), [false, false, true, true, true]);
+    assert.equal(rows.length, 6); assert.equal(rows[0].textContent.includes('Pátio das Comportas'), true);
+    assert.match(rows[5].textContent, /Travessia da Vala Seca.*Percurso alternativo/);
+    assert.deepEqual(rows.map(row => row.disabled), [false, false, true, true, true, false]);
     assert.match(rows[2].textContent, /Depois de Passagem dos Respiros/);
     rows[0].click(); assert.equal(selections, 1); assert.equal(enters, 0); assert.equal(road(view).moving, true);
     h.button('Ver a jornada de Guaíra').click(); rows[1].click(); assert.equal(selections, 1, 'Retained old DOM rows carry old generations');
@@ -497,7 +497,7 @@ test('optional target title takes precedence at 5/5 and a natural arrival repair
     assert.equal(h.byClass('chapter-map-count').textContent, '5/5 · concluídos');
     assert.match(h.byClass('chapter-map-story').textContent, /Ramal público aberto\. Os moradores têm água na bica outra vez\. Os gaps continuam\./);
     assert.equal(entries, 0); assert.deepEqual(session.snapshot(), before);
-    h.button('Ver a jornada de Guaíra').click(); assert.equal(h.byClass('chapter-map-list').children.length, 5);
+    h.button('Ver a jornada de Guaíra').click(); assert.equal(h.byClass('chapter-map-list').children.length, 6);
     assert.equal(h.byClass('chapter-map-optional').textContent.includes('Concluído'), false);
 });
 
@@ -711,7 +711,7 @@ test('development chapter exposes existing stage choices without completed badge
     assert.equal(h.byClass('chapter-map-count').textContent, '0/5 · concluídos');
     h.button('Ver a jornada de Guaíra').click();
     const rows = h.all().filter(node => node.className === 'chapter-map-step-button');
-    assert.equal(rows.length, 5);
+    assert.equal(rows.length, 6);
     for (const row of rows) { assert.equal(row.disabled, false); assert.doesNotMatch(row.textContent, /Concluído|Depois de/); }
     rows[4].click(); assert.deepEqual(selected, chapterTarget('guaira-prefeito'));
     assert.equal(session.snapshot().accepted.length, 0);

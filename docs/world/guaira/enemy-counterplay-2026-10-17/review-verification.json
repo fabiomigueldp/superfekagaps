@@ -1,0 +1,88 @@
+{
+  "physicalDevice": false,
+  "setup": "isolated prerequisite save, native chapter mounting and ordinary checkpoint load",
+  "routes": [],
+  "pauses": [],
+  "review": [
+    {
+      "width": 1440,
+      "media": {
+        "fits": true,
+        "videos": [
+          {
+            "width": 960,
+            "height": 540,
+            "duration": 3.666667,
+            "error": null
+          },
+          {
+            "width": 960,
+            "height": 540,
+            "duration": 4.366667,
+            "error": null
+          },
+          {
+            "width": 960,
+            "height": 540,
+            "duration": 3.266667,
+            "error": null
+          },
+          {
+            "width": 960,
+            "height": 540,
+            "duration": 2.9,
+            "error": null
+          },
+          {
+            "width": 960,
+            "height": 540,
+            "duration": 4.7,
+            "error": null
+          }
+        ],
+        "decoded": 5
+      }
+    },
+    {
+      "width": 390,
+      "media": {
+        "fits": true,
+        "videos": [
+          {
+            "width": 960,
+            "height": 540,
+            "duration": 3.666667,
+            "error": null
+          },
+          {
+            "width": 960,
+            "height": 540,
+            "duration": 4.366667,
+            "error": null
+          },
+          {
+            "width": 960,
+            "height": 540,
+            "duration": 3.266667,
+            "error": null
+          },
+          {
+            "width": 960,
+            "height": 540,
+            "duration": 2.9,
+            "error": null
+          },
+          {
+            "width": 960,
+            "height": 540,
+            "duration": 4.7,
+            "error": null
+          }
+        ],
+        "decoded": 5
+      }
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

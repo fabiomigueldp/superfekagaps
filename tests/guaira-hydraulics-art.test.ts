@@ -368,6 +368,7 @@ test(`${scene}: water follows simulation through hitstop, reveal and pause (redu
 
 test('completed ascent keeps water moving with fixed gameplay state and still freezes on pause',t=>{
     const h=guairaAscentBrowser(t),g=h.create();
+    const baseline=raster();g.art.background(baseline.c,{}as never,1088,38,0);
     const replay=JSON.parse(readFileSync(new URL('./helpers/guairaAscentReplay.json',import.meta.url),'utf8'))as{runs:Array<[number,string[]]>};
     for(const[n,keys]of replay.runs)h.run(g,n,keys);
     assert.equal(g.finished,true);const objects=structuredClone(g.objects),elapsed=g.elapsed;
@@ -375,5 +376,5 @@ test('completed ascent keeps water moving with fixed gameplay state and still fr
     const before=paint();h.run(g,18);assert.notDeepEqual(paint(),before);assert.deepEqual(structuredClone(g.objects),objects);assert.equal(g.elapsed,elapsed);
     g.toggleAscentPause();const paused=paint();h.run(g,20);assert.deepEqual(paint(),paused);
     g.load(g.stage.id);assert.equal(g.objects.time,0);
-    const reset=raster();drawGuairaAscentBackground(reset.c,1088,38,0,false);assert.deepEqual(paint(),reset.pixels);
+    assert.deepEqual(paint(),baseline.pixels);
 });

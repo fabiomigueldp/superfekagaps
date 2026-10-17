@@ -12,6 +12,9 @@ import {pixelText} from '../src/graphics/BitmapFont';
 import {GuairaGallery} from '../src/adventure/experimental/guaira/gallery/GuairaGallery';
 import {GuairaRelief} from '../src/adventure/experimental/guaira/relief/GuairaRelief';
 const [outArg,canvasArg,baselineArg]=process.argv.slice(2);assert.ok(outArg&&canvasArg,'OUTPUT and CANVAS module required');
+const captureStride=Number(process.env.GUAIRA_CAPTURE_STRIDE??4);assert.ok([1,2,4].includes(captureStride),'capture stride must be 1, 2 or 4');
+const captureFrom=Number(process.env.GUAIRA_CAPTURE_FROM??1),captureTo=Number(process.env.GUAIRA_CAPTURE_TO??Infinity);
+assert.ok(Number.isInteger(captureFrom)&&captureFrom>=1&&(captureTo===Infinity||Number.isInteger(captureTo)&&captureTo>=captureFrom),'valid native capture window required');
 const {createCanvas}=await import(pathToFileURL(resolve(canvasArg)).href);
 const out=resolve(outArg),root=resolve('src/adventure/experimental/guaira');mkdirSync(out,{recursive:true});
 const hashes:Record<string,string>={},prepared=new Set<string>();
@@ -28,6 +31,8 @@ const {loadGuairaChapterScene}=await import(pathToFileURL(baselineArg?previous(r
 const read=(name:string)=>JSON.parse(readFileSync('tests/helpers/'+name+'.json','utf8').replace(/^\uFEFF/,''));
 const field=read('guairaFieldRoutesReplays'),routes=read('guairaReadableRoutesReplays');
 const runs:any={travessia:field.travessia,patio:read('guairaJunctionOptionalReplay'),respiros:field.respiros,lab:read('guairaLabReplay'),subida:routes.subida,prefeito:read('guairaMayorReplay'),galeria:routes.galeria,alivio:read('guairaReliefRoutesReplays').high};
+if(process.env.GUAIRA_COURSE_REPLAYS)for(const key of ['travessia','patio','respiros','subida','galeria','alivio'])
+ runs[key]=JSON.parse(readFileSync(join(process.env.GUAIRA_COURSE_REPLAYS,key+'-draft.json'),'utf8'));
 const ids:any={travessia:'guaira-travessia',patio:'guaira-patio-comportas',respiros:'guaira-respiros',lab:'guaira-lab',subida:'guaira-subida',prefeito:'guaira-prefeito'};
 const report:any={};
 for(const [key,tape] of Object.entries(runs) as any){
@@ -45,7 +50,7 @@ for(const [key,tape] of Object.entries(runs) as any){
  let lastSupported:any=null,air:Array<any>=[];
  const total=tape.runs.reduce((sum:number,x:any)=>sum+x[0],0)+(tape.initialSettleFrames||0);
  const sheetMarks=new Set(Array.from({length:16},(_,i)=>Math.round(i*(total-1)/15)+1));
- const marks=new Set([...sheetMarks,...(({patio:[123,1745,1769],subida:[1014,1038,1056],respiros:[379],prefeito:[519]} as Record<string,number[]>)[key]??[])]);
+ const marks=new Set([...sheetMarks,...(tape.notes??[]).map((note:any)=>note.frame),...(({patio:[123,1745,1769],subida:[1014,1038,1056],respiros:[379],prefeito:[519]} as Record<string,number[]>)[key]??[])]);
  const video=join(out,key+'-replay');if(!baselineArg)mkdirSync(video,{recursive:true});let videoFrames=0;
  const capture=()=>{const state=()=>JSON.stringify({p:g.player.data,o:g.objects,b:g.boss,c:g.camera,coins:g.coins,t:g.time,tiles:g.level.data.tiles});
   const before=state();g.render();assert.equal(state(),before,'native paint is read-only');fc.drawImage(screen,0,0,320,180);return frame.toBuffer('image/png');};
@@ -66,9 +71,10 @@ for(const [key,tape] of Object.entries(runs) as any){
     const support=Math.round(feet)+':'+Math.floor(p.position.x/32);if(support!==lastGround){sample.contacts.push({n,x:Math.round(p.position.x),feet:Math.round(feet)});lastGround=support;}
    }else air.push(now);
    if(g.boss?.hint&&g.boss.hint!==lastHint){lastHint=g.boss.hint;sample.hints.push({n,hint:lastHint});}
-   if(marks.has(n)||!baselineArg&&n%4===0){
+   const videoFrame=!baselineArg&&n%captureStride===0&&n>=captureFrom&&n<=captureTo;
+   if(marks.has(n)||videoFrame){
     const png=capture();
-    if(!baselineArg&&n%4===0)writeFileSync(join(video,String(++videoFrames).padStart(5,'0')+'.png'),png);
+    if(videoFrame)writeFileSync(join(video,String(++videoFrames).padStart(5,'0')+'.png'),png);
     if(!marks.has(n))continue;
     const file=key+'-'+n+'.png';writeFileSync(join(out,file),png);
     const snap={n,file,p:{...p.position},feet,camera:{x:g.camera.x,y:g.camera.y},hint:g.boss?.hint,status:h.status.textContent};sample.snapshots.push(snap);
@@ -77,7 +83,9 @@ for(const [key,tape] of Object.entries(runs) as any){
    }
   }
  }
- sample.frames=n;sample.videoFrames=videoFrames;sample.finished=g.finished??g.mayor?.publicWaterOpen??(g.boss?.phase==='defeated');sample.coins=g.coins;report[key]=sample;
+ sample.frames=n;sample.videoFrames=videoFrames;sample.captureFps=60/captureStride;
+ sample.videoWindow={firstFrame:Math.ceil(captureFrom/captureStride)*captureStride,lastFrame:Math.floor(Math.min(n,captureTo)/captureStride)*captureStride};
+ sample.finished=g.finished??g.mayor?.publicWaterOpen??(g.boss?.phase==='defeated');sample.coins=g.coins;report[key]=sample;
  assert.equal(sample.finished,true);assert.equal(sample.damage.length,0);assert.equal(n,total);
  writeFileSync(join(out,key+'-sheet.png'),sheet.toBuffer('image/png'));g.dispose();for(const fn of cleanup.reverse())fn();
  console.log(key,JSON.stringify({finished:sample.finished,coins:sample.coins,minHelmet:sample.minHelmet,maxFeet:sample.maxFeet,maxCameraStepX:sample.maxCameraStepX,maxCameraStepY:sample.maxCameraStepY,damage:sample.damage.length}));

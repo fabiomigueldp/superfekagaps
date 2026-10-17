@@ -1,0 +1,783 @@
+{
+  "kind": "authored-pose-study-not-player-replay",
+  "simulationHz": 60,
+  "captureFps": 30,
+  "frames": 480,
+  "inventory": [
+    {
+      "id": "guaira-travessia",
+      "count": 8,
+      "families": {
+        "minion": 3,
+        "helmet": 4,
+        "charger": 0,
+        "loader": 1,
+        "agitator": 0,
+        "rail": 0
+      },
+      "enemies": [
+        {
+          "id": "guaira-travessia:course:minion:192",
+          "kind": "minion",
+          "x": 1728,
+          "feet": 192,
+          "range": 40,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-travessia:course:helmet:496",
+          "kind": "helmet",
+          "x": 2032,
+          "feet": 192,
+          "range": 28,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-travessia:course:helmet:1704",
+          "kind": "helmet",
+          "x": 3240,
+          "feet": 192,
+          "range": 20,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-travessia:course:loader:2048",
+          "kind": "loader",
+          "x": 3584,
+          "feet": 192,
+          "range": 40,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-travessia:course:helmet:2096",
+          "kind": "helmet",
+          "x": 3632,
+          "feet": 96,
+          "range": 10,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-travessia:course:minion:2640",
+          "kind": "minion",
+          "x": 4176,
+          "feet": 192,
+          "range": 12,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-travessia:course:detour:guard",
+          "kind": "helmet",
+          "x": 1980,
+          "feet": 64,
+          "range": 12,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-travessia:course:maintenance:guard",
+          "kind": "minion",
+          "x": 2544,
+          "feet": 48,
+          "range": 12,
+          "behavior": "canal"
+        }
+      ]
+    },
+    {
+      "id": "guaira-patio-comportas",
+      "count": 7,
+      "families": {
+        "minion": 3,
+        "helmet": 3,
+        "charger": 0,
+        "loader": 1,
+        "agitator": 0,
+        "rail": 0
+      },
+      "enemies": [
+        {
+          "id": "guaira-patio-comportas:course:minion:160",
+          "kind": "minion",
+          "x": 1120,
+          "feet": 208,
+          "range": 32,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-patio-comportas:course:helmet:432",
+          "kind": "helmet",
+          "x": 1392,
+          "feet": 208,
+          "range": 32,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-patio-comportas:course:minion:1008",
+          "kind": "minion",
+          "x": 1968,
+          "feet": 208,
+          "range": 24,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-patio-comportas:course:helmet:1512",
+          "kind": "helmet",
+          "x": 2472,
+          "feet": 208,
+          "range": 24,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-patio-comportas:course:loader:1904",
+          "kind": "loader",
+          "x": 2864,
+          "feet": 208,
+          "range": 40,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-patio-comportas:course:helmet:2720",
+          "kind": "helmet",
+          "x": 3680,
+          "feet": 208,
+          "range": 12,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-patio-comportas:course:detour:guard",
+          "kind": "minion",
+          "x": 1440,
+          "feet": 48,
+          "range": 8,
+          "behavior": "canal"
+        }
+      ]
+    },
+    {
+      "id": "guaira-respiros",
+      "count": 7,
+      "families": {
+        "minion": 2,
+        "helmet": 3,
+        "charger": 0,
+        "loader": 1,
+        "agitator": 1,
+        "rail": 0
+      },
+      "enemies": [
+        {
+          "id": "guaira-respiros:course:minion:560",
+          "kind": "minion",
+          "x": 1712,
+          "feet": 304,
+          "range": 24,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-respiros:course:helmet:1168",
+          "kind": "helmet",
+          "x": 2320,
+          "feet": 304,
+          "range": 24,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-respiros:course:minion:1552",
+          "kind": "minion",
+          "x": 2704,
+          "feet": 304,
+          "range": 20,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-respiros:course:loader:2088",
+          "kind": "loader",
+          "x": 3240,
+          "feet": 304,
+          "range": 40,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-respiros:course:helmet:2952",
+          "kind": "helmet",
+          "x": 4104,
+          "feet": 304,
+          "range": 12,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-respiros:course:detour:guard",
+          "kind": "helmet",
+          "x": 2312,
+          "feet": 144,
+          "range": 12,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-respiros:course:maintenance:guard",
+          "kind": "agitator",
+          "x": 2776,
+          "feet": 160,
+          "range": 0,
+          "behavior": "canal"
+        }
+      ]
+    },
+    {
+      "id": "guaira-subida",
+      "count": 8,
+      "families": {
+        "minion": 2,
+        "helmet": 3,
+        "charger": 1,
+        "loader": 2,
+        "agitator": 0,
+        "rail": 0
+      },
+      "enemies": [
+        {
+          "id": "guaira-subida:course:helmet:176",
+          "kind": "helmet",
+          "x": 1520,
+          "feet": 144,
+          "range": 40,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-subida:course:minion:480",
+          "kind": "minion",
+          "x": 1824,
+          "feet": 144,
+          "range": 32,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-subida:course:loader:1088",
+          "kind": "loader",
+          "x": 2432,
+          "feet": 96,
+          "range": 40,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-subida:course:helmet:1648",
+          "kind": "helmet",
+          "x": 2992,
+          "feet": 144,
+          "range": 24,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-subida:course:charger:1968",
+          "kind": "charger",
+          "x": 3312,
+          "feet": 144,
+          "range": 48,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-subida:course:helmet:2528",
+          "kind": "helmet",
+          "x": 3872,
+          "feet": 96,
+          "range": 16,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-subida:course:loader:2880",
+          "kind": "loader",
+          "x": 4224,
+          "feet": 48,
+          "range": 40,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-subida:course:detour:guard",
+          "kind": "minion",
+          "x": 3376,
+          "feet": 48,
+          "range": 4,
+          "behavior": "canal"
+        }
+      ]
+    },
+    {
+      "id": "guaira-galeria",
+      "count": 7,
+      "families": {
+        "minion": 3,
+        "helmet": 2,
+        "charger": 0,
+        "loader": 2,
+        "agitator": 0,
+        "rail": 0
+      },
+      "enemies": [
+        {
+          "id": "guaira-galeria:course:minion:480",
+          "kind": "minion",
+          "x": 1184,
+          "feet": 192,
+          "range": 16,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-galeria:course:loader:800",
+          "kind": "loader",
+          "x": 1504,
+          "feet": 192,
+          "range": 40,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-galeria:course:helmet:1088",
+          "kind": "helmet",
+          "x": 1792,
+          "feet": 192,
+          "range": 24,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-galeria:course:minion:1584",
+          "kind": "minion",
+          "x": 2288,
+          "feet": 192,
+          "range": 24,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-galeria:course:helmet:2112",
+          "kind": "helmet",
+          "x": 2816,
+          "feet": 288,
+          "range": 16,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-galeria:course:loader:2560",
+          "kind": "loader",
+          "x": 3264,
+          "feet": 192,
+          "range": 40,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-galeria:course:detour:guard",
+          "kind": "minion",
+          "x": 1804,
+          "feet": 48,
+          "range": 12,
+          "behavior": "canal"
+        }
+      ]
+    },
+    {
+      "id": "guaira-camara-alivio",
+      "count": 7,
+      "families": {
+        "minion": 2,
+        "helmet": 2,
+        "charger": 0,
+        "loader": 2,
+        "agitator": 0,
+        "rail": 1
+      },
+      "enemies": [
+        {
+          "id": "guaira-camara-alivio:course:minion:496",
+          "kind": "minion",
+          "x": 1232,
+          "feet": 336,
+          "range": 24,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-camara-alivio:course:helmet:768",
+          "kind": "helmet",
+          "x": 1504,
+          "feet": 336,
+          "range": 32,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-camara-alivio:course:loader:1328",
+          "kind": "loader",
+          "x": 2064,
+          "feet": 336,
+          "range": 40,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-camara-alivio:course:helmet:1904",
+          "kind": "helmet",
+          "x": 2640,
+          "feet": 208,
+          "range": 10,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-camara-alivio:course:loader:2176",
+          "kind": "loader",
+          "x": 2912,
+          "feet": 336,
+          "range": 40,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-camara-alivio:course:detour:guard",
+          "kind": "minion",
+          "x": 1284,
+          "feet": 144,
+          "range": 8,
+          "behavior": "canal"
+        },
+        {
+          "id": "guaira-camara-alivio:course:maintenance:guard",
+          "kind": "rail",
+          "x": 2000,
+          "feet": 208,
+          "range": 32,
+          "behavior": "canal"
+        }
+      ]
+    }
+  ],
+  "states": [
+    {
+      "kind": "minion",
+      "frame": 0,
+      "phase": "walk",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "helmet",
+      "frame": 0,
+      "phase": "walk",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "charger",
+      "frame": 0,
+      "phase": "walk",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "loader",
+      "frame": 0,
+      "phase": "rest",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "agitator",
+      "frame": 0,
+      "phase": "rest",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "rail",
+      "frame": 0,
+      "phase": "walk",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "rail",
+      "frame": 12,
+      "phase": "walk",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "rail",
+      "frame": 32,
+      "phase": "walk",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "minion",
+      "frame": 40,
+      "phase": "warning",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "helmet",
+      "frame": 40,
+      "phase": "walk",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "charger",
+      "frame": 40,
+      "phase": "warning",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "minion",
+      "frame": 50,
+      "phase": "warning",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "rail",
+      "frame": 50,
+      "phase": "walk",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "charger",
+      "frame": 60,
+      "phase": "warning",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "rail",
+      "frame": 65,
+      "phase": "warning",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "minion",
+      "frame": 66,
+      "phase": "warning",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "minion",
+      "frame": 72,
+      "phase": "attack",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "minion",
+      "frame": 78,
+      "phase": "attack",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "minion",
+      "frame": 86,
+      "phase": "rest",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "charger",
+      "frame": 87,
+      "phase": "warning",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "rail",
+      "frame": 90,
+      "phase": "walk",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "loader",
+      "frame": 92,
+      "phase": "warning",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "agitator",
+      "frame": 94,
+      "phase": "warning",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "charger",
+      "frame": 95,
+      "phase": "attack",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "minion",
+      "frame": 100,
+      "phase": "rest",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "charger",
+      "frame": 110,
+      "phase": "attack",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "rail",
+      "frame": 110,
+      "phase": "walk",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "loader",
+      "frame": 115,
+      "phase": "warning",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "agitator",
+      "frame": 115,
+      "phase": "warning",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "helmet",
+      "frame": 119,
+      "phase": "walk",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "helmet",
+      "frame": 121,
+      "phase": "stunned",
+      "high": false,
+      "armored": false
+    },
+    {
+      "kind": "charger",
+      "frame": 125,
+      "phase": "attack",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "rail",
+      "frame": 125,
+      "phase": "walk",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "helmet",
+      "frame": 132,
+      "phase": "stunned",
+      "high": false,
+      "armored": false
+    },
+    {
+      "kind": "agitator",
+      "frame": 138,
+      "phase": "warning",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "loader",
+      "frame": 139,
+      "phase": "warning",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "loader",
+      "frame": 143,
+      "phase": "recoil",
+      "high": true,
+      "armored": true
+    },
+    {
+      "kind": "agitator",
+      "frame": 144,
+      "phase": "attack",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "charger",
+      "frame": 150,
+      "phase": "rest",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "helmet",
+      "frame": 152,
+      "phase": "stunned",
+      "high": false,
+      "armored": false
+    },
+    {
+      "kind": "agitator",
+      "frame": 155,
+      "phase": "attack",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "helmet",
+      "frame": 165,
+      "phase": "walk",
+      "high": false,
+      "armored": false
+    },
+    {
+      "kind": "agitator",
+      "frame": 180,
+      "phase": "attack",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "helmet",
+      "frame": 200,
+      "phase": "walk",
+      "high": false,
+      "armored": false
+    },
+    {
+      "kind": "agitator",
+      "frame": 200,
+      "phase": "rest",
+      "high": false,
+      "armored": true
+    },
+    {
+      "kind": "loader",
+      "frame": 260,
+      "phase": "warning",
+      "high": true,
+      "armored": true
+    },
+    {
+      "kind": "loader",
+      "frame": 285,
+      "phase": "warning",
+      "high": true,
+      "armored": true
+    },
+    {
+      "kind": "loader",
+      "frame": 310,
+      "phase": "recoil",
+      "high": false,
+      "armored": true
+    }
+  ],
+  "readOnlyPaint": true
+}

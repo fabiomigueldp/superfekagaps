@@ -353,13 +353,7 @@ export class Game {
     }
 
     if (this.player.data.isGrounded) {
-      const footX = this.player.data.position.x + this.player.data.width / 2;
-      const footY = this.player.data.position.y + this.player.data.height + 1;
-      const col = this.level.worldToCol(footX);
-      const row = this.level.worldToRow(footY);
-      if (this.level.getTile(col, row) === TileType.PLATFORM_FALLING) {
-        this.level.markFallingPlatformContact(col, row);
-      }
+      this.level.markFallingPlatformSupport(this.player.getRect());
     }
 
     this.level.updateFallingPlatforms(deltaTime);

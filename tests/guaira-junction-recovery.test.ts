@@ -43,8 +43,8 @@ for(const route of ['direct','optional'] as const)for(const touch of [false,true
         assert.equal(updates,recordings[route].frames);assert.ok(fell>0);assert.ok(recovered>fell);
         assert.ok(recovered-fell<360,'local return takes fewer than six seconds in this recording');
         assert.ok(lowestX>=480,'no walk back to A or the inlet');assert.deepEqual([...used].sort(),[...steps].sort());
-        assert.equal(g.finished,true);assert.equal(g.coins,route==='optional'?3:0);
-        assert.equal(g.store.save.checkpoint?.index,0);assert.deepEqual(g.store.save.completed,[]);assert.deepEqual(h.storageCalls,[]);
+        assert.equal(g.finished,true);assert.equal(g.coins,recordings[route].coins);
+        assert.equal(g.store.save.checkpoint?.index,g.stage.checkpoints.length-1);assert.deepEqual(g.store.save.completed,[]);assert.deepEqual(h.storageCalls,[]);
         const before=snapshot(g);g.render();assert.deepEqual(snapshot(g),before,'paint is read-only');
     });
 

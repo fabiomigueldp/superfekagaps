@@ -1,0 +1,8345 @@
+{
+  "main": {
+    "id": "travessia",
+    "prefixFrames": 1257,
+    "crossingEnd": 1757,
+    "notes": [
+      {
+        "frame": 1260,
+        "x": 615.6211356237773,
+        "feet": 192,
+        "at": [
+          615.6211356237773,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 1275,
+        "x": 625.0628618737774,
+        "feet": 192,
+        "at": [
+          625.0628618737774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 1290,
+        "x": 655.0628618737774,
+        "feet": 192,
+        "at": [
+          655.0628618737774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 1305,
+        "x": 685.0628618737774,
+        "feet": 192,
+        "at": [
+          685.0628618737774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 1320,
+        "x": 714.7628618737772,
+        "feet": 192,
+        "at": [
+          714.7628618737772,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 1335,
+        "x": 719.3045881237772,
+        "feet": 157.40000000000003,
+        "at": [
+          719.3045881237772,
+          157.40000000000003
+        ],
+        "ground": false,
+        "keys": [
+          "Space"
+        ],
+        "hint": "PLACA ABAIXO / PASSADICO ACIMA"
+      },
+      {
+        "frame": 1350,
+        "x": 719.3045881237772,
+        "feet": 125.50000000000001,
+        "at": [
+          719.3045881237772,
+          125.50000000000001
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "PLACA ABAIXO / PASSADICO ACIMA"
+      },
+      {
+        "frame": 1365,
+        "x": 719.3045881237772,
+        "feet": 192,
+        "at": [
+          719.3045881237772,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1380,
+        "x": 719.3045881237772,
+        "feet": 192,
+        "at": [
+          719.3045881237772,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1395,
+        "x": 719.3045881237772,
+        "feet": 192,
+        "at": [
+          719.3045881237772,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1410,
+        "x": 719.3045881237772,
+        "feet": 192,
+        "at": [
+          719.3045881237772,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1425,
+        "x": 719.3045881237772,
+        "feet": 192,
+        "at": [
+          719.3045881237772,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1440,
+        "x": 719.3045881237772,
+        "feet": 192,
+        "at": [
+          719.3045881237772,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1455,
+        "x": 719.3045881237772,
+        "feet": 192,
+        "at": [
+          719.3045881237772,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1470,
+        "x": 719.3045881237772,
+        "feet": 192,
+        "at": [
+          719.3045881237772,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1485,
+        "x": 727.6045881237774,
+        "feet": 192,
+        "at": [
+          727.6045881237774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1500,
+        "x": 757.6045881237774,
+        "feet": 192,
+        "at": [
+          757.6045881237774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1515,
+        "x": 787.6045881237774,
+        "feet": 192,
+        "at": [
+          787.6045881237774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 1530,
+        "x": 817.6045881237774,
+        "feet": 192,
+        "at": [
+          817.6045881237774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 1545,
+        "x": 847.6045881237774,
+        "feet": 192,
+        "at": [
+          847.6045881237774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 1560,
+        "x": 877.6045881237774,
+        "feet": 192,
+        "at": [
+          877.6045881237774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "ILHA FIRME: OBSERVE A DESCARGA"
+      },
+      {
+        "frame": 1575,
+        "x": 903.1045881237774,
+        "feet": 192,
+        "at": [
+          903.1045881237774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "AGUA NA GRELHA"
+      },
+      {
+        "frame": 1590,
+        "x": 903.8463143737772,
+        "feet": 192,
+        "at": [
+          903.8463143737772,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "ILHA FIRME: OBSERVE A DESCARGA"
+      },
+      {
+        "frame": 1605,
+        "x": 903.8463143737772,
+        "feet": 192,
+        "at": [
+          903.8463143737772,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "ILHA FIRME: OBSERVE A DESCARGA"
+      },
+      {
+        "frame": 1620,
+        "x": 916.1463143737774,
+        "feet": 192,
+        "at": [
+          916.1463143737774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "ILHA FIRME: OBSERVE A DESCARGA"
+      },
+      {
+        "frame": 1635,
+        "x": 944.3463143737772,
+        "feet": 192,
+        "at": [
+          944.3463143737772,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 1650,
+        "x": 952.6880406237774,
+        "feet": 150.70000000000005,
+        "at": [
+          952.6880406237774,
+          150.70000000000005
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 1665,
+        "x": 1001.1880406237774,
+        "feet": 92.50000000000001,
+        "at": [
+          1001.1880406237774,
+          92.50000000000001
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 1680,
+        "x": 1043.1880406237774,
+        "feet": 158.50000000000009,
+        "at": [
+          1043.1880406237774,
+          158.50000000000009
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1695,
+        "x": 1066.8880406237772,
+        "feet": 192,
+        "at": [
+          1066.8880406237772,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1710,
+        "x": 1081.7297668737774,
+        "feet": 192,
+        "at": [
+          1081.7297668737774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1725,
+        "x": 1111.7297668737774,
+        "feet": 192,
+        "at": [
+          1111.7297668737774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1740,
+        "x": 1141.7297668737774,
+        "feet": 192,
+        "at": [
+          1141.7297668737774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1755,
+        "x": 1159.867091873777,
+        "feet": 192,
+        "at": [
+          1159.867091873777,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1770,
+        "x": 1186.7714931237774,
+        "feet": 192,
+        "at": [
+          1186.7714931237774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1785,
+        "x": 1239.2714931237774,
+        "feet": 192,
+        "at": [
+          1239.2714931237774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1800,
+        "x": 1291.7714931237774,
+        "feet": 192,
+        "at": [
+          1291.7714931237774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1815,
+        "x": 1344.2714931237774,
+        "feet": 192,
+        "at": [
+          1344.2714931237774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1830,
+        "x": 1396.7714931237774,
+        "feet": 192,
+        "at": [
+          1396.7714931237774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "PRESSAO SUBINDO"
+      },
+      {
+        "frame": 1845,
+        "x": 1449.2714931237774,
+        "feet": 192,
+        "at": [
+          1449.2714931237774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1860,
+        "x": 1501.7714931237774,
+        "feet": 192,
+        "at": [
+          1501.7714931237774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1875,
+        "x": 1554.2714931237774,
+        "feet": 192,
+        "at": [
+          1554.2714931237774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 1890,
+        "x": 1606.7714931237774,
+        "feet": 192,
+        "at": [
+          1606.7714931237774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 1905,
+        "x": 1659.2714931237774,
+        "feet": 130.60000000000002,
+        "at": [
+          1659.2714931237774,
+          130.60000000000002
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 1920,
+        "x": 1711.7714931237774,
+        "feet": 90.09999999999998,
+        "at": [
+          1711.7714931237774,
+          90.09999999999998
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1935,
+        "x": 1764.2714931237774,
+        "feet": 162.09999999999997,
+        "at": [
+          1764.2714931237774,
+          162.09999999999997
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1950,
+        "x": 1813.4714931237772,
+        "feet": 192,
+        "at": [
+          1813.4714931237772,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1965,
+        "x": 1822.5132193737772,
+        "feet": 192,
+        "at": [
+          1822.5132193737772,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1980,
+        "x": 1869.3132193737774,
+        "feet": 192,
+        "at": [
+          1869.3132193737774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SALTE OU ATAQUE POR CIMA"
+      },
+      {
+        "frame": 1995,
+        "x": 1921.8132193737774,
+        "feet": 192,
+        "at": [
+          1921.8132193737774,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "ARREMESSO A CAMINHO"
+      },
+      {
+        "frame": 2010,
+        "x": 1966.5132193737772,
+        "feet": 192,
+        "at": [
+          1966.5132193737772,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "ARREMESSO A CAMINHO"
+      },
+      {
+        "frame": 2025,
+        "x": 1974.8549456237774,
+        "feet": 150.70000000000005,
+        "at": [
+          1974.8549456237774,
+          150.70000000000005
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "ARREMESSO A CAMINHO"
+      },
+      {
+        "frame": 2040,
+        "x": 2018.8549456237774,
+        "feet": 112.60000000000007,
+        "at": [
+          2018.8549456237774,
+          112.60000000000007
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2055,
+        "x": 2041.1772240237774,
+        "feet": 145.80000000000013,
+        "at": [
+          2041.1772240237774,
+          145.80000000000013
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ArrowDown"
+        ],
+        "hint": "SALTE OU ATAQUE POR CIMA"
+      },
+      {
+        "frame": 2070,
+        "x": 2057.351376642527,
+        "feet": 121.5,
+        "at": [
+          2057.351376642527,
+          121.5
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2085,
+        "x": 2050.03454956617,
+        "feet": 174,
+        "at": [
+          2050.03454956617,
+          174
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2100,
+        "x": 2066.7749175449662,
+        "feet": 192,
+        "at": [
+          2066.7749175449662,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2115,
+        "x": 2119.0749175449664,
+        "feet": 192,
+        "at": [
+          2119.0749175449664,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2130,
+        "x": 2154.7749175449662,
+        "feet": 192,
+        "at": [
+          2154.7749175449662,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2145,
+        "x": 2168.8166437949662,
+        "feet": 130.60000000000002,
+        "at": [
+          2168.8166437949662,
+          130.60000000000002
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2160,
+        "x": 2219.1166437949664,
+        "feet": 121.30000000000008,
+        "at": [
+          2219.1166437949664,
+          121.30000000000008
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2175,
+        "x": 2249.1166437949664,
+        "feet": 192,
+        "at": [
+          2249.1166437949664,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2190,
+        "x": 2258.3583700449663,
+        "feet": 192,
+        "at": [
+          2258.3583700449663,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2205,
+        "x": 2289.6583700449664,
+        "feet": 192,
+        "at": [
+          2289.6583700449664,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2220,
+        "x": 2301.2000962949664,
+        "feet": 137.3,
+        "at": [
+          2301.2000962949664,
+          137.3
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2235,
+        "x": 2352.2000962949664,
+        "feet": 117.90000000000008,
+        "at": [
+          2352.2000962949664,
+          117.90000000000008
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2250,
+        "x": 2392.7000962949664,
+        "feet": 192,
+        "at": [
+          2392.7000962949664,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2265,
+        "x": 2416.4000962949663,
+        "feet": 192,
+        "at": [
+          2416.4000962949663,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2280,
+        "x": 2433.4418225449663,
+        "feet": 192,
+        "at": [
+          2433.4418225449663,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2295,
+        "x": 2485.7418225449665,
+        "feet": 192,
+        "at": [
+          2485.7418225449665,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SALTE OU ATAQUE POR CIMA"
+      },
+      {
+        "frame": 2310,
+        "x": 2538.2418225449665,
+        "feet": 192,
+        "at": [
+          2538.2418225449665,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SALTE OU ATAQUE POR CIMA"
+      },
+      {
+        "frame": 2325,
+        "x": 2590.7418225449665,
+        "feet": 104.60000000000001,
+        "at": [
+          2590.7418225449665,
+          104.60000000000001
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2340,
+        "x": 2643.2418225449665,
+        "feet": 101.59999999999997,
+        "at": [
+          2643.2418225449665,
+          101.59999999999997
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      }
+    ],
+    "frames": 2354,
+    "coins": 23,
+    "runs": [
+      [
+        92,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        10,
+        [
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        160,
+        []
+      ],
+      [
+        95,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        35,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        25,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        40,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        40,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        2,
+        [
+          "Space"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        2,
+        [
+          "Space"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        40,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        8,
+        [
+          "Space"
+        ]
+      ],
+      [
+        40,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        100,
+        []
+      ],
+      [
+        70,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        45,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        55,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        30,
+        []
+      ],
+      [
+        45,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        10,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        28,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        50,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        12,
+        [
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        135,
+        []
+      ],
+      [
+        92,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        35,
+        []
+      ],
+      [
+        21,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        18,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        11,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        46,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        139,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        28,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        46,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        11,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        9,
+        [
+          "ArrowRight",
+          "ArrowDown"
+        ]
+      ],
+      [
+        5,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        3,
+        []
+      ],
+      [
+        33,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        11,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        13,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        18,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        17,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        41,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        19,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ]
+    ]
+  },
+  "high": {
+    "id": "travessia",
+    "prefixFrames": 1384,
+    "crossingEnd": 1792,
+    "notes": [
+      {
+        "frame": 1350,
+        "x": 576.3712833508775,
+        "feet": 25.29999999999998,
+        "at": [
+          576.3712833508775,
+          25.29999999999998
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "Space"
+        ],
+        "hint": "DESCIDA: SIGA OS APOIOS"
+      },
+      {
+        "frame": 1365,
+        "x": 603.7885458508777,
+        "feet": 89.79999999999997,
+        "at": [
+          603.7885458508777,
+          89.79999999999997
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1380,
+        "x": 602.3230426966006,
+        "feet": 192,
+        "at": [
+          602.3230426966006,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1395,
+        "x": 614.4643483684463,
+        "feet": 177.5,
+        "at": [
+          614.4643483684463,
+          177.5
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 1410,
+        "x": 643.0643483684462,
+        "feet": 95,
+        "at": [
+          643.0643483684462,
+          95
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "Space"
+        ],
+        "hint": "PLACA ABAIXO / PASSADICO ACIMA"
+      },
+      {
+        "frame": 1425,
+        "x": 670.4816108684463,
+        "feet": 114.49999999999996,
+        "at": [
+          670.4816108684463,
+          114.49999999999996
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "PLACA ABAIXO / PASSADICO ACIMA"
+      },
+      {
+        "frame": 1440,
+        "x": 678.6571028450867,
+        "feet": 102.69999999999999,
+        "at": [
+          678.6571028450867,
+          102.69999999999999
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1455,
+        "x": 725.6571028450867,
+        "feet": 41.199999999999974,
+        "at": [
+          725.6571028450867,
+          41.199999999999974
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "Space"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1470,
+        "x": 755.6571028450867,
+        "feet": 90.69999999999996,
+        "at": [
+          755.6571028450867,
+          90.69999999999996
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1485,
+        "x": 764.7988290950866,
+        "feet": 81.5,
+        "at": [
+          764.7988290950866,
+          81.5
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1500,
+        "x": 804.6988290950867,
+        "feet": -1.0000000000000036,
+        "at": [
+          804.6988290950867,
+          -1.0000000000000036
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1515,
+        "x": 848.1988290950867,
+        "feet": 18.500000000000007,
+        "at": [
+          848.1988290950867,
+          18.500000000000007
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1530,
+        "x": 875.1988290950867,
+        "feet": 96,
+        "at": [
+          875.1988290950867,
+          96
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "TABUA CEDE - CONTINUE"
+      },
+      {
+        "frame": 1545,
+        "x": 884.8405553450866,
+        "feet": 47.99999999999999,
+        "at": [
+          884.8405553450866,
+          47.99999999999999
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1560,
+        "x": 931.7405553450867,
+        "feet": -7,
+        "at": [
+          931.7405553450867,
+          -7
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "Space"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1575,
+        "x": 961.7405553450867,
+        "feet": 48,
+        "at": [
+          961.7405553450867,
+          48
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PINCA: PREPARE O SALTO"
+      },
+      {
+        "frame": 1590,
+        "x": 969.7822815950867,
+        "feet": 26.8,
+        "at": [
+          969.7822815950867,
+          26.8
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "Space"
+        ],
+        "hint": "PINCA: PREPARE O SALTO"
+      },
+      {
+        "frame": 1605,
+        "x": 997.9822815950865,
+        "feet": -51.20000000000002,
+        "at": [
+          997.9822815950865,
+          -51.20000000000002
+        ],
+        "ground": false,
+        "keys": [
+          "Space"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1620,
+        "x": 1003.2444425806871,
+        "feet": -18.70000000000003,
+        "at": [
+          1003.2444425806871,
+          -18.70000000000003
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft",
+          "ArrowDown"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1635,
+        "x": 1013.850510753487,
+        "feet": -16,
+        "at": [
+          1013.850510753487,
+          -16
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1650,
+        "x": 1035.017415753487,
+        "feet": 21.5,
+        "at": [
+          1035.017415753487,
+          21.5
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1665,
+        "x": 1033.7683525914445,
+        "feet": 48,
+        "at": [
+          1033.7683525914445,
+          48
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 1680,
+        "x": 1035.1271984148825,
+        "feet": 0,
+        "at": [
+          1035.1271984148825,
+          0
+        ],
+        "ground": false,
+        "keys": [
+          "Space"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1695,
+        "x": 1035.1271984148825,
+        "feet": 5.499999999999993,
+        "at": [
+          1035.1271984148825,
+          5.499999999999993
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowDown"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1710,
+        "x": 1036.9271984148827,
+        "feet": 33.5,
+        "at": [
+          1036.9271984148827,
+          33.5
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "GRELHA FECHADA: DESCA A DIREITA"
+      },
+      {
+        "frame": 1725,
+        "x": 1071.9271984148827,
+        "feet": -14.350000000000009,
+        "at": [
+          1071.9271984148827,
+          -14.350000000000009
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "DESCIDA: SIGA OS APOIOS"
+      },
+      {
+        "frame": 1740,
+        "x": 1101.0721984148827,
+        "feet": 62.899999999999984,
+        "at": [
+          1101.0721984148827,
+          62.899999999999984
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "DESCIDA: SIGA OS APOIOS"
+      },
+      {
+        "frame": 1755,
+        "x": 1115.894103414883,
+        "feet": 57.29999999999998,
+        "at": [
+          1115.894103414883,
+          57.29999999999998
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "DESCIDA: SIGA OS APOIOS"
+      },
+      {
+        "frame": 1770,
+        "x": 1148.894103414883,
+        "feet": 67.04999999999995,
+        "at": [
+          1148.894103414883,
+          67.04999999999995
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "DESCIDA: SIGA OS APOIOS"
+      },
+      {
+        "frame": 1785,
+        "x": 1168.9765381008206,
+        "feet": 185.7,
+        "at": [
+          1168.9765381008206,
+          185.7
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "DESCIDA: SIGA OS APOIOS"
+      },
+      {
+        "frame": 1800,
+        "x": 1178.7017231241111,
+        "feet": 192,
+        "at": [
+          1178.7017231241111,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1815,
+        "x": 1229.7017231241111,
+        "feet": 192,
+        "at": [
+          1229.7017231241111,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1830,
+        "x": 1282.2017231241111,
+        "feet": 192,
+        "at": [
+          1282.2017231241111,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1845,
+        "x": 1306.637097501724,
+        "feet": 192,
+        "at": [
+          1306.637097501724,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PRESSAO SUBINDO"
+      },
+      {
+        "frame": 1860,
+        "x": 1308.3816353625784,
+        "feet": 192,
+        "at": [
+          1308.3816353625784,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PRESSAO SUBINDO"
+      },
+      {
+        "frame": 1875,
+        "x": 1308.3816353625784,
+        "feet": 192,
+        "at": [
+          1308.3816353625784,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "AGUA NA GRELHA"
+      },
+      {
+        "frame": 1890,
+        "x": 1308.3816353625784,
+        "feet": 192,
+        "at": [
+          1308.3816353625784,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "AGUA NA GRELHA"
+      },
+      {
+        "frame": 1905,
+        "x": 1308.3816353625784,
+        "feet": 192,
+        "at": [
+          1308.3816353625784,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "AGUA NA GRELHA"
+      },
+      {
+        "frame": 1920,
+        "x": 1310.1816353625786,
+        "feet": 192,
+        "at": [
+          1310.1816353625786,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1935,
+        "x": 1352.6816353625786,
+        "feet": 192,
+        "at": [
+          1352.6816353625786,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1950,
+        "x": 1405.1816353625786,
+        "feet": 192,
+        "at": [
+          1405.1816353625786,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1965,
+        "x": 1457.6816353625786,
+        "feet": 192,
+        "at": [
+          1457.6816353625786,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1980,
+        "x": 1505.6618447375786,
+        "feet": 192,
+        "at": [
+          1505.6618447375786,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1995,
+        "x": 1515.1105796372735,
+        "feet": 192,
+        "at": [
+          1515.1105796372735,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PRESSAO SUBINDO"
+      },
+      {
+        "frame": 2010,
+        "x": 1515.361547601046,
+        "feet": 192,
+        "at": [
+          1515.361547601046,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2025,
+        "x": 1515.361547601046,
+        "feet": 192,
+        "at": [
+          1515.361547601046,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "AGUA NA GRELHA"
+      },
+      {
+        "frame": 2040,
+        "x": 1515.361547601046,
+        "feet": 192,
+        "at": [
+          1515.361547601046,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "AGUA NA GRELHA"
+      },
+      {
+        "frame": 2055,
+        "x": 1515.361547601046,
+        "feet": 192,
+        "at": [
+          1515.361547601046,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 2070,
+        "x": 1549.161547601046,
+        "feet": 192,
+        "at": [
+          1549.161547601046,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2085,
+        "x": 1601.661547601046,
+        "feet": 192,
+        "at": [
+          1601.661547601046,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2100,
+        "x": 1654.161547601046,
+        "feet": 124.40000000000002,
+        "at": [
+          1654.161547601046,
+          124.40000000000002
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 2115,
+        "x": 1706.661547601046,
+        "feet": 91.39999999999998,
+        "at": [
+          1706.661547601046,
+          91.39999999999998
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2130,
+        "x": 1759.161547601046,
+        "feet": 170.89999999999998,
+        "at": [
+          1759.161547601046,
+          170.89999999999998
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2145,
+        "x": 1810.161547601046,
+        "feet": 192,
+        "at": [
+          1810.161547601046,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2160,
+        "x": 1819.403273851046,
+        "feet": 192,
+        "at": [
+          1819.403273851046,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2175,
+        "x": 1864.203273851046,
+        "feet": 192,
+        "at": [
+          1864.203273851046,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2190,
+        "x": 1916.703273851046,
+        "feet": 192,
+        "at": [
+          1916.703273851046,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "ARREMESSO A CAMINHO"
+      },
+      {
+        "frame": 2205,
+        "x": 1965.903273851046,
+        "feet": 192,
+        "at": [
+          1965.903273851046,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "ARREMESSO A CAMINHO"
+      },
+      {
+        "frame": 2220,
+        "x": 1973.445000101046,
+        "feet": 164.10000000000002,
+        "at": [
+          1973.445000101046,
+          164.10000000000002
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "ARREMESSO A CAMINHO"
+      },
+      {
+        "frame": 2235,
+        "x": 2015.2450001010461,
+        "feet": 109.30000000000005,
+        "at": [
+          2015.2450001010461,
+          109.30000000000005
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2250,
+        "x": 2040.6235601010462,
+        "feet": 145.80000000000013,
+        "at": [
+          2040.6235601010462,
+          145.80000000000013
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ArrowDown"
+        ],
+        "hint": "SALTE OU ATAQUE POR CIMA"
+      },
+      {
+        "frame": 2265,
+        "x": 2056.965944651046,
+        "feet": 123,
+        "at": [
+          2056.965944651046,
+          123
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2280,
+        "x": 2051.2497624255075,
+        "feet": 160.5,
+        "at": [
+          2051.2497624255075,
+          160.5
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2295,
+        "x": 2067.356901374287,
+        "feet": 192,
+        "at": [
+          2067.356901374287,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2310,
+        "x": 2119.6569013742874,
+        "feet": 192,
+        "at": [
+          2119.6569013742874,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2325,
+        "x": 2152.0269013742873,
+        "feet": 192,
+        "at": [
+          2152.0269013742873,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2340,
+        "x": 2168.898627624287,
+        "feet": 124.40000000000002,
+        "at": [
+          2168.898627624287,
+          124.40000000000002
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2355,
+        "x": 2219.6986276242874,
+        "feet": 125.20000000000009,
+        "at": [
+          2219.6986276242874,
+          125.20000000000009
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2370,
+        "x": 2249.6986276242874,
+        "feet": 192,
+        "at": [
+          2249.6986276242874,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2385,
+        "x": 2258.940353874287,
+        "feet": 192,
+        "at": [
+          2258.940353874287,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2400,
+        "x": 2290.2403538742874,
+        "feet": 192,
+        "at": [
+          2290.2403538742874,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2415,
+        "x": 2301.7820801242874,
+        "feet": 137.3,
+        "at": [
+          2301.7820801242874,
+          137.3
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2430,
+        "x": 2352.7820801242874,
+        "feet": 117.90000000000008,
+        "at": [
+          2352.7820801242874,
+          117.90000000000008
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2445,
+        "x": 2393.2820801242874,
+        "feet": 192,
+        "at": [
+          2393.2820801242874,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2460,
+        "x": 2415.1520801242873,
+        "feet": 192,
+        "at": [
+          2415.1520801242873,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2475,
+        "x": 2435.3238063742874,
+        "feet": 192,
+        "at": [
+          2435.3238063742874,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2490,
+        "x": 2487.8238063742874,
+        "feet": 192,
+        "at": [
+          2487.8238063742874,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SALTE OU ATAQUE POR CIMA"
+      },
+      {
+        "frame": 2505,
+        "x": 2540.3238063742874,
+        "feet": 192,
+        "at": [
+          2540.3238063742874,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SALTE OU ATAQUE POR CIMA"
+      },
+      {
+        "frame": 2520,
+        "x": 2592.8238063742874,
+        "feet": 100.9,
+        "at": [
+          2592.8238063742874,
+          100.9
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2535,
+        "x": 2645.3238063742874,
+        "feet": 105.39999999999996,
+        "at": [
+          2645.3238063742874,
+          105.39999999999996
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      }
+    ],
+    "frames": 2548,
+    "coins": 27,
+    "runs": [
+      [
+        92,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        10,
+        [
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        160,
+        []
+      ],
+      [
+        95,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        35,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        25,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        40,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        40,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        2,
+        [
+          "Space"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        2,
+        [
+          "Space"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        40,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        8,
+        [
+          "Space"
+        ]
+      ],
+      [
+        40,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        100,
+        []
+      ],
+      [
+        70,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        45,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        55,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        30,
+        []
+      ],
+      [
+        45,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        16,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        8,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        10,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        20,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        13,
+        [
+          "ArrowRight",
+          "ArrowDown"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        11,
+        []
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        19,
+        []
+      ],
+      [
+        11,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        5,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        9,
+        []
+      ],
+      [
+        15,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        9,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        10,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        4,
+        []
+      ],
+      [
+        8,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        3,
+        []
+      ],
+      [
+        9,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        15,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        3,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        4,
+        []
+      ],
+      [
+        20,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        13,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        2,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        17,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        20,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        13,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        17,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        3,
+        [
+          "Space"
+        ]
+      ],
+      [
+        3,
+        [
+          "ArrowLeft",
+          "Space"
+        ]
+      ],
+      [
+        14,
+        [
+          "ArrowLeft",
+          "ArrowDown"
+        ]
+      ],
+      [
+        18,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        4,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        2,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        3,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        2,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        7,
+        []
+      ],
+      [
+        12,
+        [
+          "Space"
+        ]
+      ],
+      [
+        14,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        8,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        8,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        18,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        4,
+        []
+      ],
+      [
+        3,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        8,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        3,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        18,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        3,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        40,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        85,
+        []
+      ],
+      [
+        59,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        79,
+        []
+      ],
+      [
+        35,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        30,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        47,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        5,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        12,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        9,
+        [
+          "ArrowRight",
+          "ArrowDown"
+        ]
+      ],
+      [
+        5,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        15,
+        []
+      ],
+      [
+        32,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        13,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        18,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        41,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        19,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ]
+    ]
+  },
+  "recovery": {
+    "id": "travessia",
+    "prefixFrames": 1384,
+    "crossingEnd": 1757,
+    "notes": [
+      {
+        "frame": 1350,
+        "x": 576.3712833508775,
+        "feet": 25.29999999999998,
+        "at": [
+          576.3712833508775,
+          25.29999999999998
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "Space"
+        ],
+        "hint": "DESCIDA: SIGA OS APOIOS"
+      },
+      {
+        "frame": 1365,
+        "x": 603.7885458508777,
+        "feet": 89.79999999999997,
+        "at": [
+          603.7885458508777,
+          89.79999999999997
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1380,
+        "x": 602.3230426966006,
+        "feet": 192,
+        "at": [
+          602.3230426966006,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1395,
+        "x": 614.4643483684463,
+        "feet": 177.5,
+        "at": [
+          614.4643483684463,
+          177.5
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 1410,
+        "x": 643.0643483684462,
+        "feet": 95,
+        "at": [
+          643.0643483684462,
+          95
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "Space"
+        ],
+        "hint": "PLACA ABAIXO / PASSADICO ACIMA"
+      },
+      {
+        "frame": 1425,
+        "x": 670.4816108684463,
+        "feet": 114.49999999999996,
+        "at": [
+          670.4816108684463,
+          114.49999999999996
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "PLACA ABAIXO / PASSADICO ACIMA"
+      },
+      {
+        "frame": 1440,
+        "x": 678.6571028450867,
+        "feet": 102.69999999999999,
+        "at": [
+          678.6571028450867,
+          102.69999999999999
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1455,
+        "x": 725.6571028450867,
+        "feet": 41.199999999999974,
+        "at": [
+          725.6571028450867,
+          41.199999999999974
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "Space"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1470,
+        "x": 755.6571028450867,
+        "feet": 90.69999999999996,
+        "at": [
+          755.6571028450867,
+          90.69999999999996
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1485,
+        "x": 764.7988290950866,
+        "feet": 81.5,
+        "at": [
+          764.7988290950866,
+          81.5
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1500,
+        "x": 804.6988290950867,
+        "feet": -1.0000000000000036,
+        "at": [
+          804.6988290950867,
+          -1.0000000000000036
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1515,
+        "x": 848.1988290950867,
+        "feet": 18.500000000000007,
+        "at": [
+          848.1988290950867,
+          18.500000000000007
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1530,
+        "x": 875.1988290950867,
+        "feet": 96,
+        "at": [
+          875.1988290950867,
+          96
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "TABUA CEDE - CONTINUE"
+      },
+      {
+        "frame": 1545,
+        "x": 876.4405553450865,
+        "feet": 96,
+        "at": [
+          876.4405553450865,
+          96
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "TABUA CEDE - CONTINUE"
+      },
+      {
+        "frame": 1560,
+        "x": 876.4405553450865,
+        "feet": 123.5,
+        "at": [
+          876.4405553450865,
+          123.5
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1575,
+        "x": 880.9405553450865,
+        "feet": 192,
+        "at": [
+          880.9405553450865,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "ILHA FIRME: OBSERVE A DESCARGA"
+      },
+      {
+        "frame": 1590,
+        "x": 902.6105553450866,
+        "feet": 192,
+        "at": [
+          902.6105553450866,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "ILHA FIRME: OBSERVE A DESCARGA"
+      },
+      {
+        "frame": 1605,
+        "x": 902.9822815950865,
+        "feet": 192,
+        "at": [
+          902.9822815950865,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "ILHA FIRME: OBSERVE A DESCARGA"
+      },
+      {
+        "frame": 1620,
+        "x": 915.2822815950867,
+        "feet": 192,
+        "at": [
+          915.2822815950867,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "ILHA FIRME: OBSERVE A DESCARGA"
+      },
+      {
+        "frame": 1635,
+        "x": 944.3822815950866,
+        "feet": 192,
+        "at": [
+          944.3822815950866,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 1650,
+        "x": 952.0240078450865,
+        "feet": 157.40000000000003,
+        "at": [
+          952.0240078450865,
+          157.40000000000003
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 1665,
+        "x": 998.8240078450867,
+        "feet": 92.10000000000001,
+        "at": [
+          998.8240078450867,
+          92.10000000000001
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 1680,
+        "x": 1042.3240078450867,
+        "feet": 150.60000000000008,
+        "at": [
+          1042.3240078450867,
+          150.60000000000008
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1695,
+        "x": 1067.8240078450867,
+        "feet": 192,
+        "at": [
+          1067.8240078450867,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1710,
+        "x": 1080.8657340950867,
+        "feet": 192,
+        "at": [
+          1080.8657340950867,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1725,
+        "x": 1110.8657340950867,
+        "feet": 192,
+        "at": [
+          1110.8657340950867,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1740,
+        "x": 1140.8657340950867,
+        "feet": 192,
+        "at": [
+          1140.8657340950867,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1755,
+        "x": 1159.0030590950864,
+        "feet": 192,
+        "at": [
+          1159.0030590950864,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1770,
+        "x": 1185.9074603450867,
+        "feet": 192,
+        "at": [
+          1185.9074603450867,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1785,
+        "x": 1238.4074603450867,
+        "feet": 192,
+        "at": [
+          1238.4074603450867,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1800,
+        "x": 1290.9074603450867,
+        "feet": 192,
+        "at": [
+          1290.9074603450867,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1815,
+        "x": 1343.4074603450867,
+        "feet": 192,
+        "at": [
+          1343.4074603450867,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1830,
+        "x": 1395.9074603450867,
+        "feet": 192,
+        "at": [
+          1395.9074603450867,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "PRESSAO SUBINDO"
+      },
+      {
+        "frame": 1845,
+        "x": 1448.4074603450867,
+        "feet": 192,
+        "at": [
+          1448.4074603450867,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1860,
+        "x": 1500.9074603450867,
+        "feet": 192,
+        "at": [
+          1500.9074603450867,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1875,
+        "x": 1553.4074603450867,
+        "feet": 192,
+        "at": [
+          1553.4074603450867,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 1890,
+        "x": 1605.9074603450867,
+        "feet": 192,
+        "at": [
+          1605.9074603450867,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 1905,
+        "x": 1658.4074603450867,
+        "feet": 130.60000000000002,
+        "at": [
+          1658.4074603450867,
+          130.60000000000002
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 1920,
+        "x": 1710.9074603450867,
+        "feet": 90.09999999999998,
+        "at": [
+          1710.9074603450867,
+          90.09999999999998
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1935,
+        "x": 1763.4074603450867,
+        "feet": 162.09999999999997,
+        "at": [
+          1763.4074603450867,
+          162.09999999999997
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1950,
+        "x": 1812.6074603450866,
+        "feet": 192,
+        "at": [
+          1812.6074603450866,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1965,
+        "x": 1821.6491865950866,
+        "feet": 192,
+        "at": [
+          1821.6491865950866,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1980,
+        "x": 1868.4491865950868,
+        "feet": 192,
+        "at": [
+          1868.4491865950868,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SALTE OU ATAQUE POR CIMA"
+      },
+      {
+        "frame": 1995,
+        "x": 1920.9491865950868,
+        "feet": 192,
+        "at": [
+          1920.9491865950868,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "ARREMESSO A CAMINHO"
+      },
+      {
+        "frame": 2010,
+        "x": 1968.0491865950867,
+        "feet": 192,
+        "at": [
+          1968.0491865950867,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "ARREMESSO A CAMINHO"
+      },
+      {
+        "frame": 2025,
+        "x": 1975.6909128450866,
+        "feet": 157.40000000000003,
+        "at": [
+          1975.6909128450866,
+          157.40000000000003
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "ARREMESSO A CAMINHO"
+      },
+      {
+        "frame": 2040,
+        "x": 2017.9909128450868,
+        "feet": 110.70000000000006,
+        "at": [
+          2017.9909128450868,
+          110.70000000000006
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2055,
+        "x": 2041.893760845087,
+        "feet": 145.80000000000013,
+        "at": [
+          2041.893760845087,
+          145.80000000000013
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ArrowDown"
+        ],
+        "hint": "SALTE OU ATAQUE POR CIMA"
+      },
+      {
+        "frame": 2070,
+        "x": 2057.5690736450865,
+        "feet": 122,
+        "at": [
+          2057.5690736450865,
+          122
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2085,
+        "x": 2050.162564595179,
+        "feet": 167,
+        "at": [
+          2050.162564595179,
+          167
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2100,
+        "x": 2061.2338205291185,
+        "feet": 192,
+        "at": [
+          2061.2338205291185,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2115,
+        "x": 2112.2338205291185,
+        "feet": 192,
+        "at": [
+          2112.2338205291185,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2130,
+        "x": 2154.2338205291185,
+        "feet": 192,
+        "at": [
+          2154.2338205291185,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2145,
+        "x": 2163.8755467791184,
+        "feet": 144.00000000000003,
+        "at": [
+          2163.8755467791184,
+          144.00000000000003
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2160,
+        "x": 2213.7755467791185,
+        "feet": 115.00000000000007,
+        "at": [
+          2213.7755467791185,
+          115.00000000000007
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2175,
+        "x": 2245.2755467791185,
+        "feet": 192,
+        "at": [
+          2245.2755467791185,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2190,
+        "x": 2256.4172730291184,
+        "feet": 192,
+        "at": [
+          2256.4172730291184,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2205,
+        "x": 2288.5172730291183,
+        "feet": 192,
+        "at": [
+          2288.5172730291183,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2220,
+        "x": 2296.8589992791185,
+        "feet": 150.70000000000005,
+        "at": [
+          2296.8589992791185,
+          150.70000000000005
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2235,
+        "x": 2345.3589992791185,
+        "feet": 112.60000000000007,
+        "at": [
+          2345.3589992791185,
+          112.60000000000007
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2250,
+        "x": 2388.8589992791185,
+        "feet": 192,
+        "at": [
+          2388.8589992791185,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2265,
+        "x": 2415.8589992791185,
+        "feet": 192,
+        "at": [
+          2415.8589992791185,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2280,
+        "x": 2427.9007255291185,
+        "feet": 192,
+        "at": [
+          2427.9007255291185,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2295,
+        "x": 2478.9007255291185,
+        "feet": 192,
+        "at": [
+          2478.9007255291185,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SALTE OU ATAQUE POR CIMA"
+      },
+      {
+        "frame": 2310,
+        "x": 2531.4007255291185,
+        "feet": 192,
+        "at": [
+          2531.4007255291185,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SALTE OU ATAQUE POR CIMA"
+      },
+      {
+        "frame": 2325,
+        "x": 2583.900725529118,
+        "feet": 113.50000000000001,
+        "at": [
+          2583.900725529118,
+          113.50000000000001
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2340,
+        "x": 2636.400725529118,
+        "feet": 95.49999999999997,
+        "at": [
+          2636.400725529118,
+          95.49999999999997
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2355,
+        "x": 2688.900725529118,
+        "feet": 190,
+        "at": [
+          2688.900725529118,
+          190
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SALTE OU ATAQUE POR CIMA"
+      }
+    ],
+    "frames": 2356,
+    "coins": 27,
+    "runs": [
+      [
+        92,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        10,
+        [
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        160,
+        []
+      ],
+      [
+        95,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        35,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        25,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        40,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        40,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        2,
+        [
+          "Space"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        2,
+        [
+          "Space"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        40,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        8,
+        [
+          "Space"
+        ]
+      ],
+      [
+        40,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        100,
+        []
+      ],
+      [
+        70,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        45,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        55,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        30,
+        []
+      ],
+      [
+        45,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        16,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        8,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        10,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        20,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        13,
+        [
+          "ArrowRight",
+          "ArrowDown"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        11,
+        []
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        19,
+        []
+      ],
+      [
+        11,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        5,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        9,
+        []
+      ],
+      [
+        15,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        9,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        10,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        4,
+        []
+      ],
+      [
+        8,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        3,
+        []
+      ],
+      [
+        9,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        15,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        3,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        4,
+        []
+      ],
+      [
+        20,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        13,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        2,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        17,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        38,
+        []
+      ],
+      [
+        13,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        22,
+        []
+      ],
+      [
+        22,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        18,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        11,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        45,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        139,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        28,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        47,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        5,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        12,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        9,
+        [
+          "ArrowRight",
+          "ArrowDown"
+        ]
+      ],
+      [
+        5,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        4,
+        []
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        13,
+        []
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        4,
+        []
+      ],
+      [
+        33,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        11,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        13,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        18,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        17,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        41,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        19,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ]
+    ]
+  },
+  "return": {
+    "id": "travessia",
+    "prefixFrames": 1384,
+    "crossingEnd": 2496,
+    "notes": [
+      {
+        "frame": 1350,
+        "x": 576.3712833508775,
+        "feet": 25.29999999999998,
+        "at": [
+          576.3712833508775,
+          25.29999999999998
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "Space"
+        ],
+        "hint": "DESCIDA: SIGA OS APOIOS"
+      },
+      {
+        "frame": 1365,
+        "x": 603.7885458508777,
+        "feet": 89.79999999999997,
+        "at": [
+          603.7885458508777,
+          89.79999999999997
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1380,
+        "x": 602.3230426966006,
+        "feet": 192,
+        "at": [
+          602.3230426966006,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1395,
+        "x": 614.4643483684463,
+        "feet": 177.5,
+        "at": [
+          614.4643483684463,
+          177.5
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 1410,
+        "x": 643.0643483684462,
+        "feet": 95,
+        "at": [
+          643.0643483684462,
+          95
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "Space"
+        ],
+        "hint": "PLACA ABAIXO / PASSADICO ACIMA"
+      },
+      {
+        "frame": 1425,
+        "x": 670.4816108684463,
+        "feet": 114.49999999999996,
+        "at": [
+          670.4816108684463,
+          114.49999999999996
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "PLACA ABAIXO / PASSADICO ACIMA"
+      },
+      {
+        "frame": 1440,
+        "x": 678.6571028450867,
+        "feet": 102.69999999999999,
+        "at": [
+          678.6571028450867,
+          102.69999999999999
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1455,
+        "x": 725.6571028450867,
+        "feet": 41.199999999999974,
+        "at": [
+          725.6571028450867,
+          41.199999999999974
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "Space"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1470,
+        "x": 755.6571028450867,
+        "feet": 90.69999999999996,
+        "at": [
+          755.6571028450867,
+          90.69999999999996
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1485,
+        "x": 764.7988290950866,
+        "feet": 81.5,
+        "at": [
+          764.7988290950866,
+          81.5
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1500,
+        "x": 804.6988290950867,
+        "feet": -1.0000000000000036,
+        "at": [
+          804.6988290950867,
+          -1.0000000000000036
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1515,
+        "x": 848.1988290950867,
+        "feet": 18.500000000000007,
+        "at": [
+          848.1988290950867,
+          18.500000000000007
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1530,
+        "x": 875.1988290950867,
+        "feet": 96,
+        "at": [
+          875.1988290950867,
+          96
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "TABUA CEDE - CONTINUE"
+      },
+      {
+        "frame": 1545,
+        "x": 884.8405553450866,
+        "feet": 47.99999999999999,
+        "at": [
+          884.8405553450866,
+          47.99999999999999
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1560,
+        "x": 931.7405553450867,
+        "feet": -7,
+        "at": [
+          931.7405553450867,
+          -7
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "Space"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1575,
+        "x": 961.7405553450867,
+        "feet": 48,
+        "at": [
+          961.7405553450867,
+          48
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PINCA: PREPARE O SALTO"
+      },
+      {
+        "frame": 1590,
+        "x": 969.7822815950867,
+        "feet": 26.8,
+        "at": [
+          969.7822815950867,
+          26.8
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "Space"
+        ],
+        "hint": "PINCA: PREPARE O SALTO"
+      },
+      {
+        "frame": 1605,
+        "x": 997.9822815950865,
+        "feet": -51.20000000000002,
+        "at": [
+          997.9822815950865,
+          -51.20000000000002
+        ],
+        "ground": false,
+        "keys": [
+          "Space"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1620,
+        "x": 1003.2444425806871,
+        "feet": -18.70000000000003,
+        "at": [
+          1003.2444425806871,
+          -18.70000000000003
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft",
+          "ArrowDown"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1635,
+        "x": 1013.850510753487,
+        "feet": -16,
+        "at": [
+          1013.850510753487,
+          -16
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1650,
+        "x": 1035.017415753487,
+        "feet": 21.5,
+        "at": [
+          1035.017415753487,
+          21.5
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1665,
+        "x": 1033.7683525914445,
+        "feet": 48,
+        "at": [
+          1033.7683525914445,
+          48
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 1680,
+        "x": 1035.1271984148825,
+        "feet": 0,
+        "at": [
+          1035.1271984148825,
+          0
+        ],
+        "ground": false,
+        "keys": [
+          "Space"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1695,
+        "x": 1035.1271984148825,
+        "feet": 5.499999999999993,
+        "at": [
+          1035.1271984148825,
+          5.499999999999993
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowDown"
+        ],
+        "hint": "REGISTRO DE MANUTENCAO A DIREITA"
+      },
+      {
+        "frame": 1710,
+        "x": 1036.9271984148827,
+        "feet": 33.5,
+        "at": [
+          1036.9271984148827,
+          33.5
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "GRELHA FECHADA: DESCA A DIREITA"
+      },
+      {
+        "frame": 1725,
+        "x": 1071.9271984148827,
+        "feet": -14.350000000000009,
+        "at": [
+          1071.9271984148827,
+          -14.350000000000009
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "DESCIDA: SIGA OS APOIOS"
+      },
+      {
+        "frame": 1740,
+        "x": 1101.0721984148827,
+        "feet": 62.899999999999984,
+        "at": [
+          1101.0721984148827,
+          62.899999999999984
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "DESCIDA: SIGA OS APOIOS"
+      },
+      {
+        "frame": 1755,
+        "x": 1094.2941034148826,
+        "feet": 57.29999999999998,
+        "at": [
+          1094.2941034148826,
+          57.29999999999998
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "DESCIDA: SIGA OS APOIOS"
+      },
+      {
+        "frame": 1770,
+        "x": 1059.7941034148826,
+        "feet": 9.29999999999999,
+        "at": [
+          1059.7941034148826,
+          9.29999999999999
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft",
+          "Space"
+        ],
+        "hint": "RETORNO: PROCURE APOIOS"
+      },
+      {
+        "frame": 1785,
+        "x": 1037.0448034148826,
+        "feet": 48,
+        "at": [
+          1037.0448034148826,
+          48
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "RETORNO: PROCURE APOIOS"
+      },
+      {
+        "frame": 1800,
+        "x": 1017.0183437586325,
+        "feet": -25.300000000000004,
+        "at": [
+          1017.0183437586325,
+          -25.300000000000004
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "RETORNO: PROCURE APOIOS"
+      },
+      {
+        "frame": 1815,
+        "x": 984.0183437586325,
+        "feet": -50.80000000000004,
+        "at": [
+          984.0183437586325,
+          -50.80000000000004
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "RETORNO: PROCURE APOIOS"
+      },
+      {
+        "frame": 1830,
+        "x": 965.1640281336322,
+        "feet": 36.19999999999994,
+        "at": [
+          965.1640281336322,
+          36.19999999999994
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "RETORNO: PROCURE APOIOS"
+      },
+      {
+        "frame": 1845,
+        "x": 967.9178744725295,
+        "feet": 33.5,
+        "at": [
+          967.9178744725295,
+          33.5
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "RETORNO: PROCURE APOIOS"
+      },
+      {
+        "frame": 1860,
+        "x": 928.0178744725295,
+        "feet": -14.350000000000009,
+        "at": [
+          928.0178744725295,
+          -14.350000000000009
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft",
+          "ShiftLeft"
+        ],
+        "hint": "RETORNO: PROCURE APOIOS"
+      },
+      {
+        "frame": 1875,
+        "x": 893.5178744725295,
+        "feet": 62.899999999999984,
+        "at": [
+          893.5178744725295,
+          62.899999999999984
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "RETORNO: PROCURE APOIOS"
+      },
+      {
+        "frame": 1890,
+        "x": 877.2761482225296,
+        "feet": 96,
+        "at": [
+          877.2761482225296,
+          96
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "TABUA CEDE - CONTINUE"
+      },
+      {
+        "frame": 1905,
+        "x": 850.4761482225294,
+        "feet": 12.799999999999994,
+        "at": [
+          850.4761482225294,
+          12.799999999999994
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "RETORNO: PROCURE APOIOS"
+      },
+      {
+        "frame": 1920,
+        "x": 800.9761482225294,
+        "feet": 2.3000000000000043,
+        "at": [
+          800.9761482225294,
+          2.3000000000000043
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "RETORNO: PROCURE APOIOS"
+      },
+      {
+        "frame": 1935,
+        "x": 770.9761482225294,
+        "feet": 96,
+        "at": [
+          770.9761482225294,
+          96
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "RETORNO: PROCURE APOIOS"
+      },
+      {
+        "frame": 1950,
+        "x": 762.9344219725294,
+        "feet": 74.8,
+        "at": [
+          762.9344219725294,
+          74.8
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "RETORNO: PROCURE APOIOS"
+      },
+      {
+        "frame": 1965,
+        "x": 720.4344219725294,
+        "feet": 35.3,
+        "at": [
+          720.4344219725294,
+          35.3
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft",
+          "ShiftLeft"
+        ],
+        "hint": "RETORNO: PROCURE APOIOS"
+      },
+      {
+        "frame": 1980,
+        "x": 685.9344219725294,
+        "feet": 120.05000000000001,
+        "at": [
+          685.9344219725294,
+          120.05000000000001
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "RETORNO: PROCURE APOIOS"
+      },
+      {
+        "frame": 1995,
+        "x": 669.6926957225296,
+        "feet": 144,
+        "at": [
+          669.6926957225296,
+          144
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2010,
+        "x": 648.8926957225294,
+        "feet": 80.04999999999998,
+        "at": [
+          648.8926957225294,
+          80.04999999999998
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "RETORNO: PROCURE APOIOS"
+      },
+      {
+        "frame": 2025,
+        "x": 619.1926957225296,
+        "feet": 127.30000000000001,
+        "at": [
+          619.1926957225296,
+          127.30000000000001
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE O CAMINHO DE VOLTA"
+      },
+      {
+        "frame": 2040,
+        "x": 616.5999412458891,
+        "feet": 192,
+        "at": [
+          616.5999412458891,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2055,
+        "x": 645.8999412458893,
+        "feet": 192,
+        "at": [
+          645.8999412458893,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 2070,
+        "x": 675.8999412458893,
+        "feet": 192,
+        "at": [
+          675.8999412458893,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 2085,
+        "x": 705.8999412458893,
+        "feet": 192,
+        "at": [
+          705.8999412458893,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 2100,
+        "x": 720.1416674958891,
+        "feet": 192,
+        "at": [
+          720.1416674958891,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 2115,
+        "x": 720.1416674958891,
+        "feet": 113.50000000000001,
+        "at": [
+          720.1416674958891,
+          113.50000000000001
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "PLACA ABAIXO / PASSADICO ACIMA"
+      },
+      {
+        "frame": 2130,
+        "x": 720.1416674958891,
+        "feet": 192,
+        "at": [
+          720.1416674958891,
+          192
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 2145,
+        "x": 720.1416674958891,
+        "feet": 192,
+        "at": [
+          720.1416674958891,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 2160,
+        "x": 720.1416674958891,
+        "feet": 192,
+        "at": [
+          720.1416674958891,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 2175,
+        "x": 720.1416674958891,
+        "feet": 192,
+        "at": [
+          720.1416674958891,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 2190,
+        "x": 720.1416674958891,
+        "feet": 192,
+        "at": [
+          720.1416674958891,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 2205,
+        "x": 720.1416674958891,
+        "feet": 192,
+        "at": [
+          720.1416674958891,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 2220,
+        "x": 720.1416674958891,
+        "feet": 192,
+        "at": [
+          720.1416674958891,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 2235,
+        "x": 720.1416674958891,
+        "feet": 192,
+        "at": [
+          720.1416674958891,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 2250,
+        "x": 721.0416674958892,
+        "feet": 192,
+        "at": [
+          721.0416674958892,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 2265,
+        "x": 748.4416674958893,
+        "feet": 192,
+        "at": [
+          748.4416674958893,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 2280,
+        "x": 778.4416674958893,
+        "feet": 192,
+        "at": [
+          778.4416674958893,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 2295,
+        "x": 808.4416674958893,
+        "feet": 192,
+        "at": [
+          808.4416674958893,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 2310,
+        "x": 838.4416674958893,
+        "feet": 192,
+        "at": [
+          838.4416674958893,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 2325,
+        "x": 868.4416674958893,
+        "feet": 192,
+        "at": [
+          868.4416674958893,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 2340,
+        "x": 898.1416674958891,
+        "feet": 192,
+        "at": [
+          898.1416674958891,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "ILHA FIRME: OBSERVE A DESCARGA"
+      },
+      {
+        "frame": 2355,
+        "x": 907.1833937458891,
+        "feet": 192,
+        "at": [
+          907.1833937458891,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "ILHA FIRME: OBSERVE A DESCARGA"
+      },
+      {
+        "frame": 2370,
+        "x": 936.9833937458893,
+        "feet": 192,
+        "at": [
+          936.9833937458893,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 2385,
+        "x": 947.5251199958893,
+        "feet": 184.5,
+        "at": [
+          947.5251199958893,
+          184.5
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 2400,
+        "x": 984.5251199958893,
+        "feet": 97.7,
+        "at": [
+          984.5251199958893,
+          97.7
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 2415,
+        "x": 1034.0251199958893,
+        "feet": 124.00000000000007,
+        "at": [
+          1034.0251199958893,
+          124.00000000000007
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2430,
+        "x": 1063.7251199958891,
+        "feet": 192,
+        "at": [
+          1063.7251199958891,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2445,
+        "x": 1072.7668462458892,
+        "feet": 192,
+        "at": [
+          1072.7668462458892,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2460,
+        "x": 1102.5668462458893,
+        "feet": 192,
+        "at": [
+          1102.5668462458893,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2475,
+        "x": 1132.5668462458893,
+        "feet": 192,
+        "at": [
+          1132.5668462458893,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2490,
+        "x": 1158.0668462458893,
+        "feet": 192,
+        "at": [
+          1158.0668462458893,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2505,
+        "x": 1172.3085724958892,
+        "feet": 192,
+        "at": [
+          1172.3085724958892,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 2520,
+        "x": 1224.1085724958893,
+        "feet": 192,
+        "at": [
+          1224.1085724958893,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 2535,
+        "x": 1276.6085724958893,
+        "feet": 192,
+        "at": [
+          1276.6085724958893,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 2550,
+        "x": 1329.1085724958893,
+        "feet": 192,
+        "at": [
+          1329.1085724958893,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 2565,
+        "x": 1381.6085724958893,
+        "feet": 192,
+        "at": [
+          1381.6085724958893,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 2580,
+        "x": 1434.1085724958893,
+        "feet": 192,
+        "at": [
+          1434.1085724958893,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 2595,
+        "x": 1486.6085724958893,
+        "feet": 192,
+        "at": [
+          1486.6085724958893,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 2610,
+        "x": 1539.1085724958893,
+        "feet": 192,
+        "at": [
+          1539.1085724958893,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2625,
+        "x": 1591.6085724958893,
+        "feet": 192,
+        "at": [
+          1591.6085724958893,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2640,
+        "x": 1644.1085724958893,
+        "feet": 164.10000000000002,
+        "at": [
+          1644.1085724958893,
+          164.10000000000002
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2655,
+        "x": 1696.6085724958893,
+        "feet": 91.1,
+        "at": [
+          1696.6085724958893,
+          91.1
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2670,
+        "x": 1749.1085724958893,
+        "feet": 125.59999999999995,
+        "at": [
+          1749.1085724958893,
+          125.59999999999995
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2685,
+        "x": 1801.6085724958893,
+        "feet": 192,
+        "at": [
+          1801.6085724958893,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2700,
+        "x": 1817.1502987458894,
+        "feet": 192,
+        "at": [
+          1817.1502987458894,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2715,
+        "x": 1854.1502987458894,
+        "feet": 192,
+        "at": [
+          1854.1502987458894,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2730,
+        "x": 1906.6502987458894,
+        "feet": 192,
+        "at": [
+          1906.6502987458894,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "ARREMESSO A CAMINHO"
+      },
+      {
+        "frame": 2745,
+        "x": 1959.1502987458894,
+        "feet": 192,
+        "at": [
+          1959.1502987458894,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "ARREMESSO A CAMINHO"
+      },
+      {
+        "frame": 2760,
+        "x": 1971.1920249958894,
+        "feet": 184.5,
+        "at": [
+          1971.1920249958894,
+          184.5
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "ARREMESSO A CAMINHO"
+      },
+      {
+        "frame": 2775,
+        "x": 2008.1920249958894,
+        "feet": 108.10000000000004,
+        "at": [
+          2008.1920249958894,
+          108.10000000000004
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2790,
+        "x": 2038.5720249958895,
+        "feet": 145.80000000000013,
+        "at": [
+          2038.5720249958895,
+          145.80000000000013
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ArrowDown"
+        ],
+        "hint": "SALTE OU ATAQUE POR CIMA"
+      },
+      {
+        "frame": 2805,
+        "x": 2054.8941357958893,
+        "feet": 129,
+        "at": [
+          2054.8941357958893,
+          129
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2820,
+        "x": 2052.336495932148,
+        "feet": 144,
+        "at": [
+          2052.336495932148,
+          144
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2835,
+        "x": 2059.7039262691305,
+        "feet": 192,
+        "at": [
+          2059.7039262691305,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2850,
+        "x": 2109.6039262691306,
+        "feet": 192,
+        "at": [
+          2109.6039262691306,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2865,
+        "x": 2151.6039262691306,
+        "feet": 192,
+        "at": [
+          2151.6039262691306,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2880,
+        "x": 2161.2456525191305,
+        "feet": 144.00000000000003,
+        "at": [
+          2161.2456525191305,
+          144.00000000000003
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2895,
+        "x": 2211.1456525191306,
+        "feet": 115.00000000000007,
+        "at": [
+          2211.1456525191306,
+          115.00000000000007
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2910,
+        "x": 2244.1456525191306,
+        "feet": 192,
+        "at": [
+          2244.1456525191306,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2925,
+        "x": 2256.6873787691306,
+        "feet": 192,
+        "at": [
+          2256.6873787691306,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2940,
+        "x": 2288.2873787691306,
+        "feet": 192,
+        "at": [
+          2288.2873787691306,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2955,
+        "x": 2295.9291050191305,
+        "feet": 157.40000000000003,
+        "at": [
+          2295.9291050191305,
+          157.40000000000003
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2970,
+        "x": 2342.7291050191307,
+        "feet": 110.70000000000006,
+        "at": [
+          2342.7291050191307,
+          110.70000000000006
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2985,
+        "x": 2387.7291050191307,
+        "feet": 191.70000000000013,
+        "at": [
+          2387.7291050191307,
+          191.70000000000013
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 3000,
+        "x": 2414.7291050191307,
+        "feet": 192,
+        "at": [
+          2414.7291050191307,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 3015,
+        "x": 2426.7708312691307,
+        "feet": 192,
+        "at": [
+          2426.7708312691307,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 3030,
+        "x": 2477.7708312691307,
+        "feet": 192,
+        "at": [
+          2477.7708312691307,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SALTE OU ATAQUE POR CIMA"
+      },
+      {
+        "frame": 3045,
+        "x": 2530.2708312691307,
+        "feet": 192,
+        "at": [
+          2530.2708312691307,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SALTE OU ATAQUE POR CIMA"
+      },
+      {
+        "frame": 3060,
+        "x": 2582.77083126913,
+        "feet": 113.50000000000001,
+        "at": [
+          2582.77083126913,
+          113.50000000000001
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 3075,
+        "x": 2635.27083126913,
+        "feet": 95.49999999999997,
+        "at": [
+          2635.27083126913,
+          95.49999999999997
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 3090,
+        "x": 2687.77083126913,
+        "feet": 190,
+        "at": [
+          2687.77083126913,
+          190
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SALTE OU ATAQUE POR CIMA"
+      }
+    ],
+    "frames": 3091,
+    "coins": 30,
+    "runs": [
+      [
+        92,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        10,
+        [
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        160,
+        []
+      ],
+      [
+        95,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        35,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        25,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        40,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        40,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        2,
+        [
+          "Space"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        2,
+        [
+          "Space"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        40,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        8,
+        [
+          "Space"
+        ]
+      ],
+      [
+        40,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        100,
+        []
+      ],
+      [
+        70,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        45,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        55,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        30,
+        []
+      ],
+      [
+        45,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        16,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        8,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        10,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        20,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        13,
+        [
+          "ArrowRight",
+          "ArrowDown"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        11,
+        []
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        19,
+        []
+      ],
+      [
+        11,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        5,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        9,
+        []
+      ],
+      [
+        15,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        9,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        10,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        4,
+        []
+      ],
+      [
+        8,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        3,
+        []
+      ],
+      [
+        9,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        15,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        3,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        4,
+        []
+      ],
+      [
+        20,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        13,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        2,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        17,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        20,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        13,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        17,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        3,
+        [
+          "Space"
+        ]
+      ],
+      [
+        3,
+        [
+          "ArrowLeft",
+          "Space"
+        ]
+      ],
+      [
+        14,
+        [
+          "ArrowLeft",
+          "ArrowDown"
+        ]
+      ],
+      [
+        18,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        4,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        2,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        3,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        2,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        7,
+        []
+      ],
+      [
+        12,
+        [
+          "Space"
+        ]
+      ],
+      [
+        14,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        8,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        8,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        18,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        4,
+        []
+      ],
+      [
+        3,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowLeft",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        [
+          "ArrowLeft",
+          "Space"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        4,
+        []
+      ],
+      [
+        3,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        4,
+        []
+      ],
+      [
+        13,
+        [
+          "ArrowLeft",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        11,
+        [
+          "ArrowLeft",
+          "Space"
+        ]
+      ],
+      [
+        8,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        4,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        2,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        9,
+        []
+      ],
+      [
+        8,
+        [
+          "ArrowLeft",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        [
+          "ArrowLeft",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        17,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        24,
+        [
+          "ArrowLeft",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        2,
+        [
+          "ArrowLeft",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        17,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        8,
+        [
+          "ArrowLeft",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        13,
+        [
+          "ArrowLeft",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        17,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        8,
+        [
+          "ArrowLeft",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        19,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        3,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        3,
+        []
+      ],
+      [
+        53,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        12,
+        [
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        135,
+        []
+      ],
+      [
+        91,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        22,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        18,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        11,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        45,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        140,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        27,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        47,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        5,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        12,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        9,
+        [
+          "ArrowRight",
+          "ArrowDown"
+        ]
+      ],
+      [
+        5,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        15,
+        []
+      ],
+      [
+        32,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        13,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        18,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        41,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        19,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ]
+    ]
+  }
+}

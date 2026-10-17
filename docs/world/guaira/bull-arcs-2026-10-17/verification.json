@@ -1,0 +1,87 @@
+{
+  "date": "2026-10-17",
+  "scope": "Ossabravo: taller staggered projectiles, native movement, individual animation and readable arena",
+  "tests": {
+    "total": 3633,
+    "passed": 3632,
+    "failed": 0,
+    "skipped": 1,
+    "newArcCases": 13,
+    "finalFocusedCases": 142
+  },
+  "typecheck": true,
+  "build": true,
+  "validators": true,
+  "native": {
+    "inputOnly": true,
+    "actorOrClockWrites": false,
+    "routes": {
+      "jump": {
+        "frames": 1274,
+        "hits": [
+          180,
+          338,
+          552,
+          701,
+          965,
+          1178
+        ],
+        "damage": [],
+        "finished": true,
+        "minHead": 32
+      },
+      "ground": {
+        "frames": 1294,
+        "hits": [
+          180,
+          338,
+          569,
+          718,
+          982,
+          1198
+        ],
+        "damage": [],
+        "finished": true,
+        "minHead": 32
+      },
+      "failure": {
+        "frames": 500,
+        "hits": [
+          180,
+          338
+        ],
+        "damage": [
+          474
+        ],
+        "finished": false,
+        "minHead": 53
+      }
+    }
+  },
+  "browser": {
+    "passed": true,
+    "routes": 8,
+    "pauses": 10,
+    "physicalDevice": false,
+    "errors": []
+  },
+  "campaign": {
+    "passed": true,
+    "normalCampaign": true,
+    "runs": 9,
+    "errors": []
+  },
+  "review": {
+    "passed": true,
+    "widths": [
+      1440,
+      390
+    ],
+    "decodedVideos": 6,
+    "errors": []
+  },
+  "limits": [
+    "Authored replays establish possible routes, fairness margins and actual damage; they do not establish first-time-player enjoyment.",
+    "Touch and gamepad inputs were simulated in a desktop browser, not tested on physical mobile/controller hardware."
+  ]
+}

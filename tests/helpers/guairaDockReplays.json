@@ -1,0 +1,6432 @@
+{
+  "travessia-low": {
+    "id": "travessia",
+    "high": false,
+    "wait": 0,
+    "prefixFrames": 2162,
+    "notes": [
+      {
+        "frame": 1350,
+        "x": 576.3712833508775,
+        "feet": 25.29999999999998,
+        "at": [
+          576.3712833508775,
+          25.29999999999998
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "Space"
+        ],
+        "hint": "DESCIDA: SIGA OS APOIOS"
+      },
+      {
+        "frame": 1365,
+        "x": 603.7885458508777,
+        "feet": 89.79999999999997,
+        "at": [
+          603.7885458508777,
+          89.79999999999997
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1380,
+        "x": 602.3230426966006,
+        "feet": 192,
+        "at": [
+          602.3230426966006,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1395,
+        "x": 615.3643483684464,
+        "feet": 192,
+        "at": [
+          615.3643483684464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 1410,
+        "x": 643.8643483684464,
+        "feet": 192,
+        "at": [
+          643.8643483684464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 1425,
+        "x": 673.8643483684464,
+        "feet": 192,
+        "at": [
+          673.8643483684464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 1440,
+        "x": 703.8643483684464,
+        "feet": 192,
+        "at": [
+          703.8643483684464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 1455,
+        "x": 720.1060746184462,
+        "feet": 192,
+        "at": [
+          720.1060746184462,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 1470,
+        "x": 720.1060746184462,
+        "feet": 113.50000000000001,
+        "at": [
+          720.1060746184462,
+          113.50000000000001
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "PLACA ABAIXO / PASSADICO ACIMA"
+      },
+      {
+        "frame": 1485,
+        "x": 720.1060746184462,
+        "feet": 192,
+        "at": [
+          720.1060746184462,
+          192
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1500,
+        "x": 720.1060746184462,
+        "feet": 192,
+        "at": [
+          720.1060746184462,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1515,
+        "x": 720.1060746184462,
+        "feet": 192,
+        "at": [
+          720.1060746184462,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1530,
+        "x": 720.1060746184462,
+        "feet": 192,
+        "at": [
+          720.1060746184462,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1545,
+        "x": 720.1060746184462,
+        "feet": 192,
+        "at": [
+          720.1060746184462,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1560,
+        "x": 720.1060746184462,
+        "feet": 192,
+        "at": [
+          720.1060746184462,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1575,
+        "x": 720.1060746184462,
+        "feet": 192,
+        "at": [
+          720.1060746184462,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1590,
+        "x": 720.1060746184462,
+        "feet": 192,
+        "at": [
+          720.1060746184462,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1605,
+        "x": 720.4060746184464,
+        "feet": 192,
+        "at": [
+          720.4060746184464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1620,
+        "x": 746.4060746184464,
+        "feet": 192,
+        "at": [
+          746.4060746184464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1635,
+        "x": 776.4060746184464,
+        "feet": 192,
+        "at": [
+          776.4060746184464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1650,
+        "x": 806.4060746184464,
+        "feet": 192,
+        "at": [
+          806.4060746184464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 1665,
+        "x": 836.4060746184464,
+        "feet": 192,
+        "at": [
+          836.4060746184464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 1680,
+        "x": 866.4060746184464,
+        "feet": 192,
+        "at": [
+          866.4060746184464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 1695,
+        "x": 896.4060746184464,
+        "feet": 192,
+        "at": [
+          896.4060746184464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "ILHA FIRME: OBSERVE A DESCARGA"
+      },
+      {
+        "frame": 1710,
+        "x": 905.6478008684462,
+        "feet": 192,
+        "at": [
+          905.6478008684462,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "ILHA FIRME: OBSERVE A DESCARGA"
+      },
+      {
+        "frame": 1725,
+        "x": 934.9478008684464,
+        "feet": 192,
+        "at": [
+          934.9478008684464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 1740,
+        "x": 947.1895271184462,
+        "feet": 192,
+        "at": [
+          947.1895271184462,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 1755,
+        "x": 980.9895271184464,
+        "feet": 100.9,
+        "at": [
+          980.9895271184464,
+          100.9
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 1770,
+        "x": 1031.9895271184464,
+        "feet": 118.60000000000007,
+        "at": [
+          1031.9895271184464,
+          118.60000000000007
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1785,
+        "x": 1061.9895271184464,
+        "feet": 192,
+        "at": [
+          1061.9895271184464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1800,
+        "x": 1071.2312533684462,
+        "feet": 192,
+        "at": [
+          1071.2312533684462,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1815,
+        "x": 1100.5312533684464,
+        "feet": 192,
+        "at": [
+          1100.5312533684464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1830,
+        "x": 1130.5312533684464,
+        "feet": 192,
+        "at": [
+          1130.5312533684464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1845,
+        "x": 1157.5312533684464,
+        "feet": 192,
+        "at": [
+          1157.5312533684464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1860,
+        "x": 1169.5729796184464,
+        "feet": 192,
+        "at": [
+          1169.5729796184464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1875,
+        "x": 1220.5729796184464,
+        "feet": 192,
+        "at": [
+          1220.5729796184464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1890,
+        "x": 1273.0729796184464,
+        "feet": 192,
+        "at": [
+          1273.0729796184464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1905,
+        "x": 1306.5016372656887,
+        "feet": 192,
+        "at": [
+          1306.5016372656887,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "AGUA NA GRELHA"
+      },
+      {
+        "frame": 1920,
+        "x": 1311.552891856914,
+        "feet": 192,
+        "at": [
+          1311.552891856914,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1935,
+        "x": 1354.052891856914,
+        "feet": 192,
+        "at": [
+          1354.052891856914,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1950,
+        "x": 1406.552891856914,
+        "feet": 192,
+        "at": [
+          1406.552891856914,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1965,
+        "x": 1459.052891856914,
+        "feet": 192,
+        "at": [
+          1459.052891856914,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1980,
+        "x": 1507.0331012319139,
+        "feet": 192,
+        "at": [
+          1507.0331012319139,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PRESSAO SUBINDO"
+      },
+      {
+        "frame": 1995,
+        "x": 1516.4818361316088,
+        "feet": 192,
+        "at": [
+          1516.4818361316088,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PRESSAO SUBINDO"
+      },
+      {
+        "frame": 2010,
+        "x": 1516.7328040953812,
+        "feet": 192,
+        "at": [
+          1516.7328040953812,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 2025,
+        "x": 1516.7328040953812,
+        "feet": 192,
+        "at": [
+          1516.7328040953812,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "AGUA NA GRELHA"
+      },
+      {
+        "frame": 2040,
+        "x": 1516.7328040953812,
+        "feet": 192,
+        "at": [
+          1516.7328040953812,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "AGUA NA GRELHA"
+      },
+      {
+        "frame": 2055,
+        "x": 1516.7328040953812,
+        "feet": 192,
+        "at": [
+          1516.7328040953812,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2070,
+        "x": 1550.5328040953814,
+        "feet": 192,
+        "at": [
+          1550.5328040953814,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2085,
+        "x": 1603.0328040953814,
+        "feet": 192,
+        "at": [
+          1603.0328040953814,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2100,
+        "x": 1655.5328040953814,
+        "feet": 108.80000000000001,
+        "at": [
+          1655.5328040953814,
+          108.80000000000001
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 2115,
+        "x": 1708.0328040953814,
+        "feet": 98.29999999999997,
+        "at": [
+          1708.0328040953814,
+          98.29999999999997
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2130,
+        "x": 1760.5328040953814,
+        "feet": 192,
+        "at": [
+          1760.5328040953814,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2145,
+        "x": 1811.5328040953814,
+        "feet": 192,
+        "at": [
+          1811.5328040953814,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2160,
+        "x": 1820.7745303453812,
+        "feet": 192,
+        "at": [
+          1820.7745303453812,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2175,
+        "x": 1865.5745303453814,
+        "feet": 192,
+        "at": [
+          1865.5745303453814,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2190,
+        "x": 1918.0745303453814,
+        "feet": 192,
+        "at": [
+          1918.0745303453814,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "ARREMESSO A CAMINHO"
+      },
+      {
+        "frame": 2205,
+        "x": 1965.1745303453813,
+        "feet": 192,
+        "at": [
+          1965.1745303453813,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "ARREMESSO A CAMINHO"
+      },
+      {
+        "frame": 2220,
+        "x": 1972.8162565953812,
+        "feet": 157.40000000000003,
+        "at": [
+          1972.8162565953812,
+          157.40000000000003
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "ARREMESSO A CAMINHO"
+      },
+      {
+        "frame": 2235,
+        "x": 2016.6162565953814,
+        "feet": 110.70000000000006,
+        "at": [
+          2016.6162565953814,
+          110.70000000000006
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2250,
+        "x": 2040.5191045953816,
+        "feet": 145.80000000000013,
+        "at": [
+          2040.5191045953816,
+          145.80000000000013
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ArrowDown"
+        ],
+        "hint": "SALTE OU ATAQUE POR CIMA"
+      },
+      {
+        "frame": 2265,
+        "x": 2056.958388582881,
+        "feet": 122,
+        "at": [
+          2056.958388582881,
+          122
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2280,
+        "x": 2052.257077992252,
+        "feet": 167,
+        "at": [
+          2052.257077992252,
+          167
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2295,
+        "x": 2071.951008176159,
+        "feet": 192,
+        "at": [
+          2071.951008176159,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2310,
+        "x": 2124.451008176159,
+        "feet": 192,
+        "at": [
+          2124.451008176159,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2325,
+        "x": 2153.465508176159,
+        "feet": 192,
+        "at": [
+          2153.465508176159,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2340,
+        "x": 2173.492734426159,
+        "feet": 118.70000000000002,
+        "at": [
+          2173.492734426159,
+          118.70000000000002
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2355,
+        "x": 2221.492734426159,
+        "feet": 129.60000000000008,
+        "at": [
+          2221.492734426159,
+          129.60000000000008
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2370,
+        "x": 2251.192734426159,
+        "feet": 192,
+        "at": [
+          2251.192734426159,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2385,
+        "x": 2260.234460676159,
+        "feet": 192,
+        "at": [
+          2260.234460676159,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2400,
+        "x": 2290.234460676159,
+        "feet": 192,
+        "at": [
+          2290.234460676159,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2415,
+        "x": 2304.276186926159,
+        "feet": 130.60000000000002,
+        "at": [
+          2304.276186926159,
+          130.60000000000002
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2430,
+        "x": 2356.076186926159,
+        "feet": 121.30000000000008,
+        "at": [
+          2356.076186926159,
+          121.30000000000008
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2445,
+        "x": 2395.076186926159,
+        "feet": 192,
+        "at": [
+          2395.076186926159,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2460,
+        "x": 2415.090686926159,
+        "feet": 192,
+        "at": [
+          2415.090686926159,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2475,
+        "x": 2438.617913176159,
+        "feet": 192,
+        "at": [
+          2438.617913176159,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2490,
+        "x": 2491.117913176159,
+        "feet": 192,
+        "at": [
+          2491.117913176159,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SALTE OU ATAQUE POR CIMA"
+      },
+      {
+        "frame": 2505,
+        "x": 2543.617913176159,
+        "feet": 192,
+        "at": [
+          2543.617913176159,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SALTE OU ATAQUE POR CIMA"
+      },
+      {
+        "frame": 2520,
+        "x": 2596.117913176159,
+        "feet": 100.9,
+        "at": [
+          2596.117913176159,
+          100.9
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2535,
+        "x": 2648.617913176159,
+        "feet": 105.39999999999996,
+        "at": [
+          2648.617913176159,
+          105.39999999999996
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      }
+    ],
+    "frames": 2548,
+    "coins": 25,
+    "runs": [
+      [
+        92,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        10,
+        [
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        160,
+        []
+      ],
+      [
+        95,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        35,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        25,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        40,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        40,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        2,
+        [
+          "Space"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        2,
+        [
+          "Space"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        40,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        8,
+        [
+          "Space"
+        ]
+      ],
+      [
+        40,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        100,
+        []
+      ],
+      [
+        70,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        45,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        55,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        30,
+        []
+      ],
+      [
+        45,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        16,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        8,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        10,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        20,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        13,
+        [
+          "ArrowRight",
+          "ArrowDown"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        11,
+        []
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        19,
+        []
+      ],
+      [
+        11,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        5,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        9,
+        []
+      ],
+      [
+        15,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        9,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        10,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        4,
+        []
+      ],
+      [
+        8,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        2,
+        []
+      ],
+      [
+        53,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        12,
+        [
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        135,
+        []
+      ],
+      [
+        91,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        22,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        18,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        11,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        45,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        43,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        22,
+        []
+      ],
+      [
+        59,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        79,
+        []
+      ],
+      [
+        32,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        33,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        46,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        11,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        9,
+        [
+          "ArrowRight",
+          "ArrowDown"
+        ]
+      ],
+      [
+        5,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        5,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        15,
+        []
+      ],
+      [
+        32,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        11,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        17,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        13,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        18,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        42,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        19,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ]
+    ]
+  },
+  "travessia-high": {
+    "id": "travessia",
+    "high": true,
+    "wait": 0,
+    "prefixFrames": 2162,
+    "notes": [
+      {
+        "frame": 1350,
+        "x": 576.3712833508775,
+        "feet": 25.29999999999998,
+        "at": [
+          576.3712833508775,
+          25.29999999999998
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "Space"
+        ],
+        "hint": "DESCIDA: SIGA OS APOIOS"
+      },
+      {
+        "frame": 1365,
+        "x": 603.7885458508777,
+        "feet": 89.79999999999997,
+        "at": [
+          603.7885458508777,
+          89.79999999999997
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1380,
+        "x": 602.3230426966006,
+        "feet": 192,
+        "at": [
+          602.3230426966006,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1395,
+        "x": 615.3643483684464,
+        "feet": 192,
+        "at": [
+          615.3643483684464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 1410,
+        "x": 643.8643483684464,
+        "feet": 192,
+        "at": [
+          643.8643483684464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 1425,
+        "x": 673.8643483684464,
+        "feet": 192,
+        "at": [
+          673.8643483684464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 1440,
+        "x": 703.8643483684464,
+        "feet": 192,
+        "at": [
+          703.8643483684464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 1455,
+        "x": 720.1060746184462,
+        "feet": 192,
+        "at": [
+          720.1060746184462,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PULE + BAIXO NO REGISTRO"
+      },
+      {
+        "frame": 1470,
+        "x": 720.1060746184462,
+        "feet": 113.50000000000001,
+        "at": [
+          720.1060746184462,
+          113.50000000000001
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "PLACA ABAIXO / PASSADICO ACIMA"
+      },
+      {
+        "frame": 1485,
+        "x": 720.1060746184462,
+        "feet": 192,
+        "at": [
+          720.1060746184462,
+          192
+        ],
+        "ground": false,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1500,
+        "x": 720.1060746184462,
+        "feet": 192,
+        "at": [
+          720.1060746184462,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1515,
+        "x": 720.1060746184462,
+        "feet": 192,
+        "at": [
+          720.1060746184462,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1530,
+        "x": 720.1060746184462,
+        "feet": 192,
+        "at": [
+          720.1060746184462,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1545,
+        "x": 720.1060746184462,
+        "feet": 192,
+        "at": [
+          720.1060746184462,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1560,
+        "x": 720.1060746184462,
+        "feet": 192,
+        "at": [
+          720.1060746184462,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1575,
+        "x": 720.1060746184462,
+        "feet": 192,
+        "at": [
+          720.1060746184462,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1590,
+        "x": 720.1060746184462,
+        "feet": 192,
+        "at": [
+          720.1060746184462,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1605,
+        "x": 720.4060746184464,
+        "feet": 192,
+        "at": [
+          720.4060746184464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1620,
+        "x": 746.4060746184464,
+        "feet": 192,
+        "at": [
+          746.4060746184464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1635,
+        "x": 776.4060746184464,
+        "feet": 192,
+        "at": [
+          776.4060746184464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "PONTE: SIGA ATE A ILHA"
+      },
+      {
+        "frame": 1650,
+        "x": 806.4060746184464,
+        "feet": 192,
+        "at": [
+          806.4060746184464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 1665,
+        "x": 836.4060746184464,
+        "feet": 192,
+        "at": [
+          836.4060746184464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 1680,
+        "x": 866.4060746184464,
+        "feet": 192,
+        "at": [
+          866.4060746184464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 1695,
+        "x": 896.4060746184464,
+        "feet": 192,
+        "at": [
+          896.4060746184464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "ILHA FIRME: OBSERVE A DESCARGA"
+      },
+      {
+        "frame": 1710,
+        "x": 905.6478008684462,
+        "feet": 192,
+        "at": [
+          905.6478008684462,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "ILHA FIRME: OBSERVE A DESCARGA"
+      },
+      {
+        "frame": 1725,
+        "x": 934.9478008684464,
+        "feet": 192,
+        "at": [
+          934.9478008684464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 1740,
+        "x": 947.1895271184462,
+        "feet": 192,
+        "at": [
+          947.1895271184462,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 1755,
+        "x": 980.9895271184464,
+        "feet": 100.9,
+        "at": [
+          980.9895271184464,
+          100.9
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "SALTE O CANAL NO INTERVALO SECO"
+      },
+      {
+        "frame": 1770,
+        "x": 1031.9895271184464,
+        "feet": 118.60000000000007,
+        "at": [
+          1031.9895271184464,
+          118.60000000000007
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1785,
+        "x": 1061.9895271184464,
+        "feet": 192,
+        "at": [
+          1061.9895271184464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1800,
+        "x": 1071.2312533684462,
+        "feet": 192,
+        "at": [
+          1071.2312533684462,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1815,
+        "x": 1100.5312533684464,
+        "feet": 192,
+        "at": [
+          1100.5312533684464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1830,
+        "x": 1130.5312533684464,
+        "feet": 192,
+        "at": [
+          1130.5312533684464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1845,
+        "x": 1157.5312533684464,
+        "feet": 192,
+        "at": [
+          1157.5312533684464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 1860,
+        "x": 1169.5729796184464,
+        "feet": 192,
+        "at": [
+          1169.5729796184464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1875,
+        "x": 1220.5729796184464,
+        "feet": 192,
+        "at": [
+          1220.5729796184464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1890,
+        "x": 1273.0729796184464,
+        "feet": 192,
+        "at": [
+          1273.0729796184464,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1905,
+        "x": 1306.5016372656887,
+        "feet": 192,
+        "at": [
+          1306.5016372656887,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "AGUA NA GRELHA"
+      },
+      {
+        "frame": 1920,
+        "x": 1311.552891856914,
+        "feet": 192,
+        "at": [
+          1311.552891856914,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1935,
+        "x": 1354.052891856914,
+        "feet": 192,
+        "at": [
+          1354.052891856914,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1950,
+        "x": 1406.552891856914,
+        "feet": 192,
+        "at": [
+          1406.552891856914,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1965,
+        "x": 1459.052891856914,
+        "feet": 192,
+        "at": [
+          1459.052891856914,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 1980,
+        "x": 1507.0331012319139,
+        "feet": 192,
+        "at": [
+          1507.0331012319139,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PRESSAO SUBINDO"
+      },
+      {
+        "frame": 1995,
+        "x": 1516.4818361316088,
+        "feet": 192,
+        "at": [
+          1516.4818361316088,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "PRESSAO SUBINDO"
+      },
+      {
+        "frame": 2010,
+        "x": 1516.7328040953812,
+        "feet": 192,
+        "at": [
+          1516.7328040953812,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 2025,
+        "x": 1516.7328040953812,
+        "feet": 192,
+        "at": [
+          1516.7328040953812,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "AGUA NA GRELHA"
+      },
+      {
+        "frame": 2040,
+        "x": 1516.7328040953812,
+        "feet": 192,
+        "at": [
+          1516.7328040953812,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "AGUA NA GRELHA"
+      },
+      {
+        "frame": 2055,
+        "x": 1516.7328040953812,
+        "feet": 192,
+        "at": [
+          1516.7328040953812,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2070,
+        "x": 1550.5328040953814,
+        "feet": 192,
+        "at": [
+          1550.5328040953814,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2085,
+        "x": 1603.0328040953814,
+        "feet": 192,
+        "at": [
+          1603.0328040953814,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2100,
+        "x": 1655.5328040953814,
+        "feet": 108.80000000000001,
+        "at": [
+          1655.5328040953814,
+          108.80000000000001
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "OBSERVE A PRESSAO"
+      },
+      {
+        "frame": 2115,
+        "x": 1708.0328040953814,
+        "feet": 98.29999999999997,
+        "at": [
+          1708.0328040953814,
+          98.29999999999997
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2130,
+        "x": 1760.5328040953814,
+        "feet": 192,
+        "at": [
+          1760.5328040953814,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2145,
+        "x": 1811.5328040953814,
+        "feet": 192,
+        "at": [
+          1811.5328040953814,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2160,
+        "x": 1820.7745303453812,
+        "feet": 192,
+        "at": [
+          1820.7745303453812,
+          192
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2175,
+        "x": 1829.6333761688193,
+        "feet": 192,
+        "at": [
+          1829.6333761688193,
+          192
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2190,
+        "x": 1863.4333761688194,
+        "feet": 100.9,
+        "at": [
+          1863.4333761688194,
+          100.9
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2205,
+        "x": 1914.4333761688194,
+        "feet": 105.39999999999996,
+        "at": [
+          1914.4333761688194,
+          105.39999999999996
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2220,
+        "x": 1944.4333761688194,
+        "feet": 144,
+        "at": [
+          1944.4333761688194,
+          144
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "ARREMESSO A CAMINHO"
+      },
+      {
+        "frame": 2235,
+        "x": 1953.5751024188194,
+        "feet": 129.5,
+        "at": [
+          1953.5751024188194,
+          129.5
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "ARREMESSO A CAMINHO"
+      },
+      {
+        "frame": 2250,
+        "x": 1993.4751024188195,
+        "feet": 46.99999999999997,
+        "at": [
+          1993.4751024188195,
+          46.99999999999997
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2265,
+        "x": 2045.9751024188195,
+        "feet": 66.49999999999997,
+        "at": [
+          2045.9751024188195,
+          66.49999999999997
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2280,
+        "x": 2081.9751024188195,
+        "feet": 34.599999999999994,
+        "at": [
+          2081.9751024188195,
+          34.599999999999994
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "Space"
+        ],
+        "hint": "SENTADA QUEBRA A COURACA"
+      },
+      {
+        "frame": 2295,
+        "x": 2108.0192024188195,
+        "feet": -6.699999999999999,
+        "at": [
+          2108.0192024188195,
+          -6.699999999999999
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft",
+          "ArrowDown"
+        ],
+        "hint": "ARMAZEM: TABUA ENTRE SACADAS"
+      },
+      {
+        "frame": 2310,
+        "x": 2107.2829430908196,
+        "feet": 60.5,
+        "at": [
+          2107.2829430908196,
+          60.5
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "ARMAZEM: TABUA ENTRE SACADAS"
+      },
+      {
+        "frame": 2325,
+        "x": 2094.0464801815197,
+        "feet": 30.5,
+        "at": [
+          2094.0464801815197,
+          30.5
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "ARMAZEM: TABUA ENTRE SACADAS"
+      },
+      {
+        "frame": 2340,
+        "x": 2097.671056713242,
+        "feet": 96,
+        "at": [
+          2097.671056713242,
+          96
+        ],
+        "ground": true,
+        "keys": [],
+        "hint": "ARMAZEM: TABUA ENTRE SACADAS"
+      },
+      {
+        "frame": 2355,
+        "x": 2131.471056713242,
+        "feet": 4.899999999999995,
+        "at": [
+          2131.471056713242,
+          4.899999999999995
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "ARMAZEM: TABUA ENTRE SACADAS"
+      },
+      {
+        "frame": 2370,
+        "x": 2180.971056713242,
+        "feet": 9.400000000000006,
+        "at": [
+          2180.971056713242,
+          9.400000000000006
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "ARMAZEM: TABUA ENTRE SACADAS"
+      },
+      {
+        "frame": 2385,
+        "x": 2210.971056713242,
+        "feet": 96,
+        "at": [
+          2210.971056713242,
+          96
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "TABUA CEDE - CONTINUE"
+      },
+      {
+        "frame": 2400,
+        "x": 2219.012782963242,
+        "feet": 74.8,
+        "at": [
+          2219.012782963242,
+          74.8
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "ARMAZEM: TABUA ENTRE SACADAS"
+      },
+      {
+        "frame": 2415,
+        "x": 2261.512782963242,
+        "feet": -3.200000000000003,
+        "at": [
+          2261.512782963242,
+          -3.200000000000003
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "ARMAZEM: TABUA ENTRE SACADAS"
+      },
+      {
+        "frame": 2430,
+        "x": 2314.012782963242,
+        "feet": 23.800000000000004,
+        "at": [
+          2314.012782963242,
+          23.800000000000004
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "ARMAZEM: TABUA ENTRE SACADAS"
+      },
+      {
+        "frame": 2445,
+        "x": 2344.012782963242,
+        "feet": 96,
+        "at": [
+          2344.012782963242,
+          96
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "ARMAZEM: DESCIDA A DIREITA"
+      },
+      {
+        "frame": 2460,
+        "x": 2353.154509213242,
+        "feet": 96,
+        "at": [
+          2353.154509213242,
+          96
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "ARMAZEM: DESCIDA A DIREITA"
+      },
+      {
+        "frame": 2475,
+        "x": 2376.054509213242,
+        "feet": 96,
+        "at": [
+          2376.054509213242,
+          96
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowLeft"
+        ],
+        "hint": "ARMAZEM: DESCIDA A DIREITA"
+      },
+      {
+        "frame": 2490,
+        "x": 2389.096235463242,
+        "feet": 96,
+        "at": [
+          2389.096235463242,
+          96
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "ARMAZEM: DESCIDA A DIREITA"
+      },
+      {
+        "frame": 2505,
+        "x": 2419.096235463242,
+        "feet": 96,
+        "at": [
+          2419.096235463242,
+          96
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "ARMAZEM: DESCIDA A DIREITA"
+      },
+      {
+        "frame": 2520,
+        "x": 2449.096235463242,
+        "feet": 118.5,
+        "at": [
+          2449.096235463242,
+          118.5
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "ARMAZEM: DESCIDA A DIREITA"
+      },
+      {
+        "frame": 2535,
+        "x": 2479.096235463242,
+        "feet": 128,
+        "at": [
+          2479.096235463242,
+          128
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "ARMAZEM: DESCIDA A DIREITA"
+      },
+      {
+        "frame": 2550,
+        "x": 2509.096235463242,
+        "feet": 160,
+        "at": [
+          2509.096235463242,
+          160
+        ],
+        "ground": true,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "ARMAZEM: DESCIDA A DIREITA"
+      },
+      {
+        "frame": 2565,
+        "x": 2539.096235463242,
+        "feet": 170.5,
+        "at": [
+          2539.096235463242,
+          170.5
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight"
+        ],
+        "hint": "ARMAZEM: DESCIDA A DIREITA"
+      },
+      {
+        "frame": 2580,
+        "x": 2551.637961713242,
+        "feet": 184.5,
+        "at": [
+          2551.637961713242,
+          184.5
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "SALTE OU ATAQUE POR CIMA"
+      },
+      {
+        "frame": 2595,
+        "x": 2588.6379617132416,
+        "feet": 97.7,
+        "at": [
+          2588.6379617132416,
+          97.7
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      },
+      {
+        "frame": 2610,
+        "x": 2641.1379617132416,
+        "feet": 109.69999999999996,
+        "at": [
+          2641.1379617132416,
+          109.69999999999996
+        ],
+        "ground": false,
+        "keys": [
+          "ArrowRight",
+          "ShiftLeft"
+        ],
+        "hint": "EXPLORE E SIGA A DIREITA"
+      }
+    ],
+    "frames": 2624,
+    "coins": 28,
+    "runs": [
+      [
+        92,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        10,
+        [
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        160,
+        []
+      ],
+      [
+        95,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        35,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        25,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        40,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        40,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        2,
+        [
+          "Space"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        2,
+        [
+          "Space"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        40,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        8,
+        [
+          "Space"
+        ]
+      ],
+      [
+        40,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        100,
+        []
+      ],
+      [
+        70,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        45,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        55,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        30,
+        []
+      ],
+      [
+        45,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        16,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        8,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        10,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        20,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        13,
+        [
+          "ArrowRight",
+          "ArrowDown"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        11,
+        []
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        19,
+        []
+      ],
+      [
+        11,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        5,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        9,
+        []
+      ],
+      [
+        15,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        9,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        10,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        4,
+        []
+      ],
+      [
+        8,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        2,
+        []
+      ],
+      [
+        53,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        12,
+        [
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        135,
+        []
+      ],
+      [
+        91,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        22,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        18,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        11,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        45,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        43,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        22,
+        []
+      ],
+      [
+        59,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        79,
+        []
+      ],
+      [
+        32,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        33,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        5,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        8,
+        []
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        5,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        17,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        2,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        19,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        3,
+        [
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft",
+          "Space"
+        ]
+      ],
+      [
+        14,
+        [
+          "ArrowLeft",
+          "ArrowDown"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        5,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        15,
+        []
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        17,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        9,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        87,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        21,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ]
+    ]
+  },
+  "patio-low": {
+    "id": "patio",
+    "high": false,
+    "wait": 0,
+    "frames": 3431,
+    "prefixFrames": 2813,
+    "coins": 11,
+    "finished": true,
+    "damage": [],
+    "ride": {
+      "guaira-patio-comportas:course:transfer-a": 70,
+      "guaira-patio-comportas:course:transfer-b": 15
+    },
+    "dead": [
+      "guaira-patio-comportas:course:detour:guard"
+    ],
+    "position": {
+      "x": 3777.371923146507,
+      "y": 184
+    },
+    "checkpoint": 5,
+    "result": {
+      "frames": 607,
+      "damage": 0,
+      "dead": false,
+      "finished": true
+    },
+    "notes": [
+      {
+        "frame": 15,
+        "at": [
+          -887.7,
+          304
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 30,
+        "at": [
+          -857.7,
+          304
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 45,
+        "at": [
+          -827.7,
+          304
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 60,
+        "at": [
+          -797.7,
+          304
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 75,
+        "at": [
+          -787.3669581167673,
+          216.60000000000014
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 90,
+        "at": [
+          -786.8816511261664,
+          304
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 105,
+        "at": [
+          -786.8816511261664,
+          304
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 120,
+        "at": [
+          -770.5816511261664,
+          304
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 135,
+        "at": [
+          -740.5816511261664,
+          304
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 150,
+        "at": [
+          -710.8816511261664,
+          349.5
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 165,
+        "at": [
+          -702.0898301035086,
+          352.33333333333235
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 180,
+        "at": [
+          -701.8563104372961,
+          338.58333333333206
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 195,
+        "at": [
+          -701.8563104372961,
+          324.8333333333318
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 210,
+        "at": [
+          -701.8563104372961,
+          311.0833333333315
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 225,
+        "at": [
+          -701.8563104372961,
+          297.3333333333312
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 240,
+        "at": [
+          -701.8563104372961,
+          283.5833333333309
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 255,
+        "at": [
+          -701.8563104372961,
+          269.83333333333064
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 270,
+        "at": [
+          -701.8563104372961,
+          256.08333333333036
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 285,
+        "at": [
+          -701.8563104372961,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 300,
+        "at": [
+          -701.5563104372961,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 315,
+        "at": [
+          -675.5563104372961,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 330,
+        "at": [
+          -645.5563104372961,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 345,
+        "at": [
+          -615.5563104372961,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 360,
+        "at": [
+          -585.5563104372961,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 375,
+        "at": [
+          -555.5563104372961,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 390,
+        "at": [
+          -525.5563104372961,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 405,
+        "at": [
+          -495.5563104372961,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 420,
+        "at": [
+          -470.4973382810461,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 435,
+        "at": [
+          -466.83096974842573,
+          248.5
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 450,
+        "at": [
+          -466.83096974842573,
+          168.60000000000014
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 465,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 480,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 495,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 510,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 525,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 540,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 555,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 570,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 585,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 600,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 615,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 630,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 645,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 660,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 675,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 690,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 705,
+        "at": [
+          -466.83096974842573,
+          241.5
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 720,
+        "at": [
+          -466.83096974842573,
+          168.60000000000014
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 735,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 750,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 765,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 780,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 795,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 810,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 825,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 840,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 855,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 870,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 885,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 900,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 915,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 930,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 945,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 960,
+        "at": [
+          -466.83096974842573,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 975,
+        "at": [
+          -468.63096974842574,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 990,
+        "at": [
+          -497.13096974842574,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 1005,
+        "at": [
+          -527.1309697484257,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 1020,
+        "at": [
+          -557.1309697484257,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 1035,
+        "at": [
+          -587.1309697484257,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 1050,
+        "at": [
+          -617.1309697484257,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 1065,
+        "at": [
+          -647.1309697484257,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 1080,
+        "at": [
+          -677.1309697484257,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 1095,
+        "at": [
+          -707.1309697484257,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 1110,
+        "at": [
+          -722.8522298342158,
+          256
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 1125,
+        "at": [
+          -732.156310437296,
+          208.00000000000006
+        ],
+        "coins": 0
+      },
+      {
+        "frame": 1140,
+        "at": [
+          -754.4014178201867,
+          169.80000000000018
+        ],
+        "coins": 2
+      },
+      {
+        "frame": 1155,
+        "at": [
+          -756.8816511261664,
+          176
+        ],
+        "coins": 2
+      },
+      {
+        "frame": 1170,
+        "at": [
+          -756.8816511261664,
+          176
+        ],
+        "coins": 2
+      },
+      {
+        "frame": 1185,
+        "at": [
+          -775.5549011261664,
+          176
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1200,
+        "at": [
+          -781.9069918150368,
+          176
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1215,
+        "at": [
+          -761.6069918150367,
+          176
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1230,
+        "at": [
+          -731.6069918150367,
+          179
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1245,
+        "at": [
+          -701.6069918150367,
+          256
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1260,
+        "at": [
+          -671.6069918150367,
+          256
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1275,
+        "at": [
+          -641.6069918150367,
+          256
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1290,
+        "at": [
+          -611.6069918150367,
+          256
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1305,
+        "at": [
+          -581.6069918150367,
+          256
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1320,
+        "at": [
+          -551.6069918150367,
+          256
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1335,
+        "at": [
+          -521.6069918150367,
+          256
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1350,
+        "at": [
+          -491.6069918150368,
+          256
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1365,
+        "at": [
+          -466.5480196587868,
+          256
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1380,
+        "at": [
+          -462.88165112616645,
+          248.5
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1395,
+        "at": [
+          -462.88165112616645,
+          168.60000000000014
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1410,
+        "at": [
+          -462.88165112616645,
+          256
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1425,
+        "at": [
+          -462.88165112616645,
+          256
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1440,
+        "at": [
+          -444.58165112616643,
+          256
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1455,
+        "at": [
+          -414.58165112616643,
+          256
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1470,
+        "at": [
+          -384.58165112616643,
+          256
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1485,
+        "at": [
+          -354.58165112616643,
+          316
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1500,
+        "at": [
+          -330.88152479335383,
+          337.6666666666654
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1515,
+        "at": [
+          -327.85631043729586,
+          323.9166666666651
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1530,
+        "at": [
+          -327.85631043729586,
+          310.1666666666648
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1545,
+        "at": [
+          -327.85631043729586,
+          296.4166666666645
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1560,
+        "at": [
+          -327.85631043729586,
+          282.66666666666424
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1575,
+        "at": [
+          -327.85631043729586,
+          268.91666666666396
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1590,
+        "at": [
+          -327.85631043729586,
+          255.1666666666637
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1605,
+        "at": [
+          -327.85631043729586,
+          241.41666666666384
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1620,
+        "at": [
+          -327.85631043729586,
+          227.66666666666399
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1635,
+        "at": [
+          -327.85631043729586,
+          213.91666666666413
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1650,
+        "at": [
+          -327.85631043729586,
+          208
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1665,
+        "at": [
+          -326.9563104372959,
+          208
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1680,
+        "at": [
+          -299.5563104372959,
+          208
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1695,
+        "at": [
+          -269.5563104372959,
+          208
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1710,
+        "at": [
+          -239.5563104372959,
+          208
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1725,
+        "at": [
+          -209.5563104372959,
+          208
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1740,
+        "at": [
+          -179.5563104372959,
+          208
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1755,
+        "at": [
+          -149.5563104372959,
+          140.40000000000006
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1770,
+        "at": [
+          -119.5563104372959,
+          107.40000000000002
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1785,
+        "at": [
+          -89.5563104372959,
+          186.90000000000003
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1800,
+        "at": [
+          -59.556310437295906,
+          208
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1815,
+        "at": [
+          -29.556310437295906,
+          208
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1830,
+        "at": [
+          -5.8561841044833045,
+          208
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1845,
+        "at": [
+          6.409967480307614,
+          208
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1860,
+        "at": [
+          57.00880123311754,
+          208
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1875,
+        "at": [
+          109.50880123311754,
+          120.60000000000005
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1890,
+        "at": [
+          162.00880123311754,
+          117.60000000000001
+        ],
+        "coins": 3
+      },
+      {
+        "frame": 1905,
+        "at": [
+          213.75880123311754,
+          89.29999999999998
+        ],
+        "coins": 4
+      },
+      {
+        "frame": 1920,
+        "at": [
+          266.25880123311754,
+          41.29999999999997
+        ],
+        "coins": 4
+      },
+      {
+        "frame": 1935,
+        "at": [
+          303.75880123311754,
+          96
+        ],
+        "coins": 4
+      },
+      {
+        "frame": 1950,
+        "at": [
+          340.9588012331176,
+          41.3
+        ],
+        "coins": 5
+      },
+      {
+        "frame": 1965,
+        "at": [
+          385.9588012331176,
+          -6.699999999999999
+        ],
+        "coins": 5
+      },
+      {
+        "frame": 1980,
+        "at": [
+          415.65880123311763,
+          48
+        ],
+        "coins": 5
+      },
+      {
+        "frame": 1995,
+        "at": [
+          456.15880123311763,
+          -43.10000000000001
+        ],
+        "coins": 6
+      },
+      {
+        "frame": 2010,
+        "at": [
+          478.48107963311736,
+          -54.70000000000003
+        ],
+        "coins": 6
+      },
+      {
+        "frame": 2025,
+        "at": [
+          478.3267370342576,
+          -10
+        ],
+        "coins": 6
+      },
+      {
+        "frame": 2040,
+        "at": [
+          478.3267370342576,
+          5
+        ],
+        "coins": 6
+      },
+      {
+        "frame": 2055,
+        "at": [
+          486.1567370342575,
+          48
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2070,
+        "at": [
+          517.2767370342576,
+          -43.10000000000001
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2085,
+        "at": [
+          540.7900082217575,
+          -38.60000000000005
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2100,
+        "at": [
+          536.0886976311283,
+          75.99999999999994
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2115,
+        "at": [
+          550.382627815035,
+          44.399999999999984
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2130,
+        "at": [
+          580.382627815035,
+          11.399999999999991
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2145,
+        "at": [
+          585.7162739479256,
+          90.89999999999999
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2160,
+        "at": [
+          588.7971554596204,
+          118.69999999999999
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2175,
+        "at": [
+          619.0375388271327,
+          57.199999999999946
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2190,
+        "at": [
+          636.1137071083826,
+          106.6999999999999
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2205,
+        "at": [
+          633.275135367204,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2220,
+        "at": [
+          674.2270431968059,
+          200.5
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2235,
+        "at": [
+          689.5134439064591,
+          127.40000000000006
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2250,
+        "at": [
+          690.0251144076392,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2265,
+        "at": [
+          690.3251144076391,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2280,
+        "at": [
+          725.828864407639,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2295,
+        "at": [
+          738.9066981788424,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2310,
+        "at": [
+          739.5050266461055,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2325,
+        "at": [
+          739.5050266461055,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2340,
+        "at": [
+          739.5050266461055,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2355,
+        "at": [
+          739.5050266461055,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2370,
+        "at": [
+          740.4050266461054,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2385,
+        "at": [
+          780.3050266461055,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2400,
+        "at": [
+          832.8050266461055,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2415,
+        "at": [
+          885.3050266461055,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2430,
+        "at": [
+          937.8050266461055,
+          160.00000000000006
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2445,
+        "at": [
+          990.3050266461055,
+          105.00000000000003
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2460,
+        "at": [
+          1042.8050266461055,
+          162
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2475,
+        "at": [
+          1095.3050266461055,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2490,
+        "at": [
+          1147.8050266461055,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2505,
+        "at": [
+          1200.3050266461055,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2520,
+        "at": [
+          1252.8050266461055,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2535,
+        "at": [
+          1305.3050266461055,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2550,
+        "at": [
+          1323.4058346339307,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2565,
+        "at": [
+          1324.4849388845728,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2580,
+        "at": [
+          1324.4849388845728,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2595,
+        "at": [
+          1324.4849388845728,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2610,
+        "at": [
+          1326.284938884573,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2625,
+        "at": [
+          1368.784938884573,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2640,
+        "at": [
+          1421.284938884573,
+          193.5
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2655,
+        "at": [
+          1473.784938884573,
+          111.00000000000004
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2670,
+        "at": [
+          1526.284938884573,
+          130.5
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2685,
+        "at": [
+          1578.784938884573,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2700,
+        "at": [
+          1631.284938884573,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2715,
+        "at": [
+          1683.784938884573,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2730,
+        "at": [
+          1736.284938884573,
+          140.40000000000006
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2745,
+        "at": [
+          1788.784938884573,
+          107.40000000000002
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2760,
+        "at": [
+          1841.284938884573,
+          160
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2775,
+        "at": [
+          1893.784938884573,
+          92.39999999999998
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2790,
+        "at": [
+          1946.284938884573,
+          59.399999999999935
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2805,
+        "at": [
+          1998.784938884573,
+          138.8999999999999
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2820,
+        "at": [
+          2034.4849388845728,
+          208
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2835,
+        "at": [
+          2048.526665134573,
+          146.60000000000008
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2850,
+        "at": [
+          2098.826665134573,
+          106.10000000000002
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2865,
+        "at": [
+          2128.826665134573,
+          152.5
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2880,
+        "at": [
+          2138.502543400276,
+          65.69999999999996
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2895,
+        "at": [
+          2134.9541913604035,
+          77.69999999999992
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2910,
+        "at": [
+          2134.9541913604035,
+          197.9999999999999
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2925,
+        "at": [
+          2158.2541913604036,
+          129.50000000000006
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2940,
+        "at": [
+          2195.7541913604036,
+          111.50000000000001
+        ],
+        "coins": 7
+      },
+      {
+        "frame": 2955,
+        "at": [
+          2220.6462751104036,
+          206.00000000000006
+        ],
+        "coins": 8
+      },
+      {
+        "frame": 2970,
+        "at": [
+          2220.9210963604037,
+          214.40000000006302
+        ],
+        "coins": 8
+      },
+      {
+        "frame": 2985,
+        "at": [
+          2220.9210963604037,
+          203.73333333339792
+        ],
+        "coins": 8
+      },
+      {
+        "frame": 3000,
+        "at": [
+          2220.9210963604037,
+          193.06666666673277
+        ],
+        "coins": 8
+      },
+      {
+        "frame": 3015,
+        "at": [
+          2220.9210963604037,
+          182.40000000006768
+        ],
+        "coins": 8
+      },
+      {
+        "frame": 3030,
+        "at": [
+          2223.9210963604037,
+          145.9666666667356
+        ],
+        "coins": 8
+      },
+      {
+        "frame": 3045,
+        "at": [
+          2268.721096360404,
+          72.96666666673553
+        ],
+        "coins": 8
+      },
+      {
+        "frame": 3060,
+        "at": [
+          2318.221096360404,
+          107.46666666673549
+        ],
+        "coins": 8
+      },
+      {
+        "frame": 3075,
+        "at": [
+          2347.9210963604037,
+          160
+        ],
+        "coins": 9
+      },
+      {
+        "frame": 3090,
+        "at": [
+          2352.4628226104037,
+          160
+        ],
+        "coins": 9
+      },
+      {
+        "frame": 3105,
+        "at": [
+          2352.4628226104037,
+          160
+        ],
+        "coins": 9
+      },
+      {
+        "frame": 3120,
+        "at": [
+          2352.4628226104037,
+          160
+        ],
+        "coins": 9
+      },
+      {
+        "frame": 3135,
+        "at": [
+          2352.4628226104037,
+          160
+        ],
+        "coins": 9
+      },
+      {
+        "frame": 3150,
+        "at": [
+          2352.4628226104037,
+          160
+        ],
+        "coins": 9
+      },
+      {
+        "frame": 3165,
+        "at": [
+          2352.4628226104037,
+          160
+        ],
+        "coins": 9
+      },
+      {
+        "frame": 3180,
+        "at": [
+          2352.4628226104037,
+          160
+        ],
+        "coins": 9
+      },
+      {
+        "frame": 3195,
+        "at": [
+          2352.4628226104037,
+          160
+        ],
+        "coins": 9
+      },
+      {
+        "frame": 3210,
+        "at": [
+          2354.262822610404,
+          138.8
+        ],
+        "coins": 9
+      },
+      {
+        "frame": 3225,
+        "at": [
+          2396.762822610404,
+          60.799999999999955
+        ],
+        "coins": 9
+      },
+      {
+        "frame": 3240,
+        "at": [
+          2441.762822610404,
+          87.79999999999991
+        ],
+        "coins": 9
+      },
+      {
+        "frame": 3255,
+        "at": [
+          2469.9628226104037,
+          160.55362130199853
+        ],
+        "coins": 10
+      },
+      {
+        "frame": 3270,
+        "at": [
+          2478.304548860404,
+          118.69999999999999
+        ],
+        "coins": 10
+      },
+      {
+        "frame": 3285,
+        "at": [
+          2517.804548860404,
+          57.199999999999946
+        ],
+        "coins": 10
+      },
+      {
+        "frame": 3300,
+        "at": [
+          2546.177798860404,
+          106.6999999999999
+        ],
+        "coins": 10
+      },
+      {
+        "frame": 3315,
+        "at": [
+          2546.530196896507,
+          160
+        ],
+        "coins": 10
+      },
+      {
+        "frame": 3330,
+        "at": [
+          2568.830196896507,
+          167.5
+        ],
+        "coins": 10
+      },
+      {
+        "frame": 3345,
+        "at": [
+          2598.830196896507,
+          181
+        ],
+        "coins": 11
+      },
+      {
+        "frame": 3360,
+        "at": [
+          2628.830196896507,
+          195
+        ],
+        "coins": 11
+      },
+      {
+        "frame": 3375,
+        "at": [
+          2646.9675218965067,
+          208
+        ],
+        "coins": 11
+      },
+      {
+        "frame": 3390,
+        "at": [
+          2673.871923146507,
+          124.80000000000005
+        ],
+        "coins": 11
+      },
+      {
+        "frame": 3405,
+        "at": [
+          2726.371923146507,
+          114.30000000000001
+        ],
+        "coins": 11
+      },
+      {
+        "frame": 3420,
+        "at": [
+          2778.871923146507,
+          208
+        ],
+        "coins": 11
+      }
+    ],
+    "runs": [
+      [
+        60,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        14,
+        [
+          "Space"
+        ]
+      ],
+      [
+        35,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        40,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        150,
+        []
+      ],
+      [
+        115,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        14,
+        [
+          "Space"
+        ]
+      ],
+      [
+        35,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        220,
+        []
+      ],
+      [
+        14,
+        [
+          "Space"
+        ]
+      ],
+      [
+        35,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        220,
+        []
+      ],
+      [
+        126,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        14,
+        [
+          "Space",
+          "ArrowLeft"
+        ]
+      ],
+      [
+        40,
+        []
+      ],
+      [
+        10,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        157,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        14,
+        [
+          "Space"
+        ]
+      ],
+      [
+        35,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        65,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        170,
+        []
+      ],
+      [
+        82,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        54,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        15,
+        []
+      ],
+      [
+        23,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        11,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        18,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        13,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        10,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        13,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        2,
+        [
+          "ArrowRight",
+          "ArrowDown"
+        ]
+      ],
+      [
+        5,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft",
+          "ArrowDown"
+        ]
+      ],
+      [
+        31,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        19,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft",
+          "Space"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        5,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        16,
+        []
+      ],
+      [
+        7,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        17,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        2,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        12,
+        []
+      ],
+      [
+        8,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        2,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        5,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        11,
+        []
+      ],
+      [
+        17,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        12,
+        [
+          "Space"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        15,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        17,
+        []
+      ],
+      [
+        14,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        90,
+        []
+      ],
+      [
+        55,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        88,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        72,
+        []
+      ],
+      [
+        31,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        58,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        21,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        23,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        14,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        3,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft",
+          "Space"
+        ]
+      ],
+      [
+        6,
+        [
+          "Space"
+        ]
+      ],
+      [
+        5,
+        [
+          "ArrowLeft",
+          "Space"
+        ]
+      ],
+      [
+        9,
+        [
+          "Space"
+        ]
+      ],
+      [
+        25,
+        []
+      ],
+      [
+        17,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        4,
+        []
+      ],
+      [
+        3,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        69,
+        []
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        8,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        127,
+        []
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        17,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        15,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        9,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        9,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        4,
+        []
+      ],
+      [
+        5,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        8,
+        []
+      ],
+      [
+        50,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        30,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ]
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "checks": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "overflow": false,
+      "images": true,
+      "section": true,
+      "sceneChoices": 8,
+      "comparisons": 2
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "overflow": false,
+      "images": true,
+      "section": true,
+      "sceneChoices": 8,
+      "comparisons": 2
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

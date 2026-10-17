@@ -1,0 +1,122 @@
+{
+  "physicalDevice": false,
+  "mountsForVisualInspection": true,
+  "checks": [
+    {
+      "variant": "subida-main",
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-subida",
+      "finished": true,
+      "coins": 26,
+      "frames": 2485
+    },
+    {
+      "variant": "galeria-main",
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-galeria",
+      "finished": true,
+      "coins": 19,
+      "frames": 2088
+    },
+    {
+      "variant": "galeria-tunnel",
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-galeria",
+      "finished": true,
+      "coins": 22,
+      "frames": 2258
+    },
+    {
+      "variant": "subida-main",
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-subida",
+      "finished": true,
+      "coins": 26,
+      "frames": 2485
+    },
+    {
+      "variant": "galeria-main",
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-galeria",
+      "finished": true,
+      "coins": 19,
+      "frames": 2088
+    },
+    {
+      "variant": "galeria-tunnel",
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-galeria",
+      "finished": true,
+      "coins": 22,
+      "frames": 2258
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

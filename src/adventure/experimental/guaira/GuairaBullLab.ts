@@ -52,7 +52,7 @@ export class GuairaBullEncounter extends BossEncounter {
         if (b.state === 'defeated') return 'A OSSADA DESCANSOU';
         if (b.vulnerable) return 'AGORA! PULE NAS COSTELAS';
         if (b.rearming) return 'COSTELAS FECHANDO! RECUE';
-        if(b.state==='rattle'||b.state==='bones')if(b.bouncingBones)return 'OSSOS QUICAM! SALTE O ARCO';
+        if(b.state==='rattle'||b.state==='bones')if(b.bouncingBones)return 'DOIS ARCOS! CUIDADO AO POUSAR';
         if (b.state === 'rattle' || b.state === 'bones') return 'OSSOS BAIXOS! PULE';
         if(b.state==='turn')return 'ELE VAI VOLTAR! PULE OUTRA VEZ';
         if((b.state==='tell'||b.state==='charge')&&b.chargeCount===2)
@@ -119,6 +119,7 @@ export class GuairaBullLab extends WorldGame {
         if (this.state === 'map' || this.state === 'title' || this.state === 'intro') { this.load('guaira-lab'); return; }
         if (this.boss?.phase === 'defeated') {
             // Never hand the experimental identifier to campaign completion.
+            if (this.updateController()) return;
             this.input.setMenuMode(this.state !== 'playing'); this.input.update();
             if (this.input.consumeMute()) this.audio.toggle();
             this.audio.tick(dt);

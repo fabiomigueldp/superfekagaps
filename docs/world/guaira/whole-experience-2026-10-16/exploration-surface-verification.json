@@ -1,0 +1,520 @@
+{
+  "physicalDevice": false,
+  "mountsForVisualInspection": true,
+  "checks": [
+    {
+      "variant": "travessia",
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-travessia",
+      "finished": true,
+      "coins": 23,
+      "frames": 2548,
+      "exploration": {
+        "id": "travessia:detour",
+        "total": 3,
+        "name": "VARANDA DO ARROZ",
+        "actual": [
+          0,
+          1,
+          2
+        ],
+        "saveKey": "super_feka_gaps_world_v1:development-unlocked-v1",
+        "record": [
+          0,
+          1,
+          2
+        ],
+        "mapText": "VARANDA DO ARROZ · 3/3 moedas",
+        "reloaded": true,
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "fits": true
+      }
+    },
+    {
+      "variant": "patio",
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-patio-comportas",
+      "finished": true,
+      "coins": 12,
+      "frames": 3839,
+      "exploration": {
+        "id": "patio:detour",
+        "total": 3,
+        "name": "PASSADICO DAS DOCAS",
+        "actual": [
+          0,
+          1,
+          2
+        ],
+        "saveKey": "super_feka_gaps_world_v1:development-unlocked-v1",
+        "record": [
+          0,
+          1,
+          2
+        ],
+        "mapText": "PASSADICO DAS DOCAS · 3/3 moedas",
+        "reloaded": true,
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "fits": true
+      }
+    },
+    {
+      "variant": "respiros",
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-respiros",
+      "finished": true,
+      "coins": 21,
+      "frames": 2648,
+      "exploration": {
+        "id": "respiros:detour",
+        "total": 3,
+        "name": "PONTE DO RESERVATORIO",
+        "actual": [
+          0,
+          1,
+          2
+        ],
+        "saveKey": "super_feka_gaps_world_v1:development-unlocked-v1",
+        "record": [
+          0,
+          1,
+          2
+        ],
+        "mapText": "PONTE DO RESERVATORIO · 3/3 moedas\nREGISTRO DAS TAIPAS · 1/5 moedas",
+        "reloaded": true,
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "fits": true
+      }
+    },
+    {
+      "variant": "subida",
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-subida",
+      "finished": true,
+      "coins": 25,
+      "frames": 2605,
+      "exploration": {
+        "id": "subida:detour",
+        "total": 3,
+        "name": "BEIRAL DA PORTARIA",
+        "actual": [
+          0,
+          1,
+          2
+        ],
+        "saveKey": "super_feka_gaps_world_v1:development-unlocked-v1",
+        "record": [
+          0,
+          1,
+          2
+        ],
+        "mapText": "BEIRAL DA PORTARIA · 3/3 moedas",
+        "reloaded": true,
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "fits": true
+      }
+    },
+    {
+      "variant": "galeria",
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-galeria",
+      "finished": true,
+      "coins": 19,
+      "frames": 2515,
+      "exploration": {
+        "id": "galeria:detour",
+        "total": 4,
+        "name": "VIGA DE INSPECAO",
+        "actual": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "saveKey": "super_feka_gaps_world_v1:development-unlocked-v1",
+        "record": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "mapText": "VIGA DE INSPECAO · 4/4 moedas",
+        "reloaded": true,
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "fits": true
+      }
+    },
+    {
+      "variant": "alivio",
+      "touch": false,
+      "reduced": false,
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-camara-alivio",
+      "finished": true,
+      "coins": 15,
+      "frames": 2146,
+      "exploration": {
+        "id": "alivio:detour",
+        "total": 4,
+        "name": "ALTO DO COLETOR",
+        "actual": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "saveKey": "super_feka_gaps_world_v1:development-unlocked-v1",
+        "record": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "mapText": "ALTO DO COLETOR · 4/4 moedas\nPASSADICO DO COLETOR · 0/5 moedas",
+        "reloaded": true,
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "fits": true
+      }
+    },
+    {
+      "variant": "travessia",
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-travessia",
+      "finished": true,
+      "coins": 23,
+      "frames": 2548,
+      "exploration": {
+        "id": "travessia:detour",
+        "total": 3,
+        "name": "VARANDA DO ARROZ",
+        "actual": [
+          0,
+          1,
+          2
+        ],
+        "saveKey": "super_feka_gaps_world_v1:development-unlocked-v1",
+        "record": [
+          0,
+          1,
+          2
+        ],
+        "mapText": "VARANDA DO ARROZ · 3/3 moedas",
+        "reloaded": true,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "fits": true
+      }
+    },
+    {
+      "variant": "patio",
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-patio-comportas",
+      "finished": true,
+      "coins": 12,
+      "frames": 3839,
+      "exploration": {
+        "id": "patio:detour",
+        "total": 3,
+        "name": "PASSADICO DAS DOCAS",
+        "actual": [
+          0,
+          1,
+          2
+        ],
+        "saveKey": "super_feka_gaps_world_v1:development-unlocked-v1",
+        "record": [
+          0,
+          1,
+          2
+        ],
+        "mapText": "PASSADICO DAS DOCAS · 3/3 moedas",
+        "reloaded": true,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "fits": true
+      }
+    },
+    {
+      "variant": "respiros",
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-respiros",
+      "finished": true,
+      "coins": 21,
+      "frames": 2648,
+      "exploration": {
+        "id": "respiros:detour",
+        "total": 3,
+        "name": "PONTE DO RESERVATORIO",
+        "actual": [
+          0,
+          1,
+          2
+        ],
+        "saveKey": "super_feka_gaps_world_v1:development-unlocked-v1",
+        "record": [
+          0,
+          1,
+          2
+        ],
+        "mapText": "PONTE DO RESERVATORIO · 3/3 moedas\nREGISTRO DAS TAIPAS · 1/5 moedas",
+        "reloaded": true,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "fits": true
+      }
+    },
+    {
+      "variant": "subida",
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-subida",
+      "finished": true,
+      "coins": 25,
+      "frames": 2605,
+      "exploration": {
+        "id": "subida:detour",
+        "total": 3,
+        "name": "BEIRAL DA PORTARIA",
+        "actual": [
+          0,
+          1,
+          2
+        ],
+        "saveKey": "super_feka_gaps_world_v1:development-unlocked-v1",
+        "record": [
+          0,
+          1,
+          2
+        ],
+        "mapText": "BEIRAL DA PORTARIA · 3/3 moedas",
+        "reloaded": true,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "fits": true
+      }
+    },
+    {
+      "variant": "galeria",
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-galeria",
+      "finished": true,
+      "coins": 19,
+      "frames": 2515,
+      "exploration": {
+        "id": "galeria:detour",
+        "total": 4,
+        "name": "VIGA DE INSPECAO",
+        "actual": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "saveKey": "super_feka_gaps_world_v1:development-unlocked-v1",
+        "record": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "mapText": "VIGA DE INSPECAO · 4/4 moedas",
+        "reloaded": true,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "fits": true
+      }
+    },
+    {
+      "variant": "alivio",
+      "touch": true,
+      "reduced": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "pause": {
+        "paused": true,
+        "pixelsFrozen": true,
+        "stateFrozen": true,
+        "fits": true
+      },
+      "id": "guaira-camara-alivio",
+      "finished": true,
+      "coins": 15,
+      "frames": 2146,
+      "exploration": {
+        "id": "alivio:detour",
+        "total": 4,
+        "name": "ALTO DO COLETOR",
+        "actual": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "saveKey": "super_feka_gaps_world_v1:development-unlocked-v1",
+        "record": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "mapText": "ALTO DO COLETOR · 4/4 moedas\nPASSADICO DO COLETOR · 0/5 moedas",
+        "reloaded": true,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "fits": true
+      }
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

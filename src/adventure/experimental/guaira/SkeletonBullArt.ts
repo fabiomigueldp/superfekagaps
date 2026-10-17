@@ -16,6 +16,9 @@ const GALLOP = [
 export function drawSkeletonBull(ctx: CanvasRenderingContext2D, b: SkeletonBullModel, reducedMotion = false) {
     const p = BULL_PALETTE, moving = b.state === 'charge', boneTell = b.state === 'rattle' || b.state === 'bones';
     const turning=b.state==='turn';
+    const pivot = reducedMotion ? 5 : Math.min(5, Math.floor(b.stateTick * 6 / BULL_RULES.turn));
+    const visualFacing = turning && !reducedMotion && pivot < 3 ? -b.facing : b.facing;
+    const frontTurn = turning && !reducedMotion && (pivot === 2 || pivot === 3);
     const anticipation = b.state === 'tell'||turning, braking = b.state === 'brake', open = b.vulnerable;
     const hurt = b.state === 'hurt';
     const closing = b.rearming;
@@ -23,23 +26,28 @@ export function drawSkeletonBull(ctx: CanvasRenderingContext2D, b: SkeletonBullM
     // Three deliberate beats, never a faster attack: all cues use the existing clocks.
     // Reduced motion holds the committed silhouette, without hoof/jaw oscillation.
     const preparation = reducedMotion ? 2 : Math.min(2, Math.floor(b.warningProgress * 3));
-    const release = reducedMotion ? 2 : Math.min(2, Math.floor(b.stateTick / 4));
+    const release = reducedMotion ? 2 : Math.min(2, Math.floor(b.boneReleaseAge / 4));
+    const nextRib = b.state === 'bones' ? b.boneShots.find(shot => shot.delay > b.stateTick) : undefined;
+    const reload = !reducedMotion && nextRib && nextRib.delay - b.stateTick <= 8;
     // Arrest, compress, settle inside the existing brake clock. Hooves stay on
     // the floor, and the final pose is recovery itself: no snap at the boundary.
     // Reduced motion holds that exposed-core pose throughout the opening.
     const settling = reducedMotion ? 2 : Math.min(2, Math.floor(b.stateTick * 3 / BULL_RULES.brake));
     const recoil = hurt ? (reducedMotion ? 1 : Math.max(0, 3 - Math.floor(b.stateTick / 10))) : 0;
-    const stride = moving && !reducedMotion ? b.stateTick / 3 : 0;
+    const stride = moving && !reducedMotion ? b.chargeDistance / 15 : 0;
     const frame = Math.floor(stride) % GALLOP.length, next = (frame + 1) % GALLOP.length;
     const between = stride % 1;
     const blend = (a: number, z: number) => Math.round(a + (z - a) * between);
     const pulse = !reducedMotion ? Math.floor(b.stateTick / 8) % 2 : 0;
     const bounce = [8, 7, 6, 7, 8, 8];
-    const bodyY = turning?[11,9,10][preparation]:anticipation ? 8 + preparation : hurt ? 8 - recoil : moving ? blend(bounce[frame], bounce[next]) : braking ? [7, 10, 9][settling] : open ? 9
-        : closing ? [9,9,8,8][closure] : b.state==='rattle' ? [8,7,10][preparation] : b.state==='bones' ? [10,9,8][release] : 8;
-    const headDrop = turning?[-3,1,6][preparation]:anticipation ? 2 + preparation * 2 : hurt ? -2 - recoil : moving ? 5 : braking ? [1, 5, 8][settling] : open ? 8
-        : closing ? [8,5,2,0][closure] : b.state==='rattle' ? [-2,-5,0][preparation] : b.state==='bones' ? [0,-1,-2][release] : 0;
-    ctx.save(); ctx.translate(Math.round(b.x + b.width / 2), Math.round(b.y)); ctx.scale(b.facing, 1);
+    const launchWeight = moving && !reducedMotion ? Math.max(0, 1 - b.chargeDistance / 12) : 0;
+    const stopWeight = b.slowingCharge && !reducedMotion ? Math.min(1, Math.max(0, 1 - Math.abs(b.chargeVelocity) / 5.8)) : 0;
+    const runningBody = Math.round(blend(bounce[frame], bounce[next]) * (1 - launchWeight) + 10 * launchWeight);
+    const bodyY = turning?[7,10,9,9,10,10][pivot]:anticipation ? 8 + preparation : hurt ? 8 - recoil : moving ? Math.round(runningBody * (1 - stopWeight) + 7 * stopWeight) : braking ? [7, 10, 9][settling] : open ? 9
+        : closing ? [9,9,8,8][closure] : b.state==='rattle' ? [8,7,10][preparation] : reload ? 7 : b.state==='bones' ? [10,9,8][release] : 8;
+    const headDrop = turning?[1,-1,-3,-3,2,6][pivot]:anticipation ? 2 + preparation * 2 : hurt ? -2 - recoil : moving ? Math.round(5 + launchWeight - 4 * stopWeight) : braking ? [1, 5, 8][settling] : open ? 8
+        : closing ? [8,5,2,0][closure] : b.state==='rattle' ? [-2,-5,0][preparation] : reload ? -4 : b.state==='bones' ? [0,-1,-2][release] : 0;
+    ctx.save(); ctx.translate(Math.round(b.x + b.width / 2), Math.round(b.y)); ctx.scale(visualFacing, 1);
     const r = (color: string, x: number, y: number, w: number, h: number) => { ctx.fillStyle = color; ctx.fillRect(x, y, w, h); };
     const line = (x: number, y: number, xx: number, yy: number, color: string, size = 1) => pixelLine(ctx, x, y, xx, yy, color, size);
     r('#542A31', -22, 32, 45, 3);
@@ -70,14 +78,17 @@ export function drawSkeletonBull(ctx: CanvasRenderingContext2D, b: SkeletonBullM
         ctx.restore(); return;
     }
     function leg(hip: number, index: number, near: boolean) {
-        const [reach, lift] = moving ? [blend(GALLOP[frame][index][0], GALLOP[next][index][0]), blend(GALLOP[frame][index][1], GALLOP[next][index][1])]
+        const gallopReach = blend(GALLOP[frame][index][0], GALLOP[next][index][0]);
+        const gallopLift = blend(GALLOP[frame][index][1], GALLOP[next][index][1]);
+        const loadedReach = gallopReach * (1 - launchWeight) - 4 * launchWeight;
+        const [reach, lift] = moving ? [Math.round(loadedReach * (1 - stopWeight) + (hip > 0 ? 5 : -4) * stopWeight), Math.round(gallopLift * (1 - stopWeight) * (1 - launchWeight))]
             : braking ? [hip > 0 ? 5 - settling : settling === 2 ? -3 : -4, 0]
-            : turning?[hip>0?4:-5,0]:anticipation ? [hip > 0 ? -2 - preparation : -4, hip > 0 && preparation === 1 ? 3 : 0]
+            : turning?[hip>0?[5,4,1,-1,-3,-4][pivot]:[-4,-3,-1,1,-3,-4][pivot],hip>0?[0,2,3,3,1,0][pivot]:0]:anticipation ? [hip > 0 ? -2 - preparation : -4, hip > 0 && preparation === 1 ? 3 : 0]
             : hurt ? [hip > 0 ? -3 : 3, 0]
             : open ? [hip > 0 ? 3 : -3, 0]
             : closing ? [(hip>0?1:-1)*[3,2,1,0][closure],0]
             : b.state==='rattle' ? [hip>0?-3:2,hip>0?[1,4,0][preparation]:0]
-            : b.state==='bones' ? [(hip>0?-1:1)*[2,1,0][release],0] : [0, 0];
+            : b.state==='bones' ? [(hip>0?-1:1)*[2,1,0][release],reload && hip>0 ? 3 : 0] : [0, 0];
         const knee = hip + (hip > 0 ? -2 : 3) + Math.round(reach / 2), foot = hip + reach;
         const kneeY = bodyY + 15 - Math.floor(lift / 2), footY = 30 - lift;
         line(hip, bodyY + 11, knee, kneeY, p.shade, 3);
@@ -127,6 +138,25 @@ export function drawSkeletonBull(ctx: CanvasRenderingContext2D, b: SkeletonBullM
     r('#fff1cf', -20, bodyY + 4, 2, 4);
     r(p.bone, -25, bodyY + 2, 6, 3); line(-25, bodyY + 4, -28, bodyY + 11, p.shade, 2);
     leg(-17, 2, true); leg(16, 3, true);
+    if (frontTurn) {
+        // Two front-facing pivot poses join the side silhouettes. Direction
+        // still reads from the committed ground arrows throughout the turn.
+        r(p.shade,-4,bodyY+3,8,12);r(p.bone,-2,bodyY+3,4,10);
+        polygon(ctx,[[-10,7+headDrop],[10,7+headDrop],[12,12+headDrop],[9,21+headDrop],[5,25+headDrop],[-5,25+headDrop],[-9,21+headDrop],[-12,12+headDrop]],p.horn);
+        polygon(ctx,[[-8,8+headDrop],[8,8+headDrop],[9,13+headDrop],[6,21+headDrop],[4,24+headDrop],[-4,24+headDrop],[-6,21+headDrop],[-9,13+headDrop]],p.bone);
+        r('#fff1cf',-6,8+headDrop,12,2);r(p.shade,-1,11+headDrop,2,9);
+        for(const side of [-1,1]){
+            const eye=side<0?-7:3;r(p.horn,eye,13+headDrop,4,4);r(p.glow,eye+1,14+headDrop,2,1);
+            line(side*8,10+headDrop,side*14,5+headDrop,p.horn,3);
+            line(side*14,5+headDrop,side*13,1+headDrop,p.horn,3);
+            line(side*8,10+headDrop,side*14,5+headDrop,'#796a68');
+            line(side*14,5+headDrop,side*13,1+headDrop,'#796a68');
+            r(p.bone,side<0?-15:12,headDrop,3,3);
+        }
+        r(p.shade,-4,21+headDrop,8,3);r(p.horn,-3,21+headDrop,2,2);r(p.horn,1,21+headDrop,2,2);
+        r('#fff1cf',-3,24+headDrop,6,1);
+    } else {
+    ctx.save();ctx.translate(turning && !reducedMotion && (pivot===1||pivot===4)?-10:0,0);
     // Lowered horns signal the charge. The lifted forelegs and rattling cage
     // prepare the loose ribs; the stamp meets their actual launch on the clay.
     line(14, bodyY + 3, 21, 16 + headDrop, p.shade, 5);
@@ -149,12 +179,10 @@ export function drawSkeletonBull(ctx: CanvasRenderingContext2D, b: SkeletonBullM
     r(p.horn, 27, 5 + headDrop, 4, 6); r(p.horn, 30, 3 + headDrop, 5, 3);
     r('#796a68', 19, 3 + headDrop, 1, 5); r('#796a68', 22, 2 + headDrop, 3, 1);
     r('#796a68', 28, 6 + headDrop, 1, 3); r('#fff1cf', 33, 3 + headDrop, 2, 1);
+    ctx.restore();
+    }
     if (braking && settling < 2) for (let i = 0; i < 3 - settling; i++)
         r('#DB9C68', -27 - settling * 3 - i * 5, 31 - i % 2, 3 - settling, 2);
-    if((moving||turning)&&!reducedMotion){
-        const drift=moving?b.stateTick%6:preparation*2;
-        for(let i=0;i<3;i++)r('#bd8966',-29-i*5-drift,31-(i+drift)%3,3,1+i%2);
-    }
     if (open) {
         // Three small costal marks drain only in recovery's final 52 ticks.
         // Discrete information remains available with reduced motion; ribs and

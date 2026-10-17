@@ -1,3 +1,4 @@
+import { introductionReached, replayPrefix } from './helpers/guairaCourseTest';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { Input } from '../src/engine/Input';
@@ -53,7 +54,7 @@ function crossExit(h: Harness, g: GuairaJunction) {
 test('isolated authored junction uses native objects/player/input and never reads storage or expands campaign', t => {
     const before = structuredClone(STAGES), worlds = structuredClone(ISLANDS), h = guairaJunctionBrowser(t), g = h.create();
     assert.ok(g.player instanceof Player); assert.ok(g.input instanceof Input); assert.ok(g.objects instanceof WorldObjects); assert.ok(g.level instanceof WorldLevel);
-    assert.deepEqual(g.stage.foes, []); assert.deepEqual(g.stage.exits, []); assert.equal(g.boss, null);
+    assert.equal(g.stage.foes.length,7); assert.deepEqual(g.stage.exits, []); assert.equal(g.boss, null);
     assert.equal(g.player.data.position.x, 48); assert.equal(feet(g), G.startY);
     assert.equal(g.objects.get(G.liftAId)!.y, G.dockY); assert.equal(g.objects.get(G.liftBId)!.y, G.terraceY);
     const changed = guairaJunctionStage(); changed.level.tiles[25][0] = 0;
@@ -68,8 +69,8 @@ for (const touch of [false, true]) test(`${touch ? 'native touch' : 'keyboard'} 
     const result = replay(h, g);
     assert.equal(result.frames, recording.frames); assert.ok(result.carriedA > 70); assert.ok(result.carriedB > 100);
     assert.ok(result.warnings >= 46); assert.ok(result.pounds > 0); assert.equal(g.finished, true);
-    assert.equal(g.store.save.checkpoint?.index, 0); assert.equal(feet(g), G.terraceY);
-    assert.equal(g.mapReturnHref, './guaira.html?at=rice&visit=junction-clear'); assert.equal(g.coins, 0); assert.equal(campaignFinishes, 0);
+    assert.equal(g.store.save.checkpoint?.index, g.stage.checkpoints.length-1); assert.equal(feet(g), G.terraceY);
+    assert.equal(g.mapReturnHref, './guaira.html?at=rice&visit=junction-clear'); assert.equal(g.coins, recording.coins); assert.equal(campaignFinishes, 0);
     assert.deepEqual(g.store.save.completed, []); assert.deepEqual(g.store.save.times, {});
     const done = snapshot(g); h.run(g, 120, ['ArrowLeft', 'Space', 'ArrowDown']); g.render();
     assert.deepEqual(snapshot(g), done); assert.match(h.status.textContent, /Pátio concluído/);
@@ -129,7 +130,7 @@ test('the checkpoint plate can reverse A/B repeatedly and the next B crossing st
         assert.equal(g.player.data.isDead, false); assert.equal(feet(g), G.middleY);
     }
     h.run(g, 25, ['ArrowRight']); h.run(g, 40, ['ArrowRight', 'Space']); crossExit(h, g);
-    assert.equal(g.finished, true);
+    assert.equal(introductionReached(g), true);
 });
 
 test('a skilled jump off rising B finishes on arrival without waiting for the empty decks to settle', t => {
@@ -139,12 +140,12 @@ test('a skilled jump off rising B finishes on arrival without waiting for the em
     h.run(g, 24, ['ArrowRight', 'ShiftLeft', 'Space']); h.run(g, 6);
     assert.equal(g.player.data.isGrounded, true); assert.equal(feet(g), G.terraceY);
     h.run(g, 24, ['ArrowRight', 'ShiftLeft', 'Space']);
-    for (let i = 0; i < 100 && !g.finished; i++) {
+    for (let i = 0; i < 100 && !introductionReached(g); i++) {
         h.run(g, 1, ['ArrowRight', 'ShiftLeft']);
-        if (g.player.data.isGrounded && feet(g) === G.terraceY && g.player.data.position.x >= G.finishX)
-            assert.equal(g.finished, true, 'safe terrace arrival finishes immediately');
+        if (g.player.data.isGrounded && feet(g) === G.terraceY && g.player.data.position.x >= 880)
+            assert.equal(introductionReached(g), true, 'the empty deck does not block the district exit');
     }
-    assert.equal(g.finished, true); assert.equal(g.moving, true, 'a still-moving empty deck adds no deadline or wait');
+    assert.equal(introductionReached(g), true); assert.equal(g.moving, true, 'a still-moving empty deck adds no deadline or wait');
 });
 
 for (const afterCheckpoint of [false, true]) test(`a missed ${afterCheckpoint ? 'B' : 'A'} crossing returns over the dry floor with native controls`, t => {
@@ -219,7 +220,7 @@ for (const touch of [false, true]) test(`${touch ? 'touch' : 'keyboard'} can rev
     const h = guairaJunctionBrowser(t, { touch, reducedMotion: touch }), g = h.create();
     let frame = 0, shelfFrames = 0, minimumHeadroom = Infinity;
     const requested: string[] = [];
-    for (const [count, keys] of optionalRecording.runs as Array<[number, string[]]>) {
+    for (const [count, keys] of replayPrefix(optionalRecording.runs as Array<[number,string[]]>, optionalRecording.introductionFrames)) {
         h.keys(keys);
         for (let n = 0; n < count; n++) {
             const before = g.routing.selected;
@@ -239,16 +240,18 @@ for (const touch of [false, true]) test(`${touch ? 'touch' : 'keyboard'} can rev
             }
         }
     }
-    assert.equal(frame, optionalRecording.frames); assert.deepEqual(requested, ['a', 'b', 'a', 'b']);
+    assert.equal(frame, optionalRecording.introductionFrames); assert.deepEqual(requested, ['a', 'b', 'a', 'b']);
     assert.ok(shelfFrames > 50); assert.ok(minimumHeadroom >= 23, `helmet remains below the HUD: ${minimumHeadroom}`);
-    assert.equal(g.finished, true); assert.equal(g.coins, 3); assert.equal(g.routing.supplied, 'b');
+    assert.equal(introductionReached(g), true); assert.equal(g.coins, 3); assert.equal(g.routing.supplied, 'b');
+    const continuation=continueGuairaCourse(g,keys=>h.run(g,1,keys));
+    assert.ok(continuation.finished&&!continuation.dead); assert.equal(continuation.damage,0);
     assert.equal(g.mapReturnHref, './guaira.html?at=rice&visit=junction-clear');
     assert.deepEqual(g.store.save.completed, []); assert.equal(h.storageCalls.length, 0);
 });
 
 test('missing the last hop keeps the optional coins and recovers by walking the dry floor to the inlet', t => {
     const h = guairaJunctionBrowser(t), g = h.create();
-    for (const [count, keys] of optionalRecording.runs.slice(0, -4) as Array<[number, string[]]>) h.run(g, count, keys);
+    for (const [count, keys] of replayPrefix(optionalRecording.runs as Array<[number,string[]]>, optionalRecording.introductionFrames).slice(0, -4) as Array<[number, string[]]>) h.run(g, count, keys);
     h.run(g, 160, ['ArrowRight']); h.run(g, 30);
     assert.equal(g.finished, false); assert.equal(feet(g), G.recoveryY); assert.equal(g.coins, 3);
     assert.equal(g.store.save.checkpoint?.index, 0);
@@ -294,3 +297,4 @@ for (const touch of [false, true]) test(`${touch ? 'touch' : 'keyboard'} immedia
         }
     }
 });
+import { continueGuairaCourse } from './helpers/guairaCourseController';

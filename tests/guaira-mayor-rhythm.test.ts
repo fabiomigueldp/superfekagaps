@@ -98,7 +98,8 @@ for(const register of ['lower','upper'] as const)test(`${register}: cut feedback
     advance(m,8,{...ready,liftReady:false});assert.notDeepEqual(raster(m),first);assert.deepEqual(raster(m,true),still);
     const age=e.age;assert.equal(e.age,age);const snap=JSON.stringify(m);
     for(const dt of [0,-1,NaN,Infinity])m.update(dt,closed);assert.equal(JSON.stringify(m),snap);
-    advance(m,42,closed);assert.equal(m.feedback.length,0);assert.equal(raster(m).size,0);
+    advance(m,42,closed);assert.equal(m.feedback.some(e=>e.kind==='interrupt'),false);
+    assert.ok(m.feedback.every(e=>e.kind==='landing'),'the new landing has independent feedback');
 });
 
 test('each hit breaks the matching physical seal; repeated contact cannot emit duplicate effects',()=>{
@@ -123,16 +124,17 @@ test(`native missed opening, changed phrase and late lift remain winnable: touch
             const wasReady=g.mayor.vulnerable;g.update(R.tickMs);frame++;
             assert.equal(g.player.data.hasHelmet,true,`frame ${frame}`);assert.equal(g.player.data.isDead,false);
             assert.ok(Math.round(g.player.data.position.y)-Math.round(g.camera.y)-4>=26);
-            if(frame===1062)assert.deepEqual(g.mayor.salvo!.sequence,[{lane:'low',direction:-1},{lane:'high',direction:-1}]);
-            if(frame>1400&&frame<1700&&g.objects.events.some(e=>e.kind==='switch'))lateSwitches.push(frame);
-            if(frame>1400&&frame<1700&&!wasReady&&g.mayor.vulnerable){
+            if(frame===retry.salvoWarningFrames[2])assert.deepEqual(g.mayor.salvo!.sequence,[{lane:'low',direction:-1},{lane:'high',direction:-1}]);
+            if(g.mayor.sealsRemaining===2&&g.mayor.cycle===3&&g.objects.events.some(e=>e.kind==='switch'))lateSwitches.push(frame);
+            if(g.mayor.sealsRemaining===2&&g.mayor.cycle===3&&!wasReady&&g.mayor.vulnerable){
                 arrivals.push(frame);assert.equal(g.objects.get(A.liftId)!.y,A.deckY);
                 assert.equal(g.mayor.recoveryTicksRemaining,R.minimumOpening);assert.equal(g.mayor.recoveryProgress,0);
             }
             if(g.mayor.sealsRemaining<seals){hits.push(frame);seals=g.mayor.sealsRemaining;}
         }
     }
-    assert.deepEqual(lateSwitches,[1589]);assert.deepEqual(arrivals,[1659]);assert.deepEqual(hits,retry.hitFrames);
+    assert.equal(lateSwitches.length,1);assert.deepEqual(arrivals,[retry.seamWarningFrames[1]]);
+    assert.equal(arrivals[0]-lateSwitches[0],70,'late input still earns the complete native lift trip');assert.deepEqual(hits,retry.hitFrames);
     assert.equal(g.mayor.publicWaterOpen,true);assert.ok(g.player.data.position.x<100);
     assert.deepEqual(g.store.save.completed,[]);assert.deepEqual(h.storageCalls,[]);
 });

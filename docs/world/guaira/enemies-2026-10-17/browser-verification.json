@@ -1,0 +1,146 @@
+{
+  "physicalDevice": false,
+  "routes": [
+    {
+      "name": "pincer-counter",
+      "touch": false,
+      "frame": 138,
+      "damage": [],
+      "minHead": 40.118808464,
+      "maxFeet": 164.29690941689915,
+      "killed": false,
+      "phase": "rest",
+      "high": false,
+      "reduced": false
+    },
+    {
+      "name": "pincer-counter",
+      "touch": true,
+      "frame": 138,
+      "damage": [],
+      "minHead": 40.118808464,
+      "maxFeet": 164.29690941689915,
+      "killed": false,
+      "phase": "rest",
+      "high": false,
+      "reduced": true
+    },
+    {
+      "name": "pincer-hit",
+      "touch": false,
+      "frame": 99,
+      "damage": [
+        75
+      ],
+      "minHead": 136,
+      "maxFeet": 164,
+      "killed": false,
+      "phase": "rest",
+      "high": false,
+      "reduced": false
+    },
+    {
+      "name": "pincer-hit",
+      "touch": true,
+      "frame": 99,
+      "damage": [
+        75
+      ],
+      "minHead": 136,
+      "maxFeet": 164,
+      "killed": false,
+      "phase": "rest",
+      "high": false,
+      "reduced": true
+    },
+    {
+      "name": "loader-counter",
+      "touch": false,
+      "frame": 455,
+      "damage": [],
+      "minHead": 38.61873064000001,
+      "maxFeet": 164.0007063285438,
+      "killed": true,
+      "phase": "rest",
+      "high": false,
+      "reduced": false
+    },
+    {
+      "name": "loader-counter",
+      "touch": true,
+      "frame": 455,
+      "damage": [],
+      "minHead": 38.61873064000001,
+      "maxFeet": 164.0007063285438,
+      "killed": true,
+      "phase": "rest",
+      "high": false,
+      "reduced": true
+    },
+    {
+      "name": "loader-hit",
+      "touch": false,
+      "frame": 353,
+      "damage": [
+        329
+      ],
+      "minHead": 40.118808464,
+      "maxFeet": 164,
+      "killed": false,
+      "phase": "rest",
+      "high": false,
+      "reduced": false
+    },
+    {
+      "name": "loader-hit",
+      "touch": true,
+      "frame": 353,
+      "damage": [
+        329
+      ],
+      "minHead": 40.118808464,
+      "maxFeet": 164,
+      "killed": false,
+      "phase": "rest",
+      "high": false,
+      "reduced": true
+    }
+  ],
+  "pauses": [
+    {
+      "name": "pincer-counter",
+      "touch": false,
+      "until": 60,
+      "paused": true,
+      "state": true,
+      "pixels": true
+    },
+    {
+      "name": "pincer-counter",
+      "touch": true,
+      "until": 60,
+      "paused": true,
+      "state": true,
+      "pixels": true
+    },
+    {
+      "name": "loader-counter",
+      "touch": false,
+      "until": 280,
+      "paused": true,
+      "state": true,
+      "pixels": true
+    },
+    {
+      "name": "loader-counter",
+      "touch": true,
+      "until": 280,
+      "paused": true,
+      "state": true,
+      "pixels": true
+    }
+  ],
+  "review": [],
+  "errors": [],
+  "passed": true
+}

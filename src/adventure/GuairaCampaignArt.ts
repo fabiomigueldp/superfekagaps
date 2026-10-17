@@ -37,7 +37,9 @@ export interface CampaignRegionArt {
 }
 export const GUAIRA_CAMPAIGN_PLACEMENT: AtlasPlacement = Object.freeze({ origin: Object.freeze({ x: 3.65, y: .05 }), scale: 1.1 });
 const descriptor = (regionKey: GuairaCampaignRegion, metadata: typeof guairaMetadata | typeof factoryMetadata | typeof serraMetadata,
-    placement: AtlasPlacement): CampaignRegionArt => ({ regionKey, path: campaignMapAsset(`guaira-campaign/${regionKey}.webp`),
+    placement: AtlasPlacement): CampaignRegionArt => ({ regionKey,
+    // Beauty and depth must invalidate together after an island geometry export.
+    path: campaignMapAsset(`guaira-campaign/${regionKey}.webp${regionKey === 'guaira' ? `?v=${guairaMetadata.nativeMapRevision}` : ''}`),
     frame: metadata.assetFrame, placement, terminal: metadata.terminal, replacesBase: regionKey === 'serra', aircraftScale: .65 * 20.6 / metadata.camera.orthoScale });
 export const GUAIRA_CAMPAIGN_ART: Readonly<Record<GuairaCampaignRegion, CampaignRegionArt>> = Object.freeze({
     fabrica: descriptor('fabrica', factoryMetadata, WORLD_ATLAS_PLACEMENTS[3]),

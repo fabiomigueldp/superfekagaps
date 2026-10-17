@@ -1,0 +1,108 @@
+{
+  "date": "2026-10-17",
+  "scope": "Ossabravo: physical acceleration and deceleration, six-pose return, distance-based gait and fixed world hoof contacts",
+  "tests": {
+    "total": 3646,
+    "passed": 3645,
+    "failed": 0,
+    "skipped": 1,
+    "newMotionCases": 13,
+    "skip": "Optional @napi-rs/canvas unavailable through the default module resolver"
+  },
+  "typecheck": true,
+  "build": true,
+  "validators": true,
+  "motion": {
+    "fullRunwayPixels": 240,
+    "fullRunTicks": 48,
+    "firstAndLastStepPixels": 0.4761904761904762,
+    "cruisePixelsPerTick": 5.714285714285714,
+    "turnPoses": 6,
+    "turnTicks": 42,
+    "openingTicks": 72,
+    "maximumContactAgeTicks": 16
+  },
+  "native": {
+    "inputOnly": true,
+    "actorOrClockWrites": false,
+    "captureFps": 30,
+    "simulationHz": 60,
+    "routes": {
+      "guairaLabReplay": {
+        "frames": 1274,
+        "hits": [
+          180,
+          338,
+          552,
+          701,
+          965,
+          1178
+        ],
+        "damage": [],
+        "finished": true,
+        "minHead": 32
+      },
+      "guairaBullPoundReplay": {
+        "frames": 1294,
+        "hits": [
+          180,
+          338,
+          569,
+          718,
+          982,
+          1198
+        ],
+        "damage": [],
+        "finished": true,
+        "minHead": 32
+      },
+      "guairaBullMissReplay": {
+        "frames": 390,
+        "hits": [
+          385
+        ],
+        "damage": [],
+        "finished": false,
+        "minHead": 53
+      },
+      "guairaBullArcFailureReplay": {
+        "frames": 500,
+        "hits": [
+          180,
+          338
+        ],
+        "damage": [
+          474
+        ],
+        "finished": false,
+        "minHead": 53
+      }
+    }
+  },
+  "browser": {
+    "passed": true,
+    "routes": 8,
+    "pauses": 10,
+    "physicalDevice": false,
+    "errors": []
+  },
+  "campaign": {
+    "passed": true,
+    "normalCampaign": true,
+    "runs": 9,
+    "errors": []
+  },
+  "review": {
+    "passed": true,
+    "widths": [
+      1440,
+      390
+    ],
+    "decodedVideos": 6,
+    "errors": []
+  },
+  "limits": [
+    "Authored replays establish executable routes and actual damage, not first-time-player enjoyment.",
+    "Touch and gamepad inputs were simulated in a desktop browser, not tested on physical hardware."
+  ]
+}

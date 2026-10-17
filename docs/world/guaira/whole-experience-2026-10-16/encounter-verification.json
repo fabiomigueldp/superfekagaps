@@ -1,0 +1,352 @@
+{
+  "revision": "guaira-encounter-polish-2026-10-17",
+  "reviewedAt": "2026-10-17T06:20:35.642Z",
+  "scope": "Two authored finales: pump-basin carrier/fragile service walk in Respiros, alternating discharges/guarded maintenance valve in Relief; scenery, guidance and receiving-platform framing.",
+  "nativeInputOnly": true,
+  "actorOrClockEdits": false,
+  "notAFirstPlaytest": true,
+  "sourceHashes": {
+    "src/adventure/experimental/guaira/GuairaCourseDesign.ts": "c740525b7f9ad31117e0a654d64fb70d631a8a904890513709d95f76c6fc7101",
+    "src/adventure/experimental/guaira/GuairaCourseGuidance.ts": "36ee2aa35c011587cb2da2101705df9d9a17ea744f5272ddacbaa03a516a62de",
+    "src/adventure/experimental/guaira/GuairaCoursePresentation.ts": "4295c3a4e1d840be8b92a0e192d65d17fdf6c90ed50bddd4a69a59654fcf0638",
+    "src/adventure/experimental/guaira/GuairaCourseLandmarks.ts": "f8a733d85b3c827dc02247dd8990d007b2f5e3d05c71fcab5baed95a3e2108b5",
+    "tests/guaira-course-finales.test.ts": "09dd13706a13edc4c5a9e318adacd7e28b827facfbc77cee68aac22fe01e44a3",
+    "tests/helpers/guairaFinaleController.ts": "cef0551dd6d67bf66070bf4f734e32ef10d770d81cc3002f303140acb08b391c",
+    "tests/helpers/guairaFinaleReplays.json": "1a7090f1b37faa7117c551626154cce90d4f3e6e65c5c059d975e121d6a3eb9b",
+    "tests/helpers/guairaExplorationReplays.json": "9eb344cf0c01e7eb70c1af127d5f9fe7d22daccf203f040f0936e9988b11f1bf",
+    "scripts/record_guaira_finales.ts": "7f1cad7b4728cf0ce94cb944d1cac6ff255bdd01037bfe1454976bb303752bb9",
+    "scripts/verify_guaira_workshop_surface.cjs": "0b7dfe4e4f424cfe8a0af7d23f687a2df1993edc07d02c4e585eb3501c19b5dd",
+    "tests/guaira-level-design.test.ts": "931c59034bed467d6a486a51364af4e01633a13f7a3aa9536f6ab68ad6a18b6b",
+    "tests/guaira-relief.test.ts": "cce1cb69d180e29cf8f6384c50788b5ffd20e8726f958757791ba10ccba9adcc",
+    "tests/guaira-relief-challenge.test.ts": "c21a8dd00bfc74e68905d6f61347ef8d63d4509e2734d7843d8f4e5603c5f50d",
+    "tests/guaira-respiros.test.ts": "8fa27209b925f56e79fd056ac4397620907d384464699f03739a46a41ab364ae",
+    "tests/helpers/guairaRespirosReplay.json": "bcde1a2dbc0d94246e4bc4244c60c43641ff76b8311900314a3a779e7b55f1e7",
+    "tests/helpers/guairaFieldRoutesReplays.json": "39914023729ee5bc6668c107f05c3147e63769cd4f885132894f0271d64f0319",
+    "tests/helpers/guairaLevelDesignReplays.json": "38cc7f9b2e779ec69158bcfe3ce7eddbbf061352b02164a771570cacdbc274f5",
+    "tests/helpers/guairaReliefRoutesReplays.json": "cda1a3fea6ab8ad39fe2064f3cfbb548c60cce38bf34b7965f5e56858698a954",
+    "tests/helpers/guairaReliefReplay.json": "5f7efbab82f2897fa99ab7f09f7317ec7558c5b661db750366153cb057fbd751"
+  },
+  "levelChanges": {
+    "respiros": {
+      "oldWidth": 3584,
+      "width": 4256,
+      "addedPixels": 672,
+      "foes": 6,
+      "finalCheckpoint": 6
+    },
+    "alivio": {
+      "oldWidth": 2400,
+      "width": 3072,
+      "addedPixels": 672,
+      "foes": 6,
+      "finalCheckpoint": 4
+    }
+  },
+  "checks": {
+    "typescriptSuite": {
+      "tests": 3516,
+      "pass": 3515,
+      "fail": 0,
+      "skipped": 1,
+      "optionalCase": "Native atlas case subsequently passed using bundled canvas; its separate file has 2 passes, 0 skips."
+    },
+    "serverTests": {
+      "pass": 3,
+      "fail": 0
+    },
+    "nativeAtlasTests": {
+      "pass": 2,
+      "fail": 0,
+      "skipped": 0
+    },
+    "newRegressionCases": 9,
+    "build": true,
+    "typecheck": true,
+    "validators": true,
+    "delayedArrivals": {
+      "runs": 16,
+      "finished": 16,
+      "damage": 0
+    },
+    "extendedExistingRoutes": {
+      "runs": 11,
+      "oldInputPrefixPreserved": true,
+      "finished": 11,
+      "damage": 0
+    },
+    "fragileFailure": {
+      "realDeath": true,
+      "earnedCheckpointRestored": true,
+      "subsequentCompletion": true,
+      "subsequentDamage": 0
+    },
+    "browserFinales": {
+      "checks": 8,
+      "keyboard": true,
+      "touchSimulated": true,
+      "reducedMotion": true,
+      "physicalDevice": false,
+      "pauseStateAndPixelsFrozen": true
+    },
+    "campaign": {
+      "checks": 9,
+      "passed": true,
+      "normalCampaign": true,
+      "gamepadApiSimulated": true,
+      "physicalDevice": false
+    },
+    "reviewPage": {
+      "passed": true,
+      "viewports": [
+        1440,
+        390
+      ],
+      "videos": 14,
+      "checks": 28,
+      "decodedAndPlayed": true
+    }
+  },
+  "recordings": {
+    "respiros-low": {
+      "fullRouteFrames": 2359,
+      "prefixFrames": 2102,
+      "excerptSeconds": 4.283333333333333,
+      "coins": 21,
+      "finished": true,
+      "damage": 0,
+      "simulationHz": 60,
+      "videoFps": 30
+    },
+    "alivio-low": {
+      "fullRouteFrames": 1642,
+      "prefixFrames": 1354,
+      "excerptSeconds": 4.8,
+      "coins": 16,
+      "finished": true,
+      "damage": 0,
+      "simulationHz": 60,
+      "videoFps": 30
+    },
+    "respiros-high": {
+      "fullRouteFrames": 2681,
+      "prefixFrames": 2102,
+      "excerptSeconds": 9.65,
+      "coins": 19,
+      "finished": true,
+      "damage": 0,
+      "simulationHz": 60,
+      "videoFps": 30
+    },
+    "alivio-high": {
+      "fullRouteFrames": 1726,
+      "prefixFrames": 1354,
+      "excerptSeconds": 6.2,
+      "coins": 20,
+      "finished": true,
+      "damage": 0,
+      "simulationHz": 60,
+      "videoFps": 30
+    }
+  },
+  "variations": [
+    {
+      "id": "respiros",
+      "route": "low",
+      "waitFrames": 0,
+      "frames": 2359,
+      "coins": 21,
+      "finished": true,
+      "damage": 0,
+      "rideFrames": 0,
+      "fragileFrames": 34
+    },
+    {
+      "id": "respiros",
+      "route": "high",
+      "waitFrames": 0,
+      "frames": 2681,
+      "coins": 19,
+      "finished": true,
+      "damage": 0,
+      "rideFrames": 295,
+      "fragileFrames": 0
+    },
+    {
+      "id": "alivio",
+      "route": "low",
+      "waitFrames": 0,
+      "frames": 1642,
+      "coins": 16,
+      "finished": true,
+      "damage": 0,
+      "rideFrames": 0,
+      "fragileFrames": 0,
+      "valveClosed": false,
+      "guardDefeated": false
+    },
+    {
+      "id": "alivio",
+      "route": "high",
+      "waitFrames": 0,
+      "frames": 1726,
+      "coins": 20,
+      "finished": true,
+      "damage": 0,
+      "rideFrames": 0,
+      "fragileFrames": 0,
+      "valveClosed": true,
+      "guardDefeated": true
+    },
+    {
+      "id": "respiros",
+      "route": "low",
+      "waitFrames": 120,
+      "frames": 2478,
+      "coins": 21,
+      "finished": true,
+      "damage": 0,
+      "rideFrames": 0,
+      "fragileFrames": 32
+    },
+    {
+      "id": "respiros",
+      "route": "high",
+      "waitFrames": 120,
+      "frames": 2681,
+      "coins": 19,
+      "finished": true,
+      "damage": 0,
+      "rideFrames": 249,
+      "fragileFrames": 0
+    },
+    {
+      "id": "alivio",
+      "route": "low",
+      "waitFrames": 120,
+      "frames": 1699,
+      "coins": 16,
+      "finished": true,
+      "damage": 0,
+      "rideFrames": 0,
+      "fragileFrames": 0,
+      "valveClosed": false,
+      "guardDefeated": false
+    },
+    {
+      "id": "alivio",
+      "route": "high",
+      "waitFrames": 120,
+      "frames": 1844,
+      "coins": 20,
+      "finished": true,
+      "damage": 0,
+      "rideFrames": 0,
+      "fragileFrames": 0,
+      "valveClosed": true,
+      "guardDefeated": true
+    },
+    {
+      "id": "respiros",
+      "route": "low",
+      "waitFrames": 300,
+      "frames": 2658,
+      "coins": 21,
+      "finished": true,
+      "damage": 0,
+      "rideFrames": 4,
+      "fragileFrames": 32
+    },
+    {
+      "id": "respiros",
+      "route": "high",
+      "waitFrames": 300,
+      "frames": 3257,
+      "coins": 19,
+      "finished": true,
+      "damage": 0,
+      "rideFrames": 295,
+      "fragileFrames": 0
+    },
+    {
+      "id": "alivio",
+      "route": "low",
+      "waitFrames": 300,
+      "frames": 1893,
+      "coins": 16,
+      "finished": true,
+      "damage": 0,
+      "rideFrames": 0,
+      "fragileFrames": 0,
+      "valveClosed": false,
+      "guardDefeated": false
+    },
+    {
+      "id": "alivio",
+      "route": "high",
+      "waitFrames": 300,
+      "frames": 2027,
+      "coins": 20,
+      "finished": true,
+      "damage": 0,
+      "rideFrames": 0,
+      "fragileFrames": 0,
+      "valveClosed": true,
+      "guardDefeated": true
+    },
+    {
+      "id": "respiros",
+      "route": "low",
+      "waitFrames": 570,
+      "frames": 2928,
+      "coins": 21,
+      "finished": true,
+      "damage": 0,
+      "rideFrames": 0,
+      "fragileFrames": 32
+    },
+    {
+      "id": "respiros",
+      "route": "high",
+      "waitFrames": 570,
+      "frames": 3257,
+      "coins": 19,
+      "finished": true,
+      "damage": 0,
+      "rideFrames": 295,
+      "fragileFrames": 0
+    },
+    {
+      "id": "alivio",
+      "route": "low",
+      "waitFrames": 570,
+      "frames": 2149,
+      "coins": 16,
+      "finished": true,
+      "damage": 0,
+      "rideFrames": 0,
+      "fragileFrames": 0,
+      "valveClosed": false,
+      "guardDefeated": false
+    },
+    {
+      "id": "alivio",
+      "route": "high",
+      "waitFrames": 570,
+      "frames": 2296,
+      "coins": 20,
+      "finished": true,
+      "damage": 0,
+      "rideFrames": 0,
+      "fragileFrames": 0,
+      "valveClosed": true,
+      "guardDefeated": true
+    }
+  ],
+  "limitations": [
+    "Rehearsed routes and visual inspection do not establish first-time discovery or perceived fun.",
+    "Touch and Gamepad API checks use simulation, not physical devices.",
+    "The other four stage recordings and boss recordings are retained from the previous revision.",
+    "Island geometry is unchanged in this iteration."
+  ],
+  "supersededBy": "docks-verification.json"
+}

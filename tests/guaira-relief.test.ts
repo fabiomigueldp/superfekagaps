@@ -1,3 +1,4 @@
+import { introductionReached } from './helpers/guairaCourseTest';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { Input } from '../src/engine/Input';
@@ -60,10 +61,10 @@ test('relief uses native authority, isolated tiles and no campaign/save/exit add
     assert.ok(g.input instanceof Input); assert.ok(g.player instanceof Player); assert.ok(g.level instanceof WorldLevel);
     assert.equal(g.player.data.position.x, G.spawnX); assert.equal(feet(g), G.floor);
     assert.equal(g.level.data.tiles.flat().filter(tile => tile === T.BRICK_BREAKABLE).length, 3);
-    assert.equal(g.stage.mechanisms.length, 1); assert.equal(g.stage.mechanisms[0].kind, 'jet');
-    for (const key of ['exits','foes','dialogues','landmarks'] as const) assert.deepEqual(g.stage[key], []);
-    assert.equal(g.stage.pickups.length,5);
-    assert.ok(g.stage.pickups.every(p => p.kind === 'coin' && p.y < 288));
+    assert.equal(g.stage.mechanisms.length, 8); assert.equal(g.stage.mechanisms[0].kind, 'jet');
+    for (const key of ['exits','dialogues','landmarks'] as const) assert.deepEqual(g.stage[key], []);
+    assert.equal(g.stage.pickups.filter(p=>!p.id.includes(':course:')).length,5);
+    assert.ok(g.stage.pickups.filter(p=>!p.id.includes(':course:')).every(p => p.kind === 'coin' && p.y < 288));
     assert.equal(g.boss, null); assert.equal(g.store.save.checkpoint, null);
     const altered = guairaReliefStage(); altered.level.tiles[10][15] = T.EMPTY;
     assert.equal(guairaReliefStage().level.tiles[10][15], T.BRICK_BREAKABLE);
@@ -80,7 +81,7 @@ for (const touch of [false, true]) for (const reducedMotion of [false, true])
             assert.equal(g.reliefOpened, name === 'maintenance'); assert.equal(jet(g).active, name === 'maintenance');
             assert.equal(trace.openedAt > 0, name === 'maintenance');
             assert.equal(trace.highLanding, name === 'maintenance');
-            assert.equal(g.store.save.checkpoint?.index, 0); assert.equal(g.coins, name === 'maintenance' ? 3 : 0);
+            assert.equal(g.store.save.checkpoint?.index, g.stage.checkpoints.length-1); assert.equal(g.coins, name === 'maintenance' ? 8 : 5);
             assert.deepEqual(g.store.save.completed, []); assert.deepEqual(g.store.save.times, {});
             const frozen = snapshot(g); h.run(g, 60, ['ArrowLeft', 'Space', 'ArrowDown']); g.render();
             assert.deepEqual(snapshot(g), frozen); assert.match(h.status.textContent, /PASSAGEM INSPECIONADA/);
@@ -95,7 +96,7 @@ for (const touch of [false, true]) test(`native ${touch ? 'touch' : 'keyboard'} 
     assert.equal(g.level.getTile(15,10), T.EMPTY); assert.equal(g.level.getTile(17,10), T.BRICK_BREAKABLE,
         'one native opening suffices without secretly requiring the entire lid');
     h.keys([]); g.load(G.id); route(h, g, recording.skipFlag as Run[]);
-    assert.equal(g.finished, true); assert.equal(g.store.save.checkpoint, null); assert.equal(g.reliefOpened, false);
+    assert.equal(g.finished, true); assert.equal(g.store.save.checkpoint?.index, g.stage.checkpoints.length-1); assert.equal(g.reliefOpened, false);
 });
 
 function waitForRetraction(h: Harness, g: GuairaRelief) {
@@ -121,7 +122,7 @@ for (const touch of [false, true]) test(`twelve native arrival phases allow obse
         assert.ok(g.player.data.position.x + g.player.data.width < G.jetStart, 'reverses to dry bank');
         h.run(g,756); assert.equal(g.player.data.hasHelmet,true); assert.equal(g.player.data.isDead,false);
         waitForRetraction(h,g); h.run(g,130,['ArrowRight']);
-        assert.equal(g.finished,true, `arrival delay ${delay}`); assert.equal(g.player.data.hasHelmet,true);
+        assert.equal(introductionReached(g), true, `arrival delay ${delay}`); assert.equal(g.player.data.hasHelmet,true);
         assert.equal(g.reliefOpened,false);
     }
 });
@@ -134,7 +135,7 @@ for (const touch of [false,true]) test(`maintenance detour and opened grate rema
     h.run(g,220,['ArrowLeft']);h.run(g,30);assert.ok(g.player.data.position.x<128);
     assert.equal(feet(g),G.floor);assert.equal(g.player.data.hasHelmet,true);assert.equal(g.finished,false);
     h.run(g,756);assert.equal(g.objects.jetDanger(jet(g)),null);
-    h.run(g,260,['ArrowRight']);assert.equal(g.finished,true);assert.equal(g.reliefOpened,true);
+    h.run(g,260,['ArrowRight']);assert.equal(introductionReached(g), true);assert.equal(g.reliefOpened,true);
 });
 
 for (const touch of [false,true]) test(`real break during live discharge stops pressure immediately with ${touch?'touch':'keys'}`,t=>{
@@ -148,7 +149,7 @@ for (const touch of [false,true]) test(`real break during live discharge stops p
     }
     assert.equal(wasDangerous,true);assert.equal(g.reliefOpened,true);assert.equal(sawSnapshot,true);
     assert.equal(g.objects.jetDanger(jet(g)),null);assert.equal(g.player.data.hasHelmet,true);
-    h.run(g,200,['ArrowRight']);assert.equal(g.finished,true);assert.equal(g.player.data.hasHelmet,true);
+    h.run(g,200,['ArrowRight']);assert.equal(introductionReached(g), true);assert.equal(g.player.data.hasHelmet,true);
 });
 
 test('the initial phase asks for a choice, and backing out of the intact upper route stays safe',t=>{
@@ -182,8 +183,8 @@ test('first warning is visible with measured braking margin before native contac
 
 test('helmet-assisted crossing is a valid arrival and the result reports only the actual relief state',t=>{
     const h=guairaReliefBrowser(t),g=h.create();h.run(g,300,['ArrowRight']);g.render();
-    assert.equal(g.finished,true);assert.equal(g.player.data.hasHelmet,false);assert.equal(g.reliefOpened,false);
-    assert.match(h.status.textContent,/alívio intacto, grelha mantém o ciclo/);
+    assert.equal(introductionReached(g), true);assert.equal(g.player.data.hasHelmet,false);assert.equal(g.reliefOpened,false);
+    assert.equal(g.finished,false); assert.doesNotMatch(h.status.textContent,/PASSAGEM INSPECIONADA/);
     assert.doesNotMatch(h.status.textContent,/pelo intervalo/);
 });
 

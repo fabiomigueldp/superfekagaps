@@ -12,7 +12,7 @@
     "src/adventure/WorldAtlasModel.ts": "08aec86444beff853975be56405f239461a345060a8e924640366cff4dcf1934",
     "src/adventure/WorldMapArt.ts": "407a5d9c0fc6e54e4a22bf4d05a6938f5613c1ade2e8cca2ec015f022fbaa50e",
     "src/adventure/WorldMapModel.ts": "dac756bb2d1488a0b8a0d49cc7c97d2886f539c82e0a57f462543460983f3360",
-    "src/adventure/GuairaCampaignArt.ts": "aadd45e74ad56c27b3aa1588cdb0b4fee124902be73178aedfc773550008ec3f",
+    "src/adventure/GuairaCampaignArt.ts": "28108b19ff279eb7dff84d985c0c5a712f947983ed784d8f9262a479a266d18a",
     "src/adventure/delicia/DeliciaIsland.ts": "f15d417fdbf74fd9842dbc5d73cde2ffeb115d275dcc82817a5044d7200cdad7",
     "public/assets/world/map/costa-diorama.meta.json": "889ca6e3c4cb64558d5c22d8a8f898189ff36b14604db989287b959c00738b18",
     "public/assets/world/map/porto-diorama.meta.json": "9ab92d40237767c133ff8ac0a951f21ae3b61dfa714d758cade2ebd55f25004c",

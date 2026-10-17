@@ -1,0 +1,258 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "viewport": 1440,
+      "kind": "finale",
+      "id": "respiros-high",
+      "width": 640,
+      "height": 360,
+      "duration": 9.633333,
+      "played": true
+    },
+    {
+      "viewport": 1440,
+      "kind": "finale",
+      "id": "respiros-low",
+      "width": 640,
+      "height": 360,
+      "duration": 4.266667,
+      "played": true
+    },
+    {
+      "viewport": 1440,
+      "kind": "finale",
+      "id": "alivio-high",
+      "width": 640,
+      "height": 360,
+      "duration": 6.2,
+      "played": true
+    },
+    {
+      "viewport": 1440,
+      "kind": "finale",
+      "id": "alivio-low",
+      "width": 640,
+      "height": 360,
+      "duration": 4.8,
+      "played": true
+    },
+    {
+      "viewport": 1440,
+      "kind": "course",
+      "id": "travessia",
+      "width": 640,
+      "height": 360,
+      "duration": 34.433333,
+      "played": true
+    },
+    {
+      "viewport": 1440,
+      "kind": "course",
+      "id": "patio",
+      "width": 640,
+      "height": 360,
+      "duration": 46.866667,
+      "played": true
+    },
+    {
+      "viewport": 1440,
+      "kind": "course",
+      "id": "respiros",
+      "width": 640,
+      "height": 360,
+      "duration": 44.666667,
+      "played": true
+    },
+    {
+      "viewport": 1440,
+      "kind": "course",
+      "id": "subida",
+      "width": 640,
+      "height": 360,
+      "duration": 31.9,
+      "played": true
+    },
+    {
+      "viewport": 1440,
+      "kind": "course",
+      "id": "galeria",
+      "width": 640,
+      "height": 360,
+      "duration": 24.7,
+      "played": true
+    },
+    {
+      "viewport": 1440,
+      "kind": "course",
+      "id": "alivio",
+      "width": 640,
+      "height": 360,
+      "duration": 28.766667,
+      "played": true
+    },
+    {
+      "viewport": 1440,
+      "kind": "recovery",
+      "id": "respiros",
+      "width": 640,
+      "height": 360,
+      "duration": 3.766667,
+      "played": true
+    },
+    {
+      "viewport": 1440,
+      "kind": "recovery",
+      "id": "subida",
+      "width": 640,
+      "height": 360,
+      "duration": 3.6,
+      "played": true
+    },
+    {
+      "viewport": 1440,
+      "kind": "recovery",
+      "id": "galeria",
+      "width": 640,
+      "height": 360,
+      "duration": 3.766667,
+      "played": true
+    },
+    {
+      "viewport": 1440,
+      "kind": "recovery",
+      "id": "alivio",
+      "width": 640,
+      "height": 360,
+      "duration": 3.766667,
+      "played": true
+    },
+    {
+      "viewport": 390,
+      "kind": "finale",
+      "id": "respiros-high",
+      "width": 640,
+      "height": 360,
+      "duration": 9.633333,
+      "played": true
+    },
+    {
+      "viewport": 390,
+      "kind": "finale",
+      "id": "respiros-low",
+      "width": 640,
+      "height": 360,
+      "duration": 4.266667,
+      "played": true
+    },
+    {
+      "viewport": 390,
+      "kind": "finale",
+      "id": "alivio-high",
+      "width": 640,
+      "height": 360,
+      "duration": 6.2,
+      "played": true
+    },
+    {
+      "viewport": 390,
+      "kind": "finale",
+      "id": "alivio-low",
+      "width": 640,
+      "height": 360,
+      "duration": 4.8,
+      "played": true
+    },
+    {
+      "viewport": 390,
+      "kind": "course",
+      "id": "travessia",
+      "width": 640,
+      "height": 360,
+      "duration": 34.433333,
+      "played": true
+    },
+    {
+      "viewport": 390,
+      "kind": "course",
+      "id": "patio",
+      "width": 640,
+      "height": 360,
+      "duration": 46.866667,
+      "played": true
+    },
+    {
+      "viewport": 390,
+      "kind": "course",
+      "id": "respiros",
+      "width": 640,
+      "height": 360,
+      "duration": 44.666667,
+      "played": true
+    },
+    {
+      "viewport": 390,
+      "kind": "course",
+      "id": "subida",
+      "width": 640,
+      "height": 360,
+      "duration": 31.9,
+      "played": true
+    },
+    {
+      "viewport": 390,
+      "kind": "course",
+      "id": "galeria",
+      "width": 640,
+      "height": 360,
+      "duration": 24.7,
+      "played": true
+    },
+    {
+      "viewport": 390,
+      "kind": "course",
+      "id": "alivio",
+      "width": 640,
+      "height": 360,
+      "duration": 28.766667,
+      "played": true
+    },
+    {
+      "viewport": 390,
+      "kind": "recovery",
+      "id": "respiros",
+      "width": 640,
+      "height": 360,
+      "duration": 3.766667,
+      "played": true
+    },
+    {
+      "viewport": 390,
+      "kind": "recovery",
+      "id": "subida",
+      "width": 640,
+      "height": 360,
+      "duration": 3.6,
+      "played": true
+    },
+    {
+      "viewport": 390,
+      "kind": "recovery",
+      "id": "galeria",
+      "width": 640,
+      "height": 360,
+      "duration": 3.766667,
+      "played": true
+    },
+    {
+      "viewport": 390,
+      "kind": "recovery",
+      "id": "alivio",
+      "width": 640,
+      "height": 360,
+      "duration": 3.766667,
+      "played": true
+    }
+  ],
+  "errors": []
+}

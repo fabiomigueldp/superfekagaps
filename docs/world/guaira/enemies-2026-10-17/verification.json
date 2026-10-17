@@ -1,0 +1,275 @@
+{
+  "date": "2026-10-17",
+  "scope": "Six ordinary Guaíra enemy families: native behaviors, procedural pixel art, animation, projectile visibility and player counterplay",
+  "passed": true,
+  "tests": {
+    "typescript": {
+      "tests": 3681,
+      "pass": 3680,
+      "fail": 0,
+      "skipped": 1,
+      "cancelled": 0
+    },
+    "javascript": {
+      "tests": 3,
+      "pass": 3,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0
+    },
+    "newCases": 35
+  },
+  "build": {
+    "validators": true,
+    "gameTypecheck": true,
+    "toolsTypecheck": true,
+    "viteBuild": true
+  },
+  "inventory": {
+    "enemies": 44,
+    "families": 6,
+    "courses": [
+      {
+        "id": "guaira-travessia",
+        "count": 8,
+        "families": {
+          "minion": 3,
+          "helmet": 4,
+          "charger": 0,
+          "loader": 1,
+          "agitator": 0,
+          "rail": 0
+        }
+      },
+      {
+        "id": "guaira-patio-comportas",
+        "count": 7,
+        "families": {
+          "minion": 3,
+          "helmet": 3,
+          "charger": 0,
+          "loader": 1,
+          "agitator": 0,
+          "rail": 0
+        }
+      },
+      {
+        "id": "guaira-respiros",
+        "count": 7,
+        "families": {
+          "minion": 2,
+          "helmet": 3,
+          "charger": 0,
+          "loader": 1,
+          "agitator": 1,
+          "rail": 0
+        }
+      },
+      {
+        "id": "guaira-subida",
+        "count": 8,
+        "families": {
+          "minion": 2,
+          "helmet": 3,
+          "charger": 1,
+          "loader": 2,
+          "agitator": 0,
+          "rail": 0
+        }
+      },
+      {
+        "id": "guaira-galeria",
+        "count": 7,
+        "families": {
+          "minion": 3,
+          "helmet": 2,
+          "charger": 0,
+          "loader": 2,
+          "agitator": 0,
+          "rail": 0
+        }
+      },
+      {
+        "id": "guaira-camara-alivio",
+        "count": 7,
+        "families": {
+          "minion": 2,
+          "helmet": 2,
+          "charger": 0,
+          "loader": 2,
+          "agitator": 0,
+          "rail": 1
+        }
+      }
+    ]
+  },
+  "rendering": {
+    "invisibleBarrelsFixed": true,
+    "courseAndIntroductorySeamCovered": true,
+    "sharedHeldAndFlyingSprite": [
+      14,
+      16
+    ],
+    "readOnlyPaint": true,
+    "pixelGrid": true
+  },
+  "encounters": {
+    "setup": "ordinary checkpoint loading in test save",
+    "nativeInputOnly": true,
+    "actorOrClockEdits": false,
+    "simulationHz": 60,
+    "captureFps": 30,
+    "routes": {
+      "pincer-counter": {
+        "frames": 138,
+        "videoFrames": 69,
+        "damage": [],
+        "killed": false,
+        "checkpoint": 3,
+        "minHead": 40.118808464,
+        "maxFeet": 164.29690941689915
+      },
+      "pincer-hit": {
+        "frames": 99,
+        "videoFrames": 49,
+        "damage": [
+          75
+        ],
+        "killed": false,
+        "checkpoint": 3,
+        "minHead": 136,
+        "maxFeet": 164
+      },
+      "loader-counter": {
+        "frames": 455,
+        "videoFrames": 227,
+        "damage": [],
+        "killed": true,
+        "checkpoint": 6,
+        "minHead": 38.61873064000001,
+        "maxFeet": 164.0007063285438
+      },
+      "loader-hit": {
+        "frames": 353,
+        "videoFrames": 176,
+        "damage": [
+          329
+        ],
+        "killed": false,
+        "checkpoint": 6,
+        "minHead": 40.118808464,
+        "maxFeet": 164
+      }
+    }
+  },
+  "browser": {
+    "physicalDevice": false,
+    "keyboardAndSimulatedTouchRuns": 8,
+    "pausedStateAndPixels": 4,
+    "reducedMotion": true,
+    "errors": []
+  },
+  "campaign": {
+    "normalCampaign": true,
+    "input": "standard Gamepad API confirm",
+    "physicalDevice": false,
+    "scenes": [
+      "guaira-travessia",
+      "guaira-patio-comportas",
+      "guaira-respiros",
+      "guaira-lab",
+      "guaira-subida",
+      "guaira-prefeito",
+      "guaira-galeria",
+      "guaira-camara-alivio"
+    ],
+    "runs": [
+      {
+        "id": "guaira-travessia",
+        "frames": 2354,
+        "finished": true,
+        "coins": 23
+      },
+      {
+        "id": "guaira-patio-comportas",
+        "frames": 3425,
+        "finished": true,
+        "coins": 11
+      },
+      {
+        "id": "guaira-respiros",
+        "frames": 2132,
+        "finished": true,
+        "coins": 15
+      },
+      {
+        "id": "guaira-lab",
+        "frames": 1274,
+        "finished": true,
+        "coins": 0
+      },
+      {
+        "id": "guaira-subida",
+        "frames": 2566,
+        "finished": true,
+        "coins": 17
+      },
+      {
+        "id": "guaira-prefeito",
+        "frames": 2196,
+        "finished": true,
+        "coins": 0
+      },
+      {
+        "id": "guaira-galeria",
+        "frames": 2011,
+        "finished": true,
+        "coins": 16
+      },
+      {
+        "id": "guaira-camara-alivio",
+        "frames": 1390,
+        "finished": true,
+        "coins": 10
+      },
+      {
+        "id": "guaira-patio-comportas",
+        "frames": 3425,
+        "finished": true,
+        "coins": 11
+      }
+    ],
+    "errors": []
+  },
+  "review": {
+    "viewports": [
+      1440,
+      390
+    ],
+    "decodedVideos": 10,
+    "noHorizontalOverflow": true,
+    "errors": []
+  },
+  "sources": {
+    "src/adventure/WorldEnemies.ts": "f360f669fa40fca9b0e8eaf1f59460c069df738f461a1758d8d18374b2a43f60",
+    "src/adventure/types.ts": "5d092d39d076632b67266f267037d5e3f1069935c0fa84959b32d2b0daf7df47",
+    "src/adventure/experimental/guaira/GuairaCourseDesign.ts": "7e7338d491e92ae87dc8826e56257a142d5694e56e02b74af1839b6cef2fe6af",
+    "src/adventure/experimental/guaira/GuairaCourseGuidance.ts": "8ab98e8b7ef08aa95090a759671c12b992b6d7c619f35c73aca93aba5c557832",
+    "src/adventure/experimental/guaira/GuairaCoursePresentation.ts": "313f2de90fe0df2bd8ee465135ecafc3be0503138879b096b58e685f11e9a84a",
+    "src/adventure/experimental/guaira/GuairaFoeArt.ts": "1742562a2aa594353e8cc44f3a1c31a2aba30dc751d24652c14b89b4fe991a90",
+    "src/adventure/experimental/guaira/GuairaFoeProjectiles.ts": "21cca2cd1d231921ef868c20674dcc435f2f6112904652536918dbbd8a593b9c"
+  },
+  "limitations": [
+    "Counterplay clips start from ordinary checkpoints in a test save; full chapter traversal is checked separately.",
+    "The six-family animation is an authored pose study, not a player completion.",
+    "Touch and gamepad inputs are simulated in a desktop browser, not physical devices.",
+    "Scripted routes establish executable responses and regression coverage; they do not establish first-time player enjoyment or discovery difficulty."
+  ],
+  "evidence": {
+    "native": "native-verification.json",
+    "art": "art-verification.json",
+    "browser": "browser-verification.json",
+    "campaign": "campaign-verification.json",
+    "review": "review-verification.json"
+  }
+}

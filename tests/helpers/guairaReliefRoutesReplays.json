@@ -1,6 +1,6 @@
 {
   "high": {
-    "frames": 613,
+    "frames": 1390,
     "runs": [
       [
         39,
@@ -63,15 +63,7 @@
         ]
       ],
       [
-        14,
-        [
-          "ArrowRight",
-          "ShiftLeft",
-          "Space"
-        ]
-      ],
-      [
-        38,
+        52,
         [
           "ArrowRight",
           "ShiftLeft",
@@ -101,11 +93,132 @@
       [
         30,
         []
+      ],
+      [
+        136,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        48,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        21,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        91,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        11,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        75,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        46,
+        []
+      ],
+      [
+        59,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        67,
+        []
+      ],
+      [
+        49,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        30,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
       ]
-    ]
+    ],
+    "coins": 10,
+    "introductionFrames": 613
   },
   "opened": {
-    "frames": 601,
+    "frames": 1389,
     "runs": [
       [
         39,
@@ -220,7 +333,128 @@
       [
         30,
         []
+      ],
+      [
+        134,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        48,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        21,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        91,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        11,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        74,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        61,
+        []
+      ],
+      [
+        60,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        66,
+        []
+      ],
+      [
+        49,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        29,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
       ]
-    ]
+    ],
+    "coins": 10,
+    "introductionFrames": 601
   }
 }

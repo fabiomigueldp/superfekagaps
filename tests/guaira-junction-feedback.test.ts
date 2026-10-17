@@ -35,7 +35,7 @@ test('native replay gives both low riders travel feedback and never calls an air
             if (frame >= 546 && frame <= 556) { assert.match(h.status.textContent, /No tabuleiro B · subindo/); lowB++; }
         }
     }
-    assert.equal(lowA, 30); assert.equal(lowB, 11); assert.equal(frame, 893); assert.equal(g.finished, true);
+    assert.equal(lowA, 30); assert.equal(lowB, 11); assert.equal(frame, recording.frames); assert.equal(g.finished, true);
 });
 
 test('recovery requires real dry support; partial deck overlap, the dock and airborne feet are distinct', t => {

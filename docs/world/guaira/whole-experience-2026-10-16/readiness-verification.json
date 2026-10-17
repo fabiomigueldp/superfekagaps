@@ -1,0 +1,102 @@
+{
+  "date": "2026-10-16",
+  "scope": "Guaíra: complete native controller continuity, pause/help/completion, real death and checkpoint recovery",
+  "sourceSHA256": {
+    "src/adventure/WorldGame.ts": "30890b3e79069a3c059e9054710249a0be92bd7feb5e2b0764730e113801e319",
+    "src/adventure/WorldControlsHelp.ts": "e100b5a7d7a5b72a910b3a0c49b25b1c04619fff27587c8f44bcb03db5173762",
+    "src/adventure/world-controls-help.css": "8492b59da619e392b702f4430f91efe6d8e8b4d2b5a98255d223165724a1d896",
+    "src/adventure/experimental/guaira/chapter/GuairaChapterApp.ts": "ee301c335550c30b0876643be3f27aa46de4543e5cfe18e530fd1cfc823bf990",
+    "src/adventure/experimental/guaira/chapter/GuairaChapterChrome.ts": "6e5bfee87502444b08ba98bd5e240d07ea5bccd8d048b568f5ed112fdfee9741",
+    "src/adventure/experimental/guaira/chapter/GuairaChapterControlsHelp.ts": "55ae101d81a785aa51ba79a981ee528509497beafc9c1a379c786b8a4ef9ed0f",
+    "src/adventure/experimental/guaira/GuairaTraversal.ts": "bcd6df236ab0c67759df52256d3cf1bab709113d9d6304aadd946007d00b0e24",
+    "src/adventure/experimental/guaira/GuairaAscent.ts": "9fdfb8dcfddb12897e49d80c3e652538a45ed9042260b7627a60a6e8b5df4d3c",
+    "src/adventure/experimental/guaira/GuairaBullLab.ts": "580517824f48c5676fb2788b57f96ad62d6d5e512dbe4e3169502c66e67470b5",
+    "src/adventure/experimental/guaira/respiros/GuairaRespiros.ts": "6ec5425c28cc3afdde214c86847612ce6bcb092013fe2d32bd56afecada4bbab",
+    "src/adventure/experimental/guaira/junction/GuairaJunction.ts": "74e5fe26e7ce943efbacc3c1d6622eb11626caf3ee2499c769dee15c1435db79",
+    "src/adventure/experimental/guaira/gallery/GuairaGallery.ts": "32897dca6146edcd46ab07263e3a6c9765a4e39404a3362e49f0335ff42af132",
+    "src/adventure/experimental/guaira/relief/GuairaRelief.ts": "45e14a023aad27139eff76cfd083bed730f9c5a8e40e46419743f8f2f726c1de"
+  },
+  "tests": {
+    "guaira": {
+      "passed": 1212,
+      "failed": 0,
+      "log": "output/guaira/controller-readiness-2026-10-16/all-tests-final.log",
+      "sha256": "19065521a1b6bbcf31071dafed96c7bcf324dd8496363858e49af627f4220d0e"
+    },
+    "shared": {
+      "passed": 286,
+      "failed": 0,
+      "log": "output/guaira/controller-readiness-2026-10-16/world-tests-final.log",
+      "sha256": "d9c1e79050240841064dfcdcfbe46f8bba9924c570b71e91311f9b949bca062c"
+    }
+  },
+  "build": {
+    "passed": true,
+    "log": "output/guaira/controller-readiness-2026-10-16/build-final.log",
+    "sha256": "2cb7fe22740fb95623aa483257000beedeae2a5fc4972a98598fe3480d759cee"
+  },
+  "campaign": {
+    "record": "controller-campaign-verification.json",
+    "normalProgression": true,
+    "initialFixture": "Factory prerequisites only; no Guaíra receipt or development access",
+    "completedRuns": 9,
+    "distinctScenes": 8,
+    "normalMapWalking": true,
+    "mapSelection": "native phase buttons",
+    "levelAndEntryControls": "standard Gamepad API simulation",
+    "physicalDevice": false
+  },
+  "recovery": {
+    "nativeMistakes": [
+      "water damage and death before first checkpoint",
+      "water damage and death after first checkpoint"
+    ],
+    "positionOrHazardEdits": false,
+    "bothRecoveredAndCompleted": true
+  },
+  "surfaces": {
+    "record": "controller-surface-verification.json",
+    "viewports": [
+      [
+        1440,
+        900
+      ],
+      [
+        844,
+        390
+      ],
+      [
+        390,
+        844
+      ]
+    ],
+    "pausedPixelsFrozen": true,
+    "reducedMotion": true,
+    "helpScrollAndBack": true,
+    "disconnectAndFocus": true,
+    "keyboardAlongsideController": true,
+    "retryDisposesPreviousRuntime": true
+  },
+  "model": {
+    "priorAudit": "model-verification.json",
+    "sourceUnchanged": true,
+    "currentSourceSHA256": "1993480be169eb419e8111196712b556572225ab296edbe0801fe11a8a1fde27",
+    "closedMeshes": 548,
+    "routeSamples": 590,
+    "supportProbes": 1770,
+    "unsupported": 0,
+    "bodyContacts": 0,
+    "rerun": false
+  },
+  "artAndDesign": {
+    "review": "index.html#interiores",
+    "eightSceneSurvey": "scene-survey.json",
+    "unchangedFromPriorWholeExperienceReview": true
+  },
+  "limits": [
+    "Runs use rehearsed input and do not measure first-play discovery or subjective fun.",
+    "Gamepad and touch are simulated browser devices; no physical controller was connected.",
+    "Difficulty calibration with external first-time players has not been conducted."
+  ],
+  "review": "readiness-review-verification.json"
+}

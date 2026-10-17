@@ -214,7 +214,7 @@ test('mixed ownership completes the exact native two-lift journey without changi
         }
         assert.equal(frame, recording.frames); assert.equal(game.finished, true);
         assert.ok(carriesA > 70); assert.ok(carriesB > 100);
-        assert.equal(game.store.save.checkpoint?.index, 0);
+        assert.equal(game.store.save.checkpoint?.index, game.stage.checkpoints.length-1);
         assert.deepEqual(game.store.save.completed, []); assert.deepEqual(game.store.save.times, {});
         assert.equal(game.mapReturnHref, './guaira.html?at=rice&visit=junction-clear');
         game.render(); assert.match(h.status.textContent, /Pátio concluído/);
@@ -224,5 +224,5 @@ test('mixed ownership completes the exact native two-lift journey without changi
     }
     const mixed = journey(true), baseline = journey(false);
     assert.deepEqual(mixed, baseline, 'Every native movement, jump, routing and checkpoint step matches ordinary controls.');
-    t.diagnostic(`${mixed.trace.length} identical native frames; lift A: ${mixed.carriesA} carried frames; lift B: ${mixed.carriesB}; checkpoint 0; native completion.`);
+    t.diagnostic(`${mixed.trace.length} identical native frames; lift A: ${mixed.carriesA} carried frames; lift B: ${mixed.carriesB}; final checkpoint; native completion.`);
 });

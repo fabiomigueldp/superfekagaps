@@ -2,9 +2,13 @@
   "evidence": "Frozen native keyboard/touch replay through Input/WorldGame/Player; automated offline DOM harness, no reposition or clock editing.",
   "baselineCommit": "c0e31ea5c3e5340dcb2a29740b74d9d3231cff8b",
   "stepMs": 16.666666666666668,
-  "initialSettleFrames": 1,
-  "inputFrames": 877,
+  "initialSettleFrames": 0,
+  "inputFrames": 1880,
   "runs": [
+    [
+      1,
+      []
+    ],
     [
       43,
       [
@@ -50,13 +54,190 @@
       [
         "ArrowRight"
       ]
+    ],
+    [
+      113,
+      [
+        "ArrowRight",
+        "ShiftLeft"
+      ]
+    ],
+    [
+      44,
+      []
+    ],
+    [
+      42,
+      [
+        "ArrowRight",
+        "ShiftLeft"
+      ]
+    ],
+    [
+      24,
+      [
+        "ArrowRight",
+        "ShiftLeft",
+        "Space"
+      ]
+    ],
+    [
+      153,
+      [
+        "ArrowRight",
+        "ShiftLeft"
+      ]
+    ],
+    [
+      24,
+      [
+        "ArrowRight",
+        "ShiftLeft",
+        "Space"
+      ]
+    ],
+    [
+      62,
+      [
+        "ArrowRight",
+        "ShiftLeft"
+      ]
+    ],
+    [
+      24,
+      [
+        "ArrowRight",
+        "ShiftLeft",
+        "Space"
+      ]
+    ],
+    [
+      18,
+      [
+        "ArrowRight",
+        "ShiftLeft"
+      ]
+    ],
+    [
+      38,
+      []
+    ],
+    [
+      17,
+      [
+        "ArrowRight",
+        "ShiftLeft"
+      ]
+    ],
+    [
+      24,
+      [
+        "ArrowRight",
+        "ShiftLeft",
+        "Space"
+      ]
+    ],
+    [
+      89,
+      [
+        "ArrowRight",
+        "ShiftLeft"
+      ]
+    ],
+    [
+      24,
+      [
+        "ArrowRight",
+        "ShiftLeft",
+        "Space"
+      ]
+    ],
+    [
+      18,
+      [
+        "ArrowRight",
+        "ShiftLeft"
+      ]
+    ],
+    [
+      24,
+      [
+        "ArrowRight",
+        "ShiftLeft",
+        "Space"
+      ]
+    ],
+    [
+      114,
+      [
+        "ArrowRight",
+        "ShiftLeft"
+      ]
+    ],
+    [
+      20,
+      [
+        "ArrowRight",
+        "ShiftLeft",
+        "Space"
+      ]
+    ],
+    [
+      7,
+      [
+        "ArrowLeft"
+      ]
+    ],
+    [
+      22,
+      []
+    ],
+    [
+      10,
+      [
+        "ArrowRight",
+        "ShiftLeft"
+      ]
+    ],
+    [
+      24,
+      [
+        "ArrowRight",
+        "ShiftLeft",
+        "Space"
+      ]
+    ],
+    [
+      17,
+      [
+        "ArrowRight",
+        "ShiftLeft"
+      ]
+    ],
+    [
+      24,
+      [
+        "ArrowRight",
+        "ShiftLeft",
+        "Space"
+      ]
+    ],
+    [
+      26,
+      [
+        "ArrowRight",
+        "ShiftLeft"
+      ]
     ]
   ],
   "expected": {
-    "x": 1088.4013627554818,
+    "x": 4194.402913482416,
     "feetY": 304,
     "helmet": true,
-    "checkpointIndex": 1,
+    "checkpointIndex": 6,
     "finished": true
-  }
+  },
+  "frames": 1880,
+  "coins": 8,
+  "introductionFrames": 878
 }

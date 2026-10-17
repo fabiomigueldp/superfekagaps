@@ -1,4 +1,5 @@
 import { DisposalScope } from '../engine/DisposalScope';
+import type { GamepadMenuCommand } from '../engine/StandardGamepad';
 
 interface ControlsHelpHost {
     canOpen(): boolean;
@@ -13,6 +14,7 @@ export interface ControlsHelpContent {
     navigation?: readonly string[];
     touch?: string;
     closeLabel?: string;
+    footerHint?: string;
 }
 
 /** Readable reference only; the host retains its settings/paused state and save. */
@@ -21,6 +23,7 @@ export class WorldControlsHelp {
     readonly dialog = document.createElement('dialog');
     readonly closeButton = document.createElement('button');
     private readonly heading = document.createElement('h2');
+    private readonly content = document.createElement('div');
     private opened = false;
     private restoreFocus: HTMLElement | null = null;
     private originalInert = false;
@@ -32,7 +35,7 @@ export class WorldControlsHelp {
             const titleId = contentOptions.id ? `${contentOptions.id}-title` : 'world-controls-title';
             this.dialog.setAttribute('aria-labelledby', titleId);
             this.heading.id = titleId; this.heading.textContent = 'CONTROLES'; this.heading.tabIndex = -1;
-            const content = document.createElement('div'); content.className = 'world-controls-content'; content.tabIndex = 0;
+            const content = this.content; content.className = 'world-controls-content'; content.tabIndex = 0;
             content.setAttribute('role', 'region'); content.setAttribute('aria-label', contentOptions.regionLabel ?? 'Controles da aventura World');
             const list = document.createElement('dl');
             for (const [action, keys] of [
@@ -60,6 +63,10 @@ export class WorldControlsHelp {
             const footer = document.createElement('footer');
             this.closeButton.type = 'button'; this.closeButton.textContent = contentOptions.closeLabel ?? 'VOLTAR ÀS OPÇÕES';
             if (contentOptions.id) this.closeButton.id = `${contentOptions.id}-close`;
+            if (contentOptions.footerHint) {
+                const hint = document.createElement('p'); hint.className = 'world-controls-footer-hint';
+                hint.textContent = contentOptions.footerHint; footer.append(hint);
+            }
             footer.append(this.closeButton); this.dialog.append(this.heading, content, footer); document.body.append(this.dialog);
             this.lifetime.listen(this.closeButton, 'click', () => this.close());
             this.lifetime.listen(this.dialog, 'cancel', event => { event.preventDefault(); this.close(); });
@@ -82,6 +89,18 @@ export class WorldControlsHelp {
     }
 
     get isOpen(): boolean { return this.opened; }
+
+    /** An opt-in host can route its controller to this modal, never behind it. */
+    canControl(): boolean {
+        return this.opened && !this.lifetime.isDisposed && !document.hidden && this.host.canOpen()
+            && (typeof document.hasFocus !== 'function' || document.hasFocus())
+            && this.dialog.contains(document.activeElement);
+    }
+    control(command: GamepadMenuCommand): void {
+        if (!this.canControl()) return;
+        if (command === 'confirm' || command === 'back' || command === 'pause') this.close();
+        else if (command === 'up' || command === 'down') this.content.scrollBy({ top: command === 'up' ? -96 : 96, behavior: 'instant' });
+    }
 
     open(): void {
         if (this.opened || this.lifetime.isDisposed || !this.host.canOpen() || document.hidden) return;

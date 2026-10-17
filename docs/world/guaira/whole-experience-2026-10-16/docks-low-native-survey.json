@@ -1,0 +1,3540 @@
+{
+  "nativeInputOnly": true,
+  "actorOrClockEdits": false,
+  "baseline": false,
+  "conservativeTopNote": "minHelmet uses a conservative physics y-10 bound; the real sprite top is y-4, verified separately in browser-verification.json.",
+  "baselineHashes": {},
+  "scenes": {
+    "travessia": {
+      "frames": 2296,
+      "minHelmet": 26,
+      "maxFeet": 168,
+      "maxCameraStepY": 8,
+      "maxCameraStepX": 5.907965153966927,
+      "contacts": [
+        {
+          "n": 1,
+          "x": 48,
+          "feet": 224
+        },
+        {
+          "n": 10,
+          "x": 65,
+          "feet": 224
+        },
+        {
+          "n": 20,
+          "x": 99,
+          "feet": 224
+        },
+        {
+          "n": 29,
+          "x": 131,
+          "feet": 224
+        },
+        {
+          "n": 38,
+          "x": 162,
+          "feet": 224
+        },
+        {
+          "n": 47,
+          "x": 194,
+          "feet": 224
+        },
+        {
+          "n": 56,
+          "x": 225,
+          "feet": 224
+        },
+        {
+          "n": 65,
+          "x": 257,
+          "feet": 224
+        },
+        {
+          "n": 74,
+          "x": 288,
+          "feet": 224
+        },
+        {
+          "n": 84,
+          "x": 323,
+          "feet": 224
+        },
+        {
+          "n": 93,
+          "x": 354,
+          "feet": 224
+        },
+        {
+          "n": 285,
+          "x": 387,
+          "feet": 224
+        },
+        {
+          "n": 294,
+          "x": 418,
+          "feet": 224
+        },
+        {
+          "n": 303,
+          "x": 450,
+          "feet": 224
+        },
+        {
+          "n": 312,
+          "x": 481,
+          "feet": 224
+        },
+        {
+          "n": 321,
+          "x": 513,
+          "feet": 224
+        },
+        {
+          "n": 330,
+          "x": 544,
+          "feet": 224
+        },
+        {
+          "n": 340,
+          "x": 579,
+          "feet": 224
+        },
+        {
+          "n": 349,
+          "x": 611,
+          "feet": 224
+        },
+        {
+          "n": 358,
+          "x": 642,
+          "feet": 224
+        },
+        {
+          "n": 367,
+          "x": 674,
+          "feet": 224
+        },
+        {
+          "n": 423,
+          "x": 755,
+          "feet": 208
+        },
+        {
+          "n": 450,
+          "x": 796,
+          "feet": 256
+        },
+        {
+          "n": 453,
+          "x": 802,
+          "feet": 256
+        },
+        {
+          "n": 478,
+          "x": 834,
+          "feet": 256
+        },
+        {
+          "n": 494,
+          "x": 866,
+          "feet": 256
+        },
+        {
+          "n": 512,
+          "x": 897,
+          "feet": 256
+        },
+        {
+          "n": 535,
+          "x": 929,
+          "feet": 256
+        },
+        {
+          "n": 585,
+          "x": 948,
+          "feet": 240
+        },
+        {
+          "n": 593,
+          "x": 961,
+          "feet": 240
+        },
+        {
+          "n": 623,
+          "x": 980,
+          "feet": 224
+        },
+        {
+          "n": 631,
+          "x": 993,
+          "feet": 224
+        },
+        {
+          "n": 663,
+          "x": 1025,
+          "feet": 224
+        },
+        {
+          "n": 679,
+          "x": 1057,
+          "feet": 224
+        },
+        {
+          "n": 860,
+          "x": 1088,
+          "feet": 224
+        },
+        {
+          "n": 871,
+          "x": 1123,
+          "feet": 224
+        },
+        {
+          "n": 880,
+          "x": 1154,
+          "feet": 224
+        },
+        {
+          "n": 889,
+          "x": 1186,
+          "feet": 224
+        },
+        {
+          "n": 898,
+          "x": 1217,
+          "feet": 224
+        },
+        {
+          "n": 907,
+          "x": 1249,
+          "feet": 224
+        },
+        {
+          "n": 916,
+          "x": 1280,
+          "feet": 224
+        },
+        {
+          "n": 926,
+          "x": 1314,
+          "feet": 224
+        },
+        {
+          "n": 975,
+          "x": 1400,
+          "feet": 192
+        },
+        {
+          "n": 979,
+          "x": 1408,
+          "feet": 192
+        },
+        {
+          "n": 1005,
+          "x": 1442,
+          "feet": 192
+        },
+        {
+          "n": 1021,
+          "x": 1474,
+          "feet": 192
+        },
+        {
+          "n": 1037,
+          "x": 1506,
+          "feet": 192
+        },
+        {
+          "n": 1056,
+          "x": 1536,
+          "feet": 192
+        },
+        {
+          "n": 1092,
+          "x": 1569,
+          "feet": 192
+        },
+        {
+          "n": 1101,
+          "x": 1601,
+          "feet": 192
+        },
+        {
+          "n": 1110,
+          "x": 1632,
+          "feet": 192
+        },
+        {
+          "n": 1120,
+          "x": 1667,
+          "feet": 192
+        },
+        {
+          "n": 1151,
+          "x": 1776,
+          "feet": 96
+        },
+        {
+          "n": 1191,
+          "x": 1877,
+          "feet": 64
+        },
+        {
+          "n": 1264,
+          "x": 1970,
+          "feet": 64
+        },
+        {
+          "n": 1275,
+          "x": 1984,
+          "feet": 64
+        },
+        {
+          "n": 1326,
+          "x": 2065,
+          "feet": 128
+        },
+        {
+          "n": 1376,
+          "x": 2137,
+          "feet": 192
+        },
+        {
+          "n": 1384,
+          "x": 2144,
+          "feet": 192
+        },
+        {
+          "n": 1395,
+          "x": 2179,
+          "feet": 192
+        },
+        {
+          "n": 1404,
+          "x": 2211,
+          "feet": 192
+        },
+        {
+          "n": 1413,
+          "x": 2242,
+          "feet": 192
+        },
+        {
+          "n": 1467,
+          "x": 2275,
+          "feet": 192
+        },
+        {
+          "n": 1482,
+          "x": 2304,
+          "feet": 192
+        },
+        {
+          "n": 1576,
+          "x": 2337,
+          "feet": 192
+        },
+        {
+          "n": 1585,
+          "x": 2369,
+          "feet": 192
+        },
+        {
+          "n": 1594,
+          "x": 2400,
+          "feet": 192
+        },
+        {
+          "n": 1604,
+          "x": 2435,
+          "feet": 192
+        },
+        {
+          "n": 1613,
+          "x": 2467,
+          "feet": 192
+        },
+        {
+          "n": 1622,
+          "x": 2498,
+          "feet": 192
+        },
+        {
+          "n": 1669,
+          "x": 2663,
+          "feet": 192
+        },
+        {
+          "n": 1677,
+          "x": 2691,
+          "feet": 192
+        },
+        {
+          "n": 1686,
+          "x": 2722,
+          "feet": 192
+        },
+        {
+          "n": 1695,
+          "x": 2754,
+          "feet": 192
+        },
+        {
+          "n": 1704,
+          "x": 2785,
+          "feet": 192
+        },
+        {
+          "n": 1713,
+          "x": 2817,
+          "feet": 192
+        },
+        {
+          "n": 1722,
+          "x": 2848,
+          "feet": 192
+        },
+        {
+          "n": 1732,
+          "x": 2883,
+          "feet": 192
+        },
+        {
+          "n": 1741,
+          "x": 2915,
+          "feet": 192
+        },
+        {
+          "n": 1750,
+          "x": 2946,
+          "feet": 192
+        },
+        {
+          "n": 1759,
+          "x": 2978,
+          "feet": 192
+        },
+        {
+          "n": 1768,
+          "x": 3009,
+          "feet": 192
+        },
+        {
+          "n": 1778,
+          "x": 3042,
+          "feet": 192
+        },
+        {
+          "n": 1814,
+          "x": 3073,
+          "feet": 192
+        },
+        {
+          "n": 1823,
+          "x": 3104,
+          "feet": 192
+        },
+        {
+          "n": 1833,
+          "x": 3139,
+          "feet": 192
+        },
+        {
+          "n": 1879,
+          "x": 3300,
+          "feet": 192
+        },
+        {
+          "n": 1887,
+          "x": 3328,
+          "feet": 192
+        },
+        {
+          "n": 1897,
+          "x": 3363,
+          "feet": 192
+        },
+        {
+          "n": 1921,
+          "x": 3395,
+          "feet": 192
+        },
+        {
+          "n": 1930,
+          "x": 3426,
+          "feet": 192
+        },
+        {
+          "n": 1939,
+          "x": 3458,
+          "feet": 192
+        },
+        {
+          "n": 1948,
+          "x": 3489,
+          "feet": 192
+        },
+        {
+          "n": 2032,
+          "x": 3587,
+          "feet": 192
+        },
+        {
+          "n": 2046,
+          "x": 3617,
+          "feet": 192
+        },
+        {
+          "n": 2055,
+          "x": 3648,
+          "feet": 192
+        },
+        {
+          "n": 2065,
+          "x": 3683,
+          "feet": 192
+        },
+        {
+          "n": 2114,
+          "x": 3779,
+          "feet": 192
+        },
+        {
+          "n": 2138,
+          "x": 3808,
+          "feet": 192
+        },
+        {
+          "n": 2190,
+          "x": 3925,
+          "feet": 192
+        },
+        {
+          "n": 2196,
+          "x": 3937,
+          "feet": 192
+        },
+        {
+          "n": 2222,
+          "x": 3970,
+          "feet": 192
+        },
+        {
+          "n": 2231,
+          "x": 4001,
+          "feet": 192
+        },
+        {
+          "n": 2240,
+          "x": 4033,
+          "feet": 192
+        },
+        {
+          "n": 2249,
+          "x": 4064,
+          "feet": 192
+        },
+        {
+          "n": 2296,
+          "x": 4229,
+          "feet": 192
+        }
+      ],
+      "hints": [],
+      "snapshots": [
+        {
+          "n": 1,
+          "file": "travessia-1.png",
+          "p": {
+            "x": 48.3,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 0,
+            "y": 60
+          },
+          "status": "Guaíra fictícia · setas/A D: mover · Espaço: pular · baixo no ar: sentada · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 15,
+          "file": "travessia-15.png",
+          "p": {
+            "x": 81.8,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 0,
+            "y": 60
+          },
+          "status": "Guaíra fictícia · setas/A D: mover · Espaço: pular · baixo no ar: sentada · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 30,
+          "file": "travessia-30.png",
+          "p": {
+            "x": 134.3,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 8.613084355805185,
+            "y": 60
+          },
+          "status": "Guaíra fictícia · setas/A D: mover · Espaço: pular · baixo no ar: sentada · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 45,
+          "file": "travessia-45.png",
+          "p": {
+            "x": 186.8,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 51.74706965596973,
+            "y": 60
+          },
+          "status": "Guaíra fictícia · setas/A D: mover · Espaço: pular · baixo no ar: sentada · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 60,
+          "file": "travessia-60.png",
+          "p": {
+            "x": 239.3,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 112.47943302636773,
+            "y": 60
+          },
+          "status": "Guaíra fictícia · setas/A D: mover · Espaço: pular · baixo no ar: sentada · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 75,
+          "file": "travessia-75.png",
+          "p": {
+            "x": 291.8,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 196.4256000155534,
+            "y": 60
+          },
+          "status": "Pule primeiro. No ar, aperte baixo sobre a placa; espere a ponte subir"
+        },
+        {
+          "n": 90,
+          "file": "travessia-90.png",
+          "p": {
+            "x": 344.3,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 283.55718138436964,
+            "y": 60
+          },
+          "status": "Pule primeiro. No ar, aperte baixo sobre a placa; espere a ponte subir"
+        },
+        {
+          "n": 105,
+          "file": "travessia-105.png",
+          "p": {
+            "x": 368.73537437761274,
+            "y": 192.5
+          },
+          "feet": 216.5,
+          "camera": {
+            "x": 325.86685483061325,
+            "y": 60
+          },
+          "status": "Pule primeiro. No ar, aperte baixo sobre a placa; espere a ponte subir"
+        },
+        {
+          "n": 120,
+          "file": "travessia-120.png",
+          "p": {
+            "x": 370.47991223846697,
+            "y": 132.4000000000001
+          },
+          "feet": 156.4000000000001,
+          "camera": {
+            "x": 333.2996194228736,
+            "y": 60
+          },
+          "status": "Pule primeiro. No ar, aperte baixo sobre a placa; espere a ponte subir"
+        },
+        {
+          "n": 135,
+          "file": "travessia-135.png",
+          "p": {
+            "x": 370.47991223846697,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 334.30644005462864,
+            "y": 60
+          },
+          "status": "Água liberada · a ponte está subindo"
+        },
+        {
+          "n": 150,
+          "file": "travessia-150.png",
+          "p": {
+            "x": 370.47991223846697,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 334.4544163630638,
+            "y": 60
+          },
+          "status": "Água liberada · a ponte está subindo"
+        },
+        {
+          "n": 154,
+          "file": "travessia-154.png",
+          "p": {
+            "x": 370.47991223846697,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 334.46462248028854,
+            "y": 60
+          },
+          "status": "Água liberada · a ponte está subindo"
+        },
+        {
+          "n": 165,
+          "file": "travessia-165.png",
+          "p": {
+            "x": 370.47991223846697,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 334.4761650114004,
+            "y": 60
+          },
+          "status": "Água liberada · a ponte está subindo"
+        },
+        {
+          "n": 180,
+          "file": "travessia-180.png",
+          "p": {
+            "x": 370.47991223846697,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 334.47936149406354,
+            "y": 60
+          },
+          "status": "Água liberada · a ponte está subindo"
+        },
+        {
+          "n": 195,
+          "file": "travessia-195.png",
+          "p": {
+            "x": 370.47991223846697,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 334.4798312934395,
+            "y": 60
+          },
+          "status": "Água liberada · a ponte está subindo"
+        },
+        {
+          "n": 210,
+          "file": "travessia-210.png",
+          "p": {
+            "x": 370.47991223846697,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 334.4799003416643,
+            "y": 60
+          },
+          "status": "Água liberada · a ponte está subindo"
+        },
+        {
+          "n": 225,
+          "file": "travessia-225.png",
+          "p": {
+            "x": 370.47991223846697,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 334.47991048994794,
+            "y": 60
+          },
+          "status": "Água liberada · a ponte está subindo"
+        },
+        {
+          "n": 240,
+          "file": "travessia-240.png",
+          "p": {
+            "x": 370.47991223846697,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 334.47991198148037,
+            "y": 60
+          },
+          "status": "Água liberada · a ponte está subindo"
+        },
+        {
+          "n": 255,
+          "file": "travessia-255.png",
+          "p": {
+            "x": 370.47991223846697,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 334.4799122006967,
+            "y": 60
+          },
+          "status": "Ponte pronta · atravesse até a bandeira do checkpoint"
+        },
+        {
+          "n": 270,
+          "file": "travessia-270.png",
+          "p": {
+            "x": 370.47991223846697,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 334.47991223291575,
+            "y": 60
+          },
+          "status": "Ponte pronta · atravesse até a bandeira do checkpoint"
+        },
+        {
+          "n": 285,
+          "file": "travessia-285.png",
+          "p": {
+            "x": 386.97991223846697,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 346.27090508024884,
+            "y": 60
+          },
+          "status": "Ponte pronta · atravesse até a bandeira do checkpoint"
+        },
+        {
+          "n": 300,
+          "file": "travessia-300.png",
+          "p": {
+            "x": 439.279912238467,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 392.6492008633272,
+            "y": 60
+          },
+          "status": "Guaíra fictícia · setas/A D: mover · Espaço: pular · baixo no ar: sentada · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 307,
+          "file": "travessia-307.png",
+          "p": {
+            "x": 463.779912238467,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 416.5366152183777,
+            "y": 60
+          },
+          "status": "Guaíra fictícia · setas/A D: mover · Espaço: pular · baixo no ar: sentada · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 315,
+          "file": "travessia-315.png",
+          "p": {
+            "x": 491.779912238467,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 444.2655039134643,
+            "y": 60
+          },
+          "status": "Guaíra fictícia · setas/A D: mover · Espaço: pular · baixo no ar: sentada · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 330,
+          "file": "travessia-330.png",
+          "p": {
+            "x": 544.279912238467,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 496.6356235670631,
+            "y": 60
+          },
+          "status": "Guaíra fictícia · setas/A D: mover · Espaço: pular · baixo no ar: sentada · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 345,
+          "file": "travessia-345.png",
+          "p": {
+            "x": 596.779912238467,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 545.8462528295012,
+            "y": 60
+          },
+          "status": "Guaíra fictícia · setas/A D: mover · Espaço: pular · baixo no ar: sentada · Shift: correr · Esc: pausa · M: som"
+        },
+        {
+          "n": 360,
+          "file": "travessia-360.png",
+          "p": {
+            "x": 649.279912238467,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 578.9811589855118,
+            "y": 60
+          },
+          "status": "Ponto seguro nesta tentativa · Dois percursos · pule pelas passarelas ou desça ao canal de inspeção; os dois chegam à próxima comporta · sair e reentrar reinicia a travessia"
+        },
+        {
+          "n": 375,
+          "file": "travessia-375.png",
+          "p": {
+            "x": 690,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 606.1463196647253,
+            "y": 86.63617438688934
+          },
+          "status": "Dois percursos · pule pelas passarelas ou desça ao canal de inspeção; os dois chegam à próxima comporta"
+        },
+        {
+          "n": 390,
+          "file": "travessia-390.png",
+          "p": {
+            "x": 694.5,
+            "y": 145.30000000000007
+          },
+          "feet": 169.30000000000007,
+          "camera": {
+            "x": 612.3969090262256,
+            "y": 91.72667306236782
+          },
+          "status": "Dois percursos · pule pelas passarelas ou desça ao canal de inspeção; os dois chegam à próxima comporta"
+        },
+        {
+          "n": 405,
+          "file": "travessia-405.png",
+          "p": {
+            "x": 724.3,
+            "y": 97.30000000000005
+          },
+          "feet": 121.30000000000005,
+          "camera": {
+            "x": 638.317420899928,
+            "y": 61.05400000000006
+          },
+          "status": "Dois percursos · pule pelas passarelas ou desça ao canal de inspeção; os dois chegam à próxima comporta"
+        },
+        {
+          "n": 420,
+          "file": "travessia-420.png",
+          "p": {
+            "x": 752.67325,
+            "y": 161.80000000000007
+          },
+          "feet": 185.80000000000007,
+          "camera": {
+            "x": 666.7041143194009,
+            "y": 86.34988651307116
+          },
+          "status": "Dois percursos · pule pelas passarelas ou desça ao canal de inspeção; os dois chegam à próxima comporta"
+        },
+        {
+          "n": 435,
+          "file": "travessia-435.png",
+          "p": {
+            "x": 765.943677657152,
+            "y": 184
+          },
+          "feet": 208,
+          "camera": {
+            "x": 681.971379792386,
+            "y": 91.71208455903532
+          },
+          "status": "Dois percursos · pule pelas passarelas ou desça ao canal de inspeção; os dois chegam à próxima comporta"
+        },
+        {
+          "n": 450,
+          "file": "travessia-450.png",
+          "p": {
+            "x": 795.943677657152,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 709.673012757129,
+            "y": 91.98532855997713
+          },
+          "status": "Canal de inspeção · siga por baixo das passarelas; o degrau à direita volta à margem e ao ponto seguro"
+        },
+        {
+          "n": 460,
+          "file": "travessia-460.png",
+          "p": {
+            "x": 811.0026498134021,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 726.0391391670829,
+            "y": 91.99798343945199
+          },
+          "status": "Canal de inspeção · siga por baixo das passarelas; o degrau à direita volta à margem e ao ponto seguro"
+        },
+        {
+          "n": 465,
+          "file": "travessia-465.png",
+          "p": {
+            "x": 813.3804542286699,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 730.0427311307066,
+            "y": 91.99925238065863
+          },
+          "status": "Canal de inspeção · siga por baixo das passarelas; o degrau à direita volta à margem e ao ponto seguro"
+        },
+        {
+          "n": 480,
+          "file": "travessia-480.png",
+          "p": {
+            "x": 837.587355314304,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 751.8929164620029,
+            "y": 91.99996190321612
+          },
+          "status": "Canal de inspeção · siga por baixo das passarelas; o degrau à direita volta à margem e ao ponto seguro"
+        },
+        {
+          "n": 495,
+          "file": "travessia-495.png",
+          "p": {
+            "x": 867.587355314304,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 781.0635807163835,
+            "y": 91.9999980586846
+          },
+          "status": "Canal de inspeção · siga por baixo das passarelas; o degrau à direita volta à margem e ao ponto seguro"
+        },
+        {
+          "n": 510,
+          "file": "travessia-510.png",
+          "p": {
+            "x": 895.0046178143041,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 809.2666969856728,
+            "y": 91.9999999010755
+          },
+          "status": "Canal de inspeção · siga por baixo das passarelas; o degrau à direita volta à margem e ao ponto seguro"
+        },
+        {
+          "n": 525,
+          "file": "travessia-525.png",
+          "p": {
+            "x": 909.231032971456,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 824.9254935795408,
+            "y": 91.99999999495905
+          },
+          "status": "Canal de inspeção · siga por baixo das passarelas; o degrau à direita volta à margem e ao ponto seguro"
+        },
+        {
+          "n": 540,
+          "file": "travessia-540.png",
+          "p": {
+            "x": 930,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 846.4230027525227,
+            "y": 91.99999999974312
+          },
+          "status": "Canal de inspeção · siga por baixo das passarelas; o degrau à direita volta à margem e ao ponto seguro"
+        },
+        {
+          "n": 555,
+          "file": "travessia-555.png",
+          "p": {
+            "x": 930,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 849.4742749291481,
+            "y": 91.99999999998691
+          },
+          "status": "Canal de inspeção · siga por baixo das passarelas; o degrau à direita volta à margem e ao ponto seguro"
+        },
+        {
+          "n": 570,
+          "file": "travessia-570.png",
+          "p": {
+            "x": 930,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 849.9227321602448,
+            "y": 91.99999999999933
+          },
+          "status": "Canal de inspeção · siga por baixo das passarelas; o degrau à direita volta à margem e ao ponto seguro"
+        },
+        {
+          "n": 585,
+          "file": "travessia-585.png",
+          "p": {
+            "x": 948.3,
+            "y": 216
+          },
+          "feet": 240,
+          "camera": {
+            "x": 863.7556211993883,
+            "y": 91.99999999999997
+          },
+          "status": "Canal de inspeção · siga por baixo das passarelas; o degrau à direita volta à margem e ao ponto seguro"
+        },
+        {
+          "n": 600,
+          "file": "travessia-600.png",
+          "p": {
+            "x": 962,
+            "y": 216
+          },
+          "feet": 240,
+          "camera": {
+            "x": 880.4086457373431,
+            "y": 91.99999999999997
+          },
+          "status": "Canal de inspeção · siga por baixo das passarelas; o degrau à direita volta à margem e ao ponto seguro"
+        },
+        {
+          "n": 613,
+          "file": "travessia-613.png",
+          "p": {
+            "x": 962.9,
+            "y": 194
+          },
+          "feet": 218,
+          "camera": {
+            "x": 883.1324252753058,
+            "y": 91.99999999999997
+          },
+          "status": "Dois percursos · pule pelas passarelas ou desça ao canal de inspeção; os dois chegam à próxima comporta"
+        },
+        {
+          "n": 615,
+          "file": "travessia-615.png",
+          "p": {
+            "x": 965,
+            "y": 191.5
+          },
+          "feet": 215.5,
+          "camera": {
+            "x": 884.8838301331967,
+            "y": 91.99999999999997
+          },
+          "status": "Dois percursos · pule pelas passarelas ou desça ao canal de inspeção; os dois chegam à próxima comporta"
+        },
+        {
+          "n": 630,
+          "file": "travessia-630.png",
+          "p": {
+            "x": 991.7172625000001,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 917.2573138965855,
+            "y": 64.39833700275075
+          },
+          "status": "Dois percursos · pule pelas passarelas ou desça ao canal de inspeção; os dois chegam à próxima comporta"
+        },
+        {
+          "n": 645,
+          "file": "travessia-645.png",
+          "p": {
+            "x": 997.0253406888705,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 932.61665793206,
+            "y": 60.224128088858386
+          },
+          "status": "Dois percursos · pule pelas passarelas ou desça ao canal de inspeção; os dois chegam à próxima comporta"
+        },
+        {
+          "n": 660,
+          "file": "travessia-660.png",
+          "p": {
+            "x": 1019.3253406888705,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 958.0284660828936,
+            "y": 60.011420998478265
+          },
+          "status": "Ponto seguro nesta tentativa · Dois percursos · pule pelas passarelas ou desça ao canal de inspeção; os dois chegam à próxima comporta · sair e reentrar reinicia a travessia"
+        },
+        {
+          "n": 675,
+          "file": "travessia-675.png",
+          "p": {
+            "x": 1049.3253406888705,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 1000.4348784295538,
+            "y": 60.00058198509123
+          },
+          "status": "Pule primeiro. No ar, aperte baixo sobre a placa; espere a ponte subir"
+        },
+        {
+          "n": 690,
+          "file": "travessia-690.png",
+          "p": {
+            "x": 1076.7426031888704,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 1042.4492977830469,
+            "y": 60.00002965648293
+          },
+          "status": "Pule primeiro. No ar, aperte baixo sobre a placa; espere a ponte subir"
+        },
+        {
+          "n": 705,
+          "file": "travessia-705.png",
+          "p": {
+            "x": 1082.0506813777406,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 1055.8688862064885,
+            "y": 60.00000151121909
+          },
+          "status": "Pule primeiro. No ar, aperte baixo sobre a placa; espere a ponte subir"
+        },
+        {
+          "n": 720,
+          "file": "travessia-720.png",
+          "p": {
+            "x": 1082.0506813777406,
+            "y": 145.30000000000007
+          },
+          "feet": 169.30000000000007,
+          "camera": {
+            "x": 1057.7300145330012,
+            "y": 60.00000007700789
+          },
+          "status": "Pule primeiro. No ar, aperte baixo sobre a placa; espere a ponte subir"
+        },
+        {
+          "n": 735,
+          "file": "travessia-735.png",
+          "p": {
+            "x": 1082.0506813777406,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 1058.003551735751,
+            "y": 60.00000000392413
+          },
+          "status": "Água liberada · a ponte está subindo"
+        },
+        {
+          "n": 750,
+          "file": "travessia-750.png",
+          "p": {
+            "x": 1082.0506813777406,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 1058.0437545526243,
+            "y": 60.00000000019996
+          },
+          "status": "Água liberada · a ponte está subindo"
+        },
+        {
+          "n": 765,
+          "file": "travessia-765.png",
+          "p": {
+            "x": 1082.0506813777406,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 1058.0496633155578,
+            "y": 60.00000000001019
+          },
+          "status": "Água liberada · a ponte está subindo"
+        },
+        {
+          "n": 766,
+          "file": "travessia-766.png",
+          "p": {
+            "x": 1082.0506813777406,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 1058.0497854830198,
+            "y": 60.000000000008356
+          },
+          "status": "Água liberada · a ponte está subindo"
+        },
+        {
+          "n": 780,
+          "file": "travessia-780.png",
+          "p": {
+            "x": 1082.0506813777406,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 1058.050531749218,
+            "y": 60.00000000000052
+          },
+          "status": "Água liberada · a ponte está subindo"
+        },
+        {
+          "n": 795,
+          "file": "travessia-795.png",
+          "p": {
+            "x": 1082.0506813777406,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 1058.05065938626,
+            "y": 60.00000000000003
+          },
+          "status": "Água liberada · a ponte está subindo"
+        },
+        {
+          "n": 810,
+          "file": "travessia-810.png",
+          "p": {
+            "x": 1082.0506813777406,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 1058.050678145568,
+            "y": 60.000000000000014
+          },
+          "status": "Água liberada · a ponte está subindo"
+        },
+        {
+          "n": 825,
+          "file": "travessia-825.png",
+          "p": {
+            "x": 1082.0506813777406,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 1058.0506809026956,
+            "y": 60.000000000000014
+          },
+          "status": "Água liberada · a ponte está subindo"
+        },
+        {
+          "n": 840,
+          "file": "travessia-840.png",
+          "p": {
+            "x": 1082.0506813777406,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 1058.0506813079214,
+            "y": 60.000000000000014
+          },
+          "status": "Água liberada · a ponte está subindo"
+        },
+        {
+          "n": 855,
+          "file": "travessia-855.png",
+          "p": {
+            "x": 1082.3506813777406,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 1058.2306813674788,
+            "y": 60.000000000000014
+          },
+          "status": "Ponte pronta · atravesse até a bandeira do checkpoint"
+        },
+        {
+          "n": 870,
+          "file": "travessia-870.png",
+          "p": {
+            "x": 1119.3506813777406,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 1086.9573987734636,
+            "y": 60.000000000000014
+          },
+          "status": "Ponte pronta · atravesse até a bandeira do checkpoint"
+        },
+        {
+          "n": 885,
+          "file": "travessia-885.png",
+          "p": {
+            "x": 1171.8506813777406,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 1136.6651165820185,
+            "y": 60.000000000000014
+          },
+          "status": "Atravesse e pule para a margem alta · bandeira depois do canal"
+        },
+        {
+          "n": 900,
+          "file": "travessia-900.png",
+          "p": {
+            "x": 1224.3506813777406,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 1188.7547241071652,
+            "y": 60.000000000000014
+          },
+          "status": "Atravesse e pule para a margem alta · bandeira depois do canal"
+        },
+        {
+          "n": 915,
+          "file": "travessia-915.png",
+          "p": {
+            "x": 1276.8506813777406,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 1241.1944071435244,
+            "y": 60.000000000000014
+          },
+          "status": "Atravesse e pule para a margem alta · bandeira depois do canal"
+        },
+        {
+          "n": 919,
+          "file": "travessia-919.png",
+          "p": {
+            "x": 1290.8506813777406,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 1255.1902470045936,
+            "y": 60.000000000000014
+          },
+          "status": "Atravesse e pule para a margem alta · bandeira depois do canal"
+        },
+        {
+          "n": 930,
+          "file": "travessia-930.png",
+          "p": {
+            "x": 1320.7038826511778,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 1287.8262643985727,
+            "y": 60.000000000000014
+          },
+          "status": "Atravesse e pule para a margem alta · bandeira depois do canal"
+        },
+        {
+          "n": 945,
+          "file": "travessia-945.png",
+          "p": {
+            "x": 1340.3521172777557,
+            "y": 138.60000000000008
+          },
+          "feet": 162.60000000000008,
+          "camera": {
+            "x": 1310.5739791673227,
+            "y": 60.000000000000014
+          },
+          "status": "Atravesse e pule para a margem alta · bandeira depois do canal"
+        },
+        {
+          "n": 960,
+          "file": "travessia-960.png",
+          "p": {
+            "x": 1370.3521172777557,
+            "y": 98.10000000000005
+          },
+          "feet": 122.10000000000005,
+          "camera": {
+            "x": 1339.816041077299,
+            "y": 37.728213485568006
+          },
+          "status": "Atravesse e pule para a margem alta · bandeira depois do canal"
+        },
+        {
+          "n": 975,
+          "file": "travessia-975.png",
+          "p": {
+            "x": 1400.3521172777557,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 1369.7046439951905,
+            "y": 28.495725064987766
+          },
+          "status": "Ponto seguro nesta tentativa · Atravesse e pule para a margem alta · bandeira depois do canal · sair e reentrar reinicia a travessia"
+        },
+        {
+          "n": 990,
+          "file": "travessia-990.png",
+          "p": {
+            "x": 1421.0604585532126,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 1393.029897727616,
+            "y": 28.025260890956154
+          },
+          "status": "Ponto seguro nesta tentativa · Atravesse e pule para a margem alta · bandeira depois do canal · sair e reentrar reinicia a travessia"
+        },
+        {
+          "n": 1005,
+          "file": "travessia-1005.png",
+          "p": {
+            "x": 1441.9957949349073,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 1412.5739561659636,
+            "y": 28.001287230880518
+          },
+          "status": "Atravesse e pule para a margem alta · bandeira depois do canal"
+        },
+        {
+          "n": 1020,
+          "file": "travessia-1020.png",
+          "p": {
+            "x": 1471.9957949349073,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 1441.5120854218112,
+            "y": 28.000065594018146
+          },
+          "status": "Atravesse e pule para a margem alta · bandeira depois do canal"
+        },
+        {
+          "n": 1035,
+          "file": "travessia-1035.png",
+          "p": {
+            "x": 1501.9957949349073,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 1438.241851582915,
+            "y": 28.00000334250466
+          },
+          "status": "Atravesse e pule para a margem alta · bandeira depois do canal"
+        },
+        {
+          "n": 1050,
+          "file": "travessia-1050.png",
+          "p": {
+            "x": 1531.1407949349073,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 1448.5624195171454,
+            "y": 28.000000170325553
+          },
+          "status": "Atravesse e pule para a margem alta · bandeira depois do canal"
+        },
+        {
+          "n": 1065,
+          "file": "travessia-1065.png",
+          "p": {
+            "x": 1538.6138428041663,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 1462.9110822520593,
+            "y": 28.000000008679358
+          },
+          "status": "Caranguejos patrulham a margem. Salte sobre eles ou use a sentada."
+        },
+        {
+          "n": 1072,
+          "file": "travessia-1072.png",
+          "p": {
+            "x": 1538.7211356237774,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 1465.1640597898893,
+            "y": 28.000000002163635
+          },
+          "status": "Caranguejos patrulham a margem. Salte sobre eles ou use a sentada."
+        },
+        {
+          "n": 1080,
+          "file": "travessia-1080.png",
+          "p": {
+            "x": 1539.6211356237773,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 1466.3008373961707,
+            "y": 28.000000000442277
+          },
+          "status": "Caranguejos patrulham a margem. Salte sobre eles ou use a sentada."
+        },
+        {
+          "n": 1095,
+          "file": "travessia-1095.png",
+          "p": {
+            "x": 1579.5211356237774,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 1488.1094383466054,
+            "y": 28.00000000002254
+          },
+          "status": "Ponto seguro nesta tentativa · Caranguejos patrulham a margem. Salte sobre eles ou use a sentada. · sair e reentrar reinicia a travessia"
+        },
+        {
+          "n": 1110,
+          "file": "travessia-1110.png",
+          "p": {
+            "x": 1632.0211356237774,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 1535.273785914312,
+            "y": 28.000000000001148
+          },
+          "status": "Caranguejos patrulham a margem. Salte sobre eles ou use a sentada."
+        },
+        {
+          "n": 1125,
+          "file": "travessia-1125.png",
+          "p": {
+            "x": 1684.5211356237774,
+            "y": 153.5
+          },
+          "feet": 177.5,
+          "camera": {
+            "x": 1586.9895845132664,
+            "y": 28.000000000000057
+          },
+          "status": "Caranguejos patrulham a margem. Salte sobre eles ou use a sentada."
+        },
+        {
+          "n": 1140,
+          "file": "travessia-1140.png",
+          "p": {
+            "x": 1737.0211356237774,
+            "y": 71
+          },
+          "feet": 95,
+          "camera": {
+            "x": 1639.3743274111205,
+            "y": 25.972184800000004
+          },
+          "status": "Caranguejos patrulham a margem. Salte sobre eles ou use a sentada."
+        },
+        {
+          "n": 1155,
+          "file": "travessia-1155.png",
+          "p": {
+            "x": 1788.7711356237774,
+            "y": 50.8
+          },
+          "feet": 74.8,
+          "camera": {
+            "x": 1691.5755588946288,
+            "y": 4.514165150200136
+          },
+          "status": "Desvio alto: atravesse a varanda e a couraça para recolher as moedas; desça à direita."
+        },
+        {
+          "n": 1170,
+          "file": "travessia-1170.png",
+          "p": {
+            "x": 1838.2711356237774,
+            "y": -27.200000000000003
+          },
+          "feet": -3.200000000000003,
+          "camera": {
+            "x": 1743.1553068607614,
+            "y": -65.556
+          },
+          "status": "Desvio alto: atravesse a varanda e a couraça para recolher as moedas; desça à direita."
+        },
+        {
+          "n": 1185,
+          "file": "travessia-1185.png",
+          "p": {
+            "x": 1868.2711356237774,
+            "y": -0.19999999999999396
+          },
+          "feet": 23.800000000000004,
+          "camera": {
+            "x": 1780.3626630415833,
+            "y": -59.53417299727485
+          },
+          "status": "Desvio alto: atravesse a varanda e a couraça para recolher as moedas; desça à direita."
+        },
+        {
+          "n": 1200,
+          "file": "travessia-1200.png",
+          "p": {
+            "x": 1894.1645000300273,
+            "y": -14.7
+          },
+          "feet": 9.3,
+          "camera": {
+            "x": 1807.1566501970417,
+            "y": -52.7
+          },
+          "status": "Desvio alto: atravesse a varanda e a couraça para recolher as moedas; desça à direita."
+        },
+        {
+          "n": 1215,
+          "file": "travessia-1215.png",
+          "p": {
+            "x": 1942.1187990612773,
+            "y": -62.70000000000003
+          },
+          "feet": -38.70000000000003,
+          "camera": {
+            "x": 1849.5292246301763,
+            "y": -100.70000000000003
+          },
+          "status": "Desvio alto: atravesse a varanda e a couraça para recolher as moedas; desça à direita."
+        },
+        {
+          "n": 1225,
+          "file": "travessia-1225.png",
+          "p": {
+            "x": 1957.497359061277,
+            "y": -53.700000000000045
+          },
+          "feet": -29.700000000000045,
+          "camera": {
+            "x": 1872.5868416193218,
+            "y": -91.70000000000005
+          },
+          "status": "Desvio alto: atravesse a varanda e a couraça para recolher as moedas; desça à direita."
+        },
+        {
+          "n": 1230,
+          "file": "travessia-1230.png",
+          "p": {
+            "x": 1960.239368661277,
+            "y": -17.700000000000045
+          },
+          "feet": 6.2999999999999545,
+          "camera": {
+            "x": 1879.4798023615272,
+            "y": -67.70000000000005
+          },
+          "status": "Desvio alto: atravesse a varanda e a couraça para recolher as moedas; desça à direita."
+        },
+        {
+          "n": 1245,
+          "file": "travessia-1245.png",
+          "p": {
+            "x": 1970.0495719073651,
+            "y": -28
+          },
+          "feet": -4,
+          "camera": {
+            "x": 1893.607565650616,
+            "y": -66
+          },
+          "status": "Desvio alto: atravesse a varanda e a couraça para recolher as moedas; desça à direita."
+        },
+        {
+          "n": 1260,
+          "file": "travessia-1260.png",
+          "p": {
+            "x": 1969.9603290757025,
+            "y": 17
+          },
+          "feet": 41,
+          "camera": {
+            "x": 1897.3205866600022,
+            "y": -41.355799999999995
+          },
+          "status": "Desvio alto: atravesse a varanda e a couraça para recolher as moedas; desça à direita."
+        },
+        {
+          "n": 1275,
+          "file": "travessia-1275.png",
+          "p": {
+            "x": 1984.2603290757024,
+            "y": 40
+          },
+          "feet": 64,
+          "camera": {
+            "x": 1903.5611262570785,
+            "y": -11.901052529656251
+          },
+          "status": "Desvio alto: atravesse a varanda e a couraça para recolher as moedas; desça à direita."
+        },
+        {
+          "n": 1290,
+          "file": "travessia-1290.png",
+          "p": {
+            "x": 2027.4603290757025,
+            "y": -43.2
+          },
+          "feet": -19.200000000000003,
+          "camera": {
+            "x": 1935.154633265891,
+            "y": -81.2
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1305,
+          "file": "travessia-1305.png",
+          "p": {
+            "x": 2057.4603290757022,
+            "y": -53.700000000000045
+          },
+          "feet": -29.700000000000045,
+          "camera": {
+            "x": 1969.9648725636127,
+            "y": -91.70000000000005
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1320,
+          "file": "travessia-1320.png",
+          "p": {
+            "x": 2066.6181816148423,
+            "y": 47.99999999999994
+          },
+          "feet": 71.99999999999994,
+          "camera": {
+            "x": 1991.4945883110595,
+            "y": 3.7999999999999403
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1335,
+          "file": "travessia-1335.png",
+          "p": {
+            "x": 2073.9621512757667,
+            "y": 49.29999999999998
+          },
+          "feet": 73.29999999999998,
+          "camera": {
+            "x": 1995.4709866585335,
+            "y": 11.299999999999983
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1350,
+          "file": "travessia-1350.png",
+          "p": {
+            "x": 2112.3712833508775,
+            "y": 1.2999999999999803
+          },
+          "feet": 25.29999999999998,
+          "camera": {
+            "x": 2024.908673779269,
+            "y": -36.70000000000002
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1365,
+          "file": "travessia-1365.png",
+          "p": {
+            "x": 2139.7885458508777,
+            "y": 65.79999999999997
+          },
+          "feet": 89.79999999999997,
+          "camera": {
+            "x": 2055.001934155987,
+            "y": -7.992891611620804
+          },
+          "status": "A placa ergue a ponte. Observe a saída antes de atravessar."
+        },
+        {
+          "n": 1378,
+          "file": "travessia-1378.png",
+          "p": {
+            "x": 2137.1757974114676,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2064.475893836424,
+            "y": 25.310399999999998
+          },
+          "status": "Ponto seguro nesta tentativa · A placa ergue a ponte. Observe a saída antes de atravessar. · sair e reentrar reinicia a travessia"
+        },
+        {
+          "n": 1380,
+          "file": "travessia-1380.png",
+          "p": {
+            "x": 2138.3230426966006,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2064.816196068225,
+            "y": 26.19151296
+          },
+          "status": "Ponto seguro nesta tentativa · A placa ergue a ponte. Observe a saída antes de atravessar. · sair e reentrar reinicia a travessia"
+        },
+        {
+          "n": 1395,
+          "file": "travessia-1395.png",
+          "p": {
+            "x": 2179.3356464796984,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2087.6087599941825,
+            "y": 27.907844091131068
+          },
+          "status": "A placa ergue a ponte. Observe a saída antes de atravessar."
+        },
+        {
+          "n": 1410,
+          "file": "travessia-1410.png",
+          "p": {
+            "x": 2231.8356464796984,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2135.041972197575,
+            "y": 27.99530396881392
+          },
+          "status": "A placa ergue a ponte. Observe a saída antes de atravessar."
+        },
+        {
+          "n": 1425,
+          "file": "travessia-1425.png",
+          "p": {
+            "x": 2259.347851629831,
+            "y": 89.50000000000001
+          },
+          "feet": 113.50000000000001,
+          "camera": {
+            "x": 2175.532660160301,
+            "y": 27.999760702171233
+          },
+          "status": "A placa ergue a ponte. Observe a saída antes de atravessar."
+        },
+        {
+          "n": 1440,
+          "file": "travessia-1440.png",
+          "p": {
+            "x": 2261.1087176905326,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2187.0072082593247,
+            "y": 27.999987805990084
+          },
+          "status": "A placa ergue a ponte. Observe a saída antes de atravessar."
+        },
+        {
+          "n": 1455,
+          "file": "travessia-1455.png",
+          "p": {
+            "x": 2261.1087176905326,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2188.7998507504203,
+            "y": 27.999999378624207
+          },
+          "status": "A placa ergue a ponte. Observe a saída antes de atravessar."
+        },
+        {
+          "n": 1470,
+          "file": "travessia-1470.png",
+          "p": {
+            "x": 2284.4087176905327,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2198.7051610120793,
+            "y": 27.99999996833627
+          },
+          "status": "A placa ergue a ponte. Observe a saída antes de atravessar."
+        },
+        {
+          "n": 1485,
+          "file": "travessia-1485.png",
+          "p": {
+            "x": 2305.7037859115035,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2225.568772201649,
+            "y": 27.999999998386496
+          },
+          "status": "A placa ergue a ponte. Observe a saída antes de atravessar."
+        },
+        {
+          "n": 1500,
+          "file": "travessia-1500.png",
+          "p": {
+            "x": 2307.088629929,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2233.608848479444,
+            "y": 27.99999999991778
+          },
+          "status": "A placa ergue a ponte. Observe a saída antes de atravessar."
+        },
+        {
+          "n": 1515,
+          "file": "travessia-1515.png",
+          "p": {
+            "x": 2307.088629929,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2234.8711407464293,
+            "y": 27.99999999999581
+          },
+          "status": "A placa ergue a ponte. Observe a saída antes de atravessar."
+        },
+        {
+          "n": 1530,
+          "file": "travessia-1530.png",
+          "p": {
+            "x": 2307.088629929,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2235.056664705656,
+            "y": 27.999999999999787
+          },
+          "status": "A placa ergue a ponte. Observe a saída antes de atravessar."
+        },
+        {
+          "n": 1531,
+          "file": "travessia-1531.png",
+          "p": {
+            "x": 2307.088629929,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2235.0605005324574,
+            "y": 27.999999999999826
+          },
+          "status": "A placa ergue a ponte. Observe a saída antes de atravessar."
+        },
+        {
+          "n": 1545,
+          "file": "travessia-1545.png",
+          "p": {
+            "x": 2307.088629929,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2235.0839318769345,
+            "y": 27.99999999999999
+          },
+          "status": "A placa ergue a ponte. Observe a saída antes de atravessar."
+        },
+        {
+          "n": 1560,
+          "file": "travessia-1560.png",
+          "p": {
+            "x": 2307.088629929,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2235.0879394381823,
+            "y": 27.999999999999993
+          },
+          "status": "A placa ergue a ponte. Observe a saída antes de atravessar."
+        },
+        {
+          "n": 1575,
+          "file": "travessia-1575.png",
+          "p": {
+            "x": 2333.888629929,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2246.7893464886515,
+            "y": 27.999999999999993
+          },
+          "status": "A placa ergue a ponte. Observe a saída antes de atravessar."
+        },
+        {
+          "n": 1590,
+          "file": "travessia-1590.png",
+          "p": {
+            "x": 2386.388629929,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2290.2750923007447,
+            "y": 27.999999999999993
+          },
+          "status": "A placa ergue a ponte. Observe a saída antes de atravessar."
+        },
+        {
+          "n": 1605,
+          "file": "travessia-1605.png",
+          "p": {
+            "x": 2438.888629929,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2341.450232622713,
+            "y": 27.999999999999993
+          },
+          "status": "A placa ergue a ponte. Observe a saída antes de atravessar."
+        },
+        {
+          "n": 1620,
+          "file": "travessia-1620.png",
+          "p": {
+            "x": 2491.388629929,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2393.7555128899558,
+            "y": 27.999999999999993
+          },
+          "status": "A placa ergue a ponte. Observe a saída antes de atravessar."
+        },
+        {
+          "n": 1635,
+          "file": "travessia-1635.png",
+          "p": {
+            "x": 2543.888629929,
+            "y": 106.60000000000002
+          },
+          "feet": 130.60000000000002,
+          "camera": {
+            "x": 2446.226894180402,
+            "y": 27.999999999999993
+          },
+          "status": "A placa ergue a ponte. Observe a saída antes de atravessar."
+        },
+        {
+          "n": 1650,
+          "file": "travessia-1650.png",
+          "p": {
+            "x": 2596.388629929,
+            "y": 66.09999999999998
+          },
+          "feet": 90.09999999999998,
+          "camera": {
+            "x": 2498.7226879783652,
+            "y": 18.41865944812715
+          },
+          "status": "A placa ergue a ponte. Observe a saída antes de atravessar."
+        },
+        {
+          "n": 1665,
+          "file": "travessia-1665.png",
+          "p": {
+            "x": 2648.888629929,
+            "y": 138.09999999999997
+          },
+          "feet": 162.09999999999997,
+          "camera": {
+            "x": 2551.2220697766415,
+            "y": 27.0800564881796
+          },
+          "status": "A placa ergue a ponte. Observe a saída antes de atravessar."
+        },
+        {
+          "n": 1680,
+          "file": "travessia-1680.png",
+          "p": {
+            "x": 2701.388629929,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2603.7219789171522,
+            "y": 27.95312201383545
+          },
+          "status": "Ponto seguro nesta tentativa · Atravesse cada grelha no intervalo seco; a ilha entre elas permite parar. · sair e reentrar reinicia a travessia"
+        },
+        {
+          "n": 1684,
+          "file": "travessia-1684.png",
+          "p": {
+            "x": 2715.388629929,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2617.721972650456,
+            "y": 27.97880544239003
+          },
+          "status": "Ponto seguro nesta tentativa · Atravesse cada grelha no intervalo seco; a ilha entre elas permite parar. · sair e reentrar reinicia a travessia"
+        },
+        {
+          "n": 1695,
+          "file": "travessia-1695.png",
+          "p": {
+            "x": 2753.888629929,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2656.2219655631825,
+            "y": 27.99761121682081
+          },
+          "status": "Atravesse cada grelha no intervalo seco; a ilha entre elas permite parar."
+        },
+        {
+          "n": 1710,
+          "file": "travessia-1710.png",
+          "p": {
+            "x": 2806.388629929,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2708.7219636004984,
+            "y": 27.99987827367291
+          },
+          "status": "Atravesse cada grelha no intervalo seco; a ilha entre elas permite parar."
+        },
+        {
+          "n": 1725,
+          "file": "travessia-1725.png",
+          "p": {
+            "x": 2858.888629929,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2761.221963312035,
+            "y": 27.999993797135367
+          },
+          "status": "Atravesse cada grelha no intervalo seco; a ilha entre elas permite parar."
+        },
+        {
+          "n": 1740,
+          "file": "travessia-1740.png",
+          "p": {
+            "x": 2911.388629929,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2813.7219632696383,
+            "y": 27.999999683917764
+          },
+          "status": "Atravesse cada grelha no intervalo seco; a ilha entre elas permite parar."
+        },
+        {
+          "n": 1755,
+          "file": "travessia-1755.png",
+          "p": {
+            "x": 2963.888629929,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2866.221963263407,
+            "y": 27.999999983893254
+          },
+          "status": "Atravesse cada grelha no intervalo seco; a ilha entre elas permite parar."
+        },
+        {
+          "n": 1770,
+          "file": "travessia-1770.png",
+          "p": {
+            "x": 3016.388629929,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2918.721963262491,
+            "y": 27.999999999179238
+          },
+          "status": "Atravesse cada grelha no intervalo seco; a ilha entre elas permite parar."
+        },
+        {
+          "n": 1785,
+          "file": "travessia-1785.png",
+          "p": {
+            "x": 3049.8172875762425,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2963.545817037737,
+            "y": 27.999999999958174
+          },
+          "status": "Atravesse cada grelha no intervalo seco; a ilha entre elas permite parar."
+        },
+        {
+          "n": 1800,
+          "file": "travessia-1800.png",
+          "p": {
+            "x": 3053.0685421674675,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2978.170069947173,
+            "y": 27.99999999999787
+          },
+          "status": "Atravesse cada grelha no intervalo seco; a ilha entre elas permite parar."
+        },
+        {
+          "n": 1815,
+          "file": "travessia-1815.png",
+          "p": {
+            "x": 3076.3685421674677,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 2990.2843812209057,
+            "y": 27.999999999999893
+          },
+          "status": "Atravesse cada grelha no intervalo seco; a ilha entre elas permite parar."
+        },
+        {
+          "n": 1830,
+          "file": "travessia-1830.png",
+          "p": {
+            "x": 3128.8685421674677,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 3032.904201004305,
+            "y": 27.999999999999993
+          },
+          "status": "Atravesse cada grelha no intervalo seco; a ilha entre elas permite parar."
+        },
+        {
+          "n": 1837,
+          "file": "travessia-1837.png",
+          "p": {
+            "x": 3153.3685421674677,
+            "y": 160.5
+          },
+          "feet": 184.5,
+          "camera": {
+            "x": 3056.397574391161,
+            "y": 27.999999999999993
+          },
+          "status": "Atravesse cada grelha no intervalo seco; a ilha entre elas permite parar."
+        },
+        {
+          "n": 1845,
+          "file": "travessia-1845.png",
+          "p": {
+            "x": 3181.3685421674677,
+            "y": 106.60000000000002
+          },
+          "feet": 130.60000000000002,
+          "camera": {
+            "x": 3083.9520728406437,
+            "y": 27.999999999999993
+          },
+          "status": "Atravesse cada grelha no intervalo seco; a ilha entre elas permite parar."
+        },
+        {
+          "n": 1860,
+          "file": "travessia-1860.png",
+          "p": {
+            "x": 3233.8685421674677,
+            "y": 66.09999999999998
+          },
+          "feet": 90.09999999999998,
+          "camera": {
+            "x": 3136.238647968073,
+            "y": 18.41865944812715
+          },
+          "status": "Atravesse cada grelha no intervalo seco; a ilha entre elas permite parar."
+        },
+        {
+          "n": 1875,
+          "file": "travessia-1875.png",
+          "p": {
+            "x": 3286.3685421674677,
+            "y": 138.09999999999997
+          },
+          "feet": 162.09999999999997,
+          "camera": {
+            "x": 3188.707280092033,
+            "y": 27.0800564881796
+          },
+          "status": "Atravesse cada grelha no intervalo seco; a ilha entre elas permite parar."
+        },
+        {
+          "n": 1890,
+          "file": "travessia-1890.png",
+          "p": {
+            "x": 3338.8685421674677,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 3241.202669834403,
+            "y": 27.95312201383545
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 1905,
+          "file": "travessia-1905.png",
+          "p": {
+            "x": 3371.2385421674676,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 3286.2383787623125,
+            "y": 27.99761121682081
+          },
+          "status": "Ponto seguro nesta tentativa · O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas. · sair e reentrar reinicia a travessia"
+        },
+        {
+          "n": 1920,
+          "file": "travessia-1920.png",
+          "p": {
+            "x": 3391.4102684174677,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 3305.4173806355534,
+            "y": 27.99987827367291
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 1935,
+          "file": "travessia-1935.png",
+          "p": {
+            "x": 3443.9102684174677,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 3347.959342023071,
+            "y": 27.999993797135367
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 1950,
+          "file": "travessia-1950.png",
+          "p": {
+            "x": 3496.4102684174677,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 3398.995770710908,
+            "y": 27.999999683917764
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 1965,
+          "file": "travessia-1965.png",
+          "p": {
+            "x": 3505.5519946674676,
+            "y": 153.5
+          },
+          "feet": 177.5,
+          "camera": {
+            "x": 3427.3446497400955,
+            "y": 27.999999983893254
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 1980,
+          "file": "travessia-1980.png",
+          "p": {
+            "x": 3545.4519946674677,
+            "y": 84.00000000000004
+          },
+          "feet": 108.00000000000004,
+          "camera": {
+            "x": 3453.3220293026416,
+            "y": 27.999999999179238
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 1990,
+          "file": "travessia-1990.png",
+          "p": {
+            "x": 3566.9519946674677,
+            "y": 110.5000000000001
+          },
+          "feet": 134.5000000000001,
+          "camera": {
+            "x": 3478.346042517119,
+            "y": 27.999999999887187
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 1995,
+          "file": "travessia-1995.png",
+          "p": {
+            "x": 3574.8559946674677,
+            "y": 121.80000000000011
+          },
+          "feet": 145.80000000000013,
+          "camera": {
+            "x": 3488.854941955275,
+            "y": 27.999999999958174
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 2010,
+          "file": "travessia-2010.png",
+          "p": {
+            "x": 3591.1981179674676,
+            "y": 102.5
+          },
+          "feet": 126.5,
+          "camera": {
+            "x": 3509.3347042098762,
+            "y": 27.99999999999787
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 2025,
+          "file": "travessia-2025.png",
+          "p": {
+            "x": 3587.3477936457875,
+            "y": 125
+          },
+          "feet": 149,
+          "camera": {
+            "x": 3516.1366607046625,
+            "y": 27.999999999999893
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 2040,
+          "file": "travessia-2040.png",
+          "p": {
+            "x": 3597.363895940709,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 3518.3561628526177,
+            "y": 27.999999999999993
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 2055,
+          "file": "travessia-2055.png",
+          "p": {
+            "x": 3648.363895940709,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 3553.6786497298303,
+            "y": 27.999999999999993
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 2070,
+          "file": "travessia-2070.png",
+          "p": {
+            "x": 3690.363895940709,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 3600.672120851726,
+            "y": 27.999999999999993
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 2085,
+          "file": "travessia-2085.png",
+          "p": {
+            "x": 3700.005622190709,
+            "y": 120.00000000000003
+          },
+          "feet": 144.00000000000003,
+          "camera": {
+            "x": 3619.31593066644,
+            "y": 27.999999999999993
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 2100,
+          "file": "travessia-2100.png",
+          "p": {
+            "x": 3749.905622190709,
+            "y": 91.00000000000007
+          },
+          "feet": 115.00000000000007,
+          "camera": {
+            "x": 3655.1674403617576,
+            "y": 27.999999999999993
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 2115,
+          "file": "travessia-2115.png",
+          "p": {
+            "x": 3781.405622190709,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 3693.3321930529783,
+            "y": 27.999999999999993
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 2130,
+          "file": "travessia-2130.png",
+          "p": {
+            "x": 3792.547348440709,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 3715.1855270724827,
+            "y": 27.999999999999993
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 2143,
+          "file": "travessia-2143.png",
+          "p": {
+            "x": 3822.147348440709,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 3734.5364201494194,
+            "y": 27.999999999999993
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 2145,
+          "file": "travessia-2145.png",
+          "p": {
+            "x": 3824.647348440709,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 3738.5060855719344,
+            "y": 27.999999999999993
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 2160,
+          "file": "travessia-2160.png",
+          "p": {
+            "x": 3832.989074690709,
+            "y": 126.70000000000003
+          },
+          "feet": 150.70000000000005,
+          "camera": {
+            "x": 3753.973255208038,
+            "y": 27.999999999999993
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 2175,
+          "file": "travessia-2175.png",
+          "p": {
+            "x": 3881.489074690709,
+            "y": 88.60000000000007
+          },
+          "feet": 112.60000000000007,
+          "camera": {
+            "x": 3787.2617598693987,
+            "y": 27.999999999999993
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 2190,
+          "file": "travessia-2190.png",
+          "p": {
+            "x": 3924.989074690709,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 3833.719457865049,
+            "y": 27.999999999999993
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 2205,
+          "file": "travessia-2205.png",
+          "p": {
+            "x": 3951.989074690709,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 3866.987646507865,
+            "y": 27.999999999999993
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 2220,
+          "file": "travessia-2220.png",
+          "p": {
+            "x": 3964.030800940709,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 3882.621663731936,
+            "y": 27.999999999999993
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 2235,
+          "file": "travessia-2235.png",
+          "p": {
+            "x": 4015.030800940709,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 3919.992611111442,
+            "y": 27.999999999999993
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 2250,
+          "file": "travessia-2250.png",
+          "p": {
+            "x": 4067.530800940709,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 3970.2504516447225,
+            "y": 27.999999999999993
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 2265,
+          "file": "travessia-2265.png",
+          "p": {
+            "x": 4120.030800940709,
+            "y": 89.50000000000001
+          },
+          "feet": 113.50000000000001,
+          "camera": {
+            "x": 4017.7363161192106,
+            "y": 27.999999999999993
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 2280,
+          "file": "travessia-2280.png",
+          "p": {
+            "x": 4172.530800940709,
+            "y": 71.49999999999997
+          },
+          "feet": 95.49999999999997,
+          "camera": {
+            "x": 4029.903611409227,
+            "y": 18.96533622259496
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 2295,
+          "file": "travessia-2295.png",
+          "p": {
+            "x": 4225.030800940709,
+            "y": 166
+          },
+          "feet": 190,
+          "camera": {
+            "x": 4031.691885689542,
+            "y": 27.49277258577461
+          },
+          "status": "O carregador guarda a entrada. Cruze os dois canais pela taipa central ou suba ao armazém: a couraça e a tábua rachada protegem as moedas."
+        },
+        {
+          "n": 2296,
+          "file": "travessia-2296.png",
+          "p": {
+            "x": 4228.530800940709,
+            "y": 168
+          },
+          "feet": 192,
+          "camera": {
+            "x": 4031.728859406797,
+            "y": 27.58407352033518
+          },
+          "status": "Travessia concluída · a água chegou ao arrozal · Curral abre a arena de Ossabravo · Mapa volta ao arrozal na maquete"
+        }
+      ],
+      "damage": [],
+      "jumps": [
+        {
+          "start": {
+            "n": 104,
+            "x": 368.3122051501326,
+            "feet": 224,
+            "y": 200,
+            "camX": 324.69941895012414,
+            "camY": 60
+          },
+          "apex": {
+            "n": 114,
+            "x": 370.47991223846697,
+            "feet": 156.4000000000001,
+            "y": 132.4000000000001,
+            "camX": 331.93839107364056,
+            "camY": 60
+          },
+          "end": {
+            "n": 127,
+            "x": 370.47991223846697,
+            "feet": 224,
+            "y": 200,
+            "camX": 333.99755536816326,
+            "camY": 60
+          },
+          "landingAtTakeoff": {
+            "x": 45.780493288342825,
+            "y": 164
+          },
+          "landingAtApex": {
+            "x": 38.541521164826406,
+            "y": 164
+          }
+        },
+        {
+          "start": {
+            "n": 382,
+            "x": 690,
+            "feet": 224,
+            "y": 200,
+            "camX": 608.4250948907627,
+            "camY": 90.66287620799274
+          },
+          "apex": {
+            "n": 404,
+            "x": 722.3,
+            "feet": 121.00000000000006,
+            "y": 97.00000000000006,
+            "camX": 636.4107055681001,
+            "camY": 61.00000000000006
+          },
+          "end": {
+            "n": 423,
+            "x": 755.35897215625,
+            "feet": 208,
+            "y": 184,
+            "camX": 670.3536918612208,
+            "camY": 88.88470822693901
+          },
+          "landingAtTakeoff": {
+            "x": 146.93387726548735,
+            "y": 117.33712379200726
+          },
+          "landingAtApex": {
+            "x": 118.94826658814998,
+            "y": 146.99999999999994
+          }
+        },
+        {
+          "start": {
+            "n": 570,
+            "x": 930,
+            "feet": 256,
+            "y": 232,
+            "camX": 849.9227321602448,
+            "camY": 91.99999999999933
+          },
+          "apex": {
+            "n": 578,
+            "x": 934.5,
+            "feet": 231,
+            "y": 207,
+            "camX": 852.9355110939669,
+            "camY": 91.99999999999987
+          },
+          "end": {
+            "n": 585,
+            "x": 948.3,
+            "feet": 240,
+            "y": 216,
+            "camX": 863.7556211993883,
+            "camY": 91.99999999999997
+          },
+          "landingAtTakeoff": {
+            "x": 98.37726783975518,
+            "y": 148.00000000000068
+          },
+          "landingAtApex": {
+            "x": 95.3644889060331,
+            "y": 148.0000000000001
+          }
+        },
+        {
+          "start": {
+            "n": 608,
+            "x": 962,
+            "feet": 240,
+            "y": 216,
+            "camX": 882.0680595411466,
+            "camY": 91.99999999999997
+          },
+          "apex": {
+            "n": 616,
+            "x": 966.5,
+            "feet": 215,
+            "y": 191,
+            "camX": 886.1877705172132,
+            "camY": 91.99999999999997
+          },
+          "end": {
+            "n": 623,
+            "x": 980.3,
+            "feet": 224,
+            "y": 200,
+            "camX": 900.7936819774741,
+            "camY": 77.64377599999999
+          },
+          "landingAtTakeoff": {
+            "x": 98.23194045885339,
+            "y": 132.00000000000003
+          },
+          "landingAtApex": {
+            "x": 94.1122294827868,
+            "y": 132.00000000000003
+          }
+        },
+        {
+          "start": {
+            "n": 706,
+            "x": 1082.0506813777406,
+            "feet": 224,
+            "y": 200,
+            "camX": 1056.1307016270387,
+            "camY": 60.000001239199655
+          },
+          "apex": {
+            "n": 714,
+            "x": 1082.0506813777406,
+            "feet": 169.30000000000007,
+            "y": 145.30000000000007,
+            "camX": 1057.3601903724607,
+            "camY": 60.000000253309864
+          },
+          "end": {
+            "n": 726,
+            "x": 1082.0506813777406,
+            "feet": 224,
+            "y": 200,
+            "camX": 1057.9017623845475,
+            "camY": 60.00000002341091
+          },
+          "landingAtTakeoff": {
+            "x": 25.91997975070194,
+            "y": 163.99999876080034
+          },
+          "landingAtApex": {
+            "x": 24.69049100527991,
+            "y": 163.99999974669015
+          }
+        },
+        {
+          "start": {
+            "n": 936,
+            "x": 1325.3628865278727,
+            "feet": 224,
+            "y": 200,
+            "camX": 1295.934732900257,
+            "camY": 60.000000000000014
+          },
+          "apex": {
+            "n": 958,
+            "x": 1366.3521172777557,
+            "feet": 121.00000000000006,
+            "y": 97.00000000000006,
+            "camX": 1335.854084994108,
+            "camY": 42.46789632000001
+          },
+          "end": {
+            "n": 975,
+            "x": 1400.3521172777557,
+            "feet": 192,
+            "y": 168,
+            "camX": 1369.7046439951905,
+            "camY": 28.495725064987766
+          },
+          "landingAtTakeoff": {
+            "x": 104.41738437749882,
+            "y": 132
+          },
+          "landingAtApex": {
+            "x": 64.49803228364772,
+            "y": 149.53210367999998
+          }
+        },
+        {
+          "start": {
+            "n": 1123,
+            "x": 1677.5211356237774,
+            "feet": 192,
+            "y": 168,
+            "camX": 1580.0289466897498,
+            "camY": 28.00000000000009
+          },
+          "apex": {
+            "n": 1145,
+            "x": 1754.5211356237774,
+            "feet": 88.99999999999999,
+            "y": 64.99999999999999,
+            "camX": 1656.8649488971098,
+            "camY": 19.72394326015342
+          },
+          "end": {
+            "n": 1151,
+            "x": 1775.5211356237774,
+            "feet": 96,
+            "y": 72,
+            "camX": 1677.8593358840756,
+            "camY": 14.831575702527868
+          },
+          "landingAtTakeoff": {
+            "x": 195.49218893402758,
+            "y": 67.99999999999991
+          },
+          "landingAtApex": {
+            "x": 118.65618672666756,
+            "y": 76.27605673984658
+          }
+        },
+        {
+          "start": {
+            "n": 1152,
+            "x": 1778.4961356237773,
+            "feet": 96,
+            "y": 72,
+            "camX": 1681.2957518528397,
+            "camY": 11.441892076072852
+          },
+          "apex": {
+            "n": 1174,
+            "x": 1846.2711356237774,
+            "feet": -7,
+            "y": -31,
+            "camX": 1754.5375456520421,
+            "camY": -73.67056563455999
+          },
+          "end": {
+            "n": 1191,
+            "x": 1876.5758087487773,
+            "feet": 64,
+            "y": 40,
+            "camX": 1792.068914225787,
+            "camY": -30.095652752
+          },
+          "landingAtTakeoff": {
+            "x": 195.2800568959376,
+            "y": 52.558107923927146
+          },
+          "landingAtApex": {
+            "x": 122.03826309673514,
+            "y": 137.67056563455998
+          }
+        },
+        {
+          "start": {
+            "n": 1192,
+            "x": 1877.3301077800272,
+            "feet": 64,
+            "y": 40,
+            "camX": 1793.6602574522958,
+            "camY": -26.47843525664
+          },
+          "apex": {
+            "n": 1214,
+            "x": 1940.1187990612773,
+            "feet": -39.00000000000003,
+            "y": -63.00000000000003,
+            "camX": 1846.7215553895717,
+            "camY": -101.00000000000003
+          },
+          "end": {
+            "n": 1264,
+            "x": 1969.9603290757025,
+            "feet": 64,
+            "y": 40,
+            "camX": 1897.5766785174117,
+            "camY": -26.867151322208002
+          },
+          "landingAtTakeoff": {
+            "x": 176.30007162340667,
+            "y": 90.47843525664
+          },
+          "landingAtApex": {
+            "x": 123.2387736861308,
+            "y": 165.00000000000003
+          }
+        },
+        {
+          "start": {
+            "n": 1277,
+            "x": 1987.9603290757025,
+            "feet": 64,
+            "y": 40,
+            "camX": 1906.1788664129601,
+            "camY": -11.278267720940862
+          },
+          "apex": {
+            "n": 1299,
+            "x": 2045.4603290757025,
+            "feet": -39.00000000000003,
+            "y": -63.00000000000003,
+            "camX": 1957.0090315907278,
+            "camY": -101.00000000000003
+          },
+          "end": {
+            "n": 1326,
+            "x": 2064.7166041067676,
+            "feet": 128,
+            "y": 104,
+            "camX": 1992.4381119494412,
+            "camY": 24.292601567999967
+          },
+          "landingAtTakeoff": {
+            "x": 158.53773769380746,
+            "y": 139.27826772094087
+          },
+          "landingAtApex": {
+            "x": 107.70757251603982,
+            "y": 229.00000000000003
+          }
+        },
+        {
+          "start": {
+            "n": 1327,
+            "x": 2064.543887125545,
+            "feet": 128,
+            "y": 104,
+            "camX": 1992.4508049705737,
+            "camY": 24.959933285759973
+          },
+          "apex": {
+            "n": 1349,
+            "x": 2110.3712833508775,
+            "feet": 24.99999999999998,
+            "y": 0.9999999999999805,
+            "camX": 2022.8001361104134,
+            "camY": -37.00000000000002
+          },
+          "end": {
+            "n": 1376,
+            "x": 2137.2285521263348,
+            "feet": 192,
+            "y": 168,
+            "camX": 2064.288853940408,
+            "camY": 24
+          },
+          "landingAtTakeoff": {
+            "x": 144.77774715576106,
+            "y": 167.04006671424003
+          },
+          "landingAtApex": {
+            "x": 114.42841601592136,
+            "y": 229.00000000000003
+          }
+        },
+        {
+          "start": {
+            "n": 1413,
+            "x": 2242.3356464796984,
+            "feet": 192,
+            "y": 168,
+            "camX": 2145.263899679311,
+            "camY": 27.997410758676992
+          },
+          "apex": {
+            "n": 1426,
+            "x": 2259.771020857311,
+            "feet": 111.40000000000002,
+            "y": 87.40000000000002,
+            "camX": 2177.001263443942,
+            "camY": 27.99980377578041
+          },
+          "end": {
+            "n": 1440,
+            "x": 2261.1087176905326,
+            "feet": 192,
+            "y": 168,
+            "camX": 2187.0072082593247,
+            "camY": 27.999987805990084
+          },
+          "landingAtTakeoff": {
+            "x": 115.84481801122138,
+            "y": 164.002589241323
+          },
+          "landingAtApex": {
+            "x": 84.10745424659035,
+            "y": 164.0001962242196
+          }
+        },
+        {
+          "start": {
+            "n": 1626,
+            "x": 2512.388629929,
+            "feet": 192,
+            "y": 168,
+            "camX": 2414.737543846511,
+            "camY": 27.999999999999993
+          },
+          "apex": {
+            "n": 1648,
+            "x": 2589.388629929,
+            "feet": 88.99999999999999,
+            "y": 64.99999999999999,
+            "camX": 2491.7228991043166,
+            "camY": 19.723943260153415
+          },
+          "end": {
+            "n": 1669,
+            "x": 2662.888629929,
+            "feet": 192,
+            "y": 168,
+            "camX": 2565.2220271384695,
+            "camY": 27.58407352033518
+          },
+          "landingAtTakeoff": {
+            "x": 248.1510860824892,
+            "y": 164
+          },
+          "landingAtApex": {
+            "x": 171.16573082468358,
+            "y": 172.27605673984658
+          }
+        },
+        {
+          "start": {
+            "n": 1836,
+            "x": 3149.8685421674677,
+            "feet": 192,
+            "y": 168,
+            "camX": 3052.9924424216647,
+            "camY": 27.999999999999993
+          },
+          "apex": {
+            "n": 1858,
+            "x": 3226.8685421674677,
+            "feet": 88.99999999999999,
+            "y": 64.99999999999999,
+            "camX": 3129.2493606083326,
+            "camY": 19.723943260153415
+          },
+          "end": {
+            "n": 1879,
+            "x": 3300.3685421674677,
+            "feet": 192,
+            "y": 168,
+            "camX": 3202.7051166090855,
+            "camY": 27.58407352033518
+          },
+          "landingAtTakeoff": {
+            "x": 247.376099745803,
+            "y": 164
+          },
+          "landingAtApex": {
+            "x": 171.1191815591351,
+            "y": 172.27605673984658
+          }
+        },
+        {
+          "start": {
+            "n": 1963,
+            "x": 3504.6519946674675,
+            "feet": 192,
+            "y": 168,
+            "camX": 3425.6181298335673,
+            "camY": 27.999999976045885
+          },
+          "apex": {
+            "n": 1980,
+            "x": 3545.4519946674677,
+            "feet": 108.00000000000004,
+            "y": 84.00000000000004,
+            "camX": 3453.3220293026416,
+            "camY": 27.999999999179238
+          },
+          "end": {
+            "n": 2032,
+            "x": 3586.563895940709,
+            "feet": 192,
+            "y": 168,
+            "camX": 3515.289736279813,
+            "camY": 27.999999999999975
+          },
+          "landingAtTakeoff": {
+            "x": 160.94576610714148,
+            "y": 164.0000000239541
+          },
+          "landingAtApex": {
+            "x": 133.24186663806722,
+            "y": 164.00000000082076
+          }
+        },
+        {
+          "start": {
+            "n": 2078,
+            "x": 3691.605622190709,
+            "feet": 192,
+            "y": 168,
+            "camX": 3612.681486613976,
+            "camY": 27.999999999999993
+          },
+          "apex": {
+            "n": 2095,
+            "x": 3732.405622190709,
+            "feet": 108.00000000000004,
+            "y": 84.00000000000004,
+            "camX": 3640.288145831638,
+            "camY": 27.999999999999993
+          },
+          "end": {
+            "n": 2114,
+            "x": 3779.405622190709,
+            "feet": 192,
+            "y": 168,
+            "camX": 3691.140361806924,
+            "camY": 27.999999999999993
+          },
+          "landingAtTakeoff": {
+            "x": 166.7241355767328,
+            "y": 164
+          },
+          "landingAtApex": {
+            "x": 139.11747635907113,
+            "y": 164
+          }
+        },
+        {
+          "start": {
+            "n": 2154,
+            "x": 3826.689074690709,
+            "feet": 192,
+            "y": 168,
+            "camX": 3749.3989255458796,
+            "camY": 27.999999999999993
+          },
+          "apex": {
+            "n": 2171,
+            "x": 3867.489074690709,
+            "feet": 108.00000000000004,
+            "y": 84.00000000000004,
+            "camX": 3775.557573034084,
+            "camY": 27.999999999999993
+          },
+          "end": {
+            "n": 2190,
+            "x": 3924.989074690709,
+            "feet": 192,
+            "y": 168,
+            "camX": 3833.719457865049,
+            "camY": 27.999999999999993
+          },
+          "landingAtTakeoff": {
+            "x": 175.5901491448294,
+            "y": 164
+          },
+          "landingAtApex": {
+            "x": 149.4315016566252,
+            "y": 164
+          }
+        },
+        {
+          "start": {
+            "n": 2253,
+            "x": 4078.030800940709,
+            "feet": 192,
+            "y": 168,
+            "camX": 3980.6273987452746,
+            "camY": 27.999999999999993
+          },
+          "apex": {
+            "n": 2275,
+            "x": 4155.030800940709,
+            "feet": 88.99999999999999,
+            "y": 64.99999999999999,
+            "camX": 4028.0275501177102,
+            "camY": 19.723943260153415
+          },
+          "end": {
+            "n": 2296,
+            "x": 4228.530800940709,
+            "feet": 192,
+            "y": 168,
+            "camX": 4031.728859406797,
+            "camY": 27.58407352033518
+          },
+          "landingAtTakeoff": {
+            "x": 247.9034021954344,
+            "y": 164
+          },
+          "landingAtApex": {
+            "x": 200.50325082299878,
+            "y": 172.27605673984658
+          }
+        }
+      ],
+      "videoFrames": 1148,
+      "captureFps": 30,
+      "videoWindow": {
+        "firstFrame": 2,
+        "lastFrame": 2296
+      },
+      "finished": true,
+      "coins": 22
+    }
+  }
+}

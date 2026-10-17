@@ -50,10 +50,10 @@ for(const name of Object.keys(factories) as Array<keyof typeof factories>)
             assert.equal(frames,route.frames);assert.equal(g.finished,true);
             const expected={travessia:[176,144],respiros:[288,240,192],galeria:[352,288],subida:[240,192,144]}[name];
             for(const y of expected)assert.ok(supported.has(y),`used new route at y${y}`);
-            assert.equal(g.coins,{travessia:16,respiros:5,galeria:5,subida:4}[name]);
+            assert.equal(g.coins,route.coins);
             if(name==='respiros') {
                 assert.ok(firstIsolation>0);assert.ok(independentDanger,'D remains a real timing challenge');
-                assert.equal(g.store.save.checkpoint?.index,1,'safe point precedes the service detour');
+                assert.equal(g.store.save.checkpoint?.index,g.stage.checkpoints.length-1,'the final pump-basin checkpoint is earned');
                 for(const id of[R.firstJetId,R.secondJetId,R.fourthJetId])assert.equal(g.objects.get(id)!.active,false);
             }
             assert.deepEqual(g.store.save.completed,[]);assert.deepEqual(h.storageCalls,[]);

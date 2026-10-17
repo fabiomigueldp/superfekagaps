@@ -1,3 +1,4 @@
+import { introductionReached } from './helpers/guairaCourseTest';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { jetCycle } from '../src/adventure/WorldMachineState';
@@ -47,7 +48,7 @@ test(`relief ${route}: full native route, touch=${touch}, reduced=${reducedMotio
         if(frame>=(route==='high'?422:405)&&frame<=(route==='high'?473:456))visible(g,G.landingStart,G.landingY,80);
         if(frame===(route==='high'?548:536)){visible(g,G.returnEnd+16,G.floor,16);assert.equal(feet(g),G.returnY);}
     });
-    assert.equal(count,tapes[route].frames);assert.equal(g.finished,true);assert.equal(g.coins,5);
+    assert.equal(count,tapes[route].frames);assert.equal(g.finished,true);assert.equal(g.coins,tapes[route].coins);
     assert.equal(g.reliefOpened,route==='opened');assert.equal(g.objects.get(G.jetId)!.active,route==='opened');
     for(const y of [288,224,160,G.gantryY,G.landingY,G.returnY,G.floor])assert.ok(contacts.has(y),`native support ${y}`);
     const state=()=>JSON.stringify({p:g.player.data,o:g.objects,camera:g.camera,tiles:g.level.data.tiles,coins:g.coins,t:g.time});
@@ -80,7 +81,7 @@ for(const hold of [1,3,6,12])test(`opening the relief makes a ${hold}-frame shor
     h.run(g,8,['ArrowRight','ShiftLeft']);h.run(g,hold,['ArrowRight','ShiftLeft','Space']);
     h.keys(['ArrowRight','ShiftLeft']);for(let n=0;n<52-hold;n++){g.update(dt);safe(g);assert.equal(g.objects.jetDanger(g.objects.get(G.jetId)!),null);}
     h.run(g,20);safe(g);assert.ok(feet(g)===G.floor||feet(g)===G.landingY);
-    h.run(g,90,['ArrowRight']);safe(g);assert.equal(g.finished,true);assert.equal(g.reliefOpened,true);
+    h.run(g,90,['ArrowRight']);safe(g);assert.equal(introductionReached(g), true);assert.equal(g.reliefOpened,true);
 });
 
 test('the gantry remains reversible, pause freezes and checkpoint reconstruction restores pressure',t=>{

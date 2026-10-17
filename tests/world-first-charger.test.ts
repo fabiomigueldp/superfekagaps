@@ -58,11 +58,12 @@ function firstChargerHarness(previousX?: number) {
 }
 type Harness = ReturnType<typeof firstChargerHarness>;
 function alive(h: Harness) { assert.equal(h.game.player.data.isDead, false, 'Use an undamaged arrival and observation.'); }
-function walkTo(h: Harness, tile: number) {
+function walkTo(h: Harness, tile: number, brake = false) {
     for (let frame = 0; frame < 240; frame++) {
         const p = h.game.player.data, dx = tile * 16 - p.position.x;
         if (Math.abs(dx) < 2 && Math.abs(p.velocity.x) < .25) return;
-        h.step({ left: dx < -1, right: dx > 1 }); alive(h);
+        const stopping=brake&&dx*p.velocity.x>0&&Math.abs(dx)<p.velocity.x*p.velocity.x/.6;
+        h.step({ left: stopping?p.velocity.x>0:dx < -1, right: stopping?p.velocity.x<0:dx > 1 }); alive(h);
     }
     assert.fail(`Could not walk to ${tile}.`);
 }
@@ -82,7 +83,9 @@ function jumpTo(h: Harness, tile: number, floor: number, hold = 9, run = true) {
 function arrive(h: Harness, arrival: Arrival) {
     walkTo(h, 118);
     jumpTo(h, 124.5, 13);
-    walkTo(h, arrival.takeoff);
+    // Brake deliberately on the fragile bridge instead of repeatedly coasting
+    // beyond its edge and relying on the former centre-only contact bug.
+    walkTo(h, arrival.takeoff, arrival.takeoff<126);
     jumpTo(h, 131.4, 11, arrival.hold, arrival.run);
     walkTo(h, 131.25);
 }

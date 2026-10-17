@@ -5,6 +5,7 @@ import { supportsStanding, isOneWayTile } from '../../../../world/tileRules';
 import { pixelText } from '../../../../graphics/BitmapFont';
 import { blockFragmentPose } from '../../../../graphics/blockImpactArt';
 import { drawGuairaStoneFace, drawGuairaPlaster, drawGuairaTimber } from '../GuairaMaterials';
+import { drawWorkshopClerestory, drawWorkshopMasonryReveal, drawWorkshopRoofFrame } from '../GuairaWorkshopArt';
 
 /** Existing Guaíra clay, plaster, wood and iron hues; no texture payloads. */
 export const GALLERY_MATERIAL_COLORS = Object.freeze({
@@ -237,7 +238,7 @@ function workshop(c: CanvasRenderingContext2D, cx: number, cy: number) {
 /** Authored against the measured descent cameras: the first return surface is
  * visible at y160 from each cover; no background object enters either shaft.
  * Only the native terrain layer supplies continuous bright horizontal edges. */
-export function drawGalleryBackground(c: CanvasRenderingContext2D, cx: number, cy: number, _time: number, _reducedMotion: boolean) {
+export function drawGalleryBackground(c: CanvasRenderingContext2D, cx: number, cy: number, time: number, reducedMotion: boolean) {
     layer(c, cx, cy, (cameraX, cameraY) => {
         r(c, 0, 23, 320, 157, '#e6bc8f');
         r(c, 0, 23, 320, 24, '#ebcda4');
@@ -246,6 +247,9 @@ export function drawGalleryBackground(c: CanvasRenderingContext2D, cx: number, c
         r(c, 0, 160 - cameraY, 320, 272, '#c7a17f');
         r(c, 0, 208 - cameraY, 320, 224, '#bf967d');
         r(c, 0, 304 - cameraY, 320, 128, '#b6977c');
+        drawWorkshopClerestory(c, 278 - cameraX, 86 - cameraY, 70, time, reducedMotion, true);
+        drawWorkshopClerestory(c, 420 - cameraX, 92 - cameraY, 56, time, reducedMotion);
+        drawWorkshopRoofFrame(c, cameraX, cameraY, 233, 628, 69, 164);
         workshop(c, cameraX, cameraY);
         // The same worn, inset service bays tie the gallery to the water workshop.
         for (const [wx, wy, width, height] of [[249,168,124,120],[472,180,78,204],[574,107,116,85]] as const) {
@@ -287,6 +291,8 @@ export function drawGalleryBackground(c: CanvasRenderingContext2D, cx: number, c
             r(c, wx + 5 - cameraX, wy - cameraY, 54, bottom - wy, '#b6977c');
             polygon(c, [[wx + 6 - cameraX,wy - cameraY],[wx + 41 - cameraX,wy - cameraY],
                 [wx + 57 - cameraX,bottom - 12 - cameraY],[wx + 34 - cameraX,bottom - 12 - cameraY]], '#bf967d');
+            drawWorkshopMasonryReveal(c, wx - 9 - cameraX, wy - cameraY, bottom - wy);
+            drawWorkshopMasonryReveal(c, wx + 59 - cameraX, wy - cameraY, bottom - wy, true);
             // Muted vertical marks explain depth without sketching false stairs.
             for (let dy = 12; dy < bottom - wy - 10; dy += 24) {
                 r(c, wx + 7 - cameraX, wy + dy - cameraY, 2, 5, '#a58a68');

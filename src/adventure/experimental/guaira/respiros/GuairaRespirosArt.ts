@@ -277,6 +277,12 @@ function pressureWater(c: CanvasRenderingContext2D, s: JetCycle, cx: number, cy:
         r(c, left + dx, top + 1, Math.min(4, width - dx - 1), 1, W.light);
 }
 
+export function drawGuairaPressureOutlet(c: CanvasRenderingContext2D, b: MovingBody, cx: number, cy: number, time: number, reducedMotion: boolean) {
+    const s = jetCycle(b, time);
+    grate(c, b, s, Math.round(cx), Math.round(cy));
+    pressureWater(c, s, Math.round(cx), Math.round(cy), time, reducedMotion);
+}
+
 export function drawRespirosObjects(c: CanvasRenderingContext2D, objects: WorldObjects, cx: number, cy: number, _time: number, reducedMotion: boolean) {
     layer(c, cx, cy, (cameraX, cameraY) => {
         // The object clock is the only hydraulic authority. A decorative render

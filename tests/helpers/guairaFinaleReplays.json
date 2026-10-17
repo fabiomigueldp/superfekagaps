@@ -1,0 +1,5640 @@
+{
+  "respiros-low": {
+    "id": "respiros",
+    "high": false,
+    "wait": 0,
+    "frames": 2359,
+    "prefixFrames": 2102,
+    "finished": true,
+    "damage": [],
+    "dead": false,
+    "coins": 22,
+    "rideFrames": 0,
+    "fragileFrames": 34,
+    "liveJets": 0,
+    "warningFrames": 0,
+    "result": {
+      "marks": [
+        {
+          "label": "observe",
+          "x": 3531.69594964409,
+          "feet": 304
+        },
+        {
+          "label": "finish",
+          "x": 4194.43767589409,
+          "feet": 304
+        }
+      ],
+      "result": {
+        "frames": 227,
+        "damage": 0,
+        "dead": false,
+        "finished": true
+      }
+    },
+    "notes": [
+      {
+        "frame": 2115,
+        "at": [
+          2378.9959496440906,
+          304
+        ],
+        "camera": {
+          "x": 3451.981291787311,
+          "y": 139.98733335174998,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2130,
+        "at": [
+          2379.59594964409,
+          304
+        ],
+        "camera": {
+          "x": 3458.3327342982816,
+          "y": 139.99935453975837,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2145,
+        "at": [
+          2405.39594964409,
+          304
+        ],
+        "camera": {
+          "x": 3470.527128411128,
+          "y": 139.99996710898455,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2160,
+        "at": [
+          2457.89594964409,
+          304
+        ],
+        "camera": {
+          "x": 3513.8162839346323,
+          "y": 139.99999832395733,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2175,
+        "at": [
+          2510.39594964409,
+          304
+        ],
+        "camera": {
+          "x": 3564.9625306242474,
+          "y": 139.9999999145931,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2190,
+        "at": [
+          2562.89594964409,
+          304
+        ],
+        "camera": {
+          "x": 3617.2635642829905,
+          "y": 139.99999999564787,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2205,
+        "at": [
+          2615.39594964409,
+          304
+        ],
+        "camera": {
+          "x": 3669.734321433019,
+          "y": 139.99999999977823,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2220,
+        "at": [
+          2667.89594964409,
+          230.7000000000001
+        ],
+        "camera": {
+          "x": 3722.2300234986596,
+          "y": 139.9999999999887,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2235,
+        "at": [
+          2706.89594964409,
+          208.80000000000024
+        ],
+        "camera": {
+          "x": 3770.501688451099,
+          "y": 132.10656484814595,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2250,
+        "at": [
+          2707.6376758940896,
+          304
+        ],
+        "camera": {
+          "x": 3785.0908593957024,
+          "y": 139.57204327769446,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2265,
+        "at": [
+          2716.0376758940897,
+          304
+        ],
+        "camera": {
+          "x": 3789.8033941700437,
+          "y": 139.9781924117628,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2280,
+        "at": [
+          2765.93767589409,
+          225.5000000000001
+        ],
+        "camera": {
+          "x": 3823.5603751063813,
+          "y": 139.99888874066013,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2295,
+        "at": [
+          2818.43767589409,
+          207.50000000000028
+        ],
+        "camera": {
+          "x": 3873.2544600075407,
+          "y": 130.96527959564008,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2310,
+        "at": [
+          2870.93767589409,
+          248.5
+        ],
+        "camera": {
+          "x": 3921.1737152145834,
+          "y": 139.49276970020875,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2325,
+        "at": [
+          2923.43767589409,
+          161.70000000000016
+        ],
+        "camera": {
+          "x": 3933.820923786067,
+          "y": 99.70000000000016,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2340,
+        "at": [
+          2975.93767589409,
+          173.70000000000033
+        ],
+        "camera": {
+          "x": 3935.6797327708955,
+          "y": 89.8241792716163,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2355,
+        "at": [
+          3028.43767589409,
+          294.00000000000045
+        ],
+        "camera": {
+          "x": 3935.9529290910605,
+          "y": 135.46074303081897,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      }
+    ],
+    "runs": [
+      [
+        1,
+        []
+      ],
+      [
+        43,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        106,
+        []
+      ],
+      [
+        86,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        94,
+        []
+      ],
+      [
+        135,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        30,
+        [
+          "Space"
+        ]
+      ],
+      [
+        30,
+        []
+      ],
+      [
+        18,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        35,
+        []
+      ],
+      [
+        20,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        35,
+        []
+      ],
+      [
+        8,
+        [
+          "Space"
+        ]
+      ],
+      [
+        40,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        32,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        37,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        30,
+        []
+      ],
+      [
+        14,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        162,
+        []
+      ],
+      [
+        118,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        115,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        38,
+        []
+      ],
+      [
+        42,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        40,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        18,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        3,
+        []
+      ],
+      [
+        17,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        20,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        13,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        23,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        17,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        19,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        5,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        3,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        14,
+        [
+          "ArrowRight",
+          "ArrowDown"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        5,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        13,
+        []
+      ],
+      [
+        10,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        11,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        13,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        11,
+        []
+      ],
+      [
+        11,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        13,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        5,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        5,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        11,
+        []
+      ],
+      [
+        32,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        19,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        17,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        24,
+        []
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        91,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        11,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        21,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        41,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        8,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        77,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        20,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        22,
+        []
+      ],
+      [
+        10,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        17,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        26,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ]
+    ]
+  },
+  "alivio-low": {
+    "id": "alivio",
+    "high": false,
+    "wait": 0,
+    "frames": 1642,
+    "prefixFrames": 1354,
+    "finished": true,
+    "damage": [],
+    "dead": false,
+    "coins": 16,
+    "rideFrames": 0,
+    "fragileFrames": 0,
+    "liveJets": 537,
+    "warningFrames": 52,
+    "valve": false,
+    "guardDefeated": false,
+    "result": {
+      "marks": [
+        {
+          "label": "observe",
+          "x": 2346.6508366833295,
+          "feet": 336
+        },
+        {
+          "label": "finish",
+          "x": 3009.830748921797,
+          "feet": 336
+        }
+      ],
+      "result": {
+        "frames": 258,
+        "damage": 0,
+        "dead": false,
+        "finished": true
+      }
+    },
+    "notes": [
+      {
+        "frame": 1365,
+        "at": [
+          1609.8508366833303,
+          336
+        ],
+        "camera": {
+          "x": 2264.9192706424046,
+          "y": 171.98733335174998,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1380,
+        "at": [
+          1610.4508366833297,
+          336
+        ],
+        "camera": {
+          "x": 2272.9058859541246,
+          "y": 171.99935453975837,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1395,
+        "at": [
+          1629.3508366833294,
+          336
+        ],
+        "camera": {
+          "x": 2281.6276546296745,
+          "y": 171.99996710898455,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1410,
+        "at": [
+          1681.8508366833294,
+          336
+        ],
+        "camera": {
+          "x": 2322.233497687034,
+          "y": 171.99999832395733,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1425,
+        "at": [
+          1734.3508366833294,
+          336
+        ],
+        "camera": {
+          "x": 2372.9853676022813,
+          "y": 171.9999999145931,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1440,
+        "at": [
+          1786.8508366833294,
+          336
+        ],
+        "camera": {
+          "x": 2425.2284381866066,
+          "y": 171.99999999564787,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1455,
+        "at": [
+          1839.3508366833294,
+          336
+        ],
+        "camera": {
+          "x": 2477.6906762802046,
+          "y": 171.99999999977823,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1470,
+        "at": [
+          1891.8508366833294,
+          336
+        ],
+        "camera": {
+          "x": 2530.18512626729,
+          "y": 171.9999999999887,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1485,
+        "at": [
+          1928.090433915379,
+          336
+        ],
+        "camera": {
+          "x": 2576.5620547169933,
+          "y": 171.99999999999943,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1500,
+        "at": [
+          1932.0307489217967,
+          336
+        ],
+        "camera": {
+          "x": 2592.73705114591,
+          "y": 171.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1515,
+        "at": [
+          1932.0307489217967,
+          336
+        ],
+        "camera": {
+          "x": 2595.546661466092,
+          "y": 171.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1530,
+        "at": [
+          1932.0307489217967,
+          336
+        ],
+        "camera": {
+          "x": 2595.9596007228074,
+          "y": 171.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1545,
+        "at": [
+          1938.3307489217968,
+          336
+        ],
+        "camera": {
+          "x": 2597.7612393966783,
+          "y": 171.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1560,
+        "at": [
+          1986.8307489217968,
+          336
+        ],
+        "camera": {
+          "x": 2628.962977702782,
+          "y": 171.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1575,
+        "at": [
+          2039.3307489217968,
+          336
+        ],
+        "camera": {
+          "x": 2678.222420559635,
+          "y": 171.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1590,
+        "at": [
+          2091.830748921797,
+          321.5
+        ],
+        "camera": {
+          "x": 2729.751526430766,
+          "y": 171.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1605,
+        "at": [
+          2144.330748921797,
+          239.00000000000017
+        ],
+        "camera": {
+          "x": 2748.730056096135,
+          "y": 169.97218480000004,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1620,
+        "at": [
+          2196.830748921797,
+          258.50000000000034
+        ],
+        "camera": {
+          "x": 2751.519403742412,
+          "y": 168.3096785796403,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1635,
+        "at": [
+          2249.330748921797,
+          336
+        ],
+        "camera": {
+          "x": 2751.929364915852,
+          "y": 171.81195058798338,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      }
+    ],
+    "runs": [
+      [
+        39,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        30,
+        []
+      ],
+      [
+        45,
+        [
+          "Space"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        26,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        30,
+        []
+      ],
+      [
+        26,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        30,
+        []
+      ],
+      [
+        52,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        130,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        52,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        15,
+        []
+      ],
+      [
+        30,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        30,
+        []
+      ],
+      [
+        35,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        30,
+        []
+      ],
+      [
+        45,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        2,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        19,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft",
+          "Space"
+        ]
+      ],
+      [
+        2,
+        [
+          "Space"
+        ]
+      ],
+      [
+        2,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        17,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        11,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        2,
+        []
+      ],
+      [
+        23,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        17,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        15,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        9,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        10,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        3,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        18,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        4,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        8,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        11,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ArrowDown"
+        ]
+      ],
+      [
+        2,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        8,
+        []
+      ],
+      [
+        3,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        18,
+        []
+      ],
+      [
+        9,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        19,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "Space"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        5,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        22,
+        []
+      ],
+      [
+        7,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        17,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        2,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        13,
+        []
+      ],
+      [
+        8,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        2,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        5,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        11,
+        []
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        22,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        91,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        11,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        43,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        8,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        92,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        63,
+        []
+      ],
+      [
+        49,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        30,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ]
+    ]
+  },
+  "respiros-high": {
+    "id": "respiros",
+    "high": true,
+    "wait": 0,
+    "frames": 2681,
+    "prefixFrames": 2102,
+    "finished": true,
+    "damage": [],
+    "dead": false,
+    "coins": 20,
+    "rideFrames": 295,
+    "fragileFrames": 0,
+    "liveJets": 0,
+    "warningFrames": 0,
+    "result": {
+      "marks": [
+        {
+          "label": "observe",
+          "x": 3531.69594964409,
+          "feet": 304
+        },
+        {
+          "label": "land-2504",
+          "x": 3641.49594964409,
+          "feet": 256
+        },
+        {
+          "label": "boarding",
+          "x": 3648.937675894089,
+          "feet": 256
+        },
+        {
+          "label": "aboard",
+          "x": 3704.0101644420533,
+          "feet": 256
+        },
+        {
+          "label": "arrival",
+          "x": 3973.1823701075714,
+          "feet": 256
+        },
+        {
+          "label": "land-2864",
+          "x": 4009.4457897650223,
+          "feet": 256
+        },
+        {
+          "label": "finish",
+          "x": 4193.745789765022,
+          "feet": 304
+        }
+      ],
+      "result": {
+        "frames": 58,
+        "damage": 0,
+        "dead": false,
+        "finished": true
+      }
+    },
+    "notes": [
+      {
+        "frame": 2115,
+        "at": [
+          2378.9959496440906,
+          304
+        ],
+        "camera": {
+          "x": 3451.981291787311,
+          "y": 139.98733335174998,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2130,
+        "at": [
+          2379.59594964409,
+          304
+        ],
+        "camera": {
+          "x": 3458.3327342982816,
+          "y": 139.99935453975837,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2145,
+        "at": [
+          2402.99594964409,
+          225.5000000000001
+        ],
+        "camera": {
+          "x": 3469.1394355060143,
+          "y": 139.99996710898455,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2160,
+        "at": [
+          2455.49594964409,
+          207.50000000000028
+        ],
+        "camera": {
+          "x": 3511.565066609699,
+          "y": 130.96533454655255,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2175,
+        "at": [
+          2485.49594964409,
+          256
+        ],
+        "camera": {
+          "x": 3549.4676853944943,
+          "y": 139.49277250036775,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2190,
+        "at": [
+          2495.39594964409,
+          256
+        ],
+        "camera": {
+          "x": 3570.9471832553013,
+          "y": 139.9741529741723,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2205,
+        "at": [
+          2496.295949644089,
+          256
+        ],
+        "camera": {
+          "x": 3575.248788842495,
+          "y": 139.99868290117428,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2220,
+        "at": [
+          2496.937675894089,
+          256
+        ],
+        "camera": {
+          "x": 3576.64245807876,
+          "y": 139.99993288398719,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2235,
+        "at": [
+          2496.937675894089,
+          256
+        ],
+        "camera": {
+          "x": 3576.8942865940303,
+          "y": 139.99999657993837,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2250,
+        "at": [
+          2496.937675894089,
+          256
+        ],
+        "camera": {
+          "x": 3576.9312988014412,
+          "y": 139.99999982572234,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2265,
+        "at": [
+          2496.937675894089,
+          256
+        ],
+        "camera": {
+          "x": 3576.9367386282056,
+          "y": 139.99999999111927,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2280,
+        "at": [
+          2496.937675894089,
+          256
+        ],
+        "camera": {
+          "x": 3576.93753814051,
+          "y": 139.99999999954744,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2295,
+        "at": [
+          2520.316205156308,
+          256
+        ],
+        "camera": {
+          "x": 3589.606460271595,
+          "y": 139.99999999997692,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2310,
+        "at": [
+          2548.2101644420545,
+          256
+        ],
+        "camera": {
+          "x": 3615.1153853226856,
+          "y": 139.9999999999988,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2325,
+        "at": [
+          2551.210164442054,
+          256
+        ],
+        "camera": {
+          "x": 3628.6628778013082,
+          "y": 139.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2340,
+        "at": [
+          2552.3246644420533,
+          256
+        ],
+        "camera": {
+          "x": 3631.396723447142,
+          "y": 139.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2355,
+        "at": [
+          2552.923314829112,
+          256
+        ],
+        "camera": {
+          "x": 3632.462922310557,
+          "y": 139.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2370,
+        "at": [
+          2563.7774883805037,
+          256
+        ],
+        "camera": {
+          "x": 3638.1789322072204,
+          "y": 139.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2385,
+        "at": [
+          2582.360109870131,
+          256
+        ],
+        "camera": {
+          "x": 3653.775156492324,
+          "y": 139.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2400,
+        "at": [
+          2600.99024685643,
+          256
+        ],
+        "camera": {
+          "x": 3671.9590639061817,
+          "y": 139.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2415,
+        "at": [
+          2619.6203838427286,
+          256
+        ],
+        "camera": {
+          "x": 3690.523616812494,
+          "y": 139.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2430,
+        "at": [
+          2638.250520829027,
+          256
+        ],
+        "camera": {
+          "x": 3709.1441146538023,
+          "y": 139.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2445,
+        "at": [
+          2656.880657815326,
+          256
+        ],
+        "camera": {
+          "x": 3727.772834937814,
+          "y": 139.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2460,
+        "at": [
+          2675.5107948016243,
+          256
+        ],
+        "camera": {
+          "x": 3746.4027637059176,
+          "y": 139.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2475,
+        "at": [
+          2694.1409317879234,
+          256
+        ],
+        "camera": {
+          "x": 3765.0328700895857,
+          "y": 139.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2490,
+        "at": [
+          2712.771068774222,
+          256
+        ],
+        "camera": {
+          "x": 3783.663002578098,
+          "y": 139.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2505,
+        "at": [
+          2731.4012057605205,
+          256
+        ],
+        "camera": {
+          "x": 3802.2931389033397,
+          "y": 139.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2520,
+        "at": [
+          2750.031342746819,
+          256
+        ],
+        "camera": {
+          "x": 3820.923275792479,
+          "y": 139.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2535,
+        "at": [
+          2768.6614797331176,
+          256
+        ],
+        "camera": {
+          "x": 3839.5534127644987,
+          "y": 139.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2550,
+        "at": [
+          2787.291616719416,
+          256
+        ],
+        "camera": {
+          "x": 3858.1835497486986,
+          "y": 139.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2565,
+        "at": [
+          2805.921753705715,
+          256
+        ],
+        "camera": {
+          "x": 3876.813686734689,
+          "y": 139.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2580,
+        "at": [
+          2821.8439613244714,
+          256
+        ],
+        "camera": {
+          "x": 3894.507043625904,
+          "y": 139.99999999999994,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2595,
+        "at": [
+          2846.7243792399963,
+          164.90000000000015
+        ],
+        "camera": {
+          "x": 3914.0929125894386,
+          "y": 102.90000000000015,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2610,
+        "at": [
+          2859.514103329137,
+          169.40000000000032
+        ],
+        "camera": {
+          "x": 3932.378783422635,
+          "y": 87.65631618489786,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2625,
+        "at": [
+          2858.3457897650223,
+          256
+        ],
+        "camera": {
+          "x": 3935.467775843818,
+          "y": 134.46432076929142,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2640,
+        "at": [
+          2898.2457897650224,
+          194.60000000000008
+        ],
+        "camera": {
+          "x": 3935.921776964627,
+          "y": 132.60000000000008,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2655,
+        "at": [
+          2950.745789765022,
+          154.10000000000025
+        ],
+        "camera": {
+          "x": 3935.9885032590278,
+          "y": 84.17059166732207,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 2670,
+        "at": [
+          3003.245789765022,
+          226.10000000000042
+        ],
+        "camera": {
+          "x": 3935.998310279672,
+          "y": 121.7909284530538,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      }
+    ],
+    "runs": [
+      [
+        1,
+        []
+      ],
+      [
+        43,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        106,
+        []
+      ],
+      [
+        86,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        94,
+        []
+      ],
+      [
+        135,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        30,
+        [
+          "Space"
+        ]
+      ],
+      [
+        30,
+        []
+      ],
+      [
+        18,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        35,
+        []
+      ],
+      [
+        20,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        35,
+        []
+      ],
+      [
+        8,
+        [
+          "Space"
+        ]
+      ],
+      [
+        40,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        32,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        37,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        30,
+        []
+      ],
+      [
+        14,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        162,
+        []
+      ],
+      [
+        118,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        20,
+        []
+      ],
+      [
+        115,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        38,
+        []
+      ],
+      [
+        42,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        40,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        18,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        3,
+        []
+      ],
+      [
+        17,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        20,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        13,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        23,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        17,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        19,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        5,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        3,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        14,
+        [
+          "ArrowRight",
+          "ArrowDown"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        5,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        13,
+        []
+      ],
+      [
+        10,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        11,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        13,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        11,
+        []
+      ],
+      [
+        11,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        13,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        5,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        5,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        11,
+        []
+      ],
+      [
+        32,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        19,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        17,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        24,
+        []
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        91,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        11,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        21,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        41,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        8,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        3,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        17,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        73,
+        []
+      ],
+      [
+        28,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        242,
+        []
+      ],
+      [
+        18,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft",
+          "Space"
+        ]
+      ],
+      [
+        5,
+        [
+          "Space"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        4,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        14,
+        []
+      ],
+      [
+        8,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        26,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ]
+    ]
+  },
+  "alivio-high": {
+    "id": "alivio",
+    "high": true,
+    "wait": 0,
+    "frames": 1726,
+    "prefixFrames": 1354,
+    "finished": true,
+    "damage": [],
+    "dead": false,
+    "coins": 20,
+    "rideFrames": 0,
+    "fragileFrames": 0,
+    "liveJets": 556,
+    "warningFrames": 52,
+    "valve": true,
+    "guardDefeated": true,
+    "result": {
+      "marks": [
+        {
+          "label": "observe",
+          "x": 2346.6508366833295,
+          "feet": 336
+        },
+        {
+          "label": "land-1712",
+          "x": 2433.4508366833297,
+          "feet": 272
+        },
+        {
+          "label": "land-1824",
+          "x": 2545.1508366833295,
+          "feet": 208
+        },
+        {
+          "label": "land-1912",
+          "x": 2643.8387458900875,
+          "feet": 208
+        },
+        {
+          "label": "land-1936",
+          "x": 2656.1387458900876,
+          "feet": 208
+        },
+        {
+          "label": "valve",
+          "x": 2663.5804721400864,
+          "feet": 208
+        },
+        {
+          "label": "land-2096",
+          "x": 2816.8804721400866,
+          "feet": 288
+        },
+        {
+          "label": "finish",
+          "x": 3009.8804721400866,
+          "feet": 336
+        }
+      ],
+      "result": {
+        "frames": 56,
+        "damage": 0,
+        "dead": false,
+        "finished": true
+      }
+    },
+    "notes": [
+      {
+        "frame": 1365,
+        "at": [
+          1609.8508366833303,
+          336
+        ],
+        "camera": {
+          "x": 2264.9192706424046,
+          "y": 171.98733335174998,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1380,
+        "at": [
+          1610.4508366833297,
+          336
+        ],
+        "camera": {
+          "x": 2272.9058859541246,
+          "y": 171.99935453975837,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1395,
+        "at": [
+          1627.1508366833295,
+          268.4000000000001
+        ],
+        "camera": {
+          "x": 2280.534869369972,
+          "y": 171.99996710898455,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1410,
+        "at": [
+          1673.4508366833297,
+          235.40000000000026
+        ],
+        "camera": {
+          "x": 2318.428975115291,
+          "y": 162.2352990714218,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1425,
+        "at": [
+          1703.4508366833297,
+          257.5
+        ],
+        "camera": {
+          "x": 2352.084511837522,
+          "y": 171.24564623490042,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1440,
+        "at": [
+          1754.1508366833295,
+          175.00000000000017
+        ],
+        "camera": {
+          "x": 2394.287474050051,
+          "y": 113.00000000000017,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1455,
+        "at": [
+          1793.1508366833295,
+          194.50000000000034
+        ],
+        "camera": {
+          "x": 2439.267946360086,
+          "y": 108.46582700272543,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1470,
+        "at": [
+          1827.3508366833294,
+          166.70000000000005
+        ],
+        "camera": {
+          "x": 2472.9533303187222,
+          "y": 104.70000000000005,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1485,
+        "at": [
+          1872.3508366833294,
+          105.20000000000003
+        ],
+        "camera": {
+          "x": 2516.947495436074,
+          "y": 39.93833459200004,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1500,
+        "at": [
+          1899.0740366833293,
+          130.5
+        ],
+        "camera": {
+          "x": 2550.236659082883,
+          "y": 51.05908852432762,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1515,
+        "at": [
+          1907.4676290421226,
+          150
+        ],
+        "camera": {
+          "x": 2566.3994639726257,
+          "y": 88,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1530,
+        "at": [
+          1907.8387458900875,
+          157.5
+        ],
+        "camera": {
+          "x": 2571.0475425916047,
+          "y": 95.5,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1545,
+        "at": [
+          1912.3387458900875,
+          208
+        ],
+        "camera": {
+          "x": 2572.8417181010504,
+          "y": 130.70800188704746,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1560,
+        "at": [
+          1925.9387458900874,
+          208
+        ],
+        "camera": {
+          "x": 2586.2097763074494,
+          "y": 133.8322481326192,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1575,
+        "at": [
+          1926.8387458900866,
+          208
+        ],
+        "camera": {
+          "x": 2589.897376399117,
+          "y": 133.991451790662,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1590,
+        "at": [
+          1927.5804721400864,
+          134.70000000000005
+        ],
+        "camera": {
+          "x": 2591.2409296171536,
+          "y": 72.70000000000006,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1605,
+        "at": [
+          1927.5804721400864,
+          196.80000000000007
+        ],
+        "camera": {
+          "x": 2591.530568266928,
+          "y": 110.80000000000005,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1620,
+        "at": [
+          1933.8804721400866,
+          173.40000000000003
+        ],
+        "camera": {
+          "x": 2593.3140849754086,
+          "y": 111.40000000000003,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1635,
+        "at": [
+          1982.3804721400866,
+          105.90000000000003
+        ],
+        "camera": {
+          "x": 2624.513159826419,
+          "y": 43.900000000000034,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1650,
+        "at": [
+          2034.8804721400866,
+          147.89999999999998
+        ],
+        "camera": {
+          "x": 2673.7722112250126,
+          "y": 85.89999999999999,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1665,
+        "at": [
+          2070.8804721400866,
+          286.00000000000006
+        ],
+        "camera": {
+          "x": 2717.5999870710007,
+          "y": 162.81548030983066,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1680,
+        "at": [
+          2112.8804721400866,
+          260.1
+        ],
+        "camera": {
+          "x": 2745.269541169761,
+          "y": 171.5319801907056,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1695,
+        "at": [
+          2165.3804721400866,
+          187.1000000000002
+        ],
+        "camera": {
+          "x": 2751.010798527203,
+          "y": 124.04208000000018,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1710,
+        "at": [
+          2217.8804721400866,
+          221.60000000000036
+        ],
+        "camera": {
+          "x": 2751.8546132472593,
+          "y": 131.1885020766327,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      },
+      {
+        "frame": 1725,
+        "at": [
+          2270.3804721400866,
+          336
+        ],
+        "camera": {
+          "x": 2751.9786319486434,
+          "y": 169.4971989634166,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        }
+      }
+    ],
+    "runs": [
+      [
+        39,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        30,
+        []
+      ],
+      [
+        45,
+        [
+          "Space"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        26,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        30,
+        []
+      ],
+      [
+        26,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        30,
+        []
+      ],
+      [
+        52,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        130,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        52,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        15,
+        []
+      ],
+      [
+        30,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        30,
+        []
+      ],
+      [
+        35,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        30,
+        []
+      ],
+      [
+        45,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        2,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        19,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft",
+          "Space"
+        ]
+      ],
+      [
+        2,
+        [
+          "Space"
+        ]
+      ],
+      [
+        2,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        17,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        11,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        2,
+        []
+      ],
+      [
+        23,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        17,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        15,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        9,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        10,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        3,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        18,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        4,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        8,
+        []
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        11,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ArrowDown"
+        ]
+      ],
+      [
+        2,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        8,
+        []
+      ],
+      [
+        3,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        18,
+        []
+      ],
+      [
+        9,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        19,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "Space"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        5,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        22,
+        []
+      ],
+      [
+        7,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        17,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        2,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        13,
+        []
+      ],
+      [
+        8,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        2,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        5,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        11,
+        []
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        22,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        91,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        11,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        43,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        8,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        21,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        3,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        13,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        23,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        16,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        8,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        8,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        12,
+        [
+          "ArrowRight",
+          "ArrowDown"
+        ]
+      ],
+      [
+        10,
+        []
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        21,
+        []
+      ],
+      [
+        9,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        13,
+        [
+          "Space"
+        ]
+      ],
+      [
+        14,
+        [
+          "ArrowDown"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        8,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        15,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        16,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        24,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        26,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ]
+    ]
+  }
+}

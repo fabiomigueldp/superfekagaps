@@ -1,4 +1,6 @@
 import { chapterJourneyStory } from './GuairaChapterStory';
+import { guairaAlternateOpening } from './GuairaChapterProgress';
+import { guairaExplorationRows, type GuairaExplorationProgress } from '../GuairaCourseExploration';
 import { chapterExitPresentation } from './GuairaChapterPresentation';
 import { GuairaChapterAction } from './GuairaChapterAction';
 import { approachGuairaCamera, guairaCamera, guairaScreenPoint, paintGuairaMap, paintGuairaWaterFrame, type GuairaCamera } from '../GuairaMapArt';
@@ -18,6 +20,7 @@ export interface GuairaChapterMapOptions {
     audioEnabled?: () => boolean;
     storageMessage?: () => string;
     optionalProgress?: () => { gallery: boolean; relief: boolean };
+    explorationProgress?: () => GuairaExplorationProgress | undefined;
     campaign?: boolean;
     canContinueCampaign?: () => boolean;
     onContinueCampaign?: (generation: GuairaChapterGeneration, revision: number) => void;
@@ -90,6 +93,7 @@ export class GuairaChapterMapView {
     private readonly list = element('ol', 'chapter-map-list');
     private readonly optionalGroup = element('section', 'chapter-map-optional');
     private readonly optionalButton = element('button', 'chapter-map-optional-button');
+    private readonly optionalExploration = element('p', 'chapter-map-exploration');
     private readonly close = control('FECHAR', 'Fechar a jornada e voltar ao mapa');
     private readonly restart = control('VOLTAR AO INÍCIO', 'Voltar ao início sem apagar trechos concluídos');
     private readonly lifecycle = new AbortController();
@@ -173,6 +177,7 @@ export class GuairaChapterMapView {
         this.optionalButton.setAttribute('aria-label', 'Bairro da Vala Seca / Galeria dos Remendos: desvio opcional');
         this.optionalButton.append(element('span', 'chapter-map-step-title', 'Bairro da Vala Seca'), element('span', 'chapter-map-step-state', 'Galeria dos Remendos · fora das cinco etapas'));
         this.optionalGroup.append(optionalTitle, this.optionalButton);
+        this.optionalGroup.append(this.optionalExploration);
         const dialogFooter = element('div', 'chapter-map-dialog-footer');
         dialogFooter.append(element('p', 'chapter-map-session-note', 'Voltar ao início mantém os trechos concluídos. Cada nova tentativa começa do início.'), this.restart.button);
         const utilities = element('nav', 'chapter-map-utilities'); utilities.setAttribute('aria-label', 'Opções e viagens de Guaíra');
@@ -255,6 +260,8 @@ export class GuairaChapterMapView {
             && revision === this.navigation.revision && sameChapterMapTarget(target, this.navigation.target);
     }
     private selectable(sceneId: GuairaChapterSceneId) {
+        if (sceneId === guairaAlternateOpening(this.snapshot.opening))
+            return this.snapshot.developmentUnlocked || this.snapshot.accepted.some(receipt => receipt.sceneId === this.snapshot.opening);
         return this.snapshot.route.includes(sceneId) && (this.snapshot.developmentUnlocked || sceneId === this.snapshot.nextRecommendedScene || this.snapshot.accepted.some(receipt => receipt.sceneId === sceneId));
     }
     private targetSelectable(target: GuairaChapterMapTarget) {
@@ -337,7 +344,8 @@ export class GuairaChapterMapView {
         const optional = target.kind === 'optional';
         const ready = this.loadState === 'ready', moving = this.moving();
         const canEnter = this.canEnter(target, snapshot.generation, revision);
-        const accepted = !optional && snapshot.accepted.some(receipt => receipt.sceneId === snapshot.selectedScene);
+        const accepted = !optional && (snapshot.accepted.some(receipt => receipt.sceneId === snapshot.selectedScene)
+            || snapshot.alternateCompleted === true && snapshot.selectedScene === guairaAlternateOpening(snapshot.opening));
         const opening = !optional && this.openingAvailable && !snapshot.accepted.length && !snapshot.activeAttempt;
         const canContinueCampaign = !!this.options.canContinueCampaign?.();
         const key = `${snapshot.generation.sessionId}:${snapshot.generation.generation}:${revision}:${optional}:${ready}:${this.loadState}:${moving}:${canEnter}:${this.entryRequested}:${this.overviewActive}:${opening}:${snapshot.selectedScene}:${snapshot.accepted.length}:${this.water.released}:${this.options.storageMessage?.()}:${canContinueCampaign}:${this.menuOpen}`;
@@ -414,14 +422,20 @@ export class GuairaChapterMapView {
     private renderList() {
         this.list.replaceChildren();
         const generation = this.snapshot.generation, { target, revision } = this.navigation, menuVersion = ++this.menuVersion;
-        this.snapshot.route.forEach((sceneId, index) => {
+        const alternate = guairaAlternateOpening(this.snapshot.opening);
+        const visitable = [...this.snapshot.route, ...(this.selectable(alternate) ? [alternate] : [])];
+        visitable.forEach((sceneId, index) => {
             const scene = CHAPTER_SCENES[sceneId], item = element('li', 'chapter-map-step');
-            const accepted = this.snapshot.accepted.some(receipt => receipt.sceneId === sceneId);
-            const state = accepted ? 'Concluído · repetir' : sceneId === this.snapshot.nextRecommendedScene ? 'Próximo trecho' : this.snapshot.developmentUnlocked ? 'Disponível' : `Depois de ${CHAPTER_SCENES[this.snapshot.route[index - 1]].title}`;
+            const side = sceneId === alternate;
+            const accepted = side ? this.snapshot.alternateCompleted : this.snapshot.accepted.some(receipt => receipt.sceneId === sceneId);
+            const state = accepted ? 'Concluído · repetir' : side ? 'Percurso alternativo · opcional' : sceneId === this.snapshot.nextRecommendedScene ? 'Próximo trecho' : this.snapshot.developmentUnlocked ? 'Disponível' : `Depois de ${CHAPTER_SCENES[this.snapshot.route[index - 1]].title}`;
             const row = element('button', 'chapter-map-step-button'); row.type = 'button';
-            row.append(element('span', 'chapter-map-step-title', `${index + 1}. ${scene.title}`), element('span', 'chapter-map-step-state', state));
+            row.append(element('span', 'chapter-map-step-title', `${side ? 'D' : index + 1}. ${scene.title}`), element('span', 'chapter-map-step-state', state));
+            const exploration = this.selectable(sceneId) ? guairaExplorationRows(sceneId, this.options.explorationProgress?.()) : [];
+            for (const detail of exploration) row.append(element('span', 'chapter-map-exploration', detail));
             row.disabled = !this.selectable(sceneId) || !this.current(generation, revision, target);
             row.setAttribute('aria-label', `${scene.title}: ${state}`);
+            row.setAttribute('aria-description', exploration.join(' · '));
             row.setAttribute('aria-pressed', String(target.kind === 'chapter' && sceneId === target.sceneId));
             // Property handlers let replaced rows be collected rather than retaining them on the lifetime signal.
             row.onclick = () => {
@@ -430,6 +444,10 @@ export class GuairaChapterMapView {
             };
             item.append(row); this.list.append(item);
         });
+        this.optionalExploration.replaceChildren();
+        for (const [name, stageId] of [['Galeria', 'guaira-galeria'], ['Alívio', 'guaira-camara-alivio']])
+            for (const detail of guairaExplorationRows(stageId, this.options.explorationProgress?.()))
+                this.optionalExploration.append(element('span', 'chapter-map-exploration-row', `${name}: ${detail}`));
         this.optionalButton.disabled = !this.current(generation, revision, target);
         this.optionalButton.setAttribute('aria-pressed', String(target.kind === 'optional'));
         this.optionalButton.onclick = () => {

@@ -1,3 +1,4 @@
+import { restoreGuairaCoursePassages } from '../GuairaCourseDesign';
 import { WorldGame } from '../../../WorldGame';
 import type { CameraData } from '../../../../types';
 import { CompletedAvatarPresentation } from '../CompletedAvatarPresentation';
@@ -7,6 +8,7 @@ import { panel, pixelText } from '../../../../graphics/BitmapFont';
 import { drawGuairaCoinReadout } from '../GuairaCoinReadout';
 import { GUAIRA_RELIEF as G, guairaReliefStage, reliefOpen } from './GuairaReliefStage';
 import { drawReliefBackground, drawReliefTerrain, drawReliefObjects } from './GuairaReliefArt';
+import { installGuairaCourseArt, frameGuairaCourse, drawGuairaCourseHUD, guairaCourseStatus } from '../GuairaCoursePresentation';
 import { GuairaReliefChallenge, RELIEF_ROUTE_OBJECTIVES, reliefChallengeMessage,
     type GuairaReliefOptions, type GuairaReliefReplayKind, type GuairaReliefReplayAction,
     type GuairaReliefRouteAPI } from './GuairaReliefChallenge';
@@ -43,6 +45,7 @@ export class GuairaRelief extends WorldGame {
             this.art.terrain = (c, level, _island, x, y, _time, reducedMotion) => drawReliefTerrain(c, level, x, y, reducedMotion);
             this.art.genericStructures = false;
             this.art.objects = (c, objects, x, y) => drawReliefObjects(c, objects, x, y, this.reducedMotion);
+            installGuairaCourseArt(this, 'alivio');
             this.store.save.preferences.shake = !this.reducedMotion;
             if (this.reducedMotion) {
                 (this as unknown as { particle: (...args: unknown[]) => void }).particle = () => {};
@@ -61,6 +64,7 @@ export class GuairaRelief extends WorldGame {
         this.replayRevision++; this.replayPending = false;
         if (resume) this.challenge.reconstruct(); else this.challenge.reset();
         super.load(G.id, resume, guairaReliefStage());
+        if (resume && this.store.save.checkpoint) restoreGuairaCoursePassages(this.objects, this.player.data.position.x);
         this.finished = false; this.time = 0; this.completedAvatar.reset();
         const p = this.player.data;
         p.isGrounded = true; p.facingRight = true; p.respawnRevealTimer = 0;
@@ -92,6 +96,7 @@ export class GuairaRelief extends WorldGame {
             reliefOpened: this.reliefOpened, finished: this.finished });
     }
     private frameRelief(snap = false, previousX = this.camera.x, previousY = this.camera.y) {
+        if (frameGuairaCourse(this, 'alivio', snap, previousX, previousY)) return;
         const p = this.player.data, feet = p.position.y + p.height;
         const tx = Math.max(0, Math.min(G.width * 16 - 320, p.position.x - 64));
         this.camera.x = snap ? tx : previousX + (tx - previousX) * .12;
@@ -137,6 +142,7 @@ export class GuairaRelief extends WorldGame {
         if (this.isDisposed || !Number.isFinite(dt) || dt <= 0) return;
         if (['map', 'title', 'intro'].includes(this.state)) { this.load(G.id); return; }
         if (this.finished) {
+            if (this.updateController()) return;
             this.input.setMenuMode(this.state !== 'playing'); this.input.update();
             if (this.input.consumeMute()) this.audio.toggle();
             this.audio.tick(dt);
@@ -188,6 +194,7 @@ export class GuairaRelief extends WorldGame {
             panel(c, 62, 70, 196, 43, '#283d40', '#c2b78a');
             pixelText(c, 'PAUSADO', 160, 79, '#f3ddb1', 2, 'center');
         }
+        drawGuairaCourseHUD(this, 'alivio');
         this.renderer.present();
         const message = paused ? 'Pausado · Esc para continuar'
             : this.finished ? `PASSAGEM INSPECIONADA · ${this.reliefOpened ? 'alívio aberto, grelha sem pressão' : 'alívio intacto, grelha mantém o ciclo'} · sem progresso salvo`
@@ -195,6 +202,7 @@ export class GuairaRelief extends WorldGame {
             : this.routeHint()[1];
         const optional = !paused && !this.player.data.isDead ? reliefChallengeMessage(this.routes.snapshot) : null;
         const text = optional ? `${message} · ${optional}` : message;
-        if (this.status.textContent !== text) this.status.textContent = text;
+        const courseStatus = guairaCourseStatus(this, 'alivio', text);
+        if (this.status.textContent !== courseStatus) this.status.textContent = courseStatus;
     }
 }

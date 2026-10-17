@@ -1,0 +1,1734 @@
+{
+  "nativeInputOnly": true,
+  "actorOrClockEdits": false,
+  "stepMs": 16.666666666666668,
+  "captureFps": 30,
+  "routes": {
+    "upper": {
+      "frames": 2196,
+      "hitFrames": [
+        407,
+        1083,
+        2012
+      ],
+      "minHelmet": 27,
+      "maxFeet": 160,
+      "damage": [],
+      "screens": [
+        {
+          "frame": 679,
+          "file": "upper-679.png",
+          "label": "DESCIDA"
+        },
+        {
+          "frame": 714,
+          "file": "upper-714.png",
+          "label": "PREPARACAO"
+        },
+        {
+          "frame": 754,
+          "file": "upper-754.png",
+          "label": "INVESTIDA"
+        },
+        {
+          "frame": 792,
+          "file": "upper-792.png",
+          "label": "FRENAGEM"
+        },
+        {
+          "frame": 1083,
+          "file": "upper-1083.png",
+          "label": "CONTRA-ATAQUE"
+        },
+        {
+          "frame": 1415,
+          "file": "upper-1415.png",
+          "label": "DESCIDA"
+        },
+        {
+          "frame": 1450,
+          "file": "upper-1450.png",
+          "label": "PREPARACAO"
+        },
+        {
+          "frame": 1484,
+          "file": "upper-1484.png",
+          "label": "INVESTIDA"
+        },
+        {
+          "frame": 1518,
+          "file": "upper-1518.png",
+          "label": "FRENAGEM"
+        },
+        {
+          "frame": 1550,
+          "file": "upper-1550.png",
+          "label": "PREPARACAO"
+        },
+        {
+          "frame": 2012,
+          "file": "upper-2012.png",
+          "label": "AGUA LIBERADA"
+        }
+      ],
+      "events": [
+        {
+          "frame": 102,
+          "tick": 102,
+          "kind": "warning",
+          "seals": 3,
+          "player": {
+            "x": 25.97465931112964,
+            "feet": 224
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 194,
+          "tick": 194,
+          "kind": "stamp",
+          "seals": 3,
+          "player": {
+            "x": 92.99999999999999,
+            "feet": 224
+          },
+          "boss": {
+            "x": 26,
+            "y": 184
+          }
+        },
+        {
+          "frame": 407,
+          "tick": 407,
+          "kind": "hit",
+          "seals": 2,
+          "player": {
+            "x": 284.0760220666111,
+            "feet": 120
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 496,
+          "tick": 491,
+          "kind": "jetWarning",
+          "seals": 2,
+          "player": {
+            "x": 284.0760220666111,
+            "feet": 160
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 542,
+          "tick": 537,
+          "kind": "jet",
+          "seals": 2,
+          "player": {
+            "x": 284.0760220666111,
+            "feet": 62.99999999999996
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 580,
+          "tick": 575,
+          "kind": "jetWarning",
+          "seals": 2,
+          "player": {
+            "x": 284.0760220666111,
+            "feet": 77.5
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 626,
+          "tick": 621,
+          "kind": "jet",
+          "seals": 2,
+          "player": {
+            "x": 284.0760220666111,
+            "feet": 85
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 664,
+          "tick": 659,
+          "kind": "vault",
+          "seals": 2,
+          "pass": 1,
+          "player": {
+            "x": 284.0760220666111,
+            "feet": 77.5
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 696,
+          "tick": 691,
+          "kind": "rushWarning",
+          "seals": 2,
+          "pass": 1,
+          "player": {
+            "x": 284.0760220666111,
+            "feet": 160
+          },
+          "boss": {
+            "x": 68,
+            "y": 184
+          }
+        },
+        {
+          "frame": 738,
+          "tick": 733,
+          "kind": "rush",
+          "seals": 2,
+          "pass": 1,
+          "player": {
+            "x": 284.0760220666111,
+            "feet": 69.99999999999994
+          },
+          "boss": {
+            "x": 68,
+            "y": 184
+          }
+        },
+        {
+          "frame": 738,
+          "tick": 733,
+          "kind": "jet",
+          "seals": 2,
+          "pass": 1,
+          "player": {
+            "x": 284.0760220666111,
+            "feet": 69.99999999999994
+          },
+          "boss": {
+            "x": 68,
+            "y": 184
+          }
+        },
+        {
+          "frame": 786,
+          "tick": 781,
+          "kind": "brake",
+          "seals": 2,
+          "pass": 1,
+          "player": {
+            "x": 284.0760220666111,
+            "feet": 160
+          },
+          "boss": {
+            "x": 264,
+            "y": 184
+          }
+        },
+        {
+          "frame": 806,
+          "tick": 801,
+          "kind": "warning",
+          "seals": 2,
+          "player": {
+            "x": 284.0760220666111,
+            "feet": 160
+          },
+          "boss": {
+            "x": 264,
+            "y": 184
+          }
+        },
+        {
+          "frame": 898,
+          "tick": 893,
+          "kind": "stamp",
+          "seals": 2,
+          "player": {
+            "x": 237.05068137774072,
+            "feet": 160
+          },
+          "boss": {
+            "x": 266,
+            "y": 120
+          }
+        },
+        {
+          "frame": 922,
+          "tick": 917,
+          "kind": "waves",
+          "seals": 2,
+          "player": {
+            "x": 237.05068137774072,
+            "feet": 160
+          },
+          "boss": {
+            "x": 266,
+            "y": 120
+          }
+        },
+        {
+          "frame": 947,
+          "tick": 941,
+          "kind": "drain",
+          "seals": 2,
+          "player": {
+            "x": 237.05068137774072,
+            "feet": 160
+          },
+          "boss": {
+            "x": 264.8095238095238,
+            "y": 85.59937899169893
+          }
+        },
+        {
+          "frame": 1083,
+          "tick": 1078,
+          "kind": "hit",
+          "seals": 1,
+          "player": {
+            "x": 285.84250240039864,
+            "feet": 120
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1172,
+          "tick": 1162,
+          "kind": "jetWarning",
+          "seals": 1,
+          "player": {
+            "x": 286.0760220666111,
+            "feet": 160
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1214,
+          "tick": 1204,
+          "kind": "jet",
+          "seals": 1,
+          "player": {
+            "x": 286.0760220666111,
+            "feet": 160
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1248,
+          "tick": 1238,
+          "kind": "jetWarning",
+          "seals": 1,
+          "player": {
+            "x": 286.0760220666111,
+            "feet": 160
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1290,
+          "tick": 1280,
+          "kind": "jet",
+          "seals": 1,
+          "player": {
+            "x": 286.0760220666111,
+            "feet": 59.09999999999995
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1324,
+          "tick": 1314,
+          "kind": "jetWarning",
+          "seals": 1,
+          "player": {
+            "x": 286.0760220666111,
+            "feet": 75
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1366,
+          "tick": 1356,
+          "kind": "jet",
+          "seals": 1,
+          "player": {
+            "x": 286.0760220666111,
+            "feet": 113.5
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1400,
+          "tick": 1390,
+          "kind": "vault",
+          "seals": 1,
+          "pass": 1,
+          "player": {
+            "x": 286.0760220666111,
+            "feet": 85
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1432,
+          "tick": 1422,
+          "kind": "rushWarning",
+          "seals": 1,
+          "pass": 1,
+          "player": {
+            "x": 286.0760220666111,
+            "feet": 160
+          },
+          "boss": {
+            "x": 68,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1468,
+          "tick": 1458,
+          "kind": "rush",
+          "seals": 1,
+          "pass": 1,
+          "player": {
+            "x": 286.0760220666111,
+            "feet": 60.09999999999995
+          },
+          "boss": {
+            "x": 68,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1468,
+          "tick": 1458,
+          "kind": "jet",
+          "seals": 1,
+          "pass": 1,
+          "player": {
+            "x": 286.0760220666111,
+            "feet": 60.09999999999995
+          },
+          "boss": {
+            "x": 68,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1512,
+          "tick": 1502,
+          "kind": "brake",
+          "seals": 1,
+          "pass": 1,
+          "player": {
+            "x": 286.0760220666111,
+            "feet": 160
+          },
+          "boss": {
+            "x": 264,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1532,
+          "tick": 1522,
+          "kind": "rushWarning",
+          "seals": 1,
+          "pass": 2,
+          "player": {
+            "x": 286.0760220666111,
+            "feet": 160
+          },
+          "boss": {
+            "x": 264,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1568,
+          "tick": 1558,
+          "kind": "rush",
+          "seals": 1,
+          "pass": 2,
+          "player": {
+            "x": 286.0760220666111,
+            "feet": 60.09999999999995
+          },
+          "boss": {
+            "x": 264,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1568,
+          "tick": 1558,
+          "kind": "jet",
+          "seals": 1,
+          "pass": 2,
+          "player": {
+            "x": 286.0760220666111,
+            "feet": 60.09999999999995
+          },
+          "boss": {
+            "x": 264,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1612,
+          "tick": 1602,
+          "kind": "brake",
+          "seals": 1,
+          "pass": 2,
+          "player": {
+            "x": 286.0760220666111,
+            "feet": 160
+          },
+          "boss": {
+            "x": 68,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1632,
+          "tick": 1622,
+          "kind": "warning",
+          "seals": 1,
+          "player": {
+            "x": 286.0760220666111,
+            "feet": 160
+          },
+          "boss": {
+            "x": 68,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1724,
+          "tick": 1714,
+          "kind": "stamp",
+          "seals": 1,
+          "player": {
+            "x": 237.05068137774072,
+            "feet": 160
+          },
+          "boss": {
+            "x": 266,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1748,
+          "tick": 1738,
+          "kind": "warning",
+          "seals": 1,
+          "player": {
+            "x": 237.05068137774072,
+            "feet": 160
+          },
+          "boss": {
+            "x": 266,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1818,
+          "tick": 1808,
+          "kind": "stamp",
+          "seals": 1,
+          "player": {
+            "x": 290.0760220666111,
+            "feet": 160
+          },
+          "boss": {
+            "x": 223,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1842,
+          "tick": 1832,
+          "kind": "waves",
+          "seals": 1,
+          "player": {
+            "x": 290.0760220666111,
+            "feet": 160
+          },
+          "boss": {
+            "x": 223,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1897,
+          "tick": 1886,
+          "kind": "drain",
+          "seals": 1,
+          "player": {
+            "x": 236.7115138397895,
+            "feet": 160
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 2012,
+          "tick": 2002,
+          "kind": "released",
+          "seals": 0,
+          "player": {
+            "x": 285.5033348624474,
+            "feet": 120
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        }
+      ],
+      "videoFrames": 1098,
+      "complete": true
+    },
+    "ground": {
+      "frames": 2259,
+      "hitFrames": [
+        407,
+        1146,
+        2075
+      ],
+      "minHelmet": 27,
+      "maxFeet": 160,
+      "damage": [],
+      "screens": [
+        {
+          "frame": 679,
+          "file": "ground-679.png",
+          "label": "DESCIDA"
+        },
+        {
+          "frame": 714,
+          "file": "ground-714.png",
+          "label": "PREPARACAO"
+        },
+        {
+          "frame": 754,
+          "file": "ground-754.png",
+          "label": "INVESTIDA"
+        },
+        {
+          "frame": 792,
+          "file": "ground-792.png",
+          "label": "FRENAGEM"
+        },
+        {
+          "frame": 1146,
+          "file": "ground-1146.png",
+          "label": "CONTRA-ATAQUE"
+        },
+        {
+          "frame": 1478,
+          "file": "ground-1478.png",
+          "label": "DESCIDA"
+        },
+        {
+          "frame": 1513,
+          "file": "ground-1513.png",
+          "label": "PREPARACAO"
+        },
+        {
+          "frame": 1547,
+          "file": "ground-1547.png",
+          "label": "INVESTIDA"
+        },
+        {
+          "frame": 1581,
+          "file": "ground-1581.png",
+          "label": "FRENAGEM"
+        },
+        {
+          "frame": 1613,
+          "file": "ground-1613.png",
+          "label": "PREPARACAO"
+        },
+        {
+          "frame": 2075,
+          "file": "ground-2075.png",
+          "label": "AGUA LIBERADA"
+        }
+      ],
+      "events": [
+        {
+          "frame": 102,
+          "tick": 102,
+          "kind": "warning",
+          "seals": 3,
+          "player": {
+            "x": 25.97465931112964,
+            "feet": 224
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 194,
+          "tick": 194,
+          "kind": "stamp",
+          "seals": 3,
+          "player": {
+            "x": 92.99999999999999,
+            "feet": 224
+          },
+          "boss": {
+            "x": 26,
+            "y": 184
+          }
+        },
+        {
+          "frame": 407,
+          "tick": 407,
+          "kind": "hit",
+          "seals": 2,
+          "player": {
+            "x": 284.0760220666111,
+            "feet": 120
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 496,
+          "tick": 491,
+          "kind": "jetWarning",
+          "seals": 2,
+          "player": {
+            "x": 182.07589573379855,
+            "feet": 160
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 542,
+          "tick": 537,
+          "kind": "jet",
+          "seals": 2,
+          "player": {
+            "x": 179.05068137774072,
+            "feet": 202.16666666666623
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 580,
+          "tick": 575,
+          "kind": "jetWarning",
+          "seals": 2,
+          "player": {
+            "x": 179.05068137774072,
+            "feet": 224
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 626,
+          "tick": 621,
+          "kind": "jet",
+          "seals": 2,
+          "player": {
+            "x": 179.05068137774072,
+            "feet": 224
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 664,
+          "tick": 659,
+          "kind": "vault",
+          "seals": 2,
+          "pass": 1,
+          "player": {
+            "x": 179.05068137774072,
+            "feet": 135.00000000000009
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 696,
+          "tick": 691,
+          "kind": "rushWarning",
+          "seals": 2,
+          "pass": 1,
+          "player": {
+            "x": 179.05068137774072,
+            "feet": 224
+          },
+          "boss": {
+            "x": 68,
+            "y": 184
+          }
+        },
+        {
+          "frame": 738,
+          "tick": 733,
+          "kind": "rush",
+          "seals": 2,
+          "pass": 1,
+          "player": {
+            "x": 179.05068137774072,
+            "feet": 224
+          },
+          "boss": {
+            "x": 68,
+            "y": 184
+          }
+        },
+        {
+          "frame": 786,
+          "tick": 781,
+          "kind": "brake",
+          "seals": 2,
+          "pass": 1,
+          "player": {
+            "x": 179.05068137774072,
+            "feet": 224
+          },
+          "boss": {
+            "x": 264,
+            "y": 184
+          }
+        },
+        {
+          "frame": 806,
+          "tick": 801,
+          "kind": "warning",
+          "seals": 2,
+          "player": {
+            "x": 179.05068137774072,
+            "feet": 224
+          },
+          "boss": {
+            "x": 264,
+            "y": 184
+          }
+        },
+        {
+          "frame": 898,
+          "tick": 893,
+          "kind": "stamp",
+          "seals": 2,
+          "player": {
+            "x": 94.02534068887036,
+            "feet": 224
+          },
+          "boss": {
+            "x": 165,
+            "y": 184
+          }
+        },
+        {
+          "frame": 922,
+          "tick": 917,
+          "kind": "waves",
+          "seals": 2,
+          "player": {
+            "x": 94.02534068887036,
+            "feet": 224
+          },
+          "boss": {
+            "x": 165,
+            "y": 184
+          }
+        },
+        {
+          "frame": 956,
+          "tick": 950,
+          "kind": "drain",
+          "seals": 2,
+          "player": {
+            "x": 94.02534068887036,
+            "feet": 224
+          },
+          "boss": {
+            "x": 245.14285714285714,
+            "y": 111.9109541001858
+          }
+        },
+        {
+          "frame": 1146,
+          "tick": 1141,
+          "kind": "hit",
+          "seals": 1,
+          "player": {
+            "x": 285.10136275548143,
+            "feet": 120
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1235,
+          "tick": 1225,
+          "kind": "jetWarning",
+          "seals": 1,
+          "player": {
+            "x": 285.10136275548143,
+            "feet": 160
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1277,
+          "tick": 1267,
+          "kind": "jet",
+          "seals": 1,
+          "player": {
+            "x": 285.10136275548143,
+            "feet": 160
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1311,
+          "tick": 1301,
+          "kind": "jetWarning",
+          "seals": 1,
+          "player": {
+            "x": 285.10136275548143,
+            "feet": 160
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1353,
+          "tick": 1343,
+          "kind": "jet",
+          "seals": 1,
+          "player": {
+            "x": 285.10136275548143,
+            "feet": 59.09999999999995
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1387,
+          "tick": 1377,
+          "kind": "jetWarning",
+          "seals": 1,
+          "player": {
+            "x": 285.10136275548143,
+            "feet": 75
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1429,
+          "tick": 1419,
+          "kind": "jet",
+          "seals": 1,
+          "player": {
+            "x": 285.10136275548143,
+            "feet": 113.5
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1463,
+          "tick": 1453,
+          "kind": "vault",
+          "seals": 1,
+          "pass": 1,
+          "player": {
+            "x": 285.10136275548143,
+            "feet": 85
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1495,
+          "tick": 1485,
+          "kind": "rushWarning",
+          "seals": 1,
+          "pass": 1,
+          "player": {
+            "x": 285.10136275548143,
+            "feet": 160
+          },
+          "boss": {
+            "x": 68,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1531,
+          "tick": 1521,
+          "kind": "rush",
+          "seals": 1,
+          "pass": 1,
+          "player": {
+            "x": 285.10136275548143,
+            "feet": 60.09999999999995
+          },
+          "boss": {
+            "x": 68,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1531,
+          "tick": 1521,
+          "kind": "jet",
+          "seals": 1,
+          "pass": 1,
+          "player": {
+            "x": 285.10136275548143,
+            "feet": 60.09999999999995
+          },
+          "boss": {
+            "x": 68,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1575,
+          "tick": 1565,
+          "kind": "brake",
+          "seals": 1,
+          "pass": 1,
+          "player": {
+            "x": 285.10136275548143,
+            "feet": 160
+          },
+          "boss": {
+            "x": 264,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1595,
+          "tick": 1585,
+          "kind": "rushWarning",
+          "seals": 1,
+          "pass": 2,
+          "player": {
+            "x": 285.10136275548143,
+            "feet": 160
+          },
+          "boss": {
+            "x": 264,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1631,
+          "tick": 1621,
+          "kind": "rush",
+          "seals": 1,
+          "pass": 2,
+          "player": {
+            "x": 285.10136275548143,
+            "feet": 60.09999999999995
+          },
+          "boss": {
+            "x": 264,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1631,
+          "tick": 1621,
+          "kind": "jet",
+          "seals": 1,
+          "pass": 2,
+          "player": {
+            "x": 285.10136275548143,
+            "feet": 60.09999999999995
+          },
+          "boss": {
+            "x": 264,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1675,
+          "tick": 1665,
+          "kind": "brake",
+          "seals": 1,
+          "pass": 2,
+          "player": {
+            "x": 285.10136275548143,
+            "feet": 160
+          },
+          "boss": {
+            "x": 68,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1695,
+          "tick": 1685,
+          "kind": "warning",
+          "seals": 1,
+          "player": {
+            "x": 285.10136275548143,
+            "feet": 160
+          },
+          "boss": {
+            "x": 68,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1787,
+          "tick": 1777,
+          "kind": "stamp",
+          "seals": 1,
+          "player": {
+            "x": 236.07602206661107,
+            "feet": 160
+          },
+          "boss": {
+            "x": 266,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1811,
+          "tick": 1801,
+          "kind": "warning",
+          "seals": 1,
+          "player": {
+            "x": 236.07602206661107,
+            "feet": 160
+          },
+          "boss": {
+            "x": 266,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1881,
+          "tick": 1871,
+          "kind": "stamp",
+          "seals": 1,
+          "player": {
+            "x": 289.10136275548143,
+            "feet": 160
+          },
+          "boss": {
+            "x": 222,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1905,
+          "tick": 1895,
+          "kind": "waves",
+          "seals": 1,
+          "player": {
+            "x": 289.10136275548143,
+            "feet": 160
+          },
+          "boss": {
+            "x": 222,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1960,
+          "tick": 1949,
+          "kind": "drain",
+          "seals": 1,
+          "player": {
+            "x": 235.73685452865985,
+            "feet": 160
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 2075,
+          "tick": 2065,
+          "kind": "released",
+          "seals": 0,
+          "player": {
+            "x": 284.5286755513178,
+            "feet": 120
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        }
+      ],
+      "videoFrames": 1129,
+      "complete": true
+    },
+    "interrupt": {
+      "frames": 1959,
+      "hitFrames": [
+        407,
+        996,
+        1767
+      ],
+      "minHelmet": 27,
+      "maxFeet": 160,
+      "damage": [],
+      "screens": [
+        {
+          "frame": 586,
+          "file": "interrupt-586.png",
+          "label": "DESCIDA"
+        },
+        {
+          "frame": 620,
+          "file": "interrupt-620.png",
+          "label": "PREPARACAO"
+        },
+        {
+          "frame": 660,
+          "file": "interrupt-660.png",
+          "label": "INVESTIDA"
+        },
+        {
+          "frame": 698,
+          "file": "interrupt-698.png",
+          "label": "FRENAGEM"
+        },
+        {
+          "frame": 996,
+          "file": "interrupt-996.png",
+          "label": "CONTRA-ATAQUE"
+        },
+        {
+          "frame": 1150,
+          "file": "interrupt-1150.png",
+          "label": "DESCIDA"
+        },
+        {
+          "frame": 1184,
+          "file": "interrupt-1184.png",
+          "label": "PREPARACAO"
+        },
+        {
+          "frame": 1218,
+          "file": "interrupt-1218.png",
+          "label": "INVESTIDA"
+        },
+        {
+          "frame": 1253,
+          "file": "interrupt-1253.png",
+          "label": "FRENAGEM"
+        },
+        {
+          "frame": 1285,
+          "file": "interrupt-1285.png",
+          "label": "PREPARACAO"
+        },
+        {
+          "frame": 1767,
+          "file": "interrupt-1767.png",
+          "label": "AGUA LIBERADA"
+        }
+      ],
+      "events": [
+        {
+          "frame": 102,
+          "tick": 102,
+          "kind": "warning",
+          "seals": 3,
+          "player": {
+            "x": 25.97465931112964,
+            "feet": 224
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 194,
+          "tick": 194,
+          "kind": "stamp",
+          "seals": 3,
+          "player": {
+            "x": 92.99999999999999,
+            "feet": 224
+          },
+          "boss": {
+            "x": 26,
+            "y": 184
+          }
+        },
+        {
+          "frame": 407,
+          "tick": 407,
+          "kind": "hit",
+          "seals": 2,
+          "player": {
+            "x": 284.0760220666111,
+            "feet": 120
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 496,
+          "tick": 491,
+          "kind": "jetWarning",
+          "seals": 2,
+          "player": {
+            "x": 243.05068137774072,
+            "feet": 160
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 542,
+          "tick": 537,
+          "kind": "jet",
+          "seals": 2,
+          "player": {
+            "x": 243.05068137774072,
+            "feet": 65.69999999999996
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 571,
+          "tick": 565,
+          "kind": "vault",
+          "seals": 2,
+          "pass": 1,
+          "player": {
+            "x": 243.05068137774072,
+            "feet": 160
+          },
+          "boss": {
+            "x": 257.875,
+            "y": 119.2555200707723
+          }
+        },
+        {
+          "frame": 571,
+          "tick": 565,
+          "kind": "interrupt",
+          "seals": 2,
+          "pass": 1,
+          "player": {
+            "x": 243.05068137774072,
+            "feet": 160
+          },
+          "boss": {
+            "x": 257.875,
+            "y": 119.2555200707723
+          }
+        },
+        {
+          "frame": 602,
+          "tick": 597,
+          "kind": "rushWarning",
+          "seals": 2,
+          "pass": 1,
+          "player": {
+            "x": 243.05068137774072,
+            "feet": 160
+          },
+          "boss": {
+            "x": 68,
+            "y": 184
+          }
+        },
+        {
+          "frame": 644,
+          "tick": 639,
+          "kind": "rush",
+          "seals": 2,
+          "pass": 1,
+          "player": {
+            "x": 243.05068137774072,
+            "feet": 160
+          },
+          "boss": {
+            "x": 68,
+            "y": 184
+          }
+        },
+        {
+          "frame": 692,
+          "tick": 687,
+          "kind": "brake",
+          "seals": 2,
+          "pass": 1,
+          "player": {
+            "x": 243.05068137774072,
+            "feet": 160
+          },
+          "boss": {
+            "x": 264,
+            "y": 184
+          }
+        },
+        {
+          "frame": 712,
+          "tick": 707,
+          "kind": "warning",
+          "seals": 2,
+          "player": {
+            "x": 243.05068137774072,
+            "feet": 160
+          },
+          "boss": {
+            "x": 264,
+            "y": 184
+          }
+        },
+        {
+          "frame": 804,
+          "tick": 799,
+          "kind": "stamp",
+          "seals": 2,
+          "player": {
+            "x": 312.0760220666111,
+            "feet": 160
+          },
+          "boss": {
+            "x": 229,
+            "y": 120
+          }
+        },
+        {
+          "frame": 996,
+          "tick": 991,
+          "kind": "hit",
+          "seals": 1,
+          "player": {
+            "x": 278.0738934921478,
+            "feet": 120
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1085,
+          "tick": 1075,
+          "kind": "jetWarning",
+          "seals": 1,
+          "player": {
+            "x": 115.7738934921478,
+            "feet": 160
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1127,
+          "tick": 1117,
+          "kind": "jet",
+          "seals": 1,
+          "player": {
+            "x": 83.04855280327746,
+            "feet": 169.30000000000007
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        },
+        {
+          "frame": 1135,
+          "tick": 1124,
+          "kind": "vault",
+          "seals": 1,
+          "pass": 1,
+          "player": {
+            "x": 83.04855280327746,
+            "feet": 224
+          },
+          "boss": {
+            "x": 262.75,
+            "y": 119.2555200707723
+          }
+        },
+        {
+          "frame": 1135,
+          "tick": 1124,
+          "kind": "interrupt",
+          "seals": 1,
+          "pass": 1,
+          "player": {
+            "x": 83.04855280327746,
+            "feet": 224
+          },
+          "boss": {
+            "x": 262.75,
+            "y": 119.2555200707723
+          }
+        },
+        {
+          "frame": 1166,
+          "tick": 1156,
+          "kind": "rushWarning",
+          "seals": 1,
+          "pass": 1,
+          "player": {
+            "x": 83.04855280327746,
+            "feet": 224
+          },
+          "boss": {
+            "x": 224,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1202,
+          "tick": 1192,
+          "kind": "rush",
+          "seals": 1,
+          "pass": 1,
+          "player": {
+            "x": 83.04855280327746,
+            "feet": 224
+          },
+          "boss": {
+            "x": 224,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1247,
+          "tick": 1237,
+          "kind": "brake",
+          "seals": 1,
+          "pass": 1,
+          "player": {
+            "x": 83.04855280327746,
+            "feet": 145.70000000000013
+          },
+          "boss": {
+            "x": 24,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1267,
+          "tick": 1257,
+          "kind": "rushWarning",
+          "seals": 1,
+          "pass": 2,
+          "player": {
+            "x": 83.04855280327746,
+            "feet": 224
+          },
+          "boss": {
+            "x": 24,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1303,
+          "tick": 1293,
+          "kind": "rush",
+          "seals": 1,
+          "pass": 2,
+          "player": {
+            "x": 83.04855280327746,
+            "feet": 224
+          },
+          "boss": {
+            "x": 24,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1348,
+          "tick": 1338,
+          "kind": "brake",
+          "seals": 1,
+          "pass": 2,
+          "player": {
+            "x": 83.04855280327746,
+            "feet": 224
+          },
+          "boss": {
+            "x": 224,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1368,
+          "tick": 1358,
+          "kind": "warning",
+          "seals": 1,
+          "player": {
+            "x": 83.04855280327746,
+            "feet": 224
+          },
+          "boss": {
+            "x": 224,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1460,
+          "tick": 1450,
+          "kind": "stamp",
+          "seals": 1,
+          "player": {
+            "x": 190.07389349214782,
+            "feet": 224
+          },
+          "boss": {
+            "x": 69,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1484,
+          "tick": 1474,
+          "kind": "warning",
+          "seals": 1,
+          "player": {
+            "x": 190.07389349214782,
+            "feet": 224
+          },
+          "boss": {
+            "x": 69,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1554,
+          "tick": 1544,
+          "kind": "stamp",
+          "seals": 1,
+          "player": {
+            "x": 83.04855280327746,
+            "feet": 224
+          },
+          "boss": {
+            "x": 176,
+            "y": 184
+          }
+        },
+        {
+          "frame": 1767,
+          "tick": 1757,
+          "kind": "released",
+          "seals": 0,
+          "player": {
+            "x": 274.12457486988853,
+            "feet": 120
+          },
+          "boss": {
+            "x": 264,
+            "y": 120
+          }
+        }
+      ],
+      "videoFrames": 979,
+      "complete": true
+    }
+  }
+}

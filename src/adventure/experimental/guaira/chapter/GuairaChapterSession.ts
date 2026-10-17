@@ -1,4 +1,4 @@
-import { sanitizeGuairaChapterProgress, type GuairaChapterProgress } from './GuairaChapterProgress';
+import { guairaAlternateOpening, sanitizeGuairaChapterProgress, type GuairaChapterProgress } from './GuairaChapterProgress';
 /** The chapter owns only receipts and navigation, never native scene/save state. */
 export type GuairaChapterOpening = 'guaira-travessia' | 'guaira-patio-comportas';
 export type GuairaChapterSceneId = GuairaChapterOpening | 'guaira-respiros' | 'guaira-lab'
@@ -60,6 +60,7 @@ export interface GuairaChapterSnapshot {
     readonly chapterComplete: boolean;
     readonly disposed: boolean;
     readonly developmentUnlocked: boolean;
+    readonly alternateCompleted?: true;
 }
 
 export interface GuairaChapterTransition {
@@ -104,7 +105,7 @@ export class GuairaChapterSession {
         this.route = Object.freeze([opening, 'guaira-respiros', 'guaira-lab', 'guaira-subida', 'guaira-prefeito']);
         this.currentGeneration = this.makeGeneration();
         if (restored) {
-            for (const sceneId of restored.completed) {
+            for (const sceneId of [...restored.completed, ...(restored.alternateCompleted ? [guairaAlternateOpening(opening)] : [])]) {
                 const result: GuairaChapterResult = sceneId === 'guaira-lab' ? { sceneId, kind: 'defeated-bull' }
                     : sceneId === 'guaira-prefeito' ? { sceneId, kind: 'mayor-water-released' } : { sceneId, kind: 'reached-finish' };
                 this.accepted.set(sceneId, Object.freeze({ sceneId, result: Object.freeze(result), acceptedVia: 'restored',
@@ -123,15 +124,16 @@ export class GuairaChapterSession {
                 return receipt ? [receipt] : [];
             })),
             selectedScene: this.selectedScene, activeAttempt: this.activeAttempt, nextRecommendedScene,
-            chapterComplete: nextRecommendedScene === null, disposed: this.closed, developmentUnlocked: this.developmentUnlocked
+            chapterComplete: nextRecommendedScene === null, disposed: this.closed, developmentUnlocked: this.developmentUnlocked,
+            ...(this.accepted.has(guairaAlternateOpening(this.opening)) ? { alternateCompleted: true as const } : {})
         });
     }
 
     /** Map selection is separate from physical arrival and never mounts a scene. */
     canSelectScene(sceneId: GuairaChapterSceneId, from: GuairaChapterGeneration): boolean {
         return this.isCurrentGeneration(from) && this.activeAttempt === null
-            && this.route.includes(sceneId)
-            && (this.developmentUnlocked || sceneId === this.nextRecommendedScene() || this.accepted.has(sceneId));
+            && (sceneId === guairaAlternateOpening(this.opening) ? this.developmentUnlocked || this.accepted.has(this.opening)
+                : this.route.includes(sceneId) && (this.developmentUnlocked || sceneId === this.nextRecommendedScene() || this.accepted.has(sceneId)));
     }
 
     /** Even reselecting retires existing contextual buttons before returning. */
@@ -232,7 +234,8 @@ export class GuairaChapterSession {
             && this.matchesAttempt(attempt, this.activeAttempt);
     }
 
-    private hasLiveCompletion(attempt: GuairaChapterAttempt, live: GuairaChapterLiveResult): boolean {
+    /** Fresh success is recordable while paused; Continue still requires playing. */
+    hasLiveCompletion(attempt: GuairaChapterAttempt, live: GuairaChapterLiveResult): boolean {
         return this.isCurrentAttempt(attempt) && this.matchesAttempt(live.attempt, attempt)
             && (live.state === 'playing' || live.state === 'paused') && live.alive === true
             && this.isSceneResult(attempt.sceneId, live.result);

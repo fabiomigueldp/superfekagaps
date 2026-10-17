@@ -39,7 +39,7 @@ test('local traversal uses real engine and independent cloned stage without camp
     const h = guairaTraversalBrowser(t), before = structuredClone(STAGES), worlds = structuredClone(ISLANDS), game = h.create();
     assert.ok(game.player instanceof Player); assert.ok(game.input instanceof Input); assert.ok(game.renderer instanceof Renderer);
     assert.equal(game.stage.id, G.id); assert.equal(game.boss, null); assert.deepEqual(game.stage.exits, []);
-    assert.equal(game.stage.level.width, 96); assert.equal(game.stage.level.height, 18);
+    assert.equal(game.stage.level.width, G.width); assert.equal(game.stage.level.height, 18);
     assert.equal(game.player.data.position.x, 48); assert.equal(game.player.data.position.y + game.player.data.height,224);
     assert.equal(game.player.data.hasHelmet, true); assert.equal(game.objects.get(G.bridgeId)!.y, 336);
     const changed = guairaTraversalStage(); changed.level.tiles[14][0] = 0;

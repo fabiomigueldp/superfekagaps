@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-17",
+  "typescript": {
+    "total": 3720,
+    "passed": 3719,
+    "failed": 0,
+    "skipped": 1,
+    "newTests": 20
+  },
+  "javascript": {
+    "passed": 3,
+    "failed": 0
+  },
+  "build": {
+    "passed": true,
+    "levelValidator": true,
+    "playerAssets": true,
+    "worldStages": 30,
+    "worldSpriteFrames": 260,
+    "typecheck": true
+  },
+  "nativeComparison": "native-verification.json",
+  "browser": {
+    "studies": 12,
+    "pausedStateAndPixels": true,
+    "reducedMotionStable": true,
+    "readOnlyPainting": true,
+    "source": "browser-report-scenes.json"
+  },
+  "campaign": {
+    "normalCampaign": true,
+    "executions": 9,
+    "input": "simulated-standard-gamepad",
+    "errors": [],
+    "source": "campaign-report.json"
+  },
+  "review": {
+    "viewports": [
+      1440,
+      390
+    ],
+    "decodedVideoVariants": 12,
+    "overflow": false,
+    "source": "browser-report-review.json"
+  }
+}

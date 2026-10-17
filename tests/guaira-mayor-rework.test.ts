@@ -137,7 +137,8 @@ test('native valve pair resets on each tell and hit-stop cannot replay the water
  }
  h.keys([]);g.load(A.id);sounds.length=0;
  for(const [count,keys]of groundRoute.runs as Array<[number,string[]]>){h.run(g,count,keys);}
- // Four physical impacts, two travelling bursts, five crosscurrent shots and one full seam discharge.
- assert.equal(sounds.filter(s=>s==='jet').length,12);
+ // Four impacts, two waves, five salvo shots, three rush beats (including
+ // simultaneous balcony shots) and one seam discharge. No duplicate launch cue.
+ assert.equal(sounds.filter(s=>s==='jet').length,15);
  const before=sounds.length;g.toggleLabPause();h.run(g,60);g.render();assert.equal(sounds.length,before);
 });

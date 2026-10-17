@@ -30,26 +30,28 @@ for(const n of [2,3])test(`seal ${n}: every high/low shot has its own complete, 
   assert.ok(oldJets.every(j=>Object.isFrozen(j)));advance(m,m.jetBeatDuration);
  }
  assert.deepEqual(sequence,n===2?[['high',-1],['low',1]]:[['low',1],['high',-1],['low',-1]]);
- assert.equal(m.state,'warning');assert.equal(m.strike,1,'ignoring the registers still leads to the aimed attack');
+ assert.equal(m.state,'vault');until(m,'warning');assert.equal(m.strike,1,'ignoring the registers leads through pursuit to the aimed attack');
  until(m,'recover');assert.equal(m.jets.length,0);assert.equal(m.vulnerable,false);
 });
 
-test('a fresh sentada after discharge interrupts the entire combo; early or held switches cannot',()=>{
+test('a fresh sentada cuts water but retains pursuit and requires a new opening after the physical combo',()=>{
  const m=phase(2);m.update(R.tickMs,opened);assert.equal(m.registerOpenedThisCycle,false);assert.equal(m.state,'jetWarning');
  until(m,'jetBurst',{...opened,registerOpened:false});assert.equal(m.jets.length,1);
  advance(m,5,{...opened,registerOpened:false});assert.equal(m.state,'jetBurst');
  const packet=m.jets[0];m.update(R.tickMs,{...opened,liftReady:false});
- assert.equal(m.state,'recover');assert.equal(m.pressureInterrupted,true);assert.equal(m.jets.length,0);
+ assert.equal(m.state,'vault');assert.equal(m.pressureInterrupted,true);assert.equal(m.jets.length,0);
  assert.equal(m.dangers.length,0);assert.equal(m.vulnerable,false);assert.equal(m.events.filter(e=>e.kind==='interrupt').length,1);
  assert.equal(packet.age,5,'previous snapshots cannot be drained retroactively');
- advance(m,70,{...opened,liftReady:false,registerOpened:false});assert.equal(m.vulnerable,false);
- advance(m,1,{...opened,registerOpened:false});assert.equal(m.vulnerable,true);
+ until(m,'recover',{...opened,registerOpened:false});assert.equal(m.vulnerable,false);
+ assert.equal(m.registerOpenedThisCycle,false,'the interrupted valve is not a fresh post-combo opening');
+ m.update(R.tickMs,opened);assert.equal(m.vulnerable,true);
  advance(m,90,{...opened,registerOpened:false});assert.equal(m.counterpressure,null,'the interruption spends the seam attack');
  assert.equal(hit(m),'hit');assert.equal(m.sealsRemaining,1);
 });
 
 test('missing an interrupt or its top hit never soft-locks the next attack',()=>{
  const m=phase(3);until(m,'jetBurst');m.update(R.tickMs,opened);assert.equal(m.pressureInterrupted,true);
+ until(m,'recover',{...opened,registerOpened:false});
  advance(m,R.recover-m.stateTick,{...opened,registerOpened:false});assert.equal(m.state,'idle');
  until(m,'jetWarning',{...opened,registerOpened:false});assert.equal(m.pressureInterrupted,false);
  assert.equal(m.salvo!.shot,1);assert.equal(m.registerOpenedThisCycle,false);
@@ -98,8 +100,9 @@ for(const touch of [false,true])for(const reducedMotion of [false,true])test(`tw
    if(m.sealsRemaining<seals){hits.push(frame);seals=m.sealsRemaining;}
   }
  }
- assert.deepEqual(hits,interrupt.hitFrames);assert.deepEqual(cuts,[{frame:571,valve:A.upperValve.x},{frame:875,valve:A.valve.x}]);
- assert.equal(stamps,1);assert.equal(shots,2);assert.ok(hits[2]<full.hitFrames[2]-500,'reading and interrupting the pattern earns a materially faster victory');
+ assert.deepEqual(hits,interrupt.hitFrames);assert.deepEqual(cuts.map(c=>c.valve),[A.upperValve.x,A.valve.x]);
+ assert.equal(stamps,4,'cuts retain all aimed physical attacks');assert.equal(shots,2);
+ assert.ok(hits[2]<full.hitFrames[2]-150,'cutting the volleys earns a faster and hydraulically safer victory');
  assert.equal(g.mayor.publicWaterOpen,true);assert.deepEqual(g.store.save.completed,[]);assert.deepEqual(h.storageCalls,[]);
 });
 
@@ -125,5 +128,5 @@ for(const [offset,safe]of [[-24,false],[-6,true],[0,true],[12,true],[20,false]] 
   step(154+offset);step(14,['Space']);step(57-offset);
   assert.equal(g.player.data.hasHelmet,safe);assert.equal(g.player.data.isDead,false);
   assert.equal(g.mayor.sealsRemaining,2,'no health or completion shortcut was used');
-  assert.equal(g.mayor.state,'warning');
+  assert.equal(g.mayor.state,'rushWarning');
  });

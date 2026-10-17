@@ -1,5 +1,5 @@
-import { mayorStampWater, mayorWaveWater, mayorJetWater } from './GuairaMayorWater';
-import type { MayorSalvo, MayorFeedback } from './GuairaMayorModel';
+import { mayorStampWater, mayorWaveWater, mayorJetWater, mayorRushWater } from './GuairaMayorWater';
+import type { MayorSalvo, MayorFeedback, MayorRush, MayorState } from './GuairaMayorModel';
 
 /** Original, code-native art for the Guaíra mayor encounter.
  * Art consumes readonly state. Collision, targeting and timing belong to the model.
@@ -13,7 +13,7 @@ export const MAYOR_PALETTE = Object.freeze({
     bronze:'#bd8b4a', bronzeLight:'#e9be78', bronzeShade:'#855d3e', wood:'#a66542', woodLight:'#d29661',
     water:'#62bcca', waterLight:'#b9e9df', waterShade:'#397e90', warning:'#eebd69',
 });
-export type MayorPose = 'intro'|'idle'|'jetWarning'|'jetBurst'|'warning'|'leap'|'stamp'|'returning'|'recover'|'hurt'|'released';
+export type MayorPose = MayorState;
 export interface MayorRect { readonly x:number; readonly y:number; readonly width:number; readonly height:number }
 export interface MayorCounterpressure {
     readonly phase:'warning'|'active';
@@ -43,6 +43,9 @@ export interface GuairaMayorArtState extends MayorRect {
     readonly jets?:readonly (MayorRect & {readonly direction:-1|1;readonly age:number})[];
     readonly pressureInterrupted?:boolean;
     readonly feedback?:readonly Readonly<MayorFeedback>[];
+    readonly rush?:Readonly<MayorRush>|null;
+    readonly crossfire?:Readonly<MayorSalvo>|null;
+    readonly attacksCancelled?:boolean;
 }
 
 type Brush = ReturnType<typeof brush>;
@@ -244,20 +247,70 @@ function interruptedRecovery(b:Brush,tick:number){
     b.poly([[8,-27],[12,-26],[18,hand+2],[19,hand+4],[13,-21],[9,-23]],P.cream);
     stamp(b,17,hand-7);b.rect(18,hand,5,4,P.skin);b.rect(19,hand,3,2,P.skinLight);
 }
+
+/** Planted anticipation, eight weight-shifting strides and a heel-first skid.
+ * Boots and the low water crest share the floor; the loose sash trails the turn.
+ * Reduced motion holds one readable pose but retains all physical travel. */
+function rushing(b:Brush,m:GuairaMayorArtState,reduced:boolean){
+    const rush=m.rush,warning=m.state==='rushWarning',braking=m.state==='brake';
+    // Strides follow distance, so boots settle as the physical rush slows.
+    const beat=reduced?2:Math.floor((rush?.distance??0)/6)%8;
+    const stopping=!!rush?.stopping,skid=braking||stopping;
+    const settle=braking&&!reduced?Math.min(1,m.stateTick/20):0;
+    const stride=warning?2:skid?Math.round(8-settle*6):[-6,-2,4,8,6,2,-4,-8][beat];
+    const lift=warning||skid?0:[4,6,3,0,0,1,3,5][beat];
+    const landing=warning&&rush?.pass===1?Math.max(0,3-Math.floor(m.stateTick/3)):0;
+    const compression=reduced?1:warning?Math.max(landing,Math.floor((rush?.progress??0)*3)):braking?Math.round(3*(1-settle)):stopping?2:1;
+    b.poly([[-9,-16],[0,-16],[-5+stride,-7-lift],[-12+stride,-4-lift],[-15+stride,-9-lift]],P.ink);
+    b.poly([[-8,-15],[-1,-15],[-6+stride,-8-lift],[-11+stride,-6-lift],[-13+stride,-9-lift]],P.pantsShade);
+    b.poly([[0,-17],[8,-17],[13-stride,-7],[6-stride,-3],[0,-9]],P.ink);
+    b.poly([[1,-16],[7,-16],[11-stride,-8],[6-stride,-5],[2,-10]],P.pants);
+    b.line(6,-15,8-stride,-8,P.pantsLight,2);
+    boot(b,-15+stride,-7-lift,11);boot(b,5-stride,-7,12);
+    const lean=reduced?3:braking?Math.round(-3+settle*3):stopping?-3:warning?Math.floor((rush?.progress??0)*3):Math.round(Math.min(4,(rush?.speed??0)*.7));
+    const upper:Brush={rect:(x,y,w,h,color)=>b.rect(x+lean,y+compression,w,h,color),
+        line:(x0,y0,x1,y1,color,w)=>b.line(x0+lean,y0+compression,x1+lean,y1+compression,color,w),
+        poly:(points,color)=>b.poly(points.map(([x,y])=>[x+lean,y+compression] as const),color)};
+    coat(upper,4);face(upper,-1,-39,warning?'frown':'effort');
+    // The back hand sweeps the key low; the forward elbow braces the stamp.
+    key(upper,-22,-22,true);
+    upper.poly([[-10,-27],[-17,-24],[-19,-19],[-13,-16],[-7,-23]],P.ink);
+    upper.poly([[-10,-26],[-15,-23],[-17,-20],[-13,-18],[-8,-23]],P.creamShade);
+    upper.rect(-19,-20,5,4,P.skinLight);
+    upper.poly([[9,-27],[16,-25],[21,-16],[17,-12],[12,-19],[8,-21]],P.ink);
+    upper.poly([[10,-26],[15,-24],[19,-16],[17,-14],[13,-20],[9,-22]],P.cream);
+    stamp(upper,17,warning?-20:-17);upper.rect(17,-17,5,4,P.skin);upper.rect(18,-17,3,2,P.skinLight);
+    const tail=reduced?-1:warning?-1:braking?Math.round(3-settle*4):stopping?2:[-3,-2,0,1,0,-2,-3,-4][beat];
+    upper.poly([[-7,-21],[-13,-18],[-24,-20+tail],[-29,-24+tail],[-18,-24+tail],[-10,-24]],P.ink);
+    upper.poly([[-8,-21],[-13,-19],[-23,-21+tail],[-26,-23+tail],[-18,-23+tail],[-10,-23]],P.sash);
+    upper.line(-13,-20,-23,-22+tail,P.sashLight);
+    // A two-stroke pictogram advertises the return pass before it happens.
+    if(warning&&rush){
+        for(let i=0;i<rush.total;i++){
+            const x=-9+i*12,color=i===rush.pass-1?P.creamLight:P.bronzeShade;
+            b.rect(x,-49,9,7,P.ink);b.rect(x+1,-48,7,5,color);
+            const dir=i===rush.pass-1?1:-1,tip=x+(dir===1?6:2);
+            b.rect(x+2,-46,5,1,P.ink);b.rect(tip-dir,-47,1,3,P.ink);
+        }
+    }
+}
 /** Authored flight poses: folded knees on ascent, extended boots before landing. */
 function airborne(b:Brush,progress:number,returning:boolean){
-    const foot=progress<.3?-13:progress<.7?-9:-2;
-    b.poly([[-9,-19],[0,-18],[-4,-10],[-12,-8],[-16,-13]],P.ink);
-    b.poly([[-8,-18],[-1,-17],[-5,-11],[-11,-10],[-14,-13]],P.pantsShade);
+    // Six foot placements release both knees before contact. The final boots
+    // meet the support plane instead of jumping there from the tucked pose.
+    const pose=Math.min(5,Math.max(0,Math.floor(progress*6)));
+    const foot=[-13,-14,-12,-9,-5,-2][pose],rear=[-14,-15,-13,-11,-8,-7][pose];
+    b.poly([[-9,-19],[0,-18],[-4,rear+4],[-12,rear+6],[-16,rear+1]],P.ink);
+    b.poly([[-8,-18],[-1,-17],[-5,rear+3],[-11,rear+4],[-14,rear+1]],P.pantsShade);
     b.poly([[1,-18],[9,-17],[14,foot-5],[7,foot],[0,-11]],P.ink);
     b.poly([[2,-17],[8,-16],[12,foot-5],[7,foot-2],[2,-11]],P.pants);
-    boot(b,-18,-14,11);boot(b,6,foot-5,12);coat(b,2);
+    boot(b,-18,rear,11);boot(b,6,foot-5,12);coat(b,2);
     // The heavy key trails behind; the carimbo leads the downward attack.
     key(b,-26,-31,returning);
     b.poly([[-10,-28],[-16,-25],[-20,-20],[-16,-17],[-9,-23]],P.creamShade);
     b.rect(-20,-20,5,4,P.skin);face(b,-3,-41,'effort');
     // The loose end follows the three authored flight beats, with a held apex.
-    const tail=progress<.3?-2:progress<.7?0:2;
+    const tail=[-2,-3,-2,0,1,2][pose];
     b.poly([[-9,-20],[-12,-17],[-20,-19+tail],[-17,-23+tail]],P.ink);
     b.poly([[-10,-20],[-12,-18],[-18,-20+tail],[-17,-22+tail]],P.sash);b.line(-12,-19,-17,-21+tail,P.sashLight);
     if(returning){
@@ -367,14 +420,17 @@ function openingCue(c:CanvasRenderingContext2D,m:GuairaMayorArtState,cx:number,c
 export function drawGuairaMayor(c:CanvasRenderingContext2D,m:GuairaMayorArtState,cx=0,cy=0,reducedMotion=false){
     if(![m.x,m.y,m.width,m.height,cx,cy].every(Number.isFinite))return;
     // A ground shadow anchors the jump without pretending to be a collision surface.
-    if(m.state==='leap'||m.state==='returning'){
-        const center=m.x+m.width/2,ground=center>=224?160:center<=48?176:224;
+    if(m.state==='leap'||m.state==='returning'||m.state==='vault'){
+        const center=m.x+m.width/2,feet=m.y+m.height;
+        const ground=center>=224&&feet<=160?160:center>=16&&center<=48&&feet<=176?176:224;
         const shadow=brush(c),sx=Math.round(m.x+m.width/2-cx),sy=Math.round(ground-cy);
         shadow.rect(sx-12,sy-2,24,2,P.creamDark);shadow.rect(sx-8,sy-3,16,1,P.creamDark);
     }
     c.save();c.translate(Math.round(m.x+m.width/2-cx),Math.round(m.y+m.height-cy));c.scale(m.facing??-1,1);
     const b=brush(c);
     if(m.state==='released')released(b,m.stateTick,reducedMotion);
+    else if(m.state==='rushWarning'||m.state==='rush'||m.state==='brake')rushing(b,m,reducedMotion);
+    else if(m.state==='vault')airborne(b,m.rush?.progress??.5,true);
     else if(m.state==='jetWarning'||m.state==='jetBurst')commanding(b,m,reducedMotion);
     else if(m.state==='recover'){
         if(m.vulnerable)recovering(b,true,m.counterpressure,m.stateTick,reducedMotion);
@@ -397,12 +453,58 @@ export function drawGuairaMayor(c:CanvasRenderingContext2D,m:GuairaMayorArtState
     c.save();openingCue(c,m,cx,cy);c.restore();
 }
 
+/** The leading crest passes in front of the boots. It uses the very same
+ * contours as contact; neither foam nor highlights enlarge the hit area. */
+export function drawGuairaMayorRushForeground(c:CanvasRenderingContext2D,m:GuairaMayorArtState,cx=0,cy=0,reduced=false){
+    const rush=m.rush;
+    if(m.attacksCancelled||rush?.phase!=='active')return;
+    const q=rush.rect;
+    c.save();c.beginPath();
+    c.rect(Math.round(q.x-cx+(rush.direction===1?q.width-16:0)),Math.round(q.y-cy),16,q.height);
+    c.rect(Math.round(q.x-cx),Math.round(q.y+q.height-3-cy),q.width,3);c.clip();
+    drawRushWater(c,m,rush,cx,cy,reduced);c.restore();
+}
+
+function drawRushWater(c:CanvasRenderingContext2D,m:GuairaMayorArtState,rush:Readonly<MayorRush>,cx:number,cy:number,reduced:boolean){
+    const water=brush(c),q=rush.rect,sections=mayorRushWater(q,rush.direction);
+    c.save();c.beginPath();
+    for(const part of sections)c.rect(Math.round(part.x-cx),Math.round(part.y-cy),part.width,part.height);
+    c.clip();water.rect(q.x-cx,q.y-cy,q.width,q.height,P.waterShade);
+    const beat=reduced?0:Math.floor(m.stateTick/2);
+    for(const part of sections){
+        water.rect(part.x-cx+1,part.y-cy+1,part.width-2,part.height-1,P.water);
+        water.rect(part.x-cx,part.y-cy,part.width,1,P.waterLight);
+    }
+    for(let y=4;y<q.height;y+=5){
+        const offset=(beat*3+y)%16;
+        water.rect(q.x-cx+offset,q.y-cy+y,12,1,P.waterLight);
+    }
+    water.rect(q.x-cx,q.y-cy+q.height-2,q.width,2,P.waterLight);c.restore();
+}
+
 /** Warning and active ink never extend beyond the model's exact locked rectangle. */
 export function drawGuairaMayorStampTarget(c:CanvasRenderingContext2D,m:GuairaMayorArtState,cx=0,cy=0,_reducedMotion=false){
+    if(m.attacksCancelled)return;
     const water=brush(c);
+    const rush=m.rush;
+    if(rush&&(rush.phase==='approach'||rush.phase==='warning')){
+        const q=rush.lane,x=q.x-cx,y=q.y-cy;
+        water.rect(x,y+q.height-3,q.width,3,P.ink);water.rect(x,y+q.height-2,q.width,1,P.warning);
+        water.rect(x,y,2,q.height,P.warning);water.rect(x+q.width-2,y,2,q.height,P.warning);
+        for(let xx=x+12;xx<x+q.width-12;xx+=28){
+            water.line(xx-rush.direction*4,y+8,xx,y+12,P.warning,2);
+            water.line(xx,y+12,xx-rush.direction*4,y+16,P.warning,2);
+        }
+        const x0=m.x+m.width/2-cx;
+        water.rect(x0-13,y-7,26,4,P.ink);
+        water.rect(x0-12,y-6,24*(rush.phase==='warning'?rush.progress:0),2,P.warning);
+    }
+    if(rush?.phase==='active'){
+        drawRushWater(c,m,rush,cx,cy,_reducedMotion);
+    }
     // A narrow lane outline communicates height and origin without filling the
     // arena. It is only a tell: only the solid cyan packets can make contact.
-    const salvo=m.salvo;
+    const salvo=m.salvo??m.crossfire;
     if(salvo?.phase==='warning'){
         const q=salvo.rect,x=q.x-cx,y=q.y-cy,source=salvo.direction===1?x:x+q.width-16;
         water.rect(x,y-2,q.width,1,P.ink);water.rect(x,y-1,q.width,1,P.warning);

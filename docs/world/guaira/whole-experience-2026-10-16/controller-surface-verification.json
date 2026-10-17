@@ -1,0 +1,78 @@
+{
+  "physicalDevice": false,
+  "mountsForSurfaceInspection": true,
+  "actorOrHazardEdits": false,
+  "checks": [
+    {
+      "name": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "reduced": false,
+      "pause": {
+        "stateFrozen": true,
+        "pixelsFrozen": true,
+        "fits": true
+      },
+      "helpScrolled": false,
+      "keyboardAlongsideController": true,
+      "retry": {
+        "oldDisposed": true,
+        "retiredPolls": 0,
+        "noInheritedJump": true,
+        "checkpoint": null,
+        "completed": false,
+        "x": 48
+      }
+    },
+    {
+      "name": "landscape",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "reduced": true,
+      "pause": {
+        "stateFrozen": true,
+        "pixelsFrozen": true,
+        "fits": true
+      },
+      "helpScrolled": true,
+      "keyboardAlongsideController": true,
+      "retry": {
+        "oldDisposed": true,
+        "retiredPolls": 0,
+        "noInheritedJump": true,
+        "checkpoint": null,
+        "completed": false,
+        "x": 48
+      }
+    },
+    {
+      "name": "portrait",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "reduced": true,
+      "pause": {
+        "stateFrozen": true,
+        "pixelsFrozen": true,
+        "fits": true
+      },
+      "helpScrolled": true,
+      "keyboardAlongsideController": true,
+      "retry": {
+        "oldDisposed": true,
+        "retiredPolls": 0,
+        "noInheritedJump": true,
+        "checkpoint": null,
+        "completed": false,
+        "x": 48
+      }
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

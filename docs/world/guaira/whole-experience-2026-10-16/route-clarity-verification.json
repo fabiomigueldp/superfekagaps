@@ -1,0 +1,429 @@
+{
+  "revision": "guaira-route-clarity-2026-10-17",
+  "reviewedAt": "2026-10-17T03:35:51.984Z",
+  "notAFirstPlaytest": true,
+  "scope": "Shared fragile support contact; fracture animation; stable optional-route identity; visible final banks; recovery and earned-checkpoint retries in six developed courses.",
+  "sourceHashes": {
+    "src/world/Level.ts": "744cfdd442a3dd5bc94a26cd111153a0728aef8af1c5eb0652c5082c6794d844",
+    "src/game/Game.ts": "67db91c95a0f54dff1ff22c41c2157d85cf7292690e0d46f716f84fb69fa3622",
+    "src/adventure/WorldGame.ts": "61b577600fb2faa340fecd96ddaadbaf4d19f68699906abe63c27b8e045938b5",
+    "src/adventure/experimental/guaira/GuairaCourseGuidance.ts": "b48c76bf66c98c88f7f0f2d5afd7395d5b4b232781051ce0826f833f1733855a",
+    "src/adventure/experimental/guaira/GuairaCoursePresentation.ts": "ed4eb0e9ee51a96cf01ca4865a581c4b1661cb53bbbbed5c31217483ca3adb7d",
+    "src/adventure/experimental/guaira/GuairaCourseDesign.ts": "38129dc4feeef199cbb02284f1706ffe613d57675bc069ed1d4c6a3febd00572",
+    "tests/falling-platform-support.test.ts": "7dcc60092791a2567b3bacc340511c31f4e69fd7b0c9d97ec7c0d983c522dfd4",
+    "tests/guaira-course-recovery.test.ts": "f1e0f32600fafe23dd8b7f9ac30e38c0d7d36d675aaf0d3474aa0508a039610b",
+    "tests/guaira-course-exploration.test.ts": "8eec6f7ad6b85eac11911f3e586d870f23fdd521958d7ffa0d669bfb28611f18",
+    "tests/world-first-charger.test.ts": "7f404c304b212a036116af0af68425e763d6b43f8812644519308009a3c47285",
+    "tests/input-mixed-ownership.test.ts": "fab4d01f7ea1341a560b35f78c8290c60348369b99afc97b9ab848c2614d596a",
+    "tests/world-carrier-motion.test.ts": "ddd753eeef6c861f253e5cc7cc28adb3caa15398e3b499e5893beb5b60f68d33",
+    "tests/world-carrier-structure.test.ts": "02293d957b2f62e6b98a042ae5ac0f5bdbd21fa77ee83785d88c8ff6cf9393a9",
+    "scripts/record_guaira_exploration.ts": "8dc152ecd7dd1b1e89e737cd16740346855d104eba70f8db987350a052c9ddd8",
+    "scripts/prove_guaira_chapter_readability.ts": "739c91b672e785f95905cce4b17b627880dca152f68cb9b41ce474dccea5c153",
+    "tests/helpers/guairaExplorationReplays.json": "362eeb0092a3dc7393edfff8f37f341f8130cc16c8e8eaefd6ae3479922e51d0"
+  },
+  "checks": {
+    "typescriptSuite": {
+      "tests": 3507,
+      "pass": 3506,
+      "fail": 0,
+      "skipped": 1,
+      "optionalCase": "The skipped native atlas case was subsequently executed successfully with the bundled canvas; separate native-atlas-tests.log has 2 passed, 0 skipped."
+    },
+    "serverTests": {
+      "pass": 3,
+      "fail": 0
+    },
+    "nativeAtlasTests": {
+      "pass": 2,
+      "fail": 0,
+      "skipped": 0
+    },
+    "newRegressionCases": 23,
+    "build": true,
+    "typecheck": true,
+    "validators": true,
+    "delayedApproaches": {
+      "executions": 24,
+      "allFinished": true,
+      "allUpperRewards": true,
+      "allGuardsDefeated": true,
+      "damage": 0
+    },
+    "fragileFalls": {
+      "scenes": 4,
+      "allFinished": true,
+      "damage": 0,
+      "receivingFloorVisible": true
+    },
+    "nativeDeathsAndRetries": {
+      "scenes": 6,
+      "earnedCheckpointRestored": true,
+      "coinsRetained": true,
+      "rewardsDoNotRespawn": true,
+      "subsequentDamageFreeCompletion": true
+    },
+    "browserOptionalRoutes": {
+      "checks": 12,
+      "keyboard": true,
+      "touchSimulated": true,
+      "physicalDevice": false,
+      "reducedMotion": true,
+      "pauseStateAndPixelsFrozen": true
+    },
+    "campaign": {
+      "checks": 9,
+      "passed": true,
+      "normalCampaign": true,
+      "gamepadApiSimulated": true,
+      "physicalDevice": false
+    },
+    "factoryAtlasAudit": {
+      "refreshed": true,
+      "geometryChanged": false,
+      "sourceFingerprint": "src/adventure/GuairaCampaignArt.ts"
+    },
+    "reviewPage": {
+      "passed": true,
+      "viewports": [
+        1440,
+        390
+      ],
+      "videos": 10,
+      "checks": 20,
+      "decodedAndPlayed": true
+    }
+  },
+  "nativeInputOnly": true,
+  "actorOrClockEdits": false,
+  "recordings": {
+    "travessia": {
+      "frames": 2066,
+      "coins": 19,
+      "finished": true,
+      "damage": 0,
+      "videoFps": 30,
+      "simulationHz": 60,
+      "maxCameraStepY": 8
+    },
+    "patio": {
+      "frames": 2813,
+      "coins": 7,
+      "finished": true,
+      "damage": 0,
+      "videoFps": 30,
+      "simulationHz": 60,
+      "maxCameraStepY": 9
+    },
+    "respiros": {
+      "frames": 2102,
+      "coins": 15,
+      "finished": true,
+      "damage": 0,
+      "videoFps": 30,
+      "simulationHz": 60,
+      "maxCameraStepY": 10
+    },
+    "subida": {
+      "frames": 1915,
+      "coins": 20,
+      "finished": true,
+      "damage": 0,
+      "videoFps": 30,
+      "simulationHz": 60,
+      "maxCameraStepY": 8
+    },
+    "galeria": {
+      "frames": 1482,
+      "coins": 15,
+      "finished": true,
+      "damage": 0,
+      "videoFps": 30,
+      "simulationHz": 60,
+      "maxCameraStepY": 8
+    },
+    "alivio": {
+      "frames": 1354,
+      "coins": 14,
+      "finished": true,
+      "damage": 0,
+      "videoFps": 30,
+      "simulationHz": 60,
+      "maxCameraStepY": 8
+    }
+  },
+  "recoveryClips": {
+    "respiros": {
+      "fullRouteFrames": 2102,
+      "fullRouteCoins": 14,
+      "fullRouteFinished": true,
+      "damage": 0,
+      "videoWindow": {
+        "firstFrame": 1520,
+        "lastFrame": 1744
+      },
+      "videoFps": 30,
+      "simulationHz": 60
+    },
+    "subida": {
+      "fullRouteFrames": 1876,
+      "fullRouteCoins": 17,
+      "fullRouteFinished": true,
+      "damage": 0,
+      "videoWindow": {
+        "firstFrame": 1662,
+        "lastFrame": 1876
+      },
+      "videoFps": 30,
+      "simulationHz": 60
+    },
+    "galeria": {
+      "fullRouteFrames": 1422,
+      "fullRouteCoins": 13,
+      "fullRouteFinished": true,
+      "damage": 0,
+      "videoWindow": {
+        "firstFrame": 1106,
+        "lastFrame": 1330
+      },
+      "videoFps": 30,
+      "simulationHz": 60
+    },
+    "alivio": {
+      "fullRouteFrames": 1346,
+      "fullRouteCoins": 11,
+      "fullRouteFinished": true,
+      "damage": 0,
+      "videoWindow": {
+        "firstFrame": 828,
+        "lastFrame": 1052
+      },
+      "videoFps": 30,
+      "simulationHz": 60
+    }
+  },
+  "delayedApproaches": [
+    {
+      "id": "travessia",
+      "waitFrames": 90,
+      "frames": 2130,
+      "coins": 19,
+      "guardDefeated": true,
+      "detourRewards": 3,
+      "damage": 0
+    },
+    {
+      "id": "patio",
+      "waitFrames": 90,
+      "frames": 2833,
+      "coins": 8,
+      "guardDefeated": true,
+      "detourRewards": 3,
+      "damage": 0
+    },
+    {
+      "id": "respiros",
+      "waitFrames": 90,
+      "frames": 2172,
+      "coins": 14,
+      "guardDefeated": true,
+      "detourRewards": 3,
+      "damage": 0
+    },
+    {
+      "id": "subida",
+      "waitFrames": 90,
+      "frames": 1998,
+      "coins": 20,
+      "guardDefeated": true,
+      "detourRewards": 3,
+      "damage": 0
+    },
+    {
+      "id": "galeria",
+      "waitFrames": 90,
+      "frames": 1572,
+      "coins": 16,
+      "guardDefeated": true,
+      "detourRewards": 4,
+      "damage": 0
+    },
+    {
+      "id": "alivio",
+      "waitFrames": 90,
+      "frames": 1441,
+      "coins": 15,
+      "guardDefeated": true,
+      "detourRewards": 4,
+      "damage": 0
+    },
+    {
+      "id": "travessia",
+      "waitFrames": 150,
+      "frames": 2318,
+      "coins": 19,
+      "guardDefeated": true,
+      "detourRewards": 3,
+      "damage": 0
+    },
+    {
+      "id": "patio",
+      "waitFrames": 150,
+      "frames": 2893,
+      "coins": 8,
+      "guardDefeated": true,
+      "detourRewards": 3,
+      "damage": 0
+    },
+    {
+      "id": "respiros",
+      "waitFrames": 150,
+      "frames": 2354,
+      "coins": 15,
+      "guardDefeated": true,
+      "detourRewards": 3,
+      "damage": 0
+    },
+    {
+      "id": "subida",
+      "waitFrames": 150,
+      "frames": 2058,
+      "coins": 20,
+      "guardDefeated": true,
+      "detourRewards": 3,
+      "damage": 0
+    },
+    {
+      "id": "galeria",
+      "waitFrames": 150,
+      "frames": 1633,
+      "coins": 16,
+      "guardDefeated": true,
+      "detourRewards": 4,
+      "damage": 0
+    },
+    {
+      "id": "alivio",
+      "waitFrames": 150,
+      "frames": 1500,
+      "coins": 15,
+      "guardDefeated": true,
+      "detourRewards": 4,
+      "damage": 0
+    },
+    {
+      "id": "travessia",
+      "waitFrames": 270,
+      "frames": 2317,
+      "coins": 19,
+      "guardDefeated": true,
+      "detourRewards": 3,
+      "damage": 0
+    },
+    {
+      "id": "patio",
+      "waitFrames": 270,
+      "frames": 3065,
+      "coins": 8,
+      "guardDefeated": true,
+      "detourRewards": 3,
+      "damage": 0
+    },
+    {
+      "id": "respiros",
+      "waitFrames": 270,
+      "frames": 2353,
+      "coins": 14,
+      "guardDefeated": true,
+      "detourRewards": 3,
+      "damage": 0
+    },
+    {
+      "id": "subida",
+      "waitFrames": 270,
+      "frames": 2180,
+      "coins": 20,
+      "guardDefeated": true,
+      "detourRewards": 3,
+      "damage": 0
+    },
+    {
+      "id": "galeria",
+      "waitFrames": 270,
+      "frames": 1751,
+      "coins": 16,
+      "guardDefeated": true,
+      "detourRewards": 4,
+      "damage": 0
+    },
+    {
+      "id": "alivio",
+      "waitFrames": 270,
+      "frames": 1619,
+      "coins": 15,
+      "guardDefeated": true,
+      "detourRewards": 4,
+      "damage": 0
+    },
+    {
+      "id": "travessia",
+      "waitFrames": 600,
+      "frames": 2821,
+      "coins": 19,
+      "guardDefeated": true,
+      "detourRewards": 3,
+      "damage": 0
+    },
+    {
+      "id": "patio",
+      "waitFrames": 600,
+      "frames": 3344,
+      "coins": 8,
+      "guardDefeated": true,
+      "detourRewards": 3,
+      "damage": 0
+    },
+    {
+      "id": "respiros",
+      "waitFrames": 600,
+      "frames": 2683,
+      "coins": 14,
+      "guardDefeated": true,
+      "detourRewards": 3,
+      "damage": 0
+    },
+    {
+      "id": "subida",
+      "waitFrames": 600,
+      "frames": 2508,
+      "coins": 20,
+      "guardDefeated": true,
+      "detourRewards": 3,
+      "damage": 0
+    },
+    {
+      "id": "galeria",
+      "waitFrames": 600,
+      "frames": 2080,
+      "coins": 16,
+      "guardDefeated": true,
+      "detourRewards": 4,
+      "damage": 0
+    },
+    {
+      "id": "alivio",
+      "waitFrames": 600,
+      "frames": 1950,
+      "coins": 15,
+      "guardDefeated": true,
+      "detourRewards": 4,
+      "damage": 0
+    }
+  ],
+  "limitations": [
+    "Recorded routes are rehearsed, not first-time playtests.",
+    "Keyboard, touch and Gamepad API checks use browser simulation, not physical mobile devices or gamepads.",
+    "No 3D island geometry changes in this round.",
+    "Downward landing anticipation is limited to 8 pixels per update; faster native falls may require faster actor-following motion."
+  ],
+  "supersededBy": "encounter-verification.json"
+}

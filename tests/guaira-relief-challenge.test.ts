@@ -1,3 +1,4 @@
+import { continueGuairaCourse } from './helpers/guairaCourseController';
 import assert from 'node:assert/strict';
 import test, { type TestContext } from 'node:test';
 import { TileType } from '../src/constants';
@@ -29,6 +30,10 @@ function guairaReliefBrowser(t: TestContext, options: { touch?: boolean; reduced
     };
     const hidden = (value: boolean) => { h.document.hidden = value; h.document.dispatch('visibilitychange'); };
     return { ...h, keys, run, hidden };
+}
+function finishCourse(h: ReturnType<typeof guairaReliefBrowser>,g:GuairaRelief){
+    h.keys([]);const result=continueGuairaCourse(g,keys=>h.run(g,1,keys));h.keys([]);
+    assert.ok(result.finished&&!result.dead,JSON.stringify({result,position:g.player.data.position,velocity:g.player.data.velocity}));
 }
 type Harness = ReturnType<typeof guairaReliefBrowser>;
 type Route = keyof Omit<typeof recording, 'description'>;
@@ -67,7 +72,7 @@ for (const touch of [false, true]) for (const reducedMotion of [false, true]) {
         assert.deepEqual(game.routes.snapshot.evidence, { lidOpened: false, helmetLost: false,
             died: false, reconstructed: false, arrived: true, reliefOpenAtArrival: false });
         game.render(); assert.match(h.status.textContent, /tampa e capacete conservados/);
-        assert.deepEqual(game.store.save.completed, []); assert.equal(game.coins, 0);
+        assert.deepEqual(game.store.save.completed, []); assert.equal(game.coins, 5);
         const maintenance = game.routes.capture('other-route')!.consume(); assert.ok(maintenance);
         assert.equal(maintenance.routeGoal, 'open-relief');
         game.dispose(); game = create(h, maintenance);
@@ -93,7 +98,7 @@ for (const touch of [false, true]) {
         assert.equal(game.reliefOpened, true); assert.equal(game.finished, false);
         assert.equal(game.routes.snapshot.verdict, 'in-progress');
         assert.equal(game.routes.capture('other-route'), null);
-        h.run(game, 180, ['ArrowRight']); h.keys([]);
+        h.run(game, 180, ['ArrowRight']); h.keys([]); finishCourse(h,game);
         assert.equal(game.routes.snapshot.verdict, 'met'); game.dispose();
         const intact = create(h, { routeGoal: 'keep-lid-and-helmet' });
         play(h, intact, 'maintenance');
@@ -104,7 +109,7 @@ for (const touch of [false, true]) {
 
     test(`helmet-assisted arrival is valid but misses the optional goal (${touch})`, t => {
         const h = guairaReliefBrowser(t, { touch }), game = create(h, { routeGoal: 'keep-lid-and-helmet' });
-        h.run(game, 300, ['ArrowRight']); h.keys([]);
+        h.run(game, 300, ['ArrowRight']); h.keys([]); finishCourse(h,game);
         assert.equal(game.finished, true); assert.equal(game.reliefOpened, false);
         assert.equal(game.player.data.hasHelmet, false);
         assert.equal(game.routes.snapshot.evidence.helmetLost, true);
@@ -120,7 +125,7 @@ for (const touch of [false, true]) {
         assert.equal(next.routes.snapshot.verdict, 'in-progress');
         assert.equal(next.routes.snapshot.evidence.helmetLost, false);
         play(h, next, 'skipFlag');
-        assert.equal(next.store.save.checkpoint, null, 'checkpoint is not a challenge prerequisite');
+        assert.equal(next.store.save.checkpoint?.index, next.stage.checkpoints.length-1, 'the first flag can be skipped without skipping later districts');
         assert.equal(next.routes.snapshot.verdict, 'met');
         assert.equal(retry.consume(), null); next.dispose();
     });
@@ -146,7 +151,7 @@ for (const touch of [false, true]) {
             h.run(game, 1); const danger = game.objects.jetDanger(game.objects.get(G.jetId)!);
             sawWater ||= !!danger; if (sawWater && !danger) break;
         }
-        assert.equal(sawWater, true); h.run(game, 160, ['ArrowRight']); h.keys([]);
+        assert.equal(sawWater, true); h.run(game, 160, ['ArrowRight']); h.keys([]); finishCourse(h,game);
         assert.equal(game.finished, true); assert.equal(game.player.data.hasHelmet, true);
         assert.equal(game.routes.snapshot.verdict, 'missed', 'a clean final state is insufficient');
         game.load(G.id);

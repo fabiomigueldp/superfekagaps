@@ -6,6 +6,19 @@ import { freshSave } from '../src/adventure/progress';
 import { freshDeliciaSave, completeDeliciaStage } from '../src/adventure/delicia/DeliciaProgress';
 import { withDevelopmentAccess } from '../src/adventure/DevelopmentProgress';
 
+test('the shared island map shows separate exploration records without changing completion or entry', () => {
+    const save = freshSave(); save.completed = ['3-5']; save.guaira.completed = ['guaira-travessia'];
+    save.guaira.optional.relief = true;
+    save.guaira.exploration = {'travessia:detour':[0,1], 'alivio:detour':[0,1,2,3], 'alivio:maintenance':[0]};
+    const before = JSON.stringify(save), stages = chapterMapStages('guaira', save, freshDeliciaSave());
+    assert.deepEqual(stages.find(stage => stage.id === 'guaira-travessia')?.exploration,
+        [{name:'VARANDA DO ARROZ',found:2,total:3},{name:'PASSADICO DA ECLUSA',found:0,total:5}]);
+    assert.deepEqual(stages.find(stage => stage.id === 'relief')?.exploration,
+        [{name:'ALTO DO COLETOR',found:4,total:4},{name:'PASSADICO DO COLETOR',found:1,total:5}]);
+    assert.equal(stages.find(stage => stage.id === 'guaira-prefeito')?.open,false);
+    assert.equal(JSON.stringify(save),before);
+});
+
 test('one map exposes both chapters without granting progress by inspecting them', () => {
     const save = freshSave(), delicia = freshDeliciaSave(), before = JSON.stringify([save, delicia]);
     const guaira = chapterMapStages('guaira', save, delicia), empire = chapterMapStages('delicia', save, delicia);

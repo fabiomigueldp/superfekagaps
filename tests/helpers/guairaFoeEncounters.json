@@ -1,0 +1,499 @@
+{
+  "pincer-counter": {
+    "stage": "guaira-travessia",
+    "checkpoint": 3,
+    "foeId": ":minion:192",
+    "frames": 138,
+    "runs": [
+      [
+        47,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        11,
+        []
+      ],
+      [
+        18,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        2,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        18,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        1,
+        []
+      ],
+      [
+        4,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        30,
+        []
+      ]
+    ],
+    "damage": [],
+    "killed": false,
+    "events": [
+      {
+        "frame": 45,
+        "phase": "warning",
+        "high": false,
+        "x": 1703.800000000002,
+        "player": {
+          "x": 1652.3,
+          "y": 168
+        }
+      },
+      {
+        "frame": 72,
+        "phase": "attack",
+        "high": false,
+        "x": 1702.600000000002,
+        "player": {
+          "x": 1673.34172625,
+          "y": 113.30000000000003
+        }
+      },
+      {
+        "frame": 87,
+        "phase": "rest",
+        "high": false,
+        "x": 1688,
+        "player": {
+          "x": 1719.84172625,
+          "y": 70.80000000000003
+        }
+      }
+    ]
+  },
+  "pincer-hit": {
+    "stage": "guaira-travessia",
+    "checkpoint": 3,
+    "foeId": ":minion:192",
+    "frames": 99,
+    "runs": [
+      [
+        47,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        5,
+        []
+      ],
+      [
+        8,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        33,
+        []
+      ]
+    ],
+    "damage": [
+      75
+    ],
+    "killed": false,
+    "events": [
+      {
+        "frame": 45,
+        "phase": "warning",
+        "high": false,
+        "x": 1703.800000000002,
+        "player": {
+          "x": 1652.3,
+          "y": 168
+        }
+      },
+      {
+        "frame": 72,
+        "phase": "attack",
+        "high": false,
+        "x": 1702.600000000002,
+        "player": {
+          "x": 1679.9006984062498,
+          "y": 168
+        }
+      },
+      {
+        "frame": 87,
+        "phase": "rest",
+        "high": false,
+        "x": 1688,
+        "player": {
+          "x": 1683.56706693887,
+          "y": 168
+        }
+      }
+    ]
+  },
+  "loader-counter": {
+    "stage": "guaira-travessia",
+    "checkpoint": 6,
+    "foeId": ":loader:2048",
+    "frames": 455,
+    "runs": [
+      [
+        39,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        14,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        14,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        2,
+        []
+      ],
+      [
+        3,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        214,
+        []
+      ],
+      [
+        7,
+        [
+          "Space"
+        ]
+      ],
+      [
+        49,
+        []
+      ],
+      [
+        7,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        8,
+        [
+          "ArrowRight",
+          "ShiftLeft"
+        ]
+      ],
+      [
+        12,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        10,
+        [
+          "ArrowRight",
+          "ArrowDown"
+        ]
+      ],
+      [
+        5,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        4,
+        []
+      ],
+      [
+        7,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        14,
+        []
+      ],
+      [
+        1,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        28,
+        []
+      ]
+    ],
+    "damage": [],
+    "killed": true,
+    "events": [
+      {
+        "frame": 90,
+        "phase": "warning",
+        "high": false,
+        "x": 3584,
+        "player": {
+          "x": 3511.3787387500006,
+          "y": 120
+        }
+      },
+      {
+        "frame": 142,
+        "phase": "recoil",
+        "high": true,
+        "x": 3584,
+        "player": {
+          "x": 3512.3635094843735,
+          "y": 120
+        }
+      },
+      {
+        "frame": 166,
+        "phase": "rest",
+        "high": true,
+        "x": 3584,
+        "player": {
+          "x": 3512.3635094843735,
+          "y": 120
+        }
+      },
+      {
+        "frame": 256,
+        "phase": "warning",
+        "high": true,
+        "x": 3584,
+        "player": {
+          "x": 3512.3635094843735,
+          "y": 120
+        }
+      },
+      {
+        "frame": 308,
+        "phase": "recoil",
+        "high": false,
+        "x": 3584,
+        "player": {
+          "x": 3512.3635094843735,
+          "y": 85.39999999999999
+        }
+      },
+      {
+        "frame": 332,
+        "phase": "rest",
+        "high": false,
+        "x": 3584,
+        "player": {
+          "x": 3512.3635094843735,
+          "y": 120
+        }
+      }
+    ]
+  },
+  "loader-hit": {
+    "stage": "guaira-travessia",
+    "checkpoint": 6,
+    "foeId": ":loader:2048",
+    "frames": 353,
+    "runs": [
+      [
+        39,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        6,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        6,
+        []
+      ],
+      [
+        14,
+        [
+          "ArrowRight",
+          "ShiftLeft",
+          "Space"
+        ]
+      ],
+      [
+        4,
+        [
+          "ArrowRight",
+          "Space"
+        ]
+      ],
+      [
+        14,
+        [
+          "ArrowRight"
+        ]
+      ],
+      [
+        1,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        2,
+        []
+      ],
+      [
+        3,
+        [
+          "ArrowLeft"
+        ]
+      ],
+      [
+        264,
+        []
+      ]
+    ],
+    "damage": [
+      329
+    ],
+    "killed": false,
+    "events": [
+      {
+        "frame": 90,
+        "phase": "warning",
+        "high": false,
+        "x": 3584,
+        "player": {
+          "x": 3511.3787387500006,
+          "y": 120
+        }
+      },
+      {
+        "frame": 142,
+        "phase": "recoil",
+        "high": true,
+        "x": 3584,
+        "player": {
+          "x": 3512.3635094843735,
+          "y": 120
+        }
+      },
+      {
+        "frame": 166,
+        "phase": "rest",
+        "high": true,
+        "x": 3584,
+        "player": {
+          "x": 3512.3635094843735,
+          "y": 120
+        }
+      },
+      {
+        "frame": 256,
+        "phase": "warning",
+        "high": true,
+        "x": 3584,
+        "player": {
+          "x": 3512.3635094843735,
+          "y": 120
+        }
+      },
+      {
+        "frame": 308,
+        "phase": "recoil",
+        "high": false,
+        "x": 3584,
+        "player": {
+          "x": 3512.3635094843735,
+          "y": 120
+        }
+      },
+      {
+        "frame": 332,
+        "phase": "rest",
+        "high": false,
+        "x": 3584,
+        "player": {
+          "x": 3512.3635094843735,
+          "y": 120
+        }
+      }
+    ]
+  }
+}

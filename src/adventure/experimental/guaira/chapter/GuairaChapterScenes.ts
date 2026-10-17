@@ -6,11 +6,11 @@ export const CHAPTER_SCENES: Record<GuairaChapterSceneId, {
     title: string; short: string; place: string; arrival: GuairaArrival; objective: string;
 }> = {
     'guaira-travessia': { title: 'Travessia da Vala Seca', short: 'TRAVESSIA', place: 'Estrada do Vento', arrival: 'town', objective: 'Abra a comporta e atravesse até o arrozal.' },
-    'guaira-patio-comportas': { title: 'Pátio das Comportas', short: 'PATIO', place: 'Estrada do Vento', arrival: 'town', objective: 'Desvie a água entre A e B para chegar ao arrozal.' },
+    'guaira-patio-comportas': { title: 'Pátio das Comportas', short: 'PATIO', place: 'Pátio das Comportas', arrival: 'town', objective: 'Desvie a água entre A e B para chegar ao arrozal.' },
     'guaira-respiros': { title: 'Passagem dos Respiros', short: 'RESPIROS', place: 'Passarela dos Arrozais', arrival: 'rice', objective: 'Observe a pressão e atravesse nas janelas secas.' },
     'guaira-lab': { title: 'Ossabravo', short: 'OSSABRAVO', place: 'Curral da Comporta', arrival: 'corral', objective: 'Leia os ataques e acerte a ossada na recuperação.' },
-    'guaira-subida': { title: 'Subida à Casa da Vazão', short: 'SUBIDA', place: 'Curral da Comporta', arrival: 'corral', objective: 'Embarque na prancha e alcance a Casa da Vazão.' },
-    'guaira-prefeito': { title: 'Prefeito da Vazão', short: 'PREFEITO', place: 'Casa da Vazão', arrival: 'vazao', objective: 'Reabra o registro, cruze a passarela e solte os três lacres.' }
+    'guaira-subida': { title: 'Subida à Casa da Vazão', short: 'SUBIDA', place: 'Inspeção da Casa da Vazão', arrival: 'corral', objective: 'Suba pelo elevador ou pelos telhados até a Casa da Vazão.' },
+    'guaira-prefeito': { title: 'Prefeito da Vazão', short: 'PREFEITO', place: 'Casa da Vazão', arrival: 'vazao', objective: 'Corte a água e desvie das investidas. Após a última carimbada, reabra o registro e ataque por cima.' }
 };
 
 export interface GuairaChapterRuntime {

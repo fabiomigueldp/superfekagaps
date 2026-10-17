@@ -1,0 +1,87 @@
+{
+  "physicalDevice": false,
+  "routes": [],
+  "pauses": [],
+  "review": [
+    {
+      "width": 1440,
+      "media": {
+        "fits": true,
+        "videos": [
+          {
+            "duration": 7.566667,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "duration": 2.3,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "duration": 8,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "duration": 1.633333,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "duration": 5.866667,
+            "width": 960,
+            "height": 540,
+            "error": null
+          }
+        ],
+        "decoded": 5
+      }
+    },
+    {
+      "width": 390,
+      "media": {
+        "fits": true,
+        "videos": [
+          {
+            "duration": 7.566667,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "duration": 2.3,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "duration": 8,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "duration": 1.633333,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "duration": 5.866667,
+            "width": 960,
+            "height": 540,
+            "error": null
+          }
+        ],
+        "decoded": 5
+      }
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

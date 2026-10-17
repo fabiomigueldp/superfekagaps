@@ -6,15 +6,17 @@ import type { AdventureStage } from '../../types';
 import { panel, pixelText } from '../../../graphics/BitmapFont';
 import { drawGuairaAscentBackground, drawGuairaAscentTerrain, drawGuairaAscentObjects } from './GuairaAscentArt';
 import { drawGuairaCoinReadout } from './GuairaCoinReadout';
+import { developGuairaCourse, GUAIRA_COURSES, restoreGuairaCoursePassages } from './GuairaCourseDesign';
+import { installGuairaCourseArt, frameGuairaCourse, drawGuairaCourseHUD, guairaCourseStatus } from './GuairaCoursePresentation';
 
 export const GUAIRA_ASCENT = Object.freeze({
-    id: 'guaira-subida', width: 84, height: 25, floor: 304, recoveryFloor: 368,
+    id: 'guaira-subida', width: GUAIRA_COURSES.subida.end / 16, height: 25, floor: 304, recoveryFloor: 368,
     plankId: 'guaira-plank', liftId: 'guaira-service-lift', period: 10000,
     serviceId: 'guaira-inspection-carriage', checkpointX: 528, upperCheckpointX: 800,
-    terraceY: 144, finishX: 1264, mapHref: './guaira.html'
+    terraceY: GUAIRA_COURSES.subida.finishY!, finishX: GUAIRA_COURSES.subida.finish, mapHref: './guaira.html'
 });
 
-/** Isolated data clone: no campaign registration, exits, combat or persistent unlock. */
+/** Local authored stage; the chapter host owns campaign registration and unlocks. */
 export function guairaAscentStage(): AdventureStage {
     const stage = structuredClone(STAGES[0]);
     stage.id = GUAIRA_ASCENT.id; stage.name = 'GUAÍRA · SUBIDA DA VAZÃO';
@@ -58,7 +60,7 @@ export function guairaAscentStage(): AdventureStage {
     stage.pickups.push(...[[560,170],[576,170],[608,106],[664,106]].map(([x,y],i) =>
         ({ id: `guaira-subida:roof:${i}`, kind: 'coin' as const, x, y })));
     stage.route = [{ x: 48, y: 304 }, { x: 528, y: 304 }, { x: 712, y: 144 }, { x: 800, y: 144 }, { x: 1024, y: 144 }, { x: 1264, y: 144 }];
-    return stage;
+    return developGuairaCourse(stage, 'subida');
 }
 
 /** Native Player, carry, checkpoint and death flow; only scene presentation is local. */
@@ -80,6 +82,7 @@ export class GuairaAscent extends WorldGame {
                     !this.player.data.isDead && !((this.player.data.respawnRevealTimer ?? 0) > 0);
                 drawGuairaAscentObjects(c, objects, cx, cy, time, this.reducedMotion, running);
             };
+            installGuairaCourseArt(this, 'subida');
             this.store.save.preferences.shake = !this.reducedMotion;
             if (this.reducedMotion) {
                 // WorldGame currently has no particle preference. This instance-only
@@ -98,10 +101,12 @@ export class GuairaAscent extends WorldGame {
     override load(_id: string, resume = false, _custom?: AdventureStage) {
         if (this.isDisposed) return;
         super.load(GUAIRA_ASCENT.id, resume, guairaAscentStage());
+        if (resume && this.store.save.checkpoint) restoreGuairaCoursePassages(this.objects, this.player.data.position.x);
         this.finished = false; this.time = 0; this.completedArtTime = 0;
         this.player.data.isGrounded = true; this.player.data.facingRight = true;
         if (!resume || !this.store.save.checkpoint) this.player.data.hasHelmet = true;
         this.player.data.respawnRevealTimer = 0;
+        frameGuairaCourse(this, 'subida', true);
     }
     get mapReturnHref() {
         return guairaReturnHref(this.finished ? 'vazao' : 'corral', this.finished ? 'ascent-clear' : null);
@@ -116,6 +121,7 @@ export class GuairaAscent extends WorldGame {
         if (!Number.isFinite(dt) || dt <= 0) return;
         if (this.state === 'map' || this.state === 'title' || this.state === 'intro') { this.load(GUAIRA_ASCENT.id); return; }
         if (this.finished) {
+            if (this.updateController()) return;
             this.input.setMenuMode(this.state !== 'playing'); this.input.update();
             if (this.input.consumeMute()) this.audio.toggle();
             this.audio.tick(dt);
@@ -127,7 +133,7 @@ export class GuairaAscent extends WorldGame {
                 jump: false, jumpPressed: false, jumpReleased: false, down: false, downPressed: false }, this.level);
             return;
         }
-        const previousObjects = this.objects, previousTime = this.objects.time, previousY = this.camera.y;
+        const previousObjects = this.objects, previousTime = this.objects.time, previousY = this.camera.y, previousX = this.camera.x;
         super.update(dt);
         const p = this.player.data;
         // This upper service route needs a little sky beyond the native world
@@ -145,6 +151,7 @@ export class GuairaAscent extends WorldGame {
             const targetY = Math.min(receiving - 168, p.position.y - 36);
             const nextY = previousY + Math.max(-6, Math.min(6, (targetY - previousY) * .18));
             this.camera.y = Math.max(feet - 168, Math.min(p.position.y - 36, nextY));
+            frameGuairaCourse(this, 'subida', false, previousX, previousY);
         }
         // Check the actual terrace, not just x: falling beneath the house cannot finish.
         if (this.state === 'playing' && !p.isDead && p.isGrounded &&
@@ -186,6 +193,7 @@ export class GuairaAscent extends WorldGame {
             pixelText(c, 'PAUSADO', 160, 79, '#f0ddae', 2, 'center');
             pixelText(c, 'ESC OU CONTINUAR', 160, 100, '#edcaf5', 1, 'center');
         }
+        drawGuairaCourseHUD(this, 'subida');
         this.renderer.present();
         const message = paused ? 'Pausado · Esc ou Continuar para voltar'
             : this.finished ? 'O ramal do bairro segue fechado · CASA volta ao mapa · Prefeito: encontro opcional para reabrir a água'
@@ -204,6 +212,7 @@ export class GuairaAscent extends WorldGame {
             : x < 768 ? 'Ponto seguro · embarque no elevador pela margem ou suba à sacada; salte à direita perto do terraço'
             : x < 1088 ? 'Ponto seguro no patamar · embarque na prancha e salte à direita junto ao terraço · galeria abaixo é opcional'
             : 'Casa da Vazão · siga até o cano para observar o desvio';
-        if (this.status.textContent !== message) this.status.textContent = message;
+        const courseStatus = guairaCourseStatus(this, 'subida', message);
+        if (this.status.textContent !== courseStatus) this.status.textContent = courseStatus;
     }
 }

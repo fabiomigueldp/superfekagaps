@@ -1,0 +1,4175 @@
+{
+  "nativeInputOnly": true,
+  "actorOrClockEdits": false,
+  "baseline": false,
+  "conservativeTopNote": "minHelmet uses a conservative physics y-10 bound; the real sprite top is y-4, verified separately in browser-verification.json.",
+  "baselineHashes": {},
+  "scenes": {
+    "alivio": {
+      "frames": 1957,
+      "minHelmet": 26,
+      "maxFeet": 168,
+      "maxCameraStepY": 8,
+      "maxCameraStepX": 3.499999851114353,
+      "contacts": [
+        {
+          "n": 1,
+          "x": 32,
+          "feet": 336
+        },
+        {
+          "n": 19,
+          "x": 64,
+          "feet": 336
+        },
+        {
+          "n": 35,
+          "x": 96,
+          "feet": 336
+        },
+        {
+          "n": 106,
+          "x": 115,
+          "feet": 288
+        },
+        {
+          "n": 150,
+          "x": 170,
+          "feet": 224
+        },
+        {
+          "n": 206,
+          "x": 227,
+          "feet": 160
+        },
+        {
+          "n": 270,
+          "x": 309,
+          "feet": 160
+        },
+        {
+          "n": 276,
+          "x": 321,
+          "feet": 160
+        },
+        {
+          "n": 419,
+          "x": 355,
+          "feet": 160
+        },
+        {
+          "n": 464,
+          "x": 512,
+          "feet": 160
+        },
+        {
+          "n": 465,
+          "x": 515,
+          "feet": 160
+        },
+        {
+          "n": 474,
+          "x": 546,
+          "feet": 160
+        },
+        {
+          "n": 498,
+          "x": 578,
+          "feet": 160
+        },
+        {
+          "n": 525,
+          "x": 625,
+          "feet": 256
+        },
+        {
+          "n": 557,
+          "x": 641,
+          "feet": 256
+        },
+        {
+          "n": 590,
+          "x": 700,
+          "feet": 336
+        },
+        {
+          "n": 615,
+          "x": 704,
+          "feet": 336
+        },
+        {
+          "n": 628,
+          "x": 737,
+          "feet": 336
+        },
+        {
+          "n": 637,
+          "x": 769,
+          "feet": 336
+        },
+        {
+          "n": 646,
+          "x": 800,
+          "feet": 336
+        },
+        {
+          "n": 656,
+          "x": 835,
+          "feet": 336
+        },
+        {
+          "n": 696,
+          "x": 892,
+          "feet": 288
+        },
+        {
+          "n": 734,
+          "x": 968,
+          "feet": 240
+        },
+        {
+          "n": 776,
+          "x": 1078,
+          "feet": 224
+        },
+        {
+          "n": 814,
+          "x": 1170,
+          "feet": 176
+        },
+        {
+          "n": 858,
+          "x": 1224,
+          "feet": 176
+        },
+        {
+          "n": 924,
+          "x": 1281,
+          "feet": 144
+        },
+        {
+          "n": 986,
+          "x": 1336,
+          "feet": 224
+        },
+        {
+          "n": 1036,
+          "x": 1383,
+          "feet": 288
+        },
+        {
+          "n": 1085,
+          "x": 1432,
+          "feet": 336
+        },
+        {
+          "n": 1122,
+          "x": 1541,
+          "feet": 288
+        },
+        {
+          "n": 1130,
+          "x": 1569,
+          "feet": 288
+        },
+        {
+          "n": 1179,
+          "x": 1741,
+          "feet": 336
+        },
+        {
+          "n": 1229,
+          "x": 1760,
+          "feet": 288
+        },
+        {
+          "n": 1267,
+          "x": 1840,
+          "feet": 240
+        },
+        {
+          "n": 1317,
+          "x": 1931,
+          "feet": 208
+        },
+        {
+          "n": 1523,
+          "x": 2006,
+          "feet": 208
+        },
+        {
+          "n": 1571,
+          "x": 2085,
+          "feet": 208
+        },
+        {
+          "n": 1645,
+          "x": 2149,
+          "feet": 256
+        },
+        {
+          "n": 1692,
+          "x": 2259,
+          "feet": 336
+        },
+        {
+          "n": 1716,
+          "x": 2292,
+          "feet": 288
+        },
+        {
+          "n": 1731,
+          "x": 2305,
+          "feet": 288
+        },
+        {
+          "n": 1752,
+          "x": 2347,
+          "feet": 336
+        },
+        {
+          "n": 1774,
+          "x": 2370,
+          "feet": 336
+        },
+        {
+          "n": 1783,
+          "x": 2400,
+          "feet": 336
+        },
+        {
+          "n": 1793,
+          "x": 2435,
+          "feet": 336
+        },
+        {
+          "n": 1802,
+          "x": 2467,
+          "feet": 336
+        },
+        {
+          "n": 1811,
+          "x": 2498,
+          "feet": 336
+        },
+        {
+          "n": 1820,
+          "x": 2530,
+          "feet": 336
+        },
+        {
+          "n": 1829,
+          "x": 2561,
+          "feet": 336
+        },
+        {
+          "n": 1838,
+          "x": 2593,
+          "feet": 336
+        },
+        {
+          "n": 1847,
+          "x": 2624,
+          "feet": 336
+        },
+        {
+          "n": 1857,
+          "x": 2659,
+          "feet": 336
+        },
+        {
+          "n": 1866,
+          "x": 2691,
+          "feet": 336
+        },
+        {
+          "n": 1875,
+          "x": 2722,
+          "feet": 336
+        },
+        {
+          "n": 1884,
+          "x": 2754,
+          "feet": 336
+        },
+        {
+          "n": 1893,
+          "x": 2785,
+          "feet": 336
+        },
+        {
+          "n": 1902,
+          "x": 2817,
+          "feet": 336
+        },
+        {
+          "n": 1946,
+          "x": 2971,
+          "feet": 336
+        },
+        {
+          "n": 1948,
+          "x": 2978,
+          "feet": 336
+        },
+        {
+          "n": 1957,
+          "x": 3009,
+          "feet": 336
+        }
+      ],
+      "hints": [],
+      "snapshots": [
+        {
+          "n": 1,
+          "file": "alivio-1.png",
+          "p": {
+            "x": 32.3,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 0,
+            "y": 176
+          },
+          "status": "Atravesse no intervalo seco ou suba pela oficina para abrir o alívio. A manutenção também leva à passarela sobre a grelha."
+        },
+        {
+          "n": 10,
+          "file": "alivio-10.png",
+          "p": {
+            "x": 46.3,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 0,
+            "y": 176
+          },
+          "status": "Atravesse no intervalo seco ou suba pela oficina para abrir o alívio. A manutenção também leva à passarela sobre a grelha."
+        },
+        {
+          "n": 20,
+          "file": "alivio-20.png",
+          "p": {
+            "x": 66.3,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 0.30767999999999934,
+            "y": 176
+          },
+          "status": "Ponto seguro nesta tentativa · Atravesse no intervalo seco ou suba pela oficina para abrir o alívio. A manutenção também leva à passarela sobre a grelha. · sair e reentrar reinicia a câmara"
+        },
+        {
+          "n": 30,
+          "file": "alivio-30.png",
+          "p": {
+            "x": 86.3,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 11.163151250281508,
+            "y": 176
+          },
+          "status": "Ponto seguro nesta tentativa · Atravesse no intervalo seco ou suba pela oficina para abrir o alívio. A manutenção também leva à passarela sobre a grelha. · sair e reentrar reinicia a câmara"
+        },
+        {
+          "n": 40,
+          "file": "alivio-40.png",
+          "p": {
+            "x": 106,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 28.580391068338873,
+            "y": 176
+          },
+          "status": "Atravesse no intervalo seco ou suba pela oficina para abrir o alívio. A manutenção também leva à passarela sobre a grelha."
+        },
+        {
+          "n": 50,
+          "file": "alivio-50.png",
+          "p": {
+            "x": 113.7367765715177,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 42.53952410192249,
+            "y": 176
+          },
+          "status": "Atravesse no intervalo seco ou suba pela oficina para abrir o alívio. A manutenção também leva à passarela sobre a grelha."
+        },
+        {
+          "n": 60,
+          "file": "alivio-60.png",
+          "p": {
+            "x": 115.02534068887034,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 48.51990188991418,
+            "y": 176
+          },
+          "status": "Atravesse no intervalo seco ou suba pela oficina para abrir o alívio. A manutenção também leva à passarela sobre a grelha."
+        },
+        {
+          "n": 70,
+          "file": "alivio-70.png",
+          "p": {
+            "x": 115.02534068887034,
+            "y": 304.5
+          },
+          "feet": 328.5,
+          "camera": {
+            "x": 50.32757353802923,
+            "y": 176
+          },
+          "status": "Atravesse no intervalo seco ou suba pela oficina para abrir o alívio. A manutenção também leva à passarela sobre a grelha."
+        },
+        {
+          "n": 80,
+          "file": "alivio-80.png",
+          "p": {
+            "x": 115.02534068887034,
+            "y": 238.7000000000001
+          },
+          "feet": 262.7000000000001,
+          "camera": {
+            "x": 50.83101185633379,
+            "y": 142.89775623679998
+          },
+          "status": "Atravesse no intervalo seco ou suba pela oficina para abrir o alívio. A manutenção também leva à passarela sobre a grelha."
+        },
+        {
+          "n": 90,
+          "file": "alivio-90.png",
+          "p": {
+            "x": 115.02534068887034,
+            "y": 209.20000000000022
+          },
+          "feet": 233.20000000000022,
+          "camera": {
+            "x": 50.97121991934214,
+            "y": 112.84382890826174
+          },
+          "status": "A tampa está acima da plataforma de manutenção. Suba para aliviar a pressão ou volte ao piso e observe o intervalo seco."
+        },
+        {
+          "n": 100,
+          "file": "alivio-100.png",
+          "p": {
+            "x": 115.02534068887034,
+            "y": 229.70000000000033
+          },
+          "feet": 253.70000000000033,
+          "camera": {
+            "x": 51.01026800173436,
+            "y": 108.66577474756879
+          },
+          "status": "A tampa está acima da plataforma de manutenção. Suba para aliviar a pressão ou volte ao piso e observe o intervalo seco."
+        },
+        {
+          "n": 110,
+          "file": "alivio-110.png",
+          "p": {
+            "x": 115.02534068887034,
+            "y": 264
+          },
+          "feet": 288,
+          "camera": {
+            "x": 51.02114293079188,
+            "y": 137.84858891200017
+          },
+          "status": "Atravesse no intervalo seco ou suba pela oficina para abrir o alívio. A manutenção também leva à passarela sobre a grelha."
+        },
+        {
+          "n": 120,
+          "file": "alivio-120.png",
+          "p": {
+            "x": 119.52534068887034,
+            "y": 229.40000000000003
+          },
+          "feet": 253.40000000000003,
+          "camera": {
+            "x": 52.14343001810845,
+            "y": 126.62405223873967
+          },
+          "status": "A tampa está acima da plataforma de manutenção. Suba para aliviar a pressão ou volte ao piso e observe o intervalo seco."
+        },
+        {
+          "n": 130,
+          "file": "alivio-130.png",
+          "p": {
+            "x": 139.32534068887034,
+            "y": 172.90000000000015
+          },
+          "feet": 196.90000000000015,
+          "camera": {
+            "x": 63.857189776292984,
+            "y": 110.55983931571285
+          },
+          "status": "A tampa está acima da plataforma de manutenção. Suba para aliviar a pressão ou volte ao piso e observe o intervalo seco."
+        },
+        {
+          "n": 131,
+          "file": "alivio-131.png",
+          "p": {
+            "x": 141.32534068887034,
+            "y": 169.70000000000016
+          },
+          "feet": 193.70000000000016,
+          "camera": {
+            "x": 65.47336788580226,
+            "y": 110.09906823888454
+          },
+          "status": "A tampa está acima da plataforma de manutenção. Suba para aliviar a pressão ou volte ao piso e observe o intervalo seco."
+        },
+        {
+          "n": 140,
+          "file": "alivio-140.png",
+          "p": {
+            "x": 159.32534068887034,
+            "y": 163.40000000000026
+          },
+          "feet": 187.40000000000026,
+          "camera": {
+            "x": 81.549463781499,
+            "y": 108.35184487448113
+          },
+          "status": "A tampa está acima da plataforma de manutenção. Suba para aliviar a pressão ou volte ao piso e observe o intervalo seco."
+        },
+        {
+          "n": 150,
+          "file": "alivio-150.png",
+          "p": {
+            "x": 170.03368196432737,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 97.40832792900989,
+            "y": 108.04836038533307
+          },
+          "status": "A tampa está acima da plataforma de manutenção. Suba para aliviar a pressão ou volte ao piso e observe o intervalo seco."
+        },
+        {
+          "n": 160,
+          "file": "alivio-160.png",
+          "p": {
+            "x": 172.0506813777407,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 104.78598283924266,
+            "y": 108.00664703975868
+          },
+          "status": "A tampa está acima da plataforma de manutenção. Suba para aliviar a pressão ou volte ao piso e observe o intervalo seco."
+        },
+        {
+          "n": 170,
+          "file": "alivio-170.png",
+          "p": {
+            "x": 172.0506813777407,
+            "y": 200
+          },
+          "feet": 224,
+          "camera": {
+            "x": 107.14145964839253,
+            "y": 108.00091362252904
+          },
+          "status": "A tampa está acima da plataforma de manutenção. Suba para aliviar a pressão ou volte ao piso e observe o intervalo seco."
+        },
+        {
+          "n": 180,
+          "file": "alivio-180.png",
+          "p": {
+            "x": 184.3506813777407,
+            "y": 138.60000000000008
+          },
+          "feet": 162.60000000000008,
+          "camera": {
+            "x": 112.31885154520258,
+            "y": 96.00018675731411
+          },
+          "status": "Tampa de alívio: pule e use baixo no ar para retirar a pressão. A passarela à direita oferece um salto opcional."
+        },
+        {
+          "n": 190,
+          "file": "alivio-190.png",
+          "p": {
+            "x": 204.3506813777407,
+            "y": 99.10000000000007
+          },
+          "feet": 123.10000000000007,
+          "camera": {
+            "x": 127.53182324504196,
+            "y": 63.100000000000065
+          },
+          "status": "Tampa de alívio: pule e use baixo no ar para retirar a pressão. A passarela à direita oferece um salto opcional."
+        },
+        {
+          "n": 200,
+          "file": "alivio-200.png",
+          "p": {
+            "x": 222.72393137774068,
+            "y": 109.60000000000004
+          },
+          "feet": 133.60000000000002,
+          "camera": {
+            "x": 145.88525479126258,
+            "y": 60.245296903038614
+          },
+          "status": "Tampa de alívio: pule e use baixo no ar para retirar a pressão. A passarela à direita oferece um salto opcional."
+        },
+        {
+          "n": 210,
+          "file": "alivio-210.png",
+          "p": {
+            "x": 228.31375245066224,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 158.23840643013446,
+            "y": 60.03371557641547
+          },
+          "status": "Tampa de alívio: pule e use baixo no ar para retirar a pressão. A passarela à direita oferece um salto opcional."
+        },
+        {
+          "n": 220,
+          "file": "alivio-220.png",
+          "p": {
+            "x": 229.07602206661105,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 163.1166783559958,
+            "y": 60.00463413960367
+          },
+          "status": "Tampa de alívio: pule e use baixo no ar para retirar a pressão. A passarela à direita oferece um salto opcional."
+        },
+        {
+          "n": 230,
+          "file": "alivio-230.png",
+          "p": {
+            "x": 230.87602206661106,
+            "y": 114.8
+          },
+          "feet": 138.8,
+          "camera": {
+            "x": 164.8692613308668,
+            "y": 60.00063695336546
+          },
+          "status": "Tampa de alívio: pule e use baixo no ar para retirar a pressão. A passarela à direita oferece um salto opcional."
+        },
+        {
+          "n": 240,
+          "file": "alivio-240.png",
+          "p": {
+            "x": 249.37602206661106,
+            "y": 52.79999999999997
+          },
+          "feet": 76.79999999999997,
+          "camera": {
+            "x": 174.68811843457655,
+            "y": 16.79999999999997
+          },
+          "status": "Tampa de alívio: pule e use baixo no ar para retirar a pressão. A passarela à direita oferece um salto opcional."
+        },
+        {
+          "n": 250,
+          "file": "alivio-250.png",
+          "p": {
+            "x": 269.3760220666111,
+            "y": 33.29999999999994
+          },
+          "feet": 57.29999999999994,
+          "camera": {
+            "x": 191.81744478839957,
+            "y": -2.9460000000000575
+          },
+          "status": "Tampa de alívio: pule e use baixo no ar para retirar a pressão. A passarela à direita oferece um salto opcional."
+        },
+        {
+          "n": 260,
+          "file": "alivio-260.png",
+          "p": {
+            "x": 289.3760220666111,
+            "y": 63.79999999999991
+          },
+          "feet": 87.79999999999991,
+          "camera": {
+            "x": 211.01795937613485,
+            "y": 12.759896756279128
+          },
+          "status": "Tampa de alívio: pule e use baixo no ar para retirar a pressão. A passarela à direita oferece um salto opcional."
+        },
+        {
+          "n": 262,
+          "file": "alivio-262.png",
+          "p": {
+            "x": 293.3760220666111,
+            "y": 75.8999999999999
+          },
+          "feet": 99.8999999999999,
+          "camera": {
+            "x": 214.9483383191063,
+            "y": 20.721114578922055
+          },
+          "status": "Tampa de alívio: pule e use baixo no ar para retirar a pressão. A passarela à direita oferece um salto opcional."
+        },
+        {
+          "n": 270,
+          "file": "alivio-270.png",
+          "p": {
+            "x": 309.3760220666111,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 230.79530190851384,
+            "y": 51.045725921157775
+          },
+          "status": "Tampa de alívio: pule e use baixo no ar para retirar a pressão. A passarela à direita oferece um salto opcional."
+        },
+        {
+          "n": 280,
+          "file": "alivio-280.png",
+          "p": {
+            "x": 329.0760220666111,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 250.6972915864656,
+            "y": 56.25221202862051
+          },
+          "status": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura."
+        },
+        {
+          "n": 290,
+          "file": "alivio-290.png",
+          "p": {
+            "x": 336.81279863812875,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 265.34842988116907,
+            "y": 56.034666046813136
+          },
+          "status": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura."
+        },
+        {
+          "n": 300,
+          "file": "alivio-300.png",
+          "p": {
+            "x": 338.10136275548143,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 271.5215318097862,
+            "y": 56.00476477988866
+          },
+          "status": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura."
+        },
+        {
+          "n": 310,
+          "file": "alivio-310.png",
+          "p": {
+            "x": 338.10136275548143,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 273.382877319166,
+            "y": 56.00065490961545
+          },
+          "status": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura."
+        },
+        {
+          "n": 320,
+          "file": "alivio-320.png",
+          "p": {
+            "x": 338.10136275548143,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 273.901263860219,
+            "y": 56.00009001603735
+          },
+          "status": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura."
+        },
+        {
+          "n": 330,
+          "file": "alivio-330.png",
+          "p": {
+            "x": 338.10136275548143,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 274.0456350178525,
+            "y": 56.00001237252712
+          },
+          "status": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura."
+        },
+        {
+          "n": 340,
+          "file": "alivio-340.png",
+          "p": {
+            "x": 338.10136275548143,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 274.085842526161,
+            "y": 56.000001700579496
+          },
+          "status": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura."
+        },
+        {
+          "n": 350,
+          "file": "alivio-350.png",
+          "p": {
+            "x": 338.10136275548143,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 274.09704035646786,
+            "y": 56.000000233741304
+          },
+          "status": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura."
+        },
+        {
+          "n": 360,
+          "file": "alivio-360.png",
+          "p": {
+            "x": 338.10136275548143,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 274.1001589631374,
+            "y": 56.00000003212728
+          },
+          "status": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura."
+        },
+        {
+          "n": 370,
+          "file": "alivio-370.png",
+          "p": {
+            "x": 338.10136275548143,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 274.1010274981387,
+            "y": 56.00000000441583
+          },
+          "status": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura."
+        },
+        {
+          "n": 380,
+          "file": "alivio-380.png",
+          "p": {
+            "x": 338.10136275548143,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 274.1012693859843,
+            "y": 56.000000000606946
+          },
+          "status": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura."
+        },
+        {
+          "n": 390,
+          "file": "alivio-390.png",
+          "p": {
+            "x": 338.10136275548143,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 274.1013367519854,
+            "y": 56.000000000083425
+          },
+          "status": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura."
+        },
+        {
+          "n": 392,
+          "file": "alivio-392.png",
+          "p": {
+            "x": 338.10136275548143,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 274.10134261837413,
+            "y": 56.0000000000561
+          },
+          "status": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura."
+        },
+        {
+          "n": 400,
+          "file": "alivio-400.png",
+          "p": {
+            "x": 338.10136275548143,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 274.1013555134824,
+            "y": 56.00000000001147
+          },
+          "status": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura."
+        },
+        {
+          "n": 410,
+          "file": "alivio-410.png",
+          "p": {
+            "x": 338.40136275548144,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 274.1373607385776,
+            "y": 56.00000000000158
+          },
+          "status": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura."
+        },
+        {
+          "n": 420,
+          "file": "alivio-420.png",
+          "p": {
+            "x": 357.90136275548144,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 281.88072433704093,
+            "y": 56.00000000000021
+          },
+          "status": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura."
+        },
+        {
+          "n": 430,
+          "file": "alivio-430.png",
+          "p": {
+            "x": 392.90136275548144,
+            "y": 74.59999999999998
+          },
+          "feet": 98.59999999999998,
+          "camera": {
+            "x": 307.03512827459764,
+            "y": 38.59999999999998
+          },
+          "status": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura."
+        },
+        {
+          "n": 440,
+          "file": "alivio-440.png",
+          "p": {
+            "x": 427.90136275548144,
+            "y": 35.09999999999995
+          },
+          "feet": 59.09999999999995,
+          "camera": {
+            "x": 339.29312016181285,
+            "y": -0.9000000000000483
+          },
+          "status": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura."
+        },
+        {
+          "n": 450,
+          "file": "alivio-450.png",
+          "p": {
+            "x": 462.90136275548144,
+            "y": 45.59999999999992
+          },
+          "feet": 69.59999999999992,
+          "camera": {
+            "x": 373.52946822617656,
+            "y": 2.1293616575304286
+          },
+          "status": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura."
+        },
+        {
+          "n": 460,
+          "file": "alivio-460.png",
+          "p": {
+            "x": 497.90136275548144,
+            "y": 106.0999999999999
+          },
+          "feet": 130.0999999999999,
+          "camera": {
+            "x": 408.31679041677035,
+            "y": 38.88459420058388
+          },
+          "status": "Passarela opcional: corra até a borda e mantenha o salto até a sacada do outro lado. Abrir o alívio antes torna a queda segura."
+        },
+        {
+          "n": 470,
+          "file": "alivio-470.png",
+          "p": {
+            "x": 532.9013627554814,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 443.2575594392752,
+            "y": 81.34880245284847
+          },
+          "status": "Sacada de inspeção: siga até o patamar abaixo à direita, depois desça ao piso de saída."
+        },
+        {
+          "n": 480,
+          "file": "alivio-480.png",
+          "p": {
+            "x": 556.8765838379034,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 474.70554785728876,
+            "y": 97.43642961508593
+          },
+          "status": "Sacada de inspeção: siga até o patamar abaixo à direita, depois desça ao piso de saída."
+        },
+        {
+          "n": 490,
+          "file": "alivio-490.png",
+          "p": {
+            "x": 563.0136502770155,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 490.79894265549194,
+            "y": 99.64764229740238
+          },
+          "status": "Sacada de inspeção: siga até o patamar abaixo à direita, depois desça ao piso de saída."
+        },
+        {
+          "n": 500,
+          "file": "alivio-500.png",
+          "p": {
+            "x": 581.5308695775786,
+            "y": 136
+          },
+          "feet": 160,
+          "camera": {
+            "x": 505.1085674177178,
+            "y": 99.9515691274519
+          },
+          "status": "Sacada de inspeção: siga até o patamar abaixo à direita, depois desça ao piso de saída."
+        },
+        {
+          "n": 510,
+          "file": "alivio-510.png",
+          "p": {
+            "x": 601.5308695775786,
+            "y": 143.5
+          },
+          "feet": 167.5,
+          "camera": {
+            "x": 523.4892606165782,
+            "y": 101.85639959031238
+          },
+          "status": "Sacada de inspeção: siga até o patamar abaixo à direita, depois desça ao piso de saída."
+        },
+        {
+          "n": 520,
+          "file": "alivio-520.png",
+          "p": {
+            "x": 620.6758695775787,
+            "y": 196
+          },
+          "feet": 220,
+          "camera": {
+            "x": 542.9040020920022,
+            "y": 133.3687178676535
+          },
+          "status": "Atravesse no intervalo seco ou suba pela oficina para abrir o alívio. A manutenção também leva à passarela sobre a grelha."
+        },
+        {
+          "n": 523,
+          "file": "alivio-523.png",
+          "p": {
+            "x": 623.8355427025788,
+            "y": 221.5
+          },
+          "feet": 245.5,
+          "camera": {
+            "x": 548.023978009448,
+            "y": 150.88234865147587
+          },
+          "status": "Atravesse no intervalo seco ou suba pela oficina para abrir o alívio. A manutenção também leva à passarela sobre a grelha."
+        },
+        {
+          "n": 530,
+          "file": "alivio-530.png",
+          "p": {
+            "x": 627.2521296633689,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 556.47575458537,
+            "y": 169.73853446402822
+          },
+          "status": "Patamar de saída: siga à direita para voltar ao piso da oficina."
+        },
+        {
+          "n": 540,
+          "file": "alivio-540.png",
+          "p": {
+            "x": 628.2562102664492,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 561.997827331241,
+            "y": 175.13937388880274
+          },
+          "status": "Patamar de saída: siga à direita para voltar ao piso da oficina."
+        },
+        {
+          "n": 550,
+          "file": "alivio-550.png",
+          "p": {
+            "x": 629.1562102664492,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 563.7669284147906,
+            "y": 175.88170863529962
+          },
+          "status": "Patamar de saída: siga à direita para voltar ao piso da oficina."
+        },
+        {
+          "n": 560,
+          "file": "alivio-560.png",
+          "p": {
+            "x": 646.5562102664492,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 572.4083943903648,
+            "y": 175.9837410847979
+          },
+          "status": "Patamar de saída: siga à direita para voltar ao piso da oficina."
+        },
+        {
+          "n": 570,
+          "file": "alivio-570.png",
+          "p": {
+            "x": 666.5562102664492,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 589.1480479554006,
+            "y": 175.99776524411382
+          },
+          "status": "Patamar de saída: siga à direita para voltar ao piso da oficina."
+        },
+        {
+          "n": 580,
+          "file": "alivio-580.png",
+          "p": {
+            "x": 686.5562102664492,
+            "y": 250
+          },
+          "feet": 274,
+          "camera": {
+            "x": 608.2400382911343,
+            "y": 175.99969283720293
+          },
+          "status": "Atravesse no intervalo seco ou suba pela oficina para abrir o alívio. A manutenção também leva à passarela sobre a grelha."
+        },
+        {
+          "n": 590,
+          "file": "alivio-590.png",
+          "p": {
+            "x": 700.2563365992618,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 620.1948698375174,
+            "y": 172.54974990642208
+          },
+          "status": "Atravesse no intervalo seco ou suba pela oficina para abrir o alívio. A manutenção também leva à passarela sobre a grelha."
+        },
+        {
+          "n": 600,
+          "file": "alivio-600.png",
+          "p": {
+            "x": 703.1742581357087,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 627.6242403553888,
+            "y": 172.07556204236485
+          },
+          "status": "Atravesse no intervalo seco ou suba pela oficina para abrir o alívio. A manutenção também leva à passarela sobre a grelha."
+        },
+        {
+          "n": 610,
+          "file": "alivio-610.png",
+          "p": {
+            "x": 703.2815509553197,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 630.2629863836695,
+            "y": 172.01038585396677
+          },
+          "status": "Atravesse no intervalo seco ou suba pela oficina para abrir o alívio. A manutenção também leva à passarela sobre a grelha."
+        },
+        {
+          "n": 620,
+          "file": "alivio-620.png",
+          "p": {
+            "x": 711.6815509553197,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 633.5379134398852,
+            "y": 172.0014275151815
+          },
+          "status": "Atravesse no intervalo seco ou suba pela oficina para abrir o alívio. A manutenção também leva à passarela sobre a grelha."
+        },
+        {
+          "n": 630,
+          "file": "alivio-630.png",
+          "p": {
+            "x": 744.0815509553197,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 652.6731531226814,
+            "y": 172.00019620915143
+          },
+          "status": "O novo ramal tem registro próprio: subir e fazer manutenção abre uma travessia segura."
+        },
+        {
+          "n": 640,
+          "file": "alivio-640.png",
+          "p": {
+            "x": 779.0815509553197,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 683.157818267059,
+            "y": 172.0000269685616
+          },
+          "status": "Ponto seguro nesta tentativa · O novo ramal tem registro próprio: subir e fazer manutenção abre uma travessia segura. · sair e reentrar reinicia a câmara"
+        },
+        {
+          "n": 650,
+          "file": "alivio-650.png",
+          "p": {
+            "x": 814.0815509553197,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 716.9002931027591,
+            "y": 172.00000370677571
+          },
+          "status": "O novo ramal tem registro próprio: subir e fazer manutenção abre uma travessia segura."
+        },
+        {
+          "n": 653,
+          "file": "alivio-653.png",
+          "p": {
+            "x": 824.5815509553197,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 727.2456768040195,
+            "y": 172.0000020437975
+          },
+          "status": "O novo ramal tem registro próprio: subir e fazer manutenção abre uma travessia segura."
+        },
+        {
+          "n": 660,
+          "file": "alivio-660.png",
+          "p": {
+            "x": 848.3315509553197,
+            "y": 304.5
+          },
+          "feet": 328.5,
+          "camera": {
+            "x": 751.4046311171451,
+            "y": 172.000000509489
+          },
+          "status": "O novo ramal tem registro próprio: subir e fazer manutenção abre uma travessia segura."
+        },
+        {
+          "n": 670,
+          "file": "alivio-670.png",
+          "p": {
+            "x": 869.8315509553197,
+            "y": 238.7000000000001
+          },
+          "feet": 262.7000000000001,
+          "camera": {
+            "x": 779.8896423022703,
+            "y": 172.00000007002828
+          },
+          "status": "O novo ramal tem registro próprio: subir e fazer manutenção abre uma travessia segura."
+        },
+        {
+          "n": 680,
+          "file": "alivio-680.png",
+          "p": {
+            "x": 889.8315509553197,
+            "y": 209.20000000000022
+          },
+          "feet": 233.20000000000022,
+          "camera": {
+            "x": 802.2527261987785,
+            "y": 164.76090642444663
+          },
+          "status": "O novo ramal tem registro próprio: subir e fazer manutenção abre uma travessia segura."
+        },
+        {
+          "n": 690,
+          "file": "alivio-690.png",
+          "p": {
+            "x": 896.0732772053199,
+            "y": 229.70000000000033
+          },
+          "feet": 253.70000000000033,
+          "camera": {
+            "x": 817.8306687427846,
+            "y": 167.49960802527454
+          },
+          "status": "O novo ramal tem registro próprio: subir e fazer manutenção abre uma travessia segura."
+        },
+        {
+          "n": 700,
+          "file": "alivio-700.png",
+          "p": {
+            "x": 892.7071684139751,
+            "y": 242.8
+          },
+          "feet": 266.8,
+          "camera": {
+            "x": 819.9186196939419,
+            "y": 171.3814299828338
+          },
+          "status": "O novo ramal tem registro próprio: subir e fazer manutenção abre uma travessia segura."
+        },
+        {
+          "n": 710,
+          "file": "alivio-710.png",
+          "p": {
+            "x": 914.7095246472632,
+            "y": 180.80000000000013
+          },
+          "feet": 204.80000000000013,
+          "camera": {
+            "x": 829.2383909193559,
+            "y": 142.80000000000013
+          },
+          "status": "O novo ramal tem registro próprio: subir e fazer manutenção abre uma travessia segura."
+        },
+        {
+          "n": 720,
+          "file": "alivio-720.png",
+          "p": {
+            "x": 940.7095246472632,
+            "y": 161.30000000000024
+          },
+          "feet": 185.30000000000024,
+          "camera": {
+            "x": 852.3308808523718,
+            "y": 117.064136179661
+          },
+          "status": "O novo ramal tem registro próprio: subir e fazer manutenção abre uma travessia segura."
+        },
+        {
+          "n": 730,
+          "file": "alivio-730.png",
+          "p": {
+            "x": 960.7095246472632,
+            "y": 191.80000000000035
+          },
+          "feet": 215.80000000000035,
+          "camera": {
+            "x": 873.5660706794802,
+            "y": 127.58597814223492
+          },
+          "status": "O novo ramal tem registro próprio: subir e fazer manutenção abre uma travessia segura."
+        },
+        {
+          "n": 740,
+          "file": "alivio-740.png",
+          "p": {
+            "x": 979.7240246472633,
+            "y": 181.40000000000003
+          },
+          "feet": 205.40000000000003,
+          "camera": {
+            "x": 892.9097410451196,
+            "y": 98.83928681298893
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 750,
+          "file": "alivio-750.png",
+          "p": {
+            "x": 1014.0805246472632,
+            "y": 124.90000000000013
+          },
+          "feet": 148.90000000000015,
+          "camera": {
+            "x": 919.6219952536056,
+            "y": 78.94121500956271
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 760,
+          "file": "alivio-760.png",
+          "p": {
+            "x": 1046.0805246472632,
+            "y": 115.4000000000001
+          },
+          "feet": 139.4000000000001,
+          "camera": {
+            "x": 951.7889273423017,
+            "y": 66.66677967046905
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 770,
+          "file": "alivio-770.png",
+          "p": {
+            "x": 1066.0805246472632,
+            "y": 155.90000000000015
+          },
+          "feet": 179.90000000000015,
+          "camera": {
+            "x": 977.2903073558274,
+            "y": 74.024580787629
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 780,
+          "file": "alivio-780.png",
+          "p": {
+            "x": 1086.6805246472632,
+            "y": 178.8
+          },
+          "feet": 202.8,
+          "camera": {
+            "x": 998.842035666993,
+            "y": 75.72848251819637
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 783,
+          "file": "alivio-783.png",
+          "p": {
+            "x": 1096.2805246472633,
+            "y": 158.70000000000005
+          },
+          "feet": 182.70000000000005,
+          "camera": {
+            "x": 1005.9526890849005,
+            "y": 75.8502939490929
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 790,
+          "file": "alivio-790.png",
+          "p": {
+            "x": 1120.7805246472633,
+            "y": 116.80000000000008
+          },
+          "feet": 140.80000000000007,
+          "camera": {
+            "x": 1026.1130591588062,
+            "y": 73.64248045665282
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 800,
+          "file": "alivio-800.png",
+          "p": {
+            "x": 1143.7805246472633,
+            "y": 97.30000000000005
+          },
+          "feet": 121.30000000000005,
+          "camera": {
+            "x": 1053.9931586631155,
+            "y": 52.881211504223856
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 810,
+          "file": "alivio-810.png",
+          "p": {
+            "x": 1163.7805246472633,
+            "y": 127.80000000000003
+          },
+          "feet": 151.8,
+          "camera": {
+            "x": 1076.2447401748461,
+            "y": 63.3649465436013
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 820,
+          "file": "alivio-820.png",
+          "p": {
+            "x": 1180.9178496472632,
+            "y": 117.4
+          },
+          "feet": 141.4,
+          "camera": {
+            "x": 1094.9931626189964,
+            "y": 72.43489677659338
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 830,
+          "file": "alivio-830.png",
+          "p": {
+            "x": 1201.7618621472632,
+            "y": 60.89999999999998
+          },
+          "feet": 84.89999999999998,
+          "camera": {
+            "x": 1115.0667792290558,
+            "y": 22.899999999999977
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 840,
+          "file": "alivio-840.png",
+          "p": {
+            "x": 1221.7618621472632,
+            "y": 51.39999999999995
+          },
+          "feet": 75.39999999999995,
+          "camera": {
+            "x": 1135.0872815268078,
+            "y": 13.399999999999949
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 850,
+          "file": "alivio-850.png",
+          "p": {
+            "x": 1228.003588397263,
+            "y": 91.89999999999992
+          },
+          "feet": 115.89999999999992,
+          "camera": {
+            "x": 1150.0128128091785,
+            "y": 52
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 860,
+          "file": "alivio-860.png",
+          "p": {
+            "x": 1223.3801283676444,
+            "y": 144.5
+          },
+          "feet": 168.5,
+          "camera": {
+            "x": 1151.6656014504176,
+            "y": 70.48039650434494
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 870,
+          "file": "alivio-870.png",
+          "p": {
+            "x": 1240.3934087882562,
+            "y": 78.69999999999999
+          },
+          "feet": 102.69999999999999,
+          "camera": {
+            "x": 1157.8415212709776,
+            "y": 40.69999999999999
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 880,
+          "file": "alivio-880.png",
+          "p": {
+            "x": 1261.7447368303174,
+            "y": 49.19999999999996
+          },
+          "feet": 73.19999999999996,
+          "camera": {
+            "x": 1175.8476939941957,
+            "y": 11.19999999999996
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 890,
+          "file": "alivio-890.png",
+          "p": {
+            "x": 1272.576445630317,
+            "y": 61.299999999999955
+          },
+          "feet": 85.29999999999995,
+          "camera": {
+            "x": 1191.986349550159,
+            "y": 19.299999999999955
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 900,
+          "file": "alivio-900.png",
+          "p": {
+            "x": 1282.1331731314572,
+            "y": 68.5
+          },
+          "feet": 92.5,
+          "camera": {
+            "x": 1202.5551546560744,
+            "y": 30.5
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 910,
+          "file": "alivio-910.png",
+          "p": {
+            "x": 1282.5196263000282,
+            "y": 56
+          },
+          "feet": 80,
+          "camera": {
+            "x": 1208.9163401227395,
+            "y": 18
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 914,
+          "file": "alivio-914.png",
+          "p": {
+            "x": 1281.6885823418427,
+            "y": 65
+          },
+          "feet": 89,
+          "camera": {
+            "x": 1209.3214111998445,
+            "y": 27
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 920,
+          "file": "alivio-920.png",
+          "p": {
+            "x": 1281.4367332038469,
+            "y": 93.5
+          },
+          "feet": 117.5,
+          "camera": {
+            "x": 1209.3905051401032,
+            "y": 52
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 930,
+          "file": "alivio-930.png",
+          "p": {
+            "x": 1285.9367332038469,
+            "y": 120
+          },
+          "feet": 144,
+          "camera": {
+            "x": 1210.5431170519348,
+            "y": 66.25772651583797
+          },
+          "status": "Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada."
+        },
+        {
+          "n": 940,
+          "file": "alivio-940.png",
+          "p": {
+            "x": 1305.4367332038469,
+            "y": 85.39999999999999
+          },
+          "feet": 109.39999999999999,
+          "camera": {
+            "x": 1222.1046435293797,
+            "y": 47.39999999999999
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 950,
+          "file": "alivio-950.png",
+          "p": {
+            "x": 1325.4367332038469,
+            "y": 28.899999999999967
+          },
+          "feet": 52.89999999999996,
+          "camera": {
+            "x": 1239.6987494840862,
+            "y": -9.100000000000033
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 960,
+          "file": "alivio-960.png",
+          "p": {
+            "x": 1340.4957053600967,
+            "y": 19.399999999999974
+          },
+          "feet": 43.39999999999998,
+          "camera": {
+            "x": 1257.591989912586,
+            "y": -18.600000000000026
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 970,
+          "file": "alivio-970.png",
+          "p": {
+            "x": 1337.4165000878643,
+            "y": 59.89999999999996
+          },
+          "feet": 83.89999999999996,
+          "camera": {
+            "x": 1264.347593205213,
+            "y": 21.899999999999963
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 980,
+          "file": "alivio-980.png",
+          "p": {
+            "x": 1336.1426239846244,
+            "y": 147.99999999999994
+          },
+          "feet": 171.99999999999994,
+          "camera": {
+            "x": 1264.3402185993943,
+            "y": 99.79999999999995
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 990,
+          "file": "alivio-990.png",
+          "p": {
+            "x": 1337.9426239846243,
+            "y": 178.8
+          },
+          "feet": 202.8,
+          "camera": {
+            "x": 1264.5365726776922,
+            "y": 131.72508010391613
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1000,
+          "file": "alivio-1000.png",
+          "p": {
+            "x": 1356.5426239846242,
+            "y": 116.80000000000008
+          },
+          "feet": 140.80000000000007,
+          "camera": {
+            "x": 1273.981150955175,
+            "y": 78.80000000000008
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1010,
+          "file": "alivio-1010.png",
+          "p": {
+            "x": 1376.5426239846242,
+            "y": 97.30000000000005
+          },
+          "feet": 121.30000000000005,
+          "camera": {
+            "x": 1291.0192577526302,
+            "y": 59.300000000000054
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1020,
+          "file": "alivio-1020.png",
+          "p": {
+            "x": 1389.7221183596241,
+            "y": 127.80000000000003
+          },
+          "feet": 151.8,
+          "camera": {
+            "x": 1308.0939736702803,
+            "y": 89.80000000000003
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1030,
+          "file": "alivio-1030.png",
+          "p": {
+            "x": 1384.6507893655169,
+            "y": 208.0000000000001
+          },
+          "feet": 232.0000000000001,
+          "camera": {
+            "x": 1312.6504182587178,
+            "y": 163.80000000000007
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1040,
+          "file": "alivio-1040.png",
+          "p": {
+            "x": 1384.7946532514436,
+            "y": 242.8
+          },
+          "feet": 266.8,
+          "camera": {
+            "x": 1312.106413456007,
+            "y": 170.75224006675012
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1044,
+          "file": "alivio-1044.png",
+          "p": {
+            "x": 1390.9533049762147,
+            "y": 216.00000000000006
+          },
+          "feet": 240.00000000000006,
+          "camera": {
+            "x": 1313.8807102301125,
+            "y": 170.3558605829216
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1050,
+          "file": "alivio-1050.png",
+          "p": {
+            "x": 1403.2429679074075,
+            "y": 180.80000000000013
+          },
+          "feet": 204.80000000000013,
+          "camera": {
+            "x": 1320.8973068005148,
+            "y": 142.80000000000013
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1060,
+          "file": "alivio-1060.png",
+          "p": {
+            "x": 1423.2429679074075,
+            "y": 161.30000000000024
+          },
+          "feet": 185.30000000000024,
+          "camera": {
+            "x": 1337.77970550648,
+            "y": 101.50200000000015
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1070,
+          "file": "alivio-1070.png",
+          "p": {
+            "x": 1436.7562390949074,
+            "y": 191.80000000000035
+          },
+          "feet": 215.80000000000035,
+          "camera": {
+            "x": 1354.8687332018778,
+            "y": 125.4469931609584
+          },
+          "status": "O cascudo ocupa a margem. Use a altura e cuide da água entre os apoios."
+        },
+        {
+          "n": 1080,
+          "file": "alivio-1080.png",
+          "p": {
+            "x": 1432.9414940322597,
+            "y": 272.00000000000045
+          },
+          "feet": 296.00000000000045,
+          "camera": {
+            "x": 1360.2782997458044,
+            "y": 163.4732832494951
+          },
+          "status": "O cascudo ocupa a margem. Use a altura e cuide da água entre os apoios."
+        },
+        {
+          "n": 1090,
+          "file": "alivio-1090.png",
+          "p": {
+            "x": 1435.9309884096126,
+            "y": 277.40000000000003
+          },
+          "feet": 301.40000000000003,
+          "camera": {
+            "x": 1361.1086735419326,
+            "y": 170.82801956888375
+          },
+          "status": "O cascudo ocupa a margem. Use a altura e cuide da água entre os apoios."
+        },
+        {
+          "n": 1100,
+          "file": "alivio-1100.png",
+          "p": {
+            "x": 1464.4574722770808,
+            "y": 220.90000000000015
+          },
+          "feet": 244.90000000000015,
+          "camera": {
+            "x": 1375.4385822973002,
+            "y": 171.6409135969788
+          },
+          "status": "O cascudo ocupa a margem. Use a altura e cuide da água entre os apoios."
+        },
+        {
+          "n": 1110,
+          "file": "alivio-1110.png",
+          "p": {
+            "x": 1499.4574722770808,
+            "y": 211.40000000000026
+          },
+          "feet": 235.40000000000026,
+          "camera": {
+            "x": 1404.199219858023,
+            "y": 162.2131597384942
+          },
+          "status": "O cascudo ocupa a margem. Use a altura e cuide da água entre os apoios."
+        },
+        {
+          "n": 1120,
+          "file": "alivio-1120.png",
+          "p": {
+            "x": 1534.4574722770808,
+            "y": 251.90000000000038
+          },
+          "feet": 275.9000000000004,
+          "camera": {
+            "x": 1437.4615513290082,
+            "y": 169.96223162100432
+          },
+          "status": "O cascudo ocupa a margem. Use a altura e cuide da água entre os apoios."
+        },
+        {
+          "n": 1130,
+          "file": "alivio-1130.png",
+          "p": {
+            "x": 1569.4574722770808,
+            "y": 264
+          },
+          "feet": 288,
+          "camera": {
+            "x": 1471.9776089476968,
+            "y": 171.71991274798836
+          },
+          "status": "O cascudo ocupa a margem. Use a altura e cuide da água entre os apoios."
+        },
+        {
+          "n": 1140,
+          "file": "alivio-1140.png",
+          "p": {
+            "x": 1604.4574722770808,
+            "y": 202.60000000000008
+          },
+          "feet": 226.60000000000008,
+          "camera": {
+            "x": 1506.842830522169,
+            "y": 164.60000000000008
+          },
+          "status": "O cascudo ocupa a margem. Use a altura e cuide da água entre os apoios."
+        },
+        {
+          "n": 1150,
+          "file": "alivio-1150.png",
+          "p": {
+            "x": 1639.4574722770808,
+            "y": 163.1000000000002
+          },
+          "feet": 187.1000000000002,
+          "camera": {
+            "x": 1541.8052945991146,
+            "y": 124.04208000000018
+          },
+          "status": "O cascudo ocupa a margem. Use a altura e cuide da água entre os apoios."
+        },
+        {
+          "n": 1160,
+          "file": "alivio-1160.png",
+          "p": {
+            "x": 1674.4574722770808,
+            "y": 173.6000000000003
+          },
+          "feet": 197.6000000000003,
+          "camera": {
+            "x": 1576.7948408079087,
+            "y": 117.95648315231439
+          },
+          "status": "O cascudo ocupa a margem. Use a altura e cuide da água entre os apoios."
+        },
+        {
+          "n": 1170,
+          "file": "alivio-1170.png",
+          "p": {
+            "x": 1709.4574722770808,
+            "y": 234.10000000000042
+          },
+          "feet": 258.1000000000004,
+          "camera": {
+            "x": 1611.7919294168548,
+            "y": 153.7909284530538
+          },
+          "status": "O cascudo ocupa a margem. Use a altura e cuide da água entre os apoios."
+        },
+        {
+          "n": 1175,
+          "file": "alivio-1175.png",
+          "p": {
+            "x": 1726.9574722770808,
+            "y": 282.00000000000045
+          },
+          "feet": 306.00000000000045,
+          "camera": {
+            "x": 1629.2913986789413,
+            "y": 165.2491716698676
+          },
+          "status": "O cascudo ocupa a margem. Use a altura e cuide da água entre os apoios."
+        },
+        {
+          "n": 1180,
+          "file": "alivio-1180.png",
+          "p": {
+            "x": 1742.9574722770808,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 1646.6111185916047,
+            "y": 169.4971989634166
+          },
+          "status": "O cascudo ocupa a margem. Use a altura e cuide da água entre os apoios."
+        },
+        {
+          "n": 1190,
+          "file": "alivio-1190.png",
+          "p": {
+            "x": 1749.1991985270809,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 1668.0544972932953,
+            "y": 171.65599492469602
+          },
+          "status": "O cascudo ocupa a margem. Use a altura e cuide da água entre os apoios."
+        },
+        {
+          "n": 1200,
+          "file": "alivio-1200.png",
+          "p": {
+            "x": 1759.1991985270809,
+            "y": 257.30000000000007
+          },
+          "feet": 281.30000000000007,
+          "camera": {
+            "x": 1678.0770599746281,
+            "y": 171.95271717962987
+          },
+          "status": "O cascudo ocupa a margem. Use a altura e cuide da água entre os apoios."
+        },
+        {
+          "n": 1210,
+          "file": "alivio-1210.png",
+          "p": {
+            "x": 1763.8296658395807,
+            "y": 212.80000000000018
+          },
+          "feet": 236.80000000000018,
+          "camera": {
+            "x": 1688.1779456097404,
+            "y": 168.6746926054242
+          },
+          "status": "O cascudo ocupa a margem. Use a altura e cuide da água entre os apoios."
+        },
+        {
+          "n": 1220,
+          "file": "alivio-1220.png",
+          "p": {
+            "x": 1760.4359471428845,
+            "y": 218.3000000000003
+          },
+          "feet": 242.3000000000003,
+          "camera": {
+            "x": 1688.9366068997497,
+            "y": 163.9246824373147
+          },
+          "status": "O cascudo ocupa a margem. Use a altura e cuide da água entre os apoios."
+        },
+        {
+          "n": 1230,
+          "file": "alivio-1230.png",
+          "p": {
+            "x": 1760.2050893078583,
+            "y": 264
+          },
+          "feet": 288,
+          "camera": {
+            "x": 1688.412845927619,
+            "y": 160.3947948909667
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1240,
+          "file": "alivio-1240.png",
+          "p": {
+            "x": 1776.7050893078583,
+            "y": 196.4000000000001
+          },
+          "feet": 220.4000000000001,
+          "camera": {
+            "x": 1694.403133982949,
+            "y": 142.80322440726408
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1250,
+          "file": "alivio-1250.png",
+          "p": {
+            "x": 1807.0050893078583,
+            "y": 161.9000000000002
+          },
+          "feet": 185.9000000000002,
+          "camera": {
+            "x": 1717.1770179411756,
+            "y": 121.85650560000019
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1260,
+          "file": "alivio-1260.png",
+          "p": {
+            "x": 1827.0050893078583,
+            "y": 177.40000000000032
+          },
+          "feet": 201.40000000000032,
+          "camera": {
+            "x": 1739.4579683466764,
+            "y": 119.65631618489786
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1270,
+          "file": "alivio-1270.png",
+          "p": {
+            "x": 1842.6850893078583,
+            "y": 216
+          },
+          "feet": 240,
+          "camera": {
+            "x": 1759.0218563206774,
+            "y": 136.8245962270856
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1280,
+          "file": "alivio-1280.png",
+          "p": {
+            "x": 1844.6024117656707,
+            "y": 201.5
+          },
+          "feet": 225.5,
+          "camera": {
+            "x": 1768.2178193149364,
+            "y": 139.56354700271615
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1290,
+          "file": "alivio-1290.png",
+          "p": {
+            "x": 1867.0024117656708,
+            "y": 137.5000000000001
+          },
+          "feet": 161.5000000000001,
+          "camera": {
+            "x": 1780.334887036894,
+            "y": 99.50000000000011
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1300,
+          "file": "alivio-1300.png",
+          "p": {
+            "x": 1897.5024117656708,
+            "y": 113.00000000000011
+          },
+          "feet": 137.0000000000001,
+          "camera": {
+            "x": 1806.4028248639725,
+            "y": 70.32943436544012
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1305,
+          "file": "alivio-1305.png",
+          "p": {
+            "x": 1907.5024117656708,
+            "y": 119.5000000000001
+          },
+          "feet": 143.5000000000001,
+          "camera": {
+            "x": 1818.4963516063494,
+            "y": 67.93129558642804
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1310,
+          "file": "alivio-1310.png",
+          "p": {
+            "x": 1917.5024117656708,
+            "y": 138.5000000000001
+          },
+          "feet": 162.5000000000001,
+          "camera": {
+            "x": 1829.6011724869759,
+            "y": 76.46582700272523
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1320,
+          "file": "alivio-1320.png",
+          "p": {
+            "x": 1934.5024117656708,
+            "y": 184
+          },
+          "feet": 208,
+          "camera": {
+            "x": 1849.8336672296,
+            "y": 119.7481343231433
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1330,
+          "file": "alivio-1330.png",
+          "p": {
+            "x": 1935.7441380156708,
+            "y": 184
+          },
+          "feet": 208,
+          "camera": {
+            "x": 1859.7810063365605,
+            "y": 132.04110911985154
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1340,
+          "file": "alivio-1340.png",
+          "p": {
+            "x": 1935.7441380156708,
+            "y": 184
+          },
+          "feet": 208,
+          "camera": {
+            "x": 1862.6404019749848,
+            "y": 133.73075430492162
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1350,
+          "file": "alivio-1350.png",
+          "p": {
+            "x": 1935.7441380156708,
+            "y": 184
+          },
+          "feet": 208,
+          "camera": {
+            "x": 1863.436746451083,
+            "y": 133.9629927092658
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1360,
+          "file": "alivio-1360.png",
+          "p": {
+            "x": 1935.7441380156708,
+            "y": 184
+          },
+          "feet": 208,
+          "camera": {
+            "x": 1863.6585291649162,
+            "y": 133.9949134207435
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1370,
+          "file": "alivio-1370.png",
+          "p": {
+            "x": 1935.7441380156708,
+            "y": 184
+          },
+          "feet": 208,
+          "camera": {
+            "x": 1863.7202958671805,
+            "y": 133.99930085969498
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1380,
+          "file": "alivio-1380.png",
+          "p": {
+            "x": 1935.7441380156708,
+            "y": 184
+          },
+          "feet": 208,
+          "camera": {
+            "x": 1863.7374979540461,
+            "y": 133.99990390454147
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1390,
+          "file": "alivio-1390.png",
+          "p": {
+            "x": 1935.7441380156708,
+            "y": 184
+          },
+          "feet": 208,
+          "camera": {
+            "x": 1863.7422887520274,
+            "y": 133.9999867918684
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1400,
+          "file": "alivio-1400.png",
+          "p": {
+            "x": 1935.7441380156708,
+            "y": 184
+          },
+          "feet": 208,
+          "camera": {
+            "x": 1863.743622993941,
+            "y": 133.99999818456834
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1410,
+          "file": "alivio-1410.png",
+          "p": {
+            "x": 1935.7441380156708,
+            "y": 184
+          },
+          "feet": 208,
+          "camera": {
+            "x": 1863.743994581616,
+            "y": 133.99999975047248
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1420,
+          "file": "alivio-1420.png",
+          "p": {
+            "x": 1935.7441380156708,
+            "y": 184
+          },
+          "feet": 208,
+          "camera": {
+            "x": 1863.7440980691465,
+            "y": 133.99999996570293
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1430,
+          "file": "alivio-1430.png",
+          "p": {
+            "x": 1935.7441380156708,
+            "y": 184
+          },
+          "feet": 208,
+          "camera": {
+            "x": 1863.744126890525,
+            "y": 133.99999999528592
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1435,
+          "file": "alivio-1435.png",
+          "p": {
+            "x": 1935.7441380156708,
+            "y": 184
+          },
+          "feet": 208,
+          "camera": {
+            "x": 1863.7441321445765,
+            "y": 133.9999999982523
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1440,
+          "file": "alivio-1440.png",
+          "p": {
+            "x": 1935.7441380156708,
+            "y": 184
+          },
+          "feet": 208,
+          "camera": {
+            "x": 1863.744134917307,
+            "y": 133.99999999935204
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1450,
+          "file": "alivio-1450.png",
+          "p": {
+            "x": 1935.7441380156708,
+            "y": 184
+          },
+          "feet": 208,
+          "camera": {
+            "x": 1863.7441371527736,
+            "y": 133.99999999991095
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1460,
+          "file": "alivio-1460.png",
+          "p": {
+            "x": 1935.7441380156708,
+            "y": 184
+          },
+          "feet": 208,
+          "camera": {
+            "x": 1863.7441377753532,
+            "y": 133.99999999998778
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1470,
+          "file": "alivio-1470.png",
+          "p": {
+            "x": 1946.0441380156708,
+            "y": 129.30000000000007
+          },
+          "feet": 153.30000000000007,
+          "camera": {
+            "x": 1867.204807615213,
+            "y": 91.30000000000007
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1480,
+          "file": "alivio-1480.png",
+          "p": {
+            "x": 1966.0441380156708,
+            "y": 100.40000000000009
+          },
+          "feet": 124.40000000000009,
+          "camera": {
+            "x": 1881.5573921386972,
+            "y": 62.40000000000009
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1490,
+          "file": "alivio-1490.png",
+          "p": {
+            "x": 1973.2835534140706,
+            "y": 136.4000000000001
+          },
+          "feet": 160.4000000000001,
+          "camera": {
+            "x": 1894.7153686495058,
+            "y": 84
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1500,
+          "file": "alivio-1500.png",
+          "p": {
+            "x": 1983.0959180064035,
+            "y": 127
+          },
+          "feet": 151,
+          "camera": {
+            "x": 1902.7711842052108,
+            "y": 88.46708073129479
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1510,
+          "file": "alivio-1510.png",
+          "p": {
+            "x": 2002.7959180064036,
+            "y": 119.5
+          },
+          "feet": 143.5,
+          "camera": {
+            "x": 1918.1594858325573,
+            "y": 81.5
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1520,
+          "file": "alivio-1520.png",
+          "p": {
+            "x": 2007.4263853189034,
+            "y": 162
+          },
+          "feet": 186,
+          "camera": {
+            "x": 1930.7959308855218,
+            "y": 95.52213456988801
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1530,
+          "file": "alivio-1530.png",
+          "p": {
+            "x": 2006.2894812829873,
+            "y": 169.5
+          },
+          "feet": 193.5,
+          "camera": {
+            "x": 1932.9384350263547,
+            "y": 124.26576134459647
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1540,
+          "file": "alivio-1540.png",
+          "p": {
+            "x": 2028.6894812829873,
+            "y": 105.50000000000006
+          },
+          "feet": 129.50000000000006,
+          "camera": {
+            "x": 1942.8668021300377,
+            "y": 67.50000000000006
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1550,
+          "file": "alivio-1550.png",
+          "p": {
+            "x": 2053.1894812829873,
+            "y": 81.00000000000003
+          },
+          "feet": 105.00000000000003,
+          "camera": {
+            "x": 1965.3259451386648,
+            "y": 43.00000000000003
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1560,
+          "file": "alivio-1560.png",
+          "p": {
+            "x": 2073.1894812829873,
+            "y": 106.5
+          },
+          "feet": 130.5,
+          "camera": {
+            "x": 1986.1894852986377,
+            "y": 68.5
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1566,
+          "file": "alivio-1566.png",
+          "p": {
+            "x": 2082.6067437829875,
+            "y": 145.8
+          },
+          "feet": 169.8,
+          "camera": {
+            "x": 1997.7823153869438,
+            "y": 86.7144
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1570,
+          "file": "alivio-1570.png",
+          "p": {
+            "x": 2084.8570515017373,
+            "y": 182.00000000000006
+          },
+          "feet": 206.00000000000006,
+          "camera": {
+            "x": 2003.6324992770267,
+            "y": 104.99823352934402
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1580,
+          "file": "alivio-1580.png",
+          "p": {
+            "x": 2084.4822357596277,
+            "y": 142.70000000000005
+          },
+          "feet": 166.70000000000005,
+          "camera": {
+            "x": 2010.030819698378,
+            "y": 104.70000000000005
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1590,
+          "file": "alivio-1590.png",
+          "p": {
+            "x": 2084.4822357596277,
+            "y": 105.50000000000006
+          },
+          "feet": 129.50000000000006,
+          "camera": {
+            "x": 2011.7995139939644,
+            "y": 67.50000000000006
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1600,
+          "file": "alivio-1600.png",
+          "p": {
+            "x": 2084.4822357596277,
+            "y": 184
+          },
+          "feet": 208,
+          "camera": {
+            "x": 2012.2920970815476,
+            "y": 105.18025600000006
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1610,
+          "file": "alivio-1610.png",
+          "p": {
+            "x": 2085.3822357596277,
+            "y": 176.5
+          },
+          "feet": 200.5,
+          "camera": {
+            "x": 2012.5689619522054,
+            "y": 128.68878292359366
+          },
+          "status": "O vagonete patrulha a passarela e freia nas pontas. Salte sobre ele e alcance o registro; os apoios de descida passam pela grelha que você fechou."
+        },
+        {
+          "n": 1620,
+          "file": "alivio-1620.png",
+          "p": {
+            "x": 2106.282235759628,
+            "y": 122.25000000000009
+          },
+          "feet": 146.25000000000009,
+          "camera": {
+            "x": 2021.929326758654,
+            "y": 84
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1630,
+          "file": "alivio-1630.png",
+          "p": {
+            "x": 2126.282235759628,
+            "y": 131.25000000000014
+          },
+          "feet": 155.25000000000014,
+          "camera": {
+            "x": 2040.2599528611058,
+            "y": 93.25000000000014
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1640,
+          "file": "alivio-1640.png",
+          "p": {
+            "x": 2145.427235759628,
+            "y": 190.2500000000002
+          },
+          "feet": 214.2500000000002,
+          "camera": {
+            "x": 2059.660750601314,
+            "y": 123.84810051200007
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1650,
+          "file": "alivio-1650.png",
+          "p": {
+            "x": 2150.367745156266,
+            "y": 232
+          },
+          "feet": 256,
+          "camera": {
+            "x": 2072.5664673761084,
+            "y": 137.7799532130381
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1660,
+          "file": "alivio-1660.png",
+          "p": {
+            "x": 2158.8761419342704,
+            "y": 184.00000000000006
+          },
+          "feet": 208.00000000000006,
+          "camera": {
+            "x": 2079.3703255138234,
+            "y": 138.61485893965838
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1670,
+          "file": "alivio-1670.png",
+          "p": {
+            "x": 2191.2761419342705,
+            "y": 169.65000000000012
+          },
+          "feet": 193.65000000000012,
+          "camera": {
+            "x": 2099.4883759470863,
+            "y": 122.04548731624443
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1680,
+          "file": "alivio-1680.png",
+          "p": {
+            "x": 2226.2761419342705,
+            "y": 208.65000000000018
+          },
+          "feet": 232.65000000000018,
+          "camera": {
+            "x": 2130.246754844702,
+            "y": 134.43318327881354
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1690,
+          "file": "alivio-1690.png",
+          "p": {
+            "x": 2255.2761419342705,
+            "y": 295.70000000000016
+          },
+          "feet": 319.70000000000016,
+          "camera": {
+            "x": 2162.468810267826,
+            "y": 165.44
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1696,
+          "file": "alivio-1696.png",
+          "p": {
+            "x": 2267.2761419342705,
+            "y": 290.8
+          },
+          "feet": 314.8,
+          "camera": {
+            "x": 2177.7577253461354,
+            "y": 170.19151295999998
+          },
+          "status": "O carregador e a grelha guardam o piso. A passarela do vagonete leva ao registro que isola essa descarga."
+        },
+        {
+          "n": 1700,
+          "file": "alivio-1700.png",
+          "p": {
+            "x": 2275.2761419342705,
+            "y": 264.00000000000006
+          },
+          "feet": 288.00000000000006,
+          "camera": {
+            "x": 2186.8992940718185,
+            "y": 171.182343656538
+          },
+          "status": "O carregador e a grelha guardam o piso. A passarela do vagonete leva ao registro que isola essa descarga."
+        },
+        {
+          "n": 1710,
+          "file": "alivio-1710.png",
+          "p": {
+            "x": 2291.5808150592707,
+            "y": 249.65000000000012
+          },
+          "feet": 273.6500000000001,
+          "camera": {
+            "x": 2207.1743331462644,
+            "y": 171.88761474528178
+          },
+          "status": "O carregador e a grelha guardam o piso. A passarela do vagonete leva ao registro que isola essa descarga."
+        },
+        {
+          "n": 1720,
+          "file": "alivio-1720.png",
+          "p": {
+            "x": 2290.786092535911,
+            "y": 264
+          },
+          "feet": 288,
+          "camera": {
+            "x": 2216.1367139151807,
+            "y": 171.9845528679878
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1730,
+          "file": "alivio-1730.png",
+          "p": {
+            "x": 2303.086092535911,
+            "y": 264
+          },
+          "feet": 288,
+          "camera": {
+            "x": 2222.5696273107133,
+            "y": 171.99787682211513
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1740,
+          "file": "alivio-1740.png",
+          "p": {
+            "x": 2323.086092535911,
+            "y": 265.5
+          },
+          "feet": 289.5,
+          "camera": {
+            "x": 2238.1322629733477,
+            "y": 171.99970817337956
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1750,
+          "file": "alivio-1750.png",
+          "p": {
+            "x": 2343.086092535911,
+            "y": 303
+          },
+          "feet": 327,
+          "camera": {
+            "x": 2256.896452674482,
+            "y": 171.99995988900554
+          },
+          "status": "Desça pelos apoios até reencontrar a margem e o caminho principal."
+        },
+        {
+          "n": 1760,
+          "file": "alivio-1760.png",
+          "p": {
+            "x": 2358.586092535911,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2275.4330198911257,
+            "y": 171.182343656538
+          },
+          "status": "Ponto seguro nesta tentativa · As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída. · sair e reentrar reinicia a câmara"
+        },
+        {
+          "n": 1770,
+          "file": "alivio-1770.png",
+          "p": {
+            "x": 2362.327818785911,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2284.6197767045983,
+            "y": 171.88761474528178
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1780,
+          "file": "alivio-1780.png",
+          "p": {
+            "x": 2389.627818785911,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2300.3230235377605,
+            "y": 171.9845528679878
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1790,
+          "file": "alivio-1790.png",
+          "p": {
+            "x": 2424.627818785911,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2329.2899414705666,
+            "y": 171.99787682211513
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1800,
+          "file": "alivio-1800.png",
+          "p": {
+            "x": 2459.627818785911,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2362.609722226508,
+            "y": 171.99970817337956
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1810,
+          "file": "alivio-1810.png",
+          "p": {
+            "x": 2494.627818785911,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2397.1417795271277,
+            "y": 171.99995988900554
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1820,
+          "file": "alivio-1820.png",
+          "p": {
+            "x": 2529.627818785911,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2432.0114570286346,
+            "y": 171.9999944868228
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1827,
+          "file": "alivio-1827.png",
+          "p": {
+            "x": 2554.127818785911,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2456.48171050809,
+            "y": 171.99999862564502
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1830,
+          "file": "alivio-1830.png",
+          "p": {
+            "x": 2564.627818785911,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2466.9751620856077,
+            "y": 171.99999924222465
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1840,
+          "file": "alivio-1840.png",
+          "p": {
+            "x": 2599.627818785911,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2501.9650539085505,
+            "y": 171.99999989584526
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1850,
+          "file": "alivio-1850.png",
+          "p": {
+            "x": 2634.627818785911,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2536.9622387713744,
+            "y": 171.99999998568413
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1860,
+          "file": "alivio-1860.png",
+          "p": {
+            "x": 2669.627818785911,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2571.961454752923,
+            "y": 171.9999999980323
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1870,
+          "file": "alivio-1870.png",
+          "p": {
+            "x": 2704.627818785911,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2606.9612364030195,
+            "y": 171.99999999972954
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1880,
+          "file": "alivio-1880.png",
+          "p": {
+            "x": 2739.627818785911,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2641.961175592358,
+            "y": 171.99999999996282
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1890,
+          "file": "alivio-1890.png",
+          "p": {
+            "x": 2774.627818785911,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2676.9611586565297,
+            "y": 171.99999999999488
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1900,
+          "file": "alivio-1900.png",
+          "p": {
+            "x": 2809.627818785911,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2711.9611539398843,
+            "y": 171.9999999999993
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1910,
+          "file": "alivio-1910.png",
+          "p": {
+            "x": 2844.627818785911,
+            "y": 264.00000000000006
+          },
+          "feet": 288.00000000000006,
+          "camera": {
+            "x": 2739.9074531360798,
+            "y": 171.99999999999991
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1920,
+          "file": "alivio-1920.png",
+          "p": {
+            "x": 2879.627818785911,
+            "y": 215.00000000000017
+          },
+          "feet": 239.00000000000017,
+          "camera": {
+            "x": 2748.632213895959,
+            "y": 169.97218480000004
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1930,
+          "file": "alivio-1930.png",
+          "p": {
+            "x": 2914.627818785911,
+            "y": 215.50000000000028
+          },
+          "feet": 239.50000000000028,
+          "camera": {
+            "x": 2751.0620682830336,
+            "y": 162.9653362225952
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1940,
+          "file": "alivio-1940.png",
+          "p": {
+            "x": 2949.627818785911,
+            "y": 266.0000000000004
+          },
+          "feet": 290.0000000000004,
+          "camera": {
+            "x": 2751.7387851013946,
+            "y": 170.63185081525822
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1950,
+          "file": "alivio-1950.png",
+          "p": {
+            "x": 2984.627818785911,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2751.9272513957903,
+            "y": 171.81195058798338
+          },
+          "status": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída."
+        },
+        {
+          "n": 1957,
+          "file": "alivio-1957.png",
+          "p": {
+            "x": 3009.127818785911,
+            "y": 312
+          },
+          "feet": 336,
+          "camera": {
+            "x": 2751.9702694207895,
+            "y": 171.95312201383544
+          },
+          "status": "PASSAGEM INSPECIONADA · alívio intacto, grelha mantém o ciclo · sem progresso salvo"
+        }
+      ],
+      "damage": [],
+      "jumps": [
+        {
+          "start": {
+            "n": 69,
+            "x": 115.02534068887034,
+            "feet": 336,
+            "y": 312,
+            "camX": 50.232423472005436,
+            "camY": 176
+          },
+          "apex": {
+            "n": 91,
+            "x": 115.02534068887034,
+            "feet": 233.00000000000023,
+            "y": 209.00000000000023,
+            "camX": 50.977714411685525,
+            "camY": 111.97193970477463
+          },
+          "end": {
+            "n": 106,
+            "x": 115.02534068887034,
+            "feet": 288,
+            "y": 264,
+            "camX": 51.018340871365574,
+            "camY": 120.70000000000039
+          },
+          "landingAtTakeoff": {
+            "x": 64.79291721686491,
+            "y": 112
+          },
+          "landingAtApex": {
+            "x": 64.04762627718482,
+            "y": 176.02806029522537
+          }
+        },
+        {
+          "start": {
+            "n": 115,
+            "x": 115.02534068887034,
+            "feet": 288,
+            "y": 264,
+            "camX": 51.023125397953336,
+            "camY": 146.7535080721762
+          },
+          "apex": {
+            "n": 137,
+            "x": 153.32534068887034,
+            "feet": 185.00000000000023,
+            "y": 161.00000000000023,
+            "camX": 75.96582935550471,
+            "camY": 108.63813074839513
+          },
+          "end": {
+            "n": 150,
+            "x": 170.03368196432737,
+            "feet": 224,
+            "y": 200,
+            "camX": 97.40832792900989,
+            "camY": 108.04836038533307
+          },
+          "landingAtTakeoff": {
+            "x": 119.01055656637404,
+            "y": 77.2464919278238
+          },
+          "landingAtApex": {
+            "x": 94.06785260882266,
+            "y": 115.36186925160487
+          }
+        },
+        {
+          "start": {
+            "n": 171,
+            "x": 172.0506813777407,
+            "feet": 224,
+            "y": 200,
+            "camX": 107.25056625591431,
+            "camY": 108.00074917047381
+          },
+          "apex": {
+            "n": 193,
+            "x": 210.3506813777407,
+            "feet": 121.00000000000006,
+            "y": 97.00000000000006,
+            "camX": 132.94324448833422,
+            "camY": 60.98400000000005
+          },
+          "end": {
+            "n": 206,
+            "x": 227.05902265319773,
+            "feet": 160,
+            "y": 136,
+            "camX": 154.4245727970233,
+            "camY": 60.07457189500339
+          },
+          "landingAtTakeoff": {
+            "x": 119.80845639728342,
+            "y": 51.99925082952619
+          },
+          "landingAtApex": {
+            "x": 94.11577816486351,
+            "y": 99.01599999999995
+          }
+        },
+        {
+          "start": {
+            "n": 227,
+            "x": 229.07602206661105,
+            "feet": 160,
+            "y": 136,
+            "camX": 164.27528610718173,
+            "camY": 60.00115522367177
+          },
+          "apex": {
+            "n": 249,
+            "x": 267.3760220666111,
+            "feet": 56.99999999999994,
+            "y": 32.99999999999994,
+            "camX": 189.96854788682526,
+            "camY": -3.000000000000057
+          },
+          "end": {
+            "n": 270,
+            "x": 309.3760220666111,
+            "feet": 160,
+            "y": 136,
+            "camX": 230.79530190851384,
+            "camY": 51.045725921157775
+          },
+          "landingAtTakeoff": {
+            "x": 145.10073595942936,
+            "y": 99.99884477632823
+          },
+          "landingAtApex": {
+            "x": 119.40747417978582,
+            "y": 163.00000000000006
+          }
+        },
+        {
+          "start": {
+            "n": 421,
+            "x": 361.40136275548144,
+            "feet": 160,
+            "y": 136,
+            "camX": 283.7432009472538,
+            "camY": 56.00000000000018
+          },
+          "apex": {
+            "n": 443,
+            "x": 438.40136275548144,
+            "feet": 56.99999999999994,
+            "y": 32.99999999999994,
+            "camX": 349.45598245868894,
+            "camY": -3.000000000000057
+          },
+          "end": {
+            "n": 464,
+            "x": 511.90136275548144,
+            "feet": 160,
+            "y": 136,
+            "camX": 422.28392767637206,
+            "camY": 48.26175260685377
+          },
+          "landingAtTakeoff": {
+            "x": 228.15816180822765,
+            "y": 103.99999999999983
+          },
+          "landingAtApex": {
+            "x": 162.4453802967925,
+            "y": 163.00000000000006
+          }
+        },
+        {
+          "start": {
+            "n": 659,
+            "x": 845.0565509553197,
+            "feet": 336,
+            "y": 312,
+            "camX": 748.0055056846667,
+            "camY": 172.00000062132807
+          },
+          "apex": {
+            "n": 681,
+            "x": 891.5315509553197,
+            "feet": 233.00000000000023,
+            "y": 209.00000000000023,
+            "camX": 804.3261851695635,
+            "camY": 163.72394326804627
+          },
+          "end": {
+            "n": 696,
+            "x": 892.2838989769582,
+            "feet": 288,
+            "y": 264,
+            "camX": 819.7205488685212,
+            "camY": 170.6318508156604
+          },
+          "landingAtTakeoff": {
+            "x": 144.27839329229153,
+            "y": 115.99999937867193
+          },
+          "landingAtApex": {
+            "x": 87.95771380739473,
+            "y": 124.27605673195373
+          }
+        },
+        {
+          "start": {
+            "n": 697,
+            "x": 891.9397163362124,
+            "feet": 288,
+            "y": 264,
+            "camX": 819.7468489646441,
+            "camY": 170.87811766884153
+          },
+          "apex": {
+            "n": 719,
+            "x": 938.7095246472632,
+            "feet": 185.00000000000023,
+            "y": 161.00000000000023,
+            "camX": 850.0974294257958,
+            "camY": 118.32943436544019
+          },
+          "end": {
+            "n": 734,
+            "x": 967.8545246472632,
+            "feet": 240,
+            "y": 216,
+            "camX": 881.6226508484101,
+            "camY": 133.85278879632796
+          },
+          "landingAtTakeoff": {
+            "x": 148.10767568261917,
+            "y": 69.12188233115847
+          },
+          "landingAtApex": {
+            "x": 117.75709522146747,
+            "y": 121.67056563455981
+          }
+        },
+        {
+          "start": {
+            "n": 735,
+            "x": 969.0827746472632,
+            "feet": 240,
+            "y": 216,
+            "camX": 883.4778657042725,
+            "camY": 127.85278879632796
+          },
+          "apex": {
+            "n": 757,
+            "x": 1038.5805246472632,
+            "feet": 137.0000000000001,
+            "y": 113.00000000000011,
+            "camX": 942.22494539388,
+            "camY": 68.50650395102546
+          },
+          "end": {
+            "n": 776,
+            "x": 1078.0805246472632,
+            "feet": 224,
+            "y": 200,
+            "camX": 990.4276723919611,
+            "camY": 75.39945938058008
+          },
+          "landingAtTakeoff": {
+            "x": 194.60265894299073,
+            "y": 96.14721120367204
+          },
+          "landingAtApex": {
+            "x": 135.8555792533832,
+            "y": 155.49349604897452
+          }
+        },
+        {
+          "start": {
+            "n": 777,
+            "x": 1079.7805246472633,
+            "feet": 224,
+            "y": 200,
+            "camX": 992.5100146625973,
+            "camY": 75.50755669207567
+          },
+          "apex": {
+            "n": 799,
+            "x": 1141.7805246472633,
+            "feet": 121.00000000000006,
+            "y": 97.00000000000006,
+            "camX": 1051.5676087561862,
+            "camY": 54.106355492955906
+          },
+          "end": {
+            "n": 814,
+            "x": 1170.1537746472632,
+            "feet": 176,
+            "y": 152,
+            "camX": 1084.2792756651947,
+            "camY": 70.28741739359894
+          },
+          "landingAtTakeoff": {
+            "x": 177.64375998466585,
+            "y": 100.49244330792433
+          },
+          "landingAtApex": {
+            "x": 118.58616589107692,
+            "y": 121.89364450704409
+          }
+        },
+        {
+          "start": {
+            "n": 815,
+            "x": 1171.1977871472632,
+            "feet": 176,
+            "y": 152,
+            "camX": 1086.069497043043,
+            "camY": 71.31568226275114
+          },
+          "apex": {
+            "n": 837,
+            "x": 1215.7618621472632,
+            "feet": 72.99999999999996,
+            "y": 48.99999999999996,
+            "camX": 1129.0835824520514,
+            "camY": 10.999999999999957
+          },
+          "end": {
+            "n": 858,
+            "x": 1223.577472283522,
+            "feet": 176,
+            "y": 152,
+            "camX": 1151.755765407953,
+            "camY": 67.79119051806207
+          },
+          "landingAtTakeoff": {
+            "x": 137.50797524047903,
+            "y": 104.68431773724886
+          },
+          "landingAtApex": {
+            "x": 94.4938898314706,
+            "y": 165.00000000000006
+          }
+        },
+        {
+          "start": {
+            "n": 859,
+            "x": 1223.3288003255832,
+            "feet": 176,
+            "y": 152,
+            "camX": 1151.7045295980686,
+            "camY": 69.26877622481089
+          },
+          "apex": {
+            "n": 881,
+            "x": 1263.7447368303174,
+            "feet": 72.99999999999996,
+            "y": 48.99999999999996,
+            "camX": 1177.7553391345302,
+            "camY": 10.999999999999957
+          },
+          "end": {
+            "n": 924,
+            "x": 1281.4367332038469,
+            "feet": 144,
+            "y": 120,
+            "camX": 1209.4090104485178,
+            "camY": 57.69016
+          },
+          "landingAtTakeoff": {
+            "x": 129.7322036057783,
+            "y": 74.73122377518911
+          },
+          "landingAtApex": {
+            "x": 103.68139406931664,
+            "y": 133.00000000000006
+          }
+        },
+        {
+          "start": {
+            "n": 935,
+            "x": 1295.4367332038469,
+            "feet": 144,
+            "y": 120,
+            "camX": 1215.0887614768749,
+            "camY": 68.61259011527027
+          },
+          "apex": {
+            "n": 957,
+            "x": 1337.8099832038467,
+            "feet": 40.99999999999997,
+            "y": 16.99999999999997,
+            "camX": 1252.8362201943457,
+            "camY": -21.00000000000003
+          },
+          "end": {
+            "n": 986,
+            "x": 1336.1426239846244,
+            "feet": 224,
+            "y": 200,
+            "camX": 1264.23438773125,
+            "camY": 127.62563452799996
+          },
+          "landingAtTakeoff": {
+            "x": 121.0538625077495,
+            "y": 155.38740988472972
+          },
+          "landingAtApex": {
+            "x": 83.30640379027864,
+            "y": 245.00000000000003
+          }
+        },
+        {
+          "start": {
+            "n": 987,
+            "x": 1336.1426239846244,
+            "feet": 224,
+            "y": 200,
+            "camX": 1264.223376081655,
+            "camY": 129.85302031295998
+          },
+          "apex": {
+            "n": 1009,
+            "x": 1374.5426239846242,
+            "feet": 121.00000000000006,
+            "y": 97.00000000000006,
+            "camX": 1289.1751623573582,
+            "camY": 59.00000000000006
+          },
+          "end": {
+            "n": 1036,
+            "x": 1383.4360015266725,
+            "feet": 288,
+            "y": 264,
+            "camX": 1312.1846148005432,
+            "camY": 169.2402126072192
+          },
+          "landingAtTakeoff": {
+            "x": 119.21262544501747,
+            "y": 158.14697968704002
+          },
+          "landingAtApex": {
+            "x": 94.2608391693143,
+            "y": 228.99999999999994
+          }
+        },
+        {
+          "start": {
+            "n": 1037,
+            "x": 1383.3256644578653,
+            "feet": 288,
+            "y": 264,
+            "camX": 1312.0815407594218,
+            "camY": 169.73697433791975
+          },
+          "apex": {
+            "n": 1059,
+            "x": 1421.2429679074075,
+            "feet": 185.00000000000023,
+            "y": 161.00000000000023,
+            "camX": 1335.9438060881716,
+            "camY": 107.1000000000002
+          },
+          "end": {
+            "n": 1085,
+            "x": 1432.0549285042782,
+            "feet": 336,
+            "y": 312,
+            "camX": 1360.2941569147958,
+            "camY": 168.83880636890697
+          },
+          "landingAtTakeoff": {
+            "x": 119.97338774485638,
+            "y": 166.26302566208025
+          },
+          "landingAtApex": {
+            "x": 96.11112241610658,
+            "y": 228.8999999999998
+          }
+        },
+        {
+          "start": {
+            "n": 1085,
+            "x": 1432.0549285042782,
+            "feet": 336,
+            "y": 312,
+            "camX": 1360.2941569147958,
+            "camY": 168.83880636890697
+          },
+          "apex": {
+            "n": 1107,
+            "x": 1488.9574722770808,
+            "feet": 233.00000000000023,
+            "y": 209.00000000000023,
+            "camX": 1394.8249409052012,
+            "camY": 163.68378676037437
+          },
+          "end": {
+            "n": 1122,
+            "x": 1541.4574722770808,
+            "feet": 288,
+            "y": 264,
+            "camX": 1444.3102310948934,
+            "camY": 170.6298045419633
+          },
+          "landingAtTakeoff": {
+            "x": 181.16331536228495,
+            "y": 119.16119363109303
+          },
+          "landingAtApex": {
+            "x": 146.63253137187962,
+            "y": 124.31621323962563
+          }
+        },
+        {
+          "start": {
+            "n": 1131,
+            "x": 1572.9574722770808,
+            "feet": 288,
+            "y": 264,
+            "camX": 1475.4551925472229,
+            "camY": 171.77032845335046
+          },
+          "apex": {
+            "n": 1153,
+            "x": 1649.9574722770808,
+            "feet": 185.00000000000023,
+            "y": 161.00000000000023,
+            "camX": 1552.300679450522,
+            "camY": 118.32943436544019
+          },
+          "end": {
+            "n": 1179,
+            "x": 1740.9574722770808,
+            "feet": 336,
+            "y": 312,
+            "camX": 1643.291161270858,
+            "camY": 168.94780361392267
+          },
+          "landingAtTakeoff": {
+            "x": 265.50227972985795,
+            "y": 164.22967154664954
+          },
+          "landingAtApex": {
+            "x": 188.65679282655879,
+            "y": 217.6705656345598
+          }
+        },
+        {
+          "start": {
+            "n": 1192,
+            "x": 1749.1991985270809,
+            "feet": 336,
+            "y": 312,
+            "camX": 1670.1175418916373,
+            "camY": 171.7686909873656
+          },
+          "apex": {
+            "n": 1214,
+            "x": 1761.809836892469,
+            "feet": 233.00000000000023,
+            "y": 209.00000000000023,
+            "camX": 1689.0643761396848,
+            "camY": 163.7210049522235
+          },
+          "end": {
+            "n": 1229,
+            "x": 1760.2050893078583,
+            "feet": 288,
+            "y": 264,
+            "camX": 1688.4411763757682,
+            "camY": 164.87170108654476
+          },
+          "landingAtTakeoff": {
+            "x": 90.08754741622101,
+            "y": 116.2313090126344
+          },
+          "landingAtApex": {
+            "x": 71.14071316817353,
+            "y": 124.2789950477765
+          }
+        },
+        {
+          "start": {
+            "n": 1230,
+            "x": 1760.2050893078583,
+            "feet": 288,
+            "y": 264,
+            "camX": 1688.412845927619,
+            "camY": 160.3947948909667
+          },
+          "apex": {
+            "n": 1252,
+            "x": 1811.0050893078583,
+            "feet": 185.00000000000023,
+            "y": 161.00000000000023,
+            "camX": 1721.890230841499,
+            "camY": 118.32943436544019
+          },
+          "end": {
+            "n": 1267,
+            "x": 1840.1500893078583,
+            "feet": 240,
+            "y": 216,
+            "camX": 1753.8443224573043,
+            "camY": 134.24086313874872
+          },
+          "landingAtTakeoff": {
+            "x": 151.7372433802393,
+            "y": 79.6052051090333
+          },
+          "landingAtApex": {
+            "x": 118.25985846635922,
+            "y": 121.67056563455981
+          }
+        },
+        {
+          "start": {
+            "n": 1278,
+            "x": 1843.7024117656708,
+            "feet": 240,
+            "y": 216,
+            "camX": 1767.0223078778422,
+            "camY": 139.35090274050586
+          },
+          "apex": {
+            "n": 1300,
+            "x": 1897.5024117656708,
+            "feet": 137.0000000000001,
+            "y": 113.00000000000011,
+            "camX": 1806.4028248639725,
+            "camY": 70.32943436544012
+          },
+          "end": {
+            "n": 1317,
+            "x": 1931.2024117656708,
+            "feet": 208,
+            "y": 184,
+            "camX": 1844.2952054005216,
+            "camY": 108.15180845305368
+          },
+          "landingAtTakeoff": {
+            "x": 164.18010388782864,
+            "y": 68.64909725949414
+          },
+          "landingAtApex": {
+            "x": 124.79958690169838,
+            "y": 137.67056563455986
+          }
+        },
+        {
+          "start": {
+            "n": 1462,
+            "x": 1935.7441380156708,
+            "feet": 208,
+            "y": 184,
+            "camX": 1863.744137829569,
+            "camY": 133.9999999999918
+          },
+          "apex": {
+            "n": 1479,
+            "x": 1964.0441380156708,
+            "feet": 124.00000000000009,
+            "y": 100.00000000000009,
+            "camX": 1879.8546540645643,
+            "camY": 62.000000000000085
+          },
+          "end": {
+            "n": 1523,
+            "x": 2005.7958169381104,
+            "feet": 208,
+            "y": 184,
+            "camX": 1931.8924619248357,
+            "camY": 109.86205629353
+          },
+          "landingAtTakeoff": {
+            "x": 142.05167910854152,
+            "y": 74.00000000000821
+          },
+          "landingAtApex": {
+            "x": 125.94116287354609,
+            "y": 145.99999999999991
+          }
+        },
+        {
+          "start": {
+            "n": 1528,
+            "x": 2005.3894812829874,
+            "feet": 208,
+            "y": 184,
+            "camX": 1932.6266632863026,
+            "camY": 125.0511025350929
+          },
+          "apex": {
+            "n": 1550,
+            "x": 2053.1894812829873,
+            "feet": 105.00000000000003,
+            "y": 81.00000000000003,
+            "camX": 1965.3259451386648,
+            "camY": 43.00000000000003
+          },
+          "end": {
+            "n": 1571,
+            "x": 2084.711350532987,
+            "feet": 208,
+            "y": 184,
+            "camX": 2004.721961427742,
+            "camY": 110.2185514940621
+          },
+          "landingAtTakeoff": {
+            "x": 152.08468724668455,
+            "y": 82.9488974649071
+          },
+          "landingAtApex": {
+            "x": 119.38540539432233,
+            "y": 164.99999999999997
+          }
+        },
+        {
+          "start": {
+            "n": 1574,
+            "x": 2084.4822357596277,
+            "feet": 208,
+            "y": 184,
+            "camX": 2007.2036085231073,
+            "camY": 120.88767030017803
+          },
+          "apex": {
+            "n": 1586,
+            "x": 2084.4822357596277,
+            "feet": 129.50000000000006,
+            "y": 105.50000000000006,
+            "camX": 2011.3437881223754,
+            "camY": 67.50000000000006
+          },
+          "end": {
+            "n": 1600,
+            "x": 2084.4822357596277,
+            "feet": 208,
+            "y": 184,
+            "camX": 2012.2920970815476,
+            "camY": 105.18025600000006
+          },
+          "landingAtTakeoff": {
+            "x": 77.27862723652038,
+            "y": 87.11232969982197
+          },
+          "landingAtApex": {
+            "x": 73.13844763725228,
+            "y": 140.49999999999994
+          }
+        },
+        {
+          "start": {
+            "n": 1609,
+            "x": 2084.782235759628,
+            "feet": 208,
+            "y": 184,
+            "camX": 2012.458060978466,
+            "camY": 129.16924746779713
+          },
+          "apex": {
+            "n": 1623,
+            "x": 2112.282235759628,
+            "feet": 143.7000000000001,
+            "y": 119.7000000000001,
+            "camX": 2027.1923301569163,
+            "camY": 81.7000000000001
+          },
+          "end": {
+            "n": 1645,
+            "x": 2149.461730134628,
+            "feet": 256,
+            "y": 232,
+            "camX": 2067.6098827241503,
+            "camY": 134.01184731643676
+          },
+          "landingAtTakeoff": {
+            "x": 137.003669156162,
+            "y": 126.83075253220287
+          },
+          "landingAtApex": {
+            "x": 122.2693999777116,
+            "y": 174.2999999999999
+          }
+        },
+        {
+          "start": {
+            "n": 1653,
+            "x": 2150.4761419342703,
+            "feet": 256,
+            "y": 232,
+            "camX": 2074.448864193771,
+            "camY": 138.7759372431664
+          },
+          "apex": {
+            "n": 1667,
+            "x": 2180.7761419342705,
+            "feet": 191.7000000000001,
+            "y": 167.7000000000001,
+            "camX": 2091.7362430283965,
+            "camY": 124.69759963625813
+          },
+          "end": {
+            "n": 1692,
+            "x": 2259.2761419342705,
+            "feet": 336,
+            "y": 312,
+            "camX": 2167.854144291776,
+            "camY": 168
+          },
+          "landingAtTakeoff": {
+            "x": 184.82727774049954,
+            "y": 197.2240627568336
+          },
+          "landingAtApex": {
+            "x": 167.539898905874,
+            "y": 211.30240036374187
+          }
+        },
+        {
+          "start": {
+            "n": 1693,
+            "x": 2261.2761419342705,
+            "feet": 336,
+            "y": 312,
+            "camX": 2170.424784008875,
+            "camY": 168.72
+          },
+          "apex": {
+            "n": 1707,
+            "x": 2288.4211419342705,
+            "feet": 271.7000000000001,
+            "y": 247.7000000000001,
+            "camX": 2201.7762859475156,
+            "camY": 171.7961701536574
+          },
+          "end": {
+            "n": 1716,
+            "x": 2291.6066092467704,
+            "feet": 288,
+            "y": 264,
+            "camX": 2214.2630670926096,
+            "camY": 171.96583413279598
+          },
+          "landingAtTakeoff": {
+            "x": 121.18182523789528,
+            "y": 119.28
+          },
+          "landingAtApex": {
+            "x": 89.83032329925481,
+            "y": 116.20382984634259
+          }
+        },
+        {
+          "start": {
+            "n": 1903,
+            "x": 2820.127818785911,
+            "feet": 336,
+            "y": 312,
+            "camX": 2722.4611533599596,
+            "camY": 171.99999999999963
+          },
+          "apex": {
+            "n": 1925,
+            "x": 2897.127818785911,
+            "feet": 233.00000000000023,
+            "y": 209.00000000000023,
+            "camX": 2750.222711783942,
+            "camY": 163.72394326015356
+          },
+          "end": {
+            "n": 1946,
+            "x": 2970.627818785911,
+            "feet": 336,
+            "y": 312,
+            "camX": 2751.878690733559,
+            "camY": 171.58407352033518
+          },
+          "landingAtTakeoff": {
+            "x": 248.16666542595158,
+            "y": 164.00000000000037
+          },
+          "landingAtApex": {
+            "x": 220.4051070019691,
+            "y": 172.27605673984644
+          }
+        }
+      ],
+      "videoFrames": 978,
+      "captureFps": 30,
+      "videoWindow": {
+        "firstFrame": 2,
+        "lastFrame": 1956
+      },
+      "finished": true,
+      "coins": 21
+    }
+  }
+}

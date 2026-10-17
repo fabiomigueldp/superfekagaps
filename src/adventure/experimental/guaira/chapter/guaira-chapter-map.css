@@ -80,6 +80,8 @@
 .guaira-chapter-map .chapter-map-step-button:disabled { background: #101d29; color: #b5c0b0; }
 .guaira-chapter-map .chapter-map-step-title { font-size: 14px; font-weight: 700; }
 .guaira-chapter-map .chapter-map-step-state { font-size: 12px; line-height: 1.35; }
+.guaira-chapter-map .chapter-map-exploration { margin: 4px 0 0; color: #d9d5b7; font-size: 11px; line-height: 1.5; }
+.guaira-chapter-map .chapter-map-exploration-row { display: block; }
 .guaira-chapter-map .chapter-map-optional { border-top: 1px solid #648591; padding-top: 10px; margin-bottom: 14px; }
 .guaira-chapter-map .chapter-map-optional-title { margin: 0 0 7px; color: var(--chapter-gold); font-size: 13px; line-height: 1.35; }
 .guaira-chapter-map .chapter-map-optional-button { min-height: 54px; }

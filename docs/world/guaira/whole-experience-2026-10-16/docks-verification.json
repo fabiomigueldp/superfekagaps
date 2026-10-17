@@ -1,0 +1,297 @@
+{
+  "revision": "guaira-docks-design-2026-10-17",
+  "reviewedAt": "2026-10-17T06:50:00.719Z",
+  "scope": "Rebuilt rice-warehouse finale with distinct ground/upper combat approaches; expanded junction with alternating native hoists, a receiving island, landing dock and continuous descending stairs; scenery and camera.",
+  "nativeInputOnly": true,
+  "actorOrClockEdits": false,
+  "notAFirstPlaytest": true,
+  "sourceHashes": {
+    "src/adventure/experimental/guaira/GuairaCourseDesign.ts": "70ed2baa06b9618038655a26b7f4ffdda51df80e7681594adcd84cf83ec4069c",
+    "src/adventure/experimental/guaira/GuairaCourseGuidance.ts": "37c7fea0002e58eb339dce0ee75e676c40802c0a8dc833fe5f4cfcc469f17ef9",
+    "src/adventure/experimental/guaira/GuairaCoursePresentation.ts": "ee0dd20f3c9ad8033bfa2f7dd09a489b277ee917c659f0a65b9040f16931adf4",
+    "src/adventure/experimental/guaira/GuairaDockLandscape.ts": "c34ad8f26157bbb732a0470c3f2fd6cd1a835f444a13c5c4d0fdc2185d9c8e40",
+    "tests/guaira-dock-crossings.test.ts": "bd14179f9188add92b19d925a72a5a457f4efba183bbf131f759f9b13e541d45",
+    "tests/helpers/guairaDockController.ts": "efb4001149fd489c79ebd3ba5f7045aa05981033e0a487df484b9849b9376940",
+    "tests/helpers/guairaDockReplays.json": "21f087c1f188d09c08b8bc2da98bbe5118fa1b4810d436a06b261e15ae1c88d2",
+    "tests/helpers/guairaCourseController.ts": "2ffb57a7180dba913cfb1200ae52f99a3c90599c30a402c9c6d898422c53ad4b",
+    "tests/helpers/guairaExplorationReplays.json": "dbfe45deb268a7ef4c3003bbb8a4923e3f2fa996c43a276e5523545042e2c1d0",
+    "scripts/record_guaira_docks.ts": "163eb493632485e0d169d783d5e6a6afbff6a0579a889400ccd57ba9f0de5ab4",
+    "scripts/verify_guaira_workshop_surface.cjs": "56b7e8e8e0a2fed56c7fb149a6159c682b6caeb4a425c2fc15f0eb3b1e1d1d81",
+    "tests/guaira-junction.test.ts": "6446edbcd2106ccc1b0619d5ab99c0534f20c7a5328121bf6acba6438242b5ee",
+    "tests/guaira-junction-recovery.test.ts": "fecca48a773c45703e6d37146784e83ffa75fe9d5d26aacb4fa32c5ea250c671",
+    "tests/guaira-traversal-depth.test.ts": "ac90e91561e769407eddea3fda11b720a3cc6e2aae1bdb76c1a3ab179ed8ae70",
+    "tests/helpers/guairaTraversalReplay.json": "6b40f930d11ba2d67a8b2683853f89e9ae3b004bdf4e26cbf131455d1de2a90a",
+    "tests/helpers/guairaTraversalMaintenanceReplay.json": "c3fa0f6e19385fff22dbc056d02de9363e5da43635d4bf22c470f63b5fd45be8",
+    "tests/helpers/guairaJunctionReplay.json": "0a21e76018c676b3dbd7595efc7ad5602fca7c0ea2e4bec6f59184c7236db611",
+    "tests/helpers/guairaJunctionOptionalReplay.json": "e3ff67202fc9c3130b21699734d4e8e0366817e4ffe35fe72e6a7c9d16c427e8",
+    "tests/helpers/guairaFieldRoutesReplays.json": "7d897662412d22c7e19a0955c4b02fe06d5fbc6f5fe2800524a788d9c6c9c9af",
+    "tests/helpers/guairaLevelDesignReplays.json": "b8fd21281651132424729ea1ca8b8ec885c14c8ad0697d73f1f627f9ad21d95c",
+    "tests/helpers/guairaJunctionRecoveryReplays.json": "5693e4823018aa4e3dc7d4609663324427813e1636e89b195cdcc023a9e4f4a4"
+  },
+  "levelChanges": {
+    "travessia": {
+      "oldWidth": 4032,
+      "width": 4352,
+      "addedPixels": 320,
+      "foes": 8,
+      "finalCheckpoint": 6
+    },
+    "patio": {
+      "oldWidth": 3008,
+      "width": 3840,
+      "addedPixels": 832,
+      "foes": 7,
+      "finalCheckpoint": 5
+    }
+  },
+  "checks": {
+    "typescriptSuite": {
+      "tests": 3525,
+      "pass": 3524,
+      "fail": 0,
+      "skipped": 1,
+      "optionalCase": "Native atlas case passed separately using bundled canvas; its file has 2 passes, 0 skips (one overlaps the general suite)."
+    },
+    "serverTests": {
+      "pass": 3,
+      "fail": 0
+    },
+    "nativeAtlasTests": {
+      "pass": 2,
+      "fail": 0,
+      "skipped": 0
+    },
+    "newRegressionCases": 9,
+    "build": true,
+    "typecheck": true,
+    "validators": true,
+    "focusedCourseTestsAfterGuidancePolish": {
+      "pass": 68,
+      "fail": 0
+    },
+    "arrivalVariations": {
+      "runs": 12,
+      "finished": 12,
+      "damage": 0
+    },
+    "updatedExistingRoutes": {
+      "runs": 10,
+      "inputPrefixBeforeRebuiltSectionPreserved": true,
+      "finished": 10,
+      "damage": 0
+    },
+    "failuresAndRecovery": {
+      "realFalls": 2,
+      "earnedCheckpointRestored": true,
+      "subsequentCompletion": true,
+      "subsequentDamage": 0
+    },
+    "safeIsland": {
+      "idleSeconds": 10,
+      "phaseChanged": true,
+      "continuedWithoutDamage": true
+    },
+    "camera": {
+      "fullAvatar": true,
+      "receivingIslandAndDockVisibleAtJumpApex": true,
+      "upperExitWalksDownContinuousSteps": true
+    },
+    "browserCrossings": {
+      "checks": 6,
+      "keyboard": true,
+      "touchSimulated": true,
+      "reducedMotion": true,
+      "physicalDevice": false,
+      "pauseStateAndPixelsFrozen": true
+    },
+    "campaign": {
+      "checks": 9,
+      "normalCampaign": true,
+      "gamepadApiSimulated": true,
+      "physicalDevice": false
+    },
+    "reviewPage": {
+      "passed": true,
+      "viewports": [
+        1440,
+        390
+      ],
+      "videos": 17,
+      "checks": 34,
+      "decodedAndPlayed": true
+    }
+  },
+  "recordings": {
+    "travessia-low": {
+      "fullRouteFrames": 2296,
+      "prefixFrames": 1897,
+      "excerptSeconds": 6.65,
+      "coins": 22,
+      "finished": true,
+      "damage": 0,
+      "simulationHz": 60,
+      "videoFps": 30
+    },
+    "travessia-high": {
+      "fullRouteFrames": 2357,
+      "prefixFrames": 1897,
+      "excerptSeconds": 7.666666666666667,
+      "coins": 24,
+      "finished": true,
+      "damage": 0,
+      "simulationHz": 60,
+      "videoFps": 30
+    },
+    "patio-low": {
+      "fullRouteFrames": 3431,
+      "prefixFrames": 2813,
+      "excerptSeconds": 10.3,
+      "coins": 11,
+      "finished": true,
+      "damage": 0,
+      "simulationHz": 60,
+      "videoFps": 30
+    }
+  },
+  "variations": [
+    {
+      "id": "travessia",
+      "high": false,
+      "waitFrames": 0,
+      "frames": 2296,
+      "coins": 22,
+      "finished": true,
+      "damage": 0,
+      "ride": {}
+    },
+    {
+      "id": "travessia",
+      "high": true,
+      "waitFrames": 0,
+      "frames": 2357,
+      "coins": 24,
+      "finished": true,
+      "damage": 0,
+      "ride": {}
+    },
+    {
+      "id": "patio",
+      "high": false,
+      "waitFrames": 0,
+      "frames": 3431,
+      "coins": 11,
+      "finished": true,
+      "damage": 0,
+      "ride": {
+        "guaira-patio-comportas:course:transfer-a": 70,
+        "guaira-patio-comportas:course:transfer-b": 15
+      }
+    },
+    {
+      "id": "travessia",
+      "high": false,
+      "waitFrames": 120,
+      "frames": 2416,
+      "coins": 22,
+      "finished": true,
+      "damage": 0,
+      "ride": {}
+    },
+    {
+      "id": "travessia",
+      "high": true,
+      "waitFrames": 120,
+      "frames": 2477,
+      "coins": 25,
+      "finished": true,
+      "damage": 0,
+      "ride": {}
+    },
+    {
+      "id": "patio",
+      "high": false,
+      "waitFrames": 120,
+      "frames": 3833,
+      "coins": 11,
+      "finished": true,
+      "damage": 0,
+      "ride": {
+        "guaira-patio-comportas:course:transfer-a": 122,
+        "guaira-patio-comportas:course:transfer-b": 15
+      }
+    },
+    {
+      "id": "travessia",
+      "high": false,
+      "waitFrames": 300,
+      "frames": 2596,
+      "coins": 22,
+      "finished": true,
+      "damage": 0,
+      "ride": {}
+    },
+    {
+      "id": "travessia",
+      "high": true,
+      "waitFrames": 300,
+      "frames": 2657,
+      "coins": 25,
+      "finished": true,
+      "damage": 0,
+      "ride": {}
+    },
+    {
+      "id": "patio",
+      "high": false,
+      "waitFrames": 300,
+      "frames": 3833,
+      "coins": 11,
+      "finished": true,
+      "damage": 0,
+      "ride": {
+        "guaira-patio-comportas:course:transfer-a": 122,
+        "guaira-patio-comportas:course:transfer-b": 15
+      }
+    },
+    {
+      "id": "travessia",
+      "high": false,
+      "waitFrames": 570,
+      "frames": 2866,
+      "coins": 22,
+      "finished": true,
+      "damage": 0,
+      "ride": {}
+    },
+    {
+      "id": "travessia",
+      "high": true,
+      "waitFrames": 570,
+      "frames": 2927,
+      "coins": 25,
+      "finished": true,
+      "damage": 0,
+      "ride": {}
+    },
+    {
+      "id": "patio",
+      "high": false,
+      "waitFrames": 570,
+      "frames": 4241,
+      "coins": 11,
+      "finished": true,
+      "damage": 0,
+      "ride": {
+        "guaira-patio-comportas:course:transfer-a": 122,
+        "guaira-patio-comportas:course:transfer-b": 15
+      }
+    }
+  ],
+  "limitations": [
+    "Rehearsed routes and visual inspection do not establish first-time discovery or perceived fun.",
+    "Touch and Gamepad API checks simulate input, not physical devices.",
+    "Recordings of the other four courses and bosses are retained from their previous revisions; integrated progression was checked again.",
+    "Island geometry is unchanged."
+  ],
+  "supersededBy": "aqueduct-verification.json"
+}

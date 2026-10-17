@@ -2,10 +2,11 @@ import { STAGES } from '../../../campaign';
 import { TileType as T } from '../../../../constants';
 import type { AdventureStage } from '../../../types';
 import type { WorldLevel } from '../../../WorldPhysics';
+import { developGuairaCourse, GUAIRA_COURSES } from '../GuairaCourseDesign';
 
 export const GUAIRA_RELIEF = Object.freeze({
-    id: 'guaira-camara-alivio', width: 46, height: 24, floor: 336,
-    spawnX: 32, checkpointX: 80, finishX: 592,
+    id: 'guaira-camara-alivio', width: GUAIRA_COURSES.alivio.end / 16, height: 24, floor: 336,
+    spawnX: 32, checkpointX: 80, finishX: GUAIRA_COURSES.alivio.finish,
     lidStart: 240, lidEnd: 288, lidY: 160,
     gantryStart: 320, gantryEnd: 384, gantryY: 160,
     landingStart: 512, landingEnd: 592, landingY: 160,
@@ -52,5 +53,5 @@ export function guairaReliefStage(): AdventureStage {
     stage.checkpoints = [{ x: g.checkpointX / 16, y: g.floor / 16 }];
     stage.route = [{ x: g.spawnX, y: g.floor }, { x: g.checkpointX, y: g.floor },
         { x: 336, y: g.floor }, { x: g.finishX, y: g.floor }];
-    return stage;
+    return developGuairaCourse(stage, 'alivio');
 }

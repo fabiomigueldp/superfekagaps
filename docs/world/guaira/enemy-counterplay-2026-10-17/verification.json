@@ -1,0 +1,258 @@
+{
+  "date": "2026-10-17",
+  "scope": "Guaíra enemy defenses, recovery poses, vertical counterattack guidance and five native encounters",
+  "passed": true,
+  "tests": {
+    "typescript": {
+      "tests": 3700,
+      "pass": 3699,
+      "fail": 0,
+      "skipped": 1,
+      "cancelled": 0
+    },
+    "javascript": {
+      "tests": 3,
+      "pass": 3,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0
+    },
+    "finalEncounterTapes": {
+      "tests": 19,
+      "pass": 19,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0
+    },
+    "newCases": 19
+  },
+  "build": {
+    "levelSpriteAndWorldValidators": true,
+    "gameTypecheck": true,
+    "toolsTypecheck": true,
+    "viteBuild": true
+  },
+  "mechanics": {
+    "trolleyRoofBlocksOrdinaryStompWhileMoving": true,
+    "brakingOpeningMs": 550,
+    "groundPoundBreaksMovingRoof": true,
+    "sideContactStillDangerous": true,
+    "nativeContactAndBounce": true,
+    "legacyTrolleyRulePreserved": true,
+    "sharedWorldGameUnchanged": true
+  },
+  "encounterCapture": {
+    "setup": "ordinary checkpoint loading in test save",
+    "nativeInputOnly": true,
+    "actorOrClockEdits": false,
+    "simulationHz": 60,
+    "captureFps": 30,
+    "routes": {
+      "helmet-stomps": {
+        "frames": 175,
+        "videoFrames": 87,
+        "minHead": 67.5,
+        "maxFeet": 164,
+        "hiddenAttackFrames": 0,
+        "checkpoint": 4,
+        "contacts": [
+          {
+            "frame": 87,
+            "result": "bounce",
+            "phase": "walk",
+            "pound": false
+          },
+          {
+            "frame": 115,
+            "result": "kill",
+            "phase": "stunned",
+            "pound": false
+          }
+        ],
+        "damage": []
+      },
+      "charger-counter": {
+        "frames": 197,
+        "videoFrames": 98,
+        "minHead": 40.11880846399998,
+        "maxFeet": 164,
+        "hiddenAttackFrames": 0,
+        "checkpoint": 5,
+        "contacts": [
+          {
+            "frame": 137,
+            "result": "kill",
+            "phase": "rest",
+            "pound": false
+          }
+        ],
+        "damage": []
+      },
+      "agitator-counter": {
+        "frames": 282,
+        "videoFrames": 141,
+        "minHead": 34,
+        "maxFeet": 164,
+        "hiddenAttackFrames": 0,
+        "checkpoint": 4,
+        "contacts": [
+          {
+            "frame": 222,
+            "result": "kill",
+            "phase": "rest",
+            "pound": false
+          }
+        ],
+        "damage": []
+      },
+      "rail-window": {
+        "frames": 221,
+        "videoFrames": 110,
+        "minHead": 34,
+        "maxFeet": 164,
+        "hiddenAttackFrames": 0,
+        "checkpoint": 3,
+        "contacts": [
+          {
+            "frame": 161,
+            "result": "kill",
+            "phase": "warning",
+            "pound": false
+          }
+        ],
+        "damage": []
+      },
+      "rail-pounds": {
+        "frames": 263,
+        "videoFrames": 131,
+        "minHead": 34,
+        "maxFeet": 164,
+        "hiddenAttackFrames": 0,
+        "checkpoint": 3,
+        "contacts": [
+          {
+            "frame": 194,
+            "result": "bounce",
+            "phase": "walk",
+            "pound": false
+          },
+          {
+            "frame": 203,
+            "result": "kill",
+            "phase": "walk",
+            "pound": true
+          }
+        ],
+        "damage": []
+      }
+    }
+  },
+  "browser": {
+    "setup": "isolated prerequisite save, native chapter mounting and ordinary checkpoint load",
+    "physicalDevice": false,
+    "keyboardAndSimulatedGamepadRuns": 10,
+    "pauses": 4,
+    "pausedStateAndPixels": true,
+    "errors": []
+  },
+  "campaign": {
+    "normalCampaign": true,
+    "input": "standard Gamepad API confirm",
+    "physicalDevice": false,
+    "scenes": [
+      "guaira-travessia",
+      "guaira-patio-comportas",
+      "guaira-respiros",
+      "guaira-lab",
+      "guaira-subida",
+      "guaira-prefeito",
+      "guaira-galeria",
+      "guaira-camara-alivio"
+    ],
+    "runs": [
+      {
+        "id": "guaira-travessia",
+        "frames": 2354,
+        "coins": 23,
+        "finished": true
+      },
+      {
+        "id": "guaira-patio-comportas",
+        "frames": 3425,
+        "coins": 11,
+        "finished": true
+      },
+      {
+        "id": "guaira-respiros",
+        "frames": 2132,
+        "coins": 15,
+        "finished": true
+      },
+      {
+        "id": "guaira-lab",
+        "frames": 1274,
+        "coins": 0,
+        "finished": true
+      },
+      {
+        "id": "guaira-subida",
+        "frames": 2566,
+        "coins": 17,
+        "finished": true
+      },
+      {
+        "id": "guaira-prefeito",
+        "frames": 2196,
+        "coins": 0,
+        "finished": true
+      },
+      {
+        "id": "guaira-galeria",
+        "frames": 2011,
+        "coins": 16,
+        "finished": true
+      },
+      {
+        "id": "guaira-camara-alivio",
+        "frames": 1390,
+        "coins": 10,
+        "finished": true
+      },
+      {
+        "id": "guaira-patio-comportas",
+        "frames": 3425,
+        "coins": 11,
+        "finished": true
+      }
+    ],
+    "errors": []
+  },
+  "review": {
+    "viewports": [
+      1440,
+      390
+    ],
+    "decodedVideos": 10,
+    "noHorizontalOverflow": true,
+    "errors": []
+  },
+  "sources": {
+    "src/adventure/WorldEnemies.ts": "201bdb9325ce5bf39ed00e8003b066d0b8e7f35fb91aa23591b4324e449cc6a4",
+    "src/adventure/experimental/guaira/GuairaCourseGuidance.ts": "58f4e512e1460e6bf473169bbb0e116a45bbd74e3c16e3ddfe0cb35ca5443698",
+    "src/adventure/experimental/guaira/GuairaCourseDesign.ts": "531afc22f523f98c9e3c003af5454926a542c8cd64732e6599be6f232334cd0f",
+    "src/adventure/experimental/guaira/GuairaFoeArt.ts": "5ae15bc1792a5025ebb1c2c062ad3b0766e6f00af259c23f8409123e73d53308",
+    "tests/helpers/guairaCounterplayReplays.json": "590bd214535ad75901aa097911e61708bd8c97ec021789651d3bb44ab34a2116"
+  },
+  "limitations": [
+    "Encounter clips load ordinary checkpoints in test saves; full campaign traversal is checked separately.",
+    "The recovery atlas is a separate native-clock pose study, not player completion.",
+    "The controller is simulated in a desktop browser; no physical gamepad is claimed.",
+    "Scripted routes do not establish first-time discovery difficulty or player enjoyment."
+  ],
+  "evidence": {
+    "native": "native-verification.json",
+    "browser": "browser-verification.json",
+    "campaign": "campaign-verification.json",
+    "review": "review-verification.json"
+  }
+}

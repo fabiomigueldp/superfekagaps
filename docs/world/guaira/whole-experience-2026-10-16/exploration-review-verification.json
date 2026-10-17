@@ -1,0 +1,231 @@
+{
+  "passed": true,
+  "uniqueVideos": 14,
+  "checks": [
+    {
+      "viewport": 1440,
+      "id": "travessia",
+      "kind": "clip",
+      "width": 640,
+      "height": 360,
+      "duration": 5.2
+    },
+    {
+      "viewport": 1440,
+      "id": "travessia",
+      "kind": "full",
+      "width": 640,
+      "height": 360,
+      "duration": 42.466667
+    },
+    {
+      "viewport": 1440,
+      "id": "patio",
+      "kind": "clip",
+      "width": 640,
+      "height": 360,
+      "duration": 5
+    },
+    {
+      "viewport": 1440,
+      "id": "patio",
+      "kind": "full",
+      "width": 640,
+      "height": 360,
+      "duration": 63.966667
+    },
+    {
+      "viewport": 1440,
+      "id": "respiros",
+      "kind": "clip",
+      "width": 640,
+      "height": 360,
+      "duration": 6.233333
+    },
+    {
+      "viewport": 1440,
+      "id": "respiros",
+      "kind": "full",
+      "width": 640,
+      "height": 360,
+      "duration": 44.133333
+    },
+    {
+      "viewport": 1440,
+      "id": "subida",
+      "kind": "clip",
+      "width": 640,
+      "height": 360,
+      "duration": 4.233333
+    },
+    {
+      "viewport": 1440,
+      "id": "subida",
+      "kind": "full",
+      "width": 640,
+      "height": 360,
+      "duration": 43.4
+    },
+    {
+      "viewport": 1440,
+      "id": "galeria",
+      "kind": "clip",
+      "width": 640,
+      "height": 360,
+      "duration": 6.066667
+    },
+    {
+      "viewport": 1440,
+      "id": "galeria",
+      "kind": "full",
+      "width": 640,
+      "height": 360,
+      "duration": 41.9
+    },
+    {
+      "viewport": 1440,
+      "id": "alivio",
+      "kind": "clip",
+      "width": 640,
+      "height": 360,
+      "duration": 8.2
+    },
+    {
+      "viewport": 1440,
+      "id": "alivio",
+      "kind": "full",
+      "width": 640,
+      "height": 360,
+      "duration": 35.766667
+    },
+    {
+      "viewport": 1440,
+      "id": "respiros",
+      "kind": "prior-maintenance",
+      "width": 640,
+      "height": 360,
+      "duration": 14.5
+    },
+    {
+      "viewport": 1440,
+      "id": "alivio",
+      "kind": "prior-maintenance",
+      "width": 640,
+      "height": 360,
+      "duration": 12.933333
+    },
+    {
+      "viewport": 390,
+      "id": "travessia",
+      "kind": "clip",
+      "width": 640,
+      "height": 360,
+      "duration": 5.2
+    },
+    {
+      "viewport": 390,
+      "id": "travessia",
+      "kind": "full",
+      "width": 640,
+      "height": 360,
+      "duration": 42.466667
+    },
+    {
+      "viewport": 390,
+      "id": "patio",
+      "kind": "clip",
+      "width": 640,
+      "height": 360,
+      "duration": 5
+    },
+    {
+      "viewport": 390,
+      "id": "patio",
+      "kind": "full",
+      "width": 640,
+      "height": 360,
+      "duration": 63.966667
+    },
+    {
+      "viewport": 390,
+      "id": "respiros",
+      "kind": "clip",
+      "width": 640,
+      "height": 360,
+      "duration": 6.233333
+    },
+    {
+      "viewport": 390,
+      "id": "respiros",
+      "kind": "full",
+      "width": 640,
+      "height": 360,
+      "duration": 44.133333
+    },
+    {
+      "viewport": 390,
+      "id": "subida",
+      "kind": "clip",
+      "width": 640,
+      "height": 360,
+      "duration": 4.233333
+    },
+    {
+      "viewport": 390,
+      "id": "subida",
+      "kind": "full",
+      "width": 640,
+      "height": 360,
+      "duration": 43.4
+    },
+    {
+      "viewport": 390,
+      "id": "galeria",
+      "kind": "clip",
+      "width": 640,
+      "height": 360,
+      "duration": 6.066667
+    },
+    {
+      "viewport": 390,
+      "id": "galeria",
+      "kind": "full",
+      "width": 640,
+      "height": 360,
+      "duration": 41.9
+    },
+    {
+      "viewport": 390,
+      "id": "alivio",
+      "kind": "clip",
+      "width": 640,
+      "height": 360,
+      "duration": 8.2
+    },
+    {
+      "viewport": 390,
+      "id": "alivio",
+      "kind": "full",
+      "width": 640,
+      "height": 360,
+      "duration": 35.766667
+    },
+    {
+      "viewport": 390,
+      "id": "respiros",
+      "kind": "prior-maintenance",
+      "width": 640,
+      "height": 360,
+      "duration": 14.5
+    },
+    {
+      "viewport": 390,
+      "id": "alivio",
+      "kind": "prior-maintenance",
+      "width": 640,
+      "height": 360,
+      "duration": 12.933333
+    }
+  ],
+  "errors": []
+}

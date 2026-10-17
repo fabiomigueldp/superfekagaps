@@ -58,7 +58,7 @@ function pot(c: CanvasRenderingContext2D, x: number, y: number, w = 8) {
     r(c, x + 2, y - 6, 2, 5, '#bf7952');
 }
 
-function house(c: CanvasRenderingContext2D, x: number, floor: number, w: number, h: number, variant: number) {
+export function drawGuairaVillageHouse(c: CanvasRenderingContext2D, x: number, floor: number, w: number, h: number, variant: number) {
     const top = floor - h;
     oval(c, x - 4, floor - 2, w + 9, 5, '#ad7559');
     r(c, x + 4, top + 16, w - 8, h - 16, P.plasterShade);
@@ -98,6 +98,7 @@ function house(c: CanvasRenderingContext2D, x: number, floor: number, w: number,
         pot(c, x + w - 9, floor, 7);
     }
 }
+const house = drawGuairaVillageHouse;
 
 function riceTerrace(c: CanvasRenderingContext2D, x: number, y: number, width: number, row: number, time: number, reducedMotion: boolean, wet: boolean, worldX: number) {
     // Shallow flooded beds echo the island's stone borders. Their grey, broken

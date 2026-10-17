@@ -1,0 +1,227 @@
+{
+  "physicalDevice": false,
+  "checks": [
+    {
+      "route": "guairaMayorGroundReplay",
+      "touch": false,
+      "reduced": false,
+      "finished": true,
+      "frames": 2259,
+      "minHead": 27,
+      "frameWork": {
+        "samples": 374,
+        "medianMs": 2,
+        "p95Ms": 3.2000000029802322,
+        "maxMs": 16.5,
+        "scope": "fixed-step update and draw during pursuit; excludes presentation and frame scheduling"
+      },
+      "pausedDuringPursuit": "rush"
+    },
+    {
+      "route": "guairaMayorGroundReplay",
+      "touch": true,
+      "reduced": true,
+      "finished": true,
+      "frames": 2259,
+      "minHead": 27,
+      "frameWork": {
+        "samples": 374,
+        "medianMs": 2.100000001490116,
+        "p95Ms": 9.100000001490116,
+        "maxMs": 17.899999998509884,
+        "scope": "fixed-step update and draw during pursuit; excludes presentation and frame scheduling"
+      },
+      "pausedDuringPursuit": "rush"
+    },
+    {
+      "route": "guairaMayorReplay",
+      "touch": false,
+      "reduced": false,
+      "finished": true,
+      "frames": 2196,
+      "minHead": 27,
+      "frameWork": {
+        "samples": 374,
+        "medianMs": 2.399999998509884,
+        "p95Ms": 9.899999998509884,
+        "maxMs": 18.200000002980232,
+        "scope": "fixed-step update and draw during pursuit; excludes presentation and frame scheduling"
+      },
+      "pausedDuringPursuit": "rushWarning"
+    },
+    {
+      "route": "guairaMayorReplay",
+      "touch": true,
+      "reduced": true,
+      "finished": true,
+      "frames": 2196,
+      "minHead": 27,
+      "frameWork": {
+        "samples": 374,
+        "medianMs": 2.399999998509884,
+        "p95Ms": 8.699999995529652,
+        "maxMs": 20,
+        "scope": "fixed-step update and draw during pursuit; excludes presentation and frame scheduling"
+      },
+      "pausedDuringPursuit": "rushWarning"
+    },
+    {
+      "route": "guairaMayorInterruptReplay",
+      "touch": false,
+      "reduced": false,
+      "finished": true,
+      "frames": 1959,
+      "minHead": 27,
+      "frameWork": {
+        "samples": 374,
+        "medianMs": 2.7999999970197678,
+        "p95Ms": 8.699999995529652,
+        "maxMs": 23.399999998509884,
+        "scope": "fixed-step update and draw during pursuit; excludes presentation and frame scheduling"
+      },
+      "pausedDuringPursuit": "rush"
+    },
+    {
+      "route": "guairaMayorInterruptReplay",
+      "touch": true,
+      "reduced": true,
+      "finished": true,
+      "frames": 1959,
+      "minHead": 27,
+      "frameWork": {
+        "samples": 374,
+        "medianMs": 2.7999999970197678,
+        "p95Ms": 4.0999999940395355,
+        "maxMs": 22.19999999552965,
+        "scope": "fixed-step update and draw during pursuit; excludes presentation and frame scheduling"
+      },
+      "pausedDuringPursuit": "rush"
+    },
+    {
+      "route": "guairaMayorJumpPulseReplay",
+      "touch": false,
+      "reduced": false,
+      "finished": true,
+      "frames": 2256,
+      "minHead": 27,
+      "frameWork": {
+        "samples": 374,
+        "medianMs": 2.6999999955296516,
+        "p95Ms": 7.799999997019768,
+        "maxMs": 21.19999999552965,
+        "scope": "fixed-step update and draw during pursuit; excludes presentation and frame scheduling"
+      },
+      "pausedDuringPursuit": "rushWarning"
+    },
+    {
+      "route": "guairaMayorJumpPulseReplay",
+      "touch": true,
+      "reduced": true,
+      "finished": true,
+      "frames": 2256,
+      "minHead": 27,
+      "frameWork": {
+        "samples": 374,
+        "medianMs": 1.8999999985098839,
+        "p95Ms": 3.0999999940395355,
+        "maxMs": 18.099999994039536,
+        "scope": "fixed-step update and draw during pursuit; excludes presentation and frame scheduling"
+      },
+      "pausedDuringPursuit": "rushWarning"
+    },
+    {
+      "route": "guairaMayorRetryReplay",
+      "touch": false,
+      "reduced": false,
+      "finished": true,
+      "frames": 3177,
+      "minHead": 27,
+      "frameWork": {
+        "samples": 517,
+        "medianMs": 1.8999999985098839,
+        "p95Ms": 7.600000001490116,
+        "maxMs": 18.700000002980232,
+        "scope": "fixed-step update and draw during pursuit; excludes presentation and frame scheduling"
+      },
+      "pausedDuringPursuit": "rush"
+    },
+    {
+      "route": "guairaMayorRetryReplay",
+      "touch": true,
+      "reduced": true,
+      "finished": true,
+      "frames": 3177,
+      "minHead": 27,
+      "frameWork": {
+        "samples": 517,
+        "medianMs": 1.7000000029802322,
+        "p95Ms": 4,
+        "maxMs": 17.899999998509884,
+        "scope": "fixed-step update and draw during pursuit; excludes presentation and frame scheduling"
+      },
+      "pausedDuringPursuit": "rush"
+    },
+    {
+      "width": 1440,
+      "media": {
+        "fits": true,
+        "videos": [
+          {
+            "src": "http://127.0.0.1:3000/docs/world/guaira/mayor-motion-2026-10-17/ground.mp4",
+            "duration": 37.633333,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "src": "http://127.0.0.1:3000/docs/world/guaira/mayor-motion-2026-10-17/interrupt.mp4",
+            "duration": 32.633333,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "src": "http://127.0.0.1:3000/docs/world/guaira/mayor-motion-2026-10-17/upper.mp4",
+            "duration": 36.6,
+            "width": 960,
+            "height": 540,
+            "error": null
+          }
+        ],
+        "decoded": 3
+      }
+    },
+    {
+      "width": 390,
+      "media": {
+        "fits": true,
+        "videos": [
+          {
+            "src": "http://127.0.0.1:3000/docs/world/guaira/mayor-motion-2026-10-17/ground.mp4",
+            "duration": 37.633333,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "src": "http://127.0.0.1:3000/docs/world/guaira/mayor-motion-2026-10-17/interrupt.mp4",
+            "duration": 32.633333,
+            "width": 960,
+            "height": 540,
+            "error": null
+          },
+          {
+            "src": "http://127.0.0.1:3000/docs/world/guaira/mayor-motion-2026-10-17/upper.mp4",
+            "duration": 36.6,
+            "width": 960,
+            "height": 540,
+            "error": null
+          }
+        ],
+        "decoded": 3
+      }
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

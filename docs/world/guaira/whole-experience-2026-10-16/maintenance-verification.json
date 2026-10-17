@@ -1,0 +1,417 @@
+{
+  "revision": "guaira-maintenance-design-2026-10-17",
+  "reviewedAt": "2026-10-17T11:44:13.128Z",
+  "nativeInputOnly": true,
+  "actorOrClockEdits": false,
+  "notAFirstPlaytest": true,
+  "scope": "Two intermediate maintenance routes with native agitator/rail enemies, individual hydraulic isolation, ten rewards, new scenery, readable staging and reversible access. Existing six-course progression rechecked.",
+  "sourceHashes": {
+    "src/adventure/experimental/guaira/GuairaCourseDesign.ts": "b5457748ea21564fd777c4a9aab3c86fa0797ac26fd978f82c1811a63b52b137",
+    "src/adventure/experimental/guaira/GuairaCourseGuidance.ts": "38f0622732a4bf2428ea5cc0dc345fc7d491ed6c05b3d800e1ed3b062a7602ef",
+    "src/adventure/experimental/guaira/GuairaCoursePresentation.ts": "f3de52675d1ebec1f82ec67a063a1d2eaf7b2a7b53a41abd113e2485f325de15",
+    "src/adventure/experimental/guaira/GuairaFoeArt.ts": "708ea05b2771670dfc927e2f74c63668d1a998dea4c9b75ec33d9a4e977c2e74",
+    "src/adventure/experimental/guaira/GuairaMaintenanceLandscape.ts": "7d65c8893ece7b02c75248be2e8692826a4a3581e6c7ef0fe886f970251c3635",
+    "tests/guaira-maintenance-routes.test.ts": "10c5ad809ade89ceafaf88cae73a17453ff0f09fe7cad35eed8935988cc21909",
+    "tests/helpers/guairaMaintenanceController.ts": "fe56bfa95356e06a0849323a0cd971e50d89c9af4ee2267e6277bc167d57a604",
+    "tests/helpers/guairaMaintenanceReplays.json": "47ce5d5d697b405c3256ac14092a81ce8fbaf922e05dc88041f124c31dda9311",
+    "scripts/record_guaira_maintenance.ts": "b5d279a5e740434a5f8834970b87b2710b7063a025b3ea53d06485bd3b789766",
+    "scripts/verify_guaira_workshop_surface.cjs": "26c0e31de752b53692506c2362be768843c4b64e96db8749b33660fa6ff7cb56"
+  },
+  "levelChanges": {
+    "respiros": {
+      "width": 4256,
+      "foes": 7,
+      "newRoute": "Registro das Taipas",
+      "isolatedOutlet": "broken-bank",
+      "extraCoins": 5
+    },
+    "alivio": {
+      "width": 3072,
+      "foes": 7,
+      "newRoute": "Passadico do Coletor",
+      "isolatedOutlet": "collector-outlet",
+      "extraCoins": 5
+    }
+  },
+  "checks": {
+    "typescriptSuite": {
+      "tests": 3542,
+      "pass": 3541,
+      "fail": 0,
+      "skipped": 1
+    },
+    "serverTests": {
+      "pass": 3,
+      "fail": 0
+    },
+    "nativeAtlasTests": {
+      "pass": 2,
+      "fail": 0,
+      "skipped": 0,
+      "note": "One test overlaps the full suite; the optional native case is run here with the bundled canvas."
+    },
+    "build": true,
+    "typecheck": true,
+    "validators": true,
+    "newRegressionCases": 8,
+    "navigationAndRecoveryFocusedCases": 81,
+    "arrivalVariations": {
+      "runs": 12,
+      "finished": 12,
+      "damage": 0
+    },
+    "existingRoutes": {
+      "runs": 15,
+      "commandsUnchanged": true,
+      "finished": 15,
+      "damage": 0,
+      "updatedCoinTotals": 6
+    },
+    "failuresAndRecovery": {
+      "nativeDeaths": 2,
+      "earnedCheckpointRestored": true,
+      "coinsRetained": true,
+      "mainRouteCompletion": true
+    },
+    "backtracking": {
+      "routes": 2,
+      "returnsToMainPath": true,
+      "linkedOutletRemainsClosed": true
+    },
+    "framing": {
+      "wholePlayerVisible": true,
+      "guardAndStagingVisible": true,
+      "lowerScaffoldNoLongerMisidentified": true,
+      "previousCameraContinuityChecksPreserved": true
+    },
+    "browser": {
+      "checks": 4,
+      "keyboard": true,
+      "touchSimulated": true,
+      "reducedMotion": true,
+      "physicalDevice": false,
+      "pauseStateAndPixelsFrozen": true
+    },
+    "campaign": {
+      "checks": 9,
+      "scenes": 8,
+      "normalCampaign": true,
+      "gamepadApiSimulated": true,
+      "physicalDevice": false
+    },
+    "reviewPage": {
+      "passed": true,
+      "viewports": [
+        1440,
+        390
+      ],
+      "videos": 22,
+      "checks": 44,
+      "decodedAndPlayed": true
+    }
+  },
+  "recordings": {
+    "respiros": {
+      "fullRouteFrames": 2609,
+      "prefixFrames": 1737,
+      "coins": 23,
+      "finished": true,
+      "damage": 0,
+      "simulationHz": 60,
+      "videoFps": 30,
+      "fullRouteSeconds": 43.483333333333334
+    },
+    "alivio": {
+      "fullRouteFrames": 1957,
+      "prefixFrames": 1179,
+      "coins": 21,
+      "finished": true,
+      "damage": 0,
+      "simulationHz": 60,
+      "videoFps": 30,
+      "fullRouteSeconds": 32.61666666666667
+    }
+  },
+  "variations": [
+    {
+      "id": "respiros",
+      "wait": 0,
+      "frames": 2609,
+      "finished": true,
+      "damage": [],
+      "isolated": [
+        "guaira-respiro-c",
+        "guaira-respiros:course:broken-bank"
+      ]
+    },
+    {
+      "id": "alivio",
+      "wait": 0,
+      "frames": 1957,
+      "finished": true,
+      "damage": [],
+      "isolated": [
+        "guaira-camara-alivio:course:collector-outlet"
+      ]
+    },
+    {
+      "id": "respiros",
+      "wait": 120,
+      "frames": 2834,
+      "finished": true,
+      "damage": [],
+      "isolated": [
+        "guaira-respiro-c",
+        "guaira-respiros:course:broken-bank"
+      ]
+    },
+    {
+      "id": "alivio",
+      "wait": 120,
+      "frames": 1957,
+      "finished": true,
+      "damage": [],
+      "isolated": [
+        "guaira-camara-alivio:course:collector-outlet"
+      ]
+    },
+    {
+      "id": "respiros",
+      "wait": 300,
+      "frames": 2833,
+      "finished": true,
+      "damage": [],
+      "isolated": [
+        "guaira-respiro-c",
+        "guaira-respiros:course:broken-bank"
+      ]
+    },
+    {
+      "id": "alivio",
+      "wait": 300,
+      "frames": 2167,
+      "finished": true,
+      "damage": [],
+      "isolated": [
+        "guaira-camara-alivio:course:collector-outlet"
+      ]
+    },
+    {
+      "id": "respiros",
+      "wait": 570,
+      "frames": 3211,
+      "finished": true,
+      "damage": [],
+      "isolated": [
+        "guaira-respiro-c",
+        "guaira-respiros:course:broken-bank"
+      ]
+    },
+    {
+      "id": "alivio",
+      "wait": 570,
+      "frames": 2650,
+      "finished": true,
+      "damage": [],
+      "isolated": [
+        "guaira-camara-alivio:course:collector-outlet"
+      ]
+    },
+    {
+      "id": "respiros",
+      "wait": 840,
+      "frames": 3415,
+      "finished": true,
+      "damage": [],
+      "isolated": [
+        "guaira-respiro-c",
+        "guaira-respiros:course:broken-bank"
+      ]
+    },
+    {
+      "id": "alivio",
+      "wait": 840,
+      "frames": 2902,
+      "finished": true,
+      "damage": [],
+      "isolated": [
+        "guaira-camara-alivio:course:collector-outlet"
+      ]
+    },
+    {
+      "id": "respiros",
+      "wait": 1020,
+      "frames": 3611,
+      "finished": true,
+      "damage": [],
+      "isolated": [
+        "guaira-respiro-c",
+        "guaira-respiros:course:broken-bank"
+      ]
+    },
+    {
+      "id": "alivio",
+      "wait": 1020,
+      "frames": 3154,
+      "finished": true,
+      "damage": [],
+      "isolated": [
+        "guaira-camara-alivio:course:collector-outlet"
+      ]
+    }
+  ],
+  "oldRoutes": [
+    {
+      "file": "guairaRespirosReplay",
+      "id": "respiros",
+      "frames": 1880,
+      "oldCoins": 7,
+      "coins": 8,
+      "finished": true,
+      "damage": []
+    },
+    {
+      "file": "guairaFieldRoutesReplays",
+      "key": "respiros",
+      "id": "respiros",
+      "frames": 2132,
+      "oldCoins": 14,
+      "coins": 15,
+      "finished": true,
+      "damage": []
+    },
+    {
+      "file": "guairaLevelDesignReplays",
+      "key": "respiros",
+      "id": "respiros",
+      "frames": 2132,
+      "oldCoins": 12,
+      "coins": 13,
+      "finished": true,
+      "damage": []
+    },
+    {
+      "file": "guairaReliefRoutesReplays",
+      "key": "high",
+      "id": "alivio",
+      "frames": 1390,
+      "oldCoins": 10,
+      "coins": 10,
+      "finished": true,
+      "damage": []
+    },
+    {
+      "file": "guairaReliefRoutesReplays",
+      "key": "opened",
+      "id": "alivio",
+      "frames": 1389,
+      "oldCoins": 10,
+      "coins": 10,
+      "finished": true,
+      "damage": []
+    },
+    {
+      "file": "guairaReliefReplay",
+      "key": "maintenance",
+      "id": "alivio",
+      "frames": 1186,
+      "coins": 8,
+      "finished": true,
+      "damage": []
+    },
+    {
+      "file": "guairaReliefReplay",
+      "key": "interval",
+      "id": "alivio",
+      "frames": 1138,
+      "coins": 5,
+      "finished": true,
+      "damage": []
+    },
+    {
+      "file": "guairaReliefReplay",
+      "key": "headBump",
+      "id": "alivio",
+      "frames": 1183,
+      "coins": 7,
+      "finished": true,
+      "damage": []
+    },
+    {
+      "file": "guairaReliefReplay",
+      "key": "skipFlag",
+      "id": "alivio",
+      "frames": 1138,
+      "coins": 6,
+      "finished": true,
+      "damage": []
+    },
+    {
+      "file": "guairaExplorationReplays",
+      "key": "respiros",
+      "id": "respiros",
+      "frames": 2326,
+      "oldCoins": 21,
+      "coins": 22,
+      "finished": true,
+      "damage": []
+    },
+    {
+      "file": "guairaFinaleReplays",
+      "key": "respiros-high",
+      "id": "respiros",
+      "frames": 2681,
+      "oldCoins": 19,
+      "coins": 20,
+      "finished": true,
+      "damage": []
+    },
+    {
+      "file": "guairaFinaleReplays",
+      "key": "respiros-low",
+      "id": "respiros",
+      "frames": 2359,
+      "oldCoins": 21,
+      "coins": 22,
+      "finished": true,
+      "damage": []
+    },
+    {
+      "file": "guairaExplorationReplays",
+      "key": "alivio",
+      "id": "alivio",
+      "frames": 1642,
+      "oldCoins": 16,
+      "coins": 16,
+      "finished": true,
+      "damage": []
+    },
+    {
+      "file": "guairaFinaleReplays",
+      "key": "alivio-high",
+      "id": "alivio",
+      "frames": 1726,
+      "oldCoins": 20,
+      "coins": 20,
+      "finished": true,
+      "damage": []
+    },
+    {
+      "file": "guairaFinaleReplays",
+      "key": "alivio-low",
+      "id": "alivio",
+      "frames": 1642,
+      "oldCoins": 16,
+      "coins": 16,
+      "finished": true,
+      "damage": []
+    }
+  ],
+  "limitations": [
+    "Rehearsed routes do not establish first-time discovery, perceived difficulty or fun.",
+    "Touch and Gamepad API checks simulate input rather than using physical devices.",
+    "The other four complete course videos remain at their previous revisions; their gameplay and campaign checks passed again.",
+    "No island geometry or boss changes in this round."
+  ],
+  "supersededBy": "exploration-return-verification.json"
+}

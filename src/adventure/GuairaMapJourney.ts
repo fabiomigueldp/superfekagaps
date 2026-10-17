@@ -24,7 +24,7 @@ export const guairaJourneyDepth = createJourneyDepthSampler(metadata);
 export function guairaJourneyCapabilities(save: AdventureSave): JourneyCapabilities {
     const route = guairaChapterRoute(save.guaira.opening), next = route.find(id => !save.guaira.completed.includes(id));
     const alternative = save.guaira.opening === 'guaira-travessia' ? 'guaira-patio-comportas' : 'guaira-travessia';
-    const stageOrder = [...route, ...(!save.guaira.completed.length ? [alternative] : []), 'gallery', 'relief'];
+    const stageOrder = [...route, alternative, 'gallery', 'relief'];
     const availableStages = isGuairaUnlocked(save) ? stageOrder.filter(id => id === next || id === 'gallery' || id === 'relief'
         || id === alternative || hasDevelopmentAccess(save) || save.guaira.completed.includes(id as typeof route[number])) : [];
     // All public streets remain traversable. Entry is gated by earned stages,
