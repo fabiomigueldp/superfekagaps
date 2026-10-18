@@ -21,7 +21,7 @@ export function guardFoot(distance:number,side:0|1):Point {
 export function guardPose(e:WorldFoe,reduced=false){
     const action=e instanceof HypotheticalGuard?e.actionPose:guardActionPose(e);
     const warning=action.brace;
-    const moving=Math.abs(e.motionX)>.01,walk=moving&&['walk','rest'].includes(e.phase);
+    const moving=Math.abs(e.motionX)>.01,walk=moving&&['walk','rest','attack'].includes(e.phase);
     const recovery=e.phase==='rest'||e.phase==='recoil';
     const thrust=action.thrust;
     const bob=walk?-(Math.sin(e.distance/20*Math.PI*2)**2):0;
@@ -29,7 +29,7 @@ export function guardPose(e:WorldFoe,reduced=false){
     const direction=e.motionX*e.facing<0?-1:1;
     const foot=(side:0|1):Point=>{const p=guardFoot(e.distance,side);return [p[0]*direction,p[1]];};
     return {warning,moving,thrust,recovery,bob:bob+breathing+action.crouch,
-        lean:action.lean,hatch:action.hatch,carry:action.carry,turn:action.turn,supply:action.supply,
+        lean:action.lean,hatch:action.hatch,carry:action.carry,turn:action.turn,supply:action.supply,cut:action.cut,
         left:walk?foot(0):[-3,0] as Point,right:walk?foot(1):[3,0] as Point};
 }
 
@@ -90,7 +90,8 @@ export function drawHypotheticalGuard(c:CanvasRenderingContext2D,e:WorldFoe,cx:n
     }
     if(kind==='charger'){
         // The low battering trolley has a clearly armored roof; braking folds it open for a stomp.
-        const open=pose.hatch,squat=pose.warning*2,lean=pose.lean*.7;
+        const brake=pose.recovery?1-ease(e.timer/260):0;
+        const open=pose.hatch,squat=pose.warning*2+brake,lean=pose.lean*.7+brake*2;
         for(const at of [5,w-6]){
             ellipse(at-4,h-8,8,8,C.ink);ellipse(at-3,h-7,6,6,C.leather);
             const a=e.distance/3.5;
@@ -110,18 +111,30 @@ export function drawHypotheticalGuard(c:CanvasRenderingContext2D,e:WorldFoe,cx:n
         rect(6+lean,2+squat,9,7,C.ink);rect(7+lean,4+squat,7,3,C.jade);
         rect(10+lean,4+squat,4,1,pose.warning?C.hot:C.glass);
         line(12,10+squat,18,h-14,C.ink,3);line(12,10+squat,18,h-14,C.brass);
-        poly([[3,2+squat],[13-open*8,squat-open*5],[18-open*11,4+squat-open*5],[3,6+squat]],C.ink);
-        line(4,2+squat,13-open*8,1+squat-open*5,C.brass,2);rect(8-open*3,2+squat-open*2,2,1,C.light);
-        if(pose.recovery){line(6,1,6,-2,C.glass);line(6,-2,10,-2,C.glass);}
+        rect(17,h-15,3,2,C.leather);rect(17,h-15,2,1,C.light);
+        line(7,12+squat,4+brake*2,h-10,C.ink,3);line(7,12+squat,4+brake*2,h-10,C.seam);
+        // The driver's second hand pulls the brake; the pad meets the rear wheel.
+        line(4+brake*2,h-12,5,h-5,C.steel);rect(3+brake*2,h-6,3,2,C.brass);
+        if(e.armor){
+            poly([[3,2+squat],[13-open*8,squat-open*5],[18-open*11,4+squat-open*5],[3,6+squat]],C.ink);
+            line(4,2+squat,13-open*8,1+squat-open*5,C.brass,2);rect(8-open*3,2+squat-open*2,2,1,C.light);
+        }else{
+            // The roof remains visibly broken after a pound; it cannot silently regain armor.
+            line(2,3+squat,4,7+squat,C.steel,2);rect(2,3+squat,2,1,C.light);
+            line(w-10,h-14,w-8,h-12,C.ink);line(w-8,h-12,w-10,h-9,C.ink);
+        }
+        if(pose.recovery||!e.armor){line(6,1,6,-2,C.glass);line(6,-2,10,-2,C.glass);}
         if(pose.moving&&!reduced)for(let i=0;i<3;i++)rect(-3-i*3,h-2-(i+Math.floor(e.age/70))%3,2,1,C.grain);
         if(pose.recovery&&e.timer<320&&!reduced)for(let i=0;i<2;i++)rect(1-i*3,h-8-e.timer/45-i*2,2,2,C.steel);
     } else {
         const torso=h-12+pose.bob,lean=pose.lean;
-        // Articulated shin/knee/boot; every planted sole ends exactly on the support surface.
+        // Thigh and shin articulate independently during actual steps, including attacking steps.
         for(const [i,foot] of [pose.left,pose.right].entries()){
             const fx=w/2+foot[0],fy=h-3+foot[1],hip=w/2+(i?2:-2);
-            line(hip,torso+5,fx-(i?1:-1),fy-2,C.ink,3);
-            line(hip,torso+5,fx,fy-2,i?C.seam:C.cloth);
+            const kneeX=(hip+fx)/2+2,kneeY=(torso+5+fy-1)/2;
+            line(hip,torso+4,kneeX,kneeY,C.ink,3);line(kneeX,kneeY,fx,fy,C.ink,3);
+            line(hip,torso+4,kneeX,kneeY,i?C.seam:C.cloth);line(kneeX,kneeY,fx,fy,i?C.seam:C.cloth);
+            rect(kneeX,kneeY,2,1,i?C.jadeLight:C.leather);
             rect(fx-2,fy,5,3,C.ink);rect(fx-1,fy,3,1,i?C.brass:C.leather);
         }
         if(kind==='loader'){
@@ -156,6 +169,8 @@ export function drawHypotheticalGuard(c:CanvasRenderingContext2D,e:WorldFoe,cx:n
             poly([[2+hx,head+2],[4+hx,head-2],[w-6+hx,head-3],[w-2+hx,head+1],[w-2+hx,head+4],[2+hx,head+4]],C.ink);
             poly([[3+hx,head+1],[5+hx,head-1],[w-7+hx,head-2],[w-4+hx,head+1],[w-3+hx,head+2],[3+hx,head+2]],C.jade);
             line(5+hx,head-1,w-7+hx,head-2,C.jadeLight);rect(7+hx,head-2,2,5,C.brass);
+            if(e.blocksStomp){line(3+hx,head+1,w-4+hx,head+1,C.brass);rect(w-5+hx,head+2,2,2,C.leather);}
+            else {line(3+hx,head-2,2+hx,head-5,C.glass);line(2+hx,head-5,6+hx,head-5,C.glass);}
         }else if(kind==='minion'){
             rect(3+hx,head,w-6,3,C.ink);rect(4+hx,head,w-8,1,C.brass);
             line(4+hx,head,1+hx-pose.warning*2,head-3,C.wood,2);
@@ -165,8 +180,10 @@ export function drawHypotheticalGuard(c:CanvasRenderingContext2D,e:WorldFoe,cx:n
         }
         line(4+lean,9+pose.bob,3,torso+3,C.ink,3);line(4+lean,9+pose.bob,3,torso+2,jacket);
         if(kind==='helmet'){
-            const extend=pose.thrust*7,sy=9+pose.bob,front=e.danger?w+4:w-4+extend-pose.turn*5;
-            line(w-6+lean,10,front,sy+6,C.ink,3);
+            const extend=pose.thrust*7,sy=e.danger?9:9+pose.bob,front=e.danger?w+4:w-4+extend-pose.turn*5;
+            const elbow=w-7-pose.warning*2+pose.thrust*4;
+            line(w-6+lean,10+pose.bob,elbow,sy+6,C.ink,3);line(elbow,sy+6,front,sy+5,C.ink,3);
+            line(elbow,sy+6,front-1,sy+5,C.jadeLight);rect(front-3,sy+5,3,2,C.leather);
             poly([[front-3,sy],[front+3,sy+1],[front+4,sy+10],[front,sy+14],[front-4,sy+10]],C.ink);
             poly([[front-2,sy+1],[front+2,sy+2],[front+3,sy+9],[front,sy+12],[front-3,sy+9]],e.armor?C.brass:C.leather);
             line(front-1,sy+2,front+1,sy+8,e.armor?C.light:C.grain);
@@ -175,8 +192,9 @@ export function drawHypotheticalGuard(c:CanvasRenderingContext2D,e:WorldFoe,cx:n
         }else if(kind==='loader'){
             const reach=pose.carry;
             const handX=w-5+12*reach-pose.supply*13,handY=15-11*reach-pose.supply*5;
-            line(w-6,10,w-3+reach*3,13,C.ink,4);line(w-3+reach*3,13,handX,handY+6,C.ink,3);
-            line(w-6,10,w-3+reach*3,12,C.grain,2);rect(handX-1,handY+5,3,3,C.brass);
+            const elbowX=w-3+reach*3-pose.supply*8,elbowY=13-pose.supply*3;
+            line(w-6,10,elbowX,elbowY,C.ink,4);line(elbowX,elbowY,handX,handY+6,C.ink,3);
+            line(w-6,10,elbowX,elbowY-1,C.grain,2);rect(handX-1,handY+5,3,3,C.brass);
             // Only one barrel: it leaves the hand on the same tick native physics spawns it.
             const supplied=e instanceof HypotheticalGuard&&e.phase==='rest'&&e.reloadProgress>=.42;
             if(e.phase==='warning'||supplied){
@@ -192,12 +210,22 @@ export function drawHypotheticalGuard(c:CanvasRenderingContext2D,e:WorldFoe,cx:n
                 rect(w+1+t*3,2+t*2,1,1,C.brass);
             }
         }else{
-            const reach=pose.thrust*8,arm=e.danger?w+5:w-3+reach-pose.turn*4;
-            line(w-6+lean,10+pose.bob,arm,12-pose.warning*3,C.ink,3);
-            line(w-6+lean,10+pose.bob,arm,12-pose.warning*3,C.seam);
-            line(arm,7-pose.warning*3,arm+1,16-pose.warning*3,C.ink,3);
-            line(arm+1,8-pose.warning*3,arm+1,14-pose.warning*3,C.brass);
-            rect(arm,7-pose.warning*3,3,2,C.light);
+            const long=e instanceof HypotheticalGuard&&e.longLunge;
+            const reach=pose.thrust*(long?11:8),arm=e.danger?w+5:w-3+reach-pose.turn*4;
+            const handY=12-pose.warning*3+pose.cut*2,elbowX=w-8-pose.warning*3+pose.thrust*4;
+            line(w-6+lean,9+pose.bob,elbowX,13+pose.bob,C.ink,3);line(elbowX,13+pose.bob,arm,handY,C.ink,3);
+            line(elbowX,12+pose.bob,arm,handY,C.seam);rect(arm-1,handY-1,3,3,C.leather);
+            const tipX=e.danger?w+(long?11:7):arm+1+pose.cut*4;
+            const tipY=long?10+Math.min(0,pose.cut)*14+Math.max(0,pose.cut)*6:7-pose.warning*3;
+            line(arm-1,handY+4,tipX,tipY,C.ink,3);line(arm,handY+3,tipX,tipY,C.brass);
+            rect(tipX-1,tipY-1,3,2,C.light);
+            if(long&&e.danger&&!reduced){
+                line(arm-3,handY-4,tipX-4,tipY-4,C.wood);rect(tipX-6,tipY-6,2,1,C.grain);
+            }
+        }
+        if(!reduced&&e.phase==='attack'&&pose.moving&&e.timer<180){
+            const t=e.timer/180;
+            rect(-2-t*5,h-2-Math.sin(t*Math.PI)*3,2,1,C.grain);rect(1-t*3,h-1,2,1,C.leather);
         }
     }
     // Bright attack edge is drawn from the collision rectangle, including its exact outer reach.

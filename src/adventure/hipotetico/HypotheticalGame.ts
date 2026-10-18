@@ -10,16 +10,18 @@ import { pixelText } from '../../graphics/BitmapFont';
 import { drawWorldResult } from '../WorldSceneUI';
 import { workshopPanel, workshopButton, WORKSHOP_UI } from '../WorldWorkshopUI';
 import { HYPOTHETICAL, HypotheticalModel, type HypotheticalAct } from './HypotheticalModel';
-import { hypotheticalStage, hypotheticalWave } from './HypotheticalStage';
+import { hypotheticalStage } from './HypotheticalStage';
+import { SIEGE_SECTORS, SIEGE_WIDTH, siegeGarrison } from './HypotheticalSiege';
 import { drawHypotheticalBackground, drawHypotheticalCombat, drawHypotheticalGuard, drawHypotheticalObjects, drawHypotheticalTerrain } from './HypotheticalArt';
 import { HypotheticalAudio } from './HypotheticalAudio';
 
 export class HypotheticalEncounter extends BossEncounter {
     readonly model: HypotheticalModel;
     livingGuards = 0;
+    garrison: HypotheticalGuard[] = [];
     private collapsedColumns=0;
-    constructor(act: HypotheticalAct, health: number) {
-        super('J1'); this.character = 'yasmin'; this.model = new HypotheticalModel(act, health); this.sync();
+    constructor(act: HypotheticalAct, health: number, cleared = 0) {
+        super('J1'); this.character = 'yasmin'; this.model = new HypotheticalModel(act, health, cleared); this.sync();
     }
     private sync() {
         const b=this.model,body=b.vulnerable?b.weakpoint:b.body;
@@ -30,7 +32,17 @@ export class HypotheticalEncounter extends BossEncounter {
     }
     override update(dt:number,p:Rect,o:WorldObjects,level:WorldLevel) {
         for(const e of o.events)if(e.kind==='switch')this.model.arm(e.x<160?0:1);
+        const cleared = this.model.route.cleared;
+        if(this.model.act==='siege')this.livingGuards=this.garrison.filter(e=>!e.dead&&e.wave===cleared+1).length;
         this.model.update(dt,p,this.livingGuards);this.sync();
+        if(this.model.act==='siege'){
+            for(const e of this.garrison)e.awake=e.wave===this.model.wave&&this.model.route.active;
+            if(this.model.route.cleared>cleared)o.barrels=[];
+            for(const [i] of SIEGE_SECTORS.entries()){
+                const gate=o.bodies.find(b=>b.id===`siege-gate-${i}`);
+                if(gate){gate.height=this.model.route.gateHeight(i);gate.active=gate.height===0;}
+            }
+        }
         if(this.model.nextAct||this.model.won)o.barrels=[];
         if(this.model.act==='chase'){
             const edge=Math.min(level.data.width,Math.max(0,Math.floor((this.model.x-78)/16)));
@@ -45,7 +57,8 @@ export class HypotheticalEncounter extends BossEncounter {
             }
         }
         this.impact=this.model.events.some(e=>e==='slam'||e==='snare');
-        this.impactPoint={x:this.model.x,y:HYPOTHETICAL.floor};this.danger=null;this.released=false;
+        this.impactPoint={x:this.model.act==='siege'&&this.model.events.includes('snare')
+            ?SIEGE_SECTORS[Math.max(0,this.model.route.cleared-1)].gate:this.model.x,y:HYPOTHETICAL.floor};this.danger=null;this.released=false;
     }
     override contact(p:Rect,previous:Rect,falling:boolean) { const hit=this.model.contact(p,previous,falling);this.sync();return hit; }
     override get shockWarning(){return this.model.act==='siege'&&this.model.events.includes('warning')||this.model.state==='roar'&&this.model.age===0;}
@@ -58,7 +71,7 @@ export class HypotheticalGame extends WorldGame {
     act:HypotheticalAct='chase';
     private encounter!:HypotheticalEncounter;
     private retryHealth:number=HYPOTHETICAL.health;
-    private entranceTicks=0;
+    private siegeCheckpoint=0;
     private transitionTicks=0;
     private attemptDeaths=0;
     private totalTicks=0;
@@ -101,16 +114,17 @@ export class HypotheticalGame extends WorldGame {
     get fight(){return this.encounter.model;}
     private get encounterHint(){
         const b=this.fight;
-        if(this.act!=='siege'||b.marks.length||b.waveReady||b.nextAct)return b.hint;
+        if(this.act!=='siege'||b.marks.length||!b.route.active||b.nextAct)return b.hint;
         if(this.foes.some(e=>!e.dead&&e.phase==='stunned'))return 'SEM CAPACETE! SALTE DE NOVO';
         const thrower=this.foes.find(e=>!e.dead&&e.spec.kind==='loader'&&e.phase==='warning');
         if(thrower){
             const pair=thrower instanceof HypotheticalGuard&&thrower.comboLength===2?`${thrower.comboStep+1}/2 `:'';
+            if(thrower instanceof HypotheticalGuard&&thrower.coveringCharge)return 'ARIETE + BARRIL! SALTE PARA A SACADA';
             return thrower.highThrow?`BARRIL ${pair}ALTO! OBSERVE O ARCO`:`BARRIL ${pair}BAIXO! USE AS SACADAS`;
         }
-        if(this.foes.some(e=>e instanceof HypotheticalGuard&&!e.dead&&e.spec.kind==='minion'&&e.comboStep===1&&['warning','attack'].includes(e.phase)))return 'SEGUNDA ESTOCADA! SALTE OU CRUZE ATRAS';
-        if(this.foes.some(e=>!e.dead&&e.spec.kind==='charger'))return 'ARIETE: SENTADA OU ATAQUE AO FREAR';
-        return b.wave===1?'PULE. SENTADA QUEBRA A ARMADURA':'CRUZE OS BARRIS E ATAQUE A SACADA';
+        if(this.foes.some(e=>e instanceof HypotheticalGuard&&!e.dead&&e.longLunge&&['warning','attack'].includes(e.phase)))return 'PASSO LONGO! SALTE OU CRUZE ATRAS';
+        if(this.foes.some(e=>e instanceof HypotheticalGuard&&e.awake&&!e.dead&&e.spec.kind==='charger'))return 'ARIETE: QUEBRE O TETO OU ATAQUE AO FREAR';
+        return b.wave===1?'BLINDADO: SENTADA, DEPOIS OUTRO SALTO':'CRUZE OS BARRIS E ATAQUE A SACADA';
     }
     get resultReady(){return this.fight.won&&this.fight.age>=60;}
     get receipt(){return {act:this.act,phase:this.fight.phaseNumber,health:this.fight.health,won:this.fight.won,deaths:this.attemptDeaths,ticks:this.totalTicks};}
@@ -118,12 +132,23 @@ export class HypotheticalGame extends WorldGame {
     override load(_id:string,resume=false,_custom?:AdventureStage) {
         if(this.isDisposed)return;
         this.weaponAudio?.cancel();
-        if(!resume){this.act='chase';this.retryHealth=HYPOTHETICAL.health;}
+        if(!resume){this.act='chase';this.retryHealth=HYPOTHETICAL.health;this.siegeCheckpoint=0;}
         const stage=hypotheticalStage(this.act);
         super.load(stage.id,false,stage);
-        this.encounter=new HypotheticalEncounter(this.act,this.retryHealth);this.boss=this.encounter;
+        this.encounter=new HypotheticalEncounter(this.act,this.retryHealth,this.siegeCheckpoint);this.boss=this.encounter;
+        if(this.act==='siege'){
+            this.foes=SIEGE_SECTORS.flatMap((s,i)=>i<this.siegeCheckpoint?[]:siegeGarrison(i).map(spec=>
+                new HypotheticalGuard(spec,i+1,()=>this.foes,{left:s.origin+12,right:s.gate})));
+            this.encounter.garrison=this.foes as HypotheticalGuard[];
+            for(const e of this.encounter.garrison)e.awake=false;
+            this.player.data.position.x=this.fight.route.checkpoint;
+            for(const [i] of SIEGE_SECTORS.entries()){
+                const gate=this.objects.bodies.find(b=>b.id===`siege-gate-${i}`);
+                if(gate){gate.height=this.fight.route.gateHeight(i);gate.active=gate.height===0;}
+            }
+        }
         this.player.data.hasHelmet=true;this.player.data.isGrounded=true;this.player.data.respawnRevealTimer=0;
-        this.camera.x=0;this.camera.y=64;this.entranceTicks=0;this.transitionTicks=0;
+        this.camera.x=this.act==='siege'?clamp(this.player.data.position.x-132,0,SIEGE_WIDTH-320):0;this.camera.y=64;this.transitionTicks=0;
         this.input.reset();
     }
     private nextAct() {
@@ -146,15 +171,8 @@ export class HypotheticalGame extends WorldGame {
         if(!steps)return;
         if(!wasWon)this.totalTicks+=steps;
         if(this.fight.health===6||this.fight.health===3)this.retryHealth=this.fight.health;
-        if(this.fight.waveReady){
-            this.entranceTicks+=steps;
-            if(this.entranceTicks>=60){
-                this.foes=this.foes.filter(e=>!e.dead);
-                this.foes.push(...hypotheticalWave(this.fight.wave,this.player.data.position.x).map(s=>new HypotheticalGuard(s,this.fight.wave,()=>this.foes)));
-                this.fight.consumeWave();this.entranceTicks=0;
-                // A single helmet in the last wave rewards movement without trivializing the duel.
-                if(this.fight.wave===3)this.stage.pickups.push({id:'hipotetico:siege:helmet',kind:'helmet',x:62,y:163});
-            }
+        if(this.act==='siege'&&this.fight.route.cleared>this.siegeCheckpoint){
+            this.siegeCheckpoint=this.fight.route.cleared;this.audio.sfx('checkpoint');
         }
         for(const event of this.fight.events){
             if(event==='shot'||event==='impact'||event==='reload'||event==='distant-shot'||event==='distant-hit')this.weaponAudio.play(event);
@@ -164,6 +182,7 @@ export class HypotheticalGame extends WorldGame {
         }
         if(this.fight.nextAct){this.transitionTicks+=steps;if(this.transitionTicks>=60)this.nextAct();}
         if(this.act==='chase')this.camera.x=clamp(this.player.data.position.x-132,0,1280);
+        else if(this.act==='siege')this.camera.x=clamp(this.player.data.position.x-132,0,SIEGE_WIDTH-320);
         else this.camera.x=0;
         // Keep the complete jump arc visible without shaking the backdrop vertically.
         this.camera.y=clamp(Math.min(64,this.player.data.position.y-38),0,64);
@@ -172,7 +191,7 @@ export class HypotheticalGame extends WorldGame {
         const b=this.fight;
         workshopPanel(c,0,0,320,31,false,true);
         pixelText(c,'FLAVIO HIPOTETICO',7,5,WORKSHOP_UI.paper);
-        pixelText(c,this.act==='chase'?'FUGA':this.act==='siege'?`CERCO ${b.wave}/3`:`FASE ${b.phaseNumber}/3`,121,5,WORKSHOP_UI.light);
+        pixelText(c,this.act==='chase'?'FUGA':this.act==='siege'?`${b.route.entered+1}/3 ${b.route.currentSector.name}`:`FASE ${b.phaseNumber}/3`,121,5,WORKSHOP_UI.light);
         if(b.chaining)for(let i=0;i<b.chainLength;i++){
             const x=190-b.chainLength*7+i*7;
             c.fillStyle=i===b.chainStep?'#dfad56':'#607487';c.fillRect(x,6,5,5);
@@ -196,9 +215,9 @@ export class HypotheticalGame extends WorldGame {
                 drawWorldResult(c,'HIPOTESE DERRUBADA','FLAVIO BOLSONARO HIPOTETICO',`${Math.floor(this.totalTicks/60)}S · ${this.attemptDeaths} QUEDAS`,'ENTER: REJOGAR · ESC: MENU');
                 workshopButton(c,'REJOGAR',80,151,160,22,true);
                 this.renderer.present();
-            }else if(b.tick<110){
+            }else if(b.tick<110&&(this.act!=='siege'||this.siegeCheckpoint===0)){
                 if(this.act==='chase')pixelText(c,'FLAVIO BOLSONARO HIPOTETICO',160,60,'#ffedbf',1,'center');
-                pixelText(c,this.act==='chase'?'I · A PONTE DO IMPOSSIVEL':this.act==='siege'?'II · CERCO AO PATIO':'III · O ULTIMO LACRE',160,72,'#ffedbf',1,'center');
+                pixelText(c,this.act==='chase'?'I · A PONTE DO IMPOSSIVEL':this.act==='siege'?'II · A TRAVESSIA DO ARSENAL':'III · O ULTIMO LACRE',160,72,'#ffedbf',1,'center');
                 if(this.act==='chase')pixelText(c,'FANTASIA SATIRICA',160,83,'#d2c6b1',1,'center');
                 this.renderer.present();
             }

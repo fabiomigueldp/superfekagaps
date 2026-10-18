@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { HYPOTHETICAL, HypotheticalModel, ARENA_COVER, type HypotheticalAttack } from '../src/adventure/hipotetico/HypotheticalModel';
-import { hypotheticalStage, hypotheticalWave } from '../src/adventure/hipotetico/HypotheticalStage';
+import { hypotheticalStage } from '../src/adventure/hipotetico/HypotheticalStage';
+import { SIEGE_SECTORS } from '../src/adventure/hipotetico/HypotheticalSiege';
 import { HypotheticalGame } from '../src/adventure/hipotetico/HypotheticalGame';
 import { sceneLifecycleBrowser } from './helpers/sceneLifecycleHarness';
 import replay from './helpers/hypotheticalReplay.json';
@@ -372,22 +373,23 @@ test('landing waves have real danger and are removed when the rider exposes the 
     const s=b.shots[0];b.update(dt,p);assert.equal(b.contact({x:s.x,y:s.y,width:14,height:24},p,false),'hurt');
     advance(b,56);assert.equal(b.state,'recover');assert.equal(b.shots.length,0);
 });
-test('siege waves require actual guard defeats and rubble has one full second of ground warning',()=>{
-    const b=new HypotheticalModel('siege');advance(b,110);assert.equal(b.waveReady,true);assert.equal(b.wave,1);
-    b.consumeWave();advance(b,500,2);assert.equal(b.wave,1);assert.equal(b.nextAct,false);
+test('the garrison must be defeated before its gate opens, and rubble has a full second of warning',()=>{
+    const b=new HypotheticalModel('siege');advance(b,500,2);assert.equal(b.wave,1);assert.equal(b.nextAct,false);
+    assert.equal(b.route.cleared,0);assert.equal(b.route.gateHeight(0),224);
     while(b.tick%210!==0)b.update(dt,p,2);
     assert.equal(b.marks[0].born,b.tick);
     advance(b,59,2);assert.equal(b.shots.filter(s=>s.kind==='rubble').length,0);
     advance(b,1,2);assert.equal(b.shots.filter(s=>s.kind==='rubble').length,1);
-    advance(b,110);assert.equal(b.wave,2);
+    advance(b,110);assert.equal(b.route.cleared,1);assert.equal(b.route.gateHeight(0),0);
+    assert.equal(b.route.active,false);assert.equal(b.nextAct,false);
 });
-test('throwers stand on balconies, and background destruction follows the dinosaur',()=>{
-    for(const x of [20,290]){
-        const stage=hypotheticalStage('siege'),loader=hypotheticalWave(2,x).find(e=>e.kind==='loader')!;
+
+test('every tall launcher has a platform, and background destruction travels through the district',()=>{
+    const stage=hypotheticalStage('siege');
+    for(const loader of stage.foes.filter(f=>f.kind==='loader'))
         assert.ok(stage.mechanisms.some(s=>s.kind==='support'&&loader.x>=s.x&&loader.x+22<=s.x+s.width&&loader.y===s.y));
-    }
     const b=new HypotheticalModel('siege');let breaks=0;
-    for(let i=0;i<1200;i++){b.update(dt,p,1);if(b.events.includes('break')){breaks++;assert.ok(b.backgroundX+44>=52+(b.destroyed-1)*112);}}
+    for(let i=0;i<1200;i++){b.update(dt,p,1);if(b.events.includes('break')){breaks++;assert.ok(b.backgroundX+44>=52+SIEGE_SECTORS[b.destroyed-1].origin);}}
     assert.equal(breaks,3);assert.equal(b.casualties,6);
 });
 

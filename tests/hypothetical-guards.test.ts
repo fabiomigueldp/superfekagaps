@@ -1,25 +1,29 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { HypotheticalGuard, GUARD_SHOVE, GUARD_FOOTWORK } from '../src/adventure/hipotetico/HypotheticalGuards';
+import { HypotheticalGuard, GUARD_SHOVE, GUARD_FOOTWORK, GUARD_LUNGE, GUARD_COVER } from '../src/adventure/hipotetico/HypotheticalGuards';
 import { guardFoot, guardPose, drawHypotheticalGuard } from '../src/adventure/hipotetico/HypotheticalGuardArt';
-import { hypotheticalStage, hypotheticalWave } from '../src/adventure/hipotetico/HypotheticalStage';
+import { hypotheticalStage } from '../src/adventure/hipotetico/HypotheticalStage';
 import { HypotheticalGame } from '../src/adventure/hipotetico/HypotheticalGame';
+import { SIEGE_SECTORS, siegeGarrison } from '../src/adventure/hipotetico/HypotheticalSiege';
 import { WorldLevel, WorldObjects } from '../src/adventure/WorldPhysics';
 import { sceneLifecycleBrowser } from './helpers/sceneLifecycleHarness';
 import type { FoeSpec } from '../src/adventure/types';
 import type { Rect } from '../src/types';
 const dt=1000/60,player={x:145,y:200,width:14,height:24};
 function setup(kind:FoeSpec['kind'],x=100,y=224,wave=1){
-    const stage=hypotheticalStage('siege'),level=new WorldLevel(stage.level),objects=new WorldObjects(stage.mechanisms);
+    const stage=hypotheticalStage('duel'),level=new WorldLevel(stage.level),objects=new WorldObjects(stage.mechanisms);
     level.bodies=objects.bodies;
     const e=new HypotheticalGuard({id:'test',kind,x,y,range:120,behavior:'canal'},wave);
     return {e,level,objects,step:(p=player)=>e.update(dt,level,objects,p)};
 }
 
-test('both courtyard entrances face inward, and balcony launchers remain on authored supports',()=>{
-    for(const px of [30,275])for(const wave of [1,2,3])for(const s of hypotheticalWave(wave,px)){
-        const e=new HypotheticalGuard(s);assert.equal(e.facing,px>160?1:-1);
-        if(s.kind==='loader')assert.ok(hypotheticalStage('siege').mechanisms.some(p=>p.kind==='support'&&e.x>=p.x&&e.x+e.width<=p.x+p.width&&e.y+e.height===p.y));
+test('authored garrisons have room bounds and every launcher stands on its own scaffold',()=>{
+    const stage=hypotheticalStage('siege');
+    assert.equal(stage.foes.length,9);
+    for(const [i,sector] of SIEGE_SECTORS.entries())for(const spec of siegeGarrison(i)){
+        const e=new HypotheticalGuard(spec,i+1,()=>[],{left:sector.origin+12,right:sector.gate});
+        assert.ok(e.x>=sector.origin&&e.x+e.width<sector.gate);
+        if(spec.kind==='loader')assert.ok(stage.mechanisms.some(p=>p.kind==='support'&&e.x>=p.x&&e.x+e.width<=p.x+p.width&&e.y+e.height===p.y));
     }
 });
 test('shield shove commits direction, has a complete tell and a bounded active interval before recovery',()=>{
@@ -39,7 +43,7 @@ test('shield shove commits direction, has a complete tell and a bounded active i
 test('a real top contact cancels the shield shove, breaks its armor and preserves the native second stomp',()=>{
     const {e,step}=setup('helmet');step();while(e.phase!=='attack')step();for(let i=0;i<6;i++)step();assert.ok(e.danger);
     const hit={x:e.x+2,y:e.y-23,width:14,height:24},old={...hit,y:hit.y-4};
-    assert.equal(e.contact(hit,old,true,false),'bounce');assert.equal(e.armor,false);assert.equal(e.phase,'stunned');assert.equal(e.danger,null);
+    assert.equal(e.contact(hit,old,true,true),'bounce');assert.equal(e.armor,false);assert.equal(e.phase,'stunned');assert.equal(e.danger,null);
     step();assert.ok(Number.isFinite(e.armorLostAt));
     for(let i=0;i<45;i++)step();assert.equal(e.phase,'walk');assert.equal(e.danger,null);
     assert.equal(e.contact({...hit,x:e.x+2,y:e.y-23},{...old,x:e.x+2,y:e.y-27},true,false),'kill');assert.equal(e.dead,true);
@@ -139,7 +143,7 @@ test('preparation, attack, braking and contact retain the previous pose at the t
     }
     const {e,step}=setup('helmet');step();while(e.phase!=='attack')step();for(let i=0;i<6;i++)step();
     const pose=e.actionPose,hit={x:e.x+3,y:e.y-23,width:14,height:24};
-    e.contact(hit,{...hit,y:hit.y-4},true,false);assert.equal(e.phase,'stunned');assert.deepEqual(e.actionPose,pose);
+    e.contact(hit,{...hit,y:hit.y-4},true,true);assert.equal(e.phase,'stunned');assert.deepEqual(e.actionPose,pose);
 });
 test('retreating boots compensate backward displacement and reduced motion preserves attack poses',()=>{
     const {e}=setup('minion');Object.assign(e,{phase:'rest',motionX:-.5,distance:2,timer:100});
@@ -189,7 +193,7 @@ test('crossing behind infantry produces a planted pivot and then a full new tell
 test('both entrances can pressure the opposite end of the courtyard instead of stopping at the spawn leash',()=>{
     for(const playerX of [20,280]){
         const {level,objects}=setup('minion');
-        const e=new HypotheticalGuard(hypotheticalWave(1,playerX)[0]);
+        const e=new HypotheticalGuard({id:'patrol',kind:'minion',x:playerX<160?280:14,y:224,range:320,behavior:'canal'});
         let warned=false;
         for(let n=0;n<600;n++){
             e.update(dt,level,objects,{...player,x:playerX});
@@ -224,4 +228,108 @@ test('spacing, pivots and reload steps remain unchanged on zero or invalid time'
         for(const bad of [0,-1,NaN,Infinity])e.update(bad,level,objects,player);
         assert.equal(JSON.stringify(e),before);
     }
+});
+
+test('the second batedor stroke has its own longer tell, committed step, reach and punish window',()=>{
+    const {e,step}=setup('minion',100,224,3);
+    while(e.comboStep!==1)step();
+    assert.equal(e.warningDuration,GUARD_LUNGE.warning);
+    const warningAt=e.age,dir=e.facing;
+    while(e.phase==='warning'){
+        step({...player,x:60});assert.equal(e.facing,dir);assert.equal(e.danger,null);
+    }
+    assert.ok(e.age-warningAt>=560&&e.age-warningAt<580);
+    const start=e.x;
+    while(e.phase==='attack'){
+        if(e.timer<GUARD_LUNGE.activeFrom||e.timer>=GUARD_LUNGE.activeUntil)assert.equal(e.danger,null);
+        else {assert.ok(e.danger);const r:Rect=e.danger;assert.equal(r.width,14);assert.equal(r.x+r.width,e.x+e.width+GUARD_LUNGE.reach);}
+        step({...player,x:60});assert.equal(e.facing,dir);
+    }
+    assert.ok(Math.abs(e.x-start-GUARD_LUNGE.distance)<1e-6);
+    for(let i=0;i<65;i++){step();assert.equal(e.phase,'rest');assert.equal(e.danger,null);}
+    while(String(e.phase)==='rest')step();assert.equal(e.comboStep,0);
+});
+
+test('a long lunge still respects allied bodies, and its weapon cannot hit outside the advertised edge',()=>{
+    const {level,objects}=setup('minion'),team:HypotheticalGuard[]=[];
+    const e=new HypotheticalGuard({id:'lunge',kind:'minion',x:100,y:224,behavior:'canal'},3,()=>team);
+    const ally=new HypotheticalGuard({id:'ally',kind:'helmet',x:143,y:224,behavior:'canal'},3,()=>team);
+    team.push(e,ally);e.comboStep=1;e.phase='attack';
+    for(let i=0;i<21;i++){
+        e.update(dt,level,objects,player);
+        assert.ok(ally.x-e.x-e.width>=GUARD_FOOTWORK.gap-1e-6);
+        if(e.danger){
+            const r:Rect=e.danger,outside={x:r.x+r.width,y:r.y,width:1,height:1},edge={...outside,x:outside.x-1};
+            assert.equal(e.contact(outside,outside,false,false),'none');
+            assert.equal(e.contact(edge,edge,false,false),'hurt');
+        }
+    }
+    assert.ok(e.x<=109.0001);assert.equal(e.phase,'rest');
+});
+
+test('jumping onto a committed follow-up interrupts it using the ordinary stomp',()=>{
+    const {e,step}=setup('minion',100,224,3);
+    while(!e.longLunge||e.phase!=='attack')step();for(let i=0;i<7;i++)step();
+    assert.ok(e.danger);
+    const hit={x:e.x+1,y:e.y-23,width:14,height:24};
+    assert.equal(e.contact(hit,{...hit,y:hit.y-4},true,false),'kill');assert.equal(e.danger,null);
+    for(let i=0;i<60;i++)step();assert.equal(e.dead,true);
+});
+
+test('actual lunging travel drives planted soles instead of sliding motionless boots',()=>{
+    for(const facing of [-1,1]){
+        const {e,step}=setup('minion',100,224,3);e.comboStep=1;e.phase='attack';e.facing=facing;e.vx=facing*.55;
+        let planted=0,lifted=0;
+        for(let n=0;n<19;n++){
+            const distance=e.distance,x=e.x,feet=guardPose(e);
+            step({...player,x:facing>0?180:40});const next=guardPose(e);
+            for(const side of ['left','right'] as const){
+                assert.ok(next[side][1]<=0);
+                if(next[side][1]<-1)lifted++;
+                if(n>0&&feet[side][1]===0&&next[side][1]===0&&e.distance-distance<3){
+                    assert.ok(Math.abs(x+facing*feet[side][0]-e.x-facing*next[side][0])<1e-6);planted++;
+                }
+            }
+        }
+        assert.ok(planted>8&&lifted>4);
+    }
+});
+
+test('a loaded launcher covers an actual ariete charge, with a complete warning and locked aim',()=>{
+    const {level,objects}=setup('minion'),team:HypotheticalGuard[]=[];
+    const ram=new HypotheticalGuard({id:'ram',kind:'charger',x:90,y:224,behavior:'canal'},2,()=>team);
+    const loader=new HypotheticalGuard({id:'loader',kind:'loader',x:238,y:168,behavior:'canal'},2,()=>team);
+    team.push(ram,loader);
+    const step=(p={...player,x:185})=>{for(const e of team)e.update(dt,level,objects,p);};
+    while(loader.phase==='rest')step();
+    assert.ok(loader.age>=GUARD_COVER.resupply&&loader.age<1500);
+    assert.equal(ram.phase,'attack');assert.equal(loader.coveringCharge,true);assert.equal(loader.timer,0);assert.equal(loader.reloadProgress,1);
+    const at=loader.age,dir=loader.facing;
+    for(let i=0;i<50;i++){step({...player,x:280});assert.equal(objects.barrels.length,0);assert.equal(loader.facing,dir);}
+    while(objects.barrels.length===0)step();
+    assert.ok(loader.age-at>=850);assert.equal(objects.barrels.length,1);assert.equal(objects.barrels[0].vy,-2.5);
+    assert.equal(ram.phase,'rest');assert.equal(ram.blocksStomp,false);
+});
+
+test('a defeated or recovering ariete cannot accelerate its partner, and a solo launcher keeps its cadence',()=>{
+    for(const state of ['solo','dead','rest'] as const){
+        const {level,objects}=setup('minion'),team:HypotheticalGuard[]=[];
+        const ram=new HypotheticalGuard({id:'ram',kind:'charger',x:90,y:224,behavior:'canal'},2,()=>team);
+        const loader=new HypotheticalGuard({id:'loader',kind:'loader',x:238,y:168,behavior:'canal'},2,()=>team);
+        ram.phase=state==='rest'?'rest':'attack';ram.dead=state==='dead';
+        team.push(loader,...state==='solo'?[]:[ram]);
+        for(let n=0;n<89;n++){loader.update(dt,level,objects,{...player,x:185});assert.equal(loader.phase,'rest');assert.equal(loader.coveringCharge,false);}
+        assert.equal(objects.barrels.length,0);
+    }
+});
+
+test('the paired launcher visibly retrieves the next barrel before raising it, without spawning a projectile',()=>{
+    const {e,objects,step}=setup('loader',238,168,3),p={...player,x:185};
+    while(objects.barrels.length===0)step(p);
+    while(e.timer<350)step(p);
+    assert.equal(e.phase,'recoil');assert.ok(e.actionPose.supply>.95);assert.ok(e.actionPose.carry<.1);
+    while(e.comboStep!==1)step(p);
+    assert.equal(e.phase,'warning');assert.ok(e.actionPose.supply>.95);assert.equal(objects.barrels.length,1);
+    for(let i=0;i<20;i++)step(p);
+    assert.ok(e.actionPose.supply<.01);assert.ok(e.actionPose.carry>.25);assert.equal(objects.barrels.length,1);
 });

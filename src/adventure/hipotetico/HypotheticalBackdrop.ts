@@ -11,9 +11,14 @@ export class HypotheticalBackdrop {
     x = -80; tick = 0; muzzle = 0; heat = 0; targetX = 100; targetY = -8;
     shots: DistantShot[] = []; impacts: DistantImpact[] = [];
     events: ('distant-shot' | 'distant-hit')[] = [];
-    readonly people: Bystander[] = [78, 144, 105, 208, 169, 259, 225, 288].map((x, i) => ({
-        x, shelter: i < 6 ? x + 22 : 332 + i * 4, escaped: false, fleeing: i >= 6, hitAt: null, color: i % 4,
-    }));
+    readonly people: Bystander[];
+    constructor(readonly wide = false) {
+        this.people = [78, 144, 105, 208, 169, 259, 225, 288].map((x, i) => {
+            x += wide ? Math.min(2, Math.floor(i / 2)) * 416 : 0;
+            return { x, shelter: i < 6 ? x + 22 : (wide ? 1280 : 320) + 12 + i * 4,
+                escaped: false, fleeing: i >= 6, hitAt: null, color: i % 4 };
+        });
+    }
     private target = -1;
     get casualties() { return this.people.filter(p => p.hitAt !== null).length; }
     get recoil() { return 3.5 * smoothMotion(this.muzzle / 5); }
@@ -29,12 +34,12 @@ export class HypotheticalBackdrop {
     cancel() { this.shots = []; this.muzzle = 0; this.events = []; }
     update(tick: number) {
         this.tick = tick; this.events = [];
-        this.x = -80 + (tick % 400) * 1.25;
+        this.x = -80 + (this.wide ? tick * 1.04 : (tick % 400) * 1.25);
         this.muzzle = Math.max(0, this.muzzle - 1); this.heat = Math.max(0, this.heat - .006);
         this.impacts = this.impacts.filter(p => tick - p.born < 28);
         for (const p of this.people) if (p.hitAt === null && !p.escaped && tick > 50) {
             p.x = Math.min(p.shelter, p.x + (p.fleeing ? .48 : .3));
-            if (p.fleeing && p.x > 326) p.escaped = true;
+            if (p.fleeing && p.x > (this.wide ? 1286 : 326)) p.escaped = true;
         }
         for (const s of this.shots) {
             s.px = s.x; s.py = s.y; s.x += s.vx; s.y += s.vy; s.life--;
@@ -48,7 +53,7 @@ export class HypotheticalBackdrop {
                 this.events.push('distant-hit'); s.life = 0;
             }
         }
-        this.shots = this.shots.filter(s => s.life > 0 && s.x < 350);
+        this.shots = this.shots.filter(s => s.life > 0 && s.x < (this.wide ? 1310 : 350));
         const pass = Math.floor(tick / 400), local = tick % 400;
         // Two short, visible attacks per crossing. Survivors flee through the far gate.
         if (pass < 3 && (local === 98 || local === 154)) {

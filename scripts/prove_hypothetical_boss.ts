@@ -39,7 +39,7 @@ try{
         const png=frame.toBuffer('image/png');
         writeFileSync(join(out,'frames',String(videoFrame++).padStart(5,'0')+'.png'),png);
         if(g.act==='siege'&&!g.player.data.isDead)for(const e of g.foes){
-            if(e.dead||e.x<8||e.x+e.width>312)continue;
+            if(e.dead||e.x-g.camera.x<8||e.x+e.width-g.camera.x>312||e instanceof HypotheticalGuard&&!e.awake)continue;
             const ready=e.phase==='warning'?e.timer>e.warningDuration*.65:e.phase==='attack'?e.timer>80:e.phase==='recoil'?e.timer<160:e.timer>80;
             const name=`guard-${e.spec.kind}-${e.phase}`;
             if(ready&&!covered.has(name)){
@@ -63,6 +63,8 @@ try{
             :b.act==='chase'&&g.player.data.position.x>=560&&g.player.data.position.x<=568?'chase-span'
             :b.act==='chase'&&g.player.data.isGrounded&&Math.abs(g.player.getRect().y+g.player.getRect().height-168)<.1?'terrace-route'
             :b.act==='chase'&&g.player.data.position.x>=1430&&g.player.data.position.x<=1440?'chase-gateway'
+            :b.act==='siege'&&b.route.gateTicks.some(t=>t>=28&&t<=40)?`siege-gate-${b.route.cleared}`
+            :b.act==='siege'&&b.route.active&&g.player.data.position.x>b.route.sector.origin+90&&g.player.data.position.x<b.route.sector.origin+155?`siege-district-${b.wave}`
             :b.act==='siege'&&b.tick>=280&&b.tick<=284?'siege-courtyard'
             :b.act==='siege'&&b.backdrop.muzzle>0?'distant-gunfire'
             :b.act==='siege'&&b.backdrop.people.some(p=>p.hitAt!==null&&b.tick-p.hitAt>=8&&b.tick-p.hitAt<=12)?'bystander-fall'

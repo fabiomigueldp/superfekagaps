@@ -2,6 +2,7 @@ import { box, oval, pixelLine, polygon } from '../WorldPainting';
 import type { WorldLevel, WorldObjects, MovingBody } from '../WorldPhysics';
 import { HYPOTHETICAL, type HypotheticalModel } from './HypotheticalModel';
 import { ARENA_BALCONIES, ARENA_COLUMNS, CHASE_GAPS } from './HypotheticalLayout';
+import { SIEGE_SECTORS, SIEGE_GATE_TICKS } from './HypotheticalSiege';
 
 const S = {
     ink: '#213545', joint: '#354956', stone: '#677b7c', stoneShade: '#516571',
@@ -187,10 +188,51 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
             pixelLine(c,x+47,top+26,x+52,top+29,'#d4c49c');pixelLine(c,x+52,top+29,x+47,top+32,'#d4c49c');
         }
     }else if(b.act==='siege'){
-        for(let i=0;i<3;i++)facade(c,24+i*112,base-5,57,56+i%2*15,i,b.destroyed>i);
-        box(c,0,base-4,320,9,'#788c82');box(c,0,base+5,320,3,'#a3ab90');
-        for(let i=0;i<10;i++)box(c,i*36+mod(i,2)*9,base+1,19,1,'#91a18e');
-        for(const x of [9,310])pennant(c,x,base-64,time);
+        for(const [i,s] of SIEGE_SECTORS.entries()){
+            const x=s.origin-cx;
+            if(x>340||x+416<-20)continue;
+            facade(c,x+24,base-5,57,56+i%2*15,i,b.destroyed>i);
+            facade(c,x+184,base-5,76,66+i*6,(i+1)%3);
+            box(c,x,base-4,416,9,'#788c82');box(c,x,base+5,416,3,'#a3ab90');
+            for(let j=0;j<11;j++)box(c,x+j*36+mod(j,2)*9,base+1,19,1,'#91a18e');
+            pennant(c,x+9,base-64,time);pennant(c,x+300,base-61,time,34);
+            if(i===0){
+                // Guardhouse clock and a hanging checkpoint lamp identify the first approach.
+                box(c,x+104,base-74,36,74,'#8b9c8c');box(c,x+100,base-79,44,5,'#b2b69b');
+                oval(c,x+113,base-67,18,18,'#667f78');oval(c,x+116,base-64,12,12,'#b8b99e');
+                pixelLine(c,x+122,base-62,x+122,base-58,'#6a827b');pixelLine(c,x+122,base-58,x+126,base-56,'#6a827b');
+                arch(c,x+112,base-41,20,37,'#5e7e77');box(c,x+120,base-34,3,29,'#93a18c');
+            }else if(i===1){
+                // Loading crane, rope, pulley and suspended pallet share one anchored structure.
+                const sway=reduced?0:Math.sin(time/80)*2;
+                box(c,x+141,base-95,7,91,'#6d847a');box(c,x+142,base-94,2,89,'#a1aa90');
+                pixelLine(c,x+145,base-91,x+222,base-105,'#617e77',5);
+                pixelLine(c,x+146,base-59,x+188,base-98,'#7f9281',3);
+                pixelLine(c,x+146,base-91,x+222,base-105,'#b4b59a');
+                oval(c,x+218,base-107,7,7,'#647c72');oval(c,x+220,base-105,3,3,'#c0b99a');
+                pixelLine(c,x+222,base-100,x+222+sway,base-63,'#657f76');
+                pixelLine(c,x+222+sway,base-63,x+207+sway,base-45,'#819886');
+                pixelLine(c,x+222+sway,base-63,x+238+sway,base-45,'#819886');
+                box(c,x+206+sway,base-45,34,4,'#718679');box(c,x+210+sway,base-59,26,14,'#9c9e7d');
+                for(const dx of [214,229])box(c,x+dx+sway,base-59,2,14,'#6b8278');
+            }else{
+                // The arsenal has reinforced doors, vent stacks and pressure pipes.
+                box(c,x+94,base-91,64,87,'#7c9186');box(c,x+89,base-94,74,5,'#adb29a');
+                for(const xx of [104,136]){box(c,x+xx,base-110,8,20,'#6d8580');box(c,x+xx-2,base-112,12,3,'#abb299');}
+                for(let j=0;j<5;j++){
+                    box(c,x+101,base-82+j*7,50,3,'#607e77');box(c,x+102,base-82+j*7,48,1,'#9aa991');
+                }
+                pixelLine(c,x+96,base-30,x+157,base-30,'#5c7f7a',5);pixelLine(c,x+96,base-30,x+157,base-30,'#a0ad96');
+                if(!reduced)for(let j=0;j<3;j++){
+                    const t=(time+j*24)%90;box(c,x+109+t*.06,base-112-t*.22,5+t*.06,2,'#b5bfb0');
+                }
+            }
+            // A rope fence sits behind the playable road, never impersonating a solid platform.
+            for(let j=0;j<5;j++){
+                const px=x+280+j*25;box(c,px,base-17,3,17,'#728c7e');
+                if(j<4){pixelLine(c,px+1,base-12,px+13,base-8,'#9cab92');pixelLine(c,px+13,base-8,px+26,base-12,'#9cab92');}
+            }
+        }
     }else{
         finalGate(c,base+3,time,b.phaseNumber);
         box(c,0,base+2,320,9,'#526f70');box(c,0,base+11,320,2,'#8fa18c');
@@ -199,7 +241,7 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
 
 export function drawHypotheticalDestruction(c: CanvasRenderingContext2D, b: HypotheticalModel, base: number, reduced: boolean) {
     if(b.backgroundStamp<=0)return;
-    const age=32-b.backgroundStamp,x=24+(b.destroyed-1)*112,drop=age*age*.035;
+    const age=32-b.backgroundStamp,x=24+(SIEGE_SECTORS[b.destroyed-1]?.origin??0),drop=age*age*.035;
     // Fragments retain the roof's tile material and converge on their own street.
     for(let i=0;i<5;i++){
         const xx=x+i*11+(i-2)*age*.12,yy=Math.min(base-6,base-60+drop+age*i*.22);
@@ -255,7 +297,7 @@ export function drawHypotheticalMasonry(c: CanvasRenderingContext2D, level: Worl
             box(c,x-4-cx,196-cy,15,7,S.cap);
             pixelLine(c,x+1-cx,198-cy,x+5-cx,200-cy,S.ink);pixelLine(c,x+5-cx,200-cy,x+1-cx,202-cy,S.ink);
         }
-    }else{
+    }else if(b.act==='duel'){
         // Small sockets explain the winch cable's attachment, without implying extra platforms.
         for(const x of [53,263]){box(c,x-cx,224-cy,5,3,S.ink);box(c,x+1-cx,224-cy,3,1,S.ironLight);}
     }
@@ -294,7 +336,38 @@ function balcony(c: CanvasRenderingContext2D, p: MovingBody, cx: number, cy: num
 
 export function drawHypotheticalFittings(c: CanvasRenderingContext2D, o: WorldObjects, b: HypotheticalModel, cx: number, cy: number) {
     for(const p of o.bodies){
-        if(p.kind==='support'){if(p.id.startsWith('chase-'))terrace(c,p,cx,cy);else balcony(c,p,cx,cy);}
+        if(p.x>cx+350||p.x+p.width<cx-30)continue;
+        if(p.kind==='support'){if(p.id.startsWith('chase-')||p.id.startsWith('siege-'))terrace(c,p,cx,cy);else balcony(c,p,cx,cy);}
+        else if(p.id.startsWith('siege-gate-')){
+            const i=Number(p.id.slice(-1)),x=p.x-cx,floor=224-cy,bottom=p.height-cy,top=42-cy;
+            const ticks=b.route.gateTicks[i],opening=ticks>0&&ticks<SIEGE_GATE_TICKS,open=p.active;
+            // The grille's painted lower edge is exactly the collision body's lower edge.
+            for(const px of [x-5,x+18]){
+                box(c,px,top,3,floor-top,S.ink);box(c,px+1,top,1,floor-top,S.ironLight);
+                for(let yy=top+8;yy<floor;yy+=21){box(c,px-1,yy,5,4,S.iron);box(c,px,yy,1,1,S.cap);}
+            }
+            if(!open){
+                c.save();c.beginPath();c.rect(x,top,16,Math.max(0,bottom-top));c.clip();
+                for(let xx=0;xx<16;xx+=5){box(c,x+xx,top,3,bottom-top,S.ink);box(c,x+xx+1,top,1,bottom-top,S.ironLight);}
+                for(let yy=bottom-9;yy>top-20;yy-=24){box(c,x,yy,16,4,S.iron);box(c,x+1,yy,14,1,S.cap);}
+                c.restore();box(c,x-1,bottom-4,18,4,S.ink);box(c,x,bottom-4,16,1,S.cap);
+                if(bottom>top+14){box(c,x+5,bottom-13,6,8,S.ink);box(c,x+6,bottom-12,4,5,opening?'#99d6bd':'#ca9951');}
+            }
+            box(c,x-8,top-4,34,9,S.ink);box(c,x-7,top-3,32,6,S.iron);box(c,x-6,top-3,30,1,S.cap);
+            for(const px of [x-2,x+14]){
+                oval(c,px,top-2,5,5,S.cap);box(c,px+2,top,1,1,S.ink);
+                const offset=opening?Math.floor(ticks/3)%5:0;
+                for(let yy=top+7+offset;yy<floor-29;yy+=5){box(c,px+1,yy,1,3,S.woodLight);}
+            }
+            // Lock lamps and the route arrow use the same ivory/brass/mint vocabulary as combat.
+            box(c,x-17,floor-35,12,18,S.ink);box(c,x-16,floor-34,10,16,S.iron);
+            for(let j=0;j<3;j++)box(c,x-13,floor-31+j*4,4,2,i<b.route.cleared?'#99d6bd':'#ca9951');
+            box(c,x+27,floor-27,2,27,S.woodShade);box(c,x+22,floor-29,17,11,S.ink);box(c,x+23,floor-28,15,9,S.cap);
+            pixelLine(c,x+28,floor-26,x+33,floor-24,S.ink);pixelLine(c,x+33,floor-24,x+28,floor-21,S.ink);
+            if(opening)for(let j=0;j<3;j++){
+                const t=(ticks+j*13)%25;box(c,x-4+j*10+(j-1)*t*.12,floor-3-t*.3,2,1,S.cap);
+            }
+        }
         else if(p.kind==='switch'){
             const side=p.id.endsWith('right')?1:0,armed=b.armed[side]>0,x=p.x-cx,y=p.y-cy,press=armed?3:0;
             const cableX=(side?263:56)-cx,floor=HYPOTHETICAL.floor-cy;

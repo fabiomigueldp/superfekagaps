@@ -4,19 +4,24 @@ import type { FoeSpec } from '../types';
 import type { Rect } from '../../types';
 import type { WorldLevel, WorldObjects } from '../WorldPhysics';
 import { isSolidTile } from '../../world/tileRules';
-import { guardActionPose, blendGuardAction, type GuardActionPose } from './HypotheticalGuardMotion';
+import { overlaps } from '../types';
+import { guardActionPose, blendGuardAction, GUARD_LUNGE, type GuardActionPose } from './HypotheticalGuardMotion';
+export { GUARD_LUNGE } from './HypotheticalGuardMotion';
 
 const frame = 1000 / 60;
 export const GUARD_SHOVE = { warning: 650, attack: 300, recovery: 950, reach: 9 } as const;
 // A complete Feka body fits between allies, including a little room after a successful stomp bounce.
 export const GUARD_FOOTWORK = { gap: 18, attackSpace: 32, pivot: 180, reload: 1000, reloadStep: 6 } as const;
+export const GUARD_COVER = { resupply:1100, chargeUntil:500 } as const;
 
 /** Encounter-local variations. Contacts, armor, stomps and terrain still belong to WorldFoe. */
 export class HypotheticalGuard extends WorldFoe {
+    awake = true;
     lastRelease = -Infinity;
     releaseHigh = false;
     armorLostAt = -Infinity;
     comboStep = 0;
+    coveringCharge = false;
     transitionAt = -Infinity;
     transitionFrom: GuardActionPose | null = null;
     yielding = false;
@@ -26,16 +31,26 @@ export class HypotheticalGuard extends WorldFoe {
     private reloadOrigin = 0;
     private reloadFacing = 1;
     private lastArmor = true;
+    private launches = 0;
 
-    constructor(spec: FoeSpec, readonly wave = 1, private readonly company: () => readonly WorldFoe[] = () => []) {
+    constructor(spec: FoeSpec, readonly wave = 1, private readonly company: () => readonly WorldFoe[] = () => [],
+        readonly bounds?: {left:number;right:number}) {
         super(spec);
         // Both entrances face into the courtyard; the left entrance used to patrol away from Feka.
-        this.facing = spec.x < 160 ? 1 : -1;
-        this.vx = this.facing * .55;
-        if(spec.kind==='loader')this.startReload();
+        this.facing = spec.x < (bounds ? (bounds.left+bounds.right)/2 : 160) ? 1 : -1;
+        this.vx = this.facing * this.patrolSpeed;
+        if(spec.kind==='loader'){this.startReload();if(bounds)this.timer=spec.x>bounds.left+230?350:800;}
     }
-    override get warningDuration() { return this.spec.kind === 'helmet' ? GUARD_SHOVE.warning : super.warningDuration; }
-    get comboLength() { return this.wave === 3 && ['minion','loader'].includes(this.spec.kind) ? 2 : 1; }
+    get patrolSpeed() { return this.spec.kind==='minion' ? .8+(this.wave-1)*.08 : .65; }
+    override get highThrow() { return this.spec.kind==='loader'?this.launches%2===1:super.highThrow; }
+    override get blocksStomp() {
+        if(this.spec.kind==='helmet')return this.armor&&!['rest','stunned'].includes(this.phase);
+        if(this.spec.kind==='charger'&&!this.armor)return false;
+        return super.blocksStomp;
+    }
+    override get warningDuration() { return this.spec.kind === 'helmet' ? GUARD_SHOVE.warning : this.longLunge ? GUARD_LUNGE.warning : super.warningDuration; }
+    get longLunge() { return this.spec.kind==='minion'&&this.comboLength===2&&this.comboStep===1; }
+    get comboLength() { return (this.wave >= 2 && this.spec.kind==='minion'||this.wave===3&&this.spec.kind==='loader') ? 2 : 1; }
     get turnProgress() { return Math.max(0, Math.min(1, (this.age-this.turnAt)/GUARD_FOOTWORK.pivot)); }
     get reloadProgress() { return Math.max(0, Math.min(1, (this.age-this.reloadAt)/GUARD_FOOTWORK.reload)); }
     get actionPose(): GuardActionPose {
@@ -49,6 +64,12 @@ export class HypotheticalGuard extends WorldFoe {
             target.supply=t<.42?smooth(t/.3):1-smooth((t-.42)/.38);
             target.crouch+=target.supply*1.2;
         }
+        if(this.spec.kind==='loader'&&this.comboLength===2){
+            // The hand returns to the satchel between the two throws. The next barrel is
+            // collected there, then raised during its own complete warning.
+            if(this.phase==='recoil'&&this.comboStep===0)target.supply=Math.max(0,Math.min(1,(this.timer-100)/220));
+            if(this.phase==='warning'&&this.comboStep===1)target.supply=1-Math.max(0,Math.min(1,this.timer/280));
+        }
         return this.transitionFrom?blendGuardAction(this.transitionFrom,target,(this.age-this.transitionAt)/(this.phase==='attack'?50:120)):target;
     }
     private change(phase: FoePhase) { this.phase = phase; this.timer = 0; }
@@ -56,7 +77,7 @@ export class HypotheticalGuard extends WorldFoe {
     private clearance(direction:number,from=this.x) {
         let space=Infinity;
         for(const ally of this.company()){
-            if(ally===this||ally.dead||Math.abs(ally.y+ally.height-this.y-this.height)>4)continue;
+            if(ally===this||ally.dead||ally instanceof HypotheticalGuard&&!ally.awake||Math.abs(ally.y+ally.height-this.y-this.height)>4)continue;
             if((ally.x+ally.width/2-from-this.width/2)*direction<=0)continue;
             space=Math.min(space,direction>0?ally.x-from-this.width:from-ally.x-ally.width);
         }
@@ -69,6 +90,20 @@ export class HypotheticalGuard extends WorldFoe {
         this.age+=dt;this.timer+=dt;this.flash=Math.max(0,this.flash-dt);this.travel(dx,dt,level);
     }
     private startReload(){this.reloadAt=this.age;this.reloadOrigin=this.x;this.reloadFacing=this.facing;}
+    private updateLauncher(dt:number,objects:WorldObjects,player:Rect){
+        this.age+=dt;this.timer+=dt;this.flash=Math.max(0,this.flash-dt);
+        if(this.dead){this.deadTimer+=dt;return;}
+        // Elevated defenders must see the actual floor below their balcony. The campaign's
+        // 60px same-bank detector left the tall arsenal balconies unable to attack grounded Feka.
+        const gap=player.x+player.width/2-this.x-this.width/2;
+        const visible=Math.abs(gap)<170&&Math.abs(player.y-this.y)<110;
+        if(this.phase==='rest'&&this.timer>1500&&visible){this.facing=gap<0?-1:1;this.change('warning');}
+        else if(this.phase==='warning'&&this.timer>this.warningDuration){
+            const barrel=objects.spawnBarrel(this.x+(this.facing<0?-14:this.width),this.y-4,this.facing);
+            barrel.vy=this.highThrow?-4.8:-2.5;if(this.highThrow)barrel.vx=this.facing*2.1;
+            this.launches++;this.change('recoil');
+        }else if(this.phase==='recoil'&&this.timer>400)this.change('rest');
+    }
     private reloadStep(level:WorldLevel){
         // The six-pixel step is confined to the actual balcony, and finishes well before the next tell.
         const support=level.bodies.find(b=>b.kind==='support'&&Math.abs(b.y-this.y-this.height)<1&&this.x>=b.x&&this.x+this.width<=b.x+b.width);
@@ -87,6 +122,7 @@ export class HypotheticalGuard extends WorldFoe {
     }
     override update(dt: number, level: WorldLevel, objects: WorldObjects, player: Rect) {
         if (!Number.isFinite(dt) || dt <= 0) return;
+        if(!this.awake&&!this.dead){this.age+=dt;this.motionX=0;return;}
         const before = this.phase, oldX = this.x, oldDistance=this.distance, wasHigh = this.highThrow, priorPose=this.actionPose;
         if (this.lastArmor && !this.armor) this.armorLostAt = this.age;
         this.lastArmor = this.armor;
@@ -102,6 +138,7 @@ export class HypotheticalGuard extends WorldFoe {
         const pivot=!this.dead&&infantry&&this.phase==='walk'&&this.turnProgress<1;
         const screened=!this.dead&&infantry&&this.phase==='walk'&&this.clearance(this.facing)<GUARD_FOOTWORK.attackSpace;
         const shove = this.spec.kind === 'helmet' && !this.dead && ['warning', 'attack', 'rest'].includes(this.phase);
+        const lunge = !this.dead && this.longLunge && ['warning','attack','rest'].includes(this.phase);
         if(pivot){
             this.idleStep(dt,level);
             if(this.turnProgress>=.5){this.facing=this.turnTarget;this.vx=this.facing*Math.abs(this.vx);}
@@ -119,9 +156,36 @@ export class HypotheticalGuard extends WorldFoe {
                 if (this.timer >= GUARD_SHOVE.attack) this.change('rest');
             } else if (this.phase === 'rest' && this.timer >= GUARD_SHOVE.recovery) this.change('walk');
             this.travel(dx, dt, level);
+        } else if(lunge) {
+            this.age+=dt;this.timer+=dt;this.flash=Math.max(0,this.flash-dt);
+            let dx=0;
+            if(this.phase==='warning'&&this.timer>=GUARD_LUNGE.warning)this.change('attack');
+            else if(this.phase==='attack'){
+                const travel=(t:number)=>{const u=Math.max(0,Math.min(1,t/GUARD_LUNGE.attack));return GUARD_LUNGE.distance*u*u*(3-2*u);};
+                dx=this.facing*(travel(this.timer)-travel(this.timer-dt));
+                if(this.timer>=GUARD_LUNGE.attack)this.change('rest');
+            }else if(this.phase==='rest'){
+                if(this.timer<200)dx=-this.facing*Math.min(dt,this.timer)*.5/frame;
+                if(this.timer>=GUARD_LUNGE.recovery){this.change('walk');this.vx=this.facing*this.patrolSpeed;this.comboStep=0;}
+            }
+            this.travel(dx,dt,level);
         } else {
-            super.update(dt, level, objects, player);
+            let coverCharge=false;
+            if(!this.dead&&this.spec.kind==='loader'&&this.phase==='rest'&&this.timer>=GUARD_COVER.resupply){
+                const ally=this.company().find(e=>!e.dead&&e.spec.kind==='charger'&&e.phase==='attack'&&e.timer<GUARD_COVER.chargeUntil);
+                const gap=player.x+player.width/2-this.x-this.width/2;
+                // The ariete drives Feka across the floor; its partner then covers the recovery
+                // with a fully announced barrel. Never interrupt resupply or an existing throw.
+                if(ally&&Math.abs(gap)<170&&Math.abs(player.y-this.y)<110){
+                    coverCharge=true;
+                }
+            }
+            if(this.spec.kind==='loader')this.updateLauncher(dt,objects,player);
+            else super.update(dt, level, objects, player);
             if (this.dead) return;
+            if(coverCharge&&this.phase==='rest'){
+                this.coveringCharge=true;this.facing=player.x+player.width/2<this.x+this.width/2?-1:1;this.comboStep=0;this.change('warning');
+            }
             if (this.comboLength===2) {
                 const gap=player.x+player.width/2-this.x-this.width/2;
                 const sameBank=Math.abs(player.y+player.height-this.y-this.height)<2;
@@ -130,7 +194,7 @@ export class HypotheticalGuard extends WorldFoe {
                 if(this.spec.kind==='minion'&&before==='attack'&&this.phase==='rest'&&this.comboStep===0&&sameBank&&gap*this.facing>0&&Math.abs(gap)<78&&this.clearance(this.facing)>=GUARD_FOOTWORK.attackSpace){
                     this.comboStep=1;this.change('warning');
                 }else if(this.spec.kind==='loader'&&before==='recoil'&&this.phase==='rest'){
-                    if(this.comboStep===0&&Math.abs(gap)<170&&Math.abs(player.y-this.y)<60){
+                    if(this.comboStep===0&&Math.abs(gap)<170&&Math.abs(player.y-this.y)<110){
                         this.comboStep=1;this.facing=gap<0?-1:1;this.change('warning');
                     }else if(this.comboStep===1)this.timer=-400; // A longer resupply after the pair.
                 }else if(this.phase==='warning'&&before!==this.phase&&['walk','rest'].includes(before))this.comboStep=0;
@@ -138,7 +202,7 @@ export class HypotheticalGuard extends WorldFoe {
             if (this.spec.kind === 'helmet' && this.armor && this.phase === 'walk') {
                 const gap = player.x + player.width / 2 - this.x - this.width / 2;
                 if (gap*this.facing>0 && Math.abs(gap) < 57 && Math.abs(gap) > 22 && Math.abs(player.y + player.height - this.y - this.height) < 2) {
-                    this.facing = Math.sign(gap); this.vx = this.facing * .55; this.change('warning');
+                    this.facing = Math.sign(gap); this.vx = this.facing * this.patrolSpeed; this.change('warning');
                 }
             }
             // The light guard withdraws after a missed thrust, opening a readable chase/punish decision.
@@ -149,13 +213,21 @@ export class HypotheticalGuard extends WorldFoe {
             }
             if(this.spec.kind==='minion'&&before==='rest'&&this.phase==='walk'){
                 // The next update performs a planted pivot instead of instantly mirroring the sprite.
-                this.vx=this.facing*.55;
+                this.vx=this.facing*this.patrolSpeed;
             }
         }
         if(this.spec.kind==='loader'&&!this.dead&&this.phase==='rest'){
-            if(before!=='rest')this.startReload();
+            if(before!=='rest'){this.startReload();this.coveringCharge=false;}
             this.reloadStep(level);
         }else if(infantry&&!this.dead)this.x=oldX+this.separate(this.x-oldX,oldX);
+        if(this.bounds&&!this.dead){
+            const bounded=Math.max(this.bounds.left,Math.min(this.bounds.right-this.width,this.x));
+            if(bounded!==this.x){
+                this.x=bounded;
+                if(this.spec.kind==='charger'&&this.phase==='attack'){this.change('rest');this.flash=100;}
+                else if(this.phase==='walk'){this.facing=this.x===this.bounds.left?1:-1;this.vx=this.facing*this.patrolSpeed;}
+            }
+        }
         this.motionX=this.x-oldX;this.distance=oldDistance+Math.abs(this.motionX);
         if (this.spec.kind === 'loader' && before === 'warning' && this.phase === 'recoil') {
             this.lastRelease = this.age; this.releaseHigh = wasHigh;
@@ -163,13 +235,26 @@ export class HypotheticalGuard extends WorldFoe {
         if(before!==this.phase){this.transitionFrom=priorPose;this.transitionAt=this.age;}
     }
     override contact(player:Rect,previous:Rect,falling:boolean,pound:boolean){
+        if(!this.awake&&!this.dead)return 'none';
         const phase=this.phase,pose=this.actionPose;
+        const top=!this.dead&&falling&&overlaps(player,this)&&previous.y+previous.height<=this.y+9;
+        if(top&&this.armor&&(this.spec.kind==='helmet'||this.spec.kind==='charger')){
+            if(pound){
+                this.armor=false;this.hp=1;this.armorLostAt=this.age;this.flash=250;this.change('stunned');
+                this.transitionFrom=pose;this.transitionAt=this.age;return 'bounce';
+            }
+            if(this.blocksStomp){this.flash=100;return 'bounce';}
+        }
         const result=super.contact(player,previous,falling,pound);
         if(this.phase!==phase){this.transitionFrom=pose;this.transitionAt=this.age;}
         return result;
     }
     override get danger(): Rect | null {
-        if (this.dead) return null;
+        if (this.dead||!this.awake) return null;
+        if(this.longLunge&&this.phase==='attack'){
+            if(this.timer<GUARD_LUNGE.activeFrom||this.timer>=GUARD_LUNGE.activeUntil)return null;
+            return {x:this.facing<0?this.x-GUARD_LUNGE.reach:this.x+this.width-2,y:this.y+8,width:GUARD_LUNGE.reach+2,height:10};
+        }
         if (this.spec.kind === 'helmet' && this.armor && this.phase === 'attack' && this.timer >= 65 && this.timer < 225)
             return { x: this.facing < 0 ? this.x - GUARD_SHOVE.reach : this.x + this.width - 1, y: this.y + 9, width: GUARD_SHOVE.reach + 1, height: 9 };
         return super.danger;

@@ -3,6 +3,7 @@ import { clamp, overlaps } from '../types';
 import { dinosaurFootAnchor, dinosaurTail, hypotheticalMotion, riderBend, smoothMotion, type DinosaurMotion } from './HypotheticalMotion';
 import { HypotheticalBackdrop } from './HypotheticalBackdrop';
 import { ARENA_COLUMNS } from './HypotheticalLayout';
+import { HypotheticalSiege, SIEGE_SECTORS, SIEGE_WIDTH } from './HypotheticalSiege';
 
 export type HypotheticalAct = 'chase' | 'siege' | 'duel';
 export type HypotheticalState = 'arrival' | 'rest' | 'tell' | 'reload' | 'attack' | 'turn' | 'recover' | 'hurt' | 'roar' | 'won';
@@ -52,9 +53,12 @@ export class HypotheticalModel {
     tick = 0; age = 0; health: number; x = 244; y: number = HYPOTHETICAL.floor; facing: -1 | 1 = -1;
     targetX = 80; targetY = 211; originX = 244; travel = 0; velocity = 0; cycle = 0; leg = 0;
     shots: Shot[] = []; dust: Dust[] = []; marks: FallingMark[] = []; events: FightEvent[] = [];
-    impacts: BulletImpact[] = []; readonly backdrop = new HypotheticalBackdrop();
+    impacts: BulletImpact[] = []; readonly backdrop: HypotheticalBackdrop;
+    readonly route: HypotheticalSiege;
+    private readonly backdropOffset: number;
     armed = [0, 0]; snared = false; muzzle = 0; destroyed = 0; backgroundX = -70; backgroundStamp = 0;
-    wave = 0; waveReady = false; nextAct = false; volley = 0; heat = 0; reloadX = 0;
+    get wave() { return Math.min(3, this.route.cleared + 1); }
+    nextAct = false; volley = 0; heat = 0; reloadX = 0;
     chainStep = 0; followup: HypotheticalAttack | null = null;
     chainTotal=1; private adaptiveFinisher=false;
     motionFrom?:DinosaurMotion; motionSpeed=0; riderSway=0; private previousVelocity=0;
@@ -62,8 +66,16 @@ export class HypotheticalModel {
     private remainder = 0; private frameHazards: Rect[] = []; private sequence = 0;
     private bowFrom = 0;
     private weaponFrom=-.15;
-    private waveClock = 0; private waitedForWave = false;
-    constructor(readonly act: HypotheticalAct = 'chase', health: number = HYPOTHETICAL.health) {
+    constructor(readonly act: HypotheticalAct = 'chase', health: number = HYPOTHETICAL.health, cleared = 0) {
+        this.route = new HypotheticalSiege(cleared);
+        this.backdrop = new HypotheticalBackdrop(act === 'siege');
+        this.backdropOffset = act === 'siege' ? this.route.cleared * 400 : 0;
+        // A checkpoint preserves the ruined districts and advances the distant rider
+        // to the same street. Replaying only this deterministic scenery never creates
+        // foreground damage, emits old audio, or advances Feka's encounter clock.
+        for(let tick=1;tick<=this.backdropOffset;tick++)this.backdrop.update(tick);
+        this.destroyed = act === 'siege' ? this.route.cleared : 0;
+        this.backgroundX = this.backdrop.x;
         this.health = health;
         if (act === 'chase') { this.x = -18; this.facing = 1; }
         if (act === 'siege') this.state = 'rest';
@@ -108,7 +120,9 @@ export class HypotheticalModel {
     private get actionHint(): string {
         if (this.won) return 'HIPOTESE DERRUBADA! ENTER: REJOGAR';
         if (this.act === 'chase') return this.tick < 150 ? 'CORRA: SHIFT + DIREITA. PULE OS VAOS' : this.state === 'tell' ? 'RAJADA A FRENTE! CONTINUE CORRENDO' : 'A PONTE ESTA CAINDO. SIGA A DIREITA';
-        if (this.act === 'siege') return this.marks.length ? 'PEDRAS! SAIA DAS MARCAS NO CHAO' : this.waveReady ? 'REFORCOS CHEGANDO PELOS PORTOES' : 'DERROTE OS GUARDAS. USE AS SACADAS';
+        if (this.act === 'siege') return this.marks.length ? 'PEDRAS! SAIA DAS MARCAS NO CHAO' : !this.route.active
+            ? this.route.cleared ? this.route.passageOpen ? 'PASSAGEM LIVRE! SIGA PARA A DIREITA' : 'PORTAO ABRINDO. TRECHO SALVO' : 'PORTARIA ADIANTE. PREPARE O SALTO'
+            : 'DERROTE A PATRULHA PARA ABRIR O PORTAO';
         if (this.vulnerable) return this.snared ? 'PRESO NO CABO! PULE NO CAVALEIRO' : 'AGORA! PULE NO CAVALEIRO';
         if (this.state === 'recover') return 'ELE SE ABAIXA. APROXIME-SE';
         if (this.state === 'hurt') return 'UM LACRE DA SELA QUEBROU';
@@ -349,36 +363,33 @@ export class HypotheticalModel {
         if (player.x >= HYPOTHETICAL.chaseEnd) { this.nextAct = true; this.cancelAttacks(); }
     }
     private siege(player: Rect, livingGuards: number) {
-        this.backdrop.update(this.tick); this.backgroundX = this.backdrop.x;
+        this.route.update(player.x, livingGuards);
+        if (this.route.openedThisTick) {
+            this.shots = []; this.marks = []; this.frameHazards = []; this.emit('snare');
+        }
+        const backdropTick=this.tick+this.backdropOffset;
+        this.backdrop.update(backdropTick); this.backgroundX = this.backdrop.x;
         this.events.push(...this.backdrop.events);
-        if (this.destroyed < 3 && Math.floor(this.tick / 400) >= this.destroyed
-            && this.backgroundX + 44 >= 52 + this.destroyed * 112) {
+        if (this.destroyed < 3 && Math.floor(backdropTick / 400) >= this.destroyed
+            && this.backgroundX + 44 >= 52 + SIEGE_SECTORS[this.destroyed].origin) {
             this.destroyed++;
             this.backgroundStamp = 32; this.emit('break');
         }
-        if (this.tick > 160 && this.tick % 210 === 0 && livingGuards > 0) {
-            this.marks.push({ x: clamp(player.x + player.width / 2, 22, 298), born: this.tick }); this.emit('warning');
+        if (this.tick > 160 && this.tick % 210 === 0 && livingGuards > 0 && this.route.active) {
+            this.marks.push({ x: clamp(player.x + player.width / 2, 22, SIEGE_WIDTH - 22), born: this.tick }); this.emit('warning');
         }
         for (const mark of this.marks) if (this.tick - mark.born === 60) {
             this.shoot(mark.x - 4, 90, mark.x - 4, 220, 3.2, 'rubble');
         }
         this.marks = this.marks.filter(mark => this.tick - mark.born < 104);
-        if (livingGuards > 0) { this.waitedForWave = false; this.waveClock = 0; return; }
-        if (this.waveReady) return;
-        if (!this.waitedForWave) { this.waitedForWave = true; this.waveClock = 0; }
-        this.waveClock++;
-        if (this.waveClock >= 110) {
-            if (this.wave >= 3) { this.nextAct = true; this.cancelAttacks(); }
-            else { this.waveReady = true; this.wave++; this.emit('warning'); }
-        }
+        if (this.route.canExit(player.x)) { this.nextAct = true; this.cancelAttacks(); }
     }
-    consumeWave() { this.waveReady = false; this.waitedForWave = false; this.waveClock = 0; }
     private advanceShots() {
         for (const s of this.shots) {
             s.px = s.x; s.py = s.y; s.x += s.vx; s.y += s.vy; s.age++; s.life--;
             const swept = sweep(s, { ...s, x: s.px, y: s.py });
             if (s.kind === 'bullet') {
-                const walls = [...(this.act === 'chase' ? [] : ARENA_COVER), { x: -200, y: HYPOTHETICAL.floor, width: 2200, height: 64 }];
+                const walls = [...(this.act === 'duel' ? ARENA_COVER : []), { x: -200, y: HYPOTHETICAL.floor, width: 2200, height: 64 }];
                 const hits = walls.map(w => surfaceHit(s, w)).filter((h): h is NonNullable<typeof h> => !!h).sort((a, b) => a.t - b.t);
                 const hit = hits[0];
                 if (hit) {
@@ -397,7 +408,7 @@ export class HypotheticalModel {
             }
             this.frameHazards.push(swept);
         }
-        this.shots = this.shots.filter(s => s.life > 0 && s.x > -150 && s.x < (this.act === 'chase' ? 1760 : 440));
+        this.shots = this.shots.filter(s => s.life > 0 && s.x > -150 && s.x < (this.act === 'chase' ? 1760 : this.act === 'siege' ? SIEGE_WIDTH + 120 : 440));
     }
     contact(player: Rect, previous: Rect, falling: boolean): 'none' | 'hurt' | 'bounce' | 'hit' {
         if (this.won || this.nextAct) return 'none';

@@ -316,7 +316,7 @@ function drawDistantRider(c:CanvasRenderingContext2D,b:HypotheticalModel,base:nu
     if(!rig){const canvas=document.createElement('canvas');canvas.width=192;canvas.height=128;rig={canvas,c:canvas.getContext('2d')!};backgroundRigs.set(c,rig);}
     rig.c.clearRect(0,0,192,128);
     const r=BACKDROP_RIG;
-    drawHypotheticalDinosaur(rig.c,{x:92,y:122,facing:1,gait:(b.tick%400)*1.25/(r.scale*11),stride:1,breath:0,bow:0,jaw:b.backgroundStamp>0?.7:.2,neckDrop:0,recoil:action.recoil,aim:action.angle,tail:0,compression:0,tuck:0,reload:0,brace:0,heat:action.heat,cloth:2,blink:false,daze:0,armor:9,flash:false,defeated:false,distant:true,focus:action.muzzle?1:0,voice:b.backgroundStamp>20?.6:0});
+    drawHypotheticalDinosaur(rig.c,{x:92,y:122,facing:1,gait:(action.x+80)/(r.scale*11),stride:1,breath:0,bow:0,jaw:b.backgroundStamp>0?.7:.2,neckDrop:0,recoil:action.recoil,aim:action.angle,tail:0,compression:0,tuck:0,reload:0,brace:0,heat:action.heat,cloth:2,blink:false,daze:0,armor:9,flash:false,defeated:false,distant:true,focus:action.muzzle?1:0,voice:b.backgroundStamp>20?.6:0});
     // Downsample the completed sprite, rather than drawing fractional rectangles.
     // Every final edge still lands on the native pixel grid.
     const smoothing=c.imageSmoothingEnabled;c.imageSmoothingEnabled=false;
@@ -365,9 +365,11 @@ export function drawHypotheticalBackground(c:CanvasRenderingContext2D,b:Hypothet
     drawHypotheticalScenery(c,b,cx,cy,reduced);
     if(b.act==='siege'){
         const base=HYPOTHETICAL.floor-cy-8;
+        c.save();c.translate(-Math.round(cx),0);
         drawDistantRider(c,b,base);
         drawBystanders(c,b.backdrop,base,reduced);
         drawHypotheticalDestruction(c,b,base,reduced);
+        c.restore();
     }
 }
 

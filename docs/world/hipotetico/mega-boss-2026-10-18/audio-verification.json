@@ -1,9 +1,9 @@
 {
   "productionSynth": true,
   "weaponEffectsOnly": true,
-  "cues": 176,
-  "seconds": 111.8,
+  "cues": 173,
+  "seconds": 111.1,
   "peak": 0.09787113964557648,
-  "rms": 0.0030996846134701936,
+  "rms": 0.003109045669984654,
   "sampleRate": 48000
 }
