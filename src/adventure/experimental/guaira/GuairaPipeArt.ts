@@ -1,4 +1,5 @@
 import { box as r, type Point } from '../../WorldPainting';
+import { GUAIRA_FLOW_STEP, guairaFluidTime } from './GuairaFluidArt';
 
 export interface GuairaPipePalette {
     edge: string; brass: string; light: string; shade: string;
@@ -27,7 +28,6 @@ export function drawGuairaPipeSaddle(c: CanvasRenderingContext2D, x: number, y: 
     }
     c.restore();
 }
-const clock = (time: number, reduced: boolean) => reduced || !Number.isFinite(time) ? 0 : Math.max(0, time);
 
 /** Compile a pixel-centred route once. Distance continues through each bend;
  * a shared corner belongs to one step, never two independent animation loops. */
@@ -98,7 +98,7 @@ export function drawGuairaInclinedPipe(c: CanvasRenderingContext2D, route: reado
  * Safe inspection glass uses muted colours, never the damaging jet palette. */
 export function drawGuairaPipeFlow(c: CanvasRenderingContext2D, route: readonly Point[],
     cx: number, cy: number, time: number, reduced: boolean, color = GUAIRA_PIPE_COLORS.glint) {
-    const travel = Math.floor(clock(time, reduced) / 100) % 20;
+    const travel = Math.floor(guairaFluidTime(time, reduced) / GUAIRA_FLOW_STEP.pipe) % 20;
     const x = Math.round(cx), y = Math.round(cy);
     c.save();
     for (let head = travel - 20; head < route.length; head += 20)
@@ -125,17 +125,21 @@ export function drawGuairaPipe(c: CanvasRenderingContext2D, x: number, y: number
     c.save();
     at(0, 0, length, 9, p.edge); at(0, 1, length, 7, p.brass);
     at(1, 1, length - 2, 1, p.light); at(1, 7, length - 2, 1, p.shade);
-    for (let offset = 22; offset < length - 6; offset += 40) {
+    // End ferrules complete short links too. Their gasket grips only the metal;
+    // the three-pixel inspection channel is painted last, through every joint.
+    const collars=[0,length-5];
+    for(let offset=22;offset<length-10;offset+=40)collars.push(offset);
+    for (const offset of collars) {
         at(offset, -1, 5, 11, p.edge); at(offset + 1, 0, 3, 9, p.brass);
         at(offset + 1, 0, 2, 1, p.light); at(offset + 3, 1, 1, 7, p.shade);
         at(offset + 1, 1, 1, 1, p.light); at(offset + 1, 7, 1, 1, p.edge);
     }
     at(0, 3, length, 3, wet ? p.water : p.dry);
     if (wet && localFlow) {
-        const drift = Math.floor(clock(time, reduced) / 140) % 20;
+        const drift = Math.floor(guairaFluidTime(time, reduced) / GUAIRA_FLOW_STEP.pipe) % 20;
         for (let offset = -20; offset < length + 20; offset += 20) {
-            const head = offset + direction * drift, start = Math.max(0, head), end = Math.min(length, head + 3);
-            if (end > start) at(start, 4, end - start, 1, p.glint);
+            const head = offset + drift, start = Math.max(0, head), end = Math.min(length, head + 3);
+            if (end > start) at(direction===1?start:length-end, 4, end - start, 1, p.glint);
         }
     }
     c.restore();

@@ -7,8 +7,22 @@ const mode=process.env.GUAIRA_BACKGROUND_MODE||'scenes';
 const scenes=[['travessia','GuairaTraversal','GuairaTraversal',3000,55],['patio','junction/GuairaJunction','GuairaJunction',2900,50],
  ['respiros','respiros/GuairaRespiros','GuairaRespiros',3500,130],['subida','GuairaAscent','GuairaAscent',3860,-100],
  ['galeria','gallery/GuairaGallery','GuairaGallery',1920,35],['alivio','relief/GuairaRelief','GuairaRelief',900,190]];
+if(process.env.GUAIRA_BACKGROUND_PROFILE==='joins'){
+ const positions={travessia:[1730,50],patio:[1510,64],respiros:[1100,156],subida:[1330,-15],galeria:[980,100],alivio:[1540,195]};
+ for(const scene of scenes)[scene[3],scene[4]]=positions[scene[0]];
+}
+const reviewPath=process.env.GUAIRA_BACKGROUND_REVIEW_PATH||'/docs/world/guaira/backgrounds-2026-10-17/index.html';
+const chapter=process.env.GUAIRA_BACKGROUND_PROFILE==='chapter';
+if(chapter)scenes.push(['lab','GuairaBullLab','GuairaBullLab',0,64],['prefeito','GuairaMayorLab','GuairaMayorLab',0,64]);
+const entrances={travessia:[0,60],patio:[0,162],respiros:[0,144],subida:[0,162],galeria:[0,80],alivio:[0,176],lab:[0,64],prefeito:[0,64]};
+const joins={travessia:[1376,52],patio:[800,68],respiros:[992,164],subida:[1184,4],galeria:[544,52],alivio:[576,196]};
+const studies=chapter?[
+ ...scenes.map(([id,file,name])=>[id,file,name,...entrances[id],id==='lab'||id==='prefeito'?'arena':'entrada']),
+ ...scenes.filter(([id])=>joins[id]).map(([id,file,name])=>[id,file,name,...joins[id],'transicao']),
+ ...scenes.filter(([id])=>joins[id]).map(scene=>[...scene,'extensao'])
+]:scenes;
 (async()=>{
- fs.mkdirSync(out,{recursive:true});const browser=await chromium.launch({headless:true,channel:'msedge'}),report={kind:'browser-background-studies',mode,studies:[],review:[],errors:[]};
+ fs.mkdirSync(out,{recursive:true});const browser=await chromium.launch({headless:true,channel:'msedge'}),report={kind:'browser-background-studies',mode,profile:process.env.GUAIRA_BACKGROUND_PROFILE||'extended',studies:[],review:[],errors:[]};
  try{
   if(mode==='scenes')for(const reduced of [false,true]){
    const context=await browser.newContext({reducedMotion:reduced?'reduce':'no-preference',viewport:{width:1280,height:800}}),page=await context.newPage();
@@ -19,13 +33,13 @@ const scenes=[['travessia','GuairaTraversal','GuairaTraversal',3000,55],['patio'
    await page.goto(base+'/?chapter=guaira',{waitUntil:'networkidle'});
    await page.waitForFunction(()=>window.worldGame);
    await page.evaluate(()=>{window.worldGame.dispose();});
-   for(const[id,file,name,cx,cy]of scenes){
+   for(const[id,file,name,cx,cy,zone]of studies){
     const result=await page.evaluate(async({file,name,cx,cy})=>{
      const Scene=(await import('/src/adventure/experimental/guaira/'+file+'.ts'))[name];
      const canvas=document.createElement('canvas'),status=document.createElement('span');canvas.width=640;canvas.height=360;
      const g=new Scene(canvas,status);g.cancelFrame();g.running=false;
      const paint=document.createElement('canvas');paint.width=320;paint.height=180;const c=paint.getContext('2d');c.imageSmoothingEnabled=false;
-     const state=()=>JSON.stringify({p:g.player.data,o:g.objects,b:g.boss,c:g.camera,tiles:g.level.data.tiles,save:g.store.save});
+     const state=()=>JSON.stringify({p:g.player.data,o:g.objects,b:g.boss,m:g.mayor,c:g.camera,tiles:g.level.data.tiles,save:g.store.save});
      const render=()=>{const before=state();c.clearRect(0,0,320,180);g.art.background(c,{id:1},cx,cy,g.time);if(state()!==before)throw Error('Painting mutated game state');return paint.toDataURL();};
      g.time=g.objects.time=6400;const first=render();g.time=g.objects.time=23700;const later=render();
      g.time=g.objects.time=6400;const repeat=render();
@@ -39,13 +53,13 @@ const scenes=[['travessia','GuairaTraversal','GuairaTraversal',3000,55],['patio'
     },{file,name,cx,cy});
     assert.equal(result.reduced,reduced);assert.ok(result.readOnly&&result.repeatable&&result.paused&&result.pausePixels&&result.pauseState);
     if(reduced)assert.equal(result.moving,false);else if(id!=='galeria')assert.equal(result.moving,true);
-    fs.writeFileSync(path.join(out,id+(reduced?'-reduced':'')+'.png'),Buffer.from(result.png.split(',')[1],'base64'));delete result.png;
-    report.studies.push({id,authoredCamera:{cx,cy},...result});
+    fs.writeFileSync(path.join(out,id+(zone?'-'+zone:'')+(reduced?'-reduced':'')+'.png'),Buffer.from(result.png.split(',')[1],'base64'));delete result.png;
+    report.studies.push({id,zone,authoredCamera:{cx,cy},...result});
    }await context.close();
   }else{
    const page=await browser.newPage();page.on('pageerror',e=>report.errors.push(e.message));
    for(const width of [1440,390]){
-    await page.setViewportSize({width,height:width===390?844:1000});await page.goto(base+'/docs/world/guaira/backgrounds-2026-10-17/index.html',{waitUntil:'networkidle'});
+    await page.setViewportSize({width,height:width===390?844:1000});await page.goto(base+reviewPath,{waitUntil:'networkidle'});
     await page.waitForFunction(()=>[...document.images].every(i=>i.complete&&i.naturalWidth>0));
     const assets=await page.evaluate(()=>({fits:document.documentElement.scrollWidth<=innerWidth,images:document.images.length}));assert.ok(assets.fits);
     const variants=[];

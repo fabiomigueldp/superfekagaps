@@ -31,7 +31,7 @@ class Raster {
     get context() { return this as unknown as CanvasRenderingContext2D; }
     at(x: number,y: number) { return this.pixels[y*320+x]; }
 }
-const liquid = new Set<string>([P.water,P.waterShade,P.foam]);
+const liquid = new Set<string>([P.water,P.waterShade,P.waterLight,P.waterEdge,P.foam]);
 function fixture() { const stage=guairaReliefStage(); return {level:new WorldLevel(stage.level),objects:new WorldObjects(stage.mechanisms)}; }
 function objectsPaint(objects: WorldObjects,reduced=false) { const c=new Raster(); drawReliefObjects(c.context,objects,320,176,reduced); return c; }
 

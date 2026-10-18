@@ -1,0 +1,650 @@
+{
+  "scenes": [
+    {
+      "id": "travessia",
+      "controls": [
+        {
+          "id": "guaira-valve",
+          "x": 352,
+          "y": 216,
+          "width": 32,
+          "height": 8,
+          "target": "guaira-bridge",
+          "targetKind": "lift",
+          "targetPosition": {
+            "x": 416,
+            "y": 336,
+            "top": 224
+          },
+          "supported": true,
+          "standingSpan": [
+            0,
+            416
+          ],
+          "clearanceBefore": 352,
+          "clearanceAfter": 32,
+          "plaqueOverlappingPickups": [],
+          "guards": [],
+          "overheadTiles": []
+        },
+        {
+          "id": "guaira-rice-valve",
+          "x": 1072,
+          "y": 216,
+          "width": 32,
+          "height": 8,
+          "target": "guaira-rice-bridge",
+          "targetKind": "lift",
+          "targetPosition": {
+            "x": 1120,
+            "y": 336,
+            "top": 224
+          },
+          "supported": true,
+          "standingSpan": [
+            976,
+            1120
+          ],
+          "clearanceBefore": 96,
+          "clearanceAfter": 16,
+          "plaqueOverlappingPickups": [],
+          "guards": [],
+          "overheadTiles": []
+        },
+        {
+          "id": "guaira-travessia:course:bridge:784:valve",
+          "x": 2240,
+          "y": 184,
+          "width": 32,
+          "height": 8,
+          "target": "guaira-travessia:course:bridge:784",
+          "targetKind": "lift",
+          "targetPosition": {
+            "x": 2320,
+            "y": 304,
+            "top": 192
+          },
+          "supported": true,
+          "standingSpan": [
+            1936,
+            2320
+          ],
+          "clearanceBefore": 304,
+          "clearanceAfter": 48,
+          "plaqueOverlappingPickups": [],
+          "guards": [],
+          "overheadTiles": []
+        },
+        {
+          "id": "guaira-travessia:course:lock-outlet:valve",
+          "x": 2568,
+          "y": 40,
+          "width": 32,
+          "height": 8,
+          "target": "guaira-travessia:course:lock-outlet",
+          "targetKind": "jet",
+          "targetPosition": {
+            "x": 2464,
+            "y": 112,
+            "top": 112
+          },
+          "supported": true,
+          "standingSpan": [
+            2496,
+            2608
+          ],
+          "clearanceBefore": 72,
+          "clearanceAfter": 8,
+          "plaqueOverlappingPickups": [],
+          "guards": [
+            {
+              "id": "guaira-travessia:course:maintenance:guard",
+              "kind": "minion",
+              "x": 2544,
+              "range": 12
+            }
+          ],
+          "overheadTiles": []
+        }
+      ],
+      "waterLids": [],
+      "movingPlatforms": [
+        {
+          "id": "guaira-bridge",
+          "x": 416,
+          "y": 336,
+          "width": 208,
+          "manual": true
+        },
+        {
+          "id": "guaira-rice-bridge",
+          "x": 1120,
+          "y": 336,
+          "width": 240,
+          "manual": true
+        },
+        {
+          "id": "guaira-travessia:course:bridge:784",
+          "x": 2320,
+          "y": 304,
+          "width": 96,
+          "manual": true
+        }
+      ]
+    },
+    {
+      "id": "patio",
+      "controls": [
+        {
+          "id": "junction-entry-plate",
+          "x": 160,
+          "y": 296,
+          "width": 32,
+          "height": 8,
+          "target": "junction-middle-plate",
+          "targetKind": "switch",
+          "targetPosition": {
+            "x": 480,
+            "y": 248,
+            "top": 248
+          },
+          "supported": true,
+          "standingSpan": [
+            0,
+            224
+          ],
+          "clearanceBefore": 160,
+          "clearanceAfter": 32,
+          "plaqueOverlappingPickups": [],
+          "guards": [],
+          "overheadTiles": []
+        },
+        {
+          "id": "junction-middle-plate",
+          "x": 480,
+          "y": 248,
+          "width": 32,
+          "height": 8,
+          "target": "junction-entry-plate",
+          "targetKind": "switch",
+          "targetPosition": {
+            "x": 160,
+            "y": 296,
+            "top": 296
+          },
+          "supported": true,
+          "standingSpan": [
+            384,
+            576
+          ],
+          "clearanceBefore": 96,
+          "clearanceAfter": 64,
+          "plaqueOverlappingPickups": [],
+          "guards": [],
+          "overheadTiles": []
+        },
+        {
+          "id": "guaira-patio-comportas:course:bridge:752:valve",
+          "x": 1632,
+          "y": 200,
+          "width": 32,
+          "height": 8,
+          "target": "guaira-patio-comportas:course:bridge:752",
+          "targetKind": "lift",
+          "targetPosition": {
+            "x": 1712,
+            "y": 320,
+            "top": 208
+          },
+          "supported": true,
+          "standingSpan": [
+            1296,
+            1712
+          ],
+          "clearanceBefore": 336,
+          "clearanceAfter": 48,
+          "plaqueOverlappingPickups": [],
+          "guards": [],
+          "overheadTiles": []
+        },
+        {
+          "id": "guaira-patio-comportas:course:return-grate:valve",
+          "x": 2224,
+          "y": 104,
+          "width": 32,
+          "height": 8,
+          "target": "guaira-patio-comportas:course:return-grate",
+          "targetKind": "jet",
+          "targetPosition": {
+            "x": 2320,
+            "y": 80,
+            "top": 80
+          },
+          "supported": true,
+          "standingSpan": [
+            2208,
+            2272
+          ],
+          "clearanceBefore": 16,
+          "clearanceAfter": 16,
+          "plaqueOverlappingPickups": [],
+          "guards": [],
+          "overheadTiles": []
+        }
+      ],
+      "waterLids": [],
+      "movingPlatforms": [
+        {
+          "id": "junction-deck-a",
+          "x": 224,
+          "y": 400,
+          "width": 160,
+          "manual": true
+        },
+        {
+          "id": "junction-deck-b",
+          "x": 576,
+          "y": 400,
+          "width": 160,
+          "manual": true
+        },
+        {
+          "id": "junction-return-upper",
+          "x": 480,
+          "y": 264,
+          "width": 48,
+          "manual": false
+        },
+        {
+          "id": "junction-return-lower",
+          "x": 528,
+          "y": 264,
+          "width": 48,
+          "manual": false
+        },
+        {
+          "id": "guaira-patio-comportas:course:bridge:752",
+          "x": 1712,
+          "y": 320,
+          "width": 192,
+          "manual": true
+        },
+        {
+          "id": "guaira-patio-comportas:course:transfer-a",
+          "x": 3120,
+          "y": 256,
+          "width": 96,
+          "manual": false
+        },
+        {
+          "id": "guaira-patio-comportas:course:transfer-b",
+          "x": 3392,
+          "y": 256,
+          "width": 96,
+          "manual": false
+        }
+      ]
+    },
+    {
+      "id": "respiros",
+      "controls": [
+        {
+          "id": "guaira-respiro-c-isolation",
+          "x": 656,
+          "y": 184,
+          "width": 32,
+          "height": 8,
+          "target": "guaira-respiro-c",
+          "targetKind": "jet",
+          "targetPosition": {
+            "x": 704,
+            "y": 176,
+            "top": 176
+          },
+          "supported": true,
+          "standingSpan": [
+            640,
+            704
+          ],
+          "clearanceBefore": 16,
+          "clearanceAfter": 16,
+          "plaqueOverlappingPickups": [],
+          "guards": [],
+          "overheadTiles": []
+        },
+        {
+          "id": "guaira-respiros:course:workshop-grate:valve",
+          "x": 1984,
+          "y": 200,
+          "width": 32,
+          "height": 8,
+          "target": "guaira-respiros:course:workshop-grate",
+          "targetKind": "jet",
+          "targetPosition": {
+            "x": 2096,
+            "y": 176,
+            "top": 176
+          },
+          "supported": true,
+          "standingSpan": [
+            1968,
+            2032
+          ],
+          "clearanceBefore": 16,
+          "clearanceAfter": 16,
+          "plaqueOverlappingPickups": [],
+          "guards": [],
+          "overheadTiles": []
+        },
+        {
+          "id": "guaira-respiros:course:broken-bank:valve",
+          "x": 2832,
+          "y": 152,
+          "width": 32,
+          "height": 8,
+          "target": "guaira-respiros:course:broken-bank",
+          "targetKind": "jet",
+          "targetPosition": {
+            "x": 2944,
+            "y": 176,
+            "top": 176
+          },
+          "supported": true,
+          "standingSpan": [
+            2720,
+            2880
+          ],
+          "clearanceBefore": 112,
+          "clearanceAfter": 16,
+          "plaqueOverlappingPickups": [],
+          "guards": [
+            {
+              "id": "guaira-respiros:course:maintenance:guard",
+              "kind": "agitator",
+              "x": 2776,
+              "range": 0
+            }
+          ],
+          "overheadTiles": []
+        }
+      ],
+      "waterLids": [],
+      "movingPlatforms": [
+        {
+          "id": "guaira-respiros:course:pump-carriage",
+          "x": 3680,
+          "y": 256,
+          "width": 64,
+          "manual": false
+        }
+      ]
+    },
+    {
+      "id": "subida",
+      "controls": [
+        {
+          "id": "guaira-subida:course:bridge:800:valve",
+          "x": 2016,
+          "y": 136,
+          "width": 32,
+          "height": 8,
+          "target": "guaira-subida:course:bridge:800",
+          "targetKind": "lift",
+          "targetPosition": {
+            "x": 2144,
+            "y": 256,
+            "top": 96
+          },
+          "supported": true,
+          "standingSpan": [
+            1728,
+            2144
+          ],
+          "clearanceBefore": 288,
+          "clearanceAfter": 96,
+          "plaqueOverlappingPickups": [],
+          "guards": [],
+          "overheadTiles": []
+        }
+      ],
+      "waterLids": [],
+      "movingPlatforms": [
+        {
+          "id": "guaira-plank",
+          "x": 240,
+          "y": 304,
+          "width": 80,
+          "manual": false
+        },
+        {
+          "id": "guaira-service-lift",
+          "x": 672,
+          "y": 304,
+          "width": 80,
+          "manual": false
+        },
+        {
+          "id": "guaira-inspection-carriage",
+          "x": 896,
+          "y": 144,
+          "width": 80,
+          "manual": false
+        },
+        {
+          "id": "guaira-subida:course:bridge:800",
+          "x": 2144,
+          "y": 256,
+          "width": 192,
+          "manual": true
+        }
+      ]
+    },
+    {
+      "id": "galeria",
+      "controls": [
+        {
+          "id": "guaira-galeria:course:inspection-outlet:valve",
+          "x": 2896,
+          "y": 280,
+          "width": 32,
+          "height": 8,
+          "target": "guaira-galeria:course:inspection-outlet",
+          "targetKind": "jet",
+          "targetPosition": {
+            "x": 2784,
+            "y": 64,
+            "top": 64
+          },
+          "supported": true,
+          "standingSpan": [
+            2208,
+            3520
+          ],
+          "clearanceBefore": 688,
+          "clearanceAfter": 592,
+          "plaqueOverlappingPickups": [],
+          "guards": [
+            {
+              "id": "guaira-galeria:course:helmet:2112",
+              "kind": "helmet",
+              "x": 2816,
+              "range": 16
+            }
+          ],
+          "overheadTiles": []
+        }
+      ],
+      "waterLids": [],
+      "movingPlatforms": []
+    },
+    {
+      "id": "alivio",
+      "controls": [
+        {
+          "id": "guaira-camara-alivio:course:independent-ramal:valve",
+          "x": 960,
+          "y": 232,
+          "width": 32,
+          "height": 8,
+          "target": "guaira-camara-alivio:course:independent-ramal",
+          "targetKind": "jet",
+          "targetPosition": {
+            "x": 1056,
+            "y": 208,
+            "top": 208
+          },
+          "supported": true,
+          "standingSpan": [
+            944,
+            1008
+          ],
+          "clearanceBefore": 16,
+          "clearanceAfter": 16,
+          "plaqueOverlappingPickups": [],
+          "guards": [],
+          "overheadTiles": []
+        },
+        {
+          "id": "guaira-camara-alivio:course:counterpressure-b:valve",
+          "x": 2656,
+          "y": 200,
+          "width": 32,
+          "height": 8,
+          "target": "guaira-camara-alivio:course:counterpressure-b",
+          "targetKind": "jet",
+          "targetPosition": {
+            "x": 2704,
+            "y": 208,
+            "top": 208
+          },
+          "supported": true,
+          "standingSpan": [
+            2624,
+            2688
+          ],
+          "clearanceBefore": 32,
+          "clearanceAfter": 0,
+          "plaqueOverlappingPickups": [],
+          "guards": [
+            {
+              "id": "guaira-camara-alivio:course:helmet:1904",
+              "kind": "helmet",
+              "x": 2640,
+              "range": 10
+            }
+          ],
+          "overheadTiles": []
+        },
+        {
+          "id": "guaira-camara-alivio:course:collector-outlet:valve",
+          "x": 2072,
+          "y": 200,
+          "width": 32,
+          "height": 8,
+          "target": "guaira-camara-alivio:course:collector-outlet",
+          "targetKind": "jet",
+          "targetPosition": {
+            "x": 2176,
+            "y": 208,
+            "top": 208
+          },
+          "supported": true,
+          "standingSpan": [
+            1920,
+            2112
+          ],
+          "clearanceBefore": 152,
+          "clearanceAfter": 8,
+          "plaqueOverlappingPickups": [],
+          "guards": [
+            {
+              "id": "guaira-camara-alivio:course:maintenance:guard",
+              "kind": "rail",
+              "x": 2000,
+              "range": 32
+            }
+          ],
+          "overheadTiles": []
+        }
+      ],
+      "waterLids": [
+        {
+          "x": 240,
+          "y": 160,
+          "width": 48,
+          "height": 16
+        }
+      ],
+      "movingPlatforms": []
+    },
+    {
+      "id": "prefeito",
+      "controls": [
+        {
+          "id": "guaira-mayor-register",
+          "x": 64,
+          "y": 216,
+          "width": 32,
+          "height": 8,
+          "target": "guaira-mayor-upper-register",
+          "targetKind": "switch",
+          "targetPosition": {
+            "x": 232,
+            "y": 152,
+            "top": 152
+          },
+          "supported": true,
+          "standingSpan": [
+            0,
+            320
+          ],
+          "clearanceBefore": 64,
+          "clearanceAfter": 224,
+          "plaqueOverlappingPickups": [],
+          "guards": [],
+          "overheadTiles": []
+        },
+        {
+          "id": "guaira-mayor-upper-register",
+          "x": 232,
+          "y": 152,
+          "width": 28,
+          "height": 8,
+          "target": "guaira-mayor-register",
+          "targetKind": "switch",
+          "targetPosition": {
+            "x": 64,
+            "y": 216,
+            "top": 216
+          },
+          "supported": true,
+          "standingSpan": [
+            224,
+            316
+          ],
+          "clearanceBefore": 8,
+          "clearanceAfter": 56,
+          "plaqueOverlappingPickups": [],
+          "guards": [],
+          "overheadTiles": []
+        }
+      ],
+      "waterLids": [],
+      "movingPlatforms": [
+        {
+          "id": "guaira-mayor-lift",
+          "x": 112,
+          "y": 224,
+          "width": 112,
+          "manual": true
+        }
+      ]
+    },
+    {
+      "id": "lab",
+      "controls": [],
+      "waterLids": [],
+      "movingPlatforms": []
+    }
+  ]
+}

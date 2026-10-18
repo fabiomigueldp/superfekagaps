@@ -57,7 +57,7 @@ export class WorldFoe implements Rect {
     }
     private enter(phase: FoePhase) { this.phase = phase; this.timer = 0; }
     get canal() { return this.spec.behavior === 'canal'; }
-    get warningDuration() { return this.spec.kind === 'minion' ? 450 : this.spec.kind === 'loader' ? 850 : this.spec.kind === 'rail' ? 550 : 800; }
+    get warningDuration(): number { return this.spec.kind === 'minion' ? 450 : this.spec.kind === 'loader' ? 850 : this.spec.kind === 'rail' ? 550 : 800; }
     get highThrow() { return this.canal && this.throws % 2 === 1; }
     /** A moving trolley locks its roof; braking exposes the rider. Ground
      * pounds still break either guard, using the campaign's ordinary contact. */

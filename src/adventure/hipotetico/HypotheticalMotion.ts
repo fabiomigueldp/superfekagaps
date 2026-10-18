@@ -1,0 +1,93 @@
+import type { HypotheticalModel } from './HypotheticalModel';
+import type { Point } from '../WorldPainting';
+
+const unit = (n: number) => Math.max(0, Math.min(1, n));
+export const smoothMotion = (n: number) => { const t = unit(n); return t * t * (3 - 2 * t); };
+export interface DinosaurMotion {
+    compression:number; tuck:number; stride:number; jaw:number; tail:number; recoil:number;
+    reload:number; brace:number; neckDrop:number; saddle:number; riderDrop:number; riderLean:number; rein:number;
+}
+
+/** Shared skeletal timing: the renderer and combat read the same moving anchors. */
+export function hypotheticalMotion(b: HypotheticalModel): DinosaurMotion {
+    const attacking = b.state === 'attack', telling = b.state === 'tell';
+    const wind = telling ? smoothMotion(b.age / b.warningTicks) : 0;
+    const leap = attacking && b.attack === 'leap';
+    const tuck = leap && b.age < 58 ? Math.sin(Math.PI * b.age / 58) : 0;
+    const landing = leap && b.age >= 58 ? 1 - smoothMotion((b.age - 58) / 20) : 0;
+    const compression = b.attack === 'leap' ? wind * 6 + landing * 7 + tuck * 10
+        : b.attack === 'charge' ? wind * 4 + (b.state === 'turn' ? (1 - smoothMotion(b.age / 26)) * 5 : 0) : 0;
+    const walking = b.act === 'chase' && b.tick >= 60 || b.state === 'reload' || attacking && (b.attack === 'charge' || b.attack === 'bite' && b.age < 24);
+    const stride = walking ? Math.min(1,Math.abs(b.velocity)/2.8) : 0;
+    const bite = b.attack === 'bite' && attacking;
+    const jaw = bite ? 1 - smoothMotion((b.age - 20) / 9)
+        : b.attack === 'bite' && telling ? .2 + wind * .7 : b.state === 'roar' ? .35 + Math.sin(b.age / 105 * Math.PI) * .6 : .12;
+    const tail = b.attack !== 'tail' ? 0 : telling ? -wind * .45
+        : attacking ? b.age < 12 ? -.45 + smoothMotion(b.age / 12) * 1.45
+            : b.age <= 32 ? 1 : 1 - smoothMotion((b.age - 32) / 20) : 0;
+    const recoil = b.muzzle > 0 ? 3.5 * smoothMotion(b.muzzle / 5) : 0;
+    const reload = b.state === 'reload' ? Math.sin(Math.PI * unit(b.age / 24)) : 0;
+    const brace=b.state==='turn'?Math.sin(Math.PI*unit(b.age/38))*.85
+        :attacking&&b.attack==='charge'&&b.age>=34?Math.sin(Math.PI*unit((b.age-34)/16))*.7
+        :b.attack==='rifle'&&(attacking||telling)?(attacking?.35:wind*.35):0;
+    const riding = b.act==='chase'||['charge','leap','bite'].includes(b.attack);
+    const rein = riding ? attacking || b.act==='chase' ? 1 : wind : 0;
+    const riderLean = (1-b.bow)*Math.max(-5,Math.min(6,b.motionSpeed*.7+b.riderSway));
+    const riderDrop = tuck*18 + (b.attack==='charge'?(attacking?7:wind*7):0) + landing*3;
+    const target = {compression,tuck,stride,jaw,tail,recoil,reload,brace,
+        neckDrop:bite?22*Math.sin(unit(b.age/45)*Math.PI):b.attack==='charge'?(attacking?8:wind*8):0,
+        riderDrop,riderLean,rein,saddle:0};
+    // Capture the previous posture at a state boundary. Anticipation becomes
+    // takeoff, bracing or recovery without resetting the body to its idle pose.
+    const from=b.motionFrom,t=smoothMotion(b.age/8);
+    if(from&&t<1)for(const key of ['compression','jaw','tail','brace','neckDrop','riderDrop','rein'] as const)
+        target[key]=from[key]+(target[key]-from[key])*t;
+    target.saddle=-64+b.bow*39+target.compression;
+    return target;
+}
+
+/** Upper-body bend around the seated hips; the rifle stays rigid at its shoulder anchor. */
+export const riderBend = (height:number,lean:number) => lean*Math.max(0,Math.min(1.4,height/28));
+
+/** Bend above the seated hips. Crouching and recoil cannot slide the waist through the saddle. */
+export function riderTorsoPoint(point: Point, rider: number, drop: number, shift: number, lean: number): Point {
+    const height = rider - point[1], upper = unit(height / 20);
+    return [point[0] + riderBend(height, lean) + shift * (1 - upper), point[1] - drop * (1 - upper)];
+}
+
+/** A long planted stance followed by a shorter airborne return; feet do not slide sinusoidally. */
+export function dinosaurFoot(gait: number, offset: number, stride: number, tuck: number): Point {
+    const t = ((gait / (Math.PI * 2) + offset) % 1 + 1) % 1;
+    const stance = .62, swing = unit((t - stance) / (1 - stance));
+    // Gait advances one radian per eleven travelled pixels. The stance travels
+    // back by precisely the ground distance, so a planted foot stays planted.
+    const reach = Math.PI * 2 * 11 * stance / 2;
+    const x = t < stance ? reach - 2 * reach * t / stance : -reach + 2 * reach * smoothMotion(swing);
+    return [x * stride + tuck * 8, -Math.sin(swing * Math.PI) * 12 * stride - tuck * 18];
+}
+
+/** Sole center shared by the articulated leg and the actual footfall particles. */
+export function dinosaurFootAnchor(gait: number, rear: boolean, stride: number, tuck: number, brace: number): Point {
+    const foot = dinosaurFoot(gait, rear ? .5 : 0, stride, tuck);
+    const step = foot[0] * (1 - brace) + (rear ? -6 : 12) * brace;
+    const lift = -foot[1] * (1 - brace);
+    return [step, -lift];
+}
+
+/** Fixed thigh/shin lengths around the same planted or tucked foot anchor. */
+export function dinosaurLeg(body: number, gait: number, rear: boolean, stride: number, tuck: number, brace: number) {
+    const foot = dinosaurFootAnchor(gait, rear, stride, tuck, brace);
+    const hip: Point = [rear ? -5 : -12, body + 6];
+    const hock: Point = [foot[0] - 5, foot[1] - 9];
+    const dx = hock[0] - hip[0], dy = hock[1] - hip[1];
+    const distance = Math.max(.001, Math.hypot(dx, dy)), thigh = 20, shin = 22;
+    const along = Math.max(-thigh, Math.min(thigh, (thigh * thigh - shin * shin + distance * distance) / (2 * distance)));
+    const bend = Math.sqrt(Math.max(0, thigh * thigh - along * along));
+    const knee: Point = [hip[0] + (dx * along + dy * bend) / distance, hip[1] + (dy * along - dx * bend) / distance];
+    return { hip, knee, hock, foot };
+}
+
+/** The distal tail is both painted and sampled for collision; no invisible floor-wide rectangle. */
+export function dinosaurTail(body: number, stroke: number): readonly Point[] {
+    return [[-22, body + 11], [-44, body + 11 + stroke * 18], [-82, body + 1 + stroke * 32]];
+}

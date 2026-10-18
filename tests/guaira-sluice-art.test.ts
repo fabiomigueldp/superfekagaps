@@ -1,3 +1,4 @@
+import { GUAIRA_FLOW_STEP as STEP } from '../src/adventure/experimental/guaira/GuairaFluidArt';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
@@ -78,9 +79,9 @@ test('pulley position is fixed, rotation follows displacement and fractional cam
 test('opening the shutter reveals a fixed falling stream instead of pulling its reflections upward', () => {
     for (let step=0; step<20; step++) {
         const closed=raster(),open=raster(),later=raster();
-        drawGuairaSluiceFlow(closed.c,30,100,170,true,step*90,false,100);
-        drawGuairaSluiceFlow(open.c,30,89,170,true,step*90,false,100);
-        drawGuairaSluiceFlow(later.c,30,89,170,true,(step+1)*90,false,100);
+        drawGuairaSluiceFlow(closed.c,30,100,170,true,step*STEP.falling,false,100);
+        drawGuairaSluiceFlow(open.c,30,89,170,true,step*STEP.falling,false,100);
+        drawGuairaSluiceFlow(later.c,30,89,170,true,(step+1)*STEP.falling,false,100);
         for (let y=101; y<169; y++) for (let x=47; x<65; x++) {
             assert.equal(open.pixels.get(`${x},${y}`),closed.pixels.get(`${x},${y}`));
             assert.equal(later.pixels.get(`${x},${y}`),open.pixels.get(`${x},${y-1}`),'water advances down one pixel, including the wrap');
@@ -126,12 +127,12 @@ test('completed crossing keeps ambient water alive without advancing mechanisms,
 test('reservoir currents approach the outlet and descend through the coping without a wrap jump', () => {
     const paint=(time:number,reduced=false)=>{const p=raster();drawGuairaReservoirFlow(p.c,20,30,true,time,reduced);assert.ok(p.balanced());return p.pixels;};
     for(let step=0;step<23;step++) {
-        const a=paint(step*200),b=paint((step+1)*200);
+        const a=paint(step*STEP.surface),b=paint((step+1)*STEP.surface);
         for(let x=35;x<61;x++) assert.equal(b.get(`${x},37`),a.get(`${x-1},37`),'left current approaches throat');
         for(let x=63;x<89;x++) assert.equal(b.get(`${x},37`),a.get(`${x+1},37`),'right current approaches throat');
     }
     for(let step=0;step<14;step++) {
-        const a=paint(step*140),b=paint((step+1)*140);
+        const a=paint(step*STEP.falling),b=paint((step+1)*STEP.falling);
         for(let y=44;y<56;y++) for(let x=55;x<69;x++)
             assert.equal(b.get(`${x},${y}`),a.get(`${x},${y-1}`),'throat flows down through the repeat seam');
     }

@@ -3,12 +3,13 @@ import { drawGuairaLandscape } from './GuairaScenery';
 import { drawGuairaClayGrain, drawGuairaTimber } from './GuairaMaterials';
 import { drawMayorTown, drawMayorCivicRoom, drawMayorReserve } from './GuairaMayorTownArt';
 import { drawGuairaPipe, drawGuairaPipeElbow, drawGuairaPipeFlow, drawGuairaPipeSaddle, guairaPipeRoute } from './GuairaPipeArt';
-import { drawGuairaPoolFlow } from './GuairaWaterworksArt';
+import { drawGuairaDrainSurface, drawGuairaSpoutFlow } from './GuairaWaterworksArt';
+import { drawGuairaControlBase } from './GuairaControlArt';
 
 /** Architecture surrounds the five actual native mechanisms. */
 export const MAYOR_ART_OBJECTS = Object.freeze({valve:'guaira-mayor-register',lift:'guaira-mayor-lift',deck:'guaira-mayor-deck',upperValve:'guaira-mayor-upper-register',refuge:'guaira-mayor-refuge'});
-interface Body extends MayorRect { readonly kind:string; readonly active:boolean; readonly home?:{readonly x:number;readonly y:number};readonly to?:{readonly x:number;readonly y:number} }
-interface Bodies { get(id:string):Body|undefined }
+interface Body extends MayorRect { readonly kind:string; readonly active:boolean; readonly changedAt?:number; readonly home?:{readonly x:number;readonly y:number};readonly to?:{readonly x:number;readonly y:number} }
+interface Bodies { readonly time?:number; get(id:string):Body|undefined }
 type MechanismCue='waiting'|'register'|'rising'|'ready'|'released';
 /** A moving lift alone is not a fresh opening: the encounter owns that decision. */
 function mechanismCue(m:GuairaMayorArtState):MechanismCue {
@@ -110,15 +111,27 @@ export function drawGuairaMayorBackground(c:CanvasRenderingContext2D,m:GuairaMay
         }
         if(m.publicWaterOpen){r(240,189,24,10,'#497f7d');r(242,192,20,5,PIPE.water);r(242,192,18,1,PIPE.glint);}
         word(c,'BAIRRO',46-cx,199-cy,'#6c5e4d');
-        // A recessed public trough: dark rim, intentionally no walkable pale highlight.
-        r(10,205,92,9,'#9e7859');r(12,206,88,6,'#785e50');r(15,207,82,4,'#b58b62');
-        if(m.publicWaterOpen){
-            r(35,203,3,5,PIPE.glint);r(16,207,81,4,'#497f7d');r(18,207,77,2,PIPE.water);
-            drawGuairaPoolFlow(c,18-cx,95-cx,207-cy,true,t,reducedMotion,36-cx);
-        }else{
-            line(c,26-cx,207-cy,30-cx,210-cy,'#795e4e');line(c,57-cx,207-cy,62-cx,210-cy,'#795e4e');
-            r(31,198,11,6,'#745a4b');r(33,199,7,3,M.sash);
+        // The basin sits on two short stone feet on the actual plaza floor.
+        // A dark lip and recessed water keep it distinct from a platform cap.
+        for(const xx of [19,86]){
+            r(xx,219,8,5,'#89745b');r(xx+1,219,5,4,'#b49b75');r(xx-1,223,10,1,'#8f775a');
         }
+        r(10,211,92,9,'#9e7859');r(12,212,88,6,'#785e50');r(15,213,82,4,'#b58b62');
+        r(12,218,88,2,'#947051');r(16,219,80,1,'#b18a64');
+        if(m.publicWaterOpen){
+            r(16,213,81,4,'#497f7d');r(18,213,77,2,PIPE.water);
+            drawGuairaSpoutFlow(c,35-cx,204-cy,214-cy,t,reducedMotion);
+            drawGuairaDrainSurface(c,18-cx,95-cx,213-cy,36-cx,t,reducedMotion);
+        }else{
+            line(c,26-cx,213-cy,30-cx,216-cy,'#795e4e');line(c,57-cx,213-cy,62-cx,216-cy,'#795e4e');
+        }
+        // A permanent cast lip receives the pipe. The seal covers its opening
+        // until the real final release, while the stream starts inside the mouth.
+        for(const xx of [30,38]){
+            r(xx,199,5,3,PIPE.edge);r(xx+1,199,4,1,PIPE.light);r(xx+1,200,4,1,PIPE.brass);
+        }
+        r(32,202,3,3,PIPE.shade);r(38,202,3,3,PIPE.shade);r(33,202,1,2,PIPE.light);
+        if(!m.publicWaterOpen){r(35,202,3,3,M.sash);r(34,202,5,1,M.woodLight);}
     });
 }
 
@@ -231,7 +244,11 @@ export function drawGuairaMayorObjects(c:CanvasRenderingContext2D,objects:Bodies
         }
         for(const control of [valve,upperValve])if(control){
             const x=Math.round(control.x)-cx,y=Math.round(control.y)-cy,w=Math.round(control.width),h=Math.round(control.height);
-            rect(c,x,y,w,h,P.woodShade);rect(c,x+1,y+1,w-2,h-2,M.bronzeShade);rect(c,x+2,y+1,w-4,2,M.bronzeLight);
+            // Same cast treadles as the chapter. Their low inlays remain owned
+            // by the encounter, with no plaque in the dangerous upper seam.
+            const progress=lift?Math.max(0,Math.min(1,(224-lift.y)/64)):0;
+            drawGuairaControlBase(c,control,cx,cy,objects.time??m.tick*1000/60,_reducedMotion,
+                seamBusy?'warning':cue==='waiting'?'locked':cue==='register'?'available':cue==='rising'?'moving':'settled',progress);
             rect(c,x+5,y+3,w-10,Math.max(1,h-4),pressure?M.waterShade:M.sash);
             const mx=x+Math.floor(w/2),color=pressure?M.waterLight:M.creamLight;
             if(cue==='register'){

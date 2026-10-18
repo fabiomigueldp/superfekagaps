@@ -1,10 +1,12 @@
 import {box as r,pixelLine as line,oval} from '../../WorldPainting';
 import {pixelText} from '../../../graphics/BitmapFont';
 import {GUAIRA_COURSES,GUAIRA_MAINTENANCE_ROUTES,type GuairaCourseId} from './GuairaCourseDesign';
+import type {WorldLevel} from '../../WorldPhysics';
+import {drawGuairaFixedScaffold} from './GuairaScaffoldArt';
 
 /** Rear structures explain the real decks without painting extra platforms.
  * Moving danger is drawn by the native enemies and connected hydraulic outlet. */
-export function drawGuairaMaintenanceLandscape(c:CanvasRenderingContext2D,id:GuairaCourseId,cx:number,cy:number){
+export function drawGuairaMaintenanceLandscape(c:CanvasRenderingContext2D,id:GuairaCourseId,cx:number,cy:number,level:WorldLevel){
     const d=GUAIRA_MAINTENANCE_ROUTES[id];if(!d)return;
     const g=GUAIRA_COURSES[id],x=g.start-Math.round(cx),f=g.floor-Math.round(cy),y=d.top-Math.round(cy);
     if(x+d.end<0||x+d.entry>320)return;
@@ -18,11 +20,7 @@ export function drawGuairaMaintenanceLandscape(c:CanvasRenderingContext2D,id:Gua
         r(c,a+25,y+17,59,13,'#aaa07e');pixelText(c,'ECLUSA',a+55,y+20,'#797b62',1,'center');
         for(const [l,rr,top,falling]of [...d.decks,...d.returns]){
             if(falling||top===d.top)continue;
-            const yy=top+6-Math.round(cy);
-            for(const xx of [x+l+4,x+rr-7]){
-                r(c,xx,yy,3,f+16-yy,'#9b896c');r(c,xx+1,yy,1,f+16-yy,'#b9a47e');
-                line(c,xx,yy+22,xx+(xx===x+l+4?16:-16),yy+2,'#9e8b6d',2);
-            }
+            drawGuairaFixedScaffold(c,level,g.start+l,g.start+rr,top,cx,cy);
         }
         return;
     }
@@ -52,10 +50,6 @@ export function drawGuairaMaintenanceLandscape(c:CanvasRenderingContext2D,id:Gua
     }
     for(const [l,rr,top,falling]of [...d.decks,...d.returns]){
         if(falling)continue;
-        const yy=top+6-Math.round(cy),height=Math.max(0,f-yy);
-        for(const xx of [x+l+4,x+rr-7]){
-            r(c,xx,yy,3,height,'#9b896c');r(c,xx+1,yy,1,height,'#b9a47e');
-            line(c,xx,yy+22,xx+(xx===x+l+4?16:-16),yy+2,'#9e8b6d',2);
-        }
+        drawGuairaFixedScaffold(c,level,g.start+l,g.start+rr,top,cx,cy);
     }
 }

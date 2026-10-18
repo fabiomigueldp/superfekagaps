@@ -1,0 +1,82 @@
+{
+  "viewports": [
+    {
+      "width": 1440,
+      "fits": true,
+      "variants": [
+        {
+          "id": "bica",
+          "width": 1280,
+          "height": 672,
+          "duration": 8.4,
+          "time": 2.66515,
+          "error": null
+        },
+        {
+          "id": "retorno",
+          "width": 1280,
+          "height": 672,
+          "duration": 8.4,
+          "time": 2.668805,
+          "error": null
+        },
+        {
+          "id": "respiros",
+          "width": 1280,
+          "height": 672,
+          "duration": 8.4,
+          "time": 2.670075,
+          "error": null
+        },
+        {
+          "id": "isolamento",
+          "width": 1280,
+          "height": 672,
+          "duration": 8.4,
+          "time": 0.636758,
+          "error": null
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "fits": true,
+      "variants": [
+        {
+          "id": "bica",
+          "width": 1280,
+          "height": 672,
+          "duration": 8.4,
+          "time": 2.656388,
+          "error": null
+        },
+        {
+          "id": "retorno",
+          "width": 1280,
+          "height": 672,
+          "duration": 8.4,
+          "time": 2.669352,
+          "error": null
+        },
+        {
+          "id": "respiros",
+          "width": 1280,
+          "height": 672,
+          "duration": 8.4,
+          "time": 2.664077,
+          "error": null
+        },
+        {
+          "id": "isolamento",
+          "width": 1280,
+          "height": 672,
+          "duration": 8.4,
+          "time": 0.624672,
+          "error": null
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

@@ -1,4 +1,6 @@
-import { box as r, pixelLine as line, roof } from '../../../WorldPainting';
+import { box as r, pixelLine as line, polygon } from '../../../WorldPainting';
+import { drawGuairaControl, guairaLinkedControl } from '../GuairaControlArt';
+import { drawGuairaTiledRoof, drawGuairaFacadeFinish } from '../GuairaBuildingFinish';
 import { jetCycle, type JetCycle } from '../../../WorldMachineState';
 import type { MovingBody, WorldLevel, WorldObjects } from '../../../WorldPhysics';
 import { pixelText } from '../../../../graphics/BitmapFont';
@@ -9,6 +11,7 @@ import { drawGuairaRicePlant } from '../GuairaRiceArt';
 import { drawGuairaClayGrain, drawGuairaPlaster } from '../GuairaMaterials';
 import { drawGuairaPipe, drawGuairaPipeElbow, drawGuairaPipeFlow, drawGuairaPipeSaddle, guairaPipeRoute, type GuairaPipePalette } from '../GuairaPipeArt';
 import { drawGuairaRiceFlow } from '../GuairaWaterworksArt';
+import { drawGuairaPressureResidue, drawGuairaRisingWater } from '../GuairaFluidArt';
 import { drawGuairaLandscape, drawGuairaTree, drawGuairaFieldBank, drawGuairaAwning } from '../GuairaScenery';
 
 const P = Object.freeze({
@@ -62,7 +65,11 @@ export function drawRespirosBackground(c: CanvasRenderingContext2D, cx: number, 
     layer(c, cx, cy, (rawX, rawY) => {
         const cameraX = Math.round(rawX), cameraY = Math.round(rawY), t = reducedMotion ? 0 : finite(time);
         drawGuairaLandscape(c, cameraX, cameraY, t, reducedMotion, 'rice');
-        r(c, 0, 231 - cameraY, 320, 64, '#c4946c');
+        // The old paddy bank descends into the extended district. A screen-wide
+        // rectangle here used to end as a 64px vertical cut at world x1152.
+        polygon(c,[[0-cameraX,231-cameraY],[1088-cameraX,231-cameraY],
+            [1136-cameraX,260-cameraY],[1152-cameraX,304-cameraY],
+            [0-cameraX,304-cameraY]],'#c4946c');
         for (const [x, y, width] of [[120,244,124],[253,234,110],[372,239,120],[502,247,112],[678,240,128],[822,245,148],[980,239,124]] as const) {
             drawGuairaFieldBank(c, x - cameraX, y + 5 - cameraY, width, 295 - cameraY);
             riceBed(c, x - cameraX, y - cameraY, width, 0, t, x);
@@ -73,8 +80,9 @@ export function drawRespirosBackground(c: CanvasRenderingContext2D, cx: number, 
         const hx = 18 - cameraX, hy = 207 - cameraY;
         drawGuairaTree(c, 5 - cameraX, 282 - cameraY, 70, t, 5, true);
         r(c, hx + 3, hy + 13, 78, 65, '#b79677');
-        r(c, hx + 4, hy + 14, 66, 62, '#dac099'); roof(c, hx, hy, 87, 16);
+        r(c, hx + 4, hy + 14, 66, 62, '#dac099'); drawGuairaTiledRoof(c, hx, hy, 87);
         drawGuairaPlaster(c, hx + 4, hy + 17, 66, 59, 4);
+        drawGuairaFacadeFinish(c,hx,hy+17,87,hy+78);
         r(c, hx + 15, hy + 39, 21, 38, '#846b58'); r(c, hx + 17, hy + 40, 17, 35, '#625a50');
         r(c, hx + 18, hy + 40, 2, 35, '#a18763');
         drawGuairaAwning(c, hx + 13, hy + 36, 25, t, 31);
@@ -98,7 +106,9 @@ export function drawRespirosBackground(c: CanvasRenderingContext2D, cx: number, 
         const exitOffset = G.finishX - 656;
         const sx = 631 + exitOffset - cameraX, sy = 226 - cameraY;
         r(c, sx + 2, sy + 13, 54, 55, '#b49775'); r(c, sx + 3, sy + 14, 44, 53, '#d5b991');
-        roof(c, sx - 2, sy, 62, 16); r(c, sx + 15, sy + 37, 18, 30, '#827157');
+        drawGuairaTiledRoof(c, sx - 2, sy, 62);
+        drawGuairaFacadeFinish(c,sx,sy+17,58,sy+68);
+        r(c, sx + 15, sy + 37, 18, 30, '#827157');
         r(c, sx + 17, sy + 39, 14, 28, '#675d4e');
         for (const x of [592,613,638,670,695]) {
             r(c, x + exitOffset - cameraX, 276 - cameraY, 2, 15, '#927b5f');
@@ -245,6 +255,12 @@ function grate(c: CanvasRenderingContext2D, b: MovingBody, s: JetCycle, cx: numb
         // A zero-height first rising frame still announces imminent discharge.
         r(c, px + 5, py + 3, 3, 1, P.cap); r(c, px + 4, py + 4, 5, 1, P.cap);
         r(c, px + 3, py + 5, 7, 1, P.cap); r(c, px + 5, py + 6, 3, 3, P.cap);
+    } else if (b.active) {
+        // A closed register is not a quiet moment between discharges. Repeat
+        // the treadle's crossed-out streams at the receiving gauge, using
+        // shape as well as enamel so the result survives distance and pause.
+        for (const dx of [3,6,9]) r(c,px+dx,py+3,1,7,P.cap);
+        r(c,px+2,py+5,9,3,P.brassLight); r(c,px+3,py+6,7,1,P.ink);
     } else {
         r(c, px + 4, py + 6, 5, 1, P.brassLight);
     }
@@ -252,35 +268,14 @@ function grate(c: CanvasRenderingContext2D, b: MovingBody, s: JetCycle, cx: numb
 
 function pressureWater(c: CanvasRenderingContext2D, s: JetCycle, cx: number, cy: number, time: number, reducedMotion: boolean) {
     if (!s.danger) return;
-    const d = s.danger, left = Math.floor(d.x - cx), top = Math.floor(d.y - cy);
-    const right = Math.ceil(d.x + d.width - cx), bottom = Math.ceil(d.y + d.height - cy);
-    const width = right - left, height = bottom - top;
-    // Outward rasterisation covers every intersecting pixel, including the
-    // first/last 1px danger frame and fractional cameras. Texture never erases it.
-    r(c, left, top, width, height, W.body);
-    r(c, left, top, 1, height, W.edge); r(c, right - 1, top, 1, height, W.edge);
-    const textureTime = reducedMotion || !Number.isFinite(time) ? 0 : Math.max(0,time);
-    const drift = Math.floor(textureTime / 70) % 22;
-    for (let dx = 4; dx < width - 2; dx += 12) {
-        const band = 2 + Math.floor(dx / 12) % 3;
-        r(c, left + dx, top, Math.min(band, width - dx - 1), height, W.shade);
-        // Upward trails are anchored at the fixed nozzle, not the changing top.
-        // Spacing and wrap both use 22px: no backward jump when a cycle repeats.
-        for (let yy = bottom + 22 - dx % 22 - drift; yy > top - 22; yy -= 22) {
-            const start = Math.max(top+2,yy-8), end = Math.min(bottom,yy);
-            if(end>start)r(c,left+dx+band,start,Math.min(2,width-dx-band-1),end-start,W.light);
-        }
-    }
-    // Attached foam stays entirely inside the real height, even during collapse.
-    r(c, left, top, width, 1, W.foam);
-    if (height > 3) for (let dx = 2; dx < width - 3; dx += 9)
-        r(c, left + dx, top + 1, Math.min(4, width - dx - 1), 1, W.light);
+    drawGuairaRisingWater(c,s.danger,time,cx,cy,reducedMotion,W);
 }
 
 export function drawGuairaPressureOutlet(c: CanvasRenderingContext2D, b: MovingBody, cx: number, cy: number, time: number, reducedMotion: boolean) {
     const s = jetCycle(b, time);
     grate(c, b, s, Math.round(cx), Math.round(cy));
     pressureWater(c, s, Math.round(cx), Math.round(cy), time, reducedMotion);
+    drawGuairaPressureResidue(c,b,s,Math.round(cx),Math.round(cy),time,reducedMotion);
 }
 
 export function drawRespirosObjects(c: CanvasRenderingContext2D, objects: WorldObjects, cx: number, cy: number, _time: number, reducedMotion: boolean) {
@@ -290,7 +285,6 @@ export function drawRespirosObjects(c: CanvasRenderingContext2D, objects: WorldO
         const time = objects.time;
         const isolation = objects.get(G.serviceValveId);
         if (isolation) {
-            const x=Math.round(isolation.x-cameraX), y=Math.round(isolation.y-cameraY);
             const wet=!objects.get(G.thirdJetId)?.active;
             drawGuairaPipe(c,668-cameraX,199-cameraY,76,wet,time,reducedMotion,true,1,false,PIPE);
             drawGuairaPipeElbow(c,668-cameraX,275-cameraY,wet,false,true,PIPE);
@@ -299,41 +293,15 @@ export function drawRespirosObjects(c: CanvasRenderingContext2D, objects: WorldO
             drawGuairaPipe(c,698-cameraX,284-cameraY,23,wet,time,reducedMotion,true,1,false,PIPE);
             if (wet) drawGuairaPipeFlow(c,SERVICE_FEED,cameraX,cameraY,time,reducedMotion,PIPE.glint);
             drawGuairaPipeSaddle(c,672-cameraX,218-cameraY,true,PIPE);
-            r(c,x,y,isolation.width,isolation.height,P.pipe);
-            r(c,x+1,y+1,isolation.width-2,6,P.brass);
-            r(c,x+2,y+1,isolation.width-4,1,P.brassLight);
-            for(const dx of [2,isolation.width-4])r(c,x+dx,y+4,2,2,P.pipe);
-            // C is the circuit name, not a keyboard binding. The down arrow
-            // shares the same sentada grammar as the other pressure plates.
-            pixelText(c,'C',x+6,y+2,P.ink);
-            if(isolation.active) {
-                r(c,x+16,y+3,9,2,P.pipe); r(c,x+19,y+1,2,6,P.pipe);
-            } else {
-                r(c,x+19,y+2,2,3,P.cap); r(c,x+17,y+4,6,1,P.cap); r(c,x+18,y+5,4,1,P.cap);
-            }
+            const target=objects.get(G.thirdJetId);
+            if(target)drawGuairaControl(c,isolation,{...guairaLinkedControl(isolation,target),circuit:'C'},cameraX,cameraY,time,reducedMotion);
         }
         for (const b of objects.bodies) {
             if (b.kind !== 'jet' || b.x + b.width < cameraX - 2 || b.x > cameraX + 322) continue;
             const s = jetCycle(b, time);
             grate(c, b, s, cameraX, cameraY);
             pressureWater(c, s, cameraX, cameraY, time, reducedMotion);
-            if (!reducedMotion && s.vent > 0) {
-                // Harmless residual mist is sparse, pale and detached: no cyan
-                // core, no floor-covering curtain, and no droplets in the refuge.
-                const age = 1 - s.vent, mouth = b.y + b.height - 4;
-                for (let n = 0; n < 4; n++) {
-                    const x = b.x + (n + 1) * b.width / 5;
-                    r(c, x - cameraX, mouth - 5 - Math.round(age * (7 + n)) - cameraY, 2, 1, P.mist);
-                }
-            }
-            // The native valve records the interrupted column once. After
-            // isolation only pale, harmless drops remain; no stale danger ink.
-            if (!reducedMotion && b.active && b.jetShutdown) {
-                const age=time-b.jetShutdown.at;
-                if(age>=0 && age<300)for(let n=0;n<4;n++)
-                    r(c,b.x+(n+1)*b.width/5-cameraX,
-                        b.y+b.height-4-Math.round(b.jetShutdown.height*(n+1)/5*(1-age/300))-cameraY,2,1,P.mist);
-            }
+            drawGuairaPressureResidue(c,b,s,cameraX,cameraY,time,reducedMotion);
         }
         // Friendly existing art remains behind safe banks, well clear of the
         // channels, gauges, centre checkpoint and Feka's feet on the bright cap.

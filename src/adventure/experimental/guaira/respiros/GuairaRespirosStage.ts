@@ -33,8 +33,10 @@ export function guairaRespirosStage(): AdventureStage {
     for (let col = G.shelfStart / 16; col < G.shelfEnd / 16; col++) stage.level.tiles[G.shelfTop / 16][col] = TileType.PLATFORM;
     // A deliberate two-jump detour trades observation/timing for isolation of C.
     // Its entire footprint lies in the dry bay. D retains its independent cycle.
-    for (const [x, y] of [[608,240],[656,192]])
-        for (let col = x / 16; col < x / 16 + 2; col++) stage.level.tiles[y / 16][col] = TileType.PLATFORM;
+    // A tile of footing on either side of C lets the player land, read the
+    // circuit and prepare a pound. The deck stops at the jet's dry boundary.
+    for (const [left, right, y] of [[608,640,240],[640,704,192]])
+        for (let col = left / 16; col < right / 16; col++) stage.level.tiles[y / 16][col] = TileType.PLATFORM;
     // An optional high route continues the workshop instead of dropping back
     // into the same corridor. Its first deck clears C's full-height envelope;
     // the receiving deck lies wholly inside the dry island before D.
@@ -60,8 +62,9 @@ export function guairaRespirosStage(): AdventureStage {
         { id: 'respiros-shelf-a', kind: 'coin', x: 584, y: 252 },
         { id: 'respiros-shelf-b', kind: 'coin', x: 600, y: 252 },
         { id: 'respiros-service-step', kind: 'coin', x: 616, y: 218 },
-        { id: 'respiros-service-a', kind: 'coin', x: 656, y: 158 },
-        { id: 'respiros-service-b', kind: 'coin', x: 672, y: 158 },
+        // Frame the wider landing, leaving the circuit plaque unobscured.
+        { id: 'respiros-service-a', kind: 'coin', x: 640, y: 158 },
+        { id: 'respiros-service-b', kind: 'coin', x: 688, y: 158 },
         { id: 'respiros-inspection', kind: 'coin', x: 744, y: 138 },
         { id: 'respiros-overlook', kind: 'coin', x: 824, y: 218 }
     ];

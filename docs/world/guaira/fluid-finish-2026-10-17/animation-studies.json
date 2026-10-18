@@ -1,0 +1,340 @@
+{
+  "kind": "authored-production-water-animation-studies",
+  "baselineHashes": {
+    "GuairaTraversalArt.ts": "1c53f9792cae72ea628aa81fe14ec6447495a2db4d11510e9534ec050983abdc",
+    "GuairaWaterworksArt.ts": "6b7f08a3e0cf686dcb65e3a52d5ca8b0263437dcc039744e72fb0f65b5eee3f9",
+    "GuairaSluiceArt.ts": "138f3f50fba1ab22d782e4d3e185d1769bf7bc705cf5ed7317f2a865160c2d31",
+    "GuairaPipeArt.ts": "4ea77e8e35c10b3e7fd518b1775526033bf51074de0c528933d1940bf97dc8ea",
+    "GuairaJunctionArt.ts": "e6dd3026c8f80714575fc9db07d0bab7518b8a6450378245887ded599fd67228",
+    "GuairaJunctionHardwareArt.ts": "9b06d42ebdee4cd0db319bc1a02e20e8bec3cf2a38dfc71fc9c487c88c7a49c4",
+    "GuairaRespirosArt.ts": "621f3e717f6cca7428bd8876398da7a1a351d4fe6582872dc83394fb91b7f396",
+    "GuairaReliefArt.ts": "51fbe3349a1fdd77dd63299cee1d5999867f2dc8b4054dcaa560289e3ab7ac37",
+    "GuairaReliefFlow.ts": "ba24a3a7af5a7c7a8be56c4a3d67096755f6b9e69eb84b5cf9a9ccbf5bfe070d"
+  },
+  "studies": [
+    {
+      "id": "comporta",
+      "authoredPose": true,
+      "actorIncluded": false,
+      "clockEditedForStudy": true,
+      "readOnlyPaint": true,
+      "repeatable": true,
+      "fps": 30,
+      "frames": 252,
+      "comparisonTime": 1400,
+      "camera": [
+        368,
+        108
+      ],
+      "samples": [
+        {
+          "frame": 0,
+          "time": 0
+        },
+        {
+          "frame": 16,
+          "time": 533.3333333333334
+        },
+        {
+          "frame": 32,
+          "time": 1066.6666666666667
+        },
+        {
+          "frame": 48,
+          "time": 1600
+        },
+        {
+          "frame": 64,
+          "time": 2133.3333333333335
+        },
+        {
+          "frame": 80,
+          "time": 2666.6666666666665
+        },
+        {
+          "frame": 96,
+          "time": 3200
+        },
+        {
+          "frame": 112,
+          "time": 3733.3333333333335
+        },
+        {
+          "frame": 128,
+          "time": 4266.666666666667
+        },
+        {
+          "frame": 144,
+          "time": 4800
+        },
+        {
+          "frame": 160,
+          "time": 5333.333333333333
+        },
+        {
+          "frame": 176,
+          "time": 5866.666666666667
+        },
+        {
+          "frame": 192,
+          "time": 6400
+        },
+        {
+          "frame": 208,
+          "time": 6933.333333333333
+        },
+        {
+          "frame": 224,
+          "time": 7466.666666666667
+        },
+        {
+          "frame": 240,
+          "time": 8000
+        }
+      ]
+    },
+    {
+      "id": "canos",
+      "authoredPose": true,
+      "actorIncluded": false,
+      "clockEditedForStudy": true,
+      "readOnlyPaint": true,
+      "repeatable": true,
+      "fps": 30,
+      "frames": 252,
+      "comparisonTime": 1400,
+      "camera": [
+        350,
+        128
+      ],
+      "samples": [
+        {
+          "frame": 0,
+          "time": 0
+        },
+        {
+          "frame": 16,
+          "time": 533.3333333333334
+        },
+        {
+          "frame": 32,
+          "time": 1066.6666666666667
+        },
+        {
+          "frame": 48,
+          "time": 1600
+        },
+        {
+          "frame": 64,
+          "time": 2133.3333333333335
+        },
+        {
+          "frame": 80,
+          "time": 2666.6666666666665
+        },
+        {
+          "frame": 96,
+          "time": 3200
+        },
+        {
+          "frame": 112,
+          "time": 3733.3333333333335
+        },
+        {
+          "frame": 128,
+          "time": 4266.666666666667
+        },
+        {
+          "frame": 144,
+          "time": 4800
+        },
+        {
+          "frame": 160,
+          "time": 5333.333333333333
+        },
+        {
+          "frame": 176,
+          "time": 5866.666666666667
+        },
+        {
+          "frame": 192,
+          "time": 6400
+        },
+        {
+          "frame": 208,
+          "time": 6933.333333333333
+        },
+        {
+          "frame": 224,
+          "time": 7466.666666666667
+        },
+        {
+          "frame": 240,
+          "time": 8000
+        }
+      ]
+    },
+    {
+      "id": "respiros",
+      "authoredPose": true,
+      "actorIncluded": false,
+      "clockEditedForStudy": true,
+      "readOnlyPaint": true,
+      "repeatable": true,
+      "fps": 30,
+      "frames": 252,
+      "comparisonTime": 2100,
+      "camera": [
+        80,
+        144
+      ],
+      "samples": [
+        {
+          "frame": 0,
+          "time": 0
+        },
+        {
+          "frame": 16,
+          "time": 533.3333333333334
+        },
+        {
+          "frame": 32,
+          "time": 1066.6666666666667
+        },
+        {
+          "frame": 48,
+          "time": 1600
+        },
+        {
+          "frame": 64,
+          "time": 2133.3333333333335
+        },
+        {
+          "frame": 80,
+          "time": 2666.6666666666665
+        },
+        {
+          "frame": 96,
+          "time": 3200
+        },
+        {
+          "frame": 112,
+          "time": 3733.3333333333335
+        },
+        {
+          "frame": 128,
+          "time": 4266.666666666667
+        },
+        {
+          "frame": 144,
+          "time": 4800
+        },
+        {
+          "frame": 160,
+          "time": 5333.333333333333
+        },
+        {
+          "frame": 176,
+          "time": 5866.666666666667
+        },
+        {
+          "frame": 192,
+          "time": 6400
+        },
+        {
+          "frame": 208,
+          "time": 6933.333333333333
+        },
+        {
+          "frame": 224,
+          "time": 7466.666666666667
+        },
+        {
+          "frame": 240,
+          "time": 8000
+        }
+      ]
+    },
+    {
+      "id": "alivio",
+      "authoredPose": true,
+      "actorIncluded": false,
+      "clockEditedForStudy": true,
+      "readOnlyPaint": true,
+      "repeatable": true,
+      "fps": 30,
+      "frames": 252,
+      "comparisonTime": 3000,
+      "camera": [
+        240,
+        176
+      ],
+      "samples": [
+        {
+          "frame": 0,
+          "time": 0
+        },
+        {
+          "frame": 16,
+          "time": 533.3333333333334
+        },
+        {
+          "frame": 32,
+          "time": 1066.6666666666667
+        },
+        {
+          "frame": 48,
+          "time": 1600
+        },
+        {
+          "frame": 64,
+          "time": 2133.3333333333335
+        },
+        {
+          "frame": 80,
+          "time": 2666.6666666666665
+        },
+        {
+          "frame": 96,
+          "time": 3200
+        },
+        {
+          "frame": 112,
+          "time": 3733.3333333333335
+        },
+        {
+          "frame": 128,
+          "time": 4266.666666666667
+        },
+        {
+          "frame": 144,
+          "time": 4800
+        },
+        {
+          "frame": 160,
+          "time": 5333.333333333333
+        },
+        {
+          "frame": 176,
+          "time": 5866.666666666667
+        },
+        {
+          "frame": 192,
+          "time": 6400
+        },
+        {
+          "frame": 208,
+          "time": 6933.333333333333
+        },
+        {
+          "frame": 224,
+          "time": 7466.666666666667
+        },
+        {
+          "frame": 240,
+          "time": 8000
+        }
+      ]
+    }
+  ]
+}

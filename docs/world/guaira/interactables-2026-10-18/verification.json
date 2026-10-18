@@ -1,0 +1,59 @@
+{
+  "date": "2026-10-18",
+  "scope": {
+    "switches": 18,
+    "waterLid": 1,
+    "scenesWithControls": 7,
+    "reviewedNativeScenes": 8,
+    "widenedLandings": 4,
+    "relocatedPickups": 10,
+    "repositionedWayfindingSigns": 2
+  },
+  "typescript": {
+    "tests": 3771,
+    "pass": 3770,
+    "fail": 0,
+    "skipped": 1,
+    "durationMs": 208212.193,
+    "newTests": 7
+  },
+  "javascript": {
+    "tests": 3,
+    "pass": 3,
+    "fail": 0
+  },
+  "build": {
+    "passed": true,
+    "levelValidation": true,
+    "playerAssets": true,
+    "worldValidation": true,
+    "bothTypechecks": true
+  },
+  "native": {
+    "inputOnly": true,
+    "complete": 8,
+    "damage": 0,
+    "sampledStates": 183,
+    "unchangedSampledStates": 182,
+    "durationAndCoinTotalsPreserved": true
+  },
+  "campaign": {
+    "passed": true,
+    "developmentUnlock": false,
+    "executions": 9,
+    "errors": []
+  },
+  "review": {
+    "passed": true,
+    "viewports": [
+      1440,
+      390
+    ],
+    "videoDecodes": 12,
+    "sheets": 7
+  },
+  "limits": [
+    "Authored art studies are separate from input-only gameplay.",
+    "First-play comprehension requires observation with new players."
+  ]
+}

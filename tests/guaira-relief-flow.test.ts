@@ -32,7 +32,7 @@ class Raster {
     get context() { return this as unknown as CanvasRenderingContext2D; }
     at(x: number,y: number) { return this.pixels[y*320+x]; }
 }
-const liquid = new Set<string>([P.water,P.waterShade,P.foam]);
+const liquid = new Set<string>([P.water,P.waterShade,P.waterLight,P.waterEdge,P.foam]);
 const fixture = () => new WorldObjects(guairaReliefStage().mechanisms);
 function paint(objects:WorldObjects,reduced=false,cx=240,cy=176) {
     const c=new Raster();
@@ -41,13 +41,24 @@ function paint(objects:WorldObjects,reduced=false,cx=240,cy=176) {
     assert.equal(c.globalCompositeOperation,'multiply');return c;
 }
 
-test('one full native cycle preserves every opaque damage pixel and all nonliquid pixels',()=>{
+test('one full native cycle preserves every opaque damage pixel and all hardware beneath the residuals',()=>{
     const objects=fixture(), b=objects.get(G.jetId)!, hardware=createHash('sha256');
     for(let frame=0;frame<252;frame++) {
         objects.time=frame*1000/60;const d=jetCycle(b,objects.time).danger;
         for(const reduced of [false,true]) {
             const after=paint(objects,reduced);
-            hardware.update(after.pixels.map(p=>liquid.has(p)?'':p).join(','));
+            hardware.update(after.pixels.map((p,i)=>{
+                // Newly shared vent droplets occupy previously empty air only.
+                // Keep the original hardware hash rather than accepting an
+                // unexplained change to the grate, gauge or warning signs.
+                if(p===P.mist||p==='#a4b6a7'){
+                    const x=i%320,y=Math.floor(i/320);
+                    assert.equal(d,null);assert.ok(!reduced);
+                    assert.ok(x>b.x-240&&x<b.x+b.width-240&&y>=G.floor-176-8&&y<G.floor-176);
+                    return '';
+                }
+                return liquid.has(p)?'':p;
+            }).join(','));
             for(let yy=0;yy<180;yy++)for(let xx=0;xx<320;xx++) {
                 const expected=!!d&&xx>=d.x-240&&xx<d.x+d.width-240&&yy>=Math.max(23,Math.floor(d.y-176))&&yy<Math.ceil(d.y+d.height-176);
                 assert.equal(liquid.has(after.at(xx,yy)),expected,`danger at ${frame}:${xx},${yy}`);

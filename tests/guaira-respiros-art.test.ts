@@ -127,7 +127,10 @@ test('standpipe plate distinguishes charge, actual danger and dry recovery witho
         assert.deepEqual(plate(time, true), dry);
     }
     objects.bodies[0].active = true;
-    assert.deepEqual(plate(2100), dry, 'A closed valve never receives a danger marker');
+    const isolated = plate(2100);
+    assert.notDeepEqual(isolated, dry, 'Manual isolation has a crossed-stream seal, not the ordinary dry dash');
+    assert.notDeepEqual(isolated, danger, 'A closed valve never receives a danger marker');
+    assert.deepEqual(plate(2100, true), isolated, 'Isolation remains legible with reduced motion');
 });
 
 test('each authored jet owns an unobstructive phase plate above touch controls', async () => {

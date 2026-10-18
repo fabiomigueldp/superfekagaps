@@ -1,3 +1,4 @@
+import { GUAIRA_FLOW_STEP as STEP } from '../src/adventure/experimental/guaira/GuairaFluidArt';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { WorldObjects, WorldLevel } from '../src/adventure/WorldPhysics';
@@ -68,8 +69,8 @@ test('ram stays below its real platform, docks out of view and keeps a stationar
 test('inspection pipe flow crosses its repeat seam in either direction, without escaping the glass',()=>{
     for(const vertical of [false,true])for(const direction of [-1,1] as const) {
         const before=raster(),after=raster();
-        drawJunctionPipe(before.c,10,20,64,true,19*140,false,vertical,direction);
-        drawJunctionPipe(after.c,10,20,64,true,20*140,false,vertical,direction);
+        drawJunctionPipe(before.c,10,20,64,true,19*STEP.pipe,false,vertical,direction);
+        drawJunctionPipe(after.c,10,20,64,true,20*STEP.pipe,false,vertical,direction);
         assert.ok(before.balanced()&&after.balanced());
         for(let along=4;along<60;along++) {
             const at=(i:number)=>`${10+(vertical?4:i)},${20+(vertical?i:4)}`;
@@ -105,7 +106,7 @@ test('pressurised water trails rise continuously across every wrap during full d
     const paint=(time:number)=>{objects.time=time;const r=raster(),before=JSON.stringify(objects);drawRespirosObjects(r.c,objects,80,144,-9999,false);assert.equal(JSON.stringify(objects),before);assert.ok(r.balanced());return r.pixels;};
     let movingPixels=0;
     for(const time of [1960,2030,2100,2170,2240]) {
-        const before=paint(time),after=paint(time+70);
+        const before=paint(time),after=paint(time+STEP.pressure);
         for(let x=82;x<174;x++)for(let y=55;y<151;y++) {
             assert.equal(after.get(`${x},${y}`),before.get(`${x},${y+1}`),`one upward pixel at ${time}, ${x},${y}`);
             if(after.get(`${x},${y}`)===W.light&&before.get(`${x},${y}`)!==W.light)movingPixels++;
@@ -118,8 +119,8 @@ test('one flow retains its distance through successive right, up and down bends 
     const path=guairaPipeRoute([[20,80],[60,80],[60,40],[120,40],[120,120]]);
     for(let step=0;step<22;step++) {
         const a=raster(),b=raster();
-        drawGuairaPipeFlow(a.c,path,0,0,step*100,false);
-        drawGuairaPipeFlow(b.c,path,0,0,(step+1)*100,false);
+        drawGuairaPipeFlow(a.c,path,0,0,step*STEP.pipe,false);
+        drawGuairaPipeFlow(b.c,path,0,0,(step+1)*STEP.pipe,false);
         for(let d=1;d<path.length;d++)assert.equal(b.pixels.get(path[d].join(',')),a.pixels.get(path[d-1].join(',')));
         assert.ok(a.balanced()&&b.balanced());
     }
@@ -138,7 +139,7 @@ test('production B flow crosses both elbow mouths continuously and A stays dry u
         const cx=points[0][0]-50,cy=160;
         const paint=(time:number)=>{const r=raster();drawJunctionBackground(r.c,cx,cy,time,false,routing);return r.pixels;};
         for(let step=0;step<20;step++) {
-            const a=paint(step*100),b=paint((step+1)*100);
+            const a=paint(step*STEP.pipe),b=paint((step+1)*STEP.pipe);
             const at=(d:number)=>`${points[d][0]-cx},${points[d][1]-cy}`;
             for(let d=1;d<points.length;d++) {
                 assert.equal(b.get(at(d)),a.get(at(d-1)),`joined flow at ${points[d]} / ${step}`);
@@ -165,7 +166,7 @@ test('relief diverts visible water into the connected screened return and isolat
             assert.equal(pixels.get('130,131'),open?'#aa8d67':R.safe,'feed at world 350,307');
             assert.equal(pixels.get('61,102'),open?R.safe:'#aa8d67','return at world 281,278');
             assert.equal(pixels.get('43,110'),open?'#aa8d67':R.safe,'lower tee at world 263,286');
-            assert.equal(pixels.get('44,97'),R.safe,'source at world 264,273');
+            assert.equal(pixels.get('43,97'),R.safe,'source glass beside the reflection at world 263,273');
             if(open)for(const x of [291,292,293,294,295])assert.equal(pixels.get(`${x-220},102`),R.safe,'no gap at the screened return mouth');
         }
         assert.equal(JSON.stringify(level),before);
@@ -201,7 +202,7 @@ test('inclined pipes keep an open sight channel through every joint in either di
         const route=guairaInclinedPipeRoute(from,to), liquid=new Set([GUAIRA_PIPE_COLORS.water,GUAIRA_PIPE_COLORS.glint]);
         const paint=(time:number,reduced=false,wet=true,cx=0,cy=0)=>{const p=raster();drawGuairaInclinedPipe(p.c,route,cx,cy,wet,time,reduced);assert.ok(p.balanced());return p.pixels;};
         for(let step=0;step<21;step++) {
-            const a=paint(step*100),b=paint((step+1)*100);
+            const a=paint(step*STEP.pipe),b=paint((step+1)*STEP.pipe);
             for(let d=0;d<route.length;d++) {
                 const [x,y]=route[d];for(const dy of [-1,0,1])assert.ok(liquid.has(a.get(`${x},${y+dy}`)!),'no collar plugs the glass');
                 if(d)assert.equal(b.get(route[d].join(',')),a.get(route[d-1].join(',')),'reflection travels continuously, even at repeat seam');
@@ -245,7 +246,7 @@ test('pump feed flows through both visible elbow mouths before entering the buri
     const paint=(time:number)=>{const p=raster();drawRespirosBackground(p.c,0,144,time,false);assert.ok(p.balanced());return p.pixels;};
     let moving=0;
     for(let step=0;step<20;step++) {
-        const a=paint(step*100),b=paint((step+1)*100);
+        const a=paint(step*STEP.pipe),b=paint((step+1)*STEP.pipe);
         for(let d=1;d<route.length;d++) {
             const key=(i:number)=>`${route[i][0]},${route[i][1]-144}`;
             assert.equal(b.get(key(d)),a.get(key(d-1)),'no break at a pipe junction');
@@ -285,7 +286,7 @@ test('patio intake is seated and its inspection water descends continuously insi
     const paint=(time:number,reduced=false)=>{const p=raster();drawJunctionIntake(p.c,120,250,time,reduced);assert.ok(p.balanced());return p.pixels;};
     const first=paint(0);
     for(let step=0;step<12;step++) {
-        const a=paint(step*140),b=paint((step+1)*140);
+        const a=paint(step*STEP.falling),b=paint((step+1)*STEP.falling);
         for(let y=262;y<273;y++)assert.equal(b.get(`135,${y}`),a.get(`135,${y-1}`));
         for(const[key,color]of b)if(color!==first.get(key)) {
             const[x,y]=key.split(',').map(Number);assert.ok(x>=129&&x<141&&y>=261&&y<273);
@@ -306,7 +307,7 @@ test('relief return flow rounds the final corner and descends behind its screen 
     level.data.tiles[10][15]=TileType.EMPTY;
     const route=guairaPipeRoute([[339,279],[344,279],[344,289]]);
     for(let step=0;step<21;step++) {
-        const a=paint(step*100),b=paint((step+1)*100);
+        const a=paint(step*STEP.pipe),b=paint((step+1)*STEP.pipe);
         for(let d=1;d<route.length;d++) {
             const[x,y]=route[d],[px,py]=route[d-1];
             assert.equal(b.get(`${x-220},${y-176}`),a.get(`${px-220},${py-176}`),'continuous return through the corner');
@@ -320,7 +321,7 @@ test('ascent feed retains one flow through the cistern elbow and wall mounts whi
     // Bureau coordinates are translated 320 pixels to the final terrace.
     const route=guairaPipeRoute([[824,89],[824,103],[944,103]]);
     for(let step=0;step<21;step++) {
-        const a=paint(step*100),b=paint((step+1)*100);
+        const a=paint(step*STEP.pipe),b=paint((step+1)*STEP.pipe);
         for(let d=1;d<route.length;d++) {
             const[x,y]=route[d],[px,py]=route[d-1];
             assert.equal(b.get(`${x-768},${y-38}`),a.get(`${px-768},${py-38}`),'source-to-tank flow, including repeat');
@@ -339,7 +340,7 @@ test('mayor supply keeps the private inlet wet and opens the whole public route 
     mayor.state='released';
     const route=guairaPipeRoute([[65,194],[36,194],[36,204]]);
     for(let step=0;step<21;step++) {
-        const a=paint(step*100),b=paint((step+1)*100);
+        const a=paint(step*STEP.pipe),b=paint((step+1)*STEP.pipe);
         for(let d=1;d<route.length;d++) {
             const[x,y]=route[d],[px,py]=route[d-1];
             // The nozzle's pale discharge begins at y203; the pipe is continuous above it.

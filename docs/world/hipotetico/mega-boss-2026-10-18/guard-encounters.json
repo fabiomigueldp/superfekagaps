@@ -1,0 +1,393 @@
+{
+  "inputOnly": true,
+  "actorCameraClockEdits": false,
+  "videoFrames": 813,
+  "receipts": [
+    {
+      "branch": "shield",
+      "inputOnly": true,
+      "actorCameraClockEdits": false,
+      "frames": 886,
+      "receipt": {
+        "act": "siege",
+        "phase": 1,
+        "health": 9,
+        "won": false,
+        "deaths": 0,
+        "ticks": 887
+      },
+      "captures": 2
+    },
+    {
+      "branch": "launcher",
+      "inputOnly": true,
+      "actorCameraClockEdits": false,
+      "frames": 1375,
+      "receipt": {
+        "act": "siege",
+        "phase": 1,
+        "health": 9,
+        "won": false,
+        "deaths": 0,
+        "ticks": 1376
+      },
+      "captures": 4
+    },
+    {
+      "branch": "batedor-pair",
+      "inputOnly": true,
+      "actorCameraClockEdits": false,
+      "frames": 1445,
+      "receipt": {
+        "act": "siege",
+        "phase": 1,
+        "health": 9,
+        "won": false,
+        "deaths": 0,
+        "ticks": 1446
+      },
+      "captures": 4
+    },
+    {
+      "branch": "launcher-pair",
+      "inputOnly": true,
+      "actorCameraClockEdits": false,
+      "frames": 1570,
+      "receipt": {
+        "act": "siege",
+        "phase": 1,
+        "health": 9,
+        "won": false,
+        "deaths": 0,
+        "ticks": 1571
+      },
+      "captures": 4
+    },
+    {
+      "branch": "flank",
+      "inputOnly": true,
+      "actorCameraClockEdits": false,
+      "frames": 778,
+      "receipt": {
+        "act": "siege",
+        "phase": 1,
+        "health": 9,
+        "won": false,
+        "deaths": 0,
+        "ticks": 779
+      },
+      "captures": 1
+    }
+  ],
+  "captures": [
+    {
+      "file": "guard-shield-warning.png",
+      "frame": 782,
+      "branch": "shield",
+      "phase": "warning",
+      "timer": 533.3333333333335,
+      "player": {
+        "x": 128,
+        "y": 200
+      }
+    },
+    {
+      "file": "guard-shield-attack.png",
+      "frame": 796,
+      "branch": "shield",
+      "phase": "attack",
+      "timer": 100.00000000000001,
+      "player": {
+        "x": 128,
+        "y": 200
+      }
+    },
+    {
+      "file": "guard-throw-low-warning.png",
+      "frame": 1106,
+      "branch": "launcher",
+      "phase": "warning",
+      "timer": 683.3333333333331,
+      "player": {
+        "x": 150.12133097343988,
+        "y": 200
+      }
+    },
+    {
+      "file": "guard-throw-low-recoil.png",
+      "frame": 1119,
+      "branch": "launcher",
+      "phase": "recoil",
+      "timer": 33.333333333333336,
+      "player": {
+        "x": 149.82133097343987,
+        "y": 200
+      }
+    },
+    {
+      "file": "guard-throw-high-warning.png",
+      "frame": 1272,
+      "branch": "launcher",
+      "phase": "warning",
+      "timer": 683.3333333333331,
+      "player": {
+        "x": 188.28897369556796,
+        "y": 200
+      }
+    },
+    {
+      "file": "guard-throw-high-recoil.png",
+      "frame": 1285,
+      "branch": "launcher",
+      "phase": "recoil",
+      "timer": 33.333333333333336,
+      "player": {
+        "x": 188.28897369556796,
+        "y": 200
+      }
+    },
+    {
+      "file": "guard-batedor-pair-1-warning.png",
+      "frame": 1302,
+      "branch": "batedor-pair",
+      "phase": "warning",
+      "timer": 366.66666666666674,
+      "player": {
+        "x": 185.27609671372804,
+        "y": 200
+      }
+    },
+    {
+      "file": "guard-batedor-pair-1-attack.png",
+      "frame": 1313,
+      "branch": "batedor-pair",
+      "phase": "attack",
+      "timer": 100.00000000000001,
+      "player": {
+        "x": 183.47609671372803,
+        "y": 200
+      }
+    },
+    {
+      "file": "guard-batedor-pair-2-warning.png",
+      "frame": 1344,
+      "branch": "batedor-pair",
+      "phase": "warning",
+      "timer": 366.66666666666674,
+      "player": {
+        "x": 164.25075602485768,
+        "y": 178.8
+      }
+    },
+    {
+      "file": "guard-batedor-pair-2-attack.png",
+      "frame": 1355,
+      "branch": "batedor-pair",
+      "phase": "attack",
+      "timer": 100.00000000000001,
+      "player": {
+        "x": 164.25075602485768,
+        "y": 112.60000000000008
+      }
+    },
+    {
+      "file": "guard-launcher-pair-1-warning.png",
+      "frame": 1391,
+      "branch": "launcher-pair",
+      "phase": "warning",
+      "timer": 683.3333333333331,
+      "player": {
+        "x": 149.9702059329501,
+        "y": 158.60000000000016
+      }
+    },
+    {
+      "file": "guard-launcher-pair-1-recoil.png",
+      "frame": 1404,
+      "branch": "launcher-pair",
+      "phase": "recoil",
+      "timer": 33.333333333333336,
+      "player": {
+        "x": 149.9702059329501,
+        "y": 200
+      }
+    },
+    {
+      "file": "guard-launcher-pair-2-warning.png",
+      "frame": 1467,
+      "branch": "launcher-pair",
+      "phase": "warning",
+      "timer": 683.3333333333331,
+      "player": {
+        "x": 117.69117349532165,
+        "y": 166.50000000000017
+      }
+    },
+    {
+      "file": "guard-launcher-pair-2-recoil.png",
+      "frame": 1480,
+      "branch": "launcher-pair",
+      "phase": "recoil",
+      "timer": 33.333333333333336,
+      "player": {
+        "x": 117.69117349532165,
+        "y": 138.60000000000008
+      }
+    }
+  ],
+  "details": [
+    {
+      "file": "guard-formation.png",
+      "frame": 750,
+      "branch": "shield"
+    },
+    {
+      "file": "guard-resupply.png",
+      "frame": 1002,
+      "branch": "launcher"
+    },
+    {
+      "file": "guard-pivot.png",
+      "frame": 688,
+      "branch": "flank"
+    }
+  ],
+  "damage": [
+    {
+      "branch": "shield",
+      "frame": 769,
+      "x": 128,
+      "y": 200,
+      "dead": false,
+      "guards": [
+        {
+          "kind": "minion",
+          "x": 218.7499999999987,
+          "y": 204,
+          "phase": "walk",
+          "timer": 2233.3333333333353
+        },
+        {
+          "kind": "helmet",
+          "x": 182.7499999999987,
+          "y": 201,
+          "phase": "warning",
+          "timer": 316.6666666666667
+        }
+      ],
+      "barrels": [],
+      "marks": [
+        {
+          "x": 135,
+          "born": 210
+        }
+      ]
+    },
+    {
+      "branch": "launcher",
+      "frame": 1159,
+      "x": 149.82133097343987,
+      "y": 103.00000000000007,
+      "dead": false,
+      "guards": [
+        {
+          "kind": "loader",
+          "x": 241.9270509831248,
+          "y": 143,
+          "phase": "rest",
+          "timer": 300
+        }
+      ],
+      "barrels": [
+        {
+          "x": 148.39999999999952,
+          "y": 208,
+          "vx": -1.8,
+          "vy": 0
+        }
+      ],
+      "marks": [
+        {
+          "x": 156.82133097343987,
+          "born": 630
+        }
+      ]
+    },
+    {
+      "branch": "batedor-pair",
+      "frame": 1432,
+      "x": 156.9588947161784,
+      "y": 200,
+      "dead": false,
+      "guards": [
+        {
+          "kind": "helmet",
+          "x": 237.5000000000001,
+          "y": 201,
+          "phase": "walk",
+          "timer": 2866.666666666663
+        },
+        {
+          "kind": "minion",
+          "x": 203.5000000000001,
+          "y": 204,
+          "phase": "warning",
+          "timer": 199.99999999999997
+        },
+        {
+          "kind": "loader",
+          "x": 238,
+          "y": 143,
+          "phase": "warning",
+          "timer": 100.00000000000001
+        }
+      ],
+      "barrels": [
+        {
+          "x": 169.99999999999966,
+          "y": 208,
+          "vx": -1.8,
+          "vy": 0
+        }
+      ],
+      "marks": []
+    },
+    {
+      "branch": "launcher-pair",
+      "frame": 1371,
+      "x": 149.9702059329501,
+      "y": 108.90000000000008,
+      "dead": false,
+      "guards": [
+        {
+          "kind": "helmet",
+          "x": 234.34999999999906,
+          "y": 201,
+          "phase": "walk",
+          "timer": 1850.0000000000027
+        },
+        {
+          "kind": "minion",
+          "x": 197.19999999999914,
+          "y": 204,
+          "phase": "attack",
+          "timer": 50
+        },
+        {
+          "kind": "loader",
+          "x": 238,
+          "y": 143,
+          "phase": "warning",
+          "timer": 350.00000000000006
+        }
+      ],
+      "barrels": [],
+      "marks": [
+        {
+          "x": 157.27020593295012,
+          "born": 840
+        }
+      ]
+    }
+  ]
+}

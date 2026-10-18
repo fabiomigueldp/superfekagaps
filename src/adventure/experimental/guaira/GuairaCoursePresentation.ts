@@ -1,19 +1,19 @@
 import type { WorldGame } from '../../WorldGame';
-import type { MovingBody } from '../../WorldPhysics';
 import { TileType as T, FALLING_PLATFORM_ARM_MS, FALLING_PLATFORM_FALL_MS } from '../../../constants';
 import { supportsStanding, isOneWayTile } from '../../../world/tileRules';
 import { box as r, pixelLine as line } from '../../WorldPainting';
 import { pixelText } from '../../../graphics/BitmapFont';
-import { GUAIRA_COURSES, GUAIRA_COURSE_DETOURS, GUAIRA_MAINTENANCE_ROUTES, guairaCourseDetours, type GuairaCourseId } from './GuairaCourseDesign';
+import { GUAIRA_COURSES, guairaCourseDetours, type GuairaCourseId } from './GuairaCourseDesign';
 import { guairaCourseGuidance, guairaDetourAt, guairaDetourRecovery, guairaWarehouseRoute, updateGuairaCourseNavigation } from './GuairaCourseGuidance';
 import { drawGuairaCourseLandmark, drawGuairaCourseFinale } from './GuairaCourseLandmarks';
 import { drawGuairaFoe } from './GuairaFoeArt';
 import { drawGuairaFoeProjectiles } from './GuairaFoeProjectiles';
-import { drawGuairaLandscape, drawGuairaTree } from './GuairaScenery';
+import { drawGuairaLandscape } from './GuairaScenery';
 import { drawGuairaClayGrain, drawGuairaStoneFace } from './GuairaMaterials';
-import { drawGuairaVillageHouse } from './GuairaTraversalArt';
 import { drawGuairaWorkshopBackground } from './GuairaWorkshopBackground';
-import { drawGuairaPipe, drawGuairaPipeElbow, drawGuairaPipeFlow, drawGuairaPipeSaddle, guairaPipeRoute } from './GuairaPipeArt';
+import { drawGuairaNeighborhood } from './GuairaNeighborhoodArt';
+import { drawGuairaFixedScaffold, guairaOrdinaryScaffolds } from './GuairaScaffoldArt';
+import { drawGuairaControlConnection } from './GuairaControlConnections';
 import { drawGuairaBridgeHoists } from './GuairaSluiceArt';
 import { drawGuairaPressureOutlet } from './respiros/GuairaRespirosArt';
 import { drawCarrier, drawCarrierTrack } from '../../WorldTransportArt';
@@ -22,6 +22,7 @@ import {drawGuairaAqueductLandscape} from './GuairaAqueductLandscape';
 import {drawGuairaMaintenanceLandscape} from './GuairaMaintenanceLandscape';
 import {drawGuairaRiceLock} from './GuairaRiceLockLandscape';
 import {guairaDetourCoinCount} from './GuairaCourseExploration';
+import {drawGuairaControl, guairaLinkedControl} from './GuairaControlArt';
 
 type CourseGame=WorldGame & {readonly reducedMotion:boolean;finished:boolean};
 function region(c:CanvasRenderingContext2D,boundary:number,after:boolean,paint:()=>void) {
@@ -40,41 +41,23 @@ export function installGuairaCourseArt(game:CourseGame,id:GuairaCourseId) {
     a.background=(c,island,cx,cy,time,variant)=>{
         region(c,g.start-cx,false,()=>oldBackground(c,island,cx,cy,time,variant));
         region(c,g.start-cx,true,()=>{
-            const x=Math.round(cx),y=Math.round(cy),t=game.reducedMotion?0:game.objects.time;
+            const t=game.reducedMotion?0:game.objects.time;
             const inside=id==='galeria'||id==='alivio';
             // Both sides of the join use the same sky/profile and parallax
             // coordinates. Switching village to rice here used to draw two suns.
             if(inside)drawGuairaWorkshopBackground(c,id,cx,cy,t,game.reducedMotion);
             else drawGuairaLandscape(c,cx,cy,t,game.reducedMotion,id==='subida'?'heights':id==='patio'?'junction':id==='travessia'?'village':'rice');
-            for(let n=Math.max(0,Math.floor((cx-g.start)/192));!inside&&n<(cx+360-g.start)/192;n++) {
-                const wx=g.start+n*192,xx=wx-x;
-                const d=GUAIRA_COURSE_DETOURS[id];
-                if(n*192+140>d.entry&&n*192<d.end)continue;
-                const m=GUAIRA_MAINTENANCE_ROUTES[id];
-                if(m&&n*192+140>m.entry&&n*192<m.end)continue;
-                if(id==='respiros'&&n*192+140>2464&&n*192<2896)continue;
-                if(id==='travessia'&&n*192+140>1904&&n*192<2496||id==='patio'&&n*192+140>1808&&n*192<2672)continue;
-                if(id==='subida'&&n*192+140>2320)continue;
-                if(n%3===1) {
-                    drawGuairaVillageHouse(c,xx+24,g.floor+12-y,108+(n%2)*12,92+(n%2)*16,n);
-                } else drawGuairaTree(c,xx+80,g.floor+12-y,84+(n%3)*9,t,wx,true);
-            }
-            drawGuairaCourseLandmark(c,id,cx,cy,t,game.reducedMotion);
+            drawGuairaNeighborhood(c,id,cx,cy,t,game.reducedMotion);
+            drawGuairaCourseLandmark(c,id,cx,cy,t,game.reducedMotion,game.level);
             drawGuairaCourseFinale(c,id,cx,cy,t,game.reducedMotion);
             drawGuairaDockLandscape(c,id,cx,cy,t,game.reducedMotion);
             drawGuairaAqueductLandscape(c,id,cx,cy,t,game.reducedMotion);
-            drawGuairaMaintenanceLandscape(c,id,cx,cy);
+            drawGuairaMaintenanceLandscape(c,id,cx,cy,game.level);
             if(id==='travessia')drawGuairaRiceLock(c,cx,cy,t,game.reducedMotion);
             for(const b of game.objects.bodies)if(b.id.includes(':course:')&&b.kind==='platform')
                 drawCarrierTrack(c,b,cx,cy,game.level);
-            // Platforms have fixed brackets in the background, behind actors.
-            for(let col=Math.max(g.start/16,Math.floor(cx/16));col<Math.min(game.level.data.width,Math.ceil((cx+320)/16));col++)
-                for(let row=0;row<game.level.data.height;row++)if(game.level.getTile(col,row)===T.PLATFORM&&col%3===0){
-                    if(guairaCourseDetours(id).some(d=>[...d.decks,...d.returns].some(([left,right,top])=>col*16>=g.start+left&&col*16<g.start+right&&row*16===top)))continue;
-                    if(id==='travessia'&&col*16>=g.start+2064&&col*16<g.start+2528)continue;
-                    const xx=col*16-x,yy=row*16-y;
-                    r(c,xx+7,yy+6,3,Math.max(4,g.floor-row*16-6),'#aa8c68');line(c,xx,yy+7,xx+9,yy+22,'#957e61');
-                }
+            for(const deck of guairaOrdinaryScaffolds(game.level,id,cx-24,cx+344))
+                drawGuairaFixedScaffold(c,game.level,deck.left,deck.right,deck.top,cx,cy);
         });
     };
     a.terrain=(c,level,island,cx,cy,time,reduced)=>{
@@ -126,6 +109,14 @@ export function installGuairaCourseArt(game:CourseGame,id:GuairaCourseId) {
         region(c,g.start-cx,false,()=>oldObjects(c,objects,cx,cy,time,world,level,structures));
         region(c,g.start-cx,true,()=>{
             const x=Math.round(cx),y=Math.round(cy);
+            // Feed pipes belong behind the operating hardware, regardless of
+            // mechanism order in the stage. A leftward return cannot paint
+            // over its own status plaque or over a neighbouring outlet.
+            for(const b of objects.bodies)if(b.id.includes(':course:')&&b.kind==='switch'){
+                const target=objects.get(b.link??'');
+                if(target&&Math.max(b.x+b.width,target.x+target.width)>=cx-16&&Math.min(b.x,target.x)<=cx+336)
+                    drawGuairaControlConnection(c,b,target,x,y,objects.time,game.reducedMotion);
+            }
             for(const b of objects.bodies.filter(b=>b.id.includes(':course:'))) {
                 if(b.x+b.width<cx-140||b.x>cx+450)continue;
                 if(b.kind==='jet')drawGuairaPressureOutlet(c,b,cx,cy,objects.time,game.reducedMotion);
@@ -137,9 +128,7 @@ export function installGuairaCourseArt(game:CourseGame,id:GuairaCourseId) {
                 }
                 if(b.kind==='switch') {
                     const target=objects.get(b.link??'');
-                    if(target)drawConnection(c,b,target,x,y,objects.time,game.reducedMotion);
-                    r(c,b.x-x,b.y-y,32,8,'#6d594a');r(c,b.x+1-x,b.y+1-y,30,5,'#be995f');r(c,b.x+2-x,b.y+1-y,28,1,'#ead29a');
-                    pixelText(c,b.active?'✓':'↓',b.x+16-x,b.y+1-y,b.active?'#d8eed0':'#493e3b',1,'center');
+                    if(target)drawGuairaControl(c,b,guairaLinkedControl(b,target),x,y,objects.time,game.reducedMotion);
                 }
             }
             for(const room of g.rooms) {
@@ -149,7 +138,7 @@ export function installGuairaCourseArt(game:CourseGame,id:GuairaCourseId) {
                 pixelText(c,'→',xx+4,yy-29,'#4f5446',1,'center');
             }
             for(const d of guairaCourseDetours(id)){
-            const sx=g.start+d.entry-x,sy=d.entryY-y;
+            const sx=g.start+d.entry+(d.entrySignOffset??0)-x,sy=d.entryY-y;
             // An upward arrow and coin identify an optional climb. The post ends
             // at its real first deck, and never suggests an invisible landing.
             r(c,sx+7,sy-28,2,28,'#8a7054');r(c,sx-4,sy-32,26,13,'#685c4d');
@@ -163,29 +152,6 @@ export function installGuairaCourseArt(game:CourseGame,id:GuairaCourseId) {
         });
         drawGuairaFoeProjectiles(c,objects,cx,cy,game.reducedMotion);
     };
-}
-
-function drawConnection(c:CanvasRenderingContext2D,b:MovingBody,target:MovingBody,cx:number,cy:number,time:number,reduced:boolean){
-    // A return valve can feed an outlet to its left. Mirror the same continuous
-    // fittings rather than requesting a negative-length horizontal pipe.
-    if(target.x+target.width<b.x){
-        c.save();c.translate(320,0);c.scale(-1,1);
-        drawConnection(c,{...b,x:-b.x-b.width},{...target,x:-target.x-target.width},-cx-320,cy,time,reduced);
-        c.restore();return;
-    }
-    const start=b.x+16,end=target.x-16,ey=target.kind==='jet'?target.y+target.height+6:target.to!.y+14;
-    let sy=b.y+24;if(Math.abs(ey-sy)<18)sy=ey+24;
-    const wet=target.kind==='jet'?!target.active:target.active;
-    const upward=ey<sy;
-    drawGuairaPipe(c,start-4-cx,b.y+8-cy,sy-b.y-12,wet,time,reduced,true,1,false);
-    drawGuairaPipeElbow(c,start-4-cx,sy-4-cy,wet,false,true);
-    drawGuairaPipe(c,start+5-cx,sy-4-cy,end-start-9,wet,time,reduced,false,1,false);
-    drawGuairaPipeElbow(c,end-4-cx,sy-4-cy,wet,true,upward);
-    drawGuairaPipe(c,end-4-cx,Math.min(sy,ey)+5-cy,Math.abs(ey-sy)-9,wet,time,reduced,true,1,false);
-    drawGuairaPipeElbow(c,end-4-cx,ey-4-cy,wet,false,!upward);
-    drawGuairaPipe(c,end+5-cx,ey-4-cy,target.x-end,wet,time,reduced,false,1,false);
-    if(wet)drawGuairaPipeFlow(c,guairaPipeRoute([[start,b.y+8],[start,sy],[end,sy],[end,ey],[target.x+4,ey]]),cx,cy,time,reduced);
-    drawGuairaPipeSaddle(c,start+28-cx,sy-cy);
 }
 
 /** Preview real receiving surfaces, including the maintenance well and dock

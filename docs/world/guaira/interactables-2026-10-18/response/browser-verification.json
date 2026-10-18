@@ -1,0 +1,732 @@
+{
+  "viewports": [
+    {
+      "width": 1440,
+      "fits": true,
+      "videos": [
+        {
+          "id": "travessia",
+          "era": "before",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.082018,
+          "error": null
+        },
+        {
+          "id": "travessia",
+          "era": "after",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.090639,
+          "error": null
+        },
+        {
+          "id": "patio",
+          "era": "before",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.128603,
+          "error": null
+        },
+        {
+          "id": "patio",
+          "era": "after",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.09036,
+          "error": null
+        },
+        {
+          "id": "respiros",
+          "era": "before",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.085729,
+          "error": null
+        },
+        {
+          "id": "respiros",
+          "era": "after",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.08794,
+          "error": null
+        }
+      ],
+      "sheets": [
+        {
+          "id": "travessia",
+          "width": 960,
+          "height": 1632
+        },
+        {
+          "id": "patio",
+          "width": 960,
+          "height": 1632
+        },
+        {
+          "id": "respiros",
+          "width": 960,
+          "height": 1224
+        },
+        {
+          "id": "subida",
+          "width": 960,
+          "height": 408
+        },
+        {
+          "id": "galeria",
+          "width": 960,
+          "height": 408
+        },
+        {
+          "id": "alivio",
+          "width": 960,
+          "height": 1632
+        },
+        {
+          "id": "prefeito",
+          "width": 960,
+          "height": 816
+        }
+      ],
+      "responses": [
+        {
+          "id": "guaira-travessia:course:bridge:784:valve",
+          "phase": "approach",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-travessia-course-bridge-784-valve-approach.png",
+          "alt": "Travessia · Ponte da eclusa: Aproximação"
+        },
+        {
+          "id": "guaira-travessia:course:bridge:784:valve",
+          "phase": "operation",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-travessia-course-bridge-784-valve-operation.png",
+          "alt": "Travessia · Ponte da eclusa: Sentada no pedal"
+        },
+        {
+          "id": "guaira-travessia:course:bridge:784:valve",
+          "phase": "response",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-travessia-course-bridge-784-valve-response.png",
+          "alt": "Travessia · Ponte da eclusa: Resposta do mecanismo"
+        },
+        {
+          "id": "guaira-subida:course:bridge:800:valve",
+          "phase": "approach",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-subida-course-bridge-800-valve-approach.png",
+          "alt": "Subida · Guincho da oficina: Aproximação"
+        },
+        {
+          "id": "guaira-subida:course:bridge:800:valve",
+          "phase": "operation",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-subida-course-bridge-800-valve-operation.png",
+          "alt": "Subida · Guincho da oficina: Sentada no pedal"
+        },
+        {
+          "id": "guaira-subida:course:bridge:800:valve",
+          "phase": "response",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-subida-course-bridge-800-valve-response.png",
+          "alt": "Subida · Guincho da oficina: Resposta do mecanismo"
+        },
+        {
+          "id": "guaira-patio-comportas:course:bridge:752:valve",
+          "phase": "approach",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-patio-comportas-course-bridge-752-valve-approach.png",
+          "alt": "Pátio · Ponte central: Aproximação"
+        },
+        {
+          "id": "guaira-patio-comportas:course:bridge:752:valve",
+          "phase": "operation",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-patio-comportas-course-bridge-752-valve-operation.png",
+          "alt": "Pátio · Ponte central: Sentada no pedal"
+        },
+        {
+          "id": "guaira-patio-comportas:course:bridge:752:valve",
+          "phase": "response",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-patio-comportas-course-bridge-752-valve-response.png",
+          "alt": "Pátio · Ponte central: Resposta do mecanismo"
+        },
+        {
+          "id": "guaira-respiros:course:broken-bank:valve",
+          "phase": "approach",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-respiros-course-broken-bank-valve-approach.png",
+          "alt": "Respiros · Registro das taipas: Aproximação"
+        },
+        {
+          "id": "guaira-respiros:course:broken-bank:valve",
+          "phase": "operation",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-respiros-course-broken-bank-valve-operation.png",
+          "alt": "Respiros · Registro das taipas: Sentada no pedal"
+        },
+        {
+          "id": "guaira-respiros:course:broken-bank:valve",
+          "phase": "response",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-respiros-course-broken-bank-valve-response.png",
+          "alt": "Respiros · Registro das taipas: Resposta do mecanismo"
+        },
+        {
+          "id": "guaira-camara-alivio:course:collector-outlet:valve",
+          "phase": "approach",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-camara-alivio-course-collector-outlet-valve-approach.png",
+          "alt": "Alívio · Saída do coletor: Aproximação"
+        },
+        {
+          "id": "guaira-camara-alivio:course:collector-outlet:valve",
+          "phase": "operation",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-camara-alivio-course-collector-outlet-valve-operation.png",
+          "alt": "Alívio · Saída do coletor: Sentada no pedal"
+        },
+        {
+          "id": "guaira-camara-alivio:course:collector-outlet:valve",
+          "phase": "response",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-camara-alivio-course-collector-outlet-valve-response.png",
+          "alt": "Alívio · Saída do coletor: Resposta do mecanismo"
+        },
+        {
+          "id": "guaira-travessia:course:lock-outlet:valve",
+          "phase": "approach",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-travessia-course-lock-outlet-valve-approach.png",
+          "alt": "Travessia · Registro da eclusa: Aproximação"
+        },
+        {
+          "id": "guaira-travessia:course:lock-outlet:valve",
+          "phase": "operation",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-travessia-course-lock-outlet-valve-operation.png",
+          "alt": "Travessia · Registro da eclusa: Sentada no pedal"
+        },
+        {
+          "id": "guaira-travessia:course:lock-outlet:valve",
+          "phase": "response",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-travessia-course-lock-outlet-valve-response.png",
+          "alt": "Travessia · Registro da eclusa: Resposta do mecanismo"
+        },
+        {
+          "id": "guaira-camara-alivio:course:counterpressure-b:valve",
+          "phase": "approach",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-camara-alivio-course-counterpressure-b-valve-approach.png",
+          "alt": "Alívio · Segunda grelha: Aproximação"
+        },
+        {
+          "id": "guaira-camara-alivio:course:counterpressure-b:valve",
+          "phase": "operation",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-camara-alivio-course-counterpressure-b-valve-operation.png",
+          "alt": "Alívio · Segunda grelha: Sentada no pedal"
+        },
+        {
+          "id": "guaira-camara-alivio:course:counterpressure-b:valve",
+          "phase": "response",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-camara-alivio-course-counterpressure-b-valve-response.png",
+          "alt": "Alívio · Segunda grelha: Resposta do mecanismo"
+        },
+        {
+          "id": "guaira-galeria:course:inspection-outlet:valve",
+          "phase": "approach",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-galeria-course-inspection-outlet-valve-approach.png",
+          "alt": "Galeria · Registro do túnel: Aproximação"
+        },
+        {
+          "id": "guaira-galeria:course:inspection-outlet:valve",
+          "phase": "operation",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-galeria-course-inspection-outlet-valve-operation.png",
+          "alt": "Galeria · Registro do túnel: Sentada no pedal"
+        },
+        {
+          "id": "guaira-galeria:course:inspection-outlet:valve",
+          "phase": "response",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-galeria-course-inspection-outlet-valve-response.png",
+          "alt": "Galeria · Registro do túnel: Resposta do mecanismo"
+        },
+        {
+          "id": "guaira-patio-comportas:course:return-grate:valve",
+          "phase": "approach",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-patio-comportas-course-return-grate-valve-approach.png",
+          "alt": "Pátio · Registro do retorno: Aproximação"
+        },
+        {
+          "id": "guaira-patio-comportas:course:return-grate:valve",
+          "phase": "operation",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-patio-comportas-course-return-grate-valve-operation.png",
+          "alt": "Pátio · Registro do retorno: Sentada no pedal"
+        },
+        {
+          "id": "guaira-patio-comportas:course:return-grate:valve",
+          "phase": "response",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-patio-comportas-course-return-grate-valve-response.png",
+          "alt": "Pátio · Registro do retorno: Resposta do mecanismo"
+        },
+        {
+          "id": "guaira-respiros:course:workshop-grate:valve",
+          "phase": "approach",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-respiros-course-workshop-grate-valve-approach.png",
+          "alt": "Respiros · Oficina suspensa: Aproximação"
+        },
+        {
+          "id": "guaira-respiros:course:workshop-grate:valve",
+          "phase": "operation",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-respiros-course-workshop-grate-valve-operation.png",
+          "alt": "Respiros · Oficina suspensa: Sentada no pedal"
+        },
+        {
+          "id": "guaira-respiros:course:workshop-grate:valve",
+          "phase": "response",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-respiros-course-workshop-grate-valve-response.png",
+          "alt": "Respiros · Oficina suspensa: Resposta do mecanismo"
+        },
+        {
+          "id": "guaira-camara-alivio:course:independent-ramal:valve",
+          "phase": "approach",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-camara-alivio-course-independent-ramal-valve-approach.png",
+          "alt": "Alívio · Ramal independente: Aproximação"
+        },
+        {
+          "id": "guaira-camara-alivio:course:independent-ramal:valve",
+          "phase": "operation",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-camara-alivio-course-independent-ramal-valve-operation.png",
+          "alt": "Alívio · Ramal independente: Sentada no pedal"
+        },
+        {
+          "id": "guaira-camara-alivio:course:independent-ramal:valve",
+          "phase": "response",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-camara-alivio-course-independent-ramal-valve-response.png",
+          "alt": "Alívio · Ramal independente: Resposta do mecanismo"
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "fits": true,
+      "videos": [
+        {
+          "id": "travessia",
+          "era": "before",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.102268,
+          "error": null
+        },
+        {
+          "id": "travessia",
+          "era": "after",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.107921,
+          "error": null
+        },
+        {
+          "id": "patio",
+          "era": "before",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.106863,
+          "error": null
+        },
+        {
+          "id": "patio",
+          "era": "after",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.106997,
+          "error": null
+        },
+        {
+          "id": "respiros",
+          "era": "before",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.105515,
+          "error": null
+        },
+        {
+          "id": "respiros",
+          "era": "after",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.10764,
+          "error": null
+        }
+      ],
+      "sheets": [
+        {
+          "id": "travessia",
+          "width": 960,
+          "height": 1632
+        },
+        {
+          "id": "patio",
+          "width": 960,
+          "height": 1632
+        },
+        {
+          "id": "respiros",
+          "width": 960,
+          "height": 1224
+        },
+        {
+          "id": "subida",
+          "width": 960,
+          "height": 408
+        },
+        {
+          "id": "galeria",
+          "width": 960,
+          "height": 408
+        },
+        {
+          "id": "alivio",
+          "width": 960,
+          "height": 1632
+        },
+        {
+          "id": "prefeito",
+          "width": 960,
+          "height": 816
+        }
+      ],
+      "responses": [
+        {
+          "id": "guaira-travessia:course:bridge:784:valve",
+          "phase": "approach",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-travessia-course-bridge-784-valve-approach.png",
+          "alt": "Travessia · Ponte da eclusa: Aproximação"
+        },
+        {
+          "id": "guaira-travessia:course:bridge:784:valve",
+          "phase": "operation",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-travessia-course-bridge-784-valve-operation.png",
+          "alt": "Travessia · Ponte da eclusa: Sentada no pedal"
+        },
+        {
+          "id": "guaira-travessia:course:bridge:784:valve",
+          "phase": "response",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-travessia-course-bridge-784-valve-response.png",
+          "alt": "Travessia · Ponte da eclusa: Resposta do mecanismo"
+        },
+        {
+          "id": "guaira-subida:course:bridge:800:valve",
+          "phase": "approach",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-subida-course-bridge-800-valve-approach.png",
+          "alt": "Subida · Guincho da oficina: Aproximação"
+        },
+        {
+          "id": "guaira-subida:course:bridge:800:valve",
+          "phase": "operation",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-subida-course-bridge-800-valve-operation.png",
+          "alt": "Subida · Guincho da oficina: Sentada no pedal"
+        },
+        {
+          "id": "guaira-subida:course:bridge:800:valve",
+          "phase": "response",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-subida-course-bridge-800-valve-response.png",
+          "alt": "Subida · Guincho da oficina: Resposta do mecanismo"
+        },
+        {
+          "id": "guaira-patio-comportas:course:bridge:752:valve",
+          "phase": "approach",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-patio-comportas-course-bridge-752-valve-approach.png",
+          "alt": "Pátio · Ponte central: Aproximação"
+        },
+        {
+          "id": "guaira-patio-comportas:course:bridge:752:valve",
+          "phase": "operation",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-patio-comportas-course-bridge-752-valve-operation.png",
+          "alt": "Pátio · Ponte central: Sentada no pedal"
+        },
+        {
+          "id": "guaira-patio-comportas:course:bridge:752:valve",
+          "phase": "response",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-patio-comportas-course-bridge-752-valve-response.png",
+          "alt": "Pátio · Ponte central: Resposta do mecanismo"
+        },
+        {
+          "id": "guaira-respiros:course:broken-bank:valve",
+          "phase": "approach",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-respiros-course-broken-bank-valve-approach.png",
+          "alt": "Respiros · Registro das taipas: Aproximação"
+        },
+        {
+          "id": "guaira-respiros:course:broken-bank:valve",
+          "phase": "operation",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-respiros-course-broken-bank-valve-operation.png",
+          "alt": "Respiros · Registro das taipas: Sentada no pedal"
+        },
+        {
+          "id": "guaira-respiros:course:broken-bank:valve",
+          "phase": "response",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-respiros-course-broken-bank-valve-response.png",
+          "alt": "Respiros · Registro das taipas: Resposta do mecanismo"
+        },
+        {
+          "id": "guaira-camara-alivio:course:collector-outlet:valve",
+          "phase": "approach",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-camara-alivio-course-collector-outlet-valve-approach.png",
+          "alt": "Alívio · Saída do coletor: Aproximação"
+        },
+        {
+          "id": "guaira-camara-alivio:course:collector-outlet:valve",
+          "phase": "operation",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-camara-alivio-course-collector-outlet-valve-operation.png",
+          "alt": "Alívio · Saída do coletor: Sentada no pedal"
+        },
+        {
+          "id": "guaira-camara-alivio:course:collector-outlet:valve",
+          "phase": "response",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-camara-alivio-course-collector-outlet-valve-response.png",
+          "alt": "Alívio · Saída do coletor: Resposta do mecanismo"
+        },
+        {
+          "id": "guaira-travessia:course:lock-outlet:valve",
+          "phase": "approach",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-travessia-course-lock-outlet-valve-approach.png",
+          "alt": "Travessia · Registro da eclusa: Aproximação"
+        },
+        {
+          "id": "guaira-travessia:course:lock-outlet:valve",
+          "phase": "operation",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-travessia-course-lock-outlet-valve-operation.png",
+          "alt": "Travessia · Registro da eclusa: Sentada no pedal"
+        },
+        {
+          "id": "guaira-travessia:course:lock-outlet:valve",
+          "phase": "response",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-travessia-course-lock-outlet-valve-response.png",
+          "alt": "Travessia · Registro da eclusa: Resposta do mecanismo"
+        },
+        {
+          "id": "guaira-camara-alivio:course:counterpressure-b:valve",
+          "phase": "approach",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-camara-alivio-course-counterpressure-b-valve-approach.png",
+          "alt": "Alívio · Segunda grelha: Aproximação"
+        },
+        {
+          "id": "guaira-camara-alivio:course:counterpressure-b:valve",
+          "phase": "operation",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-camara-alivio-course-counterpressure-b-valve-operation.png",
+          "alt": "Alívio · Segunda grelha: Sentada no pedal"
+        },
+        {
+          "id": "guaira-camara-alivio:course:counterpressure-b:valve",
+          "phase": "response",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-camara-alivio-course-counterpressure-b-valve-response.png",
+          "alt": "Alívio · Segunda grelha: Resposta do mecanismo"
+        },
+        {
+          "id": "guaira-galeria:course:inspection-outlet:valve",
+          "phase": "approach",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-galeria-course-inspection-outlet-valve-approach.png",
+          "alt": "Galeria · Registro do túnel: Aproximação"
+        },
+        {
+          "id": "guaira-galeria:course:inspection-outlet:valve",
+          "phase": "operation",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-galeria-course-inspection-outlet-valve-operation.png",
+          "alt": "Galeria · Registro do túnel: Sentada no pedal"
+        },
+        {
+          "id": "guaira-galeria:course:inspection-outlet:valve",
+          "phase": "response",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-galeria-course-inspection-outlet-valve-response.png",
+          "alt": "Galeria · Registro do túnel: Resposta do mecanismo"
+        },
+        {
+          "id": "guaira-patio-comportas:course:return-grate:valve",
+          "phase": "approach",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-patio-comportas-course-return-grate-valve-approach.png",
+          "alt": "Pátio · Registro do retorno: Aproximação"
+        },
+        {
+          "id": "guaira-patio-comportas:course:return-grate:valve",
+          "phase": "operation",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-patio-comportas-course-return-grate-valve-operation.png",
+          "alt": "Pátio · Registro do retorno: Sentada no pedal"
+        },
+        {
+          "id": "guaira-patio-comportas:course:return-grate:valve",
+          "phase": "response",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-patio-comportas-course-return-grate-valve-response.png",
+          "alt": "Pátio · Registro do retorno: Resposta do mecanismo"
+        },
+        {
+          "id": "guaira-respiros:course:workshop-grate:valve",
+          "phase": "approach",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-respiros-course-workshop-grate-valve-approach.png",
+          "alt": "Respiros · Oficina suspensa: Aproximação"
+        },
+        {
+          "id": "guaira-respiros:course:workshop-grate:valve",
+          "phase": "operation",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-respiros-course-workshop-grate-valve-operation.png",
+          "alt": "Respiros · Oficina suspensa: Sentada no pedal"
+        },
+        {
+          "id": "guaira-respiros:course:workshop-grate:valve",
+          "phase": "response",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-respiros-course-workshop-grate-valve-response.png",
+          "alt": "Respiros · Oficina suspensa: Resposta do mecanismo"
+        },
+        {
+          "id": "guaira-camara-alivio:course:independent-ramal:valve",
+          "phase": "approach",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-camara-alivio-course-independent-ramal-valve-approach.png",
+          "alt": "Alívio · Ramal independente: Aproximação"
+        },
+        {
+          "id": "guaira-camara-alivio:course:independent-ramal:valve",
+          "phase": "operation",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-camara-alivio-course-independent-ramal-valve-operation.png",
+          "alt": "Alívio · Ramal independente: Sentada no pedal"
+        },
+        {
+          "id": "guaira-camara-alivio:course:independent-ramal:valve",
+          "phase": "response",
+          "width": 320,
+          "height": 180,
+          "src": "response/guaira-camara-alivio-course-independent-ramal-valve-response.png",
+          "alt": "Alívio · Ramal independente: Resposta do mecanismo"
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

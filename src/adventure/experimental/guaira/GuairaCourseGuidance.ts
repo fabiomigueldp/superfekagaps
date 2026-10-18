@@ -2,6 +2,7 @@ import type { WorldGame } from '../../WorldGame';
 import { TileType as T } from '../../../constants';
 import { jetCycle } from '../../WorldMachineState';
 import { GUAIRA_COURSES, guairaCourseDetours, GUAIRA_MAINTENANCE_ROUTES, guairaCourseRoom, type GuairaCourseId, type GuairaCourseDetour } from './GuairaCourseDesign';
+import { guairaLinkedControl } from './GuairaControlArt';
 
 interface CourseNavigation {
     objects:WorldGame['objects']; id:GuairaCourseId;
@@ -58,6 +59,48 @@ export function guairaDetourRecovery(game:WorldGame,id:GuairaCourseId){
     return !!d&&p.position.y+p.height>d.entryY+4&&p.position.x-GUAIRA_COURSES[id].start<d.decks.at(-1)![0];
 }
 
+const outlets: Readonly<Record<string, { hint: string; effect: string; onward: string }>> = {
+    'lock-outlet': { hint:'DESCARGA DO CANAL FECHADA', effect:'a descarga do canal abaixo e à esquerda', onward:'Desça pelos apoios à direita. A água do canal ainda exige o salto entre as margens.' },
+    'return-grate': { hint:'GRELHA DO RETORNO FECHADA', effect:'a grelha do retorno, no piso à direita', onward:'Você pode seguir pelos apoios ou descer para o piso; a patrulha continua ali.' },
+    'workshop-grate': { hint:'GRELHA DA OFICINA FECHADA', effect:'a grelha da oficina, abaixo e à direita', onward:'O passadiço alto continua pelas tábuas rachadas. Pelo piso, observe a patrulha.' },
+    'broken-bank': { hint:'GRELHA DA MARGEM FECHADA', effect:'a grelha da margem, abaixo e à direita', onward:'Desça pelos apoios à direita; os canais entre as taipas continuam abertos.' },
+    'inspection-outlet': { hint:'GRELHA DO ALTO FECHADA', effect:'a grelha do corredor acima e à esquerda', onward:'Para sair do túnel, suba os degraus à direita.' },
+    'independent-ramal': { hint:'SAIDA DO RAMAL FECHADA', effect:'a saída deste ramal, abaixo e à direita', onward:'Siga pela varanda ou retorne ao piso. Este registro não altera as outras saídas.' },
+    'counterpressure-b': { hint:'SEGUNDA GRELHA FECHADA', effect:'somente a segunda grelha, abaixo e à direita', onward:'A primeira continua descarregando. Desça pelos apoios à direita e observe o próximo carregador.' },
+    'collector-outlet': { hint:'SAIDA DO COLETOR FECHADA', effect:'a saída do coletor, abaixo e à direita', onward:'Desça pelos apoios à direita para reencontrar o piso.' },
+};
+
+/** Describe the actual receiving mechanism close to its control. A short
+ * native-clock grace keeps feedback visible during the pound's rebound; it
+ * cannot leak through another floor or follow the player into the next room. */
+function controlGuidance(game:WorldGame,id:GuairaCourseId){
+    const p=game.player.data,x=p.position.x+p.width/2,feet=p.position.y+p.height,time=game.objects.time;
+    const controls=game.objects.bodies.filter(b=>b.kind==='switch'&&b.id.includes(':course:')).map(b=>{
+        const target=game.objects.get(b.link??''),age=b.changedAt===undefined?Infinity:time-b.changedAt;
+        const recent=age>=0&&age<1800,dx=Math.abs(b.x+b.width/2-x),dy=feet-b.y-b.height;
+        const close=dx<=(target?.active?64:96)&&Math.abs(dy)<24;
+        const bridgeApproach=target?.kind==='lift'&&b.changedAt!==undefined&&x>=b.x-16&&x<=target.x+32
+            &&feet>=Math.min(b.y+b.height,target.to?.y??b.y)-16&&feet<=b.y+b.height+24;
+        return {b,target,recent,distance:dx,visible:close||bridgeApproach||recent&&dx<=120&&dy>=-88&&dy<24};
+    }).filter(v=>v.target&&v.visible).sort((a,b)=>a.distance-b.distance);
+    const nearest=controls[0];if(!nearest)return null;
+    const {b,target:body,recent}=nearest,target=body!,state=guairaLinkedControl(b,target);
+    if(target.kind==='lift'){
+        if(state.phase==='moving')return {hint:target.active?'PONTE SUBINDO: ESPERE':'PONTE DESCENDO: ESPERE',
+            detail:'O tabuleiro ainda está se movendo. Espere no apoio firme e observe sua chegada antes de avançar.'};
+        if(state.phase==='settled')return {hint:'PONTE PRONTA A DIREITA',detail:id==='travessia'
+            ?'A ponte chegou à margem. Siga até a ilha firme; a descarga e o salto do segundo canal continuam ativos.'
+            :id==='subida'?'O tabuleiro chegou à altura da sacada. Salte da margem para a ponte e siga à direita.'
+            :'A ponte chegou à margem. Atravesse o tabuleiro e prepare o salto para a próxima doca.'};
+        return {hint:'PULE + BAIXO NO REGISTRO',detail:'A sentada neste pedal ergue a ponte à direita. Espere no apoio firme até o tabuleiro chegar.'};
+    }
+    if(target.kind!=='jet')return null;
+    const outlet=outlets[target.id.split(':course:')[1]];if(!outlet)return null;
+    if(target.active)return {hint:outlet.hint,detail:`Você fechou ${outlet.effect}. ${outlet.onward} Outra sentada no mesmo pedal reabre essa saída.`};
+    if(recent)return {hint:'SAIDA REABERTA: CUIDADO',detail:`O registro reabriu ${outlet.effect}. Observe o manômetro: a pressão volta após o aviso. ${outlet.onward}`};
+    return {hint:'PULE + BAIXO NO REGISTRO',detail:`A sentada neste pedal fecha ${outlet.effect}. ${outlet.onward}`};
+}
+
 /** Warnings describe the threat on the player's actual level. A distant grate
  * must not suppress an approaching throw, and a jet below a beam is not on it. */
 export function guairaCourseGuidance(game:WorldGame,id:GuairaCourseId) {
@@ -87,8 +130,7 @@ export function guairaCourseGuidance(game:WorldGame,id:GuairaCourseId) {
     const cycle=jet?jetCycle(jet,game.objects.time):null;
     const immediate=jet&&jet.x<x+p.width+(backtracking?8:32)&&jet.x+jet.width>x-(backtracking?32:8);
     const warning=foes.find(e=>e.phase==='warning'||['charger','agitator','minion'].includes(e.spec.kind)&&e.phase==='attack');
-    const foe=foes[0],plate=game.objects.bodies.find(b=>b.kind==='switch'&&!b.active&&nearby(b.x,b.width)
-        &&Math.abs(b.y+8-feet)<24&&Math.abs(b.x-x)<96);
+    const foe=foes[0],control=controlGuidance(game,id);
     const barrel=game.objects.barrels.find(b=>b.life>0&&Math.abs(b.x-x)<96&&b.y+16>p.position.y&&b.y<feet);
     const local=x-GUAIRA_COURSES[id].start;
     const carriage=id==='respiros'?game.objects.bodies.find(b=>b.id.endsWith(':pump-carriage')):undefined;
@@ -114,7 +156,7 @@ export function guairaCourseGuidance(game:WorldGame,id:GuairaCourseId) {
         :warning?.spec.kind==='minion'?(warning.phase==='attack'?'PINCA ABERTA: SALTE':'PINCA: PREPARE O SALTO')
         :warning?.spec.kind==='loader'&&warning.highThrow?'ARREMESSO ALTO A CAMINHO'
         :warning?'ARREMESSO A CAMINHO':barrel?'BARRIL: SALTE OU RECUE':immediate&&cycle?.phase==='charging'?'PRESSAO SUBINDO'
-        :fragile?'TABUA CEDE - CONTINUE':plate?'PULE + BAIXO NO REGISTRO':foe?.spec.kind==='helmet'&&foe.armor?'SENTADA QUEBRA A COURACA'
+        :fragile?'TABUA CEDE - CONTINUE':control?control.hint:foe?.spec.kind==='helmet'&&foe.armor?'SENTADA QUEBRA A COURACA'
         :foe?.spec.kind==='helmet'&&foe.phase==='stunned'?'COURACA QUEBRADA: ATAQUE'
         :foe?.spec.kind==='charger'&&foe.phase==='rest'?'AGORA: ATAQUE POR CIMA'
         :foe?.spec.kind==='agitator'&&foe.phase==='rest'?'PINCAS RECOLHIDAS: SALTE'
@@ -133,13 +175,15 @@ export function guairaCourseGuidance(game:WorldGame,id:GuairaCourseId) {
         :recovering?'APOIO BAIXO: CUIDE DA MARGEM':descending?'DESCIDA: SIGA OS APOIOS':detour&&backtracking?'RETORNO: PROCURE APOIOS'
         :maintaining?(maintained?'GRELHA FECHADA: DESCA A DIREITA':'REGISTRO DE MANUTENCAO A DIREITA')
         :island?'ILHA FIRME: OBSERVE A DESCARGA'
-        :sluice&&local<784?(lock?.active?'PONTE: SIGA ATE A ILHA':'PLACA ABAIXO / PASSADICO ACIMA')
+        :sluice&&local<784?(lock?.active?(lock.y===lock.to?.y?'PONTE: SIGA ATE A ILHA':'PONTE SUBINDO: ESPERE')
+            :lock&&lock.y!==lock.home?.y?'PONTE DESCENDO: ESPERE':'PLACA ABAIXO / PASSADICO ACIMA')
         :sluice&&local<1024?'SALTE O CANAL NO INTERVALO SECO'
         :detour?'DESVIO ALTO - MOEDAS E RISCO':jet?.active?'REGISTRO FECHADO':jet?'OBSERVE A PRESSAO'
         :foe?'SALTE OU ATAQUE POR CIMA':backtracking?'EXPLORE O CAMINHO DE VOLTA'
         :counterpressure?'DUAS GRELHAS: LEIA CADA CICLO'
         :room.name==='ANDAIMES VIVOS'||room.name==='TABUAS DA GALERIA'?'TABUA RACHADA CEDE':'EXPLORE E SIGA A DIREITA';
-    return {name:detour?.name??room.name,hint,detail:fragile?'A tábua está cedendo. Salte para o próximo apoio antes de ela cair.'
+    return {name:detour?.name??room.name,hint,detail:control&&hint===control.hint?control.detail
+        :fragile?'A tábua está cedendo. Salte para o próximo apoio antes de ela cair.'
         :recovering?'Você caiu no apoio baixo. Observe a margem antes de descer; também é possível subir de volta ao desvio.'
         :descending?'Desça pelos apoios até reencontrar a margem e o caminho principal.'
         :detour&&backtracking?'Volte pelos apoios à esquerda. As tábuas rachadas e a pressão da água continuam ativas.':detour?.hint??room.hint};

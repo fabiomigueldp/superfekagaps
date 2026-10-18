@@ -1,0 +1,151 @@
+{
+  "date": "2026-10-17",
+  "nativeInputOnly": true,
+  "actorOrClockEdits": false,
+  "simulationHz": 60,
+  "videoFps": 30,
+  "videoFrames": {
+    "travessia": {
+      "firstFrame": 450,
+      "lastFrame": 1350
+    },
+    "respiros": {
+      "firstFrame": 450,
+      "lastFrame": 1350
+    }
+  },
+  "routes": [
+    {
+      "name": "patio",
+      "finished": true,
+      "damage": 0,
+      "frames": 3425,
+      "coins": 11,
+      "identicalSampledPositionsAndCamera": true,
+      "comparedStates": 19,
+      "visualViews": 56,
+      "sheets": [
+        "patio-sweep-01.png",
+        "patio-sweep-02.png",
+        "patio-sweep-03.png",
+        "patio-sweep-04.png"
+      ]
+    },
+    {
+      "name": "lab",
+      "finished": true,
+      "damage": 0,
+      "frames": 1274,
+      "coins": 0,
+      "identicalSampledPositionsAndCamera": true,
+      "comparedStates": 16,
+      "visualViews": 16,
+      "sheets": [
+        "lab-sweep-01.png"
+      ]
+    },
+    {
+      "name": "subida",
+      "finished": true,
+      "damage": 0,
+      "frames": 2566,
+      "coins": 17,
+      "identicalSampledPositionsAndCamera": true,
+      "comparedStates": 19,
+      "visualViews": 60,
+      "sheets": [
+        "subida-sweep-01.png",
+        "subida-sweep-02.png",
+        "subida-sweep-03.png",
+        "subida-sweep-04.png"
+      ]
+    },
+    {
+      "name": "prefeito",
+      "finished": true,
+      "damage": 0,
+      "frames": 2196,
+      "coins": 0,
+      "identicalSampledPositionsAndCamera": true,
+      "comparedStates": 64,
+      "visualViews": 64,
+      "sheets": [
+        "prefeito-sweep-01.png",
+        "prefeito-sweep-02.png",
+        "prefeito-sweep-03.png",
+        "prefeito-sweep-04.png"
+      ]
+    },
+    {
+      "name": "galeria",
+      "finished": true,
+      "damage": 0,
+      "frames": 2011,
+      "coins": 16,
+      "identicalSampledPositionsAndCamera": true,
+      "comparedStates": 16,
+      "visualViews": 53,
+      "sheets": [
+        "galeria-sweep-01.png",
+        "galeria-sweep-02.png",
+        "galeria-sweep-03.png",
+        "galeria-sweep-04.png"
+      ]
+    },
+    {
+      "name": "alivio",
+      "finished": true,
+      "damage": 0,
+      "frames": 1390,
+      "coins": 10,
+      "identicalSampledPositionsAndCamera": true,
+      "comparedStates": 16,
+      "visualViews": 43,
+      "sheets": [
+        "alivio-sweep-01.png",
+        "alivio-sweep-02.png",
+        "alivio-sweep-03.png"
+      ]
+    },
+    {
+      "name": "travessia",
+      "finished": true,
+      "damage": 0,
+      "frames": 2354,
+      "coins": 23,
+      "identicalSampledPositionsAndCamera": true,
+      "comparedStates": 16,
+      "visualViews": 47,
+      "sheets": [
+        "travessia-sweep-01.png",
+        "travessia-sweep-02.png",
+        "travessia-sweep-03.png"
+      ]
+    },
+    {
+      "name": "respiros",
+      "finished": true,
+      "damage": 0,
+      "frames": 2132,
+      "coins": 15,
+      "identicalSampledPositionsAndCamera": true,
+      "comparedStates": 17,
+      "visualViews": 47,
+      "sheets": [
+        "respiros-sweep-01.png",
+        "respiros-sweep-02.png",
+        "respiros-sweep-03.png"
+      ]
+    }
+  ],
+  "sourceHashes": {
+    "GuairaFluidArt.ts": "4d43e9ef8aa866fc4d9192192c1f5423ea3c0b474528823bb60b090e8c19dfe5",
+    "GuairaPipeArt.ts": "86abfc35b700ddd20b9a0faf7be228c855fd7152300c8687d05326111d72ce6f",
+    "GuairaWaterworksArt.ts": "24a4967d8da9d8ccdc1cf64a399ddbaa89c314d15bdd6d2ba427366295dc4e6d",
+    "GuairaSluiceArt.ts": "04f01d874ea9a23ca421bc5a713267b37799f82d8422bd98ec79a5efdc7559d1",
+    "respiros/GuairaRespirosArt.ts": "e2df4f2cf8da7948d3a0a06be17483dea36343baca894e2a4acbc83b34bd17a3",
+    "relief/GuairaReliefArt.ts": "db79af89c222bf1762f6b809181ca7c593fda82ab28c54caf9ec7dea5d0c33be",
+    "relief/GuairaReliefFlow.ts": "b4ac001f75aca70c5f402ba967d728dbbc53372b00c6265a60ffdc3ab7e93410",
+    "junction/GuairaJunctionHardwareArt.ts": "0636b95facc2f19dd7b3642b15bae1845213a79620d9c0f7dbcda78e9ec661f7"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-17",
+  "typescript": {
+    "total": 3756,
+    "passed": 3755,
+    "failed": 0,
+    "skipped": 1,
+    "newTests": 8
+  },
+  "javascript": {
+    "passed": 3,
+    "failed": 0
+  },
+  "build": {
+    "passed": true,
+    "typecheck": true,
+    "levelValidator": true,
+    "playerAssets": true,
+    "worldStages": 30,
+    "worldSpriteFrames": 260
+  },
+  "nativeComparison": {
+    "source": "native-verification.json",
+    "scenes": 8,
+    "comparedStates": 183,
+    "visualViews": 386,
+    "unchangedProgression": true
+  },
+  "animationStudies": {
+    "source": "animation-studies.json",
+    "sets": 4,
+    "framesPerSet": 252,
+    "fps": 30,
+    "authoredPose": true
+  },
+  "campaign": {
+    "source": "campaign-report.json",
+    "normalCampaign": true,
+    "executions": 9,
+    "physicalGamepad": false,
+    "passed": true
+  },
+  "review": {
+    "source": "browser-review.json",
+    "widths": [
+      1440,
+      390
+    ],
+    "decodedVideoVariants": 12,
+    "overflow": false,
+    "passed": true
+  }
+}

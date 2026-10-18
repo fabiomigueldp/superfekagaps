@@ -69,6 +69,8 @@ interface FrozenMenuPaint {
     time: number;
 }
 export class WorldGame {
+    /** Optional encounter entry, supplied by the main host without loading its assets at startup. */
+    bonusEncounter?: () => void;
     /** Embedded rooms use one native host menu, with no second pause card. */
     externalPauseMenu = false;
     private readonly lifetime = new DisposalScope();
@@ -1250,6 +1252,7 @@ export class WorldGame {
         this.button(c, this.store.save.completed.length ? 'CONTINUAR' : 'JOGAR', 102, 80, 116, () => this.begin(), WORKSHOP_UI.light, false, 22);
         this.button(c, 'OPÇÕES', 102, 105, 116, () => this.settings('title'), WORKSHOP_UI.light, false, 22);
         this.button(c, 'GALERIA', 102, 130, 116, () => this.change('gallery'), WORKSHOP_UI.light, false, 22);
+        if (this.bonusEncounter) this.button(c, 'MEGA BOSS', 102, 155, 116, this.bonusEncounter, WORKSHOP_UI.gold, false, 20);
     }
     private renderStory(c: CanvasRenderingContext2D) {
         const ending = this.state === 'ending';

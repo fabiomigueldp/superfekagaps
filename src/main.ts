@@ -47,6 +47,15 @@ window.addEventListener('DOMContentLoaded', async () => {
     canvas.setAttribute('inputmode', 'none');
   }
   const classic = params.get('classic') === 'true';
+  if (!isEditor && !classic && params.get('encounter') === 'hipotetico') {
+    const mode = await optionalMode(() => import('./adventure/hipotetico/HypotheticalGame'));
+    if (!mode) return;
+    const encounter = new mode.HypotheticalGame(canvas, () => window.location.assign('./'));
+    encounter.start();
+    canvas.addEventListener('pointerdown', () => canvas.focus({ preventScroll: true }));
+    canvas.focus({ preventScroll: true });
+    return;
+  }
   let game;
   if (isEditor || classic) {
     const mode = await optionalMode(() => import('./game/ClassicEntry'));
@@ -54,6 +63,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     game = new mode.Game(canvas);
   } else {
     game = new FactoryCampaign(canvas);
+    game.bonusEncounter = () => window.location.assign('?encounter=hipotetico');
     game.enableGamepadControls();
     if (params.get('guairaReturn') === '1') game.restoreGuairaReturn();
   }

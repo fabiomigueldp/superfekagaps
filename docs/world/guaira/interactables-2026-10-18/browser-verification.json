@@ -1,0 +1,200 @@
+{
+  "viewports": [
+    {
+      "width": 1440,
+      "fits": true,
+      "videos": [
+        {
+          "id": "travessia",
+          "era": "before",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.093259,
+          "error": null
+        },
+        {
+          "id": "travessia",
+          "era": "after",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.075796,
+          "error": null
+        },
+        {
+          "id": "patio",
+          "era": "before",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.079774,
+          "error": null
+        },
+        {
+          "id": "patio",
+          "era": "after",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.098419,
+          "error": null
+        },
+        {
+          "id": "respiros",
+          "era": "before",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.091091,
+          "error": null
+        },
+        {
+          "id": "respiros",
+          "era": "after",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.094294,
+          "error": null
+        }
+      ],
+      "sheets": [
+        {
+          "id": "travessia",
+          "width": 960,
+          "height": 1632
+        },
+        {
+          "id": "patio",
+          "width": 960,
+          "height": 1632
+        },
+        {
+          "id": "respiros",
+          "width": 960,
+          "height": 1224
+        },
+        {
+          "id": "subida",
+          "width": 960,
+          "height": 408
+        },
+        {
+          "id": "galeria",
+          "width": 960,
+          "height": 408
+        },
+        {
+          "id": "alivio",
+          "width": 960,
+          "height": 1632
+        },
+        {
+          "id": "prefeito",
+          "width": 960,
+          "height": 816
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "fits": true,
+      "videos": [
+        {
+          "id": "travessia",
+          "era": "before",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.094775,
+          "error": null
+        },
+        {
+          "id": "travessia",
+          "era": "after",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.07922,
+          "error": null
+        },
+        {
+          "id": "patio",
+          "era": "before",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.084994,
+          "error": null
+        },
+        {
+          "id": "patio",
+          "era": "after",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.095347,
+          "error": null
+        },
+        {
+          "id": "respiros",
+          "era": "before",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.096173,
+          "error": null
+        },
+        {
+          "id": "respiros",
+          "era": "after",
+          "width": 1280,
+          "height": 600,
+          "duration": 8,
+          "time": 1.075735,
+          "error": null
+        }
+      ],
+      "sheets": [
+        {
+          "id": "travessia",
+          "width": 960,
+          "height": 1632
+        },
+        {
+          "id": "patio",
+          "width": 960,
+          "height": 1632
+        },
+        {
+          "id": "respiros",
+          "width": 960,
+          "height": 1224
+        },
+        {
+          "id": "subida",
+          "width": 960,
+          "height": 408
+        },
+        {
+          "id": "galeria",
+          "width": 960,
+          "height": 408
+        },
+        {
+          "id": "alivio",
+          "width": 960,
+          "height": 1632
+        },
+        {
+          "id": "prefeito",
+          "width": 960,
+          "height": 816
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

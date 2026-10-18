@@ -1,0 +1,126 @@
+{
+  "viewports": [
+    {
+      "width": 1440,
+      "fits": true,
+      "variants": [
+        {
+          "id": "respiros",
+          "kind": "authored-study",
+          "width": 1280,
+          "height": 408,
+          "duration": 8.4,
+          "time": 2.137381,
+          "error": null
+        },
+        {
+          "id": "comporta",
+          "kind": "authored-study",
+          "width": 1280,
+          "height": 408,
+          "duration": 8.4,
+          "time": 2.126238,
+          "error": null
+        },
+        {
+          "id": "canos",
+          "kind": "authored-study",
+          "width": 1280,
+          "height": 408,
+          "duration": 8.4,
+          "time": 2.122694,
+          "error": null
+        },
+        {
+          "id": "alivio",
+          "kind": "authored-study",
+          "width": 1280,
+          "height": 408,
+          "duration": 8.4,
+          "time": 2.13139,
+          "error": null
+        },
+        {
+          "id": "travessia",
+          "kind": "native-gameplay",
+          "width": 960,
+          "height": 540,
+          "duration": 15.033333,
+          "time": 2.136862,
+          "error": null
+        },
+        {
+          "id": "respiros",
+          "kind": "native-gameplay",
+          "width": 960,
+          "height": 540,
+          "duration": 15.033333,
+          "time": 2.119211,
+          "error": null
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "fits": true,
+      "variants": [
+        {
+          "id": "respiros",
+          "kind": "authored-study",
+          "width": 1280,
+          "height": 408,
+          "duration": 8.4,
+          "time": 2.140463,
+          "error": null
+        },
+        {
+          "id": "comporta",
+          "kind": "authored-study",
+          "width": 1280,
+          "height": 408,
+          "duration": 8.4,
+          "time": 2.129128,
+          "error": null
+        },
+        {
+          "id": "canos",
+          "kind": "authored-study",
+          "width": 1280,
+          "height": 408,
+          "duration": 8.4,
+          "time": 2.141015,
+          "error": null
+        },
+        {
+          "id": "alivio",
+          "kind": "authored-study",
+          "width": 1280,
+          "height": 408,
+          "duration": 8.4,
+          "time": 2.117904,
+          "error": null
+        },
+        {
+          "id": "travessia",
+          "kind": "native-gameplay",
+          "width": 960,
+          "height": 540,
+          "duration": 15.033333,
+          "time": 2.126148,
+          "error": null
+        },
+        {
+          "id": "respiros",
+          "kind": "native-gameplay",
+          "width": 960,
+          "height": 540,
+          "duration": 15.033333,
+          "time": 2.129556,
+          "error": null
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

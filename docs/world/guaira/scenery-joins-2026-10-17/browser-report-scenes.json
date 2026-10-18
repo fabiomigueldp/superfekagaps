@@ -1,0 +1,201 @@
+{
+  "kind": "browser-background-studies",
+  "mode": "scenes",
+  "studies": [
+    {
+      "id": "travessia",
+      "authoredCamera": {
+        "cx": 1730,
+        "cy": 50
+      },
+      "reduced": false,
+      "readOnly": true,
+      "repeatable": true,
+      "moving": true,
+      "paused": true,
+      "pausePixels": true,
+      "pauseState": true,
+      "painterMedianMs": 1.7000000029802322,
+      "painterP95Ms": 7
+    },
+    {
+      "id": "patio",
+      "authoredCamera": {
+        "cx": 1510,
+        "cy": 64
+      },
+      "reduced": false,
+      "readOnly": true,
+      "repeatable": true,
+      "moving": true,
+      "paused": true,
+      "pausePixels": true,
+      "pauseState": true,
+      "painterMedianMs": 2.1999999955296516,
+      "painterP95Ms": 5.899999998509884
+    },
+    {
+      "id": "respiros",
+      "authoredCamera": {
+        "cx": 1100,
+        "cy": 156
+      },
+      "reduced": false,
+      "readOnly": true,
+      "repeatable": true,
+      "moving": true,
+      "paused": true,
+      "pausePixels": true,
+      "pauseState": true,
+      "painterMedianMs": 5.699999995529652,
+      "painterP95Ms": 13.700000002980232
+    },
+    {
+      "id": "subida",
+      "authoredCamera": {
+        "cx": 1330,
+        "cy": -15
+      },
+      "reduced": false,
+      "readOnly": true,
+      "repeatable": true,
+      "moving": true,
+      "paused": true,
+      "pausePixels": true,
+      "pauseState": true,
+      "painterMedianMs": 2.9000000059604645,
+      "painterP95Ms": 6.9000000059604645
+    },
+    {
+      "id": "galeria",
+      "authoredCamera": {
+        "cx": 980,
+        "cy": 100
+      },
+      "reduced": false,
+      "readOnly": true,
+      "repeatable": true,
+      "moving": false,
+      "paused": true,
+      "pausePixels": true,
+      "pauseState": true,
+      "painterMedianMs": 1.1000000014901161,
+      "painterP95Ms": 3.1999999955296516
+    },
+    {
+      "id": "alivio",
+      "authoredCamera": {
+        "cx": 1540,
+        "cy": 195
+      },
+      "reduced": false,
+      "readOnly": true,
+      "repeatable": true,
+      "moving": true,
+      "paused": true,
+      "pausePixels": true,
+      "pauseState": true,
+      "painterMedianMs": 1.5,
+      "painterP95Ms": 3.7000000029802322
+    },
+    {
+      "id": "travessia",
+      "authoredCamera": {
+        "cx": 1730,
+        "cy": 50
+      },
+      "reduced": true,
+      "readOnly": true,
+      "repeatable": true,
+      "moving": false,
+      "paused": true,
+      "pausePixels": true,
+      "pauseState": true,
+      "painterMedianMs": 1.2999999970197678,
+      "painterP95Ms": 4.399999998509884
+    },
+    {
+      "id": "patio",
+      "authoredCamera": {
+        "cx": 1510,
+        "cy": 64
+      },
+      "reduced": true,
+      "readOnly": true,
+      "repeatable": true,
+      "moving": false,
+      "paused": true,
+      "pausePixels": true,
+      "pauseState": true,
+      "painterMedianMs": 1.5,
+      "painterP95Ms": 6.199999995529652
+    },
+    {
+      "id": "respiros",
+      "authoredCamera": {
+        "cx": 1100,
+        "cy": 156
+      },
+      "reduced": true,
+      "readOnly": true,
+      "repeatable": true,
+      "moving": false,
+      "paused": true,
+      "pausePixels": true,
+      "pauseState": true,
+      "painterMedianMs": 6.100000001490116,
+      "painterP95Ms": 18.5
+    },
+    {
+      "id": "subida",
+      "authoredCamera": {
+        "cx": 1330,
+        "cy": -15
+      },
+      "reduced": true,
+      "readOnly": true,
+      "repeatable": true,
+      "moving": false,
+      "paused": true,
+      "pausePixels": true,
+      "pauseState": true,
+      "painterMedianMs": 3.399999998509884,
+      "painterP95Ms": 7.200000002980232
+    },
+    {
+      "id": "galeria",
+      "authoredCamera": {
+        "cx": 980,
+        "cy": 100
+      },
+      "reduced": true,
+      "readOnly": true,
+      "repeatable": true,
+      "moving": false,
+      "paused": true,
+      "pausePixels": true,
+      "pauseState": true,
+      "painterMedianMs": 1,
+      "painterP95Ms": 2.6999999955296516
+    },
+    {
+      "id": "alivio",
+      "authoredCamera": {
+        "cx": 1540,
+        "cy": 195
+      },
+      "reduced": true,
+      "readOnly": true,
+      "repeatable": true,
+      "moving": false,
+      "paused": true,
+      "pausePixels": true,
+      "pauseState": true,
+      "painterMedianMs": 1.6000000014901161,
+      "painterP95Ms": 5.5
+    }
+  ],
+  "review": [],
+  "errors": [],
+  "passed": true
+}

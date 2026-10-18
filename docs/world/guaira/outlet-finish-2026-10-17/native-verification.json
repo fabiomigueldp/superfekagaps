@@ -1,0 +1,71 @@
+{
+  "nativeInputOnly": true,
+  "actorOrClockEdits": false,
+  "allSampledStatesUnchanged": true,
+  "scenes": {
+    "travessia": {
+      "frames": 2354,
+      "coins": 23,
+      "finished": true,
+      "damage": 0,
+      "snapshots": 16,
+      "positionsAndCameraUnchanged": true
+    },
+    "patio": {
+      "frames": 3425,
+      "coins": 11,
+      "finished": true,
+      "damage": 0,
+      "snapshots": 19,
+      "positionsAndCameraUnchanged": true
+    },
+    "respiros": {
+      "frames": 2132,
+      "coins": 15,
+      "finished": true,
+      "damage": 0,
+      "snapshots": 17,
+      "positionsAndCameraUnchanged": true
+    },
+    "lab": {
+      "frames": 1274,
+      "coins": 0,
+      "finished": true,
+      "damage": 0,
+      "snapshots": 16,
+      "positionsAndCameraUnchanged": true
+    },
+    "subida": {
+      "frames": 2566,
+      "coins": 17,
+      "finished": true,
+      "damage": 0,
+      "snapshots": 19,
+      "positionsAndCameraUnchanged": true
+    },
+    "prefeito": {
+      "frames": 2196,
+      "coins": 0,
+      "finished": true,
+      "damage": 0,
+      "snapshots": 64,
+      "positionsAndCameraUnchanged": true
+    },
+    "galeria": {
+      "frames": 2011,
+      "coins": 16,
+      "finished": true,
+      "damage": 0,
+      "snapshots": 16,
+      "positionsAndCameraUnchanged": true
+    },
+    "alivio": {
+      "frames": 1390,
+      "coins": 10,
+      "finished": true,
+      "damage": 0,
+      "snapshots": 16,
+      "positionsAndCameraUnchanged": true
+    }
+  }
+}

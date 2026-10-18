@@ -47,14 +47,11 @@ function servicePanel(c: CanvasRenderingContext2D, x: number, y: number, wet: bo
     for (const dx of [2,33]) for (const dy of [2,40]) r(c, x + dx, y + dy, 1, 1, '#d0b78f');
 }
 
-/** Back wall, roof joinery and buried foundations share the collision camera.
- * Only the landscape through the windows is distant. No false platform caps,
- * warning flashes, interactable-looking valves or independent animation clock. */
-export function drawGuairaWorkshopBackground(c: CanvasRenderingContext2D, id: Interior,
-    cx: number, cy: number, time: number, reduced: boolean) {
+/** One continuous wall under the old and expanded workshops. Masonry joints
+ * are world-anchored and the cornice must not follow the HUD while climbing. */
+export function drawGuairaWorkshopWall(c:CanvasRenderingContext2D,id:Interior,cx:number,cy:number) {
     const g = GUAIRA_COURSES[id], x = g.start - Math.round(cx), f = g.floor - Math.round(cy);
-    const t = sceneryTime(time, reduced), wet = id === 'alivio';
-    c.save(); c.beginPath(); c.rect(0, 0, 320, 180); c.clip();
+    const wet=id==='alivio';
     r(c, 0, 0, 320, 180, wet ? '#cfb18d' : '#d6b38c');
     r(c, 0, f - 204, 320, 25, wet ? '#c5a989' : '#c8a682');
     // Foundation joints remain below the plaster, including the inspection
@@ -69,6 +66,17 @@ export function drawGuairaWorkshopBackground(c: CanvasRenderingContext2D, id: In
             r(c, xx + 1, yy + 3, 1, 13, wet ? '#b4a188' : '#b1997e');
         }
     }
+}
+
+/** Back wall, roof joinery and buried foundations share the collision camera.
+ * Only the landscape through the windows is distant. No false platform caps,
+ * warning flashes, interactable-looking valves or independent animation clock. */
+export function drawGuairaWorkshopBackground(c: CanvasRenderingContext2D, id: Interior,
+    cx: number, cy: number, time: number, reduced: boolean) {
+    const g = GUAIRA_COURSES[id], x = g.start - Math.round(cx), f = g.floor - Math.round(cy);
+    const t = sceneryTime(time, reduced), wet = id === 'alivio';
+    c.save(); c.beginPath(); c.rect(0, 0, 320, 180); c.clip();
+    drawGuairaWorkshopWall(c,id,cx,cy);
     for (const [at, width, use] of BAYS[id]) {
         const left = x + at;
         if (left + width + 12 < 0 || left - 20 > 320) continue;

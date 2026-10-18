@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-17",
+  "scope": "Guaíra: bocais, bacias e resíduos de pressão",
+  "typescript": {
+    "total": 3764,
+    "passed": 3763,
+    "failed": 0,
+    "skipped": 1,
+    "newCases": 8
+  },
+  "javascript": {
+    "passed": 3,
+    "failed": 0
+  },
+  "build": true,
+  "validators": true,
+  "toolsTypecheck": true,
+  "native": {
+    "scenes": 8,
+    "samples": 183,
+    "allStatesUnchanged": true,
+    "damage": 0,
+    "allFinished": true
+  },
+  "campaign": {
+    "normal": true,
+    "developmentAccess": false,
+    "input": "keyboard",
+    "executions": 9,
+    "errors": [],
+    "report": "campaign-report.json"
+  },
+  "browser": {
+    "viewports": [
+      1440,
+      390
+    ],
+    "decodedVideos": 8,
+    "errors": [],
+    "report": "browser-report.json"
+  },
+  "art": {
+    "studies": 4,
+    "framesPerStudy": 252,
+    "fps": 30,
+    "authoredPoses": true,
+    "actorIncluded": false,
+    "finalSourceHashesMatch": true,
+    "report": "animation-studies.json"
+  }
+}

@@ -1,6 +1,7 @@
 import { box as r, oval, pixelLine as line } from '../../../WorldPainting';
 import type { MovingBody } from '../../../WorldPhysics';
 import { drawGuairaTimber } from '../GuairaMaterials';
+import { GUAIRA_FLOW_STEP, guairaFluidTime } from '../GuairaFluidArt';
 
 const P = {
     edge: '#735b4b', brass: '#b99465', light: '#d4b680', shade: '#997650',
@@ -18,7 +19,7 @@ export function drawJunctionIntake(c: CanvasRenderingContext2D, x:number,y:numbe
     oval(c,x,y,30,8,P.edge);oval(c,x+2,y+1,26,5,'#d6b98b');
     r(c,x+7,y+9,16,17,'#75664f');r(c,x+8,y+10,14,15,'#377783');
     r(c,x+9,y+11,12,12,P.water);r(c,x+10,y+11,2,12,'#8ac7c3');
-    const drift=Math.floor((reduced||!Number.isFinite(time)?0:Math.max(0,time))/140)%11;
+    const drift=Math.floor(guairaFluidTime(time,reduced)/GUAIRA_FLOW_STEP.falling)%11;
     c.save();c.beginPath();c.rect(x+9,y+11,12,12);c.clip();
     for(let step=-11;step<23;step+=11) r(c,x+14,y+11+step+drift,4,1,P.glint);
     c.restore();

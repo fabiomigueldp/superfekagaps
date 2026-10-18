@@ -11,6 +11,8 @@ export interface GuairaCourseDetour {
     name: string; hint: string;
     /** Local world pixels, relative to the course's first district. */
     entry: number; end: number; entryY: number; top: number;
+    /** Keep the wood wayfinding post on its landing, clear of enamel controls. */
+    entrySignOffset?: number;
     decks: readonly (readonly [number,number,number,boolean?])[];
     returns: readonly (readonly [number,number,number])[];
     rewards: readonly (readonly [number,number])[];
@@ -25,13 +27,13 @@ export const GUAIRA_COURSE_DETOURS: Readonly<Record<GuairaCourseId,GuairaCourseD
     patio:{name:'PASSADICO DAS DOCAS',hint:'Desvio alto: suba pelos apoios das docas e salte sobre a patrulha; a descida reencontra a margem.',
         entry:176,end:624,entryY:144,top:48,decks:[[304,368,96],[400,512,48]],returns:[[528,560,112],[576,608,160]],rewards:[[320,74],[432,26],[496,26]],guard:{kind:'minion',x:480,y:48,range:8}},
     respiros:{name:'PONTE DO RESERVATORIO',hint:'Desvio alto: continue sobre a grelha e não pare nas tábuas rachadas; a varanda tem uma couraça.',
-        entry:832,end:1312,entryY:208,top:144,decks:[[1040,1088,144,true],[1136,1200,144]],returns:[[1232,1280,224]],rewards:[[1056,122],[1152,122],[1184,122]],guard:{kind:'helmet',x:1160,y:144,range:12}},
+        entry:832,end:1312,entryY:208,entrySignOffset:-20,top:144,decks:[[1040,1088,144,true],[1136,1200,144]],returns:[[1232,1280,224]],rewards:[[1056,122],[1152,122],[1184,122]],guard:{kind:'helmet',x:1160,y:144,range:12}},
     subida:{name:'BEIRAL DA PORTARIA',hint:'Desvio alto: use o beiral para passar sobre a investida; a primeira tábua cede e a sacada tem uma patrulha.',
         entry:1840,end:2112,entryY:80,top:48,decks:[[1920,1952,48,true],[2000,2064,48]],returns:[[2048,2096,96]],rewards:[[1932,26],[2012,26],[2036,26]],guard:{kind:'minion',x:2032,y:48,range:4}},
     galeria:{name:'VIGA DE INSPECAO',hint:'Desvio alto: atravesse a viga sobre o respiro, sem ficar na tábua rachada; retorne pela sacada.',
         entry:800,end:1296,entryY:96,top:48,decks:[[864,912,64],[976,1024,64,true],[1072,1136,48]],returns:[[1168,1200,112],[1232,1280,160]],rewards:[[884,42],[992,42],[1088,26],[1120,26]],guard:{kind:'minion',x:1100,y:48,range:12}},
     alivio:{name:'ALTO DO COLETOR',hint:'Desvio alto: continue pelo registro e pelo coletor; o apoio estreito liga a varanda à última sacada.',
-        entry:224,end:688,entryY:240,top:144,decks:[[416,464,176],[480,512,176,true],[528,576,144]],returns:[[592,624,224],[640,672,288]],rewards:[[432,154],[492,154],[544,122],[568,122]],guard:{kind:'minion',x:548,y:144,range:8}},
+        entry:224,end:688,entryY:240,entrySignOffset:-20,top:144,decks:[[416,464,176],[480,512,176,true],[528,576,144]],returns:[[592,624,224],[640,672,288]],rewards:[[432,154],[492,154],[544,122],[568,122]],guard:{kind:'minion',x:548,y:144,range:8}},
 };
 /** Later maintenance loops trade the floor's water/combat for a different
  * encounter, then isolate one real outlet. Their first deck is always safe. */
@@ -39,17 +41,17 @@ export const GUAIRA_MAINTENANCE_ROUTES: Partial<Record<GuairaCourseId,GuairaCour
     travessia:{name:'PASSADICO DA ECLUSA',hint:'Pelo alto, atravesse a tábua rachada e a patrulha. O registro depois da sacada fecha a descarga do canal; os apoios retornam à taipa.',
         entry:656,end:1184,entryY:144,top:48,
         decks:[[656,704,144],[752,816,96],[864,912,96,true],[960,1072,48]],returns:[[1088,1136,112]],
-        rewards:[[676,122],[772,74],[884,74],[1040,26],[1108,90]],
+        rewards:[[676,122],[772,74],[884,74],[1040,0],[1108,90]],
         guard:{kind:'minion',x:1008,y:48,range:12},outlet:'lock-outlet',valve:1032},
     respiros:{name:'REGISTRO DAS TAIPAS',hint:'Suba pelos apoios firmes. Espere as pinças do mexedor recolherem antes de saltar sobre ele; o registro fecha a grelha da margem.',
         entry:1360,end:1936,entryY:256,top:160,
         decks:[[1360,1408,256],[1456,1504,192],[1568,1728,160]],returns:[[1760,1808,208],[1856,1904,256]],
-        rewards:[[1380,234],[1476,170],[1588,138],[1696,138],[1872,234]],
+        rewards:[[1380,234],[1476,170],[1588,138],[1696,112],[1872,234]],
         guard:{kind:'agitator',x:1624,y:160,range:0},outlet:'broken-bank',valve:1680},
     alivio:{name:'PASSADICO DO COLETOR',hint:'O teto do vagonete se abre quando ele freia nas pontas: aproveite para pisar no piloto. A sentada também quebra a proteção em movimento. O registro depois da passarela fecha a grelha do piso.',
         entry:1008,end:1616,entryY:288,top:208,
         decks:[[1008,1056,288],[1088,1136,240],[1184,1376,208]],returns:[[1392,1440,256],[1536,1584,288]],
-        rewards:[[1028,266],[1108,218],[1204,186],[1352,186],[1552,266]],
+        rewards:[[1028,266],[1108,218],[1204,186],[1352,160],[1552,266]],
         guard:{kind:'rail',x:1264,y:208,range:32},outlet:'collector-outlet',valve:1336},
 };
 export const guairaCourseDetours=(id:GuairaCourseId):readonly GuairaCourseDetour[]=>
@@ -159,8 +161,8 @@ export function developGuairaCourse(stage: AdventureStage, id: GuairaCourseId): 
         deck(176,224,f-64); coins([[188,f-86],[212,f-86]]);
         cp(640); bridge(752,944,672); foe('minion',1008,f,24);
         cp(1120); const outlet=jet('return-grate',1360,96,1100);
-        deck(1184,1232,f-48); deck(1264,1312,f-96); valve(1264,f-96,outlet);
-        coins([[1196,f-70],[1272,f-126],[1410,f-118]]); deck(1360,1440,f-96);
+        deck(1184,1232,f-48); deck(1248,1312,f-96); valve(1264,f-96,outlet);
+        coins([[1196,f-70],[1272,f-144],[1410,f-118]]); deck(1360,1440,f-96);
         foe('helmet',1512,f,24); cp(1632); gap(1728,1824);
         foe('loader',1904,f); deck(1664,1712,f-48); deck(1840,1888,f-48); helmet(1680,f-70);
         cp(2048); deck(2080,2128,f-48); gap(2176,2560); ground(2336,2384,f-48);
@@ -179,9 +181,9 @@ export function developGuairaCourse(stage: AdventureStage, id: GuairaCourseId): 
         jet('rhythm-a',176,80,0); jet('rhythm-b',384,96,2100); foe('minion',560,f,24);
         deck(288,336,f-48); coins([[300,f-70],[324,f-70]]);
         cp(672); const outlet=jet('workshop-grate',944,112,900);
-        deck(752,800,f-48); deck(832,880,f-96); valve(832,f-96,outlet);
+        deck(752,800,f-48); deck(816,880,f-96); valve(832,f-96,outlet);
         deck(928,992,f-144); deck(1056,1104,f-64); foe('helmet',1168,f,24);
-        coins([[764,f-70],[844,f-126],[944,f-166],[1080,f-86]]); helmet(956,f-166);
+        coins([[764,f-70],[844,f-144],[944,f-166],[1080,f-86]]); helmet(956,f-166);
         cp(1312); gap(1424,1504); foe('minion',1552,f,20); gap(1632,1728);
         jet('broken-bank',1792,64,700); cp(1888);
         foe('loader',2088,f); deck(1984,2032,f-64); deck(2112,2176,f-64);
@@ -237,12 +239,12 @@ export function developGuairaCourse(stage: AdventureStage, id: GuairaCourseId): 
         // Approach the last thrower on one plane: its whole silhouette and the
         // landing stay visible even at the apex of a held native jump.
         foe('loader',2560,f);
-        coins([[1920,f+74],[2032,f+74],[2144,f+74],[2216,f+74],[2272,f+42],
+        coins([[1920,f+74],[2032,f+74],[2144,f+74],[2216,f+48],[2272,f+42],
             [2016,f-22],[2208,f-22],[2464,f-22],[2688,f-22]]);
     } else {
         const outlet=jet('independent-ramal',320,112,800);
-        deck(144,192,f-48); deck(224,272,f-96); valve(224,f-96,outlet);
-        deck(320,384,f-112); coins([[156,f-70],[236,f-126],[344,f-134]]); helmet(356,f-134);
+        deck(144,192,f-48); deck(208,272,f-96); valve(224,f-96,outlet);
+        deck(320,384,f-112); coins([[156,f-70],[236,f-144],[344,f-134]]); helmet(356,f-134);
         foe('minion',496,f,24); cp(704); foe('helmet',768,f,32); gap(880,976);
         deck(816,864,f-48); coins([[828,f-70],[916,f-62],[948,f-62]]);
         cp(1120); foe('loader',1328,f); deck(1184,1232,f-64); deck(1328,1376,f-64);
@@ -254,7 +256,7 @@ export function developGuairaCourse(stage: AdventureStage, id: GuairaCourseId): 
         deck(1696,1744,f-64); deck(1808,1856,f-128); deck(1888,1952,f-128); deck(1872,1920,f-48);
         foe('helmet',1904,f-128,10); valve(1920,f-128,returnOutlet);
         foe('loader',2176,f); deck(2080,2128,f-48);
-        coins([[1712,f-86],[1824,f-150],[1896,f-150],[1936,f-150],[1888,f-70],[2096,f-70],[2256,f-22]]);
+        coins([[1712,f-86],[1824,f-150],[1896,f-150],[1936,f-176],[1888,f-70],[2096,f-70],[2256,f-22]]);
     }
     const detour=GUAIRA_COURSE_DETOURS[id];
     for(const [left,right,y,falling]of detour.decks)deck(left,right,y,falling);

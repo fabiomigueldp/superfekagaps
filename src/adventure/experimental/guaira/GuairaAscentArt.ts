@@ -1,4 +1,5 @@
-import { box as r, pixelLine as line, polygon, roof } from '../../WorldPainting';
+import { box as r, pixelLine as line, polygon } from '../../WorldPainting';
+import { drawGuairaTiledRoof, drawGuairaFacadeFinish } from './GuairaBuildingFinish';
 import type { WorldLevel, WorldObjects, MovingBody } from '../../WorldPhysics';
 import { drawGuairaWorker } from './GuairaWorkerArt';
 import { pixelText } from '../../../graphics/BitmapFont';
@@ -74,7 +75,8 @@ function house(c: CanvasRenderingContext2D, x: number, floor: number, w: number,
     r(c, x + 4, top + 14, w - 8, h - 14, P.plasterShade);
     r(c, x + 5, top + 15, w - 18, h - 16, P.plaster);
     drawGuairaPlaster(c, x + 5, top + 18, w - 18, h - 19, w);
-    roof(c, x, top, w, 16);
+    drawGuairaTiledRoof(c, x, top, w);
+    drawGuairaFacadeFinish(c,x,top+17,w,floor);
     r(c, x + 13, floor - 27, 16, 26, '#9a765e');
     r(c, x + 15, floor - 26, 12, 25, '#6c5750');
     r(c, x + 16, floor - 24, 2, 22, '#90715b');
@@ -144,7 +146,8 @@ function bureau(c: CanvasRenderingContext2D, cx: number, cy: number, t: number) 
     r(c, x + 3, y + 20, 153, 72, '#b6977c');
     r(c, x + 5, y + 20, 137, 69, '#dfc096');
     r(c, x + 8, y + 23, 130, 3, '#ecd2aa');
-    roof(c, x - 2, y + 5, 161, 19);
+    drawGuairaTiledRoof(c, x - 2, y + 5, 161);
+    drawGuairaFacadeFinish(c,x,y+22,157,y+92);
     polygon(c, [[x + 51,y + 7],[x + 78,y - 6],[x + 104,y + 7]], '#bc795e');
     polygon(c, [[x + 57,y + 7],[x + 78,y - 2],[x + 98,y + 7]], '#e3c49a');
     r(c, x + 69, y + 5, 18, 12, '#b68d69');

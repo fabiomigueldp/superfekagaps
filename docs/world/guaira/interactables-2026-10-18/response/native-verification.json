@@ -1,0 +1,1108 @@
+{
+  "nativeInputOnly": true,
+  "actorCameraClockEdits": false,
+  "routes": [
+    {
+      "name": "travessia-principal",
+      "scope": "complete-stage",
+      "frames": 2354,
+      "coins": 23,
+      "finished": true,
+      "damage": 0,
+      "activated": [
+        "guaira-travessia:course:bridge:784:valve"
+      ]
+    },
+    {
+      "name": "subida-principal",
+      "scope": "complete-stage",
+      "frames": 2566,
+      "coins": 17,
+      "finished": true,
+      "damage": 0,
+      "activated": [
+        "guaira-subida:course:bridge:800:valve"
+      ]
+    },
+    {
+      "name": "patio-exploracao",
+      "scope": "complete-stage",
+      "frames": 3431,
+      "coins": 11,
+      "finished": true,
+      "damage": 0,
+      "activated": [
+        "guaira-patio-comportas:course:bridge:752:valve"
+      ]
+    },
+    {
+      "name": "respiros-manutencao",
+      "scope": "complete-stage",
+      "frames": 2609,
+      "coins": 23,
+      "finished": true,
+      "damage": 0,
+      "activated": [
+        "guaira-respiros:course:broken-bank:valve"
+      ]
+    },
+    {
+      "name": "alivio-manutencao",
+      "scope": "complete-stage",
+      "frames": 1957,
+      "coins": 21,
+      "finished": true,
+      "damage": 0,
+      "activated": [
+        "guaira-camara-alivio:course:collector-outlet:valve"
+      ]
+    },
+    {
+      "name": "travessia-manutencao",
+      "scope": "complete-stage",
+      "frames": 2548,
+      "coins": 27,
+      "finished": true,
+      "damage": 0,
+      "activated": [
+        "guaira-travessia:course:lock-outlet:valve"
+      ]
+    },
+    {
+      "name": "alivio-registro-alto",
+      "scope": "complete-stage",
+      "frames": 1726,
+      "coins": 20,
+      "finished": true,
+      "damage": 0,
+      "activated": [
+        "guaira-camara-alivio:course:counterpressure-b:valve"
+      ]
+    },
+    {
+      "name": "galeria-inspecao",
+      "scope": "complete-stage",
+      "frames": 2258,
+      "coins": 22,
+      "finished": true,
+      "damage": 0,
+      "activated": [
+        "guaira-galeria:course:inspection-outlet:valve"
+      ]
+    },
+    {
+      "name": "patio-registro",
+      "scope": "complete-stage",
+      "frames": 3839,
+      "coins": 13,
+      "finished": true,
+      "damage": 0,
+      "activated": [
+        "guaira-patio-comportas:course:bridge:752:valve",
+        "guaira-patio-comportas:course:return-grate:valve"
+      ]
+    },
+    {
+      "name": "respiros-registro",
+      "scope": "control-and-rejoin",
+      "frames": 1652,
+      "coins": 9,
+      "finished": false,
+      "damage": 0,
+      "activated": [
+        "guaira-respiros:course:workshop-grate:valve"
+      ]
+    },
+    {
+      "name": "alivio-registro",
+      "scope": "control-and-rejoin",
+      "frames": 932,
+      "coins": 7,
+      "finished": false,
+      "damage": 0,
+      "activated": [
+        "guaira-camara-alivio:course:independent-ramal:valve"
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "guaira-travessia:course:bridge:784:valve",
+      "route": "travessia-principal",
+      "scene": "travessia",
+      "approach": {
+        "frame": 1354,
+        "player": {
+          "x": 2255.304588123777,
+          "y": 149.5
+        },
+        "camera": {
+          "x": 2183.040881455285,
+          "y": 27.999999999325706,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4352,
+            "minY": 0,
+            "maxY": 288
+          }
+        },
+        "controlActive": false,
+        "targetActive": false,
+        "targetY": 304,
+        "targetTo": 192,
+        "hint": "PULE + BAIXO NO REGISTRO",
+        "detail": "A sentada neste pedal ergue a ponte à direita. Espere no apoio firme até o tabuleiro chegar.",
+        "file": "guaira-travessia-course-bridge-784-valve-approach.png"
+      },
+      "operation": {
+        "frame": 1356,
+        "player": {
+          "x": 2255.304588123777,
+          "y": 168
+        },
+        "camera": {
+          "x": 2183.100373679697,
+          "y": 27.999999999546603,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 130,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4352,
+            "minY": 0,
+            "maxY": 288
+          }
+        },
+        "controlActive": true,
+        "targetActive": true,
+        "targetY": 304,
+        "targetTo": 192,
+        "hint": "PONTE SUBINDO: ESPERE",
+        "detail": "O tabuleiro ainda está se movendo. Espere no apoio firme e observe sua chegada antes de avançar.",
+        "file": "guaira-travessia-course-bridge-784-valve-operation.png"
+      },
+      "at": 1356,
+      "response": {
+        "frame": 1479,
+        "player": {
+          "x": 2255.6045881237774,
+          "y": 168
+        },
+        "camera": {
+          "x": 2183.3405880934756,
+          "y": 27.999999999999993,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4352,
+            "minY": 0,
+            "maxY": 288
+          }
+        },
+        "controlActive": true,
+        "targetActive": true,
+        "targetY": 192,
+        "targetTo": 192,
+        "hint": "PONTE PRONTA A DIREITA",
+        "detail": "A ponte chegou à margem. Siga até a ilha firme; a descarga e o salto do segundo canal continuam ativos.",
+        "file": "guaira-travessia-course-bridge-784-valve-response.png"
+      },
+      "sheet": "guaira-travessia-course-bridge-784-valve-sequence.png"
+    },
+    {
+      "id": "guaira-subida:course:bridge:800:valve",
+      "route": "subida-principal",
+      "scene": "subida",
+      "approach": {
+        "frame": 1414,
+        "player": {
+          "x": 2036.0837999218197,
+          "y": 99.39999999999998
+        },
+        "camera": {
+          "x": 1961.345722424929,
+          "y": -20.000005093694103,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4544,
+            "minY": 0,
+            "maxY": 400
+          }
+        },
+        "controlActive": false,
+        "targetActive": false,
+        "targetY": 256,
+        "targetTo": 96,
+        "hint": "PULE + BAIXO NO REGISTRO",
+        "detail": "A sentada neste pedal ergue a ponte à direita. Espere no apoio firme até o tabuleiro chegar.",
+        "file": "guaira-subida-course-bridge-800-valve-approach.png"
+      },
+      "operation": {
+        "frame": 1416,
+        "player": {
+          "x": 2036.0837999218197,
+          "y": 120
+        },
+        "camera": {
+          "x": 1961.9634327082274,
+          "y": -20.000003424999914,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 130,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4544,
+            "minY": 0,
+            "maxY": 400
+          }
+        },
+        "controlActive": true,
+        "targetActive": true,
+        "targetY": 256,
+        "targetTo": 96,
+        "hint": "PONTE SUBINDO: ESPERE",
+        "detail": "O tabuleiro ainda está se movendo. Espere no apoio firme e observe sua chegada antes de avançar.",
+        "file": "guaira-subida-course-bridge-800-valve-operation.png"
+      },
+      "at": 1416,
+      "response": {
+        "frame": 1591,
+        "player": {
+          "x": 2131.3637121602874,
+          "y": 72
+        },
+        "camera": {
+          "x": 2059.099707973023,
+          "y": -20.000000000000007,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4544,
+            "minY": 0,
+            "maxY": 400
+          }
+        },
+        "controlActive": true,
+        "targetActive": true,
+        "targetY": 96,
+        "targetTo": 96,
+        "hint": "PONTE PRONTA A DIREITA",
+        "detail": "O tabuleiro chegou à altura da sacada. Salte da margem para a ponte e siga à direita.",
+        "file": "guaira-subida-course-bridge-800-valve-response.png"
+      },
+      "sheet": "guaira-subida-course-bridge-800-valve-sequence.png"
+    },
+    {
+      "id": "guaira-patio-comportas:course:bridge:752:valve",
+      "route": "patio-exploracao",
+      "scene": "patio",
+      "approach": {
+        "frame": 2244,
+        "player": {
+          "x": 1650.0251144076392,
+          "y": 163.40000000000006
+        },
+        "camera": {
+          "x": 1575.561156808523,
+          "y": 43.99926528220157,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3840,
+            "minY": 0,
+            "maxY": 448
+          }
+        },
+        "controlActive": false,
+        "targetActive": false,
+        "targetY": 320,
+        "targetTo": 208,
+        "hint": "PULE + BAIXO NO REGISTRO",
+        "detail": "A sentada neste pedal ergue a ponte à direita. Espere no apoio firme até o tabuleiro chegar.",
+        "file": "guaira-patio-comportas-course-bridge-752-valve-approach.png"
+      },
+      "operation": {
+        "frame": 2246,
+        "player": {
+          "x": 1650.0251144076392,
+          "y": 184
+        },
+        "camera": {
+          "x": 1576.1170256428836,
+          "y": 43.999505975752335,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 130,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3840,
+            "minY": 0,
+            "maxY": 448
+          }
+        },
+        "controlActive": true,
+        "targetActive": true,
+        "targetY": 320,
+        "targetTo": 208,
+        "hint": "PONTE SUBINDO: ESPERE",
+        "detail": "O tabuleiro ainda está se movendo. Espere no apoio firme e observe sua chegada antes de avançar.",
+        "file": "guaira-patio-comportas-course-bridge-752-valve-operation.png"
+      },
+      "at": 2246,
+      "response": {
+        "frame": 2369,
+        "player": {
+          "x": 1699.8050266461055,
+          "y": 184
+        },
+        "camera": {
+          "x": 1627.540480753217,
+          "y": 43.999999999999986,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3840,
+            "minY": 0,
+            "maxY": 448
+          }
+        },
+        "controlActive": true,
+        "targetActive": true,
+        "targetY": 208,
+        "targetTo": 208,
+        "hint": "PONTE PRONTA A DIREITA",
+        "detail": "A ponte chegou à margem. Atravesse o tabuleiro e prepare o salto para a próxima doca.",
+        "file": "guaira-patio-comportas-course-bridge-752-valve-response.png"
+      },
+      "sheet": "guaira-patio-comportas-course-bridge-752-valve-sequence.png"
+    },
+    {
+      "id": "guaira-respiros:course:broken-bank:valve",
+      "route": "respiros-manutencao",
+      "scene": "respiros",
+      "approach": {
+        "frame": 2106,
+        "player": {
+          "x": 2841.843576873675,
+          "y": 117.49999999999997
+        },
+        "camera": {
+          "x": 2769.7855569910453,
+          "y": 45.18025599999997,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        },
+        "controlActive": false,
+        "targetActive": false,
+        "targetY": 176,
+        "hint": "PULE + BAIXO NO REGISTRO",
+        "detail": "A sentada neste pedal fecha a grelha da margem, abaixo e à direita. Desça pelos apoios à direita; os canais entre as taipas continuam abertos.",
+        "file": "guaira-respiros-course-broken-bank-valve-approach.png"
+      },
+      "operation": {
+        "frame": 2108,
+        "player": {
+          "x": 2841.843576873675,
+          "y": 136
+        },
+        "camera": {
+          "x": 2769.798646276566,
+          "y": 57.18025599999997,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 130,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        },
+        "controlActive": true,
+        "targetActive": true,
+        "targetY": 176,
+        "hint": "GRELHA DA MARGEM FECHADA",
+        "detail": "Você fechou a grelha da margem, abaixo e à direita. Desça pelos apoios à direita; os canais entre as taipas continuam abertos. Outra sentada no mesmo pedal reabre essa saída.",
+        "file": "guaira-respiros-course-broken-bank-valve-operation.png"
+      },
+      "at": 2108,
+      "response": {
+        "frame": 2138,
+        "player": {
+          "x": 2895.643576873675,
+          "y": 83.25000000000006
+        },
+        "camera": {
+          "x": 2804.8241281082373,
+          "y": 36,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        },
+        "controlActive": true,
+        "targetActive": true,
+        "targetY": 176,
+        "hint": "GRELHA DA MARGEM FECHADA",
+        "detail": "Você fechou a grelha da margem, abaixo e à direita. Desça pelos apoios à direita; os canais entre as taipas continuam abertos. Outra sentada no mesmo pedal reabre essa saída.",
+        "file": "guaira-respiros-course-broken-bank-valve-response.png"
+      },
+      "sheet": "guaira-respiros-course-broken-bank-valve-sequence.png"
+    },
+    {
+      "id": "guaira-camara-alivio:course:collector-outlet:valve",
+      "route": "alivio-manutencao",
+      "scene": "alivio",
+      "approach": {
+        "frame": 1598,
+        "player": {
+          "x": 2084.4822357596277,
+          "y": 165.50000000000006
+        },
+        "camera": {
+          "x": 2012.236705441859,
+          "y": 93.18025600000006,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        },
+        "controlActive": false,
+        "targetActive": false,
+        "targetY": 208,
+        "hint": "PULE + BAIXO NO REGISTRO",
+        "detail": "A sentada neste pedal fecha a saída do coletor, abaixo e à direita. Desça pelos apoios à direita para reencontrar o piso.",
+        "file": "guaira-camara-alivio-course-collector-outlet-valve-approach.png"
+      },
+      "operation": {
+        "frame": 1600,
+        "player": {
+          "x": 2084.4822357596277,
+          "y": 184
+        },
+        "camera": {
+          "x": 2012.2920970815476,
+          "y": 105.18025600000006,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 130,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        },
+        "controlActive": true,
+        "targetActive": true,
+        "targetY": 208,
+        "hint": "SAIDA DO COLETOR FECHADA",
+        "detail": "Você fechou a saída do coletor, abaixo e à direita. Desça pelos apoios à direita para reencontrar o piso. Outra sentada no mesmo pedal reabre essa saída.",
+        "file": "guaira-camara-alivio-course-collector-outlet-valve-operation.png"
+      },
+      "at": 1600,
+      "response": {
+        "frame": 1630,
+        "player": {
+          "x": 2126.282235759628,
+          "y": 131.25000000000014
+        },
+        "camera": {
+          "x": 2040.2599528611058,
+          "y": 93.25000000000014,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        },
+        "controlActive": true,
+        "targetActive": true,
+        "targetY": 208,
+        "hint": "SAIDA DO COLETOR FECHADA",
+        "detail": "Você fechou a saída do coletor, abaixo e à direita. Desça pelos apoios à direita para reencontrar o piso. Outra sentada no mesmo pedal reabre essa saída.",
+        "file": "guaira-camara-alivio-course-collector-outlet-valve-response.png"
+      },
+      "sheet": "guaira-camara-alivio-course-collector-outlet-valve-sequence.png"
+    },
+    {
+      "id": "guaira-travessia:course:lock-outlet:valve",
+      "route": "travessia-manutencao",
+      "scene": "travessia",
+      "approach": {
+        "frame": 1697,
+        "player": {
+          "x": 2571.1271984148825,
+          "y": 5.499999999999993
+        },
+        "camera": {
+          "x": 2499.0593049777526,
+          "y": -57.620000000000005,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4352,
+            "minY": 0,
+            "maxY": 288
+          }
+        },
+        "controlActive": false,
+        "targetActive": false,
+        "targetY": 112,
+        "hint": "PULE + BAIXO NO REGISTRO",
+        "detail": "A sentada neste pedal fecha a descarga do canal abaixo e à esquerda. Desça pelos apoios à direita. A água do canal ainda exige o salto entre as margens.",
+        "file": "guaira-travessia-course-lock-outlet-valve-approach.png"
+      },
+      "operation": {
+        "frame": 1699,
+        "player": {
+          "x": 2571.1271984148825,
+          "y": 24
+        },
+        "camera": {
+          "x": 2499.0746217371693,
+          "y": -48.220688,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 130,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4352,
+            "minY": 0,
+            "maxY": 288
+          }
+        },
+        "controlActive": true,
+        "targetActive": true,
+        "targetY": 112,
+        "hint": "DESCARGA DO CANAL FECHADA",
+        "detail": "Você fechou a descarga do canal abaixo e à esquerda. Desça pelos apoios à direita. A água do canal ainda exige o salto entre as margens. Outra sentada no mesmo pedal reabre essa saída.",
+        "file": "guaira-travessia-course-lock-outlet-valve-operation.png"
+      },
+      "at": 1699,
+      "response": {
+        "frame": 1729,
+        "player": {
+          "x": 2615.9271984148827,
+          "y": -28.750000000000014
+        },
+        "camera": {
+          "x": 2529.1225142839417,
+          "y": -66.75000000000001,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4352,
+            "minY": 0,
+            "maxY": 288
+          }
+        },
+        "controlActive": true,
+        "targetActive": true,
+        "targetY": 112,
+        "hint": "DESCARGA DO CANAL FECHADA",
+        "detail": "Você fechou a descarga do canal abaixo e à esquerda. Desça pelos apoios à direita. A água do canal ainda exige o salto entre as margens. Outra sentada no mesmo pedal reabre essa saída.",
+        "file": "guaira-travessia-course-lock-outlet-valve-response.png"
+      },
+      "sheet": "guaira-travessia-course-lock-outlet-valve-sequence.png"
+    },
+    {
+      "id": "guaira-camara-alivio:course:counterpressure-b:valve",
+      "route": "alivio-registro-alto",
+      "scene": "alivio",
+      "approach": {
+        "frame": 1604,
+        "player": {
+          "x": 2663.5804721400864,
+          "y": 160.80000000000007
+        },
+        "camera": {
+          "x": 2591.5237631933155,
+          "y": 102.80000000000005,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        },
+        "controlActive": false,
+        "targetActive": false,
+        "targetY": 208,
+        "hint": "PULE + BAIXO NO REGISTRO",
+        "detail": "A sentada neste pedal fecha somente a segunda grelha, abaixo e à direita. A primeira continua descarregando. Desça pelos apoios à direita e observe o próximo carregador.",
+        "file": "guaira-camara-alivio-course-counterpressure-b-valve-approach.png"
+      },
+      "operation": {
+        "frame": 1606,
+        "player": {
+          "x": 2663.5804721400864,
+          "y": 184
+        },
+        "camera": {
+          "x": 2591.536556731707,
+          "y": 116,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 130,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        },
+        "controlActive": true,
+        "targetActive": true,
+        "targetY": 208,
+        "hint": "SEGUNDA GRELHA FECHADA",
+        "detail": "Você fechou somente a segunda grelha, abaixo e à direita. A primeira continua descarregando. Desça pelos apoios à direita e observe o próximo carregador. Outra sentada no mesmo pedal reabre essa saída.",
+        "file": "guaira-camara-alivio-course-counterpressure-b-valve-operation.png"
+      },
+      "at": 1606,
+      "response": {
+        "frame": 1636,
+        "player": {
+          "x": 2721.8804721400866,
+          "y": 81.20000000000003
+        },
+        "camera": {
+          "x": 2627.557237304059,
+          "y": 43.20000000000003,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        },
+        "controlActive": true,
+        "targetActive": true,
+        "targetY": 208,
+        "hint": "SEGUNDA GRELHA FECHADA",
+        "detail": "As grelhas descarregam alternadamente. Use o apoio entre elas ou suba à válvula protegida para fechar a segunda saída.",
+        "file": "guaira-camara-alivio-course-counterpressure-b-valve-response.png"
+      },
+      "sheet": "guaira-camara-alivio-course-counterpressure-b-valve-sequence.png"
+    },
+    {
+      "id": "guaira-galeria:course:inspection-outlet:valve",
+      "route": "galeria-inspecao",
+      "scene": "galeria",
+      "approach": {
+        "frame": 1923,
+        "player": {
+          "x": 2911.8774021274007,
+          "y": 247
+        },
+        "camera": {
+          "x": 2839.5785731219194,
+          "y": 123.99999999999997,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3520,
+            "minY": 0,
+            "maxY": 432
+          }
+        },
+        "controlActive": false,
+        "targetActive": false,
+        "targetY": 64,
+        "hint": "PULE + BAIXO NO REGISTRO",
+        "detail": "A sentada neste pedal fecha a grelha do corredor acima e à esquerda. Para sair do túnel, suba os degraus à direita.",
+        "file": "guaira-galeria-course-inspection-outlet-valve-approach.png"
+      },
+      "operation": {
+        "frame": 1925,
+        "player": {
+          "x": 2911.8774021274007,
+          "y": 264
+        },
+        "camera": {
+          "x": 2839.645988945556,
+          "y": 123.99999999999997,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 130,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3520,
+            "minY": 0,
+            "maxY": 432
+          }
+        },
+        "controlActive": true,
+        "targetActive": true,
+        "targetY": 64,
+        "hint": "GRELHA DO ALTO FECHADA",
+        "detail": "Você fechou a grelha do corredor acima e à esquerda. Para sair do túnel, suba os degraus à direita. Outra sentada no mesmo pedal reabre essa saída.",
+        "file": "guaira-galeria-course-inspection-outlet-valve-operation.png"
+      },
+      "at": 1925,
+      "response": {
+        "frame": 1955,
+        "player": {
+          "x": 2952.3774021274007,
+          "y": 232
+        },
+        "camera": {
+          "x": 2866.634600147942,
+          "y": 123.99999999999997,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3520,
+            "minY": 0,
+            "maxY": 432
+          }
+        },
+        "controlActive": true,
+        "targetActive": true,
+        "targetY": 64,
+        "hint": "GRELHA DO ALTO FECHADA",
+        "detail": "Você fechou a grelha do corredor acima e à esquerda. Para sair do túnel, suba os degraus à direita. Outra sentada no mesmo pedal reabre essa saída.",
+        "file": "guaira-galeria-course-inspection-outlet-valve-response.png"
+      },
+      "sheet": "guaira-galeria-course-inspection-outlet-valve-sequence.png"
+    },
+    {
+      "id": "guaira-patio-comportas:course:return-grate:valve",
+      "route": "patio-registro",
+      "scene": "patio",
+      "approach": {
+        "frame": 2609,
+        "player": {
+          "x": 2236.750864516139,
+          "y": 69.49999999999999
+        },
+        "camera": {
+          "x": 2164.451851024759,
+          "y": -15.375839623968488,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3840,
+            "minY": 0,
+            "maxY": 448
+          }
+        },
+        "controlActive": false,
+        "targetActive": false,
+        "targetY": 80,
+        "hint": "PULE + BAIXO NO REGISTRO",
+        "detail": "A sentada neste pedal fecha a grelha do retorno, no piso à direita. Você pode seguir pelos apoios ou descer para o piso; a patrulha continua ali.",
+        "file": "guaira-patio-comportas-course-return-grate-valve-approach.png"
+      },
+      "operation": {
+        "frame": 2611,
+        "player": {
+          "x": 2236.750864516139,
+          "y": 88
+        },
+        "camera": {
+          "x": 2164.5193084684142,
+          "y": -3.3758396239684885,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 130,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3840,
+            "minY": 0,
+            "maxY": 448
+          }
+        },
+        "controlActive": true,
+        "targetActive": true,
+        "targetY": 80,
+        "hint": "GRELHA DO RETORNO FECHADA",
+        "detail": "Você fechou a grelha do retorno, no piso à direita. Você pode seguir pelos apoios ou descer para o piso; a patrulha continua ali. Outra sentada no mesmo pedal reabre essa saída.",
+        "file": "guaira-patio-comportas-course-return-grate-valve-operation.png"
+      },
+      "at": 2611,
+      "response": {
+        "frame": 2641,
+        "player": {
+          "x": 2236.750864516139,
+          "y": 88
+        },
+        "camera": {
+          "x": 2164.745862601306,
+          "y": 37.88655688183978,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3840,
+            "minY": 0,
+            "maxY": 448
+          }
+        },
+        "controlActive": true,
+        "targetActive": true,
+        "targetY": 80,
+        "hint": "GRELHA DO RETORNO FECHADA",
+        "detail": "Você fechou a grelha do retorno, no piso à direita. Você pode seguir pelos apoios ou descer para o piso; a patrulha continua ali. Outra sentada no mesmo pedal reabre essa saída.",
+        "file": "guaira-patio-comportas-course-return-grate-valve-response.png"
+      },
+      "sheet": "guaira-patio-comportas-course-return-grate-valve-sequence.png"
+    },
+    {
+      "id": "guaira-respiros:course:workshop-grate:valve",
+      "route": "respiros-registro",
+      "scene": "respiros",
+      "approach": {
+        "frame": 1523,
+        "player": {
+          "x": 1997.8944376490451,
+          "y": 165.50000000000006
+        },
+        "camera": {
+          "x": 1925.678213020185,
+          "y": 68.81712759684363,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        },
+        "controlActive": false,
+        "targetActive": false,
+        "targetY": 176,
+        "hint": "PULE + BAIXO NO REGISTRO",
+        "detail": "A sentada neste pedal fecha a grelha da oficina, abaixo e à direita. O passadiço alto continua pelas tábuas rachadas. Pelo piso, observe a patrulha.",
+        "file": "guaira-respiros-course-workshop-grate-valve-approach.png"
+      },
+      "operation": {
+        "frame": 1525,
+        "player": {
+          "x": 1997.8944376490451,
+          "y": 184
+        },
+        "camera": {
+          "x": 1925.726993296456,
+          "y": 71.17023659611766,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 130,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        },
+        "controlActive": true,
+        "targetActive": true,
+        "targetY": 176,
+        "hint": "GRELHA DA OFICINA FECHADA",
+        "detail": "Você fechou a grelha da oficina, abaixo e à direita. O passadiço alto continua pelas tábuas rachadas. Pelo piso, observe a patrulha. Outra sentada no mesmo pedal reabre essa saída.",
+        "file": "guaira-respiros-course-workshop-grate-valve-operation.png"
+      },
+      "at": 1525,
+      "response": {
+        "frame": 1555,
+        "player": {
+          "x": 1997.8944376490451,
+          "y": 184
+        },
+        "camera": {
+          "x": 1925.8908206310527,
+          "y": 75.98745873259561,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 4256,
+            "minY": 0,
+            "maxY": 384
+          }
+        },
+        "controlActive": true,
+        "targetActive": true,
+        "targetY": 176,
+        "hint": "GRELHA DA OFICINA FECHADA",
+        "detail": "Você fechou a grelha da oficina, abaixo e à direita. O passadiço alto continua pelas tábuas rachadas. Pelo piso, observe a patrulha. Outra sentada no mesmo pedal reabre essa saída.",
+        "file": "guaira-respiros-course-workshop-grate-valve-response.png"
+      },
+      "sheet": "guaira-respiros-course-workshop-grate-valve-sequence.png"
+    },
+    {
+      "id": "guaira-camara-alivio:course:independent-ramal:valve",
+      "route": "alivio-registro",
+      "scene": "alivio",
+      "approach": {
+        "frame": 783,
+        "player": {
+          "x": 974.3248030891903,
+          "y": 197.5000000000001
+        },
+        "camera": {
+          "x": 902.1084923775062,
+          "y": 76.10756142636127,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        },
+        "controlActive": false,
+        "targetActive": false,
+        "targetY": 208,
+        "hint": "PULE + BAIXO NO REGISTRO",
+        "detail": "A sentada neste pedal fecha a saída deste ramal, abaixo e à direita. Siga pela varanda ou retorne ao piso. Este registro não altera as outras saídas.",
+        "file": "guaira-camara-alivio-course-independent-ramal-valve-approach.png"
+      },
+      "operation": {
+        "frame": 785,
+        "player": {
+          "x": 974.3248030891903,
+          "y": 216
+        },
+        "camera": {
+          "x": 902.1572920740622,
+          "y": 76.07232430308532,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 130,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        },
+        "controlActive": true,
+        "targetActive": true,
+        "targetY": 208,
+        "hint": "SAIDA DO RAMAL FECHADA",
+        "detail": "Você fechou a saída deste ramal, abaixo e à direita. Siga pela varanda ou retorne ao piso. Este registro não altera as outras saídas. Outra sentada no mesmo pedal reabre essa saída.",
+        "file": "guaira-camara-alivio-course-independent-ramal-valve-operation.png"
+      },
+      "at": 785,
+      "response": {
+        "frame": 815,
+        "player": {
+          "x": 974.3248030891903,
+          "y": 216
+        },
+        "camera": {
+          "x": 902.3211846311992,
+          "y": 76.00018780183396,
+          "targetX": 0,
+          "targetY": 0,
+          "shakeTimer": 0,
+          "shakeMagnitude": 0,
+          "bounds": {
+            "minX": 0,
+            "maxX": 3072,
+            "minY": 0,
+            "maxY": 384
+          }
+        },
+        "controlActive": true,
+        "targetActive": true,
+        "targetY": 208,
+        "hint": "SAIDA DO RAMAL FECHADA",
+        "detail": "Você fechou a saída deste ramal, abaixo e à direita. Siga pela varanda ou retorne ao piso. Este registro não altera as outras saídas. Outra sentada no mesmo pedal reabre essa saída.",
+        "file": "guaira-camara-alivio-course-independent-ramal-valve-response.png"
+      },
+      "sheet": "guaira-camara-alivio-course-independent-ramal-valve-sequence.png"
+    }
+  ],
+  "covered": 11
+}

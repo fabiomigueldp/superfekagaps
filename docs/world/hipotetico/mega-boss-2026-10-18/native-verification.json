@@ -1,0 +1,840 @@
+{
+  "inputOnly": true,
+  "actorCameraClockEdits": false,
+  "frames": 6528,
+  "videoFrames": 3354,
+  "receipt": {
+    "act": "duel",
+    "phase": 3,
+    "health": 0,
+    "won": true,
+    "deaths": 1,
+    "ticks": 6366
+  },
+  "captures": [
+    {
+      "file": "chase-0.png",
+      "frame": 12,
+      "act": "chase",
+      "state": "arrival",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "chase-span.png",
+      "frame": 138,
+      "act": "chase",
+      "state": "rest",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "chase-1.png",
+      "frame": 150,
+      "act": "chase",
+      "state": "rest",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "terrace-route.png",
+      "frame": 218,
+      "act": "chase",
+      "state": "tell",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "chase-2.png",
+      "frame": 300,
+      "act": "chase",
+      "state": "attack",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "chase-gateway.png",
+      "frame": 388,
+      "act": "chase",
+      "state": "rest",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "chase-3.png",
+      "frame": 450,
+      "act": "chase",
+      "state": "rest",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "siege-0.png",
+      "frame": 478,
+      "act": "siege",
+      "state": "rest",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "distant-gunfire.png",
+      "frame": 578,
+      "act": "siege",
+      "state": "rest",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "guard-minion-walk.png",
+      "frame": 642,
+      "act": "siege",
+      "state": "walk",
+      "phase": 1,
+      "attack": "minion"
+    },
+    {
+      "file": "guard-helmet-walk.png",
+      "frame": 642,
+      "act": "siege",
+      "state": "walk",
+      "phase": 1,
+      "attack": "helmet"
+    },
+    {
+      "file": "bystander-fall.png",
+      "frame": 648,
+      "act": "siege",
+      "state": "rest",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "guard-helmet-stunned.png",
+      "frame": 700,
+      "act": "siege",
+      "state": "stunned",
+      "phase": 1,
+      "attack": "helmet"
+    },
+    {
+      "file": "siege-courtyard.png",
+      "frame": 748,
+      "act": "siege",
+      "state": "rest",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "siege-1.png",
+      "frame": 768,
+      "act": "siege",
+      "state": "rest",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "guard-minion-warning.png",
+      "frame": 774,
+      "act": "siege",
+      "state": "warning",
+      "phase": 1,
+      "attack": "minion"
+    },
+    {
+      "file": "guard-minion-attack.png",
+      "frame": 788,
+      "act": "siege",
+      "state": "attack",
+      "phase": 1,
+      "attack": "minion"
+    },
+    {
+      "file": "guard-minion-rest.png",
+      "frame": 802,
+      "act": "siege",
+      "state": "rest",
+      "phase": 1,
+      "attack": "minion"
+    },
+    {
+      "file": "guard-loader-rest.png",
+      "frame": 982,
+      "act": "siege",
+      "state": "rest",
+      "phase": 1,
+      "attack": "loader"
+    },
+    {
+      "file": "guard-resupply.png",
+      "frame": 1004,
+      "act": "siege",
+      "state": "rest",
+      "phase": 1,
+      "attack": "loader"
+    },
+    {
+      "file": "guard-charger-warning.png",
+      "frame": 1010,
+      "act": "siege",
+      "state": "warning",
+      "phase": 1,
+      "attack": "charger"
+    },
+    {
+      "file": "guard-charger-attack.png",
+      "frame": 1032,
+      "act": "siege",
+      "state": "attack",
+      "phase": 1,
+      "attack": "charger"
+    },
+    {
+      "file": "siege-2.png",
+      "frame": 1068,
+      "act": "siege",
+      "state": "rest",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "guard-charger-rest.png",
+      "frame": 1076,
+      "act": "siege",
+      "state": "rest",
+      "phase": 1,
+      "attack": "charger"
+    },
+    {
+      "file": "siege-3.png",
+      "frame": 1368,
+      "act": "siege",
+      "state": "rest",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "siege-aftermath.png",
+      "frame": 1460,
+      "act": "siege",
+      "state": "rest",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "duel-1-rifle-arrival.png",
+      "frame": 1584,
+      "act": "duel",
+      "state": "arrival",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "duel-gate.png",
+      "frame": 1684,
+      "act": "duel",
+      "state": "rest",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "duel-1-rifle-rest.png",
+      "frame": 1688,
+      "act": "duel",
+      "state": "rest",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "duel-1-rifle-tell.png",
+      "frame": 1720,
+      "act": "duel",
+      "state": "tell",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "duel-1-rifle-attack.png",
+      "frame": 1774,
+      "act": "duel",
+      "state": "attack",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "hot-rifle.png",
+      "frame": 1796,
+      "act": "duel",
+      "state": "attack",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "column-impact.png",
+      "frame": 1802,
+      "act": "duel",
+      "state": "attack",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "duel-1-rifle-recover.png",
+      "frame": 1894,
+      "act": "duel",
+      "state": "recover",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "open-window.png",
+      "frame": 1900,
+      "act": "duel",
+      "state": "recover",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "recovery-hit.png",
+      "frame": 1974,
+      "act": "duel",
+      "state": "hurt",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "duel-1-rifle-hurt.png",
+      "frame": 1980,
+      "act": "duel",
+      "state": "hurt",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "duel-1-charge-tell.png",
+      "frame": 2062,
+      "act": "duel",
+      "state": "tell",
+      "phase": 1,
+      "attack": "charge"
+    },
+    {
+      "file": "duel-1-charge-attack.png",
+      "frame": 2116,
+      "act": "duel",
+      "state": "attack",
+      "phase": 1,
+      "attack": "charge"
+    },
+    {
+      "file": "rider-lean.png",
+      "frame": 2126,
+      "act": "duel",
+      "state": "attack",
+      "phase": 1,
+      "attack": "charge"
+    },
+    {
+      "file": "grounded-footfall.png",
+      "frame": 2132,
+      "act": "duel",
+      "state": "attack",
+      "phase": 1,
+      "attack": "charge"
+    },
+    {
+      "file": "charge-brake.png",
+      "frame": 2148,
+      "act": "duel",
+      "state": "attack",
+      "phase": 1,
+      "attack": "charge"
+    },
+    {
+      "file": "duel-1-charge-recover.png",
+      "frame": 2166,
+      "act": "duel",
+      "state": "recover",
+      "phase": 1,
+      "attack": "charge"
+    },
+    {
+      "file": "duel-1-charge-hurt.png",
+      "frame": 2244,
+      "act": "duel",
+      "state": "hurt",
+      "phase": 1,
+      "attack": "charge"
+    },
+    {
+      "file": "duel-1-charge-rest.png",
+      "frame": 2294,
+      "act": "duel",
+      "state": "rest",
+      "phase": 1,
+      "attack": "charge"
+    },
+    {
+      "file": "duel-1-bite-tell.png",
+      "frame": 2326,
+      "act": "duel",
+      "state": "tell",
+      "phase": 1,
+      "attack": "bite"
+    },
+    {
+      "file": "duel-1-bite-attack.png",
+      "frame": 2380,
+      "act": "duel",
+      "state": "attack",
+      "phase": 1,
+      "attack": "bite"
+    },
+    {
+      "file": "strike-jaw.png",
+      "frame": 2394,
+      "act": "duel",
+      "state": "attack",
+      "phase": 1,
+      "attack": "bite"
+    },
+    {
+      "file": "duel-1-bite-recover.png",
+      "frame": 2432,
+      "act": "duel",
+      "state": "recover",
+      "phase": 1,
+      "attack": "bite"
+    },
+    {
+      "file": "duel-2-bite-hurt.png",
+      "frame": 2468,
+      "act": "duel",
+      "state": "hurt",
+      "phase": 2,
+      "attack": "bite"
+    },
+    {
+      "file": "duel-2-bite-roar.png",
+      "frame": 2518,
+      "act": "duel",
+      "state": "roar",
+      "phase": 2,
+      "attack": "bite"
+    },
+    {
+      "file": "roar-command.png",
+      "frame": 2530,
+      "act": "duel",
+      "state": "roar",
+      "phase": 2,
+      "attack": "bite"
+    },
+    {
+      "file": "duel-2-bite-rest.png",
+      "frame": 2624,
+      "act": "duel",
+      "state": "rest",
+      "phase": 2,
+      "attack": "bite"
+    },
+    {
+      "file": "duel-2-leap-tell.png",
+      "frame": 2656,
+      "act": "duel",
+      "state": "tell",
+      "phase": 2,
+      "attack": "leap"
+    },
+    {
+      "file": "reins-takeoff.png",
+      "frame": 2702,
+      "act": "duel",
+      "state": "attack",
+      "phase": 2,
+      "attack": "leap"
+    },
+    {
+      "file": "duel-2-leap-attack.png",
+      "frame": 2704,
+      "act": "duel",
+      "state": "attack",
+      "phase": 2,
+      "attack": "leap"
+    },
+    {
+      "file": "airborne-tuck.png",
+      "frame": 2722,
+      "act": "duel",
+      "state": "attack",
+      "phase": 2,
+      "attack": "leap"
+    },
+    {
+      "file": "landing-weight.png",
+      "frame": 2754,
+      "act": "duel",
+      "state": "attack",
+      "phase": 2,
+      "attack": "leap"
+    },
+    {
+      "file": "duel-2-rifle-tell.png",
+      "frame": 2818,
+      "act": "duel",
+      "state": "tell",
+      "phase": 2,
+      "attack": "rifle"
+    },
+    {
+      "file": "combo-rifle-tell.png",
+      "frame": 2820,
+      "act": "duel",
+      "state": "tell",
+      "phase": 2,
+      "attack": "rifle"
+    },
+    {
+      "file": "duel-2-rifle-attack.png",
+      "frame": 2868,
+      "act": "duel",
+      "state": "attack",
+      "phase": 2,
+      "attack": "rifle"
+    },
+    {
+      "file": "duel-2-rifle-reload.png",
+      "frame": 2934,
+      "act": "duel",
+      "state": "reload",
+      "phase": 2,
+      "attack": "rifle"
+    },
+    {
+      "file": "reload-advance.png",
+      "frame": 2934,
+      "act": "duel",
+      "state": "reload",
+      "phase": 2,
+      "attack": "rifle"
+    },
+    {
+      "file": "rifle-reload.png",
+      "frame": 2936,
+      "act": "duel",
+      "state": "reload",
+      "phase": 2,
+      "attack": "rifle"
+    },
+    {
+      "file": "rifle-locked.png",
+      "frame": 2954,
+      "act": "duel",
+      "state": "reload",
+      "phase": 2,
+      "attack": "rifle"
+    },
+    {
+      "file": "duel-2-rifle-recover.png",
+      "frame": 3096,
+      "act": "duel",
+      "state": "recover",
+      "phase": 2,
+      "attack": "rifle"
+    },
+    {
+      "file": "duel-2-rifle-hurt.png",
+      "frame": 3172,
+      "act": "duel",
+      "state": "hurt",
+      "phase": 2,
+      "attack": "rifle"
+    },
+    {
+      "file": "duel-2-rifle-rest.png",
+      "frame": 3222,
+      "act": "duel",
+      "state": "rest",
+      "phase": 2,
+      "attack": "rifle"
+    },
+    {
+      "file": "duel-2-bite-tell.png",
+      "frame": 3254,
+      "act": "duel",
+      "state": "tell",
+      "phase": 2,
+      "attack": "bite"
+    },
+    {
+      "file": "duel-2-bite-attack.png",
+      "frame": 3302,
+      "act": "duel",
+      "state": "attack",
+      "phase": 2,
+      "attack": "bite"
+    },
+    {
+      "file": "duel-2-rifle-arrival.png",
+      "frame": 3434,
+      "act": "duel",
+      "state": "arrival",
+      "phase": 2,
+      "attack": "rifle"
+    },
+    {
+      "file": "duel-2-tail-tell.png",
+      "frame": 4268,
+      "act": "duel",
+      "state": "tell",
+      "phase": 2,
+      "attack": "tail"
+    },
+    {
+      "file": "combo-tail-tell.png",
+      "frame": 4268,
+      "act": "duel",
+      "state": "tell",
+      "phase": 2,
+      "attack": "tail"
+    },
+    {
+      "file": "duel-2-tail-attack.png",
+      "frame": 4316,
+      "act": "duel",
+      "state": "attack",
+      "phase": 2,
+      "attack": "tail"
+    },
+    {
+      "file": "tail-sweep.png",
+      "frame": 4326,
+      "act": "duel",
+      "state": "attack",
+      "phase": 2,
+      "attack": "tail"
+    },
+    {
+      "file": "duel-2-tail-recover.png",
+      "frame": 4404,
+      "act": "duel",
+      "state": "recover",
+      "phase": 2,
+      "attack": "tail"
+    },
+    {
+      "file": "duel-2-tail-hurt.png",
+      "frame": 4448,
+      "act": "duel",
+      "state": "hurt",
+      "phase": 2,
+      "attack": "tail"
+    },
+    {
+      "file": "duel-2-tail-rest.png",
+      "frame": 4498,
+      "act": "duel",
+      "state": "rest",
+      "phase": 2,
+      "attack": "tail"
+    },
+    {
+      "file": "duel-3-rifle-hurt.png",
+      "frame": 4900,
+      "act": "duel",
+      "state": "hurt",
+      "phase": 3,
+      "attack": "rifle"
+    },
+    {
+      "file": "duel-3-rifle-roar.png",
+      "frame": 4950,
+      "act": "duel",
+      "state": "roar",
+      "phase": 3,
+      "attack": "rifle"
+    },
+    {
+      "file": "duel-3-rifle-rest.png",
+      "frame": 5054,
+      "act": "duel",
+      "state": "rest",
+      "phase": 3,
+      "attack": "rifle"
+    },
+    {
+      "file": "duel-3-charge-tell.png",
+      "frame": 5086,
+      "act": "duel",
+      "state": "tell",
+      "phase": 3,
+      "attack": "charge"
+    },
+    {
+      "file": "duel-3-charge-attack.png",
+      "frame": 5130,
+      "act": "duel",
+      "state": "attack",
+      "phase": 3,
+      "attack": "charge"
+    },
+    {
+      "file": "duel-3-charge-turn.png",
+      "frame": 5180,
+      "act": "duel",
+      "state": "turn",
+      "phase": 3,
+      "attack": "charge"
+    },
+    {
+      "file": "planted-pivot.png",
+      "frame": 5186,
+      "act": "duel",
+      "state": "turn",
+      "phase": 3,
+      "attack": "charge"
+    },
+    {
+      "file": "return-footfall.png",
+      "frame": 5208,
+      "act": "duel",
+      "state": "attack",
+      "phase": 3,
+      "attack": "charge"
+    },
+    {
+      "file": "duel-3-charge-recover.png",
+      "frame": 5268,
+      "act": "duel",
+      "state": "recover",
+      "phase": 3,
+      "attack": "charge"
+    },
+    {
+      "file": "duel-3-charge-hurt.png",
+      "frame": 5342,
+      "act": "duel",
+      "state": "hurt",
+      "phase": 3,
+      "attack": "charge"
+    },
+    {
+      "file": "duel-3-charge-rest.png",
+      "frame": 5392,
+      "act": "duel",
+      "state": "rest",
+      "phase": 3,
+      "attack": "charge"
+    },
+    {
+      "file": "duel-3-rifle-tell.png",
+      "frame": 5424,
+      "act": "duel",
+      "state": "tell",
+      "phase": 3,
+      "attack": "rifle"
+    },
+    {
+      "file": "duel-3-rifle-attack.png",
+      "frame": 5468,
+      "act": "duel",
+      "state": "attack",
+      "phase": 3,
+      "attack": "rifle"
+    },
+    {
+      "file": "duel-3-rifle-reload.png",
+      "frame": 5554,
+      "act": "duel",
+      "state": "reload",
+      "phase": 3,
+      "attack": "rifle"
+    },
+    {
+      "file": "rifle-pressure.png",
+      "frame": 5640,
+      "act": "duel",
+      "state": "attack",
+      "phase": 3,
+      "attack": "rifle"
+    },
+    {
+      "file": "duel-3-leap-tell.png",
+      "frame": 5732,
+      "act": "duel",
+      "state": "tell",
+      "phase": 3,
+      "attack": "leap"
+    },
+    {
+      "file": "combo-leap-tell.png",
+      "frame": 5734,
+      "act": "duel",
+      "state": "tell",
+      "phase": 3,
+      "attack": "leap"
+    },
+    {
+      "file": "duel-3-leap-attack.png",
+      "frame": 5776,
+      "act": "duel",
+      "state": "attack",
+      "phase": 3,
+      "attack": "leap"
+    },
+    {
+      "file": "third-charge-tell.png",
+      "frame": 5894,
+      "act": "duel",
+      "state": "tell",
+      "phase": 3,
+      "attack": "charge"
+    },
+    {
+      "file": "duel-3-tail-tell.png",
+      "frame": 6230,
+      "act": "duel",
+      "state": "tell",
+      "phase": 3,
+      "attack": "tail"
+    },
+    {
+      "file": "duel-3-tail-attack.png",
+      "frame": 6274,
+      "act": "duel",
+      "state": "attack",
+      "phase": 3,
+      "attack": "tail"
+    },
+    {
+      "file": "duel-3-bite-tell.png",
+      "frame": 6362,
+      "act": "duel",
+      "state": "tell",
+      "phase": 3,
+      "attack": "bite"
+    },
+    {
+      "file": "combo-bite-tell.png",
+      "frame": 6362,
+      "act": "duel",
+      "state": "tell",
+      "phase": 3,
+      "attack": "bite"
+    },
+    {
+      "file": "duel-3-bite-attack.png",
+      "frame": 6406,
+      "act": "duel",
+      "state": "attack",
+      "phase": 3,
+      "attack": "bite"
+    },
+    {
+      "file": "duel-3-bite-recover.png",
+      "frame": 6456,
+      "act": "duel",
+      "state": "recover",
+      "phase": 3,
+      "attack": "bite"
+    }
+  ]
+}

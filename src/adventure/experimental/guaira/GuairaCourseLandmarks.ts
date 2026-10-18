@@ -3,10 +3,12 @@ import {pixelText} from '../../../graphics/BitmapFont';
 import {GUAIRA_COURSES,GUAIRA_COURSE_DETOURS,type GuairaCourseId} from './GuairaCourseDesign';
 import {drawGuairaPipe,drawGuairaPipeSaddle} from './GuairaPipeArt';
 import {guairaBreeze} from './GuairaScenery';
+import type {WorldLevel} from '../../WorldPhysics';
+import {drawGuairaFixedScaffold} from './GuairaScaffoldArt';
 
 /** Landmarks explain what each raised route belongs to. They sit behind the
  * real tiles, use quiet values, and never add a decorative walkable cap. */
-export function drawGuairaCourseLandmark(c:CanvasRenderingContext2D,id:GuairaCourseId,cx:number,cy:number,time:number,reduced:boolean){
+export function drawGuairaCourseLandmark(c:CanvasRenderingContext2D,id:GuairaCourseId,cx:number,cy:number,time:number,reduced:boolean,level:WorldLevel){
     const g=GUAIRA_COURSES[id],d=GUAIRA_COURSE_DETOURS[id],x0=g.start-Math.round(cx),floor=g.floor-Math.round(cy);
     if(x0+d.end<0||x0+d.entry>320)return;
     const last=d.decks[d.decks.length-1],x=x0+last[0]-6,y=last[2]+12-Math.round(cy),w=last[1]-last[0]+12,h=Math.max(24,floor-y);
@@ -47,12 +49,12 @@ export function drawGuairaCourseLandmark(c:CanvasRenderingContext2D,id:GuairaCou
     }
     for(const[left,right,top,falling]of [...d.decks,...d.returns]){
         if(falling)continue;
-        const a=x0+left,b=x0+right,yy=top+6-Math.round(cy);
-        for(const xx of [a+3,b-6]){r(c,xx,yy,3,floor-yy,'#a48a68');r(c,xx+1,yy,1,floor-yy,'#c3a57c');}
-        line(c,a+5,yy+23,a+23,yy+1,'#988063',2);line(c,b-5,yy+23,b-23,yy+1,'#988063',2);
+        drawGuairaFixedScaffold(c,level,g.start+left,g.start+right,top,cx,cy);
     }
-    const bannerX=x0+d.entry+32,bannerY=d.entryY+16-Math.round(cy),bend=reduced?0:guairaBreeze(time,g.start+d.entry,1);
-    line(c,bannerX,bannerY,bannerX,bannerY+24,'#ac9672');
+    // The pennant hangs from a bracket bolted to the actual entry deck.
+    const bannerX=x0+d.entry+32,bannerY=d.entryY+6-Math.round(cy),bend=reduced?0:guairaBreeze(time,g.start+d.entry,1);
+    line(c,bannerX,bannerY,bannerX,bannerY+25,'#ac9672');
+    r(c,bannerX-2,bannerY,5,3,'#a28e70');r(c,bannerX,bannerY+1,1,1,'#cbb58a');
     r(c,bannerX+1,bannerY+2,12,7,'#a5aa7c');r(c,bannerX+9,bannerY+3+bend,5,5,'#a5aa7c');
 }
 

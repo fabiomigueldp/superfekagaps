@@ -1,4 +1,6 @@
-import { box as r, pixelLine as line, roof } from '../../../WorldPainting';
+import { box as r, pixelLine as line } from '../../../WorldPainting';
+import { drawGuairaControl } from '../GuairaControlArt';
+import { drawGuairaTiledRoof, drawGuairaFacadeFinish } from '../GuairaBuildingFinish';
 import type { WorldLevel, WorldObjects } from '../../../WorldPhysics';
 import { pixelText } from '../../../../graphics/BitmapFont';
 import { supportsStanding, isOneWayTile } from '../../../../world/tileRules';
@@ -38,16 +40,22 @@ export function drawJunctionBackground(c: CanvasRenderingContext2D, cx: number, 
         drawGuairaFieldBank(c, 8 - cameraX, 284 - cameraY, 182, 400 - cameraY);
         drawGuairaTree(c, 125 - cameraX, 289 - cameraY, 75, t, 125, true);
         drawGuairaTree(c, 718 - cameraX, 206 - cameraY, 61, t, 718, true);
-        for (const [left, right] of [[752, G.exitGapStartX], [G.exitGapEndX, 964]])
+        // Finish the bank and its flared foot before the x960 district join;
+        // clipping the old paddy there used to slice both soil and rice stems.
+        for (const [left, right] of [[752, G.exitGapStartX], [G.exitGapEndX, 944]])
             drawGuairaFieldBank(c, left - cameraX, 166 - cameraY, right - left, 208 - cameraY);
         // The dry neighbourhood and the irrigated rows share an ordinary working landscape.
         const hx = 24 - cameraX, hy = 228 - cameraY;
         r(c, hx, hy, 94, 61, '#c8a784'); r(c, hx + 3, hy + 3, 88, 58, '#e0c29a');
         drawGuairaPlaster(c, hx + 3, hy + 3, 88, 58, 3);
-        roof(c, hx - 6, hy - 16, 106, 18); r(c, hx + 19, hy + 25, 20, 36, '#796454');
+        drawGuairaTiledRoof(c, hx - 6, hy - 16, 106);
+        drawGuairaFacadeFinish(c,hx,hy+1,94,hy+61);
+        r(c, hx + 19, hy + 25, 20, 36, '#796454');
         r(c, hx + 60, hy + 18, 20, 20, '#749a90'); r(c, hx + 69, hy + 18, 2, 20, '#d7b98b');
+        r(c,hx+61,hy+19,2,17,'#a9b9a3');r(c,hx+60,hy+27,20,1,'#b8a384');
+        r(c,hx+57,hy+39,26,2,'#b29b7c');
         drawGuairaAwning(c, hx + 17, hy + 23, 24, t, 41);
-        for (let row = 0; row < 3; row++) for (let x = 760 + row % 2 * 6; x < 956; x += 20) {
+        for (let row = 0; row < 3; row++) for (let x = 760 + row % 2 * 6; x < 936; x += 20) {
             if (x >= G.exitGapStartX && x < G.exitGapEndX) continue;
             const y = 168 + row * 10;
             line(c, x - cameraX, y - cameraY, x + 17 - cameraX, y - cameraY, '#89a89a', 2);
@@ -168,11 +176,9 @@ export function drawJunctionObjects(c: CanvasRenderingContext2D, objects: WorldO
             const x = Math.round(b.x) - cameraX, y = Math.round(b.y) - cameraY;
             if (x > 322 || x + b.width < -2) continue;
             if (b.kind === 'switch') {
-                // Raised border and ↓ shape identify an impact plate independently of state.
-                r(c, x - 2, y + 4, b.width + 4, 4, P.pipe); r(c, x, y + 2, b.width, 4, P.bronze);
-                r(c, x + 2, y + 1, b.width - 4, 2, routing.warning ? P.warning : P.deck);
-                pixelText(c, 'A/B', x + 13, y - 8, P.ink);
-                r(c, x + 4, y - 5, 1, 4, P.ink); r(c, x + 2, y - 2, 5, 1, P.ink); r(c, x + 3, y - 1, 3, 1, P.ink);
+                drawGuairaControl(c,b,{kind:'route',phase:routing.warning?'warning':'available',
+                    progress:routing.warning?1-routing.warningRemaining/G.warningMs:1,
+                    supplied:routing.supplied,selected:routing.selected},cameraX,cameraY,objects.time,reduced);
                 continue;
             }
             if (b.id === G.returnUpperId || b.id === G.returnLowerId) {

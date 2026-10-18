@@ -1,5 +1,7 @@
 import { drawGuairaWindPump, drawGuairaChannelFlow, drawGuairaRiceFlow } from './GuairaWaterworksArt';
-import { box as r, pixelLine as line, polygon, oval, roof } from '../../WorldPainting';
+import { drawGuairaControl, guairaLinkedControl } from './GuairaControlArt';
+import { box as r, pixelLine as line, polygon, oval } from '../../WorldPainting';
+import { drawGuairaTiledRoof, drawGuairaFacadeFinish } from './GuairaBuildingFinish';
 import type { WorldLevel, WorldObjects } from '../../WorldPhysics';
 import { drawGuairaWorker } from './GuairaWorkerArt';
 import { drawGuairaRicePlant } from './GuairaRiceArt';
@@ -66,9 +68,8 @@ export function drawGuairaVillageHouse(c: CanvasRenderingContext2D, x: number, f
     drawGuairaPlaster(c, x + 5, top + 21, w - 21, h - 24, variant);
     r(c, x + 6, top + 20, w - 21, 2, '#efd6ae');
     r(c, x + w - 16, top + 19, 8, h - 22, '#c7a17f');
-    roof(c, x, top, w, 17);
-    // Staggered baked clay courses, rather than an unbroken colored slab.
-    for (let xx = 8; xx < w - 9; xx += 8) r(c, x + xx, top + 8, 6, 1, '#d58568');
+    drawGuairaTiledRoof(c, x, top, w);
+    drawGuairaFacadeFinish(c,x,top+17,w,floor);
     r(c, x + 14, floor - 29, 15, 26, '#816257');
     r(c, x + 16, floor - 27, 11, 24, '#604e4b');
     r(c, x + 17, floor - 26, 2, 23, '#92725c');
@@ -407,29 +408,8 @@ export function drawGuairaTraversalObjects(c: CanvasRenderingContext2D, objects:
             }
         }
         for (const valve of [objects.get(GUAIRA_TRAVERSAL_ART.valveId), objects.get('guaira-rice-valve')]) if (valve && visible(valve.x - 4, valve.width + 8, cameraX)) {
-            const x = Math.round(valve.x) - cameraX, y = Math.round(valve.y) - cameraY, w = Math.round(valve.width), h = Math.round(valve.height);
-            r(c, x, y, w, h, P.ink);
-            r(c, x + 2, y + 1, w - 4, Math.max(1, h - 3), valve.active ? '#5c9c8c' : '#bb8151');
-            r(c, x + 3, y + 1, w - 6, 1, valve.active ? '#b0dec6' : '#f1cf8e');
-            // A stout treadle with a recessed valve emblem, entirely inside its real body.
-            const mx = x + Math.floor(w / 2);
-            r(c, mx - 4, y + 2, 9, 3, '#735846');
-            r(c, mx - 3, y + 2, 7, 1, '#edcb88');
-            r(c, mx, y + 2, 1, Math.min(4, h - 2), '#edcb88');
-            r(c, x + 3, y + h - 2, w - 6, 1, '#685248');
-            // A static downward marker connects the jump instruction to the real
-            // pressure plate, not the nearby worker or the gap. It disappears
-            // when solved and never moves or changes the collision body.
-            if (!valve.active) {
-                r(c, mx - 2, y - 15, 5, 8, P.ink);
-                r(c, mx - 5, y - 9, 11, 3, P.ink);
-                r(c, mx - 3, y - 6, 7, 2, P.ink);
-                r(c, mx - 1, y - 4, 3, 2, P.ink);
-                r(c, mx - 1, y - 14, 3, 7, '#ffe7a3');
-                r(c, mx - 4, y - 8, 9, 1, '#ffe7a3');
-                r(c, mx - 2, y - 7, 5, 2, '#ffe7a3');
-                r(c, mx, y - 5, 1, 2, '#ffe7a3');
-            }
+            const target = objects.get(valve.link ?? '');
+            if (target) drawGuairaControl(c, valve, guairaLinkedControl(valve, target), cameraX, cameraY, objects.time, reducedMotion);
         }
     });
 }

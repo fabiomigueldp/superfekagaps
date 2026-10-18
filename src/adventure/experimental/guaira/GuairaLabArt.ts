@@ -5,6 +5,7 @@ import { drawGuairaClayGrain } from './GuairaMaterials';
 import { bullBoneY, BULL_RULES, type SkeletonBullModel } from './SkeletonBullModel';
 import { box as r, pixelLine as line, polygon, oval, roof } from '../../WorldPainting';
 import { drawGuairaLandscape, drawGuairaTree, drawGuairaPerchedBird, guairaBreeze, sceneryTime } from './GuairaScenery';
+import { drawGuairaCorralOutbuildings } from './GuairaCorralScenery';
 
 const rect = (c: CanvasRenderingContext2D, color: string, x: number, y: number, w: number, h: number) => {
     c.fillStyle = color; c.fillRect(Math.round(x), Math.round(y), w, h);
@@ -28,6 +29,7 @@ export function drawGuairaBackground(c: CanvasRenderingContext2D, cx = 0, cy = 6
             line(c, xx + 1 - x, top + 9 - y, xx + 4 + sway - x, top + 2 - y, '#9caa79');
         }
     }
+    drawGuairaCorralOutbuildings(c,x,y,t,reducedMotion);
     r(c, 0, 174 - y, 320, 180, '#bf926b');
     polygon(c, [[112-x,174-y],[177-x,174-y],[225-x,209-y],[72-x,209-y]], '#cda177');
     drawCorralGate(c,x,y,t,reducedMotion,bull);

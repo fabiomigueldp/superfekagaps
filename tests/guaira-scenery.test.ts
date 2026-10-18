@@ -8,6 +8,8 @@ import { GuairaRespiros } from '../src/adventure/experimental/guaira/respiros/Gu
 import { GuairaBullLab } from '../src/adventure/experimental/guaira/GuairaBullLab';
 import { GuairaAscent } from '../src/adventure/experimental/guaira/GuairaAscent';
 import { GuairaMayorLab } from '../src/adventure/experimental/guaira/GuairaMayorLab';
+import { GuairaGallery } from '../src/adventure/experimental/guaira/gallery/GuairaGallery';
+import { GuairaRelief } from '../src/adventure/experimental/guaira/relief/GuairaRelief';
 import { drawGuairaAscentBackground } from '../src/adventure/experimental/guaira/GuairaAscentArt';
 import { GUAIRA_DISTANT_COLORS } from '../src/adventure/experimental/guaira/GuairaDistantScenery';
 
@@ -117,7 +119,7 @@ test('ascent houses meet their yards and signposts reach the bank instead of end
     for (let y = 288; y < 296; y++) assert.equal(at(205, y), '#a58a68', 'Guidance sign has a complete fixed support');
 });
 
-for (const Scene of [GuairaTraversal, GuairaJunction, GuairaRespiros, GuairaBullLab, GuairaAscent, GuairaMayorLab])
+for (const Scene of [GuairaTraversal, GuairaJunction, GuairaRespiros, GuairaBullLab, GuairaAscent, GuairaMayorLab, GuairaGallery, GuairaRelief])
     for (const reducedMotion of [false, true]) test(`${Scene.name}: native background uses the paused clock and freezes decoration in reduced motion (${reducedMotion})`, t => {
         const h = guairaBrowser(t, { reducedMotion });
         const game = new Scene(h.canvas as unknown as HTMLCanvasElement, h.status as unknown as HTMLElement);
@@ -130,8 +132,11 @@ for (const Scene of [GuairaTraversal, GuairaJunction, GuairaRespiros, GuairaBull
             return calls;
         };
         game.time = game.objects.time = 6400; const first = paint();
-        game.time = game.objects.time = 23700;
-        if (reducedMotion) assert.deepEqual(paint(), first); else assert.notDeepEqual(paint(), first);
+        // Sample several moments: a short water loop can legitimately return
+        // to the same phase at two distant times, despite moving in between.
+        const later=[6417,6471,6539,23700].map(time=>{game.time=game.objects.time=time;return paint();});
+        if (reducedMotion) for(const frame of later)assert.deepEqual(frame,first);
+        else assert.ok(later.some(frame=>JSON.stringify(frame)!==JSON.stringify(first)));
         game.time = game.objects.time = 6400; assert.deepEqual(paint(), first);
         h.window.dispatch('blur'); assert.equal(game.state, 'paused');
         for (let i = 0; i < 120; i++) game.update(1000 / 60);

@@ -1,4 +1,6 @@
-import { box as r, pixelLine as line, polygon, roof } from '../../../WorldPainting';
+import { box as r, pixelLine as line, polygon } from '../../../WorldPainting';
+import { drawGuairaTiledRoof, drawGuairaFacadeFinish } from '../GuairaBuildingFinish';
+import { drawGuairaWorkshopWall } from '../GuairaWorkshopBackground';
 import type { WorldLevel, WorldObjects } from '../../../WorldPhysics';
 import { TileType } from '../../../../constants';
 import { supportsStanding, isOneWayTile } from '../../../../world/tileRules';
@@ -219,7 +221,8 @@ function workshop(c: CanvasRenderingContext2D, cx: number, cy: number) {
     r(c, x + 6, y + 16, 122, 58, P.plaster);
     drawGuairaPlaster(c, x + 7, y + 20, 119, 54, 5);
     r(c, x + 7, y + 19, 118, 2, '#efd6ae');
-    roof(c, x, y, 139, 17);
+    drawGuairaTiledRoof(c, x, y, 139);
+    drawGuairaFacadeFinish(c,x,y+17,137,y+77);
     r(c, x + 12, y + 44, 22, 30, '#9a765e');
     r(c, x + 14, y + 46, 18, 28, '#816257');
     r(c, x + 16, y + 47, 2, 26, '#a58a68');
@@ -240,13 +243,7 @@ function workshop(c: CanvasRenderingContext2D, cx: number, cy: number) {
  * Only the native terrain layer supplies continuous bright horizontal edges. */
 export function drawGalleryBackground(c: CanvasRenderingContext2D, cx: number, cy: number, time: number, reducedMotion: boolean) {
     layer(c, cx, cy, (cameraX, cameraY) => {
-        r(c, 0, 23, 320, 157, '#e6bc8f');
-        r(c, 0, 23, 320, 24, '#ebcda4');
-        // The view is a dry workshop cutaway. Broad layers become warmer and
-        // darker with depth; there are no water hues, flows or victory changes.
-        r(c, 0, 160 - cameraY, 320, 272, '#c7a17f');
-        r(c, 0, 208 - cameraY, 320, 224, '#bf967d');
-        r(c, 0, 304 - cameraY, 320, 128, '#b6977c');
+        drawGuairaWorkshopWall(c,'galeria',cameraX,cameraY);
         drawWorkshopClerestory(c, 278 - cameraX, 86 - cameraY, 70, time, reducedMotion, true);
         drawWorkshopClerestory(c, 420 - cameraX, 92 - cameraY, 56, time, reducedMotion);
         drawWorkshopRoofFrame(c, cameraX, cameraY, 233, 628, 69, 164);

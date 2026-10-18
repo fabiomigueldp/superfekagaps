@@ -1,6 +1,6 @@
 import { box as r, oval, pixelLine as line, polygon } from '../../WorldPainting';
 import type { MovingBody } from '../../WorldPhysics';
-import { drawGuairaPoolFlow, drawGuairaReservoirFlow, drawGuairaSluiceFlow, drawGuairaSluiceImpact } from './GuairaWaterworksArt';
+import { drawGuairaPoolDepth, drawGuairaPoolFlow, drawGuairaReservoirFlow, drawGuairaSluiceFlow, drawGuairaSluiceImpact } from './GuairaWaterworksArt';
 
 /** Presentation of the two native bridges; their bodies remain the sole source of motion. */
 export function guairaSluiceRise(body: MovingBody): number {
@@ -123,6 +123,7 @@ export function drawGuairaSluice(c: CanvasRenderingContext2D, body: MovingBody,
         // Fixed world anchor: raising the shutter reveals water, without dragging falling streaks upward.
         drawGuairaSluiceFlow(c, x, spillY, poolY, true, time, reduced, top+49);
         r(c, poolX, poolY, poolW, 23, '#326f81');
+        drawGuairaPoolDepth(c,poolX+4,poolX+poolW-4,poolY,true,time,reduced,x+25);
         r(c, poolX+4, poolY, poolW-8, 3, '#63b6bf');
         drawGuairaPoolFlow(c, poolX+4, poolX+poolW-4, poolY, true, time, reduced, x+25);
         drawGuairaSluiceImpact(c, poolX+4, poolX+poolW-4, poolY, x+25, true, time, reduced);

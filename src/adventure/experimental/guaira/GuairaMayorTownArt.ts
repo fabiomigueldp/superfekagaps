@@ -1,5 +1,7 @@
 import { drawGuairaAwning, drawGuairaPerchedBird, drawGuairaTree, guairaBreeze } from './GuairaScenery';
 import { drawGuairaPlaster } from './GuairaMaterials';
+import { drawGuairaFacadeFinish } from './GuairaBuildingFinish';
+import { guairaFluidTime } from './GuairaFluidArt';
 
 /** Town scenery stays softer than actors, amber tells and cream collision tops.
  * Every moving detail is rooted in architecture and reads the simulation clock. */
@@ -39,6 +41,7 @@ export function drawMayorTown(c:CanvasRenderingContext2D,cx:number,cy:number,tim
         r(x+2,y,w-4,h,'#cfb391');r(x+w-10,y+2,8,h-2,'#b8a287');
         r(x+5,y+8,w-17,h-11,i%2?'#d4ba96':'#ccb493');
         drawGuairaPlaster(c,x+8-cx,y+12-cy,w-24,h-15,i+17);
+        drawGuairaFacadeFinish(c,x-cx,y+5-cy,w,y+h-cy);
         // Recessed doors and shutters, with warm bounce light at their bases.
         const dx=x+Math.floor(w*.47);
         r(dx,y+h-29,12,26,'#af9a80');r(dx+2,y+h-31,8,2,'#af9a80');
@@ -55,7 +58,8 @@ export function drawMayorTown(c:CanvasRenderingContext2D,cx:number,cy:number,tim
     drawGuairaAwning(c,96-cx,176-cy,24,t,96);
     drawGuairaAwning(c,153-cx,168-cy,29,t,153);
     // A grounded washing line uses the same breeze as the trees and awnings.
-    r(12,158,1,19,'#a99a7c');r(40,160,1,18,'#a99a7c');
+    r(12,158,1,39,'#a99a7c');r(40,160,1,37,'#a99a7c');
+    for(const x of [11,39]){r(x,192,3,5,'#b19c7b');r(x+1,193,1,2,'#c5b08b');}
     for(let x=12;x<=40;x++)r(x,158+Math.floor((x-12)/14),1,1,'#a39b80');
     for(const [x,y,w,color] of [[17,160,6,'#c3bf9f'],[29,161,7,'#b3b89d']] as const){
         const sway=guairaBreeze(t,x,1);
@@ -102,8 +106,10 @@ export function drawMayorCivicRoom(c:CanvasRenderingContext2D,cx:number,cy:numbe
     r(229,151,22,6,'#b9b89b');r(292,151,16,6,'#b9b89b');
     for(const x of [231,238,245,294,301]){r(x,153,3,2,'#82978c');r(x+1,152,1,1,'#96aa9a');}
     r(245,107,49,9,'#a78f71');r(246,108,47,7,'#c8b08b');r(247,109,45,1,'#d9c29b');
-    // Rain chain stays fixed to the eave; foliage and the bird obey reduced motion.
-    for(let y=110;y<155;y+=5){r(315,y,2,3,'#a38b6d');r(316,y+1,1,2,'#c1a780');}
+    // The top hook meets the eave; overlapping links drain into a stone shoe.
+    r(313,103,5,2,'#a38b6d');
+    for(let y=105;y<155;y+=4){r(315,y,2,3,'#a38b6d');r(316,y+2,1,3,'#c1a780');}
+    r(312,155,7,4,'#aa9476');r(314,155,3,2,'#8f8870');
     drawGuairaPerchedBird(c,236-cx,89-cy,reduced?0:time,236,1);
 }
 
@@ -120,7 +126,10 @@ export function drawMayorReserve(c:CanvasRenderingContext2D,cx:number,cy:number,
     r(288,181,7,15,'#887c60');r(289,182,5,13,'#607e72');r(290,184,3,10,'#87b3a2');r(290,184,2,2,'#bcd3b4');
     for(const y of [185,189,193])r(294,y,2,1,'#c8b687');
     // A restrained travelling reflection; no loose cyan droplets resembling danger.
-    const glint=185+(reduced?0:Math.floor(Math.max(0,time)/180)%8);
-    r(290,glint,2,1,'#b4cbb0');
+    const drift=Math.floor(guairaFluidTime(time,reduced)/100)%12;
+    for(let offset=-12;offset<20;offset+=12){
+        const top=Math.max(186,184+offset+drift),bottom=Math.min(194,187+offset+drift);
+        if(bottom>top)r(290,top,1,bottom-top,'#b4cbb0');
+    }
     r(282,205,15,3,'#87795d');r(284,205,11,1,released?'#8db49f':'#bb9d6a');
 }

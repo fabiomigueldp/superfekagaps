@@ -1,6 +1,18 @@
 # Guaíra — revisão de level design, 17/10/2026
 
-Revisão atual (17/10/2026): [Fundos — arquitetura, continuidade e profundidade](world/guaira/backgrounds-2026-10-17/README.md). Paisagem distante nas quatro fases externas, oficinas com vãos e fundações na Galeria e no Alívio, arcos de alvenaria no aqueduto e correção do céu duplicado da Travessia. Seis percursos comparados nos mesmos momentos e enquadramentos.
+Revisão atual (18/10/2026): [Controles da água](world/guaira/interactables-2026-10-18/README.md). Os 18 pedais compartilham acabamento e animação de compressão; mostradores distinguem pontes, isolamento e ramais A/B. A tampa de alívio recebeu selos próprios. Quatro aproximações foram ampliadas e moedas e placas foram separadas dos mostradores. Oito percursos nativos e nove execuções da campanha normal concluídos.
+
+Continuação de 18/10: [resposta dos registros durante o jogo](world/guaira/interactables-2026-10-18/index.html#resposta). Os 11 controles ampliados indicam a saída alterada e a chegada real das pontes. A beirada de espera da Subida mantém a orientação; Galeria e contrapressão explicam o efeito local sem esconder os avisos de perigo. Manômetros distinguem isolamento e intervalo seco. Braçadeiras das conexões curtas ficam sobre os tubos. Há capturas nativas dos 11 acionamentos: nove percursos completos e dois encerrados após o retorno ao piso, todos sem dano.
+
+Revisão de 17/10/2026: [Bocais, retorno e despressurização](world/guaira/outlet-finish-2026-10-17/README.md). Respingos em pequenos arcos e efeitos de isolamento compartilhados pelos percursos ampliados; bica pública com bocal, queda visível e bacia apoiada no piso; correntes atrás da grade de retorno; visor da reserva sem salto no reflexo.
+
+Rodada anterior da água: [Canos, pressão e água em movimento](world/guaira/fluid-finish-2026-10-17/README.md). Luvas nas extremidades dos canos, fluxo contínuo nas curvas, jatos com filetes curvos e paleta comum, ondas de impacto e reflexos submersos. Resíduos após fechar registros caem com aceleração. Oito partidas comparadas com a referência e campanha normal concluída.
+
+Fundos: [revisão das oito cenas](world/guaira/chapter-backgrounds-2026-10-17/README.md). Entradas com o mesmo acabamento das extensões, paredes contínuas nos dois interiores, margens corrigidas no Pátio e nos Respiros, construções rurais no curral e encaixes completos na praça do Prefeito. Inspeção de 386 vistas, oito partidas comparadas e campanha normal concluída.
+
+Rodada anterior: [Cenários — fachadas, passarelas e encaixes](world/guaira/scenery-joins-2026-10-17/README.md). Quatorze edifícios e oito árvores com posições escolhidas, casas de bombas animadas, telhados e fundações completos. Apoios das passarelas chegam ao terreno real e continuam pelos canais abertos.
+
+Rodada anterior dos fundos: [arquitetura, continuidade e profundidade](world/guaira/backgrounds-2026-10-17/README.md). Paisagem distante nas quatro fases externas, oficinas com vãos e fundações na Galeria e no Alívio, arcos de alvenaria no aqueduto e correção do céu duplicado da Travessia.
 
 Revisão dos inimigos: [defesas e contra-ataques](world/guaira/enemy-counterplay-2026-10-17/README.md). Teto do vagonete protegido em movimento e aberto na freada, testa do investidor exposta na recuperação e avisos que conservam o alvo abaixo do beiral ou da quicada. Cinco encontros nativos demonstram as respostas sem dano.
 

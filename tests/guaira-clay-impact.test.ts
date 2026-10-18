@@ -124,8 +124,8 @@ for (const [scene, Game, runs, direction] of [
         for (const reduced of [false, true]) {
             const actual = new PaintRecorder(), expected = new PaintRecorder();
             game.art.terrain(actual.context, game.level, ISLANDS[0], cx, cy, game.time, reduced);
-            drawGalleryTerrain(expected.context, game.level, cx, cy, reduced);
-            assert.deepEqual(actual.calls, expected.calls, 'Both adapters forward the current renderer motion preference.');
+            (game instanceof GuairaGallery?drawGalleryTerrain:drawReliefTerrain)(expected.context, game.level, cx, cy, reduced);
+            assert.deepEqual(actual.calls, expected.calls, 'Each adapter forwards the motion preference to its own terrain, including the relief seals.');
         }
         for (let frame = 0; frame < 30; frame++) game.update(BLOCK_DT);
         assert.equal(game.level.blockImpacts.active.length, 0);

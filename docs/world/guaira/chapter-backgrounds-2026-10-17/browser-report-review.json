@@ -1,0 +1,136 @@
+{
+  "kind": "browser-background-studies",
+  "mode": "review",
+  "profile": "chapter",
+  "studies": [],
+  "review": [
+    {
+      "width": 1440,
+      "fits": true,
+      "images": 2,
+      "variants": [
+        {
+          "id": "travessia",
+          "width": 960,
+          "height": 540,
+          "duration": 15,
+          "error": null
+        },
+        {
+          "id": "patio",
+          "width": 960,
+          "height": 540,
+          "duration": 16.666667,
+          "error": null
+        },
+        {
+          "id": "respiros",
+          "width": 960,
+          "height": 540,
+          "duration": 17.5,
+          "error": null
+        },
+        {
+          "id": "subida",
+          "width": 960,
+          "height": 540,
+          "duration": 17.5,
+          "error": null
+        },
+        {
+          "id": "galeria",
+          "width": 960,
+          "height": 540,
+          "duration": 16.666667,
+          "error": null
+        },
+        {
+          "id": "alivio",
+          "width": 960,
+          "height": 540,
+          "duration": 16.666667,
+          "error": null
+        },
+        {
+          "id": "lab",
+          "width": 960,
+          "height": 540,
+          "duration": 21.233333,
+          "error": null
+        },
+        {
+          "id": "prefeito",
+          "width": 960,
+          "height": 540,
+          "duration": 36.6,
+          "error": null
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "fits": true,
+      "images": 2,
+      "variants": [
+        {
+          "id": "travessia",
+          "width": 960,
+          "height": 540,
+          "duration": 15,
+          "error": null
+        },
+        {
+          "id": "patio",
+          "width": 960,
+          "height": 540,
+          "duration": 16.666667,
+          "error": null
+        },
+        {
+          "id": "respiros",
+          "width": 960,
+          "height": 540,
+          "duration": 17.5,
+          "error": null
+        },
+        {
+          "id": "subida",
+          "width": 960,
+          "height": 540,
+          "duration": 17.5,
+          "error": null
+        },
+        {
+          "id": "galeria",
+          "width": 960,
+          "height": 540,
+          "duration": 16.666667,
+          "error": null
+        },
+        {
+          "id": "alivio",
+          "width": 960,
+          "height": 540,
+          "duration": 16.666667,
+          "error": null
+        },
+        {
+          "id": "lab",
+          "width": 960,
+          "height": 540,
+          "duration": 21.233333,
+          "error": null
+        },
+        {
+          "id": "prefeito",
+          "width": 960,
+          "height": 540,
+          "duration": 36.6,
+          "error": null
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

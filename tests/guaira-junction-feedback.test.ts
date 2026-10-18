@@ -3,6 +3,7 @@ import test from 'node:test';
 import { pixelText } from '../src/graphics/BitmapFont';
 import { WorldObjects } from '../src/adventure/WorldPhysics';
 import { drawGuairaWorker } from '../src/adventure/experimental/guaira/GuairaWorkerArt';
+import { GUAIRA_CONTROL_COLORS as C } from '../src/adventure/experimental/guaira/GuairaControlArt';
 import { drawJunctionBackground, drawJunctionObjects } from '../src/adventure/experimental/guaira/junction/GuairaJunctionArt';
 import { GUAIRA_JUNCTION as G, guairaJunctionStage, JunctionRouting } from '../src/adventure/experimental/guaira/junction/GuairaJunctionModel';
 import { guairaJunctionBrowser } from './helpers/guairaJunctionHarness';
@@ -92,20 +93,28 @@ test('compact header prioritizes DESVIO, actual travel at replay frame 500, then
     expectBanner('B SOBE / A DESCE');
 });
 
-test('both plate engravings remain A/B while the valve shows actual supply throughout the warning', () => {
+test('both plaques retain actual supply and identify the requested ramal throughout the warning', () => {
     const objects = new WorldObjects(guairaJunctionStage().mechanisms), routing = new JunctionRouting();
-    for (const selected of ['b', 'a'] as const) {
-        routing.step(selected, 1);
-        for (const [cameraX, cameraY, x, y] of [[0, 200, 173, 88], [320, 150, 173, 90]]) {
+    for (const elapsed of [0, 1, 199, 200]) {
+        if(elapsed)routing.step('a',elapsed);
+        for (const [cameraX, cameraY, x, y] of [[0, 200, 168, 81], [320, 150, 168, 83]]) {
             const r = recorder(); drawJunctionObjects(r.c, objects, cameraX, cameraY, 0, true, routing);
-            const letter = r.calls.filter(([color, px, py]) => color === '#4c4144' && px >= x && px < x + 17 && py >= y && py < y + 7);
-            assert.deepEqual(letter, glyph('A/B', x, y, '#4c4144'));
+            const letter = r.calls.filter(([color, px, py]) => color === C.ink && px >= x && px < x + 5 && py >= y && py < y + 7);
+            assert.deepEqual(letter, glyph('B', x, y, C.ink),'actual B remains readable until the transfer finishes');
+            if(routing.warning){
+                const requested = r.calls.filter(([color, px, py]) => color === C.ink && px >= x+12 && px < x+17 && py >= y && py < y+7);
+                assert.deepEqual(requested,glyph('A',x+12,y,C.ink),'A is a separate request, never a premature supply reading');
+            }
         }
     }
     const r = recorder(); drawJunctionBackground(r.c, 200, 150, 0, true, routing);
     const valve = r.calls.filter(([color, x, y]) => color === '#f2be72' && x >= 101 && x < 106 && y >= 127 && y < 134);
     assert.deepEqual(valve, glyph('B', 101, 127, '#f2be72'));
     assert.equal(routing.selected, 'a'); assert.equal(routing.supplied, 'b');
+    routing.step('a',1);
+    const ready=recorder();drawJunctionObjects(ready.c,objects,0,200,0,true,routing);
+    assert.deepEqual(ready.calls.filter(([color,x,y])=>color===C.ink&&x>=168&&x<173&&y>=81&&y<88),glyph('A',168,81,C.ink));
+    assert.equal(routing.supplied,'a');assert.equal(routing.warning,false);
 });
 
 test('each worker observes its own deck, including descending A, warning and the settled dry dock', () => {

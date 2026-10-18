@@ -1,0 +1,108 @@
+{
+  "date": "2026-10-17",
+  "kind": "native-scenery-joins-comparison",
+  "simulationHz": 60,
+  "captureFps": 30,
+  "audio": false,
+  "actorOrClockEdits": false,
+  "routes": [
+    {
+      "name": "travessia",
+      "finished": true,
+      "damage": 0,
+      "frames": 2354,
+      "coins": 23,
+      "identicalNativePositionsAndCamera": true,
+      "comparedFrames": 16,
+      "comparisonFrame": 1727,
+      "videoFrames": 428,
+      "videoWindow": {
+        "firstFrame": 1500,
+        "lastFrame": 2354
+      }
+    },
+    {
+      "name": "patio",
+      "finished": true,
+      "damage": 0,
+      "frames": 3425,
+      "coins": 11,
+      "identicalNativePositionsAndCamera": true,
+      "comparedFrames": 19,
+      "comparisonFrame": 2284,
+      "videoFrames": 531,
+      "videoWindow": {
+        "firstFrame": 1740,
+        "lastFrame": 2800
+      }
+    },
+    {
+      "name": "respiros",
+      "finished": true,
+      "damage": 0,
+      "frames": 2132,
+      "coins": 15,
+      "identicalNativePositionsAndCamera": true,
+      "comparedFrames": 17,
+      "comparisonFrame": 1422,
+      "videoFrames": 527,
+      "videoWindow": {
+        "firstFrame": 1080,
+        "lastFrame": 2132
+      }
+    },
+    {
+      "name": "subida",
+      "finished": true,
+      "damage": 0,
+      "frames": 2566,
+      "coins": 17,
+      "identicalNativePositionsAndCamera": true,
+      "comparedFrames": 19,
+      "comparisonFrame": 1882,
+      "videoFrames": 476,
+      "videoWindow": {
+        "firstFrame": 1100,
+        "lastFrame": 2050
+      }
+    },
+    {
+      "name": "galeria",
+      "finished": true,
+      "damage": 0,
+      "frames": 2011,
+      "coins": 16,
+      "identicalNativePositionsAndCamera": true,
+      "comparedFrames": 16,
+      "comparisonFrame": 1073,
+      "videoFrames": 656,
+      "videoWindow": {
+        "firstFrame": 700,
+        "lastFrame": 2010
+      }
+    },
+    {
+      "name": "alivio",
+      "finished": true,
+      "damage": 0,
+      "frames": 1390,
+      "coins": 10,
+      "identicalNativePositionsAndCamera": true,
+      "comparedFrames": 16,
+      "comparisonFrame": 834,
+      "videoFrames": 396,
+      "videoWindow": {
+        "firstFrame": 600,
+        "lastFrame": 1390
+      }
+    }
+  ],
+  "sourceHashes": {
+    "GuairaNeighborhoodArt.ts": "3f59dde785b67bb12c92011e10833c85ed3d285368da680e606dd38f8eae5a20",
+    "GuairaScaffoldArt.ts": "469b72ca32b4105c1bdd3d041657e18eb1746db181cf933765efff52f3429111",
+    "GuairaCourseLandmarks.ts": "ef084b51b8029a8665110fe08e40b4d555f0e4a63ab8bb623b011724e6232c08",
+    "GuairaCoursePresentation.ts": "ef3be7aeb3dc636c9540c5e8994d0decf634aafb4c81577cbbe464cfe07b5f16",
+    "GuairaMaintenanceLandscape.ts": "36f104916d52569caad32ddc2a16c84696f723acaea38c7954a9650a60d1f129"
+  },
+  "bossBackgroundsUnchanged": true
+}

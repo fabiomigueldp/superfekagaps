@@ -1,3 +1,4 @@
+import { GUAIRA_FLOW_STEP as STEP } from '../src/adventure/experimental/guaira/GuairaFluidArt';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { WorldObjects } from '../src/adventure/WorldPhysics';
@@ -117,14 +118,14 @@ test('dry channels draw nothing and reduced water is deterministic and clipped',
 });
 
 test('repeating channel, rice and falling-water patterns cross their wrap one pixel forward', () => {
-    for(const direction of [-1,1] as const){const a=raster(),b=raster();drawGuairaChannelFlow(a.c,0,160,0,true,31*120,false,direction);drawGuairaChannelFlow(b.c,0,160,0,true,32*120,false,direction);for(let x=20;x<140;x++)for(let y=2;y<5;y++)assert.equal(b.pixels.get(`${x},${y}`),a.pixels.get(`${x-direction},${y}`));}
-    for(const row of [0,1]){const a=raster(),b=raster();drawGuairaRiceFlow(a.c,0,0,160,true,38*240,false,row);drawGuairaRiceFlow(b.c,0,0,160,true,39*240,false,row);for(let x=20;x<140;x++)for(let y=6;y<12;y++)assert.equal(b.pixels.get(`${x},${y}`),a.pixels.get(`${x-1},${y}`));}
-    const a=raster(),b=raster();drawGuairaSluiceFlow(a.c,0,0,100,true,18*90,false);drawGuairaSluiceFlow(b.c,0,0,100,true,19*90,false);for(let y=20;y<80;y++)for(let x=17;x<35;x++)assert.equal(b.pixels.get(`${x},${y}`),a.pixels.get(`${x},${y-1}`));
+    for(const direction of [-1,1] as const){const a=raster(),b=raster();drawGuairaChannelFlow(a.c,0,160,0,true,31*STEP.channel,false,direction);drawGuairaChannelFlow(b.c,0,160,0,true,32*STEP.channel,false,direction);for(let x=20;x<140;x++)for(let y=2;y<5;y++)assert.equal(b.pixels.get(`${x},${y}`),a.pixels.get(`${x-direction},${y}`));}
+    for(const row of [0,1]){const a=raster(),b=raster();drawGuairaRiceFlow(a.c,0,0,160,true,38*STEP.rice,false,row);drawGuairaRiceFlow(b.c,0,0,160,true,39*STEP.rice,false,row);for(let x=20;x<140;x++)for(let y=6;y<12;y++)assert.equal(b.pixels.get(`${x},${y}`),a.pixels.get(`${x-1},${y}`));}
+    const a=raster(),b=raster();drawGuairaSluiceFlow(a.c,0,0,100,true,18*STEP.falling,false);drawGuairaSluiceFlow(b.c,0,0,100,true,19*STEP.falling,false);for(let y=20;y<80;y++)for(let x=17;x<35;x++)assert.equal(b.pixels.get(`${x},${y}`),a.pixels.get(`${x},${y-1}`));
 });
 
 
 test('pool wrap radiates outward and its integrated pixels stay on the authored surface row', () => {
-    const a=raster(),b=raster();drawGuairaPoolFlow(a.c,0,184,20,true,26*240,false,95);drawGuairaPoolFlow(b.c,0,184,20,true,27*240,false,95);
+    const a=raster(),b=raster();drawGuairaPoolFlow(a.c,0,184,20,true,26*STEP.surface,false,95);drawGuairaPoolFlow(b.c,0,184,20,true,27*STEP.surface,false,95);
     for(let x=20;x<75;x++)assert.equal(b.pixels.get(`${x},23`),a.pixels.get(`${x+1},23`));
     for(let x=115;x<165;x++)assert.equal(b.pixels.get(`${x},23`),a.pixels.get(`${x-1},23`));
     const objects=new WorldObjects(guairaTraversalStage().mechanisms);

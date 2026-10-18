@@ -1,4 +1,8 @@
-import { box as r, pixelLine as line, polygon, roof } from '../../../WorldPainting';
+import { box as r, pixelLine as line, polygon } from '../../../WorldPainting';
+import { TileType } from '../../../../constants';
+import { drawGuairaReliefLidTile } from '../GuairaControlArt';
+import { drawGuairaTiledRoof } from '../GuairaBuildingFinish';
+import { drawGuairaWorkshopWall } from '../GuairaWorkshopBackground';
 import { jetCycle } from '../../../WorldMachineState';
 import type { WorldLevel, WorldObjects } from '../../../WorldPhysics';
 import { pixelText } from '../../../../graphics/BitmapFont';
@@ -7,13 +11,15 @@ import { GUAIRA_RELIEF as G, reliefOpen } from './GuairaReliefStage';
 import { drawReliefFlow } from './GuairaReliefFlow';
 import { drawWorkshopClerestory, drawWorkshopRoofFrame } from '../GuairaWorkshopArt';
 import { drawGuairaPipe, drawGuairaPipeElbow, drawGuairaPipeFlow, drawGuairaPipeSaddle, guairaPipeRoute } from '../GuairaPipeArt';
+import { drawGuairaPressureResidue } from '../GuairaFluidArt';
+import { drawGuairaDrainSurface } from '../GuairaWaterworksArt';
 
 /** Guaíra's plaster, clay and worn brass; liquid colours belong to the native jet. */
 export const RELIEF_MATERIAL_COLORS = Object.freeze({
     ink: '#493c43', wall: '#dfbe96', plaster: '#e3c49a', shade: '#c29b79',
     recess: '#ac8c70', recessLight: '#ba9978', brass: '#b58a54', light: '#e2bb79',
     pipe: '#6d584c', pipeShade: '#8c7157', gauge: '#edba62', safe: '#80afa7',
-    water: '#40b8cb', waterShade: '#329eb7', foam: '#c6f0df', mist: '#cad6c4',
+    water: '#40b8cb', waterShade: '#329eb7', waterLight: '#76d7df', waterEdge: '#267f98', foam: '#c6f0df', mist: '#cad6c4',
 });
 const P = RELIEF_MATERIAL_COLORS;
 const PIPE = Object.freeze({ edge: P.pipe, brass: P.brass, light: P.light, shade: P.pipeShade,
@@ -119,8 +125,7 @@ export function drawReliefBackground(c: CanvasRenderingContext2D, level: WorldLe
     time = 0, reducedMotion = false) {
     layer(c, cx, cy, (x, y) => {
         const open = reliefOpen(level);
-        r(c, 0, 23, 320, 157, P.wall);
-        r(c, 0, 296 - y, 320, 88, '#d2ad87');
+        drawGuairaWorkshopWall(c,'alivio',x,y);
         drawWorkshopClerestory(c, 286 - x, 44 - y, 70, time, reducedMotion, true);
         drawWorkshopClerestory(c, 421 - x, 34 - y, 65, time, reducedMotion);
         drawWorkshopClerestory(c, 570 - x, 42 - y, 70, time, reducedMotion);
@@ -146,7 +151,7 @@ export function drawReliefBackground(c: CanvasRenderingContext2D, level: WorldLe
             r(c, xx + 4 - x, yy - 2 - y, w - 11, 2, '#d4af89');
         }
         // Workshop eave and title sit above the playable ascent, without a shelf.
-        roof(c, 19 - x, 100 - y, 161, 14);
+        drawGuairaTiledRoof(c, 19 - x, 100 - y, 161);
         r(c, 26 - x, 116 - y, 146, 27, P.plaster);
         pixelText(c, 'OFICINA DAS AGUAS', 34 - x, 126 - y, '#8c7157');
         pixelText(c, 'OFICINA', 25 - x, 222 - y, P.pipeShade);
@@ -193,6 +198,7 @@ export function drawReliefBackground(c: CanvasRenderingContext2D, level: WorldLe
             r(c,294-x,281-y,51,9,'#688f87');
             r(c,296-x,288-y,47,2,'#5b7f77');
             r(c,343-x,280-y,3,10,P.safe);
+            drawGuairaDrainSurface(c,296-x,343-x,283-y,344-x,time,reducedMotion);
         }
         drawGuairaPipeFlow(c, open ? RETURN_ROUTE : FEED_ROUTE, x, y, time, reducedMotion, PIPE.glint);
         drawGuairaPipeSaddle(c,380-x,308-y,false,PIPE);
@@ -221,8 +227,16 @@ export function drawReliefBackground(c: CanvasRenderingContext2D, level: WorldLe
     });
 }
 
-/** Gallery's actual tile reader retains pale safe caps and branching brittle clay. */
-export const drawReliefTerrain = drawGalleryTerrain;
+/** Only the pressure cover carries the stamped relief seal. A missing native
+ * tile stays open; ordinary gallery breakables retain their own clay finish. */
+export function drawReliefTerrain(c:CanvasRenderingContext2D,level:WorldLevel,cx:number,cy:number,reducedMotion=false) {
+    drawGalleryTerrain(c,level,cx,cy,reducedMotion);
+    layer(c,cx,cy,(x,y)=>{
+        for(let wx=G.lidStart;wx<G.lidEnd;wx+=16)
+            if(level.getTile(wx/16,G.lidY/16)===TileType.BRICK_BREAKABLE)
+                drawGuairaReliefLidTile(c,wx-x,G.lidY-y);
+    });
+}
 
 /** Native gameplay-owned envelope and shutdown snapshot. No independent art clock. */
 export function drawReliefObjects(c: CanvasRenderingContext2D, objects: WorldObjects, cx: number, cy: number, reducedMotion: boolean) {
@@ -247,16 +261,10 @@ export function drawReliefObjects(c: CanvasRenderingContext2D, objects: WorldObj
             line(c, gaugeX + 2, gaugeY + 29, gaugeX + 6, gaugeY + 33, P.light);
             line(c, gaugeX + 6, gaugeY + 33, gaugeX + 7, gaugeY + 29, P.light);
         }
-        // Native jet paint retained from the gameplay prototype, inside danger.
+        // The same opaque pressure surface as the rest of the water network.
         if (s.danger) {
             drawReliefFlow(c, s.danger, objects.time, x, y, reducedMotion, P);
         }
-        // Same native shutdown snapshot, visibly harmless sparse pale drops only.
-        const shutdown = b.jetShutdown;
-        if (!reducedMotion && b.active && shutdown) {
-            const age = objects.time - shutdown.at;
-            if (age >= 0 && age < 300) for (let i = 0; i < 5; i++)
-                r(c, left + 12 + i * 23, mouth - Math.round(shutdown.height * (i + 1) / 6 * (1 - age / 300)), 2, 1, P.mist);
-        }
+        drawGuairaPressureResidue(c,b,s,x,y,objects.time,reducedMotion,5);
     });
 }

@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-18",
+  "scope": "Causa e efeito dos controles, manômetros receptores e conexões curtas",
+  "passed": true,
+  "typescript": {
+    "total": 3779,
+    "passed": 3778,
+    "failed": 0,
+    "skipped": 1,
+    "newCases": 8,
+    "log": "output/guaira/control-response-2026-10-18/full.log"
+  },
+  "javascript": {
+    "total": 3,
+    "passed": 3,
+    "log": "output/guaira/control-response-2026-10-18/javascript.log"
+  },
+  "build": {
+    "passed": true,
+    "includes": [
+      "3 legacy levels",
+      "30 world stages",
+      "260 player sprites",
+      "both TypeScript configurations",
+      "Vite production build"
+    ],
+    "log": "output/guaira/control-response-2026-10-18/build-final.log"
+  },
+  "native": {
+    "controls": 11,
+    "fullStageRuns": 9,
+    "controlAndRejoinRuns": 2,
+    "damage": 0,
+    "actorCameraClockEdits": false,
+    "file": "native-verification.json"
+  },
+  "browser": {
+    "passed": true,
+    "viewports": [
+      1440,
+      390
+    ],
+    "responseImages": 66,
+    "videos": 12,
+    "errors": [],
+    "file": "browser-verification.json"
+  },
+  "campaign": {
+    "passed": true,
+    "normalCampaign": true,
+    "executions": 9,
+    "entries": 8,
+    "errors": [],
+    "file": "campaign-verification.json"
+  },
+  "limitations": [
+    "Dois percursos adicionais verificam apenas acionamento e volta ao piso; os nove restantes concluem a fase.",
+    "As capturas verificam os estados e o enquadramento; não medem compreensão espontânea de uma primeira partida."
+  ]
+}

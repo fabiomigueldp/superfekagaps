@@ -14,6 +14,7 @@ import {GuairaRelief} from '../src/adventure/experimental/guaira/relief/GuairaRe
 const [outArg,canvasArg,baselineArg]=process.argv.slice(2);assert.ok(outArg&&canvasArg,'OUTPUT and CANVAS module required');
 const captureStride=Number(process.env.GUAIRA_CAPTURE_STRIDE??4);assert.ok([1,2,4].includes(captureStride),'capture stride must be 1, 2 or 4');
 const captureFrom=Number(process.env.GUAIRA_CAPTURE_FROM??1),captureTo=Number(process.env.GUAIRA_CAPTURE_TO??Infinity);
+const denseSurvey=process.env.GUAIRA_DENSE_SURVEY==='1';
 assert.ok(Number.isInteger(captureFrom)&&captureFrom>=1&&(captureTo===Infinity||Number.isInteger(captureTo)&&captureTo>=captureFrom),'valid native capture window required');
 const {createCanvas}=await import(pathToFileURL(resolve(canvasArg)).href);
 const out=resolve(outArg),root=resolve('src/adventure/experimental/guaira');mkdirSync(out,{recursive:true});
@@ -52,6 +53,11 @@ for(const [key,tape] of Object.entries(runs) as any){
  const sheetMarks=new Set(Array.from({length:16},(_,i)=>Math.round(i*(total-1)/15)+1));
  const marks=new Set([...sheetMarks,...(tape.notes??[]).map((note:any)=>note.frame),...(({patio:[123,1745,1769],subida:[1014,1038,1056],respiros:[379],prefeito:[519]} as Record<string,number[]>)[key]??[])]);
  const video=join(out,key+'-replay');if(!baselineArg)mkdirSync(video,{recursive:true});let videoFrames=0;
+ const visitedViews=new Set<string>(),sweepViews:any[]=[],sweepSheets:string[]=[];
+ const sweep=createCanvas(1280,816),sw=sweep.getContext('2d');let sweepCount=0;
+ sw.fillStyle='#131e25';sw.fillRect(0,0,1280,816);
+ const flushSweep=()=>{if(!sweepCount)return;const name=key+'-sweep-'+String(sweepSheets.length+1).padStart(2,'0')+'.png';
+  writeFileSync(join(out,name),sweep.toBuffer('image/png'));sweepSheets.push(name);sweepCount=0;sw.fillStyle='#131e25';sw.fillRect(0,0,1280,816);};
  const capture=()=>{const state=()=>JSON.stringify({p:g.player.data,o:g.objects,b:g.boss,c:g.camera,coins:g.coins,t:g.time,tiles:g.level.data.tiles});
   const before=state();g.render();assert.equal(state(),before,'native paint is read-only');fc.drawImage(screen,0,0,320,180);return frame.toBuffer('image/png');};
  for(const [count,keys]of [[tape.initialSettleFrames||0,[]],...tape.runs]){
@@ -72,9 +78,18 @@ for(const [key,tape] of Object.entries(runs) as any){
    }else air.push(now);
    if(g.boss?.hint&&g.boss.hint!==lastHint){lastHint=g.boss.hint;sample.hints.push({n,hint:lastHint});}
    const videoFrame=!baselineArg&&n%captureStride===0&&n>=captureFrom&&n<=captureTo;
-   if(marks.has(n)||videoFrame){
+   const viewCell=Math.floor(g.camera.x/144)+':'+Math.floor(g.camera.y/72);
+   const sweepMark=denseSurvey&&(!visitedViews.has(viewCell)||marks.has(n));
+   if(marks.has(n)||videoFrame||sweepMark){
     const png=capture();
     if(videoFrame)writeFileSync(join(video,String(++videoFrames).padStart(5,'0')+'.png'),png);
+    if(sweepMark){
+     visitedViews.add(viewCell);const file=key+'-'+n+'.png';if(!marks.has(n))writeFileSync(join(out,file),png);
+     const x=sweepCount%4*320,y=Math.floor(sweepCount/4)*204;
+     sw.putImageData(fc.getImageData(0,0,320,180),x,y+24);
+     pixelText(sw,key.toUpperCase()+' #'+n+'  CAM '+Math.round(g.camera.x)+','+Math.round(g.camera.y),x+4,y+8,'#ffe1ab');
+     sweepViews.push({n,file,camera:{x:g.camera.x,y:g.camera.y}});sweepCount++;if(sweepCount===16)flushSweep();
+    }
     if(!marks.has(n))continue;
     const file=key+'-'+n+'.png';writeFileSync(join(out,file),png);
     const snap={n,file,p:{...p.position},feet,camera:{x:g.camera.x,y:g.camera.y},hint:g.boss?.hint,status:h.status.textContent};sample.snapshots.push(snap);
@@ -85,6 +100,7 @@ for(const [key,tape] of Object.entries(runs) as any){
  }
  sample.frames=n;sample.videoFrames=videoFrames;sample.captureFps=60/captureStride;
  sample.videoWindow={firstFrame:Math.ceil(captureFrom/captureStride)*captureStride,lastFrame:Math.floor(Math.min(n,captureTo)/captureStride)*captureStride};
+ if(denseSurvey){flushSweep();sample.visualSweep={cellWidth:144,cellHeight:72,sheets:sweepSheets,views:sweepViews};}
  sample.finished=g.finished??g.mayor?.publicWaterOpen??(g.boss?.phase==='defeated');sample.coins=g.coins;report[key]=sample;
  assert.equal(sample.finished,true);assert.equal(sample.damage.length,0);assert.equal(n,total);
  writeFileSync(join(out,key+'-sheet.png'),sheet.toBuffer('image/png'));g.dispose();for(const fn of cleanup.reverse())fn();

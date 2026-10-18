@@ -94,7 +94,7 @@ for (const chapter of [false, true]) test(`native completed route retains ${chap
     game.toggleTraversalPause(); assert.deepEqual(paint().calls.filter(([,,,,color]) => color === '#edcaf5'), expected);
 });
 
-test('unsolved plate has a static downward target cue, removed by the native sentada', t => {
+test('the tread keeps its static impact engraving through native activation and rearming', t => {
     const h = guairaTraversalBrowser(t), game = h.create();
     h.run(game, 92, ['ArrowRight', 'ShiftLeft']); h.run(game, 12);
     const valve = game.objects.get(G.valveId)!;
@@ -106,18 +106,20 @@ test('unsolved plate has a static downward target cue, removed by the native sen
         c.fillRect = (x, y, w, h) => { calls.push([x, y, w, h, c.fillStyle as string]); original(x, y, w, h); };
         try { drawGuairaTraversalObjects(c, game.objects, game.camera.x, game.camera.y, time, false); }
         finally { c.fillRect = original; }
-        return calls.filter(([,,,,color]) => color === '#ffe7a3');
+        const x=Math.round(valve.x)-Math.round(game.camera.x),y=Math.round(valve.y)-Math.round(game.camera.y);
+        return calls.filter(([xx,yy,w,,color])=>color==='#f2dfaf'&&w<=5&&xx>=x+6&&xx<x+valve.width-8&&yy>=y+3&&yy<y+8)
+            .map(([xx,yy,w,h,color])=>[xx-x,yy-y,w,h,color]);
     };
     const initial = cue();
-    const x = Math.round(valve.x) - Math.round(game.camera.x) + Math.floor(valve.width / 2);
-    const y = Math.round(valve.y) - Math.round(game.camera.y);
     assert.deepEqual(initial, [
-        [x - 1, y - 14, 3, 7, '#ffe7a3'], [x - 4, y - 8, 9, 1, '#ffe7a3'],
-        [x - 2, y - 7, 5, 2, '#ffe7a3'], [x, y - 5, 1, 2, '#ffe7a3'],
+        [14,3,1,3,'#f2dfaf'],[12,4,5,1,'#f2dfaf'],[13,5,3,1,'#f2dfaf'],[14,6,1,1,'#f2dfaf'],
     ]);
     assert.deepEqual(valve, before, 'cue never changes the mechanism');
     assert.deepEqual(cue(game.time + 500), initial, 'target does not pulse or shift');
     h.run(game, 17, ['Space']); h.run(game, 1, ['ArrowDown']); h.run(game, 50);
     assert.equal(valve.active, true);
-    assert.deepEqual(cue(), [], 'the solved plate no longer asks for another action');
+    assert.deepEqual(cue(), initial, 'the command remains engraved because this is a reversible valve');
+    h.run(game,17,['Space']);h.run(game,1,['ArrowDown']);h.run(game,50);
+    assert.equal(valve.active,false,'a second real sentada rearms the mechanism');
+    assert.deepEqual(cue(),initial);
 });

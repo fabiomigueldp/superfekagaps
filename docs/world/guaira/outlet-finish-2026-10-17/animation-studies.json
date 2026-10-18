@@ -1,0 +1,373 @@
+{
+  "kind": "authored-production-outlet-studies",
+  "baselineHashes": {
+    "GuairaRespirosArt.ts": "e2df4f2cf8da7948d3a0a06be17483dea36343baca894e2a4acbc83b34bd17a3",
+    "GuairaPipeArt.ts": "86abfc35b700ddd20b9a0faf7be228c855fd7152300c8687d05326111d72ce6f",
+    "GuairaFluidArt.ts": "4d43e9ef8aa866fc4d9192192c1f5423ea3c0b474528823bb60b090e8c19dfe5",
+    "GuairaWaterworksArt.ts": "24a4967d8da9d8ccdc1cf64a399ddbaa89c314d15bdd6d2ba427366295dc4e6d",
+    "GuairaReliefArt.ts": "db79af89c222bf1762f6b809181ca7c593fda82ab28c54caf9ec7dea5d0c33be",
+    "GuairaReliefFlow.ts": "b4ac001f75aca70c5f402ba967d728dbbc53372b00c6265a60ffdc3ab7e93410",
+    "GuairaMayorArenaArt.ts": "c4497f2ea706ed42e75baebeda917e25ad2643ece1b6daf8f0dd66ac831ae7c2",
+    "GuairaMayorTownArt.ts": "8141f2159e8610a4d7d71e406b2b8832cd992a2fdd432c8a99b5eaee0d3706c9"
+  },
+  "currentHashes": {
+    "GuairaRespirosArt.ts": "77edacb42b5870c5bde7554acabe280a953a60bfe92e17fc03a481269c78f7c9",
+    "GuairaPipeArt.ts": "86abfc35b700ddd20b9a0faf7be228c855fd7152300c8687d05326111d72ce6f",
+    "GuairaFluidArt.ts": "22d470bd2374453ea0d71ecfd3ab06c8852b8449215a20ce47760393408ec270",
+    "GuairaWaterworksArt.ts": "a50dd815821dadc79bd7e473db5ee23ff2096482f52a216d2c7f952f381aa7ab",
+    "GuairaReliefArt.ts": "9935a2f762691df61fba772f9ff454d7e16e1d7ecb7a6b4e1cd370e0b30490f6",
+    "GuairaReliefFlow.ts": "b4ac001f75aca70c5f402ba967d728dbbc53372b00c6265a60ffdc3ab7e93410",
+    "GuairaMayorArenaArt.ts": "66aac572a0356cccab5da4407057089a97b9c796e21331a75dfcd9b49229b417",
+    "GuairaMayorTownArt.ts": "fe61cbf006c550b017b9a5bc35bca6f8636316d13c109b274da67541fadc4352"
+  },
+  "studies": [
+    {
+      "id": "respiros",
+      "authoredPose": true,
+      "actorIncluded": false,
+      "componentOnly": false,
+      "readOnlyPaint": true,
+      "repeatable": true,
+      "fps": 30,
+      "frames": 252,
+      "camera": [
+        80,
+        144
+      ],
+      "crop": [
+        76,
+        138,
+        104,
+        28
+      ],
+      "comparisonFrame": 79,
+      "samples": [
+        {
+          "frame": 0,
+          "time": 0
+        },
+        {
+          "frame": 40,
+          "time": 1333.3333333333333
+        },
+        {
+          "frame": 56,
+          "time": 1866.6666666666667
+        },
+        {
+          "frame": 64,
+          "time": 2133.3333333333335
+        },
+        {
+          "frame": 70,
+          "time": 2333.3333333333335
+        },
+        {
+          "frame": 74,
+          "time": 2466.6666666666665
+        },
+        {
+          "frame": 75,
+          "time": 2500
+        },
+        {
+          "frame": 76,
+          "time": 2533.3333333333335
+        },
+        {
+          "frame": 77,
+          "time": 2566.6666666666665
+        },
+        {
+          "frame": 78,
+          "time": 2600
+        },
+        {
+          "frame": 79,
+          "time": 2633.3333333333335
+        },
+        {
+          "frame": 80,
+          "time": 2666.6666666666665
+        },
+        {
+          "frame": 81,
+          "time": 2700
+        },
+        {
+          "frame": 82,
+          "time": 2733.3333333333335
+        },
+        {
+          "frame": 84,
+          "time": 2800
+        },
+        {
+          "frame": 86,
+          "time": 2866.6666666666665
+        }
+      ]
+    },
+    {
+      "id": "isolamento",
+      "authoredPose": true,
+      "actorIncluded": false,
+      "componentOnly": true,
+      "readOnlyPaint": true,
+      "repeatable": true,
+      "fps": 30,
+      "frames": 252,
+      "camera": [
+        640,
+        144
+      ],
+      "crop": [
+        60,
+        125,
+        88,
+        40
+      ],
+      "comparisonFrame": 18,
+      "samples": [
+        {
+          "frame": 0,
+          "time": 1100
+        },
+        {
+          "frame": 10,
+          "time": 1433.3333333333333
+        },
+        {
+          "frame": 14,
+          "time": 1566.6666666666667
+        },
+        {
+          "frame": 15,
+          "time": 1600
+        },
+        {
+          "frame": 16,
+          "time": 1633.3333333333335
+        },
+        {
+          "frame": 17,
+          "time": 1666.6666666666665
+        },
+        {
+          "frame": 18,
+          "time": 1700
+        },
+        {
+          "frame": 19,
+          "time": 1733.3333333333335
+        },
+        {
+          "frame": 20,
+          "time": 1766.6666666666665
+        },
+        {
+          "frame": 22,
+          "time": 1833.3333333333335
+        },
+        {
+          "frame": 24,
+          "time": 1900
+        },
+        {
+          "frame": 89,
+          "time": 4066.6666666666665
+        },
+        {
+          "frame": 90,
+          "time": 4100
+        },
+        {
+          "frame": 105,
+          "time": 4600
+        },
+        {
+          "frame": 114,
+          "time": 4900
+        },
+        {
+          "frame": 125,
+          "time": 5266.666666666667
+        }
+      ]
+    },
+    {
+      "id": "retorno",
+      "authoredPose": true,
+      "actorIncluded": false,
+      "componentOnly": false,
+      "readOnlyPaint": true,
+      "repeatable": true,
+      "fps": 30,
+      "frames": 252,
+      "camera": [
+        200,
+        176
+      ],
+      "crop": [
+        86,
+        94,
+        68,
+        30
+      ],
+      "comparisonFrame": 80,
+      "samples": [
+        {
+          "frame": 0,
+          "time": 0
+        },
+        {
+          "frame": 16,
+          "time": 533.3333333333334
+        },
+        {
+          "frame": 32,
+          "time": 1066.6666666666667
+        },
+        {
+          "frame": 48,
+          "time": 1600
+        },
+        {
+          "frame": 64,
+          "time": 2133.3333333333335
+        },
+        {
+          "frame": 80,
+          "time": 2666.6666666666665
+        },
+        {
+          "frame": 96,
+          "time": 3200
+        },
+        {
+          "frame": 112,
+          "time": 3733.3333333333335
+        },
+        {
+          "frame": 128,
+          "time": 4266.666666666667
+        },
+        {
+          "frame": 144,
+          "time": 4800
+        },
+        {
+          "frame": 160,
+          "time": 5333.333333333333
+        },
+        {
+          "frame": 176,
+          "time": 5866.666666666667
+        },
+        {
+          "frame": 192,
+          "time": 6400
+        },
+        {
+          "frame": 208,
+          "time": 6933.333333333333
+        },
+        {
+          "frame": 224,
+          "time": 7466.666666666667
+        },
+        {
+          "frame": 240,
+          "time": 8000
+        }
+      ]
+    },
+    {
+      "id": "bica",
+      "authoredPose": true,
+      "actorIncluded": false,
+      "componentOnly": false,
+      "readOnlyPaint": true,
+      "repeatable": true,
+      "fps": 30,
+      "frames": 252,
+      "camera": [
+        0,
+        64
+      ],
+      "crop": [
+        8,
+        130,
+        98,
+        31
+      ],
+      "comparisonFrame": 80,
+      "samples": [
+        {
+          "frame": 0,
+          "time": 0
+        },
+        {
+          "frame": 16,
+          "time": 533.3333333333334
+        },
+        {
+          "frame": 32,
+          "time": 1066.6666666666667
+        },
+        {
+          "frame": 48,
+          "time": 1600
+        },
+        {
+          "frame": 64,
+          "time": 2133.3333333333335
+        },
+        {
+          "frame": 80,
+          "time": 2666.6666666666665
+        },
+        {
+          "frame": 96,
+          "time": 3200
+        },
+        {
+          "frame": 112,
+          "time": 3733.3333333333335
+        },
+        {
+          "frame": 128,
+          "time": 4266.666666666667
+        },
+        {
+          "frame": 144,
+          "time": 4800
+        },
+        {
+          "frame": 160,
+          "time": 5333.333333333333
+        },
+        {
+          "frame": 176,
+          "time": 5866.666666666667
+        },
+        {
+          "frame": 192,
+          "time": 6400
+        },
+        {
+          "frame": 208,
+          "time": 6933.333333333333
+        },
+        {
+          "frame": 224,
+          "time": 7466.666666666667
+        },
+        {
+          "frame": 240,
+          "time": 8000
+        }
+      ]
+    }
+  ]
+}

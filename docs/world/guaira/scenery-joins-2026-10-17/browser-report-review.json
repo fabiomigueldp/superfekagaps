@@ -1,0 +1,107 @@
+{
+  "kind": "browser-background-studies",
+  "mode": "review",
+  "studies": [],
+  "review": [
+    {
+      "width": 1440,
+      "fits": true,
+      "images": 2,
+      "variants": [
+        {
+          "id": "travessia",
+          "width": 960,
+          "height": 540,
+          "duration": 14.266667,
+          "error": null
+        },
+        {
+          "id": "patio",
+          "width": 960,
+          "height": 540,
+          "duration": 17.7,
+          "error": null
+        },
+        {
+          "id": "respiros",
+          "width": 960,
+          "height": 540,
+          "duration": 17.566667,
+          "error": null
+        },
+        {
+          "id": "subida",
+          "width": 960,
+          "height": 540,
+          "duration": 15.866667,
+          "error": null
+        },
+        {
+          "id": "galeria",
+          "width": 960,
+          "height": 540,
+          "duration": 21.866667,
+          "error": null
+        },
+        {
+          "id": "alivio",
+          "width": 960,
+          "height": 540,
+          "duration": 13.2,
+          "error": null
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "fits": true,
+      "images": 2,
+      "variants": [
+        {
+          "id": "travessia",
+          "width": 960,
+          "height": 540,
+          "duration": 14.266667,
+          "error": null
+        },
+        {
+          "id": "patio",
+          "width": 960,
+          "height": 540,
+          "duration": 17.7,
+          "error": null
+        },
+        {
+          "id": "respiros",
+          "width": 960,
+          "height": 540,
+          "duration": 17.566667,
+          "error": null
+        },
+        {
+          "id": "subida",
+          "width": 960,
+          "height": 540,
+          "duration": 15.866667,
+          "error": null
+        },
+        {
+          "id": "galeria",
+          "width": 960,
+          "height": 540,
+          "duration": 21.866667,
+          "error": null
+        },
+        {
+          "id": "alivio",
+          "width": 960,
+          "height": 540,
+          "duration": 13.2,
+          "error": null
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "passed": true
+}
