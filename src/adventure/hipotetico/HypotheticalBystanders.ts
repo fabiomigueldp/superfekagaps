@@ -5,7 +5,6 @@ import { bystanderPose,bystanderFall } from './HypotheticalBystanderMotion';
 import { bystanderTexture,drawBystanderTexture,type BystanderTexture } from './HypotheticalBystanderPixels';
 import {drawBlood} from './HypotheticalBlood';
 import {OPENING} from './HypotheticalOpening';
-import {smoothMotion} from './HypotheticalMotion';
 export { bystanderPose } from './HypotheticalBystanderMotion';
 
 type Paint=(x:number,y:number,w:number,h:number,color:string)=>void;

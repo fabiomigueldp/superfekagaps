@@ -30,7 +30,7 @@ export function arrivalOpeningAt(tick:number){
     const force=active?wind*(1-release):0;
     const thrashEnv=smoothMotion((tick-63)/3)*(1-smoothMotion((tick-73)/4));
     const ripEnv=smoothMotion((tick-71)/5)*(1-smoothMotion((tick-80)/6));
-    const tossEnv=smoothMotion((tick-79)/3)*(1-smoothMotion((tick-85)/3));
+    const tossEnv=smoothMotion((tick-78)/3)*(1-smoothMotion((tick-83)/3));
     const chewEnv=smoothMotion((tick-86)/3)*(1-smoothMotion((tick-100)/5));
     const hit=smoothMotion((tick-62)/3)*(1-smoothMotion((tick-86)/10));
     const pull=smoothMotion((tick-64)/14)*(1-release);

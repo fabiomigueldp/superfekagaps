@@ -6,6 +6,8 @@ import {HypotheticalGuard} from '../src/adventure/hipotetico/HypotheticalGuards'
 import {HypotheticalBackdrop,backdropBaseline,BACKDROP_RIG} from '../src/adventure/hipotetico/HypotheticalBackdrop';
 import {bystanderBounds,bystanderIntersection,bystanderPose} from '../src/adventure/hipotetico/HypotheticalBystanderMotion';
 import {drawBystanders} from '../src/adventure/hipotetico/HypotheticalBystanders';
+import {OPENING,arrivalOpeningAt,drawOpeningAftermath} from '../src/adventure/hipotetico/HypotheticalOpening';
+import {distantRiderPose} from '../src/adventure/hipotetico/HypotheticalArt';
 import {sceneLifecycleBrowser} from './helpers/sceneLifecycleHarness';
 const dt=1000/60;
 
@@ -131,3 +133,34 @@ test('the second plaza waits for Feka, resumes through ordinary movement and kee
         assert.equal(g.fight.arrival.ready,true);assert.equal(g.fight.route.active,false);
     }finally{g.dispose();}
 });
+
+test('opening mauling clamps, thrashes, rips apart and devours the first petista with persistent gore and stained jaws',()=>{
+    const b=new HypotheticalBackdrop(true),thuds:number[]=[];
+    assert.ok(arrivalOpeningAt(56).jaw>.85,'jaws open wide during the lunge');
+    assert.ok(arrivalOpeningAt(OPENING.clamp).jaw<.5,'jaws snap shut on clamp');
+    assert.ok(arrivalOpeningAt(OPENING.rip).jaw>.7,'jaws wrench open during the dismemberment rip');
+    assert.ok(arrivalOpeningAt(OPENING.toss).jaw>.75,'jaws open to toss the upper torso');
+    assert.ok(arrivalOpeningAt(OPENING.occluded).jaw<.28,'jaws crunch shut to swallow the torso');
+    assert.ok(arrivalOpeningAt(89).jaw>arrivalOpeningAt(OPENING.occluded).jaw,'post-swallow chew cycle');
+    for(let tick=1;tick<=OPENING.join;tick++){
+        b.update(tick);
+        if(b.events.includes('distant-thud'))thuds.push(tick);
+        assert.equal((distantRiderPose(b).gore??0)>0,tick>=OPENING.clamp);
+    }
+    assert.deepEqual(thuds,[OPENING.clamp,OPENING.contact]);
+    const record=(tick:number,reduced:boolean)=>{
+        const pixels=new Map<string,string>();
+        const c={fillStyle:'',fillRect(x:number,y:number,w:number,h:number){
+            for(let yy=Math.round(y);yy<Math.round(y+h);yy++)for(let xx=Math.round(x);xx<Math.round(x+w);xx++)pixels.set(`${xx},${yy}`,this.fillStyle);
+        }};
+        drawOpeningAftermath(c as unknown as CanvasRenderingContext2D,tick,116,reduced);
+        return pixels;
+    };
+    const thrash=record(68,false),rip=record(76,false),settled=record(140,false),reducedSettled=record(140,true);
+    assert.ok(thrash.size>80,'clamped victim and puncture spray render in the jaws');
+    assert.ok(rip.size>thrash.size,'dismemberment geyser, visceral strands and flying limbs expand the silhouette');
+    assert.deepEqual(settled,reducedSettled,'settled blood pools, severed limbs, cap and torn star-shirt match in reduced motion');
+    assert.ok([...settled.values()].includes('#f0e6d7'),'torn red star-shirt preserves white star pixels on the street');
+    assert.ok([...settled.keys()].every(k=>Number(k.split(',')[1])<=116),'gore and severed remains never sink below the street');
+});
+
