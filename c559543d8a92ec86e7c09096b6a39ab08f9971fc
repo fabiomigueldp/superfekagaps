@@ -1,0 +1,18 @@
+Technical documentation supplement for c559543d8a92ec86e7c09096b6a39ab08f9971fc
+
+Fix Classic scoreboard dialog focus and keyboard access
+
+Behavior
+Replace the custom scoreboard overlay with a native modal dialog. Keyboard focus remains inside the dialog, Escape closes it, and closing restores the triggering control or game canvas.
+
+Implementation
+GlobalScoreboard.panel becomes HTMLDialogElement. openPanel() selects autofocus according to form visibility; restoreFocus() handles detached or hidden triggers and queued close events. publish() moves focus before disabling controls or hiding the submission form. Ranking refresh scrolls the focused control into view. scoreboard.css adds native ::backdrop styling, dynamic viewport sizing and focus-visible outlines.
+
+Scope and limitations
+Adds tests/global-scoreboard-accessibility.browser.mjs. The original commit body reports 10 Chromium cases, 3 leaderboard API tests, both TypeScript projects and a production build passing. These are historical author claims, not checks rerun during this documentation task.
+
+Publication evidence
+No successful per-commit publisher receipt was found in the retained local deployment logs during this review. This does not establish whether the commit was published elsewhere or as part of a later descendant. No per-commit test pass is inferred.
+
+Full file inventory and provenance: docs/commits/2026-10-19/c559543.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
