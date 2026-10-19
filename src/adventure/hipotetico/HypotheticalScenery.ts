@@ -5,8 +5,12 @@ import { ARENA_BALCONIES, ARENA_COLUMNS, CHASE_GAPS } from './HypotheticalLayout
 import { SIEGE_SECTORS, SIEGE_UNLOCK_TICKS, SIEGE_LOCK_TICKS } from './HypotheticalSiege';
 import { DESTRUCTION_SITES, ruinAge, rubbleApproach } from './HypotheticalDevastation';
 import { backdropBaseline } from './HypotheticalBackdrop';
-import {drawChaseLandmarks} from './HypotheticalChaseArt';
-import {chaseMaterialAt,chaseCollapsedEdge,CHASE_WATER_Y} from './HypotheticalChaseDetails';
+import {drawChaseLandmarks,drawChaseTerrace} from './HypotheticalChaseArt';
+import {chaseCollapsedEdge} from './HypotheticalChaseDetails';
+import {CHASE_QUAYS,chaseQuayX,chaseQuayBase} from './HypotheticalChaseLife';
+import {drawChaseIndustry,drawChaseQuayLife,drawChaseSkiffs} from './HypotheticalChaseLifeArt';
+import {drawChaseQuayGround,drawChaseFrontage,drawChaseShoreWater} from './HypotheticalChaseQuayArt';
+import {drawArrivalCourtyard,drawArrivalFittings} from './HypotheticalArrivalArt';
 
 const S = {
     ink: '#213545', joint: '#354956', stone: '#677b7c', stoneShade: '#516571',
@@ -84,8 +88,8 @@ function facade(c: CanvasRenderingContext2D, x: number, base: number, w: number,
     box(c,x,base-3,w,3,'#7b8c82');
 }
 
-function foliage(c: CanvasRenderingContext2D, x: number, base: number, time: number) {
-    const top=base-47, sway=Math.sin(time/57+x)*1.4;
+function foliage(c: CanvasRenderingContext2D, x: number, base: number, time: number, phase=x) {
+    const top=base-47, sway=Math.sin(time/57+phase)*1.4;
     polygon(c,[[x-2,base],[x+3,base],[x,top],[x-3,top]],'#71847a');
     for(let i=0;i<4;i++)pixelLine(c,x-1,base-i*10,x+2,base-i*10-2,'#a1a68a');
     for(const d of [-1,1]){
@@ -210,46 +214,52 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
         const pulse=reduced?0:Math.sin(time/48+row)*2,x=248-cx*.025-row*3+pulse,y=122+lift+row*5;
         box(c,x,y,8+row*3,1,'#9aaf98');box(c,x+5+row*2,y+2,5+row,1,'#84a69b');
     }
-    // The far quay has arches whose piers terminate in the canal.
-    const quay=cx*.23;
+    // The skyline has its own bank. It cannot support the nearer houses because
+    // the two planes move at different speeds.
+    const quay=cx*(b.act==='chase'?.11:.23);
     for(let i=Math.floor(quay/68)-1;i<Math.ceil((quay+320)/68);i++){
         const x=i*68-Math.round(quay),y=109+lift;
+        if(b.act==='chase'){
+            box(c,x,y+1,68,12,'#8d9f92');box(c,x,y+1,68,2,'#a8b29d');
+            for(const dx of [11,42]){arch(c,x+dx,y+5,17,8,'#75998e');box(c,x+dx-2,y+6,2,7,'#9cad98');}
+            continue;
+        }
         box(c,x,y,68,27,'#8d9d91');arch(c,x+9,y+6,49,24,'#588782');
         box(c,x,y,68,3,'#afb49d');box(c,x+1,y+6,5,31,'#a0aa96');
         box(c,x+3,y+32,9,2,'#7da091');
         for(let j=0;j<3;j++)box(c,x+1+j%2,y+24+j*4,3,2,'#758f82');
     }
     if(b.act==='chase'){
-        const drift=cx*.23;
-        for(let i=Math.floor(drift/213)-1;i<Math.ceil((drift+320)/213);i++){
-            const x=i*213+74-Math.round(drift),y=143+lift+(reduced?0:Math.sin(time/60+i)*.7);
-            polygon(c,[[x,y],[x+24,y],[x+19,y+5],[x+6,y+5]],'#577b75');
-            box(c,x+5,y-3,13,3,'#809b88');box(c,x+11,y-5,6,2,'#8ca18c');
-            pixelLine(c,x+3,y,x-5,y-8,'#7e9c8a');box(c,x+5,y+7,17,1,'#81a499');
+        // Architecture, street, foundations and occupants share one projection.
+        const quayBase=chaseQuayBase(cy);
+        drawChaseQuayGround(c,cx,cy);
+        for(const [i,site]of CHASE_QUAYS.entries()){
+            const x=chaseQuayX(site.x,cx);if(x<-155||x>340)continue;
+            drawChaseFrontage(c,i,x,quayBase);
+            if(site.kind==='quay')facade(c,x+6,quayBase,63,51+mod(i,2)*14,mod(i,3));
+            else drawChaseIndustry(c,b,i,x,quayBase,reduced);
+            if([0,2,8].includes(i))foliage(c,x+119,quayBase-2,time,site.x*.03);
+            if(site.kind==='quay'){
+                box(c,x+83,quayBase-7,3,7,'#6e8e81');box(c,x+131,quayBase-7,3,7,'#6e8e81');
+                pixelLine(c,x+84,quayBase-5,x+108,quayBase-2,'#92a390');pixelLine(c,x+108,quayBase-2,x+132,quayBase-5,'#92a390');
+            }
+            drawChaseQuayLife(c,b,i,x,quayBase,reduced);
         }
-    }
-    if(b.act==='chase'){
-        const middle=cx*.36;
-        for(let i=Math.floor(middle/144)-1;i<Math.ceil((middle+320)/144);i++){
-            const x=i*144-Math.round(middle);
-            facade(c,x+6,base-15,63,51+mod(i,2)*14,mod(i,3));
-            foliage(c,x+111,base-15,time);
-            // Rope bollards belong to the distant quay, well above the bridge's voids.
-            box(c,x+83,base-22,3,7,'#6e8e81');box(c,x+131,base-22,3,7,'#6e8e81');
-            pixelLine(c,x+84,base-20,x+108,base-17,'#92a390');pixelLine(c,x+108,base-17,x+132,base-20,'#92a390');
-        }
+        drawChaseShoreWater(c,b,cx,cy,reduced);
+        drawChaseSkiffs(c,b,cx,cy,reduced);
         // Nothing spans the foreground gaps: water remains visible through the missing deck.
         drawChaseLandmarks(c,b,cx,cy,reduced);
         if(cx>HYPOTHETICAL.chaseEnd-420){
             // This gateway is tied to the chase's destination, not the repeating parallax street.
-            const x=HYPOTHETICAL.chaseEnd-cx-49,top=base-76;
-            arch(c,x,top,98,76,'#b2ae95');arch(c,x+7,top+7,84,69,'#7f9588');
-            arch(c,x+14,top+14,70,62,'#567980');
+            const x=HYPOTHETICAL.chaseEnd-cx-49,gateBase=HYPOTHETICAL.floor-cy,top=gateBase-84;
+            arch(c,x,top,98,84,'#b2ae95');arch(c,x+7,top+7,84,77,'#7f9588');
+            arch(c,x+14,top+14,70,70,'#567980');
             for(const px of [x+2,x+83]){
-                box(c,px,top+25,13,51,'#9ca58f');box(c,px+2,top+27,2,48,'#c2b99a');
+                box(c,px,top+25,13,59,'#9ca58f');box(c,px+2,top+27,2,56,'#c2b99a');
                 box(c,px-3,top+22,19,4,'#c2b99a');
+                box(c,px-2,gateBase-5,17,5,'#839b88');box(c,px-2,gateBase-5,17,1,'#a9ae91');
             }
-            box(c,x+21,base-7,56,7,'#81998b');
+            box(c,x+21,gateBase-7,56,7,'#81998b');
             polygon(c,[[x+43,top+21],[x+56,top+21],[x+56,top+35],[x+50,top+39],[x+43,top+35]],'#72998d');
             pixelLine(c,x+47,top+26,x+52,top+29,'#d4c49c');pixelLine(c,x+52,top+29,x+47,top+32,'#d4c49c');
         }
@@ -260,6 +270,16 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
             const damageAge=ruinAge(b.backdrop.breaches,i,b.backdrop.tick);
             facade(c,x+24,base-5,57,56+i%2*15,i);
             siegeFacade(c,x+184,base-5,i,damageAge);
+            // The raised rear street is supported all the way to the canal, behind Feka's road.
+            box(c,x,base+7,416,31,'#607d7b');box(c,x,base+8,416,2,'#526f72');
+            for(let row=0;row<3;row++)for(let j=0;j<13;j++){
+                const sx=x+j*34+(row%2?17:0),yy=base+12+row*9;
+                box(c,sx,yy,30,1,'#80958a');box(c,sx,yy+1,1,6,'#526f72');
+            }
+            for(const dx of [42,174,338]){
+                arch(c,x+dx,base+14,14,20,'#476970');arch(c,x+dx+3,base+17,8,17,'#3e626c');
+                box(c,x+dx-2,base+32,18,2,'#82968a');
+            }
             box(c,x,base-4,416,9,'#788c82');box(c,x,base+5,416,3,'#a3ab90');
             for(let j=0;j<11;j++)box(c,x+j*36+mod(j,2)*9,base+1,19,1,'#91a18e');
             pennant(c,x+9,base-64,time);pennant(c,x+300,base-61,time,34);
@@ -268,7 +288,8 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
                 box(c,x+104,base-74,36,74,'#8b9c8c');box(c,x+100,base-79,44,5,'#b2b69b');
                 oval(c,x+113,base-67,18,18,'#667f78');oval(c,x+116,base-64,12,12,'#b8b99e');
                 pixelLine(c,x+122,base-62,x+122,base-58,'#6a827b');pixelLine(c,x+122,base-58,x+126,base-56,'#6a827b');
-                arch(c,x+112,base-41,20,37,'#5e7e77');box(c,x+120,base-34,3,29,'#93a18c');
+                arch(c,x+112,base-41,20,37,'#5e7e77');
+                drawArrivalCourtyard(c,x,base,b.backdrop.tick,damageAge);
             }else if(i===1){
                 // Loading crane, rope, pulley and suspended pallet share one anchored structure.
                 const shock=damageAge>=0&&damageAge<100?Math.sin(damageAge/5)*5*Math.exp(-damageAge/30):0;
@@ -307,8 +328,9 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
             }
             // A rope fence sits behind the playable road, never impersonating a solid platform.
             for(let j=0;j<5;j++){
+                if(i===0&&(j===1||j===2))continue;
                 const px=x+280+j*25;box(c,px,base-17,3,17,'#728c7e');
-                if(j<4){pixelLine(c,px+1,base-12,px+13,base-8,'#9cab92');pixelLine(c,px+13,base-8,px+26,base-12,'#9cab92');}
+                if(j<4&&!(i===0&&j===0)){pixelLine(c,px+1,base-12,px+13,base-8,'#9cab92');pixelLine(c,px+13,base-8,px+26,base-12,'#9cab92');}
             }
         }
     }else{
@@ -469,21 +491,7 @@ function terrace(c: CanvasRenderingContext2D, p: MovingBody, cx: number, cy: num
         for(let xx=5;xx<w-2;xx+=9){box(c,x+xx,y+2,1,3,S.woodShade);box(c,x+xx-2,y+3,1,1,S.cap);}
         box(c,x+2,y+5,w-4,1,S.woodLight);return;
     }
-    const iron=chaseMaterialAt(p.x)==='iron',body=iron?S.iron:S.woodShade,light=iron?S.ironLight:S.woodLight;
-    for(const dx of [5,w-9]){
-        const px=x+dx,wet=chase&&CHASE_GAPS.some(([a,z])=>p.x+dx>=a*16&&p.x+dx<z*16);
-        const foot=(wet?CHASE_WATER_Y:224)-cy;
-        box(c,px,y+7,4,foot-y-7,body);box(c,px+1,y+8,1,foot-y-9,light);
-        pixelLine(c,px+2,Math.min(foot-10,y+24),px+(dx===5?15:-11),y+8,body,3);
-        box(c,px+1,y+10,2,2,S.cap);
-        box(c,px-2,foot-5,8,5,S.iron);box(c,px-1,foot-5,6,1,S.ironLight);
-        if(wet)box(c,px-3,foot,10,1,S.seaLight);
-    }
-    box(c,x,y,w,7,S.ink);box(c,x,y,w,1,S.edge);box(c,x,y+1,w,1,S.cap);
-    box(c,x+1,y+2,w-2,3,iron?S.iron:S.wood);
-    for(let xx=5;xx<w-2;xx+=iron?12:17){box(c,x+xx,y+2,1,3,body);box(c,x+xx-2,y+3,1,1,S.cap);}
-    box(c,x+2,y+5,w-4,1,light);
-    for(const dx of [4,w-8]){box(c,x+dx,y+2,4,4,S.iron);box(c,x+dx+1,y+3,1,1,S.cap);}
+    drawChaseTerrace(c,p,cx,cy);
 }
 
 /** The same walkable lip, with district-specific joinery below it. Posts are
@@ -607,6 +615,7 @@ function balcony(c: CanvasRenderingContext2D, p: MovingBody, cx: number, cy: num
 }
 
 export function drawHypotheticalFittings(c: CanvasRenderingContext2D, o: WorldObjects, b: HypotheticalModel, cx: number, cy: number) {
+    if(b.act==='siege')drawArrivalFittings(c,b,cx,cy);
     for(const p of o.bodies){
         if(p.x>cx+350||p.x+p.width<cx-30)continue;
         if(p.kind==='support'){

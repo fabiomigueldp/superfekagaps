@@ -47,7 +47,7 @@ test('mute, pause and disposal stop weapon tails and never queue silent shots fo
 });
 
 test('long barrages bound simultaneous voices and natural endings release their graphs',()=>{
-    const {audio,context}=setup();const cues:WeaponCue[]=['shot','impact','splash','distant-shot','distant-hit','reload','distant-crash'];
+    const {audio,context}=setup();const cues:WeaponCue[]=['shot','impact','splash','collapse-water','debris-land','distant-shot','distant-hit','reload','distant-crash'];
     for(let i=0;i<80;i++)audio.play(cues[i%cues.length]);
     assert.equal(audio.activeVoices,12);
     for(const n of context.nodes)n.onended?.();
@@ -78,4 +78,15 @@ test('water contact uses a softer filtered splash on the same owned effects bus'
     const start=context.nodes.length;audio.play('splash');const nodes=context.nodes.slice(start);
     assert.ok(nodes.some(n=>n.type==='bandpass'));assert.ok(Math.max(...nodes.flatMap(n=>n.gain.changes))<strike);
     audio.cancel();assert.equal(audio.activeVoices,0);assert.ok(nodes.every(n=>n.disconnected));
+});
+
+test('falling structures distinguish water from masonry without masking the rifle or leaving tails after pause',()=>{
+    const {audio,context,route}=setup();audio.play('shot');const rifle=Math.max(...context.nodes.flatMap(n=>n.gain.changes));
+    for(const cue of ['collapse-water','debris-land'] as const){
+        const start=context.nodes.length;audio.play(cue);const nodes=context.nodes.slice(start);
+        assert.ok(Math.max(...nodes.flatMap(n=>n.gain.changes))<rifle*.5);
+        assert.ok(nodes.some(n=>n.type===(cue==='collapse-water'?'bandpass':'lowpass')));
+        assert.ok(nodes.some(n=>n.frequency.changes.includes(cue==='collapse-water'?48:42)));
+    }
+    route.enabled=false;audio.sync();assert.equal(audio.activeVoices,0);assert.ok(context.nodes.every(n=>n.disconnected));
 });

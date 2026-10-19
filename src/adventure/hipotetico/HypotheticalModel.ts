@@ -4,8 +4,10 @@ import { dinosaurFootAnchor, dinosaurTail, hypotheticalMotion, riderBend, smooth
 import { HypotheticalBackdrop } from './HypotheticalBackdrop';
 import { ARENA_COLUMNS, CHASE_ATTACKS, CHASE_EXIT, CHASE_WIDTH, CHASE_GAPS, CHASE_BREAKS } from './HypotheticalLayout';
 import { HypotheticalSiege, SIEGE_WIDTH } from './HypotheticalSiege';
-import {chaseDeckSpans,chaseMaterialAt,CHASE_WATER_Y} from './HypotheticalChaseDetails';
+import {chaseDeckSpans,chaseMaterialAt,chaseTerraceFall,chaseRuinAt,CHASE_WATER_Y} from './HypotheticalChaseDetails';
 import { RIFLE_BURSTS, RIFLE_SPEED, type GunImpact } from './HypotheticalGunfire';
+import {chaseReactionStarts,updateChaseReactions} from './HypotheticalChaseLife';
+import {ARRIVAL,arrivalGate} from './HypotheticalArrival';
 
 export type HypotheticalAct = 'chase' | 'siege' | 'duel';
 export type HypotheticalState = 'arrival' | 'rest' | 'tell' | 'reload' | 'attack' | 'turn' | 'recover' | 'hurt' | 'roar' | 'won';
@@ -14,7 +16,7 @@ export interface Shot extends Rect { vx: number; vy: number; age: number; life: 
 export interface Dust { x: number; y: number; born: number; kind: 'step' | 'stone' | 'hit' | 'shell' | 'clasp' | 'skid'; direction?: number }
 export interface FallingMark { x: number; born: number }
 export interface BulletImpact extends GunImpact {}
-export type FightEvent = 'warning' | 'shot' | 'impact' | 'splash' | 'reload' | 'distant-shot' | 'distant-hit' | 'step' | 'slam' | 'hit' | 'break' | 'snare' | 'won';
+export type FightEvent = 'warning' | 'shot' | 'impact' | 'splash' | 'collapse-water' | 'debris-land' | 'reload' | 'distant-shot' | 'distant-hit' | 'step' | 'slam' | 'hit' | 'break' | 'snare' | 'won';
 export const HYPOTHETICAL = Object.freeze({ floor: 224, chaseEnd: CHASE_EXIT, health: 9, step: 1000 / 60, warning: 54, recovery: 156 });
 const rifleBursts = RIFLE_BURSTS;
 const patterns: readonly (readonly HypotheticalAttack[])[] = [
@@ -70,10 +72,11 @@ export class HypotheticalModel {
     terraceDebris:Array<{x:number;y:number;width:number;born:number}>=[];
     bridgeDebris:Array<{x:number;born:number;material:number}>=[];
     chaseBreaks:number[]=CHASE_BREAKS.map(()=>-1);
-    constructor(readonly act: HypotheticalAct = 'chase', health: number = HYPOTHETICAL.health, cleared = 0, readonly chaseStart=0) {
+    chaseReactions:number[]=chaseReactionStarts(0);
+    constructor(readonly act: HypotheticalAct = 'chase', health: number = HYPOTHETICAL.health, cleared = 0, readonly chaseStart=0, readonly arrivalSeen=false) {
         this.route = new HypotheticalSiege(cleared);
         this.backdrop = new HypotheticalBackdrop(act === 'siege');
-        this.backdropOffset = act === 'siege' ? this.route.cleared * 400 : 0;
+        this.backdropOffset = act === 'siege' ? this.route.cleared * 400 || (arrivalSeen?ARRIVAL.release:0) : 0;
         // A checkpoint preserves the ruined districts and advances the distant rider
         // to the same street. Replaying only this deterministic scenery never creates
         // foreground damage, emits old audio, or advances Feka's encounter clock.
@@ -82,8 +85,11 @@ export class HypotheticalModel {
         this.backgroundX = this.backdrop.x;
         this.health = health;
         if (act === 'chase') { this.x = chaseStart?chaseStart-114:-18; this.facing = 1;this.pursuitIndex=CHASE_ATTACKS.findIndex(a=>a.x>=chaseStart);this.chaseBreaks=CHASE_BREAKS.map(s=>s.x<this.x?-1000:-1);if(chaseStart)this.state='rest'; }
+        if (act === 'chase') this.chaseReactions=chaseReactionStarts(chaseStart);
         if (act === 'siege') this.state = 'rest';
     }
+    get arrivalSkipped(){return this.arrivalSeen||this.backdropOffset>=400;}
+    get arrival(){return arrivalGate(this.tick,this.arrivalSkipped);}
     get phaseNumber() { return this.health > 6 ? 1 : this.health > 3 ? 2 : 3; }
     get vulnerable() { return this.act === 'duel' && this.state === 'recover' && this.age >= 14; }
     get weakpoint(): Rect { return { x: this.x - 12, y: this.y - 65, width: 24, height: 15 }; }
@@ -246,7 +252,7 @@ export class HypotheticalModel {
         this.tick++; this.age++; this.muzzle = Math.max(0, this.muzzle - 1);this.velocity=0;this.heat=Math.max(0,this.heat-.004);
         this.dust = this.dust.filter(p => this.tick - p.born < (p.kind==='shell'?64:40));
         this.impacts = this.impacts.filter(p => this.tick - p.born < 180);
-        this.terraceDebris=this.terraceDebris.filter(p=>this.tick-p.born<65);
+        this.terraceDebris=this.terraceDebris.filter(p=>this.tick-p.born<80);
         this.bridgeDebris=this.bridgeDebris.filter(p=>this.tick-p.born<48);
         if (this.won || this.nextAct) return;
         this.armed = this.armed.map(n => Math.max(0, n - 1));
@@ -352,6 +358,15 @@ export class HypotheticalModel {
     }
     private chase(player: Rect) {
         if (this.tick < (this.chaseStart?18:60)) return;
+        for(const piece of this.terraceDebris){
+            const age=this.tick-piece.born,contact=chaseTerraceFall(piece,age).contact;
+            if(age>=contact&&age-1<contact)this.emit('collapse-water');
+        }
+        for(const [i,site]of CHASE_BREAKS.entries()){
+            const at=this.chaseBreaks[i];if(at<0)continue;
+            const age=this.tick-at,contact=chaseRuinAt(age,site.kind==='crane'?78:site.kind==='sluice'?58:69).beamContact;
+            if(age>=contact&&age-1<contact)this.emit('debris-land');
+        }
         // Converge smoothly on a visible pursuit distance, without teleporting.
         // At Feka's 3.5px run speed the gap settles at 110px, inside the camera.
         const surge=this.pursuitKind==='ram'&&this.state==='attack'?(this.age<20?.8:this.age<52?-.45:0):0;
@@ -366,6 +381,7 @@ export class HypotheticalModel {
         this.footstep(oldTravel);
         this.frameHazards.push(this.body);
         for(const [i,site] of CHASE_BREAKS.entries())if(this.chaseBreaks[i]===-1&&this.x+56>=site.x){this.chaseBreaks[i]=this.tick;this.emit('break');}
+        updateChaseReactions(this.chaseReactions,this.tick,this.x);
         this.destroyed = Math.min(16, Math.floor(Math.max(0, this.x - 120) / 260));
         if (this.state === 'arrival') this.enter('rest');
         const cue=CHASE_ATTACKS[this.pursuitIndex];
@@ -385,7 +401,7 @@ export class HypotheticalModel {
         if (player.x >= HYPOTHETICAL.chaseEnd) { this.nextAct = true; this.cancelAttacks(); }
     }
     private siege(player: Rect, livingGuards: number) {
-        this.route.update(player.x, livingGuards);
+        if(this.arrival.ready)this.route.update(player.x, livingGuards);
         if (this.route.openedThisTick) {
             this.shots = []; this.marks = []; this.frameHazards = []; this.emit('snare');
         }
@@ -394,7 +410,8 @@ export class HypotheticalModel {
         this.events.push(...this.backdrop.events);
         this.destroyed=this.backdrop.breaches.filter(t=>t>=0).length;
         if(this.backdrop.events.includes('break'))this.backgroundStamp=120;
-        if (this.tick > 160 && this.tick % 210 === 0 && livingGuards > 0 && this.route.active) {
+        const combatTick=this.tick-(this.arrivalSkipped?0:ARRIVAL.release);
+        if (combatTick > 160 && combatTick % 210 === 0 && livingGuards > 0 && this.route.active) {
             this.marks.push({ x: clamp(player.x + player.width / 2, 22, SIEGE_WIDTH - 22), born: this.tick }); this.emit('warning');
         }
         for (const mark of this.marks) if (this.tick - mark.born === 60) {

@@ -1,0 +1,9 @@
+{
+  "inspectionOnly": true,
+  "representsGameplayCamera": false,
+  "productionDrawing": true,
+  "gameplayProof": "pursuit-verification.json",
+  "frames": 180,
+  "seconds": 6,
+  "renderPure": true
+}

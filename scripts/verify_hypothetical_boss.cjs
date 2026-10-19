@@ -6,7 +6,7 @@ const out=path.resolve(process.env.HYPOTHETICAL_OUTPUT||'output/hipotetico/brows
 const tape=JSON.parse(fs.readFileSync('tests/helpers/hypotheticalReplay.json','utf8'));
 (async()=>{
  fs.mkdirSync(out,{recursive:true});const browser=await chromium.launch({headless:true,channel:'msedge'});
- const report={errors:[],captures:[],passed:false};
+ const report={errors:[],captures:[],chaseRenderSamples:[],passed:false};
  try{
   const ctx=await browser.newContext({viewport:{width:1280,height:800}}),page=await ctx.newPage();
   page.on('pageerror',e=>report.errors.push(e.message));
@@ -36,6 +36,11 @@ const tape=JSON.parse(fs.readFileSync('tests/helpers/hypotheticalReplay.json','u
    const name=result.act==='duel'?`${result.act}-${result.phase}-${result.attack}-${result.state}`:result.act==='siege'?`${result.act}-${Math.floor(result.tick/350)}`:`chase-${Math.floor(result.tick/150)}`;
    if(!captured.has(name)&&!result.dead&&result.state!=='hurt'){
     captured.add(name);const file=name+'.png';await page.locator('#game-canvas').screenshot({path:path.join(out,file)});report.captures.push({file,frames,...result});
+    if(result.act==='chase')report.chaseRenderSamples.push({file,...await page.evaluate(()=>{
+     const g=window.worldGame,samples=[];for(let i=0;i<3;i++)g.render();
+     for(let i=0;i<24;i++){const start=performance.now();g.render();samples.push(performance.now()-start);}
+     samples.sort((a,b)=>a-b);return{x:g.player.getRect().x,tick:g.fight.tick,median:samples[12],p95:samples[22]};
+    })});
    }
    if(result.reset){for(const k of held)await page.keyboard.up(k);held=new Set();}
   }

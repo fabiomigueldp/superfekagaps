@@ -56,7 +56,173 @@
       "warningTicks": 42
     }
   ],
+  "terraceReleases": [
+    {
+      "worldX": 720,
+      "frame": 202,
+      "playerClearance": 16.299999999999955,
+      "cause": "head-strike"
+    },
+    {
+      "worldX": 800,
+      "frame": 228,
+      "playerClearance": 11.299999999999955,
+      "cause": "head-strike"
+    },
+    {
+      "worldX": 904,
+      "frame": 253,
+      "playerClearance": 18.799999999999955,
+      "cause": "head-strike"
+    },
+    {
+      "worldX": 1584,
+      "frame": 448,
+      "playerClearance": 13.299999999999955,
+      "cause": "head-strike"
+    },
+    {
+      "worldX": 1664,
+      "frame": 475,
+      "playerClearance": 11.799999999999955,
+      "cause": "head-strike"
+    },
+    {
+      "worldX": 1760,
+      "frame": 502,
+      "playerClearance": 10.299999999999955,
+      "cause": "head-strike"
+    },
+    {
+      "worldX": 1872,
+      "frame": 530,
+      "playerClearance": 12.299999999999955,
+      "cause": "head-strike"
+    },
+    {
+      "worldX": 3296,
+      "frame": 937,
+      "playerClearance": 12.800000000000182,
+      "cause": "head-strike"
+    },
+    {
+      "worldX": 3376,
+      "frame": 964,
+      "playerClearance": 11.300000000000182,
+      "cause": "head-strike"
+    },
+    {
+      "worldX": 3536,
+      "frame": 1005,
+      "playerClearance": 10.800000000000182,
+      "cause": "head-strike"
+    }
+  ],
+  "terraceContacts": [
+    {
+      "worldX": 720,
+      "frame": 226,
+      "screenX": 44.08507627547476,
+      "visible": true
+    },
+    {
+      "worldX": 800,
+      "frame": 257,
+      "screenX": 27.728732005850702,
+      "visible": true
+    },
+    {
+      "worldX": 904,
+      "frame": 278,
+      "screenX": 38.259812987740816,
+      "visible": true
+    },
+    {
+      "worldX": 1584,
+      "frame": 472,
+      "screenX": 47.08507627547465,
+      "visible": true
+    },
+    {
+      "worldX": 1664,
+      "frame": 504,
+      "screenX": 27.228732005850816,
+      "visible": true
+    },
+    {
+      "worldX": 1760,
+      "frame": 534,
+      "screenX": 15.75451774787507,
+      "visible": true
+    },
+    {
+      "worldX": 1872,
+      "frame": 556,
+      "screenX": 40.021933871619694,
+      "visible": true
+    },
+    {
+      "worldX": 3296,
+      "frame": 961,
+      "screenX": 47.58507627547442,
+      "visible": true
+    },
+    {
+      "worldX": 3376,
+      "frame": 993,
+      "screenX": 27.72873200585036,
+      "visible": true
+    },
+    {
+      "worldX": 3536,
+      "frame": 1029,
+      "screenX": 49.58507627547442,
+      "visible": true
+    }
+  ],
   "captures": [
+    {
+      "file": "pursuit-life-quay-notice.png",
+      "frame": 124,
+      "x": 511.3,
+      "state": "rest",
+      "kind": "high",
+      "camera": {
+        "x": 361.3,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-life-quay-reaction.png",
+      "frame": 154,
+      "x": 616.3,
+      "state": "tell",
+      "kind": "high",
+      "camera": {
+        "x": 466.29999999999995,
+        "y": 63.40000000000009,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
     {
       "file": "pursuit-high-warning.png",
       "frame": 180,
@@ -66,6 +232,48 @@
       "camera": {
         "x": 557.3,
         "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-platform-wood-release.png",
+      "frame": 205,
+      "x": 794.8,
+      "state": "attack",
+      "kind": "high",
+      "camera": {
+        "x": 644.8,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-terrace-fall.png",
+      "frame": 210,
+      "x": 812.3,
+      "state": "attack",
+      "kind": "high",
+      "camera": {
+        "x": 662.3,
+        "y": 62.10000000000008,
         "targetX": 0,
         "targetY": 0,
         "shakeTimer": 0,
@@ -121,6 +329,69 @@
       }
     },
     {
+      "file": "pursuit-platform-wood-contact.png",
+      "frame": 226,
+      "x": 868.3,
+      "state": "attack",
+      "kind": "high",
+      "camera": {
+        "x": 718.3,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-site-1-approach.png",
+      "frame": 228,
+      "x": 875.3,
+      "state": "attack",
+      "kind": "high",
+      "camera": {
+        "x": 725.3,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-platform-wood-spray.png",
+      "frame": 233,
+      "x": 892.8,
+      "state": "attack",
+      "kind": "high",
+      "camera": {
+        "x": 742.8,
+        "y": 41.749999999999986,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
       "file": "pursuit-destruction-1.png",
       "frame": 286,
       "x": 1078.3,
@@ -128,6 +399,48 @@
       "kind": "high",
       "camera": {
         "x": 928.3,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-ruin-pier-contact.png",
+      "frame": 300,
+      "x": 1127.3,
+      "state": "rest",
+      "kind": "high",
+      "camera": {
+        "x": 977.3,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-site-1-fall.png",
+      "frame": 304,
+      "x": 1141.3,
+      "state": "rest",
+      "kind": "high",
+      "camera": {
+        "x": 991.3,
         "y": 64,
         "targetX": 0,
         "targetY": 0,
@@ -163,6 +476,27 @@
       }
     },
     {
+      "file": "pursuit-site-2-approach.png",
+      "frame": 392,
+      "x": 1449.3,
+      "state": "attack",
+      "kind": "low",
+      "camera": {
+        "x": 1299.3,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
       "file": "pursuit-low-attack.png",
       "frame": 396,
       "x": 1463.3,
@@ -184,6 +518,27 @@
       }
     },
     {
+      "file": "pursuit-impact-timber.png",
+      "frame": 426,
+      "x": 1568.3,
+      "state": "attack",
+      "kind": "low",
+      "camera": {
+        "x": 1418.3,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
       "file": "pursuit-destruction-2.png",
       "frame": 450,
       "x": 1652.3,
@@ -191,6 +546,90 @@
       "kind": "low",
       "camera": {
         "x": 1502.3,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-life-cargo-notice.png",
+      "frame": 452,
+      "x": 1659.3,
+      "state": "attack",
+      "kind": "low",
+      "camera": {
+        "x": 1509.3,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-ruin-crane-contact.png",
+      "frame": 466,
+      "x": 1708.3,
+      "state": "rest",
+      "kind": "low",
+      "camera": {
+        "x": 1558.3,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-site-2-fall.png",
+      "frame": 468,
+      "x": 1715.3,
+      "state": "rest",
+      "kind": "low",
+      "camera": {
+        "x": 1565.3,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-life-cargo-reaction.png",
+      "frame": 482,
+      "x": 1764.3,
+      "state": "rest",
+      "kind": "low",
+      "camera": {
+        "x": 1614.3,
         "y": 64,
         "targetX": 0,
         "targetY": 0,
@@ -268,6 +707,48 @@
       }
     },
     {
+      "file": "pursuit-site-3-approach.png",
+      "frame": 552,
+      "x": 2009.3,
+      "state": "attack",
+      "kind": "ram",
+      "camera": {
+        "x": 1859.3,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 83.33333333333336,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-ram-recovery.png",
+      "frame": 581,
+      "x": 2110.8,
+      "state": "attack",
+      "kind": "ram",
+      "camera": {
+        "x": 1960.8000000000002,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
       "file": "pursuit-destruction-3.png",
       "frame": 611,
       "x": 2215.8,
@@ -275,6 +756,27 @@
       "kind": "ram",
       "camera": {
         "x": 2065.8,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-site-3-fall.png",
+      "frame": 629,
+      "x": 2278.8,
+      "state": "rest",
+      "kind": "ram",
+      "camera": {
+        "x": 2128.8,
         "y": 64,
         "targetX": 0,
         "targetY": 0,
@@ -310,6 +812,69 @@
       }
     },
     {
+      "file": "pursuit-site-4-approach.png",
+      "frame": 740,
+      "x": 2667.3,
+      "state": "attack",
+      "kind": "high",
+      "camera": {
+        "x": 2517.3,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-life-water-notice.png",
+      "frame": 795,
+      "x": 2859.8,
+      "state": "rest",
+      "kind": "high",
+      "camera": {
+        "x": 2709.8,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-life-water-surge.png",
+      "frame": 796,
+      "x": 2863.3,
+      "state": "rest",
+      "kind": "high",
+      "camera": {
+        "x": 2713.3,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
       "file": "pursuit-destruction-4.png",
       "frame": 798,
       "x": 2870.3,
@@ -317,6 +882,69 @@
       "kind": "high",
       "camera": {
         "x": 2720.3,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-ruin-sluice-contact.png",
+      "frame": 809,
+      "x": 2908.8,
+      "state": "rest",
+      "kind": "high",
+      "camera": {
+        "x": 2758.8,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-site-4-fall.png",
+      "frame": 816,
+      "x": 2933.3,
+      "state": "rest",
+      "kind": "high",
+      "camera": {
+        "x": 2783.3,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-life-water-reaction.png",
+      "frame": 825,
+      "x": 2964.8,
+      "state": "tell",
+      "kind": "low",
+      "camera": {
+        "x": 2814.8,
         "y": 64,
         "targetX": 0,
         "targetY": 0,
@@ -352,6 +980,48 @@
       }
     },
     {
+      "file": "pursuit-site-5-approach.png",
+      "frame": 881,
+      "x": 3160.8,
+      "state": "attack",
+      "kind": "low",
+      "camera": {
+        "x": 3010.8,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-impact-stone.png",
+      "frame": 904,
+      "x": 3241.3,
+      "state": "attack",
+      "kind": "low",
+      "camera": {
+        "x": 3091.3,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
       "file": "pursuit-destruction-5.png",
       "frame": 939,
       "x": 3363.8,
@@ -373,6 +1043,174 @@
       }
     },
     {
+      "file": "pursuit-impact-iron.png",
+      "frame": 944,
+      "x": 3381.3,
+      "state": "rest",
+      "kind": "low",
+      "camera": {
+        "x": 3231.3,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-site-5-fall.png",
+      "frame": 957,
+      "x": 3426.8,
+      "state": "rest",
+      "kind": "low",
+      "camera": {
+        "x": 3276.8,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-platform-iron-release.png",
+      "frame": 967,
+      "x": 3461.8,
+      "state": "rest",
+      "kind": "low",
+      "camera": {
+        "x": 3311.8,
+        "y": 44.59999999999998,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-platform-iron-contact.png",
+      "frame": 993,
+      "x": 3552.8,
+      "state": "tell",
+      "kind": "ram",
+      "camera": {
+        "x": 3402.8,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-life-port-notice.png",
+      "frame": 1023,
+      "x": 3657.8,
+      "state": "tell",
+      "kind": "ram",
+      "camera": {
+        "x": 3507.8,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-platform-iron-spray.png",
+      "frame": 1036,
+      "x": 3703.3,
+      "state": "attack",
+      "kind": "ram",
+      "camera": {
+        "x": 3553.3,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-life-port-reaction.png",
+      "frame": 1053,
+      "x": 3762.8,
+      "state": "attack",
+      "kind": "ram",
+      "camera": {
+        "x": 3612.8,
+        "y": 62.500000000000085,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-site-6-approach.png",
+      "frame": 1092,
+      "x": 3899.3,
+      "state": "attack",
+      "kind": "ram",
+      "camera": {
+        "x": 3749.3,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
       "file": "pursuit-destruction-6.png",
       "frame": 1150,
       "x": 4102.3,
@@ -380,6 +1218,48 @@
       "kind": "low",
       "camera": {
         "x": 3952.3,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-ruin-gantry-contact.png",
+      "frame": 1164,
+      "x": 4151.3,
+      "state": "tell",
+      "kind": "low",
+      "camera": {
+        "x": 4001.3,
+        "y": 64,
+        "targetX": 0,
+        "targetY": 0,
+        "shakeTimer": 0,
+        "shakeMagnitude": 0,
+        "bounds": {
+          "minX": 0,
+          "maxX": 4480,
+          "minY": 0,
+          "maxY": 288
+        }
+      }
+    },
+    {
+      "file": "pursuit-site-6-fall.png",
+      "frame": 1168,
+      "x": 4165.3,
+      "state": "tell",
+      "kind": "low",
+      "camera": {
+        "x": 4015.3,
         "y": 64,
         "targetX": 0,
         "targetY": 0,

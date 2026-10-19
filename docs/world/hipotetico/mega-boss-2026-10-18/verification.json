@@ -1,23 +1,1287 @@
 {
-  "revision": "pursuit-20",
+  "revision": "pursuit-24",
   "tests": {
-    "passed": 163,
+    "passed": 185,
     "failed": 0,
-    "encounter": 120,
+    "encounter": 142,
     "sharedMechanisms": 43,
-    "logs": "output/hipotetico/pursuit/tests.log"
+    "logs": "output/hipotetico/pursuit-shore/tests.log"
   },
-  "productionBuild": "passed",
+  "productionBuild": "passed; output/hipotetico/pursuit-shore/build.log",
   "browser": {
-    "passed": true,
     "errors": [],
+    "captures": [
+      {
+        "file": "chase-0.png",
+        "frames": 58,
+        "reset": false,
+        "act": "chase",
+        "state": "arrival",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 58,
+        "receipt": {
+          "act": "chase",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 0,
+          "ticks": 58
+        }
+      },
+      {
+        "file": "chase-1.png",
+        "frames": 150,
+        "reset": false,
+        "act": "chase",
+        "state": "tell",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 150,
+        "receipt": {
+          "act": "chase",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 0,
+          "ticks": 150
+        }
+      },
+      {
+        "file": "chase-2.png",
+        "frames": 323,
+        "reset": false,
+        "act": "chase",
+        "state": "rest",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 323,
+        "receipt": {
+          "act": "chase",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 0,
+          "ticks": 323
+        }
+      },
+      {
+        "file": "chase-3.png",
+        "frames": 488,
+        "reset": false,
+        "act": "chase",
+        "state": "tell",
+        "attack": "charge",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 488,
+        "receipt": {
+          "act": "chase",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 0,
+          "ticks": 488
+        }
+      },
+      {
+        "file": "chase-5.png",
+        "frames": 772,
+        "reset": false,
+        "act": "chase",
+        "state": "attack",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 772,
+        "receipt": {
+          "act": "chase",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 0,
+          "ticks": 772
+        }
+      },
+      {
+        "file": "chase-6.png",
+        "frames": 913,
+        "reset": false,
+        "act": "chase",
+        "state": "attack",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 913,
+        "receipt": {
+          "act": "chase",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 0,
+          "ticks": 913
+        }
+      },
+      {
+        "file": "chase-7.png",
+        "frames": 1050,
+        "reset": false,
+        "act": "chase",
+        "state": "attack",
+        "attack": "charge",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 1050,
+        "receipt": {
+          "act": "chase",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 0,
+          "ticks": 1050
+        }
+      },
+      {
+        "file": "chase-8.png",
+        "frames": 1202,
+        "reset": false,
+        "act": "chase",
+        "state": "attack",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 1202,
+        "receipt": {
+          "act": "chase",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 0,
+          "ticks": 1202
+        }
+      },
+      {
+        "file": "siege-0.png",
+        "frames": 1281,
+        "reset": true,
+        "act": "siege",
+        "state": "rest",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 0,
+        "receipt": {
+          "act": "siege",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 0,
+          "ticks": 1281
+        }
+      },
+      {
+        "file": "siege-1.png",
+        "frames": 1639,
+        "reset": false,
+        "act": "siege",
+        "state": "rest",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 358,
+        "receipt": {
+          "act": "siege",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 0,
+          "ticks": 1639
+        }
+      },
+      {
+        "file": "duel-1-rifle-arrival.png",
+        "frames": 2925,
+        "reset": true,
+        "act": "duel",
+        "state": "arrival",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 0,
+        "receipt": {
+          "act": "duel",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 2,
+          "ticks": 2691
+        }
+      },
+      {
+        "file": "duel-1-rifle-recover.png",
+        "frames": 3235,
+        "reset": false,
+        "act": "duel",
+        "state": "recover",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 310,
+        "receipt": {
+          "act": "duel",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 2,
+          "ticks": 3001
+        }
+      },
+      {
+        "file": "duel-1-rifle-rest.png",
+        "frames": 3372,
+        "reset": false,
+        "act": "duel",
+        "state": "rest",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 8,
+        "dead": false,
+        "tick": 442,
+        "receipt": {
+          "act": "duel",
+          "phase": 1,
+          "health": 8,
+          "won": false,
+          "deaths": 2,
+          "ticks": 3133
+        }
+      },
+      {
+        "file": "duel-1-charge-tell.png",
+        "frames": 3418,
+        "reset": false,
+        "act": "duel",
+        "state": "tell",
+        "attack": "charge",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 8,
+        "dead": false,
+        "tick": 488,
+        "receipt": {
+          "act": "duel",
+          "phase": 1,
+          "health": 8,
+          "won": false,
+          "deaths": 2,
+          "ticks": 3179
+        }
+      },
+      {
+        "file": "duel-1-charge-attack.png",
+        "frames": 3472,
+        "reset": false,
+        "act": "duel",
+        "state": "attack",
+        "attack": "charge",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 8,
+        "dead": false,
+        "tick": 542,
+        "receipt": {
+          "act": "duel",
+          "phase": 1,
+          "health": 8,
+          "won": false,
+          "deaths": 2,
+          "ticks": 3233
+        }
+      },
+      {
+        "file": "duel-1-charge-recover.png",
+        "frames": 3508,
+        "reset": false,
+        "act": "duel",
+        "state": "recover",
+        "attack": "charge",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 8,
+        "dead": false,
+        "tick": 578,
+        "receipt": {
+          "act": "duel",
+          "phase": 1,
+          "health": 8,
+          "won": false,
+          "deaths": 2,
+          "ticks": 3269
+        }
+      },
+      {
+        "file": "duel-1-charge-rest.png",
+        "frames": 3636,
+        "reset": false,
+        "act": "duel",
+        "state": "rest",
+        "attack": "charge",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 7,
+        "dead": false,
+        "tick": 701,
+        "receipt": {
+          "act": "duel",
+          "phase": 1,
+          "health": 7,
+          "won": false,
+          "deaths": 2,
+          "ticks": 3392
+        }
+      },
+      {
+        "file": "duel-1-bite-tell.png",
+        "frames": 3708,
+        "reset": false,
+        "act": "duel",
+        "state": "tell",
+        "attack": "bite",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 7,
+        "dead": false,
+        "tick": 773,
+        "receipt": {
+          "act": "duel",
+          "phase": 1,
+          "health": 7,
+          "won": false,
+          "deaths": 2,
+          "ticks": 3464
+        }
+      },
+      {
+        "file": "duel-1-bite-attack.png",
+        "frames": 3723,
+        "reset": false,
+        "act": "duel",
+        "state": "attack",
+        "attack": "bite",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 7,
+        "dead": false,
+        "tick": 788,
+        "receipt": {
+          "act": "duel",
+          "phase": 1,
+          "health": 7,
+          "won": false,
+          "deaths": 2,
+          "ticks": 3479
+        }
+      },
+      {
+        "file": "duel-1-bite-recover.png",
+        "frames": 3773,
+        "reset": false,
+        "act": "duel",
+        "state": "recover",
+        "attack": "bite",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 7,
+        "dead": false,
+        "tick": 838,
+        "receipt": {
+          "act": "duel",
+          "phase": 1,
+          "health": 7,
+          "won": false,
+          "deaths": 2,
+          "ticks": 3529
+        }
+      },
+      {
+        "file": "duel-2-bite-roar.png",
+        "frames": 3860,
+        "reset": false,
+        "act": "duel",
+        "state": "roar",
+        "attack": "bite",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 2,
+        "health": 6,
+        "dead": false,
+        "tick": 920,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 6,
+          "won": false,
+          "deaths": 2,
+          "ticks": 3611
+        }
+      },
+      {
+        "file": "duel-2-leap-tell.png",
+        "frames": 3997,
+        "reset": false,
+        "act": "duel",
+        "state": "tell",
+        "attack": "leap",
+        "chainStep": 0,
+        "chainLength": 2,
+        "followup": "rifle",
+        "pivot": 0,
+        "phase": 2,
+        "health": 6,
+        "dead": false,
+        "tick": 1057,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 6,
+          "won": false,
+          "deaths": 2,
+          "ticks": 3748
+        }
+      },
+      {
+        "file": "duel-2-leap-attack.png",
+        "frames": 4073,
+        "reset": false,
+        "act": "duel",
+        "state": "attack",
+        "attack": "leap",
+        "chainStep": 0,
+        "chainLength": 2,
+        "followup": "rifle",
+        "pivot": 0,
+        "phase": 2,
+        "health": 6,
+        "dead": false,
+        "tick": 1133,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 6,
+          "won": false,
+          "deaths": 2,
+          "ticks": 3824
+        }
+      },
+      {
+        "file": "duel-2-rifle-tell.png",
+        "frames": 4160,
+        "reset": false,
+        "act": "duel",
+        "state": "tell",
+        "attack": "rifle",
+        "chainStep": 1,
+        "chainLength": 2,
+        "followup": null,
+        "pivot": 0,
+        "phase": 2,
+        "health": 6,
+        "dead": false,
+        "tick": 1220,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 6,
+          "won": false,
+          "deaths": 2,
+          "ticks": 3911
+        }
+      },
+      {
+        "file": "duel-2-rifle-recover.png",
+        "frames": 4437,
+        "reset": false,
+        "act": "duel",
+        "state": "recover",
+        "attack": "rifle",
+        "chainStep": 1,
+        "chainLength": 2,
+        "followup": null,
+        "pivot": 0,
+        "phase": 2,
+        "health": 6,
+        "dead": false,
+        "tick": 1497,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 6,
+          "won": false,
+          "deaths": 2,
+          "ticks": 4188
+        }
+      },
+      {
+        "file": "duel-2-rifle-rest.png",
+        "frames": 4563,
+        "reset": false,
+        "act": "duel",
+        "state": "rest",
+        "attack": "rifle",
+        "chainStep": 1,
+        "chainLength": 2,
+        "followup": null,
+        "pivot": 0,
+        "phase": 2,
+        "health": 5,
+        "dead": false,
+        "tick": 1618,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 5,
+          "won": false,
+          "deaths": 2,
+          "ticks": 4309
+        }
+      },
+      {
+        "file": "duel-2-bite-tell.png",
+        "frames": 4617,
+        "reset": false,
+        "act": "duel",
+        "state": "tell",
+        "attack": "bite",
+        "chainStep": 0,
+        "chainLength": 2,
+        "followup": "tail",
+        "pivot": 0,
+        "phase": 2,
+        "health": 5,
+        "dead": false,
+        "tick": 1672,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 5,
+          "won": false,
+          "deaths": 2,
+          "ticks": 4363
+        }
+      },
+      {
+        "file": "duel-2-bite-attack.png",
+        "frames": 4653,
+        "reset": false,
+        "act": "duel",
+        "state": "attack",
+        "attack": "bite",
+        "chainStep": 0,
+        "chainLength": 2,
+        "followup": "tail",
+        "pivot": 0,
+        "phase": 2,
+        "health": 5,
+        "dead": false,
+        "tick": 1708,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 5,
+          "won": false,
+          "deaths": 2,
+          "ticks": 4399
+        }
+      },
+      {
+        "file": "duel-2-rifle-arrival.png",
+        "frames": 4749,
+        "reset": true,
+        "act": "duel",
+        "state": "arrival",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 2,
+        "health": 6,
+        "dead": false,
+        "tick": 0,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 6,
+          "won": false,
+          "deaths": 3,
+          "ticks": 4404
+        }
+      },
+      {
+        "file": "duel-2-tail-tell.png",
+        "frames": 5609,
+        "reset": false,
+        "act": "duel",
+        "state": "tell",
+        "attack": "tail",
+        "chainStep": 1,
+        "chainLength": 2,
+        "followup": null,
+        "pivot": 0,
+        "phase": 2,
+        "health": 5,
+        "dead": false,
+        "tick": 829,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 5,
+          "won": false,
+          "deaths": 3,
+          "ticks": 5233
+        }
+      },
+      {
+        "file": "duel-2-tail-attack.png",
+        "frames": 5658,
+        "reset": false,
+        "act": "duel",
+        "state": "attack",
+        "attack": "tail",
+        "chainStep": 1,
+        "chainLength": 2,
+        "followup": null,
+        "pivot": 0,
+        "phase": 2,
+        "health": 5,
+        "dead": false,
+        "tick": 878,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 5,
+          "won": false,
+          "deaths": 3,
+          "ticks": 5282
+        }
+      },
+      {
+        "file": "duel-2-tail-recover.png",
+        "frames": 5745,
+        "reset": false,
+        "act": "duel",
+        "state": "recover",
+        "attack": "tail",
+        "chainStep": 1,
+        "chainLength": 2,
+        "followup": null,
+        "pivot": 0,
+        "phase": 2,
+        "health": 5,
+        "dead": false,
+        "tick": 965,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 5,
+          "won": false,
+          "deaths": 3,
+          "ticks": 5369
+        }
+      },
+      {
+        "file": "duel-2-tail-rest.png",
+        "frames": 5839,
+        "reset": false,
+        "act": "duel",
+        "state": "rest",
+        "attack": "tail",
+        "chainStep": 1,
+        "chainLength": 2,
+        "followup": null,
+        "pivot": 0,
+        "phase": 2,
+        "health": 4,
+        "dead": false,
+        "tick": 1054,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 4,
+          "won": false,
+          "deaths": 3,
+          "ticks": 5458
+        }
+      },
+      {
+        "file": "duel-2-rifle-attack.png",
+        "frames": 5957,
+        "reset": false,
+        "act": "duel",
+        "state": "attack",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 2,
+        "health": 4,
+        "dead": false,
+        "tick": 1172,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 4,
+          "won": false,
+          "deaths": 3,
+          "ticks": 5576
+        }
+      },
+      {
+        "file": "duel-3-rifle-roar.png",
+        "frames": 6291,
+        "reset": false,
+        "act": "duel",
+        "state": "roar",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 3,
+        "health": 3,
+        "dead": false,
+        "tick": 1501,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 3,
+          "won": false,
+          "deaths": 3,
+          "ticks": 5905
+        }
+      },
+      {
+        "file": "duel-3-charge-tell.png",
+        "frames": 6428,
+        "reset": false,
+        "act": "duel",
+        "state": "tell",
+        "attack": "charge",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 3,
+        "health": 3,
+        "dead": false,
+        "tick": 1638,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 3,
+          "won": false,
+          "deaths": 3,
+          "ticks": 6042
+        }
+      },
+      {
+        "file": "duel-3-charge-attack.png",
+        "frames": 6490,
+        "reset": false,
+        "act": "duel",
+        "state": "attack",
+        "attack": "charge",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 3,
+        "health": 3,
+        "dead": false,
+        "tick": 1700,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 3,
+          "won": false,
+          "deaths": 3,
+          "ticks": 6104
+        }
+      },
+      {
+        "file": "duel-3-charge-turn.png",
+        "frames": 6522,
+        "reset": false,
+        "act": "duel",
+        "state": "turn",
+        "attack": "charge",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 3,
+        "health": 3,
+        "dead": false,
+        "tick": 1732,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 3,
+          "won": false,
+          "deaths": 3,
+          "ticks": 6136
+        }
+      },
+      {
+        "file": "duel-3-charge-recover.png",
+        "frames": 6610,
+        "reset": false,
+        "act": "duel",
+        "state": "recover",
+        "attack": "charge",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 3,
+        "health": 3,
+        "dead": false,
+        "tick": 1820,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 3,
+          "won": false,
+          "deaths": 3,
+          "ticks": 6224
+        }
+      },
+      {
+        "file": "duel-3-charge-rest.png",
+        "frames": 6734,
+        "reset": false,
+        "act": "duel",
+        "state": "rest",
+        "attack": "charge",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 3,
+        "health": 2,
+        "dead": false,
+        "tick": 1939,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 2,
+          "won": false,
+          "deaths": 3,
+          "ticks": 6343
+        }
+      },
+      {
+        "file": "duel-3-rifle-tell.png",
+        "frames": 6807,
+        "reset": false,
+        "act": "duel",
+        "state": "tell",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 3,
+        "followup": "leap",
+        "pivot": 0,
+        "phase": 3,
+        "health": 2,
+        "dead": false,
+        "tick": 2012,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 2,
+          "won": false,
+          "deaths": 3,
+          "ticks": 6416
+        }
+      },
+      {
+        "file": "duel-3-rifle-attack.png",
+        "frames": 6813,
+        "reset": false,
+        "act": "duel",
+        "state": "attack",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 3,
+        "followup": "leap",
+        "pivot": 0,
+        "phase": 3,
+        "health": 2,
+        "dead": false,
+        "tick": 2018,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 2,
+          "won": false,
+          "deaths": 3,
+          "ticks": 6422
+        }
+      },
+      {
+        "file": "duel-3-leap-tell.png",
+        "frames": 7074,
+        "reset": false,
+        "act": "duel",
+        "state": "tell",
+        "attack": "leap",
+        "chainStep": 1,
+        "chainLength": 3,
+        "followup": "bite",
+        "pivot": 0,
+        "phase": 3,
+        "health": 2,
+        "dead": false,
+        "tick": 2279,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 2,
+          "won": false,
+          "deaths": 3,
+          "ticks": 6683
+        }
+      },
+      {
+        "file": "duel-3-leap-attack.png",
+        "frames": 7150,
+        "reset": false,
+        "act": "duel",
+        "state": "attack",
+        "attack": "leap",
+        "chainStep": 1,
+        "chainLength": 3,
+        "followup": "bite",
+        "pivot": 0,
+        "phase": 3,
+        "health": 2,
+        "dead": false,
+        "tick": 2355,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 2,
+          "won": false,
+          "deaths": 3,
+          "ticks": 6759
+        }
+      },
+      {
+        "file": "duel-3-tail-tell.png",
+        "frames": 7572,
+        "reset": false,
+        "act": "duel",
+        "state": "tell",
+        "attack": "tail",
+        "chainStep": 0,
+        "chainLength": 2,
+        "followup": "bite",
+        "pivot": 0,
+        "phase": 3,
+        "health": 1,
+        "dead": false,
+        "tick": 2772,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 1,
+          "won": false,
+          "deaths": 3,
+          "ticks": 7176
+        }
+      },
+      {
+        "file": "duel-3-tail-attack.png",
+        "frames": 7616,
+        "reset": false,
+        "act": "duel",
+        "state": "attack",
+        "attack": "tail",
+        "chainStep": 0,
+        "chainLength": 2,
+        "followup": "bite",
+        "pivot": 0,
+        "phase": 3,
+        "health": 1,
+        "dead": false,
+        "tick": 2816,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 1,
+          "won": false,
+          "deaths": 3,
+          "ticks": 7220
+        }
+      },
+      {
+        "file": "duel-3-bite-tell.png",
+        "frames": 7703,
+        "reset": false,
+        "act": "duel",
+        "state": "tell",
+        "attack": "bite",
+        "chainStep": 1,
+        "chainLength": 2,
+        "followup": null,
+        "pivot": 0,
+        "phase": 3,
+        "health": 1,
+        "dead": false,
+        "tick": 2903,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 1,
+          "won": false,
+          "deaths": 3,
+          "ticks": 7307
+        }
+      },
+      {
+        "file": "duel-3-bite-attack.png",
+        "frames": 7748,
+        "reset": false,
+        "act": "duel",
+        "state": "attack",
+        "attack": "bite",
+        "chainStep": 1,
+        "chainLength": 2,
+        "followup": null,
+        "pivot": 0,
+        "phase": 3,
+        "health": 1,
+        "dead": false,
+        "tick": 2948,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 1,
+          "won": false,
+          "deaths": 3,
+          "ticks": 7352
+        }
+      },
+      {
+        "file": "duel-3-bite-recover.png",
+        "frames": 7849,
+        "reset": false,
+        "act": "duel",
+        "state": "recover",
+        "attack": "bite",
+        "chainStep": 1,
+        "chainLength": 2,
+        "followup": null,
+        "pivot": 0,
+        "phase": 3,
+        "health": 1,
+        "dead": false,
+        "tick": 3049,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 1,
+          "won": false,
+          "deaths": 3,
+          "ticks": 7453
+        }
+      },
+      {
+        "file": "duel-3-bite-won.png",
+        "frames": 7881,
+        "reset": false,
+        "act": "duel",
+        "state": "won",
+        "attack": "bite",
+        "chainStep": 1,
+        "chainLength": 2,
+        "followup": null,
+        "pivot": 0,
+        "phase": 3,
+        "health": 0,
+        "dead": false,
+        "tick": 3081,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 0,
+          "won": true,
+          "deaths": 3,
+          "ticks": 7485
+        }
+      }
+    ],
+    "chaseRenderSamples": [
+      {
+        "file": "chase-0.png",
+        "x": 280.3,
+        "tick": 58,
+        "median": 2.7999999970197678,
+        "p95": 3.5
+      },
+      {
+        "file": "chase-1.png",
+        "x": 602.3,
+        "tick": 150,
+        "median": 1.7000000029802322,
+        "p95": 3.2000000029802322
+      },
+      {
+        "file": "chase-2.png",
+        "x": 1207.8,
+        "tick": 323,
+        "median": 1.9000000059604645,
+        "p95": 3.3999999910593033
+      },
+      {
+        "file": "chase-3.png",
+        "x": 1785.3,
+        "tick": 488,
+        "median": 3.699999988079071,
+        "p95": 4.0999999940395355
+      },
+      {
+        "file": "chase-5.png",
+        "x": 2779.3,
+        "tick": 772,
+        "median": 2.7999999970197678,
+        "p95": 3.0999999940395355
+      },
+      {
+        "file": "chase-6.png",
+        "x": 3272.8,
+        "tick": 913,
+        "median": 3,
+        "p95": 3.8999999910593033
+      },
+      {
+        "file": "chase-7.png",
+        "x": 3752.3,
+        "tick": 1050,
+        "median": 3.0999999940395355,
+        "p95": 3.3999999910593033
+      },
+      {
+        "file": "chase-8.png",
+        "x": 4284.3,
+        "tick": 1202,
+        "median": 3.1000000089406967,
+        "p95": 3.7999999970197678
+      }
+    ],
+    "passed": true,
     "receipt": {
       "act": "duel",
       "phase": 3,
       "health": 0,
       "won": true,
       "deaths": 3,
-      "ticks": 7215
+      "ticks": 7485
+    },
+    "renderMs": {
+      "median": 3.5999999940395355,
+      "p95": 4.5
     },
     "campaignSave": null,
     "mobile": {
@@ -25,10 +1289,6 @@
       "height": 180,
       "viewport": 390,
       "reduced": true
-    },
-    "renderMs": {
-      "median": 2.9000000059604645,
-      "p95": 11.399999991059303
     }
   },
   "siege": {
@@ -242,25 +1502,29 @@
   "nativeReplay": {
     "inputOnly": true,
     "actorCameraClockEdits": false,
-    "frames": 7611,
-    "videoFrames": 3895,
+    "frames": 7881,
+    "videoFrames": 4030,
     "receipt": {
       "act": "duel",
       "phase": 3,
       "health": 0,
       "won": true,
       "deaths": 3,
-      "ticks": 7215
+      "ticks": 7485
     }
   },
   "audio": {
     "productionSynth": true,
     "weaponEffectsOnly": false,
     "destructionCues": 9,
-    "cues": 205,
+    "contactCues": {
+      "water": 10,
+      "bank": 6
+    },
+    "cues": 221,
     "seconds": 129.83333333333334,
     "peak": 0.10918664932250977,
-    "rms": 0.005025699031378486,
+    "rms": 0.005100115523479381,
     "sampleRate": 48000
   },
   "guardVault": {
@@ -632,16 +1896,20 @@
     "breakableLandmarks": 6,
     "midpointPixels": 2304,
     "helmetLosses": 0,
-    "nativeCaptures": 17,
+    "nativeCaptures": 53,
     "nativeProof": "pursuit-verification.json",
     "audio": {
       "productionSynth": true,
       "weaponEffectsOnly": false,
       "destructionCues": 6,
-      "cues": 38,
+      "contactCues": {
+        "water": 10,
+        "bank": 6
+      },
+      "cues": 54,
       "seconds": 21.333333333333332,
       "peak": 0.10817068815231323,
-      "rms": 0.006367986187704983,
+      "rms": 0.006718420254116533,
       "sampleRate": 48000
     },
     "speedsPixelsPerTick": {
@@ -652,7 +1920,525 @@
     "inAppPlaybackConfirmed": true,
     "currentVideoTimeVerified": 21.333333,
     "renderPure": true,
-    "restartByRAndDeathTested": true
+    "restartByRAndDeathTested": true,
+    "finish": {
+      "districtDeckMaterials": [
+        "stone",
+        "timber",
+        "stone",
+        "iron"
+      ],
+      "landmarkContactHoldTicks": 4,
+      "successiveJointFailure": true,
+      "craneLoadSettles": true,
+      "terraceDebrisCap": 4,
+      "groundDebrisCap": 18,
+      "waterSurfaceY": 240,
+      "materialImpacts": [
+        "stone",
+        "timber",
+        "iron",
+        "water"
+      ],
+      "waterAndCollapsedBankCollisionTested": true,
+      "lungeNeckSettledBeforeAttackEnds": true,
+      "nativeProof": "pursuit-verification.json",
+      "renderPure": true,
+      "sourceRevision": "pursuit-24",
+      "checkpointSignOverlapResolved": true,
+      "sharedIntactAndDetachedSprite": true,
+      "orientedBeamThickness": true,
+      "postsAndPanelsRestOnFoundation": true,
+      "detachedTerraceLifetimeTicks": 80,
+      "dropletFlightCompletes": true,
+      "headStrikeRequiresPlayerClearancePixels": 10,
+      "nativeVisibleTerraceContacts": 10,
+      "nativeTerraceContacts": 10,
+      "minimumRecordedClearance": 10.299999999999955,
+      "media": [
+        {
+          "file": "pursuit-play.mp4",
+          "frames": 640,
+          "seconds": 21.333333,
+          "width": 960,
+          "height": 540,
+          "video": "h264",
+          "audio": "aac",
+          "sha256": "41207fbab92b85faff06019dfe94a084323d982b99df44f8ac7b189fa4144209"
+        },
+        {
+          "file": "native-play.mp4",
+          "frames": 3895,
+          "seconds": 129.833333,
+          "width": 960,
+          "height": 540,
+          "video": "h264",
+          "audio": "aac",
+          "sha256": "62e060ab457323e8d47093a4e3586f64aac00217d5301ae09dc2438b2f4d9088"
+        },
+        {
+          "file": "rupture-inspection.mp4",
+          "frames": 180,
+          "seconds": 6.0,
+          "width": 960,
+          "height": 540,
+          "video": "h264",
+          "audio": null,
+          "sha256": "d5a34e53e0b091914ec5a973917f931091579eeb214abb68b6bbba64a641658a"
+        }
+      ],
+      "sourceHashes": {
+        "src/adventure/hipotetico/HypotheticalChaseQuayArt.ts": "38dc83f6474969f67e17cc9367ab61d2c6066553316d9def4a263c243d0f0867",
+        "src/adventure/hipotetico/HypotheticalChaseLife.ts": "dcf251ba5268e30f6fa4d93a26e209d80f0280d68f9b70733c9ae39561f400be",
+        "src/adventure/hipotetico/HypotheticalChaseLifeArt.ts": "4c8b2d2a23a2202fa51e0efaefe124640b66447d4d741e0c3dc94ad3331550b6",
+        "src/adventure/hipotetico/HypotheticalScenery.ts": "03d5ec18036c0538b06724692f3c2f7cd1d6b65543daa55bc9787e0dad7ed462",
+        "src/adventure/hipotetico/HypotheticalModel.ts": "82d23e45150577b3369244e7e2e80215cfb927317e6ee412956edfc0b8dd5eb4",
+        "src/adventure/hipotetico/HypotheticalGame.ts": "e31105bcb3cfe1ef8ea2374ef111558275ccac2d764ded635407bccc1f30635d",
+        "src/adventure/hipotetico/HypotheticalChaseArt.ts": "f3ecec6db1fad819ec582b768d0f44022acbeaca57989c1d0e9a6a7d6f0af470",
+        "src/adventure/hipotetico/HypotheticalChaseDetails.ts": "53708a8ca9ab356a9b6951297162a2a611c526d1682b46888e9b0d8cce8a5cb9",
+        "src/adventure/hipotetico/HypotheticalAudio.ts": "bde1e0c23281d48fc533300a1f7ca47948f66814b50ab6d1d2ede33faa6e58fa"
+      }
+    },
+    "playbackReachedEnd": true,
+    "sourceRevision": "pursuit-24",
+    "environment": {
+      "quays": 12,
+      "workers": 7,
+      "birdGroups": 5,
+      "skiffs": 4,
+      "oneShotModelClockReactions": true,
+      "checkpointSettlesEarlierActions": true,
+      "verticalQuayWaterParallax": 0.2,
+      "keyboardOnly": true,
+      "captures": [
+        {
+          "file": "pursuit-life-quay-notice.png",
+          "frame": 124,
+          "x": 511.3,
+          "state": "rest",
+          "kind": "high",
+          "camera": {
+            "x": 361.3,
+            "y": 64,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 4480,
+              "minY": 0,
+              "maxY": 288
+            }
+          }
+        },
+        {
+          "file": "pursuit-life-quay-reaction.png",
+          "frame": 154,
+          "x": 616.3,
+          "state": "tell",
+          "kind": "high",
+          "camera": {
+            "x": 466.29999999999995,
+            "y": 63.40000000000009,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 4480,
+              "minY": 0,
+              "maxY": 288
+            }
+          }
+        },
+        {
+          "file": "pursuit-life-cargo-notice.png",
+          "frame": 452,
+          "x": 1659.3,
+          "state": "attack",
+          "kind": "low",
+          "camera": {
+            "x": 1509.3,
+            "y": 64,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 4480,
+              "minY": 0,
+              "maxY": 288
+            }
+          }
+        },
+        {
+          "file": "pursuit-life-cargo-reaction.png",
+          "frame": 482,
+          "x": 1764.3,
+          "state": "rest",
+          "kind": "low",
+          "camera": {
+            "x": 1614.3,
+            "y": 64,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 4480,
+              "minY": 0,
+              "maxY": 288
+            }
+          }
+        },
+        {
+          "file": "pursuit-life-water-notice.png",
+          "frame": 795,
+          "x": 2859.8,
+          "state": "rest",
+          "kind": "high",
+          "camera": {
+            "x": 2709.8,
+            "y": 64,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 4480,
+              "minY": 0,
+              "maxY": 288
+            }
+          }
+        },
+        {
+          "file": "pursuit-life-water-surge.png",
+          "frame": 796,
+          "x": 2863.3,
+          "state": "rest",
+          "kind": "high",
+          "camera": {
+            "x": 2713.3,
+            "y": 64,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 4480,
+              "minY": 0,
+              "maxY": 288
+            }
+          }
+        },
+        {
+          "file": "pursuit-life-water-reaction.png",
+          "frame": 825,
+          "x": 2964.8,
+          "state": "tell",
+          "kind": "low",
+          "camera": {
+            "x": 2814.8,
+            "y": 64,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 4480,
+              "minY": 0,
+              "maxY": 288
+            }
+          }
+        },
+        {
+          "file": "pursuit-life-port-notice.png",
+          "frame": 1023,
+          "x": 3657.8,
+          "state": "tell",
+          "kind": "ram",
+          "camera": {
+            "x": 3507.8,
+            "y": 64,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 4480,
+              "minY": 0,
+              "maxY": 288
+            }
+          }
+        },
+        {
+          "file": "pursuit-life-port-reaction.png",
+          "frame": 1053,
+          "x": 3762.8,
+          "state": "attack",
+          "kind": "ram",
+          "camera": {
+            "x": 3612.8,
+            "y": 62.500000000000085,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 4480,
+              "minY": 0,
+              "maxY": 288
+            }
+          }
+        }
+      ],
+      "sourceRevision": "pursuit-24",
+      "sourceHashes": {
+        "src/adventure/hipotetico/HypotheticalChaseQuayArt.ts": "38dc83f6474969f67e17cc9367ab61d2c6066553316d9def4a263c243d0f0867",
+        "src/adventure/hipotetico/HypotheticalChaseLife.ts": "dcf251ba5268e30f6fa4d93a26e209d80f0280d68f9b70733c9ae39561f400be",
+        "src/adventure/hipotetico/HypotheticalChaseLifeArt.ts": "4c8b2d2a23a2202fa51e0efaefe124640b66447d4d741e0c3dc94ad3331550b6",
+        "src/adventure/hipotetico/HypotheticalScenery.ts": "03d5ec18036c0538b06724692f3c2f7cd1d6b65543daa55bc9787e0dad7ed462",
+        "src/adventure/hipotetico/HypotheticalModel.ts": "82d23e45150577b3369244e7e2e80215cfb927317e6ee412956edfc0b8dd5eb4",
+        "src/adventure/hipotetico/HypotheticalGame.ts": "e31105bcb3cfe1ef8ea2374ef111558275ccac2d764ded635407bccc1f30635d",
+        "src/adventure/hipotetico/HypotheticalChaseArt.ts": "f3ecec6db1fad819ec582b768d0f44022acbeaca57989c1d0e9a6a7d6f0af470",
+        "src/adventure/hipotetico/HypotheticalChaseDetails.ts": "53708a8ca9ab356a9b6951297162a2a611c526d1682b46888e9b0d8cce8a5cb9",
+        "src/adventure/hipotetico/HypotheticalAudio.ts": "bde1e0c23281d48fc533300a1f7ca47948f66814b50ab6d1d2ede33faa6e58fa"
+      },
+      "media": [
+        {
+          "file": "pursuit-play.mp4",
+          "frames": 640,
+          "seconds": 21.333333,
+          "width": 960,
+          "height": 540,
+          "video": "h264",
+          "audio": "aac",
+          "sha256": "41207fbab92b85faff06019dfe94a084323d982b99df44f8ac7b189fa4144209"
+        },
+        {
+          "file": "native-play.mp4",
+          "frames": 3895,
+          "seconds": 129.833333,
+          "width": 960,
+          "height": 540,
+          "video": "h264",
+          "audio": "aac",
+          "sha256": "62e060ab457323e8d47093a4e3586f64aac00217d5301ae09dc2438b2f4d9088"
+        },
+        {
+          "file": "rupture-inspection.mp4",
+          "frames": 180,
+          "seconds": 6.0,
+          "width": 960,
+          "height": 540,
+          "video": "h264",
+          "audio": null,
+          "sha256": "d5a34e53e0b091914ec5a973917f931091579eeb214abb68b6bbba64a641658a"
+        }
+      ]
+    },
+    "terraceReleases": [
+      {
+        "worldX": 720,
+        "frame": 202,
+        "playerClearance": 16.299999999999955,
+        "cause": "head-strike"
+      },
+      {
+        "worldX": 800,
+        "frame": 228,
+        "playerClearance": 11.299999999999955,
+        "cause": "head-strike"
+      },
+      {
+        "worldX": 904,
+        "frame": 253,
+        "playerClearance": 18.799999999999955,
+        "cause": "head-strike"
+      },
+      {
+        "worldX": 1584,
+        "frame": 448,
+        "playerClearance": 13.299999999999955,
+        "cause": "head-strike"
+      },
+      {
+        "worldX": 1664,
+        "frame": 475,
+        "playerClearance": 11.799999999999955,
+        "cause": "head-strike"
+      },
+      {
+        "worldX": 1760,
+        "frame": 502,
+        "playerClearance": 10.299999999999955,
+        "cause": "head-strike"
+      },
+      {
+        "worldX": 1872,
+        "frame": 530,
+        "playerClearance": 12.299999999999955,
+        "cause": "head-strike"
+      },
+      {
+        "worldX": 3296,
+        "frame": 937,
+        "playerClearance": 12.800000000000182,
+        "cause": "head-strike"
+      },
+      {
+        "worldX": 3376,
+        "frame": 964,
+        "playerClearance": 11.300000000000182,
+        "cause": "head-strike"
+      },
+      {
+        "worldX": 3536,
+        "frame": 1005,
+        "playerClearance": 10.800000000000182,
+        "cause": "head-strike"
+      }
+    ],
+    "terraceContacts": [
+      {
+        "worldX": 720,
+        "frame": 226,
+        "screenX": 44.08507627547476,
+        "visible": true
+      },
+      {
+        "worldX": 800,
+        "frame": 257,
+        "screenX": 27.728732005850702,
+        "visible": true
+      },
+      {
+        "worldX": 904,
+        "frame": 278,
+        "screenX": 38.259812987740816,
+        "visible": true
+      },
+      {
+        "worldX": 1584,
+        "frame": 472,
+        "screenX": 47.08507627547465,
+        "visible": true
+      },
+      {
+        "worldX": 1664,
+        "frame": 504,
+        "screenX": 27.228732005850816,
+        "visible": true
+      },
+      {
+        "worldX": 1760,
+        "frame": 534,
+        "screenX": 15.75451774787507,
+        "visible": true
+      },
+      {
+        "worldX": 1872,
+        "frame": 556,
+        "screenX": 40.021933871619694,
+        "visible": true
+      },
+      {
+        "worldX": 3296,
+        "frame": 961,
+        "screenX": 47.58507627547442,
+        "visible": true
+      },
+      {
+        "worldX": 3376,
+        "frame": 993,
+        "screenX": 27.72873200585036,
+        "visible": true
+      },
+      {
+        "worldX": 3536,
+        "frame": 1029,
+        "screenX": 49.58507627547442,
+        "visible": true
+      }
+    ],
+    "inspection": {
+      "inspectionOnly": true,
+      "representsGameplayCamera": false,
+      "productionDrawing": true,
+      "gameplayProof": "pursuit-verification.json",
+      "frames": 180,
+      "seconds": 6,
+      "renderPure": true,
+      "playbackReachedEnd": true
+    },
+    "shore": {
+      "continuousSupportPixelsTested": true,
+      "cameraTranslationPixelsTested": true,
+      "clearNearChannelTested": true,
+      "frontages": 12,
+      "districts": [
+        "quay",
+        "cargo",
+        "water",
+        "port"
+      ],
+      "projection": {
+        "x": 0.36,
+        "y": 0.2
+      },
+      "atCameraY64": {
+        "street": 129,
+        "wallEdge": 134,
+        "outlet": 140,
+        "water": 148,
+        "boatWaterline": 155
+      },
+      "farSkylineAndItsBankProjectionX": 0.11,
+      "windPhaseIndependentOfCamera": true,
+      "oarReturnDry": true,
+      "reducedAmbientBoatDrift": 0,
+      "pairedCapturesSameInputTick": true,
+      "beforeSource": "pursuit-23",
+      "afterSource": "pursuit-24",
+      "comparisonPairs": [
+        [
+          "shore-before-quay.png",
+          "shore-after-quay.png"
+        ],
+        [
+          "shore-before-water.png",
+          "shore-after-water.png"
+        ]
+      ],
+      "fullChaseInputOnly": true,
+      "audioReuse": {
+        "chase": {
+          "source": "output\\hipotetico\\pursuit-rupture\\verified",
+          "equalCompleteCueTape": true,
+          "events": 54
+        },
+        "fullReplay": {
+          "source": "output\\hipotetico\\pursuit-rupture\\native-final",
+          "equalCompleteCueTape": true,
+          "events": 221
+        }
+      },
+      "renderTimingScope": "24 repeated draws at eight native browser chase snapshots, local machine; not whole-frame or cross-device performance",
+      "gatewayPillarsAndThresholdMeetPlayableDeck": true,
+      "nativeProofDirectory": "output/hipotetico/pursuit-shore/verified",
+      "fullProofDirectory": "output/hipotetico/pursuit-shore/native-final",
+      "browserProofDirectory": "output/hipotetico/pursuit-shore/browser-final"
+    },
+    "previewUrlRevision": "pursuit-24b"
   },
   "reviewPage": {
     "passed": true,
@@ -660,40 +2446,633 @@
       1440,
       390
     ],
-    "assetResponses": 277,
+    "assetResponses": 320,
     "errors": [],
-    "screenshot": "output/hipotetico/pursuit/review-page.png",
+    "screenshot": "output/hipotetico/pursuit-shore/review-page.png",
     "media": [
       {
-        "src": "http://127.0.0.1:3000/docs/world/hipotetico/mega-boss-2026-10-18/pursuit-play.mp4?rev=pursuit-20",
-        "w": 960,
-        "h": 540,
-        "duration": 21.333333
+        "file": "arrival-play.mp4",
+        "frames": 300,
+        "seconds": 10.0,
+        "width": 960,
+        "height": 540,
+        "video": "h264",
+        "audio": "aac",
+        "sha256": "00b4ca56262111892b1657ad7fe402fc1e1ab4dff8323545b2f8d6aae8d8e8e0"
       },
       {
-        "src": "http://127.0.0.1:3000/docs/world/hipotetico/mega-boss-2026-10-18/gunfire-play.mp4?rev=pursuit-20",
-        "w": 960,
-        "h": 540,
-        "duration": 14.133333
-      },
-      {
-        "src": "http://127.0.0.1:3000/docs/world/hipotetico/mega-boss-2026-10-18/guards-play.mp4?rev=pursuit-20",
-        "w": 960,
-        "h": 540,
-        "duration": 22.9
-      },
-      {
-        "src": "http://127.0.0.1:3000/docs/world/hipotetico/mega-boss-2026-10-18/bystander-motion.mp4?rev=motion-18",
-        "w": 960,
-        "h": 540,
-        "duration": 5
-      },
-      {
-        "src": "http://127.0.0.1:3000/docs/world/hipotetico/mega-boss-2026-10-18/native-play.mp4?rev=pursuit-20",
-        "w": 960,
-        "h": 540,
-        "duration": 129.833333
+        "file": "native-play.mp4",
+        "frames": 4030,
+        "seconds": 134.333333,
+        "width": 960,
+        "height": 540,
+        "video": "h264",
+        "audio": "aac",
+        "sha256": "9809aa3b376a531ad9a1e310abe3b9447fb126ac8cb3322b61a86dafb5402830"
       }
-    ]
+    ],
+    "arrivalResponsiveReview": {
+      "passed": true,
+      "viewports": [
+        1440,
+        390
+      ],
+      "files": 334,
+      "errors": []
+    }
+  },
+  "arrival": {
+    "revision": 25,
+    "proof": {
+      "inputOnly": true,
+      "actorCameraClockEdits": false,
+      "recordedFromInputFrame": 1162,
+      "inputFrames": 1761,
+      "videoFrames": 300,
+      "seconds": 10,
+      "receipt": {
+        "act": "siege",
+        "phase": 1,
+        "health": 9,
+        "won": false,
+        "deaths": 0,
+        "ticks": 1761
+      },
+      "captures": [
+        {
+          "file": "arrival-crowd.png",
+          "inputFrame": 1317,
+          "tick": 36,
+          "crowd": [
+            {
+              "x": 224,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 262,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 154,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 188,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 206,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 238,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 286,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 305,
+              "escaped": false,
+              "hitAt": null
+            }
+          ],
+          "gate": {
+            "travel": 0,
+            "height": 120,
+            "ready": false
+          },
+          "guardsActive": false
+        },
+        {
+          "file": "arrival-flight.png",
+          "inputFrame": 1355,
+          "tick": 74,
+          "crowd": [
+            {
+              "x": 233.06777936087929,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 267.4182780378587,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 131.66252798697334,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 173.19791666666666,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 212.42565597667638,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 239.8893494897959,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 305.685302734375,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 305,
+              "escaped": false,
+              "hitAt": null
+            }
+          ],
+          "gate": {
+            "travel": 0,
+            "height": 120,
+            "ready": false
+          },
+          "guardsActive": false
+        },
+        {
+          "file": "arrival-volley.png",
+          "inputFrame": 1393,
+          "tick": 112,
+          "crowd": [
+            {
+              "x": 246,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 283.1581518420517,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 132.69921875,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 249.23181341107872,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 271.0612244897959,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 317.04373177842564,
+              "escaped": false,
+              "hitAt": null
+            }
+          ],
+          "gate": {
+            "travel": 0,
+            "height": 120,
+            "ready": false
+          },
+          "guardsActive": false
+        },
+        {
+          "file": "arrival-reaction.png",
+          "inputFrame": 1427,
+          "tick": 146,
+          "crowd": [
+            {
+              "x": 246,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 284,
+              "escaped": false,
+              "hitAt": 142
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 279.97139067055394,
+              "escaped": false,
+              "hitAt": 137
+            },
+            {
+              "x": 307.14827806122446,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            }
+          ],
+          "gate": {
+            "travel": 0,
+            "height": 120,
+            "ready": false
+          },
+          "guardsActive": false
+        },
+        {
+          "file": "arrival-ram.png",
+          "inputFrame": 1455,
+          "tick": 174,
+          "crowd": [
+            {
+              "x": 246,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 284,
+              "escaped": false,
+              "hitAt": 142
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 279.97139067055394,
+              "escaped": false,
+              "hitAt": 137
+            },
+            {
+              "x": 321.9205994897959,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            }
+          ],
+          "gate": {
+            "travel": 0,
+            "height": 120,
+            "ready": false
+          },
+          "guardsActive": false
+        },
+        {
+          "file": "arrival-collapse.png",
+          "inputFrame": 1469,
+          "tick": 188,
+          "crowd": [
+            {
+              "x": 246,
+              "escaped": false,
+              "hitAt": 184
+            },
+            {
+              "x": 284,
+              "escaped": false,
+              "hitAt": 142
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 279.97139067055394,
+              "escaped": false,
+              "hitAt": 137
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            }
+          ],
+          "gate": {
+            "travel": 0,
+            "height": 120,
+            "ready": false
+          },
+          "guardsActive": false
+        },
+        {
+          "file": "arrival-aftermath.png",
+          "inputFrame": 1507,
+          "tick": 226,
+          "crowd": [
+            {
+              "x": 246,
+              "escaped": false,
+              "hitAt": 184
+            },
+            {
+              "x": 284,
+              "escaped": false,
+              "hitAt": 142
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 279.97139067055394,
+              "escaped": false,
+              "hitAt": 137
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            }
+          ],
+          "gate": {
+            "travel": 0,
+            "height": 120,
+            "ready": false
+          },
+          "guardsActive": false
+        },
+        {
+          "file": "arrival-deployment.png",
+          "inputFrame": 1541,
+          "tick": 260,
+          "crowd": [
+            {
+              "x": 246,
+              "escaped": false,
+              "hitAt": 184
+            },
+            {
+              "x": 284,
+              "escaped": false,
+              "hitAt": 142
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 279.97139067055394,
+              "escaped": false,
+              "hitAt": 137
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            }
+          ],
+          "gate": {
+            "travel": 0,
+            "height": 120,
+            "ready": false
+          },
+          "guardsActive": false
+        },
+        {
+          "file": "arrival-opening.png",
+          "inputFrame": 1575,
+          "tick": 294,
+          "crowd": [
+            {
+              "x": 246,
+              "escaped": false,
+              "hitAt": 184
+            },
+            {
+              "x": 284,
+              "escaped": false,
+              "hitAt": 142
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 279.97139067055394,
+              "escaped": false,
+              "hitAt": 137
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            }
+          ],
+          "gate": {
+            "travel": 0.5,
+            "height": 60,
+            "ready": true
+          },
+          "guardsActive": true
+        },
+        {
+          "file": "arrival-combat.png",
+          "inputFrame": 1611,
+          "tick": 330,
+          "crowd": [
+            {
+              "x": 246,
+              "escaped": false,
+              "hitAt": 184
+            },
+            {
+              "x": 284,
+              "escaped": false,
+              "hitAt": 142
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 279.97139067055394,
+              "escaped": false,
+              "hitAt": 137
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            }
+          ],
+          "gate": {
+            "travel": 1,
+            "height": 0,
+            "ready": true
+          },
+          "guardsActive": true
+        }
+      ]
+    },
+    "media": [
+      {
+        "file": "arrival-play.mp4",
+        "frames": 300,
+        "seconds": 10.0,
+        "width": 960,
+        "height": 540,
+        "video": "h264",
+        "audio": "aac",
+        "sha256": "00b4ca56262111892b1657ad7fe402fc1e1ab4dff8323545b2f8d6aae8d8e8e0"
+      },
+      {
+        "file": "native-play.mp4",
+        "frames": 4030,
+        "seconds": 134.333333,
+        "width": 960,
+        "height": 540,
+        "video": "h264",
+        "audio": "aac",
+        "sha256": "9809aa3b376a531ad9a1e310abe3b9447fb126ac8cb3322b61a86dafb5402830"
+      }
+    ],
+    "sourceHashes": {
+      "src/adventure/hipotetico/HypotheticalArrival.ts": "457cdcdc681f518c8ea8a76b93da9e0dd4502ec7cd133b106fede59a5225e360",
+      "src/adventure/hipotetico/HypotheticalArrivalArt.ts": "e32fc1c3801a4a39c698363f90cddd26020fb1be652aab34a6271976460a2c12",
+      "src/adventure/hipotetico/HypotheticalBackdrop.ts": "11684a798ab6e1f94a2864f4be6e2d3f62dc606a8e722d219b72df5a28d09380",
+      "src/adventure/hipotetico/HypotheticalBystanders.ts": "9638cf3a2c8cec5b14e4f286e54c4388f8650f8a13b8d1cfdeb4501b4f6011d4",
+      "src/adventure/hipotetico/HypotheticalBystanderMotion.ts": "d36e22cc4524606bb3281c511ba3655fce79860f77d44d9b522e172f8e88ccb6",
+      "src/adventure/hipotetico/HypotheticalScenery.ts": "7dceee688e78dd9572134e52cbb909cb378f5ec9a66b74f43dc574105b15fc9b",
+      "src/adventure/hipotetico/HypotheticalModel.ts": "522f402ab7156b0f781c4be6ee7fbf8c47cc23ab4725025270997f453e79969d",
+      "src/adventure/hipotetico/HypotheticalGame.ts": "6d186554562d00f19e86a079de6ddc66c3d74f996ac2a597af6227a77585219b",
+      "src/adventure/hipotetico/HypotheticalStage.ts": "950bb17819e45e50f65faeb2134b11b39e3bed61c3855c905ddaa78cf391b8c0"
+    },
+    "gatheredPeople": 8,
+    "protectedTicks": 270,
+    "gateLiftTicks": 48,
+    "firstVolleyShots": 8,
+    "nativeProofDirectory": "output/hipotetico/arrival-cinema/verified",
+    "inAppPlaybackConfirmed": true,
+    "playbackReachedEnd": true,
+    "currentVideoTimeVerified": 10,
+    "inspectionFrameSeconds": 5.1,
+    "screenshot": "output/hipotetico/arrival-cinema/review-page.png"
   }
 }

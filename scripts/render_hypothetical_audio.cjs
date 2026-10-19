@@ -11,7 +11,7 @@ const tape=JSON.parse(fs.readFileSync(source,'utf8')),rate=48000;
   samples=await page.evaluate(async rate=>{
    const {HypotheticalAudio}=await import('/src/adventure/hipotetico/HypotheticalAudio.ts');
    const result={};
-   for(const kind of ['shot','impact','splash','reload','distant-shot','distant-hit','distant-crash']){
+   for(const kind of ['shot','impact','splash','collapse-water','debris-land','reload','distant-shot','distant-hit','distant-crash']){
     const context=new OfflineAudioContext(1,Math.ceil(rate*.36),rate),bus=context.createGain();bus.gain.value=.18;bus.connect(context.destination);
     // Only the offline device boundary differs. The production voice owns every envelope and oscillator.
     const routeContext=new Proxy(context,{get(target,key){if(key==='state')return 'running';const value=Reflect.get(target,key,target);return typeof value==='function'?value.bind(target):value;}});
@@ -30,6 +30,7 @@ const tape=JSON.parse(fs.readFileSync(source,'utf8')),rate=48000;
  for(let i=0;i<mix.length;i++)wav.writeInt16LE(Math.round(Math.max(-1,Math.min(1,mix[i]))*32767),44+i*2);
  fs.mkdirSync(path.dirname(path.resolve(destination)),{recursive:true});fs.writeFileSync(destination,wav);
  const destructionCues=tape.cues.filter(c=>c.kind==='distant-crash').length;
- const report={productionSynth:true,weaponEffectsOnly:destructionCues===0,destructionCues,cues:tape.cues.length,seconds:tape.seconds,peak,rms:Math.sqrt(energy/mix.length),sampleRate:rate};
+ const contactCues={water:tape.cues.filter(c=>c.kind==='collapse-water').length,bank:tape.cues.filter(c=>c.kind==='debris-land').length};
+ const report={productionSynth:true,weaponEffectsOnly:destructionCues===0,destructionCues,contactCues,cues:tape.cues.length,seconds:tape.seconds,peak,rms:Math.sqrt(energy/mix.length),sampleRate:rate};
  fs.writeFileSync(destination+'.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report));
 })().catch(e=>{console.error(e);process.exitCode=1;});

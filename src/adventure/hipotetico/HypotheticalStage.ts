@@ -4,6 +4,7 @@ import type { AdventureStage } from '../types';
 import type { HypotheticalAct } from './HypotheticalModel';
 import { ARENA_BALCONIES, CHASE_GAPS, CHASE_STEPS, CHASE_TERRACES, CHASE_WIDTH, CHASE_CHECKPOINT } from './HypotheticalLayout';
 import { SIEGE_SECTORS, SIEGE_WIDTH, SIEGE_LINKS, siegeGarrison } from './HypotheticalSiege';
+import {ARRIVAL} from './HypotheticalArrival';
 
 export function hypotheticalStage(act: HypotheticalAct): AdventureStage {
     const s = structuredClone(STAGES[0]);
@@ -35,6 +36,7 @@ export function hypotheticalStage(act: HypotheticalAct): AdventureStage {
             s.pickups.push({id:`hipotetico:terrace:${i+1}`,kind:'coin',x:p.x+p.width/2,y:p.y-26});
         s.pickups.push({id:'hipotetico:mid:helmet',kind:'helmet',x:CHASE_CHECKPOINT+32,y:193});
     } else if (act === 'siege') {
+        s.mechanisms.push({id:'arrival-gate',kind:'target',x:ARRIVAL.gateX,y:ARRIVAL.gateY,width:12,height:ARRIVAL.gateHeight,gated:true});
         for (const [i, sector] of SIEGE_SECTORS.entries()) {
             s.foes.push(...siegeGarrison(i));
             s.mechanisms.push(...sector.platforms.map((p,j)=>({...p, id:`siege-scaffold-${i}-${j}`,kind:'support' as const,height:7})),

@@ -6,13 +6,15 @@ import { gunRecoil, type GunImpact } from './HypotheticalGunfire';
 /** All positions are native pixels, relative to the distant street's baseline. */
 export const BACKDROP_RIG = { width: 192, height: 160, scale: .6875, x: 92, y: 148 } as const;
 /** The rear street has vertical parallax, so high foreground jumps do not hide its action. */
-export const backdropBaseline=(cameraY:number)=>152+(64-cameraY)*.22;
+export const backdropBaseline=(cameraY:number)=>128+(64-cameraY)*.22;
 export type BystanderClothes = 'workcoat' | 'star-shirt' | 'scarf' | 'satchel';
 export interface Bystander {
     x:number; shelter:number; escaped:boolean; fleeing:boolean; hitAt:number|null; color:number;
     distance:number; velocity:number; alertAt:number; speed:number; district:number; clothes:BystanderClothes;
     stoppedAt:number|null; threatenedAt:number|null; startledAt:number|null;
     originX:number; reactionTimes:number[];
+    appearance?:number; depth?:number; exitAtShelter?:boolean; runTicks?:number;
+    belonging?:'parcel'|'papers';
 }
 export interface DistantShot { x: number; y: number; px: number; py: number; vx: number; vy: number; life: number; age:number }
 export interface DistantImpact extends GunImpact {}
@@ -36,6 +38,20 @@ export class HypotheticalBackdrop {
                 originX:x,reactionTimes:[],
                 alertAt:i<6?Math.floor(i/2)*400+38+i%2*8:650+(i-6)*12,speed:i<6?.5:(i===6?.82:.94) };
         });
+        // A courtyard crowd has two real exits, staggered reactions and distinct silhouettes.
+        // These runners share the same shot geometry as the rest of the street.
+        const crowd=[
+            {x:154,shelter:116,alertAt:30,runTicks:68,clothes:'workcoat',belonging:'parcel'},
+            {x:188,shelter:116,alertAt:40,runTicks:96,clothes:'star-shirt',belonging:'papers'},
+            {x:206,shelter:322,alertAt:48,runTicks:140,clothes:'scarf'},
+            {x:238,shelter:322,alertAt:58,runTicks:112,clothes:'star-shirt'},
+            {x:286,shelter:322,alertAt:34,runTicks:64,clothes:'satchel'},
+            {x:305,shelter:322,alertAt:70,runTicks:56,clothes:'star-shirt'},
+        ] as const;
+        for(const [i,p] of crowd.entries())this.people.push({...p,belonging:'belonging' in p?p.belonging:undefined,
+            originX:p.x,escaped:false,fleeing:true,hitAt:null,color:(i+1)%4,distance:0,velocity:0,speed:1,
+            district:0,stoppedAt:null,threatenedAt:null,startledAt:null,reactionTimes:[],
+            appearance:i+1,depth:i%2?-2:-4,exitAtShelter:true});
     }
     private target = -1;
     get aimedPerson(){return this.people[this.target]??null;}
@@ -78,11 +94,12 @@ export class HypotheticalBackdrop {
             p.reactionTimes=p.reactionTimes.filter(at=>tick-at<32);
             if(p.hitAt!==null||p.escaped||tick<=p.alertAt+6)continue;
             const old=p.x,age=tick-p.alertAt-6;
-            p.x=p.fleeing?Math.min(p.shelter,p.x+p.speed*smoothMotion(age/14))
+            p.x=p.exitAtShelter?p.originX+(p.shelter-p.originX)*smoothMotion(age/p.runTicks!)
+                :p.fleeing?Math.min(p.shelter,p.x+p.speed*smoothMotion(age/14))
                 :p.originX+(p.shelter-p.originX)*smoothMotion(age/68);
-            p.velocity=p.x-old;p.distance+=p.velocity;
+            p.velocity=p.x-old;p.distance+=Math.abs(p.velocity);
             if(p.x===p.shelter&&p.stoppedAt===null)p.stoppedAt=tick;
-            if (p.fleeing && p.x > (this.wide ? 1286 : 326)) p.escaped = true;
+            if (p.exitAtShelter?p.x===p.shelter:p.fleeing&&p.x>(this.wide?1286:326))p.escaped=true;
         }
         for (const s of this.shots) {
             s.px = s.x; s.py = s.y; s.x += s.vx; s.y += s.vy; s.life--;s.age++;
@@ -112,7 +129,8 @@ export class HypotheticalBackdrop {
                 const p=this.people[this.target];this.targetX=p.shelter;this.targetY=-7;p.threatenedAt=tick;
             }
         }
-        if (pass < 3 && this.target >= 0 && [110, 118, 126, 166, 174, 182].includes(local)) {
+        const volley=pass===0?[110,116,122,128,166,172,178,184]:[110,118,126,166,174,182];
+        if (pass < 3 && this.target >= 0 && volley.includes(local)) {
             this.muzzle = 5; this.heat = Math.min(1, this.heat + .23);
             const m = this.barrel, a = this.angle;
             this.shots.push({ x: m.x, y: m.y, px: m.x, py: m.y, vx: Math.cos(a) * 5, vy: Math.sin(a) * 5, life: 70,age:0 });

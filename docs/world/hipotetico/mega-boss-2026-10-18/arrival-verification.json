@@ -1,0 +1,548 @@
+{
+  "inputOnly": true,
+  "actorCameraClockEdits": false,
+  "recordedFromInputFrame": 1162,
+  "inputFrames": 1761,
+  "videoFrames": 300,
+  "seconds": 10,
+  "receipt": {
+    "act": "siege",
+    "phase": 1,
+    "health": 9,
+    "won": false,
+    "deaths": 0,
+    "ticks": 1761
+  },
+  "captures": [
+    {
+      "file": "arrival-crowd.png",
+      "inputFrame": 1317,
+      "tick": 36,
+      "crowd": [
+        {
+          "x": 224,
+          "escaped": false,
+          "hitAt": null
+        },
+        {
+          "x": 262,
+          "escaped": false,
+          "hitAt": null
+        },
+        {
+          "x": 154,
+          "escaped": false,
+          "hitAt": null
+        },
+        {
+          "x": 188,
+          "escaped": false,
+          "hitAt": null
+        },
+        {
+          "x": 206,
+          "escaped": false,
+          "hitAt": null
+        },
+        {
+          "x": 238,
+          "escaped": false,
+          "hitAt": null
+        },
+        {
+          "x": 286,
+          "escaped": false,
+          "hitAt": null
+        },
+        {
+          "x": 305,
+          "escaped": false,
+          "hitAt": null
+        }
+      ],
+      "gate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "guardsActive": false
+    },
+    {
+      "file": "arrival-flight.png",
+      "inputFrame": 1355,
+      "tick": 74,
+      "crowd": [
+        {
+          "x": 233.06777936087929,
+          "escaped": false,
+          "hitAt": null
+        },
+        {
+          "x": 267.4182780378587,
+          "escaped": false,
+          "hitAt": null
+        },
+        {
+          "x": 131.66252798697334,
+          "escaped": false,
+          "hitAt": null
+        },
+        {
+          "x": 173.19791666666666,
+          "escaped": false,
+          "hitAt": null
+        },
+        {
+          "x": 212.42565597667638,
+          "escaped": false,
+          "hitAt": null
+        },
+        {
+          "x": 239.8893494897959,
+          "escaped": false,
+          "hitAt": null
+        },
+        {
+          "x": 305.685302734375,
+          "escaped": false,
+          "hitAt": null
+        },
+        {
+          "x": 305,
+          "escaped": false,
+          "hitAt": null
+        }
+      ],
+      "gate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "guardsActive": false
+    },
+    {
+      "file": "arrival-volley.png",
+      "inputFrame": 1393,
+      "tick": 112,
+      "crowd": [
+        {
+          "x": 246,
+          "escaped": false,
+          "hitAt": null
+        },
+        {
+          "x": 283.1581518420517,
+          "escaped": false,
+          "hitAt": null
+        },
+        {
+          "x": 116,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 132.69921875,
+          "escaped": false,
+          "hitAt": null
+        },
+        {
+          "x": 249.23181341107872,
+          "escaped": false,
+          "hitAt": null
+        },
+        {
+          "x": 271.0612244897959,
+          "escaped": false,
+          "hitAt": null
+        },
+        {
+          "x": 322,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 317.04373177842564,
+          "escaped": false,
+          "hitAt": null
+        }
+      ],
+      "gate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "guardsActive": false
+    },
+    {
+      "file": "arrival-reaction.png",
+      "inputFrame": 1427,
+      "tick": 146,
+      "crowd": [
+        {
+          "x": 246,
+          "escaped": false,
+          "hitAt": null
+        },
+        {
+          "x": 284,
+          "escaped": false,
+          "hitAt": 142
+        },
+        {
+          "x": 116,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 116,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 279.97139067055394,
+          "escaped": false,
+          "hitAt": 137
+        },
+        {
+          "x": 307.14827806122446,
+          "escaped": false,
+          "hitAt": null
+        },
+        {
+          "x": 322,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 322,
+          "escaped": true,
+          "hitAt": null
+        }
+      ],
+      "gate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "guardsActive": false
+    },
+    {
+      "file": "arrival-ram.png",
+      "inputFrame": 1455,
+      "tick": 174,
+      "crowd": [
+        {
+          "x": 246,
+          "escaped": false,
+          "hitAt": null
+        },
+        {
+          "x": 284,
+          "escaped": false,
+          "hitAt": 142
+        },
+        {
+          "x": 116,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 116,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 279.97139067055394,
+          "escaped": false,
+          "hitAt": 137
+        },
+        {
+          "x": 321.9205994897959,
+          "escaped": false,
+          "hitAt": null
+        },
+        {
+          "x": 322,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 322,
+          "escaped": true,
+          "hitAt": null
+        }
+      ],
+      "gate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "guardsActive": false
+    },
+    {
+      "file": "arrival-collapse.png",
+      "inputFrame": 1469,
+      "tick": 188,
+      "crowd": [
+        {
+          "x": 246,
+          "escaped": false,
+          "hitAt": 184
+        },
+        {
+          "x": 284,
+          "escaped": false,
+          "hitAt": 142
+        },
+        {
+          "x": 116,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 116,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 279.97139067055394,
+          "escaped": false,
+          "hitAt": 137
+        },
+        {
+          "x": 322,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 322,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 322,
+          "escaped": true,
+          "hitAt": null
+        }
+      ],
+      "gate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "guardsActive": false
+    },
+    {
+      "file": "arrival-aftermath.png",
+      "inputFrame": 1507,
+      "tick": 226,
+      "crowd": [
+        {
+          "x": 246,
+          "escaped": false,
+          "hitAt": 184
+        },
+        {
+          "x": 284,
+          "escaped": false,
+          "hitAt": 142
+        },
+        {
+          "x": 116,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 116,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 279.97139067055394,
+          "escaped": false,
+          "hitAt": 137
+        },
+        {
+          "x": 322,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 322,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 322,
+          "escaped": true,
+          "hitAt": null
+        }
+      ],
+      "gate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "guardsActive": false
+    },
+    {
+      "file": "arrival-deployment.png",
+      "inputFrame": 1541,
+      "tick": 260,
+      "crowd": [
+        {
+          "x": 246,
+          "escaped": false,
+          "hitAt": 184
+        },
+        {
+          "x": 284,
+          "escaped": false,
+          "hitAt": 142
+        },
+        {
+          "x": 116,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 116,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 279.97139067055394,
+          "escaped": false,
+          "hitAt": 137
+        },
+        {
+          "x": 322,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 322,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 322,
+          "escaped": true,
+          "hitAt": null
+        }
+      ],
+      "gate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "guardsActive": false
+    },
+    {
+      "file": "arrival-opening.png",
+      "inputFrame": 1575,
+      "tick": 294,
+      "crowd": [
+        {
+          "x": 246,
+          "escaped": false,
+          "hitAt": 184
+        },
+        {
+          "x": 284,
+          "escaped": false,
+          "hitAt": 142
+        },
+        {
+          "x": 116,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 116,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 279.97139067055394,
+          "escaped": false,
+          "hitAt": 137
+        },
+        {
+          "x": 322,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 322,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 322,
+          "escaped": true,
+          "hitAt": null
+        }
+      ],
+      "gate": {
+        "travel": 0.5,
+        "height": 60,
+        "ready": true
+      },
+      "guardsActive": true
+    },
+    {
+      "file": "arrival-combat.png",
+      "inputFrame": 1611,
+      "tick": 330,
+      "crowd": [
+        {
+          "x": 246,
+          "escaped": false,
+          "hitAt": 184
+        },
+        {
+          "x": 284,
+          "escaped": false,
+          "hitAt": 142
+        },
+        {
+          "x": 116,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 116,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 279.97139067055394,
+          "escaped": false,
+          "hitAt": 137
+        },
+        {
+          "x": 322,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 322,
+          "escaped": true,
+          "hitAt": null
+        },
+        {
+          "x": 322,
+          "escaped": true,
+          "hitAt": null
+        }
+      ],
+      "gate": {
+        "travel": 1,
+        "height": 0,
+        "ready": true
+      },
+      "guardsActive": true
+    }
+  ]
+}

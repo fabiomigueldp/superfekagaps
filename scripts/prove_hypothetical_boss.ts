@@ -77,7 +77,7 @@ try{
             :b.act==='siege'&&b.tick>=280&&b.tick<=284?'siege-courtyard'
             :b.act==='siege'&&b.backdrop.muzzle>0?'distant-gunfire'
             :b.act==='siege'&&b.backdrop.people.some(p=>p.hitAt!==null&&b.tick-p.hitAt>=8&&b.tick-p.hitAt<=12)?'bystander-fall'
-            :b.act==='siege'&&b.casualties===6?'siege-aftermath'
+            :b.act==='siege'&&b.backdrop.people.every(p=>p.escaped||p.hitAt!==null)?'siege-aftermath'
             :b.act!=='duel'?null
             :b.phaseNumber===1&&b.tick>=112&&b.tick<=116?'duel-gate'
             :b.state==='roar'&&b.age>=22&&b.age<=24?'roar-command'

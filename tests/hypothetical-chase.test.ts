@@ -6,7 +6,7 @@ import {CHASE_ATTACKS,CHASE_BREAKS,CHASE_CHECKPOINT,CHASE_GAPS,CHASE_WIDTH} from
 import {sceneLifecycleBrowser} from './helpers/sceneLifecycleHarness';
 import {hypotheticalChaseInputs} from './helpers/hypotheticalRoutes';
 
-import {chaseDeckSpans,chaseRuinAt,chaseDebrisAt,CHASE_WATER_Y} from '../src/adventure/hipotetico/HypotheticalChaseDetails';
+import {chaseDeckSpans,chaseRuinAt,chaseDebrisAt,chaseTerraceFall,chaseCollapsedEdge,CHASE_WATER_Y} from '../src/adventure/hipotetico/HypotheticalChaseDetails';
 import {hypotheticalMotion} from '../src/adventure/hipotetico/HypotheticalMotion';
 
 const dt=HYPOTHETICAL.step;
@@ -19,7 +19,7 @@ function keys(h:ReturnType<typeof sceneLifecycleBrowser>,held:Set<string>,input:
 
 test('the entire pursuit teaches high fire, low fire and lunges, with seven complete warnings and six visible destructions',t=>{
     const h=sceneLifecycleBrowser(t),g=new HypotheticalGame(h.canvas as unknown as HTMLCanvasElement);
-    let held=new Set<string>(),frames=0,last='arrival',warning=0,visibleDebris=0;
+    let held=new Set<string>(),frames=0,last='arrival',warning=0,visibleDebris=0,visibleCaps=0;
     const kinds:string[]=[],tells:number[]=[],breaks=new Set<number>(),landings=new Set<string>(),districts=new Set<number>();
     try{for(const [count,input] of hypotheticalChaseInputs('upper')){
         held=keys(h,held,input);
@@ -35,13 +35,19 @@ test('the entire pursuit teaches high fire, low fire and lunges, with seven comp
             visibleDebris+=b.bridgeDebris.filter(d=>d.x-g.camera.x>=0&&d.x-g.camera.x<320).length;
             if(g.player.data.isGrounded)for(const body of g.objects.bodies)if(body.id.startsWith('chase-')&&Math.abs(p.y+p.height-body.y)<.1&&p.x+p.width>body.x&&p.x<body.x+body.width)landings.add(body.id);
             assert.ok(b.bridgeDebris.length<=18);assert.ok(b.terraceDebris.length<=4);
-            for(const d of b.terraceDebris)assert.ok(!g.objects.bodies.some(p=>p.x===d.x&&p.id.startsWith('chase-')));
+            for(const d of b.terraceDebris){
+                assert.ok(!g.objects.bodies.some(p=>p.x===d.x&&p.id.startsWith('chase-')));
+                if(d.born===b.tick&&d.x>=chaseCollapsedEdge(b.x))assert.ok(p.x>=d.x+d.width+10,'a head strike never removes the deck beneath Feka');
+                const fall=chaseTerraceFall(d,b.tick-d.born),sx=d.x+fall.contactX-g.camera.x;
+                if(fall.splashAge>=0&&fall.splashAge<1&&sx>5&&sx<315)visibleCaps++;
+            }
         }
     }
     assert.equal(g.act,'siege');assert.equal(g.receipt.deaths,0);assert.equal(frames,1281);
     assert.deepEqual([...districts],[0,1,2,3]);assert.deepEqual(kinds,CHASE_ATTACKS.map(a=>a.kind));
     assert.deepEqual(tells,CHASE_ATTACKS.map(a=>a.tell));assert.equal(breaks.size,CHASE_BREAKS.length);assert.ok(visibleDebris>100);
     assert.ok([...landings].some(s=>s.includes('cargo')));assert.ok([...landings].some(s=>s.includes('final')));
+    assert.ok(visibleCaps>=8,`${visibleCaps} terrace impacts are visible during the native run`);
     }finally{g.dispose();}
 });
 
@@ -72,7 +78,7 @@ test('moving rifle directions, muzzle anchors and environment events are determi
     const p={x:3000,y:200,width:14,height:24};
     for(let i=0;i<360;i++)a.update(dt,p);for(let i=0;i<60;i++)b.update(dt*6,p);
     assert.equal(a.tick,b.tick);assert.equal(a.pursuitIndex,b.pursuitIndex);assert.equal(a.state,b.state);
-    assert.deepEqual(a.shots,b.shots);assert.deepEqual(a.chaseBreaks,b.chaseBreaks);
+    assert.deepEqual(a.shots,b.shots);assert.deepEqual(a.chaseBreaks,b.chaseBreaks);assert.deepEqual(a.chaseReactions,b.chaseReactions);
 });
 
 test('a real death after the midpoint returns to that bank with no lingering projectiles or replayed collapses',t=>{

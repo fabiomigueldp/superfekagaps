@@ -17,9 +17,11 @@ test('the fictional rider prefers a red-star shirt in each local group, includin
         }
         b.people.forEach((p,i)=>{if(old[i]===null&&p.hitAt!==null&&!firstHits.some(id=>b.people[id].district===p.district))firstHits.push(i);});
     }
-    assert.deepEqual(aims,[1,2,5]);assert.deepEqual(firstHits,aims);
-    assert.equal(b.casualties,6);
-    assert.deepEqual(b.people.filter(p=>p.escaped).map(p=>p.clothes),['star-shirt','workcoat']);
+    assert.deepEqual(aims,[1,2,5]);assert.deepEqual(firstHits,[10,2,5]);
+    assert.ok(b.people[10].hitAt!<b.people[1].hitAt!,'a runner can cross the committed volley before the aimed person');
+    assert.equal(b.casualties,7);
+    assert.deepEqual(b.people.filter(p=>p.escaped&&!p.exitAtShelter).map(p=>p.clothes),['star-shirt','workcoat']);
+    assert.equal(b.people.filter(p=>p.escaped&&p.exitAtShelter).length,5);
 });
 
 test('each burst has twenty ticks of preparation and commits to one destination while its actor moves',()=>{
@@ -29,9 +31,9 @@ test('each burst has twenty ticks of preparation and commits to one destination 
         if(tick===90){lock=[b.targetX,b.targetY];startX=b.aimedPerson!.x;assert.equal(b.aimedPerson!.threatenedAt,90);}
         if(tick>=90)assert.deepEqual([b.targetX,b.targetY],lock);
         if(tick<110)assert.ok(!b.events.includes('distant-shot'));
-        if(b.events.includes('distant-shot')){shots++;assert.ok([110,118,126].includes(tick));}
+        if(b.events.includes('distant-shot')){shots++;assert.ok([110,116,122,128].includes(tick));}
     }
-    assert.equal(shots,3);assert.ok(b.aimedPerson!.x>startX);
+    assert.equal(shots,4);assert.ok(b.aimedPerson!.x>startX);
 });
 
 test('distant bullets use the posed silhouette, ignore inactive actors, and do not hit empty corners of a sweep',()=>{
@@ -105,7 +107,7 @@ test('gunfire reactions start after the sound and overlapping shots do not reset
         if(tick>=110&&tick<=112)assert.equal(reaction,0);
         if(tick===113)assert.ok(reaction>0&&reaction<.1);
         if(tick>=118&&tick<=126)assert.ok(reaction>.8,'the next pending sound must not erase an active response');
-        assert.ok(p.reactionTimes.length<=3);assert.ok(reaction>=0&&reaction<=1);
+        assert.ok(p.reactionTimes.length<=4);assert.ok(reaction>=0&&reaction<=1);
     }
 });
 

@@ -53,7 +53,7 @@ test('every visible distant shot originates at the articulated rifle, including 
         const muzzle={x:b.x+(rx+31*Math.cos(pose.aim))*s,y:(pose.y-BACKDROP_RIG.y+ry+31*Math.sin(pose.aim))*s};
         const shot=b.shots[b.shots.length-1];assert.ok(Math.hypot(shot.x-muzzle.x,shot.y-muzzle.y)<1e-7);
     }
-    assert.equal(shots,18);assert.equal(b.casualties,6);assert.equal(b.people.filter(p=>p.escaped).length,2);
+    assert.equal(shots,20);assert.equal(b.casualties,7);assert.equal(b.people.filter(p=>p.escaped).length,7);
 });
 
 test('civilians wait for their local alert, walk by real distance, and keep stopped poses stable',()=>{
@@ -66,7 +66,7 @@ test('civilians wait for their local alert, walk by real distance, and keep stop
 });
 
 test('scenic rubble reaches the native projectile after the full ground warning, without an extra collision',()=>{
-    const b=new HypotheticalModel('siege');for(let n=0;n<210;n++)b.update(dt,p,2);
+    const b=new HypotheticalModel('siege');for(let n=0;n<480;n++)b.update(dt,p,2);
     assert.equal(b.marks.length,1);const mark={...b.marks[0]},site=DESTRUCTION_SITES[0];
     for(let n=0;n<59;n++)b.update(dt,p,2);assert.equal(b.shots.length,0);
     b.update(dt,p,2);const stone=b.shots[0],point=rubbleApproach(site.x+site.width/2,mark.x,60);
@@ -75,7 +75,7 @@ test('scenic rubble reaches the native projectile after the full ground warning,
     for(const cy of [0,24,64]){
         const floor=backdropBaseline(cy),end=rubbleApproach(site.x+site.width/2,mark.x,60,floor+cy);
         assert.equal(end.y-cy,stone.y+stone.height/2-cy);
-        assert.ok(floor<170&&floor>=152,'the rear street remains visible through the full foreground jump');
+        assert.ok(floor<143&&floor>=128,'the rear street stays above the foreground garrison doorways');
     }
 });
 

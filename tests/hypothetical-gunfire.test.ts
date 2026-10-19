@@ -54,7 +54,7 @@ test('background masonry hits resolve on the street and retain their last visibl
         }
         assert.ok(b.casings.length<=6);assert.ok(b.impacts.length<=18);
     }
-    assert.ok(hits>=8);assert.equal(b.casualties,6);
+    assert.ok(hits>=8);assert.equal(b.casualties,7);
 });
 test('cancellation clears ignition as well as bullets and recoil returns fully between bursts',()=>{
     const b=new HypotheticalModel('duel');b.state='attack';b.attack='rifle';b.update(dt,player);

@@ -3,15 +3,15 @@ import type { Bystander,DistantShot } from './HypotheticalBackdrop';
 
 /** One pose supplies both the pixel body and the distant bullet silhouette. */
 export function bystanderPose(p:Bystander,tick:number){
-    const age=p.hitAt===null?-1:tick-p.hitAt,running=age<0&&p.velocity>.01;
-    const cycle=p.distance/13+p.color*.23,travel=smoothMotion(p.velocity/.3);
+    const age=p.hitAt===null?-1:tick-p.hitAt,running=age<0&&Math.abs(p.velocity)>.01;
+    const cycle=p.distance/13+p.color*.23,travel=smoothMotion(Math.abs(p.velocity)/.3);
     const foot=(offset:number)=>{
         const t=(cycle+offset)%1,swing=Math.max(0,(t-.6)/.4);
         return [running?(t<.6?3.5-7*t/.6:-3.5+7*smoothMotion(swing))*travel:0,running?-Math.sin(swing*Math.PI)*3*travel:0];
     };
     const crouch=p.stoppedAt===null?0:smoothMotion((tick-p.stoppedAt)/9);
     const pulse=(age:number,rise:number,hold:number,end:number)=>age<0?0:smoothMotion(age/rise)*(1-smoothMotion((age-hold)/(end-hold)));
-    const recoil=p.reactionTimes.reduce((value,at)=>Math.max(value,pulse(tick-at,8,14,32)),0);
+    const recoil=p.reactionTimes.reduce((value,at)=>Math.max(value,pulse(tick-at,p.exitAtShelter?10:8,14,32)),0);
     const alert=pulse(tick-p.alertAt,8,10,28),cover=Math.max(crouch,recoil,alert);
     const glance=(p.distance%72)-24;
     const gaze=Math.max(p.threatenedAt===null?0:pulse(tick-p.threatenedAt,6,12,24),p.fleeing?pulse(glance,5,18,24):0);
@@ -28,7 +28,10 @@ export function bystanderPose(p:Bystander,tick:number){
 
 export function bystanderBounds(p:Bystander,tick:number){
     const pose=bystanderPose(p,tick);
-    return {left:p.x-4,right:p.x+4,top:pose.headY+pose.bob,bottom:-1};
+    const depth=p.depth??0,heading=Math.sign(p.shelter-p.originX)||1;
+    const door=p.shelter-heading*8;
+    return {left:p.exitAtShelter&&heading<0?Math.max(p.x-4,door):p.x-4,
+        right:p.exitAtShelter&&heading>0?Math.min(p.x+4,door):p.x+4,top:pose.headY+pose.bob+depth,bottom:-1+depth};
 }
 
 /** A hit retains the crouch at contact; a sheltered actor never pops upright to fall. */
@@ -47,6 +50,7 @@ export function bystanderFall(p:Bystander,tick:number){
 export function bystanderIntersection(p:Bystander,tick:number,s:Pick<DistantShot,'px'|'py'|'x'|'y'>){
     if(p.escaped||p.hitAt!==null||tick<p.alertAt)return null;
     const bounds=bystanderBounds(p,tick);let first=0,last=1;
+    if(bounds.left>=bounds.right)return null;
     for(const [start,end,min,max] of [[s.px,s.x,bounds.left,bounds.right],[s.py,s.y,bounds.top,bounds.bottom]]){
         const delta=end-start;
         if(Math.abs(delta)<1e-9){if(start<min||start>max)return null;continue;}

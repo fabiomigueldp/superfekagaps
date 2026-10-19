@@ -376,7 +376,7 @@ test('landing waves have real danger and are removed when the rider exposes the 
 test('the garrison must be defeated before its gate opens, and rubble has a full second of warning',()=>{
     const b=new HypotheticalModel('siege');advance(b,500,2);assert.equal(b.wave,1);assert.equal(b.nextAct,false);
     assert.equal(b.route.cleared,0);assert.equal(b.route.gateHeight(0),224);
-    while(b.tick%210!==0)b.update(dt,p,2);
+    while((b.tick-270)%210!==0)b.update(dt,p,2);
     assert.equal(b.marks[0].born,b.tick);
     advance(b,59,2);assert.equal(b.shots.filter(s=>s.kind==='rubble').length,0);
     advance(b,1,2);assert.equal(b.shots.filter(s=>s.kind==='rubble').length,1);
@@ -390,10 +390,10 @@ test('every tall launcher has a platform, and background destruction travels thr
         assert.ok(stage.mechanisms.some(s=>s.kind==='support'&&loader.x>=s.x&&loader.x+22<=s.x+s.width&&loader.y===s.y));
     const b=new HypotheticalModel('siege');let breaks=0;
     for(let i=0;i<1200;i++){b.update(dt,p,1);if(b.events.includes('break')){breaks++;assert.ok(b.backgroundX+44>=52+SIEGE_SECTORS[b.destroyed-1].origin);}}
-    assert.equal(breaks,3);assert.equal(b.casualties,6);
+    assert.equal(breaks,3);assert.equal(b.casualties,7);
 });
 
-test('six background casualties follow visible bullets, two bystanders escape and neither can damage Feka',()=>{
+test('background casualties follow visible bullets, seven bystanders escape and neither can damage Feka',()=>{
     const b=new HypotheticalModel('siege');let shots=0,deaths=0;
     for(let i=0;i<1000;i++){
         const previous=b.casualties;b.update(dt,p,1);
@@ -405,12 +405,12 @@ test('six background casualties follow visible bullets, two bystanders escape an
         // Rubble can hurt Feka, but distant bullets are never registered as foreground shots.
         assert.ok(b.shots.every(s=>s.kind==='rubble'));
     }
-    assert.equal(deaths,6);assert.equal(b.casualties,6);assert.equal(shots,18);
+    assert.equal(deaths,7);assert.equal(b.casualties,7);assert.equal(shots,20);
     // The survivors now flee when the rider approaches their district, rather than
     // disappearing at the far end before that part of the street comes into view.
-    advance(b,200,1);assert.equal(b.backdrop.people.filter(p=>p.escaped).length,2);
+    advance(b,200,1);assert.equal(b.backdrop.people.filter(p=>p.escaped).length,7);
     const deathTimes=b.backdrop.people.filter(p=>p.hitAt!==null).map(p=>p.hitAt!);
-    assert.equal(new Set(deathTimes).size,6,'individual falls rather than an instantaneous casualty counter');
+    assert.equal(new Set(deathTimes).size,7,'individual falls rather than an instantaneous casualty counter');
     b.cancelAttacks();assert.equal(b.backdrop.shots.length,0);assert.equal(b.backdrop.muzzle,0);
 });
 

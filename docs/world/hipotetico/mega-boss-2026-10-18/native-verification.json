@@ -1,15 +1,15 @@
 {
   "inputOnly": true,
   "actorCameraClockEdits": false,
-  "frames": 7611,
-  "videoFrames": 3895,
+  "frames": 7881,
+  "videoFrames": 4030,
   "receipt": {
     "act": "duel",
     "phase": 3,
     "health": 0,
     "won": true,
     "deaths": 3,
-    "ticks": 7215
+    "ticks": 7485
   },
   "captures": [
     {
@@ -117,36 +117,20 @@
       "attack": "rifle"
     },
     {
-      "file": "siege-district-1.png",
-      "frame": 1302,
+      "file": "distant-gunfire.png",
+      "frame": 1392,
       "act": "siege",
       "state": "rest",
       "phase": 1,
       "attack": "rifle"
     },
     {
-      "file": "guard-pivot.png",
-      "frame": 1304,
+      "file": "bystander-fall.png",
+      "frame": 1426,
       "act": "siege",
-      "state": "walk",
+      "state": "rest",
       "phase": 1,
-      "attack": "minion"
-    },
-    {
-      "file": "guard-minion-walk.png",
-      "frame": 1306,
-      "act": "siege",
-      "state": "walk",
-      "phase": 1,
-      "attack": "minion"
-    },
-    {
-      "file": "guard-helmet-walk.png",
-      "frame": 1306,
-      "act": "siege",
-      "state": "walk",
-      "phase": 1,
-      "attack": "helmet"
+      "attack": "rifle"
     },
     {
       "file": "background-1-prepare.png",
@@ -155,22 +139,6 @@
       "state": "prepare",
       "phase": 1,
       "attack": "ram"
-    },
-    {
-      "file": "distant-gunfire.png",
-      "frame": 1448,
-      "act": "siege",
-      "state": "rest",
-      "phase": 1,
-      "attack": "rifle"
-    },
-    {
-      "file": "guard-helmet-stunned.png",
-      "frame": 1450,
-      "act": "siege",
-      "state": "stunned",
-      "phase": 1,
-      "attack": "helmet"
     },
     {
       "file": "background-1-strike.png",
@@ -189,44 +157,52 @@
       "attack": "ram"
     },
     {
-      "file": "bystander-fall.png",
-      "frame": 1474,
+      "file": "background-1-aftermath.png",
+      "frame": 1508,
+      "act": "siege",
+      "state": "march",
+      "phase": 1,
+      "attack": "ram"
+    },
+    {
+      "file": "siege-courtyard.png",
+      "frame": 1562,
       "act": "siege",
       "state": "rest",
       "phase": 1,
       "attack": "rifle"
     },
     {
-      "file": "siege-gate-1.png",
-      "frame": 1482,
-      "act": "siege",
-      "state": "rest",
-      "phase": 1,
-      "attack": "rifle"
-    },
-    {
-      "file": "guard-loader-rest.png",
-      "frame": 1550,
-      "act": "siege",
-      "state": "rest",
-      "phase": 1,
-      "attack": "loader"
-    },
-    {
-      "file": "siege-district-2.png",
-      "frame": 1552,
-      "act": "siege",
-      "state": "rest",
-      "phase": 1,
-      "attack": "rifle"
-    },
-    {
-      "file": "guard-charger-warning.png",
+      "file": "siege-district-1.png",
       "frame": 1572,
       "act": "siege",
-      "state": "warning",
+      "state": "rest",
       "phase": 1,
-      "attack": "charger"
+      "attack": "rifle"
+    },
+    {
+      "file": "guard-pivot.png",
+      "frame": 1574,
+      "act": "siege",
+      "state": "walk",
+      "phase": 1,
+      "attack": "minion"
+    },
+    {
+      "file": "guard-minion-walk.png",
+      "frame": 1576,
+      "act": "siege",
+      "state": "walk",
+      "phase": 1,
+      "attack": "minion"
+    },
+    {
+      "file": "guard-helmet-walk.png",
+      "frame": 1576,
+      "act": "siege",
+      "state": "walk",
+      "phase": 1,
+      "attack": "helmet"
     },
     {
       "file": "siege-1.png",
@@ -237,16 +213,96 @@
       "attack": "rifle"
     },
     {
+      "file": "guard-helmet-stunned.png",
+      "frame": 1720,
+      "act": "siege",
+      "state": "stunned",
+      "phase": 1,
+      "attack": "helmet"
+    },
+    {
+      "file": "siege-gate-1.png",
+      "frame": 1752,
+      "act": "siege",
+      "state": "rest",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "guard-loader-rest.png",
+      "frame": 1820,
+      "act": "siege",
+      "state": "rest",
+      "phase": 1,
+      "attack": "loader"
+    },
+    {
+      "file": "siege-district-2.png",
+      "frame": 1822,
+      "act": "siege",
+      "state": "rest",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "background-2-prepare.png",
+      "frame": 1832,
+      "act": "siege",
+      "state": "prepare",
+      "phase": 1,
+      "attack": "bite"
+    },
+    {
+      "file": "guard-charger-warning.png",
+      "frame": 1842,
+      "act": "siege",
+      "state": "warning",
+      "phase": 1,
+      "attack": "charger"
+    },
+    {
+      "file": "background-2-strike.png",
+      "frame": 1856,
+      "act": "siege",
+      "state": "strike",
+      "phase": 1,
+      "attack": "bite"
+    },
+    {
       "file": "guard-charger-attack.png",
-      "frame": 1594,
+      "frame": 1864,
       "act": "siege",
       "state": "attack",
       "phase": 1,
       "attack": "charger"
     },
     {
+      "file": "background-2-collapse.png",
+      "frame": 1870,
+      "act": "siege",
+      "state": "recover",
+      "phase": 1,
+      "attack": "bite"
+    },
+    {
+      "file": "siege-2.png",
+      "frame": 1882,
+      "act": "siege",
+      "state": "rest",
+      "phase": 1,
+      "attack": "rifle"
+    },
+    {
+      "file": "background-2-aftermath.png",
+      "frame": 1908,
+      "act": "siege",
+      "state": "march",
+      "phase": 1,
+      "attack": "bite"
+    },
+    {
       "file": "guard-minion-warning.png",
-      "frame": 1656,
+      "frame": 1926,
       "act": "siege",
       "state": "warning",
       "phase": 1,
@@ -254,7 +310,7 @@
     },
     {
       "file": "guard-minion-attack.png",
-      "frame": 1676,
+      "frame": 1946,
       "act": "siege",
       "state": "attack",
       "phase": 1,
@@ -262,71 +318,31 @@
     },
     {
       "file": "guard-resupply.png",
-      "frame": 1822,
+      "frame": 2092,
       "act": "siege",
       "state": "rest",
       "phase": 1,
       "attack": "loader"
     },
     {
-      "file": "background-2-prepare.png",
-      "frame": 1944,
-      "act": "siege",
-      "state": "prepare",
-      "phase": 1,
-      "attack": "bite"
-    },
-    {
-      "file": "background-2-strike.png",
-      "frame": 1968,
-      "act": "siege",
-      "state": "strike",
-      "phase": 1,
-      "attack": "bite"
-    },
-    {
       "file": "guard-minion-rest.png",
-      "frame": 1972,
+      "frame": 2242,
       "act": "siege",
       "state": "rest",
       "phase": 1,
       "attack": "minion"
     },
     {
-      "file": "background-2-collapse.png",
-      "frame": 1982,
-      "act": "siege",
-      "state": "recover",
-      "phase": 1,
-      "attack": "bite"
-    },
-    {
-      "file": "background-2-aftermath.png",
-      "frame": 2020,
-      "act": "siege",
-      "state": "march",
-      "phase": 1,
-      "attack": "bite"
-    },
-    {
       "file": "guard-charger-stunned.png",
-      "frame": 2058,
+      "frame": 2328,
       "act": "siege",
       "state": "stunned",
       "phase": 1,
       "attack": "charger"
     },
     {
-      "file": "siege-courtyard.png",
-      "frame": 2074,
-      "act": "siege",
-      "state": "rest",
-      "phase": 1,
-      "attack": "rifle"
-    },
-    {
       "file": "siege-gate-2.png",
-      "frame": 2090,
+      "frame": 2360,
       "act": "siege",
       "state": "rest",
       "phase": 1,
@@ -334,7 +350,7 @@
     },
     {
       "file": "siege-district-3.png",
-      "frame": 2348,
+      "frame": 2618,
       "act": "siege",
       "state": "rest",
       "phase": 1,
@@ -342,7 +358,7 @@
     },
     {
       "file": "background-3-prepare.png",
-      "frame": 2470,
+      "frame": 2740,
       "act": "siege",
       "state": "prepare",
       "phase": 1,
@@ -350,7 +366,7 @@
     },
     {
       "file": "background-3-strike.png",
-      "frame": 2494,
+      "frame": 2764,
       "act": "siege",
       "state": "strike",
       "phase": 1,
@@ -358,23 +374,15 @@
     },
     {
       "file": "background-3-collapse.png",
-      "frame": 2508,
+      "frame": 2778,
       "act": "siege",
       "state": "recover",
       "phase": 1,
       "attack": "stamp"
     },
     {
-      "file": "siege-aftermath.png",
-      "frame": 2518,
-      "act": "siege",
-      "state": "rest",
-      "phase": 1,
-      "attack": "rifle"
-    },
-    {
       "file": "siege-gate-3.png",
-      "frame": 2540,
+      "frame": 2810,
       "act": "siege",
       "state": "rest",
       "phase": 1,
@@ -382,7 +390,7 @@
     },
     {
       "file": "background-3-aftermath.png",
-      "frame": 2546,
+      "frame": 2816,
       "act": "siege",
       "state": "march",
       "phase": 1,
@@ -390,7 +398,7 @@
     },
     {
       "file": "duel-1-rifle-arrival.png",
-      "frame": 2666,
+      "frame": 2936,
       "act": "duel",
       "state": "arrival",
       "phase": 1,
@@ -398,7 +406,7 @@
     },
     {
       "file": "duel-gate.png",
-      "frame": 2768,
+      "frame": 3038,
       "act": "duel",
       "state": "rest",
       "phase": 1,
@@ -406,7 +414,7 @@
     },
     {
       "file": "duel-1-rifle-rest.png",
-      "frame": 2772,
+      "frame": 3042,
       "act": "duel",
       "state": "rest",
       "phase": 1,
@@ -414,7 +422,7 @@
     },
     {
       "file": "duel-1-rifle-tell.png",
-      "frame": 2804,
+      "frame": 3074,
       "act": "duel",
       "state": "tell",
       "phase": 1,
@@ -422,7 +430,7 @@
     },
     {
       "file": "duel-1-rifle-attack.png",
-      "frame": 2858,
+      "frame": 3128,
       "act": "duel",
       "state": "attack",
       "phase": 1,
@@ -430,7 +438,7 @@
     },
     {
       "file": "column-impact.png",
-      "frame": 2876,
+      "frame": 3146,
       "act": "duel",
       "state": "attack",
       "phase": 1,
@@ -438,7 +446,7 @@
     },
     {
       "file": "hot-rifle.png",
-      "frame": 2884,
+      "frame": 3154,
       "act": "duel",
       "state": "attack",
       "phase": 1,
@@ -446,7 +454,7 @@
     },
     {
       "file": "duel-1-rifle-recover.png",
-      "frame": 2976,
+      "frame": 3246,
       "act": "duel",
       "state": "recover",
       "phase": 1,
@@ -454,7 +462,7 @@
     },
     {
       "file": "open-window.png",
-      "frame": 2984,
+      "frame": 3254,
       "act": "duel",
       "state": "recover",
       "phase": 1,
@@ -462,7 +470,7 @@
     },
     {
       "file": "recovery-hit.png",
-      "frame": 3056,
+      "frame": 3326,
       "act": "duel",
       "state": "hurt",
       "phase": 1,
@@ -470,7 +478,7 @@
     },
     {
       "file": "duel-1-rifle-hurt.png",
-      "frame": 3064,
+      "frame": 3334,
       "act": "duel",
       "state": "hurt",
       "phase": 1,
@@ -478,7 +486,7 @@
     },
     {
       "file": "duel-1-charge-tell.png",
-      "frame": 3146,
+      "frame": 3416,
       "act": "duel",
       "state": "tell",
       "phase": 1,
@@ -486,7 +494,7 @@
     },
     {
       "file": "duel-1-charge-attack.png",
-      "frame": 3200,
+      "frame": 3470,
       "act": "duel",
       "state": "attack",
       "phase": 1,
@@ -494,7 +502,7 @@
     },
     {
       "file": "grounded-footfall.png",
-      "frame": 3202,
+      "frame": 3472,
       "act": "duel",
       "state": "attack",
       "phase": 1,
@@ -502,7 +510,7 @@
     },
     {
       "file": "rider-lean.png",
-      "frame": 3208,
+      "frame": 3478,
       "act": "duel",
       "state": "attack",
       "phase": 1,
@@ -510,7 +518,7 @@
     },
     {
       "file": "charge-brake.png",
-      "frame": 3230,
+      "frame": 3500,
       "act": "duel",
       "state": "attack",
       "phase": 1,
@@ -518,7 +526,7 @@
     },
     {
       "file": "duel-1-charge-recover.png",
-      "frame": 3250,
+      "frame": 3520,
       "act": "duel",
       "state": "recover",
       "phase": 1,
@@ -526,7 +534,7 @@
     },
     {
       "file": "duel-1-charge-hurt.png",
-      "frame": 3328,
+      "frame": 3598,
       "act": "duel",
       "state": "hurt",
       "phase": 1,
@@ -534,7 +542,7 @@
     },
     {
       "file": "duel-1-charge-rest.png",
-      "frame": 3378,
+      "frame": 3648,
       "act": "duel",
       "state": "rest",
       "phase": 1,
@@ -542,7 +550,7 @@
     },
     {
       "file": "duel-1-bite-tell.png",
-      "frame": 3410,
+      "frame": 3680,
       "act": "duel",
       "state": "tell",
       "phase": 1,
@@ -550,7 +558,7 @@
     },
     {
       "file": "duel-1-bite-attack.png",
-      "frame": 3464,
+      "frame": 3734,
       "act": "duel",
       "state": "attack",
       "phase": 1,
@@ -558,7 +566,7 @@
     },
     {
       "file": "strike-jaw.png",
-      "frame": 3476,
+      "frame": 3746,
       "act": "duel",
       "state": "attack",
       "phase": 1,
@@ -566,7 +574,7 @@
     },
     {
       "file": "duel-1-bite-recover.png",
-      "frame": 3514,
+      "frame": 3784,
       "act": "duel",
       "state": "recover",
       "phase": 1,
@@ -574,7 +582,7 @@
     },
     {
       "file": "duel-2-bite-hurt.png",
-      "frame": 3552,
+      "frame": 3822,
       "act": "duel",
       "state": "hurt",
       "phase": 2,
@@ -582,7 +590,7 @@
     },
     {
       "file": "duel-2-bite-roar.png",
-      "frame": 3602,
+      "frame": 3872,
       "act": "duel",
       "state": "roar",
       "phase": 2,
@@ -590,7 +598,7 @@
     },
     {
       "file": "roar-command.png",
-      "frame": 3612,
+      "frame": 3882,
       "act": "duel",
       "state": "roar",
       "phase": 2,
@@ -598,7 +606,7 @@
     },
     {
       "file": "duel-2-bite-rest.png",
-      "frame": 3706,
+      "frame": 3976,
       "act": "duel",
       "state": "rest",
       "phase": 2,
@@ -606,7 +614,7 @@
     },
     {
       "file": "duel-2-leap-tell.png",
-      "frame": 3738,
+      "frame": 4008,
       "act": "duel",
       "state": "tell",
       "phase": 2,
@@ -614,7 +622,7 @@
     },
     {
       "file": "reins-takeoff.png",
-      "frame": 3784,
+      "frame": 4054,
       "act": "duel",
       "state": "attack",
       "phase": 2,
@@ -622,7 +630,7 @@
     },
     {
       "file": "duel-2-leap-attack.png",
-      "frame": 3788,
+      "frame": 4058,
       "act": "duel",
       "state": "attack",
       "phase": 2,
@@ -630,7 +638,7 @@
     },
     {
       "file": "airborne-tuck.png",
-      "frame": 3804,
+      "frame": 4074,
       "act": "duel",
       "state": "attack",
       "phase": 2,
@@ -638,7 +646,7 @@
     },
     {
       "file": "landing-weight.png",
-      "frame": 3836,
+      "frame": 4106,
       "act": "duel",
       "state": "attack",
       "phase": 2,
@@ -646,7 +654,7 @@
     },
     {
       "file": "duel-2-rifle-tell.png",
-      "frame": 3902,
+      "frame": 4172,
       "act": "duel",
       "state": "tell",
       "phase": 2,
@@ -654,7 +662,7 @@
     },
     {
       "file": "combo-rifle-tell.png",
-      "frame": 3902,
+      "frame": 4172,
       "act": "duel",
       "state": "tell",
       "phase": 2,
@@ -662,7 +670,7 @@
     },
     {
       "file": "duel-2-rifle-attack.png",
-      "frame": 3950,
+      "frame": 4220,
       "act": "duel",
       "state": "attack",
       "phase": 2,
@@ -670,7 +678,7 @@
     },
     {
       "file": "reload-advance.png",
-      "frame": 4016,
+      "frame": 4286,
       "act": "duel",
       "state": "reload",
       "phase": 2,
@@ -678,7 +686,7 @@
     },
     {
       "file": "duel-2-rifle-reload.png",
-      "frame": 4018,
+      "frame": 4288,
       "act": "duel",
       "state": "reload",
       "phase": 2,
@@ -686,7 +694,7 @@
     },
     {
       "file": "rifle-reload.png",
-      "frame": 4020,
+      "frame": 4290,
       "act": "duel",
       "state": "reload",
       "phase": 2,
@@ -694,7 +702,7 @@
     },
     {
       "file": "rifle-locked.png",
-      "frame": 4036,
+      "frame": 4306,
       "act": "duel",
       "state": "reload",
       "phase": 2,
@@ -702,7 +710,7 @@
     },
     {
       "file": "duel-2-rifle-recover.png",
-      "frame": 4178,
+      "frame": 4448,
       "act": "duel",
       "state": "recover",
       "phase": 2,
@@ -710,7 +718,7 @@
     },
     {
       "file": "duel-2-rifle-hurt.png",
-      "frame": 4254,
+      "frame": 4524,
       "act": "duel",
       "state": "hurt",
       "phase": 2,
@@ -718,7 +726,7 @@
     },
     {
       "file": "duel-2-rifle-rest.png",
-      "frame": 4304,
+      "frame": 4574,
       "act": "duel",
       "state": "rest",
       "phase": 2,
@@ -726,7 +734,7 @@
     },
     {
       "file": "duel-2-bite-tell.png",
-      "frame": 4336,
+      "frame": 4606,
       "act": "duel",
       "state": "tell",
       "phase": 2,
@@ -734,7 +742,7 @@
     },
     {
       "file": "duel-2-bite-attack.png",
-      "frame": 4386,
+      "frame": 4656,
       "act": "duel",
       "state": "attack",
       "phase": 2,
@@ -742,7 +750,7 @@
     },
     {
       "file": "duel-2-rifle-arrival.png",
-      "frame": 4516,
+      "frame": 4786,
       "act": "duel",
       "state": "arrival",
       "phase": 2,
@@ -750,7 +758,7 @@
     },
     {
       "file": "duel-2-tail-tell.png",
-      "frame": 5350,
+      "frame": 5620,
       "act": "duel",
       "state": "tell",
       "phase": 2,
@@ -758,7 +766,7 @@
     },
     {
       "file": "combo-tail-tell.png",
-      "frame": 5352,
+      "frame": 5622,
       "act": "duel",
       "state": "tell",
       "phase": 2,
@@ -766,7 +774,7 @@
     },
     {
       "file": "duel-2-tail-attack.png",
-      "frame": 5400,
+      "frame": 5670,
       "act": "duel",
       "state": "attack",
       "phase": 2,
@@ -774,7 +782,7 @@
     },
     {
       "file": "tail-sweep.png",
-      "frame": 5408,
+      "frame": 5678,
       "act": "duel",
       "state": "attack",
       "phase": 2,
@@ -782,7 +790,7 @@
     },
     {
       "file": "duel-2-tail-recover.png",
-      "frame": 5486,
+      "frame": 5756,
       "act": "duel",
       "state": "recover",
       "phase": 2,
@@ -790,7 +798,7 @@
     },
     {
       "file": "duel-2-tail-hurt.png",
-      "frame": 5530,
+      "frame": 5800,
       "act": "duel",
       "state": "hurt",
       "phase": 2,
@@ -798,7 +806,7 @@
     },
     {
       "file": "duel-2-tail-rest.png",
-      "frame": 5580,
+      "frame": 5850,
       "act": "duel",
       "state": "rest",
       "phase": 2,
@@ -806,7 +814,7 @@
     },
     {
       "file": "duel-3-rifle-hurt.png",
-      "frame": 5982,
+      "frame": 6252,
       "act": "duel",
       "state": "hurt",
       "phase": 3,
@@ -814,7 +822,7 @@
     },
     {
       "file": "duel-3-rifle-roar.png",
-      "frame": 6032,
+      "frame": 6302,
       "act": "duel",
       "state": "roar",
       "phase": 3,
@@ -822,7 +830,7 @@
     },
     {
       "file": "duel-3-rifle-rest.png",
-      "frame": 6138,
+      "frame": 6408,
       "act": "duel",
       "state": "rest",
       "phase": 3,
@@ -830,7 +838,7 @@
     },
     {
       "file": "duel-3-charge-tell.png",
-      "frame": 6170,
+      "frame": 6440,
       "act": "duel",
       "state": "tell",
       "phase": 3,
@@ -838,7 +846,7 @@
     },
     {
       "file": "duel-3-charge-attack.png",
-      "frame": 6214,
+      "frame": 6484,
       "act": "duel",
       "state": "attack",
       "phase": 3,
@@ -846,7 +854,7 @@
     },
     {
       "file": "duel-3-charge-turn.png",
-      "frame": 6264,
+      "frame": 6534,
       "act": "duel",
       "state": "turn",
       "phase": 3,
@@ -854,7 +862,7 @@
     },
     {
       "file": "planted-pivot.png",
-      "frame": 6270,
+      "frame": 6540,
       "act": "duel",
       "state": "turn",
       "phase": 3,
@@ -862,7 +870,7 @@
     },
     {
       "file": "braced-turn.png",
-      "frame": 6272,
+      "frame": 6542,
       "act": "duel",
       "state": "turn",
       "phase": 3,
@@ -870,7 +878,7 @@
     },
     {
       "file": "return-footfall.png",
-      "frame": 6336,
+      "frame": 6606,
       "act": "duel",
       "state": "attack",
       "phase": 3,
@@ -878,7 +886,7 @@
     },
     {
       "file": "duel-3-charge-recover.png",
-      "frame": 6352,
+      "frame": 6622,
       "act": "duel",
       "state": "recover",
       "phase": 3,
@@ -886,7 +894,7 @@
     },
     {
       "file": "duel-3-charge-hurt.png",
-      "frame": 6426,
+      "frame": 6696,
       "act": "duel",
       "state": "hurt",
       "phase": 3,
@@ -894,7 +902,7 @@
     },
     {
       "file": "duel-3-charge-rest.png",
-      "frame": 6476,
+      "frame": 6746,
       "act": "duel",
       "state": "rest",
       "phase": 3,
@@ -902,7 +910,7 @@
     },
     {
       "file": "duel-3-rifle-tell.png",
-      "frame": 6508,
+      "frame": 6778,
       "act": "duel",
       "state": "tell",
       "phase": 3,
@@ -910,7 +918,7 @@
     },
     {
       "file": "duel-3-rifle-attack.png",
-      "frame": 6552,
+      "frame": 6822,
       "act": "duel",
       "state": "attack",
       "phase": 3,
@@ -918,7 +926,7 @@
     },
     {
       "file": "duel-3-rifle-reload.png",
-      "frame": 6636,
+      "frame": 6906,
       "act": "duel",
       "state": "reload",
       "phase": 3,
@@ -926,7 +934,7 @@
     },
     {
       "file": "rifle-pressure.png",
-      "frame": 6732,
+      "frame": 7002,
       "act": "duel",
       "state": "attack",
       "phase": 3,
@@ -934,7 +942,7 @@
     },
     {
       "file": "duel-3-leap-tell.png",
-      "frame": 6816,
+      "frame": 7086,
       "act": "duel",
       "state": "tell",
       "phase": 3,
@@ -942,7 +950,7 @@
     },
     {
       "file": "combo-leap-tell.png",
-      "frame": 6816,
+      "frame": 7086,
       "act": "duel",
       "state": "tell",
       "phase": 3,
@@ -950,7 +958,7 @@
     },
     {
       "file": "duel-3-leap-attack.png",
-      "frame": 6860,
+      "frame": 7130,
       "act": "duel",
       "state": "attack",
       "phase": 3,
@@ -958,7 +966,7 @@
     },
     {
       "file": "third-charge-tell.png",
-      "frame": 6976,
+      "frame": 7246,
       "act": "duel",
       "state": "tell",
       "phase": 3,
@@ -966,7 +974,7 @@
     },
     {
       "file": "duel-3-tail-tell.png",
-      "frame": 7314,
+      "frame": 7584,
       "act": "duel",
       "state": "tell",
       "phase": 3,
@@ -974,7 +982,7 @@
     },
     {
       "file": "duel-3-tail-attack.png",
-      "frame": 7358,
+      "frame": 7628,
       "act": "duel",
       "state": "attack",
       "phase": 3,
@@ -982,7 +990,7 @@
     },
     {
       "file": "duel-3-bite-tell.png",
-      "frame": 7444,
+      "frame": 7714,
       "act": "duel",
       "state": "tell",
       "phase": 3,
@@ -990,7 +998,7 @@
     },
     {
       "file": "combo-bite-tell.png",
-      "frame": 7446,
+      "frame": 7716,
       "act": "duel",
       "state": "tell",
       "phase": 3,
@@ -998,7 +1006,7 @@
     },
     {
       "file": "duel-3-bite-attack.png",
-      "frame": 7488,
+      "frame": 7758,
       "act": "duel",
       "state": "attack",
       "phase": 3,
@@ -1006,7 +1014,7 @@
     },
     {
       "file": "duel-3-bite-recover.png",
-      "frame": 7540,
+      "frame": 7810,
       "act": "duel",
       "state": "recover",
       "phase": 3,

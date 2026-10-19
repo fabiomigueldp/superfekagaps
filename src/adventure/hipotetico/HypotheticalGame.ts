@@ -16,14 +16,15 @@ import { drawHypotheticalBackground, drawHypotheticalCombat, drawHypotheticalGua
 import { HypotheticalAudio } from './HypotheticalAudio';
 import {chaseCollapsedEdge} from './HypotheticalChaseDetails';
 import { CHASE_WIDTH, CHASE_CHECKPOINT, CHASE_DISTRICTS } from './HypotheticalLayout';
+import {ARRIVAL,arrivalFade,arrivalDeployment} from './HypotheticalArrival';
 
 export class HypotheticalEncounter extends BossEncounter {
     readonly model: HypotheticalModel;
     livingGuards = 0;
     garrison: HypotheticalGuard[] = [];
     private collapsedColumns=0;
-    constructor(act: HypotheticalAct, health: number, cleared = 0, chaseStart=0) {
-        super('J1'); this.character = 'yasmin'; this.model = new HypotheticalModel(act, health, cleared,chaseStart); this.sync();
+    constructor(act: HypotheticalAct, health: number, cleared = 0, chaseStart=0, arrivalSeen=false) {
+        super('J1'); this.character = 'yasmin'; this.model = new HypotheticalModel(act, health, cleared,chaseStart,arrivalSeen); this.sync();
     }
     private sync() {
         const b=this.model,body=b.vulnerable?b.weakpoint:b.body;
@@ -38,6 +39,8 @@ export class HypotheticalEncounter extends BossEncounter {
         if(this.model.act==='siege')this.livingGuards=this.garrison.filter(e=>!e.dead&&e.wave===cleared+1).length;
         this.model.update(dt,p,this.livingGuards);this.sync();
         if(this.model.act==='siege'){
+            const entrance=o.bodies.find(body=>body.id==='arrival-gate');
+            if(entrance){entrance.height=this.model.arrival.height;entrance.active=entrance.height===0;}
             for(const e of this.garrison)e.awake=e.wave===this.model.wave&&this.model.route.active;
             if(this.model.route.cleared>cleared)o.barrels=[];
             for(const [i] of SIEGE_SECTORS.entries()){
@@ -56,10 +59,12 @@ export class HypotheticalEncounter extends BossEncounter {
                 for(let row=13;row<level.data.height;row++)level.data.tiles[row][this.collapsedColumns]=TileType.EMPTY;
                 this.collapsedColumns++;
             }
-            // Terraces are fixed to the bridge, so they lose both art and collision with their footing.
+            // The head breaks the first brace once Feka has cleared the whole deck.
+            // Losing the bank is still unconditional: standing still cannot preserve an unsupported terrace.
             for(let i=o.bodies.length-1;i>=0;i--){
                 const body=o.bodies[i];
-                if(body.id.startsWith('chase-terrace-')&&body.x<edge*16){
+                const struck=this.model.x+56>=body.x+5&&p.x>=body.x+body.width+10;
+                if(body.id.startsWith('chase-terrace-')&&(body.x<edge*16||struck)){
                     if(this.model.tick>1){
                         this.model.terraceDebris.push({x:body.x,y:body.y,width:body.width,born:this.model.tick});
                         if(this.model.terraceDebris.length>4)this.model.terraceDebris.shift();
@@ -86,6 +91,7 @@ export class HypotheticalGame extends WorldGame {
     private siegeCheckpoint=0;
     private chaseCheckpoint=0;
     private transitionTicks=0;
+    private arrivalSeen=false;
     private attemptDeaths=0;
     private totalTicks=0;
     private exiting=false;
@@ -107,7 +113,15 @@ export class HypotheticalGame extends WorldGame {
             this.art.terrain=(c,l,_island,cx,cy)=>drawHypotheticalTerrain(c,l,this.fight,cx,cy);
             this.art.objects=(c,o,cx,cy)=>drawHypotheticalObjects(c,o,this.fight,cx,cy);
             this.art.boss=(c,_b,cx,cy)=>drawHypotheticalCombat(c,this.fight,cx,cy,this.renderer.reducedMotion);
-            this.art.foe=(c,e,cx,cy)=>drawHypotheticalGuard(c,e,cx,cy,this.renderer.reducedMotion);
+            this.art.foe=(c,e,cx,cy)=>{
+                const deployment=this.act==='siege'?arrivalDeployment(this.fight.tick,this.fight.arrivalSkipped):1;
+                if(deployment===0)return;
+                if(deployment<1){
+                    c.save();c.beginPath();c.rect(e.x-cx-8,e.y+e.height-cy-30*deployment+1,e.width+16,30*deployment+2);c.clip();
+                    drawHypotheticalGuard(c,e,cx,cy,this.renderer.reducedMotion);c.restore();return;
+                }
+                drawHypotheticalGuard(c,e,cx,cy,this.renderer.reducedMotion);
+            };
             this.tutorial.observe=()=>{};
             this.load('hipotetico-chase');
             this.listen(window,'keydown',e=>{
@@ -128,6 +142,7 @@ export class HypotheticalGame extends WorldGame {
     get fight(){return this.encounter.model;}
     private get encounterHint(){
         const b=this.fight;
+        if(this.act==='siege'&&!b.arrival.ready)return b.tick<136?'REFUGIO! A GRADE PROTEGE A PASSAGEM':b.tick<225?'O ARSENAL ESTA CEDENDO!':'PREPARE-SE: A GRADE VAI ABRIR';
         if(this.act!=='siege'||b.marks.length||!b.route.active||b.nextAct)return b.hint;
         const patrol=this.foes.filter(e=>e instanceof HypotheticalGuard&&e.awake&&!e.dead);
         const visible=patrol.filter(e=>e.x+e.width>this.camera.x+4&&e.x<this.camera.x+316);
@@ -155,21 +170,23 @@ export class HypotheticalGame extends WorldGame {
     }
     get resultReady(){return this.fight.won&&this.fight.age>=60;}
     get receipt(){return {act:this.act,phase:this.fight.phaseNumber,health:this.fight.health,won:this.fight.won,deaths:this.attemptDeaths,ticks:this.totalTicks};}
-    replay(){this.act='chase';this.retryHealth=HYPOTHETICAL.health;this.totalTicks=0;this.attemptDeaths=0;this.chaseCheckpoint=0;this.siegeCheckpoint=0;this.load('hipotetico-chase');}
+    replay(){this.act='chase';this.arrivalSeen=false;this.retryHealth=HYPOTHETICAL.health;this.totalTicks=0;this.attemptDeaths=0;this.chaseCheckpoint=0;this.siegeCheckpoint=0;this.load('hipotetico-chase');}
     override load(_id:string,resume=false,_custom?:AdventureStage) {
         if(this.isDisposed)return;
         this.weaponAudio?.cancel();
-        if(!resume){this.act='chase';this.retryHealth=HYPOTHETICAL.health;this.siegeCheckpoint=0;this.chaseCheckpoint=0;}
+        if(!resume){this.act='chase';this.arrivalSeen=false;this.retryHealth=HYPOTHETICAL.health;this.siegeCheckpoint=0;this.chaseCheckpoint=0;}
         const stage=hypotheticalStage(this.act);
         if(this.act==='chase'&&this.chaseCheckpoint)stage.level.playerSpawn.x=this.chaseCheckpoint/16;
         super.load(stage.id,false,stage);
-        this.encounter=new HypotheticalEncounter(this.act,this.retryHealth,this.siegeCheckpoint,this.chaseCheckpoint);this.boss=this.encounter;
+        this.encounter=new HypotheticalEncounter(this.act,this.retryHealth,this.siegeCheckpoint,this.chaseCheckpoint,this.arrivalSeen);this.boss=this.encounter;
         if(this.act==='siege'){
             this.foes=SIEGE_SECTORS.flatMap((s,i)=>i<this.siegeCheckpoint?[]:siegeGarrison(i).map(spec=>
                 new HypotheticalGuard(spec,i+1,()=>this.foes,{left:s.origin+12,right:s.gate})));
             this.encounter.garrison=this.foes as HypotheticalGuard[];
             for(const e of this.encounter.garrison)e.awake=false;
             this.player.data.position.x=this.fight.route.checkpoint;
+            const entrance=this.objects.bodies.find(body=>body.id==='arrival-gate');
+            if(entrance){entrance.height=this.fight.arrival.height;entrance.active=entrance.height===0;}
             for(const [i] of SIEGE_SECTORS.entries()){
                 const gate=this.objects.bodies.find(b=>b.id===`siege-gate-${i}`);
                 if(gate){gate.height=this.fight.route.gateHeight(i);gate.active=gate.height===0;}
@@ -198,6 +215,11 @@ export class HypotheticalGame extends WorldGame {
         if(this.player.data.isDead||this.state!=='playing')return;
         const steps=Math.max(0,this.fight.tick-before);
         if(!steps)return;
+        if(this.act==='siege'&&this.fight.tick>=ARRIVAL.release)this.arrivalSeen=true;
+        if(this.act==='siege'&&!this.fight.arrivalSkipped){
+            if(before<246&&this.fight.tick>=246)this.audio.sfx('switch');
+            if(before<ARRIVAL.release&&this.fight.tick>=ARRIVAL.release)this.audio.sfx('checkpoint');
+        }
         if(this.act==='siege')for(const e of this.foes)if(e instanceof HypotheticalGuard&&!e.dead){
             const at=Math.max(e.impactAt,e.vaultLandedAt);
             if(Number.isFinite(at)&&at>(this.guardImpacts.get(e)??-Infinity)){
@@ -212,7 +234,7 @@ export class HypotheticalGame extends WorldGame {
             this.siegeCheckpoint=this.fight.route.cleared;this.audio.sfx('checkpoint');
         }else if(this.act==='siege'&&this.fight.route.releasedThisTick)this.audio.sfx('switch');
         for(const event of this.fight.events){
-            if(event==='shot'||event==='impact'||event==='splash'||event==='reload'||event==='distant-shot'||event==='distant-hit')this.weaponAudio.play(event);
+            if(event==='shot'||event==='impact'||event==='splash'||event==='collapse-water'||event==='debris-land'||event==='reload'||event==='distant-shot'||event==='distant-hit')this.weaponAudio.play(event);
             if(event==='step'&&this.fight.tick%3===0)this.audio.sfx('land');
             if(event==='break'){
                 if(this.act==='siege'){
@@ -233,9 +255,9 @@ export class HypotheticalGame extends WorldGame {
         workshopPanel(c,0,0,320,31,false,true);
         pixelText(c,'FLAVIO HIPOTETICO',7,5,WORKSHOP_UI.paper);
         const district=Math.min(3,Math.floor(this.player.data.position.x/1120));
-        pixelText(c,this.act==='chase'?`${district+1}/4 ${CHASE_DISTRICTS[district].name}`:this.act==='siege'?`${b.route.entered+1}/3 ${b.route.currentSector.name}`:`FASE ${b.phaseNumber}/3`,121,5,WORKSHOP_UI.light);
+        pixelText(c,this.act==='chase'?`${district+1}/4 ${CHASE_DISTRICTS[district].name}`:this.act==='siege'&&!b.arrival.ready?'CHEGADA AO ARSENAL':this.act==='siege'?`${b.route.entered+1}/3 ${b.route.currentSector.name}`:`FASE ${b.phaseNumber}/3`,121,5,WORKSHOP_UI.light);
         if(this.act==='chase')for(let i=0;i<4;i++){c.fillStyle=i<=district?'#dfad56':'#435969';c.fillRect(244+i*6,6,4,5);}
-        if(this.act==='siege'){
+        if(this.act==='siege'&&b.arrival.ready){
             const i=b.route.entered,total=SIEGE_SECTORS[i].guards.length,left=b.route.remaining[i];
             pixelText(c,`${left}/${total}`,251,5,left?'#edc586':'#99d6bd');
             for(let j=0;j<total;j++){
@@ -266,12 +288,14 @@ export class HypotheticalGame extends WorldGame {
                 drawWorldResult(c,'HIPOTESE DERRUBADA','FLAVIO BOLSONARO HIPOTETICO',`${Math.floor(this.totalTicks/60)}S · ${this.attemptDeaths} QUEDAS`,'ENTER: REJOGAR · ESC: MENU');
                 workshopButton(c,'REJOGAR',80,151,160,22,true);
                 this.renderer.present();
-            }else if(b.tick<110&&(this.act!=='siege'||this.siegeCheckpoint===0)){
+            }else if(b.tick<(this.act==='siege'?54:110)&&(this.act!=='siege'||!b.arrivalSkipped)){
                 if(this.act==='chase')pixelText(c,'FLAVIO BOLSONARO HIPOTETICO',160,60,'#ffedbf',1,'center');
-                pixelText(c,this.act==='chase'?'I · A PONTE DO IMPOSSIVEL':this.act==='siege'?'II · A TRAVESSIA DO ARSENAL':'III · O ULTIMO LACRE',160,72,'#ffedbf',1,'center');
+                pixelText(c,this.act==='chase'?'I · A PONTE DO IMPOSSIVEL':this.act==='siege'?'II · A TRAVESSIA DO ARSENAL':'III · O ULTIMO LACRE',160,this.act==='siege'?39:72,'#ffedbf',1,'center');
                 if(this.act==='chase')pixelText(c,'FANTASIA SATIRICA',160,83,'#d2c6b1',1,'center');
                 this.renderer.present();
             }
+            const fade=arrivalFade(this.act,b.tick,this.transitionTicks,b.arrivalSkipped);
+            if(fade>0){c.save();c.globalAlpha=fade;c.fillStyle='#122630';c.fillRect(0,0,320,180);c.restore();this.renderer.present();}
         }
         const status=`Flávio Bolsonaro Hipotético. ${this.act==='chase'?'Perseguição':this.act==='siege'?`Cerco, ${b.route.currentSector.name}, ${b.route.remaining[b.route.entered]} de ${b.route.currentSector.guards.length} guardas restantes`:`Confronto, fase ${b.phaseNumber}`}. ${this.state==='paused'?'Pausado.':this.encounterHint} ${b.health} lacres. Setas: mover; Shift: correr; Espaço: pular; baixo no ar: sentada; Esc: pausa; R: retomar o trecho.`;
         if(this.status.textContent!==status)this.status.textContent=status;
