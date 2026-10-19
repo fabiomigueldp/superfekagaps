@@ -416,8 +416,10 @@ export class HypotheticalModel {
         if(backdropTick>this.backdrop.tick+1){this.backdrop.cancel();this.backdrop.x=devastationAt(backdropTick).x;}
         if(advanced)this.backdrop.update(backdropTick);
         else {this.backdrop.velocity=0;this.backdrop.events=[];}
-        this.backgroundX = this.backdrop.x;
+        this.backdrop.aftermath.update(this.backdrop.tick,this.backdrop.x,player.x);
+        this.backgroundX = this.backdrop.displayX;
         if(advanced)this.events.push(...this.backdrop.events);
+        this.events.push(...this.backdrop.aftermath.events);
         this.destroyed=this.backdrop.breaches.filter(t=>t>=0).length;
         if(advanced&&this.backdrop.events.includes('break'))this.backgroundStamp=120;
         const combatTick=this.arrivalTime-(this.arrivalSkipped?0:ARRIVAL.release);

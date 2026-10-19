@@ -5,6 +5,7 @@ import { bystanderIntersection } from './HypotheticalBystanderMotion';
 import { gunRecoil, type GunImpact } from './HypotheticalGunfire';
 import {OPENING} from './HypotheticalOpening';
 import {scenicLandingCues} from './HypotheticalScenicMotion';
+import {HypotheticalAftermath} from './HypotheticalAftermath';
 
 /** All positions are native pixels, relative to the distant street's baseline. */
 export const BACKDROP_RIG = { width: 192, height: 160, scale: .6875, x: 92, y: 148 } as const;
@@ -34,6 +35,8 @@ export class HypotheticalBackdrop {
     blood:BloodContact[]=[];
     footfalls:Array<{x:number;born:number}>=[];
     readonly people: Bystander[];
+    readonly aftermath = new HypotheticalAftermath();
+    get displayX(){return this.aftermath.active?this.aftermath.x:this.x;}
     constructor(readonly wide = false) {
         const clothes:BystanderClothes[]=['workcoat','star-shirt','star-shirt','scarf','satchel','star-shirt','star-shirt','workcoat'];
         this.people = [224, 262, 224, 262, 224, 262, 94, 118].map((x, i) => {

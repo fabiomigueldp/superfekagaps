@@ -123,20 +123,20 @@ function belongings(c:CanvasRenderingContext2D,p:Bystander,tick:number,base:numb
 }
 
 /** Articulated street actors share the game's pixel grid and retain their clothing as they fall. */
-export function drawBystanders(output:CanvasRenderingContext2D,b:HypotheticalBackdrop,street:number,reduced:boolean,openingOnly=false,actors?:readonly Bystander[]){
+export function drawBystanders(output:CanvasRenderingContext2D,b:HypotheticalBackdrop,street:number,reduced:boolean,openingOnly=false,actors?:readonly Bystander[],tick=b.tick){
     if(!openingOnly&&!actors)drawBlood(output,b,street,reduced,false);
     for(const p of [...(actors??b.people)].sort((a,b)=>(a.depth??0)-(b.depth??0))){
-        const behindDino=Boolean(p.opening)||(p.exitAtShelter===true&&p.shelter===116&&b.tick>0&&b.tick<OPENING.join);
+        const behindDino=Boolean(p.opening)||(p.exitAtShelter===true&&p.shelter===116&&tick>0&&tick<OPENING.join);
         if(!actors&&behindDino!==openingOnly)continue;
         const base=street+(p.depth??0);
         const site=p.district===0?(p.originX>320?1:0):p.district+1;
-        belongings(output,p,b.tick,p.opening?street:base,b.breaches[site],reduced);
-        if(p.escaped||p.capturedAt!==undefined&&b.tick>=OPENING.clamp)continue;
+        belongings(output,p,tick,p.opening?street:base,b.breaches[site],reduced);
+        if(p.escaped||p.capturedAt!==undefined&&tick>=OPENING.clamp)continue;
         const c=actorContext(output,p);
-        const x=p.x,pose=bystanderPose(p,b.tick),age=pose.age,skin=SKIN[p.color];
+        const x=p.x,pose=bystanderPose(p,tick),age=pose.age,skin=SKIN[p.color];
         const cloth=WARDROBE[p.clothes],ink='#485f62',shoe='#89978a';
         if(age>=0){
-            const motion=bystanderFall(p,b.tick),{angle,height,headTop}=motion,fall=angle/(Math.PI/2);
+            const motion=bystanderFall(p,tick),{angle,height,headTop}=motion,fall=angle/(Math.PI/2);
             oval(c,x-6,base-1,15+fall*14,2,'#6c8076');
             const hipX=x+motion.hipX,hipY=base+motion.hipY,cos=Math.cos(angle),sin=Math.sin(angle);
             const point=(u:number,v:number)=>[hipX+u*cos-v*sin,hipY+u*sin+v*cos];
