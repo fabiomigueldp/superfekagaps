@@ -46,7 +46,7 @@ export class HypotheticalTowerSearch {
     }
     private random(){this.seed=(Math.imul(this.seed,1664525)+1013904223)>>>0;return this.seed/4294967296;}
     get part(){return this.physics.bodies['roof-left'];}
-    get ready(){return this.age<0&&this.physics.age>150&&this.part.sleeping;}
+    get ready(){return this.age<0&&this.physics.age>135&&(this.part.sleeping||this.physics.age>185);}
     get done(){return this.age>=TOWER_SEARCH.end;}
     get active(){return this.age>=0&&!this.done;}
     get stance(){return this.age<0?this.origin+this.part.x+reach:this.fromX;}

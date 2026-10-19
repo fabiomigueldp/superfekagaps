@@ -50,7 +50,7 @@ export class HypotheticalBackdrop {
                 escaped: false, fleeing: i >= 6, hitAt: null, color: i % 4,distance:0,velocity:0,
                 district:Math.min(2,Math.floor(i/2)),clothes:clothes[i],stoppedAt:null,threatenedAt:null,startledAt:null,
                 originX:x,reactionTimes:[],
-                alertAt:i<6?SCENIC_STARTS[district]+38+i%2*8:1050+(i-6)*12,speed:i<6?.5:(i===6?.82:.94) };
+                alertAt:i<6?SCENIC_STARTS[district]+38+i%2*8:arrivalBeat(1050+(i-6)*12),speed:i<6?.5:(i===6?.82:.94) };
         });
         // A courtyard crowd has two real exits, staggered reactions and distinct silhouettes.
         // These runners share the same shot geometry as the rest of the street.

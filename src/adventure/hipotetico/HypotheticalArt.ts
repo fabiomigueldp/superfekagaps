@@ -16,6 +16,7 @@ import {drawTowerEffects} from './HypotheticalTowerArt';
 import {drawLauncher,drawLauncherHands} from './HypotheticalLauncherArt';
 import type {LauncherPose} from './HypotheticalTower';
 import type {PlantedFeet} from './HypotheticalAftermathFooting';
+import {drawHelicopterRear,drawHelicopterEffects} from './HypotheticalHelicopterArt';
 import { drawHypotheticalScenery, drawHypotheticalDestruction, drawHypotheticalMasonry, drawHypotheticalFittings } from './HypotheticalScenery';
 import { drawHypotheticalCanister } from './HypotheticalGuardArt';
 export { drawHypotheticalGuard } from './HypotheticalGuardArt';
@@ -387,19 +388,23 @@ export function distantRiderPose(action:HypotheticalBackdrop,reduced=false):Dino
         return {
             x:r.x,y:r.y+pose.lift/r.scale,...pose,
             daze:0,armor:9,flash:false,defeated:false,distant:true,heldDebris:action.aftermath.heldDebris,
-            launcher:action.aftermath.district===3?action.aftermath.launcherPose:undefined,
+            launcher:action.aftermath.district===3?action.aftermath.launcherPose:
+                {draw:0,rifleLower:0,reach:0,aim:-.12,recoil:0,fired:action.helicopter.launchAt>=0},
             carriedBystander:s.carried,gore:s.age>=242?(s.active?1:.85):0,
         };
     }
-    return {x:r.x,y:r.y+m.lift/r.scale,facing:1,gait:action.travel/(r.scale*11),stride:action.stride,
+    const pose:DinosaurPose={x:r.x,y:r.y+m.lift/r.scale,facing:1,gait:action.travel/(r.scale*11),stride:action.stride,
         breath:0,bow:0,jaw:m.jaw,neckDrop:m.neckDrop,recoil:action.recoil,aim:action.angle,tail:m.tail,
         compression:m.compression,tuck:m.tuck,reload:0,brace:m.brace,heat:action.heat,
         cloth:reduced?0:Math.min(4,Math.abs(action.velocity)*1.8)+m.force*1.5,
         riderDrop:m.riderDrop,riderLean:m.riderLean,rein:m.rein,lookBack:m.lookBack,
-        launcher:m.district===3?{draw:0,rifleLower:0,reach:0,aim:-.12,recoil:0,fired:action.aftermath.tower.destroyed}:undefined,
+        launcher:{draw:0,rifleLower:0,reach:0,aim:-.12,recoil:0,fired:m.district===3?action.aftermath.tower.destroyed:action.helicopter.launchAt>=0},
         blink:false,daze:0,armor:9,flash:false,defeated:false,distant:true,focus:m.force||action.muzzle?1:0,
         gore:m.district===0&&action.tick>=63?(action.tick<110?1:.75):0,
         voice:m.district===0&&action.tick>=63&&action.tick<90?.7:m.local>=m.impactTick&&m.local<m.impactTick+16?.65*(1-smoothMotion((m.local-m.impactTick-5)/11)):0};
+    if(action.helicopter.active)return {...pose,...action.helicopter.body,stride:0,recoil:0,heat:0,
+        cloth:reduced?0:.5+Math.sin(action.helicopter.age/19)*.35,launcher:action.helicopter.launcher};
+    return pose;
 }
 const backgroundRigs=new WeakMap<CanvasRenderingContext2D,{canvas:HTMLCanvasElement;c:CanvasRenderingContext2D}>();
 function drawDistantRider(c:CanvasRenderingContext2D,b:HypotheticalModel,base:number,reduced:boolean){
@@ -431,6 +436,7 @@ export function drawHypotheticalBackground(c:CanvasRenderingContext2D,b:Hypothet
     if(b.act==='siege'){
         const base=backdropBaseline(cy);
         c.save();c.translate(-Math.round(cx),0);
+        drawHelicopterRear(c,b.backdrop.helicopter,base,reduced);
         drawBystanders(c,b.backdrop,base,reduced,true);
         drawAftermathYards(c,b.backdrop,base,cx,reduced);
         drawTowerSearchActors(c,b.backdrop,base,reduced);
@@ -440,6 +446,7 @@ export function drawHypotheticalBackground(c:CanvasRenderingContext2D,b:Hypothet
         drawHypotheticalDestruction(c,b,base,cy,reduced);
         drawAftermathEffects(c,b.backdrop.aftermath,base,reduced);
         drawTowerEffects(c,b.backdrop.aftermath.tower,base,reduced);
+        drawHelicopterEffects(c,b.backdrop.helicopter,base,reduced);
         drawTowerSearchDust(c,b.backdrop,base,reduced);
         c.restore();
     }

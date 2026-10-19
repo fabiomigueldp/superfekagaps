@@ -159,12 +159,18 @@ export class HypotheticalAftermath {
     private planTower(){
         if(this.district!==3||this.tower.search.done)return false;
         const searching=this.tower.destroyed;
-        const stance=searching?this.tower.search.stance:Math.min(this.origin+250,this.viewX+246);
+        const stance=searching?this.tower.search.stance:Math.max(BASTION_TOWER.x+76,Math.min(this.origin+236,this.viewX+228));
         const ready=searching?this.tower.search.ready:this.tower.available;
         if(ready&&(searching?this.searchFramed(stance):this.towerFramed(stance))){
-            this.targetProp=-1;this.roamThen=searching?'tower-search':'tower';this.destination=stance;this.planView=this.viewX;
-            this.roamTicks=Math.max(48,Math.min(144,Math.ceil(Math.abs(this.destination-this.x)*1.45)));
-            this.orient(Math.sign(this.destination-this.x)||this.facing,'roam');this.destinationFacing=-1;
+            const next=searching?'tower-search':'tower';
+            this.targetProp=-1;this.roamThen=next;this.destination=stance;this.planView=this.viewX;
+            const distance=Math.abs(this.destination-this.x);
+            if(distance<6){
+                this.x=stance;this.orient(-1,next);
+            }else{
+                this.roamTicks=Math.max(24,Math.min(108,Math.ceil(distance*1.2)));
+                this.orient(Math.sign(this.destination-this.x)||this.facing,'roam');this.destinationFacing=-1;
+            }
         }else if(this.phase!=='tower-await'){
             this.targetProp=-1;this.enter('tower-await');
         }
@@ -260,13 +266,13 @@ export class HypotheticalAftermath {
             dx:this.facing*Math.cos(p.aim),dy:Math.sin(p.aim)};
     }
     private towerFramed(x=this.x){
-        return x>BASTION_TOWER.x+84&&this.inView(x-60,12)&&this.inView(x+60,12)
-            &&this.inView(BASTION_TOWER.x+BASTION_TOWER.left,12)&&this.inView(BASTION_TOWER.x+BASTION_TOWER.right,12);
+        const margin=this.phase==='tower'?-48:-20;
+        return x>=BASTION_TOWER.x+68&&this.inView(x,margin)&&this.inView(BASTION_TOWER.x,margin);
     }
     private searchFramed(x=this.x){
-        const s=this.tower.search,target=s.age<TOWER_SEARCH.release?BASTION_TOWER.x+s.part.x-20:s.person.x-14;
-        return this.inView(x-64,12)&&this.inView(x+60,12)
-            &&this.inView(target,12);
+        const s=this.tower.search,target=s.age<TOWER_SEARCH.release?BASTION_TOWER.x+s.part.x-12:s.person.x-8;
+        const margin=this.phase==='tower-search'?-48:-20;
+        return this.inView(x,margin)&&this.inView(target,margin);
     }
     get launcherPose(){const p=this.pose(false);return towerLauncherPose(this.tower,p,p.lift,this.x,this.facing);}
     get launcherBarrel(){
@@ -405,7 +411,7 @@ export class HypotheticalAftermath {
             else this.plan();
         }
         // A large camera move redirects the next walk, never a committed strike.
-        if(this.phase==='roam'&&Math.abs(this.viewX-this.planView)>72)this.plan();
+        if(this.phase==='roam'&&this.roamThen!=='tower'&&this.roamThen!=='tower-search'&&Math.abs(this.viewX-this.planView)>72)this.plan();
     }
 
     update(storyTick:number, storyX:number, playerX:number){
@@ -480,7 +486,7 @@ export class HypotheticalAftermath {
         const center=yard.origin+272;
         const visible=(x:number,margin=28)=>this.inView(x,margin);
         if(!this.active){
-            if(storyTick-SCENIC_STARTS[district]<yard.start || !visible(storyX,12))return;
+            if(storyTick-SCENIC_STARTS[district]<yard.start || !visible(storyX,-16)&&!(district===3&&visible(BASTION_TOWER.x,-20)))return;
             this.active=true; this.x=storyX; this.velocity=0; this.facing=1; this.travel=0; this.lastStep=0;
             this.enter('approach');
             if(district===3){this.plan();return;}

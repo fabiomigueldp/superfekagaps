@@ -41,15 +41,16 @@ export class HypotheticalTower {
     private rubbleCueAt=-100;
     private trailGap=0;
     private trailSeed=0;
+    private unframed=0;
     get destroyed(){return this.impactAt>=0;}
     get impactAge(){return this.destroyed?this.tick-this.impactAt:-1;}
     get done(){return this.age>=0&&(this.abortedAt>=0?this.age-this.abortedAt>=60:this.age>=TOWER_SEQUENCE.end);}
     get active(){return this.age>=0&&!this.done;}
     get available(){return !this.destroyed&&this.launchAt<0&&!this.active&&this.tick>=this.retryAt;}
-    begin(){if(!this.available)return;this.age=0;this.abortedAt=-1;this.retract=null;}
+    begin(){if(!this.available)return;this.age=0;this.abortedAt=-1;this.retract=null;this.unframed=0;}
     private abort(){
         if(this.abortedAt>=0||this.launchAt>=0)return;
-        this.retract=this.motion;this.abortedAt=this.age;this.retryAt=this.tick+210;
+        this.retract=this.motion;this.abortedAt=this.age;this.retryAt=this.tick+48;
     }
     get motion():LauncherPose {
         const a=this.age;
@@ -78,7 +79,8 @@ export class HypotheticalTower {
         this.events=[];this.tick++;this.search.advance();
         if(this.active){
             this.age++;
-            if(!framed&&this.age<=TOWER_SEQUENCE.fire)this.abort();
+            this.unframed=framed?0:this.unframed+1;
+            if(this.unframed>=36&&this.age<=TOWER_SEQUENCE.fire)this.abort();
             if(this.abortedAt<0){
                 if(this.age===38||this.age===104)this.events.push('distant-metal');
                 if(this.age===TOWER_SEQUENCE.fire){

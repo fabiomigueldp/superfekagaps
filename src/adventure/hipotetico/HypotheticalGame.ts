@@ -20,6 +20,7 @@ import { HypotheticalAudio } from './HypotheticalAudio';
 import {chaseCollapsedEdge} from './HypotheticalChaseDetails';
 import { CHASE_WIDTH, CHASE_CHECKPOINT, CHASE_DISTRICTS } from './HypotheticalLayout';
 import {ARRIVAL,arrivalFade,arrivalDeployment,arrivalLookAhead} from './HypotheticalArrival';
+import {arrivalStoryTime,HELICOPTER_SEQUENCE} from './HypotheticalHelicopterTiming';
 
 export class HypotheticalEncounter extends BossEncounter {
     readonly model: HypotheticalModel;
@@ -150,9 +151,12 @@ export class HypotheticalGame extends WorldGame {
         const b=this.fight;
         if(this.act==='siege'&&!b.arrival.ready){
             const t=b.arrivalTime;
+            if(b.backdrop.helicopter.active)return b.backdrop.helicopter.age<HELICOPTER_SEQUENCE.fire
+                ?'HELICOPTERO! AGUARDE SOB O ARCO':'FIQUE ABRIGADO. A PASSAGEM VAI ABRIR';
+            const story=arrivalStoryTime(t);
             return t<90?'REFUGIO! A GRADE PROTEGE A PASSAGEM':t<200?'ELE VIROU PARA A RUA!'
                 :t<ARRIVAL.firstRelease?'O ARSENAL ESTA CEDENDO!':t<=ARRIVAL.hold?'SIGA PELO PATIO PARA A PRACA'
-                :t<480?'ABRIGUE-SE! OUTRA RAJADA!':t<574?'A GALERIA VAI DESABAR!':'PREPARE-SE: A GRADE VAI ABRIR';
+                :story<480?'ABRIGUE-SE! OUTRA RAJADA!':story<574?'A GALERIA VAI DESABAR!':'PREPARE-SE: A GRADE VAI ABRIR';
         }
         if(this.act!=='siege'||b.marks.length||!b.route.active||b.nextAct)return b.hint;
         const patrol=this.foes.filter(e=>e instanceof HypotheticalGuard&&e.awake&&!e.dead);
@@ -276,7 +280,7 @@ export class HypotheticalGame extends WorldGame {
             this.siegeCheckpoint=this.fight.route.cleared;this.audio.sfx('checkpoint');
         }else if(this.act==='siege'&&this.fight.route.releasedThisTick)this.audio.sfx('switch');
         for(const event of this.fight.events){
-            if(event==='shot'||event==='impact'||event==='splash'||event==='collapse-water'||event==='debris-land'||event==='reload'||event==='distant-shot'||event==='distant-hit'||event==='distant-debris'||event==='distant-thud'||event==='distant-roar'||event==='distant-wood'||event==='distant-stone'||event==='distant-metal'||event==='distant-creak'||event==='distant-chain'||event==='distant-leak'||event==='distant-snort'||event==='distant-grit'||event==='distant-launch'||event==='distant-rocket'||event==='distant-blast'||event==='distant-bell')this.weaponAudio.play(event);
+            if(event==='shot'||event==='impact'||event==='splash'||event==='collapse-water'||event==='debris-land'||event==='reload'||event==='distant-shot'||event==='distant-hit'||event==='distant-debris'||event==='distant-thud'||event==='distant-roar'||event==='distant-wood'||event==='distant-stone'||event==='distant-metal'||event==='distant-creak'||event==='distant-chain'||event==='distant-leak'||event==='distant-snort'||event==='distant-grit'||event==='distant-launch'||event==='distant-rocket'||event==='distant-blast'||event==='distant-bell'||event==='distant-rotor'||event==='distant-engine-fail'||event==='distant-crash')this.weaponAudio.play(event);
             if(event==='step'&&this.fight.tick%3===0)this.audio.sfx('land');
             if(event==='break'){
                 if(this.act==='siege'){

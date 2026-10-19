@@ -25,10 +25,10 @@ export function aircraftPoint(p:Pick<AircraftBody,'x'|'y'|'angle'>,x:number,y:nu
     const co=Math.cos(p.angle),si=Math.sin(p.angle);return [p.x+x*co-y*si,p.y+x*si+y*co];
 }
 export function helicopterFlightAt(age:number){
-    const settle=smoothMotion((age-54)/28);
-    return {x:424-154*smoothMotion(age/80)+Math.sin(age/33)*.7*settle,
-        y:-66-6*smoothMotion(age/80)+Math.sin(age/21)*.6*settle,
-        angle:-.065*(1-smoothMotion((age-38)/45))+Math.sin(age/27)*.012*settle};
+    const settle=smoothMotion((age-54)/28),evade=smoothMotion((age-138)/52);
+    return {x:424-166*smoothMotion(age/80)+Math.sin(age/33)*.7*settle+evade*3,
+        y:-66-6*smoothMotion(age/80)+Math.sin(age/21)*.6*settle-evade*3,
+        angle:-.065*(1-smoothMotion((age-38)/45))+Math.sin(age/27)*.012*settle+evade*.045};
 }
 const pulse=(a:number,start:number,rise:number,hold:number,end:number)=>smoothMotion((a-start)/rise)*(1-smoothMotion((a-hold)/(end-hold)));
 const cross=(ax:number,ay:number,bx:number,by:number)=>ax*by-ay*bx;
@@ -150,7 +150,7 @@ export class HypotheticalHelicopter {
             this.rocket={x,y,fromX:x,fromY:y,dx,dy,age:0,remaining:180,speed:0};this.events.push('distant-launch');
         }
         if(this.rocket&&this.tick>this.launchAt){
-            const r=this.rocket,speed=.65+2.85*smoothMotion((r.age-3)/18),next:Point=[r.x+r.dx*speed,r.y+r.dy*speed];
+            const r=this.rocket,speed=.65+2.3*smoothMotion((r.age-3)/18),next:Point=[r.x+r.dx*speed,r.y+r.dy*speed];
             const contact=hullContact([r.x,r.y],next,this.hull);
             if(r.age>=3)for(let d=2.5-this.trailGap;d<=speed;d+=2.5){
                 const tail=rocketTail(r.age+d/speed);
@@ -164,7 +164,7 @@ export class HypotheticalHelicopter {
         if(hit>=0){
             if(hit===8){this.release('tail',36,-9,.55,-.6,.035);this.events.push('distant-engine-fail');}
             if(hit===21){this.release('rotor',1,-22,-.28,-1.05,-.052);this.scatter(this.hull.x,this.hull.y-14,5,.7);}
-            if(hit<58&&hit%6===0){const p=aircraftPoint(this.hull,9,-12);this.puff(...p,4,'smoke',.15,-.18);}
+            if(hit<70&&hit%6===0){const p=aircraftPoint(this.hull,9,-12);this.puff(...p,4+(hit%12)/6,'smoke',.16,-.18);}
             if(hit>14&&this.crashAt<0)this.hull.spin=Math.max(-.016,this.hull.spin-.0002);
             this.stepBody(this.hull,hit<18?.005:.033);
             if(this.crashAt>=0&&this.crashAge<240&&this.crashAge%12===0){const p=aircraftPoint(this.hull,9,-8);this.puff(...p,5,'smoke',.11,-.12);}

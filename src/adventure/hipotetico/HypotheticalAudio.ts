@@ -1,6 +1,6 @@
 export type WeaponCue = 'shot' | 'impact' | 'splash' | 'collapse-water' | 'debris-land' | 'reload' | 'distant-shot' | 'distant-hit' | 'distant-crash' | 'distant-debris' | 'distant-thud'
     | 'guard-swipe' | 'guard-sweep' | 'guard-parry' | 'guard-stomp' | 'distant-roar'
-    | 'distant-wood' | 'distant-stone' | 'distant-metal' | 'distant-creak' | 'distant-chain' | 'distant-leak' | 'distant-snort' | 'distant-grit' | 'distant-launch' | 'distant-rocket' | 'distant-blast' | 'distant-bell';
+    | 'distant-wood' | 'distant-stone' | 'distant-metal' | 'distant-creak' | 'distant-chain' | 'distant-leak' | 'distant-snort' | 'distant-grit' | 'distant-launch' | 'distant-rocket' | 'distant-blast' | 'distant-bell' | 'distant-rotor' | 'distant-engine-fail';
 interface Route { context: BaseAudioContext; destination: AudioNode; enabled: boolean }
 
 /** Short, owned voices on WorldAudio's existing effects bus. No new context or timers. */
@@ -30,6 +30,8 @@ export class HypotheticalAudio {
             kind==='distant-leak'?{duration:.65,filter:'bandpass' as BiquadFilterType,cutoff:3100,tail:1200,noise:.16,pitch:200,end:130,body:.006,wave:'sine' as OscillatorType}:
             kind==='distant-snort'?{duration:.24,filter:'bandpass' as BiquadFilterType,cutoff:1350,tail:330,noise:.21,pitch:98,end:65,body:.035,wave:'triangle' as OscillatorType}:
             kind==='distant-grit'?{duration:.14,filter:'highpass' as BiquadFilterType,cutoff:1700,tail:900,noise:.085,pitch:480,end:210,body:.008,wave:'sine' as OscillatorType}:
+            kind==='distant-rotor'?{duration:.19,filter:'bandpass' as BiquadFilterType,cutoff:590,tail:180,noise:.13,pitch:68,end:56,body:.055,wave:'triangle' as OscillatorType}:
+            kind==='distant-engine-fail'?{duration:.95,filter:'bandpass' as BiquadFilterType,cutoff:2300,tail:230,noise:.24,pitch:780,end:84,body:.12,wave:'sawtooth' as OscillatorType}:
             kind==='distant-launch'?{duration:.34,filter:'bandpass' as BiquadFilterType,cutoff:1900,tail:330,noise:.4,pitch:210,end:62,body:.22,wave:'triangle' as OscillatorType}:
             kind==='distant-rocket'?{duration:.3,filter:'bandpass' as BiquadFilterType,cutoff:900,tail:3100,noise:.24,pitch:180,end:470,body:.045,wave:'triangle' as OscillatorType}:
             kind==='distant-blast'?{duration:.64,filter:'lowpass' as BiquadFilterType,cutoff:2100,tail:100,noise:.55,pitch:94,end:29,body:.48,wave:'triangle' as OscillatorType}:
@@ -63,6 +65,17 @@ export class HypotheticalAudio {
             if(shot)body.frequency.exponentialRampToValueAtTime(88,now+.014);
             body.frequency.exponentialRampToValueAtTime(contact?.end??(splash?150:crash?32:shot?42:kind==='reload'?700:310),now+duration*.75);
             low.gain.setValueAtTime(0,now);low.gain.linearRampToValueAtTime((contact?.body??(splash?.04:crash?.42:shot?.43:.075))*volume,now+.003);low.gain.exponentialRampToValueAtTime(.001,now+duration);
+            if(kind==='distant-rotor'){
+                // Four blade beats per owned voice; no looping source survives pause.
+                for(const [gain,peak] of [[env.gain,.13],[low.gain,.055]] as const){
+                    gain.cancelScheduledValues(now);gain.setValueAtTime(.001,now);
+                    for(let blade=0;blade<4;blade++){
+                        const at=now+blade*.044;
+                        gain.linearRampToValueAtTime(peak*volume,at+.006);
+                        gain.exponentialRampToValueAtTime(.001,at+.039);
+                    }
+                }
+            }
             noise.connect(filter);filter.connect(env);env.connect(destination);body.connect(low);low.connect(destination);
             if(kind==='distant-bell')for(const [ratio,level,length] of [[2.71,.11,.7],[4.08,.055,.38]]){
                 const partial=c.createOscillator(),gain=c.createGain();nodes.push(partial,gain);sources.push(partial);
