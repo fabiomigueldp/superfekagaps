@@ -58,7 +58,7 @@ function drawClothes(c:CanvasRenderingContext2D,p:Bystander,x:number,y:number,he
     drawBystanderTexture(c,texture,x,y,angle,shear);
 }
 
-function drawHead(c:CanvasRenderingContext2D,p:Bystander,x:number,y:number,gaze:number,angle=0){
+export function drawHead(c:CanvasRenderingContext2D,p:Bystander,x:number,y:number,gaze:number,angle=0){
     const facing=gaze<.35?1:gaze>.65?-1:0,key=`head:${p.color}:${facing}:${p.appearance??0}`;
     let texture=textures.get(key);
     if(!texture){
@@ -86,25 +86,60 @@ function drawHead(c:CanvasRenderingContext2D,p:Bystander,x:number,y:number,gaze:
     drawBystanderTexture(c,texture,x,y,angle);
 }
 
-export interface CarriedBystander {person:Bystander;angle:number;kick:number}
+export interface CarriedBystander {
+    person:Bystander;angle:number;kick:number;
+    stage?:'whole'|'maimed-arm'|'upper-half'|'head-bite';
+    wound?:number;thrash?:number;
+}
 /** The same whole actor and wardrobe, articulated around a chest grip. Used
  * inside the dinosaur rig, so its foreground teeth occlude the contact. */
 export function drawCarriedBystander(output:CanvasRenderingContext2D,actor:CarriedBystander,x:number,y:number,scale=1){
     const p=actor.person,angle=actor.angle,co=Math.cos(angle),si=Math.sin(angle),kick=actor.kick;
+    const stage=actor.stage??'whole',wound=actor.wound??0,thrash=actor.thrash??kick;
     const c={get fillStyle(){return output.fillStyle;},set fillStyle(v){output.fillStyle=v;},
         fillRect(xx:number,yy:number,w:number,h:number){output.fillRect(Math.round(x+xx*scale),Math.round(y+yy*scale),
             Math.max(1,Math.round(w*scale)),Math.max(1,Math.round(h*scale)));}} as CanvasRenderingContext2D;
     const point=(u:number,v:number):[number,number]=>[u*co-v*si,u*si+v*co];
-    const skin=SKIN[p.color],cloth=WARDROBE[p.clothes],hip=point(0,4);
+    const skin=SKIN[p.color],cloth=WARDROBE[p.clothes],hip=point(0,stage==='head-bite'?1:stage==='upper-half'?2:4);
+    if(stage==='whole'||stage==='maimed-arm'){
+        for(const d of [-1,1]){
+            const knee=point(d*3+kick*d*2.4,10),foot=point(d*4-kick*d*3.4,16-Math.max(0,kick*d)*3.5);
+            pixelLine(c,...point(d,4),...knee,'#485f62',2);pixelLine(c,...knee,...foot,'#667c79',2);
+            pixelLine(c,...foot,...point(d*4-kick*d*3.4+3,16-Math.max(0,kick*d)*3.5),'#89978a');
+        }
+    }else if(stage==='upper-half'){
+        pixelLine(c,...point(-3,2),...point(3,2),'#5a1016',3);
+        pixelLine(c,...point(-2,3),...point(2,3),'#9e2028',2);
+        pixelLine(c,...point(0,2),...point(kick*1.5,6),'#e6dfd3',2);
+        pixelLine(c,...point(-2,3),...point(-2-kick*2,8),'#7a1820',2);
+        pixelLine(c,...point(2,3),...point(1+kick*2.2,9),'#b8252e');
+    }
     for(const d of [-1,1]){
-        const knee=point(d*3+kick*d*2,10),foot=point(d*4-kick*d*3,16-Math.max(0,kick*d)*3);
-        pixelLine(c,...point(d,4),...knee,'#485f62',2);pixelLine(c,...knee,...foot,'#667c79',2);
-        pixelLine(c,...foot,...point(d*4-kick*d*3+3,16-Math.max(0,kick*d)*3),'#89978a');
-        const shoulder=point(d*4,-4),elbow=point(d*(7+kick),1),hand=point(d*(5+kick),-2);
+        if(stage==='head-bite')continue;
+        if(d===-1&&stage!=='whole'){
+            pixelLine(c,...point(-4,-4),...point(-6,-3),'#6b1117',3);
+            pixelLine(c,...point(-5,-4),...point(-7,-2),'#e6dfd3');
+            pixelLine(c,...point(-5,-3),...point(-7,0),'#b8252e');
+            continue;
+        }
+        const shoulder=point(d*4,-4),elbow=point(d*(7+thrash*1.4),1-thrash*d*1.5),hand=point(d*(5+thrash*1.8),-3-thrash*d*2);
         pixelLine(c,...shoulder,...elbow,cloth.shade,2);pixelLine(c,...elbow,...hand,skin,2);
     }
-    drawClothes(c,p,hip[0],hip[1],9,angle);
-    const head=point(0,-12);drawHead(c,p,head[0],head[1],1,angle);
+    drawClothes(c,p,hip[0],hip[1],stage==='head-bite'?5:stage==='upper-half'?7:9,angle);
+    if(wound>0){
+        pixelLine(c,...point(-3,-2),...point(3,0),'#5a1016',2);
+        pixelLine(c,...point(-2,-4),...point(2,-1),'#9e2028',2);
+        if(wound>.45){
+            pixelLine(c,...point(-2,-1),...point(2,-1),'#e6dfd3');
+            pixelLine(c,...point(-1,1),...point(3,2),'#c92c34',2);
+        }
+    }
+    const head=point(0,stage==='head-bite'?-9:-12);drawHead(c,p,head[0],head[1],1,angle);
+    if(wound>.15){
+        const mouth=point(2,stage==='head-bite'?-5:-8);
+        c.fillStyle='#3a0b10';c.fillRect(mouth[0],mouth[1],2,2);
+        c.fillStyle='#9e2028';c.fillRect(mouth[0]-1,mouth[1]+1,2,2);
+    }
 }
 
 /** A pixel-only viewport mirrors the gait and occludes bodies behind their actual doorway. */

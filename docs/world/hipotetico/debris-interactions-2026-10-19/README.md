@@ -2,6 +2,22 @@
 
 Revisão de 19/10/2026, integrada ao encontro nativo `/?encounter=hipotetico`.
 
+## Refinamento 7: apoio, deslocamento e repercussão
+
+Durante puxadas, sacudidas, investidas e rajadas, os apoios passam a ser definidos no espaço da rua. O movimento do tronco é compensado nas patas, e os joelhos são reconstruídos pelo mesmo esqueleto articulado do jogo. A preparação reposiciona uma pata por vez nos passos 2–14 e 13–25. Puxadas usam uma base recuada sob o quadril para evitar alongar a perna dianteira além do alcance. O fim da performance libera os apoios em sequência.
+
+A poeira da caminhada agora parte do apoio calculado pelo mesmo desenho. Deslocamentos de esforço deixam de avançar o ciclo de caminhada. A aproximação de um alvo próximo usa uma duração proporcional, com mínimo de 18 passos; uma distância praticamente nula pula diretamente para a orientação/preparação. A aproximação cinematográfica da torre mantém seu tempo próprio.
+
+Pancadas, quedas de peças, passos e rugidos podem transmitir um impulso ao pátio. Ele chega aos objetos próximos primeiro, perde força com a distância e desaparece gradualmente. Panos presos, correntes ancoradas e poças já formadas pelos vazamentos respondem a essa energia. Não há sorteio por quadro. São até seis impulsos, com expiração em 160 passos, e os fragmentos de uma mesma queda não reiniciam repetidamente a reação. Movimento reduzido omite esses movimentos decorativos.
+
+O ponto de saída da arma também incorpora a inclinação do corpo, como o desenho da sela e do ombro já faziam.
+
+`weight-response.mp4` reúne 14,63 segundos a 30 fps, com sacudida na Portaria, pedra no Cais, chapa no Arsenal e investida no Bastião. A composição usa posições dirigidas de Feka, sem áudio ou combate em primeiro plano. `weight-study.json` guarda as poses, posições do corpo, apoios e impulsos. É material de autoria; não é teste, partida gravada ou avaliação de dificuldade.
+
+```powershell
+node --import tsx scripts/render_hypothetical_material_responses.ts .tmp/aftermath-weight-7 C:/Users/fabio/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/@napi-rs/canvas/index.js --weight
+```
+
 ## Refinamento 6: reação, intenção e contato
 
 O gesto genérico de atenção foi substituído por quatro respostas. Cabeça, mandíbula, cauda e apoio do corpo participam da reação; o cavaleiro responde quatro passos depois, e ambos voltam ao repouso antes da caminhada seguinte.

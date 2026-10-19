@@ -382,12 +382,15 @@ export function dinosaurPose(b: HypotheticalModel, cx: number, cy: number, reduc
 
 export function distantRiderPose(action:HypotheticalBackdrop,reduced=false):DinosaurPose {
     const m=action.motion,r=BACKDROP_RIG;
-    if(action.aftermath.active){const pose=action.aftermath.pose(reduced);return {
-        x:r.x,y:r.y+pose.lift/r.scale,...pose,
-        daze:0,armor:9,flash:false,defeated:false,distant:true,heldDebris:action.aftermath.heldDebris,
-        launcher:action.aftermath.district===3?action.aftermath.launcherPose:undefined,
-        carriedBystander:action.aftermath.tower.search.carried,
-    };}
+    if(action.aftermath.active){
+        const pose=action.aftermath.pose(reduced),s=action.aftermath.tower.search;
+        return {
+            x:r.x,y:r.y+pose.lift/r.scale,...pose,
+            daze:0,armor:9,flash:false,defeated:false,distant:true,heldDebris:action.aftermath.heldDebris,
+            launcher:action.aftermath.district===3?action.aftermath.launcherPose:undefined,
+            carriedBystander:s.carried,gore:s.age>=242?(s.active?1:.85):0,
+        };
+    }
     return {x:r.x,y:r.y+m.lift/r.scale,facing:1,gait:action.travel/(r.scale*11),stride:action.stride,
         breath:0,bow:0,jaw:m.jaw,neckDrop:m.neckDrop,recoil:action.recoil,aim:action.angle,tail:m.tail,
         compression:m.compression,tuck:m.tuck,reload:0,brace:m.brace,heat:action.heat,

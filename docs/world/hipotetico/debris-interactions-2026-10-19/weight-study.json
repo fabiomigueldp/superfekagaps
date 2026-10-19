@@ -1,0 +1,636 @@
+{
+  "kind": "directed native art footage",
+  "gameplayTest": false,
+  "heldViewpoints": true,
+  "audio": false,
+  "foregroundCombat": false,
+  "fps": 30,
+  "frames": 439,
+  "seconds": 14.633333333333333,
+  "clips": [
+    {
+      "district": 0,
+      "kind": "weight-shake",
+      "title": "SACUDIDA / PORTARIA",
+      "action": "shake",
+      "preRoll": 2900,
+      "firstFrame": 0,
+      "frames": 135,
+      "steps": 268,
+      "changes": [
+        {
+          "step": 0,
+          "phase": "perform",
+          "action": "shake",
+          "prop": 0
+        },
+        {
+          "step": 250,
+          "phase": "recover",
+          "action": "shake",
+          "prop": 0
+        }
+      ],
+      "reaction": {
+        "kind": "settle",
+        "prop": 1,
+        "born": 1968,
+        "variant": 0,
+        "strength": 0.55,
+        "noticed": true
+      }
+    },
+    {
+      "district": 1,
+      "kind": "weight-sift",
+      "title": "PEDRA / CAIS",
+      "action": "sift",
+      "preRoll": 2393,
+      "firstFrame": 135,
+      "frames": 106,
+      "steps": 210,
+      "changes": [
+        {
+          "step": 0,
+          "phase": "perform",
+          "action": "sift",
+          "prop": 1
+        },
+        {
+          "step": 192,
+          "phase": "recover",
+          "action": "sift",
+          "prop": 1
+        }
+      ],
+      "reaction": {
+        "kind": "creak",
+        "prop": 0,
+        "born": 1335,
+        "variant": 4,
+        "strength": 0.65,
+        "noticed": true
+      }
+    },
+    {
+      "district": 2,
+      "kind": "weight-wrench",
+      "title": "CHAPA / ARSENAL",
+      "action": "wrench",
+      "wet": true,
+      "preRoll": 1539,
+      "firstFrame": 241,
+      "frames": 105,
+      "steps": 208,
+      "changes": [
+        {
+          "step": 0,
+          "phase": "perform",
+          "action": "wrench",
+          "prop": 2,
+          "motivation": "leak"
+        },
+        {
+          "step": 190,
+          "phase": "recover",
+          "action": "wrench",
+          "prop": 2,
+          "motivation": "leak"
+        }
+      ],
+      "reaction": {
+        "kind": "leak",
+        "prop": 2,
+        "born": 1389,
+        "variant": 6,
+        "strength": 0.55,
+        "noticed": true
+      }
+    },
+    {
+      "district": 3,
+      "kind": "weight-breach",
+      "title": "INVESTIDA / BASTIAO",
+      "action": "breach",
+      "preRoll": 2688,
+      "firstFrame": 346,
+      "frames": 93,
+      "steps": 184,
+      "changes": [
+        {
+          "step": 0,
+          "phase": "perform",
+          "action": "breach",
+          "prop": 2,
+          "motivation": "rattle"
+        },
+        {
+          "step": 166,
+          "phase": "recover",
+          "action": "breach",
+          "prop": 2,
+          "motivation": "rattle"
+        }
+      ],
+      "reaction": {
+        "kind": "rattle",
+        "prop": 2,
+        "born": 2518,
+        "variant": 1,
+        "strength": 0.65,
+        "noticed": true
+      }
+    }
+  ],
+  "captures": [
+    {
+      "file": "weight-shake-0.png",
+      "step": 8,
+      "phase": "perform",
+      "age": 8,
+      "action": "shake",
+      "prop": 0,
+      "rootX": 412.5,
+      "feet": [
+        {
+          "x": 418.0567677884084,
+          "y": -2.0625
+        },
+        {
+          "x": 413.4172321259867,
+          "y": 0
+        }
+      ],
+      "impulses": [
+        {
+          "x": 264.10646387546376,
+          "born": 2798,
+          "strength": 0.2
+        },
+        {
+          "x": 240.34816943269095,
+          "born": 2814,
+          "strength": 0.2
+        },
+        {
+          "x": 216.5898749899182,
+          "born": 2829,
+          "strength": 0.2
+        },
+        {
+          "x": 192.8315805471454,
+          "born": 2844,
+          "strength": 0.2
+        },
+        {
+          "x": 169.07328610437253,
+          "born": 2861,
+          "strength": 0.2
+        },
+        {
+          "x": 150.81124832500444,
+          "born": 2885,
+          "strength": 0.2
+        }
+      ]
+    },
+    {
+      "file": "weight-shake-1.png",
+      "step": 25,
+      "phase": "perform",
+      "age": 25,
+      "action": "shake",
+      "prop": 0,
+      "rootX": 412.5,
+      "feet": [
+        {
+          "x": 424.1875,
+          "y": -2.525834023241416e-16
+        },
+        {
+          "x": 414.5625,
+          "y": -2.525834023241416e-16
+        }
+      ],
+      "impulses": [
+        {
+          "x": 264.10646387546376,
+          "born": 2798,
+          "strength": 0.2
+        },
+        {
+          "x": 240.34816943269095,
+          "born": 2814,
+          "strength": 0.2
+        },
+        {
+          "x": 216.5898749899182,
+          "born": 2829,
+          "strength": 0.2
+        },
+        {
+          "x": 192.8315805471454,
+          "born": 2844,
+          "strength": 0.2
+        },
+        {
+          "x": 169.07328610437253,
+          "born": 2861,
+          "strength": 0.2
+        },
+        {
+          "x": 150.81124832500444,
+          "born": 2885,
+          "strength": 0.2
+        }
+      ]
+    },
+    {
+      "file": "weight-shake-2.png",
+      "step": 138,
+      "phase": "perform",
+      "age": 138,
+      "action": "shake",
+      "prop": 0,
+      "rootX": 421.5,
+      "feet": [
+        {
+          "x": 424.1875,
+          "y": -2.525834023241416e-16
+        },
+        {
+          "x": 414.5625,
+          "y": -2.525834023241416e-16
+        }
+      ],
+      "impulses": [
+        {
+          "x": 150.81124832500444,
+          "born": 2885,
+          "strength": 0.2
+        },
+        {
+          "x": 118,
+          "born": 2979,
+          "strength": 0.72
+        }
+      ]
+    },
+    {
+      "file": "weight-shake-3.png",
+      "step": 238,
+      "phase": "perform",
+      "age": 238,
+      "action": "shake",
+      "prop": 0,
+      "rootX": 412.5,
+      "feet": [
+        {
+          "x": 412.5,
+          "y": -4.209723372069026e-16
+        },
+        {
+          "x": 414.240234375,
+          "y": -0.972271824131503
+        }
+      ],
+      "impulses": [
+        {
+          "x": 118.26621074125296,
+          "born": 3130,
+          "strength": 0.6355000000000003
+        }
+      ]
+    },
+    {
+      "file": "weight-sift-0.png",
+      "step": 8,
+      "phase": "perform",
+      "age": 8,
+      "action": "sift",
+      "prop": 1,
+      "rootX": 909.5,
+      "feet": [
+        {
+          "x": 916.21,
+          "y": -2.0625
+        },
+        {
+          "x": 906.035,
+          "y": 0
+        }
+      ],
+      "impulses": [
+        {
+          "x": 225.2439397033412,
+          "born": 2323,
+          "strength": 0.2
+        },
+        {
+          "x": 245.19366333667665,
+          "born": 2349,
+          "strength": 0.2
+        }
+      ]
+    },
+    {
+      "file": "weight-sift-1.png",
+      "step": 25,
+      "phase": "perform",
+      "age": 25,
+      "action": "sift",
+      "prop": 1,
+      "rootX": 909.5,
+      "feet": [
+        {
+          "x": 921.1875,
+          "y": -2.525834023241416e-16
+        },
+        {
+          "x": 911.5625,
+          "y": -2.525834023241416e-16
+        }
+      ],
+      "impulses": [
+        {
+          "x": 225.2439397033412,
+          "born": 2323,
+          "strength": 0.2
+        },
+        {
+          "x": 245.19366333667665,
+          "born": 2349,
+          "strength": 0.2
+        }
+      ]
+    },
+    {
+      "file": "weight-sift-2.png",
+      "step": 112,
+      "phase": "perform",
+      "age": 112,
+      "action": "sift",
+      "prop": 1,
+      "rootX": 916.5,
+      "feet": [
+        {
+          "x": 921.1875,
+          "y": -2.525834023241416e-16
+        },
+        {
+          "x": 911.5625,
+          "y": -2.525834023241416e-16
+        }
+      ],
+      "impulses": [
+        {
+          "x": 245.19366333667665,
+          "born": 2349,
+          "strength": 0.2
+        },
+        {
+          "x": 199,
+          "born": 2474,
+          "strength": 0.72
+        }
+      ]
+    },
+    {
+      "file": "weight-sift-3.png",
+      "step": 176,
+      "phase": "perform",
+      "age": 176,
+      "action": "sift",
+      "prop": 1,
+      "rootX": 909.5,
+      "feet": [
+        {
+          "x": 910.3657407407408,
+          "y": -0.6875000000000001
+        },
+        {
+          "x": 911.5625,
+          "y": -2.525834023241416e-16
+        }
+      ],
+      "impulses": [
+        {
+          "x": 199,
+          "born": 2474,
+          "strength": 0.72
+        },
+        {
+          "x": 182.30534364585947,
+          "born": 2550,
+          "strength": 0.5354000000000002
+        }
+      ]
+    },
+    {
+      "file": "weight-wrench-0.png",
+      "step": 8,
+      "phase": "perform",
+      "age": 8,
+      "action": "wrench",
+      "prop": 2,
+      "rootX": 1359.5,
+      "feet": [
+        {
+          "x": 1352.660973961734,
+          "y": -2.0625
+        },
+        {
+          "x": 1362.1031216807742,
+          "y": 0
+        }
+      ],
+      "impulses": [
+        {
+          "x": 279.4013531605765,
+          "born": 1536,
+          "strength": 0.2
+        }
+      ]
+    },
+    {
+      "file": "weight-wrench-1.png",
+      "step": 25,
+      "phase": "perform",
+      "age": 25,
+      "action": "wrench",
+      "prop": 2,
+      "rootX": 1359.5,
+      "feet": [
+        {
+          "x": 1347.8125,
+          "y": -2.525834023241416e-16
+        },
+        {
+          "x": 1357.4375,
+          "y": -2.525834023241416e-16
+        }
+      ],
+      "impulses": [
+        {
+          "x": 279.4013531605765,
+          "born": 1536,
+          "strength": 0.2
+        }
+      ]
+    },
+    {
+      "file": "weight-wrench-2.png",
+      "step": 112,
+      "phase": "perform",
+      "age": 112,
+      "action": "wrench",
+      "prop": 2,
+      "rootX": 1340.0969282485312,
+      "feet": [
+        {
+          "x": 1347.8125,
+          "y": -2.525834023241416e-16
+        },
+        {
+          "x": 1357.4375,
+          "y": -2.525834023241416e-16
+        }
+      ],
+      "impulses": [
+        {
+          "x": 279.4013531605765,
+          "born": 1536,
+          "strength": 0.2
+        },
+        {
+          "x": 310,
+          "born": 1622,
+          "strength": 0.72
+        }
+      ]
+    },
+    {
+      "file": "weight-wrench-3.png",
+      "step": 172,
+      "phase": "perform",
+      "age": 172,
+      "action": "wrench",
+      "prop": 2,
+      "rootX": 1359.5,
+      "feet": [
+        {
+          "x": 1356.4699074074074,
+          "y": -1.1907849302036035
+        },
+        {
+          "x": 1357.4375,
+          "y": -2.525834023241416e-16
+        }
+      ],
+      "impulses": [
+        {
+          "x": 310,
+          "born": 1622,
+          "strength": 0.72
+        },
+        {
+          "x": 310,
+          "born": 1678,
+          "strength": 0.8756062975972181
+        }
+      ]
+    },
+    {
+      "file": "weight-breach-0.png",
+      "step": 8,
+      "phase": "perform",
+      "age": 8,
+      "action": "breach",
+      "prop": 2,
+      "rootX": 1767.5,
+      "feet": [
+        {
+          "x": 1763.88375,
+          "y": -2.0625
+        },
+        {
+          "x": 1770.965,
+          "y": 0
+        }
+      ],
+      "impulses": []
+    },
+    {
+      "file": "weight-breach-1.png",
+      "step": 25,
+      "phase": "perform",
+      "age": 25,
+      "action": "breach",
+      "prop": 2,
+      "rootX": 1767.5298833819243,
+      "feet": [
+        {
+          "x": 1762,
+          "y": -2.525834023241416e-16
+        },
+        {
+          "x": 1775.75,
+          "y": -2.525834023241416e-16
+        }
+      ],
+      "impulses": []
+    },
+    {
+      "file": "weight-breach-2.png",
+      "step": 52,
+      "phase": "perform",
+      "age": 52,
+      "action": "breach",
+      "prop": 2,
+      "rootX": 1775.5,
+      "feet": [
+        {
+          "x": 1762,
+          "y": -2.525834023241416e-16
+        },
+        {
+          "x": 1775.75,
+          "y": -2.525834023241416e-16
+        }
+      ],
+      "impulses": [
+        {
+          "x": 310,
+          "born": 2741,
+          "strength": 1
+        }
+      ]
+    },
+    {
+      "file": "weight-breach-3.png",
+      "step": 94,
+      "phase": "perform",
+      "age": 94,
+      "action": "breach",
+      "prop": 2,
+      "rootX": 1767.5,
+      "feet": [
+        {
+          "x": 1762,
+          "y": -2.525834023241416e-16
+        },
+        {
+          "x": 1775.75,
+          "y": -2.525834023241416e-16
+        }
+      ],
+      "impulses": [
+        {
+          "x": 310,
+          "born": 2741,
+          "strength": 1
+        }
+      ]
+    }
+  ]
+}
