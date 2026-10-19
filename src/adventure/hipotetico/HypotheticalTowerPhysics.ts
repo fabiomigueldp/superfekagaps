@@ -2,7 +2,7 @@ import type {Point} from '../WorldPainting';
 import {smoothMotion} from './HypotheticalMotion';
 
 export type TowerPart='arch'|'shaft'|'belfry'|'roof'|'bell'|'pier-left'|'pier-right'|'lintel'|'sill'|'roof-left'|'roof-right';
-type Material='stone'|'tile'|'bronze';
+type Material='stone'|'tile'|'bronze'|'wood';
 export const TOWER_RELEASE={shaft:18,belfry:40,roof:48,bell:56,arch:88} as const;
 const FLOOR=-5;
 interface Definition {x:number;y:number;shape:Point[];material:Material;inertia:number}
@@ -24,9 +24,10 @@ export interface TowerBody {
     id:TowerPart;x:number;y:number;angle:number;vx:number;vy:number;spin:number;
     attached:boolean;hidden:boolean;sleeping:boolean;quiet:number;landedAt:number;lastContact:number;
 }
-export interface TowerContact {part:TowerPart;x:number;y:number;born:number;strength:number;material:Material;first:boolean}
+export interface TowerContact {part:TowerPart;x:number;y:number;born:number;strength:number;slide:number;material:Material;first:boolean}
 export interface TowerChip {x:number;y:number;vx:number;vy:number;angle:number;spin:number;radius:number;
-    born:number;material:Material;rest:boolean;keep:boolean;bounces:number}
+    born:number;material:Material;rest:boolean;keep:boolean;bounces:number;stretch:number;shade:number}
+export interface TowerPlume {x:number;y:number;vx:number;vy:number;born:number;radius:number;seed:number}
 const rotate=(x:number,y:number,angle:number):Point=>[x*Math.cos(angle)-y*Math.sin(angle),x*Math.sin(angle)+y*Math.cos(angle)];
 export function towerBodyPoint(body:TowerBody,x:number,y:number):Point {
     const d=TOWER_PARTS[body.id],r=rotate(x-d.x,y-d.y,body.angle);return [body.x+r[0],body.y+r[1]];
@@ -42,7 +43,9 @@ export class HypotheticalTowerPhysics {
     age=-1;
     readonly bodies=Object.fromEntries((Object.keys(TOWER_PARTS) as TowerPart[]).map(id=>[id,makeBody(id)])) as Record<TowerPart,TowerBody>;
     chips:TowerChip[]=[];contacts:TowerContact[]=[];events:TowerContact[]=[];
-    fractures:Array<{x:number;y:number;born:number;part:TowerPart}>=[];
+    fractures:Array<{x:number;y:number;born:number;part:TowerPart;material:Material}>=[];
+    plumes:TowerPlume[]=[];
+    clapper=0;private clapperVelocity=0;
     private seed=731;
     private random(){this.seed=(Math.imul(this.seed,1664525)+1013904223)>>>0;return this.seed/4294967296;}
     start(direction:number){
@@ -51,17 +54,23 @@ export class HypotheticalTowerPhysics {
     }
     private splinters(x:number,y:number,count:number,material:Material,vx=0,force=1){
         for(let i=0;i<count&&this.chips.length<64;i++){
-            const radius=material==='tile'?1.1+this.random():.8+this.random()*1.5;
+            const radius=material==='wood'?.65+this.random()*.7:material==='tile'?1.1+this.random():.8+this.random()*1.5;
+            const shade=i%3,stretch=material==='wood'?2.8:material==='tile'?1.55:1;
             this.chips.push({x:x+(this.random()-.5)*8,y:y+(this.random()-.5)*5,
                 vx:vx+(this.random()-.5)*force*1.6,vy:-.5-this.random()*force,
                 angle:this.random()*Math.PI,spin:(this.random()-.5)*.24,radius,born:this.age,
-                material,rest:false,keep:i%3===0,bounces:0});
+                material,rest:false,keep:i%3===0,bounces:0,stretch,shade});
         }
     }
     private release(id:TowerPart,vx:number,vy:number,spin:number){
         const b=this.bodies[id];b.attached=false;b.vx+=vx;b.vy+=vy;b.spin+=spin;
-        this.fractures.push({part:id,x:b.x,y:b.y+5,born:this.age});
-        this.splinters(b.x,b.y+5,id==='roof'?8:4,id==='roof'?'tile':'stone',vx*.4,.6);
+        // Fragments come from the joint that fails, transformed with the part.
+        // The bell tears its timber suspension, rather than shedding masonry.
+        const joint:Point=id==='shaft'?[0,-64]:id==='belfry'?[6,-67]:id==='roof'?[0,-107]:id==='bell'?[0,-88]:[-5,-26];
+        const p=towerBodyPoint(id==='bell'?this.bodies.belfry:b,...joint);
+        const material=id==='bell'?'wood':id==='roof'?'tile':'stone';
+        this.fractures.push({part:id,x:p[0],y:p[1],born:this.age,material});
+        this.splinters(p[0],p[1],id==='roof'?8:4,material,vx*.4,.6);
     }
     private follow(id:'roof'|'bell'){
         const b=this.bodies[id],parent=this.bodies.belfry,d=TOWER_PARTS[id];
@@ -87,6 +96,13 @@ export class HypotheticalTowerPhysics {
             }
         }
         return floor;
+    }
+    shadow(body:TowerBody){
+        const vertices=TOWER_PARTS[body.id].shape.map(([x,y])=>rotate(x,y,body.angle));
+        const bottom=body.y+Math.max(...vertices.map(p=>p[1]));
+        const floor=this.surface(body.x,bottom-1,body);
+        const width=Math.max(...vertices.map(p=>p[0]))-Math.min(...vertices.map(p=>p[0]));
+        return {y:floor,height:Math.max(0,floor-bottom),width};
     }
     private integrate(b:TowerBody){
         const def=TOWER_PARTS[b.id],restitution=def.material==='bronze'?.28:def.material==='tile'?.16:.09;
@@ -114,7 +130,7 @@ export class HypotheticalTowerPhysics {
                 b.vx+=friction;b.spin-=cy*friction/def.inertia;
                 if(velocity>.48&&this.age-b.lastContact>8){
                     const contact={part:b.id,x:b.x+cx,y:b.y+cy,born:this.age,
-                        strength:Math.min(1.8,velocity/2.2),material:def.material,first:b.landedAt<0};
+                        strength:Math.min(1.8,velocity/2.2),slide,material:def.material,first:b.landedAt<0};
                     if(b.landedAt<0)b.landedAt=this.age;b.lastContact=this.age;
                     this.contacts.push(contact);this.events.push(contact);
                 }
@@ -136,8 +152,9 @@ export class HypotheticalTowerPhysics {
             b.x=p[0];b.y=p[1];b.angle=parent.angle;b.hidden=false;b.attached=false;
             b.vx=parent.vx*.5+impulse;b.vy=-.35-Math.abs(impulse)*.35;b.spin=parent.spin+impulse*.045;
         }
-        this.fractures.push({part:'belfry',x:parent.x,y:parent.y,born:this.age});
-        this.splinters(parent.x,parent.y,10,'stone',.3,1.1);
+        const hit=this.events.find(e=>e.part==='belfry'),x=hit?.x??parent.x,y=hit?.y??parent.y;
+        this.fractures.push({part:'belfry',x,y,born:this.age,material:'stone'});
+        this.splinters(x,y,10,'stone',(hit?.slide??.6)*.3,1.1);
     }
     private splitRoof(){
         const parent=this.bodies.roof;parent.hidden=true;parent.sleeping=true;
@@ -151,6 +168,7 @@ export class HypotheticalTowerPhysics {
     step(age:number){
         if(this.age<0||age<=this.age)return;
         this.age=age;this.events=[];
+        const bell=this.bodies.bell,oldBellVX=bell.vx,oldBellSpin=bell.spin;
         const top=this.bodies.belfry;
         if(top.attached){
             const angle=.21*smoothMotion((age-7)/33),p=rotate(-18,-17,angle);
@@ -173,6 +191,18 @@ export class HypotheticalTowerPhysics {
         for(const id of ['pier-left','pier-right','lintel','sill','roof-left','roof-right'] as const){
             const b=this.bodies[id];if(!b.hidden&&!b.sleeping)this.integrate(b);
         }
+        // The clapper lags the bell's acceleration, then catches its inner lip.
+        this.clapperVelocity+=-Math.sin(bell.angle+this.clapper)*.035-(bell.vx-oldBellVX)*.06-(bell.spin-oldBellSpin)*.4;
+        this.clapperVelocity*=.965;this.clapper+=this.clapperVelocity;
+        if(Math.abs(this.clapper)>.55){this.clapper=Math.sign(this.clapper)*.55;this.clapperVelocity=0;}
+        // Delayed smoke is emitted by the moving breach, never by an empty
+        // point in the sky after the shaft has fallen. Released puffs drift freely.
+        if(age>=8&&age<=68&&(age-8)%12===0){
+            const b=this.bodies.shaft,p=towerBodyPoint(b,1,-60),seed=(age-8)/12;
+            this.plumes.push({x:p[0],y:p[1],vx:b.vx*.12+.08,vy:b.vy*.04-.16,
+                born:age,radius:4+seed%3*.6,seed});
+        }
+        this.plumes=this.plumes.filter(p=>age-p.born<168);
         for(const chip of this.chips){
             if(chip.rest)continue;
             const previous=chip.y+chip.radius;chip.vy+=.11;chip.x+=chip.vx;chip.y+=chip.vy;chip.angle+=chip.spin;

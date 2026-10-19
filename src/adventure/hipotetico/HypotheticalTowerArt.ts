@@ -1,6 +1,7 @@
 import {box,oval,pixelLine,polygon,type Point} from '../WorldPainting';
 import {BASTION_TOWER,type HypotheticalTower} from './HypotheticalTower';
 import {towerBodyPoint,TOWER_RELEASE,type TowerPart} from './HypotheticalTowerPhysics';
+import {smoothMotion} from './HypotheticalMotion';
 export {drawTowerEffects} from './HypotheticalTowerEffects';
 
 const P={dark:'#536e70',joint:'#6c8279',stone:'#94a18b',side:'#7e9384',light:'#b6b69a',cap:'#c5bb96',
@@ -23,6 +24,10 @@ function brokenBelfry(c:CanvasRenderingContext2D,x:number,base:number,tower:Hypo
         p.line(left+2,-98,left+2,-69,P.light,2);p.line(right-1,-99,right-1,-71,P.side,2);
         for(let yy=-95;yy<-69;yy+=6){p.line(left+2,yy,right-2,yy,P.joint);p.line(left+3,yy+1,right-3,yy+1,P.light);}
         p.line(left+2,-82,right-3,-79,P.dark);p.line(right-3,-79,right-4,-75,P.dark);
+        // The ends of the broken bell support stay attached to their jambs.
+        const inner=id==='pier-left'?right:left,sign=id==='pier-left'?1:-1;
+        p.poly([[inner-sign*3,-90],[inner+sign*5,-89],[inner+sign*3,-87],[inner+sign*6,-86],[inner-sign*3,-87]],'#7c8370');
+        p.line(inner-sign*2,-89,inner+sign*3,-88,'#b4ac8a');
     }
     const lintel=partPainter(c,x,base,'lintel',tower);
     lintel.poly([[-11,-102],[12,-102],[12,-90],[7,-94],[0,-97],[-5,-94],[-11,-89]],P.joint);
@@ -83,13 +88,17 @@ function masonry(p:ReturnType<typeof partPainter>,top:number,height:number,broke
         const yy=top+row*8,h=Math.min(7,top+height-yy);p.rect(dx,yy,6,h,P.side);p.line(dx,yy,dx+5,yy,P.cap);p.line(dx,yy+1,dx,yy+h-1,P.light);
     }
 }
-function bell(c:CanvasRenderingContext2D,x:number,y:number,angle:number){
+function bell(c:CanvasRenderingContext2D,x:number,y:number,angle:number,clapper:number){
     const co=Math.cos(angle),si=Math.sin(angle),at=(a:number,b:number):Point=>[x+a*co-b*si,y+a*si+b*co];
     polygon(c,[[-4,-7],[4,-7],[6,1],[10,5],[-10,5],[-6,1]].map(([a,b])=>at(a,b)),P.dark);
     polygon(c,[[-3,-6],[3,-6],[5,1],[8,3],[-8,3],[-5,1]].map(([a,b])=>at(a,b)),P.bell);
-    for(const [a,b,d,e,col] of [[-3,-5,-4,1,P.bellLight],[-8,3,8,3,P.bellLight],[-1,6,2,6,P.dark]] as const){
+    polygon(c,[[-7,4],[7,4],[5,6],[-5,6]].map(([a,b])=>at(a,b)),P.deep);
+    for(const [a,b,d,e,col] of [[-3,-5,-4,1,P.bellLight],[-8,3,8,3,P.bellLight],[3,-4,5,1,'#8a8f72']] as const){
         const u=at(a,b),v=at(d,e);pixelLine(c,u[0],u[1],v[0],v[1],col,2);
     }
+    const pivot=at(0,-2),tip=at(Math.sin(clapper)*8,-2+Math.cos(clapper)*8);
+    pixelLine(c,...pivot,...tip,P.dark);box(c,tip[0]-1,tip[1],3,2,P.bellLight);
+    const band1=at(-4,-1),band2=at(4,-1);pixelLine(c,...band1,...band2,'#c1aa7d');
 }
 
 /** The former static tower is assembled from the same parts before and after
@@ -97,11 +106,6 @@ function bell(c:CanvasRenderingContext2D,x:number,y:number,angle:number){
 export function drawBastionTower(c:CanvasRenderingContext2D,tower:HypotheticalTower,base:number,cameraX:number,reduced:boolean,time:number){
     const x=BASTION_TOWER.x-cameraX,age=tower.impactAge;
     if(x<-110||x>370)return;
-    if(age>=0)for(const b of Object.values(tower.destruction.bodies)){
-        if(b.hidden||b.attached||b.sleeping)continue;
-        const size=8+Math.max(0,1+ b.y/110)*18;
-        oval(c,x+b.x-size/2,base-5,size,3,P.joint);
-    }
     oval(c,x-34,base-5,75,8,P.joint);
     box(c,x-29,base-10,60,7,P.dark);box(c,x-28,base-11,58,3,P.light);box(c,x-26,base-24,52,13,P.stone);
     box(c,x-8,base-24,18,18,P.deep);pixelLine(c,x-7,base-23,x-7,base-5,P.side);
@@ -110,24 +114,35 @@ export function drawBastionTower(c:CanvasRenderingContext2D,tower:HypotheticalTo
         pixelLine(c,x+d*20,base-27,x+d*22,base-9,P.light,2);
         box(c,x+d*22-3,base-16,7,1,P.joint);box(c,x+d*22-2,base-8,7,2,P.cap);
     }
+    if(age>=0)for(const body of Object.values(tower.destruction.bodies)){
+        if(body.hidden||body.attached)continue;
+        const s=tower.destruction.shadow(body),near=1-smoothMotion(s.height/80),width=Math.max(8,s.width*(.48+near*.28));
+        c.save();c.globalAlpha=.16+near*.25;
+        oval(c,x+body.x-width/2,base+s.y-1,width,near> .8?3:2,P.deep);c.restore();
+    }
     const arch=partPainter(c,x,base,'arch',tower);masonry(arch,-42,18,age>=TOWER_RELEASE.arch);
     arch.poly([[-9,-24],[-9,-33],[-6,-38],[0,-40],[7,-38],[10,-33],[10,-24]],P.deep);
     for(const d of [-1,1])arch.line(d*11,-25,d*11,-33,P.cap,2);
     arch.line(-7,-38,-3,-41,P.cap,2);arch.line(3,-41,8,-38,P.cap,2);
     const shaft=partPainter(c,x,base,'shaft',tower);masonry(shaft,-66,24,age>=8);
+    shaft.rect(-5,-58,11,10,P.side);shaft.poly([[0,-57],[4,-53],[0,-49],[-3,-53]],P.light);
     if(age<8){
         shaft.rect(-25,-66,51,4,P.joint);shaft.line(-26,-66,26,-66,P.cap,2);shaft.line(-23,-62,23,-62,P.light);
     }else{
         shaft.poly([[-25,-66],[-10,-66],[-5,-64],[-9,-61],[-24,-62]],P.side);
         shaft.poly([[7,-65],[25,-66],[26,-62],[12,-62]],P.side);
         shaft.line(-25,-66,-10,-66,P.cap,2);shaft.line(10,-65,25,-66,P.cap,2);
-        shaft.poly([[-8,-64],[-1,-61],[5,-62],[10,-57],[3,-55],[-2,-58],[-9,-59]],P.soot);
-        shaft.line(-8,-64,-1,-61,P.dark);shaft.line(3,-55,10,-57,P.light);
+        shaft.poly([[-10,-64],[-4,-66],[4,-63],[7,-64],[12,-58],[7,-54],[1,-55],[-2,-58],[-9,-59]],P.soot);
+        shaft.poly([[-7,-63],[-3,-64],[3,-61],[7,-61],[9,-58],[4,-56],[-1,-59],[-6,-59]],P.deep);
+        shaft.poly([[-7,-63],[-3,-64],[-1,-61],[-3,-60]],'#b6ad8c');
+        shaft.poly([[2,-57],[8,-59],[6,-55],[1,-55]],'#acaa8c');
+        shaft.line(-8,-64,-1,-61,P.dark);shaft.line(1,-55,7,-54,P.light);
+        shaft.line(7,-62,9,-59,P.light);shaft.line(-9,-58,-6,-56,P.joint);
     }
-    shaft.rect(-5,-58,11,10,P.side);shaft.poly([[0,-57],[4,-53],[0,-49],[-3,-53]],P.light);
     if(age>=0){
-        shaft.line(-20,-63,-9,-59,P.dark,2);shaft.line(-9,-59,-3,-52,P.dark);shaft.line(-3,-52,8,-49,P.dark);
-        if(age>10){shaft.line(2,-66,5,-59,P.deep);shaft.line(5,-59,15,-54,P.deep);}
+        shaft.line(-20,-63,-9,-59,P.dark,2);
+        if(age>4){shaft.line(-9,-59,-3,-52,P.dark);shaft.line(-3,-52,8,-49,P.dark);}
+        if(age>10){shaft.line(2,-66,5,-59,P.deep);shaft.line(5,-59,15,-54,P.deep);shaft.line(14,-53,17,-50,P.light);}
     }
     const b=partPainter(c,x,base,'belfry',tower);
     if(tower.destruction.bodies.belfry.hidden)brokenBelfry(c,x,base,tower);
@@ -154,11 +169,24 @@ export function drawBastionTower(c:CanvasRenderingContext2D,tower:HypotheticalTo
     const bronze=tower.destruction.bodies.bell,sway=age<0&&!reduced?Math.sin(time/90)*.07:0;
     if(bronze.attached){
         const u=b.point(0,-88);pixelLine(c,u[0],u[1],x+bronze.x+Math.sin(sway)*8,base+bronze.y-6,P.bellLight,2);
+    }else if(!tower.destruction.bodies.belfry.hidden){
+        const a=age-TOWER_RELEASE.bell,swing=Math.sin(a*.35)*Math.exp(-a/20)*2;
+        b.line(0,-88,swing,-85,P.bellLight);b.line(swing,-85,swing-2,-83,P.side);
     }
-    bell(c,x+bronze.x+Math.sin(sway)*8,base+bronze.y,bronze.angle+sway);
+    bell(c,x+bronze.x+Math.sin(sway)*8,base+bronze.y,bronze.angle+sway,age<0?-sway*.6:tower.destruction.clapper);
     if(age>28){
         pixelLine(c,x-25,base-24,x-18,base-20,P.dark);pixelLine(c,x+15,base-21,x+24,base-16,P.dark);
         box(c,x-15,base-7,3,2,P.side);box(c,x+27,base-5,6,2,P.light);
+    }
+    if(age>=0&&age<16&&!reduced){
+        // The flash briefly catches nearby edges, rather than brightening the
+        // entire scene or washing out the foreground combat silhouettes.
+        c.save();c.globalAlpha=smoothMotion((age+1)/2)*(1-smoothMotion((age-3)/13))*.5;
+        shaft.line(-23,-62,-11,-62,'#dcc29b',2);shaft.line(10,-62,23,-62,'#dcc29b',2);
+        arch.line(-20,-41,20,-41,'#cab996');b.line(-20,-69,20,-69,'#dcc29b',2);
+        b.line(13,-85,13,-71,'#cab996');
+        const bronzeLight=partPainter(c,x,base,'bell',tower);bronzeLight.line(-7,-76,7,-76,'#e0c497');
+        c.restore();
     }
 }
 

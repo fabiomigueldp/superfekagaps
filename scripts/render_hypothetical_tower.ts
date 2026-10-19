@@ -43,6 +43,7 @@ try{
         if(elapsed%60===0)samples.push({frame:elapsed,phase:a.phase,age:t.age,impactAge:t.impactAge,action:a.action,
             destroyed:t.destroyed,rocket:t.rocket?{...t.rocket}:null,launcher:a.launcherPose,
             chips:t.destruction.chips.length,movingChips:t.destruction.chips.filter(p=>!p.rest).length,
+            clapper:t.destruction.clapper,plumes:t.destruction.plumes.map(p=>({...p})),
             bodies:Object.values(t.destruction.bodies).map(b=>({id:b.id,x:b.x,y:b.y,angle:b.angle,
                 sleeping:b.sleeping,hidden:b.hidden,landedAt:b.landedAt,quiet:b.quiet,vx:b.vx,vy:b.vy,spin:b.spin}))});
         drawHypotheticalBackground(c,model,cameraX,64,false);

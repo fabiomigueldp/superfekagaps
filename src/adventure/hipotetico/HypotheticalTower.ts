@@ -22,6 +22,8 @@ export function launcherGeometry(body:RiderBody,p:LauncherPose){
 }
 const pulse=(a:number,start:number,rise:number,hold:number,end:number)=>
     smoothMotion((a-start)/rise)*(1-smoothMotion((a-hold)/(end-hold)));
+/** The motor casing emerges from the tube behind the already-visible warhead. */
+export const rocketTail=(age:number)=>8+5*smoothMotion(age/5);
 
 /** A unique landmark event, independent from the repeatable debris score.
  * Before ignition an unseen scene retracts the weapon; after ignition its
@@ -87,10 +89,11 @@ export class HypotheticalTower {
         }
         if(this.rocket&&this.tick>this.launchAt){
             const r=this.rocket,speed=Math.min(r.remaining,1.1+5.6*smoothMotion((r.age-3)/15));
-            for(let d=3-this.trailGap;d<=speed;d+=3){
-                this.trail.push({x:r.x+r.dx*(d-8),y:r.y+r.dy*(d-8),born:this.tick-(speed-d)/speed,seed:this.trailSeed++});
+            if(r.age>=3)for(let d=3-this.trailGap;d<=speed;d+=3){
+                const tail=rocketTail(r.age+d/speed);
+                this.trail.push({x:r.x+r.dx*(d-tail),y:r.y+r.dy*(d-tail),born:this.tick-(speed-d)/speed,seed:this.trailSeed++});
             }
-            this.trailGap=(this.trailGap+speed)%3;
+            this.trailGap=r.age>=3?(this.trailGap+speed)%3:0;
             r.age++;r.speed=speed;r.remaining-=speed;r.x+=r.dx*speed;r.y+=r.dy*speed;
             if(r.age===4)this.events.push('distant-rocket');
             if(r.remaining<=0){
@@ -105,7 +108,7 @@ export class HypotheticalTower {
             if(contacts.some(c=>c.part==='bell'&&c.first))this.events.push('distant-bell');
             const strongest=contacts.filter(c=>c.part!=='bell').sort((a,b)=>b.strength-a.strength)[0];
             if(strongest&&this.tick-this.rubbleCueAt>=10){
-                this.events.push(strongest.material==='tile'?'distant-wood':'distant-stone');this.rubbleCueAt=this.tick;
+                this.events.push(strongest.material==='tile'||strongest.material==='wood'?'distant-wood':'distant-stone');this.rubbleCueAt=this.tick;
             }
         }
     }
