@@ -1,0 +1,28 @@
+Technical documentation supplement for 529aa16c7ffbf0c43b6933beb4cebccb5dec24d0
+
+feat(hipotetico): stage background discoveries and short pursuits
+
+Add finite resident discoveries and short pursuits between recurring material activities.
+
+Implementation
+HypotheticalAftermathEscape.ts creates exactly two EscapeEntry residents per yard: rubble and hatch. Each owns its hiding place, exit, stance, Bystander, begunAt/completed state and bounded wall marks. candidate() requires both timing/performance eligibility and a visible source, exit and stance.
+
+ESCAPE_TIMINGS defines separate peek, run, chase, shot and recovery phases. The actor uses the shared native gait/fall rig. The mount accelerates toward a trailing position and brakes after the resident is hit or escapes; body pose adds recognition, reins and delayed rider compensation.
+
+HypotheticalAftermath introduces the pursuit phase and fireAtEscape(). Existing scenic projectiles use bystanderIntersection() through intersectShot(); misses can hit the ground or shelter wall. Hit motion retains part of the runner’s velocity and shortens the active passage only after a recovery interval.
+
+HypotheticalAftermathEscapeArt draws rubble/hatch fixtures, opening occlusion, the emerging resident, dust and retained marks. The director plans the tower before pursuit, and suppresses ordinary incidents while the passage or its approach is reserved.
+
+Timing and limitations
+Initial eligibility requires at least two completed performances. Starting an entry sets nextAt to tick +1260 and nextPerformance to performed +5. Its begunAt prevents reuse. Rubble/hatch maximum passage lengths are 260/256 ticks before hit-based shortening.
+
+Each entry retains at most eight wall marks. The removedAt/forage lifecycle is added in 0e96e46; it is not part of this initial escape patch. Pursuit remains background-only and does not replace player control or guard progression.
+
+Authoring material
+Adds scripts/render_hypothetical_escapes.ts and escape-activities.mp4, escape-study.json, two fixture stills, a poster and detail board. The study contains four five-second 60-fps held compositions, not an interactive playthrough.
+
+Publication evidence
+A retained successful publisher response identifies build `529aa16c7ffbf0c43b6933beb4cebccb5dec24d0-e1c331a6f7a3` for this exact source revision. The matching request records command `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its saved build-log SHA-256 is `32e3cb937e803863133c4eefe6f70ff84726985b84935e7769afe084eb5d378f`. This records build and activation completion; it is not evidence of correct gameplay, audio quality or passing tests.
+
+Full source map and patch inventory: docs/commits/2026-10-19-followup/529aa16.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
