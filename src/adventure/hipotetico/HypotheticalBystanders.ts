@@ -15,9 +15,9 @@ const WARDROBE={
     scarf:{base:'#9b9271',shade:'#736c60',light:'#c0b38b'},
     satchel:{base:'#8598a2',shade:'#566f7d',light:'#adbbb1'},
 };
-const SKIN=['#c1a183','#b18872','#947567','#d0b19a'];
+export const SKIN=['#c1a183','#b18872','#947567','#d0b19a'];
 const HAIR=['#53615b','#514e51','#6b625b','#a4a393'];
-const SKIN_SHADE=['#a08773','#96715f','#7d635b','#b49683'];
+export const SKIN_SHADE=['#a08773','#96715f','#7d635b','#b49683'];
 const textures=new Map<string,BystanderTexture>();
 
 function clothes(p:Bystander,paint:Paint,height:number){
