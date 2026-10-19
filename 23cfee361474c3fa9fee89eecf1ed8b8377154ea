@@ -1,0 +1,18 @@
+Technical documentation supplement for 23cfee361474c3fa9fee89eecf1ed8b8377154ea
+
+feat(hipotetico): plant dinosaur feet and propagate yard vibrations
+
+Behavior
+Plant the dinosaur feet during background effort and propagate local impact vibration to nearby fittings.
+
+Implementation
+HypotheticalAftermathFooting.ts adds PlantedFeet and aftermathFooting(). It repositions feet before effort, compensates root movement during the pull and releases the stance afterward. dinosaurLeg() accepts an explicit plantedFoot, consumed by HypotheticalArt. AftermathEnvironment adds YardImpulse, yardImpulseAge(), yardVibration() and disturb(), with travel delay, distance decay and bounded impulse storage.
+
+Scope and limitations
+Updates material-response authoring and tower integration. Nearby impacts are coalesced rather than restarting the vibration for every fragment. This is a pose/environment change, not a change to player collision.
+
+Publication evidence
+A successful local publisher receipt identifies build `23cfee361474c3fa9fee89eecf1ed8b8377154ea-0b464d4f7290` for this exact source commit. The report records `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its build-log SHA-256 is `4ed0e379c18254ef3951ef50fa4075a9cb186c40c8a348adaae75263ed96d252`. This establishes recorded build/publication completion, not gameplay correctness.
+
+Full file inventory and provenance: docs/commits/2026-10-19/23cfee3.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
