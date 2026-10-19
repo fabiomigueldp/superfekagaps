@@ -119,6 +119,7 @@ function belongings(c:CanvasRenderingContext2D,p:Bystander,tick:number,base:numb
         const shock=impactAt<0||reduced?0:Math.max(0,Math.min(1,(tick-impactAt-6-i*3)/30));
         const drift=-shock*(7+i*2),lift=Math.sin(shock*Math.PI)*(4+i);
         box(c,xx+drift,yy-lift,4,1,'#d2ccb1');box(c,xx+1+drift,yy+1-lift,3,1,'#aaa88f');
+        if(p.opening&&tick>=OPENING.contact+i*2)box(c,xx+1+drift,yy-lift,2,1,i%2?'#8f292f':'#6e1e24');
     }
 }
 
@@ -126,19 +127,14 @@ function belongings(c:CanvasRenderingContext2D,p:Bystander,tick:number,base:numb
 export function drawBystanders(output:CanvasRenderingContext2D,b:HypotheticalBackdrop,street:number,reduced:boolean,openingOnly=false){
     if(!openingOnly)drawBlood(output,b,street,reduced,false);
     for(const p of [...b.people].sort((a,b)=>(a.depth??0)-(b.depth??0))){
-        if(Boolean(p.opening)!==openingOnly)continue;
+        const behindDino=Boolean(p.opening)||(p.exitAtShelter===true&&p.shelter===116&&b.tick>0&&b.tick<OPENING.join);
+        if(behindDino!==openingOnly)continue;
         const base=street+(p.depth??0);
         const site=p.district===0?(p.originX>320?1:0):p.district+1;
         belongings(output,p,b.tick,p.opening?street:base,b.breaches[site],reduced);
-        if(p.escaped||p.capturedAt!==undefined&&b.tick>=OPENING.occluded)continue;
+        if(p.escaped||p.capturedAt!==undefined&&b.tick>=OPENING.clamp)continue;
         const c=actorContext(output,p);
         const x=p.x,pose=bystanderPose(p,b.tick),age=pose.age,skin=SKIN[p.color];
-        if(p.capturedAt!==undefined){
-            const fold=smoothMotion((b.tick-p.capturedAt)/8);
-            pose.left=[pose.left[0]-fold*2,pose.left[1]-fold*3];
-            pose.right=[pose.right[0]+fold*2,pose.right[1]-fold];
-            pose.leftHand=[-7,-13-fold*2];pose.rightHand=[7,-12-fold*3];
-        }
         const cloth=WARDROBE[p.clothes],ink='#485f62',shoe='#89978a';
         if(age>=0){
             const motion=bystanderFall(p,b.tick),{angle,height,headTop}=motion,fall=angle/(Math.PI/2);

@@ -123,8 +123,8 @@ export class HypotheticalBackdrop {
             p.reactionTimes=p.reactionTimes.filter(at=>tick-at<32);
             if(p.capturedAt!==undefined){
                 if(tick<=OPENING.occluded){
-                    const old=p.x,u=smoothMotion((tick-p.capturedAt)/(OPENING.occluded-OPENING.contact));
-                    p.x=p.captureX!+(m.x+50*BACKDROP_RIG.scale-p.captureX!)*u;p.depth=-6*u;
+                    const old=p.x,u=smoothMotion((tick-p.capturedAt)/(OPENING.occluded-OPENING.clamp));
+                    p.x=p.captureX!+(m.x+48*BACKDROP_RIG.scale-p.captureX!)*u;p.depth=-6*u;
                     p.velocity=p.x-old;p.distance+=Math.abs(p.velocity);
                 }
                 continue;
@@ -138,8 +138,11 @@ export class HypotheticalBackdrop {
             if(p.x===p.shelter&&p.stoppedAt===null)p.stoppedAt=tick;
             if (p.exitAtShelter?p.x===p.shelter:p.fleeing&&p.x>(this.wide?SIEGE_WIDTH+6:326))p.escaped=true;
         }
-        if(tick===OPENING.contact){
+        if(tick===OPENING.clamp){
             const actor=this.people.find(p=>p.opening)!;actor.capturedAt=tick;actor.captureX=actor.x;
+            this.events.push('distant-thud');
+        }
+        if(tick===OPENING.contact){
             this.events.push('distant-thud');
             for(const p of this.people)if(!p.opening&&p.district===0&&p.originX<336&&!p.escaped&&p.hitAt===null){
                 p.reactionTimes.push(tick+3+p.color%3);p.startledAt=tick;

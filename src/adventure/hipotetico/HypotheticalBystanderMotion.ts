@@ -11,12 +11,12 @@ export function bystanderPose(p:Bystander,tick:number){
     };
     const crouch=p.stoppedAt===null?0:smoothMotion((tick-p.stoppedAt)/9);
     const pulse=(age:number,rise:number,hold:number,end:number)=>age<0?0:smoothMotion(age/rise)*(1-smoothMotion((age-hold)/(end-hold)));
-    const recoil=p.reactionTimes.reduce((value,at)=>Math.max(value,pulse(tick-at,p.exitAtShelter?10:8,14,32)),0);
+    const recoil=p.reactionTimes.reduce((value,at)=>Math.max(value,pulse(tick-at,p.exitAtShelter?14:8,15,32)),0);
     const alert=pulse(tick-p.alertAt,8,10,28),cover=Math.max(crouch,recoil,alert);
     const glance=(p.distance%72)-24;
     const gaze=Math.max(p.threatenedAt===null?0:pulse(tick-p.threatenedAt,6,12,24),p.fleeing?pulse(glance,5,18,24):0);
     const lean=travel*2,hipY=-6+crouch*4,torsoY=hipY-Math.round(9-crouch*2),headY=-22+crouch*8;
-    const swing=running?Math.sin(cycle*Math.PI*2)*3*travel:0;
+    const swing=running?Math.sin(cycle*Math.PI*2)*(p.exitAtShelter?2.4:3)*travel:0;
     const mix=(a:number,b:number)=>a+(b-a)*cover;
     const leftHand=[mix(-7+swing,-6+lean),mix(torsoY+6,headY+5)];
     const rightHand=[mix(5-swing,5+lean),mix(torsoY+7,headY+4)];

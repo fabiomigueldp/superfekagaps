@@ -17,7 +17,7 @@ const P = { ink: '#172c36', deep: '#263f3d', shade: '#556047', hide: '#92845a', 
     suit: '#304659', lapel: '#607487', skin: '#c58d68', face: '#edbc8e', hair: '#3c3034',
     brass: '#d3a75c', mint: '#99e0cf', hot: '#ffb267', scute:'#6e7953', skinLight:'#f7d2a6',
     mouth:'#593b40', tongue:'#bc796a', leather:'#583f38', stitch:'#b8885d', clothShade:'#203644' };
-export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; riderDrop?:number; riderLean?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number; lookBack?:number }
+export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; riderDrop?:number; riderLean?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number; lookBack?:number; gore?:number }
 const fogPalette=new Map<string,string>();
 function distantColor(color:string){
     if(!fogPalette.has(color)){
@@ -204,7 +204,19 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     line(32,neck+7,63,neck+6,P.rust);
     for(const [tx,length] of [[36,3],[41,5],[47,4],[53,5],[59,3]]){
         poly([[tx,neck+6],[tx+3,neck+6],[tx+1,neck+6+length]],P.ivory);
-        if(jaw>3)poly([[tx+1,neck+13+jaw],[tx+3,neck+13+jaw],[tx+2,neck+10+jaw]],P.light);
+        if((pose.gore??0)>.2)poly([[tx,neck+6+length-2],[tx+2,neck+6+length-2],[tx+1,neck+6+length]],'#9e3237');
+        if(jaw>3){
+            poly([[tx+1,neck+13+jaw],[tx+3,neck+13+jaw],[tx+2,neck+10+jaw]],P.light);
+            if((pose.gore??0)>.2)rect(tx+1,neck+10+jaw,2,2,'#8f292f');
+        }
+    }
+    if((pose.gore??0)>.2){
+        line(36,neck+14+jaw,58,neck+15+jaw,'#7a2228',2);
+        line(40,neck+7,61,neck+6,'#9e3237');
+        if((pose.gore??0)>.8&&jaw>4){
+            line(42,neck+9,43,neck+11+jaw,'#9e3237');
+            line(54,neck+9,53,neck+11+jaw,'#7a2228');
+        }
     }
     rect(47,neck-7,7,4,P.ink);rect(49,neck-6,4,2,P.brass);rect(51,neck-6,1,2,P.ink);
     rect(49,neck-6,1,1,P.ivory);
@@ -346,7 +358,8 @@ export function distantRiderPose(action:HypotheticalBackdrop,reduced=false):Dino
         cloth:reduced?0:Math.min(4,Math.abs(action.velocity)*1.8)+m.force*1.5,
         riderDrop:m.riderDrop,riderLean:m.riderLean,rein:m.rein,lookBack:m.lookBack,
         blink:false,daze:0,armor:9,flash:false,defeated:false,distant:true,focus:m.force||action.muzzle?1:0,
-        voice:m.local>=m.impactTick&&m.local<m.impactTick+16?.65*(1-smoothMotion((m.local-m.impactTick-5)/11)):0};
+        gore:m.district===0&&action.tick>=63?(action.tick<110?1:.75):0,
+        voice:m.district===0&&action.tick>=63&&action.tick<90?.7:m.local>=m.impactTick&&m.local<m.impactTick+16?.65*(1-smoothMotion((m.local-m.impactTick-5)/11)):0};
 }
 const backgroundRigs=new WeakMap<CanvasRenderingContext2D,{canvas:HTMLCanvasElement;c:CanvasRenderingContext2D}>();
 function drawDistantRider(c:CanvasRenderingContext2D,b:HypotheticalModel,base:number,reduced:boolean){
