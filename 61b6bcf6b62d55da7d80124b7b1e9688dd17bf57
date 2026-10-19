@@ -1,0 +1,18 @@
+Technical documentation supplement for 61b6bcf6b62d55da7d80124b7b1e9688dd17bf57
+
+Merge remote-tracking branch 'origin/main'
+
+Behavior
+Merge the three Classic improvements from origin/main into the local aftermath implementation.
+
+Implementation
+This is a two-parent merge: first parent 893228c contains the local scene work; second parent 0352fae includes c559543 and f3488a2. Relative to the first parent, it adds Classic interruption pause, reduced-motion shake handling and scoreboard accessibility, including their test files.
+
+Scope and limitations
+The merge completed without conflicts in the recorded publication session. A merge is not a second implementation of the incoming fixes. File inventory below uses the first-parent diff to avoid double-counting local aftermath changes.
+
+Publication evidence
+A successful local publisher receipt identifies build `61b6bcf6b62d55da7d80124b7b1e9688dd17bf57-8a69c3162247` for this exact source commit. The report records `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its build-log SHA-256 is `43e88b4dcc6b6adca9f88cd52b76bb72ab89c669a5d1a8dd5d08c86f04b6ea26`. This establishes recorded build/publication completion, not gameplay correctness.
+
+Full file inventory and provenance: docs/commits/2026-10-19/61b6bcf.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
