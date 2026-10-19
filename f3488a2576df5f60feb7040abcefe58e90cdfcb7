@@ -1,0 +1,18 @@
+Technical documentation supplement for f3488a2576df5f60feb7040abcefe58e90cdfcb7
+
+Respect reduced motion for Classic camera shake
+
+Behavior
+Respect the live reduced-motion setting during Classic camera shake.
+
+Implementation
+Game.updateCamera() continues decrementing shakeTimer but applies random camera x/y offsets only when renderer.reducedMotion is false. Tracking and zoom continue through the same camera update. Adds tests/classic-reduced-motion-shake.test.ts for normal shake, reduced motion, preference changes and expiry.
+
+Scope and limitations
+The original commit body reports 3 camera tests, 36 existing Classic regressions, both TypeScript projects and a production build passing. This task does not repeat those checks.
+
+Publication evidence
+No successful per-commit publisher receipt was found in the retained local deployment logs during this review. This does not establish whether the commit was published elsewhere or as part of a later descendant. No per-commit test pass is inferred.
+
+Full file inventory and provenance: docs/commits/2026-10-19/f3488a2.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
