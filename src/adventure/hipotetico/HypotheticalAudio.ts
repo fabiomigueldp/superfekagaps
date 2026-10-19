@@ -1,6 +1,6 @@
 export type WeaponCue = 'shot' | 'impact' | 'splash' | 'collapse-water' | 'debris-land' | 'reload' | 'distant-shot' | 'distant-hit' | 'distant-crash' | 'distant-debris' | 'distant-thud'
     | 'guard-swipe' | 'guard-sweep' | 'guard-parry' | 'guard-stomp' | 'distant-roar'
-    | 'distant-wood' | 'distant-stone' | 'distant-metal';
+    | 'distant-wood' | 'distant-stone' | 'distant-metal' | 'distant-launch' | 'distant-blast' | 'distant-bell';
 interface Route { context: BaseAudioContext; destination: AudioNode; enabled: boolean }
 
 /** Short, owned voices on WorldAudio's existing effects bus. No new context or timers. */
@@ -25,6 +25,9 @@ export class HypotheticalAudio {
             kind==='distant-wood'?{duration:.16,filter:'bandpass' as BiquadFilterType,cutoff:1900,tail:540,noise:.31,pitch:174,end:74,body:.16,wave:'triangle' as OscillatorType}:
             kind==='distant-stone'?{duration:.27,filter:'lowpass' as BiquadFilterType,cutoff:1150,tail:240,noise:.34,pitch:112,end:46,body:.23,wave:'triangle' as OscillatorType}:
             kind==='distant-metal'?{duration:.36,filter:'bandpass' as BiquadFilterType,cutoff:2700,tail:840,noise:.14,pitch:710,end:395,body:.14,wave:'sine' as OscillatorType}:
+            kind==='distant-launch'?{duration:.34,filter:'bandpass' as BiquadFilterType,cutoff:1900,tail:330,noise:.4,pitch:210,end:62,body:.22,wave:'triangle' as OscillatorType}:
+            kind==='distant-blast'?{duration:.64,filter:'lowpass' as BiquadFilterType,cutoff:2100,tail:100,noise:.55,pitch:94,end:29,body:.48,wave:'triangle' as OscillatorType}:
+            kind==='distant-bell'?{duration:.72,filter:'bandpass' as BiquadFilterType,cutoff:1800,tail:520,noise:.14,pitch:436,end:392,body:.27,wave:'sine' as OscillatorType}:
             kind==='distant-thud'?{duration:.18,filter:'lowpass' as BiquadFilterType,cutoff:820,tail:120,noise:.2,pitch:96,end:38,body:.38,wave:'triangle' as OscillatorType}:
             kind==='collapse-water'?{duration:.28,filter:'bandpass' as BiquadFilterType,cutoff:1600,tail:200,noise:.18,pitch:145,end:48,body:.12,wave:'sine' as OscillatorType}:
             kind==='debris-land'?{duration:.16,filter:'lowpass' as BiquadFilterType,cutoff:980,tail:170,noise:.18,pitch:110,end:42,body:.13,wave:'triangle' as OscillatorType}:
@@ -41,7 +44,8 @@ export class HypotheticalAudio {
                 for(let i=0;i<data.length;i++){seed=(Math.imul(seed,1664525)+1013904223)>>>0;data[i]=seed/2147483648-1;}this.buffers.set(c,buffer);}
             const noise=c.createBufferSource(),filter=c.createBiquadFilter(),env=c.createGain(),body=c.createOscillator(),low=c.createGain();
             nodes.push(noise,filter,env,body,low);sources.push(noise,body);noise.buffer=buffer;
-            const duration=contact?.duration??(splash?.16:crash?.32:kind==='reload'?.045:shot?.18:.085),volume=crash?.55:distant?.24:1;
+            const duration=contact?.duration??(splash?.16:crash?.32:kind==='reload'?.045:shot?.18:.085),volume=crash?.55:kind==='distant-blast'?.4:distant?.24:1;
+            noise.loop=duration>buffer.duration;
             filter.type=contact?.filter??(splash?'bandpass':kind==='reload'?'highpass':'lowpass');
             filter.frequency.setValueAtTime(contact?.cutoff??(splash?2100:crash?1100:distant?1500:shot?5800:6200),now);
             if(shot)filter.frequency.exponentialRampToValueAtTime(distant?780:2400,now+.018);

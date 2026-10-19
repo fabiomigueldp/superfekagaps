@@ -6,6 +6,7 @@ import {gunRecoil,type GunImpact,type GunTrace} from './HypotheticalGunfire';
 import {AFTERMATH_PROPS,AFTERMATH_SCORES,aftermathReach,aftermathActionTiming,type AftermathAction} from './HypotheticalAftermathScore';
 import {AFTERMATH_SCALE,DEBRIS_GRIP_X,createAftermathProp,handlingForMaterial,handlingMotion,handlingTiming,
     isHandling,shutterHandle,stepAftermathProp,type AftermathProp,type HeldDebris} from './HypotheticalAftermathHandling';
+import {HypotheticalTower,BASTION_TOWER,TOWER_SEQUENCE,launcherGeometry,towerLauncherPose,type TowerCue} from './HypotheticalTower';
 
 /** These small service yards belong to the rear street, never to Feka's collision layer. */
 export const AFTERMATH_YARDS = SIEGE_SECTORS.map((s, district) => ({
@@ -14,9 +15,9 @@ export const AFTERMATH_YARDS = SIEGE_SECTORS.map((s, district) => ({
     start: district === 0 ? 634 : 278,
 }));
 type Activity = 'approach' | 'search' | 'rummage' | 'listen' | 'flush' | 'turn-out' | 'patrol' | 'survey' | 'turn-back' | 'return' | 'watch'
-    | 'roam' | 'orient' | 'perform' | 'recover';
+    | 'roam' | 'orient' | 'perform' | 'recover' | 'tower';
 type Sound = 'distant-debris' | 'distant-thud' | 'distant-shot' | 'distant-hit' | 'distant-roar'
-    | 'distant-wood' | 'distant-stone' | 'distant-metal';
+    | 'distant-wood' | 'distant-stone' | 'distant-metal' | TowerCue;
 export interface AftermathContact { x:number; y?:number; born:number; strength:number; kind:'scrape'|'break'|'step'; material?:'timber'|'stone'|'iron' }
 interface AmbientShot extends GunTrace {targetX:number;targetY:number;remaining:number;prop:number}
 export interface AftermathYard {
@@ -38,6 +39,7 @@ export class HypotheticalAftermath {
     action:AftermathAction='ram'; actionCount=0; variant=0; targetProp=-1;
     targetX=0;targetY=0; muzzle=0;heat=0;
     shots:AmbientShot[]=[];impacts:GunImpact[]=[];
+    readonly tower=new HypotheticalTower();
     casings:Array<{x:number;y:number;born:number;direction:number}>=[];
     readonly yards:AftermathYard[] = AFTERMATH_YARDS.map((yard, district) => ({
         damage:0, shiftedAt:-1, brokenAt:-1, birdsAt:-1, runnerAt:-1,birdsFlights:0,roarAt:-1,
@@ -56,8 +58,8 @@ export class HypotheticalAftermath {
     private destination=0;
     private destinationFacing=1;
     private roamTicks=72;
-    private orientThen:'roam'|'perform'|'search'='perform';
-    private roamThen:'perform'|'search'='perform';
+    private orientThen:'roam'|'perform'|'search'|'tower'='perform';
+    private roamThen:'perform'|'search'|'tower'='perform';
     private recent:AftermathAction[]=[];
     private viewX=0;
     private planView=0;
@@ -85,10 +87,12 @@ export class HypotheticalAftermath {
             case 'orient': return 36;
             case 'perform': return aftermathActionTiming(this.action,this.variant).duration;
             case 'recover': return 32+(this.variant%3)*8;
+            case 'tower': return TOWER_SEQUENCE.end;
         }
     }
     private enter(phase:Activity){
         this.phase=phase; this.age=0; this.fromX=this.x; this.fromFacing=this.facing;
+        if(phase==='tower')this.tower.begin();
         if(phase==='perform'){
             this.recent=[...this.recent,this.action].slice(-2);
             this.lastPerformed[this.action]=++this.performances;
@@ -106,13 +110,20 @@ export class HypotheticalAftermath {
             :material==='stone'?'distant-stone':kind==='break'?'distant-thud':'distant-debris');
     }
     private inView(x:number,margin=20){return x>=this.viewX+margin&&x<=this.viewX+320-margin;}
-    private orient(facing:number,next:'roam'|'perform'|'search'){
+    private orient(facing:number,next:'roam'|'perform'|'search'|'tower'){
         this.destinationFacing=facing;this.orientThen=next;
         this.enter(this.facing===facing?next:'orient');
     }
     /** A rotating score changes order each lap and excludes the two last
      * performances. Placement is chosen before anticipation, not during impact. */
     private plan(){
+        const towerStance=Math.min(this.origin+250,this.viewX+246);
+        if(this.district===3&&this.yard.damage===2&&this.tower.available&&this.towerFramed(towerStance)){
+            this.targetProp=-1;this.roamThen='tower';this.destination=towerStance;this.planView=this.viewX;
+            this.roamTicks=Math.max(48,Math.min(144,Math.ceil(Math.abs(this.destination-this.x)*1.45)));
+            this.orient(Math.sign(this.destination-this.x)||this.facing,'roam');this.destinationFacing=-1;
+            return;
+        }
         this.roamThen='perform';
         const order=AFTERMATH_SCORES[this.district],lap=Math.floor(this.actionCount/order.length);
         const candidates=Array.from({length:order.length},(_,j)=>order[(this.actionCount+lap*2+j)%order.length]);
@@ -179,6 +190,16 @@ export class HypotheticalAftermath {
         return {x:shoulder.x+this.facing*Math.cos(p.aim)*31*scale,y:shoulder.y+Math.sin(p.aim)*31*scale,
             dx:this.facing*Math.cos(p.aim),dy:Math.sin(p.aim)};
     }
+    private towerFramed(x=this.x){
+        return x>BASTION_TOWER.x+84&&this.inView(x-60,12)&&this.inView(x+60,12)
+            &&this.inView(BASTION_TOWER.x+BASTION_TOWER.left,12)&&this.inView(BASTION_TOWER.x+BASTION_TOWER.right,12);
+    }
+    get launcherPose(){const p=this.pose(false);return towerLauncherPose(this.tower,p,p.lift,this.x,this.facing);}
+    get launcherBarrel(){
+        const p=this.pose(false),g=launcherGeometry(p,this.launcherPose),s=AFTERMATH_SCALE;
+        return {x:this.x+this.facing*g.mouth[0]*s,y:p.lift+g.mouth[1]*s,
+            backX:this.x+this.facing*g.exhaust[0]*s,backY:p.lift+g.exhaust[1]*s};
+    }
     private fire(){
         if(this.targetProp<0||!this.inView(this.targetX,16)||!this.inView(this.x,24))return;
         this.muzzle=5;this.heat=Math.min(1,this.heat+.22);
@@ -243,6 +264,8 @@ export class HypotheticalAftermath {
         }else if(this.phase==='roam'){
             this.x=this.fromX+(this.destination-this.fromX)*smoothMotion(this.age/this.duration);
             if(this.age>=this.duration)this.orient(this.destinationFacing,this.roamThen);
+        }else if(this.phase==='tower'){
+            if(this.tower.done)this.enter('recover');
         }else if(this.phase==='perform'){
             const timing=aftermathActionTiming(this.action,this.variant),a=this.age;
             if(isHandling(this.action))this.handleDebris();
@@ -277,6 +300,8 @@ export class HypotheticalAftermath {
         this.events=[];
         this.tick++;
         this.viewX=Math.max(0,Math.min(SIEGE_WIDTH-320,playerX-132));
+        this.tower.update(this.phase==='tower'&&this.towerFramed(),()=>this.launcherBarrel);
+        if(this.district===3&&(this.inView(BASTION_TOWER.x,0)||this.phase==='tower'))this.events.push(...this.tower.events);
         this.muzzle=Math.max(0,this.muzzle-1);this.heat=Math.max(0,this.heat-.006);
         this.casings=this.casings.filter(p=>this.tick-p.born<150).slice(-18);
         this.impacts=this.impacts.filter(p=>this.tick-p.born<100).slice(-24);
@@ -330,7 +355,7 @@ export class HypotheticalAftermath {
             }else{s.x+=s.vx;s.y+=s.vy;}
         }
         this.shots=this.shots.filter(s=>s.remaining>0&&s.age<60).slice(-12);
-        if(['roam','orient','perform','recover'].includes(this.phase)){
+        if(['roam','orient','perform','recover','tower'].includes(this.phase)){
             const old=this.x;this.routine();this.velocity=this.x-old;this.travel+=Math.abs(this.velocity);
             const step=Math.floor(this.travel/(Math.PI*11*AFTERMATH_SCALE));
             if(step>this.lastStep&&this.stride>.15&&this.inView(this.x)){this.contact('step',this.x+this.facing*(step%2?9:-7),.4);this.lastStep=step;}
@@ -454,7 +479,7 @@ export class HypotheticalAftermath {
         const shoulderY=bodyLift+(-78+compression+riderDrop)*AFTERMATH_SCALE;
         const shoulderX=this.x+this.facing*(7-recoil+tuck*10+riderBend(14,riderLean))*AFTERMATH_SCALE;
         const gunAngle=Math.atan2(this.targetY-shoulderY,Math.max(12,(this.targetX-shoulderX)*this.facing));
-        return {
+        const pose={
             facing:this.facing, gait:this.travel/(AFTERMATH_SCALE*11), stride:this.stride,
             pivot:turn||orienting?Math.sin(Math.PI*turnProgress)*.98:0,
             bow,
@@ -471,5 +496,8 @@ export class HypotheticalAftermath {
             blink:this.tick%197<5, voice:Math.max(phase==='flush'?pulse(a-60,4,12,30)*.28:0,roar*.65),
             cloth:reduced?0:this.stride*2+strike*2+ram*3+tailStrike*2+roar+(h?.toss??0)*3,
         };
+        if(this.phase==='tower')return {...pose,...this.tower.body,stride:0,rein:0,recoil:0,aim:-.12,
+            lift:0,reload:0,cloth:reduced?0:this.tower.motion.recoil*3};
+        return pose;
     }
 }

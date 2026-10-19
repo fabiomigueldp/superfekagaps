@@ -14,6 +14,7 @@ import {drawArrivalCourtyard,drawArrivalPlaza,drawArrivalFittings} from './Hypot
 import {drawForecourt} from './HypotheticalForecourt';
 import {masonryFall,SCENIC_FRACTURE,scenicRecoil,craneLoad,bastionCloth,arsenalPressure,scenicChip} from './HypotheticalScenicMotion';
 import {drawSiegeDistricts,drawSiegeRouteBody} from './HypotheticalDistrictArt';
+import {drawBastionTower} from './HypotheticalTowerArt';
 
 const S = {
     ink: '#213545', joint: '#354956', stone: '#677b7c', stoneShade: '#516571',
@@ -372,18 +373,7 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
             }else if(i===3){
                 // The last post is a fortified customs yard, with buttresses and
                 // a bell tower grounded on the same rear street as its facade.
-                const tx=x+102,top=base-108;
-                box(c,tx,top,46,104,'#718b82');box(c,tx+3,top+5,40,99,'#95a28e');
-                for(const dx of [0,39]){box(c,tx+dx-3,top+9,9,95,'#6b827c');box(c,tx+dx-2,top+10,2,92,'#b4b49a');}
-                roof(c,tx-3,top,52,true);arch(c,tx+12,top+16,22,37,'#435f65');
-                const sway=reduced?0:Math.sin(time/90)*1.2+scenicRecoil(damageAge,9,8,8,62);
-                const bellRise=13-Math.sqrt(Math.max(0,169-sway*sway));
-                pixelLine(c,tx+22,top+18,tx+22+sway,top+31-bellRise,'#b2a586',2);
-                polygon(c,[[tx+17+sway,top+29-bellRise],[tx+28+sway,top+29-bellRise],
-                    [tx+32+sway,top+41-bellRise],[tx+13+sway,top+41-bellRise]],'#b6a06e');
-                box(c,tx+13+sway,top+40-bellRise,19,2,'#dfc28b');
-                box(c,tx+21+sway*.6,top+42-bellRise,3,3,'#6c7469');
-                arch(c,tx+12,base-30,24,26,'#4c6a69');box(c,tx+11,base-6,27,2,'#b9b095');
+                drawBastionTower(c,b.backdrop.aftermath.tower,base,cx,reduced,time);
                 for(const dx of [278,318,358,398,438]){
                     box(c,x+dx,base-39,8,35,'#7a9185');box(c,x+dx-2,base-42,12,4,'#b1b49a');
                     if(dx<438){arch(c,x+dx+8,base-32,32,28,'#536f70');pixelLine(c,x+dx+8,base-32,x+dx+39,base-32,'#94a78e',2);}

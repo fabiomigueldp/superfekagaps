@@ -11,6 +11,9 @@ import {drawOpeningAftermath} from './HypotheticalOpening';
 import {drawAftermathYards,drawAftermathEffects} from './HypotheticalAftermathArt';
 import {drawDebrisPiece} from './HypotheticalDebrisArt';
 import {AFTERMATH_SCALE,DEBRIS_GRIP_X,type HeldDebris} from './HypotheticalAftermathHandling';
+import {drawTowerEffects} from './HypotheticalTowerArt';
+import {drawLauncher,drawLauncherHands} from './HypotheticalLauncherArt';
+import type {LauncherPose} from './HypotheticalTower';
 import { drawHypotheticalScenery, drawHypotheticalDestruction, drawHypotheticalMasonry, drawHypotheticalFittings } from './HypotheticalScenery';
 import { drawHypotheticalCanister } from './HypotheticalGuardArt';
 export { drawHypotheticalGuard } from './HypotheticalGuardArt';
@@ -20,7 +23,7 @@ const P = { ink: '#172c36', deep: '#263f3d', shade: '#556047', hide: '#92845a', 
     suit: '#304659', lapel: '#607487', skin: '#c58d68', face: '#edbc8e', hair: '#3c3034',
     brass: '#d3a75c', mint: '#99e0cf', hot: '#ffb267', scute:'#6e7953', skinLight:'#f7d2a6',
     mouth:'#593b40', tongue:'#bc796a', leather:'#583f38', stitch:'#b8885d', clothShade:'#203644' };
-export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; riderDrop?:number; riderLean?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number; lookBack?:number; gore?:number; heldDebris?:HeldDebris }
+export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; riderDrop?:number; riderLean?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number; lookBack?:number; gore?:number; heldDebris?:HeldDebris; launcher?:LauncherPose }
 const fogPalette=new Map<string,string>();
 function distantColor(color:string){
     if(!fogPalette.has(color)){
@@ -42,6 +45,11 @@ function drawDinosaurPivot(c:CanvasRenderingContext2D,p:DinosaurPose){
     const x=p.x,y=p.y,body=y-43+p.compression,head=x+p.facing*42*profile;
     const rect=(xx:number,yy:number,w:number,h:number,col:string)=>box(c,x+xx,y+yy,w,h,col);
     const saddle=y-64+p.compression,rider=saddle+(p.riderDrop??0),lean=p.riderLean??0;
+    if(p.launcher){
+        // Narrow rear view of the holstered tube while the actor turns.
+        pixelLine(c,x-11,rider-7,x-16,rider-36,P.ink,5);pixelLine(c,x-12,rider-8,x-16,rider-35,'#637653',3);
+        pixelLine(c,x-16,rider-34,x-15,rider-31,P.brass,2);
+    }
     // The tail rotates behind the hips instead of disappearing at the key pose.
     const tail=x-p.facing*82*profile,root=x-p.facing*12;
     polygon(c,[[root,body-3],[tail,body-2],[tail,body+2],[root,body+20]],P.ink);
@@ -256,6 +264,7 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     if(pose.armor<=6){line(-17,saddle+10,-22-pose.cloth*.4,saddle+17,P.rust,2);line(-22-pose.cloth*.4,saddle+17,-20,saddle+19,P.brass);}
     if(pose.armor<=3){line(12,saddle+10,17+pose.cloth*.3,saddle+15,P.rust,2);rect(15,saddle+15,2,2,P.brass);}
     // Riding boots follow the saddle; jacket tails lag behind the stride.
+    if(pose.launcher&&pose.launcher.draw<.35)drawLauncher({poly,line},pose,pose.launcher);
     poly([[-10,saddle-4],[7,saddle-5],[11,saddle+13],[5,saddle+18],[12,saddle+20],[11,saddle+24],[1,saddle+23],[-2,saddle+9],[-15,saddle+4]],P.ink);
     line(-7,saddle-2,3,saddle+9,P.suit,7);line(3,saddle+9,4,saddle+19,P.lapel,3);
     line(-8,saddle-2,1,saddle+5,P.clothShade,3);line(4,saddle+8,5,saddle+13,P.clothShade,2);
@@ -317,7 +326,8 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     }
     headFacing=1;riderBase=null;
     // Rifle and both hands use one angle, so muzzle flash aligns with the bullet.
-    const lean=pose.riderLean??0,gx=7-r+riderBend(14,lean), gy=rider-14, a=pose.aim;
+    const lean=pose.riderLean??0,lower=pose.launcher?.rifleLower??0;
+    const gx=(7-r+riderBend(14,lean))*(1-lower)-14*lower,gy=rider-14+lower*19,a=pose.aim*(1-lower)+lower*1.24;
     const gp=(xx:number,yy:number):Point=>[gx+Math.cos(a)*xx-Math.sin(a)*yy,gy+Math.sin(a)*xx+Math.cos(a)*yy];
     poly([gp(-2,-3),gp(22,-3),gp(22,-1),gp(31,-1),gp(31,2),gp(20,2),gp(19,5),gp(8,5),gp(6,2),gp(-2,4)],P.ink);
     poly([gp(3,-2),gp(21,-2),gp(21,1),gp(4,1)],P.lapel);
@@ -332,6 +342,11 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     poly([gp(10,3+magazine),gp(17,3+magazine),gp(16,11+magazine),gp(11,10+magazine)],P.ink);
     line(...gp(12,5+magazine),...gp(12,9+magazine),P.lapel);line(...gp(14,5+magazine),...gp(14,9+magazine),P.shade);
     line(...gp(7,-4),...gp(16,-4),P.brass);line(...gp(3,-1),...gp(6,-1),P.ivory);
+    if(pose.launcher&&lower>.001){
+        line(-9,rider-23,...gp(4,0),P.leather,2);
+        if(pose.launcher.draw>=.35)drawLauncher({poly,line},pose,pose.launcher);
+        drawLauncherHands({poly,line},pose,pose.launcher,gp);
+    }else{
     line(-8-r+riderBend(20,lean),rider-20,1-r+riderBend(9,lean),rider-9,P.suit,6);line(1-r+riderBend(9,lean),rider-9,...gp(8,4),P.skin,4);
     const grip=gp(18-pose.reload*6,3+pose.reload*9),rein=pose.rein??0;
     const hand:Point=[grip[0]*(1-rein)+(14-r)*rein,grip[1]*(1-rein)+(rider-2)*rein];
@@ -339,6 +354,7 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     if(rein>.05){line(hand[0],hand[1],28,neck+4,P.ink,2);line(hand[0],hand[1],28,neck+4,P.rust);line(28,neck+4,48,neck+13,P.rust);}
     line(6-r+riderBend(20,lean),rider-20,...elbow,P.suit,5);line(...elbow,...hand,P.suit,4);ell(hand[0]-1,hand[1]-2,5,4,P.face);
     line(...gp(6,4),...gp(7,6),P.face,2);
+    }
     if(pose.defeated)for(let i=0;i<3;i++){
         const a=pose.daze+i*Math.PI*2/3,sx=Math.cos(a)*18,sy=rider-44+Math.sin(a)*4;
         rect(sx-2,sy,5,1,P.brass);rect(sx,sy-2,1,5,P.ivory);
@@ -365,12 +381,14 @@ export function distantRiderPose(action:HypotheticalBackdrop,reduced=false):Dino
     if(action.aftermath.active){const pose=action.aftermath.pose(reduced);return {
         x:r.x,y:r.y+pose.lift/r.scale,...pose,
         daze:0,armor:9,flash:false,defeated:false,distant:true,heldDebris:action.aftermath.heldDebris,
+        launcher:action.aftermath.district===3?action.aftermath.launcherPose:undefined,
     };}
     return {x:r.x,y:r.y+m.lift/r.scale,facing:1,gait:action.travel/(r.scale*11),stride:action.stride,
         breath:0,bow:0,jaw:m.jaw,neckDrop:m.neckDrop,recoil:action.recoil,aim:action.angle,tail:m.tail,
         compression:m.compression,tuck:m.tuck,reload:0,brace:m.brace,heat:action.heat,
         cloth:reduced?0:Math.min(4,Math.abs(action.velocity)*1.8)+m.force*1.5,
         riderDrop:m.riderDrop,riderLean:m.riderLean,rein:m.rein,lookBack:m.lookBack,
+        launcher:m.district===3?{draw:0,rifleLower:0,reach:0,aim:-.12,recoil:0,fired:action.aftermath.tower.destroyed}:undefined,
         blink:false,daze:0,armor:9,flash:false,defeated:false,distant:true,focus:m.force||action.muzzle?1:0,
         gore:m.district===0&&action.tick>=63?(action.tick<110?1:.75):0,
         voice:m.district===0&&action.tick>=63&&action.tick<90?.7:m.local>=m.impactTick&&m.local<m.impactTick+16?.65*(1-smoothMotion((m.local-m.impactTick-5)/11)):0};
@@ -412,6 +430,7 @@ export function drawHypotheticalBackground(c:CanvasRenderingContext2D,b:Hypothet
         drawOpeningAftermath(c,b.backdrop.tick,base,reduced);
         drawHypotheticalDestruction(c,b,base,cy,reduced);
         drawAftermathEffects(c,b.backdrop.aftermath,base,reduced);
+        drawTowerEffects(c,b.backdrop.aftermath.tower,base,reduced);
         c.restore();
     }
 }
