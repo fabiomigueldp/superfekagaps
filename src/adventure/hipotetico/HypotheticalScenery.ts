@@ -13,6 +13,7 @@ import {drawChaseQuayGround,drawChaseFrontage,drawChaseShoreWater} from './Hypot
 import {drawArrivalCourtyard,drawArrivalPlaza,drawArrivalFittings} from './HypotheticalArrivalArt';
 import {drawForecourt} from './HypotheticalForecourt';
 import {masonryFall,SCENIC_FRACTURE,scenicRecoil,craneLoad,bastionCloth,arsenalPressure,scenicChip} from './HypotheticalScenicMotion';
+import {drawSiegeDistricts,drawSiegeRouteBody} from './HypotheticalDistrictArt';
 
 const S = {
     ink: '#213545', joint: '#354956', stone: '#677b7c', stoneShade: '#516571',
@@ -747,9 +748,10 @@ function balcony(c: CanvasRenderingContext2D, p: MovingBody, cx: number, cy: num
     box(c,px+5,py+23,2,3,S.stoneShade);
 }
 
-export function drawHypotheticalFittings(c: CanvasRenderingContext2D, o: WorldObjects, b: HypotheticalModel, cx: number, cy: number) {
+export function drawHypotheticalFittings(c: CanvasRenderingContext2D, o: WorldObjects, b: HypotheticalModel, cx: number, cy: number, reduced = false) {
     if(b.act==='siege'){
         drawForecourt(c,b,cx,cy);drawArrivalFittings(c,b,cx,cy);
+        drawSiegeDistricts(c,b,cx,cy,reduced);
         const yard=SIEGE_SECTORS[3].origin-cx,floor=224-cy;
         // An inset road panel, not an extra platform: it frames the space between
         // the two duelling perches without adding obstruction or a false hazard.
@@ -761,6 +763,7 @@ export function drawHypotheticalFittings(c: CanvasRenderingContext2D, o: WorldOb
     }
     for(const p of o.bodies){
         if(p.x>cx+350||p.x+p.width<cx-30)continue;
+        if(b.act==='siege'&&drawSiegeRouteBody(c,p,cx,cy))continue;
         if(p.kind==='support'){
             if(p.id.startsWith('siege-'))siegeDeck(c,p,cx,cy);
             else if(p.id.startsWith('chase-'))terrace(c,p,cx,cy);else balcony(c,p,cx,cy);

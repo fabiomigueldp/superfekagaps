@@ -1,0 +1,149 @@
+{
+  "kind": "Authored production-renderer compositions; no gameplay assertions",
+  "sources": [
+    {
+      "file": "district-0.png",
+      "sector": "PORTARIA",
+      "camera": 314,
+      "state": "authored active encounter"
+    },
+    {
+      "file": "district-0-clear-8.png",
+      "sector": "PORTARIA",
+      "camera": 358,
+      "state": "authored clearance +8 frames"
+    },
+    {
+      "file": "district-0-clear-36.png",
+      "sector": "PORTARIA",
+      "camera": 358,
+      "state": "authored clearance +36 frames"
+    },
+    {
+      "file": "district-0-clear-72.png",
+      "sector": "PORTARIA",
+      "camera": 358,
+      "state": "authored clearance +72 frames"
+    },
+    {
+      "file": "district-0-clear-180.png",
+      "sector": "PORTARIA",
+      "camera": 358,
+      "state": "authored clearance +180 frames"
+    },
+    {
+      "file": "district-0-clear-300.png",
+      "sector": "PORTARIA",
+      "camera": 358,
+      "state": "authored clearance +300 frames"
+    },
+    {
+      "file": "district-1.png",
+      "sector": "CAIS DE CARGA",
+      "camera": 682,
+      "state": "authored active encounter"
+    },
+    {
+      "file": "district-1-clear-8.png",
+      "sector": "CAIS DE CARGA",
+      "camera": 774,
+      "state": "authored clearance +8 frames"
+    },
+    {
+      "file": "district-1-clear-36.png",
+      "sector": "CAIS DE CARGA",
+      "camera": 774,
+      "state": "authored clearance +36 frames"
+    },
+    {
+      "file": "district-1-clear-72.png",
+      "sector": "CAIS DE CARGA",
+      "camera": 774,
+      "state": "authored clearance +72 frames"
+    },
+    {
+      "file": "district-1-clear-180.png",
+      "sector": "CAIS DE CARGA",
+      "camera": 774,
+      "state": "authored clearance +180 frames"
+    },
+    {
+      "file": "district-1-clear-300.png",
+      "sector": "CAIS DE CARGA",
+      "camera": 774,
+      "state": "authored clearance +300 frames"
+    },
+    {
+      "file": "district-2.png",
+      "sector": "ARSENAL",
+      "camera": 1098,
+      "state": "authored active encounter"
+    },
+    {
+      "file": "district-2-clear-8.png",
+      "sector": "ARSENAL",
+      "camera": 1190,
+      "state": "authored clearance +8 frames"
+    },
+    {
+      "file": "district-2-clear-36.png",
+      "sector": "ARSENAL",
+      "camera": 1190,
+      "state": "authored clearance +36 frames"
+    },
+    {
+      "file": "district-2-clear-72.png",
+      "sector": "ARSENAL",
+      "camera": 1190,
+      "state": "authored clearance +72 frames"
+    },
+    {
+      "file": "district-2-clear-180.png",
+      "sector": "ARSENAL",
+      "camera": 1190,
+      "state": "authored clearance +180 frames"
+    },
+    {
+      "file": "district-2-clear-300.png",
+      "sector": "ARSENAL",
+      "camera": 1190,
+      "state": "authored clearance +300 frames"
+    },
+    {
+      "file": "district-3.png",
+      "sector": "BASTIAO",
+      "camera": 1514,
+      "state": "authored active encounter"
+    },
+    {
+      "file": "district-3-clear-8.png",
+      "sector": "BASTIAO",
+      "camera": 1702,
+      "state": "authored clearance +8 frames"
+    },
+    {
+      "file": "district-3-clear-36.png",
+      "sector": "BASTIAO",
+      "camera": 1702,
+      "state": "authored clearance +36 frames"
+    },
+    {
+      "file": "district-3-clear-72.png",
+      "sector": "BASTIAO",
+      "camera": 1702,
+      "state": "authored clearance +72 frames"
+    },
+    {
+      "file": "district-3-clear-180.png",
+      "sector": "BASTIAO",
+      "camera": 1702,
+      "state": "authored clearance +180 frames"
+    },
+    {
+      "file": "district-3-clear-300.png",
+      "sector": "BASTIAO",
+      "camera": 1702,
+      "state": "authored clearance +300 frames"
+    }
+  ]
+}

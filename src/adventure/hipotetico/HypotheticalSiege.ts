@@ -1,4 +1,4 @@
-import type { FoeSpec } from '../types';
+import type { FoeSpec, MechanismSpec } from '../types';
 
 /** The garrison exists from load. Crossing a threshold wakes the next patrol;
  * defeating it opens its physical gate, never teleports Feka or creates a wave. */
@@ -38,6 +38,18 @@ export const SIEGE_LINKS = [
     { id: 'siege-link-1', x: 800+SIEGE_APPROACH, y: 184, width: 48, height: 7, kind: 'support' as const },
     { id: 'siege-link-2', x: 1216+SIEGE_APPROACH, y: 184, width: 48, height: 7, kind: 'support' as const },
 ];
+/** Optional flanking routes. The road remains continuous under every deck. */
+export const SIEGE_SIDE_ROUTES: readonly MechanismSpec[] = [
+    {id:'siege-inspection-roof',kind:'support',x:452,y:144,width:40,height:7},
+    {id:'siege-arsenal-gallery',kind:'support',x:1308,y:132,width:40,height:7},
+];
+/** Shares the campaign's carrier collision, transport and eased motor profile.
+ * Both 650 ms stops allow boarding; the upper stop meets the loader's balcony. */
+export const SIEGE_CARGO_LIFT: Readonly<MechanismSpec> = {
+    id:'siege-cargo-lift',kind:'lift',x:816,y:196,width:40,height:7,
+    to:{x:816,y:148},period:4600,
+    motion:{kind:'shuttle',maxSpeed:44,rampMs:300,dwellMs:650},
+};
 export function siegeGarrison(sector: number): FoeSpec[] {
     return SIEGE_SECTORS[sector].guards.map((g, i) => ({ ...g, id: `hipotetico:garrison:${sector}:${i}${'vanguard' in g ? ':vanguard' : ''}`, range: 352, behavior: 'canal' }));
 }
@@ -51,12 +63,18 @@ export class HypotheticalSiege {
     gateTicks: number[];
     remaining: number[];
     lockTicks: number[][];
+    /** Longer settling time than the gate motor, without replaying on retry. */
+    clearTicks: number[];
+    ticks = 0;
+    clearedAt: number[];
     constructor(cleared = 0) {
         this.cleared = Math.max(0, Math.min(SIEGE_SECTORS.length, Math.floor(cleared)));
         this.entered = Math.min(SIEGE_SECTORS.length-1, this.cleared);
         this.gateTicks = SIEGE_SECTORS.map((_, i) => i < this.cleared ? SIEGE_GATE_TICKS : 0);
         this.remaining = SIEGE_SECTORS.map((s, i) => i < this.cleared ? 0 : s.guards.length);
         this.lockTicks = SIEGE_SECTORS.map((s, i) => s.guards.map(() => i < this.cleared ? SIEGE_LOCK_TICKS : 0));
+        this.clearTicks = SIEGE_SECTORS.map((_,i)=>i<this.cleared?900:0);
+        this.clearedAt = SIEGE_SECTORS.map(()=>0);
     }
     get sector() { return SIEGE_SECTORS[Math.min(SIEGE_SECTORS.length-1, this.cleared)]; }
     get currentSector() { return SIEGE_SECTORS[this.entered]; }
@@ -73,11 +91,15 @@ export class HypotheticalSiege {
             : t < SIEGE_UNLOCK_TICKS + SIEGE_LIFT_TICKS ? 'lift' : t < SIEGE_GATE_TICKS ? 'settle' : 'open';
     }
     update(playerX: number, living: number) {
+        this.ticks++;
         this.openedThisTick = false;
         this.releasedThisTick = false;
         for (const [i, s] of SIEGE_SECTORS.entries()) for (let j = 0; j < s.guards.length - this.remaining[i]; j++)
             this.lockTicks[i][j] = Math.min(SIEGE_LOCK_TICKS, this.lockTicks[i][j] + 1);
-        for (let i = 0; i < this.cleared; i++) this.gateTicks[i] = Math.min(SIEGE_GATE_TICKS, this.gateTicks[i] + 1);
+        for (let i = 0; i < this.cleared; i++) {
+            this.gateTicks[i] = Math.min(SIEGE_GATE_TICKS, this.gateTicks[i] + 1);
+            this.clearTicks[i] = Math.min(900, this.clearTicks[i] + 1);
+        }
         if (this.cleared === SIEGE_SECTORS.length) return;
         if (!this.active && playerX >= this.sector.trigger) { this.entered = this.cleared; this.active = true; return; }
         if (this.active) {
@@ -86,6 +108,7 @@ export class HypotheticalSiege {
             this.remaining[this.cleared] = remaining;
         }
         if (this.active && living === 0) {
+            this.clearedAt[this.cleared]=this.ticks;
             this.cleared++; this.active = false; this.openedThisTick = true;
         }
     }

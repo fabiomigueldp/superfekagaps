@@ -411,9 +411,10 @@ export function drawHypotheticalTerrain(c:CanvasRenderingContext2D,level:WorldLe
     drawHypotheticalMasonry(c,level,b,cx,cy);
 }
 
-export function drawHypotheticalObjects(c:CanvasRenderingContext2D,o:WorldObjects,b:HypotheticalModel,cx:number,cy:number){
+export function drawHypotheticalObjects(c:CanvasRenderingContext2D,o:WorldObjects,b:HypotheticalModel,cx:number,cy:number,reduced=false){
+    drawHypotheticalFittings(c,o,b,cx,cy,reduced);
+    // Live projectiles stay readable in front of decorative braces and stores.
     for(const barrel of o.barrels)drawHypotheticalCanister(c,barrel,cx,cy);
-    drawHypotheticalFittings(c,o,b,cx,cy);
 }
 export function drawHypotheticalCombat(c:CanvasRenderingContext2D,b:HypotheticalModel,cx:number,cy:number,reduced:boolean){
     const floor=HYPOTHETICAL.floor-cy;

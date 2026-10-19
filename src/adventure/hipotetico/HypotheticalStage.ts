@@ -3,7 +3,7 @@ import { TileType } from '../../constants';
 import type { AdventureStage } from '../types';
 import type { HypotheticalAct } from './HypotheticalModel';
 import { ARENA_BALCONIES, CHASE_GAPS, CHASE_STEPS, CHASE_TERRACES, CHASE_WIDTH, CHASE_CHECKPOINT } from './HypotheticalLayout';
-import { SIEGE_SECTORS, SIEGE_WIDTH, SIEGE_LINKS, SIEGE_APPROACH, siegeGarrison } from './HypotheticalSiege';
+import { SIEGE_SECTORS, SIEGE_WIDTH, SIEGE_LINKS, SIEGE_APPROACH, SIEGE_SIDE_ROUTES, SIEGE_CARGO_LIFT, siegeGarrison } from './HypotheticalSiege';
 import {ARRIVAL} from './HypotheticalArrival';
 
 export function hypotheticalStage(act: HypotheticalAct): AdventureStage {
@@ -40,12 +40,15 @@ export function hypotheticalStage(act: HypotheticalAct): AdventureStage {
         s.mechanisms.push({id:'arrival-gate',kind:'target',x:ARRIVAL.gateX,y:ARRIVAL.gateY,width:12,height:ARRIVAL.gateHeight,gated:true});
         for (const [i, sector] of SIEGE_SECTORS.entries()) {
             s.foes.push(...siegeGarrison(i));
-            s.mechanisms.push(...sector.platforms.map((p,j)=>({...p, id:`siege-scaffold-${i}-${j}`,kind:'support' as const,height:7})),
+            s.mechanisms.push(...sector.platforms.map((p,j)=>i===1&&j===1?structuredClone(SIEGE_CARGO_LIFT)
+                :({...p, id:`siege-scaffold-${i}-${j}`,kind:'support' as const,height:7})),
                 {id:`siege-gate-${i}`,kind:'target',x:sector.gate,y:0,width:16,height:224,gated:true});
             for (const [j,p] of sector.platforms.entries())
-                s.pickups.push({id:`hipotetico:route:${i}:${j}`,kind:'coin',x:p.x+12,y:p.y-22});
+                s.pickups.push({id:`hipotetico:route:${i}:${j}`,kind:'coin',x:p.x+12,y:i===1&&j===1?126:p.y-22});
         }
-        s.mechanisms.push(...SIEGE_LINKS.map(p=>({...p})));
+        s.mechanisms.push(...SIEGE_LINKS.map(p=>({...p})),...SIEGE_SIDE_ROUTES.map(p=>structuredClone(p)));
+        for(const [i,p] of SIEGE_SIDE_ROUTES.entries())
+            for(const [j,dx] of [9,25].entries())s.pickups.push({id:`hipotetico:flank:${i}:${j}`,kind:'coin',x:p.x+dx,y:p.y-22});
         for(const [i,x] of [396,434,816,854].entries())
             s.pickups.push({id:`hipotetico:link:${i}`,kind:'coin',x:x+SIEGE_APPROACH,y:i%2?138:158});
         s.pickups.push({id:'hipotetico:siege:helmet',kind:'helmet',x:900+SIEGE_APPROACH,y:158});

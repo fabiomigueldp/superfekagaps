@@ -117,7 +117,7 @@ export class HypotheticalGame extends WorldGame {
             this.art.arena=()=>{};this.art.genericStructures=false;
             this.art.background=(c,_island,cx,cy)=>drawHypotheticalBackground(c,this.fight,cx,cy,this.renderer.reducedMotion);
             this.art.terrain=(c,l,_island,cx,cy)=>drawHypotheticalTerrain(c,l,this.fight,cx,cy);
-            this.art.objects=(c,o,cx,cy)=>drawHypotheticalObjects(c,o,this.fight,cx,cy);
+            this.art.objects=(c,o,cx,cy)=>drawHypotheticalObjects(c,o,this.fight,cx,cy,this.renderer.reducedMotion);
             this.art.boss=(c,_b,cx,cy)=>drawHypotheticalCombat(c,this.fight,cx,cy,this.renderer.reducedMotion);
             this.art.foe=(c,e,cx,cy)=>{
                 const deployment=this.act==='siege'?arrivalDeployment(this.fight.arrivalTime,this.fight.arrivalSkipped):1;
@@ -190,6 +190,8 @@ export class HypotheticalGame extends WorldGame {
             return thrower.highThrow?`BARRIL ${pair}ALTO! OBSERVE O ARCO`:`BARRIL ${pair}BAIXO! USE AS SACADAS`;
         }
         if(visible.some(e=>e instanceof HypotheticalGuard&&e.longLunge&&['warning','attack'].includes(e.phase)))return 'PASSO LONGO! SALTE OU CRUZE ATRAS';
+        if(b.wave===2&&Math.abs(this.player.data.position.x-836)<62
+            &&!visible.some(e=>e.phase==='warning'||e.phase==='attack'))return 'MONTA-CARGAS: SUBA E FLANQUEIE A SACADA';
         if(visible.some(e=>e.spec.kind==='charger'))return 'ARIETE: QUEBRE O TETO OU ATAQUE AO FREAR';
         return b.wave===1?'BLINDADO: SENTADA, DEPOIS OUTRO SALTO':'CRUZE OS BARRIS E ATAQUE A SACADA';
     }
