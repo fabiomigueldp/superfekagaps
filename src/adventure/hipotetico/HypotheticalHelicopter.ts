@@ -9,7 +9,7 @@ export type AircraftPart='hull'|'tail'|'rotor'|'door'|'panel'|'skid';
 export const HELICOPTER_GROUND=-6;
 export interface AircraftBody {
     part:AircraftPart;x:number;y:number;angle:number;vx:number;vy:number;spin:number;
-    sleeping:boolean;contacts:number;quiet:number;born:number;
+    sleeping:boolean;contacts:number;quiet:number;born:number;flatten:number;
 }
 export interface AircraftChip {x:number;y:number;vx:number;vy:number;angle:number;spin:number;size:number;glass:boolean;rest:boolean}
 export interface AircraftPuff {x:number;y:number;vx:number;vy:number;born:number;seed:number;radius:number;kind:'smoke'|'dust'}
@@ -21,8 +21,9 @@ export const AIRCRAFT_SHAPES:Record<AircraftPart,readonly Point[]>={
     panel:[[-6,-3],[5,-5],[7,2],[-4,5]],
     skid:[[-23,0],[-20,-2],[20,-2],[24,0],[22,2],[-22,2]],
 };
-export function aircraftPoint(p:Pick<AircraftBody,'x'|'y'|'angle'>,x:number,y:number):Point {
-    const co=Math.cos(p.angle),si=Math.sin(p.angle);return [p.x+x*co-y*si,p.y+x*si+y*co];
+export function aircraftPoint(p:Pick<AircraftBody,'x'|'y'|'angle'>&{flatten?:number},x:number,y:number):Point {
+    const co=Math.cos(p.angle),si=Math.sin(p.angle),height=y*(1-(p.flatten??0));
+    return [p.x+x*co-height*si,p.y+x*si+height*co];
 }
 export function helicopterFlightAt(age:number){
     const settle=smoothMotion((age-54)/28),evade=smoothMotion((age-138)/52);
@@ -50,7 +51,7 @@ function hullContact(from:Point,to:Point,hull:AircraftBody):Point|null {
 export class HypotheticalHelicopter {
     tick=0;age=-1;launchAt=-1;impactAt=-1;crashAt=-1;actorX=168;
     events:HelicopterCue[]=[];
-    hull:AircraftBody={part:'hull',x:424,y:-66,angle:0,vx:0,vy:0,spin:0,sleeping:false,contacts:0,quiet:0,born:0};
+    hull:AircraftBody={part:'hull',x:424,y:-66,angle:0,vx:0,vy:0,spin:0,sleeping:false,contacts:0,quiet:0,born:0,flatten:0};
     pieces:AircraftBody[]=[];chips:AircraftChip[]=[];plumes:AircraftPuff[]=[];
     contacts:Array<{x:number;y:number;born:number;strength:number}>=[];
     impact:{x:number;y:number;dx:number;dy:number}|null=null;
@@ -88,7 +89,7 @@ export class HypotheticalHelicopter {
     private release(part:AircraftPart,x:number,y:number,vx:number,vy:number,spin:number){
         const p=aircraftPoint(this.hull,x,y);
         this.pieces.push({part,x:p[0],y:p[1],angle:this.hull.angle,vx:this.hull.vx+vx,vy:this.hull.vy+vy,
-            spin:this.hull.spin+spin,sleeping:false,contacts:0,quiet:0,born:this.tick});
+            spin:this.hull.spin+spin,sleeping:false,contacts:0,quiet:0,born:this.tick,flatten:0});
     }
     private scatter(x:number,y:number,count:number,force:number){
         for(let i=0;i<count;i++){
@@ -109,6 +110,9 @@ export class HypotheticalHelicopter {
     }
     private stepBody(p:AircraftBody,gravity:number){
         if(p.sleeping)return;
+        // Sheet metal tips onto its broad face after first contact. Drawing and
+        // support geometry share the same foreshortening, so doors cannot rest upright.
+        if(p.contacts>0&&(p.part==='door'||p.part==='panel'))p.flatten=Math.min(.72,p.flatten+.035);
         p.vy+=gravity;p.x+=p.vx;p.y+=p.vy;p.angle+=p.spin;
         const shape=p.part==='hull'&&this.skidsAttached?[...AIRCRAFT_SHAPES.hull,[-20,17],[21,17]] as Point[]:AIRCRAFT_SHAPES[p.part];
         const bottom=Math.max(...shape.map(v=>aircraftPoint(p,...v)[1])),floor=HELICOPTER_GROUND;
@@ -171,7 +175,8 @@ export class HypotheticalHelicopter {
             for(const piece of this.pieces)if(piece.born<this.tick)this.stepBody(piece,.045);
             for(const p of this.chips)if(!p.rest){
                 p.vy+=.045;p.x+=p.vx;p.y+=p.vy;p.angle+=p.spin;
-                if(p.y+p.size>=HELICOPTER_GROUND){p.y=HELICOPTER_GROUND-p.size;p.vy*=-.2;p.vx*=.66;p.spin*=.5;if(Math.abs(p.vx)+Math.abs(p.vy)<.2)p.rest=true;}
+                const support=Math.abs(Math.sin(p.angle))*p.size+.5;
+                if(p.y+support>=HELICOPTER_GROUND){p.y=HELICOPTER_GROUND-support;p.vy*=-.2;p.vx*=.66;p.spin*=.5;if(Math.abs(p.vx)+Math.abs(p.vy)<.2)p.rest=true;}
             }
         }
         this.trail=this.trail.filter(p=>this.tick-p.born<88).slice(-36);

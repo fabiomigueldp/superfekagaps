@@ -53,6 +53,7 @@ function rotor(c:CanvasRenderingContext2D,p:Pick<AircraftBody,'x'|'y'|'angle'>,b
 }
 function fuselage(c:CanvasRenderingContext2D,h:HypotheticalHelicopter,base:number,reduced:boolean){
     const s=painter(c,h.hull,base),damaged=h.impactAt>=0;
+    const rim=damaged&&h.impactAge<9&&!reduced?'#dfc69c':P.light;
     if(h.tailAttached){const p=aircraftPoint(h.hull,36,-9);tail(c,{x:p[0],y:p[1],angle:h.hull.angle},base,h.rotor,false,reduced);}
     if(h.skidsAttached){
         for(const d of [-1,1]){
@@ -63,7 +64,7 @@ function fuselage(c:CanvasRenderingContext2D,h:HypotheticalHelicopter,base:numbe
     s.poly(AIRCRAFT_SHAPES.hull,P.ink);
     s.poly([[-24,0],[-22,-5],[-14,-12],[4,-12],[18,-7],[21,2],[13,9],[-13,8]],damaged?'#6f8179':P.paint);
     s.poly([[-23,3],[-7,4],[9,3],[20,1],[13,9],[-13,8]],P.shade);
-    s.line(-13,-12,3,-12,P.light);s.line(4,-11,16,-7,P.light);
+    s.line(-13,-12,3,-12,rim);s.line(4,-11,16,-7,rim);
     s.line(-21,2,16,2,damaged?'#b6a483':P.stripe,2);
     // Two window panes, a sloping windshield and a recessed sliding cargo door.
     s.poly([[-23,-3],[-14,-11],[-8,-11],[-9,-3]],P.ink);

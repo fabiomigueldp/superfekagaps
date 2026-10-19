@@ -236,7 +236,9 @@ function finalGate(c: CanvasRenderingContext2D, base: number, time: number, phas
 export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: HypotheticalModel, cx: number, cy: number, reduced: boolean) {
     const time=reduced?0:b.tick, lift=(64-cy)*.2,base=b.act==='siege'?backdropBaseline(cy):HYPOTHETICAL.floor-cy-8;
     box(c,0,0,320,180,'#b4c0b0');box(c,0,0,320,57,'#6d939f');box(c,0,57,320,25,'#8faab0');box(c,0,82,320,23,'#c4c3ac');
-    oval(c,242-Math.round(cx*.025),43+lift,25,25,'#f0d1a0');
+    // Leave clear sky between the arriving aircraft and the rider's muzzle.
+    const sunX=b.act==='siege'?282:242;
+    oval(c,sunX-Math.round(cx*.025),43+lift,25,25,'#f0d1a0');
     for(let i=0;i<4;i++){
         const x=mod(i*107-Math.round(cx*.05)+Math.floor(time/100),430)-45,y=44+i%2*24+lift;
         box(c,x,y,37,2,'#c3c7b5');box(c,x+8,y-2,21,2,'#c3c7b5');box(c,x+22,y+2,25,1,'#c3c7b5');
@@ -257,7 +259,7 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
     }
     // A broken, quiet reflection gives the canal depth without resembling a walkable edge.
     for(let row=0;row<6;row++){
-        const pulse=reduced?0:Math.sin(time/48+row)*2,x=248-cx*.025-row*3+pulse,y=122+lift+row*5;
+        const pulse=reduced?0:Math.sin(time/48+row)*2,x=sunX+6-cx*.025-row*3+pulse,y=122+lift+row*5;
         box(c,x,y,8+row*3,1,'#9aaf98');box(c,x+5+row*2,y+2,5+row,1,'#84a69b');
     }
     // The skyline has its own bank. It cannot support the nearer houses because

@@ -1,0 +1,3443 @@
+{
+  "kind": "directed native art footage",
+  "gameplayTest": false,
+  "heldCamera": true,
+  "audio": false,
+  "foregroundCombat": false,
+  "fps": 30,
+  "frames": 241,
+  "seconds": 8.033333333333333,
+  "arrivalStart": 304,
+  "launchAt": 458,
+  "impactAt": 481,
+  "crashAt": 552,
+  "captures": [
+    {
+      "file": "entrada.png",
+      "age": 42,
+      "seconds": 0.7,
+      "impactAge": -1,
+      "crashAge": -1
+    },
+    {
+      "file": "saque.png",
+      "age": 88,
+      "seconds": 1.4666666666666666,
+      "impactAge": -1,
+      "crashAge": -1
+    },
+    {
+      "file": "mira.png",
+      "age": 140,
+      "seconds": 2.3333333333333335,
+      "impactAge": -1,
+      "crashAge": -1
+    },
+    {
+      "file": "disparo.png",
+      "age": 154,
+      "seconds": 2.566666666666667,
+      "impactAge": -1,
+      "crashAge": -1
+    },
+    {
+      "file": "voo.png",
+      "age": 168,
+      "seconds": 2.8,
+      "impactAge": -1,
+      "crashAge": -1
+    },
+    {
+      "file": "impacto.png",
+      "age": 181,
+      "seconds": 3.0166666666666666,
+      "impactAge": 4,
+      "crashAge": -1
+    },
+    {
+      "file": "ruptura.png",
+      "age": 202,
+      "seconds": 3.3666666666666667,
+      "impactAge": 25,
+      "crashAge": -1
+    },
+    {
+      "file": "queda.png",
+      "age": 229,
+      "seconds": 3.816666666666667,
+      "impactAge": 52,
+      "crashAge": -1
+    },
+    {
+      "file": "contato.png",
+      "age": 250,
+      "seconds": 4.166666666666667,
+      "impactAge": 73,
+      "crashAge": 2
+    },
+    {
+      "file": "assentamento.png",
+      "age": 273,
+      "seconds": 4.55,
+      "impactAge": 96,
+      "crashAge": 25
+    },
+    {
+      "file": "destrocos.png",
+      "age": 350,
+      "seconds": 5.833333333333333,
+      "impactAge": 173,
+      "crashAge": 102
+    },
+    {
+      "file": "retomada.png",
+      "age": 400,
+      "seconds": 6.666666666666667,
+      "impactAge": 223,
+      "crashAge": 152
+    }
+  ],
+  "cues": [
+    {
+      "age": 30,
+      "seconds": 0.5,
+      "cue": "distant-rotor"
+    },
+    {
+      "age": 42,
+      "seconds": 0.7,
+      "cue": "distant-rotor"
+    },
+    {
+      "age": 54,
+      "seconds": 0.9,
+      "cue": "distant-rotor"
+    },
+    {
+      "age": 66,
+      "seconds": 1.1,
+      "cue": "distant-rotor"
+    },
+    {
+      "age": 72,
+      "seconds": 1.2,
+      "cue": "distant-metal"
+    },
+    {
+      "age": 78,
+      "seconds": 1.3,
+      "cue": "distant-rotor"
+    },
+    {
+      "age": 90,
+      "seconds": 1.5,
+      "cue": "distant-rotor"
+    },
+    {
+      "age": 102,
+      "seconds": 1.7,
+      "cue": "distant-rotor"
+    },
+    {
+      "age": 114,
+      "seconds": 1.9,
+      "cue": "distant-rotor"
+    },
+    {
+      "age": 126,
+      "seconds": 2.1,
+      "cue": "distant-rotor"
+    },
+    {
+      "age": 130,
+      "seconds": 2.1666666666666665,
+      "cue": "distant-metal"
+    },
+    {
+      "age": 138,
+      "seconds": 2.3,
+      "cue": "distant-rotor"
+    },
+    {
+      "age": 150,
+      "seconds": 2.5,
+      "cue": "distant-rotor"
+    },
+    {
+      "age": 154,
+      "seconds": 2.566666666666667,
+      "cue": "distant-launch"
+    },
+    {
+      "age": 158,
+      "seconds": 2.6333333333333333,
+      "cue": "distant-rocket"
+    },
+    {
+      "age": 162,
+      "seconds": 2.7,
+      "cue": "distant-rotor"
+    },
+    {
+      "age": 174,
+      "seconds": 2.9,
+      "cue": "distant-rotor"
+    },
+    {
+      "age": 177,
+      "seconds": 2.95,
+      "cue": "distant-blast"
+    },
+    {
+      "age": 185,
+      "seconds": 3.0833333333333335,
+      "cue": "distant-engine-fail"
+    },
+    {
+      "age": 248,
+      "seconds": 4.133333333333334,
+      "cue": "distant-crash"
+    },
+    {
+      "age": 249,
+      "seconds": 4.15,
+      "cue": "distant-debris"
+    },
+    {
+      "age": 263,
+      "seconds": 4.383333333333334,
+      "cue": "distant-debris"
+    },
+    {
+      "age": 276,
+      "seconds": 4.6,
+      "cue": "distant-debris"
+    },
+    {
+      "age": 303,
+      "seconds": 5.05,
+      "cue": "distant-debris"
+    },
+    {
+      "age": 347,
+      "seconds": 5.783333333333333,
+      "cue": "distant-debris"
+    }
+  ],
+  "poses": [
+    {
+      "age": 0,
+      "hull": {
+        "part": "hull",
+        "x": 424,
+        "y": -66,
+        "angle": -0.065,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": false,
+        "contacts": 0,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": -0.2345192860885471,
+        "recoil": 0,
+        "fired": false
+      },
+      "projectile": null,
+      "pieces": [],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 304
+    },
+    {
+      "age": 12,
+      "hull": {
+        "part": "hull",
+        "x": 413.9155,
+        "y": -66.3645,
+        "angle": -0.065,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": false,
+        "contacts": 0,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": -0.2345192860885471,
+        "recoil": 0,
+        "fired": false
+      },
+      "projectile": null,
+      "pieces": [],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 316
+    },
+    {
+      "age": 24,
+      "hull": {
+        "part": "hull",
+        "x": 388.144,
+        "y": -67.296,
+        "angle": -0.065,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": false,
+        "contacts": 0,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": -0.2345192860885471,
+        "recoil": 0,
+        "fired": false
+      },
+      "projectile": null,
+      "pieces": [],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 328
+    },
+    {
+      "age": 36,
+      "hull": {
+        "part": "hull",
+        "x": 353.4085,
+        "y": -68.5515,
+        "angle": -0.065,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": false,
+        "contacts": 0,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": -0.23401186202821414,
+        "recoil": 0,
+        "fired": false
+      },
+      "projectile": null,
+      "pieces": [],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 340
+    },
+    {
+      "age": 48,
+      "hull": {
+        "part": "hull",
+        "x": 316.432,
+        "y": -69.888,
+        "angle": -0.05679698216735254,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": false,
+        "contacts": 0,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0.2257624032771962,
+        "reach": 0,
+        "aim": -0.23271690258369357,
+        "recoil": 0,
+        "fired": false
+      },
+      "projectile": null,
+      "pieces": [],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 352
+    },
+    {
+      "age": 60,
+      "hull": {
+        "part": "hull",
+        "x": 284.01763676722834,
+        "y": -71.04261867519476,
+        "angle": -0.03245640005725754,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": false,
+        "contacts": 0,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0.864815657715066,
+        "reach": 0.3520000000000001,
+        "aim": -0.2325738863432944,
+        "recoil": 0,
+        "fired": false
+      },
+      "projectile": null,
+      "pieces": [],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 364
+    },
+    {
+      "age": 72,
+      "hull": {
+        "part": "hull",
+        "x": 263.05418799023056,
+        "y": -71.95231936887811,
+        "angle": -0.005865547645491251,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": false,
+        "contacts": 0,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0.06561279296875,
+        "rifleLower": 1,
+        "reach": 0.8960000000000001,
+        "aim": -0.2325738863432944,
+        "recoil": 0,
+        "fired": false
+      },
+      "projectile": null,
+      "pieces": [],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 376
+    },
+    {
+      "age": 84,
+      "hull": {
+        "part": "hull",
+        "x": 258.3930156396798,
+        "y": -72.45408149718476,
+        "angle": 0.00036572187008383696,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": false,
+        "contacts": 0,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0.27325439453125,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": -0.2325738863432944,
+        "recoil": 0,
+        "fired": false
+      },
+      "projectile": null,
+      "pieces": [],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 388
+    },
+    {
+      "age": 96,
+      "hull": {
+        "part": "hull",
+        "x": 258.1612888704824,
+        "y": -72.5940489126575,
+        "angle": -0.004826887780664719,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": false,
+        "contacts": 0,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0.54681396484375,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": -0.2339339219817873,
+        "recoil": 0,
+        "fired": false
+      },
+      "projectile": null,
+      "pieces": [],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 400
+    },
+    {
+      "age": 108,
+      "hull": {
+        "part": "hull",
+        "x": 257.90846862717484,
+        "y": -72.54526229208281,
+        "angle": -0.009081629943695138,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": false,
+        "contacts": 0,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0.80718994140625,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": -0.24173690302583112,
+        "recoil": 0,
+        "fired": false
+      },
+      "projectile": null,
+      "pieces": [],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 412
+    },
+    {
+      "age": 120,
+      "hull": {
+        "part": "hull",
+        "x": 257.6676189224244,
+        "y": -72.32322317303169,
+        "angle": -0.01157180540314534,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": false,
+        "contacts": 0,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0.97528076171875,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": -0.24950997559244217,
+        "recoil": 0,
+        "fired": false
+      },
+      "projectile": null,
+      "pieces": [],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 424
+    },
+    {
+      "age": 132,
+      "hull": {
+        "part": "hull",
+        "x": 257.47023825328444,
+        "y": -71.99848261449665,
+        "angle": -0.011813571420535431,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": false,
+        "contacts": 0,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 1,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": -0.25085870456568354,
+        "recoil": 0,
+        "fired": false
+      },
+      "projectile": null,
+      "pieces": [],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 436
+    },
+    {
+      "age": 144,
+      "hull": {
+        "part": "hull",
+        "x": 257.4527455761282,
+        "y": -71.78482956337893,
+        "angle": -0.008100872134404951,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": false,
+        "contacts": 0,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 1,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": -0.25085870456568354,
+        "recoil": 0,
+        "fired": false
+      },
+      "projectile": null,
+      "pieces": [],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 448
+    },
+    {
+      "age": 156,
+      "hull": {
+        "part": "hull",
+        "x": 258.1296178148442,
+        "y": -72.28301857014493,
+        "angle": 0.0066331355194205605,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": false,
+        "contacts": 0,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 1,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": -0.2701038408721391,
+        "recoil": 1,
+        "fired": true
+      },
+      "projectile": {
+        "x": 199.52545409534648,
+        "y": -63.711031105037534,
+        "fromX": 198.26614459246363,
+        "fromY": -63.38832446434216,
+        "dx": 0.9686996176022086,
+        "dy": -0.2482358774579832,
+        "age": 2,
+        "remaining": 178.7,
+        "speed": 0.65
+      },
+      "pieces": [],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 460
+    },
+    {
+      "age": 168,
+      "hull": {
+        "part": "hull",
+        "x": 259.1929740715124,
+        "y": -73.24980790136598,
+        "angle": 0.026920238774748247,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": false,
+        "contacts": 0,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 1,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": -0.26059542733779767,
+        "recoil": 0.5,
+        "fired": true
+      },
+      "projectile": {
+        "x": 212.71245899260774,
+        "y": -67.09029096251237,
+        "fromX": 198.26614459246363,
+        "fromY": -63.38832446434216,
+        "dx": 0.9686996176022086,
+        "dy": -0.2482358774579832,
+        "age": 14,
+        "remaining": 165.08689986282576,
+        "speed": 1.990877914951989
+      },
+      "pieces": [],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 472
+    },
+    {
+      "age": 180,
+      "hull": {
+        "part": "hull",
+        "x": 260.6145202039868,
+        "y": -74.49760081053253,
+        "angle": 0.0331969307403185,
+        "vx": 0.16,
+        "vy": -0.10999999999999999,
+        "spin": -0.002,
+        "sleeping": false,
+        "contacts": 0,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 1,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": -0.2522614946348981,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 241.98368536847516,
+          "y": -81.5443566522216,
+          "angle": -0.08480306925968151,
+          "vx": -0.39,
+          "vy": -0.8949999999999999,
+          "spin": -0.042,
+          "sleeping": false,
+          "contacts": 0,
+          "quiet": 0,
+          "born": 481,
+          "flatten": 0
+        }
+      ],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 484
+    },
+    {
+      "age": 192,
+      "hull": {
+        "part": "hull",
+        "x": 262.5345202039871,
+        "y": -75.42760081053252,
+        "angle": 0.008996930740318486,
+        "vx": 0.16,
+        "vy": -0.049999999999999954,
+        "spin": -0.0022,
+        "sleeping": false,
+        "contacts": 0,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 1,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": -0.2568156367533196,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 237.30368536847533,
+          "y": -88.7743566522216,
+          "angle": -0.5888030692596815,
+          "vx": -0.39,
+          "vy": -0.35499999999999965,
+          "spin": -0.042,
+          "sleeping": false,
+          "contacts": 0,
+          "quiet": 0,
+          "born": 481,
+          "flatten": 0
+        },
+        {
+          "part": "tail",
+          "x": 302.4398412545383,
+          "y": -86.54775045101991,
+          "angle": 0.25619693074031846,
+          "vx": 0.7100000000000001,
+          "vy": -0.37499999999999983,
+          "spin": 0.033,
+          "sleeping": false,
+          "contacts": 0,
+          "quiet": 0,
+          "born": 489,
+          "flatten": 0
+        }
+      ],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 496
+    },
+    {
+      "age": 204,
+      "hull": {
+        "part": "hull",
+        "x": 264.4545202039874,
+        "y": -74.09760081053253,
+        "angle": -0.03300306925968152,
+        "vx": 0.16,
+        "vy": 0.29000000000000004,
+        "spin": -0.0046,
+        "sleeping": false,
+        "contacts": 0,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 1,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": -0.23890061054967315,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 232.6236853684755,
+          "y": -89.5243566522216,
+          "angle": -1.092803069259682,
+          "vx": -0.39,
+          "vy": 0.18500000000000028,
+          "spin": -0.042,
+          "sleeping": false,
+          "contacts": 0,
+          "quiet": 0,
+          "born": 481,
+          "flatten": 0
+        },
+        {
+          "part": "tail",
+          "x": 310.95984125453805,
+          "y": -87.53775045101989,
+          "angle": 0.6521969307403188,
+          "vx": 0.7100000000000001,
+          "vy": 0.1650000000000001,
+          "spin": 0.033,
+          "sleeping": false,
+          "contacts": 0,
+          "quiet": 0,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 263.50444062412663,
+          "y": -102.44032852177266,
+          "angle": -0.3362030692596816,
+          "vx": -0.12000000000000002,
+          "vy": -0.7209999999999998,
+          "spin": -0.0552,
+          "sleeping": false,
+          "contacts": 0,
+          "quiet": 0,
+          "born": 502,
+          "flatten": 0
+        }
+      ],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 508
+    },
+    {
+      "age": 216,
+      "hull": {
+        "part": "hull",
+        "x": 266.3745202039877,
+        "y": -68.04360081053252,
+        "angle": -0.10380306925968148,
+        "vx": 0.16,
+        "vy": 0.6860000000000004,
+        "spin": -0.006999999999999996,
+        "sleeping": false,
+        "contacts": 0,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 1,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": -0.173921780681307,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 227.94368536847566,
+          "y": -83.7943566522216,
+          "angle": -1.5968030692596824,
+          "vx": -0.39,
+          "vy": 0.7250000000000004,
+          "spin": -0.042,
+          "sleeping": false,
+          "contacts": 0,
+          "quiet": 0,
+          "born": 481,
+          "flatten": 0
+        },
+        {
+          "part": "tail",
+          "x": 319.4798412545378,
+          "y": -82.04775045101991,
+          "angle": 1.048196930740319,
+          "vx": 0.7100000000000001,
+          "vy": 0.7050000000000002,
+          "spin": 0.033,
+          "sleeping": false,
+          "contacts": 0,
+          "quiet": 0,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 262.0644406241266,
+          "y": -107.58232852177265,
+          "angle": -0.9986030692596819,
+          "vx": -0.12000000000000002,
+          "vy": -0.18099999999999972,
+          "spin": -0.0552,
+          "sleeping": false,
+          "contacts": 0,
+          "quiet": 0,
+          "born": 502,
+          "flatten": 0
+        }
+      ],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 520
+    },
+    {
+      "age": 228,
+      "hull": {
+        "part": "hull",
+        "x": 268.294520203988,
+        "y": -57.237600810532534,
+        "angle": -0.20340306925968143,
+        "vx": 0.16,
+        "vy": 1.0820000000000005,
+        "spin": -0.009399999999999999,
+        "sleeping": false,
+        "contacts": 0,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 1,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": -0.06097789746113817,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 223.26368536847582,
+          "y": -71.5843566522216,
+          "angle": -2.1008030692596824,
+          "vx": -0.39,
+          "vy": 1.2650000000000003,
+          "spin": -0.042,
+          "sleeping": false,
+          "contacts": 0,
+          "quiet": 0,
+          "born": 481,
+          "flatten": 0
+        },
+        {
+          "part": "tail",
+          "x": 327.99984125453756,
+          "y": -70.0777504510199,
+          "angle": 1.444196930740318,
+          "vx": 0.7100000000000001,
+          "vy": 1.245,
+          "spin": 0.033,
+          "sleeping": false,
+          "contacts": 0,
+          "quiet": 0,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 260.6244406241265,
+          "y": -106.24432852177264,
+          "angle": -1.6610030692596809,
+          "vx": -0.12000000000000002,
+          "vy": 0.3590000000000002,
+          "spin": -0.0552,
+          "sleeping": false,
+          "contacts": 0,
+          "quiet": 0,
+          "born": 502,
+          "flatten": 0
+        }
+      ],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 532
+    },
+    {
+      "age": 240,
+      "hull": {
+        "part": "hull",
+        "x": 270.2145202039883,
+        "y": -41.679600810532534,
+        "angle": -0.3318030692596815,
+        "vx": 0.16,
+        "vy": 1.4779999999999995,
+        "spin": -0.011800000000000005,
+        "sleeping": false,
+        "contacts": 0,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 1,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": 0.09789507451237602,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 218.58368536847598,
+          "y": -52.89435665222161,
+          "angle": -2.60480306925968,
+          "vx": -0.39,
+          "vy": 1.8049999999999995,
+          "spin": -0.042,
+          "sleeping": false,
+          "contacts": 0,
+          "quiet": 0,
+          "born": 481,
+          "flatten": 0
+        },
+        {
+          "part": "tail",
+          "x": 336.5198412545373,
+          "y": -51.62775045101991,
+          "angle": 1.840196930740317,
+          "vx": 0.7100000000000001,
+          "vy": 1.7849999999999993,
+          "spin": 0.033,
+          "sleeping": false,
+          "contacts": 0,
+          "quiet": 0,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 259.18444062412647,
+          "y": -98.42632852177265,
+          "angle": -2.323403069259681,
+          "vx": -0.12000000000000002,
+          "vy": 0.8990000000000005,
+          "spin": -0.0552,
+          "sleeping": false,
+          "contacts": 0,
+          "quiet": 0,
+          "born": 502,
+          "flatten": 0
+        }
+      ],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 544
+    },
+    {
+      "age": 252,
+      "hull": {
+        "part": "hull",
+        "x": 272.0321202039886,
+        "y": -30.333604551115506,
+        "angle": -0.4635383930790456,
+        "vx": 0.1344,
+        "vy": -0.07703999999999986,
+        "spin": -0.007533830954841005,
+        "sleeping": false,
+        "contacts": 1,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 1,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": 0.19212508823708369,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 213.90368536847615,
+          "y": -27.724356652221616,
+          "angle": -3.108803069259678,
+          "vx": -0.39,
+          "vy": 2.344999999999999,
+          "spin": -0.042,
+          "sleeping": false,
+          "contacts": 0,
+          "quiet": 0,
+          "born": 481,
+          "flatten": 0
+        },
+        {
+          "part": "tail",
+          "x": 344.8836412545371,
+          "y": -31.660686431956517,
+          "angle": 2.208638043785475,
+          "vx": 0.5538000000000001,
+          "vy": -0.5021999999999995,
+          "spin": 0.005441113045159023,
+          "sleeping": false,
+          "contacts": 1,
+          "quiet": 0,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 257.7444406241264,
+          "y": -84.12832852177264,
+          "angle": -2.9858030692596826,
+          "vx": -0.12000000000000002,
+          "vy": 1.4389999999999998,
+          "spin": -0.0552,
+          "sleeping": false,
+          "contacts": 0,
+          "quiet": 0,
+          "born": 502,
+          "flatten": 0
+        },
+        {
+          "part": "skid",
+          "x": 277.23102187592804,
+          "y": -18.45990129360294,
+          "angle": -0.5086021220202794,
+          "vx": -0.18137377440000002,
+          "vy": 0,
+          "spin": 0.0018175768368861743,
+          "sleeping": false,
+          "contacts": 4,
+          "quiet": 0,
+          "born": 552,
+          "flatten": 0
+        },
+        {
+          "part": "door",
+          "x": 277.03718409467206,
+          "y": -28.576871367998173,
+          "angle": -0.22700306925968167,
+          "vx": 0.81,
+          "vy": 0.921999999999999,
+          "spin": 0.05159999999999999,
+          "sleeping": false,
+          "contacts": 0,
+          "quiet": 0,
+          "born": 552,
+          "flatten": 0
+        }
+      ],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 556
+    },
+    {
+      "age": 264,
+      "hull": {
+        "part": "hull",
+        "x": 273.64492020398893,
+        "y": -28.684084551115504,
+        "angle": -0.553944364537138,
+        "vx": 0.1344,
+        "vy": 0.31896000000000024,
+        "spin": -0.007533830954841005,
+        "sleeping": false,
+        "contacts": 1,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 1,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": 0.21031127817559303,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 209.6526853684762,
+          "y": -14.638640964021926,
+          "angle": -3.5349456843003457,
+          "vx": -0.3042,
+          "vy": -0.41339999999999955,
+          "spin": -0.026428523008133753,
+          "sleeping": false,
+          "contacts": 1,
+          "quiet": 0,
+          "born": 481,
+          "flatten": 0.17500000000000002
+        },
+        {
+          "part": "tail",
+          "x": 351.5292412545374,
+          "y": -34.17708643195651,
+          "angle": 2.2739314003273807,
+          "vx": 0.5538000000000001,
+          "vy": 0.03780000000000033,
+          "spin": 0.005441113045159023,
+          "sleeping": false,
+          "contacts": 1,
+          "quiet": 0,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 256.30444062412636,
+          "y": -63.35032852177267,
+          "angle": -3.6482030692596843,
+          "vx": -0.12000000000000002,
+          "vy": 1.978999999999999,
+          "spin": -0.0552,
+          "sleeping": false,
+          "contacts": 0,
+          "quiet": 0,
+          "born": 502,
+          "flatten": 0
+        },
+        {
+          "part": "skid",
+          "x": 275.73560381194125,
+          "y": -17.128008374466695,
+          "angle": -0.4308602169865957,
+          "vx": -0.08607128738906882,
+          "vy": 0.045,
+          "spin": 0.008763856792106036,
+          "sleeping": false,
+          "contacts": 7,
+          "quiet": 0,
+          "born": 552,
+          "flatten": 0
+        },
+        {
+          "part": "door",
+          "x": 286.5789840946721,
+          "y": -15.839822182630135,
+          "angle": 0.3729056597854772,
+          "vx": 0.6318,
+          "vy": -0.2950799999999996,
+          "spin": 0.032308729045158996,
+          "sleeping": false,
+          "contacts": 1,
+          "quiet": 0,
+          "born": 552,
+          "flatten": 0.035
+        }
+      ],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 568
+    },
+    {
+      "age": 276,
+      "hull": {
+        "part": "hull",
+        "x": 275.25772020398927,
+        "y": -22.417148473685657,
+        "angle": -0.6443503359952307,
+        "vx": 0.11289599999999998,
+        "vy": -0.08579520000000007,
+        "spin": -0.0018235063075708003,
+        "sleeping": false,
+        "contacts": 2,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 1,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": 0.27282640479384734,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 206.0022853684761,
+          "y": -16.089440964021918,
+          "angle": -3.8520879603979514,
+          "vx": -0.3042,
+          "vy": 0.12660000000000035,
+          "spin": -0.026428523008133753,
+          "sleeping": false,
+          "contacts": 1,
+          "quiet": 0,
+          "born": 481,
+          "flatten": 0.5950000000000003
+        },
+        {
+          "part": "tail",
+          "x": 357.9311692545376,
+          "y": -31.5451153090669,
+          "angle": 2.2997022944180725,
+          "vx": 0.43196400000000007,
+          "vy": -0.027072000000000054,
+          "spin": -0.014320118180448252,
+          "sleeping": false,
+          "contacts": 2,
+          "quiet": 0,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 254.8644406241263,
+          "y": -38.7420434694671,
+          "angle": -4.3106030692596855,
+          "vx": -0.09360000000000002,
+          "vy": -0.6045599999999995,
+          "spin": -0.02799687500813368,
+          "sleeping": false,
+          "contacts": 1,
+          "quiet": 0,
+          "born": 502,
+          "flatten": 0
+        },
+        {
+          "part": "skid",
+          "x": 274.816362462626,
+          "y": -15.038642477816595,
+          "angle": -0.3240000948697521,
+          "vx": -0.06713560416347368,
+          "vy": 0.26999999999999996,
+          "spin": 0.009046163560701212,
+          "sleeping": false,
+          "contacts": 8,
+          "quiet": 0,
+          "born": 552,
+          "flatten": 0
+        },
+        {
+          "part": "door",
+          "x": 294.16058409467206,
+          "y": -15.870782182630133,
+          "angle": 0.7606104083273855,
+          "vx": 0.6318,
+          "vy": 0.2449200000000003,
+          "spin": 0.032308729045158996,
+          "sleeping": false,
+          "contacts": 1,
+          "quiet": 0,
+          "born": 552,
+          "flatten": 0.4550000000000002
+        }
+      ],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 580
+    },
+    {
+      "age": 288,
+      "hull": {
+        "part": "hull",
+        "x": 276.13316914675005,
+        "y": -22.094194648780586,
+        "angle": -0.5863207809512441,
+        "vx": 0.039660142577319916,
+        "vy": 0.033,
+        "spin": 0.008443377325143747,
+        "sleeping": false,
+        "contacts": 8,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 1,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": 0.2737745727054774,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 202.351885368476,
+          "y": -11.703130753885027,
+          "angle": -4.169230236495557,
+          "vx": -0.23727600000000001,
+          "vy": -0.1599840000000001,
+          "spin": -0.009585872969019917,
+          "sleeping": false,
+          "contacts": 2,
+          "quiet": 0,
+          "born": 481,
+          "flatten": 0.72
+        },
+        {
+          "part": "tail",
+          "x": 362.1321055473375,
+          "y": -30.40041852954124,
+          "angle": 2.0032979058429756,
+          "vx": 0.26280689760000003,
+          "vy": 0.135,
+          "spin": -0.03461356790485717,
+          "sleeping": false,
+          "contacts": 4,
+          "quiet": 0,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 253.7412406241262,
+          "y": -42.48676346946709,
+          "angle": -4.6465655693572865,
+          "vx": -0.09360000000000002,
+          "vy": -0.06455999999999959,
+          "spin": -0.02799687500813368,
+          "sleeping": false,
+          "contacts": 1,
+          "quiet": 0,
+          "born": 502,
+          "flatten": 0
+        },
+        {
+          "part": "skid",
+          "x": 274.19299495084704,
+          "y": -13.014326187971932,
+          "angle": -0.22172670669183758,
+          "vx": -0.04084530157305739,
+          "vy": 0.135,
+          "spin": 0.007882623604596193,
+          "sleeping": false,
+          "contacts": 10,
+          "quiet": 0,
+          "born": 552,
+          "flatten": 0
+        },
+        {
+          "part": "door",
+          "x": 301.325196094672,
+          "y": -12.518482664494465,
+          "angle": 1.091560775006857,
+          "vx": 0.492804,
+          "vy": -0.02098080000000009,
+          "spin": 0.013390601757680174,
+          "sleeping": false,
+          "contacts": 2,
+          "quiet": 0,
+          "born": 552,
+          "flatten": 0.72
+        }
+      ],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 592
+    },
+    {
+      "age": 300,
+      "hull": {
+        "part": "hull",
+        "x": 276.48665140556835,
+        "y": -21.423967836161168,
+        "angle": -0.48846693703231164,
+        "vx": 0.01974564912276417,
+        "vy": 0.033,
+        "spin": 0.007437239813685856,
+        "sleeping": false,
+        "contacts": 12,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0.931392,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": 0.27888015810377914,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 200.34738823654826,
+          "y": -11.477184908155623,
+          "angle": -4.116029469378554,
+          "vx": -0.06850571853415681,
+          "vy": 0,
+          "spin": 0.020923568151157566,
+          "sleeping": false,
+          "contacts": 7,
+          "quiet": 0,
+          "born": 481,
+          "flatten": 0.72
+        },
+        {
+          "part": "tail",
+          "x": 365.2857883185375,
+          "y": -25.27041852954124,
+          "angle": 1.5879350909846899,
+          "vx": 0.26280689760000003,
+          "vy": 0.675,
+          "spin": -0.03461356790485717,
+          "sleeping": false,
+          "contacts": 4,
+          "quiet": 0,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 252.7210006241262,
+          "y": -41.150293272178295,
+          "angle": -4.996511247242703,
+          "vx": -0.07300800000000002,
+          "vy": 0.22499999999999998,
+          "spin": -0.030793510565696288,
+          "sleeping": false,
+          "contacts": 2,
+          "quiet": 0,
+          "born": 502,
+          "flatten": 0
+        },
+        {
+          "part": "skid",
+          "x": 273.78875717023857,
+          "y": -11.1027820914435,
+          "angle": -0.1368953686038626,
+          "vx": -0.024850281477048115,
+          "vy": 0.09,
+          "spin": 0.005913866404964759,
+          "sleeping": false,
+          "contacts": 12,
+          "quiet": 0,
+          "born": 552,
+          "flatten": 0
+        },
+        {
+          "part": "door",
+          "x": 304.36409938227484,
+          "y": -12.209989511825428,
+          "angle": 0.9664020035702171,
+          "vx": 0.041079036727365265,
+          "vy": 0,
+          "spin": -0.024977976583396226,
+          "sleeping": false,
+          "contacts": 12,
+          "quiet": 0,
+          "born": 552,
+          "flatten": 0.72
+        }
+      ],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 604
+    },
+    {
+      "age": 312,
+      "hull": {
+        "part": "hull",
+        "x": 276.66264009850204,
+        "y": -20.76596130449793,
+        "angle": -0.409862107696085,
+        "vx": 0.009830793182833402,
+        "vy": 0.033,
+        "spin": 0.0054955366477482505,
+        "sleeping": false,
+        "contacts": 16,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0.6479999999999999,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": 0.2845049395738943,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 199.70208135737465,
+          "y": -10.363599507549898,
+          "angle": -3.8623423552976743,
+          "vx": -0.03250952574182118,
+          "vy": 0.045,
+          "spin": 0.020453627487962235,
+          "sleeping": false,
+          "contacts": 10,
+          "quiet": 0,
+          "born": 481,
+          "flatten": 0.72
+        },
+        {
+          "part": "tail",
+          "x": 367.9191134324894,
+          "y": -22.920523655250843,
+          "angle": 1.172080259891274,
+          "vx": 0.20498938012800003,
+          "vy": 0.21059999999999995,
+          "spin": -0.03466823637542705,
+          "sleeping": false,
+          "contacts": 5,
+          "quiet": 0,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 251.8770281441263,
+          "y": -36.619663458444364,
+          "angle": -5.362298547002862,
+          "vx": -0.056946240000000016,
+          "vy": -0.07200000000000001,
+          "spin": -0.028926097051597616,
+          "sleeping": false,
+          "contacts": 3,
+          "quiet": 0,
+          "born": 502,
+          "flatten": 0
+        },
+        {
+          "part": "skid",
+          "x": 273.56440505182115,
+          "y": -9.758065648965236,
+          "angle": -0.07882727720931548,
+          "vx": -0.011792750775496139,
+          "vy": 0.045,
+          "spin": 0.0035314690416303374,
+          "sleeping": false,
+          "contacts": 15,
+          "quiet": 0,
+          "born": 552,
+          "flatten": 0
+        },
+        {
+          "part": "door",
+          "x": 304.5988266082282,
+          "y": -11.54832839885051,
+          "angle": 0.6904731500958801,
+          "vx": 0.0072157664812799345,
+          "vy": 0,
+          "spin": -0.019770848344041476,
+          "sleeping": false,
+          "contacts": 19,
+          "quiet": 0,
+          "born": 552,
+          "flatten": 0.72
+        }
+      ],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 616
+    },
+    {
+      "age": 324,
+      "hull": {
+        "part": "hull",
+        "x": 276.7359785297196,
+        "y": -20.259546026451556,
+        "angle": -0.35659940847135213,
+        "vx": 0.0034535382943533645,
+        "vy": 0.033,
+        "spin": 0.0035820939427723838,
+        "sleeping": false,
+        "contacts": 22,
+        "quiet": 0,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0.295488,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": 0.2915882235214684,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 199.49828435521226,
+          "y": -9.66168193460003,
+          "angle": -3.648449028944983,
+          "vx": -0.007321132216134539,
+          "vy": 0.045,
+          "spin": 0.01515871527277598,
+          "sleeping": false,
+          "contacts": 16,
+          "quiet": 0,
+          "born": 481,
+          "flatten": 0.72
+        },
+        {
+          "part": "tail",
+          "x": 369.8125593388555,
+          "y": -20.621409531161405,
+          "angle": 0.7952495147958799,
+          "vx": 0.12471553886987521,
+          "vy": 0.09,
+          "spin": -0.02763708154767463,
+          "sleeping": false,
+          "contacts": 7,
+          "quiet": 0,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 251.1936732641263,
+          "y": -33.97366345844437,
+          "angle": -5.709411711622028,
+          "vx": -0.056946240000000016,
+          "vy": 0.46799999999999986,
+          "spin": -0.028926097051597616,
+          "sleeping": false,
+          "contacts": 3,
+          "quiet": 0,
+          "born": 502,
+          "flatten": 0
+        },
+        {
+          "part": "skid",
+          "x": 273.48438384038127,
+          "y": -9.080019869361882,
+          "angle": -0.049221789808206566,
+          "vx": -0.0016157417307391961,
+          "vy": 0,
+          "spin": 0.001443884270307064,
+          "sleeping": false,
+          "contacts": 23,
+          "quiet": 5,
+          "born": 552,
+          "flatten": 0
+        },
+        {
+          "part": "door",
+          "x": 304.6496518696003,
+          "y": -10.768935460680853,
+          "angle": 0.4826608540891645,
+          "vx": 0.0016249877303575486,
+          "vy": 0,
+          "spin": -0.014116584784296253,
+          "sleeping": false,
+          "contacts": 25,
+          "quiet": 0,
+          "born": 552,
+          "flatten": 0.72
+        }
+      ],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 628
+    },
+    {
+      "age": 336,
+      "hull": {
+        "part": "hull",
+        "x": 276.7548993801768,
+        "y": -19.924243793101468,
+        "angle": -0.3227614158863615,
+        "vx": 0.00042620222120206874,
+        "vy": 0,
+        "spin": 0.002248951491926046,
+        "sleeping": false,
+        "contacts": 34,
+        "quiet": 12,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0.039744,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": 0.2993796342275765,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 199.45238935170062,
+          "y": -9.042935365133113,
+          "angle": -3.494756116531473,
+          "vx": -0.0012859985203842578,
+          "vy": 0,
+          "spin": 0.010138182657495066,
+          "sleeping": false,
+          "contacts": 23,
+          "quiet": 0,
+          "born": 481,
+          "flatten": 0.72
+        },
+        {
+          "part": "tail",
+          "x": 371.28170838674237,
+          "y": -16.759901293407975,
+          "angle": 0.4694190707180251,
+          "vx": 0.09727812031850266,
+          "vy": -0.0954,
+          "spin": -0.021822547053433856,
+          "sleeping": false,
+          "contacts": 8,
+          "quiet": 0,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 250.51031838412626,
+          "y": -24.84766345844437,
+          "angle": -6.056524876241195,
+          "vx": -0.056946240000000016,
+          "vy": 1.0080000000000002,
+          "spin": -0.028926097051597616,
+          "sleeping": false,
+          "contacts": 3,
+          "quiet": 0,
+          "born": 502,
+          "flatten": 0
+        },
+        {
+          "part": "skid",
+          "x": 273.4776517625537,
+          "y": -8.814685585007027,
+          "angle": -0.03710223917764513,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 33,
+          "quiet": 15,
+          "born": 552,
+          "flatten": 0
+        },
+        {
+          "part": "door",
+          "x": 304.661097698167,
+          "y": -10.092511856547887,
+          "angle": 0.33589642391644015,
+          "vx": 0.0003659465880254192,
+          "vy": 0,
+          "spin": -0.00986599497180312,
+          "sleeping": false,
+          "contacts": 31,
+          "quiet": 0,
+          "born": 552,
+          "flatten": 0.72
+        }
+      ],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 640
+    },
+    {
+      "age": 348,
+      "hull": {
+        "part": "hull",
+        "x": 276.75598432055114,
+        "y": -19.857643984841292,
+        "angle": -0.3162003911814976,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": true,
+        "contacts": 37,
+        "quiet": 15,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0.896,
+        "reach": 0.896,
+        "aim": 0.3059019086896813,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 199.44684035494942,
+          "y": -8.60475781214243,
+          "angle": -3.3940978299129467,
+          "vx": -0.00006521923512370654,
+          "vy": 0,
+          "spin": 0.0068517555547005825,
+          "sleeping": false,
+          "contacts": 35,
+          "quiet": 0,
+          "born": 481,
+          "flatten": 0.72
+        },
+        {
+          "part": "tail",
+          "x": 372.4490458305643,
+          "y": -14.394701293407978,
+          "angle": 0.20754850607681896,
+          "vx": 0.09727812031850266,
+          "vy": 0.4445999999999999,
+          "spin": -0.021822547053433856,
+          "sleeping": false,
+          "contacts": 8,
+          "quiet": 0,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 249.83949167692623,
+          "y": -11.735466634672992,
+          "angle": -6.3936348324489565,
+          "vx": -0.034646092416000016,
+          "vy": 0,
+          "spin": -0.011966296149132697,
+          "sleeping": false,
+          "contacts": 5,
+          "quiet": 0,
+          "born": 502,
+          "flatten": 0
+        },
+        {
+          "part": "skid",
+          "x": 273.4776517625537,
+          "y": -8.814685585007027,
+          "angle": -0.03710223917764513,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 33,
+          "quiet": 15,
+          "born": 552,
+          "flatten": 0
+        },
+        {
+          "part": "door",
+          "x": 304.6632738199154,
+          "y": -9.586174896489062,
+          "angle": 0.2370122460004351,
+          "vx": 0.000030504487239856407,
+          "vy": 0,
+          "spin": -0.006462789779871672,
+          "sleeping": false,
+          "contacts": 41,
+          "quiet": 0,
+          "born": 552,
+          "flatten": 0.72
+        }
+      ],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 652
+    },
+    {
+      "age": 360,
+      "hull": {
+        "part": "hull",
+        "x": 276.75598432055114,
+        "y": -19.857643984841292,
+        "angle": -0.3162003911814976,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": true,
+        "contacts": 37,
+        "quiet": 15,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0.352,
+        "reach": 0.352,
+        "aim": 0.3109852551451072,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 199.4465589383552,
+          "y": -8.279801964869996,
+          "angle": -3.323151092139121,
+          "vx": -0.000003307584388861001,
+          "vy": 0,
+          "spin": 0.004921182546440539,
+          "sleeping": false,
+          "contacts": 47,
+          "quiet": 8,
+          "born": 481,
+          "flatten": 0.72
+        },
+        {
+          "part": "tail",
+          "x": 373.13414404440493,
+          "y": -14.137021008783186,
+          "angle": 0.08206403941231144,
+          "vx": 0.013328215060142371,
+          "vy": 0,
+          "spin": -0.00021537911140212098,
+          "sleeping": false,
+          "contacts": 16,
+          "quiet": 4,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 249.67886554292116,
+          "y": -12.10601097998826,
+          "angle": -6.403434985403331,
+          "vx": -0.004746910910717764,
+          "vy": 0.045,
+          "spin": 0.0025908463875934464,
+          "sleeping": false,
+          "contacts": 13,
+          "quiet": 0,
+          "born": 502,
+          "flatten": 0
+        },
+        {
+          "part": "skid",
+          "x": 273.4776517625537,
+          "y": -8.814685585007027,
+          "angle": -0.03710223917764513,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 33,
+          "quiet": 15,
+          "born": 552,
+          "flatten": 0
+        },
+        {
+          "part": "door",
+          "x": 304.6634054447174,
+          "y": -9.22467235559215,
+          "angle": 0.17033761920224208,
+          "vx": 0.0000015470308045376621,
+          "vy": 0,
+          "spin": -0.00461746706204548,
+          "sleeping": false,
+          "contacts": 53,
+          "quiet": 10,
+          "born": 552,
+          "flatten": 0.72
+        }
+      ],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 664
+    },
+    {
+      "age": 372,
+      "hull": {
+        "part": "hull",
+        "x": 276.75598432055114,
+        "y": -19.857643984841292,
+        "angle": -0.3162003911814976,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": true,
+        "contacts": 37,
+        "quiet": 15,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 0.3131424794350814,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 199.44654654477165,
+          "y": -8.130468807588645,
+          "angle": -3.291381166379267,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 54,
+          "quiet": 15,
+          "born": 481,
+          "flatten": 0.72
+        },
+        {
+          "part": "tail",
+          "x": 373.1907878042183,
+          "y": -14.145708182027874,
+          "angle": 0.08869286620512624,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 27,
+          "quiet": 15,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 249.638503964533,
+          "y": -11.031168333812863,
+          "angle": -6.371520266985783,
+          "vx": -0.002252656066502937,
+          "vy": 0.09,
+          "spin": 0.0025904531487520514,
+          "sleeping": false,
+          "contacts": 16,
+          "quiet": 0,
+          "born": 502,
+          "flatten": 0
+        },
+        {
+          "part": "skid",
+          "x": 273.4776517625537,
+          "y": -8.814685585007027,
+          "angle": -0.03710223917764513,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 33,
+          "quiet": 15,
+          "born": 552,
+          "flatten": 0
+        },
+        {
+          "part": "door",
+          "x": 304.66341044642667,
+          "y": -9.102904824567098,
+          "angle": 0.14846950340578077,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 58,
+          "quiet": 15,
+          "born": 552,
+          "flatten": 0.72
+        }
+      ],
+      "firstGate": {
+        "travel": 0,
+        "height": 120,
+        "ready": true
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 676
+    },
+    {
+      "age": 384,
+      "hull": {
+        "part": "hull",
+        "x": 276.75598432055114,
+        "y": -19.857643984841292,
+        "angle": -0.3162003911814976,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": true,
+        "contacts": 37,
+        "quiet": 15,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 0.3454512729588482,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 199.44654654477165,
+          "y": -8.130468807588645,
+          "angle": -3.291381166379267,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 54,
+          "quiet": 15,
+          "born": 481,
+          "flatten": 0.72
+        },
+        {
+          "part": "tail",
+          "x": 373.1907878042183,
+          "y": -14.145708182027874,
+          "angle": 0.08869286620512624,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 27,
+          "quiet": 15,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 249.6219938942842,
+          "y": -10.06774682966669,
+          "angle": -6.344148419975006,
+          "vx": -0.0006503810855126983,
+          "vy": 0,
+          "spin": 0.0018546591392157377,
+          "sleeping": false,
+          "contacts": 21,
+          "quiet": 1,
+          "born": 502,
+          "flatten": 0
+        },
+        {
+          "part": "skid",
+          "x": 273.4776517625537,
+          "y": -8.814685585007027,
+          "angle": -0.03710223917764513,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 33,
+          "quiet": 15,
+          "born": 552,
+          "flatten": 0
+        },
+        {
+          "part": "door",
+          "x": 304.66341044642667,
+          "y": -9.102904824567098,
+          "angle": 0.14846950340578077,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 58,
+          "quiet": 15,
+          "born": 552,
+          "flatten": 0.72
+        }
+      ],
+      "firstGate": {
+        "travel": 0.15625,
+        "height": 101,
+        "ready": true
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 688
+    },
+    {
+      "age": 396,
+      "hull": {
+        "part": "hull",
+        "x": 276.75598432055114,
+        "y": -19.857643984841292,
+        "angle": -0.3162003911814976,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": true,
+        "contacts": 37,
+        "quiet": 15,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 0.4441245159237743,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 199.44654654477165,
+          "y": -8.130468807588645,
+          "angle": -3.291381166379267,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 54,
+          "quiet": 15,
+          "born": 481,
+          "flatten": 0.72
+        },
+        {
+          "part": "tail",
+          "x": 373.1907878042183,
+          "y": -14.145708182027874,
+          "angle": 0.08869286620512624,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 27,
+          "quiet": 15,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 249.6174541548584,
+          "y": -9.430363676639542,
+          "angle": -6.325319499402409,
+          "vx": -0.00011424313739505715,
+          "vy": 0,
+          "spin": 0.0011982383190014057,
+          "sleeping": false,
+          "contacts": 28,
+          "quiet": 3,
+          "born": 502,
+          "flatten": 0
+        },
+        {
+          "part": "skid",
+          "x": 273.4776517625537,
+          "y": -8.814685585007027,
+          "angle": -0.03710223917764513,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 33,
+          "quiet": 15,
+          "born": 552,
+          "flatten": 0
+        },
+        {
+          "part": "door",
+          "x": 304.66341044642667,
+          "y": -9.102904824567098,
+          "angle": 0.14846950340578077,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 58,
+          "quiet": 15,
+          "born": 552,
+          "flatten": 0.72
+        }
+      ],
+      "firstGate": {
+        "travel": 0.5,
+        "height": 60,
+        "ready": true
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 700
+    },
+    {
+      "age": 408,
+      "hull": {
+        "part": "hull",
+        "x": 276.75598432055114,
+        "y": -19.857643984841292,
+        "angle": -0.3162003911814976,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": true,
+        "contacts": 37,
+        "quiet": 15,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 0.7017392169940186,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 199.44654654477165,
+          "y": -8.130468807588645,
+          "angle": -3.291381166379267,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 54,
+          "quiet": 15,
+          "born": 481,
+          "flatten": 0.72
+        },
+        {
+          "part": "tail",
+          "x": 373.1907878042183,
+          "y": -14.145708182027874,
+          "angle": 0.08869286620512624,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 27,
+          "quiet": 15,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 249.61696120343723,
+          "y": -9.024179754716634,
+          "angle": -6.313339552160444,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 40,
+          "quiet": 15,
+          "born": 502,
+          "flatten": 0
+        },
+        {
+          "part": "skid",
+          "x": 273.4776517625537,
+          "y": -8.814685585007027,
+          "angle": -0.03710223917764513,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 33,
+          "quiet": 15,
+          "born": 552,
+          "flatten": 0
+        },
+        {
+          "part": "door",
+          "x": 304.66341044642667,
+          "y": -9.102904824567098,
+          "angle": 0.14846950340578077,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 58,
+          "quiet": 15,
+          "born": 552,
+          "flatten": 0.72
+        }
+      ],
+      "firstGate": {
+        "travel": 0.84375,
+        "height": 19,
+        "ready": true
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 712
+    },
+    {
+      "age": 420,
+      "hull": {
+        "part": "hull",
+        "x": 276.75598432055114,
+        "y": -19.857643984841292,
+        "angle": -0.3162003911814976,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": true,
+        "contacts": 37,
+        "quiet": 15,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 1.2275823910788173,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 199.44654654477165,
+          "y": -8.130468807588645,
+          "angle": -3.291381166379267,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 54,
+          "quiet": 15,
+          "born": 481,
+          "flatten": 0.72
+        },
+        {
+          "part": "tail",
+          "x": 373.1907878042183,
+          "y": -14.145708182027874,
+          "angle": 0.08869286620512624,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 27,
+          "quiet": 15,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 249.61696120343723,
+          "y": -9.024179754716634,
+          "angle": -6.313339552160444,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 40,
+          "quiet": 15,
+          "born": 502,
+          "flatten": 0
+        },
+        {
+          "part": "skid",
+          "x": 273.4776517625537,
+          "y": -8.814685585007027,
+          "angle": -0.03710223917764513,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 33,
+          "quiet": 15,
+          "born": 552,
+          "flatten": 0
+        },
+        {
+          "part": "door",
+          "x": 304.66341044642667,
+          "y": -9.102904824567098,
+          "angle": 0.14846950340578077,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 58,
+          "quiet": 15,
+          "born": 552,
+          "flatten": 0.72
+        }
+      ],
+      "firstGate": {
+        "travel": 1,
+        "height": 0,
+        "ready": true
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 724
+    },
+    {
+      "age": 432,
+      "hull": {
+        "part": "hull",
+        "x": 276.75598432055114,
+        "y": -19.857643984841292,
+        "angle": -0.3162003911814976,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": true,
+        "contacts": 37,
+        "quiet": 15,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 1.2275823910788173,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 199.44654654477165,
+          "y": -8.130468807588645,
+          "angle": -3.291381166379267,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 54,
+          "quiet": 15,
+          "born": 481,
+          "flatten": 0.72
+        },
+        {
+          "part": "tail",
+          "x": 373.1907878042183,
+          "y": -14.145708182027874,
+          "angle": 0.08869286620512624,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 27,
+          "quiet": 15,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 249.61696120343723,
+          "y": -9.024179754716634,
+          "angle": -6.313339552160444,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 40,
+          "quiet": 15,
+          "born": 502,
+          "flatten": 0
+        },
+        {
+          "part": "skid",
+          "x": 273.4776517625537,
+          "y": -8.814685585007027,
+          "angle": -0.03710223917764513,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 33,
+          "quiet": 15,
+          "born": 552,
+          "flatten": 0
+        },
+        {
+          "part": "door",
+          "x": 304.66341044642667,
+          "y": -9.102904824567098,
+          "angle": 0.14846950340578077,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 58,
+          "quiet": 15,
+          "born": 552,
+          "flatten": 0.72
+        }
+      ],
+      "firstGate": {
+        "travel": 1,
+        "height": 0,
+        "ready": true
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 736
+    },
+    {
+      "age": 444,
+      "hull": {
+        "part": "hull",
+        "x": 276.75598432055114,
+        "y": -19.857643984841292,
+        "angle": -0.3162003911814976,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": true,
+        "contacts": 37,
+        "quiet": 15,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 1.2275823910788173,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 199.44654654477165,
+          "y": -8.130468807588645,
+          "angle": -3.291381166379267,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 54,
+          "quiet": 15,
+          "born": 481,
+          "flatten": 0.72
+        },
+        {
+          "part": "tail",
+          "x": 373.1907878042183,
+          "y": -14.145708182027874,
+          "angle": 0.08869286620512624,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 27,
+          "quiet": 15,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 249.61696120343723,
+          "y": -9.024179754716634,
+          "angle": -6.313339552160444,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 40,
+          "quiet": 15,
+          "born": 502,
+          "flatten": 0
+        },
+        {
+          "part": "skid",
+          "x": 273.4776517625537,
+          "y": -8.814685585007027,
+          "angle": -0.03710223917764513,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 33,
+          "quiet": 15,
+          "born": 552,
+          "flatten": 0
+        },
+        {
+          "part": "door",
+          "x": 304.66341044642667,
+          "y": -9.102904824567098,
+          "angle": 0.14846950340578077,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 58,
+          "quiet": 15,
+          "born": 552,
+          "flatten": 0.72
+        }
+      ],
+      "firstGate": {
+        "travel": 1,
+        "height": 0,
+        "ready": true
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 748
+    },
+    {
+      "age": 456,
+      "hull": {
+        "part": "hull",
+        "x": 276.75598432055114,
+        "y": -19.857643984841292,
+        "angle": -0.3162003911814976,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": true,
+        "contacts": 37,
+        "quiet": 15,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 1.2275823910788173,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 199.44654654477165,
+          "y": -8.130468807588645,
+          "angle": -3.291381166379267,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 54,
+          "quiet": 15,
+          "born": 481,
+          "flatten": 0.72
+        },
+        {
+          "part": "tail",
+          "x": 373.1907878042183,
+          "y": -14.145708182027874,
+          "angle": 0.08869286620512624,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 27,
+          "quiet": 15,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 249.61696120343723,
+          "y": -9.024179754716634,
+          "angle": -6.313339552160444,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 40,
+          "quiet": 15,
+          "born": 502,
+          "flatten": 0
+        },
+        {
+          "part": "skid",
+          "x": 273.4776517625537,
+          "y": -8.814685585007027,
+          "angle": -0.03710223917764513,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 33,
+          "quiet": 15,
+          "born": 552,
+          "flatten": 0
+        },
+        {
+          "part": "door",
+          "x": 304.66341044642667,
+          "y": -9.102904824567098,
+          "angle": 0.14846950340578077,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 58,
+          "quiet": 15,
+          "born": 552,
+          "flatten": 0.72
+        }
+      ],
+      "firstGate": {
+        "travel": 1,
+        "height": 0,
+        "ready": true
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 760
+    },
+    {
+      "age": 468,
+      "hull": {
+        "part": "hull",
+        "x": 276.75598432055114,
+        "y": -19.857643984841292,
+        "angle": -0.3162003911814976,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": true,
+        "contacts": 37,
+        "quiet": 15,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 1.2275823910788173,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 199.44654654477165,
+          "y": -8.130468807588645,
+          "angle": -3.291381166379267,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 54,
+          "quiet": 15,
+          "born": 481,
+          "flatten": 0.72
+        },
+        {
+          "part": "tail",
+          "x": 373.1907878042183,
+          "y": -14.145708182027874,
+          "angle": 0.08869286620512624,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 27,
+          "quiet": 15,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 249.61696120343723,
+          "y": -9.024179754716634,
+          "angle": -6.313339552160444,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 40,
+          "quiet": 15,
+          "born": 502,
+          "flatten": 0
+        },
+        {
+          "part": "skid",
+          "x": 273.4776517625537,
+          "y": -8.814685585007027,
+          "angle": -0.03710223917764513,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 33,
+          "quiet": 15,
+          "born": 552,
+          "flatten": 0
+        },
+        {
+          "part": "door",
+          "x": 304.66341044642667,
+          "y": -9.102904824567098,
+          "angle": 0.14846950340578077,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 58,
+          "quiet": 15,
+          "born": 552,
+          "flatten": 0.72
+        }
+      ],
+      "firstGate": {
+        "travel": 1,
+        "height": 0,
+        "ready": true
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 772
+    },
+    {
+      "age": 480,
+      "hull": {
+        "part": "hull",
+        "x": 276.75598432055114,
+        "y": -19.857643984841292,
+        "angle": -0.3162003911814976,
+        "vx": 0,
+        "vy": 0,
+        "spin": 0,
+        "sleeping": true,
+        "contacts": 37,
+        "quiet": 15,
+        "born": 0,
+        "flatten": 0
+      },
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 1.2275823910788173,
+        "recoil": 0,
+        "fired": true
+      },
+      "projectile": null,
+      "pieces": [
+        {
+          "part": "panel",
+          "x": 199.44654654477165,
+          "y": -8.130468807588645,
+          "angle": -3.291381166379267,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 54,
+          "quiet": 15,
+          "born": 481,
+          "flatten": 0.72
+        },
+        {
+          "part": "tail",
+          "x": 373.1907878042183,
+          "y": -14.145708182027874,
+          "angle": 0.08869286620512624,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 27,
+          "quiet": 15,
+          "born": 489,
+          "flatten": 0
+        },
+        {
+          "part": "rotor",
+          "x": 249.61696120343723,
+          "y": -9.024179754716634,
+          "angle": -6.313339552160444,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 40,
+          "quiet": 15,
+          "born": 502,
+          "flatten": 0
+        },
+        {
+          "part": "skid",
+          "x": 273.4776517625537,
+          "y": -8.814685585007027,
+          "angle": -0.03710223917764513,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 33,
+          "quiet": 15,
+          "born": 552,
+          "flatten": 0
+        },
+        {
+          "part": "door",
+          "x": 304.66341044642667,
+          "y": -9.102904824567098,
+          "angle": 0.14846950340578077,
+          "vx": 0,
+          "vy": 0,
+          "spin": 0,
+          "sleeping": true,
+          "contacts": 58,
+          "quiet": 15,
+          "born": 552,
+          "flatten": 0.72
+        }
+      ],
+      "firstGate": {
+        "travel": 1,
+        "height": 0,
+        "ready": true
+      },
+      "arrival": {
+        "travel": 0,
+        "height": 120,
+        "ready": false
+      },
+      "storyTick": 772
+    }
+  ]
+}
