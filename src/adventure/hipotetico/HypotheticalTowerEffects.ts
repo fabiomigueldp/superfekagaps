@@ -1,6 +1,7 @@
 import {box,pixelLine,polygon,type Point} from '../WorldPainting';
 import {smoothMotion} from './HypotheticalMotion';
-import {BASTION_TOWER,rocketTail,type HypotheticalTower} from './HypotheticalTower';
+import {BASTION_TOWER,type HypotheticalTower} from './HypotheticalTower';
+import {rocketTail} from './HypotheticalRocketMotion';
 import {drawLauncherWarhead} from './HypotheticalLauncherArt';
 import {AFTERMATH_SCALE} from './HypotheticalAftermathHandling';
 
@@ -34,10 +35,10 @@ export function drawScenicRocket(c:CanvasRenderingContext2D,t:Pick<HypotheticalT
             c.save();c.globalAlpha=(a<12?.7:.55)*fade;
             puff(c,p.x,p.y,r,p.seed,a<24?'#c4c3ac':'#a7afa0','#c4c1a9');c.restore();
         }
-        if(age<10){
-            const extension=9+age*1.8,fade=1-smoothMotion(age/10);
+        if(age<7){
+            const fade=1-smoothMotion(age/7),mouth=at(launch.x,launch.y,-8*AFTERMATH_SCALE+age*.55,0);
             c.save();c.globalAlpha=fade;
-            polygon(c,[at(launch.x,launch.y,-9,-2),at(launch.x,launch.y,extension,0),at(launch.x,launch.y,-9,2)],'#dbc797');
+            puff(c,mouth[0],mouth[1],1.5+age*.45,1,'#b9b49a','#d3c5a2');
             c.restore();
         }
         if(age<14){
@@ -57,21 +58,30 @@ export function drawScenicRocket(c:CanvasRenderingContext2D,t:Pick<HypotheticalT
     const r=t.rocket;if(!r)return;
     const point=(a:number,b:number):Point=>[r.x+r.dx*a-r.dy*b,base+r.y+r.dy*a+r.dx*b];
     const tail=rocketTail(r.age);
+    // Hide the part still inside the tube. The ejection puff is separate from
+    // the motor, whose flame appears only after the casing clears the muzzle.
+    c.save();
+    if(Math.hypot(r.x-r.fromX,r.y-r.fromY)<tail+8){
+        const clip=[at(launch.x,launch.y,-8*AFTERMATH_SCALE,-60),at(launch.x,launch.y,500,-60),
+            at(launch.x,launch.y,500,60),at(launch.x,launch.y,-8*AFTERMATH_SCALE,60)];
+        c.beginPath();c.moveTo(...clip[0]);for(const p of clip.slice(1))c.lineTo(...p);c.closePath();c.clip();
+    }
     if(r.age>0){
         polygon(c,[point(-8,-1.3),point(-tail,-.8),point(-tail,.8),point(-8,1.3)],'#536e66');
         pixelLine(c,...point(-8,-1),...point(-tail,-1),'#9ea78c');
     }
-    if(r.age>=3){
-        const motor=smoothMotion((r.age-2)/6),length=5+motor*(5+r.speed*.4)+(reduced?0:r.age%3);
+    if(r.motorAge>=0){
+        const motor=smoothMotion((r.motorAge+1)/5),length=2+motor*(7+r.speed*.4)+(reduced?0:Math.sin(r.motorAge*1.4)*.8);
         polygon(c,[point(-tail,-1.3),point(-tail-length,0),point(-tail,1.3)],reduced?'#aaac8b':'#dab77f');
         if(!reduced)polygon(c,[point(-tail,-.6),point(-tail-length*.65,0),point(-tail,.6)],'#f1dbab');
-        const fin=1+2*smoothMotion((r.age-4)/4);
+        const fin=1+2*smoothMotion(r.motorAge/4);
         polygon(c,[point(-tail+3,-1),point(-tail,-fin),point(-tail,fin),point(-tail+3,1)],'#61766c');
         pixelLine(c,...point(-tail,-fin),...point(-tail,fin),'#a4ab83');
     }
     drawLauncherWarhead({poly:(v,col)=>polygon(c,v,col),line:(x,y,xx,yy,col,width)=>pixelLine(c,x,y,xx,yy,col,width)},
         (a,b)=>point(a*AFTERMATH_SCALE,b*AFTERMATH_SCALE),{ink:'#47565a',green:'#79876d',lit:'#a4ab83'});
     if(r.age>4&&!reduced)pixelLine(c,...point(-2,-1),...point(-5,-2),'#d8c994');
+    c.restore();
 }
 function drawImpact(c:CanvasRenderingContext2D,t:HypotheticalTower,base:number,reduced:boolean){
     const a=t.impactAge,x=BASTION_TOWER.x,y=base+BASTION_TOWER.hitY,dx=t.launch?.dx??-1,dy=t.launch?.dy??0;

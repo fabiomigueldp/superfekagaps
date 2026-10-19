@@ -3,11 +3,12 @@ import {SIEGE_SECTORS} from './HypotheticalSiege';
 import {AFTERMATH_SCALE} from './HypotheticalAftermathHandling';
 import {HypotheticalTowerPhysics,TOWER_RELEASE} from './HypotheticalTowerPhysics';
 import {HypotheticalTowerSearch} from './HypotheticalTowerSearch';
+import {advanceRocketMotor,rocketTail,type ScenicRocket} from './HypotheticalRocketMotion';
 
 export const BASTION_TOWER={x:SIEGE_SECTORS[3].origin+125,left:-31,right:33,hitY:-64} as const;
 export const TOWER_SEQUENCE={draw:30,shoulder:98,fire:142,lower:286,stow:324,end:354} as const;
 export type TowerCue='distant-metal'|'distant-launch'|'distant-rocket'|'distant-blast'|'distant-stone'|'distant-bell'|'distant-debris'|'distant-wood';
-export interface LauncherPose {draw:number;rifleLower:number;reach:number;aim:number;recoil:number;fired:boolean}
+export interface LauncherPose {draw:number;rifleLower:number;reach:number;supportReach?:number;triggerReach?:number;aim:number;recoil:number;fired:boolean}
 interface RiderBody {bow:number;compression:number;riderDrop?:number;riderLean?:number}
 export function launcherShoulder(body:RiderBody){
     return {x:7+riderBend(14,body.riderLean??0),y:-85+body.bow*39+body.compression+(body.riderDrop??0)};
@@ -23,8 +24,6 @@ export function launcherGeometry(body:RiderBody,p:LauncherPose){
 }
 const pulse=(a:number,start:number,rise:number,hold:number,end:number)=>
     smoothMotion((a-start)/rise)*(1-smoothMotion((a-hold)/(end-hold)));
-/** The motor casing emerges from the tube behind the already-visible warhead. */
-export const rocketTail=(age:number)=>8+5*smoothMotion(age/5);
 
 /** A unique landmark event, independent from the repeatable debris score.
  * Before ignition an unseen scene retracts the weapon; after ignition its
@@ -34,7 +33,7 @@ export class HypotheticalTower {
     events:TowerCue[]=[];
     readonly destruction=new HypotheticalTowerPhysics();
     readonly search=new HypotheticalTowerSearch(this.destruction,BASTION_TOWER.x);
-    rocket:{x:number;y:number;fromX:number;fromY:number;dx:number;dy:number;age:number;remaining:number;speed:number}|null=null;
+    rocket:ScenicRocket|null=null;
     trail:Array<{x:number;y:number;born:number;seed:number}>=[];
     launch:{x:number;y:number;dx:number;dy:number;backX:number;backY:number}|null=null;
     private retract:LauncherPose|null=null;
@@ -86,20 +85,21 @@ export class HypotheticalTower {
                 if(this.age===TOWER_SEQUENCE.fire){
                     const p=barrel(),dx=BASTION_TOWER.x-p.x,dy=BASTION_TOWER.hitY-p.y,length=Math.hypot(dx,dy);
                     this.launchAt=this.tick;this.launch={...p,dx:dx/length,dy:dy/length};
-                    this.rocket={x:p.x,y:p.y,fromX:p.x,fromY:p.y,dx:dx/length,dy:dy/length,age:0,remaining:length,speed:0};
+                    this.rocket={x:p.x,y:p.y,fromX:p.x,fromY:p.y,dx:dx/length,dy:dy/length,age:0,remaining:length,speed:0,motorAge:-1};
                     this.events.push('distant-launch');
                 }
             }
         }
         if(this.rocket&&this.tick>this.launchAt){
             const r=this.rocket,speed=Math.min(r.remaining,1.1+5.6*smoothMotion((r.age-3)/15));
-            if(r.age>=3)for(let d=3-this.trailGap;d<=speed;d+=3){
+            const motor=advanceRocketMotor(r,speed);
+            if(motor.ignited)this.events.push('distant-rocket');
+            for(let d=speed-motor.burnDistance+3-this.trailGap;d<=speed;d+=3){
                 const tail=rocketTail(r.age+d/speed);
                 this.trail.push({x:r.x+r.dx*(d-tail),y:r.y+r.dy*(d-tail),born:this.tick-(speed-d)/speed,seed:this.trailSeed++});
             }
-            this.trailGap=r.age>=3?(this.trailGap+speed)%3:0;
+            this.trailGap=(this.trailGap+motor.burnDistance)%3;
             r.age++;r.speed=speed;r.remaining-=speed;r.x+=r.dx*speed;r.y+=r.dy*speed;
-            if(r.age===4)this.events.push('distant-rocket');
             if(r.remaining<=0){
                 this.rocket=null;this.impactAt=this.tick;this.destruction.start(r.dx);this.events.push('distant-blast');
             }

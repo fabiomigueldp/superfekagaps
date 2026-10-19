@@ -40,8 +40,8 @@ export function drawLauncher(p:Painter,body:Body,l:LauncherPose){
 
 export function drawLauncherHands(p:Painter,body:Body,l:LauncherPose,rifle:(x:number,y:number)=>Point){
     const g=launcherGeometry(body,l),rider=-64+body.bow*39+body.compression+(body.riderDrop??0),lean=body.riderLean??0;
-    const blend=(a:Point,b:Point):Point=>[a[0]+(b[0]-a[0])*l.reach,a[1]+(b[1]-a[1])*l.reach];
-    const right=blend(rifle(8,4),g.trigger),left=blend(rifle(18,3),g.support);
+    const blend=(a:Point,b:Point,t:number):Point=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];
+    const right=blend(rifle(8,4),g.trigger,l.triggerReach??l.reach),left=blend(rifle(18,3),g.support,l.supportReach??l.reach);
     const shoulderR:Point=[-8+riderBend(20,lean),rider-20],shoulderL:Point=[6+riderBend(20,lean),rider-20];
     const elbowR:Point=[(shoulderR[0]+right[0])*.5-4,(shoulderR[1]+right[1])*.5+8];
     const elbowL:Point=[(shoulderL[0]+left[0])*.5+5,(shoulderL[1]+left[1])*.5+7];
