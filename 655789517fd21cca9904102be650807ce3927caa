@@ -1,0 +1,26 @@
+Technical documentation supplement for 655789517fd21cca9904102be650807ce3927caa
+
+docs(history): complete technical records for 23 recent commits
+
+Complete the first retrospective documentation range and establish a repeatable way to preserve detailed commit information.
+
+Implementation
+Adds the missing record for 9c4c6bd and extends the previous index to 23 commits. The other 22 records and deployment message-file implementation had already entered the tree in the concurrent 9c4c6bd commit; this patch does not introduce them again.
+
+Adds AGENTS.md instructions to use UTF-8 --message-file input for detailed commit descriptions and to use --no-commit --allow-dirty when publishing selected committed files while unrelated edits remain local.
+
+The documentation distinguishes runtime changes, authoring artifacts and evidence. It identifies partial helicopter integration in 9c4c6bd rather than treating the presence of a simulation class as a complete visible scene.
+
+Timing and limitations
+Documentation and workflow instructions only: no gameplay source, public assets or authoring renders change in this patch.
+
+The original 23 commits keep their hashes. Supplemental Git notes live in refs/notes/commits; normal branch pushes and clones do not automatically transfer that ref.
+
+Authoring material
+Three text paths change: AGENTS.md, the prior index and 9c4c6bd.md. Publication can produce a new source/build identity even when the game payload is unchanged.
+
+Publication evidence
+A retained successful publisher response identifies build `655789517fd21cca9904102be650807ce3927caa-f5b9bbf9253b` for this exact source revision. The matching request records command `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its saved build-log SHA-256 is `02d19953d05cb99eedc2aff5c3a173cb7d5d8d5643c2c2db9f74f84c21acf4b8`. This records build and activation completion; it is not evidence of correct gameplay, audio quality or passing tests.
+
+Full source map and patch inventory: docs/commits/2026-10-19-followup/6557895.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
