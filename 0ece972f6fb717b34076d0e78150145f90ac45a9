@@ -1,0 +1,18 @@
+Technical documentation supplement for 0ece972f6fb717b34076d0e78150145f90ac45a9
+
+Polish tower rocket exhaust, material fractures and physical impact effects
+
+Behavior
+Keep rocket exhaust attached to the visible motor and distinguish tower fracture materials and contact effects.
+
+Implementation
+rocketTail() shares the motor extension with emission placement and delays the trail until ignition. TowerContact records slide; TowerChip adds stretch and shade; wood becomes a distinct material. Fractures emit at transformed joints, including the bell suspension. HypotheticalTowerPhysics adds clapper response, moving-breach smoke plumes and support-relative shadows; art/effects render material edges and brief local impact light.
+
+Scope and limitations
+Updates the tower authoring set and README. Decorative smoke and light are governed by reduced-motion rendering; the core trajectory and support simulation remain separate from those drawing choices.
+
+Publication evidence
+A successful local publisher receipt identifies build `0ece972f6fb717b34076d0e78150145f90ac45a9-91555abadb41` for this exact source commit. The report records `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its build-log SHA-256 is `c7e45c4094293d66ea1813cad971e44f01b15e508b94637d38cdccda997764e0`. This establishes recorded build/publication completion, not gameplay correctness.
+
+Full file inventory and provenance: docs/commits/2026-10-19/0ece972.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
