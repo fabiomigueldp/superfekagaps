@@ -1,0 +1,18 @@
+Technical documentation supplement for 675e808cbdd14416a476d26f3776b0d7a4b2ae57
+
+Polish siege background choreography and document living streets
+
+Behavior
+Add presentation material for the living rear streets implemented by the preceding commits.
+
+Implementation
+Changes only docs/world/hipotetico/living-background-2026-10-19/: district pose images, activity-board.png, poster.png, living-background.mp4, art-study.json and index.html. The JSON records authoring state; the HTML describes choreography and limits.
+
+Scope and limitations
+Despite the title mentioning choreography polish, this commit has no src/, scripts/ or public/ changes. It documents and illustrates behavior already present; it does not change runtime choreography.
+
+Publication evidence
+A successful local publisher receipt identifies build `675e808cbdd14416a476d26f3776b0d7a4b2ae57-b2b4afe0beb6` for this exact source commit. The report records `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its build-log SHA-256 is `5ccb7794e351f7c00b6b684e971a2b6adf481c03438a3e234c34de3d02a34796`. This establishes recorded build/publication completion, not gameplay correctness.
+
+Full file inventory and provenance: docs/commits/2026-10-19/675e808.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
