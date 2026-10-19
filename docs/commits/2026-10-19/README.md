@@ -1,5 +1,7 @@
 # Recent commit technical records — 19 October 2026
 
+The [follow-up review](../2026-10-19-followup/README.md) documents the next ten commits, through `fed12cf`, with exact-revision code maps and additional timing, persistence and authoring details.
+
 This review covers all 23 commits reachable from `9c4c6bd` after `8c56886`, including the three incoming Classic commits and their merge. Earlier Vanguard work is documented in [its release notes](../../world/hipotetico/vanguard-refinement-2026-10-19/release-notes.md).
 
 Each record describes its own first-parent patch, key symbols, runtime behavior, authoring outputs and known limits. Full hashes and immutable source links prevent later local edits from changing the meaning of a record. Documentation-only commits are identified as such. The original published commits are not amended or rebased.
