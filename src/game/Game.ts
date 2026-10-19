@@ -1032,8 +1032,10 @@ export class Game {
     // 5. Aplica shake
     if (this.camera.shakeTimer > 0) {
       this.camera.shakeTimer -= deltaTime;
-      this.camera.x += (Math.random() - 0.5) * this.camera.shakeMagnitude;
-      this.camera.y += (Math.random() - 0.5) * this.camera.shakeMagnitude;
+      if (!this.renderer.reducedMotion) {
+        this.camera.x += (Math.random() - 0.5) * this.camera.shakeMagnitude;
+        this.camera.y += (Math.random() - 0.5) * this.camera.shakeMagnitude;
+      }
     }
   }
 
