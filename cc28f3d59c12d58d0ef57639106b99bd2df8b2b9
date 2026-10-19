@@ -1,0 +1,18 @@
+Technical documentation supplement for cc28f3d59c12d58d0ef57639106b99bd2df8b2b9
+
+feat(hipotetico): render aftermath scenes and refine background activity
+
+Behavior
+Connect the previously added aftermath scene to the background renderer and refine district-specific activity.
+
+Implementation
+HypotheticalArt imports drawAftermathYards() and drawAftermathEffects(), selects aftermath.pose() in distantRiderPose(), and draws the rider shadow at displayX. HypotheticalAftermath advances started escapes across all yards, gates staged contacts on visibility, varies patrol stops and adds cargo, steam and bastion-specific pose responses. Adds scripts/render_hypothetical_aftermath.ts.
+
+Scope and limitations
+This is the visible integration missing from 893228c. The scene remains background activity; authoring renders do not establish combat balance.
+
+Publication evidence
+A successful local publisher receipt identifies build `cc28f3d59c12d58d0ef57639106b99bd2df8b2b9-b2b4afe0beb6` for this exact source commit. The report records `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its build-log SHA-256 is `ab67dc4199ed38c492a28ad65cdd925befa3c2ba247b9dedc6ca51102d9c462f`. This establishes recorded build/publication completion, not gameplay correctness.
+
+Full file inventory and provenance: docs/commits/2026-10-19/cc28f3d.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
