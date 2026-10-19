@@ -1,0 +1,18 @@
+Technical documentation supplement for 7807bcbeb06a9593345193ad5e7a327d0ce44b9d
+
+feat(hipotetico): expand tower-search aftermath simulation and rendering
+
+Behavior
+Extend the tower-search capture from an intact dropped actor to staged damage, simulated fragments and persistent scene marks.
+
+Implementation
+HypotheticalTowerSearch adds thrash, rip, crunch and spit timing points; carried chooses stage/wound/thrash state. New TowerGorePiece, TowerGoreSplinter, TowerBloodStain and TowerBloodSpray arrays track emitted pieces and effects. A seeded generator controls fragments; stepGore() applies gravity, rebound, friction and resting states against rubbleFloor(). HypotheticalTowerSearchArt renders the fragment types, stains and sprays. HypotheticalBystanders exports shared skin palettes.
+
+Scope and limitations
+The prior tower README and authoring video still describe the intact-fall version. They are historical material and do not validate this newer fragment sequence. This task documents the committed revision only; later local art edits are excluded.
+
+Publication evidence
+A successful local publisher receipt identifies build `7807bcbeb06a9593345193ad5e7a327d0ce44b9d-e50e1ab30115` for this exact source commit. The report records `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its build-log SHA-256 is `dd8b2567ca089fba92ffdc03a5699beaac65cc6da23d0403da52a0d3439fbbba`. This establishes recorded build/publication completion, not gameplay correctness.
+
+Full file inventory and provenance: docs/commits/2026-10-19/7807bcb.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
