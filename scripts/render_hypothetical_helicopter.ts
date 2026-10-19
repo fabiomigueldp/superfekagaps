@@ -20,6 +20,8 @@ const board=createCanvas(1280,612),bc=board.getContext('2d');bc.imageSmoothingEn
 bc.fillStyle='#102630';bc.fillRect(0,0,1280,612);
 const detail=createCanvas(1116,408),dc=detail.getContext('2d');dc.imageSmoothingEnabled=false;
 dc.fillStyle='#102630';dc.fillRect(0,0,1116,408);
+const landing=createCanvas(1044,724),lc=landing.getContext('2d');lc.imageSmoothingEnabled=false;
+lc.fillStyle='#102630';lc.fillRect(0,0,1044,724);
 const shots=[{kind:'scene',at:42,name:'entrada'},{kind:'scene',at:88,name:'saque'},
     {kind:'scene',at:140,name:'mira'},{kind:'scene',at:HELICOPTER_SEQUENCE.fire,name:'disparo'},
     {kind:'flight',at:23,name:'voo'},{kind:'impact',at:4,name:'impacto'},
@@ -30,6 +32,9 @@ const seen=new Set<string>(),captures:object[]=[],cues:object[]=[],poses:object[
 const details=[{kind:'flight',at:0,name:'EJECAO'},{kind:'flight',at:6,name:'CORPO EMERGE'},
     {kind:'flight',at:16,name:'MOTOR ACENDE'},{kind:'flight',at:23,name:'ACELERACAO'},
     {kind:'impact',at:2,name:'CONTATO NA CHAPA'},{kind:'impact',at:12,name:'RUPTURA DO MOTOR'}];
+const landings=[{kind:'impact',at:27,name:'ROTOR AINDA PRESO'},{kind:'impact',at:28,name:'ROTOR LIVRE'},
+    {kind:'rail',at:0,name:'BARREIRA CEDE'},{kind:'crash',at:0,name:'PATIM TOCA O PISO'},
+    {kind:'crash',at:22,name:'CHAPAS E ATRITO'},{kind:'scene',at:480,name:'DESTROCOS ASSENTADOS'}];
 let frames=0;
 try{
     for(let step=0;step<HELICOPTER_SEQUENCE.start+480;step++){
@@ -38,7 +43,9 @@ try{
         for(const cue of a.events)cues.push({age:a.age,seconds:a.age/60,cue});
         const shot=shots.find(s=>!seen.has(s.name)&&(s.kind==='scene'?a.age:s.kind==='flight'?a.launchAt<0?-1:a.tick-a.launchAt:s.kind==='impact'?a.impactAge:a.crashAge)===s.at);
         if(a.age%12===0)poses.push({age:a.age,hull:{...a.hull},launcher:a.launcher,
-            projectile:a.rocket?{...a.rocket}:null,pieces:a.pieces.map(p=>({...p})),
+            projectile:a.rocket?{...a.rocket}:null,pieces:a.pieces.map(p=>({...p,
+                projection:p.projection?{...p.projection}:undefined,accessory:p.accessory?{...p.accessory}:undefined})),
+            railBrokenAt:a.railBrokenAt,scars:a.scars.map(p=>({...p})),
             firstGate:model.forecourt,arrival:model.arrival,storyTick:model.backdrop.tick});
         drawHypotheticalBackground(c,model,0,64,false);
         if(shot){
@@ -52,6 +59,12 @@ try{
             const x=i%3*372,y=Math.floor(i/3)*204;
             dc.drawImage(screen,128,8,186,92,x,y+20,372,184);pixelText(dc,d.name,x+8,y+7,'#dfba7d');
         }
+        for(const [i,d] of landings.entries()){
+            const age=d.kind==='impact'?a.impactAge:d.kind==='crash'?a.crashAge:d.kind==='rail'?a.railBrokenAt<0?-1:a.tick-a.railBrokenAt:a.age;
+            if(age!==d.at)continue;
+            const x=i%3*348,y=Math.floor(i/3)*362;
+            lc.drawImage(screen,204,8,116,114,x,y+20,348,342);pixelText(lc,d.name,x+8,y+7,'#dfba7d');
+        }
         fc.fillStyle='#102630';fc.fillRect(0,0,640,408);fc.drawImage(screen,0,48,640,360);
         pixelText(fc,'CHEGADA / HELICOPTERO',16,12,'#dfba7d',2);
         pixelText(fc,(a.age/60).toFixed(1)+' S / COMPOSICAO NATIVA',16,34,'#aebfb3');
@@ -59,9 +72,10 @@ try{
     }
     writeFileSync(join(out,'storyboard.png'),board.toBuffer('image/png'));
     writeFileSync(join(out,'launch-study.png'),detail.toBuffer('image/png'));
+    writeFileSync(join(out,'landing-study.png'),landing.toBuffer('image/png'));
     writeFileSync(join(out,'art-study.json'),JSON.stringify({kind:'directed native art footage',gameplayTest:false,
         heldCamera:true,audio:false,foregroundCombat:false,fps:60,frames,seconds:frames/60,
         arrivalStart:HELICOPTER_SEQUENCE.start,launchAt:a.launchAt,impactAt:a.impactAt,crashAt:a.crashAt,
-        groundContact:a.groundContact,impact:a.impact,captures,cues,poses},null,2));
+        groundContact:a.groundContact,impact:a.impact,railBrokenAt:a.railBrokenAt,captures,cues,poses},null,2));
     console.log(JSON.stringify({output:out,frames,captures:captures.length,impactAt:a.impactAt,crashAt:a.crashAt}));
 }finally{for(const f of clean.reverse())f();}

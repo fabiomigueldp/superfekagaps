@@ -1,5 +1,6 @@
 import {box,oval,pixelLine,polygon,type Point} from '../WorldPainting';
-import {aircraftPoint,AIRCRAFT_SHAPES,HELICOPTER_GROUND,HELICOPTER_BREAKUP,type AircraftBody,type AircraftPuff,type HypotheticalHelicopter} from './HypotheticalHelicopter';
+import {aircraftPoint,AIRCRAFT_SHAPES,HELICOPTER_GROUND,HELICOPTER_BREAKUP,HELICOPTER_RAIL,type AircraftBody,type AircraftPuff,type HypotheticalHelicopter} from './HypotheticalHelicopter';
+import {aircraftOutline} from './HypotheticalAircraftPhysics';
 import {drawScenicRocket} from './HypotheticalTowerEffects';
 import {smoothMotion} from './HypotheticalMotion';
 
@@ -28,7 +29,11 @@ function tail(c:CanvasRenderingContext2D,p:Pick<AircraftBody,'x'|'y'|'angle'>,ba
     s.line(14-co*5,-7-si*5,14+co*5,-7+si*5,P.ink);
     s.line(14+si*5,-7-co*5,14-si*5,-7+co*5,P.metal);
     s.line(13,-7,15,-7,P.light,2);
-    if(damaged)s.line(-17,3,-12,0,'#c5ac82',2);
+    if(damaged){
+        s.poly([[-18,2],[-14,1],[-16,4],[-12,4],[-16,6]],'#485f5a');
+        s.line(-17,2,-14,1,'#c5ac82');s.line(-16,4,-13,4,'#bdad8a');
+        s.line(-12,2,-9,3,'#435d58');
+    }
 }
 function rotor(c:CanvasRenderingContext2D,p:Pick<AircraftBody,'x'|'y'|'angle'>,base:number,phase:number,broken:boolean,reduced:boolean){
     const s=painter(c,p,base);
@@ -121,17 +126,69 @@ function fuselage(c:CanvasRenderingContext2D,h:HypotheticalHelicopter,base:numbe
     if(crushed){
         s.line(-21,4,-14,6,'#344f50');s.line(-14,6,-8,4,'#344f50');
         s.line(-19,5,-14,7,'#a5a78a');s.line(9,7,12,5,'#a5a78a');
+        s.line(-17,-8,-14,-6,'#a3b8a6');s.line(-14,-6,-12,-8,'#789488');
+        s.line(-14,-6,-16,-4,'#334f55');s.line(-11,3,-8,5,'#b0aa8b');
+        s.line(12,4,15,3,'#b0aa8b');
     }
 }
 function part(c:CanvasRenderingContext2D,p:AircraftBody,base:number,reduced:boolean){
-    if(p.part==='tail'){tail(c,p,base,0,true,reduced);return;}
+    if(p.part==='tail'){tail(c,p,base,p.accessory?.phase??0,true,reduced);return;}
     if(p.part==='rotor'){rotor(c,p,base,0,true,reduced);return;}
     const s=painter(c,p,base);s.poly(AIRCRAFT_SHAPES[p.part],P.ink);
     if(p.part==='door'){
         s.poly([[-5,-7],[5,-7],[5,7],[-5,7]],'#6f877c');s.poly([[-3,-5],[3,-5],[3,0],[-3,0]],P.glass);
         s.line(-4,3,4,3,P.stripe,2);s.line(2,4,4,4,P.ink);s.line(-4,-7,4,-7,P.light);
+        if(p.contacts){s.line(-2,-4,1,-1,P.metal);s.line(1,-1,2,-4,P.shade);s.line(-4,6,1,5,P.metal);}
     }else if(p.part==='skid'){s.line(-20,0,22,0,P.metal);s.line(-14,0,-14,-3,P.ink);}
+    else if(p.part==='rail'){
+        s.line(-18,0,18,0,'#9fa98e');
+        for(const x of [-16,-6,4,14])s.line(x,-1,x+3,1,'#c1b387');
+        s.line(-19,-1,-16,-1,'#d0c29c');s.line(17,0,20,1,'#4d685f');
+    }
     else{s.poly([[-4,-2],[4,-4],[5,1],[-3,3]],'#8c9b88');s.line(-3,-2,3,-3,P.light);}
+}
+
+function landingStage(c:CanvasRenderingContext2D,h:HypotheticalHelicopter,base:number){
+    const floor=base+HELICOPTER_GROUND,rail=HELICOPTER_RAIL;
+    polygon(c,[[242,floor],[326,floor],[333,floor+6],[237,floor+6]],'#889a89');
+    pixelLine(c,243,floor,325,floor,'#b0b199');pixelLine(c,237,floor+6,333,floor+6,'#6c847a');
+    for(const x of [263,286,310])pixelLine(c,x,floor+1,x-1,floor+5,'#7b9181');
+    // A recessed drain, repaired paving and bolted rail give the contact plane
+    // recognizable scale before the aircraft reaches it.
+    box(c,246,floor,12,3,'#5b7970');pixelLine(c,246,floor,257,floor,'#b5b69a');
+    for(let x=248;x<257;x+=3)pixelLine(c,x,floor+1,x-1,floor+2,'#354f53');
+    pixelLine(c,264,floor+3,276,floor+3,'#9ba58c');
+    const bend=h.railBrokenAt<0?0:smoothMotion((h.tick-h.railBrokenAt)/12);
+    for(const [x,d] of [[rail.left+2,-1],[rail.right-2,1]]){
+        box(c,x-2,floor,5,2,'#5f786a');box(c,x-1,floor,1,1,'#bbb396');
+        pixelLine(c,x,floor,x+d*bend*4,base+rail.y+bend*5,'#455f59',2);
+        pixelLine(c,x+1,floor-1,x+1+d*bend*4,base+rail.y+1+bend*5,'#a2ab8b');
+    }
+    if(h.railBrokenAt<0){
+        box(c,rail.left,base+rail.y-1,rail.right-rail.left+1,3,'#4d685f');
+        pixelLine(c,rail.left,base+rail.y-1,rail.right,base+rail.y-1,'#adb394');
+        for(let x=rail.left+3;x<rail.right;x+=10)pixelLine(c,x,base+rail.y,x+3,base+rail.y+1,'#c1b387');
+    }
+}
+
+function surfaceScars(c:CanvasRenderingContext2D,h:HypotheticalHelicopter,base:number){
+    const floor=base+HELICOPTER_GROUND;
+    for(const mark of h.scars){
+        pixelLine(c,mark.x,base+mark.y,mark.end,base+mark.y+1,'#526c62');
+        if(mark.strength>1.2){
+            pixelLine(c,mark.x-3,floor+1,mark.x+1,floor+2,'#5a7266');
+            pixelLine(c,mark.x+1,floor+2,mark.x+4,floor+4,'#5a7266');
+            box(c,mark.x+2,floor+1,2,1,'#b3af93');
+        }
+    }
+}
+
+function pieceShadow(c:CanvasRenderingContext2D,p:AircraftBody,base:number){
+    const points=aircraftOutline(p),low=Math.max(...points.map(v=>v[1]));
+    const left=Math.min(...points.map(v=>v[0])),right=Math.max(...points.map(v=>v[0]));
+    const height=Math.max(0,HELICOPTER_GROUND-low),width=Math.max(3,(right-left)*.75);
+    c.save();c.globalAlpha=Math.max(.025,.27*(1-height/85));
+    oval(c,(left+right-width)/2,base+HELICOPTER_GROUND,width,2,'#48655b');c.restore();
 }
 
 function plume(c:CanvasRenderingContext2D,h:HypotheticalHelicopter,p:AircraftPuff,base:number,reduced:boolean){
@@ -151,9 +208,7 @@ function plume(c:CanvasRenderingContext2D,h:HypotheticalHelicopter,p:AircraftPuf
 /** A rear service apron separates the wreck from Feka's walkable foreground. */
 export function drawHelicopterRear(c:CanvasRenderingContext2D,h:HypotheticalHelicopter,base:number,reduced:boolean){
     const floor=base+HELICOPTER_GROUND;
-    polygon(c,[[242,floor],[326,floor],[333,floor+6],[237,floor+6]],'#889a89');
-    pixelLine(c,243,floor,325,floor,'#b0b199');pixelLine(c,237,floor+6,333,floor+6,'#6c847a');
-    for(const x of [263,286,310])pixelLine(c,x,floor+1,x-1,floor+5,'#7b9181');
+    landingStage(c,h,base);
     if(h.age<0)return;
     if(h.groundContact){
         const spread=smoothMotion((h.crashAge+3)/35),contact=h.groundContact.x;
@@ -163,6 +218,7 @@ export function drawHelicopterRear(c:CanvasRenderingContext2D,h:HypotheticalHeli
     }else{
         c.save();c.globalAlpha=.3;oval(c,h.hull.x-20,floor,45,3,'#627970');c.restore();
     }
+    surfaceScars(c,h,base);
     if(h.impactAt<0){
         if(h.age>40&&h.age<160&&!reduced){
             const lamp=aircraftPoint(h.hull,-20,6);
@@ -183,6 +239,7 @@ export function drawHelicopterRear(c:CanvasRenderingContext2D,h:HypotheticalHeli
         }
     }
     for(const p of h.plumes)if(p.kind==='smoke')plume(c,h,p,base,reduced);
+    for(const p of h.pieces)pieceShadow(c,p,base);
     for(const p of h.pieces)if(p.part==='tail'||p.part==='rotor')part(c,p,base,reduced);
     fuselage(c,h,base,reduced);
     for(const p of h.pieces)if(p.part!=='tail'&&p.part!=='rotor')part(c,p,base,reduced);
@@ -202,6 +259,12 @@ export function drawHelicopterRear(c:CanvasRenderingContext2D,h:HypotheticalHeli
             c.save();c.globalAlpha=fade*.55;
             smoke(c,hit.x+d*(4+a*.2),base+hit.y-1,2+a*.07,0,'#a6a98f','#c1b69a');c.restore();
         }
+    }
+    if(!reduced)for(const p of h.sparks){
+        const a=h.tick-p.born,fade=1-smoothMotion(a/p.life);
+        c.save();c.globalAlpha=fade;
+        pixelLine(c,p.x-p.vx*2,base+p.y-p.vy*2,p.x,base+p.y,a<5?'#dfc395':'#b49b78');
+        if(a<4)box(c,p.x,base+p.y,1,1,'#f0d9a7');c.restore();
     }
     if(h.impactAge>=HELICOPTER_BREAKUP.engine){
         const a=h.impactAge-HELICOPTER_BREAKUP.engine,fade=smoothMotion((a+2)/10)*(1-smoothMotion((a-132)/152));

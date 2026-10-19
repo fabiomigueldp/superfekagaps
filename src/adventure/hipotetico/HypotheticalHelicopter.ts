@@ -4,29 +4,15 @@ import {advanceRocketMotor,rocketTail,type ScenicRocket} from './HypotheticalRoc
 import {AFTERMATH_SCALE} from './HypotheticalAftermathHandling';
 import {HELICOPTER_SEQUENCE as SEQUENCE} from './HypotheticalHelicopterTiming';
 import type {Point} from '../WorldPainting';
+import {aircraftPoint,aircraftOutline,stepAircraftBody,AIRCRAFT_SHAPES,HELICOPTER_GROUND,type AircraftBody,type AircraftPart,type AircraftContact} from './HypotheticalAircraftPhysics';
+export {aircraftPoint,AIRCRAFT_SHAPES,HELICOPTER_GROUND,type AircraftBody,type AircraftPart} from './HypotheticalAircraftPhysics';
 
 export type HelicopterCue='distant-rotor'|'distant-engine-fail'|'distant-metal'|'distant-launch'|'distant-rocket'|'distant-blast'|'distant-crash'|'distant-debris';
-export type AircraftPart='hull'|'tail'|'rotor'|'door'|'panel'|'skid';
-export const HELICOPTER_GROUND=-6;
 export const HELICOPTER_BREAKUP={engine:9,tail:16,rotor:28} as const;
-export interface AircraftBody {
-    part:AircraftPart;x:number;y:number;angle:number;vx:number;vy:number;spin:number;
-    sleeping:boolean;contacts:number;quiet:number;born:number;flatten:number;
-}
+export const HELICOPTER_RAIL={left:267,right:306,y:HELICOPTER_GROUND-7} as const;
 export interface AircraftChip {x:number;y:number;vx:number;vy:number;angle:number;spin:number;size:number;glass:boolean;rest:boolean;born:number;hot:number}
 export interface AircraftPuff {x:number;y:number;vx:number;vy:number;born:number;seed:number;radius:number;kind:'smoke'|'dust'}
-export const AIRCRAFT_SHAPES:Record<AircraftPart,readonly Point[]>={
-    hull:[[-26,1],[-24,-6],[-15,-14],[5,-14],[19,-8],[23,3],[14,11],[-14,10]],
-    tail:[[-18,3],[8,-3],[12,-16],[18,-18],[17,3],[2,8]],
-    rotor:[[-35,-1],[33,-1],[36,1],[-34,2]],
-    door:[[-6,-8],[6,-8],[6,8],[-6,8]],
-    panel:[[-6,-3],[5,-5],[7,2],[-4,5]],
-    skid:[[-23,0],[-20,-2],[20,-2],[24,0],[22,2],[-22,2]],
-};
-export function aircraftPoint(p:Pick<AircraftBody,'x'|'y'|'angle'>&{flatten?:number},x:number,y:number):Point {
-    const co=Math.cos(p.angle),si=Math.sin(p.angle),height=y*(1-(p.flatten??0));
-    return [p.x+x*co-height*si,p.y+x*si+height*co];
-}
+export interface AircraftSpark {x:number;y:number;vx:number;vy:number;born:number;life:number}
 export function helicopterFlightAt(age:number){
     const settle=smoothMotion((age-54)/28),evade=smoothMotion((age-138)/52);
     return {x:424-166*smoothMotion(age/80)+Math.sin(age/33)*.7*settle+evade*3,
@@ -59,13 +45,16 @@ export class HypotheticalHelicopter {
     events:HelicopterCue[]=[];
     hull:AircraftBody={part:'hull',x:424,y:-66,angle:0,vx:0,vy:0,spin:0,sleeping:false,contacts:0,quiet:0,born:0,flatten:0};
     pieces:AircraftBody[]=[];chips:AircraftChip[]=[];plumes:AircraftPuff[]=[];
+    sparks:AircraftSpark[]=[];
+    scars:Array<{x:number;y:number;end:number;strength:number;born:number}>=[];
+    railBrokenAt=-1;
     contacts:Array<{x:number;y:number;born:number;strength:number}>=[];
     impact:{x:number;y:number;dx:number;dy:number;nx:number;ny:number;localX:number;localY:number}|null=null;
     groundContact:{x:number;y:number;strength:number}|null=null;
     launch:{x:number;y:number;dx:number;dy:number;backX:number;backY:number}|null=null;
     rocket:ScenicRocket|null=null;
     trail:Array<{x:number;y:number;born:number;seed:number}>=[];
-    rotor=0;private trailGap=0;private seed=0;private lastRattle=-100;private firedAim:number|null=null;
+    rotor=0;rotorRate=2.18;private trailGap=0;private seed=0;private lastRattle=-100;private firedAim:number|null=null;
     get active(){return this.age>=0&&this.age<SEQUENCE.duration;}
     get impactAge(){return this.impactAt<0?-1:this.tick-this.impactAt;}
     get crashAge(){return this.crashAt<0?-1:this.tick-this.crashAt;}
@@ -102,7 +91,9 @@ export class HypotheticalHelicopter {
         const p=aircraftPoint(this.hull,x,y);
         this.pieces.push({part,x:p[0],y:p[1],angle:this.hull.angle,
             vx:this.hull.vx-this.hull.spin*(p[1]-this.hull.y)+vx,vy:this.hull.vy+this.hull.spin*(p[0]-this.hull.x)+vy,
-            spin:this.hull.spin+spin,sleeping:false,contacts:0,quiet:0,born:this.tick,flatten:0});
+            spin:this.hull.spin+spin,sleeping:false,contacts:0,quiet:0,born:this.tick,flatten:0,
+            ...(part==='rotor'?{projection:{phase:this.rotor,rate:this.rotorRate,tilt:.085}}:{}),
+            ...(part==='tail'?{accessory:{phase:this.rotor,rate:this.rotorRate}}:{})});
     }
     private scatter(x:number,y:number,count:number,force:number,normal?:Point,glazing=true){
         for(let i=0;i<count;i++){
@@ -126,36 +117,66 @@ export class HypotheticalHelicopter {
         this.release('panel',contact.localX+3,contact.localY,contact.nx*.6,contact.ny*.6-.25,-.04);
         this.scatter(contact.x,contact.y,16,1.15,[contact.nx,contact.ny]);
     }
+    private contactSparks(hit:AircraftContact,count:number){
+        const direction=Math.sign(hit.slide)||1;
+        for(let i=0;i<count;i++){
+            const seed=this.seed++;
+            this.sparks.push({x:hit.x,y:hit.y-.5,vx:direction*(.22+seed%5*.13),
+                vy:-.2-seed%4*.12,born:this.tick,life:13+seed%9});
+        }
+        this.sparks=this.sparks.slice(-28);
+    }
+    private recordScar(hit:AircraftContact,slideLength:number,strength:number){
+        const end=hit.x+hit.slide*slideLength,near=this.scars.find(mark=>Math.abs(mark.x-hit.x)<2);
+        if(near){
+            near.end=Math.max(near.end,end,near.x,hit.x);near.x=Math.min(near.x,hit.x,end);
+            near.strength=Math.max(near.strength,strength);return;
+        }
+        const mark={x:hit.x,y:hit.y,end,strength,born:this.tick};
+        if(this.scars.length<32){this.scars.push(mark);return;}
+        const weakest=this.scars.reduce((index,value,i)=>value.strength<this.scars[index].strength?i:index,0);
+        if(strength>this.scars[weakest].strength)this.scars[weakest]=mark;
+    }
+    private hitRail(before:Point[],after:Point[]){
+        if(this.railBrokenAt>=0)return;
+        const rail=HELICOPTER_RAIL;
+        for(let i=0;i<after.length;i++){
+            const a=before[i],b=after[i];
+            if(a[1]>=rail.y||b[1]<rail.y)continue;
+            const x=a[0]+(b[0]-a[0])*(rail.y-a[1])/(b[1]-a[1]);
+            if(x<rail.left||x>rail.right)continue;
+            this.railBrokenAt=this.tick;this.events.push('distant-metal');
+            this.pieces.push({part:'rail',x:(rail.left+rail.right)/2,y:rail.y,angle:0,vx:-.65,vy:-.7,
+                spin:-.025,sleeping:false,contacts:0,quiet:0,born:this.tick,flatten:0});
+            this.contactSparks({x,y:rail.y,strength:this.hull.vy,slide:this.hull.vx,first:true},5);
+            for(let j=0;j<3;j++)this.puff(x+(j-1)*3,HELICOPTER_GROUND,2,'dust',(j-1)*.15,-.08);
+            this.hull.vy*=.93;this.hull.spin*=.88;
+            return;
+        }
+    }
     private stepBody(p:AircraftBody,gravity:number){
         if(p.sleeping)return;
-        // Sheet metal tips onto its broad face after first contact. Drawing and
-        // support geometry share the same foreshortening, so doors cannot rest upright.
-        if(p.contacts>0&&(p.part==='door'||p.part==='panel'))p.flatten=Math.min(.72,p.flatten+.035);
-        if(p.contacts>0&&p.part==='hull')p.flatten=Math.min(.11,p.flatten+.012);
-        p.vy+=gravity;p.x+=p.vx;p.y+=p.vy;p.angle+=p.spin;
-        const shape=p.part==='hull'&&this.skidsAttached?[...AIRCRAFT_SHAPES.hull,[-20,17],[21,17]] as Point[]:AIRCRAFT_SHAPES[p.part];
-        const support=shape.map(v=>aircraftPoint(p,...v)).reduce((lowest,v)=>v[1]>lowest[1]?v:lowest),floor=HELICOPTER_GROUND;
-        if(support[1]<floor){p.quiet=0;return;}
-        p.y-=support[1]-floor;const strength=Math.max(0,p.vy),first=p.contacts++===0;
+        const skids=p.part==='hull'&&this.skidsAttached,before=p.part==='hull'&&this.railBrokenAt<0?aircraftOutline(p,skids):null;
+        const hit=stepAircraftBody(p,gravity,skids);
+        if(before)this.hitRail(before,aircraftOutline(p,skids));
+        if(!hit)return;
+        const {strength,first,x,y:floor}=hit;
         if(p.part==='hull'&&this.crashAt<0){
-            this.crashAt=this.tick;this.groundContact={x:support[0],y:floor,strength};
+            this.crashAt=this.tick;this.groundContact={x,y:floor,strength};
             this.events.push('distant-crash');this.release('skid',0,17,-.65,-.6,-.025);
-            this.release('door',3,-1,.65,-1,.065);this.scatter(support[0],floor,16,1.3);
-            for(let j=0;j<7;j++)this.puff(support[0]+(j-3)*2,floor-1,3+j%3,'dust',(j-3)*.24+p.vx*.2,-.065);
+            this.release('door',3,-1,-.9,-.8,-.045);this.scatter(x,floor,16,1.3);
+            for(let j=0;j<7;j++)this.puff(x+(j-3)*2,floor-1,3+j%3,'dust',(j-3)*.24+p.vx*.2,-.065);
         }
         if(first||strength>.7){
-            this.contacts.push({x:support[0],y:floor,born:this.tick,strength});
+            this.contacts.push({x,y:floor,born:this.tick,strength});
+            if(strength>.45)this.contactSparks(hit,p.part==='hull'?7:3);
+            if(strength>.6)this.recordScar(hit,3,strength);
             if(p.part!=='hull'&&this.tick-this.lastRattle>12){this.events.push('distant-debris');this.lastRattle=this.tick;}
         }
-        p.vy=strength>.45?-strength*(p.part==='hull'?.12:.24):0;
-        p.vx*=p.part==='hull'?.84:.78;
-        // Contact torque brings each broad surface onto the street; its lowest
-        // painted vertex is projected back onto the ground on every frame.
-        const target=p.part==='hull'?-.24:p.part==='tail'?.12:Math.round(p.angle/Math.PI)*Math.PI;
-        p.spin=(p.spin+(target-p.angle)*.012)*.68;
-        if(Math.abs(p.vx)+Math.abs(p.vy)+Math.abs(p.spin)*15<.09){
-            if(++p.quiet>14){p.sleeping=true;p.vx=p.vy=p.spin=0;}
-        }else p.quiet=0;
+        if(Math.abs(hit.slide)>.12&&this.tick%5===0){
+            this.recordScar(hit,5,Math.abs(hit.slide));
+            this.contactSparks(hit,2);
+        }
     }
     update(storyTick:number,actorX:number){
         this.events=[];this.tick++;
@@ -163,9 +184,10 @@ export class HypotheticalHelicopter {
         this.actorX=actorX;
         const a=this.age;
         if(this.impactAt<0){
-            Object.assign(this.hull,helicopterFlightAt(a));this.rotor+=2.18;
+            Object.assign(this.hull,helicopterFlightAt(a));this.rotorRate=2.18;
             if(a>=30&&a%12===6)this.events.push('distant-rotor');
-        }else this.rotor+=Math.max(.04,2.18*(1-smoothMotion(this.impactAge/88)));
+        }else this.rotorRate=Math.max(.04,2.18*(1-smoothMotion(this.impactAge/88)));
+        this.rotor+=this.rotorRate;
         if(a===72||a===130)this.events.push('distant-metal');
         if(a===SEQUENCE.fire){
             const geometry=launcherGeometry(this.body,this.launcher),scale=AFTERMATH_SCALE;
@@ -193,21 +215,26 @@ export class HypotheticalHelicopter {
                 const p=aircraftPoint(this.hull,9,-14);this.scatter(...p,7,.7,[.25,-1],false);
                 this.hull.spin-=.001;this.hull.vy-=.05;
             }
-            if(hit===HELICOPTER_BREAKUP.tail)this.release('tail',36,-9,.55,-.6,.035);
-            if(hit===HELICOPTER_BREAKUP.rotor){this.release('rotor',1,-23,-.28,-1.05,-.052);this.scatter(this.hull.x,this.hull.y-14,5,.7);}
+            if(hit===HELICOPTER_BREAKUP.tail)this.release('tail',36,-9,-.28,-.6,.035);
+            if(hit===HELICOPTER_BREAKUP.rotor){this.release('rotor',1,-23,-.44,-.45,-.033);this.scatter(this.hull.x,this.hull.y-14,5,.7);}
             if(hit>=HELICOPTER_BREAKUP.engine&&this.crashAt<0&&hit%(this.hull.vy>.65?3:5)===0){
                 const p=aircraftPoint(this.hull,9,-12);this.puff(...p,3.5+(hit%10)/5,'smoke',.13+this.hull.vx*.25,-.18+this.hull.vy*.07);
             }
             if(hit>14&&this.crashAt<0)this.hull.spin=Math.max(-.016,this.hull.spin-.0002);
             this.stepBody(this.hull,hit<18?.005:.033);
             if(this.crashAt>=0&&this.crashAge<240&&this.crashAge%12===0){const p=aircraftPoint(this.hull,9,-8);this.puff(...p,5,'smoke',.11,-.12);}
-            for(const piece of this.pieces)if(piece.born<this.tick)this.stepBody(piece,.045);
+            for(const piece of this.pieces)if(piece.born<this.tick)this.stepBody(piece,piece.part==='rotor'?.032:.045);
             for(const p of this.chips)if(!p.rest){
                 p.vy+=.045;p.x+=p.vx;p.y+=p.vy;p.angle+=p.spin;
                 const support=Math.abs(Math.sin(p.angle))*p.size+.5;
                 if(p.y+support>=HELICOPTER_GROUND){p.y=HELICOPTER_GROUND-support;p.vy*=-.2;p.vx*=.66;p.spin*=.5;if(Math.abs(p.vx)+Math.abs(p.vy)<.2)p.rest=true;}
             }
+            for(const p of this.sparks){
+                p.vy+=.04;p.x+=p.vx;p.y+=p.vy;
+                if(p.y>HELICOPTER_GROUND){p.y=HELICOPTER_GROUND;p.vy*=-.15;p.vx*=.7;}
+            }
         }
+        this.sparks=this.sparks.filter(p=>this.tick-p.born<p.life);
         this.trail=this.trail.filter(p=>this.tick-p.born<88).slice(-36);
         this.plumes=this.plumes.filter(p=>this.tick-p.born<132).slice(-48);
         this.contacts=this.contacts.filter(p=>this.tick-p.born<75).slice(-16);
