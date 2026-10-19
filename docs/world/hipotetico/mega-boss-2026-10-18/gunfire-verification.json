@@ -1,19 +1,19 @@
 {
   "inputOnly": true,
   "actorCameraClockEdits": false,
-  "frames": 6797,
+  "frames": 7611,
   "receipt": {
     "act": "duel",
     "phase": 3,
     "health": 0,
     "won": true,
     "deaths": 3,
-    "ticks": 6401
+    "ticks": 7215
   },
   "captures": [
     {
       "file": "gun-distant-ignition.png",
-      "frame": 577,
+      "frame": 1391,
       "act": "siege",
       "phase": 1,
       "age": 110,
@@ -21,7 +21,7 @@
     },
     {
       "file": "gun-distant-impact.png",
-      "frame": 615,
+      "frame": 1429,
       "act": "siege",
       "phase": 1,
       "age": 148,
@@ -29,7 +29,7 @@
     },
     {
       "file": "gun-close-ignition.png",
-      "frame": 2033,
+      "frame": 2847,
       "act": "duel",
       "phase": 1,
       "age": 1,
@@ -37,7 +37,7 @@
     },
     {
       "file": "gun-reduced.png",
-      "frame": 2033,
+      "frame": 2847,
       "act": "duel",
       "phase": 1,
       "age": 1,
@@ -45,7 +45,7 @@
     },
     {
       "file": "gun-cover-impact.png",
-      "frame": 2061,
+      "frame": 2875,
       "act": "duel",
       "phase": 1,
       "age": 29,
@@ -53,7 +53,7 @@
     },
     {
       "file": "gun-cooling.png",
-      "frame": 2090,
+      "frame": 2904,
       "act": "duel",
       "phase": 1,
       "age": 58,
@@ -61,7 +61,7 @@
     },
     {
       "file": "gun-dense-volley.png",
-      "frame": 5735,
+      "frame": 6549,
       "act": "duel",
       "phase": 3,
       "age": 9,
@@ -74,16 +74,16 @@
     "playbackRate": 1,
     "sourceVideoFrameRanges": [
       [
-        273,
-        390
+        680,
+        797
       ],
       [
-        979,
-        1085
+        1386,
+        1492
       ],
       [
-        2829,
-        3030
+        3236,
+        3437
       ]
     ],
     "rangeEndExclusive": true,

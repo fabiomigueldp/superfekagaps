@@ -2,6 +2,21 @@
 
 Encontro bônus de fantasia satírica, acessível pelo botão **MEGA BOSS** no título de Super Feka Gaps World ou por `/?encounter=hipotetico`. A caricatura é ficcional; as cenas não representam acontecimentos reais.
 
+## Revisão 20 · A perseguição como fase completa
+
+O percurso passa de 1.600 para **4.480 pixels**. A travessia gravada cresce de 7,8 para **21,3 segundos**, com a mesma velocidade e física de Feka. A extensão é organizada em quatro setores: cais de pedra, carga sobre madeira, comportas e portaria de metal.
+
+- **Progressão:** oito vãos, dez tablados elevados e sete sequências de ataque. A primeira rajada alta permite seguir por baixo ou buscar as moedas e o capacete por cima; depois vêm tiro baixo, investida e combinações com vãos sucessivos. Moedas e bordas claras indicam as rotas. Os saltos das duas variantes iniciais foram percorridos com o personagem real, sem dano.
+- **Fuzil em movimento:** projéteis altos a 6,6 pixels por tick e baixos a 6,8, contra 5,6 na revisão anterior. As últimas rajadas baixas usam dois trios concentrados, com pausa suficiente para pousar e saltar novamente. O fuzil continua usando o recuo, clarão, estojos e impactos compartilhados com o duelo. Os avisos duram 52 a 42 ticks; um ataque só começa depois da recuperação do anterior.
+- **Investida:** mandíbula e postura anunciam o avanço. O dinossauro acelera, empurra uma onda de destroços e acomoda a passada. A onda termina ao encontrar um vão, respeitando o espaço jogável.
+- **Cenário:** seis estruturas em posições fixas se rompem na aproximação. Guindastes, comportas e pórticos têm pés, rebites, travessas, cordas e cargas; vigas caem e as bases quebradas permanecem. Materiais do piso mudam por setor. A porta de saída aparece apenas no trecho final.
+- **Ponte que cede:** o mesmo evento retira colisão e registra a peça em queda. A borda permanece visível atrás do perseguidor, com lajes, tábuas, chapas, pequenos fragmentos e respingos no canal. Os efeitos têm vida e quantidade limitadas; renderizar não avança a simulação.
+- **Retomada:** alcançar x=2.304 registra o marco nas comportas. Morrer ou apertar R retoma ali, com capacete, câmera posicionada, ruínas anteriores e uma nova preparação completa. Recomeçar o encontro pelo resultado final volta ao cais.
+
+`scripts/prove_hypothetical_chase.ts` grava 1.281 ticks de controles normais, sete avisos completos, seis quebras visíveis, passagens pelas rotas altas de carga e portaria, sem mortes nem perda do capacete. A prévia tem 640 quadros a 30 fps, velocidade normal, áudio de produção e nenhum reposicionamento de atores ou câmera. Os seis testes novos também cobrem pausa, retomada por R e por morte, determinismo, colisão das ondas e impactos no fim da ponte.
+
+163 testes passaram (120 do encontro + 43 compartilhados). A execução completa, incluindo os atos seguintes, continua chegando à vitória com três mortes e retomadas. As revisões anteriores abaixo documentam a evolução; os números da perseguição desta revisão substituem os anteriores.
+
 ## Revisão 19 · Disparos, pressão e impacto
 
 A arma agora separa ignição, recuo, traçante, estojo, gases e contato com a superfície. O mesmo desenho atende ao duelo e à rua distante, com escala e contraste diferentes.
@@ -155,7 +170,7 @@ As imagens em `grounded-footfall.png`, `return-footfall.png`, `airborne-tuck.png
 
 ## Percurso
 
-1. **A ponte do impossível.** Perseguição de 1.600 pixels: três obstáculos baixos, dois vãos de 64 pixels, moedas e rajadas com mira anunciada. A rota alta acrescenta três tablados, quatro moedas e o capacete opcional; a rota baixa permanece disponível. As rotas convergem antes do segundo vão. Piso e tablados perdem colisão e desenho conforme a ponte desaba atrás do dinossauro. Um portal marca a chegada ao pátio. Parar permite que o perseguidor alcance Feka, quebre o capacete e o derrote.
+1. **A ponte do impossível.** Perseguição de 4.480 pixels: quatro setores, oito vãos, dez tablados, sete sequências de tiro alto, baixo e investida. Há moedas e capacete na rota inicial elevada e outro capacete nas comportas. Um marco em x=2.304 permite retomar a segunda metade. Piso e tablados perdem colisão e desenho conforme a ponte desaba; seis estruturas deixam ruínas. O portal ao final marca a chegada ao pátio. Parar permite que o perseguidor alcance e derrote Feka.
 2. **A travessia do arsenal.** Três postos conectados, nove guardas e portões que abrem ao vencer cada guarnição. Lançadores ocupam as sacadas; os demais circulam no próprio posto. Enquanto isso, o cavaleiro atravessa o plano intermediário, derruba três fachadas e dispara contra os NPCs, com seis quedas cartunescas e dois sobreviventes que escapam. Pedras que chegam ao plano jogável têm uma marca no chão por um segundo antes de cair.
 3. **O último lacre.** Nove acertos, três fases. Rajada mirável, investida, mordida com avanço, salto com ondas no solo e varredura de cauda. A última fase inclui investida de ida e volta, com aviso próprio antes do retorno. Os cabos laterais podem prender o dinossauro e ampliar a recuperação.
 
@@ -179,11 +194,11 @@ As imagens em `grounded-footfall.png`, `return-footfall.png`, `airborne-tuck.png
 - `scripts/prove_hypothetical_boss.ts`: quadros do mesmo replay no tamanho nativo de 320 × 180. O vídeo de revisão reproduz essa execução, incluindo as mortes e retomadas.
 - `scripts/prove_hypothetical_upper_routes.ts`: reproduz as duas alternativas elevadas pelos comandos registrados e captura os pousos, sem alterar os atores, a câmera ou o relógio.
 - `scripts/prove_hypothetical_sprites.ts`: prancha de doze poses em 768 × 456, para revisão visual dos sprites. A execução verifica que desenhar cada pose não altera o estado do combate.
-- `tests/hypothetical-*.test.ts`: 114 testes do encontro, cobrindo chefe, guardas, progressão, saltos, cenário, NPCs, áudio e disparos. Mais 43 regressões de barris, máquinas, canhões secretos e transporte nativo compõem a verificação selecionada.
+- `tests/hypothetical-*.test.ts`: 120 testes do encontro, cobrindo chefe, guardas, progressão, saltos, cenário, NPCs, áudio e disparos. Mais 43 regressões de barris, máquinas, canhões secretos e transporte nativo compõem a verificação selecionada.
 - `scripts/prove_hypothetical_gunfire.ts`: sete capturas de disparos no cenário, clarão, rajada final, cobertura, resfriamento e movimento reduzido, retiradas da partida por controles normais.
 - `scripts/prove_hypothetical_guards.ts`: 50 poses dos quatro guardas em 1280 × 640. `scripts/prove_hypothetical_guard_encounters.ts`: reproduz a travessia dos postos pelos controles normais, verifica nove guardas derrotados e três passagens, grava vídeo e registra dano/retomada.
 - `scripts/render_hypothetical_audio.cjs`: renderiza o sintetizador de produção e coloca os sons de arma nos ticks registrados. A faixa de revisão contém fuzil, recarga, impactos e desabamentos; música e demais sons continuam disponíveis ao jogar. `audio-verification.json` registra a renderização sem saturação.
 
 O replay confirma que há um percurso executável e que as transições funcionam. A dificuldade e o prazer do combate continuam sendo questões de experiência de jogadores; não são garantidos por uma execução automatizada.
 
-Verificação desta revisão: 157 testes e build de produção concluídos; replay de 6.797 frames até a vitória, com três mortes e retomadas; 6.401 ticks ativos. Os três postos foram atravessados por controles normais, com nove guardas derrotados, abertura dos três portões e retomadas no cais e no arsenal. Os três contatos com as fachadas aparecem na câmera normal. O batedor prepara, salta, aterrissa e é derrotado na gravação; as rotas elevadas continuam executáveis. Navegador sem erros; pausa por teclado/toque, menu real, vitória e apresentação móvel de 390 pixels com movimento reduzido conferidos. A prévia dos postos tem 22,9 segundos, com áudio de disparos e desabamentos; o vídeo completo tem aproximadamente 116,3 segundos, incluindo a reação de derrota e o resultado final.
+Verificação desta revisão: 163 testes e build de produção concluídos; replay de 7.611 frames até a vitória, com três mortes e retomadas; 7.215 ticks ativos. Os três postos foram atravessados por controles normais, com nove guardas derrotados, abertura dos três portões e retomadas no cais e no arsenal. Os três contatos com as fachadas aparecem na câmera normal. O batedor prepara, salta, aterrissa e é derrotado na gravação; as rotas elevadas continuam executáveis. Navegador sem erros; pausa por teclado/toque, menu real, vitória e apresentação móvel de 390 pixels com movimento reduzido conferidos. A prévia dos postos tem 22,9 segundos, com áudio de disparos e desabamentos; o vídeo completo tem aproximadamente 129,8 segundos, incluindo a reação de derrota e o resultado final.

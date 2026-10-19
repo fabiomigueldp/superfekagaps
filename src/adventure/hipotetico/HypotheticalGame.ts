@@ -14,6 +14,7 @@ import { hypotheticalStage } from './HypotheticalStage';
 import { SIEGE_SECTORS, SIEGE_WIDTH, siegeGarrison } from './HypotheticalSiege';
 import { drawHypotheticalBackground, drawHypotheticalCombat, drawHypotheticalGuard, drawHypotheticalObjects, drawHypotheticalTerrain } from './HypotheticalArt';
 import { HypotheticalAudio } from './HypotheticalAudio';
+import {chaseCollapsedEdge} from './HypotheticalChaseDetails';
 import { CHASE_WIDTH, CHASE_CHECKPOINT, CHASE_DISTRICTS } from './HypotheticalLayout';
 
 export class HypotheticalEncounter extends BossEncounter {
@@ -46,7 +47,7 @@ export class HypotheticalEncounter extends BossEncounter {
         }
         if(this.model.nextAct||this.model.won)o.barrels=[];
         if(this.model.act==='chase'){
-            const edge=Math.min(level.data.width,Math.max(0,Math.floor((this.model.x-32)/16)));
+            const edge=Math.min(level.data.width,chaseCollapsedEdge(this.model.x)/16);
             while(this.collapsedColumns<edge){
                 if(level.data.tiles[14][this.collapsedColumns]&&this.model.tick>1){
                     this.model.bridgeDebris.push({x:this.collapsedColumns*16,born:this.model.tick,material:Math.min(3,Math.floor(this.collapsedColumns*16/1120))});
@@ -58,7 +59,13 @@ export class HypotheticalEncounter extends BossEncounter {
             // Terraces are fixed to the bridge, so they lose both art and collision with their footing.
             for(let i=o.bodies.length-1;i>=0;i--){
                 const body=o.bodies[i];
-                if(body.id.startsWith('chase-terrace-')&&body.x<edge*16)o.bodies.splice(i,1);
+                if(body.id.startsWith('chase-terrace-')&&body.x<edge*16){
+                    if(this.model.tick>1){
+                        this.model.terraceDebris.push({x:body.x,y:body.y,width:body.width,born:this.model.tick});
+                        if(this.model.terraceDebris.length>4)this.model.terraceDebris.shift();
+                    }
+                    o.bodies.splice(i,1);
+                }
             }
         }
         this.impact=this.model.events.some(e=>e==='slam'||e==='snare');
@@ -169,7 +176,8 @@ export class HypotheticalGame extends WorldGame {
             }
         }
         this.player.data.hasHelmet=true;this.player.data.isGrounded=true;this.player.data.respawnRevealTimer=0;
-        this.camera.x=this.act==='siege'?clamp(this.player.data.position.x-132,0,SIEGE_WIDTH-320):0;this.camera.y=64;this.transitionTicks=0;
+        this.camera.x=this.act==='siege'?clamp(this.player.data.position.x-132,0,SIEGE_WIDTH-320)
+            :this.act==='chase'?clamp(this.player.data.position.x-150,0,CHASE_WIDTH-320):0;this.camera.y=64;this.transitionTicks=0;
         this.input.reset();
     }
     private nextAct() {
@@ -204,7 +212,7 @@ export class HypotheticalGame extends WorldGame {
             this.siegeCheckpoint=this.fight.route.cleared;this.audio.sfx('checkpoint');
         }else if(this.act==='siege'&&this.fight.route.releasedThisTick)this.audio.sfx('switch');
         for(const event of this.fight.events){
-            if(event==='shot'||event==='impact'||event==='reload'||event==='distant-shot'||event==='distant-hit')this.weaponAudio.play(event);
+            if(event==='shot'||event==='impact'||event==='splash'||event==='reload'||event==='distant-shot'||event==='distant-hit')this.weaponAudio.play(event);
             if(event==='step'&&this.fight.tick%3===0)this.audio.sfx('land');
             if(event==='break'){
                 if(this.act==='siege'){

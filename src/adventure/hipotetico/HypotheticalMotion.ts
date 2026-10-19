@@ -16,27 +16,31 @@ export function hypotheticalMotion(b: HypotheticalModel): DinosaurMotion {
     const leap = attacking && b.attack === 'leap';
     const tuck = leap && b.age < 58 ? Math.sin(Math.PI * b.age / 58) : 0;
     const landing = leap && b.age >= 58 ? 1 - smoothMotion((b.age - 58) / 20) : 0;
-    const compression = b.attack === 'leap' ? wind * 6 + landing * 7 + tuck * 10
+    const chaseRam=b.act==='chase'&&b.attack==='charge';
+    const drive=chaseRam?(telling?wind:attacking?1-smoothMotion((b.age-14)/34):0):0;
+    const contact=chaseRam&&attacking&&b.age>4&&b.age<26?Math.sin(Math.PI*unit((b.age-4)/22)):0;
+    const compression = chaseRam?drive*4+contact*2: b.attack === 'leap' ? wind * 6 + landing * 7 + tuck * 10
         : b.attack === 'charge' ? wind * 4 + (b.state === 'turn' ? (1 - smoothMotion(b.age / 26)) * 5 : 0) : 0;
-    const walking = b.act === 'chase' && b.tick >= 60 || b.state === 'reload' || attacking && (b.attack === 'charge' || b.attack === 'bite' && b.age < 24);
+    const walking = b.act === 'chase' && b.velocity>0 || b.state === 'reload' || attacking && (b.attack === 'charge' || b.attack === 'bite' && b.age < 24);
     const stride = walking ? Math.min(1,Math.abs(b.velocity)/2.8) : 0;
     const bite = b.attack === 'bite' && attacking;
-    const jaw = bite ? 1 - smoothMotion((b.age - 20) / 9)
+    const jaw = b.act==='chase'&&b.attack==='charge'?(telling?.18+wind*.45:attacking?.18+(1-smoothMotion((b.age-12)/12))*.6:.18)
+        :bite ? 1 - smoothMotion((b.age - 20) / 9)
         : b.attack === 'bite' && telling ? .2 + wind * .7 : b.state === 'roar' ? .35 + Math.sin(b.age / 105 * Math.PI) * .6 : .12;
-    const tail = b.attack !== 'tail' ? 0 : telling ? -wind * .45
+    const tail = chaseRam?-drive*.045: b.attack !== 'tail' ? 0 : telling ? -wind * .45
         : attacking ? b.age < 12 ? -.45 + smoothMotion(b.age / 12) * 1.45
             : b.age <= 32 ? 1 : 1 - smoothMotion((b.age - 32) / 20) : 0;
     const recoil = gunRecoil(b.muzzle);
     const reload = b.state === 'reload' ? Math.sin(Math.PI * unit(b.age / 24)) : 0;
-    const brace=b.state==='turn'?Math.sin(Math.PI*unit(b.age/38))*.85
+    const brace=chaseRam?drive*.08:b.state==='turn'?Math.sin(Math.PI*unit(b.age/38))*.85
         :attacking&&b.attack==='charge'&&b.age>=34?Math.sin(Math.PI*unit((b.age-34)/16))*.7
         :b.attack==='rifle'&&(attacking||telling)?(attacking?.35:wind*.35):0;
     const riding = b.act==='chase'||['charge','leap','bite'].includes(b.attack);
     const rein = riding ? attacking || b.act==='chase' ? 1 : wind : 0;
     const riderLean = (1-b.bow)*Math.max(-5,Math.min(6,b.motionSpeed*.7+b.riderSway));
-    const riderDrop = tuck*18 + (b.attack==='charge'?(attacking?7:wind*7):0) + landing*3;
+    const riderDrop = chaseRam?drive*7+contact*2:tuck*18 + (b.attack==='charge'?(attacking?7:wind*7):0) + landing*3;
     const target = {compression,tuck,stride,jaw,tail,recoil,reload,brace,
-        neckDrop:bite?22*Math.sin(unit(b.age/45)*Math.PI):b.attack==='charge'?(attacking?8:wind*8):0,
+        neckDrop:chaseRam?drive*8+contact*4:bite?22*Math.sin(unit(b.age/45)*Math.PI):b.attack==='charge'?(attacking?8:wind*8):0,
         riderDrop,riderLean,rein,saddle:0};
     // Capture the previous posture at a state boundary. Anticipation becomes
     // takeoff, bracing or recovery without resetting the body to its idle pose.

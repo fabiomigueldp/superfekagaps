@@ -1,11 +1,6 @@
-import replay from './hypotheticalReplay.json';
+import routes from './hypotheticalChaseRoutes.json';
 
-/** Both routes begin at the native spawn; only the third jump's timing differs. */
+/** Complete native-input routes, including the elevated escape from the first high volley. */
 export function hypotheticalChaseInputs(route: 'upper' | 'lower'): [number, string[]][] {
-    return (replay.runs.slice(0, 11) as [number, string[]][]).flatMap((run, i): [number, string[]][] =>
-        route === 'lower' && i === 5 ? [
-            [9, ['ArrowRight', 'ShiftLeft']],
-            [6, ['ArrowRight', 'ShiftLeft', 'Space']],
-            [3, ['ArrowRight', 'ShiftLeft']],
-        ] : [run]);
+    return routes.runs[route] as [number,string[]][];
 }

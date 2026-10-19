@@ -1,11 +1,11 @@
 {
-  "revision": "gunfire-19",
+  "revision": "pursuit-20",
   "tests": {
-    "passed": 157,
+    "passed": 163,
     "failed": 0,
-    "encounter": 114,
+    "encounter": 120,
     "sharedMechanisms": 43,
-    "logs": "output/hipotetico/gunfire/tests.log"
+    "logs": "output/hipotetico/pursuit/tests.log"
   },
   "productionBuild": "passed",
   "browser": {
@@ -17,7 +17,7 @@
       "health": 0,
       "won": true,
       "deaths": 3,
-      "ticks": 6401
+      "ticks": 7215
     },
     "campaignSave": null,
     "mobile": {
@@ -25,6 +25,10 @@
       "height": 180,
       "viewport": 390,
       "reduced": true
+    },
+    "renderMs": {
+      "median": 2.9000000059604645,
+      "p95": 11.399999991059303
     }
   },
   "siege": {
@@ -45,17 +49,17 @@
     ],
     "gates": [
       {
-        "frame": 640,
+        "frame": 1454,
         "cleared": 1,
         "x": 184.14411402604554
       },
       {
-        "frame": 1248,
+        "frame": 2062,
         "cleared": 2,
         "x": 444.5580138843547
       },
       {
-        "frame": 1697,
+        "frame": 2511,
         "cleared": 3,
         "x": 960.9886132284018
       }
@@ -65,64 +69,64 @@
     "videoSeconds": 22.9,
     "pinChanges": [
       {
-        "frame": 594,
+        "frame": 1408,
         "sector": 1,
         "remaining": 1
       },
       {
-        "frame": 640,
+        "frame": 1454,
         "sector": 1,
         "remaining": 0
       },
       {
-        "frame": 789,
+        "frame": 1603,
         "sector": 2,
         "remaining": 2
       },
       {
-        "frame": 954,
+        "frame": 1768,
         "sector": 2,
         "remaining": 3
       },
       {
-        "frame": 1059,
+        "frame": 1873,
         "sector": 2,
         "remaining": 2
       },
       {
-        "frame": 1168,
+        "frame": 1982,
         "sector": 2,
         "remaining": 1
       },
       {
-        "frame": 1248,
+        "frame": 2062,
         "sector": 2,
         "remaining": 0
       },
       {
-        "frame": 1556,
+        "frame": 2370,
         "sector": 3,
         "remaining": 3
       },
       {
-        "frame": 1613,
+        "frame": 2427,
         "sector": 3,
         "remaining": 2
       },
       {
-        "frame": 1643,
+        "frame": 2457,
         "sector": 3,
         "remaining": 1
       },
       {
-        "frame": 1697,
+        "frame": 2511,
         "sector": 3,
         "remaining": 0
       }
     ],
     "vaultEvents": [
       {
-        "frame": 813,
+        "frame": 1627,
         "id": "hipotetico:garrison:1:2",
         "phase": "warning",
         "x": 642.5600000000004,
@@ -131,7 +135,7 @@
         "targetY": 136
       },
       {
-        "frame": 856,
+        "frame": 1670,
         "id": "hipotetico:garrison:1:2",
         "phase": "attack",
         "x": 642.5600000000004,
@@ -140,7 +144,7 @@
         "targetY": 136
       },
       {
-        "frame": 1083,
+        "frame": 1897,
         "id": "hipotetico:garrison:1:2",
         "phase": "warning",
         "x": 642.5600000000004,
@@ -149,7 +153,7 @@
         "targetY": 136
       },
       {
-        "frame": 1126,
+        "frame": 1940,
         "id": "hipotetico:garrison:1:2",
         "phase": "attack",
         "x": 642.5600000000004,
@@ -158,7 +162,7 @@
         "targetY": 136
       },
       {
-        "frame": 1152,
+        "frame": 1966,
         "id": "hipotetico:garrison:1:2",
         "phase": "rest",
         "x": 648.1284173846605,
@@ -167,7 +171,7 @@
         "targetY": 136
       },
       {
-        "frame": 1167,
+        "frame": 1981,
         "id": "hipotetico:garrison:1:2",
         "phase": "defeated",
         "x": 648.1284173846605,
@@ -186,13 +190,13 @@
       "captures": [
         {
           "file": "upper-1-link.png",
-          "frame": 730,
+          "frame": 1544,
           "x": 398.90294419610416,
           "y": 156
         },
         {
           "file": "upper-1-arrival.png",
-          "frame": 771,
+          "frame": 1585,
           "x": 503.5079441961042,
           "y": 164
         }
@@ -203,7 +207,7 @@
         "health": 9,
         "won": false,
         "deaths": 0,
-        "ticks": 771
+        "ticks": 1585
       }
     },
     {
@@ -214,13 +218,13 @@
       "captures": [
         {
           "file": "upper-2-link.png",
-          "frame": 1384,
+          "frame": 2198,
           "x": 816.8292529637719,
           "y": 160
         },
         {
           "file": "upper-2-arrival.png",
-          "frame": 1425,
+          "frame": 2239,
           "x": 892.7715935887717,
           "y": 164
         }
@@ -231,32 +235,32 @@
         "health": 9,
         "won": false,
         "deaths": 1,
-        "ticks": 1308
+        "ticks": 2122
       }
     }
   ],
   "nativeReplay": {
     "inputOnly": true,
     "actorCameraClockEdits": false,
-    "frames": 6797,
-    "videoFrames": 3488,
+    "frames": 7611,
+    "videoFrames": 3895,
     "receipt": {
       "act": "duel",
       "phase": 3,
       "health": 0,
       "won": true,
       "deaths": 3,
-      "ticks": 6401
+      "ticks": 7215
     }
   },
   "audio": {
     "productionSynth": true,
     "weaponEffectsOnly": false,
-    "destructionCues": 3,
-    "cues": 179,
-    "seconds": 116.26666666666667,
+    "destructionCues": 9,
+    "cues": 205,
+    "seconds": 129.83333333333334,
     "peak": 0.10918664932250977,
-    "rms": 0.004770211074973335,
+    "rms": 0.005025699031378486,
     "sampleRate": 48000
   },
   "guardVault": {
@@ -278,7 +282,7 @@
     "cues": 39,
     "seconds": 22.9,
     "peak": 0.047964222729206085,
-    "rms": 0.002132636665830605,
+    "rms": 0.002132636310220289,
     "sampleRate": 48000
   },
   "scenery": {
@@ -444,42 +448,6 @@
       "maxReactionQueue": 3
     }
   },
-  "reviewPage": {
-    "passed": true,
-    "viewports": [
-      1440,
-      390
-    ],
-    "assetResponses": 251,
-    "errors": [],
-    "screenshot": "output/hipotetico/gunfire/review-page.png",
-    "media": [
-      {
-        "src": "http://127.0.0.1:3000/docs/world/hipotetico/mega-boss-2026-10-18/gunfire-play.mp4?rev=gunfire-19",
-        "w": 960,
-        "h": 540,
-        "duration": 14.133
-      },
-      {
-        "src": "http://127.0.0.1:3000/docs/world/hipotetico/mega-boss-2026-10-18/guards-play.mp4?rev=gunfire-19",
-        "w": 960,
-        "h": 540,
-        "duration": 22.9
-      },
-      {
-        "src": "http://127.0.0.1:3000/docs/world/hipotetico/mega-boss-2026-10-18/bystander-motion.mp4?rev=motion-18",
-        "w": 960,
-        "h": 540,
-        "duration": 5
-      },
-      {
-        "src": "http://127.0.0.1:3000/docs/world/hipotetico/mega-boss-2026-10-18/native-play.mp4?rev=gunfire-19",
-        "w": 960,
-        "h": 540,
-        "duration": 116.266667
-      }
-    ]
-  },
   "civilianAnimation": {
     "inspectionOnly": true,
     "productionNpcTimeline": true,
@@ -560,7 +528,6 @@
       4.2,
       4.45
     ],
-    "pursuitSpeed": 5.6,
     "burstIntervalsTicks": [
       6,
       5,
@@ -587,6 +554,146 @@
     "previewFrames": 424,
     "previewSeconds": 14.133333333333333,
     "inAppPlaybackConfirmed": true,
-    "currentVideoTimeVerified": 11.73087
+    "currentVideoTimeVerified": 11.73087,
+    "previewSourceRevision": "pursuit-20",
+    "pursuitSpeedsPixelsPerTick": [
+      6.6,
+      6.8
+    ]
+  },
+  "pursuit": {
+    "inputOnly": true,
+    "actorCameraClockEdits": false,
+    "frames": 1281,
+    "videoFrames": 640,
+    "seconds": 21.333333333333332,
+    "receipt": {
+      "act": "siege",
+      "phase": 1,
+      "health": 9,
+      "won": false,
+      "deaths": 0,
+      "ticks": 1281
+    },
+    "attacks": [
+      {
+        "frame": 150,
+        "x": 602.3,
+        "kind": "high",
+        "warningTicks": 52
+      },
+      {
+        "frame": 335,
+        "x": 1249.8,
+        "kind": "low",
+        "warningTicks": 48
+      },
+      {
+        "frame": 485,
+        "x": 1774.8,
+        "kind": "ram",
+        "warningTicks": 48
+      },
+      {
+        "frame": 669,
+        "x": 2418.8,
+        "kind": "high",
+        "warningTicks": 46
+      },
+      {
+        "frame": 817,
+        "x": 2936.8,
+        "kind": "low",
+        "warningTicks": 44
+      },
+      {
+        "frame": 984,
+        "x": 3521.3,
+        "kind": "ram",
+        "warningTicks": 44
+      },
+      {
+        "frame": 1130,
+        "x": 4032.3,
+        "kind": "low",
+        "warningTicks": 42
+      }
+    ],
+    "lengthPixels": 4480,
+    "previousLengthPixels": 1600,
+    "districts": [
+      "cais",
+      "carga",
+      "comportas",
+      "portaria"
+    ],
+    "gaps": 8,
+    "elevatedPlatforms": 10,
+    "breakableLandmarks": 6,
+    "midpointPixels": 2304,
+    "helmetLosses": 0,
+    "nativeCaptures": 17,
+    "nativeProof": "pursuit-verification.json",
+    "audio": {
+      "productionSynth": true,
+      "weaponEffectsOnly": false,
+      "destructionCues": 6,
+      "cues": 38,
+      "seconds": 21.333333333333332,
+      "peak": 0.10817068815231323,
+      "rms": 0.006367986187704983,
+      "sampleRate": 48000
+    },
+    "speedsPixelsPerTick": {
+      "high": 6.6,
+      "low": 6.8,
+      "wave": 7
+    },
+    "inAppPlaybackConfirmed": true,
+    "currentVideoTimeVerified": 21.333333,
+    "renderPure": true,
+    "restartByRAndDeathTested": true
+  },
+  "reviewPage": {
+    "passed": true,
+    "viewports": [
+      1440,
+      390
+    ],
+    "assetResponses": 277,
+    "errors": [],
+    "screenshot": "output/hipotetico/pursuit/review-page.png",
+    "media": [
+      {
+        "src": "http://127.0.0.1:3000/docs/world/hipotetico/mega-boss-2026-10-18/pursuit-play.mp4?rev=pursuit-20",
+        "w": 960,
+        "h": 540,
+        "duration": 21.333333
+      },
+      {
+        "src": "http://127.0.0.1:3000/docs/world/hipotetico/mega-boss-2026-10-18/gunfire-play.mp4?rev=pursuit-20",
+        "w": 960,
+        "h": 540,
+        "duration": 14.133333
+      },
+      {
+        "src": "http://127.0.0.1:3000/docs/world/hipotetico/mega-boss-2026-10-18/guards-play.mp4?rev=pursuit-20",
+        "w": 960,
+        "h": 540,
+        "duration": 22.9
+      },
+      {
+        "src": "http://127.0.0.1:3000/docs/world/hipotetico/mega-boss-2026-10-18/bystander-motion.mp4?rev=motion-18",
+        "w": 960,
+        "h": 540,
+        "duration": 5
+      },
+      {
+        "src": "http://127.0.0.1:3000/docs/world/hipotetico/mega-boss-2026-10-18/native-play.mp4?rev=pursuit-20",
+        "w": 960,
+        "h": 540,
+        "duration": 129.833333
+      }
+    ]
   }
 }

@@ -218,14 +218,14 @@ test('crossing behind the rifle during its tracking tell turns the visible gun; 
 
 test('running rider inertia does not detach a shot from the visible barrel',()=>{
     const b=new HypotheticalModel('chase');let checks=0;
-    for(let i=0;i<390;i++){
+    for(let i=0;i<1250;i++){
         b.update(dt,{...p,x:96+i*3.5});if(!b.events.includes('shot'))continue;
         const pose=dinosaurPose(b,0,0),s=b.shots[b.shots.length-1];
         const x=b.x+b.facing*(7-pose.recoil+pose.tuck*10+riderBend(14,pose.riderLean??0)+31*Math.cos(pose.aim));
         const y=b.y-64+pose.bow*39+pose.compression+(pose.riderDrop??0)-14+31*Math.sin(pose.aim);
         assert.ok(Math.abs(x-s.x)<1e-8&&Math.abs(y-s.y)<1e-8);assert.ok((pose.riderLean??0)>1);checks++;
     }
-    assert.ok(checks>=6);
+    assert.ok(checks>=18);
 });
 
 test('anticipation survives the exact takeoff frame and the rider absorbs braking without changing collision',()=>{
@@ -466,14 +466,15 @@ for(const route of ['upper','lower'] as const)test(`the ${route} chase route rea
             g.update(dt);if(g.act!=='chase')break routeRun;
             assert.equal(g.player.data.isDead,false,'the chosen route must be survivable without a retry');
             const p=g.player.getRect();highest=Math.min(highest,p.y-g.camera.y-4);
-            landedOnTerrace ||= g.player.data.isGrounded&&CHASE_TERRACES.some(t=>Math.abs(p.y+p.height-t.y)<.1&&p.x<t.x+t.width&&p.x+p.width>t.x);
+            landedOnTerrace ||= g.player.data.isGrounded&&CHASE_TERRACES.slice(0,3).some(t=>Math.abs(p.y+p.height-t.y)<.1&&p.x<t.x+t.width&&p.x+p.width>t.x);
             // Read the native pickup receipt; the route never moves or equips the player directly.
             const collected=Reflect.get(g,'collected') as Set<string>;
             reward ||= collected.has('hipotetico:run:helmet');
-            coins=Math.max(coins,[...collected].filter(id=>id.startsWith('hipotetico:terrace:')).length);
+            coins=Math.max(coins,[...collected].filter(id=>/^hipotetico:terrace:[0-3]$/.test(id)).length);
             if(g.fight.x>1100){
-                assert.equal(g.objects.bodies.some(p=>p.id.startsWith('chase-terrace-')),false);
-                assert.equal(g.level.bodies.some(p=>p.id.startsWith('chase-terrace-')),false);
+                const collapsedEdge=Math.floor((g.fight.x-32)/16)*16;
+                assert.equal(g.objects.bodies.some(p=>p.id.startsWith('chase-terrace-')&&p.x<collapsedEdge),false);
+                assert.equal(g.level.bodies.some(p=>p.id.startsWith('chase-terrace-')&&p.x<collapsedEdge),false);
                 collapsed=true;
             }
         }

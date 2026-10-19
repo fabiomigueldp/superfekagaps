@@ -26,7 +26,7 @@ export function hypotheticalStage(act: HypotheticalAct): AdventureStage {
             const x=192+i*68, top=[592,660,1040].some(p=>Math.abs(p-x)<50)?164:185;
             s.pickups.push({id:`hipotetico:run:${i}`,kind:'coin',x,y:top});
         }
-        for(const [i,[x,y]] of [[744,164],[814,134],[850,141],[922,164]].entries())
+        for(const [i,[x,y]] of [[776,136],[814,118],[850,141],[922,94]].entries())
             s.pickups.push({id:`hipotetico:terrace:${i}`,kind:'coin',x,y});
         s.pickups.push({id:'hipotetico:run:helmet',kind:'helmet',x:832,y:138});
         for(const [i,[from,to]] of CHASE_GAPS.entries())if(i>=2)

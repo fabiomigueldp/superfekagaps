@@ -71,7 +71,7 @@ try{
         const closeup=g.player.data.isDead?null
             :b.act==='chase'&&g.player.data.position.x>=560&&g.player.data.position.x<=568?'chase-span'
             :b.act==='chase'&&g.player.data.isGrounded&&Math.abs(g.player.getRect().y+g.player.getRect().height-168)<.1?'terrace-route'
-            :b.act==='chase'&&g.player.data.position.x>=1430&&g.player.data.position.x<=1440?'chase-gateway'
+            :b.act==='chase'&&g.player.data.position.x>=4280&&g.player.data.position.x<=4290?'chase-gateway'
             :b.act==='siege'&&b.route.gateTicks.some(t=>t>=28&&t<=40)?`siege-gate-${b.route.cleared}`
             :b.act==='siege'&&b.route.active&&g.player.data.position.x>b.route.sector.origin+90&&g.player.data.position.x<b.route.sector.origin+155?`siege-district-${b.wave}`
             :b.act==='siege'&&b.tick>=280&&b.tick<=284?'siege-courtyard'

@@ -4,6 +4,7 @@ import { dinosaurFootAnchor, dinosaurTail, hypotheticalMotion, riderBend, smooth
 import { HypotheticalBackdrop } from './HypotheticalBackdrop';
 import { ARENA_COLUMNS, CHASE_ATTACKS, CHASE_EXIT, CHASE_WIDTH, CHASE_GAPS, CHASE_BREAKS } from './HypotheticalLayout';
 import { HypotheticalSiege, SIEGE_WIDTH } from './HypotheticalSiege';
+import {chaseDeckSpans,chaseMaterialAt,CHASE_WATER_Y} from './HypotheticalChaseDetails';
 import { RIFLE_BURSTS, RIFLE_SPEED, type GunImpact } from './HypotheticalGunfire';
 
 export type HypotheticalAct = 'chase' | 'siege' | 'duel';
@@ -13,7 +14,7 @@ export interface Shot extends Rect { vx: number; vy: number; age: number; life: 
 export interface Dust { x: number; y: number; born: number; kind: 'step' | 'stone' | 'hit' | 'shell' | 'clasp' | 'skid'; direction?: number }
 export interface FallingMark { x: number; born: number }
 export interface BulletImpact extends GunImpact {}
-export type FightEvent = 'warning' | 'shot' | 'impact' | 'reload' | 'distant-shot' | 'distant-hit' | 'step' | 'slam' | 'hit' | 'break' | 'snare' | 'won';
+export type FightEvent = 'warning' | 'shot' | 'impact' | 'splash' | 'reload' | 'distant-shot' | 'distant-hit' | 'step' | 'slam' | 'hit' | 'break' | 'snare' | 'won';
 export const HYPOTHETICAL = Object.freeze({ floor: 224, chaseEnd: CHASE_EXIT, health: 9, step: 1000 / 60, warning: 54, recovery: 156 });
 const rifleBursts = RIFLE_BURSTS;
 const patterns: readonly (readonly HypotheticalAttack[])[] = [
@@ -66,6 +67,7 @@ export class HypotheticalModel {
     private bowFrom = 0;
     private weaponFrom=-.15;
     pursuitIndex=0; pursuitKind:'high'|'low'|'ram'='high'; pursuitTell=52;
+    terraceDebris:Array<{x:number;y:number;width:number;born:number}>=[];
     bridgeDebris:Array<{x:number;born:number;material:number}>=[];
     chaseBreaks:number[]=CHASE_BREAKS.map(()=>-1);
     constructor(readonly act: HypotheticalAct = 'chase', health: number = HYPOTHETICAL.health, cleared = 0, readonly chaseStart=0) {
@@ -244,6 +246,7 @@ export class HypotheticalModel {
         this.tick++; this.age++; this.muzzle = Math.max(0, this.muzzle - 1);this.velocity=0;this.heat=Math.max(0,this.heat-.004);
         this.dust = this.dust.filter(p => this.tick - p.born < (p.kind==='shell'?64:40));
         this.impacts = this.impacts.filter(p => this.tick - p.born < 180);
+        this.terraceDebris=this.terraceDebris.filter(p=>this.tick-p.born<65);
         this.bridgeDebris=this.bridgeDebris.filter(p=>this.tick-p.born<48);
         if (this.won || this.nextAct) return;
         this.armed = this.armed.map(n => Math.max(0, n - 1));
@@ -406,21 +409,22 @@ export class HypotheticalModel {
             if(s.kind==='wave'&&this.act==='chase'&&CHASE_GAPS.some(([a,z])=>s.x+7>=a*16&&s.x+7<z*16)){s.life=0;continue;}
             const swept = sweep(s, { ...s, x: s.px, y: s.py });
             if (s.kind === 'bullet') {
-                const walls = [...(this.act === 'duel' ? ARENA_COVER : []), { x: -200, y: HYPOTHETICAL.floor, width: CHASE_WIDTH+400, height: 64 }];
-                const hits = walls.map(w => surfaceHit(s, w)).filter((h): h is NonNullable<typeof h> => !!h).sort((a, b) => a.t - b.t);
+                const walls = this.act==='chase' ? [...chaseDeckSpans(this.x),{x:-200,y:CHASE_WATER_Y,width:CHASE_WIDTH+400,height:64}]
+                    : [...(this.act === 'duel' ? ARENA_COVER : []), { x: -200, y: HYPOTHETICAL.floor, width: CHASE_WIDTH+400, height: 64 }];
+                const hits = walls.map(w => {const h=surfaceHit(s,w);return h?{...h,water:this.act==='chase'&&w.y===CHASE_WATER_Y}:null;}).filter((h): h is NonNullable<typeof h> => !!h).sort((a, b) => a.t - b.t);
                 const hit = hits[0];
                 if (hit) {
                     const x = s.px + s.vx * hit.t, y = s.py + s.vy * hit.t;
                     this.impacts.push({ x: x + s.width / 2 - hit.nx * s.width / 2, y: y + s.height / 2 - hit.ny * s.height / 2,
-                        nx: hit.nx, ny: hit.ny, born: this.tick, fromX:s.px+s.width/2,fromY:s.py+s.height/2,material:'stone' });
+                        nx: hit.nx, ny: hit.ny, born: this.tick, fromX:s.px+s.width/2,fromY:s.py+s.height/2,material:hit.water?'water':this.act==='chase'?chaseMaterialAt(x):'stone' });
                     if (this.impacts.length > 24) this.impacts.shift();
-                    this.emit('impact');
+                    this.emit(hit.water?'splash':'impact');
                     // Preserve danger in front of the cover, never beyond its surface.
                     this.frameHazards.push(sweep({ ...s, x: s.px, y: s.py }, { ...s, x, y }));
                     s.life = 0; continue;
                 }
             }
-            if (s.y + s.height >= HYPOTHETICAL.floor && s.kind !== 'wave') {
+            if (s.y + s.height >= HYPOTHETICAL.floor && s.kind !== 'wave' && !(s.kind==='bullet'&&this.act==='chase')) {
                 s.life = 0; this.particle('stone', s.x, HYPOTHETICAL.floor); continue;
             }
             this.frameHazards.push(swept);

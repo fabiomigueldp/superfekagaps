@@ -47,7 +47,7 @@ test('mute, pause and disposal stop weapon tails and never queue silent shots fo
 });
 
 test('long barrages bound simultaneous voices and natural endings release their graphs',()=>{
-    const {audio,context}=setup();const cues:WeaponCue[]=['shot','impact','distant-shot','distant-hit','reload','distant-crash'];
+    const {audio,context}=setup();const cues:WeaponCue[]=['shot','impact','splash','distant-shot','distant-hit','reload','distant-crash'];
     for(let i=0;i<80;i++)audio.play(cues[i%cues.length]);
     assert.equal(audio.activeVoices,12);
     for(const n of context.nodes)n.onended?.();
@@ -70,4 +70,12 @@ test('rifle crack decays into a low body while impacts use a separate short meta
     const begin=context.nodes.length;audio.play('impact');
     assert.ok(context.nodes.slice(begin).some(n=>n.type==='sine'&&n.frequency.changes.join(',')==='1350,310'));
     audio.dispose();assert.ok(context.nodes.every(n=>n.disconnected));
+});
+
+
+test('water contact uses a softer filtered splash on the same owned effects bus',()=>{
+    const {audio,context}=setup();audio.play('impact');const strike=Math.max(...context.nodes.flatMap(n=>n.gain.changes));
+    const start=context.nodes.length;audio.play('splash');const nodes=context.nodes.slice(start);
+    assert.ok(nodes.some(n=>n.type==='bandpass'));assert.ok(Math.max(...nodes.flatMap(n=>n.gain.changes))<strike);
+    audio.cancel();assert.equal(audio.activeVoices,0);assert.ok(nodes.every(n=>n.disconnected));
 });

@@ -1,10 +1,10 @@
 {
   "productionSynth": true,
   "weaponEffectsOnly": false,
-  "destructionCues": 3,
-  "cues": 179,
-  "seconds": 116.26666666666667,
+  "destructionCues": 9,
+  "cues": 205,
+  "seconds": 129.83333333333334,
   "peak": 0.10918664932250977,
-  "rms": 0.004770211074973335,
+  "rms": 0.005025699031378486,
   "sampleRate": 48000
 }

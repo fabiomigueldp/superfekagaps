@@ -50,11 +50,23 @@ export function drawGunTracer(c: CanvasRenderingContext2D, s: GunTrace, ox: numb
 
 export interface GunImpact {
     x:number; y:number; nx:number; ny:number; born:number;
-    fromX?:number; fromY?:number; material?:'stone'|'cloth';
+    fromX?:number; fromY?:number; material?:'stone'|'cloth'|'timber'|'iron'|'water';
 }
 export function drawGunImpact(c:CanvasRenderingContext2D,p:GunImpact,tick:number,ox:number,oy:number,reduced:boolean,distant=false) {
-    const color=distant?far:close,age=tick-p.born,x=p.x+ox,y=p.y+oy,soft=p.material==='cloth';
+    const base=distant?far:close,color=p.material==='timber'?{...base,chip:'#c8a47b',smoke:'#a9a490'}:p.material==='iron'?{...base,chip:'#92aba7'}:base,age=tick-p.born,x=p.x+ox,y=p.y+oy,soft=p.material==='cloth';
     if(age<0)return;
+    if(p.material==='water'){
+        if(age>27)return;
+        const spread=2+age*.42;
+        pixelLine(c,x-spread,y,x+spread,y,'#79aaa5');
+        if(age<16)pixelLine(c,x-spread*.65,y-1,x+spread*.65,y-1,'#b0d1ba');
+        if(!reduced&&age<18)for(const d of [-1,1]){
+            const lift=Math.max(0,age*1.1-age*age*.06);
+            box(c,x+d*age*.4,y-lift,1,2,'#d3e2c2');
+        }
+        return;
+    }
+    const wood=p.material==='timber',metal=p.material==='iron';
     if(!soft) {
         box(c,x-(p.nx?0:1),y-(p.ny?0:1),p.nx?1:3,p.ny?1:3,color.scar);
         if(age<2&&p.fromX!==undefined&&p.fromY!==undefined)pixelLine(c,p.fromX+ox,p.fromY+oy,x,y,color.fire);
@@ -66,7 +78,8 @@ export function drawGunImpact(c:CanvasRenderingContext2D,p:GunImpact,tick:number
         const fan=(i-(count-1)/2)*.4,travel=Math.min(age,reduced?4:20)*(.55+(i%3)*.22)*(distant?.65:1);
         const nx=p.nx*Math.cos(fan)-p.ny*Math.sin(fan),ny=p.ny*Math.cos(fan)+p.nx*Math.sin(fan);
         const px=x+nx*travel,py=y+ny*travel+age*age*.015;
-        if(!soft&&age<9&&!reduced)pixelLine(c,px,py,px+nx*3,py+ny*3,i%2?color.fire:color.core);
+        if(wood&&age<18)pixelLine(c,px,py,px+nx*3,py+ny*3,color.chip);
+        else if(!soft&&age<(metal?12:9)&&!reduced)pixelLine(c,px,py,px+nx*(metal?5:3),py+ny*(metal?5:3),i%2?color.fire:color.core);
         else if(age<20)box(c,px,py,i%2?1:2,1,color.chip);
     }
     if(!reduced&&age>3&&age<25)for(let i=0;i<2;i++){

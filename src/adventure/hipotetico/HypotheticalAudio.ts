@@ -1,4 +1,4 @@
-export type WeaponCue = 'shot' | 'impact' | 'reload' | 'distant-shot' | 'distant-hit' | 'distant-crash';
+export type WeaponCue = 'shot' | 'impact' | 'splash' | 'reload' | 'distant-shot' | 'distant-hit' | 'distant-crash';
 interface Route { context: BaseAudioContext; destination: AudioNode; enabled: boolean }
 
 /** Short, owned voices on WorldAudio's existing effects bus. No new context or timers. */
@@ -14,7 +14,7 @@ export class HypotheticalAudio {
     play(kind: WeaponCue) {
         const route=this.route();
         if(this.disposed||!route?.enabled||route.context.state!=='running')return false;
-        const {context:c,destination}=route,now=c.currentTime,distant=kind.startsWith('distant'),shot=kind.endsWith('shot'),crash=kind==='distant-crash';
+        const {context:c,destination}=route,now=c.currentTime,distant=kind.startsWith('distant'),shot=kind.endsWith('shot'),crash=kind==='distant-crash',splash=kind==='splash';
         const nodes:AudioNode[]=[],sources:AudioScheduledSourceNode[]=[];
         let done=false;
         const release=()=>{if(done)return;done=true;for(const s of sources){s.onended=null;try{s.stop();}catch{/* Already ended. */}}for(const n of nodes){try{n.disconnect();}catch{/* Closed device. */}}this.releases.delete(release);};
@@ -27,18 +27,18 @@ export class HypotheticalAudio {
                 for(let i=0;i<data.length;i++){seed=(Math.imul(seed,1664525)+1013904223)>>>0;data[i]=seed/2147483648-1;}this.buffers.set(c,buffer);}
             const noise=c.createBufferSource(),filter=c.createBiquadFilter(),env=c.createGain(),body=c.createOscillator(),low=c.createGain();
             nodes.push(noise,filter,env,body,low);sources.push(noise,body);noise.buffer=buffer;
-            const duration=crash?.32:kind==='reload'?.045:shot?.18:.085,volume=crash?.55:distant?.24:1;
-            filter.type=kind==='reload'?'highpass':'lowpass';
-            filter.frequency.setValueAtTime(crash?1100:distant?1500:shot?5800:6200,now);
+            const duration=splash?.16:crash?.32:kind==='reload'?.045:shot?.18:.085,volume=crash?.55:distant?.24:1;
+            filter.type=splash?'bandpass':kind==='reload'?'highpass':'lowpass';
+            filter.frequency.setValueAtTime(splash?2100:crash?1100:distant?1500:shot?5800:6200,now);
             if(shot)filter.frequency.exponentialRampToValueAtTime(distant?780:2400,now+.018);
-            filter.frequency.exponentialRampToValueAtTime(crash?120:distant?300:shot?420:900,now+duration);
-            env.gain.setValueAtTime(0,now);env.gain.linearRampToValueAtTime((crash?.42:shot?.46:.16)*volume,now+.001);
+            filter.frequency.exponentialRampToValueAtTime(splash?280:crash?120:distant?300:shot?420:900,now+duration);
+            env.gain.setValueAtTime(0,now);env.gain.linearRampToValueAtTime((splash?.095:crash?.42:shot?.46:.16)*volume,now+.001);
             if(shot)env.gain.exponentialRampToValueAtTime(.12*volume,now+.025);
             env.gain.exponentialRampToValueAtTime(.001,now+duration);
-            body.type=shot||crash?'triangle':'sine';body.frequency.setValueAtTime(crash?82:shot?(distant?145:210):kind==='reload'?1600:1350,now);
+            body.type=shot||crash?'triangle':'sine';body.frequency.setValueAtTime(splash?480:crash?82:shot?(distant?145:210):kind==='reload'?1600:1350,now);
             if(shot)body.frequency.exponentialRampToValueAtTime(88,now+.014);
-            body.frequency.exponentialRampToValueAtTime(crash?32:shot?42:kind==='reload'?700:310,now+duration*.75);
-            low.gain.setValueAtTime(0,now);low.gain.linearRampToValueAtTime((crash?.42:shot?.43:.075)*volume,now+.003);low.gain.exponentialRampToValueAtTime(.001,now+duration);
+            body.frequency.exponentialRampToValueAtTime(splash?150:crash?32:shot?42:kind==='reload'?700:310,now+duration*.75);
+            low.gain.setValueAtTime(0,now);low.gain.linearRampToValueAtTime((splash?.04:crash?.42:shot?.43:.075)*volume,now+.003);low.gain.exponentialRampToValueAtTime(.001,now+duration);
             noise.connect(filter);filter.connect(env);env.connect(destination);body.connect(low);low.connect(destination);
             noise.onended=release;noise.start(now);body.start(now);noise.stop(now+duration+.015);body.stop(now+duration+.01);
             return true;

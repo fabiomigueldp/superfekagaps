@@ -1,5 +1,5 @@
 import { drawGunMuzzle, drawGunTracer, drawGunImpact, drawGunCasing } from './HypotheticalGunfire';
-import {drawChaseCollapse} from './HypotheticalChaseArt';
+import {drawChaseCollapse,drawChaseWave} from './HypotheticalChaseArt';
 import { box, oval, pixelLine, polygon, type Point } from '../WorldPainting';
 import { pixelText } from '../../graphics/BitmapFont';
 import type { WorldLevel, WorldObjects } from '../WorldPhysics';
@@ -412,6 +412,7 @@ export function drawHypotheticalCombat(c:CanvasRenderingContext2D,b:Hypothetical
     for(const s of b.shots){
         const x=s.x-cx,y=s.y-cy;
         if(s.kind==='bullet')drawGunTracer(c,s,-cx,-cy,reduced);
+        else if(s.kind==='wave'&&b.act==='chase')drawChaseWave(c,s,cx,cy,reduced);
         else if(s.kind==='wave'){
             const dir=s.vx<0?-1:1,px=(v:number)=>x+(dir>0?v:15-v),roll=s.age%8;
             polygon(c,[[px(0),y+12],[px(3),y+7],[px(6),y+2],[px(10),y+1],[px(12),y+7],[px(15),y+12]],P.ink);

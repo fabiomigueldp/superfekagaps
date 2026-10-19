@@ -6,6 +6,7 @@ import { SIEGE_SECTORS, SIEGE_UNLOCK_TICKS, SIEGE_LOCK_TICKS } from './Hypotheti
 import { DESTRUCTION_SITES, ruinAge, rubbleApproach } from './HypotheticalDevastation';
 import { backdropBaseline } from './HypotheticalBackdrop';
 import {drawChaseLandmarks} from './HypotheticalChaseArt';
+import {chaseMaterialAt,chaseCollapsedEdge,CHASE_WATER_Y} from './HypotheticalChaseDetails';
 
 const S = {
     ink: '#213545', joint: '#354956', stone: '#677b7c', stoneShade: '#516571',
@@ -362,6 +363,26 @@ function timberStep(c: CanvasRenderingContext2D, x: number, y: number, col: numb
     box(c,x,y,16,1,S.edge);box(c,x+1,y+1,14,1,S.cap);
 }
 
+/** Long deck planks and steel plates stay distinct from the raised cargo crates. */
+function chaseDeckTile(c:CanvasRenderingContext2D,x:number,y:number,col:number,iron:boolean){
+    box(c,x,y,16,16,S.ink);box(c,x+1,y+2,15,7,iron?S.iron:S.wood);
+    box(c,x,y,16,1,S.edge);box(c,x,y+1,16,1,S.cap);
+    if(iron){
+        box(c,x+2,y+3,12,4,'#5e7e83');pixelLine(c,x+4,y+5,x+9,y+5,S.ironLight);
+        box(c,x+2,y+3,1,1,S.cap);box(c,x+12,y+6,1,1,S.cap);
+        box(c,x+4,y+10,8,2,S.iron);box(c,x+5,y+10,7,1,S.ironLight);
+    }else{
+        const seam=col%2===0;
+        if(seam)box(c,x,y+2,1,7,S.woodShade);
+        pixelLine(c,x+2,y+3,x+12,y+3,S.woodLight);
+        pixelLine(c,x+4+col%3,y+6,x+11,y+6,S.woodShade);
+        if(col%4===1){box(c,x+8,y+4,3,2,S.woodShade);box(c,x+9,y+4,1,1,S.woodLight);}
+        box(c,x,y+10,16,4,S.woodShade);box(c,x,y+10,16,1,S.wood);
+    }
+    if(col%2===0){box(c,x+1,y+7,4,8,S.iron);box(c,x+2,y+8,1,1,S.cap);box(c,x+2,y+13,1,1,S.ironLight);}
+    box(c,x,y+15,16,1,S.stoneShade);
+}
+
 /** Terrain paint samples the surviving tile mask, including the collapsing chase bridge. */
 export function drawHypotheticalMasonry(c: CanvasRenderingContext2D, level: WorldLevel, b: HypotheticalModel, cx: number, cy: number) {
     const tiles=level.data.tiles,left=Math.max(0,Math.floor(cx/16)),right=Math.min(level.data.width,Math.ceil((cx+320)/16));
@@ -370,10 +391,9 @@ export function drawHypotheticalMasonry(c: CanvasRenderingContext2D, level: Worl
         if(!solid(col,row))continue;
         const x=col*16-cx,y=row*16-cy;
         if(b.act==='chase'&&row===13){timberStep(c,x,y,col);continue;}
-        if(b.act==='chase'&&row===14&&col>=70&&col<140){timberStep(c,x,y,col);continue;}
+        if(b.act==='chase'&&row===14&&col>=70&&col<140){chaseDeckTile(c,x,y,col,false);continue;}
         if(b.act==='chase'&&row===14&&col>=210){
-            box(c,x,y,16,16,S.ink);box(c,x+1,y+2,14,12,S.iron);box(c,x,y,16,2,S.edge);
-            pixelLine(c,x+3,y+5,x+11,y+11,S.ironLight);box(c,x+2,y+3,2,1,S.cap);box(c,x+12,y+12,2,1,S.cap);continue;
+            chaseDeckTile(c,x,y,col,true);continue;
         }
         box(c,x,y,16,16,S.stoneShade);
         const seam=mod(col+Math.floor(row/2),2)===0;
@@ -389,6 +409,13 @@ export function drawHypotheticalMasonry(c: CanvasRenderingContext2D, level: Worl
         if(mod(col*7+row*3,9)===0){pixelLine(c,x+7,y+6,x+10,y+10,S.stoneShade);box(c,x+4,y+10,3,1,S.stoneLight);}
     }
     if(b.act==='chase'){
+        // The remaining bank cracks before it detaches; only surviving native tiles are painted.
+        const edge=chaseCollapsedEdge(b.x);
+        for(let k=0;k<3;k++){
+            const col=edge/16+k;if(!solid(col,14))continue;
+            const x=col*16-cx,y=224-cy;
+            pixelLine(c,x+4,y+2,x+8,y+4,S.joint);pixelLine(c,x+8,y+4,x+6,y+7-k,S.joint);
+        }
         for(const [from,to] of CHASE_GAPS){
             for(const col of [from-1,to]){
                 if(!solid(col,14))continue;
@@ -432,15 +459,31 @@ export function drawHypotheticalMasonry(c: CanvasRenderingContext2D, level: Worl
 }
 
 function terrace(c: CanvasRenderingContext2D, p: MovingBody, cx: number, cy: number) {
-    const x=p.x-cx,y=p.y-cy,w=p.width;
-    for(const px of [x+5,x+w-9]){
-        box(c,px,y+7,4,224-p.y-7,S.woodShade);box(c,px+1,y+8,1,224-p.y-8,S.woodLight);
-        pixelLine(c,px+2,y+20,px+(px===x+5?15:-11),y+8,S.woodShade,3);
-        box(c,px+1,y+10,2,2,S.cap);
+    const x=p.x-cx,y=p.y-cy,w=p.width,chase=p.id.startsWith('chase-');
+    if(!chase){
+        for(const px of [x+5,x+w-9]){
+            box(c,px,y+7,4,224-p.y-7,S.woodShade);box(c,px+1,y+8,1,224-p.y-8,S.woodLight);
+            pixelLine(c,px+2,y+20,px+(px===x+5?15:-11),y+8,S.woodShade,3);box(c,px+1,y+10,2,2,S.cap);
+        }
+        box(c,x,y,w,7,S.ink);box(c,x,y,w,2,S.edge);box(c,x+1,y+2,w-2,3,S.wood);
+        for(let xx=5;xx<w-2;xx+=9){box(c,x+xx,y+2,1,3,S.woodShade);box(c,x+xx-2,y+3,1,1,S.cap);}
+        box(c,x+2,y+5,w-4,1,S.woodLight);return;
     }
-    box(c,x,y,w,7,S.ink);box(c,x,y,w,2,S.edge);box(c,x+1,y+2,w-2,3,S.wood);
-    for(let xx=5;xx<w-2;xx+=9){box(c,x+xx,y+2,1,3,S.woodShade);box(c,x+xx-2,y+3,1,1,S.cap);}
-    box(c,x+2,y+5,w-4,1,S.woodLight);
+    const iron=chaseMaterialAt(p.x)==='iron',body=iron?S.iron:S.woodShade,light=iron?S.ironLight:S.woodLight;
+    for(const dx of [5,w-9]){
+        const px=x+dx,wet=chase&&CHASE_GAPS.some(([a,z])=>p.x+dx>=a*16&&p.x+dx<z*16);
+        const foot=(wet?CHASE_WATER_Y:224)-cy;
+        box(c,px,y+7,4,foot-y-7,body);box(c,px+1,y+8,1,foot-y-9,light);
+        pixelLine(c,px+2,Math.min(foot-10,y+24),px+(dx===5?15:-11),y+8,body,3);
+        box(c,px+1,y+10,2,2,S.cap);
+        box(c,px-2,foot-5,8,5,S.iron);box(c,px-1,foot-5,6,1,S.ironLight);
+        if(wet)box(c,px-3,foot,10,1,S.seaLight);
+    }
+    box(c,x,y,w,7,S.ink);box(c,x,y,w,1,S.edge);box(c,x,y+1,w,1,S.cap);
+    box(c,x+1,y+2,w-2,3,iron?S.iron:S.wood);
+    for(let xx=5;xx<w-2;xx+=iron?12:17){box(c,x+xx,y+2,1,3,body);box(c,x+xx-2,y+3,1,1,S.cap);}
+    box(c,x+2,y+5,w-4,1,light);
+    for(const dx of [4,w-8]){box(c,x+dx,y+2,4,4,S.iron);box(c,x+dx+1,y+3,1,1,S.cap);}
 }
 
 /** The same walkable lip, with district-specific joinery below it. Posts are
