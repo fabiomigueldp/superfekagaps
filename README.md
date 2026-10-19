@@ -28,6 +28,7 @@ O Vite informa a URL local no terminal, normalmente `http://localhost:3000`. Abr
 | Comando | Finalidade |
 | --- | --- |
 | `npm run dev` | Servidor local com recarregamento |
+| `npm run deploy -- -m "Descrição das mudanças"` | Adiciona, commita, envia ao GitHub e publica na Oracle, sem testes |
 | `npm test` | Testes de regressão |
 | `npm run check` | Executa testes, validações, typecheck e build |
 | `npm run validate` | Valida fases e matrizes de sprites |
@@ -38,6 +39,9 @@ O Vite informa a URL local no terminal, normalmente `http://localhost:3000`. Abr
 
 O [critério do pacote de publicação](docs/build-output.md) preserva os originais
 e omite apenas referências de revisão que não são usadas pelas entradas publicadas.
+
+O deploy usa envio incremental e reaproveita os assets já presentes na Oracle.
+Veja [o comando e a localização dos arquivos](docs/deploy.md).
 
 ### Editor de mundos
 
