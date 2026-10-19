@@ -6,6 +6,22 @@ export const CHASE_QUAYS = Array.from({length:12},(_,i)=>({
 const unit=(n:number)=>Math.max(0,Math.min(1,n));
 const ease=(n:number)=>{const t=unit(n);return t*t*(3-2*t);};
 
+/** Shared breeze for cloth, reeds and exhaust. World position supplies phase,
+ * so panning the camera never restarts or synchronizes neighbouring props. */
+export function chaseWindAt(tick:number,worldX:number,reduced:boolean){
+    if(reduced)return 0;
+    return Math.sin(tick/53-worldX*.0021)*.7+Math.sin(tick/117+worldX*.0013)*.3;
+}
+
+/** Quiet, staggered work before the warning. No simulation state or random
+ * draws are consumed by painting these small gestures. */
+export function chaseWorkAt(tick:number,index:number,reduced:boolean){
+    const phase=(reduced?index*.8:tick/36+index*1.73),stroke=Math.sin(phase);
+    return {stroke:reduced?0:stroke,bend:reduced?.25:Math.max(0,stroke)*.8,
+        glance:reduced?0:Math.max(0,Math.sin(phase*.37)-.8)*5,
+        breath:reduced?0:Math.sin(tick/31+index)*.35};
+}
+
 /** The projection is independent of which camera tile happens to be visible. */
 export const chaseQuayX=(worldX:number,cameraX:number)=>96+(worldX-cameraX)*.36;
 export const chaseQuayBase=(cameraY:number)=>129+(64-cameraY)*.2;

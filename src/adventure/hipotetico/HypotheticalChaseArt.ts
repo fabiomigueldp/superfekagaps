@@ -20,6 +20,15 @@ function beam(c:CanvasRenderingContext2D,x:number,y:number,length:number,angle:n
     for(let i=5;i<length-3;i+=material==='iron'?12:17){
         pixelLine(c,...at(i,0),...at(i+(material==='iron'?0:3),0),p.grain);
         if(material==='iron'){const a=at(i,-2);box(c,a[0],a[1],1,1,p.light);}
+        else if(material==='timber'&&i+4<length-2)pixelLine(c,...at(i+4,1),...at(Math.min(length-2,i+9),1),p.grain);
+    }
+    if(width>=5&&length>18){
+        // Joinery travels with each rigid piece, including detached beams.
+        for(const u of [4,length-5]){
+            pixelLine(c,...at(u,-width/2+1),...at(u,width/2-1),p.dark);
+            const bolt=at(u,-width/2+1);box(c,bolt[0],bolt[1],1,1,p.light);
+        }
+        if(material==='iron')pixelLine(c,...at(length*.4,width/2-1),...at(length*.4+4,width/2-1),'#829184');
     }
 }
 

@@ -1,6 +1,7 @@
 import {box,oval,pixelLine,polygon} from '../WorldPainting';
 import type {HypotheticalModel} from './HypotheticalModel';
-import {CHASE_QUAYS,CHASE_SHORE,chaseQuayX,chaseQuaySection,chaseWorkerAt,chaseBirdAt,chaseQuayReaction,chaseOutflowAt,chaseOarAt} from './HypotheticalChaseLife';
+import {CHASE_QUAYS,CHASE_SHORE,chaseQuayX,chaseQuaySection,chaseWorkerAt,chaseBirdAt,chaseQuayReaction,chaseOutflowAt,chaseOarAt,chaseWindAt,chaseWorkAt} from './HypotheticalChaseLife';
+import {drawScenicShadow} from './HypotheticalSceneShadow';
 
 const P={shade:'#607e7b',dark:'#597471',stone:'#9ca797',light:'#b8b79d',wood:'#9c9278',seam:'#7b8878',water:'#79aaa2'};
 const ageAt=(b:HypotheticalModel,i:number)=>b.chaseReactions[i]===-1?-1:b.tick-b.chaseReactions[i];
@@ -16,8 +17,9 @@ function pipe(c:CanvasRenderingContext2D,x:number,y:number,w:number){
 }
 function crate(c:CanvasRenderingContext2D,x:number,y:number,w=12,h=10){
     box(c,x,y,w,h,P.shade);box(c,x+1,y+1,w-2,h-2,P.wood);
+    if(w>=10){pixelLine(c,x+3,y+h-3,x+w-4,y+h-3,'#858d77');box(c,x+w-5,y+3,2,1,'#b6ac8c');}
     pixelLine(c,x+2,y+2,x+w-3,y+h-3,P.seam);box(c,x+1,y+1,w-2,1,P.light);
-    for(const dx of [1,w-3])box(c,x+dx,y+2,2,h-3,'#7b8877');
+    for(const dx of [1,w-3]){box(c,x+dx,y+2,2,h-3,'#7b8877');box(c,x+dx,y+2,1,1,'#b1b296');}
 }
 
 /** Industrial silhouettes replace repeated residential facades as the district changes. */
@@ -43,9 +45,11 @@ export function drawChaseIndustry(c:CanvasRenderingContext2D,b:HypotheticalModel
         // Canvas is tied at both corners; a passing shock travels through its loose lower hem.
         pixelLine(c,x+71,base-31,x+121,base-33,P.shade);
         for(const dx of [72,119])box(c,x+dx,base-36,2,36,P.shade);
-        const wind=Math.sin(time/43+index)*1.2+reaction.gust;
+        const wind=chaseWindAt(b.tick,site.x,reduced)*1.2+reaction.gust;
         polygon(c,[[x+77,base-31],[x+114,base-32],[x+114+wind,base-17],[x+103+wind,base-19],[x+90+wind,base-17],[x+78,base-20]],'#7c9b8c');
         pixelLine(c,x+80,base-29,x+81+wind,base-20,'#a1b39a');pixelLine(c,x+107,base-30,x+108+wind,base-21,'#98ac95');
+        pixelLine(c,x+91,base-30,x+92+wind,base-20,'#6f9082');
+        for(const dx of [77,113])box(c,x+dx,base-32,2,2,'#a6b39b');
     }else if(site.kind==='water'){
         const top=base-52;
         box(c,x+4,top,68,52,'#8fa393');box(c,x+8,top+3,60,49,'#a5b09a');
@@ -102,20 +106,44 @@ export function drawChaseIndustry(c:CanvasRenderingContext2D,b:HypotheticalModel
     box(c,x+3,base-2,70,2,P.seam);
 }
 
-function worker(c:CanvasRenderingContext2D,x:number,base:number,age:number,index:number,reduced:boolean){
+function worker(c:CanvasRenderingContext2D,x:number,base:number,age:number,index:number,tick:number,reduced:boolean){
     const p=chaseWorkerAt(age);if(p.hidden)return;
-    const px=x-p.travel,step=reduced?0:p.stride,bodyY=base-9+p.duck*2;
-    const shirt=index%2?'#788f9a':'#a19e7f';
-    pixelLine(c,px+1,bodyY+4,px+1-step,base-1,P.shade,2);
-    pixelLine(c,px+3,bodyY+4,px+3+step,base-1,'#718984',2);
-    box(c,px-step,base-1,3,1,'#52716f');box(c,px+3+step,base-1,3,1,'#52716f');
-    polygon(c,[[px,bodyY],[px+4,bodyY],[px+5-p.speed,bodyY+5],[px,bodyY+5]],shirt);
-    box(c,px+1,bodyY,1,4,'#b2b79f');
-    const head=px+1-p.notice;
-    box(c,head,bodyY-4,3,4,'#b9ae8e');box(c,head-1,bodyY-5,4,2,'#748779');box(c,head-2,bodyY-4,6,1,'#a8ad91');
-    box(c,head,bodyY-3,1,1,'#627970');
-    pixelLine(c,px+1,bodyY+1,px-1+step,bodyY+4,'#b6ac8b');
-    pixelLine(c,px+4,bodyY+1,px+5-step,bodyY+4,'#9aa28a');
+    const work=chaseWorkAt(tick,index,reduced),quiet=1-p.notice,kind=CHASE_QUAYS[index].kind;
+    const px=x-p.travel,step=reduced?0:p.stride,lean=work.bend*quiet-p.speed*.6;
+    const bodyY=base-9+p.duck*2+(work.bend*.6+work.breath)*quiet,shoulder=px+lean;
+    const shirt=kind==='cargo'?'#a19b7b':kind==='water'?'#7c9d99':kind==='port'?'#7a8f9a':'#a7a48a';
+    drawScenicShadow(c,px-2,base-1,11,2,.18);
+    // Knees articulate above planted feet; only the retreat stride lifts a heel.
+    for(const [j,dir]of [-1,1].entries()){
+        const hip=px+1+j*2,foot=hip+step*dir,knee=hip-step*dir*.35;
+        const heel=reduced?0:Math.max(0,dir*step)*.7;
+        pixelLine(c,hip,bodyY+4,knee,base-3,P.shade,2);
+        pixelLine(c,knee,base-3,foot,base-1-heel,j?'#718984':P.shade,2);
+        box(c,foot-1,base-1-heel,3,1,'#52716f');
+    }
+    polygon(c,[[shoulder,bodyY],[shoulder+4,bodyY],[px+5,bodyY+5],[px,bodyY+5]],shirt);
+    box(c,shoulder+1,bodyY+1,1,3,'#b2b79f');box(c,px,bodyY+4,5,1,'#7d907e');
+    if(kind==='quay')box(c,shoulder+2,bodyY+2,2,4,'#bbc0a5');
+    const head=shoulder+1-p.notice+work.glance*.5*quiet;
+    box(c,head,bodyY-4,3,4,index%2?'#a9a084':'#c0b394');
+    box(c,head-1,bodyY-5,4,2,kind==='water'?'#b8b597':'#748779');
+    box(c,head-2,bodyY-4,6,1,'#a8ad91');
+    box(c,head+(p.notice>.5?0:2),bodyY-3,1,1,'#627970');
+    const reach=kind==='water'?quiet:0,handX=px+5-step,handY=bodyY+3-reach*10;
+    pixelLine(c,shoulder+3,bodyY+1,px+5,bodyY+2-reach*5,shirt,2);
+    pixelLine(c,px+5,bodyY+2-reach*5,handX,handY,'#b6ac8b');
+    const nearX=px+1+quiet*(5+work.stroke),nearY=bodyY+4-quiet;
+    pixelLine(c,shoulder,bodyY+1,px-1,bodyY+3,shirt,2);
+    pixelLine(c,px-1,bodyY+3,nearX,nearY,'#b6ac8b');
+    // Quiet work uses small tools in the occupied hand; it blends out on notice.
+    if(quiet>.5&&kind==='port'){
+        box(c,handX,handY-2,5,4,'#6a837d');box(c,handX+1,handY-1,3,2,'#b9b69a');
+    }else if(quiet>.5&&kind==='water'){
+        pixelLine(c,handX,handY,handX+3+work.stroke,handY-4,'#b1bca4');
+        box(c,handX+2+work.stroke,handY-5,3,1,'#78978b');
+    }else if(quiet>.5&&kind==='quay'){
+        box(c,nearX,nearY,3,2,'#b1bca2');box(c,nearX+1,nearY+2,2,1,'#90a794');
+    }
 }
 
 export function drawChaseQuayLife(c:CanvasRenderingContext2D,b:HypotheticalModel,index:number,x:number,base:number,reduced:boolean){
@@ -123,16 +151,20 @@ export function drawChaseQuayLife(c:CanvasRenderingContext2D,b:HypotheticalModel
     if(site.kind==='quay'){
         // Only the upper shutters close; the doorway stays open for the retreat.
         const top=base-(51+index%2*14);
-        for(const dx of [15,37]){
-            const open=3*p.shutter,closed=4*(1-p.shutter);
+        for(const [j,dx]of [15,37].entries()){
+            const shutter=chaseQuayReaction(age<0?-1:Math.max(0,age-j*6),reduced).shutter;
+            const open=3*shutter,closed=4*(1-shutter);
             box(c,x+dx-open,top+18,3+closed,12,'#789084');
             box(c,x+dx+9-closed,top+18,3+closed,12,'#789084');
-            for(let j=0;j<3;j++)pixelLine(c,x+dx-open,top+20+j*3,x+dx+2+closed,top+20+j*3,'#aab49b');
+            for(let j=0;j<3;j++){
+                pixelLine(c,x+dx-open,top+20+j*3,x+dx+2+closed,top+20+j*3,'#aab49b');
+                pixelLine(c,x+dx+9-closed,top+20+j*3,x+dx+11+open,top+20+j*3,'#aab49b');
+            }
         }
         if(index===0){
             // The awning is fixed to its brackets. Only the loose fringe responds
             // to the breeze and the short shock, rather than the whole facade.
-            const wind=reduced?0:Math.sin(b.tick/43+index)*.5+p.gust*.6;
+            const wind=chaseWindAt(b.tick,site.x,reduced)*.5+p.gust*.6;
             for(let j=0;j<5;j++){
                 const left=x+6+j*12,y=base-18+Math.sin(j+1)*wind;
                 polygon(c,[[left,base-20],[left+12,base-20],[left+11,y+1],[left+2,y]],j%2?'#91aa96':'#72978a');
@@ -141,9 +173,10 @@ export function drawChaseQuayLife(c:CanvasRenderingContext2D,b:HypotheticalModel
         }
     }
     if(site.worker){
-        if(site.kind==='cargo')crate(c,x+78,base-8+chaseWorkerAt(age).crateDrop,7,5);
+        const pose=chaseWorkerAt(age),work=chaseWorkAt(b.tick,index,reduced);
+        if(site.kind==='cargo')crate(c,x+78,base-8+pose.crateDrop+(work.bend*.6+work.breath)*(1-pose.notice),7,5);
         // Occlusion by the jamb, rather than a fade, takes the worker inside.
-        c.save();c.beginPath();c.rect(x+47,base-28,45,30);c.clip();worker(c,x+75,base,age,index,reduced);c.restore();
+        c.save();c.beginPath();c.rect(x+47,base-28,45,30);c.clip();worker(c,x+75,base,age,index,b.tick,reduced);c.restore();
     }
     if(site.birds){
         for(let j=0;j<3;j++){
@@ -151,8 +184,13 @@ export function drawChaseQuayLife(c:CanvasRenderingContext2D,b:HypotheticalModel
             const rx=19+j*10,roof=site.kind==='cargo'?base-54-index%2*7+3-(rx<35?rx/35:(75-rx)/40)*13:
                 base-(site.kind==='port'?[65,78,58][index-9]+7:site.kind==='water'?60:63+index%2*14);
             const bx=x+19+j*10+bird.x,by=roof-bird.y+bird.crouch;
-            box(c,bx,by,4,2,'#aeb9a4');box(c,bx+3,by-1,2,2,'#bec3ab');
-            if(bird.flying&&!reduced){pixelLine(c,bx+1,by,bx-3,by-bird.wing,'#849f94');pixelLine(c,bx+2,by,bx+6,by-bird.wing,'#b4c1a9');}
+            const peck=age<0&&!reduced?Math.max(0,Math.sin(b.tick/31+j*2+index)-.65)*4:0;
+            box(c,bx,by,4,2,'#aeb9a4');box(c,bx+3+peck*.4,by-1+peck,2,2,'#bec3ab');
+            box(c,bx+5+peck*.4,by+peck,1,1,'#9f9e81');pixelLine(c,bx,by+1,bx-2,by,'#8da598');
+            if(bird.flying&&!reduced){
+                pixelLine(c,bx+1,by,bx-3,by-bird.wing,'#849f94');pixelLine(c,bx+2,by,bx+6,by-bird.wing,'#b4c1a9');
+                box(c,bx-4,by-bird.wing,2,1,'#92aba0');
+            }
             else if(!bird.flying)box(c,bx+1,by+2,2,1,'#708b82');
         }
     }
@@ -166,17 +204,31 @@ export function drawChaseSkiffs(c:CanvasRenderingContext2D,b:HypotheticalModel,c
         const x=chaseQuayX(anchor,cx)+drift,y=section.boat-6+oar.bob;
         if(x<-60||x>345)continue;
         const pitch=stroke*.6;
-        polygon(c,[[x,y],[x+31,y+pitch],[x+26,y+6],[x+7,y+6]],'#527b77');
+        polygon(c,[[x,y],[x+31,y+pitch],[x+26,y+6],[x+7,y+6]],i%2?'#5b7b73':'#527b77');
         pixelLine(c,x+2,y,x+29,y+pitch,'#92ab96');pixelLine(c,x+8,y+4,x+24,y+4,'#70988c');
-        box(c,x+7,y-2,19,2,'#839d88');crate(c,x+19,y-6,7,5);
-        // A seated rower has a fixed hip and shoulders that follow the oar handle.
-        const shoulder=x+12+stroke;
-        box(c,shoulder,y-8,4,6,'#91a28d');box(c,shoulder,y-11,3,3,'#b0b397');box(c,shoulder-1,y-12,5,1,'#7e9784');
+        pixelLine(c,x+7,y+2,x+26,y+2,'#72988a');box(c,x+7,y-2,19,2,'#839d88');
+        if(i%2)crate(c,x+21,y-6,7,5);
+        else{
+            oval(c,x+21,y-4,8,4,'#9eaf94');
+            for(let j=0;j<3;j++)pixelLine(c,x+22+j*2,y-3,x+23+j*2,y-1,'#658c7f');
+        }
+        // A fixed rowlock connects the blade, shaft and grip. Hands follow the
+        // handle while the seated hip and feet remain supported by the hull.
+        const shoulder=x+15-stroke*2.5;
         const tipX=x+8+stroke*8,tipY=y+6-oar.lift;
-        pixelLine(c,x+15,y-3,tipX,tipY,'#a0b097');pixelLine(c,shoulder+2,y-5,x+15,y-3,'#b3b79b');
+        const lockX=x+18,lockY=y,gripX=lockX+(lockX-tipX)*.4,gripY=lockY+(lockY-tipY)*.4;
+        polygon(c,[[shoulder,y-8],[shoulder+3,y-8],[x+16,y-2],[x+12,y-2]],'#91a28d');
+        pixelLine(c,x+14,y-2,x+18,y-1,'#6d8e81',2);pixelLine(c,x+18,y-1,x+21,y,'#6d8e81');
+        box(c,shoulder,y-11,3,3,'#b0b397');box(c,shoulder-1,y-12,5,1,'#7e9784');
+        pixelLine(c,gripX,gripY,tipX,tipY,'#a0b097');box(c,lockX-1,lockY,3,1,'#5f8278');
+        pixelLine(c,shoulder+2,y-6,shoulder+5,y-4,'#b3b79b');pixelLine(c,shoulder+5,y-4,gripX,gripY,'#b3b79b');
         pixelLine(c,tipX,tipY,tipX-2,tipY+1,'#7fa89b',2);
         const pull=oar.wet;
         pixelLine(c,x+5,y+8,x+26,y+8,'#679a91');
-        if(pull>.2){pixelLine(c,tipX-3-pull*2,tipY+2,tipX+3,tipY+2,'#9cbba7');box(c,x+30,y+2,3,1,'#a2bba3');}
+        pixelLine(c,x-4,y+5,x+1,y+5,'#6e9e92');pixelLine(c,x-9,y+7,x-5,y+7,'#67958d');
+        if(pull>.2){
+            pixelLine(c,tipX-3-pull*2,tipY+2,tipX+3,tipY+2,'#9cbba7');box(c,x+30,y+2,3,1,'#a2bba3');
+            if(!reduced&&pull>.8)box(c,tipX-1,tipY-1,1,1,'#b5c3a7');
+        }
     }
 }

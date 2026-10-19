@@ -7,9 +7,10 @@ import { DESTRUCTION_SITES, ruinAge, rubbleApproach } from './HypotheticalDevast
 import { backdropBaseline } from './HypotheticalBackdrop';
 import {drawChaseLandmarks,drawChaseTerrace} from './HypotheticalChaseArt';
 import {chaseCollapsedEdge} from './HypotheticalChaseDetails';
-import {CHASE_QUAYS,chaseQuayX,chaseQuayBase} from './HypotheticalChaseLife';
+import {CHASE_QUAYS,chaseQuayX,chaseQuayBase,chaseWindAt} from './HypotheticalChaseLife';
 import {drawChaseIndustry,drawChaseQuayLife,drawChaseSkiffs} from './HypotheticalChaseLifeArt';
 import {drawChaseQuayGround,drawChaseFrontage,drawChaseShoreWater} from './HypotheticalChaseQuayArt';
+import {drawChaseDressing,drawChaseHarbor} from './HypotheticalChaseDressing';
 import {drawArrivalCourtyard,drawArrivalPlaza,drawArrivalFittings} from './HypotheticalArrivalArt';
 import {drawForecourt} from './HypotheticalForecourt';
 import {masonryFall,SCENIC_FRACTURE,scenicRecoil,craneLoad,bastionCloth,arsenalPressure,scenicChip} from './HypotheticalScenicMotion';
@@ -93,8 +94,8 @@ function facade(c: CanvasRenderingContext2D, x: number, base: number, w: number,
     box(c,x,base-3,w,3,'#7b8c82');
 }
 
-function foliage(c: CanvasRenderingContext2D, x: number, base: number, time: number, phase=x) {
-    const top=base-47, sway=Math.sin(time/57+phase)*1.4;
+function foliage(c: CanvasRenderingContext2D, x: number, base: number, time: number, phase=x,wind?:number) {
+    const top=base-47, sway=wind??Math.sin(time/57+phase)*1.4;
     polygon(c,[[x-2,base],[x+3,base],[x,top],[x-3,top]],'#71847a');
     for(let i=0;i<4;i++)pixelLine(c,x-1,base-i*10,x+2,base-i*10-2,'#a1a68a');
     for(const d of [-1,1]){
@@ -280,13 +281,15 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
     if(b.act==='chase'){
         // Architecture, street, foundations and occupants share one projection.
         const quayBase=chaseQuayBase(cy);
+        drawChaseHarbor(c,cx,cy,b.tick,reduced);
         drawChaseQuayGround(c,cx,cy);
         for(const [i,site]of CHASE_QUAYS.entries()){
             const x=chaseQuayX(site.x,cx);if(x<-155||x>340)continue;
             drawChaseFrontage(c,i,x,quayBase);
             if(site.kind==='quay')facade(c,x+6,quayBase,63,51+mod(i,2)*14,mod(i,3));
             else drawChaseIndustry(c,b,i,x,quayBase,reduced);
-            if([0,2,8].includes(i))foliage(c,x+119,quayBase-2,time,site.x*.03);
+            drawChaseDressing(c,b,i,x,quayBase,reduced);
+            if([0,2,8].includes(i))foliage(c,x+119,quayBase-2,time,site.x*.03,chaseWindAt(b.tick,site.x,reduced)*1.4);
             if(site.kind==='quay'){
                 box(c,x+83,quayBase-7,3,7,'#6e8e81');box(c,x+131,quayBase-7,3,7,'#6e8e81');
                 pixelLine(c,x+84,quayBase-5,x+108,quayBase-2,'#92a390');pixelLine(c,x+108,quayBase-2,x+132,quayBase-5,'#92a390');
@@ -520,6 +523,8 @@ function chaseDeckTile(c:CanvasRenderingContext2D,x:number,y:number,col:number,i
         box(c,x+2,y+3,12,4,'#5e7e83');pixelLine(c,x+4,y+5,x+9,y+5,S.ironLight);
         box(c,x+2,y+3,1,1,S.cap);box(c,x+12,y+6,1,1,S.cap);
         box(c,x+4,y+10,8,2,S.iron);box(c,x+5,y+10,7,1,S.ironLight);
+        if(col%3===1){box(c,x+10,y+5,3,1,'#8a8b76');box(c,x+12,y+7,1,2,'#617576');}
+        pixelLine(c,x+15,y+3,x+15,y+7,'#304e5c');
     }else{
         const seam=col%2===0;
         if(seam)box(c,x,y+2,1,7,S.woodShade);
@@ -527,6 +532,7 @@ function chaseDeckTile(c:CanvasRenderingContext2D,x:number,y:number,col:number,i
         pixelLine(c,x+4+col%3,y+6,x+11,y+6,S.woodShade);
         if(col%4===1){box(c,x+8,y+4,3,2,S.woodShade);box(c,x+9,y+4,1,1,S.woodLight);}
         box(c,x,y+10,16,4,S.woodShade);box(c,x,y+10,16,1,S.wood);
+        if(col%3===0){pixelLine(c,x+5,y+12,x+11,y+12,'#79604f');box(c,x+7,y+13,2,1,'#a17a59');}
     }
     if(col%2===0){box(c,x+1,y+7,4,8,S.iron);box(c,x+2,y+8,1,1,S.cap);box(c,x+2,y+13,1,1,S.ironLight);}
     box(c,x,y+15,16,1,S.stoneShade);

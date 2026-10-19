@@ -1,0 +1,37 @@
+{
+  "kind": "directed native art",
+  "fps": 30,
+  "seconds": 24,
+  "frames": 720,
+  "browser": false,
+  "gameplay": false,
+  "audio": false,
+  "warningAt": 180,
+  "scenes": [
+    {
+      "name": "cais",
+      "camera": 90,
+      "first": 0,
+      "label": "CAIS / ROTINA E VENTO"
+    },
+    {
+      "name": "carga",
+      "camera": 1290,
+      "first": 3,
+      "label": "CARGA / MADEIRA E TECIDOS"
+    },
+    {
+      "name": "comportas",
+      "camera": 2490,
+      "first": 6,
+      "label": "COMPORTAS / BOMBAS E VAPOR"
+    },
+    {
+      "name": "portaria",
+      "camera": 3690,
+      "first": 9,
+      "label": "PORTARIA / PEDRA E SINAIS"
+    }
+  ],
+  "scope": "Native chase scenery, terrain and mechanisms. Fixed authored viewpoints and staggered warning; foreground actors omitted to expose environment."
+}
