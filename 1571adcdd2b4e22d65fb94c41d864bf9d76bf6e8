@@ -1,0 +1,18 @@
+Technical documentation supplement for 1571adcdd2b4e22d65fb94c41d864bf9d76bf6e8
+
+Open Bastiao activities with tower destruction and a persistent rubble discovery scene
+
+Behavior
+Make tower destruction the first fourth-yard background event and continue it with a persistent rubble search and character discovery.
+
+Implementation
+Adds HypotheticalTowerSearch.ts and HypotheticalTowerSearchArt.ts. TOWER_SEARCH defines grip, yield, roof release, reveal, notice, clamp, bite, drop and completion. The search grabs the actual sleeping roof-left body, carries it at the jaw and returns it to physics. The revealed Bystander uses star-shirt clothing. HypotheticalArt attaches carriedBystander inside the mouth layers; the scene director coordinates tower-search, framing and camera offsets.
+
+Scope and limitations
+At this revision the character falls as an intact articulated sprite. The later staged fragment implementation belongs to 7807bcb. Updates tower-cinematic assets and documentation; directed video is not a full gameplay test.
+
+Publication evidence
+A successful local publisher receipt identifies build `1571adcdd2b4e22d65fb94c41d864bf9d76bf6e8-5630f6ced337` for this exact source commit. The report records `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its build-log SHA-256 is `1b209a6ec32dbf44ee9ce1dc916e602f4e7d2422e6021c6bc482d29c0b730a94`. This establishes recorded build/publication completion, not gameplay correctness.
+
+Full file inventory and provenance: docs/commits/2026-10-19/1571adc.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
