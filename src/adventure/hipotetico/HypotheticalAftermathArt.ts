@@ -5,6 +5,8 @@ import { drawBystanders } from './HypotheticalBystanders';
 import type { HypotheticalBackdrop } from './HypotheticalBackdrop';
 import {AFTERMATH_PROPS} from './HypotheticalAftermathScore';
 import {drawGunTracer,drawGunImpact} from './HypotheticalGunfire';
+import {shutterHandle} from './HypotheticalAftermathHandling';
+import {drawDebrisPiece} from './HypotheticalDebrisArt';
 
 // Rear-street colours stay below the contrast of guards, bullets and playable ledges.
 const P={ink:'#516d70',dark:'#657c73',stone:'#92a18c',edge:'#c1b99a',wood:'#9e9475',grain:'#7d826d',
@@ -16,8 +18,13 @@ const progress=(tick:number,born:number,time:number)=>born<0?0:smoothMotion((tic
 function secondaryProp(c:CanvasRenderingContext2D,x:number,y:number,index:number,s:AftermathYard['props'][number],tick:number,reduced:boolean){
     const age=s.struckAt<0?100:tick-s.struckAt,shake=reduced||age>28?0:Math.sin(age*1.7)*(1-age/28)*s.force*2;
     oval(c,x-16,y-3,34,4,P.dark);
+    if(s.handledAt>=0&&index<2){
+        // Scuffed ground remains visible when the loose component is moved.
+        pixelLine(c,x-11,y-2,x+13,y-2,P.grain);
+        for(let j=0;j<4;j++)box(c,x-10+j*6,y-1-j%2,3,1,j%2?P.light:P.stone);
+    }
     if(index===0){
-        for(let i=0;i<4;i++){
+        for(let i=0;i<3;i++){
             const yy=y-6-i*4,slip=s.wear*(i%2?1:-1);
             pixelLine(c,x-14+slip,yy+shake,x+14+slip,yy-3+shake,P.grain,4);
             pixelLine(c,x-12+slip,yy-1+shake,x+13+slip,yy-3+shake,P.light);
@@ -26,6 +33,7 @@ function secondaryProp(c:CanvasRenderingContext2D,x:number,y:number,index:number
         pixelLine(c,x-9,y-19,x-8-s.wear*2,y-3,P.ink);pixelLine(c,x+9,y-19,x+9+s.wear*2,y-3,P.metal);
     }else if(index===1){
         for(let i=0;i<5;i++){
+            if(i===1)continue; // This wedge is a loose, individually handled stone.
             const xx=x-16+i*7,yy=y-5-i%2*6;
             polygon(c,[[xx,yy],[xx+3,yy-5],[xx+10,yy-4],[xx+12,yy+3],[xx+1,yy+4]],i%2?P.metal:P.stone);
             pixelLine(c,xx+3,yy-4,xx+8,yy-3,P.edge);box(c,xx+7,yy+1,3,1,P.dark);
@@ -36,15 +44,37 @@ function secondaryProp(c:CanvasRenderingContext2D,x:number,y:number,index:number
         // no intact new target pops into place after the previous burst.
         for(const d of [-1,1]){box(c,x+d*12,y-37,3,36,P.dark);box(c,x+d*12+1,y-36,1,32,P.shine);}
         box(c,x-14,y-39,31,3,P.metal);box(c,x-13,y-39,29,1,P.edge);
-        box(c,x-10+shake,y-35,22,31,P.ink);box(c,x-9+shake,y-34,20,28,P.metal);
+        // A top hinge stays fixed. Pulling the lower handle swings the panel
+        // out of its frame, revealing a dark service recess and real braces.
+        box(c,x-10,y-35,22,31,P.ink);
+        box(c,x-7,y-32,16,23,'#45666b');pixelLine(c,x-7,y-10,x+8,y-29,P.dark,2);
+        pixelLine(c,x+6,y-31,x+6,y-12,P.metal,2);pixelLine(c,x+7,y-31,x+7,y-13,P.shine);
+        box(c,x-6,y-28,7,9,P.dark);box(c,x-5,y-27,5,3,P.grain);box(c,x-4,y-26,2,1,P.light);
+        const dx=-s.hingeFacing*Math.sin(s.hinge)*22,dy=Math.cos(s.hinge)*30;
+        const at=(xx:number,t:number):[number,number]=>[x+xx+dx*t+shake*t,y-35+dy*t];
+        polygon(c,[at(-10,0),at(12,0),at(12,1),at(-10,1)],P.dark);
+        polygon(c,[at(-9,.03),at(11,.03),at(11,.97),at(-9,.97)],P.metal);
         for(let j=0;j<6;j++){
             const bend=j===2||j===3?s.wear:0;
-            pixelLine(c,x-8+shake,y-32+j*4,x+9+shake,y-32+j*4+bend,P.shine);
+            const u=at(-8,(3+j*4)/30),v=at(9,(3+j*4+bend)/30);
+            pixelLine(c,u[0],u[1],v[0],v[1],P.shine);
         }
         for(let j=0;j<s.wear;j++){
-            const xx=x-5+j*4,yy=y-30+j*7;box(c,xx+shake,yy,2,2,P.ink);pixelLine(c,xx+1+shake,yy+2,xx+4+shake,yy+3,P.dark);
+            const u=at(-5+j*4,(5+j*7)/30);box(c,u[0],u[1],2,2,P.ink);pixelLine(c,u[0]+1,u[1]+2,u[0]+4,u[1]+3,P.dark);
         }
+        for(const hx of [-7,7]){box(c,x+hx,y-38,3,5,P.dark);box(c,x+hx,y-37,2,1,P.shine);}
+        const handle=shutterHandle(s);
+        // y is three pixels above the street baseline used by the shared grip.
+        pixelLine(c,x+handle.x-4,y+3+handle.y,x+handle.x+4,y+3+handle.y,P.ink,2);
+        pixelLine(c,x+handle.x-3,y+2+handle.y,x+handle.x+3,y+2+handle.y,P.edge);
+        pixelLine(c,x-10,y-7,x-10+dx*.85,y-35+dy*.85,P.dark);
         box(c,x-14,y-3,31,3,P.dark);
+    }
+    if(s.piece&&!s.piece.held){
+        const p=s.piece,material=index===0?'timber':'stone';
+        // Airborne pieces are drawn in the front layer; settled ones belong
+        // to the material pile, so the actor can walk past them naturally.
+        if(!p.moving)drawDebrisPiece(c,x+p.x,y+3+p.y,{material,angle:p.angle,wear:s.wear});
     }
 }
 
@@ -209,6 +239,11 @@ export function drawAftermathYards(c:CanvasRenderingContext2D,b:HypotheticalBack
 /** Front layer: short contact accents, persistent chips and low settling dust. */
 export function drawAftermathEffects(c:CanvasRenderingContext2D,a:HypotheticalAftermath,base:number,reduced:boolean){
     for(const [i,s] of a.yards.entries()){
+        for(const [j,prop] of s.props.entries()){
+            const p=prop.piece;
+            if(p?.moving&&!p.held)drawDebrisPiece(c,AFTERMATH_YARDS[i].origin+AFTERMATH_PROPS[j].offset+p.x,
+                base+p.y,{material:j===0?'timber':'stone',angle:p.angle,wear:prop.wear});
+        }
         if(s.shiftedAt<0)continue;
         const x=AFTERMATH_YARDS[i].origin+272,age=a.tick-(s.brokenAt<0?s.shiftedAt:s.brokenAt);
         if(i<2){

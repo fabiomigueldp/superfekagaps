@@ -6,9 +6,10 @@ import { gunRecoil, type GunImpact } from './HypotheticalGunfire';
 import {OPENING} from './HypotheticalOpening';
 import {scenicLandingCues} from './HypotheticalScenicMotion';
 import {HypotheticalAftermath} from './HypotheticalAftermath';
+import {AFTERMATH_SCALE} from './HypotheticalAftermathHandling';
 
 /** All positions are native pixels, relative to the distant street's baseline. */
-export const BACKDROP_RIG = { width: 192, height: 160, scale: .6875, x: 92, y: 148 } as const;
+export const BACKDROP_RIG = { width: 192, height: 160, scale: AFTERMATH_SCALE, x: 92, y: 148 } as const;
 /** The rear street has vertical parallax, so high foreground jumps do not hide its action. */
 export const backdropBaseline=(cameraY:number)=>116+(64-cameraY)*.22;
 export type BystanderClothes = 'workcoat' | 'star-shirt' | 'scarf' | 'satchel';

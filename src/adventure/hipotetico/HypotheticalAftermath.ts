@@ -4,6 +4,8 @@ import { SIEGE_SECTORS, SIEGE_WIDTH } from './HypotheticalSiege';
 import type { Bystander } from './HypotheticalBackdrop';
 import {gunRecoil,type GunImpact,type GunTrace} from './HypotheticalGunfire';
 import {AFTERMATH_PROPS,AFTERMATH_SCORES,aftermathReach,aftermathActionTiming,type AftermathAction} from './HypotheticalAftermathScore';
+import {AFTERMATH_SCALE,DEBRIS_GRIP_X,createAftermathProp,handlingForMaterial,handlingMotion,handlingTiming,
+    isHandling,shutterHandle,stepAftermathProp,type AftermathProp,type HeldDebris} from './HypotheticalAftermathHandling';
 
 /** These small service yards belong to the rear street, never to Feka's collision layer. */
 export const AFTERMATH_YARDS = SIEGE_SECTORS.map((s, district) => ({
@@ -13,13 +15,14 @@ export const AFTERMATH_YARDS = SIEGE_SECTORS.map((s, district) => ({
 }));
 type Activity = 'approach' | 'search' | 'rummage' | 'listen' | 'flush' | 'turn-out' | 'patrol' | 'survey' | 'turn-back' | 'return' | 'watch'
     | 'roam' | 'orient' | 'perform' | 'recover';
-type Sound = 'distant-debris' | 'distant-thud' | 'distant-shot' | 'distant-hit' | 'distant-roar';
+type Sound = 'distant-debris' | 'distant-thud' | 'distant-shot' | 'distant-hit' | 'distant-roar'
+    | 'distant-wood' | 'distant-stone' | 'distant-metal';
 export interface AftermathContact { x:number; y?:number; born:number; strength:number; kind:'scrape'|'break'|'step'; material?:'timber'|'stone'|'iron' }
 interface AmbientShot extends GunTrace {targetX:number;targetY:number;remaining:number;prop:number}
 export interface AftermathYard {
     damage: number; shiftedAt:number; brokenAt:number; birdsAt:number; runnerAt:number;
     people:Bystander[];
-    props:Array<{wear:number;struckAt:number;force:number}>;
+    props:AftermathProp[];
     birdsFlights:number;roarAt:number;
 }
 const pulse = (age:number, rise:number, hold:number, end:number) =>
@@ -38,7 +41,7 @@ export class HypotheticalAftermath {
     casings:Array<{x:number;y:number;born:number;direction:number}>=[];
     readonly yards:AftermathYard[] = AFTERMATH_YARDS.map((yard, district) => ({
         damage:0, shiftedAt:-1, brokenAt:-1, birdsAt:-1, runnerAt:-1,birdsFlights:0,roarAt:-1,
-        props:AFTERMATH_PROPS.map(()=>({wear:0,struckAt:-1,force:0})),
+        props:AFTERMATH_PROPS.map(p=>createAftermathProp(p.material)),
         people:[0,1].map(i => ({
             x:yard.origin+290-i*6, originX:yard.origin+290-i*6, shelter:yard.origin+(district===3?342:354),
             escaped:false, fleeing:true, hitAt:null, color:(district+i)%4,
@@ -58,6 +61,11 @@ export class HypotheticalAftermath {
     private recent:AftermathAction[]=[];
     private viewX=0;
     private planView=0;
+    private gripX=0;
+    private gripY=0;
+    private gripAngle=0;
+    private performances=0;
+    private lastPerformed:Partial<Record<AftermathAction,number>>={};
 
     get yard(){ return this.yards[this.district]; }
     get origin(){ return AFTERMATH_YARDS[this.district]?.origin ?? 0; }
@@ -81,11 +89,21 @@ export class HypotheticalAftermath {
     }
     private enter(phase:Activity){
         this.phase=phase; this.age=0; this.fromX=this.x; this.fromFacing=this.facing;
-        if(phase==='perform')this.recent=[...this.recent,this.action].slice(-2);
+        if(phase==='perform'){
+            this.recent=[...this.recent,this.action].slice(-2);
+            this.lastPerformed[this.action]=++this.performances;
+            if(isHandling(this.action)&&this.targetProp>=0){
+                const prop=this.yard.props[this.targetProp],p=prop.piece??shutterHandle(prop);
+                this.gripX=this.origin+AFTERMATH_PROPS[this.targetProp].offset+p.x;
+                this.gripY=p.y;this.gripAngle=prop.piece?.angle??0;
+                prop.handledAt=this.tick;
+            }
+        }
     }
-    private contact(kind:AftermathContact['kind'],x:number,strength:number){
-        this.contacts.push({kind,x,strength,born:this.tick});
-        if(kind!=='step')this.events.push(kind==='break'?'distant-thud':'distant-debris');
+    private contact(kind:AftermathContact['kind'],x:number,strength:number,y?:number,material?:AftermathContact['material']){
+        this.contacts.push({kind,x,strength,born:this.tick,y,material});
+        if(kind!=='step')this.events.push(material==='iron'?'distant-metal':material==='timber'?'distant-wood'
+            :material==='stone'?'distant-stone':kind==='break'?'distant-thud':'distant-debris');
     }
     private inView(x:number,margin=20){return x>=this.viewX+margin&&x<=this.viewX+320-margin;}
     private orient(facing:number,next:'roam'|'perform'|'search'){
@@ -98,16 +116,35 @@ export class HypotheticalAftermath {
         this.roamThen='perform';
         const order=AFTERMATH_SCORES[this.district],lap=Math.floor(this.actionCount/order.length);
         const candidates=Array.from({length:order.length},(_,j)=>order[(this.actionCount+lap*2+j)%order.length]);
+        // Investigate a recently disturbed material before wandering elsewhere.
+        // The cooldown leaves room for the other performances on later laps.
+        const prompted=this.yard.props.map((p,i)=>({p,i})).filter(({p,i})=>p.cueAt>=0&&this.tick-p.cueAt<360
+            &&this.tick-p.handledAt>540&&this.inView(this.origin+AFTERMATH_PROPS[i].offset,40))
+            .sort((a,b)=>b.p.cueAt-a.p.cueAt)[0];
+        if(prompted)candidates.unshift(handlingForMaterial(AFTERMATH_PROPS[prompted.i].material));
+        // Consequences must not monopolize the score. Reserve a place for
+        // eligible actions absent from the last six completed selections.
+        const overdue=[...new Set(candidates)].filter(a=>this.performances-(this.lastPerformed[a]??-3)>=6)
+            .sort((a,b)=>(this.lastPerformed[a]??-3)-(this.lastPerformed[b]??-3));
+        candidates.unshift(...overdue);
         this.variant=this.actionCount+this.district;this.actionCount++;this.cycle=Math.floor(this.actionCount/3);
         const lo=Math.max(this.origin+66,this.viewX+64),hi=Math.min(this.origin+372,this.viewX+256);
         let target:{i:number;facing:number;x:number}|undefined;
         for(const action of candidates.filter(a=>!this.recent.includes(a))){
             const options=AFTERMATH_PROPS.flatMap((p,i)=>[-1,1].map(facing=>{
-                const ideal=this.origin+p.offset-facing*aftermathReach(action);
+                const s=this.yard.props[i],offset=isHandling(action)?s.piece?.x??0:0;
+                const ideal=this.origin+p.offset+offset-facing*aftermathReach(action);
                 return {i,facing,x:action==='fire'?Math.max(lo,Math.min(hi,ideal)):ideal};
             })).filter(p=>p.x>=lo&&p.x<=hi&&this.inView(this.origin+AFTERMATH_PROPS[p.i].offset,26)
+                &&(!isHandling(action)||action===handlingForMaterial(AFTERMATH_PROPS[p.i].material)
+                    &&!this.yard.props[p.i].piece?.moving&&this.yard.props[p.i].hinge<.03
+                    &&this.inView(p.x+p.facing*aftermathReach(action),32))
                 &&(action!=='fire'||(this.origin+AFTERMATH_PROPS[p.i].offset-p.x)*p.facing>40));
             options.sort((a,b)=>Math.abs(a.x-this.x)-Math.abs(b.x-this.x)
+                +(prompted&&isHandling(action)?(a.i===prompted.i?-100:0)-(b.i===prompted.i?-100:0):0)
+                // If already near an edge, turn the next toss back into the yard.
+                +(isHandling(action)?Math.max(0,(this.yard.props[a.i].piece?.x??0)*a.facing)*2
+                    -Math.max(0,(this.yard.props[b.i].piece?.x??0)*b.facing)*2:0)
                 +(a.i===this.targetProp?55:0)-(b.i===this.targetProp?55:0));
             if(options.length){this.action=action;target=options[0];break;}
         }
@@ -127,9 +164,8 @@ export class HypotheticalAftermath {
     }
     private hitProp(prop:number,x:number,y:number,strength:number,kind:AftermathContact['kind']){
         if(!this.inView(x)||prop<0)return;
-        const s=this.yard.props[prop];s.wear=Math.min(3,s.wear+1);s.struckAt=this.tick;s.force=strength;
-        this.contact(kind,x,strength);
-        Object.assign(this.contacts[this.contacts.length-1],{y,material:AFTERMATH_PROPS[prop].material});
+        const s=this.yard.props[prop];s.wear=Math.min(3,s.wear+1);s.struckAt=this.tick;s.force=strength;s.cueAt=this.tick;
+        this.contact(kind,x,strength,y,AFTERMATH_PROPS[prop].material);
     }
     private scatterBirds(){
         if(this.yard.birdsAt<0||this.tick-this.yard.birdsAt>1630){
@@ -137,7 +173,7 @@ export class HypotheticalAftermath {
         }
     }
     get barrel(){
-        const p=this.pose(false),scale=.6875,r=p.recoil-p.tuck*10;
+        const p=this.pose(false),scale=AFTERMATH_SCALE,r=p.recoil-p.tuck*10;
         const shoulder={x:this.x+this.facing*(7-r+riderBend(14,p.riderLean))*scale,
             y:p.lift+(-78+p.compression+p.riderDrop)*scale};
         return {x:shoulder.x+this.facing*Math.cos(p.aim)*31*scale,y:shoulder.y+Math.sin(p.aim)*31*scale,
@@ -152,6 +188,53 @@ export class HypotheticalAftermath {
         this.casings.push({x:m.x-m.dx*15,y:m.y-m.dy*15,born:this.tick,direction:this.facing});
         this.events.push('distant-shot');
     }
+    private handleDebris(){
+        if(!isHandling(this.action)||this.targetProp<0)return;
+        const action=this.action,a=this.age,t=handlingTiming(action),motion=handlingMotion(action,a,this.variant);
+        const s=this.yard.props[this.targetProp],anchor=this.origin+AFTERMATH_PROPS[this.targetProp].offset;
+        if(action==='wrench'){
+            if(a===t.grip){s.driven=true;s.hingeFacing=this.facing;s.hingeVelocity=0;}
+            if(a>=t.grip&&a<t.release)s.hinge=motion.hinge;
+            if(a===t.release){s.driven=false;s.hingeVelocity=-.012;}
+            const handle=shutterHandle(s);
+            const returning=smoothMotion((a-t.release)/36);
+            this.x=this.fromX+(a<t.release?handle.x:-this.facing*Math.sin(1.08)*22*(1-returning));
+        }else{
+            this.x=this.fromX-this.facing*motion.pull;
+            const p=s.piece!;
+            if(a===t.grip){p.held=true;p.moving=false;p.settling=false;p.vx=0;p.vy=0;p.spin=0;}
+            if(p.held){
+                const jaw=this.jawAnchor;
+                p.x=jaw.x-anchor;p.y=jaw.y;
+                p.angle=this.gripAngle+(motion.angle-(action==='haul'?-.11:0))*this.facing;
+            }
+            if(a===t.release){
+                p.held=false;p.moving=true;p.bounces=0;
+                const left=Math.max(-33,this.planView+28-anchor),right=Math.min(33,this.planView+292-anchor);
+                const landing=Math.max(left,Math.min(right,p.x+this.facing*(action==='haul'?26:20)));
+                p.vy=action==='haul'?-.85:-.3;
+                const flight=(-p.vy+Math.sqrt(p.vy*p.vy+2*.12*Math.max(0,-5-p.y)))/.12;
+                p.vx=(landing-p.x)/Math.max(10,flight);p.spin=this.facing*(action==='haul'?.014:.037);
+            }
+        }
+        if(a===t.grip||a===t.yield){
+            const strength=a===t.grip?.22:.72;
+            s.wear=Math.min(3,s.wear+(a===t.yield?1:0));s.struckAt=this.tick;s.force=strength;
+            if(this.inView(this.gripX))this.contact('scrape',this.gripX,strength,this.gripY,AFTERMATH_PROPS[this.targetProp].material);
+        }
+        if(a===t.release+20&&action==='sift'&&this.inView(this.gripX))
+            this.contact('scrape',this.gripX,.22,-8,'stone');
+    }
+    get jawAnchor(){
+        const p=this.pose(false);
+        return {x:this.x+this.facing*DEBRIS_GRIP_X*AFTERMATH_SCALE,
+            y:p.lift+(-59+p.bow*25+p.breath+p.neckDrop+p.compression+10+p.jaw*6)*AFTERMATH_SCALE};
+    }
+    get heldDebris():HeldDebris|undefined {
+        if(!this.active||this.targetProp<0)return;
+        const s=this.yard.props[this.targetProp],material=AFTERMATH_PROPS[this.targetProp].material;
+        if(s.piece?.held&&material!=='iron')return {material,angle:s.piece.angle,wear:s.wear};
+    }
     private routine(){
         this.age++;
         if(this.phase==='orient'){
@@ -162,6 +245,7 @@ export class HypotheticalAftermath {
             if(this.age>=this.duration)this.orient(this.destinationFacing,this.roamThen);
         }else if(this.phase==='perform'){
             const timing=aftermathActionTiming(this.action,this.variant),a=this.age;
+            if(isHandling(this.action))this.handleDebris();
             if(this.action==='ram')this.x=this.fromX+this.facing*8*pulse(a-20,28,34,84);
             if(this.action==='rake')this.x=this.fromX+this.facing*3*pulse(a,26,96,124);
             if(timing.beats.includes(a)){
@@ -197,6 +281,15 @@ export class HypotheticalAftermath {
         this.casings=this.casings.filter(p=>this.tick-p.born<150).slice(-18);
         this.impacts=this.impacts.filter(p=>this.tick-p.born<100).slice(-24);
         this.contacts=this.contacts.filter(p=>this.tick-p.born<88);
+        for(const [district,yard] of this.yards.entries())for(const [i,s] of yard.props.entries()){
+            const hit=stepAftermathProp(s);
+            if(hit){
+                s.struckAt=this.tick;s.force=hit.strength;
+                const x=AFTERMATH_YARDS[district].origin+AFTERMATH_PROPS[i].offset+hit.x;
+                if(district===this.district&&this.active&&this.inView(x))
+                    this.contact('break',x,hit.strength,hit.y,AFTERMATH_PROPS[i].material);
+            }
+        }
         // Already-started escapes and settling finish even after the camera leaves a street.
         for(const yard of this.yards)for(const p of yard.people){
             p.velocity=0;
@@ -209,9 +302,15 @@ export class HypotheticalAftermath {
         const district=scenicDistrict(storyTick), yard=AFTERMATH_YARDS[district];
         // A new authored street has priority. No hidden activity continues in a later district.
         if(district!==this.district){
+            // If the next authored scene takes over during a grip, the actual
+            // loose piece drops at its current location instead of vanishing.
+            for(const s of this.yard?.props??[]){
+                s.driven=false;
+                if(s.piece?.held){s.piece.held=false;s.piece.moving=true;s.piece.vy=0;}
+            }
             this.active=false; this.district=district; this.cycle=0; this.contacts=[];
             this.shots=[];this.impacts=[];this.casings=[];this.muzzle=0;this.heat=0;
-            this.actionCount=0;this.recent=[];
+            this.actionCount=0;this.recent=[];this.performances=0;this.lastPerformed={};
         }
         const center=yard.origin+272;
         const visible=(x:number,margin=28)=>this.inView(x,margin);
@@ -224,7 +323,7 @@ export class HypotheticalAftermath {
             s.age++;s.remaining-=Math.hypot(s.vx,s.vy);
             if(s.remaining<=0){
                 if(this.inView(s.targetX)){
-                    const prop=this.yard.props[s.prop];prop.wear=Math.min(3,prop.wear+1);prop.struckAt=this.tick;prop.force=.25;
+                    const prop=this.yard.props[s.prop];prop.wear=Math.min(3,prop.wear+1);prop.struckAt=this.tick;prop.force=.25;prop.cueAt=this.tick;
                     this.impacts.push({x:s.targetX,y:s.targetY,nx:-Math.sign(s.vx),ny:0,born:this.tick,
                         fromX:s.x,fromY:s.y,material:AFTERMATH_PROPS[s.prop].material});this.events.push('distant-hit');
                 }
@@ -233,7 +332,7 @@ export class HypotheticalAftermath {
         this.shots=this.shots.filter(s=>s.remaining>0&&s.age<60).slice(-12);
         if(['roam','orient','perform','recover'].includes(this.phase)){
             const old=this.x;this.routine();this.velocity=this.x-old;this.travel+=Math.abs(this.velocity);
-            const step=Math.floor(this.travel/(Math.PI*11*.6875));
+            const step=Math.floor(this.travel/(Math.PI*11*AFTERMATH_SCALE));
             if(step>this.lastStep&&this.stride>.15&&this.inView(this.x)){this.contact('step',this.x+this.facing*(step%2?9:-7),.4);this.lastStep=step;}
             return;
         }
@@ -258,7 +357,7 @@ export class HypotheticalAftermath {
             +(this.district===3?40:19)*pulse(this.age-32,26,37,94);
         this.velocity=this.x-oldX;
         this.travel+=Math.abs(this.velocity);
-        const step=Math.floor(this.travel/(Math.PI*11*.6875));
+        const step=Math.floor(this.travel/(Math.PI*11*AFTERMATH_SCALE));
         if(step>this.lastStep&&this.stride>.15){
             this.contact('step',this.x+this.facing*(step%2?9:-7),.4); this.lastStep=step;
         }
@@ -321,32 +420,56 @@ export class HypotheticalAftermath {
         const roar=performing&&this.action==='bellow'?pulse(a-10,34,54,102):0;
         const firing=performing&&this.action==='fire'?pulse(a,26,108,142):0;
         const orienting=phase==='orient',turnProgress=orienting?a/36:a/44;
-        const compression=probe*2+(stamp?landing*7:strike*5)+ram*4+rakeBeat*2+crush*8+(turn||orienting?Math.sin(Math.PI*turnProgress)*2:0);
-        const riderDrop=probe*3+strike*5+lift*5+ram*5+rise*5+crush*4;
+        const handling=performing&&isHandling(this.action)?this.action:null;
+        const h=handling?handlingMotion(handling,a,this.variant):null;
+        const riderHandling=handling?handlingMotion(handling,a-5,this.variant):null;
+        const effort=h?.effort??0,heave=h?.raise??0,inspection=h?.inspect??0;
+        const compression=probe*2+(stamp?landing*7:strike*5)+ram*4+rakeBeat*2+crush*8+effort*3
+            +(turn||orienting?Math.sin(Math.PI*turnProgress)*2:0);
+        const riderDrop=probe*3+strike*5+lift*5+ram*5+rise*5+crush*4+(riderHandling?.effort??0)*4-(riderHandling?.raise??0)*2;
         const bodyLift=-lift*7-rise*9;
-        const riderLean=probe*3-strike*4-steam*5-ram*4-rakeBeat*2-tailStrike*4+roar*2;
+        const riderLean=probe*3-strike*4-steam*5-ram*4-rakeBeat*2-tailStrike*4+roar*2
+            -(riderHandling?.effort??0)*3+(riderHandling?.raise??0)*4-(riderHandling?.toss??0)*4;
+        const bow=search*.52+probe*.48-cargo*.22+(stamp?0:strike*.34)-steam*.1+sniff*.2+ram*.55+rake*.5+crush*.22-roar*.15
+            +(h?h.reach*.48-heave*.27+effort*.08+inspection*.08:0);
+        const jaw=h?h.jaw:.12+probe*.24+flush*.62*(1-smoothMotion((a-54)/8))+ram*.25+rake*.28+roar*.8;
+        let neckDrop=search*(14+(reduced?0:Math.sin(a/9)*2))+probe*10-cargo*10+(stamp?landing*5:strike*10)-steam*8+sniff*5
+            +ram*13+rake*14+rakeBeat*3+crush*6-roar*10;
+        const contact=ram?pulse(a-22,26,54,88):rake?Math.min(1,rakeBeat):0;
+        if(contact){
+            const aligned=(this.targetY-bodyLift)/AFTERMATH_SCALE+59-bow*25-breath-compression-10-jaw*6;
+            neckDrop+=(aligned-neckDrop)*contact;
+        }
+        if(h&&this.targetProp>=0){
+            const s=this.yard.props[this.targetProp],t=handlingTiming(handling!);
+            const panel=shutterHandle(s);
+            const desiredY=handling==='wrench'?(a<t.release?panel.y:-38+Math.cos(1.08)*29
+                +(this.gripY-(-38+Math.cos(1.08)*29))*smoothMotion((a-t.release)/32))
+                :this.gripY-h.height+(reduced?0:h.sniff*Math.sin(a/4)*.8);
+            // Cancel idle breathing inside this anchor, keeping teeth in contact
+            // with the same physical component through effort, lift and release.
+            neckDrop=((desiredY-bodyLift)/AFTERMATH_SCALE+59-bow*25-breath-compression-10-jaw*6)*h.reach;
+        }
         const recoil=gunRecoil(this.muzzle),tuck=lift*.55+rise*.6;
-        const shoulderY=bodyLift+(-78+compression+riderDrop)*.6875;
-        const shoulderX=this.x+this.facing*(7-recoil+tuck*10+riderBend(14,riderLean))*.6875;
+        const shoulderY=bodyLift+(-78+compression+riderDrop)*AFTERMATH_SCALE;
+        const shoulderX=this.x+this.facing*(7-recoil+tuck*10+riderBend(14,riderLean))*AFTERMATH_SCALE;
         const gunAngle=Math.atan2(this.targetY-shoulderY,Math.max(12,(this.targetX-shoulderX)*this.facing));
         return {
-            facing:this.facing, gait:this.travel/(.6875*11), stride:this.stride,
+            facing:this.facing, gait:this.travel/(AFTERMATH_SCALE*11), stride:this.stride,
             pivot:turn||orienting?Math.sin(Math.PI*turnProgress)*.98:0,
-            bow:search*.52+probe*.48-cargo*.22+(stamp?0:strike*.34)-steam*.1+sniff*.2+ram*.55+rake*.5+crush*.22-roar*.15,
+            bow,
             lift:bodyLift, breath, compression,
-            neckDrop:search*(14+(reduced?0:Math.sin(a/9)*2))+probe*10-cargo*10+(stamp?landing*5:strike*10)-steam*8+sniff*5
-                +ram*13+rake*14+rakeBeat*3+crush*6-roar*10,
-            jaw:.12+probe*.24+flush*.62*(1-smoothMotion((a-54)/8))+ram*.25+rake*.28+roar*.8,
-            tail:search*-.09+strike*.12-tailWind*.35+tailStrike*.95+(reduced?0:Math.sin(this.tick/29)*.025+tailCheck*.12),
-            tuck, brace:Math.max(probe*.35,(stamp?landing*.6:strike*.6),ram*.65,crush*.7,firing*.5,turn||orienting?.42:0),
+            neckDrop,jaw,
+            tail:search*-.09+strike*.12-tailWind*.35+tailStrike*.95-heave*.18+effort*.08+(reduced?0:Math.sin(this.tick/29)*.025+tailCheck*.12),
+            tuck, brace:Math.max(probe*.35,(stamp?landing*.6:strike*.6),ram*.65,crush*.7,firing*.5,effort*.8,heave*.6,turn||orienting?.42:0),
             riderDrop, riderLean,
-            rein:Math.max(probe,flush,this.stride*.6,ram,rake,crush,roar), lookBack:firing?0:look*(this.cycle%2?.8:.55),
-            aim:look*.3-.12+(gunAngle+.12)*firing,
+            rein:Math.max(probe,flush,this.stride*.6,ram,rake,crush,roar,effort,heave*.8), lookBack:firing?0:look*(this.cycle%2?.8:.55)+inspection*.3,
+            aim:look*.3-.12+(gunAngle+.12)*firing+(h?.reach??0)*.35,
             recoil,heat:this.heat,
             reload:phase==='watch'||phase==='recover'&&this.action==='fire'?Math.sin(Math.PI*a/this.duration)*.65:0,
-            focus:Math.max(search,probe,flush,ram,rake,firing,roar), eyeClose:Math.max(search*.35,steam*.8,crush*.65),
+            focus:Math.max(search,probe,flush,ram,rake,firing,roar,h?.reach??0), eyeClose:Math.max(search*.35,steam*.8,crush*.65,effort*.35),
             blink:this.tick%197<5, voice:Math.max(phase==='flush'?pulse(a-60,4,12,30)*.28:0,roar*.65),
-            cloth:reduced?0:this.stride*2+strike*2+ram*3+tailStrike*2+roar,
+            cloth:reduced?0:this.stride*2+strike*2+ram*3+tailStrike*2+roar+(h?.toss??0)*3,
         };
     }
 }
