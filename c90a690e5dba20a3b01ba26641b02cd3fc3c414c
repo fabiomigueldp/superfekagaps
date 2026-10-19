@@ -1,0 +1,18 @@
+Technical documentation supplement for c90a690e5dba20a3b01ba26641b02cd3fc3c414c
+
+Recompress mechanism atlas losslessly to publish continuous background activities
+
+Behavior
+Reduce the runtime mechanism atlas size without changing its decoded scanlines or non-IDAT PNG chunks.
+
+Implementation
+public/assets/world/mechanisms.png decreases from 635125 to 209156 bytes. scripts/repack_png_lossless.mjs concatenates and inflates IDAT data, tries level-9 zlib strategies, replaces the compressed stream, computes CRC and writes only when --write is supplied and the result is smaller. It rejects animated PNG input.
+
+Scope and limitations
+The lossless claim follows the repacker implementation; no new pixel comparison was run for this documentation. This commit changes compression and adds an authoring utility, not the atlas artwork or gameplay logic.
+
+Publication evidence
+A successful local publisher receipt identifies build `c90a690e5dba20a3b01ba26641b02cd3fc3c414c-2ce5193761a3` for this exact source commit. The report records `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its build-log SHA-256 is `b961237f0b287e3a88e8a7c4d6ea20a08055e19842aa4e16718b25b234b5f87e`. This establishes recorded build/publication completion, not gameplay correctness.
+
+Full file inventory and provenance: docs/commits/2026-10-19/c90a690.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
