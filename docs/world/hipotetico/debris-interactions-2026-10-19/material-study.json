@@ -1,0 +1,340 @@
+{
+  "kind": "directed native art footage",
+  "gameplayTest": false,
+  "heldViewpoints": true,
+  "audio": false,
+  "foregroundCombat": false,
+  "fps": 30,
+  "frames": 721,
+  "seconds": 24.033333333333335,
+  "clips": [
+    {
+      "district": 0,
+      "kind": "creak",
+      "title": "MADEIRA / PORTARIA",
+      "preRoll": 2524,
+      "firstFrame": 0,
+      "frames": 172,
+      "steps": 342,
+      "changes": [
+        {
+          "step": 0,
+          "phase": "notice",
+          "action": "shake",
+          "prop": 0
+        },
+        {
+          "step": 64,
+          "phase": "roam",
+          "action": "haul",
+          "prop": 0,
+          "motivation": "creak"
+        },
+        {
+          "step": 112,
+          "phase": "perform",
+          "action": "haul",
+          "prop": 0,
+          "motivation": "creak"
+        },
+        {
+          "step": 324,
+          "phase": "recover",
+          "action": "haul",
+          "prop": 0,
+          "motivation": "creak"
+        }
+      ],
+      "reaction": {
+        "kind": "creak",
+        "prop": 0,
+        "born": 2511,
+        "variant": 3,
+        "strength": 0.65,
+        "noticed": true
+      }
+    },
+    {
+      "district": 1,
+      "kind": "settle",
+      "title": "PEDRA / CAIS",
+      "preRoll": 3350,
+      "firstFrame": 172,
+      "frames": 198,
+      "steps": 395,
+      "changes": [
+        {
+          "step": 0,
+          "phase": "notice",
+          "action": "fire",
+          "prop": 1
+        },
+        {
+          "step": 68,
+          "phase": "roam",
+          "action": "sift",
+          "prop": 1,
+          "motivation": "settle"
+        },
+        {
+          "step": 185,
+          "phase": "perform",
+          "action": "sift",
+          "prop": 1,
+          "motivation": "settle"
+        },
+        {
+          "step": 377,
+          "phase": "recover",
+          "action": "sift",
+          "prop": 1,
+          "motivation": "settle"
+        }
+      ],
+      "reaction": {
+        "kind": "settle",
+        "prop": 1,
+        "born": 3314,
+        "variant": 6,
+        "strength": 0.55,
+        "noticed": true
+      }
+    },
+    {
+      "district": 3,
+      "kind": "rattle",
+      "title": "METAL / BASTIAO",
+      "preRoll": 2595,
+      "firstFrame": 370,
+      "frames": 183,
+      "steps": 365,
+      "changes": [
+        {
+          "step": 0,
+          "phase": "notice",
+          "action": "wrench",
+          "prop": 2
+        },
+        {
+          "step": 61,
+          "phase": "orient",
+          "action": "breach",
+          "prop": 2,
+          "motivation": "rattle"
+        },
+        {
+          "step": 97,
+          "phase": "roam",
+          "action": "breach",
+          "prop": 2,
+          "motivation": "rattle"
+        },
+        {
+          "step": 145,
+          "phase": "orient",
+          "action": "breach",
+          "prop": 2,
+          "motivation": "rattle"
+        },
+        {
+          "step": 181,
+          "phase": "perform",
+          "action": "breach",
+          "prop": 2,
+          "motivation": "rattle"
+        },
+        {
+          "step": 347,
+          "phase": "recover",
+          "action": "breach",
+          "prop": 2,
+          "motivation": "rattle"
+        }
+      ],
+      "reaction": {
+        "kind": "rattle",
+        "prop": 2,
+        "born": 2576,
+        "variant": 1,
+        "strength": 0.65,
+        "noticed": true
+      }
+    },
+    {
+      "district": 2,
+      "kind": "leak",
+      "title": "VAZAMENTO / ARSENAL",
+      "preRoll": 1495,
+      "firstFrame": 553,
+      "frames": 168,
+      "steps": 334,
+      "changes": [
+        {
+          "step": 0,
+          "phase": "notice",
+          "action": "breach",
+          "prop": 2
+        },
+        {
+          "step": 78,
+          "phase": "roam",
+          "action": "wrench",
+          "prop": 2,
+          "motivation": "leak"
+        },
+        {
+          "step": 126,
+          "phase": "perform",
+          "action": "wrench",
+          "prop": 2,
+          "motivation": "leak"
+        },
+        {
+          "step": 316,
+          "phase": "recover",
+          "action": "wrench",
+          "prop": 2,
+          "motivation": "leak"
+        }
+      ],
+      "reaction": {
+        "kind": "leak",
+        "prop": 2,
+        "born": 1441,
+        "variant": 6,
+        "strength": 0.55,
+        "noticed": true
+      }
+    }
+  ],
+  "captures": [
+    {
+      "file": "creak-0.png",
+      "step": 10,
+      "phase": "notice",
+      "age": 10,
+      "action": "shake",
+      "prop": 0
+    },
+    {
+      "file": "creak-1.png",
+      "step": 36,
+      "phase": "notice",
+      "age": 36,
+      "action": "shake",
+      "prop": 0
+    },
+    {
+      "file": "creak-2.png",
+      "step": 224,
+      "phase": "perform",
+      "age": 112,
+      "action": "haul",
+      "prop": 0
+    },
+    {
+      "file": "creak-3.png",
+      "step": 310,
+      "phase": "perform",
+      "age": 198,
+      "action": "haul",
+      "prop": 0
+    },
+    {
+      "file": "settle-0.png",
+      "step": 10,
+      "phase": "notice",
+      "age": 10,
+      "action": "fire",
+      "prop": 1
+    },
+    {
+      "file": "settle-1.png",
+      "step": 36,
+      "phase": "notice",
+      "age": 36,
+      "action": "fire",
+      "prop": 1
+    },
+    {
+      "file": "settle-2.png",
+      "step": 297,
+      "phase": "perform",
+      "age": 112,
+      "action": "sift",
+      "prop": 1
+    },
+    {
+      "file": "settle-3.png",
+      "step": 361,
+      "phase": "perform",
+      "age": 176,
+      "action": "sift",
+      "prop": 1
+    },
+    {
+      "file": "rattle-0.png",
+      "step": 10,
+      "phase": "notice",
+      "age": 10,
+      "action": "wrench",
+      "prop": 2
+    },
+    {
+      "file": "rattle-1.png",
+      "step": 36,
+      "phase": "notice",
+      "age": 36,
+      "action": "wrench",
+      "prop": 2
+    },
+    {
+      "file": "rattle-2.png",
+      "step": 233,
+      "phase": "perform",
+      "age": 52,
+      "action": "breach",
+      "prop": 2
+    },
+    {
+      "file": "rattle-3.png",
+      "step": 275,
+      "phase": "perform",
+      "age": 94,
+      "action": "breach",
+      "prop": 2
+    },
+    {
+      "file": "leak-0.png",
+      "step": 10,
+      "phase": "notice",
+      "age": 10,
+      "action": "breach",
+      "prop": 2
+    },
+    {
+      "file": "leak-1.png",
+      "step": 36,
+      "phase": "notice",
+      "age": 36,
+      "action": "breach",
+      "prop": 2
+    },
+    {
+      "file": "leak-2.png",
+      "step": 238,
+      "phase": "perform",
+      "age": 112,
+      "action": "wrench",
+      "prop": 2
+    },
+    {
+      "file": "leak-3.png",
+      "step": 298,
+      "phase": "perform",
+      "age": 172,
+      "action": "wrench",
+      "prop": 2
+    }
+  ]
+}

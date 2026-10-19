@@ -54,5 +54,7 @@ export class AftermathEnvironment {
         }
         return e;
     }
-    get invitation(){return [...this.incidents].reverse().find(e=>!e.noticed&&e.kind!=='draft');}
+    invitationFor(visible:(prop:number)=>boolean){
+        return [...this.incidents].reverse().find(e=>!e.noticed&&e.kind!=='draft'&&visible(e.prop));
+    }
 }

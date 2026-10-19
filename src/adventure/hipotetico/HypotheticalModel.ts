@@ -17,7 +17,7 @@ export interface Shot extends Rect { vx: number; vy: number; age: number; life: 
 export interface Dust { x: number; y: number; born: number; kind: 'step' | 'stone' | 'hit' | 'shell' | 'clasp' | 'skid'; direction?: number }
 export interface FallingMark { x: number; born: number }
 export interface BulletImpact extends GunImpact {}
-export type FightEvent = 'warning' | 'shot' | 'impact' | 'splash' | 'collapse-water' | 'debris-land' | 'reload' | 'distant-shot' | 'distant-hit' | 'distant-debris' | 'distant-thud' | 'distant-roar' | 'distant-wood' | 'distant-stone' | 'distant-metal' | 'distant-creak' | 'distant-chain' | 'distant-leak' | 'distant-launch' | 'distant-rocket' | 'distant-blast' | 'distant-bell' | 'step' | 'slam' | 'hit' | 'break' | 'snare' | 'won';
+export type FightEvent = 'warning' | 'shot' | 'impact' | 'splash' | 'collapse-water' | 'debris-land' | 'reload' | 'distant-shot' | 'distant-hit' | 'distant-debris' | 'distant-thud' | 'distant-roar' | 'distant-wood' | 'distant-stone' | 'distant-metal' | 'distant-creak' | 'distant-chain' | 'distant-leak' | 'distant-snort' | 'distant-grit' | 'distant-launch' | 'distant-rocket' | 'distant-blast' | 'distant-bell' | 'step' | 'slam' | 'hit' | 'break' | 'snare' | 'won';
 export const HYPOTHETICAL = Object.freeze({ floor: 224, chaseEnd: CHASE_EXIT, health: 9, step: 1000 / 60, warning: 54, recovery: 156 });
 const rifleBursts = RIFLE_BURSTS;
 const patterns: readonly (readonly HypotheticalAttack[])[] = [

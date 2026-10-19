@@ -6,7 +6,9 @@ import {gunRecoil,type GunImpact,type GunTrace} from './HypotheticalGunfire';
 import {AFTERMATH_PROPS,AftermathRepertoire,aftermathFamily,aftermathShotPoint,aftermathReach,aftermathActionTiming,type AftermathAction} from './HypotheticalAftermathScore';
 import {AFTERMATH_SCALE,DEBRIS_GRIP_X,createAftermathProp,handlingForMaterial,handlingMotion,handlingTiming,
     isHandling,handlesMaterial,SHAKE_BEATS,shutterHandle,stepAftermathProp,type AftermathProp,type HeldDebris} from './HypotheticalAftermathHandling';
-import {AftermathEnvironment} from './HypotheticalAftermathEnvironment';
+import {AftermathEnvironment,type YardIncident} from './HypotheticalAftermathEnvironment';
+import {aftermathReaction,reactionDuration,reactionReplies} from './HypotheticalAftermathReaction';
+import {fragmentLanding} from './HypotheticalAftermathParticles';
 import {HypotheticalTower,BASTION_TOWER,TOWER_SEQUENCE,launcherGeometry,towerLauncherPose,type TowerCue} from './HypotheticalTower';
 import {TOWER_SEARCH} from './HypotheticalTowerSearch';
 
@@ -20,8 +22,8 @@ type Activity = 'approach' | 'search' | 'rummage' | 'listen' | 'flush' | 'turn-o
     | 'roam' | 'orient' | 'perform' | 'recover' | 'notice' | 'tower' | 'tower-await' | 'tower-search';
 type Destination='perform'|'search'|'tower'|'tower-search'|'notice';
 type Sound = 'distant-debris' | 'distant-thud' | 'distant-shot' | 'distant-hit' | 'distant-roar'
-    | 'distant-wood' | 'distant-stone' | 'distant-metal' | 'distant-creak' | 'distant-chain' | 'distant-leak' | TowerCue;
-export interface AftermathContact { x:number; y?:number; born:number; strength:number; kind:'scrape'|'break'|'step'; material?:'timber'|'stone'|'iron' }
+    | 'distant-wood' | 'distant-stone' | 'distant-metal' | 'distant-creak' | 'distant-chain' | 'distant-leak' | 'distant-snort' | 'distant-grit' | TowerCue;
+export interface AftermathContact { x:number; y?:number; born:number; landingAt?:number; strength:number; kind:'scrape'|'break'|'step'; material?:'timber'|'stone'|'iron' }
 interface AmbientShot extends GunTrace {targetX:number;targetY:number;remaining:number;prop:number}
 export interface AftermathYard {
     damage: number; shiftedAt:number; brokenAt:number; birdsAt:number; runnerAt:number;
@@ -43,6 +45,8 @@ export class HypotheticalAftermath {
     action:AftermathAction='ram'; actionCount=0; variant=0; targetProp=-1;
     targetX=0;targetY=0; muzzle=0;heat=0;
     shots:AmbientShot[]=[];impacts:GunImpact[]=[];
+    reaction:YardIncident|null=null;motivation:YardIncident|null=null;
+    exhales:Array<{x:number;y:number;facing:number;born:number}>=[];
     readonly tower=new HypotheticalTower();
     casings:Array<{x:number;y:number;born:number;direction:number}>=[];
     readonly yards:AftermathYard[] = AFTERMATH_YARDS.map((yard, district) => ({
@@ -79,6 +83,7 @@ export class HypotheticalAftermath {
     private noticeX=0;
     private noticeTicks=40;
     private recoverTicks=32;
+    private reply:YardIncident|null=null;
 
     get yard(){ return this.yards[this.district]; }
     get origin(){ return AFTERMATH_YARDS[this.district]?.origin ?? 0; }
@@ -126,7 +131,11 @@ export class HypotheticalAftermath {
         }
     }
     private contact(kind:AftermathContact['kind'],x:number,strength:number,y?:number,material?:AftermathContact['material']){
-        this.contacts.push({kind,x,strength,born:this.tick,y,material});
+        const contact:AftermathContact={kind,x,strength,born:this.tick,
+            y:y??(kind==='step'?-2:this.district===3&&kind==='break'?-4:-17),
+            material:material??(this.district===2?'iron':this.district===3?'stone':'timber')};
+        if(kind!=='step')contact.landingAt=this.tick+fragmentLanding(contact);
+        this.contacts.push(contact);
         if(kind!=='step')this.events.push(material==='iron'?'distant-metal':material==='timber'?'distant-wood'
             :material==='stone'?'distant-stone':kind==='break'?'distant-thud':'distant-debris');
     }
@@ -154,11 +163,12 @@ export class HypotheticalAftermath {
         // The landmark and its discovery are the opening of this yard's
         // secondary score, never a lottery after other activities finish.
         if(this.planTower())return;
-        const invitation=this.yard.environment.invitation;
-        if(invitation&&this.tick-this.lastNoticed>480&&this.inView(this.origin+AFTERMATH_PROPS[invitation.prop].offset,36)){
+        const invitation=this.yard.environment.invitationFor(prop=>this.inView(this.origin+AFTERMATH_PROPS[prop].offset,36));
+        if(invitation&&this.tick-this.lastNoticed>480){
             invitation.noticed=true;this.lastNoticed=this.tick;
+            this.reaction={...invitation};this.reply={...invitation};
             this.noticeX=this.origin+AFTERMATH_PROPS[invitation.prop].offset;
-            this.noticeTicks=34+Math.floor(this.repertoire.random()*17);
+            this.noticeTicks=reactionDuration(invitation.kind)+invitation.variant%3*3;
             this.orient(Math.sign(this.noticeX-this.x)||this.facing,'notice');return;
         }
         this.roamThen='perform';
@@ -167,17 +177,22 @@ export class HypotheticalAftermath {
         const prompted=this.yard.props.map((p,i)=>({p,i})).filter(({p,i})=>p.cueAt>=0&&this.tick-p.cueAt<360
             &&this.tick-p.handledAt>540&&this.inView(this.origin+AFTERMATH_PROPS[i].offset,40))
             .sort((a,b)=>b.p.cueAt-a.p.cueAt)[0];
-        const candidates=this.repertoire.order(this.district,this.recent,this.performances,this.lastPerformed,
+        const scored=this.repertoire.order(this.district,this.recent,this.performances,this.lastPerformed,
             prompted?handlingForMaterial(AFTERMATH_PROPS[prompted.i].material):undefined);
+        const reply=this.reply&&this.tick-this.reply.born<600&&this.inView(this.origin+AFTERMATH_PROPS[this.reply.prop].offset,32)?this.reply:null;
+        const responses=reply?reactionReplies(reply.kind).filter(action=>!this.recent.slice(-2).includes(action)):[];
+        const candidates=[...responses.map(action=>({action,prop:reply!.prop})),...scored.map(action=>({action,prop:-1}))];
         this.variant=Math.floor(this.repertoire.random()*24);this.actionCount++;this.cycle=Math.floor(this.actionCount/3);
         const lo=Math.max(this.origin+66,this.viewX+64),hi=Math.min(this.origin+372,this.viewX+256);
         let target:{i:number;facing:number;x:number}|undefined;
-        for(const action of candidates){
+        this.motivation=null;
+        for(const candidate of candidates){
+            const action=candidate.action;
             const options=AFTERMATH_PROPS.flatMap((p,i)=>[-1,1].map(facing=>{
                 const s=this.yard.props[i],offset=isHandling(action)?s.piece?.x??0:0;
                 const ideal=this.origin+p.offset+offset-facing*aftermathReach(action);
                 return {i,facing,x:action==='fire'?Math.max(lo,Math.min(hi,ideal)):ideal};
-            })).filter(p=>p.x>=lo&&p.x<=hi&&this.inView(this.origin+AFTERMATH_PROPS[p.i].offset,26)
+            })).filter(p=>(candidate.prop<0||p.i===candidate.prop)&&p.x>=lo&&p.x<=hi&&this.inView(this.origin+AFTERMATH_PROPS[p.i].offset,26)
                 &&(!isHandling(action)||handlesMaterial(action,AFTERMATH_PROPS[p.i].material)
                     &&!this.yard.props[p.i].piece?.moving&&this.yard.props[p.i].hinge<.03
                     &&this.inView(p.x+p.facing*aftermathReach(action),32))
@@ -189,8 +204,9 @@ export class HypotheticalAftermath {
                 +(isHandling(action)?Math.max(0,(this.yard.props[a.i].piece?.x??0)*a.facing)*2
                     -Math.max(0,(this.yard.props[b.i].piece?.x??0)*b.facing)*2:0)
                 +(a.i===this.targetProp?55:0)-(b.i===this.targetProp?55:0));
-            if(options.length){this.action=action;target=options[0];break;}
+            if(options.length){this.action=action;target=options[0];this.motivation=candidate.prop>=0?reply:null;break;}
         }
+        this.reply=null;
         this.targetProp=target?.i??-1;
         if(!target)this.action='bellow';
         this.targetX=target?this.origin+AFTERMATH_PROPS[target.i].offset:this.x;
@@ -335,6 +351,13 @@ export class HypotheticalAftermath {
             if(framed)this.events.push(...search.events);
             if(search.done)this.enter('recover');
         }else if(this.phase==='notice'){
+            if(this.reaction?.kind==='leak'&&[34,39,44].includes(this.age)){
+                const mouth=this.jawAnchor;
+                if(this.inView(mouth.x,12)){
+                    this.exhales.push({...mouth,facing:this.facing,born:this.tick});
+                    if(this.age===34)this.events.push('distant-snort');
+                }
+            }
             if(this.age>=this.duration)this.plan();
         }else if(this.phase==='perform'){
             const timing=aftermathActionTiming(this.action,this.variant),a=this.age;
@@ -383,11 +406,14 @@ export class HypotheticalAftermath {
         this.casings=this.casings.filter(p=>this.tick-p.born<150).slice(-18);
         this.impacts=this.impacts.filter(p=>this.tick-p.born<100).slice(-24);
         this.contacts=this.contacts.filter(p=>this.tick-p.born<88);
+        if(this.contacts.some(p=>p.strength>=.35&&p.landingAt===this.tick&&this.inView(p.x)))this.events.push('distant-grit');
+        this.exhales=this.exhales.filter(p=>this.tick-p.born<28).slice(-6);
         const regular=this.active&&this.district===scenicDistrict(storyTick)
             &&(this.district!==3||this.tower.search.done)&&!['tower','tower-await','tower-search'].includes(this.phase);
         const timing=aftermathActionTiming(this.action,this.variant);
         const closeToImpact=this.phase==='perform'&&[...timing.beats,...timing.shots].some(t=>Math.abs(t-this.age)<20);
-        const reserved=this.phase==='perform'||isHandling(this.action)&&this.roamThen==='perform'&&['roam','orient'].includes(this.phase)
+        const noticing=this.phase==='notice'||this.phase==='orient'&&this.orientThen==='notice';
+        const reserved=noticing?this.reaction?.prop??-1:this.phase==='perform'||isHandling(this.action)&&this.roamThen==='perform'&&['roam','orient'].includes(this.phase)
             ?this.targetProp:-1;
         for(const [district,yard] of this.yards.entries()){
             const event=yard.environment.update(this.tick,yard.props,regular&&district===this.district&&!closeToImpact,
@@ -430,6 +456,7 @@ export class HypotheticalAftermath {
             this.active=false; this.district=district; this.cycle=0; this.contacts=[];
             this.shots=[];this.impacts=[];this.casings=[];this.muzzle=0;this.heat=0;
             this.actionCount=0;this.recent=[];this.performances=0;this.lastPerformed={};
+            this.reaction=null;this.motivation=null;this.reply=null;this.exhales=[];
             this.lastNoticed=-1000;this.repertoire.reset(((district+1)*0x9e3779b9)^this.tick^(Math.round(playerX)*257));
         }
         const center=yard.origin+272;
@@ -523,7 +550,10 @@ export class HypotheticalAftermath {
         const strike=phase==='flush'?pulse(a-32,26,30,62):0;
         const turn=phase==='turn-out'||phase==='turn-back';
         const survey=phase==='survey'||phase==='listen'||phase==='watch';
-        const notice=phase==='notice'?pulse(a,12,this.duration-15,this.duration):0;
+        const proximity=Math.max(0,1-Math.abs(this.noticeX-this.x)/110);
+        const reaction=phase==='notice'&&this.reaction?aftermathReaction(this.reaction.kind,a,this.duration,proximity):null;
+        const riderReaction=phase==='notice'&&this.reaction?aftermathReaction(this.reaction.kind,a-4,this.duration-4,proximity):null;
+        const notice=reaction?.attention??0;
         const cooling=phase==='recover'?pulse(a,10,this.duration-12,this.duration):0;
         const look=phase==='tower-await'?.25+Math.sin(this.tick/48)*.12:survey?pulse(a,24,this.duration-30,this.duration):0;
         const breath=reduced?0:Math.sin(this.tick/19)*.5;
@@ -552,19 +582,19 @@ export class HypotheticalAftermath {
         const h=handling?handlingMotion(handling,a,this.variant):null;
         const riderHandling=handling?handlingMotion(handling,a-5,this.variant):null;
         const effort=h?.effort??0,heave=h?.raise??0,inspection=h?.inspect??0,shake=h?.shake??0;
-        const compression=probe*2+(stamp?landing*7:strike*5)+ram*4+rakeBeat*2+crush*8+effort*3
+        const compression=probe*2+(stamp?landing*7:strike*5)+ram*4+rakeBeat*2+crush*8+effort*3+(reaction?.flinch??0)*1.8
             +(turn||orienting?Math.sin(Math.PI*turnProgress)*2:0);
         const riderDrop=probe*3+strike*5+lift*5+ram*5+rise*5+crush*4+(riderHandling?.effort??0)*4-(riderHandling?.raise??0)*2
-            +(riderHandling?.shake??0)*3;
+            +(riderHandling?.shake??0)*3+(riderReaction?.flinch??0)*1.8;
         const bodyLift=-lift*7-rise*9;
         const riderLean=probe*3-strike*4-steam*5-ram*4-rakeBeat*2-tailStrike*4+roar*2
             -(riderHandling?.effort??0)*3+(riderHandling?.raise??0)*4-(riderHandling?.toss??0)*4
-            -(riderHandling?.shake??0)*5+notice*2;
+            -(riderHandling?.shake??0)*5+(riderReaction?.lean??0);
         const bow=search*.52+probe*.48-cargo*.22+(stamp?0:strike*.34)-steam*.1+sniff*.2+ram*.55+rake*.5+crush*.22-roar*.15
-            +(h?h.reach*.48-heave*.27+effort*.08+inspection*.08:0)+notice*.16;
-        const jaw=h?h.jaw:.12+probe*.24+flush*.62*(1-smoothMotion((a-54)/8))+ram*.25+rake*.28+roar*.8;
+            +(h?h.reach*.48-heave*.27+effort*.08+inspection*.08:0)+(reaction?.bow??0);
+        const jaw=h?h.jaw:.12+probe*.24+flush*.62*(1-smoothMotion((a-54)/8))+ram*.25+rake*.28+roar*.8+(reaction?.jaw??0);
         let neckDrop=search*(14+(reduced?0:Math.sin(a/9)*2))+probe*10-cargo*10+(stamp?landing*5:strike*10)-steam*8+sniff*5
-            +ram*13+rake*14+rakeBeat*3+crush*6-roar*10+notice*(3+Math.sin(a*.24)*1.2);
+            +ram*13+rake*14+rakeBeat*3+crush*6-roar*10+(reaction?.neckDrop??0);
         const contact=ram?(breach?pulse(a-26,26,32,54):pulse(a-22,26,54,88)):rake?Math.min(1,rakeBeat):0;
         if(contact){
             const aligned=(this.targetY-bodyLift)/AFTERMATH_SCALE+59-bow*25-breath-compression-10-jaw*6;
@@ -591,16 +621,16 @@ export class HypotheticalAftermath {
             bow,
             lift:bodyLift, breath, compression,
             neckDrop,jaw,
-            tail:search*-.09+strike*.12-tailWind*.35+tailStrike*.95-heave*.18+effort*.08-shake*.12+(reduced?0:Math.sin(this.tick/29)*.025+tailCheck*.12),
-            tuck, brace:Math.max(probe*.35,(stamp?landing*.6:strike*.6),ram*.65,crush*.7,firing*.5,effort*.8,heave*.6,turn||orienting?.42:0),
+            tail:search*-.09+strike*.12-tailWind*.35+tailStrike*.95-heave*.18+effort*.08-shake*.12+(reaction?.tail??0)+(reduced?0:Math.sin(this.tick/29)*.025+tailCheck*.12),
+            tuck, brace:Math.max(probe*.35,(stamp?landing*.6:strike*.6),ram*.65,crush*.7,firing*.5,effort*.8,heave*.6,reaction?.brace??0,turn||orienting?.42:0),
             riderDrop, riderLean,
-            rein:Math.max(probe,flush,this.stride*.6,ram,rake,crush,roar,effort,heave*.8,Math.abs(shake)),
-            lookBack:firing?0:look*(this.cycle%2?.8:.55)+inspection*.3+notice*.25+cooling*.16,
-            aim:look*.3-.12+(gunAngle+.12)*firing+(h?.reach??0)*.35+notice*.22,
+            rein:Math.max(probe,flush,this.stride*.6,ram,rake,crush,roar,effort,heave*.8,Math.abs(shake),riderReaction?.brace??0),
+            lookBack:firing?0:look*(this.cycle%2?.8:.55)+inspection*.3+cooling*.16,
+            aim:look*.3-.12+(gunAngle+.12)*firing+(h?.reach??0)*.35+(riderReaction?.inspect??0)*.22,
             recoil,heat:this.heat,
             reload:phase==='watch'||phase==='recover'&&aftermathFamily(this.action)==='gun'?Math.sin(Math.PI*a/this.duration)*.65:0,
-            focus:Math.max(search,probe,flush,ram,rake,firing,roar,h?.reach??0,notice), eyeClose:Math.max(search*.35,steam*.8,crush*.65,effort*.35),
-            blink:this.tick%197<5, voice:Math.max(phase==='flush'?pulse(a-60,4,12,30)*.28:0,roar*.65),
+            focus:Math.max(search,probe,flush,ram,rake,firing,roar,h?.reach??0,notice), eyeClose:Math.max(search*.35,steam*.8,crush*.65,effort*.35,reaction?.eyeClose??0),
+            blink:this.tick%197<5, voice:Math.max(phase==='flush'?pulse(a-60,4,12,30)*.28:0,roar*.65,(reaction?.exhale??0)*.16),
             cloth:reduced?0:this.stride*2+strike*2+ram*3+tailStrike*2+roar+(h?.toss??0)*3+Math.abs(shake)*2,
         };
         if(this.phase==='tower')return {...pose,...this.tower.body,stride:0,rein:0,recoil:0,aim:-.12,

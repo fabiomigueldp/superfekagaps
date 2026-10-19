@@ -8,6 +8,7 @@ import {drawGunTracer,drawGunImpact} from './HypotheticalGunfire';
 import {shutterHandle} from './HypotheticalAftermathHandling';
 import {drawDebrisPiece} from './HypotheticalDebrisArt';
 import {drawAftermathFittings,drawAftermathIncidents} from './HypotheticalAftermathEnvironmentArt';
+import {drawAftermathContact} from './HypotheticalAftermathParticles';
 
 // Rear-street colours stay below the contrast of guards, bullets and playable ledges.
 const P={ink:'#516d70',dark:'#657c73',stone:'#92a18c',edge:'#c1b99a',wood:'#9e9475',grain:'#7d826d',
@@ -281,33 +282,12 @@ export function drawAftermathEffects(c:CanvasRenderingContext2D,a:HypotheticalAf
     if(!a.active)return;
     for(const shot of a.shots)drawGunTracer(c,shot,0,base,reduced,true);
     for(const hit of a.impacts)drawGunImpact(c,hit,a.tick,0,base,reduced,true);
-    for(const p of a.contacts){
-        const age=a.tick-p.born,step=p.kind==='step',end=step?26:72;
-        if(reduced&&step)continue;
-        if(age>=end)continue;
-        const fade=1-age/end,grow=Math.min(1,(age+1)/6),n=step?3:reduced?3:6;
-        if(!step&&age<8){
-            const impactY=base+(p.y??-(a.district===3&&p.kind==='break'?4:17));
-            for(let j=0;j<4;j++){
-                const angle=-Math.PI*.88+j*.7,r=4+age*1.2;
-                pixelLine(c,p.x+Math.cos(angle)*r,impactY+Math.sin(angle)*r*.45,
-                    p.x+Math.cos(angle)*(r+3),impactY+Math.sin(angle)*(r+3)*.45,P.edge);
-            }
-        }
-        if(!step&&!reduced&&p.material&&age<38){
-            // Small fragments leave the actual contact, settle, and expire.
-            for(let j=0;j<5;j++){
-                const dx=(j-2)*.55,xx=p.x+dx*age,yy=base+(p.y??-12)-age*(.8+j%2*.4)+age*age*.035;
-                if(yy>base-2)continue;
-                pixelLine(c,xx,yy,xx+2+(p.material==='timber'?2:0),yy+j%2,
-                    p.material==='iron'?P.shine:p.material==='stone'?P.stone:P.wood,2);
-            }
-        }
-        for(let j=0;j<n;j++){
-            const dir=j%2?1:-1,xx=p.x+dir*(3+j*4+age*.27),yy=base-5-Math.min(age,30)*.11-j%2*2;
-            const w=(step?4:9)*fade*grow*p.strength+2;
-            box(c,xx,yy,w,step?1:3,P.dust);
-            if(!step){box(c,xx+1,yy-2,Math.max(1,w-3),2,P.shine);box(c,xx+1,yy+3,w-2,1,P.stone);}
-        }
+    for(const p of a.contacts)drawAftermathContact(c,p,a.tick,base,reduced);
+    if(!reduced)for(const p of a.exhales){
+        const age=a.tick-p.born;if(age<0||age>=28)continue;
+        const x=p.x+p.facing*(2+age*.38),y=base+p.y-age*.09;
+        const size=Math.max(1,3-age/12);
+        box(c,x,y,size,1,P.shine);
+        if(age>5&&age<20)box(c,x-p.facing*2,y-2,2,1,P.dust);
     }
 }

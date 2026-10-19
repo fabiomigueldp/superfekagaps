@@ -2,6 +2,29 @@
 
 Revisão de 19/10/2026, integrada ao encontro nativo `/?encounter=hipotetico`.
 
+## Refinamento 6: reação, intenção e contato
+
+O gesto genérico de atenção foi substituído por quatro respostas. Cabeça, mandíbula, cauda e apoio do corpo participam da reação; o cavaleiro responde quatro passos depois, e ambos voltam ao repouso antes da caminhada seguinte.
+
+| Origem | Reação | Duração, em passos nativos | Possíveis respostas no mesmo objeto |
+| --- | --- | --- | --- |
+| Madeira | Abaixar a cabeça e farejar duas vezes | 64–70 | Sacudir, erguer ou investir |
+| Pedra | Inspeção mais baixa, voltada ao piso | 68–74 | Afastar, remexer ou pisar |
+| Corrente / chapa | Recuo curto e apoio do corpo | 58–64 | Forçar, investir com rajada ou golpear com a cauda |
+| Vazamento | Recuo, fechamento breve dos olhos e sopro | 78–84 | Forçar, investir com rajada ou atirar na estrutura |
+
+As respostas evitam as duas ações recentes e dependem de alcance, enquadramento e estado da peça. Quando não há resposta adequada, o diretor retorna ao repertório geral. Um evento fora do enquadramento deixa de esconder outro ruído visível. A reação reserva seu objeto para evitar que um novo evento o mova durante a observação.
+
+O sopro usa a posição real da boca nos passos 34, 39 e 44. Seu som ocorre uma vez. Fragmentos passam a ter origem no contato, trajetórias determinísticas, gravidade e ressalto próprios por material, atrito e acomodação. Poeira no piso e o novo som discreto de resíduos acompanham a primeira queda. Os fragmentos pequenos expiram entre 76 e 88 passos; as peças grandes continuam persistentes. O vento e os estalos não recomeçam uma demolição já concluída.
+
+`material-responses.mp4` contém quatro trechos selecionados, totalizando 24,03 segundos a 30 fps. O registro `material-study.json` documenta estalo seguido de erguer uma viga, acomodação seguida de busca na pedra, corrente seguida de investida e rajada, e vazamento seguido de manipulação da chapa. As sequências usam o diretor e renderizador nativos, com posições dirigidas de Feka, sem áudio e sem combate em primeiro plano. São material de autoria, não testes ou uma avaliação de jogabilidade.
+
+```powershell
+node --import tsx scripts/render_hypothetical_material_responses.ts .tmp/aftermath-responses-6 C:/Users/fabio/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/@napi-rs/canvas/index.js
+```
+
+O argumento `--stills` produz somente as 16 poses e a prancha. O vídeo anterior de 120 segundos permanece disponível para comparação do repertório.
+
 ## O que mudou nesta rodada
 
 O repertório passa de nove para **onze performances**. A ordem fixa foi substituída por uma seleção ponderada, com semente na entrada da rua. As duas ações anteriores são evitadas; as que ficaram muito tempo sem aparecer ganham prioridade quando há um alvo acessível. Cada pátio tem preferências próprias. Depois de duas passagens mais ruidosas, as investigações recebem mais peso.
@@ -35,7 +58,7 @@ Cinco tipos de evento pequeno complementam as ações: **estalos de madeira, aco
 - Pedra solta usa a física existente. Uma peça presa na boca ou uma chapa sendo manipulada fica protegida desses eventos.
 - Correntes têm fixação, elos e oscilação amortecida. Panos dobram a partir da amarração; folhas e poeira passam perto do piso.
 - Cais e Arsenal têm juntas de tubulação visíveis, gotas, pequenos respingos e marcas de umidade. O Arsenal acrescenta um sopro de vapor.
-- Um ruído pode levar o dinossauro a virar e observar por 34–50 passos antes de escolher a próxima ação. Há intervalo entre essas reações.
+- Um ruído pode levar o dinossauro a virar e reagir por 58–84 passos antes de uma resposta no mesmo objeto. Há intervalo entre essas reações.
 - Aves bicam no pouso, fogem de impactos fortes e retornam com intervalos variados.
 - Estalos, correntes e vazamentos têm sons breves próprios no barramento existente de efeitos, com o mesmo limite de vozes.
 

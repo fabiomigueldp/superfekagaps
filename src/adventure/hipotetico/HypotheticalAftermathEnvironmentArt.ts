@@ -2,6 +2,7 @@ import {box,oval,pixelLine,polygon} from '../WorldPainting';
 import {smoothMotion} from './HypotheticalMotion';
 import {AFTERMATH_PROPS} from './HypotheticalAftermathScore';
 import type {AftermathEnvironment,YardIncident} from './HypotheticalAftermathEnvironment';
+import {drawAftermathContact} from './HypotheticalAftermathParticles';
 
 const P={ink:'#526f72',dark:'#6b8279',metal:'#80968c',light:'#b5b69b',wood:'#a49c7e',rust:'#958a72',dust:'#a9b39c',water:'#86a99e'};
 const swell=(a:number,start:number,end:number)=>a<0||a>end?0:Math.sin(Math.PI*Math.min(1,a/(end-start)));
@@ -58,12 +59,9 @@ export function drawAftermathFittings(c:CanvasRenderingContext2D,origin:number,b
 }
 
 function grit(c:CanvasRenderingContext2D,x:number,base:number,age:number,e:YardIncident,reduced:boolean){
-    for(let j=0;j<(reduced?2:5);j++){
-        const t=age-j*5;if(t<0||t>58)continue;
-        const dir=(j%2?1:-1),xx=x+dir*(j*2+t*.24),yy=base-3-Math.max(0,t*.65-t*t*.023);
-        box(c,xx,yy,j%2+1,1,e.kind==='creak'?P.wood:P.metal);
-        if(t<34&&!reduced)box(c,xx-dir*3,base-5-t*.08,3,1,P.dust);
-    }
+    const material=e.kind==='creak'?'timber':e.kind==='rattle'?'iron':'stone';
+    drawAftermathContact(c,{x:x+(e.kind==='rattle'?17:0),y:e.kind==='rattle'?-22:AFTERMATH_PROPS[e.prop].top,
+        born:e.born,strength:.2+e.strength*.24,kind:'scrape',material},e.born+age,base,reduced);
 }
 
 /** Events are short and localized, with slower debris and cloth following
@@ -94,8 +92,6 @@ export function drawAftermathIncidents(c:CanvasRenderingContext2D,origin:number,
                 const xx=sourceX+t*.16,yy=sourceY-t*.24;
                 box(c,xx,yy,Math.max(1,5-t/15),2,P.dust);box(c,xx+1,yy-1,2,1,P.metal);
             }
-        }else if(event.kind==='rattle'){
-            if(age<52)grit(c,x,base,age,event,reduced);
-        }else grit(c,x,base,age,event,reduced);
+        }else if(age<88)grit(c,x,base,age,event,reduced);
     }
 }
