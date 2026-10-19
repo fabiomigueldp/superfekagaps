@@ -1,0 +1,1482 @@
+{
+  "kind": "authored native renderer study",
+  "gameplayTest": false,
+  "frames": 720,
+  "fps": 20,
+  "seconds": 36,
+  "heldPlayers": true,
+  "captures": [
+    {
+      "file": "portaria-farejar.png",
+      "step": 157,
+      "story": 791,
+      "phase": "search",
+      "age": 76,
+      "cycle": 0
+    },
+    {
+      "file": "cais-farejar.png",
+      "step": 157,
+      "story": 1199,
+      "phase": "search",
+      "age": 76,
+      "cycle": 0
+    },
+    {
+      "file": "arsenal-farejar.png",
+      "step": 157,
+      "story": 1599,
+      "phase": "search",
+      "age": 76,
+      "cycle": 0
+    },
+    {
+      "file": "bastiao-farejar.png",
+      "step": 157,
+      "story": 2000,
+      "phase": "search",
+      "age": 76,
+      "cycle": 0
+    },
+    {
+      "file": "portaria-investigar.png",
+      "step": 265,
+      "story": 799,
+      "phase": "rummage",
+      "age": 58,
+      "cycle": 0
+    },
+    {
+      "file": "arsenal-investigar.png",
+      "step": 265,
+      "story": 1599,
+      "phase": "rummage",
+      "age": 58,
+      "cycle": 0
+    },
+    {
+      "file": "cais-investigar.png",
+      "step": 283,
+      "story": 1199,
+      "phase": "rummage",
+      "age": 58,
+      "cycle": 0
+    },
+    {
+      "file": "bastiao-investigar.png",
+      "step": 283,
+      "story": 2000,
+      "phase": "rummage",
+      "age": 58,
+      "cycle": 0
+    },
+    {
+      "file": "portaria-reagir.png",
+      "step": 467,
+      "story": 799,
+      "phase": "flush",
+      "age": 68,
+      "cycle": 0
+    },
+    {
+      "file": "arsenal-reagir.png",
+      "step": 467,
+      "story": 1599,
+      "phase": "flush",
+      "age": 68,
+      "cycle": 0
+    },
+    {
+      "file": "cais-reagir.png",
+      "step": 485,
+      "story": 1199,
+      "phase": "flush",
+      "age": 68,
+      "cycle": 0
+    },
+    {
+      "file": "bastiao-reagir.png",
+      "step": 485,
+      "story": 2000,
+      "phase": "flush",
+      "age": 68,
+      "cycle": 0
+    },
+    {
+      "file": "portaria-virar.png",
+      "step": 621,
+      "story": 799,
+      "phase": "turn-out",
+      "age": 22,
+      "cycle": 0
+    },
+    {
+      "file": "arsenal-virar.png",
+      "step": 621,
+      "story": 1599,
+      "phase": "turn-out",
+      "age": 22,
+      "cycle": 0
+    },
+    {
+      "file": "cais-virar.png",
+      "step": 639,
+      "story": 1199,
+      "phase": "turn-out",
+      "age": 22,
+      "cycle": 0
+    },
+    {
+      "file": "bastiao-virar.png",
+      "step": 639,
+      "story": 2000,
+      "phase": "turn-out",
+      "age": 22,
+      "cycle": 0
+    },
+    {
+      "file": "portaria-patrulhar.png",
+      "step": 703,
+      "story": 799,
+      "phase": "patrol",
+      "age": 60,
+      "cycle": 0
+    },
+    {
+      "file": "arsenal-patrulhar.png",
+      "step": 703,
+      "story": 1599,
+      "phase": "patrol",
+      "age": 60,
+      "cycle": 0
+    },
+    {
+      "file": "cais-patrulhar.png",
+      "step": 721,
+      "story": 1199,
+      "phase": "patrol",
+      "age": 60,
+      "cycle": 0
+    },
+    {
+      "file": "bastiao-patrulhar.png",
+      "step": 721,
+      "story": 2000,
+      "phase": "patrol",
+      "age": 60,
+      "cycle": 0
+    },
+    {
+      "file": "portaria-observar.png",
+      "step": 817,
+      "story": 799,
+      "phase": "survey",
+      "age": 50,
+      "cycle": 0
+    },
+    {
+      "file": "arsenal-observar.png",
+      "step": 817,
+      "story": 1599,
+      "phase": "survey",
+      "age": 50,
+      "cycle": 0
+    },
+    {
+      "file": "cais-observar.png",
+      "step": 835,
+      "story": 1199,
+      "phase": "survey",
+      "age": 50,
+      "cycle": 0
+    },
+    {
+      "file": "bastiao-observar.png",
+      "step": 835,
+      "story": 2000,
+      "phase": "survey",
+      "age": 50,
+      "cycle": 0
+    }
+  ],
+  "transitions": [
+    {
+      "scene": "portaria",
+      "step": 81,
+      "phase": "search",
+      "cycle": 0
+    },
+    {
+      "scene": "cais",
+      "step": 81,
+      "phase": "search",
+      "cycle": 0
+    },
+    {
+      "scene": "arsenal",
+      "step": 81,
+      "phase": "search",
+      "cycle": 0
+    },
+    {
+      "scene": "bastiao",
+      "step": 81,
+      "phase": "search",
+      "cycle": 0
+    },
+    {
+      "scene": "portaria",
+      "step": 207,
+      "phase": "rummage",
+      "cycle": 0
+    },
+    {
+      "scene": "arsenal",
+      "step": 207,
+      "phase": "rummage",
+      "cycle": 0
+    },
+    {
+      "scene": "cais",
+      "step": 225,
+      "phase": "rummage",
+      "cycle": 0
+    },
+    {
+      "scene": "bastiao",
+      "step": 225,
+      "phase": "rummage",
+      "cycle": 0
+    },
+    {
+      "scene": "portaria",
+      "step": 315,
+      "phase": "listen",
+      "cycle": 0
+    },
+    {
+      "scene": "arsenal",
+      "step": 315,
+      "phase": "listen",
+      "cycle": 0
+    },
+    {
+      "scene": "cais",
+      "step": 333,
+      "phase": "listen",
+      "cycle": 0
+    },
+    {
+      "scene": "bastiao",
+      "step": 333,
+      "phase": "listen",
+      "cycle": 0
+    },
+    {
+      "scene": "portaria",
+      "step": 399,
+      "phase": "flush",
+      "cycle": 0
+    },
+    {
+      "scene": "arsenal",
+      "step": 399,
+      "phase": "flush",
+      "cycle": 0
+    },
+    {
+      "scene": "cais",
+      "step": 417,
+      "phase": "flush",
+      "cycle": 0
+    },
+    {
+      "scene": "bastiao",
+      "step": 417,
+      "phase": "flush",
+      "cycle": 0
+    },
+    {
+      "scene": "portaria",
+      "step": 525,
+      "phase": "watch",
+      "cycle": 0
+    },
+    {
+      "scene": "arsenal",
+      "step": 525,
+      "phase": "watch",
+      "cycle": 0
+    },
+    {
+      "scene": "cais",
+      "step": 543,
+      "phase": "watch",
+      "cycle": 0
+    },
+    {
+      "scene": "bastiao",
+      "step": 543,
+      "phase": "watch",
+      "cycle": 0
+    },
+    {
+      "scene": "portaria",
+      "step": 599,
+      "phase": "turn-out",
+      "cycle": 0
+    },
+    {
+      "scene": "arsenal",
+      "step": 599,
+      "phase": "turn-out",
+      "cycle": 0
+    },
+    {
+      "scene": "cais",
+      "step": 617,
+      "phase": "turn-out",
+      "cycle": 0
+    },
+    {
+      "scene": "bastiao",
+      "step": 617,
+      "phase": "turn-out",
+      "cycle": 0
+    },
+    {
+      "scene": "portaria",
+      "step": 643,
+      "phase": "patrol",
+      "cycle": 0
+    },
+    {
+      "scene": "arsenal",
+      "step": 643,
+      "phase": "patrol",
+      "cycle": 0
+    },
+    {
+      "scene": "cais",
+      "step": 661,
+      "phase": "patrol",
+      "cycle": 0
+    },
+    {
+      "scene": "bastiao",
+      "step": 661,
+      "phase": "patrol",
+      "cycle": 0
+    },
+    {
+      "scene": "portaria",
+      "step": 767,
+      "phase": "survey",
+      "cycle": 0
+    },
+    {
+      "scene": "arsenal",
+      "step": 767,
+      "phase": "survey",
+      "cycle": 0
+    },
+    {
+      "scene": "cais",
+      "step": 785,
+      "phase": "survey",
+      "cycle": 0
+    },
+    {
+      "scene": "bastiao",
+      "step": 785,
+      "phase": "survey",
+      "cycle": 0
+    },
+    {
+      "scene": "portaria",
+      "step": 871,
+      "phase": "turn-back",
+      "cycle": 0
+    },
+    {
+      "scene": "arsenal",
+      "step": 871,
+      "phase": "turn-back",
+      "cycle": 0
+    },
+    {
+      "scene": "cais",
+      "step": 889,
+      "phase": "turn-back",
+      "cycle": 0
+    },
+    {
+      "scene": "bastiao",
+      "step": 889,
+      "phase": "turn-back",
+      "cycle": 0
+    },
+    {
+      "scene": "portaria",
+      "step": 915,
+      "phase": "return",
+      "cycle": 1
+    },
+    {
+      "scene": "arsenal",
+      "step": 915,
+      "phase": "return",
+      "cycle": 1
+    },
+    {
+      "scene": "cais",
+      "step": 933,
+      "phase": "return",
+      "cycle": 1
+    },
+    {
+      "scene": "bastiao",
+      "step": 933,
+      "phase": "return",
+      "cycle": 1
+    },
+    {
+      "scene": "portaria",
+      "step": 1039,
+      "phase": "search",
+      "cycle": 1
+    },
+    {
+      "scene": "arsenal",
+      "step": 1039,
+      "phase": "search",
+      "cycle": 1
+    },
+    {
+      "scene": "cais",
+      "step": 1057,
+      "phase": "search",
+      "cycle": 1
+    },
+    {
+      "scene": "bastiao",
+      "step": 1057,
+      "phase": "search",
+      "cycle": 1
+    },
+    {
+      "scene": "portaria",
+      "step": 1165,
+      "phase": "listen",
+      "cycle": 1
+    },
+    {
+      "scene": "arsenal",
+      "step": 1165,
+      "phase": "listen",
+      "cycle": 1
+    },
+    {
+      "scene": "cais",
+      "step": 1201,
+      "phase": "listen",
+      "cycle": 1
+    },
+    {
+      "scene": "bastiao",
+      "step": 1201,
+      "phase": "listen",
+      "cycle": 1
+    },
+    {
+      "scene": "portaria",
+      "step": 1249,
+      "phase": "watch",
+      "cycle": 1
+    },
+    {
+      "scene": "arsenal",
+      "step": 1249,
+      "phase": "watch",
+      "cycle": 1
+    },
+    {
+      "scene": "cais",
+      "step": 1285,
+      "phase": "watch",
+      "cycle": 1
+    },
+    {
+      "scene": "bastiao",
+      "step": 1285,
+      "phase": "watch",
+      "cycle": 1
+    },
+    {
+      "scene": "portaria",
+      "step": 1323,
+      "phase": "turn-out",
+      "cycle": 1
+    },
+    {
+      "scene": "arsenal",
+      "step": 1323,
+      "phase": "turn-out",
+      "cycle": 1
+    },
+    {
+      "scene": "cais",
+      "step": 1359,
+      "phase": "turn-out",
+      "cycle": 1
+    },
+    {
+      "scene": "bastiao",
+      "step": 1359,
+      "phase": "turn-out",
+      "cycle": 1
+    },
+    {
+      "scene": "portaria",
+      "step": 1367,
+      "phase": "patrol",
+      "cycle": 1
+    },
+    {
+      "scene": "arsenal",
+      "step": 1367,
+      "phase": "patrol",
+      "cycle": 1
+    },
+    {
+      "scene": "cais",
+      "step": 1403,
+      "phase": "patrol",
+      "cycle": 1
+    },
+    {
+      "scene": "bastiao",
+      "step": 1403,
+      "phase": "patrol",
+      "cycle": 1
+    },
+    {
+      "scene": "portaria",
+      "step": 1491,
+      "phase": "survey",
+      "cycle": 1
+    },
+    {
+      "scene": "arsenal",
+      "step": 1491,
+      "phase": "survey",
+      "cycle": 1
+    },
+    {
+      "scene": "cais",
+      "step": 1527,
+      "phase": "survey",
+      "cycle": 1
+    },
+    {
+      "scene": "bastiao",
+      "step": 1527,
+      "phase": "survey",
+      "cycle": 1
+    },
+    {
+      "scene": "portaria",
+      "step": 1614,
+      "phase": "turn-back",
+      "cycle": 1
+    },
+    {
+      "scene": "arsenal",
+      "step": 1614,
+      "phase": "turn-back",
+      "cycle": 1
+    },
+    {
+      "scene": "cais",
+      "step": 1650,
+      "phase": "turn-back",
+      "cycle": 1
+    },
+    {
+      "scene": "bastiao",
+      "step": 1650,
+      "phase": "turn-back",
+      "cycle": 1
+    },
+    {
+      "scene": "portaria",
+      "step": 1658,
+      "phase": "return",
+      "cycle": 2
+    },
+    {
+      "scene": "arsenal",
+      "step": 1658,
+      "phase": "return",
+      "cycle": 2
+    },
+    {
+      "scene": "cais",
+      "step": 1694,
+      "phase": "return",
+      "cycle": 2
+    },
+    {
+      "scene": "bastiao",
+      "step": 1694,
+      "phase": "return",
+      "cycle": 2
+    },
+    {
+      "scene": "portaria",
+      "step": 1782,
+      "phase": "search",
+      "cycle": 2
+    },
+    {
+      "scene": "arsenal",
+      "step": 1782,
+      "phase": "search",
+      "cycle": 2
+    },
+    {
+      "scene": "cais",
+      "step": 1818,
+      "phase": "search",
+      "cycle": 2
+    },
+    {
+      "scene": "bastiao",
+      "step": 1818,
+      "phase": "search",
+      "cycle": 2
+    },
+    {
+      "scene": "portaria",
+      "step": 1908,
+      "phase": "listen",
+      "cycle": 2
+    },
+    {
+      "scene": "arsenal",
+      "step": 1908,
+      "phase": "listen",
+      "cycle": 2
+    },
+    {
+      "scene": "cais",
+      "step": 1962,
+      "phase": "listen",
+      "cycle": 2
+    },
+    {
+      "scene": "bastiao",
+      "step": 1962,
+      "phase": "listen",
+      "cycle": 2
+    },
+    {
+      "scene": "portaria",
+      "step": 1992,
+      "phase": "turn-out",
+      "cycle": 2
+    },
+    {
+      "scene": "arsenal",
+      "step": 1992,
+      "phase": "turn-out",
+      "cycle": 2
+    },
+    {
+      "scene": "portaria",
+      "step": 2036,
+      "phase": "patrol",
+      "cycle": 2
+    },
+    {
+      "scene": "arsenal",
+      "step": 2036,
+      "phase": "patrol",
+      "cycle": 2
+    },
+    {
+      "scene": "cais",
+      "step": 2046,
+      "phase": "turn-out",
+      "cycle": 2
+    },
+    {
+      "scene": "bastiao",
+      "step": 2046,
+      "phase": "turn-out",
+      "cycle": 2
+    },
+    {
+      "scene": "cais",
+      "step": 2090,
+      "phase": "patrol",
+      "cycle": 2
+    },
+    {
+      "scene": "bastiao",
+      "step": 2090,
+      "phase": "patrol",
+      "cycle": 2
+    }
+  ],
+  "scenes": [
+    {
+      "name": "portaria",
+      "cameraX": 376,
+      "playerX": 508,
+      "samples": [
+        {
+          "step": 0,
+          "story": 634,
+          "ambient": 1,
+          "phase": "approach",
+          "age": 1,
+          "x": 453.2471413578999,
+          "cleared": 0,
+          "damage": 0
+        },
+        {
+          "step": 120,
+          "story": 754,
+          "ambient": 121,
+          "phase": "search",
+          "age": 39,
+          "x": 478,
+          "cleared": 0,
+          "damage": 0
+        },
+        {
+          "step": 240,
+          "story": 799,
+          "ambient": 241,
+          "phase": "rummage",
+          "age": 33,
+          "x": 487.49195668305936,
+          "cleared": 0,
+          "damage": 0
+        },
+        {
+          "step": 360,
+          "story": 799,
+          "ambient": 361,
+          "phase": "listen",
+          "age": 45,
+          "x": 478,
+          "cleared": 0,
+          "damage": 1
+        },
+        {
+          "step": 480,
+          "story": 799,
+          "ambient": 481,
+          "phase": "flush",
+          "age": 81,
+          "x": 494.82825484764544,
+          "cleared": 0,
+          "damage": 2
+        },
+        {
+          "step": 600,
+          "story": 799,
+          "ambient": 601,
+          "phase": "turn-out",
+          "age": 1,
+          "x": 478,
+          "cleared": 0,
+          "damage": 2
+        },
+        {
+          "step": 720,
+          "story": 799,
+          "ambient": 721,
+          "phase": "patrol",
+          "age": 77,
+          "x": 430.54620732771644,
+          "cleared": 0,
+          "damage": 2
+        },
+        {
+          "step": 840,
+          "story": 799,
+          "ambient": 841,
+          "phase": "survey",
+          "age": 73,
+          "x": 408,
+          "cleared": 0,
+          "damage": 2
+        },
+        {
+          "step": 960,
+          "story": 799,
+          "ambient": 961,
+          "phase": "return",
+          "age": 45,
+          "x": 428.9655915377127,
+          "cleared": 0,
+          "damage": 2
+        },
+        {
+          "step": 1080,
+          "story": 799,
+          "ambient": 1081,
+          "phase": "search",
+          "age": 41,
+          "x": 478,
+          "cleared": 0,
+          "damage": 2
+        },
+        {
+          "step": 1200,
+          "story": 799,
+          "ambient": 1201,
+          "phase": "listen",
+          "age": 35,
+          "x": 478,
+          "cleared": 0,
+          "damage": 2
+        },
+        {
+          "step": 1320,
+          "story": 799,
+          "ambient": 1321,
+          "phase": "watch",
+          "age": 71,
+          "x": 478,
+          "cleared": 0,
+          "damage": 2
+        },
+        {
+          "step": 1440,
+          "story": 799,
+          "ambient": 1441,
+          "phase": "patrol",
+          "age": 73,
+          "x": 451.4699300963378,
+          "cleared": 0,
+          "damage": 2
+        },
+        {
+          "step": 1560,
+          "story": 799,
+          "ambient": 1561,
+          "phase": "survey",
+          "age": 69,
+          "x": 436,
+          "cleared": 0,
+          "damage": 2
+        },
+        {
+          "step": 1680,
+          "story": 799,
+          "ambient": 1681,
+          "phase": "return",
+          "age": 22,
+          "x": 439.497062871337,
+          "cleared": 0,
+          "damage": 2
+        },
+        {
+          "step": 1800,
+          "story": 799,
+          "ambient": 1801,
+          "phase": "search",
+          "age": 18,
+          "x": 478,
+          "cleared": 0,
+          "damage": 2
+        },
+        {
+          "step": 1920,
+          "story": 799,
+          "ambient": 1921,
+          "phase": "listen",
+          "age": 12,
+          "x": 478,
+          "cleared": 0,
+          "damage": 2
+        },
+        {
+          "step": 2040,
+          "story": 799,
+          "ambient": 2041,
+          "phase": "patrol",
+          "age": 4,
+          "x": 477.7373032123796,
+          "cleared": 0,
+          "damage": 2
+        }
+      ]
+    },
+    {
+      "name": "cais",
+      "cameraX": 792,
+      "playerX": 924,
+      "samples": [
+        {
+          "step": 0,
+          "story": 1078,
+          "ambient": 1,
+          "phase": "approach",
+          "age": 1,
+          "x": 890.8813807112491,
+          "cleared": 1,
+          "damage": 0
+        },
+        {
+          "step": 120,
+          "story": 1198,
+          "ambient": 121,
+          "phase": "search",
+          "age": 39,
+          "x": 894,
+          "cleared": 1,
+          "damage": 0
+        },
+        {
+          "step": 240,
+          "story": 1199,
+          "ambient": 241,
+          "phase": "rummage",
+          "age": 15,
+          "x": 897.0818041178765,
+          "cleared": 1,
+          "damage": 0
+        },
+        {
+          "step": 360,
+          "story": 1199,
+          "ambient": 361,
+          "phase": "listen",
+          "age": 27,
+          "x": 894,
+          "cleared": 1,
+          "damage": 1
+        },
+        {
+          "step": 480,
+          "story": 1199,
+          "ambient": 481,
+          "phase": "flush",
+          "age": 63,
+          "x": 913,
+          "cleared": 1,
+          "damage": 2
+        },
+        {
+          "step": 600,
+          "story": 1199,
+          "ambient": 601,
+          "phase": "watch",
+          "age": 57,
+          "x": 894,
+          "cleared": 1,
+          "damage": 2
+        },
+        {
+          "step": 720,
+          "story": 1199,
+          "ambient": 721,
+          "phase": "patrol",
+          "age": 59,
+          "x": 861.5383400187976,
+          "cleared": 1,
+          "damage": 2
+        },
+        {
+          "step": 840,
+          "story": 1199,
+          "ambient": 841,
+          "phase": "survey",
+          "age": 55,
+          "x": 824,
+          "cleared": 1,
+          "damage": 2
+        },
+        {
+          "step": 960,
+          "story": 1199,
+          "ambient": 961,
+          "phase": "return",
+          "age": 27,
+          "x": 832.5111380114799,
+          "cleared": 1,
+          "damage": 2
+        },
+        {
+          "step": 1080,
+          "story": 1199,
+          "ambient": 1081,
+          "phase": "search",
+          "age": 23,
+          "x": 894,
+          "cleared": 1,
+          "damage": 2
+        },
+        {
+          "step": 1200,
+          "story": 1199,
+          "ambient": 1201,
+          "phase": "search",
+          "age": 143,
+          "x": 894,
+          "cleared": 1,
+          "damage": 2
+        },
+        {
+          "step": 1320,
+          "story": 1199,
+          "ambient": 1321,
+          "phase": "watch",
+          "age": 35,
+          "x": 894,
+          "cleared": 1,
+          "damage": 2
+        },
+        {
+          "step": 1440,
+          "story": 1199,
+          "ambient": 1441,
+          "phase": "patrol",
+          "age": 37,
+          "x": 885.0132233728307,
+          "cleared": 1,
+          "damage": 2
+        },
+        {
+          "step": 1560,
+          "story": 1199,
+          "ambient": 1561,
+          "phase": "survey",
+          "age": 33,
+          "x": 852,
+          "cleared": 1,
+          "damage": 2
+        },
+        {
+          "step": 1680,
+          "story": 1199,
+          "ambient": 1681,
+          "phase": "turn-back",
+          "age": 30,
+          "x": 852,
+          "cleared": 1,
+          "damage": 2
+        },
+        {
+          "step": 1800,
+          "story": 1199,
+          "ambient": 1801,
+          "phase": "return",
+          "age": 106,
+          "x": 891.6018931892182,
+          "cleared": 1,
+          "damage": 2
+        },
+        {
+          "step": 1920,
+          "story": 1199,
+          "ambient": 1921,
+          "phase": "search",
+          "age": 102,
+          "x": 894,
+          "cleared": 1,
+          "damage": 2
+        },
+        {
+          "step": 2040,
+          "story": 1199,
+          "ambient": 2041,
+          "phase": "listen",
+          "age": 78,
+          "x": 894,
+          "cleared": 1,
+          "damage": 2
+        }
+      ]
+    },
+    {
+      "name": "arsenal",
+      "cameraX": 1208,
+      "playerX": 1340,
+      "samples": [
+        {
+          "step": 0,
+          "story": 1478,
+          "ambient": 1,
+          "phase": "approach",
+          "age": 1,
+          "x": 1306.8813807112492,
+          "cleared": 2,
+          "damage": 0
+        },
+        {
+          "step": 120,
+          "story": 1598,
+          "ambient": 121,
+          "phase": "search",
+          "age": 39,
+          "x": 1310,
+          "cleared": 2,
+          "damage": 0
+        },
+        {
+          "step": 240,
+          "story": 1599,
+          "ambient": 241,
+          "phase": "rummage",
+          "age": 33,
+          "x": 1319.4919566830592,
+          "cleared": 2,
+          "damage": 0
+        },
+        {
+          "step": 360,
+          "story": 1599,
+          "ambient": 361,
+          "phase": "listen",
+          "age": 45,
+          "x": 1310,
+          "cleared": 2,
+          "damage": 1
+        },
+        {
+          "step": 480,
+          "story": 1599,
+          "ambient": 481,
+          "phase": "flush",
+          "age": 81,
+          "x": 1326.8282548476454,
+          "cleared": 2,
+          "damage": 2
+        },
+        {
+          "step": 600,
+          "story": 1599,
+          "ambient": 601,
+          "phase": "turn-out",
+          "age": 1,
+          "x": 1310,
+          "cleared": 2,
+          "damage": 2
+        },
+        {
+          "step": 720,
+          "story": 1599,
+          "ambient": 721,
+          "phase": "patrol",
+          "age": 77,
+          "x": 1262.5462073277165,
+          "cleared": 2,
+          "damage": 2
+        },
+        {
+          "step": 840,
+          "story": 1599,
+          "ambient": 841,
+          "phase": "survey",
+          "age": 73,
+          "x": 1240,
+          "cleared": 2,
+          "damage": 2
+        },
+        {
+          "step": 960,
+          "story": 1599,
+          "ambient": 961,
+          "phase": "return",
+          "age": 45,
+          "x": 1260.9655915377127,
+          "cleared": 2,
+          "damage": 2
+        },
+        {
+          "step": 1080,
+          "story": 1599,
+          "ambient": 1081,
+          "phase": "search",
+          "age": 41,
+          "x": 1310,
+          "cleared": 2,
+          "damage": 2
+        },
+        {
+          "step": 1200,
+          "story": 1599,
+          "ambient": 1201,
+          "phase": "listen",
+          "age": 35,
+          "x": 1310,
+          "cleared": 2,
+          "damage": 2
+        },
+        {
+          "step": 1320,
+          "story": 1599,
+          "ambient": 1321,
+          "phase": "watch",
+          "age": 71,
+          "x": 1310,
+          "cleared": 2,
+          "damage": 2
+        },
+        {
+          "step": 1440,
+          "story": 1599,
+          "ambient": 1441,
+          "phase": "patrol",
+          "age": 73,
+          "x": 1283.4699300963377,
+          "cleared": 2,
+          "damage": 2
+        },
+        {
+          "step": 1560,
+          "story": 1599,
+          "ambient": 1561,
+          "phase": "survey",
+          "age": 69,
+          "x": 1268,
+          "cleared": 2,
+          "damage": 2
+        },
+        {
+          "step": 1680,
+          "story": 1599,
+          "ambient": 1681,
+          "phase": "return",
+          "age": 22,
+          "x": 1271.497062871337,
+          "cleared": 2,
+          "damage": 2
+        },
+        {
+          "step": 1800,
+          "story": 1599,
+          "ambient": 1801,
+          "phase": "search",
+          "age": 18,
+          "x": 1310,
+          "cleared": 2,
+          "damage": 2
+        },
+        {
+          "step": 1920,
+          "story": 1599,
+          "ambient": 1921,
+          "phase": "listen",
+          "age": 12,
+          "x": 1310,
+          "cleared": 2,
+          "damage": 2
+        },
+        {
+          "step": 2040,
+          "story": 1599,
+          "ambient": 2041,
+          "phase": "patrol",
+          "age": 4,
+          "x": 1309.7373032123796,
+          "cleared": 2,
+          "damage": 2
+        }
+      ]
+    },
+    {
+      "name": "bastiao",
+      "cameraX": 1624,
+      "playerX": 1756,
+      "samples": [
+        {
+          "step": 0,
+          "story": 1878,
+          "ambient": 1,
+          "phase": "approach",
+          "age": 1,
+          "x": 1819.7527783984563,
+          "cleared": 3,
+          "damage": 0
+        },
+        {
+          "step": 120,
+          "story": 1998,
+          "ambient": 121,
+          "phase": "search",
+          "age": 39,
+          "x": 1726,
+          "cleared": 3,
+          "damage": 0
+        },
+        {
+          "step": 240,
+          "story": 2000,
+          "ambient": 241,
+          "phase": "rummage",
+          "age": 15,
+          "x": 1729.0818041178763,
+          "cleared": 3,
+          "damage": 0
+        },
+        {
+          "step": 360,
+          "story": 2000,
+          "ambient": 361,
+          "phase": "listen",
+          "age": 27,
+          "x": 1726,
+          "cleared": 3,
+          "damage": 1
+        },
+        {
+          "step": 480,
+          "story": 2000,
+          "ambient": 481,
+          "phase": "flush",
+          "age": 63,
+          "x": 1766,
+          "cleared": 3,
+          "damage": 2
+        },
+        {
+          "step": 600,
+          "story": 2000,
+          "ambient": 601,
+          "phase": "watch",
+          "age": 57,
+          "x": 1726,
+          "cleared": 3,
+          "damage": 2
+        },
+        {
+          "step": 720,
+          "story": 2000,
+          "ambient": 721,
+          "phase": "patrol",
+          "age": 59,
+          "x": 1693.5383400187977,
+          "cleared": 3,
+          "damage": 2
+        },
+        {
+          "step": 840,
+          "story": 2000,
+          "ambient": 841,
+          "phase": "survey",
+          "age": 55,
+          "x": 1656,
+          "cleared": 3,
+          "damage": 2
+        },
+        {
+          "step": 960,
+          "story": 2000,
+          "ambient": 961,
+          "phase": "return",
+          "age": 27,
+          "x": 1664.51113801148,
+          "cleared": 3,
+          "damage": 2
+        },
+        {
+          "step": 1080,
+          "story": 2000,
+          "ambient": 1081,
+          "phase": "search",
+          "age": 23,
+          "x": 1726,
+          "cleared": 3,
+          "damage": 2
+        },
+        {
+          "step": 1200,
+          "story": 2000,
+          "ambient": 1201,
+          "phase": "search",
+          "age": 143,
+          "x": 1726,
+          "cleared": 3,
+          "damage": 2
+        },
+        {
+          "step": 1320,
+          "story": 2000,
+          "ambient": 1321,
+          "phase": "watch",
+          "age": 35,
+          "x": 1726,
+          "cleared": 3,
+          "damage": 2
+        },
+        {
+          "step": 1440,
+          "story": 2000,
+          "ambient": 1441,
+          "phase": "patrol",
+          "age": 37,
+          "x": 1717.0132233728307,
+          "cleared": 3,
+          "damage": 2
+        },
+        {
+          "step": 1560,
+          "story": 2000,
+          "ambient": 1561,
+          "phase": "survey",
+          "age": 33,
+          "x": 1684,
+          "cleared": 3,
+          "damage": 2
+        },
+        {
+          "step": 1680,
+          "story": 2000,
+          "ambient": 1681,
+          "phase": "turn-back",
+          "age": 30,
+          "x": 1684,
+          "cleared": 3,
+          "damage": 2
+        },
+        {
+          "step": 1800,
+          "story": 2000,
+          "ambient": 1801,
+          "phase": "return",
+          "age": 106,
+          "x": 1723.6018931892181,
+          "cleared": 3,
+          "damage": 2
+        },
+        {
+          "step": 1920,
+          "story": 2000,
+          "ambient": 1921,
+          "phase": "search",
+          "age": 102,
+          "x": 1726,
+          "cleared": 3,
+          "damage": 2
+        },
+        {
+          "step": 2040,
+          "story": 2000,
+          "ambient": 2041,
+          "phase": "listen",
+          "age": 78,
+          "x": 1726,
+          "cleared": 3,
+          "damage": 2
+        }
+      ]
+    }
+  ]
+}
