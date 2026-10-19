@@ -1,0 +1,28 @@
+Technical documentation supplement for fed12cfb7ed4f8ad0cc549f02b95c76159e3ebbf
+
+polish(hipotetico): articulate scavenging motion and ground effects
+
+Align the optional forage head motion, planted stance and ground effects around one physical mouth contact.
+
+Implementation
+HypotheticalMotion.dinosaurHeadPoint() rotates the skull around native pivot (29, neck +6). DinosaurPose gains optional headPitch; zero pitch returns the original point. HypotheticalArt applies the transform to head pixels, jaw, bridle and reins; HypotheticalAftermath.jawAnchor uses the same transform for effects.
+
+AftermathForage exposes rootShift and adds asymmetric support/settling curves. HypotheticalAftermath moves the actor root and supplies opposite root compensation to aftermathFooting(), keeping the soles planted. Rider and tail use delayed motion samples; body() aligns the rotated mouth with the ground target.
+
+The first contact calls forage.contact() with the actual jaw x and records contactTick/contactX/landingTick. forageGrain() supplies the same ballistic first landing and rebound used for drawing and the grit sound timing, including staggered grain births.
+
+drawForageCover() fades the dense core by losing opacity, separates wisp births and retains bounded scuff marks. cancel(tick) records the cutoff: existing effects continue from their own contact clock while births after cancellation are suppressed. The cover still supplies the visibility mask.
+
+Timing and limitations
+The previous finite-resident and concealment rules remain. The patch changes motion/effect continuity rather than resident count or the condition that permits removal.
+
+Reduced motion retains the required low occlusion but omits decorative wisps/grains. The original author reports inspection of composed native frames, including reduced motion; this review does not repeat that visual inspection or infer a gameplay/audio test.
+
+Authoring material
+Refreshes scripts/render_hypothetical_forage.ts and adds forage-polish.mp4, forage-polish-study.json, six-pose board, contact/drift stills and poster. The new record describes 24 seconds at 60 fps across four yards.
+
+Publication evidence
+A retained successful publisher response identifies build `fed12cfb7ed4f8ad0cc549f02b95c76159e3ebbf-88cb51815e54` for this exact source revision. The matching request records command `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its saved build-log SHA-256 is `eab5087f5983ab023602160d09f154cde2d9edc5ab4a31d2d9c22223ce22d3fa`. This records build and activation completion; it is not evidence of correct gameplay, audio quality or passing tests.
+
+Full source map and patch inventory: docs/commits/2026-10-19-followup/fed12cf.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
