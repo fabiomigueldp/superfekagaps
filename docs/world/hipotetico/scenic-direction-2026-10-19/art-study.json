@@ -1,0 +1,145 @@
+{
+  "kind": "authored render study",
+  "gameplayTest": false,
+  "cameras": [
+    {
+      "scene": "cais",
+      "x": 704,
+      "sector": 672
+    },
+    {
+      "scene": "arsenal",
+      "x": 1120,
+      "sector": 1088
+    },
+    {
+      "scene": "bastiao",
+      "x": 1536,
+      "sector": 1504
+    }
+  ],
+  "frames": 161,
+  "fps": 30,
+  "captures": [
+    {
+      "file": "cais-preparar.png",
+      "scene": "cais",
+      "age": -12
+    },
+    {
+      "file": "arsenal-preparar.png",
+      "scene": "arsenal",
+      "age": -12
+    },
+    {
+      "file": "bastiao-preparar.png",
+      "scene": "bastiao",
+      "age": -12
+    },
+    {
+      "file": "cais-contato.png",
+      "scene": "cais",
+      "age": 0
+    },
+    {
+      "file": "arsenal-contato.png",
+      "scene": "arsenal",
+      "age": 0
+    },
+    {
+      "file": "bastiao-contato.png",
+      "scene": "bastiao",
+      "age": 0
+    },
+    {
+      "file": "cais-rachadura.png",
+      "scene": "cais",
+      "age": 8
+    },
+    {
+      "file": "arsenal-rachadura.png",
+      "scene": "arsenal",
+      "age": 8
+    },
+    {
+      "file": "bastiao-rachadura.png",
+      "scene": "bastiao",
+      "age": 8
+    },
+    {
+      "file": "cais-parede.png",
+      "scene": "cais",
+      "age": 20
+    },
+    {
+      "file": "arsenal-parede.png",
+      "scene": "arsenal",
+      "age": 20
+    },
+    {
+      "file": "bastiao-parede.png",
+      "scene": "bastiao",
+      "age": 20
+    },
+    {
+      "file": "cais-queda.png",
+      "scene": "cais",
+      "age": 32
+    },
+    {
+      "file": "arsenal-queda.png",
+      "scene": "arsenal",
+      "age": 32
+    },
+    {
+      "file": "bastiao-queda.png",
+      "scene": "bastiao",
+      "age": 32
+    },
+    {
+      "file": "cais-telhado.png",
+      "scene": "cais",
+      "age": 52
+    },
+    {
+      "file": "arsenal-telhado.png",
+      "scene": "arsenal",
+      "age": 52
+    },
+    {
+      "file": "bastiao-telhado.png",
+      "scene": "bastiao",
+      "age": 52
+    },
+    {
+      "file": "cais-poeira.png",
+      "scene": "cais",
+      "age": 82
+    },
+    {
+      "file": "arsenal-poeira.png",
+      "scene": "arsenal",
+      "age": 82
+    },
+    {
+      "file": "bastiao-poeira.png",
+      "scene": "bastiao",
+      "age": 82
+    },
+    {
+      "file": "cais-ruina.png",
+      "scene": "cais",
+      "age": 140
+    },
+    {
+      "file": "arsenal-ruina.png",
+      "scene": "arsenal",
+      "age": 140
+    },
+    {
+      "file": "bastiao-ruina.png",
+      "scene": "bastiao",
+      "age": 140
+    }
+  ]
+}

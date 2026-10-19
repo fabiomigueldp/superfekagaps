@@ -345,11 +345,17 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
                 pixelLine(c,x+146,base-91,x+222,base-105,'#b4b59a');
                 oval(c,x+218,base-107,7,7,'#647c72');oval(c,x+220,base-105,3,3,'#c0b99a');
                 const whip=reduced?0:scenicRecoil(damageAge,load.release,8,4,24);
-                pixelLine(c,x+222,base-100,x+222+(load.broken?whip:sway),base-(load.broken?80:63),'#657f76');
+                const ropeY=base-63-load.ropeLift;
+                pixelLine(c,x+222,base-100,x+222+(load.broken?whip:sway),ropeY,'#657f76');
                 if(!load.broken){
                     pixelLine(c,x+222+sway,base-63,x+207+sway,base-45,'#819886');
                     pixelLine(c,x+222+sway,base-63,x+238+sway,base-45,'#819886');
-                }else pixelLine(c,x+222+whip,base-80,x+220+whip*.6,base-73,'#a4af95');
+                }else{
+                    pixelLine(c,x+222+whip,ropeY,x+220+whip*.6,ropeY+7,'#a4af95');
+                    // The sling stays with the cargo while the severed upper rope recoils.
+                    pixelLine(c,x+222+sway,base-63+drop,x+207+sway,base-45+drop,'#81907b');
+                    pixelLine(c,x+222+sway,base-63+drop,x+238+sway,base-45+drop,'#81907b');
+                }
                 const loadX=x+sway,split=load.split;
                 box(c,loadX+206,base-45+drop,34,4,'#657d73');
                 for(let j=0;j<3;j++){
@@ -382,7 +388,11 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
                     if(dx<438){arch(c,x+dx+8,base-32,32,28,'#536f70');pixelLine(c,x+dx+8,base-32,x+dx+39,base-32,'#94a78e',2);}
                 }
                 const cloth=bastionCloth(damageAge),flutter=reduced?0:cloth.swing;
-                pixelLine(c,x+268,base-44,x+320+flutter,base-50+cloth.drop,'#a3ab91');
+                pixelLine(c,x+268,base-44,x+278,base-46,'#a3ab91');
+                pixelLine(c,x+278,base-46,x+302+flutter,base-49+cloth.drop,'#a3ab91');
+                pixelLine(c,x+302+flutter,base-49+cloth.drop,x+320-10*cloth.loose+flutter,
+                    base-50+cloth.drop+cloth.loose*4,'#a3ab91');
+                if(cloth.loose>0)pixelLine(c,x+320,base-50,x+317,base-47,'#a3ab91');
                 polygon(c,[[x+278,base-46],[x+302+flutter,base-49+cloth.drop],
                     [x+300+flutter,base-32+cloth.drop],[x+281,base-30]],'#8f6961');
                 pixelLine(c,x+280,base-43,x+299+flutter,base-46+cloth.drop,'#b58b77');

@@ -38,6 +38,7 @@ export function craneLoad(age: number) {
         ? Math.sin(Math.PI * (t - land + release) / 12) * 3 : 0;
     return { release, land, drop: 41 * u * u - bounce,
         sway: scenicRecoil(age, 2, 5, 6, 28) * (1 - u),
+        ropeLift: 17 * smoothMotion((age - release) / 10),
         split: smoothMotion((age - land) / 12), broken: age >= release };
 }
 
