@@ -62,11 +62,17 @@ Os tempos de contato resultam da simulação. `art-study.json` registra os conta
 - Movimento reduzido remove o escape luminoso, os rastros e a fumaça decorativa, reduz fragmentos e poeira e atenua o clarão. A trajetória e a queda física permanecem iguais.
 - O rastro tem até 36 emissões, e a fragmentação tem até 64 partículas. Fragmentos menores expiram, e peças acomodadas deixam de integrar movimento. As nove ações recorrentes não recriam nem reiniciam a destruição.
 
-## Busca nas ruínas
+## Busca nas ruínas, captura e desmembramento
 
 O dinossauro caminha até a posição física da parte esquerda do telhado depois que ela se acomoda. Primeiro fareja e revolve pequenos fragmentos existentes. Depois prende a peça, faz força, levanta e a solta. A parte mantém sua textura e geometria; só há um corpo, transferido entre repouso, boca e movimento livre. Peças apoiadas nela são despertadas quando o apoio sai do lugar.
 
-O NPC de camisa vermelha com estrela branca aparece no espaço exposto, com o mesmo desenho de roupas, rosto e membros dos moradores do cenário. Há um momento de percepção, tentativa de recuo e antecipação do dinossauro. Na captura, o corpo articulado é desenhado entre as camadas da boca, sob os dentes; acompanha o mesmo ponto usado pelo pescoço. A mordida tem fechamento, deslocamento de peso e reação do cavaleiro. O personagem cai inteiro junto às ruínas e permanece no cenário.
+O NPC petista (`clothes: 'star-shirt'`, camisa vermelha com estrela branca) aparece no espaço exposto, com o mesmo desenho de roupas, rosto e membros dos moradores do cenário. Há um momento de percepção, tentativa de recuo e antecipação do dinossauro. Na captura (`clamp`), o corpo articulado é desenhado entre as camadas da boca, sob os dentes; acompanha o mesmo ponto usado pelo pescoço e sofre estágios progressivos de mutilação (`whole` $\rightarrow$ `maimed-arm` $\rightarrow$ `upper-half` $\rightarrow$ `head-bite`):
+
+1. **Captura e chacoalhão (`242–277`):** As mandíbulas se fecham no peito do NPC (`'distant-thud'`) e o dinossauro o ergue sacudindo a cabeça com violência (`thrash`), espalhando jatos de sangue e abrindo ferimentos no torso.
+2. **Primeira mordida trituradora — braço esquerdo decepado (`278`):** Uma mordida pesada (`'distant-thud'`) arranca o braço esquerdo (`arm-left`) com osso úmero exposto e tira retalhos da camisa vermelha (`cloth-left`), lançando-os em trajetória balística.
+3. **Arrancada brutal ao meio (`296`):** O dinossauro puxa o pescoço para o alto (`'distant-thud'` + `'distant-roar'`) e rasga o NPC ao meio pela cintura. O quadril com a perna direita e coluna lombar exposta (`pelvis`), a perna esquerda decepada (`leg-left`) e o peito rasgado da camisa com a estrela branca (`cloth-star`) são arremessados para a esquerda com filamentos viscerais esticados entre os dentes e os pedaços em voo.
+4. **Arremesso, trituração torácica e cuspe da cabeça (`312–336`):** No passo `312` (`drop`), o braço direito (`arm-right`) e mais um retalho (`cloth-right`) se desprendem enquanto o tronco superior é jogado para cima entre as presas; no passo `324` (`crunch`), o dinossauro esmaga a caixa torácica (`torso-stump`, com costelas brancas aparentes) e, no passo `336` (`spit`), cospe a cabeça decepada (`head`, com vértebra cervical exposta) sobre os escombros.
+5. **Física sobre os escombros e persistência:** As 6 partes anatômicas (`arm-left`, `pelvis`, `leg-left`, `arm-right`, `torso-stump`, `head`), os 3 retalhos de camisa (`cloth-star`, `cloth-left`, `cloth-right`) e as lascas de osso/vísceras (`splinters`) caem sob gravidade, quicam com restituição e atrito sobre o piso irregular de escombros (`rubbleFloor`) e permanecem no cenário sobre poças de sangue em múltiplas camadas (`stains`), enquanto os dentes e a mandíbula do dinossauro permanecem manchados de sangue (`gore`).
 
 | Momento da busca | Passo local |
 | --- | ---: |
@@ -76,11 +82,15 @@ O NPC de camisa vermelha com estrela branca aparece no espaço exposto, com o me
 | Soltar a cobertura para a física | 138 |
 | NPC emerge; percebe a montaria | 166–194 |
 | Preparar a investida e capturar | 218–242 |
-| Levantar e morder | 242–278 |
-| Soltar e acomodar o personagem | 312–350 |
+| Chacoalhão violento na boca (`thrash`) | 242–277 |
+| Mordida trituradora e decepação do braço esquerdo (`bite`) | 278 |
+| Arrancada ao meio: pelve e pernas arremessadas (`rip`) | 296 |
+| Arremesso do tronco e queda do braço direito (`drop`) | 312 |
+| Trituração da caixa torácica (`crunch`) | 324 |
+| Cuspe da cabeça decepada e acomodação nos escombros (`spit`) | 336–375 |
 | Retomar o restante das atividades | 392 |
 
-A continuação possui seu próprio relógio de atuação e um relógio livre para a poeira. Os contatos sonoros pertencem aos passos de esforço, captura e mordida. Não se reinicia a busca nem se recriam moradores a cada ciclo.
+A continuação possui seu próprio relógio de atuação e um relógio livre para a poeira e jatos arteriais. Os contatos sonoros pertencem aos passos de esforço, captura, chacoalhão, mordida, arrancada, trituração e cuspe. Não se reinicia a busca nem se recriam moradores a cada ciclo.
 
 ## Material de autoria e limites
 

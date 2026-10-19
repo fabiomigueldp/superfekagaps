@@ -12,12 +12,13 @@ import {fragmentLanding} from './HypotheticalAftermathParticles';
 import {aftermathFooting,type PlantedFeet} from './HypotheticalAftermathFooting';
 import {HypotheticalTower,BASTION_TOWER,TOWER_SEQUENCE,launcherGeometry,towerLauncherPose,type TowerCue} from './HypotheticalTower';
 import {TOWER_SEARCH} from './HypotheticalTowerSearch';
+import {arrivalBeat} from './HypotheticalHelicopterTiming';
 
 /** These small service yards belong to the rear street, never to Feka's collision layer. */
 export const AFTERMATH_YARDS = SIEGE_SECTORS.map((s, district) => ({
     origin: s.origin + (district === 0 ? 256 : 0),
     kind: (['timber', 'cargo', 'vent', 'masonry'] as const)[district],
-    start: district === 0 ? 634 : district===3?226:278,
+    start: district === 0 ? arrivalBeat(634) : district===3?226:278,
 }));
 type Activity = 'approach' | 'search' | 'rummage' | 'listen' | 'flush' | 'turn-out' | 'patrol' | 'survey' | 'turn-back' | 'return' | 'watch'
     | 'roam' | 'orient' | 'perform' | 'recover' | 'notice' | 'tower' | 'tower-await' | 'tower-search';

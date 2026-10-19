@@ -9,6 +9,7 @@ import { RIFLE_BURSTS, RIFLE_SPEED, type GunImpact } from './HypotheticalGunfire
 import {chaseReactionStarts,updateChaseReactions} from './HypotheticalChaseLife';
 import {ARRIVAL,arrivalGate} from './HypotheticalArrival';
 import {SCENIC_STARTS,nextScenicTick,devastationAt} from './HypotheticalDevastation';
+import type {HelicopterCue} from './HypotheticalHelicopter';
 
 export type HypotheticalAct = 'chase' | 'siege' | 'duel';
 export type HypotheticalState = 'arrival' | 'rest' | 'tell' | 'reload' | 'attack' | 'turn' | 'recover' | 'hurt' | 'roar' | 'won';
@@ -17,7 +18,7 @@ export interface Shot extends Rect { vx: number; vy: number; age: number; life: 
 export interface Dust { x: number; y: number; born: number; kind: 'step' | 'stone' | 'hit' | 'shell' | 'clasp' | 'skid'; direction?: number }
 export interface FallingMark { x: number; born: number }
 export interface BulletImpact extends GunImpact {}
-export type FightEvent = 'warning' | 'shot' | 'impact' | 'splash' | 'collapse-water' | 'debris-land' | 'reload' | 'distant-shot' | 'distant-hit' | 'distant-debris' | 'distant-thud' | 'distant-roar' | 'distant-wood' | 'distant-stone' | 'distant-metal' | 'distant-creak' | 'distant-chain' | 'distant-leak' | 'distant-snort' | 'distant-grit' | 'distant-launch' | 'distant-rocket' | 'distant-blast' | 'distant-bell' | 'step' | 'slam' | 'hit' | 'break' | 'snare' | 'won';
+export type FightEvent = HelicopterCue | 'warning' | 'shot' | 'impact' | 'splash' | 'collapse-water' | 'debris-land' | 'reload' | 'distant-shot' | 'distant-hit' | 'distant-debris' | 'distant-thud' | 'distant-roar' | 'distant-wood' | 'distant-stone' | 'distant-metal' | 'distant-creak' | 'distant-chain' | 'distant-leak' | 'distant-snort' | 'distant-grit' | 'distant-launch' | 'distant-rocket' | 'distant-blast' | 'distant-bell' | 'step' | 'slam' | 'hit' | 'break' | 'snare' | 'won';
 export const HYPOTHETICAL = Object.freeze({ floor: 224, chaseEnd: CHASE_EXIT, health: 9, step: 1000 / 60, warning: 54, recovery: 156 });
 const rifleBursts = RIFLE_BURSTS;
 const patterns: readonly (readonly HypotheticalAttack[])[] = [
@@ -415,11 +416,12 @@ export class HypotheticalModel {
         const advanced=backdropTick>this.backdrop.tick;
         if(backdropTick>this.backdrop.tick+1){this.backdrop.cancel();this.backdrop.x=devastationAt(backdropTick).x;}
         if(advanced)this.backdrop.update(backdropTick);
-        else {this.backdrop.velocity=0;this.backdrop.events=[];}
+        else {this.backdrop.velocity=0;this.backdrop.events=[];this.backdrop.helicopter.update(this.backdrop.tick,this.backdrop.x);}
         this.backdrop.aftermath.update(this.backdrop.tick,this.backdrop.x,player.x);
         this.backgroundX = this.backdrop.displayX;
         if(advanced)this.events.push(...this.backdrop.events);
         this.events.push(...this.backdrop.aftermath.events);
+        this.events.push(...this.backdrop.helicopter.events);
         this.destroyed=this.backdrop.breaches.filter(t=>t>=0).length;
         if(advanced&&this.backdrop.events.includes('break'))this.backgroundStamp=120;
         const combatTick=this.arrivalTime-(this.arrivalSkipped?0:ARRIVAL.release);

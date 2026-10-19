@@ -3,6 +3,7 @@
 ```sh
 npm run deploy
 npm run deploy -- -m "Describe the changes"
+npm run deploy -- --message-file .tmp/deploy/release-message.txt
 ```
 
 One command adds pending files, commits when needed, pushes `main`, builds the
@@ -38,3 +39,16 @@ history records remain.
 Prerequisites: installed project dependencies, Node.js 20+, Git, tar, and the
 existing `oracle` SSH alias with noninteractive access and `sudo -n` on Oracle.
 Run from `main`. Use `--no-commit` to require an already clean checkout.
+
+For a detailed commit, write the subject, blank line and technical body to a UTF-8
+file and pass `--message-file`. This avoids transporting multiline messages through
+PowerShell/npm command arguments. The tool passes the message to Git with `commit -F`.
+Commit descriptions should identify behavior, implementation and validation that
+actually occurred. Do not claim tests passed when only the Vite build ran.
+
+After explicitly committing selected files, use
+`npm run deploy -- --no-commit --allow-dirty` to publish committed `HEAD` while
+leaving unrelated local edits untouched. This option requires `--no-commit`;
+the cached snapshot still comes from the exact Git commit, never the working tree.
+
+Recent commit descriptions and Git notes: [technical records](commits/2026-10-19/README.md).

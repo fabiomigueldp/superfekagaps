@@ -12,7 +12,7 @@ function puff(c:CanvasRenderingContext2D,x:number,y:number,r:number,seed:number,
     box(c,x-r*.5+seed%2,y-r*.32,r*.5,Math.max(1,r*.16),light);
     box(c,x+r*.1,y-r*.52,r*.3,Math.max(1,r*.13),light);
 }
-function drawRocket(c:CanvasRenderingContext2D,t:HypotheticalTower,base:number,reduced:boolean){
+export function drawScenicRocket(c:CanvasRenderingContext2D,t:Pick<HypotheticalTower,'tick'|'launchAt'|'launch'|'trail'|'rocket'>,base:number,reduced:boolean){
     const launch=t.launch;if(!launch)return;
     const age=t.tick-t.launchAt,at=(x:number,y:number,a:number,b:number):Point=>
         [x+launch.dx*a-launch.dy*b,base+y+launch.dy*a+launch.dx*b];
@@ -128,7 +128,7 @@ function drawImpact(c:CanvasRenderingContext2D,t:HypotheticalTower,base:number,r
 /** Effects use the scenic bodies' contact points and times. Their draw order
  * stays behind Feka, enemies, foreground platforms and combat telegraphs. */
 export function drawTowerEffects(c:CanvasRenderingContext2D,t:HypotheticalTower,base:number,reduced:boolean){
-    drawRocket(c,t,base,reduced);drawImpact(c,t,base,reduced);
+    drawScenicRocket(c,t,base,reduced);drawImpact(c,t,base,reduced);
     const age=t.impactAge,physics=t.destruction,x=BASTION_TOWER.x;if(age<0)return;
     for(const [i,p] of physics.chips.entries()){
         if(reduced&&i%3)continue;

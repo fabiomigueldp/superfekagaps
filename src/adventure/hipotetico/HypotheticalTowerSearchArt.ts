@@ -98,14 +98,14 @@ export function drawTowerSearchActors(c:CanvasRenderingContext2D,b:HypotheticalB
     for(const stain of s.stains){
         const grow=smoothMotion((s.tick-stain.born)/14),r=stain.radius*(.45+.55*grow);
         const y=base+stain.y;
-        oval(c,stain.x-r*1.15,y-1.5,r*2.3,3,'#4a0f14');
-        oval(c,stain.x-r*.82,y-1,r*1.64,2.2,'#7a1820');
-        oval(c,stain.x-r*.45,y-1,r*.9,1.5,'#b8252e');
-        box(c,stain.x-r*.2,y-1,Math.max(1,r*.35),1,'#df4850');
-        if(stain.y<-7){
-            const drip=Math.min(base-5-y,(4+stain.seed%4)*grow);
-            pixelLine(c,stain.x-1,y,stain.x-1,y+drip,'#5a1016');
-            pixelLine(c,stain.x+1,y,stain.x+1,y+drip*.75,'#8e1c24');
+        oval(c,stain.x-r*1.2,y-1.5,r*2.4,3.2,'#4a0f14');
+        oval(c,stain.x-r*.85,y-1,r*1.7,2.3,'#7a1820');
+        oval(c,stain.x-r*.48,y-1,r*.96,1.5,'#b8252e');
+        box(c,stain.x-r*.22,y-1,Math.max(1,r*.35),1,'#df4850');
+        if(stain.y<-7&&r>5){
+            const drip=Math.min(3,(2+stain.seed%2)*grow);
+            pixelLine(c,stain.x-1,y+1,stain.x-1,y+1+drip,'#5a1016');
+            pixelLine(c,stain.x,y+1,stain.x,y+1+drip*.7,'#8e1c24');
         }
     }
     for(const p of s.pieces){

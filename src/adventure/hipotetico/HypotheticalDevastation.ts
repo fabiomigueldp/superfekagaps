@@ -1,13 +1,14 @@
 import { smoothMotion } from './HypotheticalMotion';
 import {SIEGE_SECTORS,SIEGE_WIDTH} from './HypotheticalSiege';
 import {arrivalOpeningAt,OPENING} from './HypotheticalOpening';
+import {arrivalBeat,arrivalStoryTime,HELICOPTER_SEQUENCE} from './HypotheticalHelicopterTiming';
 
 /** Authored contacts share a clock across scenery, rider, crowd and effects. */
 export const DEVASTATION = { period:400, prepare:136, strike:166, impact:180, hold:185, recover:225, settle:120 } as const;
 /** The opening gives the rifle, ram and aftermath separate beats before combat resumes. */
 export const ARRIVAL_RAM={prepare:200,strike:228,impact:244,hold:254,recover:302} as const;
 export const ARRIVAL_BITE={prepare:480,strike:508,impact:526,hold:536,recover:574} as const;
-export const SCENIC_STARTS=[0,800,1200,1600] as const;
+export const SCENIC_STARTS=[0,arrivalBeat(800),arrivalBeat(1200),arrivalBeat(1600)] as const;
 export const SCENIC_END=SCENIC_STARTS[SCENIC_STARTS.length-1]+DEVASTATION.period;
 export const scenicDistrict=(tick:number)=>SCENIC_STARTS.reduce<number>((district,start,i)=>tick>=start?i:district,0);
 
@@ -38,7 +39,7 @@ export const DESTRUCTION_SITES = [
 ] as const;
 
 export function devastationAt(tick:number) {
-    const district=scenicDistrict(tick),local=tick-SCENIC_STARTS[district];
+    const district=scenicDistrict(tick),local=district===0?arrivalStoryTime(tick):tick-SCENIC_STARTS[district];
     const plaza=district===0&&local>=360,siteIndex=district===0?(plaza?1:0):district+1;
     const site=DESTRUCTION_SITES[siteIndex],timing=district===0?(plaza?ARRIVAL_BITE:ARRIVAL_RAM):DEVASTATION;
     const wind=smoothMotion((local-timing.prepare)/(timing.strike-timing.prepare));
@@ -59,7 +60,7 @@ export function devastationAt(tick:number) {
     const airborne=stamp&&local>=154&&local<180?Math.sin(Math.PI*(local-154)/26):0;
     const hit=local>=timing.impact&&local<timing.impact+28?smoothMotion((local-timing.impact+1)/3)*(1-smoothMotion((local-timing.impact-3)/25)):0;
     const lookAt=plaza?560:278,lookEnd=plaza?608:320;
-    const lookBack=district===0?smoothMotion((local-lookAt)/16)*(1-smoothMotion((local-lookEnd)/18)):0;
+    const lookBack=district===0&&(local<HELICOPTER_SEQUENCE.start||plaza)?smoothMotion((local-lookAt)/16)*(1-smoothMotion((local-lookEnd)/18)):0;
     const motion={ district,siteIndex,local,kind:site.kind,active,impactTick:timing.impact,lookBack,wind:active?wind:0,drive:active?drive:0,force,
         x:SIEGE_SECTORS[district].origin+x, lift:airborne?-airborne*13:0,
         compression:stamp?force*3+hit*6:force*(bite?2:5)+(district===0?hit*2:0),

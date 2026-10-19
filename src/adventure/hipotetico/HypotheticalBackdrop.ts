@@ -7,6 +7,8 @@ import {OPENING} from './HypotheticalOpening';
 import {scenicLandingCues} from './HypotheticalScenicMotion';
 import {HypotheticalAftermath} from './HypotheticalAftermath';
 import {AFTERMATH_SCALE} from './HypotheticalAftermathHandling';
+import {HypotheticalHelicopter} from './HypotheticalHelicopter';
+import {arrivalBeat} from './HypotheticalHelicopterTiming';
 
 /** All positions are native pixels, relative to the distant street's baseline. */
 export const BACKDROP_RIG = { width: 192, height: 160, scale: AFTERMATH_SCALE, x: 92, y: 148 } as const;
@@ -37,6 +39,7 @@ export class HypotheticalBackdrop {
     footfalls:Array<{x:number;born:number}>=[];
     readonly people: Bystander[];
     readonly aftermath = new HypotheticalAftermath();
+    readonly helicopter = new HypotheticalHelicopter();
     get displayX(){return this.aftermath.active?this.aftermath.x:this.x;}
     constructor(readonly wide = false) {
         const clothes:BystanderClothes[]=['workcoat','star-shirt','star-shirt','scarf','satchel','star-shirt','star-shirt','workcoat'];
@@ -75,7 +78,7 @@ export class HypotheticalBackdrop {
         ] as const;
         for(const [i,p] of plaza.entries()){
             const exposed='exposed' in p;
-            this.people.push({...p,originX:p.x,escaped:false,fleeing:!exposed,hitAt:null,color:i%4,distance:0,velocity:0,
+            this.people.push({...p,alertAt:arrivalBeat(p.alertAt),originX:p.x,escaped:false,fleeing:!exposed,hitAt:null,color:i%4,distance:0,velocity:0,
                 speed:1,district:0,stoppedAt:null,threatenedAt:null,startledAt:null,reactionTimes:[],
                 appearance:7+i,depth:exposed?0:i%2?-2:-4,exitAtShelter:!exposed,belonging:i===2?'papers':i===7?'parcel':undefined});
         }
@@ -116,6 +119,7 @@ export class HypotheticalBackdrop {
         this.tick = tick; this.events = [];
         const oldX=this.x,oldTravel=this.travel,m=this.motion;
         this.x=m.x;this.velocity=this.x-oldX;this.travel+=Math.abs(this.velocity);
+        this.helicopter.update(tick,this.x);
         if(m.local===m.impactTick&&this.breaches[m.siteIndex]<0){
             this.breaches[m.siteIndex]=tick;this.events.push('break');
         }

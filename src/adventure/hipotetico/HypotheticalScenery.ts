@@ -15,6 +15,7 @@ import {drawForecourt} from './HypotheticalForecourt';
 import {masonryFall,SCENIC_FRACTURE,scenicRecoil,craneLoad,bastionCloth,arsenalPressure,scenicChip} from './HypotheticalScenicMotion';
 import {drawSiegeDistricts,drawSiegeRouteBody} from './HypotheticalDistrictArt';
 import {drawBastionTower} from './HypotheticalTowerArt';
+import {arrivalStoryTime} from './HypotheticalHelicopterTiming';
 
 const S = {
     ink: '#213545', joint: '#354956', stone: '#677b7c', stoneShade: '#516571',
@@ -336,7 +337,7 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
                 pixelLine(c,x+122,base-62,x+122,base-58,'#6a827b');pixelLine(c,x+122,base-58,x+126,base-56,'#6a827b');
                 arch(c,x+112,base-41,20,37,'#5e7e77');
                 drawArrivalCourtyard(c,x,base,b.backdrop.tick,damageAge);
-                drawArrivalPlaza(c,x,base,b.backdrop.tick,ruinAge(b.backdrop.breaches,1,b.backdrop.tick),reduced);
+                drawArrivalPlaza(c,x,base,arrivalStoryTime(b.backdrop.tick),ruinAge(b.backdrop.breaches,1,b.backdrop.tick),reduced);
             }else if(i===1){
                 // Loading crane, rope, pulley and suspended pallet share one anchored structure.
                 const load=craneLoad(damageAge),drop=load.drop;

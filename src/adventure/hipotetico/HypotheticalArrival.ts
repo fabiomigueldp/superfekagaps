@@ -1,7 +1,8 @@
 import {smoothMotion} from './HypotheticalMotion';
+import {arrivalBeat,HELICOPTER_SEQUENCE} from './HypotheticalHelicopterTiming';
 
 /** The courtyard is readable before the first garrison is admitted. */
-export const ARRIVAL={release:660,deployment:636,firstRelease:220,hold:400,watchX:280,
+export const ARRIVAL={release:arrivalBeat(660),deployment:arrivalBeat(636),firstRelease:arrivalBeat(HELICOPTER_SEQUENCE.start),hold:arrivalBeat(400),watchX:280,
     lift:48,gateX:352,firstGateX:96,gateY:104,gateHeight:120} as const;
 export function arrivalGate(tick:number,skipped=false,release:number=ARRIVAL.release){
     const travel=skipped?1:smoothMotion((tick-release)/ARRIVAL.lift);

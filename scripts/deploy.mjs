@@ -12,18 +12,26 @@ const sshArgs = ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-o', 'Server
 const hash = data => createHash('sha256').update(data).digest('hex');
 const start = performance.now();
 const options = process.argv.slice(2);
-let message = 'Deploy latest game changes', commitChanges = true;
+let message = 'Deploy latest game changes', commitChanges = true, allowDirty = false;
 for (let i = 0; i < options.length; i++) {
   if (options[i] === '--help' || options[i] === '-h') {
-    console.log('npm run deploy [-- -m "Commit message"] [-- --no-commit]\nCommits pending changes, pushes main, builds and deploys to Oracle. Tests are not run.');
+    console.log('npm run deploy [-- -m "Commit message" | --message-file path] [-- --no-commit [--allow-dirty]]\nCommits pending changes, pushes main, builds and deploys to Oracle. Tests are not run.');
     process.exit(0);
   }
   if (options[i] === '--no-commit') commitChanges = false;
+  else if (options[i] === '--allow-dirty') allowDirty = true;
+  else if (options[i] === '--message-file') {
+    const filename = options[++i];
+    if (!filename) throw Error('A UTF-8 file path is required after --message-file.');
+    message = (await fs.readFile(path.resolve(root, filename), 'utf8')).replace(/^\uFEFF/, '');
+    if (!message.trim()) throw Error('The commit message file is empty.');
+  }
   else if (options[i] === '-m' || options[i] === '--message') {
     message = options[++i];
     if (!message?.trim()) throw Error('A commit message is required after -m.');
   } else throw Error(`Unknown option: ${options[i]}`);
 }
+if (allowDirty && commitChanges) throw Error('--allow-dirty requires --no-commit; uncommitted edits are never published.');
 function git(...args) {
   const r = spawnSync('git', args, { cwd: root, encoding: 'utf8', windowsHide: true, maxBuffer: 8_000_000 });
   if (r.error || r.status !== 0) throw Error(r.error?.message || r.stderr.trim() || `git ${args[0]} failed`);
@@ -136,8 +144,14 @@ await lock.writeFile(String(process.pid));
 try {
   if (git('branch', '--show-current') !== 'main') throw Error('Run this command on main; it never switches branches or force-pushes.');
   if (git('status', '--porcelain=v1', '--untracked-files=normal')) {
-    if (!commitChanges) throw Error('Uncommitted changes found; remove --no-commit or commit them first.');
-    git('add', '--all'); git('commit', '-m', message);
+    if (!commitChanges) {
+      if (!allowDirty) throw Error('Uncommitted changes found; commit them first or use --no-commit --allow-dirty to publish only HEAD.');
+      console.log('[deploy] Publishing committed HEAD; local edits remain outside this release.');
+    } else {
+      const messagePath = path.join(stateDir, 'commit-message.txt');
+      await fs.writeFile(messagePath, message, 'utf8');
+      git('add', '--all'); git('commit', '-F', messagePath);
+    }
   }
   const commit = git('rev-parse', 'HEAD');
   const runId = `${commit}-${randomUUID().replaceAll('-', '').slice(0, 12)}`;

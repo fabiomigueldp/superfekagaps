@@ -251,14 +251,64 @@
       "event": "distant-thud"
     },
     {
+      "frame": 682,
+      "seconds": 11.366666666666667,
+      "event": "distant-thud"
+    },
+    {
       "frame": 702,
       "seconds": 11.7,
       "event": "distant-thud"
     },
     {
+      "frame": 720,
+      "seconds": 12,
+      "event": "distant-thud"
+    },
+    {
+      "frame": 720,
+      "seconds": 12,
+      "event": "distant-roar"
+    },
+    {
+      "frame": 748,
+      "seconds": 12.466666666666667,
+      "event": "distant-thud"
+    },
+    {
+      "frame": 760,
+      "seconds": 12.666666666666666,
+      "event": "distant-thud"
+    },
+    {
+      "frame": 1115,
+      "seconds": 18.583333333333332,
+      "event": "distant-stone"
+    },
+    {
+      "frame": 1131,
+      "seconds": 18.85,
+      "event": "distant-stone"
+    },
+    {
       "frame": 1134,
       "seconds": 18.9,
       "event": "distant-debris"
+    },
+    {
+      "frame": 1140,
+      "seconds": 19,
+      "event": "distant-stone"
+    },
+    {
+      "frame": 1144,
+      "seconds": 19.066666666666666,
+      "event": "distant-grit"
+    },
+    {
+      "frame": 1156,
+      "seconds": 19.266666666666666,
+      "event": "distant-grit"
     }
   ],
   "contacts": [
@@ -2545,7 +2595,7 @@
         "done": false,
         "actorX": 1706.403696161499,
         "jawX": 1667.903696161499,
-        "jawY": -30.81786800361634,
+        "jawY": -30.69663844826169,
         "personX": 1659.903696161499,
         "carrying": false
       },
@@ -2718,7 +2768,7 @@
         "draw": 0,
         "rifleLower": 0,
         "reach": 0,
-        "aim": 0.5462069214089181,
+        "aim": 0.5384036756435059,
         "recoil": 0,
         "fired": true
       },
@@ -2730,9 +2780,9 @@
       "search": {
         "age": 236,
         "done": false,
-        "actorX": 1697.122446161499,
-        "jawX": 1658.622446161499,
-        "jawY": -15,
+        "actorX": 1695.4495263643541,
+        "jawX": 1656.9495263643541,
+        "jawY": -14,
         "personX": 1657.215696161499,
         "carrying": false
       },
@@ -2905,7 +2955,7 @@
         "draw": 0,
         "rifleLower": 0,
         "reach": 0,
-        "aim": 0.8091174637343711,
+        "aim": 0.8390025866032058,
         "recoil": 0,
         "fired": true
       },
@@ -2917,9 +2967,9 @@
       "search": {
         "age": 296,
         "done": false,
-        "actorX": 1695.403696161499,
-        "jawX": 1656.903696161499,
-        "jawY": -36.40524781341108,
+        "actorX": 1699.2185109763138,
+        "jawX": 1660.7185109763138,
+        "jawY": -45.333333333333336,
         "personX": 1656.9134739392769,
         "carrying": true
       },
@@ -3092,7 +3142,7 @@
         "draw": 0,
         "rifleLower": 0,
         "reach": 0,
-        "aim": 0.6289068602267691,
+        "aim": 0.7663580508917315,
         "recoil": 0,
         "fired": true
       },
@@ -3104,9 +3154,9 @@
       "search": {
         "age": 356,
         "done": false,
-        "actorX": 1706.403696161499,
-        "jawX": 1667.903696161499,
-        "jawY": -25.3455,
+        "actorX": 1699.5877682877199,
+        "jawX": 1661.0877682877199,
+        "jawY": -27.677720618647854,
         "personX": 1656.9134739392769,
         "carrying": false
       },
