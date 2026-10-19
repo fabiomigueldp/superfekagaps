@@ -1,0 +1,18 @@
+Technical documentation supplement for e818e242634aff61a8093060454aaaa61045f859
+
+Refine rocket flight, staged tower impact and settling debris physics
+
+Behavior
+Improve tower impact readability and stop low-amplitude rubble motion from running indefinitely.
+
+Implementation
+HypotheticalTowerPhysics.integrate() tracks near-support state across two substeps and sleeps a body after 24 frames of sufficiently small total motion. It retains finite-state recovery and reduces lateral roof separation. HypotheticalTowerEffects adds a short expanding impact shape, projectile highlights and drifting exhaust variation. Tower part artwork and the authoring renderer are updated.
+
+Scope and limitations
+Updates tower-cinematic captures and state data, including ignition, breakup and settling views. The sleep threshold is implementation behavior; no new stability or gameplay test is claimed by this retrospective.
+
+Publication evidence
+A successful local publisher receipt identifies build `e818e242634aff61a8093060454aaaa61045f859-654d8b27bbc8` for this exact source commit. The report records `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its build-log SHA-256 is `3c4654b9666966718dd7ccb3f7b23d67fc0a72de8cff20a87358a2031f0ad626`. This establishes recorded build/publication completion, not gameplay correctness.
+
+Full file inventory and provenance: docs/commits/2026-10-19/e818e24.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
