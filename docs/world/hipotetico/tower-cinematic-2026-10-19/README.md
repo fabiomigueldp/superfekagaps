@@ -1,6 +1,6 @@
 # A torre do Bastião
 
-Cena integrada ao encontro nativo `/?encounter=hipotetico`, no pátio da Vanguarda. Revisão de 19/10/2026.
+Cena integrada ao encontro nativo `/?encounter=hipotetico`, no pátio da Vanguarda. Revisão de 19/10/2026, segunda rodada: continuidade do foguete, impacto e física dos escombros.
 
 ## Direção
 
@@ -8,7 +8,11 @@ A torre anterior era um desenho estático. Agora tem fundação, arco inferior, 
 
 O cavaleiro põe o fuzil na bandoleira e pega o lançador das costas. O tubo percorre uma trajetória contínua até o ombro. Empunhaduras, boca do tubo, escape e projétil compartilham a mesma geometria. A sustentação do corpo antecede o disparo; cavaleiro e montaria reagem ao lançamento. A arma acompanha a descida da torre antes de ser guardada.
 
-A explosão atinge o corpo abaixo do campanário. A ruptura expõe bordas irregulares, libera argamassa, lança fragmentos e inicia a queda em partes. O sino se solta da suspensão em movimento. Os blocos assentam acima da rua com ressalto amortecido, sem atravessar o piso. A base permanece no lugar, e parte dos fragmentos forma escombros persistentes.
+A munição carregada e o foguete em voo compartilham o desenho e a posição da ponta. O primeiro quadro não avança o projétil: ele se separa do tubo antes de acelerar, com propulsão, aletas e um som de passagem próprio. A fumaça é emitida a cada três pixels percorridos, incluindo posições intermediárias nos passos mais rápidos. Cada emissão fica no local e se dispersa, sem esticar a fumaça atrás do foguete.
+
+A explosão atinge o corpo abaixo do campanário. Há um clarão curto, expansão quente, projeção de material e uma nuvem que perde contraste. O topo inclina sobre o apoio antes de cair. A cobertura se rompe em duas partes, expondo as travessas. O sino se desprende da suspensão em movimento. O primeiro contato do campanário dispara sua fragmentação em dois pilares, lintel e soleira.
+
+As peças soltas usam uma simulação local com gravidade, velocidade angular, impulso no contato, restituição e atrito. Há dois subpassos por quadro para resolver os cantos em rotação. As superfícies consideradas são a rua, a base preservada e as peças já acomodadas; é uma física cênica delimitada, sem simulação geral de colisões entre todos os corpos móveis. Movimentos residuais sustentados abaixo de um pixel levam ao repouso. As ruínas e parte dos fragmentos permanecem no cenário.
 
 ## Tempos
 
@@ -22,17 +26,17 @@ Passos nativos a 60 Hz; deslocamento até a posição e virada acontecem antes d
 | Recolher o tubo | 286–324 | 4,77–5,40 s |
 | Voltar ao fuzil | 324–354 | 5,40–5,90 s |
 
-O voo termina ao alcançar a posição da torre, não em um relógio fixo. Nesta composição, o impacto acontece no passo 159 (2,65 s).
+O voo termina ao alcançar a posição da torre, não em um relógio fixo. Nesta composição, o impacto acontece no passo 166 (2,77 s): 24 passos de voo após a saída. A propulsão começa quatro passos depois do lançamento.
 
-| Elemento | Começa a cair após impacto | Contato com o chão após impacto |
-| --- | ---: | ---: |
-| Corpo de alvenaria | 18 passos | 92 passos |
-| Telhado | 22 passos | 77 passos |
-| Campanário | 28 passos | 126 passos |
-| Sino | 48 passos | 108 passos |
-| Arco inferior | 70 passos | 154 passos |
+| Elemento | Liberação após o impacto | Comportamento |
+| --- | ---: | --- |
+| Corpo de alvenaria | 18 passos | Cede abaixo do topo e gira para fora |
+| Campanário | 40 passos | Herda a inclinação e se fragmenta no primeiro contato |
+| Cobertura | 48 passos | Separa duas partes, com velocidades e giros diferentes |
+| Sino | 56 passos | Herda a posição e o movimento da suspensão |
+| Arco inferior | 88 passos | Solta-se por último, perto da base preservada |
 
-Argamassa acompanha a separação das partes; poeira e sons de pedra acompanham as aterrissagens. O sino usa um corpo tonal com dois parciais de decaimento próprio. Os sons permanecem no barramento de efeitos existente e respeitam seu limite de vozes.
+Os tempos de contato resultam da simulação. `art-study.json` registra os contatos efetivos desta composição. Argamassa acompanha a separação das partes; poeira e sons de pedra acompanham as aterrissagens. O sino usa um corpo tonal com dois parciais de decaimento próprio. Os sons permanecem no barramento de efeitos existente, respeitam seu limite de vozes e têm intervalo entre os impactos de escombros.
 
 ## Orquestração e continuidade
 
@@ -43,16 +47,17 @@ Argamassa acompanha a separação das partes; poeira e sons de pedra acompanham 
 - A queda ocorre uma única vez. As nove atividades recorrentes continuam disponíveis depois dela.
 - O estado pertence ao cenário persistente do cerco, preservado no retry do mesmo encontro. Um novo encontro começa com a torre intacta.
 - O evento pertence ao plano de fundo. Não bloqueia o controle de Feka, não modifica a colisão dos percursos e não cria um novo projétil contra o jogador.
-- Movimento reduzido remove o escape luminoso, os rastros e a fumaça decorativa, reduz fragmentos e poeira e retira tremores e oscilações. A trajetória principal continua visível.
+- Movimento reduzido remove o escape luminoso, os rastros e a fumaça decorativa, reduz fragmentos e poeira e atenua o clarão. A trajetória e a queda física permanecem iguais.
+- O rastro tem até 36 emissões, e a fragmentação tem até 64 partículas. Fragmentos menores expiram, e peças acomodadas deixam de integrar movimento. As nove ações recorrentes não recriam nem reiniciam a destruição.
 
 ## Material de autoria e limites
 
-`tower-sequence.mp4` tem 20 segundos, 30 fps e ampliação inteira de uma composição nativa de 320 × 180 pixels. Não inclui áudio nem combate em primeiro plano. A câmera e a posição de Feka foram fixadas para dirigir o enquadramento; o diretor real escolhe e executa a atividade. Depois da queda, o registro mostra a retomada das atividades recorrentes.
+`tower-sequence.mp4` tem 16 segundos, 60 fps e ampliação inteira de uma composição nativa de 320 × 180 pixels. Não inclui áudio nem combate em primeiro plano. A câmera e a posição de Feka foram fixadas para dirigir o enquadramento; o diretor real escolhe e executa a atividade. Depois da queda, o registro mostra a retomada das atividades recorrentes.
 
-`art-study.json` registra poses, tempos, estados e sinais sonoros da composição. O vídeo e as oito imagens são material de autoria, não uma partida gravada ou teste de gameplay. O som e a disputa de atenção durante a luta completa não foram avaliados em uma partida nesta rodada.
+`art-study.json` registra poses, tempos, estados físicos, contatos e sinais sonoros da composição. O vídeo e as doze imagens são material de autoria, não uma partida gravada ou teste de gameplay. O som e a disputa de atenção durante a luta completa não foram avaliados em uma partida nesta rodada.
 
 ```powershell
-node --import tsx scripts/render_hypothetical_tower.ts .tmp/tower-finish C:/Users/fabio/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/@napi-rs/canvas/index.js
+node --import tsx scripts/render_hypothetical_tower.ts .tmp/tower-flight-release C:/Users/fabio/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/@napi-rs/canvas/index.js
 ```
 
 Publicação pelo fluxo autorizado do projeto, somente com build de produção, sem suíte de testes, typecheck ou revisão de navegador.

@@ -31,6 +31,21 @@ function brokenBelfry(c:CanvasRenderingContext2D,x:number,base:number,tower:Hypo
     const sill=partPainter(c,x,base,'sill',tower);
     sill.poly([[-11,-70],[12,-70],[10,-67],[4,-68],[-1,-66],[-9,-67]],P.side);sill.line(-10,-70,11,-70,P.cap,2);
 }
+function brokenRoof(c:CanvasRenderingContext2D,x:number,base:number,tower:HypotheticalTower){
+    const left=partPainter(c,x,base,'roof-left',tower),right=partPainter(c,x,base,'roof-right',tower);
+    left.poly([[-30,-102],[-22,-109],[0,-114],[-1,-109],[1,-106],[-1,-102]],P.dark);
+    left.poly([[-25,-104],[-19,-108],[-2,-111],[-3,-104]],P.roof);
+    right.poly([[0,-114],[24,-109],[32,-102],[0,-102],[2,-106],[0,-109]],P.dark);
+    right.poly([[3,-110],[21,-107],[27,-104],[3,-104]],P.roof);
+    left.line(-28,-102,-2,-102,P.cap,2);right.line(2,-102,30,-102,P.cap,2);
+    for(let j=0;j<3;j++)left.line(-19+j*6,-108+Math.abs(j-3)*.55,-22+j*7,-104,P.roofLight);
+    for(let j=4;j<7;j++)right.line(-19+j*6,-108+Math.abs(j-3)*.55,-22+j*7,-104,P.roofLight);
+    left.line(-1,-111,-3,-105,P.side);right.line(2,-109,3,-105,P.side);
+    // Split joists are exposed under the tiles instead of one rigid roof slab.
+    left.line(-21,-101,-7,-101,'#9b9c82',2);left.line(-6,-103,-3,-100,'#c0b694');
+    right.line(5,-101,22,-101,'#9b9c82',2);right.line(3,-103,6,-100,'#c0b694');
+    right.line(1,-111,1,-113,P.dark);right.line(1,-112,7,-112,P.light);
+}
 function masonry(p:ReturnType<typeof partPainter>,top:number,height:number,broken=false){
     if(broken){
         const bottom=top+height;
@@ -127,13 +142,15 @@ export function drawBastionTower(c:CanvasRenderingContext2D,tower:HypotheticalTo
     else{b.line(-21,-69,-8,-69,P.cap,2);b.line(5,-70,21,-69,P.cap,2);b.line(-8,-69,-4,-73,P.dark);}
     for(const d of [-1,1]){b.rect(d*18-1,-99,3,25,P.light);b.line(d*19,-78,d*19,-75,P.side);}
     }
+    if(tower.destruction.bodies.roof.hidden)brokenRoof(c,x,base,tower);
+    else{
     const roof=partPainter(c,x,base,'roof',tower);
     roof.poly([[-30,-102],[-22,-109],[0,-114],[24,-109],[32,-102]],P.dark);
     roof.poly([[-25,-104],[-19,-108],[0,-111],[21,-107],[27,-104]],P.roof);
     roof.line(-26,-104,27,-104,P.roofLight);roof.line(-28,-102,30,-102,P.cap,2);
     for(let j=0;j<7;j++)roof.line(-19+j*6,-108+Math.abs(j-3)*.55,-22+j*7,-104,P.roofLight);
     roof.line(0,-111,0,-113,P.dark);roof.line(-4,-112,7,-112,P.light);roof.poly([[7,-113],[10,-112],[7,-111]],P.side);
-    if(age>=TOWER_RELEASE.roof){roof.line(-18,-107,-9,-104,P.dark,2);roof.line(3,-110,12,-105,P.dark);}
+    }
     const bronze=tower.destruction.bodies.bell,sway=age<0&&!reduced?Math.sin(time/90)*.07:0;
     if(bronze.attached){
         const u=b.point(0,-88);pixelLine(c,u[0],u[1],x+bronze.x+Math.sin(sway)*8,base+bronze.y-6,P.bellLight,2);

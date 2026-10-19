@@ -20,8 +20,9 @@ function drawRocket(c:CanvasRenderingContext2D,t:HypotheticalTower,base:number,r
         // stretched between the moving missile and the barrel.
         for(const p of t.trail){
             const a=t.tick-p.born,fade=1-smoothMotion((a-24)/64),r=(1.3+a*.035)*fade;
-            c.save();c.globalAlpha=.7*fade;
-            puff(c,p.x+a*.065,base+p.y-a*.035,r,p.seed,a<24?'#c4c3ac':'#a7afa0','#d0cab0');c.restore();
+            const eddy=Math.sin(p.seed*1.79)*(.3+Math.min(1,a/24));
+            c.save();c.globalAlpha=(a<12?.7:.55)*fade;
+            puff(c,p.x+a*.065,base+p.y-a*.035+eddy,r,p.seed,a<24?'#c4c3ac':'#a7afa0','#c4c1a9');c.restore();
         }
         if(age<10){
             const extension=9+age*1.8,fade=1-smoothMotion(age/10);
@@ -55,11 +56,25 @@ function drawRocket(c:CanvasRenderingContext2D,t:HypotheticalTower,base:number,r
     }
     drawLauncherWarhead({poly:(v,col)=>polygon(c,v,col),line:(x,y,xx,yy,col,width)=>pixelLine(c,x,y,xx,yy,col,width)},
         (a,b)=>point(a*AFTERMATH_SCALE,b*AFTERMATH_SCALE),{ink:'#47565a',green:'#79876d',lit:'#a4ab83'});
+    if(r.age>4&&!reduced)pixelLine(c,...point(-2,-1),...point(-5,-2),'#d8c994');
 }
 function drawImpact(c:CanvasRenderingContext2D,t:HypotheticalTower,base:number,reduced:boolean){
     const a=t.impactAge,x=BASTION_TOWER.x,y=base+BASTION_TOWER.hitY,dx=t.launch?.dx??-1,dy=t.launch?.dy??0;
     const at=(u:number,v:number):Point=>[x+dx*u-dy*v,y+dy*u+dx*v];
     if(a<0)return;
+    if(a<27){
+        const envelope=smoothMotion((a+1)/3)*(1-smoothMotion((a-11)/16));
+        const radius=(6+14*smoothMotion(a/7))*envelope,edge:Point[]=[];
+        for(let j=0;j<14;j++){
+            const angle=j*Math.PI/7,reach=radius*(j%3===0?.73:1);
+            edge.push(at(Math.cos(angle)*reach+3,Math.sin(angle)*reach*.78));
+        }
+        polygon(c,edge,reduced?'#b4ae91':a<7?'#d1a579':a<15?'#b79675':'#a9a08a');
+        if(!reduced&&a<14){
+            const hot=radius*(1-smoothMotion((a-6)/8))*.65;
+            puff(c,x+dx*3,y,hot,0,a<5?'#f0dba9':'#e5bc85','#f4e2b0');
+        }
+    }
     if(a<8){
         const scale=1+a*.35;
         polygon(c,[at(-5,-3),at(4,-7*scale),at(7,-2),at(17*scale,0),at(6,3),at(1,6*scale),at(-6,2)],

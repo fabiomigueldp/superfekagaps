@@ -44,7 +44,7 @@ try{
             destroyed:t.destroyed,rocket:t.rocket?{...t.rocket}:null,launcher:a.launcherPose,
             chips:t.destruction.chips.length,movingChips:t.destruction.chips.filter(p=>!p.rest).length,
             bodies:Object.values(t.destruction.bodies).map(b=>({id:b.id,x:b.x,y:b.y,angle:b.angle,
-                sleeping:b.sleeping,hidden:b.hidden,landedAt:b.landedAt}))});
+                sleeping:b.sleeping,hidden:b.hidden,landedAt:b.landedAt,quiet:b.quiet,vx:b.vx,vy:b.vy,spin:b.spin}))});
         drawHypotheticalBackground(c,model,cameraX,64,false);
         if(shot){
             seen.add(shot.name);const file=shot.name+'.png';writeFileSync(join(out,file),screen.toBuffer('image/png'));

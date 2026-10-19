@@ -90,6 +90,7 @@ export class HypotheticalTowerPhysics {
     }
     private integrate(b:TowerBody){
         const def=TOWER_PARTS[b.id],restitution=def.material==='bronze'?.28:def.material==='tile'?.16:.09;
+        const startX=b.x,startY=b.y,startAngle=b.angle;let nearSupport=false;
         // Two short substeps keep rotating corners from tunnelling into the road.
         for(let sub=0;sub<2;sub++){
             const oldX=b.x,oldY=b.y,oldAngle=b.angle;
@@ -98,10 +99,11 @@ export class HypotheticalTowerPhysics {
             for(const [xx,yy] of def.shape){
                 const p=rotate(xx,yy,b.angle),before=rotate(xx,yy,oldAngle);
                 const floor=this.surface(b.x+p[0],oldY+before[1],b),over=b.y+p[1]-floor;
+                if(over>-.65)nearSupport=true;
                 if(over>depth+.2){depth=over;cx=p[0];cy=p[1];n=1;}
-                else if(over>0&&Math.abs(over-depth)<=.2){cx+=p[0];cy+=p[1];n++;}
+                else if(over>0&&Math.abs(over-depth)<=.2){cx+=p[0];cy+=p[1];n++;depth=Math.max(depth,over);}
             }
-            if(!n){b.quiet=0;continue;}
+            if(!n)continue;
             cx/=n;cy/=n;b.y-=depth;
             const velocity=b.vy+b.spin*cx;
             if(velocity>0){
@@ -118,12 +120,14 @@ export class HypotheticalTowerPhysics {
                 }
             }
             b.vx*=.98;b.spin*=.96;
-            const slow=Math.abs(b.x-oldX)<.035&&Math.abs(b.y-oldY)<.065&&Math.abs(b.angle-oldAngle)<.003;
-            b.quiet=slow?b.quiet+1:0;
-            if(b.quiet>=18){b.sleeping=true;b.vx=0;b.vy=0;b.spin=0;break;}
             // Preserve finite velocities if two nearly coincident supports meet.
             if(!Number.isFinite(b.x+b.y+b.angle)){b.x=oldX;b.y=oldY;b.angle=oldAngle;b.vx=b.vy=b.spin=0;b.sleeping=true;}
         }
+        // Sleep on sustained subpixel motion, including the tiny intervals
+        // between contacts. Resetting at each micro-bounce kept rubble alive.
+        const slow=Math.hypot(b.x-startX,b.y-startY)<.16&&Math.abs(b.angle-startAngle)<.006;
+        b.quiet=nearSupport&&slow?b.quiet+1:0;
+        if(b.quiet>=24){b.sleeping=true;b.vx=0;b.vy=0;b.spin=0;}
     }
     private breakBelfry(){
         const parent=this.bodies.belfry;parent.hidden=true;parent.sleeping=true;
@@ -140,7 +144,7 @@ export class HypotheticalTowerPhysics {
         for(const [id,direction] of [['roof-left',-1],['roof-right',1]] as const){
             const b=this.bodies[id],d=TOWER_PARTS[id],p=towerBodyPoint(parent,d.x,d.y);
             b.x=p[0];b.y=p[1];b.angle=parent.angle;b.hidden=false;b.attached=false;
-            b.vx=parent.vx+direction*.6;b.vy=parent.vy+(direction<0?.2:-.1);
+            b.vx=parent.vx+direction*.35;b.vy=parent.vy+(direction<0?.2:-.1);
             b.spin=parent.spin+direction*.018;
         }
     }
