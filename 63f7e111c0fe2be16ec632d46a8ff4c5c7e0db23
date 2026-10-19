@@ -1,0 +1,18 @@
+Technical documentation supplement for 63f7e111c0fe2be16ec632d46a8ff4c5c7e0db23
+
+feat(hipotetico): simulate tower collapse and refine rocket effects
+
+Behavior
+Replace tower collapse pose interpolation with staged, bounded rigid-body motion and separate the effect renderer.
+
+Implementation
+Adds HypotheticalTowerPhysics.ts: TOWER_PARTS, TOWER_RELEASE, TowerBody, TowerContact and HypotheticalTowerPhysics. Parts release in an authored order, then use gravity, angular motion, friction and support contacts. Adds HypotheticalTowerEffects.ts for projectile and impact effects. HypotheticalTower adds accelerating flight, spatially sampled exhaust, a rocket audio cue and contact-triggered rubble/bell sounds.
+
+Scope and limitations
+Tower sounds now follow physical contact events instead of the earlier fixed landing timestamps. The simulation is local scenic physics, not general collision resolution between all moving bodies.
+
+Publication evidence
+A successful local publisher receipt identifies build `63f7e111c0fe2be16ec632d46a8ff4c5c7e0db23-c67fcea56418` for this exact source commit. The report records `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its build-log SHA-256 is `1c7c8bc089b35d819814b90012f9499958b0e3d516e6df0443213fa95d39985e`. This establishes recorded build/publication completion, not gameplay correctness.
+
+Full file inventory and provenance: docs/commits/2026-10-19/63f7e11.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
