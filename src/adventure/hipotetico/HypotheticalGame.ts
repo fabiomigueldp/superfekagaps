@@ -276,7 +276,7 @@ export class HypotheticalGame extends WorldGame {
             this.siegeCheckpoint=this.fight.route.cleared;this.audio.sfx('checkpoint');
         }else if(this.act==='siege'&&this.fight.route.releasedThisTick)this.audio.sfx('switch');
         for(const event of this.fight.events){
-            if(event==='shot'||event==='impact'||event==='splash'||event==='collapse-water'||event==='debris-land'||event==='reload'||event==='distant-shot'||event==='distant-hit'||event==='distant-debris'||event==='distant-thud')this.weaponAudio.play(event);
+            if(event==='shot'||event==='impact'||event==='splash'||event==='collapse-water'||event==='debris-land'||event==='reload'||event==='distant-shot'||event==='distant-hit'||event==='distant-debris'||event==='distant-thud'||event==='distant-roar')this.weaponAudio.play(event);
             if(event==='step'&&this.fight.tick%3===0)this.audio.sfx('land');
             if(event==='break'){
                 if(this.act==='siege'){

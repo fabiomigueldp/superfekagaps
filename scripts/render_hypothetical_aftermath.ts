@@ -7,9 +7,11 @@ import {HypotheticalModel} from '../src/adventure/hipotetico/HypotheticalModel';
 import {drawHypotheticalBackground} from '../src/adventure/hipotetico/HypotheticalArt';
 import {AFTERMATH_YARDS} from '../src/adventure/hipotetico/HypotheticalAftermath';
 import {SCENIC_STARTS} from '../src/adventure/hipotetico/HypotheticalDevastation';
+import {SIEGE_WIDTH} from '../src/adventure/hipotetico/HypotheticalSiege';
 import {sceneLifecycleBrowser} from '../tests/helpers/sceneLifecycleHarness';
 import {pixelText} from '../src/graphics/BitmapFont';
 const [destination,canvasModule]=process.argv.slice(2),out=resolve(destination);
+const routines=process.argv.includes('--routines'),steps=routines?3600:2160;
 mkdirSync(join(out,'frames'),{recursive:true});
 const {createCanvas}=await import(pathToFileURL(resolve(canvasModule)).href);
 const clean:Array<()=>void>=[],h=sceneLifecycleBrowser({after:f=>clean.push(f as ()=>void)});
@@ -25,36 +27,48 @@ const scenes=names.map((name,i)=>{
 });
 const screen=createCanvas(320,180),c=screen.getContext('2d');c.imageSmoothingEnabled=false;
 const film=createCanvas(640,408),fc=film.getContext('2d');fc.imageSmoothingEnabled=false;
-const board=createCanvas(1280,640),bc=board.getContext('2d');bc.imageSmoothingEnabled=false;
-bc.fillStyle='#102731';bc.fillRect(0,0,1280,640);
-const shots=[{phase:'search',age:76,label:'farejar'},{phase:'rummage',age:58,label:'investigar'},
+const board=createCanvas(routines?1920:1280,640),bc=board.getContext('2d');bc.imageSmoothingEnabled=false;
+bc.fillStyle='#102731';bc.fillRect(0,0,board.width,640);
+const shots:Array<{phase:string;age:number;label:string;action?:string}>=routines?
+    [{phase:'perform',action:'ram',age:48,label:'ariete'},{phase:'perform',action:'stomp',age:54,label:'pisada'},
+    {phase:'perform',action:'rake',age:68,label:'remexer'},{phase:'perform',action:'tail',age:52,label:'caudada'},
+    {phase:'perform',action:'fire',age:48,label:'rajada'},{phase:'perform',action:'bellow',age:48,label:'rugido'}]
+    :[{phase:'search',age:76,label:'farejar'},{phase:'rummage',age:58,label:'investigar'},
     {phase:'flush',age:68,label:'reagir'},{phase:'turn-out',age:22,label:'virar'},
     {phase:'patrol',age:60,label:'patrulhar'},{phase:'survey',age:50,label:'observar'}];
 const captures:object[]=[],transitions:object[]=[];
 try{
-    for(let step=0;step<2160;step++){
+    for(let step=0;step<steps;step++){
         if(step%3===0){fc.fillStyle='#102731';fc.fillRect(0,0,640,408);}
         for(const [i,s] of scenes.entries()){
+            if(routines&&step>=2400){
+                // The final twenty seconds study reframing inside the same
+                // courtyard; these are explicit authoring poses, not inputs.
+                s.player.x=AFTERMATH_YARDS[i].origin+252+130*Math.sin((step-2400)/1200*Math.PI*2);
+                s.cameraX=Math.max(0,Math.min(SIEGE_WIDTH-320,s.player.x-132));
+            }
             const a=s.model.backdrop.aftermath,previous=a.phase;
             s.model.update(1000/60,s.player,2);
-            if(a.phase!==previous)transitions.push({scene:s.name,step,phase:a.phase,cycle:a.cycle});
+            if(a.phase!==previous)transitions.push({scene:s.name,step,phase:a.phase,cycle:a.cycle,action:a.action,count:a.actionCount});
             if(step%120===0)s.samples.push({step,story:s.model.backdrop.tick,ambient:a.tick,phase:a.phase,age:a.age,
-                x:a.x,cleared:s.model.route.cleared,damage:a.yards[i].damage});
-            const shot=shots.find(x=>x.phase===a.phase&&x.age===a.age&&!s.seen.has(x.label));
+                x:a.x,playerX:s.player.x,cameraX:s.cameraX,cleared:s.model.route.cleared,damage:a.yards[i].damage,action:a.action,
+                shots:a.shots.length,impacts:a.impacts.length,casings:a.casings.length});
+            const shot=shots.find(x=>x.phase===a.phase&&x.age===a.age&&(!x.action||x.action===a.action)&&!s.seen.has(x.label));
             if(step%3!==0&&!shot)continue;
             drawHypotheticalBackground(c,s.model,s.cameraX,64,false);
+            const pixels=c.getImageData(0,0,320,180);
             if(step%3===0){
                 const x=i%2*320,y=Math.floor(i/2)*204;
-                fc.drawImage(screen,x,y+24);pixelText(fc,s.name.toUpperCase(),x+10,y+9,'#e2c28b');
+                fc.putImageData(pixels,x,y+24);pixelText(fc,s.name.toUpperCase(),x+10,y+9,'#e2c28b');
             }
             if(shot){
                 s.seen.add(shot.label);const file=s.name+'-'+shot.label+'.png';
                 writeFileSync(join(out,file),screen.toBuffer('image/png'));
                 captures.push({file,step,story:s.model.backdrop.tick,phase:a.phase,age:a.age,cycle:a.cycle});
                 const column=shots.indexOf(shot);
-                if(column<4){
+                if(column<(routines?6:4)){
                     const x=column*320,y=i*160;
-                    bc.drawImage(screen,0,0,320,136,x,y+24,320,136);
+                    bc.putImageData(c.getImageData(0,0,320,136),x,y+24);
                     pixelText(bc,s.name.toUpperCase()+' / '+shot.label.toUpperCase(),x+7,y+9,'#e2c28b');
                 }
             }
@@ -63,7 +77,8 @@ try{
     }
     writeFileSync(join(out,'activity-board.png'),board.toBuffer('image/png'));
     writeFileSync(join(out,'art-study.json'),JSON.stringify({kind:'authored native renderer study',gameplayTest:false,
-        frames:720,fps:20,seconds:36,heldPlayers:true,captures,transitions,
+        frames:steps/3,fps:20,seconds:steps/60,heldPlayers:!routines,
+        cameraStudy:routines?'40 seconds held, then 20 seconds of authored camera travel':null,captures,transitions,
         scenes:scenes.map(s=>({name:s.name,cameraX:s.cameraX,playerX:s.player.x,samples:s.samples}))},null,2));
-    console.log(JSON.stringify({output:out,frames:720,captures:captures.length}));
+    console.log(JSON.stringify({output:out,frames:steps/3,captures:captures.length}));
 }finally{for(const f of clean.reverse())f();}

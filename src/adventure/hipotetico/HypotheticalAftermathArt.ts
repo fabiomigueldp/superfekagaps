@@ -3,11 +3,50 @@ import { smoothMotion } from './HypotheticalMotion';
 import { AFTERMATH_YARDS, type HypotheticalAftermath, type AftermathYard } from './HypotheticalAftermath';
 import { drawBystanders } from './HypotheticalBystanders';
 import type { HypotheticalBackdrop } from './HypotheticalBackdrop';
+import {AFTERMATH_PROPS} from './HypotheticalAftermathScore';
+import {drawGunTracer,drawGunImpact} from './HypotheticalGunfire';
 
 // Rear-street colours stay below the contrast of guards, bullets and playable ledges.
 const P={ink:'#516d70',dark:'#657c73',stone:'#92a18c',edge:'#c1b99a',wood:'#9e9475',grain:'#7d826d',
     light:'#b7aa87',metal:'#718b84',shine:'#abb49a',dust:'#a8ae96',bird:'#c4c4ab',wing:'#839b91'};
 const progress=(tick:number,born:number,time:number)=>born<0?0:smoothMotion((tick-born)/time);
+
+/** Survivable debris and anchored hardware: repeated blows dent and shake
+ * them, while the initial demolition and escaped residents remain permanent. */
+function secondaryProp(c:CanvasRenderingContext2D,x:number,y:number,index:number,s:AftermathYard['props'][number],tick:number,reduced:boolean){
+    const age=s.struckAt<0?100:tick-s.struckAt,shake=reduced||age>28?0:Math.sin(age*1.7)*(1-age/28)*s.force*2;
+    oval(c,x-16,y-3,34,4,P.dark);
+    if(index===0){
+        for(let i=0;i<4;i++){
+            const yy=y-6-i*4,slip=s.wear*(i%2?1:-1);
+            pixelLine(c,x-14+slip,yy+shake,x+14+slip,yy-3+shake,P.grain,4);
+            pixelLine(c,x-12+slip,yy-1+shake,x+13+slip,yy-3+shake,P.light);
+            box(c,x-8+slip,yy-2+shake,2,1,P.dark);
+        }
+        pixelLine(c,x-9,y-19,x-8-s.wear*2,y-3,P.ink);pixelLine(c,x+9,y-19,x+9+s.wear*2,y-3,P.metal);
+    }else if(index===1){
+        for(let i=0;i<5;i++){
+            const xx=x-16+i*7,yy=y-5-i%2*6;
+            polygon(c,[[xx,yy],[xx+3,yy-5],[xx+10,yy-4],[xx+12,yy+3],[xx+1,yy+4]],i%2?P.metal:P.stone);
+            pixelLine(c,xx+3,yy-4,xx+8,yy-3,P.edge);box(c,xx+7,yy+1,3,1,P.dark);
+        }
+        for(let i=0;i<s.wear;i++)pixelLine(c,x-10+i*8,y-6,x-6+i*8,y-3,P.ink);
+    }else{
+        // Bolted, already battered service shutter. It bends on its hinges;
+        // no intact new target pops into place after the previous burst.
+        for(const d of [-1,1]){box(c,x+d*12,y-37,3,36,P.dark);box(c,x+d*12+1,y-36,1,32,P.shine);}
+        box(c,x-14,y-39,31,3,P.metal);box(c,x-13,y-39,29,1,P.edge);
+        box(c,x-10+shake,y-35,22,31,P.ink);box(c,x-9+shake,y-34,20,28,P.metal);
+        for(let j=0;j<6;j++){
+            const bend=j===2||j===3?s.wear:0;
+            pixelLine(c,x-8+shake,y-32+j*4,x+9+shake,y-32+j*4+bend,P.shine);
+        }
+        for(let j=0;j<s.wear;j++){
+            const xx=x-5+j*4,yy=y-30+j*7;box(c,xx+shake,yy,2,2,P.ink);pixelLine(c,xx+1+shake,yy+2,xx+4+shake,yy+3,P.dark);
+        }
+        box(c,x-14,y-3,31,3,P.dark);
+    }
+}
 
 function refuge(c:CanvasRenderingContext2D,x:number,y:number,district:number){
     // The bastion uses an existing arcade bay; the other streets have a service recess.
@@ -112,7 +151,8 @@ function masonry(c:CanvasRenderingContext2D,x:number,y:number,s:AftermathYard,ti
         box(c,xx,yy,16,8,P.ink);box(c,xx+1,yy+1,14,6,row%2?P.stone:P.metal);
         box(c,xx+1,yy+1,13,1,P.edge);box(c,xx+3,yy+3,5,1,P.shine);
     }
-    const sway=reduced?0:Math.sin(tick/33)*1.4;
+    const roarAge=s.roarAt<0?100:tick-s.roarAt;
+    const sway=reduced?0:Math.sin(tick/33)*1.4+(roarAge<80?Math.sin(roarAge/3)*(1-roarAge/80)*3:0);
     pixelLine(c,x+21,y-36,x+21,y-7,P.dark,2);
     polygon(c,[[x+21,y-34],[x+34,y-32+sway],[x+31,y-20+sway],[x+23,y-22]],'#947f70');
     pixelLine(c,x+23,y-32,x+31,y-31+sway,'#b4a18a');
@@ -138,6 +178,7 @@ export function drawAftermathYards(c:CanvasRenderingContext2D,b:HypotheticalBack
         const x=yard.origin,s=a.yards[i];
         if(x+390<cameraX||x+110>cameraX+320)continue;
         refuge(c,x,base,i);
+        for(const [j,prop] of AFTERMATH_PROPS.entries())secondaryProp(c,x+prop.offset,base-3,j,s.props[j],a.tick,reduced);
         if(s.runnerAt>=0){
             // The stack hides the start of the escape; actors emerge past its actual right edge.
             c.save();c.beginPath();c.rect(x+296,base-34,95,36);c.clip();
@@ -154,7 +195,8 @@ export function drawAftermathYards(c:CanvasRenderingContext2D,b:HypotheticalBack
             const returned=age>1450;
             if(reduced&&s.birdsAt>=0)continue;
             if(age>142&&!returned)continue;
-            const perchX=x+(j<2?264+j*14:344+(j-2)*9),perchY=base-(j<2?33:i===3?32:47);
+            const eave=s.birdsFlights>1;
+            const perchX=x+(eave?335+j*7:j<2?264+j*14:344+(j-2)*9),perchY=base-(eave?i===3?32:47:j<2?33:i===3?32:47);
             const flight=age>=0&&age<=142,landing=returned&&age<1606;
             const t=flight?age:landing?1606-age:0;
             const xx=flight?perchX+t*.93:returned?x+335+j*7+t*.4:perchX;
@@ -188,17 +230,28 @@ export function drawAftermathEffects(c:CanvasRenderingContext2D,a:HypotheticalAf
         }
     }
     if(!a.active)return;
+    for(const shot of a.shots)drawGunTracer(c,shot,0,base,reduced,true);
+    for(const hit of a.impacts)drawGunImpact(c,hit,a.tick,0,base,reduced,true);
     for(const p of a.contacts){
         const age=a.tick-p.born,step=p.kind==='step',end=step?26:72;
         if(reduced&&step)continue;
         if(age>=end)continue;
         const fade=1-age/end,grow=Math.min(1,(age+1)/6),n=step?3:reduced?3:6;
         if(!step&&age<8){
-            const impactY=base-(a.district===3&&p.kind==='break'?4:17);
+            const impactY=base+(p.y??-(a.district===3&&p.kind==='break'?4:17));
             for(let j=0;j<4;j++){
                 const angle=-Math.PI*.88+j*.7,r=4+age*1.2;
                 pixelLine(c,p.x+Math.cos(angle)*r,impactY+Math.sin(angle)*r*.45,
                     p.x+Math.cos(angle)*(r+3),impactY+Math.sin(angle)*(r+3)*.45,P.edge);
+            }
+        }
+        if(!step&&!reduced&&p.material&&age<38){
+            // Small fragments leave the actual contact, settle, and expire.
+            for(let j=0;j<5;j++){
+                const dx=(j-2)*.55,xx=p.x+dx*age,yy=base+(p.y??-12)-age*(.8+j%2*.4)+age*age*.035;
+                if(yy>base-2)continue;
+                pixelLine(c,xx,yy,xx+2+(p.material==='timber'?2:0),yy+j%2,
+                    p.material==='iron'?P.shine:p.material==='stone'?P.stone:P.wood,2);
             }
         }
         for(let j=0;j<n;j++){

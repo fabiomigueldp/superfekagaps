@@ -360,7 +360,7 @@ export function dinosaurPose(b: HypotheticalModel, cx: number, cy: number, reduc
 export function distantRiderPose(action:HypotheticalBackdrop,reduced=false):DinosaurPose {
     const m=action.motion,r=BACKDROP_RIG;
     if(action.aftermath.active){const pose=action.aftermath.pose(reduced);return {
-        x:r.x,y:r.y+pose.lift/r.scale,...pose,recoil:0,heat:0,
+        x:r.x,y:r.y+pose.lift/r.scale,...pose,
         daze:0,armor:9,flash:false,defeated:false,distant:true,
     };}
     return {x:r.x,y:r.y+m.lift/r.scale,facing:1,gait:action.travel/(r.scale*11),stride:action.stride,
@@ -387,8 +387,14 @@ function drawDistantRider(c:CanvasRenderingContext2D,b:HypotheticalModel,base:nu
     const smoothing=c.imageSmoothingEnabled;c.imageSmoothingEnabled=false;
     c.drawImage(rig.canvas,0,0,r.width,r.height,Math.round(b.backgroundX-r.x*r.scale),Math.round(base-r.y*r.scale),r.width*r.scale,r.height*r.scale);
     c.imageSmoothingEnabled=smoothing;
-    if(action.muzzle>0){const m=action.barrel;drawGunMuzzle(c,m.x,base+m.y,Math.cos(action.angle),Math.sin(action.angle),action.muzzle,reduced,true);}
-    for(const shell of action.casings)drawGunCasing(c,shell.x,base+shell.y,1,action.tick-shell.born,base,reduced,BACKDROP_RIG.scale);
+    if(action.aftermath.active){
+        const a=action.aftermath;
+        if(a.muzzle>0){const m=a.barrel;drawGunMuzzle(c,m.x,base+m.y,m.dx,m.dy,a.muzzle,reduced,true);}
+        for(const shell of a.casings)drawGunCasing(c,shell.x,base+shell.y,shell.direction,a.tick-shell.born,base,reduced,r.scale);
+    }else{
+        if(action.muzzle>0){const m=action.barrel;drawGunMuzzle(c,m.x,base+m.y,Math.cos(action.angle),Math.sin(action.angle),action.muzzle,reduced,true);}
+        for(const shell of action.casings)drawGunCasing(c,shell.x,base+shell.y,1,action.tick-shell.born,base,reduced,r.scale);
+    }
 }
 
 export function drawHypotheticalBackground(c:CanvasRenderingContext2D,b:HypotheticalModel,cx:number,cy:number,reduced:boolean){
