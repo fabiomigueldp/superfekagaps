@@ -2,6 +2,37 @@
 
 Revisão de 19/10/2026, integrada ao encontro nativo `/?encounter=hipotetico`.
 
+## Refinamento do movimento e da poeira
+
+Revisão 11: a cabeça recebe uma rotação rígida no alto do pescoço. O desenho,
+a mandíbula, as rédeas e `jawAnchor` compartilham `dinosaurHeadPoint`; escamas,
+olhos e focinho acompanham a inclinação sem deformar a textura. O valor padrão
+é zero, preservando a geometria das demais ações.
+
+`AftermathForage` antecipa a descida com transferência de peso de até 2,8 pixels
+nativos. `aftermathFooting` compensa esse deslocamento nos apoios. A resposta
+do cavaleiro vem cinco passos depois, e a da cauda, oito. Duas acomodações
+assimétricas substituem a oscilação uniforme; a recuperação libera cabeça e
+tronco em momentos distintos. O contato mantém a altura da boca sobre o piso.
+
+A poeira começa no contato, e seu núcleo permanece opaco antes da oclusão.
+Depois se alarga e perde densidade. Cinco fiapos têm nascimentos espaçados,
+arrasto e deriva. Nove grãos compartilham uma trajetória analítica de queda,
+ressalto amortecido e rolamento com o instante do som de chegada. O contato
+deixa uma marca seca por figura, com no máximo duas por pátio.
+
+Uma mudança de rua cancela a ação e as emissões futuras, mas os resíduos já
+emitidos concluem sua queda e dissipação pelo relógio global. O núcleo leva
+20 passos para se dissipar nesse corte. Movimento reduzido conserva o núcleo
+e as marcas, omitindo deriva, fiapos e grãos decorativos.
+
+`forage-polish.mp4` reúne quatro composições nativas de seis segundos a 60 fps.
+`forage-polish-board.png` apresenta seis poses por pátio; `forage-polish-study.json`
+registra cabeça, mandíbula, apoios no espaço da rua, contatos e tempos. Os
+quadros foram compostos e inspecionados com o renderizador Canvas do jogo,
+sem navegador, áudio ou combate em primeiro plano. Não são testes de gameplay.
+A publicação segue apenas o build Vite, sem suíte de testes ou typecheck.
+
 ## Investigação e alimentação sugerida
 
 Refinamento 10: `HypotheticalAftermathForage` acrescenta uma passagem ocasional

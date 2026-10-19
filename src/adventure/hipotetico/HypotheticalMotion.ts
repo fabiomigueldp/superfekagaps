@@ -60,6 +60,14 @@ export function riderTorsoPoint(point: Point, rider: number, drop: number, shift
     return [point[0] + riderBend(height, lean) + shift * (1 - upper), point[1] - drop * (1 - upper)];
 }
 
+/** Rigid skull rotation at the upper neck. The renderer, bridle and mouth
+ * effects share this pivot so texture and contact cannot slide apart. */
+export function dinosaurHeadPoint(point:Point,neck:number,pitch=0):Point {
+    if(pitch===0)return point;
+    const dx=point[0]-29,dy=point[1]-neck-6,c=Math.cos(pitch),s=Math.sin(pitch);
+    return [29+dx*c-dy*s,neck+6+dx*s+dy*c];
+}
+
 /** A long planted stance followed by a shorter airborne return; feet do not slide sinusoidally. */
 export function dinosaurFoot(gait: number, offset: number, stride: number, tuck: number): Point {
     const t = ((gait / (Math.PI * 2) + offset) % 1 + 1) % 1;

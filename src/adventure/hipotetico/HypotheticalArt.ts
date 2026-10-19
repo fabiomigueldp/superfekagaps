@@ -4,7 +4,7 @@ import { box, oval, pixelLine, polygon, type Point } from '../WorldPainting';
 import { pixelText } from '../../graphics/BitmapFont';
 import type { WorldLevel, WorldObjects } from '../WorldPhysics';
 import { HYPOTHETICAL, type HypotheticalModel } from './HypotheticalModel';
-import { dinosaurLeg, dinosaurTail, hypotheticalMotion, riderBend, riderTorsoPoint, smoothMotion } from './HypotheticalMotion';
+import { dinosaurLeg, dinosaurTail, dinosaurHeadPoint, hypotheticalMotion, riderBend, riderTorsoPoint, smoothMotion } from './HypotheticalMotion';
 import { BACKDROP_RIG, backdropBaseline, type HypotheticalBackdrop } from './HypotheticalBackdrop';
 import { drawBystanders,drawCarriedBystander,type CarriedBystander } from './HypotheticalBystanders';
 import {drawTowerSearchActors,drawTowerSearchDust} from './HypotheticalTowerSearchArt';
@@ -26,7 +26,7 @@ const P = { ink: '#172c36', deep: '#263f3d', shade: '#556047', hide: '#92845a', 
     suit: '#304659', lapel: '#607487', skin: '#c58d68', face: '#edbc8e', hair: '#3c3034',
     brass: '#d3a75c', mint: '#99e0cf', hot: '#ffb267', scute:'#6e7953', skinLight:'#f7d2a6',
     mouth:'#593b40', tongue:'#bc796a', leather:'#583f38', stitch:'#b8885d', clothShade:'#203644' };
-export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; riderDrop?:number; riderLean?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number; lookBack?:number; gore?:number; heldDebris?:HeldDebris; launcher?:LauncherPose; carriedBystander?:CarriedBystander; feet?:PlantedFeet }
+export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; headPitch?:number; riderDrop?:number; riderLean?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number; lookBack?:number; gore?:number; heldDebris?:HeldDebris; launcher?:LauncherPose; carriedBystander?:CarriedBystander; feet?:PlantedFeet }
 const fogPalette=new Map<string,string>();
 function distantColor(color:string){
     if(!fogPalette.has(color)){
@@ -130,8 +130,9 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     if((pose.pivot??0)>.78){drawDinosaurPivot(c,pose);return;}
     const { x, y, facing: d } = pose, bow = pose.bow, bob = pose.breath;
     const profile=Math.sqrt(Math.max(0,1-(pose.pivot??0)**2));
-    let riderBase:number|null=null,headFacing=1;
-    const riderPoint=(xx:number,yy:number):Point=>riderBase===null?[xx,yy]
+    let riderBase:number|null=null,headFacing=1,skull=false;
+    const headPoint=(point:Point)=>dinosaurHeadPoint(point,neck,pose.headPitch??0);
+    const riderPoint=(xx:number,yy:number):Point=>skull?headPoint([xx,yy]):riderBase===null?[xx,yy]
         :riderTorsoPoint([xx*headFacing,yy],riderBase,pose.riderDrop??pose.tuck*18,pose.recoil-pose.tuck*10,pose.riderLean??0);
     const tint=(color:string)=>pose.distant?distantColor(color):color;
     const poly = (pts: Point[], color: string) => polygon(c, pts.map(([xx, yy]) => {
@@ -141,7 +142,7 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
         const a=riderPoint(x1,y1),b=riderPoint(x2,y2);pixelLine(c,x+d*a[0]*profile,y+a[1],x+d*b[0]*profile,y+b[1],tint(col),w);
     };
     const rect = (xx: number, yy: number, w: number, h: number, col: string) => {
-        if(riderBase!==null){poly([[xx,yy],[xx+w,yy],[xx+w,yy+h],[xx,yy+h]],col);return;}
+        if(riderBase!==null||skull){poly([[xx,yy],[xx+w,yy],[xx+w,yy+h],[xx,yy+h]],col);return;}
         box(c,x+(d>0?xx:-xx-w)*profile,y+yy,w*profile,h,tint(col));
     };
     const ell = (xx: number, yy: number, w: number, h: number, col: string) => {
@@ -208,6 +209,7 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
         line(25+i*4,neck+11+i*3,33+i*2,neck+13+i*3,P.light);
     }
     // Hinged lower jaw, teeth and palate. The eye keeps a readable 1px pupil.
+    skull=(pose.headPitch??0)!==0;
     const jaw = pose.jaw * 13;
     poly([[26,neck-11],[47,neck-16],[66,neck-10],[70,neck+3],[61,neck+9],[30,neck+8]],P.ink);
     poly([[29,neck-9],[48,neck-13],[64,neck-8],[66,neck+2],[59,neck+5],[31,neck+5]],P.hide);
@@ -246,6 +248,7 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     if(pose.defeated||(pose.eyeClose??0)>.5){rect(47,neck-7,7,4,P.hide);line(48,neck-5,53,neck-5,P.ink);}
     line(44,neck-10,49,neck-9,P.scute,2);line(49,neck-9,55,neck-8+(pose.focus??0),P.shade,2);
     rect(62,neck-4,3,2,P.ink);rect(61,neck-5,3,1,P.light);
+    skull=false;
     line(27,body-2,32,body+8,P.ink,5);line(29,body-2,33,body+7,P.light,2);
     line(33,body+7,42,body+5,P.hide,3);line(40,body+5,44,body+9,P.ivory);
     leg(false);
@@ -264,8 +267,11 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
         for(let stud=0;stud<remaining;stud++){rect(xx+1+stud*2,saddle+6,1,2,P.brass);rect(xx+1+stud*2,saddle+6,1,1,P.ivory);}
         if(!remaining)line(xx+2,saddle+6,xx+5,saddle+9,P.ink);
     }
-    line(12,saddle+3,28,neck+9,P.ink,2);line(28,neck+9,48,neck+13,P.rust,2);
+    const bridle=headPoint([28,neck+9]),buckle=headPoint([48,neck+13]);
+    line(12,saddle+3,...bridle,P.ink,2);line(...bridle,...buckle,P.rust,2);
+    skull=(pose.headPitch??0)!==0;
     rect(44,neck+10,4,5,P.brass);rect(45,neck+11,2,2,P.ink);
+    skull=false;
     if(pose.armor<=6){line(-17,saddle+10,-22-pose.cloth*.4,saddle+17,P.rust,2);line(-22-pose.cloth*.4,saddle+17,-20,saddle+19,P.brass);}
     if(pose.armor<=3){line(12,saddle+10,17+pose.cloth*.3,saddle+15,P.rust,2);rect(15,saddle+15,2,2,P.brass);}
     // Riding boots follow the saddle; jacket tails lag behind the stride.
@@ -356,7 +362,7 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     const grip=gp(18-pose.reload*6,3+pose.reload*9),rein=pose.rein??0;
     const hand:Point=[grip[0]*(1-rein)+(14-r)*rein,grip[1]*(1-rein)+(rider-2)*rein];
     const elbow:Point=[16-r-rein*8+riderBend(12,lean),rider-12+pose.reload*5];
-    if(rein>.05){line(hand[0],hand[1],28,neck+4,P.ink,2);line(hand[0],hand[1],28,neck+4,P.rust);line(28,neck+4,48,neck+13,P.rust);}
+    if(rein>.05){const loop=headPoint([28,neck+4]);line(...hand,...loop,P.ink,2);line(...hand,...loop,P.rust);line(...loop,...buckle,P.rust);}
     line(6-r+riderBend(20,lean),rider-20,...elbow,P.suit,5);line(...elbow,...hand,P.suit,4);ell(hand[0]-1,hand[1]-2,5,4,P.face);
     line(...gp(6,4),...gp(7,6),P.face,2);
     }

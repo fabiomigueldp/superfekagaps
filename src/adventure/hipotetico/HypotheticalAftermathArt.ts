@@ -235,6 +235,7 @@ export function drawAftermathYards(c:CanvasRenderingContext2D,b:HypotheticalBack
 /** Front layer: short contact accents, persistent chips and low settling dust. */
 export function drawAftermathEffects(c:CanvasRenderingContext2D,a:HypotheticalAftermath,base:number,reduced:boolean){
     for(const [i,s] of a.yards.entries()){
+        drawForageCover(c,s.forage,base,reduced,a.tick);
         drawEscapeDust(c,s.escape,base,reduced);
         drawAftermathIncidents(c,AFTERMATH_YARDS[i].origin,base,s.environment,a.tick,reduced);
         for(const [j,prop] of s.props.entries()){
@@ -263,7 +264,6 @@ export function drawAftermathEffects(c:CanvasRenderingContext2D,a:HypotheticalAf
         }
     }
     if(!a.active)return;
-    drawForageCover(c,a.yard.forage,base,reduced);
     for(const shot of a.shots)drawGunTracer(c,shot,0,base,reduced,true);
     for(const hit of a.impacts)drawGunImpact(c,hit,a.tick,0,base,reduced,true);
     for(const p of a.contacts)drawAftermathContact(c,p,a.tick,base,reduced);

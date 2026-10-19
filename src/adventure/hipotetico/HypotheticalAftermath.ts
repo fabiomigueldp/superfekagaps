@@ -1,4 +1,4 @@
-import { smoothMotion, riderBend, dinosaurFootAnchor } from './HypotheticalMotion';
+import { smoothMotion, riderBend, dinosaurFootAnchor, dinosaurHeadPoint } from './HypotheticalMotion';
 import { scenicDistrict, SCENIC_STARTS } from './HypotheticalDevastation';
 import { SIEGE_SECTORS, SIEGE_WIDTH } from './HypotheticalSiege';
 import type { Bystander } from './HypotheticalBackdrop';
@@ -461,8 +461,9 @@ export class HypotheticalAftermath {
     }
     get jawAnchor(){
         const p=this.pose(false);
-        return {x:this.x+this.facing*DEBRIS_GRIP_X*AFTERMATH_SCALE,
-            y:p.lift+(-59+p.bow*25+p.breath+p.neckDrop+p.compression+10+p.jaw*6)*AFTERMATH_SCALE};
+        const neck=-59+p.bow*25+p.breath+p.neckDrop+p.compression;
+        const mouth=dinosaurHeadPoint([DEBRIS_GRIP_X,neck+10+p.jaw*6],neck,p.headPitch);
+        return {x:this.x+this.facing*mouth[0]*AFTERMATH_SCALE,y:p.lift+mouth[1]*AFTERMATH_SCALE};
     }
     get heldDebris():HeldDebris|undefined {
         if(!this.active||this.targetProp<0)return;
@@ -492,6 +493,7 @@ export class HypotheticalAftermath {
             if(e.done)this.enter('recover');
         }else if(this.phase==='forage'){
             const s=this.yard.forage;s.update(this.tick);
+            this.x=this.fromX+s.rootShift;
             if([22,s.variant===0?44:82,254+s.offset].includes(s.age)){
                 const mouth=this.jawAnchor;
                 if(this.inView(mouth.x,12)){
@@ -499,10 +501,14 @@ export class HypotheticalAftermath {
                     if(s.age===22)this.events.push('distant-snort');
                 }
             }
-            if(s.age===s.contactAt&&this.inView(s.targetX,16)){
-                this.contact('scrape',s.targetX,.32,-3,'stone');
-                this.yard.environment.disturb(s.targetX-this.origin,this.tick,.22);
+            if(s.age===s.contactAt){
+                const mouth=this.jawAnchor;s.contact(this.tick,mouth.x);
+                if(this.inView(mouth.x,16)){
+                    this.events.push('distant-debris');
+                    this.yard.environment.disturb(mouth.x-this.origin,this.tick,.22);
+                }
             }
+            if(this.tick===s.landingTick&&this.inView(s.contactX,12))this.events.push('distant-grit');
             if(s.variant===1&&s.age===56){
                 this.yard.environment.disturb(AFTERMATH_PROPS[2].offset+17,this.tick,.42);
                 if(this.inView(this.origin+AFTERMATH_PROPS[2].offset,12))this.events.push('distant-chain');
@@ -638,7 +644,7 @@ export class HypotheticalAftermath {
         const district=scenicDistrict(storyTick), yard=AFTERMATH_YARDS[district];
         // A new authored street has priority. No hidden activity continues in a later district.
         if(district!==this.district){
-            this.yard?.forage.cancel();
+            this.yard?.forage.cancel(this.tick);
             // If the next authored scene takes over during a grip, the actual
             // loose piece drops at its current location instead of vanishing.
             for(const s of this.yard?.props??[]){
@@ -867,7 +873,7 @@ export class HypotheticalAftermath {
             pivot:turn||orienting?Math.sin(Math.PI*turnProgress)*.98:0,
             bow,
             lift:bodyLift, breath, compression,
-            neckDrop,jaw,
+            neckDrop,jaw,headPitch:0,
             tail:search*-.09+strike*.12-tailWind*.35+tailStrike*.95-heave*.18+effort*.08-shake*.12+(reaction?.tail??0)+(reduced?0:Math.sin(this.tick/29)*.025+tailCheck*.12),
             tuck, brace:Math.max(probe*.35,(stamp?landing*.6:strike*.6),ram*.65,crush*.7,firing*.5,effort*.8,heave*.6,reaction?.brace??0,turn||orienting?.42:0),
             riderDrop, riderLean,
@@ -898,7 +904,7 @@ export class HypotheticalAftermath {
         }
         if(this.phase==='forage'){
             const s=this.yard.forage;
-            return {...pose,...s.body(breath,reduced),feet:aftermathFooting(s.age,s.duration,0,this.feetFrom)};
+            return {...pose,...s.body(breath,reduced),feet:aftermathFooting(s.age,s.duration,(this.fromX-this.x)/AFTERMATH_SCALE,this.feetFrom)};
         }
         return pose;
     }

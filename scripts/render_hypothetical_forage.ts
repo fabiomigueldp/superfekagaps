@@ -24,9 +24,9 @@ const scenes=['portaria','cais','arsenal','bastiao'].map((name,i)=>{
 });
 const screen=createCanvas(320,180),c=screen.getContext('2d');c.imageSmoothingEnabled=false;
 const film=createCanvas(640,408),fc=film.getContext('2d');fc.imageSmoothingEnabled=false;
-const board=createCanvas(1600,816),bc=board.getContext('2d');bc.imageSmoothingEnabled=false;
-const detail=createCanvas(1600,736),dc=detail.getContext('2d');dc.imageSmoothingEnabled=false;
-bc.fillStyle='#102630';bc.fillRect(0,0,1600,816);dc.fillStyle='#102630';dc.fillRect(0,0,1600,736);
+const board=createCanvas(1920,816),bc=board.getContext('2d');bc.imageSmoothingEnabled=false;
+const detail=createCanvas(1920,736),dc=detail.getContext('2d');dc.imageSmoothingEnabled=false;
+bc.fillStyle='#102630';bc.fillRect(0,0,1920,816);dc.fillStyle='#102630';dc.fillRect(0,0,1920,736);
 const clips:object[]=[],poses:object[]=[],cues:object[]=[],captures:object[]=[];
 try{
     for(let step=0;step<8400;step++){
@@ -50,8 +50,9 @@ try{
             pixelText(fc,s.name.toUpperCase()+' / '+(f.variant===0?'FAREJAR E RECOLHER':'RUIDO E RETOMADA'),16,12,'#dfba7d',2);
             pixelText(fc,(frame/60).toFixed(1)+' S / COMPOSICAO NATIVA',16,34,'#aebfb3');
             writeFileSync(join(out,'frames',s.name,String(frame).padStart(5,'0')+'.png'),film.toBuffer('image/png'));
-            const shots=[{at:28,label:'ATENCAO'},{at:96+f.offset,label:'APOIO'},
-                {at:140+f.offset,label:'OCLUSAO'},{at:236+f.offset,label:'RECUPERACAO'},{at:280+f.offset,label:'CONTINUIDADE'}];
+            const shots=[{at:28,label:'ATENCAO'},{at:84+f.offset,label:'TRANSFERENCIA'},
+                {at:104+f.offset,label:'CONTATO'},{at:140+f.offset,label:'OCLUSAO'},
+                {at:193+f.offset,label:'DISSIPACAO'},{at:260+f.offset,label:'RECUPERACAO'}];
             const shot=shots.find(q=>q.at===frame);
             if(shot){
                 const file=s.name+'-'+shot.label.toLowerCase()+'.png';writeFileSync(join(out,file),screen.toBuffer('image/png'));
@@ -65,9 +66,14 @@ try{
                     writeFileSync(join(out,s.name+'-reduced.png'),screen.toBuffer('image/png'));
                 }
             }
-            if(frame%6===0)poses.push({yard:s.name,frame,phase:a.phase,actorX:a.x,
-                age:f.age,variant:f.variant,pose:a.pose(false),jaw:a.jawAnchor,cover:f.cover,
-                target:f.targetX,removedAt:f.entry.removedAt,person:{...f.entry.person}});
+            if(frame%6===0){
+                const pose=a.pose(false);
+                poses.push({yard:s.name,frame,phase:a.phase,actorX:a.x,
+                    age:f.age,variant:f.variant,pose,jaw:a.jawAnchor,cover:f.coverAt(a.tick),
+                    feetWorld:pose.feet?.map(p=>[a.x+p[0]*.6875,p[1]*.6875]),
+                    target:f.targetX,contactX:f.contactX,contactTick:f.contactTick,landingTick:f.landingTick,
+                    removedAt:f.entry.removedAt,person:{...f.entry.person}});
+            }
         }
     }
     writeFileSync(join(out,'storyboard.png'),board.toBuffer('image/png'));
