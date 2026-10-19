@@ -10,8 +10,9 @@ committed source and updates all existing World experiences on Oracle. It never
 runs tests, typecheck, validation scripts, browser reviews, `npm ci`, or the npm
 `prebuild` hook. Only Vite and its existing packaging policy run.
 
-The build and push run concurrently. The build snapshot excludes documentation,
-tests and authoring tools, and reuses the installed `node_modules`. New edits made
+The build and push run concurrently. The cached build snapshot excludes documentation,
+tests and authoring tools, extracts only changes between commits, and reuses the
+installed `node_modules`. Unchanged local assets are not copied again. New edits made
 while deployment runs stay outside the published commit. A failed build or push
 stops publication; there are no forced pushes or automatic branch switches.
 
@@ -31,7 +32,8 @@ module lexer. Its private operator adapter records **build succeeded / tests not
 run** truthfully. It does not modify Torbware's source checkout or rebuild/restart
 services. Package checksums, storage isolation, the catalog lock, atomic activation,
 the previous catalog and existing release retention remain in use. Large temporary
-build copies are removed after publication; cache and small history records remain.
+remote build copies are removed after publication; local/remote caches and small
+history records remain.
 
 Prerequisites: installed project dependencies, Node.js 20+, Git, tar, and the
 existing `oracle` SSH alias with noninteractive access and `sudo -n` on Oracle.

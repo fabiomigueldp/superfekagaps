@@ -65,20 +65,48 @@ const tool=await import(pathToFileURL(target).href);await tool.prepare(${JSON.st
   return result(await success(launch('ssh', [...sshArgs, 'sudo', '-n', 'node', '--input-type=module'], { input: program }), 'Oracle preparation'), 'DEPLOY_PLAN ');
 }
 async function snapshot(commit, destination) {
-  await fs.mkdir(destination);
-  // Exclude large review galleries, editable models and tests from the build snapshot.
+  await fs.mkdir(destination, { recursive: true });
+  // A stable local snapshot avoids recopying 75 MB and invalidating path-based
+  // build caches on every deploy. Only committed input changes are extracted.
   const inputs = git('ls-tree', '--name-only', commit).split(/\r?\n/).filter(p => !['docs', 'tests', 'tools'].includes(p));
-  const source = spawn('git', ['archive', commit, '--', ...inputs], { cwd: root, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
-  const unpack = launch('tar', ['-xf', '-', '-C', destination]);
-  source.stdout.pipe(unpack.child.stdin);
-  let archiveError = '';
-  source.stderr.on('data', b => { archiveError += b; });
-  const archived = new Promise((resolve, reject) => {
-    source.on('error', reject); source.on('close', code => resolve(code));
-  });
-  const [code] = await Promise.all([archived, success(unpack, 'Source snapshot')]);
-  if (code !== 0) throw Error(`git archive failed: ${archiveError}`);
-  await fs.symlink(path.join(root, 'node_modules'), path.join(destination, 'node_modules'), process.platform === 'win32' ? 'junction' : 'dir');
+  let previous;
+  try { previous = JSON.parse(await fs.readFile(path.join(stateDir, 'source.json'), 'utf8')); }
+  catch (e) { if (e.code !== 'ENOENT') throw e; }
+  let extract = inputs;
+  if (previous?.commit) {
+    const selected = name => inputs.some(p => name === p || name.startsWith(p + '/'));
+    const changed = git('diff', '--name-only', '--no-renames', '-z', previous.commit, commit).split('\0').filter(Boolean);
+    const present = new Set(git('ls-tree', '-r', '--name-only', '-z', commit).split('\0'));
+    extract = [];
+    for (const name of changed) {
+      if (!selected(name)) {
+        // Also remove a former root input that disappeared from the new tree.
+        if (!present.has(name) && !['docs', 'tests', 'tools'].includes(name.split('/')[0]))
+          await fs.unlink(path.join(destination, name)).catch(e => { if (e.code !== 'ENOENT') throw e; });
+        continue;
+      }
+      if (present.has(name)) extract.push(name);
+      else await fs.unlink(path.join(destination, name)).catch(e => { if (e.code !== 'ENOENT') throw e; });
+    }
+    // Fall back to root inputs before reaching Windows' command-line limit.
+    if (extract.join(' ').length > 12000) extract = inputs;
+  }
+  if (extract.length) {
+    const source = spawn('git', ['archive', commit, '--', ...extract], { cwd: root, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
+    const unpack = launch('tar', ['-xf', '-', '-C', destination]);
+    source.stdout.pipe(unpack.child.stdin);
+    let archiveError = '';
+    source.stderr.on('data', b => { archiveError += b; });
+    const archived = new Promise((resolve, reject) => {
+      source.on('error', reject); source.on('close', code => resolve(code));
+    });
+    const [code] = await Promise.all([archived, success(unpack, 'Source snapshot')]);
+    if (code !== 0) throw Error(`git archive failed: ${archiveError}`);
+  }
+  const modules = path.join(destination, 'node_modules');
+  if (!await fs.lstat(modules).catch(e => { if (e.code !== 'ENOENT') throw e; return null; }))
+    await fs.symlink(path.join(root, 'node_modules'), modules, process.platform === 'win32' ? 'junction' : 'dir');
+  await fs.writeFile(path.join(stateDir, 'source.json'), JSON.stringify({ commit }));
 }
 async function manifest(directory) {
   const entries = [];
@@ -105,7 +133,6 @@ catch (e) {
   throw e;
 }
 await lock.writeFile(String(process.pid));
-let work;
 try {
   if (git('branch', '--show-current') !== 'main') throw Error('Run this command on main; it never switches branches or force-pushes.');
   if (git('status', '--porcelain=v1', '--untracked-files=normal')) {
@@ -117,8 +144,7 @@ try {
   const logs = path.join(stateDir, runId);
   await fs.mkdir(logs);
   console.log(`[deploy] ${commit.slice(0, 7)}: build + push (no tests)`);
-  work = await fs.mkdtemp(path.join(stateDir, 'work-'));
-  const source = path.join(work, 'source');
+  const source = path.join(stateDir, 'source');
   const push = success(launch('git', ['push', 'origin', 'main']), 'Git push', path.join(logs, 'push.log'));
   const build = (async () => {
     await snapshot(commit, source);
@@ -127,7 +153,7 @@ try {
       logSha256: hash(output), tests: 'not-run', publicationMode: 'manual-no-tests', authorizedBy: 'explicit-user-request',
       summary: 'Publicação manual sem testes, por solicitação do usuário. Apenas o build de produção foi gerado com sucesso.' };
   })();
-  // Wait for both operations, including on failure, before removing the source snapshot.
+  // Wait for both operations, including on failure, before releasing the deploy lock.
   const outcomes = await Promise.allSettled([build, push]);
   for (const outcome of outcomes) if (outcome.status === 'rejected') throw outcome.reason;
   const report = outcomes[0].value;
@@ -163,11 +189,5 @@ try {
 } catch (error) {
   console.error(`[deploy] ${error.message}`); process.exitCode = 1;
 } finally {
-  if (work) {
-    // Never follow the dependency junction into the user's actual node_modules.
-    await fs.unlink(path.join(work, 'source/node_modules')).catch(e => { if (e.code !== 'ENOENT') throw e; });
-    if (path.dirname(path.resolve(work)) !== path.resolve(stateDir) || (await fs.lstat(work)).isSymbolicLink()) throw Error('Unsafe snapshot cleanup path');
-    await fs.rm(work, { recursive: true, force: true });
-  }
   await lock.close(); await fs.unlink(path.join(stateDir, 'lock'));
 }
