@@ -163,9 +163,10 @@ export class HypotheticalGame extends WorldGame {
         const elite=visible.find(e=>e instanceof HypotheticalVanguard);
         if(elite instanceof HypotheticalVanguard){
             if(elite.exposed)return 'VANGUARDA EXPOSTO! SALTE OU USE A SENTADA';
+            if(elite.move==='sweep'&&['warning','attack'].includes(elite.phase))return 'VARREDURA BAIXA! SALTE OU USE A SACADA';
             if(elite.move==='vault'&&['warning','attack'].includes(elite.phase))return 'SALTO MARCADO! SAIA DO POUSO E CONTRA-ATAQUE';
             if(elite.move==='cross'&&['warning','attack'].includes(elite.phase))return elite.strike?'SEGUNDO CORTE! CRUZE POR CIMA':'CORTE DUPLO! GUARDE ESPACO PARA O SEGUNDO';
-            return 'INVESTIDA! SALTE E ATAQUE PELAS COSTAS';
+            return elite.enraged?'INVESTIDA! CUIDADO COM A VARREDURA':'INVESTIDA! SALTE E ATAQUE PELAS COSTAS';
         }
         if(stunned)return stunned.spec.kind==='charger'?'TETO QUEBRADO! SALTE NO ARIETE':'SEM CAPACETE! SALTE DE NOVO';
         const vault=visible.find(e=>e instanceof HypotheticalGuard&&e.vaultTarget);
@@ -269,7 +270,8 @@ export class HypotheticalGame extends WorldGame {
         else if(this.act==='siege')this.camera.x=clamp(this.player.data.position.x-132+arrivalLookAhead(this.fight.arrivalTime,this.fight.arrivalSkipped),0,SIEGE_WIDTH-320);
         else this.camera.x=0;
         // Keep the complete jump arc visible without shaking the backdrop vertically.
-        this.camera.y=clamp(Math.min(64,this.player.data.position.y-38),0,64);
+        const headroom=this.act==='siege'&&this.fight.route.entered===3?32:38;
+        this.camera.y=clamp(Math.min(64,this.player.data.position.y-headroom),0,64);
     }
     protected override renderEncounterHud(c:CanvasRenderingContext2D) {
         const b=this.fight;

@@ -15,9 +15,11 @@ const ORIGINAL_SECTORS = [
             { kind: 'loader', x: 986, y: 160 }, { kind: 'loader', x: 1124, y: 176 }],
         platforms: [{ x: 870, y: 188, width: 56 }, { x: 972, y: 160, width: 64 }, { x: 1098, y: 176, width: 56 }] },
     { name: 'BASTIAO', origin: 1248, trigger: 1296, gate: 1696, checkpoint: 1264,
-        guards: [{ kind: 'minion', x: 1472, y: 224, vanguard: true }, { kind: 'loader', x: 1612, y: 160 }],
-        platforms: [{ x: 1312, y: 188, width: 56 }, { x: 1400, y: 164, width: 64 },
-            { x: 1512, y: 192, width: 48 }, { x: 1608, y: 160, width: 64 }] },
+        guards: [{ kind: 'minion', x: 1448, y: 224, vanguard: true }, { kind: 'loader', x: 1620, y: 164 }],
+        // Two flanking perches leave a central floor for crossing the elite's
+        // committed attack. Short steps connect both sides to the thrower.
+        platforms: [{ x: 1312, y: 192, width: 64 }, { x: 1400, y: 168, width: 56 },
+            { x: 1528, y: 176, width: 56 }, { x: 1616, y: 164, width: 64 }] },
 ] as const;
 export const SIEGE_SECTORS = ORIGINAL_SECTORS.map((s,i)=>({...s,
     origin:s.origin+(i?SIEGE_APPROACH:0),trigger:s.trigger+SIEGE_APPROACH,gate:s.gate+SIEGE_APPROACH,

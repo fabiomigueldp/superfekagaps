@@ -650,6 +650,14 @@ function siegeDeck(c: CanvasRenderingContext2D, p: MovingBody, cx: number, cy: n
     }
     box(c,x+2,y+5,w-4,1,iron?S.ironLight:S.woodLight);
     for(const px of [x+3,x+w-6]){box(c,px,y+3,3,4,S.iron);box(c,px+1,y+3,1,1,S.cap);}
+    if(index===3){
+        // Heavy customs-yard steel, with a recessed brace badge. The only bright
+        // horizontal edge remains the real walkable surface.
+        box(c,x+w/2-5,y+8,10,10,S.ink);box(c,x+w/2-4,y+9,8,8,S.iron);
+        pixelLine(c,x+w/2-2,y+11,x+w/2,y+14,'#a5b49f');
+        pixelLine(c,x+w/2,y+14,x+w/2+2,y+11,'#a5b49f');
+        for(const dx of [12,w-18]){box(c,x+dx,y+4,4,1,'#9c9f86');box(c,x+dx+1,y+4,1,1,S.woodShade);}
+    }
     if(!iron&&w>=64){
         // A dark sling under the loading bay explains how it was assembled.
         pixelLine(c,x+8,y+9,x+w-9,y+20,S.woodShade);
@@ -740,7 +748,17 @@ function balcony(c: CanvasRenderingContext2D, p: MovingBody, cx: number, cy: num
 }
 
 export function drawHypotheticalFittings(c: CanvasRenderingContext2D, o: WorldObjects, b: HypotheticalModel, cx: number, cy: number) {
-    if(b.act==='siege'){drawForecourt(c,b,cx,cy);drawArrivalFittings(c,b,cx,cy);}
+    if(b.act==='siege'){
+        drawForecourt(c,b,cx,cy);drawArrivalFittings(c,b,cx,cy);
+        const yard=SIEGE_SECTORS[3].origin-cx,floor=224-cy;
+        // An inset road panel, not an extra platform: it frames the space between
+        // the two duelling perches without adding obstruction or a false hazard.
+        box(c,yard+132,floor+3,204,7,'#3d5c65');box(c,yard+134,floor+4,200,1,'#7f938b');
+        for(const dx of [144,184,224,264,304]){
+            box(c,yard+dx,floor+4,1,5,'#253e4d');box(c,yard+dx+1,floor+7,15,1,'#58777a');
+        }
+        polygon(c,[[yard+231,floor+4],[yard+237,floor+4],[yard+240,floor+7],[yard+235,floor+9],[yard+229,floor+7]],'#9da78e');
+    }
     for(const p of o.bodies){
         if(p.x>cx+350||p.x+p.width<cx-30)continue;
         if(p.kind==='support'){

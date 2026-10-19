@@ -62,7 +62,7 @@ export function drawHypotheticalGuard(c:CanvasRenderingContext2D,e:WorldFoe,cx:n
     if(e instanceof HypotheticalVanguard){drawVanguard(c,e,cx,cy,reduced);return;}
     if(e.dead&&e.deadTimer>=420)return;
     const x=Math.round(e.x-cx),y=Math.round(e.y-cy),w=e.width,h=e.height,d=e.facing||1;
-    const pose=guardPose(e,reduced),kind=e.spec.kind,hit=e.flash>0;
+    const pose=guardPose(e,reduced),kind=e.spec.kind,hit=e.flash>0&&Math.floor(e.flash/45)%2===0;
     const color=(col:string)=>hit?C.light:col;
     const xx=(v:number)=>x+(d>0?v:w-1-v);
     const rect=(a:number,b:number,ww:number,hh:number,col:string)=>box(c,xx(d>0?a:a+ww-1),y+b,ww,hh,color(col));
@@ -181,6 +181,12 @@ export function drawHypotheticalGuard(c:CanvasRenderingContext2D,e:WorldFoe,cx:n
         }
         poly([[4+lean,7+pose.bob],[w-5+lean,7+pose.bob],[w-3,torso+6],[3,torso+6]],C.ink);
         poly([[5+lean,8+pose.bob],[w-6+lean,8+pose.bob],[w-5,torso+4],[4,torso+4]],jacket);
+        // Seams and shoulder plates remain attached to the pose, not to an idle sprite.
+        line(5+lean,8+pose.bob,7+lean,9+pose.bob,kind==='loader'?C.brass:C.seam);
+        line(w-7+lean,9+pose.bob,w-5,torso+2,kind==='helmet'?C.jadeLight:C.seam);
+        rect(5+lean,10+pose.bob,3,2,kind==='helmet'?C.jadeShade:C.cloth);
+        rect(6+lean,10+pose.bob,1,1,C.brass);
+        line(5,torso+3,7,torso+3,kind==='loader'?C.leather:C.seam);
         rect(5,torso+1,3,3,kind==='helmet'?C.jadeShade:C.cloth);
         line(6+lean,8+pose.bob,w-6,torso+3,C.leather,2);
         rect(w/2,torso+1,3,2,C.brass);rect(w/2+1,torso+1,1,1,C.light);
@@ -220,12 +226,15 @@ export function drawHypotheticalGuard(c:CanvasRenderingContext2D,e:WorldFoe,cx:n
             line(front-1,sy+2,front+1,sy+8,e.armor?C.light:C.grain);
             rect(front-1,sy+5,2,3,C.jadeShade);
             rect(front-2,sy+9,1,1,C.steel);rect(front+2,sy+3,1,1,C.leather);
+            line(front-2,sy+4,front,sy+5,e.armor?C.grain:C.wood);
+            line(front,sy+10,front+2,sy+8,e.armor?C.steel:C.grain);
         }else if(kind==='loader'){
             const reach=pose.carry;
             const handX=w-5+12*reach-pose.supply*13,handY=15-11*reach-pose.supply*5;
             const elbowX=w-3+reach*3-pose.supply*8,elbowY=13-pose.supply*3;
             line(w-6,10,elbowX,elbowY,C.ink,4);line(elbowX,elbowY,handX,handY+6,C.ink,3);
             line(w-6,10,elbowX,elbowY-1,C.grain,2);rect(handX-1,handY+5,3,3,C.brass);
+            rect(elbowX-1,elbowY,2,2,C.leather);rect(elbowX,elbowY,1,1,C.steel);
             // Only one barrel: it leaves the hand on the same tick native physics spawns it.
             const supplied=e instanceof HypotheticalGuard&&e.phase==='rest'&&e.reloadProgress>=.42;
             if(e.phase==='warning'||supplied){

@@ -1,0 +1,447 @@
+{
+  "kind": "directed native-keyboard capture",
+  "suiteRun": false,
+  "inputFrames": 9705,
+  "videoFrames": 731,
+  "fps": 30,
+  "siegeReceipt": {
+    "act": "duel",
+    "phase": 1,
+    "health": 9,
+    "won": false,
+    "deaths": 3,
+    "ticks": 4398
+  },
+  "finalReceipt": {
+    "act": "duel",
+    "phase": 3,
+    "health": 0,
+    "won": true,
+    "deaths": 4,
+    "ticks": 9192
+  },
+  "captures": [
+    {
+      "file": "rush-tell.png",
+      "frame": 3332,
+      "hp": 5,
+      "move": "rush",
+      "phase": "warning"
+    },
+    {
+      "file": "rush-action.png",
+      "frame": 3360,
+      "hp": 5,
+      "move": "rush",
+      "phase": "attack"
+    },
+    {
+      "file": "cross-tell.png",
+      "frame": 3426,
+      "hp": 5,
+      "move": "cross",
+      "phase": "warning"
+    },
+    {
+      "file": "cross-action.png",
+      "frame": 3454,
+      "hp": 5,
+      "move": "cross",
+      "phase": "attack"
+    },
+    {
+      "file": "sweep-tell.png",
+      "frame": 3570,
+      "hp": 5,
+      "move": "sweep",
+      "phase": "warning"
+    },
+    {
+      "file": "sweep-action.png",
+      "frame": 3600,
+      "hp": 5,
+      "move": "sweep",
+      "phase": "attack"
+    },
+    {
+      "file": "vault-tell.png",
+      "frame": 3672,
+      "hp": 5,
+      "move": "vault",
+      "phase": "warning"
+    },
+    {
+      "file": "vault-action.png",
+      "frame": 3704,
+      "hp": 5,
+      "move": "vault",
+      "phase": "attack"
+    },
+    {
+      "file": "counterattack.png",
+      "frame": 3740,
+      "hp": 3,
+      "move": "vault",
+      "phase": "stunned"
+    },
+    {
+      "file": "passage-open.png",
+      "frame": 4618,
+      "hp": 0,
+      "move": "vault",
+      "phase": "stunned"
+    }
+  ],
+  "actions": [
+    {
+      "frame": 3287,
+      "move": "rush",
+      "strike": 0,
+      "phase": "rest",
+      "hp": 5
+    },
+    {
+      "frame": 3318,
+      "move": "rush",
+      "strike": 0,
+      "phase": "walk",
+      "hp": 5
+    },
+    {
+      "frame": 3319,
+      "move": "rush",
+      "strike": 0,
+      "phase": "warning",
+      "hp": 5
+    },
+    {
+      "frame": 3351,
+      "move": "rush",
+      "strike": 0,
+      "phase": "attack",
+      "hp": 5
+    },
+    {
+      "frame": 3373,
+      "move": "rush",
+      "strike": 0,
+      "phase": "rest",
+      "hp": 5
+    },
+    {
+      "frame": 3413,
+      "move": "rush",
+      "strike": 0,
+      "phase": "walk",
+      "hp": 5
+    },
+    {
+      "frame": 3414,
+      "move": "cross",
+      "strike": 0,
+      "phase": "warning",
+      "hp": 5
+    },
+    {
+      "frame": 3446,
+      "move": "cross",
+      "strike": 0,
+      "phase": "attack",
+      "hp": 5
+    },
+    {
+      "frame": 3468,
+      "move": "cross",
+      "strike": 1,
+      "phase": "warning",
+      "hp": 5
+    },
+    {
+      "frame": 3494,
+      "move": "cross",
+      "strike": 1,
+      "phase": "attack",
+      "hp": 5
+    },
+    {
+      "frame": 3516,
+      "move": "cross",
+      "strike": 1,
+      "phase": "rest",
+      "hp": 5
+    },
+    {
+      "frame": 3556,
+      "move": "cross",
+      "strike": 1,
+      "phase": "walk",
+      "hp": 5
+    },
+    {
+      "frame": 3557,
+      "move": "sweep",
+      "strike": 0,
+      "phase": "warning",
+      "hp": 5
+    },
+    {
+      "frame": 3591,
+      "move": "sweep",
+      "strike": 0,
+      "phase": "attack",
+      "hp": 5
+    },
+    {
+      "frame": 3617,
+      "move": "sweep",
+      "strike": 0,
+      "phase": "rest",
+      "hp": 5
+    },
+    {
+      "frame": 3659,
+      "move": "sweep",
+      "strike": 0,
+      "phase": "walk",
+      "hp": 5
+    },
+    {
+      "frame": 3660,
+      "move": "vault",
+      "strike": 0,
+      "phase": "warning",
+      "hp": 5
+    },
+    {
+      "frame": 3696,
+      "move": "vault",
+      "strike": 0,
+      "phase": "attack",
+      "hp": 5
+    },
+    {
+      "frame": 3737,
+      "move": "vault",
+      "strike": 0,
+      "phase": "rest",
+      "hp": 5
+    },
+    {
+      "frame": 3739,
+      "move": "vault",
+      "strike": 0,
+      "phase": "stunned",
+      "hp": 3
+    },
+    {
+      "frame": 3759,
+      "move": "vault",
+      "strike": 0,
+      "phase": "walk",
+      "hp": 3
+    },
+    {
+      "frame": 3775,
+      "move": "rush",
+      "strike": 0,
+      "phase": "warning",
+      "hp": 3
+    },
+    {
+      "frame": 3807,
+      "move": "rush",
+      "strike": 0,
+      "phase": "attack",
+      "hp": 3
+    },
+    {
+      "frame": 3829,
+      "move": "rush",
+      "strike": 0,
+      "phase": "rest",
+      "hp": 3
+    },
+    {
+      "frame": 3847,
+      "move": "rush",
+      "strike": 0,
+      "phase": "stunned",
+      "hp": 1
+    },
+    {
+      "frame": 3867,
+      "move": "rush",
+      "strike": 0,
+      "phase": "walk",
+      "hp": 1
+    },
+    {
+      "frame": 3883,
+      "move": "cross",
+      "strike": 0,
+      "phase": "warning",
+      "hp": 1
+    },
+    {
+      "frame": 3911,
+      "move": "cross",
+      "strike": 0,
+      "phase": "attack",
+      "hp": 1
+    },
+    {
+      "frame": 3931,
+      "move": "vault",
+      "strike": 1,
+      "phase": "warning",
+      "hp": 1
+    },
+    {
+      "frame": 3957,
+      "move": "vault",
+      "strike": 1,
+      "phase": "attack",
+      "hp": 1
+    },
+    {
+      "frame": 4047,
+      "move": "rush",
+      "strike": 0,
+      "phase": "rest",
+      "hp": 5
+    },
+    {
+      "frame": 4103,
+      "move": "rush",
+      "strike": 0,
+      "phase": "walk",
+      "hp": 5
+    },
+    {
+      "frame": 4104,
+      "move": "rush",
+      "strike": 0,
+      "phase": "warning",
+      "hp": 5
+    },
+    {
+      "frame": 4136,
+      "move": "rush",
+      "strike": 0,
+      "phase": "attack",
+      "hp": 5
+    },
+    {
+      "frame": 4158,
+      "move": "rush",
+      "strike": 0,
+      "phase": "rest",
+      "hp": 5
+    },
+    {
+      "frame": 4198,
+      "move": "rush",
+      "strike": 0,
+      "phase": "walk",
+      "hp": 5
+    },
+    {
+      "frame": 4199,
+      "move": "vault",
+      "strike": 0,
+      "phase": "warning",
+      "hp": 5
+    },
+    {
+      "frame": 4235,
+      "move": "vault",
+      "strike": 0,
+      "phase": "attack",
+      "hp": 5
+    },
+    {
+      "frame": 4281,
+      "move": "vault",
+      "strike": 0,
+      "phase": "rest",
+      "hp": 5
+    },
+    {
+      "frame": 4296,
+      "move": "vault",
+      "strike": 0,
+      "phase": "stunned",
+      "hp": 3
+    },
+    {
+      "frame": 4316,
+      "move": "vault",
+      "strike": 0,
+      "phase": "walk",
+      "hp": 3
+    },
+    {
+      "frame": 4341,
+      "move": "rush",
+      "strike": 0,
+      "phase": "warning",
+      "hp": 3
+    },
+    {
+      "frame": 4373,
+      "move": "rush",
+      "strike": 0,
+      "phase": "attack",
+      "hp": 3
+    },
+    {
+      "frame": 4395,
+      "move": "rush",
+      "strike": 0,
+      "phase": "rest",
+      "hp": 3
+    },
+    {
+      "frame": 4426,
+      "move": "rush",
+      "strike": 0,
+      "phase": "stunned",
+      "hp": 1
+    },
+    {
+      "frame": 4446,
+      "move": "rush",
+      "strike": 0,
+      "phase": "walk",
+      "hp": 1
+    },
+    {
+      "frame": 4462,
+      "move": "vault",
+      "strike": 0,
+      "phase": "warning",
+      "hp": 1
+    },
+    {
+      "frame": 4494,
+      "move": "vault",
+      "strike": 0,
+      "phase": "attack",
+      "hp": 1
+    },
+    {
+      "frame": 4535,
+      "move": "vault",
+      "strike": 0,
+      "phase": "rest",
+      "hp": 1
+    },
+    {
+      "frame": 4549,
+      "move": "vault",
+      "strike": 0,
+      "phase": "stunned",
+      "hp": 0
+    }
+  ]
+}

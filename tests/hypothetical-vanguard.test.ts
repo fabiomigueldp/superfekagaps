@@ -32,22 +32,22 @@ test('rush has a complete tell, commits its direction and recovers after a bound
     }
     const start=e.x;let active=0;
     while(e.phase==='attack'){if(e.danger)active++;step({...p,x:e.x+100});assert.equal(e.facing,direction);}
-    assert.ok(active>=12&&active<=15);assert.ok(Math.abs(e.x-start)>85&&Math.abs(e.x-start)<=92);
+    assert.ok(active>=12&&active<=15);assert.ok(Math.abs(e.x-start)>85&&Math.abs(e.x-start)<=VANGUARD.rushDistance);
     assert.equal(e.phase,'rest');for(let i=0;i<35;i++){step();assert.equal(e.danger,null);assert.equal(e.phase,'rest');}
 });
 test('vault reaches the native upper deck, marks its destination and never tracks a dodge in flight',()=>{
-    const {e,step}=setup();const p={x:1668,y:140,width:14,height:24};
+    const {e,step}=setup();const p={x:1668,y:144,width:14,height:24};
     while(e.phase!=='warning')step(p);
-    assert.equal(e.move,'vault');assert.equal(e.landing?.y,164);const mark={...e.landing!};
+    assert.equal(e.move,'vault');assert.equal(e.landing?.y,168);const mark={...e.landing!};
     for(let i=0;i<130&&!e.landed;i++){
         step({...p,x:1850,y:200});assert.deepEqual(e.landing,mark);
     }
-    assert.equal(e.landed,true);assert.equal(e.y+e.height,164);
+    assert.equal(e.landed,true);assert.equal(e.y+e.height,168);
     assert.ok(Math.abs(e.x-mark.x)<5);assert.ok(e.danger);
     for(let i=0;i<14;i++)step();assert.equal(e.phase,'rest');assert.equal(e.danger,null);
 });
 test('crosscut re-aims only in its second tell and exposes an uninterrupted punish window afterwards',()=>{
-    const {e,step,p}=setup();e.attacks=1;
+    const {e,step,p}=setup();e.attacks=1;e.lastPrimary='rush';
     while(e.phase!=='warning')step();assert.equal(e.move,'cross');
     const direction=e.facing;
     while(e.strike===0)step({...p,x:e.x+80});
@@ -56,17 +56,17 @@ test('crosscut re-aims only in its second tell and exposes an uninterrupted puni
     assert.equal(tells,VANGUARD.secondWarning);
     while(e.phase==='attack')step(p);assert.equal(e.phase,'rest');
 });
-test('native stomps chip four pips; a ground pound deals two, cancels the attack and cannot hit twice in one contact',()=>{
+test('native stomps chip five pips; a ground pound deals two, cancels the attack and cannot hit twice in one contact',()=>{
     const {e,step}=setup();
     const stomp=(pound:boolean)=>{const p={x:e.x+3,y:e.y-23,width:14,height:24};return e.contact(p,{...p,y:p.y-5},true,pound);};
-    assert.equal(stomp(false),'bounce');assert.equal(e.hp,3);assert.equal(e.phase,'stunned');
-    assert.equal(stomp(false),'bounce');assert.equal(e.hp,3);
+    assert.equal(stomp(false),'bounce');assert.equal(e.hp,4);assert.equal(e.phase,'stunned');
+    assert.equal(stomp(false),'bounce');assert.equal(e.hp,4);
     for(let i=0;i<VANGUARD.immunity;i++)step();
     e.phase='rest';
-    assert.equal(stomp(true),'bounce');assert.equal(e.hp,1);assert.equal(e.enraged,true);
+    assert.equal(stomp(true),'bounce');assert.equal(e.hp,2);assert.equal(e.enraged,true);
     for(let i=0;i<VANGUARD.immunity;i++)step();
     e.phase='rest';
-    assert.equal(stomp(false),'kill');assert.equal(e.dead,true);assert.equal(e.danger,null);
+    assert.equal(stomp(true),'kill');assert.equal(e.dead,true);assert.equal(e.danger,null);
 });
 test('the elite remains in its arena and fixed-step movement is independent of update batching',()=>{
     const a=setup(),b=setup(),p:Rect={x:1600,y:200,width:14,height:24};
@@ -107,7 +107,7 @@ test('a faster crossing starts the visible street without silently destroying an
 test('an early stomp bounces off the visible brow guard without removing health',()=>{
     const {e,step}=setup();while(e.phase!=='warning')step();
     const p={x:e.x+3,y:e.y-23,width:14,height:24};
-    assert.equal(e.blocksStomp,true);assert.equal(e.contact(p,{...p,y:p.y-5},true,true),'bounce');assert.equal(e.hp,4);
+    assert.equal(e.blocksStomp,true);assert.equal(e.contact(p,{...p,y:p.y-5},true,true),'bounce');assert.equal(e.hp,VANGUARD.health);
 });
 test('foreground gathering has distinct exits and staggered reactions, remaining entirely before combat',()=>{
     assert.equal(forecourtPeople(0).length,8);assert.equal(new Set(forecourtPeople(0).map(p=>p.alertAt)).size,8);
