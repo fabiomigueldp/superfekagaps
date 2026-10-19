@@ -1,0 +1,18 @@
+Technical documentation supplement for 9c4c6bd4886779c4b6626e9849f3f979cd5c9ff1
+
+Enhance tower rubble petista capture with multi-piece dismemberment and gore physics
+
+Behavior
+Update tower-search stain rendering and authoring evidence, add helicopter simulation and arrival timing hooks, and include the first 22 retrospective commit records and deployment message support.
+
+Implementation
+HypotheticalTowerSearchArt adjusts stain dimensions and limits short drips to large elevated stains. The tower README and art-study.json now describe the staged fragment sequence, with updated PNGs. New HypotheticalHelicopter.ts defines aircraft bodies, swept hull contact, flight, rocket, breakup and ground-contact state. HypotheticalHelicopterTiming.ts inserts a 372-frame interval at story frame 304 through arrivalBeat()/arrivalStoryTime(); arrival, devastation, crowd and scenery clocks use the mapping. HypotheticalBackdrop owns and updates the helicopter, and HypotheticalModel forwards its events. HypotheticalTowerEffects exports drawScenicRocket() for reuse. scripts/deploy.mjs adds --message-file and commit -F, plus explicit --no-commit --allow-dirty publication of committed HEAD.
+
+Scope and limitations
+The subject does not cover the complete patch: this commit also includes docs/commits/2026-10-19/ and docs/deploy.md from the concurrent documentation work. Core multi-piece tower-search simulation already exists in 7807bcb; this revision refines its art and records. Helicopter rendering and dedicated rotor/engine audio are not connected here: the patch adds simulation/timing hooks but no helicopter art module or corresponding Game/Audio routing. Do not describe it as a complete visible helicopter encounter.
+
+Publication evidence
+A successful local publisher receipt identifies build `9c4c6bd4886779c4b6626e9849f3f979cd5c9ff1-f5b9bbf9253b` for this exact source commit. The report records `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its build-log SHA-256 is `b400477b8db5c720fef3153160f7c4854fe93f4111e5fe08270a7a3f0238e350`. This establishes recorded build/publication completion, not gameplay correctness.
+
+Full file inventory and provenance: docs/commits/2026-10-19/9c4c6bd.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
