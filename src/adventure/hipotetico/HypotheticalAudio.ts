@@ -1,4 +1,5 @@
-export type WeaponCue = 'shot' | 'impact' | 'splash' | 'collapse-water' | 'debris-land' | 'reload' | 'distant-shot' | 'distant-hit' | 'distant-crash' | 'distant-debris' | 'distant-thud';
+export type WeaponCue = 'shot' | 'impact' | 'splash' | 'collapse-water' | 'debris-land' | 'reload' | 'distant-shot' | 'distant-hit' | 'distant-crash' | 'distant-debris' | 'distant-thud'
+    | 'guard-swipe' | 'guard-sweep' | 'guard-parry' | 'guard-stomp';
 interface Route { context: BaseAudioContext; destination: AudioNode; enabled: boolean }
 
 /** Short, owned voices on WorldAudio's existing effects bus. No new context or timers. */
@@ -15,7 +16,11 @@ export class HypotheticalAudio {
         const route=this.route();
         if(this.disposed||!route?.enabled||route.context.state!=='running')return false;
         const {context:c,destination}=route,now=c.currentTime,distant=kind.startsWith('distant'),shot=kind.endsWith('shot'),crash=kind==='distant-crash',splash=kind==='splash';
-        const contact=kind==='distant-thud'?{duration:.18,filter:'lowpass' as BiquadFilterType,cutoff:820,tail:120,noise:.2,pitch:96,end:38,body:.38,wave:'triangle' as OscillatorType}:
+        const contact=kind==='guard-swipe'?{duration:.14,filter:'bandpass' as BiquadFilterType,cutoff:2400,tail:600,noise:.14,pitch:620,end:240,body:.035,wave:'triangle' as OscillatorType}:
+            kind==='guard-sweep'?{duration:.2,filter:'bandpass' as BiquadFilterType,cutoff:1700,tail:420,noise:.19,pitch:330,end:90,body:.07,wave:'triangle' as OscillatorType}:
+            kind==='guard-parry'?{duration:.13,filter:'highpass' as BiquadFilterType,cutoff:3600,tail:1400,noise:.12,pitch:1600,end:1150,body:.08,wave:'sine' as OscillatorType}:
+            kind==='guard-stomp'?{duration:.18,filter:'lowpass' as BiquadFilterType,cutoff:1000,tail:150,noise:.25,pitch:120,end:45,body:.19,wave:'triangle' as OscillatorType}:
+            kind==='distant-thud'?{duration:.18,filter:'lowpass' as BiquadFilterType,cutoff:820,tail:120,noise:.2,pitch:96,end:38,body:.38,wave:'triangle' as OscillatorType}:
             kind==='collapse-water'?{duration:.28,filter:'bandpass' as BiquadFilterType,cutoff:1600,tail:200,noise:.18,pitch:145,end:48,body:.12,wave:'sine' as OscillatorType}:
             kind==='debris-land'?{duration:.16,filter:'lowpass' as BiquadFilterType,cutoff:980,tail:170,noise:.18,pitch:110,end:42,body:.13,wave:'triangle' as OscillatorType}:
             kind==='distant-debris'?{duration:.24,filter:'bandpass' as BiquadFilterType,cutoff:1250,tail:180,noise:.36,pitch:96,end:35,body:.2,wave:'triangle' as OscillatorType}:null;

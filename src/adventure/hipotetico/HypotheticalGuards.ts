@@ -14,6 +14,7 @@ export const GUARD_SHOVE = { warning: 650, attack: 300, recovery: 950, reach: 9 
 // A complete Feka body fits between allies, including a little room after a successful stomp bounce.
 export const GUARD_FOOTWORK = { gap: 18, attackSpace: 32, pivot: 180, reload: 1000, reloadStep: 6 } as const;
 export const GUARD_COVER = { resupply:1100, chargeUntil:500 } as const;
+export interface GuardCoverSignal { serial:number; arc:'high'|'low' }
 
 /** Encounter-local variations. Contacts, armor, stomps and terrain still belong to WorldFoe. */
 export class HypotheticalGuard extends WorldFoe {
@@ -23,6 +24,8 @@ export class HypotheticalGuard extends WorldFoe {
     armorLostAt = -Infinity;
     comboStep = 0;
     coveringCharge = false;
+    coveringElite:'high'|'low'|null=null;
+    private lastCoverSerial=-1;
     transitionAt = -Infinity;
     transitionFrom: GuardActionPose | null = null;
     yielding = false;
@@ -50,7 +53,8 @@ export class HypotheticalGuard extends WorldFoe {
         if(spec.kind==='loader'){this.startReload();if(bounds)this.timer=spec.x>bounds.left+230?350:800;}
     }
     get patrolSpeed() { return this.spec.kind==='minion' ? .8+(this.wave-1)*.08 : .65; }
-    override get highThrow() { return this.spec.kind==='loader'?this.launches%2===1:super.highThrow; }
+    override get highThrow() { return this.spec.kind==='loader'?(this.coveringElite?this.coveringElite==='high':this.launches%2===1):super.highThrow; }
+    get coverSignal():GuardCoverSignal|null { return null; }
     override get blocksStomp() {
         if(this.spec.kind==='helmet')return this.armor&&!['rest','stunned'].includes(this.phase);
         if(this.spec.kind==='charger'&&!this.armor)return false;
@@ -157,7 +161,21 @@ export class HypotheticalGuard extends WorldFoe {
         // 60px same-bank detector left the tall arsenal balconies unable to attack grounded Feka.
         const gap=player.x+player.width/2-this.x-this.width/2;
         const visible=Math.abs(gap)<170&&Math.abs(player.y-this.y)<110;
-        if(this.phase==='rest'&&this.timer>1500&&visible){this.facing=gap<0?-1:1;this.change('warning');}
+        if(this.phase==='rest'&&visible){
+            const captain=this.wave===4?this.company().find(e=>e instanceof HypotheticalGuard&&e.wave===this.wave
+                &&e.spec.id.endsWith(':vanguard')&&!e.dead&&e.awake) as HypotheticalGuard|undefined:undefined;
+            const signal=captain?.coverSignal;
+            // A final-post throw supports one committed move, after full resupply.
+            // Existing barrels remain physical; do not stack an endless floor of them.
+            const room=this.wave!==4||objects.barrels.filter(b=>b.life>0&&(!this.bounds
+                ||b.x+b.width>this.bounds.left&&b.x<this.bounds.right)).length<2;
+            if(room&&signal&&signal.serial!==this.lastCoverSerial&&this.timer>=GUARD_COVER.resupply){
+                this.coveringElite=signal.arc;this.lastCoverSerial=signal.serial;
+                this.facing=gap<0?-1:1;this.change('warning');
+            }else if(room&&this.timer>1500&&captain?.phase!=='stunned'){
+                this.coveringElite=null;this.facing=gap<0?-1:1;this.change('warning');
+            }
+        }
         else if(this.phase==='warning'&&this.timer>this.warningDuration){
             const barrel=objects.spawnBarrel(this.x+(this.facing<0?-14:this.width),this.y-4,this.facing);
             barrel.vy=this.highThrow?-4.8:-2.5;if(this.highThrow)barrel.vx=this.facing*2.1;
@@ -284,7 +302,7 @@ export class HypotheticalGuard extends WorldFoe {
             }
         }
         if(this.spec.kind==='loader'&&!this.dead&&this.phase==='rest'){
-            if(before!=='rest'){this.startReload();this.coveringCharge=false;}
+            if(before!=='rest'){this.startReload();this.coveringCharge=false;this.coveringElite=null;}
             this.reloadStep(level);
         }else if(infantry&&!this.dead&&!vault)this.x=oldX+this.separate(this.x-oldX,oldX);
         if(this.bounds&&!this.dead){

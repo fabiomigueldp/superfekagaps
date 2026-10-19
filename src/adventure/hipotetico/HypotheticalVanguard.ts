@@ -2,8 +2,9 @@ import type { Rect } from '../../types';
 import { clamp, overlaps, type FoeSpec } from '../types';
 import type { WorldFoe, FoePhase } from '../WorldEnemies';
 import type { WorldLevel, WorldObjects } from '../WorldPhysics';
-import { HypotheticalGuard } from './HypotheticalGuards';
+import { HypotheticalGuard, type GuardCoverSignal } from './HypotheticalGuards';
 import {VANGUARD,planVanguardVault,vanguardLandingSpan,type VanguardLanding} from './HypotheticalVanguardTactics';
+import {vanguardTargetPose,blendVanguardPose,type VanguardPose} from './HypotheticalVanguardMotion';
 export {VANGUARD} from './HypotheticalVanguardTactics';
 
 export type VanguardMove = 'rush' | 'cross' | 'vault' | 'sweep';
@@ -17,6 +18,9 @@ export class HypotheticalVanguard extends HypotheticalGuard {
     landing:VanguardLanding|null=null;
     landed=false; landingAge=0; retreatTicks=0;
     pivotAt=-Infinity; pivotFrom=-1;
+    swungAt=-Infinity; parryAt=-Infinity;
+    swingKind:'guard-swipe'|'guard-sweep'='guard-swipe';
+    parryPoint={x:0,y:0};
     lastPrimary:VanguardMove|null=null;
     private fraction=0;
     private flightX=0;
@@ -24,6 +28,8 @@ export class HypotheticalVanguard extends HypotheticalGuard {
     private dashLength:number=VANGUARD.rushDistance;
     private retreatDirection=1;
     private grounded=true;
+    private poseFrom:VanguardPose|null=null;
+    private poseChangedAt=-Infinity;
     constructor(spec:FoeSpec,wave:number,private readonly squad:()=>readonly WorldFoe[],bounds:{left:number;right:number}){
         super(spec,wave,squad,bounds);
         this.width=20;this.height=28;this.y=spec.y-this.height;this.hp=VANGUARD.health;
@@ -42,12 +48,23 @@ export class HypotheticalVanguard extends HypotheticalGuard {
     get enraged(){return this.hp<=2;}
     get pivotProgress(){return clamp((this.age-this.pivotAt)/(8*STEP),0,1);}
     get rushTarget(){return clamp(this.dashOrigin+this.facing*this.dashLength,this.bounds!.left,this.bounds!.right-this.width);}
-    private state(phase:FoePhase){this.phase=phase;this.actionTicks=0;this.timer=0;}
+    get duelPose(){
+        const target=vanguardTargetPose(this);
+        return this.poseFrom?blendVanguardPose(this.poseFrom,target,(this.age-this.poseChangedAt)/(6*STEP)):target;
+    }
+    override get coverSignal():GuardCoverSignal|null {
+        if(this.dead||!this.awake||this.strike!==0||this.phase!=='warning')return null;
+        return this.move==='rush'?{serial:this.attacks,arc:'high'}:this.move==='vault'?{serial:this.attacks,arc:'low'}:null;
+    }
+    private state(phase:FoePhase,from=this.duelPose){
+        this.poseFrom=from;this.poseChangedAt=this.age;this.phase=phase;this.actionTicks=0;this.timer=0;
+    }
     private face(direction:number){
         if(direction===this.facing)return;
         this.pivotFrom=this.facing;this.pivotAt=this.age;this.facing=direction;
     }
     private prepare(player:Rect,level:WorldLevel,followup?:VanguardMove){
+        const pose=this.duelPose;
         const gap=player.x+player.width/2-this.x-this.width/2;
         this.face(gap<0?-1:1);
         const foot=player.y+player.height;
@@ -69,7 +86,7 @@ export class HypotheticalVanguard extends HypotheticalGuard {
         this.flightX=this.landing?.velocityX??0;
         this.dashLength=this.move==='sweep'?32:this.move==='cross'?(this.strike?88:62)
             :clamp(Math.abs(gap)+22,80,this.enraged?120:VANGUARD.rushDistance);
-        this.dashOrigin=this.x;this.state('warning');
+        this.dashOrigin=this.x;this.state('warning',pose);
     }
     private finishStrike(player:Rect,level:WorldLevel){
         const gap=Math.abs(player.x+player.width/2-this.x-this.width/2);
@@ -109,6 +126,9 @@ export class HypotheticalVanguard extends HypotheticalGuard {
         if(this.retreatTicks){dx=this.retreatDirection*VANGUARD.retreatSpeed;this.retreatTicks--;}
         if(this.phase==='warning'&&this.move==='cross'&&this.strike===0&&this.actionTicks<9)dx=-this.facing*.8;
         if(this.phase==='attack'){
+            if(this.move!=='vault'&&this.actionTicks===this.activeFrom){
+                this.swungAt=this.age;this.swingKind=this.move==='sweep'?'guard-sweep':'guard-swipe';
+            }
             if(this.move==='vault'){
                 if(!this.landed)dx=this.flightX;
                 else if(++this.landingAge>=12)this.state('rest');
@@ -147,9 +167,15 @@ export class HypotheticalVanguard extends HypotheticalGuard {
         if(this.danger&&overlaps(p,this.danger))return 'hurt';
         if(!overlaps(p,this))return 'none';
         if(falling&&previous.y+previous.height<=this.y+8){
-            if(this.hitCooldown||!this.exposed)return 'bounce';
+            if(this.hitCooldown||!this.exposed){
+                if(!this.exposed&&this.age-this.parryAt>=120){
+                    this.parryAt=this.age;this.parryPoint={x:clamp(p.x+p.width/2,this.x+3,this.x+this.width-3),y:this.y-3};
+                }
+                return 'bounce';
+            }
+            const pose=this.duelPose;
             this.hp=Math.max(0,this.hp-(pound?2:1));this.flash=200;this.hitCooldown=VANGUARD.immunity;
-            this.landing=null;this.landed=false;this.vy=0;this.state('stunned');
+            this.landing=null;this.landed=false;this.vy=0;this.state('stunned',pose);
             if(this.hp===0){this.dead=true;this.deadTimer=0;return 'kill';}
             return 'bounce';
         }

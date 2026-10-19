@@ -34,17 +34,11 @@ export function drawVanguard(c:CanvasRenderingContext2D,e:HypotheticalVanguard,c
         return;
     }
     const tell=e.phase==='warning'?Math.min(1,e.actionTicks/e.tellTicks):0;
-    const attack=e.phase==='attack',rest=e.phase==='rest'||e.phase==='stunned';
-    const progress=attack?Math.min(1,e.actionTicks/e.attackDuration):0;
-    const release=smoothMotion(e.actionTicks/6),thrust=smoothMotion(progress/.26)*(1-smoothMotion((progress-.65)/.35));
-    const sweep=e.move==='sweep',cross=e.move==='cross',airborne=attack&&e.move==='vault'&&!e.landed;
-    const crouch=e.dead?14:e.phase==='stunned'?4:sweep?(attack?6*thrust+4*(1-release):tell*5)
-        :attack&&e.move==='vault'?(e.landed?4:3*(1-release))
-        :attack?3*(1-release):rest&&e.landed?4*(1-smoothMotion(e.actionTicks/10)):tell*3;
-    const lean=e.phase==='stunned'?-3:attack&&e.move!=='vault'?-2*(1-release)+(sweep?6:4)*thrust
-        :airborne?2:tell*-2;
-    const lift=airborne?(e.vy<0?6:2+4*(1-smoothMotion(e.vy/8)))*release:0;
-    if(e.landing&&!e.dead&&['warning','attack'].includes(e.phase)){
+    const attack=e.phase==='attack',sweep=e.move==='sweep',airborne=attack&&e.move==='vault'&&!e.landed;
+    const pose=e.duelPose,{lift,spread,armX,armY,bladeX,bladeY}=pose;
+    const brace=e.age-e.parryAt<150?Math.sin(Math.max(0,e.age-e.parryAt)/150*Math.PI):0;
+    const crouch=pose.crouch+brace*1.5,lean=pose.lean-brace;
+    if(e.landing&&(e.phase==='warning'||attack&&!e.landed)){
         const span=vanguardLandingSpan(e.landing),ty=e.landing.y-cy;
         pixelLine(c,span.left-cx,ty-1,span.right-cx,ty-1,P.gold);
         for(const [at,d] of [[span.left,1],[span.right,-1]]){
@@ -67,7 +61,7 @@ export function drawVanguard(c:CanvasRenderingContext2D,e:HypotheticalVanguard,c
     const stepDirection=e.motionX*e.facing<0?-1:1;
     const feet=[0,1].map(side=>{
         const p=e.motionX&&!airborne?vanguardFoot(e.distance,side):[0,0];
-        return [(side?4:-4)+p[0]*stepDirection+(sweep&&attack?(side?5:-4)*thrust:0),p[1]-lift*(side?.6:1)];
+        return [(side?4:-4)+p[0]*stepDirection+(side?5:-4)*spread,p[1]-lift*(side?.6:1)];
     });
     for(const [i,f] of feet.entries()){
         const kx=(f[0]+(i?3:-3))/2+(lift?3:0),ky=-7+crouch*.4-lift*.6;
@@ -99,13 +93,8 @@ export function drawVanguard(c:CanvasRenderingContext2D,e:HypotheticalVanguard,c
         pixelLine(c,-4+lean,-30+crouch,7+lean,-30+crouch,P.gold,2);
         pixelLine(c,7+lean,-30+crouch,8+lean,-26+crouch,P.gold,2);
     }
-    const armX=sweep?(attack?8+17*thrust:8-tell*5):attack?(cross?-1+9*release+10*Math.sin(progress*Math.PI):3+5*release+14*thrust):rest?8:7-tell*(cross?8:4);
-    const armY=sweep?-17+11*(attack?thrust:tell):attack&&cross?-27+crouch+17*Math.sin(progress*Math.PI)+10*smoothMotion((progress-.65)/.35)
-        :-17+crouch-(attack?5*(1-release):tell*(cross?10:5));
     pixelLine(c,5+lean,-22+crouch,armX-3,armY-2,P.ink,5);
     pixelLine(c,armX-3,armY-2,armX,armY,P.steel,3);q(armX-1,armY-1,3,3,P.skin);
-    const extension=attack?thrust:0;
-    const bladeX=armX+2+(sweep?12:7)*extension,bladeY=armY-12+(sweep?12:cross?17:10)*extension;
     pixelLine(c,armX,armY,bladeX,bladeY,P.ink,4);pixelLine(c,armX,armY,bladeX,bladeY,P.steel,2);
     q(bladeX,bladeY,2,2,P.edge);q(armX-2,armY,5,2,P.gold);
     if(tell>0){
@@ -114,6 +103,15 @@ export function drawVanguard(c:CanvasRenderingContext2D,e:HypotheticalVanguard,c
         if(e.strike)q(-2,-42,4,2,P.red);
     }
     c.restore();
+    if(e.age-e.parryAt<170){
+        const t=Math.max(0,(e.age-e.parryAt)/170),px=e.parryPoint.x-cx,py=e.parryPoint.y-cy;
+        // A compact metal contact at the actual blocked stomp, not a full-screen flash.
+        for(const [dx,dy] of [[-1,-1],[1,-1],[-1,0],[1,0]]){
+            const near=2+t*4,far=near+(1-t)*4;
+            pixelLine(c,px+dx*near,py+dy*near,px+dx*far,py+dy*far,dy?P.edge:P.gold);
+        }
+        if(t<.35)box(c,px-1,py-1,3,2,P.edge);
+    }
     const danger=e.danger;
     if(danger&&e.move!=='vault'){
         const edge=(e.facing>0?danger.x+danger.width-1:danger.x)-cx,yy=danger.y-cy;
@@ -127,9 +125,12 @@ export function drawVanguard(c:CanvasRenderingContext2D,e:HypotheticalVanguard,c
         if(!reduced&&Math.abs(e.motionX)>3&&!airborne){
             for(let i=0;i<3;i++)box(c,x-e.facing*(9+i*5),foot-2-i%2,3-i%2,1,i%2?'#93a79c':'#688d91');
         }
-        if(e.landed&&e.phase==='attack')for(const d of [-1,1]){
-            const age=e.landingAge;box(c,x+d*(12+age*2)-3,foot-3-age%3,5,2,P.steel);
-            pixelLine(c,x+d*8,foot-1,x+d*(15+age*2),foot-1,P.gold);
+        if(e.landed&&e.phase==='attack'&&e.landing)for(const d of [-1,1]){
+            const age=e.landingAge,span=vanguardLandingSpan({...e.landing,x:e.x});
+            const edge=Math.max(span.left-cx,Math.min(span.right-cx,x+d*(15+age*2)));
+            const live=age<8,from=Math.max(span.left-cx,Math.min(span.right-cx,x+d*8));
+            pixelLine(c,from,foot-1,edge,foot-1,live?P.gold:'#687e7e');
+            box(c,Math.max(span.left-cx,Math.min(span.right-cx-3,edge-1)),foot-2,3,1,live?P.edge:'#687e7e');
             if(!reduced)for(let i=0;i<3;i++){
                 const reach=10+age*(1.2+i*.35),rise=Math.max(0,age*(1+i*.1)-age*age*.1);
                 box(c,x+d*reach,foot-2-rise,3-i%2,2,i%2?'#a6b3a5':'#7f9694');

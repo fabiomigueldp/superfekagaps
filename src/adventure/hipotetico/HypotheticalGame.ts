@@ -2,6 +2,7 @@ import { WorldGame } from '../WorldGame';
 import { BossEncounter } from '../BossEncounter';
 import { HypotheticalGuard } from './HypotheticalGuards';
 import { HypotheticalVanguard } from './HypotheticalVanguard';
+import {drawBastionEdgeCue} from './HypotheticalGuardCues';
 import type { HypotheticalBackdrop } from './HypotheticalBackdrop';
 import type { WorldLevel, WorldObjects } from '../WorldPhysics';
 import type { Rect } from '../../types';
@@ -100,6 +101,7 @@ export class HypotheticalGame extends WorldGame {
     private totalTicks=0;
     private exiting=false;
     private readonly guardImpacts=new WeakMap<HypotheticalGuard,number>();
+    private readonly vanguardSounds=new WeakMap<HypotheticalVanguard,{swing:number;parry:number}>();
     private readonly weaponAudio=new HypotheticalAudio(()=>{
         const route=this.audio.getEffectsRoute();
         return route?{...route,enabled:route.enabled&&this.audio.preferences.effects>0&&this.state==='playing'&&!this.player.data.isDead}:null;
@@ -162,7 +164,13 @@ export class HypotheticalGame extends WorldGame {
         const stunned=visible.find(e=>e.phase==='stunned');
         const elite=visible.find(e=>e instanceof HypotheticalVanguard);
         if(elite instanceof HypotheticalVanguard){
+            const cover=visible.find(e=>e instanceof HypotheticalGuard&&e.coveringElite&&e.phase==='warning') as HypotheticalGuard|undefined;
+            if(cover&&elite.exposed)return 'ABERTURA! CUIDADO COM O BARRIL';
             if(elite.exposed)return 'VANGUARDA EXPOSTO! SALTE OU USE A SENTADA';
+            if(cover&&['warning','attack'].includes(elite.phase)){
+                const move=elite.move==='vault'?'SALTO':elite.move==='sweep'?'VARREDURA':elite.move==='cross'?'CORTE DUPLO':'INVESTIDA';
+                return `${move} + BARRIL ${cover.highThrow?'ALTO':'BAIXO'}! OBSERVE O ARCO`;
+            }
             if(elite.move==='sweep'&&['warning','attack'].includes(elite.phase))return 'VARREDURA BAIXA! SALTE OU USE A SACADA';
             if(elite.move==='vault'&&['warning','attack'].includes(elite.phase))return 'SALTO MARCADO! SAIA DO POUSO E CONTRA-ATAQUE';
             if(elite.move==='cross'&&['warning','attack'].includes(elite.phase))return elite.strike?'SEGUNDO CORTE! CRUZE POR CIMA':'CORTE DUPLO! GUARDE ESPACO PARA O SEGUNDO';
@@ -246,7 +254,17 @@ export class HypotheticalGame extends WorldGame {
             const at=Math.max(e.impactAt,e.vaultLandedAt);
             if(Number.isFinite(at)&&at>(this.guardImpacts.get(e)??-Infinity)){
                 this.guardImpacts.set(e,at);
-                if(Math.abs(e.x-this.player.data.position.x)<220)this.audio.sfx(e.spec.kind==='charger'?'barrelBreak':'land');
+                if(Math.abs(e.x-this.player.data.position.x)<220){
+                    if(e instanceof HypotheticalVanguard)this.weaponAudio.play('guard-stomp');
+                    else this.audio.sfx(e.spec.kind==='charger'?'barrelBreak':'land');
+                }
+            }
+            if(e instanceof HypotheticalVanguard){
+                const prior=this.vanguardSounds.get(e)??{swing:-Infinity,parry:-Infinity};
+                const near=Math.abs(e.x-this.player.data.position.x)<220;
+                if(e.swungAt>prior.swing&&near)this.weaponAudio.play(e.swingKind);
+                if(e.parryAt>prior.parry&&near)this.weaponAudio.play('guard-parry');
+                this.vanguardSounds.set(e,{swing:e.swungAt,parry:e.parryAt});
             }
         }
         if(!wasWon)this.totalTicks+=steps;
@@ -300,6 +318,8 @@ export class HypotheticalGame extends WorldGame {
         if(this.player.data.hasHelmet)this.renderer.drawHelmet(280,3,c);
         pixelText(c,'II',306,5,WORKSHOP_UI.paper);
         pixelText(c,this.encounterHint,7,20,WORKSHOP_UI.paper);
+        if(this.act==='siege'&&b.route.entered===3&&!this.player.data.isDead)
+            drawBastionEdgeCue(c,this.foes,this.camera.x,this.camera.y);
     }
     override render() {
         if(this.isDisposed)return;

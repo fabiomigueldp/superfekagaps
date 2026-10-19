@@ -6,6 +6,7 @@ import {pathToFileURL} from 'node:url';
 import {sceneLifecycleBrowser} from '../tests/helpers/sceneLifecycleHarness';
 import {HypotheticalGame} from '../src/adventure/hipotetico/HypotheticalGame';
 import {HypotheticalVanguard} from '../src/adventure/hipotetico/HypotheticalVanguard';
+import {HypotheticalGuard} from '../src/adventure/hipotetico/HypotheticalGuards';
 import replay from '../tests/helpers/hypotheticalReplay.json';
 const [directory,canvasModule]=process.argv.slice(2),out=resolve(directory);
 mkdirSync(join(out,'frames'),{recursive:true});
@@ -20,6 +21,9 @@ let held=new Set<string>(),previous=g.player,n=0,frames=0,jump=0;
 const inputs:string[][]=[],resets=new Set<number>(),captures:Array<{file:string;frame:number;hp:number;move:string;phase:string}>=[];
 const covered=new Set<string>(),actions:Array<{frame:number;move:string;strike:number;phase:string;hp:number}>=[];
 let lastPhase='';
+let lastCover='',lastParry=-Infinity;
+const supportEvents:Array<{frame:number;phase:string;arc:string;barrels:number}>=[];
+const parries:number[]=[];
 function step(keys:string[],record=false){
     const next=new Set(keys);
     for(const key of held)if(!next.has(key))h.window.dispatch('keyup',{key:key==='Space'?' ':key,code:key,target:h.canvas});
@@ -31,11 +35,19 @@ function step(keys:string[],record=false){
     if(e){
         const phase=e.move+':'+e.phase+':'+e.strike+':'+e.hp;
         if(phase!==lastPhase){lastPhase=phase;actions.push({frame:n,move:e.move,strike:e.strike,phase:e.phase,hp:e.hp});}
+        if(e.parryAt!==lastParry){lastParry=e.parryAt;if(Number.isFinite(e.parryAt))parries.push(n);}
     }
+    const support=g.foes.find(f=>f instanceof HypotheticalGuard&&f.spec.kind==='loader'&&f.wave===4&&!f.dead) as HypotheticalGuard|undefined;
+    if(support?.coveringElite){
+        const phase=support.phase+':'+support.coveringElite;
+        if(phase!==lastCover){lastCover=phase;supportEvents.push({frame:n,phase:support.phase,arc:support.coveringElite,barrels:g.objects.barrels.length});}
+    }else lastCover='';
     if(n%2)return;
     g.render();c.drawImage(screen,0,0,320,180);const png=frame.toBuffer('image/png');
     writeFileSync(join(out,'frames',String(frames++).padStart(5,'0')+'.png'),png);
-    const name=g.player.data.isDead?null:g.fight.route.cleared===4?'passage-open':e?.phase==='stunned'?'counterattack'
+    const name=g.player.data.isDead?null:g.fight.route.cleared===4?'passage-open':e&&e.age-e.parryAt<120?'guard-parry'
+        :support?.coveringElite&&support.phase==='warning'&&support.timer>=240?'cover-'+support.coveringElite
+        :e?.phase==='stunned'?'counterattack'
         :e?.phase==='warning'&&e.actionTicks>=12?e.move+'-tell':e?.phase==='attack'&&e.actionTicks>=8?e.move+'-action':null;
     if(name&&!covered.has(name)){
         covered.add(name);writeFileSync(join(out,name+'.png'),png);
@@ -69,6 +81,6 @@ try{
  }
  writeFileSync(join(out,'recorded-input.json'),JSON.stringify({siegeEndFrame,receipt:g.receipt,runs}));
  const report={kind:'directed native-keyboard capture',suiteRun:false,inputFrames:n,videoFrames:frames,fps:30,
-    siegeReceipt,finalReceipt:g.receipt,captures,actions};
+    siegeReceipt,finalReceipt:g.receipt,captures,actions,supportEvents,parries};
  writeFileSync(join(out,'capture.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));
 }finally{g.dispose();for(const f of clean.reverse())f();}

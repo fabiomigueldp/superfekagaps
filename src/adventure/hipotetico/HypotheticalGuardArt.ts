@@ -194,6 +194,11 @@ export function drawHypotheticalGuard(c:CanvasRenderingContext2D,e:WorldFoe,cx:n
         if(kind==='minion'&&e instanceof HypotheticalGuard&&e.wave>=2){
             line(6+lean,8+pose.bob,w-5,torso+3,C.grain);rect(5,torso+3,3,1,C.brass);
         }
+        if(kind==='loader'&&e instanceof HypotheticalGuard&&e.wave===4){
+            // The bastion artillery carries the same brass shoulder insignia as its captain.
+            poly([[4+lean,8+pose.bob],[7+lean,7+pose.bob],[9+lean,9+pose.bob],[7+lean,12+pose.bob],[4+lean,11+pose.bob]],C.ink);
+            line(5+lean,9+pose.bob,7+lean,11+pose.bob,C.brass);line(7+lean,11+pose.bob,8+lean,9+pose.bob,C.light);
+        }
         if(e instanceof HypotheticalGuard&&e.comboLength===2){
             rect(3,torso,2,1,C.brass);rect(3,torso+3,2,1,C.brass);
         }
@@ -243,7 +248,10 @@ export function drawHypotheticalGuard(c:CanvasRenderingContext2D,e:WorldFoe,cx:n
                 line(w-5,13,handX-3,handY+6,C.ink,3);
                 rect(handX-4,handY+5,3,3,C.leather);rect(handX-3,handY+5,2,1,C.brass);
             }
-            if(e.phase==='warning'&&e.highThrow){line(w/2,-6,w/2+3,-9,C.brass);line(w/2+3,-9,w/2+6,-6,C.brass);}
+            if(e.phase==='warning'){
+                if(e.highThrow){line(w/2,-6,w/2+3,-9,C.brass);line(w/2+3,-9,w/2+6,-6,C.brass);}
+                else if(e instanceof HypotheticalGuard&&e.coveringElite){line(w/2,-6,w/2+7,-6,C.brass);line(w/2+7,-6,w/2+5,-8,C.light);}
+            }
             if(!reduced&&e instanceof HypotheticalGuard&&e.age-e.lastRelease<130){
                 const t=(e.age-e.lastRelease)/130;
                 line(w+3+t*4,-2-t*3,w+5+t*4,-3-t*3,C.grain);

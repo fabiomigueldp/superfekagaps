@@ -1,8 +1,8 @@
 {
   "kind": "directed native-keyboard capture",
   "suiteRun": false,
-  "inputFrames": 9705,
-  "videoFrames": 731,
+  "inputFrames": 9377,
+  "videoFrames": 567,
   "fps": 30,
   "siegeReceipt": {
     "act": "duel",
@@ -10,7 +10,7 @@
     "health": 9,
     "won": false,
     "deaths": 3,
-    "ticks": 4398
+    "ticks": 4070
   },
   "finalReceipt": {
     "act": "duel",
@@ -18,7 +18,7 @@
     "health": 0,
     "won": true,
     "deaths": 4,
-    "ticks": 9192
+    "ticks": 8864
   },
   "captures": [
     {
@@ -31,6 +31,13 @@
     {
       "file": "rush-action.png",
       "frame": 3360,
+      "hp": 5,
+      "move": "rush",
+      "phase": "attack"
+    },
+    {
+      "file": "cover-high.png",
+      "frame": 3364,
       "hp": 5,
       "move": "rush",
       "phase": "attack"
@@ -50,6 +57,13 @@
       "phase": "attack"
     },
     {
+      "file": "guard-parry.png",
+      "frame": 3486,
+      "hp": 5,
+      "move": "cross",
+      "phase": "warning"
+    },
+    {
       "file": "sweep-tell.png",
       "frame": 3570,
       "hp": 5,
@@ -65,28 +79,28 @@
     },
     {
       "file": "vault-tell.png",
-      "frame": 3672,
+      "frame": 3884,
       "hp": 5,
       "move": "vault",
       "phase": "warning"
     },
     {
       "file": "vault-action.png",
-      "frame": 3704,
+      "frame": 3916,
       "hp": 5,
       "move": "vault",
       "phase": "attack"
     },
     {
       "file": "counterattack.png",
-      "frame": 3740,
+      "frame": 3968,
       "hp": 3,
       "move": "vault",
       "phase": "stunned"
     },
     {
       "file": "passage-open.png",
-      "frame": 4618,
+      "frame": 4290,
       "hp": 0,
       "move": "vault",
       "phase": "stunned"
@@ -199,249 +213,167 @@
       "hp": 5
     },
     {
-      "frame": 3659,
-      "move": "sweep",
-      "strike": 0,
-      "phase": "walk",
-      "hp": 5
-    },
-    {
-      "frame": 3660,
-      "move": "vault",
-      "strike": 0,
-      "phase": "warning",
-      "hp": 5
-    },
-    {
-      "frame": 3696,
-      "move": "vault",
-      "strike": 0,
-      "phase": "attack",
-      "hp": 5
-    },
-    {
-      "frame": 3737,
-      "move": "vault",
+      "frame": 3719,
+      "move": "rush",
       "strike": 0,
       "phase": "rest",
       "hp": 5
-    },
-    {
-      "frame": 3739,
-      "move": "vault",
-      "strike": 0,
-      "phase": "stunned",
-      "hp": 3
-    },
-    {
-      "frame": 3759,
-      "move": "vault",
-      "strike": 0,
-      "phase": "walk",
-      "hp": 3
     },
     {
       "frame": 3775,
       "move": "rush",
       "strike": 0,
-      "phase": "warning",
-      "hp": 3
-    },
-    {
-      "frame": 3807,
-      "move": "rush",
-      "strike": 0,
-      "phase": "attack",
-      "hp": 3
-    },
-    {
-      "frame": 3829,
-      "move": "rush",
-      "strike": 0,
-      "phase": "rest",
-      "hp": 3
-    },
-    {
-      "frame": 3847,
-      "move": "rush",
-      "strike": 0,
-      "phase": "stunned",
-      "hp": 1
-    },
-    {
-      "frame": 3867,
-      "move": "rush",
-      "strike": 0,
       "phase": "walk",
-      "hp": 1
+      "hp": 5
     },
     {
-      "frame": 3883,
-      "move": "cross",
+      "frame": 3776,
+      "move": "rush",
       "strike": 0,
       "phase": "warning",
-      "hp": 1
+      "hp": 5
     },
     {
-      "frame": 3911,
-      "move": "cross",
+      "frame": 3808,
+      "move": "rush",
       "strike": 0,
       "phase": "attack",
-      "hp": 1
+      "hp": 5
     },
     {
-      "frame": 3931,
-      "move": "vault",
-      "strike": 1,
-      "phase": "warning",
-      "hp": 1
-    },
-    {
-      "frame": 3957,
-      "move": "vault",
-      "strike": 1,
-      "phase": "attack",
-      "hp": 1
-    },
-    {
-      "frame": 4047,
+      "frame": 3830,
       "move": "rush",
       "strike": 0,
       "phase": "rest",
       "hp": 5
     },
     {
-      "frame": 4103,
+      "frame": 3870,
       "move": "rush",
       "strike": 0,
       "phase": "walk",
       "hp": 5
     },
     {
-      "frame": 4104,
-      "move": "rush",
-      "strike": 0,
-      "phase": "warning",
-      "hp": 5
-    },
-    {
-      "frame": 4136,
-      "move": "rush",
-      "strike": 0,
-      "phase": "attack",
-      "hp": 5
-    },
-    {
-      "frame": 4158,
-      "move": "rush",
-      "strike": 0,
-      "phase": "rest",
-      "hp": 5
-    },
-    {
-      "frame": 4198,
-      "move": "rush",
-      "strike": 0,
-      "phase": "walk",
-      "hp": 5
-    },
-    {
-      "frame": 4199,
+      "frame": 3871,
       "move": "vault",
       "strike": 0,
       "phase": "warning",
       "hp": 5
     },
     {
-      "frame": 4235,
+      "frame": 3907,
       "move": "vault",
       "strike": 0,
       "phase": "attack",
       "hp": 5
     },
     {
-      "frame": 4281,
+      "frame": 3953,
       "move": "vault",
       "strike": 0,
       "phase": "rest",
       "hp": 5
     },
     {
-      "frame": 4296,
+      "frame": 3968,
       "move": "vault",
       "strike": 0,
       "phase": "stunned",
       "hp": 3
     },
     {
-      "frame": 4316,
+      "frame": 3988,
       "move": "vault",
       "strike": 0,
       "phase": "walk",
       "hp": 3
     },
     {
-      "frame": 4341,
+      "frame": 4013,
       "move": "rush",
       "strike": 0,
       "phase": "warning",
       "hp": 3
     },
     {
-      "frame": 4373,
+      "frame": 4045,
       "move": "rush",
       "strike": 0,
       "phase": "attack",
       "hp": 3
     },
     {
-      "frame": 4395,
+      "frame": 4067,
       "move": "rush",
       "strike": 0,
       "phase": "rest",
       "hp": 3
     },
     {
-      "frame": 4426,
+      "frame": 4098,
       "move": "rush",
       "strike": 0,
       "phase": "stunned",
       "hp": 1
     },
     {
-      "frame": 4446,
+      "frame": 4118,
       "move": "rush",
       "strike": 0,
       "phase": "walk",
       "hp": 1
     },
     {
-      "frame": 4462,
+      "frame": 4134,
       "move": "vault",
       "strike": 0,
       "phase": "warning",
       "hp": 1
     },
     {
-      "frame": 4494,
+      "frame": 4166,
       "move": "vault",
       "strike": 0,
       "phase": "attack",
       "hp": 1
     },
     {
-      "frame": 4535,
+      "frame": 4207,
       "move": "vault",
       "strike": 0,
       "phase": "rest",
       "hp": 1
     },
     {
-      "frame": 4549,
+      "frame": 4221,
       "move": "vault",
       "strike": 0,
       "phase": "stunned",
       "hp": 0
     }
+  ],
+  "supportEvents": [
+    {
+      "frame": 3348,
+      "phase": "warning",
+      "arc": "high",
+      "barrels": 0
+    },
+    {
+      "frame": 3400,
+      "phase": "recoil",
+      "arc": "high",
+      "barrels": 1
+    }
+  ],
+  "parries": [
+    3485,
+    3585,
+    3917,
+    3944,
+    3992,
+    4173,
+    4197
   ]
 }
