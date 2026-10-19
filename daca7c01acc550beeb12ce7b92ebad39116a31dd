@@ -1,0 +1,18 @@
+Technical documentation supplement for daca7c01acc550beeb12ce7b92ebad39116a31dd
+
+Add continuous varied background performances and camera-aware choreography
+
+Behavior
+Extend finite aftermath activity with repeatable performances selected within the visible yard.
+
+Implementation
+Adds HypotheticalAftermathScore.ts with AFTERMATH_ACTIONS, AFTERMATH_SCORES, AFTERMATH_PROPS, aftermathActionTiming() and aftermathReach(). Initial recurring actions are ram, stomp, rake, tail, fire and bellow. HypotheticalAftermath adds planning, movement/orientation, performance and recovery states; scene and audio integration forwards the new actions through existing rendering and effects routes.
+
+Scope and limitations
+Adds continuous-background-2026-10-19 pose sheets, video and state records, and updates the aftermath authoring renderer. Recurring actions operate on surviving wreckage rather than recreating destroyed buildings or escaped actors. Later commits replace the initial fixed action ordering.
+
+Publication evidence
+No successful per-commit publisher receipt was found in the retained local deployment logs during this review. This does not establish whether the commit was published elsewhere or as part of a later descendant. No per-commit test pass is inferred.
+
+Full file inventory and provenance: docs/commits/2026-10-19/daca7c0.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
