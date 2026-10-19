@@ -1,0 +1,18 @@
+Technical documentation supplement for 31b17efefae40718b481cf6d1c7258ed4335796f
+
+Refine siege district routes, cargo lift and environmental progression
+
+Behavior
+Add optional siege side routes and a cargo lift, with district-specific route artwork and post-clear environmental progression.
+
+Implementation
+HypotheticalSiege.ts adds SIEGE_SIDE_ROUTES, SIEGE_CARGO_LIFT, clearTicks and clearedAt. HypotheticalStage replaces one dock support with the lift, adds side-route supports and places corresponding coins. The lift moves between y=196 and y=148 with 650 ms boarding stops. HypotheticalGame adds a cargo-lift hint and passes reduced motion to object drawing. HypotheticalDistrictArt.ts provides district detail rendering.
+
+Scope and limitations
+This commit changes playable mechanism placement, unlike background-only aftermath work. Adds scripts/render_hypothetical_districts.ts and the district-routes-2026-10-19 authoring set. Existing carrier physics supplies lift transport.
+
+Publication evidence
+A successful local publisher receipt identifies build `31b17efefae40718b481cf6d1c7258ed4335796f-33b745898723` for this exact source commit. The report records `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its build-log SHA-256 is `acf95af8f211892489e506bf1a83b8f2b517ecc56c6372eadcd878996913452a`. This establishes recorded build/publication completion, not gameplay correctness.
+
+Full file inventory and provenance: docs/commits/2026-10-19/31b17ef.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
