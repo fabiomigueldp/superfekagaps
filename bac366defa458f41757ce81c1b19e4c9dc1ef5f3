@@ -1,0 +1,18 @@
+Technical documentation supplement for bac366defa458f41757ce81c1b19e4c9dc1ef5f3
+
+feat(hipotetico): add bastion tower destruction and launcher animation
+
+Behavior
+Add a one-time background launcher attack against the fourth-district tower.
+
+Implementation
+HypotheticalTower.ts owns TOWER_SEQUENCE, launcherShoulder(), launcherGeometry(), flight and impact state. HypotheticalLauncherArt.ts draws the launcher and hand contacts; HypotheticalTowerArt.ts draws the tower sequence. HypotheticalAftermath schedules it, HypotheticalArt integrates its poses, and HypotheticalAudio/Game/Model add launch, blast and bell events. Longer noise effects loop their source buffer.
+
+Scope and limitations
+Adds scripts/render_hypothetical_tower.ts. The tower collapse at this revision predates the dedicated body simulation introduced in 63f7e11; do not attribute that later physics to this commit.
+
+Publication evidence
+A successful local publisher receipt identifies build `bac366defa458f41757ce81c1b19e4c9dc1ef5f3-2491e4e32c53` for this exact source commit. The report records `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its build-log SHA-256 is `cbcfcced464567406a136c6fe957c100c3b85f00662fd3290d27167d8da82226`. This establishes recorded build/publication completion, not gameplay correctness.
+
+Full file inventory and provenance: docs/commits/2026-10-19/bac366d.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
