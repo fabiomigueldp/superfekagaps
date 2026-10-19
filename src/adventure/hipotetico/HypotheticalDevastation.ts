@@ -26,7 +26,7 @@ export function nextScenicTick(tick:number,playerX:number,cleared:number){
     // Suspend unseen contact, including a retry that starts behind this street.
     if(district>0&&next-SCENIC_STARTS[district]>=DEVASTATION.prepare&&next-SCENIC_STARTS[district]<DEVASTATION.recover){
         const center=DESTRUCTION_SITES[district+1].x+38;
-        if(playerX<center-164||playerX>center+108)return tick;
+        if(playerX<center-164||playerX>center+(district===3?230:108))return tick;
     }
     return next;
 }

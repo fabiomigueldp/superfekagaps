@@ -159,7 +159,7 @@ export class HypotheticalAftermath {
     private planTower(){
         if(this.district!==3||this.tower.search.done)return false;
         const searching=this.tower.destroyed;
-        const stance=searching?this.tower.search.stance:Math.max(BASTION_TOWER.x+76,Math.min(this.origin+236,this.viewX+228));
+        const stance=searching?this.tower.search.stance:Math.max(BASTION_TOWER.x+76,Math.min(this.origin+224,this.viewX+224));
         const ready=searching?this.tower.search.ready:this.tower.available;
         if(ready&&(searching?this.searchFramed(stance):this.towerFramed(stance))){
             const next=searching?'tower-search':'tower';
@@ -266,12 +266,12 @@ export class HypotheticalAftermath {
             dx:this.facing*Math.cos(p.aim),dy:Math.sin(p.aim)};
     }
     private towerFramed(x=this.x){
-        const margin=this.phase==='tower'?-48:-20;
+        const margin=this.phase==='tower'?-160:-120;
         return x>=BASTION_TOWER.x+68&&this.inView(x,margin)&&this.inView(BASTION_TOWER.x,margin);
     }
     private searchFramed(x=this.x){
         const s=this.tower.search,target=s.age<TOWER_SEARCH.release?BASTION_TOWER.x+s.part.x-12:s.person.x-8;
-        const margin=this.phase==='tower-search'?-48:-20;
+        const margin=this.phase==='tower-search'?-160:-120;
         return this.inView(x,margin)&&this.inView(target,margin);
     }
     get launcherPose(){const p=this.pose(false);return towerLauncherPose(this.tower,p,p.lift,this.x,this.facing);}
@@ -486,8 +486,9 @@ export class HypotheticalAftermath {
         const center=yard.origin+272;
         const visible=(x:number,margin=28)=>this.inView(x,margin);
         if(!this.active){
-            if(storyTick-SCENIC_STARTS[district]<yard.start || !visible(storyX,-16)&&!(district===3&&visible(BASTION_TOWER.x,-20)))return;
-            this.active=true; this.x=storyX; this.velocity=0; this.facing=1; this.travel=0; this.lastStep=0;
+            const startX=district===3?Math.min(yard.origin+216,storyX):storyX;
+            if(storyTick-SCENIC_STARTS[district]<yard.start || !visible(startX,-24)&&!(district===3&&visible(BASTION_TOWER.x,-64)))return;
+            this.active=true; this.x=startX; this.velocity=0; this.facing=1; this.travel=0; this.lastStep=0;
             this.enter('approach');
             if(district===3){this.plan();return;}
         }
