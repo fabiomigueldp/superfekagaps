@@ -2,6 +2,19 @@
 
 Encontro bônus de fantasia satírica, acessível pelo botão **MEGA BOSS** no título de Super Feka Gaps World ou por `/?encounter=hipotetico`. A caricatura é ficcional; as cenas não representam acontecimentos reais.
 
+## Revisão 26 · Ritmo, peso e leitura da chegada
+
+A revisão separa o alívio de chegar ao abrigo da demonstração de força do vilão. Na versão anterior, a segunda rajada coincidia com a investida e o primeiro plano escondia parte das quedas. Agora a ação tem prioridades sucessivas, com tempo para observar suas consequências.
+
+- **Encenação:** chegada protegida de 360 ticks. As duas rajadas preservam a mira e suas trajetórias; a preparação da investida começa em 200, a carga em 228, o impacto em 244 e o contato fica retido até 254. A recuperação vai até 302. Os postos abrem de 336 a 360; a grade sobe de 360 a 408. A repetição após a chegada continua pulando a espera.
+- **Atuação:** o dinossauro comprime o corpo no contato; a reação do cavaleiro usa o novo instante do golpe. Depois ele olha para o abrigo, passando por vistas frontal e de perfil enquanto arma e mãos conservam seus apoios. A saída da primeira rua acelera e desacelera suavemente.
+- **Composição:** a rua distante sobe mais 12 pixels. O muro, as fiadas e os drenos se prolongam até a altura anterior do canal. As quedas ficam acima do andaime mais próximo, e o cavaleiro permanece abaixo do HUD durante as três ações de fundo e o deslocamento vertical da câmera.
+- **Consequências:** seis ticks de fissura antes da parede superior ceder, partes com a textura original, dois sons de destroços depois do golpe e papéis que levantam uma vez e repousam em outra posição. A poeira baixa, a luminária e as ruínas acompanham o mesmo relógio. Movimento reduzido desativa o voo secundário dos papéis; pausa e mute interrompem as caudas sonoras.
+
+188 testes passaram (145 do encontro, 43 compartilhados), incluindo novas verificações de separação entre balas e contato, margem para o desfecho, enquadramento do cavaleiro e sons de destroços. TypeScript e build de produção passaram. O replay recebeu 90 ticks adicionais de espera; os comandos de combate continuam iguais e completam os três atos, com três mortes e 7.575 ticks ativos. As duas rotas altas também continuam válidas. O navegador percorreu menu, pausa, vitória, reinício e apresentação móvel com movimento reduzido, sem erros.
+
+O vídeo de chegada tem 345 quadros a 30 fps (11,5 segundos), dez capturas e nenhuma morte. O vídeo completo tem 4.075 quadros (135,83 segundos). Ambos usam controles normais, sem reposicionar atores ou câmera. Os sons são os eventos do sintetizador de produção. Evidências desta rodada: `output/hipotetico/arrival-direction/`. A transição e o vídeo completo mostram a versão atual; as seções abaixo preservam o histórico.
+
 ## Revisão 25 · Chegada, multidão e passagem ao cerco
 
 A chegada anterior trocava o cenário de forma brusca, deixava os guardas visíveis desde o primeiro quadro e colocava somente dois civis parecidos atrás das estruturas jogáveis. A revisão separa a observação da ameaça da entrada no combate.

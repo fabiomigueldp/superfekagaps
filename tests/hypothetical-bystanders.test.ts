@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { HypotheticalBackdrop } from '../src/adventure/hipotetico/HypotheticalBackdrop';
+import {SCENIC_STARTS,scenicDistrict} from '../src/adventure/hipotetico/HypotheticalDevastation';
 import { HypotheticalModel } from '../src/adventure/hipotetico/HypotheticalModel';
 import { bystanderPose,bystanderBounds,bystanderFall,bystanderIntersection } from '../src/adventure/hipotetico/HypotheticalBystanderMotion';
 import { bystanderTexture,drawBystanderTexture } from '../src/adventure/hipotetico/HypotheticalBystanderPixels';
@@ -8,10 +9,10 @@ import { drawBystanders } from '../src/adventure/hipotetico/HypotheticalBystande
 
 test('the fictional rider prefers a red-star shirt in each local group, including one behind a closer neutral actor',()=>{
     const b=new HypotheticalBackdrop(true),firstHits:number[]=[],aims:number[]=[];
-    for(let tick=1;tick<=1200;tick++){
+    for(let tick=1;tick<=1800;tick++){
         const old=b.people.map(p=>p.hitAt);b.update(tick);
-        if(tick%400===90){
-            const target=b.aimedPerson!;assert.equal(target.clothes,'star-shirt');assert.equal(target.district,Math.floor(tick/400));
+        if(SCENIC_STARTS.some(start=>tick===start+90)){
+            const target=b.aimedPerson!;assert.equal(target.clothes,'star-shirt');assert.equal(target.district,scenicDistrict(tick));
             aims.push(b.people.indexOf(target));
             if(tick===90)assert.ok(b.people[0].x<target.x,'priority is not just nearest-first');
         }
@@ -19,9 +20,9 @@ test('the fictional rider prefers a red-star shirt in each local group, includin
     }
     assert.deepEqual(aims,[1,2,5]);assert.deepEqual(firstHits,[10,2,5]);
     assert.ok(b.people[10].hitAt!<b.people[1].hitAt!,'a runner can cross the committed volley before the aimed person');
-    assert.equal(b.casualties,7);
+    assert.equal(b.casualties,10);
     assert.deepEqual(b.people.filter(p=>p.escaped&&!p.exitAtShelter).map(p=>p.clothes),['star-shirt','workcoat']);
-    assert.equal(b.people.filter(p=>p.escaped&&p.exitAtShelter).length,5);
+    assert.equal(b.people.filter(p=>p.escaped&&p.exitAtShelter).length,10);
 });
 
 test('each burst has twenty ticks of preparation and commits to one destination while its actor moves',()=>{
@@ -67,11 +68,11 @@ test('the gait follows travelled distance, crouching blends after arrival, and f
 
 test('shots and reactions remain bounded, and replaying a cleared district reconstructs the same people',()=>{
     const a=new HypotheticalBackdrop(true);let maxShots=0,maxImpacts=0;
-    for(let tick=1;tick<=1200;tick++){
+    for(let tick=1;tick<=1800;tick++){
         a.update(tick);maxShots=Math.max(maxShots,a.shots.length);maxImpacts=Math.max(maxImpacts,a.impacts.length);
-        if(tick===400||tick===800){
-            const restored=new HypotheticalModel('siege',9,tick/400).backdrop;
-            assert.deepEqual(restored.people,a.people);assert.deepEqual(restored.breaches,a.breaches);
+        if(tick===SCENIC_STARTS[1]||tick===SCENIC_STARTS[2]){
+            const restored=new HypotheticalModel('siege',9,SCENIC_STARTS.indexOf(tick)).backdrop;
+            assert.deepEqual(restored.people,a.people);assert.deepEqual(restored.blood,a.blood);assert.deepEqual(restored.breaches,a.breaches);
         }
     }
     assert.ok(maxShots<=6);assert.ok(maxImpacts<=18);
@@ -83,7 +84,7 @@ test('shots and reactions remain bounded, and replaying a cleared district recon
 test('street actors anticipate, brake before shelter, and blend their hands without a pose teleport',()=>{
     const b=new HypotheticalBackdrop(true),previous=new Map<number,{velocity:number;pose:ReturnType<typeof bystanderPose>}>();
     let braking=0;
-    for(let tick=1;tick<=1200;tick++){
+    for(let tick=1;tick<=1800;tick++){
         b.update(tick);b.people.forEach((p,i)=>{
             const pose=bystanderPose(p,tick),old=previous.get(i);
             if(tick<=p.alertAt+6)assert.equal(p.x,p.originX,'notice the danger before moving');

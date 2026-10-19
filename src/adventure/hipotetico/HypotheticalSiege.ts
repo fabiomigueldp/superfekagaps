@@ -2,7 +2,8 @@ import type { FoeSpec } from '../types';
 
 /** The garrison exists from load. Crossing a threshold wakes the next patrol;
  * defeating it opens its physical gate, never teleports Feka or creates a wave. */
-export const SIEGE_SECTORS = [
+export const SIEGE_APPROACH = 256;
+const ORIGINAL_SECTORS = [
     { name: 'PORTARIA', origin: 0, trigger: 96, gate: 352, checkpoint: 48,
         guards: [{ kind: 'minion', x: 180, y: 224 }, { kind: 'helmet', x: 276, y: 224 }],
         platforms: [{ x: 120, y: 184, width: 48 }, { x: 244, y: 168, width: 64 }] },
@@ -14,16 +15,21 @@ export const SIEGE_SECTORS = [
             { kind: 'loader', x: 986, y: 160 }, { kind: 'loader', x: 1124, y: 176 }],
         platforms: [{ x: 870, y: 188, width: 56 }, { x: 972, y: 160, width: 64 }, { x: 1098, y: 176, width: 56 }] },
 ] as const;
-export const SIEGE_WIDTH = 1280;
-export const SIEGE_EXIT = 1240;
+export const SIEGE_SECTORS = ORIGINAL_SECTORS.map((s,i)=>({...s,
+    origin:s.origin+(i?SIEGE_APPROACH:0),trigger:s.trigger+SIEGE_APPROACH,gate:s.gate+SIEGE_APPROACH,
+    checkpoint:s.checkpoint+SIEGE_APPROACH,
+    guards:s.guards.map(g=>({...g,x:g.x+SIEGE_APPROACH})),
+    platforms:s.platforms.map(p=>({...p,x:p.x+SIEGE_APPROACH}))}));
+export const SIEGE_WIDTH = 1280+SIEGE_APPROACH;
+export const SIEGE_EXIT = 1240+SIEGE_APPROACH;
 export const SIEGE_GATE_TICKS = 72;
 export const SIEGE_UNLOCK_TICKS = 14;
 export const SIEGE_LIFT_TICKS = 50;
 export const SIEGE_LOCK_TICKS = 18;
 /** Short optional upper routes connect the cleared post to the next approach. */
 export const SIEGE_LINKS = [
-    { id: 'siege-link-0', x: 384, y: 180, width: 40, height: 7, kind: 'support' as const },
-    { id: 'siege-link-1', x: 800, y: 184, width: 48, height: 7, kind: 'support' as const },
+    { id: 'siege-link-0', x: 384+SIEGE_APPROACH, y: 180, width: 40, height: 7, kind: 'support' as const },
+    { id: 'siege-link-1', x: 800+SIEGE_APPROACH, y: 184, width: 48, height: 7, kind: 'support' as const },
 ];
 export function siegeGarrison(sector: number): FoeSpec[] {
     return SIEGE_SECTORS[sector].guards.map((g, i) => ({ ...g, id: `hipotetico:garrison:${sector}:${i}`, range: 352, behavior: 'canal' }));
@@ -47,7 +53,7 @@ export class HypotheticalSiege {
     }
     get sector() { return SIEGE_SECTORS[Math.min(2, this.cleared)]; }
     get currentSector() { return SIEGE_SECTORS[this.entered]; }
-    get checkpoint() { return this.cleared === 3 ? 1212 : this.sector.checkpoint; }
+    get checkpoint() { return this.cleared === 3 ? 1212+SIEGE_APPROACH : this.sector.checkpoint; }
     gateHeight(index: number) {
         // The latch retracts before the motor lifts. The last eight ticks let
         // the drum settle; its collision never bounces back onto the player.

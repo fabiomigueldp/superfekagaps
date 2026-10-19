@@ -1,34 +1,51 @@
 import { smoothMotion } from './HypotheticalMotion';
+import {SIEGE_SECTORS} from './HypotheticalSiege';
 
-/** One authored action per district. Scenery, rider and effects read this clock. */
+/** Authored contacts share a clock across scenery, rider, crowd and effects. */
 export const DEVASTATION = { period:400, prepare:136, strike:166, impact:180, hold:185, recover:225, settle:120 } as const;
+/** The opening gives the rifle, ram and aftermath separate beats before combat resumes. */
+export const ARRIVAL_RAM={prepare:200,strike:228,impact:244,hold:254,recover:302} as const;
+export const ARRIVAL_BITE={prepare:480,strike:508,impact:526,hold:536,recover:574} as const;
+export const SCENIC_STARTS=[0,800,1200] as const;
+export const scenicDistrict=(tick:number)=>tick<800?0:tick<1200?1:2;
 export const DESTRUCTION_SITES = [
-    { x:184, width:76, height:66, variant:0, kind:'ram' },
-    { x:600, width:76, height:72, variant:1, kind:'bite' },
-    { x:1016, width:76, height:78, variant:2, kind:'stamp' },
+    { x:184, width:76, height:66, variant:0, kind:'ram',district:0 },
+    { x:440, width:84, height:54, variant:1, kind:'bite',district:0 },
+    { x:856, width:76, height:72, variant:1, kind:'bite',district:1 },
+    { x:1272, width:76, height:78, variant:2, kind:'stamp',district:2 },
 ] as const;
 
 export function devastationAt(tick:number) {
-    const district=Math.min(2,Math.floor(tick/DEVASTATION.period)),local=tick-district*DEVASTATION.period;
-    const site=DESTRUCTION_SITES[district],wind=smoothMotion((local-DEVASTATION.prepare)/30);
-    const drive=smoothMotion((local-DEVASTATION.strike)/14),release=smoothMotion((local-DEVASTATION.hold)/40);
-    const active=local>=DEVASTATION.prepare&&local<DEVASTATION.recover;
+    const district=scenicDistrict(tick),local=tick-SCENIC_STARTS[district];
+    const plaza=district===0&&local>=360,siteIndex=district===0?(plaza?1:0):district+1;
+    const site=DESTRUCTION_SITES[siteIndex],timing=district===0?(plaza?ARRIVAL_BITE:ARRIVAL_RAM):DEVASTATION;
+    const wind=smoothMotion((local-timing.prepare)/(timing.strike-timing.prepare));
+    const drive=smoothMotion((local-timing.strike)/(timing.impact-timing.strike));
+    const release=smoothMotion((local-timing.hold)/(timing.recover-timing.hold));
+    const active=local>=timing.prepare&&local<timing.recover;
     const force=active?wind*(1-release):0;
-    const x=local<136?-80+230*smoothMotion(local/136)
-        :local<166?150-12*wind:local<180?138+40*drive
-        :local<185?178:local<225?178-10*release
+    let x=local<136?-80+230*smoothMotion(local/136)
+        :local<timing.strike?150-12*wind:local<timing.impact?138+40*drive
+        :local<timing.hold?178:local<timing.recover?178-10*release
+        :district===0?168+192*smoothMotion((local-302)/98)
         :168+(local-225)*168/175;
+    if(plaza)x=local<=400?168+192*smoothMotion((local-302)/98):local<430?360+46*smoothMotion((local-400)/30)
+        :local<timing.strike?406-12*wind:local<timing.impact?394+40*drive
+        :local<timing.hold?434:local<timing.recover?434-10*release
+        :424+168*smoothMotion((local-timing.recover)/(800-timing.recover));
     const stamp=site.kind==='stamp',bite=site.kind==='bite';
     const airborne=stamp&&local>=154&&local<180?Math.sin(Math.PI*(local-154)/26):0;
-    const hit=local>=180&&local<208?smoothMotion((local-179)/3)*(1-smoothMotion((local-183)/25)):0;
-    return { district,local,kind:site.kind,active,wind:active?wind:0,drive:active?drive:0,force,
-        x:district*416+x, lift:airborne?-airborne*13:0,
-        compression:stamp?force*3+hit*6:force*(bite?2:5),
-        jaw:bite?.15+force*(.85-.73*smoothMotion((local-176)/7)):.18+force*.45,
-        neckDrop:bite?-force*9+smoothMotion((local-170)/14)*(1-release)*19:force*10,
+    const hit=local>=timing.impact&&local<timing.impact+28?smoothMotion((local-timing.impact+1)/3)*(1-smoothMotion((local-timing.impact-3)/25)):0;
+    const lookAt=plaza?560:278,lookEnd=plaza?608:320;
+    const lookBack=district===0?smoothMotion((local-lookAt)/16)*(1-smoothMotion((local-lookEnd)/18)):0;
+    return { district,siteIndex,local,kind:site.kind,active,impactTick:timing.impact,lookBack,wind:active?wind:0,drive:active?drive:0,force,
+        x:SIEGE_SECTORS[district].origin+x, lift:airborne?-airborne*13:0,
+        compression:stamp?force*3+hit*6:force*(bite?2:5)+(district===0?hit*2:0),
+        jaw:bite?.15+force*(.85-.73*smoothMotion((local-timing.impact+4)/7)):.18+force*.45,
+        neckDrop:bite?-force*9+smoothMotion((local-timing.impact+10)/14)*(1-release)*19:force*10,
         tuck:airborne*.62,brace:force*(stamp?.45:.7),tail:force*(bite?-.22:.18),
-        riderDrop:force*5+airborne*8,riderLean:force*(4-7*smoothMotion((local-178)/8)),rein:force,
-        phase:!active?'march':local<166?'prepare':local<180?'strike':local<185?'contact':'recover' };
+        riderDrop:force*5+airborne*8,riderLean:force*(4-7*smoothMotion((local-timing.impact+2)/8)),rein:force,
+        phase:!active?'march':local<timing.strike?'prepare':local<timing.impact?'strike':local<timing.hold?'contact':'recover' };
 }
 
 export function ruinAge(breaches:readonly number[],index:number,tick:number){

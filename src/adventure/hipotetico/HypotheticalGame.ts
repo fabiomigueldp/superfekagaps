@@ -16,7 +16,7 @@ import { drawHypotheticalBackground, drawHypotheticalCombat, drawHypotheticalGua
 import { HypotheticalAudio } from './HypotheticalAudio';
 import {chaseCollapsedEdge} from './HypotheticalChaseDetails';
 import { CHASE_WIDTH, CHASE_CHECKPOINT, CHASE_DISTRICTS } from './HypotheticalLayout';
-import {ARRIVAL,arrivalFade,arrivalDeployment} from './HypotheticalArrival';
+import {ARRIVAL,arrivalFade,arrivalDeployment,arrivalLookAhead} from './HypotheticalArrival';
 
 export class HypotheticalEncounter extends BossEncounter {
     readonly model: HypotheticalModel;
@@ -39,8 +39,10 @@ export class HypotheticalEncounter extends BossEncounter {
         if(this.model.act==='siege')this.livingGuards=this.garrison.filter(e=>!e.dead&&e.wave===cleared+1).length;
         this.model.update(dt,p,this.livingGuards);this.sync();
         if(this.model.act==='siege'){
-            const entrance=o.bodies.find(body=>body.id==='arrival-gate');
-            if(entrance){entrance.height=this.model.arrival.height;entrance.active=entrance.height===0;}
+            for(const [id,pose] of [['arrival-gate',this.model.arrival],['arrival-forecourt',this.model.forecourt]] as const){
+                const entrance=o.bodies.find(body=>body.id===id);
+                if(entrance){entrance.height=pose.height;entrance.active=entrance.height===0;}
+            }
             for(const e of this.garrison)e.awake=e.wave===this.model.wave&&this.model.route.active;
             if(this.model.route.cleared>cleared)o.barrels=[];
             for(const [i] of SIEGE_SECTORS.entries()){
@@ -114,7 +116,7 @@ export class HypotheticalGame extends WorldGame {
             this.art.objects=(c,o,cx,cy)=>drawHypotheticalObjects(c,o,this.fight,cx,cy);
             this.art.boss=(c,_b,cx,cy)=>drawHypotheticalCombat(c,this.fight,cx,cy,this.renderer.reducedMotion);
             this.art.foe=(c,e,cx,cy)=>{
-                const deployment=this.act==='siege'?arrivalDeployment(this.fight.tick,this.fight.arrivalSkipped):1;
+                const deployment=this.act==='siege'?arrivalDeployment(this.fight.arrivalTime,this.fight.arrivalSkipped):1;
                 if(deployment===0)return;
                 if(deployment<1){
                     c.save();c.beginPath();c.rect(e.x-cx-8,e.y+e.height-cy-30*deployment+1,e.width+16,30*deployment+2);c.clip();
@@ -142,7 +144,12 @@ export class HypotheticalGame extends WorldGame {
     get fight(){return this.encounter.model;}
     private get encounterHint(){
         const b=this.fight;
-        if(this.act==='siege'&&!b.arrival.ready)return b.tick<136?'REFUGIO! A GRADE PROTEGE A PASSAGEM':b.tick<225?'O ARSENAL ESTA CEDENDO!':'PREPARE-SE: A GRADE VAI ABRIR';
+        if(this.act==='siege'&&!b.arrival.ready){
+            const t=b.arrivalTime;
+            return t<90?'REFUGIO! A GRADE PROTEGE A PASSAGEM':t<200?'ELE VIROU PARA A RUA!'
+                :t<ARRIVAL.firstRelease?'O ARSENAL ESTA CEDENDO!':t<=ARRIVAL.hold?'SIGA PELO PATIO PARA A PRACA'
+                :t<480?'ABRIGUE-SE! OUTRA RAJADA!':t<574?'A GALERIA VAI DESABAR!':'PREPARE-SE: A GRADE VAI ABRIR';
+        }
         if(this.act!=='siege'||b.marks.length||!b.route.active||b.nextAct)return b.hint;
         const patrol=this.foes.filter(e=>e instanceof HypotheticalGuard&&e.awake&&!e.dead);
         const visible=patrol.filter(e=>e.x+e.width>this.camera.x+4&&e.x<this.camera.x+316);
@@ -184,9 +191,11 @@ export class HypotheticalGame extends WorldGame {
                 new HypotheticalGuard(spec,i+1,()=>this.foes,{left:s.origin+12,right:s.gate})));
             this.encounter.garrison=this.foes as HypotheticalGuard[];
             for(const e of this.encounter.garrison)e.awake=false;
-            this.player.data.position.x=this.fight.route.checkpoint;
-            const entrance=this.objects.bodies.find(body=>body.id==='arrival-gate');
-            if(entrance){entrance.height=this.fight.arrival.height;entrance.active=entrance.height===0;}
+            this.player.data.position.x=this.fight.arrivalSkipped?this.fight.route.checkpoint:48;
+            for(const [id,pose] of [['arrival-gate',this.fight.arrival],['arrival-forecourt',this.fight.forecourt]] as const){
+                const entrance=this.objects.bodies.find(body=>body.id===id);
+                if(entrance){entrance.height=pose.height;entrance.active=entrance.height===0;}
+            }
             for(const [i] of SIEGE_SECTORS.entries()){
                 const gate=this.objects.bodies.find(b=>b.id===`siege-gate-${i}`);
                 if(gate){gate.height=this.fight.route.gateHeight(i);gate.active=gate.height===0;}
@@ -206,7 +215,7 @@ export class HypotheticalGame extends WorldGame {
         if(this.state==='map'||this.state==='title'||this.state==='intro'){
             if(!this.exiting){this.exiting=true;this.exitEncounter();}return;
         }
-        const before=this.fight.tick,dead=this.player.data.isDead,wasWon=this.fight.won;
+        const before=this.fight.tick,beforeArrival=this.fight.arrivalTime,dead=this.player.data.isDead,wasWon=this.fight.won;
         this.encounter.livingGuards=this.foes.filter(e=>!e.dead).length;
         super.update(dt);
         this.weaponAudio.sync();
@@ -215,10 +224,10 @@ export class HypotheticalGame extends WorldGame {
         if(this.player.data.isDead||this.state!=='playing')return;
         const steps=Math.max(0,this.fight.tick-before);
         if(!steps)return;
-        if(this.act==='siege'&&this.fight.tick>=ARRIVAL.release)this.arrivalSeen=true;
+        if(this.act==='siege'&&this.fight.arrivalTime>=ARRIVAL.release)this.arrivalSeen=true;
         if(this.act==='siege'&&!this.fight.arrivalSkipped){
-            if(before<246&&this.fight.tick>=246)this.audio.sfx('switch');
-            if(before<ARRIVAL.release&&this.fight.tick>=ARRIVAL.release)this.audio.sfx('checkpoint');
+            if([ARRIVAL.firstRelease,ARRIVAL.deployment].some(t=>beforeArrival<t&&this.fight.arrivalTime>=t))this.audio.sfx('switch');
+            if(beforeArrival<ARRIVAL.release&&this.fight.arrivalTime>=ARRIVAL.release)this.audio.sfx('checkpoint');
         }
         if(this.act==='siege')for(const e of this.foes)if(e instanceof HypotheticalGuard&&!e.dead){
             const at=Math.max(e.impactAt,e.vaultLandedAt);
@@ -234,7 +243,7 @@ export class HypotheticalGame extends WorldGame {
             this.siegeCheckpoint=this.fight.route.cleared;this.audio.sfx('checkpoint');
         }else if(this.act==='siege'&&this.fight.route.releasedThisTick)this.audio.sfx('switch');
         for(const event of this.fight.events){
-            if(event==='shot'||event==='impact'||event==='splash'||event==='collapse-water'||event==='debris-land'||event==='reload'||event==='distant-shot'||event==='distant-hit')this.weaponAudio.play(event);
+            if(event==='shot'||event==='impact'||event==='splash'||event==='collapse-water'||event==='debris-land'||event==='reload'||event==='distant-shot'||event==='distant-hit'||event==='distant-debris')this.weaponAudio.play(event);
             if(event==='step'&&this.fight.tick%3===0)this.audio.sfx('land');
             if(event==='break'){
                 if(this.act==='siege'){
@@ -245,7 +254,7 @@ export class HypotheticalGame extends WorldGame {
         }
         if(this.fight.nextAct){this.transitionTicks+=steps;if(this.transitionTicks>=60)this.nextAct();}
         if(this.act==='chase')this.camera.x=clamp(this.player.data.position.x-150,0,CHASE_WIDTH-320);
-        else if(this.act==='siege')this.camera.x=clamp(this.player.data.position.x-132,0,SIEGE_WIDTH-320);
+        else if(this.act==='siege')this.camera.x=clamp(this.player.data.position.x-132+arrivalLookAhead(this.fight.arrivalTime,this.fight.arrivalSkipped),0,SIEGE_WIDTH-320);
         else this.camera.x=0;
         // Keep the complete jump arc visible without shaking the backdrop vertically.
         this.camera.y=clamp(Math.min(64,this.player.data.position.y-38),0,64);

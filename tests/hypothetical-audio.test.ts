@@ -47,7 +47,7 @@ test('mute, pause and disposal stop weapon tails and never queue silent shots fo
 });
 
 test('long barrages bound simultaneous voices and natural endings release their graphs',()=>{
-    const {audio,context}=setup();const cues:WeaponCue[]=['shot','impact','splash','collapse-water','debris-land','distant-shot','distant-hit','reload','distant-crash'];
+    const {audio,context}=setup();const cues:WeaponCue[]=['shot','impact','splash','collapse-water','debris-land','distant-shot','distant-hit','reload','distant-crash','distant-debris'];
     for(let i=0;i<80;i++)audio.play(cues[i%cues.length]);
     assert.equal(audio.activeVoices,12);
     for(const n of context.nodes)n.onended?.();
@@ -61,6 +61,15 @@ test('distant destruction has a low impact body and obeys the same pause and own
     assert.ok(context.nodes.some(n=>n.type==='lowpass'&&n.frequency.changes[0]===1100));
     assert.equal(audio.activeVoices,1);route.enabled=false;audio.sync();assert.equal(audio.activeVoices,0);
     assert.ok(context.nodes.every(n=>n.disconnected));assert.equal(audio.play('distant-crash'),false);
+});
+
+test('the masonry aftermath is quieter than its initial blow and never outlives pause',()=>{
+    const {audio,context,route}=setup();audio.play('distant-crash');
+    const blow=Math.max(...context.nodes.flatMap(n=>n.gain.changes)),start=context.nodes.length;
+    audio.play('distant-debris');const nodes=context.nodes.slice(start);
+    assert.ok(Math.max(...nodes.flatMap(n=>n.gain.changes))<blow*.5);
+    assert.ok(nodes.some(n=>n.type==='bandpass'));
+    route.enabled=false;audio.sync();assert.ok(nodes.every(n=>n.disconnected));assert.equal(audio.activeVoices,0);
 });
 
 test('rifle crack decays into a low body while impacts use a separate short metallic envelope',()=>{

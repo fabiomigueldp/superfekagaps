@@ -2,16 +2,16 @@
   "inputOnly": true,
   "actorCameraClockEdits": false,
   "recordedFromInputFrame": 1162,
-  "inputFrames": 1761,
-  "videoFrames": 300,
-  "seconds": 10,
+  "inputFrames": 1851,
+  "videoFrames": 345,
+  "seconds": 11.5,
   "receipt": {
     "act": "siege",
     "phase": 1,
     "health": 9,
     "won": false,
     "deaths": 0,
-    "ticks": 1761
+    "ticks": 1851
   },
   "captures": [
     {
@@ -228,13 +228,13 @@
     },
     {
       "file": "arrival-ram.png",
-      "inputFrame": 1455,
-      "tick": 174,
+      "inputFrame": 1519,
+      "tick": 238,
       "crowd": [
         {
           "x": 246,
           "escaped": false,
-          "hitAt": null
+          "hitAt": 182
         },
         {
           "x": 284,
@@ -257,8 +257,8 @@
           "hitAt": 137
         },
         {
-          "x": 321.9205994897959,
-          "escaped": false,
+          "x": 322,
+          "escaped": true,
           "hitAt": null
         },
         {
@@ -281,13 +281,13 @@
     },
     {
       "file": "arrival-collapse.png",
-      "inputFrame": 1469,
-      "tick": 188,
+      "inputFrame": 1539,
+      "tick": 258,
       "crowd": [
         {
           "x": 246,
           "escaped": false,
-          "hitAt": 184
+          "hitAt": 182
         },
         {
           "x": 284,
@@ -334,13 +334,13 @@
     },
     {
       "file": "arrival-aftermath.png",
-      "inputFrame": 1507,
-      "tick": 226,
+      "inputFrame": 1581,
+      "tick": 300,
       "crowd": [
         {
           "x": 246,
           "escaped": false,
-          "hitAt": 184
+          "hitAt": 182
         },
         {
           "x": 284,
@@ -387,13 +387,13 @@
     },
     {
       "file": "arrival-deployment.png",
-      "inputFrame": 1541,
-      "tick": 260,
+      "inputFrame": 1631,
+      "tick": 350,
       "crowd": [
         {
           "x": 246,
           "escaped": false,
-          "hitAt": 184
+          "hitAt": 182
         },
         {
           "x": 284,
@@ -440,13 +440,13 @@
     },
     {
       "file": "arrival-opening.png",
-      "inputFrame": 1575,
-      "tick": 294,
+      "inputFrame": 1665,
+      "tick": 384,
       "crowd": [
         {
           "x": 246,
           "escaped": false,
-          "hitAt": 184
+          "hitAt": 182
         },
         {
           "x": 284,
@@ -493,13 +493,13 @@
     },
     {
       "file": "arrival-combat.png",
-      "inputFrame": 1611,
-      "tick": 330,
+      "inputFrame": 1701,
+      "tick": 420,
       "crowd": [
         {
           "x": 246,
           "escaped": false,
-          "hitAt": 184
+          "hitAt": 182
         },
         {
           "x": 284,

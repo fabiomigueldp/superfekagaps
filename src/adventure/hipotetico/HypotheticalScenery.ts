@@ -10,7 +10,7 @@ import {chaseCollapsedEdge} from './HypotheticalChaseDetails';
 import {CHASE_QUAYS,chaseQuayX,chaseQuayBase} from './HypotheticalChaseLife';
 import {drawChaseIndustry,drawChaseQuayLife,drawChaseSkiffs} from './HypotheticalChaseLifeArt';
 import {drawChaseQuayGround,drawChaseFrontage,drawChaseShoreWater} from './HypotheticalChaseQuayArt';
-import {drawArrivalCourtyard,drawArrivalFittings} from './HypotheticalArrivalArt';
+import {drawArrivalCourtyard,drawArrivalPlaza,drawArrivalFittings} from './HypotheticalArrivalArt';
 
 const S = {
     ink: '#213545', joint: '#354956', stone: '#677b7c', stoneShade: '#516571',
@@ -119,6 +119,13 @@ function siegeFacade(c:CanvasRenderingContext2D,x:number,base:number,index:numbe
         }
     };
     if(age<0){intact();return;}
+    if(index===0&&age<6){
+        // Let the contact register before the upper wall gives way.
+        intact();const spread=(age+1)/6;
+        pixelLine(c,x+38,base-27,x+38-18*spread,base-27-23*spread,'#586b65',2);
+        pixelLine(c,x+38,base-27,x+38+21*spread,base-27-31*spread,'#586b65');
+        return;
+    }
     facade(c,x,base,w,h,site.variant,true);
     // The exposed core keeps its beams, brick courses and broken services after the dust clears.
     box(c,x+18,base-19,25,16,'#748276');box(c,x+21,base-17,18,13,'#62776f');
@@ -129,12 +136,13 @@ function siegeFacade(c:CanvasRenderingContext2D,x:number,base:number,index:numbe
     pixelLine(c,x+51,base-27,x+57,base-30,'#b3a58a');
     if(site.kind==='bite')pixelLine(c,x+30,base-7,x+64,base-17,'#b09c7d',3);
     if(site.kind==='stamp'){pixelLine(c,x+10,base-11,x+30,base-11,'#91a38f',3);pixelLine(c,x+30,base-11,x+33,base-16,'#6c857e',3);}
-    if(age<51){
+    const fallingAge=age-(index===0?6:0);
+    if(fallingAge<51){
         // Four pieces retain the exact facade texture. Integer translations and clipping
         // preserve crisp pixels, instead of stretching or dissolving the entire building.
         c.save();c.beginPath();c.rect(x-34,top-20,w+70,h+20);c.clip();
         for(let i=0;i<4;i++){
-            const t=Math.max(0,age-i*3),dx=Math.round((i-1.3)*t*.23),dy=Math.round(t*t*.082);
+            const t=Math.max(0,fallingAge-i*3),dx=Math.round((i-1.3)*t*.23),dy=Math.round(t*t*.082);
             c.save();c.translate(dx,dy);c.beginPath();c.rect(x-4+i*21,top-12,21,h*.58+12);c.clip();intact();c.restore();
         }
         c.restore();
@@ -265,23 +273,24 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
         }
     }else if(b.act==='siege'){
         for(const [i,s] of SIEGE_SECTORS.entries()){
-            const x=s.origin-cx;
-            if(x>340||x+416<-20)continue;
-            const damageAge=ruinAge(b.backdrop.breaches,i,b.backdrop.tick);
+            const x=s.origin-cx,width=i===0?672:416,siteIndex=i===0?0:i+1;
+            if(x>340||x+width<-20)continue;
+            const damageAge=ruinAge(b.backdrop.breaches,siteIndex,b.backdrop.tick);
             facade(c,x+24,base-5,57,56+i%2*15,i);
-            siegeFacade(c,x+184,base-5,i,damageAge);
+            siegeFacade(c,x+184,base-5,siteIndex,damageAge);
+            if(i===0)siegeFacade(c,x+440,base-5,1,ruinAge(b.backdrop.breaches,1,b.backdrop.tick));
             // The raised rear street is supported all the way to the canal, behind Feka's road.
-            box(c,x,base+7,416,31,'#607d7b');box(c,x,base+8,416,2,'#526f72');
-            for(let row=0;row<3;row++)for(let j=0;j<13;j++){
+            box(c,x,base+7,width,43,'#607d7b');box(c,x,base+8,width,2,'#526f72');
+            for(let row=0;row<4;row++)for(let j=0;j<Math.ceil(width/34);j++){
                 const sx=x+j*34+(row%2?17:0),yy=base+12+row*9;
                 box(c,sx,yy,30,1,'#80958a');box(c,sx,yy+1,1,6,'#526f72');
             }
-            for(const dx of [42,174,338]){
-                arch(c,x+dx,base+14,14,20,'#476970');arch(c,x+dx+3,base+17,8,17,'#3e626c');
-                box(c,x+dx-2,base+32,18,2,'#82968a');
+            for(const dx of (i===0?[42,174,338,506,630]:[42,174,338])){
+                arch(c,x+dx,base+14,14,32,'#476970');arch(c,x+dx+3,base+17,8,29,'#3e626c');
+                box(c,x+dx-2,base+44,18,2,'#82968a');
             }
-            box(c,x,base-4,416,9,'#788c82');box(c,x,base+5,416,3,'#a3ab90');
-            for(let j=0;j<11;j++)box(c,x+j*36+mod(j,2)*9,base+1,19,1,'#91a18e');
+            box(c,x,base-4,width,9,'#788c82');box(c,x,base+5,width,3,'#a3ab90');
+            for(let j=0;j<Math.floor(width/36);j++)box(c,x+j*36+mod(j,2)*9,base+1,19,1,'#91a18e');
             pennant(c,x+9,base-64,time);pennant(c,x+300,base-61,time,34);
             if(i===0){
                 // Guardhouse clock and a hanging checkpoint lamp identify the first approach.
@@ -290,6 +299,7 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
                 pixelLine(c,x+122,base-62,x+122,base-58,'#6a827b');pixelLine(c,x+122,base-58,x+126,base-56,'#6a827b');
                 arch(c,x+112,base-41,20,37,'#5e7e77');
                 drawArrivalCourtyard(c,x,base,b.backdrop.tick,damageAge);
+                drawArrivalPlaza(c,x,base,b.backdrop.tick,ruinAge(b.backdrop.breaches,1,b.backdrop.tick),reduced);
             }else if(i===1){
                 // Loading crane, rope, pulley and suspended pallet share one anchored structure.
                 const shock=damageAge>=0&&damageAge<100?Math.sin(damageAge/5)*5*Math.exp(-damageAge/30):0;

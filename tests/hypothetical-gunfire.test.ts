@@ -46,7 +46,7 @@ test('casings eject, fall, bounce and settle on the ground at both rendering dep
 });
 test('background masonry hits resolve on the street and retain their last visible segment',()=>{
     const b=new HypotheticalBackdrop(true);let hits=0;
-    for(let tick=1;tick<=1200;tick++){
+    for(let tick=1;tick<=1800;tick++){
         b.update(tick);
         for(const p of b.impacts.filter(p=>p.born===tick&&p.material==='stone')){
             assert.ok(Math.abs(p.y+1)<1e-8);assert.equal(p.ny,-1);
@@ -54,7 +54,7 @@ test('background masonry hits resolve on the street and retain their last visibl
         }
         assert.ok(b.casings.length<=6);assert.ok(b.impacts.length<=18);
     }
-    assert.ok(hits>=8);assert.equal(b.casualties,7);
+    assert.ok(hits>=8);assert.equal(b.casualties,10);
 });
 test('cancellation clears ignition as well as bullets and recoil returns fully between bursts',()=>{
     const b=new HypotheticalModel('duel');b.state='attack';b.attack='rifle';b.update(dt,player);

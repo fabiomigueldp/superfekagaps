@@ -3,6 +3,7 @@ import { box, oval, pixelLine } from '../WorldPainting';
 import type { Bystander, HypotheticalBackdrop } from './HypotheticalBackdrop';
 import { bystanderPose,bystanderFall } from './HypotheticalBystanderMotion';
 import { bystanderTexture,drawBystanderTexture,type BystanderTexture } from './HypotheticalBystanderPixels';
+import {drawBlood} from './HypotheticalBlood';
 export { bystanderPose } from './HypotheticalBystanderMotion';
 
 type Paint=(x:number,y:number,w:number,h:number,color:string)=>void;
@@ -41,10 +42,16 @@ function clothes(p:Bystander,paint:Paint,height:number){
     if(p.appearance===2){paint(-4,-height,1,height-1,'#65766f');paint(3,-height,1,height-1,'#65766f');}
     if(p.appearance===4){paint(-3,-2,6,1,'#d9b98e');paint(-3,-height+1,1,2,'#e1b997');}
     if(p.appearance===6){paint(-3,-height,6,1,'#e5c7a5');paint(-4,-height+3,1,2,cloth.light);}
+    if((p.appearance??0)>=7){
+        if(p.appearance!%3===0){paint(-4,-height+2,1,height-2,cloth.light);paint(3,-height+2,1,height-2,cloth.light);}
+        if(p.appearance!%3===1){paint(-3,-height+2,2,1,'#d2bb91');paint(2,-2,2,1,cloth.light);}
+        if(p.appearance!%3===2){paint(-3,-height+1,1,height-2,'#61756d');paint(3,-height+1,1,height-2,'#61756d');}
+    }
+    if(p.hitAt!==null){paint(1,-height+3,2,2,'#743e45');paint(2,-height+5,1,2,'#944d4d');}
 }
 
 function drawClothes(c:CanvasRenderingContext2D,p:Bystander,x:number,y:number,height:number,angle=0,shear=0){
-    const key=`${p.clothes}:${p.color}:${height}:${p.appearance??0}`;
+    const key=`${p.clothes}:${p.color}:${height}:${p.appearance??0}:${p.hitAt!==null}`;
     let texture=textures.get(key);
     if(!texture){texture=bystanderTexture(-4,-11,12,13,paint=>clothes(p,paint,height));textures.set(key,texture);}
     drawBystanderTexture(c,texture,x,y,angle,shear);
@@ -66,6 +73,12 @@ function drawHead(c:CanvasRenderingContext2D,p:Bystander,x:number,y:number,gaze:
             if(p.appearance===3){paint(-3,1,2,5,hair);paint(-3,5,2,2,hair);paint(-3,4,2,1,'#b87d69');}
             if(p.appearance===5){paint(-2,0,5,2,'#82998f');paint(2,2,3,1,'#b9c0a2');}
             if(p.appearance===6){paint(-2,0,5,2,'#605354');paint(-2,3,1,3,'#605354');}
+            if((p.appearance??0)>=7){
+                if(p.appearance!%4===0){paint(-2,0,5,1,'#c1bcaa');paint(-2,1,1,2,'#b4b3a0');}
+                if(p.appearance!%4===1){paint(-2,0,5,2,'#9b655b');paint(2,2,3,1,'#c2a183');}
+                if(p.appearance!%4===2){paint(-3,1,2,6,hair);paint(-3,5,2,1,'#c59274');}
+                if(p.appearance!%4===3){paint(-2,3,3,1,'#4b6060');paint(2,3,2,1,'#4b6060');}
+            }
             paint(1,5,1,1,shade);
         });textures.set(key,texture);
     }
@@ -90,7 +103,7 @@ function actorContext(c:CanvasRenderingContext2D,p:Bystander){
     } as CanvasRenderingContext2D;
 }
 
-function belongings(c:CanvasRenderingContext2D,p:Bystander,tick:number,base:number){
+function belongings(c:CanvasRenderingContext2D,p:Bystander,tick:number,base:number,impactAt:number,reduced:boolean){
     if(!p.belonging)return;
     const age=tick-p.alertAt-8,dir=Math.sign(p.shelter-p.originX)||1;
     const t=Math.max(0,Math.min(32,age)),x=age<0?p.x+dir*5:p.originX+dir*(5+t*.34);
@@ -101,15 +114,19 @@ function belongings(c:CanvasRenderingContext2D,p:Bystander,tick:number,base:numb
     }else for(let i=0;i<3;i++){
         const phase=Math.min(42,Math.max(0,age-i*3)),xx=x+i*3+Math.sin(phase*.16+i)*Math.min(3,phase*.15);
         const yy=age<0?y-i:Math.min(base-1,base-10-phase*.65+phase*phase*.04-i%2);
-        box(c,xx,yy,4,1,'#d2ccb1');box(c,xx+1,yy+1,3,1,'#aaa88f');
+        const shock=impactAt<0||reduced?0:Math.max(0,Math.min(1,(tick-impactAt-6-i*3)/30));
+        const drift=-shock*(7+i*2),lift=Math.sin(shock*Math.PI)*(4+i);
+        box(c,xx+drift,yy-lift,4,1,'#d2ccb1');box(c,xx+1+drift,yy+1-lift,3,1,'#aaa88f');
     }
 }
 
 /** Articulated street actors share the game's pixel grid and retain their clothing as they fall. */
 export function drawBystanders(output:CanvasRenderingContext2D,b:HypotheticalBackdrop,street:number,reduced:boolean){
+    drawBlood(output,b,street,reduced,false);
     for(const p of [...b.people].sort((a,b)=>(a.depth??0)-(b.depth??0))){
         const base=street+(p.depth??0);
-        belongings(output,p,b.tick,base);
+        const site=p.district===0?(p.originX>320?1:0):p.district+1;
+        belongings(output,p,b.tick,base,b.breaches[site],reduced);
         if(p.escaped)continue;
         const c=actorContext(output,p);
         const x=p.x,pose=bystanderPose(p,b.tick),age=pose.age,skin=SKIN[p.color];
@@ -158,6 +175,7 @@ export function drawBystanders(output:CanvasRenderingContext2D,b:HypotheticalBac
             box(c,x-7,torso+(reduced?2:2+pose.clothSway*1.4),2,1,'#d0a184');
         }
     }
+    drawBlood(output,b,street,reduced,true);
     for(const s of b.shots)drawGunTracer(output,s,0,street,reduced,true);
     for(const p of b.impacts)drawGunImpact(output,p,b.tick,0,street,reduced,true);
 }

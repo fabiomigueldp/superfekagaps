@@ -16,7 +16,7 @@ const P = { ink: '#172c36', deep: '#263f3d', shade: '#556047', hide: '#92845a', 
     suit: '#304659', lapel: '#607487', skin: '#c58d68', face: '#edbc8e', hair: '#3c3034',
     brass: '#d3a75c', mint: '#99e0cf', hot: '#ffb267', scute:'#6e7953', skinLight:'#f7d2a6',
     mouth:'#593b40', tongue:'#bc796a', leather:'#583f38', stitch:'#b8885d', clothShade:'#203644' };
-export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; riderDrop?:number; riderLean?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number }
+export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; riderDrop?:number; riderLean?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number; lookBack?:number }
 const fogPalette=new Map<string,string>();
 function distantColor(color:string){
     if(!fogPalette.has(color)){
@@ -109,9 +109,9 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     if((pose.pivot??0)>.78){drawDinosaurPivot(c,pose);return;}
     const { x, y, facing: d } = pose, bow = pose.bow, bob = pose.breath;
     const profile=Math.sqrt(Math.max(0,1-(pose.pivot??0)**2));
-    let riderBase:number|null=null;
+    let riderBase:number|null=null,headFacing=1;
     const riderPoint=(xx:number,yy:number):Point=>riderBase===null?[xx,yy]
-        :riderTorsoPoint([xx,yy],riderBase,pose.riderDrop??pose.tuck*18,pose.recoil-pose.tuck*10,pose.riderLean??0);
+        :riderTorsoPoint([xx*headFacing,yy],riderBase,pose.riderDrop??pose.tuck*18,pose.recoil-pose.tuck*10,pose.riderLean??0);
     const tint=(color:string)=>pose.distant?distantColor(color):color;
     const poly = (pts: Point[], color: string) => polygon(c, pts.map(([xx, yy]) => {
         const p=riderPoint(xx,yy);return [Math.round(x+p[0]*d*profile),Math.round(y+p[1])];
@@ -256,6 +256,26 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     if(pose.armor<=6){line(-14-r,rider-10,-10-r,rider-8,P.lapel);rect(-12-r,rider-9,2,1,P.ink);}
     // The head absorbs less recoil than the shoulder; jaw, cheek and ear remain distinct.
     const hr=pose.recoil*.45-pose.tuck*10,faceY=rider+pose.recoil*.22,focus=pose.focus??0;
+    const look=pose.lookBack??0;
+    // Three authored head views retain their volume at pixel scale. The rifle and hands
+    // stay on their existing anchors while the rider checks the refuge over his shoulder.
+    headFacing=look>.82?-1:1;
+    if(look>.18&&look<=.82){
+        const turn=(look-.5)*-3;
+        poly([[-10,faceY-38],[-5,faceY-42],[5,faceY-41],[10,faceY-36],[10,faceY-27],[6,faceY-22],[0,faceY-20],[-7,faceY-23],[-11,faceY-30]],P.ink);
+        poly([[-8,faceY-36],[4,faceY-38],[8,faceY-34],[8,faceY-27],[4,faceY-23],[0,faceY-22],[-6,faceY-25],[-8,faceY-30]],P.face);
+        poly([[-8,faceY-33],[-4,faceY-29],[-4,faceY-25],[0,faceY-22],[-6,faceY-25],[-8,faceY-29]],P.skin);
+        poly([[-10,faceY-35],[-9,faceY-40],[-4,faceY-42],[5,faceY-41],[9,faceY-37],[7,faceY-35],[2,faceY-38],[-3,faceY-36],[-7,faceY-35]],P.hair);
+        line(-7,faceY-39,-1,faceY-40,'#81766c');line(-4,faceY-37,4,faceY-39,'#62565a');
+        for(const d of [-1,1]){
+            line(d*7+turn,faceY-34,d*2+turn,faceY-33,P.hair,2);
+            rect(d>0?2+turn:-6+turn,faceY-32,4,2,P.ivory);
+            rect(d>0?3+turn:-5+turn,faceY-32,2,2,P.ink);
+        }
+        line(turn,faceY-32,turn-1,faceY-28,P.skinLight);rect(turn,faceY-30,2,3,P.skin);
+        line(-3,faceY-26,4,faceY-26,P.hair);line(-2,faceY-23,3,faceY-23,P.skinLight);
+        rect(-10,faceY-32,2,4,P.skin);rect(8,faceY-32,2,4,P.skin);
+    }else{
     poly([[-10-hr,faceY-39],[1-hr,faceY-42],[8-hr,faceY-36],[9-hr,faceY-31],[11-hr,faceY-29],[9-hr,faceY-26],[8-hr,faceY-22],[3-hr,faceY-20],[-6-hr,faceY-23],[-11-hr,faceY-31]],P.ink);
     poly([[-8-hr,faceY-36],[2-hr,faceY-39],[6-hr,faceY-34],[7-hr,faceY-30],[9-hr,faceY-29],[7-hr,faceY-27],[6-hr,faceY-23],[2-hr,faceY-22],[-4-hr,faceY-25],[-8-hr,faceY-31]],P.face);
     poly([[-8-hr,faceY-31],[-4-hr,faceY-29],[-2-hr,faceY-26],[5-hr,faceY-26],[6-hr,faceY-23],[2-hr,faceY-22],[-5-hr,faceY-25]],P.skin);
@@ -271,7 +291,8 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     if((pose.voice??0)>.2){rect(1-hr,faceY-26,5,2+(pose.voice??0)*2,P.mouth);rect(2-hr,faceY-26,3,1,P.ivory);}
     if(pose.blink){rect(1-hr,faceY-33,6,3,P.face);line(2-hr,faceY-31,6-hr,faceY-31,P.hair);}
     if(pose.defeated){line(0-hr,faceY-33,4-hr,faceY-30,P.ink);line(0-hr,faceY-30,4-hr,faceY-33,P.ink);}
-    riderBase=null;
+    }
+    headFacing=1;riderBase=null;
     // Rifle and both hands use one angle, so muzzle flash aligns with the bullet.
     const lean=pose.riderLean??0,gx=7-r+riderBend(14,lean), gy=rider-14, a=pose.aim;
     const gp=(xx:number,yy:number):Point=>[gx+Math.cos(a)*xx-Math.sin(a)*yy,gy+Math.sin(a)*xx+Math.cos(a)*yy];
@@ -322,9 +343,9 @@ export function distantRiderPose(action:HypotheticalBackdrop,reduced=false):Dino
         breath:0,bow:0,jaw:m.jaw,neckDrop:m.neckDrop,recoil:action.recoil,aim:action.angle,tail:m.tail,
         compression:m.compression,tuck:m.tuck,reload:0,brace:m.brace,heat:action.heat,
         cloth:reduced?0:Math.min(4,Math.abs(action.velocity)*1.8)+m.force*1.5,
-        riderDrop:m.riderDrop,riderLean:m.riderLean,rein:m.rein,
+        riderDrop:m.riderDrop,riderLean:m.riderLean,rein:m.rein,lookBack:m.lookBack,
         blink:false,daze:0,armor:9,flash:false,defeated:false,distant:true,focus:m.force||action.muzzle?1:0,
-        voice:m.local>=180&&m.local<196?.65*(1-smoothMotion((m.local-185)/11)):0};
+        voice:m.local>=m.impactTick&&m.local<m.impactTick+16?.65*(1-smoothMotion((m.local-m.impactTick-5)/11)):0};
 }
 const backgroundRigs=new WeakMap<CanvasRenderingContext2D,{canvas:HTMLCanvasElement;c:CanvasRenderingContext2D}>();
 function drawDistantRider(c:CanvasRenderingContext2D,b:HypotheticalModel,base:number,reduced:boolean){

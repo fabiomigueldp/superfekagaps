@@ -8,6 +8,7 @@ import {chaseDeckSpans,chaseMaterialAt,chaseTerraceFall,chaseRuinAt,CHASE_WATER_
 import { RIFLE_BURSTS, RIFLE_SPEED, type GunImpact } from './HypotheticalGunfire';
 import {chaseReactionStarts,updateChaseReactions} from './HypotheticalChaseLife';
 import {ARRIVAL,arrivalGate} from './HypotheticalArrival';
+import {SCENIC_STARTS} from './HypotheticalDevastation';
 
 export type HypotheticalAct = 'chase' | 'siege' | 'duel';
 export type HypotheticalState = 'arrival' | 'rest' | 'tell' | 'reload' | 'attack' | 'turn' | 'recover' | 'hurt' | 'roar' | 'won';
@@ -16,7 +17,7 @@ export interface Shot extends Rect { vx: number; vy: number; age: number; life: 
 export interface Dust { x: number; y: number; born: number; kind: 'step' | 'stone' | 'hit' | 'shell' | 'clasp' | 'skid'; direction?: number }
 export interface FallingMark { x: number; born: number }
 export interface BulletImpact extends GunImpact {}
-export type FightEvent = 'warning' | 'shot' | 'impact' | 'splash' | 'collapse-water' | 'debris-land' | 'reload' | 'distant-shot' | 'distant-hit' | 'step' | 'slam' | 'hit' | 'break' | 'snare' | 'won';
+export type FightEvent = 'warning' | 'shot' | 'impact' | 'splash' | 'collapse-water' | 'debris-land' | 'reload' | 'distant-shot' | 'distant-hit' | 'distant-debris' | 'step' | 'slam' | 'hit' | 'break' | 'snare' | 'won';
 export const HYPOTHETICAL = Object.freeze({ floor: 224, chaseEnd: CHASE_EXIT, health: 9, step: 1000 / 60, warning: 54, recovery: 156 });
 const rifleBursts = RIFLE_BURSTS;
 const patterns: readonly (readonly HypotheticalAttack[])[] = [
@@ -58,6 +59,7 @@ export class HypotheticalModel {
     impacts: BulletImpact[] = []; readonly backdrop: HypotheticalBackdrop;
     readonly route: HypotheticalSiege;
     private readonly backdropOffset: number;
+    private arrivalWait=0;
     armed = [0, 0]; snared = false; muzzle = 0; destroyed = 0; backgroundX = -70; backgroundStamp = 0;
     get wave() { return Math.min(3, this.route.cleared + 1); }
     nextAct = false; volley = 0; heat = 0; reloadX = 0;
@@ -76,7 +78,7 @@ export class HypotheticalModel {
     constructor(readonly act: HypotheticalAct = 'chase', health: number = HYPOTHETICAL.health, cleared = 0, readonly chaseStart=0, readonly arrivalSeen=false) {
         this.route = new HypotheticalSiege(cleared);
         this.backdrop = new HypotheticalBackdrop(act === 'siege');
-        this.backdropOffset = act === 'siege' ? this.route.cleared * 400 || (arrivalSeen?ARRIVAL.release:0) : 0;
+        this.backdropOffset = act === 'siege' ? (this.route.cleared?SCENIC_STARTS[Math.min(2,this.route.cleared)]:arrivalSeen?ARRIVAL.release:0) : 0;
         // A checkpoint preserves the ruined districts and advances the distant rider
         // to the same street. Replaying only this deterministic scenery never creates
         // foreground damage, emits old audio, or advances Feka's encounter clock.
@@ -88,8 +90,10 @@ export class HypotheticalModel {
         if (act === 'chase') this.chaseReactions=chaseReactionStarts(chaseStart);
         if (act === 'siege') this.state = 'rest';
     }
-    get arrivalSkipped(){return this.arrivalSeen||this.backdropOffset>=400;}
-    get arrival(){return arrivalGate(this.tick,this.arrivalSkipped);}
+    get arrivalSkipped(){return this.arrivalSeen||this.route.cleared>0&&this.backdropOffset>0;}
+    get arrivalTime(){return this.tick-this.arrivalWait;}
+    get arrival(){return arrivalGate(this.arrivalTime,this.arrivalSkipped);}
+    get forecourt(){return arrivalGate(this.arrivalTime,this.arrivalSkipped,ARRIVAL.firstRelease);}
     get phaseNumber() { return this.health > 6 ? 1 : this.health > 3 ? 2 : 3; }
     get vulnerable() { return this.act === 'duel' && this.state === 'recover' && this.age >= 14; }
     get weakpoint(): Rect { return { x: this.x - 12, y: this.y - 65, width: 24, height: 15 }; }
@@ -401,16 +405,19 @@ export class HypotheticalModel {
         if (player.x >= HYPOTHETICAL.chaseEnd) { this.nextAct = true; this.cancelAttacks(); }
     }
     private siege(player: Rect, livingGuards: number) {
+        if(!this.arrivalSkipped&&this.arrivalTime>ARRIVAL.hold&&this.backdrop.tick<=ARRIVAL.hold&&player.x<ARRIVAL.watchX)this.arrivalWait++;
         if(this.arrival.ready)this.route.update(player.x, livingGuards);
         if (this.route.openedThisTick) {
             this.shots = []; this.marks = []; this.frameHazards = []; this.emit('snare');
         }
-        const backdropTick=this.tick+this.backdropOffset;
-        this.backdrop.update(backdropTick); this.backgroundX = this.backdrop.x;
-        this.events.push(...this.backdrop.events);
+        const backdropTick=this.arrivalTime+this.backdropOffset;
+        const advanced=backdropTick>this.backdrop.tick;
+        if(advanced)this.backdrop.update(backdropTick);
+        this.backgroundX = this.backdrop.x;
+        if(advanced)this.events.push(...this.backdrop.events);
         this.destroyed=this.backdrop.breaches.filter(t=>t>=0).length;
-        if(this.backdrop.events.includes('break'))this.backgroundStamp=120;
-        const combatTick=this.tick-(this.arrivalSkipped?0:ARRIVAL.release);
+        if(advanced&&this.backdrop.events.includes('break'))this.backgroundStamp=120;
+        const combatTick=this.arrivalTime-(this.arrivalSkipped?0:ARRIVAL.release);
         if (combatTick > 160 && combatTick % 210 === 0 && livingGuards > 0 && this.route.active) {
             this.marks.push({ x: clamp(player.x + player.width / 2, 22, SIEGE_WIDTH - 22), born: this.tick }); this.emit('warning');
         }

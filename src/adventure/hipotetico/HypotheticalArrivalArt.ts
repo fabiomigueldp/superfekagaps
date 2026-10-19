@@ -1,4 +1,5 @@
-import {box,oval,pixelLine} from '../WorldPainting';
+import {box,oval,pixelLine,polygon} from '../WorldPainting';
+import {SIEGE_SECTORS} from './HypotheticalSiege';
 import {ARRIVAL,arrivalDeployment} from './HypotheticalArrival';
 import type {HypotheticalModel} from './HypotheticalModel';
 import {smoothMotion} from './HypotheticalMotion';
@@ -36,8 +37,43 @@ export function drawArrivalCourtyard(c:CanvasRenderingContext2D,x:number,base:nu
     }
 }
 
+/** The added plaza is built on the same street, with two doors and an attached textile awning. */
+export function drawArrivalPlaza(c:CanvasRenderingContext2D,x:number,base:number,tick:number,age:number,reduced:boolean){
+    for(const [left,width] of [[360,38],[530,34]]){
+        box(c,x+left,base-42,width,38,'#879c8c');box(c,x+left-3,base-45,width+6,4,'#b7b397');
+        box(c,x+left+8,base-33,22,29,'#42666a');box(c,x+left+11,base-30,15,27,'#345960');
+        box(c,x+left+width-4,base-42,4,38,'#b5b69b');
+        for(let y=base-37;y<base-5;y+=8)box(c,x+left+width-4,y,4,1,'#789284');
+        box(c,x+left+4,base-4,width-8,2,'#bfb99b');
+        const shut=smoothMotion((tick-585)/30);
+        if(shut){const h=shut*28;box(c,x+left+8,base-33,22,h,'#688578');for(let y=0;y<h;y+=4)box(c,x+left+9,base-33+y,20,1,'#a2ac93');}
+    }
+    // A low bench and recessed planting bed keep the walking strip continuous.
+    box(c,x+408,base-7,20,3,'#7e8a75');box(c,x+410,base-4,2,4,'#55716e');box(c,x+424,base-4,2,4,'#55716e');
+    box(c,x+579,base-8,27,7,'#7e9687');box(c,x+578,base-9,29,2,'#b1b499');
+    for(let j=0;j<7;j++){const sway=reduced?0:Math.sin(tick/48+j)*.7;pixelLine(c,x+581+j*3,base-9,x+582+j*3+sway,base-13-j%3,'#60877a');}
+    // The bite tears the mounted canopy out in panels; its fragments land and remain.
+    const top=base-26,fall=Math.max(0,age-4),land=Math.min(30,fall),sag=age<0?(reduced?0:Math.sin(tick/50)*.6):Math.min(3,fall*.3);
+    if(age<0){pixelLine(c,x+441,top-2,x+524,top-2,'#617a70',2);pixelLine(c,x+446,top,x+440,base-4,'#70816e',2);}
+    for(let j=0;j<6;j++){
+        const s=age<0?sag:(j%2?2:-1),xx=x+440+j*14+(age<0?0:(j-2)*land*.2);
+        const drop=age<0?0:Math.min(19-s,land*land*.035+j*.4),yy=top+drop,color=j%2?'#aa8e70':'#6e9184';
+        polygon(c,[[xx,yy],[xx+13,yy],[xx+14,yy+5+s],[xx+2,yy+6+s]],color);
+        pixelLine(c,xx+2,yy+1,xx+11,yy+1,j%2?'#c7b190':'#9fb19a');
+        if(age<0)box(c,xx+2,yy+6+s,11,2,j%2?'#8f7b65':'#5b7c74');
+    }
+    // The torn sign keeps one hinge. Its recoil decays while the sign remains attached.
+    const swing=age<0?0:Math.sin(age*.2)*Math.exp(-age/30)*5;
+    pixelLine(c,x+516,base-48,x+523,base-48,'#698076',2);
+    pixelLine(c,x+523,base-48,x+523+swing,base-41,'#718477');
+    box(c,x+517+swing,base-41,13,7,'#819b88');box(c,x+519+swing,base-39,9,1,'#c4bb9b');
+    for(const xx of [348,570,622]){box(c,x+xx,base-1,12,2,'#4d706c');for(let j=0;j<4;j++)box(c,x+xx+j*3,base-1,1,2,'#98a891');}
+}
+
 export function drawArrivalFittings(c:CanvasRenderingContext2D,b:HypotheticalModel,cx:number,cy:number){
-    const x=ARRIVAL.gateX-cx,top=ARRIVAL.gateY-cy,floor=224-cy,{height,travel}=b.arrival;
+    const top=ARRIVAL.gateY-cy,floor=224-cy;
+    for(const [gx,pose] of [[ARRIVAL.firstGateX,b.forecourt],[ARRIVAL.gateX,b.arrival]] as const){
+    const x=gx-cx,{height,travel}=pose;
     // The visible lower edge is exactly the native collision rectangle's lower edge.
     for(const px of [x-5,x+14]){
         box(c,px,top-5,4,floor-top+5,'#334c59');box(c,px+1,top-4,1,floor-top+2,'#9ba99a');
@@ -53,12 +89,17 @@ export function drawArrivalFittings(c:CanvasRenderingContext2D,b:HypotheticalMod
     const counter=top+12+travel*64;
     pixelLine(c,x-10,top-3,x-10,counter,'#7e9690');box(c,x-13,counter,6,13,'#496774');
     box(c,x-12,counter+1,1,11,'#a5af9b');oval(c,x-13,top-6,7,7,'#7c9189');box(c,x-10,top-4,1,2,'#d4c49b');
-    const ready=b.arrival.ready;
+    const ready=pose.ready;
     box(c,x-22,floor-40,11,15,'#3c5964');box(c,x-21,floor-39,9,2,'#a6a88b');
     box(c,x-18,floor-35,4,4,ready?'#9dd6b8':'#ddb974');
     if(ready){pixelLine(c,x-20,floor-28,x-15,floor-28,'#b9d2ae');pixelLine(c,x-17,floor-30,x-14,floor-28,'#b9d2ae');}
-    const deployment=arrivalDeployment(b.tick,b.arrivalSkipped);
-    for(const gx of [180,276]){
+    }
+    // Low inset lamps mark the traversable approach without covering the rear action.
+    for(const gx of [164,244]){
+        box(c,gx-cx,floor-3,17,3,'#4e6c71');box(c,gx+3-cx,floor-3,10,1,b.forecourt.ready?'#a9ceb4':'#8d9d87');
+    }
+    const deployment=arrivalDeployment(b.arrivalTime,b.arrivalSkipped);
+    for(const {x:gx} of SIEGE_SECTORS[0].guards){
         const dx=gx-cx-6,dy=floor-32;
         // Recessed garrison doors, distinct from the solid gates and climbable scaffold lips.
         box(c,dx-2,dy-3,32,35,'#526c70');box(c,dx,dy,28,32,'#2c4a58');

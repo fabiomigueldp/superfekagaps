@@ -8,6 +8,7 @@ import {HypotheticalGuard} from '../src/adventure/hipotetico/HypotheticalGuards'
 import {HypotheticalAudio,type WeaponCue} from '../src/adventure/hipotetico/HypotheticalAudio';
 import {sceneLifecycleBrowser} from '../tests/helpers/sceneLifecycleHarness';
 import replay from '../tests/helpers/hypotheticalReplay.json';
+import {DESTRUCTION_SITES} from '../src/adventure/hipotetico/HypotheticalDevastation';
 
 const [destination,canvasModule]=process.argv.slice(2);assert.ok(destination&&canvasModule);
 const out=resolve(destination);mkdirSync(out,{recursive:true});mkdirSync(join(out,'frames'),{recursive:true});
@@ -39,11 +40,12 @@ try{
         const png=frame.toBuffer('image/png');
         writeFileSync(join(out,'frames',String(videoFrame++).padStart(5,'0')+'.png'),png);
         if(g.act==='siege'&&!g.player.data.isDead){
-            const m=b.backdrop.motion,local=m.local,center=m.district*416+222-g.camera.x;
-            const moment=local>=150&&local<=154?'prepare':local>=174&&local<=178?'strike'
-                :local>=188&&local<=192?'collapse':local>=226&&local<=230?'aftermath':null;
+            const m=b.backdrop.motion,local=m.local,site=DESTRUCTION_SITES[m.siteIndex],center=site.x+site.width/2-g.camera.x;
+            const beats=m.siteIndex===0?[214,238,258,300]:m.siteIndex===1?[494,518,540,596]:[150,174,188,226];
+            const moment=local>=beats[0]&&local<=beats[0]+4?'prepare':local>=beats[1]&&local<=beats[1]+4?'strike'
+                :local>=beats[2]&&local<=beats[2]+4?'collapse':local>=beats[3]&&local<=beats[3]+4?'aftermath':null;
             if(moment&&center>24&&center<296){
-                const file=`background-${m.district+1}-${moment}.png`;
+                const file=`background-${m.siteIndex===1?'plaza':m.district+1}-${moment}.png`;
                 if(!covered.has(file)){covered.add(file);writeFileSync(join(out,file),png);captures.push({file,frame:n,act:g.act,state:m.phase,phase:b.phaseNumber,attack:m.kind});}
             }
         }

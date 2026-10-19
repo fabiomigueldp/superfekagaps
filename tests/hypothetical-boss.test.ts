@@ -1,4 +1,6 @@
 import test from 'node:test';
+import {DESTRUCTION_SITES} from '../src/adventure/hipotetico/HypotheticalDevastation';
+import {ARRIVAL} from '../src/adventure/hipotetico/HypotheticalArrival';
 import assert from 'node:assert/strict';
 import { HYPOTHETICAL, HypotheticalModel, ARENA_COVER, type HypotheticalAttack } from '../src/adventure/hipotetico/HypotheticalModel';
 import { hypotheticalStage } from '../src/adventure/hipotetico/HypotheticalStage';
@@ -12,7 +14,7 @@ import { dinosaurPose } from '../src/adventure/hipotetico/HypotheticalArt';
 import { dinosaurFoot, dinosaurLeg, hypotheticalMotion, riderBend, riderTorsoPoint } from '../src/adventure/hipotetico/HypotheticalMotion';
 
 const dt=HYPOTHETICAL.step,p={x:100,y:200,width:14,height:24};
-function advance(b:HypotheticalModel,n:number,guards=0){for(let i=0;i<n;i++)b.update(dt,p,guards);}
+function advance(b:HypotheticalModel,n:number,guards=0){for(let i=0;i<n;i++)b.update(dt,b.act==='siege'?{...p,x:SIEGE_SECTORS[0].trigger+4}:p,guards);}
 function opening(b:HypotheticalModel){b.state='recover';b.age=14;const w=b.weakpoint;return [{x:w.x+5,y:w.y-23,width:14,height:24},{x:w.x+5,y:w.y-29,width:14,height:24}] as const;}
 
 test('fixed steps produce the same target, animation and shot trajectories across frame partitions',()=>{
@@ -374,9 +376,9 @@ test('landing waves have real danger and are removed when the rider exposes the 
     advance(b,56);assert.equal(b.state,'recover');assert.equal(b.shots.length,0);
 });
 test('the garrison must be defeated before its gate opens, and rubble has a full second of warning',()=>{
-    const b=new HypotheticalModel('siege');advance(b,500,2);assert.equal(b.wave,1);assert.equal(b.nextAct,false);
+    const b=new HypotheticalModel('siege');advance(b,ARRIVAL.release+210,2);assert.equal(b.wave,1);assert.equal(b.nextAct,false);
     assert.equal(b.route.cleared,0);assert.equal(b.route.gateHeight(0),224);
-    while((b.tick-270)%210!==0)b.update(dt,p,2);
+    while((b.tick-ARRIVAL.release)%210!==0)advance(b,1,2);
     assert.equal(b.marks[0].born,b.tick);
     advance(b,59,2);assert.equal(b.shots.filter(s=>s.kind==='rubble').length,0);
     advance(b,1,2);assert.equal(b.shots.filter(s=>s.kind==='rubble').length,1);
@@ -389,14 +391,14 @@ test('every tall launcher has a platform, and background destruction travels thr
     for(const loader of stage.foes.filter(f=>f.kind==='loader'))
         assert.ok(stage.mechanisms.some(s=>s.kind==='support'&&loader.x>=s.x&&loader.x+22<=s.x+s.width&&loader.y===s.y));
     const b=new HypotheticalModel('siege');let breaks=0;
-    for(let i=0;i<1200;i++){b.update(dt,p,1);if(b.events.includes('break')){breaks++;assert.ok(b.backgroundX+44>=52+SIEGE_SECTORS[b.destroyed-1].origin);}}
-    assert.equal(breaks,3);assert.equal(b.casualties,7);
+    for(let i=0;i<1800;i++){advance(b,1,1);if(b.events.includes('break')){breaks++;assert.ok(b.backgroundX+70>=DESTRUCTION_SITES[b.destroyed-1].x);}}
+    assert.equal(breaks,4);assert.equal(b.casualties,10);
 });
 
-test('background casualties follow visible bullets, seven bystanders escape and neither can damage Feka',()=>{
+test('background casualties follow visible bullets, twelve bystanders escape and neither can damage Feka',()=>{
     const b=new HypotheticalModel('siege');let shots=0,deaths=0;
-    for(let i=0;i<1000;i++){
-        const previous=b.casualties;b.update(dt,p,1);
+    for(let i=0;i<1800;i++){
+        const previous=b.casualties;advance(b,1,1);
         if(b.events.includes('distant-shot')){
             shots++;const s=b.backdrop.shots[b.backdrop.shots.length-1],m=b.backdrop.barrel;
             assert.ok(Math.abs(s.x-m.x)<1e-8&&Math.abs(s.y-m.y)<1e-8);assert.ok(s.vx>0);
@@ -405,19 +407,19 @@ test('background casualties follow visible bullets, seven bystanders escape and 
         // Rubble can hurt Feka, but distant bullets are never registered as foreground shots.
         assert.ok(b.shots.every(s=>s.kind==='rubble'));
     }
-    assert.equal(deaths,7);assert.equal(b.casualties,7);assert.equal(shots,20);
+    assert.equal(deaths,10);assert.equal(b.casualties,10);assert.equal(shots,26);
     // The survivors now flee when the rider approaches their district, rather than
     // disappearing at the far end before that part of the street comes into view.
-    advance(b,200,1);assert.equal(b.backdrop.people.filter(p=>p.escaped).length,7);
+    advance(b,200,1);assert.equal(b.backdrop.people.filter(p=>p.escaped).length,12);
     const deathTimes=b.backdrop.people.filter(p=>p.hitAt!==null).map(p=>p.hitAt!);
-    assert.equal(new Set(deathTimes).size,7,'individual falls rather than an instantaneous casualty counter');
+    assert.equal(new Set(deathTimes).size,10,'individual falls rather than an instantaneous casualty counter');
     b.cancelAttacks();assert.equal(b.backdrop.shots.length,0);assert.equal(b.backdrop.muzzle,0);
 });
 
 test('background animation and impact cleanup are deterministic across frame partitions',()=>{
     const a=new HypotheticalModel('siege'),b=new HypotheticalModel('siege');
-    for(let i=0;i<1000;i++)a.update(dt,p,1);
-    for(let i=0;i<500;i++)b.update(dt*2,p,1);
+    for(let i=0;i<1800;i++)a.update(dt,{...p,x:360},1);
+    for(let i=0;i<900;i++)b.update(dt*2,{...p,x:360},1);
     assert.deepEqual(a.backdrop,b.backdrop);
     const c=new HypotheticalModel('duel');c.impacts.push({x:60,y:200,nx:1,ny:0,born:0});
     c.state='won';advance(c,181);assert.equal(c.impacts.length,0);

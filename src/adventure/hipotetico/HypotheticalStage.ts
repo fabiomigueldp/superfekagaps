@@ -3,7 +3,7 @@ import { TileType } from '../../constants';
 import type { AdventureStage } from '../types';
 import type { HypotheticalAct } from './HypotheticalModel';
 import { ARENA_BALCONIES, CHASE_GAPS, CHASE_STEPS, CHASE_TERRACES, CHASE_WIDTH, CHASE_CHECKPOINT } from './HypotheticalLayout';
-import { SIEGE_SECTORS, SIEGE_WIDTH, SIEGE_LINKS, siegeGarrison } from './HypotheticalSiege';
+import { SIEGE_SECTORS, SIEGE_WIDTH, SIEGE_LINKS, SIEGE_APPROACH, siegeGarrison } from './HypotheticalSiege';
 import {ARRIVAL} from './HypotheticalArrival';
 
 export function hypotheticalStage(act: HypotheticalAct): AdventureStage {
@@ -36,6 +36,7 @@ export function hypotheticalStage(act: HypotheticalAct): AdventureStage {
             s.pickups.push({id:`hipotetico:terrace:${i+1}`,kind:'coin',x:p.x+p.width/2,y:p.y-26});
         s.pickups.push({id:'hipotetico:mid:helmet',kind:'helmet',x:CHASE_CHECKPOINT+32,y:193});
     } else if (act === 'siege') {
+        s.mechanisms.push({id:'arrival-forecourt',kind:'target',x:ARRIVAL.firstGateX,y:ARRIVAL.gateY,width:12,height:ARRIVAL.gateHeight,gated:true});
         s.mechanisms.push({id:'arrival-gate',kind:'target',x:ARRIVAL.gateX,y:ARRIVAL.gateY,width:12,height:ARRIVAL.gateHeight,gated:true});
         for (const [i, sector] of SIEGE_SECTORS.entries()) {
             s.foes.push(...siegeGarrison(i));
@@ -46,8 +47,8 @@ export function hypotheticalStage(act: HypotheticalAct): AdventureStage {
         }
         s.mechanisms.push(...SIEGE_LINKS.map(p=>({...p})));
         for(const [i,x] of [396,434,816,854].entries())
-            s.pickups.push({id:`hipotetico:link:${i}`,kind:'coin',x,y:i%2?138:158});
-        s.pickups.push({id:'hipotetico:siege:helmet',kind:'helmet',x:900,y:158});
+            s.pickups.push({id:`hipotetico:link:${i}`,kind:'coin',x:x+SIEGE_APPROACH,y:i%2?138:158});
+        s.pickups.push({id:'hipotetico:siege:helmet',kind:'helmet',x:900+SIEGE_APPROACH,y:158});
     } else {
         s.mechanisms = ARENA_BALCONIES.map(p=>({...p}));
         if (act === 'duel') s.mechanisms.push(

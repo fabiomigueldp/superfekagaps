@@ -1,8 +1,9 @@
 import test from 'node:test';
+import {SCENIC_STARTS} from '../src/adventure/hipotetico/HypotheticalDevastation';
 import assert from 'node:assert/strict';
 import { HypotheticalGame } from '../src/adventure/hipotetico/HypotheticalGame';
 import { HypotheticalGuard } from '../src/adventure/hipotetico/HypotheticalGuards';
-import { HypotheticalSiege, SIEGE_SECTORS, SIEGE_GATE_TICKS, SIEGE_UNLOCK_TICKS, SIEGE_LIFT_TICKS, SIEGE_LOCK_TICKS, siegeGarrison } from '../src/adventure/hipotetico/HypotheticalSiege';
+import { HypotheticalSiege, SIEGE_APPROACH, SIEGE_EXIT, SIEGE_SECTORS, SIEGE_GATE_TICKS, SIEGE_UNLOCK_TICKS, SIEGE_LIFT_TICKS, SIEGE_LOCK_TICKS, siegeGarrison } from '../src/adventure/hipotetico/HypotheticalSiege';
 import { hypotheticalStage } from '../src/adventure/hipotetico/HypotheticalStage';
 import { WorldLevel, WorldObjects } from '../src/adventure/WorldPhysics';
 import { sceneLifecycleBrowser } from './helpers/sceneLifecycleHarness';
@@ -14,20 +15,20 @@ test('a cleared district opens gradually, never wakes the next district or compl
     const route=new HypotheticalSiege();
     for(let n=0;n<600;n++)route.update(40,0);
     assert.equal(route.cleared,0);assert.equal(route.active,false);
-    route.update(100,2);assert.equal(route.active,true);
-    for(let n=0;n<600;n++)route.update(300,1);
+    route.update(100+SIEGE_APPROACH,2);assert.equal(route.active,true);
+    for(let n=0;n<600;n++)route.update(300+SIEGE_APPROACH,1);
     assert.equal(route.gateHeight(0),224);
-    route.update(300,0);assert.equal(route.cleared,1);assert.equal(route.gateHeight(0),224);
+    route.update(300+SIEGE_APPROACH,0);assert.equal(route.cleared,1);assert.equal(route.gateHeight(0),224);
     let height=224;
     for(let n=0;n<SIEGE_GATE_TICKS;n++){
-        route.update(300,0);assert.ok(route.gateHeight(0)<=height);height=route.gateHeight(0);
+        route.update(300+SIEGE_APPROACH,0);assert.ok(route.gateHeight(0)<=height);height=route.gateHeight(0);
     }
     assert.equal(height,0);assert.equal(route.active,false);
-    for(let n=0;n<600;n++)route.update(300,0);
-    assert.equal(route.cleared,1);assert.equal(route.canExit(1240),false);
-    route.update(464,3);assert.equal(route.active,true);
+    for(let n=0;n<600;n++)route.update(300+SIEGE_APPROACH,0);
+    assert.equal(route.cleared,1);assert.equal(route.canExit(SIEGE_EXIT),false);
+    route.update(464+SIEGE_APPROACH,3);assert.equal(route.active,true);
     const complete=new HypotheticalSiege(3);
-    assert.equal(complete.canExit(1200),false);assert.equal(complete.canExit(1240),true);
+    assert.equal(complete.canExit(SIEGE_EXIT-40),false);assert.equal(complete.canExit(SIEGE_EXIT),true);
 });
 
 test('waiting patrols cannot move, emit attacks or damage Feka before their encounter',()=>{
@@ -44,14 +45,14 @@ test('waiting patrols cannot move, emit attacks or damage Feka before their enco
 
 test('each defeated guard releases one pin, while partial progress cannot raise a gate or leak into the next post',()=>{
     const route=new HypotheticalSiege();
-    route.update(96,2);route.update(200,1);
+    route.update(96+SIEGE_APPROACH,2);route.update(200+SIEGE_APPROACH,1);
     assert.deepEqual(route.remaining,[1,3,4]);assert.equal(route.releasedThisTick,true);
-    for(let n=0;n<60;n++)route.update(200,1);
+    for(let n=0;n<60;n++)route.update(200+SIEGE_APPROACH,1);
     assert.deepEqual(route.lockTicks[0],[SIEGE_LOCK_TICKS,0]);assert.equal(route.gateHeight(0),224);
     assert.equal(route.cleared,0);assert.equal(route.releasedThisTick,false);
-    route.update(200,0);assert.equal(route.openedThisTick,true);assert.equal(route.remaining[0],0);
+    route.update(200+SIEGE_APPROACH,0);assert.equal(route.openedThisTick,true);assert.equal(route.remaining[0],0);
     for(let n=1;n<=SIEGE_GATE_TICKS;n++){
-        route.update(200,0);
+        route.update(200+SIEGE_APPROACH,0);
         if(n<=SIEGE_UNLOCK_TICKS)assert.equal(route.gateHeight(0),224,'the bolt retracts before the grille moves');
         if(n>=SIEGE_UNLOCK_TICKS+SIEGE_LIFT_TICKS)assert.equal(route.gateHeight(0),0,'settling cannot close on Feka');
     }
@@ -66,10 +67,10 @@ test('barrels shatter against encounter gates before Feka moves; ordinary breaka
         const stage=hypotheticalStage('siege'),level=new WorldLevel(stage.level),objects=new WorldObjects(stage.mechanisms);
         const gate=objects.get('siege-gate-0')!;
         objects.spawnBarrel(gate.x-13,204,1,pressurized);
-        objects.update(dt,level,338);
+        objects.update(dt,level,gate.x-14);
         assert.equal(gate.active,false);assert.equal(gate.brokenAt,undefined);assert.equal(objects.barrels.length,0);
-        const p={x:338,y:200,width:14,height:24};
-        assert.equal(level.resolveCollision(p,{x:5,y:0},p).position.x,338);
+        const p={x:gate.x-14,y:200,width:14,height:24};
+        assert.equal(level.resolveCollision(p,{x:5,y:0},p).position.x,gate.x-14);
         assert.ok(objects.events.some(e=>e.kind==='barrelBreak'&&e.y>200));
         assert.ok(!objects.events.some(e=>e.kind==='break'));
     }
@@ -84,13 +85,13 @@ test('closed gate blocks floor movement and high jumps; raised collision follows
     level.bodies=objects.bodies;
     const gate=objects.bodies.find(b=>b.id==='siege-gate-0')!;
     for(const y of [200,130,60,4]){
-        const p={x:335,y,width:14,height:24},r=level.resolveCollision(p,{x:8,y:0},p);
-        assert.equal(r.position.x,338);
+        const p={x:gate.x-17,y,width:14,height:24},r=level.resolveCollision(p,{x:8,y:0},p);
+        assert.equal(r.position.x,gate.x-14);
     }
     gate.height=150;
-    const p={x:335,y:200,width:14,height:24};assert.equal(level.resolveCollision(p,{x:8,y:0},p).position.x,343);
+    const p={x:gate.x-17,y:200,width:14,height:24};assert.equal(level.resolveCollision(p,{x:8,y:0},p).position.x,gate.x-9);
     gate.height=0;gate.active=true;
-    const high={...p,y:50};assert.equal(level.resolveCollision(high,{x:8,y:0},high).position.x,343);
+    const high={...p,y:50};assert.equal(level.resolveCollision(high,{x:8,y:0},high).position.x,gate.x-9);
 });
 
 test('blindado and ariete survive a pound, stay visibly broken, and can then be finished',()=>{
@@ -108,10 +109,10 @@ test('elevated launchers threaten the floor with a complete telegraph, then comm
     const stage=hypotheticalStage('siege'),level=new WorldLevel(stage.level),objects=new WorldObjects(stage.mechanisms);
     level.bodies=objects.bodies;
     const e=new HypotheticalGuard(siegeGarrison(1).find(s=>s.kind==='loader')!,2);
-    const p={x:570,y:200,width:14,height:24};
+    const p={x:570+SIEGE_APPROACH,y:200,width:14,height:24};
     for(let n=0;n<92;n++)e.update(dt,level,objects,p);
     assert.equal(e.phase,'warning');const facing=e.facing;
-    while(e.timer<800){e.update(dt,level,objects,{...p,x:720});assert.equal(objects.barrels.length,0);assert.equal(e.facing,facing);}
+    while(e.timer<800){e.update(dt,level,objects,{...p,x:720+SIEGE_APPROACH});assert.equal(objects.barrels.length,0);assert.equal(e.facing,facing);}
     while(objects.barrels.length===0)e.update(dt,level,objects,p);
     assert.equal(objects.barrels[0].vx<0,true);assert.equal(e.lastRelease,e.age);
 });
@@ -141,7 +142,7 @@ test('native play crosses three physical gates, defeats every garrison and prese
                     }
                     if(g.player!==previousPlayer&&priorCleared>0){
                         sawRetry=true;assert.equal(g.player.data.position.x,route.checkpoint);
-                        assert.ok(g.fight.destroyed>=priorCleared);assert.equal(g.fight.backdrop.tick,priorCleared*400);
+                        assert.ok(g.fight.destroyed>=priorCleared);assert.equal(g.fight.backdrop.tick,SCENIC_STARTS[priorCleared]);
                         assert.ok(g.fight.backdrop.casualties>=priorCleared*2);
                         assert.ok(g.foes.every(e=>(e as HypotheticalGuard).wave>priorCleared));
                     }
