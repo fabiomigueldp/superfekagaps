@@ -1,0 +1,18 @@
+Technical documentation supplement for 0352fae721a1aec338ef1cef74e97cde1417cf6b
+
+Pause Classic play on focus and visibility interruptions
+
+Behavior
+Pause an actively playing Classic session when the browser window loses focus or the document becomes hidden. Returning to the tab does not resume play automatically.
+
+Implementation
+The Game constructor subscribes to blur, focus and visibilitychange. handleInterruption() resets Input, lastTime and accumulator on departure and return, and changes PLAYING to PAUSED only on interruption. Adds tests/classic-interruption-pause.browser.mjs. Existing pause/resume controls remain responsible for resuming.
+
+Scope and limitations
+The original commit body reports eight controlled Chromium scenarios, both TypeScript projects and a production build passing. Treat this as recorded author evidence rather than a new verification.
+
+Publication evidence
+No successful per-commit publisher receipt was found in the retained local deployment logs during this review. This does not establish whether the commit was published elsewhere or as part of a later descendant. No per-commit test pass is inferred.
+
+Full file inventory and provenance: docs/commits/2026-10-19/0352fae.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
