@@ -21,25 +21,30 @@ const model=new HypotheticalModel('siege',9,3,0,true,backdrop),a=backdrop.afterm
 const player={x:SIEGE_SECTORS[3].origin+190,y:198,width:16,height:26},cameraX=player.x-132;
 const screen=createCanvas(320,180),c=screen.getContext('2d');c.imageSmoothingEnabled=false;
 const film=createCanvas(640,384),fc=film.getContext('2d');fc.imageSmoothingEnabled=false;
-const board=createCanvas(1280,408),bc=board.getContext('2d');bc.imageSmoothingEnabled=false;
-bc.fillStyle='#102630';bc.fillRect(0,0,1280,408);
+const board=createCanvas(1280,612),bc=board.getContext('2d');bc.imageSmoothingEnabled=false;
+bc.fillStyle='#102630';bc.fillRect(0,0,1280,612);
 const shots=[{kind:'sequence',at:1,name:'torre'},{kind:'sequence',at:58,name:'sacar'},
-    {kind:'sequence',at:120,name:'mirar'},{kind:'launch',at:10,name:'disparo'},
-    {kind:'impact',at:4,name:'explosao'},{kind:'impact',at:68,name:'ruptura'},
-    {kind:'impact',at:126,name:'queda'},{kind:'impact',at:250,name:'ruinas'}];
-const seen=new Set<string>(),captures:object[]=[],cues:object[]=[],samples:object[]=[];
+    {kind:'sequence',at:120,name:'mirar'},{kind:'launch',at:0,name:'ignicao'},
+    {kind:'launch',at:4,name:'disparo'},{kind:'launch',at:12,name:'voo'},
+    {kind:'impact',at:3,name:'explosao'},{kind:'impact',at:28,name:'ruptura'},
+    {kind:'impact',at:90,name:'quebra'},{kind:'impact',at:126,name:'queda'},
+    {kind:'impact',at:190,name:'assentamento'},{kind:'impact',at:320,name:'ruinas'}];
+const seen=new Set<string>(),captures:object[]=[],cues:object[]=[],samples:object[]=[],contacts:object[]=[];
 let first=-1,frames=0;
 try{
     for(let step=0;step<3000;step++){
         model.update(1000/60,player,2);
         if(t.age===0&&first<0)first=step;
         if(first<0)continue;
-        const elapsed=step-first;if(elapsed>=1200)break;
+        const elapsed=step-first;if(elapsed>=960)break;
         for(const event of t.events)cues.push({frame:elapsed,seconds:elapsed/60,event});
+        for(const contact of t.destruction.events)contacts.push({frame:elapsed,seconds:elapsed/60,...contact});
         const shot=shots.find(s=>!seen.has(s.name)&&(s.kind==='sequence'?t.age:s.kind==='launch'?t.launchAt<0?-1:t.tick-t.launchAt:t.impactAge)===s.at);
         if(elapsed%60===0)samples.push({frame:elapsed,phase:a.phase,age:t.age,impactAge:t.impactAge,action:a.action,
-            destroyed:t.destroyed,rocket:t.rocket?{...t.rocket}:null,launcher:a.launcherPose});
-        if(elapsed%2!==0&&!shot)continue;
+            destroyed:t.destroyed,rocket:t.rocket?{...t.rocket}:null,launcher:a.launcherPose,
+            chips:t.destruction.chips.length,movingChips:t.destruction.chips.filter(p=>!p.rest).length,
+            bodies:Object.values(t.destruction.bodies).map(b=>({id:b.id,x:b.x,y:b.y,angle:b.angle,
+                sleeping:b.sleeping,hidden:b.hidden,landedAt:b.landedAt}))});
         drawHypotheticalBackground(c,model,cameraX,64,false);
         if(shot){
             seen.add(shot.name);const file=shot.name+'.png';writeFileSync(join(out,file),screen.toBuffer('image/png'));
@@ -47,7 +52,7 @@ try{
             const index=shots.indexOf(shot),x=index%4*320,y=Math.floor(index/4)*204;
             bc.putImageData(c.getImageData(0,0,320,180),x,y+24);pixelText(bc,shot.name.toUpperCase(),x+10,y+9,'#dfba7d');
         }
-        if(elapsed%2===0){
+        {
             fc.fillStyle='#102630';fc.fillRect(0,0,640,384);
             pixelText(fc,'BASTIAO / TORRE   '+(elapsed/60).toFixed(1)+' S',14,9,'#dfba7d');
             fc.drawImage(screen,0,24,640,360);
@@ -56,6 +61,6 @@ try{
     }
     writeFileSync(join(out,'storyboard.png'),board.toBuffer('image/png'));
     writeFileSync(join(out,'art-study.json'),JSON.stringify({kind:'authored native scenic composition',gameplayTest:false,
-        fps:30,frames,seconds:frames/30,cameraX,playerX:player.x,first,captures,cues,samples},null,2));
+        fps:60,frames,seconds:frames/60,cameraX,playerX:player.x,first,captures,cues,contacts,samples},null,2));
     console.log(JSON.stringify({output:out,frames,captures:captures.length}));
 }finally{for(const f of cleanup.reverse())f();}

@@ -1,10 +1,11 @@
 import {smoothMotion,riderBend} from './HypotheticalMotion';
 import {SIEGE_SECTORS} from './HypotheticalSiege';
 import {AFTERMATH_SCALE} from './HypotheticalAftermathHandling';
+import {HypotheticalTowerPhysics,TOWER_RELEASE} from './HypotheticalTowerPhysics';
 
 export const BASTION_TOWER={x:SIEGE_SECTORS[3].origin+125,left:-31,right:33,hitY:-64} as const;
 export const TOWER_SEQUENCE={draw:30,shoulder:98,fire:142,lower:286,stow:324,end:354} as const;
-export type TowerCue='distant-metal'|'distant-launch'|'distant-blast'|'distant-stone'|'distant-bell';
+export type TowerCue='distant-metal'|'distant-launch'|'distant-rocket'|'distant-blast'|'distant-stone'|'distant-bell'|'distant-debris'|'distant-wood';
 export interface LauncherPose {draw:number;rifleLower:number;reach:number;aim:number;recoil:number;fired:boolean}
 interface RiderBody {bow:number;compression:number;riderDrop?:number;riderLean?:number}
 export function launcherShoulder(body:RiderBody){
@@ -28,9 +29,14 @@ const pulse=(a:number,start:number,rise:number,hold:number,end:number)=>
 export class HypotheticalTower {
     tick=0;age=-1;impactAt=-1;launchAt=-1;abortedAt=-1;retryAt=0;
     events:TowerCue[]=[];
-    rocket:{x:number;y:number;fromX:number;fromY:number;dx:number;dy:number;age:number;remaining:number}|null=null;
+    readonly destruction=new HypotheticalTowerPhysics();
+    rocket:{x:number;y:number;fromX:number;fromY:number;dx:number;dy:number;age:number;remaining:number;speed:number}|null=null;
+    trail:Array<{x:number;y:number;born:number;seed:number}>=[];
     launch:{x:number;y:number;dx:number;dy:number;backX:number;backY:number}|null=null;
     private retract:LauncherPose|null=null;
+    private rubbleCueAt=-100;
+    private trailGap=0;
+    private trailSeed=0;
     get destroyed(){return this.impactAt>=0;}
     get impactAge(){return this.destroyed?this.tick-this.impactAt:-1;}
     get done(){return this.age>=0&&(this.abortedAt>=0?this.age-this.abortedAt>=60:this.age>=TOWER_SEQUENCE.end);}
@@ -59,9 +65,10 @@ export class HypotheticalTower {
         const a=this.age,m=this.motion,brace=m.draw;
         const shock=this.abortedAt>=0?0:pulse(a,TOWER_SEQUENCE.fire,3,TOWER_SEQUENCE.fire+4,TOWER_SEQUENCE.fire+26);
         const watch=smoothMotion((this.impactAge-25)/85)*brace;
-        return {bow:brace*.035+watch*.08,compression:brace+shock*2,riderDrop:brace*1.5+shock*2,
-            riderLean:-m.reach*1.8-shock*5+watch*2,neckDrop:-brace*3+watch*3,jaw:.12+shock*.16,
-            tail:brace*-.12,brace:brace*.7,focus:brace,lookBack:0,eyeClose:shock*.75};
+        const echo=pulse(this.impactAge,4,3,8,22)*brace;
+        return {bow:brace*.035+watch*.08,compression:brace+shock*2+echo*.5,riderDrop:brace*1.5+shock*2,
+            riderLean:-m.reach*1.8-shock*5+watch*2-echo*.7,neckDrop:-brace*3+watch*3+echo*1.4,jaw:.12+shock*.16,
+            tail:brace*-.12,brace:brace*.7,focus:brace,lookBack:0,eyeClose:Math.max(shock*.75,echo*.25)};
     }
     update(framed:boolean,barrel:()=>{x:number;y:number;backX:number;backY:number}){
         this.events=[];this.tick++;
@@ -73,21 +80,34 @@ export class HypotheticalTower {
                 if(this.age===TOWER_SEQUENCE.fire){
                     const p=barrel(),dx=BASTION_TOWER.x-p.x,dy=BASTION_TOWER.hitY-p.y,length=Math.hypot(dx,dy);
                     this.launchAt=this.tick;this.launch={...p,dx:dx/length,dy:dy/length};
-                    this.rocket={x:p.x,y:p.y,fromX:p.x,fromY:p.y,dx:dx/length,dy:dy/length,age:0,remaining:length};
+                    this.rocket={x:p.x,y:p.y,fromX:p.x,fromY:p.y,dx:dx/length,dy:dy/length,age:0,remaining:length,speed:0};
                     this.events.push('distant-launch');
                 }
             }
         }
-        if(this.rocket){
-            const r=this.rocket,speed=2.6+3.8*smoothMotion(r.age/10);
-            r.age++;r.remaining-=speed;
+        if(this.rocket&&this.tick>this.launchAt){
+            const r=this.rocket,speed=Math.min(r.remaining,1.1+5.6*smoothMotion((r.age-3)/15));
+            for(let d=3-this.trailGap;d<=speed;d+=3){
+                this.trail.push({x:r.x+r.dx*(d-8),y:r.y+r.dy*(d-8),born:this.tick-(speed-d)/speed,seed:this.trailSeed++});
+            }
+            this.trailGap=(this.trailGap+speed)%3;
+            r.age++;r.speed=speed;r.remaining-=speed;r.x+=r.dx*speed;r.y+=r.dy*speed;
+            if(r.age===4)this.events.push('distant-rocket');
             if(r.remaining<=0){
-                this.rocket=null;this.impactAt=this.tick;this.events.push('distant-blast');
-            }else{r.x+=r.dx*speed;r.y+=r.dy*speed;}
+                this.rocket=null;this.impactAt=this.tick;this.destruction.start(r.dx);this.events.push('distant-blast');
+            }
         }
-        // Main collapse, roof, bell and settling masonry have distinct beats.
-        if([35,77,92,126,154].includes(this.impactAge))this.events.push('distant-stone');
-        if(this.impactAge===108)this.events.push('distant-bell');
+        this.trail=this.trail.filter(p=>this.tick-p.born<88).slice(-36);
+        if(this.impactAge>0){
+            this.destruction.step(this.impactAge);
+            if(this.impactAge===TOWER_RELEASE.shaft)this.events.push('distant-debris');
+            const contacts=this.destruction.events;
+            if(contacts.some(c=>c.part==='bell'&&c.first))this.events.push('distant-bell');
+            const strongest=contacts.filter(c=>c.part!=='bell').sort((a,b)=>b.strength-a.strength)[0];
+            if(strongest&&this.tick-this.rubbleCueAt>=10){
+                this.events.push(strongest.material==='tile'?'distant-wood':'distant-stone');this.rubbleCueAt=this.tick;
+            }
+        }
     }
 }
 
