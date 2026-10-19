@@ -45,3 +45,5 @@ node --import tsx scripts/render_hypothetical_aftermath.ts .tmp/aftermath-contin
 ```
 
 Conforme `AGENTS.md`, a publicação executa somente o build de produção, sem suíte de testes, typecheck ou revisão de navegador.
+
+O primeiro build excedeu o orçamento de 53 MB por 9.642 bytes. O atlas nativo `public/assets/world/mechanisms.png` foi recomprimido sem perdas com `scripts/repack_png_lossless.mjs`: 635.125 → 209.156 bytes. Apenas o fluxo zlib foi reempacotado; scanlines, filtros, cores, transparência e os demais chunks permanecem iguais. O limite do projeto foi mantido.
