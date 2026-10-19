@@ -1,0 +1,18 @@
+Technical documentation supplement for e82c90f93badda7f53240b5497b3c8dbf2e95a47
+
+Refine background material reactions and grounded debris effects
+
+Behavior
+Give environmental incidents distinct actor reactions and render material fragments with contact-to-landing continuity.
+
+Implementation
+HypotheticalAftermathReaction.ts adds reactionDuration(), aftermathReaction() and reactionReplies() for material-specific responses and follow-up action preferences. HypotheticalAftermathParticles.ts adds seeded analytic contactFragment(), fragmentLanding() and drawAftermathContact(). Timber, stone and iron use different trajectories and rendering. The director records actual contact positions, delays the rider response and sends grit sounds at fragment landing.
+
+Scope and limitations
+Adds scripts/render_hypothetical_material_responses.ts plus material-response video, pose images and material-study.json. These paths are analytic scenic effects, not general-purpose runtime debris collision.
+
+Publication evidence
+A successful local publisher receipt identifies build `e82c90f93badda7f53240b5497b3c8dbf2e95a47-f7334d715d9b` for this exact source commit. The report records `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its build-log SHA-256 is `6a3b3185cf7cf1383e463e6b80c251aaee969f376927dd9cd111672b32544949`. This establishes recorded build/publication completion, not gameplay correctness.
+
+Full file inventory and provenance: docs/commits/2026-10-19/e82c90f.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
