@@ -2,6 +2,20 @@
 
 Encontro bônus de fantasia satírica, acessível pelo botão **MEGA BOSS** no título de Super Feka Gaps World ou por `/?encounter=hipotetico`. A caricatura é ficcional; as cenas não representam acontecimentos reais.
 
+## Revisão 27 · Pátio ampliado, segunda praça e consequências persistentes
+
+A chegada ganha 256 pixels antes do primeiro posto. A rua distante se prolonga sobre uma base contínua, com galeria, toldo, banco, canteiro, drenos e duas novas portas. O primeiro setor agora tem 672 pixels; o cerco inteiro tem 1.536. Guardas, andaimes, portões, coletáveis e pontos de retomada foram deslocados juntos.
+
+- **Percurso e câmera:** primeira grade em x=96, liberada no tick 320; segunda em x=352, liberada em 660. Ambas sobem durante 48 ticks e seu desenho coincide com a colisão. A cena espera no tick 400 até Feka alcançar x=280. A câmera antecipa 44 pixels durante a travessia e retorna gradualmente ao enquadramento normal. Feka conserva movimento e salto.
+- **Multidão:** dezesseis civis na chegada, oito a mais, e quatro saídas. Novas variações de casacos, barras de tecido, cabelos, óculos e bonés. Avisos, corridas, frenagens, entrada nas portas, quedas e pertences usam o mesmo relógio. Os atores da segunda praça não reagem à rajada distante antes de seu alerta.
+- **Ataques:** as oito balas do primeiro pátio antecedem o aríete no tick 244. Na praça, duas rajadas de três balas começam em 424 e 464. A mordida prepara em 480, avança em 508, toca a galeria em 526, mantém o contato até 536 e recupera até 574. O cavaleiro olha para trás; os postos se revelam de 636 a 660. Os outros dois desabamentos do cerco passam a 980 e 1380.
+- **Consequências:** cada contato verdadeiro com um civil cria seis pequenas gotas balísticas e uma marca na roupa. As gotas assentam no piso correspondente à profundidade do ator e mantêm suas posições. O toldo cai em seis painéis; a placa reage em uma dobradiça, as portas fecham após a fuga e as ruínas permanecem. Sem ferimentos anatômicos ou desmembramento.
+- **Continuidade:** os guardas só despertam após a chegada e a entrada no setor. A pausa congela tudo. Retomar após a chegada abre as duas grades e reconstrói NPCs, ruínas e manchas no estado do ponto de retomada. Movimento reduzido mantém o sangue assentado e omite as gotas no ar.
+
+192 testes passaram: 149 do encontro e 43 compartilhados. Novas regressões verificam a espera pela aproximação, enquadramento do segundo contato, os dois bloqueios físicos, origem e persistência do sangue, monotonicidade e assentamento das gotas e renderização sem mutar o estado. TypeScript e build de produção passaram. O navegador conferiu 52 capturas, pausa, reinício, vitória e apresentação móvel com movimento reduzido, sem erros.
+
+A chegada tem 511 quadros a 30 fps (17,03 segundos), dezesseis capturas e nenhuma morte. O replay completo tem 4.241 quadros (141,37 segundos), 8.302 entradas de controle, três mortes e vitória com 7.906 ticks ativos. A nova travessia foi inserida antes dos comandos de combate existentes; as duas rotas altas também foram verificadas. Personagens, relógio e câmera não foram reposicionados para os vídeos. Os efeitos sonoros usam o sintetizador de produção. Evidências: `output/hipotetico/arrival-plaza/`. As revisões abaixo registram o histórico.
+
 ## Revisão 26 · Ritmo, peso e leitura da chegada
 
 A revisão separa o alívio de chegar ao abrigo da demonstração de força do vilão. Na versão anterior, a segunda rajada coincidia com a investida e o primeiro plano escondia parte das quedas. Agora a ação tem prioridades sucessivas, com tempo para observar suas consequências.

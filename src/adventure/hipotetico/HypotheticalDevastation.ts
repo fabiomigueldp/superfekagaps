@@ -1,5 +1,6 @@
 import { smoothMotion } from './HypotheticalMotion';
 import {SIEGE_SECTORS} from './HypotheticalSiege';
+import {arrivalOpeningAt,OPENING} from './HypotheticalOpening';
 
 /** Authored contacts share a clock across scenery, rider, crowd and effects. */
 export const DEVASTATION = { period:400, prepare:136, strike:166, impact:180, hold:185, recover:225, settle:120 } as const;
@@ -38,7 +39,7 @@ export function devastationAt(tick:number) {
     const hit=local>=timing.impact&&local<timing.impact+28?smoothMotion((local-timing.impact+1)/3)*(1-smoothMotion((local-timing.impact-3)/25)):0;
     const lookAt=plaza?560:278,lookEnd=plaza?608:320;
     const lookBack=district===0?smoothMotion((local-lookAt)/16)*(1-smoothMotion((local-lookEnd)/18)):0;
-    return { district,siteIndex,local,kind:site.kind,active,impactTick:timing.impact,lookBack,wind:active?wind:0,drive:active?drive:0,force,
+    const motion={ district,siteIndex,local,kind:site.kind,active,impactTick:timing.impact,lookBack,wind:active?wind:0,drive:active?drive:0,force,
         x:SIEGE_SECTORS[district].origin+x, lift:airborne?-airborne*13:0,
         compression:stamp?force*3+hit*6:force*(bite?2:5)+(district===0?hit*2:0),
         jaw:bite?.15+force*(.85-.73*smoothMotion((local-timing.impact+4)/7)):.18+force*.45,
@@ -46,6 +47,7 @@ export function devastationAt(tick:number) {
         tuck:airborne*.62,brace:force*(stamp?.45:.7),tail:force*(bite?-.22:.18),
         riderDrop:force*5+airborne*8,riderLean:force*(4-7*smoothMotion((local-timing.impact+2)/8)),rein:force,
         phase:!active?'march':local<timing.strike?'prepare':local<timing.impact?'strike':local<timing.hold?'contact':'recover' };
+    return district===0&&local<OPENING.join?{...motion,...arrivalOpeningAt(local)}:motion;
 }
 
 export function ruinAge(breaches:readonly number[],index:number,tick:number){

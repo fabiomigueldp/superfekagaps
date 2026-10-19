@@ -47,7 +47,7 @@ test('mute, pause and disposal stop weapon tails and never queue silent shots fo
 });
 
 test('long barrages bound simultaneous voices and natural endings release their graphs',()=>{
-    const {audio,context}=setup();const cues:WeaponCue[]=['shot','impact','splash','collapse-water','debris-land','distant-shot','distant-hit','reload','distant-crash','distant-debris'];
+    const {audio,context}=setup();const cues:WeaponCue[]=['shot','impact','splash','collapse-water','debris-land','distant-shot','distant-hit','reload','distant-crash','distant-debris','distant-thud'];
     for(let i=0;i<80;i++)audio.play(cues[i%cues.length]);
     assert.equal(audio.activeVoices,12);
     for(const n of context.nodes)n.onended?.();

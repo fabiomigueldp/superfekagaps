@@ -66,9 +66,9 @@ test('native pause freezes arrival and retry restores the aftermath without repe
     }finally{g.dispose();}
 });
 
-test('sixteen arrival actors have four usable exits, distinct reactions and matching doorway occlusion for shots',()=>{
+test('seventeen arrival actors have four usable exits, distinct reactions and matching doorway occlusion for shots',()=>{
     const b=new HypotheticalBackdrop(true),crowd=b.people.filter(p=>p.district===0);
-    assert.equal(crowd.length,16);assert.equal(new Set(crowd.map(p=>p.appearance??0)).size,15);
+    assert.equal(crowd.length,17);assert.equal(new Set(crowd.map(p=>p.appearance??0)).size,16);
     const exits=crowd.filter(p=>p.exitAtShelter);assert.equal(new Set(exits.map(p=>p.shelter)).size,4);
     let leftRun=false,rightRun=false;
     for(let tick=1;tick<=ARRIVAL.release;tick++){

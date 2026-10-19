@@ -11,7 +11,7 @@ const tape=JSON.parse(fs.readFileSync(source,'utf8')),rate=48000;
   samples=await page.evaluate(async rate=>{
    const {HypotheticalAudio}=await import('/src/adventure/hipotetico/HypotheticalAudio.ts');
    const result={};
-   for(const kind of ['shot','impact','splash','collapse-water','debris-land','reload','distant-shot','distant-hit','distant-crash','distant-debris']){
+   for(const kind of ['shot','impact','splash','collapse-water','debris-land','reload','distant-shot','distant-hit','distant-crash','distant-debris','distant-thud']){
     const context=new OfflineAudioContext(1,Math.ceil(rate*.36),rate),bus=context.createGain();bus.gain.value=.18;bus.connect(context.destination);
     // Only the offline device boundary differs. The production voice owns every envelope and oscillator.
     const routeContext=new Proxy(context,{get(target,key){if(key==='state')return 'running';const value=Reflect.get(target,key,target);return typeof value==='function'?value.bind(target):value;}});

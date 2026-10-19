@@ -88,7 +88,7 @@ test('street actors anticipate, brake before shelter, and blend their hands with
         b.update(tick);b.people.forEach((p,i)=>{
             const pose=bystanderPose(p,tick),old=previous.get(i);
             if(tick<=p.alertAt+6)assert.equal(p.x,p.originX,'notice the danger before moving');
-            if(old&&p.hitAt===null&&!p.escaped){
+            if(old&&p.hitAt===null&&!p.escaped&&p.capturedAt===undefined){
                 assert.ok(Math.abs(p.velocity-old.velocity)<.11);
                 for(const key of ['leftHand','rightHand'] as const)assert.ok(Math.hypot(pose[key][0]-old.pose[key][0],pose[key][1]-old.pose[key][1])<2.1);
                 assert.ok(Math.abs(pose.cover-old.pose.cover)<.19);

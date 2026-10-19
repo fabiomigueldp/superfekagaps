@@ -3,6 +3,7 @@ import { devastationAt,DESTRUCTION_SITES,SCENIC_STARTS } from './HypotheticalDev
 import {SIEGE_SECTORS,SIEGE_WIDTH} from './HypotheticalSiege';
 import { bystanderIntersection } from './HypotheticalBystanderMotion';
 import { gunRecoil, type GunImpact } from './HypotheticalGunfire';
+import {OPENING} from './HypotheticalOpening';
 
 /** All positions are native pixels, relative to the distant street's baseline. */
 export const BACKDROP_RIG = { width: 192, height: 160, scale: .6875, x: 92, y: 148 } as const;
@@ -16,6 +17,7 @@ export interface Bystander {
     originX:number; reactionTimes:number[];
     appearance?:number; depth?:number; exitAtShelter?:boolean; runTicks?:number;
     belonging?:'parcel'|'papers';
+    opening?:boolean;capturedAt?:number;captureX?:number;
 }
 export interface DistantShot { x: number; y: number; px: number; py: number; vx: number; vy: number; life: number; age:number }
 export interface DistantImpact extends GunImpact {}
@@ -26,7 +28,7 @@ export class HypotheticalBackdrop {
     x = -80; tick = 0; muzzle = 0; heat = 0; targetX = 100; targetY = -7;
     shots: DistantShot[] = []; impacts: DistantImpact[] = [];
     casings:Array<{x:number;y:number;born:number}>=[];
-    events: ('distant-shot' | 'distant-hit' | 'distant-debris' | 'break')[] = [];
+    events: ('distant-shot' | 'distant-hit' | 'distant-debris' | 'distant-thud' | 'break')[] = [];
     breaches:number[]=DESTRUCTION_SITES.map(()=>-1); travel=0; velocity=0;
     blood:BloodContact[]=[];
     footfalls:Array<{x:number;born:number}>=[];
@@ -46,7 +48,7 @@ export class HypotheticalBackdrop {
         // These runners share the same shot geometry as the rest of the street.
         const crowd=[
             {x:154,shelter:116,alertAt:30,runTicks:68,clothes:'workcoat',belonging:'parcel'},
-            {x:188,shelter:116,alertAt:40,runTicks:96,clothes:'star-shirt',belonging:'papers'},
+            {x:188,shelter:116,alertAt:40,runTicks:70,clothes:'star-shirt',belonging:'papers'},
             {x:206,shelter:322,alertAt:48,runTicks:140,clothes:'scarf'},
             {x:238,shelter:322,alertAt:58,runTicks:112,clothes:'star-shirt'},
             {x:286,shelter:322,alertAt:34,runTicks:64,clothes:'satchel'},
@@ -72,6 +74,10 @@ export class HypotheticalBackdrop {
                 speed:1,district:0,stoppedAt:null,threatenedAt:null,startledAt:null,reactionTimes:[],
                 appearance:7+i,depth:exposed?0:i%2?-2:-4,exitAtShelter:!exposed,belonging:i===2?'papers':i===7?'parcel':undefined});
         }
+        this.people.push({x:170,originX:170,shelter:180,escaped:false,fleeing:true,hitAt:null,color:1,
+            distance:0,velocity:0,alertAt:OPENING.notice,speed:.22,district:0,clothes:'star-shirt',
+            stoppedAt:null,threatenedAt:null,startledAt:null,reactionTimes:[],appearance:17,depth:0,
+            belonging:'papers',opening:true});
     }
     private target = -1;
     get aimedPerson(){return this.people[this.target]??null;}
@@ -115,6 +121,14 @@ export class HypotheticalBackdrop {
         for (const p of this.people) {
             p.velocity=0;
             p.reactionTimes=p.reactionTimes.filter(at=>tick-at<32);
+            if(p.capturedAt!==undefined){
+                if(tick<=OPENING.occluded){
+                    const old=p.x,u=smoothMotion((tick-p.capturedAt)/(OPENING.occluded-OPENING.contact));
+                    p.x=p.captureX!+(m.x+50*BACKDROP_RIG.scale-p.captureX!)*u;p.depth=-6*u;
+                    p.velocity=p.x-old;p.distance+=Math.abs(p.velocity);
+                }
+                continue;
+            }
             if(p.hitAt!==null||p.escaped||tick<=p.alertAt+6)continue;
             const old=p.x,age=tick-p.alertAt-6;
             p.x=p.exitAtShelter?p.originX+(p.shelter-p.originX)*smoothMotion(age/p.runTicks!)
@@ -123,6 +137,13 @@ export class HypotheticalBackdrop {
             p.velocity=p.x-old;p.distance+=Math.abs(p.velocity);
             if(p.x===p.shelter&&p.stoppedAt===null)p.stoppedAt=tick;
             if (p.exitAtShelter?p.x===p.shelter:p.fleeing&&p.x>(this.wide?SIEGE_WIDTH+6:326))p.escaped=true;
+        }
+        if(tick===OPENING.contact){
+            const actor=this.people.find(p=>p.opening)!;actor.capturedAt=tick;actor.captureX=actor.x;
+            this.events.push('distant-thud');
+            for(const p of this.people)if(!p.opening&&p.district===0&&p.originX<336&&!p.escaped&&p.hitAt===null){
+                p.reactionTimes.push(tick+3+p.color%3);p.startledAt=tick;
+            }
         }
         for (const s of this.shots) {
             s.px = s.x; s.py = s.y; s.x += s.vx; s.y += s.vy; s.life--;s.age++;
@@ -164,7 +185,7 @@ export class HypotheticalBackdrop {
             this.casings.push({x:shoulder.x+(Math.cos(a)*9+Math.sin(a)*2)*scale,
                 y:shoulder.y+(Math.sin(a)*9-Math.cos(a)*2)*scale,born:tick});
             this.events.push('distant-shot');
-            for(const p of this.people)if(!p.escaped&&p.hitAt===null&&p.district===pass&&tick>=p.alertAt){
+            for(const p of this.people)if(!p.escaped&&p.hitAt===null&&p.capturedAt===undefined&&p.district===pass&&tick>=p.alertAt){
                 p.startledAt=tick;p.reactionTimes.push(tick+2+p.color%3);
             }
         }

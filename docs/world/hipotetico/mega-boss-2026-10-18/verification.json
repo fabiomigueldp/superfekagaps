@@ -1,13 +1,13 @@
 {
-  "revision": "arrival-26",
+  "revision": "arrival-27",
   "tests": {
-    "passed": 188,
+    "passed": 192,
     "failed": 0,
-    "encounter": 145,
+    "encounter": 149,
     "sharedMechanisms": 43,
-    "logs": "output/hipotetico/arrival-direction/tests.log"
+    "logs": "output/hipotetico/arrival-plaza/tests.log"
   },
-  "productionBuild": "passed; output/hipotetico/arrival-direction/build.log",
+  "productionBuild": "passed; output/hipotetico/arrival-plaza/build.log",
   "browser": {
     "errors": [],
     "captures": [
@@ -253,7 +253,7 @@
       },
       {
         "file": "siege-2.png",
-        "frames": 1992,
+        "frames": 1996,
         "reset": false,
         "act": "siege",
         "state": "rest",
@@ -265,19 +265,43 @@
         "phase": 1,
         "health": 9,
         "dead": false,
-        "tick": 711,
+        "tick": 715,
         "receipt": {
           "act": "siege",
           "phase": 1,
           "health": 9,
           "won": false,
           "deaths": 0,
-          "ticks": 1992
+          "ticks": 1996
+        }
+      },
+      {
+        "file": "siege-3.png",
+        "frames": 2346,
+        "reset": false,
+        "act": "siege",
+        "state": "rest",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 1065,
+        "receipt": {
+          "act": "siege",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 0,
+          "ticks": 2346
         }
       },
       {
         "file": "duel-1-rifle-arrival.png",
-        "frames": 3015,
+        "frames": 3346,
         "reset": true,
         "act": "duel",
         "state": "arrival",
@@ -296,12 +320,12 @@
           "health": 9,
           "won": false,
           "deaths": 2,
-          "ticks": 2781
+          "ticks": 3112
         }
       },
       {
         "file": "duel-1-rifle-recover.png",
-        "frames": 3325,
+        "frames": 3656,
         "reset": false,
         "act": "duel",
         "state": "recover",
@@ -320,12 +344,12 @@
           "health": 9,
           "won": false,
           "deaths": 2,
-          "ticks": 3091
+          "ticks": 3422
         }
       },
       {
         "file": "duel-1-rifle-rest.png",
-        "frames": 3462,
+        "frames": 3793,
         "reset": false,
         "act": "duel",
         "state": "rest",
@@ -344,12 +368,12 @@
           "health": 8,
           "won": false,
           "deaths": 2,
-          "ticks": 3223
+          "ticks": 3554
         }
       },
       {
         "file": "duel-1-charge-tell.png",
-        "frames": 3508,
+        "frames": 3839,
         "reset": false,
         "act": "duel",
         "state": "tell",
@@ -368,12 +392,12 @@
           "health": 8,
           "won": false,
           "deaths": 2,
-          "ticks": 3269
+          "ticks": 3600
         }
       },
       {
         "file": "duel-1-charge-attack.png",
-        "frames": 3562,
+        "frames": 3893,
         "reset": false,
         "act": "duel",
         "state": "attack",
@@ -392,12 +416,12 @@
           "health": 8,
           "won": false,
           "deaths": 2,
-          "ticks": 3323
+          "ticks": 3654
         }
       },
       {
         "file": "duel-1-charge-recover.png",
-        "frames": 3598,
+        "frames": 3929,
         "reset": false,
         "act": "duel",
         "state": "recover",
@@ -416,12 +440,12 @@
           "health": 8,
           "won": false,
           "deaths": 2,
-          "ticks": 3359
+          "ticks": 3690
         }
       },
       {
         "file": "duel-1-charge-rest.png",
-        "frames": 3726,
+        "frames": 4057,
         "reset": false,
         "act": "duel",
         "state": "rest",
@@ -440,12 +464,12 @@
           "health": 7,
           "won": false,
           "deaths": 2,
-          "ticks": 3482
+          "ticks": 3813
         }
       },
       {
         "file": "duel-1-bite-tell.png",
-        "frames": 3798,
+        "frames": 4129,
         "reset": false,
         "act": "duel",
         "state": "tell",
@@ -464,12 +488,12 @@
           "health": 7,
           "won": false,
           "deaths": 2,
-          "ticks": 3554
+          "ticks": 3885
         }
       },
       {
         "file": "duel-1-bite-attack.png",
-        "frames": 3813,
+        "frames": 4144,
         "reset": false,
         "act": "duel",
         "state": "attack",
@@ -488,12 +512,12 @@
           "health": 7,
           "won": false,
           "deaths": 2,
-          "ticks": 3569
+          "ticks": 3900
         }
       },
       {
         "file": "duel-1-bite-recover.png",
-        "frames": 3863,
+        "frames": 4194,
         "reset": false,
         "act": "duel",
         "state": "recover",
@@ -512,12 +536,12 @@
           "health": 7,
           "won": false,
           "deaths": 2,
-          "ticks": 3619
+          "ticks": 3950
         }
       },
       {
         "file": "duel-2-bite-roar.png",
-        "frames": 3950,
+        "frames": 4281,
         "reset": false,
         "act": "duel",
         "state": "roar",
@@ -536,12 +560,12 @@
           "health": 6,
           "won": false,
           "deaths": 2,
-          "ticks": 3701
+          "ticks": 4032
         }
       },
       {
         "file": "duel-2-leap-tell.png",
-        "frames": 4087,
+        "frames": 4418,
         "reset": false,
         "act": "duel",
         "state": "tell",
@@ -560,12 +584,12 @@
           "health": 6,
           "won": false,
           "deaths": 2,
-          "ticks": 3838
+          "ticks": 4169
         }
       },
       {
         "file": "duel-2-leap-attack.png",
-        "frames": 4163,
+        "frames": 4494,
         "reset": false,
         "act": "duel",
         "state": "attack",
@@ -584,12 +608,12 @@
           "health": 6,
           "won": false,
           "deaths": 2,
-          "ticks": 3914
+          "ticks": 4245
         }
       },
       {
         "file": "duel-2-rifle-tell.png",
-        "frames": 4250,
+        "frames": 4581,
         "reset": false,
         "act": "duel",
         "state": "tell",
@@ -608,12 +632,12 @@
           "health": 6,
           "won": false,
           "deaths": 2,
-          "ticks": 4001
+          "ticks": 4332
         }
       },
       {
         "file": "duel-2-rifle-recover.png",
-        "frames": 4527,
+        "frames": 4858,
         "reset": false,
         "act": "duel",
         "state": "recover",
@@ -632,12 +656,12 @@
           "health": 6,
           "won": false,
           "deaths": 2,
-          "ticks": 4278
+          "ticks": 4609
         }
       },
       {
         "file": "duel-2-rifle-rest.png",
-        "frames": 4653,
+        "frames": 4984,
         "reset": false,
         "act": "duel",
         "state": "rest",
@@ -656,12 +680,12 @@
           "health": 5,
           "won": false,
           "deaths": 2,
-          "ticks": 4399
+          "ticks": 4730
         }
       },
       {
         "file": "duel-2-bite-tell.png",
-        "frames": 4707,
+        "frames": 5038,
         "reset": false,
         "act": "duel",
         "state": "tell",
@@ -680,12 +704,12 @@
           "health": 5,
           "won": false,
           "deaths": 2,
-          "ticks": 4453
+          "ticks": 4784
         }
       },
       {
         "file": "duel-2-bite-attack.png",
-        "frames": 4743,
+        "frames": 5074,
         "reset": false,
         "act": "duel",
         "state": "attack",
@@ -704,12 +728,12 @@
           "health": 5,
           "won": false,
           "deaths": 2,
-          "ticks": 4489
+          "ticks": 4820
         }
       },
       {
         "file": "duel-2-rifle-arrival.png",
-        "frames": 4839,
+        "frames": 5170,
         "reset": true,
         "act": "duel",
         "state": "arrival",
@@ -728,12 +752,12 @@
           "health": 6,
           "won": false,
           "deaths": 3,
-          "ticks": 4494
+          "ticks": 4825
         }
       },
       {
         "file": "duel-2-tail-tell.png",
-        "frames": 5699,
+        "frames": 6030,
         "reset": false,
         "act": "duel",
         "state": "tell",
@@ -752,12 +776,12 @@
           "health": 5,
           "won": false,
           "deaths": 3,
-          "ticks": 5323
+          "ticks": 5654
         }
       },
       {
         "file": "duel-2-tail-attack.png",
-        "frames": 5748,
+        "frames": 6079,
         "reset": false,
         "act": "duel",
         "state": "attack",
@@ -776,12 +800,12 @@
           "health": 5,
           "won": false,
           "deaths": 3,
-          "ticks": 5372
+          "ticks": 5703
         }
       },
       {
         "file": "duel-2-tail-recover.png",
-        "frames": 5835,
+        "frames": 6166,
         "reset": false,
         "act": "duel",
         "state": "recover",
@@ -800,12 +824,12 @@
           "health": 5,
           "won": false,
           "deaths": 3,
-          "ticks": 5459
+          "ticks": 5790
         }
       },
       {
         "file": "duel-2-tail-rest.png",
-        "frames": 5929,
+        "frames": 6260,
         "reset": false,
         "act": "duel",
         "state": "rest",
@@ -824,12 +848,12 @@
           "health": 4,
           "won": false,
           "deaths": 3,
-          "ticks": 5548
+          "ticks": 5879
         }
       },
       {
         "file": "duel-2-rifle-attack.png",
-        "frames": 6047,
+        "frames": 6378,
         "reset": false,
         "act": "duel",
         "state": "attack",
@@ -848,12 +872,12 @@
           "health": 4,
           "won": false,
           "deaths": 3,
-          "ticks": 5666
+          "ticks": 5997
         }
       },
       {
         "file": "duel-3-rifle-roar.png",
-        "frames": 6381,
+        "frames": 6712,
         "reset": false,
         "act": "duel",
         "state": "roar",
@@ -872,12 +896,12 @@
           "health": 3,
           "won": false,
           "deaths": 3,
-          "ticks": 5995
+          "ticks": 6326
         }
       },
       {
         "file": "duel-3-charge-tell.png",
-        "frames": 6518,
+        "frames": 6849,
         "reset": false,
         "act": "duel",
         "state": "tell",
@@ -896,12 +920,12 @@
           "health": 3,
           "won": false,
           "deaths": 3,
-          "ticks": 6132
+          "ticks": 6463
         }
       },
       {
         "file": "duel-3-charge-attack.png",
-        "frames": 6580,
+        "frames": 6911,
         "reset": false,
         "act": "duel",
         "state": "attack",
@@ -920,12 +944,12 @@
           "health": 3,
           "won": false,
           "deaths": 3,
-          "ticks": 6194
+          "ticks": 6525
         }
       },
       {
         "file": "duel-3-charge-turn.png",
-        "frames": 6612,
+        "frames": 6943,
         "reset": false,
         "act": "duel",
         "state": "turn",
@@ -944,12 +968,12 @@
           "health": 3,
           "won": false,
           "deaths": 3,
-          "ticks": 6226
+          "ticks": 6557
         }
       },
       {
         "file": "duel-3-charge-recover.png",
-        "frames": 6700,
+        "frames": 7031,
         "reset": false,
         "act": "duel",
         "state": "recover",
@@ -968,12 +992,12 @@
           "health": 3,
           "won": false,
           "deaths": 3,
-          "ticks": 6314
+          "ticks": 6645
         }
       },
       {
         "file": "duel-3-charge-rest.png",
-        "frames": 6824,
+        "frames": 7155,
         "reset": false,
         "act": "duel",
         "state": "rest",
@@ -992,12 +1016,12 @@
           "health": 2,
           "won": false,
           "deaths": 3,
-          "ticks": 6433
+          "ticks": 6764
         }
       },
       {
         "file": "duel-3-rifle-tell.png",
-        "frames": 6897,
+        "frames": 7228,
         "reset": false,
         "act": "duel",
         "state": "tell",
@@ -1016,12 +1040,12 @@
           "health": 2,
           "won": false,
           "deaths": 3,
-          "ticks": 6506
+          "ticks": 6837
         }
       },
       {
         "file": "duel-3-rifle-attack.png",
-        "frames": 6903,
+        "frames": 7234,
         "reset": false,
         "act": "duel",
         "state": "attack",
@@ -1040,12 +1064,12 @@
           "health": 2,
           "won": false,
           "deaths": 3,
-          "ticks": 6512
+          "ticks": 6843
         }
       },
       {
         "file": "duel-3-leap-tell.png",
-        "frames": 7164,
+        "frames": 7495,
         "reset": false,
         "act": "duel",
         "state": "tell",
@@ -1064,12 +1088,12 @@
           "health": 2,
           "won": false,
           "deaths": 3,
-          "ticks": 6773
+          "ticks": 7104
         }
       },
       {
         "file": "duel-3-leap-attack.png",
-        "frames": 7240,
+        "frames": 7571,
         "reset": false,
         "act": "duel",
         "state": "attack",
@@ -1088,12 +1112,12 @@
           "health": 2,
           "won": false,
           "deaths": 3,
-          "ticks": 6849
+          "ticks": 7180
         }
       },
       {
         "file": "duel-3-tail-tell.png",
-        "frames": 7662,
+        "frames": 7993,
         "reset": false,
         "act": "duel",
         "state": "tell",
@@ -1112,12 +1136,12 @@
           "health": 1,
           "won": false,
           "deaths": 3,
-          "ticks": 7266
+          "ticks": 7597
         }
       },
       {
         "file": "duel-3-tail-attack.png",
-        "frames": 7706,
+        "frames": 8037,
         "reset": false,
         "act": "duel",
         "state": "attack",
@@ -1136,12 +1160,12 @@
           "health": 1,
           "won": false,
           "deaths": 3,
-          "ticks": 7310
+          "ticks": 7641
         }
       },
       {
         "file": "duel-3-bite-tell.png",
-        "frames": 7793,
+        "frames": 8124,
         "reset": false,
         "act": "duel",
         "state": "tell",
@@ -1160,12 +1184,12 @@
           "health": 1,
           "won": false,
           "deaths": 3,
-          "ticks": 7397
+          "ticks": 7728
         }
       },
       {
         "file": "duel-3-bite-attack.png",
-        "frames": 7838,
+        "frames": 8169,
         "reset": false,
         "act": "duel",
         "state": "attack",
@@ -1184,12 +1208,12 @@
           "health": 1,
           "won": false,
           "deaths": 3,
-          "ticks": 7442
+          "ticks": 7773
         }
       },
       {
         "file": "duel-3-bite-recover.png",
-        "frames": 7939,
+        "frames": 8270,
         "reset": false,
         "act": "duel",
         "state": "recover",
@@ -1208,12 +1232,12 @@
           "health": 1,
           "won": false,
           "deaths": 3,
-          "ticks": 7543
+          "ticks": 7874
         }
       },
       {
         "file": "duel-3-bite-won.png",
-        "frames": 7971,
+        "frames": 8302,
         "reset": false,
         "act": "duel",
         "state": "won",
@@ -1232,7 +1256,7 @@
           "health": 0,
           "won": true,
           "deaths": 3,
-          "ticks": 7575
+          "ticks": 7906
         }
       }
     ],
@@ -1241,57 +1265,57 @@
         "file": "chase-0.png",
         "x": 280.3,
         "tick": 58,
-        "median": 4.600000008940697,
-        "p95": 5.799999997019768
+        "median": 4.0999999940395355,
+        "p95": 5.4000000059604645
       },
       {
         "file": "chase-1.png",
         "x": 602.3,
         "tick": 150,
-        "median": 4.700000002980232,
-        "p95": 5.5999999940395355
+        "median": 4.799999997019768,
+        "p95": 6.200000002980232
       },
       {
         "file": "chase-2.png",
         "x": 1207.8,
         "tick": 323,
-        "median": 4.700000002980232,
-        "p95": 5.299999997019768
+        "median": 4.5,
+        "p95": 5.200000002980232
       },
       {
         "file": "chase-3.png",
         "x": 1785.3,
         "tick": 488,
-        "median": 5.5999999940395355,
-        "p95": 6.0999999940395355
+        "median": 5.100000008940697,
+        "p95": 6
       },
       {
         "file": "chase-5.png",
         "x": 2779.3,
         "tick": 772,
-        "median": 4.5999999940395355,
-        "p95": 5.0999999940395355
+        "median": 3.7999999970197678,
+        "p95": 5.9000000059604645
       },
       {
         "file": "chase-6.png",
         "x": 3272.8,
         "tick": 913,
-        "median": 5.200000002980232,
-        "p95": 6.100000008940697
+        "median": 3.4000000059604645,
+        "p95": 5.300000011920929
       },
       {
         "file": "chase-7.png",
         "x": 3752.3,
         "tick": 1050,
-        "median": 3.8999999910593033,
-        "p95": 4.5
+        "median": 2.8999999910593033,
+        "p95": 5
       },
       {
         "file": "chase-8.png",
         "x": 4284.3,
         "tick": 1202,
-        "median": 3.7000000029802322,
-        "p95": 4.100000008940697
+        "median": 1.9000000059604645,
+        "p95": 4
       }
     ],
     "passed": true,
@@ -1301,11 +1325,11 @@
       "health": 0,
       "won": true,
       "deaths": 3,
-      "ticks": 7575
+      "ticks": 7906
     },
     "renderMs": {
-      "median": 4.600000008940697,
-      "p95": 5.5999999940395355
+      "median": 2.699999988079071,
+      "p95": 4.200000002980232
     },
     "campaignSave": null,
     "mobile": {
@@ -1526,29 +1550,29 @@
   "nativeReplay": {
     "inputOnly": true,
     "actorCameraClockEdits": false,
-    "frames": 7971,
-    "videoFrames": 4075,
+    "frames": 8302,
+    "videoFrames": 4241,
     "receipt": {
       "act": "duel",
       "phase": 3,
       "health": 0,
       "won": true,
       "deaths": 3,
-      "ticks": 7575
+      "ticks": 7906
     }
   },
   "audio": {
     "productionSynth": true,
     "weaponEffectsOnly": false,
-    "destructionCues": 10,
+    "destructionCues": 11,
     "contactCues": {
       "water": 10,
       "bank": 6
     },
-    "cues": 240,
-    "seconds": 135.83333333333334,
+    "cues": 255,
+    "seconds": 141.36666666666667,
     "peak": 0.10918664932250977,
-    "rms": 0.005016310703925096,
+    "rms": 0.004942898448942949,
     "sampleRate": 48000
   },
   "guardVault": {
@@ -2469,55 +2493,71 @@
     "media": [
       {
         "file": "arrival-play.mp4",
-        "frames": 345,
-        "seconds": 11.5,
+        "frames": 511,
+        "seconds": 17.033333,
         "width": 960,
         "height": 540,
         "video": "h264",
         "audio": "aac",
-        "sha256": "908aebfe19c5f8e7f8d53ce676106d4ec5963b07bce8614fbf1b52b9eb9f26fb"
+        "sha256": "fb43955e06bd74a9e8817894313b67c315df0d829978e810af184e2f004c2c8f"
       },
       {
         "file": "native-play.mp4",
-        "frames": 4075,
-        "seconds": 135.833333,
+        "frames": 4241,
+        "seconds": 141.366667,
         "width": 960,
         "height": 540,
         "video": "h264",
         "audio": "aac",
-        "sha256": "6108632890422af2106147c7baf967083a2d8d8ac1a8e57280803afe0d083735"
+        "sha256": "f1bfbd6c42056f1030c2e7e9ce8801d9ce2f07e07edcb9b602e11439b30bf589"
       }
     ],
     "viewports": [
       1440,
       390
     ],
-    "assetResponses": 335,
+    "assetResponses": 346,
     "errors": [],
-    "screenshot": "output/hipotetico/arrival-direction/review-page.png"
+    "screenshot": "output/hipotetico/arrival-plaza/review-page.png"
   },
   "arrival": {
-    "revision": 26,
+    "revision": 27,
     "proof": {
       "inputOnly": true,
       "actorCameraClockEdits": false,
       "recordedFromInputFrame": 1162,
-      "inputFrames": 1851,
-      "videoFrames": 345,
-      "seconds": 11.5,
+      "inputFrames": 2182,
+      "videoFrames": 511,
+      "seconds": 17.033333333333335,
       "receipt": {
         "act": "siege",
         "phase": 1,
         "health": 9,
         "won": false,
         "deaths": 0,
-        "ticks": 1851
+        "ticks": 2182
       },
       "captures": [
         {
           "file": "arrival-crowd.png",
           "inputFrame": 1317,
           "tick": 36,
+          "sceneTick": 36,
+          "camera": {
+            "x": 0,
+            "y": 64,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 1536,
+              "minY": 0,
+              "maxY": 288
+            }
+          },
+          "bloodContacts": 0,
           "crowd": [
             {
               "x": 224,
@@ -2558,6 +2598,46 @@
               "x": 305,
               "escaped": false,
               "hitAt": null
+            },
+            {
+              "x": 344,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 368,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 396,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 414,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 438,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 474,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 492,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 514,
+              "escaped": false,
+              "hitAt": null
             }
           ],
           "gate": {
@@ -2571,6 +2651,22 @@
           "file": "arrival-flight.png",
           "inputFrame": 1355,
           "tick": 74,
+          "sceneTick": 74,
+          "camera": {
+            "x": 0,
+            "y": 64,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 1536,
+              "minY": 0,
+              "maxY": 288
+            }
+          },
+          "bloodContacts": 0,
           "crowd": [
             {
               "x": 233.06777936087929,
@@ -2611,6 +2707,46 @@
               "x": 305,
               "escaped": false,
               "hitAt": null
+            },
+            {
+              "x": 344,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 368,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 396,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 414,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 438,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 474,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 492,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 514,
+              "escaped": false,
+              "hitAt": null
             }
           ],
           "gate": {
@@ -2624,6 +2760,22 @@
           "file": "arrival-volley.png",
           "inputFrame": 1393,
           "tick": 112,
+          "sceneTick": 112,
+          "camera": {
+            "x": 0,
+            "y": 64,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 1536,
+              "minY": 0,
+              "maxY": 288
+            }
+          },
+          "bloodContacts": 0,
           "crowd": [
             {
               "x": 246,
@@ -2664,6 +2816,46 @@
               "x": 317.04373177842564,
               "escaped": false,
               "hitAt": null
+            },
+            {
+              "x": 344,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 368,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 396,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 414,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 438,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 474,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 492,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 514,
+              "escaped": false,
+              "hitAt": null
             }
           ],
           "gate": {
@@ -2677,6 +2869,22 @@
           "file": "arrival-reaction.png",
           "inputFrame": 1427,
           "tick": 146,
+          "sceneTick": 146,
+          "camera": {
+            "x": 0,
+            "y": 64,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 1536,
+              "minY": 0,
+              "maxY": 288
+            }
+          },
+          "bloodContacts": 2,
           "crowd": [
             {
               "x": 246,
@@ -2717,6 +2925,46 @@
               "x": 322,
               "escaped": true,
               "hitAt": null
+            },
+            {
+              "x": 344,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 368,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 396,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 414,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 438,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 474,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 492,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 514,
+              "escaped": false,
+              "hitAt": null
             }
           ],
           "gate": {
@@ -2730,6 +2978,22 @@
           "file": "arrival-ram.png",
           "inputFrame": 1519,
           "tick": 238,
+          "sceneTick": 238,
+          "camera": {
+            "x": 0,
+            "y": 64,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 1536,
+              "minY": 0,
+              "maxY": 288
+            }
+          },
+          "bloodContacts": 3,
           "crowd": [
             {
               "x": 246,
@@ -2769,6 +3033,46 @@
             {
               "x": 322,
               "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 344,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 368,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 396,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 414,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 438,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 474,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 492,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 514,
+              "escaped": false,
               "hitAt": null
             }
           ],
@@ -2783,6 +3087,22 @@
           "file": "arrival-collapse.png",
           "inputFrame": 1539,
           "tick": 258,
+          "sceneTick": 258,
+          "camera": {
+            "x": 0,
+            "y": 64,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 1536,
+              "minY": 0,
+              "maxY": 288
+            }
+          },
+          "bloodContacts": 3,
           "crowd": [
             {
               "x": 246,
@@ -2822,6 +3142,46 @@
             {
               "x": 322,
               "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 344,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 368,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 396,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 414,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 438,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 474,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 492,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 514,
+              "escaped": false,
               "hitAt": null
             }
           ],
@@ -2836,6 +3196,22 @@
           "file": "arrival-aftermath.png",
           "inputFrame": 1581,
           "tick": 300,
+          "sceneTick": 300,
+          "camera": {
+            "x": 0,
+            "y": 64,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 1536,
+              "minY": 0,
+              "maxY": 288
+            }
+          },
+          "bloodContacts": 3,
           "crowd": [
             {
               "x": 246,
@@ -2874,6 +3250,700 @@
             },
             {
               "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 344,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 368,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 396,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 414,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 438,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 474,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 492,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 514,
+              "escaped": false,
+              "hitAt": null
+            }
+          ],
+          "gate": {
+            "travel": 0,
+            "height": 120,
+            "ready": false
+          },
+          "guardsActive": false
+        },
+        {
+          "file": "plaza-entry.png",
+          "inputFrame": 1681,
+          "tick": 400,
+          "sceneTick": 400,
+          "camera": {
+            "x": 81.30000000000001,
+            "y": 64,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 1536,
+              "minY": 0,
+              "maxY": 288
+            }
+          },
+          "bloodContacts": 3,
+          "crowd": [
+            {
+              "x": 246,
+              "escaped": false,
+              "hitAt": 182
+            },
+            {
+              "x": 284,
+              "escaped": false,
+              "hitAt": 142
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 279.97139067055394,
+              "escaped": false,
+              "hitAt": 137
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 344,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 368,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 396,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 414,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 438,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 474,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 492,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 514,
+              "escaped": false,
+              "hitAt": null
+            }
+          ],
+          "gate": {
+            "travel": 0,
+            "height": 120,
+            "ready": false
+          },
+          "guardsActive": false
+        },
+        {
+          "file": "plaza-volley.png",
+          "inputFrame": 1736,
+          "tick": 455,
+          "sceneTick": 424,
+          "camera": {
+            "x": 219.47991223846697,
+            "y": 64,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 1536,
+              "minY": 0,
+              "maxY": 288
+            }
+          },
+          "bloodContacts": 3,
+          "crowd": [
+            {
+              "x": 246,
+              "escaped": false,
+              "hitAt": 182
+            },
+            {
+              "x": 284,
+              "escaped": false,
+              "hitAt": 142
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 279.97139067055394,
+              "escaped": false,
+              "hitAt": 137
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 344.74740484429066,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 368,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 396,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 415.10281007407406,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 438.8418481579483,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 474,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 492.2955799774616,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 514,
+              "escaped": false,
+              "hitAt": null
+            }
+          ],
+          "gate": {
+            "travel": 0,
+            "height": 120,
+            "ready": false
+          },
+          "guardsActive": false
+        },
+        {
+          "file": "plaza-fall.png",
+          "inputFrame": 1792,
+          "tick": 511,
+          "sceneTick": 480,
+          "camera": {
+            "x": 219.47991223846697,
+            "y": 64,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 1536,
+              "minY": 0,
+              "maxY": 288
+            }
+          },
+          "bloodContacts": 6,
+          "crowd": [
+            {
+              "x": 246,
+              "escaped": false,
+              "hitAt": 182
+            },
+            {
+              "x": 284,
+              "escaped": false,
+              "hitAt": 142
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 279.97139067055394,
+              "escaped": false,
+              "hitAt": 137
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 377.25259515570934,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 378,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 378.7734375,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 463.7544580740741,
+              "escaped": false,
+              "hitAt": 478
+            },
+            {
+              "x": 440.4135965805007,
+              "escaped": false,
+              "hitAt": 430
+            },
+            {
+              "x": 493.8952396702626,
+              "escaped": false,
+              "hitAt": 479
+            },
+            {
+              "x": 531.320767074733,
+              "escaped": false,
+              "hitAt": null
+            },
+            {
+              "x": 531.7283731778425,
+              "escaped": false,
+              "hitAt": null
+            }
+          ],
+          "gate": {
+            "travel": 0,
+            "height": 120,
+            "ready": false
+          },
+          "guardsActive": false
+        },
+        {
+          "file": "plaza-bite.png",
+          "inputFrame": 1830,
+          "tick": 549,
+          "sceneTick": 518,
+          "camera": {
+            "x": 219.47991223846697,
+            "y": 64,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 1536,
+              "minY": 0,
+              "maxY": 288
+            }
+          },
+          "bloodContacts": 6,
+          "crowd": [
+            {
+              "x": 246,
+              "escaped": false,
+              "hitAt": 182
+            },
+            {
+              "x": 284,
+              "escaped": false,
+              "hitAt": 142
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 279.97139067055394,
+              "escaped": false,
+              "hitAt": 137
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 378,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 378,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 378,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 463.7544580740741,
+              "escaped": false,
+              "hitAt": 478
+            },
+            {
+              "x": 440.4135965805007,
+              "escaped": false,
+              "hitAt": 430
+            },
+            {
+              "x": 493.8952396702626,
+              "escaped": false,
+              "hitAt": 479
+            },
+            {
+              "x": 548,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 548,
+              "escaped": true,
+              "hitAt": null
+            }
+          ],
+          "gate": {
+            "travel": 0,
+            "height": 120,
+            "ready": false
+          },
+          "guardsActive": false
+        },
+        {
+          "file": "plaza-collapse.png",
+          "inputFrame": 1852,
+          "tick": 571,
+          "sceneTick": 540,
+          "camera": {
+            "x": 219.47991223846697,
+            "y": 64,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 1536,
+              "minY": 0,
+              "maxY": 288
+            }
+          },
+          "bloodContacts": 6,
+          "crowd": [
+            {
+              "x": 246,
+              "escaped": false,
+              "hitAt": 182
+            },
+            {
+              "x": 284,
+              "escaped": false,
+              "hitAt": 142
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 279.97139067055394,
+              "escaped": false,
+              "hitAt": 137
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 378,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 378,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 378,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 463.7544580740741,
+              "escaped": false,
+              "hitAt": 478
+            },
+            {
+              "x": 440.4135965805007,
+              "escaped": false,
+              "hitAt": 430
+            },
+            {
+              "x": 493.8952396702626,
+              "escaped": false,
+              "hitAt": 479
+            },
+            {
+              "x": 548,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 548,
+              "escaped": true,
+              "hitAt": null
+            }
+          ],
+          "gate": {
+            "travel": 0,
+            "height": 120,
+            "ready": false
+          },
+          "guardsActive": false
+        },
+        {
+          "file": "plaza-aftermath.png",
+          "inputFrame": 1908,
+          "tick": 627,
+          "sceneTick": 596,
+          "camera": {
+            "x": 219.47991223846697,
+            "y": 64,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 1536,
+              "minY": 0,
+              "maxY": 288
+            }
+          },
+          "bloodContacts": 6,
+          "crowd": [
+            {
+              "x": 246,
+              "escaped": false,
+              "hitAt": 182
+            },
+            {
+              "x": 284,
+              "escaped": false,
+              "hitAt": 142
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 116,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 279.97139067055394,
+              "escaped": false,
+              "hitAt": 137
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 378,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 378,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 378,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 463.7544580740741,
+              "escaped": false,
+              "hitAt": 478
+            },
+            {
+              "x": 440.4135965805007,
+              "escaped": false,
+              "hitAt": 430
+            },
+            {
+              "x": 493.8952396702626,
+              "escaped": false,
+              "hitAt": 479
+            },
+            {
+              "x": 548,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 548,
               "escaped": true,
               "hitAt": null
             }
@@ -2887,8 +3957,24 @@
         },
         {
           "file": "arrival-deployment.png",
-          "inputFrame": 1631,
-          "tick": 350,
+          "inputFrame": 1962,
+          "tick": 681,
+          "sceneTick": 650,
+          "camera": {
+            "x": 219.47991223846697,
+            "y": 64,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 1536,
+              "minY": 0,
+              "maxY": 288
+            }
+          },
+          "bloodContacts": 6,
           "crowd": [
             {
               "x": 246,
@@ -2927,6 +4013,46 @@
             },
             {
               "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 378,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 378,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 378,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 463.7544580740741,
+              "escaped": false,
+              "hitAt": 478
+            },
+            {
+              "x": 440.4135965805007,
+              "escaped": false,
+              "hitAt": 430
+            },
+            {
+              "x": 493.8952396702626,
+              "escaped": false,
+              "hitAt": 479
+            },
+            {
+              "x": 548,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 548,
               "escaped": true,
               "hitAt": null
             }
@@ -2940,8 +4066,24 @@
         },
         {
           "file": "arrival-opening.png",
-          "inputFrame": 1665,
-          "tick": 384,
+          "inputFrame": 1996,
+          "tick": 715,
+          "sceneTick": 684,
+          "camera": {
+            "x": 262.779912238467,
+            "y": 64,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 1536,
+              "minY": 0,
+              "maxY": 288
+            }
+          },
+          "bloodContacts": 6,
           "crowd": [
             {
               "x": 246,
@@ -2980,6 +4122,46 @@
             },
             {
               "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 378,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 378,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 378,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 463.7544580740741,
+              "escaped": false,
+              "hitAt": 478
+            },
+            {
+              "x": 440.4135965805007,
+              "escaped": false,
+              "hitAt": 430
+            },
+            {
+              "x": 493.8952396702626,
+              "escaped": false,
+              "hitAt": 479
+            },
+            {
+              "x": 548,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 548,
               "escaped": true,
               "hitAt": null
             }
@@ -2993,8 +4175,24 @@
         },
         {
           "file": "arrival-combat.png",
-          "inputFrame": 1701,
-          "tick": 420,
+          "inputFrame": 2032,
+          "tick": 751,
+          "sceneTick": 720,
+          "camera": {
+            "x": 277.64888918566703,
+            "y": 64,
+            "targetX": 0,
+            "targetY": 0,
+            "shakeTimer": 0,
+            "shakeMagnitude": 0,
+            "bounds": {
+              "minX": 0,
+              "maxX": 1536,
+              "minY": 0,
+              "maxY": 288
+            }
+          },
+          "bloodContacts": 6,
           "crowd": [
             {
               "x": 246,
@@ -3033,6 +4231,46 @@
             },
             {
               "x": 322,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 378,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 378,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 378,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 463.7544580740741,
+              "escaped": false,
+              "hitAt": 478
+            },
+            {
+              "x": 440.4135965805007,
+              "escaped": false,
+              "hitAt": 430
+            },
+            {
+              "x": 493.8952396702626,
+              "escaped": false,
+              "hitAt": 479
+            },
+            {
+              "x": 548,
+              "escaped": true,
+              "hitAt": null
+            },
+            {
+              "x": 548,
               "escaped": true,
               "hitAt": null
             }
@@ -3049,52 +4287,64 @@
     "media": [
       {
         "file": "arrival-play.mp4",
-        "frames": 345,
-        "seconds": 11.5,
+        "frames": 511,
+        "seconds": 17.033333,
         "width": 960,
         "height": 540,
         "video": "h264",
         "audio": "aac",
-        "sha256": "908aebfe19c5f8e7f8d53ce676106d4ec5963b07bce8614fbf1b52b9eb9f26fb"
+        "sha256": "fb43955e06bd74a9e8817894313b67c315df0d829978e810af184e2f004c2c8f"
       },
       {
         "file": "native-play.mp4",
-        "frames": 4075,
-        "seconds": 135.833333,
+        "frames": 4241,
+        "seconds": 141.366667,
         "width": 960,
         "height": 540,
         "video": "h264",
         "audio": "aac",
-        "sha256": "6108632890422af2106147c7baf967083a2d8d8ac1a8e57280803afe0d083735"
+        "sha256": "f1bfbd6c42056f1030c2e7e9ce8801d9ce2f07e07edcb9b602e11439b30bf589"
       }
     ],
     "sourceHashes": {
-      "src/adventure/hipotetico/HypotheticalArrival.ts": "9ed5daa7874a97a4290db7c59d97dfb1a9b13958116bfd747f1bfc0ac7900348",
-      "src/adventure/hipotetico/HypotheticalArrivalArt.ts": "e32fc1c3801a4a39c698363f90cddd26020fb1be652aab34a6271976460a2c12",
-      "src/adventure/hipotetico/HypotheticalBackdrop.ts": "6e979d9af9423bb7b3d3300cd497fc4b048a2754f2e62d51326a3a951d1ffcfe",
-      "src/adventure/hipotetico/HypotheticalBystanders.ts": "a81df11c075acaf6d34588ff6a21dac397fe49b5e0f0ba33216933b75f3f85b4",
+      "src/adventure/hipotetico/HypotheticalArrival.ts": "006dece8fe8e2c0a7e153e50eda66b8bc2b99fdd88f8887a452508ce220a88f1",
+      "src/adventure/hipotetico/HypotheticalArrivalArt.ts": "ef8761a09ff928014d15507d8a02c20e62739b9680323e74c2dfff9b3ffac9f1",
+      "src/adventure/hipotetico/HypotheticalBackdrop.ts": "badb0dfb93b618c4bc4f56d96439b80dce870c819cf4636444bf03d50f7b0ba0",
+      "src/adventure/hipotetico/HypotheticalBlood.ts": "d5f3b236f7ed1a64cc7a84bce1237d57d7b356b259d06aa85ac7121517d28e77",
+      "src/adventure/hipotetico/HypotheticalBystanders.ts": "529885886bf578a85f7d32b219ea02551af7ea8634bb4087ddd6ca7d523a2e47",
       "src/adventure/hipotetico/HypotheticalBystanderMotion.ts": "d36e22cc4524606bb3281c511ba3655fce79860f77d44d9b522e172f8e88ccb6",
-      "src/adventure/hipotetico/HypotheticalScenery.ts": "6610e20e00a45298a88dc55a0f3c8edee342ddcc81bdbfc5343d5b159fe405a7",
-      "src/adventure/hipotetico/HypotheticalModel.ts": "d33d1fac28189f0bb11868cf3ee6750c0a1193f87ffc7ca82dba956feb15fcb9",
-      "src/adventure/hipotetico/HypotheticalGame.ts": "cb5ed43d457dd2d5132c536b157bfcd37247c6b5f55c98ad8f717de517578d8f",
-      "src/adventure/hipotetico/HypotheticalStage.ts": "950bb17819e45e50f65faeb2134b11b39e3bed61c3855c905ddaa78cf391b8c0",
+      "src/adventure/hipotetico/HypotheticalScenery.ts": "4ad174bf7cdf1b4760958cb10635b9a14cf90c1e200e6aaa1dc8fd1d313e0bfb",
+      "src/adventure/hipotetico/HypotheticalModel.ts": "107fb1e4c6535e90cdec68bd2a6ccd8ab3f296b1c6997b09fed39592a302e1d2",
+      "src/adventure/hipotetico/HypotheticalGame.ts": "338559b8e6e5baf0a70f422a679d14077cf1aac6b4cbde5c455547eccac29af4",
+      "src/adventure/hipotetico/HypotheticalStage.ts": "2f82865b82eb67bdd547e235a6ef1abc9383cc9939ba9260c086be27192f5735",
+      "src/adventure/hipotetico/HypotheticalSiege.ts": "a2f99470cec31088150d67f9936f994741446e739b8116811abc21cab7859a3c",
       "src/adventure/hipotetico/HypotheticalArt.ts": "81f98134b37780f4788787187a04af06e0c3bac3cfd759f5fbffdb578f9dd3ea",
       "src/adventure/hipotetico/HypotheticalAudio.ts": "8d606373920f09ae3181ebcc388e3986802b3ff0edcb7f31eaf9f7baf5a4d259",
-      "src/adventure/hipotetico/HypotheticalDevastation.ts": "6165fd7e563a73546553093b2ef8e201516a58cad50fc3fd2e333a4d4e4a6a95"
+      "src/adventure/hipotetico/HypotheticalDevastation.ts": "3bea0ebf4fbab265040f77185d9796abdef082119095a802a94c1d2b6d0bf7d6"
     },
-    "gatheredPeople": 8,
-    "protectedTicks": 360,
+    "gatheredPeople": 16,
+    "totalPeople": 22,
+    "addedLength": 256,
+    "protectedTicks": 660,
+    "waitingAtTick": 400,
+    "approachThreshold": 280,
+    "firstGateRelease": 320,
     "gateLiftTicks": 48,
     "firstVolleyShots": 8,
-    "impactTick": 244,
-    "deploymentTick": 336,
-    "nativeProofDirectory": "output/hipotetico/arrival-direction/verified",
+    "plazaVolleyShots": 6,
+    "impactTicks": [
+      244,
+      526
+    ],
+    "deploymentTick": 636,
+    "bloodContactsAtRelease": 6,
+    "nativeProofDirectory": "output/hipotetico/arrival-plaza/verified",
     "inAppPlaybackConfirmed": {
-      "duration": 11.5,
+      "duration": 17.033333,
       "reachedEnd": true,
       "mediaError": null,
-      "reviewFrameSeconds": 7.015,
-      "screenshot": "output/hipotetico/arrival-direction/review-page.png"
+      "reviewFrameSeconds": 11.582233,
+      "screenshot": "output/hipotetico/arrival-plaza/review-page.png"
     }
   },
   "evidenceScope": {

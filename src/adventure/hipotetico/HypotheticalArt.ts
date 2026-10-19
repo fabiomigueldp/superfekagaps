@@ -7,6 +7,7 @@ import { HYPOTHETICAL, type HypotheticalModel } from './HypotheticalModel';
 import { dinosaurLeg, dinosaurTail, hypotheticalMotion, riderBend, riderTorsoPoint, smoothMotion } from './HypotheticalMotion';
 import { BACKDROP_RIG, backdropBaseline, type HypotheticalBackdrop } from './HypotheticalBackdrop';
 import { drawBystanders } from './HypotheticalBystanders';
+import {drawOpeningAftermath} from './HypotheticalOpening';
 import { drawHypotheticalScenery, drawHypotheticalDestruction, drawHypotheticalMasonry, drawHypotheticalFittings } from './HypotheticalScenery';
 import { drawHypotheticalCanister } from './HypotheticalGuardArt';
 export { drawHypotheticalGuard } from './HypotheticalGuardArt';
@@ -371,8 +372,10 @@ export function drawHypotheticalBackground(c:CanvasRenderingContext2D,b:Hypothet
     if(b.act==='siege'){
         const base=backdropBaseline(cy);
         c.save();c.translate(-Math.round(cx),0);
+        drawBystanders(c,b.backdrop,base,reduced,true);
         drawDistantRider(c,b,base,reduced);
         drawBystanders(c,b.backdrop,base,reduced);
+        drawOpeningAftermath(c,b.backdrop.tick,base,reduced);
         drawHypotheticalDestruction(c,b,base,cy,reduced);
         c.restore();
     }

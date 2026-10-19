@@ -1,4 +1,4 @@
-export type WeaponCue = 'shot' | 'impact' | 'splash' | 'collapse-water' | 'debris-land' | 'reload' | 'distant-shot' | 'distant-hit' | 'distant-crash' | 'distant-debris';
+export type WeaponCue = 'shot' | 'impact' | 'splash' | 'collapse-water' | 'debris-land' | 'reload' | 'distant-shot' | 'distant-hit' | 'distant-crash' | 'distant-debris' | 'distant-thud';
 interface Route { context: BaseAudioContext; destination: AudioNode; enabled: boolean }
 
 /** Short, owned voices on WorldAudio's existing effects bus. No new context or timers. */
@@ -15,7 +15,8 @@ export class HypotheticalAudio {
         const route=this.route();
         if(this.disposed||!route?.enabled||route.context.state!=='running')return false;
         const {context:c,destination}=route,now=c.currentTime,distant=kind.startsWith('distant'),shot=kind.endsWith('shot'),crash=kind==='distant-crash',splash=kind==='splash';
-        const contact=kind==='collapse-water'?{duration:.28,filter:'bandpass' as BiquadFilterType,cutoff:1600,tail:200,noise:.18,pitch:145,end:48,body:.12,wave:'sine' as OscillatorType}:
+        const contact=kind==='distant-thud'?{duration:.18,filter:'lowpass' as BiquadFilterType,cutoff:820,tail:120,noise:.2,pitch:96,end:38,body:.38,wave:'triangle' as OscillatorType}:
+            kind==='collapse-water'?{duration:.28,filter:'bandpass' as BiquadFilterType,cutoff:1600,tail:200,noise:.18,pitch:145,end:48,body:.12,wave:'sine' as OscillatorType}:
             kind==='debris-land'?{duration:.16,filter:'lowpass' as BiquadFilterType,cutoff:980,tail:170,noise:.18,pitch:110,end:42,body:.13,wave:'triangle' as OscillatorType}:
             kind==='distant-debris'?{duration:.24,filter:'bandpass' as BiquadFilterType,cutoff:1250,tail:180,noise:.36,pitch:96,end:35,body:.2,wave:'triangle' as OscillatorType}:null;
         const nodes:AudioNode[]=[],sources:AudioScheduledSourceNode[]=[];

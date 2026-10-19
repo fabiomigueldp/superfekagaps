@@ -1,14 +1,14 @@
 {
   "productionSynth": true,
   "weaponEffectsOnly": false,
-  "destructionCues": 1,
+  "destructionCues": 2,
   "contactCues": {
     "water": 0,
     "bank": 1
   },
-  "cues": 35,
-  "seconds": 11.5,
+  "cues": 43,
+  "seconds": 17.033333333333335,
   "peak": 0.10784991085529327,
-  "rms": 0.004591299658320074,
+  "rms": 0.003968722887529586,
   "sampleRate": 48000
 }

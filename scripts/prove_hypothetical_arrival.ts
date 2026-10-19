@@ -20,7 +20,7 @@ h.document.createElement=((tag:string)=>tag==='canvas'?createCanvas(1,1):create(
 const g=new HypotheticalGame(h.canvas as unknown as HTMLCanvasElement);g.renderer.setTouchControlsVisible(false);g.store.save.preferences.shake=false;
 let held=new Set<string>(),lastPlayer=g.player,n=0,videoFrames=0;
 const start=1162,cues:Array<{frame:number;kind:WeaponCue}>=[],captures:unknown[]=[];
-const moments=new Map([[36,'arrival-crowd'],[74,'arrival-flight'],[112,'arrival-volley'],[146,'arrival-reaction'],
+const moments=new Map([[26,'opening-notice'],[48,'opening-brace'],[66,'opening-strike'],[72,'opening-contact'],[78,'opening-occlusion'],[86,'opening-recovery'],[100,'opening-after'],[36,'arrival-crowd'],[74,'arrival-flight'],[112,'arrival-volley'],[146,'arrival-reaction'],
     [238,'arrival-ram'],[258,'arrival-collapse'],[300,'arrival-aftermath'],[400,'plaza-entry'],[424,'plaza-volley'],
     [480,'plaza-fall'],[518,'plaza-bite'],[540,'plaza-collapse'],[596,'plaza-aftermath'],
     [650,'arrival-deployment'],[684,'arrival-opening'],[720,'arrival-combat']]);
@@ -47,7 +47,7 @@ try{
             c.drawImage(screen,0,0,320,180);const png=frame.toBuffer('image/png');
             if(n%2===0)writeFileSync(join(out,'frames',String(videoFrames++).padStart(5,'0')+'.png'),png);
             if(moment){captured.add(moment);writeFileSync(join(out,moment+'.png'),png);captures.push({file:moment+'.png',inputFrame:n,tick:b.tick,sceneTick:b.arrivalTime,camera:{...g.camera},bloodContacts:b.backdrop.blood.length,
-                crowd:b.backdrop.people.filter(p=>p.district===0).map(p=>({x:p.x,escaped:p.escaped,hitAt:p.hitAt})),
+                crowd:b.backdrop.people.filter(p=>p.district===0).map(p=>({x:p.x,escaped:p.escaped,hitAt:p.hitAt,capturedAt:p.capturedAt})),
                 gate:b.arrival,guardsActive:b.route.active});}
         }
         if(g.act==='siege'&&b.arrivalTime>=ARRIVAL.release+210)break outer;

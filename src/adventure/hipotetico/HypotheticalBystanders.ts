@@ -4,6 +4,8 @@ import type { Bystander, HypotheticalBackdrop } from './HypotheticalBackdrop';
 import { bystanderPose,bystanderFall } from './HypotheticalBystanderMotion';
 import { bystanderTexture,drawBystanderTexture,type BystanderTexture } from './HypotheticalBystanderPixels';
 import {drawBlood} from './HypotheticalBlood';
+import {OPENING} from './HypotheticalOpening';
+import {smoothMotion} from './HypotheticalMotion';
 export { bystanderPose } from './HypotheticalBystanderMotion';
 
 type Paint=(x:number,y:number,w:number,h:number,color:string)=>void;
@@ -121,15 +123,22 @@ function belongings(c:CanvasRenderingContext2D,p:Bystander,tick:number,base:numb
 }
 
 /** Articulated street actors share the game's pixel grid and retain their clothing as they fall. */
-export function drawBystanders(output:CanvasRenderingContext2D,b:HypotheticalBackdrop,street:number,reduced:boolean){
-    drawBlood(output,b,street,reduced,false);
+export function drawBystanders(output:CanvasRenderingContext2D,b:HypotheticalBackdrop,street:number,reduced:boolean,openingOnly=false){
+    if(!openingOnly)drawBlood(output,b,street,reduced,false);
     for(const p of [...b.people].sort((a,b)=>(a.depth??0)-(b.depth??0))){
+        if(Boolean(p.opening)!==openingOnly)continue;
         const base=street+(p.depth??0);
         const site=p.district===0?(p.originX>320?1:0):p.district+1;
-        belongings(output,p,b.tick,base,b.breaches[site],reduced);
-        if(p.escaped)continue;
+        belongings(output,p,b.tick,p.opening?street:base,b.breaches[site],reduced);
+        if(p.escaped||p.capturedAt!==undefined&&b.tick>=OPENING.occluded)continue;
         const c=actorContext(output,p);
         const x=p.x,pose=bystanderPose(p,b.tick),age=pose.age,skin=SKIN[p.color];
+        if(p.capturedAt!==undefined){
+            const fold=smoothMotion((b.tick-p.capturedAt)/8);
+            pose.left=[pose.left[0]-fold*2,pose.left[1]-fold*3];
+            pose.right=[pose.right[0]+fold*2,pose.right[1]-fold];
+            pose.leftHand=[-7,-13-fold*2];pose.rightHand=[7,-12-fold*3];
+        }
         const cloth=WARDROBE[p.clothes],ink='#485f62',shoe='#89978a';
         if(age>=0){
             const motion=bystanderFall(p,b.tick),{angle,height,headTop}=motion,fall=angle/(Math.PI/2);
@@ -175,6 +184,7 @@ export function drawBystanders(output:CanvasRenderingContext2D,b:HypotheticalBac
             box(c,x-7,torso+(reduced?2:2+pose.clothSway*1.4),2,1,'#d0a184');
         }
     }
+    if(openingOnly)return;
     drawBlood(output,b,street,reduced,true);
     for(const s of b.shots)drawGunTracer(output,s,0,street,reduced,true);
     for(const p of b.impacts)drawGunImpact(output,p,b.tick,0,street,reduced,true);

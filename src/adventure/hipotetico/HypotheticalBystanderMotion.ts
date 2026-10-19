@@ -48,7 +48,7 @@ export function bystanderFall(p:Bystander,tick:number){
 
 /** Slab intersection returns the first contact along a shot, not its enclosing rectangle. */
 export function bystanderIntersection(p:Bystander,tick:number,s:Pick<DistantShot,'px'|'py'|'x'|'y'>){
-    if(p.escaped||p.hitAt!==null||tick<p.alertAt)return null;
+    if(p.escaped||p.hitAt!==null||p.capturedAt!==undefined||tick<p.alertAt)return null;
     const bounds=bystanderBounds(p,tick);let first=0,last=1;
     if(bounds.left>=bounds.right)return null;
     for(const [start,end,min,max] of [[s.px,s.x,bounds.left,bounds.right],[s.py,s.y,bounds.top,bounds.bottom]]){
