@@ -1,0 +1,107 @@
+{
+  "kind": "directed native chase animation",
+  "fps": 30,
+  "frames": 390,
+  "gameplay": false,
+  "browser": false,
+  "audio": false,
+  "records": [
+    {
+      "file": "madeira-0.png",
+      "age": -7,
+      "cameraX": 845.2535722450846,
+      "bossX": 895.5
+    },
+    {
+      "file": "madeira-1.png",
+      "age": 3,
+      "cameraX": 872.5,
+      "bossX": 930.5
+    },
+    {
+      "file": "madeira-2.png",
+      "age": 20,
+      "cameraX": 932.2021484375,
+      "bossX": 990
+    },
+    {
+      "file": "madeira-3.png",
+      "age": 40,
+      "cameraX": 1015.8251953125,
+      "bossX": 1060
+    },
+    {
+      "file": "guindaste-0.png",
+      "age": -7,
+      "cameraX": 1421.2535722450846,
+      "bossX": 1471.5
+    },
+    {
+      "file": "guindaste-1.png",
+      "age": 3,
+      "cameraX": 1448.5,
+      "bossX": 1506.5
+    },
+    {
+      "file": "guindaste-2.png",
+      "age": 20,
+      "cameraX": 1508.2021484375,
+      "bossX": 1566
+    },
+    {
+      "file": "guindaste-3.png",
+      "age": 40,
+      "cameraX": 1591.8251953125,
+      "bossX": 1636
+    },
+    {
+      "file": "comporta-0.png",
+      "age": -7,
+      "cameraX": 2637.253572245085,
+      "bossX": 2687.5
+    },
+    {
+      "file": "comporta-1.png",
+      "age": 3,
+      "cameraX": 2664.5,
+      "bossX": 2722.5
+    },
+    {
+      "file": "comporta-2.png",
+      "age": 20,
+      "cameraX": 2724.2021484375,
+      "bossX": 2782
+    },
+    {
+      "file": "comporta-3.png",
+      "age": 40,
+      "cameraX": 2807.8251953125,
+      "bossX": 2852
+    },
+    {
+      "file": "portico-0.png",
+      "age": -7,
+      "cameraX": 3869.253572245085,
+      "bossX": 3919.5
+    },
+    {
+      "file": "portico-1.png",
+      "age": 3,
+      "cameraX": 3896.5,
+      "bossX": 3954.5
+    },
+    {
+      "file": "portico-2.png",
+      "age": 20,
+      "cameraX": 3956.2021484375,
+      "bossX": 4014
+    },
+    {
+      "file": "portico-3.png",
+      "age": 40,
+      "cameraX": 4039.8251953125,
+      "bossX": 4084
+    }
+  ],
+  "scope": "Authored positions, fracture ages and terrain masks; native motion, destruction, geometry, particles and framing. No gameplay validation."
+}

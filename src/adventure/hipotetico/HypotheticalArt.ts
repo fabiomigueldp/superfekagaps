@@ -1,5 +1,7 @@
 import { drawGunMuzzle, drawGunTracer, drawGunImpact, drawGunCasing } from './HypotheticalGunfire';
 import {drawChaseCollapse,drawChaseWave} from './HypotheticalChaseArt';
+import {chasePerformance} from './HypotheticalChasePerformance';
+import {drawChaseFootfall} from './HypotheticalChaseImpactArt';
 import { box, oval, pixelLine, polygon, type Point } from '../WorldPainting';
 import { pixelText } from '../../graphics/BitmapFont';
 import type { WorldLevel, WorldObjects } from '../WorldPhysics';
@@ -384,13 +386,15 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
 
 export function dinosaurPose(b: HypotheticalModel, cx: number, cy: number, reduced = false): DinosaurPose {
     const m=hypotheticalMotion(b);
+    const pursuit=b.act==='chase'?chasePerformance(b,reduced):null;
     const activeTail=b.attack==='tail'&&['tell','attack'].includes(b.state);
     const focus=b.state==='tell'?smoothMotion(b.age/b.warningTicks):b.state==='attack'?1:0;
     return { x: b.x-cx, y:b.y-cy, facing:b.visualFacing, pivot:b.pivot, gait:b.travel/11,
         ...m, breath:reduced?0:Math.sin(b.tick/13)*.6, bow:b.bow,
-        tail:reduced||activeTail?m.tail:m.tail+(1-b.bow)*(Math.sin(b.tick/22)*.025-m.tuck*.08),
+        tail:reduced||activeTail||pursuit?m.tail:m.tail+(1-b.bow)*(Math.sin(b.tick/22)*.025-m.tuck*.08),
+        headPitch:pursuit?.headPitch,jawHinge:pursuit?Math.min(.4,pursuit.jawHinge+m.jaw*.32):undefined,
         aim:b.weaponAngle,
-        armor:b.health,heat:b.heat,cloth:reduced?0:Math.min(5,Math.abs(b.motionSpeed)*.7)+Math.sin(b.travel/11-.8)*m.stride*.9+Math.sin(b.tick/9)*.25,
+        armor:b.health,heat:b.heat,cloth:reduced?0:Math.min(5,Math.abs(b.motionSpeed)*.7)+Math.sin(b.travel/11-.8)*m.stride*.9+Math.sin(b.tick/9)*.25+(pursuit?.cloth??0),
         focus,eyeClose:!reduced&&b.state==='rest'&&b.tick%137<4?1:0,
         voice:b.state==='roar'?Math.max(0,Math.sin(b.age/9))*(1-smoothMotion((b.age-75)/30)):0,
         blink:b.state==='rest'&&b.tick%160<4,daze:reduced?0:b.age/14,
@@ -552,6 +556,9 @@ export function drawHypotheticalCombat(c:CanvasRenderingContext2D,b:Hypothetical
     for(const p of b.impacts)drawGunImpact(c,p,b.tick,-cx,-cy,reduced);
     for(const p of b.dust){
         const age=b.tick-p.born;
+        if(p.kind==='step'&&b.act==='chase'){
+            drawChaseFootfall(c,p.x,p.y-cy,age,cx,reduced);continue;
+        }
         if(p.kind==='skid'){
             for(let i=0;i<(reduced?2:5);i++){
                 const dx=-(p.direction??1)*(age*.9+i*4),dy=-Math.sin(age/40*Math.PI)*(2+i);

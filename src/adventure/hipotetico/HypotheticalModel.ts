@@ -1,12 +1,13 @@
 import type { Rect } from '../../types';
 import { clamp, overlaps } from '../types';
-import { dinosaurFootAnchor, dinosaurTail, hypotheticalMotion, riderBend, smoothMotion, type DinosaurMotion } from './HypotheticalMotion';
+import { dinosaurFootAnchor, dinosaurTail, hypotheticalMotion, hypotheticalStateMotion, riderBend, smoothMotion, type DinosaurMotion } from './HypotheticalMotion';
 import { HypotheticalBackdrop } from './HypotheticalBackdrop';
 import { ARENA_COLUMNS, CHASE_ATTACKS, CHASE_EXIT, CHASE_WIDTH, CHASE_GAPS, CHASE_BREAKS } from './HypotheticalLayout';
 import { HypotheticalSiege, SIEGE_WIDTH, SIEGE_SECTORS } from './HypotheticalSiege';
 import {chaseDeckSpans,chaseMaterialAt,chaseTerraceFall,chaseRuinAt,CHASE_WATER_Y} from './HypotheticalChaseDetails';
 import { RIFLE_BURSTS, RIFLE_SPEED, type GunImpact } from './HypotheticalGunfire';
 import {chaseReactionStarts,updateChaseReactions} from './HypotheticalChaseLife';
+import {CHASE_STRIKE_REACH,chaseStructureTiming,type ChaseSound} from './HypotheticalChasePerformance';
 import {ARRIVAL,arrivalGate} from './HypotheticalArrival';
 import {SCENIC_STARTS,nextScenicTick,devastationAt} from './HypotheticalDevastation';
 import type {HelicopterCue} from './HypotheticalHelicopter';
@@ -18,7 +19,7 @@ export interface Shot extends Rect { vx: number; vy: number; age: number; life: 
 export interface Dust { x: number; y: number; born: number; kind: 'step' | 'stone' | 'hit' | 'shell' | 'clasp' | 'skid'; direction?: number }
 export interface FallingMark { x: number; born: number }
 export interface BulletImpact extends GunImpact {}
-export type FightEvent = HelicopterCue | 'warning' | 'shot' | 'impact' | 'splash' | 'collapse-water' | 'debris-land' | 'reload' | 'distant-shot' | 'distant-hit' | 'distant-debris' | 'distant-thud' | 'distant-roar' | 'distant-flutter' | 'distant-soft-hit' | 'distant-wood' | 'distant-stone' | 'distant-metal' | 'distant-creak' | 'distant-chain' | 'distant-leak' | 'distant-snort' | 'distant-grit' | 'distant-launch' | 'distant-rocket' | 'distant-blast' | 'distant-bell' | 'step' | 'slam' | 'hit' | 'break' | 'snare' | 'won';
+export type FightEvent = HelicopterCue | ChaseSound | 'warning' | 'shot' | 'impact' | 'splash' | 'collapse-water' | 'debris-land' | 'reload' | 'distant-shot' | 'distant-hit' | 'distant-debris' | 'distant-thud' | 'distant-roar' | 'distant-flutter' | 'distant-soft-hit' | 'distant-wood' | 'distant-stone' | 'distant-metal' | 'distant-creak' | 'distant-chain' | 'distant-leak' | 'distant-snort' | 'distant-grit' | 'distant-launch' | 'distant-rocket' | 'distant-blast' | 'distant-bell' | 'step' | 'slam' | 'hit' | 'break' | 'snare' | 'won';
 export const HYPOTHETICAL = Object.freeze({ floor: 224, chaseEnd: CHASE_EXIT, health: 9, step: 1000 / 60, warning: 54, recovery: 156 });
 const rifleBursts = RIFLE_BURSTS;
 const patterns: readonly (readonly HypotheticalAttack[])[] = [
@@ -154,7 +155,7 @@ export class HypotheticalModel {
         if (this.attack === 'tail') return 'CAUDA BAIXA! PULE OU USE A SACADA';
         return 'MORDIDA! SALTE OU SAIA DOS DENTES';
     }
-    private enter(state: HypotheticalState,from=hypotheticalMotion(this),weapon=this.weaponAngle) {
+    private enter(state: HypotheticalState,from=hypotheticalStateMotion(this),weapon=this.weaponAngle) {
         this.motionFrom=from;this.weaponFrom=weapon;this.bowFrom=this.bow;this.state=state;this.age=0;
     }
     private face(direction:-1|1){
@@ -207,7 +208,7 @@ export class HypotheticalModel {
         this.prepare(attack,player);
     }
     private prepare(attack:HypotheticalAttack,player:Rect) {
-        const pose=hypotheticalMotion(this),weapon=this.weaponAngle;
+        const pose=hypotheticalStateMotion(this),weapon=this.weaponAngle;
         this.attack=attack;
         this.snared = false; this.leg = 0; this.volley = 0;
         let facing:-1|1=player.x+player.width/2<this.x?-1:1;
@@ -369,8 +370,11 @@ export class HypotheticalModel {
         }
         for(const [i,site]of CHASE_BREAKS.entries()){
             const at=this.chaseBreaks[i];if(at<0)continue;
-            const age=this.tick-at,contact=chaseRuinAt(age,site.kind==='crane'?78:site.kind==='sluice'?58:69).beamContact;
+            const age=this.tick-at,pose=chaseRuinAt(age,site.kind==='crane'?78:site.kind==='sluice'?58:69,site.kind),contact=pose.beamContact;
             if(age>=contact&&age-1<contact)this.emit('debris-land');
+            const secondary=site.kind==='crane'?pose.loadContact:site.kind==='sluice'?pose.panelContact:site.kind==='gantry'?pose.sign.contact:-1;
+            if(secondary>=0&&age>=secondary&&age-1<secondary)this.emit(site.kind==='crane'?'chase-wood':'chase-metal');
+            if(site.kind==='crane'&&age===chaseStructureTiming(site.kind).release)this.emit('chase-cable');
         }
         // Converge smoothly on a visible pursuit distance, without teleporting.
         // At Feka's 3.5px run speed the gap settles at 110px, inside the camera.
@@ -385,7 +389,10 @@ export class HypotheticalModel {
         this.targetX=this.x+240;this.targetY=this.pursuitKind==='high'?this.rifleShoulder.y-4:HYPOTHETICAL.floor-12;
         this.footstep(oldTravel);
         this.frameHazards.push(this.body);
-        for(const [i,site] of CHASE_BREAKS.entries())if(this.chaseBreaks[i]===-1&&this.x+56>=site.x){this.chaseBreaks[i]=this.tick;this.emit('break');}
+        for(const [i,site] of CHASE_BREAKS.entries())if(this.chaseBreaks[i]===-1&&this.x+CHASE_STRIKE_REACH>=site.x){
+            this.chaseBreaks[i]=this.tick;this.emit('break');
+            this.emit(site.kind==='sluice'||site.kind==='gantry'?'chase-metal':'chase-wood');
+        }
         updateChaseReactions(this.chaseReactions,this.tick,this.x);
         this.destroyed = Math.min(16, Math.floor(Math.max(0, this.x - 120) / 260));
         if (this.state === 'arrival') this.enter('rest');

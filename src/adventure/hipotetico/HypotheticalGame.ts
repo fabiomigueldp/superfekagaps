@@ -18,6 +18,7 @@ import { SIEGE_SECTORS, SIEGE_WIDTH, siegeGarrison } from './HypotheticalSiege';
 import { drawHypotheticalBackground, drawHypotheticalCombat, drawHypotheticalGuard, drawHypotheticalObjects, drawHypotheticalTerrain } from './HypotheticalArt';
 import { HypotheticalAudio } from './HypotheticalAudio';
 import {chaseCollapsedEdge} from './HypotheticalChaseDetails';
+import {CHASE_STRIKE_REACH,chasePerformance} from './HypotheticalChasePerformance';
 import { CHASE_WIDTH, CHASE_CHECKPOINT, CHASE_DISTRICTS } from './HypotheticalLayout';
 import {ARRIVAL,arrivalFade,arrivalDeployment,arrivalLookAhead} from './HypotheticalArrival';
 import {arrivalStoryTime,HELICOPTER_SEQUENCE} from './HypotheticalHelicopterTiming';
@@ -69,7 +70,7 @@ export class HypotheticalEncounter extends BossEncounter {
             // Losing the bank is still unconditional: standing still cannot preserve an unsupported terrace.
             for(let i=o.bodies.length-1;i>=0;i--){
                 const body=o.bodies[i];
-                const struck=this.model.x+56>=body.x+5&&p.x>=body.x+body.width+10;
+                const struck=this.model.x+CHASE_STRIKE_REACH>=body.x+5&&p.x>=body.x+body.width+10;
                 if(body.id.startsWith('chase-terrace-')&&(body.x<edge*16||struck)){
                     if(this.model.tick>1){
                         this.model.terraceDebris.push({x:body.x,y:body.y,width:body.width,born:this.model.tick});
@@ -281,16 +282,26 @@ export class HypotheticalGame extends WorldGame {
         }else if(this.act==='siege'&&this.fight.route.releasedThisTick)this.audio.sfx('switch');
         for(const event of this.fight.events){
             if(event==='shot'||event==='impact'||event==='splash'||event==='collapse-water'||event==='debris-land'||event==='reload'||event==='distant-shot'||event==='distant-hit'||event==='distant-debris'||event==='distant-thud'||event==='distant-roar'||event==='distant-flutter'||event==='distant-soft-hit'||event==='distant-wood'||event==='distant-stone'||event==='distant-metal'||event==='distant-creak'||event==='distant-chain'||event==='distant-leak'||event==='distant-snort'||event==='distant-grit'||event==='distant-launch'||event==='distant-rocket'||event==='distant-blast'||event==='distant-bell'||event==='distant-rotor'||event==='distant-engine-fail'||event==='distant-crash')this.weaponAudio.play(event);
-            if(event==='step'&&this.fight.tick%3===0)this.audio.sfx('land');
+            if(event==='chase-wood'||event==='chase-metal'||event==='chase-cable')this.weaponAudio.play(event);
+            if(event==='step'){
+                if(this.act==='chase')this.weaponAudio.play('chase-step');
+                else if(this.fight.tick%3===0)this.audio.sfx('land');
+            }
             if(event==='break'){
                 if(this.act==='siege'){
                     if(Math.abs(this.fight.backgroundX-this.player.data.position.x)<360)this.weaponAudio.play('distant-crash');
-                }else {this.audio.sfx('break');if(this.act==='chase')this.weaponAudio.play('distant-crash');}
+                }else if(this.act==='chase')this.camera.shakeTimer=Math.max(this.camera.shakeTimer,90);
+                else this.audio.sfx('break');
             }
             if(event==='won')this.audio.sfx('checkpoint');
         }
         if(this.fight.nextAct){this.transitionTicks+=steps;if(this.transitionTicks>=60)this.nextAct();}
-        if(this.act==='chase')this.camera.x=clamp(this.player.data.position.x-150,0,CHASE_WIDTH-320);
+        if(this.act==='chase'){
+            // An 18px look-back keeps the contact and falling beam in view.
+            // The offset is bounded; input and world time never stop.
+            const look=this.renderer.reducedMotion?0:chasePerformance(this.fight).framing;
+            this.camera.x=clamp(this.player.data.position.x-150-look,0,CHASE_WIDTH-320);
+        }
         else if(this.act==='siege')this.camera.x=clamp(this.fight.backdrop.aftermath.cameraFor(this.player.data.position.x)
             +arrivalLookAhead(this.fight.arrivalTime,this.fight.arrivalSkipped),0,SIEGE_WIDTH-320);
         else this.camera.x=0;

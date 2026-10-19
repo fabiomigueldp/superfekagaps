@@ -1,6 +1,7 @@
 import type { HypotheticalModel } from './HypotheticalModel';
 import type { Point } from '../WorldPainting';
 import { gunRecoil } from './HypotheticalGunfire';
+import {chasePerformance} from './HypotheticalChasePerformance';
 
 const unit = (n: number) => Math.max(0, Math.min(1, n));
 export const smoothMotion = (n: number) => { const t = unit(n); return t * t * (3 - 2 * t); };
@@ -11,6 +12,22 @@ export interface DinosaurMotion {
 
 /** Shared skeletal timing: the renderer and combat read the same moving anchors. */
 export function hypotheticalMotion(b: HypotheticalModel): DinosaurMotion {
+    const motion=hypotheticalStateMotion(b);
+    if(b.act==='chase'){
+        const performance=chasePerformance(b);
+        motion.compression+=performance.compression;
+        motion.neckDrop+=performance.neckDrop;
+        motion.riderDrop+=performance.riderDrop;
+        motion.riderLean+=performance.riderLean;
+        motion.tail+=performance.tail;
+        motion.saddle+=performance.compression;
+    }
+    return motion;
+}
+
+/** State transitions capture only their own layer; a structural impulse must
+ * not be captured and then applied a second time after an attack changes. */
+export function hypotheticalStateMotion(b: HypotheticalModel): DinosaurMotion {
     const attacking = b.state === 'attack', telling = b.state === 'tell';
     const wind = telling ? smoothMotion(b.age / b.warningTicks) : 0;
     const leap = attacking && b.attack === 'leap';
@@ -32,7 +49,9 @@ export function hypotheticalMotion(b: HypotheticalModel): DinosaurMotion {
             : b.age <= 32 ? 1 : 1 - smoothMotion((b.age - 32) / 20) : 0;
     const recoil = gunRecoil(b.muzzle);
     const reload = b.state === 'reload' ? Math.sin(Math.PI * unit(b.age / 24)) : 0;
-    const brace=chaseRam?drive*.08:b.state==='turn'?Math.sin(Math.PI*unit(b.age/38))*.85
+    // Running and bracing the rifle are separate actions: shortening the leg
+    // stance during a burst made the planted feet slide across the chase deck.
+    const brace=b.act==='chase'?0:b.state==='turn'?Math.sin(Math.PI*unit(b.age/38))*.85
         :attacking&&b.attack==='charge'&&b.age>=34?Math.sin(Math.PI*unit((b.age-34)/16))*.7
         :b.attack==='rifle'&&(attacking||telling)?(attacking?.35:wind*.35):0;
     const riding = b.act==='chase'||['charge','leap','bite'].includes(b.attack);

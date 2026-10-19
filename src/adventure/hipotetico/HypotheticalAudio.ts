@@ -1,4 +1,5 @@
-export type WeaponCue = 'shot' | 'impact' | 'splash' | 'collapse-water' | 'debris-land' | 'reload' | 'distant-shot' | 'distant-hit' | 'distant-crash' | 'distant-debris' | 'distant-thud'
+import type {ChaseSound} from './HypotheticalChasePerformance';
+export type WeaponCue = ChaseSound | 'shot' | 'impact' | 'splash' | 'collapse-water' | 'debris-land' | 'reload' | 'distant-shot' | 'distant-hit' | 'distant-crash' | 'distant-debris' | 'distant-thud'
     | 'guard-swipe' | 'guard-sweep' | 'guard-parry' | 'guard-stomp' | 'distant-roar' | 'distant-flutter' | 'distant-soft-hit'
     | 'distant-wood' | 'distant-stone' | 'distant-metal' | 'distant-creak' | 'distant-chain' | 'distant-leak' | 'distant-snort' | 'distant-grit' | 'distant-launch' | 'distant-rocket' | 'distant-blast' | 'distant-bell' | 'distant-rotor' | 'distant-engine-fail';
 interface Route { context: BaseAudioContext; destination: AudioNode; enabled: boolean }
@@ -17,7 +18,11 @@ export class HypotheticalAudio {
         const route=this.route();
         if(this.disposed||!route?.enabled||route.context.state!=='running')return false;
         const {context:c,destination}=route,now=c.currentTime,distant=kind.startsWith('distant'),shot=kind.endsWith('shot'),crash=kind==='distant-crash',splash=kind==='splash';
-        const contact=kind==='guard-swipe'?{duration:.14,filter:'bandpass' as BiquadFilterType,cutoff:2400,tail:600,noise:.14,pitch:620,end:240,body:.035,wave:'triangle' as OscillatorType}:
+        const contact=kind==='chase-step'?{duration:.12,filter:'lowpass' as BiquadFilterType,cutoff:560,tail:110,noise:.075,pitch:88,end:34,body:.14,wave:'triangle' as OscillatorType}:
+            kind==='chase-wood'?{duration:.24,filter:'bandpass' as BiquadFilterType,cutoff:1800,tail:320,noise:.23,pitch:142,end:44,body:.17,wave:'triangle' as OscillatorType}:
+            kind==='chase-metal'?{duration:.34,filter:'bandpass' as BiquadFilterType,cutoff:2350,tail:510,noise:.14,pitch:510,end:155,body:.13,wave:'sine' as OscillatorType}:
+            kind==='chase-cable'?{duration:.18,filter:'highpass' as BiquadFilterType,cutoff:2600,tail:800,noise:.12,pitch:1100,end:330,body:.035,wave:'sine' as OscillatorType}:
+            kind==='guard-swipe'?{duration:.14,filter:'bandpass' as BiquadFilterType,cutoff:2400,tail:600,noise:.14,pitch:620,end:240,body:.035,wave:'triangle' as OscillatorType}:
             kind==='guard-sweep'?{duration:.2,filter:'bandpass' as BiquadFilterType,cutoff:1700,tail:420,noise:.19,pitch:330,end:90,body:.07,wave:'triangle' as OscillatorType}:
             kind==='guard-parry'?{duration:.13,filter:'highpass' as BiquadFilterType,cutoff:3600,tail:1400,noise:.12,pitch:1600,end:1150,body:.08,wave:'sine' as OscillatorType}:
             kind==='guard-stomp'?{duration:.18,filter:'lowpass' as BiquadFilterType,cutoff:1000,tail:150,noise:.25,pitch:120,end:45,body:.19,wave:'triangle' as OscillatorType}:

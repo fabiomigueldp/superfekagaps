@@ -1,4 +1,5 @@
 import { CHASE_GAPS, CHASE_WIDTH } from './HypotheticalLayout';
+import {chaseStructureTiming,type ChaseStructureKind} from './HypotheticalChasePerformance';
 
 export const CHASE_DECK_Y = 224;
 export const CHASE_WATER_Y = 240;
@@ -28,38 +29,65 @@ export function chaseDeckSpans(pursuerX: number) {
 }
 
 /** Contact hold, two failing joints, then a detached beam and a bouncing load. */
-export function chaseRuinAt(age: number,height=78) {
-    const t = Math.max(0, age - 4), loadTime = Math.max(0, age - 9);
-    const loadLand = Math.sqrt(31 / .09), after = Math.max(0, loadTime - loadLand);
-    const beam=landedPiece(age,4,height,66,4,.055,.8,36);
-    const panel=landedPiece(age,8,height-9,46,29,.07,.65,36);
-    const leftTurn=ease(t/29)*1.45,rightTurn=ease((t-5)/33)*1.4;
+export function chaseRuinAt(age: number,height=78,kind:ChaseStructureKind='crane') {
+    const score=chaseStructureTiming(kind),t=Math.max(0,age-score.left),rt=Math.max(0,age-score.right);
+    const push=kind==='pier'?2.6:kind==='crane'?2.5:kind==='sluice'?1.35:1.8;
+    const beam=landedPiece(age,score.beam,height,66,4,score.gravity,score.turn,score.turnTime,0,push);
+    const panel=landedPiece(age,score.panel,height-9,46,29,kind==='sluice'?.08:.07,kind==='sluice'?.4:.65,36);
+    const preload=score.gravity*Math.max(0,score.release-score.beam)**2;
+    const loadTime=Math.max(0,age-score.release),loadLand=Math.sqrt((31-preload)/.09),after=Math.max(0,loadTime-loadLand);
+    const leftTurn=ease(t/29)*1.45,rightTurn=ease(rt/33)*1.4;
     return {
+        score,
         leftTurn,rightTurn,
         postDrop:Math.min(t*t*.035,22-3.5*Math.sin(leftTurn)),
-        rightPostDrop:Math.min(Math.max(0,t-5)**2*.035,22-3.5*Math.sin(rightTurn)),
+        rightPostDrop:Math.min(rt*rt*.035,22-3.5*Math.sin(rightTurn)),
         beamX: beam.x,
         beamDrop: beam.drop,
         beamTurn: beam.turn,
         beamContact:beam.contact,
         groundAge:age-beam.contact,
-        panelDrop:panel.drop,panelTurn:panel.turn,
-        loadDrop: Math.min(31, loadTime * loadTime * .09) - (after < 12 ? Math.sin(after / 12 * Math.PI) * 2 : 0),
+        panelDrop:panel.drop,panelTurn:panel.turn,panelContact:panel.contact,
+        leftBrace:landedPiece(age,score.left,height-29,30,2,.065,.22,32,-Math.PI/2+.66),
+        rightBrace:landedPiece(age,score.right,height-29,30,2,.065,-Math.PI+.15,32,-Math.PI/2-.66),
+        sign:landedPiece(age,score.release,height-9,22,10,.07,.95,31,0,2.4),
+        loadDrop:age<score.release?beam.drop:Math.min(31,preload+loadTime*loadTime*.09)-(after<12?Math.sin(after/12*Math.PI)*2:0),
+        loadContact:score.release+loadLand,
+        recoil:age>=0&&age<score.beam?Math.sin(age*1.7)*(1-age/score.beam)*1.5:0,
         dust: age > 8 && age < 60 ? Math.sin(unit((age - 8) / 52) * Math.PI) : 0,
     };
 }
 
+const contacts=new Map<string,number>();
 /** A detached rigid piece pivots on its first contact, bounces, then rests on the bank. */
-function landedPiece(age:number,delay:number,height:number,length:number,depth:number,gravity:number,maxTurn:number,turnTime:number){
-    const rotation=(t:number)=>ease(t/turnTime)*maxTurn;
-    const reach=(t:number)=>gravity*t*t+length*Math.sin(rotation(t))+depth*Math.cos(rotation(t));
-    let lo=0,hi=80;
-    for(let i=0;i<18;i++){const m=(lo+hi)/2;if(reach(m)<height)lo=m;else hi=m;}
-    const contact=(lo+hi)/2+delay,t=Math.max(0,age-delay),land=Math.max(0,age-contact);
-    if(age<contact)return{x:t*.45,drop:t*t*gravity,turn:rotation(t),contact};
-    const turn=rotation(contact-delay)*(1-ease(land/23))+.025*ease(land/23);
+function landedPiece(age:number,delay:number,height:number,length:number,depth:number,gravity:number,maxTurn:number,turnTime:number,initial=0,drift=.45){
+    const rotation=(t:number)=>initial+ease(t/turnTime)*(maxTurn-initial);
+    const bottom=(angle:number)=>Math.max(0,length*Math.sin(angle))+Math.abs(depth*Math.cos(angle));
+    const key=[height,length,depth,gravity,maxTurn,turnTime,initial].join(':');
+    let fallTime=contacts.get(key);
+    if(fallTime===undefined){
+        let lo=0,hi=80;
+        for(let i=0;i<18;i++){const m=(lo+hi)/2;if(gravity*m*m+bottom(rotation(m))<height)lo=m;else hi=m;}
+        fallTime=(lo+hi)/2;contacts.set(key,fallTime);
+    }
+    const contact=fallTime+delay,t=Math.max(0,age-delay),land=Math.max(0,age-contact);
+    if(age<contact)return{x:t*drift,drop:t*t*gravity,turn:rotation(t),contact};
+    const rest=maxTurn<-Math.PI/2?-Math.PI+.025:.025;
+    const turn=rotation(contact-delay)*(1-ease(land/23))+rest*ease(land/23);
     const bounce=land<12?Math.sin(land/12*Math.PI)*2.1:0;
-    return{x:(contact-delay)*.45+7*ease(land/28),drop:height-length*Math.sin(turn)-depth*Math.cos(turn)-bounce,turn,contact};
+    return{x:fallTime*drift+(3+drift*8)*ease(land/28),drop:height-bottom(turn)-bounce,turn,contact};
+}
+
+/** Small fragments inherit an impulse from the struck joint, land once and
+ * settle on the same rear bank as the large rigid parts. No render-time RNG. */
+export function chaseFragmentAt(kind:ChaseStructureKind,index:number,age:number){
+    const born=index%3,t=Math.max(0,age-born),metal=kind==='sluice'||kind==='gantry';
+    const vx=-.9+(index*7%11)*.24,vy=-1.2-(index*3%5)*.29,g=.07;
+    const land=(-vy+Math.sqrt(vy*vy+4*g*31))/(2*g),after=Math.max(0,t-land);
+    const turn=(index*.73+t*(index%2?-.13:.1))*(1-ease(after/16));
+    return {visible:age>=born,metal,landed:t>=land,
+        x:vx*Math.min(t,land)+vx*6*ease(after/16),
+        y:t<land?vy*t+g*t*t:31-(after<10?Math.sin(after/10*Math.PI)*1.8:0),turn};
 }
 
 export interface ChaseTerrace {x:number;y:number;width:number}

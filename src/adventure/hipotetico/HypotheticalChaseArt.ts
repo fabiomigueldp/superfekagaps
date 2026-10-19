@@ -3,6 +3,7 @@ import {pixelText} from '../../graphics/BitmapFont';
 import type {HypotheticalModel,Shot} from './HypotheticalModel';
 import {CHASE_BREAKS,CHASE_CHECKPOINT,CHASE_DISTRICTS} from './HypotheticalLayout';
 import {chaseRuinAt,chaseDebrisAt,chaseMaterialAt,chaseTerraceFeet,chaseTerraceFall,chaseSplashAt,CHASE_DECK_Y,CHASE_WATER_Y,type ChaseMaterial,type ChaseTerrace} from './HypotheticalChaseDetails';
+import {drawChaseStructureEffects} from './HypotheticalChaseImpactArt';
 
 const materials = {
     stone: {dark:'#586e72',mid:'#8b9990',light:'#b8b499',grain:'#77877f'},
@@ -47,7 +48,7 @@ export function drawChaseLandmarks(c:CanvasRenderingContext2D,b:HypotheticalMode
         const at=b.chaseBreaks[i],age=at===-1?-1:b.tick-at,broken=age>=0;
         const pressure=Math.max(0,Math.min(1,(b.x+96-site.x)/40));
         const metal=site.kind==='gantry'||site.kind==='sluice',mat:ChaseMaterial=metal?'iron':'timber',p=materials[mat];
-        const height=site.kind==='crane'?78:site.kind==='sluice'?58:69,pose=chaseRuinAt(age,height);
+        const height=site.kind==='crane'?78:site.kind==='sluice'?58:69,pose=chaseRuinAt(age,height,site.kind);
         // Footings descend into the near bank; pale playable edges belong to the deck below.
         for(const dx of [-25,33]){
             // These separate quay piles remain visible when the foreground deck tears away.
@@ -58,7 +59,14 @@ export function drawChaseLandmarks(c:CanvasRenderingContext2D,b:HypotheticalMode
             box(c,x+dx-6,base-7,17,10,'#617b78');box(c,x+dx-5,base-7,15,2,'#a3ac95');
             box(c,x+dx-3,base-4,2,2,p.light);box(c,x+dx+6,base-4,2,2,p.light);
         }
-        c.save();c.beginPath();c.rect(x-45,base-height-9,170,height+10);c.clip();
+        if(site.kind==='sluice'){
+            // Feed pipe keeps its water-side footing when the gate shears away.
+            const end=broken&&age>=pose.score.release?38:30;
+            box(c,x+40,base-31,6,CHASE_WATER_Y-cy-base+31,p.dark);box(c,x+41,base-30,3,CHASE_WATER_Y-cy-base+30,p.mid);
+            box(c,x+end,base-31,46-end,6,p.dark);box(c,x+end+1,base-30,44-end,3,p.light);
+            box(c,x+39,base-4,9,4,p.light);box(c,x+38,base-29,3,5,p.mid);
+        }
+        c.save();c.beginPath();c.rect(x-64,base-height-9,260,height+10);c.clip();
         for(const [j,dx]of [-25,33].entries()){
             if(!broken)beam(c,x+dx+2,base-6,height-6,-Math.PI/2,mat);
             else{
@@ -68,21 +76,20 @@ export function drawChaseLandmarks(c:CanvasRenderingContext2D,b:HypotheticalMode
                 pixelLine(c,x+dx,base-24,x+dx+3,base-19,p.light);
             }
         }
-        const bx=x-26+(broken?pose.beamX:0),by=base-height+(broken?pose.beamDrop:0),turn=broken?pose.beamTurn:0;
+        const bx=x-26+(broken?pose.beamX+(reduced?0:pose.recoil):0),by=base-height+(broken?pose.beamDrop:0),turn=broken?pose.beamTurn:0;
         beam(c,bx,by,66,turn,mat,6);
-        if(!broken){
-            for(const dx of [-25,33]){
-                const dir=dx<0?1:-1;
-                beam(c,x+dx+2,base-height+29,30,-Math.PI/2+dir*.66,mat,3);
-            }
+        for(const [j,dx]of [-25,33].entries()){
+            const part=j?pose.rightBrace:pose.leftBrace;
+            beam(c,x+dx+2+(broken?part.x:0),base-height+29+(broken?part.drop:0),30,
+                broken?part.turn:-Math.PI/2+(j?-1:1)*.66,mat,3);
         }
         if(site.kind==='crane'){
-            const sway=reduced?0:Math.sin((broken?Math.min(b.tick,at+9):b.tick)/36+i)*1.8;
+            const sway=reduced?0:Math.sin((broken?Math.min(b.tick,at+pose.score.release):b.tick)/36+i)*1.8;
             const loadX=x+2+sway,loadY=base-48+(broken?pose.loadDrop:0);
             const pulleyX=bx+37*Math.cos(turn),pulleyY=by+37*Math.sin(turn);
             oval(c,pulleyX-4,pulleyY-4,9,9,p.dark);oval(c,pulleyX-2,pulleyY-2,5,5,p.light);
-            if(age<9){
-                pixelLine(c,x+11,base-height+3,loadX+11,loadY-5,p.dark);
+            if(age<pose.score.release){
+                pixelLine(c,pulleyX,pulleyY+3,loadX+11,loadY-5,p.dark);
                 pixelLine(c,loadX+11,loadY-5,loadX+3,loadY,'#a7ac91');
                 pixelLine(c,loadX+11,loadY-5,loadX+19,loadY,'#a7ac91');
             }else{
@@ -91,6 +98,11 @@ export function drawChaseLandmarks(c:CanvasRenderingContext2D,b:HypotheticalMode
                 pixelLine(c,ropeX+4+sway,ropeY+13,ropeX+1+sway,ropeY+18,p.light);
             }
             pallet(c,loadX,loadY);
+            if(broken&&age>pose.loadContact){
+                const t=Math.min(18,age-pose.loadContact),spread=Math.sin(t/36*Math.PI)*3;
+                pixelLine(c,loadX+3,loadY+4,loadX+10-spread,loadY+7,p.dark);
+                pixelLine(c,loadX+10+spread,loadY+7,loadX+20,loadY+4,p.light);
+            }
         }else if(site.kind==='sluice'){
             const drop=broken?pose.panelDrop:0,lean=broken?pose.panelTurn:0;
             const px=x-17+(broken?pose.beamX*.35:0),py=base-height+9+drop;
@@ -106,6 +118,15 @@ export function drawChaseLandmarks(c:CanvasRenderingContext2D,b:HypotheticalMode
                 pixelLine(c,...a(start[0],start[1]),...a(end[0],end[1]),p.dark,3);pixelLine(c,...a(start[0],start[1]-1),...a(end[0],end[1]-1),p.mid);
             }
         }
+        if(site.kind==='gantry'){
+            const part=pose.sign,loose=broken&&age>=pose.score.release;
+            const sx=x-6+(loose?part.x:0),sy=base-height+9+(loose?part.drop:0),angle=loose?part.turn:0;
+            const a=(u:number,v:number):Point=>[sx+u*Math.cos(angle)-v*Math.sin(angle),sy+u*Math.sin(angle)+v*Math.cos(angle)];
+            if(!loose)for(const u of [3,19])pixelLine(c,bx+(20+u)*Math.cos(turn),by+(20+u)*Math.sin(turn)+3,...a(u,0),p.light);
+            polygon(c,[a(0,0),a(22,0),a(22,10),a(0,10)],p.dark);
+            polygon(c,[a(2,1),a(20,1),a(20,8),a(2,8)],'#a8a58b');
+            pixelLine(c,...a(7,3),...a(12,5),p.dark,2);pixelLine(c,...a(12,5),...a(7,7),p.dark,2);
+        }
         if(!broken&&pressure>.2){
             pixelLine(c,x-25,base-25,x-22,base-20,p.light);pixelLine(c,x+35,base-28,x+33,base-22,p.light);
             if(!reduced&&pressure>.65){const t=(b.tick+i)%12;box(c,x-22+t*.4,base-19+t*.6,1,2,p.light);}
@@ -117,6 +138,7 @@ export function drawChaseLandmarks(c:CanvasRenderingContext2D,b:HypotheticalMode
             if(age>27)beam(c,x-9,base-4,25,-.12,mat,3);
         }
         c.restore();
+        drawChaseStructureEffects(c,x,base,age,site.kind,reduced);
         if(broken&&pose.dust>0&&!reduced){
             for(let j=0;j<5;j++){
                 const dx=(j-2)*Math.min(32,age)*.6,dy=-pose.dust*(3+j%3*2);
