@@ -22,7 +22,7 @@ export interface Bystander {
     originX:number; reactionTimes:number[];
     appearance?:number; depth?:number; exitAtShelter?:boolean; runTicks?:number;
     belonging?:'parcel'|'papers';
-    opening?:boolean;capturedAt?:number;captureX?:number;
+    opening?:boolean;capturedAt?:number;captureX?:number;foraged?:boolean;
 }
 export interface DistantShot { x: number; y: number; px: number; py: number; vx: number; vy: number; life: number; age:number }
 export interface DistantImpact extends GunImpact {}
@@ -38,7 +38,7 @@ export class HypotheticalBackdrop {
     blood:BloodContact[]=[];
     footfalls:Array<{x:number;born:number}>=[];
     readonly people: Bystander[];
-    readonly aftermath = new HypotheticalAftermath();
+    readonly aftermath: HypotheticalAftermath;
     readonly helicopter = new HypotheticalHelicopter();
     get displayX(){return this.aftermath.active?this.aftermath.x:this.x;}
     constructor(readonly wide = false) {
@@ -94,6 +94,7 @@ export class HypotheticalBackdrop {
                 clothes:i%2?'workcoat':'star-shirt',stoppedAt:null,threatenedAt:null,startledAt:null,
                 reactionTimes:[],appearance:10+i,exitAtShelter:i>=2,runTicks:86+i*12});
         }
+        this.aftermath = new HypotheticalAftermath(this.people);
     }
     private target = -1;
     get aimedPerson(){return this.people[this.target]??null;}

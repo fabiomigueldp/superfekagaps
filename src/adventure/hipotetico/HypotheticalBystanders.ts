@@ -88,19 +88,48 @@ export function drawHead(c:CanvasRenderingContext2D,p:Bystander,x:number,y:numbe
 
 export interface CarriedBystander {
     person:Bystander;angle:number;kick:number;
-    stage?:'whole'|'maimed-arm'|'upper-half'|'head-bite';
-    wound?:number;thrash?:number;
+    stage?:'whole'|'maimed-arm'|'upper-half'|'head-bite'|'legs-only'|'shins-only';
+    wound?:number;thrash?:number;offsetX?:number;offsetY?:number;
 }
-/** The same whole actor and wardrobe, articulated around a chest grip. Used
- * inside the dinosaur rig, so its foreground teeth occlude the contact. */
+/** The same whole actor and wardrobe, articulated around a chest or waist grip.
+ * Used inside the dinosaur rig, so its foreground teeth occlude the contact. */
 export function drawCarriedBystander(output:CanvasRenderingContext2D,actor:CarriedBystander,x:number,y:number,scale=1){
     const p=actor.person,angle=actor.angle,co=Math.cos(angle),si=Math.sin(angle),kick=actor.kick;
     const stage=actor.stage??'whole',wound=actor.wound??0,thrash=actor.thrash??kick;
+    const ox=(actor.offsetX??0)*scale,oy=(actor.offsetY??0)*scale;
     const c={get fillStyle(){return output.fillStyle;},set fillStyle(v){output.fillStyle=v;},
-        fillRect(xx:number,yy:number,w:number,h:number){output.fillRect(Math.round(x+xx*scale),Math.round(y+yy*scale),
+        fillRect(xx:number,yy:number,w:number,h:number){output.fillRect(Math.round(x+ox+xx*scale),Math.round(y+oy+yy*scale),
             Math.max(1,Math.round(w*scale)),Math.max(1,Math.round(h*scale)));}} as CanvasRenderingContext2D;
     const point=(u:number,v:number):[number,number]=>[u*co-v*si,u*si+v*co];
-    const skin=SKIN[p.color],cloth=WARDROBE[p.clothes],hip=point(0,stage==='head-bite'?1:stage==='upper-half'?2:4);
+    const skin=SKIN[p.color],cloth=WARDROBE[p.clothes];
+    if(stage==='legs-only'||stage==='shins-only'){
+        // Head and torso are deep inside the dinosaur's gullet; only the lower waist/knees
+        // and kicking legs/boots protrude outward past the bloody front teeth.
+        if(stage==='legs-only'){
+            const waist=point(0,1);
+            drawClothes(c,p,waist[0],waist[1],4,angle);
+            pixelLine(c,...point(-3.5,0),...point(3.5,0),'#6b1117',3);
+            pixelLine(c,...point(-2.5,1),...point(2.5,1),'#b8252e',2);
+            for(const d of [-1,1]){
+                const hip=point(d*2,2),knee=point(d*3.8+kick*d*3,9.5),foot=point(d*4.8-kick*d*4,16.5-Math.max(0,kick*d)*3.5);
+                pixelLine(c,...hip,...knee,'#485f62',3);
+                pixelLine(c,...knee,...foot,'#667c79',3);
+                pixelLine(c,...foot,...point(d*4.8-kick*d*4+3.5,16.5-Math.max(0,kick*d)*3.5),'#89978a',2);
+                pixelLine(c,...point(d*2.2,4),...point(d*2.8,7),'#9e2028',2);
+            }
+        }else{
+            pixelLine(c,...point(-3,0),...point(3,0),'#5a1016',3);
+            pixelLine(c,...point(-2,1),...point(2,1),'#9e2028',2);
+            for(const d of [-1,1]){
+                const knee=point(d*2.2+kick*d*2,1.5),ankle=point(d*3.6-kick*d*3,8.5),toe=point(d*3.6-kick*d*3+3.5,9);
+                pixelLine(c,...knee,...ankle,'#667c79',3);
+                pixelLine(c,...point(d*2,2),...point(d*2.6,5),'#9e2028',2);
+                pixelLine(c,...ankle,...toe,'#89978a',2);
+            }
+        }
+        return;
+    }
+    const hip=point(0,stage==='head-bite'?1:stage==='upper-half'?2:4);
     if(stage==='whole'||stage==='maimed-arm'){
         for(const d of [-1,1]){
             const knee=point(d*3+kick*d*2.4,10),foot=point(d*4-kick*d*3.4,16-Math.max(0,kick*d)*3.5);
@@ -187,7 +216,7 @@ export function drawBystanders(output:CanvasRenderingContext2D,b:HypotheticalBac
         const base=street+(p.depth??0);
         const site=p.district===0?(p.originX>320?1:0):p.district+1;
         belongings(output,p,tick,p.opening?street:base,b.breaches[site],reduced);
-        if(p.escaped||p.capturedAt!==undefined&&tick>=OPENING.clamp)continue;
+        if(p.escaped||p.foraged||p.capturedAt!==undefined&&tick>=OPENING.clamp)continue;
         const c=actorContext(output,p);
         const x=p.x,pose=bystanderPose(p,tick),age=pose.age,skin=SKIN[p.color];
         const cloth=WARDROBE[p.clothes],ink='#485f62',shoe='#89978a';

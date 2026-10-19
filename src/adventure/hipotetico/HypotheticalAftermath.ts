@@ -58,23 +58,26 @@ export class HypotheticalAftermath {
     exhales:Array<{x:number;y:number;facing:number;born:number}>=[];
     readonly tower=new HypotheticalTower();
     casings:Array<{x:number;y:number;born:number;direction:number}>=[];
-    readonly yards:AftermathYard[] = AFTERMATH_YARDS.map((yard, district) => {
-        const escape=new AftermathEscape(yard.origin,district);
-        return {
-            damage:0, shiftedAt:-1, brokenAt:-1, birdsAt:-1, runnerAt:-1,birdsFlights:0,birdsReturn:1250+district*73,roarAt:-1,
-            environment:new AftermathEnvironment(district),
-            flock:new AftermathFlock(yard.origin,district),
-            escape,forage:new AftermathForage(escape,district),
-            props:AFTERMATH_PROPS.map(p=>createAftermathProp(p.material)),
-            people:[0,1].map(i => ({
-                x:yard.origin+290-i*6, originX:yard.origin+290-i*6, shelter:yard.origin+(district===3?342:354),
-                escaped:false, fleeing:true, hitAt:null, color:(district+i)%4,
-                distance:0, velocity:0, alertAt:Number.MAX_SAFE_INTEGER, speed:1, district,
-                clothes:i===0?'satchel':'workcoat', stoppedAt:null, threatenedAt:null, startledAt:null,
-                reactionTimes:[], appearance:11+district+i, depth:-3-i*2, exitAtShelter:true, runTicks:60+i*8,
-            })),
-        };
-    });
+    readonly yards:AftermathYard[];
+    constructor(streetPeople:readonly Bystander[]=[]){
+        this.yards = AFTERMATH_YARDS.map((yard, district) => {
+            const escape=new AftermathEscape(yard.origin,district,streetPeople);
+            return {
+                damage:0, shiftedAt:-1, brokenAt:-1, birdsAt:-1, runnerAt:-1,birdsFlights:0,birdsReturn:1250+district*73,roarAt:-1,
+                environment:new AftermathEnvironment(district),
+                flock:new AftermathFlock(yard.origin,district),
+                escape,forage:new AftermathForage(escape,district),
+                props:AFTERMATH_PROPS.map(p=>createAftermathProp(p.material)),
+                people:[0,1].map(i => ({
+                    x:yard.origin+290-i*6, originX:yard.origin+290-i*6, shelter:yard.origin+(district===3?342:354),
+                    escaped:false, fleeing:true, hitAt:null, color:(district+i)%4,
+                    distance:0, velocity:0, alertAt:Number.MAX_SAFE_INTEGER, speed:1, district,
+                    clothes:i===0?'satchel':'workcoat', stoppedAt:null, threatenedAt:null, startledAt:null,
+                    reactionTimes:[], appearance:11+district+i, depth:-3-i*2, exitAtShelter:true, runTicks:60+i*8,
+                })),
+            };
+        });
+    }
     private fromX = 0;
     private fromFacing = 1;
     private lastStep = 0;
@@ -492,23 +495,26 @@ export class HypotheticalAftermath {
             if((e.timing.shots as readonly number[]).includes(e.age))this.fireAtEscape();
             if(e.done)this.enter('recover');
         }else if(this.phase==='forage'){
-            const s=this.yard.forage;s.update(this.tick);
+            const s=this.yard.forage;
             this.x=this.fromX+s.rootShift;
-            if([22,s.variant===0?44:82,254+s.offset].includes(s.age)){
-                const mouth=this.jawAnchor;
+            const mouth=this.jawAnchor;
+            s.update(this.tick,mouth.x,mouth.y);
+            if(this.inView(mouth.x,24))this.events.push(...s.events);
+            const exhaleBeats=s.explicit?[20,s.variant===2?284:s.variant===3?264:272]:[22,s.variant===0?44:82,254+s.offset];
+            if(exhaleBeats.includes(s.age)){
                 if(this.inView(mouth.x,12)){
                     this.exhales.push({...mouth,facing:this.facing,born:this.tick});
-                    if(s.age===22)this.events.push('distant-snort');
+                    if(s.age<=22||s.explicit)this.events.push('distant-snort');
                 }
             }
             if(s.age===s.contactAt){
-                const mouth=this.jawAnchor;s.contact(this.tick,mouth.x);
+                s.contact(this.tick,mouth.x);
                 if(this.inView(mouth.x,16)){
-                    this.events.push('distant-debris');
-                    this.yard.environment.disturb(mouth.x-this.origin,this.tick,.22);
+                    if(!s.explicit)this.events.push('distant-debris');
+                    this.yard.environment.disturb(mouth.x-this.origin,this.tick,s.explicit?.48:.22);
                 }
             }
-            if(this.tick===s.landingTick&&this.inView(s.contactX,12))this.events.push('distant-grit');
+            if(!s.explicit&&this.tick===s.landingTick&&this.inView(s.contactX,12))this.events.push('distant-grit');
             if(s.variant===1&&s.age===56){
                 this.yard.environment.disturb(AFTERMATH_PROPS[2].offset+17,this.tick,.42);
                 if(this.inView(this.origin+AFTERMATH_PROPS[2].offset,12))this.events.push('distant-chain');
@@ -603,6 +609,7 @@ export class HypotheticalAftermath {
             ?this.targetProp:-1;
         for(const [district,yard] of this.yards.entries()){
             yard.escape.update(this.tick);
+            if(district!==this.district||this.phase!=='forage')yard.forage.stepGore(this.tick);
             if(district===scenicDistrict(storyTick)&&this.phase==='pursuit'&&this.inView(yard.escape.entry?.from??-1000,0))
                 this.events.push(...yard.escape.events);
             yard.flock.update(this.tick,regular&&district===this.district&&!closeToImpact,this.viewX);
@@ -663,6 +670,9 @@ export class HypotheticalAftermath {
         if(!this.active){
             const startX=district===3?Math.min(yard.origin+216,storyX):storyX;
             if(storyTick-SCENIC_STARTS[district]<yard.start || !visible(startX,-24)&&!(district===3&&visible(BASTION_TOWER.x,-64)))return;
+            for(const e of this.yard.escape.entries)if(e.kind==='fallen'&&e.person.hitAt===null){
+                e.person.hitAt=-400;e.person.stoppedAt=-400;e.person.fleeing=false;
+            }
             this.active=true; this.x=startX; this.velocity=0; this.facing=1; this.travel=0; this.lastStep=0;
             this.enter('approach');
             if(district===3){this.plan();return;}

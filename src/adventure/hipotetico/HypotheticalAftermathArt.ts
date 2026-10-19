@@ -11,7 +11,7 @@ import {drawAftermathFittings,drawAftermathIncidents} from './HypotheticalAfterm
 import {drawAftermathContact} from './HypotheticalAftermathParticles';
 import {drawAftermathFlock} from './HypotheticalAftermathFlockArt';
 import {drawEscapeFixtures,drawEscapeActors,drawEscapeDust} from './HypotheticalAftermathEscapeArt';
-import {drawForageCover} from './HypotheticalAftermathForageArt';
+import {drawForageCover,drawForageRemains} from './HypotheticalAftermathForageArt';
 
 // Rear-street colours stay below the contrast of guards, bullets and playable ledges.
 const P={ink:'#516d70',dark:'#657c73',stone:'#92a18c',edge:'#c1b99a',wood:'#9e9475',grain:'#7d826d',
@@ -228,6 +228,7 @@ export function drawAftermathYards(c:CanvasRenderingContext2D,b:HypotheticalBack
         else if(yard.kind==='vent')vent(c,px,py,s,a.tick,reduced);
         else masonry(c,px,py,s,a.tick,reduced);
         drawEscapeActors(c,b,s.escape,base,reduced);
+        drawForageRemains(c,s.forage,base,a.tick);
         drawAftermathFlock(c,s.flock,base,a.tick,reduced);
     }
 }

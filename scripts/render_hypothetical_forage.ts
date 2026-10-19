@@ -46,11 +46,21 @@ try{
             const frame=s.frames++;
             for(const event of a.events)cues.push({yard:s.name,frame,event});
             drawHypotheticalBackground(c,s.model,a.cameraFor(s.player.x),64,false);
+            const titles=['FAREJAR E RECOLHER','RUIDO E RETOMADA','DEVORAR PARTE A PARTE','LEVANTAR E ENGOLIR INTEIRO','PRENSAR E ARRANCAR COLUNA'];
             fc.fillStyle='#102630';fc.fillRect(0,0,640,408);fc.drawImage(screen,0,48,640,360);
-            pixelText(fc,s.name.toUpperCase()+' / '+(f.variant===0?'FAREJAR E RECOLHER':'RUIDO E RETOMADA'),16,12,'#dfba7d',2);
+            pixelText(fc,s.name.toUpperCase()+' / '+(titles[f.variant]??'DEVORAR'),16,12,'#dfba7d',2);
             pixelText(fc,(frame/60).toFixed(1)+' S / COMPOSICAO NATIVA',16,34,'#aebfb3');
             writeFileSync(join(out,'frames',s.name,String(frame).padStart(5,'0')+'.png'),film.toBuffer('image/png'));
-            const shots=[{at:28,label:'ATENCAO'},{at:84+f.offset,label:'TRANSFERENCIA'},
+            const shots=f.variant===2?[
+                {at:56,label:'ABOCANHAR'},{at:90,label:'SACUDIR'},{at:116,label:'ARRANCAR-BRACO'},
+                {at:180,label:'PARTIR-TRONCO'},{at:240,label:'ESMAGAR-TORAX'},{at:272,label:'CUSPIR-CRANIO'},
+            ]:f.variant===3?[
+                {at:54,label:'ABOCANHAR'},{at:94,label:'ERGUER-CORPO'},{at:142,label:'ARREMESSAR'},
+                {at:164,label:'PERNAS-NA-BOCA'},{at:210,label:'ENGOLIR'},{at:236,label:' decepar-BOTA'},
+            ]:f.variant===4?[
+                {at:52,label:'PRENSAR'},{at:88,label:'ARRANCAR-BRACO-1'},{at:116,label:'ARRANCAR-BRACO-2'},
+                {at:154,label:'ARRANCAR-COLUNA'},{at:218,label:'TRITURAR'},{at:254,label:'CUSPIR-CABECA'},
+            ]:[{at:28,label:'ATENCAO'},{at:84+f.offset,label:'TRANSFERENCIA'},
                 {at:104+f.offset,label:'CONTATO'},{at:140+f.offset,label:'OCLUSAO'},
                 {at:193+f.offset,label:'DISSIPACAO'},{at:260+f.offset,label:'RECUPERACAO'}];
             const shot=shots.find(q=>q.at===frame);
@@ -61,7 +71,7 @@ try{
                 dc.drawImage(screen,116,44,160,80,x,i*184+24,320,160);
                 pixelText(dc,s.name.toUpperCase()+' / '+shot.label,x+7,i*184+8,'#dfba7d');
                 captures.push({file,yard:s.name,frame,age:f.age,phase:a.phase});
-                if(shot.label==='OCLUSAO'){
+                if(shot.label==='OCLUSAO'||shot.label==='PARTIR-TRONCO'||shot.label==='PERNAS-NA-BOCA'||shot.label==='ARRANCAR-COLUNA'){
                     drawHypotheticalBackground(c,s.model,a.cameraFor(s.player.x),64,true);
                     writeFileSync(join(out,s.name+'-reduced.png'),screen.toBuffer('image/png'));
                 }

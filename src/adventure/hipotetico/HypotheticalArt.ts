@@ -26,7 +26,7 @@ const P = { ink: '#172c36', deep: '#263f3d', shade: '#556047', hide: '#92845a', 
     suit: '#304659', lapel: '#607487', skin: '#c58d68', face: '#edbc8e', hair: '#3c3034',
     brass: '#d3a75c', mint: '#99e0cf', hot: '#ffb267', scute:'#6e7953', skinLight:'#f7d2a6',
     mouth:'#593b40', tongue:'#bc796a', leather:'#583f38', stitch:'#b8885d', clothShade:'#203644' };
-export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; headPitch?:number; riderDrop?:number; riderLean?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number; lookBack?:number; gore?:number; heldDebris?:HeldDebris; launcher?:LauncherPose; carriedBystander?:CarriedBystander; feet?:PlantedFeet }
+export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; headPitch?:number; riderDrop?:number; riderLean?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number; lookBack?:number; gore?:number; swallow?:number; heldDebris?:HeldDebris; launcher?:LauncherPose; carriedBystander?:CarriedBystander; feet?:PlantedFeet }
 const fogPalette=new Map<string,string>();
 function distantColor(color:string){
     if(!fogPalette.has(color)){
@@ -197,6 +197,13 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     poly([[1,body+5],[19,body-10],[29,neck-7],[45,neck-7],[47,neck+17],[25,body+19],[12,body+23]],P.ink);
     poly([[5,body+5],[22,body-10],[30,neck-4],[41,neck-3],[42,neck+14],[23,body+16],[12,body+19]],P.hide);
     poly([[22,body+10],[33,neck+7],[40,neck+9],[38,neck+18],[23,body+18],[12,body+19]],P.cream);
+    if((pose.swallow??0)>.02){
+        const u=pose.swallow!,swell=Math.sin(Math.PI*u)*5.5;
+        const bx=39-19*u,by=neck+17+(body+18-(neck+17))*u;
+        poly([[bx-6,by-2],[bx+6,by-3],[bx+4,by+swell+2],[bx-4,by+swell+1]],P.ink);
+        poly([[bx-5,by-2],[bx+5,by-2],[bx+3,by+swell],[bx-3,by+swell]],P.cream);
+        line(bx-3,by+swell-1,bx+2,by+swell-1,P.light);
+    }
     // Broad dorsal scutes and small flank clusters follow the rib cage.
     // Their coordinates belong to the body, so the texture cannot crawl while walking.
     for(const [xx,yy,w,h] of [[-23,-7,8,5],[-12,-10,9,5],[1,-10,8,5],[14,-7,7,5],[-19,1,6,4],[-8,-1,6,4],[4,0,6,4],[16,2,5,4],[-18,9,4,3],[-6,7,5,3],[7,8,4,3]]){
@@ -224,9 +231,10 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     poly([[29,neck+10],[37,neck+12+jaw],[60,neck+14+jaw],[59,neck+16+jaw],[37,neck+14+jaw]],P.hide);
     line(37,neck+14+jaw,57,neck+15+jaw,P.cream);
     line(32,neck+7,63,neck+6,P.rust);
-    if(pose.heldDebris)drawDebrisPiece(c,x+d*DEBRIS_GRIP_X,y+neck+10+pose.jaw*6,pose.heldDebris,1/AFTERMATH_SCALE);
+    const mouth=headPoint([DEBRIS_GRIP_X,neck+10+pose.jaw*6]);
+    if(pose.heldDebris)drawDebrisPiece(c,x+d*mouth[0],y+mouth[1],pose.heldDebris,1/AFTERMATH_SCALE);
     if(pose.carriedBystander)drawCarriedBystander(c,pose.carriedBystander,
-        x+d*DEBRIS_GRIP_X,y+neck+10+pose.jaw*6,1/AFTERMATH_SCALE);
+        x+d*mouth[0],y+mouth[1],1/AFTERMATH_SCALE);
     for(const [tx,length] of [[36,3],[41,5],[47,4],[53,5],[59,3]]){
         poly([[tx,neck+6],[tx+3,neck+6],[tx+1,neck+6+length]],P.ivory);
         if((pose.gore??0)>.2)poly([[tx,neck+6+length-2],[tx+2,neck+6+length-2],[tx+1,neck+6+length]],'#9e3237');
@@ -390,13 +398,15 @@ export function dinosaurPose(b: HypotheticalModel, cx: number, cy: number, reduc
 export function distantRiderPose(action:HypotheticalBackdrop,reduced=false):DinosaurPose {
     const m=action.motion,r=BACKDROP_RIG;
     if(action.aftermath.active){
-        const pose=action.aftermath.pose(reduced),s=action.aftermath.tower.search;
+        const pose=action.aftermath.pose(reduced),s=action.aftermath.tower.search,f=action.aftermath.yard?.forage;
+        const carried=s.carried??(action.aftermath.phase==='forage'?f?.carried:undefined);
+        const gore=Math.max(s.age>=242?(s.active?1:.85):0,f?.goreLevel??0);
         return {
             x:r.x,y:r.y+pose.lift/r.scale,...pose,
             daze:0,armor:9,flash:false,defeated:false,distant:true,heldDebris:action.aftermath.heldDebris,
             launcher:action.aftermath.district===3?action.aftermath.launcherPose:
                 {draw:0,rifleLower:0,reach:0,aim:-.12,recoil:0,fired:action.helicopter.launchAt>=0},
-            carriedBystander:s.carried,gore:s.age>=242?(s.active?1:.85):0,
+            carriedBystander:carried,gore,
         };
     }
     const pose:DinosaurPose={x:r.x,y:r.y+m.lift/r.scale,facing:1,gait:action.travel/(r.scale*11),stride:action.stride,

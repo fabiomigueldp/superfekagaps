@@ -1,4 +1,4 @@
-import {box,pixelLine,polygon,type Point} from '../WorldPainting';
+import {box,oval,pixelLine,polygon,type Point} from '../WorldPainting';
 import type {HypotheticalBackdrop} from './HypotheticalBackdrop';
 import {drawBystanders} from './HypotheticalBystanders';
 import {ESCAPE_TIMINGS,type AftermathEscape,type EscapeEntry} from './HypotheticalAftermathEscape';
@@ -38,7 +38,22 @@ export function drawEscapeFixtures(c:CanvasRenderingContext2D,s:AftermathEscape,
 }
 
 export function drawEscapeActors(c:CanvasRenderingContext2D,b:HypotheticalBackdrop,s:AftermathEscape,base:number,reduced:boolean){
-    for(const e of s.entries){
+    for(const [index,e] of s.entries.entries()){
+        if(e.person.hitAt!==null){
+            const inStreet=b.people.includes(e.person);
+            const hitAge=e.kind==='fallen'&&!inStreet?60:Math.max(0,(inStreet?b.tick:s.tick)-e.person.hitAt);
+            const grow=smoothMotion((hitAge-12)/24);
+            if(grow>.05){
+                const bx=e.person.x+4,by=base+(e.person.depth??-4);
+                oval(c,bx-6*grow,by-1.5,14*grow,3,'#4a0f14');
+                oval(c,bx-4*grow,by-1,9.5*grow,2,'#7a1820');
+                oval(c,bx-2*grow,by-1,5*grow,1.2,'#b8252e');
+            }
+        }
+        if(e.kind==='fallen'){
+            if(e.removedAt<0&&!b.people.includes(e.person))drawBystanders(c,b,base,reduced,false,[e.person],Math.max(60,s.tick));
+            continue;
+        }
         const age=s.tick-e.begunAt,t=ESCAPE_TIMINGS[e.kind];
         if(e.begunAt>=0&&age>=t.peek&&!e.person.escaped&&e.removedAt<0){
             const reveal=smoothMotion((age-t.peek)/20);
@@ -49,8 +64,8 @@ export function drawEscapeActors(c:CanvasRenderingContext2D,b:HypotheticalBackdr
             drawBystanders(c,b,base,reduced,false,[e.person],s.tick);c.restore();
         }
         if(e.kind==='hatch')panel(c,e,s,base,reduced);
-        else{
-            const shifted=s.opening(e)*3;
+        else if(index===0){
+            const shifted=Math.max(s.opening(e),s.opening(s.entries[4]))*3;
             polygon(c,[[e.from-12,base-7],[e.from-7,base-12],[e.from-2-shifted,base-9],[e.from+8+shifted,base-8],[e.from+13,base-2],[e.from-14,base-2]],P.shade);
             pixelLine(c,e.from-10,base-7,e.from-4-shifted,base-9,P.edge);
             pixelLine(c,e.from+5+shifted,base-7,e.from+11,base-3,P.stone,2);
