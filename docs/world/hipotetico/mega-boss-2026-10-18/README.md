@@ -2,15 +2,79 @@
 
 Encontro bônus de fantasia satírica, acessível pelo botão **MEGA BOSS** no título de Super Feka Gaps World ou por `/?encounter=hipotetico`. A caricatura é ficcional; as cenas não representam acontecimentos reais.
 
+## Revisão 19 · Disparos, pressão e impacto
+
+A arma agora separa ignição, recuo, traçante, estojo, gases e contato com a superfície. O mesmo desenho atende ao duelo e à rua distante, com escala e contraste diferentes.
+
+- **Pressão:** velocidade dos tiros do duelo passa de 3,95 / 4,2 / 4,45 para 5,2 / 5,8 / 6,4 pixels por tick (até 44% de aumento). Na perseguição, passa de 4,5 para 5,6. Dentro de cada trio, os intervalos passam de 8 / 7 / 6 para 6 / 5 / 4 ticks. Os trios ficam mais concentrados, com respiros de 24 / 22 / 18 ticks. A quantidade de tiros continua em 6 / 12 / 18 por ataque completo; os finais das sequências e as janelas de contra-ataque permanecem nos mesmos instantes.
+- **Leitura:** 24 ticks de mira comprometida antes do tiro. Testes com o movimento real de Feka conferem que esperar na linha custa o capacete e que correr para a coluna depois do travamento evita o dano. A regressão completa continua chegando à vitória, com três mortes, sem editar personagem, câmera, relógio ou equipamento.
+- **Arma:** recuo de 4,8 pixels na articulação compartilhada por sprite e origem do tiro; ferrolho móvel, apoio da coronha e mira frontal. Dois quadros de ignição forte, um de chama menor e dissipação de gases. O rastro só ocupa o caminho já percorrido, sem nascer atrás do cano. Estojos saem do receptor, descrevem uma parábola, quicam e repousam no chão.
+- **Contato:** a última fração do percurso termina na face atingida. Marcas, faíscas, lascas e poeira seguem a normal da superfície. O fundo usa o ponto real de interseção com personagem ou rua e distingue tecido de alvenaria. Os tiros do fundo continuam separados da colisão de Feka.
+- **Som e acessibilidade:** ataque seco seguido de corpo grave e cauda curta, com a rua distante abafada. O sintetizador usa o barramento de efeitos do jogo e conserva seus limites de vozes e cancelamento em pausa. Movimento reduzido simplifica o clarão, os rastros e as partículas, mantendo projéteis e sinais necessários ao combate.
+
+157 testes passaram (114 do encontro + 43 compartilhados), build e checagens TypeScript aprovados. Sete capturas específicas vêm de `scripts/prove_hypothetical_gunfire.ts`, incluindo movimento reduzido; `gunfire-verification.json` registra os quadros. `gunfire-play.mp4` reúne três trechos da partida completa, em velocidade normal e com o áudio do sintetizador de produção. A inspeção de figurinos da revisão 18 permanece disponível abaixo.
+
+## Revisão 18 · Transições, textura em movimento e apoio no chão
+
+A inspeção revelou parada brusca no abrigo, troca instantânea dos braços e falhas de preenchimento ao girar os pixels da roupa. Também havia risco de mãos e acessórios atravessarem o plano da rua durante a queda.
+
+- **Antecipação e freio:** os pares percebem a ameaça mais cedo. Há seis ticks de preparação antes de partir; os 22 pixels até o abrigo são percorridos com aceleração e desaceleração contínuas em 68 ticks. Inclinação, amplitude da passada e balanço acompanham a velocidade real. As duas fugas conservam suas velocidades individuais.
+- **Reações encadeadas:** tiros produzem pequenos atrasos individuais de dois a quatro ticks, com oito ticks para levantar a reação. Até três pulsos recentes podem se sobrepor sem apagar a resposta anterior. Braços, olhar e lenço têm transições próprias. Pausa e retomada continuam usando o mesmo relógio do cenário.
+- **Textura sem falhas no giro:** a amostragem inversa mantém os pixels vizinhos preenchidos durante a rotação. Os pequenos materiais são preparados uma vez e reutilizados. Costuras, gola, bolso, fecho da bolsa e detalhes de cabelo e barba aparecem também nos quadros de queda.
+- **Apoio:** corpo e acessórios respeitam o piso durante o giro, e as mãos se acomodam ao alcançá-lo. A sombra acompanha a extensão da silhueta. O chapéu deixa de afundar sua aba na rua.
+
+Quatro regressões novas cobrem continuidade da corrida e dos braços, reação atrasada sem reinício brusco, preenchimento da roupa ao girar e os pixels realmente desenhados junto ao chão, para todos os figurinos e 56 instantes de queda. São nove testes específicos de NPCs e 149 na verificação selecionada do encontro e dos mecanismos compartilhados.
+
+`scripts/prove_hypothetical_civilian_motion.ts` usa as trajetórias do modelo de produção para montar uma inspeção de cinco segundos e 32 quadros intermediários. Os quatro NPCs são separados e ampliados 2× apenas para essa prancha; ela não representa uma câmera jogável. A partida normal, os três postos, as capturas de cenário e a apresentação móvel são verificados separadamente.
+
+## Revisão 17 · NPCs, figurinos e reação aos disparos
+
+Os oito personagens da rua agora usam silhuetas de aproximadamente 22 pixels de altura, em vez de 17. Quatro figurinos distinguem casacos de trabalho, camisa vermelha com estrela branca, lenço e bolsa. A camisa representa os simpatizantes petistas pedidos para esta fantasia satírica; o comportamento faz parte da caracterização do vilão ficcional.
+
+- **Material e identidade:** camisa com sombra lateral, gola e dobra; estrela branca construída em cinco linhas de pixels; bolsos, alças, costuras, botas, chapéus, cabelo e tons de pele variados. A roupa permanece reconhecível durante o recuo e a queda.
+- **Atuação:** passada por distância real, pernas articuladas, braços em oposição, olhar para trás e mão protegendo a cabeça. Chegar ao abrigo inicia um agachamento de nove ticks. A postura no instante do acerto determina o começo da queda, impedindo que um NPC abaixado cresça de repente. Chapéus e bolsas conservam sua posição depois da ação.
+- **Encenação dos ataques:** a aquisição ocorre nos ticks locais 90 e 146. O cavaleiro prefere a camisa com estrela dentro do grupo atual, mesmo quando há outro figurino mais próximo, e mantém o destino escolhido. A primeira bala só sai vinte ticks depois; as duas rajadas continuam tendo três tiros cada. São dezoito disparos ao longo dos três trechos.
+- **Contato coerente:** a interseção de segmento usa os limites da postura atual. Um tiro pode passar acima de alguém agachado; a caixa envolvente da trajetória não cria falsos contatos em seus cantos. Nenhum disparo do fundo entra na colisão de Feka.
+- **Posicionamento:** os três pares foram deslocados 24 pixels para a esquerda, melhorando a leitura entre pilares e bordas de tela. Há quatro camisas com estrela ao todo: três nesses grupos e uma entre os dois personagens que escapam. As seis quedas e duas fugas continuam individuais, ligadas às ações visíveis.
+- **Retomada e acessibilidade:** os postos concluídos recompõem roupas, reações e consequências sem repetir o áudio. Pausa conserva a atuação; movimento reduzido retira detalhes de poeira e lenço sem apagar as poses e a estrela.
+
+Os cinco testes de `hypothetical-bystanders.test.ts` conferem prioridade local, vinte ticks de preparação, destino fixo, geometria do contato, passada, transição da queda, limites dos efeitos e reconstrução das pessoas na retomada. As capturas `scene-npc-aim`, `scene-npc-cover`, `scene-npc-reaction` e `scene-npc-escape` são da execução por teclado, sem ajustes de atores, câmera ou relógio. `civilians-verification.json` registra as escolhas e contatos. A prancha de vinte poses é explicitamente uma inspeção de arte.
+
+## Revisão 16 · Destruição, atuação e leitura dos fundos
+
+Dois problemas orientaram esta revisão: a fachada virava ruína sem uma ação convincente causando o dano, e saltos altos de Feka empurravam o dinossauro para fora do enquadramento. A nova atuação conserva o cerco no mesmo motor, com uma camada de fundo que permanece visível e responde aos contatos.
+
+- **Três ações com consequência:** investida contra a fachada da portaria, mordida e tração no cais, pisada no arsenal. O relógio compartilhado de `HypotheticalDevastation.ts` controla preparação, avanço, contato, retenção e recuperação. Os contatos acontecem nos ticks de cenário 180, 580 e 980. Não se cria um segundo impacto ao retomar uma área concluída.
+- **Movimento articulado:** pés acompanham distância percorrida; mandíbula fecha por vários quadros, o pescoço puxa e o cavaleiro absorve a aceleração. A pisada recolhe as pernas e comprime o corpo ao aterrissar. A arma usa a mesma posição de ombro e inclinação para desenhar o cano e lançar o projétil.
+- **Desabamento com materiais:** a fachada se divide em quatro partes que conservam sua textura. Telhas, alvenaria e ferragens se desprendem, expondo tijolos, vigas e serviços rompidos. O cais deixa a carga no chão e a corda pendurada; o arsenal fica com vazamento de vapor. Ruínas permanecem após a poeira e nos postos concluídos.
+- **Camadas e enquadramento:** a rua traseira agora acompanha 22% do deslocamento vertical da câmera. O dinossauro continua dentro da tela nos saltos altos, com contraste maior e silhueta legível. Poeira baixa, pequenos pássaros, oscilações da carga e sombras dos pés dão consequência aos impactos. O canal ganhou reflexos interrompidos, barcos e marcas de umidade nos pilares; chaminés variam a silhueta distante.
+- **Estilhaço e perigo:** durante a marca de um segundo no chão, um fragmento sai de uma estrutura já rompida. Seu arco termina no centro da pedra que a física cria em x=marca−4/y=90. O trecho de cenário não cria dano extra; o projétil real conserva seu aviso e sua colisão.
+- **NPCs:** alertas por grupo, velocidades individuais e passada guiada pela distância real. Roupas, chapéus, faixa e bolsa distinguem quatro aparências. Fuga, olhar para trás, abrigo, recuo e queda são poses diferentes; chapéus se desprendem e ficam na rua. Permanecem seis quedas causadas por projéteis visíveis e dois sobreviventes, que agora começam a fugir perto da chegada da ameaça ao seu trecho.
+- **Som e acessibilidade:** o desabamento tem ruído filtrado e corpo grave no canal de efeitos existente. Ele respeita pausa, mudo, descarte e proximidade de Feka. A prévia dos postos agora inclui os disparos e os três impactos sincronizados. Movimento reduzido retira oscilações decorativas e reduz partículas, preservando a ação principal e os avisos.
+
+`scripts/prove_hypothetical_scenery.ts` percorre os comandos normais, sem alterações de atores, câmera ou relógio, e registra 22 imagens, incluindo os três contatos, a câmera alta e movimento reduzido. `scenery-verification.json` identifica cada frame e posição da câmera. `bystander-atlas.png` é uma prancha separada de vinte poses explícitas, não uma captura da partida. Os seis testes de `hypothetical-devastation.test.ts` verificam contatos únicos, continuidade, mira, NPCs, transferência do estilhaço, pintura sem mutação e pausa.
+
+## Revisão 15 · Disputa das alturas
+
+A revisão encontrou um abrigo excessivamente seguro nos andaimes: o batedor só iniciava ataques no mesmo piso de Feka. Os defensores do cais e do arsenal agora respondem à permanência num apoio com um salto comprometido. A portaria conserva o comportamento inicial mais simples.
+
+- **Escolha física do destino:** observa o mesmo apoio por 260 ms, aceita apenas plataformas reais com espaço para o corpo e mantém 24 pixels de folga de aliados vivos. O alcance é de 112 pixels, com subida máxima de 72 pixels; a velocidade horizontal deriva do arco da física nativa. Não persegue a trajetória de um salto passageiro de Feka.
+- **Resposta previsível:** preparação completa de 700 ms e marca fixa no apoio. O salto não reajusta a mira depois de começar. O corpo em movimento é a ameaça, sem uma segunda caixa de dano invisível da lança. Um acerto por cima derrota o batedor durante o voo; a recuperação ao pousar dura 1.050 ms. Há intervalo de 2.500 ms entre aquisições.
+- **Continuidade:** depois de conquistar o apoio, o batedor pode abandoná-lo para alcançar Feka no piso. A movimentação reconhece as plataformas de mão única do cenário, além dos blocos. O golpe longo no piso mantém seus próprios avisos e condições de continuação.
+- **Animação e materiais:** agachamento antes do impulso, arma recolhida, pernas dobradas durante o arco e compressão no pouso. Bordas de cobre, tiras e tornozeleiras distinguem os batedores avançados. Poeira sai do ponto de impulsão e do apoio efetivo de aterrissagem. O aríete deixa derrapagem e fragmentos ao colidir; uma frenagem comum não produz um impacto falso.
+- **Leitura e som:** HUD distingue preparar, saltar e recuperar. Marca e pose de ataque são mantidas com movimento reduzido. Pouso e colisão usam os sons nativos, emitidos uma vez por evento, sem continuar durante a pausa.
+
+`HypotheticalGuardVault.ts` concentra a escolha e os limites do salto. Seis testes específicos cobrem os apoios, aliados, compromisso da mira, alturas, contra-ataque, retorno ao piso, pausa e eventos de impacto. As capturas `route-vault-warning.png`, `route-vault-attack.png` e `route-vault-rest.png` vêm da execução por comandos normais. A última linha do atlas usa poses explícitas de inspeção, identificadas separadamente da partida.
+
 ## Referências e direção de arte
 
 A pesquisa encontrou a versão do meme com cavaleiro de terno/faixa, tiranossauro e fuzil na [descrição do Teoria Digital](https://www.teoriadigital.com.br/flavio-hipotetico-videos-feitos-com-ia-viram-meme-viral-nas-redes-antes-do-segundo-turno/) e no [quadro publicado pelo Metrópoles](https://www.metropoles.com/colunas/mario-sabino/bolsonaro-hipotetico-contra-o-exercito-do-lula). Foram consultadas também buscas por “Flávio hipotético”, “chad” e “dinossauro”; alguns resultados eram montagens de Jair, e não foram usados como identificação de Flávio.
 
 A arte de produção é original e construída no Canvas nativo: mandíbula caricatural, cabelo penteado, terno azul, faixa, botas, fuzil, sela com lacres de latão e tiranossauro em tons de couro e bronze. Nenhuma imagem da pesquisa foi embutida no jogo. A animação articula pernas, joelhos, mandíbula, cauda, sela, casaco, braços e arma. Os passos usam distância percorrida; a mira, o recuo, os avisos e o ponto de saída dos projéteis compartilham os dados do combate.
 
-## Travessia do arsenal · revisão 13
+## Travessia do arsenal · revisão 14
 
-O pátio de 320 pixels com sete inimigos em ondas foi substituído por uma rua de 1.280 pixels, nove guardas já posicionados, oito andaimes e três portões físicos. A câmera acompanha Feka. Nenhum intervalo cria uma nova horda: o próximo posto acorda quando Feka entra nele.
+O pátio de 320 pixels com sete inimigos em ondas foi substituído por uma rua de 1.280 pixels, nove guardas já posicionados, oito andaimes de combate, duas passarelas entre postos e três portões físicos. A câmera acompanha Feka. Nenhum intervalo cria uma nova horda: o próximo posto acorda quando Feka entra nele.
 
 | Posto | Defesa | Percurso |
 | --- | --- | --- |
@@ -18,9 +82,18 @@ O pátio de 320 pixels com sete inimigos em ondas foi substituído por uma rua d
 | Cais de carga | Aríete, lançador alto e batedor com combinação | Três alturas, guindaste, carga suspensa e corredor após o portão |
 | Arsenal | Blindado, batedor e dois lançadores com pares de barris | Sacadas em alturas distintas, capacete opcional e saída para o duelo |
 
-`HypotheticalSiege.ts` concentra as posições, limites e progressão. O gatilho apenas desperta os guardas que já existem; enquanto esperam, não se movem, disparam ou causam dano. Os portões abrem ao derrotar a guarnição correspondente, em 72 ticks, com curva suave. O limite inferior desenhado da grade coincide com sua colisão. A passagem fica transitável quando há espaço real para o corpo de Feka. Os portões anteriores permanecem abertos. Esperar não conclui o encontro: é preciso caminhar até a saída.
+`HypotheticalSiege.ts` concentra as posições, limites e progressão. O gatilho apenas desperta os guardas que já existem; enquanto esperam, não se movem, disparam ou causam dano. Os portões abrem ao derrotar a guarnição correspondente, em 72 ticks: 14 para recolher o ferrolho, 50 para levantar a grade com curva suave e oito para assentar o tambor. O assentamento nunca faz a colisão descer novamente. O limite inferior desenhado da grade coincide com sua colisão. A passagem fica transitável quando há espaço real para o corpo de Feka. Os portões anteriores permanecem abertos. Esperar não conclui o encontro: é preciso caminhar até a saída.
 
 Cada posto concluído vira um ponto de retomada, inclusive depois de uma morte ou de R. O próximo posto é reconstruído com sua formação inicial; os anteriores permanecem concluídos. Barris e pedras pendentes são retirados na abertura, evitando dano atrasado após a vitória. A retomada também conserva as ruínas e avança o dinossauro e os NPCs ao trecho correspondente. Os pontos de retomada pertencem somente ao bônus.
+
+### Passagens, orientação e acabamento
+
+- Cada posto tem uma trava por guarda (2/3/4), com pino, alojamento e indicação de liberação. A derrota recolhe o pino em 18 ticks; uma derrota parcial não levanta a grade. O painel de entrada e o HUD mostram os mesmos estados. A orientação aponta a patrulha quando todos os defensores restantes estiverem fora da câmera.
+- O acionamento do portão fica à altura do jogador: tambor, corrente, ferrolho, sapatas e contrapeso. A corrente e o giro derivam do deslocamento real da grade. A abertura tem preparação, aceleração, desaceleração e acomodação; o contrapeso desce conforme a grade sobe.
+- A rotina geral de alvos quebráveis podia desativar uma grade ao receber um barril, antes do movimento de Feka. Portões controlados pelo encontro agora consomem o impacto sem abrir; alvos comuns conservam sua regra original. Há regressão específica para barris normais e pressurizados.
+- Duas passarelas opcionais, em x=384/y=180 e x=800/y=184, ligam os espaços após os portões aos primeiros apoios do cais e do arsenal. Quatro moedas indicam os arcos. As rotas continuam usando o salto, a corrida e as plataformas de mão única do jogo.
+- Portaria: madeira, encaixes e sapatas. Cais: tablados largos, cintas e travessas de carga. Arsenal: postes de metal, diagonais, chapas e rebites. Todos preservam a borda clara somente no topo jogável. Drenos embutidos e soleiras metálicas permanecem dentro do piso sólido.
+- `tests/helpers/hypotheticalUpperRoutes.json` registra duas aproximações alternativas, ambas desde a entrada do encontro, por teclado. Feka pousa em cada passarela e no primeiro apoio do posto seguinte, coleta moedas e não morre durante essas aproximações. A segunda execução inclui uma morte anterior no cais; o registro distingue esse histórico do trecho alternativo. As capturas e posições estão em `upper-routes.json`.
 
 ### Mecânicas e leitura dos guardas
 
@@ -36,9 +109,9 @@ Cada posto concluído vira um ponto de retomada, inclusive depois de uma morte o
 
 A portaria usa guarita com relógio; o cais, guindaste com roldana, corda e carga suspensa; o arsenal, portas reforçadas, tubulações e ventilação. Andaimes têm vigas, travessas, ferragens e bordas claras nas superfícies jogáveis. As grades possuem trilhos, correntes, travessas, lâmpadas e sinalização da saída. A decoração recuada usa contraste menor que personagens e apoios.
 
-O dinossauro percorre continuamente os 1.280 pixels do fundo. Fachadas, destruição e NPCs têm posições na mesma rua; o dinossauro não volta ao início de um pátio repetido a cada passagem. Seis NPCs são atingidos por projéteis visíveis e dois escapam. Os disparos distantes permanecem fora da camada de colisão de Feka. Pedras no plano jogável têm aviso de um segundo.
+O dinossauro percorre a rua ao fundo, com pausas de preparação e contato nas três estruturas. Fachadas, destruição e NPCs têm posições na mesma rua; o dinossauro não volta ao início de um pátio repetido a cada passagem. Seis NPCs são atingidos por projéteis visíveis e dois escapam. Os disparos distantes permanecem fora da camada de colisão de Feka. Pedras no plano jogável têm aviso de um segundo.
 
-`guard-atlas.png` reúne 40 poses explícitas, incluindo teto quebrado. `guards-play.mp4` mostra a travessia nativa dos três postos, com uma morte e retomada. `guard-encounters.json` registra nove derrotas, três aberturas e as capturas dos portões, apoios e proteções quebradas. Nenhuma posição de ator, câmera ou relógio é alterada para produzir a prova.
+`guard-atlas.png` reúne 50 poses explícitas, incluindo salto, pouso, colisão e teto quebrado. `guards-play.mp4` mostra a travessia nativa dos três postos, com duas mortes e retomadas. `guard-encounters.json` registra nove derrotas, três aberturas e as capturas dos portões, apoios e proteções quebradas. Nenhuma posição de ator, câmera ou relógio é alterada para produzir a prova.
 
 ## Revisão do cenário e percurso
 
@@ -100,15 +173,17 @@ As imagens em `grounded-footfall.png`, `return-footfall.png`, `airborne-tuck.png
 
 ## Verificação reproduzível
 
-- `tests/hypothetical-boss.test.ts` e `tests/hypothetical-audio.test.ts`: 48 testes, incluindo rotas alta e baixa, alcance da recompensa, câmera e remoção dos tablados desabados, quadril apoiado durante flexão e recuo, encaixe dos ombros, origem da poeira sob as patas, comprimentos das articulações, movimento reduzido, curva de colisão da cauda, alinhamento entre arma e bala, combinações, cabos, salvas de 6/12/18 tiros, cobertura, NPCs, áudio, pausa e percurso completo por controles nativos.
-- `tests/helpers/hypotheticalReplay.json`: replay por teclado, sem invulnerabilidade, teletransporte ou alteração de inimigos. A execução registrada atravessa os três atos e vence após duas mortes e retomadas.
+- `tests/hypothetical-boss.test.ts` e `tests/hypothetical-audio.test.ts`: 49 testes, incluindo rotas alta e baixa, alcance da recompensa, câmera e remoção dos tablados desabados, quadril apoiado durante flexão e recuo, encaixe dos ombros, origem da poeira sob as patas, comprimentos das articulações, movimento reduzido, curva de colisão da cauda, alinhamento entre arma e bala, combinações, cabos, salvas de 6/12/18 tiros, cobertura, NPCs, áudio, pausa e percurso completo por controles nativos.
+- `tests/helpers/hypotheticalReplay.json`: replay por teclado, sem invulnerabilidade, teletransporte ou alteração de inimigos. A execução registrada atravessa os três atos e vence após três mortes e retomadas.
 - `scripts/verify_hypothetical_boss.cjs`: entrada pelo menu real, replay no navegador, pausa, vitória, repetição, inspeção em 390 pixels com movimento reduzido e pausa por toque.
-- `scripts/prove_hypothetical_boss.ts`: quadros do mesmo replay no tamanho nativo de 320 × 180. O vídeo de revisão reproduz essa execução, incluindo a morte.
+- `scripts/prove_hypothetical_boss.ts`: quadros do mesmo replay no tamanho nativo de 320 × 180. O vídeo de revisão reproduz essa execução, incluindo as mortes e retomadas.
+- `scripts/prove_hypothetical_upper_routes.ts`: reproduz as duas alternativas elevadas pelos comandos registrados e captura os pousos, sem alterar os atores, a câmera ou o relógio.
 - `scripts/prove_hypothetical_sprites.ts`: prancha de doze poses em 768 × 456, para revisão visual dos sprites. A execução verifica que desenhar cada pose não altera o estado do combate.
-- `tests/hypothetical-guards.test.ts`: 26 testes de preparação, ataque, defesa, apoio dos pés, articulação, combinações, separação e recarga. `tests/hypothetical-siege.test.ts`: seis testes de progressão espacial, patrulhas em espera, colisão dos portões, proteções quebráveis, lançadores elevados e travessia integral com retomada. Total: 80 testes do encontro.
-- `scripts/prove_hypothetical_guards.ts`: 40 poses dos quatro guardas em 1280 × 512. `scripts/prove_hypothetical_guard_encounters.ts`: reproduz a travessia dos postos pelos controles normais, verifica nove guardas derrotados e três passagens, grava vídeo e registra dano/retomada.
-- `scripts/render_hypothetical_audio.cjs`: renderiza o sintetizador de produção e coloca os sons de arma nos ticks registrados. A faixa de revisão contém fuzil, recarga e impactos; música e demais sons continuam disponíveis ao jogar. `audio-verification.json` registra a renderização sem saturação.
+- `tests/hypothetical-*.test.ts`: 114 testes do encontro, cobrindo chefe, guardas, progressão, saltos, cenário, NPCs, áudio e disparos. Mais 43 regressões de barris, máquinas, canhões secretos e transporte nativo compõem a verificação selecionada.
+- `scripts/prove_hypothetical_gunfire.ts`: sete capturas de disparos no cenário, clarão, rajada final, cobertura, resfriamento e movimento reduzido, retiradas da partida por controles normais.
+- `scripts/prove_hypothetical_guards.ts`: 50 poses dos quatro guardas em 1280 × 640. `scripts/prove_hypothetical_guard_encounters.ts`: reproduz a travessia dos postos pelos controles normais, verifica nove guardas derrotados e três passagens, grava vídeo e registra dano/retomada.
+- `scripts/render_hypothetical_audio.cjs`: renderiza o sintetizador de produção e coloca os sons de arma nos ticks registrados. A faixa de revisão contém fuzil, recarga, impactos e desabamentos; música e demais sons continuam disponíveis ao jogar. `audio-verification.json` registra a renderização sem saturação.
 
 O replay confirma que há um percurso executável e que as transições funcionam. A dificuldade e o prazer do combate continuam sendo questões de experiência de jogadores; não são garantidos por uma execução automatizada.
 
-Verificação desta revisão: 80 testes e build de produção concluídos; replay de 6.486 frames até a vitória, com duas mortes e retomadas; 6.207 ticks ativos. Os três postos foram atravessados por controles normais, com nove guardas derrotados, abertura dos três portões e uma retomada no arsenal. Navegador sem erros; pausa por teclado/toque, menu real, vitória e apresentação móvel de 390 pixels com movimento reduzido conferidos. A prévia dos postos tem 17,7 segundos; o vídeo completo inclui a reação de derrota e o resultado final.
+Verificação desta revisão: 157 testes e build de produção concluídos; replay de 6.797 frames até a vitória, com três mortes e retomadas; 6.401 ticks ativos. Os três postos foram atravessados por controles normais, com nove guardas derrotados, abertura dos três portões e retomadas no cais e no arsenal. Os três contatos com as fachadas aparecem na câmera normal. O batedor prepara, salta, aterrissa e é derrotado na gravação; as rotas elevadas continuam executáveis. Navegador sem erros; pausa por teclado/toque, menu real, vitória e apresentação móvel de 390 pixels com movimento reduzido conferidos. A prévia dos postos tem 22,9 segundos, com áudio de disparos e desabamentos; o vídeo completo tem aproximadamente 116,3 segundos, incluindo a reação de derrota e o resultado final.

@@ -240,7 +240,11 @@ export class WorldObjects {
                 if (target.kind === 'target' && !target.active && overlaps(p, target)) {
                     p.life = 0;
                     target.hitAt = this.time;
-                    if (!target.pressurized || p.pressurized) {
+                    // Encounter gates remain solid during this object update,
+                    // before the player moves; a barrel cannot open them for a frame.
+                    if (target.gated) {
+                        this.events.push({ kind: 'barrelBreak', x: p.x + p.width / 2, y: p.y + p.height / 2 });
+                    } else if (!target.pressurized || p.pressurized) {
                         target.active = true;
                         target.brokenAt = this.time;
                         this.events.push({ kind: 'break', x: target.x, y: target.y });

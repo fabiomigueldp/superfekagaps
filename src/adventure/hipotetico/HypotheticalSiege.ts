@@ -17,6 +17,14 @@ export const SIEGE_SECTORS = [
 export const SIEGE_WIDTH = 1280;
 export const SIEGE_EXIT = 1240;
 export const SIEGE_GATE_TICKS = 72;
+export const SIEGE_UNLOCK_TICKS = 14;
+export const SIEGE_LIFT_TICKS = 50;
+export const SIEGE_LOCK_TICKS = 18;
+/** Short optional upper routes connect the cleared post to the next approach. */
+export const SIEGE_LINKS = [
+    { id: 'siege-link-0', x: 384, y: 180, width: 40, height: 7, kind: 'support' as const },
+    { id: 'siege-link-1', x: 800, y: 184, width: 48, height: 7, kind: 'support' as const },
+];
 export function siegeGarrison(sector: number): FoeSpec[] {
     return SIEGE_SECTORS[sector].guards.map((g, i) => ({ ...g, id: `hipotetico:garrison:${sector}:${i}`, range: 352, behavior: 'canal' }));
 }
@@ -26,24 +34,44 @@ export class HypotheticalSiege {
     active = false;
     entered: number;
     openedThisTick = false;
+    releasedThisTick = false;
     gateTicks: number[];
+    remaining: number[];
+    lockTicks: number[][];
     constructor(cleared = 0) {
         this.cleared = Math.max(0, Math.min(3, Math.floor(cleared)));
         this.entered = Math.min(2, this.cleared);
         this.gateTicks = SIEGE_SECTORS.map((_, i) => i < this.cleared ? SIEGE_GATE_TICKS : 0);
+        this.remaining = SIEGE_SECTORS.map((s, i) => i < this.cleared ? 0 : s.guards.length);
+        this.lockTicks = SIEGE_SECTORS.map((s, i) => s.guards.map(() => i < this.cleared ? SIEGE_LOCK_TICKS : 0));
     }
     get sector() { return SIEGE_SECTORS[Math.min(2, this.cleared)]; }
     get currentSector() { return SIEGE_SECTORS[this.entered]; }
     get checkpoint() { return this.cleared === 3 ? 1212 : this.sector.checkpoint; }
     gateHeight(index: number) {
-        const u = this.gateTicks[index] / SIEGE_GATE_TICKS;
+        // The latch retracts before the motor lifts. The last eight ticks let
+        // the drum settle; its collision never bounces back onto the player.
+        const u = Math.max(0, Math.min(1, (this.gateTicks[index] - SIEGE_UNLOCK_TICKS) / SIEGE_LIFT_TICKS));
         return Math.round(224 * (1 - u * u * (3 - 2 * u)));
+    }
+    gatePhase(index: number) {
+        const t = this.gateTicks[index];
+        return t === 0 ? 'locked' : t < SIEGE_UNLOCK_TICKS ? 'unlock'
+            : t < SIEGE_UNLOCK_TICKS + SIEGE_LIFT_TICKS ? 'lift' : t < SIEGE_GATE_TICKS ? 'settle' : 'open';
     }
     update(playerX: number, living: number) {
         this.openedThisTick = false;
+        this.releasedThisTick = false;
+        for (const [i, s] of SIEGE_SECTORS.entries()) for (let j = 0; j < s.guards.length - this.remaining[i]; j++)
+            this.lockTicks[i][j] = Math.min(SIEGE_LOCK_TICKS, this.lockTicks[i][j] + 1);
         for (let i = 0; i < this.cleared; i++) this.gateTicks[i] = Math.min(SIEGE_GATE_TICKS, this.gateTicks[i] + 1);
         if (this.cleared === 3) return;
         if (!this.active && playerX >= this.sector.trigger) { this.entered = this.cleared; this.active = true; return; }
+        if (this.active) {
+            const remaining = Math.max(0, Math.min(this.remaining[this.cleared], Math.floor(living)));
+            this.releasedThisTick = remaining < this.remaining[this.cleared];
+            this.remaining[this.cleared] = remaining;
+        }
         if (this.active && living === 0) {
             this.cleared++; this.active = false; this.openedThisTick = true;
         }

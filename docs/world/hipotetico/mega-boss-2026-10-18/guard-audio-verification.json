@@ -1,0 +1,10 @@
+{
+  "productionSynth": true,
+  "weaponEffectsOnly": false,
+  "destructionCues": 3,
+  "cues": 39,
+  "seconds": 22.9,
+  "peak": 0.047964222729206085,
+  "rms": 0.002132636665830605,
+  "sampleRate": 48000
+}

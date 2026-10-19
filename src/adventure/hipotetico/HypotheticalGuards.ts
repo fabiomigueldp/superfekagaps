@@ -6,6 +6,7 @@ import type { WorldLevel, WorldObjects } from '../WorldPhysics';
 import { isSolidTile } from '../../world/tileRules';
 import { overlaps } from '../types';
 import { guardActionPose, blendGuardAction, GUARD_LUNGE, type GuardActionPose } from './HypotheticalGuardMotion';
+import { GUARD_VAULT, planGuardVault, type GuardVaultTarget } from './HypotheticalGuardVault';
 export { GUARD_LUNGE } from './HypotheticalGuardMotion';
 
 const frame = 1000 / 60;
@@ -32,6 +33,13 @@ export class HypotheticalGuard extends WorldFoe {
     private reloadFacing = 1;
     private lastArmor = true;
     private launches = 0;
+    vaultTarget: GuardVaultTarget | null = null;
+    vaultLandedAt = -Infinity;
+    impactAt = -Infinity;
+    private lastVaultAt = -Infinity;
+    private perchTime = 0;
+    private perchId = '';
+    private vaultVelocity = 0;
 
     constructor(spec: FoeSpec, readonly wave = 1, private readonly company: () => readonly WorldFoe[] = () => [],
         readonly bounds?: {left:number;right:number}) {
@@ -48,13 +56,22 @@ export class HypotheticalGuard extends WorldFoe {
         if(this.spec.kind==='charger'&&!this.armor)return false;
         return super.blocksStomp;
     }
-    override get warningDuration() { return this.spec.kind === 'helmet' ? GUARD_SHOVE.warning : this.longLunge ? GUARD_LUNGE.warning : super.warningDuration; }
+    override get warningDuration() { return this.vaultTarget ? GUARD_VAULT.warning : this.spec.kind === 'helmet' ? GUARD_SHOVE.warning : this.longLunge ? GUARD_LUNGE.warning : super.warningDuration; }
     get longLunge() { return this.spec.kind==='minion'&&this.comboLength===2&&this.comboStep===1; }
     get comboLength() { return (this.wave >= 2 && this.spec.kind==='minion'||this.wave===3&&this.spec.kind==='loader') ? 2 : 1; }
     get turnProgress() { return Math.max(0, Math.min(1, (this.age-this.turnAt)/GUARD_FOOTWORK.pivot)); }
     get reloadProgress() { return Math.max(0, Math.min(1, (this.age-this.reloadAt)/GUARD_FOOTWORK.reload)); }
     get actionPose(): GuardActionPose {
         const target=guardActionPose(this);
+        if(this.vaultTarget){
+            if(this.phase==='warning'){target.crouch=target.brace*3;target.lean=-target.brace*3;target.cut=-target.brace*.8;}
+            else if(this.phase==='attack'){
+                const flight=Math.max(0,Math.min(1,this.timer/(this.vaultTarget.steps*frame)));
+                target.thrust=0;target.tuck=Math.sin(flight*Math.PI);target.lean=2;target.cut=-.8+flight*.6;target.crouch=0;
+            }else if(this.phase==='rest'){
+                const t=Math.min(1,this.timer/240);target.crouch=Math.sin(t*Math.PI)*2.4;target.lean=(1-t)*2;
+            }
+        }
         if(this.phase==='walk') {
             target.turn=Math.sin(Math.PI*this.turnProgress);
             if(this.yielding)target.brace=.25;
@@ -90,6 +107,49 @@ export class HypotheticalGuard extends WorldFoe {
         this.age+=dt;this.timer+=dt;this.flash=Math.max(0,this.flash-dt);this.travel(dx,dt,level);
     }
     private startReload(){this.reloadAt=this.age;this.reloadOrigin=this.x;this.reloadFacing=this.facing;}
+    private acquireVault(dt:number,level:WorldLevel,player:Rect){
+        if(this.dead||this.spec.kind!=='minion'||this.wave<2||this.phase!=='walk'||this.vaultTarget||this.age-this.lastVaultAt<GUARD_VAULT.cooldown){this.perchTime=0;return;}
+        const target=planGuardVault(this,player,level,this.company());
+        if(!target){this.perchTime=0;this.perchId='';return;}
+        if(this.perchId!==target.supportId){this.perchTime=0;this.perchId=target.supportId;}
+        this.perchTime+=dt;
+        if(this.perchTime<GUARD_VAULT.acquire)return;
+        this.vaultTarget=target;this.lastVaultAt=this.age;this.perchTime=0;this.comboStep=0;
+        this.facing=target.x>=this.x?1:-1;this.vx=this.facing*this.patrolSpeed;
+        this.vaultVelocity=(target.x-this.x)/target.steps;this.change('warning');
+    }
+    private updateVault(dt:number,level:WorldLevel,fresh:boolean){
+        const target=this.vaultTarget!;
+        this.age+=dt;this.timer+=fresh?0:dt;this.flash=Math.max(0,this.flash-dt);
+        if(this.phase==='warning'){
+            if(this.timer>=GUARD_VAULT.warning){this.change('attack');this.vy=GUARD_VAULT.velocityY;}
+        }else if(this.phase==='attack'){
+            const step=dt/frame;this.vy=Math.min(8,this.vy+GUARD_VAULT.gravity*step);
+            const remaining=target.x-this.x,dx=Math.sign(this.vaultVelocity)*Math.min(Math.abs(remaining),Math.abs(this.vaultVelocity*step));
+            const result=level.resolveCollision(this,{x:dx,y:this.vy*step},this);
+            this.x=result.position.x;this.y=result.position.y;this.vy=result.velocity.y;
+            if(result.grounded){this.vaultLandedAt=this.age;this.change('rest');}
+        }else if(this.phase==='rest'&&this.timer>=GUARD_VAULT.recovery){
+            this.vaultTarget=null;this.change('walk');this.vx=this.facing*this.patrolSpeed;
+        }
+    }
+    private updateBatedor(dt:number,level:WorldLevel,player:Rect){
+        // Use the native phases and contacts, but recognize actual one-way decks
+        // as footing. The campaign patrol's tile-only edge check cannot do that.
+        this.age+=dt;this.timer+=dt;this.flash=Math.max(0,this.flash-dt);
+        if(this.dead){this.deadTimer+=dt;return;}
+        const gap=player.x+player.width/2-this.x-this.width/2,foot=this.y+this.height;
+        if(this.phase==='walk'&&gap*this.facing>0&&Math.abs(player.x-this.x)<52&&Math.abs(player.y+player.height-foot)<1)this.change('warning');
+        else if(this.phase==='warning'&&this.timer>=this.warningDuration)this.change('attack');
+        else if(this.phase==='attack'&&this.timer>=240)this.change('rest');
+        else if(this.phase==='rest'&&this.timer>=900)this.change('walk');
+        const dx=(this.phase==='walk'?this.vx:this.phase==='attack'?this.facing*1.2:0)*dt/frame,oldX=this.x;
+        // Leave a conquered perch when Feka drops to the road; do not get stuck
+        // turning in place above him. The native floor still catches the fall.
+        const drop=this.phase==='walk'&&player.y+player.height>foot+16;
+        this.travel(dx,dt,level,drop);
+        if(this.phase==='walk'&&dx&&Math.abs(this.x-oldX)<.001){this.vx=-this.vx;this.facing=Math.sign(this.vx);}
+    }
     private updateLauncher(dt:number,objects:WorldObjects,player:Rect){
         this.age+=dt;this.timer+=dt;this.flash=Math.max(0,this.flash-dt);
         if(this.dead){this.deadTimer+=dt;return;}
@@ -112,12 +172,14 @@ export class HypotheticalGuard extends WorldFoe {
         const target=this.reloadOrigin-this.reloadFacing*offset;
         this.x=Math.max(support.x+2,Math.min(support.x+support.width-this.width-2,target));
     }
-    private travel(dx: number, dt: number, level: WorldLevel) {
+    private travel(dx: number, dt: number, level: WorldLevel, allowDrop=false) {
         dx=this.separate(dx);
         const direction = Math.sign(dx), foot = this.y + this.height;
         const support = level.getTile(level.worldToCol(this.x + (direction > 0 ? this.width + 3 : -3)), level.worldToRow(foot + 3));
+        const nextFoot=this.x+(direction>0?this.width+3:-3);
+        const deck=level.bodies.some(b=>b.kind==='support'&&Math.abs(foot-b.y)<4&&nextFoot>=b.x&&nextFoot<=b.x+b.width);
         this.vy = Math.min(8, this.vy + .4 * dt / frame);
-        const move = level.resolveCollision(this, { x: direction && !isSolidTile(support) ? 0 : dx, y: this.vy * dt / frame }, this);
+        const move = level.resolveCollision(this, { x: direction && !isSolidTile(support)&&!deck&&!allowDrop ? 0 : dx, y: this.vy * dt / frame }, this);
         this.x = move.position.x; this.y = move.position.y; this.vy = move.velocity.y;
     }
     override update(dt: number, level: WorldLevel, objects: WorldObjects, player: Rect) {
@@ -127,11 +189,13 @@ export class HypotheticalGuard extends WorldFoe {
         if (this.lastArmor && !this.armor) this.armorLostAt = this.age;
         this.lastArmor = this.armor;
         this.yielding=false;
+        this.acquireVault(dt,level,player);
+        const vault=Boolean(this.vaultTarget);
         const infantry=['minion','helmet'].includes(this.spec.kind);
         if(!this.dead&&infantry&&this.phase==='walk'){
             const gap=player.x+player.width/2-this.x-this.width/2;
             // Acquire the other side only between actions. A jump behind a committed attack stays safe.
-            if(this.turnProgress===1&&Math.abs(gap)>28&&gap*this.facing<0&&Math.abs(player.y+player.height-this.y-this.height)<60){
+            if(this.turnProgress===1&&Math.abs(gap)>28&&gap*this.facing<0&&Math.abs(player.y+player.height-this.y-this.height)<(this.spec.kind==='minion'?96:60)){
                 this.turnAt=this.age;this.turnTarget=Math.sign(gap);
             }
         }
@@ -139,7 +203,9 @@ export class HypotheticalGuard extends WorldFoe {
         const screened=!this.dead&&infantry&&this.phase==='walk'&&this.clearance(this.facing)<GUARD_FOOTWORK.attackSpace;
         const shove = this.spec.kind === 'helmet' && !this.dead && ['warning', 'attack', 'rest'].includes(this.phase);
         const lunge = !this.dead && this.longLunge && ['warning','attack','rest'].includes(this.phase);
-        if(pivot){
+        if(vault&&!this.dead){
+            this.updateVault(dt,level,before==='walk'&&this.phase==='warning');
+        }else if(pivot){
             this.idleStep(dt,level);
             if(this.turnProgress>=.5){this.facing=this.turnTarget;this.vx=this.facing*Math.abs(this.vx);}
         }else if(screened){
@@ -181,6 +247,7 @@ export class HypotheticalGuard extends WorldFoe {
                 }
             }
             if(this.spec.kind==='loader')this.updateLauncher(dt,objects,player);
+            else if(this.spec.kind==='minion')this.updateBatedor(dt,level,player);
             else super.update(dt, level, objects, player);
             if (this.dead) return;
             if(coverCharge&&this.phase==='rest'){
@@ -219,7 +286,7 @@ export class HypotheticalGuard extends WorldFoe {
         if(this.spec.kind==='loader'&&!this.dead&&this.phase==='rest'){
             if(before!=='rest'){this.startReload();this.coveringCharge=false;}
             this.reloadStep(level);
-        }else if(infantry&&!this.dead)this.x=oldX+this.separate(this.x-oldX,oldX);
+        }else if(infantry&&!this.dead&&!vault)this.x=oldX+this.separate(this.x-oldX,oldX);
         if(this.bounds&&!this.dead){
             const bounded=Math.max(this.bounds.left,Math.min(this.bounds.right-this.width,this.x));
             if(bounded!==this.x){
@@ -229,6 +296,9 @@ export class HypotheticalGuard extends WorldFoe {
             }
         }
         this.motionX=this.x-oldX;this.distance=oldDistance+Math.abs(this.motionX);
+        // A fresh collision sets exactly 100ms. A previous stomp flash has already
+        // decayed and must not turn an ordinary brake into a false impact.
+        if(this.spec.kind==='charger'&&before==='attack'&&this.phase==='rest'&&this.flash===100)this.impactAt=this.age;
         if (this.spec.kind === 'loader' && before === 'warning' && this.phase === 'recoil') {
             this.lastRelease = this.age; this.releaseHigh = wasHigh;
         }
@@ -251,6 +321,7 @@ export class HypotheticalGuard extends WorldFoe {
     }
     override get danger(): Rect | null {
         if (this.dead||!this.awake) return null;
+        if(this.vaultTarget)return null; // The moving body is the whole airborne threat.
         if(this.longLunge&&this.phase==='attack'){
             if(this.timer<GUARD_LUNGE.activeFrom||this.timer>=GUARD_LUNGE.activeUntil)return null;
             return {x:this.facing<0?this.x-GUARD_LUNGE.reach:this.x+this.width-2,y:this.y+8,width:GUARD_LUNGE.reach+2,height:10};

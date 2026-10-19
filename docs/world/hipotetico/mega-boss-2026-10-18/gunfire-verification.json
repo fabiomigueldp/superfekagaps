@@ -1,0 +1,94 @@
+{
+  "inputOnly": true,
+  "actorCameraClockEdits": false,
+  "frames": 6797,
+  "receipt": {
+    "act": "duel",
+    "phase": 3,
+    "health": 0,
+    "won": true,
+    "deaths": 3,
+    "ticks": 6401
+  },
+  "captures": [
+    {
+      "file": "gun-distant-ignition.png",
+      "frame": 577,
+      "act": "siege",
+      "phase": 1,
+      "age": 110,
+      "reduced": false
+    },
+    {
+      "file": "gun-distant-impact.png",
+      "frame": 615,
+      "act": "siege",
+      "phase": 1,
+      "age": 148,
+      "reduced": false
+    },
+    {
+      "file": "gun-close-ignition.png",
+      "frame": 2033,
+      "act": "duel",
+      "phase": 1,
+      "age": 1,
+      "reduced": false
+    },
+    {
+      "file": "gun-reduced.png",
+      "frame": 2033,
+      "act": "duel",
+      "phase": 1,
+      "age": 1,
+      "reduced": true
+    },
+    {
+      "file": "gun-cover-impact.png",
+      "frame": 2061,
+      "act": "duel",
+      "phase": 1,
+      "age": 29,
+      "reduced": false
+    },
+    {
+      "file": "gun-cooling.png",
+      "frame": 2090,
+      "act": "duel",
+      "phase": 1,
+      "age": 58,
+      "reduced": false
+    },
+    {
+      "file": "gun-dense-volley.png",
+      "frame": 5735,
+      "act": "duel",
+      "phase": 3,
+      "age": 9,
+      "reduced": false
+    }
+  ],
+  "video": {
+    "file": "gunfire-play.mp4",
+    "source": "native-play.mp4",
+    "playbackRate": 1,
+    "sourceVideoFrameRanges": [
+      [
+        273,
+        390
+      ],
+      [
+        979,
+        1085
+      ],
+      [
+        2829,
+        3030
+      ]
+    ],
+    "rangeEndExclusive": true,
+    "frames": 424,
+    "seconds": 14.133333333333333,
+    "audio": "production synth at source replay ticks"
+  }
+}

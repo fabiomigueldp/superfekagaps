@@ -1,0 +1,63 @@
+{
+  "inspectionOnly": true,
+  "productionNpcTimeline": true,
+  "relocatedForLayout": true,
+  "scale": 2,
+  "videoFrames": 150,
+  "seconds": 5,
+  "contactSheetPoses": 32,
+  "samples": [
+    {
+      "index": 0,
+      "ticks": [
+        41,
+        51,
+        72,
+        105,
+        119,
+        187,
+        202,
+        229
+      ]
+    },
+    {
+      "index": 1,
+      "ticks": [
+        49,
+        59,
+        80,
+        113,
+        127,
+        141,
+        156,
+        183
+      ]
+    },
+    {
+      "index": 3,
+      "ticks": [
+        449,
+        459,
+        480,
+        513,
+        527,
+        594,
+        609,
+        636
+      ]
+    },
+    {
+      "index": 4,
+      "ticks": [
+        841,
+        851,
+        872,
+        905,
+        919,
+        987,
+        1002,
+        1029
+      ]
+    }
+  ]
+}

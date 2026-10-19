@@ -22,7 +22,7 @@ export interface MechanismSpec extends Rect {
     link?: string;
     direction?: number;
     pressurized?: boolean;
-    /** A lift controlled by an encounter, never by the autonomous cable cycle. */
+    /** Encounter-controlled lift or gate: no autonomous motion or barrel unlock. */
     gated?: boolean;
 }
 export type FoeKind = 'minion' | 'helmet' | 'charger' | 'loader' | 'agitator' | 'rail';

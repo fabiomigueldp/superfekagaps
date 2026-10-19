@@ -2,7 +2,10 @@ import { box, oval, pixelLine, polygon } from '../WorldPainting';
 import type { WorldLevel, WorldObjects, MovingBody } from '../WorldPhysics';
 import { HYPOTHETICAL, type HypotheticalModel } from './HypotheticalModel';
 import { ARENA_BALCONIES, ARENA_COLUMNS, CHASE_GAPS } from './HypotheticalLayout';
-import { SIEGE_SECTORS, SIEGE_GATE_TICKS } from './HypotheticalSiege';
+import { SIEGE_SECTORS, SIEGE_UNLOCK_TICKS, SIEGE_LOCK_TICKS } from './HypotheticalSiege';
+import { DESTRUCTION_SITES, ruinAge, rubbleApproach } from './HypotheticalDevastation';
+import { backdropBaseline } from './HypotheticalBackdrop';
+import {drawChaseLandmarks} from './HypotheticalChaseArt';
 
 const S = {
     ink: '#213545', joint: '#354956', stone: '#677b7c', stoneShade: '#516571',
@@ -93,6 +96,51 @@ function foliage(c: CanvasRenderingContext2D, x: number, base: number, time: num
     oval(c,x-6,base-3,15,4,'#627f75');
 }
 
+function siegeFacade(c:CanvasRenderingContext2D,x:number,base:number,index:number,age:number){
+    const site=DESTRUCTION_SITES[index],w=site.width,h=site.height,top=base-h;
+    const intact=()=>{
+        facade(c,x,base,w,h,site.variant);
+        if(site.kind==='ram'){
+            pixelLine(c,x+12,base-33,x+12,base-43,'#718477');box(c,x+9,base-44,11,7,'#879c8a');
+            box(c,x+11,base-42,7,1,'#c4b99b');box(c,x+14,base-40,2,2,'#c4b99b');
+        }else if(site.kind==='bite'){
+            box(c,x+7,base-24,w-14,4,'#798c7d');
+            for(let j=0;j<4;j++){box(c,x+10+j*14,base-27,2,9,'#889783');pixelLine(c,x+10+j*14,base-18,x+16+j*14,base-24,'#8a927c');}
+        }else{
+            for(const xx of [x+7,x+w-11]){box(c,xx,top+8,4,h-11,'#7b8c80');for(let y=top+12;y<base-4;y+=9)box(c,xx+1,y,1,1,'#bec0a3');}
+            pixelLine(c,x+9,base-12,x+w-15,base-12,'#6a857d',4);pixelLine(c,x+9,base-13,x+w-15,base-13,'#a8b39b');
+            oval(c,x+w-22,base-19,12,12,'#627f78');oval(c,x+w-20,base-17,8,8,'#a2ac90');
+            pixelLine(c,x+w-16,base-16,x+w-16,base-10,'#6a857d');pixelLine(c,x+w-19,base-13,x+w-13,base-13,'#6a857d');
+        }
+    };
+    if(age<0){intact();return;}
+    facade(c,x,base,w,h,site.variant,true);
+    // The exposed core keeps its beams, brick courses and broken services after the dust clears.
+    box(c,x+18,base-19,25,16,'#748276');box(c,x+21,base-17,18,13,'#62776f');
+    for(let row=0;row<3;row++)for(let j=0;j<3;j++){
+        const xx=x+3+j*8+row%2*4;box(c,xx,base-9-row*5,6,3,'#ac9176');box(c,xx,base-9-row*5,5,1,'#c2a689');
+    }
+    pixelLine(c,x+44,base-4,x+52,base-27,site.kind==='stamp'?'#6b827c':'#827765',3);
+    pixelLine(c,x+51,base-27,x+57,base-30,'#b3a58a');
+    if(site.kind==='bite')pixelLine(c,x+30,base-7,x+64,base-17,'#b09c7d',3);
+    if(site.kind==='stamp'){pixelLine(c,x+10,base-11,x+30,base-11,'#91a38f',3);pixelLine(c,x+30,base-11,x+33,base-16,'#6c857e',3);}
+    if(age<51){
+        // Four pieces retain the exact facade texture. Integer translations and clipping
+        // preserve crisp pixels, instead of stretching or dissolving the entire building.
+        c.save();c.beginPath();c.rect(x-34,top-20,w+70,h+20);c.clip();
+        for(let i=0;i<4;i++){
+            const t=Math.max(0,age-i*3),dx=Math.round((i-1.3)*t*.23),dy=Math.round(t*t*.082);
+            c.save();c.translate(dx,dy);c.beginPath();c.rect(x-4+i*21,top-12,21,h*.58+12);c.clip();intact();c.restore();
+        }
+        c.restore();
+    }
+    if(age<15){
+        const spread=Math.min(1,age/8);
+        pixelLine(c,x+38,base-27,x+38-18*spread,base-27-23*spread,'#6c756c');
+        pixelLine(c,x+38,base-27,x+38+21*spread,base-27-31*spread,'#6c756c');
+    }
+}
+
 function pennant(c: CanvasRenderingContext2D, x: number, y: number, time: number, height = 26) {
     const bend=Math.sin(time/38+x)*1.5;
     pixelLine(c,x-2,y-3,x+12,y-3,'#89958a',2);
@@ -135,7 +183,7 @@ function finalGate(c: CanvasRenderingContext2D, base: number, time: number, phas
 
 /** Soft background edges; the ivory edge is reserved for actual walkable surfaces. */
 export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: HypotheticalModel, cx: number, cy: number, reduced: boolean) {
-    const time=reduced?0:b.tick, lift=(64-cy)*.2,base=HYPOTHETICAL.floor-cy-8;
+    const time=reduced?0:b.tick, lift=(64-cy)*.2,base=b.act==='siege'?backdropBaseline(cy):HYPOTHETICAL.floor-cy-8;
     box(c,0,0,320,180,'#b4c0b0');box(c,0,0,320,57,'#6d939f');box(c,0,57,320,25,'#8faab0');box(c,0,82,320,23,'#c4c3ac');
     oval(c,242-Math.round(cx*.025),43+lift,25,25,'#f0d1a0');
     for(let i=0;i<4;i++){
@@ -147,6 +195,7 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
     for(let i=Math.floor(far/53)-1;i<Math.ceil((far+320)/53);i++){
         const x=i*53-Math.round(far),h=19+mod(i,3)*7,y=112+lift;
         box(c,x,y-h,39,h,'#91a7a2');box(c,x+4,y-h-3,31,3,'#a9b8ab');
+        if(mod(i,3)===1){box(c,x+27,y-h-8,4,6,'#91a7a2');box(c,x+26,y-h-9,6,2,'#a9b8ab');}
         if(mod(i,4)===0){box(c,x+14,y-h-16,11,17,'#91a7a2');polygon(c,[[x+11,y-h-16],[x+20,y-h-23],[x+28,y-h-16]],'#9eafa7');}
         for(let xx=5;xx<34;xx+=10)box(c,x+xx,y-h+8,4,8,'#a9b7a9');
     }
@@ -155,6 +204,11 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
         const xx=mod(i*53+row*19-Math.round(cx*.17)+Math.floor(time/(21+row)),365)-25,yy=121+lift+row*7;
         box(c,xx,yy,6+mod(i+row,4)*5,1,row%3===0?'#92b4a3':row%2?'#4d8390':'#63968f');
     }
+    // A broken, quiet reflection gives the canal depth without resembling a walkable edge.
+    for(let row=0;row<6;row++){
+        const pulse=reduced?0:Math.sin(time/48+row)*2,x=248-cx*.025-row*3+pulse,y=122+lift+row*5;
+        box(c,x,y,8+row*3,1,'#9aaf98');box(c,x+5+row*2,y+2,5+row,1,'#84a69b');
+    }
     // The far quay has arches whose piers terminate in the canal.
     const quay=cx*.23;
     for(let i=Math.floor(quay/68)-1;i<Math.ceil((quay+320)/68);i++){
@@ -162,6 +216,16 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
         box(c,x,y,68,27,'#8d9d91');arch(c,x+9,y+6,49,24,'#588782');
         box(c,x,y,68,3,'#afb49d');box(c,x+1,y+6,5,31,'#a0aa96');
         box(c,x+3,y+32,9,2,'#7da091');
+        for(let j=0;j<3;j++)box(c,x+1+j%2,y+24+j*4,3,2,'#758f82');
+    }
+    if(b.act==='chase'){
+        const drift=cx*.23;
+        for(let i=Math.floor(drift/213)-1;i<Math.ceil((drift+320)/213);i++){
+            const x=i*213+74-Math.round(drift),y=143+lift+(reduced?0:Math.sin(time/60+i)*.7);
+            polygon(c,[[x,y],[x+24,y],[x+19,y+5],[x+6,y+5]],'#577b75');
+            box(c,x+5,y-3,13,3,'#809b88');box(c,x+11,y-5,6,2,'#8ca18c');
+            pixelLine(c,x+3,y,x-5,y-8,'#7e9c8a');box(c,x+5,y+7,17,1,'#81a499');
+        }
     }
     if(b.act==='chase'){
         const middle=cx*.36;
@@ -174,7 +238,8 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
             pixelLine(c,x+84,base-20,x+108,base-17,'#92a390');pixelLine(c,x+108,base-17,x+132,base-20,'#92a390');
         }
         // Nothing spans the foreground gaps: water remains visible through the missing deck.
-        if(cx>1080){
+        drawChaseLandmarks(c,b,cx,cy,reduced);
+        if(cx>HYPOTHETICAL.chaseEnd-420){
             // This gateway is tied to the chase's destination, not the repeating parallax street.
             const x=HYPOTHETICAL.chaseEnd-cx-49,top=base-76;
             arch(c,x,top,98,76,'#b2ae95');arch(c,x+7,top+7,84,69,'#7f9588');
@@ -191,8 +256,9 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
         for(const [i,s] of SIEGE_SECTORS.entries()){
             const x=s.origin-cx;
             if(x>340||x+416<-20)continue;
-            facade(c,x+24,base-5,57,56+i%2*15,i,b.destroyed>i);
-            facade(c,x+184,base-5,76,66+i*6,(i+1)%3);
+            const damageAge=ruinAge(b.backdrop.breaches,i,b.backdrop.tick);
+            facade(c,x+24,base-5,57,56+i%2*15,i);
+            siegeFacade(c,x+184,base-5,i,damageAge);
             box(c,x,base-4,416,9,'#788c82');box(c,x,base+5,416,3,'#a3ab90');
             for(let j=0;j<11;j++)box(c,x+j*36+mod(j,2)*9,base+1,19,1,'#91a18e');
             pennant(c,x+9,base-64,time);pennant(c,x+300,base-61,time,34);
@@ -204,17 +270,21 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
                 arch(c,x+112,base-41,20,37,'#5e7e77');box(c,x+120,base-34,3,29,'#93a18c');
             }else if(i===1){
                 // Loading crane, rope, pulley and suspended pallet share one anchored structure.
-                const sway=reduced?0:Math.sin(time/80)*2;
+                const shock=damageAge>=0&&damageAge<100?Math.sin(damageAge/5)*5*Math.exp(-damageAge/30):0;
+                const sway=reduced?0:Math.sin(time/80)*2+shock,drop=damageAge<0?0:Math.min(41,Math.max(0,damageAge-8)**2*.06);
                 box(c,x+141,base-95,7,91,'#6d847a');box(c,x+142,base-94,2,89,'#a1aa90');
                 pixelLine(c,x+145,base-91,x+222,base-105,'#617e77',5);
                 pixelLine(c,x+146,base-59,x+188,base-98,'#7f9281',3);
                 pixelLine(c,x+146,base-91,x+222,base-105,'#b4b59a');
                 oval(c,x+218,base-107,7,7,'#647c72');oval(c,x+220,base-105,3,3,'#c0b99a');
-                pixelLine(c,x+222,base-100,x+222+sway,base-63,'#657f76');
-                pixelLine(c,x+222+sway,base-63,x+207+sway,base-45,'#819886');
-                pixelLine(c,x+222+sway,base-63,x+238+sway,base-45,'#819886');
-                box(c,x+206+sway,base-45,34,4,'#718679');box(c,x+210+sway,base-59,26,14,'#9c9e7d');
-                for(const dx of [214,229])box(c,x+dx+sway,base-59,2,14,'#6b8278');
+                pixelLine(c,x+222,base-100,x+222+sway,base-(damageAge<0?63:80),'#657f76');
+                if(damageAge<8){
+                    pixelLine(c,x+222+sway,base-63,x+207+sway,base-45,'#819886');
+                    pixelLine(c,x+222+sway,base-63,x+238+sway,base-45,'#819886');
+                }else pixelLine(c,x+222+sway,base-80,x+220+sway,base-75,'#a4af95');
+                const loadX=x+(drop>=41?0:sway);
+                box(c,loadX+206,base-45+drop,34,4,'#718679');box(c,loadX+210,base-59+drop,26,14,'#9c9e7d');
+                for(const dx of [214,229])box(c,loadX+dx,base-59+drop,2,14,'#6b8278');
             }else{
                 // The arsenal has reinforced doors, vent stacks and pressure pipes.
                 box(c,x+94,base-91,64,87,'#7c9186');box(c,x+89,base-94,74,5,'#adb29a');
@@ -225,6 +295,13 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
                 pixelLine(c,x+96,base-30,x+157,base-30,'#5c7f7a',5);pixelLine(c,x+96,base-30,x+157,base-30,'#a0ad96');
                 if(!reduced)for(let j=0;j<3;j++){
                     const t=(time+j*24)%90;box(c,x+109+t*.06,base-112-t*.22,5+t*.06,2,'#b5bfb0');
+                }
+                if(damageAge>=0){
+                    pixelLine(c,x+126,base-30,x+130,base-26,'#617c73',3);
+                    for(let j=0;j<(reduced?2:5);j++){
+                        const t=reduced?j*6:(damageAge+j*9)%45;
+                        box(c,x+130+t*.7,base-27-t*.23,4+t*.1,2,'#bac0a9');
+                    }
                 }
             }
             // A rope fence sits behind the playable road, never impersonating a solid platform.
@@ -239,18 +316,42 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
     }
 }
 
-export function drawHypotheticalDestruction(c: CanvasRenderingContext2D, b: HypotheticalModel, base: number, reduced: boolean) {
-    if(b.backgroundStamp<=0)return;
-    const age=32-b.backgroundStamp,x=24+(SIEGE_SECTORS[b.destroyed-1]?.origin??0),drop=age*age*.035;
-    // Fragments retain the roof's tile material and converge on their own street.
-    for(let i=0;i<5;i++){
-        const xx=x+i*11+(i-2)*age*.12,yy=Math.min(base-6,base-60+drop+age*i*.22);
-        polygon(c,[[xx,yy],[xx+10,yy+i%2*3],[xx+9,yy+4],[xx-1,yy+3]],'#8c716b');
-        pixelLine(c,xx+1,yy+1,xx+7,yy+2,'#bd947b');
+export function drawHypotheticalDestruction(c: CanvasRenderingContext2D, b: HypotheticalModel, base: number, cy:number, reduced: boolean) {
+    for(const [index,site] of DESTRUCTION_SITES.entries()){
+        const age=ruinAge(b.backdrop.breaches,index,b.backdrop.tick);if(age<0||age>=120)continue;
+        const x=site.x+site.width/2,fade=Math.max(0,1-age/120);
+        if(age<9){
+            for(let i=0;i<(reduced?3:6);i++){
+                const angle=i*Math.PI/3,r=7+age*1.8;
+                pixelLine(c,x+Math.cos(angle)*r,base-31+Math.sin(angle)*r*.6,x+Math.cos(angle)*(r+5),base-31+Math.sin(angle)*(r+5)*.6,'#cfbf98');
+            }
+        }
+        if(age<48)for(let i=0;i<(reduced?4:10);i++){
+            const t=Math.max(0,age-i%3*2),xx=x+(i-4.5)*(3+t*.27),yy=Math.min(base-5,base-42-t*(1+i%3*.25)+t*t*.1);
+            polygon(c,[[xx,yy],[xx+4+i%3,yy-1],[xx+5,yy+3],[xx+1,yy+4]],site.kind==='stamp'?'#748b80':i%2?'#9f8973':'#a78d77');
+            box(c,xx+1,yy,3,1,'#c3b18f');
+        }
+        // Two low, receding dust banks leave the rider's head and the playable silhouettes readable.
+        for(let i=0;i<(reduced?3:7);i++){
+            const drift=(i-3)*Math.min(age,48)*.16,xx=x-34+i*10+drift;
+            const yy=base-5-Math.min(age,45)*.12-i%3*3,w=(13+Math.min(age,30)*.4)*fade;
+            if(w<2)continue;
+            box(c,xx+3,yy-3,w-4,3,'#b2ae98');box(c,xx,yy,w,4,'#aaa78f');box(c,xx+2,yy+4,w-3,2,'#9c9f88');
+            if(age<45)box(c,xx+4,yy-2,Math.max(1,w-9),1,'#c5b99b');
+        }
+        if(!reduced&&age>8&&age<78)for(let i=0;i<4;i++){
+            const t=age-8,xx=x+(i-1.5)*t*.8,yy=base-site.height-12-t*.4-i*3,flap=Math.sin(t/3+i)>0?2:-1;
+            pixelLine(c,xx-2,yy+flap,xx,yy,'#6d8a82');pixelLine(c,xx,yy,xx+2,yy+flap,'#6d8a82');
+        }
     }
-    for(let i=0;i<(reduced?3:7);i++){
-        const xx=x-2+i*8,yy=base-7-age*.18-i%3*3;
-        oval(c,xx,yy,12+age*.12,7,'#b2ac95');box(c,xx+4,yy+2,6,1,'#c5b79c');
+    // A fragment leaves a ruined structure while its existing one-second floor warning runs.
+    // At t=1 it meets the native rubble projectile's actual spawn position (world y=90).
+    for(const mark of b.marks){
+        const age=b.tick-mark.born;if(age<0||age>=60)continue;
+        const sites=DESTRUCTION_SITES.filter((_,i)=>b.backdrop.breaches[i]>=0);if(!sites.length)continue;
+        const site=sites.reduce((a,z)=>Math.abs(a.x-mark.x)<Math.abs(z.x-mark.x)?a:z);
+        const point=rubbleApproach(site.x+site.width/2,mark.x,age,base+cy),x=point.x,y=point.y-cy;
+        polygon(c,[[x-3,y-1],[x+1,y-3],[x+3,y],[x+1,y+3],[x-2,y+2]],'#91a08a');box(c,x-1,y-1,2,1,'#bdbea0');
     }
 }
 
@@ -269,6 +370,11 @@ export function drawHypotheticalMasonry(c: CanvasRenderingContext2D, level: Worl
         if(!solid(col,row))continue;
         const x=col*16-cx,y=row*16-cy;
         if(b.act==='chase'&&row===13){timberStep(c,x,y,col);continue;}
+        if(b.act==='chase'&&row===14&&col>=70&&col<140){timberStep(c,x,y,col);continue;}
+        if(b.act==='chase'&&row===14&&col>=210){
+            box(c,x,y,16,16,S.ink);box(c,x+1,y+2,14,12,S.iron);box(c,x,y,16,2,S.edge);
+            pixelLine(c,x+3,y+5,x+11,y+11,S.ironLight);box(c,x+2,y+3,2,1,S.cap);box(c,x+12,y+12,2,1,S.cap);continue;
+        }
         box(c,x,y,16,16,S.stoneShade);
         const seam=mod(col+Math.floor(row/2),2)===0;
         box(c,x+(seam?1:0),y+1,seam?15:16,13,mod(Math.floor(col/2)+row,3)===0?S.stoneLight:S.stone);
@@ -291,7 +397,7 @@ export function drawHypotheticalMasonry(c: CanvasRenderingContext2D, level: Worl
                 box(c,x+3,y+1,9,2,'#98734f');box(c,x+5,y+1,4,1,S.edge);
             }
         }
-        for(const x of [490,910,1392]){
+        for(const x of CHASE_GAPS.map(([a])=>a*16-80)){
             if(!solid(Math.floor(x/16),14))continue;
             box(c,x-cx,201-cy,2,23,S.woodShade);box(c,x-5-cx,195-cy,17,10,S.ink);
             box(c,x-4-cx,196-cy,15,7,S.cap);
@@ -300,6 +406,28 @@ export function drawHypotheticalMasonry(c: CanvasRenderingContext2D, level: Worl
     }else if(b.act==='duel'){
         // Small sockets explain the winch cable's attachment, without implying extra platforms.
         for(const x of [53,263]){box(c,x-cx,224-cy,5,3,S.ink);box(c,x+1-cx,224-cy,3,1,S.ironLight);}
+    }else if(b.act==='siege'){
+        // Inlaid drains and worn loading strips remain inside the solid road.
+        // Their dark recesses never masquerade as holes in the collision mask.
+        for(const [i,s] of SIEGE_SECTORS.entries()){
+            const y=224-cy,from=s.origin+26-cx,to=s.gate-cx;
+            for(let x=from;x<to-24;x+=i===1?56:80){
+                box(c,x,y+8,20,6,S.ink);box(c,x+1,y+9,18,4,S.iron);
+                for(let j=0;j<5;j++)box(c,x+3+j*3,y+9,1,4,S.ironLight);
+                box(c,x+1,y+8,18,1,S.stoneLight);
+            }
+            box(c,to-12,y+1,42,3,S.iron);box(c,to-11,y+1,40,1,S.ironLight);
+            for(const dx of [-8,24]){box(c,to+dx,y+2,2,1,S.cap);}
+            // A low approach marker previews the real number of locks ahead.
+            const x=s.trigger-32-cx,cleared=i<b.route.cleared;
+            box(c,x,194-cy,3,30,S.woodShade);box(c,x-5,183-cy,29,13,S.ink);
+            box(c,x-4,184-cy,27,10,S.iron);box(c,x-3,184-cy,25,1,S.cap);
+            for(let j=0;j<s.guards.length;j++){
+                const released=j<s.guards.length-b.route.remaining[i];
+                box(c,x-1+j*5,187-cy,3,released?2:5,released?'#99d6bd':'#ca9951');
+            }
+            if(cleared){pixelLine(c,x+16,188-cy,x+19,190-cy,'#99d6bd');pixelLine(c,x+19,190-cy,x+16,192-cy,'#99d6bd');}
+        }
     }
 }
 
@@ -313,6 +441,107 @@ function terrace(c: CanvasRenderingContext2D, p: MovingBody, cx: number, cy: num
     box(c,x,y,w,7,S.ink);box(c,x,y,w,2,S.edge);box(c,x+1,y+2,w-2,3,S.wood);
     for(let xx=5;xx<w-2;xx+=9){box(c,x+xx,y+2,1,3,S.woodShade);box(c,x+xx-2,y+3,1,1,S.cap);}
     box(c,x+2,y+5,w-4,1,S.woodLight);
+}
+
+/** The same walkable lip, with district-specific joinery below it. Posts are
+ * background structure: only the seven-pixel deck is a native one-way body. */
+function siegeDeck(c: CanvasRenderingContext2D, p: MovingBody, cx: number, cy: number) {
+    const index=p.id.startsWith('siege-link-')?Number(p.id.slice(-1))+1:Number(p.id.split('-')[2]);
+    const x=p.x-cx,y=p.y-cy,w=p.width,floor=224-cy;
+    if(index===0){
+        terrace(c,p,cx,cy);
+        for(const px of [x+5,x+w-9]){
+            box(c,px-2,floor-7,8,7,S.iron);box(c,px-1,floor-6,6,1,S.ironLight);
+            box(c,px+1,floor-3,2,1,S.cap);
+            pixelLine(c,px+1,y+24,px+2,floor-11,S.wood);
+        }
+        return;
+    }
+    const iron=index===2;
+    for(const px of [x+5,x+w-10]){
+        box(c,px,y+7,5,floor-y-7,iron?S.iron:S.woodShade);
+        box(c,px+1,y+9,1,floor-y-12,iron?S.ironLight:S.woodLight);
+        box(c,px-3,floor-6,11,6,S.stoneShade);box(c,px-2,floor-6,9,1,S.stoneLight);
+        for(const yy of [y+12,floor-10]){box(c,px-1,yy,7,3,S.iron);box(c,px+1,yy,2,1,S.cap);}
+    }
+    const braceY=Math.min(floor-12,y+32);
+    pixelLine(c,x+9,braceY,x+w/2,y+8,iron?S.iron:S.woodShade,3);
+    pixelLine(c,x+w-7,braceY,x+w/2,y+8,iron?S.iron:S.woodShade,3);
+    box(c,x,y,w,7,S.ink);box(c,x,y,w,1,S.edge);box(c,x+1,y+1,w-2,1,S.cap);
+    box(c,x+1,y+2,w-2,3,iron?S.iron:S.wood);
+    for(let xx=5;xx<w-2;xx+=iron?8:11){
+        box(c,x+xx,y+2,1,3,S.ink);box(c,x+xx-2,y+3,1,1,iron?S.ironLight:S.woodLight);
+    }
+    box(c,x+2,y+5,w-4,1,iron?S.ironLight:S.woodLight);
+    for(const px of [x+3,x+w-6]){box(c,px,y+3,3,4,S.iron);box(c,px+1,y+3,1,1,S.cap);}
+    if(!iron&&w>=64){
+        // A dark sling under the loading bay explains how it was assembled.
+        pixelLine(c,x+8,y+9,x+w-9,y+20,S.woodShade);
+        pixelLine(c,x+8,y+10,x+w-9,y+21,S.woodLight);
+    }
+}
+
+function siegeGate(c: CanvasRenderingContext2D, p: MovingBody, b: HypotheticalModel, cx: number, cy: number) {
+    const i=Number(p.id.slice(-1)),sector=SIEGE_SECTORS[i],x=p.x-cx,floor=224-cy,top=42-cy;
+    const ticks=b.route.gateTicks[i],phase=b.route.gatePhase(i),height=p.height,bottom=height-cy;
+    const travel=224-height,released=sector.guards.length-b.route.remaining[i];
+    // The mounting pads, paired rails and exposed counterweight reach the road.
+    for(const px of [x-5,x+18]){
+        box(c,px-3,floor-6,9,6,S.stoneShade);box(c,px-2,floor-6,7,1,S.stoneLight);
+        box(c,px,top,3,floor-top-6,S.ink);box(c,px+1,top,1,floor-top-6,S.ironLight);
+        for(let yy=top+8;yy<floor-7;yy+=21){box(c,px-1,yy,5,4,S.iron);box(c,px,yy,1,1,S.cap);}
+    }
+    box(c,x+25,floor-87,7,71,S.woodShade);box(c,x+27,floor-85,3,67,S.ink);
+    const weightY=floor-83+travel*.22;
+    pixelLine(c,x+28,top+4,x+28,weightY,S.woodLight);
+    box(c,x+24,weightY,9,15,S.ink);box(c,x+25,weightY+1,7,13,S.iron);
+    box(c,x+26,weightY+2,2,10,S.ironLight);box(c,x+25,weightY+7,7,2,S.woodShade);
+    if(!p.active){
+        // All grille pixels agree with the collider, including jumps above the headstock.
+        c.save();c.beginPath();c.rect(x,-cy,16,height);c.clip();
+        for(let xx=0;xx<16;xx+=5){box(c,x+xx,-cy,3,height,S.ink);box(c,x+xx+1,-cy,1,height,S.ironLight);}
+        for(let yy=bottom-9;yy>-cy-20;yy-=24){box(c,x,yy,16,4,S.iron);box(c,x+1,yy,14,1,S.cap);}
+        c.restore();box(c,x,bottom-4,16,4,S.ink);box(c,x+1,bottom-4,14,1,S.cap);
+    }
+    box(c,x-8,top-4,42,9,S.ink);box(c,x-7,top-3,40,6,S.iron);box(c,x-6,top-3,38,1,S.cap);
+    for(const px of [x-2,x+24]){oval(c,px,top-2,5,5,S.cap);box(c,px+2,top,1,1,S.ink);}
+    // The waist-high drive stays in view. Rotation and chain travel derive
+    // from the actual gate displacement, so they stop with the grille.
+    const drumX=x-20,drumY=floor-56,settle=phase==='settle'?Math.sin((ticks-64)*2)*(72-ticks)*.02:0;
+    box(c,x-29,drumY-6,23,17,S.ink);box(c,x-28,drumY-5,21,14,S.iron);
+    box(c,x-27,drumY-5,19,1,S.ironLight);
+    pixelLine(c,x-1,top+6,x-8,drumY,S.woodShade,2);
+    const chainLength=drumY-top-6,offset=Math.floor(travel)%5;
+    for(let yy=offset;yy<chainLength;yy+=5){const xx=x-1-7*yy/chainLength;box(c,xx,top+6+yy,1,3,S.woodLight);}
+    oval(c,drumX-6,drumY-6,13,13,S.ink);oval(c,drumX-5,drumY-5,11,11,S.cap);
+    oval(c,drumX-3,drumY-3,7,7,S.iron);
+    for(let j=0;j<4;j++){
+        const angle=travel/8+j*Math.PI/2+settle;
+        pixelLine(c,drumX,drumY,drumX+Math.cos(angle)*5,drumY+Math.sin(angle)*5,S.woodLight);
+    }
+    box(c,drumX,drumY,1,1,S.edge);
+    // One captive pin per guard; the sockets remain visible when released.
+    const panelY=floor-37;
+    box(c,x-32,panelY,25,31,S.ink);box(c,x-31,panelY+1,23,29,S.iron);
+    box(c,x-30,panelY+2,21,1,S.ironLight);
+    for(let j=0;j<sector.guards.length;j++){
+        const py=panelY+5+j*6,u=b.route.lockTicks[i][j]/SIEGE_LOCK_TICKS,shift=Math.round(6*u);
+        box(c,x-28,py,16,4,S.ink);
+        box(c,x-27-shift,py+1,11,2,j<released?'#99d6bd':'#ca9951');
+        box(c,x-15,py+1,2,2,j<released?'#99d6bd':S.woodShade);
+    }
+    const latchShift=Math.round(7*Math.min(1,ticks/SIEGE_UNLOCK_TICKS));
+    box(c,x-8,floor-19,9,5,S.ink);box(c,x-6-latchShift,floor-18,9,3,S.woodLight);
+    box(c,x-6-latchShift,floor-18,8,1,S.cap);
+    // A settled exit reads differently from the still-locked next post.
+    const exitColor=phase==='open'?'#99d6bd':S.cap;
+    box(c,x+43,floor-27,2,27,S.woodShade);box(c,x+37,floor-30,18,12,S.ink);box(c,x+38,floor-29,16,10,exitColor);
+    pixelLine(c,x+43,floor-27,x+48,floor-24,S.ink);pixelLine(c,x+48,floor-24,x+43,floor-21,S.ink);
+    if(phase==='unlock'){
+        // A small release puff belongs to the latch, never the entire screen.
+        const t=ticks/SIEGE_UNLOCK_TICKS;
+        for(let j=0;j<3;j++)box(c,x-6-j*3-t*5,floor-22-j*3-t*5,2,1,S.stoneLight);
+    }
 }
 
 function balcony(c: CanvasRenderingContext2D, p: MovingBody, cx: number, cy: number) {
@@ -337,37 +566,11 @@ function balcony(c: CanvasRenderingContext2D, p: MovingBody, cx: number, cy: num
 export function drawHypotheticalFittings(c: CanvasRenderingContext2D, o: WorldObjects, b: HypotheticalModel, cx: number, cy: number) {
     for(const p of o.bodies){
         if(p.x>cx+350||p.x+p.width<cx-30)continue;
-        if(p.kind==='support'){if(p.id.startsWith('chase-')||p.id.startsWith('siege-'))terrace(c,p,cx,cy);else balcony(c,p,cx,cy);}
-        else if(p.id.startsWith('siege-gate-')){
-            const i=Number(p.id.slice(-1)),x=p.x-cx,floor=224-cy,bottom=p.height-cy,top=42-cy;
-            const ticks=b.route.gateTicks[i],opening=ticks>0&&ticks<SIEGE_GATE_TICKS,open=p.active;
-            // The grille's painted lower edge is exactly the collision body's lower edge.
-            for(const px of [x-5,x+18]){
-                box(c,px,top,3,floor-top,S.ink);box(c,px+1,top,1,floor-top,S.ironLight);
-                for(let yy=top+8;yy<floor;yy+=21){box(c,px-1,yy,5,4,S.iron);box(c,px,yy,1,1,S.cap);}
-            }
-            if(!open){
-                c.save();c.beginPath();c.rect(x,top,16,Math.max(0,bottom-top));c.clip();
-                for(let xx=0;xx<16;xx+=5){box(c,x+xx,top,3,bottom-top,S.ink);box(c,x+xx+1,top,1,bottom-top,S.ironLight);}
-                for(let yy=bottom-9;yy>top-20;yy-=24){box(c,x,yy,16,4,S.iron);box(c,x+1,yy,14,1,S.cap);}
-                c.restore();box(c,x-1,bottom-4,18,4,S.ink);box(c,x,bottom-4,16,1,S.cap);
-                if(bottom>top+14){box(c,x+5,bottom-13,6,8,S.ink);box(c,x+6,bottom-12,4,5,opening?'#99d6bd':'#ca9951');}
-            }
-            box(c,x-8,top-4,34,9,S.ink);box(c,x-7,top-3,32,6,S.iron);box(c,x-6,top-3,30,1,S.cap);
-            for(const px of [x-2,x+14]){
-                oval(c,px,top-2,5,5,S.cap);box(c,px+2,top,1,1,S.ink);
-                const offset=opening?Math.floor(ticks/3)%5:0;
-                for(let yy=top+7+offset;yy<floor-29;yy+=5){box(c,px+1,yy,1,3,S.woodLight);}
-            }
-            // Lock lamps and the route arrow use the same ivory/brass/mint vocabulary as combat.
-            box(c,x-17,floor-35,12,18,S.ink);box(c,x-16,floor-34,10,16,S.iron);
-            for(let j=0;j<3;j++)box(c,x-13,floor-31+j*4,4,2,i<b.route.cleared?'#99d6bd':'#ca9951');
-            box(c,x+27,floor-27,2,27,S.woodShade);box(c,x+22,floor-29,17,11,S.ink);box(c,x+23,floor-28,15,9,S.cap);
-            pixelLine(c,x+28,floor-26,x+33,floor-24,S.ink);pixelLine(c,x+33,floor-24,x+28,floor-21,S.ink);
-            if(opening)for(let j=0;j<3;j++){
-                const t=(ticks+j*13)%25;box(c,x-4+j*10+(j-1)*t*.12,floor-3-t*.3,2,1,S.cap);
-            }
+        if(p.kind==='support'){
+            if(p.id.startsWith('siege-'))siegeDeck(c,p,cx,cy);
+            else if(p.id.startsWith('chase-'))terrace(c,p,cx,cy);else balcony(c,p,cx,cy);
         }
+        else if(p.id.startsWith('siege-gate-'))siegeGate(c,p,b,cx,cy);
         else if(p.kind==='switch'){
             const side=p.id.endsWith('right')?1:0,armed=b.armed[side]>0,x=p.x-cx,y=p.y-cy,press=armed?3:0;
             const cableX=(side?263:56)-cx,floor=HYPOTHETICAL.floor-cy;

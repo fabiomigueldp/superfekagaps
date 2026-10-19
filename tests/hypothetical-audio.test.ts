@@ -47,9 +47,27 @@ test('mute, pause and disposal stop weapon tails and never queue silent shots fo
 });
 
 test('long barrages bound simultaneous voices and natural endings release their graphs',()=>{
-    const {audio,context}=setup();const cues:WeaponCue[]=['shot','impact','distant-shot','distant-hit','reload'];
+    const {audio,context}=setup();const cues:WeaponCue[]=['shot','impact','distant-shot','distant-hit','reload','distant-crash'];
     for(let i=0;i<80;i++)audio.play(cues[i%cues.length]);
     assert.equal(audio.activeVoices,12);
     for(const n of context.nodes)n.onended?.();
     assert.equal(audio.activeVoices,0);assert.ok(context.nodes.every(n=>n.disconnected));audio.dispose();
+});
+
+test('distant destruction has a low impact body and obeys the same pause and ownership as gunfire',()=>{
+    const {audio,context,route}=setup();assert.equal(audio.play('distant-crash'),true);
+    assert.ok(context.nodes.some(n=>n.type==='triangle'&&n.frequency.changes[0]===82));
+    assert.ok(context.nodes.some(n=>n.frequency.changes.includes(32)));
+    assert.ok(context.nodes.some(n=>n.type==='lowpass'&&n.frequency.changes[0]===1100));
+    assert.equal(audio.activeVoices,1);route.enabled=false;audio.sync();assert.equal(audio.activeVoices,0);
+    assert.ok(context.nodes.every(n=>n.disconnected));assert.equal(audio.play('distant-crash'),false);
+});
+
+test('rifle crack decays into a low body while impacts use a separate short metallic envelope',()=>{
+    const {audio,context}=setup();audio.play('shot');
+    assert.ok(context.nodes.some(n=>n.type==='triangle'&&n.frequency.changes.join(',')==='210,88,42'));
+    assert.ok(context.nodes.some(n=>n.type==='lowpass'&&n.frequency.changes.join(',')==='5800,2400,420'));
+    const begin=context.nodes.length;audio.play('impact');
+    assert.ok(context.nodes.slice(begin).some(n=>n.type==='sine'&&n.frequency.changes.join(',')==='1350,310'));
+    audio.dispose();assert.ok(context.nodes.every(n=>n.disconnected));
 });

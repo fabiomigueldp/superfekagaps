@@ -1,9 +1,11 @@
 {
-  "revision": "siege-route-13",
+  "revision": "gunfire-19",
   "tests": {
-    "passed": 80,
+    "passed": 157,
     "failed": 0,
-    "log": "output/hipotetico/siege-route/tests-final.log"
+    "encounter": 114,
+    "sharedMechanisms": 43,
+    "logs": "output/hipotetico/gunfire/tests.log"
   },
   "productionBuild": "passed",
   "browser": {
@@ -14,8 +16,8 @@
       "phase": 3,
       "health": 0,
       "won": true,
-      "deaths": 2,
-      "ticks": 6207
+      "deaths": 3,
+      "ticks": 6401
     },
     "campaignSave": null,
     "mobile": {
@@ -29,6 +31,18 @@
     "lengthPixels": 1280,
     "districts": 3,
     "guards": 9,
+    "combatPlatforms": 8,
+    "optionalLinks": 2,
+    "gateTicks": {
+      "unlock": 14,
+      "lift": 50,
+      "settle": 8
+    },
+    "pinsPerDistrict": [
+      2,
+      3,
+      4
+    ],
     "gates": [
       {
         "frame": 640,
@@ -36,46 +50,543 @@
         "x": 184.14411402604554
       },
       {
-        "frame": 913,
+        "frame": 1248,
         "cleared": 2,
-        "x": 444.6473608799318
+        "x": 444.5580138843547
       },
       {
-        "frame": 1386,
+        "frame": 1697,
         "cleared": 3,
-        "x": 959.7961043189242
+        "x": 960.9886132284018
       }
     ],
     "inputOnly": true,
-    "deaths": 1,
-    "videoSeconds": 17.7
+    "deaths": 2,
+    "videoSeconds": 22.9,
+    "pinChanges": [
+      {
+        "frame": 594,
+        "sector": 1,
+        "remaining": 1
+      },
+      {
+        "frame": 640,
+        "sector": 1,
+        "remaining": 0
+      },
+      {
+        "frame": 789,
+        "sector": 2,
+        "remaining": 2
+      },
+      {
+        "frame": 954,
+        "sector": 2,
+        "remaining": 3
+      },
+      {
+        "frame": 1059,
+        "sector": 2,
+        "remaining": 2
+      },
+      {
+        "frame": 1168,
+        "sector": 2,
+        "remaining": 1
+      },
+      {
+        "frame": 1248,
+        "sector": 2,
+        "remaining": 0
+      },
+      {
+        "frame": 1556,
+        "sector": 3,
+        "remaining": 3
+      },
+      {
+        "frame": 1613,
+        "sector": 3,
+        "remaining": 2
+      },
+      {
+        "frame": 1643,
+        "sector": 3,
+        "remaining": 1
+      },
+      {
+        "frame": 1697,
+        "sector": 3,
+        "remaining": 0
+      }
+    ],
+    "vaultEvents": [
+      {
+        "frame": 813,
+        "id": "hipotetico:garrison:1:2",
+        "phase": "warning",
+        "x": 642.5600000000004,
+        "y": 204,
+        "targetX": 648.4725314107061,
+        "targetY": 136
+      },
+      {
+        "frame": 856,
+        "id": "hipotetico:garrison:1:2",
+        "phase": "attack",
+        "x": 642.5600000000004,
+        "y": 204,
+        "targetX": 648.4725314107061,
+        "targetY": 136
+      },
+      {
+        "frame": 1083,
+        "id": "hipotetico:garrison:1:2",
+        "phase": "warning",
+        "x": 642.5600000000004,
+        "y": 204,
+        "targetX": 648.1284173846605,
+        "targetY": 136
+      },
+      {
+        "frame": 1126,
+        "id": "hipotetico:garrison:1:2",
+        "phase": "attack",
+        "x": 642.5600000000004,
+        "y": 204,
+        "targetX": 648.1284173846605,
+        "targetY": 136
+      },
+      {
+        "frame": 1152,
+        "id": "hipotetico:garrison:1:2",
+        "phase": "rest",
+        "x": 648.1284173846605,
+        "y": 136,
+        "targetX": 648.1284173846605,
+        "targetY": 136
+      },
+      {
+        "frame": 1167,
+        "id": "hipotetico:garrison:1:2",
+        "phase": "defeated",
+        "x": 648.1284173846605,
+        "y": 136,
+        "targetX": 648.1284173846605,
+        "targetY": 136
+      }
+    ]
   },
+  "upperRoutes": [
+    {
+      "route": 1,
+      "inputOnly": true,
+      "actorCameraClockEdits": false,
+      "deathsDuringApproach": 0,
+      "captures": [
+        {
+          "file": "upper-1-link.png",
+          "frame": 730,
+          "x": 398.90294419610416,
+          "y": 156
+        },
+        {
+          "file": "upper-1-arrival.png",
+          "frame": 771,
+          "x": 503.5079441961042,
+          "y": 164
+        }
+      ],
+      "receipt": {
+        "act": "siege",
+        "phase": 1,
+        "health": 9,
+        "won": false,
+        "deaths": 0,
+        "ticks": 771
+      }
+    },
+    {
+      "route": 2,
+      "inputOnly": true,
+      "actorCameraClockEdits": false,
+      "deathsDuringApproach": 0,
+      "captures": [
+        {
+          "file": "upper-2-link.png",
+          "frame": 1384,
+          "x": 816.8292529637719,
+          "y": 160
+        },
+        {
+          "file": "upper-2-arrival.png",
+          "frame": 1425,
+          "x": 892.7715935887717,
+          "y": 164
+        }
+      ],
+      "receipt": {
+        "act": "siege",
+        "phase": 1,
+        "health": 9,
+        "won": false,
+        "deaths": 1,
+        "ticks": 1308
+      }
+    }
+  ],
   "nativeReplay": {
     "inputOnly": true,
     "actorCameraClockEdits": false,
-    "frames": 6486,
-    "videoFrames": 3333,
+    "frames": 6797,
+    "videoFrames": 3488,
     "receipt": {
       "act": "duel",
       "phase": 3,
       "health": 0,
       "won": true,
-      "deaths": 2,
-      "ticks": 6207
+      "deaths": 3,
+      "ticks": 6401
     }
   },
   "audio": {
     "productionSynth": true,
-    "weaponEffectsOnly": true,
-    "cues": 173,
-    "seconds": 111.1,
-    "peak": 0.09787113964557648,
-    "rms": 0.003109045669984654,
+    "weaponEffectsOnly": false,
+    "destructionCues": 3,
+    "cues": 179,
+    "seconds": 116.26666666666667,
+    "peak": 0.10918664932250977,
+    "rms": 0.004770211074973335,
     "sampleRate": 48000
   },
-  "artInspection": {
-    "poses": 40,
-    "width": 1280,
-    "height": 512
+  "guardVault": {
+    "acquisitionMs": 260,
+    "warningMs": 700,
+    "recoveryMs": 1050,
+    "cooldownMs": 2500,
+    "rangePixels": 112,
+    "maxRisePixels": 72,
+    "lockedLanding": true,
+    "nativeCollision": true,
+    "topHitDefeats": true,
+    "atlasPoses": 50
+  },
+  "siegeAudio": {
+    "productionSynth": true,
+    "weaponEffectsOnly": false,
+    "destructionCues": 3,
+    "cues": 39,
+    "seconds": 22.9,
+    "peak": 0.047964222729206085,
+    "rms": 0.002132636665830605,
+    "sampleRate": 48000
+  },
+  "scenery": {
+    "inputOnly": true,
+    "actorCameraClockEdits": false,
+    "nativeCaptures": 22,
+    "districtImpacts": [
+      180,
+      580,
+      980
+    ],
+    "verticalParallax": 0.22,
+    "bystanderInspectionPoses": 20,
+    "visibleShotsInThreePasses": 18,
+    "casualties": 6,
+    "survivors": 2,
+    "capturedDistricts": [
+      1,
+      2,
+      3
+    ]
+  },
+  "civilians": {
+    "revision": "motion-18",
+    "scenicTimeline": true,
+    "sceneTicks": 1200,
+    "npcs": 8,
+    "shirtCount": 4,
+    "aims": [
+      {
+        "tick": 90,
+        "index": 1,
+        "clothes": "star-shirt",
+        "district": 0,
+        "x": 284,
+        "y": -7
+      },
+      {
+        "tick": 146,
+        "index": 0,
+        "clothes": "workcoat",
+        "district": 0,
+        "x": 246,
+        "y": -7
+      },
+      {
+        "tick": 490,
+        "index": 2,
+        "clothes": "star-shirt",
+        "district": 1,
+        "x": 662,
+        "y": -7
+      },
+      {
+        "tick": 546,
+        "index": 3,
+        "clothes": "scarf",
+        "district": 1,
+        "x": 700,
+        "y": -7
+      },
+      {
+        "tick": 890,
+        "index": 5,
+        "clothes": "star-shirt",
+        "district": 2,
+        "x": 1116,
+        "y": -7
+      },
+      {
+        "tick": 946,
+        "index": 4,
+        "clothes": "satchel",
+        "district": 2,
+        "x": 1078,
+        "y": -7
+      }
+    ],
+    "shots": [
+      110,
+      118,
+      126,
+      166,
+      174,
+      182,
+      510,
+      518,
+      526,
+      566,
+      574,
+      582,
+      910,
+      918,
+      926,
+      966,
+      974,
+      982
+    ],
+    "hits": [
+      {
+        "tick": 138,
+        "index": 1,
+        "clothes": "star-shirt",
+        "district": 0,
+        "stoppedAt": 120
+      },
+      {
+        "tick": 184,
+        "index": 0,
+        "clothes": "workcoat",
+        "district": 0,
+        "stoppedAt": 112
+      },
+      {
+        "tick": 530,
+        "index": 2,
+        "clothes": "star-shirt",
+        "district": 1,
+        "stoppedAt": 512
+      },
+      {
+        "tick": 591,
+        "index": 3,
+        "clothes": "scarf",
+        "district": 1,
+        "stoppedAt": 520
+      },
+      {
+        "tick": 938,
+        "index": 5,
+        "clothes": "star-shirt",
+        "district": 2,
+        "stoppedAt": 920
+      },
+      {
+        "tick": 984,
+        "index": 4,
+        "clothes": "satchel",
+        "district": 2,
+        "stoppedAt": 912
+      }
+    ],
+    "escaped": [
+      {
+        "index": 6,
+        "clothes": "star-shirt"
+      },
+      {
+        "index": 7,
+        "clothes": "workcoat"
+      }
+    ],
+    "foregroundCollisionsAdded": 0,
+    "preparationTicks": 20,
+    "inspectionPoses": 20,
+    "motion": {
+      "anticipationTicks": 6,
+      "shelterTravelTicks": 68,
+      "armRiseTicks": 8,
+      "maxVelocityDelta": 0.10002915451900662,
+      "maxHandTravel": 2.0445039502095725,
+      "maxCoverDelta": 0.18359375,
+      "maxReactionQueue": 3
+    }
+  },
+  "reviewPage": {
+    "passed": true,
+    "viewports": [
+      1440,
+      390
+    ],
+    "assetResponses": 251,
+    "errors": [],
+    "screenshot": "output/hipotetico/gunfire/review-page.png",
+    "media": [
+      {
+        "src": "http://127.0.0.1:3000/docs/world/hipotetico/mega-boss-2026-10-18/gunfire-play.mp4?rev=gunfire-19",
+        "w": 960,
+        "h": 540,
+        "duration": 14.133
+      },
+      {
+        "src": "http://127.0.0.1:3000/docs/world/hipotetico/mega-boss-2026-10-18/guards-play.mp4?rev=gunfire-19",
+        "w": 960,
+        "h": 540,
+        "duration": 22.9
+      },
+      {
+        "src": "http://127.0.0.1:3000/docs/world/hipotetico/mega-boss-2026-10-18/bystander-motion.mp4?rev=motion-18",
+        "w": 960,
+        "h": 540,
+        "duration": 5
+      },
+      {
+        "src": "http://127.0.0.1:3000/docs/world/hipotetico/mega-boss-2026-10-18/native-play.mp4?rev=gunfire-19",
+        "w": 960,
+        "h": 540,
+        "duration": 116.266667
+      }
+    ]
+  },
+  "civilianAnimation": {
+    "inspectionOnly": true,
+    "productionNpcTimeline": true,
+    "relocatedForLayout": true,
+    "scale": 2,
+    "videoFrames": 150,
+    "seconds": 5,
+    "contactSheetPoses": 32,
+    "samples": [
+      {
+        "index": 0,
+        "ticks": [
+          41,
+          51,
+          72,
+          105,
+          119,
+          187,
+          202,
+          229
+        ]
+      },
+      {
+        "index": 1,
+        "ticks": [
+          49,
+          59,
+          80,
+          113,
+          127,
+          141,
+          156,
+          183
+        ]
+      },
+      {
+        "index": 3,
+        "ticks": [
+          449,
+          459,
+          480,
+          513,
+          527,
+          594,
+          609,
+          636
+        ]
+      },
+      {
+        "index": 4,
+        "ticks": [
+          841,
+          851,
+          872,
+          905,
+          919,
+          987,
+          1002,
+          1029
+        ]
+      }
+    ],
+    "groundedFallSamples": 448,
+    "rotationTestAngles": 6,
+    "inAppPlaybackConfirmed": true,
+    "sourceRevision": "motion-18"
+  },
+  "gunfire": {
+    "nativeProof": "gunfire-verification.json",
+    "nativeCaptures": 7,
+    "speedsPixelsPerTick": [
+      5.2,
+      5.8,
+      6.4
+    ],
+    "previousSpeeds": [
+      3.95,
+      4.2,
+      4.45
+    ],
+    "pursuitSpeed": 5.6,
+    "burstIntervalsTicks": [
+      6,
+      5,
+      4
+    ],
+    "betweenGroupsTicks": [
+      24,
+      22,
+      18
+    ],
+    "shotsPerCompleteAttack": [
+      6,
+      12,
+      18
+    ],
+    "committedAimTicks": 24,
+    "nativeCounterplayTests": [
+      "standing in locked line loses helmet",
+      "running to cover preserves helmet"
+    ],
+    "tracerBoundedByBirth": true,
+    "groundedCasings": true,
+    "reducedMotionCapture": "gun-reduced.png",
+    "previewFrames": 424,
+    "previewSeconds": 14.133333333333333,
+    "inAppPlaybackConfirmed": true,
+    "currentVideoTimeVerified": 11.73087
   }
 }

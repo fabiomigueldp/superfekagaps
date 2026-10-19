@@ -21,7 +21,9 @@ export function guardFoot(distance:number,side:0|1):Point {
 export function guardPose(e:WorldFoe,reduced=false){
     const action=e instanceof HypotheticalGuard?e.actionPose:guardActionPose(e);
     const warning=action.brace;
-    const moving=Math.abs(e.motionX)>.01,walk=moving&&['walk','rest','attack'].includes(e.phase);
+    const vault=e instanceof HypotheticalGuard&&e.vaultTarget;
+    const airborne=Boolean(vault&&e.phase==='attack');
+    const moving=Math.abs(e.motionX)>.01,walk=moving&&!airborne&&['walk','rest','attack'].includes(e.phase);
     const recovery=e.phase==='rest'||e.phase==='recoil';
     const thrust=action.thrust;
     const bob=walk?-(Math.sin(e.distance/20*Math.PI*2)**2):0;
@@ -29,8 +31,9 @@ export function guardPose(e:WorldFoe,reduced=false){
     const direction=e.motionX*e.facing<0?-1:1;
     const foot=(side:0|1):Point=>{const p=guardFoot(e.distance,side);return [p[0]*direction,p[1]];};
     return {warning,moving,thrust,recovery,bob:bob+breathing+action.crouch,
-        lean:action.lean,hatch:action.hatch,carry:action.carry,turn:action.turn,supply:action.supply,cut:action.cut,
-        left:walk?foot(0):[-3,0] as Point,right:walk?foot(1):[3,0] as Point};
+        lean:action.lean,hatch:action.hatch,carry:action.carry,turn:action.turn,supply:action.supply,cut:action.cut,tuck:action.tuck,
+        left:airborne?[-4-action.tuck*2,-action.tuck*5] as Point:walk?foot(0):[-3,0] as Point,
+        right:airborne?[3+action.tuck*2,-action.tuck*3] as Point:walk?foot(1):[3,0] as Point};
 }
 
 /** Same copper canister in the launcher's hands and in native projectile physics. */
@@ -63,6 +66,14 @@ export function drawHypotheticalGuard(c:CanvasRenderingContext2D,e:WorldFoe,cx:n
     const line=(a:number,b:number,aa:number,bb:number,col:string,size=1)=>pixelLine(c,xx(a),y+b,xx(aa),y+bb,color(col),size);
     const poly=(p:readonly Point[],col:string)=>polygon(c,p.map(([a,b])=>[xx(a),y+b] as Point),color(col));
     const ellipse=(a:number,b:number,ww:number,hh:number,col:string)=>oval(c,xx(d>0?a:a+ww-1),y+b,ww,hh,color(col));
+    if(e instanceof HypotheticalGuard&&!e.dead&&e.vaultTarget&&['warning','attack'].includes(e.phase)){
+        // This bracket is attached to the real destination and remains locked
+        // when Feka dodges. The airborne body is the whole danger region.
+        const target=e.vaultTarget,tx=Math.round(target.x-cx),ty=Math.round(target.floor-cy);
+        pixelLine(c,tx-2,ty-4,tx-2,ty-1,C.hot);pixelLine(c,tx-2,ty-1,tx+3,ty-1,C.hot);
+        pixelLine(c,tx+w+1,ty-4,tx+w+1,ty-1,C.hot);pixelLine(c,tx+w-4,ty-1,tx+w+1,ty-1,C.hot);
+        box(c,tx+w/2-1,ty-2,2,1,C.light);
+    }
     if(e.dead){
         const t=unit(e.deadTimer/240),rise=Math.sin(t*Math.PI)*7;
         // Brief recoil, a tumbling cap and grounded debris replace the instant flat rectangle.
@@ -126,6 +137,15 @@ export function drawHypotheticalGuard(c:CanvasRenderingContext2D,e:WorldFoe,cx:n
         if(pose.recovery||!e.armor){line(6,1,6,-2,C.glass);line(6,-2,10,-2,C.glass);}
         if(pose.moving&&!reduced)for(let i=0;i<3;i++)rect(-3-i*3,h-2-(i+Math.floor(e.age/70))%3,2,1,C.grain);
         if(pose.recovery&&e.timer<320&&!reduced)for(let i=0;i<2;i++)rect(1-i*3,h-8-e.timer/45-i*2,2,2,C.steel);
+        if(e instanceof HypotheticalGuard&&e.age-e.impactAt<280){
+            const t=(e.age-e.impactAt)/280;
+            // Wheel skid and fragments originate at the actual front bumper.
+            for(let i=0;i<(reduced?2:5);i++){
+                const px=w+(i%2?1:-1)*t*(5+i),py=h-5-t*(9+i*2)+t*t*10;
+                rect(px,py,2,1,i%2?C.steel:C.brass);
+            }
+            line(w-8-t*14,h-1,w-2,h-1,C.leather);
+        }
     } else {
         const torso=h-12+pose.bob,lean=pose.lean;
         // Thigh and shin articulate independently during actual steps, including attacking steps.
@@ -150,6 +170,11 @@ export function drawHypotheticalGuard(c:CanvasRenderingContext2D,e:WorldFoe,cx:n
             const flutter=reduced?0:Math.sin(e.distance/4)*Math.min(2,Math.abs(e.motionX)*2);
             poly([[4,torso-2],[6,torso+5],[1-flutter,torso+7],[-1-flutter,torso+3]],C.ink);
             line(2,torso+1,1-flutter,torso+5,C.seam);
+            if(e instanceof HypotheticalGuard&&e.wave>=2){
+                // Copper edging and two ankle wraps distinguish the agile flankers.
+                line(1-flutter,torso+4,3,torso+5,C.grain);
+                for(const foot of [pose.left,pose.right])rect(w/2+foot[0]-1,h-5+foot[1],3,1,C.grain);
+            }
         }
         poly([[4+lean,7+pose.bob],[w-5+lean,7+pose.bob],[w-3,torso+6],[3,torso+6]],C.ink);
         poly([[5+lean,8+pose.bob],[w-6+lean,8+pose.bob],[w-5,torso+4],[4,torso+4]],jacket);
@@ -157,6 +182,9 @@ export function drawHypotheticalGuard(c:CanvasRenderingContext2D,e:WorldFoe,cx:n
         line(6+lean,8+pose.bob,w-6,torso+3,C.leather,2);
         rect(w/2,torso+1,3,2,C.brass);rect(w/2+1,torso+1,1,1,C.light);
         rect(5,torso+5,w-10,2,C.leather);rect(w/2,torso+5,2,1,C.brass);
+        if(kind==='minion'&&e instanceof HypotheticalGuard&&e.wave>=2){
+            line(6+lean,8+pose.bob,w-5,torso+3,C.grain);rect(5,torso+3,3,1,C.brass);
+        }
         if(e instanceof HypotheticalGuard&&e.comboLength===2){
             rect(3,torso,2,1,C.brass);rect(3,torso+3,2,1,C.brass);
         }
@@ -210,22 +238,33 @@ export function drawHypotheticalGuard(c:CanvasRenderingContext2D,e:WorldFoe,cx:n
                 rect(w+1+t*3,2+t*2,1,1,C.brass);
             }
         }else{
-            const long=e instanceof HypotheticalGuard&&e.longLunge;
+            const long=e instanceof HypotheticalGuard&&e.longLunge,vault=e instanceof HypotheticalGuard&&e.vaultTarget;
             const reach=pose.thrust*(long?11:8),arm=e.danger?w+5:w-3+reach-pose.turn*4;
             const handY=12-pose.warning*3+pose.cut*2,elbowX=w-8-pose.warning*3+pose.thrust*4;
             line(w-6+lean,9+pose.bob,elbowX,13+pose.bob,C.ink,3);line(elbowX,13+pose.bob,arm,handY,C.ink,3);
             line(elbowX,12+pose.bob,arm,handY,C.seam);rect(arm-1,handY-1,3,3,C.leather);
             const tipX=e.danger?w+(long?11:7):arm+1+pose.cut*4;
-            const tipY=long?10+Math.min(0,pose.cut)*14+Math.max(0,pose.cut)*6:7-pose.warning*3;
+            const tipY=vault?5+pose.cut*9:long?10+Math.min(0,pose.cut)*14+Math.max(0,pose.cut)*6:7-pose.warning*3;
             line(arm-1,handY+4,tipX,tipY,C.ink,3);line(arm,handY+3,tipX,tipY,C.brass);
             rect(tipX-1,tipY-1,3,2,C.light);
             if(long&&e.danger&&!reduced){
                 line(arm-3,handY-4,tipX-4,tipY-4,C.wood);rect(tipX-6,tipY-6,2,1,C.grain);
             }
         }
-        if(!reduced&&e.phase==='attack'&&pose.moving&&e.timer<180){
+        if(!reduced&&e.phase==='attack'&&pose.moving&&e.timer<180&&!(e instanceof HypotheticalGuard&&e.vaultTarget)){
             const t=e.timer/180;
             rect(-2-t*5,h-2-Math.sin(t*Math.PI)*3,2,1,C.grain);rect(1-t*3,h-1,2,1,C.leather);
+        }
+        if(e instanceof HypotheticalGuard&&e.vaultTarget&&e.phase==='attack'&&e.timer<180&&!reduced){
+            const t=e.timer/180,from=e.vaultTarget;
+            for(const side of [-1,1])box(c,from.fromX+w/2-cx+side*(3+t*9),from.fromFloor-cy-2-Math.sin(t*Math.PI)*2,3,1,C.grain);
+        }
+        if(e instanceof HypotheticalGuard&&e.age-e.vaultLandedAt<300){
+            const t=(e.age-e.vaultLandedAt)/300;
+            for(const side of [-1,1])for(let i=0;i<(reduced?1:3);i++){
+                const xx=x+w/2+side*(4+t*(12+i*4)),yy=y+h-2-Math.sin(t*Math.PI)*(2+i);
+                box(c,xx,yy,3-i%2,1,i===0?C.grain:C.leather);
+            }
         }
     }
     // Bright attack edge is drawn from the collision rectangle, including its exact outer reach.
@@ -241,8 +280,10 @@ export function drawHypotheticalGuard(c:CanvasRenderingContext2D,e:WorldFoe,cx:n
     }
     if(e.phase==='warning'){
         // Fixed, nonflashing anticipation pip; weapon/stance carries the direction, not color alone.
-        const pair=e instanceof HypotheticalGuard&&e.comboLength===2;
+        const vault=e instanceof HypotheticalGuard&&Boolean(e.vaultTarget);
+        const pair=e instanceof HypotheticalGuard&&e.comboLength===2&&!vault;
         pixelText(c,pair?`${e.comboStep+1}/2`:'!',x+w/2-(pair?6:2),y-(kind==='loader'?25:11),C.hot);
+        if(vault){pixelLine(c,x+w/2-4,y-14,x+w/2,y-18,C.brass);pixelLine(c,x+w/2,y-18,x+w/2+4,y-14,C.brass);}
         box(c,x+w/2-5,y-(kind==='loader'?16:5),10,1,C.ink);
         box(c,x+w/2-5,y-(kind==='loader'?16:5),10*unit(e.timer/e.warningDuration),1,C.brass);
     }

@@ -1,9 +1,12 @@
+import { drawGunMuzzle, drawGunTracer, drawGunImpact, drawGunCasing } from './HypotheticalGunfire';
+import {drawChaseCollapse} from './HypotheticalChaseArt';
 import { box, oval, pixelLine, polygon, type Point } from '../WorldPainting';
 import { pixelText } from '../../graphics/BitmapFont';
 import type { WorldLevel, WorldObjects } from '../WorldPhysics';
 import { HYPOTHETICAL, type HypotheticalModel } from './HypotheticalModel';
 import { dinosaurLeg, dinosaurTail, hypotheticalMotion, riderBend, riderTorsoPoint, smoothMotion } from './HypotheticalMotion';
-import { BACKDROP_RIG, type HypotheticalBackdrop } from './HypotheticalBackdrop';
+import { BACKDROP_RIG, backdropBaseline, type HypotheticalBackdrop } from './HypotheticalBackdrop';
+import { drawBystanders } from './HypotheticalBystanders';
 import { drawHypotheticalScenery, drawHypotheticalDestruction, drawHypotheticalMasonry, drawHypotheticalFittings } from './HypotheticalScenery';
 import { drawHypotheticalCanister } from './HypotheticalGuardArt';
 export { drawHypotheticalGuard } from './HypotheticalGuardArt';
@@ -18,7 +21,7 @@ const fogPalette=new Map<string,string>();
 function distantColor(color:string){
     if(!fogPalette.has(color)){
         const rgb=[1,3,5].map(i=>parseInt(color.slice(i,i+2),16));
-        fogPalette.set(color,'#'+rgb.map((v,i)=>Math.round(v*.54+[163,168,160][i]*.46).toString(16).padStart(2,'0')).join(''));
+        fogPalette.set(color,'#'+rgb.map((v,i)=>Math.round(v*.66+[163,168,160][i]*.34).toString(16).padStart(2,'0')).join(''));
     }
     return fogPalette.get(color)!;
 }
@@ -274,9 +277,13 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     const gp=(xx:number,yy:number):Point=>[gx+Math.cos(a)*xx-Math.sin(a)*yy,gy+Math.sin(a)*xx+Math.cos(a)*yy];
     poly([gp(-2,-3),gp(22,-3),gp(22,-1),gp(31,-1),gp(31,2),gp(20,2),gp(19,5),gp(8,5),gp(6,2),gp(-2,4)],P.ink);
     poly([gp(3,-2),gp(21,-2),gp(21,1),gp(4,1)],P.lapel);
+    line(...gp(-3,-3),...gp(-3,4),P.clothShade,2);
+    line(...gp(4,2),...gp(17,2),P.shade);
+    line(...gp(26,-2),...gp(26,-4),P.ink);line(...gp(26,-4),...gp(28,-4),P.lapel);
     for(let vent=0;vent<3;vent++)line(...gp(19+vent*3,-1),...gp(19+vent*3,1),pose.heat>.55?P.hot:P.shade);
     line(...gp(25,-1),...gp(30,-1),pose.heat>.8?P.cream:pose.heat>.45?P.brass:P.lapel);
-    line(...gp(5,0),...gp(8-pose.recoil,0),P.ink,2);
+    line(...gp(6,-1),...gp(12,-1),P.ink,2);
+    line(...gp(10-pose.recoil*.6,-1),...gp(12-pose.recoil*.6,-1),pose.recoil>2?P.brass:P.ivory);
     const magazine=pose.reload*11;
     poly([gp(10,3+magazine),gp(17,3+magazine),gp(16,11+magazine),gp(11,10+magazine)],P.ink);
     line(...gp(12,5+magazine),...gp(12,9+magazine),P.lapel);line(...gp(14,5+magazine),...gp(14,9+magazine),P.shade);
@@ -309,66 +316,43 @@ export function dinosaurPose(b: HypotheticalModel, cx: number, cy: number, reduc
         flash:b.state==='hurt'&&b.age<12, defeated:b.won };
 }
 
+export function distantRiderPose(action:HypotheticalBackdrop,reduced=false):DinosaurPose {
+    const m=action.motion,r=BACKDROP_RIG;
+    return {x:r.x,y:r.y+m.lift/r.scale,facing:1,gait:action.travel/(r.scale*11),stride:action.stride,
+        breath:0,bow:0,jaw:m.jaw,neckDrop:m.neckDrop,recoil:action.recoil,aim:action.angle,tail:m.tail,
+        compression:m.compression,tuck:m.tuck,reload:0,brace:m.brace,heat:action.heat,
+        cloth:reduced?0:Math.min(4,Math.abs(action.velocity)*1.8)+m.force*1.5,
+        riderDrop:m.riderDrop,riderLean:m.riderLean,rein:m.rein,
+        blink:false,daze:0,armor:9,flash:false,defeated:false,distant:true,focus:m.force||action.muzzle?1:0,
+        voice:m.local>=180&&m.local<196?.65*(1-smoothMotion((m.local-185)/11)):0};
+}
 const backgroundRigs=new WeakMap<CanvasRenderingContext2D,{canvas:HTMLCanvasElement;c:CanvasRenderingContext2D}>();
-function drawDistantRider(c:CanvasRenderingContext2D,b:HypotheticalModel,base:number){
-    const action=b.backdrop;
+function drawDistantRider(c:CanvasRenderingContext2D,b:HypotheticalModel,base:number,reduced:boolean){
+    const action=b.backdrop,r=BACKDROP_RIG;
     let rig=backgroundRigs.get(c);
-    if(!rig){const canvas=document.createElement('canvas');canvas.width=192;canvas.height=128;rig={canvas,c:canvas.getContext('2d')!};backgroundRigs.set(c,rig);}
-    rig.c.clearRect(0,0,192,128);
-    const r=BACKDROP_RIG;
-    drawHypotheticalDinosaur(rig.c,{x:92,y:122,facing:1,gait:(action.x+80)/(r.scale*11),stride:1,breath:0,bow:0,jaw:b.backgroundStamp>0?.7:.2,neckDrop:0,recoil:action.recoil,aim:action.angle,tail:0,compression:0,tuck:0,reload:0,brace:0,heat:action.heat,cloth:2,blink:false,daze:0,armor:9,flash:false,defeated:false,distant:true,focus:action.muzzle?1:0,voice:b.backgroundStamp>20?.6:0});
-    // Downsample the completed sprite, rather than drawing fractional rectangles.
-    // Every final edge still lands on the native pixel grid.
+    if(!rig){const canvas=document.createElement('canvas');canvas.width=r.width;canvas.height=r.height;rig={canvas,c:canvas.getContext('2d')!};backgroundRigs.set(c,rig);}
+    rig.c.clearRect(0,0,r.width,r.height);
+    drawHypotheticalDinosaur(rig.c,distantRiderPose(action,reduced));
+    oval(c,action.x-31,base-2,64,4,'#718378');
+    if(!reduced)for(const p of action.footfalls){
+        const t=(action.tick-p.born)/28;
+        for(let i=0;i<3;i++)box(c,p.x-5+i*4-t*(i+1),base-2-t*3-i%2,3,1,'#b5ad95');
+    }
     const smoothing=c.imageSmoothingEnabled;c.imageSmoothingEnabled=false;
     c.drawImage(rig.canvas,0,0,r.width,r.height,Math.round(b.backgroundX-r.x*r.scale),Math.round(base-r.y*r.scale),r.width*r.scale,r.height*r.scale);
     c.imageSmoothingEnabled=smoothing;
-    if(action.muzzle>0){const m=action.barrel;pixelLine(c,m.x,base+m.y,m.x+Math.cos(action.angle)*8,base+m.y+Math.sin(action.angle)*8,'#e4c490',3);box(c,m.x,base+m.y,2,2,'#f0dbaf');}
-}
-
-function drawBystanders(c:CanvasRenderingContext2D,b:HypotheticalBackdrop,base:number,reduced:boolean){
-    for(const p of b.people){
-        if(p.escaped)continue;
-        const x=p.x, age=p.hitAt===null?-1:b.tick-p.hitAt;
-        const jacket=['#79928a','#9d7f79','#a39a79','#7d8995'][p.color],skin='#c5ae91',ink='#596c6a';
-        oval(c,x-4,base-1,11,2,'#667973');
-        if(age>=0){
-            // Feet remain on the street as the torso recoils, folds and comes to rest.
-            const t=smoothMotion(age/22),angle=t*Math.PI/2,hipX=x+t*5,hipY=base-6+t*4;
-            const headX=hipX+Math.sin(angle)*10,headY=hipY-Math.cos(angle)*10;
-            pixelLine(c,x-2,base-1,hipX,hipY,ink,2);pixelLine(c,x+2,base-1,hipX,hipY,ink,2);
-            pixelLine(c,hipX,hipY,headX-Math.sin(angle)*3,headY+Math.cos(angle)*3,jacket,4);
-            oval(c,headX-2,headY-3,4,4,skin);
-            pixelLine(c,hipX,hipY-3,hipX+6,hipY+1,ink);
-            if(age<7){pixelLine(c,x-4,base-12,x-7,base-16,'#e0c9a0');pixelLine(c,x+4,base-13,x+8,base-16,'#e0c9a0');}
-            if(age>=18&&age<34)box(c,x+(age-18)*.6,base-2,3,1,'#b2ab92');
-            continue;
-        }
-        const running=b.tick>50&&p.x<p.shelter,step=running&&!reduced?Math.sin(b.tick/3.5+p.color)*2:0;
-        const crouch=!running&&b.tick>50?3:0;
-        oval(c,x-2,base-17+crouch,5,5,skin);box(c,x-3,base-12+crouch,6,7-crouch,jacket);
-        box(c,x-2,base-17+crouch,5,2,ink);
-        pixelLine(c,x-1,base-5,x-3+step,base,ink,2);pixelLine(c,x+2,base-5,x+4-step,base,ink,2);
-        pixelLine(c,x-3,base-11+crouch,x-5+step,base-7+crouch,ink);
-        pixelLine(c,x+3,base-11+crouch,x+5-step,base-15+crouch,skin);
-    }
-    for(const s of b.shots){pixelLine(c,s.px,base+s.py,s.x,base+s.y,'#d8bb86');box(c,s.x,base+s.y,2,1,'#eee0bd');}
-    for(const p of b.impacts){
-        const age=b.tick-p.born;
-        if(age<8)for(let i=0;i<(reduced?2:4);i++){
-            const a=i*Math.PI/2+.4,r=age*.6+2;box(c,p.x+Math.cos(a)*r,base+p.y+Math.sin(a)*r,2,1,'#d4c5a0');
-        }
-        if(age<20)box(c,p.x+age*.25,base-2-age*.18,3,2,'#b1ab96');
-    }
+    if(action.muzzle>0){const m=action.barrel;drawGunMuzzle(c,m.x,base+m.y,Math.cos(action.angle),Math.sin(action.angle),action.muzzle,reduced,true);}
+    for(const shell of action.casings)drawGunCasing(c,shell.x,base+shell.y,1,action.tick-shell.born,base,reduced,BACKDROP_RIG.scale);
 }
 
 export function drawHypotheticalBackground(c:CanvasRenderingContext2D,b:HypotheticalModel,cx:number,cy:number,reduced:boolean){
     drawHypotheticalScenery(c,b,cx,cy,reduced);
     if(b.act==='siege'){
-        const base=HYPOTHETICAL.floor-cy-8;
+        const base=backdropBaseline(cy);
         c.save();c.translate(-Math.round(cx),0);
-        drawDistantRider(c,b,base);
+        drawDistantRider(c,b,base,reduced);
         drawBystanders(c,b.backdrop,base,reduced);
-        drawHypotheticalDestruction(c,b,base,reduced);
+        drawHypotheticalDestruction(c,b,base,cy,reduced);
         c.restore();
     }
 }
@@ -383,6 +367,7 @@ export function drawHypotheticalObjects(c:CanvasRenderingContext2D,o:WorldObject
 }
 export function drawHypotheticalCombat(c:CanvasRenderingContext2D,b:HypotheticalModel,cx:number,cy:number,reduced:boolean){
     const floor=HYPOTHETICAL.floor-cy;
+    if(b.act==='chase')drawChaseCollapse(c,b,cx,cy,reduced);
     for(const mark of b.marks){const x=mark.x-cx,remain=Math.max(0,1-(b.tick-mark.born)/60);box(c,x-15,floor-2,30,2,P.hot);pixelLine(c,x-6,floor-8,x,floor-3,P.hot);pixelLine(c,x,floor-3,x+6,floor-8,P.hot);box(c,x-15,floor-4,30*remain,1,P.ivory);}
     if(b.act!=='siege'){
         const airborne=b.state==='attack'&&b.attack==='leap'&&b.age<58;
@@ -419,17 +404,14 @@ export function drawHypotheticalCombat(c:CanvasRenderingContext2D,b:Hypothetical
             for(let i=0;i<2;i++){const t=(b.tick+i*13)%32,dx=Math.sin((t+i*5)/7)*2;box(c,x+dx,y-3-t*.35,1,2,'#c0b2a1');}
         }
         if(b.muzzle>0){
-            const p=b.aim,a=b.rifleAngle,flash=(xx:number,yy:number):Point=>[p.x-cx+b.facing*(Math.cos(a)*xx-Math.sin(a)*yy),p.y-cy+Math.sin(a)*xx+Math.cos(a)*yy];
-            const size=reduced?6:5+b.muzzle*2;
-            polygon(c,[flash(-1,-2),flash(size*.65,-4),flash(size*.5,-1),flash(size,0),flash(size*.6,2),flash(size*.7,4),flash(-1,2)],P.hot);
-            polygon(c,[flash(0,-1),flash(size*.7,0),flash(0,2)],P.ivory);
-            if(b.muzzle>=4&&!reduced){pixelLine(c,...flash(2,-5),...flash(5,-7),P.cream);pixelLine(c,...flash(3,5),...flash(6,7),P.brass);}
+            const p=b.aim,a=b.rifleAngle;
+            drawGunMuzzle(c,p.x-cx,p.y-cy,b.facing*Math.cos(a),Math.sin(a),b.muzzle,reduced);
         }
         if(b.vulnerable){const w=b.weakpoint,x=w.x-cx,y=w.y-cy;pixelLine(c,x-3,y+3,x-3,y-3,P.mint);pixelLine(c,x-3,y-3,x+4,y-3,P.mint);pixelLine(c,x+w.width+3,y+3,x+w.width+3,y-3,P.mint);pixelLine(c,x+w.width+3,y-3,x+w.width-4,y-3,P.mint);}
     }
     for(const s of b.shots){
         const x=s.x-cx,y=s.y-cy;
-        if(s.kind==='bullet'){pixelLine(c,x-s.vx*2,y-s.vy*2,x,y,P.hot,2);pixelLine(c,x-s.vx,y-s.vy,x+2,y+2,P.cream);box(c,x,y,5,4,P.ink);box(c,x+1,y+1,3,2,P.ivory);}
+        if(s.kind==='bullet')drawGunTracer(c,s,-cx,-cy,reduced);
         else if(s.kind==='wave'){
             const dir=s.vx<0?-1:1,px=(v:number)=>x+(dir>0?v:15-v),roll=s.age%8;
             polygon(c,[[px(0),y+12],[px(3),y+7],[px(6),y+2],[px(10),y+1],[px(12),y+7],[px(15),y+12]],P.ink);
@@ -440,19 +422,7 @@ export function drawHypotheticalCombat(c:CanvasRenderingContext2D,b:Hypothetical
         }
         else {polygon(c,[[x-3,y],[x+3,y-3],[x+9,y+1],[x+8,y+7],[x+1,y+8]],P.ink);polygon(c,[[x-1,y],[x+3,y-1],[x+7,y+2],[x+2,y+5]],P.cream);}
     }
-    for(const p of b.impacts){
-        const age=b.tick-p.born,x=p.x-cx,y=p.y-cy;
-        // Small lasting chips explain why a bullet stopped; sparks radiate out of the surface.
-        box(c,x-(p.nx?0:1),y-(p.ny?0:1),p.nx?1:3,p.ny?1:3,P.deep);
-        if(age>24)continue;
-        if(age<4){box(c,x-2,y-2,5,4,P.cream);box(c,x-1,y-1,3,2,P.ivory);}
-        for(let i=0;i<(reduced?2:5);i++){
-            const fan=(i-2)*.55,travel=age*(.7+(i%3)*.26),nx=p.nx*Math.cos(fan)-p.ny*Math.sin(fan),ny=p.ny*Math.cos(fan)+p.nx*Math.sin(fan);
-            const px=x+nx*travel,py=y+ny*travel+age*age*.012;
-            if(age<12)pixelLine(c,px,py,px+nx*2,py+ny*2,i%2?P.brass:P.ivory);
-            else if(i<3)box(c,px,py,2,2,P.shade);
-        }
-    }
+    for(const p of b.impacts)drawGunImpact(c,p,b.tick,-cx,-cy,reduced);
     for(const p of b.dust){
         const age=b.tick-p.born;
         if(p.kind==='skid'){
@@ -472,8 +442,7 @@ export function drawHypotheticalCombat(c:CanvasRenderingContext2D,b:Hypothetical
             continue;
         }
         if(p.kind==='shell'){
-            const x=p.x-cx-(p.direction??1)*age*.45,y=p.y-cy-age*.9+age*age*.035;
-            if(y<=floor){box(c,x,y,age%6<3?3:1,age%6<3?1:3,P.brass);box(c,x,y,1,1,P.ivory);}
+            drawGunCasing(c,p.x-cx,p.y-cy,p.direction??1,age,floor,reduced);
             continue;
         }
         if(p.kind==='stone'&&age<13){

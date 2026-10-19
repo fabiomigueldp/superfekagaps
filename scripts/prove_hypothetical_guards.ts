@@ -10,7 +10,7 @@ import type { FoeSpec } from '../src/adventure/types';
 const [destination,canvasModule]=process.argv.slice(2);
 assert.ok(destination&&canvasModule,'Pass output PNG and canvas module paths');
 const {createCanvas}=await import(pathToFileURL(resolve(canvasModule)).href);
-const canvas=createCanvas(1280,512),c=canvas.getContext('2d');c.imageSmoothingEnabled=false;
+const canvas=createCanvas(1280,640),c=canvas.getContext('2d');c.imageSmoothingEnabled=false;
 const kinds:readonly FoeSpec['kind'][]=['minion','helmet','charger','loader'];
 // The atlas poses are explicit; this supplies the second throw's high-arc cue without advancing a live scene.
 class InspectionGuard extends HypotheticalGuard { override get highThrow(){return this.comboStep===1;} }
@@ -47,6 +47,25 @@ for(const [row,kind] of kinds.entries())for(let col=0;col<10;col++){
     pixelText(c,`${names[row]} / ${label}`,col*128+4,row*128+117,'#e7cb9c');
     assert.equal(JSON.stringify(e),snapshot,'Rendering must not advance an enemy');
 }
+const vaultLabels=['AGACHAR','IMPULSO','RECOLHER','DESCER','POUSAR','RECUPERAR','RETOMAR','COLIDIR','FRAGMENTOS','ASSENTAR'];
+for(let col=0;col<10;col++){
+    c.fillStyle=col%2?'#30434b':'#293e47';c.fillRect(col*128,512,128,128);
+    const e=new InspectionGuard({id:'tactics',kind:col<7?'minion':'charger',x:20,y:54,behavior:'canal'},3);
+    e.age=2000;e.facing=1;
+    if(col<7){
+        e.vaultTarget={x:20,y:34,floor:54,supportId:'inspection',steps:30,fromX:8,fromFloor:54};
+        e.phase=col===0?'warning':col<4?'attack':col<6?'rest':'walk';
+        e.timer=[620,50,230,430,90,350,100][col];
+        if(col>=4&&col<=5)e.vaultLandedAt=e.age-e.timer;
+        if(col===6){e.vaultTarget=null;e.motionX=.96;e.distance=8;}
+    }else{
+        e.phase='rest';e.timer=[0,0,0,0,0,0,0,45,160,280][col];e.impactAt=e.age-e.timer;
+    }
+    const snapshot=JSON.stringify(e);
+    c.save();c.translate(col*128,512);c.scale(2,2);boxFloor();drawHypotheticalGuard(c,e,0,0);c.restore();
+    pixelText(c,vaultLabels[col],col*128+4,629,'#e7cb9c');
+    assert.equal(JSON.stringify(e),snapshot);
+}
 function boxFloor(){c.fillStyle='#485950';c.fillRect(0,54,64,1);}
 const file=resolve(destination);mkdirSync(dirname(file),{recursive:true});writeFileSync(file,canvas.toBuffer('image/png'));
-console.log(JSON.stringify({file,width:1280,height:512,poses:40,artInspectionOnly:true}));
+console.log(JSON.stringify({file,width:1280,height:640,poses:50,artInspectionOnly:true}));

@@ -2,8 +2,9 @@ import type { Rect } from '../../types';
 import { clamp, overlaps } from '../types';
 import { dinosaurFootAnchor, dinosaurTail, hypotheticalMotion, riderBend, smoothMotion, type DinosaurMotion } from './HypotheticalMotion';
 import { HypotheticalBackdrop } from './HypotheticalBackdrop';
-import { ARENA_COLUMNS } from './HypotheticalLayout';
-import { HypotheticalSiege, SIEGE_SECTORS, SIEGE_WIDTH } from './HypotheticalSiege';
+import { ARENA_COLUMNS, CHASE_ATTACKS, CHASE_EXIT, CHASE_WIDTH, CHASE_GAPS, CHASE_BREAKS } from './HypotheticalLayout';
+import { HypotheticalSiege, SIEGE_WIDTH } from './HypotheticalSiege';
+import { RIFLE_BURSTS, RIFLE_SPEED, type GunImpact } from './HypotheticalGunfire';
 
 export type HypotheticalAct = 'chase' | 'siege' | 'duel';
 export type HypotheticalState = 'arrival' | 'rest' | 'tell' | 'reload' | 'attack' | 'turn' | 'recover' | 'hurt' | 'roar' | 'won';
@@ -11,12 +12,10 @@ export type HypotheticalAttack = 'rifle' | 'charge' | 'bite' | 'leap' | 'tail';
 export interface Shot extends Rect { vx: number; vy: number; age: number; life: number; kind: 'bullet' | 'wave' | 'rubble'; px: number; py: number }
 export interface Dust { x: number; y: number; born: number; kind: 'step' | 'stone' | 'hit' | 'shell' | 'clasp' | 'skid'; direction?: number }
 export interface FallingMark { x: number; born: number }
-export interface BulletImpact { x: number; y: number; nx: number; ny: number; born: number }
+export interface BulletImpact extends GunImpact {}
 export type FightEvent = 'warning' | 'shot' | 'impact' | 'reload' | 'distant-shot' | 'distant-hit' | 'step' | 'slam' | 'hit' | 'break' | 'snare' | 'won';
-export const HYPOTHETICAL = Object.freeze({ floor: 224, chaseEnd: 1504, health: 9, step: 1000 / 60, warning: 54, recovery: 156 });
-const rifleBursts: readonly (readonly number[])[] = [
-    [1, 9, 17, 33, 41, 49], [1, 8, 15, 29, 36, 43], [1, 7, 13, 25, 31, 37, 49, 55, 61],
-];
+export const HYPOTHETICAL = Object.freeze({ floor: 224, chaseEnd: CHASE_EXIT, health: 9, step: 1000 / 60, warning: 54, recovery: 156 });
+const rifleBursts = RIFLE_BURSTS;
 const patterns: readonly (readonly HypotheticalAttack[])[] = [
     ['rifle', 'charge', 'bite', 'leap'],
     ['leap', 'bite', 'rifle', 'tail', 'charge'],
@@ -66,7 +65,10 @@ export class HypotheticalModel {
     private remainder = 0; private frameHazards: Rect[] = []; private sequence = 0;
     private bowFrom = 0;
     private weaponFrom=-.15;
-    constructor(readonly act: HypotheticalAct = 'chase', health: number = HYPOTHETICAL.health, cleared = 0) {
+    pursuitIndex=0; pursuitKind:'high'|'low'|'ram'='high'; pursuitTell=52;
+    bridgeDebris:Array<{x:number;born:number;material:number}>=[];
+    chaseBreaks:number[]=CHASE_BREAKS.map(()=>-1);
+    constructor(readonly act: HypotheticalAct = 'chase', health: number = HYPOTHETICAL.health, cleared = 0, readonly chaseStart=0) {
         this.route = new HypotheticalSiege(cleared);
         this.backdrop = new HypotheticalBackdrop(act === 'siege');
         this.backdropOffset = act === 'siege' ? this.route.cleared * 400 : 0;
@@ -74,10 +76,10 @@ export class HypotheticalModel {
         // to the same street. Replaying only this deterministic scenery never creates
         // foreground damage, emits old audio, or advances Feka's encounter clock.
         for(let tick=1;tick<=this.backdropOffset;tick++)this.backdrop.update(tick);
-        this.destroyed = act === 'siege' ? this.route.cleared : 0;
+        this.destroyed = this.backdrop.breaches.filter(t=>t>=0).length;
         this.backgroundX = this.backdrop.x;
         this.health = health;
-        if (act === 'chase') { this.x = -18; this.facing = 1; }
+        if (act === 'chase') { this.x = chaseStart?chaseStart-114:-18; this.facing = 1;this.pursuitIndex=CHASE_ATTACKS.findIndex(a=>a.x>=chaseStart);this.chaseBreaks=CHASE_BREAKS.map(s=>s.x<this.x?-1000:-1);if(chaseStart)this.state='rest'; }
         if (act === 'siege') this.state = 'rest';
     }
     get phaseNumber() { return this.health > 6 ? 1 : this.health > 3 ? 2 : 3; }
@@ -96,7 +98,7 @@ export class HypotheticalModel {
         return {x:this.x+(this.facing<0?-68:26),y:neck+4,width:42,height:13+m.jaw*13};
     }
     get biteEndX(){return clamp(this.targetX-this.facing*37,52,268);}
-    get warningTicks() { return HYPOTHETICAL.warning - (this.phaseNumber - 1) * 5; }
+    get warningTicks() { return this.act==='chase'?this.pursuitTell:HYPOTHETICAL.warning - (this.phaseNumber - 1) * 5; }
     get reloadTicks() { return 48; }
     get rifleSchedule() { return rifleBursts[this.phaseNumber - 1]; }
     get rifleLastShot() { return this.rifleSchedule[this.rifleSchedule.length - 1]; }
@@ -119,7 +121,10 @@ export class HypotheticalModel {
     get hint(): string { return `${this.chaining?`${this.chainStep+1}/${this.chainLength}: `:''}${this.actionHint}`; }
     private get actionHint(): string {
         if (this.won) return 'HIPOTESE DERRUBADA! ENTER: REJOGAR';
-        if (this.act === 'chase') return this.tick < 150 ? 'CORRA: SHIFT + DIREITA. PULE OS VAOS' : this.state === 'tell' ? 'RAJADA A FRENTE! CONTINUE CORRENDO' : 'A PONTE ESTA CAINDO. SIGA A DIREITA';
+        if (this.act === 'chase') return this.tick < 110 ? 'CORRA: SHIFT + DIREITA. PULE OS VAOS'
+            :['tell','attack'].includes(this.state)?this.pursuitKind==='high'?'TIRO ALTO! FIQUE BAIXO OU SALTE POR CIMA'
+            :this.pursuitKind==='low'?'RAJADA BAIXA! SALTE QUANDO ELA CHEGAR':'INVESTIDA! SALTE A ONDA DE DESTROCOS'
+            :'A PONTE CEDE! SIGA AS BORDAS CLARAS';
         if (this.act === 'siege') return this.marks.length ? 'PEDRAS! SAIA DAS MARCAS NO CHAO' : !this.route.active
             ? this.route.cleared ? this.route.passageOpen ? 'PASSAGEM LIVRE! SIGA PARA A DIREITA' : 'PORTAO ABRINDO. TRECHO SALVO' : 'PORTARIA ADIANTE. PREPARE O SALTO'
             : 'DERROTE A PATRULHA PARA ABRIR O PORTAO';
@@ -155,7 +160,7 @@ export class HypotheticalModel {
             this.particle('step',this.x+this.facing*(foot[0]+3),this.y+foot[1]);this.emit('step');
         }
     }
-    cancelAttacks() { this.shots = []; this.marks = []; this.frameHazards = []; this.events = [];this.followup=null;this.adaptiveFinisher=false; this.backdrop.cancel(); }
+    cancelAttacks() { this.shots = []; this.marks = []; this.frameHazards = []; this.events = [];this.muzzle=0;this.followup=null;this.adaptiveFinisher=false; this.backdrop.cancel(); }
     arm(index: number) {
         if (this.act !== 'duel' || this.won || index < 0 || index > 1 || this.armed[index] > 0) return;
         this.armed[index] = 240; this.particle('shell', index ? 278 : 38, HYPOTHETICAL.floor - 8);
@@ -165,7 +170,11 @@ export class HypotheticalModel {
         this.shots.push({ x, y, px: x, py: y, width: kind === 'wave' ? 15 : 5, height: kind === 'wave' ? 12 : 5,
             vx: (tx - x) / d * speed, vy: (ty - y) / d * speed, age: 0, life: 190, kind });
         if (this.shots.length > 24) this.shots.shift();
-        if (kind === 'bullet') { this.muzzle = 5;this.heat=Math.min(1,this.heat+.24); this.emit('shot'); this.particle('shell', x - this.facing * 12, y); }
+        if (kind === 'bullet') {
+            this.muzzle = 5;this.heat=Math.min(1,this.heat+.24); this.emit('shot');
+            const s=this.rifleShoulder,a=this.rifleAngle;
+            this.particle('shell',s.x+this.facing*(Math.cos(a)*9+Math.sin(a)*2),s.y+Math.sin(a)*9-Math.cos(a)*2);
+        }
     }
     private open() {
         this.shots = []; this.frameHazards = []; this.y = HYPOTHETICAL.floor;this.followup=null;this.adaptiveFinisher=false;
@@ -233,8 +242,9 @@ export class HypotheticalModel {
         this.motionSpeed+=(this.velocity*this.facing-this.motionSpeed)*.25;
         this.pivotAge=Math.min(12,this.pivotAge+1);
         this.tick++; this.age++; this.muzzle = Math.max(0, this.muzzle - 1);this.velocity=0;this.heat=Math.max(0,this.heat-.004);
-        this.dust = this.dust.filter(p => this.tick - p.born < 40);
+        this.dust = this.dust.filter(p => this.tick - p.born < (p.kind==='shell'?64:40));
         this.impacts = this.impacts.filter(p => this.tick - p.born < 180);
+        this.bridgeDebris=this.bridgeDebris.filter(p=>this.tick-p.born<48);
         if (this.won || this.nextAct) return;
         this.armed = this.armed.map(n => Math.max(0, n - 1));
         this.backgroundStamp = Math.max(0, this.backgroundStamp - 1);
@@ -285,7 +295,7 @@ export class HypotheticalModel {
                 this.muzzle = 5;
                 const muzzle = this.aim;
                 const a=this.rifleAngle;
-                this.shoot(muzzle.x,muzzle.y,muzzle.x+this.facing*Math.cos(a)*200,muzzle.y+Math.sin(a)*200,3.7+this.phaseNumber*.25);
+                this.shoot(muzzle.x,muzzle.y,muzzle.x+this.facing*Math.cos(a)*200,muzzle.y+Math.sin(a)*200,RIFLE_SPEED[this.phaseNumber-1]);
             }
             if (this.phaseNumber > 1 && this.volley === 0 && this.age >= this.rifleLastShot + 24) {
                 this.originX = this.x;
@@ -338,27 +348,36 @@ export class HypotheticalModel {
         if(this.attack!=='leap'){const oldTravel=this.travel;this.travel+=Math.abs(this.velocity);this.footstep(oldTravel);}
     }
     private chase(player: Rect) {
-        if (this.tick < 60) return;
+        if (this.tick < (this.chaseStart?18:60)) return;
         // Converge smoothly on a visible pursuit distance, without teleporting.
         // At Feka's 3.5px run speed the gap settles at 110px, inside the camera.
-        const speed = clamp(3.5 + (player.x - this.x - 110) * .025, 2.25, 6);
+        const surge=this.pursuitKind==='ram'&&this.state==='attack'?(this.age<20?.8:this.age<52?-.45:0):0;
+        const speed = clamp(3.5 + (player.x - this.x - 110) * .025+surge, 2.25, 6);
         // Catch up and keep pressure after the helmet absorbs the first hit.
         // The pursuer must never run harmlessly through a stationary Feka.
         const movement = Math.min(speed, Math.max(0, player.x + 8 - this.x));
         const oldTravel=this.travel;this.x += movement; this.travel += movement;this.velocity=movement;
         // A moving pursuer commits to a forward angle, not a world point it can
         // overtake halfway through the burst. The whole tell remains on screen.
-        this.targetX=this.x+240;this.targetY=HYPOTHETICAL.floor-12;
+        this.targetX=this.x+240;this.targetY=this.pursuitKind==='high'?this.rifleShoulder.y-4:HYPOTHETICAL.floor-12;
         this.footstep(oldTravel);
         this.frameHazards.push(this.body);
-        this.destroyed = Math.min(5, Math.floor(Math.max(0, this.x - 120) / 260));
+        for(const [i,site] of CHASE_BREAKS.entries())if(this.chaseBreaks[i]===-1&&this.x+56>=site.x){this.chaseBreaks[i]=this.tick;this.emit('break');}
+        this.destroyed = Math.min(16, Math.floor(Math.max(0, this.x - 120) / 260));
         if (this.state === 'arrival') this.enter('rest');
-        if (this.state === 'rest' && this.age >= 120) {
-            this.enter('tell'); this.emit('warning');
-        } else if (this.state === 'tell' && this.age >= 54) this.enter('attack');
+        const cue=CHASE_ATTACKS[this.pursuitIndex];
+        if (this.state === 'rest' && this.age >= 24 && cue&&player.x>=cue.x) {
+            this.pursuitKind=cue.kind;this.pursuitTell=cue.tell;this.pursuitIndex++;
+            this.attack=cue.kind==='ram'?'charge':'rifle';this.enter('tell'); this.emit('warning');
+        } else if (this.state === 'tell' && this.age >= this.warningTicks) this.enter('attack');
         else if (this.state === 'attack') {
-            if (rifleBursts[0].includes(this.age)) {this.muzzle=5;const m=this.aim;this.shoot(m.x,m.y,this.targetX,this.targetY,4.5);}
-            if (this.age >= 76) this.enter('rest');
+            if(this.pursuitKind==='ram'){
+                if(this.age===12){this.shoot(this.x+40,HYPOTHETICAL.floor-12,this.x+240,HYPOTHETICAL.floor-12,7,'wave');this.emit('slam');this.particle('stone',this.x+40);}
+            }else if((this.pursuitKind==='high'?[1,7,13]:this.pursuitIndex>=5?[1,6,11,41,46,51]:[1,7,13]).includes(this.age)){
+                this.muzzle=5;const m=this.aim,a=this.rifleAngle;
+                this.shoot(m.x,m.y,m.x+Math.cos(a)*200,m.y+Math.sin(a)*200,this.pursuitKind==='high'?6.6:6.8);
+            }
+            if (this.age >= 78) {this.enter('rest');this.attack='rifle';}
         }
         if (player.x >= HYPOTHETICAL.chaseEnd) { this.nextAct = true; this.cancelAttacks(); }
     }
@@ -370,11 +389,8 @@ export class HypotheticalModel {
         const backdropTick=this.tick+this.backdropOffset;
         this.backdrop.update(backdropTick); this.backgroundX = this.backdrop.x;
         this.events.push(...this.backdrop.events);
-        if (this.destroyed < 3 && Math.floor(backdropTick / 400) >= this.destroyed
-            && this.backgroundX + 44 >= 52 + SIEGE_SECTORS[this.destroyed].origin) {
-            this.destroyed++;
-            this.backgroundStamp = 32; this.emit('break');
-        }
+        this.destroyed=this.backdrop.breaches.filter(t=>t>=0).length;
+        if(this.backdrop.events.includes('break'))this.backgroundStamp=120;
         if (this.tick > 160 && this.tick % 210 === 0 && livingGuards > 0 && this.route.active) {
             this.marks.push({ x: clamp(player.x + player.width / 2, 22, SIEGE_WIDTH - 22), born: this.tick }); this.emit('warning');
         }
@@ -387,15 +403,16 @@ export class HypotheticalModel {
     private advanceShots() {
         for (const s of this.shots) {
             s.px = s.x; s.py = s.y; s.x += s.vx; s.y += s.vy; s.age++; s.life--;
+            if(s.kind==='wave'&&this.act==='chase'&&CHASE_GAPS.some(([a,z])=>s.x+7>=a*16&&s.x+7<z*16)){s.life=0;continue;}
             const swept = sweep(s, { ...s, x: s.px, y: s.py });
             if (s.kind === 'bullet') {
-                const walls = [...(this.act === 'duel' ? ARENA_COVER : []), { x: -200, y: HYPOTHETICAL.floor, width: 2200, height: 64 }];
+                const walls = [...(this.act === 'duel' ? ARENA_COVER : []), { x: -200, y: HYPOTHETICAL.floor, width: CHASE_WIDTH+400, height: 64 }];
                 const hits = walls.map(w => surfaceHit(s, w)).filter((h): h is NonNullable<typeof h> => !!h).sort((a, b) => a.t - b.t);
                 const hit = hits[0];
                 if (hit) {
                     const x = s.px + s.vx * hit.t, y = s.py + s.vy * hit.t;
                     this.impacts.push({ x: x + s.width / 2 - hit.nx * s.width / 2, y: y + s.height / 2 - hit.ny * s.height / 2,
-                        nx: hit.nx, ny: hit.ny, born: this.tick });
+                        nx: hit.nx, ny: hit.ny, born: this.tick, fromX:s.px+s.width/2,fromY:s.py+s.height/2,material:'stone' });
                     if (this.impacts.length > 24) this.impacts.shift();
                     this.emit('impact');
                     // Preserve danger in front of the cover, never beyond its surface.
@@ -408,7 +425,7 @@ export class HypotheticalModel {
             }
             this.frameHazards.push(swept);
         }
-        this.shots = this.shots.filter(s => s.life > 0 && s.x > -150 && s.x < (this.act === 'chase' ? 1760 : this.act === 'siege' ? SIEGE_WIDTH + 120 : 440));
+        this.shots = this.shots.filter(s => s.life > 0 && s.x > -150 && s.x < (this.act === 'chase' ? CHASE_WIDTH+120 : this.act === 'siege' ? SIEGE_WIDTH + 120 : 440));
     }
     contact(player: Rect, previous: Rect, falling: boolean): 'none' | 'hurt' | 'bounce' | 'hit' {
         if (this.won || this.nextAct) return 'none';

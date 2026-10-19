@@ -1,0 +1,279 @@
+{
+  "inputOnly": true,
+  "actorCameraClockEdits": false,
+  "frames": 6797,
+  "receipt": {
+    "act": "duel",
+    "phase": 3,
+    "health": 0,
+    "won": true,
+    "deaths": 3,
+    "ticks": 6401
+  },
+  "captures": [
+    {
+      "file": "scene-civilian-running.png",
+      "frame": 516,
+      "tick": 49,
+      "district": 1,
+      "phase": "march",
+      "camera": {
+        "x": 28.968976947200048,
+        "y": 64
+      },
+      "reduced": false
+    },
+    {
+      "file": "scene-npc-aim.png",
+      "frame": 563,
+      "tick": 96,
+      "district": 1,
+      "phase": "march",
+      "camera": {
+        "x": 0,
+        "y": 64
+      },
+      "reduced": false
+    },
+    {
+      "file": "scene-npc-cover.png",
+      "frame": 588,
+      "tick": 121,
+      "district": 1,
+      "phase": "march",
+      "camera": {
+        "x": 0,
+        "y": 64
+      },
+      "reduced": false
+    },
+    {
+      "file": "scene-npc-reaction.png",
+      "frame": 611,
+      "tick": 144,
+      "district": 1,
+      "phase": "prepare",
+      "camera": {
+        "x": 3.525177753600019,
+        "y": 64
+      },
+      "reduced": false
+    },
+    {
+      "file": "scene-1-prepare.png",
+      "frame": 615,
+      "tick": 148,
+      "district": 1,
+      "phase": "prepare",
+      "camera": {
+        "x": 17.52517775360002,
+        "y": 64
+      },
+      "reduced": false
+    },
+    {
+      "file": "scene-civilian-fall.png",
+      "frame": 617,
+      "tick": 150,
+      "district": 1,
+      "phase": "prepare",
+      "camera": {
+        "x": 24.52517775360002,
+        "y": 64
+      },
+      "reduced": false
+    },
+    {
+      "file": "scene-1-strike.png",
+      "frame": 642,
+      "tick": 175,
+      "district": 1,
+      "phase": "strike",
+      "camera": {
+        "x": 53.64411402604554,
+        "y": 64
+      },
+      "reduced": false
+    },
+    {
+      "file": "scene-1-collapse.png",
+      "frame": 657,
+      "tick": 190,
+      "district": 1,
+      "phase": "recover",
+      "camera": {
+        "x": 96.14411402604554,
+        "y": 64
+      },
+      "reduced": false
+    },
+    {
+      "file": "scene-1-settle.png",
+      "frame": 680,
+      "tick": 213,
+      "district": 1,
+      "phase": "recover",
+      "camera": {
+        "x": 176.64411402604554,
+        "y": 64
+      },
+      "reduced": false
+    },
+    {
+      "file": "scene-2-prepare.png",
+      "frame": 1128,
+      "tick": 548,
+      "district": 2,
+      "phase": "prepare",
+      "camera": {
+        "x": 516.4284173846604,
+        "y": 64
+      },
+      "reduced": false
+    },
+    {
+      "file": "scene-high-camera.png",
+      "frame": 1146,
+      "tick": 566,
+      "district": 2,
+      "phase": "strike",
+      "camera": {
+        "x": 489.12841738466045,
+        "y": 15.499999999999972
+      },
+      "reduced": false
+    },
+    {
+      "file": "scene-2-strike.png",
+      "frame": 1155,
+      "tick": 575,
+      "district": 2,
+      "phase": "strike",
+      "camera": {
+        "x": 506.46041738466045,
+        "y": 0
+      },
+      "reduced": false
+    },
+    {
+      "file": "scene-2-collapse.png",
+      "frame": 1170,
+      "tick": 590,
+      "district": 2,
+      "phase": "recover",
+      "camera": {
+        "x": 512.3051051528842,
+        "y": 56
+      },
+      "reduced": false
+    },
+    {
+      "file": "scene-2-settle.png",
+      "frame": 1193,
+      "tick": 613,
+      "district": 2,
+      "phase": "recover",
+      "camera": {
+        "x": 443.39929833512906,
+        "y": 64
+      },
+      "reduced": false
+    },
+    {
+      "file": "scene-rubble-transfer.png",
+      "frame": 1232,
+      "tick": 652,
+      "district": 2,
+      "phase": "march",
+      "camera": {
+        "x": 317.56931433512904,
+        "y": 64
+      },
+      "reduced": false
+    },
+    {
+      "file": "scene-survivors.png",
+      "frame": 1373,
+      "tick": 793,
+      "district": 2,
+      "phase": "march",
+      "camera": {
+        "x": 734.5580138843548,
+        "y": 64
+      },
+      "reduced": false
+    },
+    {
+      "file": "scene-npc-escape.png",
+      "frame": 1380,
+      "tick": 800,
+      "district": 3,
+      "phase": "march",
+      "camera": {
+        "x": 759.0580138843548,
+        "y": 64
+      },
+      "reduced": false
+    },
+    {
+      "file": "scene-3-prepare.png",
+      "frame": 1654,
+      "tick": 948,
+      "district": 3,
+      "phase": "prepare",
+      "camera": {
+        "x": 926.7825359924934,
+        "y": 64
+      },
+      "reduced": false
+    },
+    {
+      "file": "scene-3-strike.png",
+      "frame": 1681,
+      "tick": 975,
+      "district": 3,
+      "phase": "strike",
+      "camera": {
+        "x": 835.9505359924934,
+        "y": 64
+      },
+      "reduced": false
+    },
+    {
+      "file": "scene-3-collapse.png",
+      "frame": 1696,
+      "tick": 990,
+      "district": 3,
+      "phase": "recover",
+      "camera": {
+        "x": 828.6886132284019,
+        "y": 64
+      },
+      "reduced": false
+    },
+    {
+      "file": "scene-reduced.png",
+      "frame": 1696,
+      "tick": 990,
+      "district": 3,
+      "phase": "recover",
+      "camera": {
+        "x": 828.6886132284019,
+        "y": 64
+      },
+      "reduced": true
+    },
+    {
+      "file": "scene-3-settle.png",
+      "frame": 1719,
+      "tick": 1013,
+      "district": 3,
+      "phase": "recover",
+      "camera": {
+        "x": 890.4886132284018,
+        "y": 64
+      },
+      "reduced": false
+    }
+  ]
+}

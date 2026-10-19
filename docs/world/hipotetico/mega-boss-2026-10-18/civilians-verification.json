@@ -1,0 +1,143 @@
+{
+  "revision": "motion-18",
+  "scenicTimeline": true,
+  "sceneTicks": 1200,
+  "npcs": 8,
+  "shirtCount": 4,
+  "aims": [
+    {
+      "tick": 90,
+      "index": 1,
+      "clothes": "star-shirt",
+      "district": 0,
+      "x": 284,
+      "y": -7
+    },
+    {
+      "tick": 146,
+      "index": 0,
+      "clothes": "workcoat",
+      "district": 0,
+      "x": 246,
+      "y": -7
+    },
+    {
+      "tick": 490,
+      "index": 2,
+      "clothes": "star-shirt",
+      "district": 1,
+      "x": 662,
+      "y": -7
+    },
+    {
+      "tick": 546,
+      "index": 3,
+      "clothes": "scarf",
+      "district": 1,
+      "x": 700,
+      "y": -7
+    },
+    {
+      "tick": 890,
+      "index": 5,
+      "clothes": "star-shirt",
+      "district": 2,
+      "x": 1116,
+      "y": -7
+    },
+    {
+      "tick": 946,
+      "index": 4,
+      "clothes": "satchel",
+      "district": 2,
+      "x": 1078,
+      "y": -7
+    }
+  ],
+  "shots": [
+    110,
+    118,
+    126,
+    166,
+    174,
+    182,
+    510,
+    518,
+    526,
+    566,
+    574,
+    582,
+    910,
+    918,
+    926,
+    966,
+    974,
+    982
+  ],
+  "hits": [
+    {
+      "tick": 138,
+      "index": 1,
+      "clothes": "star-shirt",
+      "district": 0,
+      "stoppedAt": 120
+    },
+    {
+      "tick": 184,
+      "index": 0,
+      "clothes": "workcoat",
+      "district": 0,
+      "stoppedAt": 112
+    },
+    {
+      "tick": 530,
+      "index": 2,
+      "clothes": "star-shirt",
+      "district": 1,
+      "stoppedAt": 512
+    },
+    {
+      "tick": 591,
+      "index": 3,
+      "clothes": "scarf",
+      "district": 1,
+      "stoppedAt": 520
+    },
+    {
+      "tick": 938,
+      "index": 5,
+      "clothes": "star-shirt",
+      "district": 2,
+      "stoppedAt": 920
+    },
+    {
+      "tick": 984,
+      "index": 4,
+      "clothes": "satchel",
+      "district": 2,
+      "stoppedAt": 912
+    }
+  ],
+  "escaped": [
+    {
+      "index": 6,
+      "clothes": "star-shirt"
+    },
+    {
+      "index": 7,
+      "clothes": "workcoat"
+    }
+  ],
+  "foregroundCollisionsAdded": 0,
+  "preparationTicks": 20,
+  "inspectionPoses": 20,
+  "motion": {
+    "anticipationTicks": 6,
+    "shelterTravelTicks": 68,
+    "armRiseTicks": 8,
+    "maxVelocityDelta": 0.10002915451900662,
+    "maxHandTravel": 2.0445039502095725,
+    "maxCoverDelta": 0.18359375,
+    "maxReactionQueue": 3
+  }
+}

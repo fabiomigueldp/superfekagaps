@@ -1,5 +1,6 @@
 import type { HypotheticalModel } from './HypotheticalModel';
 import type { Point } from '../WorldPainting';
+import { gunRecoil } from './HypotheticalGunfire';
 
 const unit = (n: number) => Math.max(0, Math.min(1, n));
 export const smoothMotion = (n: number) => { const t = unit(n); return t * t * (3 - 2 * t); };
@@ -25,7 +26,7 @@ export function hypotheticalMotion(b: HypotheticalModel): DinosaurMotion {
     const tail = b.attack !== 'tail' ? 0 : telling ? -wind * .45
         : attacking ? b.age < 12 ? -.45 + smoothMotion(b.age / 12) * 1.45
             : b.age <= 32 ? 1 : 1 - smoothMotion((b.age - 32) / 20) : 0;
-    const recoil = b.muzzle > 0 ? 3.5 * smoothMotion(b.muzzle / 5) : 0;
+    const recoil = gunRecoil(b.muzzle);
     const reload = b.state === 'reload' ? Math.sin(Math.PI * unit(b.age / 24)) : 0;
     const brace=b.state==='turn'?Math.sin(Math.PI*unit(b.age/38))*.85
         :attacking&&b.attack==='charge'&&b.age>=34?Math.sin(Math.PI*unit((b.age-34)/16))*.7

@@ -2,11 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { HypotheticalGame } from '../src/adventure/hipotetico/HypotheticalGame';
 import { HypotheticalGuard } from '../src/adventure/hipotetico/HypotheticalGuards';
-import { HypotheticalSiege, SIEGE_SECTORS, SIEGE_GATE_TICKS, siegeGarrison } from '../src/adventure/hipotetico/HypotheticalSiege';
+import { HypotheticalSiege, SIEGE_SECTORS, SIEGE_GATE_TICKS, SIEGE_UNLOCK_TICKS, SIEGE_LIFT_TICKS, SIEGE_LOCK_TICKS, siegeGarrison } from '../src/adventure/hipotetico/HypotheticalSiege';
 import { hypotheticalStage } from '../src/adventure/hipotetico/HypotheticalStage';
 import { WorldLevel, WorldObjects } from '../src/adventure/WorldPhysics';
 import { sceneLifecycleBrowser } from './helpers/sceneLifecycleHarness';
 import tape from './helpers/hypotheticalReplay.json';
+import upperRoutes from './helpers/hypotheticalUpperRoutes.json';
 const dt=1000/60;
 
 test('a cleared district opens gradually, never wakes the next district or completes by waiting',()=>{
@@ -39,6 +40,43 @@ test('waiting patrols cannot move, emit attacks or damage Feka before their enco
         assert.deepEqual({x:e.x,y:e.y},origin);assert.equal(e.timer,0);assert.equal(e.danger,null);
         assert.equal(e.contact(p,p,false,false),'none');assert.equal(objects.barrels.length,0);
     }
+});
+
+test('each defeated guard releases one pin, while partial progress cannot raise a gate or leak into the next post',()=>{
+    const route=new HypotheticalSiege();
+    route.update(96,2);route.update(200,1);
+    assert.deepEqual(route.remaining,[1,3,4]);assert.equal(route.releasedThisTick,true);
+    for(let n=0;n<60;n++)route.update(200,1);
+    assert.deepEqual(route.lockTicks[0],[SIEGE_LOCK_TICKS,0]);assert.equal(route.gateHeight(0),224);
+    assert.equal(route.cleared,0);assert.equal(route.releasedThisTick,false);
+    route.update(200,0);assert.equal(route.openedThisTick,true);assert.equal(route.remaining[0],0);
+    for(let n=1;n<=SIEGE_GATE_TICKS;n++){
+        route.update(200,0);
+        if(n<=SIEGE_UNLOCK_TICKS)assert.equal(route.gateHeight(0),224,'the bolt retracts before the grille moves');
+        if(n>=SIEGE_UNLOCK_TICKS+SIEGE_LIFT_TICKS)assert.equal(route.gateHeight(0),0,'settling cannot close on Feka');
+    }
+    assert.equal(route.gatePhase(0),'open');assert.deepEqual(route.remaining,[0,3,4]);
+    const retry=new HypotheticalSiege(1);
+    assert.deepEqual(retry.remaining,[0,3,4]);assert.deepEqual(retry.lockTicks,[[18,18],[0,0,0],[0,0,0,0]]);
+    assert.equal(retry.gatePhase(0),'open');assert.equal(retry.gatePhase(1),'locked');
+});
+
+test('barrels shatter against encounter gates before Feka moves; ordinary breakable targets retain their behavior',()=>{
+    for(const pressurized of [false,true]){
+        const stage=hypotheticalStage('siege'),level=new WorldLevel(stage.level),objects=new WorldObjects(stage.mechanisms);
+        const gate=objects.get('siege-gate-0')!;
+        objects.spawnBarrel(gate.x-13,204,1,pressurized);
+        objects.update(dt,level,338);
+        assert.equal(gate.active,false);assert.equal(gate.brokenAt,undefined);assert.equal(objects.barrels.length,0);
+        const p={x:338,y:200,width:14,height:24};
+        assert.equal(level.resolveCollision(p,{x:5,y:0},p).position.x,338);
+        assert.ok(objects.events.some(e=>e.kind==='barrelBreak'&&e.y>200));
+        assert.ok(!objects.events.some(e=>e.kind==='break'));
+    }
+    const level=new WorldLevel(hypotheticalStage('siege').level);
+    const ordinary=new WorldObjects([{id:'ordinary',kind:'target',x:352,y:192,width:16,height:32}]);
+    ordinary.spawnBarrel(339,204,1);ordinary.update(dt,level,338);
+    assert.equal(ordinary.get('ordinary')!.active,true);assert.equal(ordinary.barrels.length,0);
 });
 
 test('closed gate blocks floor movement and high jumps; raised collision follows the visible bottom',()=>{
@@ -114,5 +152,34 @@ test('native play crosses three physical gates, defeats every garrison and prese
         }
         assert.deepEqual([...districts],[0,1,2]);assert.deepEqual([...opens],[0,1,2]);assert.equal(defeated.size,9);
         assert.ok(sawRetry);assert.ok(maxCamera>=950);assert.equal(g.receipt.won,true);
+    }finally{g.dispose();}
+});
+
+for(const route of upperRoutes)test(`native jumps cross optional upper approach ${route.link+1} and land in the next post`,t=>{
+    const h=sceneLifecycleBrowser(t),g=new HypotheticalGame(h.canvas as unknown as HTMLCanvasElement);
+    let held=new Set<string>(),previousPlayer=g.player,n=0,coinsAtBranch=0;
+    const landed=new Set<string>();
+    try{
+        for(const [count,keys] of route.runs as [number,string[]][]){
+            const next=new Set(keys);
+            for(const k of held)if(!next.has(k))h.window.dispatch('keyup',{key:k==='Space'?' ':k,code:k,target:h.canvas});
+            for(const k of next)if(!held.has(k))h.window.dispatch('keydown',{key:k==='Space'?' ':k,code:k,target:h.canvas});held=next;
+            for(let i=0;i<count;i++){
+                g.update(dt);n++;
+                if(n===route.branchAt)coinsAtBranch=g.coins;
+                if(n>route.branchAt){
+                    assert.equal(g.fight.route.cleared,route.link+1);
+                    assert.equal(g.receipt.deaths,route.deathsAtBranch,'the alternate approach does not cause another death');
+                    const p=g.player.getRect();
+                    if(g.player.data.isGrounded)for(const body of g.objects.bodies)
+                        if(body.kind==='support'&&Math.abs(p.y+p.height-body.y)<.1&&p.x+p.width>body.x&&p.x<body.x+body.width)landed.add(body.id);
+                }
+                if(g.player!==previousPlayer){held=new Set();previousPlayer=g.player;}
+            }
+        }
+        assert.ok(landed.has(`siege-link-${route.link}`));
+        assert.ok(landed.has(`siege-scaffold-${route.link+1}-0`));
+        assert.equal(g.fight.route.entered,route.link+1);assert.equal(g.fight.route.active,true);
+        assert.ok(g.coins>coinsAtBranch);assert.equal(g.player.data.hasHelmet,true);
     }finally{g.dispose();}
 });

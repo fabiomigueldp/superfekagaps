@@ -38,6 +38,15 @@ try{
         c.drawImage(screen,0,0,320,180);
         const png=frame.toBuffer('image/png');
         writeFileSync(join(out,'frames',String(videoFrame++).padStart(5,'0')+'.png'),png);
+        if(g.act==='siege'&&!g.player.data.isDead){
+            const m=b.backdrop.motion,local=m.local,center=m.district*416+222-g.camera.x;
+            const moment=local>=150&&local<=154?'prepare':local>=174&&local<=178?'strike'
+                :local>=188&&local<=192?'collapse':local>=226&&local<=230?'aftermath':null;
+            if(moment&&center>24&&center<296){
+                const file=`background-${m.district+1}-${moment}.png`;
+                if(!covered.has(file)){covered.add(file);writeFileSync(join(out,file),png);captures.push({file,frame:n,act:g.act,state:m.phase,phase:b.phaseNumber,attack:m.kind});}
+            }
+        }
         if(g.act==='siege'&&!g.player.data.isDead)for(const e of g.foes){
             if(e.dead||e.x-g.camera.x<8||e.x+e.width-g.camera.x>312||e instanceof HypotheticalGuard&&!e.awake)continue;
             const ready=e.phase==='warning'?e.timer>e.warningDuration*.65:e.phase==='attack'?e.timer>80:e.phase==='recoil'?e.timer<160:e.timer>80;

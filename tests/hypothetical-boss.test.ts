@@ -127,7 +127,7 @@ test('the first rifle phase teaches two three-shot bursts and later bursts keep 
     const b=new HypotheticalModel('duel');advance(b,137+b.warningTicks);
     const fired:number[]=[];
     for(let i=0;i<150&&b.state!=='recover';i++){b.update(dt,p);if(b.events.includes('shot'))fired.push(b.age);}
-    assert.deepEqual(fired,[1,9,17,33,41,49]);assert.equal(b.state,'recover');
+    assert.deepEqual(fired,[1,7,13,37,43,49]);assert.equal(b.state,'recover');
     assert.ok(b.openingTicks>=156);assert.equal(b.shots.length,0);
 });
 
@@ -406,7 +406,9 @@ test('six background casualties follow visible bullets, two bystanders escape an
         assert.ok(b.shots.every(s=>s.kind==='rubble'));
     }
     assert.equal(deaths,6);assert.equal(b.casualties,6);assert.equal(shots,18);
-    assert.equal(b.backdrop.people.filter(p=>p.escaped).length,2);
+    // The survivors now flee when the rider approaches their district, rather than
+    // disappearing at the far end before that part of the street comes into view.
+    advance(b,200,1);assert.equal(b.backdrop.people.filter(p=>p.escaped).length,2);
     const deathTimes=b.backdrop.people.filter(p=>p.hitAt!==null).map(p=>p.hitAt!);
     assert.equal(new Set(deathTimes).size,6,'individual falls rather than an instantaneous casualty counter');
     b.cancelAttacks();assert.equal(b.backdrop.shots.length,0);assert.equal(b.backdrop.muzzle,0);

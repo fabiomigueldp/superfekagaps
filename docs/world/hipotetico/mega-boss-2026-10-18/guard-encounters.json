@@ -1,7 +1,7 @@
 {
   "inputOnly": true,
   "actorCameraClockEdits": false,
-  "videoFrames": 531,
+  "videoFrames": 687,
   "videoSourceFrames": [
     468,
     470,
@@ -533,15 +533,171 @@
     1522,
     1524,
     1526,
-    1528
+    1528,
+    1530,
+    1532,
+    1534,
+    1536,
+    1538,
+    1540,
+    1542,
+    1544,
+    1546,
+    1548,
+    1550,
+    1552,
+    1554,
+    1556,
+    1558,
+    1560,
+    1562,
+    1564,
+    1566,
+    1568,
+    1570,
+    1572,
+    1574,
+    1576,
+    1578,
+    1580,
+    1582,
+    1584,
+    1586,
+    1588,
+    1590,
+    1592,
+    1594,
+    1596,
+    1598,
+    1600,
+    1602,
+    1604,
+    1606,
+    1608,
+    1610,
+    1612,
+    1614,
+    1616,
+    1618,
+    1620,
+    1622,
+    1624,
+    1626,
+    1628,
+    1630,
+    1632,
+    1634,
+    1636,
+    1638,
+    1640,
+    1642,
+    1644,
+    1646,
+    1648,
+    1650,
+    1652,
+    1654,
+    1656,
+    1658,
+    1660,
+    1662,
+    1664,
+    1666,
+    1668,
+    1670,
+    1672,
+    1674,
+    1676,
+    1678,
+    1680,
+    1682,
+    1684,
+    1686,
+    1688,
+    1690,
+    1692,
+    1694,
+    1696,
+    1698,
+    1700,
+    1702,
+    1704,
+    1706,
+    1708,
+    1710,
+    1712,
+    1714,
+    1716,
+    1718,
+    1720,
+    1722,
+    1724,
+    1726,
+    1728,
+    1730,
+    1732,
+    1734,
+    1736,
+    1738,
+    1740,
+    1742,
+    1744,
+    1746,
+    1748,
+    1750,
+    1752,
+    1754,
+    1756,
+    1758,
+    1760,
+    1762,
+    1764,
+    1766,
+    1768,
+    1770,
+    1772,
+    1774,
+    1776,
+    1778,
+    1780,
+    1782,
+    1784,
+    1786,
+    1788,
+    1790,
+    1792,
+    1794,
+    1796,
+    1798,
+    1800,
+    1802,
+    1804,
+    1806,
+    1808,
+    1810,
+    1812,
+    1814,
+    1816,
+    1818,
+    1820,
+    1822,
+    1824,
+    1826,
+    1828,
+    1830,
+    1832,
+    1834,
+    1836,
+    1838,
+    1840
   ],
   "receipt": {
     "act": "duel",
     "phase": 1,
     "health": 9,
     "won": false,
-    "deaths": 1,
-    "ticks": 1413
+    "deaths": 2,
+    "ticks": 1607
   },
   "guardsDefeated": 9,
   "gates": [
@@ -551,14 +707,127 @@
       "x": 184.14411402604554
     },
     {
-      "frame": 913,
+      "frame": 1248,
       "cleared": 2,
-      "x": 444.6473608799318
+      "x": 444.5580138843547
     },
     {
-      "frame": 1386,
+      "frame": 1697,
       "cleared": 3,
-      "x": 959.7961043189242
+      "x": 960.9886132284018
+    }
+  ],
+  "locks": [
+    {
+      "frame": 594,
+      "sector": 1,
+      "remaining": 1
+    },
+    {
+      "frame": 640,
+      "sector": 1,
+      "remaining": 0
+    },
+    {
+      "frame": 789,
+      "sector": 2,
+      "remaining": 2
+    },
+    {
+      "frame": 954,
+      "sector": 2,
+      "remaining": 3
+    },
+    {
+      "frame": 1059,
+      "sector": 2,
+      "remaining": 2
+    },
+    {
+      "frame": 1168,
+      "sector": 2,
+      "remaining": 1
+    },
+    {
+      "frame": 1248,
+      "sector": 2,
+      "remaining": 0
+    },
+    {
+      "frame": 1556,
+      "sector": 3,
+      "remaining": 3
+    },
+    {
+      "frame": 1613,
+      "sector": 3,
+      "remaining": 2
+    },
+    {
+      "frame": 1643,
+      "sector": 3,
+      "remaining": 1
+    },
+    {
+      "frame": 1697,
+      "sector": 3,
+      "remaining": 0
+    }
+  ],
+  "vaultEvents": [
+    {
+      "frame": 813,
+      "id": "hipotetico:garrison:1:2",
+      "phase": "warning",
+      "x": 642.5600000000004,
+      "y": 204,
+      "targetX": 648.4725314107061,
+      "targetY": 136
+    },
+    {
+      "frame": 856,
+      "id": "hipotetico:garrison:1:2",
+      "phase": "attack",
+      "x": 642.5600000000004,
+      "y": 204,
+      "targetX": 648.4725314107061,
+      "targetY": 136
+    },
+    {
+      "frame": 1083,
+      "id": "hipotetico:garrison:1:2",
+      "phase": "warning",
+      "x": 642.5600000000004,
+      "y": 204,
+      "targetX": 648.1284173846605,
+      "targetY": 136
+    },
+    {
+      "frame": 1126,
+      "id": "hipotetico:garrison:1:2",
+      "phase": "attack",
+      "x": 642.5600000000004,
+      "y": 204,
+      "targetX": 648.1284173846605,
+      "targetY": 136
+    },
+    {
+      "frame": 1152,
+      "id": "hipotetico:garrison:1:2",
+      "phase": "rest",
+      "x": 648.1284173846605,
+      "y": 136,
+      "targetX": 648.1284173846605,
+      "targetY": 136
+    },
+    {
+      "frame": 1167,
+      "id": "hipotetico:garrison:1:2",
+      "phase": "defeated",
+      "x": 648.1284173846605,
+      "y": 136,
+      "targetX": 648.1284173846605,
+      "targetY": 136
     }
   ],
   "captures": [
@@ -573,6 +842,12 @@
       "frame": 512,
       "sector": 1,
       "x": 160.96897694720005
+    },
+    {
+      "file": "locks-1.png",
+      "frame": 594,
+      "sector": 1,
+      "x": 95.93440087040003
     },
     {
       "file": "guard-1-helmet-stunned.png",
@@ -593,10 +868,34 @@
       "x": 203.64411402604554
     },
     {
+      "file": "gate-1-unlock.png",
+      "frame": 650,
+      "sector": 1,
+      "x": 203.64411402604554
+    },
+    {
+      "file": "gate-1-lift.png",
+      "frame": 654,
+      "sector": 1,
+      "x": 217.64411402604554
+    },
+    {
       "file": "gate-1-passage.png",
       "frame": 688,
       "sector": 1,
       "x": 336.64411402604554
+    },
+    {
+      "file": "gate-1-settle.png",
+      "frame": 704,
+      "sector": 1,
+      "x": 392.64411402604554
+    },
+    {
+      "file": "gate-1-open.png",
+      "frame": 712,
+      "sector": 1,
+      "x": 420.64411402604554
     },
     {
       "file": "district-2.png",
@@ -617,64 +916,142 @@
       "x": 652.1772919947956
     },
     {
+      "file": "locks-2.png",
+      "frame": 790,
+      "sector": 2,
+      "x": 657.7619045341547
+    },
+    {
       "file": "scaffold-2.png",
       "frame": 798,
       "sector": 2,
       "x": 657.8725314107061
     },
     {
-      "file": "guard-2-charger-stunned.png",
-      "frame": 904,
+      "file": "vault-warning.png",
+      "frame": 840,
       "sector": 2,
-      "x": 445.5031195157291
+      "x": 633.4725314107061
+    },
+    {
+      "file": "guard-2-minion-warning.png",
+      "frame": 842,
+      "sector": 2,
+      "x": 639.9725314107061
+    },
+    {
+      "file": "guard-2-minion-attack.png",
+      "frame": 862,
+      "sector": 2,
+      "x": 638.9725314107061
+    },
+    {
+      "file": "vault-attack.png",
+      "frame": 1134,
+      "sector": 2,
+      "x": 632.5284173846604
+    },
+    {
+      "file": "vault-rest.png",
+      "frame": 1158,
+      "sector": 2,
+      "x": 641.9584013846604
+    },
+    {
+      "file": "guard-2-charger-stunned.png",
+      "frame": 1238,
+      "sector": 2,
+      "x": 445.77938711750903
     },
     {
       "file": "broken-charger.png",
-      "frame": 904,
+      "frame": 1238,
       "sector": 2,
-      "x": 445.5031195157291
+      "x": 445.77938711750903
     },
     {
       "file": "gate-2-opening.png",
-      "frame": 968,
+      "frame": 1302,
       "sector": 2,
-      "x": 621.6473608799317
+      "x": 618.0580138843548
+    },
+    {
+      "file": "gate-2-lift.png",
+      "frame": 1302,
+      "sector": 2,
+      "x": 618.0580138843548
+    },
+    {
+      "file": "gate-2-settle.png",
+      "frame": 1312,
+      "sector": 2,
+      "x": 653.0580138843548
+    },
+    {
+      "file": "gate-2-open.png",
+      "frame": 1320,
+      "sector": 2,
+      "x": 681.0580138843548
     },
     {
       "file": "gate-2-passage.png",
-      "frame": 1006,
+      "frame": 1340,
       "sector": 2,
-      "x": 754.6473608799317
+      "x": 751.0580138843548
     },
     {
       "file": "district-3.png",
-      "frame": 1202,
+      "frame": 1536,
       "sector": 3,
-      "x": 937.8
+      "x": 934.3
     },
     {
-      "file": "scaffold-3.png",
-      "frame": 1326,
+      "file": "locks-3.png",
+      "frame": 1556,
       "sector": 3,
-      "x": 1033.5713799793516
+      "x": 980.8381153759998
     },
     {
       "file": "guard-3-helmet-stunned.png",
-      "frame": 1376,
+      "frame": 1688,
       "sector": 3,
-      "x": 957.9198727793515
+      "x": 962.1135590452935
+    },
+    {
+      "file": "scaffold-3.png",
+      "frame": 1714,
+      "sector": 3,
+      "x": 1004.9886132284018
     },
     {
       "file": "gate-3-opening.png",
-      "frame": 1412,
+      "frame": 1722,
       "sector": 3,
-      "x": 1035.2961043189243
+      "x": 1032.9886132284018
+    },
+    {
+      "file": "gate-3-lift.png",
+      "frame": 1722,
+      "sector": 3,
+      "x": 1032.9886132284018
     },
     {
       "file": "gate-3-passage.png",
-      "frame": 1450,
+      "frame": 1760,
       "sector": 3,
-      "x": 1168.2961043189243
+      "x": 1165.9886132284018
+    },
+    {
+      "file": "gate-3-settle.png",
+      "frame": 1762,
+      "sector": 3,
+      "x": 1172.9886132284018
+    },
+    {
+      "file": "gate-3-open.png",
+      "frame": 1770,
+      "sector": 3,
+      "x": 1200.9886132284018
     }
   ],
   "damage": [
@@ -685,13 +1062,25 @@
       "sector": 2
     },
     {
-      "frame": 1055,
+      "frame": 864,
       "dead": true,
-      "x": 926.1473608799317,
+      "x": 632.8725314107061,
+      "sector": 2
+    },
+    {
+      "frame": 1134,
+      "dead": false,
+      "x": 632.5284173846604,
+      "sector": 2
+    },
+    {
+      "frame": 1390,
+      "dead": true,
+      "x": 926.0580138843548,
       "sector": 3
     },
     {
-      "frame": 1261,
+      "frame": 1596,
       "dead": false,
       "x": 1110.4756538719998,
       "sector": 3
