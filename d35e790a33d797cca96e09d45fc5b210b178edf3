@@ -1,0 +1,28 @@
+Technical documentation supplement for d35e790a33d797cca96e09d45fc5b210b178edf3
+
+Prevent premature interruption of Bastion tower RPG and rubble search sequence
+
+Allow the Bastion tower launch and subsequent rubble search to continue across a wider camera range.
+
+Implementation
+planTower() reduces the planned firing stance clamp from origin/view +236/+228 to +224/+224, while retaining a minimum of BASTION_TOWER.x +76.
+
+towerFramed() and searchFramed() change margin from -48 to -160 while their corresponding sequence is active, and from -20 to -120 while preparing it. These negative margins deliberately admit actors outside the nominal viewport.
+
+Fourth-district aftermath activation clamps the initial actor x to yard.origin +216 and widens activation checks. Other districts retain their story x.
+
+HypotheticalDevastation.nextScenicTick() permits the fourth-district player position up to center +230 during the authored contact interval, instead of center +108; the other districts keep +108.
+
+Timing and limitations
+Only HypotheticalAftermath.ts and HypotheticalDevastation.ts change. There are no new art files, audio cues, tests or authoring captures.
+
+The patch changes scene eligibility and clock suspension, not projectile damage or tower physics. It retains the 36-step abort counter already added in 4057d1a. Its purpose is to avoid premature interruption; no new gameplay observation is inferred from the source patch.
+
+Authoring material
+No assets change. The original Git message contains only a subject; this record supplies the missing implementation description and exact parameter changes.
+
+Publication evidence
+A retained successful publisher response identifies build `d35e790a33d797cca96e09d45fc5b210b178edf3-811f3044a1b3` for this exact source revision. The matching request records command `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its saved build-log SHA-256 is `e5b108d010f904e7a1aabca44e32071d9e511e50913d65d5a7ba2e6dd24f8ba3`. This records build and activation completion; it is not evidence of correct gameplay, audio quality or passing tests.
+
+Full source map and patch inventory: docs/commits/2026-10-19-followup/d35e790.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
