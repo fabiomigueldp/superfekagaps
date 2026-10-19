@@ -1,6 +1,6 @@
 # Recent commit technical records — 19 October 2026
 
-This review covers all 22 commits reachable from `7807bcb` after `8c56886`, including the three incoming Classic commits and their merge. Earlier Vanguard work is documented in [its release notes](../../world/hipotetico/vanguard-refinement-2026-10-19/release-notes.md).
+This review covers all 23 commits reachable from `9c4c6bd` after `8c56886`, including the three incoming Classic commits and their merge. Earlier Vanguard work is documented in [its release notes](../../world/hipotetico/vanguard-refinement-2026-10-19/release-notes.md).
 
 Each record describes its own first-parent patch, key symbols, runtime behavior, authoring outputs and known limits. Full hashes and immutable source links prevent later local edits from changing the meaning of a record. Documentation-only commits are identified as such. The original published commits are not amended or rebased.
 
@@ -28,6 +28,7 @@ Each record describes its own first-parent patch, key symbols, runtime behavior,
 | [`23cfee3`](23cfee3.md) | feat(hipotetico): plant dinosaur feet and propagate yard vibrations | 8 |
 | [`791cc3a`](791cc3a.md) | Publish grounded background movement and environmental impact polish | 24 |
 | [`7807bcb`](7807bcb.md) | feat(hipotetico): expand tower-search aftermath simulation and rendering | 3 |
+| [`9c4c6bd`](9c4c6bd.md) | Enhance tower rubble petista capture with multi-piece dismemberment and gore physics | 58 |
 
 ## Git notes
 
