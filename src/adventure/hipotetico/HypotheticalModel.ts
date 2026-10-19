@@ -84,7 +84,7 @@ export class HypotheticalModel {
         // foreground damage, emits old audio, or advances Feka's encounter clock.
         if(!previousBackdrop)for(let tick=1;tick<=this.backdropOffset;tick++)this.backdrop.update(tick);
         this.destroyed = this.backdrop.breaches.filter(t=>t>=0).length;
-        this.backgroundX = this.backdrop.x;
+        this.backgroundX = this.backdrop.displayX;
         this.health = health;
         if (act === 'chase') { this.x = chaseStart?chaseStart-114:-18; this.facing = 1;this.pursuitIndex=CHASE_ATTACKS.findIndex(a=>a.x>=chaseStart);this.chaseBreaks=CHASE_BREAKS.map(s=>s.x<this.x?-1000:-1);if(chaseStart)this.state='rest'; }
         if (act === 'chase') this.chaseReactions=chaseReactionStarts(chaseStart);

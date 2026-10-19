@@ -8,6 +8,7 @@ import { dinosaurLeg, dinosaurTail, hypotheticalMotion, riderBend, riderTorsoPoi
 import { BACKDROP_RIG, backdropBaseline, type HypotheticalBackdrop } from './HypotheticalBackdrop';
 import { drawBystanders } from './HypotheticalBystanders';
 import {drawOpeningAftermath} from './HypotheticalOpening';
+import {drawAftermathYards,drawAftermathEffects} from './HypotheticalAftermathArt';
 import { drawHypotheticalScenery, drawHypotheticalDestruction, drawHypotheticalMasonry, drawHypotheticalFittings } from './HypotheticalScenery';
 import { drawHypotheticalCanister } from './HypotheticalGuardArt';
 export { drawHypotheticalGuard } from './HypotheticalGuardArt';
@@ -29,6 +30,12 @@ function distantColor(color:string){
 
 /** Front / three-quarter key pose during a planted turn, with both sides of the face visible. */
 function drawDinosaurPivot(c:CanvasRenderingContext2D,p:DinosaurPose){
+    // The turn has the same atmospheric palette as the side view, including costume accents.
+    if(p.distant){
+        const output=c;
+        c={set fillStyle(color:string){output.fillStyle=distantColor(color);},
+            fillRect(x:number,y:number,w:number,h:number){output.fillRect(x,y,w,h);}} as CanvasRenderingContext2D;
+    }
     const profile=Math.sqrt(Math.max(0,1-(p.pivot??0)**2));
     const x=p.x,y=p.y,body=y-43+p.compression,head=x+p.facing*42*profile;
     const rect=(xx:number,yy:number,w:number,h:number,col:string)=>box(c,x+xx,y+yy,w,h,col);
@@ -45,7 +52,7 @@ function drawDinosaurPivot(c:CanvasRenderingContext2D,p:DinosaurPose){
         box(c,foot-9,y-7-lift,18,6,P.ink);box(c,foot-7,y-6-lift,14,4,P.hide);
         for(let i=0;i<3;i++)box(c,foot-6+i*5,y-3-lift,3,2,P.ivory);
     }
-    const half=19+7*profile;
+    const half=p.distant?17+4*profile:19+7*profile;
     oval(c,x-half,body-13,half*2,41,P.ink);oval(c,x-half+3,body-11,half*2-6,36,P.hide);
     oval(c,x-half+5,body+5,half*2-10,19,P.shade);
     polygon(c,[[x-9,body-7],[x+10,body-7],[x+8,body+15],[x+2,body+22],[x-7,body+16]],P.light);
@@ -87,7 +94,7 @@ function drawDinosaurPivot(c:CanvasRenderingContext2D,p:DinosaurPose){
     for(const d of [-1,1]){pixelLine(c,x+d*12,rider-22,x+d*15,rider-12,P.suit,5);box(c,x+d*10-2,rider-15,4,4,P.face);}
     // A tapered brow, narrow snout and hinged jaw retain the dinosaur's silhouette.
     const ny=y-66+p.compression+p.neckDrop;
-    const hw=16+5*profile,jaw=p.jaw*8;
+    const hw=p.distant?14+2*profile:16+5*profile,jaw=p.jaw*8;
     polygon(c,[[head-hw,ny-4],[head-hw+5,ny-11],[head+hw-5,ny-11],[head+hw,ny-4],[head+hw-3,ny+12],[head+hw-6,ny+20+jaw],[head-hw+6,ny+20+jaw],[head-hw+3,ny+12]],P.ink);
     polygon(c,[[head-hw+3,ny-3],[head-hw+6,ny-8],[head+hw-6,ny-8],[head+hw-3,ny-3],[head+hw-5,ny+10],[head-hw+5,ny+10]],P.hide);
     polygon(c,[[head-7,ny-6],[head+7,ny-6],[head+hw-6,ny+6],[head+hw-5,ny+10],[head-hw+5,ny+10],[head-hw+6,ny+6]],P.light);
@@ -352,6 +359,10 @@ export function dinosaurPose(b: HypotheticalModel, cx: number, cy: number, reduc
 
 export function distantRiderPose(action:HypotheticalBackdrop,reduced=false):DinosaurPose {
     const m=action.motion,r=BACKDROP_RIG;
+    if(action.aftermath.active){const pose=action.aftermath.pose(reduced);return {
+        x:r.x,y:r.y+pose.lift/r.scale,...pose,recoil:0,heat:0,
+        daze:0,armor:9,flash:false,defeated:false,distant:true,
+    };}
     return {x:r.x,y:r.y+m.lift/r.scale,facing:1,gait:action.travel/(r.scale*11),stride:action.stride,
         breath:0,bow:0,jaw:m.jaw,neckDrop:m.neckDrop,recoil:action.recoil,aim:action.angle,tail:m.tail,
         compression:m.compression,tuck:m.tuck,reload:0,brace:m.brace,heat:action.heat,
@@ -368,8 +379,8 @@ function drawDistantRider(c:CanvasRenderingContext2D,b:HypotheticalModel,base:nu
     if(!rig){const canvas=document.createElement('canvas');canvas.width=r.width;canvas.height=r.height;rig={canvas,c:canvas.getContext('2d')!};backgroundRigs.set(c,rig);}
     rig.c.clearRect(0,0,r.width,r.height);
     drawHypotheticalDinosaur(rig.c,distantRiderPose(action,reduced));
-    oval(c,action.x-31,base-2,64,4,'#718378');
-    if(!reduced)for(const p of action.footfalls){
+    oval(c,action.displayX-31,base-2,64,4,'#718378');
+    if(!reduced&&!action.aftermath.active)for(const p of action.footfalls){
         const t=(action.tick-p.born)/28;
         for(let i=0;i<3;i++)box(c,p.x-5+i*4-t*(i+1),base-2-t*3-i%2,3,1,'#b5ad95');
     }
@@ -386,10 +397,12 @@ export function drawHypotheticalBackground(c:CanvasRenderingContext2D,b:Hypothet
         const base=backdropBaseline(cy);
         c.save();c.translate(-Math.round(cx),0);
         drawBystanders(c,b.backdrop,base,reduced,true);
+        drawAftermathYards(c,b.backdrop,base,cx,reduced);
         drawDistantRider(c,b,base,reduced);
         drawBystanders(c,b.backdrop,base,reduced);
         drawOpeningAftermath(c,b.backdrop.tick,base,reduced);
         drawHypotheticalDestruction(c,b,base,cy,reduced);
+        drawAftermathEffects(c,b.backdrop.aftermath,base,reduced);
         c.restore();
     }
 }

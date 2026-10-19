@@ -29,12 +29,31 @@ function refuge(c:CanvasRenderingContext2D,x:number,y:number,district:number){
         for(let i=0;i<6;i++)box(c,cx-w/2-4+i*7,top-3,5,1,P.light);
         box(c,cx+w/2-3,top+15,2,4,P.shine);box(c,cx+w/2+2,y-10,2,6,P.dark);
     }
+    if(district===0){
+        // A folded shutter and a lamp belong to the courtyard, with an open passage between.
+        box(c,cx+w/2+3,top+9,8,y-top-14,P.grain);
+        for(let j=0;j<4;j++)box(c,cx+w/2+4,top+11+j*6,6,1,P.light);
+        pixelLine(c,cx-21,top+6,cx-26,top+6,P.dark);box(c,cx-29,top+7,6,9,P.dark);
+        box(c,cx-28,top+9,4,4,'#b9ad86');box(c,cx-27,top+10,2,2,'#d0c19b');
+    }else if(district===1){
+        const rx=cx+24;
+        oval(c,rx-6,y-16,13,13,P.dark);oval(c,rx-4,y-14,9,9,P.light);oval(c,rx-2,y-12,5,5,P.grain);
+        pixelLine(c,rx+5,y-9,rx+8,y-4,P.light);box(c,rx+7,y-4,5,1,P.grain);
+        pixelLine(c,cx-21,top+1,cx+21,top+1,P.metal,3);
+        for(const dx of [-20,20])pixelLine(c,cx+dx,top+2,cx+dx*.7,top+8,P.dark);
+    }else if(district===2){
+        box(c,cx-25,top+10,7,16,P.metal);box(c,cx-24,top+11,5,2,P.shine);
+        for(let j=0;j<3;j++)box(c,cx-24,top+15+j*3,4,1,P.ink);
+        pixelLine(c,cx-22,top+26,cx-22,y-3,P.dark,2);
+        for(const dx of [-5,2,9])box(c,cx+dx,top+7,1,5,P.metal);
+    }
 }
 
 function timber(c:CanvasRenderingContext2D,x:number,y:number,s:AftermathYard,tick:number){
     const nudge=progress(tick,s.shiftedAt,44),split=progress(tick,s.brokenAt,30);
     oval(c,x-23,y-3,50,5,'#637c74');
     for(let j=0;j<4;j++){
+        if(j===3&&s.shiftedAt>=0)continue; // This beam is pulled free and drawn across the jaw below.
         const yy=y-5-j*6*(1-split*.7),left=x-17-j%2*4+nudge*(j-1)*2,slide=(j-1.5)*split*5;
         pixelLine(c,left+slide,yy,x+20+slide,yy-3+split*(j%2?3:-3),P.dark,5);
         pixelLine(c,left+slide,yy-1,x+19+slide,yy-4+split*(j%2?3:-3),P.wood,3);
@@ -56,7 +75,7 @@ function cargo(c:CanvasRenderingContext2D,x:number,y:number,s:AftermathYard,tick
         pixelLine(c,xx+1,yy+2,xx+12,yy+14*(1-split*.48),P.dark,2);
         box(c,xx+1,yy,13,1,P.edge);box(c,xx+2,yy+1,1,1,P.ink);box(c,xx+11,yy+1,1,1,P.ink);
         const age=s.brokenAt<0?0:tick-s.brokenAt,hop=Math.sin(Math.PI*Math.min(1,age/32))*12;
-        pixelLine(c,xx-1-split*4,yy-2-nudge*(j%2?4:0)-hop,xx+15+split*5,yy-2+split*7-hop,P.light,2);
+        if(j!==1||s.shiftedAt<0)pixelLine(c,xx-1-split*4,yy-2-nudge*(j%2?4:0)-hop,xx+15+split*5,yy-2+split*7-hop,P.light,2);
     }
     pixelLine(c,x-17,y-23+split*17,x-3,y-26+split*20,P.dark);
     pixelLine(c,x-3,y-26+split*20,x+21,y-22+split*20,P.dark);
@@ -119,6 +138,11 @@ export function drawAftermathYards(c:CanvasRenderingContext2D,b:HypotheticalBack
         const x=yard.origin,s=a.yards[i];
         if(x+390<cameraX||x+110>cameraX+320)continue;
         refuge(c,x,base,i);
+        if(s.runnerAt>=0){
+            // The stack hides the start of the escape; actors emerge past its actual right edge.
+            c.save();c.beginPath();c.rect(x+296,base-34,95,36);c.clip();
+            drawBystanders(c,b,base,reduced,false,s.people,a.tick);c.restore();
+        }
         const px=x+272,py=base-3;
         if(yard.kind==='timber')timber(c,px,py,s,a.tick);
         else if(yard.kind==='cargo')cargo(c,px,py,s,a.tick);
@@ -131,13 +155,12 @@ export function drawAftermathYards(c:CanvasRenderingContext2D,b:HypotheticalBack
             if(reduced&&s.birdsAt>=0)continue;
             if(age>142&&!returned)continue;
             const perchX=x+(j<2?264+j*14:344+(j-2)*9),perchY=base-(j<2?33:i===3?32:47);
-            const flight=age>=0&&age<=142,landing=returned&&age<1560;
-            const t=flight?age:landing?1560-age:0;
+            const flight=age>=0&&age<=142,landing=returned&&age<1606;
+            const t=flight?age:landing?1606-age:0;
             const xx=flight?perchX+t*.93:returned?x+335+j*7+t*.4:perchX;
             const yy=flight?perchY-Math.min(65,t*.78):returned?base-(i===3?32:47)-t*.6:perchY;
             gull(c,xx,yy,flight||landing?a.tick:a.tick*.12,j,flight||landing,reduced);
         }
-        if(s.runnerAt>=0)drawBystanders(c,b,base,reduced,false,s.people,a.tick);
     }
 }
 
@@ -146,6 +169,17 @@ export function drawAftermathEffects(c:CanvasRenderingContext2D,a:HypotheticalAf
     for(const [i,s] of a.yards.entries()){
         if(s.shiftedAt<0)continue;
         const x=AFTERMATH_YARDS[i].origin+272,age=a.tick-(s.brokenAt<0?s.shiftedAt:s.brokenAt);
+        if(i<2){
+            // A freed beam/lid rises with the muzzle, then drops once and remains in the street.
+            const t=a.tick-s.shiftedAt,release=smoothMotion((t-28)/40);
+            const lift=8*smoothMotion(t/15)*(1-release);
+            const xx=x+smoothMotion(t/62)*24,yy=base-18-lift+release*15;
+            const tilt=Math.sin(Math.min(1,t/68)*Math.PI)*6;
+            pixelLine(c,xx-14,yy-tilt,xx+15,yy+tilt,P.dark,4);
+            pixelLine(c,xx-13,yy-tilt,xx+14,yy+tilt,P.wood,2);
+            pixelLine(c,xx-11,yy-tilt-1,xx+12,yy+tilt-1,P.light);
+            box(c,xx-9,yy-tilt,1,2,P.ink);box(c,xx+8,yy+tilt,1,2,P.ink);
+        }
         for(let j=0;j<(s.damage===2?8:4);j++){
             const t=Math.min(42,Math.max(0,age-j*2)),dir=j%2?1:-1;
             const xx=x+dir*(8+j*2+t*.48),yy=base-3-Math.max(0,Math.sin(Math.PI*t/42)*(5+j%3*3));
@@ -156,13 +190,15 @@ export function drawAftermathEffects(c:CanvasRenderingContext2D,a:HypotheticalAf
     if(!a.active)return;
     for(const p of a.contacts){
         const age=a.tick-p.born,step=p.kind==='step',end=step?26:72;
+        if(reduced&&step)continue;
         if(age>=end)continue;
         const fade=1-age/end,grow=Math.min(1,(age+1)/6),n=step?3:reduced?3:6;
         if(!step&&age<8){
+            const impactY=base-(a.district===3&&p.kind==='break'?4:17);
             for(let j=0;j<4;j++){
                 const angle=-Math.PI*.88+j*.7,r=4+age*1.2;
-                pixelLine(c,p.x+Math.cos(angle)*r,base-17+Math.sin(angle)*r*.45,
-                    p.x+Math.cos(angle)*(r+3),base-17+Math.sin(angle)*(r+3)*.45,P.edge);
+                pixelLine(c,p.x+Math.cos(angle)*r,impactY+Math.sin(angle)*r*.45,
+                    p.x+Math.cos(angle)*(r+3),impactY+Math.sin(angle)*(r+3)*.45,P.edge);
             }
         }
         for(let j=0;j<n;j++){

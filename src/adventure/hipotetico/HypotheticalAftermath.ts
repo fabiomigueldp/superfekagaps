@@ -29,11 +29,11 @@ export class HypotheticalAftermath {
     readonly yards:AftermathYard[] = AFTERMATH_YARDS.map((yard, district) => ({
         damage:0, shiftedAt:-1, brokenAt:-1, birdsAt:-1, runnerAt:-1,
         people:[0,1].map(i => ({
-            x:yard.origin+290-i*12, originX:yard.origin+290-i*12, shelter:yard.origin+354,
+            x:yard.origin+290-i*6, originX:yard.origin+290-i*6, shelter:yard.origin+(district===3?342:354),
             escaped:false, fleeing:true, hitAt:null, color:(district+i)%4,
             distance:0, velocity:0, alertAt:Number.MAX_SAFE_INTEGER, speed:1, district,
             clothes:i===0?'satchel':'workcoat', stoppedAt:null, threatenedAt:null, startledAt:null,
-            reactionTimes:[], appearance:11+district+i, depth:-3-i*2, exitAtShelter:true, runTicks:68+i*12,
+            reactionTimes:[], appearance:11+district+i, depth:-3-i*2, exitAtShelter:true, runTicks:60+i*8,
         })),
     }));
     private fromX = 0;
@@ -66,6 +66,17 @@ export class HypotheticalAftermath {
 
     update(storyTick:number, storyX:number, playerX:number){
         this.events=[];
+        this.tick++;
+        this.contacts=this.contacts.filter(p=>this.tick-p.born<88);
+        // Already-started escapes and settling finish even after the camera leaves a street.
+        for(const yard of this.yards)for(const p of yard.people){
+            p.velocity=0;
+            if(p.escaped||this.tick<=p.alertAt+8)continue;
+            const old=p.x;
+            p.x=p.originX+(p.shelter-p.originX)*smoothMotion((this.tick-p.alertAt-8)/p.runTicks!);
+            p.velocity=p.x-old;p.distance+=Math.abs(p.velocity);
+            if(p.x===p.shelter)p.escaped=true;
+        }
         const district=scenicDistrict(storyTick), yard=AFTERMATH_YARDS[district];
         // A new authored street has priority. No hidden activity continues in a later district.
         if(district!==this.district){
@@ -78,20 +89,24 @@ export class HypotheticalAftermath {
             this.active=true; this.x=storyX; this.velocity=0; this.facing=1; this.travel=0; this.lastStep=0;
             this.enter('approach');
         }
-        this.tick++;
-        this.contacts=this.contacts.filter(p=>this.tick-p.born<88);
         const areaVisible=playerX>yard.origin+62 && playerX<yard.origin+440;
         const needsContact=(this.phase==='search'&&this.yard.damage===0)
             || (this.phase==='listen'&&this.yard.damage===1);
         // Continue breathing and looking around while waiting, not a frozen attack silhouette.
-        const waiting=!areaVisible || needsContact&&this.age>=this.duration-1&&!visible(center,48);
+        const staging=(this.phase==='rummage'||this.phase==='flush')&&this.age<58;
+        const waiting=!areaVisible || needsContact&&this.age>=this.duration-1&&!visible(center,48)
+            || staging&&!visible(center,20);
         if(!waiting)this.age++;
         const oldX=this.x, t=smoothMotion(this.age/this.duration);
         const home=yard.origin+222;
         if(this.phase==='approach'||this.phase==='return')this.x=this.fromX+(home-this.fromX)*t;
-        else if(this.phase==='patrol')this.x=this.fromX+(yard.origin+152-this.fromX)*t;
+        else if(this.phase==='patrol'){
+            const stop=yard.origin+[152,180,136][this.cycle%3];
+            this.x=this.fromX+(stop-this.fromX)*t;
+        }
         else if(this.phase==='rummage')this.x=this.fromX+11*pulse(this.age,43,65,108);
-        else if(this.phase==='flush')this.x=this.fromX-7*pulse(this.age,25,30,43)+19*pulse(this.age-32,26,37,94);
+        else if(this.phase==='flush')this.x=this.fromX-7*pulse(this.age,25,30,43)
+            +(this.district===3?40:19)*pulse(this.age-32,26,37,94);
         this.velocity=this.x-oldX;
         this.travel+=Math.abs(this.velocity);
         const step=Math.floor(this.travel/(Math.PI*11*.6875));
@@ -115,7 +130,7 @@ export class HypotheticalAftermath {
                     case 'approach': case 'return': this.enter('search');break;
                     case 'search': this.enter(this.yard.damage===0?'rummage':'listen');break;
                     case 'rummage': this.enter('listen');break;
-                    case 'listen': this.enter(this.yard.damage===1?'flush':'turn-out');break;
+                    case 'listen': this.enter(this.yard.damage===1?'flush':this.cycle%2?'watch':'turn-out');break;
                     case 'flush': this.enter('watch');break;
                     case 'watch': this.enter('turn-out');break;
                     case 'turn-out': this.enter('patrol');break;
@@ -124,15 +139,6 @@ export class HypotheticalAftermath {
                     case 'turn-back': this.cycle++;this.enter('return');break;
                 }
             }
-        }
-        // Survivors cross the rear street to a real recess. No respawning crowds or corpses.
-        for(const p of this.yard.people){
-            p.velocity=0;
-            if(p.escaped||this.tick<=p.alertAt+8)continue;
-            const old=p.x;
-            p.x=p.originX+(p.shelter-p.originX)*smoothMotion((this.tick-p.alertAt-8)/p.runTicks!);
-            p.velocity=p.x-old;p.distance+=Math.abs(p.velocity);
-            if(p.x===p.shelter)p.escaped=true;
         }
     }
 
@@ -147,19 +153,26 @@ export class HypotheticalAftermath {
         const survey=phase==='survey'||phase==='listen'||phase==='watch';
         const look=survey?pulse(a,24,this.duration-30,this.duration):0;
         const breath=reduced?0:Math.sin(this.tick/19)*.5;
+        const cargo=this.district===1&&rummaging?pulse(a-56,12,26,52):0;
+        const steam=this.district===2&&phase==='flush'?pulse(a-60,8,25,54):0;
+        const stamp=this.district===3&&phase==='flush';
+        const lift=stamp&&a>=38&&a<58?Math.sin(Math.PI*(a-38)/20):0;
+        const landing=stamp?pulse(a-58,3,8,30):0;
+        const sniff=phase==='listen'&&this.cycle>0?pulse(a-10,16,32,60):0;
+        const tailCheck=phase==='survey'?pulse(a-34,20,32,62):0;
         return {
             facing:this.facing, gait:this.travel/(.6875*11), stride:this.stride,
             pivot:turn?Math.sin(Math.PI*a/44)*.98:0,
-            bow:search*.52+probe*.66+strike*.56,
-            breath, compression:probe*2+strike*5+(turn?Math.sin(Math.PI*a/44)*2:0),
-            neckDrop:search*(14+(reduced?0:Math.sin(a/9)*2))+probe*16+strike*17,
+            bow:search*.52+probe*.48-cargo*.22+(stamp?0:strike*.34)-steam*.1+sniff*.2,
+            lift:-lift*7, breath, compression:probe*2+(stamp?landing*7:strike*5)+(turn?Math.sin(Math.PI*a/44)*2:0),
+            neckDrop:search*(14+(reduced?0:Math.sin(a/9)*2))+probe*10-cargo*10+(stamp?landing*5:strike*10)-steam*8+sniff*5,
             jaw:.12+probe*.24+flush*.62*(1-smoothMotion((a-54)/8)),
-            tail:search*-.09+strike*.12+(reduced?0:Math.sin(this.tick/29)*.025),
-            tuck:0, brace:probe*.35+strike*.6+(turn?.42:0),
-            riderDrop:probe*3+strike*5, riderLean:probe*3-strike*4,
+            tail:search*-.09+strike*.12+(reduced?0:Math.sin(this.tick/29)*.025+tailCheck*.12),
+            tuck:lift*.55, brace:probe*.35+(stamp?landing*.6:strike*.6)+(turn?.42:0),
+            riderDrop:probe*3+strike*5+lift*5, riderLean:probe*3-strike*4-steam*5,
             rein:Math.max(probe,flush,this.stride*.6), lookBack:look*(this.cycle%2?.8:.55),
             aim:look*.3-.12, reload:phase==='watch'?Math.sin(Math.PI*a/this.duration)*.65:0,
-            focus:Math.max(search,probe,flush), eyeClose:search*.35,
+            focus:Math.max(search,probe,flush), eyeClose:Math.max(search*.35,steam*.8),
             blink:this.tick%197<5, voice:phase==='flush'?pulse(a-60,4,12,30)*.28:0,
             cloth:reduced?0:this.stride*2+strike*2,
         };
