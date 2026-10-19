@@ -1,0 +1,30 @@
+Technical documentation supplement for 6f6f49ac9bc9d8b7d0c96722afd719dc4dab2041
+
+feat(hipotetico): refine helicopter missile ignition and staged destruction
+
+Tie missile ignition to muzzle clearance and stage helicopter destruction around the actual hull contact.
+
+Implementation
+HypotheticalRocketMotion.ts introduces ScenicRocket, rocketTail() and advanceRocketMotor(). Before ignition, motorAge is negative. The helper compares traveled distance with the extending casing plus a two-pixel clearance, returns the fraction of the current step that burns, and raises a one-time ignition transition.
+
+Both helicopter and tower consume that transition for rocket audio and trail emission. The tower retains its existing speed expression; sharing ignition does not make the two flights identical. The effect renderer clips the emerging projectile at the muzzle, replaces the forward flare with a local gas puff, and renders only the burning path.
+
+LauncherPose adds independently timed supportReach and triggerReach; launcher art uses them for the hand grips. Helicopter body anticipation precedes the shoulder position, and aim holds through firing before following the wreck.
+
+The swept hull intersection records point, normal and hull-local coordinates. Breach rendering follows the struck panel, and detached parts inherit attachment-point linear/angular motion. HELICOPTER_BREAKUP separates engine, tail and rotor events at 9, 16 and 28 post-impact ticks.
+
+Ground dust and marks use the actual support vertex. Hull compression is shared with drawing/contact transforms; explosion lobes, engine fire and smoke follow the new stages.
+
+Timing and limitations
+Impact is determined by swept geometry, not a scheduled mid-air explosion. Breakup offsets are fixed relative to that impact; total flight duration remains a result of the composition.
+
+The original authoring record reports ignition 16 ticks after launch, hull contact 27 ticks after launch and ground contact 74 ticks after impact for that held composition. These are dataset observations, not universal constants or results rerun here.
+
+Authoring material
+Refreshes the helicopter review assets and scripts/render_hypothetical_helicopter.ts; adds launch-study.png. The revised video records 60 fps rather than the initial study’s 30 fps.
+
+Publication evidence
+A retained successful publisher response identifies build `6f6f49ac9bc9d8b7d0c96722afd719dc4dab2041-d5f6ca5fad1e` for this exact source revision. The matching request records command `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its saved build-log SHA-256 is `964101f00c37c7389b284d26514aa3b9b6f2596d55ea6d9d03df9a791be75f86`. This records build and activation completion; it is not evidence of correct gameplay, audio quality or passing tests.
+
+Full source map and patch inventory: docs/commits/2026-10-19-followup/6f6f49a.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
