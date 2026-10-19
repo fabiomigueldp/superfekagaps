@@ -6,18 +6,19 @@ import type { WorldLevel, WorldObjects } from '../WorldPhysics';
 import { HYPOTHETICAL, type HypotheticalModel } from './HypotheticalModel';
 import { dinosaurLeg, dinosaurTail, dinosaurHeadPoint, dinosaurJawPoint, dinosaurMouthPoint, hypotheticalMotion, riderBend, riderTorsoPoint, smoothMotion } from './HypotheticalMotion';
 import { BACKDROP_RIG, backdropBaseline, type HypotheticalBackdrop } from './HypotheticalBackdrop';
-import { drawBystanders,drawCarriedBystander,type CarriedBystander } from './HypotheticalBystanders';
+import { drawBystanders,drawBystanderGround,drawBystanderEffects,drawCarriedBystander,type CarriedBystander } from './HypotheticalBystanders';
 import {drawTowerSearchActors,drawTowerSearchDust} from './HypotheticalTowerSearchArt';
-import {drawOpeningAftermath} from './HypotheticalOpening';
+import {drawOpeningStreet,drawOpeningAftermath} from './HypotheticalOpening';
 import {drawAftermathYards,drawAftermathEffects} from './HypotheticalAftermathArt';
 import {drawDebrisPiece} from './HypotheticalDebrisArt';
 import {AFTERMATH_SCALE,type HeldDebris} from './HypotheticalAftermathHandling';
-import {drawTowerEffects} from './HypotheticalTowerArt';
+import {drawTowerDebris,drawTowerEffects} from './HypotheticalTowerArt';
+import {drawScenicShadow} from './HypotheticalSceneShadow';
 import {drawLauncher,drawLauncherHands} from './HypotheticalLauncherArt';
 import type {LauncherPose} from './HypotheticalTower';
 import type {PlantedFeet} from './HypotheticalAftermathFooting';
 import {drawHelicopterRear,drawHelicopterEffects} from './HypotheticalHelicopterArt';
-import { drawHypotheticalScenery, drawHypotheticalDestruction, drawHypotheticalMasonry, drawHypotheticalFittings } from './HypotheticalScenery';
+import { drawHypotheticalScenery, drawHypotheticalRubble, drawHypotheticalDestruction, drawHypotheticalMasonry, drawHypotheticalFittings } from './HypotheticalScenery';
 import { drawHypotheticalCanister } from './HypotheticalGuardArt';
 export { drawHypotheticalGuard } from './HypotheticalGuardArt';
 
@@ -429,8 +430,12 @@ function drawDistantRider(c:CanvasRenderingContext2D,b:HypotheticalModel,base:nu
     let rig=backgroundRigs.get(c);
     if(!rig){const canvas=document.createElement('canvas');canvas.width=r.width;canvas.height=r.height;rig={canvas,c:canvas.getContext('2d')!};backgroundRigs.set(c,rig);}
     rig.c.clearRect(0,0,r.width,r.height);
-    drawHypotheticalDinosaur(rig.c,distantRiderPose(action,reduced));
-    oval(c,action.displayX-31,base-2,64,4,'#718378');
+    const pose=distantRiderPose(action,reduced);
+    drawHypotheticalDinosaur(rig.c,pose);
+    // The projection stays on the street when the body lifts. It broadens and
+    // softens in value, while still preserving every underlying paving mark.
+    const height=Math.max(0,(r.y-pose.y)*r.scale),spread=Math.min(10,height*.22);
+    drawScenicShadow(c,action.displayX-31-spread/2,base-2,64+spread,4,.26*(1-Math.min(.65,height/70)));
     if(!reduced&&!action.aftermath.active)for(const p of action.footfalls){
         const t=(action.tick-p.born)/28;
         for(let i=0;i<3;i++)box(c,p.x-5+i*4-t*(i+1),base-2-t*3-i%2,3,1,'#b5ad95');
@@ -453,12 +458,20 @@ export function drawHypotheticalBackground(c:CanvasRenderingContext2D,b:Hypothet
     if(b.act==='siege'){
         const base=backdropBaseline(cy);
         c.save();c.translate(-Math.round(cx),0);
+        // Rear street: physical scenery retains its depth in flight and at rest.
         drawHelicopterRear(c,b.backdrop.helicopter,base,reduced);
-        drawBystanders(c,b.backdrop,base,reduced,true);
+        drawHypotheticalRubble(c,b,base);
+        drawTowerDebris(c,b.backdrop.aftermath.tower,base,reduced);
+        drawBystanderGround(c,b.backdrop,base,reduced);
+        drawOpeningStreet(c,b.backdrop.tick,base,reduced);
+        drawBystanders(c,b.backdrop,base,reduced,true,undefined,b.backdrop.tick,'actors');
         drawAftermathYards(c,b.backdrop,base,cx,reduced);
         drawTowerSearchActors(c,b.backdrop,base,reduced);
+        // Characters occlude the rear street; ground decals never paint over them.
         drawDistantRider(c,b,base,reduced);
-        drawBystanders(c,b.backdrop,base,reduced);
+        drawBystanders(c,b.backdrop,base,reduced,false,undefined,b.backdrop.tick,'actors');
+        // Transient contact effects can cross silhouettes; settled solids cannot.
+        drawBystanderEffects(c,b.backdrop,base,reduced);
         drawOpeningAftermath(c,b.backdrop.tick,base,reduced);
         drawHypotheticalDestruction(c,b,base,cy,reduced);
         drawAftermathEffects(c,b.backdrop.aftermath,base,reduced);

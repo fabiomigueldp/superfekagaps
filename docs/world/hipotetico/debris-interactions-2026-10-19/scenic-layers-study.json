@@ -1,0 +1,171 @@
+{
+  "kind": "directed compositing plates",
+  "gameplayTest": false,
+  "browser": false,
+  "audio": false,
+  "fps": 60,
+  "framesPerScene": 240,
+  "staged": "Rear scenery history; authored walk across static remnants; settled tower physics; no foreground combat.",
+  "records": [
+    {
+      "scene": "chegada",
+      "frame": 30,
+      "file": "chegada-30.png",
+      "actorX": 117,
+      "cameraX": 20,
+      "story": 200
+    },
+    {
+      "scene": "chegada",
+      "frame": 90,
+      "file": "chegada-90.png",
+      "actorX": 159,
+      "cameraX": 20,
+      "story": 200
+    },
+    {
+      "scene": "chegada",
+      "frame": 150,
+      "file": "chegada-150.png",
+      "actorX": 201,
+      "cameraX": 20,
+      "story": 200
+    },
+    {
+      "scene": "chegada",
+      "frame": 210,
+      "file": "chegada-210.png",
+      "actorX": 243,
+      "cameraX": 20,
+      "story": 200
+    },
+    {
+      "scene": "portaria",
+      "frame": 30,
+      "file": "portaria-30.png",
+      "actorX": 438,
+      "cameraX": 341,
+      "story": 1030
+    },
+    {
+      "scene": "portaria",
+      "frame": 90,
+      "file": "portaria-90.png",
+      "actorX": 480,
+      "cameraX": 341,
+      "story": 1030
+    },
+    {
+      "scene": "portaria",
+      "frame": 150,
+      "file": "portaria-150.png",
+      "actorX": 522,
+      "cameraX": 341,
+      "story": 1030
+    },
+    {
+      "scene": "portaria",
+      "frame": 210,
+      "file": "portaria-210.png",
+      "actorX": 564,
+      "cameraX": 341,
+      "story": 1030
+    },
+    {
+      "scene": "cais",
+      "frame": 30,
+      "file": "cais-30.png",
+      "actorX": 854,
+      "cameraX": 757,
+      "story": 1474
+    },
+    {
+      "scene": "cais",
+      "frame": 90,
+      "file": "cais-90.png",
+      "actorX": 896,
+      "cameraX": 757,
+      "story": 1474
+    },
+    {
+      "scene": "cais",
+      "frame": 150,
+      "file": "cais-150.png",
+      "actorX": 938,
+      "cameraX": 757,
+      "story": 1474
+    },
+    {
+      "scene": "cais",
+      "frame": 210,
+      "file": "cais-210.png",
+      "actorX": 980,
+      "cameraX": 757,
+      "story": 1474
+    },
+    {
+      "scene": "arsenal",
+      "frame": 30,
+      "file": "arsenal-30.png",
+      "actorX": 1270,
+      "cameraX": 1173,
+      "story": 1874
+    },
+    {
+      "scene": "arsenal",
+      "frame": 90,
+      "file": "arsenal-90.png",
+      "actorX": 1312,
+      "cameraX": 1173,
+      "story": 1874
+    },
+    {
+      "scene": "arsenal",
+      "frame": 150,
+      "file": "arsenal-150.png",
+      "actorX": 1354,
+      "cameraX": 1173,
+      "story": 1874
+    },
+    {
+      "scene": "arsenal",
+      "frame": 210,
+      "file": "arsenal-210.png",
+      "actorX": 1396,
+      "cameraX": 1173,
+      "story": 1874
+    },
+    {
+      "scene": "bastiao",
+      "frame": 30,
+      "file": "bastiao-30.png",
+      "actorX": 1566,
+      "cameraX": 1469,
+      "story": 2222
+    },
+    {
+      "scene": "bastiao",
+      "frame": 90,
+      "file": "bastiao-90.png",
+      "actorX": 1608,
+      "cameraX": 1469,
+      "story": 2222
+    },
+    {
+      "scene": "bastiao",
+      "frame": 150,
+      "file": "bastiao-150.png",
+      "actorX": 1650,
+      "cameraX": 1469,
+      "story": 2222
+    },
+    {
+      "scene": "bastiao",
+      "frame": 210,
+      "file": "bastiao-210.png",
+      "actorX": 1692,
+      "cameraX": 1469,
+      "story": 2222
+    }
+  ]
+}

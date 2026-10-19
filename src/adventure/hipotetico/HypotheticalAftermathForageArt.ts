@@ -98,7 +98,7 @@ function bloodCloud(c:CanvasRenderingContext2D,x:number,y:number,r:number,seed:n
 
 /** Back layer: persistent blood pools, torn clothing scraps and severed anatomical
  * pieces lying on the street cobbles behind the dinosaur. */
-export function drawForageRemains(c:CanvasRenderingContext2D,s:AftermathForage,base:number,tick:number){
+export function drawForageRemains(c:CanvasRenderingContext2D,s:AftermathForage,base:number,tick:number,reduced=false){
     for(const stain of s.stains){
         const grow=smoothMotion((tick-stain.born)/14),r=stain.radius*(.45+.55*grow);
         const y=base+stain.y;
@@ -116,11 +116,7 @@ export function drawForageRemains(c:CanvasRenderingContext2D,s:AftermathForage,b
     for(const p of s.pieces){
         if(p.kind==='head')drawForagePiece(c,p,base);
     }
-}
-
-/** Front layer: dust occlusion for variants 0 & 1, plus visceral tear strands,
- * bone/flesh splinters, arterial sprays and jaw blood drips for explicit variants 2, 3 & 4. */
-export function drawForageCover(c:CanvasRenderingContext2D,s:AftermathForage,base:number,reduced:boolean,tick:number){
+    // Floor marks and released particles share the street layer.
     for(const mark of s.marks){
         pixelLine(c,mark.x-11,base-2,mark.x+10,base-2,'#7b8e7e');
         pixelLine(c,mark.x-7,base-3,mark.x+5,base-3,'#909e87');
@@ -133,6 +129,22 @@ export function drawForageCover(c:CanvasRenderingContext2D,s:AftermathForage,bas
         box(c,x-1,y-1,2,sp.bone?1:2,sp.bone?'#e6dfd3':'#7a1820');
         box(c,x,y,1,1,sp.bone?'#9e2028':'#c92c34');
     }
+    if(reduced||s.explicit||s.contactTick<0)return;
+    const a=tick-s.contactTick;if(a<0)return;
+    for(let j=0;j<9;j++){
+        if(s.cancelledAt>=0&&s.contactTick+j>s.cancelledAt)continue;
+        const t=a-j;if(t<0||t>112)continue;
+        const g=forageGrain(j,t,s.district),px=s.contactX+g.x,py=base+g.y;
+        c.save();c.globalAlpha*=1-smoothMotion((t-68)/44);
+        if(t<g.landing+g.rebound)box(c,px,base-2,2,1,P.shade);
+        box(c,px,py,2,1,j%2?P.stone:P.ink);
+        if(t>g.landing&&t<g.landing+8)box(c,px+1,base-3,2,1,P.dust);
+        c.restore();
+    }
+}
+
+/** Front layer: transient contact effects and dust occlusion only. */
+export function drawForageCover(c:CanvasRenderingContext2D,s:AftermathForage,base:number,reduced:boolean,tick:number){
     if(!reduced){
         const jx=s.jawX,jy=base+s.jawY;
         for(const p of s.pieces){
@@ -207,16 +219,6 @@ export function drawForageCover(c:CanvasRenderingContext2D,s:AftermathForage,bas
         c.save();c.globalAlpha*=life*.65;
         box(c,px,py,4+j%3+t*.025,1,P.dust);
         if(j%2===0)box(c,px+2,py-1,3+t*.015,1,P.light);
-        c.restore();
-    }
-    for(let j=0;j<9;j++){
-        if(s.cancelledAt>=0&&s.contactTick+j>s.cancelledAt)continue;
-        const t=a-j;if(t<0||t>112)continue;
-        const g=forageGrain(j,t,s.district),px=s.contactX+g.x,py=base+g.y;
-        c.save();c.globalAlpha*=1-smoothMotion((t-68)/44);
-        if(t<g.landing+g.rebound)box(c,px,base-2,2,1,P.shade);
-        box(c,px,py,2,1,j%2?P.stone:P.ink);
-        if(t>g.landing&&t<g.landing+8)box(c,px+1,base-3,2,1,P.dust);
         c.restore();
     }
 }

@@ -3,6 +3,7 @@ import {aircraftPoint,AIRCRAFT_SHAPES,HELICOPTER_GROUND,HELICOPTER_BREAKUP,HELIC
 import {aircraftOutline} from './HypotheticalAircraftPhysics';
 import {drawScenicRocket} from './HypotheticalTowerEffects';
 import {smoothMotion} from './HypotheticalMotion';
+import {drawScenicShadow} from './HypotheticalSceneShadow';
 
 const P={ink:'#3b5356',shade:'#52665d',paint:'#7b8e74',light:'#b5b896',metal:'#9faea1',glass:'#466976',glint:'#a0c4b4',stripe:'#d0bd8e',char:'#495953'};
 function painter(c:CanvasRenderingContext2D,p:Pick<AircraftBody,'x'|'y'|'angle'>,base:number){
@@ -187,8 +188,7 @@ function pieceShadow(c:CanvasRenderingContext2D,p:AircraftBody,base:number){
     const points=aircraftOutline(p),low=Math.max(...points.map(v=>v[1]));
     const left=Math.min(...points.map(v=>v[0])),right=Math.max(...points.map(v=>v[0]));
     const height=Math.max(0,HELICOPTER_GROUND-low),width=Math.max(3,(right-left)*.75);
-    c.save();c.globalAlpha=Math.max(.025,.27*(1-height/85));
-    oval(c,(left+right-width)/2,base+HELICOPTER_GROUND,width,2,'#48655b');c.restore();
+    drawScenicShadow(c,(left+right-width)/2,base+HELICOPTER_GROUND,width,2,Math.max(.025,.27*(1-height/85)));
 }
 
 function plume(c:CanvasRenderingContext2D,h:HypotheticalHelicopter,p:AircraftPuff,base:number,reduced:boolean){
@@ -216,7 +216,7 @@ export function drawHelicopterRear(c:CanvasRenderingContext2D,h:HypotheticalHeli
         pixelLine(c,contact,floor,h.hull.x+12,floor,'#4e6560',2);
         for(let j=0;j<5;j++)box(c,contact-8+j*7*spread,floor+j%2,2+spread*2,1,'#889583');
     }else{
-        c.save();c.globalAlpha=.3;oval(c,h.hull.x-20,floor,45,3,'#627970');c.restore();
+        drawScenicShadow(c,h.hull.x-20,floor,45,3,.3);
     }
     surfaceScars(c,h,base);
     if(h.impactAt<0){

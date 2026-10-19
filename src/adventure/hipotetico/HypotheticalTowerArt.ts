@@ -2,7 +2,8 @@ import {box,oval,pixelLine,polygon,type Point} from '../WorldPainting';
 import {BASTION_TOWER,type HypotheticalTower} from './HypotheticalTower';
 import {towerBodyPoint,TOWER_RELEASE,type TowerPart} from './HypotheticalTowerPhysics';
 import {smoothMotion} from './HypotheticalMotion';
-export {drawTowerEffects} from './HypotheticalTowerEffects';
+import {drawScenicShadow} from './HypotheticalSceneShadow';
+export {drawTowerEffects,drawTowerDebris} from './HypotheticalTowerEffects';
 
 const P={dark:'#536e70',joint:'#6c8279',stone:'#94a18b',side:'#7e9384',light:'#b6b69a',cap:'#c5bb96',
     roof:'#718a80',roofLight:'#a8af94',deep:'#405f66',bell:'#ae986d',bellLight:'#d3b883',soot:'#5e7270'};
@@ -106,7 +107,7 @@ function bell(c:CanvasRenderingContext2D,x:number,y:number,angle:number,clapper:
 export function drawBastionTower(c:CanvasRenderingContext2D,tower:HypotheticalTower,base:number,cameraX:number,reduced:boolean,time:number){
     const x=BASTION_TOWER.x-cameraX,age=tower.impactAge;
     if(x<-110||x>370)return;
-    oval(c,x-34,base-5,75,8,P.joint);
+    drawScenicShadow(c,x-34,base-5,75,8,.3);
     box(c,x-29,base-10,60,7,P.dark);box(c,x-28,base-11,58,3,P.light);box(c,x-26,base-24,52,13,P.stone);
     box(c,x-8,base-24,18,18,P.deep);pixelLine(c,x-7,base-23,x-7,base-5,P.side);
     for(const d of [-1,1]){
@@ -117,8 +118,7 @@ export function drawBastionTower(c:CanvasRenderingContext2D,tower:HypotheticalTo
     if(age>=0)for(const body of Object.values(tower.destruction.bodies)){
         if(body.hidden||body.attached)continue;
         const s=tower.destruction.shadow(body),near=1-smoothMotion(s.height/80),width=Math.max(8,s.width*(.48+near*.28));
-        c.save();c.globalAlpha=.16+near*.25;
-        oval(c,x+body.x-width/2,base+s.y-1,width,near> .8?3:2,P.deep);c.restore();
+        drawScenicShadow(c,x+body.x-width/2,base+s.y-1,width,near>.8?3:2,.16+near*.25);
     }
     const arch=partPainter(c,x,base,'arch',tower);masonry(arch,-42,18,age>=TOWER_RELEASE.arch);
     arch.poly([[-9,-24],[-9,-33],[-6,-38],[0,-40],[7,-38],[10,-33],[10,-24]],P.deep);

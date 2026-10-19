@@ -12,6 +12,7 @@ import {drawAftermathContact} from './HypotheticalAftermathParticles';
 import {drawAftermathFlock} from './HypotheticalAftermathFlockArt';
 import {drawEscapeFixtures,drawEscapeActors,drawEscapeDust} from './HypotheticalAftermathEscapeArt';
 import {drawForageCover,drawForageRemains} from './HypotheticalAftermathForageArt';
+import {drawScenicShadow} from './HypotheticalSceneShadow';
 
 // Rear-street colours stay below the contrast of guards, bullets and playable ledges.
 const P={ink:'#516d70',dark:'#657c73',stone:'#92a18c',edge:'#c1b99a',wood:'#9e9475',grain:'#7d826d',
@@ -22,7 +23,7 @@ const progress=(tick:number,born:number,time:number)=>born<0?0:smoothMotion((tic
  * them, while the initial demolition and escaped residents remain permanent. */
 function secondaryProp(c:CanvasRenderingContext2D,x:number,y:number,index:number,s:AftermathYard['props'][number],tick:number,reduced:boolean){
     const age=s.struckAt<0?100:tick-s.struckAt,shake=reduced||age>28?0:Math.sin(age*1.7)*(1-age/28)*s.force*2;
-    oval(c,x-16,y-3,34,4,P.dark);
+    drawScenicShadow(c,x-16,y-3,34,4);
     if(s.handledAt>=0&&index<2){
         // Scuffed ground remains visible when the loose component is moved.
         pixelLine(c,x-11,y-2,x+13,y-2,P.grain);
@@ -86,9 +87,9 @@ function secondaryProp(c:CanvasRenderingContext2D,x:number,y:number,index:number
     }
     if(s.piece&&!s.piece.held){
         const p=s.piece,material=index===0?'timber':'stone';
-        // Airborne pieces are drawn in the front layer; settled ones belong
-        // to the material pile, so the actor can walk past them naturally.
-        if(!p.moving)drawDebrisPiece(c,x+p.x,y+3+p.y,{material,angle:p.angle,wear:s.wear});
+        // Released pieces keep their pile's depth while airborne and at rest.
+        // Only a held piece is transferred to the dinosaur's mouth layer.
+        drawDebrisPiece(c,x+p.x,y+3+p.y,{material,angle:p.angle,wear:s.wear});
     }
 }
 
@@ -134,7 +135,7 @@ function refuge(c:CanvasRenderingContext2D,x:number,y:number,district:number){
 
 function timber(c:CanvasRenderingContext2D,x:number,y:number,s:AftermathYard,tick:number){
     const nudge=progress(tick,s.shiftedAt,44),split=progress(tick,s.brokenAt,30);
-    oval(c,x-23,y-3,50,5,'#637c74');
+    drawScenicShadow(c,x-23,y-3,50,5);
     for(let j=0;j<4;j++){
         if(j===3&&s.shiftedAt>=0)continue; // This beam is pulled free and drawn across the jaw below.
         const yy=y-5-j*6*(1-split*.7),left=x-17-j%2*4+nudge*(j-1)*2,slide=(j-1.5)*split*5;
@@ -150,7 +151,7 @@ function timber(c:CanvasRenderingContext2D,x:number,y:number,s:AftermathYard,tic
 
 function cargo(c:CanvasRenderingContext2D,x:number,y:number,s:AftermathYard,tick:number){
     const nudge=progress(tick,s.shiftedAt,50),split=progress(tick,s.brokenAt,38);
-    oval(c,x-22,y-3,49,5,'#637c74');
+    drawScenicShadow(c,x-22,y-3,49,5);
     for(let j=0;j<3;j++){
         const xx=x-21+j*15+(j-1)*split*8,yy=y-21+(j%2?-7:0)*(1-split)+split*8;
         box(c,xx,yy,15,18*(1-split*.48),P.grain);box(c,xx+1,yy+1,13,15*(1-split*.48),P.wood);
@@ -208,7 +209,8 @@ export function drawAftermathYards(c:CanvasRenderingContext2D,b:HypotheticalBack
     const a=b.aftermath;
     for(const [i,yard] of AFTERMATH_YARDS.entries()){
         const x=yard.origin,s=a.yards[i];
-        if(x+390<cameraX||x+110>cameraX+320){
+        // Include projecting fittings, exits and loose pieces at both edges.
+        if(x+448<cameraX||x+72>cameraX+320){
             // Flights and falling bodies can outlive their original courtyard's
             // scenery bounds while Feka moves the camera onward.
             drawAftermathFlock(c,s.flock,base,a.tick,reduced);continue;
@@ -227,47 +229,46 @@ export function drawAftermathYards(c:CanvasRenderingContext2D,b:HypotheticalBack
         else if(yard.kind==='cargo')cargo(c,px,py,s,a.tick);
         else if(yard.kind==='vent')vent(c,px,py,s,a.tick,reduced);
         else masonry(c,px,py,s,a.tick,reduced);
+        drawYardDebris(c,s,i,base,a.tick);
         drawEscapeActors(c,b,s.escape,base,reduced);
-        drawForageRemains(c,s.forage,base,a.tick);
+        drawForageRemains(c,s.forage,base,a.tick,reduced);
         drawAftermathFlock(c,s.flock,base,a.tick,reduced);
+        drawEscapeDust(c,s.escape,base,reduced);
+        drawAftermathIncidents(c,x,base,s.environment,a.tick,reduced);
+    }
+    for(const p of a.contacts)drawAftermathContact(c,p,a.tick,base,reduced,'fragments');
+}
+
+/** Loose material belongs to the same rear street as its source pile. */
+function drawYardDebris(c:CanvasRenderingContext2D,s:AftermathYard,i:number,base:number,tick:number){
+    if(s.shiftedAt<0)return;
+    const x=AFTERMATH_YARDS[i].origin+272,age=tick-(s.brokenAt<0?s.shiftedAt:s.brokenAt);
+    if(i<2){
+        // A freed beam/lid rises with the muzzle, then drops once and remains in the street.
+        const t=tick-s.shiftedAt,release=smoothMotion((t-28)/40);
+        const lift=8*smoothMotion(t/15)*(1-release);
+        const xx=x+smoothMotion(t/62)*24,yy=base-18-lift+release*15;
+        const tilt=Math.sin(Math.min(1,t/68)*Math.PI)*6;
+        pixelLine(c,xx-14,yy-tilt,xx+15,yy+tilt,P.dark,4);
+        pixelLine(c,xx-13,yy-tilt,xx+14,yy+tilt,P.wood,2);
+        pixelLine(c,xx-11,yy-tilt-1,xx+12,yy+tilt-1,P.light);
+        box(c,xx-9,yy-tilt,1,2,P.ink);box(c,xx+8,yy+tilt,1,2,P.ink);
+    }
+    for(let j=0;j<(s.damage===2?8:4);j++){
+        const t=Math.min(42,Math.max(0,age-j*2)),dir=j%2?1:-1;
+        const xx=x+dir*(8+j*2+t*.48),yy=base-3-Math.max(0,Math.sin(Math.PI*t/42)*(5+j%3*3));
+        pixelLine(c,xx,yy,xx+3+j%3,yy+(j%2?1:-1),i===2?P.metal:P.wood,2);
+        box(c,xx,yy-1,2,1,P.edge);
     }
 }
 
-/** Front layer: short contact accents, persistent chips and low settling dust. */
+/** Front layer: temporary mouth/contact accents, dust, tracers and impacts. */
 export function drawAftermathEffects(c:CanvasRenderingContext2D,a:HypotheticalAftermath,base:number,reduced:boolean){
-    for(const [i,s] of a.yards.entries()){
-        drawForageCover(c,s.forage,base,reduced,a.tick);
-        drawEscapeDust(c,s.escape,base,reduced);
-        drawAftermathIncidents(c,AFTERMATH_YARDS[i].origin,base,s.environment,a.tick,reduced);
-        for(const [j,prop] of s.props.entries()){
-            const p=prop.piece;
-            if(p?.moving&&!p.held)drawDebrisPiece(c,AFTERMATH_YARDS[i].origin+AFTERMATH_PROPS[j].offset+p.x,
-                base+p.y,{material:j===0?'timber':'stone',angle:p.angle,wear:prop.wear});
-        }
-        if(s.shiftedAt<0)continue;
-        const x=AFTERMATH_YARDS[i].origin+272,age=a.tick-(s.brokenAt<0?s.shiftedAt:s.brokenAt);
-        if(i<2){
-            // A freed beam/lid rises with the muzzle, then drops once and remains in the street.
-            const t=a.tick-s.shiftedAt,release=smoothMotion((t-28)/40);
-            const lift=8*smoothMotion(t/15)*(1-release);
-            const xx=x+smoothMotion(t/62)*24,yy=base-18-lift+release*15;
-            const tilt=Math.sin(Math.min(1,t/68)*Math.PI)*6;
-            pixelLine(c,xx-14,yy-tilt,xx+15,yy+tilt,P.dark,4);
-            pixelLine(c,xx-13,yy-tilt,xx+14,yy+tilt,P.wood,2);
-            pixelLine(c,xx-11,yy-tilt-1,xx+12,yy+tilt-1,P.light);
-            box(c,xx-9,yy-tilt,1,2,P.ink);box(c,xx+8,yy+tilt,1,2,P.ink);
-        }
-        for(let j=0;j<(s.damage===2?8:4);j++){
-            const t=Math.min(42,Math.max(0,age-j*2)),dir=j%2?1:-1;
-            const xx=x+dir*(8+j*2+t*.48),yy=base-3-Math.max(0,Math.sin(Math.PI*t/42)*(5+j%3*3));
-            pixelLine(c,xx,yy,xx+3+j%3,yy+(j%2?1:-1),i===2?P.metal:P.wood,2);
-            box(c,xx,yy-1,2,1,P.edge);
-        }
-    }
+    for(const s of a.yards)drawForageCover(c,s.forage,base,reduced,a.tick);
     if(!a.active)return;
     for(const shot of a.shots)drawGunTracer(c,shot,0,base,reduced,true);
     for(const hit of a.impacts)drawGunImpact(c,hit,a.tick,0,base,reduced,true);
-    for(const p of a.contacts)drawAftermathContact(c,p,a.tick,base,reduced);
+    for(const p of a.contacts)drawAftermathContact(c,p,a.tick,base,reduced,'effects');
     if(!reduced)for(const p of a.exhales){
         const age=a.tick-p.born;if(age<0||age>=28)continue;
         const x=p.x+p.facing*(2+age*.38),y=base+p.y-age*.09;

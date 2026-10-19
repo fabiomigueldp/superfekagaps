@@ -193,7 +193,7 @@ function drawVictimInJaws(c:CanvasRenderingContext2D,tick:number,base:number){
  * - Severed arm in torn red sleeve and torn 'star-shirt' chest shreds with white star pixels
  * - Multi-wave arterial blood sprays, visceral chunks, blood mist, jaw drips, and knocked-off cap
  */
-export function drawOpeningAftermath(c:CanvasRenderingContext2D,tick:number,base:number,reduced:boolean){
+export function drawOpeningStreet(c:CanvasRenderingContext2D,tick:number,base:number,reduced:boolean){
     const clampAge=tick-OPENING.clamp;
     if(clampAge<0)return;
     const ripAge=tick-OPENING.contact;
@@ -305,6 +305,15 @@ export function drawOpeningAftermath(c:CanvasRenderingContext2D,tick:number,base
     box(c,hatX,hatY,5,2,'#88675e');
     box(c,hatX-1,hatY+2,8,1,'#b7a187');
     box(c,hatX+1,hatY,2,1,'#7a2228');
+
+}
+
+/** Contact layer only. Street objects above remain behind the rider. */
+export function drawOpeningAftermath(c:CanvasRenderingContext2D,tick:number,base:number,reduced:boolean){
+    const clampAge=tick-OPENING.clamp;
+    if(clampAge<0)return;
+    const ripAge=tick-OPENING.contact;
+    const {x:jx,y:jy}=openingJawAnchor(tick,base);
 
     // 6. Victim clamped, thrashing and ripped apart inside the dinosaur's jaws (ticks 63–85).
     drawVictimInJaws(c,tick,base);

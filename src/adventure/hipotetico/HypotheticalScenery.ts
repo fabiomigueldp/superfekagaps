@@ -433,18 +433,11 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
     }
 }
 
-export function drawHypotheticalDestruction(c: CanvasRenderingContext2D, b: HypotheticalModel, base: number, cy:number, reduced: boolean) {
+/** Scenic fragments belong to their source street even after landing. */
+export function drawHypotheticalRubble(c:CanvasRenderingContext2D,b:HypotheticalModel,base:number){
     for(const [index,site] of DESTRUCTION_SITES.entries()){
         const age=ruinAge(b.backdrop.breaches,index,b.backdrop.tick);if(age<0)continue;
-        const x=site.x+site.width/2,floor=base-4;
-        if(age<7){
-            const hitY=site.kind==='stamp'?floor-7:floor-27;
-            for(let i=0;i<(reduced?3:5);i++){
-                const angle=-Math.PI*.7+i*Math.PI*.35,r=3+age*1.6;
-                pixelLine(c,x+Math.cos(angle)*r,hitY+Math.sin(angle)*r*.5,
-                    x+Math.cos(angle)*(r+4),hitY+Math.sin(angle)*(r+4)*.5,'#d5c39d');
-            }
-        }
+        const floor=base-4;
         for(let i=0;i<15;i++){
             const chip=scenicChip(index,i,age);if(!chip.visible)continue;
             const xx=site.x+chip.x,yy=floor+chip.y;
@@ -455,6 +448,21 @@ export function drawHypotheticalDestruction(c: CanvasRenderingContext2D, b: Hypo
                 const palette=['#a5826d','#a3977c','#748c80'];
                 polygon(c,[[xx-1,yy],[xx+2,yy-2],[xx+5,yy],[xx+4,yy+2],[xx,yy+2]],palette[chip.material]);
                 box(c,xx+1,yy-1,3,1,'#c4b18e');
+            }
+        }
+    }
+}
+
+export function drawHypotheticalDestruction(c: CanvasRenderingContext2D, b: HypotheticalModel, base: number, cy:number, reduced: boolean) {
+    for(const [index,site] of DESTRUCTION_SITES.entries()){
+        const age=ruinAge(b.backdrop.breaches,index,b.backdrop.tick);if(age<0)continue;
+        const x=site.x+site.width/2,floor=base-4;
+        if(age<7){
+            const hitY=site.kind==='stamp'?floor-7:floor-27;
+            for(let i=0;i<(reduced?3:5);i++){
+                const angle=-Math.PI*.7+i*Math.PI*.35,r=3+age*1.6;
+                pixelLine(c,x+Math.cos(angle)*r,hitY+Math.sin(angle)*r*.5,
+                    x+Math.cos(angle)*(r+4),hitY+Math.sin(angle)*(r+4)*.5,'#d5c39d');
             }
         }
         // Contact, wall landing, then roof landing: the dust is caused by weight.

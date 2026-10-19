@@ -1,5 +1,6 @@
-import {box,oval,pixelLine,polygon} from '../WorldPainting';
+import {box,pixelLine,polygon} from '../WorldPainting';
 import type {AftermathContact} from './HypotheticalAftermath';
+import {drawScenicShadow} from './HypotheticalSceneShadow';
 
 const FLOOR=-2;
 const P={wood:'#9e9475',grain:'#7d826d',stone:'#92a18c',dark:'#657c73',metal:'#718b84',light:'#abb49a',dust:'#a8ae96'};
@@ -34,14 +35,14 @@ function puff(c:CanvasRenderingContext2D,x:number,y:number,age:number,scale:numb
     for(const dir of [-1,1])box(c,x+dir*(1+age*.23),y-age*.055,Math.max(1,w),1,P.dust);
 }
 
-export function drawAftermathContact(c:CanvasRenderingContext2D,p:AftermathContact,tick:number,base:number,reduced:boolean){
+export function drawAftermathContact(c:CanvasRenderingContext2D,p:AftermathContact,tick:number,base:number,reduced:boolean,pass:'all'|'fragments'|'effects'='all'){
     const age=tick-p.born;if(age<0)return;
     if(p.kind==='step'){
-        if(!reduced)puff(c,p.x,base-3,age,3*p.strength+1);
+        if(!reduced&&pass!=='fragments')puff(c,p.x,base-3,age,3*p.strength+1);
         return;
     }
     const material=p.material??'stone',sourceY=base+(p.y??-12);
-    if(age<7){
+    if(age<7&&pass!=='fragments'){
         // A small, local chip instead of a ground cloud below a high contact.
         for(let j=0;j<(reduced?2:3);j++){
             const angle=-2.7+j*.9,r=2+age*.6;
@@ -49,8 +50,8 @@ export function drawAftermathContact(c:CanvasRenderingContext2D,p:AftermathConta
                 p.x+Math.cos(angle)*(r+2),sourceY+Math.sin(angle)*(r+2),P.light);
         }
     }
-    if(material!=='iron'&&age<18)puff(c,p.x,sourceY,age,2+p.strength*2);
-    if(reduced)return;
+    if(material!=='iron'&&age<18&&pass!=='fragments')puff(c,p.x,sourceY,age,2+p.strength*2);
+    if(reduced||pass==='effects')return;
     for(let j=0;j<5;j++){
         const f=contactFragment(p,j,age);if(age>=f.end)continue;
         const x=f.x,y=base+f.y;
@@ -66,6 +67,6 @@ export function drawAftermathContact(c:CanvasRenderingContext2D,p:AftermathConta
             if(age<9&&j%2===0)pixelLine(c,x,y,x-(j-2)*1.4,y+2,'#c5b58c');
         }
         if(j%2===0)puff(c,x,base-3,age-f.landing,(material==='iron'?1.5:2.5)*p.strength);
-        if(age<f.landing)oval(c,x-1,base-1,2,1,P.dark);
+        if(age<f.landing)drawScenicShadow(c,x-1,base-1,2,1,.18);
     }
 }

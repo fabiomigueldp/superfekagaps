@@ -5,6 +5,7 @@ import { bystanderPose,bystanderFall } from './HypotheticalBystanderMotion';
 import { bystanderTexture,drawBystanderTexture,type BystanderTexture } from './HypotheticalBystanderPixels';
 import {drawBlood} from './HypotheticalBlood';
 import {OPENING} from './HypotheticalOpening';
+import {drawScenicShadow} from './HypotheticalSceneShadow';
 export { bystanderPose } from './HypotheticalBystanderMotion';
 
 type Paint=(x:number,y:number,w:number,h:number,color:string)=>void;
@@ -176,6 +177,12 @@ function actorContext(c:CanvasRenderingContext2D,p:Bystander){
     const facing=Math.sign(p.shelter-p.originX)||1,door=p.shelter-facing*8;
     if(facing===1&&!p.exitAtShelter)return c;
     return {
+        // The pixel viewport changes geometry only; shadow compositing still
+        // uses the real canvas state and must restore it for the next actor.
+        save(){c.save();},restore(){c.restore();},
+        get globalAlpha(){return c.globalAlpha;},set globalAlpha(v){c.globalAlpha=v;},
+        get globalCompositeOperation(){return c.globalCompositeOperation;},
+        set globalCompositeOperation(v){c.globalCompositeOperation=v;},
         get fillStyle(){return c.fillStyle;},set fillStyle(v){c.fillStyle=v;},
         fillRect(x:number,y:number,w:number,h:number){
             if(facing<0)x=Math.round(p.x*2-x-w);
@@ -208,11 +215,11 @@ function belongings(c:CanvasRenderingContext2D,p:Bystander,tick:number,base:numb
 }
 
 /** Articulated street actors share the game's pixel grid and retain their clothing as they fall. */
-export function drawBystanders(output:CanvasRenderingContext2D,b:HypotheticalBackdrop,street:number,reduced:boolean,openingOnly=false,actors?:readonly Bystander[],tick=b.tick){
-    if(!openingOnly&&!actors)drawBlood(output,b,street,reduced,false);
+export function drawBystanders(output:CanvasRenderingContext2D,b:HypotheticalBackdrop,street:number,reduced:boolean,rear=false,actors?:readonly Bystander[],tick=b.tick,pass:'all'|'actors'='all'){
+    if(!rear&&!actors&&pass==='all')drawBystanderGround(output,b,street,reduced);
     for(const p of [...(actors??b.people)].sort((a,b)=>(a.depth??0)-(b.depth??0))){
-        const behindDino=Boolean(p.opening)||(p.exitAtShelter===true&&p.shelter===116&&tick>0&&tick<OPENING.join);
-        if(!actors&&behindDino!==openingOnly)continue;
+        const behindDino=Boolean(p.opening)||(p.depth??0)<0||(p.exitAtShelter===true&&p.shelter===116&&tick>0&&tick<OPENING.join);
+        if(!actors&&behindDino!==rear)continue;
         const base=street+(p.depth??0);
         const site=p.district===0?(p.originX>320?1:0):p.district+1;
         belongings(output,p,tick,p.opening?street:base,b.breaches[site],reduced);
@@ -222,7 +229,7 @@ export function drawBystanders(output:CanvasRenderingContext2D,b:HypotheticalBac
         const cloth=WARDROBE[p.clothes],ink='#485f62',shoe='#89978a';
         if(age>=0){
             const motion=bystanderFall(p,tick),{angle,height,headTop}=motion,fall=angle/(Math.PI/2);
-            oval(c,x-6,base-1,15+fall*14,2,'#6c8076');
+            drawScenicShadow(c,x-6,base-1,15+fall*14,2,.2);
             const hipX=x+motion.hipX,hipY=base+motion.hipY,cos=Math.cos(angle),sin=Math.sin(angle);
             const point=(u:number,v:number)=>[hipX+u*cos-v*sin,hipY+u*sin+v*cos];
             pixelLine(c,x-3,base-1,hipX-1,hipY,ink,2);pixelLine(c,x+3+fall*3,base-1,hipX+1,hipY,ink,2);
@@ -240,7 +247,7 @@ export function drawBystanders(output:CanvasRenderingContext2D,b:HypotheticalBac
             if(age>=29&&age<45&&!reduced)for(let i=0;i<3;i++)box(c,x+4+i*5+(age-29)*.25,base-2-i%2,3,1,'#b2ab92');
             continue;
         }
-        oval(c,x-6,base-1,15,2,'#6c8076');
+        drawScenicShadow(c,x-6,base-1,15,2,.2);
         const hipY=base+pose.hipY,headX=x+pose.lean-pose.recoil*.6-pose.gaze*.4,headY=base+pose.headY+pose.bob;
         const height=Math.round(9-pose.crouch*2),torso=hipY-height;
         const swing=pose.swing;
@@ -264,7 +271,16 @@ export function drawBystanders(output:CanvasRenderingContext2D,b:HypotheticalBac
             box(c,x-7,torso+(reduced?2:2+pose.clothSway*1.4),2,1,'#d0a184');
         }
     }
-    if(openingOnly||actors)return;
+    if(rear||actors||pass==='actors')return;
+    drawBystanderEffects(output,b,street,reduced);
+}
+
+/** Surface decals precede every actor, including the distant rider. */
+export function drawBystanderGround(output:CanvasRenderingContext2D,b:HypotheticalBackdrop,street:number,reduced:boolean){
+    drawBlood(output,b,street,reduced,false);
+}
+
+export function drawBystanderEffects(output:CanvasRenderingContext2D,b:HypotheticalBackdrop,street:number,reduced:boolean){
     drawBlood(output,b,street,reduced,true);
     for(const s of b.shots)drawGunTracer(output,s,0,street,reduced,true);
     for(const p of b.impacts)drawGunImpact(output,p,b.tick,0,street,reduced,true);

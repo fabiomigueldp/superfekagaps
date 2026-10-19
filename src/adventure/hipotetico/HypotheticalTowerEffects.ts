@@ -135,13 +135,11 @@ function drawImpact(c:CanvasRenderingContext2D,t:HypotheticalTower,base:number,r
     }
 }
 
-/** Effects use the scenic bodies' contact points and times. Their draw order
- * stays behind Feka, enemies, foreground platforms and combat telegraphs. */
-export function drawTowerEffects(c:CanvasRenderingContext2D,t:HypotheticalTower,base:number,reduced:boolean){
-    drawScenicRocket(c,t,base,reduced);drawImpact(c,t,base,reduced);
+/** Physical fragments share the tower's rear street throughout flight and rest.
+ * Landing must not move a piece across the dinosaur's silhouette. */
+export function drawTowerDebris(c:CanvasRenderingContext2D,t:HypotheticalTower,base:number,reduced:boolean){
     const age=t.impactAge,physics=t.destruction,x=BASTION_TOWER.x;if(age<0)return;
-    for(const [i,p] of physics.chips.entries()){
-        if(reduced&&i%3)continue;
+    for(const p of physics.chips){
         const a=age-p.born,fade=p.keep?1:1-smoothMotion((a-180)/60),co=Math.cos(p.angle),si=Math.sin(p.angle);
         const at=(u:number,v:number):Point=>[x+p.x+u*co-v*si,base+p.y+u*si+v*co],r=p.radius;
         c.save();c.globalAlpha=fade;
@@ -153,6 +151,13 @@ export function drawTowerEffects(c:CanvasRenderingContext2D,t:HypotheticalTower,
         if(!p.rest&&p.vy>1.8&&!reduced)pixelLine(c,x+p.x-p.vx,base+p.y-p.vy,x+p.x,base+p.y,'#9fa58c');
         c.restore();
     }
+}
+
+/** Only short-lived missile, impact and contact accents cross the rider layer.
+ * All of these still stay behind foreground combat and its telegraphs. */
+export function drawTowerEffects(c:CanvasRenderingContext2D,t:HypotheticalTower,base:number,reduced:boolean){
+    drawScenicRocket(c,t,base,reduced);drawImpact(c,t,base,reduced);
+    const age=t.impactAge,physics=t.destruction,x=BASTION_TOWER.x;if(age<0)return;
     for(const f of physics.fractures){
         const a=age-f.born,fade=1-smoothMotion((a-10)/60),wood=f.material==='wood',count=wood||reduced?2:5;
         for(let j=0;j<count;j++){

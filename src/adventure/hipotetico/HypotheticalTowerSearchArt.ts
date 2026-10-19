@@ -117,6 +117,14 @@ export function drawTowerSearchActors(c:CanvasRenderingContext2D,b:HypotheticalB
     for(const p of s.pieces){
         if(p.kind==='head')drawGorePiece(c,s,p,base);
     }
+    // Released solids stay with the other objects on the rear street.
+    for(const [i,sp] of s.splinters.entries()){
+        if(reduced&&i%2)continue;
+        const x=sp.x,y=base+sp.y;
+        if(!sp.rest&&!reduced)pixelLine(c,x-sp.vx*1.4,y-sp.vy*1.4,x,y,'#9e2028');
+        box(c,x-1,y-1,sp.bone?2:2,sp.bone?1:2,sp.bone?'#e6dfd3':'#7a1820');
+        box(c,x,y,1,1,sp.bone?'#9e2028':'#c92c34');
+    }
 }
 
 function bloodCloud(c:CanvasRenderingContext2D,x:number,y:number,r:number,seed:number){
@@ -138,13 +146,6 @@ export function drawTowerSearchDust(c:CanvasRenderingContext2D,b:HypotheticalBac
             box(c,x-r*.5,y-r*.7,Math.max(1,r*.7),1,'#c1b99f');
         }
         c.restore();
-    }
-    for(const [i,sp] of s.splinters.entries()){
-        if(reduced&&i%2)continue;
-        const x=sp.x,y=base+sp.y;
-        if(!sp.rest&&!reduced)pixelLine(c,x-sp.vx*1.4,y-sp.vy*1.4,x,y,'#9e2028');
-        box(c,x-1,y-1,sp.bone?2:2,sp.bone?1:2,sp.bone?'#e6dfd3':'#7a1820');
-        box(c,x,y,1,1,sp.bone?'#9e2028':'#c92c34');
     }
     if(reduced||a<t.clamp)return;
     const jx=s.jawX,jy=base+s.body.jawY;

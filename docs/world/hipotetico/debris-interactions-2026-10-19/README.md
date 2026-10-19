@@ -2,6 +2,42 @@
 
 Revisão de 19/10/2026, integrada ao encontro nativo `/?encounter=hipotetico`.
 
+## Hierarquia dos planos e sombras
+
+Revisão 13: correção da composição da rua traseira, sem alterações na física,
+na escolha de ações, nas colisões ou no conteúdo gráfico dos eventos existentes.
+
+- `drawScenicShadow` usa multiplicação de cor com opacidade limitada, conserva
+  a grade de pixels e restaura o estado do Canvas. Substitui o preenchimento
+  opaco do dinossauro, dos NPCs e das pilhas; uniformiza as sombras da torre,
+  do helicóptero, dos pássaros e dos pequenos fragmentos.
+- A projeção do dinossauro permanece na rua quando o corpo sobe. Altura amplia
+  discretamente a projeção e reduz sua intensidade.
+- `drawBystanderGround` separa as marcas de piso dos atores e dos efeitos. NPCs
+  com profundidade negativa pertencem ao plano anterior ao dinossauro.
+- `drawOpeningStreet` separa objetos da rua da camada de contato da chegada.
+  O conteúdo existente é conservado; apenas sua posição na composição muda.
+- `drawTowerDebris` e `drawHypotheticalRubble` mantêm os fragmentos físicos
+  junto do cenário durante voo e repouso. Efeitos de impacto continuam separados.
+  O modo reduzido mantém a silhueta física das ruínas da torre.
+- Peças livres das pilhas, vigas, tampas, grãos de contato e fragmentos das
+  buscas saíram da camada dianteira. Peças seguradas continuam no desenho da
+  boca. Soltura e assentamento não trocam a peça para a frente do dinossauro.
+- Poeira de contato, traçantes e efeitos breves conservam sua camada dianteira.
+  Os destroços do helicóptero já eram desenhados na rua traseira; essa ordem
+  foi preservada.
+
+`scripts/render_hypothetical_layers.ts` produz cinco travessias dirigidas de
+quatro segundos, com dano e idades do cenário escolhidos para a composição.
+A torre usa 360 passos de sua física de assentamento; o ator atravessa as
+ruínas com posição dirigida. O vídeo não demonstra a seleção de atividades,
+nem a dificuldade ou a progressão de uma partida.
+
+Foram inspecionadas as pranchas nativas, o piso da chegada e da Portaria e o
+Bastião com movimento reduzido e outra altura de câmera. Não foram executados
+testes, typecheck, scripts de validação ou revisão de navegador. A publicação
+usa somente o build de produção Vite, conforme o fluxo do projeto.
+
 ## Revisão da orquestração e das articulações
 
 Revisão 12, sobre a ampliação `c469795` do usuário. As variantes adicionais e

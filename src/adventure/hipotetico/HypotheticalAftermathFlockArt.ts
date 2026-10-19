@@ -1,5 +1,6 @@
-import {box,oval,pixelLine,polygon,type Point} from '../WorldPainting';
+import {box,pixelLine,polygon,type Point} from '../WorldPainting';
 import type {AftermathFlock,YardBird} from './HypotheticalAftermathFlock';
+import {drawScenicShadow} from './HypotheticalSceneShadow';
 
 const palettes=[
     {body:'#c4c6b2',light:'#dcdbc1',wing:'#8daba1',shade:'#65817e',ink:'#415e61',beak:'#bcaa78'},
@@ -14,7 +15,7 @@ function bird(c:CanvasRenderingContext2D,b:YardBird,base:number,tick:number,redu
     const at=(u:number,v:number):Point=>[x+(u*cos-v*sin)*b.facing,y+u*sin+v*cos+crouch];
     const line=(a:number,d:number,e:number,f:number,color:string,width=1)=>pixelLine(c,...at(a,d),...at(e,f),color,width);
     const patch=(points:Point[],color:string)=>polygon(c,points.map(q=>at(...q)),color);
-    if(fall&&!reduced){const height=Math.max(0,-4-b.y);oval(c,x-3-height*.02,base-2,7+height*.04,1,'#59716e');}
+    if(fall&&!reduced){const height=Math.max(0,-4-b.y);drawScenicShadow(c,x-3-height*.02,base-2,7+height*.04,1,.2);}
     if(rest){
         const fade=Math.max(0,Math.min(1,(1500-(tick-b.landedAt))/150));
         c.save();c.globalAlpha*=fade;
