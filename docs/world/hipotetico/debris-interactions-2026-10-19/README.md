@@ -2,6 +2,56 @@
 
 Revisão de 19/10/2026, integrada ao encontro nativo `/?encounter=hipotetico`.
 
+## Descobertas e perseguições
+
+Refinamento 9: `HypotheticalAftermathEscape` acrescenta dois acontecimentos
+ocasionais por pátio, com personagens próprios: descoberta num vão entre pedras
+e saída de uma escotilha. Eles entram entre as doze performances do repertório
+recorrente, depois da destruição inicial da pilha e de outras atividades.
+
+O diretor só prepara uma cena quando a origem, o destino e a posição da
+montaria cabem no enquadramento. Usa a caminhada e o giro nativos para chegar
+ao ponto de preparação. Mudanças de câmera durante a aproximação podem
+redirecionar a escolha, sem consumir o personagem. Uma cena já iniciada conclui
+seus movimentos; uma nova rua conserva a prioridade de sua ação principal.
+
+- **Pedras:** ruídos nos passos 12 e 22; espreitada a partir de 22; corrida em 64;
+  reação da montaria em 82; grupos de tiros a partir de 112. Duração máxima de
+  260 passos, com recuperação antecipada após um acerto.
+- **Escotilha:** ruído inicial, espreitada em 32, abertura gradual da folha;
+  corrida em 76; perseguição em 94; grupos de tiros a partir de 120. Duração
+  máxima de 256 passos. O batente, o vão e a folha pertencem ao cenário desde
+  antes da cena; a folha permanece aberta depois.
+
+Os atores reaproveitam roupa, cabeça, marcha, olhar para trás e queda de
+`HypotheticalBystanders`. A profundidade acompanha o pequeno salto sobre os
+destroços e também entra no volume usado pela colisão. O cavaleiro antecipa o
+movimento do alvo. As balas seguem o cano visível; a interseção real determina
+o acerto. Os disparos que passam atingem o piso ou o fundo do abrigo no primeiro
+ponto de contato do segmento, com marcas limitadas a oito por evento.
+
+A montaria acelera progressivamente, mantém distância durante a corrida e
+freia após o acerto ou a fuga. Apoios, ciclo de caminhada, poeira e mira usam a
+posição real do corpo. O personagem atingido conserva parte do impulso da
+corrida antes de concluir a queda compartilhada.
+
+Cada pátio tem duas figuras finitas; não são reutilizadas depois de uma fuga
+ou de um acerto. Há pelo menos 1260 passos e cinco outras performances antes
+de preparar a segunda cena. O restante do repertório continua indefinidamente.
+Eventos ambientais e chegadas de bandos aguardam os sinais principais da cena;
+o primeiro grupo de tiros pode assustar aves próximas. As vozes sonoras usam
+o barramento já existente. Não há temporizadores externos ao relógio do jogo.
+
+O lançamento da torre, a tolerância de enquadramento ajustada pelo usuário e
+a busca existente nos seus escombros foram preservados. As novas cenas não
+interferem nos controles, colisões de Feka, portões ou progressão dos guardas.
+
+`render_hypothetical_escapes.ts` produz quatro composições de cinco segundos,
+a 60 fps, com o diretor e o renderizador nativos. `escape-study.json` registra
+poses, atores e contatos do material. São composições com Feka parado, sem
+combate ou áudio; não são testes ou partidas gravadas. A publicação usa apenas
+o build Vite, sem suíte de testes, typecheck, prebuild ou revisão de navegador.
+
 ## Bandos e rajadas
 
 Refinamento 8: os quatro pátios compartilham agora doze performances. `flush-fire`

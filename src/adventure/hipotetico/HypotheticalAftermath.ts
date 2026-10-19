@@ -14,6 +14,7 @@ import {HypotheticalTower,BASTION_TOWER,TOWER_SEQUENCE,launcherGeometry,towerLau
 import {TOWER_SEARCH} from './HypotheticalTowerSearch';
 import {arrivalBeat} from './HypotheticalHelicopterTiming';
 import {AftermathFlock,FLOCK_VOLLEYS,OPENING_FLOCK_SHOTS} from './HypotheticalAftermathFlock';
+import {AftermathEscape} from './HypotheticalAftermathEscape';
 
 /** These small service yards belong to the rear street, never to Feka's collision layer. */
 export const AFTERMATH_YARDS = SIEGE_SECTORS.map((s, district) => ({
@@ -22,13 +23,13 @@ export const AFTERMATH_YARDS = SIEGE_SECTORS.map((s, district) => ({
     start: district === 0 ? arrivalBeat(634) : district===3?226:278,
 }));
 type Activity = 'approach' | 'search' | 'rummage' | 'listen' | 'flush' | 'turn-out' | 'patrol' | 'survey' | 'turn-back' | 'return' | 'watch'
-    | 'roam' | 'orient' | 'perform' | 'recover' | 'notice' | 'tower' | 'tower-await' | 'tower-search';
-type Destination='perform'|'search'|'tower'|'tower-search'|'notice';
+    | 'roam' | 'orient' | 'perform' | 'recover' | 'notice' | 'tower' | 'tower-await' | 'tower-search' | 'pursuit';
+type Destination='perform'|'search'|'tower'|'tower-search'|'notice'|'pursuit';
 type Sound = 'distant-debris' | 'distant-thud' | 'distant-shot' | 'distant-hit' | 'distant-roar'
     | 'distant-wood' | 'distant-stone' | 'distant-metal' | 'distant-creak' | 'distant-chain' | 'distant-leak' | 'distant-snort' | 'distant-grit'
     | 'distant-flutter' | 'distant-soft-hit' | TowerCue;
 export interface AftermathContact { x:number; y?:number; born:number; landingAt?:number; strength:number; kind:'scrape'|'break'|'step'; material?:'timber'|'stone'|'iron' }
-interface AmbientShot extends GunTrace {targetX:number;targetY:number;remaining:number;prop:number;flock?:boolean}
+interface AmbientShot extends GunTrace {targetX:number;targetY:number;remaining:number;prop:number;flock?:boolean;escape?:number}
 export interface AftermathYard {
     damage: number; shiftedAt:number; brokenAt:number; birdsAt:number; runnerAt:number;
     people:Bystander[];
@@ -36,6 +37,7 @@ export interface AftermathYard {
     birdsFlights:number;birdsReturn:number;roarAt:number;
     environment:AftermathEnvironment;
     flock:AftermathFlock;
+    escape:AftermathEscape;
 }
 const pulse = (age:number, rise:number, hold:number, end:number) =>
     smoothMotion(age/rise) * (1-smoothMotion((age-hold)/(end-hold)));
@@ -58,6 +60,7 @@ export class HypotheticalAftermath {
         damage:0, shiftedAt:-1, brokenAt:-1, birdsAt:-1, runnerAt:-1,birdsFlights:0,birdsReturn:1250+district*73,roarAt:-1,
         environment:new AftermathEnvironment(district),
         flock:new AftermathFlock(yard.origin,district),
+        escape:new AftermathEscape(yard.origin,district),
         props:AFTERMATH_PROPS.map(p=>createAftermathProp(p.material)),
         people:[0,1].map(i => ({
             x:yard.origin+290-i*6, originX:yard.origin+290-i*6, shelter:yard.origin+(district===3?342:354),
@@ -124,6 +127,7 @@ export class HypotheticalAftermath {
             case 'tower': return TOWER_SEQUENCE.end;
             case 'tower-await': return 96;
             case 'tower-search': return TOWER_SEARCH.end;
+            case 'pursuit': return this.yard.escape.duration;
         }
     }
     private enter(phase:Activity){
@@ -138,6 +142,12 @@ export class HypotheticalAftermath {
         if(phase==='recover')this.recoverTicks=(aftermathFamily(this.action)==='search'?20:32)+Math.floor(this.repertoire.random()*25);
         if(phase==='tower')this.tower.begin();
         if(phase==='tower-search')this.tower.search.begin();
+        if(phase==='pursuit'){
+            this.action='fire';this.targetProp=-1;this.reply=null;this.birdTracking=false;
+            this.yard.escape.begin(this.tick,this.x,++this.performances);
+            this.recent=[...this.recent,'fire' as AftermathAction].slice(-3);
+            this.lastPerformed.fire=this.performances;
+        }
         if(phase==='perform'){
             this.recent=[...this.recent,this.action].slice(-3);
             this.lastPerformed[this.action]=++this.performances;
@@ -191,10 +201,22 @@ export class HypotheticalAftermath {
         }
         return true;
     }
+    private planEscape(){
+        if(this.yard.damage<2)return false;
+        const e=this.yard.escape,index=e.candidate(this.tick,this.performances,(x,margin)=>this.inView(x,margin));
+        if(index<0)return false;
+        e.prepare(index);this.targetProp=-1;this.roamThen='pursuit';this.destination=e.entry.stance;this.planView=this.viewX;
+        const distance=Math.abs(this.destination-this.x);
+        this.roamTicks=Math.max(24,Math.min(120,Math.ceil(distance*1.35)));
+        if(distance<1)this.orient(1,'pursuit');
+        else{this.orient(Math.sign(this.destination-this.x),'roam');this.destinationFacing=1;}
+        return true;
+    }
     private plan(){
         // The landmark and its discovery are the opening of this yard's
         // secondary score, never a lottery after other activities finish.
         if(this.planTower())return;
+        if(this.planEscape())return;
         const invitation=this.yard.environment.invitationFor(prop=>this.inView(this.origin+AFTERMATH_PROPS[prop].offset,36));
         if(invitation&&this.tick-this.lastNoticed>480){
             invitation.noticed=true;this.lastNoticed=this.tick;
@@ -298,6 +320,7 @@ export class HypotheticalAftermath {
         else{this.birdAim.x+=(point.x-this.birdAim.x)*.24;this.birdAim.y+=(point.y-this.birdAim.y)*.24;}
     }
     get aimTarget(){
+        if(this.phase==='pursuit')return this.yard.escape.aimTarget;
         if(this.flockVolley&&this.birdTracking)return this.birdAim;
         const offset=aftermathShotPoint(this.action,this.variant,this.age,this.targetProp);
         return {x:this.targetX+offset.x,y:offset.y};
@@ -345,6 +368,20 @@ export class HypotheticalAftermath {
             targetX:this.birdAim.x,targetY:this.birdAim.y,remaining:220,prop:-1,flock:true});
         this.casings.push({x:m.x-m.dx*15,y:m.y-m.dy*15,born:this.tick,direction:this.facing});
         this.events.push('distant-shot');this.yard.flock.lastNoise=this.tick;
+    }
+    private fireAtEscape(){
+        const e=this.yard.escape;
+        if(!e.canFire()||!this.inView(e.entry.person.x,12)||!this.inView(this.x,12))return;
+        this.muzzle=5;this.heat=Math.min(1,this.heat+.2);
+        const m=this.barrel;
+        this.shots.push({x:m.x,y:m.y,vx:m.dx*6.8,vy:m.dy*6.8,age:0,
+            targetX:e.aimTarget.x,targetY:e.aimTarget.y,remaining:230,prop:-1,escape:e.selected});
+        this.casings.push({x:m.x-m.dx*15,y:m.y-m.dy*15,born:this.tick,direction:this.facing});
+        this.events.push('distant-shot');this.yard.flock.lastNoise=this.tick;
+        if(e.age===e.timing.shots[0]){
+            e.entry.person.threatenedAt=this.tick;e.entry.person.reactionTimes.push(this.tick+4);
+            this.scatterBirds(this.x,160);
+        }
     }
     private handleDebris(){
         if(!isHandling(this.action)||this.targetProp<0)return;
@@ -426,6 +463,10 @@ export class HypotheticalAftermath {
             search.update(framed);this.x=search.actorX;
             if(framed)this.events.push(...search.events);
             if(search.done)this.enter('recover');
+        }else if(this.phase==='pursuit'){
+            const e=this.yard.escape;this.x=e.actorX;
+            if((e.timing.shots as readonly number[]).includes(e.age))this.fireAtEscape();
+            if(e.done)this.enter('recover');
         }else if(this.phase==='notice'){
             if(this.reaction?.kind==='leak'&&[34,39,44].includes(this.age)){
                 const mouth=this.jawAnchor;
@@ -501,7 +542,8 @@ export class HypotheticalAftermath {
         if(this.contacts.some(p=>p.strength>=.35&&p.landingAt===this.tick&&this.inView(p.x)))this.events.push('distant-grit');
         this.exhales=this.exhales.filter(p=>this.tick-p.born<28).slice(-6);
         const regular=this.active&&this.district===scenicDistrict(storyTick)
-            &&(this.district!==3||this.tower.search.done)&&!['tower','tower-await','tower-search'].includes(this.phase);
+            &&(this.district!==3||this.tower.search.done)&&!['tower','tower-await','tower-search','pursuit'].includes(this.phase)
+            &&!(this.roamThen==='pursuit'&&['roam','orient'].includes(this.phase));
         const timing=aftermathActionTiming(this.action,this.variant);
         const closeToImpact=this.phase==='perform'&&([...timing.beats,...timing.shots].some(t=>Math.abs(t-this.age)<20)
             ||this.action==='flush-fire'&&this.age>=24&&this.age<=timing.shots[timing.shots.length-1]+18);
@@ -509,6 +551,9 @@ export class HypotheticalAftermath {
         const reserved=noticing?this.reaction?.prop??-1:this.phase==='perform'||isHandling(this.action)&&this.roamThen==='perform'&&['roam','orient'].includes(this.phase)
             ?this.targetProp:-1;
         for(const [district,yard] of this.yards.entries()){
+            yard.escape.update(this.tick);
+            if(district===scenicDistrict(storyTick)&&this.phase==='pursuit'&&this.inView(yard.escape.entry?.from??-1000,0))
+                this.events.push(...yard.escape.events);
             yard.flock.update(this.tick,regular&&district===this.district&&!closeToImpact,this.viewX);
             if(district===this.district&&this.tick-this.lastFlutter>10&&yard.flock.takeoffs.some(x=>this.inView(x,8))){
                 this.events.push('distant-flutter');this.lastFlutter=this.tick;
@@ -572,6 +617,30 @@ export class HypotheticalAftermath {
         }
         for(const s of this.shots){
             s.age++;s.remaining-=Math.hypot(s.vx,s.vy);
+            if(s.escape!==undefined){
+                const e=this.yard.escape,hit=e.intersectShot(s.x,s.y,s.x+s.vx,s.y+s.vy,s.escape);
+                if(hit){
+                    s.remaining=0;
+                    if(this.inView(hit.x)){
+                        this.impacts.push({...hit,nx:-1,ny:0,born:this.tick,material:'cloth'});
+                        this.events.push('distant-soft-hit');
+                    }
+                }else{
+                    const entry=e.entries[s.escape];
+                    const floor=s.vy>0?(-4-s.y)/s.vy:Infinity,wall=s.vx>0?(entry.exit-7-s.x)/s.vx:Infinity;
+                    const contact=Math.min(floor,wall);
+                    if(contact>=0&&contact<=1){
+                        const x=s.x+s.vx*contact,y=s.y+s.vy*contact,ground=floor<=wall;
+                        if(this.inView(x)){
+                            this.impacts.push({x,y,nx:ground?0:-1,ny:ground?-1:0,born:this.tick,material:'stone'});
+                            this.events.push('distant-hit');
+                            if(!ground&&entry.marks.length<8)entry.marks.push({x,y});
+                        }
+                        s.remaining=0;
+                    }else{s.x+=s.vx;s.y+=s.vy;}
+                }
+                continue;
+            }
             if(s.flock){
                 const hit=this.yard.flock.strike(s.x,s.y,s.x+s.vx,s.y+s.vy,this.tick);
                 s.x+=s.vx;s.y+=s.vy;
@@ -589,12 +658,12 @@ export class HypotheticalAftermath {
             }else{s.x+=s.vx;s.y+=s.vy;}
         }
         this.shots=this.shots.filter(s=>s.remaining>0&&s.age<60).slice(-12);
-        if(['roam','orient','perform','recover','notice','tower','tower-await','tower-search'].includes(this.phase)){
-            const old=this.x,walking=this.phase==='roam'||this.phase==='tower-search';
+        if(['roam','orient','perform','recover','notice','tower','tower-await','tower-search','pursuit'].includes(this.phase)){
+            const old=this.x,walking=this.phase==='roam'||this.phase==='tower-search'||this.phase==='pursuit';
             this.routine();this.velocity=this.x-old;
             if(walking)this.travel+=Math.abs(this.velocity);
             const step=Math.floor(this.travel/(Math.PI*11*AFTERMATH_SCALE));
-            if(step>this.lastStep&&this.phase==='roam'&&this.stride>.15){
+            if(step>this.lastStep&&(this.phase==='roam'||this.phase==='pursuit')&&this.stride>.15){
                 const p=this.pose(false),foot=dinosaurFootAnchor(p.gait,step%2===1,(1-p.bow)*p.stride,p.tuck,p.brace);
                 const x=this.x+this.facing*(foot[0]+3)*AFTERMATH_SCALE;
                 if(foot[1]>-1&&this.inView(x))this.contact('step',x,.4);
@@ -772,6 +841,14 @@ export class HypotheticalAftermath {
             const aligned=m.jawY/AFTERMATH_SCALE+59-m.bow*25-breath-m.compression-10-m.jaw*6;
             return {...pose,...m,neckDrop:aligned,aim:.16,lookBack:m.lookBack,stride:this.stride*.45,
                 lift:0,recoil:0,reload:0,cloth:reduced?0:m.cloth};
+        }
+        if(this.phase==='pursuit'){
+            const e=this.yard.escape,m=e.body;
+            const shoulderX=this.x+(7-recoil+riderBend(14,m.riderLean))*AFTERMATH_SCALE;
+            const shoulderY=(-78+m.bow*39+m.compression+m.riderDrop)*AFTERMATH_SCALE;
+            const angle=Math.atan2(e.aimTarget.y-shoulderY,Math.max(12,e.aimTarget.x-shoulderX));
+            return {...pose,...m,stride:this.stride,feet:undefined,lift:0,recoil,lookBack:0,
+                aim:-.12+(angle+.12)*m.aim,cloth:reduced?0:this.stride*1.8+m.brake};
         }
         return pose;
     }

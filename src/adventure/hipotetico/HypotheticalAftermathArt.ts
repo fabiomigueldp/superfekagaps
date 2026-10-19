@@ -10,6 +10,7 @@ import {drawDebrisPiece} from './HypotheticalDebrisArt';
 import {drawAftermathFittings,drawAftermathIncidents} from './HypotheticalAftermathEnvironmentArt';
 import {drawAftermathContact} from './HypotheticalAftermathParticles';
 import {drawAftermathFlock} from './HypotheticalAftermathFlockArt';
+import {drawEscapeFixtures,drawEscapeActors,drawEscapeDust} from './HypotheticalAftermathEscapeArt';
 
 // Rear-street colours stay below the contrast of guards, bullets and playable ledges.
 const P={ink:'#516d70',dark:'#657c73',stone:'#92a18c',edge:'#c1b99a',wood:'#9e9475',grain:'#7d826d',
@@ -212,6 +213,7 @@ export function drawAftermathYards(c:CanvasRenderingContext2D,b:HypotheticalBack
             drawAftermathFlock(c,s.flock,base,a.tick,reduced);continue;
         }
         refuge(c,x,base,i);
+        drawEscapeFixtures(c,s.escape,base);
         drawAftermathFittings(c,x,base,s.environment,a.tick,reduced);
         for(const [j,prop] of AFTERMATH_PROPS.entries())secondaryProp(c,x+prop.offset,base-3,j,s.props[j],a.tick,reduced);
         if(s.runnerAt>=0){
@@ -224,6 +226,7 @@ export function drawAftermathYards(c:CanvasRenderingContext2D,b:HypotheticalBack
         else if(yard.kind==='cargo')cargo(c,px,py,s,a.tick);
         else if(yard.kind==='vent')vent(c,px,py,s,a.tick,reduced);
         else masonry(c,px,py,s,a.tick,reduced);
+        drawEscapeActors(c,b,s.escape,base,reduced);
         drawAftermathFlock(c,s.flock,base,a.tick,reduced);
     }
 }
@@ -231,6 +234,7 @@ export function drawAftermathYards(c:CanvasRenderingContext2D,b:HypotheticalBack
 /** Front layer: short contact accents, persistent chips and low settling dust. */
 export function drawAftermathEffects(c:CanvasRenderingContext2D,a:HypotheticalAftermath,base:number,reduced:boolean){
     for(const [i,s] of a.yards.entries()){
+        drawEscapeDust(c,s.escape,base,reduced);
         drawAftermathIncidents(c,AFTERMATH_YARDS[i].origin,base,s.environment,a.tick,reduced);
         for(const [j,prop] of s.props.entries()){
             const p=prop.piece;
