@@ -27,7 +27,7 @@ export class HypotheticalAudio {
             kind==='distant-metal'?{duration:.36,filter:'bandpass' as BiquadFilterType,cutoff:2700,tail:840,noise:.14,pitch:710,end:395,body:.14,wave:'sine' as OscillatorType}:
             kind==='distant-launch'?{duration:.34,filter:'bandpass' as BiquadFilterType,cutoff:1900,tail:330,noise:.4,pitch:210,end:62,body:.22,wave:'triangle' as OscillatorType}:
             kind==='distant-blast'?{duration:.64,filter:'lowpass' as BiquadFilterType,cutoff:2100,tail:100,noise:.55,pitch:94,end:29,body:.48,wave:'triangle' as OscillatorType}:
-            kind==='distant-bell'?{duration:.72,filter:'bandpass' as BiquadFilterType,cutoff:1800,tail:520,noise:.14,pitch:436,end:392,body:.27,wave:'sine' as OscillatorType}:
+            kind==='distant-bell'?{duration:1.05,filter:'bandpass' as BiquadFilterType,cutoff:1800,tail:520,noise:.1,pitch:436,end:428,body:.27,wave:'sine' as OscillatorType}:
             kind==='distant-thud'?{duration:.18,filter:'lowpass' as BiquadFilterType,cutoff:820,tail:120,noise:.2,pitch:96,end:38,body:.38,wave:'triangle' as OscillatorType}:
             kind==='collapse-water'?{duration:.28,filter:'bandpass' as BiquadFilterType,cutoff:1600,tail:200,noise:.18,pitch:145,end:48,body:.12,wave:'sine' as OscillatorType}:
             kind==='debris-land'?{duration:.16,filter:'lowpass' as BiquadFilterType,cutoff:980,tail:170,noise:.18,pitch:110,end:42,body:.13,wave:'triangle' as OscillatorType}:
@@ -58,6 +58,13 @@ export class HypotheticalAudio {
             body.frequency.exponentialRampToValueAtTime(contact?.end??(splash?150:crash?32:shot?42:kind==='reload'?700:310),now+duration*.75);
             low.gain.setValueAtTime(0,now);low.gain.linearRampToValueAtTime((contact?.body??(splash?.04:crash?.42:shot?.43:.075))*volume,now+.003);low.gain.exponentialRampToValueAtTime(.001,now+duration);
             noise.connect(filter);filter.connect(env);env.connect(destination);body.connect(low);low.connect(destination);
+            if(kind==='distant-bell')for(const [ratio,level,length] of [[2.71,.11,.7],[4.08,.055,.38]]){
+                const partial=c.createOscillator(),gain=c.createGain();nodes.push(partial,gain);sources.push(partial);
+                partial.type='sine';partial.frequency.setValueAtTime(436*ratio,now);
+                gain.gain.setValueAtTime(0,now);gain.gain.linearRampToValueAtTime(level*volume,now+.002);
+                gain.gain.exponentialRampToValueAtTime(.001,now+length);
+                partial.connect(gain);gain.connect(destination);partial.start(now);partial.stop(now+length+.01);
+            }
             noise.onended=release;noise.start(now);body.start(now);noise.stop(now+duration+.015);body.stop(now+duration+.01);
             return true;
         }catch{release();return false;}

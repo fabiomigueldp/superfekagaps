@@ -17,7 +17,7 @@ export function launcherGeometry(body:RiderBody,p:LauncherPose){
     const y=saddle-10+(shoulder.y-saddle+10)*t-Math.sin(Math.PI*t)*14;
     const angle=-1.25+(p.aim+1.25)*t,co=Math.cos(angle),si=Math.sin(angle);
     const point=(a:number,b:number):[number,number]=>[x+a*co-b*si,y+a*si+b*co];
-    return {x,y,angle,point,mouth:point(35,0),exhaust:point(-20,0),trigger:point(5,6),support:point(21,4)};
+    return {x,y,angle,point,mouth:point(39,0),exhaust:point(-20,0),trigger:point(5,6),support:point(21,4)};
 }
 const pulse=(a:number,start:number,rise:number,hold:number,end:number)=>
     smoothMotion((a-start)/rise)*(1-smoothMotion((a-hold)/(end-hold)));
@@ -52,21 +52,22 @@ export class HypotheticalTower {
         return {draw:smoothMotion((a-TOWER_SEQUENCE.draw)/(TOWER_SEQUENCE.shoulder-TOWER_SEQUENCE.draw))
                 *(1-smoothMotion((a-TOWER_SEQUENCE.lower)/(TOWER_SEQUENCE.stow-TOWER_SEQUENCE.lower))),
             rifleLower:smoothMotion(a/28)*(1-smoothMotion((a-TOWER_SEQUENCE.stow)/30)),
-            reach:smoothMotion((a-18)/30)*(1-smoothMotion((a-TOWER_SEQUENCE.stow-6)/36)),
+            reach:smoothMotion((a-18)/30)*(1-smoothMotion((a-TOWER_SEQUENCE.stow)/30)),
             aim:-.12,recoil:pulse(a,TOWER_SEQUENCE.fire,2,TOWER_SEQUENCE.fire+3,TOWER_SEQUENCE.fire+22),fired:this.launchAt>=0};
     }
     get body(){
         const a=this.age,m=this.motion,brace=m.draw;
-        const shock=pulse(a,TOWER_SEQUENCE.fire,3,TOWER_SEQUENCE.fire+4,TOWER_SEQUENCE.fire+26);
-        return {bow:brace*.035,compression:brace+shock*2,riderDrop:brace*1.5+shock*2,
-            riderLean:-m.reach*1.8-shock*5,neckDrop:-brace*3,jaw:.12+shock*.16,
+        const shock=this.abortedAt>=0?0:pulse(a,TOWER_SEQUENCE.fire,3,TOWER_SEQUENCE.fire+4,TOWER_SEQUENCE.fire+26);
+        const watch=smoothMotion((this.impactAge-25)/85)*brace;
+        return {bow:brace*.035+watch*.08,compression:brace+shock*2,riderDrop:brace*1.5+shock*2,
+            riderLean:-m.reach*1.8-shock*5+watch*2,neckDrop:-brace*3+watch*3,jaw:.12+shock*.16,
             tail:brace*-.12,brace:brace*.7,focus:brace,lookBack:0,eyeClose:shock*.75};
     }
     update(framed:boolean,barrel:()=>{x:number;y:number;backX:number;backY:number}){
         this.events=[];this.tick++;
         if(this.active){
             this.age++;
-            if(!framed&&this.age<TOWER_SEQUENCE.fire)this.abort();
+            if(!framed&&this.age<=TOWER_SEQUENCE.fire)this.abort();
             if(this.abortedAt<0){
                 if(this.age===38||this.age===104)this.events.push('distant-metal');
                 if(this.age===TOWER_SEQUENCE.fire){
@@ -85,13 +86,14 @@ export class HypotheticalTower {
             }else{r.x+=r.dx*speed;r.y+=r.dy*speed;}
         }
         // Main collapse, roof, bell and settling masonry have distinct beats.
-        if([35,77,126,154].includes(this.impactAge))this.events.push('distant-stone');
+        if([35,77,92,126,154].includes(this.impactAge))this.events.push('distant-stone');
         if(this.impactAge===108)this.events.push('distant-bell');
     }
 }
 
 export function towerLauncherPose(tower:HypotheticalTower,body:RiderBody,lift:number,x:number,facing:number):LauncherPose {
-    const s=launcherShoulder(body),aim=Math.atan2(BASTION_TOWER.hitY-lift-s.y*AFTERMATH_SCALE,
-        Math.max(12,(BASTION_TOWER.x-x)*facing-s.x*AFTERMATH_SCALE));
+    const watch=smoothMotion((tower.impactAge-25)/85),s=launcherShoulder(body);
+    const aim=Math.atan2(BASTION_TOWER.hitY+38*watch-lift-s.y*AFTERMATH_SCALE,
+        Math.max(12,(BASTION_TOWER.x+28*watch-x)*facing-s.x*AFTERMATH_SCALE));
     return {...tower.motion,aim};
 }

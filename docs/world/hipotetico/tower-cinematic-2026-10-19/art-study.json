@@ -1,0 +1,454 @@
+{
+  "kind": "authored native scenic composition",
+  "gameplayTest": false,
+  "fps": 30,
+  "frames": 600,
+  "seconds": 20,
+  "cameraX": 1562,
+  "playerX": 1694,
+  "first": 978,
+  "captures": [
+    {
+      "file": "torre.png",
+      "frame": 1,
+      "age": 1,
+      "impactAge": -1
+    },
+    {
+      "file": "sacar.png",
+      "frame": 58,
+      "age": 58,
+      "impactAge": -1
+    },
+    {
+      "file": "mirar.png",
+      "frame": 120,
+      "age": 120,
+      "impactAge": -1
+    },
+    {
+      "file": "disparo.png",
+      "frame": 152,
+      "age": 152,
+      "impactAge": -1
+    },
+    {
+      "file": "explosao.png",
+      "frame": 163,
+      "age": 163,
+      "impactAge": 4
+    },
+    {
+      "file": "ruptura.png",
+      "frame": 227,
+      "age": 227,
+      "impactAge": 68
+    },
+    {
+      "file": "queda.png",
+      "frame": 285,
+      "age": 285,
+      "impactAge": 126
+    },
+    {
+      "file": "ruinas.png",
+      "frame": 409,
+      "age": 354,
+      "impactAge": 250
+    }
+  ],
+  "cues": [
+    {
+      "frame": 38,
+      "seconds": 0.6333333333333333,
+      "event": "distant-metal"
+    },
+    {
+      "frame": 104,
+      "seconds": 1.7333333333333334,
+      "event": "distant-metal"
+    },
+    {
+      "frame": 142,
+      "seconds": 2.3666666666666667,
+      "event": "distant-launch"
+    },
+    {
+      "frame": 159,
+      "seconds": 2.65,
+      "event": "distant-blast"
+    },
+    {
+      "frame": 194,
+      "seconds": 3.2333333333333334,
+      "event": "distant-stone"
+    },
+    {
+      "frame": 236,
+      "seconds": 3.933333333333333,
+      "event": "distant-stone"
+    },
+    {
+      "frame": 251,
+      "seconds": 4.183333333333334,
+      "event": "distant-stone"
+    },
+    {
+      "frame": 267,
+      "seconds": 4.45,
+      "event": "distant-bell"
+    },
+    {
+      "frame": 285,
+      "seconds": 4.75,
+      "event": "distant-stone"
+    },
+    {
+      "frame": 313,
+      "seconds": 5.216666666666667,
+      "event": "distant-stone"
+    }
+  ],
+  "samples": [
+    {
+      "frame": 0,
+      "phase": "tower",
+      "age": 0,
+      "impactAge": -1,
+      "action": "ram",
+      "destroyed": false,
+      "rocket": null,
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": -0.046248848286972,
+        "recoil": 0,
+        "fired": false
+      }
+    },
+    {
+      "frame": 60,
+      "phase": "tower",
+      "age": 60,
+      "impactAge": -1,
+      "action": "ram",
+      "destroyed": false,
+      "rocket": null,
+      "launcher": {
+        "draw": 0.41217178913087726,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": -0.0550550135539831,
+        "recoil": 0,
+        "fired": false
+      }
+    },
+    {
+      "frame": 120,
+      "phase": "tower",
+      "age": 120,
+      "impactAge": -1,
+      "action": "ram",
+      "destroyed": false,
+      "rocket": null,
+      "launcher": {
+        "draw": 1,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": -0.06793554419363101,
+        "recoil": 0,
+        "fired": false
+      }
+    },
+    {
+      "frame": 180,
+      "phase": "tower",
+      "age": 180,
+      "impactAge": 21,
+      "action": "ram",
+      "destroyed": true,
+      "rocket": null,
+      "launcher": {
+        "draw": 1,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": -0.06793554419363101,
+        "recoil": 0,
+        "fired": true
+      }
+    },
+    {
+      "frame": 240,
+      "phase": "tower",
+      "age": 240,
+      "impactAge": 81,
+      "action": "ram",
+      "destroyed": true,
+      "rocket": null,
+      "launcher": {
+        "draw": 1,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": 0.1779766221382877,
+        "recoil": 0,
+        "fired": true
+      }
+    },
+    {
+      "frame": 300,
+      "phase": "tower",
+      "age": 300,
+      "impactAge": 141,
+      "action": "ram",
+      "destroyed": true,
+      "rocket": null,
+      "launcher": {
+        "draw": 0.692812363318268,
+        "rifleLower": 1,
+        "reach": 1,
+        "aim": 0.30542243666258845,
+        "recoil": 0,
+        "fired": true
+      }
+    },
+    {
+      "frame": 360,
+      "phase": "recover",
+      "age": 354,
+      "impactAge": 201,
+      "action": "ram",
+      "destroyed": true,
+      "rocket": null,
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 0.3383347943205449,
+        "recoil": 0,
+        "fired": true
+      }
+    },
+    {
+      "frame": 420,
+      "phase": "roam",
+      "age": 354,
+      "impactAge": 261,
+      "action": "stomp",
+      "destroyed": true,
+      "rocket": null,
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 0.4523485485144774,
+        "recoil": 0,
+        "fired": true
+      }
+    },
+    {
+      "frame": 480,
+      "phase": "perform",
+      "age": 354,
+      "impactAge": 321,
+      "action": "stomp",
+      "destroyed": true,
+      "rocket": null,
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 0.5340698468100166,
+        "recoil": 0,
+        "fired": true
+      }
+    },
+    {
+      "frame": 540,
+      "phase": "perform",
+      "age": 354,
+      "impactAge": 381,
+      "action": "stomp",
+      "destroyed": true,
+      "rocket": null,
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 0.5235671632292416,
+        "recoil": 0,
+        "fired": true
+      }
+    },
+    {
+      "frame": 600,
+      "phase": "orient",
+      "age": 354,
+      "impactAge": 441,
+      "action": "sift",
+      "destroyed": true,
+      "rocket": null,
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 0.5104914133944288,
+        "recoil": 0,
+        "fired": true
+      }
+    },
+    {
+      "frame": 660,
+      "phase": "roam",
+      "age": 354,
+      "impactAge": 501,
+      "action": "sift",
+      "destroyed": true,
+      "rocket": null,
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 1.2164672516819905,
+        "recoil": 0,
+        "fired": true
+      }
+    },
+    {
+      "frame": 720,
+      "phase": "perform",
+      "age": 354,
+      "impactAge": 561,
+      "action": "sift",
+      "destroyed": true,
+      "rocket": null,
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 0.36678714852316097,
+        "recoil": 0,
+        "fired": true
+      }
+    },
+    {
+      "frame": 780,
+      "phase": "perform",
+      "age": 354,
+      "impactAge": 621,
+      "action": "sift",
+      "destroyed": true,
+      "rocket": null,
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 0.18031943299927022,
+        "recoil": 0,
+        "fired": true
+      }
+    },
+    {
+      "frame": 840,
+      "phase": "perform",
+      "age": 354,
+      "impactAge": 681,
+      "action": "sift",
+      "destroyed": true,
+      "rocket": null,
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 0.326314237649494,
+        "recoil": 0,
+        "fired": true
+      }
+    },
+    {
+      "frame": 900,
+      "phase": "perform",
+      "age": 354,
+      "impactAge": 741,
+      "action": "sift",
+      "destroyed": true,
+      "rocket": null,
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 0.38269123736165167,
+        "recoil": 0,
+        "fired": true
+      }
+    },
+    {
+      "frame": 960,
+      "phase": "orient",
+      "age": 354,
+      "impactAge": 801,
+      "action": "ram",
+      "destroyed": true,
+      "rocket": null,
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 0.3717428683304439,
+        "recoil": 0,
+        "fired": true
+      }
+    },
+    {
+      "frame": 1020,
+      "phase": "roam",
+      "age": 354,
+      "impactAge": 861,
+      "action": "ram",
+      "destroyed": true,
+      "rocket": null,
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 1.2164672516819905,
+        "recoil": 0,
+        "fired": true
+      }
+    },
+    {
+      "frame": 1080,
+      "phase": "perform",
+      "age": 354,
+      "impactAge": 921,
+      "action": "ram",
+      "destroyed": true,
+      "rocket": null,
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 0.7642605063218418,
+        "recoil": 0,
+        "fired": true
+      }
+    },
+    {
+      "frame": 1140,
+      "phase": "recover",
+      "age": 354,
+      "impactAge": 981,
+      "action": "ram",
+      "destroyed": true,
+      "rocket": null,
+      "launcher": {
+        "draw": 0,
+        "rifleLower": 0,
+        "reach": 0,
+        "aim": 1.2164672516819905,
+        "recoil": 0,
+        "fired": true
+      }
+    }
+  ]
+}

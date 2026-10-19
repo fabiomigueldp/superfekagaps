@@ -5,16 +5,16 @@ import {BASTION_TOWER,type HypotheticalTower} from './HypotheticalTower';
 const P={dark:'#536e70',joint:'#6c8279',stone:'#94a18b',side:'#7e9384',light:'#b6b69a',cap:'#c5bb96',
     roof:'#718a80',roofLight:'#a8af94',deep:'#405f66',bell:'#ae986d',bellLight:'#d3b883',soot:'#5e7270'};
 type Part='arch'|'shaft'|'belfry'|'roof';
-const PARTS={arch:{y:-33,delay:70,time:84,x:-22,floor:-12,angle:-.32},
-    shaft:{y:-54,delay:18,time:74,x:14,floor:-19,angle:.57},
-    belfry:{y:-83,delay:28,time:98,x:42,floor:-29,angle:1.18},
-    roof:{y:-104,delay:22,time:55,x:69,floor:-13,angle:.34}} as const;
+const PARTS={arch:{y:-33,delay:70,time:84,x:-22,floor:-22,angle:-.32},
+    shaft:{y:-54,delay:18,time:74,x:14,floor:-29,angle:.57},
+    belfry:{y:-83,delay:28,time:98,x:42,floor:-36,angle:1.18},
+    roof:{y:-104,delay:22,time:55,x:69,floor:-20,angle:.34}} as const;
 
 export function towerPartMotion(part:Part,age:number,reduced=false){
     const p=PARTS[part],t=Math.max(0,Math.min(1,(age-p.delay)/p.time)),land=age-p.delay-p.time;
     const settle=reduced||land<0||land>24?0:Math.sin(land*Math.PI/12)*(1-land/24);
     const tremor=reduced||age<0||age>p.delay?0:Math.sin(age*1.3)*(1-age/(p.delay+1))*.75;
-    return {x:p.x*smoothMotion(t)+tremor,y:p.y+(p.floor-p.y)*t*t-settle*2,
+    return {x:p.x*smoothMotion(t)+tremor,y:p.y+(p.floor-p.y)*t*t-Math.abs(settle)*2,
         angle:p.angle*Math.pow(t,1.3)+settle*.022};
 }
 function partPainter(c:CanvasRenderingContext2D,x:number,base:number,part:Part,age:number,reduced:boolean){
@@ -27,7 +27,30 @@ function partPainter(c:CanvasRenderingContext2D,x:number,base:number,part:Part,a
     const rect=(a:number,b:number,w:number,h:number,color:string)=>poly([[a,b],[a+w,b],[a+w,b+h],[a,b+h]],color);
     return {poly,line,rect,point};
 }
-function masonry(p:ReturnType<typeof partPainter>,top:number,height:number){
+function masonry(p:ReturnType<typeof partPainter>,top:number,height:number,broken=false){
+    if(broken){
+        const bottom=top+height;
+        p.poly([[-23,top+2],[-15,top],[-9,top+3],[-3,top+1],[5,top+2],[12,top],[22,top+2],
+            [26,top+4],[26,bottom-3],[19,bottom-1],[13,bottom-3],[8,bottom],[1,bottom-3],
+            [-6,bottom],[-12,bottom-3],[-19,bottom],[-23,bottom-3]],P.joint);
+        p.poly([[-20,top+3],[-14,top+2],[-8,top+5],[-2,top+3],[6,top+4],[12,top+2],[19,top+4],
+            [19,bottom-3],[13,bottom-5],[8,bottom-2],[1,bottom-5],[-6,bottom-2],[-12,bottom-5],[-20,bottom-3]],P.stone);
+        p.poly([[19,top+3],[26,top+4],[26,bottom-3],[19,bottom-1]],P.side);
+        for(let yy=top+6,row=0;yy<bottom-4;yy+=6,row++){
+            p.line(-20,yy,18,yy,P.joint);
+            for(let col=0;col<3;col++){
+                const xx=-17+col*13+(row%2?5:0);if(xx>16)continue;
+                p.line(xx,yy-3,xx,yy,P.side);p.line(xx+1,yy-3,Math.min(17,xx+8),yy-3,P.light);
+            }
+        }
+        for(const dx of [-22,18])for(let yy=top+4;yy<bottom-4;yy+=8){
+            const h=Math.min(6,bottom-4-yy);p.rect(dx,yy,5,h,P.side);p.line(dx,yy,dx+4,yy,P.cap);
+        }
+        for(const [xx,yy] of [[-19,top+2],[-7,top+3],[8,top+2],[-17,bottom-3],[3,bottom-3]]){
+            p.line(xx,yy,xx+5,yy+1,P.cap);p.line(xx,yy+1,xx+2,yy+3,P.side);
+        }
+        return;
+    }
     p.rect(-23,top,46,height,P.joint);p.rect(-20,top+1,39,height-1,P.stone);
     p.poly([[19,top],[26,top+3],[26,top+height],[19,top+height]],P.side);
     for(let row=0;row<Math.floor(height/6);row++){
@@ -63,24 +86,33 @@ export function drawBastionTower(c:CanvasRenderingContext2D,tower:HypotheticalTo
         pixelLine(c,x+d*20,base-27,x+d*22,base-9,P.light,2);
         box(c,x+d*22-3,base-16,7,1,P.joint);box(c,x+d*22-2,base-8,7,2,P.cap);
     }
-    const arch=partPainter(c,x,base,'arch',age,reduced);masonry(arch,-42,18);
+    const arch=partPainter(c,x,base,'arch',age,reduced);masonry(arch,-42,18,age>=70);
     arch.poly([[-9,-24],[-9,-33],[-6,-38],[0,-40],[7,-38],[10,-33],[10,-24]],P.deep);
     for(const d of [-1,1])arch.line(d*11,-25,d*11,-33,P.cap,2);
     arch.line(-7,-38,-3,-41,P.cap,2);arch.line(3,-41,8,-38,P.cap,2);
-    const shaft=partPainter(c,x,base,'shaft',age,reduced);masonry(shaft,-66,24);
-    shaft.rect(-25,-66,51,4,P.joint);shaft.line(-26,-66,26,-66,P.cap,2);shaft.line(-23,-62,23,-62,P.light);
+    const shaft=partPainter(c,x,base,'shaft',age,reduced);masonry(shaft,-66,24,age>=8);
+    if(age<8){
+        shaft.rect(-25,-66,51,4,P.joint);shaft.line(-26,-66,26,-66,P.cap,2);shaft.line(-23,-62,23,-62,P.light);
+    }else{
+        shaft.poly([[-25,-66],[-10,-66],[-5,-64],[-9,-61],[-24,-62]],P.side);
+        shaft.poly([[7,-65],[25,-66],[26,-62],[12,-62]],P.side);
+        shaft.line(-25,-66,-10,-66,P.cap,2);shaft.line(10,-65,25,-66,P.cap,2);
+        shaft.poly([[-8,-64],[-1,-61],[5,-62],[10,-57],[3,-55],[-2,-58],[-9,-59]],P.soot);
+        shaft.line(-8,-64,-1,-61,P.dark);shaft.line(3,-55,10,-57,P.light);
+    }
     shaft.rect(-5,-58,11,10,P.side);shaft.poly([[0,-57],[4,-53],[0,-49],[-3,-53]],P.light);
     if(age>=0){
         shaft.line(-20,-63,-9,-59,P.dark,2);shaft.line(-9,-59,-3,-52,P.dark);shaft.line(-3,-52,8,-49,P.dark);
         if(age>10){shaft.line(2,-66,5,-59,P.deep);shaft.line(5,-59,15,-54,P.deep);}
     }
-    const b=partPainter(c,x,base,'belfry',age,reduced);masonry(b,-102,36);
+    const b=partPainter(c,x,base,'belfry',age,reduced);masonry(b,-102,36,age>=28);
     b.poly([[-12,-69],[-12,-88],[-9,-95],[-3,-99],[4,-99],[11,-94],[14,-87],[14,-69]],P.dark);
     b.poly([[-9,-70],[-9,-87],[-6,-93],[0,-96],[7,-93],[11,-87],[11,-70]],P.deep);
     b.line(-12,-72,-12,-88,P.cap,2);b.line(14,-72,14,-88,P.side,2);
     b.line(-9,-94,-3,-98,P.light,2);b.line(3,-98,10,-94,P.light,2);
     b.line(-10,-88,12,-88,'#82917a',3);b.line(-9,-89,11,-89,P.light);
-    b.line(-21,-69,22,-69,P.cap,2);
+    if(age<28)b.line(-21,-69,22,-69,P.cap,2);
+    else{b.line(-21,-69,-8,-69,P.cap,2);b.line(5,-70,21,-69,P.cap,2);b.line(-8,-69,-4,-73,P.dark);}
     for(const d of [-1,1]){b.rect(d*18-1,-99,3,25,P.light);b.line(d*19,-78,d*19,-75,P.side);}
     const roof=partPainter(c,x,base,'roof',age,reduced);
     roof.poly([[-30,-102],[-22,-109],[0,-114],[24,-109],[32,-102]],P.dark);
@@ -96,10 +128,12 @@ export function drawBastionTower(c:CanvasRenderingContext2D,tower:HypotheticalTo
     }else{
         // The bell is released at its exact moving suspension, then rings on
         // landing before the heavier masonry reaches the street.
-        const release=partPainter(c,x,base,'belfry',48,reduced).point(0,-79),t=Math.min(1,(age-48)/60);
+        const sway=reduced?0:Math.sin(48/3)*.22;
+        const release=partPainter(c,x,base,'belfry',48,reduced).point(Math.sin(sway)*8,-79),t=Math.min(1,(age-48)/60);
+        const releaseAngle=towerPartMotion('belfry',48,reduced).angle+sway;
         const settle=reduced||age>142?0:Math.sin((age-108)*.32)*Math.max(0,1-(age-108)/34)*.13;
         bell(c,release[0]+(x+59-release[0])*t,release[1]+(base-10-release[1])*t*t-Math.sin(Math.PI*t)*7,
-            towerPartMotion('belfry',48,reduced).angle+(1.2-towerPartMotion('belfry',48,reduced).angle)*t+(t===1?settle:0));
+            releaseAngle+(1.2-releaseAngle)*t+(t===1?settle:0));
     }
     if(age>28){
         pixelLine(c,x-25,base-24,x-18,base-20,P.dark);pixelLine(c,x+15,base-21,x+24,base-16,P.dark);
@@ -116,6 +150,11 @@ export function drawTowerEffects(c:CanvasRenderingContext2D,t:HypotheticalTower,
         const back=[l.backX-l.dx*length,base+l.backY-l.dy*length] as Point;
         polygon(c,[[l.backX+l.dy*3,base+l.backY-l.dx*3],back,[l.backX-l.dy*3,base+l.backY+l.dx*3]],'#c9ad7e');
         pixelLine(c,l.backX,base+l.backY,back[0],back[1],'#e5c58d',2);
+    }
+    if(l&&launchAge>=4&&launchAge<58&&!reduced)for(let j=0;j<3;j++){
+        const a=launchAge-4-j*3;if(a<0)continue;
+        const fade=1-a/54,w=(3+a*.07)*fade;
+        oval(c,l.backX-l.dx*(6+a*.4+j*3),base+l.backY-l.dy*(6+a*.4)-a*.1-j*2,w,w*.6,'#a3a996');
     }
     if(l&&(t.rocket||age>=0&&age<34)){
         const end=t.rocket??{x,y:BASTION_TOWER.hitY},distance=Math.hypot(end.x-l.x,end.y-l.y);
@@ -155,7 +194,16 @@ export function drawTowerEffects(c:CanvasRenderingContext2D,t:HypotheticalTower,
         oval(c,px,py,w,Math.max(2,w*.65),j%2?'#8b988d':'#a4aa97');
         oval(c,px+2,py-2,w*.5,w*.32,'#b2b29b');
     }
-    for(const [born,dx] of [[35,6],[77,69],[108,59],[126,42],[154,-22]]){
+    // Mortar releases at the failing joints, before the landing dust below.
+    for(const [born,part] of [[18,'shaft'],[28,'belfry'],[70,'arch']] as const){
+        const a=age-born;if(a<0||a>52)continue;
+        const m=towerPartMotion(part,born,reduced),fade=1-a/52;
+        for(let j=0;j<(reduced?2:5);j++){
+            const px=x+m.x+(j-2)*(6+a*.13),py=base+m.y+8+a*.23;
+            box(c,px,py,(4+a*.07)*fade,Math.max(1,3*fade),j%2?'#a6ad98':'#b8b69a');
+        }
+    }
+    for(const [born,dx] of [[77,69],[92,14],[108,59],[126,42],[154,-22]]){
         const a=age-born;if(a<0||a>76)continue;
         const fade=1-a/76;
         for(let j=0;j<(reduced?2:6);j++){
