@@ -7,15 +7,17 @@ import {AFTERMATH_PROPS,AFTERMATH_SCORES,aftermathReach,aftermathActionTiming,ty
 import {AFTERMATH_SCALE,DEBRIS_GRIP_X,createAftermathProp,handlingForMaterial,handlingMotion,handlingTiming,
     isHandling,shutterHandle,stepAftermathProp,type AftermathProp,type HeldDebris} from './HypotheticalAftermathHandling';
 import {HypotheticalTower,BASTION_TOWER,TOWER_SEQUENCE,launcherGeometry,towerLauncherPose,type TowerCue} from './HypotheticalTower';
+import {TOWER_SEARCH} from './HypotheticalTowerSearch';
 
 /** These small service yards belong to the rear street, never to Feka's collision layer. */
 export const AFTERMATH_YARDS = SIEGE_SECTORS.map((s, district) => ({
     origin: s.origin + (district === 0 ? 256 : 0),
     kind: (['timber', 'cargo', 'vent', 'masonry'] as const)[district],
-    start: district === 0 ? 634 : 278,
+    start: district === 0 ? 634 : district===3?226:278,
 }));
 type Activity = 'approach' | 'search' | 'rummage' | 'listen' | 'flush' | 'turn-out' | 'patrol' | 'survey' | 'turn-back' | 'return' | 'watch'
-    | 'roam' | 'orient' | 'perform' | 'recover' | 'tower';
+    | 'roam' | 'orient' | 'perform' | 'recover' | 'tower' | 'tower-await' | 'tower-search';
+type Destination='perform'|'search'|'tower'|'tower-search';
 type Sound = 'distant-debris' | 'distant-thud' | 'distant-shot' | 'distant-hit' | 'distant-roar'
     | 'distant-wood' | 'distant-stone' | 'distant-metal' | TowerCue;
 export interface AftermathContact { x:number; y?:number; born:number; strength:number; kind:'scrape'|'break'|'step'; material?:'timber'|'stone'|'iron' }
@@ -58,10 +60,11 @@ export class HypotheticalAftermath {
     private destination=0;
     private destinationFacing=1;
     private roamTicks=72;
-    private orientThen:'roam'|'perform'|'search'|'tower'='perform';
-    private roamThen:'perform'|'search'|'tower'='perform';
+    private orientThen:'roam'|Destination='perform';
+    private roamThen:Destination='perform';
     private recent:AftermathAction[]=[];
     private viewX=0;
+    private lookBehind=0;
     private planView=0;
     private gripX=0;
     private gripY=0;
@@ -72,6 +75,11 @@ export class HypotheticalAftermath {
     get yard(){ return this.yards[this.district]; }
     get origin(){ return AFTERMATH_YARDS[this.district]?.origin ?? 0; }
     get stride(){ return Math.min(1, Math.abs(this.velocity)/1.05); }
+    /** Keep the opening landmark in view while leaving at least 48 native
+     * pixels ahead of Feka. Both the director and the game camera use this. */
+    cameraFor(playerX:number){
+        return Math.max(0,Math.min(SIEGE_WIDTH-320,Math.max(playerX-256,playerX-132-this.lookBehind)));
+    }
     get duration(){
         switch(this.phase){
             case 'approach': return 82;
@@ -88,11 +96,14 @@ export class HypotheticalAftermath {
             case 'perform': return aftermathActionTiming(this.action,this.variant).duration;
             case 'recover': return 32+(this.variant%3)*8;
             case 'tower': return TOWER_SEQUENCE.end;
+            case 'tower-await': return 96;
+            case 'tower-search': return TOWER_SEARCH.end;
         }
     }
     private enter(phase:Activity){
         this.phase=phase; this.age=0; this.fromX=this.x; this.fromFacing=this.facing;
         if(phase==='tower')this.tower.begin();
+        if(phase==='tower-search')this.tower.search.begin();
         if(phase==='perform'){
             this.recent=[...this.recent,this.action].slice(-2);
             this.lastPerformed[this.action]=++this.performances;
@@ -110,20 +121,30 @@ export class HypotheticalAftermath {
             :material==='stone'?'distant-stone':kind==='break'?'distant-thud':'distant-debris');
     }
     private inView(x:number,margin=20){return x>=this.viewX+margin&&x<=this.viewX+320-margin;}
-    private orient(facing:number,next:'roam'|'perform'|'search'|'tower'){
+    private orient(facing:number,next:'roam'|Destination){
         this.destinationFacing=facing;this.orientThen=next;
         this.enter(this.facing===facing?next:'orient');
     }
     /** A rotating score changes order each lap and excludes the two last
      * performances. Placement is chosen before anticipation, not during impact. */
-    private plan(){
-        const towerStance=Math.min(this.origin+250,this.viewX+246);
-        if(this.district===3&&this.yard.damage===2&&this.tower.available&&this.towerFramed(towerStance)){
-            this.targetProp=-1;this.roamThen='tower';this.destination=towerStance;this.planView=this.viewX;
+    private planTower(){
+        if(this.district!==3||this.tower.search.done)return false;
+        const searching=this.tower.destroyed;
+        const stance=searching?this.tower.search.stance:Math.min(this.origin+250,this.viewX+246);
+        const ready=searching?this.tower.search.ready:this.tower.available;
+        if(ready&&(searching?this.searchFramed(stance):this.towerFramed(stance))){
+            this.targetProp=-1;this.roamThen=searching?'tower-search':'tower';this.destination=stance;this.planView=this.viewX;
             this.roamTicks=Math.max(48,Math.min(144,Math.ceil(Math.abs(this.destination-this.x)*1.45)));
             this.orient(Math.sign(this.destination-this.x)||this.facing,'roam');this.destinationFacing=-1;
-            return;
+        }else if(this.phase!=='tower-await'){
+            this.targetProp=-1;this.enter('tower-await');
         }
+        return true;
+    }
+    private plan(){
+        // The landmark and its discovery are the opening of this yard's
+        // secondary score, never a lottery after other activities finish.
+        if(this.planTower())return;
         this.roamThen='perform';
         const order=AFTERMATH_SCORES[this.district],lap=Math.floor(this.actionCount/order.length);
         const candidates=Array.from({length:order.length},(_,j)=>order[(this.actionCount+lap*2+j)%order.length]);
@@ -193,6 +214,11 @@ export class HypotheticalAftermath {
     private towerFramed(x=this.x){
         return x>BASTION_TOWER.x+84&&this.inView(x-60,12)&&this.inView(x+60,12)
             &&this.inView(BASTION_TOWER.x+BASTION_TOWER.left,12)&&this.inView(BASTION_TOWER.x+BASTION_TOWER.right,12);
+    }
+    private searchFramed(x=this.x){
+        const s=this.tower.search,target=s.age<TOWER_SEARCH.release?BASTION_TOWER.x+s.part.x-20:s.person.x-14;
+        return this.inView(x-64,12)&&this.inView(x+60,12)
+            &&this.inView(target,12);
     }
     get launcherPose(){const p=this.pose(false);return towerLauncherPose(this.tower,p,p.lift,this.x,this.facing);}
     get launcherBarrel(){
@@ -265,7 +291,14 @@ export class HypotheticalAftermath {
             this.x=this.fromX+(this.destination-this.fromX)*smoothMotion(this.age/this.duration);
             if(this.age>=this.duration)this.orient(this.destinationFacing,this.roamThen);
         }else if(this.phase==='tower'){
-            if(this.tower.done)this.enter('recover');
+            if(this.tower.done)this.plan();
+        }else if(this.phase==='tower-await'){
+            this.plan();
+        }else if(this.phase==='tower-search'){
+            const search=this.tower.search,framed=this.searchFramed();
+            search.update(framed);this.x=search.actorX;
+            if(framed)this.events.push(...search.events);
+            if(search.done)this.enter('recover');
         }else if(this.phase==='perform'){
             const timing=aftermathActionTiming(this.action,this.variant),a=this.age;
             if(isHandling(this.action))this.handleDebris();
@@ -299,7 +332,13 @@ export class HypotheticalAftermath {
     update(storyTick:number, storyX:number, playerX:number){
         this.events=[];
         this.tick++;
-        this.viewX=Math.max(0,Math.min(SIEGE_WIDTH-320,playerX-132));
+        const normal=Math.max(0,Math.min(SIEGE_WIDTH-320,playerX-132));
+        const focus=storyTick>=SCENIC_STARTS[3]&&!this.tower.search.done;
+        const desired=focus?Math.max(playerX-256,Math.min(normal,BASTION_TOWER.x+BASTION_TOWER.left-14)):normal;
+        const offset=Math.max(0,Math.min(124,normal-desired));
+        this.lookBehind+=(offset-this.lookBehind)*.12;
+        if(Math.abs(this.lookBehind)<.01)this.lookBehind=0;
+        this.viewX=this.cameraFor(playerX);
         this.tower.update(this.phase==='tower'&&this.towerFramed(),()=>this.launcherBarrel);
         if(this.district===3&&(this.inView(BASTION_TOWER.x,0)||this.phase==='tower'))this.events.push(...this.tower.events);
         this.muzzle=Math.max(0,this.muzzle-1);this.heat=Math.max(0,this.heat-.006);
@@ -343,6 +382,7 @@ export class HypotheticalAftermath {
             if(storyTick-SCENIC_STARTS[district]<yard.start || !visible(storyX,12))return;
             this.active=true; this.x=storyX; this.velocity=0; this.facing=1; this.travel=0; this.lastStep=0;
             this.enter('approach');
+            if(district===3){this.plan();return;}
         }
         for(const s of this.shots){
             s.age++;s.remaining-=Math.hypot(s.vx,s.vy);
@@ -355,7 +395,7 @@ export class HypotheticalAftermath {
             }else{s.x+=s.vx;s.y+=s.vy;}
         }
         this.shots=this.shots.filter(s=>s.remaining>0&&s.age<60).slice(-12);
-        if(['roam','orient','perform','recover','tower'].includes(this.phase)){
+        if(['roam','orient','perform','recover','tower','tower-await','tower-search'].includes(this.phase)){
             const old=this.x;this.routine();this.velocity=this.x-old;this.travel+=Math.abs(this.velocity);
             const step=Math.floor(this.travel/(Math.PI*11*AFTERMATH_SCALE));
             if(step>this.lastStep&&this.stride>.15&&this.inView(this.x)){this.contact('step',this.x+this.facing*(step%2?9:-7),.4);this.lastStep=step;}
@@ -424,7 +464,7 @@ export class HypotheticalAftermath {
         const strike=phase==='flush'?pulse(a-32,26,30,62):0;
         const turn=phase==='turn-out'||phase==='turn-back';
         const survey=phase==='survey'||phase==='listen'||phase==='watch';
-        const look=survey?pulse(a,24,this.duration-30,this.duration):0;
+        const look=phase==='tower-await'?.25+Math.sin(this.tick/48)*.12:survey?pulse(a,24,this.duration-30,this.duration):0;
         const breath=reduced?0:Math.sin(this.tick/19)*.5;
         const cargo=this.district===1&&rummaging?pulse(a-56,12,26,52):0;
         const steam=this.district===2&&phase==='flush'?pulse(a-60,8,25,54):0;
@@ -498,6 +538,12 @@ export class HypotheticalAftermath {
         };
         if(this.phase==='tower')return {...pose,...this.tower.body,stride:0,rein:0,recoil:0,aim:-.12,
             lift:0,reload:0,cloth:reduced?0:this.tower.motion.recoil*3};
+        if(this.phase==='tower-search'){
+            const m=this.tower.search.body;
+            const aligned=m.jawY/AFTERMATH_SCALE+59-m.bow*25-breath-m.compression-10-m.jaw*6;
+            return {...pose,...m,neckDrop:aligned,aim:.16,lookBack:m.lookBack,stride:this.stride*.45,
+                lift:0,recoil:0,reload:0,cloth:reduced?0:m.cloth};
+        }
         return pose;
     }
 }

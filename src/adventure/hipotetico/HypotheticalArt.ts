@@ -6,7 +6,8 @@ import type { WorldLevel, WorldObjects } from '../WorldPhysics';
 import { HYPOTHETICAL, type HypotheticalModel } from './HypotheticalModel';
 import { dinosaurLeg, dinosaurTail, hypotheticalMotion, riderBend, riderTorsoPoint, smoothMotion } from './HypotheticalMotion';
 import { BACKDROP_RIG, backdropBaseline, type HypotheticalBackdrop } from './HypotheticalBackdrop';
-import { drawBystanders } from './HypotheticalBystanders';
+import { drawBystanders,drawCarriedBystander,type CarriedBystander } from './HypotheticalBystanders';
+import {drawTowerSearchActors,drawTowerSearchDust} from './HypotheticalTowerSearchArt';
 import {drawOpeningAftermath} from './HypotheticalOpening';
 import {drawAftermathYards,drawAftermathEffects} from './HypotheticalAftermathArt';
 import {drawDebrisPiece} from './HypotheticalDebrisArt';
@@ -23,7 +24,7 @@ const P = { ink: '#172c36', deep: '#263f3d', shade: '#556047', hide: '#92845a', 
     suit: '#304659', lapel: '#607487', skin: '#c58d68', face: '#edbc8e', hair: '#3c3034',
     brass: '#d3a75c', mint: '#99e0cf', hot: '#ffb267', scute:'#6e7953', skinLight:'#f7d2a6',
     mouth:'#593b40', tongue:'#bc796a', leather:'#583f38', stitch:'#b8885d', clothShade:'#203644' };
-export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; riderDrop?:number; riderLean?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number; lookBack?:number; gore?:number; heldDebris?:HeldDebris; launcher?:LauncherPose }
+export interface DinosaurPose { x: number; y: number; facing: number; gait: number; stride: number; breath: number; bow: number; jaw: number; neckDrop: number; recoil: number; aim: number; tail: number; compression: number; tuck: number; reload: number; brace: number; heat: number; cloth: number; blink: boolean; daze: number; armor: number; flash: boolean; defeated: boolean; distant?: boolean; pivot?:number; riderDrop?:number; riderLean?:number; rein?:number; focus?:number; eyeClose?:number; voice?:number; lookBack?:number; gore?:number; heldDebris?:HeldDebris; launcher?:LauncherPose; carriedBystander?:CarriedBystander }
 const fogPalette=new Map<string,string>();
 function distantColor(color:string){
     if(!fogPalette.has(color)){
@@ -220,6 +221,8 @@ export function drawHypotheticalDinosaur(c: CanvasRenderingContext2D, pose: Dino
     line(37,neck+14+jaw,57,neck+15+jaw,P.cream);
     line(32,neck+7,63,neck+6,P.rust);
     if(pose.heldDebris)drawDebrisPiece(c,x+d*DEBRIS_GRIP_X,y+neck+10+pose.jaw*6,pose.heldDebris,1/AFTERMATH_SCALE);
+    if(pose.carriedBystander)drawCarriedBystander(c,pose.carriedBystander,
+        x+d*DEBRIS_GRIP_X,y+neck+10+pose.jaw*6,1/AFTERMATH_SCALE);
     for(const [tx,length] of [[36,3],[41,5],[47,4],[53,5],[59,3]]){
         poly([[tx,neck+6],[tx+3,neck+6],[tx+1,neck+6+length]],P.ivory);
         if((pose.gore??0)>.2)poly([[tx,neck+6+length-2],[tx+2,neck+6+length-2],[tx+1,neck+6+length]],'#9e3237');
@@ -382,6 +385,7 @@ export function distantRiderPose(action:HypotheticalBackdrop,reduced=false):Dino
         x:r.x,y:r.y+pose.lift/r.scale,...pose,
         daze:0,armor:9,flash:false,defeated:false,distant:true,heldDebris:action.aftermath.heldDebris,
         launcher:action.aftermath.district===3?action.aftermath.launcherPose:undefined,
+        carriedBystander:action.aftermath.tower.search.carried,
     };}
     return {x:r.x,y:r.y+m.lift/r.scale,facing:1,gait:action.travel/(r.scale*11),stride:action.stride,
         breath:0,bow:0,jaw:m.jaw,neckDrop:m.neckDrop,recoil:action.recoil,aim:action.angle,tail:m.tail,
@@ -425,12 +429,14 @@ export function drawHypotheticalBackground(c:CanvasRenderingContext2D,b:Hypothet
         c.save();c.translate(-Math.round(cx),0);
         drawBystanders(c,b.backdrop,base,reduced,true);
         drawAftermathYards(c,b.backdrop,base,cx,reduced);
+        drawTowerSearchActors(c,b.backdrop,base,reduced);
         drawDistantRider(c,b,base,reduced);
         drawBystanders(c,b.backdrop,base,reduced);
         drawOpeningAftermath(c,b.backdrop.tick,base,reduced);
         drawHypotheticalDestruction(c,b,base,cy,reduced);
         drawAftermathEffects(c,b.backdrop.aftermath,base,reduced);
         drawTowerEffects(c,b.backdrop.aftermath.tower,base,reduced);
+        drawTowerSearchDust(c,b.backdrop,base,reduced);
         c.restore();
     }
 }

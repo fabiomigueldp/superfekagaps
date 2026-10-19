@@ -1,6 +1,6 @@
 # A torre do Bastião
 
-Cena integrada ao encontro nativo `/?encounter=hipotetico`, no pátio da Vanguarda. Revisão de 19/10/2026, terceira rodada: materiais, propulsão, emissão de fumaça e contatos físicos.
+Cena integrada ao encontro nativo `/?encounter=hipotetico`, no pátio da Vanguarda. Revisão de 19/10/2026, quarta rodada: abertura fixa das atividades secundárias e continuação entre os escombros.
 
 ## Direção
 
@@ -51,24 +51,45 @@ Os tempos de contato resultam da simulação. `art-study.json` registra os conta
 
 ## Orquestração e continuidade
 
-- A cena é exclusiva do quarto pátio, depois da destruição inicial dos objetos de serviço.
+- A cena é exclusiva do quarto pátio. O diretor assume no passo local 226, depois da recuperação da ação principal de entrada. A torre é a primeira atividade secundária, antes das buscas nos objetos de serviço e das seleções recorrentes.
 - O diretor verifica se torre e personagem cabem no enquadramento antes de escolher a posição e iniciar o saque.
+- A câmera compartilha seu enquadramento com o diretor. A compensação horizontal é suavizada e mantém pelo menos 48 pixels adiante do corpo de Feka; ao fim da busca, retorna gradualmente à composição habitual.
 - Até a ignição, sair desse enquadramento provoca recolhimento da arma e libera uma tentativa futura. A retirada não reproduz o recuo de um disparo.
 - Depois da ignição, projétil e escombros terminam sua trajetória mesmo se a câmera se afasta.
-- A queda ocorre uma única vez. As nove atividades recorrentes continuam disponíveis depois dela.
+- A queda ocorre uma única vez. A busca nas ruínas vem em seguida, antes das nove atividades recorrentes. Se a câmera deixa o grupo, os próximos momentos da descoberta e do ataque aguardam; fragmentos livres e poeira continuam se movendo.
 - O estado pertence ao cenário persistente do cerco, preservado no retry do mesmo encontro. Um novo encontro começa com a torre intacta.
 - O evento pertence ao plano de fundo. Não bloqueia o controle de Feka, não modifica a colisão dos percursos e não cria um novo projétil contra o jogador.
 - Movimento reduzido remove o escape luminoso, os rastros e a fumaça decorativa, reduz fragmentos e poeira e atenua o clarão. A trajetória e a queda física permanecem iguais.
 - O rastro tem até 36 emissões, e a fragmentação tem até 64 partículas. Fragmentos menores expiram, e peças acomodadas deixam de integrar movimento. As nove ações recorrentes não recriam nem reiniciam a destruição.
 
+## Busca nas ruínas
+
+O dinossauro caminha até a posição física da parte esquerda do telhado depois que ela se acomoda. Primeiro fareja e revolve pequenos fragmentos existentes. Depois prende a peça, faz força, levanta e a solta. A parte mantém sua textura e geometria; só há um corpo, transferido entre repouso, boca e movimento livre. Peças apoiadas nela são despertadas quando o apoio sai do lugar.
+
+O NPC de camisa vermelha com estrela branca aparece no espaço exposto, com o mesmo desenho de roupas, rosto e membros dos moradores do cenário. Há um momento de percepção, tentativa de recuo e antecipação do dinossauro. Na captura, o corpo articulado é desenhado entre as camadas da boca, sob os dentes; acompanha o mesmo ponto usado pelo pescoço. A mordida tem fechamento, deslocamento de peso e reação do cavaleiro. O personagem cai inteiro junto às ruínas e permanece no cenário.
+
+| Momento da busca | Passo local |
+| --- | ---: |
+| Farejar e revolver fragmentos | 0–54 |
+| Prender a cobertura | 58 |
+| A peça cede; levantar e inspecionar | 86–138 |
+| Soltar a cobertura para a física | 138 |
+| NPC emerge; percebe a montaria | 166–194 |
+| Preparar a investida e capturar | 218–242 |
+| Levantar e morder | 242–278 |
+| Soltar e acomodar o personagem | 312–350 |
+| Retomar o restante das atividades | 392 |
+
+A continuação possui seu próprio relógio de atuação e um relógio livre para a poeira. Os contatos sonoros pertencem aos passos de esforço, captura e mordida. Não se reinicia a busca nem se recriam moradores a cada ciclo.
+
 ## Material de autoria e limites
 
-`tower-sequence.mp4` tem 16 segundos, 60 fps e ampliação inteira de uma composição nativa de 320 × 180 pixels. Não inclui áudio nem combate em primeiro plano. A câmera e a posição de Feka foram fixadas para dirigir o enquadramento; o diretor real escolhe e executa a atividade. Depois da queda, o registro mostra a retomada das atividades recorrentes.
+`tower-sequence.mp4` tem 20 segundos, 60 fps e ampliação inteira de uma composição nativa de 320 × 180 pixels. Não inclui áudio nem combate em primeiro plano. A câmera e a posição de Feka foram fixadas para dirigir o enquadramento; o diretor real escolhe e executa a atividade. O registro mostra a queda, a continuação nos escombros e a retomada das demais buscas.
 
-`art-study.json` registra poses, tempos, estados físicos, contatos, posições de emissão de fumaça, ângulo do badalo e sinais sonoros da composição. O vídeo e as doze imagens são material de autoria, não uma partida gravada ou teste de gameplay. O som e a disputa de atenção durante a luta completa não foram avaliados em uma partida nesta rodada.
+`art-study.json` registra poses, tempos, estados físicos, contatos, posições de emissão de fumaça, ângulo do badalo, continuação e sinais sonoros da composição. O vídeo e as vinte imagens são material de autoria, não uma partida gravada ou teste de gameplay. O som e a disputa de atenção durante a luta completa não foram avaliados em uma partida nesta rodada.
 
 ```powershell
-node --import tsx scripts/render_hypothetical_tower.ts .tmp/tower-material-final C:/Users/fabio/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/@napi-rs/canvas/index.js
+node --import tsx scripts/render_hypothetical_tower.ts .tmp/tower-discovery-final C:/Users/fabio/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/@napi-rs/canvas/index.js
 ```
 
 Publicação pelo fluxo autorizado do projeto, somente com build de produção, sem suíte de testes, typecheck ou revisão de navegador.

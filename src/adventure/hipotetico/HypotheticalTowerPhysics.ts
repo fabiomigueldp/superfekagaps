@@ -22,7 +22,7 @@ export const TOWER_PARTS:Record<TowerPart,Definition>={
 };
 export interface TowerBody {
     id:TowerPart;x:number;y:number;angle:number;vx:number;vy:number;spin:number;
-    attached:boolean;hidden:boolean;sleeping:boolean;quiet:number;landedAt:number;lastContact:number;
+    attached:boolean;held:boolean;hidden:boolean;sleeping:boolean;quiet:number;landedAt:number;lastContact:number;
 }
 export interface TowerContact {part:TowerPart;x:number;y:number;born:number;strength:number;slide:number;material:Material;first:boolean}
 export interface TowerChip {x:number;y:number;vx:number;vy:number;angle:number;spin:number;radius:number;
@@ -33,7 +33,7 @@ export function towerBodyPoint(body:TowerBody,x:number,y:number):Point {
     const d=TOWER_PARTS[body.id],r=rotate(x-d.x,y-d.y,body.angle);return [body.x+r[0],body.y+r[1]];
 }
 const makeBody=(id:TowerPart):TowerBody=>({id,x:TOWER_PARTS[id].x,y:TOWER_PARTS[id].y,angle:0,
-    vx:0,vy:0,spin:0,attached:true,hidden:id==='pier-left'||id==='pier-right'||id==='lintel'||id==='sill'||id==='roof-left'||id==='roof-right',
+    vx:0,vy:0,spin:0,attached:true,held:false,hidden:id==='pier-left'||id==='pier-right'||id==='lintel'||id==='sill'||id==='roof-left'||id==='roof-right',
     sleeping:false,quiet:0,landedAt:-1,lastContact:-100});
 
 /** Small, bounded scenic bodies, stepped at the game's 60 Hz. The tower's
@@ -103,6 +103,38 @@ export class HypotheticalTowerPhysics {
         const floor=this.surface(body.x,bottom-1,body);
         const width=Math.max(...vertices.map(p=>p[0]))-Math.min(...vertices.map(p=>p[0]));
         return {y:floor,height:Math.max(0,floor-bottom),width};
+    }
+    grab(id:TowerPart){
+        const held=this.bodies[id];held.held=true;held.sleeping=false;held.quiet=0;held.vx=held.vy=held.spin=0;
+        const outline=TOWER_PARTS[id].shape.map(([x,y])=>{const p=rotate(x,y,held.angle);return [held.x+p[0],held.y+p[1]] as Point;});
+        // Wake a settled piece if one of its supporting corners was on this
+        // roof wing. Removing a support must not leave stones hanging in air.
+        for(const b of Object.values(this.bodies)){
+            if(!b.sleeping||b.hidden||b===held)continue;
+            const supported=TOWER_PARTS[b.id].shape.some(([x,y])=>{
+                const p=rotate(x,y,b.angle),px=b.x+p[0],py=b.y+p[1];
+                return outline.some((a,i)=>{
+                    const z=outline[(i+1)%outline.length];
+                    if(px<Math.min(a[0],z[0])||px>Math.max(a[0],z[0])||Math.abs(z[0]-a[0])<.001)return false;
+                    const top=a[1]+(z[1]-a[1])*(px-a[0])/(z[0]-a[0]);return Math.abs(py-top)<1;
+                });
+            });
+            if(supported){b.sleeping=false;b.quiet=0;}
+        }
+    }
+    carry(id:TowerPart,x:number,y:number,angle:number){
+        const b=this.bodies[id];if(!b.held)return;
+        b.vx=x-b.x;b.vy=y-b.y;b.spin=angle-b.angle;b.x=x;b.y=y;b.angle=angle;
+    }
+    drop(id:TowerPart,vx:number,vy:number,spin:number){
+        const b=this.bodies[id];b.held=false;b.sleeping=false;b.quiet=0;b.vx=vx;b.vy=vy;b.spin=spin;
+    }
+    disturbChips(x:number,y:number,force:number){
+        const nearby=this.chips.filter(p=>p.rest&&Math.hypot(p.x-x,p.y-y)<28)
+            .sort((a,b)=>Math.abs(a.x-x)-Math.abs(b.x-x)).slice(0,4);
+        for(const [i,p] of nearby.entries()){
+            p.rest=false;p.bounces=0;p.vx=-force*(.65+i*.16);p.vy=-force*(.8+i*.12);p.spin=-.02-force*.025;
+        }
     }
     private integrate(b:TowerBody){
         const def=TOWER_PARTS[b.id],restitution=def.material==='bronze'?.28:def.material==='tile'?.16:.09;
@@ -189,7 +221,7 @@ export class HypotheticalTowerPhysics {
         }
         if(top.landedAt>=0&&!top.hidden)this.breakBelfry();
         for(const id of ['pier-left','pier-right','lintel','sill','roof-left','roof-right'] as const){
-            const b=this.bodies[id];if(!b.hidden&&!b.sleeping)this.integrate(b);
+            const b=this.bodies[id];if(!b.hidden&&!b.sleeping&&!b.held)this.integrate(b);
         }
         // The clapper lags the bell's acceleration, then catches its inner lip.
         this.clapperVelocity+=-Math.sin(bell.angle+this.clapper)*.035-(bell.vx-oldBellVX)*.06-(bell.spin-oldBellSpin)*.4;

@@ -287,7 +287,8 @@ export class HypotheticalGame extends WorldGame {
         }
         if(this.fight.nextAct){this.transitionTicks+=steps;if(this.transitionTicks>=60)this.nextAct();}
         if(this.act==='chase')this.camera.x=clamp(this.player.data.position.x-150,0,CHASE_WIDTH-320);
-        else if(this.act==='siege')this.camera.x=clamp(this.player.data.position.x-132+arrivalLookAhead(this.fight.arrivalTime,this.fight.arrivalSkipped),0,SIEGE_WIDTH-320);
+        else if(this.act==='siege')this.camera.x=clamp(this.fight.backdrop.aftermath.cameraFor(this.player.data.position.x)
+            +arrivalLookAhead(this.fight.arrivalTime,this.fight.arrivalSkipped),0,SIEGE_WIDTH-320);
         else this.camera.x=0;
         // Keep the complete jump arc visible without shaking the backdrop vertically.
         const headroom=this.act==='siege'&&this.fight.route.entered===3?32:38;

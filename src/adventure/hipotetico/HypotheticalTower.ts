@@ -2,6 +2,7 @@ import {smoothMotion,riderBend} from './HypotheticalMotion';
 import {SIEGE_SECTORS} from './HypotheticalSiege';
 import {AFTERMATH_SCALE} from './HypotheticalAftermathHandling';
 import {HypotheticalTowerPhysics,TOWER_RELEASE} from './HypotheticalTowerPhysics';
+import {HypotheticalTowerSearch} from './HypotheticalTowerSearch';
 
 export const BASTION_TOWER={x:SIEGE_SECTORS[3].origin+125,left:-31,right:33,hitY:-64} as const;
 export const TOWER_SEQUENCE={draw:30,shoulder:98,fire:142,lower:286,stow:324,end:354} as const;
@@ -32,6 +33,7 @@ export class HypotheticalTower {
     tick=0;age=-1;impactAt=-1;launchAt=-1;abortedAt=-1;retryAt=0;
     events:TowerCue[]=[];
     readonly destruction=new HypotheticalTowerPhysics();
+    readonly search=new HypotheticalTowerSearch(this.destruction,BASTION_TOWER.x);
     rocket:{x:number;y:number;fromX:number;fromY:number;dx:number;dy:number;age:number;remaining:number;speed:number}|null=null;
     trail:Array<{x:number;y:number;born:number;seed:number}>=[];
     launch:{x:number;y:number;dx:number;dy:number;backX:number;backY:number}|null=null;
@@ -73,7 +75,7 @@ export class HypotheticalTower {
             tail:brace*-.12,brace:brace*.7,focus:brace,lookBack:0,eyeClose:Math.max(shock*.75,echo*.25)};
     }
     update(framed:boolean,barrel:()=>{x:number;y:number;backX:number;backY:number}){
-        this.events=[];this.tick++;
+        this.events=[];this.tick++;this.search.advance();
         if(this.active){
             this.age++;
             if(!framed&&this.age<=TOWER_SEQUENCE.fire)this.abort();

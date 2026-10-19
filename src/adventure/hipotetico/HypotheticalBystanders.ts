@@ -86,6 +86,27 @@ function drawHead(c:CanvasRenderingContext2D,p:Bystander,x:number,y:number,gaze:
     drawBystanderTexture(c,texture,x,y,angle);
 }
 
+export interface CarriedBystander {person:Bystander;angle:number;kick:number}
+/** The same whole actor and wardrobe, articulated around a chest grip. Used
+ * inside the dinosaur rig, so its foreground teeth occlude the contact. */
+export function drawCarriedBystander(output:CanvasRenderingContext2D,actor:CarriedBystander,x:number,y:number,scale=1){
+    const p=actor.person,angle=actor.angle,co=Math.cos(angle),si=Math.sin(angle),kick=actor.kick;
+    const c={get fillStyle(){return output.fillStyle;},set fillStyle(v){output.fillStyle=v;},
+        fillRect(xx:number,yy:number,w:number,h:number){output.fillRect(Math.round(x+xx*scale),Math.round(y+yy*scale),
+            Math.max(1,Math.round(w*scale)),Math.max(1,Math.round(h*scale)));}} as CanvasRenderingContext2D;
+    const point=(u:number,v:number):[number,number]=>[u*co-v*si,u*si+v*co];
+    const skin=SKIN[p.color],cloth=WARDROBE[p.clothes],hip=point(0,4);
+    for(const d of [-1,1]){
+        const knee=point(d*3+kick*d*2,10),foot=point(d*4-kick*d*3,16-Math.max(0,kick*d)*3);
+        pixelLine(c,...point(d,4),...knee,'#485f62',2);pixelLine(c,...knee,...foot,'#667c79',2);
+        pixelLine(c,...foot,...point(d*4-kick*d*3+3,16-Math.max(0,kick*d)*3),'#89978a');
+        const shoulder=point(d*4,-4),elbow=point(d*(7+kick),1),hand=point(d*(5+kick),-2);
+        pixelLine(c,...shoulder,...elbow,cloth.shade,2);pixelLine(c,...elbow,...hand,skin,2);
+    }
+    drawClothes(c,p,hip[0],hip[1],9,angle);
+    const head=point(0,-12);drawHead(c,p,head[0],head[1],1,angle);
+}
+
 /** A pixel-only viewport mirrors the gait and occludes bodies behind their actual doorway. */
 function actorContext(c:CanvasRenderingContext2D,p:Bystander){
     const facing=Math.sign(p.shelter-p.originX)||1,door=p.shelter-facing*8;
