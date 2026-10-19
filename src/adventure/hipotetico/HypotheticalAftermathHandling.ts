@@ -1,6 +1,6 @@
 import { smoothMotion } from './HypotheticalMotion';
 
-export type HandlingAction = 'haul' | 'sift' | 'wrench';
+export type HandlingAction = 'haul' | 'sift' | 'wrench' | 'shake';
 export type DebrisMaterial = 'timber' | 'stone' | 'iron';
 export interface LooseDebris {
     x:number; y:number; angle:number; vx:number; vy:number; spin:number;
@@ -9,21 +9,26 @@ export interface LooseDebris {
 export interface AftermathProp {
     material:DebrisMaterial; wear:number; struckAt:number; force:number; cueAt:number; handledAt:number;
     piece:LooseDebris|null; hinge:number; hingeVelocity:number; hingeFacing:number; driven:boolean;
+    scars:Array<{x:number;y:number}>;
 }
 export interface HeldDebris { material:'timber'|'stone'; angle:number; wear:number }
 export const AFTERMATH_SCALE=.6875;
 export const DEBRIS_GRIP_X=56;
 export const handlingForMaterial=(material:DebrisMaterial):HandlingAction=>
     material==='timber'?'haul':material==='stone'?'sift':'wrench';
-export const isHandling=(action:string):action is HandlingAction=>action==='haul'||action==='sift'||action==='wrench';
+export const isHandling=(action:string):action is HandlingAction=>action==='haul'||action==='sift'||action==='wrench'||action==='shake';
+export const handlesMaterial=(action:HandlingAction,material:DebrisMaterial)=>
+    action===handlingForMaterial(material)||action==='shake'&&material==='timber';
+export const SHAKE_BEATS=[112,138,164] as const;
 
 export function createAftermathProp(material:DebrisMaterial):AftermathProp {
-    return {material,wear:0,struckAt:-1,force:0,cueAt:-1,handledAt:-1000,hinge:0,hingeVelocity:0,hingeFacing:1,driven:false,
+    return {material,wear:0,struckAt:-1,force:0,cueAt:-1,handledAt:-1000,hinge:0,hingeVelocity:0,hingeFacing:1,driven:false,scars:[],
         piece:material==='iron'?null:{x:material==='timber'?0:-3,y:material==='timber'?-22:-15,
             angle:material==='timber'?-.11:0,vx:0,vy:0,spin:0,held:false,moving:false,settling:false,bounces:0}};
 }
 export function handlingTiming(action:HandlingAction){
     return action==='haul'?{grip:54,yield:78,release:154,duration:212}
+        :action==='shake'?{grip:52,yield:78,release:194,duration:250}
         :action==='sift'?{grip:58,yield:80,release:132,duration:192}
         :{grip:56,yield:82,release:128,duration:190};
 }
@@ -42,11 +47,13 @@ export function handlingMotion(action:HandlingAction,age:number,variant:number){
     const release=bump(age,t.release-4,4,t.release+9,t.release+24);
     const stoneGrip=action==='sift'?smoothMotion((age-t.grip+12)/12)*(1-smoothMotion((age-t.release)/20)):0;
     const sniff=(bump(age,20,9,33,43)+bump(age,t.release+10,8,t.release+23,t.release+35))*.7;
-    return {reach,effort,raise,inspect,toss,sniff,
-        pull:action==='wrench'?0:raise*(action==='haul'?12:7)-toss*3,
-        height:raise*(action==='haul'?24:13)+toss*(action==='haul'?7:3),
+    const timber=action==='haul'||action==='shake';
+    const shake=action==='shake'?SHAKE_BEATS.reduce((v,beat,i)=>v+bump(age,beat-12,12,beat+2,beat+17)*(i%2?-1:1),0):0;
+    return {reach,effort,raise,inspect,toss,sniff,shake,
+        pull:action==='wrench'?0:raise*(timber?12:7)-toss*3+shake*3,
+        height:raise*(timber?24:13)+toss*(timber?7:3)+shake*7,
         jaw:.1+opening*.38+stoneGrip*.62+release*(action==='sift'?.2:.43),
-        angle:action==='haul'?-.11+raise*(variant%2?.31:-.27)+toss*.28:raise*.32-toss*.13,
+        angle:timber?-.11+raise*(variant%2?.31:-.27)+toss*.28+shake*.38:raise*.32-toss*.13,
         hinge:action==='wrench'?(smoothMotion((age-t.yield)/28)*1.08
             +bump(age,t.grip,10,t.grip+12,t.yield)*.12):0,
     };

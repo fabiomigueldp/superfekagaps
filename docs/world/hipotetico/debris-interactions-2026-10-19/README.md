@@ -1,50 +1,58 @@
-# Buscas e interações nos escombros
+# Atividades de fundo: variedade e consequências
 
 Revisão de 19/10/2026, integrada ao encontro nativo `/?encounter=hipotetico`.
 
-## Direção
+## O que mudou nesta rodada
 
-O ciclo anterior continuava ativo, mas vários contatos terminavam na mesma sacudida genérica. Esta rodada acrescenta três performances com objetos persistentes e encadeia algumas delas às consequências de ataques anteriores. O repertório passa de seis para nove ações.
+O repertório passa de nove para **onze performances**. A ordem fixa foi substituída por uma seleção ponderada, com semente na entrada da rua. As duas ações anteriores são evitadas; as que ficaram muito tempo sem aparecer ganham prioridade quando há um alvo acessível. Cada pátio tem preferências próprias. Depois de duas passagens mais ruidosas, as investigações recebem mais peso.
 
-- **Madeira:** aproximação, pegada, esforço antes de a viga ceder, elevação, breve inspeção, soltura e acomodação no chão. A viga sai efetivamente da pilha e pode ser manipulada novamente onde ficou.
-- **Pedra:** o dinossauro segura uma pedra solta, desloca-a e volta a observar o espaço descoberto. A abertura da mandíbula acompanha o volume da pedra. Rotação, queda e pequenos ressaltos pertencem à mesma peça.
-- **Metal:** o dinossauro força o puxador inferior de uma chapa articulada. O topo continua preso ao batente. A abertura revela a estrutura de serviço; a chapa volta com rebote amortecido, preservando as deformações anteriores.
+Não há encerramento do ciclo enquanto Feka permanece na etapa. O avanço da rua seguinte continua dependendo do jogador. A queda da torre e a busca nos seus escombros ficam reservadas ao começo das atividades secundárias do Bastião, antes dos novos pequenos eventos ambientais.
 
-O cavaleiro compensa o esforço com tronco, rédeas e postura, ligeiramente depois do movimento do dinossauro. Os pés permanecem apoiados durante a elevação dos materiais. O ponto de contato da boca é compartilhado pela pose e pela peça, incluindo orientação e altura. Investidas e ações de remexer também passam a ajustar a cabeça à altura do alvo.
+## Novas performances
 
-## Orquestração
+- **Sacudir a viga:** aproximação e pegada, esforço para erguer, três sacudidas alternadas, soltura e acomodação. Cabeça, viga e partículas compartilham o ponto da boca. O cavaleiro compensa o movimento cinco passos depois do dinossauro, com rédeas, tronco e roupa. Os pés deixam de reproduzir um ciclo de caminhada durante a manipulação.
+- **Investida seguida de rajada:** antecipação, impacto do focinho no material, recuo e duas sequências de tiros do cavaleiro. A chapa responde pela dobradiça; não é substituída por um objeto novo. Os disparos ocorrem depois do contato principal, deixando as duas ações legíveis.
 
-Um material recém-atingido pode motivar a busca seguinte. Essa prioridade tem intervalo próprio e não ocupa indefinidamente o ciclo: ações elegíveis ausentes das últimas seis seleções recebem prioridade. As duas ações mais recentes continuam sendo evitadas quando há alternativas visíveis. A ordem inicial e sua rotação permanecem específicas de cada pátio.
+| Performance | Contatos principais | Soltura / tiros | Duração da ação |
+| --- | --- | --- | --- |
+| Sacudir viga | Pegada 52; esforço 78; sacudidas 112, 138 e 164 | Soltura 194 | 250 passos |
+| Investida e rajada | Investida 52 | Tiros 88, 93, 98, 103, 118 e 123 | 166 passos |
 
-As performances usam antecipação, esforço, contato e recuperação. O diretor escolhe os pontos visíveis antes de iniciar a ação. Uma caminhada pode ser redirecionada quando a câmera muda bastante; um contato já iniciado mantém seu destino. A entrada na rua seguinte continua reservada à apresentação original daquela rua.
+São passos nativos a 60 Hz. Caminhada, eventual virada e recuperação são adicionais. As manipulações anteriores de viga, pedra e chapa continuam usando as mesmas peças persistentes.
 
-| Busca | Pegada | Material cede | Soltura | Duração da ação |
-| --- | ---: | ---: | ---: | ---: |
-| Viga | 54 | 78 | 154 | 212 passos |
-| Pedra | 58 | 80 | 132 | 192 passos |
-| Chapa | 56 | 82 | 128 | 190 passos |
+O ponto de queda considera também o espaço necessário para o corpo e a boca na busca seguinte. Isso evita abandonar uma viga junto à borda da tela, ainda visível, mas impossível de alcançar na mesma composição.
 
-São passos nativos a 60 Hz. Deslocamento, eventual virada e recuperação ocorrem além desses tempos. A cena continua alternando estas buscas com investidas, pisadas, rajadas, caudadas, remexidas e rugidos.
+## Ritmo e pontaria
 
-## Continuidade e acabamento
+As rajadas isoladas têm quatro cadências, com seis a nove tiros. A arma percorre pontos dentro da superfície do alvo, em vez de disparar sempre no centro. Cada projétil conserva o ponto amostrado na saída. Perfurações ficam no material e acompanham a chapa quando ela abre. Há até doze marcas persistentes por objeto.
 
-- Há uma viga e uma pedra manipuláveis por pátio. Cada uma existe em um único lugar: pilha, boca ou chão. Nenhuma nova cópia é criada a cada repetição.
-- As peças conservam posição, orientação e desgaste. O deslocamento fica limitado ao espaço dos materiais. A viga se acomoda sobre o piso depois da queda.
-- Se a etapa muda durante uma pegada, a peça se solta onde está e termina de cair. O novo palco assume o personagem.
-- A chapa tem dobradiça, puxador, nervuras, marcas de impacto e uma estrutura visível atrás da abertura. Madeira e pedra receberam desenhos próprios para funcionar também soltas e giradas.
-- Os sons de contato distinguem madeira, pedra e metal e acompanham a pegada, o esforço e a aterrissagem. Usam o barramento de efeitos e o limite de vozes já existentes.
-- As partículas continuam breves e contidas no plano de fundo. Movimento reduzido preserva as ações principais e reduz oscilações e efeitos decorativos.
+Pisadas variam entre um, dois e três contatos. As remexidas têm séries de dois, três ou quatro movimentos; os rugidos alternam uma emissão longa e duas mais curtas. A pose lê os mesmos tempos que disparam os efeitos. As recuperações variam, com respiração, atenção ao objeto e manejo da arma.
+
+## O ambiente responde
+
+Cinco tipos de evento pequeno complementam as ações: **estalos de madeira, acomodação de pedras, corrente e chapa vibrando, rajadas de vento e vazamentos**. Um ataque pode provocar uma consequência atrasada. Há também eventos espaçados, com variação de intervalo e material. Não são sorteados novamente a cada quadro.
+
+- Pedra solta usa a física existente. Uma peça presa na boca ou uma chapa sendo manipulada fica protegida desses eventos.
+- Correntes têm fixação, elos e oscilação amortecida. Panos dobram a partir da amarração; folhas e poeira passam perto do piso.
+- Cais e Arsenal têm juntas de tubulação visíveis, gotas, pequenos respingos e marcas de umidade. O Arsenal acrescenta um sopro de vapor.
+- Um ruído pode levar o dinossauro a virar e observar por 34–50 passos antes de escolher a próxima ação. Há intervalo entre essas reações.
+- Aves bicam no pouso, fogem de impactos fortes e retornam com intervalos variados.
+- Estalos, correntes e vazamentos têm sons breves próprios no barramento existente de efeitos, com o mesmo limite de vozes.
+
+Os eventos começam apenas no pátio visível, respeitam a cena da torre e evitam os instantes próximos aos principais impactos e tiros. Estado e listas de efeitos são limitados. Movimento reduzido mantém poses essenciais, encaixes e desgaste, omitindo rajadas decorativas de vento e simplificando partículas.
 
 ## Material de autoria
 
-O vídeo reúne 80 segundos de composições simultâneas nos quatro pátios, feitos com o renderizador de produção. Os primeiros 60 segundos mantêm as posições; os últimos 20 percorrem o mesmo pátio com posições dirigidas. Não inclui áudio nem o combate em primeiro plano. Não é uma partida gravada, teste automatizado ou avaliação da dificuldade.
+O vídeo reúne **120 segundos**, a **30 quadros por segundo**, dos quatro pátios em composições simultâneas. Usa o renderizador de produção com posições dirigidas de Feka, sem áudio e sem combate em primeiro plano. Não é uma partida gravada nem uma avaliação da dificuldade. A simulação de animação continua a 60 Hz.
 
-`art-study.json` registra os momentos e posições usados na composição. A prancha organiza aproximação, esforço, elevação e soltura da viga, deslocamento da pedra e abertura da chapa.
+`art-study.json` registra a composição em vídeo, as escolhas de atividade e os eventos ambientais. `pose-study.json` registra uma segunda composição para a prancha, incluindo o contrapeso na direção oposta da sacudida. Ela apresenta sacudida, contrapeso do cavaleiro, investida, rajada, atenção a ruídos e pontaria.
 
-Nesse material de autoria, cada pátio registrou 15 inícios de performances e passou pelos nove tipos de ação. Isso descreve a composição produzida, não uma validação de gameplay.
+Nessa composição de poses, cada pátio passou pelas onze performances. São observações do material de autoria, não uma validação do combate.
 
 ```powershell
-node --import tsx scripts/render_hypothetical_aftermath.ts .tmp/aftermath-handling-release C:/Users/fabio/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/@napi-rs/canvas/index.js --handling
+node --import tsx scripts/render_hypothetical_aftermath.ts .tmp/aftermath-orchestration-final C:/Users/fabio/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/@napi-rs/canvas/index.js --orchestration
 ```
+
+Acrescente `--stills` para produzir somente a prancha e suas poses, sem gravar os quadros do vídeo.
 
 Publicação pelo fluxo do projeto, somente com build de produção, sem suíte de testes, typecheck ou revisão de navegador.

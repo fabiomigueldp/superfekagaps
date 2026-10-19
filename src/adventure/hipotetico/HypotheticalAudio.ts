@@ -1,6 +1,6 @@
 export type WeaponCue = 'shot' | 'impact' | 'splash' | 'collapse-water' | 'debris-land' | 'reload' | 'distant-shot' | 'distant-hit' | 'distant-crash' | 'distant-debris' | 'distant-thud'
     | 'guard-swipe' | 'guard-sweep' | 'guard-parry' | 'guard-stomp' | 'distant-roar'
-    | 'distant-wood' | 'distant-stone' | 'distant-metal' | 'distant-launch' | 'distant-rocket' | 'distant-blast' | 'distant-bell';
+    | 'distant-wood' | 'distant-stone' | 'distant-metal' | 'distant-creak' | 'distant-chain' | 'distant-leak' | 'distant-launch' | 'distant-rocket' | 'distant-blast' | 'distant-bell';
 interface Route { context: BaseAudioContext; destination: AudioNode; enabled: boolean }
 
 /** Short, owned voices on WorldAudio's existing effects bus. No new context or timers. */
@@ -25,6 +25,9 @@ export class HypotheticalAudio {
             kind==='distant-wood'?{duration:.16,filter:'bandpass' as BiquadFilterType,cutoff:1900,tail:540,noise:.31,pitch:174,end:74,body:.16,wave:'triangle' as OscillatorType}:
             kind==='distant-stone'?{duration:.27,filter:'lowpass' as BiquadFilterType,cutoff:1150,tail:240,noise:.34,pitch:112,end:46,body:.23,wave:'triangle' as OscillatorType}:
             kind==='distant-metal'?{duration:.36,filter:'bandpass' as BiquadFilterType,cutoff:2700,tail:840,noise:.14,pitch:710,end:395,body:.14,wave:'sine' as OscillatorType}:
+            kind==='distant-creak'?{duration:.42,filter:'bandpass' as BiquadFilterType,cutoff:840,tail:230,noise:.12,pitch:96,end:64,body:.08,wave:'triangle' as OscillatorType}:
+            kind==='distant-chain'?{duration:.3,filter:'highpass' as BiquadFilterType,cutoff:2500,tail:1550,noise:.11,pitch:1040,end:790,body:.045,wave:'sine' as OscillatorType}:
+            kind==='distant-leak'?{duration:.65,filter:'bandpass' as BiquadFilterType,cutoff:3100,tail:1200,noise:.16,pitch:200,end:130,body:.006,wave:'sine' as OscillatorType}:
             kind==='distant-launch'?{duration:.34,filter:'bandpass' as BiquadFilterType,cutoff:1900,tail:330,noise:.4,pitch:210,end:62,body:.22,wave:'triangle' as OscillatorType}:
             kind==='distant-rocket'?{duration:.3,filter:'bandpass' as BiquadFilterType,cutoff:900,tail:3100,noise:.24,pitch:180,end:470,body:.045,wave:'triangle' as OscillatorType}:
             kind==='distant-blast'?{duration:.64,filter:'lowpass' as BiquadFilterType,cutoff:2100,tail:100,noise:.55,pitch:94,end:29,body:.48,wave:'triangle' as OscillatorType}:

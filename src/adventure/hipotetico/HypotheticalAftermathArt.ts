@@ -7,6 +7,7 @@ import {AFTERMATH_PROPS} from './HypotheticalAftermathScore';
 import {drawGunTracer,drawGunImpact} from './HypotheticalGunfire';
 import {shutterHandle} from './HypotheticalAftermathHandling';
 import {drawDebrisPiece} from './HypotheticalDebrisArt';
+import {drawAftermathFittings,drawAftermathIncidents} from './HypotheticalAftermathEnvironmentArt';
 
 // Rear-street colours stay below the contrast of guards, bullets and playable ledges.
 const P={ink:'#516d70',dark:'#657c73',stone:'#92a18c',edge:'#c1b99a',wood:'#9e9475',grain:'#7d826d',
@@ -29,6 +30,8 @@ function secondaryProp(c:CanvasRenderingContext2D,x:number,y:number,index:number
             pixelLine(c,x-14+slip,yy+shake,x+14+slip,yy-3+shake,P.grain,4);
             pixelLine(c,x-12+slip,yy-1+shake,x+13+slip,yy-3+shake,P.light);
             box(c,x-8+slip,yy-2+shake,2,1,P.dark);
+            pixelLine(c,x-2+slip,yy-1+shake,x+3+slip,yy-2+shake,P.grain);
+            box(c,x+10+slip,yy-2+shake,1,2,P.dark);
         }
         pixelLine(c,x-9,y-19,x-8-s.wear*2,y-3,P.ink);pixelLine(c,x+9,y-19,x+9+s.wear*2,y-3,P.metal);
     }else if(index===1){
@@ -69,6 +72,13 @@ function secondaryProp(c:CanvasRenderingContext2D,x:number,y:number,index:number
         pixelLine(c,x+handle.x-3,y+2+handle.y,x+handle.x+3,y+2+handle.y,P.edge);
         pixelLine(c,x-10,y-7,x-10+dx*.85,y-35+dy*.85,P.dark);
         box(c,x-14,y-3,31,3,P.dark);
+    }
+    // Shot scars sit on the same material surface, including the hinged panel.
+    for(const [j,scar] of s.scars.entries()){
+        const t=(scar.y+38)/30,xx=x+scar.x+(index===2?-s.hingeFacing*Math.sin(s.hinge)*22*t:0);
+        const yy=index===2?y-35+Math.cos(s.hinge)*30*t:y+3+scar.y;
+        box(c,xx,yy,1+(j%3===0?1:0),1,P.ink);
+        if(j%2===0)pixelLine(c,xx-1,yy+1,xx+2,yy+1,index===0?P.wood:P.shine);
     }
     if(s.piece&&!s.piece.held){
         const p=s.piece,material=index===0?'timber':'stone';
@@ -191,6 +201,7 @@ function masonry(c:CanvasRenderingContext2D,x:number,y:number,s:AftermathYard,ti
 
 function gull(c:CanvasRenderingContext2D,x:number,y:number,age:number,seed:number,flying:boolean,reduced:boolean){
     const flap=reduced?0:Math.sin(age*.3+seed),wing=flap*5;
+    const peck=flying||reduced?0:Math.max(0,Math.sin(age*.42+seed*1.7)-.72)*6;
     if(flying){
         pixelLine(c,x-1,y,x-7,y-wing,P.wing,2);pixelLine(c,x-7,y-wing,x-10,y-wing+1,P.bird);
         pixelLine(c,x+1,y,x+7,y-wing*.8,P.bird,2);pixelLine(c,x+7,y-wing*.8,x+9,y-wing*.8+1,P.wing);
@@ -198,7 +209,8 @@ function gull(c:CanvasRenderingContext2D,x:number,y:number,age:number,seed:numbe
         box(c,x-2,y+3,1,2,P.grain);box(c,x+2,y+3,1,2,P.grain);
         box(c,x-5,y-1,6,4,P.wing);box(c,x-4,y-2,5,2,P.bird);
     }
-    oval(c,x-3,y-1,7,4,P.bird);box(c,x+2,y-3,3,3,P.bird);box(c,x+4,y-2,2,1,P.light);box(c,x+3,y-3,1,1,P.ink);
+    oval(c,x-3,y-1,7,4,P.bird);box(c,x+2+peck*.4,y-3+peck,3,3,P.bird);
+    box(c,x+4+peck*.4,y-2+peck,2,1,P.light);box(c,x+3+peck*.4,y-3+peck,1,1,P.ink);
 }
 
 /** Back layer: grounded props, real exits and small actors before the dinosaur. */
@@ -208,6 +220,7 @@ export function drawAftermathYards(c:CanvasRenderingContext2D,b:HypotheticalBack
         const x=yard.origin,s=a.yards[i];
         if(x+390<cameraX||x+110>cameraX+320)continue;
         refuge(c,x,base,i);
+        drawAftermathFittings(c,x,base,s.environment,a.tick,reduced);
         for(const [j,prop] of AFTERMATH_PROPS.entries())secondaryProp(c,x+prop.offset,base-3,j,s.props[j],a.tick,reduced);
         if(s.runnerAt>=0){
             // The stack hides the start of the escape; actors emerge past its actual right edge.
@@ -222,13 +235,13 @@ export function drawAftermathYards(c:CanvasRenderingContext2D,b:HypotheticalBack
         // Two birds inhabit the service eave; two inspect the intact stack below it.
         for(let j=0;j<4;j++){
             const age=s.birdsAt<0?-1:a.tick-s.birdsAt-j*6;
-            const returned=age>1450;
+            const returned=age>s.birdsReturn;
             if(reduced&&s.birdsAt>=0)continue;
             if(age>142&&!returned)continue;
             const eave=s.birdsFlights>1;
             const perchX=x+(eave?335+j*7:j<2?264+j*14:344+(j-2)*9),perchY=base-(eave?i===3?32:47:j<2?33:i===3?32:47);
-            const flight=age>=0&&age<=142,landing=returned&&age<1606;
-            const t=flight?age:landing?1606-age:0;
+            const flight=age>=0&&age<=142,landing=returned&&age<s.birdsReturn+156;
+            const t=flight?age:landing?s.birdsReturn+156-age:0;
             const xx=flight?perchX+t*.93:returned?x+335+j*7+t*.4:perchX;
             const yy=flight?perchY-Math.min(65,t*.78):returned?base-(i===3?32:47)-t*.6:perchY;
             gull(c,xx,yy,flight||landing?a.tick:a.tick*.12,j,flight||landing,reduced);
@@ -239,6 +252,7 @@ export function drawAftermathYards(c:CanvasRenderingContext2D,b:HypotheticalBack
 /** Front layer: short contact accents, persistent chips and low settling dust. */
 export function drawAftermathEffects(c:CanvasRenderingContext2D,a:HypotheticalAftermath,base:number,reduced:boolean){
     for(const [i,s] of a.yards.entries()){
+        drawAftermathIncidents(c,AFTERMATH_YARDS[i].origin,base,s.environment,a.tick,reduced);
         for(const [j,prop] of s.props.entries()){
             const p=prop.piece;
             if(p?.moving&&!p.held)drawDebrisPiece(c,AFTERMATH_YARDS[i].origin+AFTERMATH_PROPS[j].offset+p.x,
