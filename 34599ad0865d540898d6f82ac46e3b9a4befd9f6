@@ -1,0 +1,28 @@
+Technical documentation supplement for 34599ad0865d540898d6f82ac46e3b9a4befd9f6
+
+feat(hipotetico): refine helicopter wreck physics and courtyard interaction
+
+Replace prescribed aircraft resting angles with support-point contact impulses and add physical interaction with the rear service barrier.
+
+Implementation
+HypotheticalAircraftPhysics.ts extracts AircraftBody, AircraftPose, AIRCRAFT_SHAPES, aircraftPoint(), aircraftOutline() and stepAircraftBody(). Two substeps resolve support vertices using angular contact velocity, normal impulse, friction, restitution and low-energy sleep.
+
+The main rotor retains its blade phase/rate on release. Its projection changes the drawn outline and contact geometry. A detached tail rotor retains damped accessory motion. Door and panel sheets flatten in depth with matching collision derivatives instead of being forced toward a fixed screen angle.
+
+After contact, the hull compresses and its nose dents. Art adds exposed edges, cracked glazing, falling-part shadows and bounded contact sparks. Ejection trajectories keep the tail, rotor and cargo door within the directed composition.
+
+HypotheticalHelicopter adds HELICOPTER_RAIL, a swept skid/barrier check, released rail body, bent supports and merged pavement scars. Marks retain stronger impacts within 32 entries; transient sparks are capped at 28. Helicopter art adds the rear apron, drain and damaged barrier.
+
+Timing and limitations
+This is bounded 2D scenic physics with projected sheet/blade geometry and a fixed ground support. It is not a general solver for collisions between every moving wreck part.
+
+The original authoring record reports rail failure 71 ticks after missile contact, ground contact four ticks later, and a resting hull plus seven detached bodies at eight seconds. These apply to that composition and are not new validation.
+
+Authoring material
+Refreshes the helicopter study and authoring renderer; adds landing-study.png and updates launch-study.png. The records contain 15 retained paving marks in the authored final frame.
+
+Publication evidence
+A retained successful publisher response identifies build `34599ad0865d540898d6f82ac46e3b9a4befd9f6-c58828da718b` for this exact source revision. The matching request records command `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its saved build-log SHA-256 is `8c79c2b9189d4f78c543dd76842b46b77cdebe0251942fad8d0f16e108cda585`. This records build and activation completion; it is not evidence of correct gameplay, audio quality or passing tests.
+
+Full source map and patch inventory: docs/commits/2026-10-19-followup/34599ad.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
