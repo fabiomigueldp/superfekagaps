@@ -1,0 +1,18 @@
+Technical documentation supplement for c667ac36836b2874c89c13c6ccb65707de54744d
+
+Polish Bastion tower collapse, launcher continuity and cinematic direction
+
+Behavior
+Refine launcher continuity, pre-ignition cancellation and the rider response to the falling tower.
+
+Implementation
+launcherGeometry() moves the shared mouth anchor to the warhead tip. The tower motion aligns hand withdrawal with stowing; a cancelled shot no longer produces firing recoil. The framing abort check includes the firing frame. towerLauncherPose() and body pose follow the falling structure. Tower artwork and synthesized bell treatment are updated with a documented authoring sequence.
+
+Scope and limitations
+Adds the initial tower-cinematic-2026-10-19 presentation, video, pose images and art-study.json. These are directed scene renders; they are not a recorded full fight or an audio evaluation.
+
+Publication evidence
+A successful local publisher receipt identifies build `c667ac36836b2874c89c13c6ccb65707de54744d-0794345fc070` for this exact source commit. The report records `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its build-log SHA-256 is `f59081843d7f01ce5c575eac02b8a75f3947083fdf5eb29e9b9e8112c7b06e1a`. This establishes recorded build/publication completion, not gameplay correctness.
+
+Full file inventory and provenance: docs/commits/2026-10-19/c667ac3.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
