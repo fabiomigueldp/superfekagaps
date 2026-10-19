@@ -1,0 +1,18 @@
+Technical documentation supplement for 9703bb943f5c9d551be23ccfafdafcf0c64f15f8
+
+Refine background debris searches, physical props and activity orchestration
+
+Behavior
+Add physical prop handling to background searches: timber hauling, stone sifting and hinged iron-shutter manipulation.
+
+Implementation
+HypotheticalAftermathHandling.ts defines AftermathProp, LooseDebris, HeldDebris, handlingTiming(), handlingMotion(), shutterHandle() and stepAftermathProp(). Pieces transfer between pile, jaw and ground; free pieces bounce and settle, while iron uses a driven/released hinge. HypotheticalDebrisArt.ts draws held debris. Aftermath planning aligns actor movement and jaw contact with prop positions; rendering and material audio consume the shared state.
+
+Scope and limitations
+Adds debris-interactions-2026-10-19 images, video and state records. Props use bounded local scenic physics, not a replacement for the player collision engine.
+
+Publication evidence
+A successful local publisher receipt identifies build `9703bb943f5c9d551be23ccfafdafcf0c64f15f8-ba634c76a2e8` for this exact source commit. The report records `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its build-log SHA-256 is `5a28179d7c2d3b42f6c33d7bf2af315dd4b00a90c90e8bfda95740ba4c267dcc`. This establishes recorded build/publication completion, not gameplay correctness.
+
+Full file inventory and provenance: docs/commits/2026-10-19/9703bb9.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
