@@ -7,8 +7,9 @@ const PLAYER_NAME_KEY = 'super_feka_gaps_player_name';
 
 export class GlobalScoreboard {
   private root: HTMLElement;
-  private panel: HTMLElement;
+  private panel: HTMLDialogElement;
   private openButton: HTMLButtonElement;
+  private doneButton: HTMLButtonElement;
   private form: HTMLFormElement;
   private nameInput: HTMLInputElement;
   private status: HTMLElement;
@@ -16,7 +17,7 @@ export class GlobalScoreboard {
   private score = 0;
   private durationMs = 0;
   private canSubmit = false;
-  private open = false;
+  private returnFocus: HTMLElement | null = null;
 
   constructor() {
     this.root = document.createElement('section');
@@ -24,8 +25,7 @@ export class GlobalScoreboard {
     this.root.hidden = true;
     this.root.innerHTML = `
       <button class="scoreboard-tab" type="button" hidden>PLACAR GLOBAL</button>
-      <div class="scoreboard-backdrop" hidden>
-        <div class="scoreboard-panel" role="dialog" aria-modal="true" aria-labelledby="scoreboard-title">
+      <dialog class="scoreboard-panel" aria-labelledby="scoreboard-title">
           <div class="scoreboard-heading"><span class="scoreboard-kicker">SUPER FEKA GAPS · REMASTER</span><button class="scoreboard-close" type="button" aria-label="Fechar placar">×</button></div>
           <h2 id="scoreboard-title">HALL DOS HERÓIS</h2>
           <p class="scoreboard-subtitle">Os maiores recordes de todos os jogadores</p>
@@ -38,22 +38,23 @@ export class GlobalScoreboard {
           </form>
           <p class="scoreboard-status" role="status" aria-live="polite"></p>
           <button class="scoreboard-done" type="button">VOLTAR AO JOGO</button>
-        </div>
-      </div>`;
+      </dialog>`;
     document.body.append(this.root);
-    this.panel = this.root.querySelector('.scoreboard-backdrop') as HTMLElement;
+    this.panel = this.root.querySelector('.scoreboard-panel') as HTMLDialogElement;
     this.openButton = this.root.querySelector('.scoreboard-tab') as HTMLButtonElement;
+    this.doneButton = this.root.querySelector('.scoreboard-done') as HTMLButtonElement;
     this.form = this.root.querySelector('.scoreboard-form') as HTMLFormElement;
     this.nameInput = this.root.querySelector('#scoreboard-name') as HTMLInputElement;
     this.status = this.root.querySelector('.scoreboard-status') as HTMLElement;
     this.list = this.root.querySelector('.scoreboard-entries') as HTMLOListElement;
-    this.openButton.addEventListener('click', () => this.openPanel());
+    this.openButton.addEventListener('click', () => this.openPanel(this.openButton));
     this.root.querySelector('.scoreboard-close')?.addEventListener('click', () => this.closePanel());
-    this.root.querySelector('.scoreboard-done')?.addEventListener('click', () => this.closePanel());
+    this.doneButton.addEventListener('click', () => this.closePanel());
+    this.panel.addEventListener('close', () => this.restoreFocus());
     this.form.addEventListener('submit', event => { event.preventDefault(); void this.publish(); });
   }
 
-  get isOpen(): boolean { return this.open; }
+  get isOpen(): boolean { return this.panel.open; }
 
   showEnding(score: number, durationMs: number, canSubmit: boolean): void {
     this.score = score;
@@ -72,22 +73,39 @@ export class GlobalScoreboard {
   }
 
   hide(): void {
-    this.open = false;
+    const hadFocus = this.panel.open || this.root.contains(document.activeElement);
     this.root.hidden = true;
-    this.panel.hidden = true;
+    this.returnFocus = null;
+    this.panel.close();
+    if (hadFocus) document.querySelector<HTMLCanvasElement>('#game-canvas')?.focus({ preventScroll: true });
   }
 
-  private openPanel(): void {
-    this.open = true;
-    this.panel.hidden = false;
+  private openPanel(trigger: Element | null = document.activeElement): void {
+    if (this.panel.open) return;
+    this.returnFocus = trigger instanceof HTMLElement && trigger !== document.body
+      ? trigger : document.querySelector<HTMLCanvasElement>('#game-canvas');
+    this.nameInput.autofocus = !this.form.hidden;
+    this.doneButton.autofocus = this.form.hidden;
+    this.panel.showModal();
     this.openButton.hidden = true;
   }
 
   private closePanel(): void {
-    this.open = false;
-    this.panel.hidden = true;
+    this.panel.close();
+    this.restoreFocus();
+  }
+
+  private restoreFocus(): void {
+    // Native Escape also fires close. Ignore a queued close after a new opening.
+    if (this.panel.open || this.root.hidden) return;
     this.openButton.hidden = false;
-    document.querySelector<HTMLCanvasElement>('#game-canvas')?.focus();
+    const target = this.returnFocus;
+    this.returnFocus = null;
+    if (!target) return;
+    if (target.isConnected && !target.closest('[hidden], [inert]')) target.focus({ preventScroll: true });
+    if (!target.isConnected || document.activeElement !== target) {
+      document.querySelector<HTMLCanvasElement>('#game-canvas')?.focus({ preventScroll: true });
+    }
   }
 
   private render(entries: Entry[]): void {
@@ -116,6 +134,8 @@ export class GlobalScoreboard {
       if (!response.ok) throw new Error();
       const data = await response.json() as RankingResponse;
       this.render(data.entries);
+      // A loaded ranking can grow above the focused control on short screens.
+      if (this.panel.open) this.panel.querySelector<HTMLElement>(':focus')?.scrollIntoView({ block: 'nearest' });
       this.status.textContent = '';
     } catch {
       this.status.textContent = 'Placar indisponível. Seu recorde local continua salvo.';
@@ -130,6 +150,8 @@ export class GlobalScoreboard {
       return;
     }
     const button = this.form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    // Keep Escape and Tab inside the dialog while the submit button is disabled.
+    if (document.activeElement === button) this.nameInput.focus();
     button.disabled = true;
     this.status.textContent = 'Publicando recorde…';
     try {
@@ -144,6 +166,12 @@ export class GlobalScoreboard {
       localStorage.setItem(PLAYER_NAME_KEY, name);
       this.render(data.entries);
       this.status.textContent = data.saved ? 'Recorde publicado! Seu nome já está no placar.' : 'Seu recorde publicado já é igual ou maior.';
+      // Move focus before hiding the form, including a lost-focus fallback, but
+      // do not steal it after closing or navigating to another dialog control.
+      const active = document.activeElement;
+      if (this.panel.open && (this.form.contains(active) || active === document.body || active === this.panel)) {
+        this.doneButton.focus();
+      }
       this.form.hidden = true;
       this.canSubmit = false;
     } catch (error) {

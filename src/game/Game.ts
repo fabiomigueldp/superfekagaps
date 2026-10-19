@@ -122,6 +122,19 @@ export class Game {
     } else {
       this.state = GameState.BOOT;
     }
+
+    window.addEventListener('blur', () => this.handleInterruption(true));
+    window.addEventListener('focus', () => this.handleInterruption(false));
+    document.addEventListener('visibilitychange', () => this.handleInterruption(document.hidden));
+  }
+
+  private handleInterruption(interrupted: boolean): void {
+    // Discard commands and elapsed time on departure and return. Regaining
+    // focus never resumes play; the existing pause controls still own that.
+    this.input.reset();
+    this.lastTime = performance.now();
+    this.accumulator = 0;
+    if (interrupted && this.state === GameState.PLAYING) this.changeState(GameState.PAUSED);
   }
 
   start(): void {
@@ -1032,8 +1045,10 @@ export class Game {
     // 5. Aplica shake
     if (this.camera.shakeTimer > 0) {
       this.camera.shakeTimer -= deltaTime;
-      this.camera.x += (Math.random() - 0.5) * this.camera.shakeMagnitude;
-      this.camera.y += (Math.random() - 0.5) * this.camera.shakeMagnitude;
+      if (!this.renderer.reducedMotion) {
+        this.camera.x += (Math.random() - 0.5) * this.camera.shakeMagnitude;
+        this.camera.y += (Math.random() - 0.5) * this.camera.shakeMagnitude;
+      }
     }
   }
 
