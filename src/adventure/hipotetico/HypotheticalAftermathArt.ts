@@ -11,6 +11,7 @@ import {drawAftermathFittings,drawAftermathIncidents} from './HypotheticalAfterm
 import {drawAftermathContact} from './HypotheticalAftermathParticles';
 import {drawAftermathFlock} from './HypotheticalAftermathFlockArt';
 import {drawEscapeFixtures,drawEscapeActors,drawEscapeDust} from './HypotheticalAftermathEscapeArt';
+import {drawForageCover} from './HypotheticalAftermathForageArt';
 
 // Rear-street colours stay below the contrast of guards, bullets and playable ledges.
 const P={ink:'#516d70',dark:'#657c73',stone:'#92a18c',edge:'#c1b99a',wood:'#9e9475',grain:'#7d826d',
@@ -262,6 +263,7 @@ export function drawAftermathEffects(c:CanvasRenderingContext2D,a:HypotheticalAf
         }
     }
     if(!a.active)return;
+    drawForageCover(c,a.yard.forage,base,reduced);
     for(const shot of a.shots)drawGunTracer(c,shot,0,base,reduced,true);
     for(const hit of a.impacts)drawGunImpact(c,hit,a.tick,0,base,reduced,true);
     for(const p of a.contacts)drawAftermathContact(c,p,a.tick,base,reduced);

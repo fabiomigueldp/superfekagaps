@@ -40,7 +40,7 @@ export function drawEscapeFixtures(c:CanvasRenderingContext2D,s:AftermathEscape,
 export function drawEscapeActors(c:CanvasRenderingContext2D,b:HypotheticalBackdrop,s:AftermathEscape,base:number,reduced:boolean){
     for(const e of s.entries){
         const age=s.tick-e.begunAt,t=ESCAPE_TIMINGS[e.kind];
-        if(e.begunAt>=0&&age>=t.peek&&!e.person.escaped){
+        if(e.begunAt>=0&&age>=t.peek&&!e.person.escaped&&e.removedAt<0){
             const reveal=smoothMotion((age-t.peek)/20);
             // The shared gait, wardrobe, glance and fall remain at the same
             // world coordinates; only the lower doorway/stone lip occludes them.

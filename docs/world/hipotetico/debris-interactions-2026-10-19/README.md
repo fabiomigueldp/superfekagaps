@@ -2,6 +2,46 @@
 
 Revisão de 19/10/2026, integrada ao encontro nativo `/?encounter=hipotetico`.
 
+## Investigação e alimentação sugerida
+
+Refinamento 10: `HypotheticalAftermathForage` acrescenta uma passagem ocasional
+de alimentação implícita, com duas cadências. Usa exclusivamente as figuras
+atingidas nas fugas de `HypotheticalAftermathEscape`. A elegibilidade exige
+queda concluída, pelo menos 360 passos desde o acerto e espaço para o alvo,
+montaria e cauda. Não cria novos corpos para alimentar um ciclo.
+
+A aproximação usa a caminhada e o giro nativos. `aftermathFooting` assenta uma
+pata de cada vez; os apoios permanecem plantados durante a descida. O contato
+da mandíbula parte da mesma âncora usada pelo desenho. Tronco, joelhos e
+pescoço dividem o movimento, com contrapeso da cauda e uma resposta do cavaleiro
+cinco passos depois. A inclinação preserva a ligação entre quadril e sela.
+
+- **Cadência contínua:** farejadas em 22 e 44; descida entre 50 e 96; contato
+  seco em 96; consequência encoberta em 126; recuperação até 284.
+- **Cadência interrompida:** a corrente recebe um impulso em 56; a reação começa
+  em 60, antes de retomar a descida. O restante dessa passagem recebe 44 passos
+  adicionais. As duas cadências alternam entre figuras e pátios.
+
+A ação sobre o corpo é sugerida atrás de uma nuvem baixa, sem desenho de
+manipulação corporal. A oclusão fica completa antes de marcar `removedAt`.
+A figura não é mais desenhada ou movimentada depois disso, inclusive ao
+reenquadrar o local. O núcleo opaco da poeira também é mantido com movimento
+reduzido; partículas soltas e deriva são detalhes opcionais. Grãos têm queda,
+pequeno ressalto e desaceleração horizontal.
+
+Há um intervalo de pelo menos 1680 passos e cinco outras performances entre
+duas dessas passagens no mesmo pátio. As escolhas ambientais aguardam a
+preparação e a ação; a corrente da variante interrompida recebe um impulso
+direto e visível. Uma mudança de rua encerra a passagem anterior, preservando
+qualquer consequência já ocorrida. A torre e sua busca seguem prioritárias.
+
+`render_hypothetical_forage.ts` produz quatro composições de seis segundos,
+a 60 fps, e amostras da oclusão com movimento reduzido. `forage-study.json`
+registra poses, apoios, alvo, mandíbula e instantes da composição. O material
+foi dirigido com Feka parado e sem combate em primeiro plano ou áudio. É uma
+prévia de animação, não uma partida ou teste de gameplay. A publicação usa
+somente o build Vite; sem suíte de testes, typecheck ou revisão de navegador.
+
 ## Descobertas e perseguições
 
 Refinamento 9: `HypotheticalAftermathEscape` acrescenta dois acontecimentos

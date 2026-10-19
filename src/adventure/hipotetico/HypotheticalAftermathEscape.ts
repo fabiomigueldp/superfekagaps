@@ -5,7 +5,7 @@ import {smoothMotion} from './HypotheticalMotion';
 export type EscapeKind='rubble'|'hatch';
 export interface EscapeEntry {
     kind:EscapeKind; from:number; exit:number; stance:number; person:Bystander;
-    begunAt:number; completed:boolean; hitVelocity:number; marks:Array<{x:number;y:number}>;
+    begunAt:number; completed:boolean; removedAt:number; hitVelocity:number; marks:Array<{x:number;y:number}>;
 }
 export const ESCAPE_TIMINGS={
     rubble:{peek:22,run:64,chase:82,runTime:132,shots:[112,117,122,148,153,158,178,183],duration:260},
@@ -32,7 +32,7 @@ export class AftermathEscape {
                 hitAt:null,color:(district+i)%4,distance:0,velocity:0,alertAt:Number.MAX_SAFE_INTEGER,
                 speed:1,district,clothes:'star-shirt',stoppedAt:null,threatenedAt:null,startledAt:null,
                 reactionTimes:[],appearance:20+district*2+i,depth:-4,exitAtShelter:true};
-            return {kind,from,exit,stance:from-78,person,begunAt:-1,completed:false,hitVelocity:0,marks:[]};
+            return {kind,from,exit,stance:from-78,person,begunAt:-1,completed:false,removedAt:-1,hitVelocity:0,marks:[]};
         });
     }
     get entry(){return this.entries[this.selected];}
@@ -68,7 +68,7 @@ export class AftermathEscape {
         this.tick=tick;this.events=[];
         this.dust=this.dust.filter(p=>tick-p.born<80);
         for(const [index,e] of this.entries.entries()){
-            if(e.begunAt<0)continue;
+            if(e.begunAt<0||e.removedAt>=0)continue;
             const age=tick-e.begunAt,t=ESCAPE_TIMINGS[e.kind],p=e.person;
             const previous=p.x;p.velocity=0;
             if(p.hitAt!==null){
