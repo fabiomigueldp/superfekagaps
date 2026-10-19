@@ -5,6 +5,7 @@ import { HypotheticalBackdrop, BACKDROP_RIG, backdropBaseline } from '../src/adv
 import { distantRiderPose, drawHypotheticalBackground } from '../src/adventure/hipotetico/HypotheticalArt';
 import { devastationAt, ARRIVAL_RAM, ARRIVAL_BITE, SCENIC_STARTS, DESTRUCTION_SITES, ruinAge, rubbleApproach } from '../src/adventure/hipotetico/HypotheticalDevastation';
 import {ARRIVAL} from '../src/adventure/hipotetico/HypotheticalArrival';
+import {scenicLandingCues} from '../src/adventure/hipotetico/HypotheticalScenicMotion';
 import { bystanderPose } from '../src/adventure/hipotetico/HypotheticalBystanders';
 import { HypotheticalGame } from '../src/adventure/hipotetico/HypotheticalGame';
 import { riderBend } from '../src/adventure/hipotetico/HypotheticalMotion';
@@ -75,7 +76,7 @@ test('arrival lets the final bullet land before the ram and leaves a readable af
     }
     assert.ok(contact-lastShot>=50);assert.ok(contact-lastImpact>=30);
     assert.ok(ARRIVAL.deployment-contact>=90,'let settling debris and the look back finish before opening the guard posts');
-    assert.equal(debris.length,4);assert.deepEqual(debris,contacts.flatMap(t=>[t+18,t+34]));
+    assert.equal(debris.length,4);assert.deepEqual(debris,contacts.flatMap((t,i)=>scenicLandingCues(i).map(at=>t+at)));
 });
 
 test('distant rider remains below the HUD through every attack and courtyard falls clear the near scaffold',()=>{

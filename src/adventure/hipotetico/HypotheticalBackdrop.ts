@@ -4,6 +4,7 @@ import {SIEGE_SECTORS,SIEGE_WIDTH} from './HypotheticalSiege';
 import { bystanderIntersection } from './HypotheticalBystanderMotion';
 import { gunRecoil, type GunImpact } from './HypotheticalGunfire';
 import {OPENING} from './HypotheticalOpening';
+import {scenicLandingCues} from './HypotheticalScenicMotion';
 
 /** All positions are native pixels, relative to the distant street's baseline. */
 export const BACKDROP_RIG = { width: 192, height: 160, scale: .6875, x: 92, y: 148 } as const;
@@ -114,9 +115,9 @@ export class HypotheticalBackdrop {
         if(m.local===m.impactTick&&this.breaches[m.siteIndex]<0){
             this.breaches[m.siteIndex]=tick;this.events.push('break');
         }
-        // The facade lands after contact. Its two quieter falls leave the initial blow legible.
+        // Quieter secondary sounds belong to actual wall/roof/cargo landings.
         const brokenAt=this.breaches[m.siteIndex];
-        if(m.district===0&&brokenAt>=0&&[18,34].includes(tick-brokenAt))this.events.push('distant-debris');
+        if(brokenAt>=0&&scenicLandingCues(m.siteIndex).includes(tick-brokenAt))this.events.push('distant-debris');
         this.footfalls=this.footfalls.filter(p=>tick-p.born<28);
         const pace=Math.PI*11*BACKDROP_RIG.scale;
         if(Math.floor(this.travel/pace)>Math.floor(oldTravel/pace)&&m.lift===0){

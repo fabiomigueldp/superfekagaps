@@ -1,0 +1,82 @@
+{
+  "receipt": {
+    "act": "duel",
+    "phase": 3,
+    "health": 0,
+    "won": true,
+    "deaths": 3,
+    "ticks": 8308
+  },
+  "inputFrames": 8704,
+  "videoFrames": 273,
+  "captures": [
+    {
+      "file": "forecourt.png",
+      "frame": 1305,
+      "playerX": 48,
+      "sceneTick": 24
+    },
+    {
+      "file": "vault-tell.png",
+      "frame": 3317,
+      "playerX": 1603.9886132284018,
+      "sceneTick": 1601
+    },
+    {
+      "file": "vault-action.png",
+      "frame": 3363,
+      "playerX": 1736.3726164284017,
+      "sceneTick": 1647
+    },
+    {
+      "file": "vanguard-hit.png",
+      "frame": 3417,
+      "playerX": 1616.4036394812017,
+      "sceneTick": 1701
+    },
+    {
+      "file": "bastion-destruction.png",
+      "frame": 3496,
+      "playerX": 1654.8352232512777,
+      "sceneTick": 1780
+    },
+    {
+      "file": "bastion-open.png",
+      "frame": 3647,
+      "playerX": 1938,
+      "sceneTick": 1931
+    }
+  ],
+  "scenes": [
+    {
+      "frame": 1525,
+      "street": 0,
+      "cameraX": 0,
+      "siteX": 226
+    },
+    {
+      "frame": 1838,
+      "street": 0,
+      "cameraX": 219.47991223846697,
+      "siteX": 482
+    },
+    {
+      "frame": 2547,
+      "street": 1,
+      "cameraX": 754.3,
+      "siteX": 898
+    },
+    {
+      "frame": 3220,
+      "street": 2,
+      "cameraX": 1132.4886132284018,
+      "siteX": 1314
+    },
+    {
+      "frame": 3496,
+      "street": 3,
+      "cameraX": 1522.8352232512777,
+      "siteX": 1730
+    }
+  ]
+}

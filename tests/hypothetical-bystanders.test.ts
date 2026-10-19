@@ -71,7 +71,7 @@ test('shots and reactions remain bounded, and replaying a cleared district recon
     for(let tick=1;tick<=2000;tick++){
         a.update(tick);maxShots=Math.max(maxShots,a.shots.length);maxImpacts=Math.max(maxImpacts,a.impacts.length);
         if(SCENIC_STARTS.slice(1).some(start=>start===tick)){
-            const restored=new HypotheticalModel('siege',9,SCENIC_STARTS.indexOf(tick)).backdrop;
+            const restored=new HypotheticalModel('siege',9,SCENIC_STARTS.findIndex(start=>start===tick)).backdrop;
             assert.deepEqual(restored.people,a.people);assert.deepEqual(restored.blood,a.blood);assert.deepEqual(restored.breaches,a.breaches);
         }
     }

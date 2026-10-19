@@ -1,5 +1,5 @@
 import { smoothMotion } from './HypotheticalMotion';
-import {SIEGE_SECTORS} from './HypotheticalSiege';
+import {SIEGE_SECTORS,SIEGE_WIDTH} from './HypotheticalSiege';
 import {arrivalOpeningAt,OPENING} from './HypotheticalOpening';
 
 /** Authored contacts share a clock across scenery, rider, crowd and effects. */
@@ -11,8 +11,8 @@ export const SCENIC_STARTS=[0,800,1200,1600] as const;
 export const SCENIC_END=SCENIC_STARTS[SCENIC_STARTS.length-1]+DEVASTATION.period;
 export const scenicDistrict=(tick:number)=>SCENIC_STARTS.reduce<number>((district,start,i)=>tick>=start?i:district,0);
 
-/** A street opens its scene only after Feka can see the stage. Holding here is
- * deliberately before the entrance, not halfway through a strike or fall. */
+/** A street enters only after Feka can see it. Later contacts also wait when
+ * their target leaves the viewport, instead of silently creating offscreen ruins. */
 export function nextScenicTick(tick:number,playerX:number,cleared:number){
     const next=Math.min(SCENIC_END,tick+1),district=scenicDistrict(next);
     // A quick player may leave a street before its performance finishes. Start
@@ -22,7 +22,7 @@ export function nextScenicTick(tick:number,playerX:number,cleared:number){
     if(visible>scenicDistrict(tick))return SCENIC_STARTS[visible];
     if(district>0&&next===SCENIC_STARTS[district]
         &&(cleared<district||playerX<SIEGE_SECTORS[district].origin+96))return tick;
-    // Wait at a planted neutral pose before winding up if Feka backed away.
+    // Suspend unseen contact, including a retry that starts behind this street.
     if(district>0&&next-SCENIC_STARTS[district]>=DEVASTATION.prepare&&next-SCENIC_STARTS[district]<DEVASTATION.recover){
         const center=DESTRUCTION_SITES[district+1].x+38;
         if(playerX<center-164||playerX>center+108)return tick;
@@ -50,7 +50,7 @@ export function devastationAt(tick:number) {
         :local<timing.strike?150-12*wind:local<timing.impact?138+40*drive
         :local<timing.hold?178:local<timing.recover?178-10*release
         :district===0?168+192*smoothMotion((local-302)/98)
-        :168+(local-225)*168/175;
+        :168+Math.min(175,local-225)*(district===SIEGE_SECTORS.length-1?SIEGE_WIDTH-SIEGE_SECTORS[district].origin+112-168:168)/175;
     if(plaza)x=local<=400?168+192*smoothMotion((local-302)/98):local<430?360+46*smoothMotion((local-400)/30)
         :local<timing.strike?406-12*wind:local<timing.impact?394+40*drive
         :local<timing.hold?434:local<timing.recover?434-10*release

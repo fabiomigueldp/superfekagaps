@@ -8,14 +8,14 @@ import type { HypotheticalModel } from './HypotheticalModel';
  * Refuge doors are on this street as well; nobody walks through a closed gate. */
 export function forecourtPeople(tick:number):Bystander[]{
     return [140,158,180,203,232,254,278,303].map((originX,i)=>{
-        const shelter=i<4?118:332,alertAt=34+i*9,runTicks=58+Math.abs(shelter-originX)*.55;
+        const shelter=i<4?118:332,alertAt=(i>=6?130:34)+i*9,runTicks=58+Math.abs(shelter-originX)*.55;
         const u=Math.max(0,Math.min(1,(tick-alertAt-18)/runTicks));
         const x=originX+(shelter-originX)*smoothMotion(u);
         return {x,originX,shelter,alertAt,runTicks,escaped:u===1,fleeing:tick>=alertAt,
             hitAt:null,color:i%4,clothes:i===2?'scarf':i===6?'satchel':'star-shirt',
             distance:Math.abs(x-originX),velocity:(shelter-originX)*6*u*(1-u)/runTicks,
             speed:1,district:0,stoppedAt:null,threatenedAt:alertAt,startledAt:alertAt,
-            reactionTimes:[alertAt],appearance:3+i,depth:i%2?-2:0,exitAtShelter:true,
+            reactionTimes:i>=6?[40,alertAt]:[alertAt],appearance:3+i,depth:i%2?-2:0,exitAtShelter:true,
             belonging:i===2?'papers':undefined};
     });
 }
@@ -43,7 +43,7 @@ export function drawForecourt(c:CanvasRenderingContext2D,b:HypotheticalModel,cx:
     pixelLine(c,232-cx,y-5,214-cx,y-1,'#586e6c',2);box(c,212-cx,y-10,11,2,'#dad0af');
     box(c,282-cx,y-16,12,16,'#294653');box(c,283-cx,y-15,10,14,'#45616a');
     oval(c,285-cx,y-10,6,6,'#213b48');box(c,285-cx,y-13,6,1,'#b3a486');
-    if(t<250){
+    if(t<350){
         c.save();c.translate(-Math.round(cx),0);
         drawBystanders(c,b.backdrop,y,reduced,false,forecourtPeople(t));c.restore();
     }

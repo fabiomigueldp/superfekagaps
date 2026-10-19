@@ -8,7 +8,7 @@ import {chaseDeckSpans,chaseMaterialAt,chaseTerraceFall,chaseRuinAt,CHASE_WATER_
 import { RIFLE_BURSTS, RIFLE_SPEED, type GunImpact } from './HypotheticalGunfire';
 import {chaseReactionStarts,updateChaseReactions} from './HypotheticalChaseLife';
 import {ARRIVAL,arrivalGate} from './HypotheticalArrival';
-import {SCENIC_STARTS,nextScenicTick} from './HypotheticalDevastation';
+import {SCENIC_STARTS,nextScenicTick,devastationAt} from './HypotheticalDevastation';
 
 export type HypotheticalAct = 'chase' | 'siege' | 'duel';
 export type HypotheticalState = 'arrival' | 'rest' | 'tell' | 'reload' | 'attack' | 'turn' | 'recover' | 'hurt' | 'roar' | 'won';
@@ -413,7 +413,7 @@ export class HypotheticalModel {
         const backdropTick=this.arrivalTime<=ARRIVAL.hold&&!this.arrivalSkipped
             ?this.arrivalTime:nextScenicTick(this.backdrop.tick,player.x,this.route.cleared);
         const advanced=backdropTick>this.backdrop.tick;
-        if(backdropTick>this.backdrop.tick+1)this.backdrop.cancel();
+        if(backdropTick>this.backdrop.tick+1){this.backdrop.cancel();this.backdrop.x=devastationAt(backdropTick).x;}
         if(advanced)this.backdrop.update(backdropTick);
         else {this.backdrop.velocity=0;this.backdrop.events=[];}
         this.backgroundX = this.backdrop.x;

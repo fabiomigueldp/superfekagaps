@@ -1,0 +1,1523 @@
+{
+  "revision": "siege-expansion-28",
+  "date": "2026-10-19",
+  "tests": {
+    "passed": 204,
+    "failed": 0
+  },
+  "build": true,
+  "native": {
+    "receipt": {
+      "act": "duel",
+      "phase": 3,
+      "health": 0,
+      "won": true,
+      "deaths": 3,
+      "ticks": 8308
+    },
+    "inputFrames": 8704,
+    "videoFrames": 273,
+    "captures": [
+      {
+        "file": "forecourt.png",
+        "frame": 1305,
+        "playerX": 48,
+        "sceneTick": 24
+      },
+      {
+        "file": "vault-tell.png",
+        "frame": 3317,
+        "playerX": 1603.9886132284018,
+        "sceneTick": 1601
+      },
+      {
+        "file": "vault-action.png",
+        "frame": 3363,
+        "playerX": 1736.3726164284017,
+        "sceneTick": 1647
+      },
+      {
+        "file": "vanguard-hit.png",
+        "frame": 3417,
+        "playerX": 1616.4036394812017,
+        "sceneTick": 1701
+      },
+      {
+        "file": "bastion-destruction.png",
+        "frame": 3496,
+        "playerX": 1654.8352232512777,
+        "sceneTick": 1780
+      },
+      {
+        "file": "bastion-open.png",
+        "frame": 3647,
+        "playerX": 1938,
+        "sceneTick": 1931
+      }
+    ],
+    "scenes": [
+      {
+        "frame": 1525,
+        "street": 0,
+        "cameraX": 0,
+        "siteX": 226
+      },
+      {
+        "frame": 1838,
+        "street": 0,
+        "cameraX": 219.47991223846697,
+        "siteX": 482
+      },
+      {
+        "frame": 2547,
+        "street": 1,
+        "cameraX": 754.3,
+        "siteX": 898
+      },
+      {
+        "frame": 3220,
+        "street": 2,
+        "cameraX": 1132.4886132284018,
+        "siteX": 1314
+      },
+      {
+        "frame": 3496,
+        "street": 3,
+        "cameraX": 1522.8352232512777,
+        "siteX": 1730
+      }
+    ]
+  },
+  "browser": {
+    "errors": [],
+    "captures": [
+      {
+        "file": "chase-0.png",
+        "frames": 58,
+        "reset": false,
+        "act": "chase",
+        "state": "arrival",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 58,
+        "receipt": {
+          "act": "chase",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 0,
+          "ticks": 58
+        }
+      },
+      {
+        "file": "chase-1.png",
+        "frames": 150,
+        "reset": false,
+        "act": "chase",
+        "state": "tell",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 150,
+        "receipt": {
+          "act": "chase",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 0,
+          "ticks": 150
+        }
+      },
+      {
+        "file": "chase-2.png",
+        "frames": 323,
+        "reset": false,
+        "act": "chase",
+        "state": "rest",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 323,
+        "receipt": {
+          "act": "chase",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 0,
+          "ticks": 323
+        }
+      },
+      {
+        "file": "chase-3.png",
+        "frames": 488,
+        "reset": false,
+        "act": "chase",
+        "state": "tell",
+        "attack": "charge",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 488,
+        "receipt": {
+          "act": "chase",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 0,
+          "ticks": 488
+        }
+      },
+      {
+        "file": "chase-5.png",
+        "frames": 772,
+        "reset": false,
+        "act": "chase",
+        "state": "attack",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 772,
+        "receipt": {
+          "act": "chase",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 0,
+          "ticks": 772
+        }
+      },
+      {
+        "file": "chase-6.png",
+        "frames": 913,
+        "reset": false,
+        "act": "chase",
+        "state": "attack",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 913,
+        "receipt": {
+          "act": "chase",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 0,
+          "ticks": 913
+        }
+      },
+      {
+        "file": "chase-7.png",
+        "frames": 1050,
+        "reset": false,
+        "act": "chase",
+        "state": "attack",
+        "attack": "charge",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 1050,
+        "receipt": {
+          "act": "chase",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 0,
+          "ticks": 1050
+        }
+      },
+      {
+        "file": "chase-8.png",
+        "frames": 1202,
+        "reset": false,
+        "act": "chase",
+        "state": "attack",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 1202,
+        "receipt": {
+          "act": "chase",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 0,
+          "ticks": 1202
+        }
+      },
+      {
+        "file": "siege-0.png",
+        "frames": 1281,
+        "reset": true,
+        "act": "siege",
+        "state": "rest",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 0,
+        "receipt": {
+          "act": "siege",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 0,
+          "ticks": 1281
+        }
+      },
+      {
+        "file": "siege-1.png",
+        "frames": 1641,
+        "reset": false,
+        "act": "siege",
+        "state": "rest",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 360,
+        "receipt": {
+          "act": "siege",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 0,
+          "ticks": 1641
+        }
+      },
+      {
+        "file": "siege-2.png",
+        "frames": 1996,
+        "reset": false,
+        "act": "siege",
+        "state": "rest",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 715,
+        "receipt": {
+          "act": "siege",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 0,
+          "ticks": 1996
+        }
+      },
+      {
+        "file": "siege-3.png",
+        "frames": 2346,
+        "reset": false,
+        "act": "siege",
+        "state": "rest",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 1065,
+        "receipt": {
+          "act": "siege",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 0,
+          "ticks": 2346
+        }
+      },
+      {
+        "file": "duel-1-rifle-arrival.png",
+        "frames": 3748,
+        "reset": true,
+        "act": "duel",
+        "state": "arrival",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 0,
+        "receipt": {
+          "act": "duel",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 2,
+          "ticks": 3514
+        }
+      },
+      {
+        "file": "duel-1-rifle-recover.png",
+        "frames": 4058,
+        "reset": false,
+        "act": "duel",
+        "state": "recover",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 9,
+        "dead": false,
+        "tick": 310,
+        "receipt": {
+          "act": "duel",
+          "phase": 1,
+          "health": 9,
+          "won": false,
+          "deaths": 2,
+          "ticks": 3824
+        }
+      },
+      {
+        "file": "duel-1-rifle-rest.png",
+        "frames": 4195,
+        "reset": false,
+        "act": "duel",
+        "state": "rest",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 8,
+        "dead": false,
+        "tick": 442,
+        "receipt": {
+          "act": "duel",
+          "phase": 1,
+          "health": 8,
+          "won": false,
+          "deaths": 2,
+          "ticks": 3956
+        }
+      },
+      {
+        "file": "duel-1-charge-tell.png",
+        "frames": 4241,
+        "reset": false,
+        "act": "duel",
+        "state": "tell",
+        "attack": "charge",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 8,
+        "dead": false,
+        "tick": 488,
+        "receipt": {
+          "act": "duel",
+          "phase": 1,
+          "health": 8,
+          "won": false,
+          "deaths": 2,
+          "ticks": 4002
+        }
+      },
+      {
+        "file": "duel-1-charge-attack.png",
+        "frames": 4295,
+        "reset": false,
+        "act": "duel",
+        "state": "attack",
+        "attack": "charge",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 8,
+        "dead": false,
+        "tick": 542,
+        "receipt": {
+          "act": "duel",
+          "phase": 1,
+          "health": 8,
+          "won": false,
+          "deaths": 2,
+          "ticks": 4056
+        }
+      },
+      {
+        "file": "duel-1-charge-recover.png",
+        "frames": 4331,
+        "reset": false,
+        "act": "duel",
+        "state": "recover",
+        "attack": "charge",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 8,
+        "dead": false,
+        "tick": 578,
+        "receipt": {
+          "act": "duel",
+          "phase": 1,
+          "health": 8,
+          "won": false,
+          "deaths": 2,
+          "ticks": 4092
+        }
+      },
+      {
+        "file": "duel-1-charge-rest.png",
+        "frames": 4459,
+        "reset": false,
+        "act": "duel",
+        "state": "rest",
+        "attack": "charge",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 7,
+        "dead": false,
+        "tick": 701,
+        "receipt": {
+          "act": "duel",
+          "phase": 1,
+          "health": 7,
+          "won": false,
+          "deaths": 2,
+          "ticks": 4215
+        }
+      },
+      {
+        "file": "duel-1-bite-tell.png",
+        "frames": 4531,
+        "reset": false,
+        "act": "duel",
+        "state": "tell",
+        "attack": "bite",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 7,
+        "dead": false,
+        "tick": 773,
+        "receipt": {
+          "act": "duel",
+          "phase": 1,
+          "health": 7,
+          "won": false,
+          "deaths": 2,
+          "ticks": 4287
+        }
+      },
+      {
+        "file": "duel-1-bite-attack.png",
+        "frames": 4546,
+        "reset": false,
+        "act": "duel",
+        "state": "attack",
+        "attack": "bite",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 7,
+        "dead": false,
+        "tick": 788,
+        "receipt": {
+          "act": "duel",
+          "phase": 1,
+          "health": 7,
+          "won": false,
+          "deaths": 2,
+          "ticks": 4302
+        }
+      },
+      {
+        "file": "duel-1-bite-recover.png",
+        "frames": 4596,
+        "reset": false,
+        "act": "duel",
+        "state": "recover",
+        "attack": "bite",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 1,
+        "health": 7,
+        "dead": false,
+        "tick": 838,
+        "receipt": {
+          "act": "duel",
+          "phase": 1,
+          "health": 7,
+          "won": false,
+          "deaths": 2,
+          "ticks": 4352
+        }
+      },
+      {
+        "file": "duel-2-bite-roar.png",
+        "frames": 4683,
+        "reset": false,
+        "act": "duel",
+        "state": "roar",
+        "attack": "bite",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 2,
+        "health": 6,
+        "dead": false,
+        "tick": 920,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 6,
+          "won": false,
+          "deaths": 2,
+          "ticks": 4434
+        }
+      },
+      {
+        "file": "duel-2-leap-tell.png",
+        "frames": 4820,
+        "reset": false,
+        "act": "duel",
+        "state": "tell",
+        "attack": "leap",
+        "chainStep": 0,
+        "chainLength": 2,
+        "followup": "rifle",
+        "pivot": 0,
+        "phase": 2,
+        "health": 6,
+        "dead": false,
+        "tick": 1057,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 6,
+          "won": false,
+          "deaths": 2,
+          "ticks": 4571
+        }
+      },
+      {
+        "file": "duel-2-leap-attack.png",
+        "frames": 4896,
+        "reset": false,
+        "act": "duel",
+        "state": "attack",
+        "attack": "leap",
+        "chainStep": 0,
+        "chainLength": 2,
+        "followup": "rifle",
+        "pivot": 0,
+        "phase": 2,
+        "health": 6,
+        "dead": false,
+        "tick": 1133,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 6,
+          "won": false,
+          "deaths": 2,
+          "ticks": 4647
+        }
+      },
+      {
+        "file": "duel-2-rifle-tell.png",
+        "frames": 4983,
+        "reset": false,
+        "act": "duel",
+        "state": "tell",
+        "attack": "rifle",
+        "chainStep": 1,
+        "chainLength": 2,
+        "followup": null,
+        "pivot": 0,
+        "phase": 2,
+        "health": 6,
+        "dead": false,
+        "tick": 1220,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 6,
+          "won": false,
+          "deaths": 2,
+          "ticks": 4734
+        }
+      },
+      {
+        "file": "duel-2-rifle-recover.png",
+        "frames": 5260,
+        "reset": false,
+        "act": "duel",
+        "state": "recover",
+        "attack": "rifle",
+        "chainStep": 1,
+        "chainLength": 2,
+        "followup": null,
+        "pivot": 0,
+        "phase": 2,
+        "health": 6,
+        "dead": false,
+        "tick": 1497,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 6,
+          "won": false,
+          "deaths": 2,
+          "ticks": 5011
+        }
+      },
+      {
+        "file": "duel-2-rifle-rest.png",
+        "frames": 5386,
+        "reset": false,
+        "act": "duel",
+        "state": "rest",
+        "attack": "rifle",
+        "chainStep": 1,
+        "chainLength": 2,
+        "followup": null,
+        "pivot": 0,
+        "phase": 2,
+        "health": 5,
+        "dead": false,
+        "tick": 1618,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 5,
+          "won": false,
+          "deaths": 2,
+          "ticks": 5132
+        }
+      },
+      {
+        "file": "duel-2-bite-tell.png",
+        "frames": 5440,
+        "reset": false,
+        "act": "duel",
+        "state": "tell",
+        "attack": "bite",
+        "chainStep": 0,
+        "chainLength": 2,
+        "followup": "tail",
+        "pivot": 0,
+        "phase": 2,
+        "health": 5,
+        "dead": false,
+        "tick": 1672,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 5,
+          "won": false,
+          "deaths": 2,
+          "ticks": 5186
+        }
+      },
+      {
+        "file": "duel-2-bite-attack.png",
+        "frames": 5476,
+        "reset": false,
+        "act": "duel",
+        "state": "attack",
+        "attack": "bite",
+        "chainStep": 0,
+        "chainLength": 2,
+        "followup": "tail",
+        "pivot": 0,
+        "phase": 2,
+        "health": 5,
+        "dead": false,
+        "tick": 1708,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 5,
+          "won": false,
+          "deaths": 2,
+          "ticks": 5222
+        }
+      },
+      {
+        "file": "duel-2-rifle-arrival.png",
+        "frames": 5572,
+        "reset": true,
+        "act": "duel",
+        "state": "arrival",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 2,
+        "health": 6,
+        "dead": false,
+        "tick": 0,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 6,
+          "won": false,
+          "deaths": 3,
+          "ticks": 5227
+        }
+      },
+      {
+        "file": "duel-2-tail-tell.png",
+        "frames": 6432,
+        "reset": false,
+        "act": "duel",
+        "state": "tell",
+        "attack": "tail",
+        "chainStep": 1,
+        "chainLength": 2,
+        "followup": null,
+        "pivot": 0,
+        "phase": 2,
+        "health": 5,
+        "dead": false,
+        "tick": 829,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 5,
+          "won": false,
+          "deaths": 3,
+          "ticks": 6056
+        }
+      },
+      {
+        "file": "duel-2-tail-attack.png",
+        "frames": 6481,
+        "reset": false,
+        "act": "duel",
+        "state": "attack",
+        "attack": "tail",
+        "chainStep": 1,
+        "chainLength": 2,
+        "followup": null,
+        "pivot": 0,
+        "phase": 2,
+        "health": 5,
+        "dead": false,
+        "tick": 878,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 5,
+          "won": false,
+          "deaths": 3,
+          "ticks": 6105
+        }
+      },
+      {
+        "file": "duel-2-tail-recover.png",
+        "frames": 6568,
+        "reset": false,
+        "act": "duel",
+        "state": "recover",
+        "attack": "tail",
+        "chainStep": 1,
+        "chainLength": 2,
+        "followup": null,
+        "pivot": 0,
+        "phase": 2,
+        "health": 5,
+        "dead": false,
+        "tick": 965,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 5,
+          "won": false,
+          "deaths": 3,
+          "ticks": 6192
+        }
+      },
+      {
+        "file": "duel-2-tail-rest.png",
+        "frames": 6662,
+        "reset": false,
+        "act": "duel",
+        "state": "rest",
+        "attack": "tail",
+        "chainStep": 1,
+        "chainLength": 2,
+        "followup": null,
+        "pivot": 0,
+        "phase": 2,
+        "health": 4,
+        "dead": false,
+        "tick": 1054,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 4,
+          "won": false,
+          "deaths": 3,
+          "ticks": 6281
+        }
+      },
+      {
+        "file": "duel-2-rifle-attack.png",
+        "frames": 6780,
+        "reset": false,
+        "act": "duel",
+        "state": "attack",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 2,
+        "health": 4,
+        "dead": false,
+        "tick": 1172,
+        "receipt": {
+          "act": "duel",
+          "phase": 2,
+          "health": 4,
+          "won": false,
+          "deaths": 3,
+          "ticks": 6399
+        }
+      },
+      {
+        "file": "duel-3-rifle-roar.png",
+        "frames": 7114,
+        "reset": false,
+        "act": "duel",
+        "state": "roar",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 3,
+        "health": 3,
+        "dead": false,
+        "tick": 1501,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 3,
+          "won": false,
+          "deaths": 3,
+          "ticks": 6728
+        }
+      },
+      {
+        "file": "duel-3-charge-tell.png",
+        "frames": 7251,
+        "reset": false,
+        "act": "duel",
+        "state": "tell",
+        "attack": "charge",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 3,
+        "health": 3,
+        "dead": false,
+        "tick": 1638,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 3,
+          "won": false,
+          "deaths": 3,
+          "ticks": 6865
+        }
+      },
+      {
+        "file": "duel-3-charge-attack.png",
+        "frames": 7313,
+        "reset": false,
+        "act": "duel",
+        "state": "attack",
+        "attack": "charge",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 3,
+        "health": 3,
+        "dead": false,
+        "tick": 1700,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 3,
+          "won": false,
+          "deaths": 3,
+          "ticks": 6927
+        }
+      },
+      {
+        "file": "duel-3-charge-turn.png",
+        "frames": 7345,
+        "reset": false,
+        "act": "duel",
+        "state": "turn",
+        "attack": "charge",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 3,
+        "health": 3,
+        "dead": false,
+        "tick": 1732,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 3,
+          "won": false,
+          "deaths": 3,
+          "ticks": 6959
+        }
+      },
+      {
+        "file": "duel-3-charge-recover.png",
+        "frames": 7433,
+        "reset": false,
+        "act": "duel",
+        "state": "recover",
+        "attack": "charge",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 3,
+        "health": 3,
+        "dead": false,
+        "tick": 1820,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 3,
+          "won": false,
+          "deaths": 3,
+          "ticks": 7047
+        }
+      },
+      {
+        "file": "duel-3-charge-rest.png",
+        "frames": 7557,
+        "reset": false,
+        "act": "duel",
+        "state": "rest",
+        "attack": "charge",
+        "chainStep": 0,
+        "chainLength": 1,
+        "followup": null,
+        "pivot": 0,
+        "phase": 3,
+        "health": 2,
+        "dead": false,
+        "tick": 1939,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 2,
+          "won": false,
+          "deaths": 3,
+          "ticks": 7166
+        }
+      },
+      {
+        "file": "duel-3-rifle-tell.png",
+        "frames": 7630,
+        "reset": false,
+        "act": "duel",
+        "state": "tell",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 3,
+        "followup": "leap",
+        "pivot": 0,
+        "phase": 3,
+        "health": 2,
+        "dead": false,
+        "tick": 2012,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 2,
+          "won": false,
+          "deaths": 3,
+          "ticks": 7239
+        }
+      },
+      {
+        "file": "duel-3-rifle-attack.png",
+        "frames": 7636,
+        "reset": false,
+        "act": "duel",
+        "state": "attack",
+        "attack": "rifle",
+        "chainStep": 0,
+        "chainLength": 3,
+        "followup": "leap",
+        "pivot": 0,
+        "phase": 3,
+        "health": 2,
+        "dead": false,
+        "tick": 2018,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 2,
+          "won": false,
+          "deaths": 3,
+          "ticks": 7245
+        }
+      },
+      {
+        "file": "duel-3-leap-tell.png",
+        "frames": 7897,
+        "reset": false,
+        "act": "duel",
+        "state": "tell",
+        "attack": "leap",
+        "chainStep": 1,
+        "chainLength": 3,
+        "followup": "bite",
+        "pivot": 0,
+        "phase": 3,
+        "health": 2,
+        "dead": false,
+        "tick": 2279,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 2,
+          "won": false,
+          "deaths": 3,
+          "ticks": 7506
+        }
+      },
+      {
+        "file": "duel-3-leap-attack.png",
+        "frames": 7973,
+        "reset": false,
+        "act": "duel",
+        "state": "attack",
+        "attack": "leap",
+        "chainStep": 1,
+        "chainLength": 3,
+        "followup": "bite",
+        "pivot": 0,
+        "phase": 3,
+        "health": 2,
+        "dead": false,
+        "tick": 2355,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 2,
+          "won": false,
+          "deaths": 3,
+          "ticks": 7582
+        }
+      },
+      {
+        "file": "duel-3-tail-tell.png",
+        "frames": 8395,
+        "reset": false,
+        "act": "duel",
+        "state": "tell",
+        "attack": "tail",
+        "chainStep": 0,
+        "chainLength": 2,
+        "followup": "bite",
+        "pivot": 0,
+        "phase": 3,
+        "health": 1,
+        "dead": false,
+        "tick": 2772,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 1,
+          "won": false,
+          "deaths": 3,
+          "ticks": 7999
+        }
+      },
+      {
+        "file": "duel-3-tail-attack.png",
+        "frames": 8439,
+        "reset": false,
+        "act": "duel",
+        "state": "attack",
+        "attack": "tail",
+        "chainStep": 0,
+        "chainLength": 2,
+        "followup": "bite",
+        "pivot": 0,
+        "phase": 3,
+        "health": 1,
+        "dead": false,
+        "tick": 2816,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 1,
+          "won": false,
+          "deaths": 3,
+          "ticks": 8043
+        }
+      },
+      {
+        "file": "duel-3-bite-tell.png",
+        "frames": 8526,
+        "reset": false,
+        "act": "duel",
+        "state": "tell",
+        "attack": "bite",
+        "chainStep": 1,
+        "chainLength": 2,
+        "followup": null,
+        "pivot": 0,
+        "phase": 3,
+        "health": 1,
+        "dead": false,
+        "tick": 2903,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 1,
+          "won": false,
+          "deaths": 3,
+          "ticks": 8130
+        }
+      },
+      {
+        "file": "duel-3-bite-attack.png",
+        "frames": 8571,
+        "reset": false,
+        "act": "duel",
+        "state": "attack",
+        "attack": "bite",
+        "chainStep": 1,
+        "chainLength": 2,
+        "followup": null,
+        "pivot": 0,
+        "phase": 3,
+        "health": 1,
+        "dead": false,
+        "tick": 2948,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 1,
+          "won": false,
+          "deaths": 3,
+          "ticks": 8175
+        }
+      },
+      {
+        "file": "duel-3-bite-recover.png",
+        "frames": 8672,
+        "reset": false,
+        "act": "duel",
+        "state": "recover",
+        "attack": "bite",
+        "chainStep": 1,
+        "chainLength": 2,
+        "followup": null,
+        "pivot": 0,
+        "phase": 3,
+        "health": 1,
+        "dead": false,
+        "tick": 3049,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 1,
+          "won": false,
+          "deaths": 3,
+          "ticks": 8276
+        }
+      },
+      {
+        "file": "duel-3-bite-won.png",
+        "frames": 8704,
+        "reset": false,
+        "act": "duel",
+        "state": "won",
+        "attack": "bite",
+        "chainStep": 1,
+        "chainLength": 2,
+        "followup": null,
+        "pivot": 0,
+        "phase": 3,
+        "health": 0,
+        "dead": false,
+        "tick": 3081,
+        "receipt": {
+          "act": "duel",
+          "phase": 3,
+          "health": 0,
+          "won": true,
+          "deaths": 3,
+          "ticks": 8308
+        }
+      }
+    ],
+    "chaseRenderSamples": [
+      {
+        "file": "chase-0.png",
+        "x": 280.3,
+        "tick": 58,
+        "median": 2.7000000029802322,
+        "p95": 3.6000000089406967
+      },
+      {
+        "file": "chase-1.png",
+        "x": 602.3,
+        "tick": 150,
+        "median": 1.9000000059604645,
+        "p95": 3.5
+      },
+      {
+        "file": "chase-2.png",
+        "x": 1207.8,
+        "tick": 323,
+        "median": 2.8999999910593033,
+        "p95": 3.4000000059604645
+      },
+      {
+        "file": "chase-3.png",
+        "x": 1785.3,
+        "tick": 488,
+        "median": 3.2999999970197678,
+        "p95": 4
+      },
+      {
+        "file": "chase-5.png",
+        "x": 2779.3,
+        "tick": 772,
+        "median": 2.699999988079071,
+        "p95": 3
+      },
+      {
+        "file": "chase-6.png",
+        "x": 3272.8,
+        "tick": 913,
+        "median": 3.5,
+        "p95": 4.100000008940697
+      },
+      {
+        "file": "chase-7.png",
+        "x": 3752.3,
+        "tick": 1050,
+        "median": 2.6000000089406967,
+        "p95": 3.2000000029802322
+      },
+      {
+        "file": "chase-8.png",
+        "x": 4284.3,
+        "tick": 1202,
+        "median": 2.7999999970197678,
+        "p95": 3.7000000029802322
+      }
+    ],
+    "passed": true,
+    "receipt": {
+      "act": "duel",
+      "phase": 3,
+      "health": 0,
+      "won": true,
+      "deaths": 3,
+      "ticks": 8308
+    },
+    "renderMs": {
+      "median": 2.6000000089406967,
+      "p95": 5.9000000059604645
+    },
+    "campaignSave": null,
+    "mobile": {
+      "width": 320,
+      "height": 180,
+      "viewport": 390,
+      "reduced": true
+    }
+  },
+  "review": {
+    "passed": true,
+    "errors": [],
+    "views": [
+      {
+        "width": 1440,
+        "images": [
+          {
+            "src": "forecourt.png",
+            "width": 320,
+            "height": 180
+          },
+          {
+            "src": "bastion-destruction.png",
+            "width": 320,
+            "height": 180
+          },
+          {
+            "src": "vanguard-atlas.png",
+            "width": 1024,
+            "height": 480
+          }
+        ],
+        "video": {
+          "width": 960,
+          "height": 540,
+          "duration": 9.1
+        }
+      },
+      {
+        "width": 390,
+        "images": [
+          {
+            "src": "forecourt.png",
+            "width": 320,
+            "height": 180
+          },
+          {
+            "src": "bastion-destruction.png",
+            "width": 320,
+            "height": 180
+          },
+          {
+            "src": "vanguard-atlas.png",
+            "width": 1024,
+            "height": 480
+          }
+        ],
+        "video": {
+          "width": 960,
+          "height": 540,
+          "duration": 9.1
+        }
+      }
+    ]
+  },
+  "presentation": {
+    "videoSeconds": 9.1,
+    "fps": 30,
+    "frames": 273,
+    "atlasPoses": 24,
+    "audioPreviewGain": 4,
+    "allScenicContactsInView": true
+  },
+  "sourceHashes": {
+    "src/adventure/hipotetico/HypotheticalArrival.ts": "cfa394d304120fdbe2a0ebda471a989ea63d0871bc6d27a53972062864d8fba0",
+    "src/adventure/hipotetico/HypotheticalArrivalArt.ts": "ef8761a09ff928014d15507d8a02c20e62739b9680323e74c2dfff9b3ffac9f1",
+    "src/adventure/hipotetico/HypotheticalArt.ts": "f632c1d968cbf9a128c82462972ed9d90ac08a3609e8ea4d1ca228d22891c810",
+    "src/adventure/hipotetico/HypotheticalAudio.ts": "4cc6efeb6b7201edc33c0275097a41e24b5c9dd74279473cba552157a9a71ff5",
+    "src/adventure/hipotetico/HypotheticalBackdrop.ts": "ef22de43a4e51f4329f7217d6b852d507ee71789ccc72feeb6488f27e40b410c",
+    "src/adventure/hipotetico/HypotheticalBlood.ts": "d5f3b236f7ed1a64cc7a84bce1237d57d7b356b259d06aa85ac7121517d28e77",
+    "src/adventure/hipotetico/HypotheticalBystanderMotion.ts": "b3af6807e0a4ab3dfcf1d2c0af08ba4fbfce62192c60d902373513d68ede8e8a",
+    "src/adventure/hipotetico/HypotheticalBystanderPixels.ts": "8a0b987f65585270e678481235dd1939f65da5a312755aadb29b805740ec7d90",
+    "src/adventure/hipotetico/HypotheticalBystanders.ts": "bc1c4bcbb86dcb98a2e30718f0d7a2e7e6cd490f7a3dd8bc47fa01386b196725",
+    "src/adventure/hipotetico/HypotheticalChaseArt.ts": "f3ecec6db1fad819ec582b768d0f44022acbeaca57989c1d0e9a6a7d6f0af470",
+    "src/adventure/hipotetico/HypotheticalChaseDetails.ts": "53708a8ca9ab356a9b6951297162a2a611c526d1682b46888e9b0d8cce8a5cb9",
+    "src/adventure/hipotetico/HypotheticalChaseLife.ts": "dcf251ba5268e30f6fa4d93a26e209d80f0280d68f9b70733c9ae39561f400be",
+    "src/adventure/hipotetico/HypotheticalChaseLifeArt.ts": "4c8b2d2a23a2202fa51e0efaefe124640b66447d4d741e0c3dc94ad3331550b6",
+    "src/adventure/hipotetico/HypotheticalChaseQuayArt.ts": "38dc83f6474969f67e17cc9367ab61d2c6066553316d9def4a263c243d0f0867",
+    "src/adventure/hipotetico/HypotheticalDevastation.ts": "628713a61ed5683682c4efb7c8e2b9737088bce253fadd0b25c7837077ddeee1",
+    "src/adventure/hipotetico/HypotheticalForecourt.ts": "6c7ed07341d86c660ca14fdbfd655d827da94956d2b1b1fb2595e26449bea59d",
+    "src/adventure/hipotetico/HypotheticalGame.ts": "914c87e1b68ecf902d4619b1cef3a803083b8ea4aa538e6d79308eb1be859534",
+    "src/adventure/hipotetico/HypotheticalGuardArt.ts": "be8a81db29208a80a1ed493739ce205f85d5dd8b59555b1714422315d2bb4a08",
+    "src/adventure/hipotetico/HypotheticalGuardMotion.ts": "9d864cb55d18ffef3afed75d03fb284220bcc1c0b0d08a1b4c113cc94062566a",
+    "src/adventure/hipotetico/HypotheticalGuards.ts": "6d90a0a9405222cf40094b13e5ac8ac4771e1adc288412453eab44a882174008",
+    "src/adventure/hipotetico/HypotheticalGuardVault.ts": "7ac811a04e912982142fe886fd8aff2f0b18fcddd8d8c33e40276d4b1d388e43",
+    "src/adventure/hipotetico/HypotheticalGunfire.ts": "4404e18d83bcd396710eb07a8629c74439f85c7d50de6d6d30805f895cd19653",
+    "src/adventure/hipotetico/HypotheticalLayout.ts": "d83728927d987326beaad6ca2676b67e336dfac74a25718e7bf11f08ec093a09",
+    "src/adventure/hipotetico/HypotheticalModel.ts": "76e4f0dfddb3e0633f6d535b15bf7f2380b55e1e77d9b87101bb5b9cb34a75a2",
+    "src/adventure/hipotetico/HypotheticalMotion.ts": "1e1ad58c8f7c3683cf2f5053e9ffc4db064ad9c42b2f3b41c6e88bdbe4eab5df",
+    "src/adventure/hipotetico/HypotheticalOpening.ts": "43daad2f7015296650c4bc1b4cdb3dc15e26369e81942245c1746c04c9c45ab7",
+    "src/adventure/hipotetico/HypotheticalScenery.ts": "d421fe4d929b8fafc17b8dd43d55369e5a260ca1737a76decf68d5e6086d4f15",
+    "src/adventure/hipotetico/HypotheticalSiege.ts": "9a65119b9031f31d479b9e4411ab86cbc212300f2ece08f1f4fc4e845ef1d91f",
+    "src/adventure/hipotetico/HypotheticalStage.ts": "69b375220347bcbe7b6008848bd8b69c19cbde5860a00590311eae3024001c49",
+    "src/adventure/hipotetico/HypotheticalVanguard.ts": "e2bb83e3608c4a3eab50af83790cdeea2479d93fbe7c06ce2c96596f3b5486f2",
+    "src/adventure/hipotetico/HypotheticalVanguardArt.ts": "66b4b69b379653fcf12c8bbc9392e238ac4883afee16539de7e0989f7d9b1861",
+    "tests/helpers/hypotheticalReplay.json": "fc93cea9c83e3664b108c13fc778513d84282f5830eae403aa1f5ab05f3ff4f1",
+    "scripts/prove_hypothetical_siege.ts": "43095893180913f74d88b107a46a19f3a273a298f5e4dbbe776c979fd264b72f",
+    "scripts/prove_hypothetical_vanguard.ts": "dbf6bef960b3e2bbfc9a30c46c74d7e5467345c09035a8dd0968d035f6e419b9"
+  },
+  "evidenceScope": "Current siege extension and sprite inspection. Earlier pages retain historical recordings."
+}

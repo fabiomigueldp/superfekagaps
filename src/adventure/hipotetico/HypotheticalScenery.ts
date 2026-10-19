@@ -12,6 +12,7 @@ import {drawChaseIndustry,drawChaseQuayLife,drawChaseSkiffs} from './Hypothetica
 import {drawChaseQuayGround,drawChaseFrontage,drawChaseShoreWater} from './HypotheticalChaseQuayArt';
 import {drawArrivalCourtyard,drawArrivalPlaza,drawArrivalFittings} from './HypotheticalArrivalArt';
 import {drawForecourt} from './HypotheticalForecourt';
+import {masonryFall,SCENIC_FRACTURE,scenicRecoil,craneLoad,bastionCloth,arsenalPressure,scenicChip} from './HypotheticalScenicMotion';
 
 const S = {
     ink: '#213545', joint: '#354956', stone: '#677b7c', stoneShade: '#516571',
@@ -102,10 +103,16 @@ function foliage(c: CanvasRenderingContext2D, x: number, base: number, time: num
     oval(c,x-6,base-3,15,4,'#627f75');
 }
 
-function siegeFacade(c:CanvasRenderingContext2D,x:number,base:number,index:number,age:number){
+function siegeFacade(c:CanvasRenderingContext2D,x:number,base:number,index:number,age:number,reduced:boolean){
     const site=DESTRUCTION_SITES[index],w=site.width,h=site.height,top=base-h;
     const intact=()=>{
         facade(c,x,base,w,h,site.variant);
+        // Recessed lintels, a stone doorstep and contact shadows ground the elevation.
+        box(c,x+5,top+5,w-10,1,'#827b70');box(c,x+4,base-4,w-8,1,'#596f6c');
+        box(c,x+w/2-14,base-2,28,2,'#a9ab91');
+        for(const xx of [x+2,x+w-7])for(let yy=base-16;yy<base-4;yy+=6){
+            box(c,xx,yy,5,4,'#879486');box(c,xx,yy,4,1,'#b7b396');
+        }
         if(site.kind==='ram'){
             pixelLine(c,x+12,base-33,x+12,base-43,'#718477');box(c,x+9,base-44,11,7,'#879c8a');
             box(c,x+11,base-42,7,1,'#c4b99b');box(c,x+14,base-40,2,2,'#c4b99b');
@@ -120,13 +127,24 @@ function siegeFacade(c:CanvasRenderingContext2D,x:number,base:number,index:numbe
         }
     };
     if(age<0){intact();return;}
-    if(index===0&&age<6){
-        // Let the contact register before the upper wall gives way.
-        intact();const spread=(age+1)/6;
+    if(age<SCENIC_FRACTURE){
+        // All five contacts read before collapse. Only the struck building shudders.
+        const shake=reduced?0:Math.round(masonryFall(index,0,age).shake);
+        c.save();c.translate(shake,0);intact();const spread=(age+1)/SCENIC_FRACTURE;
         pixelLine(c,x+38,base-27,x+38-18*spread,base-27-23*spread,'#586b65',2);
         pixelLine(c,x+38,base-27,x+38+21*spread,base-27-31*spread,'#586b65');
+        pixelLine(c,x+38,base-27,x+48*spread,base-8,'#697268');
+        if(age<3)box(c,x+34,base-30,5-age,2,'#dbc7a2');
+        c.restore();
         return;
     }
+    // The surviving rear wall and rafters are visible through the new silhouette.
+    polygon(c,[[x+12,base-6],[x+12,top+24],[x+19,top+29],[x+29,top+24],
+        [x+43,top+39],[x+w-14,top+32],[x+w-12,base-6]],'#536d68');
+    pixelLine(c,x+17,base-7,x+17,top+29,'#7f7a64',3);
+    pixelLine(c,x+w-19,base-9,x+w-24,top+36,'#8c8068',3);
+    pixelLine(c,x+17,top+30,x+42,top+40,'#b1a184',2);
+    box(c,x+24,base-31,18,23,'#435e5d');
     facade(c,x,base,w,h,site.variant,true);
     // The exposed core keeps its beams, brick courses and broken services after the dust clears.
     box(c,x+18,base-19,25,16,'#748276');box(c,x+21,base-17,18,13,'#62776f');
@@ -137,16 +155,32 @@ function siegeFacade(c:CanvasRenderingContext2D,x:number,base:number,index:numbe
     pixelLine(c,x+51,base-27,x+57,base-30,'#b3a58a');
     if(site.kind==='bite')pixelLine(c,x+30,base-7,x+64,base-17,'#b09c7d',3);
     if(site.kind==='stamp'){pixelLine(c,x+10,base-11,x+30,base-11,'#91a38f',3);pixelLine(c,x+30,base-11,x+33,base-16,'#6c857e',3);}
-    const fallingAge=age-(index===0?6:0);
-    if(fallingAge<51){
-        // Four pieces retain the exact facade texture. Integer translations and clipping
-        // preserve crisp pixels, instead of stretching or dissolving the entire building.
-        c.save();c.beginPath();c.rect(x-34,top-20,w+70,h+20);c.clip();
-        for(let i=0;i<4;i++){
-            const t=Math.max(0,fallingAge-i*3),dx=Math.round((i-1.3)*t*.23),dy=Math.round(t*t*.082);
-            c.save();c.translate(dx,dy);c.beginPath();c.rect(x-4+i*21,top-12,21,h*.58+12);c.clip();intact();c.restore();
+    // Irregular wall panels and two roof halves keep their actual texture. Their
+    // different delays and weights replace the previous simultaneous vertical strips.
+    const seam=h*.58,panels=[
+        [[-4,-12],[w*.5,-12],[w*.45,3],[-4,3]],
+        [[w*.5,-12],[w+3,-12],[w+3,3],[w*.45,3]],
+        [[0,3],[w*.36,3],[w*.34,seam*.62],[w*.27,seam],[0,seam]],
+        [[w*.36,3],[w*.45,3],[w*.72,3],[w*.68,seam],[w*.27,seam],[w*.34,seam*.62]],
+        [[w*.72,3],[w,3],[w,seam],[w*.68,seam]],
+    ];
+    for(let i=0;i<panels.length;i++){
+        const fall=masonryFall(index,i,age);
+        if(!fall.landed){
+            c.save();c.beginPath();c.rect(x-30,top-16,w+60,h+16);c.clip();
+            c.translate(Math.round(fall.dx),Math.round(fall.dy));c.beginPath();
+            for(const [j,p] of panels[i].entries()){
+                if(j===0)c.moveTo(Math.round(x+p[0]),Math.round(top+p[1]));
+                else c.lineTo(Math.round(x+p[0]),Math.round(top+p[1]));
+            }
+            c.closePath();c.clip();intact();c.restore();
+        }else{
+            const xx=x+7+i*(w-14)/5+fall.dx*.45,roofPiece=i<2;
+            polygon(c,[[xx-5,base-1],[xx-2,base-5-i%2*3],[xx+5,base-8-i%3],
+                [xx+12,base-4],[xx+16,base-1]],roofPiece?'#827568':'#8d8a75');
+            pixelLine(c,xx-2,base-5-i%2*3,xx+5,base-8-i%3,roofPiece?'#c59b7c':'#c1ac88');
+            for(let j=0;j<3;j++)box(c,xx+j*4,base-4-j%2*2,3,2,roofPiece?'#a0806c':'#b09b7c');
         }
-        c.restore();
     }
     if(age<15){
         const spread=Math.min(1,age/8);
@@ -278,8 +312,8 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
             if(x>340||x+width<-20)continue;
             const damageAge=ruinAge(b.backdrop.breaches,siteIndex,b.backdrop.tick);
             facade(c,x+24,base-5,57,56+i%2*15,i);
-            siegeFacade(c,x+184,base-5,siteIndex,damageAge);
-            if(i===0)siegeFacade(c,x+440,base-5,1,ruinAge(b.backdrop.breaches,1,b.backdrop.tick));
+            siegeFacade(c,x+184,base-5,siteIndex,damageAge,reduced);
+            if(i===0)siegeFacade(c,x+440,base-5,1,ruinAge(b.backdrop.breaches,1,b.backdrop.tick),reduced);
             // The raised rear street is supported all the way to the canal, behind Feka's road.
             box(c,x,base+7,width,43,'#607d7b');box(c,x,base+8,width,2,'#526f72');
             for(let row=0;row<4;row++)for(let j=0;j<Math.ceil(width/34);j++){
@@ -303,21 +337,31 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
                 drawArrivalPlaza(c,x,base,b.backdrop.tick,ruinAge(b.backdrop.breaches,1,b.backdrop.tick),reduced);
             }else if(i===1){
                 // Loading crane, rope, pulley and suspended pallet share one anchored structure.
-                const shock=damageAge>=0&&damageAge<100?Math.sin(damageAge/5)*5*Math.exp(-damageAge/30):0;
-                const sway=reduced?0:Math.sin(time/80)*2+shock,drop=damageAge<0?0:Math.min(41,Math.max(0,damageAge-8)**2*.06);
+                const load=craneLoad(damageAge),drop=load.drop;
+                const sway=reduced?0:(!load.broken?Math.sin(time/80)*2:0)+load.sway;
                 box(c,x+141,base-95,7,91,'#6d847a');box(c,x+142,base-94,2,89,'#a1aa90');
                 pixelLine(c,x+145,base-91,x+222,base-105,'#617e77',5);
                 pixelLine(c,x+146,base-59,x+188,base-98,'#7f9281',3);
                 pixelLine(c,x+146,base-91,x+222,base-105,'#b4b59a');
                 oval(c,x+218,base-107,7,7,'#647c72');oval(c,x+220,base-105,3,3,'#c0b99a');
-                pixelLine(c,x+222,base-100,x+222+sway,base-(damageAge<0?63:80),'#657f76');
-                if(damageAge<8){
+                const whip=reduced?0:scenicRecoil(damageAge,load.release,8,4,24);
+                pixelLine(c,x+222,base-100,x+222+(load.broken?whip:sway),base-(load.broken?80:63),'#657f76');
+                if(!load.broken){
                     pixelLine(c,x+222+sway,base-63,x+207+sway,base-45,'#819886');
                     pixelLine(c,x+222+sway,base-63,x+238+sway,base-45,'#819886');
-                }else pixelLine(c,x+222+sway,base-80,x+220+sway,base-75,'#a4af95');
-                const loadX=x+(drop>=41?0:sway);
-                box(c,loadX+206,base-45+drop,34,4,'#718679');box(c,loadX+210,base-59+drop,26,14,'#9c9e7d');
-                for(const dx of [214,229])box(c,loadX+dx,base-59+drop,2,14,'#6b8278');
+                }else pixelLine(c,x+222+whip,base-80,x+220+whip*.6,base-73,'#a4af95');
+                const loadX=x+sway,split=load.split;
+                box(c,loadX+206,base-45+drop,34,4,'#657d73');
+                for(let j=0;j<3;j++){
+                    const px=loadX+209+j*10+(j-1)*split*7,py=base-58+drop+j%2*split*3;
+                    box(c,px,py,10,13,'#a39e7d');box(c,px,py,9,1,'#c0b392');
+                    box(c,px+2,py+3,6,1,'#85896e');box(c,px+2,py+8,6,1,'#85896e');
+                    pixelLine(c,px+1,py+1,px+8,py+11,'#7a826d');
+                }
+                if(split>0){
+                    pixelLine(c,x+210,base-6,x+201-split*10,base-4,'#ac9d7c',2);
+                    pixelLine(c,x+232,base-9,x+241+split*10,base-4,'#859079',2);
+                }
             }else if(i===3){
                 // The last post is a fortified customs yard, with buttresses and
                 // a bell tower grounded on the same rear street as its facade.
@@ -325,21 +369,27 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
                 box(c,tx,top,46,104,'#718b82');box(c,tx+3,top+5,40,99,'#95a28e');
                 for(const dx of [0,39]){box(c,tx+dx-3,top+9,9,95,'#6b827c');box(c,tx+dx-2,top+10,2,92,'#b4b49a');}
                 roof(c,tx-3,top,52,true);arch(c,tx+12,top+16,22,37,'#435f65');
-                const sway=reduced?0:Math.sin(time/90)*2;
-                pixelLine(c,tx+22,top+18,tx+22+sway,top+31,'#b2a586',2);
-                polygon(c,[[tx+17+sway,top+29],[tx+28+sway,top+29],[tx+32+sway,top+41],[tx+13+sway,top+41]],'#b6a06e');
-                box(c,tx+13+sway,top+40,19,2,'#dfc28b');box(c,tx+21+sway,top+42,3,3,'#6c7469');
+                const sway=reduced?0:Math.sin(time/90)*1.2+scenicRecoil(damageAge,9,8,8,62);
+                const bellRise=13-Math.sqrt(Math.max(0,169-sway*sway));
+                pixelLine(c,tx+22,top+18,tx+22+sway,top+31-bellRise,'#b2a586',2);
+                polygon(c,[[tx+17+sway,top+29-bellRise],[tx+28+sway,top+29-bellRise],
+                    [tx+32+sway,top+41-bellRise],[tx+13+sway,top+41-bellRise]],'#b6a06e');
+                box(c,tx+13+sway,top+40-bellRise,19,2,'#dfc28b');
+                box(c,tx+21+sway*.6,top+42-bellRise,3,3,'#6c7469');
                 arch(c,tx+12,base-30,24,26,'#4c6a69');box(c,tx+11,base-6,27,2,'#b9b095');
                 for(const dx of [278,318,358,398,438]){
                     box(c,x+dx,base-39,8,35,'#7a9185');box(c,x+dx-2,base-42,12,4,'#b1b49a');
                     if(dx<438){arch(c,x+dx+8,base-32,32,28,'#536f70');pixelLine(c,x+dx+8,base-32,x+dx+39,base-32,'#94a78e',2);}
                 }
-                const fall=damageAge<0?0:Math.min(1,damageAge/50);
-                pixelLine(c,x+268,base-44,x+320,base-50+fall*28,'#a3ab91');
-                polygon(c,[[x+278,base-46+fall*5],[x+302,base-49+fall*22],[x+300,base-32+fall*25],[x+281,base-30+fall*7]],'#8f6961');
-                if(!reduced&&damageAge>=0)for(let j=0;j<4;j++){
-                    const t=(damageAge+j*19)%90;
-                    box(c,x+219+t*.3,base-34-t*.38,7+t*.06,3,'#a9aea0');
+                const cloth=bastionCloth(damageAge),flutter=reduced?0:cloth.swing;
+                pixelLine(c,x+268,base-44,x+320+flutter,base-50+cloth.drop,'#a3ab91');
+                polygon(c,[[x+278,base-46],[x+302+flutter,base-49+cloth.drop],
+                    [x+300+flutter,base-32+cloth.drop],[x+281,base-30]],'#8f6961');
+                pixelLine(c,x+280,base-43,x+299+flutter,base-46+cloth.drop,'#b58b77');
+                if(!reduced&&damageAge>36&&damageAge<210)for(let j=0;j<4;j++){
+                    const t=damageAge-36-j*22;if(t<0||t>90)continue;
+                    const fade=1-t/90;
+                    box(c,x+219+t*.24,base-29-t*.3,(9+t*.05)*fade,3*fade,'#a9aea0');
                 }
             }else{
                 // The arsenal has reinforced doors, vent stacks and pressure pipes.
@@ -348,15 +398,21 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
                 for(let j=0;j<5;j++){
                     box(c,x+101,base-82+j*7,50,3,'#607e77');box(c,x+102,base-82+j*7,48,1,'#9aa991');
                 }
-                pixelLine(c,x+96,base-30,x+157,base-30,'#5c7f7a',5);pixelLine(c,x+96,base-30,x+157,base-30,'#a0ad96');
+                const pressure=arsenalPressure(damageAge);
+                for(const [from,to] of (pressure>0?[[96,124],[136,157]]:[[96,157]])){
+                    pixelLine(c,x+from,base-30,x+to,base-30,'#5c7f7a',5);pixelLine(c,x+from,base-30,x+to,base-30,'#a0ad96');
+                }
                 if(!reduced)for(let j=0;j<3;j++){
                     const t=(time+j*24)%90;box(c,x+109+t*.06,base-112-t*.22,5+t*.06,2,'#b5bfb0');
                 }
-                if(damageAge>=0){
-                    pixelLine(c,x+126,base-30,x+130,base-26,'#617c73',3);
+                if(pressure>0){
+                    pixelLine(c,x+124,base-30,x+130,base-26,'#617c73',3);
+                    box(c,x+127,base-27,3,2,'#3c6266');box(c,x+135,base-31,2,6,'#afaf95');
                     for(let j=0;j<(reduced?2:5);j++){
                         const t=reduced?j*6:(damageAge+j*9)%45;
-                        box(c,x+130+t*.7,base-27-t*.23,4+t*.1,2,'#bac0a9');
+                        const length=pressure*1.4+.2;
+                        box(c,x+130+t*length,base-27-t*.23,4+t*.1,2,'#bac0a9');
+                        if(t<16)pixelLine(c,x+130,base-26,x+130+t*length,base-26-t*.23,'#c5c6af');
                     }
                 }
             }
@@ -375,29 +431,54 @@ export function drawHypotheticalScenery(c: CanvasRenderingContext2D, b: Hypothet
 
 export function drawHypotheticalDestruction(c: CanvasRenderingContext2D, b: HypotheticalModel, base: number, cy:number, reduced: boolean) {
     for(const [index,site] of DESTRUCTION_SITES.entries()){
-        const age=ruinAge(b.backdrop.breaches,index,b.backdrop.tick);if(age<0||age>=120)continue;
-        const x=site.x+site.width/2,fade=Math.max(0,1-age/120);
-        if(age<9){
-            for(let i=0;i<(reduced?3:6);i++){
-                const angle=i*Math.PI/3,r=7+age*1.8;
-                pixelLine(c,x+Math.cos(angle)*r,base-31+Math.sin(angle)*r*.6,x+Math.cos(angle)*(r+5),base-31+Math.sin(angle)*(r+5)*.6,'#cfbf98');
+        const age=ruinAge(b.backdrop.breaches,index,b.backdrop.tick);if(age<0)continue;
+        const x=site.x+site.width/2,floor=base-4;
+        if(age<7){
+            const hitY=site.kind==='stamp'?floor-7:floor-27;
+            for(let i=0;i<(reduced?3:5);i++){
+                const angle=-Math.PI*.7+i*Math.PI*.35,r=3+age*1.6;
+                pixelLine(c,x+Math.cos(angle)*r,hitY+Math.sin(angle)*r*.5,
+                    x+Math.cos(angle)*(r+4),hitY+Math.sin(angle)*(r+4)*.5,'#d5c39d');
             }
         }
-        if(age<48)for(let i=0;i<(reduced?4:10);i++){
-            const t=Math.max(0,age-i%3*2),xx=x+(i-4.5)*(3+t*.27),yy=Math.min(base-5,base-42-t*(1+i%3*.25)+t*t*.1);
-            polygon(c,[[xx,yy],[xx+4+i%3,yy-1],[xx+5,yy+3],[xx+1,yy+4]],site.kind==='stamp'?'#748b80':i%2?'#9f8973':'#a78d77');
-            box(c,xx+1,yy,3,1,'#c3b18f');
+        for(let i=0;i<15;i++){
+            const chip=scenicChip(index,i,age);if(!chip.visible)continue;
+            const xx=site.x+chip.x,yy=floor+chip.y;
+            if(chip.material===3){
+                pixelLine(c,xx-2,yy,xx+5,yy+(chip.landed?1:-3),'#887d69',2);
+                pixelLine(c,xx-1,yy,xx+4,yy+(chip.landed?1:-3),'#baa487');
+            }else{
+                const palette=['#a5826d','#a3977c','#748c80'];
+                polygon(c,[[xx-1,yy],[xx+2,yy-2],[xx+5,yy],[xx+4,yy+2],[xx,yy+2]],palette[chip.material]);
+                box(c,xx+1,yy-1,3,1,'#c4b18e');
+            }
         }
-        // Two low, receding dust banks leave the rider's head and the playable silhouettes readable.
-        for(let i=0;i<(reduced?3:7);i++){
-            const drift=(i-3)*Math.min(age,48)*.16,xx=x-34+i*10+drift;
-            const yy=base-5-Math.min(age,45)*.12-i%3*3,w=(13+Math.min(age,30)*.4)*fade;
-            if(w<2)continue;
-            box(c,xx+3,yy-3,w-4,3,'#b2ae98');box(c,xx,yy,w,4,'#aaa78f');box(c,xx+2,yy+4,w-3,2,'#9c9f88');
-            if(age<45)box(c,xx+4,yy-2,Math.max(1,w-9),1,'#c5b99b');
+        // Contact, wall landing, then roof landing: the dust is caused by weight.
+        // It stays low and thins into separate wisps instead of masking the combat.
+        const pulses=[0,masonryFall(index,3,0).landAt,masonryFall(index,1,0).landAt];
+        for(const [beat,born] of pulses.entries()){
+            const ageOfDust=age-born,duration=beat===0?40:64;
+            if(ageOfDust<0||ageOfDust>=duration)continue;
+            const grow=Math.min(1,(ageOfDust+1)/7),fade=1-ageOfDust/duration;
+            for(let i=0;i<(reduced?3:5);i++){
+                const side=i-2,xx=x+side*(11+ageOfDust*.25)+beat*3;
+                const yy=floor-3-Math.min(ageOfDust,28)*.15-i%2*2;
+                const w=(beat===0?10:16)*grow*fade+2;
+                box(c,xx+3,yy-3,w-5,3,'#b9b39b');box(c,xx,yy,w,3,'#aba992');
+                box(c,xx+2,yy+3,w-3,2,'#939f8a');
+                if(ageOfDust<24)box(c,xx+4,yy-2,Math.max(1,w-9),1,'#c6bca0');
+            }
         }
-        if(!reduced&&age>8&&age<78)for(let i=0;i<4;i++){
-            const t=age-8,xx=x+(i-1.5)*t*.8,yy=base-site.height-12-t*.4-i*3,flap=Math.sin(t/3+i)>0?2:-1;
+        if(index===2){
+            const t=age-craneLoad(0).land;
+            if(t>=0&&t<28)for(const side of [-1,1]){
+                const xx=site.x+38+side*(18+t*.6),w=10*(1-t/28);
+                box(c,xx,floor-4-t*.1,w,2,'#b7af90');
+            }
+        }
+        if(!reduced&&age>12&&age<80)for(let i=0;i<3;i++){
+            const t=age-12-i*4;if(t<0)continue;
+            const xx=x+(i-1.5)*t*.8,yy=base-site.height-8-t*.4-i*3,flap=Math.sin(t/3+i)>0?2:-1;
             pixelLine(c,xx-2,yy+flap,xx,yy,'#6d8a82');pixelLine(c,xx,yy,xx+2,yy+flap,'#6d8a82');
         }
     }

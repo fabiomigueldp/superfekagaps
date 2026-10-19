@@ -7,6 +7,7 @@ import { WorldLevel, WorldObjects } from '../src/adventure/WorldPhysics';
 import { HypotheticalModel } from '../src/adventure/hipotetico/HypotheticalModel';
 import { SCENIC_STARTS, nextScenicTick } from '../src/adventure/hipotetico/HypotheticalDevastation';
 import { forecourtPeople } from '../src/adventure/hipotetico/HypotheticalForecourt';
+import { vanguardFoot } from '../src/adventure/hipotetico/HypotheticalVanguardArt';
 import type { Rect } from '../src/types';
 const dt=1000/60;
 function setup(){
@@ -110,9 +111,16 @@ test('an early stomp bounces off the visible brow guard without removing health'
 });
 test('foreground gathering has distinct exits and staggered reactions, remaining entirely before combat',()=>{
     assert.equal(forecourtPeople(0).length,8);assert.equal(new Set(forecourtPeople(0).map(p=>p.alertAt)).size,8);
-    for(let tick=0;tick<250;tick++)for(const p of forecourtPeople(tick)){
+    for(let tick=0;tick<350;tick++)for(const p of forecourtPeople(tick)){
         assert.ok(p.x>=118&&p.x<=332);assert.equal(p.hitAt,null);
         if(tick<p.alertAt)assert.equal(p.x,p.originX);
     }
-    assert.ok(forecourtPeople(250).every(p=>p.escaped));
+    assert.ok(forecourtPeople(350).every(p=>p.escaped));
+});
+test('the elite boots plant against real travel in both directions, and swing only above the floor',()=>{
+    for(const facing of [-1,1])for(const side of [0,1]){
+        const start=side?12:2,anchor=facing*vanguardFoot(start,side)[0];
+        for(let t=0;t<8;t+=.25){const [x,y]=vanguardFoot(start+t,side);assert.ok(Math.abs(facing*(t+x)-anchor)<1e-8);assert.equal(y,0);}
+    }
+    for(let t=0;t<40;t+=.25)assert.ok(vanguardFoot(t,0)[1]<=0);
 });
