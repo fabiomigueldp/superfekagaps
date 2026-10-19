@@ -9,6 +9,7 @@ import {shutterHandle} from './HypotheticalAftermathHandling';
 import {drawDebrisPiece} from './HypotheticalDebrisArt';
 import {drawAftermathFittings,drawAftermathIncidents} from './HypotheticalAftermathEnvironmentArt';
 import {drawAftermathContact} from './HypotheticalAftermathParticles';
+import {drawAftermathFlock} from './HypotheticalAftermathFlockArt';
 
 // Rear-street colours stay below the contrast of guards, bullets and playable ledges.
 const P={ink:'#516d70',dark:'#657c73',stone:'#92a18c',edge:'#c1b99a',wood:'#9e9475',grain:'#7d826d',
@@ -200,26 +201,16 @@ function masonry(c:CanvasRenderingContext2D,x:number,y:number,s:AftermathYard,ti
     if(nudge>0){pixelLine(c,x-2,y-26+split*16,x+2,y-22+split*16,P.ink);pixelLine(c,x+2,y-22+split*16,x-1,y-16+split*8,P.ink);}
 }
 
-function gull(c:CanvasRenderingContext2D,x:number,y:number,age:number,seed:number,flying:boolean,reduced:boolean){
-    const flap=reduced?0:Math.sin(age*.3+seed),wing=flap*5;
-    const peck=flying||reduced?0:Math.max(0,Math.sin(age*.42+seed*1.7)-.72)*6;
-    if(flying){
-        pixelLine(c,x-1,y,x-7,y-wing,P.wing,2);pixelLine(c,x-7,y-wing,x-10,y-wing+1,P.bird);
-        pixelLine(c,x+1,y,x+7,y-wing*.8,P.bird,2);pixelLine(c,x+7,y-wing*.8,x+9,y-wing*.8+1,P.wing);
-    }else{
-        box(c,x-2,y+3,1,2,P.grain);box(c,x+2,y+3,1,2,P.grain);
-        box(c,x-5,y-1,6,4,P.wing);box(c,x-4,y-2,5,2,P.bird);
-    }
-    oval(c,x-3,y-1,7,4,P.bird);box(c,x+2+peck*.4,y-3+peck,3,3,P.bird);
-    box(c,x+4+peck*.4,y-2+peck,2,1,P.light);box(c,x+3+peck*.4,y-3+peck,1,1,P.ink);
-}
-
 /** Back layer: grounded props, real exits and small actors before the dinosaur. */
 export function drawAftermathYards(c:CanvasRenderingContext2D,b:HypotheticalBackdrop,base:number,cameraX:number,reduced:boolean){
     const a=b.aftermath;
     for(const [i,yard] of AFTERMATH_YARDS.entries()){
         const x=yard.origin,s=a.yards[i];
-        if(x+390<cameraX||x+110>cameraX+320)continue;
+        if(x+390<cameraX||x+110>cameraX+320){
+            // Flights and falling bodies can outlive their original courtyard's
+            // scenery bounds while Feka moves the camera onward.
+            drawAftermathFlock(c,s.flock,base,a.tick,reduced);continue;
+        }
         refuge(c,x,base,i);
         drawAftermathFittings(c,x,base,s.environment,a.tick,reduced);
         for(const [j,prop] of AFTERMATH_PROPS.entries())secondaryProp(c,x+prop.offset,base-3,j,s.props[j],a.tick,reduced);
@@ -233,20 +224,7 @@ export function drawAftermathYards(c:CanvasRenderingContext2D,b:HypotheticalBack
         else if(yard.kind==='cargo')cargo(c,px,py,s,a.tick);
         else if(yard.kind==='vent')vent(c,px,py,s,a.tick,reduced);
         else masonry(c,px,py,s,a.tick,reduced);
-        // Two birds inhabit the service eave; two inspect the intact stack below it.
-        for(let j=0;j<4;j++){
-            const age=s.birdsAt<0?-1:a.tick-s.birdsAt-j*6;
-            const returned=age>s.birdsReturn;
-            if(reduced&&s.birdsAt>=0)continue;
-            if(age>142&&!returned)continue;
-            const eave=s.birdsFlights>1;
-            const perchX=x+(eave?335+j*7:j<2?264+j*14:344+(j-2)*9),perchY=base-(eave?i===3?32:47:j<2?33:i===3?32:47);
-            const flight=age>=0&&age<=142,landing=returned&&age<s.birdsReturn+156;
-            const t=flight?age:landing?s.birdsReturn+156-age:0;
-            const xx=flight?perchX+t*.93:returned?x+335+j*7+t*.4:perchX;
-            const yy=flight?perchY-Math.min(65,t*.78):returned?base-(i===3?32:47)-t*.6:perchY;
-            gull(c,xx,yy,flight||landing?a.tick:a.tick*.12,j,flight||landing,reduced);
-        }
+        drawAftermathFlock(c,s.flock,base,a.tick,reduced);
     }
 }
 

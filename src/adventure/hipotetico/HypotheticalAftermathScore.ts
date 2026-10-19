@@ -1,15 +1,16 @@
 import {handlingTiming,isHandling,AFTERMATH_SCALE,DEBRIS_GRIP_X} from './HypotheticalAftermathHandling';
 import {smoothMotion} from './HypotheticalMotion';
+import {FLOCK_VOLLEYS} from './HypotheticalAftermathFlock';
 
 /** Repeatable background performances use surviving wreckage, never reset a
  * demolished building or recreate an escaped person. Times are fixed steps. */
-export const AFTERMATH_ACTIONS = ['ram','stomp','rake','tail','fire','bellow','haul','sift','wrench','shake','breach'] as const;
+export const AFTERMATH_ACTIONS = ['ram','stomp','rake','tail','fire','bellow','haul','sift','wrench','shake','breach','flush-fire'] as const;
 export type AftermathAction = typeof AFTERMATH_ACTIONS[number];
 export const AFTERMATH_SCORES: readonly (readonly AftermathAction[])[] = [
-    ['shake','ram','haul','fire','wrench','rake','sift','bellow','tail','stomp','breach'],
-    ['tail','sift','stomp','haul','fire','ram','bellow','wrench','rake','shake','breach'],
-    ['breach','fire','wrench','rake','haul','bellow','stomp','sift','ram','tail','shake'],
-    ['stomp','sift','ram','tail','wrench','breach','fire','haul','rake','bellow','shake'],
+    ['shake','ram','haul','fire','wrench','rake','sift','bellow','tail','stomp','breach','flush-fire'],
+    ['flush-fire','sift','tail','haul','fire','ram','bellow','wrench','rake','shake','breach','stomp'],
+    ['breach','fire','wrench','rake','haul','bellow','stomp','sift','ram','tail','shake','flush-fire'],
+    ['stomp','sift','ram','tail','wrench','breach','fire','haul','rake','bellow','shake','flush-fire'],
 ];
 export const AFTERMATH_PROPS = [
     {offset:118,top:-18,material:'timber' as const},
@@ -17,6 +18,7 @@ export const AFTERMATH_PROPS = [
     {offset:310,top:-34,material:'iron' as const},
 ];
 export function aftermathActionTiming(action:AftermathAction,variant:number){
+    if(action==='flush-fire'){const t=FLOCK_VOLLEYS[variant%3];return {beats:[t.beat],shots:[...t.shots],duration:t.duration};}
     if(isHandling(action))return {beats:[],shots:[],duration:handlingTiming(action).duration};
     const beats=action==='ram'?[48]:action==='breach'?[52]:action==='stomp'?[[50],[42,80],[42,76,112]][variant%3]
         :action==='rake'?[[42,68,91],[40,62,92,118],[48,82]][variant%3]
@@ -33,7 +35,7 @@ export function aftermathReach(action:AftermathAction){
 }
 
 export const aftermathFamily=(action:AftermathAction)=>isHandling(action)?'search'
-    :action==='fire'||action==='breach'?'gun':action==='bellow'?'voice':'body';
+    :action==='fire'||action==='breach'||action==='flush-fire'?'gun':action==='bellow'?'voice':'body';
 
 /** A seeded weighted score, not a looping playlist. The seed changes at street
  * entry; drawing never consumes randomness. Neglected actions get a turn and

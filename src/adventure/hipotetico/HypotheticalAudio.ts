@@ -1,5 +1,5 @@
 export type WeaponCue = 'shot' | 'impact' | 'splash' | 'collapse-water' | 'debris-land' | 'reload' | 'distant-shot' | 'distant-hit' | 'distant-crash' | 'distant-debris' | 'distant-thud'
-    | 'guard-swipe' | 'guard-sweep' | 'guard-parry' | 'guard-stomp' | 'distant-roar'
+    | 'guard-swipe' | 'guard-sweep' | 'guard-parry' | 'guard-stomp' | 'distant-roar' | 'distant-flutter' | 'distant-soft-hit'
     | 'distant-wood' | 'distant-stone' | 'distant-metal' | 'distant-creak' | 'distant-chain' | 'distant-leak' | 'distant-snort' | 'distant-grit' | 'distant-launch' | 'distant-rocket' | 'distant-blast' | 'distant-bell' | 'distant-rotor' | 'distant-engine-fail';
 interface Route { context: BaseAudioContext; destination: AudioNode; enabled: boolean }
 
@@ -30,6 +30,8 @@ export class HypotheticalAudio {
             kind==='distant-leak'?{duration:.65,filter:'bandpass' as BiquadFilterType,cutoff:3100,tail:1200,noise:.16,pitch:200,end:130,body:.006,wave:'sine' as OscillatorType}:
             kind==='distant-snort'?{duration:.24,filter:'bandpass' as BiquadFilterType,cutoff:1350,tail:330,noise:.21,pitch:98,end:65,body:.035,wave:'triangle' as OscillatorType}:
             kind==='distant-grit'?{duration:.14,filter:'highpass' as BiquadFilterType,cutoff:1700,tail:900,noise:.085,pitch:480,end:210,body:.008,wave:'sine' as OscillatorType}:
+            kind==='distant-flutter'?{duration:.19,filter:'bandpass' as BiquadFilterType,cutoff:2200,tail:820,noise:.16,pitch:155,end:90,body:.008,wave:'triangle' as OscillatorType}:
+            kind==='distant-soft-hit'?{duration:.095,filter:'lowpass' as BiquadFilterType,cutoff:1550,tail:330,noise:.22,pitch:118,end:66,body:.045,wave:'triangle' as OscillatorType}:
             kind==='distant-rotor'?{duration:.19,filter:'bandpass' as BiquadFilterType,cutoff:590,tail:180,noise:.13,pitch:68,end:56,body:.055,wave:'triangle' as OscillatorType}:
             kind==='distant-engine-fail'?{duration:.95,filter:'bandpass' as BiquadFilterType,cutoff:2300,tail:230,noise:.24,pitch:780,end:84,body:.12,wave:'sawtooth' as OscillatorType}:
             kind==='distant-launch'?{duration:.34,filter:'bandpass' as BiquadFilterType,cutoff:1900,tail:330,noise:.4,pitch:210,end:62,body:.22,wave:'triangle' as OscillatorType}:
@@ -74,6 +76,14 @@ export class HypotheticalAudio {
                         gain.linearRampToValueAtTime(peak*volume,at+.006);
                         gain.exponentialRampToValueAtTime(.001,at+.039);
                     }
+                }
+            }
+            if(kind==='distant-flutter'){
+                env.gain.cancelScheduledValues(now);env.gain.setValueAtTime(.001,now);
+                for(let wing=0;wing<3;wing++){
+                    const at=now+wing*.058;
+                    env.gain.linearRampToValueAtTime((.16-wing*.025)*volume,at+.011);
+                    env.gain.exponentialRampToValueAtTime(.001,at+.052);
                 }
             }
             noise.connect(filter);filter.connect(env);env.connect(destination);body.connect(low);low.connect(destination);

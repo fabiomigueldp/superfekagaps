@@ -2,6 +2,56 @@
 
 Revisão de 19/10/2026, integrada ao encontro nativo `/?encounter=hipotetico`.
 
+## Bandos e rajadas
+
+Refinamento 8: os quatro pátios compartilham agora doze performances. `flush-fire`
+tem três preparações (pisada, rugido e cauda) com disparos espaçados em grupos e
+recuperação do cavaleiro. A abertura `flush` também passa a acompanhar as aves
+que escapam do beiral, depois do contato principal com a pilha.
+
+`HypotheticalAftermathFlock` substitui a trajetória puramente decorativa. Cada
+ave tem apoio, alerta, decolagem, voo, chegada, queda e repouso. O fuzil antecipa
+a trajetória e acompanha o ponto suavemente; cada projétil segue a direção do
+cano. O acerto exige interseção do segmento percorrido com o corpo. Aves que
+escapam continuam o voo, sem morte determinada apenas pelo relógio da cena.
+
+As quedas têm impulso herdado, gravidade, arrasto, giro, pequeno ressalto e
+acomodação no pavimento. Há duas plumagens, penas com deriva e sombras de
+contato. Até oito corpos permanecem temporariamente no chão; até 42 penas e
+12 projéteis podem coexistir. Os corpos desaparecem gradualmente depois de um
+tempo; nunca são reutilizados como aves vivas no beiral.
+
+As aves sobre a pilha decolam quando seu apoio se desloca. As dos beirais
+permanecem para a resposta posterior. Após a fuga, novos bandos chegam de fora
+do enquadramento, com intervalo de 940–1479 passos e pelo menos 110 passos sem
+novo ruído forte. A chegada não acontece durante a torre ou em outra rua fora
+do enquadramento. Um bando que pousou pode motivar a próxima combinação; essa
+prioridade pede espaço para uma passagem mais calma e outras performances.
+O repertório também pode escolher a combinação espontaneamente quando há alvo.
+
+O diretor preserva a exclusão das duas últimas ações, evita repetir a cadência
+anterior nas ações com variação e reserva o trecho da rajada contra incidentes
+ambientais concorrentes. As buscas usam duas farejadas com expiração. Sons
+curtos de asas e impactos secos compartilham o barramento e o limite de vozes
+existentes; pausa e descarte continuam interrompendo as vozes.
+
+**Preservado:** prioridade, tolerância de enquadramento e sequência da torre,
+assim como a busca existente entre seus escombros. Nenhum desses módulos foi
+reescrito nesta rodada. O avanço de Feka continua determinando a próxima rua.
+
+`render_hypothetical_flocks.ts` produz quatro recortes de quatro segundos,
+a 60 fps, com posições de Feka mantidas para composição. Usa o renderizador e
+o diretor nativos, sem navegador, combate, asserções ou testes. `flock-study.json`
+registra os instantes, poses e atores dos recortes; `flock-flight-board.png`
+amplia os detalhes sem suavizar a pixel art. O vídeo é mudo.
+
+```sh
+node --import tsx scripts/render_hypothetical_flocks.ts .tmp/flock-polish-final <caminho-do-canvas>
+```
+
+Publicação pelo fluxo autorizado do projeto: build Vite de produção, sem suíte
+de testes, typecheck, prebuild ou revisão de navegador.
+
 ## Refinamento 7: apoio, deslocamento e repercussão
 
 Durante puxadas, sacudidas, investidas e rajadas, os apoios passam a ser definidos no espaço da rua. O movimento do tronco é compensado nas patas, e os joelhos são reconstruídos pelo mesmo esqueleto articulado do jogo. A preparação reposiciona uma pata por vez nos passos 2–14 e 13–25. Puxadas usam uma base recuada sob o quadril para evitar alongar a perna dianteira além do alcance. O fim da performance libera os apoios em sequência.
