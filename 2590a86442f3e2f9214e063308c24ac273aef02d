@@ -1,0 +1,18 @@
+Technical documentation supplement for 2590a86442f3e2f9214e063308c24ac273aef02d
+
+Enrich Hypothetical background choreography and environmental reactions
+
+Behavior
+Replace the repeating background playlist with a seeded weighted repertoire and add autonomous environmental incidents and responses.
+
+Implementation
+AftermathRepertoire weights neglected actions, avoids recent repetitions and alternates action families. AFTERMATH_ACTIONS adds shake and breach; aftermathShotPoint() samples a shared aiming path for each shot. New AftermathEnvironment schedules creak, settle, rattle, draft and leak incidents on eligible visible props. HypotheticalAftermath reacts to invitations, coordinates follow-up actions and forwards incident sounds; environment art renders the surviving hardware.
+
+Scope and limitations
+Updates handling motion and adds orchestration.mp4 and pose-study.json under debris-interactions-2026-10-19. Rendering does not consume the director random stream. Incident scheduling excludes occupied or moving props.
+
+Publication evidence
+A successful local publisher receipt identifies build `2590a86442f3e2f9214e063308c24ac273aef02d-442a2e15aeb5` for this exact source commit. The report records `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its build-log SHA-256 is `608df969c19212c3162ea253715ba0d6c900b684c9dd8d3307eee2281357bbb5`. This establishes recorded build/publication completion, not gameplay correctness.
+
+Full file inventory and provenance: docs/commits/2026-10-19/2590a86.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
