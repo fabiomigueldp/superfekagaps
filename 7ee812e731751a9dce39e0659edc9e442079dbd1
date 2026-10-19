@@ -1,0 +1,26 @@
+Technical documentation supplement for 7ee812e731751a9dce39e0659edc9e442079dbd1
+
+feat(hipotetico): finish helicopter arrival choreography and native preview
+
+Refine helicopter debris support and publish the initial native scene study.
+
+Implementation
+AircraftBody gains flatten. aircraftPoint() applies foreshortening shared by drawing and support geometry; door and panel bodies begin flattening after contact. Small chip contact uses the rotated lower edge rather than a generic radius.
+
+The aircraft impact rim response is constrained to the impact interval. HypotheticalScenery moves the siege sun and its canal reflection away from the projectile composition.
+
+Adds the helicopter-cinematic-2026-10-19 review page, README, art-study.json, twelve story stills, storyboard and helicopter-sequence.mp4, and links it from the encounter preview. Runtime integration and audio already exist in 4057d1a.
+
+Timing and limitations
+The inserted arrival interval is inherited: HELICOPTER_SEQUENCE starts at story tick 304 and reserves 372 ticks at 60 Hz. This commit does not introduce that clock mapping.
+
+The first video is eight seconds at 30 fps from a 60 Hz scene. Later revisions replace footage and metadata; immutable source links below preserve this original version.
+
+Authoring material
+All newly committed PNG, MP4 and JSON study files are under docs/world/hipotetico/helicopter-cinematic-2026-10-19/. They are review outputs, not textures or video played by the runtime.
+
+Publication evidence
+A retained successful publisher response identifies build `7ee812e731751a9dce39e0659edc9e442079dbd1-a55b3c1afb9a` for this exact source revision. The matching request records command `node node_modules/vite/bin/vite.js build`, `tests: not-run` and `publicationMode: manual-no-tests`. Its saved build-log SHA-256 is `fb4a63cdde34625bea379d126989cd38552ab7cbeb405ff7fd8be58b22bef2bb`. This records build and activation completion; it is not evidence of correct gameplay, audio quality or passing tests.
+
+Full source map and patch inventory: docs/commits/2026-10-19-followup/7ee812e.md
+No tests, typecheck, browser review or authoring renders were run for this retrospective.
